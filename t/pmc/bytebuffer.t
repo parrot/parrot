@@ -151,27 +151,10 @@ end:
     is(n, 4, "getting ascii from buffer gives correct length")
     is(s, "abcd", "getting ascii from buffer gives correct content")
 
-    $I0 = hasicu()
-    unless $I0 goto skip_it
-
     bb = new ['ByteBuffer']
 
     # Upper case n tilde: codepoint 0xD1, utf8 encoding 0xC3, 0x91
-    #bb = utf16:"\x{D1}"
-    # Can't do that, or the program can't be compiled without ICU.
-    # Fill the buffer with bytes instead.
-
-    # Get endianess to set the bytes in the appropriate order.
-    # *** XXX *** Need report from big endian platforms.
-    big = isbigendian()
-    if big goto isbig
-    bb[0] = 0xD1
-    bb[1] = 0x00
-    goto doit
-isbig:
-    bb[0] = 0x00
-    bb[1] = 0xD1
-doit:
+    bb = utf16:"\x{D1}"
     s = bb.'get_string'('utf16')
     n = length s
     is(n, 1, "getting utf16 from buffer gives correct length")
@@ -185,10 +168,6 @@ doit:
     is(n, 1, "getting utf8 from buffer gives correct length")
     n = ord s
     is(n, 0xD1, "getting utf8 from buffer gives correct codepoint")
-    goto end
-skip_it:
-    skip(4, "this test needs ICU")
-end:
 .end
 
 .sub test_push
@@ -279,10 +258,7 @@ test_negative:
     .local pmc bb
     .local int i, big, pos, b0, b1, c
 
-    $I0 = hasicu()
-    unless $I0 goto skip_it
-
-    # Get endianess to set the bytes in the appropriate order.
+    # Get endianess to set the bytes in the appropiate order.
     # *** XXX *** Need report from big endian platforms.
     big = isbigendian()
 
@@ -328,9 +304,6 @@ loopcheck:
 failed:
     say i
     ok(0, "reallocation")
-    goto end
-skip_it:
-    skip(1, "this test needs ICU")
 end:
 .end
 

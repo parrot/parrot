@@ -24,47 +24,32 @@ This file implements encoding functions for binary strings.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* binary_change_case(PARROT_INTERP, SHIM(const STRING *src))
-        __attribute__nonnull__(1);
-
-PARROT_CANNOT_RETURN_NULL
 static STRING * binary_chr(PARROT_INTERP, UINTVAL codepoint)
         __attribute__nonnull__(1);
 
-static INTVAL binary_find_cclass(SHIM_INTERP,
-    SHIM(INTVAL flags),
-    SHIM(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count);
+PARROT_CANNOT_RETURN_NULL
+static STRING* binary_error(PARROT_INTERP, SHIM(const STRING *src))
+        __attribute__nonnull__(1);
 
-static INTVAL binary_find_not_cclass(SHIM_INTERP,
-    SHIM(INTVAL flags),
-    SHIM(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count);
-
-static INTVAL binary_is_cclass(SHIM_INTERP,
-    SHIM(INTVAL flags),
-    SHIM(const STRING *src),
-    SHIM(UINTVAL offset));
+static UINTVAL binary_scan(PARROT_INTERP, ARGIN(const STRING *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* binary_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL binary_validate(SHIM_INTERP, SHIM(const STRING *src));
-#define ASSERT_ARGS_binary_change_case __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_binary_chr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_binary_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_binary_find_not_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_binary_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_binary_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_binary_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_binary_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_binary_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -74,6 +59,25 @@ static UINTVAL binary_validate(SHIM_INTERP, SHIM(const STRING *src));
 
 #define EXCEPTION(err, str) \
     Parrot_ex_throw_from_c_args(interp, NULL, (err), (str))
+
+
+/*
+
+=item C<static STRING* binary_error(PARROT_INTERP, const STRING *src)>
+
+Throws an exception because of an invalid operation on a binary string.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static STRING*
+binary_error(PARROT_INTERP, SHIM(const STRING *src))
+{
+    ASSERT_ARGS(binary_error)
+    EXCEPTION(EXCEPTION_INVALID_ENCODING, "Invalid operation on binary string");
+}
 
 
 /*
@@ -91,14 +95,8 @@ static STRING*
 binary_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(binary_to_encoding)
-    STRING      *dest;
 
-    dest           = Parrot_str_clone(interp, src);
-    dest->encoding = Parrot_binary_encoding_ptr;
-    dest->strlen   = dest->bufused;
-    dest->hashval  = 0;
-
-    return dest;
+    return fixed8_to_encoding(interp, src, Parrot_binary_encoding_ptr);
 }
 
 
@@ -126,98 +124,21 @@ binary_chr(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<static UINTVAL binary_validate(PARROT_INTERP, const STRING *src)>
+=item C<static UINTVAL binary_scan(PARROT_INTERP, const STRING *src)>
 
-Returns 1. All sequential data is valid binary data.
+Returns the number of codepoints in string C<src>. No scanning needed
+for fixed encodings.
 
 =cut
 
 */
 
-/* Binary's always valid */
 static UINTVAL
-binary_validate(SHIM_INTERP, SHIM(const STRING *src))
+binary_scan(PARROT_INTERP, ARGIN(const STRING *src))
 {
-    ASSERT_ARGS(binary_validate)
-    return 1;
-}
+    ASSERT_ARGS(binary_scan)
 
-
-/*
-
-=item C<static INTVAL binary_is_cclass(PARROT_INTERP, INTVAL flags, const STRING
-*src, UINTVAL offset)>
-
-Returns Boolean.
-
-=cut
-
-*/
-
-static INTVAL
-binary_is_cclass(SHIM_INTERP, SHIM(INTVAL flags), SHIM(const STRING *src), SHIM(UINTVAL offset))
-{
-    ASSERT_ARGS(binary_is_cclass)
-    return 0;
-}
-
-
-/*
-
-=item C<static INTVAL binary_find_cclass(PARROT_INTERP, INTVAL flags, const
-STRING *src, UINTVAL offset, UINTVAL count)>
-
-Find a character in the given character class.
-
-=cut
-
-*/
-
-static INTVAL
-binary_find_cclass(SHIM_INTERP, SHIM(INTVAL flags),
-            SHIM(const STRING *src), UINTVAL offset, UINTVAL count)
-{
-    ASSERT_ARGS(binary_find_cclass)
-    return offset + count;
-}
-
-
-/*
-
-=item C<static INTVAL binary_find_not_cclass(PARROT_INTERP, INTVAL flags, const
-STRING *src, UINTVAL offset, UINTVAL count)>
-
-Returns C<INTVAL>.
-
-=cut
-
-*/
-
-static INTVAL
-binary_find_not_cclass(SHIM_INTERP, SHIM(INTVAL flags),
-               SHIM(const STRING *src), UINTVAL offset, UINTVAL count)
-{
-    ASSERT_ARGS(binary_find_not_cclass)
-    return offset;
-}
-
-
-/*
-
-=item C<static STRING* binary_change_case(PARROT_INTERP, const STRING *src)>
-
-Throws an exception because we cannot change case of a binary string.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-static STRING*
-binary_change_case(PARROT_INTERP, SHIM(const STRING *src))
-{
-    ASSERT_ARGS(binary_change_case)
-    EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't change case of binary data");
+    return src->bufused;
 }
 
 
@@ -235,26 +156,25 @@ static STR_VTABLE Parrot_binary_encoding = {
     fixed8_index,
     fixed8_rindex,
     fixed8_hash,
-    binary_validate,
 
-    fixed8_scan,
+    binary_scan,
     fixed8_ord,
     fixed_substr,
 
-    binary_is_cclass,
-    binary_find_cclass,
-    binary_find_not_cclass,
+    (str_vtable_is_cclass_t)binary_error,
+    (str_vtable_find_cclass_t)binary_error,
+    (str_vtable_find_not_cclass_t)binary_error,
 
-    encoding_get_graphemes,
-    fixed8_compose,
-    encoding_decompose,
+    (str_vtable_get_graphemes_t)binary_error,
+    (str_vtable_compose_t)binary_error,
+    (str_vtable_decompose_t)binary_error,
 
-    binary_change_case,
-    binary_change_case,
-    binary_change_case,
-    binary_change_case,
-    binary_change_case,
-    binary_change_case,
+    (str_vtable_upcase_t)binary_error,
+    (str_vtable_downcase_t)binary_error,
+    (str_vtable_titlecase_t)binary_error,
+    (str_vtable_upcase_first_t)binary_error,
+    (str_vtable_downcase_first_t)binary_error,
+    (str_vtable_titlecase_first_t)binary_error,
 
     fixed8_iter_get,
     fixed8_iter_skip,

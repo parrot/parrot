@@ -18,6 +18,7 @@ UCS-4 encoding
 */
 
 #include "parrot/parrot.h"
+#include "../unicode.h"
 #include "shared.h"
 
 /* HEADERIZER HFILE: none */
@@ -44,10 +45,11 @@ static UINTVAL ucs4_iter_get_and_advance(SHIM_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*i);
 
-static void ucs4_iter_set_and_advance(SHIM_INTERP,
+static void ucs4_iter_set_and_advance(PARROT_INTERP,
     ARGMOD(STRING *str),
     ARGMOD(String_iter *i),
     UINTVAL c)
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*str)
@@ -72,7 +74,8 @@ static UINTVAL ucs4_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static UINTVAL ucs4_scan(SHIM_INTERP, ARGIN(const STRING *src))
+static UINTVAL ucs4_scan(PARROT_INTERP, ARGIN(const STRING *src))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -90,7 +93,8 @@ static STRING * ucs4_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_ucs4_iter_set_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(str) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_ucs4_iter_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(i))
@@ -100,7 +104,8 @@ static STRING * ucs4_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ucs4_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(src))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ucs4_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -124,24 +129,23 @@ static STRING *
 ucs4_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(ucs4_to_encoding)
-    UINTVAL       len;
-    STRING       *res;
-    Parrot_UInt4 *buf;
+    const UINTVAL  len = src->strlen;
+    STRING        *res;
+    utf32_t       *ptr;
 
     if (src->encoding == Parrot_ucs4_encoding_ptr)
-        return Parrot_str_clone(interp, src);
+        return Parrot_str_copy(interp, src);
 
-    len = STRING_length(src);
     res = Parrot_str_new_init(interp, NULL, len * 4,
             Parrot_ucs4_encoding_ptr, 0);
-    buf = (Parrot_UInt4 *) res->strstart;
+    ptr = (utf32_t *)res->strstart;
 
     if (STRING_max_bytes_per_codepoint(src) == 1) {
-        const unsigned char *s = (const unsigned char *)src->strstart;
+        const unsigned char *s = (unsigned char *)src->strstart;
         UINTVAL i;
 
         for (i = 0; i < len; i++) {
-            buf[i] = s[i];
+            ptr[i] = s[i];
         }
     }
     else {
@@ -150,7 +154,7 @@ ucs4_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         STRING_ITER_INIT(interp, &iter);
 
         while (iter.charpos < len) {
-            buf[iter.charpos] = STRING_iter_get_and_advance(interp, src, &iter);
+            ptr[iter.charpos] = STRING_iter_get_and_advance(interp, src, &iter);
         }
     }
 
@@ -173,11 +177,26 @@ Returns the number of codepoints in string C<src>.
 
 PARROT_WARN_UNUSED_RESULT
 static UINTVAL
-ucs4_scan(SHIM_INTERP, ARGIN(const STRING *src))
+ucs4_scan(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(ucs4_scan)
+    const utf32_t * const ptr = (utf32_t *)src->strstart;
+    const UINTVAL         len = src->bufused >> 2;
+    UINTVAL               i;
 
-    return src->bufused >> 2;
+    if (src->bufused & 3)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
+            "Unaligned end in UCS-4 string\n");
+
+    for (i = 0; i < len; ++i) {
+        UINTVAL c = ptr[i];
+
+        if (UNICODE_IS_INVALID(c))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
+                    "Invalid character in UCS-4 string\n");
+    }
+
+    return len;
 }
 
 
@@ -195,8 +214,8 @@ static UINTVAL
 ucs4_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 {
     ASSERT_ARGS(ucs4_ord)
-    const UINTVAL  len = STRING_length(src);
-    const Parrot_UInt4 *s;
+    const utf32_t * const ptr = (utf32_t *)src->strstart;
+    const UINTVAL         len = src->strlen;
 
     if (idx < 0)
         idx += len;
@@ -204,9 +223,7 @@ ucs4_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
     if ((UINTVAL)idx >= len)
         encoding_ord_error(interp, src, idx);
 
-    s = (const Parrot_UInt4 *)src->strstart;
-
-    return s[idx];
+    return ptr[idx];
 }
 
 
@@ -226,9 +243,9 @@ ucs4_iter_get(SHIM_INTERP,
     ARGIN(const STRING *str), ARGIN(const String_iter *i), INTVAL offset)
 {
     ASSERT_ARGS(ucs4_iter_get)
-    const Parrot_UInt4 * const s = (const Parrot_UInt4 *)str->strstart;
+    const utf32_t * const ptr = (utf32_t *)str->strstart;
 
-    return s[i->charpos + offset];
+    return ptr[i->charpos + offset];
 }
 
 
@@ -270,10 +287,10 @@ ucs4_iter_get_and_advance(SHIM_INTERP,
     ARGIN(const STRING *str), ARGMOD(String_iter *i))
 {
     ASSERT_ARGS(ucs4_iter_get_and_advance)
-    const Parrot_UInt4 * const s = (const Parrot_UInt4 *)str->strstart;
-    const UINTVAL c = s[i->charpos];
+    const utf32_t * const ptr = (utf32_t *)str->strstart;
+    const UINTVAL         c   = ptr[i->charpos];
 
-    i->charpos++;
+    i->charpos += 1;
     i->bytepos += 4;
 
     return c;
@@ -293,15 +310,19 @@ next position in the string.
 */
 
 static void
-ucs4_iter_set_and_advance(SHIM_INTERP,
+ucs4_iter_set_and_advance(PARROT_INTERP,
     ARGMOD(STRING *str), ARGMOD(String_iter *i), UINTVAL c)
 {
     ASSERT_ARGS(ucs4_iter_set_and_advance)
-    Parrot_UInt4 * const s = (Parrot_UInt4 *)str->strstart;
+    utf32_t * const ptr = (utf32_t *)str->strstart;
 
-    s[i->charpos] = c;
+    if (UNICODE_IS_INVALID(c))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
+                "Invalid character in UCS-4 string\n");
 
-    i->charpos++;
+    ptr[i->charpos] = c;
+
+    i->charpos += 1;
     i->bytepos += 4;
 }
 
@@ -344,16 +365,13 @@ ucs4_hash(SHIM_INTERP, ARGIN(const STRING *src), size_t hashval)
 {
     ASSERT_ARGS(ucs4_hash)
     DECL_CONST_CAST;
-    STRING * const s = PARROT_const_cast(STRING *, src);
-    const Parrot_UInt4 *pos;
-    UINTVAL len;
-
-    pos = (const Parrot_UInt4 *)s->strstart;
-    len = s->strlen;
+    STRING * const  s   = PARROT_const_cast(STRING *, src);
+    const utf32_t  *ptr = (utf32_t *)s->strstart;
+    UINTVAL         len = s->strlen;
 
     while (len--) {
         hashval += hashval << 5;
-        hashval += *(pos++);
+        hashval += *(ptr++);
     }
 
     s->hashval = hashval;
@@ -376,7 +394,6 @@ static STR_VTABLE Parrot_ucs4_encoding = {
     encoding_index,
     encoding_rindex,
     ucs4_hash,
-    unicode_validate,
 
     ucs4_scan,
     ucs4_ord,

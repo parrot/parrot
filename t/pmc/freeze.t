@@ -377,7 +377,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "thaw class into new interpreter" );
 .const string fpmc = "temp.fpmc"
 .sub 'main' :main
     $P0 = new ['FileHandle']
-    $P0.'open'(fpmc, 'r')
+    $P0.'open'(fpmc, 'rb')
     if $P0 goto ok1
 
     $P0 = getinterp
@@ -447,7 +447,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr into new interpreter" );
 .const string fpmc = "temp.fpmc"
 .sub 'main' :main
     $P0 = new ['FileHandle']
-    $P0.'open'(fpmc, 'r')
+    $P0.'open'(fpmc, 'rb')
     if $P0 goto ok1
 
     $P0 = getinterp
@@ -590,7 +590,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into new interpreter" )
 .const string fpmc = 'temp.fpmc'
 .sub 'main' :main
     $P0 = new ['FileHandle']
-    $P0.'open'(fpmc, 'r')
+    $P0.'open'(fpmc, 'rb')
     if $P0 goto ok1
 
     $P0 = getinterp
