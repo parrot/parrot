@@ -11,7 +11,7 @@ use File::Copy;
 use File::Path qw( mkpath );
 use File::Spec;
 use File::Temp qw( tempdir );
-use Test::More qw(no_plan); # tests => 15;
+use Test::More qw(no_plan); # tests => 46;
 use lib qw( lib );
 use Parrot::Headerizer::Object;
 use IO::CaptureOutput qw| capture |;
@@ -269,6 +269,44 @@ my $cwd = cwd();
     }
     chdir $cwd or croak "Unable to chdir back after testing";
 }
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    chdir $tdir or croak "Unable to chdir during testing";
+
+    my $stub = 'fixedbooleanarray';
+    my $srcdir    = File::Spec->catpath( $tdir, 'src', 'pmc' );
+    mkpath( $srcdir, 0, 0777 );
+    my $srco      = File::Spec->catfile( $srcdir, "$stub.o" );
+    touchfile($srco);
+    my $srcc      = File::Spec->catfile( $srcdir, "$stub.c" );
+    copy "$cwd/t/tools/dev/headerizer/testlib/${stub}_pmc.in" => $srcc
+        or croak "Unable to copy";
+
+    $self = Parrot::Headerizer::Object->new();
+    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self->get_sources($srco);
+    ok( ! keys %{$self->{sourcefiles}},
+        "no sourcefiles" );
+    ok( keys %{$self->{sourcefiles_with_statics}},
+        "sourcefiles_with_statics" );
+    ok( ! keys %{$self->{api}},
+        "no api" );
+
+    $self->process_sources();
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_final_message; },
+            \$stdout,
+            \$stderr,
+        );
+        like($stdout, qr/Headerization complete/,
+            "Got expected final message" );
+    }
+    chdir $cwd or croak "Unable to chdir back after testing";
+}
+
 pass("Completed all tests in $0");
 
 sub touchfile {
