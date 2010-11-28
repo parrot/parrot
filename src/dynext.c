@@ -685,7 +685,10 @@ PMC *
 Parrot_dyn_load_lib(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), ARGIN_NULLOK(PMC *parameters))
 {
     ASSERT_ARGS(Parrot_dyn_load_lib)
-    void   *handle;
+    /* NULL intializa handle to protect against pitfalls in called functions.
+     * This function should not be so speed critical that this has any impact.
+     */
+    void   *handle = NULL;
     PMC    *lib_pmc;
     STRING *path;
     STRING *lib_name, *wo_ext, *ext;    /* library stem without path
