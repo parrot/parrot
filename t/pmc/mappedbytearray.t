@@ -17,9 +17,24 @@ Tests the MappedByteArray PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(2)
+    .const int inittests = 3
+    .const int moretests = 1
+    .local int alltests
+    alltests = inittests + moretests
+    plan(alltests)
 
     test_init()
+    .local int supported
+    supported = test_supported()
+
+    if supported goto more
+    skip(moretests, "Mapped files not supported in this platform")
+    goto end
+
+  more:
+    ok(1, "Mapped files are supported")
+
+  end:
 .end
 
 # Basic tests, must pass even when mapped files are not supported.
@@ -35,6 +50,16 @@ Tests the MappedByteArray PMC.
     r = 1
   check:
     ok(r, 'get_bool gives false when unopened')
+.end
+
+# Test the 'supported' method and return its result.
+.sub test_supported
+    .local pmc mm
+    .local int r
+    mm = new ['MappedByteArray']
+    r = mm.'supported'()
+    ok(1, "method 'supported' called")
+    .return(r)
 .end
 
 # Local Variables:
