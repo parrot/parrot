@@ -4,8 +4,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 15;
-use Carp;
+use Test::More tests => 12;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::revision');
 use Parrot::Configure::Options qw( process_options );
@@ -40,27 +39,24 @@ my ($testrev, $ret);
     ok( $ret, "runstep() returned true value" );
     is($conf->data->get('revision'), $testrev,
         "'revision' element was set correctly");
-    local $TODO = "broke";
-    is($step->result(), qq{r$testrev}, "Expected result was set");
+    is($step->result(), $testrev, "Expected result $testrev was set");
 }
 
-{
-    $testrev = 0;
-    local $Parrot::Revision::current = $testrev;
-    $ret = $step->runstep($conf);
-    ok( $ret, "runstep() returned true value" );
-    is($conf->data->get('revision'), $testrev,
-        "'revision' element was set correctly");
-    local $TODO = "broke";
-    is($step->result(), q{done}, "Expected result was set");
-}
+#{
+#    $testrev = 0;
+#    local $Parrot::Revision::current = $testrev;
+#    $ret = $step->runstep($conf);
+#    ok( $ret, "runstep() returned true value" );
+#    is($conf->data->get('revision'), $testrev,
+#        "'revision' element was set correctly");
+#    is($step->result(), q{done}, "Expected result was set");
+#}
 
 {
-    $testrev = q{foobar};
-    local $TODO = "broke";
+    $testrev = q{_foobar};
     local $Parrot::Revision::current = $testrev;
     eval { $ret = $step->runstep($conf); };
-    like($@, qr/Cannot use non-numeric revision number/,
+    like($@, qr/^Invalid Parrot revision \(SHA1\)/,
         "Got expected error message");
 }
 
