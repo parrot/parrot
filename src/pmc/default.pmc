@@ -20,7 +20,7 @@ generated from F<src/vtable.tbl> by F<tools/build/pmc2c.pl>.
 
 */
 
-#define INT2KEY(i, k) key_new_integer((i), (k))
+#define INT2KEY(i, k) Parrot_key_new_integer((i), (k))
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */

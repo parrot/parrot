@@ -1814,7 +1814,7 @@ clone_key_arg(PARROT_INTERP, ARGIN(PMC *key))
     if (key->vtable->base_type != enum_class_Key)
         return key;
 
-    for (t = key; t; t=key_next(interp, t)) {
+    for (t = key; t; t=Parrot_key_next(interp, t)) {
         /* register keys have to be cloned */
         if (PObj_get_FLAGS(key) & KEY_register_FLAG) {
             return VTABLE_clone(interp, key);

@@ -1640,9 +1640,9 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
             regno = r->color >= 0 ? r->color : -1 - r->color;
 
             if (r->set == 'I')
-                key_set_register(interp, tail, regno, KEY_integer_FLAG);
+                Parrot_key_set_register(interp, tail, regno, KEY_integer_FLAG);
             else if (r->set == 'S')
-                key_set_register(interp, tail, regno, KEY_string_FLAG);
+                Parrot_key_set_register(interp, tail, regno, KEY_string_FLAG);
             else
                 IMCC_fatal(interp, 1, "build_key: wrong register set\n");
 
@@ -1658,11 +1658,11 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
             switch (r->set) {
               case 'S':                       /* P["key"] */
                 /* str constant */
-                key_set_string(interp, tail, ct->str.constants[r->color]);
+                Parrot_key_set_string(interp, tail, ct->str.constants[r->color]);
                 break;
               case 'I':                       /* P[;42;..] */
                 /* int constant */
-                key_set_integer(interp, tail, atol(r->name));
+                Parrot_key_set_integer(interp, tail, atol(r->name));
                 break;
               default:
                 IMCC_fatal(interp, 1, "build_key: unknown set\n");
@@ -1675,7 +1675,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
     }
 
     {
-        STRING *name      = key_set_to_string(interp, head);
+        STRING *name      = Parrot_key_set_to_string(interp, head);
         const char *cname = Parrot_str_to_cstring(interp, name);
         SymReg * const r  = _get_sym(&IMCC_INFO(interp)->globals->cs->key_consts, cname);
 

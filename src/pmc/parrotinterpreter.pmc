@@ -458,7 +458,7 @@ Introspection interface. C<key> can be:
     VTABLE PMC *get_pmc_keyed(PMC *key) {
         PMC    *nextkey;
         STRING *outer = NULL;
-        STRING *item  = key_string(INTERP, key);
+        STRING *item  = Parrot_key_string(INTERP, key);
         STRING *name  = CONST_STRING(INTERP, "globals");
         int     level = 0;
 
@@ -471,7 +471,7 @@ Introspection interface. C<key> can be:
 
         if (STRING_equal(INTERP, item, name)) {
             outer   = item;
-            nextkey = key_next(INTERP, key);
+            nextkey = Parrot_key_next(INTERP, key);
 
             if (nextkey && (PObj_get_FLAGS(nextkey) & KEY_string_FLAG)) {
                 key  = nextkey;
@@ -479,7 +479,7 @@ Introspection interface. C<key> can be:
             }
         }
 
-        nextkey = key_next(INTERP, key);
+        nextkey = Parrot_key_next(INTERP, key);
 
         if (nextkey)
             level = VTABLE_get_integer(INTERP, nextkey);

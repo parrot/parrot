@@ -21,7 +21,7 @@ Lower bit in cell masked to indicate pointer-to-free-cell.
 
 /* Calculate size of chunk data     "header"  */
 #define CHUNK_SIZE 4096
-#define CELL_PER_CHUNK ((CHUNK_SIZE - 2 * sizeof(size_t) / sizeof (void *)))
+#define CELL_PER_CHUNK ((CHUNK_SIZE - 2 * sizeof(size_t)) / sizeof (void *))
 
 typedef struct Parrot_Pointer_Array_Chunk {
     size_t   num_free;
@@ -105,7 +105,7 @@ void Parrot_pa_remove(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(ptr))
-#define ASSERT_ARGS_Parrot_pa_is_owned __attribute__unused__ int _ASSERT_ARGS_C = (\
+#define ASSERT_ARGS_Parrot_pa_is_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(orig))
