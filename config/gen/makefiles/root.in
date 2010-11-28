@@ -25,16 +25,16 @@ CONFIG_ARGS     = @configure_args@
 # Override at least PREFIX with the install location if you're going
 # to be using this outside of your build area.
 BUILDPREFIX     =
-PREFIX          = @prefix@
-EXEC_PREFIX     = @exec_prefix@
+PREFIX          = "@prefix@"
+EXEC_PREFIX     = "@exec_prefix@"
 DESTDIR         =
-BIN_DIR         = @bindir@
-LIB_DIR         = @libdir@
-INCLUDE_DIR     = @includedir@
-DATA_DIR        = @datadir@
-DOC_DIR         = @docdir@
-VERSION_DIR     = @versiondir@
-
+BIN_DIR         = "@bindir@"
+LIB_DIR         = "@libdir@"
+INCLUDE_DIR     = "@includedir@"
+DATA_DIR        = "@datadir@"
+DOC_DIR         = "@docdir@"
+VERSION_DIR     = "@versiondir@"
+SRC_DIR         = "@srcdir@"
 
 ###############################################################################
 #
@@ -2570,7 +2570,7 @@ install-dev-only: installable
     --destdir=$(DESTDIR) \
     --docdir=$(DOC_DIR) \
     --datadir=$(DATA_DIR) \
-    --srcdir=@srcdir@ \
+    --srcdir=$(SRC_DIR) \
     --versiondir=$(VERSION_DIR) \
     MANIFEST MANIFEST.generated
 
