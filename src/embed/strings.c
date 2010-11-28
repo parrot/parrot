@@ -10,7 +10,8 @@ Parrot_api_string_export_ascii(Parrot_PMC interp_pmc, ARGIN(Parrot_String string
 {
     //ASSERT_ARGS(Parrot_api_string_export)
     EMBED_API_CALLIN(interp_pmc, interp);
-    *strout = Parrot_str_to_cstring(interp, string);
+    if(!STRING_IS_NULL(string))
+      *strout = Parrot_str_to_cstring(interp, string);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
@@ -19,7 +20,6 @@ Parrot_Int
 Parrot_api_string_free_exported_ascii(Parrot_PMC interp_pmc, ARGIN(char * const str))
 {
     EMBED_API_CALLIN(interp_pmc, interp);
-    // Do we need the interp_pmc ???
     if(!STRING_IS_NULL(str))
       Parrot_str_free_cstring(str);
     EMBED_API_CALLOUT(interp_pmc, interp);

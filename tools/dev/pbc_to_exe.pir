@@ -65,7 +65,7 @@ Compile bytecode to executable.
 #include "parrot/api.h"
 const void * get_program_code(void);
 int Parrot_set_config_hash(Parrot_PMC interp_pmc);
-static void get_last_error(Parrot_PMC interp);
+static void show_last_error_and_exit(Parrot_PMC interp);
     #define TRACE 0
 HEADER
 
@@ -94,26 +94,21 @@ HEADER
                   Parrot_api_set_executable_name(interp, argv[0]) &&
                   Parrot_api_set_runcore(interp, RUNCORE, TRACE))) {
                 fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
-                get_last_error(interp);
-                exit(EXIT_FAILURE);
+                show_last_error_and_exit(interp);
             }
 
             //Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
 
             if (!Parrot_api_load_bytecode_bytes(interp, program_code_addr, bytecode_size, &pbc)) {
                 fprintf(stderr, "PARROT VM: Could not load bytecode");
-                get_last_error(interp);
-                exit(EXIT_FAILURE);
+                show_last_error_and_exit(interp);
             }
             if (!Parrot_api_build_argv_array(interp, argc, argv, &argsarray)) {
                 fprintf(stderr, "PARROT VM: Could not build args array");
-                get_last_error(interp);
-                exit(EXIT_FAILURE);
+                show_last_error_and_exit(interp);
             }
             if (!Parrot_api_run_bytecode(interp, pbc, argsarray)) {
-                fprintf(stderr, "PARROT VM: Execution failed");
-                get_last_error(interp);
-                exit(EXIT_FAILURE);
+                show_last_error_and_exit(interp);
             }
 
             Parrot_api_destroy_interpreter(interp);
@@ -121,17 +116,23 @@ HEADER
         }
 
         static void
-        get_last_error(Parrot_PMC interp)
+        show_last_error_and_exit(Parrot_PMC interp)
         {
             Parrot_String errmsg;
-            char * errmsg_raw;
-            if (Parrot_api_get_last_error(interp, &errmsg) &&
-                Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw)) {
-                fprintf(stderr, "PARROT VM: Catastrophic error. Cannot recover\n");
+            Parrot_Int exit_code;
+            Parrot_Int is_error;
+            if (!Parrot_api_get_result(interp, &is_error, &exit_code, &errmsg)){
+                fprintf(stderr, "PARROT VM: Cannot recover\n");
+                exit(EXIT_FAILURE);
+            }
+
+            if (errmsg) {
+                char * errmsg_raw;
+                Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw);
+                fprintf(stderr, "PARROT VM: %s\n", errmsg_raw);
                 Parrot_api_string_free_exported_ascii(interp, errmsg_raw);
             }
-            else
-                fprintf(stderr, "PARROT VM: %s\n", errmsg_raw);
+            exit(exit_code);
         }
 
 MAIN

@@ -7,11 +7,15 @@
 
 PARROT_API
 Parrot_Int
-Parrot_api_get_last_error(ARGMOD(PMC * interp_pmc), ARGOUT(Parrot_String * errmsg))
+Parrot_api_get_result(ARGMOD(PMC * interp_pmc), ARGOUT(Parrot_Int *is_error), 
+                      ARGOUT(Parrot_Int *exit_code), ARGOUT(Parrot_String * errmsg))
 {
     EMBED_API_CALLIN(interp_pmc, interp);
+    *exit_code = interp->exit_code;
     *errmsg = interp->final_error;
+    *is_error = !interp->exit_code && *errmsg;
     interp->final_error = NULL;
+    interp->exit_code = 0;
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 

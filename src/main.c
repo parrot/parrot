@@ -31,7 +31,7 @@ Start Parrot
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void get_last_error(Parrot_PMC interp);
+static void show_last_error_and_exit(Parrot_PMC interp);
 static void help(void);
 static void help_debug(void);
 PARROT_WARN_UNUSED_RESULT
@@ -76,7 +76,7 @@ static void usage(ARGMOD(FILE *fp))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*fp);
 
-#define ASSERT_ARGS_get_last_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_show_last_error_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_help_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_is_all_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -136,27 +136,22 @@ main(int argc, const char *argv[])
           Parrot_set_config_hash(interp) &&
           Parrot_api_set_executable_name(interp, argv[0]))) {
         fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
-        get_last_error(interp);
-        exit(EXIT_FAILURE);
+        show_last_error_and_exit(interp);
     }
 
     /* Parse flags */
     sourcefile = parseflags(interp, argc, argv, &pir_argc, &pir_argv, &core, &trace);
     if (!Parrot_api_set_runcore(interp, core, trace)) {
-        get_last_error(interp);
-        exit(EXIT_FAILURE);
+        show_last_error_and_exit(interp);
     }
 
     if (imcc_run_api(interp, sourcefile, argc, argv, &bytecodepmc)) {
         if (!Parrot_api_build_argv_array(interp, pir_argc, pir_argv, &argsarray)) {
             fprintf(stderr, "PARROT VM: Could not load or run bytecode");
-            get_last_error(interp);
-            exit(EXIT_FAILURE);
+            show_last_error_and_exit(interp);
         }
         if (!Parrot_api_run_bytecode(interp, bytecodepmc, argsarray)) {
-            fprintf(stderr, "PARROT VM: Could not load or run bytecode");
-            get_last_error(interp);
-            exit(EXIT_FAILURE);
+            show_last_error_and_exit(interp);
         }
     }
 
@@ -166,18 +161,23 @@ main(int argc, const char *argv[])
 }
 
 static void
-get_last_error(Parrot_PMC interp)
+show_last_error_and_exit(Parrot_PMC interp)
 {
     Parrot_String errmsg;
-    char * errmsg_raw = NULL;
-    if (Parrot_api_get_last_error(interp, &errmsg) &&
-        Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw)
-        ) {
-        fprintf(stderr, "PARROT VM: Catastrophic error. Cannot recover\n");
+    Parrot_Int exit_code;
+    Parrot_Int is_error;
+    if (!Parrot_api_get_result(interp, &is_error, &exit_code, &errmsg)){
+        fprintf(stderr, "PARROT VM: Cannot recover\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    if (errmsg) {
+        char * errmsg_raw;
+        Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw);
+        fprintf(stderr, "PARROT VM: %s\n", errmsg_raw);
         Parrot_api_string_free_exported_ascii(interp, errmsg_raw);
     }
-    else if (errmsg_raw != NULL)
-        fprintf(stderr, "PARROT VM: %s\n", errmsg_raw);
+    exit(exit_code);
 }
 
 /*

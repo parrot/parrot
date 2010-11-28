@@ -38,7 +38,7 @@ typedef enum {
     enum_DIS_HEADER    = 2
 } Parrot_disassemble_options;
 
-static void get_last_error(Parrot_PMC interp);
+static void show_last_error_and_exit(Parrot_PMC interp);
 
 /*
 
@@ -105,8 +105,7 @@ main(int argc, const char *argv[])
     if (!(Parrot_api_make_interpreter(NULL, 0, initargs, &interp) &&
           Parrot_api_set_executable_name(interp, argv[0]))) {
         fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
-        get_last_error(interp);
-        exit(EXIT_FAILURE);
+        show_last_error_and_exit(interp);
     }
 
     while ((status = longopt_get(argc, argv, options, &opt)) > 0) {
@@ -144,24 +143,29 @@ main(int argc, const char *argv[])
           Parrot_api_disassemble_bytecode(interp, pbc, outfile, option) &&
           Parrot_api_destroy_interpreter(interp))) {
         fprintf(stderr, "Error during disassembly\n");
-        get_last_error(interp);
-        exit(EXIT_FAILURE);
+        show_last_error_and_exit(interp);
     }
     exit(EXIT_SUCCESS);
 }
 
 static void
-get_last_error(Parrot_PMC interp)
+show_last_error_and_exit(Parrot_PMC interp)
 {
     Parrot_String errmsg;
-    char * errmsg_raw;
-    if (Parrot_api_get_last_error(interp, &errmsg) &&
-        Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw)) {
-        fprintf(stderr, "PARROT VM: Catastrophic error. Cannot recover\n");
+    Parrot_Int exit_code;
+    Parrot_Int is_error;
+    if (!Parrot_api_get_result(interp, &is_error, &exit_code, &errmsg)){
+        fprintf(stderr, "PARROT VM: Cannot recover\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    if (errmsg) {
+        char * errmsg_raw;
+        Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw);
+        fprintf(stderr, "PARROT VM: %s\n", errmsg_raw);
         Parrot_api_string_free_exported_ascii(interp, errmsg_raw);
     }
-    else
-        fprintf(stderr, "PARROT VM: %s\n", errmsg_raw);
+    exit(exit_code);
 }
 
 /*
