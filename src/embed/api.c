@@ -57,7 +57,7 @@ Parrot_api_set_runcore(ARGIN(PMC *interp_pmc), const char * corename, Parrot_UIn
         Parrot_set_run_core(interp, PARROT_SLOW_CORE);
     } else {
         Parrot_Run_core_t core = PARROT_SLOW_CORE;
-        if (!strcmp(corename, "slow"))
+        if (!strcmp(corename, "slow") || !strcmp(corename, "bounds"))
             core = PARROT_SLOW_CORE;
         else if (!strcmp(corename, "fast") || !strcmp(corename, "jit") || !strcmp(corename, "function"))
             core = PARROT_FAST_CORE;
