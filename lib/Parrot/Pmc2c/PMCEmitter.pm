@@ -627,7 +627,7 @@ EOC
 EOC
         foreach my $maps ( sort keys %{ $self->{flags}{maps} } ) {
             $cout .= <<"EOC";
-                Parrot_register_HLL_type( interp, hll_id, enum_class_$maps, entry);
+                Parrot_hll_register_HLL_type( interp, hll_id, enum_class_$maps, entry);
 EOC
         }
         $cout .= <<"EOC";

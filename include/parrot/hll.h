@@ -61,7 +61,7 @@ INTVAL Parrot_hll_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_register_HLL_type(PARROT_INTERP,
+void Parrot_hll_register_HLL_type(PARROT_INTERP,
     INTVAL hll_id,
     INTVAL core_type,
     INTVAL hll_type)
@@ -88,7 +88,7 @@ void Parrot_hll_init_HLL(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_hll_register_HLL __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hll_name))
-#define ASSERT_ARGS_Parrot_register_HLL_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_hll_register_HLL_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_hll_init_HLL __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

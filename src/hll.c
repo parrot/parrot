@@ -263,7 +263,7 @@ Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)
 
 /*
 
-=item C<void Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL
+=item C<void Parrot_hll_register_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL
 core_type, INTVAL hll_type)>
 
 Register a type mapping of C<< core_type => hll_type >> for the given HLL.
@@ -274,10 +274,10 @@ Register a type mapping of C<< core_type => hll_type >> for the given HLL.
 
 PARROT_EXPORT
 void
-Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
+Parrot_hll_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
         INTVAL core_type, INTVAL hll_type)
 {
-    ASSERT_ARGS(Parrot_register_HLL_type)
+    ASSERT_ARGS(Parrot_hll_register_HLL_type)
 
     if (hll_id == Parrot_get_HLL_id(interp, CONST_STRING(interp, "parrot")))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
