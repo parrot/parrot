@@ -54,8 +54,8 @@ There are 2 Git ports on Windows:
 msysgit 	(http://code.google.com/p/msysgit/downloads/list)
 TortoiseGit 	(http://code.google.com/p/tortoisegit/downloads/list)
 
-In Git, branches represent some major changes of source and tags represent different releases.
-You can view the list of branches and tags at http://github.com/parrot/parrot
+In Git, branches represent some major changes of source.
+You can view the list of branches at http://github.com/parrot/parrot
 To fetch the source from the master branch: 
 
 	git clone git://github.com/parrot/parrot.git
@@ -65,12 +65,6 @@ To fetch the source from a branch:
 	git clone git://github.com/parrot/parrot.git -b <branch>, e.g:
 
 	git clone git://github.com/parrot/parrot.git -b gsoc_threads
-
-To fetch the source from a tag:
-
-	git fetch git://github.com/parrot/parrot.git tag <tag>, e.g:
-
-	git fetch git://github.com/parrot/parrot.git tag RELEASE_2_10_1
 
 INSTRUCTIONS
 ------------
