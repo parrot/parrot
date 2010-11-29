@@ -106,10 +106,11 @@ an example of a few type signatures and what they mean:
    I->N     In: Integer             Out: Numeric
    Pi->     In: none (method call)  Out: none
    ->I      In: none                Out: Integer
+   ->       In: none                Out: none
 
-TODO: Multiple return values? Spaces? Is "->" valid ?
+TODO: Multiple return values? Spaces?
 
-There are four main datatypes that can be used in Parrot Type Signatures:
+There are four datatypes that can be used in Parrot Type Signatures:
 
     I <=> Parrot_Int
     N <=> Parrot_Float (Numeric)
