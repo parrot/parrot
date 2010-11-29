@@ -1,4 +1,5 @@
 #include "parrot/parrot.h"
+#include "parrot/runcore_api.h"
 #include "parrot/embed.h"
 #include "parrot/api.h"
 #include "embed_private.h"
@@ -53,26 +54,23 @@ Parrot_api_set_runcore(ARGIN(PMC *interp_pmc), const char * corename, Parrot_UIn
     ASSERT_ARGS(Parrot_api_set_runcore)
     EMBED_API_CALLIN(interp_pmc, interp)
     if (trace) {
-        Parrot_set_trace(interp, (Parrot_trace_flags)trace);
-        Parrot_set_run_core(interp, PARROT_SLOW_CORE);
+        Parrot_pcc_trace_flags_on(interp, interp->ctx, trace);
+        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
     } else {
-        Parrot_Run_core_t core = PARROT_SLOW_CORE;
         if (!strcmp(corename, "slow") || !strcmp(corename, "bounds"))
-            core = PARROT_SLOW_CORE;
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
         else if (!strcmp(corename, "fast") || !strcmp(corename, "jit") || !strcmp(corename, "function"))
-            core = PARROT_FAST_CORE;
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "fast"));
         else if (!strcmp(corename, "exec"))
-            core = PARROT_EXEC_CORE;
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "exec"));
         else if (!strcmp(corename, "trace"))
-            core = PARROT_SLOW_CORE; // !!!
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
         else if (!strcmp(corename, "profiling"))
-            core = PARROT_PROFILING_CORE;
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "profiling"));
         else if (!strcmp(corename, "gcdebug"))
-            core = PARROT_GC_DEBUG_CORE;
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "gcdebug"));
         else
             Parrot_ex_throw_from_c_args(interp, NULL, 1, "Invalid runcore type %s", corename);
-        Parrot_set_trace(interp, (Parrot_trace_flags)trace);
-        Parrot_set_run_core(interp, core);
     }
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
@@ -183,6 +181,12 @@ Parrot_api_run_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(PMC *mai
     PMC * main_sub = NULL;
 
     PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
+
+    /* Debugging mode nonsense. */
+    if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
+         Parrot_io_eprintf(interp, "*** Parrot VM: %Ss core ***\n",
+                 interp->run_core->name);
+     }
 
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
