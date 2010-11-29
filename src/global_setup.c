@@ -28,7 +28,7 @@ I<What are these global variables?>
 /* These functions are defined in the auto-generated file core_pmcs.c */
 /* XXX Get it into some public place */
 extern void Parrot_gbl_initialize_core_pmcs(PARROT_INTERP, int pass);
-void Parrot_register_core_pmcs(PARROT_INTERP, PMC* registry);
+void Parrot_gbl_register_core_pmcs(PARROT_INTERP, PMC* registry);
 
 static const unsigned char* parrot_config_stored = NULL;
 static unsigned int parrot_config_size_stored = 0;
@@ -242,7 +242,7 @@ parrot_global_setup_2(PARROT_INTERP)
 
     /* We need a class hash */
     interp->class_hash = classname_hash = Parrot_pmc_new(interp, enum_class_NameSpace);
-    Parrot_register_core_pmcs(interp, classname_hash);
+    Parrot_gbl_register_core_pmcs(interp, classname_hash);
 
     /* init the interpreter globals array */
     interp->iglobals = Parrot_pmc_new_init_int(interp,

@@ -15,7 +15,7 @@
 #include "parrot/config.h"
 #include "parrot/interpreter.h"
 
-void Parrot_register_core_pmcs(PARROT_INTERP, ARGIN(PMC *registry))
+void Parrot_gbl_register_core_pmcs(PARROT_INTERP, ARGIN(PMC *registry))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

@@ -131,7 +131,7 @@ static void register_pmc(PARROT_INTERP, ARGIN(PMC *registry), int pmc_id)
 }
 
 void
-Parrot_register_core_pmcs(PARROT_INTERP, ARGIN(PMC *registry))
+Parrot_gbl_register_core_pmcs(PARROT_INTERP, ARGIN(PMC *registry))
 {
 END_C
 
