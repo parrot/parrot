@@ -38,7 +38,7 @@ The method depends on your distribution. To install you should execute (as root 
 
 On Ubuntu/Debian (apt-based):
 
-	apt-get install core
+	apt-get install git-core
 
 On Red Hat, Fedora (rpm-based):
 
