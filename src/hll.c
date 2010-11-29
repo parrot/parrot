@@ -374,7 +374,7 @@ Parrot_hll_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)
 
 /*
 
-=item C<PMC* Parrot_get_ctx_HLL_namespace(PARROT_INTERP)>
+=item C<PMC* Parrot_hll_get_ctx_HLL_namespace(PARROT_INTERP)>
 
 Return root namespace of the current HLL.
 
@@ -386,9 +386,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC*
-Parrot_get_ctx_HLL_namespace(PARROT_INTERP)
+Parrot_hll_get_ctx_HLL_namespace(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_get_ctx_HLL_namespace)
+    ASSERT_ARGS(Parrot_hll_get_ctx_HLL_namespace)
     return Parrot_get_HLL_namespace(interp, Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
 }
 

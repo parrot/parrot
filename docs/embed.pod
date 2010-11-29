@@ -668,7 +668,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_gc_mark_PObj_alive>
 
-=item C<Parrot_get_ctx_HLL_namespace>
+=item C<Parrot_hll_get_ctx_HLL_namespace>
 
 =item C<Parrot_hll_get_ctx_HLL_type>
 

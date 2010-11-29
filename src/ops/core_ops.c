@@ -23719,7 +23719,7 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_get_hll_namespace_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     PREG(1) = hll_ns;
 
 return (opcode_t *)cur_opcode + 2;}
@@ -23727,7 +23727,7 @@ return (opcode_t *)cur_opcode + 2;}
 opcode_t *
 Parrot_get_hll_namespace_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     if (PMC_IS_NULL(hll_ns))
         PREG(1) = PMCNULL;
     else {
@@ -23740,7 +23740,7 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_get_hll_namespace_p_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     if (PMC_IS_NULL(hll_ns))
         PREG(1) = PMCNULL;
     else {
@@ -23871,7 +23871,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_get_hll_global_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     PREG(1) = Parrot_ns_find_global_from_op(interp, hll_ns, SREG(2), cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
@@ -23879,7 +23879,7 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_get_hll_global_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     PREG(1) = Parrot_ns_find_global_from_op(interp, hll_ns, SCONST(2), cur_opcode + 3);
 
 return (opcode_t *)cur_opcode + 3;}
@@ -23887,7 +23887,7 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_get_hll_global_p_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     if (PMC_IS_NULL(hll_ns)) {
         PREG(1) = hll_ns;
     }
@@ -23904,7 +23904,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_get_hll_global_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     if (PMC_IS_NULL(hll_ns)) {
         PREG(1) = hll_ns;
     }
@@ -23921,7 +23921,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_get_hll_global_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     if (PMC_IS_NULL(hll_ns)) {
         PREG(1) = hll_ns;
     }
@@ -23938,7 +23938,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_get_hll_global_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     if (PMC_IS_NULL(hll_ns)) {
         PREG(1) = hll_ns;
     }
@@ -24091,7 +24091,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_set_hll_global_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     Parrot_ns_set_global(interp, hll_ns, SREG(1), PREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
@@ -24099,7 +24099,7 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_set_hll_global_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     Parrot_ns_set_global(interp, hll_ns, SCONST(1), PREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
@@ -24107,7 +24107,7 @@ return (opcode_t *)cur_opcode + 3;}
 opcode_t *
 Parrot_set_hll_global_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, PREG(1));
 
     Parrot_ns_set_global(interp, ns, SREG(2), PREG(3));
@@ -24117,7 +24117,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_set_hll_global_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, PCONST(1));
 
     Parrot_ns_set_global(interp, ns, SREG(2), PREG(3));
@@ -24127,7 +24127,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_set_hll_global_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, PREG(1));
 
     Parrot_ns_set_global(interp, ns, SCONST(2), PREG(3));
@@ -24137,7 +24137,7 @@ return (opcode_t *)cur_opcode + 4;}
 opcode_t *
 Parrot_set_hll_global_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, PCONST(1));
 
     Parrot_ns_set_global(interp, ns, SCONST(2), PREG(3));

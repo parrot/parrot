@@ -702,7 +702,7 @@ Parrot_ns_find_named_item(PARROT_INTERP, ARGIN(STRING *name), SHIM(void *next))
     if (!PMC_IS_NULL(g))
         return g;
 
-    g = Parrot_ns_find_namespace_global(interp, Parrot_get_ctx_HLL_namespace(interp), name);
+    g = Parrot_ns_find_namespace_global(interp, Parrot_hll_get_ctx_HLL_namespace(interp), name);
     if (!PMC_IS_NULL(g))
         return g;
     return PMCNULL;
