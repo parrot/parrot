@@ -60,7 +60,7 @@ static PMC* new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 Create a new HLL information table entry.
 Takes an interpreter name and (optional) entry name.
 Returns a pointer to the new entry.
-Used by Parrot_register_HLL.
+Used by Parrot_hll_register_HLL.
 
 =cut
 
@@ -113,12 +113,12 @@ Parrot_hll_init_HLL(PARROT_INTERP)
     interp->HLL_namespace =
         Parrot_pmc_new_constant(interp, enum_class_ResizablePMCArray);
 
-    Parrot_register_HLL(interp, CONST_STRING(interp, "parrot"));
+    Parrot_hll_register_HLL(interp, CONST_STRING(interp, "parrot"));
 }
 
 /*
 
-=item C<INTVAL Parrot_register_HLL(PARROT_INTERP, STRING *hll_name)>
+=item C<INTVAL Parrot_hll_register_HLL(PARROT_INTERP, STRING *hll_name)>
 
 Register the HLL with the given STRING name C<hll_name> in the interpreter.
 
@@ -134,9 +134,9 @@ If there is an error, C<-1> is returned.
 
 PARROT_EXPORT
 INTVAL
-Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
+Parrot_hll_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 {
-    ASSERT_ARGS(Parrot_register_HLL)
+    ASSERT_ARGS(Parrot_hll_register_HLL)
     PMC   *entry, *name, *type_hash, *ns_hash, *hll_info;
     INTVAL idx;
 
@@ -451,7 +451,7 @@ Parrot_regenerate_HLL_namespaces(PARROT_INTERP)
 
             hll_name = Parrot_str_downcase(interp, hll_name);
 
-            /* XXX as in Parrot_register_HLL() this needs to be fixed to use
+            /* XXX as in Parrot_hll_register_HLL() this needs to be fixed to use
              * the correct type of namespace. It's relatively easy to do that
              * here because the typemap already exists, but it is not currently
              * done for consistency.

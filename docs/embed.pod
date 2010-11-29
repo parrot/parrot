@@ -1360,7 +1360,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_register_encoding>
 
-=item C<Parrot_register_HLL>
+=item C<Parrot_hll_register_HLL>
 
 =item C<Parrot_register_HLL_type>
 
