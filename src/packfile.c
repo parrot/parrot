@@ -4206,7 +4206,7 @@ compile_or_load_file(PARROT_INTERP, ARGIN(STRING *path),
     PMC * context = Parrot_push_context(interp, regs_used);
     Parrot_pcc_set_HLL(interp, context, parrot_hll_id);
     Parrot_pcc_set_namespace(interp, context,
-            Parrot_get_HLL_namespace(interp, parrot_hll_id));
+            Parrot_hll_get_HLL_namespace(interp, parrot_hll_id));
 
     if (file_type == PARROT_RUNTIME_FT_PBC) {
         PackFile * const pf = PackFile_append_pbc(interp, filename);

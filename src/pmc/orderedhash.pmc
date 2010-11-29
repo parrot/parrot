@@ -220,7 +220,7 @@ box_string(PARROT_INTERP, ARGIN(STRING *str))
 {
     ASSERT_ARGS(box_string)
 
-    PMC * const ret = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
+    PMC * const ret = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp,
                 enum_class_String));
     VTABLE_set_string_native(interp, ret, str);
     return ret;
@@ -243,7 +243,7 @@ box_integer(PARROT_INTERP, INTVAL val)
 {
     ASSERT_ARGS(box_integer)
 
-    PMC * const ret = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
+    PMC * const ret = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp,
                 enum_class_Integer));
     VTABLE_set_integer_native(interp, ret, val);
     return ret;
@@ -266,7 +266,7 @@ box_number(PARROT_INTERP, FLOATVAL val)
 {
     ASSERT_ARGS(box_number)
 
-    PMC * const ret = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
+    PMC * const ret = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp,
                 enum_class_Float));
     VTABLE_set_number_native(interp, ret, val);
     return ret;
@@ -628,21 +628,21 @@ The created key = "\1idx".
     }
 
     VTABLE void set_integer_keyed_int(INTVAL idx, INTVAL value) {
-        PMC * const v = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const v = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_Integer));
         VTABLE_set_integer_native(INTERP, v, value);
         SELF.set_pmc_keyed_int(idx, v);
     }
 
     VTABLE void set_number_keyed_int(INTVAL idx, FLOATVAL value) {
-        PMC * const v = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const v = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_Float));
         VTABLE_set_number_native(INTERP, v, value);
         SELF.set_pmc_keyed_int(idx, v);
     }
 
     VTABLE void set_string_keyed_int(INTVAL idx, STRING *value) {
-        PMC * const v = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const v = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_String));
         VTABLE_set_string_native(INTERP, v, value);
         SELF.set_pmc_keyed_int(idx, v);

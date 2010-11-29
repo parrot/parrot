@@ -82,7 +82,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
         /* we'd like to share the HLL data. Give it a PMC_sync structure
            if it doesn't have one already */
         d->HLL_info = s->HLL_info;
-        Parrot_regenerate_HLL_namespaces(d);
+        Parrot_hll_regenerate_HLL_namespaces(d);
     }
 
     if (flags & (PARROT_CLONE_LIBRARIES | PARROT_CLONE_CLASSES)) {
@@ -731,7 +731,7 @@ Map core_type to hll_type.
         const INTVAL core_type_id = VTABLE_type(INTERP, core_type);
         const INTVAL hll_type_id  = VTABLE_type(INTERP, hll_type);
         const INTVAL hll_id       = Parrot_pcc_get_HLL(INTERP, CURRENT_CONTEXT(INTERP));
-        Parrot_register_HLL_type(INTERP, hll_id, core_type_id, hll_type_id);
+        Parrot_hll_register_HLL_type(INTERP, hll_id, core_type_id, hll_type_id);
     }
 
 /*
