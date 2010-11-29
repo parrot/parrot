@@ -121,7 +121,6 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
 {
     ASSERT_ARGS(Parrot_io_open)
     PMC *new_filehandle, *filehandle;
-    INTVAL flags;
     const INTVAL typenum = Parrot_get_ctx_HLL_type(interp,
                                                    Parrot_PMC_typenum(interp, "FileHandle"));
     if (PMC_IS_NULL(pmc)) {
@@ -130,8 +129,8 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
     else
         new_filehandle = pmc;
 
-    flags = Parrot_io_parse_open_flags(interp, mode);
     if (new_filehandle->vtable->base_type == typenum) {
+        const INTVAL flags = Parrot_io_parse_open_flags(interp, mode);
         /* TODO: a filehandle shouldn't allow a NULL path. */
         PARROT_ASSERT(new_filehandle->vtable->base_type == typenum);
         filehandle = PIO_OPEN(interp, new_filehandle, path, flags);
@@ -142,6 +141,9 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
         SETATTR_FileHandle_flags(interp, new_filehandle, flags);
         SETATTR_FileHandle_filename(interp, new_filehandle, path);
         SETATTR_FileHandle_mode(interp, new_filehandle, mode);
+        if (!STRING_IS_NULL(mode)
+        &&  STRING_index(interp, mode, CONST_STRING(interp, "b"), 0) >= 0)
+            SETATTR_FileHandle_encoding(interp, new_filehandle, CONST_STRING(interp, "binary"));
         Parrot_io_setbuf(interp, filehandle, PIO_UNBOUND);
     }
     else
@@ -327,7 +329,9 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
     if (pmc->vtable->base_type == enum_class_FileHandle) {
         INTVAL ignored;
         INTVAL flags;
+        STRING *encoding_str;
         GETATTR_FileHandle_flags(interp, pmc, flags);
+        GETATTR_FileHandle_encoding(interp, pmc, encoding_str);
 
         if (Parrot_io_is_closed_filehandle(interp, pmc)
         || !(flags & PIO_F_READ))
@@ -337,10 +341,17 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
         result = Parrot_str_new_noinit(interp, length);
         result->bufused = length;
 
-        if (Parrot_io_is_encoding(interp, pmc, CONST_STRING(interp, "utf8")))
+        if (Parrot_str_equal(interp, encoding_str, CONST_STRING(interp, "utf8")))
             ignored = Parrot_io_read_utf8(interp, pmc, &result);
-        else
+        else {
             ignored = Parrot_io_read_buffer(interp, pmc, &result);
+
+            if (!STRING_IS_NULL(encoding_str))
+                result->encoding = Parrot_get_encoding(interp,
+                    Parrot_encoding_number(interp, encoding_str));
+
+            result->strlen = STRING_scan(interp, result);
+        }
     }
     else if (pmc->vtable->base_type == enum_class_StringHandle) {
         STRING *string_orig;

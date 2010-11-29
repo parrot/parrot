@@ -821,7 +821,7 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
      * If any profile information was gathered, print it out
      * before exiting, then print debug infos if turned on.
      */
-    Parrot_on_exit(interp, print_debug,   NULL);
+    Parrot_x_on_exit(interp, print_debug,   NULL);
 
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */
     main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));

@@ -85,16 +85,13 @@ disassemble_output_like( <<PIR, "pir", qr/set_s_sc S0,utf8:"Hello"/ms, 'pbc_disa
 .end
 PIR
 
-SKIP: {
-    skip( 'no ICU lib', 1 ) unless $PConfig{has_icu};
-    my $utf16 = pack('S*', unpack('C*', 'Hello'));
-    $utf16 =~ s/\0/\\\\0/g;
-    disassemble_output_like( <<PIR, "pir", qr/set_s_sc S0,utf16:"$utf16"/ms, 'pbc_disassemble utf16 string');
+my $utf16 = pack('S*', unpack('C*', 'Hello'));
+$utf16 =~ s/\0/\\\\0/g;
+disassemble_output_like( <<PIR, "pir", qr/set_s_sc S0,utf16:"$utf16"/ms, 'pbc_disassemble utf16 string');
 .sub main :main
     \$S0 = utf16:"Hello"
 .end
 PIR
-}
 
 =head1 HELPER SUBROUTINES
 

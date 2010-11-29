@@ -18,12 +18,17 @@ UCS-2 encoding
 */
 
 #include "parrot/parrot.h"
+#include "../unicode.h"
 #include "shared.h"
 
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_INLINE
+static void ucs2_check_codepoint(PARROT_INTERP, UINTVAL c)
+        __attribute__nonnull__(1);
 
 static size_t ucs2_hash(SHIM_INTERP,
     ARGIN(const STRING *src),
@@ -44,10 +49,11 @@ static UINTVAL ucs2_iter_get_and_advance(SHIM_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*i);
 
-static void ucs2_iter_set_and_advance(SHIM_INTERP,
+static void ucs2_iter_set_and_advance(PARROT_INTERP,
     ARGMOD(STRING *str),
     ARGMOD(String_iter *i),
     UINTVAL c)
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*str)
@@ -82,6 +88,8 @@ static STRING * ucs2_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_ucs2_check_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_ucs2_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ucs2_iter_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -91,7 +99,8 @@ static STRING * ucs2_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_ucs2_iter_set_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(str) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_ucs2_iter_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(i))
@@ -136,9 +145,32 @@ ucs2_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     /* conversion to utf16 downgrades to ucs-2 if possible - check result */
     if (result->encoding == Parrot_utf16_encoding_ptr)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
-            "can't convert string with surrogates to ucs2");
+            "Lossy conversion to UCS-2\n");
 
     return result;
+}
+
+/*
+
+=item C<static void ucs2_check_codepoint(PARROT_INTERP, UINTVAL c)>
+
+Throws an exception if codepoint C<c> is invalid.
+
+=cut
+
+*/
+
+PARROT_INLINE
+static void
+ucs2_check_codepoint(PARROT_INTERP, UINTVAL c)
+{
+    ASSERT_ARGS(ucs2_check_codepoint)
+
+    if (UNICODE_IS_SURROGATE(c)
+    || (c >= 0xFDD0 && c <= 0xFDEF)
+    ||  c >= 0xFFFE)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
+                "Invalid character in UCS-2 string\n");
 }
 
 /*
@@ -156,7 +188,19 @@ static UINTVAL
 ucs2_scan(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(ucs2_scan)
-    return src->bufused >> 1;
+    const utf16_t * const ptr = (utf16_t *)src->strstart;
+    const UINTVAL         len = src->bufused >> 1;
+    UINTVAL               i;
+
+    if (src->bufused & 1)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
+            "Unaligned end in UCS-2 string\n");
+
+    for (i = 0; i < len; ++i) {
+        ucs2_check_codepoint(interp, ptr[i]);
+    }
+
+    return len;
 }
 
 /*
@@ -173,8 +217,8 @@ static UINTVAL
 ucs2_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 {
     ASSERT_ARGS(ucs2_ord)
-    const UINTVAL len = STRING_length(src);
-    const Parrot_UInt2 *s;
+    const utf16_t * const ptr = (utf16_t *)src->strstart;
+    const UINTVAL         len = STRING_length(src);
 
     if (idx < 0)
         idx += len;
@@ -182,9 +226,7 @@ ucs2_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
     if ((UINTVAL)idx >= len)
         encoding_ord_error(interp, src, idx);
 
-    s = (const Parrot_UInt2 *)src->strstart;
-
-    return s[idx];
+    return ptr[idx];
 }
 
 
@@ -204,9 +246,9 @@ ucs2_iter_get(SHIM_INTERP,
     ARGIN(const STRING *str), ARGIN(const String_iter *i), INTVAL offset)
 {
     ASSERT_ARGS(ucs2_iter_get)
-    const Parrot_UInt2 * const s = (const Parrot_UInt2 *)str->strstart;
+    const utf16_t * const ptr = (utf16_t *)str->strstart;
 
-    return s[i->charpos + offset];
+    return ptr[i->charpos + offset];
 }
 
 /*
@@ -246,10 +288,10 @@ ucs2_iter_get_and_advance(SHIM_INTERP,
     ARGIN(const STRING *str), ARGMOD(String_iter *i))
 {
     ASSERT_ARGS(ucs2_iter_get_and_advance)
-    const Parrot_UInt2 * const s = (Parrot_UInt2 *)str->strstart;
-    const UINTVAL c = s[i->charpos];
+    const utf16_t * const ptr = (utf16_t *)str->strstart;
+    const UINTVAL         c   = ptr[i->charpos];
 
-    i->charpos++;
+    i->charpos += 1;
     i->bytepos += 2;
 
     return c;
@@ -268,15 +310,17 @@ next position in the string.
 */
 
 static void
-ucs2_iter_set_and_advance(SHIM_INTERP,
+ucs2_iter_set_and_advance(PARROT_INTERP,
     ARGMOD(STRING *str), ARGMOD(String_iter *i), UINTVAL c)
 {
     ASSERT_ARGS(ucs2_iter_set_and_advance)
-    Parrot_UInt2 * const s = (Parrot_UInt2 *) str->strstart;
+    utf16_t * const ptr = (utf16_t *)str->strstart;
 
-    s[i->charpos] = c;
+    ucs2_check_codepoint(interp, c);
 
-    i->charpos++;
+    ptr[i->charpos] = c;
+
+    i->charpos += 1;
     i->bytepos += 2;
 }
 
@@ -317,16 +361,13 @@ ucs2_hash(SHIM_INTERP, ARGIN(const STRING *src), size_t hashval)
 {
     ASSERT_ARGS(ucs2_hash)
     DECL_CONST_CAST;
-    STRING * const s = PARROT_const_cast(STRING *, src);
-    const Parrot_UInt2 *pos;
-    UINTVAL len;
-
-    pos = (const Parrot_UInt2*)s->strstart;
-    len = s->strlen;
+    STRING * const s   = PARROT_const_cast(STRING *, src);
+    const utf16_t *ptr = (utf16_t *)s->strstart;
+    UINTVAL        len = s->strlen;
 
     while (len--) {
         hashval += hashval << 5;
-        hashval += *(pos++);
+        hashval += *(ptr++);
     }
 
     s->hashval = hashval;
@@ -347,8 +388,7 @@ static STR_VTABLE Parrot_ucs2_encoding = {
     encoding_compare,
     encoding_index,
     encoding_rindex,
-    encoding_hash,
-    unicode_validate,
+    ucs2_hash,
 
     ucs2_scan,
     ucs2_ord,

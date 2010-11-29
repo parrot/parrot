@@ -184,16 +184,16 @@ See <Parrot_really_destroy()>.
 Destroys an interpreter, regardless of the environment.  The exit code is
 currently unused.
 
-=item C<void Parrot_exit(PARROT_INTERP, int status)>
+=item C<void Parrot_x_exit(PARROT_INTERP, int status)>
 
 Destroys the interpreter and exits with an exit code of C<status>.  Before
 exiting, the function calls all registered exit handlers in LIFO order.
 C<Parrot_really_destroy()> is usually called as the last exit handler.
 
-=item C<void Parrot_on_exit(PARROT_INTERP,
+=item C<void Parrot_x_on_exit(PARROT_INTERP,
                             void (*handler)(Parrot_Interp, int, void *), void *arg)>
 
-Registers an exit handler to be called from C<Parrot_exit()> in LIFO order.
+Registers an exit handler to be called from C<Parrot_x_exit()> in LIFO order.
 The handler function should accept as arguments an interpreter, an integer
 exit code, and an argument (which can be NULL).
 
@@ -506,9 +506,9 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_block_GC_sweep>
 
-=item C<Parrot_byte_index>
+=item C<Parrot_util_byte_index>
 
-=item C<Parrot_byte_rindex>
+=item C<Parrot_util_byte_rindex>
 
 =item C<Parrot_callback_C>
 
@@ -612,7 +612,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_ex_build_exception>
 
-=item C<Parrot_exit>
+=item C<Parrot_x_exit>
 
 =item C<Parrot_ex_mark_unhandled>
 
@@ -646,7 +646,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_ns_find_named_item>
 
-=item C<Parrot_float_rand>
+=item C<Parrot_util_float_rand>
 
 =item C<Parrot_fprintf>
 
@@ -672,9 +672,9 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_get_ctx_HLL_type>
 
-=item C<Parrot_get_datatype_enum>
+=item C<Parrot_dt_get_datatype_enum>
 
-=item C<Parrot_get_datatype_name>
+=item C<Parrot_dt_get_datatype_name>
 
 =item C<Parrot_get_encoding>
 
@@ -718,7 +718,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_init_stacktop>
 
-=item C<Parrot_int_rand>
+=item C<Parrot_util_int_rand>
 
 =item C<Parrot_invalidate_method_cache>
 
@@ -850,7 +850,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_load_language>
 
-=item C<Parrot_load_lib>
+=item C<Parrot_dyn_load_lib>
 
 =item C<Parrot_locate_runtime_file>
 
@@ -892,7 +892,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_ns_get_name>
 
-=item C<Parrot_on_exit>
+=item C<Parrot_x_on_exit>
 
 =item C<Parrot_oo_get_class>
 
@@ -1354,7 +1354,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_push_mark>
 
-=item C<Parrot_range_rand>
+=item C<Parrot_util_range_rand>
 
 =item C<Parrot_regenerate_HLL_namespaces>
 
@@ -1364,7 +1364,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_register_HLL_type>
 
-=item C<Parrot_register_move>
+=item C<Parrot_util_register_move>
 
 =item C<Parrot_register_pmc>
 
@@ -1418,7 +1418,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_sprintf_s>
 
-=item C<Parrot_srand>
+=item C<Parrot_util_srand>
 
 =item C<Parrot_ns_store_global>
 
@@ -1524,7 +1524,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_thaw_constants>
 
-=item C<Parrot_uint_rand>
+=item C<Parrot_util_uint_rand>
 
 =item C<Parrot_unblock_GC_mark>
 

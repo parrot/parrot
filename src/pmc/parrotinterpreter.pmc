@@ -94,7 +94,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
         d->n_vtable_max = s->n_vtable_max;
 
         if (d->n_vtable_max > d->n_vtable_alloced)
-            parrot_realloc_vtables(d);
+            Parrot_vtbl_realloc_vtables(d);
 
         last_remove = s->n_vtable_max;
 
@@ -126,7 +126,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
         for (i = 0; i < n; ++i) {
             STRING * const key     = VTABLE_shift_string(s, lib_iter);
             PMC    * const lib_pmc = VTABLE_get_pmc_keyed_str(s, libs, key);
-            PMC    * const ignored = Parrot_clone_lib_into(d, s, lib_pmc);
+            PMC    * const ignored = Parrot_dyn_clone_lib_into(d, s, lib_pmc);
             UNUSED(ignored);
         }
     }
@@ -458,7 +458,7 @@ Introspection interface. C<key> can be:
     VTABLE PMC *get_pmc_keyed(PMC *key) {
         PMC    *nextkey;
         STRING *outer = NULL;
-        STRING *item  = key_string(INTERP, key);
+        STRING *item  = Parrot_key_string(INTERP, key);
         STRING *name  = CONST_STRING(INTERP, "globals");
         int     level = 0;
 
@@ -471,7 +471,7 @@ Introspection interface. C<key> can be:
 
         if (STRING_equal(INTERP, item, name)) {
             outer   = item;
-            nextkey = key_next(INTERP, key);
+            nextkey = Parrot_key_next(INTERP, key);
 
             if (nextkey && (PObj_get_FLAGS(nextkey) & KEY_string_FLAG)) {
                 key  = nextkey;
@@ -479,7 +479,7 @@ Introspection interface. C<key> can be:
             }
         }
 
-        nextkey = key_next(INTERP, key);
+        nextkey = Parrot_key_next(INTERP, key);
 
         if (nextkey)
             level = VTABLE_get_integer(INTERP, nextkey);

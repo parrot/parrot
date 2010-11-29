@@ -132,15 +132,29 @@ allows for tools to succinctly display one-line commit messages with metadata.
 It is good practice to describe *why* something was done in the long message,
 in addition to what was done.
 
+Instead of adding files individually, you can also tell C<git commit> that
+you want all modified and deleted files to be in your next commit via the
+C<-a> flag:
+
+    git commit -a -m "awesome and informative commit message"
+
+Be carefult with C<git commit -a>, it could add files that you do not mean
+to include. Verify that the contents of your most recent commit look sane with:
+
+    git show
+
+Reading the man page of C<git commit> with C<git help commit> is also
+a good idea.
+
 =head2 Maintaining a Branch
 
 To update your local git index from origin:
 
-  git fetch
+    git fetch
 
 If you are following multiple remotes, you can fetch updates from all of them with
 
-  git fetch --all
+    git fetch --all
 
 Note that this command requires a recent (1.7.x.x) version of git.
 

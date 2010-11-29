@@ -139,7 +139,7 @@ main(int argc, const char *argv[])
 
     do_dis(interp, outfile, option);
 
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 /*

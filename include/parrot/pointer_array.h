@@ -20,7 +20,8 @@ Lower bit in cell masked to indicate pointer-to-free-cell.
 #define PARROT_POINTER_ARRAY_H_GUARD
 
 /* Calculate size of chunk data     "header"  */
-#define CELL_PER_CHUNK ((4096 - 2 * sizeof(size_t) / sizeof (void *)))
+#define CHUNK_SIZE 4096
+#define CELL_PER_CHUNK ((CHUNK_SIZE - 2 * sizeof(size_t)) / sizeof (void *))
 
 typedef struct Parrot_Pointer_Array_Chunk {
     size_t   num_free;
@@ -67,9 +68,19 @@ void Parrot_pa_destroy(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
 void * Parrot_pa_insert(PARROT_INTERP,
     ARGIN(Parrot_Pointer_Array *self),
     ARGIN(void *ptr))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+int Parrot_pa_is_owned(PARROT_INTERP,
+    ARGIN(Parrot_Pointer_Array *self),
+    ARGIN(void *orig),
+    ARGIN_NULLOK(void *ref))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -94,6 +105,10 @@ void Parrot_pa_remove(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(ptr))
+#define ASSERT_ARGS_Parrot_pa_is_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(orig))
 #define ASSERT_ARGS_Parrot_pa_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pa_remove __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

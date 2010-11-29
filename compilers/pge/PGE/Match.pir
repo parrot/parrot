@@ -63,7 +63,7 @@ is set or implied.
     .local pmc target, grammar_class
     issrcmatch = isa src, ['PGE';'Match']
     if issrcmatch goto target_from_src
-    target = new 'CodeString'
+    target = new 'String'
     assign target, src
     pos = 0
     iscont = 1

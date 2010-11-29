@@ -54,7 +54,7 @@ Sort this array, optionally using the provided cmp_func
                 Parrot_pcc_invoke_method_from_c_args(INTERP, parent, CONST_STRING(INTERP, "sort"), "P->", cmp_func);
             }
             else
-                Parrot_quicksort(INTERP, (void **)PMC_array(SELF), n, cmp_func);
+                Parrot_util_quicksort(INTERP, (void **)PMC_array(SELF), n, cmp_func);
         }
         RETURN(PMC *SELF);
     }
@@ -344,7 +344,7 @@ Returns the PMC value of the element at index C<*key>.
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
         const INTVAL k        = VTABLE_get_integer(INTERP, key);
-        PMC   * const nextkey = key_next(INTERP, key);
+        PMC   * const nextkey = Parrot_key_next(INTERP, key);
         PMC   *box;
 
         if (!nextkey)
@@ -485,7 +485,7 @@ C<value>.
 
     VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
         const INTVAL k        = VTABLE_get_integer(INTERP, key);
-        PMC   * const nextkey = key_next(INTERP, key);
+        PMC   * const nextkey = Parrot_key_next(INTERP, key);
 
         if (nextkey == NULL) {
             SELF.set_number_keyed_int(k, value);
@@ -573,7 +573,7 @@ Sets the PMC at index C<key> to C<value>.
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
-        PMC   *nextkey = key_next(INTERP, key);
+        PMC   *nextkey = Parrot_key_next(INTERP, key);
 
         if (!nextkey) {
             SELF.set_pmc_keyed_int(k, value);

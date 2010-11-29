@@ -705,6 +705,9 @@ D: Resizable*Array PMCs
 N: Matt Kennedy
 D: Some Env PMC method implementations and tests
 
+N: Matt Rajca
+D: Code refactoring
+
 N: Mattia Barbon
 D: Win32 fixes, dynamic PMC creation and loading
 

@@ -996,8 +996,7 @@ empty parameter list), no parentheses may be used in the expansion.>
 
 =item * Heredoc arguments
 
-Heredoc arguments are not allowed when expanding a macro. The next
-implementation of PIR ("PIRC") will be able to handle this correctly.
+Heredoc arguments are not allowed when expanding a macro.
 This means that, currently, when using IMCC, the following is not allowed:
 
 =begin PIR_TODO
@@ -1373,16 +1372,6 @@ implementations:
 This is the current implementation being used in Parrot. Some of the
 specified syntactic constructs in this PDD are not implemented in
 IMCC; these constructs are marked with notes saying so.
-
-=item * compilers/pirc
-
-This is a new implementation which will fix several of IMCC's
-shortcomings. It will replace IMCC.
-
-=item * languages/PIR
-
-This is a PGE-based implementation, but needs to be updated
-and completed.
 
 =back
 

@@ -106,7 +106,7 @@ HEADER
             PackFile_fixup_subs(interp, PBC_MAIN, NULL);
             Parrot_runcode(interp, argc, argv);
             Parrot_destroy(interp);
-            Parrot_exit(interp, 0);
+            Parrot_x_exit(interp, 0);
         }
 MAIN
 
@@ -271,7 +271,7 @@ HELP
     .param pmc    outfh
     .local pmc ifh
     ifh = new ['FileHandle']
-    ifh.'open'(infile, 'r')
+    ifh.'open'(infile, 'rb')
     unless ifh goto err_infile
 
     .local int size
@@ -359,7 +359,7 @@ END_OF_FUNCTION
     .param pmc    outfh
     .local pmc ifh
     ifh = new ['FileHandle']
-    ifh.'open'(infile, 'r')
+    ifh.'open'(infile, 'rb')
     unless ifh goto err_infile
 
     .local pmc encoding_table

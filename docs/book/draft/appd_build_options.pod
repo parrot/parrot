@@ -33,8 +33,8 @@ common packaging systems.
 =item * bison and flex
 
 Bison and Flex are used to create the lexical analyzer and parser components
-for the PIR compilers IMCC and PIRC. These are not necessary most of the time
-unless you are planning to hack on IMCC and PIRC directly.
+for the PIR compiler IMCC. These are not necessary most of the time
+unless you are planning to hack on IMCC directly.
 
 =item * ICU
 

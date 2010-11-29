@@ -461,7 +461,7 @@ Returns the integer value for the element at C<*key>.
         if (!b)
             return 0;
 
-        key = key_next(INTERP, key);
+        key = Parrot_key_next(INTERP, key);
 
         /* Stop recursion. This is last step */
         if (!key)
@@ -493,7 +493,7 @@ Returns the integer value for the element at C<*key>.
                 EXCEPTION_INVALID_OPERATION,
                 "Used non-constant PMC key in constant hash.");
 
-        key = key_next(INTERP, key);
+        key = Parrot_key_next(INTERP, key);
 
         if (!key) {
             parrot_hash_put(INTERP, hash, hash_key,
@@ -587,7 +587,7 @@ Returns the floating-point value for the element at C<*key>.
         if (!b)
             return 0.0;
 
-        key = key_next(INTERP, key);
+        key = Parrot_key_next(INTERP, key);
 
         if (!key)
             return hash_value_to_number(INTERP, hash, b->value);
@@ -651,7 +651,7 @@ Returns the string value for the element at C<*key>.
         if (!b)
             return CONST_STRING(INTERP, "");
 
-        key = key_next(INTERP, key);
+        key = Parrot_key_next(INTERP, key);
 
         /* Stop recursion. This is last step */
         if (!key)
@@ -688,7 +688,7 @@ Returns the string value for the element at C<*key>.
                     "Used non-constant STRING value in constant hash.");
         }
 
-        key = key_next(INTERP, key);
+        key = Parrot_key_next(INTERP, key);
 
         if (!key) {
             parrot_hash_put(INTERP, hash, hash_key,
@@ -799,7 +799,7 @@ Returns the PMC value for the element at C<*key>.
         if (!b)
             return PMCNULL;
 
-        key = key_next(INTERP, key);
+        key = Parrot_key_next(INTERP, key);
 
         /* Stop recursion. This is last step */
         if (!key)
@@ -831,7 +831,7 @@ Returns the PMC value for the element at C<*key>.
                 EXCEPTION_INVALID_OPERATION,
                 "Used non-constant PMC key in constant hash.");
 
-        key = key_next(INTERP, key);
+        key = Parrot_key_next(INTERP, key);
 
         if (!key) {
             parrot_hash_put(INTERP, hash, hash_key,
@@ -894,7 +894,7 @@ Sets C<value> as the value for C<*key>.
                     "Used non-constant PMC value in constant hash.");
         }
 
-        key = key_next(INTERP, key);
+        key = Parrot_key_next(INTERP, key);
 
         if (!key) {
             parrot_hash_put(INTERP, hash, hash_key, value);
@@ -972,7 +972,7 @@ Returns whether a key C<*key> exists in the hash.
         if (!b)
             return 0;
 
-        key = key_next(INTERP, key);
+        key = Parrot_key_next(INTERP, key);
 
         /* lookup stops here */
         if (!key)
@@ -1025,7 +1025,7 @@ Returns whether the value for C<*key> is defined.
         if (!b)
             return 0;
 
-        key = key_next(INTERP, key);
+        key = Parrot_key_next(INTERP, key);
 
         if (!key)
             return VTABLE_defined(INTERP, hash_value_to_pmc(INTERP, h, b->value));
@@ -1070,7 +1070,7 @@ Deletes the element associated with C<*key>.
         if (!b)
             return;
 
-        key = key_next(INTERP, key);
+        key = Parrot_key_next(INTERP, key);
 
         if (!key) {
             parrot_hash_delete(INTERP, h, sx);

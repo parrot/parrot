@@ -146,7 +146,7 @@ ok:
 .pcc_sub _the_sub:
     print "in sub\n"
     get_global P0, "_next_sub"
-    get_addr I0, P0
+    get_label I0, P0
     jump I0
     print "never here\n"
 

@@ -115,7 +115,7 @@ Load a dynamic link library named $2 and store it in $1.
 =cut
 
 inline op loadlib(out PMC, in STR) {
-    $1 = Parrot_load_lib(interp, $2, NULL);
+    $1 = Parrot_dyn_load_lib(interp, $2, NULL);
 }
 
 =back

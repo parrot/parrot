@@ -98,7 +98,7 @@ parrot_set_config_hash_interpreter(PARROT_INTERP)
         STRING * const config_string =
             Parrot_str_new_init(interp,
                                (const char *)parrot_config_stored, parrot_config_size_stored,
-                               Parrot_default_encoding_ptr,
+                               Parrot_binary_encoding_ptr,
                                PObj_external_FLAG|PObj_constant_FLAG);
 
         config_hash = Parrot_thaw(interp, config_string);
