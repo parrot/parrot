@@ -252,7 +252,6 @@ sub asserts_from_args {
 #    my @modified_args = shim_test($func, \@args);
 sub shim_test {
     my ($func, $argsref) = @_;
-print STDERR Dumper [ $func, $argsref ];
     my @args = @{$argsref};
     for my $arg (@args) {
         if ( $arg =~ m{SHIM\((.+)\)} ) {

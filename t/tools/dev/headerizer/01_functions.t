@@ -263,10 +263,104 @@ ok( exists $asserts{'PARROT_ASSERT_ARG(item)'}, "Got expected assert" );
 ok( exists $asserts{'PARROT_ASSERT_ARG(interp)'}, "Got expected assert" );
 ok( exists $asserts{'PARROT_ASSERT_ARG(_abcDEF123)'}, "Got expected assert" );
 
-#    my @modified_args = shim_test($func, \@args);
+my ($var, $args_ref, $funcs_ref, $expected);
+my @modified_args;
+# shim_test
+$var = 'something';
+$args_ref =  [
+    "SHIM($var)",
+    'ARGIN(STRING *sig)',
+];
+$funcs_ref =  {
+    'macros' => [],
+    'return_type' => 'void',
+    'is_api' => undef,
+    'is_inline' => undef,
+    'is_static' => 'static',
+    'args' => $args_ref,
+    'name' => 'pcc_params',
+    'file' => 'src/pmc/nci.c',
+    'is_ignorable' => 0
+};
+$expected = [
+    "SHIM($var)",
+    $args_ref->[1],
+];
+@modified_args = shim_test($funcs_ref, $args_ref);
+is_deeply( [ @modified_args ], $expected,
+    "Got expected args back from shim_test()" );
+
+$var = 'something *else';
+$args_ref =  [
+    "SHIM($var)",
+    'ARGIN(STRING *sig)',
+];
+$funcs_ref =  {
+    'macros' => [],
+    'return_type' => 'void',
+    'is_api' => undef,
+    'is_inline' => undef,
+    'is_static' => undef,
+    'args' => $args_ref,
+    'name' => 'pcc_params',
+    'file' => 'src/pmc/nci.c',
+    'is_ignorable' => 0
+};
+$expected = [
+    "SHIM($var)",
+    $args_ref->[1],
+];
+@modified_args = shim_test($funcs_ref, $args_ref);
+is_deeply( [ @modified_args ], $expected,
+    "Got expected args back from shim_test()" );
+
+$var = 'something';
+$args_ref =  [
+    "SHIM($var)",
+    'ARGIN(STRING *sig)',
+];
+$funcs_ref =  {
+    'macros' => [],
+    'return_type' => 'void',
+    'is_api' => undef,
+    'is_inline' => undef,
+    'is_static' => undef,
+    'args' => $args_ref,
+    'name' => 'pcc_params',
+    'file' => 'src/pmc/nci.c',
+    'is_ignorable' => 0
+};
+$expected = [
+    "NULLOK($var)",
+    $args_ref->[1],
+];
+@modified_args = shim_test($funcs_ref, $args_ref);
+is_deeply( [ @modified_args ], $expected,
+    "Got expected args back from shim_test()" );
+
+$var = 'something';
+$args_ref =  [
+    "SHAM($var)",
+    'ARGIN(STRING *sig)',
+];
+$funcs_ref =  {
+    'macros' => [],
+    'return_type' => 'void',
+    'is_api' => undef,
+    'is_inline' => undef,
+    'is_static' => undef,
+    'args' => $args_ref,
+    'name' => 'pcc_params',
+    'file' => 'src/pmc/nci.c',
+    'is_ignorable' => 0
+};
+$expected = $args_ref;
+@modified_args = shim_test($funcs_ref, $args_ref);
+is_deeply( [ @modified_args ], $expected,
+    "Got expected args back from shim_test()" );
 
 # add_asserts_to_declarations()
-my $funcs_ref = [
+$funcs_ref = [
   {
     'macros' => [
       'PARROT_EXPORT'
@@ -287,7 +381,7 @@ my $funcs_ref = [
 ];
 my $decls_ref = [];
 my @decls = add_asserts_to_declarations($funcs_ref, $decls_ref);
-my $expected = <<'EXP';
+$expected = <<'EXP';
 #define ASSERT_ARGS_Parrot_list_append_and_append_and_append \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(list) \
