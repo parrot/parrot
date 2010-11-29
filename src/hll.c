@@ -95,7 +95,7 @@ new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 
 /*
 
-=item C<void Parrot_init_HLL(PARROT_INTERP)>
+=item C<void Parrot_hll_init_HLL(PARROT_INTERP)>
 
 Initialises the HLL_info and HLL_namespace fields of the interpreter structure.
 Registers the default HLL namespace "parrot".
@@ -105,9 +105,9 @@ Registers the default HLL namespace "parrot".
 */
 
 void
-Parrot_init_HLL(PARROT_INTERP)
+Parrot_hll_init_HLL(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_init_HLL)
+    ASSERT_ARGS(Parrot_hll_init_HLL)
     interp->HLL_info      =
         Parrot_pmc_new(interp, enum_class_OrderedHash);
     interp->HLL_namespace =

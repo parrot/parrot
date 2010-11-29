@@ -67,7 +67,7 @@ void Parrot_register_HLL_type(PARROT_INTERP,
     INTVAL hll_type)
         __attribute__nonnull__(1);
 
-void Parrot_init_HLL(PARROT_INTERP)
+void Parrot_hll_init_HLL(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_get_ctx_HLL_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -90,7 +90,7 @@ void Parrot_init_HLL(PARROT_INTERP)
     , PARROT_ASSERT_ARG(hll_name))
 #define ASSERT_ARGS_Parrot_register_HLL_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_init_HLL __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_hll_init_HLL __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/hll.c */

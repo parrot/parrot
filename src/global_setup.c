@@ -235,7 +235,7 @@ Parrot_gbl_setup_2(PARROT_INTERP)
 
     /* create the namespace root stash */
     interp->root_namespace = Parrot_pmc_new(interp, enum_class_NameSpace);
-    Parrot_init_HLL(interp);
+    Parrot_hll_init_HLL(interp);
 
     Parrot_pcc_set_namespace(interp, CURRENT_CONTEXT(interp),
         VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace, 0));
