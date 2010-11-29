@@ -5,12 +5,15 @@ package Parrot::Headerizer::Functions;
 use strict;
 use warnings;
 use base qw( Exporter );
+use Data::Dumper;$Data::Dumper::Indent=1;
 our @EXPORT_OK = qw(
     process_argv
     read_file
     write_file
     qualify_sourcefile
     asserts_from_args
+    shim_test
+    add_asserts_to_declarations
 );
 
 =head1 NAME
@@ -244,6 +247,49 @@ sub asserts_from_args {
     }
 
     return (@asserts);
+}
+
+#    my @modified_args = shim_test($func, \@args);
+sub shim_test {
+    my ($func, $argsref) = @_;
+print STDERR Dumper [ $func, $argsref ];
+    my @args = @{$argsref};
+    for my $arg (@args) {
+        if ( $arg =~ m{SHIM\((.+)\)} ) {
+            $arg = $1;
+            if ( $func->{is_static} || ( $arg =~ /\*/ ) ) {
+                $arg = "SHIM($arg)";
+            }
+            else {
+                $arg = "NULLOK($arg)";
+            }
+        }
+    }
+    return @args;
+}
+
+sub add_asserts_to_declarations {
+    my ($funcs_ref, $decls_ref) = @_;
+#print STDERR Dumper $funcs_ref;
+    foreach my $func (@{ $funcs_ref }) {
+        my $assert = "#define ASSERT_ARGS_" . $func->{name};
+        if(length($func->{name}) > 29) {
+            $assert .= " \\\n    ";
+        }
+        $assert .= " __attribute__unused__ int _ASSERT_ARGS_CHECK = (";
+
+        my @asserts = asserts_from_args( @{ $func->{args} } );
+        if(@asserts) {
+            $assert .= "\\\n       ";
+            $assert .= join(" \\\n    , ", @asserts);
+        }
+        else {
+            $assert .= "0";
+        }
+        $assert .= ")";
+        push(@{ $decls_ref }, $assert);
+    }
+    return @{ $decls_ref };
 }
 
 1;

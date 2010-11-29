@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 38;
+use Test::More qw(no_plan); # tests => 38;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -18,13 +18,16 @@ use Parrot::Headerizer::Functions qw(
     write_file
     qualify_sourcefile
     asserts_from_args
+    shim_test
+    add_asserts_to_declarations
 );
 
 use IO::CaptureOutput qw| capture |;
 
 my $cwd = cwd();
-
 my @ofiles;
+
+# process_argv()
 eval {
     @ofiles = process_argv();
 };
@@ -49,6 +52,7 @@ like($@, qr/No files specified/,
 @ofiles = qw( alpha.o beta.o gamma.o );
 is(@ofiles, 3, "Got expected number of ofiles");
 
+# read_file; write_file
 {
     my $tdir = tempdir( CLEANUP => 1 );
     chdir $tdir;
@@ -77,6 +81,7 @@ eval {
 };
 like($@, qr/couldn't read '$filename'/, "Got expected error message for read_file()");
 
+# qualify_sourcefile()
 my ($ofile, $is_yacc);
 my ($sourcefile, $source_code, $hfile);
 $ofile = 'foobar.xyz';
@@ -220,6 +225,7 @@ like($@, qr/$ofile doesn't look like an object file/,
     is( $hfile, 'none', "As expected, no header file" );
 }
 
+# asserts_from_args()
 my (@args, %asserts);
 @args = (
     'SHIM_INTERP',
@@ -256,6 +262,39 @@ ok( exists $asserts{'PARROT_ASSERT_ARG(list)'}, "Got expected assert" );
 ok( exists $asserts{'PARROT_ASSERT_ARG(item)'}, "Got expected assert" );
 ok( exists $asserts{'PARROT_ASSERT_ARG(interp)'}, "Got expected assert" );
 ok( exists $asserts{'PARROT_ASSERT_ARG(_abcDEF123)'}, "Got expected assert" );
+
+#    my @modified_args = shim_test($func, \@args);
+
+# add_asserts_to_declarations()
+my $funcs_ref = [
+  {
+    'macros' => [
+      'PARROT_EXPORT'
+    ],
+    'return_type' => 'void',
+    'is_api' => 1,
+    'is_inline' => undef,
+    'is_static' => undef,
+    'args' => [
+      'SHIM_INTERP',
+      'ARGMOD(Linked_List *list)',
+      'ARGMOD(List_Item_Header *item)'
+    ],
+    'name' => 'Parrot_list_append_and_append_and_append',
+    'file' => 'src/list.c',
+    'is_ignorable' => 0
+  },
+];
+my $decls_ref = [];
+my @decls = add_asserts_to_declarations($funcs_ref, $decls_ref);
+my $expected = <<'EXP';
+#define ASSERT_ARGS_Parrot_list_append_and_append_and_append \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(list) \
+EXP
+$expected .= '    , PARROT_ASSERT_ARG(item))';
+is( $decls[0], $expected,
+    "Got expected declaration from add_asserts_to_declarations()" );
 
 pass("Completed all tests in $0");
 

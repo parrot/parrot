@@ -34,6 +34,8 @@ use Parrot::Headerizer::Functions qw(
     write_file
     qualify_sourcefile
     asserts_from_args
+    shim_test
+    add_asserts_to_declarations
 );
 
 =item C<new()>
@@ -547,44 +549,37 @@ sub make_function_decls {
     foreach my $func (@funcs) {
         my $multiline = 0;
 
-        my $return = $func->{return_type};
         my $alt_void = ' ';
 
         # Splint can't handle /*@alt void@*/ on pointers, although this page
         # http://www.mail-archive.com/lclint-interest@virginia.edu/msg00139.html
         # seems to say that we can.
-        if ( $func->{is_ignorable} && ($return !~ /\*/) ) {
+        if ( $func->{is_ignorable} && ($func->{return_type} !~ /\*/) ) {
             $alt_void = " /*\@alt void@*/\n";
         }
 
-        my $decl = sprintf( "%s%s%s(", $return, $alt_void, $func->{name} );
+        my $decl = sprintf( "%s%s%s(" => (
+            $func->{return_type},
+            $alt_void,
+            $func->{name}
+        ) );
         $decl = "static $decl" if $func->{is_static};
 
         my @args    = @{ $func->{args} };
         my @attrs   = $self->attrs_from_args( $func, @args );
 
-        for my $arg (@args) {
-            if ( $arg =~ m{SHIM\((.+)\)} ) {
-                $arg = $1;
-                if ( $func->{is_static} || ( $arg =~ /\*/ ) ) {
-                    $arg = "SHIM($arg)";
-                }
-                else {
-                    $arg = "NULLOK($arg)";
-                }
-            }
-        }
+        my @modified_args = shim_test($func, \@args);
 
-        my $argline = join( ", ", @args );
+        my $argline = join( ", ", @modified_args );
         if ( length( $decl . $argline ) <= 75 ) {
             $decl = "$decl$argline)";
         }
         else {
-            if ( $args[0] =~ /^((SHIM|PARROT)_INTERP|Interp)\b/ ) {
-                $decl .= ( shift @args );
-                $decl .= "," if @args;
+            if ( $modified_args[0] =~ /^((SHIM|PARROT)_INTERP|Interp)\b/ ) {
+                $decl .= ( shift @modified_args );
+                $decl .= "," if @modified_args;
             }
-            $argline   = join( ",", map { "\n\t$_" } @args );
+            $argline   = join( ",", map { "\n\t$_" } @modified_args );
             $decl      = "$decl$argline)";
             $multiline = 1;
         }
@@ -603,25 +598,7 @@ sub make_function_decls {
         push( @decls, $decl );
     }
 
-    foreach my $func (@funcs) {
-        my @args    = @{ $func->{args} };
-        my @asserts = asserts_from_args( @args );
-
-        my $assert = "#define ASSERT_ARGS_" . $func->{name};
-        if(length($func->{name}) > 29) {
-            $assert .= " \\\n    ";
-        }
-        $assert .= " __attribute__unused__ int _ASSERT_ARGS_CHECK = (";
-        if(@asserts) {
-            $assert .= "\\\n       ";
-            $assert .= join(" \\\n    , ", @asserts);
-        }
-        else {
-            $assert .= "0";
-        }
-        $assert .= ")";
-        push(@decls, $assert);
-    }
+    @decls = add_asserts_to_declarations( \@funcs, \@decls );
 
     return @decls;
 }
