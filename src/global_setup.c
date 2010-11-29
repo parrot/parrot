@@ -27,7 +27,7 @@ I<What are these global variables?>
 
 /* These functions are defined in the auto-generated file core_pmcs.c */
 /* XXX Get it into some public place */
-extern void Parrot_initialize_core_pmcs(PARROT_INTERP, int pass);
+extern void Parrot_gbl_initialize_core_pmcs(PARROT_INTERP, int pass);
 void Parrot_register_core_pmcs(PARROT_INTERP, PMC* registry);
 
 static const unsigned char* parrot_config_stored = NULL;
@@ -166,7 +166,7 @@ init_world(PARROT_INTERP)
 
     /* Call base vtable class constructor methods */
     parrot_global_setup_2(interp);
-    Parrot_initialize_core_pmcs(interp, 1);
+    Parrot_gbl_initialize_core_pmcs(interp, 1);
 
     iglobals = interp->iglobals;
     VTABLE_set_pmc_keyed_int(interp, iglobals,

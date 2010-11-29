@@ -21,7 +21,7 @@ Functions to build and manipulate vtables
 
 /* This function is defined in the auto-generated file core_pmcs.c */
 /* XXX Get it into some public place */
-extern void Parrot_initialize_core_pmcs(PARROT_INTERP, int pass);
+extern void Parrot_gbl_initialize_core_pmcs(PARROT_INTERP, int pass);
 
 /* HEADERIZER HFILE: include/parrot/vtables.h */
 
@@ -239,7 +239,7 @@ Parrot_vtbl_initialize_core_vtables(PARROT_INTERP)
 
     if (! interp->vtables) {
         Parrot_vtbl_alloc_vtables(interp);
-        Parrot_initialize_core_pmcs(interp, 0);
+        Parrot_gbl_initialize_core_pmcs(interp, 0);
     }
 }
 

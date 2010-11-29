@@ -19,7 +19,7 @@ void Parrot_register_core_pmcs(PARROT_INTERP, ARGIN(PMC *registry))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void Parrot_initialize_core_pmcs(PARROT_INTERP, int pass)
+void Parrot_gbl_initialize_core_pmcs(PARROT_INTERP, int pass)
         __attribute__nonnull__(1);
 
 /* HEADERIZER BEGIN: src/global_setup.c */

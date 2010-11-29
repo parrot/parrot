@@ -111,7 +111,7 @@ END_C
 
     print {$OUT} <<'END_C';
 
-void Parrot_initialize_core_pmcs(PARROT_INTERP, int pass)
+void Parrot_gbl_initialize_core_pmcs(PARROT_INTERP, int pass)
 {
     /* first the PMC with the highest enum
      * this reduces MMD table resize action */
