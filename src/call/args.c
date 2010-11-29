@@ -823,7 +823,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 }
 
                 collect_positional = Parrot_pmc_new_init_int(interp,
-                    Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray),
+                    Parrot_hll_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray),
                     num_positionals);
 
                 for (j = 0; arg_index < positional_args; ++arg_index)
@@ -999,7 +999,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         /* Collected ("slurpy") named parameter */
         if (param_flags & PARROT_ARG_SLURPY_ARRAY) {
             PMC * const collect_named = Parrot_pmc_new(interp,
-                    Parrot_get_ctx_HLL_type(interp, enum_class_Hash));
+                    Parrot_hll_get_ctx_HLL_type(interp, enum_class_Hash));
             PMC * const named_arg_list = VTABLE_get_attr_str(interp, call_object, CONST_STRING(interp, "named"));
 
             if (!PMC_IS_NULL(named_arg_list)) {

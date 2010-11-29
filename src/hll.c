@@ -351,7 +351,7 @@ Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
 
 /*
 
-=item C<INTVAL Parrot_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)>
+=item C<INTVAL Parrot_hll_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)>
 
 Return an equivalent PMC type number according to the HLL settings in
 the current context.  If no type is registered, returns C<core_type>.
@@ -362,9 +362,9 @@ the current context.  If no type is registered, returns C<core_type>.
 
 PARROT_EXPORT
 INTVAL
-Parrot_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)
+Parrot_hll_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)
 {
-    ASSERT_ARGS(Parrot_get_ctx_HLL_type)
+    ASSERT_ARGS(Parrot_hll_get_ctx_HLL_type)
     const INTVAL hll_id = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp));
     if (!hll_id || hll_id == PARROT_HLL_NONE)
         return core_type;

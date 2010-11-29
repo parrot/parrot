@@ -456,7 +456,7 @@ Invokes the subroutine.
          */
         if (!PMC_IS_NULL(sub->lex_info)) {
             Parrot_pcc_set_lex_pad(INTERP, context, Parrot_pmc_new_init(INTERP,
-                    Parrot_get_ctx_HLL_type(INTERP, enum_class_LexPad),
+                    Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_LexPad),
                     sub->lex_info));
             VTABLE_set_pointer(INTERP, Parrot_pcc_get_lex_pad(INTERP, context), context);
         }
@@ -490,7 +490,7 @@ Invokes the subroutine.
                     if (!PMC_IS_NULL(outer_sub->lex_info)) {
                         Parrot_pcc_set_lex_pad(INTERP, dummy,
                             Parrot_pmc_new_init(INTERP,
-                                Parrot_get_ctx_HLL_type(INTERP,
+                                Parrot_hll_get_ctx_HLL_type(INTERP,
                                     enum_class_LexPad), outer_sub->lex_info));
 
                         VTABLE_set_pointer(INTERP,
@@ -1097,7 +1097,7 @@ slurpy arguments).
 
         /* Ensure we have lex info. */
         if (PMC_IS_NULL(sub->lex_info)) {
-            const INTVAL lex_info_id = Parrot_get_ctx_HLL_type(INTERP,
+            const INTVAL lex_info_id = Parrot_hll_get_ctx_HLL_type(INTERP,
                                            enum_class_LexInfo);
             sub->lex_info = Parrot_pmc_new_init(INTERP, lex_info_id, SELF);
         }

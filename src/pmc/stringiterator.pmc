@@ -178,7 +178,7 @@ Returns this Iterator's string.
 */
 
     VTABLE PMC *get_pmc() {
-        PMC * const string = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(
+        PMC * const string = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(
             interp, enum_class_String));
         STRING *str_val;
 
@@ -207,7 +207,7 @@ Shift next character from C<string> as PMC.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        ret = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp, enum_class_String));
+        ret = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
         STRING_iter_skip(INTERP, str_val, iter, 1);
         substr = Parrot_str_iter_substr(INTERP, str_val, &old_iter, iter);
         VTABLE_set_string_native(INTERP, ret, substr);
@@ -279,7 +279,7 @@ Shift "next" character from C<string> for reverse iterator as PMC.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        ret = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp, enum_class_String));
+        ret = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
         STRING_iter_skip(INTERP, str_val, iter, -1);
         substr = Parrot_str_iter_substr(INTERP, str_val, iter, &old_iter);
         VTABLE_set_string_native(INTERP, ret, substr);

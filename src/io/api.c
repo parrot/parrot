@@ -121,7 +121,7 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
 {
     ASSERT_ARGS(Parrot_io_open)
     PMC *new_filehandle, *filehandle;
-    const INTVAL typenum = Parrot_get_ctx_HLL_type(interp,
+    const INTVAL typenum = Parrot_hll_get_ctx_HLL_type(interp,
                                                    Parrot_PMC_typenum(interp, "FileHandle"));
     if (PMC_IS_NULL(pmc)) {
         new_filehandle = Parrot_pmc_new(interp, typenum);
