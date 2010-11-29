@@ -34,7 +34,7 @@ void Parrot_gbl_set_config_hash_internal(
 void init_world(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void init_world_once(PARROT_INTERP)
+void Parrot_gbl_init_world_once(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_gbl_set_config_hash_internal \
@@ -42,7 +42,7 @@ void init_world_once(PARROT_INTERP)
        PARROT_ASSERT_ARG(parrot_config))
 #define ASSERT_ARGS_init_world __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_init_world_once __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_gbl_init_world_once __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/global_setup.c */
