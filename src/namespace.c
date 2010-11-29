@@ -289,7 +289,7 @@ get_namespace_pmc(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
     PMC_get_sub(interp, sub_pmc, sub);
     nsname = sub->namespace_name;
-    nsroot = Parrot_get_HLL_namespace(interp, sub->HLL_id);
+    nsroot = Parrot_hll_get_HLL_namespace(interp, sub->HLL_id);
 
     /* If we have a NULL, return the HLL namespace */
     if (PMC_IS_NULL(nsname))

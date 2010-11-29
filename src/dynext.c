@@ -489,7 +489,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
     PMC * context = Parrot_push_context(interp, regs_used);
     Parrot_pcc_set_HLL(interp, context, parrot_hll_id);
     Parrot_pcc_set_namespace(interp, context,
-            Parrot_get_HLL_namespace(interp, parrot_hll_id));
+            Parrot_hll_get_HLL_namespace(interp, parrot_hll_id));
 
     if (!STRING_IS_NULL(lib_name)) {
         STRING * const load_name       = Parrot_sprintf_c(interp,

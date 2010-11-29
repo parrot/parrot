@@ -44,7 +44,7 @@ STRING * Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_get_HLL_namespace(PARROT_INTERP, int hll_id)
+PMC* Parrot_hll_get_HLL_namespace(PARROT_INTERP, int hll_id)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -78,7 +78,7 @@ void Parrot_hll_init_HLL(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_get_HLL_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_get_HLL_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_hll_get_HLL_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_hll_get_HLL_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

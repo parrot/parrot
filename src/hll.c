@@ -389,12 +389,12 @@ PMC*
 Parrot_hll_get_ctx_HLL_namespace(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_hll_get_ctx_HLL_namespace)
-    return Parrot_get_HLL_namespace(interp, Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
+    return Parrot_hll_get_HLL_namespace(interp, Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
 }
 
 /*
 
-=item C<PMC* Parrot_get_HLL_namespace(PARROT_INTERP, int hll_id)>
+=item C<PMC* Parrot_hll_get_HLL_namespace(PARROT_INTERP, int hll_id)>
 
 Return root namespace of the HLL with the ID of I<hll_id>.  If C<hll_id> is the
 special value C<PARROT_HLL_NONE>, return the global root namespace.
@@ -407,9 +407,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC*
-Parrot_get_HLL_namespace(PARROT_INTERP, int hll_id)
+Parrot_hll_get_HLL_namespace(PARROT_INTERP, int hll_id)
 {
-    ASSERT_ARGS(Parrot_get_HLL_namespace)
+    ASSERT_ARGS(Parrot_hll_get_HLL_namespace)
     if (hll_id == PARROT_HLL_NONE)
         return interp->root_namespace;
 
