@@ -55,7 +55,7 @@ static void parrot_set_config_hash_interpreter(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_set_config_hash_internal(const unsigned char* parrot_config,
+=item C<void Parrot_gbl_set_config_hash_internal(const unsigned char* parrot_config,
 unsigned int parrot_config_size)>
 
 Called by Parrot_set_config_hash with the serialised hash which
@@ -67,10 +67,10 @@ will be used in subsequently created Interpreters.
 
 PARROT_EXPORT
 void
-Parrot_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
+Parrot_gbl_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
                                  unsigned int parrot_config_size)
 {
-    ASSERT_ARGS(Parrot_set_config_hash_internal)
+    ASSERT_ARGS(Parrot_gbl_set_config_hash_internal)
     parrot_config_stored      = parrot_config;
     parrot_config_size_stored = parrot_config_size;
 }

@@ -1380,7 +1380,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_secret_snprintf>
 
-=item C<Parrot_set_config_hash_internal>
+=item C<Parrot_gbl_set_config_hash_internal>
 
 =item C<Parrot_set_context_threshold>
 

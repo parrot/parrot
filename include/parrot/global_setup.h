@@ -26,7 +26,7 @@ void Parrot_initialize_core_pmcs(PARROT_INTERP, int pass)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void Parrot_set_config_hash_internal(
+void Parrot_gbl_set_config_hash_internal(
     ARGIN(const unsigned char* parrot_config),
     unsigned int parrot_config_size)
         __attribute__nonnull__(1);
@@ -37,7 +37,7 @@ void init_world(PARROT_INTERP)
 void init_world_once(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_set_config_hash_internal \
+#define ASSERT_ARGS_Parrot_gbl_set_config_hash_internal \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(parrot_config))
 #define ASSERT_ARGS_init_world __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
