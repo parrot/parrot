@@ -222,7 +222,7 @@ Parrot_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
 
 /*
 
-=item C<STRING * Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)>
+=item C<STRING * Parrot_hll_get_HLL_name(PARROT_INTERP, INTVAL id)>
 
 Returns the STRING name of the HLL with the given C<id> number. If the id
 is out of range or does not exist, the NULL value is returned instead. Note
@@ -236,9 +236,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING *
-Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)
+Parrot_hll_get_HLL_name(PARROT_INTERP, INTVAL id)
 {
-    ASSERT_ARGS(Parrot_get_HLL_name)
+    ASSERT_ARGS(Parrot_hll_get_HLL_name)
     PMC * const  hll_info  = interp->HLL_info;
     const INTVAL nelements = VTABLE_elements(interp, hll_info);
 
@@ -445,7 +445,7 @@ Parrot_hll_regenerate_HLL_namespaces(PARROT_INTERP)
         if (PMC_IS_NULL(ns_hash) ||
                 ns_hash->vtable->base_type == enum_class_Undef)
         {
-            STRING * hll_name = Parrot_get_HLL_name(interp, hll_id);
+            STRING * hll_name = Parrot_hll_get_HLL_name(interp, hll_id);
             if (!hll_name)
                 continue;
 

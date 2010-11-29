@@ -994,7 +994,7 @@ return current Namespace
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_hll"))) {
             GET_ATTR_current_HLL(INTERP, SELF, hll);
             value = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
-            VTABLE_set_string_native(interp, value, Parrot_get_HLL_name(INTERP, hll));
+            VTABLE_set_string_native(interp, value, Parrot_hll_get_HLL_name(INTERP, hll));
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL,

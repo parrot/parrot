@@ -709,7 +709,7 @@ Archives the subroutine.
             sub->ns_entry_name = CONST_STRING(INTERP, "");
         VTABLE_push_string(INTERP, info, sub->ns_entry_name);
 
-        hll_name = Parrot_get_HLL_name(INTERP, sub->HLL_id);
+        hll_name = Parrot_hll_get_HLL_name(INTERP, sub->HLL_id);
         if (!hll_name)
             hll_name = CONST_STRING(INTERP, "");
         VTABLE_push_string(INTERP, info, hll_name);
