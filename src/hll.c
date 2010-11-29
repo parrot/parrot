@@ -302,7 +302,7 @@ Parrot_hll_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
 
 /*
 
-=item C<INTVAL Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL
+=item C<INTVAL Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL
 core_type)>
 
 Get an equivalent HLL type number for the language C<hll_id>.  If the given HLL
@@ -315,9 +315,9 @@ C<PARROT_HLL_NONE>, returns C<core_type> unchanged.
 
 PARROT_EXPORT
 INTVAL
-Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
+Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
 {
-    ASSERT_ARGS(Parrot_get_HLL_type)
+    ASSERT_ARGS(Parrot_hll_get_HLL_type)
 
     if (hll_id == PARROT_HLL_NONE || hll_id == 0)
         return core_type;
@@ -369,7 +369,7 @@ Parrot_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)
     if (!hll_id || hll_id == PARROT_HLL_NONE)
         return core_type;
 
-    return Parrot_get_HLL_type(interp, hll_id, core_type);
+    return Parrot_hll_get_HLL_type(interp, hll_id, core_type);
 }
 
 /*

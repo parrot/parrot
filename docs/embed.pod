@@ -686,7 +686,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_get_HLL_namespace>
 
-=item C<Parrot_get_HLL_type>
+=item C<Parrot_hll_get_HLL_type>
 
 =item C<Parrot_get_intreg>
 
