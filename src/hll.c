@@ -142,7 +142,7 @@ Parrot_hll_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 
     /* TODO LOCK or disallow in threads */
 
-    idx = Parrot_get_HLL_id(interp, hll_name);
+    idx = Parrot_hll_get_HLL_id(interp, hll_name);
 
     if (idx >= 0)
         return idx;
@@ -183,7 +183,7 @@ Parrot_hll_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 
 /*
 
-=item C<INTVAL Parrot_get_HLL_id(PARROT_INTERP, STRING *hll_name)>
+=item C<INTVAL Parrot_hll_get_HLL_id(PARROT_INTERP, STRING *hll_name)>
 
 Returns the ID number of the HLL with the given name. The default HLL namespace
 C<parrot> has an ID number of 0. On error, or if an HLL with the given name
@@ -196,9 +196,9 @@ does not exist, returns -1.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
+Parrot_hll_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
 {
-    ASSERT_ARGS(Parrot_get_HLL_id)
+    ASSERT_ARGS(Parrot_hll_get_HLL_id)
     PMC *       entry;
     PMC * const hll_info = interp->HLL_info;
     INTVAL      i        = -1;
@@ -279,7 +279,7 @@ Parrot_hll_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
 {
     ASSERT_ARGS(Parrot_hll_register_HLL_type)
 
-    if (hll_id == Parrot_get_HLL_id(interp, CONST_STRING(interp, "parrot")))
+    if (hll_id == Parrot_hll_get_HLL_id(interp, CONST_STRING(interp, "parrot")))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Cannot map without an HLL");
     else {

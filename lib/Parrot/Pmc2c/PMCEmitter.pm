@@ -622,7 +622,7 @@ EOC
 
         {
             /* Register this PMC as a HLL mapping */
-            const INTVAL hll_id = Parrot_get_HLL_id( interp, CONST_STRING_GEN(interp, "$hll"));
+            const INTVAL hll_id = Parrot_hll_get_HLL_id( interp, CONST_STRING_GEN(interp, "$hll"));
             if (hll_id > 0) {
 EOC
         foreach my $maps ( sort keys %{ $self->{flags}{maps} } ) {
