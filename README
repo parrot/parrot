@@ -30,6 +30,42 @@ For most of the platforms that we are supporting initially, Parrot should build
 out of the box. docs/parrot.pod lists the core platforms. PLATFORMS provides
 reports on the platforms on which Parrot has been built and tested.
 
+HOW TO GET PARROT FROM GITHUB
+-----------------------------
+Firstly, you should install Git.
+Linux:
+The method depends on your distribution. To install you should execute (as root or sudo <cmd>):
+
+On Ubuntu/Debian (apt-based):
+
+	apt-get install core
+
+On Red Hat, Fedora (rpm-based):
+
+	yum install git-core
+
+on Gentoo (portage):
+
+	emerge -av dev-vcs/git
+
+Windows:
+There are 2 Git ports on Windows:
+
+msysgit 	(http://code.google.com/p/msysgit/downloads/list)
+TortoiseGit 	(http://code.google.com/p/tortoisegit/downloads/list)
+
+In Git, branches represent some major changes of source.
+You can view the list of branches at http://github.com/parrot/parrot
+To fetch the source from the master branch: 
+
+	git clone git://github.com/parrot/parrot.git
+
+To fetch the source from a branch:
+
+	git clone git://github.com/parrot/parrot.git -b <branch>, e.g:
+
+	git clone git://github.com/parrot/parrot.git -b gsoc_threads
+
 INSTRUCTIONS
 ------------
 
