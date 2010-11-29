@@ -20,6 +20,7 @@ VERSION         = @VERSION@$(DEVEL)
 SOVERSION       = @VERSION@
 
 CONFIG_ARGS     = @configure_args@
+#IF(win32):SHELL           = CMD
 
 # Override at least PREFIX with the install location if you're going
 # to be using this outside of your build area.
