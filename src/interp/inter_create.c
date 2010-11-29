@@ -221,7 +221,7 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     /* create the root set registry */
     interp->gc_registry     = Parrot_pmc_new(interp, enum_class_AddrRegistry);
 
-    init_world_once(interp);
+    Parrot_gbl_init_world_once(interp);
 
     /* context data */
     if (is_env_var_set(interp, CONST_STRING(interp, "PARROT_GC_DEBUG"))) {

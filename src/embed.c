@@ -115,7 +115,7 @@ Parrot_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
 {
     ASSERT_ARGS(Parrot_init_stacktop)
     interp->lo_var_ptr = stack_top;
-    init_world_once(interp);
+    Parrot_gbl_init_world_once(interp);
 }
 
 

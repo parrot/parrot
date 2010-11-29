@@ -41,12 +41,12 @@ static unsigned int parrot_config_size_stored = 0;
 static void Parrot_gbl_setup_2(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void parrot_set_config_hash_interpreter(PARROT_INTERP)
+static void Parrot_gbl_set_config_hash_interpreter(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_gbl_setup_2 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_parrot_set_config_hash_interpreter \
+#define ASSERT_ARGS_Parrot_gbl_set_config_hash_interpreter \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -77,7 +77,7 @@ Parrot_gbl_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
 
 /*
 
-=item C<static void parrot_set_config_hash_interpreter(PARROT_INTERP)>
+=item C<static void Parrot_gbl_set_config_hash_interpreter(PARROT_INTERP)>
 
 Used internally to associate the config hash with an Interpreter
 using the last registered config data.
@@ -87,9 +87,9 @@ using the last registered config data.
 */
 
 static void
-parrot_set_config_hash_interpreter(PARROT_INTERP)
+Parrot_gbl_set_config_hash_interpreter(PARROT_INTERP)
 {
-    ASSERT_ARGS(parrot_set_config_hash_interpreter)
+    ASSERT_ARGS(Parrot_gbl_set_config_hash_interpreter)
     PMC *iglobals = interp->iglobals;
 
     PMC *config_hash = NULL;
@@ -113,7 +113,7 @@ parrot_set_config_hash_interpreter(PARROT_INTERP)
 
 /*
 
-=item C<void init_world_once(PARROT_INTERP)>
+=item C<void Parrot_gbl_init_world_once(PARROT_INTERP)>
 
 Call init_world() if it hasn't been called before.
 
@@ -124,9 +124,9 @@ C<interp> should be the root interpreter created in C<Parrot_new(NULL)>.
 */
 
 void
-init_world_once(PARROT_INTERP)
+Parrot_gbl_init_world_once(PARROT_INTERP)
 {
-    ASSERT_ARGS(init_world_once)
+    ASSERT_ARGS(Parrot_gbl_init_world_once)
     if (!interp->world_inited) {
         /* init_world() sets up some vtable stuff.
          * It must only be called once.
@@ -142,7 +142,7 @@ init_world_once(PARROT_INTERP)
 
 =item C<void init_world(PARROT_INTERP)>
 
-This is the actual initialization code called by C<init_world_once()>.
+This is the actual initialization code called by C<Parrot_gbl_init_world_once()>.
 
 It sets up the Parrot system, running any platform-specific init code if
 necessary, then initializing the string subsystem, and setting up the
@@ -179,7 +179,7 @@ init_world(PARROT_INTERP)
     VTABLE_set_pmc_keyed_int(interp, iglobals,
             (INTVAL)IGLOBALS_INTERPRETER, self);
 
-    parrot_set_config_hash_interpreter(interp);
+    Parrot_gbl_set_config_hash_interpreter(interp);
 
     /* lib search paths */
     parrot_init_library_paths(interp);
