@@ -38,13 +38,13 @@ static unsigned int parrot_config_size_stored = 0;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void parrot_global_setup_2(PARROT_INTERP)
+static void Parrot_gbl_setup_2(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static void parrot_set_config_hash_interpreter(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_parrot_global_setup_2 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_gbl_setup_2 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_parrot_set_config_hash_interpreter \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -165,7 +165,7 @@ init_world(PARROT_INTERP)
 #endif
 
     /* Call base vtable class constructor methods */
-    parrot_global_setup_2(interp);
+    Parrot_gbl_setup_2(interp);
     Parrot_gbl_initialize_core_pmcs(interp, 1);
 
     iglobals = interp->iglobals;
@@ -206,7 +206,7 @@ init_world(PARROT_INTERP)
 
 /*
 
-=item C<static void parrot_global_setup_2(PARROT_INTERP)>
+=item C<static void Parrot_gbl_setup_2(PARROT_INTERP)>
 
 called from inmidst of PMC bootstrapping between pass 0 and 1
 
@@ -215,9 +215,9 @@ called from inmidst of PMC bootstrapping between pass 0 and 1
 */
 
 static void
-parrot_global_setup_2(PARROT_INTERP)
+Parrot_gbl_setup_2(PARROT_INTERP)
 {
-    ASSERT_ARGS(parrot_global_setup_2)
+    ASSERT_ARGS(Parrot_gbl_setup_2)
     PMC *classname_hash;
 
     create_initial_context(interp);
