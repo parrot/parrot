@@ -37,11 +37,17 @@ Linux:
 The method depends on your distribution. To install you should execute (as root or sudo <cmd>):
 
 On Ubuntu/Debian (apt-based):
+
 	apt-get install core
+
 On Red Hat, Fedora (rpm-based):
+
 	yum install git-core
+
 on Gentoo (portage):
+
 	emerge -av dev-vcs/git
+
 Windows:
 There are 2 Git ports on Windows:
 
@@ -51,16 +57,20 @@ TortoiseGit 	(http://code.google.com/p/tortoisegit/downloads/list)
 In Git, branches represent some major changes of source and tags represent different releases.
 You can view the list of branches and tags at http://github.com/parrot/parrot
 To fetch the source from the master branch: 
+
 	git clone git://github.com/parrot/parrot.git
+
 To fetch the source from a branch:
+
 	git clone git://github.com/parrot/parrot.git -b <branch>, e.g:
+
 	git clone git://github.com/parrot/parrot.git -b gsoc_threads
+
 To fetch the source from a tag:
+
 	git fetch git://github.com/parrot/parrot.git tag <tag>, e.g:
+
 	git fetch git://github.com/parrot/parrot.git tag RELEASE_2_10_1
-If you fetched the source from a specific branch, you can merge it with the master:
-	git branch		-to list branches, active one will be marked with *
-	git merge master	-to merge active branch with master
 
 INSTRUCTIONS
 ------------
