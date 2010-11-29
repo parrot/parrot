@@ -1356,7 +1356,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_util_range_rand>
 
-=item C<Parrot_regenerate_HLL_namespaces>
+=item C<Parrot_hll_regenerate_HLL_namespaces>
 
 =item C<Parrot_register_encoding>
 

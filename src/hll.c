@@ -418,7 +418,7 @@ Parrot_hll_get_HLL_namespace(PARROT_INTERP, int hll_id)
 
 /*
 
-=item C<void Parrot_regenerate_HLL_namespaces(PARROT_INTERP)>
+=item C<void Parrot_hll_regenerate_HLL_namespaces(PARROT_INTERP)>
 
 Create all HLL namespaces that don't already exist. This is necessary when
 creating a new interpreter which shares an old interpreter's HLL_info.
@@ -429,9 +429,9 @@ creating a new interpreter which shares an old interpreter's HLL_info.
 
 PARROT_EXPORT
 void
-Parrot_regenerate_HLL_namespaces(PARROT_INTERP)
+Parrot_hll_regenerate_HLL_namespaces(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_regenerate_HLL_namespaces)
+    ASSERT_ARGS(Parrot_hll_regenerate_HLL_namespaces)
     const INTVAL n = VTABLE_elements(interp, interp->HLL_info);
     INTVAL       hll_id;
 
