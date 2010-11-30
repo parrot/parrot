@@ -78,6 +78,7 @@ include/pmc/pmc_key.h                            [devel]include
 include/pmc/pmc_lexinfo.h                        [devel]include
 include/pmc/pmc_lexpad.h                         [devel]include
 include/pmc/pmc_managedstruct.h                  [devel]include
+include/pmc/pmc_mappedbytearray.h                [devel]include
 include/pmc/pmc_multisub.h                       [devel]include
 include/pmc/pmc_namespace.h                      [devel]include
 include/pmc/pmc_nativepccmethod.h                [devel]include
@@ -375,6 +376,7 @@ src/pmc/key.dump                                 [devel]src
 src/pmc/lexinfo.dump                             [devel]src
 src/pmc/lexpad.dump                              [devel]src
 src/pmc/managedstruct.dump                       [devel]src
+src/pmc/mappedbytearray.dump                     [devel]src
 src/pmc/multisub.dump                            [devel]src
 src/pmc/namespace.dump                           [devel]src
 src/pmc/nativepccmethod.dump                     [devel]src
