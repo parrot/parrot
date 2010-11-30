@@ -15,7 +15,7 @@ consider when deciding whether this is a good idea.
 
 =head1 Introduction
 
-when considering whether to add code to Parrot, we'll ask ourselves and the
+When considering whether to add code to Parrot, we'll ask ourselves and the
 developer(s) the following questions, in approximate order of importance.  This
 is not an exhaustive list as much as a guide to help us make sure we think
 through the implications of adopting and supporting a new core component.
@@ -37,7 +37,7 @@ maintenance burden will be relative to the benefits the code will provide.
 =item * Is the code something that most of Parrot's users will be happy to find?
 
 More specifically, will the addition make development more fun for the majority
-of Parrot's users.  A generic optimization framework is would help most
+of Parrot's users.  A generic optimization framework would help most
 projects and have a good chance of inclusion.  A specialized math library or an
 HLL-specific datatype won't be of use to most projects and should live as a
 separate project.
