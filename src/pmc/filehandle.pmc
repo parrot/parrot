@@ -291,21 +291,6 @@ Returns a boolean value indicating whether C<SELF> is a console/tty.
         RETURN(INTVAL isatty);
     }
 
-/*
-
-=item C<METHOD close()>
-
-Close the filehandle.
-
-=cut
-
-*/
-
-    METHOD close() {
-        const INTVAL status = Parrot_io_close(INTERP, SELF);
-        RETURN(INTVAL status);
-    }
-
 
 /*
 

@@ -213,21 +213,6 @@ stored for mocking.
         RETURN(PMC *SELF);
     }
 
-/*
-
-=item C<METHOD close()>
-
-Reset some core data for the StringHandle, but don't delete the string data, as
-it may be wanted later (for capturing the results).
-
-=cut
-
-*/
-
-    METHOD close() {
-        SET_ATTR_read_offset(INTERP, SELF, 0);
-        RETURN(INTVAL 0);
-    }
 
 /*
 
