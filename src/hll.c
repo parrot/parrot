@@ -389,7 +389,8 @@ PMC*
 Parrot_hll_get_ctx_HLL_namespace(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_hll_get_ctx_HLL_namespace)
-    return Parrot_hll_get_HLL_namespace(interp, Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
+    return Parrot_hll_get_HLL_namespace(interp,
+        Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
 }
 
 /*
