@@ -119,14 +119,14 @@ Free all resources used.
             unsigned long length = 0;
             void *mapping = NULL;
             STRING *name = VTABLE_get_string(INTERP, init);
-            #ifdef MAPW32
-            #else
+        #  ifdef MAPW32
+        #  else
             mapping = mapfromfilename(interp, name, &length, CAN_READ);
             if (mapping == 0 || mapping == (void *)-1)
                 Parrot_ex_throw_from_c_args(INTERP, NULL,
                         EXCEPTION_INVALID_OPERATION,
                         "mmap failed: %s", strerror(errno));
-            #endif
+        #  endif
             PObj_custom_destroy_SET(SELF);
             SET_ATTR_size(INTERP, SELF, length);
             SET_ATTR_buffer(INTERP, SELF, (unsigned char*)mapping);
@@ -146,11 +146,11 @@ Free all resources used.
         GET_ATTR_size(INTERP, SELF, size);
         GET_ATTR_buffer(INTERP, SELF, buffer);
         if (size > 0) {
-            #ifdef MAPW32
+        #  ifdef MAPW32
             UnmapViewOfFile(buffer);
-            #else
+        #  else
             munmap(buffer, size);
-            #endif
+        #  endif
         }
         #endif
     }
@@ -337,11 +337,11 @@ does not fail, non zero otherwise.
         if (buffer) {
             INTVAL size;
             GET_ATTR_size(INTERP, SELF, size);
-            #ifdef MAPW32
+        #  ifdef MAPW32
             result = ! UnmapViewOfFile(buffer);
-            #else
+        #  else
             result = munmap(buffer, size);
-            #endif
+        #  endif
             if (result == 0) {
                 buffer = NULL;
                 SET_ATTR_buffer(INTERP, SELF, buffer);
@@ -464,7 +464,7 @@ mapfromfilehandle(PIOHANDLE handle, unsigned long size, int flag)
 
     #ifdef ENABLED
     void *mapping = (void *)-1;
-    #ifdef MAPW32
+    #  ifdef MAPW32
     HANDLE hmapping;
     DWORD prot, access;
     if (flag & CAN_WRITE) {
@@ -480,12 +480,12 @@ mapfromfilehandle(PIOHANDLE handle, unsigned long size, int flag)
         mapping = MapViewOfFile(hmapping, access, 0, 0, size);
         CloseHandle(hmapping);
     }
-    #else
+    #  else
     int prot = 0;
     if (flag & CAN_READ) prot |= PROT_READ;
     if (flag & CAN_WRITE) prot |= PROT_WRITE;
     mapping = mmap(0, size, prot, MAP_SHARED, handle, 0);
-    #endif
+    #  endif
     #endif
     return mapping;
 }
@@ -499,7 +499,7 @@ mapfromfilename(PARROT_INTERP, ARGIN(STRING *name), ARGMOD(unsigned long *size),
     void *mapping = (void *)-1;
     #ifdef ENABLED
     PIOHANDLE handle;
-    #ifdef MAPW32
+    #  ifdef MAPW32
     DWORD openmode = 0;
     switch (flag & (CAN_READ | CAN_WRITE)) {
       case CAN_READ:
@@ -522,7 +522,7 @@ mapfromfilename(PARROT_INTERP, ARGIN(STRING *name), ARGMOD(unsigned long *size),
             OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         Parrot_str_free_cstring(name_str);
     }
-    #else
+    #  else
     int openmode = 0;
     switch (flag & (CAN_READ | CAN_WRITE)) {
       case CAN_READ:
@@ -544,16 +544,16 @@ mapfromfilename(PARROT_INTERP, ARGIN(STRING *name), ARGMOD(unsigned long *size),
         handle = open(name_str, openmode);
         Parrot_str_free_cstring(name_str);
     }
-    #endif
+    #  endif
     if (handle == PIO_INVALID_HANDLE)
         Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION, "cannot open file '%Ss'", name);
     if (*size == 0) {
-        #ifdef MAPW32
+    #  ifdef MAPW32
         *size = (unsigned long)GetFileSize(handle, NULL);
-        #else
+    #  else
         *size = lseek(handle, 0, SEEK_END);
-        #endif
+    #  endif
     }
     mapping = mapfromfilehandle(handle, *size, flag);
 
@@ -602,3 +602,4 @@ build_string(PARROT_INTERP, ARGIN_NULLOK(const unsigned char *content),
  * End:
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
+
