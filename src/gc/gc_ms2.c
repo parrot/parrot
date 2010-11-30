@@ -590,7 +590,7 @@ Parrot_gc_ms2_init(PARROT_INTERP)
     interp->gc_sys->is_pmc_ptr                  = gc_ms2_is_pmc_ptr;
     interp->gc_sys->is_string_ptr               = gc_ms2_is_string_ptr;
     interp->gc_sys->mark_pmc_header             = gc_ms2_mark_pmc_header;
-    interp->gc_sys->mark_pobj_header            = gc_ms2_mark_pobj_header;
+    interp->gc_sys->mark_str_header             = gc_ms2_mark_pobj_header;
 
     interp->gc_sys->block_mark                  = gc_ms2_block_GC_mark;
     interp->gc_sys->unblock_mark                = gc_ms2_unblock_GC_mark;
