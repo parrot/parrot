@@ -236,7 +236,7 @@ Parrot_io_close(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
         }
     }
     else if (pmc->vtable->base_type == enum_class_StringHandle) {
-        SET_ATTR_read_offset(interp, pmc, 0);
+        SETATTR_StringHandle_read_offset(interp, pmc, 0);
         result = 0;
     }
     else
