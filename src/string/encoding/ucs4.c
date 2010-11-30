@@ -121,6 +121,7 @@ ucs4_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(ucs4_to_encoding)
     const UINTVAL  len = src->strlen;
+    UINTVAL        i;
     STRING        *res;
     utf32_t       *ptr;
 
@@ -133,7 +134,6 @@ ucs4_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 
     if (STRING_max_bytes_per_codepoint(src) == 1) {
         const unsigned char *s = (unsigned char *)src->strstart;
-        UINTVAL i;
 
         for (i = 0; i < len; i++) {
             ptr[i] = s[i];
@@ -145,7 +145,8 @@ ucs4_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         STRING_ITER_INIT(interp, &iter);
 
         while (iter.charpos < len) {
-            ptr[iter.charpos] = STRING_iter_get_and_advance(interp, src, &iter);
+            i      = iter.charpos;
+            ptr[i] = STRING_iter_get_and_advance(interp, src, &iter);
         }
     }
 
