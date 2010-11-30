@@ -18,6 +18,7 @@ Bare minimal functionality available, only for posix platforms
 
 #include "parrot/parrot.h"
 #include "../src/io/io_private.h"
+#include "../src/string/unicode.h"
 
 #define CAN_READ  1
 #define CAN_WRITE 2
@@ -374,8 +375,45 @@ Get a string from the buffer content with the specified encoding.
         if (pos < 0 || bytelength < 0 || size < 0 || pos + bytelength > size)
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                     EXCEPTION_OUT_OF_BOUNDS,
-                    "index out of mapped");
+                    "get_string: index out of mapped");
         result = build_string(INTERP, buffer + pos, bytelength, encoding);
+        RETURN(STRING *result);
+        #endif
+    }
+
+/*
+
+=item C<get_utf8(INTVAL pos, INTVAL length)>
+
+Get a utf8 string from the buffer content with the specified lenght
+in codepoints.
+
+=cut
+
+*/
+
+    METHOD get_utf8(INTVAL pos, INTVAL length)
+    {
+        #ifdef ENABLED
+        STRING *result;
+        unsigned char *buffer;
+        INTVAL size;
+        INTVAL curpos;
+        INTVAL charlen;
+        unsigned char c;
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        GET_ATTR_size(INTERP, SELF, size);
+        for (curpos = pos; length > 0; --length) {
+            if (curpos < 0 || curpos >= size)
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                        EXCEPTION_OUT_OF_BOUNDS,
+                        "get_utf8: index out of mapped");
+            c = buffer[curpos];
+            charlen = Parrot_utf8skip[c];
+            fprintf(stderr, "%i\n", (int)charlen);
+            curpos += charlen;
+        }
+        result = build_string(INTERP, buffer + pos, curpos - pos, Parrot_utf8_encoding_ptr);
         RETURN(STRING *result);
         #endif
     }
