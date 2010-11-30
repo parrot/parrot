@@ -49,6 +49,10 @@ L<https://trac.parrot.org/parrot/ticket/1580>
 
 L<https://trac.parrot.org/parrot/ticket/1599>
 
+=item MappedByteArray [experimental]
+
+L<https://trac.parrot.org/parrot/ticket/1877>
+
 =item multiple dispatch within core PMCs [eligible in 1.1]
 
 L<https://trac.parrot.org/parrot/ticket/452>
