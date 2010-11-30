@@ -270,7 +270,6 @@ sub shim_test {
 
 sub add_asserts_to_declarations {
     my ($funcs_ref, $decls_ref) = @_;
-#print STDERR Dumper $funcs_ref;
     foreach my $func (@{ $funcs_ref }) {
         my $assert = "#define ASSERT_ARGS_" . $func->{name};
         if(length($func->{name}) > 29) {
