@@ -339,9 +339,6 @@ handler:
 .end
 
 .sub complex_divide_by_zero_Complex
-    skip( 1, 'div by zero not caught' )
-    .return()
-
     $P0 = new ['Complex']
     set $P0, "4+3.5i"
     $P1 = new ['Complex']
@@ -356,9 +353,6 @@ handler:
 .end
 
 .sub complex_divide_by_zero_Float
-    skip( 1, 'div by zero not caught' )
-    .return()
-
     $P0 = new ['Complex']
     set $P0, "4+3.5i"
     $P1 = new ['Complex']
@@ -372,9 +366,6 @@ handler:
 .end
 
 .sub complex_divide_by_zero_Integer
-    skip( 1, 'div by zero not caught' )
-    .return()
-
     $P0 = new ['Complex']
     set $P0, "4+3.5i"
     $P1 = new ['Complex']
