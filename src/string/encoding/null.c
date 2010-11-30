@@ -210,8 +210,7 @@ static STR_VTABLE Parrot_null_encoding = {
     (str_vtable_iter_get_t)null_error,
     (str_vtable_iter_skip_t)null_error,
     (str_vtable_iter_get_and_advance_t)null_error,
-    (str_vtable_iter_set_and_advance_t)null_error,
-    (str_vtable_iter_set_position_t)null_error
+    (str_vtable_iter_set_and_advance_t)null_error
 };
 
 STR_VTABLE *Parrot_null_encoding_ptr = &Parrot_null_encoding;

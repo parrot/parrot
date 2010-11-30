@@ -62,14 +62,6 @@ static void utf8_iter_set_and_advance(PARROT_INTERP,
         FUNC_MODIFIES(*str)
         FUNC_MODIFIES(*i);
 
-static void utf8_iter_set_position(SHIM_INTERP,
-    ARGIN(const STRING *str),
-    ARGMOD(String_iter *i),
-    UINTVAL pos)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*i);
-
 static void utf8_iter_skip(SHIM_INTERP,
     ARGIN(const STRING *str),
     ARGMOD(String_iter *i),
@@ -119,9 +111,6 @@ static STRING * utf8_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_utf8_iter_set_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str) \
-    , PARROT_ASSERT_ARG(i))
-#define ASSERT_ARGS_utf8_iter_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_utf8_iter_skip __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(str) \
@@ -523,66 +512,6 @@ utf8_iter_set_and_advance(PARROT_INTERP,
 }
 
 
-/*
-
-=item C<static void utf8_iter_set_position(PARROT_INTERP, const STRING *str,
-String_iter *i, UINTVAL pos)>
-
-The UTF-8 implementation of the string iterator's C<set_position>
-function.
-
-=cut
-
-*/
-
-static void
-utf8_iter_set_position(SHIM_INTERP,
-    ARGIN(const STRING *str), ARGMOD(String_iter *i), UINTVAL pos)
-{
-    ASSERT_ARGS(utf8_iter_set_position)
-    const utf8_t *ptr = (utf8_t *)str->strstart;
-
-    if (pos == 0) {
-        i->charpos = 0;
-        i->bytepos = 0;
-        return;
-    }
-
-    PARROT_ASSERT(pos <= str->strlen);
-
-    /*
-     * we know the byte offsets of three positions: start, current and end
-     * now find the shortest way to reach pos
-     */
-    if (pos < i->charpos) {
-        if (pos <= (i->charpos >> 1)) {
-            /* go forward from start */
-            ptr = utf8_skip_forward(ptr, pos);
-        }
-        else {
-            /* go backward from current */
-            ptr = utf8_skip_backward(ptr + i->bytepos, i->charpos - pos);
-        }
-    }
-    else {
-        const UINTVAL  len = str->strlen;
-        if (pos <= i->charpos + ((len - i->charpos) >> 1)) {
-            /* go forward from current */
-            ptr = utf8_skip_forward(ptr + i->bytepos, pos - i->charpos);
-        }
-        else {
-            /* go backward from end */
-            ptr = utf8_skip_backward(ptr + str->bufused, len - pos);
-        }
-    }
-
-    i->charpos = pos;
-    i->bytepos = (const char *)ptr - (const char *)str->strstart;
-
-    PARROT_ASSERT(i->bytepos <= str->bufused);
-}
-
-
 static STR_VTABLE Parrot_utf8_encoding = {
     0,
     "utf8",
@@ -620,8 +549,7 @@ static STR_VTABLE Parrot_utf8_encoding = {
     utf8_iter_get,
     utf8_iter_skip,
     utf8_iter_get_and_advance,
-    utf8_iter_set_and_advance,
-    utf8_iter_set_position
+    utf8_iter_set_and_advance
 };
 
 STR_VTABLE *Parrot_utf8_encoding_ptr = &Parrot_utf8_encoding;

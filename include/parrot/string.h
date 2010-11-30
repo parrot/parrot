@@ -58,7 +58,6 @@
 #define STRING_iter_skip(i, str, iter, skip) ((str)->encoding)->iter_skip((i), (str), (iter), (skip))
 #define STRING_iter_get_and_advance(i, str, iter) ((str)->encoding)->iter_get_and_advance((i), (str), (iter))
 #define STRING_iter_set_and_advance(i, str, iter, c) ((str)->encoding)->iter_set_and_advance((i), (str), (iter), (c))
-#define STRING_iter_set_position(i, str, iter, pos) ((str)->encoding)->iter_set_position((i), (str), (iter), (pos))
 
 /* stringinfo parameters */
 
@@ -118,7 +117,6 @@ typedef UINTVAL  (*str_vtable_iter_get_t)(PARROT_INTERP, const STRING *str, cons
 typedef void     (*str_vtable_iter_skip_t)(PARROT_INTERP, const STRING *str, String_iter *i, INTVAL skip);
 typedef UINTVAL  (*str_vtable_iter_get_and_advance_t)(PARROT_INTERP, const STRING *str, String_iter *i);
 typedef void     (*str_vtable_iter_set_and_advance_t)(PARROT_INTERP, STRING *str, String_iter *i, UINTVAL c);
-typedef void     (*str_vtable_iter_set_position_t)(PARROT_INTERP, const STRING *str, String_iter *i, UINTVAL pos);
 
 struct _str_vtable {
     int         num;
@@ -158,7 +156,6 @@ struct _str_vtable {
     str_vtable_iter_skip_t              iter_skip;
     str_vtable_iter_get_and_advance_t   iter_get_and_advance;
     str_vtable_iter_set_and_advance_t   iter_set_and_advance;
-    str_vtable_iter_set_position_t      iter_set_position;
 };
 
 typedef struct _str_vtable STR_VTABLE;

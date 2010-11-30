@@ -232,7 +232,7 @@ encoding_index(PARROT_INTERP, ARGIN(const STRING *src),
         return -1;
 
     STRING_ITER_INIT(interp, &start);
-    STRING_iter_set_position(interp, src, &start, offset);
+    STRING_iter_skip(interp, src, &start, offset);
 
     return Parrot_str_iter_index(interp, src, &start, &end, search);
 }
@@ -465,7 +465,7 @@ encoding_substr(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL l
     STRING_ITER_INIT(interp, &iter);
 
     if (offset)
-        STRING_iter_set_position(interp, src, &iter, offset);
+        STRING_iter_skip(interp, src, &iter, offset);
 
     start = iter.bytepos;
     return_string->strstart += start;
@@ -475,7 +475,7 @@ encoding_substr(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL l
         return_string->strlen  -= offset;
     }
     else {
-        STRING_iter_set_position(interp, src, &iter, offset + length);
+        STRING_iter_skip(interp, src, &iter, length);
         return_string->bufused = iter.bytepos - start;
         return_string->strlen  = length;
     }
@@ -538,7 +538,7 @@ encoding_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src),
     UINTVAL     end = offset + count;
 
     STRING_ITER_INIT(interp, &iter);
-    STRING_iter_set_position(interp, src, &iter, offset);
+    STRING_iter_skip(interp, src, &iter, offset);
 
     end = src->strlen < end ? src->strlen : end;
 
@@ -588,7 +588,7 @@ encoding_find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src),
     STRING_ITER_INIT(interp, &iter);
 
     if (offset)
-        STRING_iter_set_position(interp, src, &iter, offset);
+        STRING_iter_skip(interp, src, &iter, offset);
 
     end = src->strlen < end ? src->strlen : end;
 
@@ -1222,28 +1222,6 @@ fixed8_iter_set_and_advance(PARROT_INTERP,
     iter->bytepos++;
 
     PARROT_ASSERT(iter->bytepos <= str->bufused);
-}
-
-
-/*
-
-=item C<void fixed8_iter_set_position(PARROT_INTERP, const STRING *str,
-String_iter *iter, UINTVAL pos)>
-
-Moves the string iterator C<i> to the position C<n> in the string.
-
-=cut
-
-*/
-
-void
-fixed8_iter_set_position(SHIM_INTERP,
-    ARGIN(const STRING *str), ARGMOD(String_iter *iter), UINTVAL pos)
-{
-    ASSERT_ARGS(fixed8_iter_set_position)
-    PARROT_ASSERT(pos <= str->bufused);
-
-    iter->bytepos = iter->charpos = pos;
 }
 
 

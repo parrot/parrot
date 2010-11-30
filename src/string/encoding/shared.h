@@ -202,14 +202,6 @@ void fixed8_iter_set_and_advance(PARROT_INTERP,
         FUNC_MODIFIES(*str)
         FUNC_MODIFIES(*iter);
 
-void fixed8_iter_set_position(SHIM_INTERP,
-    ARGIN(const STRING *str),
-    ARGMOD(String_iter *iter),
-    UINTVAL pos)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*iter);
-
 void fixed8_iter_skip(SHIM_INTERP,
     ARGIN(const STRING *str),
     ARGMOD(String_iter *iter),
@@ -363,9 +355,6 @@ STRING* unicode_upcase_first(PARROT_INTERP, SHIM(const STRING *src))
 #define ASSERT_ARGS_fixed8_iter_set_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str) \
-    , PARROT_ASSERT_ARG(iter))
-#define ASSERT_ARGS_fixed8_iter_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(iter))
 #define ASSERT_ARGS_fixed8_iter_skip __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(str) \

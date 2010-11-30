@@ -59,13 +59,6 @@ static void ucs2_iter_set_and_advance(PARROT_INTERP,
         FUNC_MODIFIES(*str)
         FUNC_MODIFIES(*i);
 
-static void ucs2_iter_set_position(SHIM_INTERP,
-    SHIM(const STRING *str),
-    ARGMOD(String_iter *i),
-    UINTVAL n)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*i);
-
 static void ucs2_iter_skip(SHIM_INTERP,
     SHIM(const STRING *str),
     ARGMOD(String_iter *i),
@@ -102,8 +95,6 @@ static STRING * ucs2_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(i))
-#define ASSERT_ARGS_ucs2_iter_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_ucs2_iter_skip __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_ucs2_ord __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -326,27 +317,6 @@ ucs2_iter_set_and_advance(PARROT_INTERP,
 
 /*
 
-=item C<static void ucs2_iter_set_position(PARROT_INTERP, const STRING *str,
-String_iter *i, UINTVAL n)>
-
-Moves the string iterator C<i> to the position C<n> in the string.
-
-=cut
-
-*/
-
-static void
-ucs2_iter_set_position(SHIM_INTERP,
-    SHIM(const STRING *str), ARGMOD(String_iter *i), UINTVAL n)
-{
-    ASSERT_ARGS(ucs2_iter_set_position)
-
-    i->charpos = n;
-    i->bytepos = n * 2;
-}
-
-/*
-
 =item C<static size_t ucs2_hash(PARROT_INTERP, const STRING *src, size_t
 hashval)>
 
@@ -412,8 +382,7 @@ static STR_VTABLE Parrot_ucs2_encoding = {
     ucs2_iter_get,
     ucs2_iter_skip,
     ucs2_iter_get_and_advance,
-    ucs2_iter_set_and_advance,
-    ucs2_iter_set_position
+    ucs2_iter_set_and_advance
 };
 
 STR_VTABLE *Parrot_ucs2_encoding_ptr = &Parrot_ucs2_encoding;

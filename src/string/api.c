@@ -1198,7 +1198,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     /* get byte position of the part that will be replaced */
     STRING_ITER_INIT(interp, &iter);
 
-    STRING_iter_set_position(interp, src, &iter, true_offset);
+    STRING_iter_skip(interp, src, &iter, true_offset);
     start_byte = iter.bytepos;
     start_char = iter.charpos;
 
