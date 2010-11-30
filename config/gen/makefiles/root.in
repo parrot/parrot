@@ -411,7 +411,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/core_pmcs.h \
 	$(INC_DIR)/compiler.h \
 	$(INC_DIR)/cclass.h \
-	$(INC_DIR)/list.h \
 	include/pmc/pmc_callcontext.h
 
 # generated list of header files
@@ -1333,7 +1332,7 @@ src/gc/gc_ms2$(O) : \
     src/gc/gc_private.h \
     src/gc/fixed_allocator.h \
     src/gc/gc_ms2.c \
-    $(INC_DIR)/list.h \
+    $(INC_DIR)/pointer_array.h \
     src/gc/variable_size_pool.h \
     $(INC_DIR)/sysmem.h
 
@@ -1374,8 +1373,7 @@ src/hll$(O) : $(PARROT_H_HEADERS) src/hll.str $(INC_DIR)/dynext.h src/hll.c
 
 src/platform$(O) : \
     $(PARROT_H_HEADERS) \
-    src/platform.c \
-    $(INC_DIR)/sysmem.h
+    src/platform.c
 
 #IF(platform_asm):src/platform_asm$(O) : $(PARROT_H_HEADERS)
 #IF(platform_asm):
@@ -1639,7 +1637,10 @@ src/nci/libffi$(O) : src/nci/libffi.c \
     include/pmc/pmc_unmanagedstruct.h \
     include/pmc/pmc_managedstruct.h
 
-src/nci/signatures$(O) : src/nci/signatures.c $(PARROT_H_HEADERS)
+src/nci/signatures$(O) : \
+    src/nci/signatures.c \
+    src/nci/signatures.str \
+    $(PARROT_H_HEADERS)
 
 src/vtables$(O) : $(PARROT_H_HEADERS) src/vtables.c
 
