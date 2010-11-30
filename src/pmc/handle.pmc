@@ -67,6 +67,29 @@ subtypes that are or can be tty.
         RETURN(INTVAL 0);
     }
 
+/*
+
+=item C<METHOD get_fd()>
+
+Retrieve the integer file descriptor for the FileHandle (only available on
+platforms that use integer file descriptors).
+
+=cut
+
+*/
+
+    METHOD get_fd() {
+#ifndef PIO_OS_STDIO
+        PIOHANDLE os_handle;
+        INTVAL    fd;
+        GET_ATTR_os_handle(INTERP, SELF, os_handle);
+        fd = (INTVAL)os_handle;
+        RETURN(INTVAL fd);
+#endif /*PIO_OS_STDIO*/
+
+        RETURN(INTVAL -1);
+    }
+
 }
 
 /*
