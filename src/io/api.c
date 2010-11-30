@@ -199,7 +199,13 @@ Parrot_io_fdopen(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), PIOHANDLE fd,
 
 =item C<INTVAL Parrot_io_close(PARROT_INTERP, PMC *pmc)>
 
-Closes the handle object.
+Closes the Handle object.
+
+If it is a C<StringHandle> reset some core data, but don't delete the
+string data, as it may be wanted later (for capturing the results).
+
+If it is a C<FileHandle> call the C<close> method on the
+filehandle-PMC object.
 
 =cut
 
