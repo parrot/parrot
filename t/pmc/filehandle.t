@@ -824,6 +824,17 @@ ok 5
 ok 6
 OUTPUT
 
+# FileHandle use file descriptor, get_fd should not return -1
+pir_output_is( <<'CODE', <<'OUT', 'get_fd method' );
+.sub test :main
+    new $P0, ['FileHandle']
+    $N0 = $P0.'get_fd'()
+    say $N0
+.end
+CODE
+-1
+OUT
+
 # TT #1178
 # L<PDD22/I\/O PMC API/=item get_fd>
 # NOTES: this is going to be platform dependent
