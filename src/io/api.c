@@ -198,8 +198,7 @@ Parrot_io_fdopen(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), PIOHANDLE fd,
 
 =item C<INTVAL Parrot_io_close(PARROT_INTERP, PMC *pmc)>
 
-Closes the filehandle object. Calls the C<close> method on the filehandle
-PMC object.
+Closes the handle object.
 
 =cut
 
@@ -218,6 +217,16 @@ Parrot_io_close(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
     if (pmc->vtable->base_type == enum_class_FileHandle) {
         result = Parrot_io_close_filehandle(interp, pmc);
         SETATTR_FileHandle_flags(interp, pmc, 0);
+    }
+    else if (pmc->vtable->base_type == enum_class_Socket) {
+        result = -1;
+        if (PARROT_SOCKET(SELF)) {
+            Parrot_Socket_attributes *data_struct = PARROT_SOCKET(SELF);
+
+            if (data_struct->os_handle != PIO_INVALID_HANDLE)
+                result = Parrot_io_close_piohandle(INTERP, data_struct->os_handle);
+            data_struct->os_handle = PIO_INVALID_HANDLE;
+        }
     }
     else
         Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "close"), "->I", &result);
