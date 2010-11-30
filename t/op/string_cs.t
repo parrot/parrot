@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 55;
+use Parrot::Test tests => 57;
 use Parrot::Config;
 
 =head1 NAME
@@ -796,10 +796,50 @@ OUTPUT
     $P0.'encoding'("utf8") # set utf8 output
     print $S1
     print "\n"
+    length $I0, $S1
+    print $I0
+    print "\n"
     end
 .end
 CODE
 HACEK J J\xcc\x8c
+10
+OUTPUT
+
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode titlecase to combined char" );
+.sub main :main
+    set $S1, utf8:"hacek j \u01f0"
+    titlecase $S1, $S1
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
+    print "\n"
+    length $I0, $S1
+    print $I0
+    print "\n"
+    end
+.end
+CODE
+Hacek J J\xcc\x8c
+10
+OUTPUT
+
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode downcase to combined char" );
+.sub main :main
+    set $S1, utf8:"I WITH DOT ABOVE \u0130"
+    downcase $S1, $S1
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
+    print "\n"
+    length $I0, $S1
+    print $I0
+    print "\n"
+    end
+.end
+CODE
+i with dot above i\xcc\x87
+19
 OUTPUT
 
     # charset/unicode.c
