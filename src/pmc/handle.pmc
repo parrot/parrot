@@ -90,6 +90,22 @@ platforms that use integer file descriptors).
         RETURN(INTVAL -1);
     }
 
+
+/*
+
+=item C<METHOD close()>
+
+Close the handle.
+
+=cut
+
+*/
+
+    METHOD close() {
+        const INTVAL status = Parrot_io_close(INTERP, SELF);
+        RETURN(INTVAL status);
+    }
+
 }
 
 /*
