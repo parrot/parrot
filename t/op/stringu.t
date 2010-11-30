@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 40;
+use Parrot::Test tests => 41;
 use Parrot::Config;
 
 =head1 NAME
@@ -1044,6 +1044,39 @@ CODE
 0x2673
 OUT
 }
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'ord with Unicode encodings' );
+.sub 'main'
+    test(utf8:"a\uBABEb c\uBEEFd")
+    test(utf16:"a\uBABEb c\uBEEFd")
+    test(ucs2:"a\uBABEb c\uBEEFd")
+    test(ucs4:"a\uBABEb c\uBEEFd")
+.end
+
+.sub 'test'
+    .param string str
+    .local int c
+
+    c = ord str, -2
+    say c
+
+    push_eh handler
+    c = ord str, 100
+    print "not "
+handler:
+    say "ok"
+    pop_eh
+.end
+CODE
+48879
+ok
+48879
+ok
+48879
+ok
+48879
+ok
+OUTPUT
 
 # Local Variables:
 #   mode: cperl
