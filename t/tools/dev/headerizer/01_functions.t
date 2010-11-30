@@ -9,6 +9,8 @@ use Test::More qw(no_plan); # tests => 38;
 use Carp;
 use Cwd;
 use File::Copy;
+use File::Path qw( mkpath );
+use File::Spec;
 use File::Temp qw( tempdir );
 use lib qw( lib );
 use Parrot::Config;
@@ -20,6 +22,7 @@ use Parrot::Headerizer::Functions qw(
     asserts_from_args
     shim_test
     add_asserts_to_declarations
+    add_headerizer_markers
 );
 
 use IO::CaptureOutput qw| capture |;
@@ -390,7 +393,55 @@ $expected .= '    , PARROT_ASSERT_ARG(item))';
 is( $decls[0], $expected,
     "Got expected declaration from add_asserts_to_declarations()" );
 
+# add_headerizer_markers
+#{
+#    my $tdir = tempdir( CLEANUP => 1 );
+#    chdir $tdir or croak "Unable to chdir during testing";
+#
+#    my $stub = 'list';
+#    my $srcdir    = File::Spec->catpath( $tdir, 'src' );
+#    mkpath( $srcdir, 0, 0777 );
+#    my $srco      = File::Spec->catfile( $srcdir, "$stub.o" );
+#    touchfile($srco);
+#    my $srcc      = File::Spec->catfile( $srcdir, "$stub.c" );
+#    copy "$cwd/t/tools/dev/headerizer/testlib/list.in" => $srcc
+#        or croak "Unable to copy";
+#    my $incdir    = File::Spec->catpath( $tdir, 'include', 'parrot' );
+#    mkpath( $incdir, 0, 0777 );
+#    my $inch      = File::Spec->catfile( $incdir, "$stub.h" );
+#    copy "$cwd/t/tools/dev/headerizer/testlib/list_h.in" => $inch
+#        or croak "Unable to copy";
+#
+#    my $source_code = read_file($srcc);
+#    my $function_decls_file = "$tdir/function_decls";
+#    copy "$cwd/t/tools/dev/headerizer/testlib/function_decls.in" =>
+#        $function_decls_file or croak "Unable to copy";
+#    my $intext = read_file($function_decls_file);
+#    my @function_decls;
+#    ( @function_decls ) = $intext =~ m/'([^,][^']*?)'/gs;
+#
+# TEST IS NOT SET UP PROPERLY YET.
+#
+#    my $headerized_source =  add_headerizer_markers( {
+#        function_decls  => \@function_decls,
+#        sourcefile      => $srcc,
+#        hfile           => $inch,
+#        code            => $source_code,
+#    } );
+#print STDERR $headerized_source;
+#
+#    chdir $cwd or croak "Unable to chdir back after testing";
+#}
+
 pass("Completed all tests in $0");
+
+sub touchfile {
+    my $filename = shift;
+    open my $IN, '>', $filename or croak "Unable to open for writing";
+    print $IN "\n";
+    close $IN or croak "Unable to close after writing";
+    return 1;
+}
 
 ################### DOCUMENTATION ###################
 

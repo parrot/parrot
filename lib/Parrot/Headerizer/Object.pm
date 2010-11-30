@@ -26,6 +26,7 @@ of C-language files.
 
 use strict;
 use warnings;
+use Data::Dumper;$Data::Dumper::Indent=1;
 use Scalar::Util qw( reftype );
 use lib qw( lib );
 use Parrot::Config;
@@ -36,6 +37,7 @@ use Parrot::Headerizer::Functions qw(
     asserts_from_args
     shim_test
     add_asserts_to_declarations
+    add_headerizer_markers
 );
 
 =item C<new()>
@@ -528,18 +530,28 @@ sub replace_headerized_declarations {
     } @funcs;
     my @function_decls = $self->make_function_decls(@funcs);
 
-    my $function_decls = join( "\n", @function_decls );
-    my $STARTMARKER    = qr{/\* HEADERIZER BEGIN: $sourcefile \*/\n};
-    my $ENDMARKER      = qr{/\* HEADERIZER END: $sourcefile \*/\n?};
-    my $DO_NOT_TOUCH   = q{/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */};
+#    my $function_decls = join( "\n", @function_decls );
+#    my $STARTMARKER    = qr{/\* HEADERIZER BEGIN: $sourcefile \*/\n};
+#    my $ENDMARKER      = qr{/\* HEADERIZER END: $sourcefile \*/\n?};
+#    my $DO_NOT_TOUCH   = q{/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */};
+#
+#    $source_code =~
+#        s{($STARTMARKER)(?:.*?)($ENDMARKER)}
+#         {$1$DO_NOT_TOUCH\n\n$function_decls\n$DO_NOT_TOUCH\n$2}s
+#        or die "Need begin/end HEADERIZER markers for $sourcefile in $hfile\n";
+#
+#    return $source_code;
 
-    $source_code =~
-        s{($STARTMARKER)(?:.*?)($ENDMARKER)}
-         {$1$DO_NOT_TOUCH\n\n$function_decls\n$DO_NOT_TOUCH\n$2}s
-        or die "Need begin/end HEADERIZER markers for $sourcefile in $hfile\n";
-
-    return $source_code;
+    my $markers_args = {
+        function_decls  => \@function_decls,
+        sourcefile      => $sourcefile,
+        hfile           => $hfile,
+        code            => $source_code,
+    };
+#print STDERR Dumper $markers_args;
+    return add_headerizer_markers( $markers_args );
 }
+
 
 sub make_function_decls {
     my $self = shift;

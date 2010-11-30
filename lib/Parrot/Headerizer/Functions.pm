@@ -14,6 +14,7 @@ our @EXPORT_OK = qw(
     asserts_from_args
     shim_test
     add_asserts_to_declarations
+    add_headerizer_markers
 );
 
 =head1 NAME
@@ -289,6 +290,33 @@ sub add_asserts_to_declarations {
         push(@{ $decls_ref }, $assert);
     }
     return @{ $decls_ref };
+}
+
+=pod
+
+    return add_headerizer_markers( {
+        function_decls  => \@function_decls,
+        sourcefile      => $sourcefile,
+        hfile           => $hfile,
+        code            => $source_code,
+    } );
+
+=cut
+
+sub add_headerizer_markers {
+    my $args = shift;
+
+    my $function_decls = join( "\n" => @{ $args->{function_decls} });
+    my $STARTMARKER    = qr{/\* HEADERIZER BEGIN: $args->{sourcefile} \*/\n};
+    my $ENDMARKER      = qr{/\* HEADERIZER END: $args->{sourcefile} \*/\n?};
+    my $DO_NOT_TOUCH   = q{/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */};
+
+    $args->{code} =~
+        s{($STARTMARKER)(?:.*?)($ENDMARKER)}
+         {$1$DO_NOT_TOUCH\n\n$function_decls\n$DO_NOT_TOUCH\n$2}s
+        or die "Need begin/end HEADERIZER markers for $args->{sourcefile} in $args->{hfile}\n";
+
+    return $args->{code};
 }
 
 1;
