@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 46;
 use Parrot::Config;
 
 =head1 NAME
@@ -238,6 +238,46 @@ OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UTF-8" );
     set S0, utf8:"\x{D888}"
+    length I0, S0
+    print I0
+    print "\n"
+    end
+CODE
+/Invalid character/
+OUTPUT
+
+pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UTF-16" );
+    set S0, utf16:"\x{FDDA}"
+    length I0, S0
+    print I0
+    print "\n"
+    end
+CODE
+/Invalid character/
+OUTPUT
+
+pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UTF-16" );
+    set S0, utf16:"\x{3FFFE}"
+    length I0, S0
+    print I0
+    print "\n"
+    end
+CODE
+/Invalid character/
+OUTPUT
+
+pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UCS-2" );
+    set S0, ucs2:"\x{12345}"
+    length I0, S0
+    print I0
+    print "\n"
+    end
+CODE
+/Invalid character/
+OUTPUT
+
+pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UCS-4" );
+    set S0, ucs4:"\x{130000}"
     length I0, S0
     print I0
     print "\n"
