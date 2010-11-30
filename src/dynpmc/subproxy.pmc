@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2003-2009, Parrot Foundation.
  */
 
@@ -40,7 +39,7 @@ pmclass SubProxy dynpmc extends Sub auto_attrs {
             if (!file)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "SubProxy: no file");
 
-            sub_pmc = key_next(INTERP, key);
+            sub_pmc = Parrot_key_next(INTERP, key);
             if (!sub_pmc)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "SubProxy: no sub");
 
@@ -68,5 +67,5 @@ pmclass SubProxy dynpmc extends Sub auto_attrs {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

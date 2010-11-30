@@ -1,7 +1,5 @@
 /* hash.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Hashtable implementation
  */
@@ -34,7 +32,7 @@ typedef enum {
     Hash_key_type_PMC,
     Hash_key_type_ptr,
     Hash_key_type_PMC_ptr,
-    Hash_key_type_STRING_enc,
+    Hash_key_type_STRING_enc
 } Hash_key_type;
 /* &end_gen */
 
@@ -88,8 +86,8 @@ struct _hash {
 
 #define parrot_hash_iterate_indexed(_hash, _code)                           \
 {                                                                           \
-    UINTVAL _loc;                                                           \
-    if ((_hash)->entries){                                                  \
+    if ((_hash)->entries) {                                                 \
+        UINTVAL _loc;                                                       \
         for (_loc = 0; _loc <= (_hash)->mask; ++_loc) {                     \
             HashBucket *_bucket = (_hash)->index[_loc];                     \
             while (_bucket) {                                               \
@@ -484,5 +482,5 @@ Hash * Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

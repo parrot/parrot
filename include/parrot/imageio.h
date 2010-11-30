@@ -1,5 +1,4 @@
 /* Copyright (C) 2001-2009, Parrot Foundation.
- * $Id$
  */
 #ifndef PARROT_IMAGEIO_H_GUARD
 #define PARROT_IMAGEIO_H_GUARD
@@ -20,7 +19,7 @@
 
 enum {
     enum_PackID_normal     = 0,
-    enum_PackID_seen       = 1,
+    enum_PackID_seen       = 1
 };
 
 #endif /* PARROT_IMAGEIO_H_GUARD */
@@ -29,5 +28,5 @@ enum {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

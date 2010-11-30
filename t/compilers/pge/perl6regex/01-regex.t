@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -91,7 +90,7 @@ Description of the test.
     .local pmc config
                config = interp[.IGLOBALS_CONFIG_HASH]
 
-    .local int has_icu    # flag indicating presense of icu
+    .local int has_icu    # flag indicating presence of icu
                has_icu = config['has_icu']
 
     .local pmc file_iterator # iterate over list of files..

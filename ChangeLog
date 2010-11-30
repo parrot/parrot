@@ -1,5 +1,13 @@
 #1 $Id$
 
+2010.11.16     tcurtis
+	* Released 2.10.0
+	See NEWS for more.
+
+2010.10.19     Gerd
+	* Released 2.9.0
+	See NEWS for more.
+
 2010.09.21     Gerd
 	* Released 2.8.0
 	See NEWS for more.
@@ -224,7 +232,7 @@
 	well as keys; the corresponding namespace PMC methods are gone.
 
 2006.07.21    leo
-	* Parrot_exit, Parrot_on_exit take now an Interp * argument
+	* Parrot_x_exit, Parrot_x_on_exit take now an Interp * argument
 
 2006.07.25    chip
 	* add experimental op find_type_i_p
@@ -1442,7 +1450,7 @@
 
 	* string.c: When you clone a constant, it ain't constant no mo'.
 
-	Cocurtesy of "Bryan C. Warnock" <Bryan.Warnock@raba.com>
+	Courtesy of "Bryan C. Warnock" <Bryan.Warnock@raba.com>
 
 2002-02-28 00:51  dan
 
@@ -2348,7 +2356,7 @@
 
 2002-01-30 19:08  dan
 
-	* lib/Parrot/Assembler.pm:  fixes the POD in Parrot::Assember so
+	* lib/Parrot/Assembler.pm:  fixes the POD in Parrot::Assembler so
 	that perldoc
 	 can read it and just tidies it up generally. It also adds
 	documentation
@@ -3161,7 +3169,7 @@
 
 2002-01-13 19:39  dan
 
-	* key.c, classes/perlarray.pmc: key.c:	 intialize KEY.keys
+	* key.c, classes/perlarray.pmc: key.c:	 initialize KEY.keys
 
 	classes/perlarray.c:  * get_string: is casting
 	SELF->cache.struct_val to a STRING*,	while all other methods are
@@ -8331,7 +8339,7 @@
 
 	* assemble.pl: macro expansion.  Here's the test macro I was using:
 
-	# this uses I32,I31 as temporaries.  # macro must be preceeded by a
+	# this uses I32,I31 as temporaries.  # macro must be preceded by a
 	label.	testi	    macro   num,got,want    print   "Test #"
 	print	num	print	"..."	set	I32,want	set
 	I31,got 	eq	I32,I31,$ok	print	"NG\n"	branch

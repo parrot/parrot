@@ -1,5 +1,4 @@
-# Copyright (C) 2006-2008, Parrot Foundation.
-# $Id$
+# Copyright (C) 2006-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -132,7 +131,7 @@ sub send_archive_to_smolder {
             password     => $SMOLDER_CONFIG{password},
             tags         => $tags,
             report_file  => $report_file,
-            revision     => $PConfig{revision},
+            revision     => $PConfig{git_describe},
         ]
     );
 
@@ -162,15 +161,15 @@ sub collect_test_environment_data {
       $arch .= 8 * $PConfig{opcode_t_size};
     }
     my $devel = $PConfig{DEVEL};
-    # check for local-modifications if -d .svn and query to continue
-    if (-d ".svn") {
-        my $status = `svn status`;
-        @mods = grep /\S/, map { /^M +(.+)$/ and $1 } split(/\n/, $status);
+    # check for local-modifications if -d .git and query to continue
+    if (-d ".git") {
+        my $status = `git status`;
+        @mods = grep /\S/, map { /^#\s+modified:\s+(.+)$/ and $1 } split(/\n/, $status);
         if (@mods) {
             $devel .= (" ".@mods." mods");
         }
-        my $info = `svn info .`;
-        ($branch) = $info =~ m{URL: .+/parrot/(?:branches/)?(\w+)$}m;
+        my $out = `git branch`;
+        ($branch) = $out =~ m{\* (\w+)$}m;
     }
     my $me = $^O eq 'MSWin32' ? $ENV{'USERNAME'}
            : $ENV{'LOGNAME'} || eval { getpwuid($<) };
@@ -200,6 +199,8 @@ sub collect_test_environment_data {
     push @data, ( 'Configure args' => $PConfig{configure_args} )
       if $PConfig{configure_args};
     push @data, ( 'Modifications' => join(" ", @mods) ) if @mods;
+    push @data, ( 'Git sha1' => $PConfig{sha1} )
+      if $PConfig{sha1};
     return @data;
 }
 

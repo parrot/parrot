@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -246,7 +245,7 @@ main(int argc, const char *argv[])
     Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "debugger"));
     PDB_run_code(interp, argc - nextarg, argv + nextarg);
 
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 
@@ -352,5 +351,5 @@ Renamed from F<pdb.c> on 2008.7.15
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2003-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -401,13 +400,13 @@ mmd_build_type_tuple_from_type_list(PARROT_INTERP, ARGIN(PMC *type_list))
         STRING *type_name = VTABLE_get_string_keyed_int(interp, type_list, i);
         INTVAL  type;
 
-        if (Parrot_str_equal(interp, type_name, CONST_STRING(interp, "DEFAULT")))
+        if (STRING_equal(interp, type_name, CONST_STRING(interp, "DEFAULT")))
             type = enum_type_PMC;
-        else if (Parrot_str_equal(interp, type_name, CONST_STRING(interp, "STRING")))
+        else if (STRING_equal(interp, type_name, CONST_STRING(interp, "STRING")))
             type = enum_type_STRING;
-        else if (Parrot_str_equal(interp, type_name, CONST_STRING(interp, "INTVAL")))
+        else if (STRING_equal(interp, type_name, CONST_STRING(interp, "INTVAL")))
             type = enum_type_INTVAL;
-        else if (Parrot_str_equal(interp, type_name, CONST_STRING(interp, "FLOATVAL")))
+        else if (STRING_equal(interp, type_name, CONST_STRING(interp, "FLOATVAL")))
             type = enum_type_FLOATVAL;
         else
             type = Parrot_pmc_get_type_str(interp, type_name);
@@ -730,12 +729,12 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
         {
             STRING *s1, *s2;
             if (type_sig < 0)
-                s1 = Parrot_get_datatype_name(interp, type_sig);
+                s1 = Parrot_dt_get_datatype_name(interp, type_sig);
             else
                 s1 = interp->vtables[type_sig]->whoami;
 
             if (type_call < 0)
-                s2 = Parrot_get_datatype_name(interp, type_call);
+                s2 = Parrot_dt_get_datatype_name(interp, type_call);
             else
                 s2 = interp->vtables[type_call]->whoami;
 
@@ -947,7 +946,7 @@ mmd_add_multi_to_namespace(PARROT_INTERP, ARGIN(STRING *ns_name),
     PMC        *multi_sub = Parrot_ns_get_global(interp, ns, sub_name);
 
     if (PMC_IS_NULL(multi_sub)) {
-        multi_sub = Parrot_pmc_new_constant(interp, enum_class_MultiSub);
+        multi_sub = Parrot_pmc_new(interp, enum_class_MultiSub);
         Parrot_ns_set_global(interp, ns, sub_name, multi_sub);
     }
 
@@ -1077,7 +1076,7 @@ Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
         STRING   *ns_name   = mmd_info[i].ns_name;
 
         /* Create an NCI sub for the C function */
-        PMC    *sub_obj       = Parrot_pmc_new_constant(interp, enum_class_NCI);
+        PMC    *sub_obj       = Parrot_pmc_new(interp, enum_class_NCI);
 
         Parrot_gc_write_barrier(interp, sub_obj);
 
@@ -1155,7 +1154,8 @@ mmd_cache_key_from_values(PARROT_INTERP, ARGIN(const char *name),
     if (name)
         strcpy((char *)(type_ids + num_values), name);
 
-    key = Parrot_str_new(interp, (char *)type_ids, id_size);
+    key = Parrot_str_new_init(interp, (char *)type_ids, id_size,
+            Parrot_binary_encoding_ptr, 0);
     mem_gc_free(interp, type_ids);
 
     return key;
@@ -1257,7 +1257,8 @@ mmd_cache_key_from_types(PARROT_INTERP, ARGIN(const char *name),
     if (name)
         strcpy((char *)(type_ids + num_types), name);
 
-    key = Parrot_str_new(interp, (char *)type_ids, id_size);
+    key = Parrot_str_new_init(interp, (char *)type_ids, id_size,
+            Parrot_binary_encoding_ptr, 0);
 
     mem_gc_free(interp, type_ids);
     return key;
@@ -1378,5 +1379,5 @@ F<http://svn.perl.org/perl6/doc/trunk/design/syn/S12.pod>
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

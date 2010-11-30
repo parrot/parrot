@@ -1,12 +1,11 @@
-# $Id$
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
-blib/lib/libparrot.2.8.0.dylib                   [main]lib
+blib/lib/libparrot.2.10.1.dylib                  [main]lib
 blib/lib/libparrot.a                             [main]lib
 blib/lib/libparrot.dylib                         [main]lib
 blib/lib/libparrot.so                            [main]lib
-blib/lib/libparrot.so.2.8.0                      [main]lib
+blib/lib/libparrot.so.2.10.1                     [main]lib
 compilers/data_json/data_json.pbc                [data_json]
 config/gen/call_list/opengl.in                   []
 docs/ops/bit.pod                                 [doc]
@@ -252,6 +251,7 @@ runtime/parrot/library/Data/Dumper/Base.pbc      [main]
 runtime/parrot/library/Data/Dumper/Default.pbc   [main]
 runtime/parrot/library/Data/Replace.pbc          [main]
 runtime/parrot/library/Digest/MD5.pbc            [main]
+runtime/parrot/library/Digest/sha256.pbc         [main]
 runtime/parrot/library/Getopt/Obj.pbc            [main]
 runtime/parrot/library/HLL.pbc                   [main]
 runtime/parrot/library/HTTP/Daemon.pbc           [main]

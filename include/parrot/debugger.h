@@ -5,8 +5,6 @@
 /*
  * debugger.h
  *
- * SVN Info
- *    $Id$
  * Overview:
  *    Parrot debugger header files
  * History:
@@ -475,5 +473,5 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

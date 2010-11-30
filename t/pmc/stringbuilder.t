@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -124,7 +123,7 @@ Tests the C<StringBuilder> PMC.
     s = repeat iso-8859-1:"x", n
     push sb, s
     # push a string that needs reallocation and has incompatible encoding rep.
-    s = unicode:"yyyy"
+    s = utf8:"yyyy"
     push sb, s
     # Check the expected string length. Not a rock solid check, but the
     # purpose of this test is just code coverage, so is enough.
@@ -158,7 +157,7 @@ Tests the C<StringBuilder> PMC.
     sb = new ["StringBuilder"]
 
     push sb, "le"
-    push sb, unicode:"o "
+    push sb, utf8:"o "
     push sb, iso-8859-1:"tötsch"
 
     $S0 = sb
@@ -311,7 +310,7 @@ CODE
     iterator = iter list
     .local pmc sb
     sb = new 'StringBuilder'
-    sb = unicode:""
+    sb = utf8:""
     loop:
       unless iterator goto done
       $P1 = shift iterator
@@ -359,11 +358,11 @@ CODE
 
     push sb, "foo"
     push sb, iso-8859-1:"\x{E4}\x{F6}\x{FC}"
-    push sb, utf8:unicode:"БДЖ"
+    push sb, utf8:"БДЖ"
     push sb, "bar"
 
     $S0 = sb
-    is( $S0, utf8:unicode:"fooäöüБДЖbar", 'push strings with different encodings' )
+    is( $S0, utf8:"fooäöüБДЖbar", 'push strings with different encodings' )
 .end
 
 # Local Variables:

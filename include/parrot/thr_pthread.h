@@ -1,7 +1,5 @@
 /* thr_pthread.h
  *  Copyright (C) 2001-2003, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     POSIS pthread interface
  *  Data Structure and Algorithms:
@@ -67,5 +65,5 @@ typedef void (*Cleanup_Handler)(void *);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

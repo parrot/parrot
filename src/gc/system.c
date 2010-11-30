@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -188,7 +187,7 @@ trace_system_areas(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools))
 
 #  endif /* __hpux */
 
-        trace_mem_block(interp, base,
+        trace_mem_block(interp, mem_pools, base,
                 (size_t)current_regstore_top);
 
 #else /* !__ia64__ */
@@ -557,5 +556,5 @@ F<src/gc/api.c> and F<include/parrot/gc_api.h>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

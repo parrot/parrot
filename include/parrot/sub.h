@@ -1,7 +1,5 @@
 /* sub.h
  *  Copyright (C) 2001-2008, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Data Structure and Algorithms:
  *     Subroutine, coroutine, closure and continuation structures
  *     and related routines.
@@ -291,5 +289,5 @@ INTVAL Parrot_Sub_get_line_from_pc(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

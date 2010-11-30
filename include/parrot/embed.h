@@ -1,7 +1,5 @@
 /* embed.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the Parrot embedding system--the only part of Parrot that
  *     the outside world should see.
@@ -34,7 +32,7 @@ PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 void
-Parrot_exit(PARROT_INTERP, int status);
+Parrot_x_exit(PARROT_INTERP, int status);
 
 PARROT_EXPORT
 void Parrot_destroy(PARROT_INTERP)
@@ -83,6 +81,11 @@ void Parrot_disassemble(PARROT_INTERP,
 
 PARROT_EXPORT
 void Parrot_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+int Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -174,6 +177,9 @@ Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)
 #define ASSERT_ARGS_Parrot_init_stacktop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(stack_top))
+#define ASSERT_ARGS_Parrot_load_bytecode_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(filename))
 #define ASSERT_ARGS_Parrot_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_pbc_fixup_loaded __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -215,5 +221,5 @@ Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

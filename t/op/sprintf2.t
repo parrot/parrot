@@ -1,10 +1,9 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
-t/op/sprintf2.t - Auxilliary tests for the sprintf opcode
+t/op/sprintf2.t - Auxiliary tests for the sprintf opcode
 
 =head1 SYNOPSIS
 

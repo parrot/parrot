@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -67,7 +66,7 @@ t/pmc/orderedhash.t.
     i = 1
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
-    set_addr eh, catch
+    set_label eh, catch
     push_eh eh
     it = 9999 # Let's hope it will never be a valid iteration type
     i = 0
@@ -85,7 +84,7 @@ t/pmc/orderedhash.t.
     i = 1
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
-    set_addr eh, catch
+    set_label eh, catch
     push_eh eh
     p = shift it
     i = 0
@@ -104,7 +103,7 @@ t/pmc/orderedhash.t.
     i = 1
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
-    set_addr eh, catch
+    set_label eh, catch
     push_eh eh
     p = pop it
     i = 0

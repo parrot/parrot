@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -191,7 +190,7 @@ Parrot_gc_trace_root(PARROT_INTERP,
     Parrot_gc_mark_PMC_alive(interp, interp->dynamic_env);
 
     /* mark the vtables: the data, Class PMCs, etc. */
-    mark_vtables(interp);
+    Parrot_vtbl_mark_vtables(interp);
 
     /* mark the root_namespace */
     Parrot_gc_mark_PMC_alive(interp, interp->root_namespace);
@@ -354,7 +353,7 @@ if one is present. Also handles marking shared PMCs.
 */
 
 void
-mark_special(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools), ARGIN(PMC *obj))
+mark_special(PARROT_INTERP, SHIM(Memory_Pools *mem_pools), ARGIN(PMC *obj))
 {
     ASSERT_ARGS(mark_special)
 
@@ -866,5 +865,5 @@ F<include/parrot/mark_sweep.h>, F<docs/memory_internals.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

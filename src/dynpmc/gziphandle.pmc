@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -208,7 +207,8 @@ Read the given number of bytes from the gziphandle and return them in a string.
         GET_ATTR_file(INTERP, SELF, file);
         result = gzread(file, buf, length);
         if (result > 0) {
-            str = Parrot_str_new(INTERP, buf, result);
+            str = Parrot_str_new_init(INTERP, buf, result,
+                    Parrot_binary_encoding_ptr, 0);
         }
         mem_sys_free(buf);
         RETURN(STRING *str);
@@ -263,7 +263,8 @@ Returns a string with the zlib version.
 
         switch (rc) {
           case Z_OK:
-            dst = Parrot_str_new(INTERP, buf, dstLen);
+            dst = Parrot_str_new_init(INTERP, buf, dstLen,
+                    Parrot_binary_encoding_ptr, 0);
             mem_sys_free(buf);
             break;
 
@@ -314,7 +315,8 @@ Returns a string with the zlib version.
         switch (rc) {
           case Z_OK:
             Parrot_str_free_cstring(src);
-            dst = Parrot_str_new(INTERP, buf, dstLen);
+            dst = Parrot_str_new_init(INTERP, buf, dstLen,
+                    Parrot_binary_encoding_ptr, 0);
             mem_sys_free(buf);
             break;
 
@@ -364,6 +366,6 @@ Returns a string with the zlib version.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

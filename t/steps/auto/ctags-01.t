@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
 # auto/ctags-01.t
 
 use strict;

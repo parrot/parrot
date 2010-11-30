@@ -1,7 +1,5 @@
 /* encoding.h
  *  Copyright (C) 2004-2007, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the header for the generic encoding functions
  *  Data Structure and Algorithms:
@@ -24,6 +22,10 @@ PARROT_DATA STR_VTABLE *Parrot_ucs2_encoding_ptr;
 PARROT_DATA STR_VTABLE *Parrot_ucs4_encoding_ptr;
 
 PARROT_DATA STR_VTABLE *Parrot_default_encoding_ptr;
+
+#ifdef PARROT_IN_CORE
+PARROT_DATA STR_VTABLE *Parrot_null_encoding_ptr;
+#endif
 
 /* HEADERIZER BEGIN: src/string/encoding.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -147,5 +149,5 @@ void Parrot_str_internal_register_encoding_names(PARROT_INTERP)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

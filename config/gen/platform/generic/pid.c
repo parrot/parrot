@@ -1,5 +1,4 @@
-/* $Id$
- * Copyright (C) 2010, Parrot Foundation.
+/* Copyright (C) 2010, Parrot Foundation.
  */
 
 /*
@@ -52,5 +51,5 @@ Parrot_getpid(void)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

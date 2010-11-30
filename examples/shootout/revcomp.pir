@@ -1,6 +1,5 @@
 #!parrot
 # Copyright (C) 2005-2010, Parrot Foundation.
-# $Id$
 # Reads from stdin a file in the format made by fasta.pir
 # ./parrot -R jit
 # N = 2500000 for fasta
@@ -36,9 +35,8 @@ loop:
 	.local pmc stdin, stdout
 	.local string line, seq
         $P0    = getinterp
-        .include 'stdio.pasm'
-        stdin  = $P0.'stdhandle'(.PIO_STDIN_FILENO)
-        stdout = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+        stdin  = $P0.'stdin_handle'()
+        stdout = $P0.'stdout_handle'()
 	# stdout is linebuffered per default - make it block buffered
 	stdout.'buffer_size'(8192)
 

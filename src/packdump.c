@@ -2,7 +2,6 @@
 Copyright (C) 2001-2009, Parrot Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
-$Id$
 
 =head1 NAME
 
@@ -37,11 +36,9 @@ static void PackFile_Constant_dump_pmc(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static void PackFile_Constant_dump_str(PARROT_INTERP,
-    ARGIN(const PackFile_ConstTable *ct),
     ARGIN(const STRING *self))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 static void pobj_flag_dump(PARROT_INTERP, long flags)
         __attribute__nonnull__(1);
@@ -52,7 +49,6 @@ static void pobj_flag_dump(PARROT_INTERP, long flags)
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_Constant_dump_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ct) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_pobj_flag_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -85,7 +81,7 @@ PackFile_ConstTable_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *self))
 
     for (i = 0; i < self->str.const_count; i++) {
         Parrot_io_printf(interp, "    # %x:\n", (long)i);
-        PackFile_Constant_dump_str(interp, self, self->str.constants[i]);
+        PackFile_Constant_dump_str(interp, self->str.constants[i]);
     }
 
     for (i = 0; i < self->pmc.const_count; i++) {
@@ -176,8 +172,8 @@ pobj_flag_dump(PARROT_INTERP, long flags)
 
 /*
 
-=item C<static void PackFile_Constant_dump_str(PARROT_INTERP, const
-PackFile_ConstTable *ct, const STRING *self)>
+=item C<static void PackFile_Constant_dump_str(PARROT_INTERP, const STRING
+*self)>
 
 Print the representation of a string constant.
 
@@ -186,14 +182,13 @@ Print the representation of a string constant.
 */
 
 static void
-PackFile_Constant_dump_str(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
-                            ARGIN(const STRING *self))
+PackFile_Constant_dump_str(PARROT_INTERP, ARGIN(const STRING *self))
 {
     ASSERT_ARGS(PackFile_Constant_dump_str)
 
     Parrot_io_printf(interp, "    [ 'PFC_STRING', {\n");
     pobj_flag_dump(interp, (long)PObj_get_FLAGS(self));
-    Parrot_io_printf(interp, "        ENCODING => %ld,\n", self->encoding);
+    Parrot_io_printf(interp, "        ENCODING => %s,\n", self->encoding->name);
     Parrot_io_printf(interp, "        SIZE     => %ld,\n", self->bufused);
     Parrot_io_printf(interp, "        DATA     => \"%Ss\"\n",
             Parrot_str_escape(interp, self));
@@ -238,14 +233,13 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
               case KEY_integer_FLAG:
                 Parrot_io_printf(interp, "        TYPE        => INTEGER\n");
                 Parrot_io_printf(interp, "        DATA        => %ld\n",
-                            VTABLE_get_integer(interp, key));
+                            Parrot_key_integer(interp, key));
                 Parrot_io_printf(interp, "       },\n");
                 break;
               case KEY_number_FLAG:
                 {
                     size_t ct_index;
-                    FLOATVAL n;
-                    GETATTR_Key_num_key(interp, key, n);
+                    FLOATVAL n = Parrot_key_number(interp, key);
 
                     Parrot_io_printf(interp, "        TYPE        => NUMBER\n");
                     ct_index = PackFile_ConstTable_rlookup_num(interp, ct, n);
@@ -259,8 +253,7 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
               case KEY_string_FLAG:
                 {
                     size_t ct_index;
-                    STRING *s;
-                    GETATTR_Key_str_key(interp, key, s);
+                    STRING *s = Parrot_key_string(interp, key);
 
                     Parrot_io_printf(interp, "        TYPE        => STRING\n");
                     ct_index = PackFile_ConstTable_rlookup_str(interp, ct, s);
@@ -298,7 +291,7 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
               default:
                 Parrot_io_eprintf(NULL, "PackFile_Constant_pack: "
                             "unsupported constant type\n");
-                Parrot_exit(interp, 1);
+                Parrot_x_exit(interp, 1);
             }
             GETATTR_Key_next_key(interp, key, key);
         }
@@ -349,7 +342,7 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                             break;
                         case enum_class_Key:
                             namespace_description =
-                                key_set_to_string(interp, sub->namespace_name);
+                                Parrot_key_set_to_string(interp, sub->namespace_name);
                             break;
                         default:
                             namespace_description = sub->namespace_name->vtable->whoami;
@@ -402,41 +395,6 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
 
 /*
 
-=item C<void PackFile_Fixup_dump(PARROT_INTERP, const PackFile_FixupTable *ft)>
-
-Dumps the fix-up table C<ft>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-PackFile_Fixup_dump(PARROT_INTERP, ARGIN(const PackFile_FixupTable *ft))
-{
-    ASSERT_ARGS(PackFile_Fixup_dump)
-    opcode_t i;
-
-    for (i = 0; i < ft->fixup_count; ++i) {
-        Parrot_io_printf(interp, "\t#%d\n", (int) i);
-        switch (ft->fixups[i].type) {
-          case enum_fixup_sub:
-            Parrot_io_printf(interp,
-                        "\ttype => %d offs => %8d name => '%s',\n",
-                        (int)ft->fixups[i].type,
-                        (int)ft->fixups[i].offset,
-                        ft->fixups[i].name);
-            break;
-          default:
-            Parrot_io_printf(interp, "\ttype => %d ???,\n",
-                        (int) ft->fixups[i].type);
-            break;
-        }
-    }
-}
-
-/*
-
 =back
 
 =head1 SEE ALSO
@@ -452,5 +410,5 @@ F<src/pbc_dump.c>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

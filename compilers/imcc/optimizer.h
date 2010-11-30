@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2002-2009, Parrot Foundation.
  */
 
@@ -98,6 +97,6 @@ int pre_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

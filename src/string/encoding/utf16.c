@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -8,7 +7,7 @@ src/string/encoding/utf16.c - UTF-16 encoding
 
 =head1 DESCRIPTION
 
-UTF-16 encoding with the help of the ICU library.
+UTF-16 encoding
 
 =head2 Functions
 
@@ -19,12 +18,27 @@ UTF-16 encoding with the help of the ICU library.
 */
 
 #include "parrot/parrot.h"
+#include "../unicode.h"
 #include "shared.h"
 
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_WARN_UNUSED_RESULT
+static UINTVAL utf16_decode(PARROT_INTERP, ARGIN(const utf16_t *p))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static utf16_t * utf16_encode(PARROT_INTERP,
+    ARGMOD(utf16_t *ptr),
+    UINTVAL c)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*ptr);
 
 static UINTVAL utf16_iter_get(PARROT_INTERP,
     ARGIN(const STRING *str),
@@ -53,15 +67,6 @@ static void utf16_iter_set_and_advance(PARROT_INTERP,
         FUNC_MODIFIES(*str)
         FUNC_MODIFIES(*i);
 
-static void utf16_iter_set_position(PARROT_INTERP,
-    ARGIN(const STRING *str),
-    ARGMOD(String_iter *i),
-    UINTVAL n)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*i);
-
 static void utf16_iter_skip(PARROT_INTERP,
     ARGIN(const STRING *str),
     ARGMOD(String_iter *i),
@@ -73,7 +78,7 @@ static void utf16_iter_skip(PARROT_INTERP,
 
 static UINTVAL utf16_ord(PARROT_INTERP,
     ARGIN(const STRING *src),
-    UINTVAL offset)
+    INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -82,14 +87,19 @@ static UINTVAL utf16_scan(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING * utf16_substr(PARROT_INTERP,
-    ARGIN(const STRING *src),
-    UINTVAL offset,
+PARROT_WARN_UNUSED_RESULT
+static const utf16_t * utf16_skip_backward(
+    ARGIN(const utf16_t *p),
     UINTVAL count)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(1);
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static const utf16_t * utf16_skip_forward(
+    ARGIN(const utf16_t *p),
+    UINTVAL count)
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -97,6 +107,12 @@ static STRING * utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_utf16_decode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(p))
+#define ASSERT_ARGS_utf16_encode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ptr))
 #define ASSERT_ARGS_utf16_iter_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str) \
@@ -106,10 +122,6 @@ static STRING * utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_utf16_iter_set_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(str) \
-    , PARROT_ASSERT_ARG(i))
-#define ASSERT_ARGS_utf16_iter_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(i))
@@ -123,32 +135,22 @@ static STRING * utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_utf16_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_utf16_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_utf16_skip_backward __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(p))
+#define ASSERT_ARGS_utf16_skip_forward __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(p))
 #define ASSERT_ARGS_utf16_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-#if PARROT_HAS_ICU
-#  include <unicode/utf16.h>
-#  include <unicode/ustring.h>
-#endif
-
-#define UNIMPL Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, \
-    "unimpl utf16")
-
 
 /*
 
 =item C<static STRING * utf16_to_encoding(PARROT_INTERP, const STRING *src)>
 
-Converts the string C<src> to this particular encoding.  If C<dest> is
-provided, it will contain the result.  Otherwise this function operates in
-place.
-
+Converts the string C<src> to this particular encoding.
 
 =cut
 
@@ -160,71 +162,46 @@ static STRING *
 utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(utf16_to_encoding)
-#if PARROT_HAS_ICU
-    UErrorCode err;
-    int dest_len;
-    UChar *p;
-#endif
-    int src_len;
-    STRING *result;
+    STRING  *result;
+    UINTVAL  src_len;
 
-    if (src->encoding == Parrot_utf16_encoding_ptr
-    ||  src->encoding == Parrot_ucs2_encoding_ptr)
+    src_len = STRING_length(src);
+
+    if (STRING_max_bytes_per_codepoint(src) == 1) {
+        result           = Parrot_gc_new_string_header(interp, 0);
+        result->encoding = Parrot_ucs2_encoding_ptr;
+        result->bufused  = 2 * src_len;
+        result->strlen   = src_len;
+
+        if (src_len) {
+            UINTVAL       i;
+            Parrot_UInt2 *p;
+
+            Parrot_gc_allocate_string_storage(interp, result, 2 * src_len);
+            p = (Parrot_UInt2 *)result->strstart;
+
+            for (i = 0; i < src_len; ++i) {
+                p[i] = (unsigned char)src->strstart[i];
+            }
+        }
+    }
+    else if (src->encoding == Parrot_utf16_encoding_ptr
+         ||  src->encoding == Parrot_ucs2_encoding_ptr) {
         /* we have to use clone instead of copy because the Unicode upcase
          * and downcase functions assume to get an unshared buffer */
-        return Parrot_str_clone(interp, src);
-
-    result = Parrot_gc_new_string_header(interp, 0);
-
-    /*
-     * TODO adapt string creation functions
-     */
-    src_len = src->strlen;
-    if (!src_len) {
-        result->encoding = Parrot_ucs2_encoding_ptr;
-        result->strlen = result->bufused = 0;
-        return result;
-    }
-#if PARROT_HAS_ICU
-    Parrot_gc_allocate_string_storage(interp, result, sizeof (UChar) * src_len);
-    p = (UChar *)result->strstart;
-
-    if (src->encoding == Parrot_latin1_encoding_ptr ||
-            src->encoding == Parrot_ascii_encoding_ptr) {
-        for (dest_len = 0; dest_len < (int)src->strlen; ++dest_len) {
-            p[dest_len] = (UChar)((unsigned char*)src->strstart)[dest_len];
-        }
+        result = Parrot_str_clone(interp, src);
     }
     else {
-        err = U_ZERO_ERROR;
-        u_strFromUTF8(p, src_len,
-                &dest_len, src->strstart, src->bufused, &err);
-        if (!U_SUCCESS(err)) {
-            /*
-             * have to resize - required len in UChars is in dest_len
-             */
-            result->bufused = dest_len * sizeof (UChar);
-            Parrot_gc_reallocate_string_storage(interp, result,
-                                     sizeof (UChar) * dest_len);
-            p = (UChar *)result->strstart;
-            u_strFromUTF8(p, dest_len,
-                    &dest_len, src->strstart, src->bufused, &err);
-            PARROT_ASSERT(U_SUCCESS(err));
-        }
-    }
-    result->bufused = dest_len * sizeof (UChar);
-    result->encoding = Parrot_utf16_encoding_ptr;
-    result->strlen = src_len;
+        result = encoding_to_encoding(interp, src, Parrot_utf16_encoding_ptr, 2.2);
 
-    /* downgrade if possible */
-    if (dest_len == (int)src->strlen)
-        result->encoding = Parrot_ucs2_encoding_ptr;
+        /* downgrade if possible */
+        if (result->bufused == result->strlen << 1)
+            result->encoding = Parrot_ucs2_encoding_ptr;
+    }
+
     return result;
-#else
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
-#endif
 }
+
 
 /*
 
@@ -242,30 +219,175 @@ static UINTVAL
 utf16_scan(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(utf16_scan)
-#if PARROT_HAS_ICU
-    const UChar * const s = (UChar*) src->strstart;
-    UINTVAL pos = 0, charpos = 0;
-    /*
-     * this is used to initially calculate src->strlen,
-     * therefore we must scan the whole string
-     */
-    while (pos * sizeof (UChar) < src->bufused) {
-        U16_FWD_1_UNSAFE(s, pos);
-        ++charpos;
-    }
-    return charpos;
-#else
-    UNUSED(src);
+    const utf16_t *p   = (utf16_t *)src->strstart;
+    UINTVAL        len = 0;
+    UINTVAL        i, n;
 
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
-#endif
+    if (src->bufused & 1)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF16,
+            "Unaligned end in UTF-16 string\n");
+
+    n = src->bufused >> 1;
+
+    for (i = 0; i < n; ++i) {
+        UINTVAL c = p[i];
+
+        if (UNICODE_IS_HIGH_SURROGATE(c)) {
+            ++i;
+
+            if (i >= n)
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF16,
+                    "Unaligned end in UTF-16 string\n");
+
+            if (!UNICODE_IS_LOW_SURROGATE(p[i]))
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF16,
+                    "Malformed UTF-16 string\n");
+
+            c = UNICODE_DECODE_SURROGATE(c, p[i]);
+        }
+        else {
+            if (UNICODE_IS_LOW_SURROGATE(c))
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF16,
+                    "Malformed UTF-16 string\n");
+        }
+
+        if (UNICODE_IS_NON_CHARACTER(c))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
+                "Non-character in UTF-16 string\n");
+
+        ++len;
+    }
+
+    return len;
 }
+
 
 /*
 
-=item C<static UINTVAL utf16_ord(PARROT_INTERP, const STRING *src, UINTVAL
-offset)>
+=item C<static const utf16_t * utf16_skip_forward(const utf16_t *p, UINTVAL
+count)>
+
+Skips C<count> codepoints starting from C<p>. Returns the new pointer.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static const utf16_t *
+utf16_skip_forward(ARGIN(const utf16_t *p), UINTVAL count)
+{
+    ASSERT_ARGS(utf16_skip_forward)
+    UINTVAL i;
+
+    for (i = 0; i < count; ++i) {
+        if (UNICODE_IS_HIGH_SURROGATE(*p))
+            p += 2;
+        else
+            p += 1;
+    }
+
+    return p;
+}
+
+
+/*
+
+=item C<static const utf16_t * utf16_skip_backward(const utf16_t *p, UINTVAL
+count)>
+
+Skips C<count> codepoints backwards starting from C<p>. Returns the new
+pointer.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static const utf16_t *
+utf16_skip_backward(ARGIN(const utf16_t *p), UINTVAL count)
+{
+    ASSERT_ARGS(utf16_skip_backward)
+    UINTVAL i;
+
+    for (i = 0; i < count; ++i) {
+        --p;
+        if (UNICODE_IS_LOW_SURROGATE(*p))
+            --p;
+    }
+
+    return p;
+}
+
+
+/*
+
+=item C<static UINTVAL utf16_decode(PARROT_INTERP, const utf16_t *p)>
+
+Decodes the codepoint starting at C<p>.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+static UINTVAL
+utf16_decode(PARROT_INTERP, ARGIN(const utf16_t *p))
+{
+    ASSERT_ARGS(utf16_decode)
+    UINTVAL c = *p;
+
+    if (UNICODE_IS_HIGH_SURROGATE(c))
+        c = UNICODE_DECODE_SURROGATE(c, p[1]);
+
+    return c;
+}
+
+
+/*
+
+=item C<static utf16_t * utf16_encode(PARROT_INTERP, utf16_t *ptr, UINTVAL c)>
+
+Decodes the codepoint starting at C<p>.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static utf16_t *
+utf16_encode(PARROT_INTERP, ARGMOD(utf16_t *ptr), UINTVAL c)
+{
+    ASSERT_ARGS(utf16_encode)
+
+    if (c < 0xFFFE) {
+        if (UNICODE_IS_SURROGATE(c)
+        || (c >= 0xFDD0 && c <= 0xFDEF))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
+                    "Invalid character for UTF-16 encoding\n");
+
+        *ptr++ = c;
+    }
+    else {
+        if ((c & 0xFFFE) == 0xFFFE
+        ||   c > 0x10FFFF)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
+                    "Invalid character for UTF-16 encoding\n");
+
+        *ptr++ = UNICODE_HIGH_SURROGATE(c);
+        *ptr++ = UNICODE_LOW_SURROGATE(c);
+    }
+
+    return ptr;
+}
+
+
+/*
+
+=item C<static UINTVAL utf16_ord(PARROT_INTERP, const STRING *src, INTVAL idx)>
 
 Returns the codepoint in string C<src> at position C<offset>.
 
@@ -274,67 +396,23 @@ Returns the codepoint in string C<src> at position C<offset>.
 */
 
 static UINTVAL
-utf16_ord(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
+utf16_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 {
     ASSERT_ARGS(utf16_ord)
-#if PARROT_HAS_ICU
-    const UChar * const s = (UChar*) src->strstart;
-    UINTVAL c, pos;
-    UNUSED(interp);
+    const UINTVAL  len = STRING_length(src);
+    const utf16_t *start;
 
-    pos = 0;
-    U16_FWD_N_UNSAFE(s, pos, offset);
-    U16_GET_UNSAFE(s, pos, c);
-    return c;
-#else
-    UNUSED(src);
-    UNUSED(offset);
+    if (idx < 0)
+        idx += len;
 
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
-#endif
+    if ((UINTVAL)idx >= len)
+        encoding_ord_error(interp, src, idx);
+
+    start = utf16_skip_forward((const utf16_t *)src->strstart, idx);
+
+    return utf16_decode(interp, start);
 }
 
-/*
-
-=item C<static STRING * utf16_substr(PARROT_INTERP, const STRING *src, UINTVAL
-offset, UINTVAL count)>
-
-Returns the codepoints in string C<src> at position C<offset> and length
-C<count>.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-utf16_substr(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
-{
-    ASSERT_ARGS(utf16_substr)
-#if PARROT_HAS_ICU
-    UINTVAL pos = 0, start;
-    const UChar * const s = (UChar*) src->strstart;
-    STRING * const return_string = Parrot_str_copy(interp, src);
-
-    U16_FWD_N_UNSAFE(s, pos, offset);
-    start = pos * sizeof (UChar);
-    return_string->strstart = (char *)return_string->strstart + start;
-    U16_FWD_N_UNSAFE(s, pos, count);
-    return_string->bufused = pos * sizeof (UChar) - start;
-    return_string->strlen = count;
-    return_string->hashval = 0;
-    return return_string;
-#else
-    UNUSED(src);
-    UNUSED(offset);
-    UNUSED(count);
-
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
-#endif
-}
 
 /*
 
@@ -352,28 +430,16 @@ utf16_iter_get(PARROT_INTERP,
     ARGIN(const STRING *str), ARGIN(const String_iter *i), INTVAL offset)
 {
     ASSERT_ARGS(utf16_iter_get)
-#if PARROT_HAS_ICU
-    const UChar * const s = (UChar*) str->strstart;
-    UINTVAL c, pos;
+    const utf16_t *ptr = (utf16_t *)(str->strstart + i->bytepos);
 
-    pos = i->bytepos / sizeof (UChar);
-    if (offset > 0) {
-        U16_FWD_N_UNSAFE(s, pos, offset);
-    }
-    else if (offset < 0) {
-        U16_BACK_N_UNSAFE(s, pos, -offset);
-    }
-    U16_GET_UNSAFE(s, pos, c);
+    PARROT_ASSERT((UINTVAL)(i->charpos + offset) <= str->strlen);
 
-    return c;
-#else
-    UNUSED(str);
-    UNUSED(i);
-    UNUSED(offset);
+    if (offset > 0)
+        ptr = utf16_skip_forward(ptr, offset);
+    else if (offset < 0)
+        ptr = utf16_skip_backward(ptr, -offset);
 
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
-#endif
+    return utf16_decode(interp, ptr);
 }
 
 /*
@@ -392,27 +458,20 @@ utf16_iter_skip(PARROT_INTERP,
     ARGIN(const STRING *str), ARGMOD(String_iter *i), INTVAL skip)
 {
     ASSERT_ARGS(utf16_iter_skip)
-#if PARROT_HAS_ICU
-    const UChar * const s = (UChar*) str->strstart;
-    UINTVAL pos = i->bytepos / sizeof (UChar);
-
-    if (skip > 0) {
-        U16_FWD_N_UNSAFE(s, pos, skip);
-    }
-    else if (skip < 0) {
-        U16_BACK_N_UNSAFE(s, pos, -skip);
-    }
+    const utf16_t *ptr = (utf16_t *)(str->strstart + i->bytepos);
 
     i->charpos += skip;
-    i->bytepos = pos * sizeof (UChar);
-#else
-    UNUSED(str);
-    UNUSED(i);
-    UNUSED(skip);
 
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
-#endif
+    PARROT_ASSERT(i->charpos <= str->strlen);
+
+    if (skip > 0)
+        ptr = utf16_skip_forward(ptr, skip);
+    else if (skip < 0)
+        ptr = utf16_skip_backward(ptr, -skip);
+
+    i->bytepos = (const char *)ptr - (const char *)str->strstart;
+
+    PARROT_ASSERT(i->bytepos <= str->bufused);
 }
 
 /*
@@ -432,24 +491,19 @@ utf16_iter_get_and_advance(PARROT_INTERP,
     ARGIN(const STRING *str), ARGMOD(String_iter *i))
 {
     ASSERT_ARGS(utf16_iter_get_and_advance)
-#if PARROT_HAS_ICU
-    const UChar * const s = (UChar*) str->strstart;
-    UINTVAL c, pos;
-    pos = i->bytepos / sizeof (UChar);
-    /* TODO either make sure that we don't go past end or use SAFE
-     *      iter versions
-     */
-    U16_NEXT_UNSAFE(s, pos, c);
-    i->charpos++;
-    i->bytepos = pos * sizeof (UChar);
-    return c;
-#else
-    UNUSED(str);
-    UNUSED(i);
+    const utf16_t *ptr = (utf16_t *)(str->strstart + i->bytepos);
+    UINTVAL        c   = utf16_decode(interp, ptr);
 
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
-#endif
+    i->charpos += 1;
+
+    if (UNICODE_IS_HIGH_SURROGATE(*ptr))
+        i->bytepos += 4;
+    else
+        i->bytepos += 2;
+
+    PARROT_ASSERT(i->bytepos <= str->bufused);
+
+    return c;
 }
 
 /*
@@ -469,54 +523,13 @@ utf16_iter_set_and_advance(PARROT_INTERP,
     ARGMOD(STRING *str), ARGMOD(String_iter *i), UINTVAL c)
 {
     ASSERT_ARGS(utf16_iter_set_and_advance)
-#if PARROT_HAS_ICU
-    UChar * const s = (UChar*) str->strstart;
-    UINTVAL pos;
-    pos = i->bytepos / sizeof (UChar);
-    U16_APPEND_UNSAFE(s, pos, c);
-    i->charpos++;
-    i->bytepos = pos * sizeof (UChar);
-#else
-    UNUSED(str);
-    UNUSED(i);
-    UNUSED(c);
+    utf16_t * const ptr = (utf16_t *)(str->strstart + i->bytepos);
+    utf16_t * const end = utf16_encode(interp, ptr, c);
 
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
-#endif
-}
+    i->charpos += 1;
+    i->bytepos += (char *)end - (char *)ptr;
 
-/*
-
-=item C<static void utf16_iter_set_position(PARROT_INTERP, const STRING *str,
-String_iter *i, UINTVAL n)>
-
-Moves the string iterator C<i> to the position C<n> in the string.
-
-=cut
-
-*/
-
-static void
-utf16_iter_set_position(PARROT_INTERP,
-    ARGIN(const STRING *str), ARGMOD(String_iter *i), UINTVAL n)
-{
-    ASSERT_ARGS(utf16_iter_set_position)
-#if PARROT_HAS_ICU
-    UChar * const s = (UChar*) str->strstart;
-    UINTVAL pos;
-    pos = 0;
-    U16_FWD_N_UNSAFE(s, pos, n);
-    i->charpos = n;
-    i->bytepos = pos * sizeof (UChar);
-#else
-    UNUSED(str);
-    UNUSED(i);
-    UNUSED(n);
-
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
-#endif
+    PARROT_ASSERT(i->bytepos <= str->bufused);
 }
 
 
@@ -534,11 +547,10 @@ static STR_VTABLE Parrot_utf16_encoding = {
     encoding_index,
     encoding_rindex,
     encoding_hash,
-    unicode_validate,
 
     utf16_scan,
     utf16_ord,
-    utf16_substr,
+    encoding_substr,
 
     encoding_is_cclass,
     encoding_find_cclass,
@@ -558,8 +570,7 @@ static STR_VTABLE Parrot_utf16_encoding = {
     utf16_iter_get,
     utf16_iter_skip,
     utf16_iter_get_and_advance,
-    utf16_iter_set_and_advance,
-    utf16_iter_set_position
+    utf16_iter_set_and_advance
 };
 
 STR_VTABLE *Parrot_utf16_encoding_ptr = &Parrot_utf16_encoding;
@@ -586,5 +597,5 @@ F<docs/string.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

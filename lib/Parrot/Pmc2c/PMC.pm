@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2010, Parrot Foundation.
-# $Id$
 #
 
 =head1 NAME
@@ -71,7 +70,7 @@ sub dump {
 # methods
 sub add_method {
     my ( $self, $method ) = @_;
-    warn "FATAL ERROR: Duplicated VTABLE function: " . $method->name
+    die "FATAL ERROR: Duplicated VTABLE function: " . $method->name
         if exists $self->{has_method}{$method->name};
     $self->{has_method}{ $method->name } = @{ $self->{methods} };
     push @{ $self->{methods} }, $method;

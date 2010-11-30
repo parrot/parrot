@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -82,25 +81,6 @@ const_dump(PARROT_INTERP, const PackFile_Segment *segp)
 
 /*
 
-=item C<static void fixup_dump(PARROT_INTERP, const PackFile_Segment *segp)>
-
-Dump the fixup table.
-
-=cut
-
-*/
-
-static void
-fixup_dump(PARROT_INTERP, const PackFile_Segment *segp)
-{
-    Parrot_io_printf(interp, "%Ss => [\n", segp->name);
-    PackFile_Fixup_dump(interp, (const PackFile_FixupTable *)segp);
-    Parrot_io_printf(interp, "],\n");
-}
-
-
-/*
-
 =item C<static void disas_dump(PARROT_INTERP, const PackFile_Segment *self)>
 
 Disassemble and dump.
@@ -113,9 +93,32 @@ static void
 disas_dump(PARROT_INTERP, const PackFile_Segment *self)
 {
     const opcode_t *pc = self->data;
+    const PackFile_ByteCode_OpMapping *map = &((const PackFile_ByteCode *)self)->op_mapping;
+    INTVAL i;
 
     Parrot_io_printf(interp, "%Ss => [ # %d ops at offs 0x%x\n",
             self->name, (int)self->size, (int)self->file_offset + 4);
+
+    for (i = 0; i < map->n_libs; i++) {
+
+        INTVAL j, lib_num, table_num;
+        PackFile_ByteCode_OpMappingEntry *entry = &map->libs[i];
+        Parrot_io_printf(interp, "  map #%d => [\n", i);
+        Parrot_io_printf(interp, "    oplib: \"%s\" version %d.%d.%d (%d ops)\n",
+                entry->lib->name,
+                entry->lib->major_version,
+                entry->lib->minor_version,
+                entry->lib->patch_version,
+                entry->n_ops);
+
+        for (j = 0; j < map->libs[i].n_ops; j++) {
+            lib_num    = entry->lib_ops[j];
+            table_num  = entry->table_ops[j];
+            Parrot_io_printf(interp, "    %08lx => %08lx (%s)\n", table_num, lib_num,
+                    entry->lib->op_info_table[lib_num].full_name);
+        }
+        Parrot_io_printf(interp, "  ]\n");
+    }
 
     while (pc < self->data + self->size) {
         /* n can't be const; the ADD_OP_VAR_PART macro increments it */
@@ -420,19 +423,18 @@ main(int argc, const char **argv)
 
         fclose(fp);
         Parrot_gc_free_memory_chunk(interp, pack);
-        Parrot_exit(interp, 0);
+        Parrot_x_exit(interp, 0);
     }
 
     if (!nums_only)
         PackFile_header_dump(interp, pf);
 
     if (options & PFOPT_HEADERONLY)
-        Parrot_exit(interp, 0);
+        Parrot_x_exit(interp, 0);
 
     /* install a dumper function */
     if (!terse) {
         pf->PackFuncs[PF_CONST_SEG].dump = const_dump;
-        pf->PackFuncs[PF_FIXUP_SEG].dump = fixup_dump;
     }
 
     if (disas)
@@ -451,7 +453,7 @@ main(int argc, const char **argv)
     /* do a directory dump, which dumps segs then */
     PackFile_Segment_dump(interp, &pf->directory.base);
 
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 
@@ -471,5 +473,5 @@ F<src/packdump.c>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,7 +1,5 @@
 /* atomic/fallback.h
  *  Copyright (C) 2006, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This header provides an implementation of atomic
  *     operations in terms of threading primitives.
@@ -119,5 +117,5 @@ typedef struct Parrot_atomic_integer {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

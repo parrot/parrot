@@ -505,7 +505,7 @@ Log a debug message.
     line = $P0.'lineof'(orig, from, 'cache'=>1)
 
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(2)
+    $P1 = $P0.'stderr_handle'()
 
     $N0 = time
     push fmt, $N0

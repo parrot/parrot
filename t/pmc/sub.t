@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -67,7 +66,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Continuation" );
     set P5, 3
     set_global "foo", P5
     new P1, ['Continuation']
-    set_addr P1, endcont
+    set_label P1, endcont
 endcont:
     get_global P4, "foo"
     print "here "
@@ -99,7 +98,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "definedness of Continuation" );
     defined I1, P1
     print I1
     print "\n"
-    set_addr P1, cont
+    set_label P1, cont
     defined I1, P1
     print I1
     print "\n"
@@ -147,7 +146,7 @@ ok:
 .pcc_sub _the_sub:
     print "in sub\n"
     get_global P0, "_next_sub"
-    get_addr I0, P0
+    get_label I0, P0
     jump I0
     print "never here\n"
 
@@ -1157,7 +1156,7 @@ OUTPUT
 
 # see also #38964
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names, compilation' );
-.sub unicode:"\u7777"
+.sub utf8:"\u7777"
    print "ok\n"
 .end
 CODE
@@ -1165,24 +1164,24 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names, invocation' );
-.sub unicode:"\u7777"
+.sub utf8:"\u7777"
     print "ok\n"
 .end
 
 .sub test :main
-    unicode:"\u7777"()
+    utf8:"\u7777"()
 .end
 CODE
 ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names, dynamic' );
-.sub unicode:"\u7777"
+.sub utf8:"\u7777"
     print "ok\n"
 .end
 
 .sub test :main
-    $P1 = find_name unicode:"\u7777"
+    $P1 = find_name utf8:"\u7777"
     $P1()
 .end
 CODE
@@ -1190,12 +1189,12 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names' );
-.sub unicode:"\u7777"
+.sub utf8:"\u7777"
     print "ok\n"
 .end
 
 .sub test :main
-    # unicode:"\u7777" ends up as a string nicode:"\u7777
+    # utf8:"\u7777" ends up as a string nicode:"\u7777
     # (or it did, in r12860)
     $P1 = find_name 'nicode:"\u7777'
     unless null $P1 goto bad
@@ -1208,11 +1207,11 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub constant' );
 .sub main :main
-    .const 'Sub' s = unicode:"\u7777"
+    .const 'Sub' s = utf8:"\u7777"
     s()
 .end
 
-.sub unicode:"\u7777"
+.sub utf8:"\u7777"
    print "ok\n"
 .end
 CODE

@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2005-2007, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -27,7 +26,7 @@ _main:
 OUT
 
 ##############################
-pir_2_pasm_is( <<'CODE', <<'OUT', "constant propogation and resulting dead code" );
+pir_2_pasm_is( <<'CODE', <<'OUT', "constant propagation and resulting dead code" );
 .sub _main
        set $I0, 5
 loop:

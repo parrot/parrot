@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -127,11 +126,11 @@ Parrot_runcore_switch(PARROT_INTERP, ARGIN(STRING *name))
     size_t i;
 
     if (interp->run_core
-    &&  Parrot_str_equal(interp, name, interp->run_core->name))
+    &&  STRING_equal(interp, name, interp->run_core->name))
         return;
 
     for (i = 0; i < num_cores; ++i) {
-        if (Parrot_str_equal(interp, name, interp->cores[i]->name)) {
+        if (STRING_equal(interp, name, interp->cores[i]->name)) {
             interp->run_core = interp->cores[i];
             return;
         }
@@ -446,5 +445,5 @@ F<src/interp/inter_create.c>, F<src/interp/inter_misc.c>, F<src/call/ops.c>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

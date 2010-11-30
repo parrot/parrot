@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2006, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -73,7 +72,7 @@ main(int argc, const char* argv[])
     Parrot_run_native(interp, the_test);
 
     Parrot_io_eprintf(interp, "back\n");
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
     return 0;
 }
 

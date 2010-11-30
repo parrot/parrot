@@ -1,5 +1,4 @@
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -103,7 +102,7 @@ PARROT_EXPORT VTABLE* Parrot_default_get_vtable(PARROT_INTERP) {
 
 $vtable_decl
 
-    return Parrot_clone_vtable(interp, &temp_vtable);
+    return Parrot_vtbl_clone_vtable(interp, &temp_vtable);
 }
 
 EOC

@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -185,7 +184,7 @@ end:
 
     $P2 = new ['ExceptionHandler']
     $P2.'handle_types'(.EXCEPTION_UNEXPECTED_NULL)
-    set_addr $P2, null_ex_eh
+    set_label $P2, null_ex_eh
     push_eh $P2
 
     $P1 = $P0[$S0]
@@ -1311,7 +1310,7 @@ postit_end:
 .sub unicode_keys_register_rt_39249
   $P1 = new ['Hash']
 
-  $S99 = unicode:"\u7777"
+  $S99 = utf8:"\u7777"
   $P1[$S99] = "ok"
   $S1 = $P1[$S99]
   is( $S1, 'ok', 'unicode key' )
@@ -1320,11 +1319,11 @@ postit_end:
 .sub unicode_keys_literal_rt_39249
   $P1 = new ['Hash']
 
-  $P1[unicode:"\u7777"] = "ok"
-  $S1 = $P1[unicode:"\u7777"]
+  $P1[utf8:"\u7777"] = "ok"
+  $S1 = $P1[utf8:"\u7777"]
   is( $S1, 'ok', 'literal unicode key' )
 
-  $S2 = unicode:"\u7777"
+  $S2 = utf8:"\u7777"
   $S1 = $P1[$S2]
   is( $S1, 'ok', 'literal unicode key lookup via var' )
 .end
@@ -1360,7 +1359,7 @@ postit_end:
 
     # PMC is first value type
     hash.'set_value_type'(.DATATYPE_PMC)
-    $P0 = new 'Env' # arbitary choice. Just to prevent possible casting.
+    $P0 = new 'Env' # arbitrary choice. Just to prevent possible casting.
     hash['env'] = $P0
     hash['foo'] = 42
     hash['bar'] = 21285.06

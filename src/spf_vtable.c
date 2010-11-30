@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -452,7 +451,7 @@ getchr_pmc(PARROT_INTERP, SHIM(INTVAL size), ARGMOD(SPRINTF_OBJ *obj))
 
     ++obj->index;
     s = VTABLE_get_string(interp, tmp);
-    return Parrot_str_substr(interp, s, 0, 1);
+    return STRING_substr(interp, s, 0, 1);
 }
 
 /*
@@ -660,5 +659,5 @@ this point neither of those is needed.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

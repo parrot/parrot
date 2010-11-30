@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2008-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -391,8 +390,6 @@ Read a line from the filehandle and return it in a string.
             else
                 string_result = Parrot_str_new_init(INTERP, r, strlen(r), enc, 0);
             free(r);
-            if (enc != NULL)
-                STRING_validate(INTERP, string_result);
         }
 #else
         if (got_prompt) {
@@ -584,11 +581,11 @@ Full buffering, bytes are sent when the buffer is full.
         INTVAL flags;
 
         if (got_type) {
-            if (Parrot_str_equal(INTERP, new_type, nobuffer_string))
+            if (STRING_equal(INTERP, new_type, nobuffer_string))
                 Parrot_io_setbuf(INTERP, SELF, PIOCTL_NONBUF);
-            else if (Parrot_str_equal(INTERP, new_type, linebuffer_string))
+            else if (STRING_equal(INTERP, new_type, linebuffer_string))
                 Parrot_io_setlinebuf(INTERP, SELF);
-            else if (Parrot_str_equal(INTERP, new_type, fullbuffer_string))
+            else if (STRING_equal(INTERP, new_type, fullbuffer_string))
                 Parrot_io_setbuf(INTERP, SELF, PIO_UNBOUND);
         }
 
@@ -699,29 +696,6 @@ If this is a pipe, return the exit status of the child process.
 
 /*
 
-=item C<METHOD get_fd()>
-
-Retrieve the integer file descriptor for the FileHandle (only available on
-platforms that use integer file descriptors).
-
-=cut
-
-*/
-
-    METHOD get_fd() {
-#ifndef PIO_OS_STDIO
-        PIOHANDLE os_handle;
-        INTVAL    fd;
-        GET_ATTR_os_handle(INTERP, SELF, os_handle);
-        fd = (INTVAL)os_handle;
-        RETURN(INTVAL fd);
-#endif /*PIO_OS_STDIO*/
-
-        RETURN(INTVAL -1);
-    }
-
-/*
-
 =item C<METHOD tell()>
 
 Get the file position of the stream. 2 C<INTVAL>s are returned. The first is
@@ -799,5 +773,5 @@ Returns the next byte from the stream, but does not remove it.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

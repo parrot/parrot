@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2006, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -950,7 +949,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::ParrotIO" );
     # open this file
     stream."open"( "t/library/perlhist.txt", 'r' )
 
-    # you can specifiy a custom block size with
+    # you can specify a custom block size with
     # stream."blockSize"( 10 )
 
     # dump the stream

@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -96,9 +95,9 @@ sub check_operators {
 ## L<PDD07/Code Formatting"there should be one space or a newline after a comma">/
     my @comma_space_files;
     for my $path ( sort keys %comma_space ) {
-        if (my $cnt = scalar  @{ $comma_space{$path} }) {
+        if (my $count = scalar  @{ $comma_space{$path} }) {
             push @comma_space_files, <<"END_ERROR";
-$path [$cnt line@{[ ($cnt >1) ? 's': '' ]}] at :
+$path [$count line@{[ ($count >1) ? 's': '' ]}] at :
 @{[ join("\n--\n", @{$comma_space{$path}}) ]}
 END_ERROR
         }

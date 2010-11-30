@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2002-2008, Parrot Foundation.
 ** io.ops
 */
@@ -210,5 +209,5 @@ inline op getstderr(out PMC) :base_io {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

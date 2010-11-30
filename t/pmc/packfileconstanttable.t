@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -26,7 +25,6 @@ Tests the PackfileConstantTable PMC.
 
 .sub 'main' :main
 .include 'test_more.pir'
-.include 'packfile_constants.pasm'
     'plan'(15)
 
     'test_sanity'()

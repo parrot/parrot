@@ -1,5 +1,4 @@
 /*
- * $Id$
 ** obscure.ops
 */
 
@@ -221,5 +220,5 @@ as the Parrot interpreter itself.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

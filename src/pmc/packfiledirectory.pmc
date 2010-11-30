@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -96,9 +95,6 @@ Initialize PackfileDirectory from PackFile_Directory.
             switch (pfseg->type) {
               case PF_DIR_SEG:
                 pmc_type = enum_class_PackfileDirectory;
-                break;
-              case PF_FIXUP_SEG:
-                pmc_type = enum_class_PackfileFixupTable;
                 break;
               case PF_CONST_SEG:
                 pmc_type = enum_class_PackfileConstantTable;
@@ -282,5 +278,5 @@ Delete the specified segment from the directory.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

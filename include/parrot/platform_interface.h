@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2003-2010, Parrot Foundation.
- * $Id$
  */
 
 #ifndef PARROT_PLATFORM_INTERFACE_H_GUARD
@@ -154,5 +153,5 @@ INTVAL Parrot_Run_OS_Command_Argv(Interp*, struct PMC *);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

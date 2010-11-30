@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -116,7 +115,7 @@ Parrot_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
 {
     ASSERT_ARGS(Parrot_init_stacktop)
     interp->lo_var_ptr = stack_top;
-    init_world_once(interp);
+    Parrot_gbl_init_world_once(interp);
 }
 
 
@@ -591,6 +590,9 @@ again:
 
 Loads the C<PackFile> returned by C<Parrot_pbc_read()>.
 
+TODO: We don't do any error or sanity checking here. The packfile pointer
+should be a valid packfile, not simply a non-null pointer
+
 =cut
 
 */
@@ -609,6 +611,30 @@ Parrot_pbc_load(PARROT_INTERP, ARGIN(Parrot_PackFile pf))
     interp->code       = pf->cur_cs;
 }
 
+/*
+
+=item C<int Parrot_load_bytecode_file(PARROT_INTERP, const char *filename)>
+
+Load a bytecode file into the interpreter by name. Returns C<0> on failure,
+Success otherwise. Writes error information to the interpreter's error file
+stream.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+int
+Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
+{
+    ASSERT_ARGS(Parrot_load_bytecode_file)
+    PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
+
+    if (!pf)
+        return 0;
+    Parrot_pbc_load(interp, pf);
+    return 1;
+}
 
 /*
 
@@ -717,8 +743,8 @@ set_current_sub(PARROT_INTERP)
     PMC *new_sub_pmc;
 
     PackFile_ByteCode   * const cur_cs = interp->code;
-    PackFile_FixupTable * const ft     = cur_cs->fixups;
     PackFile_ConstTable * const ct     = cur_cs->const_table;
+    STRING * const SUB = CONST_STRING(interp, "Sub");
 
     opcode_t    i;
 
@@ -727,10 +753,9 @@ set_current_sub(PARROT_INTERP)
      * entry point with the address at our resume_offset.
      */
 
-    for (i = 0; i < ft->fixup_count; ++i) {
-        if (ft->fixups[i].type == enum_fixup_sub) {
-            const opcode_t ci      = ft->fixups[i].offset;
-            PMC    * const sub_pmc = ct->pmc.constants[ci];
+    for (i = 0; i < ct->pmc.const_count; i++) {
+        PMC *sub_pmc = ct->pmc.constants[i];
+        if (VTABLE_isa(interp, sub_pmc, SUB)) {
             Parrot_Sub_attributes *sub;
 
             PMC_get_sub(interp, sub_pmc, sub);
@@ -749,7 +774,7 @@ set_current_sub(PARROT_INTERP)
     }
 
     /* If we didn't find anything, put a dummy PMC into current_sub.
-       The default values set by SUb.init are appropiate for the
+       The default values set by SUb.init are appropriate for the
        dummy, don't need additional settings. */
     new_sub_pmc = Parrot_pmc_new(interp, enum_class_Sub);
     Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), new_sub_pmc);
@@ -796,7 +821,7 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
      * If any profile information was gathered, print it out
      * before exiting, then print debug infos if turned on.
      */
-    Parrot_on_exit(interp, print_debug,   NULL);
+    Parrot_x_on_exit(interp, print_debug,   NULL);
 
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */
     main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
@@ -1119,10 +1144,10 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code)
         PARROT_ASSERT(interp->initial_pf);
     }
 
-    if (Parrot_str_compare(interp, CONST_STRING(interp, "PIR"), type) == 0)
+    if (STRING_equal(interp, CONST_STRING(interp, "PIR"), type))
         return IMCC_compile_pir_s(interp, code, error);
 
-    if (Parrot_str_compare(interp, CONST_STRING(interp, "PASM"), type) == 0)
+    if (STRING_equal(interp, CONST_STRING(interp, "PASM"), type))
         return IMCC_compile_pasm_s(interp, code, error);
 
     *error = Parrot_str_new(interp, "Invalid interpreter type", 0);
@@ -1146,5 +1171,5 @@ F<include/parrot/embed.h> and F<docs/embed.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

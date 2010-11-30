@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2004-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -163,18 +162,18 @@ Parrot_encoding_number(PARROT_INTERP, ARGIN(const STRING *encodingname))
     int i;
 
     for (i = 0; i < n; ++i) {
-        if (Parrot_str_equal(interp, encodings[i]->name_str, encodingname))
+        if (STRING_equal(interp, encodings[i]->name_str, encodingname))
             return i;
     }
 
     /* backwards compatibility */
-    if (Parrot_str_equal(interp, encodingname, unicode_str)) {
+    if (STRING_equal(interp, encodingname, unicode_str)) {
         for (i = 0; i < n; ++i) {
             if (STREQ(encodings[i]->name, "utf8"))
                 return i;
         }
     }
-    else if (Parrot_str_equal(interp, encodingname, fixed_8_str)) {
+    else if (STRING_equal(interp, encodingname, fixed_8_str)) {
         for (i = 0; i < n; ++i) {
             if (STREQ(encodings[i]->name, "ascii"))
                 return i;
@@ -425,5 +424,5 @@ Parrot_default_encoding(SHIM_INTERP)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

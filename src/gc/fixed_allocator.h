@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -60,7 +59,7 @@ typedef struct Fixed_Allocator
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-void* Parrot_gc_fixed_allocator_allocate(PARROT_INTERP,
+void * Parrot_gc_fixed_allocator_allocate(PARROT_INTERP,
     ARGIN(Fixed_Allocator *allocator),
     size_t size)
         __attribute__nonnull__(1)
@@ -183,5 +182,5 @@ Pool_Allocator * Parrot_gc_pool_new(SHIM_INTERP, size_t object_size);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

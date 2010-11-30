@@ -1,6 +1,5 @@
 #! nqp
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 class Ops::Emitter is Hash;
 
@@ -320,9 +319,6 @@ method _generate_guard_macro_name($filename) {
 
 method _emit_guard_prefix($fh, $filename) {
     my $guardname := self._generate_guard_macro_name($filename);
-    $fh.print('
-/* $Id' ~ '$ */
-');
     $fh.print(qq/
 #ifndef $guardname
 #define $guardname
@@ -375,7 +371,7 @@ method _emit_preamble($fh) {
  * .ops files). by {self<script>}.
  *
  * Any changes made here will be lost!  To regenerate this file after making
- * changes to any ops, use the bootstap-ops makefile target.
+ * changes to any ops, use the bootstrap-ops makefile target.
  *
  */
 |);

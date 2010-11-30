@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2007, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -204,5 +203,5 @@ Returns whether the pointer has the same value as C<*pmc2>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

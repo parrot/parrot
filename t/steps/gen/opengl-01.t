@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2007-2008, Parrot Foundation.
-# $Id$
 # gen/opengl-01.t
 
 use strict;

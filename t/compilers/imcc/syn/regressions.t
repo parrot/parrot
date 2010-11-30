@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2008-2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -156,9 +155,9 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'unicode lexical identifiers (TT #575)');
  .sub main :main
     $P0 = box 'hello world'
-    .lex unicode:"$\u03b2\u03bf\u03bf", $P0
+    .lex utf8:"$\u03b2\u03bf\u03bf", $P0
 
-    $P1 = find_lex unicode:"$\u03b2\u03bf\u03bf"
+    $P1 = find_lex utf8:"$\u03b2\u03bf\u03bf"
     say $P1
  .end
 CODE
@@ -167,12 +166,12 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'unicode named identifiers (TT #654)');
  .sub 'main' :main
-    'foo'(1 :named(unicode:"\x{e4}"))
+    'foo'(1 :named(utf8:"\x{e4}"))
  .end
 
  # Perl 6:  sub foo(:$ä) { say "ok $ä"; }
  .sub 'foo'
-    .param int x :named(unicode:"\x{e4}")
+    .param int x :named(utf8:"\x{e4}")
     print "ok "
     say x
  .end

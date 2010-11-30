@@ -1,23 +1,20 @@
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 
 .sub 'get_hellos'
     $P0 = new ['ResizableStringArray']
     push $P0, "hello"
-    push $P0, unicode:"hello"
-    push $P0, utf8:unicode:"hello"
-    push $P0, utf16:unicode:"hello"
-    push $P0, ucs2:unicode:"hello"
+    push $P0, utf8:"hello"
+    push $P0, utf16:"hello"
+    push $P0, ucs2:"hello"
     .return ($P0)
 .end
 
 .sub 'get_empties'
     $P0 = new ['ResizableStringArray']
     push $P0, ""
-    push $P0, unicode:""
-    push $P0, utf8:unicode:""
-    push $P0, utf16:unicode:""
-    push $P0, ucs2:unicode:""
+    push $P0, utf8:""
+    push $P0, utf16:""
+    push $P0, ucs2:""
     .return ($P0)
 .end
 

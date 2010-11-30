@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2010, Parrot Foundation.
-# $Id$
 
 package Parrot::Headerizer;
 
@@ -29,9 +28,7 @@ use warnings;
 
 =item C<new()>
 
-TODO
-
-Contructor of headerizer objects
+Constructor of headerizer objects.
 
 =cut
 
@@ -70,9 +67,11 @@ sub new {
     return $self;
 }
 
-=item $headerizer->valid_macro( $macro )
+=item C<valid_macro()>
 
-Returns a boolean saying wither I<$macro> is a valid PARROT_XXX macro.
+    $headerizer->valid_macro( $macro )
+
+Returns a boolean saying whether I<$macro> is a valid C<PARROT_XXX> macro.
 
 =cut
 
@@ -83,9 +82,11 @@ sub valid_macro {
     return exists $self->{valid_macros}{$macro};
 }
 
-=item $headerizer->valid_macros()
+=item C<valid_macros()>
 
-Returns a list of all the valid PARROT_XXX macros.
+    $headerizer->valid_macros()
+
+Returns a list of all the valid C<PARROT_XXX> macros.
 
 =cut
 
@@ -97,7 +98,9 @@ sub valid_macros {
     return @macros;
 }
 
-=item $headerizer->extract_function_declarations($text)
+=item C<extract_function_declarations()>
+
+    $headerizer->extract_function_declarations($text)
 
 Extracts the function declarations from the text argument, and returns an
 array of strings containing the function declarations.
@@ -352,6 +355,10 @@ sub squawk {
 
     return;
 }
+
+=back
+
+=cut
 
 1;
 

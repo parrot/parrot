@@ -1,6 +1,5 @@
 #! nqp
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 class Ops::Trans::C is Ops::Trans;
 

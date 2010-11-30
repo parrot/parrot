@@ -1,21 +1,21 @@
 {
-    "release.version"  : "2.8.0",
-    "release.name"     : "Tui Parakeet",
+    "release.version"  : "2.10.0",
+    "release.name"     : "Pesquet's",
     "release.day"      : "Tuesday",
-    "release.date"     : "21 September 2010",
-    "release.nextdate" : "19 October 2010",
+    "release.date"     : "16 November 2010",
+    "release.nextdate" : "21 December 2010",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
     "web.openpatches"  : "openpatches.html",
-    "web.repository"   : "https://svn.parrot.org/parrot/trunk/",
+    "web.repository"   : "https://github.com/parrot/parrot",
+    "web.org_root"    :  "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "16 October 2010",
+    "bugday.date"      : "18 November 2010",
 
     "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
-    "wiki.bugday"      : "bug_day_2010_10_16",
+    "wiki.bugday"      : "bug_day_2010_12_18",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/2.8.0/",
-    "subversion.root"  : "http://subversion.apache.org/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/2.10.0/",
 }

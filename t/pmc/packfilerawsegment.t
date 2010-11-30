@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -114,7 +113,7 @@ load_error:
 
   done:
     $I0 = elements hash
-    is($I0, 4, "Got all types of Packfile segments")
+    is($I0, 3, "Got all types of Packfile segments")
 
     # Now create RawSegment and set type.
     $P0 = new ['PackfileRawSegment']

@@ -2,7 +2,6 @@
  *
  * by Wolfram Gloger 1995.
  *
- * $Id$
  * Copyright (C) 2002-2007, Parrot Foundation.
  */
 
@@ -347,5 +346,5 @@ void cfree(void *mem)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

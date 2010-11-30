@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2006, Parrot Foundation.
-# $Id$
 
 use warnings;
 use strict;
@@ -50,7 +49,7 @@ print << "EOF";
 void Parrot_set_config_hash(void);
 
 void
-Parrot_set_config_hash_internal (const unsigned char* parrot_config,
+Parrot_gbl_set_config_hash_internal (const unsigned char* parrot_config,
                                  unsigned int parrot_config_size);
 
 
@@ -90,7 +89,7 @@ print << "EOF";
 void
 Parrot_set_config_hash(void)
 {
-    Parrot_set_config_hash_internal(parrot_config, sizeof(parrot_config));
+    Parrot_gbl_set_config_hash_internal(parrot_config, sizeof(parrot_config));
 }
 EOF
 

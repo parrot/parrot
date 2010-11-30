@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -74,7 +73,7 @@ print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
         Parrot_io_puts(interp, Parrot_io_STDERR(interp), "Unknown warning\n");
     else {
         Parrot_io_putps(interp, Parrot_io_STDERR(interp), msg);
-        if (string_ord(interp, msg, -1) != '\n')
+        if (STRING_ord(interp, msg, -1) != '\n')
             Parrot_io_eprintf(interp, "%c", '\n');
     }
     print_pbc_location(interp);
@@ -163,5 +162,5 @@ F<include/parrot/warnings.h>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

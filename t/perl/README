@@ -1,6 +1,5 @@
 # Copyright (C) 2003-2006, Parrot Foundation.
 
-# $Id$
 
 This directory contains test code for Perl5 modules used as helpers for Parrot.
 See also the documentation in ../../docs/tests.pod.

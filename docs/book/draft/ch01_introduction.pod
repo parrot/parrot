@@ -115,7 +115,7 @@ X<metacommitter role>
 
 Metacommitters manage commit access to the Parrot repository. Once a
 contributor is selected for commit access, a metacommitter gives the new
-committer access to the SVN repository and the bugtracker. The architect is a
+committer access to the repository and the bugtracker. The architect is a
 metacommitter, but other team members also hold this role.
 
 =item Committer
@@ -140,7 +140,7 @@ subsystem, the exceptions system, or the concurrency scheduler.
 X<compiler developer role>
 
 Compiler developers develop and maintain one or more Parrot front-end
-compilers such as IMCC, PIRC, PGE and TGE.
+compilers such as IMCC, PGE and TGE.
 
 =item High-Level Language Developer
 

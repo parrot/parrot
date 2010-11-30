@@ -1,0 +1,27 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+
+seeing if struct stat has BSD extensions
+
+*/
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/stat.h>
+
+int
+main()
+{
+    struct stat st;
+    st.st_blocks  = 22;
+    st.st_blksize = 500;
+    printf("OK: %d %d", st.st_blocks, st.st_blksize);
+    return EXIT_SUCCESS;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

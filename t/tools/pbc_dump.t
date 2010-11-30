@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -45,10 +44,10 @@ BEGIN {
         plan skip_all => "pbc_dump hasn't been built. Run make parrot_utils";
         exit(0);
     }
-    plan tests => 8;
+    plan tests => 13;
 }
 
-dump_output_like( <<PIR, "pir", [qr/FIXUP_t/, qr/CONSTANT_t/, qr/BYTECODE_t/], 'pbc_dump basic sanity');
+dump_output_like( <<PIR, "pir", [qr/CONSTANT_t/, qr/BYTECODE_t/], 'pbc_dump basic sanity');
 .sub main :main
     \$I0 = 42
 .end
@@ -71,6 +70,14 @@ dump_output_like( <<PIR, "pir", qr/BYTECODE_t.*=>.*\[.*offs.*op_count.*itype.*id
     \$I0 = 42
 .end
 PIR
+
+for my $enc ( qw(binary iso-8859-1 utf8 utf16 ucs2 ucs4) ) {
+    dump_output_like( <<PIR, "pir", qr/ENCODING.*=>.*$enc/ms, "pbc_dump $enc encoding");
+.sub main :main
+    \$S0 = $enc:"abc"
+.end
+PIR
+}
 
 my $longcode = ".sub main :main\n";
 for (0 ... 10000) {

@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2003-2010, Parrot Foundation.
- * $Id$
  */
 
 /*
@@ -528,7 +527,7 @@ typedef struct move_info_t {
 =item C<static int pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s,
 void *vinfo)>
 
-Callback for C<Parrot_register_move>. Inserts move instructions in stead of
+Callback for C<Parrot_util_register_move>. Inserts move instructions in stead of
 actually moving the registers.
 
 =cut
@@ -650,7 +649,7 @@ done:
         ;
     }
 
-    Parrot_register_move(interp, n, move_list, move_list + n, 255,
+    Parrot_util_register_move(interp, n, move_list, move_list + n, 255,
         pcc_reg_mov, NULL, &move_info);
 
     mem_sys_free(move_list);
@@ -932,5 +931,5 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

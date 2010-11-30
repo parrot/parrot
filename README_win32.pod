@@ -1,4 +1,3 @@
-# $Id$
 
 This file is best viewed with "perldoc README_win32".
 

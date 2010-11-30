@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2007-2009, Parrot Foundation.
-$Id$
 
 figure out if the compiler supports attributes.
 see parrot/compiler.h for attribute value definitions.
@@ -57,5 +56,5 @@ main()
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

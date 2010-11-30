@@ -1,6 +1,5 @@
 #! parrot
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 
 # Common functions for various Packfile* PMCs tests.
 # Return test filename
@@ -21,7 +20,7 @@
     pf   = new ['Packfile']
     $S0  = '_filename'()
     pio  = new ['FileHandle']
-    pio.'open'($S0, 'r')
+    pio.'open'($S0, 'rb')
     $S0  = pio.'readall'()
     pio.'close'()
     pf   = $S0
@@ -63,13 +62,6 @@
   done:
     .return ()
 .end
-
-.sub '_get_fixup_table'
-    .param pmc pf
-
-    .tailcall '_find_segment_by_type'(pf, "PackfileFixupTable")
-.end
-
 
 # Report no ok for loading packfile failures
 .sub report_load_error

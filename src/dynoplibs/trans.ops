@@ -1,5 +1,4 @@
 /*
- * $Id$
  * trans.ops
  */
 
@@ -272,7 +271,7 @@ inline op pow(invar PMC, invar PMC, invar PMC) :base_core {
     const FLOATVAL b = VTABLE_get_number(interp, $3);
     const FLOATVAL c = pow(a, b);
     if (PMC_IS_NULL($1))
-        $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
+        $1 = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Float));
     else
         $1 = Parrot_pmc_new(interp, $1->vtable->base_type);
     VTABLE_set_number_native(interp, $1, c);
@@ -283,7 +282,7 @@ inline op pow(invar PMC, invar PMC, in INT) :base_core {
     const FLOATVAL b = (FLOATVAL)$3;
     const FLOATVAL c = pow(a, b);
     if (PMC_IS_NULL($1))
-        $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
+        $1 = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Float));
     else
         $1 = Parrot_pmc_new(interp, $1->vtable->base_type);
     VTABLE_set_number_native(interp, $1, c);
@@ -293,7 +292,7 @@ inline op pow(invar PMC, invar PMC, in NUM) :base_core {
     const FLOATVAL a = VTABLE_get_number(interp, $2);
     const FLOATVAL c = pow(a, $3);
     if (PMC_IS_NULL($1))
-        $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
+        $1 = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Float));
     else
         $1 = Parrot_pmc_new(interp, $1->vtable->base_type);
     VTABLE_set_number_native(interp, $1, c);
@@ -340,5 +339,5 @@ as the Parrot interpreter itself.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

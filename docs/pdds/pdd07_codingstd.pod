@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 PDD 7: Conventions and Guidelines for Parrot Source Code
 
@@ -498,81 +497,6 @@ the variables happen to have the same names.
 You could hoist the C<int i;> outside the test, but then you'd have an
 C<i> that's visible after it's used, which is confusing at best.
 
-=head3 Subversion Properties
-
-=head4 svn:ignore
-
-Sometimes new files will be created in the configuration and build process of
-Parrot. These files should not show up when checking the distribution with
-
-    svn status
-
-or
-
-    perl tools/dev/manicheck.pl
-
-The list of these ignore files can be set up with:
-
-    svn propedit svn:ignore <PATH>
-
-In order to keep the two different checks synchronized,
-the MANIFEST and MANIFEST.SKIP files should be regenerated with:
-
-    perl tools/dev/mk_manifest_and_skip.pl
-
-and the files then committed to the Parrot svn repository.
-
-=head4 svn:mime-type
-
-The C<svn:mime-type> property must be set to C<text/plain> for all test
-files, and may be set to C<text/plain> for other source code files in
-the repository. Using I<auto-props>, Subversion can automatically set
-this property for you on test files.  To enable this option, add the
-following to your F<~/.subversion/config>:
-
-    [miscellany]
-    enable-auto-props = yes
-    [auto-props]
-    *.t = svn:mime-type=text/plain
-
-The F<t/distro/file_metadata.t> test checks that the files needing
-this property have it set.
-
-=head4 svn:keywords
-
-The C<svn:keywords> property should be set to:
-
-    Author Date Id Revision
-
-on each file with a mime-type of C<text/plain>.  Do this with the command:
-
-    svn propset svn:keywords "Author Date Id Revision" <filename>
-
-The F<t/distro/file_metadata.t> test checks that the files needing
-this property have it set.
-
-=head4 svn:eol-style
-
-The C<svn:eol-style> property makes sure that whenever a file is checked out
-of subversion it has the correct end-of-line characters appropriate for
-the given platform.  Therefore, most files should have their
-C<svn:eol-style> property set to C<native>.  However, this is not true
-for all files.  Some input files to tests (such as the C<*.input> and
-C<*.output> files for PIR tests) need to have C<LF> as their
-C<svn:eol-style> property.  The current list of such files is described in
-F<t/distro/file_metadata.t>.
-
-Set the C<svn:eol-style> property to C<native> with the command:
-
-    svn propset svn:eol-style "native" <filename>
-
-Set the C<svn:eol-style> property to C<LF> with the command:
-
-    svn propset svn:eol-style "LF" <filename>
-
-The F<t/distro/file_metadata.t> test checks that the files needing
-this property have it set.
-
 =head3 Naming Conventions
 
 =over 4
@@ -820,10 +744,6 @@ overview of what the source file is for, the algorithms it implements, etc.
 The Pod documentation should follow the layout:
 
 =over 4
-
-=item Version
-
-A SVN id string.
 
 =item Title
 

@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -24,7 +23,7 @@ Tests the Packfile PMC.
 .sub main :main
 .include 'test_more.pir'
 
-    plan(49)
+    plan(45)
     'test_new'()
     'test_set_string_native'()
     'test_get_string'()
@@ -354,15 +353,6 @@ load_error:
     .local pmc pf, pfdir
     pf = new 'Packfile'
     pfdir = pf.'get_directory'()
-    #$P0 = new 'PackfileConstantTable'
-    #$P0[0] = 42.0
-    $P0 = new 'PackfileFixupTable'
-    $P1 = new 'PackfileFixupEntry'
-    $P1 = 42
-    $P1.'set_type'(1)
-    $P1 = "The fixup"
-    $P0[0] = $P1
-    pfdir["FIXUP_t/pmc/packfile.t"] = $P0
 
     $P1 = new 'PackfileRawSegment'
     pfdir["BYTECODE_t/pmc/packfile.t"] = $P1
@@ -400,17 +390,6 @@ load_error:
     $I0 = pf['uuid_type']
     is($I0, 1, "uuid_type preserved")
 
-    # Check that FixupTable contains our Entry.
-    $P0 = _get_fixup_table(pf)
-    $I1 = elements $P0
-    is($I1, 1, "FixupTable contains one element")
-    $P1 = $P0[0]
-    isa_ok($P1, "PackfileFixupEntry")
-    $I0 = $P1
-    is($I0, 42, "FixupEntry offset preserved")
-    $S0 = $P1
-    is($S0, "The fixup", "FixupEntry name preserved")
-
     # Check unpacked ConstTable
     $P0 = _find_segment_by_type(pf, "PackfileConstantTable")
     $I0 = defined $P0
@@ -442,7 +421,7 @@ load_error:
     push_eh load_error
     $S0 = '_filename'()
     $P0 = new ['FileHandle']
-    $P0.'open'($S0, 'r')
+    $P0.'open'($S0, 'rb')
 
     orig = $P0.'readall'()
 

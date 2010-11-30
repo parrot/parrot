@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2002-2010, Parrot Foundation.
- * $Id$
  */
 
 /*
@@ -1692,5 +1691,5 @@ hash_str(ARGIN(const char *str))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

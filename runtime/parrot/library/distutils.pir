@@ -1,5 +1,4 @@
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -2173,7 +2172,7 @@ the server. The default is "parrot-autobot:qa_rocks"
     $S0 = config['osname']
     push contents, $S0
     push contents, 'revision'
-    $S0 = config['revision']
+    $S0 = config['git_describe']
     push contents, $S0
     $I0 = exists kv['smolder_tags']
     unless $I0 goto L2

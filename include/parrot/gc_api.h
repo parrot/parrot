@@ -1,7 +1,5 @@
 /* gc_api.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Handles dead object destruction of the various headers
  *  History:
@@ -490,5 +488,5 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

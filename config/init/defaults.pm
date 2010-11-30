@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -59,6 +58,7 @@ sub runstep {
         ccflags
         d_socklen_t
         optimize
+        osvers
         scriptdirexp
         sig_name
         sPRIgldbl
@@ -197,7 +197,7 @@ sub runstep {
         touch     => '$(PERL) -MExtUtils::Command -e touch',
 
         ar        => $Config{ar},
-        ar_flags  => 'cr',
+        arflags   => 'cr',
 
         # for Win32
         ar_out => '',
@@ -262,6 +262,13 @@ sub runstep {
 
     $conf->data->set( 'archname', $Config{archname});
 
+    $conf->data->set( has_core_nci_thunks => 1 );
+    $conf->data->set( HAS_CORE_NCI_THUNKS => 1 );
+    if ( $conf->options->get( 'without-core-nci-thunks' ) ) {
+        $conf->data->set( has_core_nci_thunks => 0 );
+        $conf->data->set( HAS_CORE_NCI_THUNKS => 0 );
+    }
+
     $conf->data->set( has_extra_nci_thunks => 1 );
     $conf->data->set( HAS_EXTRA_NCI_THUNKS => 1 );
     if ( $conf->options->get( 'without-extra-nci-thunks' ) ) {
@@ -287,12 +294,12 @@ sub _64_bit_adjustments {
             $archname =~ s/x86_64/i386/;
 
             # adjust gcc?
-            for my $cc qw(cc link ld) {
+            for my $cc (qw(cc link ld)) {
                 $conf->data->add( ' ', $cc, '-m32' );
             }
 
             # and lib flags
-            for my $lib qw(ld_load_flags ld_share_flags ldflags linkflags) {
+            for my $lib (qw(ld_load_flags ld_share_flags ldflags linkflags)) {
                 my $item = $conf->data->get($lib);
                 ( my $ni = $item ) =~ s/lib64/lib/g;
                 $conf->data->set( $lib, $ni );

@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -22,7 +21,7 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(37)
+    plan(38)
 
     test_init()
     test_set_string()
@@ -65,6 +64,14 @@ Tests C<ByteBuffer> PMC..
     n = elements bb
     is(n, 42, "size of a new buffer with initial size is correct")
 
+    push_eh handler
+    bb = new ['ByteBuffer'], -1
+handler:
+    pop_eh
+    ok(1,"Creating a negative-sized ByteBuffer throws an exception")
+    goto done
+
+  done:
 .end
 
 .sub test_set_string
@@ -144,27 +151,10 @@ end:
     is(n, 4, "getting ascii from buffer gives correct length")
     is(s, "abcd", "getting ascii from buffer gives correct content")
 
-    $I0 = hasicu()
-    unless $I0 goto skip_it
-
     bb = new ['ByteBuffer']
 
     # Upper case n tilde: codepoint 0xD1, utf8 encoding 0xC3, 0x91
-    #bb = utf16:unicode:"\x{D1}"
-    # Can't do that, or the program can't be compiled without ICU.
-    # Fill the buffer with bytes instead.
-
-    # Get endianess to set the bytes in the appropiate order.
-    # *** XXX *** Need report from big endian platforms.
-    big = isbigendian()
-    if big goto isbig
-    bb[0] = 0xD1
-    bb[1] = 0x00
-    goto doit
-isbig:
-    bb[0] = 0x00
-    bb[1] = 0xD1
-doit:
+    bb = utf16:"\x{D1}"
     s = bb.'get_string'('utf16')
     n = length s
     is(n, 1, "getting utf16 from buffer gives correct length")
@@ -173,15 +163,11 @@ doit:
     bb = new ['ByteBuffer']
     bb[0] = 0xC3
     bb[1] = 0x91
-    s = bb.'get_string_as'(utf8:unicode:"")
+    s = bb.'get_string_as'(utf8:"")
     n = length s
     is(n, 1, "getting utf8 from buffer gives correct length")
     n = ord s
     is(n, 0xD1, "getting utf8 from buffer gives correct codepoint")
-    goto end
-skip_it:
-    skip(4, "this test needs ICU")
-end:
 .end
 
 .sub test_push
@@ -253,7 +239,7 @@ end:
     .local pmc eh
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
-    set_addr eh, catch_negative
+    set_label eh, catch_negative
     n = 1
     push_eh eh
     bb = -1
@@ -272,10 +258,7 @@ test_negative:
     .local pmc bb
     .local int i, big, pos, b0, b1, c
 
-    $I0 = hasicu()
-    unless $I0 goto skip_it
-
-    # Get endianess to set the bytes in the appropiate order.
+    # Get endianess to set the bytes in the appropriate order.
     # *** XXX *** Need report from big endian platforms.
     big = isbigendian()
 
@@ -321,9 +304,6 @@ loopcheck:
 failed:
     say i
     ok(0, "reallocation")
-    goto end
-skip_it:
-    skip(1, "this test needs ICU")
 end:
 .end
 
@@ -352,7 +332,7 @@ donearray:
     .local pmc bb, eh, ex
     .local string s
     eh = new ['ExceptionHandler'], .EXCEPTION_INVALID_ENCODING
-    set_addr eh, catch_encoding
+    set_label eh, catch_encoding
     push_eh eh
     bb = new ['ByteBuffer']
     bb = 'something'
@@ -368,7 +348,7 @@ catch_encoding:
 check_content:
     bb[0] = 128 # Out of ascii range
     eh = new ['ExceptionHandler'], .EXCEPTION_INVALID_STRING_REPRESENTATION
-    set_addr eh, catch_content
+    set_label eh, catch_content
     push_eh eh
     s = bb.'get_string'('ascii')
     pop_eh

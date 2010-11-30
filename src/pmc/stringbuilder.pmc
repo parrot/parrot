@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -320,7 +319,7 @@ For testing purpose only?
         /* We must clone here becase we can reallocate buffer behind the scene... */
         /* TODO Optimize it to avoid creation of redundant STRING */
         return Parrot_str_clone(INTERP,
-                Parrot_str_substr(INTERP, buffer, offset, length));
+                STRING_substr(INTERP, buffer, offset, length));
     }
 
 /*
@@ -360,7 +359,7 @@ key receives the value of the hash element.
          * for the string builder. */
         while (pos >= 0) {
             /* Find the next % */
-            percentPos = Parrot_str_find_index(INTERP, fmt, percent, pos);
+            percentPos = STRING_index(INTERP, fmt, percent, pos);
 
             if (percentPos < 0) {
                 if (pos == 0) {
@@ -369,7 +368,7 @@ key receives the value of the hash element.
                 else {
                     /* remaining string can be added as is. */
                     VTABLE_push_string(INTERP, stringbuilder,
-                        Parrot_str_substr(INTERP, fmt, pos,
+                        STRING_substr(INTERP, fmt, pos,
                             Parrot_str_length(INTERP, fmt) -pos));
                     }
                 break;
@@ -377,13 +376,13 @@ key receives the value of the hash element.
             else {
                 /* slurp up to just before the % sign... */
                 VTABLE_push_string(INTERP, stringbuilder,
-                    Parrot_str_substr(INTERP, fmt, pos, percentPos - pos));
+                    STRING_substr(INTERP, fmt, pos, percentPos - pos));
                 /* skip the % sign */
                 pos = percentPos + 1 ;
             }
 
             /* key is always a single character */
-            key = Parrot_str_substr(INTERP, fmt, pos++, 1);
+            key = STRING_substr(INTERP, fmt, pos++, 1);
 
             if (VTABLE_exists_keyed_str(INTERP, hash, key)) {
                 VTABLE_push_string(INTERP, stringbuilder,
@@ -394,7 +393,7 @@ key receives the value of the hash element.
                     VTABLE_get_string_keyed_int(INTERP, args,
                         Parrot_str_to_int(INTERP, key)));
             }
-            else if (Parrot_str_equal(INTERP, key, comma)) {
+            else if (STRING_equal(INTERP, key, comma)) {
                 INTVAL num_args = VTABLE_elements(INTERP, args);
                 INTVAL pos_args;
 
@@ -405,13 +404,13 @@ key receives the value of the hash element.
                         VTABLE_get_string_keyed_int(INTERP, args, pos_args));
                 }
             }
-            else if (Parrot_str_equal(INTERP, key, percent)) {
+            else if (STRING_equal(INTERP, key, percent)) {
                 VTABLE_push_string(INTERP, stringbuilder, percent);
             }
             else {
                 /* %foo has no special meaning, pass it through unchanged */
                 VTABLE_push_string(INTERP, stringbuilder,
-                    Parrot_str_substr(INTERP, fmt, pos-2, 2));
+                    STRING_substr(INTERP, fmt, pos-2, 2));
             }
         }
 
@@ -484,5 +483,5 @@ calculate_capacity(SHIM_INTERP, size_t needed)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

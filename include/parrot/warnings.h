@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2002-2007, Parrot Foundation.
  */
 
@@ -87,5 +86,5 @@ void print_pbc_location(PARROT_INTERP)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,3 +1,14 @@
+parrot (2.9.1-1) unstable; urgency=low
+  * New upstream release (Closes: #601704)
+  * debian/rules:
+    - Fix script-not-executable lintian warning.
+  * debian/patches:
+    - Added 05_fix_gc_ftbfs_ia64.patch, from upstream, resolve
+      FTBFS on ia64 arch, missing argument to trace_mem_block
+      function (Closes: #597138).
+
+ -- Allison Randal <allison@parrot.org>  Sat, 27 Nov 2010 17:17:58 -0800
+
 parrot (2.6.0-1) unstable; urgency=low
   * New upstream release
   * debian/parrot-devel.install.in:

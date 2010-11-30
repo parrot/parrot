@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -22,7 +21,7 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(30)
+    plan(67)
 
     test_get_pmc()
     test_clone()
@@ -31,7 +30,13 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
     iterate_backward() # 8 tests
     iterate_wrong() # 1 test
     iterate_out() # 1 test
-    get_keyed()
+    get_keyed("abcdefg", "b", "d", "f")
+    get_keyed(iso-8859-1:"a\x{e4}c\x{f6}e\x{fc}g", utf8:"ä", utf8:"ö", utf8:"ü")
+    get_keyed(binary:"a\x{e4}c\x{f6}e\x{fc}g", utf8:"ä", utf8:"ö", utf8:"ü")
+    get_keyed(utf8:"aäc\x{20123}eüg", utf8:"ä", utf8:"\x{20123}", utf8:"ü")
+    get_keyed(utf16:"aäcöe\x{20abc}g", utf8:"ä", utf8:"ö", utf8:"\x{20abc}")
+    get_keyed(ucs2:"aäcöe\x{beef}g", utf8:"ä", utf8:"ö", utf8:"\x{beef}")
+    get_keyed(ucs4:"a\x{20789}cöeüg", utf8:"\x{20789}", utf8:"ö", utf8:"ü")
 
 .end
 
@@ -183,14 +188,14 @@ dotest:
     push_eh eh
 
     # shift string
-    set_addr eh, catch1
+    set_label eh, catch1
     rs = shift it
     goto fail
 catch1:
     finalize eh
 
     # shift integer
-    set_addr eh, catch2
+    set_label eh, catch2
     .local int ri
     ri = shift it
     goto fail
@@ -199,7 +204,7 @@ catch2:
 
 t3:
     # pop string
-    set_addr eh, catch3
+    set_label eh, catch3
     .local int ri
     rs = pop it
     goto fail
@@ -207,7 +212,7 @@ catch3:
     finalize eh
 
     # pop integer
-    set_addr eh, catch4
+    set_label eh, catch4
     .local int ri
     ri = pop it
     goto fail
@@ -222,23 +227,30 @@ end:
 .end
 
 .sub get_keyed
-    .local pmc s, it, eh
-    .local string s1
+    .param pmc s
+    .param string c1
+    .param string c3
+    .param string c5
+    .local pmc it, eh
+    .local string c
     .local int result, i1
     result = 0
-    s = new ['String']
-    s = 'hi'
     it = iter s
-    s1 = it[0]
-    is(s1, 'h', 'get_string_keyed_int - zero')
-    s1 = it[1]
-    is(s1, 'i', 'get_string_keyed_int - not zero')
+    c = shift it
+    c = shift it
+    c = shift it
+    c = it[0]
+    is(c, c3, 'get_string_keyed_int - zero')
+    c = it[2]
+    is(c, c5, 'get_string_keyed_int - pos')
+    c = it[-2]
+    is(c, c1, 'get_string_keyed_int - neg')
 
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
     set_label eh, catch
     push_eh eh
-    s1 = it[2]
+    c = it[50]
     goto done
   catch:
     finalize eh
@@ -248,11 +260,11 @@ end:
 
     result = 0
     i1 = it[0]
-    s1 = chr i1
-    is(s1, 'h', 'get_integer_keyed_int')
+    c = chr i1
+    is(c, c3, 'get_integer_keyed_int')
 
     set_label eh, catch2
-    i1 = it[2]
+    i1 = it[-20]
     goto done2
   catch2:
     finalize eh

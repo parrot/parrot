@@ -1,7 +1,6 @@
 /*
  *
 Copyright (C) 2009, Parrot Foundation.
-$Id$
 
 =head1
 
@@ -37,5 +36,5 @@ int main() {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

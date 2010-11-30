@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -198,6 +197,7 @@ sub _set_implementations {
         misc.c
         hires_timer.c
         pid.c
+        sysmem.c
         /;
 
     my $plat_c = q{src/platform.c};

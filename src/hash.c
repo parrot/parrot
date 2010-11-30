@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -141,34 +140,11 @@ static size_t key_hash_cstring(SHIM_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
-static size_t key_hash_int(SHIM_INTERP,
-    ARGIN_NULLOK(const void *value),
-    size_t seed);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t key_hash_PMC(PARROT_INTERP,
-    ARGIN(PMC *value),
-    SHIM(size_t seed))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t key_hash_pointer(SHIM_INTERP,
-    ARGIN(const void *value),
+static size_t key_hash_STRING(PARROT_INTERP,
+    ARGIN(const STRING *s),
     size_t seed)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), size_t seed)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*s);
+        __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
 static HashBucket * parrot_hash_get_bucket_string(PARROT_INTERP,
@@ -239,12 +215,6 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
     , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_key_hash_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
-#define ASSERT_ARGS_key_hash_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_key_hash_PMC __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(value))
-#define ASSERT_ARGS_key_hash_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_key_hash_STRING __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
@@ -270,7 +240,8 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 
 /*
 
-=item C<static size_t key_hash_STRING(PARROT_INTERP, STRING *s, size_t seed)>
+=item C<static size_t key_hash_STRING(PARROT_INTERP, const STRING *s, size_t
+seed)>
 
 Returns the hashed value of the key C<value>.  See also string.c.
 
@@ -283,14 +254,14 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
 static size_t
-key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), size_t seed)
+key_hash_STRING(PARROT_INTERP, ARGIN(const STRING *s), size_t seed)
 {
     ASSERT_ARGS(key_hash_STRING)
 
     if (s->hashval)
         return s->hashval;
 
-    return Parrot_str_to_hashval(interp, s);
+    return STRING_hash(interp, s, seed);
 }
 
 
@@ -316,7 +287,7 @@ hash_compare_string(PARROT_INTERP, ARGIN(const void *search_key),
     STRING const *s1 = (STRING const *)search_key;
     STRING const *s2 = (STRING const *)bucket_key;
 
-    return Parrot_str_equal(interp, s1, s2) == 0;
+    return !STRING_equal(interp, s1, s2);
 }
 
 
@@ -367,28 +338,6 @@ hash_compare_pointer(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(cons
 {
     ASSERT_ARGS(hash_compare_pointer)
     return a != b;
-}
-
-
-/*
-
-=item C<static size_t key_hash_pointer(PARROT_INTERP, const void *value, size_t
-seed)>
-
-Returns a hashvalue for a pointer.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t
-key_hash_pointer(SHIM_INTERP, ARGIN(const void *value), size_t seed)
-{
-    ASSERT_ARGS(key_hash_pointer)
-    return ((size_t) value) ^ seed;
 }
 
 
@@ -450,26 +399,6 @@ hash_compare_cstring(SHIM_INTERP, ARGIN(const char *a), ARGIN(const char *b))
 
 /*
 
-=item C<static size_t key_hash_PMC(PARROT_INTERP, PMC *value, size_t seed)>
-
-Returns a hashed value for an PMC key (passed as a void pointer, sadly).
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t
-key_hash_PMC(PARROT_INTERP, ARGIN(PMC *value), SHIM(size_t seed))
-{
-    ASSERT_ARGS(key_hash_PMC)
-    return VTABLE_hashvalue(interp, value);
-}
-
-/*
-
 =item C<static int hash_compare_pmc(PARROT_INTERP, PMC *a, PMC *b)>
 
 Compares two PMC for equality, returning 0 if the first is equal to second.
@@ -496,27 +425,6 @@ hash_compare_pmc(PARROT_INTERP, ARGIN(PMC *a), ARGIN(PMC *b))
         return 1;
 
     return !VTABLE_is_equal(interp, a, b);
-}
-
-/*
-
-=item C<static size_t key_hash_int(PARROT_INTERP, const void *value, size_t
-seed)>
-
-Returns a hashed value for an integer key (passed as a void pointer, sadly).
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t
-key_hash_int(SHIM_INTERP, ARGIN_NULLOK(const void *value), size_t seed)
-{
-    ASSERT_ARGS(key_hash_int)
-    return (size_t)value ^ seed;
 }
 
 /*
@@ -890,7 +798,6 @@ Parrot_hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
     const Hash_key_type    key_type   = hash->key_type;
     const PARROT_DATA_TYPE entry_type = hash->entry_type;
     const size_t           entries    = hash->entries;
-    size_t                 i;
 
     VTABLE_push_integer(interp, info, entries);
     VTABLE_push_integer(interp, info, key_type);
@@ -1500,7 +1407,7 @@ parrot_hash_get_bucket_string(PARROT_INTERP, ARGIN(const Hash *hash),
                 if ((STRING_byte_length(s) == STRING_byte_length(s2))
                 && (memcmp(s->strstart, s2->strstart, STRING_byte_length(s)) == 0))
                     break;
-            } else if (Parrot_str_equal(interp, s, s2))
+            } else if (STRING_equal(interp, s, s2))
                     break;
         }
         bucket = bucket->next;
@@ -1739,7 +1646,7 @@ static PMC*
 get_integer_pmc(PARROT_INTERP, INTVAL value)
 {
     ASSERT_ARGS(get_integer_pmc)
-    PMC * const ret = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+    PMC * const ret = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
     VTABLE_set_integer_native(interp, ret, value);
     return ret;
 }
@@ -1760,7 +1667,7 @@ static PMC*
 get_number_pmc(PARROT_INTERP, FLOATVAL value)
 {
     ASSERT_ARGS(get_number_pmc)
-    PMC * const ret = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
+    PMC * const ret = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Float));
     VTABLE_set_number_native(interp, ret, value);
     return ret;
 }
@@ -1780,7 +1687,7 @@ static PMC *
 get_string_pmc(PARROT_INTERP, ARGIN(STRING *value))
 {
     ASSERT_ARGS(get_string_pmc)
-    PMC * const ret = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String));
+    PMC * const ret = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
     VTABLE_set_string_native(interp, ret, value);
     return ret;
 }
@@ -1907,18 +1814,18 @@ hash_key_from_pmc(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(PMC *key))
         {
             /* Extract real value from Key (and box it if nessary) */
             if (key->vtable->base_type == enum_class_Key)
-                switch (key_type(interp, key)) {
+                switch (Parrot_key_type(interp, key)) {
                   case KEY_integer_FLAG:
-                    key = get_integer_pmc(interp, key_integer(interp, key));
+                    key = get_integer_pmc(interp, Parrot_key_integer(interp, key));
                     break;
                   case KEY_string_FLAG:
-                    key = get_string_pmc(interp, key_string(interp, key));
+                    key = get_string_pmc(interp, Parrot_key_string(interp, key));
                     break;
                   case KEY_number_FLAG:
-                    key = get_number_pmc(interp, key_number(interp, key));
+                    key = get_number_pmc(interp, Parrot_key_number(interp, key));
                     break;
                   case KEY_pmc_FLAG:
-                    key = key_pmc(interp, key);
+                    key = Parrot_key_pmc(interp, key);
                     break;
                   default:
                     /* It's impossible if Keys are same (and they are not) */
@@ -2384,5 +2291,5 @@ Future optimizations:
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

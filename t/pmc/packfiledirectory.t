@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -22,7 +21,7 @@ Tests the PackfileDirectory PMC.
 
 .sub 'main' :main
 .include 'test_more.pir'
-    plan(20)
+    plan(17)
 
     'test_create'()
     'test_typeof'()
@@ -69,7 +68,7 @@ Tests the PackfileDirectory PMC.
     pop_eh
     pfdir = pf.'get_directory'()
     $I0   = elements pfdir
-    is($I0, 4, 'PackfileDirectory.elements')
+    is($I0, 3, 'PackfileDirectory.elements')
     .return()
 load_error:
     .get_results($P0)

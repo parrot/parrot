@@ -1,5 +1,4 @@
 #! ./parrot-nqp
-# $Id$
 
 pir::load_bytecode("opsc.pbc");
 pir::load_bytecode("Getopt/Obj.pbc");

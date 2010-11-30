@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -129,7 +128,6 @@ src/pmc/coroutine.pmc
 src/pmc/eval.pmc
 src/pmc/imageio.pmc
 src/pmc/namespace.pmc
-src/pmc/nci.pmc
 src/pmc/object.pmc
 src/pmc/sub.pmc
 src/pmc/threadinterpreter.pmc

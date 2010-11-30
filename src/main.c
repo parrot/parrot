@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2007-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -157,7 +156,7 @@ main(int argc, const char *argv[])
 
     /* Clean-up after ourselves */
     Parrot_destroy(interp);
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 #define SET_FLAG(flag)   Parrot_set_flag(interp, (flag))
@@ -640,5 +639,5 @@ F<compilers/imcc/main.c>, unfortunately.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

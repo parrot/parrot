@@ -1,7 +1,5 @@
 /* extend.h
  *  Copyright (C) 2001-2008, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the Parrot extension mechanism, the face we present to
  *     extension modules and whatnot
@@ -151,6 +149,10 @@ void Parrot_register_pmc(PARROT_INTERP, Parrot_PMC pmc)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+void Parrot_register_string(PARROT_INTERP, Parrot_String s)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 void Parrot_set_intreg(PARROT_INTERP, Parrot_Int regnum, Parrot_Int value)
         __attribute__nonnull__(1);
 
@@ -178,6 +180,10 @@ Parrot_PMC Parrot_sub_new_from_c_func(PARROT_INTERP,
 
 PARROT_EXPORT
 void Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_unregister_string(PARROT_INTERP, Parrot_String s)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -224,6 +230,8 @@ int Parrot_vfprintf(PARROT_INTERP,
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_register_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_register_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_set_intreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_set_numreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -238,6 +246,8 @@ int Parrot_vfprintf(PARROT_INTERP,
     , PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_unregister_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_unregister_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_vfprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pio) \
@@ -251,5 +261,5 @@ int Parrot_vfprintf(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

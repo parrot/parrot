@@ -1,6 +1,5 @@
 #! parrot
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -37,24 +36,6 @@ Compile bytecode to executable.
     (infile, cfile, objfile, exefile, runcore, install) = 'handle_args'(argv)
     unless infile > '' goto err_infile
 
-    .local string code_type
-    code_type = 'determine_code_type'()
-
-    .local string codestring
-    if code_type == 'gcc'  goto code_for_gcc
-    if code_type == 'msvc' goto code_for_msvc
-    goto code_for_default
-  code_for_gcc:
-    codestring = 'generate_code_gcc'(infile)
-    goto code_end
-  code_for_msvc:
-    codestring = 'generate_code_msvc'(infile)
-    goto code_end
-  code_for_default:
-    codestring = 'generate_code'(infile)
-  code_end:
-
-
   open_outfile:
     .local pmc outfh
     outfh = new ['FileHandle']
@@ -66,7 +47,22 @@ Compile bytecode to executable.
 const void * get_program_code(void);
 HEADER
 
-    print outfh, codestring
+    .local string code_type
+    code_type = 'determine_code_type'()
+
+    if code_type == 'gcc'  goto code_for_gcc
+    if code_type == 'msvc' goto code_for_msvc
+    goto code_for_default
+  code_for_gcc:
+    'generate_code_gcc'(infile, outfh)
+    goto code_end
+  code_for_msvc:
+    'generate_code_msvc'(infile, outfh)
+    goto code_end
+  code_for_default:
+    'generate_code'(infile, outfh)
+  code_end:
+
 
     print outfh, '#define RUNCORE '
     print outfh, runcore
@@ -110,7 +106,7 @@ HEADER
             PackFile_fixup_subs(interp, PBC_MAIN, NULL);
             Parrot_runcode(interp, argc, argv);
             Parrot_destroy(interp);
-            Parrot_exit(interp, 0);
+            Parrot_x_exit(interp, 0);
         }
 MAIN
 
@@ -272,16 +268,15 @@ HELP
 
 .sub 'generate_code'
     .param string infile
+    .param pmc    outfh
     .local pmc ifh
     ifh = new ['FileHandle']
-    ifh.'open'(infile, 'r')
+    ifh.'open'(infile, 'rb')
     unless ifh goto err_infile
 
-    .local pmc codestring
     .local int size
 
-    codestring = new [ 'StringBuilder' ]
-    push codestring, "const Parrot_UInt1 program_code[] = {"
+    print outfh, "const Parrot_UInt1 program_code[] = {"
     size = 0
 
   read_loop:
@@ -298,13 +293,13 @@ HELP
     unless pos < pbclength goto code_done
     $I0 = ord pbcstring, pos
     $S0 = $I0
-    push codestring, $S0
-    push codestring, ','
+    print outfh, $S0
+    print outfh, ','
     inc pos
     inc size
     $I0 = size % 32
     unless $I0 == 0 goto code_loop
-    push codestring, "\n"
+    print outfh, "\n"
     goto code_loop
   code_done:
     goto read_loop
@@ -312,19 +307,18 @@ HELP
   read_done:
     ifh.'close'()
 
-    push codestring, "\n};\n\nconst size_t bytecode_size = "
+    print outfh, "\n};\n\nconst size_t bytecode_size = "
     $S0 = size
-    push codestring, $S0
-    push codestring, ";\n"
-    push codestring, <<'END_OF_FUNCTION'
+    print outfh, $S0
+    print outfh, ";\n"
+    print outfh, <<'END_OF_FUNCTION'
         const void * get_program_code(void)
         {
             return program_code;
         }
 END_OF_FUNCTION
 
-    $S0 = codestring
-    .return ($S0)
+    .return ()
 
   err_infile:
     die "cannot open infile"
@@ -362,21 +356,19 @@ END_OF_FUNCTION
 
 .sub 'generate_code_gcc'
     .param string infile
+    .param pmc    outfh
     .local pmc ifh
     ifh = new ['FileHandle']
-    ifh.'open'(infile, 'r')
+    ifh.'open'(infile, 'rb')
     unless ifh goto err_infile
 
     .local pmc encoding_table
     encoding_table = 'generate_encoding_table'()
 
-    .local pmc codestring
     .local int size
 
-    codestring = new ['StringBuilder']
-
-    push codestring, "const char * program_code =\n"
-    push codestring, '"'
+    print outfh, "const char * program_code =\n"
+    print outfh, '"'
     size = 0
 
   read_loop:
@@ -393,14 +385,14 @@ END_OF_FUNCTION
     unless pos < pbclength goto code_done
     $I0 = ord pbcstring, pos
     $S0 = encoding_table[$I0]
-    push codestring, $S0
+    print outfh, $S0
     inc pos
     inc size
     $I0 = size % 32
     unless $I0 == 0 goto code_loop
-    push codestring, '"'
-    push codestring, "\n"
-    push codestring, '"'
+    print outfh, '"'
+    print outfh, "\n"
+    print outfh, '"'
     goto code_loop
   code_done:
     goto read_loop
@@ -408,22 +400,21 @@ END_OF_FUNCTION
   read_done:
     ifh.'close'()
 
-    push codestring, '"'
-    push codestring, "\n;\n\n"
-    push codestring, "const size_t bytecode_size = "
+    print outfh, '"'
+    print outfh, "\n;\n\n"
+    print outfh, "const size_t bytecode_size = "
     $S0 = size
-    push codestring, $S0
-    push codestring, ";\n"
+    print outfh, $S0
+    print outfh, ";\n"
 
-    push codestring, <<'END_OF_FUNCTION'
+    print outfh, <<'END_OF_FUNCTION'
         const void * get_program_code(void)
         {
             return program_code;
         }
 END_OF_FUNCTION
 
-    $S0 = codestring
-    .return ($S0)
+    .return ()
 
   err_infile:
     die "cannot open infile"
@@ -467,6 +458,7 @@ END_OF_FUNCTION
 # this sub creates supplemental .rc and .RES files.
 .sub 'generate_code_msvc'
     .param string pbc_path
+    .param pmc    outfh
 
     .local string rc_path
     .local string res_path
@@ -505,16 +497,14 @@ END_OF_DEFINES
     pbc_size = $P2[7]
 
 
-    .local pmc codestring
-    codestring  = new [ 'StringBuilder' ]
-    push codestring, "#include <windows.h>\n"
-    push codestring, rc_constant_defines
-    push codestring, "const unsigned int bytecode_size = "
+    print outfh, "#include <windows.h>\n"
+    print outfh, rc_constant_defines
+    print outfh, "const unsigned int bytecode_size = "
     $S0 = pbc_size
-    push codestring, $S0
-    push codestring, ";\n"
+    print outfh, $S0
+    print outfh, ";\n"
 
-    push codestring, <<'END_OF_FUNCTION'
+    print outfh, <<'END_OF_FUNCTION'
         const void * get_program_code(void)
         {
             HRSRC   hResource;
@@ -558,8 +548,8 @@ END_OF_FUNCTION
     die "RC command failed"
 
   rc_ok:
-    $S0 = codestring
-    .return ($S0)
+
+    .return ()
 
   err_h_open:
     die "cannot open .h file"

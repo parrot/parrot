@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -114,6 +113,7 @@ Remove an item from the list, returning the (pointer to) item
 */
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
 List_Item_Header*
 Parrot_list_remove(SHIM_INTERP, ARGMOD(Linked_List *list), ARGMOD(List_Item_Header *item))
 {
@@ -151,6 +151,7 @@ Pop an item off the list - i.e. get the first item in the list and remove it.
 */
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
 List_Item_Header*
 Parrot_list_pop(PARROT_INTERP, ARGIN(Linked_List *list))
 {
@@ -237,5 +238,5 @@ Parrot_list_contains(SHIM_INTERP, ARGIN(Linked_List *list), ARGIN(List_Item_Head
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

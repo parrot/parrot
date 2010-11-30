@@ -1,5 +1,4 @@
 # Copyright (C) 2007, Parrot Foundation.
-# $Id$
 package Parrot::Configure::Test;
 use strict;
 use warnings;

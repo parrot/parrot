@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2005-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 

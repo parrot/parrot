@@ -17,6 +17,9 @@
 #  define __STDC_VERSION__ 0
 #endif
 
+#include "imc.h"
+#include "parser.h"
+
 }
 
 %{
@@ -30,16 +33,8 @@
  *
  * The tokenizer.
  *
- * $Id$
  *
  */
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "imc.h"
-#include "parser.h"
 
 typedef struct parser_state_t parser_state_t;
 
@@ -313,8 +308,6 @@ SP              [ ]
 ".begin_call"            return PCC_BEGIN;
 ".end_call"              return PCC_END;
 ".call"                  return PCC_CALL;
-".nci_call"              return NCI_CALL;
-".meth_call"             return METH_CALL;
 ".invocant"              return INVOCANT;
 <emit,INITIAL>".pcc_sub" return PCC_SUB;
 ".begin_return"          return PCC_BEGIN_RETURN;
@@ -334,7 +327,6 @@ SP              [ ]
 <emit,INITIAL>":lex"       return NEED_LEX;
 <emit,INITIAL>":vtable"    return VTABLE_METHOD;
 <emit,INITIAL>":nsentry"   return NS_ENTRY;
-":unique_reg"              return UNIQUE_REG;
 ":instanceof"              return SUB_INSTANCE_OF;
 ":subid"                   return SUBID;
 
@@ -1472,5 +1464,5 @@ handle_identifier(PARROT_INTERP, YYSTYPE *valp, const char *text)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

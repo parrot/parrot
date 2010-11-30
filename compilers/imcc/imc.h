@@ -1,9 +1,6 @@
 /*
- * $Id$
  * Copyright (C) 2002-2009, Parrot Foundation.
  */
-
-/* $Id$ */
 
 #ifndef PARROT_IMCC_IMC_H_GUARD
 #define PARROT_IMCC_IMC_H_GUARD
@@ -59,7 +56,7 @@ typedef struct IMC_Unit IMC_Unit;
 enum {
     IMCC_FATAL_EXCEPTION     = 1,
     IMCC_FATALY_EXCEPTION    = 2,
-    IMCC_PARSEFAIL_EXCEPTION = 3,
+    IMCC_PARSEFAIL_EXCEPTION = 3
 };
 
 #define N_ELEMENTS(x) (sizeof (x)/sizeof ((x)[0]))
@@ -625,5 +622,5 @@ FILE * imc_yyin_get(void *yyscanner);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

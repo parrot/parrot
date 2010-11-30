@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2009, Parrot Foundation.
-# $Id$
 
 # recursive queens placement
 # prints all 92 solutions in chess notation

@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -33,8 +32,8 @@ TT1603 - http://trac.parrot.org/parrot/ticket/1603
         unless count goto done
 
         # original test form TT1603
-        $P0 = new 'CodeString'
-        $P0.'emit'("a")
+        $P0 = new 'StringBuilder'
+        $P0.'append_format'("a\n")
         $S0 = $P0
 
         # another way to trigger the problem

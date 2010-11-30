@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -318,7 +317,7 @@ Get or create constant for passed value.
 
         for (i=0; i < num; ++i) {
             STRING * const str = VTABLE_get_string_keyed_int(INTERP, attrs->str_constants, i);
-            if (Parrot_str_equal(INTERP, value, str))
+            if (STRING_equal(INTERP, value, str))
                 return i;
         }
 
@@ -389,5 +388,5 @@ Set segment type.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

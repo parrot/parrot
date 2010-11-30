@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2009-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -607,93 +606,6 @@ Parrot_set_new_context(PARROT_INTERP, ARGIN(const UINTVAL *number_regs_used))
 
 =cut
 
-=item C<void Parrot_clear_i(PARROT_INTERP)>
-
-Sets all integer registers in the current context to 0.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_clear_i(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_clear_i)
-    const UINTVAL regs_used = Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_INT);
-    UINTVAL i;
-    for (i = 0; i < regs_used; ++i)
-        REG_INT(interp, i) = 0;
-}
-
-
-/*
-
-=item C<void Parrot_clear_s(PARROT_INTERP)>
-
-Sets all STRING registers in the current context to NULL.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_clear_s(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_clear_s)
-    const UINTVAL regs_used = Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_STR);
-    UINTVAL i;
-    for (i = 0; i < regs_used; ++i)
-        REG_STR(interp, i) = NULL;
-}
-
-
-/*
-
-=item C<void Parrot_clear_p(PARROT_INTERP)>
-
-Sets all PMC registers in the current context to NULL.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_clear_p(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_clear_p)
-    const UINTVAL regs_used = Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_PMC);
-    UINTVAL i;
-    for (i = 0; i < regs_used; ++i)
-        REG_PMC(interp, i) = PMCNULL;
-}
-
-
-/*
-
-=item C<void Parrot_clear_n(PARROT_INTERP)>
-
-Sets all number registers in the current context to 0.0.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_clear_n(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_clear_n)
-    const UINTVAL regs_used = Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_NUM);
-    UINTVAL i;
-    for (i = 0; i < regs_used; ++i)
-        REG_NUM(interp, i) = 0.0;
-}
-
-/*
-
 =item C<INTVAL * Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, const PMC *ctx,
 UINTVAL idx)>
 
@@ -904,5 +816,5 @@ Parrot_pcc_set_regs_ps(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(Regs_ps *bp_ps))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

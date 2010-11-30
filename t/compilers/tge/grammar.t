@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2005-2006, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -178,7 +177,7 @@ GRAMMAR
     print $S4
     print "\n"
 
-    # Rerieve the transformed tree
+    # Retrieve the transformed tree
     $P5 = AGI.'get'('result')
 
     $P6 = getattribute tree, 'left'

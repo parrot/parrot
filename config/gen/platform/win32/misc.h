@@ -1,6 +1,5 @@
 /*
- * $Id$
- * Copyright (C) 2004-2007, Parrot Foundation.
+ * Copyright (C) 2004-2010, Parrot Foundation.
  */
 
 #ifndef PARROT_PLATFORM_WIN32_MISC_H_GUARD
@@ -27,5 +26,5 @@ void Parrot_platform_init_code(void);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

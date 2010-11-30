@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -191,6 +190,13 @@ Get/set the opcode type for this node.
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .tailcall self.'attr'('hll', value, has_value)
+.end
+
+
+.sub 'loadlibs' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('loadlibs', value, has_value)
 .end
 
 

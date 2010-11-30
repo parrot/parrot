@@ -1,5 +1,4 @@
 /*
- * $Id$
 ** var.ops
 */
 
@@ -202,12 +201,12 @@ null.
 =cut
 
 op get_hll_namespace(out PMC) {
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     $1 = hll_ns;
 }
 
 op get_hll_namespace(out PMC, in PMC) {
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     if (PMC_IS_NULL(hll_ns))
         $1 = PMCNULL;
     else {
@@ -298,12 +297,12 @@ global doesn't exist, $1 is set to null.
 =cut
 
 op get_hll_global(out PMC, in STR) {
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     $1 = Parrot_ns_find_global_from_op(interp, hll_ns, $2, expr NEXT());
 }
 
 op get_hll_global(out PMC, in PMC, in STR) {
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     if (PMC_IS_NULL(hll_ns)) {
         $1 = hll_ns;
     }
@@ -394,12 +393,12 @@ does not exist, it is created.
 =cut
 
 op set_hll_global(in STR, invar PMC) {
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     Parrot_ns_set_global(interp, hll_ns, $1, $2);
 }
 
 op set_hll_global(in PMC, in STR, invar PMC) {
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, $1);
 
     Parrot_ns_set_global(interp, ns, $2, $3);
@@ -507,5 +506,5 @@ as the Parrot interpreter itself.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

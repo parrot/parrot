@@ -1,7 +1,6 @@
 #! perl
 
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 use 5.008;
 use strict;
@@ -284,6 +283,14 @@ Specify which linker to use.
 =item C<--linkflags=(flags)>
 
 Use the given linker flags
+
+=item C<--ar=(archiver)>
+
+Specify which librarian to use for static libraries
+
+=item C<--arflags=(flags)>
+
+Use the given librarian flags for static libraris
 
 =item C<--ld=(linker)>
 
@@ -623,7 +630,6 @@ configuration file.
     auto::signal
     auto::socklen_t
     auto::env
-    auto::extra_nci_thunks
     auto::gmp
     auto::readline
     auto::pcre

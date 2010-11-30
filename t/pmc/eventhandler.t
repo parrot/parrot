@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 

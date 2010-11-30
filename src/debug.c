@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -125,6 +124,7 @@ static void no_such_register(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_PURE_FUNCTION
 static const char * skip_whitespace(ARGIN(const char *cmd))
         __attribute__nonnull__(1);
 
@@ -443,7 +443,7 @@ In echo mode the script commands are written to stderr before executing."
         & dbg_gcdebug,
         "toggle gcdebug mode",
 "Toggle gcdebug mode.\n\n\
-In gcdebug mode a garbage collection cycle is run before each opcocde,\n\
+In gcdebug mode a garbage collection cycle is run before each opcode,\n\
 same as using the gcdebug core."
     },
     cmd_help = {
@@ -631,6 +631,7 @@ Return a pointer to the first non-whitespace character in C<cmd>.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_PURE_FUNCTION
 static const char *
 skip_whitespace(ARGIN(const char *cmd))
 {
@@ -898,8 +899,8 @@ Parrot_debugger_start(PARROT_INTERP, ARGIN_NULLOK(opcode_t * cur_opcode))
     debugger_cmdline(interp);
 
     if (interp->pdb->state & PDB_EXIT) {
-        TRACEDEB_MSG("Parrot_debugger_start Parrot_exit");
-        Parrot_exit(interp, 0);
+        TRACEDEB_MSG("Parrot_debugger_start Parrot_x_exit");
+        Parrot_x_exit(interp, 0);
     }
     TRACEDEB_MSG("Parrot_debugger_start ends");
 }
@@ -1489,7 +1490,6 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     PDB_breakpoint_t *newbreak,
                      *oldbreak;
     PDB_line_t       *line = NULL;
-    long              bp_id;
     opcode_t         *breakpos = NULL;
 
     unsigned long ln = get_ulong(& command, 0);
@@ -1796,10 +1796,8 @@ void
 PDB_delete_breakpoint(PARROT_INTERP, ARGIN(const char *command))
 {
     ASSERT_ARGS(PDB_delete_breakpoint)
-    PDB_t *pdb = interp->pdb;
+    PDB_t * const pdb = interp->pdb;
     PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
-    const PDB_line_t *line;
-    long bp_id;
 
     if (breakpoint) {
         display_breakpoint(pdb, breakpoint);
@@ -1993,17 +1991,17 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
             n = REG_STR(interp, *(int *)condition->value);
 
         if (((condition->type & PDB_cond_gt) &&
-                (Parrot_str_compare(interp, m, n) >  0)) ||
+                (STRING_compare(interp, m, n) >  0)) ||
             ((condition->type & PDB_cond_ge) &&
-                (Parrot_str_compare(interp, m, n) >= 0)) ||
+                (STRING_compare(interp, m, n) >= 0)) ||
             ((condition->type & PDB_cond_eq) &&
-                (Parrot_str_compare(interp, m, n) == 0)) ||
+                (STRING_compare(interp, m, n) == 0)) ||
             ((condition->type & PDB_cond_ne) &&
-                (Parrot_str_compare(interp, m, n) != 0)) ||
+                (STRING_compare(interp, m, n) != 0)) ||
             ((condition->type & PDB_cond_le) &&
-                (Parrot_str_compare(interp, m, n) <= 0)) ||
+                (STRING_compare(interp, m, n) <= 0)) ||
             ((condition->type & PDB_cond_lt) &&
-                (Parrot_str_compare(interp, m, n) <  0)))
+                (STRING_compare(interp, m, n) <  0)))
                     return 1;
 
         return 0;
@@ -2353,12 +2351,19 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
           case PARROT_ARG_SC:
             {
                 const STRING *s = interp->code->const_table->str.constants[op[j]];
+
+                if (s->encoding != Parrot_ascii_encoding_ptr) {
+                    strcpy(&dest[size], s->encoding->name);
+                    size += strlen(s->encoding->name);
+                    dest[size++] = ':';
+                }
+
                 dest[size++] = '"';
                 if (s->strlen) {
                     char * const unescaped =
                         Parrot_str_to_cstring(interp, s);
                     char * const escaped =
-                        PDB_escape(interp, unescaped, s->strlen);
+                        PDB_escape(interp, unescaped, s->bufused);
                     if (escaped) {
                         strcpy(&dest[size], escaped);
                         size += strlen(escaped);
@@ -3546,5 +3551,5 @@ runs of course in the C<debugee>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

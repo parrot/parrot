@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -50,7 +49,7 @@ BEGIN {
     }
 }
 
-can_ok( 'Parrot::Test', $_ ) for qw/
+can_ok( 'Parrot::Test', $_ ) for ( qw/
     c_output_is                     c_output_isnt
     c_output_like                   c_output_unlike
     example_output_is               example_output_isnt
@@ -82,7 +81,7 @@ can_ok( 'Parrot::Test', $_ ) for qw/
     slurp_file
     run_command
     write_code_to_file
-    /;
+    / );
 
 # per_test
 is( Parrot::Test::per_test(), undef, 'per_test() no args' );

@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -49,6 +48,10 @@ out-of-bounds test. Checks INT and PMC keys.
     $P0 = 1
     $I0 = $P0
     is($I0, 1, 'size set to 1')
+
+    # Make sure destroy is exercised
+    null $P0
+    sweep 1
 .end
 
 .sub 'resizing_not_allowed'

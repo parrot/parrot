@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -69,14 +68,14 @@ You must pass the address_of(&) the OUT results, of course.
 
 
 Signatures:
-  uppercase letters repesent each arg and denote its types
+  uppercase letters represent each arg and denote its types
 
   I INTVAL
   N FLOATVAL
   S STRING *
   P PMC *
 
-  lowercase letters are adverb modifiers to the preceeding uppercase arg
+  lowercase letters are adverb modifiers to the preceding uppercase arg
   identifier
 
   f flatten
@@ -309,7 +308,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
 
     Parrot_pcc_set_signature(interp, ctx, call_object);
     Parrot_pcc_set_continuation(interp, ctx, ret_cont);
-    interp->current_cont         = NEED_CONTINUATION;
+    interp->current_cont                    = NEED_CONTINUATION;
     PARROT_CONTINUATION(ret_cont)->from_ctx = ctx;
 
     /* Invoke the function */
@@ -345,5 +344,5 @@ F<include/parrot/interpreter.h>, F<src/call/ops.c>, F<src/pmc/sub.pmc>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

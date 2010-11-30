@@ -1,5 +1,4 @@
 # Copyright (C) 2008-2010, Parrot Foundation.
-# $Id$
 
 =head1 PDD 28: Strings
 
@@ -403,6 +402,10 @@ Returns the character at the specified index (the Nth character from the start
 of the string). Combining characters are counted separately. Variable-width
 encodings will lookahead to capture full character values.
 
+=head4 Parrot_str_chr (was string_chr)
+
+Returns a single character string from a codepoint.
+
 =head4 Parrot_str_grapheme_indexed
 
 Returns the grapheme at the given index (the Nth grapheme from the string's
@@ -554,8 +557,7 @@ Replaced by C<Parrot_str_indexed>.
 
 =head4 string_chr
 
-This is handled just fine by C<Parrot_str_new>, we don't need a special
-version for a single character.
+Replaced by C<Parrot_str_chr>.
 
 =head4 make_writable
 
@@ -758,9 +760,7 @@ Translate an ASCII string with entries from a translation table.
 
 =item reverse
 
-Reverse a string, one grapheme at a time. {{ NOTE: Currently only works for
-ASCII strings, because it reverses one C<char> at a time. }}
-
+Reverse a string, one grapheme at a time.
 
 =item is_integer
 

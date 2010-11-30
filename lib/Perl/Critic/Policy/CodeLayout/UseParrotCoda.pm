@@ -1,4 +1,3 @@
-# $Id$
 package Perl::Critic::Policy::CodeLayout::UseParrotCoda;
 
 # Copyright (C) 2006-2007, Parrot Foundation.

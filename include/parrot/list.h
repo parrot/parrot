@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -126,11 +125,13 @@ PARROT_CANNOT_RETURN_NULL
 struct Linked_List* Parrot_list_new(SHIM_INTERP);
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
 List_Item_Header* Parrot_list_pop(PARROT_INTERP, ARGIN(Linked_List *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
 List_Item_Header* Parrot_list_remove(SHIM_INTERP,
     ARGMOD(Linked_List *list),
     ARGMOD(List_Item_Header *item))
@@ -165,5 +166,5 @@ List_Item_Header* Parrot_list_remove(SHIM_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

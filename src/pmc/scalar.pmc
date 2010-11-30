@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -524,7 +523,7 @@ Calculates modulus inplace
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
-                floatval_mod(SELF.get_number(), d));
+                Parrot_util_floatval_mod(SELF.get_number(), d));
         return dest;
     }
 
@@ -536,7 +535,7 @@ Calculates modulus inplace
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
-                floatval_mod(SELF.get_number(), (FLOATVAL)value));
+                Parrot_util_floatval_mod(SELF.get_number(), (FLOATVAL)value));
         return dest;
     }
 
@@ -548,7 +547,7 @@ Calculates modulus inplace
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
-                floatval_mod(SELF.get_number(), value));
+                Parrot_util_floatval_mod(SELF.get_number(), value));
         return dest;
     }
 
@@ -560,7 +559,7 @@ Calculates modulus inplace
                 "float modulus by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
-                floatval_mod(SELF.get_number(), d));
+                Parrot_util_floatval_mod(SELF.get_number(), d));
     }
 
     VTABLE void i_modulus_int(INTVAL value) {
@@ -569,7 +568,7 @@ Calculates modulus inplace
                 "float modulus by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
-                floatval_mod(SELF.get_number(), (FLOATVAL)value));
+                Parrot_util_floatval_mod(SELF.get_number(), (FLOATVAL)value));
     }
 
     VTABLE void i_modulus_float(FLOATVAL value) {
@@ -578,7 +577,7 @@ Calculates modulus inplace
                 "float modulus by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
-                floatval_mod(SELF.get_number(), value));
+                Parrot_util_floatval_mod(SELF.get_number(), value));
     }
 
 /*
@@ -753,7 +752,7 @@ C<*value>.
 */
 
     MULTI INTVAL cmp_string(PMC *value) {
-        return Parrot_str_compare(INTERP, SELF.get_string(),
+        return STRING_compare(INTERP, SELF.get_string(),
             VTABLE_get_string(INTERP, value));
     }
 
@@ -800,7 +799,7 @@ Returns whether the PMC has string equality with C<*value>.
 */
 
     MULTI INTVAL is_equal_string(PMC *value) {
-        return (0 != Parrot_str_equal(INTERP, VTABLE_get_string(INTERP, SELF),
+        return (0 != STRING_equal(INTERP, VTABLE_get_string(INTERP, SELF),
                                           VTABLE_get_string(INTERP, value)));
     }
 
@@ -831,7 +830,7 @@ C<offset>.
 */
 
     VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
-        return Parrot_str_substr(INTERP, VTABLE_get_string(INTERP, SELF),
+        return STRING_substr(INTERP, VTABLE_get_string(INTERP, SELF),
                 offset, length);
     }
 
@@ -874,5 +873,5 @@ Sets this PMC as shared and read-only.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

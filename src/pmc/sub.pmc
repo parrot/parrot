@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -457,7 +456,7 @@ Invokes the subroutine.
          */
         if (!PMC_IS_NULL(sub->lex_info)) {
             Parrot_pcc_set_lex_pad(INTERP, context, Parrot_pmc_new_init(INTERP,
-                    Parrot_get_ctx_HLL_type(INTERP, enum_class_LexPad),
+                    Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_LexPad),
                     sub->lex_info));
             VTABLE_set_pointer(INTERP, Parrot_pcc_get_lex_pad(INTERP, context), context);
         }
@@ -491,7 +490,7 @@ Invokes the subroutine.
                     if (!PMC_IS_NULL(outer_sub->lex_info)) {
                         Parrot_pcc_set_lex_pad(INTERP, dummy,
                             Parrot_pmc_new_init(INTERP,
-                                Parrot_get_ctx_HLL_type(INTERP,
+                                Parrot_hll_get_ctx_HLL_type(INTERP,
                                     enum_class_LexPad), outer_sub->lex_info));
 
                         VTABLE_set_pointer(INTERP,
@@ -710,7 +709,7 @@ Archives the subroutine.
             sub->ns_entry_name = CONST_STRING(INTERP, "");
         VTABLE_push_string(INTERP, info, sub->ns_entry_name);
 
-        hll_name = Parrot_get_HLL_name(INTERP, sub->HLL_id);
+        hll_name = Parrot_hll_get_HLL_name(INTERP, sub->HLL_id);
         if (!hll_name)
             hll_name = CONST_STRING(INTERP, "");
         VTABLE_push_string(INTERP, info, hll_name);
@@ -757,7 +756,8 @@ Unarchives the subroutine.
         sub->name           = VTABLE_shift_string(INTERP, info);
         sub->method_name    = VTABLE_shift_string(INTERP, info);
         sub->ns_entry_name  = VTABLE_shift_string(INTERP, info);
-        sub->HLL_id         = Parrot_get_HLL_id(INTERP,
+        /* lookup or create HLL */
+        sub->HLL_id         = Parrot_hll_register_HLL(INTERP,
             VTABLE_shift_string(INTERP, info));
         sub->comp_flags     = VTABLE_shift_integer(INTERP, info);
         sub->vtable_index   = VTABLE_shift_integer(INTERP, info);
@@ -908,22 +908,22 @@ The number of optional named arguments
         }
 
         /* Return the requested argument information */
-        if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "pos_required"))) {
+        if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "pos_required"))) {
             count_found = (INTVAL)sub->arg_info->pos_required;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "pos_optional"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "pos_optional"))) {
             count_found = (INTVAL)sub->arg_info->pos_optional;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "pos_slurpy"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "pos_slurpy"))) {
             count_found = (INTVAL)sub->arg_info->pos_slurpy;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "named_required"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "named_required"))) {
             count_found = (INTVAL)sub->arg_info->named_required;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "named_optional"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "named_optional"))) {
             count_found = (INTVAL)sub->arg_info->named_optional;
         }
-        else if (Parrot_str_equal(INTERP, what, CONST_STRING(INTERP, "named_slurpy"))) {
+        else if (STRING_equal(INTERP, what, CONST_STRING(INTERP, "named_slurpy"))) {
             count_found = (INTVAL)sub->arg_info->named_slurpy;
         }
         else
@@ -1040,7 +1040,7 @@ slurpy arguments).
                 EXCEPTION_INVALID_OPERATION,
                 "illegal register kind '%Ss'", reg);
 
-        kind = Parrot_str_find_index(INTERP, types, reg, 0);
+        kind = STRING_index(INTERP, types, reg, 0);
 
         if (kind == -1)
             Parrot_ex_throw_from_c_args(INTERP, NULL,
@@ -1097,7 +1097,7 @@ slurpy arguments).
 
         /* Ensure we have lex info. */
         if (PMC_IS_NULL(sub->lex_info)) {
-            const INTVAL lex_info_id = Parrot_get_ctx_HLL_type(INTERP,
+            const INTVAL lex_info_id = Parrot_hll_get_ctx_HLL_type(INTERP,
                                            enum_class_LexInfo);
             sub->lex_info = Parrot_pmc_new_init(INTERP, lex_info_id, SELF);
         }
@@ -1181,5 +1181,5 @@ slurpy arguments).
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

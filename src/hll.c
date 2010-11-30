@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2005-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -61,7 +60,7 @@ static PMC* new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 Create a new HLL information table entry.
 Takes an interpreter name and (optional) entry name.
 Returns a pointer to the new entry.
-Used by Parrot_register_HLL and Parrot_register_HLL_lib.
+Used by Parrot_hll_register_HLL.
 
 =cut
 
@@ -96,7 +95,7 @@ new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 
 /*
 
-=item C<void Parrot_init_HLL(PARROT_INTERP)>
+=item C<void Parrot_hll_init_HLL(PARROT_INTERP)>
 
 Initialises the HLL_info and HLL_namespace fields of the interpreter structure.
 Registers the default HLL namespace "parrot".
@@ -106,20 +105,20 @@ Registers the default HLL namespace "parrot".
 */
 
 void
-Parrot_init_HLL(PARROT_INTERP)
+Parrot_hll_init_HLL(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_init_HLL)
+    ASSERT_ARGS(Parrot_hll_init_HLL)
     interp->HLL_info      =
         Parrot_pmc_new(interp, enum_class_OrderedHash);
     interp->HLL_namespace =
         Parrot_pmc_new_constant(interp, enum_class_ResizablePMCArray);
 
-    Parrot_register_HLL(interp, CONST_STRING(interp, "parrot"));
+    Parrot_hll_register_HLL(interp, CONST_STRING(interp, "parrot"));
 }
 
 /*
 
-=item C<INTVAL Parrot_register_HLL(PARROT_INTERP, STRING *hll_name)>
+=item C<INTVAL Parrot_hll_register_HLL(PARROT_INTERP, STRING *hll_name)>
 
 Register the HLL with the given STRING name C<hll_name> in the interpreter.
 
@@ -135,15 +134,15 @@ If there is an error, C<-1> is returned.
 
 PARROT_EXPORT
 INTVAL
-Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
+Parrot_hll_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 {
-    ASSERT_ARGS(Parrot_register_HLL)
+    ASSERT_ARGS(Parrot_hll_register_HLL)
     PMC   *entry, *name, *type_hash, *ns_hash, *hll_info;
     INTVAL idx;
 
     /* TODO LOCK or disallow in threads */
 
-    idx = Parrot_get_HLL_id(interp, hll_name);
+    idx = Parrot_hll_get_HLL_id(interp, hll_name);
 
     if (idx >= 0)
         return idx;
@@ -181,60 +180,10 @@ Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
     return idx;
 }
 
-/*
-
-=item C<INTVAL Parrot_register_HLL_lib(PARROT_INTERP, STRING *hll_lib)>
-
-Register an HLL library.
-Takes a pointer to a library name STRING to add. If the name has already
-been registered the list position of the library in the HLL Info list is
-returned. Otherwise, the library is added to the list and 0 is returned.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-INTVAL
-Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
-{
-    ASSERT_ARGS(Parrot_register_HLL_lib)
-    PMC   *hll_info = interp->HLL_info;
-    const INTVAL nelements = VTABLE_elements(interp, hll_info);
-    INTVAL i;
-
-    for (i = 0; i < nelements; ++i) {
-        PMC * const entry    = VTABLE_get_pmc_keyed_int(interp, hll_info, i);
-        PMC * const lib_name = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_lib);
-
-        if (!PMC_IS_NULL(lib_name)) {
-            const STRING * const lib_name_str = VTABLE_get_string(interp, lib_name);
-            if (Parrot_str_equal(interp, lib_name_str, hll_lib))
-                break;
-        }
-    }
-
-    if (i < nelements)
-        return i;
-    else {
-        PMC * const new_entry = new_hll_entry(interp, NULL);
-        PMC *name;
-
-        VTABLE_set_pmc_keyed_int(interp, new_entry, e_HLL_name, PMCNULL);
-
-        /* register dynlib */
-        name    = Parrot_pmc_new_constant(interp, enum_class_String);
-
-        VTABLE_set_string_native(interp, name, hll_lib);
-        VTABLE_set_pmc_keyed_int(interp, new_entry, e_HLL_lib, name);
-
-        return 0;
-    }
-}
 
 /*
 
-=item C<INTVAL Parrot_get_HLL_id(PARROT_INTERP, STRING *hll_name)>
+=item C<INTVAL Parrot_hll_get_HLL_id(PARROT_INTERP, STRING *hll_name)>
 
 Returns the ID number of the HLL with the given name. The default HLL namespace
 C<parrot> has an ID number of 0. On error, or if an HLL with the given name
@@ -247,9 +196,9 @@ does not exist, returns -1.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
+Parrot_hll_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
 {
-    ASSERT_ARGS(Parrot_get_HLL_id)
+    ASSERT_ARGS(Parrot_hll_get_HLL_id)
     PMC *       entry;
     PMC * const hll_info = interp->HLL_info;
     INTVAL      i        = -1;
@@ -273,7 +222,7 @@ Parrot_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
 
 /*
 
-=item C<STRING * Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)>
+=item C<STRING * Parrot_hll_get_HLL_name(PARROT_INTERP, INTVAL id)>
 
 Returns the STRING name of the HLL with the given C<id> number. If the id
 is out of range or does not exist, the NULL value is returned instead. Note
@@ -287,9 +236,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING *
-Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)
+Parrot_hll_get_HLL_name(PARROT_INTERP, INTVAL id)
 {
-    ASSERT_ARGS(Parrot_get_HLL_name)
+    ASSERT_ARGS(Parrot_hll_get_HLL_name)
     PMC * const  hll_info  = interp->HLL_info;
     const INTVAL nelements = VTABLE_elements(interp, hll_info);
 
@@ -314,7 +263,7 @@ Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)
 
 /*
 
-=item C<void Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL
+=item C<void Parrot_hll_register_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL
 core_type, INTVAL hll_type)>
 
 Register a type mapping of C<< core_type => hll_type >> for the given HLL.
@@ -325,12 +274,12 @@ Register a type mapping of C<< core_type => hll_type >> for the given HLL.
 
 PARROT_EXPORT
 void
-Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
+Parrot_hll_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
         INTVAL core_type, INTVAL hll_type)
 {
-    ASSERT_ARGS(Parrot_register_HLL_type)
+    ASSERT_ARGS(Parrot_hll_register_HLL_type)
 
-    if (hll_id == Parrot_get_HLL_id(interp, CONST_STRING(interp, "parrot")))
+    if (hll_id == Parrot_hll_get_HLL_id(interp, CONST_STRING(interp, "parrot")))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Cannot map without an HLL");
     else {
@@ -353,7 +302,7 @@ Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
 
 /*
 
-=item C<INTVAL Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL
+=item C<INTVAL Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL
 core_type)>
 
 Get an equivalent HLL type number for the language C<hll_id>.  If the given HLL
@@ -366,9 +315,9 @@ C<PARROT_HLL_NONE>, returns C<core_type> unchanged.
 
 PARROT_EXPORT
 INTVAL
-Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
+Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
 {
-    ASSERT_ARGS(Parrot_get_HLL_type)
+    ASSERT_ARGS(Parrot_hll_get_HLL_type)
 
     if (hll_id == PARROT_HLL_NONE || hll_id == 0)
         return core_type;
@@ -402,7 +351,7 @@ Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
 
 /*
 
-=item C<INTVAL Parrot_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)>
+=item C<INTVAL Parrot_hll_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)>
 
 Return an equivalent PMC type number according to the HLL settings in
 the current context.  If no type is registered, returns C<core_type>.
@@ -413,19 +362,19 @@ the current context.  If no type is registered, returns C<core_type>.
 
 PARROT_EXPORT
 INTVAL
-Parrot_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)
+Parrot_hll_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)
 {
-    ASSERT_ARGS(Parrot_get_ctx_HLL_type)
+    ASSERT_ARGS(Parrot_hll_get_ctx_HLL_type)
     const INTVAL hll_id = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp));
     if (!hll_id || hll_id == PARROT_HLL_NONE)
         return core_type;
 
-    return Parrot_get_HLL_type(interp, hll_id, core_type);
+    return Parrot_hll_get_HLL_type(interp, hll_id, core_type);
 }
 
 /*
 
-=item C<PMC* Parrot_get_ctx_HLL_namespace(PARROT_INTERP)>
+=item C<PMC* Parrot_hll_get_ctx_HLL_namespace(PARROT_INTERP)>
 
 Return root namespace of the current HLL.
 
@@ -437,15 +386,15 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC*
-Parrot_get_ctx_HLL_namespace(PARROT_INTERP)
+Parrot_hll_get_ctx_HLL_namespace(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_get_ctx_HLL_namespace)
-    return Parrot_get_HLL_namespace(interp, Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
+    ASSERT_ARGS(Parrot_hll_get_ctx_HLL_namespace)
+    return Parrot_hll_get_HLL_namespace(interp, Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
 }
 
 /*
 
-=item C<PMC* Parrot_get_HLL_namespace(PARROT_INTERP, int hll_id)>
+=item C<PMC* Parrot_hll_get_HLL_namespace(PARROT_INTERP, int hll_id)>
 
 Return root namespace of the HLL with the ID of I<hll_id>.  If C<hll_id> is the
 special value C<PARROT_HLL_NONE>, return the global root namespace.
@@ -458,9 +407,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC*
-Parrot_get_HLL_namespace(PARROT_INTERP, int hll_id)
+Parrot_hll_get_HLL_namespace(PARROT_INTERP, int hll_id)
 {
-    ASSERT_ARGS(Parrot_get_HLL_namespace)
+    ASSERT_ARGS(Parrot_hll_get_HLL_namespace)
     if (hll_id == PARROT_HLL_NONE)
         return interp->root_namespace;
 
@@ -469,7 +418,7 @@ Parrot_get_HLL_namespace(PARROT_INTERP, int hll_id)
 
 /*
 
-=item C<void Parrot_regenerate_HLL_namespaces(PARROT_INTERP)>
+=item C<void Parrot_hll_regenerate_HLL_namespaces(PARROT_INTERP)>
 
 Create all HLL namespaces that don't already exist. This is necessary when
 creating a new interpreter which shares an old interpreter's HLL_info.
@@ -480,9 +429,9 @@ creating a new interpreter which shares an old interpreter's HLL_info.
 
 PARROT_EXPORT
 void
-Parrot_regenerate_HLL_namespaces(PARROT_INTERP)
+Parrot_hll_regenerate_HLL_namespaces(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_regenerate_HLL_namespaces)
+    ASSERT_ARGS(Parrot_hll_regenerate_HLL_namespaces)
     const INTVAL n = VTABLE_elements(interp, interp->HLL_info);
     INTVAL       hll_id;
 
@@ -496,13 +445,13 @@ Parrot_regenerate_HLL_namespaces(PARROT_INTERP)
         if (PMC_IS_NULL(ns_hash) ||
                 ns_hash->vtable->base_type == enum_class_Undef)
         {
-            STRING * hll_name = Parrot_get_HLL_name(interp, hll_id);
+            STRING * hll_name = Parrot_hll_get_HLL_name(interp, hll_id);
             if (!hll_name)
                 continue;
 
             hll_name = Parrot_str_downcase(interp, hll_name);
 
-            /* XXX as in Parrot_register_HLL() this needs to be fixed to use
+            /* XXX as in Parrot_hll_register_HLL() this needs to be fixed to use
              * the correct type of namespace. It's relatively easy to do that
              * here because the typemap already exists, but it is not currently
              * done for consistency.
@@ -533,5 +482,5 @@ Leopold Toetsch
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

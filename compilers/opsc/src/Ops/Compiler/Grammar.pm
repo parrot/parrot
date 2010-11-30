@@ -1,6 +1,5 @@
 #! nqp
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 INIT { pir::load_bytecode('HLL.pbc'); }
 

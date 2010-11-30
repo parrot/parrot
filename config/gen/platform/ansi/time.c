@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2007-2010, Parrot Foundation.
  */
 
@@ -106,5 +105,5 @@ Parrot_usleep(unsigned int microseconds)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

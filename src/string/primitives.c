@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2006-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -391,5 +390,5 @@ str_dup_remove_quotes(ARGIN(const char *old))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
