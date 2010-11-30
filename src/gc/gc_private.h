@@ -83,7 +83,8 @@ typedef enum _gc_sys_type_enum {
     MS,  /* mark and sweep */
     INF, /* infinite memory core */
     TMS, /* tricolor mark and sweep */
-    MS2
+    MS2,
+    GMS  /* Generational M&S */
 } gc_sys_type_enum;
 
 /* how often to skip a full GC when this pool has nothing free */
@@ -658,6 +659,17 @@ void Parrot_gc_ms2_init(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/gc_ms2.c */
+
+/* HEADERIZER BEGIN: src/gc/gc_gms.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+void Parrot_gc_gms_init(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_Parrot_gc_gms_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/gc/gc_gms.c */
 
 /* HEADERIZER BEGIN: src/gc/string_gc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

@@ -39,8 +39,9 @@
  * INF -- infinite memory "collector"
  * TMS -- TriColor Mark & Sweep
  * MS2 -- new style mark & sweep
+ * GMS -- Generational M&S based on MS2
  */
-#define PARROT_GC_DEFAULT_TYPE MS2
+#define PARROT_GC_DEFAULT_TYPE GMS
 
 /*
  * JIT/i386 can use the CGP run core for external functions instead
