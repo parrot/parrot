@@ -48,6 +48,7 @@ Create empty PackfileDebug.
     VTABLE void init() {
         SUPER();
         SET_ATTR_type(INTERP, SELF, PF_DEBUG_SEG);
+        Parrot_warn_experimental(interp, "PackfileDebug is experimental");
     }
 
 /*

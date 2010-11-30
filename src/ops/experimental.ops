@@ -353,6 +353,7 @@ op finalize(in PMC) {
     /* Go to the next op after loop unrolling */
     opcode_t * const dest = expr NEXT();
     PMC *eh = PMCNULL;
+    Parrot_warn_experimental(interp, "finalize is experimental");
     if (!PMC_IS_NULL($1)) {
         /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
         if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "ExceptionHandler")))
