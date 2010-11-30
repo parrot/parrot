@@ -228,6 +228,10 @@ Parrot_io_close(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
             data_struct->os_handle = PIO_INVALID_HANDLE;
         }
     }
+    else if (pmc->vtable->base_type == enum_class_StringHandle) {
+        SET_ATTR_read_offset(INTERP, SELF, 0);
+        result = 0;
+    }
     else
         Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "close"), "->I", &result);
 
