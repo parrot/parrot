@@ -574,6 +574,7 @@ pir_output_is( <<'CODE', <<'OUT', 'illegal utf8 chars' );
     'test_chars'(binary:"\x41\x80\x41")
     'test_chars'(binary:"\x41\xBF\x41")
     'test_chars'(binary:"\x41\xC1\xBF")
+    'test_chars'(binary:"\x41\xC2\x41")
     'test_chars'(binary:"\x41\xF5\xA1\xA2\xA3")
     'test_chars'(binary:"\x41\xFE\x41")
 
@@ -620,6 +621,7 @@ pir_output_is( <<'CODE', <<'OUT', 'illegal utf8 chars' );
     pop_eh
 .end
 CODE
+Malformed UTF-8 string
 Malformed UTF-8 string
 Malformed UTF-8 string
 Malformed UTF-8 string
