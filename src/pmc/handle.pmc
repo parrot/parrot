@@ -71,7 +71,7 @@ subtypes that are or can be tty.
 
 =item C<METHOD get_fd()>
 
-Retrieve the integer file descriptor for the FileHandle (only available on
+Retrieve the integer file descriptor for the Handle (only available on
 platforms that use integer file descriptors).
 
 =cut
