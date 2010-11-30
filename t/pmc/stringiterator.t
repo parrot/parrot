@@ -21,7 +21,7 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(67)
+    plan(81)
 
     test_get_pmc()
     test_clone()
@@ -261,7 +261,13 @@ end:
     result = 0
     i1 = it[0]
     c = chr i1
-    is(c, c3, 'get_integer_keyed_int')
+    is(c, c3, 'get_integer_keyed_int - zero')
+    i1 = it[2]
+    c = chr i1
+    is(c, c5, 'get_integer_keyed_int - pos')
+    i1 = it[-2]
+    c = chr i1
+    is(c, c1, 'get_integer_keyed_int - neg')
 
     set_label eh, catch2
     i1 = it[-20]
