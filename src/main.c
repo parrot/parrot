@@ -156,7 +156,7 @@ main(int argc, const char *argv[])
 
     /* Clean-up after ourselves */
     Parrot_destroy(interp);
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 #define SET_FLAG(flag)   Parrot_set_flag(interp, (flag))

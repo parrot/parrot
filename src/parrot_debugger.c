@@ -245,7 +245,7 @@ main(int argc, const char *argv[])
     Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "debugger"));
     PDB_run_code(interp, argc - nextarg, argv + nextarg);
 
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 

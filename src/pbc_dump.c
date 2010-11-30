@@ -423,14 +423,14 @@ main(int argc, const char **argv)
 
         fclose(fp);
         Parrot_gc_free_memory_chunk(interp, pack);
-        Parrot_exit(interp, 0);
+        Parrot_x_exit(interp, 0);
     }
 
     if (!nums_only)
         PackFile_header_dump(interp, pf);
 
     if (options & PFOPT_HEADERONLY)
-        Parrot_exit(interp, 0);
+        Parrot_x_exit(interp, 0);
 
     /* install a dumper function */
     if (!terse) {
@@ -453,7 +453,7 @@ main(int argc, const char **argv)
     /* do a directory dump, which dumps segs then */
     PackFile_Segment_dump(interp, &pf->directory.base);
 
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 

@@ -147,6 +147,42 @@ Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
 
 /*
 
+=item C<int Parrot_pa_is_owned(PARROT_INTERP, Parrot_Pointer_Array *self, void
+*orig, void *ref)>
+
+Check that C<orig> pointer is stored in C<ref> cell. Used during system stack t
+
+=cut
+
+*/
+PARROT_EXPORT
+int
+Parrot_pa_is_owned(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self),
+        ARGIN(void *orig), ARGIN_NULLOK(void *ref))
+{
+    ASSERT_ARGS(Parrot_pa_is_owned)
+    size_t i;
+
+    /* Return early if ref is null */
+    if (!ref)
+        return 0;
+
+    /* We can't just deref pointer. It can be garbage */
+    /* So, ensure that C<ref> is looks like real pointer */
+    for (i = 0; i < self->total_chunks; i++) {
+        Parrot_Pointer_Array_Chunk *chunk = self->chunks[i];
+        if (PTR2UINTVAL(ref) < PTR2UINTVAL(chunk->data))
+            continue;
+        if (PTR2UINTVAL(ref) > PTR2UINTVAL(chunk) + CHUNK_SIZE)
+            continue;
+        return (*(void **)ref == orig);
+    }
+
+    return 0;
+}
+
+/*
+
 =item C<static void allocate_more_chunks(PARROT_INTERP, Parrot_Pointer_Array
 *self)>
 

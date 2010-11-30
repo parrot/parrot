@@ -190,7 +190,7 @@ help(PARROT_INTERP)
     printf("pbc_merge - merge multiple parrot bytecode files into one\n");
     printf("Usage:\n");
     printf("   pbc_merge -o out.pbc file1.pbc file2.pbc ...\n\n");
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 /*
@@ -226,7 +226,7 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
     if (!Parrot_stat_info_intval(interp, fs, STAT_EXISTS)) {
         Parrot_io_eprintf(interp, "PBC Merge: Can't stat %s, code %i.\n",
                 fullname, errno);
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
 
     /* Get program size. */
@@ -237,7 +237,7 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
     if (!io) {
         Parrot_io_eprintf(interp, "PBC Merge: Can't open %s, code %i.\n",
                 fullname, errno);
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
 
     /* Read in program. Nabbed from Parrot_pbc_read. */
@@ -261,7 +261,7 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
     if (read_result < 0) {
         Parrot_io_eprintf(interp,
                 "PBC Merge: Problem reading packfile from PIO.\n");
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
     fclose(io);
 
@@ -271,7 +271,7 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
                 pf, (opcode_t *)program_code, program_size)) {
         Parrot_io_eprintf(interp, "PBC Merge: Can't unpack packfile %s.\n",
                 fullname);
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
 
     /* Return the packfile. */
@@ -310,7 +310,7 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     if (!bc_seg) {
         Parrot_io_eprintf(interp,
             "PBC Merge: Error creating bytecode segment.");
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
 
     /* Loop over input files. */
@@ -321,7 +321,7 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             Parrot_io_eprintf(interp,
                 "PBC Merge: Cannot locate bytecode segment in %s",
                 inputs[i]->filename);
-            Parrot_exit(interp, 1);
+            Parrot_x_exit(interp, 1);
         }
 
         /* Re-allocate the current buffer. */
@@ -382,7 +382,7 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     if (const_seg == NULL) {
         Parrot_io_eprintf(interp,
             "PBC Merge: Error creating constant table segment.");
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
 
     /* Loop over input files. */
@@ -394,7 +394,7 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             Parrot_io_eprintf(interp,
                 "PBC Merge: Cannot locate constant table segment in %s\n",
                 inputs[i]->filename);
-            Parrot_exit(interp, 1);
+            Parrot_x_exit(interp, 1);
         }
 
         /* Store cursor as position where constant table starts. */
@@ -725,7 +725,7 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     PackFile * const merged = PackFile_new(interp, 0);
     if (merged == NULL) {
         Parrot_io_eprintf(interp, "PBC Merge: Error creating new packfile.\n");
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
 
     /* calculate how many constants are stored in the packfiles to be merged */
@@ -794,11 +794,11 @@ pbc_merge_write(PARROT_INTERP, ARGMOD(PackFile *pf), ARGIN(const char *filename)
     PackFile_pack(interp, pf, pack);
     if ((fp = fopen(filename, "wb")) == 0) {
         Parrot_io_eprintf(interp, "PBC Merge: Couldn't open %s\n", filename);
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
     if ((1 != fwrite(pack, size, 1, fp))) {
         Parrot_io_eprintf(interp, "PBC Merge: Couldn't write %s\n", filename);
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
     fclose(fp);
     mem_gc_free(interp, pack);
@@ -878,7 +878,7 @@ main(int argc, const char **argv)
             Parrot_io_eprintf(interp,
                 "PBC Merge: Unknown error while reading and unpacking %s\n",
                 *argv);
-            Parrot_exit(interp, 1);
+            Parrot_x_exit(interp, 1);
         }
 
         /* Next file. */
@@ -892,7 +892,7 @@ main(int argc, const char **argv)
     pbc_merge_write(interp, merged, output_file);
 
     /* Finally, we're done. */
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 

@@ -531,7 +531,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
 */
 
     METHOD to_int(INTVAL base) {
-        PMC * const result = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const result = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                         enum_class_Integer));
 
         /* TODO verify encoding */

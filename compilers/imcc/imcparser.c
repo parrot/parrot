@@ -3277,7 +3277,7 @@ yyreduce:
     {
             STRING * const hll_name = Parrot_str_unescape(interp, (yyvsp[(2) - (2)].s) + 1, '"', NULL);
             Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp),
-                Parrot_register_HLL(interp, hll_name));
+                Parrot_hll_register_HLL(interp, hll_name));
 
             IMCC_INFO(interp)->cur_namespace = NULL;
             mem_sys_free((yyvsp[(2) - (2)].s));

@@ -899,8 +899,8 @@ Parrot_debugger_start(PARROT_INTERP, ARGIN_NULLOK(opcode_t * cur_opcode))
     debugger_cmdline(interp);
 
     if (interp->pdb->state & PDB_EXIT) {
-        TRACEDEB_MSG("Parrot_debugger_start Parrot_exit");
-        Parrot_exit(interp, 0);
+        TRACEDEB_MSG("Parrot_debugger_start Parrot_x_exit");
+        Parrot_x_exit(interp, 0);
     }
     TRACEDEB_MSG("Parrot_debugger_start ends");
 }

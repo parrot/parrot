@@ -20,6 +20,7 @@ VERSION         = @VERSION@$(DEVEL)
 SOVERSION       = @VERSION@
 
 CONFIG_ARGS     = @configure_args@
+#IF(win32):SHELL           = CMD
 
 # Override at least PREFIX with the install location if you're going
 # to be using this outside of your build area.
@@ -1678,7 +1679,8 @@ src/string/encoding/tables$(O) : $(PARROT_H_HEADERS) \
 src/string/encoding/shared$(O) : $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/tables.h
-src/string/encoding/null$(O) : $(PARROT_H_HEADERS)
+src/string/encoding/null$(O) : $(PARROT_H_HEADERS) \
+    src/string/encoding/shared.h
 src/string/encoding/ascii$(O) : $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/tables.h
@@ -1691,11 +1693,14 @@ src/string/encoding/utf8$(O) : $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/unicode.h
 src/string/encoding/utf16$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/shared.h
+    src/string/encoding/shared.h \
+    src/string/unicode.h
 src/string/encoding/ucs2$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/shared.h
+    src/string/encoding/shared.h \
+    src/string/unicode.h
 src/string/encoding/ucs4$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/shared.h
+    src/string/encoding/shared.h \
+    src/string/unicode.h
 
 src/pbc_merge$(O) : \
     $(INC_DIR)/embed.h \
@@ -1846,7 +1851,7 @@ CONFIGURE_TEST_FILES = \
     t/configure/*.t \
     t/steps/*.t
 PBC_TEST_FILES = \
-#IF(has_icu):    t/op/testlib/test_strings.pbc \
+    t/op/testlib/test_strings.pbc \
     t/pmc/testlib/annotations.pbc \
     t/pmc/testlib/number.pbc
 
@@ -2027,6 +2032,7 @@ clean : \
 	$(RM_F) $(DYNOPLIBS_CLEANUPS) $(DYNPMC_CLEANUPS)
 	$(RM_F) $(GEN_PASM_INCLUDES) $(GEN_PM_INCLUDES)
 	$(RM_F) $(NQPRX_CLEANUPS)  $(OPSC_CLEANUPS)
+	$(RM_RF) blib
 
 prog-clean :
 	$(RM_F) \
@@ -2174,7 +2180,6 @@ test-clean :
 realclean : clean
 	$(RM_RF) \
     $(CONFIGURE_GENERATED_FILES) \
-    blib \
     cover_db
 
 distclean : realclean

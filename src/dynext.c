@@ -489,7 +489,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
     PMC * context = Parrot_push_context(interp, regs_used);
     Parrot_pcc_set_HLL(interp, context, parrot_hll_id);
     Parrot_pcc_set_namespace(interp, context,
-            Parrot_get_HLL_namespace(interp, parrot_hll_id));
+            Parrot_hll_get_HLL_namespace(interp, parrot_hll_id));
 
     if (!STRING_IS_NULL(lib_name)) {
         STRING * const load_name       = Parrot_sprintf_c(interp,
@@ -685,7 +685,10 @@ PMC *
 Parrot_dyn_load_lib(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), ARGIN_NULLOK(PMC *parameters))
 {
     ASSERT_ARGS(Parrot_dyn_load_lib)
-    void   *handle;
+    /* NULL intializa handle to protect against pitfalls in called functions.
+     * This function should not be so speed critical that this has any impact.
+     */
+    void   *handle = NULL;
     PMC    *lib_pmc;
     STRING *path;
     STRING *lib_name, *wo_ext, *ext;    /* library stem without path
@@ -720,7 +723,7 @@ Parrot_dyn_load_lib(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), ARGIN_NULLOK(PMC *
      * XXX Parrot_ex_throw_from_c_args? return PMCNULL?
      * PMC Undef seems convenient, because it can be queried with get_bool()
      */
-    if (!path || !handle)
+    if (STRING_IS_NULL(path) || !handle)
         return Parrot_pmc_new(interp, enum_class_Undef);
 
     return run_init_lib(interp, handle, lib_name, wo_ext);

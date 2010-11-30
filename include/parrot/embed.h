@@ -32,7 +32,7 @@ PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 void
-Parrot_exit(PARROT_INTERP, int status);
+Parrot_x_exit(PARROT_INTERP, int status);
 
 PARROT_EXPORT
 void Parrot_destroy(PARROT_INTERP)

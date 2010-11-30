@@ -161,7 +161,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
      * returning NULL from here returns resume address NULL to the
      * runloop, which will terminate the thread function finally
      *
-     * TT #1287 this check should better be in Parrot_exit
+     * TT #1287 this check should better be in Parrot_x_exit
      */
 
     /* no exception handler, but this is not the main thread */
@@ -170,9 +170,9 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 
     /*
      * only main should run the destroy functions - exit handler chain
-     * is freed during Parrot_exit
+     * is freed during Parrot_x_exit
      */
-    Parrot_exit(interp, exit_status);
+    Parrot_x_exit(interp, exit_status);
 }
 
 /*
@@ -654,7 +654,7 @@ of the error would interfere with the exception system).
 This involves printing an error message to stderr, and calling C<exit> to exit
 the process with the given exitcode. It is not possible for Parrot bytecode to
 intercept a fatal error (for that, use C<Parrot_ex_throw_from_c_args>).
-C<exit_fatal> does not call C<Parrot_exit> to invoke exit handlers (that would
+C<exit_fatal> does not call C<Parrot_x_exit> to invoke exit handlers (that would
 require an interpreter).
 
 =cut

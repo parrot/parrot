@@ -255,7 +255,7 @@ internal_ns_maybe_create(PARROT_INTERP, ARGIN(PMC *ns), ARGIN(STRING *key), int 
     if (!(flags & INTERN_NS_CREAT))
         return PMCNULL;
     else {
-        const INTVAL type_id = Parrot_get_ctx_HLL_type(interp, enum_class_NameSpace);
+        const INTVAL type_id = Parrot_hll_get_ctx_HLL_type(interp, enum_class_NameSpace);
         /* TT #1221 - match HLL of enclosing namespace? */
         PMC * const sub_ns = Parrot_pmc_new(interp, type_id);
 
@@ -289,7 +289,7 @@ get_namespace_pmc(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
     PMC_get_sub(interp, sub_pmc, sub);
     nsname = sub->namespace_name;
-    nsroot = Parrot_get_HLL_namespace(interp, sub->HLL_id);
+    nsroot = Parrot_hll_get_HLL_namespace(interp, sub->HLL_id);
 
     /* If we have a NULL, return the HLL namespace */
     if (PMC_IS_NULL(nsname))
@@ -328,7 +328,7 @@ store_sub_in_multi(PARROT_INTERP, ARGIN(PMC *sub_pmc), ARGIN(PMC *ns))
 
     /* is there an existing MultiSub PMC? or do we need to create one? */
     if (PMC_IS_NULL(multisub)) {
-        multisub = Parrot_pmc_new(interp,  Parrot_get_ctx_HLL_type(interp, enum_class_MultiSub));
+        multisub = Parrot_pmc_new(interp,  Parrot_hll_get_ctx_HLL_type(interp, enum_class_MultiSub));
         /* we have to push the sub onto the MultiSub before we try to store
         it because storing requires information from the sub */
         VTABLE_push_pmc(interp, multisub, sub_pmc);
@@ -702,7 +702,7 @@ Parrot_ns_find_named_item(PARROT_INTERP, ARGIN(STRING *name), SHIM(void *next))
     if (!PMC_IS_NULL(g))
         return g;
 
-    g = Parrot_ns_find_namespace_global(interp, Parrot_get_ctx_HLL_namespace(interp), name);
+    g = Parrot_ns_find_namespace_global(interp, Parrot_hll_get_ctx_HLL_namespace(interp), name);
     if (!PMC_IS_NULL(g))
         return g;
     return PMCNULL;

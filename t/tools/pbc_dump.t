@@ -72,14 +72,11 @@ dump_output_like( <<PIR, "pir", qr/BYTECODE_t.*=>.*\[.*offs.*op_count.*itype.*id
 PIR
 
 for my $enc ( qw(binary iso-8859-1 utf8 utf16 ucs2 ucs4) ) {
-    SKIP: {
-        skip( 'no ICU lib', 1 ) if $enc eq 'utf16' && !$PConfig{has_icu};
-        dump_output_like( <<PIR, "pir", qr/ENCODING.*=>.*$enc/ms, "pbc_dump $enc encoding");
+    dump_output_like( <<PIR, "pir", qr/ENCODING.*=>.*$enc/ms, "pbc_dump $enc encoding");
 .sub main :main
     \$S0 = $enc:"abc"
 .end
 PIR
-    }
 }
 
 my $longcode = ".sub main :main\n";

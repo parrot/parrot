@@ -366,6 +366,12 @@ W: http://eric.lubow.org/
 N: Felix Gallo
 D: delegate.pmc patch
 
+N: Fernando Brito
+E: email@fernandobrito.com
+D: GCI Student
+U: fbrito
+S: João Pessoa, Brazil
+
 N: Flavio Poletti
 D: SmartLink patch for Moose after 0.43
 
@@ -704,6 +710,9 @@ D: Resizable*Array PMCs
 
 N: Matt Kennedy
 D: Some Env PMC method implementations and tests
+
+N: Matt Rajca
+D: Code refactoring
 
 N: Mattia Barbon
 D: Win32 fixes, dynamic PMC creation and loading

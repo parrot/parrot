@@ -88,7 +88,7 @@ main(SHIM(int argc), char *argv[])
     printf("%s\n", pf->directory.base.name);
     PackFile_map_segments(interp, &pf->directory, iter, (void*)2);
 
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 /*

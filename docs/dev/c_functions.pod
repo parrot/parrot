@@ -167,7 +167,7 @@ C<strchr()>.
 
 =head2 PARROT_DOES_NOT_RETURN
 
-For functions that can't return, like C<Parrot_exit()> or functions that
+For functions that can't return, like C<Parrot_x_exit()> or functions that
 cause exceptions to be thrown. This helps the compiler's flow analysis
 which can help detect unreachable code, or opportunities for optimization.
 

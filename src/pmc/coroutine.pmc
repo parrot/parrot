@@ -208,7 +208,7 @@ Swaps the "context".
 
             /* create pad if needed */
             if (!PMC_IS_NULL(lex_info)) {
-                const INTVAL hlltype = Parrot_get_ctx_HLL_type(INTERP, enum_class_LexPad);
+                const INTVAL hlltype = Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_LexPad);
                 PMC * const lexpad = Parrot_pmc_new_init(INTERP, hlltype, lex_info);
                 Parrot_pcc_set_lex_pad(INTERP, ctx, lexpad);
                 VTABLE_set_pointer(INTERP, lexpad, ctx);

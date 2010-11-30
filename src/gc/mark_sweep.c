@@ -190,7 +190,7 @@ Parrot_gc_trace_root(PARROT_INTERP,
     Parrot_gc_mark_PMC_alive(interp, interp->dynamic_env);
 
     /* mark the vtables: the data, Class PMCs, etc. */
-    mark_vtables(interp);
+    Parrot_vtbl_mark_vtables(interp);
 
     /* mark the root_namespace */
     Parrot_gc_mark_PMC_alive(interp, interp->root_namespace);

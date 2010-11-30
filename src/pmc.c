@@ -712,7 +712,7 @@ Parrot_pmc_get_new_vtable_index(PARROT_INTERP)
 
     /* Have we overflowed the table? */
     if (type_id >= interp->n_vtable_alloced)
-        parrot_realloc_vtables(interp);
+        Parrot_vtbl_realloc_vtables(interp);
 
     return type_id;
 }
@@ -905,7 +905,7 @@ Parrot_pmc_create_mro(PARROT_INTERP, INTVAL type)
         if (!vtable->_namespace) {
             /* need a namespace Hash, anchor at parent, name it */
             PMC * const ns     = Parrot_pmc_new(interp,
-                    Parrot_get_ctx_HLL_type(interp, enum_class_NameSpace));
+                    Parrot_hll_get_ctx_HLL_type(interp, enum_class_NameSpace));
             vtable->_namespace = ns;
 
             /* anchor at parent, aka current_namespace, that is 'parrot' */
