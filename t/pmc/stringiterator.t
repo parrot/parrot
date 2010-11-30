@@ -34,7 +34,7 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
     get_keyed(iso-8859-1:"a\x{e4}c\x{f6}e\x{fc}g", utf8:"ä", utf8:"ö", utf8:"ü")
     get_keyed(binary:"a\x{e4}c\x{f6}e\x{fc}g", utf8:"ä", utf8:"ö", utf8:"ü")
     get_keyed(utf8:"aäc\x{20123}eüg", utf8:"ä", utf8:"\x{20123}", utf8:"ü")
-    get_keyed(utf16:"aäcöe\x{20abc}g", utf8:"ä", utf8:"ö", utf8:"\x{20abc}")
+    get_keyed(utf16:"aä\x{20456}öe\x{20abc}g", utf8:"ä", utf8:"ö", utf8:"\x{20abc}")
     get_keyed(ucs2:"aäcöe\x{beef}g", utf8:"ä", utf8:"ö", utf8:"\x{beef}")
     get_keyed(ucs4:"a\x{20789}cöeüg", utf8:"\x{20789}", utf8:"ö", utf8:"ü")
 
