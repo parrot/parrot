@@ -1037,5 +1037,5 @@ C<5.1.0.14.2.20011008152120.02158148@pop.sidhe.org>
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

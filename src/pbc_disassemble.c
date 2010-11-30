@@ -188,5 +188,5 @@ Reini Urban: Renamed from disassemble to pbc_disassemble (2008-07-03).
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

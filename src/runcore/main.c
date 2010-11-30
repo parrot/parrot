@@ -445,5 +445,5 @@ F<src/interp/inter_create.c>, F<src/interp/inter_misc.c>, F<src/call/ops.c>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

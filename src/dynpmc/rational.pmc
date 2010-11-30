@@ -1061,5 +1061,5 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

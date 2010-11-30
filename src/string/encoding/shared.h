@@ -367,5 +367,5 @@ UINTVAL unicode_validate(PARROT_INTERP, ARGIN(const STRING *src))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

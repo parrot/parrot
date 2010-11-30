@@ -744,5 +744,5 @@ F<include/parrot/dynext.h> and F<src/pmc/parrotlibrary.pmc>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

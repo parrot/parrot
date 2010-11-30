@@ -814,5 +814,5 @@ Parrot_pcc_set_regs_ps(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(Regs_ps *bp_ps))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

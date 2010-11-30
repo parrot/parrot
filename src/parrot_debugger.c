@@ -351,5 +351,5 @@ Renamed from F<pdb.c> on 2008.7.15
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

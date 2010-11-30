@@ -286,5 +286,5 @@ Returns 1 if the C<*value> is an Undef PMC, 0 otherwise.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

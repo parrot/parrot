@@ -1996,5 +1996,5 @@ Default fallback. Performs a multiple dispatch call for 'i_repeat_int'.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1840,5 +1840,5 @@ Set C<dest> to the negated value of C<SELF>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

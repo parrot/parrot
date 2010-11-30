@@ -485,5 +485,5 @@ arena_size(ARGIN(const Pool_Allocator *self))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

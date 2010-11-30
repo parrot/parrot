@@ -512,5 +512,5 @@ L<include/parrot/interpreter.h>, L<src/interp/interpreter.c>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

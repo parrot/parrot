@@ -289,5 +289,5 @@ PMC * Parrot_mmd_sort_manhattan_by_sig_pmc(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

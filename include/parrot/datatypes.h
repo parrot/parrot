@@ -172,5 +172,5 @@ STRING * Parrot_dt_get_datatype_name(PARROT_INTERP, INTVAL type)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

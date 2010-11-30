@@ -674,6 +674,6 @@ free_ffi_thunk(PARROT_INTERP, void *thunk_func, void *thunk_data)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

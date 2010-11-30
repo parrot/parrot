@@ -462,5 +462,5 @@ dump_dominance_frontiers(ARGIN(const IMC_Unit *unit))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

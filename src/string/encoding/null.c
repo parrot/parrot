@@ -248,6 +248,6 @@ STR_VTABLE *Parrot_null_encoding_ptr = &Parrot_null_encoding;
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

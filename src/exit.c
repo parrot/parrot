@@ -112,5 +112,5 @@ F<include/parrot/exit.h> and F<t/src/exit.t>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

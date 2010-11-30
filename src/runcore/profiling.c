@@ -937,5 +937,5 @@ destroy_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

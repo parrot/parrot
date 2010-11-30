@@ -560,5 +560,5 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

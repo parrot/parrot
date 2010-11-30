@@ -271,5 +271,5 @@ moved available size to int_val2 - Matt Fowles 2005-07-22
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

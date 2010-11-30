@@ -760,5 +760,5 @@ void Parrot_gc_str_reallocate_string_storage(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

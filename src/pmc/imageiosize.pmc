@@ -284,5 +284,5 @@ hasn't been seen yet, it is also pushed onto the todo list.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

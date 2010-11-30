@@ -1368,5 +1368,5 @@ F<http://svn.perl.org/perl6/doc/trunk/design/syn/S12.pod>
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

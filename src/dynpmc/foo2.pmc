@@ -20,5 +20,5 @@ pmclass Foo2 dynpmc group foo_group provides scalar extends Foo auto_attrs {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

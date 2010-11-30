@@ -1633,5 +1633,5 @@ sub, or for the point of the call a level deeper for the rest.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

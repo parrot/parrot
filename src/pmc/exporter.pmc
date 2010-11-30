@@ -359,5 +359,5 @@ F<docs/pdds/pdd17_basic_types.pod>, F<docs/pdds/pdd21_namespaces.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

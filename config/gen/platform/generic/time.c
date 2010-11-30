@@ -154,5 +154,5 @@ Parrot_asctime_r(const struct tm *tm, char *buffer)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
