@@ -2032,6 +2032,7 @@ clean : \
 	$(RM_F) $(DYNOPLIBS_CLEANUPS) $(DYNPMC_CLEANUPS)
 	$(RM_F) $(GEN_PASM_INCLUDES) $(GEN_PM_INCLUDES)
 	$(RM_F) $(NQPRX_CLEANUPS)  $(OPSC_CLEANUPS)
+	$(RM_RF) blib
 
 prog-clean :
 	$(RM_F) \
@@ -2179,7 +2180,6 @@ test-clean :
 realclean : clean
 	$(RM_RF) \
     $(CONFIGURE_GENERATED_FILES) \
-    blib \
     cover_db
 
 distclean : realclean
