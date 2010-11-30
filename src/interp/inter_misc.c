@@ -337,6 +337,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
             return Parrot_get_runtime_path(interp);
         case GC_SYS_NAME: {
             STRING * name = Parrot_gc_sys_name(interp);
+            Parrot_warn_experimental(interp, "GC_SYS_NAME option is experimental");
             return name;
         }
       default:
