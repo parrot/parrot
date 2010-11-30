@@ -245,6 +245,92 @@ This flag is only needed when merging branches into master. It is optional
 for other merge cases, but it won't hurt. If it is simpler to think about,
 you can always use "--no-ff" when merging.
 
+=head2 Merging Code From Forks
+
+If you are merging code from non-core committers, Parrot would like to see
+"Signed-off-by" lines on each commit, so it is clear that one person wrote the
+code and someone else is taking responsibility for merging the code.
+
+To merge in a pull request on Github, the following method should be used.
+Follow the first two steps on the Github pull request page, i.e:
+
+    # 1) Make a new branch to pull stuff into
+    git checkout -b someguy-newbranch master
+
+    # 2) Pull in changes from the branch of a forked repo
+    # and switch to newbranch
+    git pull https://github.com/someguy/parrot.git newbranch
+
+Then you will follow this procedure:
+
+    # 3) let's look at a diff OPTIONAL
+    git diff master    # look at a diff
+
+    # 4) let's make a patch of the difference between this branch and master
+    git format-patch master --stdout > foo.patch
+
+    # 5) Switch back to the master branch
+    git checkout master
+
+    # 6) does the patch apply? OPTIONAL
+    git apply --check gci.patch
+
+    # 7) Actually merge in the changes with Signed-Off-By lines
+    git am --signoff gci.patch
+
+There is also a secret ninja way to skip the first five steps. If you
+have a pull request URL from github, such as:
+
+    https://github.com/parrot/parrot/pull/14
+
+you can turn it into a diff by appending ".diff" to the URL, i.e. :
+
+    https://github.com/parrot/parrot/pull/14.diff
+
+If you do this, instead of the above 7 steps, you can just do (assuming
+you are on the master branch)
+
+    # 1) Get the diff
+    wget https://github.com/parrot/parrot/pull/14.diff
+
+    # 2) does the patch apply? OPTIONAL
+    git apply --check gci.patch
+
+    # 3) Actually merge in the changes with Signed-Off-By lines
+    git am --signoff gci.patch
+
+After doing this, you will the new commits in master with
+your Signed-Off-By lines. Run the tests and if they all pass, push
+your changes upstream. If they don't, and you want others to take
+a look at stuff, create a new branch from your local master:
+
+    # make a new branch
+    git checkout -b my_new_branch
+
+    # push it upstream
+    git push origin my_new_branch
+
+At this point, your local master has commits that are now in
+my_new_branch, so you should reset master back to before you
+applied the patch. You can do this by looking at the output
+of C<git log> and finding the most recent SHA1 before your
+branch, then doing:
+
+    git reset --hard $sha1
+
+Be careful with C<git reset>! Make sure there are no untracked
+files that you care about BEFORE YOUR RUN C<git reset>.
+
+The use of reset can be avoided if you create a new branch
+before applying the patch, and then merging that branch
+to master before pushing.
+
+Also note that you will have to manually close the Github
+pull request, since adding Signed-Off-By lines changes
+the SHA1's which Github uses to automatically close
+pull requests.
+
+
 =head2 Announcing a Merge
 
 Send a message to parrot-dev@lists.parrot.org letting people know that your
@@ -257,6 +343,7 @@ If there was a specific language, tool, or platform that you wanted tested
 before merging but couldn't get any response from the responsible person, you
 may want to include some warning in the announcement that you weren't able to
 test that piece fully.
+
 
 =head2 Deleting a Branch
 
