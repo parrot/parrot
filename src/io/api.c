@@ -32,6 +32,7 @@ a new F<src/io/io_string.c>.
 #include "api.str"
 #include "pmc/pmc_filehandle.h"
 #include "pmc/pmc_stringhandle.h"
+#include "pmc/pmc_socket.h"
 
 #include <stdarg.h>
 
@@ -220,16 +221,16 @@ Parrot_io_close(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
     }
     else if (pmc->vtable->base_type == enum_class_Socket) {
         result = -1;
-        if (PARROT_SOCKET(SELF)) {
-            Parrot_Socket_attributes *data_struct = PARROT_SOCKET(SELF);
+        if (PARROT_SOCKET(pmc)) {
+            Parrot_Socket_attributes *data_struct = PARROT_SOCKET(pmc);
 
             if (data_struct->os_handle != PIO_INVALID_HANDLE)
-                result = Parrot_io_close_piohandle(INTERP, data_struct->os_handle);
+                result = Parrot_io_close_piohandle(interp, data_struct->os_handle);
             data_struct->os_handle = PIO_INVALID_HANDLE;
         }
     }
     else if (pmc->vtable->base_type == enum_class_StringHandle) {
-        SET_ATTR_read_offset(INTERP, SELF, 0);
+        SET_ATTR_read_offset(interp, pmc, 0);
         result = 0;
     }
     else
