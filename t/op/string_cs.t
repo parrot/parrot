@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 53;
+use Parrot::Test tests => 55;
 use Parrot::Config;
 
 =head1 NAME
@@ -386,6 +386,48 @@ pasm_error_output_like( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i utf-8 to ascii
     end
 CODE
 /Lossy conversion/
+OUTPUT
+
+pasm_output_is( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i iso-8859-1 to ucs4" );
+    set S0, iso-8859-1:"abc_ä_"
+    find_encoding I0, "ucs4"
+    trans_encoding S1, S0, I0
+    iseq I1, S0, S1
+    print I1
+    print "\n"
+    encoding I0, S1
+    encodingname S2, I0
+    print S2
+    print "\n"
+    length I2, S1
+    print I2
+    print "\n"
+    end
+CODE
+1
+ucs4
+6
+OUTPUT
+
+pasm_output_is( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i utf8 to ucs4" );
+    set S0, utf8:"\x{fc}_\x{20202}"
+    find_encoding I0, "ucs4"
+    trans_encoding S1, S0, I0
+    iseq I1, S0, S1
+    print I1
+    print "\n"
+    encoding I0, S1
+    encodingname S2, I0
+    print S2
+    print "\n"
+    length I2, S1
+    print I2
+    print "\n"
+    end
+CODE
+1
+ucs4
+3
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "bug #34661 literal" );
