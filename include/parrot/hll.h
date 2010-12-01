@@ -11,6 +11,10 @@
 #ifndef PARROT_HLL_H_GUARD
 #define PARROT_HLL_H_GUARD
 
+/* Temporary defines to help keep some symbols around during the rename
+   transition. TT #443. Can be removed after 2.11 */
+#define Parrot_get_ctx_HLL_namespace Parrot_hll_get_ctx_HLL_namespace
+
 /* this invalid HLL type means "no HLL" when passed to the below functions */
 #define PARROT_HLL_NONE -1
 
