@@ -64,11 +64,11 @@ PARROT_EXPORT
 void Parrot_warn_deprecated(PARROT_INTERP, ARGIN(const char *message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
-        
+
 PARROT_EXPORT
 void Parrot_warn_experimental(PARROT_INTERP, ARGIN(const char *message))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);        
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 void print_pbc_location(PARROT_INTERP)
@@ -82,7 +82,7 @@ void print_pbc_location(PARROT_INTERP)
     , PARROT_ASSERT_ARG(message))
 #define ASSERT_ARGS_Parrot_warn_experimental __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(message))    
+    , PARROT_ASSERT_ARG(message))
 #define ASSERT_ARGS_print_pbc_location __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
