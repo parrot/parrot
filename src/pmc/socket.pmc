@@ -214,7 +214,7 @@ string containing the received message.
 
     METHOD recv() {
         STRING * result;
-        INTVAL read = Parrot_io_recv(INTERP, SELF, &result);
+        result = Parrot_io_reads(INTERP, SELF, 0);
         RETURN(STRING * result);
     }
 

@@ -19,9 +19,12 @@ Tests the Socket PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(16)
+    plan(18)
 
     test_init()
+    test_get_fd()
+    test_read()
+    test_readline()
     test_clone()
     test_bool()
     test_close()
@@ -40,11 +43,29 @@ Tests the Socket PMC.
     new $P0, ['Socket']
     ok(1, 'Instantiated a Socket PMC')
 
-    $N0 = $P0.'get_fd'()
-    isnt($N0, -1, 'Socket get_fd did not return -1')
-
     $S0 = typeof $P0
     is($S0, 'Socket', 'PMC has correct type')
+.end
+
+.sub test_get_fd
+    new $P0, ['Socket']
+    $N0 = $P0.'get_fd'()
+    isnt($N0, -1, 'Socket get_fd did not return -1')
+.end
+
+.sub test_read
+    new $P0, ['Socket']
+    $N0 = $P0.'read'(5)
+    is($N0, 0, 'Socket read returns 0 when not connected')
+.end
+
+.sub test_readline
+    throws_substring(<<'CODE', 'not implemented', 'Socket readline is not implemented')
+    .sub main
+        new $P0, ['Socket']
+        $P0.'readline'()
+    .end
+CODE
 .end
 
 .sub test_bool

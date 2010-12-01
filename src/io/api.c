@@ -381,7 +381,7 @@ Parrot_io_flush(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
 
 =item C<STRING * Parrot_io_reads(PARROT_INTERP, PMC *pmc, size_t length)>
 
-Return a new C<STRING*> holding up to C<len> bytes read from the filehandle
+Return a new C<STRING*> holding up to C<len> bytes read from the handle
 PMC. Calls the C<read> method on the filehandle PMC.
 
 =cut
@@ -452,6 +452,9 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
             SETATTR_StringHandle_read_offset(interp, pmc, offset + read_length);
         }
     }
+    else if (pmc->vtable->base_type == enum_class_Socket) {
+        INTVAL read = Parrot_io_recv(interp, pmc, &result);
+    }
     else
         Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "read"), "I->S", length, &result);
     return result;
@@ -508,6 +511,10 @@ Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
 
         result = STRING_substr(interp, result, offset, read_length);
         SETATTR_StringHandle_read_offset(interp, pmc, newline_pos + 1);
+    }
+    else if (pmc->vtable->base_type == enum_class_Socket) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                "Parrot_io_readline on Socket not implemented");
     }
     else
         Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "readline"), "->S", &result);
