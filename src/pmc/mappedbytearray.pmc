@@ -114,8 +114,8 @@ Free all resources used.
 
     VTABLE void init_pmc(PMC * init) {
         #ifdef ENABLED
-        PObj_custom_destroy_SET(SELF);
         void *mapping = NULL;
+        PObj_custom_destroy_SET(SELF);
         if (VTABLE_isa(INTERP, init, CONST_STRING(INTERP, "String"))) {
             unsigned long length = 0;
             STRING *name = VTABLE_get_string(INTERP, init);
