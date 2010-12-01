@@ -441,7 +441,7 @@ allocate_new_pool_arena(ARGMOD(Pool_Allocator *pool))
         pool->lo_arena_ptr = new_arena;
 
     if (pool->hi_arena_ptr < (char *)new_arena + GC_FIXED_SIZE_POOL_SIZE)
-        pool->hi_arena_ptr = new_arena + GC_FIXED_SIZE_POOL_SIZE;
+        pool->hi_arena_ptr = (char *)new_arena + GC_FIXED_SIZE_POOL_SIZE;
 }
 
 /*
