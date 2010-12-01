@@ -19,7 +19,7 @@ Tests the Socket PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(18)
+    plan(20)
 
     test_init()
     test_get_fd()
@@ -28,6 +28,7 @@ Tests the Socket PMC.
     test_clone()
     test_bool()
     test_close()
+    test_is_closed()
     test_tcp_socket()
     test_tcp_socket6()
     test_raw_tcp_socket()
@@ -78,6 +79,18 @@ CODE
     $P0.'close'()
     ok(1, 'Closed a Socket')
     nok($P0,'A closed Socket returns False')
+.end
+
+.sub test_is_closed
+    new $P0, ['Socket']
+
+    $N0 = $P0.'is_closed'()
+    is($N0, 0, 'Socket is_closed returned 0 to new socket')
+
+    $P0.'close'()
+
+    $N0 = $P0.'is_closed'()
+    is($N0, 1, 'Socket is_closed returned 1 to closed socket')
 .end
 
 .sub test_clone
