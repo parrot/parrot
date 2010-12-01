@@ -262,7 +262,7 @@ PackFile_ConstTable_rlookup_str(PARROT_INTERP,
     int      i;
 
     if (ct->string_hash) {
-        HashBucket *bucket = parrot_hash_get_bucket(interp, ct->string_hash, s);
+        HashBucket *bucket = Parrot_hsh_get_bucket(interp, ct->string_hash, s);
         if (bucket) {
             i = (int)PTR2INTVAL(bucket->value);
             return i;

@@ -1089,13 +1089,13 @@ add_const_str(PARROT_INTERP, ARGIN(STRING *s))
 
         /* initialize rlookup cache */
         if (!ct->string_hash)
-            ct->string_hash = parrot_create_hash(interp,
+            ct->string_hash = Parrot_hsh_create_hash(interp,
                     enum_type_INTVAL,
                     Hash_key_type_STRING_enc);
 
         ct->str.constants[ct->str.const_count] = s;
 
-        parrot_hash_put(interp, ct->string_hash, s,
+        Parrot_hsh_put(interp, ct->string_hash, s,
             (void *)ct->str.const_count);
 
         return ct->str.const_count++;

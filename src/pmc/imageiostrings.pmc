@@ -46,7 +46,7 @@ Initializes the PMC.
 
         PARROT_IMAGEIOSTRINGS(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
         VTABLE_set_pointer(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->seen,
-            parrot_new_intval_hash(INTERP));
+            Parrot_hsh_new_intval_hash(INTERP));
 
         PARROT_IMAGEIOSTRINGS(SELF)->list = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
 
@@ -166,10 +166,10 @@ Checks new pmcs for strings.
         if (!PMC_IS_NULL(v)) {
             Hash * const hash    = (Hash *)VTABLE_get_pointer(INTERP,
                                                 PARROT_IMAGEIOSTRINGS(SELF)->seen);
-            HashBucket * const b = parrot_hash_get_bucket(INTERP, hash, v);
+            HashBucket * const b = Parrot_hsh_get_bucket(INTERP, hash, v);
             if (!b) {
                 /* not yet seen */
-                parrot_hash_put(INTERP, hash, v, v);
+                Parrot_hsh_put(INTERP, hash, v, v);
                 VTABLE_push_pmc(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->todo, v);
             }
         }

@@ -281,7 +281,7 @@ the next one.
         if (attrs->elements < 0)
             return CONST_STRING(INTERP, "");
 
-        return hash_key_to_string(INTERP, attrs->parrot_hash, attrs->bucket->key);
+        return Parrot_hsh_key_to_string(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }
 
 }

@@ -43,7 +43,7 @@ Get "key".
         if (!attrs->parrot_hash || !attrs->bucket)
             return PMCNULL;
 
-        return hash_key_to_pmc(INTERP, attrs->parrot_hash, attrs->bucket->key);
+        return Parrot_hsh_key_to_pmc(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }
 
     METHOD key() {
@@ -54,7 +54,7 @@ Get "key".
     METHOD value() {
         Parrot_HashIteratorKey_attributes *attrs =
                 PARROT_HASHITERATORKEY(SELF);
-        PMC *ret = hash_value_to_pmc(INTERP, attrs->parrot_hash, attrs->bucket->value);
+        PMC *ret = Parrot_hsh_value_to_pmc(INTERP, attrs->parrot_hash, attrs->bucket->value);
         RETURN(PMC* ret);
     }
 
@@ -71,7 +71,7 @@ Get "key".
         if (!attrs->parrot_hash || !attrs->bucket)
             return CONST_STRING(INTERP, "");
 
-        return hash_key_to_string(INTERP, attrs->parrot_hash, attrs->bucket->key);
+        return Parrot_hsh_key_to_string(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }
 
 /*
