@@ -738,7 +738,7 @@ CODE
 OUTPUT
 
 SKIP: {
-    skip( 'no ICU lib', 8 ) unless $PConfig{has_icu};
+    skip( 'no ICU lib', 10 ) unless $PConfig{has_icu};
 
     pir_output_is( <<'CODE', <<"OUTPUT", "unicode downcase" );
 .sub main :main
