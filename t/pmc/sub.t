@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -9,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 69;
+use Parrot::Test tests => 70;
 use Parrot::Config;
 
 =head1 NAME
@@ -26,6 +25,8 @@ Tests the creation and invocation of C<Sub>, C<Closure> and
 C<Continuation> PMCs.
 
 =cut
+
+my @todo;
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "PASM subs - invokecc" );
     .const 'Sub' P0 = "func"
@@ -65,7 +66,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Continuation" );
     set P5, 3
     set_global "foo", P5
     new P1, ['Continuation']
-    set_addr P1, endcont
+    set_label P1, endcont
 endcont:
     get_global P4, "foo"
     print "here "
@@ -97,7 +98,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "definedness of Continuation" );
     defined I1, P1
     print I1
     print "\n"
-    set_addr P1, cont
+    set_label P1, cont
     defined I1, P1
     print I1
     print "\n"
@@ -145,7 +146,7 @@ ok:
 .pcc_sub _the_sub:
     print "in sub\n"
     get_global P0, "_next_sub"
-    get_addr I0, P0
+    get_label I0, P0
     jump I0
     print "never here\n"
 
@@ -835,10 +836,7 @@ the_sub
 main
 OUTPUT
 
-my @todo = ( todo => 'broken with JIT (TT #983)' )
-    if ( defined $ENV{TEST_PROG_ARGS} and
-        $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ );
-pir_output_is( <<'CODE', <<'OUTPUT', "caller introspection via interp", @todo );
+pir_output_is( <<'CODE', <<'OUTPUT', "caller introspection via interp" );
 .sub main :main
 .include "interpinfo.pasm"
     # this test will fail when run with -Oc
@@ -992,21 +990,22 @@ OUTPUT
 unlink( $l1_pbc, $l2_pbc );
 
 pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const" );
-.sub make_pi :immediate :anon
-    $N0 = atan 1.0, 1.0
-    $N0 *= 4
+.sub make_phi :immediate :anon
+    $N0 = sqrt 5
+    $N0 += 1
+    $N0 /= 2
     $P0 = new ['Float']
     $P0 = $N0
     .return ($P0)
 .end
 
 .sub main :main
-    .const 'Sub' pi = "make_pi"
-    print pi
+    .const 'Sub' phi = "make_phi"
+    print phi
     print "\n"
 .end
 CODE
-3.14159265358979
+1.61803398874989
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const - obj" );
@@ -1157,7 +1156,7 @@ OUTPUT
 
 # see also #38964
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names, compilation' );
-.sub unicode:"\u7777"
+.sub utf8:"\u7777"
    print "ok\n"
 .end
 CODE
@@ -1165,24 +1164,24 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names, invocation' );
-.sub unicode:"\u7777"
+.sub utf8:"\u7777"
     print "ok\n"
 .end
 
 .sub test :main
-    unicode:"\u7777"()
+    utf8:"\u7777"()
 .end
 CODE
 ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names, dynamic' );
-.sub unicode:"\u7777"
+.sub utf8:"\u7777"
     print "ok\n"
 .end
 
 .sub test :main
-    $P1 = find_name unicode:"\u7777"
+    $P1 = find_name utf8:"\u7777"
     $P1()
 .end
 CODE
@@ -1190,12 +1189,12 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names' );
-.sub unicode:"\u7777"
+.sub utf8:"\u7777"
     print "ok\n"
 .end
 
 .sub test :main
-    # unicode:"\u7777" ends up as a string nicode:"\u7777
+    # utf8:"\u7777" ends up as a string nicode:"\u7777
     # (or it did, in r12860)
     $P1 = find_name 'nicode:"\u7777'
     unless null $P1 goto bad
@@ -1208,11 +1207,11 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub constant' );
 .sub main :main
-    .const 'Sub' s = unicode:"\u7777"
+    .const 'Sub' s = utf8:"\u7777"
     s()
 .end
 
-.sub unicode:"\u7777"
+.sub utf8:"\u7777"
    print "ok\n"
 .end
 CODE
@@ -1727,6 +1726,24 @@ named_required 3
 named_optional 5
 named_slurpy 8
 OUTPUT
+
+pir_output_is( <<'CODE', <<'OUT', 'interface' );
+.sub 'main' :main
+    .const 'Sub' $P0 = "main"
+
+    $I0 = does $P0, 'scalar'
+    say $I0 # Sub does not scalar
+    $I0 = does $P0, 'invokable'
+    say $I0 # Sub does invokable
+    $I0 = does $P0, 'no_interface'
+    say $I0 # Sub does not no_interface
+.end
+CODE
+0
+1
+0
+OUT
+
 
 # Local Variables:
 #   mode: cperl

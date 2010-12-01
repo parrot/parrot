@@ -1,6 +1,5 @@
-#!parrot
+#!./parrot
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -17,13 +16,7 @@ Tests the metamodel for the OO implementation.
 =cut
 
 .sub _main :main
-    load_bytecode 'Test/More.pbc'
-
-    .local pmc exports, curr_namespace, test_namespace
-    curr_namespace = get_namespace
-    test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports = split " ", "plan ok is isa_ok skip todo"
-    test_namespace.'export_to'(curr_namespace, exports)
+    .include 'test_more.pir'
 
     plan( 12 )
 
@@ -52,7 +45,7 @@ Tests the metamodel for the OO implementation.
     $P1 = attributes['tail']
     $S1 = $P1['type']
     $I0 = iseq $S1, 'Str'
-    todo($I0, "tail attribute has a type", "not implemented")
+    todo($I0, "tail attribute has a type", "not implemented: TT #1618")
 #    is($S1,'Str', "tail attribute has a type")
     goto end_tail_attrib_test
   no_tail_attribute:
@@ -85,10 +78,9 @@ FAIL:
     fail("no attribute")
 NEXT:
 
-    todo(0, "new opcode makes working objects", "not implemented")
-#    $P0 = new "Dog"
-#    $I0 = defined $P0
-#    isa_ok($P0, "Dog", "new opcode makes working objects")
+    $P0 = new "Dog"
+    $I0 = defined $P0
+    isa_ok($P0, "Dog", "new opcode makes working objects")
 
 .end
 

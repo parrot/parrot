@@ -1,11 +1,10 @@
 #! perl
 # Copyright (C) 2007-2008, Parrot Foundation.
-# $Id$
 # auto/opengl-01.t
 
 use strict;
 use warnings;
-use Test::More tests => 32;
+use Test::More tests => 29;
 use Carp;
 use lib qw( lib );
 use_ok('config::auto::opengl');
@@ -138,26 +137,8 @@ my $test = qq{$try[0] $try[1]\n};
     my ($glut_api_version, $glut_brand);
     capture(
         sub { ($glut_api_version, $glut_brand) = $step->_evaluate_cc_run(
+            $conf,
             $test,
-            0,
-        ); },
-        \$stdout,
-        \$stderr,
-    );
-    is( $glut_api_version, $try[0],
-        "Got first expected return value for _evaluate_cc_run()." );
-    is( $glut_brand, $try[1],
-        "Got first expected return value for _evaluate_cc_run()." );
-    ok(! $stdout, "Nothing captured on STDOUT, as expected");
-}
-
-{
-    my ($stdout, $stderr);
-    my ($glut_api_version, $glut_brand);
-    capture(
-        sub { ($glut_api_version, $glut_brand) = $step->_evaluate_cc_run(
-            $test,
-            $conf->options->get( 'verbose' )
         ); },
         \$stdout,
         \$stderr,
@@ -171,6 +152,8 @@ my $test = qq{$try[0] $try[1]\n};
         qr/yes, $glut_brand API version $glut_api_version/,
         "Got expected verbose output for _evaluate_cc_run()"
     );
+    # prepare for next test
+    $conf->options->set(verbose => undef);
 }
 
 ########## _handle_glut() ##########

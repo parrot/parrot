@@ -1,5 +1,4 @@
 # Copyright (C) 2007-2009, Parrot Foundation.
-# $Id$
 package Parrot::Configure::Options::Conf::Shared;
 
 use strict;
@@ -10,12 +9,13 @@ our @EXPORT_OK = qw(
 );
 
 our @shared_valid_options = qw{
+    ar
+    arflags
     bindir
     cage
     cc
     ccflags
     ccwarn
-    cgoto
     configure_trace
     cxx
     darwin_no_fink
@@ -40,7 +40,6 @@ our @shared_valid_options = qw{
     intval
     jitcapable
     buildframes
-    languages
     ld
     ldflags
     lex
@@ -61,6 +60,7 @@ our @shared_valid_options = qw{
     ops
     optimize
     parrot_is_shared
+    pkgconfigdir
     prefix
     profile
     sbindir
@@ -72,13 +72,18 @@ our @shared_valid_options = qw{
     verbose-step
     version
     without-crypto
+    without-core-nci-thunks
+    without-extra-nci-thunks
     without-gdbm
     without-gettext
     without-gmp
     without-icu
     without-opengl
+    without-libffi
+    without-readline
     without-pcre
     without-threads
+    without-zlib
     yacc
 };
 

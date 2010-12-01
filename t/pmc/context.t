@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -48,7 +47,7 @@ TODO: Implement real tests when CallContext PMC will be migrated to use ATTRibut
     $P0 = newclass 'Foo'
 .end
 
-.sub 'test_inspect' :method :outer('load')
+.sub 'test_inspect' :method :nsentry('test_inspect') :outer('load')
     .include 'test_more.pir'
 
     .local pmc ctx

@@ -1,7 +1,6 @@
 #! perl
 ################################################################################
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 ################################################################################
 
 =head1 TITLE
@@ -159,9 +158,11 @@ my(%metatransforms) = (
             my($filehash) = @_;
             # For the time being this is hardcoded as being installed under
             # libdir as it is typically done with automake installed packages.
-            # If there is a use case to make this configurable we'll add a
-            # seperate --pkgconfigdir option.
+            # If the --pkgconfigdir option is used, then the default value will
+            # be overwritten with the specified subdirectory under libdir.
             $filehash->{DestDirs} = ['pkgconfig', $parrotdir];
+            $filehash->{DestDirs} = [$options{pkgconfigdir}]
+                if $options{pkgconfigdir};
             return($filehash);
         },
     },

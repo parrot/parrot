@@ -1,11 +1,10 @@
 #! perl
 # Copyright (C) 2007-2008, Parrot Foundation.
-# $Id$
 # gen/platform-01.t
 
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 12;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -39,24 +38,20 @@ $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
 
-ok(-f $step->{platform_interface},
-    "Located required platform interface header");
-
 my $platform_orig = $conf->data->get('osname');
 my $archname_orig = $conf->data->get('archname');
 $conf->data->set( archname => 'foo-bar' );
-my $verbose = 0;
 
 ########## _get_generated() ##########
 
 my $TEMP_generated_orig = $conf->data->get('TEMP_generated');
 {
-    $verbose = 1;
+    $conf->options->set(verbose => 1);
     my ($stdout, $stderr, $rv);
     my $expected = q{foo};
     $conf->data->set( TEMP_generated => $expected );
     capture(
-        sub { $rv = $step->_get_generated( $conf, $verbose ) },
+        sub { $rv = $step->_get_generated( $conf ) },
         \$stdout,
         \$stderr,
     );
@@ -64,8 +59,8 @@ my $TEMP_generated_orig = $conf->data->get('TEMP_generated');
     like( $stdout, qr/\($expected\)/, "Got expected verbose output");
 }
 $conf->data->set( TEMP_generated => undef );
-$verbose = 0;
-is( $step->_get_generated( $conf, $verbose ), q{},
+$conf->options->set(verbose => 0);
+is( $step->_get_generated( $conf ), q{},
     "Got expected generated");
 
 # re-set to original values

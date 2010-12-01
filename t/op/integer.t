@@ -1,6 +1,5 @@
-#!parrot
+#!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -16,7 +15,7 @@ Tests the use of Parrot integer registers.
 
 =cut
 
-.const int TESTS = 202
+.const int TESTS = 153
 
 .sub 'test' :main
     .include 'test_more.pir'
@@ -30,9 +29,9 @@ Tests the use of Parrot integer registers.
     test_sub()
     test_mul()
     test_div()
+    test_fdiv()
     test_mod()
     mod_negative_zero_rest()
-    test_cmod()
     test_eq()
     test_ne()
     test_lt()
@@ -47,11 +46,9 @@ Tests the use of Parrot integer registers.
     test_dec()
     test_sub_i_i()
     test_set_n()
-    test_cleari()
     test_neg()
-    test_fact()
+    test_negate_max_integer()
     test_mul_i_i()
-    test_exchange()
     test_null()
     test_div_i_i_by_zero()
     test_div_i_ic_by_zero()
@@ -63,9 +60,6 @@ Tests the use of Parrot integer registers.
     test_fdiv_i_i_i_by_zero()
     test_fdiv_i_ic_i_by_zero()
     test_fdiv_i_i_ic_by_zero()
-    test_cmod_i_i_i_by_zero()
-    test_cmod_i_ic_i_by_zero()
-    test_cmod_i_i_ic_by_zero()
     test_mod_i_i_i_by_zero()
     test_mod_i_ic_i_by_zero()
     test_mod_i_i_ic_by_zero()
@@ -283,6 +277,18 @@ Tests the use of Parrot integer registers.
     is($I1, 10, 'div_i_ic_ic')
 .end
 
+.sub 'test_fdiv'
+    $I0 = 9
+    $I1 = -4
+    fdiv $I0, $I1
+    is($I0, -3, 'fdiv_i_i with negative divisor')
+
+    $I0 = 9
+    $I1 = -4
+    $I2 = fdiv $I0, $I1
+    is($I2, -3, 'fdiv_i_i_i with negative divisor')
+.end
+
 .sub 'test_mod'
     $I0 = 5
     $I1 = 0
@@ -338,26 +344,6 @@ Tests the use of Parrot integer registers.
 
     $I1 = mod -3, -3
     is($I1, 0, 'mod - negative, zero rest (#36003), -3 mod -3 = 0')
-.end
-
-.sub 'test_cmod'
-    $I0 = 5
-    $I1 = 3
-    $I2 = cmod $I0, $I1
-    is($I2, 2, 'cmod_i_i_i')
-    is($I0, 5, 'cmod_i_i_i - dividend unchanged')
-    is($I1, 3, 'cmod_i_i_i - divisor unchanged')
-
-    $I0 = 12
-
-    $I1 = cmod $I0, 10
-    is($I1, 2, 'cmod_i_i_ic')
-
-    $I1 = cmod 14, $I0
-    is($I1, 2, 'cmod_i_ic_i')
-
-    $I1 = cmod 13, 11
-    is($I1, 2, 'cmod_i_ic_ic')
 .end
 
 .sub 'test_eq'
@@ -751,76 +737,6 @@ Tests the use of Parrot integer registers.
     is($N2, -2147483648.0, 'set_n_i - negative integer')
 .end
 
-.sub 'test_cleari'
-    $I0 = 0xdeadbee
-    $I1 = 0xdeadbee
-    $I2 = 0xdeadbee
-    $I3 = 0xdeadbee
-    $I4 = 0xdeadbee
-    $I5 = 0xdeadbee
-    $I6 = 0xdeadbee
-    $I7 = 0xdeadbee
-    $I8 = 0xdeadbee
-    $I9 = 0xdeadbee
-    $I10 = 0xdeadbee
-    $I11 = 0xdeadbee
-    $I12 = 0xdeadbee
-    $I13 = 0xdeadbee
-    $I14 = 0xdeadbee
-    $I15 = 0xdeadbee
-    $I16 = 0xdeadbee
-    $I17 = 0xdeadbee
-    $I18 = 0xdeadbee
-    $I19 = 0xdeadbee
-    $I20 = 0xdeadbee
-    $I21 = 0xdeadbee
-    $I22 = 0xdeadbee
-    $I23 = 0xdeadbee
-    $I24 = 0xdeadbee
-    $I25 = 0xdeadbee
-    $I26 = 0xdeadbee
-    $I27 = 0xdeadbee
-    $I28 = 0xdeadbee
-    $I29 = 0xdeadbee
-    $I30 = 0xdeadbee
-    $I31 = 0xdeadbee
-
-    cleari
-
-    is($I0, 0, 'cleari - $I0 cleared')
-    is($I1, 0, 'cleari - $I1 cleared')
-    is($I2, 0, 'cleari - $I2 cleared')
-    is($I3, 0, 'cleari - $I3 cleared')
-    is($I4, 0, 'cleari - $I4 cleared')
-    is($I5, 0, 'cleari - $I5 cleared')
-    is($I6, 0, 'cleari - $I6 cleared')
-    is($I7, 0, 'cleari - $I7 cleared')
-    is($I8, 0, 'cleari - $I8 cleared')
-    is($I9, 0, 'cleari - $I9 cleared')
-    is($I10, 0, 'cleari - $I10 cleared')
-    is($I11, 0, 'cleari - $I11 cleared')
-    is($I12, 0, 'cleari - $I12 cleared')
-    is($I13, 0, 'cleari - $I13 cleared')
-    is($I14, 0, 'cleari - $I14 cleared')
-    is($I15, 0, 'cleari - $I15 cleared')
-    is($I16, 0, 'cleari - $I16 cleared')
-    is($I17, 0, 'cleari - $I17 cleared')
-    is($I18, 0, 'cleari - $I18 cleared')
-    is($I19, 0, 'cleari - $I19 cleared')
-    is($I20, 0, 'cleari - $I20 cleared')
-    is($I21, 0, 'cleari - $I21 cleared')
-    is($I22, 0, 'cleari - $I22 cleared')
-    is($I23, 0, 'cleari - $I23 cleared')
-    is($I24, 0, 'cleari - $I24 cleared')
-    is($I25, 0, 'cleari - $I25 cleared')
-    is($I26, 0, 'cleari - $I26 cleared')
-    is($I27, 0, 'cleari - $I27 cleared')
-    is($I28, 0, 'cleari - $I28 cleared')
-    is($I29, 0, 'cleari - $I29 cleared')
-    is($I30, 0, 'cleari - $I30 cleared')
-    is($I31, 0, 'cleari - $I31 cleared')
-.end
-
 .sub 'test_neg'
     $I0 = neg 3
     $I0 = neg $I0
@@ -829,56 +745,43 @@ Tests the use of Parrot integer registers.
     is($I0, -3, 'neg_i')
 .end
 
+# Test to ensure that the negative of the maximum integer is equal to the
+# minimum integer + 1. This should be true because we are assuming a
+# two's-complement machine.
+
+.include 'iglobals.pasm'
+.sub test_negate_max_integer
+    .local int max, min
+
+    $P0 = getinterp
+    $P1 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I0 = $P1['intvalsize']
+
+    # XXX can't use sysinfo (from sys_ops) in coretest
+    # build up 2's compliment min and max integers manually
+    max = 0x7F
+    min = 0x80
+    dec $I0
+  loop:
+    unless $I0 goto end_loop
+    min <<= 8
+    max <<= 8
+    max  |= 0xFF
+    dec $I0
+    goto loop
+  end_loop:
+
+    neg max
+    inc min
+    is(max, min)
+.end
+
 .sub 'test_mul_i_i'
     $I0 = 3
     $I1 = 4
     mul $I0, $I1
 
     is($I0, 12, 'mul_i_i')
-.end
-
-.sub 'test_fact'
-    $I0 = 3
-    $I1 = 11
-    $I2 = 0
-    $I3 = -563
-
-    $I5 = fact $I0
-    is($I5, 6, 'fact_i_i - first')
-
-    $I6 = fact $I1
-    is($I6, 39916800, 'fact_i_i - second')
-
-    $I7 = fact $I2
-    is($I7, 1, 'fact_i_i on zero')
-
-    $I8 = fact $I3
-    is($I8, 1, 'fact_i_i on a negative integer')
-
-    # Now run the same tests, with constants instead
-    $I5 = fact 3
-    is($I5, 6, 'fact_i_ic - first')
-
-    $I6 = fact 11
-    is($I6, 39916800, 'fact_i_ic - second')
-
-    $I7 = fact 0
-    is($I7, 1, 'fact_i_ic on zero')
-
-    $I8 = fact -563
-    is($I8, 1, 'fact_i_ic on a negative integer')
-.end
-
-.sub 'test_exchange'
-    $I10 = 10
-    $I20 = 20
-    exchange $I10, $I20
-    is($I10, 20, 'exchange - first operand ok')
-    is($I20, 10, 'exchange - second operand ok')
-
-    $I30 = 30
-    exchange $I30, $I30
-    is($I30, 30, 'exchange - reflexive')
 .end
 
 .sub 'test_null'
@@ -1040,52 +943,6 @@ Tests the use of Parrot integer registers.
 
   test_fdiv_i_i_ic_by_zero_end:
     ok($I3, 'fdiv_i_i_ic by zero')
-.end
-
-.sub 'test_cmod_i_i_i_by_zero'
-    $I0 = 0
-    $I1 = 10
-    push_eh test_cmod_i_i_i_by_zero_catch
-    $I2 = cmod $I1, $I0
-    pop_eh
-    $I3 = 0
-    goto test_cmod_i_i_i_by_zero_end
-
-  test_cmod_i_i_i_by_zero_catch:
-    $I3 = 1
-
-  test_cmod_i_i_i_by_zero_end:
-    ok($I3, 'cmod_i_i_i by zero')
-.end
-
-.sub 'test_cmod_i_ic_i_by_zero'
-    $I0 = 0
-    push_eh test_cmod_i_ic_i_by_zero_catch
-    $I2 = cmod 10, $I0
-    pop_eh
-    $I3 = 0
-    goto test_cmod_i_ic_i_by_zero_end
-
-  test_cmod_i_ic_i_by_zero_catch:
-    $I3 = 1
-
-  test_cmod_i_ic_i_by_zero_end:
-    ok($I3, 'cmod_i_ic_i by zero')
-.end
-
-.sub 'test_cmod_i_i_ic_by_zero'
-    $I1 = 10
-    push_eh test_cmod_i_i_ic_by_zero_catch
-    $I2 = cmod $I1, 0
-    pop_eh
-    $I3 = 0
-    goto test_cmod_i_i_ic_by_zero_end
-
-  test_cmod_i_i_ic_by_zero_catch:
-    $I3 = 1
-
-  test_cmod_i_i_ic_by_zero_end:
-    ok($I3, 'cmod_i_i_ic by zero')
 .end
 
 .sub 'test_mod_i_i_i_by_zero'

@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -280,6 +279,7 @@ use Cwd;
 use File::Spec;
 use File::Basename;
 use Memoize ();
+use IO::File ();
 
 use lib qw( lib );
 use Parrot::BuildUtil ();
@@ -297,7 +297,6 @@ use base qw( Exporter );
 Memoize::memoize('path_to_parrot');
 
 # Tell parrot it's being tested--disables searching of installed libraries.
-# (see Parrot_get_runtime_prefix in src/library.c).
 $ENV{PARROT_TEST} = 1 unless defined $ENV{PARROT_TEST};
 
 my $builder = Test::Builder->new();
@@ -401,10 +400,14 @@ sub write_code_to_file {
     return;
 }
 
+{
+    no warnings 'once';
 # We can inherit from other modules, so we do so.
 *plan = \&Test::More::plan;
 *skip = \&Test::More::skip;
 *slurp_file = \&Parrot::BuildUtil::slurp_file;
+
+}
 
 sub convert_line_endings {
     my ($text) = @_;
@@ -443,7 +446,7 @@ sub generate_languages_functions {
             # set a todo-item for Test::Builder to find
             my $call_pkg = $self->{builder}->exported_to() || '';
 
-            no strict 'refs';
+            no strict 'refs';  ## no critic Variables::ProhibitConditionalDeclarations
 
             local *{ $call_pkg . '::TODO' } = ## no critic Variables::ProhibitConditionalDeclarations
                 \$options{todo}
@@ -493,17 +496,27 @@ sub generate_languages_functions {
             }
 
             # The generated files are left in the t/* directories.
-            # Let 'make clean' and 'svn:ignore' take care of them.
+            # Let 'make clean' and '.gitignore' take care of them.
 
             return;
         };
 
         my ($package) = caller();
 
-        no strict 'refs';
-
-        *{ $package . '::' . $func } = $test_sub;
+        create_sub($package, $func, $test_sub);
     }
+}
+
+sub create_sub {
+    my $package = shift;
+    my $func    = shift;
+    my $sub     = shift;
+
+    no strict 'refs';
+
+    *{ $package . '::' . $func } = $sub;
+
+    return;
 }
 
 =over
@@ -623,10 +636,10 @@ sub _run_test_file {
         $run_exec = 1;
         my $pbc_f = per_test( '.pbc', $test_no );
         my $o_f = per_test( '_pbcexe' . $PConfig{o}, $test_no );
-        my $exe_f =
-            per_test( '_pbcexe' . $PConfig{exe}, $test_no )
-            ;    # Make cleanup and svn:ignore more simple
-        my $exec_f = per_test( '_pbcexe', $test_no );    # Make cleanup and svn:ignore more simple
+
+        # make cleanup and .gitignore more simple
+        my $exe_f = per_test( '_pbcexe' . $PConfig{exe}, $test_no );
+        my $exec_f = per_test( '_pbcexe', $test_no );
         $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
 
         run_command(
@@ -691,8 +704,6 @@ sub _generate_test_functions {
     my $path_to_parrot = path_to_parrot();
     my $parrot         = File::Spec->join( File::Spec->curdir(),
                             'parrot' . $PConfig{exe} );
-    my $pirc           = File::Spec->join( File::Spec->curdir(),
-                            qw( compilers pirc ), "pirc$PConfig{exe}" );
 
     ##### 1: Parrot test map #####
     my %parrot_test_map = map {
@@ -766,9 +777,7 @@ sub _generate_test_functions {
             return $pass;
         };
 
-        no strict 'refs';
-
-        *{ $package . '::' . $func } = $test_sub;
+        create_sub($package, $func, $test_sub);
     }
 
     ##### 2: PIR-to-PASM test map #####
@@ -777,11 +786,6 @@ sub _generate_test_functions {
         pir_2_pasm_isnt    => 'isnt_eq',
         pir_2_pasm_like    => 'like',
         pir_2_pasm_unlike  => 'unlike',
-
-        pirc_2_pasm_is     => 'is_eq',
-        pirc_2_pasm_isnt   => 'isnt_eq',
-        pirc_2_pasm_like   => 'like',
-        pirc_2_pasm_unlike => 'unlike',
     );
 
     foreach my $func ( keys %pir_2_pasm_test_map ) {
@@ -819,8 +823,6 @@ sub _generate_test_functions {
                 $args   .= " $opt --output=$out_f";
                 $args    =~ s/--run-exec//;
                 $cmd       = qq{$parrot $args "$code_f"};
-            } elsif ($func =~ /^pirc_/) {
-                $cmd       = qq{$pirc -b -x "$code_f"};
             }
 
             write_code_to_file( $code, $code_f );
@@ -860,9 +862,7 @@ sub _generate_test_functions {
             return $pass;
         };
 
-        no strict 'refs';
-
-        *{ $package . '::' . $func } = $test_sub;
+        create_sub($package, $func, $test_sub);
     }
 
     ##### 3: Language test map #####
@@ -926,9 +926,7 @@ sub _generate_test_functions {
             }
         };
 
-        no strict 'refs';
-
-        *{ $package . '::' . $func } = $test_sub;
+        create_sub($package, $func, $test_sub);
     }
 
     ##### 4:  Example test map #####
@@ -973,9 +971,7 @@ sub _generate_test_functions {
             }
         };
 
-        no strict 'refs';
-
-        *{ $package . '::' . $func } = $test_sub;
+        create_sub($package, $func, $test_sub);
     }
 
     ##### 5: C test map #####
@@ -1100,9 +1096,7 @@ sub _generate_test_functions {
             return $pass;
         };
 
-        no strict 'refs';
-
-        *{ $package . '::' . $func } = $test_sub;
+        create_sub($package, $func, $test_sub);
     }
 
     return;

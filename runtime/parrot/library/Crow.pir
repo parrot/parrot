@@ -1,5 +1,4 @@
 # Copyright (C) 2007-2009, Parrot Foundation.
-# $Id$
 
 .namespace ['Crow']
 
@@ -15,8 +14,8 @@
     getopts = new ['Getopt';'Obj']
     getopts.'notOptStop'(1)
 
-    getopts = push 'help|h'
-    getopts = push 'type|t=s'
+    push getopts, 'help|h'
+    push getopts, 'type|t=s'
 
     .local pmc opts
     opts = getopts.'get_options'(args)
@@ -65,7 +64,8 @@ END_HELP
     .local pmc newsfile
     .local string buf, news, start
 
-    newsfile = open 'NEWS', 'r'
+    newsfile = new ['FileHandle']
+    newsfile.'open'('NEWS', 'r')
 
     ## find the start of the news item for this version
     start    = concat 'New in ', version
@@ -73,12 +73,12 @@ END_HELP
   before:
     $I0 = newsfile.'eof'()
     if $I0 goto err_news
-    buf      = readline newsfile
+    buf      = newsfile.'readline'()
     $I0      = index buf, start
     if  $I0 != 0 goto before
 
   blank:
-    buf      = readline newsfile
+    buf      = newsfile.'readline'()
     $I0      = index buf, "\n"
     if  $I0 == 0 goto blank
     $I0      = index buf, "\r"
@@ -86,7 +86,7 @@ END_HELP
     news    .= buf
 
   item:
-    buf      = readline newsfile
+    buf      = newsfile.'readline'()
     $I0      = index buf, "\n"
     if  $I0 == 0 goto done
     $I0      = index buf, "\r"
@@ -124,7 +124,7 @@ END_HELP
         $I0 = index template, symbol
         if -1 == $I0 goto repl_done
         $I1 = length symbol
-        substr template, $I0, $I1, value
+        template = replace template, $I0, $I1, value
         goto repl_loop
       repl_done:
     goto it_loop

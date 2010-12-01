@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2008, Parrot Foundation.
-$Id$
+Copyright (C) 2008-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -17,8 +16,18 @@ than an external file. Commonly used as a mock FileHandle for testing.
 
 #include "../src/io/io_private.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
 PARROT_INLINE
-static int encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s));
+static int encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_encoding_is_utf8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 /*
 
@@ -26,7 +35,7 @@ static int encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s));
 
 =over 4
 
-=item C<static int encoding_is_utf8()>
+=item C<static int encoding_is_utf8(PARROT_INTERP, const STRING *s)>
 
 Helper function for internal usage. Return 1 if the string argument is
 not null and has utf8 encoding, 0 otherwise.
@@ -38,12 +47,14 @@ not null and has utf8 encoding, 0 otherwise.
 */
 
 PARROT_INLINE
-static int encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
+static int
+encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
+    ASSERT_ARGS(encoding_is_utf8)
     if (STRING_IS_NULL(s))
         return 0;
     else
-        return Parrot_str_equal(interp, s, CONST_STRING(interp, "utf8"));
+        return STRING_equal(interp, s, CONST_STRING(interp, "utf8"));
 }
 
 pmclass StringHandle extends Handle auto_attrs {
@@ -69,7 +80,7 @@ Initializes a newly created StringHandle object.
 */
 
     VTABLE void init() {
-        Parrot_StringHandle_attributes *data_struct =
+        Parrot_StringHandle_attributes * const data_struct =
                 (Parrot_StringHandle_attributes *) PMC_data(SELF);
 
         data_struct->flags        = 0;
@@ -97,12 +108,9 @@ Create a copy of the stringhandle.
         PMC * const copy = Parrot_pmc_new(INTERP, enum_class_StringHandle);
         Parrot_StringHandle_attributes * const data_struct = PARROT_STRINGHANDLE(copy);
 
-        if (old_struct->stringhandle != NULL)
-            data_struct->stringhandle = Parrot_str_copy(INTERP, old_struct->stringhandle);
-        if (old_struct->mode != NULL)
-            data_struct->mode     = Parrot_str_copy(INTERP, old_struct->mode);
-        if (old_struct->encoding != NULL)
-            data_struct->encoding = Parrot_str_copy(INTERP, old_struct->encoding);
+        data_struct->stringhandle = old_struct->stringhandle;
+        data_struct->mode     = old_struct->mode;
+        data_struct->encoding = old_struct->encoding;
         data_struct->flags    = old_struct->flags;
 
         return copy;
@@ -120,10 +128,10 @@ Mark active stringhandle data as live.
 
     VTABLE void mark() {
         Parrot_StringHandle_attributes * const data_struct = PARROT_STRINGHANDLE(SELF);
-        Parrot_gc_mark_STRING_alive(interp, data_struct->stringhandle);
-        Parrot_gc_mark_STRING_alive(interp, data_struct->mode);
-        Parrot_gc_mark_STRING_alive(interp, data_struct->encoding);
-        Parrot_gc_mark_STRING_alive(interp, data_struct->filename);
+        Parrot_gc_mark_STRING_alive(INTERP, data_struct->stringhandle);
+        Parrot_gc_mark_STRING_alive(INTERP, data_struct->mode);
+        Parrot_gc_mark_STRING_alive(INTERP, data_struct->encoding);
+        Parrot_gc_mark_STRING_alive(INTERP, data_struct->filename);
     }
 
 /*
@@ -170,10 +178,10 @@ stored for mocking.
         INTVAL flags;
 
         if (got_mode && !STRING_IS_NULL(mode))
-            SET_ATTR_mode(INTERP, SELF, Parrot_str_copy(INTERP, mode));
+            SET_ATTR_mode(INTERP, SELF, mode);
 
         if (got_filename && !STRING_IS_NULL(filename))
-            SET_ATTR_filename(INTERP, SELF, Parrot_str_copy(INTERP, filename));
+            SET_ATTR_filename(INTERP, SELF, filename);
 
 
         /* If StringHandle hasn't already been initialized, create a new string. */
@@ -184,9 +192,10 @@ stored for mocking.
 
             GET_ATTR_encoding(INTERP, SELF, encoding);
             if (encoding_is_utf8(INTERP, encoding))
-                new_string = string_make(INTERP, "", 0, "unicode", 0);
+                new_string = Parrot_str_new_init(INTERP, "", 0,
+                        Parrot_utf8_encoding_ptr, 0);
             else
-                new_string = Parrot_str_new(INTERP, "", 0);
+                new_string = CONST_STRING(INTERP, "");
 
             SET_ATTR_stringhandle(INTERP, SELF, new_string);
         }
@@ -194,43 +203,16 @@ stored for mocking.
         /* Set a default mode of read-only. */
         GET_ATTR_mode(INTERP, SELF, open_mode);
         if (STRING_IS_NULL(open_mode)) {
-            open_mode = Parrot_str_new_constant(INTERP, "r");
+            open_mode = CONST_STRING(INTERP, "r");
             SET_ATTR_mode(INTERP, SELF, open_mode);
         }
 
-        SELF = Parrot_io_open(INTERP, SELF, filename, open_mode);
+        flags = Parrot_io_parse_open_flags(INTERP, open_mode);
+        SET_ATTR_flags(INTERP, SELF, flags);
 
         RETURN(PMC *SELF);
     }
 
-/*
-
-=item C<METHOD is_tty()>
-
-StringHandles are never tty's, returns false.
-
-=cut
-
-*/
-    METHOD is_tty() {
-        RETURN(INTVAL 0);
-    }
-
-/*
-
-=item C<METHOD close()>
-
-Reset some core data for the StringHandle, but don't delete the string data, as
-it may be wanted later (for capturing the results).
-
-=cut
-
-*/
-
-    METHOD close() {
-        SET_ATTR_read_offset(INTERP, SELF, 0);
-        RETURN(INTVAL 0);
-    }
 
 /*
 
@@ -243,8 +225,10 @@ Check if the StringHandle is open.
 */
 
     METHOD is_closed() {
+        STRING *stringhandle;
         INTVAL status;
-        status = Parrot_io_is_closed(INTERP, SELF);
+        GET_ATTR_stringhandle(INTERP, SELF, stringhandle);
+        status = STRING_IS_NULL(stringhandle);
         RETURN(INTVAL status);
     }
 
@@ -260,8 +244,7 @@ C<bytes> argument is currently ignored.
 */
 
     METHOD read(INTVAL length) {
-        STRING *string_result;
-        string_result = Parrot_io_reads(INTERP, SELF, length);
+        STRING * const string_result = Parrot_io_reads(INTERP, SELF, length);
         RETURN(STRING *string_result);
     }
 
@@ -277,8 +260,7 @@ responds to "\n" newlines.)
 */
 
     METHOD readline() {
-        STRING *string_result;
-        string_result = Parrot_io_readline(INTERP, SELF);
+        STRING * const string_result = Parrot_io_readline(INTERP, SELF);
         RETURN(STRING *string_result);
     }
 
@@ -301,12 +283,11 @@ StringHandle object that isn't opened yet, returns an empty string.
             STRING *encoding;
             GET_ATTR_encoding(INTERP, SELF, encoding);
             if (encoding_is_utf8(INTERP, encoding))
-                string_result = string_make(INTERP, "", 0, "unicode", 0);
+                string_result = Parrot_str_new_init(INTERP, "", 0,
+                        Parrot_utf8_encoding_ptr, 0);
             else
-                string_result = Parrot_str_new_constant(INTERP, "");
+                string_result = CONST_STRING(INTERP, "");
         }
-        else
-            string_result = Parrot_str_copy(INTERP, string_result);
 
         RETURN(STRING *string_result);
     }
@@ -339,7 +320,7 @@ Print the passed in integer, number, string, or PMC to the stringhandle.
     METHOD print(PMC *to_print) {
         STRING * const string_to_print = VTABLE_get_string(INTERP, to_print);
 
-        Parrot_io_putps(interp, SELF, string_to_print);
+        Parrot_io_putps(INTERP, SELF, string_to_print);
     }
 
 /*
@@ -358,19 +339,19 @@ Print the string to the stringhandle.
 
         GET_ATTR_stringhandle(INTERP, SELF, old_string);
         if (STRING_IS_NULL(old_string))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot write to a closed filehandle");
 
         GET_ATTR_flags(INTERP, SELF, flags);
         if (!(flags & PIO_F_WRITE))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot write to a filehandle not opened for write");
 
-        new_string = Parrot_str_append(interp, old_string, to_print);
+        new_string = Parrot_str_concat(INTERP, old_string, to_print);
 
         SET_ATTR_stringhandle(INTERP, SELF, new_string);
 
-        status = Parrot_str_byte_length(interp, new_string);
+        status = Parrot_str_byte_length(INTERP, new_string);
         RETURN(INTVAL status);
     }
 
@@ -394,15 +375,15 @@ ignored, but stored for mocking.
         GET_ATTR_flags(INTERP, SELF, flags);
 
         if (got_type) {
-            if (Parrot_str_equal(INTERP, new_type, nobuffer_string)) {
+            if (STRING_equal(INTERP, new_type, nobuffer_string)) {
                 flags &= ~ PIO_F_LINEBUF;
                 flags &= ~ PIO_F_BLKBUF;
             }
-            else if (Parrot_str_equal(INTERP, new_type, linebuffer_string)) {
+            else if (STRING_equal(INTERP, new_type, linebuffer_string)) {
                 flags |=   PIO_F_LINEBUF;
                 flags &= ~ PIO_F_BLKBUF;
             }
-            else if (Parrot_str_equal(INTERP, new_type, fullbuffer_string)) {
+            else if (STRING_equal(INTERP, new_type, fullbuffer_string)) {
                 flags &= ~ PIO_F_LINEBUF;
                 flags |=   PIO_F_BLKBUF;
             }
@@ -435,7 +416,7 @@ Returns the current size of the stringhandle.
 
         if (STRING_IS_NULL(stringhandle))
             RETURN(INTVAL 0);
-        buffer_size = Parrot_str_byte_length(interp, stringhandle);
+        buffer_size = Parrot_str_byte_length(INTERP, stringhandle);
 
         RETURN(INTVAL buffer_size);
 
@@ -452,13 +433,9 @@ Retrieve the read mode string for the stringhandle.
 */
 
     METHOD mode() {
-        STRING *mode, *mode_copy;
-
+        STRING *mode;
         GET_ATTR_mode(INTERP, SELF, mode);
-        mode_copy = Parrot_str_copy(INTERP, mode);
-
-        RETURN(STRING *mode_copy);
-
+        RETURN(STRING *mode);
     }
 
 /*
@@ -474,21 +451,14 @@ scheme) for the stringhandle.
 
     METHOD encoding(STRING *new_encoding :optional, INTVAL got_encoding :opt_flag) {
         STRING *encoding;
-        STRING *encoding_copy = NULL;
 
         if (got_encoding) {
-            if (!STRING_IS_NULL(new_encoding))
-                encoding_copy = Parrot_str_copy(INTERP, new_encoding);
-            SET_ATTR_encoding(INTERP, SELF, encoding_copy);
+            SET_ATTR_encoding(INTERP, SELF, new_encoding);
             RETURN(STRING *new_encoding);
         }
 
         GET_ATTR_encoding(INTERP, SELF, encoding);
-        if (!STRING_IS_NULL(encoding))
-            encoding_copy = Parrot_str_copy(INTERP, encoding);
-
-        RETURN(STRING *encoding_copy);
-
+        RETURN(STRING *encoding);
     }
 
 /*
@@ -527,6 +497,7 @@ value.
 */
 
     METHOD get_fd() {
+        UNUSED(INTERP);
         RETURN(INTVAL -1);
     }
 
@@ -545,5 +516,5 @@ value.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

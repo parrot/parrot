@@ -1,0 +1,18 @@
+DYNOPLIBS_TARGETS = \
+    $(DYNEXT_DIR)/obscure_ops$(LOAD_EXT) \
+    $(DYNEXT_DIR)/math_ops$(LOAD_EXT) \
+    $(DYNEXT_DIR)/trans_ops$(LOAD_EXT) \
+    $(DYNEXT_DIR)/bit_ops$(LOAD_EXT) \
+    $(DYNEXT_DIR)/debug_ops$(LOAD_EXT) \
+    $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) \
+    $(DYNEXT_DIR)/io_ops$(LOAD_EXT) \
+
+DYNOPLIBS_CLEANUPS = \
+    src/dynoplibs/*.c \
+    src/dynoplibs/*.h \
+    src/dynoplibs/*.lib \
+    src/dynoplibs/*.pdb \
+    src/dynoplibs/*.ilk \
+    src/dynoplibs/*.def \
+    src/dynoplibs/*.manifest \
+    src/dynoplibs/*$(O) \

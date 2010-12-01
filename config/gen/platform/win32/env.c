@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2004-2008, Parrot Foundation.
  */
 
@@ -46,8 +45,8 @@ it does exist.
 void
 Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)
 {
-    char * name  = Parrot_str_to_cstring(interp, str_name);
-    char * value = Parrot_str_to_cstring(interp, str_value);
+    char * const name  = Parrot_str_to_cstring(interp, str_name);
+    char * const value = Parrot_str_to_cstring(interp, str_value);
     assert(name  != NULL);
     assert(value != NULL);
 
@@ -99,9 +98,9 @@ freed later.
 char *
 Parrot_getenv(PARROT_INTERP, ARGIN(STRING *str_name))
 {
-    char *name       = Parrot_str_to_cstring(interp, str_name);
-    const DWORD size = GetEnvironmentVariable(name, NULL, 0);
-    char *buffer     = NULL;
+    char * const name = Parrot_str_to_cstring(interp, str_name);
+    const DWORD size  = GetEnvironmentVariable(name, NULL, 0);
+    char *buffer      = NULL;
 
     if (size == 0) {
         Parrot_str_free_cstring(name);
@@ -146,5 +145,5 @@ Parrot_unsetenv(PARROT_INTERP, STRING *name)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

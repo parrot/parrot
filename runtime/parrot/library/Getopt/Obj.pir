@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -153,7 +152,7 @@ endif_0:
 endif_1:
 
     # ok now, we know we've got an arg to process, maybe long
-    # maybe short, maybe with it's own argument.
+    # maybe short, maybe with its own argument.
     $S0 = substr arg, 0, 2
     unless $S0 == '--' goto shortarg
 
@@ -189,8 +188,23 @@ endif_2:
     unless type == 'Boolean' goto endif_4
     val = 1
     goto beginstore_1
+
 endif_4:
+    # just a --foo type, do the optarg check here
+    $I0 = spec."optarg"()
     if $I0 goto beginstore_1
+    $I0 = index arg, '='
+    if $I0 != -1 goto else_4
+    delete argv[i]
+    argc = argv
+    unless i < argc goto error_1
+#    # XXX/TODO doesn't yet check the value of argv[i]
+#    #          to see if it's a possible argument
+#    # argv[i] gets deleted before going to the next arg
+    val = argv[i]
+    goto beginstore
+
+else_4:
     if_null val, error_0
     goto beginstore_1
 error_0:
@@ -357,7 +371,7 @@ finish:
 
 =item C<push_string(STRING format)>
 
-A vtable method, invoked by e.g. C<push getopts, "foo|f=s">.  The format is as such.
+A vtable, invoked by e.g. C<push getopts, "foo|f=s">.  The format is:
 
 =over 4
 
@@ -413,8 +427,8 @@ check:
     if type == 'f' goto flt
     $P0 = new 'Exception'
     $S0 = "Unknown specs option '"
-    $S0 .= type
-    $S0 .= "'"
+    $S0 = $S0 . type
+    $S0 = $S0 . "'"
     $P0 = $S0
     throw $P0
 
@@ -506,8 +520,8 @@ endfor:
     if $I0 goto finish
     $P0 = new 'Exception'
     $S0 = "Option '"
-    $S0 .= key
-    $S0 .= "' not in specs"
+    $S0 = $S0 . key
+    $S0 = $S0 . "' not in specs"
     $P0 = $S0
     throw $P0
 finish:
@@ -558,8 +572,8 @@ When a required argument is missing, throws an exception with the message
 
     $P0 = new 'Exception'
     $S0 = "Missing a required argument for option '"
-    $S0 .= arg
-    $S0 .= "'"
+    $S0 = $S0 . arg
+    $S0 = $S0 . "'"
     $P0 = $S0
     throw $P0
 .end

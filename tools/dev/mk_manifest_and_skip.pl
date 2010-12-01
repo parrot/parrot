@@ -1,6 +1,5 @@
-##! perl
-# $Id$
-# Copyright (C) 2006-2009, Parrot Foundation.
+#! perl
+# Copyright (C) 2006-2010, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -9,12 +8,6 @@ use lib qw| lib |;
 use Parrot::Manifest;
 
 my $script = $0;
-
-if (-e '.git') {
-    print "Sorry, this script is not compatible with git-svn\n";
-    print "Patches Welcome!\n";
-    exit 1;
-}
 
 my $mani = Parrot::Manifest->new( { script => $script, } );
 
@@ -38,12 +31,13 @@ tools/dev/mk_manifest_and_skip.pl - Recreate MANIFEST and MANIFEST.SKIP
 
 =head1 DESCRIPTION
 
-Recreates MANIFEST and MANIFEST.SKIP from the subversion properties
-and the output of C<svn status>. .
-So far tested with svn 1.2.0 and svn 1.4.2.  This also worked with svk 1.08,
-but to keep our tasks manageable, we only guarantee support for Subversion.
+Recreates MANIFEST and MANIFEST.SKIP from the output of C<git status>.
 
-This won't work for git-svn.
+    git add file1 file2
+    git commit -m "commit msg"
+    perl tools/dev/mk_manifest_and_skip.pl
+    git commit -m "update manifest"
+    git push
 
 =head1 SEE ALSO
 

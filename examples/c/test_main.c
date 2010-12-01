@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2008, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -92,7 +91,7 @@ main(int argc, char *argv[])
     Parrot_runcode(interp, argc, argv);
     Parrot_destroy(interp);
 
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
     return 0;
 }
 
@@ -127,7 +126,7 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
     while (longopt_get(interp, *argc, *argv, options, &opt)) {
         if (opt.opt_id == -1) {
             fprintf(stderr, "parrot: %s\n", opt.opt_error);
-            Parrot_exit(interp, 1);
+            Parrot_x_exit(interp, 1);
         }
 
         switch (opt.opt_id) {
@@ -209,13 +208,6 @@ Returns the user help.
 static void
 usage(void)
 {
-#ifdef HAVE_COMPUTED_GOTO
-    const char* cgoto_info = "Deactivate computed goto";
-#else
-    const char* cgoto_info =
-        "Deactivate computed goto (not available on this platform)";
-#endif
-
     fprintf(stderr,
 "Usage: parrot [switches] [--] programfile [arguments]\n\
   -b  --bounds-checks           Activate bounds checks\n\
@@ -223,9 +215,6 @@ usage(void)
   -h  --help                    Display this message\n\
   -j  --jit                     Activate Just-In-Time compiler\n\
   -p  --profile                 Activate profiling\n\
-  -P  --predereferenced_core    Activate predereferencing\n\
-  -S  --switched_core           Activate switched core\n\
-  -g  --no-computed-goto        %s\n\
   -t  --trace                   Activate tracing\n\
   -v  --version                 Display version information\n\
   -.  --wait                    Wait for a keypress (gives Windows users\n\
@@ -233,10 +222,9 @@ usage(void)
       --gc-debug\n\
         Enable garbage collection debugging mode. This may also be enabled\n\
         by setting the environment variable $PARROT_GC_DEBUG to 1.\n\
-\n",
-            cgoto_info);
+\n");
 
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 /*
@@ -266,7 +254,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either\n\
 the GNU General Public License or the Artistic License for more details.\n\n");
 
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 /*
@@ -290,6 +278,6 @@ performs that role.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

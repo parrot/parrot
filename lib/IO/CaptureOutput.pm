@@ -1,4 +1,3 @@
-# $Id$
 package IO::CaptureOutput;
 use strict;
 use vars qw/$VERSION @ISA @EXPORT_OK %EXPORT_TAGS/;

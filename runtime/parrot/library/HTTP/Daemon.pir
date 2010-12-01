@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -207,10 +206,9 @@ set_it:
     $P0 = doc_root
 .end
 
-=item __get_bool()
+=item get_bool()
 
-Vtable method, called from the C<if> or C<unless> opcode. Returns
-true, if the daemon object is listening on a socket, that is if the
+Object is true if the daemon is listening on a socket, that is if the
 initialization went ok.
 
 =cut
@@ -433,7 +431,7 @@ not_found:
 .end
 
 # close all sockets
-# this needs enabling of SIGHUP in src/events.c but still doesn't
+# this needs enabling of SIGHUP but still doesn't
 # help against FIN_WAIT2 / TIME_WAIT state of connections
 .sub 'shutdown' :method
     .local pmc active, sock

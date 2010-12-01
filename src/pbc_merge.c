@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2005-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2005-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -36,23 +35,26 @@ segments from the input PBC files.
 
 */
 
+#define PARROT_IN_EXTENSION
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/oplib/ops.h"
+#include "parrot/oplib/core_ops.h"
 #include "pmc/pmc_sub.h"
-
 
 /* This struct describes an input file. */
 typedef struct pbc_merge_input {
-    const char *filename;   /* name of the input file */
-    PackFile   *pf;         /* loaded packfile struct */
-    opcode_t    code_start; /* where the bytecode is located in the merged
-                               packfile */
-    opcode_t    const_start;/* where the const table is located within the
-                               merged table */
-    opcode_t   *const_map;  /* map constants from input files to their location
-                               in the output file */
+    const char *filename;       /* name of the input file */
+    PackFile   *pf;             /* loaded packfile struct */
+    opcode_t    code_start;     /* where the bytecode is located in the merged
+    packfile */
+    struct {
+        opcode_t  const_start;  /* where the const table is located within the
+                                   merged table */
+        opcode_t *const_map;    /* map constants from input files to their location
+                                   in the output file */
+    } num, str, pmc;
 } pbc_merge_input;
 
 /* HEADERIZER HFILE: none */
@@ -63,6 +65,16 @@ typedef struct pbc_merge_input {
 PARROT_DOES_NOT_RETURN
 static void help(PARROT_INTERP)
         __attribute__nonnull__(1);
+
+static void pbc_fixup_bytecode(PARROT_INTERP,
+    ARGMOD(pbc_merge_input **inputs),
+    int num_inputs,
+    ARGMOD(PackFile_ByteCode *bc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*inputs)
+        FUNC_MODIFIES(*bc);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -100,16 +112,6 @@ static PackFile_ConstTable* pbc_merge_constants(PARROT_INTERP,
         FUNC_MODIFIES(*pf)
         FUNC_MODIFIES(*bc);
 
-static void pbc_merge_ctpointers(PARROT_INTERP,
-    ARGMOD(pbc_merge_input **inputs),
-    int num_inputs,
-    ARGMOD(PackFile_ByteCode *bc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*inputs)
-        FUNC_MODIFIES(*bc);
-
 static void pbc_merge_debugs(PARROT_INTERP,
     ARGMOD(pbc_merge_input **inputs),
     int num_inputs,
@@ -120,18 +122,6 @@ static void pbc_merge_debugs(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*inputs)
-        FUNC_MODIFIES(*pf)
-        FUNC_MODIFIES(*bc);
-
-static void pbc_merge_fixups(PARROT_INTERP,
-    ARGIN(pbc_merge_input **inputs),
-    int num_inputs,
-    ARGMOD(PackFile *pf),
-    ARGMOD(PackFile_ByteCode *bc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
         FUNC_MODIFIES(*pf)
         FUNC_MODIFIES(*bc);
 
@@ -152,6 +142,10 @@ static void pbc_merge_write(PARROT_INTERP,
 
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_pbc_fixup_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(inputs) \
+    , PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_pbc_merge_begin __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs))
@@ -164,16 +158,7 @@ static void pbc_merge_write(PARROT_INTERP,
     , PARROT_ASSERT_ARG(inputs) \
     , PARROT_ASSERT_ARG(pf) \
     , PARROT_ASSERT_ARG(bc))
-#define ASSERT_ARGS_pbc_merge_ctpointers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(inputs) \
-    , PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_pbc_merge_debugs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(inputs) \
-    , PARROT_ASSERT_ARG(pf) \
-    , PARROT_ASSERT_ARG(bc))
-#define ASSERT_ARGS_pbc_merge_fixups __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs) \
     , PARROT_ASSERT_ARG(pf) \
@@ -205,7 +190,7 @@ help(PARROT_INTERP)
     printf("pbc_merge - merge multiple parrot bytecode files into one\n");
     printf("Usage:\n");
     printf("   pbc_merge -o out.pbc file1.pbc file2.pbc ...\n\n");
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 /*
@@ -236,12 +221,12 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
     INTVAL read_result;
 
     /* Check the file exists. */
-    STRING * const fs = string_make(interp, fullname,
-            strlen(fullname), NULL, 0);
+    STRING * const fs = Parrot_str_new_init(interp, fullname,
+            strlen(fullname), Parrot_default_encoding_ptr, 0);
     if (!Parrot_stat_info_intval(interp, fs, STAT_EXISTS)) {
         Parrot_io_eprintf(interp, "PBC Merge: Can't stat %s, code %i.\n",
                 fullname, errno);
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
 
     /* Get program size. */
@@ -252,7 +237,7 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
     if (!io) {
         Parrot_io_eprintf(interp, "PBC Merge: Can't open %s, code %i.\n",
                 fullname, errno);
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
 
     /* Read in program. Nabbed from Parrot_pbc_read. */
@@ -276,7 +261,7 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
     if (read_result < 0) {
         Parrot_io_eprintf(interp,
                 "PBC Merge: Problem reading packfile from PIO.\n");
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
     fclose(io);
 
@@ -286,7 +271,7 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
                 pf, (opcode_t *)program_code, program_size)) {
         Parrot_io_eprintf(interp, "PBC Merge: Can't unpack packfile %s.\n",
                 fullname);
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
 
     /* Return the packfile. */
@@ -325,18 +310,18 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     if (!bc_seg) {
         Parrot_io_eprintf(interp,
             "PBC Merge: Error creating bytecode segment.");
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
 
     /* Loop over input files. */
-    for (i = 0; i < num_inputs; i++) {
+    for (i = 0; i < num_inputs; ++i) {
         /* Get the bytecode segment from the input file. */
         PackFile_ByteCode * const in_seg = inputs[i]->pf->cur_cs;
         if (in_seg == NULL) {
             Parrot_io_eprintf(interp,
                 "PBC Merge: Cannot locate bytecode segment in %s",
                 inputs[i]->filename);
-            Parrot_exit(interp, 1);
+            Parrot_x_exit(interp, 1);
         }
 
         /* Re-allocate the current buffer. */
@@ -378,11 +363,15 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                     ARGMOD(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(pbc_merge_constants)
-    PackFile_Constant   **constants = mem_gc_allocate_typed(interp, PackFile_Constant *);
 
-    opcode_t cursor           = 0;
-    opcode_t output_const_num = 0;
-    opcode_t input_const_num  = 0;
+    FLOATVAL  *num_constants = mem_gc_allocate_typed(interp, FLOATVAL);
+    STRING   **str_constants = mem_gc_allocate_typed(interp, STRING *);
+    PMC      **pmc_constants = mem_gc_allocate_typed(interp, PMC *);
+
+    opcode_t num_cursor = 0;
+    opcode_t str_cursor = 0;
+    opcode_t pmc_cursor = 0;
+
     int      i, j;
 
     /* Add a constant table segment. */
@@ -393,11 +382,11 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     if (const_seg == NULL) {
         Parrot_io_eprintf(interp,
             "PBC Merge: Error creating constant table segment.");
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
 
     /* Loop over input files. */
-    for (i = 0; i < num_inputs; i++) {
+    for (i = 0; i < num_inputs; ++i) {
 
         /* Get the constant table segment from the input file. */
         PackFile_ConstTable * const in_seg = inputs[i]->pf->cur_cs->const_table;
@@ -405,147 +394,70 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             Parrot_io_eprintf(interp,
                 "PBC Merge: Cannot locate constant table segment in %s\n",
                 inputs[i]->filename);
-            Parrot_exit(interp, 1);
+            Parrot_x_exit(interp, 1);
         }
 
         /* Store cursor as position where constant table starts. */
-        inputs[i]->const_start = cursor;
-        input_const_num = 0;
+        inputs[i]->num.const_start = num_cursor;
+        inputs[i]->str.const_start = str_cursor;
+        inputs[i]->pmc.const_start = pmc_cursor;
 
         /* Allocate space for the constant list, provided we have some. */
-        if (in_seg->const_count > 0)
-            constants = mem_gc_realloc_n_typed(interp, constants,
-                    cursor + in_seg->const_count, PackFile_Constant*);
+        if (in_seg->num.const_count > 0)
+            num_constants = mem_gc_realloc_n_typed(interp, num_constants,
+                                num_cursor + in_seg->num.const_count, FLOATVAL);
+        if (in_seg->str.const_count > 0)
+            str_constants = mem_gc_realloc_n_typed(interp, str_constants,
+                                str_cursor + in_seg->str.const_count, STRING *);
+        if (in_seg->pmc.const_count > 0)
+            pmc_constants = mem_gc_realloc_n_typed(interp, pmc_constants,
+                                pmc_cursor + in_seg->pmc.const_count, PMC *);
 
         /* Loop over the constants and copy them to the output PBC. */
-        for (j = 0; j < in_seg->const_count; j++) {
-            /* Get the entry and allocate space for copy. */
-            PackFile_Constant *cur_entry = in_seg->constants[j];
-            PackFile_Constant *copy      = mem_gc_allocate_typed(interp,
-                    PackFile_Constant);
-            STRUCT_COPY(copy, cur_entry);
+        for (j = 0; j < in_seg->num.const_count; j++) {
+            num_constants[num_cursor] = in_seg->num.constants[j];
+            inputs[i]->num.const_map[j] = num_cursor;
+            num_cursor++;
+        }
+
+        for (j = 0; j < in_seg->str.const_count; j++) {
+            str_constants[str_cursor] = in_seg->str.constants[j];
+            inputs[i]->str.const_map[j] = str_cursor;
+            str_cursor++;
+        }
+
+        for (j = 0; j < in_seg->pmc.const_count; j++) {
+            PMC *v = pmc_constants[pmc_cursor] = in_seg->pmc.constants[j];
+            inputs[i]->pmc.const_map[j] = pmc_cursor;
+            pmc_cursor++;
 
             /* If it's a sub PMC, need to deal with offsets. */
-            if (copy->type == PFC_PMC) {
-                switch (copy->u.key->vtable->base_type) {
-                  case enum_class_Sub:
-                  case enum_class_Coroutine:
+            switch (v->vtable->base_type) {
+                case enum_class_Sub:
+                case enum_class_Coroutine:
                     {
                         Parrot_Sub_attributes *sub;
-                        PMC_get_sub(interp, copy->u.key, sub);
+                        PMC_get_sub(interp, v, sub);
                         sub->start_offs += inputs[i]->code_start;
                         sub->end_offs += inputs[i]->code_start;
                     }
                     break;
-                  default:
+                default:
                     break;
-                }
             }
-
-            inputs[i]->const_map[input_const_num] = output_const_num;
-            input_const_num++;
-            output_const_num++;
-
-            /* Slot it into the list. */
-            constants[cursor] = copy;
-            cursor++;
         }
     }
 
     /* Stash merged constants table and count and return the new segment. */
-    const_seg->constants   = constants;
-    const_seg->const_count = cursor;
-    const_seg->code        = bc;
-    bc->const_table        = const_seg;
+    const_seg->num.const_count = num_cursor;
+    const_seg->num.constants   = num_constants;
+    const_seg->str.const_count = str_cursor;
+    const_seg->str.constants   = str_constants;
+    const_seg->pmc.const_count = pmc_cursor;
+    const_seg->pmc.constants   = pmc_constants;
+    const_seg->code            = bc;
+    bc->const_table            = const_seg;
     return const_seg;
-}
-
-
-/*
-
-=item C<static void pbc_merge_fixups(PARROT_INTERP, pbc_merge_input **inputs,
-int num_inputs, PackFile *pf, PackFile_ByteCode *bc)>
-
-This function merges the fixups tables from the input PBC files.
-
-=cut
-
-*/
-
-static void
-pbc_merge_fixups(PARROT_INTERP, ARGIN(pbc_merge_input **inputs),
-                 int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
-{
-    ASSERT_ARGS(pbc_merge_fixups)
-    PackFile_FixupTable  *fixup_seg;
-    PackFile_FixupEntry **fixups = mem_gc_allocate_typed(interp,
-            PackFile_FixupEntry *);
-    opcode_t              cursor = 0;
-    int                   i, j;
-
-    /* Add a fixup table segment. */
-    fixup_seg = (PackFile_FixupTable*)PackFile_Segment_new_seg(
-        interp, &pf->directory, PF_FIXUP_SEG, FIXUP_TABLE_SEGMENT_NAME, 1);
-    if (fixup_seg == NULL) {
-        Parrot_io_eprintf(interp,
-            "PBC Merge: Error creating fixup table segment.");
-        Parrot_exit(interp, 1);
-    }
-
-    /* Loop over input files. */
-    for (i = 0; i < num_inputs; i++) {
-        /* Get the fixup segment from the input file. */
-        PackFile_FixupTable * const in_seg = inputs[i]->pf->cur_cs->fixups;
-        if (in_seg == NULL) {
-            Parrot_io_eprintf(interp,
-                "PBC Merge: Cannot locate fixup segment in %s",
-                inputs[i]->filename);
-            Parrot_exit(interp, 1);
-        }
-
-        /* Allocate space for these fixups, provided we have some. */
-        if (in_seg->fixup_count > 0) {
-            fixups = mem_gc_realloc_n_typed(interp, fixups,
-                    cursor + in_seg->fixup_count, PackFile_FixupEntry*);
-        }
-
-        /* Loop over the fixups and copy them to the output PBC, correcting
-           the offsets into the bytecode. */
-        for (j = 0; j < in_seg->fixup_count; j++) {
-            /* Get the entry and allocate space for copies. */
-            PackFile_FixupEntry *cur_entry = in_seg->fixups[j];
-            PackFile_FixupEntry *copy      = mem_gc_allocate_typed(interp,
-                    PackFile_FixupEntry);
-            char *name_copy = mem_gc_allocate_n_typed(interp,
-                    strlen(cur_entry->name) + 1, char);
-
-            /* Copy type and name. */
-            copy->type = cur_entry->type;
-            strcpy(name_copy, cur_entry->name);
-            copy->name = name_copy;
-
-            /* Set new offset and bytecode pointer. */
-            switch (copy->type) {
-              case enum_fixup_label:
-                copy->offset = cur_entry->offset + inputs[i]->code_start;
-                break;
-              case enum_fixup_sub:
-                copy->offset = cur_entry->offset + inputs[i]->const_start;
-                break;
-              default:
-                Parrot_io_eprintf(interp, "PBC Merge: Unknown fixup type");
-                Parrot_exit(interp, 1);
-            }
-
-            /* Slot it into the list. */
-            fixups[cursor] = copy;
-            cursor++;
-        }
-    }
-
-    /* Stash merged fixup table and count. */
-    fixup_seg->fixups      = fixups;
-    fixup_seg->fixup_count = cursor;
 }
 
 
@@ -568,19 +480,20 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     PackFile_Debug                 *debug_seg;
     opcode_t                       *lines    = mem_gc_allocate_typed(interp,
                                                 opcode_t);
-    PackFile_DebugFilenameMapping **mappings =
-        mem_gc_allocate_typed(interp, PackFile_DebugFilenameMapping *);
+    PackFile_DebugFilenameMapping *mappings =
+        mem_gc_allocate_typed(interp, PackFile_DebugFilenameMapping);
 
     opcode_t num_mappings = 0;
     opcode_t num_lines    = 0;
 
-    int      i, j;
+    int i;
 
     /* We need to merge both the mappings and the list of line numbers.
        The line numbers can just be concatenated. The mappings must have
        their offsets fixed up. */
-    for (i = 0; i < num_inputs; i++) {
-        PackFile_Debug *in_seg = inputs[i]->pf->cur_cs->debugs;
+    for (i = 0; i < num_inputs; ++i) {
+        const PackFile_Debug * const in_seg = inputs[i]->pf->cur_cs->debugs;
+        int j;
 
         /* Concatenate line numbers. */
         lines = mem_gc_realloc_n_typed(interp, lines,
@@ -592,15 +505,14 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         /* Concatenate mappings. */
         mappings = mem_gc_realloc_n_typed(interp, mappings,
                 num_mappings + in_seg->num_mappings,
-                PackFile_DebugFilenameMapping*);
+                PackFile_DebugFilenameMapping);
 
-        for (j = 0; j < in_seg->num_mappings; j++) {
-            PackFile_DebugFilenameMapping *mapping = mem_gc_allocate_typed(
-                    interp, PackFile_DebugFilenameMapping);
-            STRUCT_COPY(mapping, in_seg->mappings[j]);
+        for (j = 0; j < in_seg->num_mappings; ++j) {
+            PackFile_DebugFilenameMapping *mapping = mappings + num_mappings + j;
+
+            STRUCT_COPY_FROM_STRUCT(mapping, in_seg->mappings[j]);
             mapping->offset   += num_lines;
-            mapping->filename += inputs[i]->const_start;
-            mappings[num_mappings + j] = mapping;
+            mapping->filename += inputs[i]->str.const_start;
         }
 
         num_lines    += in_seg->base.size - 1;
@@ -610,7 +522,6 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     /* Create merged debug segment. Replace created data and mappings
        with merged ones we have created. */
     debug_seg = Parrot_new_debug_seg(interp, bc, num_lines);
-    PackFile_add_segment(interp, &pf->directory, (PackFile_Segment*)debug_seg);
     mem_gc_free(interp, debug_seg->base.data);
     debug_seg->base.data    = lines;
     mem_gc_free(interp, debug_seg->mappings);
@@ -619,87 +530,171 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     debug_seg->num_mappings = num_mappings;
 }
 
+
+static opcode_t
+bytecode_remap_op(PARROT_INTERP, PackFile *pf, opcode_t op) {
+    int i;
+    op_info_t         *info    = pf->cur_cs->op_info_table[op];
+    op_lib_t          *lib     = info->lib;
+    op_func_t         op_func  = pf->cur_cs->op_func_table[op];
+    PackFile_ByteCode *bc      = interp->code;
+    PackFile_ByteCode_OpMappingEntry *om;
+
+    for (i = 0; i < bc->op_mapping.n_libs; i++) {
+        if (lib == bc->op_mapping.libs[i].lib) {
+            om = &bc->op_mapping.libs[i];
+            goto found_lib;
+        }
+    }
+
+    /* library not yet mapped */
+    bc->op_mapping.n_libs++;
+    bc->op_mapping.libs = mem_gc_realloc_n_typed_zeroed(interp, bc->op_mapping.libs,
+                            bc->op_mapping.n_libs, bc->op_mapping.n_libs - 1,
+                            PackFile_ByteCode_OpMappingEntry);
+
+    /* initialize a new lib entry */
+    om            = &bc->op_mapping.libs[bc->op_mapping.n_libs - 1];
+    om->lib       = lib;
+    om->n_ops     = 0;
+    om->lib_ops   = mem_gc_allocate_n_zeroed_typed(interp, 0, opcode_t);
+    om->table_ops = mem_gc_allocate_n_zeroed_typed(interp, 0, opcode_t);
+
+  found_lib:
+    for (i = 0; i < om->n_ops; i++) {
+        if (bc->op_func_table[om->table_ops[i]] == op_func)
+            return om->table_ops[i];
+    }
+
+    /* op not yet mapped */
+    bc->op_count++;
+    bc->op_func_table =
+        mem_gc_realloc_n_typed_zeroed(interp, bc->op_func_table, bc->op_count, bc->op_count - 1,
+                                        op_func_t);
+    bc->op_func_table[bc->op_count - 1] = op_func;
+    bc->op_info_table =
+        mem_gc_realloc_n_typed_zeroed(interp, bc->op_info_table, bc->op_count, bc->op_count - 1,
+                                        op_info_t *);
+    bc->op_info_table[bc->op_count - 1] = info;
+
+    /* initialize new op mapping */
+    om->n_ops++;
+
+    om->lib_ops =
+        mem_gc_realloc_n_typed_zeroed(interp, om->lib_ops, om->n_ops, om->n_ops - 1, opcode_t);
+    for (i = 0; i < lib->op_count; i++) {
+        if (lib->op_func_table[i] == op_func) {
+            om->lib_ops[om->n_ops - 1] = i;
+            break;
+        }
+    }
+    PARROT_ASSERT(om->lib_ops[om->n_ops - 1] || !i);
+
+    om->table_ops =
+        mem_gc_realloc_n_typed_zeroed(interp, om->table_ops, om->n_ops, om->n_ops - 1, opcode_t);
+    om->table_ops[om->n_ops - 1] = bc->op_count - 1;
+
+    return bc->op_count - 1;
+}
+
 /*
 
-=item C<static void pbc_merge_ctpointers(PARROT_INTERP, pbc_merge_input
-**inputs, int num_inputs, PackFile_ByteCode *bc)>
+=item C<static void pbc_fixup_bytecode(PARROT_INTERP, pbc_merge_input **inputs,
+int num_inputs, PackFile_ByteCode *bc)>
 
-This function corrects the pointers into the constants table found in the
-bytecode.
+Fixup bytecode. This includes correcting pointers into the constant table
+and updating the ops mapping.
 
 =cut
 
 */
 
 static void
-pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
+pbc_fixup_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                      int num_inputs, ARGMOD(PackFile_ByteCode *bc))
 {
-    ASSERT_ARGS(pbc_merge_ctpointers)
+    ASSERT_ARGS(pbc_fixup_bytecode)
     int        cur_arg;
     opcode_t  *op_ptr;
     opcode_t  *ops       = bc->base.data;
     opcode_t   cur_op    = 0;
     int        cur_input = 0;
+    op_lib_t  *core_ops  = PARROT_GET_CORE_OPLIB(interp);
 
     /* Loop over the ops in the merged bytecode. */
     while (cur_op < (opcode_t)bc->base.size) {
         op_info_t *op;
         opcode_t   op_num;
+        op_func_t  op_func;
 
         /* Keep track of the current input file. */
         if (cur_input + 1 < num_inputs &&
             cur_op >= inputs[cur_input + 1]->code_start)
-            cur_input++;
+            ++cur_input;
 
-        /* Get info about this op and jump over it. */
-        op_num = ops[cur_op];
-        op     = &interp->op_info_table[op_num];
+        /* Get info about this op, remap it, and jump over it. */
+        op_num = ops[cur_op] = bytecode_remap_op(interp, inputs[cur_input]->pf, ops[cur_op]);
+        op     = bc->op_info_table[op_num];
         op_ptr = ops + cur_op;
-        cur_op++;
+        ++cur_op;
 
         /* Loop over the arguments. */
-        for (cur_arg = 1; cur_arg < op->op_count; cur_arg++) {
+        for (cur_arg = 1; cur_arg < op->op_count; ++cur_arg) {
             /* Pick out any indexes into the constant table and correct them. */
             switch (op->types[cur_arg - 1]) {
-              case PARROT_ARG_NC:
-              case PARROT_ARG_PC:
-              case PARROT_ARG_SC:
-              case PARROT_ARG_NAME_SC:
-              case PARROT_ARG_KC:
-                ops[cur_op] = inputs[cur_input]->const_map[ ops[cur_op] ];
-                break;
-              default:
-                break;
+                case PARROT_ARG_NC:
+                    ops[cur_op] = inputs[cur_input]->num.const_map[ ops[cur_op] ];
+                    break;
+
+                case PARROT_ARG_SC:
+                case PARROT_ARG_NAME_SC:
+                    ops[cur_op] = inputs[cur_input]->str.const_map[ ops[cur_op] ];
+                    break;
+
+                case PARROT_ARG_PC:
+                case PARROT_ARG_KC:
+                    ops[cur_op] = inputs[cur_input]->pmc.const_map[ ops[cur_op] ];
+                    break;
+
+                default:
+                    break;
             }
 
             /* Move along the bytecode array. */
-            cur_op++;
+            ++cur_op;
         }
 
         /* Handle special case variable argument opcodes. */
-        if (op_num == PARROT_OP_set_args_pc    ||
-                op_num == PARROT_OP_get_results_pc ||
-                op_num == PARROT_OP_get_params_pc  ||
-                op_num == PARROT_OP_set_returns_pc) {
+        op_func = interp->code->op_func_table[op_num];
+        if (op_func == core_ops->op_func_table[PARROT_OP_set_args_pc]    ||
+            op_func == core_ops->op_func_table[PARROT_OP_get_results_pc] ||
+            op_func == core_ops->op_func_table[PARROT_OP_get_params_pc]  ||
+            op_func == core_ops->op_func_table[PARROT_OP_set_returns_pc]) {
             /* Get the signature. */
-            PMC * const sig = bc->const_table->constants[op_ptr[1]]->u.key;
+            PMC * const sig = bc->const_table->pmc.constants[op_ptr[1]];
 
             /* Loop over the arguments to locate any that need a fixup. */
             const int sig_items = VTABLE_elements(interp, sig);
-            for (cur_arg = 0; cur_arg < sig_items; cur_arg++) {
+            for (cur_arg = 0; cur_arg < sig_items; ++cur_arg) {
                 switch (VTABLE_get_integer_keyed_int(interp, sig, cur_arg)) {
-                  case PARROT_ARG_NC:
-                  case PARROT_ARG_PC:
-                  case PARROT_ARG_SC:
-                  case PARROT_ARG_NAME_SC:
-                  case PARROT_ARG_KC:
-                    ops[cur_op] = inputs[cur_input]->const_map[ ops[cur_op] ];
-                    break;
-                  default:
-                    break;
+                    case PARROT_ARG_NC:
+                        ops[cur_op] = inputs[cur_input]->num.const_map[ ops[cur_op] ];
+                        break;
+
+                    case PARROT_ARG_SC:
+                    case PARROT_ARG_NAME_SC:
+                        ops[cur_op] = inputs[cur_input]->str.const_map[ ops[cur_op] ];
+                        break;
+
+                    case PARROT_ARG_PC:
+                    case PARROT_ARG_KC:
+                        ops[cur_op] = inputs[cur_input]->pmc.const_map[ ops[cur_op] ];
+                        break;
+
+                    default:
+                        break;
                 }
-                cur_op++;
+                ++cur_op;
             }
         }
     }
@@ -724,43 +719,47 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     ASSERT_ARGS(pbc_merge_begin)
     PackFile_ByteCode   *bc;
     PackFile_ConstTable *ct;
-    opcode_t             const_count = 0;
     int                  i;
 
     /* Create a new empty packfile. */
     PackFile * const merged = PackFile_new(interp, 0);
     if (merged == NULL) {
         Parrot_io_eprintf(interp, "PBC Merge: Error creating new packfile.\n");
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
 
     /* calculate how many constants are stored in the packfiles to be merged */
-    for (i = 0; i < num_inputs; i++) {
+    for (i = 0; i < num_inputs; ++i) {
         PackFile_Directory *pf_dir = &inputs[i]->pf->directory;
         unsigned int j = 0;
-        for (j = 0; j < pf_dir->num_segments; j++) {
+        for (j = 0; j < pf_dir->num_segments; ++j) {
             PackFile_Segment *seg = (PackFile_Segment *)pf_dir->segments[j];
             if (seg->type == PF_CONST_SEG) {
-                opcode_t const_count = ((PackFile_ConstTable *)seg)->const_count;
-                inputs[i]->const_map = mem_gc_allocate_n_typed(interp,
-                        const_count, opcode_t);
+                PackFile_ConstTable *ct = (PackFile_ConstTable *)seg;
+                inputs[i]->num.const_map = mem_gc_allocate_n_typed(interp, ct->num.const_count,
+                                                                    opcode_t);
+                inputs[i]->str.const_map = mem_gc_allocate_n_typed(interp, ct->str.const_count,
+                                                                    opcode_t);
+                inputs[i]->pmc.const_map = mem_gc_allocate_n_typed(interp, ct->pmc.const_count,
+                                                                    opcode_t);
             }
         }
     }
 
     /* Merge the various stuff. */
-    bc = pbc_merge_bytecode(interp, inputs, num_inputs, merged);
+    bc = interp->code = pbc_merge_bytecode(interp, inputs, num_inputs, merged);
     ct = pbc_merge_constants(interp, inputs, num_inputs, merged, bc);
     UNUSED(ct);
 
-    pbc_merge_fixups(interp, inputs, num_inputs, merged, bc);
     pbc_merge_debugs(interp, inputs, num_inputs, merged, bc);
 
     /* Walk bytecode and fix ops that reference the constants table. */
-    pbc_merge_ctpointers(interp, inputs, num_inputs, bc);
+    pbc_fixup_bytecode(interp, inputs, num_inputs, bc);
 
-    for (i = 0; i < num_inputs; i++) {
-        mem_gc_free(interp, inputs[i]->const_map);
+    for (i = 0; i < num_inputs; ++i) {
+        mem_gc_free(interp, inputs[i]->num.const_map);
+        mem_gc_free(interp, inputs[i]->str.const_map);
+        mem_gc_free(interp, inputs[i]->pmc.const_map);
     }
 
     /* Return merged result. */
@@ -795,11 +794,11 @@ pbc_merge_write(PARROT_INTERP, ARGMOD(PackFile *pf), ARGIN(const char *filename)
     PackFile_pack(interp, pf, pack);
     if ((fp = fopen(filename, "wb")) == 0) {
         Parrot_io_eprintf(interp, "PBC Merge: Couldn't open %s\n", filename);
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
     if ((1 != fwrite(pack, size, 1, fp))) {
         Parrot_io_eprintf(interp, "PBC Merge: Couldn't write %s\n", filename);
-        Parrot_exit(interp, 1);
+        Parrot_x_exit(interp, 1);
     }
     fclose(fp);
     mem_gc_free(interp, pack);
@@ -842,17 +841,17 @@ main(int argc, const char **argv)
     }
     while ((status = longopt_get(interp, argc, argv, options, &opt)) > 0) {
         switch (opt.opt_id) {
-          case 'o':
-            if (output_file == NULL)
-                output_file = opt.opt_arg;
-            else
+            case 'o':
+                if (output_file == NULL)
+                    output_file = opt.opt_arg;
+                else
+                    help(interp);
+                break;
+            case '?':
                 help(interp);
-            break;
-          case '?':
-            help(interp);
-            break;
-          default:
-            break;
+                break;
+            default:
+                break;
         }
     }
     if (status == -1 || !output_file) {
@@ -865,7 +864,7 @@ main(int argc, const char **argv)
        structure for each of them. */
     input_files = mem_gc_allocate_n_typed(interp, argc, pbc_merge_input*);
 
-    for (i = 0; i < argc; i++) {
+    for (i = 0; i < argc; ++i) {
         /* Allocate a struct. */
         input_files[i] = mem_gc_allocate_typed(interp, pbc_merge_input);
 
@@ -879,11 +878,11 @@ main(int argc, const char **argv)
             Parrot_io_eprintf(interp,
                 "PBC Merge: Unknown error while reading and unpacking %s\n",
                 *argv);
-            Parrot_exit(interp, 1);
+            Parrot_x_exit(interp, 1);
         }
 
         /* Next file. */
-        argv++;
+        ++argv;
     }
 
     /* Merge. */
@@ -893,7 +892,7 @@ main(int argc, const char **argv)
     pbc_merge_write(interp, merged, output_file);
 
     /* Finally, we're done. */
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 
@@ -901,5 +900,5 @@ main(int argc, const char **argv)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

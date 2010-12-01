@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -140,7 +139,7 @@ main(int argc, const char *argv[])
 
     do_dis(interp, outfile, option);
 
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 /*
@@ -189,5 +188,5 @@ Reini Urban: Renamed from disassemble to pbc_disassemble (2008-07-03).
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

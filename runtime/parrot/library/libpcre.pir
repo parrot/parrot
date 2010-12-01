@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2008, Parrot Foundation.
-# $Id$
 
 =head1 TITLE
 
@@ -12,7 +11,7 @@ See 'library/pcre.pir' for details on the user interface.
 =cut
 
 
-.namespace ['PCRE::NCI']
+.namespace ['PCRE'; 'NCI']
 
 
 .sub compile
@@ -35,7 +34,7 @@ See 'library/pcre.pir' for details on the user interface.
     ## allocate space in string for error message
     repeat error, " ", error_size
 
-    PCRE_NCI_compile = get_hll_global ['PCRE::NCI'], 'PCRE_compile'
+    PCRE_NCI_compile = get_hll_global ['PCRE'; 'NCI'], 'PCRE_compile'
 
     .local pmc code
 
@@ -81,7 +80,7 @@ RETURN:
 
     ## on 32 bit systems
     .local pmc PCRE_NCI_exec
-    PCRE_NCI_exec = get_hll_global ['PCRE::NCI'], 'PCRE_exec'
+    PCRE_NCI_exec = get_hll_global ['PCRE'; 'NCI'], 'PCRE_exec'
 
     .local int ok
 
@@ -128,37 +127,6 @@ M1:
 M0:
 NOMATCH:
     .return( match )
-.end
-
-=for todo
-    # or use convenience function
-    print "copy_substring\n"
-    i = 0
-    repeat match, " ", 500
-loop:
-    .begin_call
-    .set_arg s
-    .set_arg ovector
-    .set_arg ok
-    .set_arg i
-    .set_arg match
-    .set_arg 500
-    .nci_call COPY_SUBSTRING
-    .end_call
-    if i goto subp
-    print "all "
-    goto all
-subp:
-    print "("
-    print i
-    print ") "
-all:
-    print "matched: '"
-    print match
-    print "'\n"
-    inc i
-    if i < ok goto loop
-    end
 .end
 
 =head1 FILES

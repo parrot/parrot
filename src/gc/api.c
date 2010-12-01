@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -11,7 +10,7 @@ src/gc/api.c - general Parrot API for GC functions
 This file implements the external-facing API for Parrot's garbage collector.
 The collector itself is composed of various interchangable cores that each
 may operate very differently internally. The functions in this file can be used
-throughtout Parrot without having to be concerned about the internal operations
+throughout Parrot without having to be concerned about the internal operations
 of the GC. This is documented in PDD 9 with supplementary notes in
 F<docs/memory_internals.pod>.
 
@@ -99,29 +98,6 @@ implementation, and malloc wrappers for various purposes. These are unused.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void fix_pmc_syncs(
-    ARGMOD(Interp *dest_interp),
-    ARGIN(Fixed_Size_Pool *pool))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest_interp);
-
-static void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
-    ARGMOD(Fixed_Size_Pool *dest),
-    ARGMOD(Fixed_Size_Pool *source))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*dest)
-        FUNC_MODIFIES(*source);
-
-#define ASSERT_ARGS_fix_pmc_syncs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(dest_interp) \
-    , PARROT_ASSERT_ARG(pool))
-#define ASSERT_ARGS_Parrot_gc_merge_buffer_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(source))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -149,27 +125,16 @@ void
 Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
 {
     ASSERT_ARGS(Parrot_gc_mark_PObj_alive)
-    /* TODO: Have each core register a ->pobject_lives function pointer in the
-       Memory_Pools struct, and call that pointer directly instead of having a messy
-       set of #if preparser conditions. */
 
     /* if object is live or on free list return */
     if (PObj_is_live_or_free_TESTALL(obj))
         return;
 
-    /* mark it live */
-    PObj_live_SET(obj);
-
-    /* if object is a PMC and contains buffers or PMCs, then attach the PMC
-     * to the chained mark list. */
     if (PObj_is_PMC_TEST(obj)) {
-        PMC * const p = (PMC *)obj;
-
-        if (PObj_is_special_PMC_TEST(obj))
-            interp->gc_sys->mark_special(interp, p);
-
-        else if (PMC_metadata(p))
-            Parrot_gc_mark_PMC_alive(interp, PMC_metadata(p));
+        interp->gc_sys->mark_pmc_header(interp, (PMC*) obj);
+    }
+    else {
+        interp->gc_sys->mark_pobj_header(interp, obj);
     }
 }
 
@@ -188,32 +153,7 @@ void
 Parrot_gc_mark_PMC_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(PMC *obj))
 {
     ASSERT_ARGS(Parrot_gc_mark_PMC_alive_fun)
-    if (!PMC_IS_NULL(obj)) {
-        PARROT_ASSERT(PObj_is_PMC_TEST(obj));
-
-        if (PObj_is_live_or_free_TESTALL(obj))
-            return;
-
-        /* mark it live */
-        PObj_live_SET(obj);
-
-        /* if object is a PMC and contains buffers or PMCs, then attach the PMC
-         * to the chained mark list. */
-        if (PObj_is_special_PMC_TEST(obj)) {
-            if (PObj_is_PMC_shared_TEST(obj)) {
-                Parrot_Interp i = PMC_sync(obj)->owner;
-
-                if (!i->mem_pools->gc_mark_ptr)
-                    i->mem_pools->gc_mark_ptr = obj;
-            }
-
-            if (PObj_custom_mark_TEST(obj))
-                VTABLE_mark(interp, obj);
-        }
-
-        if (PMC_metadata(obj))
-            Parrot_gc_mark_PMC_alive(interp, PMC_metadata(obj));
-    }
+    interp->gc_sys->mark_pmc_header(interp, obj);
 }
 
 /*
@@ -231,12 +171,7 @@ void
 Parrot_gc_mark_STRING_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(STRING *obj))
 {
     ASSERT_ARGS(Parrot_gc_mark_STRING_alive_fun)
-    if (!STRING_IS_NULL(obj)) {
-        PARROT_ASSERT(PObj_is_string_TEST(obj));
-
-        /* mark it live */
-        PObj_live_SET(obj);
-    }
+    interp->gc_sys->mark_pobj_header(interp, (PObj*)obj);
 }
 
 /*
@@ -269,20 +204,21 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
       case INF:
         Parrot_gc_inf_init(interp);
         break;
+      case MS2:
+        Parrot_gc_ms2_init(interp);
+        break;
       default:
         /*die horribly because of invalid GC core specified*/
         break;
     };
 
     /* Assertions that GC subsystem has complete API */
-    PARROT_ASSERT(interp->gc_sys->finalize_gc_system);
-    PARROT_ASSERT(interp->gc_sys->destroy_child_interp);
-
     PARROT_ASSERT(interp->gc_sys->do_gc_mark);
     PARROT_ASSERT(interp->gc_sys->compact_string_pool);
 
-    PARROT_ASSERT(interp->gc_sys->mark_special);
-    PARROT_ASSERT(interp->gc_sys->pmc_needs_early_collection);
+    /* It should be mandatory. But there is abstraction leak in */
+    /* mark_foo_alive. */
+    /* PARROT_ASSERT(interp->gc_sys->mark_special); */
 
     PARROT_ASSERT(interp->gc_sys->allocate_pmc_header);
     PARROT_ASSERT(interp->gc_sys->free_pmc_header);
@@ -310,14 +246,6 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
     PARROT_ASSERT(interp->gc_sys->allocate_memory_chunk_with_interior_pointers);
     PARROT_ASSERT(interp->gc_sys->reallocate_memory_chunk_with_interior_pointers);
     PARROT_ASSERT(interp->gc_sys->free_memory_chunk);
-
-    PARROT_ASSERT(interp->gc_sys->block_mark);
-    PARROT_ASSERT(interp->gc_sys->unblock_mark);
-    PARROT_ASSERT(interp->gc_sys->is_blocked_mark);
-
-    PARROT_ASSERT(interp->gc_sys->block_sweep);
-    PARROT_ASSERT(interp->gc_sys->unblock_sweep);
-    PARROT_ASSERT(interp->gc_sys->is_blocked_sweep);
 
     PARROT_ASSERT(interp->gc_sys->get_gc_info);
 }
@@ -369,12 +297,10 @@ Parrot_gc_new_pmc_header(PARROT_INTERP, UINTVAL flags)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
             "Parrot VM: PMC allocation failed!\n");
 
-    if (flags & PObj_is_PMC_shared_FLAG)
-        Parrot_gc_add_pmc_sync(interp, pmc);
-
     PObj_get_FLAGS(pmc) = PObj_is_PMC_FLAG|flags;
     pmc->vtable         = NULL;
     PMC_data(pmc)       = NULL;
+    PMC_metadata(pmc)   = PMCNULL;
 
     return pmc;
 }
@@ -398,65 +324,12 @@ Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<void Parrot_gc_free_pmc_sync(PARROT_INTERP, PMC *p)>
-
-Frees the PMC_sync field of the PMC, if one exists.
-
-=cut
-
-*/
-
-void
-Parrot_gc_free_pmc_sync(PARROT_INTERP, ARGMOD(PMC *p))
-{
-    ASSERT_ARGS(Parrot_gc_free_pmc_sync)
-
-    if (PObj_is_PMC_shared_TEST(p) && PMC_sync(p)) {
-        MUTEX_DESTROY(PMC_sync(p)->pmc_lock);
-        mem_internal_free(PMC_sync(p));
-        PMC_sync(p) = NULL;
-    }
-}
-
-/*
-
-=item C<void Parrot_gc_add_pmc_sync(PARROT_INTERP, PMC *pmc)>
-
-Adds a C<Sync*> structure to the given C<PMC>. Initializes the PMC's owner
-field and the synchronization mutext. Throws an exception if Sync allocation
-fails.
-
-=cut
-
-*/
-
-void
-Parrot_gc_add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
-{
-    ASSERT_ARGS(Parrot_gc_add_pmc_sync)
-
-    /* This mutex already exists, leave it alone. */
-    if (PMC_sync(pmc))
-        return;
-
-    PMC_sync(pmc) = mem_gc_allocate_zeroed_typed(interp, Sync);
-
-    if (!PMC_sync(pmc))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
-            "Parrot VM: PMC Sync allocation failed!\n");
-
-    PMC_sync(pmc)->owner = interp;
-    MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
-}
-
-/*
-
 =item C<STRING * Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)>
 
 Returns a new C<STRING> header from the string pool or the constant string
-pool. Sets default flags on the string object: C<PObj_is_string_FLAG>,
-C<PObj_is_COWable_FLAG>, and C<PObj_live_FLAG> (for GC). Initializes the data
-field of the string buffer to C<NULL>.
+pool. Sets default flags on the string object: C<PObj_is_string_FLAG> and
+C<PObj_is_COWable_FLAG>. Initializes the data field of the string buffer to
+C<NULL>.
 
 =cut
 
@@ -476,7 +349,7 @@ Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
 
     string->strstart        = NULL;
     PObj_get_FLAGS(string) |=
-        flags | PObj_is_string_FLAG | PObj_is_COWable_FLAG | PObj_live_FLAG;
+        flags | PObj_is_string_FLAG | PObj_is_COWable_FLAG;
 
     return string;
 }
@@ -819,7 +692,8 @@ Parrot_gc_destroy_child_interp(ARGMOD(Interp *dest_interp),
     ARGIN(Interp *source_interp))
 {
     ASSERT_ARGS(Parrot_gc_destroy_child_interp)
-    dest_interp->gc_sys->destroy_child_interp(dest_interp, source_interp);
+    if (dest_interp->gc_sys->destroy_child_interp)
+        dest_interp->gc_sys->destroy_child_interp(dest_interp, source_interp);
 }
 
 /*
@@ -984,7 +858,7 @@ Parrot_gc_impatient_pmcs(PARROT_INTERP)
 
 =item C<void Parrot_block_GC_mark(PARROT_INTERP)>
 
-Blocks the GC from performing it's mark phase.
+Blocks the GC from performing its mark phase.
 
 =item C<void Parrot_unblock_GC_mark(PARROT_INTERP)>
 
@@ -992,7 +866,7 @@ Unblocks the GC mark.
 
 =item C<void Parrot_block_GC_sweep(PARROT_INTERP)>
 
-Blocks the GC from performing it's sweep phase.
+Blocks the GC from performing its sweep phase.
 
 =item C<void Parrot_unblock_GC_sweep(PARROT_INTERP)>
 
@@ -1068,7 +942,7 @@ Parrot_is_blocked_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_is_blocked_GC_sweep)
     if (interp->gc_sys->is_blocked_sweep)
-        return interp->gc_sys->is_blocked_mark(interp);
+        return interp->gc_sys->is_blocked_sweep(interp);
     else
         return 0;
 }
@@ -1124,6 +998,9 @@ Parrot_gc_sys_name(PARROT_INTERP)
         case INF:
             name = Parrot_str_new(interp, "inf", 3);
             break;
+        case MS2:
+            name = Parrot_str_new(interp, "ms2", 3);
+            break;
         default:
             name = Parrot_str_new(interp, "unknown", 7);
             break;
@@ -1152,5 +1029,5 @@ Initial version by Mike Lambert on 2002.05.27.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

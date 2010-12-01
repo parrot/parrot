@@ -1,6 +1,0 @@
-Add option to generate dlfuncs for certain h files not all includes.
-*** Allow typedefs and structs with the same name in the symbol table.
-Generate ManagedStructs definitions for structs and typedefs.
-Generate parrot_builtin_type entries in the AST such as INT NUM STR o PMC
-Add -I include support to ncigen.pl
-Convert ncigen.pl to ncigen.pir

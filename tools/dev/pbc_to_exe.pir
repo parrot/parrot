@@ -1,6 +1,5 @@
 #! parrot
-# Copyright (C) 2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2009-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -18,9 +17,9 @@ Compile bytecode to executable.
   pbc_to_exe my.pbc --install
   => installable_my.exe
 
-Warning! With --install there must be no directory prefix in the first arg yet.
-
 =cut
+
+.include 'interpcores.pasm'
 
 .sub 'main' :main
     .param pmc    argv
@@ -31,31 +30,16 @@ Warning! With --install there must be no directory prefix in the first arg yet.
     .local string cfile
     .local string objfile
     .local string exefile
+    .local int    runcore
+    .local int    install
 
-    (infile, cfile, objfile, exefile) = 'handle_args'(argv)
+    (infile, cfile, objfile, exefile, runcore, install) = 'handle_args'(argv)
     unless infile > '' goto err_infile
-
-    .local string code_type
-    code_type = 'determine_code_type'()
-
-    .local string codestring
-    if code_type == 'gcc'  goto code_for_gcc
-    if code_type == 'msvc' goto code_for_msvc
-    goto code_for_default
-  code_for_gcc:
-    codestring = 'generate_code_gcc'(infile)
-    goto code_end
-  code_for_msvc:
-    codestring = 'generate_code_msvc'(infile)
-    goto code_end
-  code_for_default:
-    codestring = 'generate_code'(infile)
-  code_end:
-
 
   open_outfile:
     .local pmc outfh
-    outfh = open cfile, 'w'
+    outfh = new ['FileHandle']
+    outfh.'open'(cfile, 'w')
     unless outfh goto err_outfh
     print outfh, <<'HEADER'
 #include "parrot/parrot.h"
@@ -63,10 +47,29 @@ Warning! With --install there must be no directory prefix in the first arg yet.
 const void * get_program_code(void);
 HEADER
 
-    print outfh, codestring
+    .local string code_type
+    code_type = 'determine_code_type'()
+
+    if code_type == 'gcc'  goto code_for_gcc
+    if code_type == 'msvc' goto code_for_msvc
+    goto code_for_default
+  code_for_gcc:
+    'generate_code_gcc'(infile, outfh)
+    goto code_end
+  code_for_msvc:
+    'generate_code_msvc'(infile, outfh)
+    goto code_end
+  code_for_default:
+    'generate_code'(infile, outfh)
+  code_end:
+
+
+    print outfh, '#define RUNCORE '
+    print outfh, runcore
+    print outfh, "\n"
 
     print outfh, <<'MAIN'
-        int main(int argc, char *argv[])
+        int main(int argc, const char *argv[])
         {
             PackFile     *pf;
             Parrot_Interp interp;
@@ -85,6 +88,7 @@ HEADER
             Parrot_init_stacktop(interp, &interp);
             Parrot_set_executable_name(interp,
                 Parrot_str_new(interp, argv[0], 0));
+            Parrot_set_run_core(interp, (Parrot_Run_core_t)RUNCORE);
             Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
 
             pf = PackFile_new(interp, 0);
@@ -102,7 +106,7 @@ HEADER
             PackFile_fixup_subs(interp, PBC_MAIN, NULL);
             Parrot_runcode(interp, argc, argv);
             Parrot_destroy(interp);
-            Parrot_exit(interp, 0);
+            Parrot_x_exit(interp, 0);
         }
 MAIN
 
@@ -121,8 +125,8 @@ MAIN
   no_extra:
 
 
-    'compile_file'(cfile, objfile)
-    'link_file'(objfile, exefile, extra_obj)
+    'compile_file'(cfile, objfile, install)
+    'link_file'(objfile, exefile, extra_obj, install)
     .return ()
 
   err_infile:
@@ -142,49 +146,99 @@ MAIN
     obj    = $P0['o']
     exe    = $P0['exe']
 
-    .local pmc args
-    args   = argv
+    load_bytecode 'Getopt/Obj.pbc'
+    .local pmc getopt
+    getopt = new ['Getopt';'Obj']
+    push getopt, 'install|i'
+    push getopt, 'runcore|R:s'
+    push getopt, 'output|o:s'
+    push getopt, 'help|h'
 
-    .local int argc
-    argc = args
+    $P0 = shift argv # ignore program name
+    .local pmc opts
+    opts = getopt.'get_options'(argv)
 
-    if argc == 2 goto proper_args
-    if argc == 3 goto check_install
-    .return ()
+    .local int    help
+    .local int    install
+    .local string runcore
+    .local string outfile
+    help    = opts['help']
+    install = opts['install']
+    runcore = opts['runcore']
+    outfile = opts['output']
 
-  check_install:
-    .local string infile, install
+    unless help goto end_help
+        $P0 = getstderr
+        print $P0, <<'HELP'
+pbc_to_exe [options] <file>
+  Options:
+    -h --help
+    -i --install
+    -R --runcore=slow|fast
+    -o --output=FILE
+HELP
+        exit 0
+    end_help:
 
-    $P0    = shift args
-    infile = shift args
-    install = shift args
-    if install == '--install' goto proper_install
-    .return ()
+    .local string infile
+    infile = shift argv
 
-  proper_install:
+    $S0 = substr infile, -4, 4
+    $S0 = downcase $S0
+    unless $S0 != '.pbc' goto done_pbc_extn_check
+        die "input pbc file name does not end in '.pbc'"
+    done_pbc_extn_check:
+
     .local string cfile, objfile, exefile
+    if outfile == '' goto no_outfile
+        $I0 = length exe
+        $I1 = - $I0
+        $S0 = substr outfile, $I1, $I0
+        $S0 = downcase $S0
+        $S1 = downcase exe
+        unless $S0 != $S1 goto done_exe_extn_check
+            $S0 = "output executable name does not end in `" . exe
+            $S0 = $S0 . "'"
+            die $S0
+        done_exe_extn_check:
+        outfile = replace outfile, $I1, $I0, ''
 
-    cfile   = 'replace_pbc_extension'(infile, '.c')
-    objfile = 'replace_pbc_extension'(infile, obj)
-    $S0     = 'replace_pbc_extension'(infile, exe)
-    exefile = 'prepend_installable'($S0)
+        cfile   = outfile . '.c'
+        objfile = outfile . obj
+        exefile = outfile . exe
+        goto end_outfile
+    no_outfile:
+        # substitute .c for .pbc
+        # remove .c for executable
+        outfile = replace infile, -4, 4, '' # remove .pbc extension
+        cfile   = outfile . '.c'
+        objfile = outfile . obj
+        exefile = outfile . exe
+        unless install goto end_installable
+            exefile = 'prepend_installable'(exefile)
+        end_installable:
+    end_outfile:
 
-    .return(infile, cfile, objfile, exefile)
+    .local int runcore_code
+    unless runcore == 'slow' goto end_slow_core
+        runcore_code = .PARROT_SLOW_CORE
+        goto done_runcore
+    end_slow_core:
+    unless runcore == 'fast' goto end_fast_core
+        runcore_code = .PARROT_FAST_CORE
+        goto done_runcore
+    end_fast_core:
+    unless runcore == '' goto end_unspecified_core
+        runcore_code = .PARROT_FAST_CORE
+        goto done_runcore
+    end_unspecified_core:
+        # invalid runcore name
+        $S0 = "Unsupported runcore: `" . runcore
+        $S0 = $S0 . "'"
+        die $S0
+    done_runcore:
 
-  proper_args:
-
-    $P0    = shift args
-    infile = shift args
-
-    cfile   = 'replace_pbc_extension'(infile, '.c')
-    objfile = 'replace_pbc_extension'(infile, obj)
-    exefile = 'replace_pbc_extension'(infile, exe)
-
-    # substitute .c for .pbc
-    # remove .c for executable
-
-    # TODO this should complain about results/returns mismatch
-    .return(infile, cfile, objfile, exefile)
+    .return (infile, cfile, objfile, exefile, runcore_code, install)
 .end
 
 .sub 'determine_code_type'
@@ -214,19 +268,22 @@ MAIN
 
 .sub 'generate_code'
     .param string infile
+    .param pmc    outfh
     .local pmc ifh
-    ifh = open infile, 'r'
+    ifh = new ['FileHandle']
+    ifh.'open'(infile, 'rb')
     unless ifh goto err_infile
-    .local string codestring
+
     .local int size
-    codestring = "const Parrot_UInt1 program_code[] = {"
+
+    print outfh, "const Parrot_UInt1 program_code[] = {"
     size = 0
 
   read_loop:
     .local string pbcstring
     .local int pbclength
 
-    pbcstring = read ifh, 16384
+    pbcstring = ifh.'read'(16384)
     pbclength = length pbcstring
     unless pbclength > 0 goto read_done
 
@@ -236,33 +293,32 @@ MAIN
     unless pos < pbclength goto code_done
     $I0 = ord pbcstring, pos
     $S0 = $I0
-    codestring .= $S0
-    codestring .= ','
+    print outfh, $S0
+    print outfh, ','
     inc pos
     inc size
     $I0 = size % 32
     unless $I0 == 0 goto code_loop
-    codestring .= "\n"
+    print outfh, "\n"
     goto code_loop
   code_done:
     goto read_loop
 
   read_done:
-    close ifh
+    ifh.'close'()
 
-    codestring .= "\n};\n\n"
-    codestring .= "const int bytecode_size = "
+    print outfh, "\n};\n\nconst size_t bytecode_size = "
     $S0 = size
-    codestring .= $S0
-    codestring .= ";\n"
-    codestring .= <<'END_OF_FUNCTION'
+    print outfh, $S0
+    print outfh, ";\n"
+    print outfh, <<'END_OF_FUNCTION'
         const void * get_program_code(void)
         {
             return program_code;
         }
 END_OF_FUNCTION
 
-    .return (codestring)
+    .return ()
 
   err_infile:
     die "cannot open infile"
@@ -300,24 +356,26 @@ END_OF_FUNCTION
 
 .sub 'generate_code_gcc'
     .param string infile
+    .param pmc    outfh
     .local pmc ifh
-    ifh = open infile, 'r'
+    ifh = new ['FileHandle']
+    ifh.'open'(infile, 'rb')
     unless ifh goto err_infile
 
     .local pmc encoding_table
     encoding_table = 'generate_encoding_table'()
 
-    .local string codestring
     .local int size
-    codestring = "const char * program_code =\n"
-    codestring .= '"'
+
+    print outfh, "const char * program_code =\n"
+    print outfh, '"'
     size = 0
 
   read_loop:
     .local string pbcstring
     .local int pbclength
 
-    pbcstring = read ifh, 16384
+    pbcstring = ifh.'read'(16384)
     pbclength = length pbcstring
     unless pbclength > 0 goto read_done
 
@@ -327,36 +385,36 @@ END_OF_FUNCTION
     unless pos < pbclength goto code_done
     $I0 = ord pbcstring, pos
     $S0 = encoding_table[$I0]
-    codestring .= $S0
+    print outfh, $S0
     inc pos
     inc size
     $I0 = size % 32
     unless $I0 == 0 goto code_loop
-    codestring .= '"'
-    codestring .= "\n"
-    codestring .= '"'
+    print outfh, '"'
+    print outfh, "\n"
+    print outfh, '"'
     goto code_loop
   code_done:
     goto read_loop
 
   read_done:
-    close ifh
+    ifh.'close'()
 
-    codestring .= '"'
-    codestring .= "\n;\n\n"
-    codestring .= "const int bytecode_size = "
+    print outfh, '"'
+    print outfh, "\n;\n\n"
+    print outfh, "const size_t bytecode_size = "
     $S0 = size
-    codestring .= $S0
-    codestring .= ";\n"
+    print outfh, $S0
+    print outfh, ";\n"
 
-    codestring .= <<'END_OF_FUNCTION'
+    print outfh, <<'END_OF_FUNCTION'
         const void * get_program_code(void)
         {
             return program_code;
         }
 END_OF_FUNCTION
 
-    .return (codestring)
+    .return ()
 
   err_infile:
     die "cannot open infile"
@@ -371,11 +429,10 @@ END_OF_FUNCTION
     .param string new_extension
 
     $S0 = substr pbc_path, -4
-    downcase $S0
+    $S0 = downcase $S0
     if $S0 != '.pbc' goto err_pbc_path_not_pbc
     .local string base_path
-     base_path = substr pbc_path, 0
-     substr base_path, -4, 4, ''
+     base_path = replace pbc_path, -4, 4, ''
 
     .local string new_path
     new_path = substr base_path, 0
@@ -401,6 +458,7 @@ END_OF_FUNCTION
 # this sub creates supplemental .rc and .RES files.
 .sub 'generate_code_msvc'
     .param string pbc_path
+    .param pmc    outfh
 
     .local string rc_path
     .local string res_path
@@ -424,7 +482,8 @@ END_OF_DEFINES
     rc_contents .= "\"\n"
 
     .local pmc rc_fh
-    rc_fh = open rc_path, 'w'
+    rc_fh = new ['FileHandle']
+    rc_fh.'open'(rc_path, 'w')
     unless rc_fh goto err_rc_open
     print rc_fh, rc_contents
     $I0 = rc_fh.'close'()
@@ -432,22 +491,20 @@ END_OF_DEFINES
 
 
     .local int pbc_size
+    $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P2 = $P1.'stat'(pbc_path)
     pbc_size = $P2[7]
 
 
-    .local string codestring
-    codestring  = ''
-    codestring .= '#include <windows.h>'
-    codestring .= "\n"
-    codestring .= rc_constant_defines
-    codestring .= "const unsigned int bytecode_size = "
+    print outfh, "#include <windows.h>\n"
+    print outfh, rc_constant_defines
+    print outfh, "const unsigned int bytecode_size = "
     $S0 = pbc_size
-    codestring .= $S0
-    codestring .= ";\n"
+    print outfh, $S0
+    print outfh, ";\n"
 
-    codestring .= <<'END_OF_FUNCTION'
+    print outfh, <<'END_OF_FUNCTION'
         const void * get_program_code(void)
         {
             HRSRC   hResource;
@@ -489,9 +546,10 @@ END_OF_FUNCTION
     unless status goto rc_ok
 
     die "RC command failed"
+
   rc_ok:
 
-    .return (codestring)
+    .return ()
 
   err_h_open:
     die "cannot open .h file"
@@ -507,13 +565,14 @@ END_OF_FUNCTION
 .sub 'compile_file'
     .param string cfile
     .param string objfile
-    .param int install :optional
+    .param int    install
 
     $P0 = '_config'()
-    .local string cc, ccflags, cc_o_out, osname, build_dir, slash
+    .local string cc, ccflags, optimize, cc_o_out, osname, build_dir, slash
     .local string installed, includepath, versiondir
     cc        = $P0['cc']
     ccflags   = $P0['ccflags']
+    optimize  = $P0['optimize']
     cc_o_out  = $P0['cc_o_out']
     osname    = $P0['osname']
     build_dir = $P0['build_dir']
@@ -547,6 +606,8 @@ END_OF_FUNCTION
     compile .= pathquote
     compile .= ' '
     compile .= ccflags
+    compile .= ' '
+    compile .= optimize
     compile .= ' -c '
     compile .= cfile
 
@@ -567,7 +628,7 @@ END_OF_FUNCTION
     .param string objfile
     .param string exefile
     .param string extra_obj
-    .param int install :optional
+    .param int    install
 
     $P0 = '_config'()
     .local string cc, link, link_dynamic, linkflags, ld_out, libparrot, libs, o
@@ -596,7 +657,7 @@ END_OF_FUNCTION
     config     = concat build_dir, slash
     config    .= 'src'
     config    .= slash
-    if exeprefix == 'installable_' goto config_to_install
+    if install goto config_to_install
     config    .= 'parrot_config'
     goto config_cont
  config_to_install:
@@ -654,6 +715,7 @@ END_OF_FUNCTION
   check_manifest:
     # Check if there is a MSVC app manifest
     .local pmc file
+    $P0 = loadlib 'file'
     file = new 'File'
     .local string manifest_file_name
     manifest_file_name  = clone exefile
@@ -687,19 +749,14 @@ END_OF_FUNCTION
 .sub 'prepend_installable'
     .param string file
 
-    $P0   = '_config'()
-
-    .local string slash
-    slash = $P0['slash']
-
     .local pmc path
-    path = split slash, file
+    path     = split '/', file
 
     file     = path[-1]
     file     = concat 'installable_', file
     path[-1] = file
 
-    file     = join slash, path
+    file     = join '/', path
 
     .return( file )
 .end

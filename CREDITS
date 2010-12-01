@@ -1,6 +1,5 @@
 =pod
 
-﻿# $Id$
 
     Following in the steps of other open source projects that
     eventually take over the world, here is the partial list
@@ -16,6 +15,7 @@
         The Parrot Team
         PS: Yes, this looks remarkably like the Linux CREDITS format
         PPS: This file is encoded in UTF-8
+        PPPS: To turn this file into a author map for git-svn, see tools/dev/mk_author_map.pl
 
 ----------
 N: Aaron Sherman
@@ -92,7 +92,7 @@ E: yDNA@cpan.org
 N: Andrew Whitworth
 D: Internals development
 D: Documentation
-D: Release manager for 0.8.2, 1.3.0 and 1.5.0
+D: Release manager for 0.8.2, 1.3.0, 1.5.0 and 2.4.0
 E: wknight8111@gmail.com
 U: Whiteknight
 
@@ -129,8 +129,7 @@ D: Keeps us running
 E: ask@develooper.com
 
 N: Audrey Tang
-U: audreyt
-U: autrijus
+U: au
 E: audreyt@audreyt.org
 D: Pugs, a Perl6->Parrot implementation.
 
@@ -242,13 +241,14 @@ E: cdolan@cpan.org
 N: Chris Fields (cjfields)
 D: Rakudo patches
 
-N: Christoph Otto a.k.a. cotto
+N: Christoph Otto
 U: cotto
 D: Patch for key flags in pdd08
 D: Range check in Env PMC
 A: christoph_googleacct@mksig.org
 A: christop...@mksig.org
-D: Pipp
+A: Christoph Otto
+D: Pipp, Lorito taskmaster
 E: christoph@mksig.org
 
 N: chromatic
@@ -291,6 +291,8 @@ D: imcc optimizer and register allocator patches and tests
 E: cgrawls@gmail.com
 
 U: cxreg
+N: Dave Olszewski
+E: cxreg@pobox.com
 D: copyright test cleanup
 
 N: Damian Miles Knopp
@@ -364,6 +366,12 @@ W: http://eric.lubow.org/
 N: Felix Gallo
 D: delegate.pmc patch
 
+N: Fernando Brito
+E: email@fernandobrito.com
+D: GCI Student
+U: fbrito
+S: João Pessoa, Brazil
+
 N: Flavio Poletti
 D: SmartLink patch for Moose after 0.43
 
@@ -400,9 +408,16 @@ D: Miscellaneous fixes
 N: Gerard Goossen
 D: Documentation patch for Parrot_PMC_get_pointer_intkey()
 
+N: Géraud Continsouzas
+U: GeJ
+E: geraud@gcu.info
+A: geraud
+D: Perl2Pir tests conversion
+D: Miscellaneous codingstd fixes
+
 N: Gerd Pokorra
 E: pokorra@uni-siegen.de
-D: Release manager for 1.9.0
+D: Release manager for 1.9.0, 2.3.0, 2.5.0, 2.8.0 and 2.9.0
 
 N: Goplat
 D: Win98 and other fixes.
@@ -450,7 +465,7 @@ D: string.pmc, complex.pmc
 N: isop
 D: various Pynie patches
 
-N: James E Keenan (Jim)
+N: James E Keenan
 E: jkeenan@cpan.org
 U: jkeenan
 D: Testing of configuration and build tools
@@ -494,7 +509,7 @@ E: jquelin@cpan.org
 U: jquelin
 S: Lyon, France
 
-N: Jerry Gay a.k.a. particle
+N: Jerry Gay
 U: particle
 E: Jerry.Gay@gmail.com
 D: Whatever
@@ -509,9 +524,14 @@ U: jesse
 E: jesse@fsck.com
 
 N: Jimmy Zhuo
-A: jimmy
+A: JimmyZ
+U: jimmy
 E: zhuomingliang@yahoo.com.cn
-D: Bugfixes
+D: Bugfixes, cage cleaning
+
+N: John Harrison
+E: ash@greatethaninfinity.com 
+U: ash_
 
 N: John J. Trammell
 E: trammell@el-swifto.com
@@ -520,7 +540,7 @@ D: coding standard tests
 N: John Paul Wallington
 D: pir-mode.el: fix for xemacs plus bugfixes and cleanups
 
-N: Jonathan Leto
+N: Jonathan "Duke" Leto
 E: jonathan@leto.net
 W: http://leto.net
 D: Release manager for 1.7.0
@@ -573,7 +593,9 @@ U: jisom
 D: Getopt/Obj.pir
 
 N: Julian Albo
-U: julianalbo
+U: NotFound
+A: julianalbo
+A: julian.notfound
 E: julian.notfound@gmail.com
 
 N: Julian Fondren
@@ -635,6 +657,10 @@ D: Patchmonster & release manager emeritus (0.0.13 - 0.4.5)
 E: lt@toetsch.at
 S: Herrnbaumgarten, Austria
 
+N: Luben Karavelov
+U: luben
+E: karavelov@spnet.net
+
 N: Luca Barbato
 D: fix to make installable
 E: lu_zero@gentoo.org
@@ -655,7 +681,7 @@ D: Bug fix
 N: Marcus Thiesen
 D: URM language, bugfixes
 
-N: Mark Glines a.k.a. Infinoid
+N: Mark Glines
 U: infinoid
 D: Cage cleaning, random bugfixes, report bugs
 E: mark@glines.org
@@ -684,6 +710,9 @@ D: Resizable*Array PMCs
 
 N: Matt Kennedy
 D: Some Env PMC method implementations and tests
+
+N: Matt Rajca
+D: Code refactoring
 
 N: Mattia Barbon
 D: Win32 fixes, dynamic PMC creation and loading
@@ -734,11 +763,15 @@ D: Patch reducing code duplication
 
 N: Mitchell N Charity
 
-N: Moritz A Lenz
-A: Moritz Lenz
+N: Moritz Lenz
 E: moritz@faui2k3.org
 U: moritz
 D: Test infrastructure for languages/perl6/ and Perl 6 in general
+
+N: Nat Tuck
+U: Chandon
+E: nat@ferrus.net
+D: 2010 Hybrid Threads GSoC project
 
 N: Neil Conway
 
@@ -757,6 +790,11 @@ U: nickg
 N: Nick Kostirya
 D: Win32, FreeBSD build fixes
 
+N: Nick Wellnhofer
+D: String iterator rewrite, GC fixes
+E: wellnhofer@aevum.de
+U: nwellnhof
+
 N: Nikolay Ananiev
 D: Win32 build fix
 
@@ -766,10 +804,6 @@ E: nnunley@gmail.com
 
 N: Nigelsandever
 D: Win32 patches
-
-N: Notfound
-D: Bugfixing and cage cleaning.
-E: julian.notfound@gmail.com
 
 N: Nuno 'smash' Carvalho
 U: smash
@@ -783,7 +817,7 @@ N: Ovid
 D: Rename 'pbc_to_c' to 'pbc_to_exe'
 
 N: Paco Alguacil
-D: Building on various platorms
+D: Building on various platforms
 E: paco.linux@gmail.com
 
 N: Pancake
@@ -801,6 +835,12 @@ D: NQP, PCT, PAST, POST
 D: APL
 D: Pynie
 E: pmichaud@pobox.com
+
+N: Paul C. Anagnostopoulos
+U: Paul_the_Greek
+A: Paul C. Anagnostopoulos
+E: paul@windfall.com
+D: Improving memory management documentation
 
 N: Paul Cochrane
 U: paultcochrane
@@ -922,6 +962,11 @@ D: Fix for string_to_num
 N: Stefan Lidman
 D: sqrt ops
 
+N: Stefan O'Rear
+E: stefanor@cox.net
+D: Perl 5 interoperability, Blizkost
+U: sorear
+
 N: Stéphane Payrard
 D: Various code fixes and improvements
 
@@ -997,6 +1042,19 @@ D: Nicer command line handling in ops2c.pl
 N: Tony Payne
 D: Example hanoi.pasm
 
+N: Tyler Curtis
+U: tcurtis
+E: tyler.l.curtis@gmail.com
+E: ekiru.0@gmail.com
+D: PAST Optimization GSoC 2010
+D: Release manager for 2.10.0
+A: tylercurtis
+A: ekiru
+
+N: Tadeusz Sośnierz
+U: tadzik
+E: tadzikes@gmail.com
+
 N: Ujwal Reddy Malipeddi
 U: ujwalic
 E: ujwalic@gmail.com
@@ -1024,7 +1082,8 @@ N: Will "Coke" Coleda
 U: coke
 A: wcoleda
 E: will@coleda.com
-D: Tcl language (partcl), APL, website, various languages/ upkeep, misc.
+D: Tcl HLL implementation (partcl), APL, website,
+D: Release Manager, PaFo board member, curmudgeon
 
 N: Zach Lipton
 
@@ -1041,18 +1100,3 @@ U: svn
 E: svn@perl.org
 
 =cut
-
-# This makes a "svn authors" file for git svn
-
-open my $fh, "<", $0 or die "can't open $0: $!";
-my %n;
-while (<$fh>) {
-    #warn "[$_]";
-    if (m/^\s*$/) {
-        printf "%-10s = %s <%s>\n", $n{U}, $n{N}, $n{E} if $n{U};
-        %n = ();
-    }
-    next unless m/^([NEDUSW]): (.*)/;
-    my ($f, $v) = ($1, $2);
-    $n{$f} = $v unless $n{$f};  # doesn't do the right thing for the multiline fields
-}

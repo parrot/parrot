@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2007-2009, Parrot Foundation.
-$Id$
 
 figure out if the compiler supports attributes.
 see parrot/compiler.h for attribute value definitions.
@@ -32,6 +31,16 @@ int
 purefunc(int x);
 
 
+__attribute__hot__
+int
+hotfunc(int x);
+
+
+__attribute__cold__
+int
+coldfunc(int x);
+
+
 static int
 useless(void) { int x __attribute__unused__; return 0; }
 
@@ -47,5 +56,5 @@ main()
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

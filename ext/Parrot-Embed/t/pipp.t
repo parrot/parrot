@@ -1,6 +1,5 @@
 #!perl
-# Copyright (C) 2008-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2008-2010, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -24,7 +23,7 @@ isa_ok( $interp, $module );
 my $result = eval { $interp->load_file($pipp_pbc) };
 my $except = $@;
 ok( $result, '... returning true if it could load the file' );
-is( $except, '', '... throwing no exeption if so' );
+is( $except, '', '... throwing no exception if so' );
 
 # What is 'Pipp' in hll namespace 'parrot' ?
 my $pipp_x = $interp->find_global( 'Pipp' );
@@ -33,8 +32,8 @@ my $pipp_x = $interp->find_global( 'Pipp' );
     isa_ok( $pipp_x, 'Parrot::PMC' );
 }
 
-# TODO: get hll id of Pipp
-# TODO: set hll namespace root to 'pipp'
+# todo: get hll id of Pipp
+# todo: set hll namespace root to 'pipp'
 # find sub 'eval' and hll namespace 'pipp'
 my $pipp_eval = $interp->find_global( 'pipp', 'eval' );
 # isa_ok( $pipp_eval, 'Parrot::PMC', todo => '$pipp_eval is not found'  );
@@ -73,3 +72,11 @@ if (0)
     ok( $pmc, 'invoke() should return a PMC, given that signature' );
     is( $pmc->get_string(), 42, 'value returned in the PMC' );
 }
+
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

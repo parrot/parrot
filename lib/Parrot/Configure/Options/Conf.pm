@@ -1,5 +1,4 @@
 # Copyright (C) 2007-2009, Parrot Foundation.
-# $Id$
 package Parrot::Configure::Options::Conf;
 
 use strict;
@@ -44,8 +43,6 @@ General Options:
                         which upon failure cause Configure.pl to halt
    --silent             Don't be verbose, interactive or fatal
    --nomanicheck        Don't check the MANIFEST
-   --languages="list of languages"
-                        Specify a list of languages to process
 
    --ask                Have Configure ask for commonly-changed info
    --test=configure     Run tests of configuration tools before configuring
@@ -74,6 +71,8 @@ Compile Options:
    --libs=(libs)        Use the given libraries
    --link=(linker)      Use the given linker
    --linkflags=(flags)  Use the given linker flags
+   --ar=(archiver)      Use the given librarian for static libraries
+   --arflags=(flags)    Use the given flags for static libraries
    --ld=(linker)        Use the given loader for shared libraries
    --ldflags=(flags)    Use the given loader flags for shared libraries
    --lex=(lexer)        Use the given lexical analyzer generator
@@ -91,20 +90,27 @@ Parrot Options:
    --opcode=(type)      Use the given type for opcodes
    --ops=(files)        Use the given ops files
 
-   --cgoto=0            Don't build cgoto core - recommended when short of mem
    --jitcapable         Use JIT
    --execcapable        Use JIT to emit a native executable
    --without-threads    Build parrot without thread support
    --buildframes        Dynamically build NCI call frames
+   --without-core-nci-thunks
+                        Build parrot without core-required
+                        statically compiled NCI call frames
+                        (useful for testing dynamic frame builders)
+   --without-extra-nci-thunks
+                        Build parrot without unnecessary
+                        statically compiled NCI call frames
 
 External Library Options:
 
-   --without-crypto     Build parrot without crypto support (libssl)
-   --without-gdbm       Build parrot without GDBM support
    --without-gettext    Build parrot without gettext support
    --without-gmp        Build parrot without GMP support
+   --without-libffi     Build parrot without libffi support
    --without-opengl     Build parrot without OpenGL support (GL/GLU/GLUT)
+   --without-readline   Build parrot without readline support
    --without-pcre       Build parrot without pcre support
+   --without-zlib       Build parrot without zlib support
 
 ICU Options:
 
@@ -157,6 +163,8 @@ Install Options:
     --oldincludedir=DIR   C header files for non-gcc [/usr/include]
     --infodir=DIR         info documentation [PREFIX/info]
     --mandir=DIR          man documentation [PREFIX/man]
+    --pkgconfigdir=DIR    subdirectory of <libdir> for pkgconfig
+                              [<libdir>/pkgconfig/<version>]
 
 EOT
     return 1;

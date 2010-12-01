@@ -3,7 +3,6 @@ This is Parrot, version 0.9.1
 
 Parrot is Copyright (C) 2001-2009, Parrot Foundation.
 
-$Id$
 
 LICENSE INFORMATION
 -------------------
@@ -103,14 +102,6 @@ docs/submissions.pod.  These documents are in POD format. You can view these
 files with the command:
 
     perldoc -F docs/intro.pod
-
-NOTES
------
-
-On some older computers with little RAM, the computed-goto dispatch core
-(ops/core_ops_cg.c) may take a while to compile or may fail to compile at all.
-You can pass a flag to Configure.pl (--cgoto=0) to disable the computed-goto
-core, at a slight cost in runtime speed.
 
 CHANGES
 -------

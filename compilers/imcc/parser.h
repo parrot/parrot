@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2002-2009, Parrot Foundation.
- * $Id$
  */
 
 #ifndef PARROT_IMCC_PARSER_H_GUARD
@@ -8,7 +7,6 @@
 
 typedef struct _IdList {
     char* id;
-    int unique_reg;
     struct _IdList*  next;
 } IdList;
 
@@ -22,15 +20,18 @@ typedef struct _IdList {
 typedef void* yyscan_t;
 #endif
 
+typedef struct yyguts_t yyguts_t;
+
 void set_filename(PARROT_INTERP, char * const filename);
 
 SymReg * macro(PARROT_INTERP, char *name);
 
-PARROT_EXPORT int yyparse(yyscan_t, PARROT_INTERP);
-PARROT_EXPORT int yylex(YYSTYPE *, yyscan_t, PARROT_INTERP);
-PARROT_EXPORT int yylex_destroy(yyscan_t);
+int yyparse(yyscan_t, PARROT_INTERP);
+int yylex(YYSTYPE *, yyscan_t, PARROT_INTERP);
+int yylex_destroy(yyscan_t);
 
 int yylex_init(yyscan_t*);
+int yylex_init_extra(PARROT_INTERP, yyscan_t*);
 int yyget_column(yyscan_t);
 void yyset_column(int column_no , yyscan_t);
 int yyerror(yyscan_t, Interp*, const char *);
@@ -43,6 +44,7 @@ void yyset_extra(YY_EXTRA_TYPE user_defined, yyscan_t yyscanner);
 
 extern void compile_file(PARROT_INTERP, FILE *file, void *);
 extern void compile_string(PARROT_INTERP, const char *, void *);
+extern void imcc_run_compilation(PARROT_INTERP, void *);
 
 int at_eof(yyscan_t yyscanner);
 
@@ -52,5 +54,5 @@ int at_eof(yyscan_t yyscanner);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -21,7 +20,7 @@ Tests the Complex PMC.
     .include 'fp_equality.pasm'
     .include "iglobals.pasm"
 
-    plan(458)
+    plan(460)
 
     string_parsing()
     exception_malformed_string__real_part()
@@ -50,10 +49,10 @@ Tests the Complex PMC.
     instantiate__pir__s()
     test_complex_neg()
     test_clone()
+    test_freeze_thaw()
     test_sub()
     test_i_sub()
     sprintf_with_a_complex()
-    e_raised_pi_time_i__plus_1_equal_0()
     ln_of_complex_numbers()
     exp_of_complex_numbers()
     sqrt_of_complex_numbers()
@@ -76,6 +75,7 @@ Tests the Complex PMC.
     sech_of_complex_numbers()
     csch_of_complex_numbers()
     add_using_subclass_of_complex_bug_59630()
+    provides_complex()
 
     # END_OF_TESTS
 
@@ -339,9 +339,6 @@ handler:
 .end
 
 .sub complex_divide_by_zero_Complex
-    skip( 1, 'div by zero not caught' )
-    .return()
-
     $P0 = new ['Complex']
     set $P0, "4+3.5i"
     $P1 = new ['Complex']
@@ -356,9 +353,6 @@ handler:
 .end
 
 .sub complex_divide_by_zero_Float
-    skip( 1, 'div by zero not caught' )
-    .return()
-
     $P0 = new ['Complex']
     set $P0, "4+3.5i"
     $P1 = new ['Complex']
@@ -372,9 +366,6 @@ handler:
 .end
 
 .sub complex_divide_by_zero_Integer
-    skip( 1, 'div by zero not caught' )
-    .return()
-
     $P0 = new ['Complex']
     set $P0, "4+3.5i"
     $P1 = new ['Complex']
@@ -514,10 +505,10 @@ handler:
     .local int bool1
 
     does bool1, pmc1, "scalar"
-    ok( bool1, 'Comples does scalar' )
+    ok( bool1, 'Complex does scalar' )
 
     does bool1, pmc1, "no_interface"
-    nok( bool1, 'Comples !does no_interface' )
+    nok( bool1, 'Complex !does no_interface' )
 .end
 
 .sub instantiate__pasm__i
@@ -591,6 +582,14 @@ handler:
      .fp_eq_ok($N1, -3.0, '... nor to imag portion')
 .end
 
+.sub test_freeze_thaw
+    $P0 = new ['Complex']
+    set $P0, "1 - 3i"
+    $S0 = freeze $P0
+    $P1 = thaw $S0
+    is($P0, $P1, 'roundtrip serialize Complex PMC')
+.end
+
 .sub test_sub
     .local pmc d, f, c
     d = new ['Undef']
@@ -640,21 +639,6 @@ handler:
     .sprintf_is( "%.3f%+.3fi", "0+i", "0.000+1.000i" )
 .end
 
-.sub e_raised_pi_time_i__plus_1_equal_0
-    .local pmc c, c2, c3
-    c  = new ['Complex']
-    c2 = new ['Complex']
-    c3 = new ['Complex']
-    # e^(pi * i) + 1 = 0
-    $N0 = atan 1
-    $N0 *= 4
-    c[0] = 0.0
-    c[1] = $N0
-    c2 = c.'exp'()
-    c2 += 1.0
-    .sprintf_is( "%.3f%+.3fi", c2, "0.000+0.000i" )
-.end
-
 # # The inverse hyperbolic functions are broken wrt -0.0
 # # Need to find some formal spec for when to return -0.0.
 
@@ -694,9 +678,7 @@ handler:
     concat $S5, $S2, " of "
     concat $S5, $S5, $S4
 
-    $I0 = cmp_str $S1, $S3
-    $I0 = not $I0
-
+    $I0 = iseq $S1, $S3
     todo( $I0, $S4 )
 .endm
 
@@ -1163,6 +1145,17 @@ todo:
     $S0 = concat $S0, ' - subclassing Complex add returns 0+0i - TT #562'
     $I0 = not $I0    # invert $I0 so todo does not pass
     todo( $I0, $S0 )
+.end
+
+.sub provides_complex
+    $P0 = new 'Complex'
+    $I0 = does $P0, 'complex'
+    ok($I0)
+
+    # ...And test a subclass, for good measure
+    $P0 = new 'MyComplex'
+    $I0 = does $P0, 'complex'
+    ok($I0)
 .end
 
 .namespace ['MyComplex']

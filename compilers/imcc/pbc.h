@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2002-2009, Parrot Foundation.
  */
 
@@ -28,13 +27,16 @@ int e_pbc_new_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-int e_pbc_open(PARROT_INTERP, SHIM(void *param))
+int e_pbc_open(PARROT_INTERP, SHIM(const char *param))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+void imcc_pbc_add_libdep(PARROT_INTERP, STRING *libname)
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -65,6 +67,8 @@ STRING * IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 #define ASSERT_ARGS_IMCC_int_from_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(r))
+#define ASSERT_ARGS_imcc_pbc_add_libdep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_IMCC_string_from__STRINGC __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buf))
@@ -81,6 +85,6 @@ STRING * IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

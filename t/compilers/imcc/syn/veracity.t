@@ -1,6 +1,5 @@
-#!parrot
+#!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 .sub test :main
     .include 'test_more.pir'

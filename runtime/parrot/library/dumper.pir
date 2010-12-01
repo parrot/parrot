@@ -1,4 +1,3 @@
-# $Id$
 # Copyright (C) 2004-2009, Parrot Foundation.
 
 =head1 TITLE
@@ -34,7 +33,7 @@ version 0.10
     say ''
     say "    .local pmc foo, dumper"
     say "    foo    = new 'ResizablePMCArray'"
-    say "    dumper = new 'Data::Dumper'"
+    say "    dumper = new ['Data'; 'Dumper']"
     say ''
     say "    dumper.'dumper'( foo, 'foo' )"
     say ".end"
@@ -148,13 +147,13 @@ Returns the global dumper instance used by the non object interface.
     .local pmc dd_class
     .local int is_defined
 
-    get_class dd_class, "Data::Dumper"
+    get_class dd_class, ['Data'; 'Dumper']
     if null dd_class goto load_dd_pir
     goto TYPE_OK
 
   load_dd_pir:
     load_bytecode "Data/Dumper.pbc"
-    get_class dd_class, "Data::Dumper"
+    get_class dd_class, ['Data'; 'Dumper']
     if null dd_class goto no_class
     goto TYPE_OK
 
@@ -164,13 +163,13 @@ Returns the global dumper instance used by the non object interface.
 TYPE_OK:
 
     errorsoff .PARROT_ERRORS_GLOBALS_FLAG
-    self = get_hll_global ['Data::Dumper'], 'global'
+    self = get_hll_global ['Data'; 'Dumper'], 'global'
     errorson .PARROT_ERRORS_GLOBALS_FLAG
     if null self goto create_type
 
 create_type:
-    new self, "Data::Dumper"
-    set_hll_global ['Data::Dumper'], 'global', self
+    new self, ['Data'; 'Dumper']
+    set_hll_global ['Data'; 'Dumper'], 'global', self
 
 END:
     .return( self )

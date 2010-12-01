@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -19,6 +18,10 @@ These are the vtable functions for the scalar base PMC class
 */
 
 #include "pmc/pmc_bigint.h"
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
 
 pmclass scalar {
 
@@ -520,7 +523,7 @@ Calculates modulus inplace
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
-                floatval_mod(SELF.get_number(), d));
+                Parrot_util_floatval_mod(SELF.get_number(), d));
         return dest;
     }
 
@@ -532,7 +535,7 @@ Calculates modulus inplace
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
-                floatval_mod(SELF.get_number(), (FLOATVAL)value));
+                Parrot_util_floatval_mod(SELF.get_number(), (FLOATVAL)value));
         return dest;
     }
 
@@ -544,7 +547,7 @@ Calculates modulus inplace
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
-                floatval_mod(SELF.get_number(), value));
+                Parrot_util_floatval_mod(SELF.get_number(), value));
         return dest;
     }
 
@@ -556,7 +559,7 @@ Calculates modulus inplace
                 "float modulus by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
-                floatval_mod(SELF.get_number(), d));
+                Parrot_util_floatval_mod(SELF.get_number(), d));
     }
 
     VTABLE void i_modulus_int(INTVAL value) {
@@ -565,7 +568,7 @@ Calculates modulus inplace
                 "float modulus by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
-                floatval_mod(SELF.get_number(), (FLOATVAL)value));
+                Parrot_util_floatval_mod(SELF.get_number(), (FLOATVAL)value));
     }
 
     VTABLE void i_modulus_float(FLOATVAL value) {
@@ -574,7 +577,7 @@ Calculates modulus inplace
                 "float modulus by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
-                floatval_mod(SELF.get_number(), value));
+                Parrot_util_floatval_mod(SELF.get_number(), value));
     }
 
 /*
@@ -628,7 +631,7 @@ Concatenate the string C<value> in place.
 
     VTABLE PMC *concatenate(PMC *value, PMC *dest) {
         STRING * const s = Parrot_str_concat(INTERP, SELF.get_string(),
-            VTABLE_get_string(INTERP, value), 0);
+            VTABLE_get_string(INTERP, value));
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -638,7 +641,7 @@ Concatenate the string C<value> in place.
 
     VTABLE PMC *concatenate_str(STRING *value, PMC *dest) {
         STRING * const s = Parrot_str_concat(INTERP,
-            SELF.get_string(), value, 0);
+            SELF.get_string(), value);
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -649,12 +652,12 @@ Concatenate the string C<value> in place.
     VTABLE void i_concatenate(PMC *value) {
         STRING * const s = SELF.get_string();
         STRING * const v = VTABLE_get_string(INTERP, value);
-        SELF.set_string_native(Parrot_str_append(INTERP, s, v));
+        SELF.set_string_native(Parrot_str_concat(INTERP, s, v));
     }
 
     VTABLE void i_concatenate_str(STRING *value) {
         STRING * const s = SELF.get_string();
-        SELF.set_string_native(Parrot_str_append(INTERP, s, value));
+        SELF.set_string_native(Parrot_str_concat(INTERP, s, value));
     }
 
 /*
@@ -749,7 +752,7 @@ C<*value>.
 */
 
     MULTI INTVAL cmp_string(PMC *value) {
-        return Parrot_str_compare(INTERP, SELF.get_string(),
+        return STRING_compare(INTERP, SELF.get_string(),
             VTABLE_get_string(INTERP, value));
     }
 
@@ -796,102 +799,10 @@ Returns whether the PMC has string equality with C<*value>.
 */
 
     MULTI INTVAL is_equal_string(PMC *value) {
-        return (0 != Parrot_str_equal(INTERP, VTABLE_get_string(INTERP, SELF),
+        return (0 != STRING_equal(INTERP, VTABLE_get_string(INTERP, SELF),
                                           VTABLE_get_string(INTERP, value)));
     }
 
-
-/*
-
-=back
-
-=head2 Logical Methods
-
-=over 4
-
-=item C<PMC *logical_or(PMC *value, PMC *dest)>
-
-Returns the result of the logical C<OR> of C<SELF> and C<value>, i.e. returns
-C<SELF> it is true or C<value>: C<dest> is alway ignored.
-
-=cut
-
-*/
-
-    VTABLE PMC *logical_or(PMC *value, PMC *dest) {
-        if (SELF.get_bool())
-            return SELF;
-
-        return value;
-    }
-
-/*
-
-=item C< PMC *logical_and(PMC *value, PMC *dest)>
-
-Returns the result of the logical C<AND> of C<SELF> and C<value>, i.e.
-returns C<value> if C<SELF> is true else C<SELF>. C<dest> is always ignored.
-
-=cut
-
-*/
-
-    VTABLE PMC *logical_and(PMC *value, PMC *dest) {
-        if (SELF.get_bool())
-            return value;
-
-        return SELF;
-    }
-
-/*
-
-=item C<PMC *logical_xor(PMC *value, PMC *dest)>
-
-Returns the result of the logical C<XOR> of C<SELF> and C<*value>.
-
-=cut
-
-*/
-
-    VTABLE PMC *logical_xor(PMC *value, PMC *dest) {
-        const INTVAL my_bool    = SELF.get_bool();
-        const INTVAL value_bool = VTABLE_get_bool(INTERP, value);
-
-        if (my_bool && ! value_bool)
-            return SELF;
-        else if (value_bool && ! my_bool)
-            return value;
-
-        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        VTABLE_set_bool(INTERP, dest, 0);
-        return dest;
-    }
-
-/*
-
-=item C<PMC *logical_not(PMC *dest)>
-
-=item C<void i_logical_not()>
-
-Returns in C<*dest> the result of the logical negation of the scalar and
-C<*value>.
-
-=cut
-
-*/
-
-    VTABLE PMC *logical_not(PMC *dest) {
-        const INTVAL a = ! SELF.get_bool();
-
-        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_bool(INTERP, dest, a);
-        return dest;
-    }
-
-    VTABLE void i_logical_not() {
-        VTABLE_set_bool(INTERP, SELF, ! SELF.get_bool());
-    }
 
 /*
 
@@ -919,8 +830,8 @@ C<offset>.
 */
 
     VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
-        return Parrot_str_substr(INTERP, VTABLE_get_string(INTERP, SELF),
-            offset, length, NULL, 0);
+        return STRING_substr(INTERP, VTABLE_get_string(INTERP, SELF),
+                offset, length);
     }
 
 /*
@@ -934,15 +845,12 @@ Sets this PMC as shared and read-only.
 */
     VTABLE PMC *share_ro() {
         PMC         *ret  = pt_shared_fixup(INTERP, SELF);
-        PMC * const _true = Parrot_pmc_new(INTERP, enum_class_Integer);
-
-        VTABLE_set_integer_native(INTERP, _true, 1);
+        PMC * const _true = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, 1);
 
         /* first set readonly */
         VTABLE_setprop(INTERP, ret, CONST_STRING(INTERP, "_ro"), _true);
 
         /* We're sharing this, so make sure it has a PMC_sync */
-        Parrot_gc_add_pmc_sync(INTERP, ret);
         PObj_is_PMC_shared_SET(ret);
 
         /* XXX FIXME workaround lack of metadata sharing*/
@@ -965,5 +873,5 @@ Sets this PMC as shared and read-only.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,6 +1,5 @@
 /*
 
-$Id$
 
 pmc.ops
 
@@ -14,6 +13,9 @@ pmc.ops - PMC Opcodes
 
 Operations that deal with PMCs, including creation and
 destruction, manipulation, and introspection.
+
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
 
 =cut
 
@@ -60,7 +62,7 @@ op new(out PMC, in STR) {
     else {
         const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
-            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);
             goto ADDRESS(dest);
@@ -80,7 +82,7 @@ op new(out PMC, in STR, in PMC) {
     else {
         const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
-            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);
             goto ADDRESS(dest);
@@ -98,7 +100,7 @@ inline op new(out PMC, in PMC) :object_classes {
     else {
         const INTVAL type = Parrot_pmc_get_type(interp, name_key);
         if (type <= 0) {
-            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
             goto ADDRESS(dest);
@@ -116,7 +118,7 @@ op new(out PMC, in PMC, in PMC) {
     else {
         const INTVAL type = Parrot_pmc_get_type(interp, name_key);
         if (type <= 0) {
-            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
             goto ADDRESS(dest);
@@ -143,7 +145,7 @@ to do with the initializer.
 op root_new(out PMC, in PMC) {
     PMC * const key      = $2;
     PMC * const root_ns  = interp->root_namespace;
-    PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, key);
+    PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC * classobj       = PMCNULL;
 
     if (!PMC_IS_NULL(ns))
@@ -151,7 +153,7 @@ op root_new(out PMC, in PMC) {
     if (!PMC_IS_NULL(classobj))
         $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, key));
         goto ADDRESS(dest);
@@ -161,7 +163,7 @@ op root_new(out PMC, in PMC) {
 op root_new(out PMC, in PMC, in PMC) {
     PMC * const key      = $2;
     PMC * const root_ns  = interp->root_namespace;
-    PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, key);
+    PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC * classobj       = PMCNULL;
 
     if (!PMC_IS_NULL(ns))
@@ -169,7 +171,7 @@ op root_new(out PMC, in PMC, in PMC) {
     if (!PMC_IS_NULL(classobj))
         $1 = VTABLE_instantiate(interp, classobj, $3);
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, key));
         goto ADDRESS(dest);
@@ -234,13 +236,13 @@ op find_method(out PMC, invar PMC, in STR) :flow {
     opcode_t * const resume = expr NEXT();
     $1 = VTABLE_find_method(interp, $2, $3);
     if (PMC_IS_NULL($1) || !VTABLE_defined(interp, $1)) {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, resume,
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, resume,
             EXCEPTION_METHOD_NOT_FOUND,
             "Method '%Ss' not found for invocant of class '%Ss'", $3,
             VTABLE_get_string(interp, VTABLE_get_class(interp, $2)));
         goto ADDRESS(dest);
     }
-    restart ADDRESS(resume);
+    goto ADDRESS(resume);
 }
 
 ########################################
@@ -648,17 +650,17 @@ Create a HLL-mapped PMC containing the provided primitive.
 =cut
 
 op box(out PMC, in INT) {
-    $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+    $1 = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
     VTABLE_set_integer_native(interp, $1, $2);
 }
 
 op box(out PMC, in NUM) {
-    $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
+    $1 = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Float));
     VTABLE_set_number_native(interp, $1, $2);
 }
 
 op box(out PMC, in STR) {
-    $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String));
+    $1 = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
     VTABLE_set_string_native(interp, $1, $2);
 }
 
@@ -678,7 +680,7 @@ inline op iter(out PMC, invar PMC) :base_core {
 
 =item B<morph>(invar PMC, in PMC)
 
-Have $1 turn itself into a PMC of type $2.
+Have $1 turn itself into a PMC of type $2. $2 should be a Class PMC.
 
 =cut
 
@@ -690,7 +692,7 @@ inline op morph(invar PMC, in PMC) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 LICENSE
 
@@ -703,5 +705,5 @@ as the Parrot interpreter itself.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2007, Parrot Foundation.
-# $Id$
 
 package init::hints::linux;
 
@@ -15,10 +14,8 @@ sub runstep {
     my $linkflags = $conf->option_or_data('linkflags');
     my $share_ext = $conf->option_or_data('share_ext');
     my $version   = $conf->option_or_data('VERSION');
-    my $verbose;
 
-    $verbose = $conf->options->get('verbose');
-    print "\n" if $verbose;
+    $conf->debug("\n");
 
     # should find g++ in most cases
     my $link = $conf->data->get('link') || 'c++';
@@ -39,7 +36,7 @@ sub runstep {
         $ld_share_flags = ' -shared -g -pipe -fexceptions -fPIC';
         $cc_shared .= ' -fPIC';
 
-        $ccflags = _handle_icc_ccflags($ccflags, $verbose);
+        $ccflags = _handle_icc_ccflags($conf, $ccflags);
 
     }
     elsif ( $cc =~ /suncc/ ) {
@@ -71,15 +68,19 @@ sub runstep {
         $ccflags .= ' -D_GNU_SOURCE';
     }
 
+    my $osvers = `/sbin/sysctl -n kernel.osrelease`;
+    chomp $osvers;
+
     $conf->data->set(
-        ccflags        => $ccflags,
-        libs           => $libs,
-        ld_share_flags => $ld_share_flags,
-        ld_load_flags  => $ld_share_flags,
-        linkflags      => $linkflags,
-        link           => $link,
-        cc_shared      => $cc_shared,
-        rpath          => '-Wl,-rpath=',
+        ccflags         => $ccflags,
+        libs            => $libs,
+        ld_share_flags  => $ld_share_flags,
+        ld_load_flags   => $ld_share_flags,
+        linkflags       => $linkflags,
+        link            => $link,
+        cc_shared       => $cc_shared,
+        rpath           => '-Wl,-rpath=',
+        osvers          => $osvers,
 
         has_dynamic_linking    => 1,
         parrot_is_shared       => 1,
@@ -96,73 +97,17 @@ sub runstep {
 }
 
 sub _handle_icc_ccflags {
-    my ($ccflags, $verbose) = @_;
-
-    # suppress sprintf warnings that don't apply
-    $ccflags .= ' -wd269';
-
-    # suppress remarks about floating point comparisons
-    $ccflags .= ' -wd1572';
-
-    # suppress remarks about hiding of parameter declarations
-    $ccflags .= ' -wd1599';
-
-    # suppress remarks about "argument is incompatible with corresponding
-    # format string conversion"
-    $ccflags .= ' -wd181';
-
-    # gcc is currently not looking for unused variables, so should icc
-    # for the time being (this will reduce the noise somewhat)
-    $ccflags .= ' -wd869';
-
-    # ignore "operands are evaluated in unspecified order" warning
-    $ccflags .= ' -wd981';
-
-    # ignore "external declaration in primary source file"
-    # (only done temporarily to reduce noise)
-    $ccflags .= ' -wd1419';
-
-    # ignore "function 'xxx' was declared but never referenced"
-    # (only done temporarily to reduce noise)
-    $ccflags .= ' -wd117';
-
-    # ignore "conversion from "" to "" may lose significant bits"
-    # warnings (only done temporarily to reduce noise)
-    $ccflags .= ' -wd810';
-
-    # ignore "function "" was declared but never referenced"
-    # warnings (only done temporarily to reduce noise)
-    $ccflags .= ' -wd177';
-
-    # ignore warnings springing from problems with computed goto
-    # statements.  If someone can find out how to make icc play nicely
-    # in these situations, that would be good.
-    $ccflags .= ' -wd1296';
-
-    $ccflags .= ' -Wall -Wcheck -w2';
-
-    $ccflags .= ' -Wabi';
-    $ccflags .= ' -Wcomment';
-    $ccflags .= ' -Wdeprecated';
-    $ccflags .= ' -Wmain';
-    $ccflags .= ' -Wmissing-prototypes';
-
-    #$ccflags .= ' -Wp64';
-    $ccflags .= ' -Wpointer-arith';
-    $ccflags .= ' -Wreturn-type';
-    $ccflags .= ' -Wstrict-prototypes';
-
-    #$ccflags .= ' -Wtrigraphs';
-    $ccflags .= ' -Wuninitialized';
-    $ccflags .= ' -Wunknown-pragmas';
-    $ccflags .= ' -Wunused-function';
-    $ccflags .= ' -Wunused-variable';
+    my ($conf, $ccflags) = @_;
 
     # enable correct floating point behavior
     # which is *not* the default behavior. ahem.
     $ccflags .= ' -we147';
 
-    $verbose and print " ccflags: $ccflags\n";
+    # TT #1488. ICC optimizes floating-point too aggressively and loses support
+    # for negative zero without this.
+    $ccflags .= ' -fp-model source';
+
+    $conf->debug(" ccflags: $ccflags\n");
     return $ccflags;
 }
 

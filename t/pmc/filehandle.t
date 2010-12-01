@@ -1,13 +1,12 @@
 #!perl
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 24;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -40,6 +39,7 @@ my (undef, $temp_file) = create_tempfile( UNLINK => 1 );
 # L<PDD22/I\/O PMC API/=item open.*=item close>
 pir_output_is( <<"CODE", <<'OUT', 'open and close - synchronous' );
 .sub 'test' :main
+    .local int i
     \$P1 = new ['FileHandle']
     \$P1.'open'('README')
     say 'ok 1 - \$P1.open(\$S1)'
@@ -73,6 +73,14 @@ pir_output_is( <<"CODE", <<'OUT', 'open and close - synchronous' );
     \$P7.'open'('$temp_file', 'w')
     say 'ok 7 - \$P7.open(\$S1, \$S2) # new file, write mode succeeds'
 
+    i = \$P7.'is_closed'()
+    print 'is_closed: '
+    say i
+    \$P7.'close'()
+    i = \$P7.'is_closed'()
+    print 'is_closed after close: '
+    say i
+
     goto end
 
   eh_bad_file_1:
@@ -93,6 +101,66 @@ ok 4 - $P3.open()         # reopening
 ok 5 - $P5.open($S1)      # with bad file
 ok 6 - $P6.open($S1, $S2) # with bad file
 ok 7 - $P7.open($S1, $S2) # new file, write mode succeeds
+is_closed: 0
+is_closed after close: 1
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'wrong open' );
+.include 'except_types.pasm'
+
+.sub main :main
+    .local pmc fh, eh
+    .local int i
+    i = 1
+    eh = new['ExceptionHandler']
+    eh = .EXCEPTION_PIO_ERROR
+    set_label eh, catchnoname
+    push_eh eh
+    fh = new['FileHandle']
+    # Open without filename
+    fh.'open'()
+    i = 0
+    goto reportnoname
+  catchnoname:
+    finalize eh
+  reportnoname:
+    say i
+
+    i = 0
+    set_label eh, catchreopen
+    fh.'open'('README')
+    i = 1
+    # Open already opened
+    fh.'open'('README')
+    i = 0
+    goto reportreopen
+  catchreopen:
+    finalize eh
+  reportreopen:
+    say i
+    pop_eh
+.end
+CODE
+1
+1
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'isatty' );
+.sub 'test' :main
+    .local pmc fh
+    .local int i
+    fh = new ['FileHandle']
+    i = fh.'isatty'()
+    print i
+    say ' unopened FileHandle is not a tty'
+    fh.'open'('README')
+    i = fh.'isatty'()
+    print i
+    say ' regular file is not a tty'
+.end
+CODE
+0 unopened FileHandle is not a tty
+0 regular file is not a tty
 OUT
 
 SKIP: {
@@ -263,7 +331,7 @@ pir_output_is( <<"CODE", <<'OUT', 'readline 10,000 lines' );
     \$I0 = filehandle.'eof'()
     if \$I0 goto end_read_loop
 
-    test_line = readline filehandle
+    test_line = filehandle.'readline'()
     if test_line == "" goto end_read_loop
     test_line = chomp( test_line )
     \$I1 = test_line
@@ -453,26 +521,36 @@ pir_output_is( <<"CODE", <<'OUT', 'encoding - read/write' );
 
     \$P1.'open'('$temp_file')
 
-    \$S1 = \$P1.'readline'()
-    if \$S1 == "1234567890\\n" goto ok_1
-print \$S1
+    .local string line
+    line = \$P1.'readline'()
+    if line == "1234567890\\n" goto ok_1
+print line
     print 'not '
   ok_1:
     say 'ok 1 - \$S1 = \$P1.readline() # read with utf8 encoding on'
 
-    \$S2 = \$P1.'readline'()
-    if \$S2 == \$S0 goto ok_2
-print \$S2
+    line = \$P1.'readline'()
+    if line == \$S0 goto ok_2
+print line
     print 'not '
   ok_2:
     say 'ok 2 - \$S2 = \$P1.readline() # read iso-8859-1 string'
 
     \$P1.'close'()
 
+    \$I1 = encoding line
+    \$S2 = encodingname \$I1
+    if \$S2 == 'utf8' goto ok_3
+    print \$S2
+    print 'not '
+  ok_3:
+    say 'ok 3 # utf8 encoding'
+
 .end
 CODE
 ok 1 - $S1 = $P1.readline() # read with utf8 encoding on
 ok 2 - $S2 = $P1.readline() # read iso-8859-1 string
+ok 3 # utf8 encoding
 OUT
 
 
@@ -546,6 +624,39 @@ CODE
 ok
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', "readall - failure conditions" );
+.include 'except_types.pasm'
+.sub main :main
+    .local pmc fh, eh
+    fh = new ['FileHandle']
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_PIO_ERROR)
+    set_label eh, catch1
+    push_eh eh
+    # Using unopened FileHandle
+    fh.'readall'()
+    say 'should never happen'
+    goto test2
+  catch1:
+    finalize eh
+    say 'caught unopened'
+  test2:
+    set_label eh, catch2
+    fh.'open'('README')
+    # Using opened FileHandle with the filepath option
+    fh.'readall'('README')
+    say 'should never happen'
+    goto end
+  catch2:
+    finalize eh
+    say 'caught reopen'
+  end:
+.end
+CODE
+caught unopened
+caught reopen
+OUTPUT
+
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on closed filehandle" );
 .sub 'main'
     .local pmc ifh
@@ -586,7 +697,6 @@ pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
 .sub 'main'
     .local pmc pipe, conf, interp
     .local string cmd
-    pipe = new ['FileHandle']
 
     interp = getinterp
     conf = interp[.IGLOBALS_CONFIG_HASH]
@@ -601,7 +711,8 @@ pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
     aux = conf['exe']
     cmd .= aux
 
-    pipe = open cmd, "rp"
+    pipe = new ['FileHandle']
+    pipe.'open'(cmd, "rp")
     pipe.'readall'()
     pipe.'close'()
     print "expect 0 exit status: "
@@ -609,7 +720,8 @@ pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
     say $I0
 
     cmd .= ' --this_is_not_a_valid_option'
-    pipe = open cmd, "rp"
+    pipe = new ['FileHandle']
+    pipe.'open'(cmd, "rp")
     pipe.'readall'()
     pipe.'close'()
     print "expect 1 exit status: "
@@ -622,6 +734,106 @@ CODE
 expect 0 exit status: 0
 expect 1 exit status: 1
 OUTPUT
+
+SKIP: {
+    skip 'Timely destruction is deprecated. TT#1800' => 1;
+
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction" );
+.const string temp_file = '%s'
+.sub main :main
+    interpinfo $I0, 2    # GC mark runs
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'w')
+        needs_destroy $P0
+    print $P0, "a line\n"
+    null $P0            # kill it
+    # Call dummy sub to cleanup CallContext
+    dummy()
+    sweep 0            # a lazy GC has to close the PIO
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'r')
+    $S0 = $P0.'read'(20)
+    print $S0
+.end
+
+.sub dummy
+.end
+
+CODE
+a line
+OUTPUT
+
+}
+
+my (undef, $no_such_file) = create_tempfile( UNLINK => 1, OPEN => 0 );
+
+pir_output_is( sprintf( <<'CODE', $no_such_file, $temp_file ), <<'OUTPUT', "get_bool" );
+.const string no_such_file = '%s'
+.const string temp_file    = '%s'
+
+.sub main :main
+    push_eh read_non_existent_file
+    $P0 = new ['FileHandle']
+    $P0.'open'(no_such_file, 'r')
+
+    print "Huh: '"
+    print no_such_file
+    print "' exists? - not "
+ok1:
+    say "ok 1"
+
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'w')
+    $P0.'print'("a line\n")
+    $P0.'print'("a line\n")
+    $P0.'close'()
+
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'r')
+    if $P0, ok2
+    print "not "
+ok2:    say "ok 2"
+    $S0 = $P0.'read'(1024)
+    $S0 = $P0.'read'(1024)
+    unless $P0, ok3
+    print "not "
+ok3:    say "ok 3"
+    defined $I0, $P0
+    if $I0, ok4
+    print "not "
+ok4:    say "ok 4"
+    $P0.'close'()
+    defined $I0, $P0        # closed file is still defined
+    if $I0, ok5
+    print "not "
+ok5:    say "ok 5"
+    unless $P0, ok6        # but false
+    print "not "
+ok6:    say "ok 6"
+    .return ()
+read_non_existent_file:
+    pop_eh
+    branch ok1
+.end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
+# FileHandle use file descriptor, get_fd should not return -1
+pir_output_is( <<'CODE', <<'OUT', 'get_fd method' );
+.sub test :main
+    new $P0, ['FileHandle']
+    $N0 = $P0.'get_fd'()
+    say $N0
+.end
+CODE
+-1
+OUT
 
 # TT #1178
 # L<PDD22/I\/O PMC API/=item get_fd>

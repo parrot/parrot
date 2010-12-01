@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2006-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -84,7 +83,7 @@ pir_error_output_like( <<'CODE', <<'OUT', ':vtable with bad name' );
     .return("monkey")
 .end
 CODE
-/'not_in_the_vtable' is not a v-table method, but was used with :vtable/
+/'not_in_the_vtable' is not a vtable, but was used with :vtable/
 OUT
 
 # '

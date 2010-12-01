@@ -1,6 +1,5 @@
 /*
- * $Id$
- * Copyright (C) 2002-2009, Parrot Foundation.
+ * Copyright (C) 2002-2010, Parrot Foundation.
  */
 
 #ifndef PARROT_IMCC_INSTRUCTIONS_H_GUARD
@@ -16,10 +15,9 @@ enum INSTYPE {    /*instruction type can be   */
     ITALIAS    =  0x100000, /*  set P,P  */
     ITADDR     =  0x200000, /*  set_addr P, addr*/
     ITRESULT   =  0x400000, /*  .get_results */
-    ITEXT      =  0x800000, /*  instruction is extcall in JIT */
-    ITSAVES    = 0x1000000, /*  saveall/restoreall in a bsr */
-    ITPCCSUB   = 0x2000000, /*  PCC sub call */
-    ITPCCYIELD = 0x4000000  /*  yield from PCC call instead of return */
+    ITSAVES    =  0x800000, /*  saveall/restoreall in a bsr */
+    ITPCCSUB   = 0x1000000, /*  PCC sub call */
+    ITPCCYIELD = 0x2000000  /*  yield from PCC call instead of return */
 };
 
 
@@ -35,7 +33,7 @@ typedef struct _Instruction {
     struct _Instruction *prev;
     struct _Instruction *next;
 
-    int     opnum;         /* parrot op number */
+    op_info_t *op;         /* parrot opcode */
     int     opsize;        /* parrot op size   */
     int     line;          /* source code line number */
     int     symreg_count;  /* count of regs in **symregs */
@@ -79,7 +77,7 @@ typedef enum {
 /* Globals */
 
 typedef struct _emittert {
-    int (*open)(PARROT_INTERP, void *param);
+    int (*open)(PARROT_INTERP, const char *param);
     int (*emit)(PARROT_INTERP, void *param, const IMC_Unit *, const Instruction *ins);
     int (*new_sub)(PARROT_INTERP, void *param, IMC_Unit *);
     int (*end_sub)(PARROT_INTERP, void *param, IMC_Unit *);
@@ -90,21 +88,6 @@ enum Emitter_type { EMIT_FILE, EMIT_PBC };
 
 /* HEADERIZER BEGIN: compilers/imcc/instructions.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_EXPORT
-int emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-int emit_flush(PARROT_INTERP,
-    ARGIN_NULLOK(void *param),
-    ARGIN(IMC_Unit *unit))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_EXPORT
-int emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
-        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -133,6 +116,18 @@ Instruction * delete_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*ins);
 
+int emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
+        __attribute__nonnull__(1);
+
+int emit_flush(PARROT_INTERP,
+    ARGIN_NULLOK(void *param),
+    ARGIN(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+int emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(const char *param))
+        __attribute__nonnull__(1);
+
 PARROT_CAN_RETURN_NULL
 Instruction * emitb(PARROT_INTERP,
     ARGMOD_NULLOK(IMC_Unit *unit),
@@ -152,9 +147,6 @@ SymReg * get_branch_reg(ARGIN(const Instruction *ins))
 int get_branch_regno(ARGIN(const Instruction *ins))
         __attribute__nonnull__(1);
 
-void imcc_init_tables(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 PARROT_IGNORABLE_RESULT
 int /*@alt void@*/
 ins_print(PARROT_INTERP,
@@ -163,9 +155,6 @@ ins_print(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
-
-int ins_writes2(ARGIN(const Instruction *ins), int t)
-        __attribute__nonnull__(1);
 
 void insert_ins(
     ARGMOD(IMC_Unit *unit),
@@ -221,13 +210,6 @@ void subst_ins(
         FUNC_MODIFIES(*ins)
         FUNC_MODIFIES(*tmp);
 
-#define ASSERT_ARGS_emit_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_emit_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(unit))
-#define ASSERT_ARGS_emit_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS__delete_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(ins))
@@ -238,6 +220,13 @@ void subst_ins(
 #define ASSERT_ARGS_delete_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(ins))
+#define ASSERT_ARGS_emit_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_emit_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_emit_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_emitb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_free_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -246,14 +235,10 @@ void subst_ins(
        PARROT_ASSERT_ARG(ins))
 #define ASSERT_ARGS_get_branch_regno __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ins))
-#define ASSERT_ARGS_imcc_init_tables __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_ins_print __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(io) \
     , PARROT_ASSERT_ARG(ins))
-#define ASSERT_ARGS_ins_writes2 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ins))
 #define ASSERT_ARGS_insert_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(tmp))
@@ -293,6 +278,6 @@ void subst_ins(
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

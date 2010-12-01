@@ -1,5 +1,4 @@
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -28,12 +27,14 @@ F<docs/pdds/pdd16_native_call.pod>.
 
 .macro_const VERSION 0.01
 
-.macro_const OPTS_GLOBAL_NAME 'options'
+.macro_const SIG_TABLE_GLOBAL_NAME  'signature_table'
+.macro_const OPTS_GLOBAL_NAME       'options'
 
 .sub 'main' :main
     .param pmc argv
 
     # initialize global variables
+    'gen_sigtable'()
     'get_options'(argv)
 
     .local string targ
@@ -43,8 +44,10 @@ F<docs/pdds/pdd16_native_call.pod>.
     sigs = 'read_sigs'()
 
     $S0 = 'read_from_opts'('output')
-    $P0 = open $S0, 'w'
-    setstdout $P0
+    $P0 = new ['FileHandle']
+    $P0.'open'($S0, 'w')
+    $P1 = getinterp
+    $P1.'stdout_handle'($P0)
 
     if targ == 'head'          goto get_targ
     if targ == 'thunks'        goto get_targ
@@ -320,8 +323,6 @@ USAGE
 
 /* %s
  *  Copyright (C) 2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Native Call Interface routines. The code needed to build a
  *     parrot to C call frame is in here
@@ -379,8 +380,7 @@ HEAD
 
     $S0 = 'get_loader_decl'(sigs)
     $S1 = 'get_loader_body'(sigs)
-    $S2 = 'sprintf'(<<'LOADER', $S0, $S0, $S1)
-%s;
+    $S2 = 'sprintf'(<<'LOADER', $S0, $S1)
 %s {
 %s
 }
@@ -404,8 +404,7 @@ DECL
 
     $S0 = 'get_dynext_loader_decl'(sigs)
     $S1 = 'get_loader_body'(sigs)
-    $S2 = 'sprintf'(<<'LOADER', $S0, $S0, $S1)
-%s;
+    $S2 = 'sprintf'(<<'LOADER', $S0, $S1)
 %s {
 %s
 }
@@ -429,15 +428,13 @@ DECL
     .param pmc sigs
     .local string code
     code = 'sprintf'(<<'HEADER', $S0, $S1)
-    PMC *iglobals;
+    PMC * const iglobals = interp->iglobals;
     PMC *nci_funcs;
     PMC *temp_pmc;
 
-    iglobals = interp->iglobals;
     PARROT_ASSERT(!(PMC_IS_NULL(iglobals)));
 
-    nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals,
-            IGLOBALS_NCI_FUNCS);
+    nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS);
     PARROT_ASSERT(!(PMC_IS_NULL(nci_funcs)));
 
 HEADER
@@ -559,7 +556,7 @@ TEMPLATE
 
     .local string call
     call = 'sprintf'(<<'TEMPLATE', return_assign, ret_cast, call_params)
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     %s %s(*fn_pointer)(%s);
 TEMPLATE
@@ -607,6 +604,9 @@ TEMPLATE
     .local string params_csig
     $P0 = 'map_from_sig_table'(params, 'as_proto')
     params_csig = join ', ', $P0
+    if params_csig goto end_default_params_csig_to_void
+        params_csig = 'void'
+    end_default_params_csig_to_void:
 
     .local string ret_tdecl
     ret_tdecl = ""
@@ -635,10 +635,12 @@ TEMPLATE
     typedef %s(* func_t)(%s);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     %s
     %s;
+    UNUSED(return_data); /* Potentially unused, at least */
 TEMPLATE
 
     .return (var_decls)
@@ -651,7 +653,7 @@ TEMPLATE
     fn_name = 'sig_to_fn_name'(sig :flat)
     fn_decl = 'sprintf'(<<'TEMPLATE', storage_class, fn_name)
 %s void
-%s(PARROT_INTERP, PMC *self)
+%s(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 TEMPLATE
     .return (fn_decl)
 .end
@@ -676,7 +678,7 @@ TEMPLATE
     .param string field_name
 
     .local pmc sig_table
-    .const 'Sub' sig_table = 'get_sigtable'
+    sig_table = get_global .SIG_TABLE_GLOBAL_NAME
 
     $P0 = split '', sig
 
@@ -705,7 +707,8 @@ TEMPLATE
 
 .sub 'read_sigs'
     .local pmc stdin, seen, sigs
-    stdin = getstdin
+    $P0 = getinterp
+    stdin = $P0.'stdin_handle'()
     seen  = new ['Hash']
     sigs  = new ['ResizablePMCArray']
 
@@ -732,7 +735,9 @@ TEMPLATE
                 $S0 = 'sprintf'(<<'ERROR', full_sig, lineno, $I0)
 Ignored signature '%s' on line %d (previously seen on line %d)
 ERROR
-                printerr $S0
+                $P0 = getinterp
+                $P1 = $P0.'stderr_handle'()
+                $P1.'print'($S0)
             end_dup_warn:
             goto read_loop
         unseen:
@@ -755,7 +760,7 @@ ERROR
     .param pmc fh
 
     .local string line
-    line = readline fh
+    line = fh.'readline'()
 
     # handle comments
     $I0 = index line, '#'
@@ -773,7 +778,7 @@ ERROR
         inner_whitespace_loop:
             $I0 = index line, $S0
             if $I0 < 0 goto end_inner_whitespace_loop
-            substr line, $I0, 1, ' '
+            line = replace line, $I0, 1, ' '
             goto inner_whitespace_loop
         end_inner_whitespace_loop:
 
@@ -784,14 +789,16 @@ ERROR
     multispace_loop:
         $I0 = index line, '  '
         if $I0 < 0 goto end_multispace_loop
-        $S0 = substr line, $I0, 2, ' '
+        $S0  = substr line, $I0, 2
+        line = replace line, $I0, 2, ' '
         goto multispace_loop
     end_multispace_loop:
 
     # remove leading whitespace
     $S0 = substr line, 0, 1
     unless $S0 == ' ' goto end_leading
-        $S0 = substr line, 0, 1, ''
+        $S0  = substr line, 0, 1
+        line = replace line, 0, 1, ' '
     end_leading:
 
     # handle empty (or whitespace only) lines
@@ -801,7 +808,8 @@ ERROR
     # remove trailing whitespace
     $S0 = substr line, -1, 1
     unless $S0 == ' ' goto end_trailing
-        $S0 = substr line, -1, 1, ''
+        $S0  = substr line, -1, 1
+        line = replace line, -1, 1, ''
     end_trailing:
 
     # read the signature
@@ -816,9 +824,9 @@ ERROR
 
 #}}}
 
-# get_sigtable {{{
+# gen_sigtable {{{
 
-.sub 'get_sigtable' :anon :immediate
+.sub 'gen_sigtable'
     .const string json_table = <<'JSON'
 {
     "p": { "as_proto":   "void *",
@@ -830,7 +838,7 @@ ERROR
                              final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
-                          Parrot_pcc_fill_returns_from_c_args(interp, call_object, \"P\", final_destination);" },
+                          ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, \"P\", final_destination);" },
     "i": { "as_proto": "int", "sig_char": "I",
            "return_type": "INTVAL" },
     "l": { "as_proto": "long",   "sig_char": "I", "return_type": "INTVAL" },
@@ -841,12 +849,12 @@ ERROR
     "t": { "as_proto": "char *",
            "final_dest": "STRING *final_destination;",
            "ret_assign": "final_destination = Parrot_str_new(interp, return_data, 0);
-                          Parrot_pcc_fill_returns_from_c_args(interp, call_object, \"S\", final_destination);",
+           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, \"S\", final_destination);",
            "sig_char": "S",
            "temp_tmpl": "char *t_%i; STRING *ts_%i",
            "fill_params_tmpl": ", &ts_%i",
-           "preamble_tmpl": "t_%i = ts_%i ? Parrot_str_to_cstring(interp, ts_%i) : (char *)NULL;",
-           "postamble_tmpl": "if (t_%i) Parrot_str_free_cstring(t_%i);" },
+           "preamble_tmpl": "t_%i = STRING_IS_NULL(ts_%i) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_%i);",
+           "postamble_tmpl": "if (!STRING_IS_NULL(ts_%i)) Parrot_str_free_cstring(t_%i);" },
     "v": { "as_proto": "void",
            "return_type": "void *",
            "sig_char": "v",
@@ -873,13 +881,13 @@ ERROR
            "sig_char": "S",
            "fill_params_tmpl": ", &ts_%i",
            "temp_tmpl": "char *t_%i; STRING *ts_%i",
-           "preamble_tmpl": "t_%i = ts_%i ? Parrot_str_to_cstring(interp, ts_%i) : (char *) NULL;",
+           "preamble_tmpl": "t_%i = STRING_IS_NULL(ts_%i) ? (char *) NULL : Parrot_str_to_cstring(interp, ts_%i);",
            "call_param_tmpl": "&t_%i",
-           "postamble_tmpl": "if (t_%i) Parrot_str_free_cstring(t_%i);" },
+           "postamble_tmpl": "if (!STRING_IS_NULL(ts_%i)) Parrot_str_free_cstring(t_%i);" },
     "2": { "as_proto": "short *",
            "sig_char": "P",
            "return_type": "short",
-           "ret_assign": "Parrot_pcc_fill_returns_from_c_args(interp, call_object, \"I\", return_data);",
+           "ret_assign": "ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, \"I\", return_data);",
            "temp_tmpl": "PMC *t_%i; short i_%i",
            "preamble_tmpl": "i_%i = VTABLE_get_integer(interp, t_%i);",
            "call_param_tmpl": "&i_%i",
@@ -887,7 +895,7 @@ ERROR
     "3": { "as_proto": "int *",
            "sig_char": "P",
            "return_type": "int",
-           "ret_assign": "Parrot_pcc_fill_returns_from_c_args(interp, call_object, \"I\", return_data);",
+           "ret_assign": "ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, \"I\", return_data);",
            "temp_tmpl": "PMC *t_%i; int i_%i",
            "preamble_tmpl": "i_%i = VTABLE_get_integer(interp, t_%i);",
            "call_param_tmpl": "&i_%i",
@@ -895,7 +903,7 @@ ERROR
     "4": { "as_proto": "long *",
            "sig_char": "P",
            "return_type": "long",
-           "ret_assign": "Parrot_pcc_fill_returns_from_c_args(interp, call_object, \"I\", return_data);",
+           "ret_assign": "ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, \"I\", return_data);",
            "temp_tmpl": "PMC *t_%i; long i_%i",
            "preamble_tmpl": "i_%i = VTABLE_get_integer(interp, t_%i);",
            "call_param_tmpl": "&i_%i",
@@ -915,7 +923,7 @@ JSON
 
     # decode table
     .local pmc compiler
-    load_bytecode 'data_json.pbc'
+    load_language 'data_json'
     compiler = compreg 'data_json'
 
     .local pmc table
@@ -955,7 +963,7 @@ JSON
     $I1 = !$I1
     $I0 = $I0 || $I1 # not (not exists v[ret_assign] and exists v[sig_char])
     if $I0 goto has_ret_assign
-        $S0 = 'Parrot_pcc_fill_returns_from_c_args(interp, call_object, "'
+        $S0 = 'ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "'
         $S1 = v['sig_char']
         $S0 = concat $S0, $S1
         $S0 = concat $S0, '", return_data);'
@@ -987,7 +995,7 @@ JSON
     goto iter_loop
   iter_end:
 
-    .return (table)
+    set_global .SIG_TABLE_GLOBAL_NAME, table
 .end
 
 # }}}
@@ -1108,7 +1116,7 @@ JSON
         $S1 = substr file, $I1, $I0
         unless $S1 == $S0 goto extn_loop
         extn = $S1
-        substr file, $I1, $I0, ''
+        file = replace file, $I1, $I0, ''
     end_extn_loop:
 
     .return (dir, file, extn)

@@ -1,7 +1,5 @@
 /* io_unix.h
  *  Copyright (C) 2001-2003, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *      Parrot IO subsystem
  *  Data Structure and Algorithms:
@@ -39,11 +37,10 @@ INTVAL Parrot_io_close_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_io_fdopen_unix(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
+    ARGMOD_NULLOK(PMC *filehandle),
     PIOHANDLE fd,
     INTVAL flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         FUNC_MODIFIES(*filehandle);
 
 INTVAL Parrot_io_flush_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
@@ -55,7 +52,7 @@ INTVAL Parrot_io_getblksize_unix(PIOHANDLE fd);
 INTVAL Parrot_io_init_unix(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-INTVAL Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(PMC *filehandle))
+INTVAL Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(const PMC *filehandle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -118,11 +115,10 @@ PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
 
 size_t Parrot_io_write_unix(PARROT_INTERP,
     ARGIN(PMC *filehandle),
-    ARGMOD(STRING *s))
+    ARGIN(const STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*s);
+        __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_Parrot_io_async_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -133,8 +129,7 @@ size_t Parrot_io_write_unix(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_fdopen_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_flush_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filehandle))
@@ -323,5 +318,5 @@ INTVAL Parrot_io_socket_unix(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

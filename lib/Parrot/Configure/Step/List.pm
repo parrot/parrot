@@ -1,12 +1,11 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 package Parrot::Configure::Step::List;
 use strict;
 use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw( get_steps_list );
 
-# EDIT HERE TO ADD NEW TESTS
+# Add new Configure.pl probes here
 my @steps = qw(
     init::manifest
     init::defaults
@@ -23,11 +22,11 @@ my @steps = qw(
     auto::msvc
     auto::attributes
     auto::warnings
+    auto::arch
+    auto::cpu
     init::optimize
     inter::shlibs
     inter::libparrot
-    inter::charset
-    inter::encoding
     inter::types
     auto::ops
     auto::pmc
@@ -37,35 +36,37 @@ my @steps = qw(
     auto::va_ptr
     auto::format
     auto::isreg
-    auto::arch
     auto::jit
     auto::frames
-    auto::cpu
-    auto::cgoto
+    auto::llvm
     auto::inline
     auto::gc
     auto::memalign
     auto::signal
     auto::socklen_t
+    auto::stat
     auto::neg_0
     auto::env
+    auto::timespec
     auto::thread
     auto::gmp
     auto::readline
-    auto::gdbm
     auto::pcre
     auto::opengl
-    auto::crypto
+    auto::zlib
     auto::gettext
     auto::snprintf
     auto::perldoc
     auto::pod2man
     auto::ctags
     auto::revision
+    auto::sha1
+    auto::git_describe
     auto::icu
+    auto::libffi
+    auto::ipv6
     gen::config_h
     gen::core_pmcs
-    gen::crypto
     gen::opengl
     gen::makefiles
     gen::platform

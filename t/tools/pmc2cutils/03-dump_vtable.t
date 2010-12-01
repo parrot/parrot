@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2006-2007, Parrot Foundation.
-# $Id$
 # 03-dump_vtable.t
 
 use strict;
@@ -23,7 +22,6 @@ use Test::More tests => 8;
 use_ok('Parrot::Pmc2c::Pmc2cMain');
 use_ok('File::Basename');
 use_ok( 'File::Temp', qw| tempdir | );
-use Data::Dumper;
 
 my ( %opt, @include, @args );
 my $self;

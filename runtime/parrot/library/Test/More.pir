@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -13,7 +12,7 @@ Test::More - Parrot extension for testing modules
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports        = split ' ', 'plan diag ok nok is is_deeply like isa_ok skip isnt todo throws_like lives_ok dies_ok'
+    exports        = split ' ', 'plan diag ok nok is is_deeply like isa_ok skip skip_all isnt todo throws_like lives_ok dies_ok'
 
     test_namespace.'export_to'(curr_namespace, exports)
 
@@ -90,6 +89,29 @@ already declared a plan or if you pass an invalid argument.
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
     test.'plan'( tests )
+.end
+
+=item C<done_testing( number_of_tests? )>
+
+If you don't know how many tests you're going to run, you can issue
+the plan when you're done running tests.
+
+C<number_of_tests> is the same as plan(), it's the number of tests
+you expected to run.  You can omit this, in which case the number
+of tests you ran doesn't matter, just the fact that your tests ran
+to conclusion.
+
+This is safer than and replaces the "no_plan" plan.
+
+=cut
+
+.sub done_testing
+    .param string tests     :optional
+    .param int    has_tests :opt_flag
+
+    .local pmc test
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
+    test.'done_testing'( tests )
 .end
 
 =item C<ok( passed, description )>
@@ -527,18 +549,18 @@ Like C<is>, but succeeds if the arguments I<don't> match.
   done:
 .end
 
-=item C<diag( diagnostic )>
+=item C<diag( diagnostic, ... )>
 
 Prints C<diagnostic> to the screen, without affecting test comparisons.
 
 =cut
 
 .sub diag
-    .param string diagnostic
+    .param pmc args :slurpy
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
-    test.'diag'( diagnostic )
+    .tailcall test.'diag'( args :flat )
 .end
 
 
@@ -560,7 +582,8 @@ This handles comparisons of array-like and hash-like structures.
     .param int have_desc   :opt_flag
 
     .local int    result
-    .local string diagnosis
+    .local pmc diagnosis
+    diagnosis = new ['StringBuilder']
 
     .local pmc position
     position = new 'ResizablePMCArray'
@@ -660,16 +683,21 @@ This handles comparisons of array-like and hash-like structures.
     r_count = r_array
     if l_count == r_count goto compare_contents
 
-    .local string l_count_string
-    .local string r_count_string
-    l_count_string  = l_count
+    .local pmc l_count_string
+    .local pmc r_count_string
+    l_count_string  = new ['StringBuilder']
+    r_count_string  = new ['StringBuilder']
+
+    $S0 = l_count
+    l_count_string  = $S0
     l_count_string .= ' element'
 
     if l_count == 1 goto pluralization_done
     l_count_string .= 's'
 
   pluralization_done:
-    r_count_string  = r_count
+    $S0 = r_count
+    r_count_string  = $S0
 
     push position, l_count_string
     push position, r_count_string
@@ -733,16 +761,21 @@ This handles comparisons of array-like and hash-like structures.
     r_count = r_hash
     if l_count == r_count goto compare_contents
 
-    .local string l_count_string
-    .local string r_count_string
-    l_count_string  = l_count
+    .local pmc l_count_string
+    .local pmc r_count_string
+    l_count_string  = new ['StringBuilder']
+    r_count_string  = new ['StringBuilder']
+
+    $S0 = l_count
+    l_count_string  = $S0
     l_count_string .= ' element'
 
     if l_count == 1 goto pluralization_done
     l_count_string .= 's'
 
   pluralization_done:
-    r_count_string  = r_count
+    $S0 = r_count
+    r_count_string  = $S0
 
     push position, l_count_string
     push position, r_count_string
@@ -1166,7 +1199,9 @@ optional test description in C<description>.
     .param string description :optional
 
     .local pmc test
-    .local string diagnostic
+    .local pmc diagnostic
+    diagnostic = new ['StringBuilder']
+
     get_hll_global test, [ 'Test'; 'More' ], '_test'
     $I0 = index target, text
     $I0 = isne $I0, -1
@@ -1206,7 +1241,8 @@ optional test description in C<description>.
     load_bytecode "PGE/Util.pbc"
     p6rule_compile = compreg "PGE::Perl6Regex"
 
-    .local string diagnostic
+    .local pmc diagnostic
+    diagnostic = new ['StringBuilder']
     .local int pass
     pass = 0
 
@@ -1281,6 +1317,18 @@ actually skipped.  Arguments are optional.
     test.'skip'()
 .end
 
+=item C<skip_all( reason )>
+
+=cut
+
+.sub skip_all
+    .param string reason :optional
+
+    .local pmc test
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
+    test.'skip_all'(reason)
+.end
+
 =item C<todo( passed, description, reason )>
 
 Records a test as pass or fail (like C<ok>, but marks it as TODO so it always
@@ -1320,12 +1368,17 @@ Bad input: "C<test that the return from Foo is correct type>"
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
-    .local string description, diagnostic
+    .local pmc description
+    .local pmc diagnostic
+    description = new ['StringBuilder']
+    diagnostic  = new ['StringBuilder']
+
     description = "The object"
     unless got_name goto keep_default
     description = object_name
   keep_default:
-    diagnostic = description
+    $S0 = description
+    diagnostic = $S0
     description .= " isa "
     $S0 = class_name
     description .= $S0
@@ -1346,14 +1399,16 @@ Bad input: "C<test that the return from Foo is correct type>"
 .sub _make_diagnostic
     .param string received
     .param string expected
-    .local string diagnostic
+    .local pmc diagnostic
 
+    diagnostic  = new ['StringBuilder']
     diagnostic  = 'Have: '
     diagnostic .= received
     diagnostic .= "\nWant: "
     diagnostic .= expected
 
-    .return( diagnostic )
+    $S0 = diagnostic
+    .return( $S0 )
 .end
 
 =back

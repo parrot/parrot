@@ -1,3 +1,5 @@
+#! perl
+
 use strict;
 use warnings;
 
@@ -14,19 +16,19 @@ diag( my $parrot            = get_parrot_path( $in_parrot_tree ) );
 diag( my $path_sep          = get_path_separator() );
 
 my $class = Module::Build->subclass(
-	code => <<"END_HERE",
-	use File::Spec;
+    code => <<"END_HERE",
+    use File::Spec;
 
-	sub ACTION_build
-	{
-		my \$self = shift;
-		my \@cmd  = ( qw( $parrot -o ),
-			map { File::Spec->catfile( 't', "greet.\$_" ) } qw( pbc pir ) );
+    sub ACTION_build
+    {
+        my \$self = shift;
+        my \@cmd  = ( qw( $parrot -o ),
+            map { File::Spec->catfile( 't', "greet.\$_" ) } qw( pbc pir ) );
 
-		system( \@cmd ) == 0 or die "Cannot compile PBC for test: \$?";
+        system( \@cmd ) == 0 or die "Cannot compile PBC for test: \$?";
 
-		\$self->SUPER::ACTION_build( \@_ );
-	}
+        \$self->SUPER::ACTION_build( \@_ );
+    }
 
     sub ACTION_test
     {
@@ -42,27 +44,27 @@ END_HERE
 );
 
 my $builder = $class->new(
-	module_name         => 'Parrot::Embed',
-	license             => 'perl',
-	dist_author         => 'chromatic <chromatic@wgz.org>',
-	dist_version_from   => 'lib/Parrot/Embed.pm',
-	build_requires =>
-	{
-		'Test::More'         => 0,
-		'ExtUtils::CBuilder' => 0,
-	},
-	add_to_cleanup       => [ 'Parrot-Embed-*' ],
+    module_name         => 'Parrot::Embed',
+    license             => 'perl',
+    dist_author         => 'chromatic <chromatic@wgz.org>',
+    dist_version_from   => 'lib/Parrot/Embed.pm',
+    build_requires =>
+    {
+        'Test::More'         => 0,
+        'ExtUtils::CBuilder' => 0,
+    },
+    add_to_cleanup       => [ 'Parrot-Embed-*' ],
     include_dirs         => [ $incp ],
-	extra_compiler_flags => $cflags,
-	extra_linker_flags   => $lflags,
+    extra_compiler_flags => $cflags,
+    extra_linker_flags   => $lflags,
 );
 
 $builder->create_build_script();
 
 sub in_parrot_tree
 {
-	my $cwd     = cwd();
-	return $cwd =~ /\bext\b.Parrot/;
+    my $cwd     = cwd();
+    return $cwd =~ /\bext\b.Parrot/;
 }
 
 sub get_dl_env_var
@@ -81,46 +83,48 @@ sub get_path_separator
 
 sub get_compiler_flags
 {
-	my $in_parrot_tree = shift;
-	return get_flags_from_parrot_src() if $in_parrot_tree;
-	return get_flags_from_pkg_config() if $ENV{PKG_CONFIG_PATH};
+    my $in_parrot_tree = shift;
+    return get_flags_from_parrot_src() if $in_parrot_tree;
+    return get_flags_from_pkg_config() if $ENV{PKG_CONFIG_PATH};
 }
 
 sub get_flags_from_pkg_config
 {
-	require ExtUtils::PkgConfig;
-	my %pkg_info = ExtUtils::PkgConfig->find( 'parrot' );
-	return @pkg_info{qw( cflags libs )};
+    require ExtUtils::PkgConfig;
+    my %pkg_info = ExtUtils::PkgConfig->find( 'parrot' );
+    return @pkg_info{qw( cflags libs )};
 }
 
 sub get_flags_from_parrot_src
 {
-	my $updir = updir();
-	my $file  = catfile( $updir, $updir, 'parrot.pc' );
-	open( my $fh, '<', $file ) or die "Cannot read $file: $!\n";
+    my $updir   = updir();
+    my $basedir = Cwd::realpath( catdir( cwd(), $updir, $updir ) );
+    my $file    = catfile( $basedir, 'parrot.pc' );
+    open( my $fh, '<', $file ) or die "Cannot read $file: $!\n";
 
-	my %vars;
-	while (<$fh>)
-	{
-		chomp;
-		last unless /\S/;
-		my ($var, $value) = split(/=/, $_);
-		$vars{$var}       = $value;
-	}
+    my %vars;
+    while (<$fh>)
+    {
+        chomp;
+        last unless /\S/;
+    }
 
-	while (<$fh>)
-	{
-		chomp;
-		last unless /\S/;
-		my ($var, $value) =  split(/: /, $_);
-		$value            =~ s/\${(\w+)}/$vars{$1}/g;
-		$vars{$var}       =  $value;
-	}
+    $vars{libdir}     = catdir( $basedir, 'lib' );
+    $vars{includedir} = catdir( $basedir, 'include' );
+
+    while (<$fh>)
+    {
+        chomp;
+        last unless /\S/;
+        my ($var, $value) =  split(/: /, $_);
+        $value            =~ s/\${(\w+)}/$vars{$1}/g;
+        $vars{$var}       =  $value;
+    }
 
     $vars{Cflags} .= ' -I' . catdir( ($updir) x 2, 'include' );
     $vars{Libs}   .= $^O =~ /Win32/ ? ' ..\..\libparrot.lib' : " -L$libp";
 
-	return @vars{qw( Cflags Libs )};
+    return @vars{qw( Cflags Libs )};
 }
 
 sub get_paths
@@ -135,42 +139,42 @@ sub get_paths
 
 sub get_parrot_path
 {
-	my $in_parrot_tree = shift;
-	return get_parrot_path_internal() if $in_parrot_tree;
-	return get_parrot_path_external();
+    my $in_parrot_tree = shift;
+    return get_parrot_path_internal() if $in_parrot_tree;
+    return get_parrot_path_external();
 }
 
 sub get_parrot_path_internal
 {
-	my $updir = updir();
-	my $path  = catfile(($updir) x 2, get_parrot_executable_name());
+    my $updir = updir();
+    my $path  = catfile(($updir) x 2, get_parrot_executable_name());
 
-	die "parrot apparently not built!\n" unless -e $path;
-	return $path;
+    die "parrot apparently not built!\n" unless -e $path;
+    return $path;
 }
 
 sub get_parrot_path_external
 {
-	my $parrot = get_parrot_executable_name();
+    my $parrot = get_parrot_executable_name();
 
-	for my $path ( path() )
-	{
-		my $file = catfile( $path, $parrot );
-		next unless -e $file;
-		return $file;
-	}
+    for my $path ( path() )
+    {
+        my $file = catfile( $path, $parrot );
+        next unless -e $file;
+        return $file;
+    }
 
-	die "parrot apparently not installed in \$PATH\n";
+    die "parrot apparently not installed in \$PATH\n";
 }
 
 sub get_parrot_executable_name
 {
-	return 'parrot' unless $^O =~ /Win32/;
-	return 'parrot.exe';
+    return 'parrot' unless $^O =~ /Win32/;
+    return 'parrot.exe';
 }
 
 sub diag
 {
-	return unless $ENV{PE_DEBUG};
-	print STDERR "<$_>\n" for @_;
+    return unless $ENV{PE_DEBUG};
+    print STDERR "<$_>\n" for @_;
 }

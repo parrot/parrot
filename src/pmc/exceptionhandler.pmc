@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -22,7 +21,11 @@ exception object's C<_P5> attribute.
 
 #include "parrot/oplib/ops.h"
 
-pmclass ExceptionHandler extends Continuation auto_attrs {
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass ExceptionHandler extends Continuation provides invokable auto_attrs {
 
     ATTR PMC    *handled_items;
     ATTR INTVAL inclusive;
@@ -59,6 +62,24 @@ Initializes the exception handler.
 
 /*
 
+=item C<void init_int(INTVAL)>
+
+Initializes the exception handler with one handled type.
+
+=cut
+
+*/
+
+    VTABLE void init_int(INTVAL handledtype) {
+        Parrot_ExceptionHandler_attributes * const attrs = PARROT_EXCEPTIONHANDLER(SELF);
+        SELF.init();
+
+        attrs->handled_types = Parrot_pmc_new_init_int(INTERP, enum_class_FixedIntegerArray, 1);
+        VTABLE_set_integer_keyed_int(INTERP, attrs->handled_types, 0, handledtype);
+    }
+
+/*
+
 =item C<void mark()>
 
 Mark any active exception handler data as live.
@@ -70,7 +91,8 @@ Mark any active exception handler data as live.
     VTABLE void mark() {
         Parrot_ExceptionHandler_attributes * const attrs =
             PARROT_EXCEPTIONHANDLER(SELF);
-        Parrot_gc_mark_PMC_alive(interp, attrs->handled_items);
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->handled_types);
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->handled_types_except);
         SUPER();
     }
 
@@ -122,8 +144,8 @@ Set up the environment for the exception handler to be invoked.
     VTABLE opcode_t *invoke(void *next) {
         opcode_t    * const pc = PARROT_CONTINUATION(SELF)->address;
 
-        Parrot_continuation_check(interp, SELF);
-        Parrot_continuation_rewind_environment(interp, SELF);
+        Parrot_continuation_check(INTERP, SELF);
+        Parrot_continuation_rewind_environment(INTERP, SELF);
 
         /* switch code segment if needed */
         if (INTERP->code != PARROT_CONTINUATION(SELF)->seg)
@@ -156,10 +178,10 @@ Report whether the exception handler can handle a particular type of exception.
 */
 
     METHOD can_handle(PMC *exception) {
-        STRING * const sev    = CONST_STRING(interp, "severity");
-        STRING * const ex_str = CONST_STRING(interp, "Exception");
+        STRING * const sev    = CONST_STRING(INTERP, "severity");
+        STRING * const ex_str = CONST_STRING(INTERP, "Exception");
 
-        INTVAL severity = VTABLE_get_integer_keyed_str(interp, exception, sev);
+        INTVAL severity = VTABLE_get_integer_keyed_str(INTERP, exception, sev);
 
         if (exception->vtable->base_type == enum_class_Exception
         ||  VTABLE_isa(INTERP, exception, ex_str)) {
@@ -176,16 +198,16 @@ Report whether the exception handler can handle a particular type of exception.
             if (max_severity > 0 &&  severity > max_severity) {
                 RETURN(INTVAL 0);
             }
-            if (! PMC_IS_NULL(handled_items)) {
-                const INTVAL elems = VTABLE_elements(interp, handled_items);
-                const INTVAL type  = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"));
+            if (! PMC_IS_NULL(handled_types)) {
+                const INTVAL elems = VTABLE_elements(INTERP, handled_types);
+                const INTVAL type  = VTABLE_get_integer_keyed_str(INTERP, exception, CONST_STRING(INTERP, "type"));
                 INTVAL i;
                 INTVAL match     = inclusive ? 1 : 0;
                 INTVAL not_match = inclusive ? 0 : 1;
 
-                for (i = 0; i < elems; i++) {
-                    INTVAL handled_type = VTABLE_get_integer_keyed_int(interp,
-                            handled_items, i);
+                for (i = 0; i < elems; ++i) {
+                    INTVAL handled_type = VTABLE_get_integer_keyed_int(INTERP,
+                            handled_types, i);
                     if (handled_type == type)
                         RETURN(INTVAL match);
                 }
@@ -259,8 +281,8 @@ Set the exception types that the ExceptionHandler will handle.
     METHOD handle_types(PMC *types :slurpy) {
         Parrot_ExceptionHandler_attributes * const attrs =
                     PARROT_EXCEPTIONHANDLER(SELF);
-        attrs->handled_items =
-            VTABLE_elements(interp, types) > 0
+        attrs->handled_types =
+            VTABLE_elements(INTERP, types) > 0
                 ? types
                 : PMCNULL;
         attrs->inclusive   = 1;
@@ -280,8 +302,8 @@ Set the exception types that the ExceptionHandler will not handle.
     METHOD handle_types_except(PMC *types :slurpy) {
         Parrot_ExceptionHandler_attributes * const attrs =
                     PARROT_EXCEPTIONHANDLER(SELF);
-        attrs->handled_items =
-            VTABLE_elements(interp, types) > 0
+        attrs->handled_types_except =
+            VTABLE_elements(INTERP, types) > 0
                 ? types
                 : PMCNULL;
         attrs->inclusive   = 0;
@@ -344,5 +366,5 @@ Set the exception classes that the ExceptionHandler will not handle.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

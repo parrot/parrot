@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -82,12 +81,13 @@ C string version of C<Parrot_vsprintf_s()>.
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING *
 Parrot_vsprintf_c(PARROT_INTERP, ARGIN(const char *pat), va_list args)
 {
     ASSERT_ARGS(Parrot_vsprintf_c)
-    STRING * const realpat = string_make(interp, pat, strlen(pat),
-                                  NULL, PObj_external_FLAG);
+    STRING * const realpat = Parrot_str_new_init(interp, pat, strlen(pat),
+            Parrot_default_encoding_ptr, PObj_external_FLAG);
 
     STRING * const ret = Parrot_vsprintf_s(interp, realpat, args);
 
@@ -112,17 +112,16 @@ Parrot_vsnprintf(PARROT_INTERP, ARGOUT(char *targ),
                  size_t len, ARGIN(const char *pat), va_list args)
 {
     ASSERT_ARGS(Parrot_vsnprintf)
-    char   *str_ret;
-    size_t  str_len;
+
     if (len == 0)
         return;
-    len--;
+    --len;
     if (len) {
         const STRING * const ret = Parrot_vsprintf_c(interp, pat, args);
         /* string_transcode(interp, ret, NULL, NULL, &ret); */
 
-        str_ret = Parrot_str_to_cstring(interp, ret);
-        str_len = strlen(str_ret);
+        char     * const str_ret = Parrot_str_to_cstring(interp, ret);
+        const    size_t  str_len = strlen(str_ret);
         if (len > str_len) {
             len = str_len;
         }
@@ -256,6 +255,7 @@ A simulation of C<snprintf> for systems that do not support it.
 
 
 PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
 int
 Parrot_secret_snprintf(ARGOUT(char *buffer), SHIM(const size_t len),
         ARGIN(const char *format), ...)
@@ -294,5 +294,5 @@ lines long, I split it into three. --BD
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

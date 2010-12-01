@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -27,6 +26,10 @@ never be set for user arrays.
 #define PMC_size(x)  ((Parrot_FixedPMCArray_attributes *)PMC_data(x))->size
 #define PMC_array(x) ((Parrot_FixedPMCArray_attributes *)PMC_data(x))->pmc_array
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass FixedPMCArray auto_attrs provides array {
     ATTR INTVAL   size;      /* number of elements in the array */
     ATTR PMC    **pmc_array; /* pointer to PMC array */
@@ -47,11 +50,11 @@ Sort this array, optionally using the provided cmp_func
         if (n > 1) {
             /* XXX Workaround for TT #218 */
             if (PObj_is_object_TEST(SELF)) {
-                PMC *parent = SELF.get_attr_str(CONST_STRING(interp, "proxy"));
-                Parrot_pcc_invoke_method_from_c_args(interp, parent, CONST_STRING(interp, "sort"), "P->", cmp_func);
+                PMC *parent = SELF.get_attr_str(CONST_STRING(INTERP, "proxy"));
+                Parrot_pcc_invoke_method_from_c_args(INTERP, parent, CONST_STRING(INTERP, "sort"), "P->", cmp_func);
             }
             else
-                Parrot_quicksort(interp, (void **)PMC_array(SELF), n, cmp_func);
+                Parrot_util_quicksort(INTERP, (void **)PMC_array(SELF), n, cmp_func);
         }
         RETURN(PMC *SELF);
     }
@@ -64,7 +67,7 @@ Sort this array, optionally using the provided cmp_func
 
 =over 4
 
-=item C<void init()>
+=item C<void init_int(INTVAL size)>
 
 Initializes the array.
 
@@ -72,8 +75,12 @@ Initializes the array.
 
 */
 
-    VTABLE void init() {
-        PObj_custom_mark_destroy_SETALL(SELF);
+    VTABLE void init_int(INTVAL size) {
+        if (size < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    _("FixedPMCArray: Cannot set array size to a negative number (%d)"), size);
+
+        SELF.set_integer_native(size);
     }
 
 /*
@@ -107,7 +114,7 @@ Creates and returns a copy of the array.
 
         if (size) {
             PMC_size(dest)  = size;
-            PMC_array(dest) = mem_gc_allocate_n_zeroed_typed(INTERP, size, PMC *);
+            PMC_array(dest) = mem_gc_allocate_n_typed(INTERP, size, PMC *);
             mem_copy_n_typed(PMC_array(dest), PMC_array(SELF), size, PMC *);
             PObj_custom_mark_destroy_SETALL(dest);
         }
@@ -198,12 +205,12 @@ TT #1229: implement freeze/thaw and use that instead.
         for (i = 0; i < n; ++i) {
             PMC * const val = SELF.get_pmc_keyed_int(i);
             if (i > 0)
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ", "));
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ", "));
 
-            res = Parrot_str_append(INTERP, res, VTABLE_get_repr(INTERP, val));
+            res = Parrot_str_concat(INTERP, res, VTABLE_get_repr(INTERP, val));
         }
 
-        res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ")"));
+        res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ")"));
 
         return res;
     }
@@ -284,7 +291,7 @@ Returns the Parrot string value of the element at index C<key>.
         PMC * const retval = SELF.get_pmc_keyed_int(key);
 
         if (PMC_IS_NULL(retval))
-            return string_from_literal(interp, "");
+            return CONST_STRING(INTERP, "");
 
         return VTABLE_get_string(INTERP, retval);
     }
@@ -337,7 +344,7 @@ Returns the PMC value of the element at index C<*key>.
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
         const INTVAL k        = VTABLE_get_integer(INTERP, key);
-        PMC   * const nextkey = key_next(INTERP, key);
+        PMC   * const nextkey = Parrot_key_next(INTERP, key);
         PMC   *box;
 
         if (!nextkey)
@@ -377,11 +384,12 @@ array.
                     _("FixedPMCArray: Cannot set array size to a negative number"));
 
         PMC_size(SELF) = size;
-        data           = mem_gc_allocate_n_zeroed_typed(INTERP, size, PMC *);
+        data           = mem_gc_allocate_n_typed(INTERP, size, PMC *);
 
-        for (i = 0; i < size; i++)
+        for (i = 0; i < size; ++i)
             data[i] = PMCNULL;
 
+        PObj_custom_mark_destroy_SETALL(SELF);
         PMC_array(SELF) = data;
     }
 
@@ -392,7 +400,7 @@ array.
         if (SELF == value)
             return;
 
-        if (!VTABLE_does(interp, value, CONST_STRING(interp, "array")))
+        if (!VTABLE_does(INTERP, value, CONST_STRING(INTERP, "array")))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     _("Can't set self from this type"));
 
@@ -400,9 +408,9 @@ array.
             mem_gc_free(INTERP, PMC_array(SELF));
 
         size            = PMC_size(SELF) = VTABLE_elements(INTERP, value);
-        PMC_array(SELF) = mem_gc_allocate_n_zeroed_typed(INTERP, size, PMC *);
+        PMC_array(SELF) = mem_gc_allocate_n_typed(INTERP, size, PMC *);
 
-        for (i = 0; i < size; i++)
+        for (i = 0; i < size; ++i)
             (PMC_array(SELF))[i] = VTABLE_get_pmc_keyed_int(INTERP, value, i);
 
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -418,7 +426,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        PMC * const val = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const val = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_Integer));
 
         VTABLE_set_integer_native(INTERP, val, value);
@@ -436,7 +444,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
-        PMC * const val = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const val = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_Integer));
 
         VTABLE_set_integer_native(INTERP, val, value);
@@ -457,7 +465,7 @@ C<value>.
 */
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        PMC * const val = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const val = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_Float));
 
         VTABLE_set_number_native(INTERP, val, value);
@@ -477,7 +485,7 @@ C<value>.
 
     VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
         const INTVAL k        = VTABLE_get_integer(INTERP, key);
-        PMC   * const nextkey = key_next(INTERP, key);
+        PMC   * const nextkey = Parrot_key_next(INTERP, key);
 
         if (nextkey == NULL) {
             SELF.set_number_keyed_int(k, value);
@@ -504,7 +512,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
-        PMC * const val = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const val = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_String));
 
         VTABLE_set_string_native(INTERP, val, value);
@@ -523,7 +531,7 @@ C<value>.
 */
 
     VTABLE void set_string_keyed(PMC *key, STRING *value) {
-        PMC * const val = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const val = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_String));
 
         VTABLE_set_string_native(INTERP, val, value);
@@ -565,7 +573,7 @@ Sets the PMC at index C<key> to C<value>.
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
-        PMC   *nextkey = key_next(INTERP, key);
+        PMC   *nextkey = Parrot_key_next(INTERP, key);
 
         if (!nextkey) {
             SELF.set_pmc_keyed_int(k, value);
@@ -613,7 +621,7 @@ The C<==> operation. Compares two array to hold equal elements.
             ||  item2->vtable->base_type == enum_class_Null)
                 return 0;
 
-            if (!VTABLE_is_equal(interp, item1, item2))
+            if (!VTABLE_is_equal(INTERP, item1, item2))
                 return 0;
         }
 
@@ -721,13 +729,13 @@ Used to unarchive the array.
     }
 
     VTABLE void freeze(PMC *info) {
-        SUPER(info);
         VTABLE_push_integer(INTERP, info, VTABLE_elements(INTERP, SELF));
     }
 
     VTABLE void thaw(PMC *info) {
-        SUPER(info);
         SELF.set_integer_native(VTABLE_shift_integer(INTERP, info));
+        /* Thawed array was created from pmc_new_noinit */
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
@@ -767,7 +775,7 @@ Mark the array.
             return;
 
         for (i = PMC_size(SELF) - 1; i >= 0; --i)
-            Parrot_gc_mark_PMC_alive(interp, data[i]);
+            Parrot_gc_mark_PMC_alive(INTERP, data[i]);
     }
 
 
@@ -790,5 +798,5 @@ F<docs/pdds/pdd17_basic_types.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

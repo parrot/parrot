@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -19,18 +18,34 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(29)
+    plan(36)
 
-    'test_set_size'()       # 2 tests
-    'test_reset_size'()     # 1 test
-    'test_set_first'()      # 3 tests
-    'test_set_second'()     # 3 tests
-    'test_out_of_bounds'()  # 4 tests
-    'test_set_via_pmc'()    # 3 tests
-    'test_get_via_pmc'()    # 4 tests
-    'test_interface_done'() # 4 tests
-    'test_get_iter'()       # 1 test
-    'test_equality'()       # 5 tests
+    test_set_size()
+    test_reset_size()
+    test_set_first()
+    test_set_second()
+    test_out_of_bounds()
+    test_set_via_pmc()
+    test_get_via_pmc()
+    test_interface_done()
+    test_get_iter()
+    test_equality()
+    test_repr()
+    test_sort()
+    test_new_style_init()
+    test_invalid_init_tt1509()
+.end
+
+.sub 'test_new_style_init'
+    $P0 = new 'FixedIntegerArray', 10
+
+    $I0 = $P0
+    is($I0, 10, "New style init creates the correct # of elements")
+
+    $P0 = new ['FixedIntegerArray'], 10
+
+    $I0 = $P0
+    is($I0, 10, "New style init creates the correct # of elements for a key constant")
 .end
 
 .sub 'test_set_size'
@@ -213,7 +228,7 @@ out-of-bounds test. Checks INT and PMC keys.
 .end
 
 .sub 'test_equality'
-    .local pmc a1, a2
+    .local pmc a1, a2, a3
     a1 = new ['FixedIntegerArray']
     a2 = new ['FixedIntegerArray']
 
@@ -233,7 +248,60 @@ out-of-bounds test. Checks INT and PMC keys.
 
     a2[1] = 84
     is(a1, a2, "Equal when second element same")
+
+    a3 = new ['Complex']
+    isnt(a1, a3, "Different PMC type is not equal")
 .end
+
+.sub 'test_repr'
+    .local pmc a1
+    .local string r
+    a1 = new ['FixedIntegerArray']
+    a1 = 2
+    a1[0] = 7
+    a1[1] = 1
+    r = get_repr a1
+    is(r, '[ 7, 1 ]', 'get_repr')
+.end
+
+.sub 'test_new_style_init'
+    $P0 = new ['FixedIntegerArray'], 10
+
+    $I0 = $P0
+    is($I0, 10, "New style init creates the correct # of elements")
+.end
+
+.sub 'test_sort'
+    .local pmc a1, a2
+    a1 = new ['FixedIntegerArray'], 3
+    a1[0] = 7
+    a1[1] = 1
+    a1[2] = 5
+
+    a2 = new ['FixedIntegerArray'], 3
+    a2[0] = 1
+    a2[1] = 5
+    a2[2] = 7
+
+    a1.'sort'()
+    $I0 = iseq a1, a2
+    is($I0, 1, 'default sort')
+.end
+
+.sub test_invalid_init_tt1509
+    throws_substring(<<'CODE', 'FixedIntegerArray: Cannot set array size to a negative number (-10)', 'New style init does not dump core for negative array lengths')
+    .sub main
+        $P0 = new ['FixedIntegerArray'], -10
+    .end
+CODE
+
+    throws_substring(<<'CODE', 'FixedIntegerArray: Cannot set array size to a negative number (-10)', 'New style init (key constant) does not dump core for negative array lengths')
+    .sub main
+        $P0 = new 'FixedIntegerArray', -10
+    .end
+CODE
+.end
+
 
 
 # Local Variables:

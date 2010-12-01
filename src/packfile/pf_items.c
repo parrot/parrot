@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -33,6 +32,8 @@ for "little endian".
 */
 
 #include "parrot/parrot.h"
+#include "byteorder.h"
+#include "pf_items.str"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
@@ -153,14 +154,6 @@ PARROT_WARN_UNUSED_RESULT
 static opcode_t fetch_op_le_8(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
-static opcode_t fetch_op_mixed_be(ARGIN(const unsigned char *b))
-        __attribute__nonnull__(1);
-
-PARROT_WARN_UNUSED_RESULT
-static opcode_t fetch_op_mixed_le(ARGIN(const unsigned char *b))
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_cvt_num12_num16 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
@@ -210,10 +203,6 @@ static opcode_t fetch_op_mixed_le(ARGIN(const unsigned char *b))
 #define ASSERT_ARGS_fetch_op_le_4 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(b))
 #define ASSERT_ARGS_fetch_op_le_8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_fetch_op_mixed_be __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_fetch_op_mixed_le __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(b))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -323,7 +312,7 @@ nul:
         dest[7] |= 0x80;
     /* long double frac 63 bits => 52 bits
        src[7] &= 0x7f; reset integer bit */
-    for (i = 0; i < 6; i++) {
+    for (i = 0; i < 6; ++i) {
         dest[i+1] |= (i==5 ? src[7]&0x7f : src[i+2]) >> 3;
         dest[i] |= (src[i+2] & 0x1f) << 5;
     }
@@ -552,7 +541,7 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
             dest[7] |= 0x80;
         /* long double frac 112 bits => 52 bits
            src[13] &= 0x7f; reset integer bit */
-        for (i = 0; i < 6; i++) {
+        for (i = 0; i < 6; ++i) {
             dest[i+1] |= (i==5 ? src[13]&0x7f : src[i+7]) >> 3;
             dest[i] |= (src[i+7] & 0x1f) << 5;
         }
@@ -819,86 +808,6 @@ cvt_num8_num16_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 }
 #endif
 
-#if 0
-
-/*
-
-=item C<static opcode_t fetch_op_mixed_le(const unsigned char *b)>
-
-opcode fetch helper function
-
-This is mostly wrong or at least untested
-
-Fetch an opcode and convert to LE
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static opcode_t
-fetch_op_mixed_le(ARGIN(const unsigned char *b))
-{
-    ASSERT_ARGS(fetch_op_mixed_le)
-#  if OPCODE_T_SIZE == 4
-    union {
-        unsigned char buf[8];
-        opcode_t o[2];
-    } u;
-    /* wordsize = 8 then */
-    fetch_buf_le_8(u.buf, b);
-    return u.o[0]; /* or u.o[1] */
-#  else
-    union {
-        unsigned char buf[4];
-        opcode_t o;
-    } u;
-
-    /* wordsize = 4 */
-    u.o = 0;
-    fetch_buf_le_4(u.buf, b);
-    return u.o;
-#  endif
-}
-
-/*
-
-=item C<static opcode_t fetch_op_mixed_be(const unsigned char *b)>
-
-Fetch an opcode and convert to BE. Determines size of opcode from
-C<OPCODE_T_SIZE> macro, and proceeds accordingly.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static opcode_t
-fetch_op_mixed_be(ARGIN(const unsigned char *b))
-{
-    ASSERT_ARGS(fetch_op_mixed_be)
-#  if OPCODE_T_SIZE == 4
-    union {
-        unsigned char buf[8];
-        opcode_t o[2];
-    } u;
-    /* wordsize = 8 then */
-    fetch_buf_be_8(u.buf, b);
-    return u.o[1]; /* or u.o[0] */
-#  else
-    union {
-        unsigned char buf[4];
-        opcode_t o;
-    } u;
-    /* wordsize = 4 */
-    u.o = 0;
-    fetch_buf_be_4(u.buf, b);
-    return u.o;
-#  endif
-}
-
-#endif
-
 /*
 
 =item C<static opcode_t fetch_op_be_4(const unsigned char *b)>
@@ -1050,14 +959,16 @@ opcode_t
 PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGMOD(const opcode_t **stream))
 {
     ASSERT_ARGS(PF_fetch_opcode)
-    opcode_t o;
-    if (!pf || !pf->fetch_op)
+    if (!pf || !pf->fetch_op) {
         return *(*stream)++;
-    o = (pf->fetch_op)(*((const unsigned char **)stream));
-    TRACE_PRINTF_VAL(("  PF_fetch_opcode: 0x%lx (%ld), at 0x%x\n",
-                      o, o, OFFS(pf, *stream)));
-    *((const unsigned char **) (stream)) += pf->header->wordsize;
-    return o;
+    }
+    else {
+        const unsigned char *ucstream = *(const unsigned char **)stream;
+        opcode_t o  = (pf->fetch_op)(ucstream);
+        ucstream   += pf->header->wordsize;
+        *stream     = (const opcode_t *)ucstream;
+        return o;
+    }
 }
 
 /*
@@ -1108,20 +1019,18 @@ Fetches an C<INTVAL> from the stream, converting byteorder if needed.
 XXX assumes C<sizeof (INTVAL) == sizeof (opcode_t)> - we don't have
 C<INTVAL> size in the PackFile header.
 
-When used for freeze/thaw the C<pf> argument might be NULL.
-
 =cut
 
 */
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-PF_fetch_integer(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
+PF_fetch_integer(ARGIN(PackFile *pf), ARGIN(const opcode_t **stream))
 {
     ASSERT_ARGS(PF_fetch_integer)
     INTVAL i;
 
-    if (!pf || pf->fetch_iv == NULL)
+    if (!pf->fetch_iv)
         return *(*stream)++;
     i = (pf->fetch_iv)(*((const unsigned char **)stream));
     TRACE_PRINTF_VAL(("  PF_fetch_integer: 0x%x (%d) at 0x%x\n", i, i,
@@ -1281,6 +1190,106 @@ PF_size_number(void)
 
 /*
 
+=item C<STRING * PF_fetch_buf(PARROT_INTERP, PackFile *pf, const opcode_t
+**cursor)>
+
+Fetches a buffer (fixed_8 encoded temporary C<STRING>) from bytecode.
+
+Opcode format is:
+
+    opcode_t size
+    * data
+
+When used for freeze/thaw, the C<pf> argument might be C<NULL>.
+
+The returned buffer points to the underlying packfile. It should be used and
+discarded immediately to avoid things changing underneath you.
+
+=cut
+
+*/
+
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+PF_fetch_buf(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **cursor))
+{
+    ASSERT_ARGS(PF_fetch_buf)
+    const int wordsize = pf ? pf->header->wordsize : sizeof (opcode_t);
+    size_t  size       = PF_fetch_opcode(pf, cursor);
+    STRING *s          = Parrot_str_new_init(interp, (const char *)*cursor, size,
+                            Parrot_binary_encoding_ptr,
+                            PObj_external_FLAG);
+    *((const unsigned char **)(cursor)) += ROUND_UP_B(size, wordsize);
+    return s;
+}
+
+
+/*
+
+=item C<opcode_t* PF_store_buf(opcode_t *cursor, const STRING *s)>
+
+Write a buffer (fixed_8 encoded, binary string) to the opcode stream. These
+are encoded more compactly and read more efficiently than normal strings, but
+have limitations (see C<PF_fetch_buf>).
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+opcode_t*
+PF_store_buf(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
+{
+    ASSERT_ARGS(PF_store_buf)
+    const int  wordsize = sizeof (opcode_t);
+
+    PARROT_ASSERT(s->encoding == Parrot_binary_encoding_ptr);
+
+    *cursor++ = s->bufused;
+
+    if (s->strstart) {
+        char *charcursor = (char *) cursor;
+        mem_sys_memcopy(charcursor, s->strstart, s->bufused);
+        charcursor += s->bufused;
+
+        /* Pad up to wordsize boundary. */
+        while ((charcursor - (char *)cursor) % wordsize)
+            *charcursor++ = 0;
+
+        cursor += (charcursor - (char *)cursor) / wordsize;
+    }
+
+    return cursor;
+}
+
+
+/*
+
+=item C<size_t PF_size_buf(const STRING *s)>
+
+Reports the stored size of a buffer in C<opcode_t> units.
+
+=cut
+
+*/
+
+PARROT_PURE_FUNCTION
+size_t
+PF_size_buf(ARGIN(const STRING *s))
+{
+    ASSERT_ARGS(PF_size_buf)
+    if (STRING_IS_NULL(s))
+        return 1;
+    else
+        return PF_size_strlen(s->bufused) - 1;
+}
+
+
+/*
+
 =item C<STRING * PF_fetch_string(PARROT_INTERP, PackFile *pf, const opcode_t
 **cursor)>
 
@@ -1288,9 +1297,7 @@ Fetches a C<STRING> from bytecode and return a new C<STRING>.
 
 Opcode format is:
 
-    opcode_t flags
-    opcode_t encoding
-    opcode_t type
+    opcode_t flags8 | encoding
     opcode_t size
     * data
 
@@ -1307,24 +1314,37 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 {
     ASSERT_ARGS(PF_fetch_string)
     STRING   *s;
-    UINTVAL   flags    = PF_fetch_opcode(pf, cursor);
-    const int wordsize = pf ? pf->header->wordsize : sizeof (opcode_t);
+    UINTVAL   flags;
+    UINTVAL   encoding_nr;
+    const STR_VTABLE *encoding;
     size_t    size;
-    opcode_t  charset_nr;
+    const int wordsize          = pf ? pf->header->wordsize : sizeof (opcode_t);
+    opcode_t  flag_charset_word = PF_fetch_opcode(pf, cursor);
 
-    /* don't let PBC mess our internals - only constant or not */
-    flags      &= (PObj_constant_FLAG | PObj_private7_FLAG);
-    charset_nr  = PF_fetch_opcode(pf, cursor);
+    if (flag_charset_word == -1)
+        return STRINGNULL;
 
-    /* These may need to be separate */
-    size        = (size_t)PF_fetch_opcode(pf, cursor);
+    /* decode flags, charset and encoding */
+    flags       = (flag_charset_word & 0x1 ? PObj_constant_FLAG : 0) |
+                  (flag_charset_word & 0x2 ? PObj_private7_FLAG : 0) ;
+    encoding_nr = (flag_charset_word >> 8) & 0xFF;
+
+    size = (size_t)PF_fetch_opcode(pf, cursor);
 
     TRACE_PRINTF(("PF_fetch_string(): flags=0x%04x, ", flags));
-    TRACE_PRINTF(("charset_nr=%ld, ", charset_nr));
+    TRACE_PRINTF(("encoding_nr=%ld, ", encoding_nr));
     TRACE_PRINTF(("size=%ld.\n", size));
 
-    s            = string_make_from_charset(interp, (const char *)*cursor,
-                        size, charset_nr, flags);
+    encoding = Parrot_get_encoding(interp, encoding_nr);
+    if (!encoding)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                    "Invalid encoding number '%d' specified", encoding_nr);
+
+    if (size || (encoding != CONST_STRING(interp, "")->encoding))
+        s = Parrot_str_new_init(interp, (const char *)*cursor, size,
+                encoding, flags);
+    else
+        s = CONST_STRING(interp, "");
 
     /* print only printable characters */
     TRACE_PRINTF_VAL(("PF_fetch_string(): string is '%s' at 0x%x\n",
@@ -1370,7 +1390,12 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
         padded_size += sizeof (opcode_t) - (padded_size % sizeof (opcode_t));
     }
 
-    *cursor++ = PObj_get_FLAGS(s); /* only constant_FLAG and private7 */
+    if (STRING_IS_NULL(s)) {
+        /* preserve NULL-ness of strings */
+        *cursor++ = -1;
+        return cursor;
+    }
+
     /*
      * TODO as soon as we have dynamically loadable charsets
      *      we have to store the charset name, not the number
@@ -1379,7 +1404,11 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
      *
      * see also PF_fetch_string
      */
-    *cursor++ = Parrot_charset_number_of_str(NULL, s);
+
+    /* encode charset_nr, encoding_nr and flags into the same word */
+    *cursor++ = (Parrot_encoding_number_of_str(NULL, s) << 8)         |
+                (PObj_get_FLAGS(s) & PObj_constant_FLAG ? 0x1 : 0x0) |
+                (PObj_get_FLAGS(s) & PObj_private7_FLAG ? 0x2 : 0x0) ;
     *cursor++ = s->bufused;
 
     /* Switch to char * since rest of string is addressed by
@@ -1415,14 +1444,38 @@ size_t
 PF_size_string(ARGIN(const STRING *s))
 {
     ASSERT_ARGS(PF_size_string)
-    opcode_t padded_size = s->bufused;
+    /* TODO: don't break encapsulation on strings */
+    const UINTVAL len = s->bufused;
+    if (STRING_IS_NULL(s))
+        return 1;
+    else
+        return PF_size_strlen(len);
+}
+
+/*
+
+=item C<size_t PF_size_strlen(const UINTVAL len)>
+
+Reports stored size of C<STRING> in C<opcode_t> units given its in-memory byte length.
+
+=cut
+
+*/
+
+PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+size_t
+PF_size_strlen(const UINTVAL len)
+{
+    ASSERT_ARGS(PF_size_strlen)
+    opcode_t padded_size = len;
 
     if (padded_size % sizeof (opcode_t)) {
         padded_size += sizeof (opcode_t) - (padded_size % sizeof (opcode_t));
     }
 
     /* Include space for flags, representation, and size fields.  */
-    return 3 + (size_t)padded_size / sizeof (opcode_t);
+    return 2 + (size_t)padded_size / sizeof (opcode_t);
 }
 
 /*
@@ -1742,5 +1795,5 @@ C<<PF_size_<type>()>> - return the needed size in C<opcode_t> units.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,5 +1,4 @@
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -31,12 +30,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my ( $verbose, $without ) = $conf->options->get(
-        qw|
-            verbose
-            without-threads
-        |
-    );
+    my $without = $conf->options->get( qw| without-threads |);
 
     if ($without) {
         $conf->data->set( HAS_THREADS => 0 );

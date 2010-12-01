@@ -1,12 +1,11 @@
 #! perl
-# Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
-use Test::More 'tests' => 58;
+use Test::More 'tests' => 56;
 
 use Parrot::Distribution;
 use File::Spec::Functions ':ALL';
@@ -40,9 +39,9 @@ to ensure nothing is broken.
 BEGIN { use_ok('Parrot::IO::Path') }
 
 my $file_temp_work_path = tempdir(
-	'PARROT_IO_XXXX',
-	TMPDIR => 1,
-	CLEANUP => 1
+    'PARROT_IO_XXXX',
+    TMPDIR => 1,
+    CLEANUP => 1
 );
 # you can sort of count on the var below being the unique part of the temp dir
 my $file_temp_dir = (splitdir($file_temp_work_path))[-1];
@@ -89,7 +88,7 @@ isa_ok( $r, 'Parrot::IO::Directory' );
 ok( !$r->parent(), 'root has no parent' );
 
 my $d = Parrot::IO::Directory->tmp_directory(
-	catfile($file_temp_dir, 't')
+    catfile($file_temp_dir, 't')
 );
 ok( $d, 'tmp_directory' );
 
@@ -171,19 +170,6 @@ is( $f3->read, "hello\nworld", 'append and scalar read' );
 is( $a[1], "world", 'array read' );
 
 ok( $f3->modified_since($time), 'modified_since' );
-
-SKIP: {
-    my $nul = File::Spec->devnull;
-
-    skip( 'keywords not expanded in non-svn checkouts', 2 )
-        unless Parrot::Distribution->new->is_svn_co();
-
-    $f = Parrot::IO::File->new( catfile( 'lib', 'Parrot', 'IO', 'File.pm' ) );
-    ok( $f->has_svn_id(), 'has_svn_id' );
-
-    ok($f->svn_id() =~ /^(?:\$)Id:.*?File.pm \d+ \d{4}-\d\d-\d\d.*?[^\$]+ \$$/,
-       'svn_id');
-}
 
 $f3->delete();
 @a = $d2->files();

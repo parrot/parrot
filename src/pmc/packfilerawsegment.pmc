@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -24,6 +23,10 @@ PDD13 for the design spec.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass PackfileRawSegment auto_attrs extends PackfileSegment {
     /* Type of segment */
     ATTR INTVAL  type;
@@ -44,7 +47,7 @@ Create empty PackfileRawSegment.
         Parrot_PackfileRawSegment_attributes * attrs =
                 PMC_data_typed(SELF, Parrot_PackfileRawSegment_attributes*);
 
-        attrs->opcodes = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
+        attrs->opcodes = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
         attrs->type    = PF_BYTEC_SEG;
 
         PObj_custom_mark_SET(SELF);
@@ -61,10 +64,10 @@ Marks the object as live.
 */
 
     VTABLE void mark() {
-        Parrot_PackfileRawSegment_attributes * attrs =
+        Parrot_PackfileRawSegment_attributes * const attrs =
                 PARROT_PACKFILERAWSEGMENT(SELF);
 
-        Parrot_gc_mark_PMC_alive(interp, attrs->opcodes);
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->opcodes);
 
         SUPER();
     }
@@ -83,20 +86,21 @@ Initialize PackfileRawSegment from PackFile_Segment
     VTABLE void set_pointer(void * pointer) {
         const PackFile_Segment * const pfseg =
                 (const PackFile_Segment *)pointer;
-        Parrot_PackfileRawSegment_attributes * attrs =
+        Parrot_PackfileRawSegment_attributes * const attrs =
                 PARROT_PACKFILERAWSEGMENT(SELF);
-        PMC * opcodes = attrs->opcodes;
-        size_t i;
+        PMC * const opcodes = attrs->opcodes;
 
         /* Preserve type of unpacked segment */
         attrs->type = pfseg->type;
 
         if (pfseg->size) {
+            size_t i;
+
             /* copy data to own array */
-            VTABLE_set_integer_native(interp, opcodes, pfseg->size);
+            VTABLE_set_integer_native(INTERP, opcodes, pfseg->size);
             /* Not very efficient... */
             for (i = 0; i < pfseg->size; ++i) {
-                VTABLE_set_integer_keyed_int(interp, opcodes, i, pfseg->data[i]);
+                VTABLE_set_integer_keyed_int(INTERP, opcodes, i, pfseg->data[i]);
             }
         }
     }
@@ -112,18 +116,18 @@ Initialize PackfileRawSegment from PackFile_Segment
     VTABLE void *get_pointer() {
         PackFile_Segment * pfseg =
                 (PackFile_Segment*)mem_gc_allocate_zeroed_typed(INTERP, PackFile_ByteCode);
-        Parrot_PackfileRawSegment_attributes * attrs =
+        Parrot_PackfileRawSegment_attributes * const attrs =
                 PARROT_PACKFILERAWSEGMENT(SELF);
         PMC * opcodes = attrs->opcodes;
         size_t i;
 
         pfseg->type     = attrs->type;
-        pfseg->size     = VTABLE_get_integer(interp, opcodes);
+        pfseg->size     = VTABLE_get_integer(INTERP, opcodes);
         pfseg->data     = mem_gc_allocate_n_typed(INTERP, pfseg->size, opcode_t);
 
         /* Not very efficient... */
         for (i = 0; i < pfseg->size; ++i) {
-            pfseg->data[i] = VTABLE_get_integer_keyed_int(interp, opcodes, i);
+            pfseg->data[i] = VTABLE_get_integer_keyed_int(INTERP, opcodes, i);
         }
 
         return pfseg;
@@ -138,10 +142,19 @@ Get the number of elements in the array.
 
 */
     VTABLE INTVAL elements() {
-        return VTABLE_elements(interp,
+        return VTABLE_elements(INTERP,
                 PARROT_PACKFILERAWSEGMENT(SELF)->opcodes);
     }
 
+    VTABLE INTVAL get_integer() {
+        return VTABLE_elements(INTERP,
+                PARROT_PACKFILERAWSEGMENT(SELF)->opcodes);
+    }
+
+    VTABLE FLOATVAL get_number() {
+        return VTABLE_elements(INTERP,
+                PARROT_PACKFILERAWSEGMENT(SELF)->opcodes);
+    }
 
 /*
 
@@ -153,7 +166,7 @@ Fetch an integer's worth of data from the segment.
 
 */
     VTABLE INTVAL get_integer_keyed_int(INTVAL key)  {
-        return VTABLE_get_integer_keyed_int(interp,
+        return VTABLE_get_integer_keyed_int(INTERP,
                 PARROT_PACKFILERAWSEGMENT(SELF)->opcodes, key);
     }
 
@@ -168,8 +181,14 @@ Set an integer's worth of data in the segment.
 
 */
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value)  {
-        VTABLE_set_integer_keyed_int(interp,
+        VTABLE_set_integer_keyed_int(INTERP,
             PARROT_PACKFILERAWSEGMENT(SELF)->opcodes, key, value);
+    }
+
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+        SELF.set_integer_keyed_int(
+            VTABLE_get_integer(INTERP, key),
+            VTABLE_get_integer(INTERP, value));
     }
 
 /*
@@ -182,8 +201,14 @@ Append opcode to segment
 
 */
     VTABLE void push_integer(INTVAL value)  {
-        VTABLE_push_integer(interp,
+        VTABLE_push_integer(INTERP,
             PARROT_PACKFILERAWSEGMENT(SELF)->opcodes, value);
+    }
+
+    VTABLE void push_pmc(PMC *value)  {
+        VTABLE_push_integer(INTERP,
+            PARROT_PACKFILERAWSEGMENT(SELF)->opcodes,
+                VTABLE_get_integer(INTERP, value));
     }
 
 /*
@@ -199,7 +224,7 @@ TODO: Don't allow create Directory, Annotations, etc segments.
 */
 
     METHOD type(INTVAL type :optional, INTVAL got_type :opt_flag) {
-        Parrot_PackfileRawSegment_attributes * attrs =
+        Parrot_PackfileRawSegment_attributes * const attrs =
                 PARROT_PACKFILERAWSEGMENT(SELF);
         INTVAL res;
 
@@ -224,5 +249,5 @@ TODO: Don't allow create Directory, Annotations, etc segments.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

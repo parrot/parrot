@@ -1,11 +1,12 @@
 #!./parrot
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 #
 # ./parrot -R jit partialsums-2.pir N  (N = 2500000 for shootout)
 #
 # By Joshua Isom
 # changed default value to N=25000 (shootout test default) Karl Forner
+
+.loadlib 'trans_ops'
 
 .sub main :main
 	.param pmc argv

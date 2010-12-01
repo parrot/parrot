@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
-# $Id$
 package Parrot::Pmc2c::Dumper;
 
 use strict;
@@ -51,8 +50,7 @@ sub dump_pmc {
     @files = glob $files[0] if $files[0] eq 'src/pmc/*.pmc';
 
     # make sure that a default.dump will always be created if it doesn't
-    # already exist; do so by adding default.pmc to list of files for dumping
-    unshift @files, 'default.pmc' unless -e './src/pmc/default.dump';
+    $pmc2cMain->find_file('default.dump') or unshift @files, 'default.pmc';
 
     # load and parse all pmc files in @files
     for my $filename (@files) {
@@ -72,7 +70,7 @@ sub dump_pmc {
     }
 
     for my $pmc ( values %$pmcs ) {
-        next if $pmc->name =~ /default$/ && $pmc->dump_is_current;
+        next if $pmc->name =~ /default$/ && $pmc->dump_is_current($pmc2cMain->find_file('default.dump'));
 
         gen_parent_lookup_info( $pmc, $pmc2cMain, $pmcs );
         gen_parent_reverse_lookup_info( $pmc, $pmcs, $vtable_dump );

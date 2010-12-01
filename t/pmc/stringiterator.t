@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -17,15 +16,71 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
 =cut
 
 .include 'iterator.pasm'
+.include 'except_types.pasm'
 
 .sub main :main
     .include 'test_more.pir'
 
-    plan(18)
+    plan(81)
 
-    iterate_forward() # 10 tests
+    test_get_pmc()
+    test_clone()
+    test_elements()
+    iterate_forward() # 11 tests
     iterate_backward() # 8 tests
+    iterate_wrong() # 1 test
+    iterate_out() # 1 test
+    get_keyed("abcdefg", "b", "d", "f")
+    get_keyed(iso-8859-1:"a\x{e4}c\x{f6}e\x{fc}g", utf8:"ä", utf8:"ö", utf8:"ü")
+    get_keyed(binary:"a\x{e4}c\x{f6}e\x{fc}g", utf8:"ä", utf8:"ö", utf8:"ü")
+    get_keyed(utf8:"aäc\x{20123}eüg", utf8:"ä", utf8:"\x{20123}", utf8:"ü")
+    get_keyed(utf16:"aä\x{20456}öe\x{20abc}g", utf8:"ä", utf8:"ö", utf8:"\x{20abc}")
+    get_keyed(ucs2:"aäcöe\x{beef}g", utf8:"ä", utf8:"ö", utf8:"\x{beef}")
+    get_keyed(ucs4:"a\x{20789}cöeüg", utf8:"\x{20789}", utf8:"ö", utf8:"ü")
 
+.end
+
+
+.sub 'test_get_pmc'
+    .local pmc s, it, sget
+    s = new ['String']
+    s = 'foobar'
+    it = iter s
+    sget = deref it
+    is(s, sget, 'deref StringIterator gives the iterated string')
+.end
+
+.sub 'test_clone'
+    .local pmc s, it, itc
+    .local int nit, nitc
+
+    s = new ['String']
+    s = 'somestring'
+    it = iter s
+    # Get a clone and make sure both the original and the clone
+    # gets marked.
+    sweep 1
+    nit = elements it
+    itc = clone it
+    sweep 1
+    nitc = elements itc
+    is(nit, nitc, "clone has same length as original")
+.end
+
+.sub test_elements
+    .local string s
+    .local pmc ps, it
+    .local int ns, nit
+
+    s = 'someotherstring'
+    ps = new ['String']
+    ps = s
+    it = iter ps
+    ns = length s
+    nit = elements it
+    is(ns, nit, "iter elements is equal to string length")
+    nit = it
+    is(ns, nit, "iter get_integer is equal to string length")
 .end
 
 .sub 'iterate_forward'
@@ -46,6 +101,9 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
     $S0 = shift it
     ok(it, "Can shift 1st character")
     is($S0, 'b', "With correct value")
+
+    $S0 = it[0]
+    is($S0, 'a', "can get string keyed int correct value")
 
     $S0 = shift it
     ok(it, "Can shift 2nd character")
@@ -94,6 +152,131 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
   fail:
     pop_eh
     ok($I0, "Shifting from finished iterator throws exception")
+.end
+
+.sub 'iterate_wrong'
+    .local pmc s, it, ex
+    .local int r
+
+    s = new ['String']
+    s = 'BAZ'
+
+    it = iter s
+    push_eh catch_wrong
+    it = 42 # Let's hope we'll never have such direction
+    r = 0
+    goto dotest
+catch_wrong:
+    .get_results(ex)
+    finalize ex
+    pop_eh
+    r = 1
+dotest:
+    ok(r, "Caught wrong direction")
+.end
+
+# out of bounds conditions not covered by previous tests
+.sub 'iterate_out'
+    .local pmc s, it, eh
+    s = new ['String']
+    s = 'hi'
+    it = iter s
+    .local string rs
+    rs = shift it
+    rs = shift it
+    eh = new ['ExceptionHandler']
+    push_eh eh
+
+    # shift string
+    set_label eh, catch1
+    rs = shift it
+    goto fail
+catch1:
+    finalize eh
+
+    # shift integer
+    set_label eh, catch2
+    .local int ri
+    ri = shift it
+    goto fail
+catch2:
+    finalize eh
+
+t3:
+    # pop string
+    set_label eh, catch3
+    .local int ri
+    rs = pop it
+    goto fail
+catch3:
+    finalize eh
+
+    # pop integer
+    set_label eh, catch4
+    .local int ri
+    ri = pop it
+    goto fail
+catch4:
+    finalize eh
+
+    ok(1, "Caught out of bounds iterations")
+    goto end
+fail:
+    ok(0, "Out of bounds iteration should throw")
+end:
+.end
+
+.sub get_keyed
+    .param pmc s
+    .param string c1
+    .param string c3
+    .param string c5
+    .local pmc it, eh
+    .local string c
+    .local int result, i1
+    result = 0
+    it = iter s
+    c = shift it
+    c = shift it
+    c = shift it
+    c = it[0]
+    is(c, c3, 'get_string_keyed_int - zero')
+    c = it[2]
+    is(c, c5, 'get_string_keyed_int - pos')
+    c = it[-2]
+    is(c, c1, 'get_string_keyed_int - neg')
+
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    set_label eh, catch
+    push_eh eh
+    c = it[50]
+    goto done
+  catch:
+    finalize eh
+    result = 1
+  done:
+    ok(result, 'get_string_keyed_int out of bounds')
+
+    result = 0
+    i1 = it[0]
+    c = chr i1
+    is(c, c3, 'get_integer_keyed_int - zero')
+    i1 = it[2]
+    c = chr i1
+    is(c, c5, 'get_integer_keyed_int - pos')
+    i1 = it[-2]
+    c = chr i1
+    is(c, c1, 'get_integer_keyed_int - neg')
+
+    set_label eh, catch2
+    i1 = it[-20]
+    goto done2
+  catch2:
+    finalize eh
+    result = 1
+  done2:
+    ok(result, 'get_integer_keyed_int out of bounds')
 .end
 
 # Local Variables:

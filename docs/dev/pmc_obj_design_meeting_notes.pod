@@ -60,7 +60,7 @@ worthy of the name SELF, it is DYNSELF. DYNSELF does dispatching, while SELF
 statically calls the method in the current class.
 
 B<Recommendation>: Throughout the source, rename SELF to STATIC_SELF, and
-rename DYNSELF to SELF. Additionally, direct access to VTABLE methods should
+rename DYNSELF to SELF. Additionally, direct access to VTABLE functions should
 be reviewed, and SELF should be used where possible to increase clarity and
 maintainability (this is a good CAGE task.) Also, this should become a coding
 standard for PMCs.

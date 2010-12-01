@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009, Parrot Foundation.
- * $Id$
 */
 
 // pbc_checker.cpp
@@ -320,7 +319,8 @@ public:
     opcode read_opcode(ifstream &pbcfile);
 private:
     unsigned int opcode_size;
-    unsigned int pbc_version;
+    unsigned int pbc_major;
+    unsigned int pbc_minor;
 
     unsigned char byte_order;
     unsigned char fp_encoding;
@@ -387,7 +387,8 @@ void PbcFile::read_header(ifstream &pbcfile)
         cerr << "*** Warning: opcode size too big for this program ***\n";
 
     this->opcode_size = opcode_size;
-    this->pbc_version = ((unsigned int) pbc_major) * 8 + pbc_minor;
+    this->pbc_major = pbc_major;
+    this->pbc_minor = pbc_minor;
     this->byte_order = byte_order;
     this->fp_encoding = fp_encoding;
     if (byte_order != ByteOrderLE && byte_order != ByteOrderBE)
@@ -431,9 +432,13 @@ void PbcFile::read_directory(ifstream &pbcfile)
     opcode size = read_opcode(pbcfile);
     cout << "Directory segment size: " << size << '\n';
 
-    pbcfile.ignore(16 - opcode_size);
-    if (pbc_version <= 0x0325 && opcode_size == 8)
-        pbcfile.ignore(16);
+    // Must be zero:
+    opcode in_type = read_opcode(pbcfile);
+    opcode in_id   = read_opcode(pbcfile);
+    opcode op_size = read_opcode(pbcfile);
+    cout << "Internal type: " << in_type << '\n';
+    cout << "Internal id:   " << in_id   << '\n';
+    cout << "Op table size: " << op_size << '\n';
 
     opcode entries = read_opcode(pbcfile);
     cout << "Directory entries: " << entries << '\n';
@@ -464,7 +469,9 @@ void PbcFile::dump_segment(const DirEntry &entry, ifstream &pbcfile)
         " (0x" << hex << type << dec << ")\n";
 
     // Set file read position to segment's start
-    pbcfile.seekg(entry.getOffset() * opcode_size);
+    size_t start = entry.getOffset() * opcode_size;
+    cout << "Start: 0x" << hex << setw(6) << start << dec << '\n';
+    pbcfile.seekg(start);
 
     switch(type)
     {
@@ -546,6 +553,9 @@ void PbcFile::dump_segment_fixup(ifstream &pbcfile)
                 cout << " Sub: " << sub;
                 }
                 break;
+            case 0x00:
+                cout << " None";
+                break;
             default:
                 throw runtime_error("Invalid fixup");
         }
@@ -609,10 +619,10 @@ void PbcFile::dump_segment_bytecode(ifstream &pbcfile)
 
     for (opcode n= 0; n < size; ++n) {
         opcode code = read_opcode(pbcfile);
-	if ((n % 8) == 0)
-	    cout << '\n' << setfill('0') << setw (7) << n << ':';
-	else
-	    cout << ' ';
+        if ((n % 8) == 0)
+            cout << '\n' << setfill('0') << setw (7) << n << ':';
+        else
+            cout << ' ';
         cout << setfill('0') << setw(opcode_size * 2) << code;
     }
     cout << dec << '\n';
@@ -715,27 +725,59 @@ void PbcFile::dump_segment_dependencies(ifstream &/*pbcfile*/)
 
 void PbcFile::dump_constant_string(ifstream &pbcfile)
 {
-    opcode flags = read_opcode(pbcfile);
-    cout << "Flags: 0x" << hex << flags << dec;
-    opcode charset = read_opcode(pbcfile);
-    cout << " Charset: " << charset;
+    opcode flags;
+    opcode charset;
+    const opcode encoding_none = 0xFFFF;
+    opcode encoding = encoding_none;
+    if (pbc_major > 5 && pbc_minor > 11) {
+        opcode flags_charset = read_opcode(pbcfile);
+        flags = flags_charset & 0xFF;
+        charset = flags_charset >> 8;
+        if (pbc_major > 6 || pbc_minor >= 17) {
+            encoding = charset >> 8;
+            charset &= 0xFF;
+        }
+    }
+    else {
+        flags = read_opcode(pbcfile);
+        charset = read_opcode(pbcfile);
+    }
 
+    cout << "Flags: 0x" << hex << setw(6) << flags << dec;
+    cout << " Charset: " << charset;
+    if (encoding != encoding_none)
+        cout << " Encoding: " << encoding;
+
+    // Encoding not saved, see TT #468
     //opcode encoding = read_opcode(pbcfile);
     //cout << " Encoding: "<< encoding;
 
     opcode length = read_opcode(pbcfile);
     cout << " Length: "<< length;
+
+    // Don't dump very long strings at full length.
+    opcode full = length;
+    length = std::min(length, (opcode)512);
+
     cout << " \'";
     for (opcode i= 0; i < length; ++i) {
         unsigned char c = pbcfile.get();
+        if (! pbcfile)
+            throw ReadError("string constant");
         if (c >= 32 && c < 128)
             cout << c;
         else
             cout << "\\x" << hex << setw(2) << setfill('0') <<
                 (unsigned int) c << dec;
     }
-    cout << "'\n";
-    for (unsigned int i= length; i % opcode_size; ++i) {
+    cout << '\'';
+    if (full > length) {
+        cout << "(...)";
+        pbcfile.ignore(full - length);
+    }
+    cout << '\n';
+
+    for (unsigned int i= full; i % opcode_size; ++i) {
         pbcfile.ignore(1);
     }
 }

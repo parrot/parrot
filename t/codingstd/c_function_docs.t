@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -91,37 +90,6 @@ foreach my $path (@files) {
 }
 
 __DATA__
-compilers/imcc/instructions.c
-compilers/imcc/optimizer.c
-compilers/imcc/parser_util.c
-compilers/imcc/pbc.c
-compilers/imcc/pcc.c
-compilers/imcc/reg_alloc.c
-compilers/imcc/symreg.c
-compilers/pirc/src/pircapi.c
-config/gen/platform/ansi/dl.c
-config/gen/platform/ansi/exec.c
-config/gen/platform/ansi/time.c
-config/gen/platform/darwin/dl.c
-config/gen/platform/darwin/memalign.c
-config/gen/platform/generic/dl.c
-config/gen/platform/generic/exec.c
-config/gen/platform/generic/math.c
-config/gen/platform/generic/memalign.c
-config/gen/platform/generic/stat.c
-config/gen/platform/generic/time.c
-config/gen/platform/netbsd/math.c
-config/gen/platform/openbsd/math.c
-config/gen/platform/solaris/math.c
-config/gen/platform/solaris/time.c
-examples/compilers/japhc.c
-src/gc/generational_ms.c
-src/io/io_string.c
-src/string/charset/ascii.c
-src/string/charset/binary.c
-src/string/charset/iso-8859-1.c
-src/string/charset/unicode.c
-src/tsq.c
 
 # Local Variables:
 #   mode: cperl

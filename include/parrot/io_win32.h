@@ -1,7 +1,5 @@
 /* io_win32.h
  *  Copyright (C) 2001-2003, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *      Parrot IO subsystem
  *  Data Structure and Algorithms:
@@ -110,7 +108,7 @@ PIOOFF_T Parrot_io_tell_win32(PARROT_INTERP, ARGIN(PMC *filehandle))
 
 size_t Parrot_io_write_win32(PARROT_INTERP,
     ARGIN(PMC *filehandle),
-    ARGIN(STRING *s))
+    ARGIN(const STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -308,5 +306,5 @@ INTVAL Parrot_io_socket_win32(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

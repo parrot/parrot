@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -21,7 +20,7 @@ GC related bugs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(140)
+    plan(139)
 
     sweep_1()
     sweep_0()
@@ -38,7 +37,6 @@ GC related bugs.
     write_barrier_2()
     addr_registry_1()
     addr_registry_2_int()
-    addr_registry_2_str()
     pmc_proxy_obj_mark()
     coro_context_ret_continuation()
     # END_OF_TESTS
@@ -200,22 +198,22 @@ GC related bugs.
 
 
 #Fail if regsave is not marked
-.namespace ["Source"]
+.namespace ['Source']
 .sub get_string :method :vtable # buffer
     $P4  = self
     $P2 = getprop "buffer", $P4
     sweep 1
     unless_null $P2, buffer_ok
-    $P2 = new "Source::Buffer"
-    $P3 = new "String"
-    $P3 = "hello"
-    $P2 = setprop "buf", $P3
-    $P4  = setprop "buffer", $P2
+    $P2 = new ['Source'; 'Buffer']
+    $P3 = new 'String'
+    $P3 = 'hello'
+    $P2 = setprop 'buf', $P3
+    $P4  = setprop 'buffer', $P2
 buffer_ok:
     .return($P2)
 .end
 
-.namespace ["Source::Buffer"]
+.namespace ['Source'; 'Buffer']
 .sub get_string :method :vtable
     $P4 = self
     sweep 1
@@ -227,9 +225,9 @@ buffer_ok:
 .namespace [ ]
 
 .sub regsave_marked
-    $P0  = newclass "Source"
-    $P1 = newclass "Source::Buffer"
-    $P2 = new "Source"
+    $P0  = newclass 'Source'
+    $P1 = newclass ['Source'; 'Buffer']
+    $P2 = new 'Source'
 
     $S1 = $P2
     is($S1, "hello")
@@ -440,35 +438,6 @@ ok5:
 .end
 
 
-# AddrRegistry 2
-.sub addr_registry_2_str
-    .local pmc a, b, c, reg, nil, it
-    null nil
-    reg = new 'AddrRegistry'
-    a = new 'String'
-    a = "k1"
-    b = new 'String'
-    b = "k2"
-    c = new 'String'
-    c = "k3"
-    reg[a] = nil
-    reg[b] = nil
-    reg[c] = nil
-
-    $P1 = new ['ResizablePMCArray']
-    it = iter reg
-loop:
-    unless it goto done
-    $P0 = shift it
-    $S0 = $P0
-    push $P1, $S0
-    goto loop
-done:
-    $P1.'sort'()
-    $S1 = join '', $P1
-    is($S1, 'k1k2k3')
-.end
-
 # verify pmc proxy object marking
 .sub pmc_proxy_obj_mark
     .local pmc cl, s, t
@@ -508,7 +477,6 @@ lp:
 
 # coro context and invalid return continuations
 # this is a stripped down version of imcc/t/syn/pcc_16
-# s. also src/pmc/retcontinuation.pmc
 
 .sub coro_context_ret_continuation
     .const 'Sub' $P0 = "co1"

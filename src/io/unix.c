@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -181,17 +180,19 @@ Parrot_io_open_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
          */
         if ((oflags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL)) {
             close(fd);
-            Parrot_str_free_cstring(spath); /* returning before C string freed */
+
+            /* returning before C string freed */
+            Parrot_str_free_cstring(spath);
             return PMCNULL;
         }
-        /*
-         * Check for truncate?
-         */
+
+        /* Check for truncate?  */
         if (oflags & O_TRUNC) {
             int tfd;
             while ((tfd = creat(spath, PIO_DEFAULTMODE)) < 0 && errno == EINTR)
                 errno = 0;
-            close(tfd);
+            if (tfd > 0)
+                close(tfd);
         }
     }
     else if (oflags & O_CREAT) {
@@ -199,10 +200,10 @@ Parrot_io_open_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
         while ((fd = creat(spath, PIO_DEFAULTMODE)) < 0 && errno == EINTR)
             errno = 0;
         if (!(oflags & O_WRONLY)) {
-            close(fd);
-            /*
-             * File created, reopen with read+write
-             */
+            if (fd > 0)
+                close(fd);
+
+            /* File created, reopen with read+write */
             while ((fd = open(spath, oflags & (O_WRONLY | O_RDWR),
                               DEFAULT_OPEN_MODE)) < 0 && errno == EINTR)
                 errno = 0;
@@ -303,7 +304,7 @@ Returns a new C<FileHandle> PMC with the file descriptor passed in.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_io_fdopen_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd, INTVAL flags)
+Parrot_io_fdopen_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle), PIOHANDLE fd, INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_fdopen_unix)
     if (io_is_tty_unix(fd))
@@ -386,7 +387,7 @@ Parrot_io_close_piohandle_unix(SHIM_INTERP, PIOHANDLE handle)
 
 /*
 
-=item C<INTVAL Parrot_io_is_closed_unix(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_is_closed_unix(PARROT_INTERP, const PMC *filehandle)>
 
 Test whether the filehandle has been closed.
 
@@ -395,7 +396,7 @@ Test whether the filehandle has been closed.
 */
 
 INTVAL
-Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(const PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_is_closed_unix)
     if (Parrot_io_get_os_handle(interp, filehandle) == -1)
@@ -523,8 +524,8 @@ Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
               case EINTR:
                 continue;
               default:
-                s->bufused = s->strlen = 0;
-                return bytes;
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                        "Read error: %s", strerror(errno));
             }
         }
         else {
@@ -539,7 +540,8 @@ Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 /*
 
-=item C<size_t Parrot_io_write_unix(PARROT_INTERP, PMC *filehandle, STRING *s)>
+=item C<size_t Parrot_io_write_unix(PARROT_INTERP, PMC *filehandle, const STRING
+*s)>
 
 Calls C<write()> to write C<len> bytes from the memory starting at
 C<buffer> to the file descriptor in C<*io>.
@@ -549,7 +551,7 @@ C<buffer> to the file descriptor in C<*io>.
 */
 
 size_t
-Parrot_io_write_unix(PARROT_INTERP, ARGIN(PMC *filehandle), ARGMOD(STRING *s))
+Parrot_io_write_unix(PARROT_INTERP, ARGIN(PMC *filehandle), ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_io_write_unix)
     const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
@@ -639,7 +641,7 @@ Parrot_io_seek_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 =item C<PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, PMC *filehandle)>
 
-Returns the current read/write position on C<*io>'s file discriptor.
+Returns the current read/write position on C<*io>'s file descriptor.
 
 =cut
 
@@ -813,8 +815,9 @@ INTVAL
 Parrot_io_pipe_unix(SHIM_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE *writer))
 {
     ASSERT_ARGS(Parrot_io_pipe_unix)
-    int fds[2], rv;
-    rv = pipe(fds);
+    int fds[2];
+    const int rv = pipe(fds);
+
     if (rv >= 0) {
         *reader = fds[0];
         *writer = fds[1];
@@ -845,5 +848,5 @@ F<include/parrot/io_unix.h>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

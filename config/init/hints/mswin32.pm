@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2007, Parrot Foundation.
-# $Id$
 
 package init::hints::mswin32;
 
@@ -98,10 +97,10 @@ sub runstep {
             libs                => 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib ',
             libparrot_static    => 'libparrot' . $conf->data->get('a'),
             libparrot_shared    => "libparrot$share_ext",
-            ar_flags            => '',
+            ar                  => 'lib',
+            arflags             => '',
             ar_out              => '-out:',
             slash               => '\\',
-            blib_dir            => 'blib\\lib',
             ccflags             => $ccflags,
             ccwarn              => $ccwarn,
             has_dynamic_linking => 1,
@@ -150,10 +149,9 @@ sub runstep {
             ld_out              => '-out:',
             ldflags             => '-nologo -nodefaultlib',
             ar                  => 'xilib',
-            ar_flags            => '',
+            arflags             => '',
             ar_out              => '-out:',
             slash               => '\\',
-            blib_dir            => 'blib\\lib',
             ccflags             => $ccflags,
             ccwarn              => '',
             has_dynamic_linking => 1
@@ -196,11 +194,10 @@ sub runstep {
             linkflags => '',
 
             ar       => 'tlib /a /P128',
-            ar_flags => '',
+            arflags  => '',
             ar_out   => '',
             ar_extra => '',
             slash    => '\\',
-            blib_dir => 'blib\\lib',
             make_and => "\n\t",
         );
     }
@@ -261,7 +258,6 @@ sub runstep {
             sym_export          => '__declspec(dllexport)',
             sym_import          => '__declspec(dllimport)',
             slash               => '\\',
-            blib_dir            => 'blib\\lib',
         );
     }
 }

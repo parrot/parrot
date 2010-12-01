@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -20,6 +19,8 @@ This example demonstrates the SDL::LCD object. It shows a simple clock.
 
 .include "tm.pasm"
 .include "timer.pasm"
+.loadlib 'sys_ops'
+.loadlib 'math_ops'
 
 =item _main
 
@@ -28,14 +29,14 @@ The main function.
 =cut
 
 .sub _main :main
-    load_bytecode "library/SDL/App.pir"
-    load_bytecode "library/SDL/Event.pir"
-    load_bytecode "library/SDL/EventHandler.pir"
-    load_bytecode "library/SDL/LCD.pir"
+    load_bytecode "SDL/App.pir"
+    load_bytecode "SDL/Event.pir"
+    load_bytecode "SDL/EventHandler.pir"
+    load_bytecode "SDL/LCD.pir"
 
     # create the SDL application object
     .local pmc app
-    app = new 'SDL::App'
+    app = new ['SDL'; 'App']
     app.'init'( 'height' => 21, 'width' => 94, 'bpp' => 16, 'flags' => 5 )
 
     .local pmc screen
@@ -44,7 +45,7 @@ The main function.
 
     # create the LCD
     .local pmc lcd
-    lcd = new 'SDL::LCD'
+    lcd = new ['SDL'; 'LCD']
     set_global 'LCD', lcd
 
     # draw the watch
@@ -67,8 +68,8 @@ The main function.
     .local pmc eh
     .local pmc loop
 
-    eh   = new 'SDL::EventHandler'
-    loop = new 'SDL::Event'
+    eh   = new ['SDL'; 'EventHandler']
+    loop = new ['SDL'; 'Event']
     loop.'init'()
     loop.'process_events'( 0.1, eh )
 .end

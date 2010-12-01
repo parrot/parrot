@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -23,7 +22,7 @@ Test cases taken from base64.t of MIME::Base64.
     load_bytecode 'MIME/Base64.pbc'
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Util.pbc'
-    load_bytecode 'compilers/json/JSON.pbc'
+    load_language 'data_json'
 
     .local pmc plan, is, ok
     plan = get_hll_global [ 'Test'; 'More' ], 'plan'
@@ -32,11 +31,11 @@ Test cases taken from base64.t of MIME::Base64.
 
     plan(550)
 
-    .local pmc JSON
-    JSON = compreg "JSON"
+    .local pmc json
+    json = compreg 'data_json'
 
     .local pmc encode_decode_tests, decode_tests
-    encode_decode_tests = JSON( <<'END_JSON' )
+    encode_decode_tests = json.'compile'( <<'END_JSON' )
 [ ["Hello, World!\n","SGVsbG8sIFdvcmxkIQo="],
   ["\u0000","AA=="],
   ["\u0001","AQ=="],
@@ -165,137 +164,137 @@ Test cases taken from base64.t of MIME::Base64.
   ["|","fA=="],
   ["}","fQ=="],
   ["~","fg=="],
-  ["","fw=="],
-  ["€","gA=="],
-  ["","gQ=="],
-  ["‚","gg=="],
-  ["ƒ","gw=="],
-  ["„","hA=="],
-  ["…","hQ=="],
-  ["†","hg=="],
-  ["‡","hw=="],
-  ["ˆ","iA=="],
-  ["‰","iQ=="],
-  ["Š","ig=="],
-  ["‹","iw=="],
-  ["Œ","jA=="],
-  ["","jQ=="],
-  ["Ž","jg=="],
-  ["","jw=="],
-  ["","kA=="],
-  ["‘","kQ=="],
-  ["’","kg=="],
-  ["“","kw=="],
-  ["”","lA=="],
-  ["•","lQ=="],
-  ["–","lg=="],
-  ["—","lw=="],
-  ["˜","mA=="],
-  ["™","mQ=="],
-  ["š","mg=="],
-  ["›","mw=="],
-  ["œ","nA=="],
-  ["","nQ=="],
-  ["ž","ng=="],
-  ["Ÿ","nw=="],
-  [" ","oA=="],
-  ["¡","oQ=="],
-  ["¢","og=="],
-  ["£","ow=="],
-  ["¤","pA=="],
-  ["¥","pQ=="],
-  ["¦","pg=="],
-  ["§","pw=="],
-  ["¨","qA=="],
-  ["©","qQ=="],
-  ["ª","qg=="],
-  ["«","qw=="],
-  ["¬","rA=="],
-  ["­","rQ=="],
-  ["®","rg=="],
-  ["¯","rw=="],
-  ["°","sA=="],
-  ["±","sQ=="],
-  ["²","sg=="],
-  ["³","sw=="],
-  ["´","tA=="],
-  ["µ","tQ=="],
-  ["¶","tg=="],
-  ["·","tw=="],
-  ["¸","uA=="],
-  ["¹","uQ=="],
-  ["º","ug=="],
-  ["»","uw=="],
-  ["¼","vA=="],
-  ["½","vQ=="],
-  ["¾","vg=="],
-  ["¿","vw=="],
-  ["À","wA=="],
-  ["Á","wQ=="],
-  ["Â","wg=="],
-  ["Ã","ww=="],
-  ["Ä","xA=="],
-  ["Å","xQ=="],
-  ["Æ","xg=="],
-  ["Ç","xw=="],
-  ["È","yA=="],
-  ["É","yQ=="],
-  ["Ê","yg=="],
-  ["Ë","yw=="],
-  ["Ì","zA=="],
-  ["Í","zQ=="],
-  ["Î","zg=="],
-  ["Ï","zw=="],
-  ["Ð","0A=="],
-  ["Ñ","0Q=="],
-  ["Ò","0g=="],
-  ["Ó","0w=="],
-  ["Ô","1A=="],
-  ["Õ","1Q=="],
-  ["Ö","1g=="],
-  ["×","1w=="],
-  ["Ø","2A=="],
-  ["Ù","2Q=="],
-  ["Ú","2g=="],
-  ["Û","2w=="],
-  ["Ü","3A=="],
-  ["Ý","3Q=="],
-  ["Þ","3g=="],
-  ["ß","3w=="],
-  ["à","4A=="],
-  ["á","4Q=="],
-  ["â","4g=="],
-  ["ã","4w=="],
-  ["ä","5A=="],
-  ["å","5Q=="],
-  ["æ","5g=="],
-  ["ç","5w=="],
-  ["è","6A=="],
-  ["é","6Q=="],
-  ["ê","6g=="],
-  ["ë","6w=="],
-  ["ì","7A=="],
-  ["í","7Q=="],
-  ["î","7g=="],
-  ["ï","7w=="],
-  ["ð","8A=="],
-  ["ñ","8Q=="],
-  ["ò","8g=="],
-  ["ó","8w=="],
-  ["ô","9A=="],
-  ["õ","9Q=="],
-  ["ö","9g=="],
-  ["÷","9w=="],
-  ["ø","+A=="],
-  ["ù","+Q=="],
-  ["ú","+g=="],
-  ["û","+w=="],
-  ["ü","/A=="],
-  ["ý","/Q=="],
-  ["þ","/g=="],
-  ["ÿ","/w=="],
-  ["\u0000ÿ","AP8="],
-  ["ÿ\u0000","/wA="],
+  ["\u007f","fw=="],
+  ["\u0080","gA=="],
+  ["\u0081","gQ=="],
+  ["\u0082","gg=="],
+  ["\u0083","gw=="],
+  ["\u0084","hA=="],
+  ["\u0085","hQ=="],
+  ["\u0086","hg=="],
+  ["\u0087","hw=="],
+  ["\u0088","iA=="],
+  ["\u0089","iQ=="],
+  ["\u008a","ig=="],
+  ["\u008b","iw=="],
+  ["\u008c","jA=="],
+  ["\u008d","jQ=="],
+  ["\u008e","jg=="],
+  ["\u008f","jw=="],
+  ["\u0090","kA=="],
+  ["\u0091","kQ=="],
+  ["\u0092","kg=="],
+  ["\u0093","kw=="],
+  ["\u0094","lA=="],
+  ["\u0095","lQ=="],
+  ["\u0096","lg=="],
+  ["\u0097","lw=="],
+  ["\u0098","mA=="],
+  ["\u0099","mQ=="],
+  ["\u009a","mg=="],
+  ["\u009b","mw=="],
+  ["\u009c","nA=="],
+  ["\u009d","nQ=="],
+  ["\u009e","ng=="],
+  ["\u009f","nw=="],
+  ["\u00a0","oA=="],
+  ["\u00a1","oQ=="],
+  ["\u00a2","og=="],
+  ["\u00a3","ow=="],
+  ["\u00a4","pA=="],
+  ["\u00a5","pQ=="],
+  ["\u00a6","pg=="],
+  ["\u00a7","pw=="],
+  ["\u00a8","qA=="],
+  ["\u00a9","qQ=="],
+  ["\u00aa","qg=="],
+  ["\u00ab","qw=="],
+  ["\u00ac","rA=="],
+  ["\u00ad","rQ=="],
+  ["\u00ae","rg=="],
+  ["\u00af","rw=="],
+  ["\u00b0","sA=="],
+  ["\u00b1","sQ=="],
+  ["\u00b2","sg=="],
+  ["\u00b3","sw=="],
+  ["\u00b4","tA=="],
+  ["\u00b5","tQ=="],
+  ["\u00b6","tg=="],
+  ["\u00b7","tw=="],
+  ["\u00b8","uA=="],
+  ["\u00b9","uQ=="],
+  ["\u00ba","ug=="],
+  ["\u00bb","uw=="],
+  ["\u00bc","vA=="],
+  ["\u00bd","vQ=="],
+  ["\u00be","vg=="],
+  ["\u00bf","vw=="],
+  ["\u00c0","wA=="],
+  ["\u00c1","wQ=="],
+  ["\u00c2","wg=="],
+  ["\u00c3","ww=="],
+  ["\u00c4","xA=="],
+  ["\u00c5","xQ=="],
+  ["\u00c6","xg=="],
+  ["\u00c7","xw=="],
+  ["\u00c8","yA=="],
+  ["\u00c9","yQ=="],
+  ["\u00ca","yg=="],
+  ["\u00cb","yw=="],
+  ["\u00cc","zA=="],
+  ["\u00cd","zQ=="],
+  ["\u00ce","zg=="],
+  ["\u00cf","zw=="],
+  ["\u00d0","0A=="],
+  ["\u00d1","0Q=="],
+  ["\u00d2","0g=="],
+  ["\u00d3","0w=="],
+  ["\u00d4","1A=="],
+  ["\u00d5","1Q=="],
+  ["\u00d6","1g=="],
+  ["\u00d7","1w=="],
+  ["\u00d8","2A=="],
+  ["\u00d9","2Q=="],
+  ["\u00da","2g=="],
+  ["\u00db","2w=="],
+  ["\u00dc","3A=="],
+  ["\u00dd","3Q=="],
+  ["\u00de","3g=="],
+  ["\u00df","3w=="],
+  ["\u00e0","4A=="],
+  ["\u00e1","4Q=="],
+  ["\u00e2","4g=="],
+  ["\u00e3","4w=="],
+  ["\u00e4","5A=="],
+  ["\u00e5","5Q=="],
+  ["\u00e6","5g=="],
+  ["\u00e7","5w=="],
+  ["\u00e8","6A=="],
+  ["\u00e9","6Q=="],
+  ["\u00ea","6g=="],
+  ["\u00eb","6w=="],
+  ["\u00ec","7A=="],
+  ["\u00ed","7Q=="],
+  ["\u00ee","7g=="],
+  ["\u00ef","7w=="],
+  ["\u00f0","8A=="],
+  ["\u00f1","8Q=="],
+  ["\u00f2","8g=="],
+  ["\u00f3","8w=="],
+  ["\u00f4","9A=="],
+  ["\u00f5","9Q=="],
+  ["\u00f6","9g=="],
+  ["\u00f7","9w=="],
+  ["\u00f8","+A=="],
+  ["\u00f9","+Q=="],
+  ["\u00fa","+g=="],
+  ["\u00fb","+w=="],
+  ["\u00fc","/A=="],
+  ["\u00fd","/Q=="],
+  ["\u00fe","/g=="],
+  ["\u00ff","/w=="],
+  ["\u0000\u00ff","AP8="],
+  ["\u00ff\u0000","/wA="],
   ["\u0000\u0000\u0000","AAAA"],
   ["",""],
   ["a","YQ=="],
@@ -310,7 +309,7 @@ Test cases taken from base64.t of MIME::Base64.
 ]
 END_JSON
 
-    decode_tests = JSON( <<'END_JSON' )
+    decode_tests = json.'compile'( <<'END_JSON' )
 [ ["YWE=","aa"],
   [" YWE=","aa"],
   ["Y WE=","aa"],
@@ -328,11 +327,12 @@ END_JSON
 # ["Y",""],
 # ["x==",""],
 
-    .local int cnt
-    cnt = 0
+    .local int count
+    count = 0
     .local pmc test_iterator, test_case
-    .local string plain, base64, comment, comment_cnt
+    .local string plain, base64, comment, comment_count
 
+    encode_decode_tests = encode_decode_tests()
     test_iterator = iter encode_decode_tests
     enc_dec_loop:
         unless test_iterator goto enc_dec_loop_end
@@ -340,17 +340,18 @@ END_JSON
         plain       = shift test_case
         base64      = shift test_case
         comment     = 'encode'
-        comment_cnt = cnt
-        concat comment, comment_cnt
+        comment_count = count
+        concat comment, comment_count
         test_encode( plain, base64, comment )
         comment     = 'decode'
-        comment_cnt = cnt
-        concat comment, comment_cnt
+        comment_count = count
+        concat comment, comment_count
         test_decode( plain, base64, comment )
-        inc cnt
+        inc count
     goto enc_dec_loop
     enc_dec_loop_end:
 
+    decode_tests = decode_tests()
     test_iterator = iter decode_tests
     dec_loop:
         unless test_iterator goto dec_loop_end
@@ -358,10 +359,10 @@ END_JSON
         base64      = shift test_case
         plain       = shift test_case
         comment     = 'decode'
-        comment_cnt = cnt
-        concat comment, comment_cnt
+        comment_count = count
+        concat comment, comment_count
         test_decode( plain, base64, comment )
-        inc cnt
+        inc count
     goto dec_loop
     dec_loop_end:
 

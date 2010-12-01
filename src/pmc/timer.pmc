@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2008, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -57,7 +56,11 @@ initializer.
 
 #include "parrot/scheduler_private.h"
 
-pmclass Timer extends Task provides event auto_attrs {
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass Timer extends Task provides event provides invokable auto_attrs {
     ATTR FLOATVAL duration;  /* The duration of the timer pause */
     ATTR FLOATVAL interval;  /* How often to repeat */
     ATTR INTVAL   repeat;    /* Whether to repeat:
@@ -82,8 +85,8 @@ Initializes the timer.
 
         /* Set up the core struct. */
         core_struct->id          = 0;
-        core_struct->type        = CONST_STRING(interp, "timer");
-        core_struct->subtype     = CONST_STRING(interp, "");
+        core_struct->type        = CONST_STRING(INTERP, "timer");
+        core_struct->subtype     = CONST_STRING(INTERP, "");
         core_struct->priority    = 0;
         core_struct->status      = CONST_STRING(interp, "created");
         core_struct->birthtime   = 0.0;
@@ -101,7 +104,7 @@ Initializes the timer.
 
 =item C<void init_pmc(PMC *init)>
 
-See F<docs/pdds/pdd02_vtables.pod> for initializers.
+Takes an even-length collection of keys and values.
 
 =cut
 
@@ -309,7 +312,7 @@ Sets the PMC associated with C<key> to C<*value>.
             Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
             core_struct->codeblock = value;
 */
-            SET_ATTR_codeblock(interp, SELF, value);
+            SET_ATTR_codeblock(INTERP, SELF, value);
         }
     }
 
@@ -369,5 +372,5 @@ Sets the floating-point value associated with C<key> to C<value>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

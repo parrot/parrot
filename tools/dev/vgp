@@ -1,2 +1,2 @@
 #! /bin/sh
-valgrind --suppressions=tools/dev/parrot.supp --num-callers=500 --leak-check=full --leak-resolution=high --show-reachable=yes ./parrot --leak-test $@
+valgrind --suppressions=tools/dev/parrot.supp --num-callers=50 --leak-check=full --leak-resolution=high --show-reachable=yes ./parrot --leak-test $@

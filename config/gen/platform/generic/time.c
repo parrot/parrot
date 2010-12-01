@@ -1,6 +1,5 @@
 /*
- * $Id$
- * Copyright (C) 2004-2006, Parrot Foundation.
+ * Copyright (C) 2004-2010, Parrot Foundation.
  */
 
 /*
@@ -11,7 +10,7 @@ config/gen/platform/generic/time.c
 
 =head1 DESCRIPTION
 
-Time stuff
+Parrot time-related functions.
 
 =head2 Functions
 
@@ -28,6 +27,8 @@ Time stuff
 
 =item C<INTVAL Parrot_intval_time(void)>
 
+Parrot wrapper around standard library C<time()> function, returning an INTVAL.
+
 =cut
 
 */
@@ -42,6 +43,8 @@ Parrot_intval_time(void)
 /*
 
 =item C<FLOATVAL Parrot_floatval_time(void)>
+
+Parrot wrapper around standard library C<time()> function, returning a FLOATVAL.
 
 =cut
 
@@ -58,6 +61,8 @@ Parrot_floatval_time(void)
 /*
 
 =item C<void Parrot_sleep(unsigned int seconds)>
+
+Parrot wrapper around standard library C<sleep()> function.
 
 =cut
 
@@ -90,10 +95,13 @@ Parrot_usleep(unsigned int microseconds)
 
 =item C<struct tm * Parrot_gmtime_r(const time_t *t, struct tm *tm)>
 
+Parrot wrapper around standard library C<gmtime_r()> function.
+
 =cut
 
 */
 
+PARROT_EXPORT
 struct tm *
 Parrot_gmtime_r(const time_t *t, struct tm *tm)
 {
@@ -104,10 +112,13 @@ Parrot_gmtime_r(const time_t *t, struct tm *tm)
 
 =item C<struct tm * Parrot_localtime_r(const time_t *t, struct tm *tm)>
 
+Parrot wrapper around standard library C<localtime_r()> function.
+
 =cut
 
 */
 
+PARROT_EXPORT
 struct tm *
 Parrot_localtime_r(const time_t *t, struct tm *tm)
 {
@@ -118,10 +129,13 @@ Parrot_localtime_r(const time_t *t, struct tm *tm)
 
 =item C<char* Parrot_asctime_r(const struct tm *tm, char *buffer)>
 
+Parrot wrapper around standard library C<asctime_r()> function.
+
 =cut
 
 */
 
+PARROT_EXPORT
 char*
 Parrot_asctime_r(const struct tm *tm, char *buffer)
 {
@@ -140,5 +154,5 @@ Parrot_asctime_r(const struct tm *tm, char *buffer)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

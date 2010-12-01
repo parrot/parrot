@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -17,9 +16,11 @@ type combinations.
 
 =cut
 
+.include 'fp_equality.pasm'
+
 .sub main :main
     .include 'test_more.pir'
-    plan(31)
+    plan(33)
     init_null_tests()
     init_int_tests()
     instantiate_tests()
@@ -82,6 +83,17 @@ type combinations.
     set $P0, $N0
     set $I0, $P0
     is($I0, 1, "Boolean converts non-0 num to true")
+
+    $P0 = 1
+    $N1 = $P0
+
+    .fp_eq_ok($N1, 1, 'Boolean converts true value to a numeric')
+
+    $P0 = 0
+    $N1 = $P0
+
+    .fp_eq_ok($N1, 0, 'Boolean converts false value to a numeric')
+
 .end
 
 .sub string_tests

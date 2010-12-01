@@ -1,6 +1,5 @@
 #! perl
-# Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -9,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 45;
+use Parrot::Test tests => 47;
 
 =head1 NAME
 
@@ -1145,20 +1144,20 @@ Called multi for class
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "unicode sub names and multi" );
-.sub unicode:"\u7777" :multi(string)
+.sub utf8:"\u7777" :multi(string)
   .param pmc arg
   print 'String:'
   say arg
 .end
-.sub unicode:"\u7777" :multi(int)
+.sub utf8:"\u7777" :multi(int)
   .param pmc arg
   print 'Int:'
   say arg
 .end
 
 .sub main :main
-  unicode:"\u7777"('what')
-  unicode:"\u7777"(23)
+  utf8:"\u7777"('what')
+  utf8:"\u7777"(23)
 .end
 CODE
 String:what
@@ -1492,6 +1491,53 @@ GoodbyeTa ta2
 77.788.8
 77.788.899.9
 OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'Integer subclass and MMD - TT #784' );
+.sub main :main
+    .local pmc int_c
+    int_c = get_class "Integer"
+
+    .local pmc sub_c
+    sub_c = subclass int_c, "MyInt"
+
+    $P1 = new 'Integer'
+    $P1 = 4
+    $P1 -= 3
+    say $P1
+
+    $P1 = new 'MyInt'
+    $P1 = 4
+    $P1 -= 3
+    say $P1
+.end
+CODE
+1
+1
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'int autoboxes to scalar - TT #1133' );
+    .sub 'foo' :multi(['scalar'])
+        .param pmc x
+        say "Scalar!"
+    .end
+
+    .sub 'foo' :multi()
+        .param pmc x
+        $I0 = isa x, 'scalar'
+        print "Scalar? "
+        say $I0
+    .end
+
+    .sub 'main' :main
+        'foo'(1)
+        $P0 = box 1
+        'foo'($P0)
+    .end
+CODE
+Scalar!
+Scalar!
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl

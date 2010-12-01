@@ -1,5 +1,4 @@
-# Copyright (C) 2001-2006, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 # Setup of some commands
 PERL    = @perl@
@@ -49,6 +48,22 @@ clean:
 
 html: all
 	$(PERL) -I../lib ../tools/docs/write_docs.pl --silent --version=$(VERSION)
+
+# The pdf target is to generate a parrot PDF document.
+# If you are missing the command 'pdflatex' then you have first to install a
+# LaTeX distribution with it. For Windows and UNIX downloads are for example
+# available from: http://miktex.org, http://tug.org/texlive or
+# http://www.ctan.org
+pdf: ../tools/docs/filename_and_chapter.pl
+	$(MKPATH) build/modified_pod
+	$(PERL) ../tools/docs/filename_and_chapter.pl
+	cd build && pdflatex parrot-book.tex && pdflatex parrot-book.tex
+
+#pdf-release: build/parrot-book.pdf
+#	cp build/parrot-book.pdf build/parrot-book-$$(date +"%Y.%m").pdf
+
+pdf-clean:
+	$(RM_RF) build
 
 html-clean:
 	$(RM_RF) html

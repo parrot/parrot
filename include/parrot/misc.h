@@ -1,7 +1,5 @@
 /* misc.h
  *  Copyright (C) 2001-2008, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Miscellaneous functions, mainly the Parrot_sprintf family
  *  Data Structure and Algorithms:
@@ -34,7 +32,8 @@ typedef int (*reg_move_func)(PARROT_INTERP, unsigned char d, unsigned char s, vo
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-INTVAL Parrot_byte_index(SHIM_INTERP,
+PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_util_byte_index(SHIM_INTERP,
     ARGIN(const STRING *base),
     ARGIN(const STRING *search),
     UINTVAL start_offset)
@@ -43,7 +42,7 @@ INTVAL Parrot_byte_index(SHIM_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_byte_rindex(SHIM_INTERP,
+INTVAL Parrot_util_byte_rindex(SHIM_INTERP,
     ARGIN(const STRING *base),
     ARGIN(const STRING *search),
     UINTVAL start_offset)
@@ -51,16 +50,19 @@ INTVAL Parrot_byte_rindex(SHIM_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-FLOATVAL Parrot_float_rand(INTVAL how_random);
+PARROT_WARN_UNUSED_RESULT
+FLOATVAL Parrot_util_float_rand(INTVAL how_random);
 
 PARROT_EXPORT
-INTVAL Parrot_int_rand(INTVAL how_random);
+PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_util_int_rand(INTVAL how_random);
 
 PARROT_EXPORT
-INTVAL Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random);
+PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_util_range_rand(INTVAL from, INTVAL to, INTVAL how_random);
 
 PARROT_EXPORT
-void Parrot_register_move(PARROT_INTERP,
+void Parrot_util_register_move(PARROT_INTERP,
     int n_regs,
     ARGOUT(unsigned char *dest_regs),
     ARGIN(unsigned char *src_regs),
@@ -75,18 +77,28 @@ void Parrot_register_move(PARROT_INTERP,
         FUNC_MODIFIES(*dest_regs);
 
 PARROT_EXPORT
-void Parrot_srand(INTVAL seed);
+void Parrot_util_srand(INTVAL seed);
 
 PARROT_EXPORT
-INTVAL Parrot_uint_rand(INTVAL how_random);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_util_tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_util_uint_rand(INTVAL how_random);
 
 PARROT_CONST_FUNCTION
-FLOATVAL floatval_mod(FLOATVAL n2, FLOATVAL n3);
+PARROT_WARN_UNUSED_RESULT
+FLOATVAL Parrot_util_floatval_mod(FLOATVAL n2, FLOATVAL n3);
 
 PARROT_CONST_FUNCTION
-INTVAL intval_mod(INTVAL i2, INTVAL i3);
+PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_util_intval_mod(INTVAL i2, INTVAL i3);
 
-void Parrot_quicksort(PARROT_INTERP,
+void Parrot_util_quicksort(PARROT_INTERP,
     ARGMOD(void **data),
     UINTVAL n,
     ARGIN(PMC *cmp))
@@ -95,37 +107,31 @@ void Parrot_quicksort(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*data);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC* tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-#define ASSERT_ARGS_Parrot_byte_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_util_byte_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(base) \
     , PARROT_ASSERT_ARG(search))
-#define ASSERT_ARGS_Parrot_byte_rindex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_util_byte_rindex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(base) \
     , PARROT_ASSERT_ARG(search))
-#define ASSERT_ARGS_Parrot_float_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_int_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_range_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_register_move __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_util_float_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_util_int_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_util_range_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_util_register_move __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dest_regs) \
     , PARROT_ASSERT_ARG(src_regs) \
     , PARROT_ASSERT_ARG(info))
-#define ASSERT_ARGS_Parrot_srand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_uint_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_floatval_mod __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_intval_mod __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_quicksort __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_util_srand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_util_tm_to_array __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(tm))
+#define ASSERT_ARGS_Parrot_util_uint_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_util_floatval_mod __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_util_intval_mod __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_util_quicksort __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(data) \
     , PARROT_ASSERT_ARG(cmp))
-#define ASSERT_ARGS_tm_to_array __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(tm))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/utils.c */
 
@@ -145,7 +151,9 @@ STRING * Parrot_psprintf(PARROT_INTERP,
         FUNC_MODIFIES(*ary);
 
 PARROT_EXPORT
-int Parrot_secret_snprintf(
+PARROT_IGNORABLE_RESULT
+int /*@alt void@*/
+Parrot_secret_snprintf(
     ARGOUT(char *buffer),
     NULLOK(const size_t len),
     ARGIN(const char *format),
@@ -192,6 +200,7 @@ void Parrot_vsnprintf(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_vsprintf_c(PARROT_INTERP,
     ARGIN(const char *pat),
     va_list args)
@@ -248,8 +257,15 @@ STRING * Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
      */
 #  define PARROT_SPRINTF_MAX_PREC 3 * PARROT_SPRINTF_BUFFER_SIZE / 4
 
-#  define cstr2pstr(cstr) string_make(interp, (cstr), strlen(cstr), "ascii", 0)
-#  define char2pstr(ch)   string_make(interp, &(ch), 1, "ascii", 0)
+    /* Floats formatted in exponent notation should have this number
+     * of exponent digits unless they need more.
+     */
+#  define PARROT_SPRINTF_EXP_DIGITS 2
+
+#  define cstr2pstr(cstr) Parrot_str_new_init(interp, (cstr), strlen(cstr), \
+        Parrot_ascii_encoding_ptr, 0)
+#  define char2pstr(ch)   Parrot_str_new_init(interp, &(ch), 1, \
+        Parrot_ascii_encoding_ptr, 0)
 
     /* SPRINTF DATA STRUCTURE AND FLAGS */
 
@@ -296,11 +312,12 @@ STRING * Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_sprintf_format(PARROT_INTERP,
-    ARGIN(STRING *pat),
-    ARGIN(SPRINTF_OBJ *obj))
+    ARGIN(const STRING *pat),
+    ARGMOD(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*obj);
 
 #define ASSERT_ARGS_Parrot_sprintf_format __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -311,17 +328,11 @@ STRING * Parrot_sprintf_format(PARROT_INTERP,
 
 #endif /* IN_SPF_SYSTEM */
 
-
-/*
- * generated src/revision.c
- */
-PARROT_EXPORT int Parrot_config_revision(void);
-
 #endif /* PARROT_MISC_H_GUARD */
 
 /*
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,5 +1,4 @@
 /*
- * $Id$
 ** math.ops
 */
 
@@ -11,8 +10,11 @@ math.ops - Mathematical Opcodes
 
 =head1 DESCRIPTION
 
-Operations that perform some sort of mathematics, including both basic
-math and transcendental functions.
+Operations that perform basic mathematics. See F<src/dynoplibs/> for more
+advanced operations.
+
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
 
 =head2 Arithmetic operations
 
@@ -52,17 +54,11 @@ inline op abs(inout NUM) :base_core {
 }
 
 inline op abs(out INT, in INT) :base_core {
-    if ($2 < 0)
-        $1 = - (INTVAL)$2;
-    else
-        $1 = (INTVAL)$2;
+    $1 = abs($2);
 }
 
 inline op abs(out NUM, in NUM) :base_core {
-    if ($2 < 0)
-        $1 = - (FLOATVAL)$2;
-    else
-        $1 = (FLOATVAL)$2;
+    $1 = fabs($2);
 }
 
 inline op abs(invar PMC) :base_core {
@@ -139,152 +135,6 @@ inline op add(invar PMC, invar PMC, in INT) :base_core {
 
 inline op add(invar PMC, invar PMC, in NUM) :base_core {
     $1 = VTABLE_add_float(interp, $2, $3, $1);
-}
-
-########################################
-
-=item B<cmod>(out INT, in INT, in INT)
-
-=item B<cmod>(invar PMC, invar PMC, in INT)
-
-=item B<cmod>(invar PMC, invar PMC, invar PMC)
-
-NOTE: This "uncorrected mod" algorithm uses the C language's built-in
-mod operator (x % y), which is
-
-    ... the remainder when x is divided by y, and thus is zero
-    when y divides x exactly.
-    ...
-    The direction of truncation for / and the sign of the result
-    for % are machine-dependent for negative operands, as is the
-    action taken on overflow or underflow.
-                                                     -- [1], page 41
-
-Also:
-
-    ... if the second operand is 0, the result is undefined.
-    Otherwise, it is always true that (a/b)*b + a%b is equal to z. If
-    both operands are non-negative, then the remainder is non-
-    negative and smaller than the divisor; if not, it is guaranteed
-    only that the absolute value of the remainder is smaller than
-    the absolute value of the divisor.
-                                                     -- [1], page 205
-
-This op is provided for those who need it (such as speed-sensitive
-applications with heavy use of mod, but using it only with positive
-arguments), but a more mathematically useful mod based on ** floor(x/y)
-and defined with y == 0 is provided by the mod op.
-
-  [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
-      Language*, Second Edition. Prentice Hall, 1988.
-
-If the denominator is zero, a 'Divide by zero' exception is thrown.
-
-=cut
-
-inline op cmod(out INT, in INT, in INT) :base_core {
-    INTVAL den = $3;
-    if ($3 == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
-            EXCEPTION_DIV_BY_ZERO,
-            "Divide by zero");
-        goto ADDRESS(handler);
-    }
-    $1 = $2 % den;
-}
-
-inline op cmod(invar PMC, invar PMC, in INT) :base_core {
-    INTVAL result;
-
-    if ($3 == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
-            EXCEPTION_DIV_BY_ZERO,
-            "Divide by zero");
-        goto ADDRESS(handler);
-    }
-
-    result = VTABLE_get_integer(interp, $2) % $3;
-
-    $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
-    VTABLE_set_integer_native(interp, $1, result);
-}
-
-inline op cmod(invar PMC, invar PMC, invar PMC) :base_core {
-    INTVAL result;
-    INTVAL value = VTABLE_get_integer(interp, $3);
-
-    if (value == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
-            EXCEPTION_DIV_BY_ZERO,
-            "Divide by zero");
-        goto ADDRESS(handler);
-    }
-
-    result = VTABLE_get_integer(interp, $2) % value;
-
-    $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
-    VTABLE_set_integer_native(interp, $1, result);
-}
-
-########################################
-
-=item B<cmod>(out NUM, in NUM, in NUM)
-
-=item B<cmod>(invar PMC, invar PMC, in NUM)
-
-NOTE: This "uncorrected mod" algorithm uses the built-in C math library's
-fmod() function, which computes
-
-    ... the remainder of dividing x by y. The return value is
-    x - n * y, where n is the quotient of x / y, rounded towards
-    zero to an integer.
-                                -- fmod() manpage on RedHat Linux 7.0
-
-In addition, fmod() returns
-
-    the remainder, unless y is zero, when the function fails and
-    errno is set.
-
-According to page 251 of [1], the result when y is zero is implementation-
-defined.
-
-This op is provided for those who need it, but a more mathematically
-useful numeric mod based on floor(x/y) instead of truncate(x/y) and
-defined with y == 0 is provided by the mod op.
-
-  [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
-      Language*, Second Edition. Prentice Hall, 1988.
-
-If the denominator is zero, a 'Divide by zero' exception is thrown.
-
-=cut
-
-inline op cmod(out NUM, in NUM, in NUM) :base_core {
-    FLOATVAL den = $3;
-    if (FLOAT_IS_ZERO($3)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
-            EXCEPTION_DIV_BY_ZERO,
-            "Divide by zero");
-        goto ADDRESS(handler);
-    }
-    $1 = fmod($2, den);
-}
-
-inline op cmod(invar PMC, invar PMC, in NUM) :base_core {
-    FLOATVAL result;
-    FLOATVAL value = $3;
-
-    if (FLOAT_IS_ZERO(value)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
-            EXCEPTION_DIV_BY_ZERO,
-            "Divide by zero");
-        goto ADDRESS(handler);
-    }
-
-    result = fmod(VTABLE_get_integer(interp, $2), value);
-
-    $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
-    VTABLE_set_integer_native(interp, $1, (INTVAL) result);
 }
 
 ########################################
@@ -448,7 +298,7 @@ inline op fdiv(inout INT, in INT) :base_core {
         goto ADDRESS(handler);
     }
 
-    f  = floor($1 / den);
+    f  = floor(((FLOATVAL)$1) / den);
     $1 = (INTVAL)f;
 }
 
@@ -486,7 +336,7 @@ inline op fdiv(out INT, in INT, in INT) :base_core {
         goto ADDRESS(handler);
     }
 
-    f  = floor($2 / den);
+    f  = floor((FLOATVAL)$2 / den);
     $1 = (INTVAL)f;
 }
 
@@ -640,11 +490,11 @@ References:
 =cut
 
 op mod(inout INT, in INT) :base_core {
-    $1 = intval_mod($1, $2);
+    $1 = Parrot_util_intval_mod($1, $2);
 }
 
 op mod(inout NUM, in NUM) :base_core {
-    $1 = floatval_mod($1, $2);
+    $1 = Parrot_util_floatval_mod($1, $2);
 }
 
 inline op mod(invar PMC, invar PMC) :base_core {
@@ -660,11 +510,11 @@ inline op mod(invar PMC, in NUM) :base_core {
 }
 
 op mod(out INT, in INT, in INT) :base_core {
-    $1 = intval_mod($2, $3);
+    $1 = Parrot_util_intval_mod($2, $3);
 }
 
 op mod(out NUM, in NUM, in NUM) :base_core {
-    $1 = floatval_mod($2, $3);
+    $1 = Parrot_util_floatval_mod($2, $3);
 }
 
 inline op mod(invar PMC, invar PMC, invar PMC) :base_core {
@@ -793,82 +643,6 @@ inline op neg(out PMC, invar PMC) :base_core {
 
 ########################################
 
-=item B<pow>(out NUM, in NUM, in NUM)
-
-=item B<pow>(out NUM, in NUM, in INT)
-
-=item B<pow>(invar PMC, invar PMC, invar PMC)
-
-=item B<pow>(invar PMC, invar PMC, in INT)
-
-=item B<pow>(invar PMC, invar PMC, in NUM)
-
-Set $1 to $2 raised to the power $3.
-
-=cut
-
-inline op pow(out NUM, in NUM, in NUM) :base_core {
-    $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
-}
-
-inline op pow(invar PMC, invar PMC, invar PMC) :base_core {
-    const FLOATVAL a = VTABLE_get_number(interp, $2);
-    const FLOATVAL b = VTABLE_get_number(interp, $3);
-    const FLOATVAL c = pow(a, b);
-    if (PMC_IS_NULL($1))
-        $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
-    else
-        $1 = Parrot_pmc_new(interp, $1->vtable->base_type);
-    VTABLE_set_number_native(interp, $1, c);
-}
-
-inline op pow(invar PMC, invar PMC, in INT) :base_core {
-    const FLOATVAL a = VTABLE_get_number(interp, $2);
-    const FLOATVAL b = (FLOATVAL)$3;
-    const FLOATVAL c = pow(a, b);
-    if (PMC_IS_NULL($1))
-        $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
-    else
-        $1 = Parrot_pmc_new(interp, $1->vtable->base_type);
-    VTABLE_set_number_native(interp, $1, c);
-}
-
-inline op pow(invar PMC, invar PMC, in NUM) :base_core {
-    const FLOATVAL a = VTABLE_get_number(interp, $2);
-    const FLOATVAL c = pow(a, $3);
-    if (PMC_IS_NULL($1))
-        $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
-    else
-        $1 = Parrot_pmc_new(interp, $1->vtable->base_type);
-    VTABLE_set_number_native(interp, $1, c);
-}
-
-inline op pow(out NUM, in NUM, in INT) :base_core {
-    FLOATVAL n2 = $2;
-    FLOATVAL res = 1.0;
-    INTVAL   e  = $3;
-    int s = 1;
-    if (e != 0) {
-        if (e < 0) {
-            s = -1;
-            e = -e;
-        }
-    }
-    while (e) {
-        if (e & 1) {
-            res *= n2;
-        }
-        n2 *= n2;
-        e >>= 1;
-    }
-    if (s < 0) {
-        res = 1.0/res;
-    }
-    $1 = res;
-}
-
-########################################
-
 =item B<sub>(inout INT, in INT)
 
 =item B<sub>(inout NUM, in NUM)
@@ -951,344 +725,6 @@ inline op sqrt(out NUM, in NUM) :base_core {
 
 =cut
 
-
-
-###############################################################################
-
-=head2 Transcendental mathematical operations
-
-These operations perform various transcendental operations such as logarithmics
-and trigonometrics.
-
-=over 4
-
-=cut
-
-########################################
-
-=item B<acos>(out NUM, in NUM)
-
-Set $1 to the arc cosine (in radians) of $2.
-
-=cut
-
-inline op acos(out NUM, in NUM) :base_math {
-    $1 = acos((FLOATVAL)$2);
-}
-
-########################################
-
-=item B<asec>(out NUM, in NUM)
-
-Set $1 to the arc secant (in radians) of $2.
-
-=cut
-
-inline op asec(out NUM, in NUM) :base_math {
-    $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
-}
-
-########################################
-
-
-=item B<asin>(out NUM, in NUM)
-
-Set $1 to the arc sine (in radians) of $2.
-
-=cut
-
-inline op asin(out NUM, in NUM) :base_math {
-    $1 = asin((FLOATVAL)$2);
-}
-
-########################################
-
-=item B<atan>(out NUM, in NUM)
-
-=item B<atan>(out NUM, in NUM, in NUM)
-
-The two-argument versions set $1 to the arc tangent (in radians) of $2.
-
-The three-argument versions set $1 to the arc tangent (in radians) of
-$2 / $3, taking account of the signs of the arguments in determining the
-quadrant of the result.
-
-=cut
-
-inline op atan(out NUM, in NUM) :base_math {
-    $1 = atan((FLOATVAL)$2);
-}
-
-inline op atan(out NUM, in NUM, in NUM) :base_math {
-    $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
-}
-
-########################################
-
-=item B<cos>(out NUM, in NUM)
-
-Set $1 to the cosine of $2 (given in radians).
-
-=cut
-
-inline op cos(out NUM, in NUM) :base_math {
-    $1 = cos((FLOATVAL)$2);
-}
-
-########################################
-
-=item B<cosh>(out NUM, in NUM)
-
-Set $1 to the hyperbolic cosine of $2 (given in radians).
-
-=cut
-
-inline op cosh(out NUM, in NUM) :base_math {
-    $1 = cosh((FLOATVAL)$2);
-}
-
-########################################
-
-=item B<exp>(out NUM, in NUM)
-
-Set $1 to I<e> raised to the power $2. I<e> is the base of the natural
-logarithm.
-
-=cut
-
-inline op exp(out NUM, in NUM) :base_math {
-    $1 = exp((FLOATVAL)$2);
-}
-
-########################################
-
-=item B<ln>(out NUM, in NUM)
-
-Set $1 to the natural (base I<e>) logarithm of $2.
-
-=cut
-
-inline op ln(out NUM, in NUM) :base_math {
-    $1 = log((FLOATVAL)$2);
-}
-
-########################################
-
-=item B<log10>(out NUM, in NUM)
-
-Set $1 to the base 10 logarithm of $2.
-
-=cut
-
-inline op log10(out NUM, in NUM) :base_math {
-    $1 = log10((FLOATVAL)$2);
-}
-
-########################################
-
-=item B<log2>(out NUM, in NUM)
-
-Set $1 to the base 2 logarithm of $2.
-
-=cut
-
-op log2(out NUM, in NUM) :base_math {
-    FLOATVAL temp = log((FLOATVAL)2.0);
-    $1 = log((FLOATVAL)$2) / temp;
-}
-
-########################################
-
-=item B<sec>(out NUM, in NUM)
-
-Set $1 to the secant of $2 (given in radians).
-
-=cut
-
-inline op sec(out NUM, in NUM) :base_math {
-    $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
-}
-
-########################################
-
-=item B<sech>(out NUM, in NUM)
-
-Set $1 to the hyperbolic secant of $2 (given in radians).
-
-=cut
-
-inline op sech(out NUM, in NUM) :base_math {
-    $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
-}
-
-########################################
-
-=item B<sin>(out NUM, in NUM)
-
-Set $1 to the sine of $2 (given in radians).
-
-=cut
-
-inline op sin(out NUM, in NUM) :base_math {
-    $1 = sin((FLOATVAL)$2);
-}
-
-########################################
-
-=item B<sinh>(out NUM, in NUM)
-
-Set $1 to the hyperbolic sine of $2 (given in radians).
-
-=cut
-
-inline op sinh(out NUM, in NUM) :base_math {
-    $1 = sinh((FLOATVAL)$2);
-}
-
-########################################
-
-=item B<tan>(out NUM, in NUM)
-
-Set $1 to the tangent of $2 (given in radians).
-
-=cut
-
-inline op tan(out NUM, in NUM) :base_math {
-    $1 = tan((FLOATVAL)$2);
-}
-
-########################################
-
-=item B<tanh>(out NUM, in NUM)
-
-Set $1 to the hyperbolic tangent of $2 (given in radians).
-
-=cut
-
-inline op tanh(out NUM, in NUM) :base_math {
-    $1 = tanh((FLOATVAL)$2);
-}
-
-=back
-
-=cut
-
-###############################################################################
-
-=head2 Other mathematical operations
-
-Implementations of various mathematical operations
-
-=over 4
-
-=cut
-
-########################################
-
-=item B<gcd>(out INT, in INT, in INT)
-
-Greatest Common divisor of $2 and $3.
-
-=cut
-
-inline op gcd(out INT, in INT, in INT) :advanced_math {
-    INTVAL p = 0;
-    INTVAL a = $2 < 0 ? -$2 : $2;
-    INTVAL b = $3 < 0 ? -$3 : $3;
-
-    if (a==0) { $1=b; goto NEXT(); }
-    if (b==0) { $1=a; goto NEXT(); }
-
-    while (!((a | b) & 1)) {
-        a>>=1;
-        b>>=1;
-        p++;
-    }
-
-    while (a>0) {
-        if (!(a & 1)) a>>=1;
-        else if (!(b & 1)) b>>=1;
-        else if (a<b)      b = (b-a)>>1;
-        else               a = (a-b)>>1;
-    }
-
-    $1 = b<<p;
-}
-
-
-########################################
-
-=item B<lcm>(out INT, in INT, in INT)
-
-Least Common Multiple of $2 and $3
-
-=cut
-
-inline op lcm(out INT, in INT, in INT) :advanced_math {
-    INTVAL gcd = 0;
-    INTVAL p = 0;
-    INTVAL a = $2 < 0 ? -$2 : $2;
-    INTVAL b = $3 < 0 ? -$3 : $3;
-    INTVAL saved_var1 = a, saved_var2 = b;
-
-    if (a==0 || b==0) { $1=0; goto NEXT(); }
-
-    while (!((a | b) & 1)) {
-        a>>=1;
-        b>>=1;
-        p++;
-    }
-
-    while (a>0) {
-        if (!(a & 1)) a>>=1;
-        else if (!(b & 1)) b>>=1;
-        else if (a<b)      b = (b-a)>>1;
-        else               a = (a-b)>>1;
-    }
-
-    gcd = b<<p;
-    saved_var1 /= gcd;
-    $1 = saved_var1*saved_var2;
-}
-
-########################################
-
-=item B<fact>(out INT, in INT)
-
-=item B<fact>(out NUM, in INT)
-
-Factorial, n!. Calculates the product of 1 to N.
-
-=cut
-
-inline op fact(out INT, in INT) :advanced_math {
-    /* Coercing a negative to a UINT can get pretty ugly
-     * in this situation. */
-    INTVAL i = $2;
-    UINTVAL q = 1;
-    while (i>0) {
-        q = q*i;
-        i--;
-    }
-    $1 = q;
-}
-
-inline op fact(out NUM, in INT) :advanced_math {
-    /* Coercing a negative to a UINT can get pretty ugly
-     * in this situation. */
-    INTVAL i = $2;
-    FLOATVAL q = 1;
-    while (i>0) {
-        q = q*i;
-        i--;
-    }
-    $1 = q;
-}
-
-=back
-
-=cut
-
 ###############################################################################
 
 =head1 COPYRIGHT
@@ -1306,5 +742,5 @@ as the Parrot interpreter itself.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2004-2010, Parrot Foundation.
  */
 
@@ -37,8 +36,8 @@ Set up Environment vars
 void
 Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)
 {
-    char *name  = Parrot_str_to_cstring(interp, str_name);
-    char *value = Parrot_str_to_cstring(interp, str_value);
+    char * const name  = Parrot_str_to_cstring(interp, str_name);
+    char * const value = Parrot_str_to_cstring(interp, str_value);
 #ifdef PARROT_HAS_SETENV
     setenv(name, value, 1);
 #else
@@ -74,13 +73,13 @@ UnSet Environment vars
 void
 Parrot_unsetenv(PARROT_INTERP, STRING *str_name)
 {
-    char *name = Parrot_str_to_cstring(interp, str_name);
 #ifdef PARROT_HAS_UNSETENV
+    char * const name = Parrot_str_to_cstring(interp, str_name);
     unsetenv(name);
-#else
-    Parrot_setenv(name, "");
-#endif
     Parrot_str_free_cstring(name);
+#else
+    Parrot_setenv(interp, str_name, Parrot_str_new(interp, "", 0));
+#endif
 }
 
 /*
@@ -96,8 +95,8 @@ Get Environment vars
 char *
 Parrot_getenv(PARROT_INTERP, STRING *str_name)
 {
-    char *name  = Parrot_str_to_cstring(interp, str_name);
-    char *value = getenv(name);
+    char * const name  = Parrot_str_to_cstring(interp, str_name);
+    char        *value = getenv(name);
     Parrot_str_free_cstring(name);
     return value;
 }
@@ -114,5 +113,5 @@ Parrot_getenv(PARROT_INTERP, STRING *str_name)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,5 +1,4 @@
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -62,7 +61,7 @@ Update from the repository.
 
 Output a skeleton for Plumage
 
-=item sdist, sdist_gztar, sdist_bztar, sdist_zip, sdist_rpm, manifest
+=item sdist, sdist_gztar, sdist_zip, sdist_rpm, manifest
 
 Create a source distribution or a source RPM package
 
@@ -96,21 +95,9 @@ Typical invocations are:
 
 =over 4
 
-=item prove (in step 'test')
-
-core module Test-Harness
-
-=item prove --archive (in step 'smoke')
-
-module TAP-Harness-Archive
-
 =item pod2html
 
 core module Pod-Html
-
-=item chmod (in step 'install')
-
-core module ExtUtils::Command, see TT #1322
 
 =back
 
@@ -120,31 +107,17 @@ core module ExtUtils::Command, see TT #1322
 
 =item glob (in step 'manifest' & 'sdist')
 
-PGE::Glob
+PGE/Glob.pbc
 
-Limitation: currently, OS.'readdir' is dummy with MSVC.
+=item tempdir (in step 'smoke')
+
+Math/Rand.pbc
 
 =back
 
 =head2 SYSTEM DEPENDENCIES
 
 =over 4
-
-=item smoke
-
-curl
-
-=item sdist_gztar
-
-Some coreutils : tar, gzip
-
-=item sdist_bztar
-
-bzip2
-
-=item sdist_zip
-
-zip
 
 =item spec, sdist_rpm, bdist_rpm
 
@@ -157,6 +130,31 @@ Inno Setup
 =back
 
 =head2 EXAMPLES
+
+    $ cat hello.pir
+    .sub 'main' :main
+        say 'hello world!'
+    .end
+
+    $ cat setup.pir
+    .sub 'main' :main
+        .param pmc args
+        $S0 = shift args
+        load_bytecode 'distutils.pbc'
+
+        $P0 = new 'Hash'
+        $P1 = new 'Hash'
+        $P1['hello.pbc'] = 'hello.pir'
+        $P0['pbc_pir'] = $P1
+        $P2 = new 'Hash'
+        $P2['parrot-hello'] = 'hello.pbc'
+        $P0['installable_pbc'] = $P2
+        .tailcall setup(args :flat, $P0 :flat :named)
+    .end
+
+    $ parrot setup.pir
+    $ parrot setup.pir install
+    $ parrot setup clean
 
 L<http://github.com/fperrad/parrot-MT19937/blob/master/setup.pir>
 
@@ -194,11 +192,18 @@ L<http://github.com/Whiteknight/parrot-linear-algebra/blob/master/setup.pir>
 
 L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
 
-L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
+L<http://github.com/bacek/pir/blob/master/setup.pir>
+
+L<http://github.com/kthakore/parrotSDL/blob/master/setup.pir>
+
+L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
 
 =cut
 
+.loadlib 'sys_ops'
+
 .sub '__onload' :load :init :anon
+    load_bytecode 'osutils.pbc'
     $P0 = new 'Hash'
     set_global '%step', $P0
 
@@ -210,16 +215,18 @@ L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
     register_step_after('build', _build_pir_pge)
     .const 'Sub' _build_pir_tge = '_build_pir_tge'
     register_step_after('build', _build_pir_tge)
-    .const 'Sub' _build_pir_nqp = '_build_pir_nqp'
-    register_step_after('build', _build_pir_nqp)
     .const 'Sub' _build_pir_nqp_rx = '_build_pir_nqp_rx'
     register_step_after('build', _build_pir_nqp_rx)
+    .const 'Sub' _build_inc_pir = '_build_inc_pir'
+    register_step_after('build', _build_inc_pir)
     .const 'Sub' _build_pir_pir = '_build_pir_pir'
     register_step_after('build', _build_pir_pir)
     .const 'Sub' _build_pbc_pir = '_build_pbc_pir'
     register_step_after('build', _build_pbc_pir)
     .const 'Sub' _build_pbc_pbc = '_build_pbc_pbc'
     register_step_after('build', _build_pbc_pbc)
+    .const 'Sub' _build_hll_hook = '_build_hll_hook'
+    register_step_after('build', _build_hll_hook)
     .const 'Sub' _build_exe_pbc = '_build_exe_pbc'
     register_step_after('build', _build_exe_pbc)
     .const 'Sub' _build_installable_pbc = '_build_installable_pbc'
@@ -235,10 +242,10 @@ L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
     register_step_after('clean', _clean_pir_pge)
     .const 'Sub' _clean_pir_tge = '_clean_pir_tge'
     register_step_after('clean', _clean_pir_tge)
-    .const 'Sub' _clean_pir_nqp = '_clean_pir_nqp'
-    register_step_after('clean', _clean_pir_nqp)
     .const 'Sub' _clean_pir_nqp_rx = '_clean_pir_nqp_rx'
     register_step_after('clean', _clean_pir_nqp_rx)
+    .const 'Sub' _clean_inc_pir = '_clean_inc_pir'
+    register_step_after('clean', _clean_inc_pir)
     .const 'Sub' _clean_pir_pir = '_clean_pir_pir'
     register_step_after('clean', _clean_pir_pir)
     .const 'Sub' _clean_pbc_pir = '_clean_pbc_pir'
@@ -253,8 +260,6 @@ L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
     register_step_after('clean', _clean_html_pod)
     .const 'Sub' _clean_gztar = '_clean_gztar'
     register_step_after('clean', _clean_gztar)
-    .const 'Sub' _clean_bztar = '_clean_bztar'
-    register_step_after('clean', _clean_bztar)
     .const 'Sub' _clean_zip = '_clean_zip'
     register_step_after('clean', _clean_zip)
     .const 'Sub' _clean_smoke = '_clean_smoke'
@@ -288,8 +293,6 @@ L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
     register_step('sdist', _sdist)
     .const 'Sub' _sdist_gztar = '_sdist_gztar'
     register_step('sdist_gztar', _sdist_gztar)
-    .const 'Sub' _sdist_bztar = '_sdist_bztar'
-    register_step('sdist_bztar', _sdist_bztar)
     .const 'Sub' _sdist_zip = '_sdist_zip'
     register_step('sdist_zip', _sdist_zip)
     .const 'Sub' _manifest = '_manifest'
@@ -316,6 +319,15 @@ L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
     .const 'Sub' _clean_wininst = '_clean_wininst'
     register_step_after('clean', _clean_wininst)
   L1:
+
+    $I0 = $P0['has_zlib']
+    if $I0 goto L2
+    .const 'Sub' _no_zlib = '_no_zlib'
+    register_step('smoke', _no_zlib)
+    register_step('sdist_gztar', _no_zlib)
+    register_step('sdist_zip', _no_zlib)
+    register_step('bdist_rpm', _no_zlib)
+  L2:
 .end
 
 =head2 Functions
@@ -367,7 +379,7 @@ Entry point.
     run_step('usage', kv :flat :named)
   L12:
     pop_eh
-    end
+    .return ()
   _handler:
     .local pmc ex
     .get_results (ex)
@@ -386,7 +398,7 @@ Call a step by its name.
 
 =cut
 
-.sub 'run_step'
+.sub 'run_step' :multi()
     .param string name
     .param pmc kv :slurpy :named
     $P0 = get_global '%step'
@@ -403,6 +415,12 @@ Call a step by its name.
     goto L2
   L3:
     .return (1)
+.end
+
+.sub 'run_step' :multi(String,Hash)
+    .param string name
+    .param pmc hash
+    .tailcall run_step(name, hash :flat :named)
 .end
 
 =item register_step
@@ -540,6 +558,8 @@ the others items of the array are just the dependencies
 
 .sub 'build_pbc_pir'
     .param pmc hash
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -558,13 +578,26 @@ the others items of the array are just the dependencies
     $I0 = newer(pbc, src)
     if $I0 goto L1
   L4:
+    $S0 = dirname(pbc)
+    mkpath($S0, 1 :named('verbose'))
     .local string cmd
     cmd = get_parrot()
     cmd .= " -o "
     cmd .= pbc
     cmd .= " "
     cmd .= src
-    system(cmd, 1 :named('verbose'))
+    push jobs, cmd
+    goto L1
+  L2:
+    .tailcall run_jobs(jobs)
+.end
+
+.sub 'run_jobs'
+    .param pmc jobs
+  L1:
+    unless jobs goto L2
+    $S0 = shift jobs
+    system($S0, 1 :named('verbose'))
     goto L1
   L2:
 .end
@@ -594,6 +627,8 @@ the value is an array of PGE pathname or a single PGE pathname
 .sub 'build_pir_pge'
     .param pmc hash
     .param string flags
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -612,6 +647,8 @@ the value is an array of PGE pathname or a single PGE pathname
     $I0 = newer(pir, src)
     if $I0 goto L1
   L4:
+    $S0 = dirname(pir)
+    mkpath($S0, 1 :named('verbose'))
     .local string cmd
     cmd = get_parrot()
     cmd .= " "
@@ -623,9 +660,10 @@ the value is an array of PGE pathname or a single PGE pathname
     cmd .= flags
     cmd .= " "
     cmd .= src
-    system(cmd, 1 :named('verbose'))
+    push jobs, cmd
     goto L1
   L2:
+    .tailcall run_jobs(jobs)
 .end
 
 =item pir_tge
@@ -649,6 +687,8 @@ the value is the TGE pathname
 
 .sub 'build_pir_tge'
     .param pmc hash
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -657,6 +697,8 @@ the value is the TGE pathname
     tge = hash[pir]
     $I0 = newer(pir, tge)
     if $I0 goto L1
+    $S0 = dirname(pir)
+    mkpath($S0, 1 :named('verbose'))
     .local string cmd
     cmd = get_parrot()
     cmd .= " "
@@ -666,12 +708,13 @@ the value is the TGE pathname
     cmd .= pir
     cmd .= " "
     cmd .= tge
-    system(cmd, 1 :named('verbose'))
+    push jobs, cmd
     goto L1
   L2:
+    .tailcall run_jobs(jobs)
 .end
 
-=item pir_nqp
+=item pir_nqp-rx / pir_nqprx / pir_nqp
 
 hash
 
@@ -683,19 +726,33 @@ the value is the NQP pathname
 
 =cut
 
-.sub '_build_pir_nqp' :anon
+.sub '_build_pir_nqp_rx' :anon
     .param pmc kv :slurpy :named
-    $I0 = exists kv['pir_nqp']
+    $I0 = exists kv['pir_nqp-rx']
     unless $I0 goto L1
+    $P0 = kv['pir_nqp-rx']
+    $S0 = get_value('pir_nqp_flags', '' :named('default'), kv :flat :named)
+    build_pir_nqp_rx($P0, $S0)
+  L1:
+    $I0 = exists kv['pir_nqprx']
+    unless $I0 goto L2
+    $P0 = kv['pir_nqprx']
+    $S0 = get_value('pir_nqp_flags', '' :named('default'), kv :flat :named)
+    build_pir_nqp_rx($P0, $S0)
+  L2:
+    $I0 = exists kv['pir_nqp']
+    unless $I0 goto L3
     $P0 = kv['pir_nqp']
     $S0 = get_value('pir_nqp_flags', '' :named('default'), kv :flat :named)
-    build_pir_nqp($P0, $S0)
-  L1:
+    build_pir_nqp_rx($P0, $S0)
+  L3:
 .end
 
-.sub 'build_pir_nqp'
+.sub 'build_pir_nqp_rx'
     .param pmc hash
     .param string flags
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -704,63 +761,59 @@ the value is the NQP pathname
     nqp = hash[pir]
     $I0 = newer(pir, nqp)
     if $I0 goto L1
+    $S0 = dirname(pir)
+    mkpath($S0, 1 :named('verbose'))
     .local string cmd
-    cmd = get_parrot()
-    cmd .= " "
-    $S0 = get_compiler('nqp/nqp.pbc')
-    cmd .= $S0
+    cmd = get_nqp()
     cmd .= " --target=pir --output="
     cmd .= pir
     cmd .= " "
     cmd .= flags
     cmd .= " "
     cmd .= nqp
-    system(cmd, 1 :named('verbose'))
+    push jobs, cmd
     goto L1
   L2:
+    .tailcall run_jobs(jobs)
 .end
 
-=item pir_nqp-rx / pir_nqprx
+=item inc_pir (include)
 
 hash
 
 the key is the PIR pathname
 
-the value is the NQP pathname
+the value is an array of PIR pathname
 
 =cut
 
-.sub '_build_pir_nqp_rx' :anon
+.sub '_build_inc_pir' :anon
     .param pmc kv :slurpy :named
-    $I0 = exists kv['pir_nqp-rx']
+    $I0 = exists kv['inc_pir']
     unless $I0 goto L1
-    $P0 = kv['pir_nqp-rx']
-    build_pir_nqp_rx($P0)
+    $P0 = kv['inc_pir']
+    build_inc_pir($P0)
   L1:
-    $I0 = exists kv['pir_nqprx']
-    unless $I0 goto L2
-    $P0 = kv['pir_nqprx']
-    build_pir_nqp_rx($P0)
-  L2:
 .end
 
-.sub 'build_pir_nqp_rx'
+.sub 'build_inc_pir'
     .param pmc hash
     $P0 = iter hash
   L1:
     unless $P0 goto L2
-    .local string pir, nqp
-    pir = shift $P0
-    nqp = hash[pir]
-    $I0 = newer(pir, nqp)
+    .local string inc
+    inc = shift $P0
+    .local pmc srcs
+    srcs = hash[inc]
+    $I0 = newer(inc, srcs)
     if $I0 goto L1
-    .local string cmd
-    cmd = get_nqp()
-    cmd .= " --target=pir --output="
-    cmd .= pir
-    cmd .= " "
-    cmd .= nqp
-    system(cmd, 1 :named('verbose'))
+    $S0 = dirname(inc)
+    mkpath($S0, 1 :named('verbose'))
+    $S0 = "# generated by distutils\n\n.include '"
+    $S1 = join "'\n.include '", srcs
+    $S0 .= $S1
+    $S0 .= "'\n\n"
+    spew(inc, $S0, 1 :named('verbose'))
     goto L1
   L2:
 .end
@@ -789,12 +842,14 @@ the value is an array of PIR pathname
     $P0 = iter hash
   L1:
     unless $P0 goto L2
-    .local string pir, src
+    .local string pir
     pir = shift $P0
     .local pmc srcs
     srcs = hash[pir]
     $I0 = newer(pir, srcs)
     if $I0 goto L1
+    $S0 = dirname(pir)
+    mkpath($S0, 1 :named('verbose'))
     spew(pir, '', 1 :named('verbose'))
     $P1 = iter srcs
   L3:
@@ -830,25 +885,45 @@ the value is an array of PBC pathname
 
 .sub 'build_pbc_pbc'
     .param pmc hash
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
     $P0 = iter hash
   L1:
     unless $P0 goto L2
-    .local string pbc, src
+    .local string pbc
     pbc = shift $P0
     .local pmc srcs
     srcs = hash[pbc]
     $I0 = newer(pbc, srcs)
     if $I0 goto L1
-    src = join ' ', srcs
+    $S0 = dirname(pbc)
+    mkpath($S0, 1 :named('verbose'))
     .local string cmd
     cmd = get_executable('pbc_merge')
     cmd .= " -o "
     cmd .= pbc
     cmd .= " "
-    cmd .= src
-    system(cmd, 1 :named('verbose'))
+    $S0 = join " ", srcs
+    cmd .= $S0
+    push jobs, cmd
     goto L1
   L2:
+    .tailcall run_jobs(jobs)
+.end
+
+=item hll_hook
+
+a subroutine
+
+=cut
+
+.sub '_build_hll_hook' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['hll_hook']
+    unless $I0 goto L1
+    $P0 = kv['hll_hook']
+    $P0(kv :flat :named)
+  L1:
 .end
 
 =item exe_pbc
@@ -872,6 +947,8 @@ the value is the PBC pathname
 
 .sub 'build_exe_pbc'
     .param pmc hash
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
     .local string exe
     exe = get_exe()
     $P0 = iter hash
@@ -880,19 +957,27 @@ the value is the PBC pathname
     .local string bin, pbc
     bin = shift $P0
     pbc = hash[bin]
-    $I0 = length pbc
-    $I0 -= 4
-    $S0 = substr pbc, 0, $I0
-    $S1 = $S0 . exe
+    $S1 = _mk_path_exe(pbc, exe)
     $I0 = newer($S1, pbc)
     if $I0 goto L1
     .local string cmd
     cmd = get_executable('pbc_to_exe')
     cmd .= " "
     cmd .= pbc
-    system(cmd, 1 :named('verbose'))
+    push jobs, cmd
     goto L1
   L2:
+    .tailcall run_jobs(jobs)
+.end
+
+.sub '_mk_path_exe' :anon
+    .param string pbcname
+    .param string exe
+    $I0 = length pbcname
+    $I0 -= 4
+    $S0 = substr pbcname, 0, $I0
+    $S1 = $S0 . exe
+    .return ($S1)
 .end
 
 =item installable_pbc
@@ -916,6 +1001,8 @@ the value is the PBC pathname
 
 .sub 'build_installable_pbc'
     .param pmc hash
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
     .local string exe
     exe = get_exe()
     .local int has_strip
@@ -926,11 +1013,7 @@ the value is the PBC pathname
     .local string bin, pbc
     bin = shift $P0
     pbc = hash[bin]
-    $I0 = length pbc
-    $I0 -= 4
-    $S0 = substr pbc, 0, $I0
-    $S1 = "installable_" . $S0
-    $S1 .= exe
+    $S1 = _mk_path_installable(pbc, exe)
     $I0 = newer($S1, pbc)
     if $I0 goto L1
     .local string cmd
@@ -938,12 +1021,29 @@ the value is the PBC pathname
     cmd .= " "
     cmd .= pbc
     cmd .= " --install"
-    system(cmd, 1 :named('verbose'))
-    unless has_strip goto L1
-    cmd = "strip " . $S1
-    system(cmd, 1 :named('verbose'))
+    unless has_strip goto L3
+    cmd .= " && strip "
+    cmd .= $S1
+  L3:
+    push jobs, cmd
     goto L1
   L2:
+    .tailcall run_jobs(jobs)
+.end
+
+.sub '_mk_path_installable' :anon
+    .param string pbcname
+    .param string exe
+    $P0 = split '/', pbcname
+    $S0 = $P0[-1]
+    $I0 = length $S0
+    $I0 -= 4
+    $S0 = substr $S0, 0, $I0
+    $S1 = "installable_" . $S0
+    $S1 .= exe
+    $P0[-1] = $S1
+    $S1 = join '/', $P0
+    .return ($S1)
 .end
 
 .sub '_has_strip' :anon
@@ -996,8 +1096,6 @@ the value is the OPS pathname
     .param string cflags
     .param string ldflags
     mkpath('dynext', 1 :named('verbose'))
-    .local pmc cores
-    cores = get_cores()
     .local string load_ext
     load_ext = get_load_ext()
     $P0 = iter hash
@@ -1006,18 +1104,10 @@ the value is the OPS pathname
     .local string ops, src
     ops = shift $P0
     src = hash[ops]
-    $P1 = iter cores
-  L3:
-    unless $P1 goto L4
-    .local string core, suffix
-    core = shift $P1
-    suffix = cores[core]
-    $S0 = _mk_path_dynops(ops, suffix, load_ext)
+    $S0 = _mk_path_dynops(ops, load_ext)
     $I0 = newer($S0, src)
-    if $I0 goto L3
-    __build_dynops(src, ops, core, suffix, cflags, ldflags)
-    goto L3
-  L4:
+    if $I0 goto L1
+    __build_dynops(src, ops, cflags, ldflags)
     goto L1
   L2:
 .end
@@ -1025,31 +1115,24 @@ the value is the OPS pathname
 .sub '__build_dynops' :anon
     .param string src
     .param string ops
-    .param string core
-    .param string suffix
     .param string cflags
     .param string ldflags
     .local pmc config
     config = get_config()
     .local string cmd
-    cmd = config['perl']
-    cmd .= " "
-    $S0 = get_tool('build/ops2c.pl')
-    cmd .= $S0
-    cmd .= " "
-    cmd .= core
+    cmd = get_executable('ops2c')
     cmd .= " --dynamic "
     cmd .= src
     system(cmd, 1 :named('verbose'))
 
     $S0 = config['o']
-    $S1 = _mk_path_gen_dynops(src, ops, suffix, $S0)
-    $S2 = _mk_path_gen_dynops(src, ops, suffix, '.c')
+    $S1 = _mk_path_gen_dynops(src, ops, $S0)
+    $S2 = _mk_path_gen_dynops(src, ops, '.c')
     __compile_cc($S1, $S2, cflags)
 
     .local string dynext
     $S0 = config['load_ext']
-    dynext = _mk_path_dynops(ops, suffix, $S0)
+    dynext = _mk_path_dynops(ops, $S0)
     cmd = config['ld']
     cmd .= " "
     $S0 = config['ld_out']
@@ -1057,7 +1140,7 @@ the value is the OPS pathname
     cmd .= dynext
     cmd .= " "
     $S0 = config['o']
-    $S0 = _mk_path_gen_dynops(src, ops, suffix, $S0)
+    $S0 = _mk_path_gen_dynops(src, ops, $S0)
     cmd .= $S0
     cmd .= " "
     $S0 = get_ldflags()
@@ -1115,10 +1198,8 @@ the value is the OPS pathname
 
 .sub '_mk_path_dynops' :anon
     .param string ops
-    .param string suffix
     .param string load_ext
     $S0 = "dynext/" . ops
-    $S0 .= suffix
     $S0 .= load_ext
     .return ($S0)
 .end
@@ -1126,23 +1207,12 @@ the value is the OPS pathname
 .sub '_mk_path_gen_dynops' :anon
     .param string src
     .param string ops
-    .param string suffix
     .param string ext
     $S0 = dirname(src)
     $S0 .= "/"
     $S0 .= ops
-    $S0 .= suffix
     $S0 .= ext
     .return ($S0)
-.end
-
-.sub 'get_cores'
-    $P0 = new 'Hash'
-    $P0['C'] = ''
-#    $P0['CGP'] = '_cgp'
-#    $P0['CGoto'] = '_cg'
-    $P0['CSwitch'] = '_switch'
-    .return ($P0)
 .end
 
 =item dynpmc
@@ -1151,7 +1221,7 @@ hash
 
 the key is the PMC name
 
-the value is an array of PMC pathname or a single PPC pathname
+the value is an array of PMC/C/H pathname or a single PMC pathname
 
 an array creates a PMC group
 
@@ -1189,24 +1259,52 @@ an array creates a PMC group
     .local pmc srcs
     srcs = hash[name]
     $I0 = does srcs, 'array'
-    unless $I0 goto L5
+    unless $I0 goto L3
+    .local pmc pmcs, includes
+    pmcs = new 'ResizableStringArray'
+    includes = new 'ResizableStringArray'
     $P1 = iter srcs
-  L3:
-    unless $P1 goto L4
+  L4:
+    unless $P1 goto L5
     .local string src
     src = shift $P1
+    .local string ext
+    $I0 = rindex(src, '.')
+    ext = substr src, $I0
+    unless ext == '.pmc' goto L6
+    push pmcs, src
+  L6:
+    unless ext == '.h' goto L4
+    push includes, src
+    goto L4
+  L5:
+    $P1 = iter srcs
+  L7:
+    unless $P1 goto L8
+    src = shift $P1
+    $I0 = rindex(src, '.')
+    ext = substr src, $I0
+    if ext == '.h' goto L7
     $S0 = _mk_path_gen_dynpmc(src, obj)
-    $I0 = newer($S0, src)
-    if $I0 goto L3
+    push includes, src
+    $I0 = newer($S0, includes)
+    $S1 = pop includes
+    if $I0 goto L7
+    if ext == '.c' goto L9
     __build_dynpmc(src, cflags)
-    goto L3
-  L4:
+    goto L7
+  L9:
+    __compile_cc($S0, src, cflags)
+    $S0 = ' ' . $S0
+    ldflags .= $S0
+    goto L7
+  L8:
     $S0 = _mk_path_dynpmc(name, load_ext)
     $I0 = newer($S0, srcs)
     if $I0 goto L1
-    __build_dynpmc_group(srcs, name, cflags, ldflags)
+    __build_dynpmc_group(pmcs, name, cflags, ldflags)
     goto L1
-  L5:
+  L3:
     src = srcs
     $S0 = _mk_path_dynpmc(name, load_ext)
     $I0 = newer($S0, src)
@@ -1217,7 +1315,7 @@ an array creates a PMC group
   L2:
 .end
 
-.sub '__build_dynpmc' :anon
+.sub '__build_dynpmc'
     .param string src
     .param string cflags
     .local pmc config
@@ -1234,31 +1332,24 @@ an array creates a PMC group
     pmc2c_includes .= " --include "
     pmc2c_includes .= $S0
     pmc2c_includes .= "/pmc"
-    .local string current_dir
-    current_dir = cwd()
     $S0 = dirname(src)
-    chdir($S0)
+    pmc2c_includes .= " --include "
+    pmc2c_includes .= $S0
 
     .local string cmd
     cmd = clone pmc2c
     cmd .= " --dump "
     cmd .= pmc2c_includes
     cmd .= " "
-#    cmd .= src
-    $S0 = basename(src)
-    cmd .= $S0
+    cmd .= src
     system(cmd, 1 :named('verbose'))
 
     cmd = clone pmc2c
     cmd .= " --c "
     cmd .= pmc2c_includes
     cmd .= " "
-#    cmd .= src
-    $S0 = basename(src)
-    cmd .= $S0
+    cmd .= src
     system(cmd, 1 :named('verbose'))
-
-    chdir(current_dir)
 
     $S0 = config['o']
     $S1 = _mk_path_gen_dynpmc(src, $S0)
@@ -1276,10 +1367,6 @@ an array creates a PMC group
     .local string src, obj
     src = srcs[0]
     obj = config['o']
-    .local string current_dir
-    current_dir = cwd()
-    $S0 = dirname(src)
-    chdir($S0)
 
     .local string cmd
     cmd = config['perl']
@@ -1287,25 +1374,14 @@ an array creates a PMC group
     $S0 = get_tool('build/pmc2c.pl')
     cmd .= $S0
     cmd .= " --library "
-#    $S0 = dirname(src)
-#    cmd .= $S0
-#    cmd .= "/"
+    $S0 = dirname(src)
+    cmd .= $S0
+    cmd .= "/"
     cmd .= group
     cmd .= " --c "
-#    $S0 = join " ", srcs
-#    cmd .= $S0
-    $P0 = iter srcs
-  L1:
-    unless $P0 goto L2
-    src = shift $P0
-    $S0 = basename(src)
+    $S0 = join " ", srcs
     cmd .= $S0
-    cmd .= " "
-    goto L1
-  L2:
     system(cmd, 1 :named('verbose'))
-
-    chdir(current_dir)
 
     $S1 = _mk_path_gen_dynpmc_group(src, group, obj)
     $S2 = _mk_path_gen_dynpmc_group(src, group, '.c')
@@ -1409,8 +1485,7 @@ an array creates a PMC group
 .sub '_mk_path_gen_dynpmc' :anon
     .param string src
     .param string ext
-    $I0 = length src
-    $I0 -= 4
+    $I0 = rindex(src, '.')
     $S0 = substr src, 0, $I0
     $S0 .= ext
     unless ext == '.h' goto L1
@@ -1462,6 +1537,8 @@ the value is the POD pathname
     pod = hash[html]
     $I0 = newer(html, pod)
     if $I0 goto L1
+    $S0 = dirname(html)
+    mkpath($S0, 1 :named('verbose'))
     .local string cmd
     cmd = "pod2html --infile "
     cmd .= pod
@@ -1504,6 +1581,19 @@ the value is the POD pathname
   L2:
 .end
 
+=item inc_pir
+
+=cut
+
+.sub '_clean_inc_pir' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['inc_pir']
+    unless $I0 goto L1
+    $P0 = kv['inc_pir']
+    clean_key($P0)
+  L1:
+.end
+
 =item pir_pir
 
 =cut
@@ -1543,20 +1633,7 @@ the value is the POD pathname
   L1:
 .end
 
-=item pir_nqp
-
-=cut
-
-.sub '_clean_pir_nqp' :anon
-    .param pmc kv :slurpy :named
-    $I0 = exists kv['pir_nqp']
-    unless $I0 goto L1
-    $P0 = kv['pir_nqp']
-    clean_key($P0)
-  L1:
-.end
-
-=item pir_nqp-rx / pir_nqprx
+=item pir_nqp-rx / pir_nqprx / pir_nqp
 
 =cut
 
@@ -1572,6 +1649,11 @@ the value is the POD pathname
     $P0 = kv['pir_nqprx']
     clean_key($P0)
   L2:
+    $I0 = exists kv['pir_nqp']
+    unless $I0 goto L3
+    $P0 = kv['pir_nqp']
+    clean_key($P0)
+  L3:
 .end
 
 =item pbc_pbc
@@ -1610,14 +1692,11 @@ the value is the POD pathname
     unless $P0 goto L2
     bin = shift $P0
     pbc = hash[bin]
-    $I0 = length pbc
-    $I0 -= 4
-    $S0 = substr pbc, 0, $I0
-    $S1 = $S0 . exe
+    $S1 = _mk_path_exe(pbc, exe)
     unlink($S1, 1 :named('verbose'))
-    $S1 = $S0 . '.c'
+    $S1 = _mk_path_exe(pbc, '.c')
     unlink($S1, 1 :named('verbose'))
-    $S1 = $S0 . obj
+    $S1 = _mk_path_exe(pbc, obj)
     unlink($S1, 1 :named('verbose'))
     goto L1
   L2:
@@ -1646,15 +1725,11 @@ the value is the POD pathname
     unless $P0 goto L2
     bin = shift $P0
     pbc = hash[bin]
-    $I0 = length pbc
-    $I0 -= 4
-    $S0 = substr pbc, 0, $I0
-    $S1 = 'installable_' . $S0
-    $S1 .= exe
+    $S1 = _mk_path_installable(pbc, exe)
     unlink($S1, 1 :named('verbose'))
-    $S1 = $S0 . '.c'
+    $S1 = _mk_path_exe(pbc, '.c')
     unlink($S1, 1 :named('verbose'))
-    $S1 = $S0 . obj
+    $S1 = _mk_path_exe(pbc, obj)
     unlink($S1, 1 :named('verbose'))
     goto L1
   L2:
@@ -1675,8 +1750,6 @@ the value is the POD pathname
 
 .sub 'clean_dynops'
     .param pmc hash
-    .local pmc cores
-    cores = get_cores()
     .local string load_ext, obj
     load_ext = get_load_ext()
     obj = get_obj()
@@ -1686,22 +1759,14 @@ the value is the POD pathname
     .local string ops, src
     ops = shift $P0
     src = hash[ops]
-    $P1 = iter cores
-  L3:
-    unless $P1 goto L4
-    .local string core, suffix
-    core = shift $P1
-    suffix = cores[core]
-    $S0 = _mk_path_dynops(ops, suffix, load_ext)
+    $S0 = _mk_path_dynops(ops, load_ext)
     unlink($S0, 1 :named('verbose'))
-    $S0 = _mk_path_gen_dynops(src, ops, suffix, '.c')
+    $S0 = _mk_path_gen_dynops(src, ops, '.c')
     unlink($S0, 1 :named('verbose'))
-    $S0 = _mk_path_gen_dynops(src, ops, suffix, '.h')
+    $S0 = _mk_path_gen_dynops(src, ops, '.h')
     unlink($S0, 1 :named('verbose'))
-    $S0 = _mk_path_gen_dynops(src, ops, suffix, obj)
+    $S0 = _mk_path_gen_dynops(src, ops, obj)
     unlink($S0, 1 :named('verbose'))
-    goto L3
-  L4:
     goto L1
   L2:
 .end
@@ -1740,13 +1805,18 @@ the value is the POD pathname
     unless $P1 goto L4
     .local string src
     src = shift $P1
+    .local string ext
+    $I0 = rindex(src, '.')
+    ext = substr src, $I0
+    if ext == '.h' goto L3
+    $S0 = _mk_path_gen_dynpmc(src, obj)
+    unlink($S0, 1 :named('verbose'))
+    if ext == '.c' goto L3
     $S0 = _mk_path_gen_dynpmc(src, '.c')
     unlink($S0, 1 :named('verbose'))
     $S0 = _mk_path_gen_dynpmc(src, '.h')
     unlink($S0, 1 :named('verbose'))
     $S0 = _mk_path_gen_dynpmc(src, '.dump')
-    unlink($S0, 1 :named('verbose'))
-    $S0 = _mk_path_gen_dynpmc(src, obj)
     unlink($S0, 1 :named('verbose'))
     goto L3
   L4:
@@ -1917,65 +1987,13 @@ The following Version Control System are handled :
 
 =head3 Step test
 
-If t/harness exists, run : t/harness
-
-If parrot-tapir exists, run it with t/*.t
-
-Else run : prove t/*.t
-
-=cut
-
-.sub '_test' :anon
-    .param pmc kv :slurpy :named
-    run_step('build', kv :flat :named)
-    $I0 = file_exists('t/harness')
-    unless $I0 goto L1
-    .tailcall _test_harness(kv :flat :named)
-  L1:
-    $S0 = get_executable('parrot-tapir')
-    $I0 = file_exists($S0)
-    unless $I0 goto L2
-    .tailcall _test_tapir($S0, kv :flat :named)
-  L2:
-    .tailcall _test_prove(kv :flat :named)
-.end
-
 =over 4
 
-=item harness_exec
-
-the default value is with perl
-
-=item harness_files
-
-the default value is "t/*.t"
-
-=cut
-
-.sub '_test_harness' :anon
-    .param pmc kv :slurpy :named
-    .local string cmd
-    $I0 = exists kv['harness_exec']
-    unless $I0 goto L1
-    cmd = kv['harness_exec']
-    goto L2
-  L1:
-    cmd = "perl -I"
-    $S0 = get_libdir()
-    cmd .= $S0
-    cmd .= "/tools/lib"
-  L2:
-    cmd .= " t/harness "
-    $S0 = get_value('harness_files', "t/*.t" :named('default'), kv :flat :named)
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'))
-.end
-
-=item prove_exec
+=item prove_exec / test_exec
 
 option --exec of prove
 
-=item prove_files
+=item prove_files / test_files
 
 the default value is "t/*.t"
 
@@ -1983,109 +2001,76 @@ the default value is "t/*.t"
 
 =cut
 
-.sub '_test_prove' :anon
+.sub '_test' :anon
     .param pmc kv :slurpy :named
-    .local string cmd
-    cmd = "prove"
+    run_step('build', kv :flat :named)
+
+    load_bytecode 'TAP/Harness.pbc'
+    .local pmc opts, files, harness, aggregate
+    opts = new 'Hash'
     $I0 = exists kv['prove_exec']
     unless $I0 goto L1
-    $S0 = get_prove_version()
-    $S0 = substr $S0, 0, 1
-    unless $S0 == "3" goto L3
-    cmd .= " --exec="
-    goto L4
+    $S0 = kv['prove_exec']
+    opts['exec'] = $S0
+  L1:
+    $I0 = exists kv['test_exec']
+    unless $I0 goto L2
+    $S0 = kv['test_exec']
+    opts['exec'] = $S0
+  L2:
+    $S0 = "t/*.t"
+    $I0 = exists kv['prove_files']
+    unless $I0 goto L3
+    $S0 = kv['prove_files']
   L3:
-    cmd .= " --perl="
+    $I0 = exists kv['test_files']
+    unless $I0 goto L4
+    $S0 = kv['test_files']
   L4:
-    $S0 = kv['prove_exec']
-    $I0 = index $S0, ' '
-    if $I0 < 0 goto L2
-    cmd .= "\""
-  L2:
-    cmd .= $S0
-    if $I0 < 0 goto L1
-    cmd .= "\""
-  L1:
-    cmd .= " "
-    $S0 = get_value('prove_files', "t/*.t" :named('default'), kv :flat :named)
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'))
+    $P0 = glob($S0)
+    files = sort_strings($P0)
+    harness = new ['TAP';'Harness']
+    harness.'process_args'(opts)
+    aggregate = harness.'runtests'(files)
+    $I0 = aggregate.'has_errors'()
+    unless $I0 goto L5
+    die "test fails"
+  L5:
 .end
 
-.sub 'get_prove_version' :anon
-    $P0 = open 'prove --version', 'rp'
-    $S0 = $P0.'readline'()
-    $P0.'close'()
-    $I1 = index $S0, "Test::Harness v"
-    $I1 += 15
-    $I2 = index $S0, " ", $I1
-    $I3 = $I2 - $I1
-    $S0 = substr $S0, $I1, $I3
-    .return ($S0)
-.end
-
-.sub '_test_tapir' :anon
-    .param string tapir
-    .param pmc kv :slurpy :named
-    .local string cmd
-    cmd = tapir
-    $I0 = exists kv['prove_exec']
-    unless $I0 goto L1
-    cmd .= " --exec="
-    $S0 = kv['prove_exec']
-    $I0 = index $S0, ' '
-    if $I0 < 0 goto L2
-    cmd .= "\""
-  L2:
-    cmd .= $S0
-    if $I0 < 0 goto L1
-    cmd .= "\""
+.sub 'sort_strings'
+    .param pmc array
+    # currently, FixedStringArray hasn't the method sort.
+    # see TT #1356
+    $I0 = elements array
+    $P0 = new 'FixedPMCArray'
+    set $P0, $I0
+    $I0 = 0
+    $P1 = iter array
   L1:
-    cmd .= " "
-    $S0 = get_value('prove_files', "t/*.t" :named('default'), kv :flat :named)
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'))
+    unless $P1 goto L2
+    $S0 = shift $P1
+    $P0[$I0] = $S0
+    inc $I0
+    goto L1
+  L2:
+    $P0.'sort'()
+    .return ($P0)
 .end
 
 =head3 Step smoke
 
-Unless t/harness exists, run : prove --archive t/*.t
-
-=cut
-
-.sub '_smoke' :anon
-    .param pmc kv :slurpy :named
-    run_step('build', kv :flat :named)
-    $I0 = file_exists('t/harness')
-    if $I0 goto L1
-    $S0 = get_prove_version()
-    $S0 = substr $S0, 0, 1
-    unless $S0 == "3" goto L2
-    .tailcall _smoke_prove(kv :flat :named)
-  L2:
-    die "Require Test::Harness v3.x (option --archive)."
-  L1:
-    die "Don't known how to smoke with t/harness."
-.end
-
-.sub '_clean_smoke' :anon
-    .param pmc kv :slurpy :named
-    $S0 = get_value('prove_archive', "report.tar.gz" :named('default'), kv :flat :named)
-    unlink($S0, 1 :named('verbose'))
-    unlink('meta.yml', 1 :named('verbose'))
-.end
-
 =over 4
 
-=item prove_exec
+=item prove_exec / test_exec
 
 option --exec of prove
 
-=item prove_files
+=item prove_files / test_files
 
 the default value is "t/*.t"
 
-=item prove_archive
+=item prove_archive / smolder_archive
 
 option --archive of prove
 
@@ -2107,120 +2092,154 @@ a string
 
 a hash
 
+=item smolder_credentials
+
+A string, of the form "USERNAME:PASSWORD" to be used as the credentials for
+the server. The default is "parrot-autobot:qa_rocks"
+
 =back
 
 =cut
 
-.sub '_smoke_prove' :anon
+.sub '_smoke' :anon
     .param pmc kv :slurpy :named
-    .local string cmd
-    cmd = "prove"
+    run_step('build', kv :flat :named)
+
+    load_bytecode 'TAP/Harness.pbc'
+    .local pmc opts, files, harness, aggregate
+    opts = new 'Hash'
     $I0 = exists kv['prove_exec']
     unless $I0 goto L1
-    cmd .= " --exec="
     $S0 = kv['prove_exec']
-    $I0 = index $S0, ' '
-    if $I0 < 0 goto L2
-    cmd .= "\""
-  L2:
-    cmd .= $S0
-    if $I0 < 0 goto L1
-    cmd .= "\""
+    opts['exec'] = $S0
   L1:
-    cmd .= " "
-    $S0 = get_value('prove_files', "t/*.t" :named('default'), kv :flat :named)
-    cmd .= $S0
-    cmd .= " --archive="
-    .local string archive
-    archive = get_value('prove_archive', "report.tar.gz" :named('default'), kv :flat :named)
-    cmd .= archive
-    system(cmd, 1 :named('verbose'), 1 :named('ignore_error'))
-
-    $I0 = exists kv['smolder_extra_properties']
+    $I0 = exists kv['test_exec']
+    unless $I0 goto L2
+    $S0 = kv['test_exec']
+    opts['exec'] = $S0
+  L2:
+    $S0 = "t/*.t"
+    $I0 = exists kv['prove_files']
+    unless $I0 goto L3
+    $S0 = kv['prove_files']
+  L3:
+    $I0 = exists kv['test_files']
     unless $I0 goto L4
-    system('perl -MExtUtils::Command -e rm_rf tmp')
-    cmd = "mkdir tmp && cd tmp && tar xzf ../"
-    cmd .= archive
-    system(cmd, 1 :named('verbose'))
-
-    $P0 = kv['smolder_extra_properties']
-    $S0 = mk_extra_properties($P0)
-    say "append extra properties"
-    append('tmp/meta.yml', $S0)
-
-    unlink(archive)
-    cmd = "cd tmp && tar czf ../"
-    cmd .= archive
-    cmd .= " *"
-    system(cmd, 1 :named('verbose'))
-    system('perl -MExtUtils::Command -e rm_rf tmp')
+    $S0 = kv['test_files']
   L4:
-
-    $I0 = exists kv['smolder_url']
+    $P0 = glob($S0)
+    files = sort_strings($P0)
+    harness = new ['TAP';'Harness';'Archive']
+    harness.'process_args'(opts)
+    .local string archive
+    archive = "report.tar.gz"
+    $I0 = exists kv['prove_archive']
     unless $I0 goto L5
-    .local pmc config
-    config = get_config()
-    cmd = "curl -F architecture="
-    $S0 = config['cpuarch']
-    cmd .= $S0
-    cmd .= " -F platform="
-    $S0 = config['osname']
-    cmd .= $S0
-    cmd .= " -F revision="
-    $S0 = config['revision']
-    cmd .= $S0
-    $I0 = exists kv['smolder_tags']
-    unless $I0 goto L6
-    cmd .= " -F tags=\""
-    $S0 = kv['smolder_tags']
-    cmd .= $S0
-    cmd .= "\""
-  L6:
-    $I0 = exists kv['smolder_comments']
-    unless $I0 goto L7
-    cmd .= " -F comments=\""
-    $S0 = kv['smolder_comments']
-    cmd .= $S0
-    cmd .= "\""
-  L7:
-    cmd .= " -F report_file=@"
-    cmd .= archive
-    cmd .= " "
-    $S0 = kv['smolder_url']
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'))
+    archive = kv['prove_archive']
   L5:
+    $I0 = exists kv['smolder_archive']
+    unless $I0 goto L6
+    archive = kv['smolder_archive']
+  L6:
+    archive = get_value('prove_archive', "report.tar.gz" :named('default'), kv :flat :named)
+    harness.'archive'(archive)
+    $I0 = exists kv['smolder_extra_properties']
+    unless $I0 goto L7
+    $P0 = kv['smolder_extra_properties']
+    harness.'extra_props'($P0)
+  L7:
+    aggregate = harness.'runtests'(files)
+    print "creat "
+    say archive
+
+    smolder_post(archive, kv :flat :named)
 .end
 
-.sub 'mk_extra_properties' :anon
-    .param pmc hash
-    $S0 = "extra_properties:\n"
-    $P0 = iter hash
-  L1:
-    unless $P0 goto L2
-    .local string key, value
-    key = shift $P0
-    value = hash[key]
-    if value == '' goto L1
-    $S0 .= "  "
-    $S0 .= key
-    $S0 .= ": "
-    $S0 .= value
-    $S0 .= "\n"
-    goto L1
+.sub 'smolder_post' :anon
+    .param string archive
+    .param pmc kv :slurpy :named
+    .local string cmd
+    $I0 = exists kv['smolder_url']
+    unless $I0 goto L1
+    .local pmc config
+    config = get_config()
+    .local pmc contents
+    contents = new 'ResizablePMCArray' # by couple
+    push contents, 'architecture'
+    $S0 = config['cpuarch']
+    push contents, $S0
+    push contents, 'platform'
+    $S0 = config['osname']
+    push contents, $S0
+    push contents, 'revision'
+    $S0 = config['git_describe']
+    push contents, $S0
+    $I0 = exists kv['smolder_tags']
+    unless $I0 goto L2
+    push contents, 'tags'
+    $S0 = kv['smolder_tags']
+    push contents, $S0
   L2:
-    .return ($S0)
+    $I0 = exists kv['smolder_comments']
+    unless $I0 goto L3
+    push contents, 'comments'
+    $S0 = kv['smolder_comments']
+    push contents, $S0
+  L3:
+    push contents, 'report_file'
+    $P0 = new 'FixedStringArray'
+    set $P0, 1
+    $P0[0] = archive
+    push contents, $P0
+    $S0 = get_value('smolder_credentials', "parrot-autobot:qa_rocks" :named('default'), kv :flat :named)
+    $P0 = split ':', $S0
+    $P1 = $P0[0]
+    push contents, 'username'
+    push contents, $P1
+    $P1 = $P0[1]
+    push contents, 'password'
+    push contents, $P1
+    load_bytecode 'LWP/UserAgent.pir'
+    .local pmc ua, response
+    ua = new ['LWP';'UserAgent']
+    ua.'env_proxy'()
+    ua.'show_progress'(1)
+    $S0 = kv['smolder_url']
+    response = ua.'post'($S0, contents :flat, 'form-data' :named('Content-Type'), 'close' :named('Connection'))
+    $I0 = response.'code'()
+    unless $I0 == 302 goto L1
+    $S0 = response.'content'()
+    $I0 = index $S0, 'Report'
+    unless $I0 == 0 goto L4
+    $I0 = index $S0, "\n"
+    if $I0 < 0 goto L4
+    $S0 = substr $S0, 0, $I0
+  L4:
+    print $S0
+  L1:
+.end
+
+.sub '_clean_smoke' :anon
+    .param pmc kv :slurpy :named
+    $S0 = get_value('prove_archive', "report.tar.gz" :named('default'), kv :flat :named)
+    unlink($S0, 1 :named('verbose'))
+    $S0 = get_value('smolder_archive', "report.tar.gz" :named('default'), kv :flat :named)
+    unlink($S0, 1 :named('verbose'))
 .end
 
 =head3 Step install
 
 =over 4
 
-=item inst_bin ???
+=item inst_bin (useful ?)
 
 array of pathname or a single pathname
 
-=item inst_dynext ???
+=item inst_data
+
+array of pathname or a single pathname
+
+=item inst_dynext (useful ?)
 
 array of pathname or a single pathname
 
@@ -2303,6 +2322,11 @@ array of pathname or a single pathname
     $P0 = kv['inst_lib']
     get_install_lib(files, "library", $P0)
   L5:
+    $I0 = exists kv['inst_data']
+    unless $I0 goto L6
+    $P0 = kv['inst_data']
+    get_install_data(files, $P0)
+  L6:
     .return (files)
 .end
 
@@ -2310,6 +2334,28 @@ array of pathname or a single pathname
     .param pmc files
     .param pmc array
     $S1 = get_bindir()
+    $S1 .= "/"
+    $I0 = does array, 'array'
+    if $I0 goto L1
+    $S0 = array
+    $S2 = $S1 . $S0
+    files[$S2] = $S0
+    goto L2
+  L1:
+    $P0 = iter array
+  L3:
+    unless $P0 goto L2
+    $S0 = shift $P0
+    $S2 = $S1 . $S0
+    files[$S2] = $S0
+    goto L3
+  L2:
+.end
+
+.sub 'get_install_data' :anon
+    .param pmc files
+    .param pmc array
+    $S1 = get_datadir()
     $S1 .= "/"
     $I0 = does array, 'array'
     if $I0 goto L1
@@ -2339,7 +2385,12 @@ array of pathname or a single pathname
     $I0 = does array, 'array'
     if $I0 goto L1
     $S0 = array
-    $S2 = $S1 . $S0
+    $S3 = $S0
+    $I0 = index $S0, "build/"
+    unless $I0 == 0 goto L0
+    $S3 = substr $S0, 6
+  L0:
+    $S2 = $S1 . $S3
     files[$S2] = $S0
     goto L2
   L1:
@@ -2347,7 +2398,12 @@ array of pathname or a single pathname
   L3:
     unless $P0 goto L2
     $S0 = shift $P0
-    $S2 = $S1 . $S0
+    $S3 = $S0
+    $I0 = index $S0, "build/"
+    unless $I0 == 0 goto L4
+    $S3 = substr $S0, 6
+  L4:
+    $S2 = $S1 . $S3
     files[$S2] = $S0
     goto L3
   L2:
@@ -2386,11 +2442,7 @@ array of pathname or a single pathname
     unless $P0 goto L2
     bin = shift $P0
     pbc = hash[bin]
-    $I0 = length pbc
-    $I0 -= 4
-    $S0 = substr pbc, 0, $I0
-    $S1 = 'installable_' . $S0
-    $S1 .= exe
+    $S1 = _mk_path_installable(pbc, exe)
     $S2 = bindir . '/'
     $S2 .= bin
     $S2 .= exe
@@ -2402,26 +2454,17 @@ array of pathname or a single pathname
 .sub 'get_install_dynops' :anon
     .param pmc files
     .param pmc hash
-    .local string libdir, load_ext, ops, suffix
+    .local string libdir, load_ext, ops
     libdir = get_libdir()
     load_ext = get_load_ext()
-    .local pmc cores
-    cores = get_cores()
     $P0 = iter hash
   L1:
     unless $P0 goto L2
     ops = shift $P0
-    $P1 = iter cores
-  L3:
-    unless $P1 goto L4
-    $S0 = shift $P1
-    suffix = cores[$S0]
-    $S1 = _mk_path_dynops(ops, suffix, load_ext)
+    $S1 = _mk_path_dynops(ops, load_ext)
     $S2 = libdir . "/"
     $S2 .= $S1
     files[$S2] = $S1
-    goto L3
-  L4:
     goto L1
   L2:
 .end
@@ -2679,7 +2722,7 @@ the default value is setup.pir
         "requires"     : {
             "fetch"    : ["%s"],
             "build"    : [],
-            "test"     : ["perl5"],
+            "test"     : [],
             "install"  : [],
             "runtime"  : []
         }
@@ -2735,10 +2778,10 @@ array of pathname or a single pathname
 
 array of pathname or a single pathname
 
-=item pbc_pir, pir_pge, pir_tge, pir_nqp, pir_nqp-rx, pir_nqprx, pir_pir
+=item pbc_pir, pir_pge, pir_tge, pir_nqp, pir_nqp-rx, pir_nqprx, inc_pir, pir_pir
 pbc_pbc, exe_pbc, installable_pbc, dynops, dynpmc, html_pod
 
-=item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
+=item inst_bin, inst_data, inst_dynext, inst_inc, inst_lang, inst_lib
 
 =item harness_files, prove_files
 
@@ -2771,7 +2814,7 @@ the default value is setup.pir
     needed = new 'Hash'
     generated = new 'Hash'
 
-    $P0 = split ' ', 'pbc_pir pir_pge pir_tge pir_nqp pir_nqp-rx pir_nqprx pir_pir pbc_pbc exe_pbc installable_pbc dynops dynpmc html_pod'
+    $P0 = split ' ', 'pbc_pir pir_pge pir_tge pir_nqp pir_nqp-rx pir_nqprx inc_pir pir_pir pbc_pbc exe_pbc installable_pbc dynops dynpmc html_pod'
   L1:
     unless $P0 goto L2
     $S0 = shift $P0
@@ -2782,7 +2825,7 @@ the default value is setup.pir
     goto L1
   L2:
 
-    $P0 = split ' ', 'inst_bin inst_dynext inst_inc inst_lang inst_lib doc_files'
+    $P0 = split ' ', 'inst_bin inst_data inst_dynext inst_inc inst_lang inst_lib doc_files'
   L3:
     unless $P0 goto L4
     $S0 = shift $P0
@@ -2967,26 +3010,35 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     .param pmc kv :slurpy :named
     run_step('manifest', kv :flat :named)
 
+    load_bytecode 'Archive/Tar.pbc'
     $S0 = slurp('MANIFEST')
     $P0 = split "\n", $S0
     $S0 = pop $P0
-    $S0 = get_tarname('.tar.gz', kv :flat :named)
-    $I0 = newer($S0, $P0)
+    .local string archive_file
+    archive_file = get_tarname('.tar.gz', kv :flat :named)
+    $I0 = newer(archive_file, $P0)
     if $I0 goto L1
+    .local pmc archive
+    archive = new ['Archive';'Tar']
+    $P1 = archive.'add_files'($P0 :flat)
+    .local string dirname
     $S0 = get_tarname('', kv :flat :named)
-    copy_sdist($S0, $P0)
-
-    .local string cmd
-    cmd = 'tar -cvf ' . $S0
-    cmd .= '.tar '
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'))
-
-    rmtree($S0)
-
-    cmd = 'gzip --best ' . $S0
-    cmd .= '.tar'
-    system(cmd, 1 :named('verbose'))
+    dirname = $S0 . '/'
+  L2:
+    unless $P1 goto L3
+    $P2 = shift $P1
+    $S0 = $P2.'full_path'()
+    $S0 = dirname . $S0
+    $P2.'rename'($S0)
+    goto L2
+  L3:
+    $P0 = loadlib 'gziphandle'
+    $P0 = new 'GzipHandle'
+    $P0.'open'(archive_file, 'wb')
+    archive.'write'($P0)
+    $P0.'close'()
+    print "creat "
+    say archive_file
   L1:
 .end
 
@@ -2996,21 +3048,6 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     $S0 = get_tarname('.tar.gz', kv :flat :named)
     unlink($S0, 1 :named('verbose'))
     unlink('MANIFEST', 1 :named('verbose'))
-.end
-
-.sub 'copy_sdist' :anon
-    .param string dirname
-    .param pmc files
-    mkdir(dirname)
-    $S1 = dirname . "/"
-    $P0 = iter files
-  L1:
-    unless $P0 goto L2
-    $S0 = shift $P0
-    $S2 = $S1 . $S0
-    install($S0, $S2)
-    goto L1
-  L2:
 .end
 
 .sub 'get_tarname' :anon
@@ -3027,45 +3064,6 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     .return ($S0)
 .end
 
-=head3 Step sdist_bztar
-
-=cut
-
-.sub '_sdist_bztar' :anon
-    .param pmc kv :slurpy :named
-    run_step('manifest', kv :flat :named)
-
-    $S0 = slurp('MANIFEST')
-    $P0 = split "\n", $S0
-    $S0 = pop $P0
-    $S0 = get_tarname('.tar.bz2', kv :flat :named)
-    $I0 = newer($S0, $P0)
-    if $I0 goto L1
-    $S0 = get_tarname('', kv :flat :named)
-    copy_sdist($S0, $P0)
-
-    .local string cmd
-    cmd = 'tar -cvf ' . $S0
-    cmd .= '.tar '
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'))
-
-    rmtree($S0)
-
-    cmd = 'bzip2 ' . $S0
-    cmd .= '.tar'
-    system(cmd, 1 :named('verbose'))
-  L1:
-.end
-
-.sub '_clean_bztar' :anon
-    .param pmc kv :slurpy :named
-
-    $S0 = get_tarname('.tar.bz2', kv :flat :named)
-    unlink($S0, 1 :named('verbose'))
-    unlink('MANIFEST', 1 :named('verbose'))
-.end
-
 =head3 Step sdist_zip
 
 =cut
@@ -3074,23 +3072,30 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     .param pmc kv :slurpy :named
     run_step('manifest', kv :flat :named)
 
+    load_bytecode 'Archive/Zip.pbc'
     $S0 = slurp('MANIFEST')
     $P0 = split "\n", $S0
     $S0 = pop $P0
-    $S0 = get_tarname('.zip', kv :flat :named)
-    $I0 = newer($S0, $P0)
+    .local string archive_file
+    archive_file = get_tarname('.zip', kv :flat :named)
+    $I0 = newer(archive_file, $P0)
     if $I0 goto L1
-    .local string cmd
+    .local pmc archive
+    archive = new ['Archive';'Zip']
+    .local string dirname
     $S0 = get_tarname('', kv :flat :named)
-    copy_sdist($S0, $P0)
-
-    cmd = 'zip -9 -r '
-    cmd .= $S0
-    cmd .= '.zip '
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'))
-
-    rmtree($S0)
+    dirname = $S0 . '/'
+    $P1 = iter $P0
+  L2:
+    unless $P1 goto L3
+    $S0 = shift $P1
+    $S1 = dirname . $S0
+    archive.'addFile'($S0, $S1)
+    goto L2
+  L3:
+    archive.'writeToFileNamed'(archive_file)
+    print "creat "
+    say archive_file
   L1:
 .end
 
@@ -3176,7 +3181,7 @@ the default value is ports/rpm
 
 =item installable_pbc, dynops, dynpmc
 
-=item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
+=item inst_bin, inst_data, inst_dynext, inst_inc, inst_lang, inst_lib
 
 =item setup
 
@@ -3419,7 +3424,7 @@ the default value is ports/debian
 
 =item installable_pbc, dynops, dynpmc
 
-=item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
+=item inst_bin, inst_data, inst_dynext, inst_inc, inst_lang, inst_lib
 
 =item setup
 
@@ -3758,7 +3763,8 @@ TEMPLATE
 .end
 
 .sub 'get_timestamp' :anon
-    $P0 = open 'date --rfc-2822', 'rp'
+    $P0 = new 'FileHandle'
+    $P0.'open'('date --rfc-2822', 'rp')
     $S0 = $P0.'readline'()
     $P0.'close'()
     $S0 = chopn $S0, 1
@@ -3909,7 +3915,7 @@ See L<http://www.jrsoftware.org/>.
 
 =item installable_pbc, dynops, dynpmc
 
-=item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
+=item inst_bin, inst_data, inst_dynext, inst_inc, inst_lang, inst_lib
 
 =item doc_files
 
@@ -3931,11 +3937,7 @@ See L<http://www.jrsoftware.org/>.
     unless $P1 goto L1
     bin = shift $P1
     pbc = $P0[bin]
-    $I0 = length pbc
-    $I0 -= 4
-    $S0 = substr pbc, 0, $I0
-    $S1 = 'installable_' . $S0
-    $S1 .= exe
+    $S1 = _mk_path_installable(pbc, exe)
     $S2 = bin . exe
     $I0 = newer($S2, $S1)
     if $I0 goto L2
@@ -4158,6 +4160,12 @@ TEMPLATE
     unlink($S0, 1 :named('verbose'))
 .end
 
+
+.sub '_no_zlib' :anon
+    .param pmc kv :slurpy :named
+    say "This step needs a parrot built with zlib"
+.end
+
 =head2 Configuration Helpers
 
 =over 4
@@ -4206,9 +4214,6 @@ Return the whole config
     flags .= " "
     $S0 = $P0['cc_hasjit']
     flags .= $S0
-    flags .= " "
-    $S0 = $P0['cg_flag']
-    flags .= $S0
     .return (flags)
 .end
 
@@ -4231,6 +4236,16 @@ Return the whole config
     $S0 .= '/compilers/'
   L2:
     $S0 .= name
+    .return ($S0)
+.end
+
+=item get_datadir
+
+=cut
+
+.sub 'get_datadir'
+    $P0 = get_config()
+    $S0 = $P0['datadir']
     .return ($S0)
 .end
 
@@ -4557,7 +4572,8 @@ Return the whole config
     system(cmd, verbose :named('verbose'), 1 :named('ignore_error'))
     unlink(srcname, verbose :named('verbose'))
 
-    $P0 = open exename, 'rp'
+    $P0 = new 'FileHandle'
+    $P0.'open'(exename, 'rp')
     $S0 = $P0.'readall'()
     $P0.'close'()
 
@@ -4594,660 +4610,34 @@ SOURCE_C
     .return ($I0)
 .end
 
-=back
-
-=head2 OS Utilities
-
-=over 4
-
-=item system
+=item runtests
 
 =cut
 
-.sub 'system'
-    .param string cmd
-    .param int verbose          :named('verbose') :optional
-    .param int has_verbose      :opt_flag
-    .param int ignore_error     :named('ignore_error') :optional
-    .param int has_ignore_error :opt_flag
-    unless has_verbose goto L1
-    unless verbose goto L1
-    say cmd
-  L1:
-    $I0 = spawnw cmd
+.sub 'runtests' :multi()
+    .param pmc files :slurpy
+    .param pmc opts :slurpy :named
+    load_bytecode 'TAP/Harness.pbc'
+    .local pmc harness
+    harness = new ['TAP';'Harness']
+    harness.'process_args'(opts)
+    .local pmc aggregate
+    aggregate = harness.'runtests'(files)
+    $I0 = aggregate.'has_errors'()
+    unless $I0 goto L1
+    $I0 = exists opts['ignore_error']
     unless $I0 goto L2
-    unless has_ignore_error goto L3
-    if ignore_error goto L2
-  L3:
-    $S0 = "exit status: "
-    $S1 = $I0
-    $S0 .= $S1
-    $S0 .= "\ncommand: "
-    $S0 .= cmd
-    $S0 .= "\n"
-    die $S0
-  L2:
-    .return ($I0)
-.end
-
-.include 'stat.pasm'
-
-.sub 'file_exists'
-    .param string filename
-    $I0 = stat filename, .STAT_EXISTS
-    .return ($I0)
-.end
-
-=item newer
-
-=cut
-
-.sub 'newer' :multi(string, pmc)
-    .param string target
-    .param pmc depends
-    $I0 = does depends, 'array'
+    $I0 = opts['ignore_error']
     if $I0 goto L1
-    $S0 = depends
-    .tailcall newer(target, $S0)
-  L1:
-    $I0 = stat target, .STAT_EXISTS
-    unless $I0 goto L2
-    $I0 = stat target, .STAT_FILESIZE
-    unless $I0 goto L2
-    goto L3
   L2:
-    .return (0)
-  L3:
-    $I0 = stat target, .STAT_MODIFYTIME
-    $P0 = iter depends
-  L4:
-    unless $P0 goto L5
-    $S0 = shift $P0
-    if $S0 == '' goto L4
-    $I1 = stat $S0, .STAT_MODIFYTIME
-    if $I1 < $I0 goto L4
-    .return (0)
-  L5:
-    .return (1)
-.end
-
-.sub 'newer' :multi(string, string)
-    .param string target
-    .param string depend
-    $I0 = stat target, .STAT_EXISTS
-    unless $I0 goto L1
-    $I0 = stat target, .STAT_FILESIZE
-    unless $I0 goto L1
-    goto L2
+    die "test fails"
   L1:
-    .return (0)
-  L2:
-    $I1 = stat target, .STAT_MODIFYTIME
-    $I2 = stat depend, .STAT_MODIFYTIME
-    $I0 = $I1 > $I2
-    .return ($I0)
 .end
 
-.sub 'newer' :multi(pmc, pmc)
-    .param pmc target
-    .param pmc depend
-    $S0 = target
-    .tailcall newer($S0, depend)
-.end
-
-=item mkpath
-
-=cut
-
-.sub 'mkpath'
-    .param string pathname
-    .param int verbose          :named('verbose') :optional
-    $I1 = 1
-  L1:
-    $I1 = index pathname, '/', $I1
-    if $I1 < 0 goto L2
-    $S0 = substr pathname, 0, $I1
-    inc $I1
-    $I0 = stat $S0, .STAT_EXISTS
-    if $I0 goto L1
-    mkdir($S0, verbose :named('verbose'))
-    goto L1
-  L2:
-    $I0 = stat pathname, .STAT_EXISTS
-    if $I0 goto L3
-    mkdir(pathname, verbose :named('verbose'))
-  L3:
-.end
-
-=item mkdir
-
-=cut
-
-.sub 'mkdir'
-    .param string dirname
-    .param int verbose          :named('verbose') :optional
-    .param int has_verbose      :opt_flag
-    unless has_verbose goto L1
-    unless verbose goto L1
-    print "mkdir "
-    say dirname
-  L1:
-    $P0 = new 'OS'
-    $I1 = 0o775
-    push_eh _handler
-    $P0.'mkdir'(dirname, $I1)
-    pop_eh
-    .return ()
-  _handler:
-    .local pmc e
-    .get_results (e)
-    $S0 = "Can't mkdir '"
-    $S0 .= dirname
-    $S0 .= "' ("
-    $S1 = err
-    $S0 .= $S1
-    $S0 .= ")\n"
-    e = $S0
-    rethrow e
-.end
-
-=item install
-
-=cut
-
-.sub 'install'
-    .param string src
-    .param string dst
-    .param int exe              :named('exe') :optional
-    .param int has_exe          :opt_flag
-    .param int verbose          :named('verbose') :optional
-    # mkpath
-    $I1 = 1
-  L1:
-    $I1 = index dst, '/', $I1
-    if $I1 < 0 goto L2
-    $S0 = substr dst, 0, $I1
-    inc $I1
-    $I0 = stat $S0, .STAT_EXISTS
-    if $I0 goto L1
-    mkdir($S0, verbose :named('verbose'))
-    goto L1
-  L2:
-    $I0 = newer(dst, src)
-    if $I0 goto L3
-    cp(src, dst, verbose :named('verbose'))
-    unless has_exe goto L3
-    unless exe goto L3
-    $P0 = getinterp
-    $P0 = $P0[.IGLOBALS_CONFIG_HASH]
-    $I0 = $P0['cygwin']
-    if $I0 goto L4
-    $I0 = $P0['hpux']
-    if $I0 goto L4
-    goto L3
-  L4:
-    chmod(dst, 0o755, verbose :named('verbose'))
-  L3:
-.end
-
-=item cp
-
-=cut
-
-.sub 'cp'
-    .param string src
-    .param string dst
-    .param int verbose          :named('verbose') :optional
-    .param int has_verbose      :opt_flag
-    unless has_verbose goto L1
-    unless verbose goto L1
-    print "cp "
-    print src
-    print " "
-    say dst
-  L1:
-    $P0 = new 'FileHandle'
-    push_eh _handler1
-    $S0 = $P0.'readall'(src)
-    pop_eh
-    push_eh _handler2
-    $P0.'open'(dst, 'w')
-    pop_eh
-    $P0.'puts'($S0)
-    $P0.'close'()
-    .return ()
-  _handler1:
-    .local pmc e
-    .get_results (e)
-    $S0 = "Can't open '"
-    $S0 .= src
-    $S0 .= "' ("
-    $S1 = err
-    $S0 .= $S1
-    $S0 .= ")\n"
-    e = $S0
-    rethrow e
-  _handler2:
-    .local pmc e
-    .get_results (e)
-    $S0 = "Can't open '"
-    $S0 .= dst
-    $S0 .= "' ("
-    $S1 = err
-    $S0 .= $S1
-    $S0 .= ")\n"
-    e = $S0
-    rethrow e
-.end
-
-=item chmod
-
-=cut
-
-.sub 'chmod'
-    .param string filename
-    .param int mode
-    .param int verbose          :named('verbose') :optional
-    # see TT #1322
-    $P0 = get_config()
-    .local string cmd
-    cmd = $P0['perl']
-    cmd .= " -MExtUtils::Command -e ExtUtils::Command::chmod "
-    $P1 = new 'FixedIntegerArray'
-    set $P1, 1
-    $P1[0] = mode
-    $S0 = sprintf '0%o', $P1
-    cmd .= $S0
-    cmd .= " "
-    cmd .= filename
-    system(cmd, verbose :named('verbose'))
-.end
-
-=item unlink
-
-=cut
-
-.sub 'unlink' :multi(string)
-    .param string filename
-    .param int verbose          :named('verbose') :optional
-    .param int has_verbose      :opt_flag
-    $I0 = stat filename, .STAT_EXISTS
-    unless $I0 goto L1
-    $I0 = stat filename, .STAT_ISREG
-    unless $I0 goto L1
-    unless has_verbose goto L2
-    unless verbose goto L2
-    print "unlink "
-    say filename
-  L2:
-    new $P0, 'OS'
-    push_eh _handler
-    $P0.'rm'(filename)
-    pop_eh
-  L1:
-    .return ()
-  _handler:
-    .local pmc e
-    .get_results (e)
-    $S0 = "Can't remove '"
-    $S0 .= filename
-    $S0 .= "' ("
-    $S1 = err
-    $S0 .= $S1
-    $S0 .= ")\n"
-    e = $S0
-    rethrow e
-.end
-
-.sub 'unlink' :multi(pmc)
-    .param pmc list
-    .param int verbose          :named('verbose') :optional
-    $I0 = does list, 'array'
-    if $I0 goto L1
-    $S0 = list
-    unlink($S0, verbose :named('verbose'))
-    goto L2
-  L1:
-    $P0 = iter list
-  L3:
-    unless $P0 goto L2
-    $S0 = shift $P0
-    unlink($S0, verbose :named('verbose'))
-    goto L3
-  L2:
-.end
-
-=item rmtree
-
-=cut
-
-.sub 'rmtree'
-    .param string path
-    .param int verbose          :named('verbose') :optional
-    .param int has_verbose      :opt_flag
-    $I0 = stat path, .STAT_EXISTS
-    unless $I0 goto L1
-    $I0 = stat path, .STAT_ISDIR
-    unless $I0 goto L1
-    unless has_verbose goto L2
-    unless verbose goto L2
-    print "rmtree "
-    say path
-  L2:
-    new $P0, 'OS'
-    $P1 = $P0.'readdir'(path)
-    push_eh _handler
-  L3:
-    unless $P1 goto L4
-    $S0 = shift $P1
-    if $S0 == '.' goto L3
-    if $S0 == '..' goto L3
-    $S1 = path . '/'
-    $S1 .= $S0
-    $I0 = stat $S1, .STAT_ISDIR
-    unless $I0 goto L5
-    rmtree($S1)
-    goto L3
-  L5:
-    $P0.'rm'($S1)
-    goto L3
-  L4:
-    push_eh _handler
-    $S1 = path
-    $P0.'rm'($S1)
-    pop_eh
-  L1:
-    .return ()
-  _handler:
-    .local pmc e
-    .get_results (e)
-    $S0 = "Can't remove '"
-    $S0 .= $S1
-    $S0 .= "' ("
-    $S1 = err
-    $S0 .= $S1
-    $S0 .= ")\n"
-    e = $S0
-    rethrow e
-.end
-
-=item basename
-
-=cut
-
-.sub 'basename'
-    .param string path
-    $I0 = 0
-  L1:
-    $I1 = index path, '/', $I0
-    if $I1 < 0 goto L2
-    $I0 = $I1 + 1
-    goto L1
-  L2:
-    $S0 = substr path, $I0
-    .return ($S0)
-.end
-
-=item dirname
-
-=cut
-
-.sub 'dirname'
-    .param string path
-    unless path goto L3
-    $I0 = 0
-  L1:
-    $I1 = index path, '/', $I0
-    if $I1 < 0 goto L2
-    $I0 = $I1 + 1
-    goto L1
-  L2:
-    dec $I0
-    unless $I0 > 0 goto L3
-    $S0 = substr path, 0, $I0
-    .return ($S0)
-  L3:
-    .return ('.')
-.end
-
-=item cwd
-
-=cut
-
-.sub 'cwd'
-    new $P0, 'OS'
-    $S0 = $P0.'cwd'()
-    $P0 = split "\\", $S0
-    $S0 = join "/", $P0
-    .return ($S0)
-.end
-
-=item chdir
-
-=cut
-
-.sub 'chdir'
-    .param string dirname
-    .param int verbose          :named('verbose') :optional
-    .param int has_verbose      :opt_flag
-    unless has_verbose goto L1
-    unless verbose goto L1
-    print "cd "
-    say dirname
-  L1:
-    new $P0, 'OS'
-    push_eh _handler
-    $P0.'chdir'(dirname)
-    pop_eh
-    .return ()
-  _handler:
-    .local pmc e
-    .get_results (e)
-    $S0 = "Can't chdir '"
-    $S0 .= dirname
-    $S0 .= "' ("
-    $S1 = err
-    $S0 .= $S1
-    $S0 .= ")\n"
-    e = $S0
-    rethrow e
-.end
-
-=item chomp
-
-=cut
-
-.include 'cclass.pasm'
-
-.sub 'chomp'
-    .param string str
-    $I0 = index str, "\r"
-    if $I0 < 0 goto L1
-    str = substr str, 0, $I0
-  L1:
-    $I1 = index str, "\n"
-    if $I1 < 0 goto L2
-    str = substr str, 0, $I1
-  L2:
-    .return (str)
-.end
-
-=item glob
-
-=cut
-
-.sub 'glob'
-    .param string patterns
-    $P0 = new 'ResizableStringArray'
-    $P1 = split ' ', patterns
-  L1:
-    unless $P1 goto L2
-    .local string pattern
-    pattern = shift $P1
-    $I0 = index pattern, '*'
-    unless $I0 < 0 goto L3
-    $I0 = index pattern, '?'
-    unless $I0 < 0 goto L3
-    $I0 = index pattern, '['
-    unless $I0 < 0 goto L3
-    $I0 = stat pattern, .STAT_EXISTS
-    unless $I0 goto L1
-    push $P0, pattern
-    goto L1
-  L3:
-    .local pmc matcher
-    load_bytecode 'PGE/Glob.pbc'
-    $P2 = compreg 'PGE::Glob'
-    matcher = $P2.'compile'(pattern)
-    $S0 = dirname(pattern)
-    $P3 = glob($S0)
-    $P4 = new 'OS'
-  L4:
-    unless $P3 goto L1
-    .local string dir
-    dir = shift $P3
-    $I0 = stat dir, .STAT_ISDIR
-    unless $I0 goto L4
-    $S0 = basename(dir)
-    $P5 = $P4.'readdir'(dir)
-  L5:
-    unless $P5 goto L4
-    $S0 = shift $P5
-    if $S0 == '.' goto L5
-    if $S0 == '..' goto L5
-    if dir == '.' goto L6
-    $S1 = dir . '/'
-    $S0 = $S1 . $S0
-  L6:
-    $P6 = matcher($S0)
-    unless $P6 goto L5
-    push $P0, $S0
-    goto L5
-  L2:
-    .return ($P0)
-.end
-
-=item getenv
-
-=cut
-
-.sub 'getenv'
-    .param string name
-    new $P0, 'Env'
-    $S0 = $P0[name]
-    .return ($S0)
-.end
-
-=item setenv
-
-=cut
-
-.sub 'setenv'
-    .param string name
-    .param string value
-    .param int verbose          :named('verbose') :optional
-    .param int has_verbose      :opt_flag
-    unless has_verbose goto L1
-    unless verbose goto L1
-    print "setenv "
-    print name
-    print " = "
-    say value
-  L1:
-    new $P0, 'Env'
-    $P0[name] = value
-.end
-
-=item slurp
-
-=cut
-
-.sub 'slurp'
-    .param string filename
-    $P0 = new 'FileHandle'
-    push_eh _handler
-    $S0 = $P0.'readall'(filename)
-    pop_eh
-    .return ($S0)
-  _handler:
-    .local pmc e
-    .get_results (e)
-    $S0 = "Can't open '"
-    $S0 .= filename
-    $S0 .= "' ("
-    $S1 = err
-    $S0 .= $S1
-    $S0 .= ")\n"
-    e = $S0
-    rethrow e
-.end
-
-=item spew
-
-=cut
-
-.sub 'spew'
-    .param string filename
-    .param string content
-    .param int verbose          :named('verbose') :optional
-    .param int has_verbose      :opt_flag
-    unless has_verbose goto L1
-    unless verbose goto L1
-    print "creat "
-    say filename
-  L1:
-    $P0 = new 'FileHandle'
-    push_eh _handler
-    $P0.'open'(filename, 'w')
-    pop_eh
-    $P0.'puts'(content)
-    $P0.'close'()
-    .return ()
-  _handler:
-    .local pmc e
-    .get_results (e)
-    $S0 = "Can't open '"
-    $S0 .= filename
-    $S0 .= "' ("
-    $S1 = err
-    $S0 .= $S1
-    $S0 .= ")\n"
-    e = $S0
-    rethrow e
-.end
-
-=item append
-
-=cut
-
-.sub 'append'
-    .param string filename
-    .param string content
-    .param int verbose          :named('verbose') :optional
-    .param int has_verbose      :opt_flag
-    unless has_verbose goto L1
-    unless verbose goto L1
-    print "append "
-    say filename
-  L1:
-    $P0 = new 'FileHandle'
-    push_eh _handler
-    $P0.'open'(filename, 'a')
-    pop_eh
-    $P0.'puts'(content)
-    $P0.'close'()
-    .return ()
-  _handler:
-    .local pmc e
-    .get_results (e)
-    $S0 = "Can't open '"
-    $S0 .= filename
-    $S0 .= "' ("
-    $S1 = err
-    $S0 .= $S1
-    $S0 .= ")\n"
-    e = $S0
-    rethrow e
+.sub 'runtests' :multi(ResizableStringArray,Hash)
+    .param pmc array
+    .param pmc hash
+    .tailcall runtests(array :flat, hash :flat :named)
 .end
 
 =back

@@ -1,5 +1,4 @@
 /* enums.h
- * $Id$
  *  Copyright (C) 2001-2008, Parrot Foundation.
  *  Overview:
  *     enums shared by much of the stack-handling code
@@ -89,5 +88,5 @@ typedef enum {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

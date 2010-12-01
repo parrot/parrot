@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -33,7 +32,7 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 =cut
 
-my $keywords = join '|' => sort { length $a cmp length $b } qw/
+my $keywords = join '|' => sort { length $a <=> length $b } qw/
     auto      double    int       struct    INTVAL
     break     else      long      switch    UINTVAL
     case      enum      register  typedef   FLOATVAL

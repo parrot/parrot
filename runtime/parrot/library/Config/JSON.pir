@@ -1,5 +1,4 @@
 # Copyright (C) 2007-2009, Parrot Foundation.
-# $Id$
 
 =head1 Config::JSON
 
@@ -25,7 +24,8 @@ If the data is not valid, an exception will be thrown.
     .local string text
     .local pmc fh
 
-    fh = open filename, 'r'
+    fh = new ['FileHandle']
+    fh.'open'(filename, 'r')
     if fh goto slurp_file
     $P0 = new 'Exception'
     $S0 = concat "Can't open file: ", filename
@@ -36,11 +36,10 @@ If the data is not valid, an exception will be thrown.
     text = fh.'readall'()
 
     # Convert the text to an object and return it.
-    .local pmc json, code, config
-    load_language  'data_json'
+    .local pmc json, code
+    load_language 'data_json'
     json = compreg 'data_json'
     code = json.'compile'(text)
-
     .tailcall code()
 .end
 
@@ -71,15 +70,16 @@ the rendered JSON will not be formatted. The default is false.
     expanded = not compact
 
     # render the object as a string.
-    load_bytecode 'JSON.pir'
+    load_bytecode 'JSON.pbc'
     .local string output
     output = _json( config, expanded )
 
     # write out the file..
-    $P1 = open filename, 'w'
+    $P1 = new ['FileHandle']
+    $P1.'open'(filename, 'w')
     print $P1, output
     print $P1, "\n"
-    close $P1
+    $P1.'close'()
 
 .end
 

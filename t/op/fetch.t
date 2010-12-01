@@ -1,6 +1,5 @@
-#!parrot
+#!./parrot
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -28,7 +27,6 @@ Tests Parrot's experimental fetch opcode.
 .end
 
 .sub 'test_fetch_keyed_int'
-    diag( 'test_fetch_keyed_int' )
     $P0    = new [ 'Hash' ]
     $P1    = box 111
     $P0[1] = $P1
@@ -48,7 +46,6 @@ Tests Parrot's experimental fetch opcode.
 .end
 
 .sub 'test_fetch_keyed_str'
-    diag( 'test_fetch_keyed_str' )
     $P0          = new [ 'Hash' ]
     $P1          = box 111
     $P0['one']   = $P1
@@ -68,7 +65,6 @@ Tests Parrot's experimental fetch opcode.
 .end
 
 .sub 'test_fetch_keyed_pmc'
-    diag( 'test_fetch_keyed_pmc' )
     $P0          = new [ 'Hash' ]
     $P1          = box 111
 

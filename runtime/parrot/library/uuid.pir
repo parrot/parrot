@@ -1,5 +1,4 @@
 # Copyright (C) 2008-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -289,7 +288,7 @@ CURRENTLY, UNUSABLE. NEED A SOURCE OF ENTROPY.
 .sub 'hex' :anon
     .param string in
     .const string xdigits = '0123456789ABCDEF'
-    upcase in
+    in  = upcase in
     $S1 = substr in, 0, 1
     $I1 = index xdigits, $S1
     $I1 *= 16

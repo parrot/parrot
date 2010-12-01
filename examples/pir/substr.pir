@@ -1,5 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -31,7 +30,7 @@ WAX:    $S2 = substr $S1, $I3, $I4
 WANE:   $I1 = length $S1
         print  $S1
         print  "\n"
-        chopn  $S1, 1
+        $S1 = chopn $S1, 1
         unless $I1 == $I3 goto WANE
 DONE:
 .end

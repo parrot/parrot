@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -16,27 +15,30 @@ Tests features related to the creation, addition, and execution of OO methods.
 
 =cut
 
+.const string library_file = "method_library.pir"
+
 .sub main :main
     .include 'test_more.pir'
 
     create_library()
 
-    plan(5)
+    plan(6)
 
     loading_methods_from_file()
     loading_methods_from_eval()
     overridden_find_method()
 
-    delete_library()
+    overridden_core_pmc()
+
+    try_delete_library()
 
 .end
 
 .sub create_library
     .local pmc file
-    .local string filename
 
-    filename = "method_library.pir"
-    file = open filename, 'w'
+    file = new ['FileHandle']
+    file.'open'(library_file, 'w')
 
     $S0 = <<'END'
     .namespace['Foo']
@@ -46,15 +48,22 @@ Tests features related to the creation, addition, and execution of OO methods.
 END
 
     print file, $S0
-    close file
+    file.'close'()
 
 .end
 
-.sub delete_library
+.sub try_delete_library
     .local pmc os
+    $P0 = loadlib 'os'
+    unless $P0 goto no_os
     os = new 'OS'
-    $S0 = "method_library.pir"
-    os.'rm'($S0)
+    os.'rm'(library_file)
+    .return ()
+
+  no_os:
+    $S1 = concat "WARNING: could not delete test file `", library_file
+    $S1 = concat $S1, "' because the OS PMC is unavailable"
+    diag($S1)
 .end
 
 .sub loading_methods_from_file
@@ -63,7 +72,7 @@ END
     $I0 = $P1.'foo_method'()
     ok ($I0, 'calling foo_method')
 
-    load_bytecode 'method_library.pir'
+    load_bytecode library_file
     $P1 = new 'Foo'
     $I0 = $P1.'bar_method'()
     ok ($I0, 'calling bar_method')
@@ -125,6 +134,20 @@ END
 .end
 
 .namespace []
+
+.sub 'overridden_core_pmc'
+    .local string msg
+    msg = "able to invoke overridden method on core PMC (TT #1596)"
+    $P0 = new 'ResizablePMCArray'
+    $I0 = $P0.'foo'()
+    is($I0, 1, msg)
+    .return()
+.end
+
+.namespace ['ResizablePMCArray']
+.sub 'foo' :method
+    .return(1)
+.end
 
 # Local Variables:
 #   mode: pir

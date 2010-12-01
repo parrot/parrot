@@ -1,6 +1,5 @@
 /*
- * $Id$
- * Copyright (C) 2004-2009, Parrot Foundation.
+ * Copyright (C) 2004-2010, Parrot Foundation.
  */
 
 /*
@@ -11,7 +10,7 @@ config/gen/platform/generic/exec.c
 
 =head1 DESCRIPTION
 
-system() stuff
+Parrot functions to run operating system commands.
 
 =head2 Functions
 
@@ -28,8 +27,8 @@ system() stuff
 
 =item C<INTVAL Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)>
 
-Spawn off a subprocess and wait for the damn thing to complete,
-returning the return value of the process
+Spawn off a subprocess provided in a string.  Wait for it to complete,
+returning the return value of the process.
 
 =cut
 
@@ -55,7 +54,7 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
     else {
         /* child */
         char * const cmd    = Parrot_str_to_cstring(interp, command);
-        int          status = execlp("sh", "sh", "-c", cmd, (void *)NULL);
+        const int    status = execlp("sh", "sh", "-c", cmd, (void *)NULL);
 
         /* if we get here, something's horribly wrong, but free anyway... */
         Parrot_str_free_cstring(cmd);
@@ -71,6 +70,9 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
 /*
 
 =item C<INTVAL Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)>
+
+Spawn off a subprocess provided in command-line arguments.  Wait for it to
+complete, returning the return value of the process.
 
 =cut
 
@@ -125,8 +127,16 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
 }
 
 /*
+
+=back
+
+=cut
+
+*/
+
+/*
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -69,7 +68,7 @@ test flags on PIR subs
     isa_ok($P30, 'Sub', ":method sub found w/.const")
     $P0 = get_global 'method1'
     $I0 = isnull $P0
-    todo($I0, ":method sub not found in namespace")
+    ok($I0, ":method sub not found in namespace")
 
     ## :subid subs
     .const 'Sub' $P40 = 'subid1'
@@ -97,7 +96,7 @@ test flags on PIR subs
     ## unicode nsentry
     .const 'Sub' $P60 = 'subid3'
     isa_ok($P60, 'Sub', 'subid3 found w/.const')
-    $P0 = get_global unicode:"nsentry\u2462"
+    $P0 = get_global utf8:"nsentry\u2462"
     $I0 = issame $P60, $P0
     ok($I0, "nsentry3 found in namespace")
 
@@ -176,7 +175,7 @@ test flags on PIR subs
 .end
 
 
-.sub 'anon3' :nsentry(unicode:"nsentry\u2462") :subid('subid3')
+.sub 'anon3' :nsentry(utf8:"nsentry\u2462") :subid('subid3')
     .return ('anon3')
 .end
 

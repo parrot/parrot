@@ -1,7 +1,5 @@
 /* compiler.h
- *  Copyright (C) 2007-2008, Parrot Foundation.
- *  SVN Info
- *     $Id$
+ *  Copyright (C) 2007-2010, Parrot Foundation.
  *  Overview:
  *     defines compiler capabilities
  */
@@ -25,7 +23,7 @@
 #  endif
 #endif
 #ifdef HASATTRIBUTE_FORMAT
-#  define __attribute__format__(x, y, z)    __attribute__((__format__((x), (y), (z))))
+#  define __attribute__format__(x, y, z)    __attribute__((format((x), (y), (z))))
 #endif
 #ifdef HASATTRIBUTE_MALLOC
 #  define __attribute__malloc__             __attribute__((__malloc__))
@@ -59,6 +57,12 @@
 #ifdef HASATTRIBUTE_WARN_UNUSED_RESULT
 #  define __attribute__warn_unused_result__ __attribute__((__warn_unused_result__))
 #endif
+#ifdef HASATTRIBUTE_HOT
+#  define __attribute__hot__                __attribute__((__hot__))
+#endif
+#ifdef HASATTRIBUTE_COLD
+#  define __attribute__cold__               __attribute__((__cold__))
+#endif
 
 /* If we haven't defined the attributes yet, define them to blank. */
 #ifndef __attribute__deprecated__
@@ -87,6 +91,12 @@
 #endif
 #ifndef __attribute__warn_unused_result__
 #  define __attribute__warn_unused_result__
+#endif
+#ifndef __attribute__hot__
+#  define __attribute__hot__
+#endif
+#ifndef __attribute__cold__
+#  define __attribute__cold__
 #endif
 
 
@@ -124,15 +134,43 @@
 #define PARROT_IGNORABLE_RESULT
 #define PARROT_WARN_UNUSED_RESULT   __attribute__warn_unused_result__
 
+#define PARROT_PURE_FUNCTION        __attribute__pure__  __attribute__warn_unused_result__
 /* Pure functions have no side-effects, and depend only on parms or globals. e.g. strlen() */
-#define PARROT_PURE_FUNCTION                __attribute__pure__  __attribute__warn_unused_result__
+/* "Many functions have no effects except the return value and their
+    return value depends only on the parameters and/or global
+    variables. Such a function can be subject to common subexpression
+    elimination and loop optimization just as an arithmetic operator
+    would be. For example, "PARROT_PURE_FUNCTION int square(int x)"
+    says that the hypothetical function square is safe to call fewer
+    times than the program says.
 
-/* Const functions are pure functions, and do not examine targets of pointers. e.g. sqrt() */
-#define PARROT_CONST_FUNCTION               __attribute__const__ __attribute__warn_unused_result__
+    Some of common examples of pure functions are strlen or
+    memcmp. Interesting non-pure functions are functions with infinite
+    loops or those depending on volatile memory or other system resource,
+    that may change between two consecutive calls (such as feof in a
+    multithreading environment)." -- http://gcc.gnu.org/onlinedocs/gcc/Function-Attributes.html
+*/
+
+#define PARROT_CONST_FUNCTION       __attribute__const__ __attribute__warn_unused_result__
+/* Const functions are pure functions, and also do not examine targets of pointer args or globals. e.g. sqrt() */
+/* "Many functions do not examine any values except their arguments,
+    and have no effects except the return value. Basically this is just
+    slightly more strict class than the pure attribute below, since
+    function is not allowed to read global memory. Note that a function
+    that has pointer arguments and examines the data pointed to must
+    not be declared const. Likewise, a function that calls a non-const
+    function usually must not be const. It does not make sense for a
+    const function to return void."
+        -- http://gcc.gnu.org/onlinedocs/gcc/Function-Attributes.html
+*/
 
 #define PARROT_DOES_NOT_RETURN              /*@noreturn@*/ __attribute__noreturn__
 #define PARROT_DOES_NOT_RETURN_WHEN_FALSE   /*@noreturnwhenfalse@*/
 #define PARROT_MALLOC                       /*@only@*/ __attribute__malloc__ __attribute__warn_unused_result__
+
+/* Hot functions can be optimized by the compiler. */
+#define PARROT_HOT                          __attribute__hot__
+#define PARROT_COLD                         __attribute__cold__
 
 /* Macros for exposure tracking for splint. */
 /* See http://www.splint.org/manual/html/all.html section 6.2 */
@@ -200,6 +238,7 @@
     /* may not pass in a reference to a shared object.  There is nothing */
     /* special about malloc and free --  their behavior can be described */
     /* entirely in terms of the provided annotations. */
+#define ARGFREE_NOTNULL(x)                  /*@only@*/ /*@out@*/ /*@notnull@*/ x
 
 #endif /* PARROT_COMPILER_H_GUARD */
 
@@ -207,5 +246,5 @@
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

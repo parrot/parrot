@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2009, Parrot Foundation.
-# $Id$
 
 package init::hints::darwin;
 
@@ -25,7 +24,6 @@ sub runstep {
 
     my $share_ext = $conf->option_or_data('share_ext');
     my $version   = $conf->option_or_data('VERSION');
-    my $verbose = $conf->options->get('verbose');
 
     # The hash referenced by $flagsref is the list of options that have -arch
     # flags added to them implicitly through config/init/defaults.pm when
@@ -35,7 +33,7 @@ sub runstep {
     # friends.  So, it's time to remove all -arch flags set in $conf->data and
     # force a single, native architecture to being the default build.
 
-    my $flagsref = _strip_arch_flags($conf, $verbose);
+    my $flagsref = _strip_arch_flags($conf);
 
     # And now, after possibly losing a few undesired compiler and linker
     # flags, on to the main Darwin config.
@@ -63,9 +61,13 @@ sub runstep {
         $flagsref->{$flag} =~ s/^\s+//;
     }
 
+    my $osvers = `/usr/sbin/sysctl -n kern.osrelease`;
+    chomp $osvers;
+
     $conf->data->set(
         darwin              => 1,
         osx_version         => $ENV{'MACOSX_DEPLOYMENT_TARGET'},
+        osvers              => $osvers,
         ccflags             => $flagsref->{ccflags},
         ldflags             => $flagsref->{ldflags},
         ccwarn              => "-Wno-shadow",
@@ -90,8 +92,7 @@ sub runstep {
         rpath                  => "-L",
         libparrot_soname       => "-install_name "
             . $lib_dir
-            . $conf->data->get('slash')
-            . "libparrot"
+            . '/libparrot'
             . $conf->data->get('share_ext')
     );
 }
@@ -99,11 +100,11 @@ sub runstep {
 #################### INTERNAL SUBROUTINES ####################
 
 sub _precheck {
-    my ($flag, $stored, $verbose) = @_;
-    if ($verbose) {
-        print "Checking $flag...\n";
-        print "Pre-check: " . ($stored || '(nil)') . "\n";
-    }
+    my ($conf, $flag, $stored) = @_;
+    $conf->debug(
+        "Checking $flag...\n",
+        "Pre-check: " . ($stored || '(nil)') . "\n",
+    );
 }
 
 sub _strip_arch_flags_engine {
@@ -117,27 +118,26 @@ sub _strip_arch_flags_engine {
 }
 
 sub _postcheck {
-    my ($flagsref, $flag, $verbose) = @_;
-    if ($verbose) {
-        print "Post-check: ", ( $flagsref->{$flag} or '(nil)' ), "\n";
-    }
+    my ($conf, $flagsref, $flag) = @_;
+    my $f = $flagsref->{$flag} || '(nil)';
+    $conf->debug("Post-check: $f\n");
 }
 
 sub _strip_arch_flags {
-    my ($conf, $verbose) = @_;
+    my ($conf) = @_;
     my $flagsref  = { map { $_ => '' } @{ $defaults{problem_flags} } };
 
-    print "\nStripping -arch flags due to Apple multi-architecture build problems:\n" if $verbose;
+    $conf->debug("\nStripping -arch flags due to Apple multi-architecture build problems:\n");
     for my $flag ( keys %{ $flagsref } ) {
         my $stored = $conf->data->get($flag) || '';
 
-        _precheck($flag, $stored, $verbose);
+        _precheck($conf, $flag, $stored);
 
         $flagsref = _strip_arch_flags_engine(
             $defaults{architectures}, $stored, $flagsref, $flag
         );
 
-        _postcheck($flagsref, $flag, $verbose);
+        _postcheck($conf, $flagsref, $flag);
     }
     return $flagsref;
 }
@@ -168,12 +168,11 @@ sub _set_deployment_environment {
 
 sub _probe_for_fink {
     my $conf = shift;
-    my $verbose = $conf->options->get( 'verbose' );
     # Per fink(8), this is location for Fink configuration file, presumably
     # regardless of where Fink itself is installed.
     my $fink_conf    = $defaults{fink_conf};
     unless (-f $fink_conf) {
-        print "Fink configuration file not located\n" if $verbose;
+        $conf->debug("Fink configuration file not located\n");
         return;
     }
     my $fink_conf_str = Parrot::BuildUtil::slurp_file($fink_conf);
@@ -186,8 +185,7 @@ sub _probe_for_fink {
         last;
     }
     unless (defined $fink_base_dir) {
-        print "Fink configuration file defective:  no 'Basepath'\n"
-            if $verbose;
+        $conf->debug("Fink configuration file defective:  no 'Basepath'\n");
         return;
     }
     my $fink_lib_dir = qq{$fink_base_dir/lib};
@@ -197,8 +195,7 @@ sub _probe_for_fink {
         push @unlocateables, $dir unless (-d $dir);
     }
     if (@unlocateables) {
-        print "Could not locate Fink directories:  @unlocateables\n"
-            if $verbose;
+        $conf->debug("Could not locate Fink directories:  @unlocateables\n");
         return;
     }
     else {
@@ -213,7 +210,6 @@ sub _probe_for_fink {
 
 sub _probe_for_macports {
     my $conf = shift;
-    my $verbose = $conf->options->get( 'verbose' );
     my $ports_base_dir = $defaults{ports_base_dir};
     my $ports_lib_dir = qq{$ports_base_dir/lib};
     my $ports_include_dir = qq{$ports_base_dir/include};
@@ -222,8 +218,7 @@ sub _probe_for_macports {
         push @unlocateables, $dir unless (-d $dir);
     }
     if (@unlocateables) {
-        print "Could not locate Macports directories:  @unlocateables\n"
-            if $verbose;
+        $conf->debug("Could not locate Macports directories:  @unlocateables\n");
         return;
     }
     else {
@@ -240,7 +235,6 @@ sub _probe_for_libraries {
     my ($conf, $flagsref, $library) = @_;
     my $no_library_option = "darwin_no_$library";
     my $title = ucfirst(lc($library));
-    my $verbose = $conf->options->get( 'verbose' );
     unless ($conf->options->get( $no_library_option ) ) {
         my $addl_flags_ref;
         if ($library eq 'fink') {
@@ -249,14 +243,14 @@ sub _probe_for_libraries {
         if ($library eq 'macports') {
             $addl_flags_ref = _probe_for_macports($conf);
         }
-        my $rv = _add_to_flags( $addl_flags_ref, $flagsref, $title, $verbose );
+        my $rv = _add_to_flags( $conf, $addl_flags_ref, $flagsref, $title );
         return $rv;
     }
     return;
 }
 
 sub _add_to_flags {
-    my ( $addl_flags_ref, $flagsref, $title, $verbose ) = @_;
+    my ( $conf, $addl_flags_ref, $flagsref, $title ) = @_;
     if ( defined $addl_flags_ref ) {
         foreach my $addl ( keys %{ $addl_flags_ref } ) {
             my %seen;
@@ -267,10 +261,10 @@ sub _add_to_flags {
             $flagsref->{$addl} .= " $addl_flags_ref->{$addl}"
                 unless $seen{ $addl_flags_ref->{$addl} };
         }
-        print "Probe for $title successful\n" if $verbose;
+        $conf->debug("Probe for $title successful\n");
     }
     else {
-        print "Probe for $title unsuccessful\n" if $verbose;
+        $conf->debug("Probe for $title unsuccessful\n");
     }
     return 1;
 }

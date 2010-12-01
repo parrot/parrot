@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2008, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -27,23 +26,19 @@ Some ideas from AT&T SFIO.
 
 #define PARROT_IN_IO 1
 #define PARROT_ASYNC_DEVEL 0
-#define PARROT_NET_DEVEL 1
 
 #include <parrot/io.h>
 
-#if PARROT_NET_DEVEL
 /* XXX: Parrot config is currently not probing for all headers so
  * I'm sticking here rather than parrot.h
  */
-#  ifdef UNIX
-#    include <sys/socket.h>
-#  endif
+#ifdef UNIX
+#  include <sys/socket.h>
+#endif
 
-#  ifdef WIN32
-#    include <winsock.h>
-#  endif
-
-#endif /* PARROT_NET_DEVEL */
+#ifdef WIN32
+#  include <winsock.h>
+#endif
 
 /* IO object flags */
 #define PIO_F_READ      00000001
@@ -113,5 +108,5 @@ F<src/io/io_win32.c>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -36,7 +36,8 @@ in the C<pmclass> declaration.
  F<docs/pdds/pdd21_namespaces.pod>.
 
  Exporter is not derived from any other PMC, and does not provide any
- standard interface--its interface consists solely of non-vtable methods.
+ standard interface--its interface consists solely of methods, not
+ vtable functions.
 
 The B<DESCRIPTION> section is further broken down as follows:
 

@@ -30,12 +30,12 @@ different pattern to create a subroutine:
   sub <function_name> { <function_body> }
 
 A grammar is a collection of rules like the ones above that specify all the
-acceptable patterns in a language. Grammars group together these rules in
-much the same way that a groups together related data fields and methods
-N<In languages like Perl 6 for instance, a grammar is just a special kind
-of class and a rule is just a special kind of method.>. Each rule defines
-a pattern for matching one unit of text, and can be made up of various other
-rules which are called recursively to make a complete match.
+acceptable patterns in a language. Grammars group together these rules in much
+the same way that a class groups together related data fields and methods N<In
+languages like Perl 6 for instance, a grammar is just a special kind of class
+and a rule is just a special kind of method.>. Each rule defines a pattern for
+matching one unit of text, and can be made up of various other rules which are
+called recursively to make a complete match.
 
 A rule can contain regular expressions to match patterns of characters:
 

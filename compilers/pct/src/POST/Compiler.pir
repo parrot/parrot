@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -33,6 +32,54 @@ PIR or an Eval PMC (bytecode).
 .end
 
 
+=item C<escape(string str)>
+
+Returns an escaped value of C<str> suitable for including in PIR.
+If the string contains any non-ASCII characters, then it's
+prefixed with 'unicode:'.  (This method just delegates to
+PAST::Compiler.escape, which does the same thing.)
+
+=cut
+
+.sub 'escape' :method
+    .param string str
+    $P0 = get_hll_global ['PAST'], 'Compiler'
+    .tailcall $P0.'escape'(str)
+.end
+
+=item C<key_pir( string name1 [, string name2, ...] )>
+
+Constructs a PIR key using the strings passed as arguments.
+For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
+
+=cut
+
+.sub 'key_pir' :method
+    .param pmc args            :slurpy
+    .local string out, sep
+    out = '['
+    sep = ''
+  args_loop:
+    unless args goto args_done
+    $P0 = shift args
+    if null $P0 goto args_loop
+    $I0 = does $P0, 'array'
+    if $I0 goto args_array
+  args_string:
+    $S0 = self.'escape'($P0)
+    concat out, sep
+    concat out, $S0
+    sep = ';'
+    goto args_loop
+  args_array:
+    splice args, $P0, 0, 0
+    goto args_loop
+  args_done:
+    concat out, ']'
+    .return (out)
+.end
+
+
 .sub 'to_pir' :method
     .param pmc post
     .param pmc adverbs         :slurpy :named
@@ -41,7 +88,7 @@ PIR or an Eval PMC (bytecode).
     newself = new ['POST';'Compiler']
 
     .local pmc innerpir, line
-    innerpir = new 'CodeString'
+    innerpir = new 'StringBuilder'
     .lex '$CODE', innerpir
     line = box 0
     .lex '$LINE', line
@@ -82,9 +129,8 @@ Return generated PIR for C<node> and all of its children.
     pos = cpost['pos']
     if null pos goto done_subline
     source = cpost['source']
-    $I0 = can source, 'lineof'
-    unless $I0 goto done_subline
-    line = source.'lineof'(pos)
+    if null source goto done_subline
+    line = self.'lineof'(source, pos, 'cache'=>1)
     inc line
   done_subline:
     self.'pir'(cpost)
@@ -140,36 +186,37 @@ Return pir for an operation node.
     if pirop == 'inline' goto pirop_inline
 
   pirop_opcode:
-    fmt = "    %n %,"
+    fmt = "    %n %,\n"
     name = pirop
     goto pirop_emit
 
   pirop_call:
-    fmt = "    %r%n(%,)"
+    fmt = "    %r%n(%,)\n"
     name = shift arglist
     goto pirop_emit
 
   pirop_callmethod:
-    fmt = "    %r%i.%n(%,)"
+    fmt = "    %r%i.%n(%,)\n"
     name = shift arglist
     invocant = shift arglist
     goto pirop_emit
 
   pirop_return:
-    fmt = "    .return (%,)"
+    fmt = "    .return (%,)\n"
     goto pirop_emit
 
   pirop_yield:
-    fmt = "    .yield (%,)"
+    fmt = "    .yield (%,)\n"
     goto pirop_emit
 
   pirop_tailcall:
     name = shift arglist
-    fmt = '    .tailcall %n(%,)'
+    fmt = "    .tailcall %n(%,)\n"
     goto pirop_emit
 
   pirop_inline:
     fmt = node.'inline'()
+    concat fmt, "\n"
     result = node.'result'()
     goto pirop_emit
 
@@ -179,10 +226,10 @@ Return pir for an operation node.
     subline = find_caller_lex '$SUBLINE'
     line    = find_caller_lex '$LINE'
     if subline == line goto done_line
-    subpir.'emit'('.annotate "line", %0', line)
+    subpir.'append_format'(".annotate 'line', %0\n", line)
     assign subline, line
   done_line:
-    subpir.'emit'(fmt, arglist :flat, 'r'=>result, 'n'=>name, 'i'=>invocant, 't'=>result)
+    subpir.'append_format'(fmt, arglist :flat, 'r'=>result, 'n'=>name, 'i'=>invocant, 't'=>result)
 .end
 
 
@@ -197,7 +244,7 @@ Generate a label.
     .local pmc subpir, value
     value = node.'result'()
     subpir = find_caller_lex '$SUBPIR'
-    subpir.'emit'('  %0:', value)
+    subpir.'append_format'("  %0:\n", value)
 .end
 
 
@@ -213,11 +260,11 @@ the sub.
     .param pmc node
 
     .local pmc subpir, subline, innerpir
-    subpir = new 'CodeString'
+    subpir = new 'StringBuilder'
     .lex '$SUBPIR', subpir
     subline = box -1
     .lex '$SUBLINE', subline
-    innerpir = new 'CodeString'
+    innerpir = new 'StringBuilder'
     .lex '$CODE', innerpir
 
     .local string name, pirflags
@@ -248,7 +295,7 @@ the sub.
     if null outerpost goto pirflags_done
     unless outerpost goto pirflags_done
     outername = outerpost.'subid'()
-    $S0 = subpir.'escape'(outername)
+    $S0 = self.'escape'(outername)
     pirflags = concat pirflags, ' :outer('
     concat pirflags, $S0
     concat pirflags, ')'
@@ -270,7 +317,31 @@ the sub.
     ns = $P0
   have_ns:
     set_global '$?NAMESPACE', ns
-    nskey = subpir.'key'(ns)
+    nskey = self.'key_pir'(ns)
+
+    .local pmc multi
+    multi = node.'multi'()
+    unless multi goto no_multi
+
+    .local pmc parts, m_iter
+    parts  = new ['ResizableStringArray']
+    m_iter = iter multi
+  multi_iter:
+    unless m_iter goto multi_iter_done
+    $P0 = shift m_iter
+    $S0 = $P0
+    if $S0 == "_" goto push_part
+    $S0 = self.'key_pir'($P0)
+  push_part:
+    push parts, $S0
+    goto multi_iter
+
+  multi_iter_done:
+    pirflags = concat pirflags, ' :multi('
+    $S0 = join ',', parts
+    pirflags = concat pirflags, $S0
+    pirflags = concat pirflags, ')'
+  no_multi:
 
   subpir_start:
     $P0 = node['loadinit']
@@ -290,13 +361,29 @@ the sub.
     goto subpir_done
 
   subpir_post:
-    unless hll goto subpir_ns
-    $P0 = subpir.'escape'(hll)
-    subpir.'emit'("\n.HLL %0", $P0)
+    unless hll goto subpir_loadlibs
+    $P0 = self.'escape'(hll)
+    subpir.'append_format'("\n.HLL %0\n", $P0)
+  subpir_loadlibs:
+    $P0 = node.'loadlibs'()
+    if null $P0 goto subpir_ns
+    unless $P0 goto subpir_ns
+    $P1 = iter $P0
+  subpir_loadlibs_loop:
+    unless $P1 goto subpir_ns
+    $P2 = shift $P1
+    $P2 = self.'escape'($P2)
+    subpir.'append_format'("\n.loadlib %0\n", $P2)
+    goto subpir_loadlibs_loop
   subpir_ns:
-    subpir.'emit'("\n.namespace %0", nskey)
-    $S0 = subpir.'escape'(name)
-    subpir.'emit'(".sub %0 %1", $S0, pirflags)
+    subpir.'append_format'("\n.namespace %0\n", nskey)
+  subpir_directives:
+    $S0 = node['directives']
+    unless $S0 goto subpir_decl
+    subpir.'append_format'("%0", $S0)
+  subpir_decl:
+    $S0 = self.'escape'(name)
+    subpir.'append_format'(".sub %0 %1\n", $S0, pirflags)
     .local pmc paramlist
     paramlist = node['paramlist']
     if null paramlist goto paramlist_done
@@ -311,7 +398,7 @@ the sub.
   paramlist_done:
 
     self.'pir_children'(node)
-    subpir.'emit'(".end\n\n")
+    subpir.'append_format'(".end\n\n")
 
   subpir_done:
     .local pmc outerpir

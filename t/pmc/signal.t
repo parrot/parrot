@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -22,8 +21,7 @@ Tests signal handling.
 
 =cut
 
-# actually more platforms should work - all POSIX compliant ones - but
-# signals are currently not enabled for all in src/events.c
+# actually more platforms should work - all POSIX compliant ones
 # a second problem is to get the test doing the right thing: mainly figuring
 # out what PID to kill. The "ps" command isn't one of the portable ones.
 

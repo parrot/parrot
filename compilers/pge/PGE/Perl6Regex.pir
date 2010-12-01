@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 
 =head1 TITLE
 
@@ -243,8 +242,7 @@ and someday may be refactored to a different location.
     $I0 = namepos - pos
     $S0 = substr target, pos, $I0
     $S0 = 'trim'($S0)
-    $P0 = new 'CodeString'
-    decnum = $P0.'charname_to_ord'($S0)
+    decnum = find_codepoint $S0
     if decnum < 0 goto err_unicode_name
     pos = namepos
     goto scan_xco_char_end
@@ -1021,7 +1019,7 @@ Extract an enumerated character list.
     ##   by converting to <, <+, <-, or <!
     $S0 = substr op, -1, 1
     if $S0 != '[' goto parse_loop
-    chopn op, 1
+    op = chopn op, 1
     goto enum
 
   parse_loop:

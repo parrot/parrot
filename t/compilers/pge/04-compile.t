@@ -1,7 +1,4 @@
-#!parrot
-# Copyright (C) 2007-2009, Parrot Foundation.
-# $Id$
-
+#!./parrot
 # Copyright (C) 2007-2009, Parrot Foundation.
 
 =head1 NAME

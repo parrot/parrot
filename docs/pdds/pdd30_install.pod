@@ -1,5 +1,4 @@
-# Copyright (C) 2008-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2008-2010, Parrot Foundation.
 
 =head1 PDD 30: Installation
 
@@ -7,8 +6,8 @@
 
 This PDD outlines Parrot's installation system and support. Parrot's core
 installation system will provide support for binary packages, a working C<make
-install> target, compiled installables, and FHS compliant search paths for the
-installables.
+install> target, compiled installables, and Filesystem Hierarchy Standard
+(FHS) compliant search paths for the installables.
 
 =head2 Version
 
@@ -33,9 +32,8 @@ Language installation process (from the language source directory):
 
 =head2 Description
 
-Parrot uses Filesystem Hierarchy Standard (FHS) compliant install directories
-by default. Each install location is configurable with options passed to the
-configure script.
+Parrot uses FHS compliant install directories by default. Each install
+location is configurable with options passed to the configure script.
 
 =over
 
@@ -84,7 +82,7 @@ F<include> for PIR or PASM includes.
 It is recommended that languages follow a standard pattern in installing their
 libraries so a bytecode compiled version of a module in the C<mylang> HLL
 named C<['Foo';'Bar']> is stored in
-F<usr/lib/parrot/E<lt>versionE<gt>/languages/E<lt>mylangE<gt>/library/Foo/Bar.pbc>
+F</usr/lib/parrot/E<lt>versionE<gt>/languages/E<lt>mylangE<gt>/library/Foo/Bar.pbc>
 
 =item F</usr/lib/parrot/E<lt>versionE<gt>/tools/>
 
@@ -115,7 +113,7 @@ Building core Parrot depends on Perl (including F<perldoc>, which may be a
 separate package), F<libgdm> and F<libreadline>.
 
 Building a language depends on a series of Parrot build tools, installed in
-F</usr/lib/parrot/E<lt>version/tools>. These tools will generally not be
+F</usr/lib/parrot/E<lt>versionE<gt>/tools>. These tools will generally not be
 included in the default C<parrot> package on most systems, languages will
 require a C<parrot-dev> package to be installed before they can be built.
 
@@ -160,14 +158,6 @@ The default distribution format is a tarball containing the source files
 and a cross-platform build infrastructure (the 'make' variants are a
 good choice, and can be combined with Autoconf, CMake, Perl, Python,
 etc. for more complex conditional builds).
-
-=head2 Attachments
-
-None.
-
-=head2 Footnotes
-
-None.
 
 =head2 References
 

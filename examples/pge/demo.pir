@@ -1,5 +1,4 @@
-# Copyright (C) 2005-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2005-2010, Parrot Foundation.
 
 .include "errors.pasm"
 .sub _main
@@ -34,8 +33,9 @@
   read_loop:
     print "\ninput \"regex <pattern>\", \"glob <pattern>\", \"save <name>\",\n"
     print "target string, \"pir\", \"exp\", \"trace\", \"next\"\n"
-    getstdin stdin
-    readline x, stdin
+    $P0 = getinterp
+    stdin = $P0.'stdin_handle'()
+    x = stdin.'readline'()
     length $I0, x
     if $I0 < 1 goto end_demo
     $I0 = index x, " "
@@ -43,7 +43,7 @@
     $I0 = index x, "\n"
   get_cmd:
     $S0 = substr x, 0, $I0
-    chopn x, 1
+    x = chopn x, 1
     if $S0 == "next" goto match_next
     if $S0 == "regex" goto make_p6rule
     if $S0 == "glob" goto make_glob

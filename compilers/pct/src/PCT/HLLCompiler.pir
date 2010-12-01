@@ -1,5 +1,4 @@
-# Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2006-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -18,17 +17,16 @@ running compilers from a command line.
     load_bytecode 'P6object.pbc'
     load_bytecode 'Parrot/Exception.pbc'
     $P0 = new 'P6metaclass'
-    $S0 = '@stages $parsegrammar $parseactions $astgrammar $commandline_banner $commandline_prompt @cmdoptions $usage $version'
+    $S0 = '@stages $parsegrammar $parseactions $astgrammar $commandline_banner $commandline_prompt @cmdoptions $usage $version $compiler_progname'
     $P0.'new_class'('PCT::HLLCompiler', 'attr'=>$S0)
 .end
 
 .namespace [ 'PCT';'HLLCompiler' ]
 
 .include 'cclass.pasm'
+.include 'iglobals.pasm'
 
 .sub 'init' :vtable :method
-    load_bytecode 'config.pir'
-
     $P0 = split ' ', 'parse past post pir evalpmc'
     setattribute self, '@stages', $P0
 
@@ -55,11 +53,19 @@ running compilers from a command line.
 
     $S0  = '???'
     push_eh _handler
-    $P0  = _config()    # currently works in the build tree, but not in the install tree
-    $S0  = $P0['revision']
+    $P0 = getinterp
+    $P0 = $P0[.IGLOBALS_CONFIG_HASH]
+    $S0  = $P0['revision']   # also $I0 = P0['installed'] could be used
   _handler:
     pop_eh
-    $P2  = box 'This compiler is built with the Parrot Compiler Toolkit, parrot revision '
+    $P2  = box 'This compiler is built with the Parrot Compiler Toolkit, parrot '
+    if $S0 goto _revision_lab
+    $P2 .= 'version '
+    $S0 = $P0['VERSION']
+    goto _is_version
+  _revision_lab:
+    $P2 .= 'revision '
+  _is_version:
     $P2 .= $S0
     $P2 .= '.'
     setattribute self, '$version', $P2
@@ -146,6 +152,11 @@ Set the command-line prompt for this compiler to C<value>.
 The prompt is displayed in interactive mode at each point where
 the compiler is ready for code to be compiled and executed.
 
+=item compiler_progname([string name])
+
+Accessor for the C<compiler_progname>, which is often the filename of
+the compiler's program entry point, like C<perl6.pbc>.
+
 =cut
 
 .sub 'stages' :method
@@ -182,6 +193,12 @@ the compiler is ready for code to be compiled and executed.
     .param string value        :optional
     .param int has_value       :opt_flag
     .tailcall self.'attr'('$commandline_prompt', value, has_value)
+.end
+
+.sub 'compiler_progname' :method
+    .param pmc value        :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('$compiler_progname', value, has_value)
 .end
 
 =item removestage(string stagename)
@@ -322,11 +339,16 @@ when the stage corresponding to target has been reached.
     result = self.stagename(result, adverbs :flat :named)
     $N1 = time
     $N2 = $N1 - $N0
-    printerr "Stage '"
-    printerr stagename
-    printerr "': "
-    printerr $N2
-    printerr " sec\n"
+    $P0 = getinterp
+    $P1 = $P0.'stderr_handle'()
+    $P1.'print'("Stage '")
+    $P1.'print'(stagename)
+    $P1.'print'("': ")
+    $P2 = new ['ResizablePMCArray']
+    push $P2, $N2
+    $S0 = sprintf "%.3f", $P2
+    $P1.'print'($S0)
+    $P1.'print'(" sec\n")
     if target == stagename goto have_result
     goto stagestats_loop
 
@@ -356,15 +378,6 @@ to any options and return the resulting parse tree.
   tcode_loop:
     unless tcode_it goto transcode_done
     tcode = shift tcode_it
-    push_eh tcode_enc
-    $I0 = find_charset tcode
-    $S0 = source
-    $S0 = trans_charset $S0, $I0
-    assign source, $S0
-    pop_eh
-    goto transcode_done
-  tcode_enc:
-    pop_eh
     push_eh tcode_fail
     $I0 = find_encoding tcode
     $S0 = source
@@ -604,11 +617,14 @@ specifies the encoding to use for the input (e.g., "utf8").
 
     # on startup show the welcome message
     $P0 = self.'commandline_banner'()
-    printerr $P0
+    $P1 = getinterp
+    $P2 = $P1.'stderr_handle'()
+    $P2.'print'($P0)
 
     .local pmc stdin
     .local int has_readline
-    stdin = getstdin
+    $P0 = getinterp
+    stdin = $P0.'stdin_handle'()
     encoding = adverbs['encoding']
     if encoding == 'fixed_8' goto interactive_loop
     unless encoding goto interactive_loop
@@ -739,7 +755,7 @@ options are passed to the evaluator.
   iter_loop_1:
     $S0 = ifh.'readall'(iname)
     code .= $S0
-    close ifh
+    ifh.'close'()
     goto iter_loop
   iter_end:
     $S0 = join ' ', files
@@ -770,6 +786,7 @@ Performs option processing of command-line args
 
     .local string arg0
     arg0 = shift args
+    self.'compiler_progname'(arg0)
     .local pmc getopts
     getopts = new ['Getopt';'Obj']
     getopts.'notOptStop'(1)
@@ -792,15 +809,18 @@ Generic method for compilers invoked from a shell command line.
 
 =cut
 
+.include 'except_severity.pasm'
 .sub 'command_line' :method
     .param pmc args
     .param pmc adverbs         :slurpy :named
 
     ## this bizarre piece of code causes the compiler to
     ## immediately abort if it looks like it's being run
-    ## from Perl's Test::Harness.  We expect to remove this
-    ## check eventually (or make it a lot smarter than it
-    ## is here).
+    ## from Perl's Test::Harness.  (Test::Harness versions 2.64
+    ## and earlier have a hardwired commandline option that is
+    ## always passed to an initial run of the interpreter binary,
+    ## whether you want it or not.)  We expect to remove this
+    ## check eventually (or make it a lot smarter than it is here).
     $S0 = args[2]
     $I0 = index $S0, '@INC'
     if $I0 < 0 goto not_harness
@@ -835,11 +855,15 @@ Generic method for compilers invoked from a shell command line.
     $I0 = adverbs['version']
     if $I0 goto version
 
+    .local int can_backtrace
+    can_backtrace = can self, 'backtrace'
+    unless can_backtrace goto no_push_eh
+    push_eh uncaught_exception
+  no_push_eh:
 
     $S0 = adverbs['e']
     $I0 = exists adverbs['e']
     if $I0 goto eval_line
-
     .local pmc result
     result = box ''
     unless args goto interactive
@@ -858,6 +882,9 @@ Generic method for compilers invoked from a shell command line.
     result = self.'eval'($S0, '-e', args :flat, adverbs :flat :named)
 
   save_output:
+    unless can_backtrace goto no_pop_eh
+    pop_eh
+  no_pop_eh:
     if null result goto end
     $I0 = defined result
     unless $I0 goto end
@@ -867,15 +894,17 @@ Generic method for compilers invoked from a shell command line.
     if target != 'pir' goto end
     .local string output
     .local pmc ofh
-    ofh = getstdout
+    $P0 = getinterp
+    ofh = $P0.'stdout_handle'()
     output = adverbs['output']
     if output == '' goto save_output_1
     if output == '-' goto save_output_1
-    ofh = open output, 'w'
+    ofh = new ['FileHandle']
+    ofh.'open'(output, 'w')
     unless ofh goto err_output
   save_output_1:
     print ofh, result
-    close ofh
+    ofh.'close'()
   end:
     .return ()
 
@@ -887,6 +916,29 @@ Generic method for compilers invoked from a shell command line.
   version:
     self.'version'()
     goto end
+
+    # If we get an uncaught exception in the program and the HLL provides
+    # a backtrace method, we end up here. We pass it the exception object
+    # so it can render a backtrace, unless the severity is exit or warning
+    # in which case it needs special handling.
+  uncaught_exception:
+    .get_results ($P0)
+    pop_eh
+    $P1 = getinterp
+    $P1 = $P1.'stderr_handle'()
+    $I0 = $P0['severity']
+    if $I0 == .EXCEPT_EXIT goto do_exit
+    $S0 = self.'backtrace'($P0)
+    print $P1, $S0
+    if $I0 <= .EXCEPT_WARNING goto do_warning
+    exit 1
+  do_exit:
+    $I0 = $P0['exit_code']
+    exit $I0
+  do_warning:
+    $P0 = $P0["resume"]
+    push_eh uncaught_exception # Otherwise we get errors about no handler to delete
+    $P0()
 .end
 
 
@@ -903,6 +955,70 @@ based on double-colon separators.
     $P0 = split '::', name
     .return ($P0)
 .end
+
+=item lineof(target, pos [, cache :named('cache')])
+
+Return the line number of offset C<pos> within C<target>.  The return
+value uses zero for the first line.  If C<cache> is true, then
+memoize the line offsets as a C<!lineof> property on C<target>.
+
+=cut
+
+.sub 'lineof' :method
+    .param pmc target
+    .param int pos
+    .param int cache           :optional :named('cache')
+    .local pmc linepos
+
+    # If we've previously cached C<linepos> for target, we use it.
+    unless cache goto linepos_build
+    linepos = getprop '!linepos', target
+    unless null linepos goto linepos_done
+
+    # calculate a new linepos array.
+  linepos_build:
+    linepos = new ['ResizableIntegerArray']
+    unless cache goto linepos_build_1
+    setprop target, '!linepos', linepos
+  linepos_build_1:
+    .local string s
+    .local int jpos, eos
+    s = target
+    eos = length s
+    jpos = 0
+    # Search for all of the newline markers in C<target>.  When we
+    # find one, mark the ending offset of the line in C<linepos>.
+  linepos_loop:
+    jpos = find_cclass .CCLASS_NEWLINE, s, jpos, eos
+    unless jpos < eos goto linepos_done
+    $I0 = ord s, jpos
+    inc jpos
+    push linepos, jpos
+    # Treat \r\n as a single logical newline.
+    if $I0 != 13 goto linepos_loop
+    $I0 = ord s, jpos
+    if $I0 != 10 goto linepos_loop
+    inc jpos
+    goto linepos_loop
+  linepos_done:
+
+    # We have C<linepos>, so now we search the array for the largest
+    # element that is not greater than C<pos>.  The index of that
+    # element is the line number to be returned.
+    # (Potential optimization: use a binary search.)
+    .local int line, count
+    count = elements linepos
+    line = 0
+  line_loop:
+    if line >= count goto line_done
+    $I0 = linepos[line]
+    if $I0 > pos goto line_done
+    inc line
+    goto line_loop
+  line_done:
+    .return (line)
+.end
+
 
 =item dumper(obj, name, options)
 
@@ -921,7 +1037,7 @@ Dump C<obj> with C<name> according to C<options>.
 
   load_dumper:
     load_bytecode 'PCT/Dumper.pbc'
-    downcase $S0
+    $S0 = downcase $S0
     $P0 = get_hll_global ['PCT';'Dumper'], $S0
     .tailcall $P0(obj, name)
 .end

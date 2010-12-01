@@ -1,5 +1,4 @@
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -72,8 +71,20 @@ our %second_analysis_subs = (
                         | t/configure/testlib/cdefectivefoobar
                         | t/configure/testlib/bdefectivefoobar
                         | examples/config/file/configwithfatalstep
+                        | compilers/opsc
                     }x
                 ) {
+                    delete $files_needing_analysis->{ $file };
+                    next SECOND_FILE;
+                }
+
+                # read first line. If it contains "nqp" remove file from test.
+                my $fh;
+                open $fh, '<', $full_file or croak "Can't opend file $full_file $!";
+                my $line = <$fh>;
+                close $fh;
+
+                if ($line =~ m/ nqp | use \s v6 /x) {
                     delete $files_needing_analysis->{ $file };
                     next SECOND_FILE;
                 }
@@ -198,7 +209,7 @@ sub identify_files_for_POD_testing {
             @files = @{ $self->{argv} };
         }
         else {
-            print STDERR "\nFinding files with POD, this may take a minute.\n";
+            print STDERR "\n# Finding files with POD, this may take a minute.\n";
             @files = (
                 keys(%{ $self->{manifest} }),
                 keys(%{ $self->{manifest_gen} })
@@ -215,6 +226,15 @@ sub identify_files_for_POD_testing {
 
         # do FIRST_FILE
         FIRST_FILE: foreach my $file ( keys %{ $files_needing_analysis } ) {
+            # http://trac.parrot.org/parrot/ticket/1272
+            # Skip podchecking for files coming from external sources (i.e. in
+            # the ext/ directory). We can't guarantee the validity of their
+            # POD and we don't want to fix it until the next import.
+            if ($file =~ qr{^ext/}) {
+                delete $files_needing_analysis->{ $file };
+                next FIRST_FILE;
+            }
+
             my $full_file = qq|$self->{build_dir}/$file|;
 
             # skip missing MANIFEST.generated files ( -e )

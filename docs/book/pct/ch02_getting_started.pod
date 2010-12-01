@@ -24,25 +24,25 @@ configuring and building Parrot.
 If you have these dependencies installed, build the core virtual machine and
 compiler toolkit and run the standard test suite with the commands:
 
-  $ B<perl Configure.pl>
-  $ B<make>
-  $ B<make test>
+  $ perl Configure.pl
+  $ make
+  $ make test
 
-By default, Parrot installs to directories F<bin/>, C<lib/>, et cetera under
+By default, Parrot installs to directories F<bin/>, F<lib/>, et cetera under
 the prefix F</usr/local>.  If you have privileges to write to these
 directories, install Parrot with:
 
-  $ B<make install>
+  $ make install
 
 To install Parrot beneath a different prefix, use the C<--prefix> option to
 C<Configure.pl>:
 
-    $ B<perl Configure.pl --prefix=/home/me/parrot>
+  $ perl Configure.pl --prefix=/home/me/parrot
 
 If you intend to I<develop> -- not just I<use> -- a language on Parrot, install
 the Parrot developer tools as well:
 
-  $ B<make install-dev>
+  $ make install-dev
 
 =head2 Running Parrot
 
@@ -59,7 +59,7 @@ low-level language native to the Parrot virtual machine.
 
 Now run this file with:
 
-  $ B<parrot news.pasm>
+  $ parrot news.pasm
 
 which will print:
 
@@ -70,11 +70,11 @@ which will print:
 Next, try out one of Parrot's high-level languages. Create a test file
 called F<more_news.nqp>:
 
-  say "No parrots were involved in an accident on the M1 today..."
+  say( "No parrots were involved in an accident on the M1 today..." );
 
 Then run it as:
 
-  $ nqp more_news.nqp
+  $ parrot-nqp more_news.nqp
 
 which will print:
 

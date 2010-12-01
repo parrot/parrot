@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2005, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -61,7 +60,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example" );
     zero = 0
 
     return = new ['Continuation']
-    set_addr return, return_here
+    set_label return, return_here
     loop:
         .begin_call
             .call itr, return
@@ -336,7 +335,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
     .local pmc pmc1
     pmc1 = new ['Coroutine']
     .local int bool1
-    does bool1, pmc1, "scalar"      # XXX WTF
+    does bool1, pmc1, "invokable"
     print bool1
     print "\n"
     does bool1, pmc1, "no_interface"

@@ -1,7 +1,5 @@
 /* runcore_api.h
  *  Copyright (C) 2001-2009, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Functions and macros to dispatch opcodes.
  */
@@ -27,8 +25,8 @@ typedef enum Parrot_profiling_flags {
     PROFILING_EXIT_CHECK_FLAG         = 1 << 0,
     PROFILING_FIRST_LOOP_FLAG         = 1 << 1,
     PROFILING_HAVE_PRINTED_CLI_FLAG   = 1 << 2,
-    PROFILING_REPORT_ANNOTATIONS_FLAG = 1 << 3
-
+    PROFILING_REPORT_ANNOTATIONS_FLAG = 1 << 3,
+    PROFILING_CANONICAL_OUTPUT_FLAG   = 1 << 4
 } Parrot_profiling_flags;
 
 typedef enum Parrot_profiling_line {
@@ -64,7 +62,7 @@ typedef enum Parrot_profiling_datatype {
 
     PPROF_DATA_CLI = 0,
 
-    PPROF_DATA_MAX = 3,
+    PPROF_DATA_MAX = 3
 } Parrot_profiling_datatype;
 
 struct profiling_runcore_t {
@@ -88,7 +86,6 @@ struct profiling_runcore_t {
     STRING         *profile_filename;
     PMC            *prev_sub;
     Parrot_Context *prev_ctx;
-    UINTVAL         level;      /* how many nested runloops */
     UINTVAL         time_size;  /* how big is the following array */
     UHUGEINTVAL    *time;       /* time spent between DO_OP and start/end of a runcore */
     Hash           *line_cache; /* hash for caching pc -> line mapping */
@@ -129,6 +126,13 @@ struct profiling_runcore_t {
 #define Profiling_report_annotations_CLEAR(o) \
     Profiling_flag_CLEAR(o, PROFILING_REPORT_ANNOTATIONS_FLAG)
 
+#define Profiling_canonical_output_TEST(o) \
+    Profiling_flag_TEST(o, PROFILING_CANONICAL_OUTPUT_FLAG)
+#define Profiling_canonical_output_SET(o) \
+    Profiling_flag_SET(o, PROFILING_CANONICAL_OUTPUT_FLAG)
+#define Profiling_canonical_output_CLEAR(o) \
+    Profiling_flag_CLEAR(o, PROFILING_CANONICAL_OUTPUT_FLAG)
+
 /* HEADERIZER BEGIN: src/runcore/profiling.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -155,5 +159,5 @@ void Parrot_runcore_profiling_init(PARROT_INTERP)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

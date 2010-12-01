@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2004-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -168,9 +167,8 @@ parrot_init_library_paths(PARROT_INTERP)
                                 (INTVAL)IGLOBALS_CONFIG_HASH);
 
     /* create the lib_paths array */
-    PMC * const lib_paths   = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
-
-    VTABLE_set_integer_native(interp, lib_paths, PARROT_LIB_PATH_SIZE);
+    PMC * const lib_paths   = Parrot_pmc_new_init_int(interp,
+            enum_class_FixedPMCArray, PARROT_LIB_PATH_SIZE);
     VTABLE_set_pmc_keyed_int(interp, iglobals,
             IGLOBALS_LIB_PATHS, lib_paths);
 
@@ -182,7 +180,7 @@ parrot_init_library_paths(PARROT_INTERP)
 
         versionlib = VTABLE_get_string_keyed_str(interp, config_hash, libkey);
         entry      = VTABLE_get_string_keyed_str(interp, config_hash, verkey);
-        versionlib = Parrot_str_append(interp, versionlib, entry);
+        versionlib = Parrot_str_concat(interp, versionlib, entry);
 
         if (!VTABLE_get_integer_keyed_str(interp, config_hash, installed))
             builddir = VTABLE_get_string_keyed_str(interp,
@@ -194,32 +192,49 @@ parrot_init_library_paths(PARROT_INTERP)
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_INCLUDE, paths);
+    { /* EXPERIMENTAL: add include path from environment */
+        const char *envvar = Parrot_getenv(interp,
+                                           Parrot_str_new_constant(interp, "PARROT_INCLUDE"));
+        Parrot_warn_experimental(interp, "PARROT_INCLUDE environment variable is experimental");
+        if (envvar != NULL  && envvar[0]) {
+            entry = Parrot_str_new(interp, envvar, 0);
+            VTABLE_push_string(interp, paths, entry);
+        }
+    }
     if (!STRING_IS_NULL(builddir)) {
-        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/"), 0);
+        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/"));
         VTABLE_push_string(interp, paths, entry);
-        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/include/"), 0);
+        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/include/"));
         VTABLE_push_string(interp, paths, entry);
     }
     entry = CONST_STRING(interp, "./");
     VTABLE_push_string(interp, paths, entry);
     if (!STRING_IS_NULL(versionlib)) {
-        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/include/"), 0);
+        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/include/"));
         VTABLE_push_string(interp, paths, entry);
     }
-
 
     /* define library paths */
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_LIBRARY, paths);
+    { /* EXPERIMENTAL: add library path from environment */
+        const char *envvar = Parrot_getenv(interp,
+                                           Parrot_str_new_constant(interp, "PARROT_LIBRARY"));
+        Parrot_warn_experimental(interp, "PARROT_LIBRARY environment variable is experimental");
+        if (envvar != NULL && envvar[0]) {
+            entry = Parrot_str_new(interp, envvar, 0);
+            VTABLE_push_string(interp, paths, entry);
+        }
+    }
     if (!STRING_IS_NULL(builddir)) {
-        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/library/"), 0);
+        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/library/"));
         VTABLE_push_string(interp, paths, entry);
     }
     entry = CONST_STRING(interp, "./");
     VTABLE_push_string(interp, paths, entry);
     if (!STRING_IS_NULL(versionlib)) {
-        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/library/"), 0);
+        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/library/"));
         VTABLE_push_string(interp, paths, entry);
     }
 
@@ -228,13 +243,13 @@ parrot_init_library_paths(PARROT_INTERP)
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_LANG, paths);
     if (!STRING_IS_NULL(builddir)) {
-        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/languages/"), 0);
+        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/languages/"));
         VTABLE_push_string(interp, paths, entry);
     }
     entry = CONST_STRING(interp, "./");
     VTABLE_push_string(interp, paths, entry);
     if (!STRING_IS_NULL(versionlib)) {
-        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/languages/"), 0);
+        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/languages/"));
         VTABLE_push_string(interp, paths, entry);
     }
 
@@ -243,13 +258,13 @@ parrot_init_library_paths(PARROT_INTERP)
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_DYNEXT, paths);
     if (!STRING_IS_NULL(builddir)) {
-        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/dynext/"), 0);
+        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/dynext/"));
         VTABLE_push_string(interp, paths, entry);
     }
     entry = CONST_STRING(interp, "dynext/");
     VTABLE_push_string(interp, paths, entry);
     if (!STRING_IS_NULL(versionlib)) {
-        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/dynext/"), 0);
+        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/dynext/"));
         VTABLE_push_string(interp, paths, entry);
     }
 
@@ -331,7 +346,7 @@ is_abs_path(ARGIN(const STRING *file))
     const char * const file_name = (const char *)file->strstart;
     if (file->strlen <= 1)
         return 0;
-    PARROT_ASSERT(file->encoding == Parrot_fixed_8_encoding_ptr ||
+    PARROT_ASSERT(STRING_max_bytes_per_codepoint(file) == 1 ||
             file->encoding == Parrot_utf8_encoding_ptr);
 
     /* XXX  ../foo, ./bar */
@@ -366,12 +381,8 @@ static void
 cnv_to_win32_filesep(ARGMOD(STRING *path))
 {
     ASSERT_ARGS(cnv_to_win32_filesep)
-    char* cnv;
+    char *cnv = path->strstart;
 
-    PARROT_ASSERT(path->encoding == Parrot_fixed_8_encoding_ptr ||
-        path->encoding == Parrot_utf8_encoding_ptr);
-
-    cnv = path->strstart;
     while ((cnv = strchr(cnv, path_separator)) != NULL)
         *cnv = win32_path_separator;
 }
@@ -403,11 +414,11 @@ path_finalize(PARROT_INTERP, ARGMOD(STRING *path))
      *      the goal is just to have for sure an invisible 0 at end
      */
 
-    STRING * const nul = string_chr(interp, '\0');
+    STRING * const nul = Parrot_str_chr(interp, '\0');
 
-    path = Parrot_str_append(interp, path, nul);
-    path->bufused--;
-    path->strlen--;
+    path = Parrot_str_concat(interp, path, nul);
+    --path->bufused;
+    --path->strlen;
 
 #ifdef WIN32
     cnv_to_win32_filesep(path);
@@ -435,12 +446,11 @@ static STRING*
 path_guarantee_trailing_separator(PARROT_INTERP, ARGMOD(STRING *path))
 {
     ASSERT_ARGS(path_guarantee_trailing_separator)
-    STRING * const path_separator_string = string_chr(interp, path_separator);
 
     /* make sure the path has a trailing slash before appending the file */
-    if (Parrot_str_indexed(interp, path , path->strlen - 1)
-         != Parrot_str_indexed(interp, path_separator_string, 0))
-        path = Parrot_str_append(interp, path , path_separator_string);
+    if (STRING_ord(interp, path, -1) != path_separator)
+        path = Parrot_str_concat(interp, path,
+                Parrot_str_chr(interp, path_separator));
 
     return path;
 }
@@ -465,7 +475,7 @@ path_append(PARROT_INTERP, ARGMOD(STRING *l_path), ARGMOD(STRING *r_path))
 {
     ASSERT_ARGS(path_append)
     l_path = path_guarantee_trailing_separator(interp, l_path);
-    l_path = Parrot_str_append(interp, l_path, r_path);
+    l_path = Parrot_str_concat(interp, l_path, r_path);
 
     return l_path;
 }
@@ -491,9 +501,8 @@ path_concat(PARROT_INTERP, ARGMOD(STRING *l_path), ARGMOD(STRING *r_path))
     ASSERT_ARGS(path_concat)
     STRING* join;
 
-    join = Parrot_str_copy(interp, l_path);
-    join = path_guarantee_trailing_separator(interp, join);
-    join = Parrot_str_append(interp, join, r_path);
+    join = path_guarantee_trailing_separator(interp, l_path);
+    join = Parrot_str_concat(interp, join, r_path);
 
     return join;
 }
@@ -516,11 +525,7 @@ static STRING*
 try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
 {
     ASSERT_ARGS(try_load_path)
-    STRING *final;
-
-    final = Parrot_str_copy(interp, path);
-
-    final = path_finalize(interp, final);
+    STRING * const final = path_finalize(interp, path);
 
     if (Parrot_stat_info_intval(interp, final, STAT_EXISTS)) {
         return final;
@@ -552,7 +557,7 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
     STRING * const pir_extension      = CONST_STRING(interp, ".pir");
     STRING * const pasm_extension     = CONST_STRING(interp, ".pasm");
 
-    test_path = Parrot_str_copy(interp, path);
+    test_path = path;
 
     /* First try the path as given. */
     result = try_load_path(interp, test_path);
@@ -568,24 +573,24 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
 
     if (!STRING_IS_NULL(test_path)) {
         if (Parrot_str_byte_length(interp, test_path) > 4) {
-            STRING *orig_ext = Parrot_str_substr(interp, test_path, -4, 4, NULL, 0);
+            STRING *orig_ext = STRING_substr(interp, test_path, -4, 4);
             /* First try substituting .pbc for the .pir extension */
-            if (Parrot_str_equal(interp, orig_ext, pir_extension)) {
+            if (STRING_equal(interp, orig_ext, pir_extension)) {
                 STRING * const without_ext = Parrot_str_chopn(interp, test_path, 4);
-                test_path = Parrot_str_append(interp, without_ext, bytecode_extension);
+                test_path = Parrot_str_concat(interp, without_ext, bytecode_extension);
                 result = try_load_path(interp, test_path);
                 if (result)
                     return result;
             }
             /* Next try substituting .pir, then .pasm for the .pbc extension */
-            else if (Parrot_str_equal(interp, orig_ext, bytecode_extension)) {
+            else if (STRING_equal(interp, orig_ext, bytecode_extension)) {
                 STRING * const without_ext = Parrot_str_chopn(interp, test_path, 4);
-                test_path = Parrot_str_append(interp, without_ext, pir_extension);
+                test_path = Parrot_str_concat(interp, without_ext, pir_extension);
                 result = try_load_path(interp, test_path);
                 if (result)
                     return result;
 
-                test_path = Parrot_str_append(interp, without_ext, pasm_extension);
+                test_path = Parrot_str_concat(interp, without_ext, pasm_extension);
                 result = try_load_path(interp, test_path);
                 if (result)
                     return result;
@@ -595,10 +600,10 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
 
         /* Finally, try substituting .pbc for the .pasm extension. */
         if (Parrot_str_byte_length(interp, test_path) > 5) {
-            STRING * const orig_ext = Parrot_str_substr(interp, test_path, -5, 5, NULL, 0);
-            if (Parrot_str_equal(interp, orig_ext, pasm_extension)) {
+            STRING * const orig_ext = STRING_substr(interp, test_path, -5, 5);
+            if (STRING_equal(interp, orig_ext, pasm_extension)) {
                 STRING * const without_ext = Parrot_str_chopn(interp, test_path, 5);
-                test_path = Parrot_str_append(interp, without_ext, bytecode_extension);
+                test_path = Parrot_str_concat(interp, without_ext, bytecode_extension);
                 result = try_load_path(interp, test_path);
                 if (result)
                     return result;
@@ -703,8 +708,7 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, ARGMOD(STRING *file),
         STRING * const path = VTABLE_get_string_keyed_int(interp, paths, i);
         STRING *found_name;
 
-        full_name = Parrot_str_copy(interp, path);
-        full_name = path_append(interp, full_name, file);
+        full_name = path_append(interp, path, file);
 
         found_name =
             (type & PARROT_RUNTIME_FT_DYNEXT)
@@ -780,45 +784,6 @@ Parrot_locate_runtime_file(PARROT_INTERP, ARGIN(const char *file_name),
 
 /*
 
-=item C<char* Parrot_get_runtime_prefix(PARROT_INTERP)>
-
-Return a malloced C-string for the runtime prefix.  The calling function
-must free it.
-
-This function is deprecated, use Parrot_get_runtime_path instead.
-See TT #1191
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-char*
-Parrot_get_runtime_prefix(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_get_runtime_prefix)
-    char * const env = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_RUNTIME"));
-
-    if (env)
-        return env;
-    else {
-        PMC    * const config_hash =
-            VTABLE_get_pmc_keyed_int(interp, interp->iglobals, (INTVAL) IGLOBALS_CONFIG_HASH);
-
-        if (VTABLE_elements(interp, config_hash)) {
-            STRING * const key = CONST_STRING(interp, "prefix");
-            STRING * const s   = VTABLE_get_string_keyed_str(interp, config_hash, key);
-            return Parrot_str_to_cstring(interp, s);
-        }
-        else
-            return mem_sys_strdup(".");
-    }
-}
-
-/*
-
 =item C<STRING * Parrot_get_runtime_path(PARROT_INTERP)>
 
 Return a string for the runtime prefix.
@@ -878,23 +843,18 @@ parrot_split_path_ext(PARROT_INTERP, ARGMOD(STRING *in),
     /* This is a quick fix for TT #65
      * TODO: redo it with the string reimplementation
      */
-    const char *   charset = Parrot_charset_c_name(interp,
-            Parrot_charset_number_of_str(interp, in));
-    STRING * const slash1  = string_make(interp, "/", 1, charset,
-            PObj_external_FLAG|PObj_constant_FLAG);
-    STRING * const slash2  = string_make(interp, "\\", 1, charset,
-            PObj_external_FLAG|PObj_constant_FLAG);
-    STRING * const dot     = string_make(interp, ".", 1, charset,
-            PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const slash1 = CONST_STRING(interp, "/");
+    STRING * const slash2 = CONST_STRING(interp, "\\");
+    STRING * const dot    = CONST_STRING(interp, ".");
 
     const INTVAL len = Parrot_str_byte_length(interp, in);
     STRING *stem;
     INTVAL pos_sl, pos_dot;
 
-    pos_sl = CHARSET_RINDEX(interp, in, slash1, len);
+    pos_sl = STRING_rindex(interp, in, slash1, len);
     if (pos_sl == -1)
-        pos_sl = CHARSET_RINDEX(interp, in, slash2, len);
-    pos_dot = CHARSET_RINDEX(interp, in, dot, len);
+        pos_sl = STRING_rindex(interp, in, slash2, len);
+    pos_dot = STRING_rindex(interp, in, dot, len);
 
     /* ignore dot in directory name */
     if (pos_dot != -1 && pos_dot < pos_sl)
@@ -903,25 +863,24 @@ parrot_split_path_ext(PARROT_INTERP, ARGMOD(STRING *in),
     ++pos_dot;
     ++pos_sl;
     if (pos_sl && pos_dot) {
-        stem = Parrot_str_substr(interp, in, pos_sl, pos_dot - pos_sl - 1,
-                NULL, 0);
-        *wo_ext = Parrot_str_substr(interp, in, 0, pos_dot - 1, NULL, 0);
-        *ext = Parrot_str_substr(interp, in, pos_dot, len - pos_dot, NULL, 0);
+        stem = STRING_substr(interp, in, pos_sl, pos_dot - pos_sl - 1);
+        *wo_ext = STRING_substr(interp, in, 0, pos_dot - 1);
+        *ext = STRING_substr(interp, in, pos_dot, len - pos_dot);
     }
     else if (pos_dot) {
-        stem = Parrot_str_substr(interp, in, 0, pos_dot - 1, NULL, 0);
+        stem = STRING_substr(interp, in, 0, pos_dot - 1);
         *wo_ext = stem;
-        *ext = Parrot_str_substr(interp, in, pos_dot, len - pos_dot, NULL, 0);
+        *ext = STRING_substr(interp, in, pos_dot, len - pos_dot);
     }
     else if (pos_sl) {
-        stem = Parrot_str_substr(interp, in, pos_sl, len - pos_sl, NULL, 0);
-        *wo_ext = Parrot_str_copy(interp, in);
-        *ext = NULL;
+        stem = STRING_substr(interp, in, pos_sl, len - pos_sl);
+        *wo_ext = in;
+        *ext = STRINGNULL;
     }
     else {
-        stem = Parrot_str_copy(interp, in);
+        stem = in;
         *wo_ext = stem;
-        *ext = NULL;
+        *ext = STRINGNULL;
     }
     return stem;
 }
@@ -943,5 +902,5 @@ F<include/parrot/library.h>
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

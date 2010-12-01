@@ -1,5 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 PDD 22: I/O
 
@@ -464,6 +463,8 @@ L<Error Handling>.
 
 =begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   $P0 = open $S1
   $P0 = open $S1, $S2
   $P0 = open $P1
@@ -488,6 +489,8 @@ object.
 
 =begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   close $P0
   close $P0, $P1
 
@@ -554,14 +557,16 @@ passing it a status object.
 
 =item C<printerr>
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   printerr $I0
   printerr $N0
   printerr $S0
   printerr $P0
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 Writes an integer, float, string, or PMC value to standard error.
 
@@ -578,6 +583,8 @@ If they want an asynchronous version, they can use C<print>.]
 
 =begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   $S0 = read $I1
   $S0 = read $P1, $I2
   $P0 = read $P1, $I2, $P3
@@ -598,6 +605,8 @@ string of bytes.
 
 =begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   $S0 = readline $P1
   $P0 = readline $P1, $P2
 
@@ -613,12 +622,14 @@ string of bytes.
 
 =item C<peek>
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   $S0 = peek
   $S0 = peek $P1
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 [C<peek>, C<seek>, C<tell>, and C<poll> are all candidates for moving from
 opcodes to FileHandle object methods.]
@@ -641,6 +652,8 @@ to be a synchronous one.]
 
 =begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   seek $P0, $I1, $I2
   seek $P0, $I1, $I2, $I3
   seek $P0, $I1, $I2, $P3
@@ -664,6 +677,8 @@ passing it a status object and the stream object it was called on.
 
 =begin PIR_FRAGMENT_INVALID
 
+  .loadlib 'io_ops'
+  ...
   $I0 = tell $P1
   ($I0, $I1) = tell $P2
 
@@ -847,7 +862,7 @@ network-specific opcodes.
 
 C<socket> returns a new socket object from a given address family,
 socket type, and protocol number (all integers). The socket object's
-boolean value can be tested for whether the socket was created.
+boolean value can be tested to see if the socket is open or closed.
 
 The asynchronous version takes an additional final PMC callback
 argument, and only returns a status object. When the socket operation is
@@ -856,7 +871,7 @@ socket object.
 
 =item *
 
-C<sockaddr> returns an object representing a socket address, generated
+C<sockaddr> returns a SockAddr object representing a socket address, generated
 from a port number (integer) and an address (string).
 
 No asynchronous version.
@@ -1038,14 +1053,6 @@ See the relevant IETF RFCs: "Application Aspects of IPv6 Transition"
 (http://www.ietf.org/rfc/rfc4038.txt) and "Basic Socket Interface
 Extensions for IPv6" (http://www.ietf.org/rfc/rfc3493.txt).
 
-=head2 Attachments
-
-None.
-
-=head2 Footnotes
-
-None.
-
 =head2 Links
 
 L<http://en.wikipedia.org/wiki/Asynchronous_I/O> for a relatively
@@ -1053,14 +1060,9 @@ comprehensive list of asynchronous I/O implementation options.
 
 =head2 References
 
-  F<src/io/core.c>
-  F<src/ops/io.ops>
-  F<include/parrot/io.h>
-  F<runtime/parrot/library/Stream/*>
-  F<src/io/unix.c>
-  F<src/io/win32.c>
-  Perl 5's IO::AIO
-  Perl 5's POE
+F<src/io/core.c>, F<src/ops/io.ops>, F<include/parrot/io.h>, 
+F<runtime/parrot/library/Stream/*>, F<src/io/unix.c>, F<src/io/win32.c>,
+Perl 5's IO::AIO, and POE
 
 =cut
 

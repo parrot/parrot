@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2005-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -35,7 +34,7 @@ Test the PIR shootout examples in 'examples/shootout/*.pir'.
 To add a new test, you do not have to modify this script:
 
  1. add your script (toto.pir) to examples/shootout
- 2. put parrot options in the first line (e.g  "#!./parrot -Oc -R cgp-jit")
+ 2. put parrot options in the first line (e.g  "#!./parrot -Oc")
  3. make sure you have default argument values
  4. put the expected output as a file : toto.pir_output
  5. if you need an input file (to be read from stdin), call it toto.pir_input
@@ -74,15 +73,13 @@ foreach my $script (@shootouts) {
         $args =~ s/-j/-C/;
         $args =~ s/-Cj/-C/;
     }
-    unless ( $PConfig{cg_flag} =~ /HAVE/ ) {
-        $args =~ s/-Cj/-j/;
+    $args =~ s/-Cj/-j/;
 
-        # Remove any plain -C option.
-        $args =~ s/(^|\s)-C(\s|$)/$1$2/;
+    # Remove any plain -C option.
+    $args =~ s/(^|\s)-C(\s|$)/$1$2/;
 
-        # Remove any extra Cs still floating around
-        $args =~ s/C//;
-    }
+    # Remove any extra Cs still floating around
+    $args =~ s/C//;
 
     # look for input files
     my $input = "$file$INPUT_EXT";

@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2007-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -18,11 +17,24 @@ Tests the behavior of VTABLE interfaces that have been overriden from PIR.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(12)
+    plan(15)
 
     newclass_tests()
     subclass_tests()
     vtable_implies_self_tests()
+    anon_vtable_tests()
+    invalid_vtable()
+    get_pmc_keyed_int_Null()
+.end
+
+.sub invalid_vtable
+    throws_substring(<<'CODE',' but was used with ', 'invalid :vtable throws an exception')
+    .namespace [ "Test" ]
+    .sub monkey :method :vtable("not_in_the_vtable")
+        .param int key
+        .return("monkey")
+    .end
+CODE
 .end
 
 .sub 'newclass_tests'
@@ -86,6 +98,28 @@ Tests the behavior of VTABLE interfaces that have been overriden from PIR.
   $P2 = $P1.'new'()
   $I0 = does $P2, 'frobulate'
   ok( $I0, ':vtable should imply the self parameter' )
+.end
+
+
+.sub 'anon_vtable_tests'
+    $P0 = newclass "AnonVtableType"
+    $P1 = new 'AnonVtableType'
+    push_eh anon_does_not_work
+    $S0 = $P1
+    is($S0, "foo", "can have :vtable :anon")
+    goto anon_end
+  anon_does_not_work:
+    ok(0, "can not have :anon :vtable")
+  anon_end:
+    pop_eh
+.end
+
+.sub 'get_pmc_keyed_int_Null'
+    $P0 = newclass [ 'NoReturn_get_pmc_keyed_int' ]
+    $P1 = new $P0
+    $P2 = $P1[0]
+    $I0 = isnull $P2
+    ok($I0, "Override get_pmc_keyed_int without .return - TT #1593")
 .end
 
 .namespace [ 'MyObject' ]
@@ -169,6 +203,21 @@ yes:
 
   true:
     .return( 1 )
+.end
+
+
+.namespace [ 'AnonVtableType' ]
+
+.sub '' :vtable('get_string') :method :anon
+    .return("foo")
+.end
+
+
+.namespace [ 'NoReturn_get_pmc_keyed_int' ]
+
+.sub 'get_pmc_keyed_int' :vtable
+    .param int i
+    # No .return
 .end
 
 # Local Variables:

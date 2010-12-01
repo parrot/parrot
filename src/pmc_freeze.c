@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -11,7 +10,7 @@ src/pmc_freeze.c - Freeze and thaw functionality
 Thawing PMCs uses a list with (maximum) size of the amount of PMCs to
 keep track of retrieved PMCs.
 
-The individual information of PMCs is frozen/thawed by their vtables.
+PMCs freeze and thaw their own information through their vtables.
 
 To avoid recursion, the whole functionality is driven by
 C<< pmc->vtable->visit >>, which is called for the first PMC initially.
@@ -49,23 +48,23 @@ Freeze using either method.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING*
 Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_freeze)
-    PMC *image = Parrot_pmc_new(interp, enum_class_ImageIO);
+    PMC * const image = Parrot_pmc_new(interp, enum_class_ImageIOFreeze);
     VTABLE_set_pmc(interp, image, pmc);
     return VTABLE_get_string(interp, image);
 }
 
+
 /*
 
-=item C<INTVAL Parrot_freeze_size(PARROT_INTERP, PMC *pmc)>
+=item C<opcode_t * Parrot_freeze_pbc(PARROT_INTERP, PMC *pmc, const
+PackFile_ConstTable *pf, opcode_t *cursor)>
 
-Get the size of an image to be frozen without allocating a large buffer.
-
-Used in C<Packfile_Constant_pack_size>.
+Freezes a PMC to a PackFile.
 
 =cut
 
@@ -74,29 +73,32 @@ Used in C<Packfile_Constant_pack_size>.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-INTVAL
-Parrot_freeze_size(PARROT_INTERP, ARGIN(PMC *pmc))
+opcode_t *
+Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf),
+    ARGIN(opcode_t *cursor))
 {
-    ASSERT_ARGS(Parrot_freeze_size)
-    PMC *result;
-    PMC *visitor = Parrot_pmc_new(interp, enum_class_ImageIOSize);
+    ASSERT_ARGS(Parrot_freeze_pbc)
+    PMC    *visitor;
+    STRING *image;
+    DECL_CONST_CAST;
+
+    visitor  = Parrot_pmc_new(interp, enum_class_ImageIOFreeze);
+    VTABLE_set_pointer(interp, visitor,
+        PARROT_const_cast(void *, (const void *)pf));
     VTABLE_set_pmc(interp, visitor, pmc);
-    result = VTABLE_get_pmc(interp, visitor);
-    return VTABLE_get_integer(interp, result);
+
+    image  = VTABLE_get_string(interp, visitor);
+    cursor = PF_store_buf(cursor, image);
+
+    return cursor;
 }
 
 
 /*
 
-=item C<PMC* Parrot_thaw(PARROT_INTERP, STRING *image)>
+=item C<UINTVAL Parrot_freeze_size(PARROT_INTERP, PMC *pmc)>
 
-Thaws a PMC.  Called from the C<thaw> opcode.
-
-For now it seems cheaper to use a list for remembering contained
-aggregates. We could of course decide dynamically, which strategy to
-use, e.g.: given a big image, the first thawed item is a small
-aggregate. This implies, it probably contains (or some big strings) more
-nested containers, for which another approach could be a win.
+Gets the size of an image to be frozen without allocating a large buffer.
 
 =cut
 
@@ -104,15 +106,100 @@ nested containers, for which another approach could be a win.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC*
+UINTVAL
+Parrot_freeze_size(PARROT_INTERP, ARGIN(PMC *pmc))
+{
+    ASSERT_ARGS(Parrot_freeze_size)
+    PMC    *pmc_result;
+    PMC    * const visitor = Parrot_pmc_new(interp, enum_class_ImageIOSize);
+    VTABLE_set_pmc(interp, visitor, pmc);
+    pmc_result = VTABLE_get_pmc(interp, visitor);
+
+    return VTABLE_get_integer(interp, pmc_result);
+}
+
+
+/*
+
+=item C<UINTVAL Parrot_freeze_pbc_size(PARROT_INTERP, PMC *pmc, const
+PackFile_ConstTable *pf)>
+
+Gets the size of an image if it were created using C<Parrot_freeze_pbc>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+UINTVAL
+Parrot_freeze_pbc_size(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf))
+{
+    ASSERT_ARGS(Parrot_freeze_pbc_size)
+    PMC *pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+    PMC *visitor, *pmc_result;
+    DECL_CONST_CAST;
+
+    VTABLE_set_pointer(interp, pf_pmc,
+        PARROT_const_cast(void *, (const void *)pf));
+
+    visitor = Parrot_pmc_new_init(interp, enum_class_ImageIOSize, pf_pmc);
+    VTABLE_set_pmc(interp, visitor, pmc);
+
+    pmc_result = VTABLE_get_pmc(interp, visitor);
+    return VTABLE_get_integer(interp, pmc_result);
+}
+
+
+/*
+
+=item C<PMC * Parrot_freeze_strings(PARROT_INTERP, PMC *pmc)>
+
+Gets the strings of a PMC to be frozen.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_freeze_strings(PARROT_INTERP, ARGIN(PMC *pmc))
+{
+    ASSERT_ARGS(Parrot_freeze_strings)
+    PMC * const visitor = Parrot_pmc_new(interp, enum_class_ImageIOStrings);
+    VTABLE_set_pmc(interp, visitor, pmc);
+    return VTABLE_get_pmc(interp, visitor);
+}
+
+
+/*
+
+=item C<PMC * Parrot_thaw(PARROT_INTERP, STRING *image)>
+
+Thaws a PMC.  Called from the C<thaw> opcode.
+
+For now it seems cheaper to use a list for remembering contained aggregates. We
+could of course decide dynamically, which strategy to use: given a big image,
+the first thawed item is a small aggregate. This implies it probably contains
+more nested containers, for which another approach could be a win.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
 Parrot_thaw(PARROT_INTERP, ARGIN(STRING *image))
 {
     ASSERT_ARGS(Parrot_thaw)
 
-    PMC        *info     = Parrot_pmc_new(interp, enum_class_ImageIO);
-    int         gc_block = 0;
     PMC        *result;
+    PMC * const info     = Parrot_pmc_new(interp, enum_class_ImageIOThaw);
+    int         gc_block = 0;
 
     /*
      * if we are thawing a lot of PMCs, it's cheaper to do
@@ -145,10 +232,10 @@ Parrot_thaw(PARROT_INTERP, ARGIN(STRING *image))
 
 /*
 
-=item C<PMC* Parrot_thaw_constants(PARROT_INTERP, STRING *image)>
+=item C<PMC* Parrot_thaw_pbc(PARROT_INTERP, PackFile_ConstTable *ct, const
+opcode_t **cursor)>
 
-Thaws constants, used by PackFile for unpacking PMC constants.
-This is a lie. It does nothing different from Parrot_thaw at the moment.
+Thaw a pmc frozen by Parrot_freeze_pbc.
 
 =cut
 
@@ -157,6 +244,32 @@ This is a lie. It does nothing different from Parrot_thaw at the moment.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
+PMC*
+Parrot_thaw_pbc(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct), ARGMOD(const opcode_t **cursor))
+{
+    ASSERT_ARGS(Parrot_thaw_pbc)
+    PackFile * const pf = ct->base.pf;
+    STRING *image       = PF_fetch_buf(interp, pf, cursor);
+    PMC *info           = Parrot_pmc_new(interp, enum_class_ImageIOThaw);
+    VTABLE_set_pointer(interp, info, ct);
+    VTABLE_set_string_native(interp, info, image);
+    return VTABLE_get_pmc(interp, info);
+}
+
+
+/*
+
+=item C<PMC* Parrot_thaw_constants(PARROT_INTERP, STRING *image)>
+
+This does nothing different from Parrot_thaw at the moment.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_thaw_constants(PARROT_INTERP, ARGIN(STRING *image))
 {
@@ -186,6 +299,7 @@ Parrot_clone(PARROT_INTERP, ARGIN(PMC *pmc))
     return VTABLE_clone(interp, pmc);
 }
 
+
 /*
 
 =item C<void Parrot_visit_loop_visit(PARROT_INTERP, PMC *info)>
@@ -197,20 +311,30 @@ Iterate a visitor PMC visiting each encountered target PMC.
 */
 
 void
-Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info)) {
+Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
+{
     ASSERT_ARGS(Parrot_visit_loop_visit)
 
-    INTVAL      i;
-    PMC * const todo    = VTABLE_get_iter(interp, info);
+    PMC * const  todo   = VTABLE_get_iter(interp, info);
+    const INTVAL action = VTABLE_get_integer(interp, info);
+    INTVAL       i;
 
     /* can't cache upper limit, visit may append items */
-    for (i = 0; i < VTABLE_elements(interp, todo); i++) {
-        PMC *current = VTABLE_get_pmc_keyed_int(interp, todo, i);
-        if (!current)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "NULL current PMC in visit_loop_todo_list");
+    for (i = 0; i < VTABLE_elements(interp, todo); ++i) {
+        PMC * const current = VTABLE_get_pmc_keyed_int(interp, todo, i);
+        if (PMC_IS_NULL(current))
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_MALFORMED_PACKFILE,
+                    "NULL current PMC at %d in visit_loop_todo_list - %s",
+                    (int) i,
+                    action == VISIT_FREEZE_NORMAL ? "feeze" : "thaw");
 
         PARROT_ASSERT(current->vtable);
+
+        if (action == VISIT_FREEZE_NORMAL)
+            VTABLE_freeze(interp, current, info);
+        else
+            VTABLE_thaw(interp, current, info);
 
         VTABLE_visit(interp, current, info);
 
@@ -218,18 +342,20 @@ Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info)) {
     }
 }
 
+
 /*
 
 =item C<void Parrot_visit_loop_thawfinish(PARROT_INTERP, PMC *info)>
 
-Iterate a visitor PMC thawfinishing each encountered target PMC.
+Iterates a visitor PMC, thawfinishing each encountered target PMC.
 
 =cut
 
 */
 
 void
-Parrot_visit_loop_thawfinish(PARROT_INTERP, ARGIN(PMC *info)) {
+Parrot_visit_loop_thawfinish(PARROT_INTERP, ARGIN(PMC *info))
+{
     ASSERT_ARGS(Parrot_visit_loop_thawfinish)
 
     /* call thawfinish for each processed PMC */
@@ -242,16 +368,17 @@ Parrot_visit_loop_thawfinish(PARROT_INTERP, ARGIN(PMC *info)) {
      *      order here is likely broken.
      */
 
-    PMC * const todo    = VTABLE_get_iter(interp, info);
-    const INTVAL n = VTABLE_elements(interp, todo);
+    PMC * const  todo = VTABLE_get_iter(interp, info);
+    const INTVAL n    = VTABLE_elements(interp, todo);
     int          i;
 
-    for (i = n-1; i >= 0; --i) {
+    for (i = n - 1; i >= 0; --i) {
         PMC *current = VTABLE_get_pmc_keyed_int(interp, todo, i);
         if (!PMC_IS_NULL(current))
             VTABLE_thawfinish(interp, current, info);
     }
 }
+
 
 /*
 
@@ -265,10 +392,6 @@ The seen-hash version for freezing might go away sometime.
 
 Lot of discussion on p6i and F<docs/dev/pmc_freeze.pod>.
 
-=head1 HISTORY
-
-Initial version by leo 2003.11.03 - 2003.11.07.
-
 =cut
 
 */
@@ -278,5 +401,5 @@ Initial version by leo 2003.11.03 - 2003.11.07.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

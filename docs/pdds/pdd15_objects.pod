@@ -1,5 +1,4 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 PDD 15: Objects and Classes
 
@@ -1629,11 +1628,6 @@ Instance Variables map to what we call attributes
 <img src="pdd15_object_metamodel.png">
 
 =end html
-
-
-=head2 Footnotes
-
-None.
 
 =head2 References
 

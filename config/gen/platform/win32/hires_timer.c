@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2009, Parrot Foundation.
  */
 
@@ -66,5 +65,5 @@ UINTVAL Parrot_hires_get_tick_duration(void)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

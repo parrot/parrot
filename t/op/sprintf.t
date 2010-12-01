@@ -1,6 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2008, Parrot Foundation.
-# $Id$
+# Copyright (C) 2006-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -59,6 +58,9 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
 .const int TESTS = 308
 
+#.loadlib 'sys_ops'
+#.loadlib 'io_ops'
+
 .sub main :main
     load_bytecode 'Test/Builder.pbc'
     .include "iglobals.pasm"
@@ -106,8 +108,6 @@ tag C<all> is allowed for todo tests that should fail on any system.
     skip_tests = 'set_skip_info'()
 
     # how many tests to run?
-    # XXX: this should be summed automatically from test_files data
-    #      until then, it's set to no plan
     test.'plan'(TESTS)
 
   outer_loop:
@@ -123,7 +123,8 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
     # Open the test file
     .local pmc file_handle   # currently open file
-               file_handle = open test_file, 'r'
+               file_handle = new ['FileHandle']
+               file_handle.'open'(test_file, 'r')
 
     unless file_handle goto bad_file
 
@@ -134,7 +135,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     $I0 = file_handle.'eof'()
     if $I0 goto end_loop
 
-    test_line = readline file_handle
+    test_line = file_handle.'readline'()
 
     # skip lines without tabs, and comment lines
     $I0 = index test_line, "\t"
@@ -156,7 +157,8 @@ tag C<all> is allowed for todo tests that should fail on any system.
     data_hash = new 'Hash'
     data_hash["''"] = ''
     data_hash['2**32-1'] = 0xffffffff
-    $N0 = pow 2, 38
+    $N0 = data_hash['2**32-1']
+    inc $N0
     data_hash['2**38'] = $N0
     data_hash["'string'"] = 'string'
 
@@ -204,8 +206,8 @@ tag C<all> is allowed for todo tests that should fail on any system.
     # remove /'s
     $S0 = substr expected, 0, 1
     if $S0 != "/" goto eh_bad_line
-    substr expected, 0, 1, ''
-    substr expected, -1, 1, ''
+    expected = replace expected, 0, 1, ''
+    expected = replace expected, -1, 1, ''
 
     $I0 = index $S1, expected
     if $I0 == -1 goto is_nok
@@ -230,7 +232,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
     goto loop
   end_loop:
-    close file_handle
+    file_handle.'close'()
     goto outer_loop
   end_outer_loop:
 
@@ -413,7 +415,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     # NOTE: there can be multiple tabs between entries, so skip until
     # we have something.
     # remove the trailing newline from record
-    chopn record, 1
+    record = chomp(record)
     $P1 = split "\t", record
     $I0 = elements $P1 # length of array
     .local int tab_number
@@ -483,8 +485,10 @@ tag C<all> is allowed for todo tests that should fail on any system.
     .local pmc it
     it = iter skip_os
 
+    load_bytecode 'config.pbc'
+    $P1 = _config()
     .local string osname
-    osname = sysinfo .SYSINFO_PARROT_OS
+    osname = $P1['osname']
 
   iter_loop:
     unless it goto iter_end
@@ -511,6 +515,20 @@ tag C<all> is allowed for todo tests that should fail on any system.
     desc = concat $S0, desc
 
     .return (desc)
+.end
+
+
+.sub 'chomp'
+    .param string str
+    $I0 = index str, "\r"
+    if $I0 < 0 goto L1
+    str = substr str, 0, $I0
+  L1:
+    $I1 = index str, "\n"
+    if $I1 < 0 goto L2
+    str = substr str, 0, $I1
+  L2:
+    .return (str)
 .end
 
 

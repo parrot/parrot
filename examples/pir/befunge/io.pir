@@ -1,5 +1,4 @@
 # Copyright (C) 2002-2009, Parrot Foundation.
-# $Id$
 
 # ** string mode
 
@@ -39,12 +38,13 @@
     $I0 = length $S0
     if $I0 > 0 goto _IO__INPUT_CHAR__SUBSTR
 
-    $P1 = getstdin
-    $S0 = readline $P1
-    chopn $S0, 1
+    $P1 = getinterp
+    $P1 = $P1.'stdin_handle'()
+    $S0 = $P1.'readline'()
+    $S0 = chopn $S0, 1
 
   _IO__INPUT_CHAR__SUBSTR:
-    $S1 = substr $S0, 0, 1, ""
+    $S1 = replace $S0, 0, 1, ""
     $P0 = $S0
     set_global "user_input", $P0
 
@@ -71,9 +71,10 @@
     len = length $S0
     if len > 0 goto _IO__INPUT_INT__PARSE_INPUT
 
-    $P1 = getstdin
-    $S0 = readline $P1
-    chopn $S0, 1
+    $P1 = getinterp
+    $P1 = $P1.'stdin_handle'()
+    $S0 = $P1.'readline'()
+    $S0 = chopn $S0, 1
     len = length $S0
 
   _IO__INPUT_INT__PARSE_INPUT:
@@ -90,7 +91,7 @@
     if i < len goto _IO__INPUT_INT__NEXT_CHAR
 
   _IO__INPUT_INT__NAN:
-    substr $S0, 0, i, ""
+    $S0 = replace $S0, 0, i, ""
     $P0 = $S0
     set_global "user_input", $P0
 

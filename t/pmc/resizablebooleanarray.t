@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -24,7 +23,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
     .include 'test_more.pir'
 
-    plan(65)
+    plan(68)
 
     setting_array_size()
     setting_first_element()
@@ -46,6 +45,7 @@ out-of-bounds test. Checks INT and PMC keys.
     sparse_access()
     check_for_zeroedness()
     pop_into_sparse()
+    clone_empty()
     clone_tests()
     alternate_clone_tests()
     get_iter_test()
@@ -70,6 +70,16 @@ out-of-bounds test. Checks INT and PMC keys.
 
     $P0 = 7
     is($P0, 7, "shrinking via int assignment to RBA works")
+
+    new $P1, ['ExceptionHandler']
+    set_label $P1, caught
+    $P1.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    push_eh $P1
+    $P0 = -1
+    ok(0, "no exception caught for setting negative size")
+    .return()
+caught:
+    ok(1, "caught exception on setting negative size")
 .end
 
 
@@ -116,7 +126,7 @@ out-of-bounds test. Checks INT and PMC keys.
     new $P0, ['ResizableBooleanArray']
     new $P1, ['ExceptionHandler']
 
-    set_addr $P1, caught
+    set_label $P1, caught
     $P1.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
     push_eh $P1
 
@@ -138,6 +148,17 @@ end:
 
     set $I0, $P0[-1]
     is($I0, 0, "negative index retrieval is 0")
+
+    new $P1, ['ExceptionHandler']
+    set_label $P1, caught
+    $P1.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    push_eh $P1
+    set $I0, $P0[-2]
+    ok(0, "no exception caught for negative index out of range access")
+    .return()
+caught:
+    pop_eh
+    ok(1, "caught exception on negative index out of range access")
 .end
 
 
@@ -288,7 +309,7 @@ end:
     $P0 = new ['ResizableBooleanArray']
     $P1 = new ['ExceptionHandler']
 
-    set_addr $P1, caught
+    set_label $P1, caught
     $P1.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
     push_eh $P1
     pop $I0, $P0
@@ -378,7 +399,7 @@ shift_loop:
     $P0 = new ['ResizableBooleanArray']
     $P1 = new ['ExceptionHandler']
 
-    set_addr $P1, caught
+    set_label $P1, caught
     $P1.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
     push_eh $P1
 
@@ -727,6 +748,15 @@ err:
     print $I4
     print " "
     print $I5
+.end
+
+.sub clone_empty
+    .local pmc rba1, rba2
+    .local int i
+    rba1 = new ['ResizableBooleanArray']
+    rba2 = clone rba1
+    i = elements rba2
+    is(i, 0, "clone empty passed")
 .end
 
 .sub clone_tests

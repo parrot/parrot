@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -53,6 +52,7 @@ the documentation at L<http://www.json.org/>.
 
 .sub 'compile' :method
     .param string json_string
+    .param pmc    opts :slurpy :named
 
     .local pmc parse, match
     parse = get_root_global ['parrot'; 'JSON'], 'value'
@@ -68,6 +68,14 @@ the documentation at L<http://www.json.org/>.
     pirbuilder = pirgrammar.'apply'(match)
     pir = pirbuilder.'get'('result')
 
+    $I0 = exists opts['target']
+    unless $I0 goto no_targ
+        $S0 = opts['target']
+        unless $S0 == 'pir' goto not_pir
+            .return (pir)
+        not_pir:
+    no_targ:
+
     .local pmc pirc, result
     pirc = compreg 'PIR'
     result = pirc(pir)
@@ -81,6 +89,28 @@ the documentation at L<http://www.json.org/>.
 
 
 .HLL 'parrot'
+
+.sub unique_pmc_reg
+    $P0 = get_root_global ['parrot';'PGE';'Util'], 'unique'
+    $I0 = $P0()
+    $S0 = $I0
+    $S0 = concat "$P", $S0
+    .return ($S0)
+.end
+
+.sub appendln
+    .param pmc sb
+    .param string line
+    push sb, line
+    push sb, "\n"
+.end
+
+.sub 'sprintf'
+    .param string fmt
+    .param pmc args :slurpy
+    $S0 = sprintf fmt, args
+    .return ($S0)
+.end
 
 .include 'compilers/data_json/data_json/grammar.pir'
 .include 'compilers/data_json/data_json/pge2pir.pir'

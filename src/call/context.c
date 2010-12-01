@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2009, Parrot Foundation.
-$Id$
+Copyright (C) 2009-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -79,17 +78,10 @@ static size_t calculate_registers_size(SHIM_INTERP,
     ARGIN(const UINTVAL *number_regs_used))
         __attribute__nonnull__(2);
 
-static void clear_regs(PARROT_INTERP, ARGMOD(PMC *pmcctx))
+static void clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmcctx);
-
-PARROT_INLINE
-PARROT_CANNOT_RETURN_NULL
-static Parrot_Context * get_context_struct_fast(PARROT_INTERP,
-    ARGIN(PMC *ctx))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        FUNC_MODIFIES(*ctx);
 
 static void init_context(PARROT_INTERP,
     ARGMOD(PMC *pmcctx),
@@ -111,9 +103,6 @@ static size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP,
        PARROT_ASSERT_ARG(number_regs_used))
 #define ASSERT_ARGS_clear_regs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmcctx))
-#define ASSERT_ARGS_get_context_struct_fast __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_init_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -132,7 +121,7 @@ static size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP,
 
 =over 4
 
-=item C<PMC* Parrot_pcc_get_sub(PARROT_INTERP, PMC *ctx)>
+=item C<PMC* Parrot_pcc_get_sub(PARROT_INTERP, const PMC *ctx)>
 
 Get Sub executed inside Context.
 
@@ -141,12 +130,13 @@ Get Sub executed inside Context.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 PMC*
-Parrot_pcc_get_sub(PARROT_INTERP, ARGIN(PMC *ctx))
+Parrot_pcc_get_sub(PARROT_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_sub)
-    Parrot_Context const *c = get_context_struct_fast(interp, ctx);
+    const Parrot_Context * const c = CONTEXT_STRUCT(ctx);
     return c->current_sub;
 }
 
@@ -166,7 +156,7 @@ void
 Parrot_pcc_set_sub(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *sub))
 {
     ASSERT_ARGS(Parrot_pcc_set_sub)
-    Parrot_Context *c = get_context_struct_fast(interp, ctx);
+    Parrot_Context * const c = CONTEXT_STRUCT(ctx);
     c->current_sub    = sub;
 
     if (sub && !PMC_IS_NULL(sub)) {
@@ -215,34 +205,7 @@ create_initial_context(PARROT_INTERP)
 
 /*
 
-=item C<static Parrot_Context * get_context_struct_fast(PARROT_INTERP, PMC
-*ctx)>
-
-Fetches Parrot_Context from Context PMC.  This is a static, inlineable function
-so it only works within this file.  It also only works if you *know* that ctx
-is a valid PMC, so be careful.  This is an encapsulation-breaking optimization
-that improves performance measurably.  Use responsibly.  Never export this
-function.
-
-=cut
-
-*/
-
-
-PARROT_INLINE
-PARROT_CANNOT_RETURN_NULL
-static Parrot_Context *
-get_context_struct_fast(PARROT_INTERP, ARGIN(PMC *ctx))
-{
-    ASSERT_ARGS(get_context_struct_fast)
-
-    /* temporarily violate encapsulation; big speedup here */
-    return PMC_data_typed(ctx, Parrot_Context *);
-}
-
-/*
-
-=item C<static void clear_regs(PARROT_INTERP, PMC *pmcctx)>
+=item C<static void clear_regs(PARROT_INTERP, Parrot_Context *ctx)>
 
 Clears all registers in a context.  PMC and STRING registers contain PMCNULL
 and NULL, respectively.  Integer and float registers contain negative flag
@@ -253,34 +216,27 @@ values, for debugging purposes.
 */
 
 static void
-clear_regs(PARROT_INTERP, ARGMOD(PMC *pmcctx))
+clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
 {
     ASSERT_ARGS(clear_regs)
-    UINTVAL i;
-    Parrot_Context *ctx = get_context_struct_fast(interp, pmcctx);
+    UINTVAL       i;
+    const UINTVAL s_regs = ctx->n_regs_used[REGNO_STR];
+    const UINTVAL p_regs = ctx->n_regs_used[REGNO_PMC];
 
-    /* NULL out registers - P/S have to be NULL for GC
-     *
-     * if the architecture has 0x := NULL and 0.0 we could memset too
-     */
+    /* NULL out registers - P/S have to be NULL for GC */
+    for (i = 0; i < s_regs; ++i)
+        ctx->bp_ps.regs_s[i] = STRINGNULL;
 
-    for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; i++) {
+    for (i = 0; i < p_regs; ++i)
         ctx->bp_ps.regs_p[-1L - i] = PMCNULL;
-    }
-
-    for (i = 0; i < ctx->n_regs_used[REGNO_STR]; i++) {
-        ctx->bp_ps.regs_s[i] = NULL;
-    }
 
     if (Interp_debug_TEST(interp, PARROT_REG_DEBUG_FLAG)) {
         /* depending on -D40, set int and num to identifiable garbage values */
-        for (i = 0; i < ctx->n_regs_used[REGNO_INT]; i++) {
+        for (i = 0; i < ctx->n_regs_used[REGNO_INT]; ++i)
             ctx->bp.regs_i[i] = -999;
-        }
 
-        for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; i++) {
+        for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; ++i)
             ctx->bp.regs_n[-1L - i] = -99.9;
-        }
     }
 }
 
@@ -299,14 +255,11 @@ static void
 init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
 {
     ASSERT_ARGS(init_context)
-    Parrot_Context *ctx    = get_context_struct_fast(interp, pmcctx);
+    Parrot_Context * const ctx = CONTEXT_STRUCT(pmcctx);
 
-    /* pmcold may be null */
-    Parrot_Context *old    = PMC_IS_NULL(pmcold)
-                           ? NULL
-                           : get_context_struct_fast(interp, pmcold);
+    PARROT_ASSERT_MSG(!PMC_IS_NULL(pmcctx), "Can't initialise Null CallContext");
 
-    PARROT_ASSERT(!PMC_IS_NULL(pmcctx) || !"Can't initialise Null CallContext");
+    PARROT_ASSERT(PMC_IS_NULL(pmcold) || pmcold->vtable->base_type == enum_class_CallContext);
 
     /*
      * FIXME Invoking corotine shouldn't initialise context. So just
@@ -315,43 +268,41 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
     if (!PMC_IS_NULL(ctx->current_sub))
         return;
 
-    ctx->results_signature = NULL;
     ctx->lex_pad           = PMCNULL;
     ctx->outer_ctx         = NULL;
     ctx->current_cont      = NULL;
     ctx->current_object    = NULL;
     ctx->handlers          = PMCNULL;
     ctx->caller_ctx        = NULL;
-    ctx->pred_offset       = 0;
     ctx->current_sig       = PMCNULL;
     ctx->current_sub       = PMCNULL;
 
-    if (old) {
+    if (PMC_IS_NULL(pmcold)) {
+        ctx->num_constants     = NULL;
+        ctx->str_constants     = NULL;
+        ctx->pmc_constants     = NULL;
+        ctx->warns             = 0;
+        ctx->errors            = 0;
+        ctx->trace_flags       = 0;
+        ctx->current_HLL       = 0;
+        ctx->current_namespace = PMCNULL;
+        ctx->recursion_depth   = 0;
+    }
+    else {
+        Parrot_Context *old = CONTEXT_STRUCT(pmcold);
         /* some items should better be COW copied */
-        ctx->constants         = old->constants;
+        ctx->num_constants     = old->num_constants;
+        ctx->str_constants     = old->str_constants;
+        ctx->pmc_constants     = old->pmc_constants;
         ctx->warns             = old->warns;
         ctx->errors            = old->errors;
         ctx->trace_flags       = old->trace_flags;
-        ctx->pred_offset       = old->pred_offset;
         ctx->current_HLL       = old->current_HLL;
         ctx->current_namespace = old->current_namespace;
         /* end COW */
         ctx->recursion_depth   = old->recursion_depth;
         ctx->caller_ctx        = pmcold;
     }
-    else {
-        ctx->constants         = NULL;
-        ctx->warns             = 0;
-        ctx->errors            = 0;
-        ctx->trace_flags       = 0;
-        ctx->pred_offset       = 0;
-        ctx->current_HLL       = 0;
-        ctx->current_namespace = PMCNULL;
-        ctx->recursion_depth   = 0;
-    }
-
-    /* other stuff is set inside Sub.invoke */
-    clear_regs(interp, pmcctx);
 }
 
 
@@ -489,7 +440,7 @@ allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const UINTVAL *numbe
     /* ctx.bp_ps points to S0, which has Px on the left */
     ctx->bp_ps.regs_s = (STRING **)((char *)ctx->registers + size_nip);
 
-    clear_regs(interp, pmcctx);
+    clear_regs(interp, ctx);
 }
 
 
@@ -509,7 +460,11 @@ Parrot_pcc_allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx),
         ARGIN(const UINTVAL *number_regs_used))
 {
     ASSERT_ARGS(Parrot_pcc_allocate_registers)
-    allocate_registers(interp, pmcctx, number_regs_used);
+    if (number_regs_used[0]
+    ||  number_regs_used[1]
+    ||  number_regs_used[2]
+    ||  number_regs_used[3])
+        allocate_registers(interp, pmcctx, number_regs_used);
 }
 
 
@@ -528,18 +483,12 @@ Parrot_pcc_free_registers(PARROT_INTERP, ARGIN(PMC *pmcctx))
 {
     ASSERT_ARGS(Parrot_pcc_free_registers)
     Parrot_CallContext_attributes * const ctx = PARROT_CALLCONTEXT(pmcctx);
-    size_t reg_size;
 
-    if (!ctx)
-        return;
+    const size_t reg_size =
+        Parrot_pcc_calculate_registers_size(interp, ctx->n_regs_used);
 
-    reg_size = Parrot_pcc_calculate_registers_size(interp, ctx->n_regs_used);
-    if (!reg_size)
-        return;
-
-    /* Free registers */
-    Parrot_gc_free_fixed_size_storage(interp, reg_size, ctx->registers);
-
+    if (reg_size)
+        Parrot_gc_free_fixed_size_storage(interp, reg_size, ctx->registers);
 }
 
 
@@ -566,7 +515,7 @@ Parrot_alloc_context(PARROT_INTERP, ARGIN(const UINTVAL *number_regs_used),
     ARGIN_NULLOK(PMC *old))
 {
     ASSERT_ARGS(Parrot_alloc_context)
-    PMC            *pmcctx = Parrot_pmc_new(interp, enum_class_CallContext);
+    PMC * const pmcctx = Parrot_pmc_new(interp, enum_class_CallContext);
 
     allocate_registers(interp, pmcctx, number_regs_used);
     init_context(interp, pmcctx, old);
@@ -592,7 +541,7 @@ PMC *
 Parrot_pcc_allocate_empty_context(PARROT_INTERP, ARGIN_NULLOK(PMC *old))
 {
     ASSERT_ARGS(Parrot_pcc_allocate_empty_context)
-    PMC            *pmcctx = Parrot_pmc_new(interp, enum_class_CallContext);
+    PMC * const pmcctx = Parrot_pmc_new(interp, enum_class_CallContext);
 
     init_context(interp, pmcctx, old);
 
@@ -657,91 +606,8 @@ Parrot_set_new_context(PARROT_INTERP, ARGIN(const UINTVAL *number_regs_used))
 
 =cut
 
-=item C<void Parrot_clear_i(PARROT_INTERP)>
-
-Sets all integer registers in the current context to 0.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_clear_i(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_clear_i)
-    UINTVAL i;
-    for (i = 0; i < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_INT); ++i)
-        REG_INT(interp, i) = 0;
-}
-
-
-/*
-
-=item C<void Parrot_clear_s(PARROT_INTERP)>
-
-Sets all STRING registers in the current context to NULL.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_clear_s(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_clear_s)
-    UINTVAL i;
-    for (i = 0; i < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_STR); ++i)
-        REG_STR(interp, i) = NULL;
-}
-
-
-/*
-
-=item C<void Parrot_clear_p(PARROT_INTERP)>
-
-Sets all PMC registers in the current context to NULL.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_clear_p(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_clear_p)
-    UINTVAL i;
-    for (i = 0; i < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_PMC); ++i)
-        REG_PMC(interp, i) = PMCNULL;
-}
-
-
-/*
-
-=item C<void Parrot_clear_n(PARROT_INTERP)>
-
-Sets all number registers in the current context to 0.0.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_clear_n(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_clear_n)
-    UINTVAL i;
-    for (i = 0; i < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_NUM); ++i)
-        REG_NUM(interp, i) = 0.0;
-}
-
-/*
-
-=item C<INTVAL * Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, PMC *ctx, UINTVAL
-idx)>
+=item C<INTVAL * Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, const PMC *ctx,
+UINTVAL idx)>
 
 Get pointer to INTVAL register.
 
@@ -750,19 +616,20 @@ Get pointer to INTVAL register.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 INTVAL *
-Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
+Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, ARGIN(const PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_INTVAL_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_INT) > idx);
-    return &(get_context_struct_fast(interp, ctx)->bp.regs_i[idx]);
+    return &(CONTEXT_STRUCT(ctx)->bp.regs_i[idx]);
 }
 
 /*
 
-=item C<FLOATVAL * Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP, PMC *ctx, UINTVAL
-idx)>
+=item C<FLOATVAL * Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP, const PMC *ctx,
+UINTVAL idx)>
 
 Get pointer to FLOATVAL register.
 
@@ -771,13 +638,14 @@ Get pointer to FLOATVAL register.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 FLOATVAL *
-Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
+Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP, ARGIN(const PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_FLOATVAL_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_NUM) > idx);
-    return &(get_context_struct_fast(interp, ctx)->bp.regs_n[-1L - idx]);
+    return &(CONTEXT_STRUCT(ctx)->bp.regs_n[-1L - idx]);
 }
 
 /*
@@ -792,13 +660,14 @@ Get pointer to STRING register.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 STRING **
 Parrot_pcc_get_STRING_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_STRING_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_STR) > idx);
-    return &(get_context_struct_fast(interp, ctx)->bp_ps.regs_s[idx]);
+    return &(CONTEXT_STRUCT(ctx)->bp_ps.regs_s[idx]);
 }
 
 /*
@@ -812,18 +681,20 @@ Get pointer to PMC register.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 PMC **
 Parrot_pcc_get_PMC_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_PMC_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_PMC) > idx);
-    return &(get_context_struct_fast(interp, ctx)->bp_ps.regs_p[-1L - idx]);
+    return &(CONTEXT_STRUCT(ctx)->bp_ps.regs_p[-1L - idx]);
 }
 
 /*
 
-=item C<UINTVAL Parrot_pcc_get_regs_used(PARROT_INTERP, PMC *ctx, int type)>
+=item C<UINTVAL Parrot_pcc_get_regs_used(PARROT_INTERP, const PMC *ctx, int
+type)>
 
 Return number of used registers of particular type.
 
@@ -831,11 +702,12 @@ Return number of used registers of particular type.
 
 */
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 UINTVAL
-Parrot_pcc_get_regs_used(PARROT_INTERP, ARGIN(PMC *ctx), int type)
+Parrot_pcc_get_regs_used(PARROT_INTERP, ARGIN(const PMC *ctx), int type)
 {
     ASSERT_ARGS(Parrot_pcc_get_regs_used)
-    return get_context_struct_fast(interp, ctx)->n_regs_used[type];
+    return CONTEXT_STRUCT(ctx)->n_regs_used[type];
 }
 
 /*
@@ -853,12 +725,12 @@ void
 Parrot_pcc_set_regs_used(PARROT_INTERP, ARGIN(PMC *ctx), int type, INTVAL num)
 {
     ASSERT_ARGS(Parrot_pcc_set_regs_used)
-    get_context_struct_fast(interp, ctx)->n_regs_used[type] = num;
+    CONTEXT_STRUCT(ctx)->n_regs_used[type] = num;
 }
 
 /*
 
-=item C<Regs_ni* Parrot_pcc_get_regs_ni(PARROT_INTERP, PMC *ctx)>
+=item C<Regs_ni* Parrot_pcc_get_regs_ni(PARROT_INTERP, const PMC *ctx)>
 
 Get pointer to FLOANFAL and INTVAL registers.
 
@@ -866,12 +738,13 @@ Get pointer to FLOANFAL and INTVAL registers.
 
 */
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 Regs_ni*
-Parrot_pcc_get_regs_ni(PARROT_INTERP, ARGIN(PMC *ctx))
+Parrot_pcc_get_regs_ni(PARROT_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_regs_ni)
-    return &(get_context_struct_fast(interp, ctx)->bp);
+    return &(CONTEXT_STRUCT(ctx)->bp);
 }
 
 /*
@@ -889,7 +762,7 @@ void
 Parrot_pcc_set_regs_ni(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(Regs_ni *bp))
 {
     ASSERT_ARGS(Parrot_pcc_set_regs_ni)
-    get_context_struct_fast(interp, ctx)->bp = *bp;
+    CONTEXT_STRUCT(ctx)->bp = *bp;
 }
 
 /*
@@ -902,12 +775,13 @@ Get pointer to PMC and STRING registers.
 
 */
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 Regs_ps*
 Parrot_pcc_get_regs_ps(PARROT_INTERP, ARGIN(PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_regs_ps)
-    return &(get_context_struct_fast(interp, ctx)->bp_ps);
+    return &(CONTEXT_STRUCT(ctx)->bp_ps);
 }
 
 /*
@@ -925,7 +799,7 @@ void
 Parrot_pcc_set_regs_ps(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(Regs_ps *bp_ps))
 {
     ASSERT_ARGS(Parrot_pcc_set_regs_ps)
-    get_context_struct_fast(interp, ctx)->bp_ps = *bp_ps;
+    CONTEXT_STRUCT(ctx)->bp_ps = *bp_ps;
 }
 
 
@@ -940,5 +814,5 @@ Parrot_pcc_set_regs_ps(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(Regs_ps *bp_ps))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -23,6 +22,7 @@ Subroutines, continuations, co-routines and other fun stuff...
 #include "sub.str"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_continuation.h"
+#include "parrot/oplib/core_ops.h"
 
 /* HEADERIZER HFILE: include/parrot/sub.h */
 
@@ -46,60 +46,6 @@ mark_context_start(void)
     if (++context_gc_mark == 0) context_gc_mark = 1;
 }
 
-
-/*
-
-=item C<PMC * new_ret_continuation_pmc(PARROT_INTERP, opcode_t *address)>
-
-Returns a new C<RetContinuation> PMC, and sets address field to C<address>
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-PMC *
-new_ret_continuation_pmc(PARROT_INTERP, ARGIN_NULLOK(opcode_t *address))
-{
-    ASSERT_ARGS(new_ret_continuation_pmc)
-    PMC* const continuation = Parrot_pmc_new(interp, enum_class_RetContinuation);
-    VTABLE_set_pointer(interp, continuation, address);
-    return continuation;
-}
-
-/*
-
-=item C<void invalidate_retc_context(PARROT_INTERP, PMC *cont)>
-
-Make true Continuations from all RetContinuations up the call chain.
-
-=cut
-
-*/
-
-void
-invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
-{
-    ASSERT_ARGS(invalidate_retc_context)
-
-    PMC *ctx = PARROT_CONTINUATION(cont)->from_ctx;
-    cont = Parrot_pcc_get_continuation(interp, ctx);
-
-    while (1) {
-        /*
-         * We  stop if we encounter a true continuation, because
-         * if one were created, everything up the chain would have been
-         * invalidated earlier.
-         */
-        if (!cont || cont->vtable != interp->vtables[enum_class_RetContinuation])
-            break;
-        cont->vtable = interp->vtables[enum_class_Continuation];
-        ctx  = Parrot_pcc_get_caller_ctx(interp, ctx);
-        cont = Parrot_pcc_get_continuation(interp, ctx);
-    }
-}
 
 /*
 
@@ -235,8 +181,8 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
 
         if (!debug)
             return 0;
-        for (i = n = 0; n < sub->seg->base.size; i++) {
-            op_info_t * const op_info = &interp->op_info_table[*pc];
+        for (i = n = 0; n < sub->seg->base.size; ++i) {
+            op_info_t * const op_info = sub->seg->op_info_table[*pc];
             opcode_t var_args = 0;
 
             if (i >= debug->base.size)
@@ -287,8 +233,11 @@ Parrot_Sub_get_line_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc), ARGIN_NULL
     base_pc            = sub->seg->base.data;
     current_annotation = pc - base_pc;
 
-    for (i = op = 0; op < debug_size; i++) {
-        op_info_t * const op_info  = &interp->op_info_table[*base_pc];
+    /* assert pc is in correct segment */
+    PARROT_ASSERT(base_pc <= pc && pc <= base_pc + sub->seg->base.size);
+
+    for (i = op = 0; op < debug_size; ++i) {
+        op_info_t * const op_info  = sub->seg->op_info_table[*base_pc];
         opcode_t          var_args = 0;
 
         if (i >= debug_size)
@@ -395,7 +344,7 @@ Parrot_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(PMC *ctx))
         PMC * const lex_pad = Parrot_pcc_get_lex_pad(interp, ctx);
         PMC * outer         = Parrot_pcc_get_outer_ctx(interp, ctx);
 
-        if (!outer)
+        if (PMC_IS_NULL(outer))
             return lex_pad;
 
         if (!PMC_IS_NULL(lex_pad))
@@ -428,7 +377,7 @@ Parrot_find_dynamic_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(PMC *ctx))
         PMC * const lex_pad = Parrot_pcc_get_lex_pad(interp, ctx);
         PMC * caller        = Parrot_pcc_get_caller_ctx(interp, ctx);
 
-        if (!caller)
+        if (PMC_IS_NULL(caller))
             return lex_pad;
 
         if (!PMC_IS_NULL(lex_pad))
@@ -475,7 +424,7 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
 
             if (!PMC_IS_NULL(child_sub->outer_sub)) {
                 PMC_get_sub(interp, child_sub->outer_sub, child_outer_sub);
-                if (Parrot_str_equal(interp, current_sub->subid,
+                if (STRING_equal(interp, current_sub->subid,
                                       child_outer_sub->subid)) {
                     child_sub->outer_ctx = ctx;
                 }
@@ -488,18 +437,6 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
     PMC_get_sub(interp, sub_pmc, sub);
     if (PMC_IS_NULL(sub->outer_sub))
         return;
-
-#if 0
-    /* verify that the current sub is sub_pmc's :outer */
-    PMC_get_sub(interp, sub->outer_sub, outer_sub);
-    if (Parrot_str_not_equal(interp, current_sub->subid,
-                         outer_sub->subid)) {
-        Parrot_ex_throw_from_c_args(interp, NULL,
-            EXCEPTION_INVALID_OPERATION, "'%Ss' isn't the :outer of '%Ss'",
-            current_sub->name, sub->name);
-        return;
-    }
-#endif
 
     /* set the sub's outer context to the current context */
     sub->outer_ctx = ctx;
@@ -570,6 +507,7 @@ Parrot_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
     ASSERT_ARGS(Parrot_continuation_rewind_environment)
 
     PMC * const to_ctx = PARROT_CONTINUATION(pmc)->to_ctx;
+    PMC * const sig    = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     /* debug print before context is switched */
     if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
@@ -582,6 +520,7 @@ Parrot_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
 
     /* set context */
     CURRENT_CONTEXT(interp) = to_ctx;
+    Parrot_pcc_set_signature(interp, to_ctx, sig);
 }
 
 
@@ -601,10 +540,11 @@ PARROT_CANNOT_RETURN_NULL
 void *
 Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass)) {
     ASSERT_ARGS(Parrot_get_sub_pmc_from_subclass)
-    PMC *key, *sub_pmc;
 
     /* Ensure we really do have a subclass of sub. */
     if (VTABLE_isa(interp, subclass, CONST_STRING(interp, "Sub"))) {
+        PMC *key, *sub_pmc;
+
         /* If it's actually a PMC still, probably does the same structure
          * underneath. */
         if (!PObj_is_object_TEST(subclass)) {
@@ -631,10 +571,6 @@ Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass)) {
 
 F<include/parrot/sub.h>.
 
-=head1 HISTORY
-
-Initial version by Melvin on 2002/06/6.
-
 =cut
 
 */
@@ -644,5 +580,5 @@ Initial version by Melvin on 2002/06/6.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

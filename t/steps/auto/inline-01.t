@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2007, Parrot Foundation.
-# $Id$
 # auto/inline-01.t
 
 use strict;
@@ -68,7 +67,7 @@ ok($step->_evaluate_inline($conf, $test),
     "_evaluate_inline() returned true value");
 is($step->result, q{yes}, "Got expected result");
 is($conf->data->get( 'inline' ), 1,
-    "'inline' attribute has expected value");;
+    "'inline' attribute has expected value");
 
 $conf->replenish($serialized);
 
@@ -85,7 +84,7 @@ ok($step->_evaluate_inline($conf, $test),
     "_evaluate_inline() returned true value");
 is($step->result, q{no}, "Got expected result");
 is($conf->data->get( 'inline' ), q{},
-    "'inline' attribute has expected value");;
+    "'inline' attribute has expected value");
 
 $conf->replenish($serialized);
 
@@ -105,7 +104,7 @@ $step = test_step_constructor_and_description($conf);
         \$stdout
     );
     ok($ret, "_evaluate_inline() returned true value");
-    is($step->result, q{yes}, "Got expected result");;
+    is($step->result, q{yes}, "Got expected result");
     is($conf->data->get( 'inline' ), 1,
         "'inline' attribute has expected value");
 }

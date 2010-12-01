@@ -1,6 +1,5 @@
 /*
- * $Id$
- * Copyright (C) 2002-2009, Parrot Foundation.
+ * Copyright (C) 2002-2010, Parrot Foundation.
  */
 
 #include <stdlib.h>
@@ -10,6 +9,7 @@
 #include "pbc.h"
 #include "optimizer.h"
 #include "pmc/pmc_callcontext.h"
+#include "parrot/oplib/core_ops.h"
 
 /*
 
@@ -50,7 +50,7 @@ static int e_file_emit(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-static int e_file_open(PARROT_INTERP, ARGIN(void *param))
+static int e_file_open(PARROT_INTERP, ARGIN(const char *param))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -112,81 +112,9 @@ _mk_instruction(ARGIN(const char *op), ARGIN(const char *fmt), int n,
         ins->symregs[i]  = r[i];
 
     ins->flags = flags;
-    ins->opnum = -1;
+    ins->op    = NULL;
 
     return ins;
-}
-
-
-/*
- * Some instructions don't have a hint in op_info that they work
- * on all registers or all registers of a given type (e.g., cleari)
- * These instructions need special handling at various points in the code.
- */
-
-static int w_special[1+4*3];
-
-/*
-
-=item C<void imcc_init_tables(PARROT_INTERP)>
-
-Initializes IMCC's table of opcodes, based on the list maintained
-by the Parrot interpreter. Stores the results in global variable
-C<w_special>.
-
-=cut
-
-*/
-
-void
-imcc_init_tables(PARROT_INTERP)
-{
-    ASSERT_ARGS(imcc_init_tables)
-    const char *writes[] = {
-        "cleari", "clearn", "clearp", "clears",
-    };
-    /* init opnums */
-    if (!w_special[0]) {
-        size_t i;
-        for (i = 0; i < N_ELEMENTS(writes); i++) {
-            const int n = interp->op_lib->op_code(interp, writes[i], 1);
-            PARROT_ASSERT(n);
-            w_special[i] = n;
-        }
-    }
-}
-
-/*
-
-=item C<int ins_writes2(const Instruction *ins, int t)>
-
-Returns TRUE if instruction ins writes to a register of type t
-
-=cut
-
-*/
-
-int
-ins_writes2(ARGIN(const Instruction *ins), int t)
-{
-    ASSERT_ARGS(ins_writes2)
-    const char *p;
-
-    if (ins->opnum == w_special[0])
-        return 1;
-
-    p = strchr(types, t);
-
-    if (p) {
-        const size_t idx = p - types;
-        size_t i;
-
-        for (i = 1; i < N_ELEMENTS(w_special); i += 4)
-            if (ins->opnum == w_special[i + idx])
-                return 1;
-    }
-
-    return 0;
 }
 
 /*
@@ -205,19 +133,22 @@ instruction_reads(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
 {
     ASSERT_ARGS(instruction_reads)
     int f, i;
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(NULL);
 
-    if (ins->opnum == PARROT_OP_set_args_pc
-    ||  ins->opnum == PARROT_OP_set_returns_pc) {
+    if (ins->op && ins->op->lib == core_ops) {
+        if (OP_INFO_OPNUM(ins->op) == PARROT_OP_set_args_pc
+        ||  OP_INFO_OPNUM(ins->op) == PARROT_OP_set_returns_pc) {
 
-        for (i = ins->symreg_count - 1; i >= 0; --i)
-            if (r == ins->symregs[i])
-                return 1;
+            for (i = ins->symreg_count - 1; i >= 0; --i)
+                if (r == ins->symregs[i])
+                    return 1;
 
-        return 0;
-    }
-    else if (ins->opnum == PARROT_OP_get_params_pc ||
-             ins->opnum == PARROT_OP_get_results_pc) {
-        return 0;
+            return 0;
+        }
+        else if (OP_INFO_OPNUM(ins->op) == PARROT_OP_get_params_pc ||
+                 OP_INFO_OPNUM(ins->op) == PARROT_OP_get_results_pc) {
+            return 0;
+        }
     }
 
     f = ins->flags;
@@ -244,7 +175,7 @@ instruction_reads(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
 
     /* a sub call reads the previous args */
     if (ins->type & ITPCCSUB) {
-        while (ins && ins->opnum != PARROT_OP_set_args_pc)
+        while (ins && ins->op != &core_ops->op_info_table[PARROT_OP_set_args_pc])
             ins = ins->prev;
 
         if (!ins)
@@ -275,21 +206,18 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
 {
     ASSERT_ARGS(instruction_writes)
     const int f = ins->flags;
-    int i;
+    int j;
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(NULL);
 
-    /*
-     * a get_results opcode is before the actual sub call
-     * but for the register allocator, the effect matters, thus
-     * postpone the effect after the invoke
-     */
-    if (ins->opnum == PARROT_OP_get_results_pc) {
+    /* a get_results opcode occurs after the actual sub call */
+    if (ins->op == &core_ops->op_info_table[PARROT_OP_get_results_pc]) {
         int i;
 
         /* but only if it isn't the get_results opcode of
          * an ExceptionHandler, which doesn't have
          * a call next
          */
-        if (ins->next && (ins->next->type & ITPCCSUB))
+        if (ins->prev && (ins->prev->type & ITPCCSUB))
             return 0;
 
         for (i = ins->symreg_count - 1; i >= 0; --i) {
@@ -307,8 +235,8 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
          * and point to the most recent pcc_sub
          * structure
          */
-        while (ins && ins->opnum != PARROT_OP_get_results_pc)
-            ins = ins->prev;
+        while (ins && ins->op != &core_ops->op_info_table[PARROT_OP_get_results_pc])
+            ins = ins->next;
 
         if (!ins)
             return 0;
@@ -321,7 +249,7 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
         return 0;
     }
 
-    if (ins->opnum == PARROT_OP_get_params_pc) {
+    if (ins->op == &core_ops->op_info_table[PARROT_OP_get_params_pc]) {
         int i;
 
         for (i = ins->symreg_count - 1; i >= 0; --i) {
@@ -331,18 +259,19 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
 
         return 0;
     }
-    else if (ins->opnum == PARROT_OP_set_args_pc
-         ||  ins->opnum == PARROT_OP_set_returns_pc) {
+    else if (ins->op == &core_ops->op_info_table[PARROT_OP_set_args_pc]
+         ||  ins->op == &core_ops->op_info_table[PARROT_OP_set_returns_pc]) {
         return 0;
     }
 
-    for (i = 0; i < ins->symreg_count; i++)
-        if (f & (1 << (16 + i)))
-            if (ins->symregs[i] == r)
+    for (j = 0; j < ins->symreg_count; j++)
+        if (f & (1 << (16 + j)))
+            if (ins->symregs[j] == r)
                 return 1;
 
     return 0;
 }
+
 
 /*
 
@@ -677,10 +606,6 @@ ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
     int i;
     int len;
 
-#if IMC_TRACE
-    Parrot_io_eprintf(NULL, "ins_print\n");
-#endif
-
     /* comments, labels and such */
     if (!ins->symregs[0] || !strchr(ins->format, '%'))
         return Parrot_io_fprintf(interp, io, "%s", ins->format);
@@ -697,16 +622,6 @@ ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
             snprintf(regb[i], REGB_SIZE, "%c%d", p->set, (int)p->color);
             regstr[i] = regb[i];
         }
-        else if (IMCC_INFO(interp)->allocated
-             && (IMCC_INFO(interp)->optimizer_level & OPT_J)
-             &&  p->set != 'K'
-             &&  p->color < 0
-             && REG_NEEDS_ALLOC(p)) {
-                    snprintf(regb[i], REGB_SIZE,
-                        "r%c%d", tolower((unsigned char)p->set),
-                        -1 -(int)p->color);
-                    regstr[i] = regb[i];
-        }
         else if (p->type & VTREGKEY) {
             const SymReg *k = p;
 
@@ -718,13 +633,6 @@ ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
                 if (k->reg && k->reg->color >= 0)
                     snprintf(regb[i]+used, REGB_SIZE - used, "%c%d",
                             k->reg->set, (int)k->reg->color);
-                else if (IMCC_INFO(interp)->allocated
-                     && (IMCC_INFO(interp)->optimizer_level & OPT_J)
-                     && k->reg
-                     && k->reg->color < 0)
-                        snprintf(regb[i]+used, REGB_SIZE - used, "r%c%d",
-                            tolower((unsigned char)k->reg->set),
-                            -1 -(int)k->reg->color);
                 else
                     strncat(regb[i], k->name, REGB_SIZE - used - 1);
 
@@ -785,7 +693,7 @@ static char *output;
 
 /*
 
-=item C<static int e_file_open(PARROT_INTERP, void *param)>
+=item C<static int e_file_open(PARROT_INTERP, const char *param)>
 
 Prints a message to STDOUT.
 
@@ -794,19 +702,19 @@ Prints a message to STDOUT.
 */
 
 static int
-e_file_open(PARROT_INTERP, ARGIN(void *param))
+e_file_open(PARROT_INTERP, ARGIN(const char *param))
 {
     ASSERT_ARGS(e_file_open)
-    char * const file = (char *) param;
+    DECL_CONST_CAST;
 
-    if (!STREQ(file, "-")) {
-        FILE *newfile = freopen(file, "w", stdout);
+    if (!STREQ(param, "-")) {
+        FILE *newfile = freopen(param, "w", stdout);
         if (!newfile)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
                 "Cannot reopen stdout: %s'\n", strerror(errno));
     }
 
-    output = file;
+    output = PARROT_const_cast(char *, param);
     Parrot_io_printf(interp, "# IMCC does produce b0rken PASM files\n");
     Parrot_io_printf(interp, "# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392\n");
     return 1;
@@ -815,6 +723,8 @@ e_file_open(PARROT_INTERP, ARGIN(void *param))
 /*
 
 =item C<static int e_file_close(PARROT_INTERP, void *param)>
+
+Close STDOUT
 
 =cut
 
@@ -835,6 +745,8 @@ e_file_close(PARROT_INTERP, SHIM(void *param))
 =item C<static int e_file_emit(PARROT_INTERP, void *param, const IMC_Unit *unit,
 const Instruction *ins)>
 
+emit the Instruction C<ins> to the given IMC_Unit C<unit>, passing C<param>
+
 =cut
 
 */
@@ -846,9 +758,7 @@ e_file_emit(PARROT_INTERP,
         ARGIN(const Instruction *ins))
 {
     ASSERT_ARGS(e_file_emit)
-#if IMC_TRACE
-    Parrot_io_eprintf(NULL, "e_file_emit\n");
-#endif
+
     if ((ins->type & ITLABEL) || ! *ins->opname)
         ins_print(interp, Parrot_io_STDOUT(interp), ins);
     else {
@@ -862,7 +772,7 @@ e_file_emit(PARROT_INTERP,
 
 /*
 
-=item C<int emit_open(PARROT_INTERP, int type, void *param)>
+=item C<int emit_open(PARROT_INTERP, int type, const char *param)>
 
 Opens the emitter function C<open> of the given C<type>. Passes
 the C<param> to the open function.
@@ -871,13 +781,11 @@ the C<param> to the open function.
 
 */
 
-PARROT_EXPORT
 int
-emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
+emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(const char *param))
 {
     ASSERT_ARGS(emit_open)
     IMCC_INFO(interp)->emitter       = type;
-    IMCC_INFO(interp)->has_compile   = 0;
     IMCC_INFO(interp)->dont_optimize = 0;
 
     return (emitters[IMCC_INFO(interp)->emitter]).open(interp, param);
@@ -894,7 +802,6 @@ IMC_Unit C<unit>.
 
 */
 
-PARROT_EXPORT
 int
 emit_flush(PARROT_INTERP, ARGIN_NULLOK(void *param), ARGIN(IMC_Unit *unit))
 {
@@ -906,7 +813,7 @@ emit_flush(PARROT_INTERP, ARGIN_NULLOK(void *param), ARGIN(IMC_Unit *unit))
         (emitters[emitter]).new_sub(interp, param, unit);
 
     for (ins = unit->instructions; ins; ins = ins->next) {
-        IMCC_debug(interp, DEBUG_IMC, "emit %I\n", ins);
+        IMCC_debug(interp, DEBUG_IMC, "emit %d\n", ins);
         (emitters[emitter]).emit(interp, param, unit, ins);
     }
 
@@ -926,7 +833,6 @@ Closes the given emitter.
 
 */
 
-PARROT_EXPORT
 int
 emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
 {
@@ -946,5 +852,5 @@ emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

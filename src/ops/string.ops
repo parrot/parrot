@@ -1,7 +1,14 @@
 /*
- * $Id$
 ** string.ops
 */
+
+BEGIN_OPS_PREAMBLE
+
+#if PARROT_HAS_ICU
+#  include <unicode/uchar.h>
+#endif
+
+END_OPS_PREAMBLE
 
 =head1 NAME
 
@@ -11,6 +18,9 @@ string.ops - String Opcodes
 
 Operations that work on strings, whether constructing, modifying
 or examining them.
+
+When making changes to any ops file, run C<make bootstrap-ops> to regenerate
+all generated ops files.
 
 =over 4
 
@@ -37,11 +47,11 @@ If $3 is less than the negative of the length of $2, an exception is thrown.
 =cut
 
 inline op ord(out INT, in STR) :base_core {
-    $1 = string_ord(interp, $2, 0);
+    $1 = STRING_ord(interp, $2, 0);
 }
 
 inline op ord(out INT, in STR, in INT) :base_core {
-    $1 = string_ord(interp, $2, $3);
+    $1 = STRING_ord(interp, $2, $3);
 }
 
 
@@ -52,15 +62,10 @@ The character specified by codepoint integer $2 is returned in string $1.
 =cut
 
 inline op chr(out STR, in INT) :base_core {
-    STRING * const s = string_chr(interp, (UINTVAL)$2);
+    STRING * const s = Parrot_str_chr(interp, (UINTVAL)$2);
     $1 = s;
 }
 
-
-=item B<chopn>(inout STR, in INT)
-
-Remove n characters specified by integer $2 from the tail of string $1.
-If $2 is negative, cut the string after -$2 characters.
 
 =item B<chopn>(out STR, in STR, in INT)
 
@@ -69,10 +74,6 @@ and returns the characters not chopped in string $1.
 If $3 is negative, cut the string after -$3 characters.
 
 =cut
-
-inline op chopn(inout STR, in INT) :base_core {
-    Parrot_str_chopn_inplace(interp, $1, $2);
-}
 
 inline op chopn(out STR, in STR, in INT) :base_core {
     $1 = Parrot_str_chopn(interp, $2, $3);
@@ -97,8 +98,8 @@ Append string $3 to string $2 and place the result into string $1.
 
 =cut
 
-inline op concat(inout STR, in STR) :base_mem {
-    $1 = Parrot_str_append(interp, $1, $2);
+inline op concat(inout STR, in STR) :base_mem :deprecated {
+    $1 = Parrot_str_concat(interp, $1, $2);
 }
 
 inline op concat(invar PMC, invar PMC) :base_core {
@@ -110,7 +111,7 @@ inline op concat(invar PMC, in STR) :base_core {
 }
 
 inline op concat(out STR, in STR, in STR) :base_mem {
-    $1 = Parrot_str_concat(interp, $2, $3, 1);
+    $1 = Parrot_str_concat(interp, $2, $3);
 }
 
 inline op concat(invar PMC, invar PMC, in STR) :base_core {
@@ -193,19 +194,11 @@ If $2 is NULL or zero length, zero is returned.
 =cut
 
 inline op length(out INT, in STR) :base_mem {
-    $1 = $2 ? Parrot_str_byte_length(interp, $2) : 0;
+    $1 = Parrot_str_length(interp, $2);
 }
 
 inline op bytelength(out INT, in STR) :base_mem {
-    UINTVAL n;
-    STRING * const s = $2;
-    if (!s)
-        n = 0;
-    else {
-        n = s->bufused;
-        PARROT_ASSERT(n == ENCODING_BYTES(interp, $2));
-    }
-    $1 = n;
+    $1 = Parrot_str_byte_length(interp, $2);
 }
 
 
@@ -240,17 +233,15 @@ op unpin(inout STR) :base_mem {
 
 =item B<substr>(out STR, in STR, in INT, in INT)
 
-=item B<substr>(out STR, inout STR, in INT, in INT, in STR)
-
-=item B<substr>(inout STR, in INT, in INT, in STR)
-
 =item B<substr>(out STR, invar PMC, in INT, in INT)
 
 Set $1 to the portion of $2 starting at (zero-based) character position
 $3 and having length $4. If no length ($4) is provided, it is equivalent to
-passing in the length of $2. This creates a COW copy of $2.
+passing in the length of $2.
 
-Optionally pass in string $5 for replacement. If the length of $5 is
+=item B<replace>(out STR, in STR, in INT, in INT, in STR)
+
+Replace part of $2 starting from $3 of length $4 with $5. If the length of $5 is
 different from the length specified in $4, then $2 will grow or shrink
 accordingly. If $3 is one character position larger than the length of
 $2, then $5 is appended to $2 (and the empty string is returned);
@@ -262,30 +253,25 @@ Finally, if $3 is negative, then it is taken to count backwards from
 the end of the string (ie an offset of -1 corresponds to the last
 character).
 
-The third form is optimized for replace only, ignoring the replaced
-substring and does not waste a register to do the string replace.
+New $1 string returned.
 
 =cut
 
 inline op substr(out STR, in STR, in INT) :base_core {
     const INTVAL len = Parrot_str_byte_length(interp, $2);
-    $1 = Parrot_str_substr(interp, $2, $3, len, &$1, 0);
+    $1 = STRING_substr(interp, $2, $3, len);
 }
 
 inline op substr(out STR, in STR, in INT, in INT) :base_core {
-    $1 = Parrot_str_substr(interp, $2, $3, $4, &$1, 0);
-}
-
-inline op substr(out STR, inout STR, in INT, in INT, in STR) :base_core {
-    $1 = Parrot_str_replace(interp, $2, $3, $4, $5, &$1);
-}
-
-inline op substr(inout STR, in INT, in INT, in STR) :base_core {
-    (void)Parrot_str_replace(interp, $1, $2, $3, $4, NULL);
+    $1 = STRING_substr(interp, $2, $3, $4);
 }
 
 inline op substr(out STR, invar PMC, in INT, in INT) :base_core {
     $1 = VTABLE_substr_str(interp, $2, $3, $4);
+}
+
+inline op replace(out STR, in STR, in INT, in INT, in STR) :base_core {
+    $1 = Parrot_str_replace(interp, $2, $3, $4, $5);
 }
 
 
@@ -305,11 +291,11 @@ B<index> returns "-1".
 =cut
 
 inline op index(out INT, in STR, in STR) :base_core {
-    $1 = ($2 && $3) ? Parrot_str_find_index(interp, $2, $3, 0) : -1;
+    $1 = ($2 && $3) ? STRING_index(interp, $2, $3, 0) : -1;
 }
 
 inline op index(out INT, in STR, in STR, in INT) :base_core {
-    $1 = ($2 && $3) ? Parrot_str_find_index(interp, $2, $3, $4) : -1;
+    $1 = ($2 && $3) ? STRING_index(interp, $2, $3, $4) : -1;
 }
 
 
@@ -344,14 +330,16 @@ inline op sprintf(out PMC, invar PMC, invar PMC) :base_core {
 
 Allocate a new empty string of length $2 (optional).
 
+XXX: Do these ops make sense with immutable strings?
+
 =cut
 
 inline op new(out STR) :base_mem {
-    $1 = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+    $1 = Parrot_str_new_noinit(interp, 0);
 }
 
 inline op new(out STR, in INT) :base_mem {
-    $1 = Parrot_str_new_noinit(interp, enum_stringrep_one, $2);
+    $1 = Parrot_str_new_noinit(interp, $2);
 }
 
 
@@ -419,28 +407,15 @@ inline op stringinfo(out INT, in STR, in INT) :base_core {
 
 Uppercase $2 and put the result in $1
 
-=item B<upcase>(inout STR)
-
-Uppercase $1 in place
-
 =cut
 
 inline op upcase(out STR, in STR) :base_core {
     $1 = Parrot_str_upcase(interp, $2);
 }
 
-inline op upcase(inout STR) :base_core {
-    Parrot_str_upcase_inplace(interp, $1);
-}
-
-
 =item B<downcase>(out STR, in STR)
 
 Downcase $2 and put the result in $1
-
-=item B<downcase>(inout STR)
-
-Downcase $1 in place
 
 =cut
 
@@ -448,27 +423,14 @@ inline op downcase(out STR, in STR) :base_core {
     $1 = Parrot_str_downcase(interp, $2);
 }
 
-inline op downcase(inout STR) :base_core {
-    Parrot_str_downcase_inplace(interp, $1);
-}
-
-
 =item B<titlecase>(out STR, in STR)
 
 Titlecase $2 and put the result in $1
-
-=item B<titlecase>(inout STR)
-
-Titlecase $1 in place
 
 =cut
 
 inline op titlecase(out STR, in STR) :base_core {
     $1 = Parrot_str_titlecase(interp, $2);
-}
-
-inline op titlecase(inout STR) :base_core {
-    Parrot_str_titlecase_inplace(interp, $1);
 }
 
 
@@ -498,62 +460,6 @@ op split(out PMC, in STR, in STR) :base_core {
 }
 
 
-=item B<charset>(out INT, in STR)
-
-Return the charset number $1 of string $2.
-
-=item B<charsetname>(out STR, in INT)
-
-Return the name $1 of charset number $2.
-If charset number $2 is not found, name $1 is set to null.
-
-=item B<find_charset>(out INT, in STR)
-
-Return the charset number of the charset named $2. If the charset doesn't
-exist, throw an exception.
-
-=item B<trans_charset>(inout STR, in INT)
-
-Change the string to have the specified charset.
-
-=item B<trans_charset>(out STR, in STR, in INT)
-
-Create a string $1 from $2 with the specified charset.
-
-Both functions may throw an exception on information loss.
-
-=cut
-
-op charset(out INT, in STR) :base_core {
-    $1 = Parrot_charset_number_of_str(interp, $2);
-}
-
-op charsetname(out STR, in INT) :base_core {
-    STRING * const name = Parrot_charset_name(interp, $2);
-    $1 = name ? Parrot_str_copy(interp, name) : NULL;
-}
-
-op find_charset(out INT, in STR) :base_core {
-    const INTVAL n = Parrot_charset_number(interp, $2);
-    if (n < 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
-                EXCEPTION_INVALID_CHARTYPE,
-                "charset '%Ss' not found", $2);
-        goto ADDRESS(handler);
-    }
-    $1 = n;
-}
-
-op trans_charset(inout STR, in INT) {
-    $1 = Parrot_str_change_charset(interp, $1, $2, NULL);
-}
-
-op trans_charset(out STR, in STR, in INT) {
-    STRING *dest = Parrot_gc_new_string_header(interp, 0);
-    $1 = Parrot_str_change_charset(interp, $2, $3, dest);
-}
-
-
 =item B<encoding>(out INT, in STR)
 
 Return the encoding number $1 of string $2.
@@ -568,10 +474,6 @@ If encoding number $2 is not found, name $1 is set to null.
 Return the encoding number of the encoding named $2. If the encoding doesn't
 exist, throw an exception.
 
-=item B<trans_encoding>(inout STR, in INT)
-
-Change the string to have the specified encoding.
-
 =item B<trans_encoding>(out STR, in STR, in INT)
 
 Create a string $1 from $2 with the specified encoding.
@@ -585,8 +487,7 @@ op encoding(out INT, in STR) :base_core {
 }
 
 op encodingname(out STR, in INT) :base_core {
-    STRING * const name = Parrot_encoding_name(interp, $2);
-    $1 = name ? Parrot_str_copy(interp, name) : NULL;
+    $1 = Parrot_encoding_name(interp, $2);
 }
 
 op find_encoding(out INT, in STR) :base_core {
@@ -600,13 +501,8 @@ op find_encoding(out INT, in STR) :base_core {
     $1 = n;
 }
 
-op trans_encoding(inout STR, in INT) {
-    $1 = Parrot_str_change_encoding(interp, $1, $2, NULL);
-}
-
 op trans_encoding(out STR, in STR, in INT) {
-    STRING * const dest = Parrot_gc_new_string_header(interp, 0);
-    $1 = Parrot_str_change_encoding(interp, $2, $3, dest);
+    $1 = Parrot_str_change_encoding(interp, $2, $3);
 }
 
 
@@ -670,11 +566,32 @@ op compose(out STR, in STR) {
 }
 
 
+=item B<find_codepoint>(out INT, in STR)
+
+Set $1 to the codepoint with the name given in $2, or -1 if there is none.
+Requires ICU lib, otherwise exception is thrown.
+
+=cut
+
+op find_codepoint(out INT, in STR) {
+#if PARROT_HAS_ICU
+    UErrorCode   err       = U_ZERO_ERROR;
+    char * const cstr      = Parrot_str_to_cstring(interp, $2);
+    UChar32      codepoint = u_charFromName(U_EXTENDED_CHAR_NAME, cstr, &err);
+    Parrot_str_free_cstring(cstr);
+    $1 = U_SUCCESS(err) ? (INTVAL) codepoint : -1;
+#else
+    opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
+    goto ADDRESS(dest);
+#endif
+}
+
 =back
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 LICENSE
 
@@ -687,5 +604,5 @@ as the Parrot interpreter itself.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

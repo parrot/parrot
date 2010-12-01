@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -14,7 +13,7 @@ $ENV{TEST_PROG_ARGS} ||= '';
 plan( skip_all => 'lexicals not thawed properly from PBC, TT #1171' )
     if $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
 
-plan( tests => 57 );
+plan( tests => 56 );
 
 =head1 NAME
 
@@ -98,16 +97,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (.local pmc ab
 .end
 CODE
 ok
-ok
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', '.lex - same lex twice' );
-.sub main
- .lex '$a', $P0
- .lex '$a', $P1
- say "ok"
-.end
-CODE
 ok
 OUTPUT
 
@@ -850,7 +839,7 @@ CODE
 /Null PMC access/
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', 'get non existing' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'get undefined lexical' );
 .sub "main" :main
     .lex 'a', $P0
     foo()
@@ -862,9 +851,14 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', 'get non existing' );
 .sub bar   :outer('foo')
     .lex 'c', $P0
     $P2 = find_lex 'no_such'
+    if null $P2 goto ok
+    print "Undefined name not NULL\n"
+    end
+ok:
+    print "ok\n"
 .end
 CODE
-/Lexical 'no_such' not found/
+ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'find_name on lexicals' );

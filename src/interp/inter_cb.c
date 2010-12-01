@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -25,6 +24,7 @@ the C-library.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "pmc/pmc_parrotinterpreter.h"
 #include "inter_cb.str"
 
@@ -159,7 +159,6 @@ verify_CD(ARGIN(char *external_data), ARGMOD_NULLOK(PMC *user_data))
 {
     ASSERT_ARGS(verify_CD)
     PARROT_INTERP = NULL;
-    size_t i;
     PMC    *interp_pmc;
     STRING *sc;
 
@@ -315,11 +314,6 @@ Parrot_run_callback(PARROT_INTERP,
       case 'v':
         pasm_sig[1] = 'v';
         break;
-#if 0
-      case '2':
-      case '3':
-      case '4':
-#endif
       case 'l':
         i_param = (INTVAL)(long) external_data;
         goto case_I;
@@ -335,14 +329,6 @@ case_I:
         pasm_sig[1] = 'I';
         param = (void*) i_param;
         break;
-#if 0
-      case 'f':
-      case 'd':
-        /* these types don't fit into a pointer, they will not
-         * work
-         */
-        break;
-#endif
       case 'p':
         /* created a UnManagedStruct */
         p_param = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
@@ -350,11 +336,6 @@ case_I:
         pasm_sig[1] = 'P';
         param = (void*) p_param;
         break;
-#if 0
-      case 'P':
-        pasm_sig[1] = 'P';
-        break;
-#endif
       case 't':
         pasm_sig[1] = 'S';
         param = Parrot_str_new(interp, external_data, 0);
@@ -369,8 +350,7 @@ case_I:
     pasm_sig[2] = '-';
     pasm_sig[3] = '>';  /* no return value supported yet */
     pasm_sig[4] = '\0';
-    Parrot_pcc_invoke_sub_from_c_args(interp, sub, pasm_sig,
-            user_data, param);
+    Parrot_ext_call(interp, sub, pasm_sig, user_data, param);
 }
 /*
 
@@ -405,5 +385,5 @@ Parrot_callback_D(ARGMOD(PMC *user_data), ARGMOD_NULLOK(char *external_data))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

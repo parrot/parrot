@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -164,9 +163,9 @@ then a warning is generated if perl is running under -w.
 
     # padding with '='
     if len_mod_3 == 0 goto END_2
-        substr base64, -1, 1, ascii:"="
+        base64 = replace base64, -1, 1, ascii:"="
         if len_mod_3 == 2 goto END_2
-            substr base64, -2, 1, ascii:"="
+            base64 = replace base64, -2, 1, ascii:"="
     END_2:
 
     .return( base64 )
@@ -260,9 +259,9 @@ then a warning is generated if perl is running under -w.
     # cut padded '='
     if len_mod_4 == 0 goto END_3
         if len_mod_4 == 1 goto END_3
-	    chopn plain, 1
+	    plain = chopn plain, 1
             if len_mod_4 == 3 goto END_3
-	        chopn plain, 1
+	        plain = chopn plain, 1
     END_3:
 
     .return( plain )

@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -59,12 +58,14 @@ STDERR by default.
 
 	output = args['output']
 	unless null output goto CHECK_ERROR_OUTPUT
-	getstdout output
+        $P0 = getinterp
+        output = $P0.'stdout_handle'()
 
   CHECK_ERROR_OUTPUT:
 	diag_output = args['diag_output']
 	unless null diag_output goto SET_OUTPUT
-	getstderr diag_output
+        $P0 = getinterp
+        diag_output = $P0.'stdout_handle'()
 
   SET_OUTPUT:
 	setattribute self, "output", output
@@ -122,7 +123,8 @@ unescaped newlines.
   	newline_index = index message, "\n"
 	if newline_index == -1 goto END_LOOP
 	inc newline_index
-	line = substr message, 0, newline_index, ''
+	line    = substr message, 0, newline_index
+	message = replace message, 0, newline_index, ''
 	push lines, line
 	if message goto SPLIT_LOOP
 
@@ -143,7 +145,7 @@ unescaped newlines.
     if i == 0 goto LINE_OK
   	line       = lines[i]
   	first_char = substr line, 0, 1
-	eq_str first_char, '#', LINE_OK
+	if first_char == '#' goto LINE_OK
 
 	.local string new_line
 	new_line = '# '
@@ -161,7 +163,7 @@ unescaped newlines.
 	.return( message )
 .end
 
-=item C<diag( message )>
+=item C<diag( message, ... )>
 
 Writes the string C<message> to the diagnostic filehandle, TAP-escaping any
 unescaped newlines.
@@ -169,7 +171,9 @@ unescaped newlines.
 =cut
 
 .sub diag :method
-	.param string message
+	.param pmc args :slurpy
+	.local string message
+	message = join '', args
 
 	.local int message_length
 	message_length = length message
@@ -181,7 +185,7 @@ unescaped newlines.
 
 	.local string first_char
 	first_char = substr message, 0, 1
-	eq_str first_char, '#', WRITE_MESSAGE
+	if first_char == '#' goto WRITE_MESSAGE
 
 	first_char = '# '
 	concat first_char, message
@@ -190,7 +194,7 @@ unescaped newlines.
   WRITE_MESSAGE:
 	.local pmc diag_output
 	diag_output = self.'diag_output'()
-	diag_output.'puts'( message )
+	.tailcall diag_output.'puts'( message )
 .end
 
 =back

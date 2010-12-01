@@ -25,22 +25,22 @@ by your own.
 
 Runtime requirements:
 
-  libreadline6 ncurses libintl8 libgmp3 libgdbm4
+  libreadline6 ncurses libintl8 libgmp3
 
 Optional requirements:
 
-  libicu38 libpq5 openssl
+  libicu38 libpq5
 
   for opengl: w32api opengl or libglut3 xorg-x11-base xorg-x11-bin-dlls
 
 Build requirements:
 
   gcc make perl parrot readline libncurses-devel libgmp-devel
-  libgdbm-devel pcre-devel
+  pcre-devel
 
 Optional build requirements:
 
-  libicu-devel openssl-devel
+  libicu-devel
 
   for Cygwin/X opengl: freeglut libglut-devel xorg-x11-devel
 

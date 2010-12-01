@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2006-2009, Parrot Foundation.
- * $Id$
  */
 
 /*
@@ -99,5 +98,5 @@ Parrot_signbit_l(long double x)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

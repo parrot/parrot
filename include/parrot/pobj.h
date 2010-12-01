@@ -1,13 +1,11 @@
 /* pobj.h
  *  Copyright (C) 2001-2005, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Parrot Object data members and flags enum
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
- *  References: memory_internals.pod
+ *  References: memory_internals.pod (out of date as of 8/2010).
  */
 
 #ifndef PARROT_POBJ_H_GUARD
@@ -15,93 +13,102 @@
 
 #include "parrot/config.h"
 
-/* Parrot Object - base class for all others */
+/* This is the base Parrot object structure. Every object begins with
+   this slot, then has additional slots as required. */
+
 typedef struct pobj_t {
-    Parrot_UInt flags;
+    Parrot_UInt flags;                  /* Lots of flags (see below). */
 } PObj;
+
+/* This is a buffer header object, "inheriting" from PObj. */
 
 typedef struct buffer_t {
     Parrot_UInt flags;
-    void *     _bufstart;
-    size_t     _buflen;
+    void *     _bufstart;               /* Pointer to start of buffer data
+                                           (not buffer prolog). */
+    size_t     _buflen;                 /* Length of buffer data. */
 } Buffer;
+
+typedef enum Forward_flag {
+    Buffer_moved_FLAG   = 1 << 0,
+    Buffer_shared_FLAG  = 1 << 1
+} Forward_flags;
+
+/* Use these macros to access the two buffer header slots. */
 
 #define Buffer_bufstart(buffer)    (buffer)->_bufstart
 #define Buffer_buflen(buffer)      (buffer)->_buflen
 
-/* See src/gc/alloc_resources.c. the basic idea is that buffer memory is
-   set up as follows:
-                    +-----------------+
-                    |  ref_count   |f |    # GC header
-  obj->bufstart  -> +-----------------+
-                    |  data           |
-                    v                 v
+/* A buffer header object points to a buffer in a Memory_Block.
+   The buffer includes a prolog, but _bufstart points to the data
+   portion. Here is how it works:
 
-The actual set-up is more involved because of padding.  obj->bufstart must
-be suitably aligned. The start of the memory region (as returned by malloc())
-is suitably aligned for any use.  If, for example, malloc() returns
-objects aligned on 8-byte boundaries, and obj->bufstart is also aligned
-on 8-byte boundaries, then there should be 4 bytes of padding.
+    Buffer header                         buffer
+   +-------------------+                 +------------------------+
+   |       flags       |                 |  (possible padding)    | }
+   +-------------------+                 +---------------------+--+  > prolog
+   |      _bufstart    | ------+         |    *Memory_Block    |fl| }
+   +-------------------+       |         +---------------------+--+
+   |      _buflen      |       +-------> |    data portion        |
+   +-------------------+                 |                        |
+                                         ~                        ~
+                                         |                        |
+                                         +------------------------+
 
-ptr from malloc ->  +------------------+
-                      [other blocks?]  |
-                    | INTVAL ref_count |
-obj->bufstart   ->  +------------------+
-                    |     data         |
-                    v                  v
-
+   The buffer prolog consists of possible padding and a pointer to the
+   Memory_Block containing the buffer. There are two flags in the low-order
+   bits of the pointer (see string.h). Padding is only required if the
+   alignment of the data portion is higher than that of a pointer.
+   This was not the case as of 8/2010.
 */
 
-/* Given a pointer to the buffer, find the ref_count and the actual start of
-   the allocated space. Setting ref_count is clunky because we avoid lvalue
-   casts. */
-#define Buffer_alloc_offset sizeof (INTVAL)
-#define Buffer_bufallocstart(b)  ((char *)Buffer_bufstart(b) - Buffer_alloc_offset)
-#define Buffer_bufrefcount(b)    (*(INTVAL *)Buffer_bufallocstart(b))
-#define Buffer_bufrefcountptr(b) ((INTVAL *)Buffer_bufallocstart(b))
+/* These macros let us address the prolog of a buffer. */
+
+#define Buffer_prolog_offset (sizeof (void*))
+#define Buffer_bufprolog(b) ((char *)Buffer_bufstart(b) - Buffer_prolog_offset)
+
+/* This macro gives us the address of the buffer prolog treated as
+   a pointer to the flags. */
+
+#define Buffer_bufflagsptr(b) ((INTVAL *)Buffer_bufprolog(b))
+
+/* These macros give us the Memory_Block pointer and pointer-pointer,
+   eliminating the flags. */
+
+#define Buffer_pool(b) ((Memory_Block *)( *(INTVAL*)(Buffer_bufprolog(b)) & ~3 ))
+#define Buffer_poolptr(b) ((Memory_Block **)Buffer_bufprolog(b))
 
 
-typedef enum {
-    enum_stringrep_unknown = 0,
-    enum_stringrep_one     = 1,
-    enum_stringrep_two     = 2,
-    enum_stringrep_four    = 4
-} parrot_string_representation_t;
+/* Here is the Parrot string header object, "inheriting" from Buffer. */
 
 struct parrot_string_t {
     Parrot_UInt flags;
     void *     _bufstart;
     size_t     _buflen;
-    char       *strstart;
-    UINTVAL     bufused;
-    UINTVAL     strlen;
-    UINTVAL     hashval; /* cached hash value computation */
+    char       *strstart;               /* Pointer to start of string
+                                           (not necessarily at _bufstart). */
+    UINTVAL     bufused;                /* Length of string in bytes. */
+    UINTVAL     strlen;                 /* Length of string in characters. */
+    UINTVAL     hashval;                /* Cached hash value. */
 
     /*    parrot_string_representation_t representation;*/
-    const struct _encoding *encoding;
-    const struct _charset  *charset;
+    const struct _str_vtable *encoding; /* Pointer to string vtable. */
 };
 
-struct _Sync;   /* forward decl */
+/* Here is the Parrot PMC object, "inheriting" from PObj. */
 
-/* note that cache and flags are isomorphic with Buffer and PObj */
 struct PMC {
-    Parrot_UInt     flags;
-    VTABLE         *vtable;
-    DPOINTER       *data;
-
-    PMC *_metadata;      /* properties */
-    /*
-     * PMC access synchronization for shared PMCs
-     * s. parrot/thread.h
-     */
-    struct _Sync *_synchronize;
+    Parrot_UInt    flags;
+    VTABLE         *vtable;             /* Pointer to vtable. */
+    DPOINTER       *data;               /* Pointer to attribute structure. */
+    PMC            *_metadata;          /* Pointer to metadata PMC. */
 };
+
+/* Use these macros to access the data and metadata. */
 
 #define PMC_data(pmc)                   (pmc)->data
 #define PMC_data_typed(pmc, type) (type)(pmc)->data
 #define PMC_metadata(pmc)         ((pmc)->_metadata)
-#define PMC_sync(pmc)             ((pmc)->_synchronize)
 
 #define POBJ_FLAG(n) ((UINTVAL)1 << (n))
 /* PObj flags */
@@ -126,6 +133,8 @@ typedef enum PObj_enum {
     PObj_is_string_FLAG         = POBJ_FLAG(8),
     /* PObj is a PMC */
     PObj_is_PMC_FLAG            = POBJ_FLAG(9),
+    /* PObj is a copy of a string that doesn't own the string buffer */
+    PObj_is_string_copy_FLAG    = POBJ_FLAG(10),
     /* the PMC is a shared PMC */
     PObj_is_PMC_shared_FLAG     = POBJ_FLAG(11), /* Same as PObj_is_shared_FLAG */
     /* PObj is otherwise shared */
@@ -142,9 +151,10 @@ typedef enum PObj_enum {
     PObj_sysmem_FLAG            = POBJ_FLAG(15),
 
 /* PObj usage FLAGs, COW & GC */
-    /* Mark the contents as Copy on write */
-    PObj_COW_FLAG               = POBJ_FLAG(16),
-    /* the Buffer may have COW copies */
+    /* Used during tri-color mark&sweep */
+    PObj_grey_FLAG              = POBJ_FLAG(16),
+
+    /* The Buffer allows COW copies, and may have some. */
     PObj_is_COWable_FLAG        = POBJ_FLAG(17),
     /* Private flag for the GC system. Set if the PObj's in use as
      * far as the GC's concerned */
@@ -208,10 +218,6 @@ typedef enum PObj_enum {
 #define PObj_flags_SETTO(o, f) PObj_get_FLAGS(o) = (f)
 #define PObj_flags_CLEARALL(o) PObj_flags_SETTO((o), 0)
 
-#define PObj_COW_TEST(o) PObj_flag_TEST(COW, o)
-#define PObj_COW_SET(o) PObj_flag_SET(COW, o)
-#define PObj_COW_CLEAR(o) PObj_flag_CLEAR(COW, o)
-
 #define PObj_is_COWable_TEST(o) PObj_flag_TEST(is_COWable, o)
 #define PObj_is_COWable_SET(o) PObj_flag_SET(is_COWable, o)
 
@@ -230,6 +236,9 @@ typedef enum PObj_enum {
 #define PObj_report_SET(o) PObj_flag_SET(report, o)
 #define PObj_report_CLEAR(o) PObj_flag_CLEAR(report, o)
 
+#define PObj_grey_TEST(o) gc_flag_TEST(grey, o)
+#define PObj_grey_SET(o) gc_flag_SET(grey, o)
+#define PObj_grey_CLEAR(o) gc_flag_CLEAR(grey, o)
 
 #define PObj_on_free_list_TEST(o) gc_flag_TEST(on_free_list, o)
 #define PObj_on_free_list_SET(o) gc_flag_SET(on_free_list, o)
@@ -242,6 +251,10 @@ typedef enum PObj_enum {
 #define PObj_is_string_TEST(o) PObj_flag_TEST(is_string, o)
 #define PObj_is_string_SET(o) PObj_flag_SET(is_string, o)
 #define PObj_is_string_CLEAR(o) PObj_flag_CLEAR(is_string, o)
+
+#define PObj_is_string_copy_TEST(o) PObj_flag_TEST(is_string_copy, o)
+#define PObj_is_string_copy_SET(o) PObj_flag_SET(is_string_copy, o)
+#define PObj_is_string_copy_CLEAR(o) PObj_flag_CLEAR(is_string_copy, o)
 
 #define PObj_sysmem_TEST(o) PObj_flag_TEST(sysmem, o)
 #define PObj_sysmem_SET(o) PObj_flag_SET(sysmem, o)
@@ -302,23 +315,21 @@ typedef enum PObj_enum {
 #define PObj_is_shared_CLEAR(o) PObj_flag_CLEAR(is_shared, o)
 
 /* some combinations */
-#define PObj_is_cowed_TESTALL(o) (PObj_get_FLAGS(o) & \
-            (PObj_COW_FLAG|PObj_constant_FLAG|PObj_external_FLAG))
-#define PObj_is_cowed_SETALL(o) (PObj_get_FLAGS(o) |= \
-            (PObj_COW_FLAG|PObj_constant_FLAG|PObj_external_FLAG))
-
 #define PObj_is_external_or_free_TESTALL(o) (PObj_get_FLAGS(o) & \
             (UINTVAL)(PObj_external_FLAG|PObj_on_free_list_FLAG))
 
 #define PObj_is_external_CLEARALL(o) (PObj_get_FLAGS(o) &= \
-            ~(UINTVAL)(PObj_COW_FLAG| \
-                       PObj_external_FLAG|PObj_sysmem_FLAG))
+            ~(UINTVAL)(PObj_external_FLAG|PObj_sysmem_FLAG))
 
 #define PObj_is_live_or_free_TESTALL(o) (PObj_get_FLAGS(o) & \
         (PObj_live_FLAG | PObj_on_free_list_FLAG))
 
 #define PObj_is_movable_TESTALL(o) (!(PObj_get_FLAGS(o) & \
         (PObj_sysmem_FLAG | PObj_on_free_list_FLAG | \
+         PObj_constant_FLAG | PObj_external_FLAG)))
+
+#define PObj_is_growable_TESTALL(o) (!(PObj_get_FLAGS(o) & \
+        (PObj_sysmem_FLAG | PObj_is_string_copy_FLAG | \
          PObj_constant_FLAG | PObj_external_FLAG)))
 
 #define PObj_custom_mark_destroy_SETALL(o) do { \
@@ -328,8 +339,8 @@ typedef enum PObj_enum {
 
 #define PObj_gc_CLEAR(o) (PObj_get_FLAGS(o) \
     &= ~PObj_custom_destroy_FLAG \
-     | ~PObj_custom_mark_FLAG \
-     | ~PObj_live_FLAG)
+     & ~PObj_custom_mark_FLAG \
+     & ~PObj_live_FLAG)
 
 #endif /* PARROT_POBJ_H_GUARD */
 
@@ -337,5 +348,5 @@ typedef enum PObj_enum {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

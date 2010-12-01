@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -166,10 +165,7 @@ consider these data as readonly.
   | label offset                              |
   +----------+----------+----------+----------+
 
-Fixup type B<0>, known as enum_fixup_label, has a label symbol and an offset
-into the bytecode.
-
-Fixup type B<1>, known as enum_fixup_sub, has a label symbol that is the name
+Fixup type B<enum_fixup_sub>, has a label symbol that is the name
 of the "sub" and an offset into the constant table, referencing a Sub, Closure
 or Coroutine PMC.
 
@@ -188,7 +184,7 @@ position mappings that are in the header.
 
 A source to bytecode position mapping simply states that the bytecode that
 starts from the specified offset up until the offset in the next mapping, or
-if there is none up until the end of the bytecode, has it's source in
+if there is none up until the end of the bytecode, has its source in
 location X.
 
 A mapping always starts with the offset in the bytecode, followed by the

@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2007, Parrot Foundation.
-# $Id$
 
 package init::hints::msys;
 

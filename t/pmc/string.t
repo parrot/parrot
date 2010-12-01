@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -16,19 +15,16 @@ Tests the C<String> PMC.
 
 =cut
 
-
 .sub main :main
     .include 'test_more.pir'
 
-    plan(171)
+    plan(136)
 
     set_or_get_strings()
     setting_integers()
     setting_numbers()
     ensure_that_concat_ppp_copies_strings()
     ensure_that_concat_pps_copies_strings()
-    setting_string_references()
-    assigning_string_copies()
     test_repeat()
     test_repeat_without_creating_dest_pmc()
     test_repeat_int()
@@ -39,19 +35,8 @@ Tests the C<String> PMC.
     test_cmp()
     cmp_with_integer()
     test_substr()
-    bands_null_string()
-    test_bands_2()
-    test_bands_3()
-    bors_null_string()
-    test_bors_2()
-    test_bors_3()
-    bxors_null_string()
-    bxors_2()
-    bxors_3()
-    bnots_null_string()
     test_eq_str()
     test_ne_str()
-    set_const_and_chop()
     check_whether_interface_is_done()
     test_clone()
     test_set_px_i()
@@ -59,7 +44,7 @@ Tests the C<String> PMC.
     test_string_replace()
     set_i0__p0__string_to_int()
     test_string_trans()
-    reverse_p0__reverse_string()
+    reverse_string()
     is_integer__check_integer()
     instantiate_str()
     get_string_returns_cow_string()
@@ -72,8 +57,8 @@ Tests the C<String> PMC.
     exception_to_int_3()
     assign_null_string()
     access_keyed()
+    exists_keyed()
     # END_OF_TESTS
-
 .end
 
 .sub set_or_get_strings
@@ -102,6 +87,12 @@ Tests the C<String> PMC.
         set $P0, "0xFFFFFF"
         set $S0, $P0
         is( $S0, "0xFFFFFF", 'String obj set with literal hex string' )
+
+        null $S0
+        set $P0, $S0
+        set $S1, $P0
+        isnull $I0, $S1
+        ok( $I0, 'String obj is null-in null-out' )
 .end
 
 .sub setting_integers
@@ -195,26 +186,6 @@ Tests the C<String> PMC.
     is( $S0, 'Grunties', 'original untouched' )
     is( $P1, 'fnargh', 'original untouched' )
     is( $P0, 'fnarghGrunties', 'concat success' )
-.end
-
-.sub setting_string_references
-    new $P0, ['String']
-    set $S0, "C2H5OH + 10H20"
-    set $P0, $S0
-    chopn $S0, 8
-
-    is( $S0, 'C2H5OH', 'removed last 8 from string' )
-    is( $P0, 'C2H5OH', '...and the PMC still reference $S0' )
-.end
-
-.sub assigning_string_copies
-    new $P0, ['String']
-    set $S0, "C2H5OH + 10H20"
-    assign $P0, $S0
-    chopn $S0, 8
-
-    is( $S0, 'C2H5OH', 'removed the last 8 from string' )
-    is( $P0, 'C2H5OH + 10H20', '...and the assigned PMC is a copy' )
 .end
 
 .sub test_repeat
@@ -442,268 +413,6 @@ TRUE5:  nok( $I0, 'uninitialized String is false' )
     is( $P0, "This is a test\n",  'original is unmodified' )
 .end
 
-.sub bands_null_string
-    new $P1, ['String']
-    new $P2, ['String']
-    new $P3, ['String']
-
-    null $S1
-    set $P1, $S1
-
-    set $S2, "abc"
-    set $P2, $S2
-
-    bands $P1, $P2
-
-    null $S3
-    set $P3, $S3
-
-    is( $P1, $P3, 'band null, "abc" -> null' )
-
-    set $P1, ""
-    bands $P1, $P2
-    nok( $P1, 'band "", "abc" -> false' )
-
-    null $S2
-    set $P2, $S2
-    set $P1, "abc"
-
-    bands $P1, $P2
-
-    null $S3
-    set $P3, $S3
-
-    is( $P1, $P3, 'bands "abc", null -> null' )
-
-    set $P2, ""
-    bands $P1, $P2
-    nok( $P1, 'bans "abc", "" -> false' )
-
-.end
-
-.sub test_bands_2
-    new $P1, ['String']
-    new $P2, ['String']
-    set $P1, "abc"
-    set $P2, "EE"
-    bands $P1, $P2
-    is( $P1, "A@", 'bands "abc", "EE" -> "A@"' )
-    is( $P2, "EE", '$2 is unchanged' )
-.end
-
-.sub test_bands_3
-    new $P1, ['String']
-    new $P2, ['String']
-    new $P0, ['String']
-    set $P1, "abc"
-    set $P2, "EE"
-    bands $P0, $P1, $P2
-    is( $P0, "A@",  'bands "abc", "EE" -> "A@"' )
-    is( $P1, "abc", '$2 is unchanged' )
-    is( $P2, "EE",  '$3 is unchanged' )
-.end
-
-.sub bors_null_string
-    new $P1, ['String']
-    new $P2, ['String']
-    new $P3, ['String']
-
-    null $S1
-    null $S2
-    set $P1, $S1
-    set $P2, $S2
-    bors $P1, $P2
-    null $S3
-    set $P3, $S3
-    is( $P1, $P3, 'bors null, null -> null' )
-
-    null $S1
-    set $P1, $S1
-    set $P2, ""
-    bors $P1, $P2
-    null $S3
-    set $P3, $S3
-    is( $P1, $P3, 'bors null, "" -> null' )
-
-    bors $P2, $P1
-    is( $P2, $P3, 'bors "", null -> null' )
-
-    null $S1
-    set $P1, $S1
-    set $P2, "def"
-    bors $P1, $P2
-    is( $P1, "def", 'bors null, "def" -> "def" / true' )
-
-    null $S2
-    set $P2, $S2
-    bors $P1, $P2
-    is( $P1, "def", 'bors "def", null -> "def" / true' )
-
-    null $S1
-    null $S2
-    set $P1, $S1
-    set $P2, $S2
-    bors $P3, $P1, $P2
-    null $S4
-    is( $P3, $S4, 'bors null, null -> null' )
-
-    set $P1, ""
-    bors $P3, $P1, $P2
-    is( $P3, $S4, 'bors "", null -> null' )
-
-    bors $P3, $P2, $P1
-    is( $P3, $S4, 'bors null, "" -> null' )
-
-    set $P1, "def"
-    bors $P3, $P1, $P2
-    is( $P3, "def", 'bors "def", null -> "def"' )
-
-    bors $P3, $P2, $P1
-    is( $P3, "def", 'bors null, "def" -> "def"' )
-.end
-
-.sub test_bors_2
-    new $P1, ['String']
-    new $P2, ['String']
-    set $P1, "abc"
-    set $P2, "EE"
-
-    bors $P1, $P2
-    is( $P1, "egc", 'bors "abc", "EE" -> "egc"' )
-    is( $P2, "EE",  '$2 is unchanged' )
-.end
-
-.sub test_bors_3
-    new $P1, ['String']
-    new $P2, ['String']
-    new $P0, ['String']
-    set $P1, "abc"
-    set $P2, "EE"
-
-    bors $P0, $P1, $P2
-    is( $P0, "egc", 'bors "abc", "EE" -> "egc"' )
-    is( $P1, "abc", '$2 unchanged' )
-    is( $P2, "EE",  '$3 unchanged' )
-.end
-
-.sub bxors_null_string
-    new $P1, ['String']
-    new $P2, ['String']
-    new $P3, ['String']
-    null $S1
-    null $S2
-    set $P1, $S1
-    set $P2, $S2
-    bxors $P1, $P2
-    null $S3
-    is( $P1, $S3, 'bxors null, null -> null' )
-
-    null $S1
-    set $P1, $S1
-    set $P2, ""
-    bxors $P1, $P2
-    null $S3
-    is( $P1, $S3, 'bxors null, "" -> null' )
-
-    bxors $P2, $P1
-    is( $S2, $S3, 'bxors "", null -> null' )
-
-    null $S1
-    set $P1, $S1
-    set $P2, "abc"
-    bxors $P1, $P2
-    is( $P1, "abc", 'bxors null, "abc" -> "abc"' )
-
-    null $S2
-    set $P2, $S2
-    bxors $P1, $P2
-    is( $P1, "abc", 'bxors "abc", "null, -> "abc"' )
-
-    null $S1
-    null $S2
-    set $P1, $S1
-    set $P2, $S2
-    bxors $P3, $P1, $P2
-    null $S4
-    is( $P3, $S4, 'bxors3 null, null -> null' )
-
-    set $P1, ""
-    bxors $P3, $P1, $P2
-    is( $P3, $S4, 'bxors3 "", null -> null' )
-
-    bxors $P3, $P2, $P1
-    is( $P3, $S4, 'bxors3 null, null -> null' )
-
-    set $P1, "abc"
-    bxors $P3, $P1, $P2
-    is( $P3, "abc", 'bxors3 "abc", null -> "abc"' )
-
-    bxors $P3, $P2, $P1
-    is( $P3, "abc", 'bxors3 null, "abc" -> "abc"' )
-.end
-
-.sub bxors_2
-    new $P1, ['String']
-    new $P2, ['String']
-    new $P3, ['String']
-
-    set $P1, "a2c"
-    set $P2, "Dw"
-    bxors $P1, $P2
-    is( $P1, "%Ec", 'bxors "a2c", "Dw" -> "%Ec"' )
-    is( $P2, "Dw", '... $2 unchanged' )
-
-    set $P1, "abc"
-    set $P2, "   X"
-    bxors $P1, $P2
-    is( $P1, "ABCX", 'bxors "abc", "   X" -> "ABCX"' )
-    is( $P2, "   X", '... $2 unchanged' )
-.end
-
-.sub bxors_3
-    new $P1, ['String']
-    new $P2, ['String']
-    new $P0, ['String']
-
-    set $P1, "a2c"
-    set $P2, "Dw"
-    bxors $P0, $P1, $P2
-    is( $P0, "%Ec", 'bxors "a2c", "Dw" -> "%Ec"' )
-    is( $P1, "a2c", '... $2 unchanged' )
-    is( $P2, "Dw",  '... $3 unchanged' )
-
-    set $P1, "abc"
-    set $P2, "   Y"
-    bxors $P0, $P1, $P2
-    is( $P0, "ABCY", 'bxors "abc", "   Y" -> "ABCY"' )
-    is( $P1, "abc",  '... $2 unchanged' )
-    is( $P2, "   Y", '... $3 unchanged' )
-.end
-
-.sub bnots_null_string
-    new $P1, ['String']
-    new $P2, ['String']
-    new $P3, ['String']
-
-    null $S1
-    null $S2
-    set $P1, $S1
-    set $P2, $S2
-    bnots $P1, $P2
-    null $S3
-    is( $P1, $S3, 'bnots null, null -> null' )
-
-    null $S1
-    set $P1, $S1
-    set $P2, ""
-    bnots $P1, $P2
-    null $S3
-    is( $P1, $S3, 'bnots null, "" -> null' )
-
-    bnots $P2, $P1
-    is( $S2, $S3, 'bnots "", null -> null' )
-.end
-
 .sub test_eq_str
         new $P1, ['String']
         new $P2, ['String']
@@ -761,15 +470,6 @@ OK3:    ok( $I0, 'ne_str "ABC", 0(Integer) -> true' )
         ne_str $P3, $P2, OK4
         set $I0, 0
 OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
-.end
-
-.sub set_const_and_chop
-   new $P0, ['String']
-   set $P0, "str"
-   set $S0, $P0
-   chopn $S0, 2
-   is( $P0, 'str', 'original not touched' )
-   is( $S0, 's', 'string chopn' )
 .end
 
 .sub check_whether_interface_is_done
@@ -841,9 +541,10 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
     is( el, 256, 'elements' )
 
     $P0 = new ['String']
-    $P0.'trans'(s, tr_00)
+    t = $P0.'trans'(s, tr_00)
 
-    is( s, 'TAACGSTAACGS', 'trans' )
+    is( t, 'TAACGSTAACGS', 'trans' )
+    is( s, 'atugcsATUGCS', "trans doesn't touch source string")
 .end
 
 # create tr table at compile-time
@@ -866,11 +567,19 @@ loop:
     .return(tr_array)
 .end
 
-.sub reverse_p0__reverse_string
-    $S0 = 'torrap'
-    $P0 = new ['String']
-    $P0.'reverse'($S0)
-    is( $S0, "parrot", 'reverse string' )
+.sub reverse_string
+    $P0 = box 'torrap'
+    $P0.'reverse'()
+    is( $P0, "parrot", 'reverse string' )
+
+    $P0 = box 'x'
+    $P0.'reverse'('hsifyllej')
+    is( $P0, 'jellyfish', "reverse string with optional arg")
+
+    $P0 = box unicode:"科ムウオ"
+    $P0.'reverse'()
+    is( $P0, unicode:"オウム科", 'reverse unicode string')
+
 .end
 
 .sub is_integer__check_integer
@@ -893,6 +602,11 @@ loop:
 
   $I0 = $P0.'is_integer'('+1')
   ok( $I0, '... +1' )
+
+  $S0 = 'abc123abc'
+  $S1 = substr $S0, 3, 3
+  $I0 = $P0.'is_integer'($S1)
+  ok( $I0, '... substr' )
 .end
 
 .sub instantiate_str
@@ -905,7 +619,7 @@ loop:
   $P0 = "Foo44"
 
   $S0 = $P0
-  substr $S0, 0, 1, "B"
+  $S0 = replace $S0, 0, 1, "B"
   is( $S0, "Boo44", 'substr replace' )
   is( $P0, "Foo44", '... no change to original' )
 .end
@@ -919,6 +633,9 @@ loop:
     s = "2a"
     $I0 = s.'to_int'(16)
     is( $I0, "42", '... 16' )
+    s = "2B"
+    $I0 = s.'to_int'(16)
+    is( $I0, "43", '... 16 upper' )
     s = "1001"
     $I0 = s.'to_int'(2)
     is( $I0, "9", '... 2' )
@@ -1034,8 +751,23 @@ check:
     $P0 = s[2]
     is($P0, 'R', 'Get PMC by index')
 
+    .local pmc k
+    k = new ['Integer']
+    k = 2
+    $S0 = s[k]
+    is($S0, 'R', 'Get string keyed with PMC')
+
+    $I0 = s[k]
+    $I1 = ord 'R'
+    is($I0, $I1, 'Get integer keyed with PMC')
+
+    $P0 = s[k]
+    $S0 = $P0
+    is($S0, 'R', 'Get PMC keyed with PMC')
+
     # Set
     s = new ['String']
+    s = ''
 
     $S0 = 'f'
     s[0] = $S0
@@ -1049,6 +781,55 @@ check:
     $P0 = 'o'
     s[2] = $P0
     is(s, 'foo', 'Set PMC keyed')
+
+    s = ''
+    k = 0
+    s[k] = $S0
+    is(s, 'f', 'Set string keyed with PMC')
+
+    k = 1
+    $I0 = ord 'g'
+    s[k] = $I0
+    is(s, 'fg', 'Set integer keyed with PMC')
+
+    k = 2
+    $P0 = new ['String']
+    $P0 = 'h'
+    s[k] = $P0
+    is(s, 'fgh', 'Set PMC keyed with PMC')
+
+    push_eh null_replace
+    s = new ['String']
+    s[0] = 'f'
+    nok('Replace on null string throws')
+    goto done_null_replace
+
+  null_replace:
+    ok(1, 'Replace on null string throws')
+  done_null_replace:
+.end
+
+.sub exists_keyed
+    .local pmc s, i
+    .local int r
+    s = new['String']
+    s = ''
+    i = new['Integer']
+    i = 0
+    r = exists s[i]
+    is(r, 0, 'exists_keyed on empty String')
+    s = 'a'
+    r = exists s[i]
+    is(r, 1, 'exists_keyed within bounds')
+    i = 1
+    r = exists s[i]
+    is(r, 0, 'exists_keyed out of bounds')
+    i = -1
+    r = exists s[i]
+    is(r, 1, 'exists_keyed negative within bounds')
+    i = -2
+    r = exists s[i]
+    is(r, 0, 'exists_keyed negative out of bounds')
 .end
 
 # Local Variables:

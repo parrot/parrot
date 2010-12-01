@@ -1,6 +1,5 @@
-#! parrot
-# Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
+#!./parrot
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -20,7 +19,7 @@ out-of-bounds test. Checks INT and PMC keys.
 .sub main :main
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
-    plan(26)
+    plan(30)
 
     array_size_tests()
     element_set_tests()
@@ -30,6 +29,8 @@ out-of-bounds test. Checks INT and PMC keys.
     what_is_truth()
     interface_check()
     get_iter_test()
+    test_new_style_init()
+    test_invalid_init_tt1509()
 .end
 
 .sub array_size_tests
@@ -93,19 +94,19 @@ end:
     push_eh eh1
     set $P0[1], -7
     pop_eh
-    ok(0, "no exception raised when setting nonexistant element")
+    ok(0, "no exception raised when setting nonexistent element")
     goto after_eh1
 eh1:
-    ok(1, "exception raised when setting nonexistant element")
+    ok(1, "exception raised when setting nonexistent element")
 after_eh1:
 
     push_eh eh2
     set $I0, $P0[1]
     pop_eh
-    ok(0, "no exception raised when getting nonexistant element")
+    ok(0, "no exception raised when getting nonexistent element")
     goto after_eh2
 eh2:
-    ok(1, "exception raised when getting nonexistant element")
+    ok(1, "exception raised when getting nonexistent element")
 after_eh2:
 .end
 
@@ -245,6 +246,31 @@ loop:
     is($S0, "1.1,99.99,-345.001,", "get_iter works")
 .end
 
+.sub test_new_style_init
+    $P0 = new 'FixedFloatArray', 10
+
+    $I0 = $P0
+    is($I0, 10, "New style init creates the correct # of elements")
+
+    $P0 = new ['FixedFloatArray'], 10
+
+    $I0 = $P0
+    is($I0, 10, "New style init creates the correct # of elements for a key constant")
+.end
+
+.sub test_invalid_init_tt1509
+    throws_substring(<<'CODE', 'FixedFloatArray: Cannot set array size to a negative number (-10)', 'New style init does not dump core for negative array lengths')
+    .sub main
+        $P0 = new ['FixedFloatArray'], -10
+    .end
+CODE
+
+    throws_substring(<<'CODE', 'FixedFloatArray: Cannot set array size to a negative number (-10)', 'New style init (key constant) does not dump core for negative array lengths')
+    .sub main
+        $P0 = new 'FixedFloatArray', -10
+    .end
+CODE
+.end
 
 # Local Variables:
 #   mode: pir

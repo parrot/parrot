@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2002-2009, Parrot Foundation.
- * $Id$
+ * Copyright (C) 2002-2010, Parrot Foundation.
  */
 
 /*
@@ -39,7 +38,6 @@ IMCC_FATAL_EXCEPTION.
 
 */
 
-PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void
 IMCC_fatal(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
@@ -63,7 +61,6 @@ Throws an IMCC_FATALY_EXCEPTION.
 
 */
 
-PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void
 IMCC_fataly(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
@@ -89,7 +86,6 @@ recoverable exception but a forced exit.
 
 */
 
-PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void
 IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
@@ -100,36 +96,7 @@ IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
     va_start(ap, fmt);
     imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
     va_end(ap);
-    Parrot_exit(interp, code);
-}
-
-/*
-
-=item C<void IMCC_fataly_standalone(PARROT_INTERP, int code, const char *fmt,
-...)>
-
-Prints an error message and exits Parrot. This is not a recoverable
-error.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_DOES_NOT_RETURN
-void
-IMCC_fataly_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
-{
-    ASSERT_ARGS(IMCC_fataly_standalone)
-
-    va_list ap;
-
-    va_start(ap, fmt);
-    fprintf(stderr, "error:imcc:");
-    imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
-    va_end(ap);
-    IMCC_print_inc(interp);
-    Parrot_exit(interp, code);
+    Parrot_x_exit(interp, code);
 }
 
 /*
@@ -143,7 +110,6 @@ cause Parrot to exit.
 
 */
 
-PARROT_EXPORT
 void
 IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
 {
@@ -168,7 +134,6 @@ then IMCC's verbose mode.
 
 */
 
-PARROT_EXPORT
 void
 IMCC_info(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 {
@@ -193,7 +158,6 @@ Prints a debug message, if IMCC's debug mode is turned on.
 
 */
 
-PARROT_EXPORT
 void
 IMCC_debug(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 {
@@ -235,10 +199,10 @@ dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 
         if (bb) {
             Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
-                    "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  %c ",
+                    "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  ",
                      ins->index, ins->line, bb->index, bb->loop_depth,
-                     ins->flags, (ins->type & ~ITEXT), ins->opnum,
-                     ins->opsize, pc, ins->type & ITEXT ? 'X' : ' ');
+                     ins->flags, ins->type, OP_INFO_OPNUM(ins->op),
+                     ins->opsize, pc);
         }
         else {
              fprintf(stderr, "\t");
@@ -406,9 +370,8 @@ dump_symreg(ARGIN(const IMC_Unit *unit))
             continue;
         if (!r->first_ins)
             continue;
-        fprintf(stderr, "%s %c\t%d\t%d\t%d\t%d\t%c   %2d %2d\t%d\t%d\t%s\t%lx\n",
+        fprintf(stderr, "%s \t%d\t%d\t%d\t%d\t%c   %2d %2d\t%d\t%d\t%s\t%lx\n",
                 r->name,
-                r->usage & U_NON_VOLATILE ? 'P' : ' ',
                 r->first_ins->index, r->last_ins->index,
                 r->first_ins->bbindex, r->last_ins->bbindex,
                 r->set,
@@ -416,126 +379,6 @@ dump_symreg(ARGIN(const IMC_Unit *unit))
                 r->use_count, r->lhs_use_count,
                 r->reg ? r->reg->name : "",
                 (UINTVAL)r->usage);
-    }
-    fprintf(stderr, "\n");
-    dump_liveness_status(unit);
-}
-
-/*
-
-=item C<void dump_liveness_status(const IMC_Unit *unit)>
-
-Dumps the list of registers in the current IMC_Unit that need to be
-allocated.
-
-=cut
-
-*/
-
-void
-dump_liveness_status(ARGIN(const IMC_Unit *unit))
-{
-    ASSERT_ARGS(dump_liveness_status)
-    unsigned int i;
-    SymReg ** const reglist = unit->reglist;
-
-    fprintf(stderr, "\nSymbols:\n--------------------------------------\n");
-
-    for (i = 0; i < unit->n_symbols; i++) {
-        const SymReg * const r = reglist[i];
-        if (REG_NEEDS_ALLOC(r))
-            dump_liveness_status_var(unit, r);
-    }
-
-    fprintf(stderr, "\n");
-}
-
-
-/*
-
-=item C<void dump_liveness_status_var(const IMC_Unit *unit, const SymReg* r)>
-
-Dumps the state of SymReg C<r> in IMC_Unit C<unit>.
-
-=cut
-
-*/
-
-void
-dump_liveness_status_var(ARGIN(const IMC_Unit *unit), ARGIN(const SymReg* r))
-{
-    ASSERT_ARGS(dump_liveness_status_var)
-    fprintf(stderr, "\nSymbol %s:", r->name);
-    if (r->life_info) {
-        unsigned int i;
-
-        for (i = 0; i<unit->n_basic_blocks; i++) {
-            const Life_range * const l = r->life_info[i];
-
-            if (l->flags & LF_lv_all)
-                fprintf(stderr, "\n\t%i:ALL\t", i);
-            else if (l->flags & LF_lv_inside)
-                fprintf(stderr, "\n\t%i:INSIDE", i);
-
-            if (l->flags & LF_lv_in)
-                fprintf(stderr, "\n\t%i: IN\t", i);
-            else if (l->flags & LF_lv_out)
-                fprintf(stderr, "\n\t%i: OUT\t", i);
-            else if (l->first_ins)
-                fprintf(stderr, "\n\t%i: INS\t", i);
-
-            if (l->flags & LF_use)
-                fprintf(stderr, "u ");
-            else if (l->flags & LF_def)
-                fprintf(stderr, "d ");
-            else
-                fprintf(stderr, "  ");
-
-            if (l->first_ins)
-                fprintf(stderr, "[%d, %d]\t", l->first_ins->index,
-                        l->last_ins->index);
-        }
-    }
-
-    fprintf(stderr, "\n");
-}
-
-/*
-
-=item C<void dump_interference_graph(const IMC_Unit *unit)>
-
-Dumps the interference graph for the current IMC_Unit C<unit>
-
-=cut
-
-*/
-
-void
-dump_interference_graph(ARGIN(const IMC_Unit *unit))
-{
-    ASSERT_ARGS(dump_interference_graph)
-    int x;
-    SymReg** const reglist = unit->reglist;
-    const int n_symbols = unit->n_symbols;
-
-    fprintf(stderr, "\nDumping the Interf. graph:"
-            "\n-------------------------------\n");
-    for (x = 0; x < n_symbols; x++) {
-        if (reglist[x]->first_ins) {
-            int cnt = 0;
-            int y;
-
-            fprintf(stderr, "%s\t -> ", reglist[x]->name);
-            for (y = 0; y < n_symbols; y++) {
-                if (ig_test(x, y, n_symbols, unit->interference_graph)) {
-                    const SymReg * const r = unit->reglist[y];
-
-                    fprintf(stderr, "%s ", r->name);
-                    cnt++;
-                }
-            }
-            fprintf(stderr, "(%d)\n", cnt);
-        }
     }
     fprintf(stderr, "\n");
 }
@@ -619,5 +462,5 @@ dump_dominance_frontiers(ARGIN(const IMC_Unit *unit))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

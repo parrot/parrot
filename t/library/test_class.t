@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2008-2010, Parrot Foundation.
-# $Id$
 
 .sub 'init_test_builder_tester'
     load_bytecode 'Test/Builder/Tester.pbc'

@@ -1,6 +1,5 @@
 #!parrot
-# Copyright (C) 2005-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2005-2010, Parrot Foundation.
 # Reads from stdin a file in the format made by fasta.pir
 # ./parrot -R jit
 # N = 2500000 for fasta
@@ -35,15 +34,16 @@ loop:
 .sub main :main
 	.local pmc stdin, stdout
 	.local string line, seq
-	stdin = getstdin
-	stdout = getstdout
+        $P0    = getinterp
+        stdin  = $P0.'stdin_handle'()
+        stdout = $P0.'stdout_handle'()
 	# stdout is linebuffered per default - make it block buffered
 	stdout.'buffer_size'(8192)
 
 	seq = ''
 
 beginwhile:
-	line = readline stdin
+	line = stdin.'readline'()
 	unless line goto endwhile
 	$I0 = ord line
 	unless $I0 == 62 goto else   # '>'
@@ -54,7 +54,7 @@ beginwhile:
 		print line
 		goto endif
 	else:
-		chopn line, 1
+		line = chopn line, 1
 		seq .= line
 	endif:
 	goto beginwhile
@@ -67,13 +67,27 @@ done:
 .sub print_revcomp
 	.param string line
 	.local int i, linelen, ch
+	.local string revline
 	linelen = length line
 
         $P0 = new 'String'
-        $P0.'reverse'(line)
-
+#       $P0.'reverse'(line)
+#         reverse is no longer available so
+        i = linelen
+        revline = ''
+rev_loop:
+        i -= 1
+        $S0 = substr line, i, 1
+        revline .= $S0
+        if i > 0 goto rev_loop
+#
+        $P0 = revline
+#
+        # line was reversed in-place so we need
+        line = revline
+#
 	.const 'Sub' tr_00 = 'tr_00_init'
-	$P0.'trans'(line, tr_00)
+	line = $P0.'trans'(line, tr_00)
 
 	i = 0
 	$S0 = 'x'

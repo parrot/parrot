@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -9,6 +8,7 @@ t/pmc/packfiledirectory.t - test the PackfileDirectory PMC
 
 =head1 SYNOPSIS
 
+    % make test_prep
     % prove t/pmc/packfiledirectory.t
 
 =head1 DESCRIPTION
@@ -21,7 +21,7 @@ Tests the PackfileDirectory PMC.
 
 .sub 'main' :main
 .include 'test_more.pir'
-    plan(20)
+    plan(17)
 
     'test_create'()
     'test_typeof'()
@@ -29,6 +29,7 @@ Tests the PackfileDirectory PMC.
     'test_get_iter'()
     'test_set_pmc_keyed_str'()
 .end
+
 
 # Test creation of fresh directory
 .sub 'test_create'
@@ -62,10 +63,18 @@ Tests the PackfileDirectory PMC.
 # PackfileDirectory.elements
 .sub 'test_elements'
     .local pmc pf, pfdir
+    push_eh load_error
     pf    = _pbc()
+    pop_eh
     pfdir = pf.'get_directory'()
     $I0   = elements pfdir
-    is($I0, 4, 'PackfileDirectory.elements')
+    is($I0, 3, 'PackfileDirectory.elements')
+    .return()
+load_error:
+    .get_results($P0)
+    pop_eh
+    report_load_error($P0, 'PackfileDirectory.elements')
+    .return()
 .end
 
 
@@ -80,7 +89,9 @@ Tests the PackfileDirectory PMC.
     expected["FIXUP"]    = 1
     expected["CONSTANT"] = 1
 
+    push_eh load_error
     pf    = _pbc()
+    pop_eh
     pfdir = pf.'get_directory'()
     $I0   = elements pfdir
     it    = iter pfdir
@@ -105,12 +116,20 @@ Tests the PackfileDirectory PMC.
     goto loop
   done:
     .return ()
+load_error:
+    .get_results($P0)
+    pop_eh
+    report_load_error($P0, "can't run get_iter tests")
+    skip(11, "can't run get_iter tests")
+    .return()
 .end
 
 ## PackfileDirectory.set_pmc_keyed_str
 .sub 'test_set_pmc_keyed_str'
     .local pmc pf, pfdir, seg
+    push_eh load_error
     pf    = _pbc()
+    pop_eh
     pfdir = pf.'get_directory'()
     seg   = new [ 'PackfileRawSegment' ]
 
@@ -139,6 +158,13 @@ Tests the PackfileDirectory PMC.
     is($I0, $I1, "segment deleted")
 
   done:
+    .return()
+load_error:
+    .get_results($P0)
+    pop_eh
+    report_load_error($P0, "Segment with old name was added")
+    report_load_error($P0, "New segment added")
+    report_load_error($P0, "segment deleted")
     .return()
 .end
 

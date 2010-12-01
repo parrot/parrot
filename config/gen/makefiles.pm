@@ -1,5 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -27,28 +26,39 @@ sub _init {
     $data{description} = q{Generate makefiles and other build files};
     $data{result}      = q{};
     $data{makefiles}   = {
-        'Makefile' => { SOURCE => 'config/gen/makefiles/root.in' },
-        'ext/Makefile' => { SOURCE => 'config/gen/makefiles/ext.in', },
+        'Makefile' => {
+            SOURCE => 'config/gen/makefiles/root.in',
+        },
+        'ext/Makefile' => {
+            SOURCE => 'config/gen/makefiles/ext.in',
+        },
+        'compilers/imcc/Rules.mak' => {
+             SOURCE => 'compilers/imcc/Rules.in',
+        },
+        'src/dynoplibs/Rules.mak' => {
+             SOURCE => 'src/dynoplibs/Rules.in',
+        },
+        'src/dynoplibs/Defines.mak' => {
+             SOURCE => 'src/dynoplibs/Defines.in',
+        },
 
         'ext/Parrot-Embed/Makefile.PL' => {
             SOURCE            => 'config/gen/makefiles/parrot_embed_pl.in',
-            replace_slashes   => 0,
             conditioned_lines => 1,
         },
 
-        'compilers/ncigen/Makefile'  =>
-            { SOURCE => 'compilers/ncigen/config/makefiles/ncigen.in' },
-        'src/dynpmc/Makefile'        =>
-            { SOURCE => 'config/gen/makefiles/dynpmc.in' },
-        'src/dynoplibs/Makefile'     =>
-            { SOURCE => 'config/gen/makefiles/dynoplibs.in' },
+        'src/dynpmc/Rules.mak' => {
+             SOURCE => 'src/dynpmc/Rules.in',
+        },
+        'src/dynpmc/Defines.mak' => {
+             SOURCE => 'src/dynpmc/Defines.in',
+        },
         'editor/Makefile'            =>
             { SOURCE => 'config/gen/makefiles/editor.in' },
 
         'parrot.pc'     => { SOURCE => 'config/gen/makefiles/parrot_pc.in' },
         'docs/Makefile' => { SOURCE => 'config/gen/makefiles/docs.in' },
     };
-    $data{CFLAGS_source} = 'config/gen/makefiles/CFLAGS.in';
     return \%data;
 }
 
@@ -56,34 +66,11 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     $self->makefiles($conf);
-    $self->cflags($conf);
+
+    $conf->shebang_mod( 'tools/dev/mk_language_shell.in'
+                         => 'tools/dev/mk_language_shell.pl', );
 
     return 1;
-}
-
-sub cflags {
-    my ( $self, $conf ) = @_;
-
-    $conf->genfile( $self->{CFLAGS_source} => 'CFLAGS',
-        comment_type                     => '#'
-    );
-
-    open( my $CFLAGS, ">>", "CFLAGS" ) or die "open >> CFLAGS: $!";
-
-    # Why is this here?  I'd think this information belongs
-    # in the CFLAGS.in file. -- A.D.  March 12, 2004
-    if ( $conf->data->get('cpuarch') =~ /sun4|sparc64/ ) {
-
-        # CFLAGS entries must be left-aligned.
-        print {$CFLAGS} <<"EOF";
-src/jit_cpu.c -{-Wcast-align}        # lots of noise!
-src/nci.c     -{-Wstrict-prototypes} # lots of noise!
-EOF
-    }
-
-    close $CFLAGS;
-
-    return;
 }
 
 sub makefiles {
@@ -96,7 +83,6 @@ sub makefiles {
         : keys %{ $self->{makefiles} };
 
     foreach my $target (@targets) {
-        $target =~ s/\\/\//g if $^O eq 'MSWin32';
         my $args   = $self->{makefiles}->{$target};
         my $source = delete $args->{SOURCE};
 

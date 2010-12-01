@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -40,16 +39,29 @@ Generic iterator for traversing arrays.
 
 NB: for different direction you have to use different ops!
 
-TODO: Discuss idea of having separate get_iter/get_reverse_iter VTABLE methods
+TODO: Discuss idea of having separate get_iter/get_reverse_iter VTABLEs
 to avoid this caveat.
 
-=head1 Methods
+=head1 Vtable functions
 
 =over 4
 
 =cut
 
 */
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_DOES_NOT_RETURN
+static void out_of_bounds(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_out_of_bounds __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 pmclass ArrayIterator extends Iterator no_ro auto_attrs {
     ATTR PMC    *array;     /* the array which this Iterator iterates */
@@ -86,7 +98,7 @@ Defaults iteration mode to iterate from start.
 
     VTABLE void init_pmc(PMC *array) {
 
-        SET_ATTR_array(interp, SELF, array);
+        SET_ATTR_array(INTERP, SELF, array);
 
         PObj_custom_mark_SET(SELF);
 
@@ -124,14 +136,14 @@ Marks the current idx/key and the aggregate as live.
         PMC   *array;
         PMC   *clone;
 
-        GET_ATTR_array(interp, SELF, array);
-        GET_ATTR_pos(interp, SELF, pos);
-        GET_ATTR_reverse(interp, SELF, reverse);
+        GET_ATTR_array(INTERP, SELF, array);
+        GET_ATTR_pos(INTERP, SELF, pos);
+        GET_ATTR_reverse(INTERP, SELF, reverse);
 
         clone = Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, array);
 
-        SET_ATTR_pos(interp, clone, pos);
-        SET_ATTR_reverse(interp, clone, reverse);
+        SET_ATTR_pos(INTERP, clone, pos);
+        SET_ATTR_reverse(INTERP, clone, reverse);
 
         return clone;
     }
@@ -163,15 +175,15 @@ Returns the number of remaining elements in the array.
     VTABLE INTVAL elements() {
         INTVAL reverse, pos, length;
 
-        GET_ATTR_reverse(interp, SELF, reverse);
+        GET_ATTR_reverse(INTERP, SELF, reverse);
 
         if (reverse) {
-            GET_ATTR_pos(interp, SELF, pos);
+            GET_ATTR_pos(INTERP, SELF, pos);
             return pos;
         }
         else {
-            GET_ATTR_length(interp, SELF, length);
-            GET_ATTR_pos(interp, SELF, pos);
+            GET_ATTR_length(INTERP, SELF, length);
+            GET_ATTR_pos(INTERP, SELF, pos);
             return length - pos;
         }
     }
@@ -195,24 +207,25 @@ Reset the Iterator. C<value> must be one of
 
     VTABLE void set_integer_native(INTVAL value) {
         PMC *array;
+        INTVAL element;
+        GET_ATTR_array(INTERP, SELF, array);
+        element = VTABLE_elements(INTERP, array);
 
-        if (value == ITERATE_FROM_START) {
-            GET_ATTR_array(interp, SELF, array);
-            SET_ATTR_reverse(interp, SELF, 0);
-            SET_ATTR_pos(interp, SELF, 0);
-            SET_ATTR_length(interp, SELF, VTABLE_elements(INTERP, array));
-        }
-        else if (value == ITERATE_FROM_END) {
-            INTVAL element;
-            GET_ATTR_array(interp, SELF, array);
-            element = VTABLE_elements(INTERP, array);
-            SET_ATTR_reverse(interp, SELF, 1);
-            SET_ATTR_length(interp, SELF, element);
-            SET_ATTR_pos(interp, SELF, element);
-        }
-        else
+        switch (value) {
+          case ITERATE_FROM_START:
+            SET_ATTR_reverse(INTERP, SELF, 0);
+            SET_ATTR_pos(INTERP, SELF, 0);
+            SET_ATTR_length(INTERP, SELF, element);
+            break;
+          case ITERATE_FROM_END:
+            SET_ATTR_reverse(INTERP, SELF, 1);
+            SET_ATTR_length(INTERP, SELF, element);
+            SET_ATTR_pos(INTERP, SELF, element);
+            break;
+          default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "Wrong direction for ArrayIterator");
+        }
     }
 
 /*
@@ -250,8 +263,7 @@ the next one.
         GET_ATTR_length(INTERP, SELF, length);
 
         if (pos >= length)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "StopIteration");
+            out_of_bounds(INTERP);
 
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, pos+1);
@@ -274,8 +286,7 @@ the next one.
         GET_ATTR_pos(INTERP, SELF, pos);
 
         if (!STATICSELF.get_bool())
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "StopIteration");
+            out_of_bounds(INTERP);
 
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, pos+1);
@@ -299,8 +310,7 @@ the next one.
         GET_ATTR_pos(INTERP, SELF, pos);
 
         if (!STATICSELF.get_bool())
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "StopIteration");
+            out_of_bounds(INTERP);
 
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, pos+1);
@@ -327,8 +337,7 @@ the next one.
 
 
         if (!STATICSELF.get_bool())
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "StopIteration");
+            out_of_bounds(INTERP);
 
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, pos+1);
@@ -356,8 +365,7 @@ the next one.
 
 
         if (!STATICSELF.get_bool())
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "StopIteration");
+            out_of_bounds(INTERP);
 
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, --pos);
@@ -380,8 +388,7 @@ the next one.
         GET_ATTR_pos(INTERP, SELF, pos);
 
         if (!STATICSELF.get_bool())
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "StopIteration");
+            out_of_bounds(INTERP);
 
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, --pos);
@@ -405,8 +412,7 @@ the next one.
         GET_ATTR_pos(INTERP, SELF, pos);
 
         if (!STATICSELF.get_bool())
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "StopIteration");
+            out_of_bounds(INTERP);
 
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, --pos);
@@ -432,8 +438,7 @@ the next one.
         GET_ATTR_pos(INTERP, SELF, pos);
 
         if (!STATICSELF.get_bool())
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "StopIteration");
+            out_of_bounds(INTERP);
 
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, --pos);
@@ -642,6 +647,32 @@ Returns the result of calling C<defined_keyed(key)> on the aggregate.
     }
 }
 
+
+/*
+
+=back
+
+=head1 Auxiliar functions
+
+=over 4
+
+=item C<static void out_of_bounds(PARROT_INTERP)>
+
+Throw out-of-bounds exception.
+
+=cut
+
+*/
+
+PARROT_DOES_NOT_RETURN
+static void
+out_of_bounds(PARROT_INTERP)
+{
+    ASSERT_ARGS(out_of_bounds)
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            "StopIteration");
+}
+
 /*
 
 =back
@@ -654,5 +685,5 @@ Returns the result of calling C<defined_keyed(key)> on the aggregate.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

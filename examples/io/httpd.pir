@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -95,6 +94,9 @@ The code was heavily hacked by bernhard and leo.
 .include 'except_types.pasm'
 .include 'socket.pasm'
 
+.loadlib 'io_ops'
+.loadlib 'sys_ops'
+
 .sub main :main
     .local pmc listener, work, fp
     .local pmc fp               # read requested files from disk
@@ -139,11 +141,11 @@ NEXT:
     req = ""
 MORE:
     buf = work.'recv'()
-    # charset I0, buf
-    # charsetname S1, I0
+    # encoding I0, buf
+    # encodingname S1, I0
     # print "\nret: "
     # print ret
-    # print "\ncharset of buf: "
+    # print "\nencoding of buf: "
     # print S1
     # print "\nbuf:"
     # print buf
@@ -267,7 +269,6 @@ SERVE_404:
 
 ERR_NO_SOCKET:
     print "Could not open socket.\n"
-    print "Did you enable PARROT_NET_DEVEL in include/io_private.h?\n"
     end
 ERR_bind:
     print "bind failed\n"

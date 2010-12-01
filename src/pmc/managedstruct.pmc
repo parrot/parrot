@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 DESCRIPTION
 
@@ -21,6 +20,10 @@ C<struct> values that Parrot is responsible for disposing of.
 
 typedef void (*custom_free_func_t)(PARROT_INTERP, void *ptr, void *priv);
 typedef PMC * (*custom_clone_func_t)(PARROT_INTERP, PMC *ptr, void *priv);
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
 
 pmclass ManagedStruct extends UnManagedStruct auto_attrs {
     /* if custom_free_func and ptr (inherited from UnManagedStruct) are both set,
@@ -144,9 +147,9 @@ of knowing how to make a deep copy of the pointer contents.
         PMC *dest;
         if (clone_func) {
             void *clone_data = PARROT_MANAGEDSTRUCT(SELF)->custom_clone_priv;
-            return clone_func(interp, SELF, clone_data);
+            return clone_func(INTERP, SELF, clone_data);
         }
-        dest = Parrot_pmc_new_init(interp, SELF->vtable->base_type,
+        dest = Parrot_pmc_new_init(INTERP, SELF->vtable->base_type,
             PARROT_MANAGEDSTRUCT(SELF)->init);
 
         if (PARROT_MANAGEDSTRUCT(SELF)->ptr)
@@ -175,5 +178,5 @@ Initial revision by sean 2002/08/04.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

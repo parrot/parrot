@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -16,6 +15,8 @@ and printed to STDOUT.
 You should check where the file is going to be before you run this.
 
 =cut
+
+.loadlib 'io_ops' # convenient I/O dynamic opcodes
 
 .sub 'example' :main
     .local string test_fn
@@ -37,6 +38,7 @@ You should check where the file is going to be before you run this.
     print $S0
 
     # now clean up after ourselves.
+    $P0 = loadlib 'os'
     $P1 = new "OS"
     $P1."rm"(test_fn)
 

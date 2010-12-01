@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2002-2009, Parrot Foundation.
  */
 
@@ -24,8 +23,7 @@ enum VARTYPE {              /* variable type can be */
     VT_ENCODED      = VARTYPE_BIT(16),  /* unicode string constant */
     VT_OPT_FLAG     = VARTYPE_BIT(17),  /* var :opt_flag */
     VT_NAMED        = VARTYPE_BIT(18),  /* var :named(name) */
-    VT_UNIQUE_REG   = VARTYPE_BIT(19),
-    VT_CALL_SIG     = VARTYPE_BIT(20)
+    VT_CALL_SIG     = VARTYPE_BIT(19)
 };
 #undef VARTYPE_BIT
 
@@ -33,37 +31,18 @@ enum VARTYPE {              /* variable type can be */
 #define VTREGISTER (VTREG | VTIDENTIFIER | VTREGKEY | VTPASM)
 #define REG_NEEDS_ALLOC(r) ((r)->type & VTREGISTER)
 
-enum LIFEFLAG {    /* The status of a var inside a basic block can be */
-    LF_use       = 1 << 0, /* block uses the the var before defining it */
-    LF_def       = 1 << 1, /* block defines the variable */
-    LF_lv_in     = 1 << 2, /* variable is alive at the beginning of the block */
-    LF_lv_out    = 1 << 3, /* variable is alive at the end of the block */
-    LF_lv_inside = 1 << 4, /* variable is alive at some moment in the block */
-    LF_lv_all    = 1 << 5  /* variable is alive throughout the block */
-};
-
-/* Liveness represents the usage of a var inside a basic block
-   This is represented by pairs of [definition, usage] in *intervals: */
-typedef struct _Life_range {
-    int                  flags;
-    struct _Instruction *first_ins;
-    struct _Instruction *last_ins;
-} Life_range;
-
 enum USAGE {
     U_KEYED         = 1 << 0,       /* array, hash, keyed */
     U_NEW           = 1 << 1,       /* PMC was inited */
     U_GLOBAL        = 1 << 3,       /* symbol is global (fixup) */
     U_LEXICAL       = 1 << 4,       /* symbol is lexical */
     U_FIXUP         = 1 << 5,       /* maybe not global, force fixup */
-    U_NON_VOLATILE  = 1 << 6,       /* needs preserving */
-    U_SUBID_LOOKUP  = 1 << 7        /* .const 'Sub' lookup is done by subid */
+    U_SUBID_LOOKUP  = 1 << 6        /* .const 'Sub' lookup is done by subid */
 };
 
 typedef struct _SymReg {
     char                *name;
     char                *subid;
-    Life_range         **life_info;     /* Each block has a Life_range status */
     struct _SymReg      *nextkey;       /* keys */
     struct _SymReg      *reg;           /* key->register for VTREGKEYs */
     struct pcc_sub_t    *pcc_sub;       /* PCC subroutine */
@@ -102,6 +81,45 @@ struct namespace_t {
     Namespace  *parent;
     char       *name;
     Identifier *idents;
+};
+
+typedef enum {
+    P_NONE           = 0x00,                  /* 0<<0 */
+    P_NEED_LEX       = 0x01,                  /* 1<<0 */
+    P_VTABLE         = SUB_COMP_FLAG_VTABLE,  /* 1<<1 0x2 */
+    P_METHOD         = SUB_COMP_FLAG_METHOD,  /* 1<<2 0x4 */
+    P_ANON           = SUB_FLAG_PF_ANON,      /* 1<<3 0x8    - private3 */
+    P_MAIN           = SUB_FLAG_PF_MAIN,      /* 1<<4 0x10   - private4 */
+    P_LOAD           = SUB_FLAG_PF_LOAD,      /* 1<<5 0x20   - private5 */
+    P_IMMEDIATE      = SUB_FLAG_PF_IMMEDIATE, /* 1<<6 0x40   - private6 */
+    P_POSTCOMP       = SUB_FLAG_PF_POSTCOMP,  /* 1<<7 0x80   - private7 */
+    P_INIT           = SUB_COMP_FLAG_PF_INIT, /* 1<<10 0x400 - 10       */
+    P_NSENTRY        = SUB_COMP_FLAG_NSENTRY  /* 1<<11 0x800 - 11       */
+} pragma_enum_t;
+
+typedef struct pcc_sub_t {
+    SymReg *sub;
+    SymReg *cc;
+    SymReg **args;
+    SymReg **multi;
+    SymReg **ret;
+    SymReg *object;
+    int    *arg_flags;    /* :slurpy, :optional, ... */
+    int    *ret_flags;    /* :slurpy, :optional, ... */
+    int     nargs;
+    int     nret;
+    int     nmulti;
+    int     yield;
+    int     tailcall;
+    int     label;
+    INTVAL  pragma;
+} pcc_sub_t;
+
+enum uniq_t {
+    U_add_once,
+    U_add_uniq_label,
+    U_add_uniq_sub,
+    U_add_all
 };
 
 /* functions */
@@ -203,9 +221,6 @@ void create_symhash(PARROT_INTERP, ARGOUT(SymHash *hash))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*hash);
 
-void debug_dump_sym_hash(ARGIN(const SymHash *hsh))
-        __attribute__nonnull__(1);
-
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 SymReg * dup_sym(PARROT_INTERP, ARGIN(const SymReg *r))
@@ -217,6 +232,10 @@ PARROT_WARN_UNUSED_RESULT
 SymReg * find_sym(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+void free_pcc_sub(ARGMOD(pcc_sub_t *sub))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*sub);
 
 void free_sym(ARGMOD(SymReg *r))
         __attribute__nonnull__(1)
@@ -262,13 +281,10 @@ SymReg * mk_const_ident(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
-SymReg * mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_IGNORABLE_RESULT
-SymReg* mk_ident_ur(PARROT_INTERP, ARGIN(const char *name), int t)
+SymReg * mk_ident(PARROT_INTERP,
+    ARGIN(const char *name),
+    int t,
+    INTVAL type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -385,14 +401,14 @@ char * symreg_to_str(ARGIN(const SymReg *s))
 #define ASSERT_ARGS_create_symhash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
-#define ASSERT_ARGS_debug_dump_sym_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(hsh))
 #define ASSERT_ARGS_dup_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_find_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_free_pcc_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(sub))
 #define ASSERT_ARGS_free_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_get_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -411,9 +427,6 @@ char * symreg_to_str(ARGIN(const SymReg *s))
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(val))
 #define ASSERT_ARGS_mk_ident __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_mk_ident_ur __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_mk_label_address __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -453,54 +466,11 @@ char * symreg_to_str(ARGIN(const SymReg *s))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/symreg.c */
 
-typedef enum {
-    P_NONE           = 0x00,                  /* 0<<0 */
-    P_NEED_LEX       = 0x01,                  /* 1<<0 */
-    P_VTABLE         = 0x02,                  /* 1<<1 */
-    P_METHOD         = 0x04,                  /* 1<<2 */
-    P_ANON           = SUB_FLAG_PF_ANON,      /* 1<<3 0x8    - private3 */
-    P_MAIN           = SUB_FLAG_PF_MAIN,      /* 1<<4 0x10   - private4 */
-    P_LOAD           = SUB_FLAG_PF_LOAD,      /* 1<<5 0x20   - private5 */
-    P_IMMEDIATE      = SUB_FLAG_PF_IMMEDIATE, /* 1<<6 0x40   - private6 */
-    P_POSTCOMP       = SUB_FLAG_PF_POSTCOMP,  /* 1<<7 0x80   - private7 */
-    P_INIT           = SUB_COMP_FLAG_PF_INIT  /* 1<<10 0x400 - 10       */
-} pragma_enum_t;
-
-typedef enum {
-    isNCI  =        0x01,
-    isTAIL_CALL =   0x02
-} pcc_flags_t;
-
-typedef struct pcc_sub_t {
-    SymReg *sub;
-    SymReg *cc;
-    SymReg **args;
-    SymReg **multi;
-    SymReg **ret;
-    SymReg *object;
-    int    *arg_flags;    /* :slurpy, :optional, ... */
-    int    *ret_flags;    /* :slurpy, :optional, ... */
-    int     nargs;
-    int     nret;
-    int     nmulti;
-    int     calls_a_sub;
-    int     flags;    /* isNCI, isTAIL_CALL */
-    int     label;
-    INTVAL  pragma;
-} pcc_sub_t;
-
-enum uniq_t {
-    U_add_once,
-    U_add_uniq_label,
-    U_add_uniq_sub,
-    U_add_all
-};
-
 #endif /* PARROT_IMCC_SYMREG_H_GUARD */
 
 /*
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

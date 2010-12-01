@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -21,11 +20,12 @@ Opcode helper functions that don't really fit elsewhere.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "pmc/pmc_nci.h"
 
 typedef unsigned short _rand_buf[3];
 
-/* Parrot_register_move companion functions i and data */
+/* Parrot_util_register_move companion functions i and data */
 typedef struct parrot_prm_context {
     unsigned char *dest_regs;
     unsigned char *src_regs;
@@ -62,12 +62,12 @@ static INTVAL COMPARE(PARROT_INTERP,
 static void next_rand(_rand_buf X);
 static void process_cycle_without_exit(
     int node_index,
-    ARGIN(parrot_prm_context* c))
+    ARGIN(const parrot_prm_context *c))
         __attribute__nonnull__(2);
 
 static void rec_climb_back_and_mark(
     int node_index,
-    ARGIN(parrot_prm_context* c))
+    ARGIN(const parrot_prm_context *c))
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS__drand48 __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -95,7 +95,7 @@ static void rec_climb_back_and_mark(
 
 /*
 
-=item C<INTVAL intval_mod(INTVAL i2, INTVAL i3)>
+=item C<INTVAL Parrot_util_intval_mod(INTVAL i2, INTVAL i3)>
 
 NOTE: This "corrected mod" algorithm is based on the C code on page 70
 of [1]. Assuming correct behavior of the built-in mod operator (%) with
@@ -120,10 +120,11 @@ Mathematics*, Second Edition. Addison-Wesley, 1994.
 */
 
 PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 INTVAL
-intval_mod(INTVAL i2, INTVAL i3)
+Parrot_util_intval_mod(INTVAL i2, INTVAL i3)
 {
-    ASSERT_ARGS(intval_mod)
+    ASSERT_ARGS(Parrot_util_intval_mod)
     INTVAL z = i3;
 
     if (z == 0)
@@ -156,7 +157,7 @@ intval_mod(INTVAL i2, INTVAL i3)
 
 /*
 
-=item C<FLOATVAL floatval_mod(FLOATVAL n2, FLOATVAL n3)>
+=item C<FLOATVAL Parrot_util_floatval_mod(FLOATVAL n2, FLOATVAL n3)>
 
 Returns C<n2 mod n3>.
 
@@ -167,10 +168,11 @@ Includes a workaround for buggy code generation in the C<lcc> compiler.
 */
 
 PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 FLOATVAL
-floatval_mod(FLOATVAL n2, FLOATVAL n3)
+Parrot_util_floatval_mod(FLOATVAL n2, FLOATVAL n3)
 {
-    ASSERT_ARGS(floatval_mod)
+    ASSERT_ARGS(Parrot_util_floatval_mod)
 #ifdef __LCC__
 
     /* Another workaround for buggy code generation in the lcc compiler-
@@ -410,21 +412,23 @@ _srand48(long seed)
 
 /*
 
-=item C<FLOATVAL Parrot_float_rand(INTVAL how_random)>
+=item C<FLOATVAL Parrot_util_float_rand(INTVAL how_random)>
 
-Returns a C<FLOATVAL> in the interval C<[0.0, 1.0)>.
+Returns a C<FLOATVAL> uniformly distributed in the in the interval
+C<[0.0, 1.0]>.
 
-C<how_random> is ignored.
+C<how_random> is currently ignored.
 
 =cut
 
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 FLOATVAL
-Parrot_float_rand(INTVAL how_random)
+Parrot_util_float_rand(INTVAL how_random)
 {
-    ASSERT_ARGS(Parrot_float_rand)
+    ASSERT_ARGS(Parrot_util_float_rand)
     UNUSED(how_random);
 
     return _drand48();          /* [0.0..1.0] */
@@ -432,9 +436,9 @@ Parrot_float_rand(INTVAL how_random)
 
 /*
 
-=item C<INTVAL Parrot_uint_rand(INTVAL how_random)>
+=item C<INTVAL Parrot_util_uint_rand(INTVAL how_random)>
 
-Returns an C<INTVAL> in the interval C<[0, 2^31)>.
+Returns an C<INTVAL> uniformly distributed in the interval C<[0, 2^31)>.
 
 C<how_random> is ignored.
 
@@ -443,10 +447,11 @@ C<how_random> is ignored.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_uint_rand(INTVAL how_random)
+Parrot_util_uint_rand(INTVAL how_random)
 {
-    ASSERT_ARGS(Parrot_uint_rand)
+    ASSERT_ARGS(Parrot_util_uint_rand)
     UNUSED(how_random);
 
     return _lrand48();          /* [0..2^31] */
@@ -454,7 +459,7 @@ Parrot_uint_rand(INTVAL how_random)
 
 /*
 
-=item C<INTVAL Parrot_int_rand(INTVAL how_random)>
+=item C<INTVAL Parrot_util_int_rand(INTVAL how_random)>
 
 Returns an C<INTVAL> in the interval C<[-2^31, 2^31)>.
 
@@ -465,10 +470,11 @@ C<how_random> is ignored.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_int_rand(INTVAL how_random)
+Parrot_util_int_rand(INTVAL how_random)
 {
-    ASSERT_ARGS(Parrot_int_rand)
+    ASSERT_ARGS(Parrot_util_int_rand)
     UNUSED(how_random);
 
     return _mrand48();          /* [-2^31..2^31] */
@@ -476,7 +482,8 @@ Parrot_int_rand(INTVAL how_random)
 
 /*
 
-=item C<INTVAL Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random)>
+=item C<INTVAL Parrot_util_range_rand(INTVAL from, INTVAL to, INTVAL
+how_random)>
 
 Returns an C<INTVAL> in the range C<[from, to]>.
 
@@ -487,17 +494,21 @@ C<how_random> is ignored.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random)
+Parrot_util_range_rand(INTVAL from, INTVAL to, INTVAL how_random)
 {
-    ASSERT_ARGS(Parrot_range_rand)
-    return (INTVAL)(from + ((double)(to - from))
-                     * Parrot_float_rand(how_random));
+    ASSERT_ARGS(Parrot_util_range_rand)
+    const double spread = (double)(to - from + 1);
+    const double randpart = Parrot_util_float_rand(how_random);
+    const INTVAL raw = from + (INTVAL)(spread * randpart);
+
+    return raw;
 }
 
 /*
 
-=item C<void Parrot_srand(INTVAL seed)>
+=item C<void Parrot_util_srand(INTVAL seed)>
 
 Seeds the random number generator with C<seed>.
 
@@ -507,9 +518,9 @@ Seeds the random number generator with C<seed>.
 
 PARROT_EXPORT
 void
-Parrot_srand(INTVAL seed)
+Parrot_util_srand(INTVAL seed)
 {
-    ASSERT_ARGS(Parrot_srand)
+    ASSERT_ARGS(Parrot_util_srand)
     _srand48(seed);
 }
 
@@ -530,7 +541,7 @@ typedef enum {
 
 /*
 
-=item C<PMC* tm_to_array(PARROT_INTERP, const struct tm *tm)>
+=item C<PMC* Parrot_util_tm_to_array(PARROT_INTERP, const struct tm *tm)>
 
 Helper to convert a B<struct tm *> to an Array
 
@@ -538,15 +549,16 @@ Helper to convert a B<struct tm *> to an Array
 
 */
 
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC*
-tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
+Parrot_util_tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
 {
-    ASSERT_ARGS(tm_to_array)
+    ASSERT_ARGS(Parrot_util_tm_to_array)
 
     PMC * const Array = Parrot_pmc_new(interp,
-        Parrot_get_ctx_HLL_type(interp, enum_class_FixedIntegerArray));
+        Parrot_hll_get_ctx_HLL_type(interp, enum_class_FixedIntegerArray));
     VTABLE_set_integer_native(interp, Array, 9);
 
     VTABLE_set_integer_keyed_int(interp, Array, 0, tm->tm_sec);
@@ -564,8 +576,8 @@ tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
 
 /*
 
-=item C<INTVAL Parrot_byte_index(PARROT_INTERP, const STRING *base, const STRING
-*search, UINTVAL start_offset)>
+=item C<INTVAL Parrot_util_byte_index(PARROT_INTERP, const STRING *base, const
+STRING *search, UINTVAL start_offset)>
 
 Looks for the location of a substring within a longer string.  Takes
 pointers to the strings and the offset within the string at which
@@ -578,11 +590,12 @@ Returns an offset value if it is found, or -1 if no match.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
+Parrot_util_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
         ARGIN(const STRING *search), UINTVAL start_offset)
 {
-    ASSERT_ARGS(Parrot_byte_index)
+    ASSERT_ARGS(Parrot_util_byte_index)
     const char * const str_start  = base->strstart;
     const INTVAL       str_len    = base->strlen;
     const char * const search_str = search->strstart;
@@ -613,10 +626,10 @@ Parrot_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
 
 /*
 
-=item C<INTVAL Parrot_byte_rindex(PARROT_INTERP, const STRING *base, const
+=item C<INTVAL Parrot_util_byte_rindex(PARROT_INTERP, const STRING *base, const
 STRING *search, UINTVAL start_offset)>
 
-Substring search (like Parrot_byte_index), but works backwards,
+Substring search (like Parrot_util_byte_index), but works backwards,
 from the rightmost end of the string.
 
 Returns offset value or -1 (if no match).
@@ -628,12 +641,12 @@ Returns offset value or -1 (if no match).
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
+Parrot_util_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
         ARGIN(const STRING *search), UINTVAL start_offset)
 {
-    ASSERT_ARGS(Parrot_byte_rindex)
+    ASSERT_ARGS(Parrot_util_byte_rindex)
     const INTVAL searchlen          = search->strlen;
-    const char * const search_start = (const char *)Buffer_bufstart(search);
+    const char * const search_start = (const char *)(search->strstart);
     UINTVAL max_possible_offset     = (base->strlen - search->strlen);
     INTVAL current_offset;
 
@@ -642,7 +655,7 @@ Parrot_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
 
     for (current_offset = max_possible_offset; current_offset >= 0;
             current_offset--) {
-        const char * const base_start = (char *)Buffer_bufstart(base) + current_offset;
+        const char * const base_start = (char *)(base->strstart) + current_offset;
         if (memcmp(base_start, search_start, searchlen) == 0) {
             return current_offset;
         }
@@ -653,21 +666,21 @@ Parrot_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
 
 /*
 
-=item C<static void rec_climb_back_and_mark(int node_index, parrot_prm_context*
-c)>
+=item C<static void rec_climb_back_and_mark(int node_index, const
+parrot_prm_context *c)>
 
-Recursive function, used by Parrot_register_move to
+Recursive function, used by Parrot_util_register_move to
 climb back the graph of register moves operations.
 
 The node must have a predecessor: it is implicit because if a node has
 a node_index, it must have a predecessor because the node_index are the
 index of registers in dest_regs[] array, so by definition they have
-a corrsponding src_regs register.
+a corresponding src_regs register.
 
 Then it emits the move operation with its predecessor, or its backup
 if already used/visited.
 
-Then continues the climbing if the predecessor was not modified, anf in that
+Then continues the climbing if the predecessor was not modified, and in that
 case marks it, and set node_index as its backup.
 
   node_index  ... the index of a destination (i.e. with a pred.) register
@@ -678,7 +691,7 @@ case marks it, and set node_index as its backup.
 */
 
 static void
-rec_climb_back_and_mark(int node_index, ARGIN(parrot_prm_context* c))
+rec_climb_back_and_mark(int node_index, ARGIN(const parrot_prm_context *c))
 {
     ASSERT_ARGS(rec_climb_back_and_mark)
     const int node = c->dest_regs[node_index];
@@ -704,10 +717,10 @@ rec_climb_back_and_mark(int node_index, ARGIN(parrot_prm_context* c))
 
 /*
 
-=item C<static void process_cycle_without_exit(int node_index,
-parrot_prm_context* c)>
+=item C<static void process_cycle_without_exit(int node_index, const
+parrot_prm_context *c)>
 
-Recursive function, used by Parrot_register_move to handle the case
+Recursive function, used by Parrot_util_register_move to handle the case
 of cycles without exits, that are cycles of move ops between registers
 where each register has exactly one predecessor and one successor
 
@@ -721,7 +734,7 @@ For instance: 1-->2, 2-->3, 3-->1
 */
 
 static void
-process_cycle_without_exit(int node_index, ARGIN(parrot_prm_context* c))
+process_cycle_without_exit(int node_index, ARGIN(const parrot_prm_context *c))
 {
     ASSERT_ARGS(process_cycle_without_exit)
     const int pred = c->src_regs[node_index];
@@ -744,7 +757,7 @@ process_cycle_without_exit(int node_index, ARGIN(parrot_prm_context* c))
 
 /*
 
-=item C<void Parrot_register_move(PARROT_INTERP, int n_regs, unsigned char
+=item C<void Parrot_util_register_move(PARROT_INTERP, int n_regs, unsigned char
 *dest_regs, unsigned char *src_regs, unsigned char temp_reg, reg_move_func mov,
 reg_move_func mov_alt, void *info)>
 
@@ -756,7 +769,7 @@ Move C<n_regs> from the given register list C<src_regs> to C<dest_regs>.
   temp_reg  ... a register number not in one of these lists
   mov       ... a register move function to be called to move one register
   mov_alt   ... a register move function to be called to move one register
-                which triese fetching from an alternate src (or NULLfunc):
+                which tries fetching from an alternate src (or NULLfunc):
 
     (void)  (mov)(interp, dest, src, info);
     moved = (mov_alt)(interp, dest, src, info);
@@ -799,7 +812,7 @@ TODO: Add tests for the above conditions.
 
 PARROT_EXPORT
 void
-Parrot_register_move(PARROT_INTERP,
+Parrot_util_register_move(PARROT_INTERP,
         int n_regs,
         ARGOUT(unsigned char *dest_regs),
         ARGIN(unsigned char *src_regs),
@@ -808,7 +821,7 @@ Parrot_register_move(PARROT_INTERP,
         reg_move_func mov_alt,
         ARGIN(void *info))
 {
-    ASSERT_ARGS(Parrot_register_move)
+    ASSERT_ARGS(Parrot_util_register_move)
     int i;
     int max_reg       = 0;
     int* nb_succ      = NULL;
@@ -834,7 +847,7 @@ Parrot_register_move(PARROT_INTERP,
     c.temp_reg = temp_reg;
 
     /* compute max_reg, the max reg number + 1 */
-    for (i = 0; i < n_regs; i++) {
+    for (i = 0; i < n_regs; ++i) {
         if (src_regs[i] > max_reg)
             max_reg = src_regs[i];
         if (dest_regs[i] > max_reg)
@@ -850,26 +863,26 @@ Parrot_register_move(PARROT_INTERP,
     c.reg_to_index = reg_to_index = mem_gc_allocate_n_zeroed_typed(interp, max_reg, int);
 
     /* init backup array */
-    for (i = 0; i < n_regs; i++)
+    for (i = 0; i < n_regs; ++i)
         backup[i] = -1;
 
     /* fill in the conversion array between a register number and its index */
-    for (i = 0; i < max_reg; i++)
+    for (i = 0; i < max_reg; ++i)
         reg_to_index[i] = -1;
-    for (i = 0; i < n_regs; i++) {
+    for (i = 0; i < n_regs; ++i) {
         const int index = dest_regs[i];
         if (index != src_regs[i]) /* get rid of self-assignment */
             reg_to_index[index] = i;
     }
 
     /* count the nb of successors for each reg index */
-    for (i = 0; i < n_regs; i++) {
+    for (i = 0; i < n_regs; ++i) {
         const int index = reg_to_index[ src_regs[i] ];
         if (index >= 0) /* not interested in the wells that have no preds */
-            nb_succ[ index ]++;
+            ++nb_succ[index];
     }
     /* process each well if any */
-    for (i = 0; i < n_regs; i++) {
+    for (i = 0; i < n_regs; ++i) {
         if (0 == nb_succ[i]) { /* a well */
             rec_climb_back_and_mark(i, &c);
         }
@@ -877,7 +890,7 @@ Parrot_register_move(PARROT_INTERP,
 
     /* process remaining dest registers not processed */
     /* remaining nodes are members of cycles without exits */
-    for (i = 0; i < n_regs; i++) {
+    for (i = 0; i < n_regs; ++i) {
         if (0 < nb_succ[i] && 0 > backup[i]) { /* not a well nor visited*/
             process_cycle_without_exit(i, &c);
         }
@@ -904,6 +917,7 @@ returns 1 if C<a> is bigger, and returns -1 if C<b> is bigger.
 /* TODO: Macroize COMPARE */
 /* This is an awfully expensive function to call, what with all the */
 /* comparisons that never change. We ought to precompute everything. */
+/* XXX We should be able to guarantee that *a and *b never change via const parameters. */
 static INTVAL
 COMPARE(PARROT_INTERP, ARGIN(void *a), ARGIN(void *b), ARGIN(PMC *cmp))
 {
@@ -917,13 +931,14 @@ COMPARE(PARROT_INTERP, ARGIN(void *a), ARGIN(void *b), ARGIN(PMC *cmp))
         return f(interp, a, b);
     }
 
-    Parrot_pcc_invoke_sub_from_c_args(interp, cmp, "PP->I", a, b, &result);
+    Parrot_ext_call(interp, cmp, "PP->I", a, b, &result);
     return result;
 }
 
 /*
 
-=item C<void Parrot_quicksort(PARROT_INTERP, void **data, UINTVAL n, PMC *cmp)>
+=item C<void Parrot_util_quicksort(PARROT_INTERP, void **data, UINTVAL n, PMC
+*cmp)>
 
 Perform a quicksort on a PMC array.
 
@@ -932,9 +947,9 @@ Perform a quicksort on a PMC array.
 */
 
 void
-Parrot_quicksort(PARROT_INTERP, ARGMOD(void **data), UINTVAL n, ARGIN(PMC *cmp))
+Parrot_util_quicksort(PARROT_INTERP, ARGMOD(void **data), UINTVAL n, ARGIN(PMC *cmp))
 {
-    ASSERT_ARGS(Parrot_quicksort)
+    ASSERT_ARGS(Parrot_util_quicksort)
     while (n > 1) {
         UINTVAL i, j, ln, rn;
         void *temp;
@@ -971,12 +986,12 @@ Parrot_quicksort(PARROT_INTERP, ARGMOD(void **data), UINTVAL n, ARGIN(PMC *cmp))
         rn = n - ++j;
 
         if (ln < rn) {
-            Parrot_quicksort(interp, data, ln, cmp);
+            Parrot_util_quicksort(interp, data, ln, cmp);
             data += j;
             n = rn;
         }
         else {
-            Parrot_quicksort(interp, data + j, rn, cmp);
+            Parrot_util_quicksort(interp, data + j, rn, cmp);
             n = ln;
         }
     }
@@ -986,12 +1001,6 @@ Parrot_quicksort(PARROT_INTERP, ARGMOD(void **data), UINTVAL n, ARGIN(PMC *cmp))
 
 =back
 
-=head1 HISTORY
-
-Initial version by leo 2003.09.09.
-
-=cut
-
 */
 
 
@@ -999,5 +1008,5 @@ Initial version by leo 2003.09.09.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,7 +1,5 @@
 /* thread.h
  *  Copyright (C) 2001-2003, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the api header for the windows thread primitives
  *  Data Structure and Algorithms:
@@ -119,13 +117,12 @@ typedef HANDLE Parrot_thread;
 
 typedef void (*Cleanup_Handler)(void *);
 
-#ifndef HAVE_STRUCT_TIMESPEC
-#  define HAVE_STRUCT_TIMESPEC
+#ifndef PARROT_HAS_TIMESPEC
 struct timespec {
     time_t tv_sec;
     long tv_nsec;
 };
-#endif /* HAVE_STRUCT_TIMESPEC */
+#endif /* PARROT_HAS_TIMESPEC */
 
 #endif /* PARROT_THR_WINDOWS_H_GUARD */
 
@@ -133,5 +130,5 @@ struct timespec {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

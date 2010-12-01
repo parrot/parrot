@@ -37,11 +37,19 @@ flags, it should declare ATTRs of the appropriate type.  The pmc2c code will
 generate a struct containing all ATTRs, including those inherited via
 C<extends> declarations.  This struct will be named in the form
 C<Parrot_x_attributes>, where C<x> is the name of your PMC, e.g.
-C<Parrot_FixedIntegerArray_attributes>.  When creating a PMC that has one or
-more ATTRs, the C<Parrot_x_attributes> struct must be allocated and assigned to
-C<PMC_data> in the PMC's C<init()> and C<init_pmc()> VTABLE functions (if used)
-and it must be destroyed in the C<destroy()> VTABLE function.  PMCs with ATTRs
-also need to indicate that they need active destruction by calling
+C<Parrot_FixedIntegerArray_attributes>. 
+
+When creating a PMC that has one or more ATTRs, the C<Parrot_x_attributes>
+struct must be allocated and assigned to C<PMC_data>, and freed on PMC
+destruction. This can be done automatically by using the auto_attrs flag in
+the PMC declaration, or manually by using the manual_attrs flag. You must set
+one of those flags, a warning is emitted otherwise. In future releases
+auto_attrs will be the default.
+
+If manual_attrs is specified or assumed the struct must be manually allocated
+in the PMC's C<init()> and C<init_pmc()> VTABLE functions (if used)
+and it must be destroyed in the C<destroy()> VTABLE function, the PMC must
+also indicate that they need active destruction by calling
 C<PObj_custom_destroy_SET()> or C<PObj_custom_mark_destroy_SETALL()>.
 
 If your PMC only needs to store a single pointer, it can use C<PMC_data> directly.

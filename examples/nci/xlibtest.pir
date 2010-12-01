@@ -1,5 +1,4 @@
 # Copyright (C) 2008, Parrot Foundation.
-# $Id$
 
 =head1 TITLE
 
@@ -277,20 +276,22 @@ finish:
 
     push_eh newfile
     .local pmc handle
-    handle = open filename, 'r'
+    handle = new 'FileHandle'
+    handle.'open'(filename, 'r')
     pop_eh
 
     push_eh failed
     .local string jsonfile
     jsonfile = handle.'readall'()
-    close handle
+    handle.'close'()
 
-    load_bytecode 'compilers/json/JSON.pbc'
-    .local pmc json
-    json = compreg 'JSON'
+    load_language 'data_json'
+    .local pmc json, jsonobject, jsondata
+    json = compreg 'data_json'
     .local pmc jsonobject
-    jsonobject = json(jsonfile)
-    listline = jsonobject [JKEY_LINES]
+    jsonobject = json.'compile'(jsonfile)
+    jsondata = jsonobject()
+    listline = jsondata [JKEY_LINES]
     goto finish
 
 failed:
@@ -321,10 +322,11 @@ finish:
     .local string jsonfile
     jsonfile = _json(jsondata)
     .local pmc handle
-    handle = open filename, 'w'
+    handle = new 'FileHandle'
+    handle.'open'(filename, 'w')
     print handle, jsonfile
     print handle, "\n"
-    close handle
+    handle.'close'()
     .return()
 failed:
     .local pmc exception

@@ -1,6 +1,5 @@
 #! parrot
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 
 # Common functions for various Packfile* PMCs tests.
 # Return test filename
@@ -9,7 +8,7 @@
 
 .sub '_filename'
     .local string filename
-    filename = 't/native_pbc/number_1.pbc'
+    filename = 't/pmc/testlib/number.pbc'
     .return (filename)
 .end
 
@@ -20,9 +19,10 @@
     .local pmc pf, pio
     pf   = new ['Packfile']
     $S0  = '_filename'()
-    pio  = open $S0, 'r'
+    pio  = new ['FileHandle']
+    pio.'open'($S0, 'rb')
     $S0  = pio.'readall'()
-    close pio
+    pio.'close'()
     pf   = $S0
     .return(pf)
 .end
@@ -63,12 +63,16 @@
     .return ()
 .end
 
-.sub '_get_fixup_table'
-    .param pmc pf
-
-    .tailcall '_find_segment_by_type'(pf, "PackfileFixupTable")
+# Report no ok for loading packfile failures
+.sub report_load_error
+    .param pmc except
+    .param string desc
+    .local string msg, aux
+    msg = concat desc, ' - error loading packfile: '
+    aux = except['message']
+    msg = concat msg, aux
+    ok(0, msg)
 .end
-
 
 
 # Local Variables:

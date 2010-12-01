@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -74,7 +73,7 @@ print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
         Parrot_io_puts(interp, Parrot_io_STDERR(interp), "Unknown warning\n");
     else {
         Parrot_io_putps(interp, Parrot_io_STDERR(interp), msg);
-        if (string_ord(interp, msg, -1) != '\n')
+        if (STRING_ord(interp, msg, -1) != '\n')
             Parrot_io_eprintf(interp, "%c", '\n');
     }
     print_pbc_location(interp);
@@ -124,6 +123,55 @@ Parrot_warn(PARROT_INTERP, INTVAL warnclass,
 
 /*
 
+=item C<void Parrot_warn_deprecated(PARROT_INTERP, const char *message)>
+
+Warn about use of a deprecated feature
+
+C<message> is a C string.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_warn_deprecated(PARROT_INTERP, ARGIN(const char *message))
+{
+    ASSERT_ARGS(Parrot_warn_deprecated)
+
+    if (PARROT_WARNINGS_test(interp, PARROT_WARNINGS_DEPRECATED_FLAG)) {
+        STRING *msg = Parrot_sprintf_c(interp, "WARNING: %s\n", message);
+        print_warning(interp, msg);
+    }
+}
+
+
+/*
+
+=item C<void Parrot_warn_experimental(PARROT_INTERP, const char *message)>
+
+Warn about use of a experimental feature
+
+C<message> is a C string.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_warn_experimental(PARROT_INTERP, ARGIN(const char *message))
+{
+    ASSERT_ARGS(Parrot_warn_experimental)
+
+    if (PARROT_WARNINGS_test(interp, PARROT_WARNINGS_DEPRECATED_FLAG)) {
+        STRING *msg = Parrot_sprintf_c(interp, "WARNING: %s\n", message);
+        print_warning(interp, msg);
+    }
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO
@@ -139,5 +187,5 @@ F<include/parrot/warnings.h>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

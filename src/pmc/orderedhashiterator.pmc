@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -20,6 +19,10 @@ Implementation of Iterator for OrderedHash.
 
 #include "pmc/pmc_orderedhash.h"
 #include "pmc/pmc_hashiteratorkey.h"
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
 
 pmclass OrderedHashIterator extends Iterator no_ro auto_attrs {
     ATTR PMC        *pmc_hash;      /* the Hash which this Iterator iterates */
@@ -91,21 +94,22 @@ Marks the hash as live.
 
         /* Restart iterator */
         attrs->elements = VTABLE_elements(INTERP, attrs->pmc_hash);
-        if (value == ITERATE_FROM_START || value == ITERATE_FROM_START_KEYS) {
+        switch (value) {
+          case ITERATE_FROM_START:
+          case ITERATE_FROM_START_KEYS:
             attrs->pos          = 0;
             attrs->reverse      = 0;
             attrs->next_entry   = PARROT_ORDEREDHASH(attrs->pmc_hash)->first;
-            return;
-        }
-        else if (value == ITERATE_FROM_END) {
+            break;
+          case ITERATE_FROM_END:
             attrs->pos          = attrs->elements;
             attrs->reverse      = 1;
             attrs->next_entry   = PARROT_ORDEREDHASH(attrs->pmc_hash)->last;
-            return;
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                    "HashIterator: unknown iterator type");
         }
-
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "HashIterator: unknown iterator type");
     };
 
 /*
@@ -179,8 +183,8 @@ the next one.
                 ORDERED_HASH_ITEM_KEY);
         attrs->next_entry = VTABLE_get_pmc_keyed_int(INTERP, attrs->next_entry,
                 ORDERED_HASH_ITEM_NEXT);
-        attrs->pos++;
-        attrs->elements--;
+        ++attrs->pos;
+        --attrs->elements;
 
         return ret;
     }
@@ -210,8 +214,8 @@ the next one for reverse iterator.
                 ORDERED_HASH_ITEM_KEY);
         attrs->next_entry = VTABLE_get_pmc_keyed_int(INTERP, attrs->next_entry,
                 ORDERED_HASH_ITEM_PREV);
-        attrs->pos--;
-        attrs->elements--;
+        --attrs->pos;
+        --attrs->elements;
 
         return ret;
     }
@@ -238,5 +242,5 @@ the next one for reverse iterator.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

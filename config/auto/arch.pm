@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -29,14 +28,20 @@ sub _init {
     my %data;
     $data{description} = q{Determine CPU architecture and OS};
     $data{result}      = q{};
+    my $unamep;
+    eval {
+       chomp( $unamep  = `uname -p` ) unless ($^O eq 'MSWin32');
+    };
+    $data{unamep} = (! $@ and $unamep)
+        ? $unamep
+        : undef;
     return \%data;
 }
 
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get('verbose');
-    $verbose and print "\n";
+    $conf->debug("\n");
 
     my $archname = $conf->data->get('archname');
     # This was added to convert IA64.ARCHREV_0 on HP-UX, TT #645, TT #653
@@ -44,10 +49,10 @@ sub runstep {
     my ( $cpuarch, $osname ) = split( /-/, $archname );
 
 
-    if ($verbose) {
-        print "determining operating system and cpu architecture\n";
-        print "archname: $archname\n";
-    }
+    $conf->debug(
+        "determining operating system and cpu architecture\n",
+        "archname: $archname\n")
+    ;
 
     if ( !defined $osname ) {
         ( $osname, $cpuarch ) = ( $cpuarch, q{} );
@@ -60,12 +65,9 @@ sub runstep {
     # the above split fails because archname is "darwin-thread-multi-2level".
     if ( $cpuarch =~ /darwin/ ) {
         $osname = 'darwin';
-         if ( $conf->data->get('byteorder') =~ /^1234/ ) {
-            $cpuarch = 'i386';
-        }
-        else {
-            $cpuarch = 'ppc';
-        }
+        $cpuarch = ( $self->{unamep} eq 'powerpc' )
+            ? 'ppc'
+            : 'i386';
     }
 
     # cpuarch and osname are reversed in archname on windows
@@ -98,6 +100,8 @@ sub runstep {
     );
 
     $conf->data->set( 'platform' => $self->_get_platform( $conf ) );
+    $conf->data->set( 'osvers' => $conf->data->get('osvers_provisional') )
+        unless $conf->data->get('osvers');
 
     _report_verbose( $conf );
 
@@ -123,12 +127,11 @@ sub _get_platform {
 
 sub _report_verbose {
     my ($conf) = @_;
-    my $verbose = $conf->options->get( 'verbose' );
-    if ( $verbose ) {
-        print "osname:   ", $conf->data->get('osname'), "\n";
-        print "cpuarch:  ", $conf->data->get('cpuarch'), "\n";
-        print "platform: ", $conf->data->get('platform'), "\n";
-    }
+    $conf->debug(
+        "osname:   ", $conf->data->get('osname'), "\n",
+        "cpuarch:  ", $conf->data->get('cpuarch'), "\n",
+        "platform: ", $conf->data->get('platform'), "\n",
+    );
     return 1;
 }
 

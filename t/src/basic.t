@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2006, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -27,7 +26,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "hello world" );
     #include <stdlib.h>
 
     int
-    main(int argc, char* argv[])
+    main(int argc, const char* argv[])
     {
         printf("Hello, World!\n");
         exit(0);
@@ -41,7 +40,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "direct exit_fatal call" );
     #include <parrot/exceptions.h>
 
     int
-    main(int argc, char* argv[])
+    main(int argc, const char* argv[])
     {
          exit_fatal(0, "Blow'd Up(tm)"); /* ' */
     }
@@ -59,7 +58,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot_run_native" );
 static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
 
 int
-main(int argc, char* argv[])
+main(int argc, const char* argv[])
 {
     Interp *interp;
 
@@ -73,7 +72,7 @@ main(int argc, char* argv[])
     Parrot_run_native(interp, the_test);
 
     Parrot_io_eprintf(interp, "back\n");
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
     return 0;
 }
 

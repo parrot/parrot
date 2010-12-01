@@ -137,18 +137,6 @@ perl t/harness t/native_pbc/integer.t && \
     perl t/harness t/native_pbc/number.t && \
     perl t/harness t/native_pbc/string.t
 
-./parrot -o t/native_pbc/annotations.pbc - <<EOF
-.sub 'main'
-.annotate "file", "annotations.pir"
-.annotate "creator", "Parrot Foundation"
-.annotate "line", 1
-    say "Hi"
-    say "line"
-.annotate "line", 2
-    .return ()
-.end
-EOF
-
 if [ "$enable_long_double" = "1" ]; then
     if [ "$1" = "--noconf" ]; then
       echo "Hmm. You have no long double, and we want to try --floatval=long double"
@@ -175,6 +163,7 @@ if [ "$enable_long_double" = "1" ]; then
       perl t/harness t/native_pbc/string.t
 fi
 
-echo ""
+echo "You should run these commands to update the PBC files in your repo:"
 echo "cd t/native_pbc"
-echo svn commit -m'native_pbc platform updates'
+echo "git add *.pbc"
+echo "git commit -m 'native_pbc platform updates'"

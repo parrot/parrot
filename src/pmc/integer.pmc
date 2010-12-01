@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2003-2008, Parrot Foundation.
-$Id$
+Copyright (C) 2003-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -21,9 +20,45 @@ integer type without going to an I register.
 
 #include "pmc/pmc_bigint.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void maybe_throw_overflow_error(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_IGNORABLE_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PMC* upgrade_self_to_bignum(PARROT_INTERP, ARGMOD(PMC *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
+
+#define ASSERT_ARGS_maybe_throw_overflow_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_upgrade_self_to_bignum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+/*
+
+=item C<static void maybe_throw_overflow_error(PARROT_INTERP)>
+
+Checks to see if the interpreter is set to throw an exception on overflow.
+
+If so, throw the exception, otherwise ignore.
+
+=cut
+
+*/
+
 static void
 maybe_throw_overflow_error(PARROT_INTERP)
 {
+    ASSERT_ARGS(maybe_throw_overflow_error)
+
     /* check to see what the behavior is. If the interpreter is set
        to throw an exception on overflow. If so, throw the exception,
        otherwise, chill out it's no big deal. */
@@ -32,9 +67,23 @@ maybe_throw_overflow_error(PARROT_INTERP)
             "Integer overflow");
 }
 
+/*
+
+=item C<static PMC* upgrade_self_to_bignum(PARROT_INTERP, PMC *self)>
+
+Returns a pointer of *self upgraded to a bignum
+
+=cut
+
+*/
+
+PARROT_IGNORABLE_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC*
-upgrade_self_to_bignum(PARROT_INTERP, PMC *self)
+upgrade_self_to_bignum(PARROT_INTERP, ARGMOD(PMC *self))
 {
+    ASSERT_ARGS(upgrade_self_to_bignum)
+
     /* Do an in-place upgrade to a Bignum of SELF and return a pointer
        to it (which is probably redundant, but whatever). */
     const INTVAL a = VTABLE_get_integer(interp, self);
@@ -74,6 +123,13 @@ Initializes the integer with a default value of C<0>.
         attrs->iv      = VTABLE_get_integer(INTERP, init);
     }
 
+    VTABLE void init_int(INTVAL init) {
+        Parrot_Integer_attributes * const attrs =
+            (Parrot_Integer_attributes *)PMC_data(SELF);
+
+        attrs->iv = init;
+    }
+
 /*
 
 =item C<PMC *clone()>
@@ -84,9 +140,8 @@ Creates an exact duplicate of this PMC.
 
 */
     VTABLE PMC *clone() {
-        PMC * const clone = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_integer_native(INTERP, clone, SELF.get_integer());
-        return clone;
+        return Parrot_pmc_new_init_int(INTERP, SELF->vtable->base_type,
+            SELF.get_integer());
     }
 
 /*
@@ -201,7 +256,7 @@ Returns the string value of the integer.
 
 =item C<void set_integer_native(INTVAL value)>
 
-Sets the value of the integer to the value of the C<Integer> C<*value>.
+Sets the value of the integer to the value of the native integer C<*value>.
 
 =cut
 
@@ -230,20 +285,23 @@ Morphs the integer to a C<String> and sets the value from C<value>.
 */
 
     VTABLE void set_number_native(FLOATVAL value) {
-        Parrot_pmc_reuse(INTERP, SELF, enum_class_Float, 0);
+        Parrot_pmc_reuse(INTERP, SELF,
+            Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_Float), 0);
         SELF.set_number_native(value);
     }
 
 
     VTABLE void set_bool(INTVAL value) {
-        Parrot_pmc_reuse(INTERP, SELF, enum_class_Boolean, 0);
+        Parrot_pmc_reuse(INTERP, SELF,
+            Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_Boolean), 0);
         SELF.set_bool(value);
     }
 
 
 
     VTABLE void set_string_native(STRING *value) {
-        Parrot_pmc_reuse(INTERP, SELF, enum_class_String, 0);
+        Parrot_pmc_reuse(INTERP, SELF,
+            Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_String), 0);
         SELF.set_string_native(value);
     }
 
@@ -264,29 +322,23 @@ Adds C<value> to the integer and returns the result in C<*dest>.
         const INTVAL b = VTABLE_get_integer(INTERP, value);
         const INTVAL c = a + b;
 
-        if ((c^a) >= 0 || (c^b) >= 0) {
-            dest = Parrot_pmc_new(INTERP, VTABLE_type(interp, SELF));
-
-            /* need this for e.g. Undef PMC */
-            VTABLE_set_integer_native(INTERP, dest, c);
-            return dest;
-        }
+        if ((c^a) >= 0 || (c^b) >= 0)
+            return Parrot_pmc_new_init_int(INTERP,
+                    VTABLE_type(INTERP, SELF), c);
         else {
-            PMC * temp;
-            maybe_throw_overflow_error(interp);
-            temp = Parrot_pmc_new(interp, enum_class_BigInt);
-            VTABLE_set_integer_native(interp, temp, a);
-            return VTABLE_add(interp, temp, value, dest);
+            PMC *temp;
+            maybe_throw_overflow_error(INTERP);
+            temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, a);
+            return VTABLE_add(INTERP, temp, value, dest);
         }
     }
 
 
     MULTI PMC *add(Complex value, PMC *dest) {
         const INTVAL a = SELF.get_integer();
-        dest           = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, value));
-
-        VTABLE_set_number_native(INTERP, dest,
-                a + VTABLE_get_number_keyed_int(INTERP, value, 0));
+        dest           = Parrot_pmc_new_init_int(INTERP,
+                            VTABLE_type(INTERP, value),
+                            a + VTABLE_get_number_keyed_int(INTERP, value, 0));
         VTABLE_set_number_keyed_int(INTERP, dest, 1,
                 VTABLE_get_number_keyed_int(INTERP, value, 1));
 
@@ -296,18 +348,17 @@ Adds C<value> to the integer and returns the result in C<*dest>.
 
     MULTI PMC *add(BigInt value, PMC *dest) {
         PMC *temp;
-        maybe_throw_overflow_error(interp);
-        temp = Parrot_pmc_new(interp, enum_class_BigInt);
-        VTABLE_set_integer_native(interp, temp, SELF.get_integer());
-        return VTABLE_add(interp, temp, value, dest);
+        maybe_throw_overflow_error(INTERP);
+        temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt,
+                SELF.get_integer());
+        return VTABLE_add(INTERP, temp, value, dest);
     }
 
 
     MULTI PMC *add(DEFAULT value, PMC *dest) {
-        dest = Parrot_pmc_new(INTERP, VTABLE_type(interp, value));
-
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, value));
         VTABLE_set_number_native(INTERP, dest,
-                SELF.get_integer() + VTABLE_get_number(INTERP, value));
+            SELF.get_integer() + VTABLE_get_number(interp, value));
         return dest;
     }
 
@@ -316,18 +367,14 @@ Adds C<value> to the integer and returns the result in C<*dest>.
         const INTVAL a = VTABLE_get_integer(INTERP, SELF);
         const INTVAL c = a + b;
 
-        if ((c^a) >= 0 || (c^b) >= 0) {
-            dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-            VTABLE_set_integer_native(INTERP, dest, c);
-            return dest;
-        }
+        if ((c^a) >= 0 || (c^b) >= 0)
+            return Parrot_pmc_new_init_int(INTERP,
+                    VTABLE_type(INTERP, SELF), c);
         else {
             PMC *temp;
-            maybe_throw_overflow_error(interp);
-            temp = Parrot_pmc_new(interp, enum_class_BigInt);
-            VTABLE_set_integer_native(interp, temp, a);
-            return VTABLE_add_int(interp, temp, b, dest);
+            maybe_throw_overflow_error(INTERP);
+            temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, a);
+            return VTABLE_add_int(INTERP, temp, b, dest);
         }
     }
 
@@ -353,6 +400,7 @@ Adds C<value> to C<SELF> inplace.
 
     MULTI void i_add(Complex value) {
         const INTVAL a = SELF.get_integer();
+        UNUSED(a);
 
         Parrot_pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
         VTABLE_set_number_native(INTERP, SELF,
@@ -373,10 +421,9 @@ Adds C<value> to C<SELF> inplace.
         if ((c^a) >= 0 || (c^b) >= 0)
             VTABLE_set_integer_native(INTERP, SELF, c);
         else {
-            PMC *temp;
-            maybe_throw_overflow_error(interp);
-            SELF = upgrade_self_to_bignum(interp, SELF);
-            VTABLE_i_add_int(interp, SELF, b);
+            maybe_throw_overflow_error(INTERP);
+            SELF = upgrade_self_to_bignum(INTERP, SELF);
+            VTABLE_i_add_int(INTERP, SELF, b);
         }
     }
 
@@ -406,18 +453,14 @@ C<get_integer> and C<set_integer_native> always.
         const INTVAL b = VTABLE_get_integer(INTERP, value);
         const INTVAL c = a - b;
 
-        if ((c^a) >= 0 || (c^~b) >= 0) {
-            dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-            VTABLE_set_integer_native(INTERP, dest, c);
-            return dest;
-        }
+        if ((c^a) >= 0 || (c^~b) >= 0)
+            return Parrot_pmc_new_init_int(INTERP,
+                    VTABLE_type(INTERP, SELF), c);
         else {
             PMC *temp;
-            maybe_throw_overflow_error(interp);
-            temp = Parrot_pmc_new(interp, enum_class_BigInt);
-            VTABLE_set_integer_native(interp, temp, a);
-            return VTABLE_subtract(interp, temp, value, dest);
+            maybe_throw_overflow_error(INTERP);
+            temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, a);
+            return VTABLE_subtract(INTERP, temp, value, dest);
         }
     }
 
@@ -437,10 +480,10 @@ C<get_integer> and C<set_integer_native> always.
 
     MULTI PMC *subtract(BigInt value, PMC *dest) {
         PMC *temp;
-        maybe_throw_overflow_error(interp);
-        temp = Parrot_pmc_new(interp, enum_class_BigInt);
-        VTABLE_set_integer_native(interp, temp, SELF.get_integer());
-        return VTABLE_subtract(interp, temp, value, dest);
+        maybe_throw_overflow_error(INTERP);
+        temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt,
+                 SELF.get_integer());
+        return VTABLE_subtract(INTERP, temp, value, dest);
     }
 
 
@@ -467,18 +510,14 @@ Subtracts C<value> from the integer and returns the result in C<*dest>.
         const INTVAL a = SELF.get_integer();
         const INTVAL c = a - b;
 
-        if ((c^a) >= 0 || (c^~b) >= 0) {
-            dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-            VTABLE_set_integer_native(INTERP, dest, c);
-            return dest;
-        }
+        if ((c^a) >= 0 || (c^~b) >= 0)
+            return Parrot_pmc_new_init_int(INTERP,
+                    VTABLE_type(INTERP, SELF), c);
         else {
             PMC *temp;
-            maybe_throw_overflow_error(interp);
-            temp = Parrot_pmc_new(interp, enum_class_BigInt);
-            VTABLE_set_integer_native(interp, temp, a);
-            return VTABLE_subtract_int(interp, temp, b, dest);
+            maybe_throw_overflow_error(INTERP);
+            temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, a);
+            return VTABLE_subtract_int(INTERP, temp, b, dest);
         }
     }
 
@@ -505,9 +544,9 @@ Subtracts C<value> from C<SELF> inplace.
         if ((c^a) >= 0 || (c^~b) >= 0)
             VTABLE_set_integer_native(INTERP, SELF, c);
         else {
-            maybe_throw_overflow_error(interp);
-            SELF = upgrade_self_to_bignum(interp, SELF);
-            VTABLE_i_subtract(interp, SELF, value);
+            maybe_throw_overflow_error(INTERP);
+            SELF = upgrade_self_to_bignum(INTERP, SELF);
+            VTABLE_i_subtract(INTERP, SELF, value);
         }
     }
 
@@ -567,17 +606,13 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
         const INTVAL c  = a * b;
         const double cf = (double)a * (double)b;
 
-        if ((double) c == cf) {
-            dest = Parrot_pmc_new(INTERP, VTABLE_type(interp, SELF));
-
-            VTABLE_set_integer_native(INTERP, dest, c);
-            return dest;
-        }
+        if ((double) c == cf)
+            return Parrot_pmc_new_init_int(INTERP,
+                    VTABLE_type(INTERP, SELF), c);
         else {
             PMC *temp;
             maybe_throw_overflow_error(INTERP);
-            temp = Parrot_pmc_new(interp, enum_class_BigInt);
-            VTABLE_set_integer_native(interp, temp, a);
+            temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, a);
             return VTABLE_multiply(INTERP, temp, value, dest);
         }
     }
@@ -600,10 +635,8 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
 
     MULTI PMC *multiply(DEFAULT value, PMC *dest) {
         const FLOATVAL valf = VTABLE_get_number(INTERP, value);
-        dest                = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_number_native(INTERP, dest, SELF.get_number() * valf);
-        return dest;
+        return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
+            SELF.get_number() * valf);
     }
 
 
@@ -612,17 +645,13 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
         const INTVAL c  = a * b;
         const double cf = (double)a * (double)b;
 
-        if ((double) c == cf) {
-            dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-            VTABLE_set_integer_native(INTERP, dest, c);
-            return dest;
-        }
+        if ((double) c == cf)
+            return Parrot_pmc_new_init_int(INTERP,
+                    VTABLE_type(INTERP, SELF), c);
         else {
             PMC *temp;
             maybe_throw_overflow_error(INTERP);
-            temp = Parrot_pmc_new(interp, enum_class_BigInt);
-            VTABLE_set_integer_native(interp, temp, a);
+            temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, a);
             return VTABLE_multiply_int(INTERP, temp, b, dest);
         }
     }
@@ -647,7 +676,7 @@ Multiply C<value> with C<SELF> inplace.
 
 
     MULTI void i_multiply(BigInt value) {
-        interp->vtables[enum_class_BigInt]->multiply_int(INTERP, value, SELF.get_integer(), SELF);
+        INTERP->vtables[enum_class_BigInt]->multiply_int(INTERP, value, SELF.get_integer(), SELF);
     }
 
 
@@ -708,8 +737,8 @@ Divides C<SELF> by C<value> inplace.
     MULTI PMC *divide(BigInt value, PMC *dest) {
         PMC *temp;
         maybe_throw_overflow_error(INTERP);
-        temp = Parrot_pmc_new(interp, enum_class_BigInt);
-        VTABLE_set_integer_native(interp, temp, SELF.get_integer());
+        temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt,
+            SELF.get_integer());
         return VTABLE_divide(INTERP, temp, value, dest);
     }
 
@@ -720,9 +749,8 @@ Divides C<SELF> by C<value> inplace.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "float division by zero");
 
-        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        VTABLE_set_number_native(INTERP, dest, SELF.get_number() / d);
-        return dest;
+        return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
+                    SELF.get_number() / d);
     }
 
 
@@ -769,8 +797,8 @@ Divides C<SELF> by C<value> inplace.
     MULTI PMC *floor_divide(BigInt value, PMC *dest) {
         PMC *temp;
         maybe_throw_overflow_error(INTERP);
-        temp = Parrot_pmc_new(interp, enum_class_BigInt);
-        VTABLE_set_integer_native(interp, temp, SELF.get_integer());
+        temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt,
+                SELF.get_integer());
         return VTABLE_floor_divide(INTERP, temp, value, dest);
     }
 
@@ -783,11 +811,9 @@ Divides C<SELF> by C<value> inplace.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "float division by zero");
 
-        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
         f = floor(SELF.get_number() / d);
-        VTABLE_set_integer_native(INTERP, dest, (INTVAL)f);
-        return dest;
+        return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
+            (INTVAL)f);
     }
 
 
@@ -798,12 +824,9 @@ Divides C<SELF> by C<value> inplace.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "float division by zero");
 
-        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
         f = floor(SELF.get_number() / value);
-        VTABLE_set_integer_native(INTERP, dest, (INTVAL)f);
-
-        return dest;
+        return Parrot_pmc_new_init_int(INTERP,
+               VTABLE_type(INTERP, SELF), (INTVAL)f);
     }
 
     VTABLE PMC *floor_divide_float(FLOATVAL value, PMC *dest) {
@@ -813,12 +836,9 @@ Divides C<SELF> by C<value> inplace.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "float division by zero");
 
-        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
         f = floor(SELF.get_number() / value);
-        VTABLE_set_integer_native(INTERP, dest, (INTVAL)f);
-
-        return dest;
+        return Parrot_pmc_new_init_int(INTERP,
+                VTABLE_type(INTERP, SELF), (INTVAL)f);
     }
 
     MULTI void i_floor_divide(BigInt value) {
@@ -854,7 +874,6 @@ Divides C<SELF> by C<value> inplace.
 
     VTABLE void i_floor_divide_float(FLOATVAL value) {
         FLOATVAL f;
-        INTVAL   self_val;
 
         if (FLOAT_IS_ZERO(value))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -892,8 +911,8 @@ Calculates modulus in place.
     MULTI PMC *modulus(BigInt value, PMC *dest) {
         PMC *temp;
         maybe_throw_overflow_error(INTERP);
-        temp = Parrot_pmc_new(interp, enum_class_BigInt);
-        VTABLE_set_integer_native(interp, temp, SELF.get_integer());
+        temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt,
+             SELF.get_integer());
         return VTABLE_modulus(INTERP, temp, value, dest);
     }
 
@@ -905,11 +924,8 @@ Calculates modulus in place.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
 
-        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_integer_native(INTERP, dest,
-                intval_mod(SELF.get_integer(), d));
-        return dest;
+        return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
+                Parrot_util_intval_mod(SELF.get_integer(), d));
     }
 
 
@@ -918,11 +934,8 @@ Calculates modulus in place.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
 
-        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_integer_native(INTERP, dest,
-                intval_mod(SELF.get_integer(), value));
-        return dest;
+        return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
+                Parrot_util_intval_mod(SELF.get_integer(), value));
     }
 
 
@@ -931,11 +944,8 @@ Calculates modulus in place.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
 
-        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_integer_native(INTERP, dest,
-                intval_mod(SELF.get_integer(), (INTVAL)value));
-        return dest;
+        return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
+                Parrot_util_intval_mod(SELF.get_integer(), (INTVAL)value));
     }
 
 
@@ -954,7 +964,7 @@ Calculates modulus in place.
                     "int modulus by zero");
 
         VTABLE_set_integer_native(INTERP, SELF,
-                intval_mod(SELF.get_integer(), d));
+                Parrot_util_intval_mod(SELF.get_integer(), d));
     }
 
 
@@ -964,7 +974,7 @@ Calculates modulus in place.
                     "int modulus by zero");
 
         VTABLE_set_integer_native(INTERP, SELF,
-                intval_mod(SELF.get_integer() , value));
+                Parrot_util_intval_mod(SELF.get_integer() , value));
     }
 
 
@@ -974,7 +984,47 @@ Calculates modulus in place.
                     "int modulus by zero");
 
         VTABLE_set_integer_native(INTERP, SELF,
-                intval_mod(SELF.get_integer() , (INTVAL)value));
+                Parrot_util_intval_mod(SELF.get_integer() , (INTVAL)value));
+    }
+
+/*
+
+=item C<PMC *neg(PMC *dest)>
+
+=item C<void i_neg()>
+
+Set C<dest> to the negated value of C<SELF>. If the value of C<SELF>
+is the minimum integer, a BigInt is created.
+
+=cut
+
+*/
+
+    VTABLE PMC *neg(PMC *dest) {
+        const INTVAL a = SELF.get_integer();
+
+        if (a != PARROT_INTVAL_MIN)
+            return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
+                                                   -a);
+        else {
+            PMC *promoted;
+            maybe_throw_overflow_error(INTERP);
+            promoted = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, 0);
+            return VTABLE_subtract_int(INTERP, promoted, a, promoted);
+        }
+    }
+
+    VTABLE void i_neg() {
+        const INTVAL a = SELF.get_integer();
+
+        if (a != PARROT_INTVAL_MIN)
+            VTABLE_set_integer_native(INTERP, SELF, -a);
+        else {
+            maybe_throw_overflow_error(INTERP);
+            SELF = upgrade_self_to_bignum(INTERP, SELF);
+            VTABLE_set_integer_native(INTERP, SELF, 0);
+            VTABLE_i_subtract_int(INTERP, SELF, a);
+        }
     }
 
 /*
@@ -989,15 +1039,16 @@ The C<==> operation.
 
     VTABLE INTVAL is_equal(PMC *value) {
         INTVAL retval;
-        PMC *temp;
 
         switch (value->vtable->base_type) {
           case enum_class_BigInt:
-            temp = Parrot_pmc_new(INTERP, enum_class_BigInt);
-            VTABLE_set_integer_native(INTERP, temp, SELF.get_integer());
-            Parrot_mmd_multi_dispatch_from_c_args(interp,
+          {
+            PMC const *temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt,
+                SELF.get_integer());
+            Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                     "is_equal", "PP->I", temp, value, &retval);
             return retval;
+          }
             break;
           default:
             return (VTABLE_get_integer(INTERP, SELF)
@@ -1018,21 +1069,26 @@ Returns the result of comparing the integer with C<*value>.
 */
 
     MULTI INTVAL cmp(String value) {
-        const FLOATVAL fdiff = SELF.get_number() - VTABLE_get_number(INTERP, value);
+        INTVAL iv;
+        GET_ATTR_iv(INTERP, SELF, iv);
+        {
+            const FLOATVAL fdiff =
+                (FLOATVAL)iv - VTABLE_get_number(INTERP, value);
 
-        if (FLOAT_IS_ZERO(fdiff)) {
-            const INTVAL idiff =
-                SELF.get_integer() - VTABLE_get_integer(INTERP, value);
-            return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
+            if (FLOAT_IS_ZERO(fdiff)) {
+                const INTVAL idiff =
+                    SELF.get_integer() - VTABLE_get_integer(INTERP, value);
+                return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
+            }
+
+            return fdiff > 0 ? 1 : -1;
         }
-
-        return fdiff > 0 ? 1 : -1;
     }
 
 
     MULTI INTVAL cmp(Float value) {
         INTVAL iv;
-        GET_ATTR_iv(interp, SELF, iv);
+        GET_ATTR_iv(INTERP, SELF, iv);
 
         {
             const FLOATVAL diff = (FLOATVAL)iv - VTABLE_get_number(INTERP, value);
@@ -1044,7 +1100,7 @@ Returns the result of comparing the integer with C<*value>.
     MULTI INTVAL cmp(DEFAULT value) {
         /* int or undef */
         INTVAL selfint;
-        GET_ATTR_iv(interp, SELF, selfint);
+        GET_ATTR_iv(INTERP, SELF, selfint);
         {
             const INTVAL valueint = VTABLE_get_integer(INTERP, value);
             return selfint > valueint ? 1 : selfint < valueint ? -1 : 0;
@@ -1100,16 +1156,16 @@ Increments the integer.
 
     VTABLE void increment() {
         INTVAL a, c;
-        GET_ATTR_iv(interp, SELF, a);
+        GET_ATTR_iv(INTERP, SELF, a);
         c = a + 1;
 
         /* did not overflow */
         if ((c^a) >= 0 || (c^1) >= 0)
-            SET_ATTR_iv(interp, SELF, c);
+            SET_ATTR_iv(INTERP, SELF, c);
         else {
-            Parrot_pmc_reuse(interp, SELF, enum_class_BigInt, 0);
-            VTABLE_set_integer_native(interp, SELF, a);
-            VTABLE_increment(interp, SELF);
+            Parrot_pmc_reuse(INTERP, SELF, enum_class_BigInt, 0);
+            VTABLE_set_integer_native(INTERP, SELF, a);
+            VTABLE_increment(INTERP, SELF);
         }
     }
 
@@ -1129,11 +1185,11 @@ Decrements the integer.
         const INTVAL c = a - 1;
 
         if ((c^a) >= 0 || (c^~1) >= 0)
-            VTABLE_set_integer_native(interp, SELF, c);
+            VTABLE_set_integer_native(INTERP, SELF, c);
         else {
             Parrot_pmc_reuse(INTERP, SELF, enum_class_BigInt, 0);
-            VTABLE_set_integer_native(interp, SELF, a);
-            VTABLE_decrement(interp, SELF);
+            VTABLE_set_integer_native(INTERP, SELF, a);
+            VTABLE_decrement(INTERP, SELF);
         }
     }
 
@@ -1144,27 +1200,38 @@ Decrements the integer.
 
 =item C<void absolute()>
 
-Sets C<dest> to the absolute value of SELF.
+Sets C<dest> to the absolute value of C<SELF>. If the value of C<SELF>
+is the minimum integer, a BigInt is created.
 
 =cut
 
 */
 
     VTABLE PMC *absolute(PMC *dest) {
-        const INTVAL a = abs(SELF.get_integer());
+        const INTVAL a = SELF.get_integer();
 
-        /* TT # 1245 overflow for -maxint */
-        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_integer_native(INTERP, dest, a);
-        return dest;
-
+        if (a != PARROT_INTVAL_MIN)
+            return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
+                                                   abs(a));
+        else {
+            PMC *promoted;
+            maybe_throw_overflow_error(INTERP);
+            promoted = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, a);
+            return VTABLE_neg(INTERP, promoted, dest);
+        }
     }
 
 
     VTABLE void i_absolute() {
-        const INTVAL a = abs(SELF.get_integer());
-        VTABLE_set_integer_native(INTERP, SELF, a);
+        const INTVAL a = SELF.get_integer();
+
+        if (a != PARROT_INTVAL_MIN)
+            VTABLE_set_integer_native(INTERP, SELF, abs(a));
+        else {
+            maybe_throw_overflow_error(INTERP);
+            SELF = upgrade_self_to_bignum(INTERP, SELF);
+            VTABLE_i_neg(INTERP, SELF);
+        }
     }
 
 
@@ -1184,10 +1251,10 @@ and 36, inclusive.
         STRING *result;
 
         if ((base < 2) || (base > 36))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "get_as_base: base out of bounds");
 
-        result = Parrot_str_from_int_base(interp, buf,
+        result = Parrot_str_from_int_base(INTERP, buf,
                 (HUGEINTVAL)VTABLE_get_integer(INTERP, SELF),
                 (unsigned int)base);
 
@@ -1237,5 +1304,5 @@ Used to unarchive the integer.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

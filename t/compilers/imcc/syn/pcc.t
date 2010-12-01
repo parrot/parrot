@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -171,7 +170,7 @@ pir_output_is( <<'CODE', <<'OUT', "coroutine iterator" );
   .local int i
   i=5
   new $P1, 'Continuation'
-  set_addr $P1, after_loop
+  set_label $P1, after_loop
 loop:
   $I2 = _addtwo($P1, i)
     print $I2
@@ -545,13 +544,13 @@ pir_output_is( <<'CODE', <<'OUT', 'Unicode allowed in method names, TT #730' );
 .sub 'main' :main
     $P0 = newclass 'Foo'
     $P1 = new $P0
-    $S0 = unicode:"foo\x{b1}"
+    $S0 = utf8:"foo\x{b1}"
     $P1.$S0(1)
-    $P1.unicode:"foo\x{b1}"(2)
+    $P1.utf8:"foo\x{b1}"(2)
 .end
 
 .namespace ['Foo']
-.sub unicode:"foo\x{b1}" :method
+.sub utf8:"foo\x{b1}" :method
     .param int count
     print 'ok '
     print count
@@ -562,7 +561,7 @@ ok 1 - Unicode method names allowed
 ok 2 - Unicode method names allowed
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'named parameters', todo => 'long version fails, TT #1030');
+pir_output_is( <<'CODE', <<'OUT', 'named parameters');
 .sub main
 .local pmc foo
 foo = get_global 'foo'
@@ -621,7 +620,7 @@ xyz:<\>
 xyz:<\>
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', ':named should default to param name', todo=>'TT #1152');
+pir_output_is( <<'CODE', <<'OUT', ':named should default to param name');
 .sub main
   $I0 = 'incr'('value'=>3)
   say $I0

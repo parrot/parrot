@@ -1,6 +1,5 @@
-#!parrot
+#!./parrot
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -9,6 +8,7 @@ t/pmc/packfilerawsegment.t - test the PackfileRawSegment PMC
 
 =head1 SYNOPSIS
 
+    % make test_prep
     % prove t/pmc/packfilerawsegment.t
 
 =head1 DESCRIPTION
@@ -35,17 +35,27 @@ Tests the PackfileRawSegment PMC.
 # PackfileRawSegment.elements
 .sub 'test_elements'
     .local pmc pf, pfdir, pfseg
+    push_eh load_error
     pf    = _pbc()
+    pop_eh
     pfdir = pf.'get_directory'()
     pfseg = '_find_segment_by_prefix'(pf, 'BYTECODE')
     $I0   = elements pfseg
     ok($I0, 'PackfileRawSegment contains some data')
+    .return()
+load_error:
+    .get_results($P0)
+    pop_eh
+    report_load_error($P0, 'PackfileRawSegment contains some data')
+    .return()
 .end
 
 # PackfileRawSegment.get_integer_keyed_int
 .sub 'test_get_integer'
     .local pmc pf, pfdir, pfseg
+    push_eh load_error
     pf    = _pbc()
+    pop_eh
     pfdir = pf.'get_directory'()
     pfseg = '_find_segment_by_prefix'(pf, 'BYTECODE')
 
@@ -61,6 +71,12 @@ Tests the PackfileRawSegment PMC.
     $I1   = pfseg[4]
     $I0   = $I0 + $I1
     ok($I0, "PackfileRawSegment.get_integer_keyed_int returns some data")
+    .return()
+load_error:
+    .get_results($P0)
+    pop_eh
+    report_load_error($P0, "PackfileRawSegment.get_integer_keyed_int returns some data")
+    .return()
 .end
 
 # PackfileRawSegment.push_integer
@@ -79,7 +95,9 @@ Tests the PackfileRawSegment PMC.
 # PackfileRawSegment.type
 .sub 'test_type'
     .local pmc pf, pfdir, pfseg, hash, it
+    push_eh load_error
     pf    = _pbc()
+    pop_eh
     pfdir = pf.'get_directory'()
     hash  = new ['Hash']
     # annotations.pbc contains all available segments. -1 for directory and unknown.
@@ -95,7 +113,7 @@ Tests the PackfileRawSegment PMC.
 
   done:
     $I0 = elements hash
-    is($I0, 4, "Got all types of Packfile segments")
+    is($I0, 3, "Got all types of Packfile segments")
 
     # Now create RawSegment and set type.
     $P0 = new ['PackfileRawSegment']
@@ -105,7 +123,13 @@ Tests the PackfileRawSegment PMC.
     $P0.'type'(.PF_DEBUG_SEG)
     $I0 = $P0.'type'()
     is($I0, .PF_DEBUG_SEG, "Type successfully changed")
-
+    .return()
+load_error:
+    .get_results($P0)
+    pop_eh
+    report_load_error($P0, "can't run test_type tests")
+    skip(2, "can't run test_type tests")
+    .return()
 .end
 
 

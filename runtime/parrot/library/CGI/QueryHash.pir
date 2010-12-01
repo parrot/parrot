@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2008, Parrot Foundation.
-# $Id$
 
 .namespace ['CGI'; 'QueryHash']
 
@@ -69,9 +68,10 @@ Get parameters for POST method.
         .local int len
         content_length  = my_env['CONTENT_LENGTH']
         len             = content_length
-        in              = getstdin
-        query           = read in, len
-        close in
+        $P0             = getinterp
+        in              = $P0.'stdin_handle'()
+        query           = in.'read'(len)
+        in.'close'()
         #_dumper( query, 'queryPOST:' )
         query_hash = parse( query )
 
@@ -143,7 +143,7 @@ set_val:
         # TODO: This should be an array
         v_array = new 'Hash'
         v_array[0] = v
-        substr k, -2, 2, ''
+        k = replace k, -2, 2, ''
         query_hash[k] = v_array
         branch next_item
 v_isnt_array:

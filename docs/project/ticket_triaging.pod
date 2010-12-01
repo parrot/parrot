@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 =pod
 
@@ -106,7 +105,7 @@ This way you will receive further correspondence about the ticket.
 =item add the patch author to F<CREDITS> or update the author's entry
 
 =item add correspondence to the ticket stating that the patch was applied.
-Include the SVN revision number in your response.
+Include the commit SHA1 in your response.
 
 =item make sure that the ticket's 'Tag' includes 'Patch'
 
@@ -130,7 +129,7 @@ from the requestor. Change the status to C<stalled>.
 
 If it's a [PATCH] ticket, it's possible that the patch was applied but the
 ticket/patch status was never changed.   Also, not all list traffic regarding a
-ticket ends up in the tracker.  Look at the SVN repo to attempt to determine if
+ticket ends up in the tracker.  Look at the git repo to attempt to determine if
 the ticket was resolved.
 
 =item Review of stalled tickets
@@ -270,7 +269,7 @@ think that their ticket was unimportant or ignored.
 
     Hi,
 
-    Can you retest for this ticket with the latest sources from SVN and confirm
+    Can you retest for this ticket with the latest sources from git and confirm
     that this still an open issue?
 
     Thanks,
@@ -281,7 +280,7 @@ or
 
     Hi,
 
-    Would you mind retesting with the latest sources from SVN?
+    Would you mind retesting with the latest sources from git?
 
     Thanks,
 
@@ -291,7 +290,7 @@ or
 
     Hi,
 
-    Can you resubmit this patch against SVN trunk?
+    Can you resubmit this patch against git master?
 
     Thanks,
 
@@ -324,9 +323,7 @@ or
 
     -J
 
-=head1 SVN USAGE TIPS
-
-=head2 Commit messages
+=head1 TIPS FOR WRITING COMMIT MESSAGES
 
 =over 4
 

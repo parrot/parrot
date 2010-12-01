@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -19,7 +18,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(78)
+    plan(83)
     test_setting_array_size()
     test_assign_from_another()
     test_assign_self()
@@ -46,6 +45,8 @@ out-of-bounds test. Checks INT and PMC keys.
     test_splice()
     test_sort()
     test_exists()
+    test_new_style_init()
+    test_invalid_init_tt1509()
 .end
 
 .sub test_exists
@@ -67,7 +68,6 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub test_sort
      .local pmc compares, cmp_fun
-     # TT #1317 doesnt work wit prederef of JIT
      bounds 1
      compares = new ['Integer']
      compares = 0
@@ -664,6 +664,37 @@ CODE
     set $I0, $P0
 
     is($I0,1,'size of FixedPMCArray is 1')
+.end
+
+.sub 'test_new_style_init'
+    $P0 = new 'FixedPMCArray', 10
+
+    $I0 = $P0
+    is($I0, 10, "New style init creates the correct # of elements")
+
+    $P0 = new ['FixedPMCArray'], 10
+
+    $I0 = $P0
+    is($I0, 10, "New style init creates the correct # of elements for a key constant")
+
+    $P1 = new 'Integer'
+    $P0[9] = $P1
+    $P2 = $P0[9]
+    is($P2, $P1, 'New style init creates the array')
+.end
+
+.sub test_invalid_init_tt1509
+    throws_substring(<<'CODE', 'Cannot set array size to a negative number (-10)', 'New style init does not dump core for negative array lengths')
+    .sub main
+        $P0 = new ['FixedPMCArray'], -10
+    .end
+CODE
+
+    throws_substring(<<'CODE', 'Cannot set array size to a negative number (-10)', 'New style init (key constant) does not dump core for negative array lengths')
+    .sub main
+        $P0 = new 'FixedPMCArray', -10
+    .end
+CODE
 .end
 
 # Local Variables:

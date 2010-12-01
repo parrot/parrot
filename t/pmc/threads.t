@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -47,7 +46,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "interp identity" );
 ok1:
     print "ok 1\n"
     new P4, ['ParrotThread']
-    ne P4, P2, ok2
+    ne P2, P4, ok2
     print "not"
 ok2:
     print "ok 2\n"
@@ -56,8 +55,6 @@ CODE
 ok 1
 ok 2
 OUTPUT
-
-# TT #1249:  rework tests since we don't really have thread types?
 
 SKIP: {
     skip 'busted on win32' => 2 if $^O eq 'MSWin32';
@@ -184,7 +181,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "thread type 2" );
 CODE
 ok 1
 hello from thread
-ParrotThread tid 1
+ThreadInterpreter tid 1
 from 10 interp
 OUTPUT
 
@@ -217,7 +214,7 @@ lp:
     branch lp
 .end
 CODE
-start 1
+start -1
 in thread
 done
 OUTPUT
@@ -835,7 +832,6 @@ pir_output_is(
 .include 'interpinfo.pasm'
 
 .loadlib 'foo_group'
-.loadlib 'myops_ops'
 
 .sub test
     .param pmc passed_value

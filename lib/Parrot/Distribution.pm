@@ -1,5 +1,4 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2004-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -218,7 +217,7 @@ BEGIN {
         header => { c => { file_exts => ['h'] }, },
     );
 
-    my @ignore_dirs = qw{ .svn };
+    my @ignore_dirs = qw{ .git };
 
     for my $class ( keys %file_class ) {
         for my $type ( keys %{ $file_class{$class} } ) {
@@ -248,13 +247,13 @@ BEGIN {
                 # and make a hash out of the directories
                 my %dirs =
                     map { ( ( File::Spec->splitpath($_) )[1] => 1 ) }
-                    grep { m|(?i)(?:$filter_ext)| } $self->_dist_files;
+                    grep { m/(?i)(?:$filter_ext)/ } $self->_dist_files;
 
                 # Filter out ignored directories
                 # and return the results
                 my @dirs = sort
                     map  { $self->directory_with_name($_) }
-                    grep { !m|(?:$filter_dir)| }
+                    grep { !m/(?:$filter_dir)/ }
                     keys %dirs;
                 return @dirs;
             };
@@ -281,7 +280,7 @@ BEGIN {
                     }
                 }
 
-                print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found: ' . $name . "\n";
+                print '# WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found: ' . $name . "\n";
                 return;
             };
 
@@ -293,7 +292,7 @@ BEGIN {
                 # and return a sorted list of filenames
                 my @files = sort
                     map  { $self->file_with_name($_) }
-                    grep { m|(?i)(?:$filter_ext)| }
+                    grep { m/(?i)(?:$filter_ext)/ }
                     $self->_dist_files;
                 return @files;
             };
@@ -334,7 +333,7 @@ sub get_make_language_files {
     # and return a sorted list of filenames
     my @files = sort
         map  { $self->file_with_name($_) }
-        grep { m|[/\\]makefiles[/\\][a-z]+\.in$| }
+        grep { m{[/\\]makefiles[/\\][a-z]+\.in$} }
         $self->_dist_files;
     return @files;
 }
@@ -406,31 +405,13 @@ This is to exclude automatically generated C-language files Parrot might have.
             compilers/imcc/imclexer.c
             compilers/imcc/imcparser.c
             compilers/imcc/imcparser.h
-            compilers/pirc/src/main.c
-            compilers/pirc/src/pir.l
-            compilers/pirc/src/pir.y
-            compilers/pirc/src/pasm.l
-            compilers/pirc/src/pasm.y
-            compilers/pirc/src/pircompiler.h
-            compilers/pirc/src/pirlexer.c
-            compilers/pirc/src/pirlexer.h
-            compilers/pirc/src/pirparser.c
-            compilers/pirc/src/pirparser.h
-            compilers/pirc/src/pircompunit.c
-            compilers/pirc/src/pircompunit.h
-            compilers/pirc/src/hdocprep.l
-            compilers/pirc/src/hdocprep.c
-            compilers/pirc/macro/lexer.h
-            compilers/pirc/macro/macro.h
-            compilers/pirc/macro/macro.l
-            compilers/pirc/macro/macro.y
-            compilers/pirc/macro/macrolexer.c
-            compilers/pirc/macro/macrolexer.h
-            compilers/pirc/macro/macroparser.c
-            compilers/pirc/macro/macroparser.h
             include/parrot/config.h
             include/parrot/has_header.h
+            include/parrot/oplib/core_ops.h
+            include/parrot/oplib/ops.h
+            include/parrot/opsenum.h
             src/gc/malloc.c
+            src/ops/core_ops.c
             } unless @exemptions;
 
         my $path = -f $file ? $file : $file->path;
@@ -510,6 +491,7 @@ sub get_perl_exemption_regexp {
         lib/File/
         lib/IO/
         lib/Pod/
+        ext/
     };
 
     my $regex = join '|', map { quotemeta $_ } @paths;
@@ -580,11 +562,9 @@ This is to exclude automatically generated PIR-language files Parrot might have.
 
 =cut
 
-{
-    sub is_pir_exemption {
-        my ( $self, $file ) = @_;
-        $file->path =~ m{/ext/};
-    }
+sub is_pir_exemption {
+    my ( $self, $file ) = @_;
+    return $file->path =~ m{/ext/};
 }
 
 
@@ -616,7 +596,7 @@ sub is_pir {
     my $line = <$file_handle>;
     close $file_handle;
 
-    if ( $line && $line =~ /^#!.*parrot/ ) {
+    if ( $line && $line =~ /^#!.*parrot(?:\s|$)/ ) {
         # something that specifies a pir or pbc is probably a HLL, skip it
         return 0 if $line =~ /\.(?:pir|pbc)/;
         return 1;

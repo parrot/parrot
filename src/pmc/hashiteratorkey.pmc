@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -18,6 +17,10 @@ Single (key,value) pair.
 =cut
 
 */
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
 
 pmclass HashIteratorKey no_ro auto_attrs {
     ATTR Hash        *parrot_hash; /* Underlying parrot's hash */
@@ -84,7 +87,7 @@ Set pointers to Hash and HashBucket. Not really part of public API.
         Parrot_HashIteratorKey_attributes *attrs =
                 PARROT_HASHITERATORKEY(SELF);
 
-        PARROT_ASSERT(value || !"Can't set NULL pointer into HashIteratorKey");
+        PARROT_ASSERT_MSG(value, "Can't set NULL pointer into HashIteratorKey");
 
         if (key == 0) {
             attrs->parrot_hash = (Hash*)value;
@@ -108,6 +111,6 @@ Set pointers to Hash and HashBucket. Not really part of public API.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 
 =head1 TITLE
 
@@ -37,7 +36,7 @@ Match an identifier.
 
 =cut
 
-.sub 'ident' :method
+.sub 'ident' :method :nsentry('ident')
     .param pmc adverbs         :slurpy :named
     .local string target
     .local pmc mob, mfrom, mpos

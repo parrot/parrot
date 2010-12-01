@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -58,7 +57,8 @@ ok #test exception from init vtable
 OUT
 
 # Local Variables:
-#   mode: pir
+#   mode: cperl
+#   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4 ft=pir:
+# vim: expandtab shiftwidth=4:

@@ -1,7 +1,6 @@
 #! perl
 
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -118,7 +117,7 @@ sub pcc_error_like {
 
 sub create {
     my %o = @_;
-    $o{$_} ||= '' for qw/args params returns results/;
+    $o{$_} ||= '' for ( qw/args params returns results/ ) ;
 
     $o{returns} =
         defined $o{returns}

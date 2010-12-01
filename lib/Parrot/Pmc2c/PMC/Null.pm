@@ -1,5 +1,4 @@
 # Copyright (C) 2007-2008, Parrot Foundation.
-# $Id$
 
 package Parrot::Pmc2c::PMC::Null;
 use base 'Parrot::Pmc2c::PMC';
@@ -29,7 +28,7 @@ The C<Null> PMC throws an execption for all methods.
 sub pre_method_gen {
     my ($self) = @_;
 
-    # vtable methods
+    # vtables
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
         next unless $self->normal_unimplemented_vtable($vt_method_name);
@@ -44,7 +43,7 @@ sub pre_method_gen {
         # to avoid compiler warnings
         my $body = <<"EOC";
     UNUSED(interp)
-    UNUSED(pmc)
+    UNUSED(_self)
 EOC
 
         foreach my $param (split /,\s*/, $method->parameters) {

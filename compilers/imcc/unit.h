@@ -1,6 +1,5 @@
 /*
- * $Id$
- * Copyright (C) 2003-2009, Parrot Foundation.
+ * Copyright (C) 2003-2010, Parrot Foundation.
  */
 
 #ifndef PARROT_IMCC_UNIT_H_GUARD
@@ -48,7 +47,6 @@ struct IMC_Unit {
     Edge             *edge_list;
 
     /* register allocation */
-    unsigned int     *interference_graph;
     SymReg          **reglist;
     unsigned int      n_symbols;
     int               max_color;
@@ -64,14 +62,14 @@ struct IMC_Unit {
     int               first_avail[4];   /* INSP */
     SymReg           *outer;
     PMC              *sub_pmc;          /* this sub */
-    int               is_vtable_method; /* 1 if a v-table method */
+    int               is_vtable_method; /* 1 if a vtable */
     int               is_method;        /* 1 if a method */
     int               has_ns_entry_name;/* 1 if in ns */
-    char             *vtable_name;      /* v-table method name, if any */
+    char             *vtable_name;      /* vtable name, if any */
     char             *method_name;      /* method name, if any */
     char             *ns_entry_name;    /* ns entry name, if any */
-    char             *instance_of;      /* PMC or class this is an instance of
-                                         * if any */
+    char             *instance_of;      /* PMC or class this is an instance of if any */
+    INTVAL            hll_id;           /* HLL ID for this sub */
     SymReg           *subid;            /* Unique subroutine id */
 
     struct            imcc_ostat ostat;
@@ -88,5 +86,5 @@ struct IMC_Unit {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,6 +1,5 @@
-#! parrot
-# Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
+#!./parrot
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -16,7 +15,7 @@ Tests the Float PMC.
 
 =cut
 
-.const int TESTS = 159
+.const int TESTS = 166
 .const num PRECISION = 0.000001
 
 .sub 'test' :main
@@ -36,11 +35,11 @@ Tests the Float PMC.
     falseness_0()
     'falseness_0.000'()
     integer_addition()
-    integer_substraction()
+    integer_subtraction()
     integer_multiplication()
     integer_division()
     number_addition()
-    number_substraction()
+    number_subtraction()
     number_multiplication()
     number_division()
     increment_decrement()
@@ -78,10 +77,12 @@ Tests the Float PMC.
     log10_method()
     log2_method()
     sec_method()
+    csc_method()
     sech_method()
     sin_method()
     sinh_method()
     tan_method()
+    cot_method()
     tanh_method()
     sqrt_method()
 .end
@@ -89,32 +90,47 @@ Tests the Float PMC.
 .include 'fp_equality.pasm'
 
 .sub 'basic_assignment'
-    $P0 = new ['Float']
+    # Assignments can morph to other PMC type,
+    # use a new Float for each test to be sure we are testing
+    # the intended code.
 
+    $P0 = new ['Float']
     $P0 = 0.001
     is($P0, 0.001, 'basic float assignment 1', PRECISION)
 
+    $P0 = new ['Float']
     $P0 = 12.5
     is($P0, 12.5, 'basic assignment 2', PRECISION)
 
+    $P0 = new ['Float']
     $P0 = 1000
     is($P0, 1000.0, 'basic integer assignment', PRECISION)
 
+    $P0 = new ['Float']
     $P0 = 'Twelve point five'
     is($P0, 0.0, 'basic string assignment', PRECISION)
 
+    $P0 = new ['Float']
     $P0 = 123.45
     $I0 = $P0
     is($I0, 123, 'rounding to integer')
 
+    $P0 = new ['Float']
     $P0 = 123.45
     $N0 = $P0
     is($N0, 123.45, 'get_float_value', PRECISION)
 
+    $P0 = new ['Float']
     $P0 = 123.45
     $S0 = $P0
     is($S0, '123.45', 'get string')
 
+    $P0 = new ['Float']
+    $P0 = 123.45
+    $S0 = get_repr $P0
+    is($S0, '123.45', 'get_repr')
+
+    $P0 = new ['Float']
     $P0 = "12.49"
     is($P0, 12.49, 'setting value from String', PRECISION)
 .end
@@ -223,7 +239,7 @@ Tests the Float PMC.
     is($P0, -0.999, 'Basic integer arithmetic: addition (2)', PRECISION)
 .end
 
-.sub 'integer_substraction'
+.sub 'integer_subtraction'
     $P0 = new ['Float']
 
     $P0 = 103.45
@@ -270,7 +286,7 @@ Tests the Float PMC.
     is($P0, -1.199, 'Basic numeric arithmetic: addition (2)', PRECISION)
 .end
 
-.sub 'number_substraction'
+.sub 'number_subtraction'
     $P0 = new ['Float']
 
     $P0 = 103.45
@@ -342,7 +358,7 @@ Tests the Float PMC.
     neg $P0
 
     $S0 = $P0
-    is($S0, "-0")
+    is($S0, "-0", "negative 0.0 to string")
     .return ()
 
   negative_zero_todoed:
@@ -436,6 +452,11 @@ Tests the Float PMC.
     $P0 = -5.0
     abs $P0
     is($P0, 5.0, 'abs of -5.0', PRECISION)
+
+    $P0 = -6.0
+    $P1 = abs $P0
+    is($P1, 6.0, 'abs two operands from -6.0', PRECISION)
+    is($P0, -6.0, 'abs two operands source unchanged', PRECISION)
 .end
 
 .sub 'lt'
@@ -978,6 +999,11 @@ Tests the Float PMC.
     test_method('sec', 0.5, 1.139493927)
 .end
 
+.sub 'csc_method'
+    test_method('csc', 0.5, 2.0858296)
+    test_method('csc', 1.0, 1.1883951)
+.end
+
 .sub 'sech_method'
     test_method('sech', 0.0, 1.0)
     test_method('sech', 0.5, 0.886818884)
@@ -996,6 +1022,11 @@ Tests the Float PMC.
 .sub 'tan_method'
     test_method('tan', 0.0, 0.0)
     test_method('tan', 0.5, 0.546302490)
+.end
+
+.sub 'cot_method'
+    test_method('cot', 0.5, 1.8304877)
+    test_method('cot', 1.0, 0.64209262)
 .end
 
 .sub 'tanh_method'

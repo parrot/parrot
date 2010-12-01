@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -36,7 +35,8 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $cmd = $conf->data->get('scriptdirexp_provisional') . q{/perldoc};
+    my $slash = $conf->data->get('slash');
+    my $cmd = $conf->data->get('scriptdirexp_provisional') . $slash . q{perldoc};
     my ( $fh, $filename ) = tempfile( UNLINK => 1 );
     my $content = capture_output("$cmd -ud $filename perldoc") || undef;
 
@@ -59,7 +59,6 @@ E_NOTE
     my $TEMP_pod = join q{ } =>
         map { my $t = $_; $t =~ s/\.ops$/.pod/; "ops/$t" } @ops;
 
-    my $slash       = $conf->data->get('slash');
     my $new_perldoc = $conf->data->get('new_perldoc');
 
     foreach my $ops (@ops) {
@@ -67,17 +66,17 @@ E_NOTE
         $pod =~ s/\.ops$/.pod/;
         if ( $new_perldoc ) {
             $TEMP_pod_build .= <<"END"
-ops$slash$pod: ..${slash}src${slash}ops${slash}$ops
-\t\$(PERLDOC_BIN) -ud ops${slash}$pod ..${slash}src${slash}ops${slash}$ops
-\t\$(CHMOD) 0644 ops${slash}$pod
+ops/$pod: ../src/ops/$ops
+\t\$(PERLDOC_BIN) -ud ops/$pod ../src/ops/$ops
+\t\$(CHMOD) 0644 ops/$pod
 
 END
         }
         else {
             $TEMP_pod_build .= <<"END"
-ops$slash$pod: ..${slash}src${slash}ops${slash}$ops
-\t\$(PERLDOC_BIN) -u ..${slash}ops${slash}$ops > ops${slash}$pod
-\t\$(CHMOD) 0644 ..${slash}ops${slash}$pod
+ops/$pod: ../src/ops/$ops
+\t\$(PERLDOC_BIN) -u ../ops/$ops > ops/$pod
+\t\$(CHMOD) 0644 ../ops/$pod
 
 END
         }

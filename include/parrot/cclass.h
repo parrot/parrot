@@ -4,7 +4,6 @@
 
 /* cclass.h
 *
-* $Id$
 *
 *   Parrot character classes
 */
@@ -39,5 +38,5 @@ enum_cclass_word = 0x2000                /* a-z, A-Z, 0-9, '_'*/
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

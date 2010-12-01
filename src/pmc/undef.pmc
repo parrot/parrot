@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2004-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2004-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -26,6 +25,10 @@ from there.
 #include "pmc/pmc_object.h"
 #define UNDEF_STRING_CLASS enum_class_String
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass Undef no_ro {
 
 /*
@@ -46,7 +49,7 @@ appropriate type.
         }
         else {
             PMC * const class_  = PARROT_OBJECT(other)->_class;
-            PMC        *clone   = VTABLE_clone(interp, other);
+            PMC        *clone   = VTABLE_clone(INTERP, other);
             void       *attrs   = PMC_data(clone);
             PMC        *meta    = PMC_metadata(clone);
 
@@ -57,11 +60,11 @@ appropriate type.
 
             /* Restore metadata. */
             if (!PMC_IS_NULL(meta)) {
-                PMC * const iter = VTABLE_get_iter(interp, meta);
-                while (VTABLE_get_bool(interp, iter)) {
-                    STRING * const key = VTABLE_shift_string(interp, iter);
-                    PMC * const value  = VTABLE_get_pmc_keyed_str(interp, meta, key);
-                    VTABLE_setprop(interp, SELF, key, value);
+                PMC * const iter = VTABLE_get_iter(INTERP, meta);
+                while (VTABLE_get_bool(INTERP, iter)) {
+                    STRING * const key = VTABLE_shift_string(INTERP, iter);
+                    PMC * const value  = VTABLE_get_pmc_keyed_str(INTERP, meta, key);
+                    VTABLE_setprop(INTERP, SELF, key, value);
                 }
             }
             PMC_data(clone) = NULL;
@@ -171,10 +174,10 @@ Returns an empty string.
 */
 
     VTABLE STRING *get_string() {
-        Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
             "Stringifying an Undef PMC");
 
-        return Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
+        return CONST_STRING(INTERP, "");
     }
 
 /*
@@ -188,7 +191,7 @@ Morphs the current PMC to a C<String> and sets the value from C<value>.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        Parrot_pmc_reuse(interp, SELF, enum_class_String, 0);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_String, 0);
         VTABLE_set_string_native(INTERP, SELF, value);
     }
 
@@ -204,22 +207,6 @@ Returns 0.
 
     VTABLE INTVAL get_bool() {
         return 0;
-    }
-
-/*
-
-=item C<INTVAL logical_not()>
-
-Returns 1.
-
-=cut
-
-*/
-
-    VTABLE PMC *logical_not(PMC *dest) {
-        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        VTABLE_set_bool(INTERP, dest, 1);
-        return dest;
     }
 
 /*
@@ -299,5 +286,5 @@ Returns 1 if the C<*value> is an Undef PMC, 0 otherwise.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -74,7 +73,7 @@ sub compile_ok {
     my $todo = 0;
     $todo = 1 if ($snippet->{modifier} =~ /TODO|INVALID/);
     TODO: {
-        # conditionally TODO the file.
+        # conditionally todo the file.
         local $TODO = 'invalid code' if $todo;
 
         is ($error_output,'',$description);

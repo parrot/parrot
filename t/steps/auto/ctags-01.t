@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
 # auto/ctags-01.t
 
 use strict;
@@ -100,14 +99,14 @@ $conf->replenish($serialized);
 } );
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
-ok(auto::ctags::_probe_for_ctags_output('Exuberant Ctags', 0),
+ok(auto::ctags::_probe_for_ctags_output($conf, 'Exuberant Ctags'),
     "Probe returned true when output matched");
-ok(! auto::ctags::_probe_for_ctags_output('alpha', 0),
+ok(! auto::ctags::_probe_for_ctags_output($conf, 'alpha'),
     "Probe returned false when output matched");
 {
     my $stdout;
     my $rv = capture(
-        sub { auto::ctags::_probe_for_ctags_output('Exuberant Ctags', 1) },
+        sub { auto::ctags::_probe_for_ctags_output($conf, 'Exuberant Ctags') },
         \$stdout
     );
     ok($rv, "Probe returned true when output matched");
@@ -115,7 +114,7 @@ ok(! auto::ctags::_probe_for_ctags_output('alpha', 0),
 {
     my $stdout;
     my $rv = capture(
-        sub { auto::ctags::_probe_for_ctags_output('alpha', 1) },
+        sub { auto::ctags::_probe_for_ctags_output($conf, 'alpha') },
         \$stdout
     );
     ok(! $rv, "Probe returned false when output matched");

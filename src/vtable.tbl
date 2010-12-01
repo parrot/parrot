@@ -1,4 +1,3 @@
-# $Id$
 # [MAIN] #default section name
 
 # MMD_EQ ... MMD_STRCMP must be in one block
@@ -192,16 +191,6 @@ INTVAL cmp_num(PMC* value)
 INTVAL cmp_string(PMC* value)
 PMC* cmp_pmc(PMC* value)
 
-PMC* logical_or(PMC* value, PMC* dest)
-
-PMC* logical_and(PMC* value, PMC* dest)
-
-PMC* logical_xor(PMC* value, PMC* dest)
-
-PMC* logical_not(PMC* dest)
-void i_logical_not() :write
-
-
 [STRING]
 PMC* concatenate(PMC* value, PMC* dest)
 PMC* concatenate_str(STRING* value, PMC* dest)
@@ -274,10 +263,12 @@ PMC* inspect()
 PMC* inspect_str(STRING* what)
 
 void freeze(PMC* info)
-void thaw  (PMC* info) :write
-void thawfinish (PMC* info) :write
-void visit (PMC* info)
+void thaw(PMC* info) :write
+void thawfinish(PMC* info) :write
+void visit(PMC* info)
 
 void share()
 
 PMC* share_ro()
+
+void init_int(INTVAL initializer)

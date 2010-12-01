@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2006-2007, Parrot Foundation.
-# $Id$
 # 04-dump_pmc.t
 
 use strict;
@@ -23,7 +22,6 @@ use Test::More tests => 108;
 use File::Basename;
 use File::Copy;
 use FindBin;
-use Data::Dumper;
 use_ok('Parrot::Pmc2c::Pmc2cMain');
 use_ok('Cwd');
 use_ok( 'File::Temp', qw| tempdir | );

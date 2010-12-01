@@ -1,9 +1,8 @@
 # Copyright (C) 2004-2006, Parrot Foundation.
-# $Id$
 package Parrot::Pmc2c::Emitter;
 use strict;
 use warnings;
-use Parrot::Pmc2c::UtilFunctions qw(count_newlines spew escape_filename);
+use Parrot::Pmc2c::UtilFunctions qw(count_newlines spew);
 use Parrot::Pmc2c::Pmc2cMain ();
 use overload '""'   => \&stringify;
 use overload 'bool' => \&boolify;
@@ -67,7 +66,7 @@ sub replace {
     $self->add_fragment($replacement);
     $self->emit( $post, $self->filename, $self->{bline} + count_newlines($all) );
 
-    for my $x qw( data bline eline ) {
+    for my $x (qw( data bline eline )) {
         delete $self->{$x};
     }
     return 1;
@@ -103,7 +102,7 @@ sub annotate {
 
     my $output = $self->{output};
 
-    for my $x qw( output current_line current_file ) {
+    for my $x (qw( output current_line current_file )) {
         delete $self->{$x};
     }
 
@@ -129,8 +128,8 @@ sub annotate_worker {
         }
         else {
             $line = $self->{current_line} if $line == -1;
-            my $filename_escaped = escape_filename($filename);
             if (!$Parrot::Pmc2c::Pmc2cMain::OPTIONS->{nolines}) {
+                ( my $filename_escaped = $filename ) =~ s|\\|/|g;
                 $data .= "#line $line \"$filename_escaped\"\n";
             }
             $data .= $it->{data};

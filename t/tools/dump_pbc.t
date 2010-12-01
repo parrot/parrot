@@ -1,10 +1,9 @@
 #! perl
 # Copyright (C) 2008-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
-t/tools/dumb_pbc.t - test the script tools/utils/dump_pbc.pl
+t/tools/dumb_pbc.t - test the script tools/dev/dump_pbc.pl
 
 =head1 SYNOPSIS
 
@@ -34,7 +33,7 @@ sub dump_pbc_output_like {
 
     my $PARROT   = ".$PConfig{slash}$PConfig{test_prog}";
     system( "$PARROT --output $pbc_fn $pir_fn" );
-    my $cmd = File::Spec->catfile( qw{. tools util dump_pbc.pl} );
+    my $cmd = File::Spec->catfile( qw{. tools dev dump_pbc.pl} );
     my $out = `$PConfig{perl} $cmd $pbc_fn`;
 
     like( $out, $snippet, $desc );

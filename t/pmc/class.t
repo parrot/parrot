@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -17,17 +16,10 @@ Tests the Class PMC.
 =cut
 
 
-.const int TESTS = 63
-
-
 .sub 'main' :main
-     load_bytecode 'Test/More.pbc'
-     .local pmc exporter, test_ns
-     test_ns = get_namespace [ 'Test'; 'More' ]
-     exporter = new ['Exporter']
-     exporter.'import'( test_ns :named('source'), 'plan ok is isa_ok todo' :named('globals') )
+    .include 'test_more.pir'
 
-     plan(TESTS)
+     plan(73)
      'new op'()
      'class flag'()
      'name'()
@@ -46,6 +38,7 @@ Tests the Class PMC.
      'does'()
      'more does'()
      'anon_inherit'()
+     'method_cache_tt1497'()
 .end
 
 
@@ -272,7 +265,7 @@ Tests the Class PMC.
 
     is(test_string_val, 'bar', 'add_method() invoking method added to class works')
 t_class_meth:
-    todo(0, 'add_method() invoking method added to class works', "classes don't seem to call methods yet")
+    todo( 0, 'add_method() invoking method added to class works', "classes don't seem to call methods yet:  TT #1615")
 
     obj_inst = class.'new'()
     test_string_val = obj_inst.'foo'()
@@ -458,7 +451,7 @@ t_class_meth:
     is(result, 42, 'new() added method returns expected value')
 .end
 
-.sub add :method
+.sub add :method :nsentry('add')
     $P0 = getattribute self, "x"
     $P1 = getattribute self, "y"
     $P2 = new ['Integer']
@@ -600,6 +593,88 @@ t_class_meth:
     addparent $P2, $P0
     addparent $P2, $P1
     ok(1, 'inheritance of two different anonymous classes works')
+.end
+
+.sub 'method_cache_tt1497'
+    $P0 = new ["tt1497_Object"]
+
+    $P1 = find_method $P0, "foo"
+    $I0 = isnull $P1
+    is($I0, 0, "can find foo. Sanity")
+    $I0 = $P0.$P1()
+    is($I0, 1, "found the correct foo")
+
+    $P9 = box 2
+    setattribute $P0, "state", $P9
+
+    $P1 = find_method $P0, "foo"
+    $I0 = isnull $P1
+    is($I0, 0, "can find foo. Sanity")
+    $I0 = $P0.$P1()
+    is($I0, 1, "we've cached the old foo")
+
+    $P2 = get_class "tt1497_Object"
+    $P2.'clear_method_cache'()
+
+    $P1 = find_method $P0, "foo"
+    $I0 = isnull $P1
+    is($I0, 0, "can find foo. Sanity")
+    $I0 = $P0.$P1()
+    is($I0, 2, "cleared cache, can find the next foo")
+
+    $P3 = $P2.'get_method_cache'()
+    $P1 = $P3["foo"]
+    $I0 = isnull $P1
+    is($I0, 0, "can find foo in method cache")
+    $I0 = $P0.$P1()
+    is($I0, 2, "cleared cache, can find the next foo")
+
+    $P9 = box 1
+    setattribute $P0, "state", $P9
+
+    $P3 = $P2.'get_method_cache'()
+    $P1 = $P3["foo"]
+    $I0 = isnull $P1
+    is($I0, 0, "can find foo in method cache")
+    $I0 = $P0.$P1()
+    is($I0, 2, "cleared cache, can find the next foo")
+.end
+
+.namespace ["tt1497_Object"]
+
+.sub '__tt1497_init' :anon :load :init
+    $P0 = newclass "tt1497_Object"
+    addattribute $P0, "state"
+.end
+
+.sub 'foo1'
+    .return(1)
+.end
+
+.sub 'foo2'
+    .return(2)
+.end
+
+.sub 'find_method' :vtable
+    .param string name
+    $P0 = getattribute self, "state"
+    unless null $P0 goto have_state
+    $P0 = box 1
+    setattribute self, "state", $P0
+  have_state:
+    if $P0 == 1 goto getfoo1
+    if $P0 == 2 goto getfoo2
+    $P0 = null
+    goto return_meth
+  getfoo1:
+    .const 'Sub' foo1 = "foo1"
+    $P0 = foo1
+    goto return_meth
+  getfoo2:
+    .const 'Sub' foo2 = "foo2"
+    $P0 = foo2
+  return_meth:
+    .return($P0)
 .end
 
 # Local Variables:

@@ -1,6 +1,5 @@
-#!parrot
+#!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -19,7 +18,7 @@ Tests the use of Parrot floating-point number registers.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(173)
+    plan(126)
     test_set_n_nc()
     test_set_n()
     test_add_n_n_n()
@@ -30,7 +29,6 @@ Tests the use of Parrot floating-point number registers.
     test_mul_i()
     test_div_i()
     test_mod_n()
-    test_cmod_n()
     test_eq_n_ic()
     test_eq_nc_ic()
     test_ne_n_ic()
@@ -47,13 +45,9 @@ Tests the use of Parrot floating-point number registers.
     test_inc_n()
     test_dec_n()
     test_set_i_n()
-    test_clearn()
     test_neg_n()
     test_neg_0_dot_0()
     test_mul_n_n()
-    test_fact_n_i()
-    test_fact_n_ic()
-    test_exchange()
     test_op_n_nc_nc()
     test_lt_nc_nc_ic()
     test_string_gt_num()
@@ -70,9 +64,6 @@ Tests the use of Parrot floating-point number registers.
     test_exception_fdiv_n_n_n_by_zero()
     test_exception_fdiv_n_nc_n_by_zero()
     test_exception_fdiv_n_n_nc_by_zero()
-    test_exception_cmod_n_n_n_by_zero()
-    test_exception_cmod_n_nc_n_by_zero()
-    test_exception_cmod_n_n_nc_by_zero()
     test_mod_n_n_n_by_zero()
     test_mod_n_nc_n_by_zero()
     test_mod_n_n_nc_by_zero()
@@ -261,13 +252,6 @@ Tests the use of Parrot floating-point number registers.
     set     $N1, -3.0
     mod     $N2, $N0, $N1
     is( $N2, "-2", 'mod_n' )
-.end
-
-.sub test_cmod_n
-    set     $N0, 5.000
-    set     $N1, 3.000
-    cmod    $N2, $N0, $N1
-    is( $N2, "2", 'cmod_n' )
 .end
 
 .sub test_eq_n_ic
@@ -609,74 +593,6 @@ Tests the use of Parrot floating-point number registers.
     is( $I2, "-2147483648", 'set_i_n' )
 .end
 
-.sub test_clearn
-    set     $N0, 547972.0
-    set     $N1, 547972.0
-    set     $N2, 547972.0
-    set     $N3, 547972.0
-    set     $N4, 547972.0
-    set     $N5, 547972.0
-    set     $N6, 547972.0
-    set     $N7, 547972.0
-    set     $N8, 547972.0
-    set     $N9, 547972.0
-    set     $N10, 547972.0
-    set     $N11, 547972.0
-    set     $N12, 547972.0
-    set     $N13, 547972.0
-    set     $N14, 547972.0
-    set     $N15, 547972.0
-    set     $N16, 547972.0
-    set     $N17, 547972.0
-    set     $N18, 547972.0
-    set     $N19, 547972.0
-    set     $N20, 547972.0
-    set     $N21, 547972.0
-    set     $N22, 547972.0
-    set     $N23, 547972.0
-    set     $N24, 547972.0
-    set     $N25, 547972.0
-    set     $N26, 547972.0
-    set     $N27, 547972.0
-    set     $N28, 547972.0
-    set     $N29, 547972.0
-    set     $N30, 547972.0
-    set     $N31, 547972.0
-    clearn
-    is( $N0, "0", 'clearn' )
-    is( $N1, "0", 'clearn' )
-    is( $N2, "0", 'clearn' )
-    is( $N3, "0", 'clearn' )
-    is( $N4, "0", 'clearn' )
-    is( $N5, "0", 'clearn' )
-    is( $N6, "0", 'clearn' )
-    is( $N7, "0", 'clearn' )
-    is( $N8, "0", 'clearn' )
-    is( $N9, "0", 'clearn' )
-    is( $N10, "0", 'clearn' )
-    is( $N11, "0", 'clearn' )
-    is( $N12, "0", 'clearn' )
-    is( $N13, "0", 'clearn' )
-    is( $N14, "0", 'clearn' )
-    is( $N15, "0", 'clearn' )
-    is( $N16, "0", 'clearn' )
-    is( $N17, "0", 'clearn' )
-    is( $N18, "0", 'clearn' )
-    is( $N19, "0", 'clearn' )
-    is( $N20, "0", 'clearn' )
-    is( $N21, "0", 'clearn' )
-    is( $N22, "0", 'clearn' )
-    is( $N23, "0", 'clearn' )
-    is( $N24, "0", 'clearn' )
-    is( $N25, "0", 'clearn' )
-    is( $N26, "0", 'clearn' )
-    is( $N27, "0", 'clearn' )
-    is( $N28, "0", 'clearn' )
-    is( $N29, "0", 'clearn' )
-    is( $N30, "0", 'clearn' )
-    is( $N31, "0", 'clearn' )
-.end
-
 .sub test_neg_n
     neg $N0,3.0
     neg $N0,$N0
@@ -704,43 +620,6 @@ Tests the use of Parrot floating-point number registers.
     set $N1,4.0
     mul $N0,$N1
     is( $N0, "12", 'mul_n_n' )
-.end
-
-.sub test_fact_n_i
-    set $I0, 3
-    set $I1, 11
-    set $I2, 0
-    set $I3, -563
-    fact $N5, $I0
-    is( $N5, "6", 'fact_n_i' )
-    fact $N6, $I1
-    is( $N6, "39916800", 'fact_n_i' )
-    fact $N7, $I2
-    is( $N7, "1", 'fact_n_i' )
-    fact $N8, $I3
-    is( $N8, "1", 'fact_n_i' )
-.end
-
-.sub test_fact_n_ic
-    fact $N5, 3
-    is( $N5, "6", 'fact_n_ic' )
-    fact $N6, 11
-    is( $N6, "39916800", 'fact_n_ic' )
-    fact $N7, 0
-    is( $N7, "1", 'fact_n_ic' )
-    fact $N8, -563
-    is( $N8, "1", 'fact_n_ic' )
-.end
-
-.sub test_exchange
-    set $N1, 1.234560
-    set $N2, 9.876540
-    exchange $N1, $N2
-    is( $N1, "9.87654", 'exchange' )
-    is( $N2, "1.23456", 'exchange' )
-    set $N3, -100.200300
-    exchange $N3, $N3
-    is( $N3, "-100.2003", 'exchange' )
 .end
 
 .sub test_op_n_nc_nc
@@ -885,31 +764,6 @@ Tests the use of Parrot floating-point number registers.
     push_eh handler
     set $N1, 10
     fdiv $N2, $N1, 0
-  handler:
-    .exception_is( 'Divide by zero' )
-.end
-
-.sub test_exception_cmod_n_n_n_by_zero
-    push_eh handler
-    set $N0, 0
-    set $N1, 10
-    cmod $N2, $N1, $N0
-  handler:
-    .exception_is( 'Divide by zero' )
-.end
-
-.sub test_exception_cmod_n_nc_n_by_zero
-    push_eh handler
-    set $N0, 0
-    cmod $N2, 10, $N0
-  handler:
-    .exception_is( 'Divide by zero' )
-.end
-
-.sub test_exception_cmod_n_n_nc_by_zero
-    push_eh handler
-    set $N1, 10
-    cmod $N2, $N1, 0
   handler:
     .exception_is( 'Divide by zero' )
 .end

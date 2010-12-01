@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2007, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -180,752 +179,12 @@ Return the root namespace
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_PMC
 Parrot_get_root_namespace(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_get_root_namespace)
     return interp->root_namespace;
-}
-
-/*
-
-=item C<Parrot_String Parrot_PMC_get_string_intkey(PARROT_INTERP, Parrot_PMC
-pmc, Parrot_Int key)>
-
-Return the integer keyed string value of the passed-in PMC
-
-=cut
-
-*/
-
-PARROT_EXPORT
-Parrot_String
-Parrot_PMC_get_string_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key)
-{
-    ASSERT_ARGS(Parrot_PMC_get_string_intkey)
-    Parrot_String retval;
-    PARROT_CALLIN_START(interp);
-    retval = VTABLE_get_string_keyed_int(interp, pmc, key);
-    PARROT_CALLIN_END(interp);
-    return retval;
-}
-
-
-/*
-
-=item C<void * Parrot_PMC_get_pointer_intkey(PARROT_INTERP, Parrot_PMC pmc,
-Parrot_Int key)>
-
-Return a pointer to the PMC indicated by an integer key.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-void *
-Parrot_PMC_get_pointer_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key)
-{
-    ASSERT_ARGS(Parrot_PMC_get_pointer_intkey)
-    void *retval;
-    PARROT_CALLIN_START(interp);
-    retval = VTABLE_get_pointer_keyed_int(interp, pmc, key);
-    PARROT_CALLIN_END(interp);
-    return retval;
-}
-
-/*
-
-=item C<Parrot_PMC Parrot_PMC_get_pmc_intkey(PARROT_INTERP, Parrot_PMC pmc,
-Parrot_Int key)>
-
-Return the integer keyed PMC value of the passed-in PMC
-
-=cut
-
-*/
-
-PARROT_EXPORT
-Parrot_PMC
-Parrot_PMC_get_pmc_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key)
-{
-    ASSERT_ARGS(Parrot_PMC_get_pmc_intkey)
-    Parrot_PMC retval;
-    PARROT_CALLIN_START(interp);
-    retval = VTABLE_get_pmc_keyed_int(interp, pmc, key);
-    PARROT_CALLIN_END(interp);
-    return retval;
-}
-
-/*
-
-=item C<Parrot_PMC Parrot_PMC_get_pmc_strkey(PARROT_INTERP, Parrot_PMC pmc,
-Parrot_String key)>
-
-Return the string keyed PMC value of the passed-in PMC
-
-=cut
-
-*/
-
-PARROT_EXPORT
-Parrot_PMC
-Parrot_PMC_get_pmc_strkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_String key)
-{
-    ASSERT_ARGS(Parrot_PMC_get_pmc_strkey)
-    Parrot_PMC retval;
-    PARROT_CALLIN_START(interp);
-    retval = VTABLE_get_pmc_keyed_str(interp, pmc, key);
-    PARROT_CALLIN_END(interp);
-    return retval;
-}
-
-/*
-
-=item C<Parrot_Int Parrot_PMC_get_intval(PARROT_INTERP, Parrot_PMC pmc)>
-
-Return the signed integer value of the value in the PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-Parrot_Int
-Parrot_PMC_get_intval(PARROT_INTERP, Parrot_PMC pmc)
-{
-    ASSERT_ARGS(Parrot_PMC_get_intval)
-    Parrot_Int retval;
-    PARROT_CALLIN_START(interp);
-    retval = VTABLE_get_integer(interp, pmc);
-    PARROT_CALLIN_END(interp);
-    return retval;
-}
-
-/*
-
-=item C<Parrot_Int Parrot_PMC_get_intval_intkey(PARROT_INTERP, Parrot_PMC pmc,
-Parrot_Int key)>
-
-Return the keyed, signed integer value of the value in the PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-Parrot_Int
-Parrot_PMC_get_intval_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key)
-{
-    ASSERT_ARGS(Parrot_PMC_get_intval_intkey)
-    Parrot_Int retval;
-    PARROT_CALLIN_START(interp);
-    retval = VTABLE_get_integer_keyed_int(interp, pmc, key);
-    PARROT_CALLIN_END(interp);
-    return retval;
-}
-
-/*
-
-=item C<Parrot_Int Parrot_PMC_get_intval_pmckey(PARROT_INTERP, Parrot_PMC pmc,
-Parrot_PMC key)>
-
-Return the keyed, signed integer value of the value in the PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-Parrot_Int
-Parrot_PMC_get_intval_pmckey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_PMC key)
-{
-    ASSERT_ARGS(Parrot_PMC_get_intval_pmckey)
-    Parrot_Int retval;
-    PARROT_CALLIN_START(interp);
-    retval = VTABLE_get_integer_keyed(interp, pmc, key);
-    PARROT_CALLIN_END(interp);
-    return retval;
-}
-
-/*
-
-=item C<Parrot_Float Parrot_PMC_get_numval(PARROT_INTERP, Parrot_PMC pmc)>
-
-Return the floating-point value of the PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-Parrot_Float
-Parrot_PMC_get_numval(PARROT_INTERP, Parrot_PMC pmc)
-{
-    ASSERT_ARGS(Parrot_PMC_get_numval)
-    Parrot_Float retval;
-    PARROT_CALLIN_START(interp);
-    retval = VTABLE_get_number(interp, pmc);
-    PARROT_CALLIN_END(interp);
-    return retval;
-}
-
-/*
-
-=item C<Parrot_Float Parrot_PMC_get_numval_intkey(PARROT_INTERP, Parrot_PMC pmc,
-Parrot_Int key)>
-
-Return the keyed, signed integer value of the value in the PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-Parrot_Float
-Parrot_PMC_get_numval_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key)
-{
-    ASSERT_ARGS(Parrot_PMC_get_numval_intkey)
-    Parrot_Float retval;
-    PARROT_CALLIN_START(interp);
-    retval = VTABLE_get_number_keyed_int(interp, pmc, key);
-    PARROT_CALLIN_END(interp);
-    return retval;
-}
-
-/*
-
-=item C<char * Parrot_PMC_get_cstring_intkey(PARROT_INTERP, Parrot_PMC pmc,
-Parrot_Int key)>
-
-Return a null-terminated string that represents the string value of the PMC.
-
-Note that you must free this string with C<Parrot_str_free_cstring()>!
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
-char *
-Parrot_PMC_get_cstring_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key)
-{
-    ASSERT_ARGS(Parrot_PMC_get_cstring_intkey)
-    STRING *intermediate;
-    char   *retval;
-
-    PARROT_CALLIN_START(interp);
-    intermediate = VTABLE_get_string_keyed_int(interp, pmc, key);
-    retval       = Parrot_str_to_cstring(interp, intermediate);
-    PARROT_CALLIN_END(interp);
-
-    return retval;
-}
-
-/*
-
-=item C<char * Parrot_PMC_get_cstring(PARROT_INTERP, Parrot_PMC pmc)>
-
-Return a null-terminated string that represents the string value of the PMC.
-
-Note that you must free this string with C<Parrot_str_free_cstring()>!
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
-char *
-Parrot_PMC_get_cstring(PARROT_INTERP, Parrot_PMC pmc)
-{
-    ASSERT_ARGS(Parrot_PMC_get_cstring)
-    STRING *intermediate;
-    char   *retval;
-
-    PARROT_CALLIN_START(interp);
-    intermediate = VTABLE_get_string(interp, pmc);
-    retval       = Parrot_str_to_cstring(interp, intermediate);
-    PARROT_CALLIN_END(interp);
-
-    return retval;
-}
-
-/*
-
-=item C<char * Parrot_PMC_get_cstringn(PARROT_INTERP, Parrot_PMC pmc, Parrot_Int
-*length)>
-
-Return a null-terminated string for the PMC, along with the length.
-
-Yes, right now this is a bit of a cheat. It needs fixing, but without
-disturbing the interface.
-
-Note that you must free the string with C<Parrot_str_free_cstring()>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
-char *
-Parrot_PMC_get_cstringn(PARROT_INTERP, ARGIN(Parrot_PMC pmc),
-        ARGOUT(Parrot_Int *length))
-{
-    ASSERT_ARGS(Parrot_PMC_get_cstringn)
-    char *retval;
-
-    PARROT_CALLIN_START(interp);
-    retval  = Parrot_str_to_cstring(interp, VTABLE_get_string(interp, pmc));
-    *length = strlen(retval);
-    PARROT_CALLIN_END(interp);
-
-    return retval;
-}
-
-/*
-
-=item C<char * Parrot_PMC_get_cstringn_intkey(PARROT_INTERP, Parrot_PMC pmc,
-Parrot_Int *length, Parrot_Int key)>
-
-Return a null-terminated string for the PMC, along with the length.
-
-Yes, right now this is a bit of a cheat. It needs fixing, but without
-disturbing the interface.
-
-Note that you must free this string with C<Parrot_str_free_cstring()>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
-char *
-Parrot_PMC_get_cstringn_intkey(PARROT_INTERP, ARGIN(Parrot_PMC pmc),
-        ARGOUT(Parrot_Int *length), Parrot_Int key)
-{
-    ASSERT_ARGS(Parrot_PMC_get_cstringn_intkey)
-    char *retval;
-
-    PARROT_CALLIN_START(interp);
-    retval  = Parrot_str_to_cstring(interp,
-                               VTABLE_get_string_keyed_int(interp, pmc, key));
-    *length = strlen(retval);
-    PARROT_CALLIN_END(interp);
-
-    return retval;
-}
-
-/*
-
-=item C<void Parrot_PMC_set_string(PARROT_INTERP, Parrot_PMC pmc, Parrot_String
-value)>
-
-Assign the passed-in Parrot string to the passed-in PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_set_string(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_String value)
-{
-    ASSERT_ARGS(Parrot_PMC_set_string)
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_string_native(interp, pmc, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_set_string_intkey(PARROT_INTERP, Parrot_PMC pmc,
-Parrot_Int key, Parrot_String value)>
-
-Assign the passed-in Parrot string to the passed-in PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_set_string_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key, Parrot_String value)
-{
-    ASSERT_ARGS(Parrot_PMC_set_string_intkey)
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_string_keyed_int(interp, pmc, key, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_set_pmc_intkey(PARROT_INTERP, Parrot_PMC pmc, Parrot_Int
-key, Parrot_PMC value)>
-
-Assign the passed-in pmc to the passed-in slot of the passed-in PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_set_pmc_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key, Parrot_PMC value)
-{
-    ASSERT_ARGS(Parrot_PMC_set_pmc_intkey)
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_pmc_keyed_int(interp, pmc, key, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_set_pmc_strkey(PARROT_INTERP, Parrot_PMC pmc,
-Parrot_String key, Parrot_PMC value)>
-
-Assign the passed-in pmc to the passed-in slot of the passed-in PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_set_pmc_strkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_String key, Parrot_PMC value)
-{
-    ASSERT_ARGS(Parrot_PMC_set_pmc_strkey)
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_pmc_keyed_str(interp, pmc, key, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_set_pmc_pmckey(PARROT_INTERP, Parrot_PMC pmc, Parrot_PMC
-key, Parrot_PMC value)>
-
-Assign the passed-in pmc to the passed-in slot of the passed-in PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_set_pmc_pmckey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_PMC key, Parrot_PMC value)
-{
-    ASSERT_ARGS(Parrot_PMC_set_pmc_pmckey)
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_pmc_keyed(interp, pmc, key, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_set_pointer_intkey(PARROT_INTERP, Parrot_PMC pmc,
-Parrot_Int key, void *value)>
-
-Assign the passed-in pointer to the passed-in PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_set_pointer_intkey(PARROT_INTERP,
-        ARGIN(Parrot_PMC pmc), Parrot_Int key, ARGIN_NULLOK(void *value))
-{
-    ASSERT_ARGS(Parrot_PMC_set_pointer_intkey)
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_pointer_keyed_int(interp, pmc, key, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_set_intval(PARROT_INTERP, Parrot_PMC pmc, Parrot_Int
-value)>
-
-Assign the passed-in Parrot integer to the passed-in PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_set_intval(PARROT_INTERP, Parrot_PMC pmc, Parrot_Int value)
-{
-    ASSERT_ARGS(Parrot_PMC_set_intval)
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_integer_native(interp, pmc, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_set_intval_intkey(PARROT_INTERP, Parrot_PMC pmc,
-Parrot_Int key, Parrot_Int value)>
-
-Assign the passed-in Parrot integer to the passed-in PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_set_intval_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key, Parrot_Int value)
-{
-    ASSERT_ARGS(Parrot_PMC_set_intval_intkey)
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_integer_keyed_int(interp, pmc, key, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_set_numval(PARROT_INTERP, Parrot_PMC pmc, Parrot_Float
-value)>
-
-Assign the passed-in Parrot number to the passed-in PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_set_numval(PARROT_INTERP, Parrot_PMC pmc, Parrot_Float value)
-{
-    ASSERT_ARGS(Parrot_PMC_set_numval)
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_number_native(interp, pmc, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_set_numval_intkey(PARROT_INTERP, Parrot_PMC pmc,
-Parrot_Int key, Parrot_Float value)>
-
-Assign the passed-in Parrot number to the passed-in PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_set_numval_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key, Parrot_Float value)
-{
-    ASSERT_ARGS(Parrot_PMC_set_numval_intkey)
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_number_keyed_int(interp, pmc, key, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_set_cstring(PARROT_INTERP, Parrot_PMC pmc, const char
-*value)>
-
-Assign the passed-in null-terminated C string to the passed-in PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_set_cstring(PARROT_INTERP, Parrot_PMC pmc, ARGIN_NULLOK(const char *value))
-{
-    ASSERT_ARGS(Parrot_PMC_set_cstring)
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_string_native(interp, pmc,
-                             Parrot_str_new(interp, value, 0));
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_set_cstring_intkey(PARROT_INTERP, Parrot_PMC pmc,
-Parrot_Int key, const char *value)>
-
-Assign the passed-in null-terminated C string to the passed-in PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_set_cstring_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key, ARGIN_NULLOK(const char *value))
-{
-    ASSERT_ARGS(Parrot_PMC_set_cstring_intkey)
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_string_keyed_int(interp, pmc, key,
-                                Parrot_str_new(interp, value, 0));
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_set_cstringn(PARROT_INTERP, Parrot_PMC pmc, const char
-*value, Parrot_UInt length)>
-
-Assign the passed-in length-noted string to the passed-in PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_set_cstringn(PARROT_INTERP,
-        Parrot_PMC pmc, ARGIN_NULLOK(const char *value), Parrot_UInt length)
-{
-    ASSERT_ARGS(Parrot_PMC_set_cstringn)
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_string_native(interp, pmc,
-                             Parrot_str_new(interp, value, length));
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_push_intval(PARROT_INTERP, Parrot_PMC pmc, Parrot_Int
-value)>
-
-Push the passed-in Parrot integer onto the passed in PMC
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_push_intval(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int value)
-{
-    ASSERT_ARGS(Parrot_PMC_push_intval)
-    PARROT_CALLIN_START(interp);
-    VTABLE_push_integer(interp, pmc, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_push_numval(PARROT_INTERP, Parrot_PMC pmc, Parrot_Float
-value)>
-
-Push the passed-in Parrot number onto the passed in PMC
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_push_numval(PARROT_INTERP, Parrot_PMC pmc, Parrot_Float value)
-{
-    ASSERT_ARGS(Parrot_PMC_push_numval)
-    PARROT_CALLIN_START(interp);
-    VTABLE_push_float(interp, pmc, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_push_pmcval(PARROT_INTERP, Parrot_PMC pmc, Parrot_PMC
-value)>
-
-Push the passed-in Parrot PMC onto the passed in PMC
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_push_pmcval(PARROT_INTERP, Parrot_PMC pmc, Parrot_PMC value)
-{
-    ASSERT_ARGS(Parrot_PMC_push_pmcval)
-    PARROT_CALLIN_START(interp);
-    VTABLE_push_pmc(interp, pmc, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_delete_pmckey(PARROT_INTERP, Parrot_PMC pmc, Parrot_PMC
-key)>
-
-Deletes the value associated with the passed-in PMC from the PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_delete_pmckey(PARROT_INTERP, Parrot_PMC pmc, Parrot_PMC key)
-{
-    ASSERT_ARGS(Parrot_PMC_delete_pmckey)
-    PARROT_CALLIN_START(interp);
-    VTABLE_delete_keyed(interp, pmc, key);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<void Parrot_PMC_set_cstringn_intkey(PARROT_INTERP, Parrot_PMC pmc,
-Parrot_Int key, const char *value, Parrot_UInt length)>
-
-Assign the passed-in length-noted string to the passed-in PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_set_cstringn_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key, ARGIN_NULLOK(const char *value),
-        Parrot_UInt length)
-{
-    ASSERT_ARGS(Parrot_PMC_set_cstringn_intkey)
-    PARROT_CALLIN_START(interp);
-    VTABLE_set_string_keyed_int(interp, pmc, key,
-                                Parrot_str_new(interp, value, length));
-    PARROT_CALLIN_END(interp);
 }
 
 /*
@@ -984,6 +243,7 @@ Returns the special C<NULL> PMC.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_PMC
 Parrot_PMC_null(void)
 {
@@ -1003,7 +263,7 @@ Deallocate a C string that the interpreter has handed to you.
 
 PARROT_EXPORT
 void
-Parrot_free_cstring(ARGIN_NULLOK(char *string))
+Parrot_free_cstring(ARGFREE(char *string))
 {
     ASSERT_ARGS(Parrot_free_cstring)
     Parrot_str_free_cstring(string);
@@ -1047,14 +307,25 @@ Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
 {
     ASSERT_ARGS(Parrot_ext_call)
     va_list args;
-    PMC  *sig_object;
+    PMC  *call_obj;
+    const char *arg_sig, *ret_sig;
+
+    PMC  * const old_call_obj = Parrot_pcc_get_signature(interp,
+        CURRENT_CONTEXT(interp));
+    Parrot_pcc_split_signature_string(signature, &arg_sig, &ret_sig);
 
     va_start(args, signature);
-    sig_object = Parrot_pcc_build_sig_object_from_varargs(interp, PMCNULL, signature, args);
-    va_end(args);
+    call_obj = Parrot_pcc_build_call_from_varargs(interp, PMCNULL,
+        arg_sig, &args);
 
-    Parrot_pcc_invoke_from_sig_object(interp, sub_pmc, sig_object);
+    Parrot_pcc_invoke_from_sig_object(interp, sub_pmc, call_obj);
+    call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+    Parrot_pcc_fill_params_from_varargs(interp, call_obj, ret_sig, &args,
+            PARROT_ERRORS_RESULT_COUNT_FLAG);
+    va_end(args);
+    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_call_obj);
 }
+
 
 /*
 
@@ -1067,6 +338,7 @@ Return the value of an integer register.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_Int
 Parrot_get_intreg(PARROT_INTERP, Parrot_Int regnum)
 {
@@ -1085,6 +357,7 @@ Return the value of a numeric register.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_Float
 Parrot_get_numreg(PARROT_INTERP, Parrot_Int regnum)
 {
@@ -1103,6 +376,7 @@ Return the value of a string register.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_String
 Parrot_get_strreg(PARROT_INTERP, Parrot_Int regnum)
 {
@@ -1121,6 +395,7 @@ Return the value of a PMC register.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_PMC
 Parrot_get_pmcreg(PARROT_INTERP, Parrot_Int regnum)
 {
@@ -1235,15 +510,29 @@ Parrot_new_string(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
 {
     ASSERT_ARGS(Parrot_new_string)
     Parrot_String retval;
+    const STR_VTABLE *encoding;
+
     PARROT_CALLIN_START(interp);
-    retval = string_make(interp, buffer, length, encoding_name, flags);
+
+    if (encoding_name) {
+        encoding = Parrot_find_encoding(interp, encoding_name);
+        if (!encoding)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                "Can't make '%s' encoding strings", encoding_name);
+    }
+    else
+        encoding = Parrot_default_encoding_ptr;
+
+    retval = Parrot_str_new_init(interp, buffer, length, encoding, flags);
+
     PARROT_CALLIN_END(interp);
     return retval;
 }
 
 /*
 
-=item C<Parrot_Language Parrot_find_language(PARROT_INTERP, char *language)>
+=item C<Parrot_Language Parrot_find_language(PARROT_INTERP, const char
+*language)>
 
 Find the magic language token for a language, by language name.
 
@@ -1252,9 +541,10 @@ Find the magic language token for a language, by language name.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 Parrot_Language
-Parrot_find_language(SHIM_INTERP, SHIM(char *language))
+Parrot_find_language(SHIM_INTERP, SHIM(const char *language))
 {
     ASSERT_ARGS(Parrot_find_language)
     return 0;
@@ -1304,10 +594,10 @@ Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
 
 /*
 
-=item C<void Parrot_PMC_set_vtable(PARROT_INTERP, Parrot_PMC pmc, Parrot_VTABLE
-vtable)>
+=item C<void Parrot_register_string(PARROT_INTERP, Parrot_String s)>
 
-Replaces the vtable of the PMC.
+Add a reference of the string to the interpreter's GC registry. This prevents
+strings only known to extension from getting destroyed during GC runs.
 
 =cut
 
@@ -1315,29 +605,34 @@ Replaces the vtable of the PMC.
 
 PARROT_EXPORT
 void
-Parrot_PMC_set_vtable(SHIM_INTERP, Parrot_PMC pmc, Parrot_VTABLE vtable)
+Parrot_register_string(PARROT_INTERP, Parrot_String s)
 {
-    ASSERT_ARGS(Parrot_PMC_set_vtable)
-    pmc->vtable = vtable;
+    ASSERT_ARGS(Parrot_register_string)
+    PARROT_CALLIN_START(interp);
+    Parrot_str_gc_register(interp, s);
+    PARROT_CALLIN_END(interp);
 }
 
 /*
 
-=item C<Parrot_VTABLE Parrot_get_vtable(PARROT_INTERP, Parrot_Int id)>
+=item C<void Parrot_unregister_string(PARROT_INTERP, Parrot_String s)>
 
-Returns the vtable corresponding to the given PMC ID.
+Remove a reference of the string from the interpreter's GC registry. If the
+reference count reaches zero, the string will be destroyed during the next GC
+run.
 
 =cut
 
 */
 
 PARROT_EXPORT
-PARROT_PURE_FUNCTION
-Parrot_VTABLE
-Parrot_get_vtable(PARROT_INTERP, Parrot_Int id)
+void
+Parrot_unregister_string(PARROT_INTERP, Parrot_String s)
 {
-    ASSERT_ARGS(Parrot_get_vtable)
-    return interp->vtables[id];
+    ASSERT_ARGS(Parrot_unregister_string)
+    PARROT_CALLIN_START(interp);
+    Parrot_str_gc_unregister(interp, s);
+    PARROT_CALLIN_END(interp);
 }
 
 /*
@@ -1361,7 +656,6 @@ Parrot_sub_new_from_c_func(PARROT_INTERP,
         (char *) NULL, 0);
     Parrot_PMC sub = Parrot_pmc_new(interp, enum_class_NCI);
     VTABLE_set_pointer_keyed_str(interp, sub, sig, F2DPTR(func));
-    PObj_get_FLAGS(sub) |= PObj_private1_FLAG;
     return sub;
 }
 
@@ -1410,5 +704,5 @@ Initial version by Dan Sugalski.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

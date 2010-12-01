@@ -1,5 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -25,13 +24,12 @@ sub _init {
     my %data;
     $data{description} = q{Move platform files into place};
     $data{result}      = q{};
-    $data{platform_interface} = q{config/gen/platform/platform_interface.h};
     $data{coda} = <<'CODA';
 /*
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 CODA
     return \%data;
@@ -40,39 +38,32 @@ CODA
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose     = $conf->options->get('verbose');
-    my $generated   = $self->_get_generated($conf, $verbose);
-
+    my $generated   = $self->_get_generated($conf);
 
     # headers are merged into platform.h
-    $self->_set_headers($conf, $verbose, $generated);
+    $self->_set_headers($conf, $generated);
 
     # implementation files are merged into platform.c
-    $self->_set_implementations($conf, $verbose, $generated);
+    $self->_set_implementations($conf, $generated);
 
     $self->_handle_asm($conf);
 
-    # interface is the same for all platforms
-    copy_if_diff( $self->{platform_interface},
-        "include/parrot/platform_interface.h" );
-
-    $self->_set_limits($conf, $verbose);
+    $self->_set_limits($conf);
 
     return 1;
 }
 
 sub _get_generated {
-    my $self = shift;
-    my ($conf, $verbose) = @_;
+    my ($self, $conf) = @_;
     my $generated = $conf->data->get('TEMP_generated');
     $generated = '' unless defined $generated;
-    print " ($generated) " if $verbose;
+    $conf->debug(" ($generated) \n");
     return $generated;
 }
 
 sub _set_headers {
     my $self = shift;
-    my ($conf, $verbose, $generated) = @_;
+    my ($conf, $generated) = @_;
     my $platform = $conf->data->get('platform');
     my @headers = qw/
         io.h
@@ -117,7 +108,7 @@ END_HERE
 
         if ( -e $header_file ) {
             local $/ = undef;
-            print("\t$header_file\n") if $verbose;
+            $conf->debug("\t$header_file\n");
             open my $IN_H, "<", "$header_file"
                 or die "Can't open $header_file: $!";
 
@@ -149,7 +140,7 @@ END_HERE
     for my $h (@headers) {
         if ( -e $h ) {
             local $/ = undef;
-            print("\t$h\n") if $verbose;
+            $conf->debug("\t$h\n");
             open my $IN_H, "<", $h or die "Can't open $h: $!";
             print {$PLATFORM_H} <<"END_HERE";
 /*
@@ -191,7 +182,7 @@ sub _set_limits {
 
 sub _set_implementations {
     my $self = shift;
-    my ($conf, $verbose, $generated) = @_;
+    my ($conf, $generated) = @_;
     my $platform = $conf->data->get('platform');
     my @impls = qw/
         time.c
@@ -199,13 +190,14 @@ sub _set_implementations {
         dl.c
         stat.c
         math.c
-        memalign.c
         signal.c
         itimer.c
         memexec.c
         exec.c
         misc.c
         hires_timer.c
+        pid.c
+        sysmem.c
         /;
 
     my $plat_c = q{src/platform.c};
@@ -243,7 +235,7 @@ END_HERE
 
         if ( -e $impl_file ) {
             local $/ = undef;
-            print("\t$impl_file\n") if $verbose;
+            $conf->debug("\t$impl_file\n");
             open my $IN_C, "<", $impl_file or die "Can't open $impl_file: $!";
 
             # slurp in the C file
@@ -268,7 +260,7 @@ END_HERE
     for my $im (@impls) {
         if ( -e $im ) {
             local $/ = undef;
-            print("\t$im\n") if $verbose;
+            $conf->debug("\t$im\n");
             open my $IN_C, "<", $im or die "Can't open $im: $!";
             print {$PLATFORM_C} <<"END_HERE";
 /*

@@ -1,7 +1,5 @@
 /* core_types.h
  *  Copyright (C) 2009, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Forward declaration of the interpreter basic types
  */
@@ -24,5 +22,5 @@ typedef struct parrot_interp_t *Parrot_Interp;
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

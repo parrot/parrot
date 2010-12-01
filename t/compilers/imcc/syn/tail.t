@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2005-2007, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -15,6 +14,7 @@ use Parrot::Test tests => 6;
 $ENV{TEST_PROG_ARGS} = '-Oc';
 
 pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
+
 .sub _main :main
     $P1 = new 'Integer'
     $P1 = 20
@@ -23,8 +23,8 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
     .const 'Sub' f = "_floor"
     .const 'Sub' c = "_funcall"
     set_args "0,0,0", f, $P1, $P2
-    get_results "0,0", $P3, $P4
     invokecc c
+    get_results "0,0", $P3, $P4
     print "_floor returned "
     print 2      # TODO argcP
     print " values, "
@@ -34,8 +34,8 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
     print ".\n"
     .const 'Sub' s = "_fib_step"
     set_args "0,0,0", s, $P1, $P2
-    get_results "0,0,0", $P3, $P4, $P5
     invokecc c
+    get_results "0,0,0", $P3, $P4, $P5
     print "_fib_step returned "
     print 3    # TODO argcP
     print " values, "
@@ -55,7 +55,7 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
     $I33 = defined function
     if $I33 goto doit
 bad_func:
-    printerr "_funcall:  Bad function.\n"
+    print "_funcall:  Bad function.\n"
     exit 0
 doit:
     set_args "0x20", argv
@@ -134,7 +134,7 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, intermediate position
 doit:
     .tailcall function(argv :flat)
 bad_func:
-    printerr "_funcall:  Bad function.\n"
+    print "_funcall:  Bad function.\n"
     exit 0
 .end
 
@@ -207,7 +207,7 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, implicit final return
     $I33 = defined function
     if $I33 goto doit
 bad_func:
-    printerr "_funcall:  Bad function.\n"
+    print "_funcall:  Bad function.\n"
     exit 0
 doit:
     .tailcall function(argv :flat)
@@ -283,7 +283,7 @@ doit:
         print " results]\n"
     .return ($P35 :flat)
 bad_func:
-    printerr "_funcall:  Bad function.\n"
+    print "_funcall:  Bad function.\n"
     exit 0
 .end
 

@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -88,10 +87,7 @@ sub remap_runcore_opts
 
     my %remap      = (
         'j' => '-runcore=fast',
-        'g' => '-runcore=cgoto',
         'G' => '-runcore=gcdebug',
-        'C' => '-runcore=cgp',
-        'S' => '-runcore=switch',
         'b' => '-runcore=bounds',
         'f' => '-runcore=fast',
         'r' => '-run-pbc',
@@ -113,9 +109,6 @@ sub Usage {
     print <<"EOF";
 perl t/harness [options] [testfiles]
     -w         ... warnings on
-    -g         ... run CGoto
-    -C         ... run CGP
-    -S         ... run Switched
     -b         ... run bounds checked
     --run-exec ... run exec core
     -f         ... run fast core

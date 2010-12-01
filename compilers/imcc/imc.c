@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2002-2009, Parrot Foundation.
  */
 
@@ -63,7 +62,6 @@ afterwards.
 
 */
 
-PARROT_EXPORT
 void
 imc_compile_all_units(PARROT_INTERP)
 {
@@ -98,6 +96,7 @@ imc_compile_all_units(PARROT_INTERP)
     }
 
     IMCC_INFO(interp)->imc_units = NULL;
+    IMCC_INFO(interp)->cur_unit  = NULL;
     IMCC_INFO(interp)->last_unit = NULL;
 }
 
@@ -113,7 +112,6 @@ on a single compilation unit at a time.
 
 */
 
-PARROT_EXPORT
 void
 imc_compile_unit(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
@@ -136,7 +134,6 @@ Cleans up the compiler state in preparation for another compiler invocation.
 
 */
 
-PARROT_EXPORT
 void
 imc_cleanup(PARROT_INTERP, ARGIN_NULLOK(void *yyscanner))
 {
@@ -257,10 +254,6 @@ imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     ASSERT_ARGS(imc_free_unit)
     imc_info_t * const imc = IMCC_INFO(interp);
 
-#if IMC_TRACE_HIGH
-    fprintf(stderr, "imc_free_unit()\n");
-#endif
-
     free_reglist(unit);
 
     /* and cfg ... */
@@ -296,5 +289,5 @@ imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

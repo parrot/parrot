@@ -1,5 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 [DRAFT] PDD 11: Extending
 
@@ -8,6 +7,10 @@
 The extension API for Parrot is a simple, somewhat abstract, interface to
 Parrot for code written in C or other compiled languages. It provides about
 the same level of access to Parrot  that bytecode programs have.
+
+=head2 Version
+
+$Revision$
 
 =head2 Description
 
@@ -69,13 +72,13 @@ that hold pointers to arbitrary data.
 A keyed version of C<Parrot_PMC_get_pointer>. Returns the pointer value of
 whatever is stored at the element of the PMC indexed by C<key>.
 
-=item C<Parrot_PMC_get_intval(interp, pmc)>
+=item C<Parrot_PMC_get_integer(interp, pmc)>
 
 Returns the integer value of the PMC.
 
-=item C<Parrot_PMC_get_intval_intkey(interp, pmc, Parrot_Int key)>
+=item C<Parrot_PMC_get_integer_keyed_int(interp, pmc, Parrot_Int key)>
 
-A keyed version of C<Parrot_PMC_get_intval>. Returns the integer value of
+A keyed version of C<Parrot_PMC_get_integer>. Returns the integer value of
 whatever is stored at the element of the PMC indexed by C<key>.
 
 =item C<Parrot_PMC_get_numval(interp, pmc)>
@@ -198,6 +201,42 @@ Keyed version of C<Parrot_PMC_set_cstringn>. Converts the first C<length>
 characters of C<value> to a Parrot_String and assigns the resulting string to
 the PMC stored at element <key> of the passed-in PMC.
 
+=item C<Parrot_PMC_push_float( interp, Parrot_PMC pmc, Parrot_Float value )>
+
+Push a float onto an aggregate PMC, such as a ResizablePMCArray.
+Returns void.
+
+=item C<Parrot_PMC_push_integer( interp, Parrot_PMC pmc, Parrot_Int value )>
+
+Push a integer onto an aggregate PMC, such as a ResizableIntegerArray.
+Returns void.
+
+=item C<Parrot_PMC_push_pmc( interp, Parrot_PMC pmc, Parrot_PMC value )>
+
+Push a PMC value onto an aggregate PMC, such as a ResizablePMCArray.
+Returns void.
+
+=item C<Parrot_PMC_push_string( interp, Parrot_PMC pmc, Parrot_String value )>
+
+Push a Parrot_String onto an aggregate PMC, such as a ResizableStringArray.
+Returns void.
+
+=item C<Parrot_PMC_pop_float( interp, Parrot_PMC pmc )>
+
+Pop a Parrot_Float off of an aggregate PMC and returns it.
+
+=item C<Parrot_PMC_pop_integer( interp, Parrot_PMC pmc )>
+
+Pop a Parrot_Int off of an aggregate PMC and returns it.
+
+=item C<Parrot_PMC_pop_pmc( interp, Parrot_PMC pmc )>
+
+Pop a PMC off of an aggregate PMC and returns it.
+
+=item C<Parrot_PMC_pop_string( interp, Parrot_PMC pmc )>
+
+Pop a Parrot_String off of an aggregate PMC and returns it.
+
 =back
 
 =head4 Creation and destruction
@@ -313,50 +352,9 @@ Return the value of a PMC register.
 
 =back
 
-=head2 Attachments
-
-None.
-
-=head2 Footnotes
-
-None.
-
 =head2 References
 
 F<docs/glossary.pod>
-
-=head2 Version
-
-=head3 Current
-
-    Maintainer:
-    Class: Internals
-    PDD Number: 11
-    Version: 1.0
-    Status: Developing
-    Last Modified: February 20, 2004
-    PDD Format: 1
-    Language: English
-
-=head3 History
-
-=over 4
-
-=item Version 1
-
-None. First version
-
-=back
-
-=head2 Changes
-
-=over 4
-
-=item Version 1.0
-
-None. First version
-
-=back
 
 =cut
 

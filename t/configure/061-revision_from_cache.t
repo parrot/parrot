@@ -1,16 +1,22 @@
 #! perl
 # Copyright (C) 2007, Parrot Foundation.
-# $Id$
 # 061-revision_from_cache.t
 
 use strict;
 use warnings;
 
 use Test::More;
-plan( skip_all =>
-    "\nRelevant only when working in checkout from repository and during configuration" )
-    unless (-e 'DEVELOPING' and ! -e 'Makefile');
-plan( tests => 25 );
+#plan( skip_all =>
+#    "\nRelevant only when working in checkout from repository and during configuration" )
+#    unless (-e 'DEVELOPING' and ! -e 'Makefile');
+#plan( tests => 25 );
+if (-e 'DEVELOPING' and ! -e 'Makefile') {
+    plan tests => 25;
+}
+else {
+    plan skip_all =>
+        q{Relevant only when working in checkout from repository and prior to configuration};
+}
 use Carp;
 use Cwd;
 use File::Copy;

@@ -11,7 +11,7 @@ This document records Parrot source code releases, and their release managers.
 Simon Cozens, Jeff Goff, Steve Fink, Leo Toetsch, Chip Salzenberg, Jerry Gay,
 Patrick Michaud, Will "coke" Coleda, Matt Diephouse, chromatic, Allison Randal,
 Jonathan Worthington, Bob Rogers, Bernhard Schmalhofer, Andrew Whitworth,
-Francois Perrad, Jonathan Leto.
+Francois Perrad, Jonathan Leto, Michael Hind.
 
 
 =head1 THE RECORDS
@@ -104,4 +104,20 @@ Starred release numbers indicate supported releases.
 
  chromatic   2.0.0 *        2010-Jan-19     "Inevitable"
  darbelo     2.1.0          2010-Feb-16     "As Scheduled"
+ coke        2.1.1          2010-Feb-19     (bugfix release)
+ cotto       2.2.0          2010-Mar-16     "Like Clockwork"
+
+ Gerd        2.3.0 *        2010-Apr-20     "Samoan Lory"
+ Whiteknight 2.4.0          2010-May-18     "Sulfer Crest"
+ Gerd        2.5.0          2010-Jun-15     "Cheops"
+
+ coke        2.6.0 *        2010-Jul-20     "Red-rumped"
+ mikehh      2.7.0          2010-Aug-17     "Australian King"
+ Gerd        2.8.0          2010-Sep-21     "Tui Parakeet"
+
+ Gerd        2.9.0 *        2010-Oct-19     "Red-masked"
+ cotto       2.9.1          2010-Oct-19     (bugfix release)
+ tcurtis     2.10.0         2010-Nov-16     "Pesquet's"
+ Gerd        2.10.1         2010-Nov-18     (bugfix release)
+
 =cut

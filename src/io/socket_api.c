@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -107,6 +106,7 @@ static int pio_sock[PIO_SOCK_MAX+1] = {
 
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 INTVAL
@@ -190,6 +190,7 @@ Parrot_io_socket(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
                 PIO_F_SOCKET|PIO_F_READ|PIO_F_WRITE);
     else
         new_socket = socket;
+    /* XXX new_socket is assigned, but never used. Probably a bug? */
 
     return PIO_SOCKET(interp, socket, fam, type, proto);
 }
@@ -370,5 +371,5 @@ F<io/api.c>
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

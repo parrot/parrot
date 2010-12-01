@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -86,6 +85,12 @@ C<P6object> and C<P6metaclass>.
     $P2.'register'($P0)
     $P3 = $P2.'register'($P1)
     setattribute $P3, 'protoobject', $P3
+
+    $P0 = new ['Boolean']
+    set_hll_global ['P6protoobject'], 'False', $P0
+    $P0 = new ['Boolean']
+    assign $P0, 1
+    set_hll_global ['P6protoobject'], 'True', $P0
 .end
 
 
@@ -95,7 +100,7 @@ Return the C<P6metaclass> of the invocant.
 
 =cut
 
-.sub 'HOW' :method
+.sub 'HOW' :method :nsentry
     $P0 = typeof self
     $P1 = getprop 'metaclass', $P0
     .return ($P1)
@@ -108,10 +113,11 @@ Return the C<P6protoobject> for the invocant.
 
 =cut
 
-.sub 'WHAT' :method
+.sub 'WHAT' :method :nsentry
     .local pmc how, what
     how = self.'HOW'()
-    .tailcall how.'WHAT'()
+    what = getattribute how, 'protoobject'
+    .return (what)
 .end
 
 
@@ -121,7 +127,7 @@ Return the memory address for the invocant.
 
 =cut
 
-.sub 'WHERE' :method
+.sub 'WHERE' :method :nsentry
     $I0 = get_addr self
     .return ($I0)
 .end
@@ -133,7 +139,7 @@ Return the package for the object.
 
 =cut
 
-.sub 'WHO' :method
+.sub 'WHO' :method :nsentry
     $P0 = typeof self
     $P0 = getprop 'metaclass', $P0
     $P0 = getattribute $P0, 'parrotclass'
@@ -162,25 +168,13 @@ below).
 
 =over
 
-=item WHAT()
-
-Return the protoobject for this metaclass.
-
-=cut
-
-.namespace ['P6metaclass']
-
-.sub 'WHAT' :method
-    $P0 = getattribute self, 'protoobject'
-    .return ($P0)
-.end
-
 =item isa(x)
 
 Return a true value if the invocant 'isa' C<x>.
 
 =cut
 
+.namespace ['P6metaclass']
 .sub 'isa' :method :multi(_,_, _)
     .param pmc obj
     .param pmc x
@@ -251,8 +245,7 @@ Deprecated; use add_parent(class, parentclass)
 
   parent_proxy:
     ##  iterate over parent's mro and methods, adding them to parrotclass' namespace
-    .local pmc parrotclassns, mroiter, methods, methoditer
-    parrotclassns = parrotclass.'get_namespace'()
+    .local pmc mroiter, methods, methoditer
     $P0 = parentclass.'inspect'('all_parents')
     mroiter = iter $P0
   mro_loop:
@@ -266,22 +259,27 @@ Deprecated; use add_parent(class, parentclass)
     .local pmc methodpmc
     methodname = shift methoditer
     methodpmc = methods[methodname]
+    # don't add NativePCCMethods
+    $I0 = isa methodpmc, 'NativePCCMethod'
+    if $I0 goto method_loop
     # don't add NCI methods (they don't work)
     $I0 = isa methodpmc, 'NCI'
     if $I0 goto method_loop
     # if there's no existing entry, add method directly
-    $P0 = parrotclassns[methodname]
+    push_eh add_method_failed
+    $P0 = inspect parrotclass, 'methods'
+    $P0 = $P0[methodname]
     if null $P0 goto add_method
     # if existing entry isn't a MultiSub, skip it
     $I0 = isa $P0, ['MultiSub']
     unless $I0 goto method_loop
-    push_eh err
-    parrotclassns.'add_sub'(methodname, methodpmc)
-  err:
+    parrotclass.'add_method'(methodname, methodpmc)
     pop_eh
     goto method_loop
   add_method:
-    parrotclassns[methodname] = methodpmc
+    parrotclass.'add_method'(methodname, methodpmc)
+  add_method_failed:
+    pop_eh
     goto method_loop
   mro_end:
 
@@ -727,7 +725,7 @@ Multimethod helper to return the parrotclass for C<x>.
 
 =over 4
 
-=item get_string()  (vtable method)
+=item get_string()
 
 Returns the "shortname" of the protoobject's class and parens.
 
@@ -743,7 +741,7 @@ Returns the "shortname" of the protoobject's class and parens.
     .return ($S0)
 .end
 
-=item defined()  (vtable method)
+=item defined()
 
 Protoobjects are always treated as being undefined.
 
@@ -754,7 +752,7 @@ Protoobjects are always treated as being undefined.
 .end
 
 
-=item name()  (vtable method)
+=item name()
 
 Have protoobjects return their longname in response to a
 C<typeof_s_p> opcode.
@@ -804,31 +802,30 @@ will be used in lieu of this one.)
 
     # Perl6Object (legacy) and Mu accept anything.
     $S0 = parrotclass
-    if $S0 == 'Perl6Object' goto accept_anyway
-    if $S0 == 'Mu' goto accept_anyway
+    if $S0 == 'Perl6Object' goto accept
+    if $S0 == 'Mu' goto accept
 
     # Otherwise, just try a normal check.
     $I0 = can topic, 'HOW'
-    unless $I0 goto end
+    unless $I0 goto reject
     topicwhat = topic.'WHAT'()
     $I0 = isa topicwhat, parrotclass
-    if $I0 goto end
+    if $I0 goto accept
     $I0 = does topic, parrotclass
-    if $I0 goto end
+    if $I0 goto accept
 
     # If this fails, and we want Any, and it's something form outside
     # of the Perl 6 world, we'd best just accept it.
-    unless $S0 == 'Any' goto end
+    unless $S0 == 'Any' goto reject
     $I0 = isa topicwhat, 'Mu'
-    unless $I0 goto accept_anyway
-    $I0 = 0
-    goto end
+    unless $I0 goto accept
+  reject:
+    $P0 = get_global 'False'
+    .return ($P0)
 
-  accept_anyway:
-    $I0 = 1
-
-  end:
-    .return ($I0)
+  accept:
+    $P0 = get_global 'True'
+    .return ($P0)
 .end
 
 

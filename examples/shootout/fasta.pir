@@ -1,6 +1,5 @@
-#!./parrot -R cgp
+#!./parrot
 # Copyright (C) 2005-2009, Parrot Foundation.
-# $Id$
 #
 # fasta.pir N         (N = 2500000 for shootout)
 # by Joshua Isom
@@ -160,10 +159,11 @@ endfor:
 
 .sub main :main
 	.param pmc argv
-	.local pmc stdout
+	.local pmc interp, stdout
 	.local int n
 	# stdout is linebuffered per default - make it block buffered
-	stdout = getstdout
+        interp = getinterp
+	stdout = interp.'stdout_handle'()
 	stdout.'buffer_size'(40960)
 	$I0 = argv
 	if $I0 > 1 goto argsok

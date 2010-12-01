@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -45,7 +44,6 @@ sub new {
             'Configuration',
             '',
             $self->new_item( '', 'tools/dev/as2c.pl' ),
-            $self->new_item( '', 'tools/build/cc_flags.pl' ),
             $self->new_item( '', 'tools/build/vtable_h.pl' ),
             $self->new_item( '', 'tools/build/vtable_extend.pl' ),
         ),
@@ -54,8 +52,6 @@ sub new {
             '',
             $self->new_item( '', 'docs/configuration.pod' ),
             $self->new_item( '', 'tools/build/c2str.pl' ),
-            $self->new_item( '', 'tools/build/ops2c.pl' ),
-            $self->new_item( '', 'tools/build/ops2pm.pl' ),
             $self->new_item( '', 'tools/build/parrot_config_c.pl' ),
             $self->new_item( '', 'tools/build/pmc2c.pl' ),
             $self->new_item( '', 'tools/dev/install_files.pl' ),
@@ -88,7 +84,7 @@ sub new {
             $self->new_item( '', 'tools/dev/list_unjitted.pl' ),
             $self->new_item( '', 'tools/dev/gen_class.pl' ),
             $self->new_item( '', 'tools/dev/nm.pl' ),
-            $self->new_item( '', 'tools/util/ncidef2pasm.pl' ),
+            $self->new_item( '', 'tools/dev/ncidef2pasm.pl' ),
             $self->new_item( '', 'tools/dev/pbc_header.pl' ),
         ),
         $self->new_group(

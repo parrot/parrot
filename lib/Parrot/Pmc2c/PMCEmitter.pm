@@ -1,5 +1,4 @@
 # Copyright (C) 2007-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -76,8 +75,8 @@ sub generate_c_file {
     $self->gen_includes;
 
     # The PCC code needs Continuation-related macros from these headers.
-    $c->emit("#include \"pmc/pmc_continuation.h\"\n");
-    $c->emit("#include \"pmc/pmc_callcontext.h\"\n");
+    $c->emit("#include \"pmc_continuation.h\"\n");
+    $c->emit("#include \"pmc_callcontext.h\"\n");
 
     $c->emit( $self->preamble );
 
@@ -91,7 +90,7 @@ sub generate_c_file {
         $ro->gen_methods;
     }
 
-    $c->emit("#include \"pmc/pmc_default.h\"\n");
+    $c->emit("#include \"pmc_default.h\"\n");
 
     $c->emit( $self->update_vtable_func );
     $c->emit( $self->get_vtable_func );
@@ -139,8 +138,8 @@ EOH
     }
     $h->emit("${export}VTABLE* Parrot_${name}_get_vtable(PARROT_INTERP);\n");
     $h->emit("${export}VTABLE* Parrot_${name}_ro_get_vtable(PARROT_INTERP);\n");
-    $h->emit("${export}PMC*    Parrot_${name}_get_mro(PARROT_INTERP, PMC* mro);\n");
-    $h->emit("${export}Hash*   Parrot_${name}_get_isa(PARROT_INTERP, Hash* isa);\n");
+    $h->emit("${export}PMC*    Parrot_${name}_get_mro(PARROT_INTERP, ARGIN_NULLOK(PMC* mro));\n");
+    $h->emit("${export}Hash*   Parrot_${name}_get_isa(PARROT_INTERP, ARGIN_NULLOK(Hash* isa));\n");
 
 
     $self->gen_attributes;
@@ -167,7 +166,7 @@ sub hdecls {
     my $name    = $self->name;
     my $lc_name = $self->name;
 
-    # generate decls for all vtable methods in this PMC
+    # generate decls for all vtables in this PMC
     foreach my $vt_method_name ( @{ $self->vtable->names } ) {
         if ( $self->implements_vtable($vt_method_name) ) {
             $hout .=
@@ -274,7 +273,7 @@ Returns the C code for the pmc methods.
 sub gen_methods {
     my ($self) = @_;
 
-    # vtable methods
+    # vtables
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
         next if $vt_method_name eq 'class_init';
@@ -284,7 +283,7 @@ sub gen_methods {
         }
     }
 
-    # non-vtable methods
+    # methods
     foreach my $method ( @{ $self->methods } ) {
         next if $method->is_vtable;
         $method->generate_body($self);
@@ -476,6 +475,7 @@ sub init_func {
     my $multi_strings = '';
     my $cache         = {};
 
+    my $i = 0;
     for my $multi (@$multi_funcs) {
         my ($name, $ssig, $fsig, $ns, $func) = @$multi;
         my ($name_str, $ssig_str, $fsig_str, $ns_name)     =
@@ -487,23 +487,23 @@ sub init_func {
                    [$ns,   $ns_name ]) {
             my ($raw_string, $name) = @$s;
             next if $strings_seen{$name}++;
-            $multi_strings .=  "        STRING * const $name = "
+            $multi_strings .=  "            STRING * const $name = "
                            . qq|CONST_STRING_GEN(interp, "$raw_string");\n|;
         }
 
         push @multi_list, <<END_MULTI_LIST;
-        { $name_str,
-          $ssig_str,
-          $fsig_str,
-          $ns_name,
-          (funcptr_t) $func }
+            _temp_multi_func_list[$i].multi_name = $name_str;
+            _temp_multi_func_list[$i].short_sig = $ssig_str;
+            _temp_multi_func_list[$i].full_sig = $fsig_str;
+            _temp_multi_func_list[$i].ns_name = $ns_name;
+            _temp_multi_func_list[$i].func_ptr = (funcptr_t) $func;
 END_MULTI_LIST
+        $i++;
 
     }
 
-    my $multi_list = join( ",\n", @multi_list);
-
-    my @isa = grep { $_ ne 'default' } @{ $self->parents };
+    my $multi_list_size = @multi_list;
+    my $multi_list = join( "\n", @multi_list);
 
     my $provides        = join( " ", keys( %{ $self->{flags}{provides} } ) );
     my $class_init_code = "";
@@ -568,10 +568,10 @@ EOC
     if ( $self->is_dynamic ) {
         $cout .= <<"EOC";
         vt->base_type    = entry;
-        vt->whoami       = string_make(interp, "$classname", @{[length($classname)]},
-                                       "ascii", PObj_constant_FLAG|PObj_external_FLAG);
-        vt->provides_str = Parrot_str_append(interp, vt->provides_str,
-            string_make(interp, "$provides", @{[length($provides)]}, "ascii",
+        vt->whoami       = Parrot_str_new_init(interp, "$classname", @{[length($classname)]},
+                                       Parrot_ascii_encoding_ptr, PObj_constant_FLAG|PObj_external_FLAG);
+        vt->provides_str = Parrot_str_concat(interp, vt->provides_str,
+            Parrot_str_new_init(interp, "$provides", @{[length($provides)]}, Parrot_ascii_encoding_ptr,
             PObj_constant_FLAG|PObj_external_FLAG));
 
 EOC
@@ -583,17 +583,9 @@ EOC
 EOC
     }
 
-    if (@isa) {
-        unshift @isa, $classname;
-        $cout .= <<"EOC";
+    $cout .= <<"EOC";
         vt->isa_hash     = Parrot_${classname}_get_isa(interp, NULL);
 EOC
-    }
-    else {
-        $cout .= <<"EOC";
-        vt->isa_hash     = NULL;
-EOC
-    }
 
     for my $k ( keys %extra_vt ) {
         my $k_flags = $self->$k->vtable_flags;
@@ -630,12 +622,12 @@ EOC
 
         {
             /* Register this PMC as a HLL mapping */
-            const INTVAL hll_id = Parrot_get_HLL_id( interp, CONST_STRING_GEN(interp, "$hll"));
+            const INTVAL hll_id = Parrot_hll_get_HLL_id( interp, CONST_STRING_GEN(interp, "$hll"));
             if (hll_id > 0) {
 EOC
         foreach my $maps ( sort keys %{ $self->{flags}{maps} } ) {
             $cout .= <<"EOC";
-                Parrot_register_HLL_type( interp, hll_id, enum_class_$maps, entry);
+                Parrot_hll_register_HLL_type( interp, hll_id, enum_class_$maps, entry);
 EOC
         }
         $cout .= <<"EOC";
@@ -663,11 +655,18 @@ EOC
         next unless $method->type eq Parrot::Pmc2c::Method::NON_VTABLE;
 
         #these differ for METHODs
-        my $method_name = $method->name;
-        my $symbol_name = $method->symbol;
+        my $method_name     = $method->name;
+        my $symbol_name     = $method->symbol;
+        my ($pcc_signature) = $method->pcc_signature;
 
         $cout .= <<"EOC";
-        register_raw_nci_method_in_ns(interp, entry, F2DPTR(Parrot_${classname}_${method_name}), CONST_STRING_GEN(interp, "$symbol_name"));
+        {
+            STRING *method_name = CONST_STRING_GEN(interp, "$symbol_name");
+            STRING *signature   = CONST_STRING_GEN(interp, "$pcc_signature");
+            register_native_pcc_method_in_ns(interp, entry,
+                F2DPTR(Parrot_${classname}_${method_name}),
+                method_name, signature);
+        }
 EOC
         if ( $method->{attrs}{write} ) {
             $cout .= <<"EOC";
@@ -692,14 +691,13 @@ EOC
 
 
     if ( @$multi_funcs ) {
+        # Don't const the list, breaks some older C compilers
         $cout .= $multi_strings . <<"EOC";
 
-            $const multi_func_list _temp_multi_func_list[] = {
-                $multi_list
-            };
-#define N_MULTI_LIST (sizeof(_temp_multi_func_list)/sizeof(_temp_multi_func_list[0]))
+            multi_func_list _temp_multi_func_list[$multi_list_size];
+$multi_list
             Parrot_mmd_add_multi_list_from_c_args(interp,
-                _temp_multi_func_list, N_MULTI_LIST);
+                _temp_multi_func_list, $multi_list_size);
 EOC
     }
 
@@ -718,7 +716,7 @@ EOC
 
 =item C<update_vtable_func()>
 
-Returns the C code for the PMC's update_vtable method.
+Returns the C code for the PMC's update_vtable.
 
 =cut
 
@@ -730,16 +728,26 @@ sub update_vtable_func {
     my $export = $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT';
 
     # Sets the attr_size field:
-    # If the auto_attrs flag is set, use the current data,
-    # else check if this PMC has init or init_pmc vtable functions,
+    # - If the auto_attrs flag is set, use the current data.
+    # - If manual_attrs is set, set to 0.
+    # - If none is set, check if this PMC has init or init_pmc vtable functions,
     # setting it to 0 in that case, and keeping the value from the
     # parent otherwise.
     my $set_attr_size = '';
-    if ( @{$self->attributes} && $self->{flags}{auto_attrs} ) {
+    my $flag_auto_attrs = $self->{flags}{auto_attrs};
+    my $flag_manual_attrs = $self->{flags}{manual_attrs};
+    die 'manual_attrs and auto_attrs can not be used together'
+         . 'in PMC ' . $self->name
+        if ($flag_auto_attrs && $flag_manual_attrs);
+    die 'PMC ' . $self->name . ' has attributes but no auto_attrs or manual_attrs'
+        if (@{$self->attributes} && ! ($flag_auto_attrs || $flag_manual_attrs));
+
+    if ( @{$self->attributes} &&  $flag_auto_attrs) {
         $set_attr_size .= "sizeof(Parrot_${classname}_attributes)";
     }
     else {
-        $set_attr_size .= "0" if exists($self->{has_method}{init}) ||
+        $set_attr_size .= "0" if $flag_manual_attrs ||
+                                 exists($self->{has_method}{init}) ||
                                  exists($self->{has_method}{init_pmc});
     }
     $set_attr_size =     "    vt->attr_size = " . $set_attr_size . ";\n"
@@ -820,13 +828,14 @@ sub get_mro_func {
 $export
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC* Parrot_${classname}_get_mro(PARROT_INTERP, PMC* mro) {
+PMC* Parrot_${classname}_get_mro(PARROT_INTERP, ARGIN_NULLOK(PMC* mro)) {
     if (PMC_IS_NULL(mro)) {
         mro = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     }
 $get_mro
     VTABLE_unshift_string(interp, mro,
-        string_make(interp, "$classname", @{[length($classname)]}, NULL, 0));
+        Parrot_str_new_init(interp, "$classname", @{[length($classname)]},
+            Parrot_default_encoding_ptr, 0));
     return mro;
 }
 
@@ -861,11 +870,20 @@ sub get_isa_func {
 $export
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-Hash* Parrot_${classname}_get_isa(PARROT_INTERP, Hash* isa) {
+Hash* Parrot_${classname}_get_isa(PARROT_INTERP, ARGIN_NULLOK(Hash* isa)) {
+EOC
+
+    if ($get_isa ne '') {
+        $cout .= $get_isa;
+    }
+    else {
+        $cout .= <<"EOC";
     if (isa == NULL) {
         isa = parrot_new_hash(interp);
     }
-$get_isa
+EOC
+    }
+    $cout .= <<"EOC";
     parrot_hash_put(interp, isa, (void *)(CONST_STRING_GEN(interp, "$classname")), PMCNULL);
     return isa;
 }
@@ -878,7 +896,7 @@ EOC
 
 =item C<get_vtable_func()>
 
-Returns the C code for the PMC's update_vtable method.
+Returns the C code for the PMC's update_vtable.
 
 =cut
 
@@ -980,7 +998,7 @@ sub gen_switch_vtable {
         push @{ $multi_methods{ $name } }, [ $sig[1], $ssig, $fsig, $ns, $func, $method ];
     }
 
-    # vtable methods
+    # vtables
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
         next if $vt_method_name eq 'class_init';

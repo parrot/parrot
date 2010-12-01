@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -48,59 +47,85 @@ Parrot_io_read_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
         ARGMOD(STRING **buf))
 {
     ASSERT_ARGS(Parrot_io_read_utf8)
-    STRING *s, *s2;
-    String_iter iter;
+    size_t  bytepos = 0;
+    size_t  charpos = 0;
+    size_t  len     = Parrot_io_read_buffer(interp, filehandle, buf);
+    STRING *s       = *buf;
 
-    size_t len  = Parrot_io_read_buffer(interp, filehandle, buf);
-    s           = *buf;
-    s->charset  = Parrot_unicode_charset_ptr;
     s->encoding = Parrot_utf8_encoding_ptr;
 
-    /* count chars, verify utf8 */
-    Parrot_utf8_encoding_ptr->iter_init(interp, s, &iter);
+    while (bytepos < s->bufused) {
+        utf8_t  *u8ptr    = (utf8_t *)(s->strstart + bytepos);
+        UINTVAL  c        = *u8ptr;
+        size_t   utf8_len = 1;
 
-    while (iter.bytepos < s->bufused) {
-        if (iter.bytepos + 4 > s->bufused) {
-            const utf8_t *u8ptr = (utf8_t *)((char *)s->strstart +
-                    iter.bytepos);
-            const UINTVAL c = *u8ptr;
+        if (UTF8_IS_START(c)) {
+            size_t new_bufused, count;
 
-            if (UTF8_IS_START(c)) {
-                UINTVAL len2 = UTF8SKIP(u8ptr);
-                INTVAL  read;
+            utf8_len    = UTF8SKIP(u8ptr);
+            new_bufused = bytepos + utf8_len;
 
-                if (iter.bytepos + len2 <= s->bufused)
-                    goto ok;
+            if (new_bufused > s->bufused) {
+                /* read additional bytes to complete UTF-8 char */
+                size_t  read;
+                size_t  len2 = new_bufused - s->bufused;
+                STRING *s2   = Parrot_str_new_init(interp, NULL, len2,
+                                    Parrot_binary_encoding_ptr, 0);
 
-                /* need len - 1 more chars */
-                len2--;
-                s2           = NULL;
-                s2           = Parrot_io_make_string(interp, &s2, len2);
-                s2->bufused  = len2;
-                s2->charset  = Parrot_unicode_charset_ptr;
-                s2->encoding = Parrot_utf8_encoding_ptr;
+                s2->bufused = len2;
+                read        = Parrot_io_read_buffer(interp, filehandle, &s2);
 
-                /* TT #1257: need to check the amount read here? */
-                read = Parrot_io_read_buffer(interp, filehandle, &s2);
-                UNUSED(read);
+                if (read < len2)
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
+                        "Unaligned end in UTF-8 string\n");
 
-                s->strlen    = iter.charpos;
-                s            = Parrot_str_append(interp, s, s2);
-                len         += len2 + 1;
+                Parrot_gc_reallocate_string_storage(interp, s, new_bufused);
+                mem_sys_memcopy(s->strstart + s->bufused, s2->strstart, len2);
 
-                /* check last char */
+                s->bufused  = new_bufused;
+                u8ptr       = (utf8_t *)(s->strstart + bytepos);
+                len        += len2;
             }
+
+            /* Check for overlong forms */
+            if (UTF8_IS_OVERLONG(c, u8ptr[1]))
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
+                    "Overlong form in UTF-8 string\n");
+
+            c &= UTF8_START_MASK(utf8_len);
+
+            for (count = 1; count < utf8_len; ++count) {
+                ++u8ptr;
+
+                if (!UTF8_IS_CONTINUATION(*u8ptr))
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
+                        "Malformed UTF-8 string\n");
+
+                c = UTF8_ACCUMULATE(c, *u8ptr);
+            }
+
+            if (UNICODE_IS_INVALID(c))
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
+                    "Invalid character in UTF-8 string\n");
         }
-ok:
-        iter.get_and_advance(interp, &iter);
+        else if (!UNICODE_IS_INVARIANT(c)) {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
+                "Malformed UTF-8 string\n");
+        }
+
+        bytepos += utf8_len;
+        charpos += 1;
     }
-    s->strlen = iter.charpos;
+
+    s->strlen = charpos;
+
     return len;
 }
 
 /*
 
-=item C<size_t Parrot_io_write_utf8(PARROT_INTERP, PMC *filehandle, STRING *s)>
+=item C<size_t Parrot_io_write_utf8(PARROT_INTERP, PMC *filehandle, const STRING
+*s)>
 
 Write a Parrot string to a filehandle in UTF-8 format.
 
@@ -109,8 +134,7 @@ Write a Parrot string to a filehandle in UTF-8 format.
 */
 
 size_t
-Parrot_io_write_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
-        ARGMOD(STRING *s))
+Parrot_io_write_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_io_write_utf8)
     STRING *dest;
@@ -118,8 +142,7 @@ Parrot_io_write_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
     if (s->encoding == Parrot_utf8_encoding_ptr)
         return Parrot_io_write_buffer(interp, filehandle, s);
 
-    dest = Parrot_utf8_encoding_ptr->to_encoding(interp, s,
-            Parrot_gc_new_string_header(interp, 0));
+    dest = Parrot_utf8_encoding_ptr->to_encoding(interp, s);
     return Parrot_io_write_buffer(interp, filehandle, dest);
 }
 
@@ -134,10 +157,6 @@ F<src/io/io.c>,
 F<src/io/io_layers.c>,
 F<src/io/io_private.h>.
 
-=head1 HISTORY
-
-Initially written by Leo.
-
 =cut
 
 */
@@ -147,5 +166,5 @@ Initially written by Leo.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

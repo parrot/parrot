@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2007, Parrot Foundation.
  */
 
@@ -20,5 +19,5 @@
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

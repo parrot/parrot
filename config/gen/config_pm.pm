@@ -1,5 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -33,7 +32,7 @@ sub _init {
         myconfig        => 'config/gen/config_pm/myconfig.in',
         config_pir      => 'config/gen/config_pm/config_pir.in',
         Config_pm       => 'config/gen/config_pm/Config_pm.in',
-        config_lib      => 'config/gen/config_pm/config_lib_pasm.in',
+        config_lib      => 'config/gen/config_pm/config_lib_pir.in',
     };
     return \%data;
 }
@@ -65,6 +64,25 @@ sub runstep {
     open( my $OUT, ">", $gen_pm )
         or die "Can't open $gen_pm: $!";
 
+    # add some keys convenient for embedders
+    $conf->data->add( ' ', 'embed-cflags' =>
+        '-I' . $conf->data->get('includedir') . $conf->data->get('versiondir') );
+    $conf->data->add( ' ', 'embed-ldflags' =>
+        '-L' . $conf->data->get('libdir') . ' -lparrot ' . $conf->data->get('icu_shared') .
+        ' ' . $conf->data->get('libs') );
+
+    # escape spaces in current directory
+    my $cwd = cwd();
+    $cwd =~ s{ }{\\ }g;
+
+    # Build directory can have non ascii characters
+    # Maybe not the better fix, but allows keep working on the issue.
+    # See TT #1717
+    my $cwdcharset = q{};
+    if ($cwd =~ /[^[:ascii:]]/) {
+        $cwdcharset = 'binary:';
+    }
+
     my $pkg = __PACKAGE__;
     print {$OUT} <<"END";
 # ex: set ro:
@@ -84,9 +102,9 @@ END
 
     $template = $self->{templates}->{config_lib};
     open( $IN,  "<", $template ) or die "Can't open '$template': $!";
-    my $c_l_pasm = q{config_lib.pasm};
-    $conf->append_configure_log($c_l_pasm);
-    open( $OUT, ">", $c_l_pasm ) or die "Can't open $c_l_pasm: $!";
+    my $c_l_pir = q{config_lib.pir};
+    $conf->append_configure_log($c_l_pir);
+    open( $OUT, ">", $c_l_pir ) or die "Can't open $c_l_pir: $!";
 
     print {$OUT} <<"END";
 # ex: set ro:
@@ -108,6 +126,7 @@ END
         if (/\@PCONFIG\@/) {
             for my $k ( sort { lc $a cmp lc $b || $a cmp $b } $conf->data->keys ) {
                 next if exists $p5_keys{$k};
+                next if $k =~ /_provisional$/;
 
                 my $v = $conf->data->get($k);
                 if ( defined $v ) {
@@ -115,18 +134,25 @@ END
                     if ( $type ) {
                         die "type of '$k' is not supported : $type\n";
                     }
-                    # Scalar
-                    $v =~ s/(["\\])/\\$1/g;
+                    # String
+                    $v =~ s/\\/\\\\/g;
+                    $v =~ s/\\\\"/\\"/g;
+                    # escape unescaped double quotes
+                    $v =~ s/(?<!\\)"/\\"/g;
                     $v =~ s/\n/\\n/g;
-                    print {$OUT} qq(    set P0["$k"], "$v"\n);
+                    my $charset = q{};
+                    if ($v =~ /[^[:ascii:]]/) {
+                        $charset = 'binary:';
+                    }
+                    print {$OUT} qq(    set \$P0["$k"], $charset"$v"\n);
                 }
                 else {
-                    # Undef
-                    print {$OUT} qq(    set P0["$k"], P1\n);
+                    # Null
+                    print {$OUT} qq(    set \$P0["$k"], \$S2\n);
                 }
             }
         }
-        elsif (s/\@PWD\@/cwd/e) {
+        elsif (s/\"\@PWD\@\"/$cwdcharset\"$cwd\"/) {
             print {$OUT} $_;
         }
         else {
@@ -135,7 +161,7 @@ END
     }
 
     close $IN  or die "Can't close $template: $!";
-    close $OUT or die "Can't close $c_l_pasm: $!";
+    close $OUT or die "Can't close $c_l_pir: $!";
 
     return 1;
 }

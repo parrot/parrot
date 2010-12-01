@@ -1,5 +1,4 @@
 
-# $Id$
 
 =head1 NAME
 
@@ -13,7 +12,7 @@ SDL::App - Parrot extension for SDL Applications
     # create a new SDL::App object
     .local pmc app
 
-    app = new 'SDL::App'
+    app = new ['SDL'; 'App']
 
     # set the app's arguments
     .local pmc app_args
@@ -62,7 +61,7 @@ The SDL::App object has the following methods:
 
 =cut
 
-.namespace [ 'SDL::App' ]
+.namespace [ 'SDL'; 'App' ]
 
 .sub _initialize :load
 
@@ -73,7 +72,7 @@ The SDL::App object has the following methods:
 
     .local pmc app_class
 
-    newclass     app_class, 'SDL::App'
+    newclass     app_class, ['SDL'; 'App']
     addattribute app_class, 'height'
     addattribute app_class, 'width'
     addattribute app_class, 'bpp'
@@ -121,7 +120,7 @@ about the interface here.
     .param int flags  :named('flags')
 
     .local pmc SetVideoMode
-    SetVideoMode = get_hll_global ['SDL::NCI'], 'SetVideoMode'
+    SetVideoMode = get_hll_global ['SDL'; 'NCI'], 'SetVideoMode'
 
     .local pmc screen
     screen = SetVideoMode( width, height, bpp, flags )
@@ -129,7 +128,7 @@ about the interface here.
     # defined $I0, screen
 
     .local pmc main_surface
-    new main_surface, 'SDL::Surface'
+    new main_surface, ['SDL'; 'Surface']
 
     main_surface.'wrap_surface'( screen )
 
@@ -178,7 +177,7 @@ this.
 
 .sub quit :method
     .local pmc SDL_Quit
-    SDL_Quit = get_hll_global ['SDL::NCI'], 'Quit'
+    SDL_Quit = get_hll_global ['SDL'; 'NCI'], 'Quit'
     SDL_Quit()
 .end
 

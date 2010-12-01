@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -56,6 +55,10 @@ in that aggregate.
 =cut
 
 */
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
 
 pmclass Iterator no_ro {
 
@@ -204,7 +207,7 @@ Restart iterator
 */
     VTABLE void set_integer_native(INTVAL value) {
         PMC *self = SELF;
-        PARROT_ASSERT(!"Iterator: implementation have to override this method");
+        PARROT_FAILURE("Iterator: implementation have to override this method");
 
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Iterator: unimplemented method");
@@ -223,5 +226,5 @@ Restart iterator
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

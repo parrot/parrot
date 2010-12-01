@@ -1,7 +1,5 @@
 /* library.h
  *  Copyright (C) 2004, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *      Contains accessor functions for the _parrotlib bytecode interface
  *  Data Structure and Algorithms:
@@ -43,12 +41,6 @@ typedef enum {
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_get_runtime_path(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-char* Parrot_get_runtime_prefix(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -104,8 +96,6 @@ STRING * parrot_split_path_ext(PARROT_INTERP,
 
 #define ASSERT_ARGS_Parrot_get_runtime_path __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_get_runtime_prefix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_lib_add_path __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path_str))
@@ -136,5 +126,5 @@ STRING * parrot_split_path_ext(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

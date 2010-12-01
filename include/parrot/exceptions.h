@@ -1,7 +1,5 @@
 /* exceptions.h
- *  Copyright (C) 2001-2008, Parrot Foundation.
- *  SVN Info
- *     $Id$
+ *  Copyright (C) 2001-2010, Parrot Foundation.
  *  Overview:
  *     define the internal interpreter exceptions
  *  Data Structure and Algorithms:
@@ -51,7 +49,6 @@ typedef enum {
     EXCEPTION_JIT_UNAVAILABLE,
     EXCEPTION_EXEC_UNAVAILABLE,
     EXCEPTION_INTERP_ERROR,
-    EXCEPTION_PREDEREF_LOAD_ERROR,
     EXCEPTION_PARROT_USAGE_ERROR,
     EXCEPTION_PIO_ERROR,
     EXCEPTION_PARROT_POINTER_ERROR,
@@ -91,6 +88,7 @@ typedef enum {
     CONTROL_ERROR,
     CONTROL_TAKE,
     CONTROL_LEAVE,
+    CONTROL_EXIT,
 
     CONTROL_LOOP_NEXT,
     CONTROL_LOOP_LAST,
@@ -118,6 +116,16 @@ typedef enum {
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
+void do_panic(
+    NULLOK_INTERP,
+    ARGIN_NULLOK(const char *message),
+    ARGIN_NULLOK(const char *file),
+    unsigned int line);
+
+PARROT_EXPORT
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void exit_fatal(int exitcode, ARGIN(const char *format), ...)
         __attribute__nonnull__(2);
 
@@ -133,6 +141,7 @@ void Parrot_assert(
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void Parrot_confess(
     ARGIN(const char *cond),
     ARGIN(const char *file),
@@ -160,6 +169,7 @@ void Parrot_ex_mark_unhandled(PARROT_INTERP, ARGIN(PMC *exception))
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void Parrot_ex_rethrow_from_c(PARROT_INTERP, ARGIN(PMC *exception))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -173,12 +183,14 @@ opcode_t * Parrot_ex_rethrow_from_op(PARROT_INTERP, ARGIN(PMC *exception))
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void Parrot_ex_throw_from_c_args(PARROT_INTERP,
     SHIM(void *ret_addr),
     int exitcode,
@@ -206,18 +218,13 @@ opcode_t * Parrot_ex_throw_from_op_args(PARROT_INTERP,
         __attribute__nonnull__(4);
 
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_DOES_NOT_RETURN
-void do_panic(
-    NULLOK_INTERP,
-    ARGIN_NULLOK(const char *message),
-    ARGIN_NULLOK(const char *file),
-    unsigned int line);
-
 void Parrot_print_backtrace(void);
+#define ASSERT_ARGS_do_panic __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_exit_fatal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(format))
 #define ASSERT_ARGS_Parrot_assert __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -255,7 +262,6 @@ void Parrot_print_backtrace(void);
 #define ASSERT_ARGS_die_from_exception __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(exception))
-#define ASSERT_ARGS_do_panic __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_print_backtrace __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exceptions.c */
@@ -272,10 +278,14 @@ void Parrot_print_backtrace(void);
 #ifdef NDEBUG
 #  define PARROT_ASSERT(x) /*@-noeffect@*/((void)0)/*@=noeffect@*/
 #  define PARROT_ASSERT_ARG(x) (0)
+#  define PARROT_FAILURE(x) /*@-noeffect@*/((void)0)/*@=noeffect@*/
+#  define PARROT_ASSERT_MSG(x, s) /*@-noeffect@*/((void)0)/*@=noeffect@*/
 #  define ASSERT_ARGS(a)
 #else
 #  define PARROT_ASSERT(x) (x) ? ((void)0) : Parrot_confess(#x, __FILE__, __LINE__)
 #  define PARROT_ASSERT_ARG(x) ((x) ? (0) : (Parrot_confess(#x, __FILE__, __LINE__), 0))
+#  define PARROT_FAILURE(x) Parrot_confess((x), __FILE__, __LINE__)
+#  define PARROT_ASSERT_MSG(x, s) ((x) ? (0) : (Parrot_confess(s, __FILE__, __LINE__), 0))
 
 #  ifdef __GNUC__
 #    define ASSERT_ARGS(a) ASSERT_ARGS_ ## a ;
@@ -291,5 +301,5 @@ void Parrot_print_backtrace(void);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

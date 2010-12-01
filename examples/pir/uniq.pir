@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -40,6 +39,8 @@ By Leon Brocard <acme@astray.com>.
 Converted to PIR by Bernhard Schmalhofer.
 
 =cut
+
+.loadlib 'io_ops' # convenient I/O dynamic opcodes
 
 .sub "uniq" :main
   .param pmc argv

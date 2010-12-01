@@ -1,0 +1,12 @@
+README for tools/build/
+
+This directory is intended to hold programs, templates and configuration files
+invoked by the default 'make' target ('make all'), with or without
+command-line options, during the Parrot build process.
+
+Programs, templates and configuration files invoked by 'make install' or
+'make install-dev' should be placed in tools/release/.
+
+Other things being equal, programs, templates and configuration files invoked
+by all other 'make' targets (e.g., 'make headerizer') should be placed in
+tools/dev/.

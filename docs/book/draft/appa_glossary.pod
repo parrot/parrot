@@ -212,13 +212,6 @@ These actions can then create the appropriate PAST nodes. A PAST to PIR
 transformation already exists. Depending on the language, other phases can
 be added, or overridden (for instance, the PAST to PIR transformation).
 
-=item PIRC
-
-Acronym for PIR Compiler, a PIR compiler currently under development.
-The purpose is to reimplement the PIR language, which is currently
-implemented by IMCC. PIRC is written using a Bison and Flex grammar
-specification.
-
 =item PDD
 
 Parrot Design Document: documents that describe the features parrot must

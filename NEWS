@@ -1,4 +1,222 @@
-# $Id$
+New in 2.11.0
+- Core
+ + Just In Time native call frame generation using LibFFI
+ + PIR op find_codepoint is no longer experimental, it is now supported
+ + Several public functions in libparrot have been brought up to standard naming conventions.
+- Languages
+ + PIRC
+   - left the nest and is currently at https://github.com/parrot/pirc/
+
+New in 2.10.0
+- Core
+ + We are on github now! https://github.com/parrot/parrot
+ + Configure, build and test subsystems were made Git-aware
+ + New parrot_config key 'osvers' which contains
+   Operating System Version information
+ + Updated to the latest nqp-rx
+ + A proper exception is now thrown on IO read errors
+ + Garbage Collector optimizations and memory leak fixes
+ + Deprecated charset ops were removed
+ + Configure system learned to detect IPv6
+ + The mk_language_shell and create_language scripts have not yet been
+   ported to Git.
+- Documentation
+ + How To Use Git to work on Parrot
+    https://github.com/parrot/parrot/blob/master/docs/project/git_workflow.pod
+ + Git Terminology
+    https://github.com/parrot/parrot/blob/master/docs/project/git_terminology.pod
+- Platforms
+- Testing
+ + Increased coverage on: String, FixedBooleanArray, PMCProxy, LexPad
+- Community
+ + Macports portfile updated to 2.6.0
+ + A Fedora package for PL/Parrot ( postgresql-plparrot ) was created
+   This package allows you to write stored procedures for PostgreSQL in
+   PIR or Rakudo Perl 6     http://pl.parrot.org
+ + Parrot Foundation is teaming up with The Perl Foundation and taking
+   part in Google Code-In 2010. Learn about it and how to get involved here:
+
+   http://trac.parrot.org/parrot/wiki/GoogleCodeIn2010Tasks
+
+   http://leto.net/perl/2010/11/parrot-foundation-the-perl-foundation-google-code-in.html
+
+
+New in 2.9.1
+ - This is a bugfix release.  If you run out of memory on a box with < 512 MB physical RAM, please report it to us.
+
+New in 2.9.0
+- Core
+  + Parrot and Rakudo's build and tests can now be run under the profiling runcore
+  + IPv6 is now detected, laying the groundwork for future networking improvements
+  + mk_language_shell.pl and create_language.pl no longer require an installed parrot
+  + String PMC's 'reverse' method is now faster and supports all encodings
+  + improvements and simplifications in internal string processing
+  + Added API for adding STRINGs to the gc root set
+  + Speed up ord, substr, index and string comparison opcodes
+- Testing
+  + "make smoke" supports parallel testing by honoring TEST_JOBS
+  + Added tests for Socket PMC, StringBuilder PMC, ByteBuffer PMC,
+    mk_language_shell.pl, create_language.pl
+  + Fixed "Configure.pl" about missing tests
+  + Parrot and Rakudo Perl 6 now have access to the GCC Compile Farm
+  + Testing on Darwin/PPC
+- Git Migration
+  + Most developer tools have been ported to Git
+  + Majority of developer docs have been written for Git
+- Platforms
+  + Parrot can now be built on Minix
+
+New in 2.8.0
+- Core
+  + Inlined hashing and comparison functions
+  + Hash memory allocation moved from system malloc to lazy allocated
+  + Avoided infinite catching of exceptions while dying from exception
+  + Some svn fixes
+  + Added a check for duplicate vtable entries in PMCs
+  + Building Parrot with Perl 5.12 and gcc-4.5 / g++-4.5
+  + Eliminated cruft left over after dynops_mapping
+  + Improved charset and string encoding
+  + Better organisation of programs by reposition it to "tools/build" and "tools/release"
+  + Implemented Exception clone vtable function
+  + Added experimental function Parrot_getpid and getpid method
+  + --gc-threshold command line argument added, which controls the % of memory wasted by the GC
+  + Closed a lot of tickets
+- Testing
+  + Added more core pmc tests
+  + Rearranged some tests with C coverage
+  + We now have Smolder back, at http://smolder.parrot.org . Submit reports with "make smoke"
+  + skip_all implementation in Parrot's Test::More completed
+- GitMigration
+  + Set up a test site for github trac plugin at http://mksig.org/trac/
+  + Code of Trac plugin at github is on http://github.com/cotto/github-trac
+  + Parrot is now mirrored on github at http://github.com/parrot/parrot
+- Compilers
+  + Fixed problem with imcc HLL in load_bytecode difference between loading a pbc and compiling a pir
+
+New in 2.7.0
+- Core
+  + cleanups in packfile and freeze/thaw handling
+  + Hash optimizations that improve HLL startup and run time
+  + As always, many bug fixes and other optimizations
+- Runtime
+  + some runtime library cleanups
+- Testing
+  + added more tests to improve coverage
+  + new codingstd test for documentation in .pmc files
+- Documentation
+  + added documentation to .pmc files (some still missing but headers in place)
+  + general documentation improvements and bringing up-to-date
+- NQP-rx
+  + Updated version included from http://github.com/perl6/nqp-rx includes
+    speed improvements
+
+New in 2.6.0
+- Core
+  + Plug some memory leaks
+  + As always, bug fixes and some optimizations
+- Runtime
+  + added (experimental) URI::Escape
+- Testing
+  + Improved test coverage of core parrot
+- Documentation
+  + Updated the Squaak tutorial to use modern NQP-rx and PCT
+- Platforms
+  + The Fedora package 'parrot-devel' install the files for syntax-highlighting
+    and automatic indenting for the vim editor
+- NQP-rx
+  + Updated version included from http://github.com/perl6/nqp-rx includes
+    new or improved: regex backtracking, named assertions, interactive mode,
+    and setting (a minimal but useful runtime library)
+
+New in 2.5.0
+- Core
+  + Added ByteBuffer PMC to allow direct byte manipulation
+  + Modified some PMC vtable functions to reduce complexity, simplifying coverage.
+  + Modified PAST to generate symbolic PASM constants in PIR output.
+  + General STRING API cleanups
+  + Increased test coverage of core PMCs
+  + Fixed up 'exit' opcode, added CONTROL_EXIT exception type.
+  + Experimental 'unroll' opcode renamed to 'finalize'
+- NQP-rx
+  + Added proper support for multisubs and multimethods
+  + Fixed sigspace handling ** quantifier in regexes
+  + Added \e strings
+  + Added use of inversion lists for charclass lists in regexes
+- Platforms
+  + EPEL (Extra Packages for Enterprise Linux) packages for RHEL6.beta are available
+- Begin moving towards Lorito, the ops refactor to enable pervasive self-hosting and JIT compilation.
+  + All ops are now built with the self-hosted opsc compiler.
+  + For more Information about Lorito see:
+      http://trac.parrot.org/parrot/wiki/Lorito
+      http://trac.parrot.org/parrot/wiki/LoritoRoadmap
+
+New in 2.4.0
+- Core
+  + Various long-standing bugs in IMCC were fixed
+  + STRINGs are now immutable.
+  + use STRINGNULL instead of NULL when working with strings
+  + Fixed storage of methods in the NameSpace PMC
+  + Added :nsentry flag to force method to be stored in the NameSpace
+  + Added StringBuilder and PackfileDebug PMCs
+  + Added experimental opcodes find_codepoint and unroll
+- Compilers
+  + Fixed reporting of line numbers in IMCC
+  + Removed deprecated NQP compiler, replaced with new NQP-RX
+  + Removed NCIGen compiler
+- Deprecations
+  + Tools to distribute on CPAN were removed
+  + Deprecated dynpmcs have been removed to external repositories
+  + Removed RetContinuation PMC
+  + Removed CGoto, CGP, and Switch runcores
+- Tests
+  + Many tests for the extend/embed interface were added
+  + done_testing() is now implemented in Test::More
+- Tools
+  + The fakexecutable tapir is renamed parrot-prove
+  + Performance fixes to the pbc_to_exe tool
+  + Fix data_json to work outside of trunk
+  + The dynpmc GzipHandle (zlib wrapper) was added
+  + The library Archive/Tar.pir was added.
+  + The library Archive/Zip.pir was added.
+  + The libraries LWP.pir, HTTP/Message.pir & URI.pir were added.
+- Miscellaneous
+  + Six Parrot-related projects accepted to GSoC
+  + Improve use of const and other compiler hints
+
+New in 2.3.0
+- Core
+  + Allow passing parameters to the dynamic linker ('dlopen' improved)
+  + loadlib opcode added
+  + Calling conventions are now much more consistent, and follows natural
+    semantics of handling arguments and return values
+  + Recursive make for src/dynpmc removed
+  + Datatype STRINGNULL for a single Null STRING added
+  + config_lib.pasm replaced with config_lib.pir
+- Platforms
+  + Improved handling of new compilers
+  + Cygwin packages will be updated again with Parrot releases
+  + Fedora packages add desktop files
+  + gzip and bzip2 compressed tar files for releases
+- Tools
+  + tapir executable added; tapir is a TAP test harness
+  + Added TAP options --merge --ignore-exit
+- Miscellaneous
+  + 3 month cycle for supported releases
+  + Review and vote of GSoC applications
+
+New in 2.2.0
+- Core changes
+  + Most internal allocations now use the GC
+  + RNG non-randomnes fixes
+  + Elimination of much dead code
+- API changes
+  + PMCs can now be initialized from an int
+  + Many legacy ops are removed
+- Platforms
+  + Sun cc and Intel icc support have been restored
+  + Compiler invocation no longer goes through a Perl script
+- Tools
+  + NCI thunks are now generated by self-hosted PIR code
 
 New in 2.1.0
 - Core changes
@@ -108,7 +326,7 @@ New in 1.8.0
   + Use the the fixed-sized allocator in the Context and the CallSignature PMC.
   + Many small speed improvements.
 - New deprecations
-  + MT19937, the Mersenne twisted pseudorandom number generator, is now hosted on github and 
+  + MT19937, the Mersenne twisted pseudorandom number generator, is now hosted on github and
     will be removed from the Parrot core. (eligible in 2.1)
   + The 'Parrot_call_*' functions for invoking a sub/method object from C are
     deprecated. They are replaced by 'Parrot_ext_call'. (eligible in 2.1)
@@ -569,7 +787,7 @@ New in 0.8.2
     - merged LuaClosure & LuaFunction PMC
   + Pipp
     - added support for a return value from user defined functions
-    - added incomplete implemention of 'require_once'
+    - added incomplete implementation of 'require_once'
   + Ecmascript
     - parser fixes, parses spidermonkey's top level test/shell.js
 - Deprecations
@@ -615,7 +833,7 @@ New in 0.8.1
     - added .PARROT method
   + Pipp
     - added some predefined constants
-    - added implemention of the function basename()
+    - added implementation of the function basename()
   + Cardinal (Ruby)
     - Added initial support for the classes Proc, Continuation, Queue, Dir, File, and FileStat
     - fixed various minor bugs
@@ -1105,7 +1323,7 @@ New in 0.5.3
   + NQP: add '=:=' op, tests for scalar and list contextualizers, \x escapes
 - Languages
   + APL: reimplementation with PCT
-  + Cardinal (Ruby): reimplemention with PCT
+  + Cardinal (Ruby): re-implementation with PCT
   + Ecmascript: reimplementation with PCT
   + lolcode: improved expression parsing, ifthen, IT, YARN
   + lua:

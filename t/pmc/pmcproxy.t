@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2007-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -16,9 +15,11 @@ Tests the PMCProxy PMC.
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'test_more.pir'
-    plan(45)
+    plan(46)
 
     new_tests()
     get_class_tests()
@@ -39,6 +40,20 @@ Tests the PMCProxy PMC.
 
     $I0 = isa $P0, 'Foo'
     is($I0, 0, "non-default isa on PMCProxy works")
+
+    .local pmc eh
+    eh = new ['ExceptionHandler'], .EXCEPTION_INVALID_OPERATION
+    set_label eh, catch
+    push_eh eh
+    $I0 = 1
+    new $P0, ['PMCProxy'], -1
+    $I0 = 0
+    goto check
+  catch:
+    finalize eh
+  check:
+    pop_eh
+    is($I0, 1, 'Attempt to proxy invalid type throws appropriately')
 .end
 
 
@@ -144,10 +159,10 @@ Tests the PMCProxy PMC.
     addparent $P0, $P1
     ok(1, "added Class's PMCProxy as a parent of the PDD15 class")
 
-    #We will override the add_role vtable method.
+    #We will override the add_role vtable
     $P2 = get_global 'no_add_role'
     $P0.'add_vtable_override'('add_role', $P2)
-    ok(1, 'overrode a vtable method')
+    ok(1, 'overrode a vtable')
 
     $P2 = $P0.'new'()
     ok(1, 'instantiated the class')
@@ -178,7 +193,7 @@ Tests the PMCProxy PMC.
     addparent $P0, $P1
     ok(1, "added Class's PMCProxy as a parent of the PDD15 class")
 
-    #We will override the inspect_str vtable method.
+    #We will override the inspect_str vtable
     $P2 = get_global 'always42'
     $P0.'add_vtable_override'('inspect_str', $P2)
     ok(1, 'overrode inspect_str method')
@@ -188,9 +203,9 @@ Tests the PMCProxy PMC.
 
     $P3 = $P2.'inspect'('methods')
     is($P3, 42, "the magic overriding sub was called")
-    ok(1, 'Called non-overridden method, which called overridden vtable method')
+    ok(1, 'Called non-overridden method, which called overridden vtable')
 .end
-.sub always42 :method
+.sub always42 :method :nsentry('always42')
     .param string what
     $P0 = new ['Integer']
     $P0 = 42

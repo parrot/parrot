@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -27,10 +26,6 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 
 #include "parrot/has_header.h"
 
-#ifdef PARROT_HAS_HEADER_SYSUTSNAME
-#  include <sys/utsname.h>
-#endif
-
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 
 /*
@@ -52,13 +47,13 @@ register_nci_method(PARROT_INTERP, const int type, ARGIN(void *func),
 {
     ASSERT_ARGS(register_nci_method)
     PMC    * const method      = Parrot_pmc_new(interp, enum_class_NCI);
-    STRING * const method_name = string_make(interp, name, strlen(name),
-        NULL, PObj_constant_FLAG|PObj_external_FLAG);
+    STRING * const method_name = Parrot_str_new_init(interp, name, strlen(name),
+        Parrot_default_encoding_ptr, PObj_constant_FLAG|PObj_external_FLAG);
 
     /* create call func */
     VTABLE_set_pointer_keyed_str(interp, method,
-            string_make(interp, proto, strlen(proto), NULL,
-                PObj_constant_FLAG|PObj_external_FLAG),
+            Parrot_str_new_init(interp, proto, strlen(proto),
+                Parrot_default_encoding_ptr, PObj_constant_FLAG|PObj_external_FLAG),
             func);
 
     /* insert it into namespace */
@@ -68,8 +63,8 @@ register_nci_method(PARROT_INTERP, const int type, ARGIN(void *func),
 
 /*
 
-=item C<void register_raw_nci_method_in_ns(PARROT_INTERP, const int type, void
-*func, STRING *name)>
+=item C<void register_native_pcc_method_in_ns(PARROT_INTERP, const int type,
+void *func, STRING *name, STRING *signature)>
 
 Create an entry in the C<nci_method_table> for the given raw NCI method
 of PMC class C<type>.
@@ -80,14 +75,14 @@ of PMC class C<type>.
 
 PARROT_EXPORT
 void
-register_raw_nci_method_in_ns(PARROT_INTERP, const int type, ARGIN(void *func),
-        ARGIN(STRING *name))
+register_native_pcc_method_in_ns(PARROT_INTERP, const int type, ARGIN(void *func),
+        ARGIN(STRING *name), ARGIN(STRING *signature))
 {
-    ASSERT_ARGS(register_raw_nci_method_in_ns)
-    PMC    * const method      = Parrot_pmc_new(interp, enum_class_NCI);
+    ASSERT_ARGS(register_native_pcc_method_in_ns)
+    PMC * method = Parrot_pmc_new(interp, enum_class_NativePCCMethod);
 
     /* setup call func */
-    VTABLE_set_pointer(interp, method, func);
+    VTABLE_set_pointer_keyed_str(interp, method, signature, func);
 
     /* insert it into namespace */
     VTABLE_set_pmc_keyed_str(interp, interp->vtables[type]->_namespace,
@@ -111,10 +106,9 @@ Parrot_mark_method_writes(PARROT_INTERP, int type, ARGIN(const char *name))
 {
     ASSERT_ARGS(Parrot_mark_method_writes)
     STRING *const str_name = Parrot_str_new_constant(interp, name);
-    PMC    *const pmc_true = Parrot_pmc_new(interp, enum_class_Integer);
+    PMC    *const pmc_true = Parrot_pmc_new_init_int(interp, enum_class_Integer, 1);
     PMC    *const method   = VTABLE_get_pmc_keyed_str(
         interp, interp->vtables[type]->_namespace, str_name);
-    VTABLE_set_integer_native(interp, pmc_true, 1);
     VTABLE_setprop(interp, method, CONST_STRING(interp, "write"), pmc_true);
 }
 
@@ -131,17 +125,16 @@ Register a parser/compiler function.
 
 PARROT_EXPORT
 void
-Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type),
-                    NOTNULL(Parrot_compiler_func_t func))
+Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type), ARGIN(Parrot_compiler_func_t func))
 {
     ASSERT_ARGS(Parrot_compreg)
-    PMC* const iglobals = interp->iglobals;
-    PMC        *nci     = Parrot_pmc_new(interp, enum_class_NCI);
-    STRING     *sc      = CONST_STRING(interp, "PJt");
-    PMC        *hash    = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+    PMC    * const iglobals = interp->iglobals;
+    PMC    * const nci      = Parrot_pmc_new(interp, enum_class_NCI);
+    STRING * const sc       = CONST_STRING(interp, "PJt");
+    PMC    * hash           = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                               IGLOBALS_COMPREG_HASH);
 
-    if (!hash) {
+    if (PMC_IS_NULL(hash)) {
         hash = Parrot_pmc_new_noinit(interp, enum_class_Hash);
         VTABLE_init(interp, hash);
         VTABLE_set_pmc_keyed_int(interp, iglobals,
@@ -171,7 +164,7 @@ void *
 Parrot_compile_file(PARROT_INTERP, ARGIN(const char *fullname), ARGOUT(STRING **error))
 {
     ASSERT_ARGS(Parrot_compile_file)
-    return IMCC_compile_file_s(interp, fullname, error);
+    return imcc_compile_file(interp, fullname, error);
 }
 
 /*
@@ -230,28 +223,8 @@ interpinfo(PARROT_INTERP, INTVAL what)
         ret = Parrot_gc_impatient_pmcs(interp);
         break;
       case CURRENT_RUNCORE:
-        {
-            STRING *name = interp->run_core->name;
-
-            if (Parrot_str_equal(interp, name, CONST_STRING(interp, "slow")))
-                return PARROT_SLOW_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "fast")))
-                return PARROT_FAST_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "switch")))
-                return PARROT_SWITCH_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "cgp")))
-                return PARROT_CGP_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "cgoto")))
-                return PARROT_CGOTO_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "exec")))
-                return PARROT_EXEC_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "gc_debug")))
-                return PARROT_GC_DEBUG_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "debugger")))
-                return PARROT_DEBUGGER_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "profiling")))
-                return PARROT_PROFILING_CORE;
-        }
+        ret = interp->run_core->id;
+        break;
       default:        /* or a warning only? */
         ret = -1;
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
@@ -273,30 +246,33 @@ interpreter.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC*
 interpinfo_p(PARROT_INTERP, INTVAL what)
 {
     ASSERT_ARGS(interpinfo_p)
+
+    PMC *result;
     switch (what) {
       case CURRENT_SUB:
-        return Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+        result = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+        break;
       case CURRENT_CONT:
-        {
-            PMC * const cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
-            if (!PMC_IS_NULL(cont) && cont->vtable->base_type ==
-                    enum_class_RetContinuation)
-                return VTABLE_clone(interp, cont);
-            return cont;
-        }
+        result = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
+        break;
       case CURRENT_OBJECT:
-        return Parrot_pcc_get_object(interp, CURRENT_CONTEXT(interp));
+        result = Parrot_pcc_get_object(interp, CURRENT_CONTEXT(interp));
+        break;
       case CURRENT_LEXPAD:
-        return Parrot_pcc_get_lex_pad(interp, CURRENT_CONTEXT(interp));
+        result = Parrot_pcc_get_lex_pad(interp, CURRENT_CONTEXT(interp));
+        break;
       default:        /* or a warning only? */
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");
     }
+
+    /* Don't send NULL values to P registers */
+    return result ? result : PMCNULL;
 }
 
 /*
@@ -306,7 +282,7 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
 Takes an interpreter name and an information type as arguments.
 Returns corresponding information strings about the interpreter:
 the full pathname, executable name, or the file stem,
-(or throws an error exception, if the type is not recognised).
+(or throws an error exception, if the type is not recognized).
 Valid types are EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME,
 and RUNTIME_PREFIX.
 
@@ -323,33 +299,33 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
     ASSERT_ARGS(interpinfo_s)
     switch (what) {
         case EXECUTABLE_FULLNAME: {
-            PMC *exe_name = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+            PMC * const exe_name = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                     IGLOBALS_EXECUTABLE);
             if (PMC_IS_NULL(exe_name))
-                return string_from_literal(interp, "");
+                return CONST_STRING(interp, "");
             return VTABLE_get_string(interp, exe_name);
         }
         case EXECUTABLE_BASENAME: {
-            STRING *basename;
-            PMC    *exe_name = VTABLE_get_pmc_keyed_int(interp,
+            PMC    * const exe_name = VTABLE_get_pmc_keyed_int(interp,
                                 interp->iglobals, IGLOBALS_EXECUTABLE);
 
             if (PMC_IS_NULL(exe_name))
-                return string_from_literal(interp, "");
+                return CONST_STRING(interp, "");
 
             else {
                 /* Need to strip back to what follows the final / or \. */
-                STRING *       fullname   = VTABLE_get_string(interp, exe_name);
+                STRING * const fullname   = VTABLE_get_string(interp, exe_name);
                 char   * const fullname_c = Parrot_str_to_cstring(interp, fullname);
                 int            pos        = strlen(fullname_c) - 1;
+                STRING *basename;
 
                 while (pos              >  0
                 &&     fullname_c[pos] != '/'
                 &&     fullname_c[pos] != '\\')
-                    pos--;
+                    --pos;
 
                 if (pos > 0)
-                    pos++;
+                    ++pos;
 
                 basename = Parrot_str_new(interp, fullname_c + pos, 0);
                 Parrot_str_free_cstring(fullname_c);
@@ -361,6 +337,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
             return Parrot_get_runtime_path(interp);
         case GC_SYS_NAME: {
             STRING * name = Parrot_gc_sys_name(interp);
+            Parrot_warn_experimental(interp, "GC_SYS_NAME option is experimental");
             return name;
         }
       default:
@@ -370,107 +347,8 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
 }
 
 /*
-
-=item C<INTVAL sysinfo_i(PARROT_INTERP, INTVAL info_wanted)>
-
-Returns the system info.
-
-C<info_wanted> is one of:
-
-    PARROT_INTSIZE
-    PARROT_FLOATSIZE
-    PARROT_POINTERSIZE
-    PARROT_INTMAX
-    PARROT_INTMIN
-
-In unknown info is requested then -1 is returned.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-INTVAL
-sysinfo_i(SHIM_INTERP, INTVAL info_wanted)
-{
-    ASSERT_ARGS(sysinfo_i)
-    switch (info_wanted) {
-      case PARROT_INTSIZE:
-        return sizeof (INTVAL);
-      case PARROT_FLOATSIZE:
-        return sizeof (FLOATVAL);
-      case PARROT_POINTERSIZE:
-        return sizeof (void *);
-      case PARROT_INTMIN:
-        return PARROT_INTVAL_MIN;
-      case PARROT_INTMAX:
-        return PARROT_INTVAL_MAX;
-      default:
-        return -1;
-    }
-}
-
-/*
-
-=item C<STRING * sysinfo_s(PARROT_INTERP, INTVAL info_wanted)>
-
-Returns the system info string.
-
-C<info_wanted> is one of:
-
-    PARROT_OS
-    PARROT_OS_VERSION
-    PARROT_OS_VERSION_NUMBER
-    CPU_ARCH
-    CPU_TYPE
-
-If unknown info is requested then an empty string is returned.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING *
-sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
-{
-    ASSERT_ARGS(sysinfo_s)
-    switch (info_wanted) {
-      case PARROT_OS:
-        return Parrot_str_new_constant(interp, BUILD_OS_NAME);
-      case PARROT_OS_VERSION:
-#ifdef PARROT_HAS_HEADER_SYSUTSNAME
-        {
-            struct utsname info;
-            if (uname(&info) == 0) {
-                return string_make(interp, info.version, strlen(info.version), "ascii", 0);
-            }
-        }
-#endif
-        break;
-      case PARROT_OS_VERSION_NUMBER:
-#ifdef PARROT_HAS_HEADER_SYSUTSNAME
-        {
-            struct utsname info;
-            if (uname(&info) == 0) {
-                return string_make(interp, info.release, strlen(info.version), "ascii", 0);
-            }
-        }
-#endif
-        break;
-      case CPU_ARCH:
-        return string_make(interp, PARROT_CPU_ARCH, sizeof (PARROT_CPU_ARCH) - 1, "ascii", 0);
-      case CPU_TYPE:
-      default:
-        break;
-    }
-    return string_from_literal(interp, "");
-}
-
-/*
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

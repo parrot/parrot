@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2003, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -18,6 +17,8 @@ Echoes what you type once you hit return.
 You'll have to Ctl-C to exit.
 
 =cut
+
+.loadlib 'io_ops'
 
 	getstdin P0
 	getstdout P1

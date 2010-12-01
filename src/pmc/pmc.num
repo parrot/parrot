@@ -77,8 +77,5 @@ orderedhash.pmc    48
 parrotclass.pmc    49
 parrotobject.pmc    50
 
-os.pmc    51
-file.pmc    52
-
-oplib.pmc    53
-opcode.pmc    54
+oplib.pmc    51
+opcode.pmc    52

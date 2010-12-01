@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2007, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -11,26 +10,30 @@ src/pmc/null.pmc - NULL
 This simply creates a way of catching C<NULL> register accesses without
 really slowing down the bytecode execution.
 
-=head2 Methods
-
-=over 4
-
 =cut
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
 PARROT_DOES_NOT_RETURN
-static void
-null_pmc_access(PARROT_INTERP, int index)
-{
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NULL_REG_ACCESS,
-            "Null PMC access in %s()",
-            Parrot_get_vtable_name(interp, index));
-}
+static void null_pmc_access(PARROT_INTERP, int index)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_null_pmc_access __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 pmclass Null singleton {
 
 /*
+
+=head2 Vtable functions
+
+=over 4
 
 =item C<void init()>
 
@@ -41,17 +44,21 @@ Overrides the default to do nothing.
 */
 
     VTABLE void init() {
+        UNUSED(INTERP)
     }
 
     VTABLE void *get_pointer() {
+        UNUSED(INTERP)
         return PMCNULL;
     }
 
     VTABLE void set_pointer(void *p) {
+        UNUSED(INTERP)
         PMCNULL = (PMC *)p;
     }
 
     VTABLE INTVAL does(STRING *what) {
+        UNUSED(INTERP)
         UNUSED(what)
         /* XXX maybe a hack to get TGE running again */
         return 0;
@@ -74,18 +81,44 @@ Returns true if value is also a null PMC, false otherwise.
 
 =item C<PMC *find_method(STRING *method_name)>
 
-=cut
+Gives a more informative message than the automaticaly generated version.
 
-Gives a more informative message than the automaticaaly generated version.
+=cut
 
 */
 
     VTABLE PMC *find_method(STRING *method_name) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NULL_REG_ACCESS,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_NULL_REG_ACCESS,
                 "Null PMC access in find_method('%Ss')",
                 method_name);
     }
 
+}
+
+/*
+
+=back
+
+=head2 Auxiliar functions
+
+=over 4
+
+=item C<static void null_pmc_access(PARROT_INTERP, int index)>
+
+Throws the Null PMC access exception.
+
+=cut
+
+*/
+
+PARROT_DOES_NOT_RETURN
+static void
+null_pmc_access(PARROT_INTERP, int index)
+{
+    ASSERT_ARGS(null_pmc_access)
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NULL_REG_ACCESS,
+            "Null PMC access in %s()",
+            Parrot_get_vtable_name(interp, index));
 }
 
 /*
@@ -100,5 +133,5 @@ Gives a more informative message than the automaticaaly generated version.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

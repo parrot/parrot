@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2005, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -309,7 +308,7 @@ push @{ $ws->{whitespace} } => @{ $ws->{whitespace_ascii} },
 
 sub string {
     my $which = shift;
-    'unicode:"' . join( '', @{ $ws->{$which} } ) . '"';
+    'utf8:"' . join( '', @{ $ws->{$which} } ) . '"';
 }
 
 my $all_ws = string('whitespace');
@@ -350,7 +349,7 @@ OUT
    .local int result, char, len, i
    .local string s
    s = $all_ws
-   s = unicode:"abc" . s
+   s = utf8:"abc" . s
    len = length s
    result = find_cclass .CCLASS_WHITESPACE, s, 0, len
    print result
@@ -366,7 +365,7 @@ OUT
    .local int result, char, len, i
    .local string s
    s = $all_ws
-   s .= unicode:"abc"
+   s .= utf8:"abc"
    len = length s
    result = find_not_cclass .CCLASS_WHITESPACE, s, 0, len
    print len
@@ -385,7 +384,7 @@ pir_output_is( <<"CODE", <<'OUT', "unicode 0-127 find_*_cclass whitespace" );
 .include "cclass.pasm"
    .local int result, char, len, i
    .local string s
-   s = unicode:"abc   def"
+   s = utf8:"abc   def"
    len = length s
    result = find_cclass .CCLASS_WHITESPACE, s, 0, len
    print len
@@ -403,7 +402,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "is_cclass, unicode first codepage" );
 .include "cclass.pasm"
 .sub main :main
-    $S1 = unicode:"ab\nC_X34.\0 \t!"
+    $S1 = utf8:"ab\nC_X34.\0 \t!"
     test1( $S1 )
 .end
 .sub test1

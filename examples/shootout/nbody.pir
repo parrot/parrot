@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 # The Computer Language Shootout
 # http://shootout.alioth.debian.org/
 #
@@ -8,6 +7,8 @@
 # Contributed by Joshua Isom
 # speed up  from 1m25 to 6s by Leopold Toetsch
 # changed default value to 1000 to match shootout default (karl)
+
+.loadlib 'trans_ops'
 
 .const int x = 0
 .const int y = 1

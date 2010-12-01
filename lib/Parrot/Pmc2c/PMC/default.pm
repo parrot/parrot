@@ -1,5 +1,4 @@
-# Copyright (C) 2007-2008, Parrot Foundation.
-# $Id$
+# Copyright (C) 2007-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -32,7 +31,7 @@ Always true.
 sub pre_method_gen {
     my ($self) = @_;
 
-    # vtable methods
+    # vtables
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
         next unless $self->unimplemented_vtable($vt_method_name);
@@ -55,9 +54,9 @@ sub gen_methods {
             # Generate default_ro_find_method.
             $self->{emitter}->emit(<<'EOC');
 static  PMC *
-Parrot_default_ro_find_method(PARROT_INTERP, PMC *pmc, STRING *method_name) {
+Parrot_default_ro_find_method(PARROT_INTERP, PMC *_self, STRING *method_name) {
     /* Use non-readonly find_method. Current vtable is ro variant. So ro_variant contains non-ro variant */
-    PMC *const method = pmc->vtable->ro_variant_vtable->find_method(interp, pmc, method_name);
+    PMC *const method = _self->vtable->ro_variant_vtable->find_method(interp, _self, method_name);
     if (!PMC_IS_NULL(VTABLE_getprop(interp, method, CONST_STRING_GEN(interp, "write"))))
         return PMCNULL;
     else
@@ -90,7 +89,7 @@ sub _generate_default_method {
         $body .= "    UNUSED($param)\n";
     }
     my $vt_method_name = uc $method->name;
-    $body .= qq{    $stub_func(interp, pmc, PARROT_VTABLE_SLOT_$vt_method_name);\n};
+    $body .= qq{    $stub_func(interp, _self, PARROT_VTABLE_SLOT_$vt_method_name);\n};
 
     $clone->body( Parrot::Pmc2c::Emitter->text($body));
 
@@ -117,7 +116,7 @@ PARROT_EXPORT VTABLE* Parrot_default_get_vtable(PARROT_INTERP) {
 
 $vtable_decl
 
-    return Parrot_clone_vtable(interp, &temp_vtable);
+    return Parrot_vtbl_clone_vtable(interp, &temp_vtable);
 }
 
 EOC
@@ -134,7 +133,7 @@ EOC
 
 PARROT_EXPORT VTABLE* Parrot_default_ro_get_vtable(PARROT_INTERP) {
 
-    VTABLE * vt = Parrot_default_get_vtable(interp);
+    VTABLE * const vt = Parrot_default_get_vtable(interp);
 
 $ro_vtable_decl
 

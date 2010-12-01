@@ -1,8 +1,7 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
-$Id$
 
 =head1 NAME
 
@@ -25,6 +24,8 @@ This file implements various functions for creating and writing packfiles.
 #include "pmc/pmc_key.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
 
 /*
 
@@ -112,7 +113,7 @@ PackFile_pack(PARROT_INTERP, ARGMOD(PackFile *self), ARGOUT(opcode_t *cursor))
     padding_size = 16 - (PACKFILE_HEADER_BYTES + self->header->uuid_size) % 16;
     if (padding_size < 16) {
         int i;
-        for (i = 0; i < padding_size; i++)
+        for (i = 0; i < padding_size; ++i)
             *byte_cursor++ = 0;
     }
     else {
@@ -159,11 +160,19 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
 {
     ASSERT_ARGS(PackFile_ConstTable_pack_size)
     opcode_t i;
-    const PackFile_ConstTable* const self = (const PackFile_ConstTable *) seg;
-    size_t size = 1;    /* const_count */
+    PackFile_ConstTable* const self = (PackFile_ConstTable *) seg;
+    size_t size = 3;    /* const_counts */
 
-    for (i = 0; i < self->const_count; i++)
-        size += PackFile_Constant_pack_size(interp, self->constants[i]);
+    size += self->num.const_count * PF_size_number();
+
+    for (i = 0; i < self->str.const_count; i++)
+        size += PF_size_string(self->str.constants[i]);
+
+    for (i = 0; i < self->pmc.const_count; i++) {
+        PMC *c = self->pmc.constants[i];
+        size += PF_size_strlen(Parrot_freeze_pbc_size(interp, c, self)) - 1;
+    }
+
     return size;
 }
 
@@ -192,24 +201,36 @@ PackFile_ConstTable_pack(PARROT_INTERP,
         ARGIN(PackFile_Segment *seg), ARGMOD(opcode_t *cursor))
 {
     ASSERT_ARGS(PackFile_ConstTable_pack)
-    const PackFile_ConstTable * const self = (const PackFile_ConstTable *)seg;
+    PackFile_ConstTable * const self = (PackFile_ConstTable *)seg;
     opcode_t i;
 
-    *cursor++ = self->const_count;
+    *cursor++ = self->num.const_count;
+    *cursor++ = self->str.const_count;
+    *cursor++ = self->pmc.const_count;
 
-    for (i = 0; i < self->const_count; i++)
-        cursor = PackFile_Constant_pack(interp, self, self->constants[i], cursor);
+    for (i = 0; i < self->num.const_count; i++)
+        cursor = PF_store_number(cursor, &self->num.constants[i]);
+
+    for (i = 0; i < self->str.const_count; i++)
+        cursor = PF_store_string(cursor, self->str.constants[i]);
+
+    for (i = 0; i < self->pmc.const_count; i++) {
+        PMC *c = self->pmc.constants[i];
+        cursor   = Parrot_freeze_pbc(interp, c, self, cursor);
+    }
 
     return cursor;
 }
 
 /*
 
-=item C<int PackFile_find_in_const(PARROT_INTERP, const PackFile_ConstTable *ct,
-PMC *key, int type)>
+=item C<int PackFile_ConstTable_rlookup_num(PARROT_INTERP, const
+PackFile_ConstTable *ct, FLOATVAL n)>
 
-This is really ugly, we don't know where our C<PARROT_ARG_SC> key
-constant is in constant table, so we have to search for it.
+=item C<int PackFile_ConstTable_rlookup_str(PARROT_INTERP, const
+PackFile_ConstTable *ct, STRING *s)>
+
+Reverse lookup a constant in the constant table.
 
 =cut
 
@@ -217,138 +238,48 @@ constant is in constant table, so we have to search for it.
 
 PARROT_EXPORT
 int
-PackFile_find_in_const(PARROT_INTERP,
-        ARGIN(const PackFile_ConstTable *ct), ARGIN(PMC *key), int type)
+PackFile_ConstTable_rlookup_num(PARROT_INTERP,
+    ARGIN(const PackFile_ConstTable *ct), FLOATVAL n)
 {
-    ASSERT_ARGS(PackFile_find_in_const)
-    int      i;
-    FLOATVAL key_num;
-    STRING  *key_str;
+    ASSERT_ARGS(PackFile_ConstTable_rlookup_num)
+    int i;
 
-    GETATTR_Key_str_key(interp, key, key_str);
-    GETATTR_Key_num_key(interp, key, key_num);
-
-    for (i = 0; i < ct->const_count; i++) {
-        if (type == PFC_STRING && ct->constants[i]->u.string == key_str)
-            return i;
-        if (type == PFC_NUMBER && ct->constants[i]->u.number == key_num)
+    for (i = 0; i < ct->num.const_count; i++) {
+        if (ct->num.constants[i] == n)
             return i;
     }
-    Parrot_io_eprintf(NULL, "find_in_const: couldn't find const for key\n");
-    Parrot_exit(interp, 1);
+
+    /* not found */
+    return -1;
 }
 
-/*
-
-=item C<opcode_t * PackFile_Constant_pack(PARROT_INTERP, const
-PackFile_ConstTable *const_table, const PackFile_Constant *self, opcode_t
-*cursor)>
-
-Pack a PackFile Constant into a contiguous region of memory.
-
-Note that the memory block had better have at least the amount of memory
-indicated by C<PackFile_pack_size()>.
-
-This means that you MUST call C<PackFile_pack_size()> before
-C<PackFile_Constant_pack()>
-
-The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
-(Note this padding is not yet implemented for FLOATVALs.)
-
-=cut
-
-*/
-
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-opcode_t *
-PackFile_Constant_pack(PARROT_INTERP,
-        ARGIN(const PackFile_ConstTable *const_table),
-        ARGIN(const PackFile_Constant *self), ARGOUT(opcode_t *cursor))
+int
+PackFile_ConstTable_rlookup_str(PARROT_INTERP,
+    ARGIN(const PackFile_ConstTable *ct), ARGIN(STRING *s))
 {
-    ASSERT_ARGS(PackFile_Constant_pack)
-    PMC *key;
-    size_t i;
-    STRING *image;
+    ASSERT_ARGS(PackFile_ConstTable_rlookup_str)
+    int      i;
 
-    *cursor++ = self->type;
-
-    switch (self->type) {
-
-      case PFC_NUMBER:
-        cursor = PF_store_number(cursor, &self->u.number);
-        break;
-
-      case PFC_STRING:
-        cursor = PF_store_string(cursor, self->u.string);
-        break;
-
-      case PFC_PMC:
-        key = self->u.key;      /* the (Sub) PMC */
-        image = Parrot_freeze(interp, key);
-        cursor = PF_store_string(cursor, image);
-        break;
-
-      case PFC_KEY:
-        for (i = 0, key = self->u.key; key; i++){
-            GETATTR_Key_next_key(interp, key, key);
+    if (ct->string_hash) {
+        HashBucket *bucket = parrot_hash_get_bucket(interp, ct->string_hash, s);
+        if (bucket) {
+            i = (int)PTR2INTVAL(bucket->value);
+            return i;
         }
-
-        /* number of key components */
-        *cursor++ = i;
-        /* and now type / value per component */
-        for (key = self->u.key; key;) {
-            const opcode_t type = PObj_get_FLAGS(key);
-
-            switch (type & KEY_type_FLAGS) {
-              case KEY_integer_FLAG:
-                *cursor++ = PARROT_ARG_IC;
-                GETATTR_Key_int_key(interp, key, *cursor++);
-                break;
-              case KEY_number_FLAG:
-                *cursor++ = PARROT_ARG_NC;
-                /* Argh */
-                *cursor++ = PackFile_find_in_const(interp, const_table, key, PFC_NUMBER);
-                break;
-              case KEY_string_FLAG:
-                *cursor++ = PARROT_ARG_SC;
-                /* Argh */
-                *cursor++ = PackFile_find_in_const(interp, const_table, key, PFC_STRING);
-                break;
-
-              case KEY_integer_FLAG | KEY_register_FLAG:
-                *cursor++ = PARROT_ARG_I;
-                GETATTR_Key_int_key(interp, key, *cursor++);
-                break;
-              case KEY_number_FLAG | KEY_register_FLAG:
-                *cursor++ = PARROT_ARG_N;
-                GETATTR_Key_int_key(interp, key, *cursor++);
-                break;
-              case KEY_string_FLAG | KEY_register_FLAG:
-                *cursor++ = PARROT_ARG_S;
-                GETATTR_Key_int_key(interp, key, *cursor++);
-                break;
-              case KEY_pmc_FLAG | KEY_register_FLAG:
-                *cursor++ = PARROT_ARG_P;
-                GETATTR_Key_int_key(interp, key, *cursor++);
-                break;
-              default:
-                Parrot_io_eprintf(NULL, "PackFile_Constant_pack: "
-                            "unsupported constant type\n");
-                Parrot_exit(interp, 1);
-            }
-            GETATTR_Key_next_key(interp, key, key);
-        }
-
-        break;
-
-      default:
-        Parrot_io_eprintf(NULL, "PackFile_Constant_pack: unsupported constant\n");
-        Parrot_exit(interp, 1);
-        break;
+        return -1;
     }
-    return cursor;
+
+    for (i = 0; i < ct->str.const_count; i++) {
+        STRING *sc = ct->str.constants[i];
+        if (STRING_equal(interp, s, sc)
+        &&  s->encoding == sc->encoding) {
+            return i;
+        }
+    }
+
+    /* not found */
+    return -1;
 }
 
 /*
@@ -371,5 +302,5 @@ leo: rewrite to use new directory-based format.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

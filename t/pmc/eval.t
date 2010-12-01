@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -28,8 +27,8 @@ Tests on-the-fly PASM, PIR and PAST compilation and invocation.
 pasm_output_is( <<'CODE', <<'OUTPUT', "eval_sc" );
     compreg P1, "PASM"	# get compiler
     set_args "0", "print \"in eval\\n\"\nset_returns \"()\"\nreturncc\n"
-    get_results "0", P0
     invokecc P1			# compile
+    get_results "0", P0
     invokecc P0			# eval code P0
     print "back again\n"
     end
@@ -46,11 +45,15 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "call subs in evaled code " );
     compreg P1, "PASM"
     set_args "0", S5
     invokecc P1
+    get_results "0", P2
+    elements I0, P2
+    say I0
     get_global P0, "_foo"
     invokecc P0
     print "back\n"
     end
 CODE
+1
 foo
 back
 OUTPUT
@@ -66,8 +69,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "call 2 subs in evaled code " );
     concat S5, "returncc\n"
     compreg P1, "PASM"
     set_args "0", S5
-    get_results "0", P6
     invokecc P1
+    get_results "0", P6
     get_global P2, "_foo"
     invokecc P2
     print "back\n"
@@ -251,14 +254,15 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string" );
   .local pmc io
   f1 = compi("foo_1", "hello from foo_1")
   \$S0 = f1
-  io = open "$temp_pbc", 'w'
+  io = new ['FileHandle']
+  io.'open'("$temp_pbc", 'w')
   print io, \$S0
-  close io
+  io.'close'()
   load_bytecode "$temp_pbc"
   f2 = compi("foo_2", "hello from foo_2")
-  io = open "$temp2_pbc", 'w'
+  io.'open'("$temp2_pbc", 'w')
   print io, f2
-  close io
+  io.'close'()
   load_bytecode "$temp2_pbc"
 .end
 
@@ -325,16 +329,15 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string - same file" );
   .local pmc io, os
   f1 = compi("foo_1", "hello from foo_1")
   \$S0 = f1
-  io = open "$temp_pbc", 'w'
+  io = new ['FileHandle']
+  io.'open'("$temp_pbc", 'w')
   print io, \$S0
-  close io
+  io.'close'()
   load_bytecode "$temp_pbc"
-  os = new ['OS']
-  os.'rm'("$temp_pbc")
   f2 = compi("foo_2", "hello from foo_2")
-  io = open "$temp_pbc", 'w'
+  io.'open'("$temp_pbc", 'w')
   print io, f2
-  close io
+  io.'close'()
   load_bytecode "$temp_pbc"
 .end
 
@@ -367,9 +370,10 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.freeze" );
   .local pmc io
   f = compi("foo_1", "hello from foo_1")
   \$S0 = freeze f
-  io = open "$temp_file", 'w'
+  io = new ['FileHandle']
+  io.'open'("$temp_file", 'w')
   print io, \$S0
-  close io
+  io.'close'()
   say "written"
 .end
 
@@ -394,18 +398,18 @@ CODE
 written
 OUTPUT
 
-pir_output_is( <<"CODE", <<'OUTPUT', "eval.thaw" );
+pir_output_is( <<"CODE", <<'OUTPUT', "eval.thaw");
 .sub main :main
     .local pmc io, e
     .local string file
     .local int size
     file = "$temp_file"
-    .include "stat.pasm"
-    size = stat file, .STAT_FILESIZE
-    io = open file, 'r'
-    \$S0 = read io, size
-    close io
+    io = new ['FileHandle']
+    io.'open'(file, 'rb')
+    \$S0 = io.'readall'()
+    io.'close'()
     e = thaw \$S0
+    sweep 1 # ensure all of the object survives GC
     e()
     e = get_global "foo_1"
     e()
@@ -421,9 +425,10 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.freeze+thaw" );
   .local pmc io
   f = compi("foo_1", "hello from foo_1")
   \$S0 = freeze f
-  io = open "$temp_file", 'w'
+  io = new ['FileHandle']
+  io.'open'("$temp_file", 'wb')
   print io, \$S0
-  close io
+  io.'close'()
   say "written"
   "read"()
 .end
@@ -457,11 +462,10 @@ MORE
     .local string file
     .local int size
     file = "$temp_file"
-    .include "stat.pasm"
-    size = stat file, .STAT_FILESIZE
-    io = open file, 'r'
-    \$S0 = read io, size
-    close io
+    io = new ['FileHandle']
+    io.'open'(file, 'rb')
+    \$S0 = io.'readall'()
+    io.'close'()
     e = thaw \$S0
     e()
     e = get_global "foo_1"

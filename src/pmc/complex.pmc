@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2004-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2004-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -13,19 +12,59 @@ string parsing/generating and basic mathematical operations.
 
 =head2 Functions
 
+Equations used are sometimes listed.  At times, multiple equations are given,
+but those starting with => are the ones used
+
 =over 4
 
 =cut
 
-Equations used are sometimes listed.  At times, multiple equations are given,
-but those starting with => are the ones used
-
 */
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void complex_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void complex_parse_string(PARROT_INTERP,
+    ARGOUT(FLOATVAL *re),
+    ARGOUT(FLOATVAL *im),
+    ARGIN(STRING *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*re)
+        FUNC_MODIFIES(*im);
+
+static void float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
+        __attribute__nonnull__(1);
+
+static void int_check_divide_zero(PARROT_INTERP, INTVAL value)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_complex_check_divide_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_complex_parse_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(re) \
+    , PARROT_ASSERT_ARG(im) \
+    , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_float_check_divide_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_int_check_divide_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 /*
 
-=item C<static void
-complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value)>
+=item C<static void complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL
+*im, STRING *value)>
 
 Parses the string in C<value> to produce a complex number, represented
 by the real (C<*re>) and imaginary (C<*im>) parts. Raises an exception
@@ -35,10 +74,20 @@ use C<j> instead of C<i>.
 
 =cut
 
+We have a conflict among our coding standards here.  Our 100-character line
+limit meant that the following function declaration had to be split over two
+lines.  However, that leads to t/codingstd/pmc_docs.t reporting that this
+function lacks documentation -- reporting due to differences in whitespacing
+between '=item' and function declaration.
+
 */
 
 static void
-complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
+complex_parse_string(PARROT_INTERP,
+                     ARGOUT(FLOATVAL *re), ARGOUT(FLOATVAL *im), ARGIN(STRING *value))
+{
+    ASSERT_ARGS(complex_parse_string)
+
     char   * const str        = Parrot_str_to_cstring(interp, value);
     char   *t                 = str;
     char   *first_num_offset  = str;
@@ -54,26 +103,26 @@ complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
 
     if (*t == '-') {
         /* first number is negative */
-        t++;
+        ++t;
         first_num_minus = 1;
 
         /* allow for an optional space */
         if (*t == ' ')
-            t++;
+            ++t;
         first_num_offset = t;
     }
 
     /* skip digits */
     while (*t >= '0' && *t <= '9')
-        t++;
+        ++t;
 
     if (*t == '.') {
         /* this number has a decimal point */
-        t++;
+        ++t;
 
         /* skip digits */
         while (*t >= '0' && *t <= '9')
-            t++;
+            ++t;
     }
 
     /* save the length of the real part */
@@ -99,32 +148,32 @@ complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
     else {
         /* skip an optional space */
         if (*t == ' ')
-            t++;
+            ++t;
 
         /* expect "+" or "-" and the imaginary part */
         if (*t == '+' || *t == '-') {
             /* save the sign */
             second_num_minus = (*t == '-');
-            t++;
+            ++t;
 
             /* skip another optional space */
             if (*t == ' ')
-                t++;
+                ++t;
 
             /* save the beginning of the imaginary part */
             second_num_offset = t;
 
             /* skip digits */
             while (*t >= '0' && *t <= '9')
-                t++;
+                ++t;
 
             if (*t == '.') {
                 /* this number has a decimal point */
-                t++;
+                ++t;
 
                 /* skip digits */
                 while (*t >= '0' && *t <= '9')
-                    t++;
+                    ++t;
             }
 
             /* save the length of the imaginary part */
@@ -132,7 +181,7 @@ complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
 
             /* allow for one more optional space */
             if (*t == ' ')
-                t++;
+                ++t;
 
             /* verify that the string ends properly */
             if ((*t != 'i' && *t != 'j') || (*(t+1) != 0)) {
@@ -192,24 +241,58 @@ complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
     Parrot_str_free_cstring(str);
 }
 
+/*
+
+=item C<static void int_check_divide_zero(PARROT_INTERP, INTVAL value)>
+
+=cut
+
+*/
+
 static void
-int_check_divide_zero(PARROT_INTERP, INTVAL value) {
+int_check_divide_zero(PARROT_INTERP, INTVAL value)
+{
+    ASSERT_ARGS(int_check_divide_zero)
+
     if (value == 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
 }
 
+/*
+
+=item C<static void float_check_divide_zero(PARROT_INTERP, FLOATVAL value)>
+
+=cut
+
+*/
+
 static void
-float_check_divide_zero(PARROT_INTERP, FLOATVAL value) {
+float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
+{
+    ASSERT_ARGS(float_check_divide_zero)
+
     if (FLOAT_IS_ZERO(value))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
 }
 
+/*
+
+=item C<static void complex_check_divide_zero(PARROT_INTERP, PMC *value)>
+
+=cut
+
+*/
+
 static void
-complex_check_divide_zero(PARROT_INTERP, PMC *value) {
+complex_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value))
+{
+    ASSERT_ARGS(complex_check_divide_zero)
+
     /* Throw an exception if we are dividing by zero. Check both the real part
      * and the imaginary part.*/
+
     if (FLOAT_IS_ZERO(VTABLE_get_number_keyed_int(interp, value, 0))
             && FLOAT_IS_ZERO(VTABLE_get_number_keyed_int(interp, value, 1)))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -217,41 +300,10 @@ complex_check_divide_zero(PARROT_INTERP, PMC *value) {
 }
 
 
-pmclass Complex auto_attrs {
+pmclass Complex provides complex provides scalar auto_attrs {
 
     ATTR FLOATVAL re; /* real part */
     ATTR FLOATVAL im; /* imaginary part */
-
-/*
-
-=item C<opcode_t *invoke(void *next)>
-
-Pythonic object constructor. SELF is a Complex Class object. Return a new
-C<complex> object according to 2.1. Built-in Functions.
-
-=cut
-
-*/
-    VTABLE opcode_t *invoke(void *next) {
-        const int   argcP = REG_INT(interp, 3);
-        PMC * const res   = Parrot_pmc_new(INTERP, enum_class_Complex);
-
-        if (argcP == 1) {
-            PMC * const arg = REG_PMC(interp, 5);
-
-            if (arg->vtable->base_type == enum_class_String)
-                VTABLE_set_string_native(INTERP, res, VTABLE_get_string(interp, arg));
-            else
-                SET_ATTR_re(INTERP, res, VTABLE_get_number(INTERP, arg));
-        }
-        else if (argcP == 2) {
-            SET_ATTR_re(INTERP, res, VTABLE_get_number(INTERP, REG_PMC(interp, 5)));
-            SET_ATTR_im(INTERP, res, VTABLE_get_number(INTERP, REG_PMC(interp, 6)));
-        }
-
-        REG_PMC(interp, 5) = res;
-        return (opcode_t *)next;
-    }
 
 /*
 
@@ -284,31 +336,31 @@ Creates an identical copy of the complex number.
     }
 
     VTABLE void init_pmc(PMC *initializer) {
-        const INTVAL arg_type = VTABLE_type(interp, initializer);
+        const INTVAL arg_type = VTABLE_type(INTERP, initializer);
         SELF.init();
         switch (arg_type) {
           case enum_class_String:
-            SELF.set_string_native(VTABLE_get_string(interp, initializer));
+            SELF.set_string_native(VTABLE_get_string(INTERP, initializer));
             break;
           case enum_class_FixedFloatArray:
           case enum_class_ResizableFloatArray:
           case enum_class_FixedIntegerArray:
           case enum_class_ResizableIntegerArray:
-            if (VTABLE_get_integer(interp, initializer) == 2) {
-                FLOATVAL re = VTABLE_get_number_keyed_int(interp, initializer, 0);
-                FLOATVAL im = VTABLE_get_number_keyed_int(interp, initializer, 1);
+            if (VTABLE_get_integer(INTERP, initializer) == 2) {
+                const FLOATVAL re = VTABLE_get_number_keyed_int(INTERP, initializer, 0);
+                const FLOATVAL im = VTABLE_get_number_keyed_int(INTERP, initializer, 1);
                 SET_ATTR_re(INTERP, SELF, re);
                 SET_ATTR_im(INTERP, SELF, im);
                 break;
             }
             /* else let it fall to default */
           default:
-            if (VTABLE_isa(interp, initializer, CONST_STRING(interp, "String"))) {
-                STRING * s = VTABLE_get_string(interp, initializer);
+            if (VTABLE_isa(INTERP, initializer, CONST_STRING(INTERP, "String"))) {
+                STRING * const s = VTABLE_get_string(INTERP, initializer);
                 SELF.set_string_native(s);
             }
             else {
-                Parrot_ex_throw_from_c_args(interp, NULL,
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
                         EXCEPTION_INVALID_OPERATION,
                         "Invalid Complex initializer");
             }
@@ -325,6 +377,42 @@ Creates an identical copy of the complex number.
         SET_ATTR_im(INTERP, dest, im);
 
         return dest;
+    }
+
+/*
+
+=item C<void freeze(PMC *visit)>
+
+=item C<void thaw(PMC *visit)>
+
+Serialize/deserialize this object for bytecode.
+
+=cut
+
+*/
+
+    VTABLE void freeze(PMC *visit) {
+        FLOATVAL re, im;
+
+        SUPER(visit);
+
+        GET_ATTR_re(INTERP, SELF, re);
+        VTABLE_push_float(INTERP, visit, re);
+
+        GET_ATTR_im(INTERP, SELF, im);
+        VTABLE_push_float(INTERP, visit, im);
+    }
+
+    VTABLE void thaw(PMC *visit) {
+        FLOATVAL re, im;
+
+        SUPER(visit);
+
+        re = VTABLE_shift_float(INTERP, visit);
+        SET_ATTR_re(INTERP, SELF, re);
+
+        im = VTABLE_shift_float(INTERP, visit);
+        SET_ATTR_im(INTERP, SELF, im);
     }
 
 /*
@@ -412,21 +500,21 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
 
     VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
         FLOATVAL value;
-        if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "real"))) {
+        if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "real"))) {
             GET_ATTR_re(INTERP, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "imag"))) {
+        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "imag"))) {
             GET_ATTR_im(INTERP, SELF, value);
         }
         else
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_INVALID_OPERATION, "Complex: key is neither 'real' or 'imag'");
         return value;
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        if (VTABLE_isa(interp, key, CONST_STRING(interp, "Integer"))) {
-            const INTVAL i = VTABLE_get_integer(interp, key);
+        if (VTABLE_isa(INTERP, key, CONST_STRING(INTERP, "Integer"))) {
+            const INTVAL i = VTABLE_get_integer(INTERP, key);
             return SELF.get_pmc_keyed_int(i);
         }
         else {
@@ -486,7 +574,7 @@ Set real or imag depending on key
             GET_ATTR_im(INTERP, SELF, f);
             break;
           default:
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
                     EXCEPTION_INVALID_OPERATION, "Complex: key must be 0 or 1");
         }
         return f;
@@ -501,7 +589,7 @@ Set real or imag depending on key
             SET_ATTR_im(INTERP, SELF, v);
             break;
           default:
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
                     EXCEPTION_INVALID_OPERATION, "Complex: key must be 0 or 1");
         }
     }
@@ -587,8 +675,8 @@ to C<value>.
     }
 
     VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
-        if (VTABLE_isa(interp, key, CONST_STRING(interp, "Integer"))) {
-            const INTVAL i = VTABLE_get_integer(interp, key);
+        if (VTABLE_isa(INTERP, key, CONST_STRING(INTERP, "Integer"))) {
+            const INTVAL i = VTABLE_get_integer(INTERP, key);
             SELF.set_number_keyed_int(i, value);
         }
         else {
@@ -598,14 +686,14 @@ to C<value>.
     }
 
     VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
-        if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "real"))) {
+        if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "real"))) {
             SET_ATTR_re(INTERP, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "imag"))) {
+        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "imag"))) {
             SET_ATTR_im(INTERP, SELF, value);
         }
         else
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_INVALID_OPERATION, "Complex: key is neither 'real' or 'imag'");
     }
 
@@ -1165,7 +1253,7 @@ Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
         d = sqrt(re*re + im*im);
 
         dest = Parrot_pmc_new(INTERP,
-            Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
+            Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_Float));
 
         VTABLE_set_number_native(INTERP, dest, d);
         return dest;
@@ -1800,12 +1888,12 @@ x ^ y = exp(y * ln x))
         PMC *log;
         PMC *dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        Parrot_pcc_invoke_method_from_c_args(interp, SELF, CONST_STRING(interp, "ln"),
+        Parrot_pcc_invoke_method_from_c_args(INTERP, SELF, CONST_STRING(INTERP, "ln"),
                     "->P", &log);
 
         l = VTABLE_multiply(INTERP, log, value, l);
 
-        Parrot_pcc_invoke_method_from_c_args(interp, l, CONST_STRING(interp, "exp"),
+        Parrot_pcc_invoke_method_from_c_args(INTERP, l, CONST_STRING(INTERP, "exp"),
                     "->P", &dest);
         RETURN(PMC *dest);
     }
@@ -1840,5 +1928,5 @@ x ^ y = exp(y * ln x))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

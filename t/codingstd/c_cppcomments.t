@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -20,7 +19,7 @@ t/codingstd/c_cppcomments.t - checks for C++ style comments
     % prove t/codingstd/c_cppcomments.t
 
     # test specific files
-    % perl t/codingstd/c_cppcoments.t src/foo.t include/parrot/bar.h
+    % perl t/codingstd/c_cppcomments.t src/foo.t include/parrot/bar.h
 
 =head1 DESCRIPTION
 
@@ -60,9 +59,9 @@ sub check_cppcomments {
                    (?: ' (?: \\\\ | \\' | [^'] )* ' )  # remove ' string
                  | (?: " (?: \\\\ | \\" | [^"] )* " )  # remove " string
                  | /\* .*? \*/                         # remove C comment
-		 | https?:\/\/                         # TT # 414 quick fix
+                 | https?:\/\/                         # TT # 414 quick fix
                )
-            }{}gsx;
+             }{}gsx;
 
     return $buf !~ m{ ( .*? // .* ) }x;
 }

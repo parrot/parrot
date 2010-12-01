@@ -1,6 +1,5 @@
-#!parrot
+#!./parrot
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 
 =head1 NAME
@@ -9,6 +8,7 @@ t/pmc/packfileannotations.t - test the PackfileAnnotations PMC
 
 =head1 SYNOPSIS
 
+    % make test_prep
     % prove t/pmc/packfileannotations.t
 
 =head1 DESCRIPTION
@@ -18,6 +18,9 @@ Tests the PackfileAnnotations PMC.
 =cut
 
 .include 't/pmc/testlib/packfile_common.pir'
+
+.const string annofilename = 't/pmc/testlib/annotations.pbc'
+
 
 .sub 'main' :main
 .include 'test_more.pir'
@@ -40,11 +43,21 @@ Tests the PackfileAnnotations PMC.
 .sub 'test_unpack'
     .local pmc pf
 
-    $P0 = open 't/native_pbc/annotations.pbc'
+    push_eh load_error
+    $P0 = new ['FileHandle']
+    $P0.'open'(annofilename, 'r')
+    $P0.'encoding'('binary')
     $S0 = $P0.'readall'()
     pf = new 'Packfile'
     pf = $S0
+    pop_eh
     .tailcall '!test_unpack'(pf)
+load_error:
+    .get_results($P0)
+    pop_eh
+    report_load_error($P0, "PackfileAnnotations unpack failed to load test file")
+    skip(7, "PackfileAnnotations unpack tests failed")
+    .return()
 .end
 
 # Programatically create PBC same as t/native_pbc/annotations.pbc and check unpack of it.
@@ -52,10 +65,6 @@ Tests the PackfileAnnotations PMC.
     .local pmc pf, pfdir
     pf = new 'Packfile'
     pfdir = pf.'get_directory'()
-    #$P0 = new 'PackfileConstantTable'
-    #$P0[0] = 42.0
-    $P0 = new 'PackfileFixupTable'
-    pfdir["FIXUP_t/pmc/packfileannotations.t"] = $P0
 
     $P1 = new 'PackfileRawSegment'
     pfdir["BYTECODE_t/pmc/packfileannotations.t"] = $P1
@@ -87,6 +96,9 @@ Tests the PackfileAnnotations PMC.
     $P6.'set_name'('line')
     $P6 = 2
     anns[3] = $P6
+
+    # Make sure the mark vtable is exercised and the content survives
+    sweep 1
 
     # Pack
     $S0 = pf
@@ -146,7 +158,7 @@ Tests the PackfileAnnotations PMC.
   fail:
     nok(1, "PackfileAnnotations wasn't found in Directory")
     # BAIL_OUT
-    skip(9, "PackfileAnnotations tests failed")
+    skip(7, "PackfileAnnotations tests failed")
 .end
 
 # Local Variables:

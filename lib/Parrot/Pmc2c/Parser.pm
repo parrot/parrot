@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2008, Parrot Foundation.
-# $Id$
 
 package Parrot::Pmc2c::Parser;
 
@@ -279,7 +278,7 @@ sub find_methods {
         }
         else {
 
-            # Name-mangle NCI and multi methods to avoid conflict with vtable methods.
+            # Name-mangle NCI and multi methods to avoid conflict with vtables
             if ( $marker) {
                 if ( $marker =~ /MULTI/ ) {
                     $method->type(Parrot::Pmc2c::Method::MULTI);

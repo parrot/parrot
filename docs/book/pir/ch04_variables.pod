@@ -31,17 +31,6 @@ operator:
 
 =end PIR_FRAGMENT
 
-X<exchange opcode>
-The C<exchange> opcode swaps the contents of two variables of the same type.
-This example sets C<$I0> to the value of C<$I1> and sets C<$I1> to the value
-of C<$I0>.
-
-=begin PIR_FRAGMENT
-
-  exchange $I0, $I1
-
-=end PIR_FRAGMENT
-
 X<null opcode>
 The C<null> opcode sets an integer or number variable to a zero value,
 and undefines a string or object.
@@ -99,12 +88,12 @@ Unary opcodes have a single argument.  They either return a result or
 modify the argument in place. Some of the most common unary numeric
 opcodes are C<inc> (increment)X<inc opcode>, C<dec> (decrement)X<dec
 opcode>, C<abs> (absolute value)X<abs opcode>, C<neg> (negate)X<neg
-opcode>, and C<fact> (factorial)X<fact opcode>:
+opcode>:
 
 =begin PIR_FRAGMENT
 
   $N0 = abs -5.0  # the absolute value of -5.0 is 5.0
-  $I1 = fact  5   # the factorial of 5 is 120
+  $I0 = 120
   inc $I1         # 120 incremented by 1 is 121
 
 =end PIR_FRAGMENT
@@ -144,12 +133,16 @@ C<exsec>X<exsec opcode> (exsecant), C<hav>X<hav opcode> (haversine), and
 C<vers>X<vers opcode> (versine).  All angle arguments for the X<trigonometric
 opcodes> trigonometric opcodes are in radians:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'trans_ops'
+
+  # ...
 
   $N0 = sin $N1
   $N0 = exp 2
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 The majority of the floating-point operations have a single argument and a
 single result. The arguments can generally be either an integer or number, but
@@ -178,14 +171,18 @@ it's false and the second argument otherwise:
 The C<or>X<or opcode> opcode returns the first argument if
 it's true and the second argument otherwise:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'bit_ops'
+
+  # ...
 
   $I0 = or 1, 0  # returns 1
   $I0 = or 0, 2  # returns 2
 
   $P0 = or $P1, $P2
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 Both C<and> and C<or> are short-circuiting ops. If they can determine what
 value to return from the first argument, they'll never evaluate the second.
@@ -221,30 +218,42 @@ C<band>X<band opcode>, C<bor>X<bor opcode>, and C<bxor>X<bxor opcode> return a
 value that is the logical AND, OR, or XOR of each bit in the source arguments.
 They each take two arguments.
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'bit_ops'
+
+  # ...
 
   $I0 = bor $I1, $I2
   $P0 = bxor $P1, $I2
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 C<band>, C<bor>, and C<bxor> also have variants that modify the result
 in place.
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'bit_ops'
+
+  # ...
 
   $I0 = band $I1
   $P0 = bor $P1
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 C<bnot>X<bnot opcode> is the logical NOT of each bit in the source argument.
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'bit_ops'
+
+  # ...
 
   $I0 = bnot $I1
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 X<shl opcode>
 X<shr opcode>
@@ -252,13 +261,17 @@ X<lsr opcode>
 The logical and arithmetic shift operations shift their values by a specified
 number of bits:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
+
+  .loadlib 'bit_ops'
+
+  # ...
 
   $I0 = shl $I1, $I2        # shift $I1 left by count $I2
   $I0 = shr $I1, $I2        # arithmetic shift right
   $P0 = lsr $P1, $P2        # logical shift right
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 =head2 Working with Strings
 
@@ -489,34 +502,35 @@ It generates a new string, "bc", in the destination register C<$S0>.
 When the offset position is negative, it counts backward from the end of the
 string. Thus an offset of -1 starts at the last character of the string.
 
-C<substr> also has a four-argument form, where the fourth argument is a string
-used to replace the substring. This variant modifies the source string and
-returns the removed substring.
+C<substr> no longer has a four-argument form, as in-place string operations
+have been removed.  There is a C<replace> operator which will perform the
+replacement and return a new_string without modifying the old_string.
+The arguments are new_string, old_string, offset, count and
+replacement_string.  The old_string is copied to the new_string with the
+replacement_string inserted from offset replacing the content for count
+characters.
 
-This example above replaces the substring "bc" in C<$S1> with the string "XYZ",
-and returns "bc" in C<$S0>:
+This example replaces the substring "bc" in C<$S1> with the string "XYZ",
+and returns "aXYZde" in C<$S0>, C<$S1> is not changed:
 
 =begin PIR_FRAGMENT
 
   $S1 = "abcde"
-  $S0 = substr $S1, 1, 2, "XYZ"
-  say $S0                        # prints "bc"
-  say $S1                        # prints "aXYZde"
+  $S0 = replace $S1, 1, 2, "XYZ"
+  say $S0                        # prints "aXYZde"
+  say $S1                        # prints "abcde"
 
 =end PIR_FRAGMENT
 
-When the offset position in a replacing C<substr> is one character beyond the
-original string length, C<substr> appends the replacement string just like the
+When the offset position in a C<replace> is one character beyond the original
+string length, C<replace> appends the replacement string just like the
 concatenation operator. If the replacement string is an empty string, the
-opcode removes the characters from the original string.
-
-If you don't need to capture the replaced string, an optimized version of
-C<substr> performs a replace without returning the removed substring:
+opcode removes the characters from the original string in the new string.
 
 =begin PIR_FRAGMENT
 
   $S1 = "abcde"
-  $S1 = substr 1, 2, "XYZ"
+  $S1 = replace $S1, 1, 2, "XYZ"
   say $S1                        # prints "aXYZde"
 
 =end PIR_FRAGMENT
@@ -897,15 +911,20 @@ The numeric bitwise opcodes also have string variants for AND, OR, and XOR:
 C<bors>X<bors opcode>, C<bands>X<bands opcode>, and C<bxors>X<bxors opcode>.
 These take string or string-like PMC arguments and perform the logical
 operation on each byte of the strings to produce the result string.
+Remember that in-place string operations are no longer available.
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
 
-  $S0 = bors $S1
+  .loadlib 'bit_ops'
+
+  # ...
+
+  $P0 = bors $P1
   $P0 = bands $P1
   $S0 = bors $S1, $S2
   $P0 = bxors $P1, $S2
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 The bitwise string opcodes produce meaningful results only when used with
 simple ASCII strings, because Parrot performs bitwise operations per byte.
@@ -947,17 +966,17 @@ world. A modern string system must also handle different encodings --
 ways to represent various charsets in memory and on disk.
 
 Every string in Parrot has an associated encoding and character set. The default
-charset is 8-bit ASCII, which is almost universally supported.  Double-quoted
-string constants can have an optional prefix specifying the string's encoding
-and charset.N<As you might suspect, single-quoted strings do not support this.>
+format is 8-bit ASCII, which is almost universally supported.  Double-quoted
+string constants can have an optional prefix specifying the string's
+format.N<As you might suspect, single-quoted strings do not support this.>
 Parrot tracks information about encoding and charset internally, and
 automatically converts strings when necessary to preserve these
-characteristics. Strings constants may have prefixes of the form C<encoding:charset:>.
+characteristics. Strings constants may have prefixes of the form C<format:>.
 
 =begin PIR_FRAGMENT
 
-  $S0 = utf8:unicode:"Hello UTF-8 Unicode World!"
-  $S1 = utf16:unicode:"Hello UTF-16 Unicode World!"
+  $S0 = utf8:"Hello UTF-8 Unicode World!"
+  $S1 = utf16:"Hello UTF-16 Unicode World!"
   $S2 = ascii:"This is 8-bit ASCII"
   $S3 = binary:"This is raw, unformatted binary data"
 
@@ -968,11 +987,10 @@ X<Latin 1 character set>
 X<UCS-2 encoding>
 X<UTF-8 encoding>
 X<UTF-16 encoding>
-Parrot supports the character sets C<ascii>, C<binary>, C<iso-8859-1>
-(Latin 1), and C<unicode> and the encodings C<fixed_8>, C<ucs2>,
-C<utf8>, and C<utf18>.
+Parrot supports the formats C<ascii>, C<binary>, C<iso-8859-1>
+(Latin 1), C<utf8>, C<utf16>, C<ucs2>, and C<ucs4>.
 
-The C<binary:> charset treats the string as a buffer of raw unformatted
+The C<binary> format treats the string as a buffer of raw unformatted
 binary data. It isn't really a string per se, because binary data
 contains no readable characters. This exists to support libraries which
 manipulate binary data that doesn't easily fit into any other primitive
@@ -1732,7 +1750,7 @@ virtual root for the currently selected HLL.
   $P0 = get_hll_namespace
 
 Each of these three opcodes can take a key argument to retrieve a namespace
-under the currenly selected namespace, root namespace, or HLL root namespace:
+under the currently selected namespace, root namespace, or HLL root namespace:
 
   $P0 = get_namespace ["Duck"]
   $P0 = get_root_namespace ["General";"Electric"]

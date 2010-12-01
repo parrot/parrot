@@ -1,13 +1,12 @@
 #!perl
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 97;
+use Parrot::Test tests => 99;
 
 =head1 NAME
 
@@ -39,11 +38,12 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "var_args - parsing" );
 .pcc_sub main:
     print "Ok 1\n"
     set_args "0, 0", P0, I0
-    get_results "0", I0
     find_name P1, "foo"
     print "Ok 2\n"
     invokecc P1
     print "Ok 5\n"
+    get_results "0", I0
+    print "Ok 6\n"
     end
 .pcc_sub foo:
     get_params "0, 0", P0, I0
@@ -57,6 +57,7 @@ Ok 2
 Ok 3
 Ok 4
 Ok 5
+Ok 6
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "call - i, ic" );
@@ -84,9 +85,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "call - i, ic, return i, ic" );
 .pcc_sub main:
     set I16, 77
     set_args "0, 0", 42, I16
-    get_results "0, 0", I16, I17
     find_name P1, "foo"
     invokecc P1
+    get_results "0, 0", I16, I17
     print I16
     print "\n"
     print I17
@@ -113,9 +114,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "call - i, ic, return i, ic - adjust sig" 
 .pcc_sub main:
     set I16, 77
     set_args "0, 0", 42, I16
-    get_results "0, 0", I16, I17
     find_name P1, "foo"
     invokecc P1
+    get_results "0, 0", I16, I17
     print I16
     print "\n"
     print I17
@@ -146,9 +147,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "all together now" );
     new P16, 'Integer'
     set P16, 101
     set_args "0, 0, 0, 0, 0, 0, 0", 42, I16, 4.5, N16, S16, "ok 2\n", P16
-    get_results "0, 0, 0, 0", I16, N16, S16, P16
     find_name P1, "foo"
     invokecc P1
+    get_results "0, 0, 0, 0", I16, N16, S16, P16
     print I16
     print "\n"
     print N16
@@ -578,9 +579,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get_param later" );
 .pcc_sub main:
     set I16, 77
     set_args "0, 0", 42, I16
-    get_results "0, 0", I16, I17
     find_name P1, "foo"
     invokecc P1
+    get_results "0, 0", I16, I17
     print I16
     print "\n"
     print I17
@@ -608,8 +609,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 1" );
 .sub main :main
     .const 'Sub' f = "foo"
     print "main\n"
-    get_results "0", $S0
     invokecc f
+    get_results "0", $S0
     print $S0
 .end
 .sub foo
@@ -633,8 +634,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 2 - pass arg" );
 .sub main :main
     .const 'Sub' f = "foo"
     print "main\n"
-    get_results "0", $S0
     invokecc f
+    get_results "0", $S0
     print $S0
 .end
 .sub foo
@@ -662,8 +663,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 3 - pass arg" );
 .sub main :main
     .const 'Sub' f = "foo"
     print "main\n"
-    get_results "0", $S0
     invokecc f
+    get_results "0", $S0
     print $S0
 .end
 .sub foo
@@ -991,13 +992,13 @@ pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing" );
     f(o, "ok 4\n")
 .end
 .namespace ["Foo"]
-.sub bar :method
+.sub bar :method :nsentry('bar')
     .param string s
     print self
     print " "
     print s
 .end
-.sub baz :method
+.sub baz :method :nsentry('baz')
     .param string s
     print self
     print " "
@@ -1245,25 +1246,23 @@ CODE
 /too few positional arguments: 3 passed, 4 \(or more\) expected/
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "tailcall to NCI" );
+pir_output_is( <<'CODE', <<'OUTPUT', "faux tailcall to NCI" );
 .sub main :main
     .local pmc s
     s = new 'String'
-    s = "OK 1\n"
-    $S0 = s."lower"()
-    print $S0
-    s = "OK 2\n"
-    $S1 = foo(s)
-    print $S1
+    $I0 = s."is_integer"(22)
+    say $I0
+    $I1 = foo(s)
+    say $I1
 .end
 .sub foo
     .param pmc s
-    $S0 = s."lower"()
-    .return ($S0)
+    $I0 = s."is_integer"(22)
+    .return ($I0)
 .end
 CODE
-ok 1
-ok 2
+1
+1
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall to NCI - 2" );
@@ -1406,10 +1405,7 @@ CODE
 ok
 OUTPUT
 
-my @todo = ( todo => 'broken with JIT (TT #983)' )
-    if ( defined $ENV{TEST_PROG_ARGS} and
-        $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ );
-pir_output_is( <<'CODE', <<'OUTPUT', "clone_key_arg", @todo );
+pir_output_is( <<'CODE', <<'OUTPUT', "clone_key_arg" );
 .sub main :main
     foo()
     print "ok\n"
@@ -1451,7 +1447,13 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "result_info op" );
 .sub main :main
     test()
+    $P0 = new 'FixedIntegerArray'
+    set_result_info $P0
+    $P0 = 1
     $I0 = test()
+    $P0 = new 'FixedIntegerArray'
+    $P0 = 3
+    set_result_info $P0
     ($I1, $I2, $I3) = test()
 .end
 
@@ -1480,8 +1482,18 @@ pir_output_is( <<'CODE', <<'OUTPUT', "result_info op with eval" );
 TESTSUB
     $P0 = compreg "PIR"
     $P1 = $P0($S0)
+    $P0 = new 'FixedIntegerArray'
+    set_result_info $P0
     test()
+
+    $P0 = new 'FixedIntegerArray'
+    $P0 = 1
+    set_result_info $P0
     $I0 = test()
+
+    $P0 = new 'FixedIntegerArray'
+    $P0 = 3
+    set_result_info $P0
     ($I1, $I2, $I3) = test()
 .end
 CODE
@@ -1572,7 +1584,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "set_args via explicit continuation" );
     result = "not ok 2\n"
     .local pmc cont
     cont = new 'Continuation'
-    set_addr cont, cont_dest
+    set_label cont, cont_dest
     bar(cont, "ok 1\n")
     print "oops\n"
 cont_dest:
@@ -1599,7 +1611,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall explicit continuation, no args" )
     result = "not ok 2\n"
     .local pmc cont
     cont = new 'Continuation'
-    set_addr cont, cont_dest
+    set_label cont, cont_dest
     bar(cont, "ok 1\n")
     print "oops\n"
 cont_dest:
@@ -1628,7 +1640,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "newclosure followed by tailcall" );
         .lex "MAIN-CONT", $P41
         $I42 = 10
         $P41 = new 'Continuation'
-        set_addr $P41, L2
+        set_label $P41, L2
         goto L3
 L2:
         get_results '0', $P45
@@ -1711,9 +1723,9 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "named - 1" );
 .pcc_sub main:
     set_args "0x200, 0, 0x200, 0", "b", 10, "a", 20
-    get_results ""
     find_name P1, "foo"
     invokecc P1
+    get_results ""
     print "ok\n"
     end
 .pcc_sub foo:
@@ -1734,9 +1746,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "named - 2 flatten" );
     set P0['a'], 20
     set P0['b'], 10
     set_args "0x220", P0            # :flatten :named
-    get_results ""
     find_name P1, "foo"
     invokecc P1
+    get_results ""
     print "ok\n"
     end
 .pcc_sub foo:
@@ -1784,9 +1796,9 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "named - 3 slurpy hash" );
 .pcc_sub main:
     set_args "0x200, 0, 0x200, 0,0x200, 0", "a", 10, "b", 20, 'c', 30
-    get_results ""
     find_name P1, "foo"
     invokecc P1
+    get_results ""
     print "ok\n"
     end
 .pcc_sub foo:
@@ -1815,9 +1827,9 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "named - 4 positional -> named" );
 .pcc_sub main:
     set_args  "0, 0, 0", 10, 20, 30
-    get_results ""
     find_name P1, "foo"
     invokecc P1
+    get_results ""
     print "ok\n"
     end
 .pcc_sub foo:
@@ -1837,9 +1849,9 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "named - 5 slurpy array -> named" );
 .pcc_sub main:
     set_args  "0, 0, 0, 0x200, 0, 0x200, 0", 10, 20, 30, 'a', 40, 'b', 50
-    get_results ""
     find_name P1, "foo"
     invokecc P1
+    get_results ""
     print "ok\n"
     end
 .pcc_sub foo:
@@ -2461,7 +2473,7 @@ foo
 OUTPUT
 
 # See Rakudo queue http://rt.perl.org/rt3/Ticket/Display.html?id=62730
-pir_output_is( <<'CODE', <<'OUTPUT', "Handling :flat of emtpy arguments" );
+pir_output_is( <<'CODE', <<'OUTPUT', "Handling :flat of empty arguments" );
 .sub 'main'
     $P0   = new ['Undef']
     ($P0) = foo()
@@ -2506,6 +2518,79 @@ $I1 = 2
 .end
 CODE
 2
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "methodtailcall 1 TT#133" );
+
+.sub main
+    say "main"
+    $P0 = foo() ## fails :-(
+    $P0 = bar()
+    say "done"
+.end
+
+.sub foo
+    .local pmc p
+    say "foo"
+    p = new "Class"
+    .tailcall p."attributes"()
+.end
+
+.sub bar
+    .local pmc  p
+    say "bar"
+    p = new "Class"
+    $P0 = p."attributes"()
+    .return ($P0)
+.end
+
+CODE
+main
+foo
+bar
+done
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "handling of slurpy after optional, TT #1733" );
+
+# Lua calling convention scheme
+
+# f() has 2 known parameters
+.sub 'f'
+    .param pmc p1 :optional
+    .param int has_p1 :opt_flag
+    .param pmc p2 :optional
+    .param int has_p2 :opt_flag
+    .param pmc extra :slurpy
+    unless has_p1 goto L1
+    say p1
+    unless has_p2 goto L1
+    say p2
+    $P0 = iter extra
+  L2:
+    unless $P0 goto L1
+    $P1 = shift $P0
+    say $P1
+    goto L2
+  L1:
+.end
+
+.sub 'main' :main
+    $P1 = box "p1"
+    $P2 = box "p2"
+    $P3 = box "p3"
+    f($P1, $P2, $P3)
+    f($P1, $P2)
+    f($P1)
+.end
+
+CODE
+p1
+p2
+p3
+p1
+p2
+p1
 OUTPUT
 
 # Local Variables:

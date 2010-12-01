@@ -1,7 +1,6 @@
 #! perl
 
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -49,7 +48,7 @@ our %deps;
 
 foreach my $file (sort grep /\.[hc]$/, @incfiles) {
     # For now, skip any files that have generated dependencies
-    next if $file =~ m{src/(ops|dynoplibs|dynpmc|pmc)/};
+    next if $file =~ m{src/pmc/};
     next if $file =~ m{src/string/(charset|encoding)/};
 
     open my $fh, '<', $file;
@@ -68,22 +67,30 @@ foreach my $file (sort grep /\.[hc]$/, @incfiles) {
 
     $deps{$file} = [ ];
     foreach my $include (@includes) {
-        # same dir as file?
-        my $file_dir = (File::Spec->splitpath($file))[1];
-        my $make_dep = collapse_path(File::Spec->catfile($file_dir, $include));
-        if (defined($make_dep) && -f $make_dep) {
-            push @{$deps{$file}}, $make_dep;
-            next;
+        my $found;
+
+        my @include_dirs;
+        push @include_dirs, (File::Spec->splitpath($file))[1];
+        push @include_dirs, 'include';
+        push @include_dirs, 'include/pmc';
+
+        for my $path (@include_dirs) {
+            next if $found;
+
+            my $make_dep = collapse_path(File::Spec->catfile($path, $include));
+            if (defined($make_dep) && -f $make_dep) {
+                push @{$deps{$file}}, $make_dep;
+                $found = 1;
+            }
         }
 
-        # global 'include' dir?
-        $make_dep = collapse_path(File::Spec->catfile('include', $include));
-        if (defined($make_dep) && -f $make_dep) {
-            push @{$deps{$file}}, $make_dep;
-            next;
-        }
-
-        diag "couldn't find $include, included from $file";
+        diag "couldn't find $include, included from $file"
+           unless $found;
+    }
+    # always require an explicit .o -> .c dep. This is lazy and not always
+    # needed. However, missing it when it is needed causes pain.
+    if ($file =~ /\.c$/) {
+        push @{$deps{$file}}, $file;
     }
 }
 
@@ -267,7 +274,7 @@ sub check_files {
         $rule_deps        = join "\n", sort split /\s+/, $rule_deps;
         my $expected_deps = join "\n", sort (get_deps($file));
 
-        eq_or_diff_text($rule_deps, $expected_deps, "$file has correct dependencies $extra_info.", {context => 0});
+        eq_or_diff_text($rule_deps, $expected_deps, "$file $extra_info.", {context => 0});
     }
 }
 

@@ -1,5 +1,4 @@
 # Copyright (C) 2005, Parrot Foundation.
-# $Id$
 
 package init::hints::openbsd;
 
@@ -21,10 +20,17 @@ sub runstep {
     if ( $libs !~ /-lpthread\b/ ) {
         $libs .= ' -lpthread';
     }
+
+    my $ldflags = $conf->data->get('ldflags');
+    if ( $ldflags !~ m|-L/usr/local/lib\b| ) {
+        $ldflags .= ' -L/usr/local/lib';
+    }
+
     $conf->data->set(
-        libs  => $libs,
-        link  => 'g++',
-        rpath => '-Wl,-R',
+        ldflags => $ldflags,
+        libs    => $libs,
+        link    => 'g++',
+        rpath   => '-Wl,-R',
 
         has_dynamic_linking    => 1,
         parrot_is_shared       => 1,

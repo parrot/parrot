@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -13,9 +12,7 @@ examples/io/http.pir - HTTP client
 
 HTTP client, connects to WWW port and grabs a page (L<http://www.ibm.com>).
 
-You should be running the echo service on your box (port 7). Be sure to
-set C<PARROT_NET_DEVEL> to 1 in F<io/io_private.h> and rebuld Parrot or
-the network layer won't exist.
+You should be running the echo service on your box (port 7).
 
 =cut
 
@@ -53,7 +50,7 @@ ERR:
     print "Socket error\n"
     end
 END:
-    close sock
+    sock.'close'()
     end
 .end
 

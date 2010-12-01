@@ -1,7 +1,6 @@
 #! perl
 
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -43,7 +42,7 @@ existing files.
 
 =cut
 
-main(\@ARGV);
+main(@ARGV);
 
 =head1 INTERNAL DATA STRUCTURES
 
@@ -117,9 +116,11 @@ similarly-named file.
 =cut
 
 sub main {
-    my $argv      = shift;
+    my $filename  = shift;
     my $stats     = {};
-    my $filename  = $argv->[0];
+
+    die "Usage: $0 filename\n"
+        unless defined $filename;
 
     $stats->{global_stats}{total_time} = 0;
 
@@ -128,8 +129,6 @@ sub main {
     process_input($in_fh, $stats);
 
     close($in_fh) or die "couldn't close $filename: $!";
-
-    #print_stats($stats);
 
     unless ($filename =~ s/pprof/out/) {
         $filename = "$filename.out";

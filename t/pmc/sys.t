@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -31,11 +30,12 @@ pir_output_is( <<"CODE", <<OUT, "spawnw, _config" );
 
 .sub _test :main
      .local pmc O
-     open O, "$temp_pir", 'w'
+     O = new ['FileHandle']
+     O.'open'("$temp_pir", 'w')
      print O, ".sub _main :main\\n"
      print O, "\tsay \\"Hello, World!\\"\\n"
      print O, ".end\\n"
-     close O
+     O.'close'()
      load_bytecode 'config.pbc'
     .local pmc conf_hash
     conf_hash = _config()

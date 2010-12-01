@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -18,6 +17,7 @@ what sorts of conversions are allowed (or desired).  The
 basic flags are:
 
     P,S,I,N   PMC, string, int, or num register
+    Q         keyed PMC, next flag indicates type of key
     s         string register or constant
     i         int register or constant
     n         num register or constant
@@ -27,6 +27,7 @@ basic flags are:
     +         PMC, int register, num register, or numeric constant
     ~         PMC, string register, or string constant
     :         argument (same as '*'), possibly with :named or :flat
+    0-9       use the nth input operand as the output result of this operation
 
 These flags are used to describe signatures and desired return
 types for various operations.  For example, if an opcode is
@@ -67,16 +68,23 @@ any value type.
     piropsig['concat']     = 'PP~'
     piropsig['copy']       = '0PP'
     piropsig['defined']    = 'IP'
+    piropsig['delete']     = 'vQ*'
     piropsig['die']        = 'v~'
     piropsig['div']        = 'PP+'
     piropsig['does']       = 'IPs'
     piropsig['downcase']   = 'Ss'
     piropsig['elements']   = 'IP'
+    piropsig['exists']     = 'IQ*'
     piropsig['exit']       = 'vi'
     piropsig['fdiv']       = 'PP+'
-    piropsig['find_name']  = 'Ps'
+    piropsig['find_codepoint']   = 'Is'
     piropsig['find_dynamic_lex'] = 'Ps'
+    piropsig['find_name']  = 'Ps'
+    piropsig['getinterp']  = 'P'
     piropsig['getprop']    = 'P~P'
+    piropsig['getstderr']  = 'P'
+    piropsig['getstdin']   = 'P'
+    piropsig['getstdout']  = 'P'
     piropsig['index']      = 'Issi'
     piropsig['isa']        = 'IP~'
     piropsig['isfalse']    = 'IP'
@@ -87,30 +95,36 @@ any value type.
     piropsig['length']     = 'Is'
     piropsig['load_bytecode'] = 'vs'
     piropsig['load_language'] = 'vs'
+    piropsig['loadlib']    = 'P~'
     piropsig['mod']        = 'PP+'
     piropsig['mul']        = 'PP+'
     piropsig['neg']        = 'PP'
+    piropsig['new']        = 'P~'
     piropsig['newclosure'] = 'PP'
     piropsig['not']        = 'PP'
     piropsig['ord']        = 'Isi'
     piropsig['pop']        = 'PP'
-    piropsig['push']       = '0P*'
-    piropsig['repeat']     = 'Ssi'
-    piropsig['shift']      = 'PP'
-    piropsig['shl']        = 'PP+'
-    piropsig['shr']        = 'PP+'
-    piropsig['splice']     = 'PPii'
-    piropsig['split']      = 'Pss'
-    piropsig['sub']        = 'PP+'
-    piropsig['substr']     = 'Ssiis'
     piropsig['pow']        = 'NN+'
     piropsig['print']      = 'v*'
+    piropsig['printerr']   = 'v*'
+    piropsig['push']       = '0P*'
+    piropsig['repeat']     = 'Ssi'
+    piropsig['replace']    = 'Ssiis'
     piropsig['say']        = 'v*'
     piropsig['set']        = 'PP'
     piropsig['setprop']    = '0P~P'
     piropsig['setattribute'] = '0P~P'
+    piropsig['shift']      = 'PP'
+    piropsig['shl']        = 'PP+'
+    piropsig['shr']        = 'PP+'
     piropsig['sleep']      = 'v+'
+    piropsig['splice']     = '0PPii'
+    piropsig['split']      = 'Pss'
+    piropsig['sub']        = 'PP+'
+    piropsig['substr']     = 'Ssii'
+    piropsig['titlecase']  = 'Ss'
     piropsig['trace']      = 'vi'
+    piropsig['typeof']     = 'SP'
     piropsig['unshift']    = '0P*'
     piropsig['upcase']     = 'Ss'
     set_global '%piropsig', piropsig
@@ -123,58 +137,30 @@ any value type.
     valflags['String']   = 's~*:e'
     valflags['Integer']  = 'i+*:'
     valflags['Float']    = 'n+*:'
+    valflags['!cconst']          = 'i+*:c'
+    valflags['!except_severity'] = 'i+*:c'
+    valflags['!except_types']    = 'i+*:c'
+    valflags['!iterator']        = 'i+*:c'
+    valflags['!socket']          = 'i+*:c'
     set_global '%valflags', valflags
 
     ##  %!controltypes holds the list of exception types for each
     ##  type of exception handler we support
     .local pmc controltypes
     controltypes = new 'Hash'
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_RETURN)
-    $P0.'push'(.CONTROL_OK)
-    $P0.'push'(.CONTROL_BREAK)
-    $P0.'push'(.CONTROL_CONTINUE)
-    #$P0.'push'(.CONTROL_ERROR)
-    $P0.'push'(.CONTROL_TAKE)
-    $P0.'push'(.CONTROL_LEAVE)
-    $P0.'push'(.CONTROL_LOOP_NEXT)
-    $P0.'push'(.CONTROL_LOOP_LAST)
-    $P0.'push'(.CONTROL_LOOP_REDO)
-    controltypes['CONTROL']   = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_RETURN)
-    controltypes['RETURN']   = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_OK)
-    controltypes['OK'] = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_BREAK)
-    controltypes['BREAK'] = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_CONTINUE)
-    controltypes['CONTINUE'] = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_ERROR)
-    controltypes['ERROR'] = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_TAKE)
-    controltypes['GATHER']   = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_LEAVE)
-    controltypes['LEAVE'] = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_LOOP_NEXT)
-    controltypes['NEXT'] = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_LOOP_LAST)
-    controltypes['LAST'] = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_LOOP_REDO)
-    controltypes['REDO'] = $P0
+    controltypes['CONTROL']  = '.CONTROL_RETURN, .CONTROL_OK, .CONTROL_BREAK, .CONTROL_CONTINUE, .CONTROL_TAKE, .CONTROL_LEAVE, .CONTROL_EXIT, .CONTROL_LOOP_NEXT, .CONTROL_LOOP_LAST, .CONTROL_LOOP_REDO'
+    controltypes['RETURN']   = '.CONTROL_RETURN'
+    controltypes['OK']       = '.CONTROL_OK'
+    controltypes['BREAK']    = '.CONTROL_BREAK'
+    controltypes['CONTINUE'] = '.CONTROL_CONTINUE'
+    controltypes['ERROR']    = '.CONTROL_ERROR'
+    controltypes['GATHER']   = '.CONTROL_TAKE'
+    controltypes['LEAVE']    = '.CONTROL_LEAVE'
+    controltypes['EXIT']     = '.CONTROL_EXIT'
+    controltypes['NEXT']     = '.CONTROL_NEXT'
+    controltypes['LAST']     = '.CONTROL_LAST'
+    controltypes['REDO']     = '.CONTROL_REDO'
     set_global '%!controltypes', controltypes
-
-    $P0 = new 'CodeString'
-    set_global '%!codestring', $P0
 
     $P0 = box 11
     set_global '$!serno', $P0
@@ -206,9 +192,11 @@ Compile the abstract syntax tree given by C<past> into POST.
     blockpast = new 'ResizablePMCArray'
     set_global '@?BLOCK', blockpast
   have_blockpast:
-    null $P0
-    set_global '$?SUB', $P0
-    .tailcall self.'as_post'(past, 'rtype'=>'v')
+    .lex '@*BLOCKPAST', blockpast
+    null $P99
+    .lex '$*SUB', $P99
+    $P1 = self.'as_post'(past, 'rtype'=>'v')
+    .return ($P1)
 .end
 
 =item escape(str)
@@ -219,9 +207,19 @@ Return C<str> as a PIR constant string.
 
 .sub 'escape' :method
     .param string str
-    $P0 = get_global '%!codestring'
-    str = $P0.'escape'(str)
-    .return (str)
+    .local string estr
+    estr = escape str
+    $I0 = index estr, "\\x"
+    if $I0 >= 0 goto unicode_prefix
+    $I0 = index estr, "\\u"
+    if $I0 >= 0 goto unicode_prefix
+    estr = concat '"', estr
+    goto done
+  unicode_prefix:
+    estr = concat 'unicode:"', estr
+  done:
+    estr = concat estr, '"'
+    .return (estr)
 .end
 
 =item unique([STR fmt])
@@ -443,6 +441,7 @@ third and subsequent children can be any value they wish.
     sigidx = 1
     rtype = substr signature, sigidx, 1
   iter_loop:
+    if rtype == 'Q' goto keyed_pos
     unless iter goto iter_end
     .local pmc cpast, cpost
     cpast = shift iter
@@ -485,6 +484,31 @@ third and subsequent children can be any value they wish.
     inc sigidx
     rtype = substr signature, sigidx, 1
     goto iter_loop
+  keyed_pos:
+    # rtype is 'Q', so construct a keyed pmc argument
+    # first, get the base PMC
+    unless iter goto iter_end
+    cpast = shift iter
+    cpost = self.'as_post'(cpast, 'rtype'=>'P')
+    cpost = self.'coerce'(cpost, 'P')
+    # now process the key arg
+    unless iter goto iter_end
+    .local pmc kpast, kpost
+    kpast = shift iter
+    inc sigidx
+    rtype = substr signature, sigidx, 1
+    kpost = self.'as_post'(kpast, 'rtype'=>rtype)
+    kpost = self.'coerce'(kpost, rtype)
+    ops.'push'(kpost)
+    ops.'push'(cpost)
+    # now construct the keyed PMC
+    $S0 = cpost
+    concat $S0, '['
+    $S1 = kpost
+    concat $S0, $S1
+    concat $S0, ']'
+    push posargs, $S0
+    goto iter_rtype
   iter_end:
     .return (ops, posargs, namedargs)
 .end
@@ -639,7 +663,7 @@ nodes of type C<PAST::Stmts>.
     .local pmc eh
     eh = node.'handlers'()
     unless eh, no_eh
-    ops = self.'wrap_handlers'(ops,eh,'rtype'=>rtype)
+    ops = self.'wrap_handlers'(ops, eh, 'rtype'=>rtype)
   no_eh:
     .return (ops)
 .end
@@ -713,28 +737,34 @@ Return the POST representation of a C<PAST::Control>.
     unless it, handler_loop_done
     node = shift it
 
-    .local pmc ehpir, types, label
+    .local pmc ehpir, label, controltypes, subpost
     .local string ehreg, type
     $P0 = get_hll_global ['POST'], 'Label'
     $S0 = self.'unique'('control_')
     label = $P0.'new'('result'=>$S0)
 
+    subpost = find_dynamic_lex '$*SUB'
+
     ehreg = self.'uniquereg'('P')
     ops.'push_pirop'('new', ehreg, "'ExceptionHandler'")
     ops.'push_pirop'('set_addr', ehreg, label)
-    $P0 = get_global '%!controltypes'
+    controltypes = get_global '%!controltypes'
     type = node.'handle_types'()
-    unless type, no_handle_types
-    types = $P0[type]
-    unless type, no_handle_types
-    ops.'push_pirop'('callmethod', '"handle_types"', ehreg, types :flat)
-  no_handle_types:
+    unless type, handle_types_done
+    type = controltypes[type]
+    unless type, handle_types_done
+    $P0 = split ',', type
+    ops.'push_pirop'('callmethod', '"handle_types"', ehreg, $P0 :flat)
+    subpost.'add_directive'('.include "except_types.pasm"')
+  handle_types_done:
     type = node.'handle_types_except'()
-    unless type, no_handle_types_except
-    types = $P0[type]
-    unless type, no_handle_types_except
-    ops.'push_pirop'('callmethod', '"handle_types_except"', ehreg, types :flat)
-  no_handle_types_except:
+    unless type, handle_types_except_done
+    type = controltypes[type]
+    unless type, handle_types_except_done
+    $P0 = split ',', type
+    ops.'push_pirop'('callmethod', '"handle_types_except"', ehreg, $P0 :flat)
+    subpost.'add_directive'('.include "except_types.pasm"')
+  handle_types_except_done:
     ops.'push_pirop'('push_eh', ehreg)
 
     # Add one pop_eh for every handler we push_eh
@@ -775,13 +805,13 @@ Return the POST representation of a C<PAST::Block>.
     .param pmc node
     .param pmc options         :slurpy :named
 
-    ##  add current block node to @?BLOCK
+    ##  add current block node to @*BLOCKPAST
     .local pmc blockpast
-    blockpast = get_global '@?BLOCK'
+    blockpast = find_dynamic_lex '@*BLOCKPAST'
     unshift blockpast, node
 
     .local string name, pirflags, blocktype
-    .local pmc nsentry, subid, ns, hll
+    .local pmc nsentry, subid, ns, hll, multi, loadlibs
     name = node.'name'()
     pirflags = node.'pirflags'()
     blocktype = node.'blocktype'()
@@ -789,6 +819,8 @@ Return the POST representation of a C<PAST::Block>.
     subid = node.'subid'()
     ns = node.'namespace'()
     hll = node.'hll'()
+    multi = node.'multi'()
+    loadlibs = node.'loadlibs'()
 
     ##  handle nsentry attribute
     $I0 = defined nsentry
@@ -814,7 +846,7 @@ Return the POST representation of a C<PAST::Block>.
     ##  create a POST::Sub node for this block
     .local pmc bpost
     $P0 = get_hll_global ['POST'], 'Sub'
-    bpost = $P0.'new'('node'=>node, 'name'=>name, 'blocktype'=>blocktype, 'namespace'=>ns, 'hll'=>hll, 'subid'=>subid)
+    bpost = $P0.'new'('node'=>node, 'name'=>name, 'blocktype'=>blocktype, 'namespace'=>ns, 'hll'=>hll, 'subid'=>subid, 'multi'=>multi, 'loadlibs'=>loadlibs)
     unless pirflags goto pirflags_done
     bpost.'pirflags'(pirflags)
   pirflags_done:
@@ -830,9 +862,9 @@ Return the POST representation of a C<PAST::Block>.
     concat blockref, $S0
     goto have_blockref
   block_ns:
-    $P0 = get_global '%!codestring'
+    $P0 = get_hll_global ['POST'], 'Compiler'
     blockref = concat 'get_hll_global ', blockreg
-    $S0 = $P0.'key'(ns)
+    $S0 = $P0.'key_pir'(ns)
     concat blockref, ', '
     concat blockref, $S0
     $S0 = self.'escape'(name)
@@ -842,8 +874,8 @@ Return the POST representation of a C<PAST::Block>.
 
     ##  determine the outer POST::Sub for the new one
     .local pmc outerpost
-    outerpost = get_global '$?SUB'
-    set_global '$?SUB', bpost
+    outerpost = find_dynamic_lex '$*SUB'
+    .lex '$*SUB', bpost
 
     .local int islexical
     islexical = node.'lexical'()
@@ -899,10 +931,10 @@ Return the POST representation of a C<PAST::Block>.
     $S0 = self.'unique'('control_')
     ctrllabel = $P0.'new'('result'=>$S0)
     $S0 = self.'uniquereg'('P')
-    bpost.'push_pirop'('new', $S0, "'ExceptionHandler'")
+    bpost.'push_pirop'('new', $S0, "['ExceptionHandler']", '.CONTROL_RETURN')
     bpost.'push_pirop'('set_addr', $S0, ctrllabel)
-    bpost.'push_pirop'('callmethod', '"handle_types"', $S0, .CONTROL_RETURN)
     bpost.'push_pirop'('push_eh', $S0)
+    bpost.'add_directive'('.include "except_types.pasm"')
 
   children_past:
     ##  all children but last are void context, last returns anything
@@ -919,7 +951,7 @@ Return the POST representation of a C<PAST::Block>.
     unless eh, no_eh
     $S0 = options['rtype']
     retval = ops[-1]
-    ops = self.'wrap_handlers'(ops,eh,'rtype'=>$S0)
+    ops = self.'wrap_handlers'(ops, eh, 'rtype'=>$S0)
     goto had_eh
   no_eh:
     ##  result of last child is return from block
@@ -974,7 +1006,6 @@ Return the POST representation of a C<PAST::Block>.
   loadinit_done:
 
     ##  restore previous outer scope and symtable
-    set_global '$?SUB', outerpost
     setattribute self, '%!symtable', outersym
 
     ##  return block or block result
@@ -987,7 +1018,16 @@ Return the POST representation of a C<PAST::Block>.
     bpost = $P0.'new'( bpost, 'node'=>node, 'result'=>blockreg)
     bpost.'push_pirop'( blockref, 'result'=>blockreg )
     unless islexical goto block_done
+    $I0 = node.'closure'()
+    if $I0 goto block_closure
     bpost.'push_pirop'('capture_lex', blockreg)
+    goto block_done
+
+  block_closure:
+    ##  return a reference to a clone of the block with captured outer context
+    result = self.'uniquereg'('P')
+    bpost.'push_pirop'('newclosure', result, blockreg)
+    bpost.'result'(result)
     goto block_done
 
   block_immediate:
@@ -1006,7 +1046,7 @@ Return the POST representation of a C<PAST::Block>.
     bpost.'push_pirop'('call', blockreg, arglist :flat, 'result'=>result)
 
   block_done:
-    ##  remove current block from @?BLOCK
+    ##  remove current block from @*BLOCKPAST
     $P99 = shift blockpast
     .return (bpost)
 .end
@@ -1098,8 +1138,8 @@ a 'pasttype' of 'pirop'.
     signature = 'vP'
   have_signature:
 
-    .local pmc ops
-    ops = self.'post_children'(node, 'signature'=>signature)
+    .local pmc ops, posargs
+    (ops, posargs) = self.'post_children'(node, 'signature'=>signature)
 
     .local pmc arglist
     arglist = ops.'list'()
@@ -1115,10 +1155,10 @@ a 'pasttype' of 'pirop'.
     .local string result
     result = self.'uniquereg'($S0)
     ops.'result'(result)
-    ops.'push_pirop'(pirop, result, arglist :flat)
+    ops.'push_pirop'(pirop, result, posargs :flat)
     .return (ops)
   pirop_void:
-    ops.'push_pirop'(pirop, arglist :flat)
+    ops.'push_pirop'(pirop, posargs :flat)
     .return (ops)
 .end
 
@@ -1150,7 +1190,7 @@ for calling a sub.
     name = node.'name'()
     if name goto call_by_name
     ##  our first child is the thing to be invoked, so make sure it's a PMC
-    substr signature, 1, 0, 'P'
+    signature = replace signature, 1, 0, 'P'
     (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>signature)
     goto children_done
   call_by_name:
@@ -1352,11 +1392,14 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'()
 
+    $P0 = find_dynamic_lex '$*SUB'
+    $P0.'add_directive'('.include "except_types.pasm"')
+
     .local string handreg
     handreg = self.'uniquereg'('P')
     ops.'push_pirop'('new', handreg, "'ExceptionHandler'")
     ops.'push_pirop'('set_addr', handreg, handlabel)
-    ops.'push_pirop'('callmethod', '"handle_types"', handreg, .CONTROL_LOOP_NEXT, .CONTROL_LOOP_REDO, .CONTROL_LOOP_LAST)
+    ops.'push_pirop'('callmethod', '"handle_types"', handreg, '.CONTROL_LOOP_NEXT', '.CONTROL_LOOP_REDO', '.CONTROL_LOOP_LAST')
     ops.'push_pirop'('push_eh', handreg)
 
     unless bodyfirst goto bodyfirst_done
@@ -1384,8 +1427,8 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
     ops.'push_pirop'('.get_results (exception)')
     $S0 = self.'uniquereg'('P')
     ops.'push_pirop'('getattribute', $S0, 'exception', "'type'")
-    ops.'push_pirop'('eq', $S0, .CONTROL_LOOP_NEXT, nextlabel)
-    ops.'push_pirop'('eq', $S0, .CONTROL_LOOP_REDO, redolabel)
+    ops.'push_pirop'('eq', $S0, '.CONTROL_LOOP_NEXT', nextlabel)
+    ops.'push_pirop'('eq', $S0, '.CONTROL_LOOP_REDO', redolabel)
     ops.'push'(donelabel)
     ops.'push_pirop'('pop_eh')
     .return (ops)
@@ -1623,7 +1666,9 @@ a return value.
     exreg = self.'uniquereg'('P')
     extype = concat exreg, "['type']"
     ops.'push_pirop'('new', exreg, '"Exception"')
-    ops.'push_pirop'('set', extype, .CONTROL_RETURN)
+    ops.'push_pirop'('set', extype, '.CONTROL_RETURN')
+    $P0 = find_dynamic_lex '$*SUB'
+    $P0.'add_directive'('.include "except_types.pasm"')
 
     .local pmc cpast, cpost
     cpast = node[0]
@@ -2018,7 +2063,7 @@ attribute.
     .local string blockname
     blockname = ''
     .local pmc it
-    $P0 = get_global '@?BLOCK'
+    $P0 = find_dynamic_lex '@*BLOCKPAST'
     it = iter $P0
   scope_error_block_loop:
     unless it goto scope_error_2
@@ -2041,7 +2086,7 @@ attribute.
     $S0 = files
     sourceline = concat ' (', $S0
     concat sourceline, ':'
-    $I0 = source.'lineof'(pos)
+    $I0 = self.'lineof'(source, pos)
     inc $I0
     $S0 = $I0
     concat sourceline, $S0
@@ -2088,7 +2133,7 @@ attribute.
 
     ##  get the current sub
     .local pmc subpost
-    subpost = get_global '$?SUB'
+    subpost = find_dynamic_lex '$*SUB'
 
     ##  determine lexical, register, and parameter names
     .local string named, pname, has_pname
@@ -2167,8 +2212,8 @@ attribute.
     .tailcall $P0.'new'(name, bindpost, 'pirop'=>'set_hll_global', 'result'=>bindpost)
 
   package_ns:
-    $P1 = new 'CodeString'
-    ns = $P1.'key'(ns)
+    $P1 = get_hll_global ['POST'], 'Compiler'
+    ns = $P1.'key_pir'(ns)
     if bindpost goto package_ns_bind
     fetchop = $P0.'new'(ops, ns, name, 'pirop'=>'get_hll_global')
     storeop = $P0.'new'(ns, name, ops, 'pirop'=>'set_hll_global')
@@ -2228,7 +2273,7 @@ attribute.
     # treat it as that type.
     .local string name
     name = node.'name'()
-    $P0 = get_global '@?BLOCK'
+    $P0 = find_dynamic_lex '@*BLOCKPAST'
     $P0 = $P0[0]
     $P0 = $P0.'symtable'()
     unless $P0 goto contextual
@@ -2345,11 +2390,19 @@ attribute.
     name = node.'name'()
     name = self.'escape'(name)
 
+    # We have three cases here.
+    #   0 children = use self
+    #   1 child    = object to look up on
+    #   2 children = object to look up on + class handle
+    # In the last case, we need to generate a different form of the op that
+    # has the extra argument.
     .local pmc call_on
+    $I0 = elements node
+    if $I0 == 0 goto use_self
     call_on = node[0]
-    if null call_on goto use_self
     call_on = self.'as_post'(call_on, 'rtype'=>'P')
     ops.'push'(call_on)
+    if $I0 == 2 goto have_class_handle
     goto invocant_done
   use_self:
     call_on = box 'self'
@@ -2366,6 +2419,25 @@ attribute.
 
   attribute_bind:
     ops.'push_pirop'('setattribute', call_on, name, bindpost)
+    ops.'result'(bindpost)
+    .return (ops)
+
+  have_class_handle:
+    .local pmc handle
+    handle = node[1]
+    handle = self.'as_post'(handle, 'rtype'=>'P')
+    ops.'push'(handle)
+
+    if bindpost goto attribute_bind_handle
+
+    .local pmc fetchop, storeop
+    $P0 = get_hll_global ['POST'], 'Op'
+    fetchop = $P0.'new'(ops, call_on, handle, name, 'pirop'=>'getattribute')
+    storeop = $P0.'new'(call_on, handle, name, ops, 'pirop'=>'setattribute')
+    .tailcall self.'vivify'(node, ops, fetchop, storeop)
+
+  attribute_bind_handle:
+    ops.'push_pirop'('setattribute', call_on, handle, name, bindpost)
     ops.'result'(bindpost)
     .return (ops)
 .end
@@ -2452,6 +2524,22 @@ to have a PMC generated containing the constant value.
     if $I0 < 0 goto escape_done
     value = self.'escape'(value)
   escape_done:
+
+    # See if this is a pasm constant type
+    $I0 = index valflags, 'c'
+    if $I0 < 0 goto const_done
+    # Add the directive for the appropriate .include statement.
+    $S0 = returns
+    $S0 = replace $S0, 0, 1, '.include "'
+    $S0 = concat $S0, '.pasm"'
+    $P0 = find_dynamic_lex '$*SUB'
+    $P0.'add_directive'($S0)
+    # Add a leading dot to the value if one isn't already there.
+    $S0 = substr value, 0, 1
+    if $S0 == '.' goto const_done
+    $P0 = box '.'
+    value = concat $P0, value
+  const_done:
 
     .local string rtype
     rtype = options['rtype']

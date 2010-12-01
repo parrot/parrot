@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2008, Parrot Foundation.
-$Id$
+Copyright (C) 2008-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -14,9 +13,12 @@ This is the base-class for all IO-related PMCs.
 
 =over 4
 
-=item * [to come]
+=item C<init>
 
-=back
+=item C<init_pmc>
+
+Handle shouldn't be directly instantiated, init and init_pmc throws
+EXCEPTION_INVALID_OPERATION.
 
 =cut
 
@@ -25,24 +27,90 @@ This is the base-class for all IO-related PMCs.
 #include "parrot/parrot.h"
 #include "../src/io/io_private.h"
 
-pmclass Handle provides Handle {
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass Handle provides Handle manual_attrs {
     /* TODO: Consider encapsulating PIOHANDLE as a PMC type, for subclassing */
     ATTR PIOHANDLE os_handle;         /* Low level OS descriptor      */
 
     VTABLE void init() {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Handle cannot be instantiated directly.");
     }
 
     VTABLE void init_pmc(PMC * init) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Handle cannot be instantiated directly.");
     }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<METHOD isatty()>
+
+Returns a boolean value indicating whether C<SELF> is a console/tty.
+This default implementation always return false. Override it in
+subtypes that are or can be tty.
+
+=cut
+
+*/
+
+    METHOD isatty() {
+        RETURN(INTVAL 0);
+    }
+
+/*
+
+=item C<METHOD get_fd()>
+
+Retrieve the integer file descriptor for the Handle (only available on
+platforms that use integer file descriptors).
+
+=cut
+
+*/
+
+    METHOD get_fd() {
+#ifndef PIO_OS_STDIO
+        PIOHANDLE os_handle;
+        INTVAL    fd;
+        GET_ATTR_os_handle(INTERP, SELF, os_handle);
+        fd = (INTVAL)os_handle;
+        RETURN(INTVAL fd);
+#endif /*PIO_OS_STDIO*/
+
+        RETURN(INTVAL -1);
+    }
+
+
+/*
+
+=item C<METHOD close()>
+
+Close the handle.
+
+=cut
+
+*/
+
+    METHOD close() {
+        const INTVAL status = Parrot_io_close(INTERP, SELF);
+        RETURN(INTVAL status);
+    }
+
 }
 
 /*
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

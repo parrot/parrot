@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -21,110 +20,99 @@ evaluation and execution.
 
 #include "pmc/pmc_sub.h"
 
-static void
-clear_fixups(PARROT_INTERP, Parrot_Sub_attributes *sub_data)
-{
-    INTVAL               i;
-    PackFile_ByteCode   *seg = sub_data->seg;
-    PackFile_FixupTable *ft;
-    PackFile_ConstTable *ct;
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-    if (!seg)
-        return;
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static PMC* get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-    ft = seg->fixups;
-    if (!ft)
-        return;
+static void mark_ct(PARROT_INTERP, ARGIN(PMC *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-    ct = seg->const_table;
-    if (!ct)
-        return;
+#define ASSERT_ARGS_get_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_mark_ct __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
-    for (i = 0; i < ft->fixup_count; i++) {
-        PackFile_FixupEntry *e = ft->fixups[i];
+/*
 
-        if (e->type == enum_fixup_sub) {
-            opcode_t  ci             = e->offset;
+=item C<static PMC* get_sub(PARROT_INTERP, PMC *self, int idx)>
 
-            ct->constants[ci]->u.key = NULL;
-            ft->fixups[i]->type      = 0;
-        }
-    }
-}
+=cut
 
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC*
-get_sub(PARROT_INTERP, PMC *self, int idx)
+get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
 {
-    INTVAL                 i, n;
+    ASSERT_ARGS(get_sub)
+
     Parrot_Sub_attributes *sub;
     PackFile_ByteCode     *seg;
-    PackFile_FixupTable   *ft;
-    PackFile_ConstTable   *ct;
 
     PMC_get_sub(interp, self, sub);
     seg = sub->seg;
 
-    if (!seg)
-        return PMCNULL;
-
-    ft = seg->fixups;
-    if (!ft)
-        return PMCNULL;
-
-    ct = seg->const_table;
-    if (!ct)
-        return PMCNULL;
-
-    for (i = n = 0; i < ft->fixup_count; i++) {
-        PackFile_FixupEntry *e = ft->fixups[i];
-
-        if (e->type == enum_fixup_sub) {
-            opcode_t ci = e->offset;
-
-            if (n++ == idx)
-                return ct->constants[ci]->u.key;
+    if (seg) {
+        PackFile_ConstTable * const ct = seg->const_table;
+        if (ct) {
+            INTVAL i, n;
+            for (i = n = 0; i < ct->pmc.const_count; ++i) {
+                STRING * const SUB = CONST_STRING(interp, "Sub");
+                PMC *x = ct->pmc.constants[i];
+                if (VTABLE_isa(interp, x, SUB))
+                    if (!idx--)
+                        return x;
+            }
         }
     }
 
     return PMCNULL;
 }
 
+/*
+
+=item C<static void mark_ct(PARROT_INTERP, PMC *self)>
+
+=cut
+
+*/
+
 static void
-mark_subs(PARROT_INTERP, PMC *self)
+mark_ct(PARROT_INTERP, ARGIN(PMC *self))
 {
+    ASSERT_ARGS(mark_ct)
+
     Parrot_Sub_attributes *sub;
     PackFile_ByteCode   *seg;
-    PackFile_FixupTable *ft;
-    PackFile_ConstTable *ct;
-    INTVAL               i;
 
     PMC_get_sub(interp, self, sub);
     seg = sub->seg;
 
-    if (!seg)
-        return;
-
-    ft = seg->fixups;
-    if (!ft)
-        return;
-
-    ct = seg->const_table;
-    if (!ct)
-        return;
-
-    for (i = 0; i < ft->fixup_count; i++) {
-        PackFile_FixupEntry *e = ft->fixups[i];
-
-        if (e->type == enum_fixup_sub) {
-            opcode_t  ci  = e->offset;
-            PMC      *sub = ct->constants[ci]->u.key;
-
-            Parrot_gc_mark_PMC_alive(interp, sub);
+    if (seg) {
+        PackFile_ConstTable * const ct = seg->const_table;
+        if (ct) {
+            INTVAL i;
+            for (i = 0; i < ct->pmc.const_count; ++i) {
+                PMC *sub = ct->pmc.constants[i];
+                Parrot_gc_mark_PMC_alive(interp, sub);
+            }
         }
     }
 }
 
-pmclass Eval extends Sub auto_attrs {
+pmclass Eval extends Sub provides invokable auto_attrs {
 
     VTABLE void init() {
         Parrot_Sub_attributes *sub_data;
@@ -176,7 +164,6 @@ Invokes the first subroutine in the eval code.
             return;
         }
 
-        clear_fixups(INTERP, sub_data);
         cur_cs = sub_data->seg;
 
         if (!cur_cs) {
@@ -185,13 +172,12 @@ Invokes the first subroutine in the eval code.
         }
 
         /* XXX Quick and dirty fix for TT #995 */
-        if ((struct PackFile *)cur_cs == interp->initial_pf
-                || cur_cs == interp->code) {
+        if ((struct PackFile *)cur_cs == INTERP->initial_pf
+                || cur_cs == INTERP->code) {
             SUPER();
             return;
         }
 
-        /* TT #1315 create PF API, move it there */
         seg = (PackFile_Segment *)cur_cs->const_table;
         if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
@@ -204,20 +190,9 @@ Invokes the first subroutine in the eval code.
             cur_cs->debugs = NULL;
         }
 
-        seg = (PackFile_Segment *)cur_cs->fixups;
-        if (seg) {
-            PackFile_Segment_destroy(INTERP, seg);
-            cur_cs->fixups = NULL;
-        }
-
-/* XXX Commenting out this to fix TT #995 and related problems.
- * May leak some memory, need further revision.
-
         seg = (PackFile_Segment *)cur_cs;
         if (seg)
             PackFile_Segment_destroy(INTERP, seg);
- * XXX End of commented out section.
- */
 
         sub_data->seg = NULL;
 
@@ -226,7 +201,7 @@ Invokes the first subroutine in the eval code.
 
     VTABLE void mark() {
         SUPER();
-        mark_subs(INTERP, SELF);
+        mark_ct(INTERP, SELF);
     }
 
 /*
@@ -260,10 +235,6 @@ for writing to disc and later loading via C<load_bytecode>.
             PackFile_add_segment(INTERP, &pf->directory,
                     (PackFile_Segment *)seg->debugs);
 
-        if (seg->fixups)
-            PackFile_add_segment(INTERP, &pf->directory,
-                    (PackFile_Segment *)seg->fixups);
-
         size = PackFile_pack_size(INTERP, pf) * sizeof (opcode_t);
 
         /*
@@ -277,8 +248,8 @@ for writing to disc and later loading via C<load_bytecode>.
          * effect
          */
         aligned_size = size + 15;
-        res          = Parrot_str_new_noinit(INTERP, enum_stringrep_one,
-                                         aligned_size);
+        res          = Parrot_str_new_init(INTERP, NULL, aligned_size,
+                Parrot_binary_encoding_ptr, 0);
         res->strlen  = res->bufused = size;
 
         if ((size_t)(res->strstart) & 0xf) {
@@ -370,33 +341,31 @@ Unarchives the code.
 
         /*
          * TT #1292 this isn't ok - it seems that the packfile
-         *     gets attached to interp->code and is
+         *     gets attached to INTERP->code and is
          *     destroyed again during interpreter destruction
          */
         /* PackFile_destroy(INTERP, pf); */
     }
 
     VTABLE INTVAL elements() {
-        INTVAL               i, n;
+        INTVAL                 n = 0;
         Parrot_Sub_attributes *sub;
-        PackFile_ByteCode   *seg;
-        PackFile_FixupTable *ft;
+        PackFile_ByteCode     *seg;
 
-        PMC_get_sub(interp, SELF, sub);
+        PMC_get_sub(INTERP, SELF, sub);
         seg = sub->seg;
 
-        if (!seg)
-            return 0;
-
-        ft = seg->fixups;
-        if (!ft)
-            return 0;
-
-        for (i = n = 0; i < ft->fixup_count; i++) {
-            PackFile_FixupEntry *e = ft->fixups[i];
-
-            if (e->type == enum_fixup_sub)
-                n++;
+        if (seg) {
+            PackFile_ConstTable *const ct = seg->const_table;
+            if (ct) {
+                INTVAL i;
+                STRING * const SUB = CONST_STRING(interp, "Sub");
+                for (i = n = 0; i < ct->pmc.const_count; ++i) {
+                    PMC *x = ct->pmc.constants[i];
+                    if (VTABLE_isa(interp, x, SUB))
+                        ++n;
+                }
+            }
         }
 
         return n;
@@ -419,5 +388,5 @@ Initial version by leo 2003/01/16.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

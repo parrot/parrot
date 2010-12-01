@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -75,7 +74,7 @@ sub _get_programs {
     my ($conf, $ask) = @_;
     # Set each variable individually so that hints files can use them as
     # triggers to help pick the correct defaults for later answers.
-    my ( $cc, $cxx, $link, $ld, $ccflags, $linkflags, $ldflags, $libs, $lex, $yacc );
+    my ( $cc, $link, $ld, $ccflags, $linkflags, $ar, $arflags, $ldflags, $libs, $lex, $yacc );
     $cc = integrate( $conf->data->get('cc'), $conf->options->get('cc') );
     $cc = prompt( "What C compiler do you want to use?", $cc )
         if $ask;
@@ -100,16 +99,29 @@ sub _get_programs {
         if $ask;
     $conf->data->set( ccflags => $ccflags );
 
-    $conf->options->get('verbose') and print "\nccflags: $ccflags\n";
+    $conf->debug("\nccflags: $ccflags\n");
+
+    $ar = integrate( $conf->data->get('ar'), $conf->options->get('ar') );
+    $ar = prompt( "What archiver do you want to use to build static libraries?", $ar ) if $ask;
+    $conf->data->set( ar => $ar );
+
+    $arflags = integrate( $conf->data->get('arflags'), $conf->options->get('arflags') );
+    $arflags = prompt( "What flags should your archiver receive to create static libraries?",
+                $arflags) if $ask;
+    $conf->data->set( arflags => $arflags );
+
 
     $linkflags = $conf->data->get('linkflags');
-    $linkflags =~ s/-libpath:\S+//g;    # TT #854: No idea why.
+    # Remove the path to the Perl library (from Win32 config).
+    # See TT #854.
+    $linkflags =~ s/-libpath:\S+//g;
     $linkflags = integrate( $linkflags, $conf->options->get('linkflags') );
     $linkflags = prompt( "And flags for your linker?", $linkflags ) if $ask;
     $conf->data->set( linkflags => $linkflags );
 
     $ldflags = $conf->data->get('ldflags');
-    $ldflags =~ s/-libpath:\S+//g;      # TT #854: No idea why.
+    # For substitution below, see comment for $linkflags above.
+    $ldflags =~ s/-libpath:\S+//g;
     $ldflags = integrate( $ldflags, $conf->options->get('ldflags') );
     $ldflags = prompt( "And your $ld flags for building shared libraries?", $ldflags )
         if $ask;
@@ -124,9 +136,6 @@ sub _get_programs {
         if $ask;
     $conf->data->set( libs => $libs );
 
-    $cxx = integrate( $conf->data->get('cxx'), $conf->options->get('cxx') );
-    $cxx = prompt( "What C++ compiler do you want to use?", $cxx ) if $ask;
-    $conf->data->set( cxx => $cxx );
     return ($conf, $cc);
 }
 

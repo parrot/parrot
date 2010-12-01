@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -312,22 +311,50 @@ declared a plan or if you pass an invalid argument.
     .return()
 .end
 
-=item C<diag( diagnostic_message )>
+=item done_testing
+
+=cut
+
+.sub 'done_testing' :method
+    .param string tests     :optional
+    .param int    has_tests :opt_flag
+
+    .local pmc testplan
+    testplan = self.'testplan'()
+
+    unless has_tests goto write_footer
+
+    .local int num_tests
+    num_tests = tests
+    unless num_tests goto write_footer
+
+    testplan.'set_tests'( num_tests )
+
+  write_footer:
+    .local pmc output
+    output = self.'output'()
+
+    $S0 = testplan.'header'()
+    output.'write'( $S0 )
+
+    $I0 = self.'results'()
+    $S0 = testplan.'footer'( $I0 )
+    output.'write'( $S0 )
+
+.end
+
+=item C<diag( diagnostic_message, ... )>
 
 Records a diagnostic message for output.
 
 =cut
 
 .sub 'diag' :method
-    .param string diagnostic
+    .param pmc args :slurpy
 
-    if diagnostic goto DIAGNOSTIC_SET
-    .return()
-
-  DIAGNOSTIC_SET:
     .local pmc output
     output = self.'output'()
-    output.'diag'( diagnostic )
+    .tailcall output.'diag'( args :flat )
 .end
 
 =item C<ok( passed, description )>
@@ -466,6 +493,9 @@ plan.  This calls C<exit>; there's little point in continuing.
 =cut
 
 .sub 'skip_all' :method
+    .param string reason  :optional
+    .param int has_reason :opt_flag
+
     .local pmc testplan
     testplan = self.'testplan'()
 
@@ -477,9 +507,14 @@ plan.  This calls C<exit>; there's little point in continuing.
     throw plan_exception
 
   SKIP_ALL:
+    $S0 = "1..0 # SKIP"
+    unless has_reason goto NO_REASON
+    $S0 .= " "
+    $S0 .= reason
+  NO_REASON:
     .local pmc output
     output = self.'output'()
-    output.'write'( "1..0" )
+    output.'write'( $S0 )
     exit 0
 .end
 
@@ -497,7 +532,8 @@ also calls C<exit>.
     .local pmc output
     output   = self.'output'()
 
-    .local string bail_out
+    .local pmc bail_out
+    bail_out = new ['StringBuilder']
     bail_out = 'Bail out!'
 
     unless has_reason goto WRITE_REASON

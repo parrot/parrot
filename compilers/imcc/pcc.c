@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2003-2009, Parrot Foundation.
- * $Id$
+ * Copyright (C) 2003-2010, Parrot Foundation.
  */
 
 /*
@@ -29,6 +28,7 @@ PCC Implementation by Leopold Toetsch
 #include <string.h>
 #include "imc.h"
 #include "parser.h"
+#include "parrot/oplib/core_ops.h"
 
 /* HEADERIZER HFILE: compilers/imcc/imc.h */
 
@@ -258,9 +258,9 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
     static const char item[] = {'0', 'x', 'f', 'f', 'f', 'f', ','};
     /* The list suffix includes the '\0' terminator */
     static const char subf[] = {')', '"', '\0'};
-    static unsigned int lenpref = sizeof pref;
-    static unsigned int lenitem = sizeof item;
-    static unsigned int lensubf = sizeof subf;
+    static const unsigned int lenpref = sizeof pref;
+    static const unsigned int lenitem = sizeof item;
+    static const unsigned int lensubf = sizeof subf;
     int i, flags;
     char s[16];
 
@@ -353,7 +353,8 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
         bufpos--;
     memcpy(buf+bufpos, subf, lensubf);
 
-    regs[0] = mk_const(interp, buf, 'S');
+    regs[0] = mk_const(interp, buf, 'P');
+    regs[0]->pmc_type = enum_class_FixedIntegerArray;
     ins     = insINS(interp, unit, ins, op_name, regs, n + 1);
 
     if (n >= PCC_GET_ARGS_LIMIT) {
@@ -416,7 +417,8 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
     SymReg      *regs[2];
 
     /* if this sub is a method, unshift 'self' as first param */
-    if ((unit->type & IMC_HAS_SELF) || (sub->pcc_sub->pragma & (P_METHOD | P_VTABLE))) {
+    if ((unit->type & IMC_HAS_SELF)
+    ||  (sub->pcc_sub->pragma & (P_METHOD | P_VTABLE))) {
         SymReg *self = get_sym(interp, "self");
         if (!self) {
             self       = mk_symreg(interp, "self", 'P');
@@ -441,7 +443,7 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
     &&  sub->pcc_sub
     && !sub->pcc_sub->object
        /* s. src/inter_call.c:119 */
-    && (sub->pcc_sub->flags & isTAIL_CALL))
+    && sub->pcc_sub->tailcall)
         return;
 
     if (unit->last_ins->type != (ITPCCSUB|ITLABEL)
@@ -470,7 +472,7 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
             tmp = INS(interp, unit, "returncc", NULL, regs, 0, 0, 0);
         }
 
-        IMCC_debug(interp, DEBUG_IMC, "add sub ret - %I\n", tmp);
+        IMCC_debug(interp, DEBUG_IMC, "add sub ret - %d\n", tmp);
         insert_ins(unit, unit->last_ins, tmp);
     }
 }
@@ -525,6 +527,9 @@ typedef struct move_info_t {
 =item C<static int pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s,
 void *vinfo)>
 
+Callback for C<Parrot_util_register_move>. Inserts move instructions in stead of
+actually moving the registers.
+
 =cut
 
 */
@@ -534,6 +539,7 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, ARGMOD(void *vinfo)
 {
     ASSERT_ARGS(pcc_reg_mov)
     static const char types[] = "INSP";
+    /* XXX non-reentrant */
     static SymReg    *temps[4];
     move_info_t      *info    = (move_info_t *)vinfo;
     SymReg           *src     = NULL;
@@ -596,6 +602,8 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, ARGMOD(void *vinfo)
 =item C<static Instruction * move_regs(PARROT_INTERP, IMC_Unit *unit,
 Instruction *ins, size_t n, SymReg **dest, SymReg **src)>
 
+Insert instructions for moving C<n> registers from C<src> to C<dest>.
+
 =cut
 
 */
@@ -641,7 +649,7 @@ done:
         ;
     }
 
-    Parrot_register_move(interp, n, move_list, move_list + n, 255,
+    Parrot_util_register_move(interp, n, move_list, move_list + n, 255,
         pcc_reg_mov, NULL, &move_info);
 
     mem_sys_free(move_list);
@@ -668,6 +676,7 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
     SymReg *regs[2];
     Instruction *get_params, *tmp_ins, *unused_ins;
     char *buf;
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(interp);
 
     if (!(unit->instructions->type & ITLABEL))
         return 0;
@@ -689,7 +698,7 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
 
     get_params = unit->instructions->next;
 
-    if (get_params->opnum != PARROT_OP_get_params_pc)
+    if (get_params->op != &core_ops->op_info_table[PARROT_OP_get_params_pc])
         return 0;
 
     buf = (char *)malloc(strlen(this_sub->name) + 3);
@@ -718,6 +727,9 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
 =item C<static void insert_tail_call(PARROT_INTERP, IMC_Unit *unit, Instruction
 *ins, SymReg *sub, SymReg *meth)>
 
+Creates and inserts an appropriate tailcall instruction for either a sub call
+or a method call.
+
 =cut
 
 */
@@ -739,7 +751,13 @@ insert_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit), ARGMOD(Instruction *ins),
         ins     = insINS(interp, unit, ins, "tailcall", regs, 1);
     }
 
+    /* don't leak this sub SymReg; it gets detached here */
+    if (regs[0]->pcc_sub)
+        free_pcc_sub(regs[0]->pcc_sub);
+
+    /* this register is always the symbol "self", global to this IMC_Unit */
     regs[0]->pcc_sub  = sub->pcc_sub;
+
     sub->pcc_sub      = NULL;
     ins->type        |= ITPCCSUB;
 }
@@ -779,7 +797,7 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
         return;
     }
 
-    tail_call = (sub->pcc_sub->flags & isTAIL_CALL);
+    tail_call = sub->pcc_sub->tailcall;
 
     if (tail_call && IMCC_INFO(interp)->optimizer_level & OPT_SUB)
         if (recursive_tail_call(interp, unit, ins, sub))
@@ -866,11 +884,6 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
         return;
     }
 
-    /* handle return results */
-    n   = sub->pcc_sub->nret;
-    ins = pcc_get_args(interp, unit, ins, "get_results", n,
-            sub->pcc_sub->ret, sub->pcc_sub->ret_flags);
-
     /* insert the call */
     if (meth_call) {
         regs[0] = sub->pcc_sub->object;
@@ -899,6 +912,11 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
     }
 
     ins->type |= ITPCCSUB;
+
+    /* handle return results */
+    n   = sub->pcc_sub->nret;
+    ins = pcc_get_args(interp, unit, ins, "get_results", n,
+            sub->pcc_sub->ret, sub->pcc_sub->ret_flags);
 }
 
 /*
@@ -913,5 +931,5 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

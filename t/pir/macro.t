@@ -1,6 +1,5 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -21,14 +20,13 @@ Tests for macros in PIR.
 .endm
 
 .macro bar(x)
-    ok(x, 'basic macro with argument')
+    ok(.x, 'basic macro with argument')
 .endm
 
 .macro_const PI_APPROX 4
 
 .sub main :main
     .include 'test_more.pir'
-    .local int x
     plan(3)
     .foo()
     .bar(42)

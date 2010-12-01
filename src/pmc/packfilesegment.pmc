@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2008, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -22,6 +21,10 @@ spec.
 =cut
 
 */
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
 
 pmclass PackfileSegment auto_attrs {
     /*
@@ -63,7 +66,7 @@ Marks the object as live.
         Parrot_PackfileSegment_attributes * attrs =
                 PARROT_PACKFILESEGMENT(SELF);
 
-        Parrot_gc_mark_PMC_alive(interp, attrs->directory);
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->directory);
     }
 
 /*
@@ -101,7 +104,7 @@ Serialize the segment.
 
 */
     METHOD pack() {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                                     "PackfileSegment.pack() not implemented yet.");
     }
 
@@ -116,7 +119,7 @@ Unpack a serialized segment string.
 
 */
     METHOD unpack(STRING *data) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                                     "PackfileSegment.unpack() not implemented yet.");
     }
 
@@ -162,5 +165,5 @@ Get owning directory.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

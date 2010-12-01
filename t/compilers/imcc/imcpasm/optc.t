@@ -1,11 +1,10 @@
 #!perl
-# Copyright (C) 2005, Parrot Foundation.
-# $Id$
+# Copyright (C) 2005-2010, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 42;
 use Test::More;
 
 # these tests are run with -Oc by TestCompiler and show
@@ -242,8 +241,8 @@ CODE
 @pcc_sub_call_\d:
   set_args
   set_p_pc (P\d+), foo
-  get_results
   invokecc \2
+  get_results
   noop
   end
 foo:
@@ -251,20 +250,6 @@ foo:
   print P0
   set_returns
   returncc/
-OUT
-
-pir_2_pasm_like( <<'CODE', <<'OUT', "tailcall 1", todo => "TT #1281" );
-.sub _main
-    foo(1, 2)
-.end
-.sub foo
-    .param int i
-    .param int j
-    .tailcall foo(I2, I3)
-.end
-CODE
-/ set I\d, I2
-  set I\d, I3/
 OUT
 
 pir_2_pasm_like( <<'CODE', <<'OUT', "tailcall 2" );
@@ -307,22 +292,9 @@ CODE
 i 1 j 3 k 2
 OUT
 
-sub permute (&@) {
-    my $code = shift;
-    my @idx  = 0 .. $#_;
-    while ( $code->( @_[@idx] ) ) {
-        my $p = $#idx;
-        --$p while $idx[ $p - 1 ] > $idx[$p];
-        my $q = $p or return;
-        push @idx, reverse splice @idx, $p;
-        ++$q while $idx[ $p - 1 ] > $idx[$q];
-        @idx[ $p - 1, $q ] = @idx[ $q, $p - 1 ];
-    }
-}
-
 my @array = ( 'i', 'j', 'k' );
 my @b;
-permute { push @b, "@_" } @array;
+my_permute( sub { push @b, "@_" }, @array );
 my $x;
 my $y;
 foreach $x (@b) {
@@ -356,7 +328,7 @@ OUT
 undef @b;
 
 @array = ( 'i', 'j', 'k', 'l' );
-permute { push @b, "@_" } @array;
+my_permute( sub { push @b, "@_" }, @array );
 foreach $x (@b) {
     $x =~ tr/ /,/;
     $y = $x;
@@ -392,7 +364,7 @@ OUT
 undef @b;
 
 @array = ( 'i', 'j' );
-permute { push @b, "@_" } @array;
+my_permute( sub { push @b, "@_" }, @array );
 foreach $x (@b) {
     $x =~ tr/ /,/;
     $y = $x;
@@ -419,10 +391,21 @@ $y
 OUT
 }
 
+sub my_permute {
+    my $code = shift;
+    my @idx  = 0 .. $#_;
+    while ( $code->( @_[@idx] ) ) {
+        my $p = $#idx;
+        --$p while $idx[ $p - 1 ] > $idx[$p];
+        my $q = $p or return;
+        push @idx, reverse splice @idx, $p;
+        ++$q while $idx[ $p - 1 ] > $idx[$q];
+        @idx[ $p - 1, $q ] = @idx[ $q, $p - 1 ];
+    }
+}
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-

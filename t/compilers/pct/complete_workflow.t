@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -25,7 +24,7 @@ pct/complete_workflow.t - PCT tests
 Special cases in grammars and actions should be tested here.
 
 This test script builds a parser from a grammar syntax file.
-After that acctions are added from a NQP class file.
+After that actions are added from a NQP class file.
 After that the generated compiler is tested against a sample input.
 
 =cut
@@ -94,7 +93,7 @@ method TOP($/) {
     # thingy() is executed before TOP.
     # So setting $?MY_OUR_VAR here won't affect the generated PAST
     our $?MY_OUR_VAR := 'was set in method TOP';
-    make $( $<thingy> );
+    make $<thingy>.ast;
 }
 
 method thingy($/) {
@@ -126,7 +125,7 @@ GRAMMAR
 
 method TOP($/) {
     our $?MY_OUR_VAR;
-    my $past := $( $<thingy> ); # $?MY_OUR_VAR has been set in thingy()
+    my $past := $<thingy>.ast; # $?MY_OUR_VAR has been set in thingy()
     $past[0][0].value( 'our var ' ~ $?MY_OUR_VAR );
 
     make $past;
@@ -181,18 +180,18 @@ GRAMMAR
 
 method TOP($/) {
     my $past := PAST::Stmts.new();
-    $past.push( $( $<scope_a> ) );
-    $past.push( $( $<scope_b> ) );
+    $past.push( $<scope_a>.ast );
+    $past.push( $<scope_b>.ast );
 
     make $past;
 }
 
 method scope_a($/) {
-   make $( $<thingy> );
+   make $<thingy>.ast;
 }
 
 method scope_b($/) {
-   make $( $<thingy> );
+   make $<thingy>.ast;
 }
 
 method INIT_SCOPE_A($/) {
@@ -244,7 +243,7 @@ GRAMMAR
 method TOP($/) {
     my $past := PAST::Stmts.new();
     for $<thingy_or_stuff> {
-        $past.push( $( $_ ) );
+        $past.push( $_.ast );
     }
 
     our $?MY_OUR_VAR;
@@ -254,7 +253,7 @@ method TOP($/) {
 }
 
 method thingy_or_stuff($/,$key) {
-    make $( $/{$key} );
+    make $/{$key}.ast;
 }
 
 method THINGY($/) {
@@ -306,11 +305,12 @@ sub test_pct
     # Do not assume that . is in $PATH
     # places to look for things
     my $BUILD_DIR     = $PConfig{build_dir};
+    my $BD_CHARSET    = $BUILD_DIR =~ /[^[:ascii:]]/ ? "binary:" : q{};
     my $TEST_DIR      = "$BUILD_DIR/t/compilers/pct";
     my $PARROT        = "$BUILD_DIR/parrot$PConfig{exe}";
     my $PGE_LIBRARY   = "$BUILD_DIR/runtime/parrot/library/PGE";
     my $PERL6GRAMMAR  = "$PGE_LIBRARY/Perl6Grammar.pbc";
-    my $NQP           = "$BUILD_DIR/compilers/nqp/nqp.pbc";
+    my $NQP           = "$BUILD_DIR/parrot-nqp.pbc";
 
     my $tempfile_opts = {
          DIR      => $TEST_DIR,
@@ -334,7 +334,7 @@ sub test_pct
     .local pmc args
     args = new 'ResizableStringArray'
     push args, "test_program"
-    push args, "$TEST_DIR/complete_workflow_sample_input.txt"
+    push args, $BD_CHARSET"$TEST_DIR/complete_workflow_sample_input.txt"
 
     \$P0 = new ['PCT'; 'HLLCompiler']
     \$P0.'language'('TestGrammar')

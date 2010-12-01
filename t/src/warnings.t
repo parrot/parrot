@@ -1,6 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -34,17 +33,16 @@ c_output_is( <<'CODE', <<'OUTPUT', "print_pbc_location" );
 #include <parrot/embed.h>
 
 int
-main(int argc, char* argv[])
+main(int argc, const char* argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
     int error_val;
 
-    if (!interp)
-        return 1;
+    if (interp) {
+        print_pbc_location(interp);
 
-    print_pbc_location(interp);
-
-    Parrot_exit(interp, 0);
+        Parrot_destroy(interp);
+    }
     return 0;
 }
 CODE
@@ -57,40 +55,39 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot_warn" );
 #include <parrot/embed.h>
 
 int
-main(int argc, char* argv[])
+main(int argc, const char* argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
     int error_val;
 
-    if (!interp)
-        return 1;
+    if (interp) {
+        PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
 
-    PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
+        error_val = Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG, "all");
+        Parrot_io_eprintf(interp, "%d\n", error_val);
 
-    error_val = Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG, "all");
-    Parrot_io_eprintf(interp, "%d\n", error_val);
+        /* warnings are on, this should return an error */
+        error_val = Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG, "none");
+        Parrot_io_eprintf(interp, "%d\n", error_val);
 
-    /* warnings are on, this should return an error */
-    error_val = Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG, "none");
-    Parrot_io_eprintf(interp, "%d\n", error_val);
+        error_val = Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG, "undef");
+        Parrot_io_eprintf(interp, "%d\n", error_val);
 
-    error_val = Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG, "undef");
-    Parrot_io_eprintf(interp, "%d\n", error_val);
+        error_val = Parrot_warn(interp, PARROT_WARNINGS_IO_FLAG, "io");
+        Parrot_io_eprintf(interp, "%d\n", error_val);
 
-    error_val = Parrot_warn(interp, PARROT_WARNINGS_IO_FLAG, "io");
-    Parrot_io_eprintf(interp, "%d\n", error_val);
+        error_val = Parrot_warn(interp, PARROT_WARNINGS_PLATFORM_FLAG, "platform");
+        Parrot_io_eprintf(interp, "%d\n", error_val);
 
-    error_val = Parrot_warn(interp, PARROT_WARNINGS_PLATFORM_FLAG, "platform");
-    Parrot_io_eprintf(interp, "%d\n", error_val);
+        error_val = Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG, "dynext");
+        Parrot_io_eprintf(interp, "%d\n", error_val);
 
-    error_val = Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG, "dynext");
-    Parrot_io_eprintf(interp, "%d\n", error_val);
+        error_val = Parrot_warn(interp, 0, "eek"); /* should return error */
+        Parrot_io_eprintf(interp, "%d\n", error_val);
 
-    error_val = Parrot_warn(interp, 0, "eek"); /* should return error */
-    Parrot_io_eprintf(interp, "%d\n", error_val);
-
-    Parrot_exit(interp, 0);
-    return 0;
+        Parrot_destroy(interp);
+   }
+   return 0;
 }
 CODE
 all

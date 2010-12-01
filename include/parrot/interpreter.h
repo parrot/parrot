@@ -1,7 +1,5 @@
 /* interpreter.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     The interpreter API handles running the operations
  */
@@ -24,12 +22,7 @@ typedef enum {
 
     PARROT_IS_THREAD        = 0x1000, /* interpreter is a thread */
     PARROT_THR_COPY_INTERP  = 0x2000, /* thread start copies interp state */
-    PARROT_THR_THREAD_POOL  = 0x4000, /* type3 threads */
-
-    PARROT_THR_TYPE_1       = PARROT_IS_THREAD,
-    PARROT_THR_TYPE_2       = PARROT_IS_THREAD | PARROT_THR_COPY_INTERP,
-    PARROT_THR_TYPE_3       = PARROT_IS_THREAD | PARROT_THR_COPY_INTERP |
-                              PARROT_THR_THREAD_POOL
+    PARROT_THR_THREAD_POOL  = 0x4000  /* type3 threads */
 
 } Parrot_Interp_flag;
 /* &end_gen */
@@ -64,9 +57,6 @@ typedef enum {
     PARROT_SLOW_CORE,                       /* slow bounds/trace/profile core */
     PARROT_FUNCTION_CORE    = PARROT_SLOW_CORE,
     PARROT_FAST_CORE        = 0x01,         /* fast DO_OP core */
-    PARROT_SWITCH_CORE      = 0x02,         /*   P   = prederef   */
-    PARROT_CGP_CORE         = 0x06,         /*  CP                */
-    PARROT_CGOTO_CORE       = 0x04,         /*  C    = cgoto      */
     PARROT_EXEC_CORE        = 0x20,         /* TODO Parrot_exec_run variants */
     PARROT_GC_DEBUG_CORE    = 0x40,         /* run GC before each op */
     PARROT_DEBUGGER_CORE    = 0x80,         /* used by parrot debugger */
@@ -152,18 +142,6 @@ struct _imc_info_t;
 struct _Thread_data;    /* in thread.h */
 struct _Caches;         /* caches .h */
 
-typedef struct _Prederef_branch {       /* item for recording branches */
-    size_t offs;                        /* offset in code */
-    void  *op;                          /* opcode at that position */
-} Prederef_branch;
-
-typedef struct _Prederef {
-    void **code;                        /* prederefed code */
-    Prederef_branch *branches;          /* list of branches in code */
-    size_t n_branches;                  /* entries in that list */
-    size_t n_allocated;                 /* allocated size of it */
-} Prederef;
-
 /* Get Context from interpreter */
 #define CONTEXT(interp)         Parrot_pcc_get_context_struct((interp), (interp)->ctx)
 
@@ -192,6 +170,8 @@ struct parrot_interp_t {
 
     struct GC_Subsystem *gc_sys;              /*functions and data specific
                                                   to current GC subsystem*/
+    UINTVAL gc_threshold;                     /* maximum percentage of memory
+                                                 wasted by GC */
 
     PMC *gc_registry;                         /* root set of registered PMCs */
 
@@ -202,19 +182,8 @@ struct parrot_interp_t {
 
     struct _ParrotIOData   *piodata;          /* interpreter's IO system */
 
-    op_lib_t  *op_lib;                        /* Opcode library */
-    size_t     op_count;                      /* The number of ops */
-    op_info_t *op_info_table;                 /* Opcode info table
-                                               * (name, nargs, arg types) */
-
-    op_func_t *op_func_table;                  /* opcode dispatch table
-                                                * (functions, labels, or nothing
-                                                * (e.g. switched core), which
-                                                * the interpreter is currently
-                                                * running */
-
     op_func_t *evc_func_table;                /* event check opcode dispatch */
-    op_func_t *save_func_table;               /* for restoring op_func_table */
+    size_t     evc_func_table_size;
 
     int         n_libs;                       /* count of libs below */
     op_lib_t  **all_op_libs;                  /* all loaded opcode libraries */
@@ -236,6 +205,8 @@ struct parrot_interp_t {
     struct PackFile          *initial_pf;     /* first created PF  */
 
     struct _imc_info_t *imc_info;             /* imcc data */
+    Hash               *op_hash;              /* mapping from op names to op_info_t */
+
 
     const char *output_file;                  /* where to write output */
 
@@ -291,12 +262,11 @@ struct parrot_interp_t {
 
     struct _Thread_data *thread_data;         /* thread specific items */
 
-    UINTVAL recursion_limit;                  /* Sub call resursion limit */
+    UINTVAL recursion_limit;                  /* Sub call recursion limit */
 
     /* during a call sequencer the caller fills these objects
      * inside the invoke these get moved to the context structure */
     PMC *current_cont;                        /* the return continuation PMC */
-    PMC *current_object;                      /* invocant, if a method call */
 };
 
 /* typedef struct parrot_interp_t Interp;    done in parrot.h so that
@@ -316,6 +286,8 @@ typedef enum {
     IGLOBALS_COMPREG_HASH,
     IGLOBALS_ARGV_LIST,
     IGLOBALS_NCI_FUNCS,
+    IGLOBALS_NCI_FB_CB,
+    IGLOBALS_NCI_FB_UD,
     IGLOBALS_INTERPRETER,       /* this interpreter as ParrotInterpreter PMC */
     IGLOBALS_DYN_LIBS,          /* Hash of ParrotLibrary loaded dynamic ext */
     IGLOBALS_CONFIG_HASH,
@@ -327,34 +299,29 @@ typedef enum {
 } iglobals_enum;
 /* &end_gen */
 
-#define PCONST(i) PF_CONST(interp->code, (i))
-#define PNCONST   PF_NCONST(interp->code)
-
 /* TODO - Make this a config option */
-/* Splint complains about PMCNULL's storage, so don't use it. */
-#ifdef S_SPLINT_S
-#  define PARROT_CATCH_NULL 0
-#else
-#  define PARROT_CATCH_NULL 1
+#ifndef PARROT_CATCH_NULL
+#  ifdef S_SPLINT_S
+#    define PARROT_CATCH_NULL 0
+#  else
+#    define PARROT_CATCH_NULL 1
+#  endif
 #endif
-
-#if PARROT_CATCH_NULL
-PARROT_DATA PMC    *PMCNULL;    /* Holds single Null PMC */
-#else
-#  define PMCNULL         ((PMC *)NULL)
-#endif /* PARROT_CATCH_NULL */
 
 /* Maybe PMC_IS_NULL(interp, pmc) ? */
 #if PARROT_CATCH_NULL
-#  define PMC_IS_NULL(pmc) ((pmc) == PMCNULL || (pmc) == NULL)
-#else
-#  define PMC_IS_NULL(pmc) (pmc) == NULL
-#endif
-
+PARROT_DATA PMC    *PMCNULL;    /* Holds single Null PMC */
 PARROT_DATA STRING *STRINGNULL; /* a single Null STRING */
+#  define PMC_IS_NULL(pmc)  ((pmc) == PMCNULL || (pmc) == NULL)
+#  define STRING_IS_NULL(s) ((s) == STRINGNULL || (s) == NULL)
+#else
+#  define PMCNULL ((PMC *)NULL)
+#  define STRINGNULL ((STRING *)NULL)
+#  define PMC_IS_NULL(pmc)       ((pmc) == NULL)
+#  define STRING_IS_NULL(string) ((string) == NULL)
+#endif /* PARROT_CATCH_NULL */
 
-#define STRING_IS_NULL(s) ((s) == STRINGNULL || (s) == NULL)
-#define STRING_IS_EMPTY(s) !(int)(s)->strlen
+#define STRING_IS_EMPTY(s) ((s)->strlen == 0)
 
 /* &gen_from_def(sysinfo.pasm) prefix(SYSINFO_) */
 
@@ -385,6 +352,7 @@ typedef PMC *(*Parrot_compiler_func_t)(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 Parrot_Interp allocate_interpreter(
     ARGIN_NULLOK(Interp *parent),
     INTVAL flags);
@@ -397,6 +365,7 @@ Parrot_Interp initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 Parrot_Interp make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags);
 
 PARROT_EXPORT
@@ -486,7 +455,7 @@ INTVAL interpinfo(PARROT_INTERP, INTVAL what)
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC* interpinfo_p(PARROT_INTERP, INTVAL what)
         __attribute__nonnull__(1);
 
@@ -509,7 +478,7 @@ void * Parrot_compile_file(PARROT_INTERP,
 PARROT_EXPORT
 void Parrot_compreg(PARROT_INTERP,
     ARGIN(STRING *type),
-    NOTNULL(Parrot_compiler_func_t func))
+    ARGIN(Parrot_compiler_func_t func))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -522,6 +491,17 @@ void Parrot_mark_method_writes(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+void register_native_pcc_method_in_ns(PARROT_INTERP,
+    const int type,
+    ARGIN(void *func),
+    ARGIN(STRING *name),
+    ARGIN(STRING *signature))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+PARROT_EXPORT
 void register_nci_method(PARROT_INTERP,
     const int type,
     ARGIN(void *func),
@@ -531,23 +511,6 @@ void register_nci_method(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
-
-PARROT_EXPORT
-void register_raw_nci_method_in_ns(PARROT_INTERP,
-    const int type,
-    ARGIN(void *func),
-    ARGIN(STRING *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
-
-PARROT_WARN_UNUSED_RESULT
-INTVAL sysinfo_i(SHIM_INTERP, INTVAL info_wanted);
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING * sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
-        __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_interpinfo __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -566,36 +529,24 @@ STRING * sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
 #define ASSERT_ARGS_Parrot_mark_method_writes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_register_native_pcc_method_in_ns \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(func) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_register_nci_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(func) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(proto))
-#define ASSERT_ARGS_register_raw_nci_method_in_ns __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(func) \
-    , PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_sysinfo_i __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_sysinfo_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/interp/inter_misc.c */
 
 
-/* interpreter.c */
-void runops_int(Interp *, size_t offset);
-void exec_init_prederef(PARROT_INTERP,
-    void *prederef_arena);
-void prepare_for_run(PARROT_INTERP);
-PARROT_EXPORT void dynop_register(PARROT_INTERP, PMC *op_lib);
-
-/* interpreter.pmc */
+/* parrotinterpreter.pmc */
+/* XXX Would be nice if this could live in some headerized grouping */
 void clone_interpreter(Parrot_Interp dest, Parrot_Interp self, INTVAL flags);
-
-void Parrot_setup_event_func_ptrs(PARROT_INTERP);
-
-PARROT_EXPORT void disable_event_checking(PARROT_INTERP);
-PARROT_EXPORT void enable_event_checking(PARROT_INTERP);
 
 #else /* !PARROT_IN_CORE */
 
@@ -609,7 +560,7 @@ typedef void * *(*native_func_t)(PARROT_INTERP,
 #  define PMC_IS_NULL(pmc) Parrot_pmc_is_null(NULL, (pmc))
 #endif
 #ifndef STRING_IS_NULL
-#  define STRING_IS_NULL(s) ((s) == NULL || STRING_is_null(NULL, (s))
+#  define STRING_IS_NULL(s) ((s) == NULL || Parrot_str_is_null(NULL, (s))
 #endif
 
 #endif   /* PARROT_INTERPRETER_H_GUARD */
@@ -618,5 +569,5 @@ typedef void * *(*native_func_t)(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

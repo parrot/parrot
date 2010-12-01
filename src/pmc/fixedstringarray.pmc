@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -19,6 +18,10 @@ stores Parrot strings.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass FixedStringArray auto_attrs provides array {
     ATTR STRING **str_array; /* where the STRINGs are stored */
     ATTR UINTVAL  size;      /* element count */
@@ -31,7 +34,7 @@ pmclass FixedStringArray auto_attrs provides array {
 
 =over 4
 
-=item C<void init()>
+=item C<void init_int(INTVAL size)>
 
 Initializes the array.
 
@@ -39,9 +42,18 @@ Initializes the array.
 
 */
 
-    VTABLE void init() {
-        PObj_custom_mark_destroy_SETALL(SELF);
+    VTABLE void init_int(INTVAL size) {
+        if (size < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                _("FixedStringArray: Cannot set array size to a negative number (%d)"), size);
+        if (size) {
+            SET_ATTR_size(INTERP, SELF, size);
+            SET_ATTR_str_array(INTERP,
+                               SELF, mem_gc_allocate_n_zeroed_typed(INTERP, size, STRING *));
+            PObj_custom_mark_destroy_SETALL(SELF);
+        }
     }
+
 
 /*
 
@@ -117,7 +129,7 @@ Marks the array as live.
             UINTVAL size, i;
             GET_ATTR_size(INTERP, SELF, size);
 
-            for (i = 0; i < size; i++) {
+            for (i = 0; i < size; ++i) {
                 Parrot_gc_mark_STRING_alive(INTERP, str_array[i]);
             }
         }
@@ -183,6 +195,20 @@ Returns the number of elements in the array.
         return SELF.elements();
     }
 
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the number of elements in the array.
+
+=cut
+
+*/
+
+    VTABLE FLOATVAL get_number() {
+        const INTVAL e = SELF.elements();
+        return (FLOATVAL)e;
+    }
 
 /*
 
@@ -196,7 +222,7 @@ Returns the integer value of the element at index C<key>.
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
         STRING * const element = SELF.get_string_keyed_int(key);
-        return Parrot_str_to_int(interp, element);
+        return Parrot_str_to_int(INTERP, element);
     }
 
 /*
@@ -228,7 +254,7 @@ Returns the floating-point value of the element at index C<key>.
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
         STRING * const element = SELF.get_string_keyed_int(key);
-        return Parrot_str_to_num(interp, element);
+        return Parrot_str_to_num(INTERP, element);
     }
 
 /*
@@ -357,7 +383,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        STRING *val = Parrot_str_from_int(interp, value);
+        STRING *val = Parrot_str_from_int(INTERP, value);
         SELF.set_string_keyed_int(key, val);
     }
 
@@ -388,7 +414,7 @@ C<value>.
 */
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        STRING *val = Parrot_str_from_num(interp, value);
+        STRING *val = Parrot_str_from_num(INTERP, value);
         SELF.set_string_keyed_int(key, val);
     }
 
@@ -500,15 +526,15 @@ Returns the Parrot string representation C<key>.
 
         for (j = 0; j < n; ++j) {
             STRING * const val = SELF.get_string_keyed_int(j);
-            res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "\""));
-            res = Parrot_str_append(INTERP, res, val);
-            res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "\""));
+            res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "\""));
+            res = Parrot_str_concat(INTERP, res, val);
+            res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "\""));
 
             if (j < n - 1)
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ", "));
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, " ]"));
+        res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, " ]"));
         return res;
     }
 
@@ -541,10 +567,10 @@ The C<==> operation. Compares two array to hold equal elements.
             if (item1 == item2)
                 continue;
 
-            if (item1 == NULL ||  item2 == NULL)
+            if (STRING_IS_NULL(item1) ||  STRING_IS_NULL(item2))
                 return 0;
 
-            if (!Parrot_str_equal(interp, item1, item2))
+            if (!STRING_equal(INTERP, item1, item2))
                 return 0;
         }
 
@@ -619,5 +645,5 @@ F<docs/pdds/pdd17_basic_types.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

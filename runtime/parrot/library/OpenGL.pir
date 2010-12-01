@@ -1,5 +1,4 @@
 # Copyright (C) 2008-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -17,7 +16,7 @@ F<examples/opengl/triangle.pir>.
  .sub main :main
     .param pmc argv
 
-    # Load OpenGL libary and a helper library for calling glutInit
+    # Load OpenGL library and a helper library for calling glutInit
     load_bytecode 'OpenGL.pbc'
     load_bytecode 'NCI/Utils.pbc'
 
@@ -142,7 +141,7 @@ the known different filenames for each library in turn before giving up.
 =item _load_lib_with_fallbacks(string friendly_name, pmc fallback_list)
 
 This function is more generally useful than just for this module -- it
-implements the search for a particular libary that may appear under any
+implements the search for a particular library that may appear under any
 of several different filenames.  The C<fallback_list> should be a simple
 array of strings, each naming one of the possible filenames, I<without>
 the trailing shared library extension (e.g. C<.dll> or C<.so>).  The
@@ -309,8 +308,7 @@ at :load time by _opengl_init().
     # Rename all 'glutcb*' symbols to 'glut*'
   rename_callbacks:
     .local string renamed
-    renamed = clone symbol
-    substr renamed, 4, 2, ''
+    renamed = replace symbol, 4, 2, ''
     export_renames[symbol] = renamed
     goto symbol_loop
   symbol_loop_end:
@@ -371,8 +369,7 @@ caller's namespace is assumed.
     # Rename all 'glutcb*' symbols to 'glut*'
   rename_callbacks:
     .local string renamed
-    renamed = clone symbol
-    substr renamed, 4, 2, ''
+    renamed = replace symbol, 4, 2, ''
     export_renames[symbol] = renamed
     goto symbol_loop
   symbol_loop_end:

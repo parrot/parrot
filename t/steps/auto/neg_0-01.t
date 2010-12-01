@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 # auto_neg_0-01.t
 
 use strict;
@@ -55,11 +54,10 @@ $step = test_step_constructor_and_description($conf);
 
 my $d_neg_0;
 my $orig_has_neg_0 = 0;
-my $verbose = $conf->data->get('verbose');
 
 $d_neg_0 = '-0';
 
-is( $step->_evaluate_cc_run($conf, $d_neg_0, $orig_has_neg_0, $verbose),
+is( $step->_evaluate_cc_run($conf, $d_neg_0, $orig_has_neg_0),
     1,
     '_evaluate_cc_run() completed satisfactorily' );
 
@@ -67,7 +65,7 @@ is( $step->result(), 'yes', 'Got expected result');
 
 $d_neg_0 = '0';
 
-is( $step->_evaluate_cc_run($conf, $d_neg_0, $orig_has_neg_0, $verbose),
+is( $step->_evaluate_cc_run($conf, $d_neg_0, $orig_has_neg_0),
     0,
     '_evaluate_cc_run() completed satisfactorily' );
 is( $step->result(), 'no', 'Got expected result' );
@@ -85,7 +83,6 @@ $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
 
-$verbose = $conf->options->get('verbose');
 my $has_neg_0;
 
 $d_neg_0 = '-0';
@@ -94,7 +91,7 @@ $d_neg_0 = '-0';
     capture(
         sub {
             $has_neg_0 = $step->_evaluate_cc_run(
-                $conf, $d_neg_0, $orig_has_neg_0, $verbose
+                $conf, $d_neg_0, $orig_has_neg_0
             ),
         },
         \$stdout,
@@ -111,7 +108,7 @@ $d_neg_0 = '0';
     capture(
         sub {
             $has_neg_0 = $step->_evaluate_cc_run(
-                $conf, $d_neg_0, $orig_has_neg_0, $verbose
+                $conf, $d_neg_0, $orig_has_neg_0
             ),
         },
         \$stdout,

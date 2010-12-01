@@ -1,5 +1,4 @@
 # Copyright (C) 2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -33,18 +32,12 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my ( $verbose, $without ) = $conf->options->get(
-        qw|
-            verbose
-            without-pcre
-        |
-    );
+    my $without = $conf->options->get( qw| without-pcre | );
 
-    if ($without) {
-        $conf->data->set( HAS_PCRE => 0 );
-        $self->set_result('no');
-        return 1;
-    }
+    $self->set_result('no');
+    $conf->data->set( HAS_PCRE => 0 );
+
+    return 1 if ($without);
 
     my $osname = $conf->data->get('osname');
 
@@ -58,24 +51,24 @@ sub runstep {
 
     $conf->cc_gen('config/auto/pcre/pcre_c.in');
     eval { $conf->cc_build( q{}, $extra_libs ) };
-    my $has_pcre = 0;
     if ( !$@ ) {
         my $test = $conf->cc_run();
-        $has_pcre = $self->_evaluate_cc_run($test, $verbose);
+        if ( my $has_pcre = $self->_evaluate_cc_run($conf, $test) ) {
+        $conf->data->set( HAS_PCRE => $has_pcre);
+        }
     }
-    $conf->data->set( HAS_PCRE => $has_pcre);
 
     return 1;
 }
 
 sub _evaluate_cc_run {
     my $self = shift;
-    my ($test, $verbose) = @_;
+    my ($conf, $test) = @_;
     my $has_pcre = 0;
     if ( $test =~ /pcre (\d+\.\d+)/ ) {
         my $pcre_version = $1;
         $has_pcre = 1;
-        print " (yes, $pcre_version) " if $verbose;
+        $conf->debug(" (yes, $pcre_version) ");
         $self->set_result("yes, $pcre_version");
     }
     return $has_pcre;

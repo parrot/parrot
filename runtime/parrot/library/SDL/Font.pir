@@ -1,5 +1,4 @@
 
-# $Id$
 
 =head1 NAME
 
@@ -12,7 +11,7 @@ SDL::Font - Parrot class representing fonts in Parrot SDL
 
     # create a new SDL::Font object
     .local pmc font
-    font = new 'SDL::Font'
+    font = new ['SDL'; 'Font']
 
     font.'init'( 'font_file'  => 'myfont.ttf', 'point_size' => 48 )
 
@@ -35,7 +34,7 @@ All SDL::Font objects have the following methods:
 
 =cut
 
-.namespace [ 'SDL::Font' ]
+.namespace [ 'SDL'; 'Font' ]
 
 .sub _sdl_init :load
     .local pmc init_ttf
@@ -44,7 +43,7 @@ All SDL::Font objects have the following methods:
 
     .local pmc   font_class
 
-    newclass     font_class, 'SDL::Font'
+    newclass     font_class, ['SDL'; 'Font']
     addattribute font_class, 'font'
     addattribute font_class, 'size'
 
@@ -65,7 +64,7 @@ drawn, in pixels.
     .param int    font_size :named( 'point_size' )
 
     .local pmc OpenFont
-    OpenFont = get_hll_global ['SDL::NCI::TTF'], 'OpenFont'
+    OpenFont = get_hll_global ['SDL'; 'NCI'; 'TTF'], 'OpenFont'
 
     .local pmc font
     font = OpenFont( font_name, font_size )
@@ -106,7 +105,7 @@ Whew.
     h = font_surface.'height'()
 
     .local pmc rect
-    rect = new 'SDL::Rect'
+    rect = new ['SDL'; 'Rect']
 
     rect.'init'( 'x' => 0, 'y' => 0, 'height' => h, 'width' => w )
 
@@ -133,12 +132,12 @@ C<SDL::Surface> containing the rendered font.
     font = self.'font'()
 
     .local pmc font_surface
-    font_surface = new 'SDL::Surface'
+    font_surface = new ['SDL'; 'Surface']
     font_surface.'init'( 'height' => 0, 'width' => 0 )
 
 # RNH use RenderUTF8 in preference to RenderText by default
     .local pmc RenderUTF8_Solid
-    get_hll_global RenderUTF8_Solid, ['SDL::NCI::TTF'], 'RenderUTF8_Solid'
+    get_hll_global RenderUTF8_Solid, ['SDL'; 'NCI'; 'TTF'], 'RenderUTF8_Solid'
 
     .local int color
 # RNH font routine takes color in the order rgb rather than bgr used by surface.pir hence cannot rely on color.get_integer

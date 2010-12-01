@@ -1,6 +1,5 @@
-#!parrot
+#!./parrot
 # Copyright (C) 2006-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -17,7 +16,7 @@ Tests all non-branching conditional operators.
 =cut
 
 
-.const int TESTS = 93
+.const int TESTS = 96
 
 .macro EXP()
   exp_nok:
@@ -66,6 +65,7 @@ Tests all non-branching conditional operators.
     'iseq'()
     'isne'()
     'cmp'()
+    'cmp_string_null'()
     'trac#11'()
 .end
 
@@ -1211,6 +1211,24 @@ EXP
     concat res, "\n"
 
     is(exp, res, desc)
+.end
+
+
+.sub 'cmp_string_null'
+    .local string s1, s2
+    .local int r
+    null s1
+    s2 = 'hello'
+
+    r = cmp s1, s2
+    is(r, -1, 'cmp snull, snotnull')
+
+    r = cmp s2, s1
+    is(r, 1, 'cmp snotnull, snull')
+
+    null s2
+    r = cmp s2, s1
+    is(r, 0, 'cmp snull, snull')
 .end
 
 

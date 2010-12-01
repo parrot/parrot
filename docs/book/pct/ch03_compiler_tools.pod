@@ -6,7 +6,7 @@ Z<CHP-4>
 
 Parrot is able to natively compile and execute code in two low-level
 languages, PASM and PIR. These two languages, which are very similar to
-one another, are very close to the machine and analagous to assembly
+one another, are very close to the machine and analogous to assembly
 languages from hardware processors and other virtual machines. While they
 do expose the power of the PVM in a very direct way, PASM and PIR are not
 designed to be used for writing large or maintainable programs. For these
@@ -29,7 +29,7 @@ languages.
 The Parrot Virtual Machine was originally conceived of as the engine for
 executing the new Perl 6 language, when specifications for that were first
 starting to be drafted. However, as time went on it was decided that Parrot
-would benefit from having a clean abstraction layer between it's internals
+would benefit from having a clean abstraction layer between its internals
 and the Perl 6 language syntax. This clean abstraction layer brought with it
 the side effect that Parrot could be used to host a wide variety of dynamic
 languages, not just Perl 6. And beyond just hosting them, it could
@@ -81,7 +81,7 @@ supports this and more.
 Parrot has a robust system for interfacing with external native code
 libraries, such as those commonly written in C, C++, Fortran and other
 compiled languages. Where previously every interpreter would need to
-maintain it's own bindings and interfaces to libraries, Parrot enables
+maintain its own bindings and interfaces to libraries, Parrot enables
 developers to write library bindings once and use them seamlessly from
 any language executing on Parrot. Want to use Tcl's Tk libraries, along with
 Python's image manipulation libraries in a program you are writing in Perl?
@@ -183,7 +183,7 @@ Syntax Tree, or PAST.>
 =back
 
 PCT's workflow is customizable, but simple.  The compiler passes the source
-code of the HLL into the grammar engine.  The grammer engine parses this code
+code of the HLL into the grammar engine.  The grammar engine parses this code
 and returns a X<PGE;Match Object> special Match object which represents a
 parsed version of the code.  The compiler then passes this match object to the
 action methods, which convert it in stages into PAST.  The compiler finally
@@ -196,8 +196,8 @@ The only way creating a new language compiler could be easier is if these files
 created themselves. PCT includes a tool to do just that:
 C<mk_language_shell.pl>.  This program automatically creates a new directory in
 F<languages/> for your new language, the necessary three files, starter files
-for libraries, a F<Makefile> to automate the build process, and a basic test
-harness to demonstrate that your language works as expects.
+for libraries, a F<setup.pir> script to automate the build process, and a basic
+test harness to demonstrate that your language works as expects.
 
 These generated files are all stubs which will require extensive editing to
 implement a full language, but they are a well-understood and working starting
@@ -218,8 +218,8 @@ An entirely new language has no such constraints.
 
 From the Parrot directory, invoke C<mk_language_shell.pl> like:
 
-  $ B<cd languages/>
-  $ B<perl ../tools/build/mk_language_shell.pl <project name>>
+  $ cd languages/
+  $ perl ../tools/dev/mk_language_shell.pl <project name>
 
 =head3 Parsing Fundamentals
 

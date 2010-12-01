@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
-# $Id$
 
 package Parrot::Pmc2c::Pmc2cMain;
 
@@ -94,7 +93,7 @@ sub new {
     unshift @{ $allargsref->{include} },
         '.', "$allargsref->{bin}/../..", "$allargsref->{bin}/../../src/pmc", "$allargsref->{bin}/../../src/dynpmc";
 
-    foreach my $opt qw(nolines) {
+    foreach my $opt ( qw(nolines) ) {
         if ( !defined $allargsref->{opt}{$opt} ) {
             $allargsref->{opt}{$opt} = 0;
         }
@@ -240,8 +239,11 @@ sub find_file {
         return $path if -e $path;
     }
 
-    print Carp::longmess;
-    die "cannot find file '$file' in path '", join( "', '", @includes ), "'" if $die_unless_found;
+    if ($die_unless_found) {
+        my $includes_list = join q|', '| => @includes;
+        Carp::confess("cannot find file '$file' in path '$includes_list'");
+    }
+
     return;
 }
 

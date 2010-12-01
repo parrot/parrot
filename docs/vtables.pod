@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -279,17 +278,6 @@ You get the picture.
 Fetch the string part of C<value> and concatenate it to yourself, storing the
 result in C<dest>. (Probably by calling its C<set_string> method) This is a
 string multimethod.
-
-=item C<logical_or>
-
-=item C<logical_and>
-
-Perform the given short-circuiting logical operations between your boolean
-value and the value passed in, storing the result in C<dest>.
-
-=item C<logical_not>
-
-Set yourself to be a logical negation of the value passed in.
 
 =item C<repeat>
 

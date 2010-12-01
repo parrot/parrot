@@ -1,13 +1,12 @@
 #! perl
 
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 
 foreach my $name (qw(Node Val Var Op Block Stmts)) {
     my $module = "'PAST';'$name'";
@@ -72,9 +71,9 @@ Integer
 }
 OUT
 
-## TODO: test that return() is taken from the type of value when not specified
+## TT #1476: test that return() is taken from the type of value when not specified
 
-## TODO: check the rest of the PAST::Var attributes
+## TT #1476: check the rest of the PAST::Var attributes
 pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Var node in visual format' );
 .sub _main :main
     load_bytecode 'PCT.pbc'
@@ -131,6 +130,36 @@ CODE
 "ast" => PMC 'PAST;Block'  {
     <blocktype> => "declaration"
 }
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'PAST::Val constant nodes' );
+.sub 'main' :main
+    load_bytecode 'PCT.pbc'
+
+    .local pmc block
+    $P0 = get_hll_global ['PAST'], 'Block'
+    block = $P0.'new'('name'=>'xyz', 'subid'=>'xyz')
+
+    .local pmc node
+    $P0 = get_hll_global ['PAST'], 'Val'
+    node = $P0.'new'('value'=> 'CONTROL_NEXT', 'returns'=>'!except_types')
+    block.'push'(node)
+
+    .local pmc compiler
+    compiler = get_hll_global ['PAST'], 'Compiler'
+    $S0 = compiler.'compile'(block, 'target'=>'pir')
+    say $S0
+.end
+CODE
+
+.namespace []
+.include "except_types.pasm"
+.sub "xyz"  :subid("xyz")
+.annotate 'line', 0
+    .return (.CONTROL_NEXT)
+.end
+
+
 OUT
 
 # Local Variables:

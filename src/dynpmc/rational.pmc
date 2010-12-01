@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2008-2009, Parrot Foundation.
-$Id$
 
 =pod
 
@@ -46,7 +45,7 @@ Currently C<rational.pmc> only has some C<static> functions for code sharing.
 
 /*
 
-=item * static STRING *rat_get_string_to_base(PARROT_INTERP, PMC *self, int base)
+=item C<static STRING *rat_get_string_to_base(PARROT_INTERP, PMC *self, int base)>
 
 Returns a string representation of a Rational-PMC to a certain base.
 
@@ -66,7 +65,7 @@ static STRING *rat_get_string_to_base(PARROT_INTERP, PMC *self, int base) {
 
 /*
 
-=item * static void rat_add_integer(PARROT_INTERP, PMC *self, int value)
+=item C<static void rat_add_integer(PARROT_INTERP, PMC *self, int value)>
 
 Adds an integer "value" to a Rational-PMC inplace.
 
@@ -87,9 +86,9 @@ static void rat_add_integer(PARROT_INTERP, PMC *self, int value) {
 
 /*
 
-=item * static void rat_add_float(PARROT_INTERP, PMC *self, double value)
+=item C<static void rat_add_float(PARROT_INTERP, PMC *self, double value)>
 
-Adds a float "value" to a Rational-PMC in-place. "value" is first conveted to a
+Adds a float "value" to a Rational-PMC in-place. "value" is first converted to a
 rational using GMPs mpq_set_d-function. This is meant to be exact.
 
 =cut
@@ -110,9 +109,9 @@ static void rat_add_float(PARROT_INTERP, PMC *self, double value) {
 
 /*
 
-=item * static void rat_multiply_integer(PARROT_INTERP, PMC *self, int value)
+=item C<static void rat_multiply_integer(PARROT_INTERP, PMC *self, int value)>
 
-Multiplys a Rational-PMC with an integer "value" in-place.
+Multiplies a Rational-PMC with an integer "value" in-place.
 
 =cut
 
@@ -127,7 +126,7 @@ static void rat_multiply_integer(PARROT_INTERP, PMC *self, int value) {
 
 /*
 
-=item * static void rat_multiply_float(PARROT_INTERP, PMC *self, double value)
+=item C<static void rat_multiply_float(PARROT_INTERP, PMC *self, double value)>
 
 Multiplies a Rational-PMC with a float "value" in-place.
 
@@ -149,7 +148,7 @@ static void rat_multiply_float(PARROT_INTERP, PMC *self, double value) {
 
 /*
 
-=item * static void rat_divide_integer(PARROT_INTERP, PMC *self, int value)
+=item C<static void rat_divide_integer(PARROT_INTERP, PMC *self, int value)>
 
 Divides a Rational-PMC through an integer "value" in-place.
 
@@ -171,7 +170,7 @@ static void rat_divide_integer(PARROT_INTERP, PMC *self, int value) {
 
 /*
 
-=item * static void rat_divide_float(PARROT_INTERP, PMC *self, double value)
+=item C<static void rat_divide_float(PARROT_INTERP, PMC *self, double value)>
 
 Divides a Rational-PMC through a float "value" in-place.
 
@@ -186,34 +185,6 @@ static void rat_divide_float(PARROT_INTERP, PMC *self, double value) {
     mpq_set_d(t, (double) value);
     mpq_div(RT(self), RT(self), t);
     mpq_clear(t);
-  #else
-    RAISE_EXCEPTION
-  #endif
-}
-
-/*
-
-=item * static void rat_power_int(PARROT_INTERP, PMC *self, int value)
-
-Calculates the power of a Rational-PMC to an exponent value in-place.
-
-=cut
-
-*/
-static void rat_power_int(PARROT_INTERP, PMC *self, int value) {
-  #ifdef PARROT_HAS_GMP
-    mpz_t num, den;
-
-    mpq_get_num(num, RT(self));
-    mpq_get_den(den, RT(self));
-
-    mpz_pow_ui(num, num, (unsigned int) value);
-    mpq_set_num(RT(self), num);
-    mpz_clear(num);
-
-    mpz_pow_ui(den, den, (unsigned int) value);
-    mpq_set_den(RT(self), den);
-    mpz_clear(den);
   #else
     RAISE_EXCEPTION
   #endif
@@ -569,7 +540,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     VTABLE PMC *add_int(INTVAL value, PMC* dest) {
-        dest = STATICSELF.clone();;
+        dest = STATICSELF.clone();
         rat_add_integer(INTERP, dest, (int) value);
         return dest;
     }
@@ -1056,7 +1027,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
         mpq_init(t);
         mpq_set_ui(t, VTABLE_get_integer(INTERP, value), 1);
 
-        eq = (INTVAL) mpq_equal(RT(SELF), RT(value));
+        eq = (INTVAL) mpq_equal(RT(SELF), t);
         mpq_clear(t);
 
         return eq;
@@ -1090,5 +1061,5 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

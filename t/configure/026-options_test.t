@@ -1,13 +1,11 @@
 #! perl
 # Copyright (C) 2007, Parrot Foundation.
-# $Id$
 # 026-options_test.t
 
 use strict;
 use warnings;
 use Carp;
 use Cwd;
-use Data::Dumper;
 use Test::More tests => 20;
 use lib qw( lib );
 use IO::CaptureOutput qw| capture |;

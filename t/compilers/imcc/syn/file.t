@@ -1,6 +1,5 @@
 #!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -400,7 +399,7 @@ END_PIR
     $err_msg =~ s/\r//g if $^O =~ /^(MSWin32|msys)$/i;
     is( $err_msg, << "OUT", 'including a non-existent file' );
 error:imcc:$enoent_err_msg
-\tin file '$temp_pir' line 2
+\tin file '$temp_pir' line 1
 OUT
 }
 

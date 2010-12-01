@@ -94,6 +94,53 @@ C<setattribute> for the change to stick:
 
 =end PIR_FRAGMENT
 
+=head2 Instantiation
+
+With a created class, we can use the C<new> opcode to instantiate an object of
+that class in the same way we can instantiate a new PMC.
+
+=begin PIR_FRAGMENT
+
+    $P0 = newclass "Foo"
+    $P1 = new $P0
+
+=end PIR_FRAGMENT
+
+Or, if we don't have the class object handy, we can do it by name too:
+
+=begin PIR_FRAGMENT
+
+    $P1 = new "Foo"
+
+=end PIR_FRAGMENT
+
+PMCs have two VTABLE interface functions for dealing with instantiating a new
+object: C<init> and C<init_pmc>. The former is called when a new PMC is
+created, the later is called when a new PMC is created with an initialization
+argument.
+
+=begin PIR
+
+    .namespace ["Foo"]
+    .sub 'init' :vtable
+        say "Creating a new Foo"
+    .end
+
+    .sub 'init_pmc' :vtable
+        .param pmc args
+        print "Creating a new Foo with argument "
+        say args
+    .end
+
+    .namespace[]
+    .sub 'main' :main
+        $P1 = new ['Foo']       # init
+        $P2 = new ['Foo'], $P1  # init_pmc
+    .end
+
+=end PIR
+
+
 =head2 Methods
 
 X<methods>
@@ -346,7 +393,7 @@ X<classes;introspection>
 Classes defined in PIR using the C<newclass> opcode are instances of the
 C<Class> PMCX<Class PMC>. This PMC contains all the meta-information for
 the class, such as attribute definitions, methods, vtable overrides, and
-its inheritance hierarchy. The opcode C<inspect>X<inspect opcode> 
+its inheritance hierarchy. The opcode C<inspect>X<inspect opcode>
 provides a way to peek behind the curtain of encapsulation to see what
 makes a class tick. When called with no arguments, C<inspect> returns an
 associative array containing data on all characteristics of the class

@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 # init/hints/linux-01.t
 
 use strict;
@@ -37,23 +36,22 @@ $conf->include_config_results( $args );
 ##### _handle_icc_ccflags() #####
 
 my $ccflags = '';
-my $verbose = 0;
-$ccflags = init::hints::linux::_handle_icc_ccflags($ccflags, $verbose);
-like( $ccflags, qr/\s-wd269/, "On icc, 'cc_flags' set as expected" );
+$ccflags = init::hints::linux::_handle_icc_ccflags($conf, $ccflags);
+like( $ccflags, qr/\s-we147/, "On icc, 'cc_flags' set as expected" );
 
 $ccflags = '';
-$verbose = 1;
 {
+    $conf->options->set( verbose => 1 );
     my ($stdout, $stderr);
     capture(
         sub { $ccflags =
-            init::hints::linux::_handle_icc_ccflags($ccflags, $verbose); },
+            init::hints::linux::_handle_icc_ccflags($conf, $ccflags); },
         \$stdout,
         \$stderr,
     );
-    like( $ccflags, qr/\s-wd269/, "On icc, 'cc_flags' set as expected" );
+    like( $ccflags, qr/\s-we147/, "On icc, 'cc_flags' set as expected" );
     like( $stdout,
-        qr/\sccflags:.*?-wd269/,
+        qr/\sccflags:.*?-we147/,
         "On icc, got expected verbose output for 'cc_flags'" );
 }
 

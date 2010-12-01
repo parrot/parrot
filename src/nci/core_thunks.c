@@ -9,8 +9,6 @@
 
 /* src/nci/core_thunks.c
  *  Copyright (C) 2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Native Call Interface routines. The code needed to build a
  *     parrot to C call frame is in here
@@ -40,149 +38,163 @@
 
 
 static void
-pcf_d_JOd(PARROT_INTERP, PMC *self)
+pcf_d_JOd(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef double(* func_t)(PARROT_INTERP, PMC *, double);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     FLOATVAL return_data;
 
     PMC * t_1;
     FLOATVAL t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiN", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (double)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "N", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "N", return_data);
     
 
 
 }
 static void
-pcf_I_JOS(PARROT_INTERP, PMC *self)
+pcf_I_JOS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef INTVAL(* func_t)(PARROT_INTERP, PMC *, STRING *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
     STRING * t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiS", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
 }
 static void
-pcf_P_JOl(PARROT_INTERP, PMC *self)
+pcf_P_JOl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef PMC *(* func_t)(PARROT_INTERP, PMC *, long);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
     INTVAL t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiI", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
 }
 static void
-pcf_P_Jt(PARROT_INTERP, PMC *self)
+pcf_P_Jt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef PMC *(* func_t)(PARROT_INTERP, char *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     char *t_1; STRING *ts_1;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "S", &ts_1);
-    t_1 = ts_1 ? Parrot_str_to_cstring(interp, ts_1) : (char *)NULL;
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
-if (t_1) Parrot_str_free_cstring(t_1);
+if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
 }
 static void
-pcf_S_JOS(PARROT_INTERP, PMC *self)
+pcf_S_JOS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef STRING *(* func_t)(PARROT_INTERP, PMC *, STRING *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     STRING * return_data;
 
     PMC * t_1;
     STRING * t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiS", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (STRING *)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "S", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", return_data);
     
 
 
 }
 static void
-pcf_I_JI(PARROT_INTERP, PMC *self)
+pcf_I_JI(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef INTVAL(* func_t)(PARROT_INTERP, INTVAL);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     INTVAL t_1;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "I", &t_1);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 }
 static void
-pcf_v_JOSP(PARROT_INTERP, PMC *self)
+pcf_v_JOSP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PARROT_INTERP, PMC *, STRING *, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
     STRING * t_2;
     PMC * t_3;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiSP", &t_1, &t_2, &t_3);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1, t_2, t_3);
     
@@ -192,20 +204,22 @@ pcf_v_JOSP(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_v_JOS(PARROT_INTERP, PMC *self)
+pcf_v_JOS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PARROT_INTERP, PMC *, STRING *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
     STRING * t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiS", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1, t_2);
     
@@ -214,112 +228,122 @@ pcf_v_JOS(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_P_JOS(PARROT_INTERP, PMC *self)
+pcf_P_JOS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef PMC *(* func_t)(PARROT_INTERP, PMC *, STRING *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
     STRING * t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiS", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
 }
 static void
-pcf_I_JOI(PARROT_INTERP, PMC *self)
+pcf_I_JOI(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef INTVAL(* func_t)(PARROT_INTERP, PMC *, INTVAL);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
     INTVAL t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiI", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
 }
 static void
-pcf_P_JOP(PARROT_INTERP, PMC *self)
+pcf_P_JOP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef PMC *(* func_t)(PARROT_INTERP, PMC *, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
     PMC * t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiP", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
 }
 static void
-pcf_P_JOPS(PARROT_INTERP, PMC *self)
+pcf_P_JOPS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef PMC *(* func_t)(PARROT_INTERP, PMC *, PMC *, STRING *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
     PMC * t_2;
     STRING * t_3;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiPS", &t_1, &t_2, &t_3);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
 
 }
 static void
-pcf_v_JOPSP(PARROT_INTERP, PMC *self)
+pcf_v_JOPSP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PARROT_INTERP, PMC *, PMC *, STRING *, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
     PMC * t_2;
     STRING * t_3;
     PMC * t_4;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiPSP", &t_1, &t_2, &t_3, &t_4);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1, t_2, t_3, t_4);
     
@@ -330,21 +354,23 @@ pcf_v_JOPSP(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_v_JPPP(PARROT_INTERP, PMC *self)
+pcf_v_JPPP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PARROT_INTERP, PMC *, PMC *, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
     PMC * t_2;
     PMC * t_3;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPP", &t_1, &t_2, &t_3);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1, t_2, t_3);
     
@@ -354,21 +380,23 @@ pcf_v_JPPP(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_v_JPIP(PARROT_INTERP, PMC *self)
+pcf_v_JPIP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PARROT_INTERP, PMC *, INTVAL, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
     INTVAL t_2;
     PMC * t_3;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PIP", &t_1, &t_2, &t_3);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1, t_2, t_3);
     
@@ -378,21 +406,23 @@ pcf_v_JPIP(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_v_JPSP(PARROT_INTERP, PMC *self)
+pcf_v_JPSP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PARROT_INTERP, PMC *, STRING *, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
     STRING * t_2;
     PMC * t_3;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSP", &t_1, &t_2, &t_3);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1, t_2, t_3);
     
@@ -402,21 +432,23 @@ pcf_v_JPSP(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_v_JPNP(PARROT_INTERP, PMC *self)
+pcf_v_JPNP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PARROT_INTERP, PMC *, FLOATVAL, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
     FLOATVAL t_2;
     PMC * t_3;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PNP", &t_1, &t_2, &t_3);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1, t_2, t_3);
     
@@ -426,20 +458,22 @@ pcf_v_JPNP(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_v_JPP(PARROT_INTERP, PMC *self)
+pcf_v_JPP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PARROT_INTERP, PMC *, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
     PMC * t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PP", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1, t_2);
     
@@ -448,20 +482,22 @@ pcf_v_JPP(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_v_JPI(PARROT_INTERP, PMC *self)
+pcf_v_JPI(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PARROT_INTERP, PMC *, INTVAL);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
     INTVAL t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PI", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1, t_2);
     
@@ -470,20 +506,22 @@ pcf_v_JPI(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_v_JPS(PARROT_INTERP, PMC *self)
+pcf_v_JPS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PARROT_INTERP, PMC *, STRING *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
     STRING * t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PS", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1, t_2);
     
@@ -492,20 +530,22 @@ pcf_v_JPS(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_v_JPN(PARROT_INTERP, PMC *self)
+pcf_v_JPN(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PARROT_INTERP, PMC *, FLOATVAL);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
     FLOATVAL t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PN", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1, t_2);
     
@@ -514,201 +554,219 @@ pcf_v_JPN(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_P_JPPP(PARROT_INTERP, PMC *self)
+pcf_P_JPPP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef PMC *(* func_t)(PARROT_INTERP, PMC *, PMC *, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
     PMC * t_2;
     PMC * t_3;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPP", &t_1, &t_2, &t_3);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
 
 }
 static void
-pcf_P_JPIP(PARROT_INTERP, PMC *self)
+pcf_P_JPIP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef PMC *(* func_t)(PARROT_INTERP, PMC *, INTVAL, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
     INTVAL t_2;
     PMC * t_3;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PIP", &t_1, &t_2, &t_3);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
 
 }
 static void
-pcf_P_JPSP(PARROT_INTERP, PMC *self)
+pcf_P_JPSP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef PMC *(* func_t)(PARROT_INTERP, PMC *, STRING *, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
     STRING * t_2;
     PMC * t_3;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PSP", &t_1, &t_2, &t_3);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
 
 }
 static void
-pcf_P_JPNP(PARROT_INTERP, PMC *self)
+pcf_P_JPNP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef PMC *(* func_t)(PARROT_INTERP, PMC *, FLOATVAL, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
     FLOATVAL t_2;
     PMC * t_3;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PNP", &t_1, &t_2, &t_3);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
 
 }
 static void
-pcf_I_JPP(PARROT_INTERP, PMC *self)
+pcf_I_JPP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef INTVAL(* func_t)(PARROT_INTERP, PMC *, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
     PMC * t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PP", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
 }
 static void
-pcf_I_JPS(PARROT_INTERP, PMC *self)
+pcf_I_JPS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef INTVAL(* func_t)(PARROT_INTERP, PMC *, STRING *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
     STRING * t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PS", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
 }
 static void
-pcf_I_JPN(PARROT_INTERP, PMC *self)
+pcf_I_JPN(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef INTVAL(* func_t)(PARROT_INTERP, PMC *, FLOATVAL);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
     FLOATVAL t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PN", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
 }
 static void
-pcf_i_JP(PARROT_INTERP, PMC *self)
+pcf_i_JP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(PARROT_INTERP, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "P", &t_1);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 }
 static void
-pcf_v_JP(PARROT_INTERP, PMC *self)
+pcf_v_JP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PARROT_INTERP, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "P", &t_1);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1);
     
@@ -716,71 +774,77 @@ pcf_v_JP(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_i_JPi(PARROT_INTERP, PMC *self)
+pcf_i_JPi(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(PARROT_INTERP, PMC *, int);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
     INTVAL t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PI", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
 }
 static void
-pcf_i_JPii(PARROT_INTERP, PMC *self)
+pcf_i_JPii(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(PARROT_INTERP, PMC *, int, int);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
     INTVAL t_2;
     INTVAL t_3;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PII", &t_1, &t_2, &t_3);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
 
 }
 static void
-pcf_i_JPiii(PARROT_INTERP, PMC *self)
+pcf_i_JPiii(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(PARROT_INTERP, PMC *, int, int, int);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
     INTVAL t_2;
     INTVAL t_3;
     INTVAL t_4;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PIII", &t_1, &t_2, &t_3, &t_4);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2, t_3, t_4);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -788,47 +852,51 @@ pcf_i_JPiii(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_i_JPt(PARROT_INTERP, PMC *self)
+pcf_i_JPt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(PARROT_INTERP, PMC *, char *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
     char *t_2; STRING *ts_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PS", &t_1, &ts_2);
-    t_2 = ts_2 ? Parrot_str_to_cstring(interp, ts_2) : (char *)NULL;
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    t_2 = STRING_IS_NULL(ts_2) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_2);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
-if (t_2) Parrot_str_free_cstring(t_2);
+if (!STRING_IS_NULL(ts_2)) Parrot_str_free_cstring(t_2);
 }
 static void
-pcf_P_JOSSS(PARROT_INTERP, PMC *self)
+pcf_P_JOSSS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef PMC *(* func_t)(PARROT_INTERP, PMC *, STRING *, STRING *, STRING *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
     STRING * t_2;
     STRING * t_3;
     STRING * t_4;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiSSS", &t_1, &t_2, &t_3, &t_4);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3, t_4);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -836,21 +904,23 @@ pcf_P_JOSSS(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_v_JOSS(PARROT_INTERP, PMC *self)
+pcf_v_JOSS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PARROT_INTERP, PMC *, STRING *, STRING *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
     STRING * t_2;
     STRING * t_3;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiSS", &t_1, &t_2, &t_3);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1, t_2, t_3);
     
@@ -860,42 +930,46 @@ pcf_v_JOSS(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_S_JOI(PARROT_INTERP, PMC *self)
+pcf_S_JOI(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef STRING *(* func_t)(PARROT_INTERP, PMC *, INTVAL);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     STRING * return_data;
 
     PMC * t_1;
     INTVAL t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiI", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (STRING *)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "S", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", return_data);
     
 
 
 }
 static void
-pcf_v_JOb(PARROT_INTERP, PMC *self)
+pcf_v_JOb(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PARROT_INTERP, PMC *, void *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
     STRING *t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiS", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1, Buffer_bufstart(t_2));
     
@@ -904,73 +978,79 @@ pcf_v_JOb(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_i_JOPxAT_(PARROT_INTERP, PMC *self)
+pcf_i_JOPxAT_(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(PARROT_INTERP, PMC *, PMC *, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
     PMC * t_2;
     PMC * t_3;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiPPs", &t_1, &t_2, &t_3);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
 
 }
 static void
-pcf_I_JOPxAT_(PARROT_INTERP, PMC *self)
+pcf_I_JOPxAT_(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef INTVAL(* func_t)(PARROT_INTERP, PMC *, PMC *, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
     PMC * t_2;
     PMC * t_3;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiPPs", &t_1, &t_2, &t_3);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
 
 }
 static void
-pcf_I_JOIPxAT_(PARROT_INTERP, PMC *self)
+pcf_I_JOIPxAT_(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef INTVAL(* func_t)(PARROT_INTERP, PMC *, INTVAL, PMC *, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
     INTVAL t_2;
     PMC * t_3;
     PMC * t_4;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiIPPs", &t_1, &t_2, &t_3, &t_4);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2, t_3, t_4);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -978,40 +1058,44 @@ pcf_I_JOIPxAT_(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_P_JO(PARROT_INTERP, PMC *self)
+pcf_P_JO(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef PMC *(* func_t)(PARROT_INTERP, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "Pi", &t_1);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 }
 static void
-pcf_v_JOP(PARROT_INTERP, PMC *self)
+pcf_v_JOP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PARROT_INTERP, PMC *, PMC *);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
     PMC * t_2;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "PiP", &t_1, &t_2);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
      (*fn_pointer)(interp, t_1, t_2);
     
@@ -1020,41 +1104,38 @@ pcf_v_JOP(PARROT_INTERP, PMC *self)
 
 }
 static void
-pcf_P_Ji(PARROT_INTERP, PMC *self)
+pcf_P_Ji(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef PMC *(* func_t)(PARROT_INTERP, int);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     INTVAL t_1;
+    UNUSED(return_data); /* Potentially unused, at least */
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "I", &t_1);
     
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 }
 
  void
 Parrot_nci_load_core_thunks(PARROT_INTERP)
-;
- void
-Parrot_nci_load_core_thunks(PARROT_INTERP)
  {
-    PMC *iglobals;
+    PMC * const iglobals = interp->iglobals;
     PMC *nci_funcs;
     PMC *temp_pmc;
 
-    iglobals = interp->iglobals;
     PARROT_ASSERT(!(PMC_IS_NULL(iglobals)));
 
-    nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals,
-            IGLOBALS_NCI_FUNCS);
+    nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS);
     PARROT_ASSERT(!(PMC_IS_NULL(nci_funcs)));
 
     temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
@@ -1241,6 +1322,6 @@ Parrot_nci_load_core_thunks(PARROT_INTERP)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

@@ -1,7 +1,5 @@
 /* gc_api.h
- *  Copyright (C) 2001-2009, Parrot Foundation.
- *  SVN Info
- *     $Id$
+ *  Copyright (C) 2001-2010, Parrot Foundation.
  *  Overview:
  *     Handles dead object destruction of the various headers
  *  History:
@@ -30,6 +28,10 @@
 
 #define WORD_ALIGN_1 (sizeof (void *) - 1)
 #define WORD_ALIGN_MASK ~WORD_ALIGN_1
+
+#define ALIGNED_STRING_SIZE(len) (((len) + sizeof (void*) + WORD_ALIGN_1) & WORD_ALIGN_MASK)
+
+#define GC_DYNAMIC_THRESHOLD_DEFAULT 25
 
 /* pool iteration */
 typedef enum {
@@ -91,10 +93,11 @@ typedef enum {
 
 /* &end_gen */
 
-#define GC_trace_stack_FLAG    (UINTVAL)(1 << 0)   /* trace system areas and stack */
-#define GC_trace_normal        (UINTVAL)(1 << 0)   /* the same */
-#define GC_lazy_FLAG           (UINTVAL)(1 << 1)   /* timely destruction run */
-#define GC_finish_FLAG         (UINTVAL)(1 << 2)   /* on Parrot exit: mark (almost) all PMCs dead and */
+#define GC_trace_stack_FLAG    (UINTVAL)(1 << 1)   /* trace system areas and stack */
+#define GC_trace_normal_FLAG   (UINTVAL)(1 << 1)   /* the same */
+#define GC_lazy_FLAG           (UINTVAL)(1 << 2)   /* timely destruction run */
+#define GC_finish_FLAG         (UINTVAL)(1 << 3)   /* on Parrot exit: mark (almost) all PMCs dead and */
+#define GC_strings_cb_FLAG     (UINTVAL)(1 << 4)   /* Invoked from String GC during mem_alloc to sweep dead strings */
                                                    /* garbage collect. */
 
 /* HEADERIZER BEGIN: src/gc/api.c */
@@ -178,11 +181,6 @@ int Parrot_gc_active_pmcs(PARROT_INTERP)
 int Parrot_gc_active_sized_buffers(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_gc_add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
-
 void Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP,
     ARGOUT(Buffer *buffer),
     size_t size)
@@ -255,11 +253,6 @@ void Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
-
-void Parrot_gc_free_pmc_sync(PARROT_INTERP, ARGMOD(PMC *p))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*p);
 
 void Parrot_gc_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
         __attribute__nonnull__(1)
@@ -371,9 +364,6 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_gc_active_sized_buffers \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_gc_add_pmc_sync __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_gc_allocate_buffer_storage_aligned \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -420,9 +410,6 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_gc_free_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_Parrot_gc_free_pmc_sync __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(p))
 #define ASSERT_ARGS_Parrot_gc_free_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
@@ -472,8 +459,6 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/api.c */
 
-void Parrot_gc_inf_init(PARROT_INTERP);
-
 #if defined(NDEBUG) && defined(PARROT_IN_CORE)
 #  define Parrot_gc_mark_STRING_alive(interp, obj) \
           do if (! STRING_IS_NULL(obj)) PObj_live_SET(obj); while (0)
@@ -495,5 +480,5 @@ void Parrot_gc_inf_init(PARROT_INTERP);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

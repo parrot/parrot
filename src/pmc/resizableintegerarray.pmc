@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2008, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -19,6 +18,10 @@ conversions.
 =cut
 
 */
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
 
 pmclass ResizableIntegerArray extends FixedIntegerArray auto_attrs provides array {
     ATTR INTVAL resize_threshold; /* max size before array needs to be resized */
@@ -41,7 +44,7 @@ Returns the integer value of the element at index C<key>.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "ResizableIntegerArray: index out of bounds!");
 
-        GET_ATTR_size(interp, SELF, size);
+        GET_ATTR_size(INTERP, SELF, size);
 
         if (key >= size)
             return 0;
@@ -147,17 +150,17 @@ of the array.
         INTVAL  nextix;
         INTVAL  resize_threshold;
 
-        GET_ATTR_size(interp, SELF, nextix);
-        GET_ATTR_resize_threshold(interp, SELF, resize_threshold);
+        GET_ATTR_size(INTERP, SELF, nextix);
+        GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
 
         /* can't always avoid the resize, but don't duplicate the code */
         if ((nextix && (nextix >= resize_threshold)) || !nextix)
             SELF.set_integer_native(nextix + 1);
         else
-            SET_ATTR_size(interp, SELF, nextix + 1);
+            SET_ATTR_size(INTERP, SELF, nextix + 1);
 
         /* fetch the array only after resize check; realloc may move it */
-        GET_ATTR_int_array(interp, SELF, int_array);
+        GET_ATTR_int_array(INTERP, SELF, int_array);
         int_array[nextix] = value;
     }
 
@@ -309,8 +312,12 @@ Used to unarchive the array.
     }
 
     VTABLE void thaw(PMC *info) {
-        const INTVAL n = VTABLE_shift_integer(INTERP, info);
-        const INTVAL rt = VTABLE_shift_integer(INTERP, info);
+        INTVAL n, rt;
+
+        SUPER(info);
+
+        n = VTABLE_shift_integer(INTERP, info);
+        rt = VTABLE_shift_integer(INTERP, info);
 
         SET_ATTR_size(INTERP, SELF, 0);
         SET_ATTR_resize_threshold(INTERP, SELF, rt);
@@ -353,5 +360,5 @@ moved available size to int_val2 - Matt Fowles 2005-07-22
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

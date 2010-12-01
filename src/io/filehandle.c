@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -26,59 +25,6 @@ operating systems. For the primary public I/O API, see F<src/io/api.c>.
 =head2 Functions
 
 =over 4
-
-=item C<INTVAL Parrot_io_parse_open_flags(PARROT_INTERP, STRING *mode_str)>
-
-Parses a Parrot string for file open mode flags (C<r> for read, C<w> for write,
-C<a> for append, and C<p> for pipe) and returns the combined generic bit flags.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-INTVAL
-Parrot_io_parse_open_flags(PARROT_INTERP, ARGIN_NULLOK(STRING *mode_str))
-{
-    ASSERT_ARGS(Parrot_io_parse_open_flags)
-    INTVAL i, mode_len;
-    INTVAL flags = 0;
-
-    if (STRING_IS_NULL(mode_str))
-        return PIO_F_READ;
-
-    mode_len = Parrot_str_byte_length(interp, mode_str);
-
-    for (i = 0; i < mode_len; ++i) {
-        INTVAL s = Parrot_str_indexed(interp, mode_str, i);
-        switch (s) {
-          case 'r':
-            flags |= PIO_F_READ;
-            break;
-          case 'w':
-            flags |= PIO_F_WRITE;
-            if (!(flags & PIO_F_APPEND)) /* don't truncate if appending */
-                flags |= PIO_F_TRUNC;
-            break;
-          case 'a':
-            flags |= PIO_F_APPEND;
-            flags |= PIO_F_WRITE;
-            if ((flags & PIO_F_TRUNC)) /* don't truncate if appending */
-                flags &= ~PIO_F_TRUNC;
-            break;
-          case 'p':
-            flags |= PIO_F_PIPE;
-            break;
-          default:
-            break;
-        }
-    }
-
-    return flags;
-}
-
-/*
 
 =item C<STRING * Parrot_io_make_string(PARROT_INTERP, STRING **buf, size_t len)>
 
@@ -120,11 +66,11 @@ Parrot_io_make_string(PARROT_INTERP, ARGMOD(STRING **buf), size_t len)
      * when we get a NULL string, we read a default len
      */
     if (*buf == NULL) {
-        *buf = Parrot_str_new_noinit(interp, enum_stringrep_one, len);
+        *buf = Parrot_str_new_noinit(interp, len);
         return *buf;
     }
     else {
-        STRING *s = *buf;
+        STRING * const s = *buf;
         if (s->bufused < len)
             Parrot_gc_reallocate_string_storage(interp, s, len);
         return s;
@@ -154,7 +100,7 @@ buffer and file positions) to their default values.
 
 PARROT_EXPORT
 void
-Parrot_io_set_os_handle(SHIM_INTERP, ARGIN(PMC *filehandle), PIOHANDLE file_descriptor)
+Parrot_io_set_os_handle(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE file_descriptor)
 {
     ASSERT_ARGS(Parrot_io_set_os_handle)
     PARROT_FILEHANDLE(filehandle)->os_handle = file_descriptor;
@@ -162,7 +108,7 @@ Parrot_io_set_os_handle(SHIM_INTERP, ARGIN(PMC *filehandle), PIOHANDLE file_desc
 
 /*
 
-=item C<PIOHANDLE Parrot_io_get_os_handle(PARROT_INTERP, PMC *filehandle)>
+=item C<PIOHANDLE Parrot_io_get_os_handle(PARROT_INTERP, const PMC *filehandle)>
 
 Retrieve the C<os_handle> attribute of the FileHandle object, which stores the
 low-level filehandle for the OS.
@@ -177,8 +123,9 @@ it can be cleanly changed later.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
-Parrot_io_get_os_handle(SHIM_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_get_os_handle(SHIM_INTERP, ARGIN(const PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_get_os_handle)
     return PARROT_FILEHANDLE(filehandle)->os_handle;
@@ -205,7 +152,7 @@ void
 Parrot_io_set_flags(SHIM_INTERP, ARGIN(PMC *filehandle), INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_set_flags)
-    Parrot_FileHandle_attributes *handle_struct = PARROT_FILEHANDLE(filehandle);
+    Parrot_FileHandle_attributes * const handle_struct = PARROT_FILEHANDLE(filehandle);
     handle_struct->flags = flags;
 }
 
@@ -304,7 +251,7 @@ it can be cleanly changed later.
 */
 
 void
-Parrot_io_set_buffer_start(SHIM_INTERP, ARGIN(PMC *filehandle),
+Parrot_io_set_buffer_start(SHIM_INTERP, ARGMOD(PMC *filehandle),
         ARGIN_NULLOK(unsigned char *new_start))
 {
     ASSERT_ARGS(Parrot_io_set_buffer_start)
@@ -329,6 +276,7 @@ it can be cleanly changed later.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 unsigned char *
 Parrot_io_get_buffer_start(SHIM_INTERP, ARGIN(PMC *filehandle))
@@ -339,7 +287,7 @@ Parrot_io_get_buffer_start(SHIM_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<unsigned char * Parrot_io_get_buffer_next(PARROT_INTERP, PMC
+=item C<unsigned char * Parrot_io_get_buffer_next(PARROT_INTERP, const PMC
 *filehandle)>
 
 Get the C<buffer_next> attribute of the FileHandle object, which stores
@@ -357,7 +305,7 @@ it can be cleanly changed later.
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 unsigned char *
-Parrot_io_get_buffer_next(SHIM_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_get_buffer_next(SHIM_INTERP, ARGIN(const PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_get_buffer_next)
     return PARROT_FILEHANDLE(filehandle)->buffer_next;
@@ -381,7 +329,7 @@ it can be cleanly changed later.
 */
 
 void
-Parrot_io_set_buffer_next(SHIM_INTERP, ARGIN(PMC *filehandle),
+Parrot_io_set_buffer_next(SHIM_INTERP, ARGMOD(PMC *filehandle),
         ARGIN_NULLOK(unsigned char *new_next))
 {
     ASSERT_ARGS(Parrot_io_set_buffer_next)
@@ -390,7 +338,7 @@ Parrot_io_set_buffer_next(SHIM_INTERP, ARGIN(PMC *filehandle),
 
 /*
 
-=item C<unsigned char * Parrot_io_get_buffer_end(PARROT_INTERP, PMC
+=item C<unsigned char * Parrot_io_get_buffer_end(PARROT_INTERP, const PMC
 *filehandle)>
 
 Get the C<buffer_end> attribute of the FileHandle object, which stores
@@ -406,9 +354,10 @@ it can be cleanly changed later.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 unsigned char *
-Parrot_io_get_buffer_end(SHIM_INTERP, ARGIN_NULLOK(PMC *filehandle))
+Parrot_io_get_buffer_end(SHIM_INTERP, ARGIN(const PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_get_buffer_end)
     return PARROT_FILEHANDLE(filehandle)->buffer_end;
@@ -432,7 +381,7 @@ it can be cleanly changed later.
 */
 
 void
-Parrot_io_set_buffer_end(SHIM_INTERP, ARGIN(PMC *filehandle),
+Parrot_io_set_buffer_end(SHIM_INTERP, ARGMOD(PMC *filehandle),
         ARGIN_NULLOK(unsigned char *new_end))
 {
     ASSERT_ARGS(Parrot_io_set_buffer_end)
@@ -441,7 +390,7 @@ Parrot_io_set_buffer_end(SHIM_INTERP, ARGIN(PMC *filehandle),
 
 /*
 
-=item C<INTVAL Parrot_io_get_buffer_flags(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_get_buffer_flags(PARROT_INTERP, const PMC *filehandle)>
 
 Get the C<buffer_flags> attribute of the FileHandle object, which stores
 a collection of flags specific to the buffer.
@@ -457,7 +406,7 @@ it can be cleanly changed later.
 
 PARROT_CAN_RETURN_NULL
 INTVAL
-Parrot_io_get_buffer_flags(SHIM_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_get_buffer_flags(SHIM_INTERP, ARGIN(const PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_get_buffer_flags)
     return PARROT_FILEHANDLE(filehandle)->buffer_flags;
@@ -481,7 +430,7 @@ it can be cleanly changed later.
 */
 
 void
-Parrot_io_set_buffer_flags(SHIM_INTERP, ARGIN(PMC *filehandle), INTVAL new_flags)
+Parrot_io_set_buffer_flags(SHIM_INTERP, ARGMOD(PMC *filehandle), INTVAL new_flags)
 {
     ASSERT_ARGS(Parrot_io_set_buffer_flags)
     PARROT_FILEHANDLE(filehandle)->buffer_flags = new_flags;
@@ -489,7 +438,7 @@ Parrot_io_set_buffer_flags(SHIM_INTERP, ARGIN(PMC *filehandle), INTVAL new_flags
 
 /*
 
-=item C<size_t Parrot_io_get_buffer_size(PARROT_INTERP, PMC *filehandle)>
+=item C<size_t Parrot_io_get_buffer_size(PARROT_INTERP, const PMC *filehandle)>
 
 Get the C<buffer_size> attribute of the FileHandle object, which stores
 the size of the buffer (in bytes).
@@ -504,8 +453,9 @@ it can be cleanly changed later.
 */
 
 PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 size_t
-Parrot_io_get_buffer_size(SHIM_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_get_buffer_size(SHIM_INTERP, ARGIN(const PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_get_buffer_size)
     return PARROT_FILEHANDLE(filehandle)->buffer_size;
@@ -529,7 +479,7 @@ it can be cleanly changed later.
 */
 
 void
-Parrot_io_set_buffer_size(SHIM_INTERP, ARGIN(PMC *filehandle), size_t new_size)
+Parrot_io_set_buffer_size(SHIM_INTERP, ARGMOD(PMC *filehandle), size_t new_size)
 {
     ASSERT_ARGS(Parrot_io_set_buffer_size)
     PARROT_FILEHANDLE(filehandle)->buffer_size = new_size;
@@ -552,7 +502,7 @@ it can be cleanly changed later.
 
 PARROT_CAN_RETURN_NULL
 void
-Parrot_io_clear_buffer(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_clear_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_clear_buffer)
     Parrot_FileHandle_attributes * const io = PARROT_FILEHANDLE(filehandle);
@@ -564,31 +514,7 @@ Parrot_io_clear_buffer(PARROT_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<PIOOFF_T Parrot_io_get_file_position(PARROT_INTERP, PMC *filehandle)>
-
-Get the C<file_pos> attribute of the FileHandle object, which stores
-the current file position of the filehandle.
-
-Currently, this pokes directly into the C struct of the FileHandle PMC. This
-needs to change to a general interface that can be used by all subclasses and
-polymorphic equivalents of FileHandle. For now, hiding it behind a function, so
-it can be cleanly changed later.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PIOOFF_T
-Parrot_io_get_file_position(SHIM_INTERP, ARGIN(PMC *filehandle))
-{
-    ASSERT_ARGS(Parrot_io_get_file_position)
-    return PARROT_FILEHANDLE(filehandle)->file_pos;
-}
-
-/*
-
-=item C<PIOOFF_T Parrot_io_get_last_file_position(PARROT_INTERP, PMC
+=item C<PIOOFF_T Parrot_io_get_file_position(PARROT_INTERP, const PMC
 *filehandle)>
 
 Get the C<file_pos> attribute of the FileHandle object, which stores
@@ -604,8 +530,35 @@ it can be cleanly changed later.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
-Parrot_io_get_last_file_position(SHIM_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_get_file_position(SHIM_INTERP, ARGIN(const PMC *filehandle))
+{
+    ASSERT_ARGS(Parrot_io_get_file_position)
+    return PARROT_FILEHANDLE(filehandle)->file_pos;
+}
+
+/*
+
+=item C<PIOOFF_T Parrot_io_get_last_file_position(PARROT_INTERP, const PMC
+*filehandle)>
+
+Get the C<file_pos> attribute of the FileHandle object, which stores
+the current file position of the filehandle.
+
+Currently, this pokes directly into the C struct of the FileHandle PMC. This
+needs to change to a general interface that can be used by all subclasses and
+polymorphic equivalents of FileHandle. For now, hiding it behind a function, so
+it can be cleanly changed later.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PIOOFF_T
+Parrot_io_get_last_file_position(SHIM_INTERP, ARGIN(const PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_get_last_file_position)
     return PARROT_FILEHANDLE(filehandle)->last_pos;
@@ -631,7 +584,7 @@ it can be cleanly changed later.
 
 PARROT_EXPORT
 void
-Parrot_io_set_file_position(SHIM_INTERP, ARGIN(PMC *filehandle), PIOOFF_T file_pos)
+Parrot_io_set_file_position(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOOFF_T file_pos)
 {
     ASSERT_ARGS(Parrot_io_set_file_position)
     Parrot_FileHandle_attributes * const handle_struct = PARROT_FILEHANDLE(filehandle);
@@ -641,8 +594,8 @@ Parrot_io_set_file_position(SHIM_INTERP, ARGIN(PMC *filehandle), PIOOFF_T file_p
 
 /*
 
-=item C<INTVAL Parrot_io_is_encoding(PARROT_INTERP, PMC *filehandle, STRING
-*value)>
+=item C<INTVAL Parrot_io_is_encoding(PARROT_INTERP, const PMC *filehandle,
+STRING *value)>
 
 Check whether the encoding attribute of the filehandle matches a passed in
 string.
@@ -659,14 +612,14 @@ it can be cleanly changed later.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_is_encoding(PARROT_INTERP, ARGIN(PMC *filehandle), ARGIN(STRING *value))
+Parrot_io_is_encoding(PARROT_INTERP, ARGIN(const PMC *filehandle), ARGIN(STRING *value))
 {
     ASSERT_ARGS(Parrot_io_is_encoding)
     Parrot_FileHandle_attributes * const handle_struct = PARROT_FILEHANDLE(filehandle);
     if (STRING_IS_NULL(handle_struct->encoding))
         return 0;
 
-    if (Parrot_str_equal(interp, value, handle_struct->encoding))
+    if (STRING_equal(interp, value, handle_struct->encoding))
         return 1;
 
     return 0;
@@ -704,7 +657,7 @@ Parrot_io_close_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_io_is_closed_filehandle(PARROT_INTERP, PMC *pmc)>
+=item C<INTVAL Parrot_io_is_closed_filehandle(PARROT_INTERP, const PMC *pmc)>
 
 Test whether a filehandle is closed.
 
@@ -713,8 +666,9 @@ Test whether a filehandle is closed.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_is_closed_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_io_is_closed_filehandle(PARROT_INTERP, ARGIN(const PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_is_closed_filehandle)
     return PIO_IS_CLOSED(interp, pmc);
@@ -762,5 +716,5 @@ F<src/io/io_private.h>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

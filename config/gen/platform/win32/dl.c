@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2004-2008, Parrot Foundation.
  */
 
@@ -23,7 +22,7 @@ Functions for working with dynamic libraries under windows.
 
 /*
 
-=item C<void * Parrot_dlopen(const char *filename)>
+=item C<void * Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)>
 
 Opens a dynamic library, and returns a system handle to that library.
 Returns Parrot_dlerror() on failure.
@@ -33,7 +32,7 @@ Returns Parrot_dlerror() on failure.
 */
 
 void *
-Parrot_dlopen(const char *filename)
+Parrot_dlopen(const char *filename, SHIM(Parrot_dlopen_flags flags))
 {
     return LoadLibrary(filename);
 }
@@ -42,7 +41,7 @@ Parrot_dlopen(const char *filename)
 
 =item C<const char * Parrot_dlerror(void)>
 
-System-dependant error code that indicates failure in opening a DL.
+System-dependent error code that indicates failure in opening a DL.
 
 =cut
 
@@ -118,6 +117,6 @@ Parrot_dlclose(void *handle)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

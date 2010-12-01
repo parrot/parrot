@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2006-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -27,6 +26,8 @@ L<http://swiss.csail.mit.edu/classes/symbolic/spring06/psets/ps6/samefringe.scm>
 =cut
 
 .const int N_TESTS = 6
+
+.loadlib 'io_ops'
 
 ## Build an N-ary tree (where N is passed as node_width) of the specified depth,
 ## with the leaves being consecutive integer PMCs from start but less than N.
@@ -145,9 +146,9 @@ done:
 	.param pmc tree2
 
 	.local pmc coro_class
-    coro_class = get_class 'Parrot::Coroutine'
+    coro_class = get_class ['Parrot'; 'Coroutine']
     unless null coro_class goto found
-	printerr "Bug:  Can't find 'Parrot::Coroutine' class.\n"
+	printerr "Bug:  Can't find ['Parrot'; 'Coroutine'] class.\n"
 	die 5, 1
 found:
 	.local pmc coro1, coro2

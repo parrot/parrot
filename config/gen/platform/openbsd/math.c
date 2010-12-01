@@ -1,6 +1,5 @@
 /*
- * $Id$
- * Copyright (C) 2006-2007, Parrot Foundation.
+ * Copyright (C) 2006-2010, Parrot Foundation.
  */
 
 /*
@@ -11,7 +10,7 @@ math.c
 
 =head1 DESCRIPTION
 
-math stuff
+Mathematical functions.
 
 =head2 Functions
 
@@ -37,7 +36,7 @@ _LIB_VERSION_TYPE _LIB_VERSION = _IEEE_;
 
 =item C<extern int Parrot_signbit(double x)>
 
-return true if the Numval has a negative sign.
+Return true if the Numval has a negative sign.
 This is mostly for handling the -0.0 case.
 
 =cut
@@ -64,6 +63,8 @@ Parrot_signbit(double x)
 /*
 
 =item C<int Parrot_signbit_l(long double x)>
+
+Like C<Parrot_signbit()>, only taking long double instead of double.
 
 =cut
 
@@ -93,5 +94,5 @@ Parrot_signbit_l(long double x)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

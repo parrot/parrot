@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -113,7 +112,7 @@ collection.
 =item C<gcdebug>
 
 Toggle garbage collection debugging mode.  In gcdebug mode a garbage collection
-cycle is run before each opcocde, which is the same as using the gcdebug core.
+cycle is run before each opcode, which is the same as using the gcdebug core.
 
 =item C<quit> or C<q>
 
@@ -136,24 +135,25 @@ and C<debug_break> ops in F<ops/debug.ops>.
 
 */
 
+#define PARROT_IN_EXTENSION
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "../compilers/imcc/imc.h"
-#include "../compilers/imcc/parser.h"
+#include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/debugger.h"
 #include "parrot/runcore_api.h"
 
 static void PDB_printwelcome(void);
-static void PDB_run_code(PARROT_INTERP, int argc, char *argv[]);
+static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[]);
 
 /*
 
-=item C<int main(int argc, char *argv[])>
+=item C<int main(int argc, const char *argv[])>
 
-Reads the PIR, PASM or PBC file from argv[1], loads it, and then calls
+Reads the PIR, PASM, or PBC file from argv[1], loads it, and then calls
 Parrot_debug().
 
 =cut
@@ -161,7 +161,7 @@ Parrot_debug().
 */
 
 int
-main(int argc, char *argv[])
+main(int argc, const char *argv[])
 {
     int nextarg;
     Parrot_Interp     interp;
@@ -206,34 +206,13 @@ main(int argc, char *argv[])
             PackFile_fixup_subs(interp, PBC_MAIN, NULL);
         }
         else {
-            void            *yyscanner;
-            Parrot_PackFile  pf        = PackFile_new(interp, 0);
-            int              pasm_file = 0;
-
-            do_yylex_init(interp, &yyscanner);
+            STRING          *errmsg = NULL;
+            Parrot_PackFile  pf     = PackFile_new(interp, 0);
 
             Parrot_pbc_load(interp, pf);
-
-            IMCC_push_parser_state(interp);
-            IMCC_INFO(interp)->state->file = mem_sys_strdup(filename);
-
-            if (!(imc_yyin_set(fopen(filename, "r"), yyscanner)))    {
-                IMCC_fatal_standalone(interp, EXCEPTION_PIO_ERROR,
-                        "Error reading source file %s.\n",
-                        filename);
-            }
-
-            if (ext && STREQ(ext, ".pasm"))
-                pasm_file = 1;
-
-            emit_open(interp, 1, NULL);
-            IMCC_INFO(interp)->state->pasm_file = pasm_file;
-            yyparse(yyscanner, interp);
-            imc_compile_all_units(interp);
-
-            imc_cleanup(interp, yyscanner);
-
-            fclose(imc_yyin_get(yyscanner));
+            Parrot_compile_file(interp, filename, &errmsg);
+            if (errmsg)
+                Parrot_ex_throw_from_c_args(interp, NULL, 1, "%S", errmsg);
             PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
 
             /* load the source for debugger list */
@@ -249,9 +228,9 @@ main(int argc, char *argv[])
         STRING *compiler = Parrot_str_new_constant(interp, "PIR");
         STRING *errstr = NULL;
         const char source []= ".sub aux :main\nexit 0\n.end\n";
-        PMC *code = Parrot_compile_string(interp, compiler, source, &errstr);
+        Parrot_compile_string(interp, compiler, source, &errstr);
 
-        if (!STRING_is_null(interp, errstr))
+        if (!STRING_IS_NULL(errstr))
             Parrot_io_eprintf(interp, "%Ss\n", errstr);
     }
 
@@ -266,21 +245,22 @@ main(int argc, char *argv[])
     Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "debugger"));
     PDB_run_code(interp, argc - nextarg, argv + nextarg);
 
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
+
 
 /*
 
-=item C<static void PDB_run_code(PARROT_INTERP, int argc, char *argv[])>
+=item C<static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[])>
 
-Run the code, catching exceptions if they are left unhandled.
+Runs the code, catching exceptions if they are left unhandled.
 
 =cut
 
 */
 
 static void
-PDB_run_code(PARROT_INTERP, int argc, char *argv[])
+PDB_run_code(PARROT_INTERP, int argc, const char *argv[])
 {
     new_runloop_jump_point(interp);
     if (setjmp(interp->current_runloop->resume)) {
@@ -297,6 +277,7 @@ PDB_run_code(PARROT_INTERP, int argc, char *argv[])
     free_runloop_jump_point(interp);
 }
 
+
 /*
 
 =item C<static void PDB_printwelcome(void)>
@@ -312,7 +293,7 @@ PDB_printwelcome(void)
 {
     fprintf(stderr,
         "Parrot " PARROT_VERSION " Debugger\n"
-        "\nPlease note: the debugger is currently under reconstruction\n");
+        "(Please note: the debugger is currently under reconstruction)\n");
 }
 
 /*
@@ -331,7 +312,7 @@ F<src/debug.c>, F<include/parrot/debug.h>.
 
 =item * Start of rewrite - leo 2005.02.16
 
-The debugger now uses it's own interpreter. User code is run in
+The debugger now uses its own interpreter. User code is run in
 Interp* debugee. We have:
 
   debug_interp->pdb->debugee->debugger
@@ -353,11 +334,7 @@ it bang now, try listing the source before loading or disassembling it.
 
 =item * Print the interpreter info.
 
-=item * Make the user interface better (add comands
-history/completion).
-
-=item * Some other things I don't remember now because it's late.
-
+=item * Make the user interface better (add command history/completion).
 
 =back
 
@@ -374,5 +351,5 @@ Renamed from F<pdb.c> on 2008.7.15
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

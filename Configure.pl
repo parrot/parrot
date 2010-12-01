@@ -1,7 +1,6 @@
 #! perl
 
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 use 5.008;
 use strict;
@@ -285,6 +284,14 @@ Specify which linker to use.
 
 Use the given linker flags
 
+=item C<--ar=(archiver)>
+
+Specify which librarian to use for static libraries
+
+=item C<--arflags=(flags)>
+
+Use the given librarian flags for static libraris
+
 =item C<--ld=(linker)>
 
 Specify which loader to use for shared libraries.
@@ -342,10 +349,6 @@ Use the given type for opcodes.
 =item C<--ops=(files)>
 
 Use the given ops files.
-
-=item C<--cgoto=0>
-
-Don't build cgoto core. This is recommended when you are short of memory.
 
 =item C<--jitcapable>
 
@@ -608,8 +611,6 @@ configuration file.
     init::optimize
     inter::shlibs
     inter::libparrot
-    inter::charset
-    inter::encoding
     inter::types
     auto::ops
     auto::alignptrs
@@ -623,7 +624,6 @@ configuration file.
     auto::jit
     auto::frames
     auto::cpu
-    auto::cgoto
     auto::inline
     auto::gc
     auto::memalign
@@ -632,10 +632,8 @@ configuration file.
     auto::env
     auto::gmp
     auto::readline
-    auto::gdbm
     auto::pcre
     auto::opengl
-    auto::crypto
     auto::gettext
     auto::snprintf
     # auto::perldoc
@@ -644,7 +642,6 @@ configuration file.
     auto::icu
     gen::config_h
     gen::core_pmcs
-    gen::crypto
     gen::opengl
     gen::makefiles
     gen::platform

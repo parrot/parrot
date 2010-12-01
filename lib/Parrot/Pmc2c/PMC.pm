@@ -1,5 +1,4 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
-# $Id$
+# Copyright (C) 2004-2010, Parrot Foundation.
 #
 
 =head1 NAME
@@ -71,6 +70,8 @@ sub dump {
 # methods
 sub add_method {
     my ( $self, $method ) = @_;
+    die "FATAL ERROR: Duplicated VTABLE function: " . $method->name
+        if exists $self->{has_method}{$method->name};
     $self->{has_method}{ $method->name } = @{ $self->{methods} };
     push @{ $self->{methods} }, $method;
 }
@@ -132,7 +133,7 @@ Determines if a given PMC type is dynamically loaded or not.
 
 =item C<implements_vtable($method)>
 
-True if pmc generates code for vtable method C<$method>.
+True if pmc generates code for vtable C<$method>.
 
 =cut
 
@@ -321,7 +322,7 @@ sub method_attrs {
 
 =item C<vtable_method_does_write($method)>
 
-Returns true if the vtable method C<$method> writes our value.
+Returns true if the vtable C<$method> writes our value.
 
 =back
 
@@ -340,7 +341,6 @@ sub vtable_method_does_multi {
     my ( $self, $methodname ) = @_;
 
     return 1 if ($methodname =~ m/^
-                (?:i_)?
                 (?:add|subtract|multiply|divide|floor_divide|modulus)
                 (?:_int|_float)?
               $/x);
@@ -433,11 +433,13 @@ B<Comments:>  Called within C<dump_pmc()>.
 =cut
 
 sub dump_is_current {
-    my ($self)   = @_;
-    my $dumpfile = $self->filename('.dump');
+    my ($self, $dumpfile)   = @_;
+    $dumpfile ||= $self->filename('.dump');
     return 0 unless -e $dumpfile;
 
     my $pmcfile  = $self->filename('.pmc');
+    return 1 unless -e $pmcfile;
+
     return ( stat $dumpfile )[9] >= ( stat $pmcfile )[9];
 }
 

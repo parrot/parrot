@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -25,13 +24,13 @@ for compiling programs in Parrot.
     p6meta.'new_class'('POST::Sub', 'parent'=>base)
 
     $P0 = new 'ResizableStringArray'
-    $P0[0] = "    .param pmc %0"
-    $P0[1] = "    .param pmc %0 :optional\n    .param int has_%0 :opt_flag"
-    $P0[2] = "    .param pmc %0 :slurpy"
-    $P0[4] = "    .param pmc %0 :named(%1)"
-    $P0[5] = "    .param pmc %0 :optional :named(%1)\n    .param int has_%0 :opt_flag"
-    $P0[6] = "    .param pmc %0 :slurpy :named"
-    $P0[8] = "    .param pmc %0 :call_sig"
+    $P0[0] = "    .param pmc %0\n"
+    $P0[1] = "    .param pmc %0 :optional\n    .param int has_%0 :opt_flag\n"
+    $P0[2] = "    .param pmc %0 :slurpy\n"
+    $P0[4] = "    .param pmc %0 :named(%1)\n"
+    $P0[5] = "    .param pmc %0 :optional :named(%1)\n    .param int has_%0 :opt_flag\n"
+    $P0[6] = "    .param pmc %0 :slurpy :named\n"
+    $P0[8] = "    .param pmc %0 :call_sig\n"
     set_hll_global ['POST';'Sub'], '%!paramfmt', $P0
     .return ()
 .end
@@ -45,10 +44,6 @@ C<POST::Node> is the base class for all POST nodes.  It's derived from class
 C<PCT::Node> (see F<compilers/pct/src/PCT/Node.pir>).
 
 =over 4
-
-=item result([value])
-
-Get/set
 
 =cut
 
@@ -82,7 +77,7 @@ as the result of the current node.
 .end
 
 
-=item get_string()   # vtable method
+=item get_string()
 
 Returns the result of the current node as a string.
 
@@ -116,13 +111,14 @@ newly created node.
 
 =item escape(str)
 
-Return C<str> as a PIR constant string.
+Return C<str> as a PIR constant string.  (Deprecated in favor of
+C<POST::Compiler.escape>.)
 
 =cut
 
 .sub 'escape' :method
     .param string str
-    $P0 = new 'CodeString'
+    $P0 = get_hll_global ['PAST'], 'Compiler'
     str = $P0.'escape'(str)
     .return (str)
 .end
@@ -197,10 +193,23 @@ Get/set the opcode type for this node.
 .end
 
 
+.sub 'loadlibs' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('loadlibs', value, has_value)
+.end
+
+
 .sub 'outer' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .tailcall self.'attr'('outer', value, has_value)
+.end
+
+.sub 'multi' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('multi', value, has_value)
 .end
 
 
@@ -271,18 +280,33 @@ Get/set the opcode type for this node.
     .local pmc code
     code = paramlist[paramseq]
     unless null code goto have_code
-    code = new 'CodeString'
+    code = new 'StringBuilder'
     paramlist[paramseq] = code
   have_code:
 
     .local pmc paramfmt
     paramfmt = get_hll_global ['POST';'Sub'], '%!paramfmt'
     $S0 = paramfmt[paramseq]
-    named = code.'escape'(named)
-    code.'emit'($S0, pname, named)
+    named = self.'escape'(named)
+    code.'append_format'($S0, pname, named)
 
     .return ()
 .end
+
+
+.sub 'add_directive' :method
+    .param string line
+    .local string dlist
+    dlist = self['directives']
+    $I0 = index dlist, line
+    unless $I0 < 0 goto done
+    dlist = concat dlist, line
+    dlist = concat dlist, "\n"
+    self['directives'] = dlist
+  done:
+    .return ()
+.end
+
 
 =back
 

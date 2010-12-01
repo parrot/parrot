@@ -1,7 +1,5 @@
 /* oo_private.h
  *  Copyright (C) 2007-2008, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Structs, typedefs and macros for the Class, Object, and PMCProxy PMCs.
  *     This header file is only included by files within the OO subsystem.
@@ -52,5 +50,5 @@ typedef enum {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

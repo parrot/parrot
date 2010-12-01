@@ -1,7 +1,5 @@
 /* extend.h
  *  Copyright (C) 2001-2008, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the Parrot extension mechanism, the face we present to
  *     extension modules and whatnot
@@ -28,7 +26,6 @@
 #if defined(PARROT_IN_CORE)
 
 #define Parrot_Language Parrot_Int
-#define Parrot_VTABLE VTABLE *
 
 /* Macro to save off the original stack pointer for GC scanning. If
    the stacktop was NULL, then set it to the address of the cached
@@ -52,7 +49,6 @@ typedef void * Parrot_Encoding;
 typedef void * Parrot_CharType;
 typedef const void * Parrot_Const_Encoding;
 typedef const void * Parrot_Const_CharType;
-typedef const void * Parrot_VTABLE;
 
 #endif
 
@@ -75,8 +71,10 @@ void Parrot_ext_call(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-Parrot_Language Parrot_find_language(SHIM_INTERP, SHIM(char *language));
+Parrot_Language Parrot_find_language(SHIM_INTERP,
+    SHIM(const char *language));
 
 PARROT_EXPORT
 int Parrot_fprintf(PARROT_INTERP,
@@ -88,31 +86,31 @@ int Parrot_fprintf(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_free_cstring(ARGIN_NULLOK(char *string));
+void Parrot_free_cstring(ARGFREE(char *string));
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_Int Parrot_get_intreg(PARROT_INTERP, Parrot_Int regnum)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_Float Parrot_get_numreg(PARROT_INTERP, Parrot_Int regnum)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_PMC Parrot_get_pmcreg(PARROT_INTERP, Parrot_Int regnum)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_PMC Parrot_get_root_namespace(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-Parrot_String Parrot_get_strreg(PARROT_INTERP, Parrot_Int regnum)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 PARROT_PURE_FUNCTION
-Parrot_VTABLE Parrot_get_vtable(PARROT_INTERP, Parrot_Int id)
+Parrot_String Parrot_get_strreg(PARROT_INTERP, Parrot_Int regnum)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -126,99 +124,6 @@ Parrot_String Parrot_new_string(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_PMC_delete_pmckey(PARROT_INTERP, Parrot_PMC pmc, Parrot_PMC key)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
-char * Parrot_PMC_get_cstring(PARROT_INTERP, Parrot_PMC pmc)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
-char * Parrot_PMC_get_cstring_intkey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_Int key)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
-char * Parrot_PMC_get_cstringn(PARROT_INTERP,
-    ARGIN(Parrot_PMC pmc),
-    ARGOUT(Parrot_Int *length))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*length);
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
-char * Parrot_PMC_get_cstringn_intkey(PARROT_INTERP,
-    ARGIN(Parrot_PMC pmc),
-    ARGOUT(Parrot_Int *length),
-    Parrot_Int key)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*length);
-
-PARROT_EXPORT
-Parrot_Int Parrot_PMC_get_intval(PARROT_INTERP, Parrot_PMC pmc)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-Parrot_Int Parrot_PMC_get_intval_intkey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_Int key)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-Parrot_Int Parrot_PMC_get_intval_pmckey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_PMC key)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-Parrot_Float Parrot_PMC_get_numval(PARROT_INTERP, Parrot_PMC pmc)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-Parrot_Float Parrot_PMC_get_numval_intkey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_Int key)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-Parrot_PMC Parrot_PMC_get_pmc_intkey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_Int key)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-Parrot_PMC Parrot_PMC_get_pmc_strkey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_String key)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-void * Parrot_PMC_get_pointer_intkey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_Int key)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-Parrot_String Parrot_PMC_get_string_intkey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_Int key)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 Parrot_PMC Parrot_PMC_new(PARROT_INTERP, Parrot_Int type)
         __attribute__nonnull__(1);
 
@@ -227,120 +132,8 @@ Parrot_PMC Parrot_PMC_newclass(PARROT_INTERP, Parrot_PMC classtype)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 Parrot_PMC Parrot_PMC_null(void);
-
-PARROT_EXPORT
-void Parrot_PMC_push_intval(PARROT_INTERP, Parrot_PMC pmc, Parrot_Int value)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_push_numval(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_Float value)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_push_pmcval(PARROT_INTERP, Parrot_PMC pmc, Parrot_PMC value)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_set_cstring(PARROT_INTERP,
-    Parrot_PMC pmc,
-    ARGIN_NULLOK(const char *value))
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_set_cstring_intkey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_Int key,
-    ARGIN_NULLOK(const char *value))
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_set_cstringn(PARROT_INTERP,
-    Parrot_PMC pmc,
-    ARGIN_NULLOK(const char *value),
-    Parrot_UInt length)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_set_cstringn_intkey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_Int key,
-    ARGIN_NULLOK(const char *value),
-    Parrot_UInt length)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_set_intval(PARROT_INTERP, Parrot_PMC pmc, Parrot_Int value)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_set_intval_intkey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_Int key,
-    Parrot_Int value)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_set_numval(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_Float value)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_set_numval_intkey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_Int key,
-    Parrot_Float value)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_set_pmc_intkey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_Int key,
-    Parrot_PMC value)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_set_pmc_pmckey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_PMC key,
-    Parrot_PMC value)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_set_pmc_strkey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_String key,
-    Parrot_PMC value)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_set_pointer_intkey(PARROT_INTERP,
-    ARGIN(Parrot_PMC pmc),
-    Parrot_Int key,
-    ARGIN_NULLOK(void *value))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-void Parrot_PMC_set_string(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_String value)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_set_string_intkey(PARROT_INTERP,
-    Parrot_PMC pmc,
-    Parrot_Int key,
-    Parrot_String value)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_PMC_set_vtable(SHIM_INTERP,
-    Parrot_PMC pmc,
-    Parrot_VTABLE vtable);
 
 PARROT_EXPORT
 Parrot_Int Parrot_PMC_typenum(PARROT_INTERP,
@@ -353,6 +146,10 @@ int Parrot_printf(NULLOK_INTERP, ARGIN(const char *s), ...)
 
 PARROT_EXPORT
 void Parrot_register_pmc(PARROT_INTERP, Parrot_PMC pmc)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_register_string(PARROT_INTERP, Parrot_String s)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -386,6 +183,10 @@ void Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+void Parrot_unregister_string(PARROT_INTERP, Parrot_String s)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 int Parrot_vfprintf(PARROT_INTERP,
     ARGIN(Parrot_PMC pio),
     ARGIN(const char *s),
@@ -416,90 +217,20 @@ int Parrot_vfprintf(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_get_strreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_get_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_new_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_delete_pmckey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_get_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_get_cstring_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_get_cstringn __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc) \
-    , PARROT_ASSERT_ARG(length))
-#define ASSERT_ARGS_Parrot_PMC_get_cstringn_intkey \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc) \
-    , PARROT_ASSERT_ARG(length))
-#define ASSERT_ARGS_Parrot_PMC_get_intval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_get_intval_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_get_intval_pmckey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_get_numval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_get_numval_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_get_pmc_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_get_pmc_strkey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_get_pointer_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_get_string_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_PMC_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_PMC_newclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_PMC_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_PMC_push_intval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_push_numval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_push_pmcval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_set_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_set_cstring_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_set_cstringn __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_set_cstringn_intkey \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_set_intval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_set_intval_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_set_numval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_set_numval_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_set_pmc_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_set_pmc_pmckey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_set_pmc_strkey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_set_pointer_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_Parrot_PMC_set_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_set_string_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_set_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_PMC_typenum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_printf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_register_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_register_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_set_intreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -515,6 +246,8 @@ int Parrot_vfprintf(PARROT_INTERP,
     , PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_unregister_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_unregister_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_vfprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pio) \
@@ -528,5 +261,5 @@ int Parrot_vfprintf(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

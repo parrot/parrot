@@ -1,6 +1,5 @@
 /*
- * $Id$
- * Copyright (C) 2002-2009, Parrot Foundation.
+ * Copyright (C) 2002-2010, Parrot Foundation.
  */
 
 /*
@@ -74,6 +73,7 @@ e.g. eliminate new Px .PerlUndef because Px where different before
 #include "pbc.h"
 #include "optimizer.h"
 #include "pmc/pmc_callcontext.h"
+#include "parrot/oplib/core_ops.h"
 
 /* HEADERIZER HFILE: compilers/imcc/optimizer.h */
 
@@ -256,6 +256,10 @@ cfg_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<int optimize(PARROT_INTERP, IMC_Unit *unit)>
 
+Runs after the CFG is built and handles constant propagation.
+
+used_once ... deletes assignments, when LHS is unused
+
 =cut
 
 */
@@ -364,7 +368,7 @@ if_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                     last->symregs[reg] = go;
                     tmp = INS(interp, unit, neg_op, "",
                               last->symregs, args, 0, 0);
-                    last->opnum = tmp->opnum;
+                    last->op = tmp->op;
                     last->opsize = tmp->opsize;
                     mem_sys_free(last->opname);
                     last->opname = mem_sys_strdup(tmp->opname);
@@ -405,6 +409,7 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     SymReg *r;
     int changes = 0;
     FLOATVAL f;
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(interp);
 
     IMCC_info(interp, 2, "\tstrength_reduce\n");
     for (ins = unit->instructions; ins; ins = ins->next) {
@@ -424,45 +429,45 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
          * div Nx, Nx, Ny => sub Nx, Ny
          * fdiv Nx, Nx, Ny => sub Nx, Ny
          */
-        if (((ins->opnum == PARROT_OP_sub_i_i_i ||
-                ins->opnum == PARROT_OP_sub_i_i_ic ||
-                ins->opnum == PARROT_OP_sub_i_ic_i ||
-                ins->opnum == PARROT_OP_div_i_i_i ||
-                ins->opnum == PARROT_OP_div_i_i_ic ||
-                ins->opnum == PARROT_OP_div_i_ic_i ||
-                ins->opnum == PARROT_OP_fdiv_i_i_i ||
-                ins->opnum == PARROT_OP_fdiv_i_i_ic ||
-                ins->opnum == PARROT_OP_fdiv_i_ic_i ||
-                ins->opnum == PARROT_OP_sub_n_n_n ||
-                ins->opnum == PARROT_OP_sub_n_n_nc ||
-                ins->opnum == PARROT_OP_sub_n_nc_n ||
-                ins->opnum == PARROT_OP_div_n_n_n ||
-                ins->opnum == PARROT_OP_div_n_n_nc ||
-                ins->opnum == PARROT_OP_div_n_nc_n ||
-                ins->opnum == PARROT_OP_fdiv_n_n_n ||
-                ins->opnum == PARROT_OP_fdiv_n_n_nc ||
-                ins->opnum == PARROT_OP_fdiv_n_nc_n) &&
+        if (((ins->op == &core_ops->op_info_table[PARROT_OP_sub_i_i_i] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_sub_i_i_ic] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_sub_i_ic_i] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_div_i_i_i] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_div_i_i_ic] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_div_i_ic_i] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_fdiv_i_i_i] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_fdiv_i_i_ic] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_fdiv_i_ic_i] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_sub_n_n_n] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_sub_n_n_nc] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_sub_n_nc_n] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_div_n_n_n] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_div_n_n_nc] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_div_n_nc_n] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_fdiv_n_n_n] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_fdiv_n_n_nc] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_fdiv_n_nc_n]) &&
              ins->symregs[0] == ins->symregs[1])
-          || ((ins->opnum == PARROT_OP_add_i_i_i ||
-                ins->opnum == PARROT_OP_add_i_i_ic ||
-                ins->opnum == PARROT_OP_add_i_ic_i ||
-                ins->opnum == PARROT_OP_mul_i_i_i ||
-                ins->opnum == PARROT_OP_mul_i_i_ic ||
-                ins->opnum == PARROT_OP_mul_i_ic_i ||
-                ins->opnum == PARROT_OP_add_n_n_n ||
-                ins->opnum == PARROT_OP_add_n_n_nc ||
-                ins->opnum == PARROT_OP_add_n_nc_n ||
-                ins->opnum == PARROT_OP_mul_n_n_n ||
-                ins->opnum == PARROT_OP_mul_n_n_nc ||
-                ins->opnum == PARROT_OP_mul_n_nc_n) &&
+          || ((ins->op == &core_ops->op_info_table[PARROT_OP_add_i_i_i] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_add_i_i_ic] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_add_i_ic_i] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_mul_i_i_i] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_mul_i_i_ic] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_mul_i_ic_i] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_add_n_n_n] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_add_n_n_nc] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_add_n_nc_n] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_n_n] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_n_nc] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_nc_n]) &&
              (ins->symregs[0] == ins->symregs[1] ||
               ins->symregs[0] == ins->symregs[2]))) {
-            IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
+            IMCC_debug(interp, DEBUG_OPT1, "opt1 %d => ", ins);
             if (ins->symregs[0] == ins->symregs[1]) {
                 ins->symregs[1] = ins->symregs[2];
             }
             tmp = INS(interp, unit, ins->opname, "", ins->symregs, 2, 0, 0);
-            IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);
+            IMCC_debug(interp, DEBUG_OPT1, "%d\n", tmp);
             subst_ins(unit, ins, tmp, 1);
             ins = tmp;
             changes = 1;
@@ -479,21 +484,21 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
          * div Nx, 1     => delete
          * fdiv Nx, 1    => delete
          */
-        if (((ins->opnum == PARROT_OP_add_i_ic ||
-                ins->opnum == PARROT_OP_sub_i_ic) &&
+        if (((ins->op == &core_ops->op_info_table[PARROT_OP_add_i_ic] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_sub_i_ic]) &&
                       IMCC_int_from_reg(interp, ins->symregs[1]) == 0)
-          || ((ins->opnum == PARROT_OP_mul_i_ic ||
-                ins->opnum == PARROT_OP_div_i_ic ||
-                ins->opnum == PARROT_OP_fdiv_i_ic) &&
+          || ((ins->op == &core_ops->op_info_table[PARROT_OP_mul_i_ic] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_div_i_ic] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_fdiv_i_ic]) &&
                       IMCC_int_from_reg(interp, ins->symregs[1]) == 1)
-          || ((ins->opnum == PARROT_OP_add_n_nc ||
-                ins->opnum == PARROT_OP_sub_n_nc) &&
+          || ((ins->op == &core_ops->op_info_table[PARROT_OP_add_n_nc] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_sub_n_nc]) &&
                 (f = atof(ins->symregs[1]->name), FLOAT_IS_ZERO(f)))
-          || ((ins->opnum  == PARROT_OP_mul_n_nc  ||
-                ins->opnum == PARROT_OP_div_n_nc ||
-                ins->opnum == PARROT_OP_fdiv_n_nc) &&
+          || ((ins->op  == &core_ops->op_info_table[PARROT_OP_mul_n_nc]  ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_div_n_nc] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_fdiv_n_nc]) &&
                       atof(ins->symregs[1]->name) == 1.0)) {
-            IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
+            IMCC_debug(interp, DEBUG_OPT1, "opt1 %d => ", ins);
             ins = delete_ins(unit, ins);
             if (ins)
                 ins = ins->prev ? ins->prev : unit->instructions;
@@ -509,21 +514,21 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
          * sub Ix, 1     => dec Ix
          * sub Nx, 1     => dec Nx
          */
-        if (((ins->opnum == PARROT_OP_add_i_ic ||
-                ins->opnum == PARROT_OP_sub_i_ic) &&
+        if (((ins->op == &core_ops->op_info_table[PARROT_OP_add_i_ic] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_sub_i_ic]) &&
                       IMCC_int_from_reg(interp, ins->symregs[1]) == 1)
-          || ((ins->opnum == PARROT_OP_add_n_nc ||
-                ins->opnum == PARROT_OP_sub_n_nc) &&
+          || ((ins->op == &core_ops->op_info_table[PARROT_OP_add_n_nc] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_sub_n_nc]) &&
                       atof(ins->symregs[1]->name) == 1.0)) {
-            IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
+            IMCC_debug(interp, DEBUG_OPT1, "opt1 %d => ", ins);
             --ins->symregs[1]->use_count;
-            if (ins->opnum == PARROT_OP_add_i_ic ||
-                ins->opnum == PARROT_OP_add_n_nc)
+            if (ins->op == &core_ops->op_info_table[PARROT_OP_add_i_ic] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_add_n_nc])
                 tmp = INS(interp, unit, "inc", "", ins->symregs, 1, 0, 0);
             else
                 tmp = INS(interp, unit, "dec", "", ins->symregs, 1, 0, 0);
             subst_ins(unit, ins, tmp, 1);
-            IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);
+            IMCC_debug(interp, DEBUG_OPT1, "%d\n", tmp);
             ins = tmp;
             changes = 1;
             continue;
@@ -544,29 +549,29 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
          * div Nx, Ny, 1 => set Nx, Ny
          * fdiv Nx, Ny, 1 => set Nx, Ny
          */
-        if (((ins->opnum == PARROT_OP_add_i_i_ic ||
-                ins->opnum == PARROT_OP_sub_i_i_ic) &&
+        if (((ins->op == &core_ops->op_info_table[PARROT_OP_add_i_i_ic] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_sub_i_i_ic]) &&
                       IMCC_int_from_reg(interp, ins->symregs[2]) == 0)
-          || (ins->opnum == PARROT_OP_add_i_ic_i &&
+          || (ins->op == &core_ops->op_info_table[PARROT_OP_add_i_ic_i] &&
                       IMCC_int_from_reg(interp, ins->symregs[1]) == 0)
-          || ((ins->opnum == PARROT_OP_mul_i_i_ic ||
-                ins->opnum == PARROT_OP_div_i_i_ic ||
-                ins->opnum == PARROT_OP_fdiv_i_i_ic) &&
+          || ((ins->op == &core_ops->op_info_table[PARROT_OP_mul_i_i_ic] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_div_i_i_ic] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_fdiv_i_i_ic]) &&
                       IMCC_int_from_reg(interp, ins->symregs[2]) == 1)
-          || (ins->opnum == PARROT_OP_mul_i_ic_i &&
+          || (ins->op == &core_ops->op_info_table[PARROT_OP_mul_i_ic_i] &&
                       IMCC_int_from_reg(interp, ins->symregs[1]) == 1)
-          || ((ins->opnum == PARROT_OP_add_n_n_nc ||
-                ins->opnum == PARROT_OP_sub_n_n_nc) &&
+          || ((ins->op == &core_ops->op_info_table[PARROT_OP_add_n_n_nc] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_sub_n_n_nc]) &&
                 (f = atof(ins->symregs[2]->name), FLOAT_IS_ZERO(f)))
-          || (ins->opnum == PARROT_OP_add_n_nc_n &&
+          || (ins->op == &core_ops->op_info_table[PARROT_OP_add_n_nc_n] &&
              (f = atof(ins->symregs[1]->name), FLOAT_IS_ZERO(f)))
-          || ((ins->opnum == PARROT_OP_mul_n_n_nc ||
-                ins->opnum == PARROT_OP_div_n_n_nc ||
-                ins->opnum == PARROT_OP_fdiv_n_n_nc) &&
+          || ((ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_n_nc] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_div_n_n_nc] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_fdiv_n_n_nc]) &&
                       atof(ins->symregs[2]->name) == 1.0)
-          || (ins->opnum == PARROT_OP_mul_n_nc_n &&
+          || (ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_nc_n] &&
                       atof(ins->symregs[1]->name) == 1.0)) {
-            IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
+            IMCC_debug(interp, DEBUG_OPT1, "opt1 %d => ", ins);
             if (ins->symregs[1]->type == VTCONST) {
                 --ins->symregs[1]->use_count;
                 ins->symregs[1] = ins->symregs[2];
@@ -575,7 +580,7 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                 --ins->symregs[2]->use_count;
             }
             tmp = INS(interp, unit, "set", "", ins->symregs, 2, 0, 0);
-            IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);
+            IMCC_debug(interp, DEBUG_OPT1, "%d\n", tmp);
             subst_ins(unit, ins, tmp, 1);
             ins = tmp;
             changes = 1;
@@ -586,24 +591,24 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
          * mul Ix, 0, Iy => set Ix, 0
          * mul Ix, 0     => set Ix, 0
          */
-        if ((ins->opnum == PARROT_OP_mul_i_i_ic &&
+        if ((ins->op == &core_ops->op_info_table[PARROT_OP_mul_i_i_ic] &&
                       IMCC_int_from_reg(interp, ins->symregs[2]) == 0)
-          || ((ins->opnum == PARROT_OP_mul_i_ic_i ||
-                ins->opnum == PARROT_OP_mul_i_ic) &&
+          || ((ins->op == &core_ops->op_info_table[PARROT_OP_mul_i_ic_i] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_mul_i_ic]) &&
                       IMCC_int_from_reg(interp, ins->symregs[1]) == 0)
-          || (ins->opnum == PARROT_OP_mul_n_n_nc &&
+          || (ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_n_nc] &&
              (f = atof(ins->symregs[2]->name), FLOAT_IS_ZERO(f)))
-          || ((ins->opnum == PARROT_OP_mul_n_nc_n ||
-                ins->opnum == PARROT_OP_mul_n_nc) &&
+          || ((ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_nc_n] ||
+                ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_nc]) &&
                 (f = atof(ins->symregs[1]->name), FLOAT_IS_ZERO(f)))) {
-            IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
+            IMCC_debug(interp, DEBUG_OPT1, "opt1 %d => ", ins);
             r = mk_const(interp, "0", ins->symregs[0]->set);
             --ins->symregs[1]->use_count;
             if (ins->opsize == 4)
                 --ins->symregs[2]->use_count;
             ins->symregs[1] = r;
             tmp = INS(interp, unit, "set", "", ins->symregs, 2, 0, 0);
-            IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);
+            IMCC_debug(interp, DEBUG_OPT1, "%d\n", tmp);
             subst_ins(unit, ins, tmp, 1);
             ins = tmp;
             changes = 1;
@@ -612,16 +617,16 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
          * set Ix, 0     => null Ix
          * set Nx, 0     => null Nx
          */
-        if ((ins->opnum == PARROT_OP_set_i_ic &&
+        if ((ins->op == &core_ops->op_info_table[PARROT_OP_set_i_ic] &&
                       IMCC_int_from_reg(interp, ins->symregs[1]) == 0)
-          || (ins->opnum == PARROT_OP_set_n_nc &&
+          || (ins->op == &core_ops->op_info_table[PARROT_OP_set_n_nc] &&
              (f = atof(ins->symregs[1]->name), FLOAT_IS_ZERO(f)) &&
               ins->symregs[1]->name[0] != '-')) {
-            IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
+            IMCC_debug(interp, DEBUG_OPT1, "opt1 %d => ", ins);
             --ins->symregs[1]->use_count;
             tmp = INS(interp, unit, "null", "", ins->symregs, 1, 0, 0);
             subst_ins(unit, ins, tmp, 1);
-            IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);
+            IMCC_debug(interp, DEBUG_OPT1, "%d\n", tmp);
             ins = tmp;
             changes = 1;
             continue;
@@ -673,7 +678,7 @@ constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             Instruction *ins2;
 
             IMCC_debug(interp, DEBUG_OPT2,
-                    "propagating constant %I => \n", ins);
+                    "propagating constant %d => \n", ins);
             for (ins2 = ins->next; ins2; ins2 = ins2->next) {
                 int i;
                 if (ins2->bbindex != ins->bbindex)
@@ -690,7 +695,7 @@ constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                             SymReg *old;
 
                             IMCC_debug(interp, DEBUG_OPT2,
-                                    "\tpropagating into %I register %i",
+                                    "\tpropagating into %d register %i",
                                     ins2, i);
                             old = ins2->symregs[i];
                             ins2->symregs[i] = c;
@@ -704,25 +709,24 @@ constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                                     subst_ins(unit, ins2, tmp, 1);
                                     any = 1;
                                     IMCC_debug(interp, DEBUG_OPT2,
-                                            " reduced to %I\n", tmp);
+                                            " reduced to %d\n", tmp);
                                     ins2 = prev->next;
                                 }
                             }
                             else {
                                 char fullname[128];
-                                const int op = check_op(interp, fullname, ins2->opname,
+                                check_op(interp, &ins2->op, fullname, ins2->opname,
                                     ins2->symregs, ins2->symreg_count, ins2->keys);
-                                if (op < 0) {
+                                if (!ins2->op) {
                                     ins2->symregs[i] = old;
                                     IMCC_debug(interp, DEBUG_OPT2,
                                             " - no %s\n", fullname);
                                 }
                                 else {
                                     --old->use_count;
-                                    ins2->opnum = op;
                                     any = 1;
                                     IMCC_debug(interp, DEBUG_OPT2,
-                                            " -> %I\n", ins2);
+                                            " -> %d\n", ins2);
                                 }
                             }
                         }
@@ -773,7 +777,7 @@ IMCC_subst_constants_umix(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const cha
             strcpy(b, r[1]->name);
             r[1] = mk_const(interp, b, 'N');
             tmp = INS(interp, unit, name, "", r, 2, 0, 0);
-            IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);
+            IMCC_debug(interp, DEBUG_OPT1, "%d\n", tmp);
         }
     }
     return tmp;
@@ -798,16 +802,12 @@ eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
 {
     ASSERT_ARGS(eval_ins)
     opcode_t eval[4], *pc;
-    int opnum;
     int i;
-    op_info_t *op_info;
-
-    opnum = interp->op_lib->op_code(interp, op, 1);
-    if (opnum < 0)
+    op_info_t *op_info = (op_info_t *)parrot_hash_get(interp, interp->op_hash, (void *)op);
+    if (!op_info || !STREQ(op_info->full_name, op))
         IMCC_fatal(interp, 1, "eval_ins: op '%s' not found\n", op);
-    op_info = interp->op_info_table + opnum;
     /* now fill registers */
-    eval[0] = opnum;
+    eval[0] = 0;
     for (i = 0; i < op_info->op_count - 1; i++) {
         switch (op_info->types[i]) {
           case PARROT_ARG_IC:
@@ -820,18 +820,19 @@ eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
           case PARROT_ARG_S:
             eval[i + 1] = i;        /* regs used are I0, I1, I2 */
             if (ops <= 2 || i) { /* fill source regs */
+                SymReg * const r_ = r[i]->type & VT_CONSTP ? r[i]->reg : r[i];
                 switch (r[i]->set) {
                   case 'I':
-                    REG_INT(interp, i) = IMCC_int_from_reg(interp, r[i]);
+                    REG_INT(interp, i) = IMCC_int_from_reg(interp, r_);
                     break;
                   case 'N':
                     {
-                        STRING * const s = Parrot_str_new(interp, r[i]->name, 0);
+                        STRING * const s = Parrot_str_new(interp, r_->name, 0);
                         REG_NUM(interp, i) = Parrot_str_to_num(interp, s);
                     }
                     break;
                   case 'S':
-                    REG_STR(interp, i) = IMCC_string_from_reg(interp, r[i]);
+                    REG_STR(interp, i) = IMCC_string_from_reg(interp, r_);
                     break;
                   default:
                     break;
@@ -850,7 +851,7 @@ eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
     if (setjmp(interp->current_runloop->resume))
         return -1;
 
-    pc = (interp->op_func_table[opnum]) (eval, interp);
+    pc = (OP_INFO_OPFUNC(op_info)) (eval, interp);
     free_runloop_jump_point(interp);
     /* the returned pc is either incremented by op_count or is eval,
      * as the branch offset is 0 - return true if it branched
@@ -1062,7 +1063,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
         tmp = INS(interp, unit, "set", "", r, 2, 0, 0);
     }
     if (tmp) {
-        IMCC_debug(interp, DEBUG_OPT1, "%I\n", tmp);
+        IMCC_debug(interp, DEBUG_OPT1, "%d\n", tmp);
     }
     *ok = 1;
     return tmp;
@@ -1111,7 +1112,7 @@ branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                         !STREQ(next->symregs[0]->name, get_branch_reg(ins)->name)) {
                     const int regno = get_branch_regno(ins);
                     IMCC_debug(interp, DEBUG_OPT1,
-                            "found branch to branch '%s' %I\n",
+                            "found branch to branch '%s' %d\n",
                             r->first_ins->symregs[0]->name, next);
                     unit->ostat.branch_branch++;
                     if (regno < 0)
@@ -1204,7 +1205,7 @@ branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                         start->prev = ins;
 
                         IMCC_debug(interp, DEBUG_OPT1,
-                                "found branch to reorganize '%s' %I\n",
+                                "found branch to reorganize '%s' %d\n",
                                 r->first_ins->symregs[0]->name, ins);
 
                         /* unconditional jump can be eliminated */
@@ -1224,6 +1225,11 @@ branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<static int branch_cond_loop_swap(PARROT_INTERP, IMC_Unit *unit,
 Instruction *branch, Instruction *start, Instruction *cond)>
+
+Converts conditional loops to post-test
+
+Returns TRUE if any optimizations were performed. Otherwise, returns
+FALSE.
 
 =cut
 
@@ -1407,7 +1413,7 @@ unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         Instruction *ins = unit->bb_list[i]->start;
         if ((ins->type & ITLABEL) && *ins->symregs[0]->name != '_') {
             const SymReg * const lab = ins->symregs[0];
-            used = IMCC_INFO(interp)->has_compile ? 1 : 0;
+            used = 0;
 
             if (!lab->first_ins)
                 continue;
@@ -1461,6 +1467,10 @@ unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<static int dead_code_remove(PARROT_INTERP, IMC_Unit *unit)>
 
+dead code elimination
+... unreachable blocks
+... unreachable instructions
+
 =cut
 
 */
@@ -1493,7 +1503,7 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
             for (ins = bb->start; ins && ins->bbindex == bbi;) {
                 IMCC_debug(interp, DEBUG_OPT1,
-                        "\tins deleted (dead block) %I\n", ins);
+                        "\tins deleted (dead block) %d\n", ins);
                 ins = delete_ins(unit, ins);
                 unit->ostat.deleted_ins++;
                 changed++;
@@ -1511,7 +1521,7 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         if ((last->type & IF_goto) && !(ins->type & ITLABEL) &&
             STREQ(last->opname, "branch")) {
             IMCC_debug(interp, DEBUG_OPT1,
-                    "unreachable ins deleted (after branch) %I\n", ins);
+                    "unreachable ins deleted (after branch) %d\n", ins);
             ins = delete_ins(unit, ins);
             unit->ostat.deleted_ins++;
             changed++;
@@ -1524,7 +1534,7 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         if (ins && last && (last->type & IF_goto) && (ins->type & ITLABEL) &&
                 STREQ(last->opname, "branch") &&
                 STREQ(last->symregs[0]->name, ins->symregs[0]->name)) {
-            IMCC_debug(interp, DEBUG_OPT1, "dead branch deleted %I\n", ins);
+            IMCC_debug(interp, DEBUG_OPT1, "dead branch deleted %d\n", ins);
             ins = delete_ins(unit, last);
             unit->ostat.deleted_ins++;
             changed++;
@@ -1541,6 +1551,8 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<static int used_once(PARROT_INTERP, IMC_Unit *unit)>
 
+used_once ... deletes assignments, when LHS is unused
+
 =cut
 
 */
@@ -1556,7 +1568,7 @@ used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         if (ins->symregs) {
             SymReg * const r = ins->symregs[0];
             if (r && (r->use_count == 1 && r->lhs_use_count == 1)) {
-                IMCC_debug(interp, DEBUG_OPT2, "used once '%I' deleted\n", ins);
+                IMCC_debug(interp, DEBUG_OPT2, "used once '%d' deleted\n", ins);
                 ins = delete_ins(unit, ins);
 
                 /* find previous instruction or first instruction of this CU
@@ -1586,5 +1598,5 @@ used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

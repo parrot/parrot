@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -109,7 +108,6 @@ my %type_for_suffix = (
 my %type_for_name = (
     'Artistic'             => 'Licence file',
     'BUGS'                 => 'Project info',
-    'CFLAGS'               => 'CFLAGS file',
     'ChangeLog'            => 'Project info',
     'Changes'              => 'Project info',
     'CREDITS'              => 'Project info',

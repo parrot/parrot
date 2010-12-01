@@ -1,9 +1,8 @@
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 
     set S1, "abc"
     set S2, "EE"
-    bors S0, S1, S2
+    concat S0, S1, S2
     print S0
     print "\n"
     print S1

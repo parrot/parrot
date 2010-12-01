@@ -1,6 +1,5 @@
-#!parrot
+#!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -19,8 +18,9 @@ number types.
 
 .sub main :main
     .include 'test_more.pir'
+    .include 'iglobals.pasm'
 
-    plan(130)
+    plan(80)
 
     take_the_negative_of_a_native_integer()
     take_the_absolute_of_a_native_integer()
@@ -41,10 +41,6 @@ number types.
     subtract_native_number_from_native_number()
     multiply_native_number_with_native_number()
     divide_native_number_by_native_number()
-    lcm_test()
-    gcd_test()
-    integer_overflow_with_pow()
-    bnot_p_p_creates_destination()
     # END_OF_TESTS
 
 .end
@@ -153,18 +149,21 @@ number types.
 # print -0.0 as -0
 #
 .sub negate_minus_zero_point_zero
-    .include 'sysinfo.pasm'
-    $S9 = sysinfo .SYSINFO_PARROT_OS
+    .local pmc interp, config_hash
+    .local string has_negative_zero
+    interp = getinterp
+    config_hash = interp[.IGLOBALS_CONFIG_HASH]
+    has_negative_zero = config_hash['has_negative_zero']
 
     set $N0, 0
     neg $N0
     $S0 = $N0
-    if $S9 == 'MSWin32' goto Todo_test1
+    unless has_negative_zero goto Todo_test1
     is( $S0, "-0", '1' )
     goto End_test1
 Todo_test1:
     $I0 = $S0 == "-0"
-    todo($I0, 'Faulty on this platform')
+    todo($I0, 'negative zero, TT #313')
 End_test1:
 
     set $N0, -0.0
@@ -181,12 +180,12 @@ End_test1:
     set $N1, 1
     neg $N1, $N0
     $S0 = $N1
-    if $S9 == 'MSWin32' goto Todo_test4
+    unless has_negative_zero goto Todo_test4
     is( $S0, "-0", '4' )
     goto End_test4
 Todo_test4:
     $I0 = $S0 == "-0"
-    todo($I0, 'Faulty on this platform')
+    todo($I0, 'negative zero, TT #313')
 End_test4:
 .end
 
@@ -466,103 +465,6 @@ End_test4:
     div $N0, $N0, $N2
     is( $N0, "-0.0307788571002883", 'divide_native_number_by_native_number' )
 
-.end
-
-.sub lcm_test
-    set $I0, 10
-    set $I1, 10
-    lcm $I2, $I1, $I0
-    is( $I2, 10, 'lcm_test' )
-
-    set $I1, 17
-    lcm $I2, $I1, $I0
-    is( $I2, 170, 'lcm_test' )
-
-    set $I0, 17
-    set $I1, 10
-    lcm $I2, $I1, $I0
-    is( $I2, 170, 'lcm_test' )
-
-    set $I0, 10
-    set $I1, 0
-    lcm $I2, $I1, $I0
-    is( $I2, 0, 'lcm_test' )
-
-    set $I0, 0
-    set $I1, 10
-    lcm $I2, $I1, $I0
-    is( $I2, 0, 'lcm_test' )
-.end
-
-.sub gcd_test
-    set $I0, 70
-    set $I1, 42
-    gcd $I2, $I1, $I0
-    is( $I2, 14, 'gcd_test' )
-
-    set $I0, 66
-    gcd $I2, $I1, $I0
-    is( $I2, 6, 'gcd_test' )
-
-    set $I0, 70
-    set $I1, 1
-    gcd $I2, $I1, $I0
-    is( $I2, 1, 'gcd_test' )
-
-    set $I0, 70
-    set $I1, 3
-    gcd $I2, $I1, $I0
-    is( $I2, 1, 'gcd_test' )
-.end
-
-.sub integer_overflow_with_pow
-    .include "iglobals.pasm"
-
-    # Check that we aren't 32-bit INTVALs without GMP
-    .local pmc interp     # a handle to our interpreter object.
-    interp = getinterp
-    .local pmc config
-    config = interp[.IGLOBALS_CONFIG_HASH]
-    .local int intvalsize
-    intvalsize = config['intvalsize']
-    .local int gmp
-    gmp = config['gmp']
-
-    if intvalsize != 4 goto can_test
-    if gmp goto can_test
-        skip(40,'No integer overflow for 32-bit INTVALs without GMP installed')
-        goto end
-
-  can_test:
-
-    .local pmc i1, i2, r
-    i1 = new 'Integer'
-    i2 = new 'Integer'
-    i1 = 2
-    i2 = 1
-    $I1 = 1
-  next:
-    null r
-    r = pow i1, i2
-    $S0 = r
-
-    $I1 = $I1 * 2
-    is( $S0, $I1, 'integer_overflow_with_pow' )
-
-    inc i2
-# XXX: this must be extended to at least 64 bit range
-# when sure that the result is not floating point.
-# In the meantime, make sure it overflows nicely
-# on 32 bit.
-    unless i2 > 40 goto next
-
-  end:
-.end
-
-.sub 'bnot_p_p_creates_destination'
-    $P0 = box 3
-    $P1 = bnot $P0
-    is( $P1, -4, 'bnot_p_p_creates_destination')
 .end
 
 # Local Variables:

@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2004-2008, Parrot Foundation.
  */
 
@@ -41,10 +40,9 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
     DWORD status = 0;
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
-    int free_it = 0;
-    char* cmd = (char *)mem_sys_allocate(command->strlen + 4);
-    char* shell = Parrot_getenv(interp, Parrot_str_new(interp, "ComSpec", strlen("ComSpec")));
-    char* cmdin = Parrot_str_to_cstring(interp, command);
+    char* const cmd   = (char *)mem_sys_allocate(command->strlen + 4);
+    char* const shell = Parrot_getenv(interp, Parrot_str_new(interp, "ComSpec", strlen("ComSpec")));
+    char* const cmdin = Parrot_str_to_cstring(interp, command);
 
     strcpy(cmd, "/c ");
     strcat(cmd, cmdin);
@@ -67,7 +65,7 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
     }
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
-    if (free_it) free(shell);
+    Parrot_str_free_cstring(shell);
     mem_sys_free(cmd);
 
     /* Return exit code left shifted by 8 for POSIX emulation. */
@@ -108,8 +106,8 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
 
     /* Now build command line. */
     for (i = 0; i < pmclen; i++) {
-        STRING *s = VTABLE_get_string_keyed_int(interp, cmdargs, i);
-        char *cs  = Parrot_str_to_cstring(interp, s);
+        STRING * const s  = VTABLE_get_string_keyed_int(interp, cmdargs, i);
+        char   * const cs = Parrot_str_to_cstring(interp, s);
         if (cmdlinepos + (int)s->strlen + 3 > cmdlinelen) {
             cmdlinelen += s->strlen + 4;
             cmdline = (char *)mem_sys_realloc(cmdline, cmdlinelen);
@@ -157,6 +155,6 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

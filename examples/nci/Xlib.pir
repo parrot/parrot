@@ -1,5 +1,4 @@
 # Copyright (C) 2008, Parrot Foundation.
-# $Id$
 
 =head1 TITLE
 
@@ -67,10 +66,12 @@ alignment.
     if xlib goto store
 check2:
     xlib = loadlib 'libX11.so'
+    $I0 = defined xlib
     unless $I0 goto check3
     if xlib goto store
 check3:
     xlib = loadlib 'libX11.so.6'
+    $I0 = defined xlib
     unless $I0 goto check4
     if xlib goto store
 check4:

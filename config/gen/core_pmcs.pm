@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -76,7 +75,7 @@ END_H
 END_H
     print {$OUT} coda();
 
-    close $OUT or die "Can't close file: $!";;
+    close $OUT or die "Can't close file: $!";
 
     move_if_diff( "$file.tmp", $file );
 
@@ -103,6 +102,8 @@ sub generate_c {
 /* HEADERIZER STOP */
 
 #include "parrot/parrot.h"
+#include "parrot/global_setup.h"
+
 
 END_C
 
@@ -110,16 +111,7 @@ END_C
 
     print {$OUT} <<'END_C';
 
-/* This isn't strictly true, but the headerizer should not bother */
-
-void Parrot_register_core_pmcs(PARROT_INTERP, NOTNULL(PMC *registry))
-    __attribute__nonnull__(1)
-    __attribute__nonnull__(2);
-
-extern void Parrot_initialize_core_pmcs(PARROT_INTERP, int pass)
-    __attribute__nonnull__(1);
-
-void Parrot_initialize_core_pmcs(PARROT_INTERP, int pass)
+void Parrot_gbl_initialize_core_pmcs(PARROT_INTERP, int pass)
 {
     /* first the PMC with the highest enum
      * this reduces MMD table resize action */
@@ -132,14 +124,14 @@ END_C
     print {$OUT} <<'END_C';
 }
 
-static void register_pmc(PARROT_INTERP, NOTNULL(PMC *registry), int pmc_id)
+static void register_pmc(PARROT_INTERP, ARGIN(PMC *registry), int pmc_id)
 {
     STRING * const key = interp->vtables[pmc_id]->whoami;
     VTABLE_set_integer_keyed_str(interp, registry, key, pmc_id);
 }
 
 void
-Parrot_register_core_pmcs(PARROT_INTERP, NOTNULL(PMC *registry))
+Parrot_gbl_register_core_pmcs(PARROT_INTERP, ARGIN(PMC *registry))
 {
 END_C
 

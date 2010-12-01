@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2009, Parrot Foundation.
-# $Id$
 
 =pod
 
@@ -150,6 +149,9 @@ Same as parrot.
 =cut
 
 .const string VERSION="0.2.3"
+
+.loadlib 'bit_ops'
+.loadlib 'io_ops'
 
 .sub _main :main
     .param pmc argv
@@ -2113,7 +2115,7 @@ out:
     .local pmc win, f
 
     win = getattribute self, "win"
-    f = get_global "ncurses::mvwaddstr"
+    f = get_global ["ncurses"], "mvwaddstr"
     f(win, r, c, s)
 .end
 
@@ -2122,7 +2124,7 @@ out:
     .local pmc win, f
 
     win = getattribute self, "win"
-    f = get_global "ncurses::waddstr"
+    f = get_global ["ncurses"], "waddstr"
     f(win, s)
 .end
 
@@ -2133,14 +2135,14 @@ out:
 
     s = i
     win = getattribute self, "win"
-    f = get_global "ncurses::waddstr"
+    f = get_global ["ncurses"], "waddstr"
     f(win, s)
 .end
 
 .sub "wait" :method
     .local pmc f
     .local int key
-    f = get_global "ncurses::getch"
+    f = get_global ["ncurses"], "getch"
     key = f()
 .end
 
@@ -2156,9 +2158,9 @@ out:
 
 .sub nc_end
     .local pmc endwin, curs_set
-    curs_set = get_global "ncurses::curs_set"
+    curs_set = get_global ["ncurses"], "curs_set"
     curs_set(1)
-    endwin = get_global "ncurses::endwin"
+    endwin = get_global ["ncurses"], "endwin"
     endwin()
 .end
 
@@ -2172,14 +2174,14 @@ out:
     .local pmc NODELAY
     .local pmc KEYPAD
     .local pmc STDSCR
-    INITSCR     = get_global "ncurses::initscr"
-    START_COLOR = get_global "ncurses::start_color"
-    INIT_PAIR   = get_global "ncurses::init_pair"
-    COLOR_PAIR  = get_global "ncurses::COLOR_PAIR"
-    WATTRON     = get_global "ncurses::wattron"
-    CURS_SET    = get_global "ncurses::curs_set"
-    NODELAY     = get_global "ncurses::nodelay"
-    KEYPAD      = get_global "ncurses::keypad"
+    INITSCR     = get_global ["ncurses"], "initscr"
+    START_COLOR = get_global ["ncurses"], "start_color"
+    INIT_PAIR   = get_global ["ncurses"], "init_pair"
+    COLOR_PAIR  = get_global ["ncurses"], "COLOR_PAIR"
+    WATTRON     = get_global ["ncurses"], "wattron"
+    CURS_SET    = get_global ["ncurses"], "curs_set"
+    NODELAY     = get_global ["ncurses"], "nodelay"
+    KEYPAD      = get_global ["ncurses"], "keypad"
     STDSCR = INITSCR()
     START_COLOR()
     # Color pair 1, dark green fg, black background

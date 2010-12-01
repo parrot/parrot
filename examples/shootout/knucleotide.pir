@@ -1,5 +1,6 @@
-# Copyright (C) 2005-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2005-2010, Parrot Foundation.
+
+.loadlib 'io_ops'
 
 .sub main :main
 	.local pmc stdin
@@ -13,7 +14,7 @@ beginwhile_1:
 	line = ''
 	.local string seq
 beginwhile_2:
-	chopn line, 1
+	line = chopn line, 1
 	seq .= line
 	line = readline stdin
 	$I0 = length line
@@ -21,7 +22,7 @@ beginwhile_2:
 	$S0 = chopn line, -1
 	if $S0 != ">" goto beginwhile_2
 endwhile_2:
-	upcase seq
+	seq = upcase seq
 	sort_seq(seq, 1)
 	sort_seq(seq, 2)
 	find_seq(seq, "GGT")
