@@ -13,6 +13,7 @@ our @EXPORT_OK = qw(
     qualify_sourcefile
     asserts_from_args
     shim_test
+    handle_modified_args
     add_asserts_to_declarations
     add_headerizer_markers
 );
@@ -266,6 +267,26 @@ sub shim_test {
         }
     }
     return @args;
+}
+
+sub handle_modified_args {
+    my ($decl, $modified_args_ref) = @_;
+    my @modified_args = @{ $modified_args_ref };
+    my  $multiline = 0;
+    my $argline = join( ", ", @modified_args );
+    if ( length( $decl . $argline ) <= 75 ) {
+        $decl = "$decl$argline)";
+    }
+    else {
+        if ( $modified_args[0] =~ /^(?:(?:SHIM|PARROT)_INTERP|Interp)\b/ ) {
+            $decl .= ( shift @modified_args );
+            $decl .= "," if @modified_args;
+        }
+        $argline   = join( ",", map { "\n\t$_" } @modified_args );
+        $decl      = "$decl$argline)";
+        $multiline = 1;
+    }
+    return ($decl, $multiline);
 }
 
 sub add_asserts_to_declarations {

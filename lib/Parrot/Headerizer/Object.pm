@@ -36,6 +36,7 @@ use Parrot::Headerizer::Functions qw(
     qualify_sourcefile
     asserts_from_args
     shim_test
+    handle_modified_args
     add_asserts_to_declarations
     add_headerizer_markers
 );
@@ -547,8 +548,6 @@ sub make_function_decls {
 
     my @decls;
     foreach my $func (@funcs) {
-        my $multiline = 0;
-
         my $alt_void = ' ';
 
         # Splint can't handle /*@alt void@*/ on pointers, although this page
@@ -570,19 +569,9 @@ sub make_function_decls {
 
         my @modified_args = shim_test($func, \@args);
 
-        my $argline = join( ", ", @modified_args );
-        if ( length( $decl . $argline ) <= 75 ) {
-            $decl = "$decl$argline)";
-        }
-        else {
-            if ( $modified_args[0] =~ /^((SHIM|PARROT)_INTERP|Interp)\b/ ) {
-                $decl .= ( shift @modified_args );
-                $decl .= "," if @modified_args;
-            }
-            $argline   = join( ",", map { "\n\t$_" } @modified_args );
-            $decl      = "$decl$argline)";
-            $multiline = 1;
-        }
+        my $multiline;
+        ($decl, $multiline) = handle_modified_args(
+            $decl, \@modified_args);
 
         my $attrs = join( "", map { "\n\t\t$_" } @attrs );
         if ($attrs) {
@@ -688,6 +677,7 @@ sub print_warnings {
         print "$nwarnings warnings in $nwarningfuncs funcs in $nwarningfiles C files\n";
     }
 }
+
 
 =back
 

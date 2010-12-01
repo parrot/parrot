@@ -21,6 +21,7 @@ use Parrot::Headerizer::Functions qw(
     qualify_sourcefile
     asserts_from_args
     shim_test
+    handle_modified_args
     add_asserts_to_declarations
     add_headerizer_markers
 );
@@ -361,6 +362,60 @@ $expected = $args_ref;
 @modified_args = shim_test($funcs_ref, $args_ref);
 is_deeply( [ @modified_args ], $expected,
     "Got expected args back from shim_test()" );
+
+# handle_modified_args()
+my ($decl_in, $decl_out, $multiline);
+
+$decl_in = 'void Parrot_list_append(';
+@modified_args = qw( alpha beta gamma );
+($decl_out, $multiline) = handle_modified_args(
+    $decl_in, \@modified_args);
+is( $decl_out, $decl_in . 'alpha, beta, gamma)',
+    "Got expected portion of declaration (short)" );
+ok( ! $multiline, "Short portion of declaration means no multiline" );
+
+$decl_in = 'void Parrot_list_append(';
+@modified_args = (
+  'FOOBAR EXTRAORDINARY',
+  'ARGMOD(Linked_List *list)',
+  'ARGMOD(List_Item_Header *item)',
+);
+$expected = $decl_in .
+    "\n\t$modified_args[0]" . ',' .
+    "\n\t$modified_args[1]" . ',' .
+    "\n\t$modified_args[2]" . ')';
+($decl_out, $multiline) = handle_modified_args(
+    $decl_in, \@modified_args);
+is( $decl_out, $expected,
+    "Got expected portion of declaration (long)" );
+ok( $multiline, "Long portion of declaration means multiline" );
+
+$decl_in = 'void Parrot_list_append(';
+@modified_args = (
+  'SHIM_INTERP',
+  'ARGMOD(Linked_List *list)',
+  'ARGMOD(List_Item_Header *item)',
+);
+$expected = $decl_in .
+    $modified_args[0] . ',' .
+    "\n\t$modified_args[1]" . ',' .
+    "\n\t$modified_args[2]" . ')';
+($decl_out, $multiline) = handle_modified_args(
+    $decl_in, \@modified_args);
+is( $decl_out, $expected,
+    "Got expected portion of declaration (long SHIM)" );
+ok( $multiline, "Long portion of declaration means multiline" );
+
+$decl_in = 'void Parrot_list_append(';
+@modified_args = (
+  'SHIM_INTERP INCURABLY_EXTREMELY_EXTRAORDINARILY_ARGMOD(Linked_List *list)',
+);
+$expected = "$decl_in$modified_args[0])";
+($decl_out, $multiline) = handle_modified_args(
+    $decl_in, \@modified_args);
+is( $decl_out, $expected,
+    "Got expected portion of declaration (long SHIM one arg)" );
+ok( $multiline, "Long portion of declaration means multiline" );
 
 # add_asserts_to_declarations()
 $funcs_ref = [
