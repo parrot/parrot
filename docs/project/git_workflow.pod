@@ -247,6 +247,8 @@ you can always use "--no-ff" when merging.
 
 =head2 Merging Code From Forks
 
+NOTE: This is not official policy, and could change at any time.
+
 If you are merging code from non-core committers, Parrot would like to see
 "Signed-off-by" lines on each commit, so it is clear that one person wrote the
 code and someone else is taking responsibility for merging the code.
@@ -276,27 +278,6 @@ Then you will follow this procedure:
     git apply --check gci.patch
 
     # 7) Actually merge in the changes with Signed-Off-By lines
-    git am --signoff gci.patch
-
-There is also a secret ninja way to skip the first five steps. If you
-have a pull request URL from github, such as:
-
-    https://github.com/parrot/parrot/pull/14
-
-you can turn it into a diff by appending ".diff" to the URL, i.e. :
-
-    https://github.com/parrot/parrot/pull/14.diff
-
-If you do this, instead of the above 7 steps, you can just do (assuming
-you are on the master branch)
-
-    # 1) Get the diff
-    wget https://github.com/parrot/parrot/pull/14.diff
-
-    # 2) does the patch apply? OPTIONAL
-    git apply --check gci.patch
-
-    # 3) Actually merge in the changes with Signed-Off-By lines
     git am --signoff gci.patch
 
 After doing this, you will the new commits in master with
