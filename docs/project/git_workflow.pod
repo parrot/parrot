@@ -138,7 +138,7 @@ C<-a> flag:
 
     git commit -a -m "awesome and informative commit message"
 
-Be carefult with C<git commit -a>, it could add files that you do not mean
+Be careful with C<git commit -a>, it could add files that you do not mean
 to include. Verify that the contents of your most recent commit look sane with:
 
     git show
