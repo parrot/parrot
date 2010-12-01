@@ -19,10 +19,11 @@ Tests the Socket PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(17)
+    plan(18)
 
     test_init()
     test_get_fd()
+    test_read()
     test_readline()
     test_clone()
     test_bool()
@@ -50,6 +51,12 @@ Tests the Socket PMC.
     new $P0, ['Socket']
     $N0 = $P0.'get_fd'()
     isnt($N0, -1, 'Socket get_fd did not return -1')
+.end
+
+.sub test_read
+    new $P0, ['Socket']
+    $N0 = $P0.'read'(5)
+    is($N0, 0, 'Socket read returns 0 when not connected')
 .end
 
 .sub test_readline
