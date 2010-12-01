@@ -103,7 +103,6 @@ Read the given number of bytes from the handle and return them in a string.
 
     METHOD read(INTVAL length) {
         STRING * const string_result = Parrot_io_reads(INTERP, SELF, length);
-
         RETURN(STRING *string_result);
     }
 
