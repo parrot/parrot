@@ -93,6 +93,39 @@ platforms that use integer file descriptors).
 
 /*
 
+=item C<METHOD read(INTVAL bytes)>
+
+Read the given number of bytes from the handle and return them in a string.
+
+=cut
+
+*/
+
+    METHOD read(INTVAL length) {
+        STRING * const string_result = Parrot_io_reads(INTERP, SELF, length);
+
+        RETURN(STRING *string_result);
+    }
+
+
+/*
+
+=item C<METHOD readline()>
+
+Read a line from the handle and return it in a string.
+
+=cut
+
+*/
+
+    METHOD readline() {
+        STRING * const string_result = Parrot_io_readline(INTERP, SELF);
+        RETURN(STRING *string_result);
+    }
+
+
+/*
+
 =item C<METHOD close()>
 
 Close the handle.

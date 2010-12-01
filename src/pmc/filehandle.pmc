@@ -310,39 +310,6 @@ Test if the filehandle is closed.
 
 /*
 
-=item C<METHOD read(INTVAL bytes)>
-
-Read the given number of bytes from the filehandle and return them in a string.
-
-=cut
-
-*/
-
-    METHOD read(INTVAL length) {
-        STRING * const string_result = Parrot_io_reads(INTERP, SELF, length);
-
-        RETURN(STRING *string_result);
-    }
-
-
-/*
-
-=item C<METHOD readline()>
-
-Read a line from the filehandle and return it in a string.
-
-=cut
-
-*/
-
-    METHOD readline() {
-        STRING * const string_result = Parrot_io_readline(INTERP, SELF);
-        RETURN(STRING *string_result);
-    }
-
-
-/*
-
 =item C<METHOD readline_interactive(STRING *prompt)>
 
 Read a line from the filehandle and return it in a string.
