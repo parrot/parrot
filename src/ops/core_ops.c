@@ -16048,6 +16048,7 @@ opcode_t *
 Parrot_loadlib_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PREG(1) = Parrot_dyn_load_lib(interp, SREG(2), PREG(3));
+    Parrot_warn_experimental(interp, "Parrot_loadlib_p_s_p is experimental");
 
 return (opcode_t *)cur_opcode + 4;}
 

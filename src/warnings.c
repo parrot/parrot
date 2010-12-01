@@ -145,6 +145,31 @@ Parrot_warn_deprecated(PARROT_INTERP, ARGIN(const char *message))
     }
 }
 
+
+/*
+
+=item C<void Parrot_warn_experimental(PARROT_INTERP, const char *message)>
+
+Warn about use of a experimental feature
+
+C<message> is a C string.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_warn_experimental(PARROT_INTERP, ARGIN(const char *message))
+{
+    ASSERT_ARGS(Parrot_warn_experimental)
+
+    if (PARROT_WARNINGS_test(interp, PARROT_WARNINGS_DEPRECATED_FLAG)) {
+        STRING *msg = Parrot_sprintf_c(interp, "WARNING: %s\n", message);
+        print_warning(interp, msg);
+    }
+}
+
 /*
 
 =back
