@@ -512,6 +512,10 @@ Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
         result = STRING_substr(interp, result, offset, read_length);
         SETATTR_StringHandle_read_offset(interp, pmc, newline_pos + 1);
     }
+    else if (pmc->vtable->base_type == enum_class_Socket) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                "Parrot_io_readline on Socket not implemented");
+    }
     else
         Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "readline"), "->S", &result);
     return result;
