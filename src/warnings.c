@@ -162,7 +162,7 @@ PARROT_EXPORT
 void
 Parrot_warn_experimental(PARROT_INTERP, ARGIN(const char *message))
 {
-    ASSERT_ARGS(Parrot_warn_deprecated)
+    ASSERT_ARGS(Parrot_warn_experimental)
 
     if (PARROT_WARNINGS_test(interp, PARROT_WARNINGS_DEPRECATED_FLAG)) {
         STRING *msg = Parrot_sprintf_c(interp, "WARNING: %s\n", message);
