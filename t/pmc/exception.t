@@ -19,7 +19,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(43)
+    plan(47)
     test_bool()
     test_int()
     test_integer_keyed()
@@ -38,6 +38,36 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     test_throw_clone()
     test_backtrace()
     test_annotations()
+    test_throw_exception_subclass()
+.end
+
+.sub test_throw_exception_subclass
+    .local pmc exc, lexc, lex
+    exc  = get_class 'Exception'
+    lexc = subclass exc, 'LolException'
+    lex  = new lexc
+    lex['message'] = 'I CAN HAZ LOLEXCEPTION?'
+    $S0 = lex['message']
+
+    push_eh gotit
+    die $S0
+
+    throw lex
+    pop_eh
+
+    .return()
+  gotit:
+    .local pmc ex, cont
+    .local string msg, type, loltype
+    .get_results(ex)
+    type    = typeof ex
+    loltype = typeof lex
+    is(type,loltype, 'throwing a subclass of Exception has the correct type')
+
+    msg = ex
+    is(msg,'I CAN HAZ LOLEXCEPTION?', 'throwing a subclass of Exception has the correct message')
+    cont = ex['resume']
+    cont()
 .end
 
 .sub test_bool
@@ -408,6 +438,12 @@ _handler:
     is($I0, 0, 'got annotations from unthrow Exception')
     $I0 = ann
     is($I0, 0, 'annotations from unthrow Exception are empty')
+.end
+
+.namespace ['LolException']
+
+.sub 'lol' :method
+    say 'OHAI'
 .end
 
 # Local Variables:
