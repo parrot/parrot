@@ -115,9 +115,9 @@ Free all resources used.
     VTABLE void init_pmc(PMC * init) {
         #ifdef ENABLED
         PObj_custom_destroy_SET(SELF);
+        void *mapping = NULL;
         if (VTABLE_isa(INTERP, init, CONST_STRING(INTERP, "String"))) {
             unsigned long length = 0;
-            void *mapping = NULL;
             STRING *name = VTABLE_get_string(INTERP, init);
         #  ifdef MAPW32
         #  else
@@ -462,8 +462,8 @@ mapfromfilehandle(PIOHANDLE handle, unsigned long size, int flag)
 {
     ASSERT_ARGS(mapfromfilehandle)
 
-    #ifdef ENABLED
     void *mapping = (void *)-1;
+    #ifdef ENABLED
     #  ifdef MAPW32
     HANDLE hmapping;
     DWORD prot, access;
