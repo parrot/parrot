@@ -410,7 +410,6 @@ in codepoints.
                         "get_utf8: index out of mapped");
             c = buffer[curpos];
             charlen = Parrot_utf8skip[c];
-            fprintf(stderr, "%i\n", (int)charlen);
             curpos += charlen;
         }
         result = build_string(INTERP, buffer + pos, curpos - pos, Parrot_utf8_encoding_ptr);
