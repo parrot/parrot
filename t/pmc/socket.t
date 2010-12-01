@@ -19,10 +19,11 @@ Tests the Socket PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(16)
+    plan(17)
 
     test_init()
     test_get_fd()
+    test_readline()
     test_clone()
     test_bool()
     test_close()
@@ -49,6 +50,15 @@ Tests the Socket PMC.
     new $P0, ['Socket']
     $N0 = $P0.'get_fd'()
     isnt($N0, -1, 'Socket get_fd did not return -1')
+.end
+
+.sub test_readline
+    throws_substring(<<'CODE', 'not implemented', 'Socket readline is not implemented')
+    .sub main
+        new $P0, ['Socket']
+        $P0.'readline'()
+    .end
+CODE
 .end
 
 .sub test_bool
