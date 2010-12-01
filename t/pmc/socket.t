@@ -22,6 +22,7 @@ Tests the Socket PMC.
     plan(16)
 
     test_init()
+    test_get_fd()
     test_clone()
     test_bool()
     test_close()
@@ -40,11 +41,14 @@ Tests the Socket PMC.
     new $P0, ['Socket']
     ok(1, 'Instantiated a Socket PMC')
 
-    $N0 = $P0.'get_fd'()
-    isnt($N0, -1, 'Socket get_fd did not return -1')
-
     $S0 = typeof $P0
     is($S0, 'Socket', 'PMC has correct type')
+.end
+
+.sub test_get_fd
+    new $P0, ['Socket']
+    $N0 = $P0.'get_fd'()
+    isnt($N0, -1, 'Socket get_fd did not return -1')
 .end
 
 .sub test_bool
