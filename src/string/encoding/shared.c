@@ -1382,6 +1382,7 @@ convert_case_buf(PARROT_INTERP, ARGMOD_NULLOK(char *dest_buf), size_t dest_len,
                            NULL, NULL, &err);
         break;
       default:
+        res = 0; /* Should never happen, just to avoid a warning */
         break;
     }
 

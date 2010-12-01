@@ -2605,11 +2605,12 @@ byte_code_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *self))
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
     size_t size;
     int i;
+    unsigned int u;
 
     size = 3; /* op_count + n_libs + n_libdeps*/
 
-    for (i = 0; i < byte_code->n_libdeps; i++)
-        size += PF_size_string(byte_code->libdeps[i]);
+    for (u = 0; u < byte_code->n_libdeps; u++)
+        size += PF_size_string(byte_code->libdeps[u]);
 
     for (i = 0; i < byte_code->op_mapping.n_libs; i++) {
         PackFile_ByteCode_OpMappingEntry * const entry = &byte_code->op_mapping.libs[i];
@@ -2645,13 +2646,14 @@ byte_code_pack(SHIM_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cur
     ASSERT_ARGS(byte_code_pack)
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
     int i;
+    unsigned int u;
 
     *cursor++ = byte_code->n_libdeps;
     *cursor++ = byte_code->op_count;
     *cursor++ = byte_code->op_mapping.n_libs;
 
-    for (i = 0; i < byte_code->n_libdeps; i++)
-        cursor = PF_store_string(cursor, byte_code->libdeps[i]);
+    for (u = 0; u < byte_code->n_libdeps; u++)
+        cursor = PF_store_string(cursor, byte_code->libdeps[u]);
 
     for (i = 0; i < byte_code->op_mapping.n_libs; i++) {
         int j;
@@ -2694,6 +2696,7 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
     ASSERT_ARGS(byte_code_unpack)
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
     int i;
+    unsigned int u;
     size_t total_ops = 0;
 
     byte_code->n_libdeps         = PF_fetch_opcode(self->pf, &cursor);
@@ -2712,7 +2715,7 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
                                     byte_code->op_mapping.n_libs,
                                     PackFile_ByteCode_OpMappingEntry);
 
-    for (i = 0; i < byte_code->n_libdeps; i++) {
+    for (u = 0; u < byte_code->n_libdeps; u++) {
         STRING *libname = PF_fetch_string(interp, self->pf, &cursor);
         PMC    *lib_pmc = Parrot_dyn_load_lib(interp, libname, NULL);
     }
@@ -2774,7 +2777,7 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
                 opcode_t idx = PF_fetch_opcode(self->pf, &cursor);
                 opcode_t op  = PF_fetch_opcode(self->pf, &cursor);
 
-                if (0 > op || (size_t)op >= entry->lib->op_count)
+                if (0 > op || op >= entry->lib->op_count)
                     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
                         "opcode index out of bounds on library `%s'. Found %d, expected 0 to %d.",
                         entry->lib->name, op, entry->lib->op_count - 1);

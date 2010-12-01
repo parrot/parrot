@@ -338,7 +338,7 @@ parrot_hash_oplib(PARROT_INTERP, ARGIN(op_lib_t *lib))
 {
     ASSERT_ARGS(parrot_hash_oplib)
 
-    size_t i;
+    int i;
 
     for (i = 0; i < lib->op_count; i++) {
         op_info_t *op = &lib->op_info_table[i];
