@@ -392,7 +392,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/nci.h \
 	$(INC_DIR)/thread.h \
 	$(INC_DIR)/scheduler.h \
-	$(INC_DIR)/longopt.h \
 	$(INC_DIR)/oo.h \
 	$(INC_DIR)/vtables.h \
 	$(INC_DIR)/multidispatch.h \
@@ -455,6 +454,9 @@ INTERP_O_FILES = \
     src/debug$(O) \
     src/dynext$(O) \
     src/embed$(O) \
+    src/embed/api$(O) \
+    src/embed/strings$(O) \
+    src/embed/pmc$(O) \
     src/string/encoding$(O) \
     src/exceptions$(O) \
     src/exit$(O) \
@@ -485,7 +487,6 @@ INTERP_O_FILES = \
     src/library$(O) \
     src/list$(O) \
     src/pointer_array$(O) \
-    src/longopt$(O) \
     src/misc$(O) \
     src/multidispatch$(O) \
     src/namespace$(O) \
@@ -514,6 +515,7 @@ INTERP_O_FILES = \
     src/vtables$(O) \
     src/warnings$(O) \
     src/packfile/pf_items$(O) \
+    src/longopt$(O) \
     @TEMP_atomic_o@ \
     @TEMP_gc_o@ \
 #IF(platform_asm):    src/platform_asm$(O) \
@@ -857,11 +859,11 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pir \
     runtime/parrot/include/datatypes.pasm $(MINIPARROT)
 	$(MINIPARROT) -Iruntime/parrot/include config_lib.pir > $@
 
-$(PARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
-    src/parrot_config$(O) \
+$(PARROT) : src/main$(O) include/parrot/api.h include/parrot/longopt.h $(LIBPARROT) \
+    src/parrot_config$(O) src/longopt$(O) \
     $(MINIPARROT)
 	$(LINK) @ld_out@$@ \
-	src/main$(O) src/parrot_config$(O) \
+	src/main$(O) src/parrot_config$(O) src/longopt$(O) \
 	@rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
@@ -885,9 +887,9 @@ $(PARROT_CONFIG) : $(DEV_TOOLS_DIR)/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
 	$(PARROT) pbc_to_exe.pbc parrot_config.pbc
 
-$(MINIPARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
-    src/null_config$(O)
-	$(LINK) @ld_out@$@ src/main$(O) src/null_config$(O) \
+$(MINIPARROT) : src/main$(O) include/parrot/api.h include/parrot/longopt.h $(LIBPARROT) \
+    src/null_config$(O) src/longopt$(O)
+	$(LINK) @ld_out@$@ src/main$(O) src/null_config$(O) src/longopt$(O) \
 	@rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
@@ -1045,12 +1047,13 @@ $(INSTALLABLEPDB) : src/parrot_debugger$(O) $(LIBPARROT) src/parrot_config$(O)
 # Parrot Disassembler
 #
 
-src/pbc_disassemble$(O) : $(INC_DIR)/embed.h $(PARROT_H_HEADERS) \
+src/pbc_disassemble$(O) : $(PARROT_H_HEADERS) \
     src/pbc_disassemble.c
 
 $(DIS) : src/pbc_disassemble$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     src/pbc_disassemble$(O) \
+    src/longopt$(O) \
     @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
@@ -1058,6 +1061,7 @@ $(INSTALLABLEDIS) : src/pbc_disassemble$(O) \
 	src/install_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     src/pbc_disassemble$(O) \
+    src/longopt$(O) \
     @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
@@ -1070,11 +1074,11 @@ src/packdump$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_sub.h \
 $(PDUMP) : src/pbc_dump$(O) src/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     src/pbc_dump$(O) \
+    src/longopt$(O) \
     src/packdump$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 src/pbc_dump$(O) : \
-    $(INC_DIR)/embed.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(PARROT_H_HEADERS) \
@@ -1086,6 +1090,7 @@ $(INSTALLABLEPDUMP) : src/pbc_dump$(O) src/packdump$(O) \
 	$(LINK) @ld_out@$@ \
     src/pbc_dump$(O) \
     src/packdump$(O) \
+    src/longopt$(O) \
     @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
@@ -1099,6 +1104,7 @@ $(PBC_MERGE) : src/pbc_merge$(O) $(LIBPARROT) src/parrot_config$(O)
 	$(LINK) @ld_out@$@ \
     src/pbc_merge$(O) \
     src/parrot_config$(O) \
+    src/longopt$(O) \
     @rpath_blib@ $(ALL_PARROT_LIBS) $(LINK_DYNAMIC) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
@@ -1106,6 +1112,7 @@ $(INSTALLABLEPBC_MERGE) : src/pbc_merge$(O) $(LIBPARROT) $(INSTALLABLECONFIG)
 	$(LINK) @ld_out@$@ \
     src/pbc_merge$(O) \
     src/install_config$(O) \
+    src/longopt$(O) \
     @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
@@ -1537,6 +1544,7 @@ src/main$(O) : \
     $(INC_DIR)/imcc.h \
     $(PARROT_H_HEADERS) \
     $(INC_DIR)/embed.h \
+    $(INC_DIR)/api.h \
     $(INC_DIR)/runcore_api.h \
     src/gc/gc_private.h \
     src/main.c \
@@ -1605,6 +1613,15 @@ src/embed$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/embed.h \
         compilers/imcc/symreg.h \
         compilers/imcc/unit.h \
 		include/pmc/pmc_sub.h
+
+src/embed/api$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/api.h \
+		src/embed/api.c src/embed/embed_private.h
+
+src/embed/strings$(O) :  $(PARROT_H_HEADERS) $(INC_DIR)/api.h \
+		src/embed/strings.c src/embed/embed_private.h
+
+src/embed/pmc$(O) :  $(PARROT_H_HEADERS) $(INC_DIR)/api.h \
+		src/embed/strings.c src/embed/embed_private.h
 
 src/dataypes$(O) : $(GENERAL_H_FILES) src/dataypes.c
 

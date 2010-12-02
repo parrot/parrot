@@ -44,7 +44,7 @@ extern int yydebug;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void compile_to_bytecode(PARROT_INTERP,
+static PackFile * compile_to_bytecode(PARROT_INTERP,
     ARGIN(const char * const sourcefile),
     ARGIN_NULLOK(const char * const output_file),
     ARGIN(yyscan_t yyscanner))
@@ -148,6 +148,58 @@ is_all_hex_digits(ARGIN(const char *s))
 
 /*
 
+=item C<static const struct longopt_opt_decl * Parrot_cmd_options(void)>
+
+Set up the const struct declaration for cmd_options
+
+=cut
+
+*/
+
+// TODO: Weed out the options that IMCC doesn't use, and rename this function
+//       to something more imcc-ish
+static const struct longopt_opt_decl *
+Parrot_cmd_options(void)
+{
+    //ASSERT_ARGS(Parrot_cmd_options)
+    static const struct longopt_opt_decl cmd_options[] = {
+        { '.', '.', (OPTION_flags)0, { "--wait" } },
+        { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
+        { 'E', 'E', (OPTION_flags)0, { "--pre-process-only" } },
+        { 'G', 'G', (OPTION_flags)0, { "--no-gc" } },
+        { '\0', OPT_HASH_SEED, OPTION_required_FLAG, { "--hash-seed" } },
+        { 'I', 'I', OPTION_required_FLAG, { "--include" } },
+        { 'L', 'L', OPTION_required_FLAG, { "--library" } },
+        { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
+        { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
+        { 'g', 'g', OPTION_required_FLAG, { "--gc" } },
+        { '\0', OPT_GC_THRESHOLD, OPTION_required_FLAG, { "--gc-threshold" } },
+        { 'V', 'V', (OPTION_flags)0, { "--version" } },
+        { 'X', 'X', OPTION_required_FLAG, { "--dynext" } },
+        { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,
+                                     { "--leak-test", "--destroy-at-end" } },
+        { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
+        { 'a', 'a', (OPTION_flags)0, { "--pasm" } },
+        { 'c', 'c', (OPTION_flags)0, { "--pbc" } },
+        { 'd', 'd', OPTION_optional_FLAG, { "--imcc-debug" } },
+        { '\0', OPT_HELP_DEBUG, (OPTION_flags)0, { "--help-debug" } },
+        { 'h', 'h', (OPTION_flags)0, { "--help" } },
+        { 'o', 'o', OPTION_required_FLAG, { "--output" } },
+        { '\0', OPT_PBC_OUTPUT, (OPTION_flags)0, { "--output-pbc" } },
+        { 'r', 'r', (OPTION_flags)0, { "--run-pbc" } },
+        { '\0', OPT_RUNTIME_PREFIX, (OPTION_flags)0, { "--runtime-prefix" } },
+        { 't', 't', OPTION_optional_FLAG, { "--trace" } },
+        { 'v', 'v', (OPTION_flags)0, { "--verbose" } },
+        { 'w', 'w', (OPTION_flags)0, { "--warnings" } },
+        { 'y', 'y', (OPTION_flags)0, { "--yydebug" } },
+        { 0, 0, (OPTION_flags)0, { NULL } }
+    };
+    return cmd_options;
+}
+
+
+/*
+
 =item C<static void imcc_parseflags(PARROT_INTERP, int argc, const char **argv)>
 
 Parse flags ans set approptiate state(s)
@@ -165,7 +217,7 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN(const char **argv))
     /* default state: run pbc */
     SET_STATE_RUN_PBC(interp);
 
-    while (longopt_get(interp, argc, argv, Parrot_cmd_options(), &opt) > 0) {
+    while (longopt_get(argc, argv, Parrot_cmd_options(), &opt) > 0) {
         switch (opt.opt_id) {
           case 'd':
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
@@ -522,7 +574,7 @@ determine_output_file_type(PARROT_INTERP, ARGIN(const char *output_file))
 
 /*
 
-=item C<static void compile_to_bytecode(PARROT_INTERP, const char * const
+=item C<static PackFile * compile_to_bytecode(PARROT_INTERP, const char * const
 sourcefile, const char * const output_file, yyscan_t yyscanner)>
 
 Compile source code into bytecode (or die trying).
@@ -531,7 +583,7 @@ Compile source code into bytecode (or die trying).
 
 */
 
-static void
+static PackFile *
 compile_to_bytecode(PARROT_INTERP,
                     ARGIN(const char * const sourcefile),
                     ARGIN_NULLOK(const char * const output_file),
@@ -581,12 +633,22 @@ compile_to_bytecode(PARROT_INTERP,
     IMCC_info(interp, 1, "%ld lines compiled.\n", IMCC_INFO(interp)->line);
     if (per_pbc && !IMCC_INFO(interp)->write_pbc)
         PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
+    return pf;
+}
+
+PARROT_API
+int
+imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(const char *sourcefile), int argc,
+        ARGIN(const char **argv), ARGOUT(PMC **pbcpmc))
+{
+    Interp * interp = VTABLE_get_pointer(NULL, interp_pmc);
+    return imcc_run(interp, sourcefile, argc, argv, pbcpmc);
 }
 
 /*
 
 =item C<int imcc_run(PARROT_INTERP, const char *sourcefile, int argc, const char
-**argv)>
+**argv, PMC **pbcpmc)>
 
 Entry point of IMCC, as invoked by Parrot's main function.
 Compile source code (if required), write bytecode file (if required)
@@ -598,10 +660,12 @@ and run. This function always returns 0.
 
 int
 imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
-        ARGIN(const char **argv))
+        ARGIN(const char **argv), ARGOUT(PMC **pbcpmc))
 {
     yyscan_t           yyscanner;
     const char * const output_file = interp->output_file;
+    PackFile * pf_raw = NULL;
+    *pbcpmc = PMCNULL;
 
     imcc_parseflags(interp, argc, argv);
 
@@ -644,12 +708,13 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
     /* If the input file is Parrot bytecode, then we simply read it
        into a packfile, which Parrot then loads */
     if (STATE_LOAD_PBC(interp)) {
-        const int loaded = Parrot_load_bytecode_file(interp, sourcefile);
-        if (!loaded)
+        pf_raw = Parrot_pbc_read(interp, sourcefile, 0);
+        if (!pf_raw)
             IMCC_fatal_standalone(interp, 1, "main: Packfile loading failed\n");
+        Parrot_pbc_load(interp, pf_raw);
     }
     else
-        compile_to_bytecode(interp, sourcefile, output_file, yyscanner);
+        pf_raw = compile_to_bytecode(interp, sourcefile, output_file, yyscanner);
 
     /* Produce a PBC output file, if one was requested */
     if (STATE_WRITE_PBC(interp)) {
@@ -661,13 +726,11 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
 
         /* If necessary, load the file written above */
         if (STATE_RUN_FROM_FILE(interp) && !STREQ(output_file, "-")) {
-            PackFile *pf;
-
             IMCC_info(interp, 1, "Loading %s\n", output_file);
-            pf = Parrot_pbc_read(interp, output_file, 0);
-            if (!pf)
+            pf_raw = Parrot_pbc_read(interp, output_file, 0);
+            if (!pf_raw)
                 IMCC_fatal_standalone(interp, 1, "Packfile loading failed\n");
-            Parrot_pbc_load(interp, pf);
+            Parrot_pbc_load(interp, pf_raw);
             SET_STATE_LOAD_PBC(interp);
         }
     }
@@ -684,6 +747,12 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
     }
 
     yylex_destroy(yyscanner);
+
+    if (pf_raw) {
+        PMC * const _pbcpmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, _pbcpmc, pf_raw);
+        *pbcpmc = _pbcpmc;
+    }
 
     /* should the bytecode be run */
     if (STATE_RUN_PBC(interp))
