@@ -42,9 +42,13 @@ Compile bytecode to executable.
     outfh.'open'(cfile, 'w')
     unless outfh goto err_outfh
     print outfh, <<'HEADER'
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "parrot/api.h"
 const void * get_program_code(void);
+int Parrot_set_config_hash(Parrot_PMC interp_pmc);
+static void show_last_error_and_exit(Parrot_PMC interp);
+    #define TRACE 0
 HEADER
 
     .local string code_type
@@ -62,24 +66,6 @@ HEADER
   code_for_default:
     'generate_code'(infile, outfh)
   code_end:
-
-
-  open_outfile:
-    .local pmc outfh
-    outfh = new ['FileHandle']
-    outfh.'open'(cfile, 'w')
-    unless outfh goto err_outfh
-    print outfh, <<'HEADER'
-#include <stdio.h>
-#include <stdlib.h>
-#include "parrot/api.h"
-const void * get_program_code(void);
-int Parrot_set_config_hash(Parrot_PMC interp_pmc);
-static void show_last_error_and_exit(Parrot_PMC interp);
-    #define TRACE 0
-HEADER
-
-    print outfh, codestring
 
     print outfh, '#define RUNCORE "'
     print outfh, runcore
