@@ -8,7 +8,7 @@
 
 PARROT_API
 Parrot_Int
-Parrot_api_get_result(ARGMOD(PMC * interp_pmc), ARGOUT(Parrot_Int *is_error), 
+Parrot_api_get_result(ARGMOD(PMC * interp_pmc), ARGOUT(Parrot_Int *is_error),
                       ARGOUT(Parrot_Int *exit_code), ARGOUT(Parrot_String * errmsg))
 {
     EMBED_API_CALLIN(interp_pmc, interp);
@@ -125,7 +125,7 @@ Parrot_api_destroy_interpreter(ARGIN(PMC *interp_pmc))
     ASSERT_ARGS(Parrot_api_destroy_interpreter)
     EMBED_API_CALLIN(interp_pmc, interp)
     Parrot_destroy(interp);
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 

@@ -83,7 +83,7 @@ Parrot_set_config_hash_pmc(PARROT_INTERP, ARGMOD(PMC * config))
     ASSERT_ARGS(Parrot_set_config_hash_pmc)
     parrot_config_hash_global = config;
     if (!PMC_IS_NULL(config))
-        parrot_set_config_hash_interpreter(interp);
+        Parrot_gbl_set_config_hash_interpreter(interp);
 }
 
 /*

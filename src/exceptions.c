@@ -107,7 +107,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
     if (already_dying) {
         //fflush(stderr);
         //fprintf(stderr, "\n***FATAL ERROR: Exception thrown while dying from previous unhandled Exception\n");
-        Parrot_exit(interp, EXCEPT_fatal);
+        Parrot_x_exit(interp, EXCEPT_fatal);
     }
     else {
         /* In some cases we have a fatal exception before the IO system
