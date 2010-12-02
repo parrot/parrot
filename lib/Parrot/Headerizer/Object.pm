@@ -37,7 +37,9 @@ use Parrot::Headerizer::Functions qw(
     asserts_from_args
     shim_test
     handle_modified_args
+    add_newline_if_multiline
     add_asserts_to_declarations
+    func_modifies
     add_headerizer_markers
 );
 
@@ -581,7 +583,7 @@ sub make_function_decls {
         my @macros = @{ $func->{macros} };
         $multiline = 1 if @macros;
 
-        $decl .= $multiline ? ";\n" : ";";
+        $decl = add_newline_if_multiline($decl, $multiline);
         $decl = join( "\n", @macros, $decl );
         $decl =~ s/\t/    /g;
         push( @decls, $decl );
@@ -605,16 +607,7 @@ sub attrs_from_args {
     my $n = 0;
     for my $arg (@args) {
         ++$n;
-        if ( $arg =~ m{ARG(?:MOD|OUT)(?:_NULLOK)?\((.+?)\)} ) {
-            my $modified = $1;
-            if ( $modified =~ s/.*\*/*/ ) {
-                # We're OK
-            }
-            else {
-                $modified =~ s/.* (\w+)$/$1/ or die qq{Unable to figure out the modified parm out of "$modified"};
-            }
-            push( @mods, "FUNC_MODIFIES($modified)" );
-        }
+        @mods = func_modifies($arg, \@mods);
         if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\(} || $arg eq 'PARROT_INTERP' ) {
             push( @attrs, "__attribute__nonnull__($n)" );
         }

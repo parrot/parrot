@@ -22,7 +22,9 @@ use Parrot::Headerizer::Functions qw(
     asserts_from_args
     shim_test
     handle_modified_args
+    add_newline_if_multiline
     add_asserts_to_declarations
+    func_modifies
     add_headerizer_markers
 );
 
@@ -417,6 +419,20 @@ is( $decl_out, $expected,
     "Got expected portion of declaration (long SHIM one arg)" );
 ok( $multiline, "Long portion of declaration means multiline" );
 
+# add_newline_if_multiline()
+$decl_in = 'alpha';
+$multiline = 1;
+$decl_out = add_newline_if_multiline($decl_in, $multiline);
+is( $decl_out, "alpha;\n",
+    "Got expected value from add_newline_if_multiline()" );
+
+$decl_in = 'alpha';
+$multiline = 0;
+$decl_out = add_newline_if_multiline($decl_in, $multiline);
+is( $decl_out, "alpha;",
+    "Got expected value from add_newline_if_multiline()" );
+
+
 # add_asserts_to_declarations()
 $funcs_ref = [
   {
@@ -447,6 +463,50 @@ EXP
 $expected .= '    , PARROT_ASSERT_ARG(item))';
 is( $decls[0], $expected,
     "Got expected declaration from add_asserts_to_declarations()" );
+
+# func_modifies()
+my ($arg, @mods, @mods_out);
+$arg = 'ARGMOD(List_Item_Header *item)';
+@mods = ( 'FUNC_MODIFIES(*list)' );
+$expected = [
+    'FUNC_MODIFIES(*list)',
+    'FUNC_MODIFIES(*item)',
+];
+@mods_out = func_modifies($arg, \@mods);
+is_deeply( \@mods_out, $expected,
+    "Got expected output of func_modifies()" );
+
+$arg = 'foobar';
+@mods = ( 'FUNC_MODIFIES(*list)' );
+$expected = [
+    'FUNC_MODIFIES(*list)',
+];
+@mods_out = func_modifies($arg, \@mods);
+is_deeply( \@mods_out, $expected,
+    "Got expected output of func_modifies()" );
+
+$arg = 'ARGMOD_NULLOK(List_Item_Header alpha)';
+@mods = ( 'FUNC_MODIFIES(*list)' );
+$expected = [
+    'FUNC_MODIFIES(*list)',
+    'FUNC_MODIFIES(alpha)',
+];
+@mods_out = func_modifies($arg, \@mods);
+is_deeply( \@mods_out, $expected,
+    "Got expected output of func_modifies()" );
+
+eval {
+   $arg = 'ARGMOD_NULLOK(List_Item_Header)';
+   @mods = ( 'FUNC_MODIFIES(*list)' );
+   $expected = [
+       'FUNC_MODIFIES(*list)',
+       'FUNC_MODIFIES(alpha)',
+   ];
+   @mods_out = func_modifies($arg, \@mods);
+};
+like($@, qr/Unable to figure out the modified/,
+    "Got expected error message for func_modifies()" );
+
 
 # add_headerizer_markers
 #{

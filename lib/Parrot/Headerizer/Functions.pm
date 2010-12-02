@@ -15,6 +15,8 @@ our @EXPORT_OK = qw(
     shim_test
     handle_modified_args
     add_asserts_to_declarations
+    add_newline_if_multiline
+    func_modifies
     add_headerizer_markers
 );
 
@@ -289,6 +291,13 @@ sub handle_modified_args {
     return ($decl, $multiline);
 }
 
+#        $decl .= $multiline ? ";\n" : ";";
+sub add_newline_if_multiline {
+    my ($decl, $multiline) = @_;
+    $decl .= $multiline ? ";\n" : ";";
+    return $decl;
+}
+
 sub add_asserts_to_declarations {
     my ($funcs_ref, $decls_ref) = @_;
     foreach my $func (@{ $funcs_ref }) {
@@ -312,6 +321,27 @@ sub add_asserts_to_declarations {
     return @{ $decls_ref };
 }
 
+=pod
+
+   @mods = func_modifies($arg, \@mods);
+
+=cut
+
+sub func_modifies {
+    my ($arg, $modsref) = @_;
+    my @mods = @{$modsref};
+    if ( $arg =~ m{ARG(?:MOD|OUT)(?:_NULLOK)?\((.+?)\)} ) {
+        my $modified = $1;
+        if ( $modified =~ s/.*\*/*/ ) {
+            # We're OK
+        }
+        else {
+            $modified =~ s/.* (\w+)$/$1/ or die qq{Unable to figure out the modified parm out of "$modified"};
+        }
+        push( @mods, "FUNC_MODIFIES($modified)" );
+    }
+    return @mods;
+}
 =pod
 
     return add_headerizer_markers( {
