@@ -43,7 +43,7 @@ On Ubuntu/Debian (apt-based):
 
 On Red Hat, Fedora (rpm-based):
 
-	yum install git-core
+	yum install git
 
 on Gentoo (portage):
 
