@@ -122,6 +122,15 @@ static void no_such_register(PARROT_INTERP,
     UINTVAL register_num)
         __attribute__nonnull__(1);
 
+static STRING * PDB_get_continuation_backtrace(PARROT_INTERP,
+    ARGMOD(PMC * sub),
+    ARGMOD(PMC * ctx))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* sub)
+        FUNC_MODIFIES(* ctx);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PARROT_PURE_FUNCTION
@@ -155,6 +164,11 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
        PARROT_ASSERT_ARG(pdb))
 #define ASSERT_ARGS_no_such_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_PDB_get_continuation_backtrace \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sub) \
+    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_skip_whitespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cmd))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -3242,6 +3256,25 @@ PDB_help(PARROT_INTERP, ARGIN(const char *command))
     }
 }
 
+STRING *
+Parrot_dbg_get_exception_backtrace(PARROT_INTERP, ARGMOD(PMC * exception))
+{
+    ASSERT_ARGS(PDB_backtrace)
+    STRING           *str;
+    PMC              *old       = PMCNULL;
+    int               rec_level = 0;
+    int               limit_count = 0;
+
+    PMC * resume = VTABLE_get_attr_str(interp, exception, CONST_STRING(interp, "resume"));
+    if (PMC_IS_NULL(resume))
+        return STRINGNULL;
+    else {
+        const Parrot_Continuation_attributes * const cont = PARROT_CONTINUATION(resume);
+        STRING * const bt = PDB_get_continuation_backtrace(interp, PMCNULL, cont->to_ctx);
+        return bt;
+    }
+}
+
 /*
 
 =item C<void PDB_backtrace(PARROT_INTERP)>
@@ -3257,19 +3290,27 @@ void
 PDB_backtrace(PARROT_INTERP)
 {
     ASSERT_ARGS(PDB_backtrace)
-    STRING           *str;
-    PMC              *old       = PMCNULL;
-    int               rec_level = 0;
-    int               limit_count = 0;
-
     /* information about the current sub */
     PMC *sub = interpinfo_p(interp, CURRENT_SUB);
     PMC *ctx = CURRENT_CONTEXT(interp);
+    STRING * const bt = PDB_get_continuation_backtrace(interp, sub, ctx);
+    Parrot_io_eprintf(interp, "%Ss", bt);
+}
+
+static STRING *
+PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD(PMC * sub), ARGMOD(PMC * ctx))
+{
+    ASSERT_ARGS(PDB_get_continuation_backtrace)
+    STRING *str;
+    PMC    *old         = PMCNULL;
+    PMC    *output      = Parrot_pmc_new(interp, enum_class_StringBuilder);
+    int     rec_level   = 0;
+    int     limit_count = 0;
 
     if (!PMC_IS_NULL(sub)) {
         str = Parrot_Context_infostr(interp, ctx);
         if (str) {
-            Parrot_io_eprintf(interp, "%Ss", str);
+            VTABLE_push_string(interp, output, str);
             if (interp->code->annotations) {
                 PMC *annot = PackFile_Annotations_lookup(interp, interp->code->annotations,
                         Parrot_pcc_get_pc(interp, ctx) - interp->code->base.data + 1, NULL);
@@ -3279,13 +3320,14 @@ PDB_backtrace(PARROT_INTERP)
                     PMC *pline = VTABLE_get_pmc_keyed_str(interp, annot,
                             Parrot_str_new_constant(interp, "line"));
                     if ((!PMC_IS_NULL(pfile)) && (!PMC_IS_NULL(pline))) {
-                        STRING *file = VTABLE_get_string(interp, pfile);
+                        STRING * const file = VTABLE_get_string(interp, pfile);
                         INTVAL line = VTABLE_get_integer(interp, pline);
-                        Parrot_io_eprintf(interp, " (%Ss:%li)", file, (long)line);
+                        STRING * const fmt = Parrot_sprintf_c(interp, " (%Ss:%li)", file, (long)line);
+                        VTABLE_push_string(interp, output, fmt);
                     }
                 }
             }
-            Parrot_io_eprintf(interp, "\n");
+            VTABLE_push_string(interp, output, CONST_STRING(interp, "\n"));
         }
     }
 
@@ -3328,7 +3370,8 @@ PDB_backtrace(PARROT_INTERP)
                 ++rec_level;
         }
         else if (rec_level != 0) {
-            Parrot_io_eprintf(interp, "... call repeated %d times\n", rec_level);
+            STRING * const fmt = Parrot_sprintf_c(interp, "... call repeated %d times\n", rec_level);
+            VTABLE_push_string(interp, output, fmt);
             rec_level = 0;
         }
 
@@ -3349,11 +3392,12 @@ PDB_backtrace(PARROT_INTERP)
                     if ((!PMC_IS_NULL(pfile)) && (!PMC_IS_NULL(pline))) {
                         STRING *file = VTABLE_get_string(interp, pfile);
                         INTVAL line = VTABLE_get_integer(interp, pline);
-                        Parrot_io_eprintf(interp, " (%Ss:%li)", file, (long)line);
+                        STRING * const fmt = Parrot_sprintf_c(interp, " (%Ss:%li)", file, (long)line);
+                        VTABLE_push_string(interp, output, fmt);
                     }
                 }
             }
-            Parrot_io_eprintf(interp, "\n");
+            VTABLE_push_string(interp, output, CONST_STRING(interp, "\n"));
         }
 
         /* get the next Continuation */
@@ -3364,9 +3408,14 @@ PDB_backtrace(PARROT_INTERP)
             break;
     }
 
-    if (rec_level != 0)
-        Parrot_io_eprintf(interp, "... call repeated %d times\n", rec_level);
+    if (rec_level != 0) {
+        STRING * const fmt = Parrot_sprintf_c(interp, "... call repeated %d times\n", rec_level);
+        VTABLE_push_string(interp, output, fmt);
+    }
+    return VTABLE_get_string(interp, output);
 }
+
+
 
 /*
  * GDB functions

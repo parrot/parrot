@@ -9,15 +9,33 @@
 PARROT_API
 Parrot_Int
 Parrot_api_get_result(ARGMOD(PMC * interp_pmc), ARGOUT(Parrot_Int *is_error),
+                      ARGOUT(PMC ** exception),
                       ARGOUT(Parrot_Int *exit_code), ARGOUT(Parrot_String * errmsg))
 {
-    EMBED_API_CALLIN(interp_pmc, interp);
+    EMBED_API_CALLIN(interp_pmc, interp)
     *exit_code = interp->exit_code;
-    *errmsg = interp->final_error;
-    *is_error = !interp->exit_code && *errmsg;
-    interp->final_error = NULL;
+    *exception = interp->final_exception;
+    if (PMC_IS_NULL(exception)) {
+        *is_error = 0;
+        *errmsg = STRINGNULL;
+    } else {
+        *is_error = !interp->exit_code;
+        *errmsg = VTABLE_get_string(interp, *exception);
+    }
+    // TODO: GC mark interp->final_exception
+    interp->final_exception = PMCNULL;
     interp->exit_code = 0;
-    EMBED_API_CALLOUT(interp_pmc, interp);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+PARROT_API
+Parrot_Int
+Parrot_api_get_exception_backtrace(ARGMOD(PMC * interp_pmc), ARGMOD(PMC * exception), ARGOUT(Parrot_String ** bt))
+{
+    EMBED_API_CALLIN(interp_pmc, interp)
+    STRING * const bts = Parrot_dbg_get_exception_backtrace(interp, exception);
+    *bt = bts;
+    EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
 PARROT_API

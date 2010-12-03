@@ -64,6 +64,20 @@ PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 void
+Parrot_x_jump_out(PARROT_INTERP, int status)
+{
+    ASSERT_ARGS(Parrot_x_jump_out)
+
+    if (interp->api_jmp_buf)
+        longjmp(*(interp->api_jmp_buf), 1);
+    else
+        exit(status);
+}
+
+PARROT_EXPORT
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+void
 Parrot_x_exit(PARROT_INTERP, int status)
 {
     ASSERT_ARGS(Parrot_x_exit)
@@ -94,12 +108,7 @@ Parrot_x_exit(PARROT_INTERP, int status)
     }
 
     interp->exit_handler_list = NULL;
-    interp->exit_code = status;
-
-    if (interp->api_jmp_buf)
-        longjmp(*(interp->api_jmp_buf), 1);
-    else
-        exit(status);
+    Parrot_x_jump_out(interp, status);
 }
 
 /*

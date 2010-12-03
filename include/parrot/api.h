@@ -14,7 +14,6 @@
 #include "parrot/config.h"
 #include "parrot/core_types.h"
 
-
 #define PARROT_API PARROT_EXPORT
 
 /* having a modified version of PARROT_ASSERT which resolves as an integer
@@ -129,17 +128,32 @@ Parrot_Int Parrot_api_flag(
         FUNC_MODIFIES(*interp_pmc);
 
 PARROT_API
+Parrot_Int Parrot_api_get_exception_backtrace(
+    ARGMOD(PMC * interp_pmc),
+    ARGMOD(PMC * exception),
+    ARGOUT(Parrot_String ** bt))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* interp_pmc)
+        FUNC_MODIFIES(* exception)
+        FUNC_MODIFIES(* bt);
+
+PARROT_API
 Parrot_Int Parrot_api_get_result(
     ARGMOD(PMC * interp_pmc),
     ARGOUT(Parrot_Int *is_error),
+    ARGOUT(PMC ** exception),
     ARGOUT(Parrot_Int *exit_code),
     ARGOUT(Parrot_String * errmsg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
         FUNC_MODIFIES(* interp_pmc)
         FUNC_MODIFIES(*is_error)
+        FUNC_MODIFIES(* exception)
         FUNC_MODIFIES(*exit_code)
         FUNC_MODIFIES(* errmsg);
 
@@ -262,9 +276,15 @@ Parrot_Int Parrot_api_set_warnings(
     , PARROT_ASSERT_ARG(outfile))
 #define ASSERT_ARGS_Parrot_api_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc))
+#define ASSERT_ARGS_Parrot_api_get_exception_backtrace \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp_pmc) \
+    , PARROT_ASSERT_ARG(exception) \
+    , PARROT_ASSERT_ARG(bt))
 #define ASSERT_ARGS_Parrot_api_get_result __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(is_error) \
+    , PARROT_ASSERT_ARG(exception) \
     , PARROT_ASSERT_ARG(exit_code) \
     , PARROT_ASSERT_ARG(errmsg))
 #define ASSERT_ARGS_Parrot_api_get_runtime_path __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

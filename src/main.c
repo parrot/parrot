@@ -24,14 +24,11 @@ Start Parrot
 #include "parrot/longopt.h"
 #include "parrot/api.h"
 
-
-
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void show_last_error_and_exit(Parrot_PMC interp);
 static void help(void);
 static void help_debug(void);
 PARROT_WARN_UNUSED_RESULT
@@ -72,11 +69,16 @@ static void parseflags_minimal(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(* initargs);
 
+static void print_parrot_string(
+    Parrot_PMC interp,
+    FILE *vector,
+    Parrot_String str);
+
+static void show_last_error_and_exit(Parrot_PMC interp);
 static void usage(ARGMOD(FILE *fp))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*fp);
 
-#define ASSERT_ARGS_show_last_error_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_help_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_is_all_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -93,6 +95,8 @@ static void usage(ARGMOD(FILE *fp))
 #define ASSERT_ARGS_parseflags_minimal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(initargs) \
     , PARROT_ASSERT_ARG(argv))
+#define ASSERT_ARGS_print_parrot_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_show_last_error_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(fp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -163,21 +167,33 @@ main(int argc, const char *argv[])
 static void
 show_last_error_and_exit(Parrot_PMC interp)
 {
-    Parrot_String errmsg;
-    Parrot_Int exit_code;
-    Parrot_Int is_error;
-    if (!Parrot_api_get_result(interp, &is_error, &exit_code, &errmsg)){
+    Parrot_String errmsg, backtrace;
+    Parrot_Int exit_code, is_error;
+    Parrot_PMC exception;
+
+    if (!(Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg) &&
+          Parrot_api_get_exception_backtrace(interp, exception, &backtrace))) {
         fprintf(stderr, "PARROT VM: Cannot recover\n");
         exit(EXIT_FAILURE);
     }
 
-    /* if (errmsg) { */
-    /*     char * errmsg_raw; */
-    /*     Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw); */
-    /*     fprintf(stderr, "PARROT VM: %s\n", errmsg_raw); */
-    /*     Parrot_api_string_free_exported_ascii(interp, errmsg_raw); */
-    /* } */
+    print_parrot_string(interp, stderr, errmsg);
+    print_parrot_string(interp, stderr, backtrace);
+
     exit(exit_code);
+}
+
+static void
+print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str)
+{
+    char * msg_raw;
+    if (!str)
+        return;
+    Parrot_api_string_export_ascii(interp, str, &msg_raw);
+    if (msg_raw) {
+        fprintf(vector, "%s\n", msg_raw);
+        Parrot_api_string_free_exported_ascii(interp, msg_raw);
+    }
 }
 
 /*

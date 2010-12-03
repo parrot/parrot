@@ -114,10 +114,12 @@ HEADER
         static void
         show_last_error_and_exit(Parrot_PMC interp)
         {
-            Parrot_String errmsg;
-            Parrot_Int exit_code;
-            Parrot_Int is_error;
-            if (!Parrot_api_get_result(interp, &is_error, &exit_code, &errmsg)){
+            Parrot_String errmsg, backtrace;
+            Parrot_Int exit_code, is_error;
+            Parrot_PMC exception;
+
+            if (!(Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg) &&
+                  Parrot_api_get_exception_backtrace(interp, exception, &backtrace))) {
                 fprintf(stderr, "PARROT VM: Cannot recover\n");
                 exit(EXIT_FAILURE);
             }
@@ -125,7 +127,11 @@ HEADER
             if (errmsg) {
                 char * errmsg_raw;
                 Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw);
-                fprintf(stderr, "PARROT VM: %s\n", errmsg_raw);
+                fprintf(stderr, "%s\n", errmsg_raw);
+                Parrot_api_string_free_exported_ascii(interp, errmsg_raw);
+
+                Parrot_api_string_export_ascii(interp, backtrace, &errmsg_raw);
+                fprintf(stderr, "%s\n", errmsg_raw);
                 Parrot_api_string_free_exported_ascii(interp, errmsg_raw);
             }
             exit(exit_code);

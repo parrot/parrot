@@ -39,16 +39,16 @@ static PMC * parrot_config_hash_global = NULL;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void Parrot_gbl_setup_2(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 static void Parrot_gbl_set_config_hash_interpreter(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_gbl_setup_2 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+static void Parrot_gbl_setup_2(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_Parrot_gbl_set_config_hash_interpreter \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_gbl_setup_2 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -70,7 +70,7 @@ void
 Parrot_gbl_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
                                  unsigned int parrot_config_size)
 {
-    ASSERT_ARGS(Parrot_set_config_hash_internal)
+    ASSERT_ARGS(Parrot_gbl_set_config_hash_internal)
     if (parrot_config_stored != NULL) {
         parrot_config_stored      = parrot_config;
         parrot_config_size_stored = parrot_config_size;
