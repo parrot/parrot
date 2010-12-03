@@ -624,6 +624,9 @@ Retrieve an attribute value for the exception object.
           case attr_handler_iter:
             GET_ATTR_handler_iter(INTERP, SELF, value);
             break;
+          case attr_thrower:
+            GET_ATTR_thrower(INTERP, SELF, value);
+            break;
           case attr_NONE:
             /* If unknown attribute name, throw an exception. */
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,

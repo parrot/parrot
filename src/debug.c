@@ -104,6 +104,11 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static const DebuggerCmd * get_cmd(ARGIN_NULLOK(const char **cmd));
 
+static PMC * get_exception_context(PARROT_INTERP, ARGMOD(PMC * exception))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* exception);
+
 PARROT_WARN_UNUSED_RESULT
 static unsigned long get_uint(ARGMOD(const char **cmd), unsigned int def)
         __attribute__nonnull__(1)
@@ -156,6 +161,9 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 #define ASSERT_ARGS_GDB_print_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_cmd __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_get_exception_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(exception))
 #define ASSERT_ARGS_get_uint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_get_ulong __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -3265,13 +3273,31 @@ Parrot_dbg_get_exception_backtrace(PARROT_INTERP, ARGMOD(PMC * exception))
     int               rec_level = 0;
     int               limit_count = 0;
 
-    PMC * resume = VTABLE_get_attr_str(interp, exception, CONST_STRING(interp, "resume"));
-    if (PMC_IS_NULL(resume))
+    PMC * const ctx = get_exception_context(interp, exception);
+    if (PMC_IS_NULL(ctx))
         return STRINGNULL;
     else {
-        const Parrot_Continuation_attributes * const cont = PARROT_CONTINUATION(resume);
-        STRING * const bt = PDB_get_continuation_backtrace(interp, PMCNULL, cont->to_ctx);
+        const Parrot_CallContext_attributes * const cattrs = PARROT_CALLCONTEXT(ctx);
+        PMC * const sub = cattrs->current_sub;
+        STRING * const bt = PDB_get_continuation_backtrace(interp, sub, ctx);
         return bt;
+    }
+}
+
+static PMC *
+get_exception_context(PARROT_INTERP, ARGMOD(PMC * exception))
+{
+    PMC * const thrower = VTABLE_get_attr_str(interp, exception, CONST_STRING(interp, "thrower"));
+    if (!PMC_IS_NULL(thrower))
+        return thrower;
+    else {
+        PMC * const resume = VTABLE_get_attr_str(interp, exception, CONST_STRING(interp, "resume"));
+        if (PMC_IS_NULL(resume))
+            return PMCNULL;
+        else {
+            const Parrot_Continuation_attributes * const cont = PARROT_CONTINUATION(resume);
+            return cont->to_ctx;
+        }
     }
 }
 

@@ -127,6 +127,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
             }
         }
 
+
         if (severity == EXCEPT_exit) {
             /* TODO: get exit status based on type */
             interp->exit_code = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "exit_code"));
@@ -338,8 +339,10 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     PMC        * const handler      =
                              Parrot_cx_find_handler_local(interp, exception);
 
-    if (PMC_IS_NULL(handler))
+    if (PMC_IS_NULL(handler)) {
+        VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), CURRENT_CONTEXT(interp));
         die_from_exception(interp, exception);
+    }
 
     if (Interp_debug_TEST(interp, PARROT_BACKTRACE_DEBUG_FLAG)) {
         STRING * const exit_code = CONST_STRING(interp, "exit_code");
