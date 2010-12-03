@@ -127,29 +127,13 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
             }
         }
 
-        if (STRING_length(message)) {
-            if (use_perr)
-                Parrot_io_eprintf(interp, "%S\n", message);
-            else {
-                char * const msg = Parrot_str_to_cstring(interp, message);
-                fflush(stderr);
-                fprintf(stderr, "\n%s\n", msg);
-                Parrot_str_free_cstring(msg);
-            }
-
-            /* caution against output swap (with PDB_backtrace) */
-            fflush(stderr);
-            PDB_backtrace(interp);
-        }
-        else if (severity == EXCEPT_exit) {
+        if (severity == EXCEPT_exit) {
             /* TODO: get exit status based on type */
             interp->exit_code = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "exit_code"));
         }
-        else {
-            Parrot_io_eprintf(interp, "No exception handler and no message\n");
-            /* caution against output swap (with PDB_backtrace) */
-            fflush(stderr);
-            PDB_backtrace(interp);
+        else if (!STRING_length(message)) {
+            STRING * const newmessage = CONST_STRING(interp, "No exception handler and no message\n");
+            VTABLE_set_string_native(interp, exception, newmessage);
         }
 
     }

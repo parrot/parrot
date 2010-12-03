@@ -3378,7 +3378,7 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD(PMC * sub), ARGMOD(PMC * ct
         /* print the context description */
         if (rec_level == 0) {
             PackFile_ByteCode *seg = sub_cont->seg;
-            Parrot_io_eprintf(interp, "%Ss", str);
+            VTABLE_push_string(interp, output, str);
             if (seg->annotations) {
                 PMC *annot = PackFile_Annotations_lookup(interp, seg->annotations,
                         Parrot_pcc_get_pc(interp, sub_cont->to_ctx) - seg->base.data,
