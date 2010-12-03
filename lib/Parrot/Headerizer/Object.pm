@@ -34,6 +34,7 @@ use Parrot::Headerizer::Functions qw(
     read_file
     write_file
     qualify_sourcefile
+    handle_split_declaration
     asserts_from_args
     shim_test
     handle_modified_args
@@ -391,28 +392,15 @@ sub generate_documentation_signature {
 
     # Wrap long lines.
     my $line_len = 80;
-    return $function_decl if length($function_decl)<= $line_len;
-
-    my @doc_chunks = split /\s+/, $function_decl;
-    my $split_decl = '';
-    my @line;
-    while (@doc_chunks) {
-        my $chunk = shift @doc_chunks;
-        if (length(join(' ', @line, $chunk)) <= $line_len) {
-            push @line, $chunk;
-        }
-        else {
-            $split_decl .= join(' ', @line) . "\n";
-            @line=($chunk);
-        }
+    if (length($function_decl)<= $line_len) {
+        return $function_decl;
     }
-    if (@line) {
-        $split_decl .= join(' ', @line) . "\n";
+    else {
+        return handle_split_declaration(
+            $function_decl,
+            $line_len,
+        );
     }
-
-    $split_decl =~ s/\n$//;
-
-    return $split_decl;
 }
 
 =item C<valid_macro()>
@@ -495,7 +483,8 @@ sub process_sources {
             for my $cfile ( sort keys %{$sourcefiles} ) {
                 my @funcs = @{ $sourcefiles->{$cfile} };
                 @funcs = grep { not $_->{is_static} } @funcs;    # skip statics
-                $header = $self->replace_headerized_declarations( $header, $cfile, $hfile, @funcs );
+                $header = $self->replace_headerized_declarations(
+                    $header, $cfile, $hfile, @funcs );
             }
     
             write_file( $hfile, $header );

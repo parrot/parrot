@@ -19,6 +19,7 @@ use Parrot::Headerizer::Functions qw(
     read_file
     write_file
     qualify_sourcefile
+    handle_split_declaration
     asserts_from_args
     shim_test
     handle_modified_args
@@ -231,6 +232,25 @@ like($@, qr/$ofile doesn't look like an object file/,
     is( $hfile, 'none', "As expected, no header file" );
 }
 
+my ($function_decl, $line_len, $expected);
+my @first_list = qw(
+    alpha beta gamma delta epsilon zeta eta theta
+    iota kappa lambda mu nu xi omicron
+);
+my @second_list = qw( pi rho sigma tau );
+$line_len = 80;
+$function_decl = join(' ' => @first_list);
+$expected = $function_decl;
+is( handle_split_declaration( $function_decl, $line_len ),
+    $expected,
+    "function declaration was exactly $line_len characters long" );
+
+$function_decl = join(' ' => (@first_list, @second_list));
+$expected = join(' ' => @first_list) . "\n" . join(' ' => @second_list);
+is( handle_split_declaration( $function_decl, $line_len ),
+    $expected,
+    "function declaration exceeded $line_len characters and so was split" );
+
 # asserts_from_args()
 my (@args, %asserts);
 @args = (
@@ -269,7 +289,7 @@ ok( exists $asserts{'PARROT_ASSERT_ARG(item)'}, "Got expected assert" );
 ok( exists $asserts{'PARROT_ASSERT_ARG(interp)'}, "Got expected assert" );
 ok( exists $asserts{'PARROT_ASSERT_ARG(_abcDEF123)'}, "Got expected assert" );
 
-my ($var, $args_ref, $funcs_ref, $expected);
+my ($var, $args_ref, $funcs_ref);
 my @modified_args;
 # shim_test
 $var = 'something';

@@ -11,6 +11,7 @@ our @EXPORT_OK = qw(
     read_file
     write_file
     qualify_sourcefile
+    handle_split_declaration
     asserts_from_args
     shim_test
     handle_modified_args
@@ -224,6 +225,39 @@ sub qualify_sourcefile {
     return ($sourcefile, $source_code, $hfile);
 }
 
+=pod
+
+    my $split_decl = handle_split_declaration(
+        $function_decl,
+        $line_len,
+    );
+
+=cut
+
+sub handle_split_declaration {
+    my ($function_decl, $line_len) = @_;
+    my @doc_chunks = split /\s+/, $function_decl;
+    my $split_decl = '';
+    my @line;
+    while (@doc_chunks) {
+        my $chunk = shift @doc_chunks;
+        if (length(join(' ', @line, $chunk)) <= $line_len) {
+            push @line, $chunk;
+        }
+        else {
+            $split_decl .= join(' ', @line) . "\n";
+            @line=($chunk);
+        }
+    }
+    if (@line) {
+        $split_decl .= join(' ', @line) . "\n";
+    }
+
+    $split_decl =~ s/\n$//;
+
+    return $split_decl;
+}
+
 sub asserts_from_args {
     my @args = @_;
     my @asserts;
@@ -253,7 +287,12 @@ sub asserts_from_args {
     return (@asserts);
 }
 
-#    my @modified_args = shim_test($func, \@args);
+=pod
+
+    my @modified_args = shim_test($func, \@args);
+
+=cut
+
 sub shim_test {
     my ($func, $argsref) = @_;
     my @args = @{$argsref};
