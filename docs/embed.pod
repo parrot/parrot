@@ -148,24 +148,39 @@ flags include:
 
 =item PARROT_NO_FLAGS
 
+The default. No flags.
+
 =item PARROT_BOUNDS_FLAG
+
+True if byte code bounds should be tracked.
 
 =item PARROT_GC_DEBUG_FLAG
 
+True if debugging memory management.
+
 =item PARROT_EXTERN_CODE_FLAG
+
+True if reusing another interpreters code.
 
 =item PARROT_DESTROY_FLAG
 
+True if the last interpreter shall cleanup.
+
 =item PARROT_IS_THREAD
+
+True if interpreter is a thread.
 
 =item PARROT_THR_COPY_INTERP
 
+True if thread start copies interpreter state.
+
 =item PARROT_THR_THREAD_POOL
+
+True if type3 threads are being used.
 
 =back
 
-See F<interpreter.h> for the definition of these flags (TODO: document flag
-definitions here).
+These are defined in F<interpreter.h>.
 
 =item C<void Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)>
 
