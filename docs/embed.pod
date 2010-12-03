@@ -85,19 +85,19 @@ Parrot's unsigned integer numeric type.
 
 Not documented yet.
 
-=head2 Type signatures
+=head2 Function signatures
 
-What is a type signature? It is a string which represents the calling and
+What is a function signature? It is a string which represents the calling and
 return conventions of a function. It is a very succinct representation of the
 answer to the question "How do I call this function and what does it
 return?".
 
-All type signatures follow the form of:
+All function signatures follow the form of:
 
     Foo->Bar
 
 where C<Foo> and C<Bar> are a list of zero or more Parrot datatypes. Here is
-an example of a few type signatures and what they mean:
+an example of a few function signatures and what they mean:
 
    P->S     In: PMC                 Out: String
    PiP->S   In: PMC (method call)   Out: String
@@ -110,7 +110,7 @@ an example of a few type signatures and what they mean:
 
 TODO: Multiple return values? Spaces?
 
-There are four datatypes that can be used in Parrot Type Signatures:
+There are four datatypes that can be used in Parrot function signatures:
 
     I <=> Parrot_Int
     N <=> Parrot_Float (Numeric)
@@ -118,8 +118,10 @@ There are four datatypes that can be used in Parrot Type Signatures:
     P <=> Parrot_PMC
 
 There is also the C<Pi> datatype, which may only appear at the beginning of a
-type signature. It stands for "PMC invocant" and basically means SELF. C<Pi>
+function signature. It stands for "PMC invocant" and basically means SELF. C<Pi>
 will only be used if calling a method on an object.
+
+Parrot function signature are mostly used when calling C<Parrot_ext_call>.
 
 =head2 Interpreter initialization and destruction
 
@@ -349,7 +351,7 @@ Not documented yet.
 
 =item C<void Parrot_ext_call(PARROT_INTERP, Parrot_PMC sub, const_char *signature, varargs ...)>
 
-Call a Parrot subroutine using the supplied signature. Variables to be filled
+Call a Parrot subroutine using the supplied function signature. Variables to be filled
 with return values are passed as references in the varargs list, after all
 arguments.
 
@@ -382,7 +384,7 @@ supplying an argument.
 
 Methods are called using the same API function as calling a subroutine. The
 first argument should be the object that the method will be invoked on, and it
-should have the signature "Pi".
+should have the signature "Pi", which stands for "PMC invocant".
 
 =back
 
