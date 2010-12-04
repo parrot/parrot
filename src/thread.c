@@ -695,7 +695,7 @@ pt_transfer_sub(ARGOUT(Parrot_Interp d), ARGIN(Parrot_Interp s), ARGIN(PMC *sub)
     ASSERT_ARGS(pt_transfer_sub)
 #if defined THREAD_DEBUG && THREAD_DEBUG
     Parrot_io_eprintf(s, "copying over subroutine [%Ss]\n",
-        Parrot_full_sub_name(s, sub));
+        Parrot_sub_full_sub_name(s, sub));
 #endif
     return make_local_copy(d, s, sub);
 }

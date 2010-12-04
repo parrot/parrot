@@ -658,7 +658,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_freeze_at_destruct>
 
-=item C<Parrot_full_sub_name>
+=item C<Parrot_sub_full_sub_name>
 
 =item C<parrot_gc_context>
 

@@ -29,7 +29,7 @@ Subroutines, continuations, co-routines and other fun stuff...
 
 /*
 
-=item C<void mark_context_start(void)>
+=item C<void Parrot_sub_mark_context_start(void)>
 
 Indicate that a new round of context marking is about to take place.
 
@@ -40,16 +40,16 @@ Indicate that a new round of context marking is about to take place.
 static int context_gc_mark = 0;
 
 void
-mark_context_start(void)
+Parrot_sub_mark_context_start(void)
 {
-    ASSERT_ARGS(mark_context_start)
+    ASSERT_ARGS(Parrot_sub_mark_context_start)
     if (++context_gc_mark == 0) context_gc_mark = 1;
 }
 
 
 /*
 
-=item C<STRING* Parrot_full_sub_name(PARROT_INTERP, PMC* sub_pmc)>
+=item C<STRING* Parrot_sub_full_sub_name(PARROT_INTERP, PMC* sub_pmc)>
 
 Return namespace, name, and location of subroutine.
 
@@ -61,9 +61,9 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING*
-Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
+Parrot_sub_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
 {
-    ASSERT_ARGS(Parrot_full_sub_name)
+    ASSERT_ARGS(Parrot_sub_full_sub_name)
     if (sub_pmc && VTABLE_defined(interp, sub_pmc)) {
         Parrot_Sub_attributes *sub;
 
@@ -105,7 +105,7 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
 
 /*
 
-=item C<int Parrot_Context_get_info(PARROT_INTERP, PMC *ctx, Parrot_Context_info
+=item C<int Parrot_sub_context_get_info(PARROT_INTERP, PMC *ctx, Parrot_Context_info
 *info)>
 
 Takes pointers to a context and its information table.
@@ -118,10 +118,10 @@ Used by Parrot_sub_Context_infostr.
 
 PARROT_EXPORT
 int
-Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
+Parrot_sub_context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
     ARGOUT(Parrot_Context_info *info))
 {
-    ASSERT_ARGS(Parrot_Context_get_info)
+    ASSERT_ARGS(Parrot_sub_context_get_info)
     PMC                   *subpmc;
     Parrot_Sub_attributes *sub;
     opcode_t              *pc;
@@ -160,7 +160,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
     }
     else {
         info->nsname   = VTABLE_get_string(interp, sub->namespace_name);
-        info->fullname = Parrot_full_sub_name(interp, subpmc);
+        info->fullname = Parrot_sub_full_sub_name(interp, subpmc);
     }
 
     pc = Parrot_pcc_get_pc(interp, ctx);
@@ -313,7 +313,7 @@ Parrot_sub_Context_infostr(PARROT_INTERP, ARGIN(PMC *ctx))
         : "called from Sub";
 
     Parrot_block_GC_mark(interp);
-    if (Parrot_Context_get_info(interp, ctx, &info)) {
+    if (Parrot_sub_context_get_info(interp, ctx, &info)) {
 
         res = Parrot_sprintf_c(interp,
             "%s '%Ss' pc %d (%Ss:%d)", msg,
@@ -514,7 +514,7 @@ Parrot_sub_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
         PMC * const sub = Parrot_pcc_get_sub(interp, to_ctx);
 
         Parrot_io_eprintf(interp, "# Back in sub '%Ss', env %p\n",
-                    Parrot_full_sub_name(interp, sub),
+                    Parrot_sub_full_sub_name(interp, sub),
                     interp->dynamic_env);
     }
 
