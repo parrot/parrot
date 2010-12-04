@@ -249,7 +249,7 @@ sub no_both_PARROT_EXPORT_and_PARROT_INLINE {
 
 =pod
 
-    validate_prototype_args( $args, $proto );
+    @args = validate_prototype_args( $args, $proto );
 
 =cut
 
@@ -263,7 +263,7 @@ sub validate_prototype_args {
             || ( $_ =~ /(PARROT|NULLOK|SHIM)_INTERP/ )
             or die "Bad args in $proto";
     }
-    return 1;
+    return @args;
 }
 
 =pod

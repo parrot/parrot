@@ -313,15 +313,7 @@ sub function_components_from_declaration {
         parrot_api      => $parrot_api,
     } );
 
-#    my @args = split( /\s*,\s*/, $args );
-#    for (@args) {
-#        /\S+\s+\S+/
-#            || ( $_ eq '...' )
-#            || ( $_ eq 'void' )
-#            || ( $_ =~ /(PARROT|NULLOK|SHIM)_INTERP/ )
-#            or die "Bad args in $proto";
-#    }
-    validate_prototype_args( $args, $proto );
+    my @args = validate_prototype_args( $args, $proto );
 
     my $is_static;
     ($return_type, $is_static) = no_both_static_and_PARROT_EXPORT( {

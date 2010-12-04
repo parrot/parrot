@@ -283,13 +283,12 @@ my ($args, $proto);
         'SHIM_INTERP',
     ) );
     $proto = 'myprototype';
-    $rv = validate_prototype_args( $args, $proto );
-    ok($rv, 'validate_prototype_args() returned true value');
+    my @args_out = validate_prototype_args( $args, $proto );
     ok(! $@, "No error message recorded");
 
     $args .= ' , single';
     eval {
-        $rv = validate_prototype_args( $args, $proto );
+        @args_out = validate_prototype_args( $args, $proto );
     };
     like($@, qr/Bad args in $proto/,
         "Detected invalid prototype arg");
