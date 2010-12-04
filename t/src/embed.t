@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 11;
+plan tests => 12;
 
 =head1 NAME
 
@@ -87,6 +87,44 @@ int main(int argc, const char **argv)
         fail("Cannot create 1st parrot interpreter");
 
     interp2 = Parrot_new(interp1);
+
+    if (!interp2)
+        fail("Cannot create 2nd parrot interpreter");
+
+    puts("Done");
+    Parrot_destroy(interp1);
+    Parrot_destroy(interp2);
+    puts("Really done");
+    return 0;
+}
+CODE
+Done
+Really done
+OUTPUT
+
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, create multiple interps without giving 1st interp to Parrot_new ", todo => 'TT #1880 : Parrot_new requires the 1st interp created as an argument');
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/embed.h"
+
+void fail(const char *msg);
+
+void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+int main(int argc, const char **argv)
+{
+    Parrot_Interp interp1, interp2;
+    interp1 = Parrot_new(NULL);
+    if (!interp1)
+        fail("Cannot create 1st parrot interpreter");
+
+    interp2 = Parrot_new(NULL);
 
     if (!interp2)
         fail("Cannot create 2nd parrot interpreter");
