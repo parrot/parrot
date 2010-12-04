@@ -12,6 +12,7 @@ our @EXPORT_OK = qw(
     write_file
     qualify_sourcefile
     no_both_PARROT_EXPORT_and_PARROT_INLINE
+    validate_prototype_args
     no_both_static_and_PARROT_EXPORT
     handle_split_declaration
     asserts_from_args
@@ -243,7 +244,26 @@ sub no_both_PARROT_EXPORT_and_PARROT_INLINE {
     my $death =
         "$args->{file} $args->{name}: Can't have both PARROT_EXPORT and PARROT_INLINE";
     die $death if $args->{parrot_inline} && $args->{parrot_api};
-    return;
+    return 1;
+}
+
+=pod
+
+    validate_prototype_args( $args, $proto );
+
+=cut
+
+sub validate_prototype_args {
+    my ($args, $proto) = @_;
+    my @args = split( /\s*,\s*/, $args );
+    for (@args) {
+        /\S+\s+\S+/
+            || ( $_ eq '...' )
+            || ( $_ eq 'void' )
+            || ( $_ =~ /(PARROT|NULLOK|SHIM)_INTERP/ )
+            or die "Bad args in $proto";
+    }
+    return 1;
 }
 
 =pod

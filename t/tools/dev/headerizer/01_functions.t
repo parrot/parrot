@@ -20,6 +20,7 @@ use Parrot::Headerizer::Functions qw(
     write_file
     qualify_sourcefile
     no_both_PARROT_EXPORT_and_PARROT_INLINE
+    validate_prototype_args
     no_both_static_and_PARROT_EXPORT
     handle_split_declaration
     asserts_from_args
@@ -34,7 +35,7 @@ use Parrot::Headerizer::Functions qw(
 use IO::CaptureOutput qw| capture |;
 
 my $cwd = cwd();
-my @ofiles;
+my (@ofiles, $rv);
 
 # process_argv()
 eval {
@@ -250,6 +251,7 @@ my ($name, $parrot_inline, $parrot_api);
     ok(! $@, "PARROT_EXPORT and PARROT_INLINE not both true: No 'die' message recorded, as expected" );
 }
 
+# no_both_PARROT_EXPORT_and_PARROT_INLINE
 {
     local $@ = '';
     $filename = 'foobar';
@@ -266,6 +268,31 @@ my ($name, $parrot_inline, $parrot_api);
     };
     like($@, qr/$filename $name: Can't have both PARROT_EXPORT and PARROT_INLINE/,
         "PARROT_EXPORT and PARROT_INLINE  both true: Got expected 'die' message" );
+}
+
+# validate_prototype_args
+my ($args, $proto);
+{
+    local $@ = '';
+    $args = join(' , ' => (
+        'alpha beta',
+        '...',
+        'void',
+        'PARROT_INTERP(interp)',
+        'NULLOK_INTERP(interp)',
+        'SHIM_INTERP',
+    ) );
+    $proto = 'myprototype';
+    $rv = validate_prototype_args( $args, $proto );
+    ok($rv, 'validate_prototype_args() returned true value');
+    ok(! $@, "No error message recorded");
+
+    $args .= ' , single';
+    eval {
+        $rv = validate_prototype_args( $args, $proto );
+    };
+    like($@, qr/Bad args in $proto/,
+        "Detected invalid prototype arg");
 }
 
 # no_both_static_and_PARROT_EXPORT
