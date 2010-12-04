@@ -81,10 +81,6 @@ Parrot's unsigned integer numeric type.
 
 =back
 
-=head2 Constants
-
-Not documented yet.
-
 =head2 Function signatures
 
 What is a function signature? It is a string which represents the calling and
@@ -102,15 +98,17 @@ the datatypes on the right are the datatype being returned.
 
 Here are some example function signatures and what they mean:
 
-   INN->N   In: Integer, two Numerics   Out: Numeric
-   P->S     In: PMC                     Out: String
-   PiP->S   In: PMC (method call)       Out: String
-   NN->N    In: Two Numerics            Out: Numeric
-   I->I     In: Integer                 Out: Integer
-   I->N     In: Integer                 Out: Numeric
-   Pi->     In: none (method call)      Out: none
-   ->I      In: none                    Out: Integer
-   ->       In: none                    Out: none
+   INN->N   In: Integer, two Numerics    Out: Numeric
+   SIN->S   In: String, Integer, Numeric Out: String
+   P->S     In: PMC                      Out: String
+   PiP->S   In: PMC (method call)        Out: String
+   NN->N    In: Two Numerics             Out: Numeric
+   I->I     In: Integer                  Out: Integer
+   I->N     In: Integer                  Out: Numeric
+   N->P     In: Numeric                  Out: PMC
+   Pi->     In: none (method call)       Out: none
+   ->I      In: none                     Out: Integer
+   ->       In: none                     Out: none
 
 TODO: Multiple return values? Spaces?
 
