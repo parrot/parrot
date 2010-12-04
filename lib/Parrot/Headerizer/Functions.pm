@@ -11,6 +11,8 @@ our @EXPORT_OK = qw(
     read_file
     write_file
     qualify_sourcefile
+    no_both_PARROT_EXPORT_and_PARROT_INLINE
+    no_both_static_and_PARROT_EXPORT
     handle_split_declaration
     asserts_from_args
     shim_test
@@ -223,6 +225,45 @@ sub qualify_sourcefile {
     }
 
     return ($sourcefile, $source_code, $hfile);
+}
+
+=pod
+
+    no_both_PARROT_EXPORT_and_PARROT_INLINE( {
+        file            => $file,
+        name            => $name,
+        parrot_inline   => $parrot_inline,
+        parrot_api      => $parrot_api,
+    } );
+
+=cut
+
+sub no_both_PARROT_EXPORT_and_PARROT_INLINE {
+    my $args = shift;
+    my $death =
+        "$args->{file} $args->{name}: Can't have both PARROT_EXPORT and PARROT_INLINE";
+    die $death if $args->{parrot_inline} && $args->{parrot_api};
+    return;
+}
+
+=pod
+
+    ($return_type, $is_static) = no_both_static_and_PARROT_EXPORT( {
+        file            => $file,
+        name            => $name,
+        return_type     => $return_type,
+        parrot_api      => $parrot_api,
+    } );
+
+=cut
+
+sub no_both_static_and_PARROT_EXPORT {
+    my $args = shift;
+    my $is_static = 0;
+    $is_static = $2 if $args->{return_type} =~ s/^((static)\s+)?//i;
+    my $death = "$args->{file} $args->{name}: Impossible to have both static and PARROT_EXPORT";
+    die $death if $args->{parrot_api} && $is_static;
+    return ($args->{return_type}, $is_static);
 }
 
 =pod

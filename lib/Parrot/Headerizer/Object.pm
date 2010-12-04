@@ -34,6 +34,8 @@ use Parrot::Headerizer::Functions qw(
     read_file
     write_file
     qualify_sourcefile
+    no_both_PARROT_EXPORT_and_PARROT_INLINE
+    no_both_static_and_PARROT_EXPORT
     handle_split_declaration
     asserts_from_args
     shim_test
@@ -303,7 +305,12 @@ sub function_components_from_declaration {
     my $name = $1;
     $args = $2;
 
-    die "Can't have both PARROT_EXPORT and PARROT_INLINE on $name\n" if $parrot_inline && $parrot_api;
+    no_both_PARROT_EXPORT_and_PARROT_INLINE( {
+        file            => $file,
+        name            => $name,
+        parrot_inline   => $parrot_inline,
+        parrot_api      => $parrot_api,
+    } );
 
     my @args = split( /\s*,\s*/, $args );
     for (@args) {
@@ -314,12 +321,15 @@ sub function_components_from_declaration {
             or die "Bad args in $proto";
     }
 
+    my $is_static;
+    ($return_type, $is_static) = no_both_static_and_PARROT_EXPORT( {
+        file            => $file,
+        name            => $name,
+        return_type     => $return_type,
+        parrot_api      => $parrot_api,
+    } );
+
     my $is_ignorable = 0;
-    my $is_static = 0;
-    $is_static = $2 if $return_type =~ s/^((static)\s+)?//i;
-
-    die "$file $name: Impossible to have both static and PARROT_EXPORT" if $parrot_api && $is_static;
-
     my %macros;
     for my $macro (@macros) {
         $macros{$macro} = 1;

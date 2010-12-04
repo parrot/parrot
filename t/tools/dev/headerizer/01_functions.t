@@ -19,6 +19,8 @@ use Parrot::Headerizer::Functions qw(
     read_file
     write_file
     qualify_sourcefile
+    no_both_PARROT_EXPORT_and_PARROT_INLINE
+    no_both_static_and_PARROT_EXPORT
     handle_split_declaration
     asserts_from_args
     shim_test
@@ -232,6 +234,93 @@ like($@, qr/$ofile doesn't look like an object file/,
     is( $hfile, 'none', "As expected, no header file" );
 }
 
+my ($name, $parrot_inline, $parrot_api);
+{
+    local $@ = '';
+    $filename = 'foobar';
+    $name = 'alpha';
+    $parrot_inline = 1;
+    $parrot_api = 0;
+    no_both_PARROT_EXPORT_and_PARROT_INLINE( {
+        file            => $filename,
+        name            => $name,
+        parrot_inline   => $parrot_inline,
+        parrot_api      => $parrot_api,
+    } );
+    ok(! $@, "PARROT_EXPORT and PARROT_INLINE not both true: No 'die' message recorded, as expected" );
+}
+
+{
+    local $@ = '';
+    $filename = 'foobar';
+    $name = 'alpha';
+    $parrot_inline = 1;
+    $parrot_api = 1;
+    eval {
+        no_both_PARROT_EXPORT_and_PARROT_INLINE( {
+            file            => $filename,
+            name            => $name,
+            parrot_inline   => $parrot_inline,
+            parrot_api      => $parrot_api,
+        } );
+    };
+    like($@, qr/$filename $name: Can't have both PARROT_EXPORT and PARROT_INLINE/,
+        "PARROT_EXPORT and PARROT_INLINE  both true: Got expected 'die' message" );
+}
+
+# no_both_static_and_PARROT_EXPORT
+my ($return_type_in, $return_type_out, $is_static);
+{
+    local $@ = '';
+    $filename = 'foobar';
+    $name = 'alpha';
+    $return_type_in = 'int';
+    $parrot_api = 0;
+    ($return_type_out, $is_static) = no_both_static_and_PARROT_EXPORT( {
+        file            => $filename,
+        name            => $name,
+        return_type     => $return_type_in,
+        parrot_api      => $parrot_api,
+    } );
+    is($return_type_out, $return_type_in, "Return type unaltered");
+    ok(! $is_static, "Not static" );
+}
+
+{
+    local $@ = '';
+    $filename = 'foobar';
+    $name = 'alpha';
+    $return_type_in = 'static gamma';
+    $parrot_api = 0;
+    ($return_type_out, $is_static) = no_both_static_and_PARROT_EXPORT( {
+        file            => $filename,
+        name            => $name,
+        return_type     => $return_type_in,
+        parrot_api      => $parrot_api,
+    } );
+    is($return_type_out, 'gamma', "Return type altered");
+    ok($is_static, "Is static" );
+}
+
+{
+    local $@ = '';
+    $filename = 'foobar';
+    $name = 'alpha';
+    $return_type_in = 'static gamma';
+    $parrot_api = 1;
+    eval {
+        ($return_type_out, $is_static) = no_both_static_and_PARROT_EXPORT( {
+            file            => $filename,
+            name            => $name,
+            return_type     => $return_type_in,
+            parrot_api      => $parrot_api,
+        } );
+    };
+    like($@, qr/$filename $name: Impossible to have both static and PARROT_EXPORT/,
+        "Both static and PARROT_EXPORT: Got expected 'die' message" );
+}
+
+# handle_split_declaration()
 my ($function_decl, $line_len, $expected);
 my @first_list = qw(
     alpha beta gamma delta epsilon zeta eta theta
