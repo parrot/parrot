@@ -16,6 +16,7 @@ embed.pod - Parrot embedding system
 
         interp = Parrot_new(NULL);
         if (!interp) {
+            fprintf(stderr, "Cannot create Parrot interpreter!\n");
             return 1;
         }
 
@@ -92,10 +93,18 @@ All function signatures follow the form of:
 
     Foo->Bar
 
-where C<Foo> and C<Bar> are a list of zero or more Parrot datatypes. The
-datatypes on the left of the arrow are function arguments being passed in and
-the datatypes on the right are the datatype being returned. No spaces are
-allowed in a function signature.
+where C<Foo> and C<Bar> are a list of zero or more Parrot datatypes. C<Foo>
+and C<Bar> are individually called 'type signatures'. The datatypes on the
+left of the arrow are function arguments being passed in and the datatypes on
+the right are the datatype being returned. No spaces are allowed in a
+function signature.
+
+There are four datatypes that can be used in Parrot function signatures:
+
+    I <=> Parrot_Int
+    N <=> Parrot_Float (Numeric)
+    S <=> Parrot_String
+    P <=> Parrot_PMC
 
 Here are some example function signatures and what they mean:
 
@@ -113,12 +122,6 @@ Here are some example function signatures and what they mean:
 
 TODO: Multiple return values?
 
-There are four datatypes that can be used in Parrot function signatures:
-
-    I <=> Parrot_Int
-    N <=> Parrot_Float (Numeric)
-    S <=> Parrot_String
-    P <=> Parrot_PMC
 
 There is also the C<Pi> datatype, which may only appear at the beginning of a
 function signature. It stands for "PMC invocant" and basically means SELF. C<Pi>
