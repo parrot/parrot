@@ -94,7 +94,8 @@ All function signatures follow the form of:
 
 where C<Foo> and C<Bar> are a list of zero or more Parrot datatypes. The
 datatypes on the left of the arrow are function arguments being passed in and
-the datatypes on the right are the datatype being returned.
+the datatypes on the right are the datatype being returned. No spaces are
+allowed in a function signature.
 
 Here are some example function signatures and what they mean:
 
@@ -110,7 +111,7 @@ Here are some example function signatures and what they mean:
    ->I      In: none                     Out: Integer
    ->       In: none                     Out: none
 
-TODO: Multiple return values? Spaces?
+TODO: Multiple return values?
 
 There are four datatypes that can be used in Parrot function signatures:
 
