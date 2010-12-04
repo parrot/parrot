@@ -8,9 +8,9 @@
 
 PARROT_API
 Parrot_Int
-Parrot_api_get_result(ARGMOD(PMC * interp_pmc), ARGOUT(Parrot_Int *is_error),
-                      ARGOUT(PMC ** exception),
-                      ARGOUT(Parrot_Int *exit_code), ARGOUT(Parrot_String * errmsg))
+Parrot_api_get_result(Parrot_PMC interp_pmc, ARGOUT(Parrot_Int *is_error),
+        ARGOUT(Parrot_PMC * exception), ARGOUT(Parrot_Int *exit_code),
+        ARGOUT(Parrot_String * errmsg))
 {
     EMBED_API_CALLIN(interp_pmc, interp)
     *exit_code = interp->exit_code;
@@ -22,7 +22,6 @@ Parrot_api_get_result(ARGMOD(PMC * interp_pmc), ARGOUT(Parrot_Int *is_error),
         *is_error = !interp->exit_code;
         *errmsg = VTABLE_get_string(interp, *exception);
     }
-    // TODO: GC mark interp->final_exception
     interp->final_exception = PMCNULL;
     interp->exit_code = 0;
     EMBED_API_CALLOUT(interp_pmc, interp)
@@ -30,7 +29,8 @@ Parrot_api_get_result(ARGMOD(PMC * interp_pmc), ARGOUT(Parrot_Int *is_error),
 
 PARROT_API
 Parrot_Int
-Parrot_api_get_exception_backtrace(ARGMOD(PMC * interp_pmc), ARGMOD(PMC * exception), ARGOUT(Parrot_String ** bt))
+Parrot_api_get_exception_backtrace(Parrot_PMC interp_pmc,
+        Parrot_PMC exception, ARGOUT(Parrot_String * bt))
 {
     EMBED_API_CALLIN(interp_pmc, interp)
     STRING * const bts = Parrot_dbg_get_exception_backtrace(interp, exception);
@@ -40,7 +40,8 @@ Parrot_api_get_exception_backtrace(ARGMOD(PMC * interp_pmc), ARGMOD(PMC * except
 
 PARROT_API
 Parrot_Int
-Parrot_api_make_interpreter(ARGIN_NULLOK(PMC *parent), Parrot_Int flags, ARGIN_NULLOK(Parrot_Init_Args *args), ARGOUT(PMC **interp))
+Parrot_api_make_interpreter(Parrot_PMC interp_pmc, Parrot_Int flags,
+        ARGIN_NULLOK(Parrot_Init_Args *args), ARGOUT(Parrot_PMC *interp))
 {
     ASSERT_ARGS(Parrot_api_make_interpreter)
     int alt_stacktop;
@@ -67,7 +68,8 @@ Parrot_api_make_interpreter(ARGIN_NULLOK(PMC *parent), Parrot_Int flags, ARGIN_N
 
 PARROT_API
 Parrot_Int
-Parrot_api_set_runcore(ARGIN(PMC *interp_pmc), const char * corename, Parrot_UInt trace)
+Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
+        Parrot_UInt trace)
 {
     ASSERT_ARGS(Parrot_api_set_runcore)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -95,7 +97,7 @@ Parrot_api_set_runcore(ARGIN(PMC *interp_pmc), const char * corename, Parrot_UIn
 
 PARROT_API
 Parrot_Int
-Parrot_api_debug_flag(ARGMOD(PMC *interp_pmc), Parrot_Int flags, Parrot_Int set)
+Parrot_api_debug_flag(Parrot_PMC interp_pmc, Parrot_Int flags, Parrot_Int set)
 {
     ASSERT_ARGS(Parrot_api_debug_flag)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -108,7 +110,7 @@ Parrot_api_debug_flag(ARGMOD(PMC *interp_pmc), Parrot_Int flags, Parrot_Int set)
 
 PARROT_API
 Parrot_Int
-Parrot_api_flag(ARGMOD(PMC *interp_pmc), Parrot_Int flags, Parrot_Int set)
+Parrot_api_flag(Parrot_PMC interp_pmc, Parrot_Int flags, Parrot_Int set)
 {
     ASSERT_ARGS(Parrot_api_flag)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -124,7 +126,7 @@ Parrot_api_flag(ARGMOD(PMC *interp_pmc), Parrot_Int flags, Parrot_Int set)
 
 PARROT_API
 Parrot_Int
-Parrot_api_set_executable_name(ARGMOD(PMC *interp_pmc), ARGIN(const char * name))
+Parrot_api_set_executable_name(Parrot_PMC interp_pmc, ARGIN(const char * name))
 {
     ASSERT_ARGS(Parrot_api_set_executable_name)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -138,7 +140,7 @@ Parrot_api_set_executable_name(ARGMOD(PMC *interp_pmc), ARGIN(const char * name)
 
 PARROT_API
 Parrot_Int
-Parrot_api_destroy_interpreter(ARGIN(PMC *interp_pmc))
+Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
 {
     ASSERT_ARGS(Parrot_api_destroy_interpreter)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -160,7 +162,8 @@ Load a bytecode file and return a bytecode PMC.
 
 PARROT_API
 Parrot_Int
-Parrot_api_load_bytecode_file(ARGMOD(PMC *interp_pmc), ARGIN(const char *filename), ARGOUT(PMC **pbc))
+Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
+        ARGIN(const char *filename), ARGOUT(Parrot_PMC * pbc))
 {
     ASSERT_ARGS(Parrot_api_load_bytecode_file)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -175,7 +178,9 @@ Parrot_api_load_bytecode_file(ARGMOD(PMC *interp_pmc), ARGIN(const char *filenam
 
 PARROT_API
 Parrot_Int
-Parrot_api_load_bytecode_bytes(ARGMOD(PMC *interp_pmc), ARGIN(const unsigned char * const pbc), Parrot_Int bytecode_size, ARGOUT(PMC **pbcpmc))
+Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
+        ARGIN(const unsigned char * const pbc), Parrot_Int bytecode_size,
+        ARGOUT(Parrot_PMC * pbcpmc))
 {
     EMBED_API_CALLIN(interp_pmc, interp)
     PackFile * const pf = PackFile_new(interp, 0);
@@ -192,7 +197,8 @@ Parrot_api_load_bytecode_bytes(ARGMOD(PMC *interp_pmc), ARGIN(const unsigned cha
 
 PARROT_API
 Parrot_Int
-Parrot_api_run_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(PMC *mainargs))
+Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
+    Parrot_PMC mainargs)
 {
     ASSERT_ARGS(Parrot_api_run_bytecode)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -230,7 +236,8 @@ Parrot_api_run_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(PMC *mai
 
 PARROT_API
 Parrot_Int
-Parrot_api_disassemble_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(const char * const outfile), Parrot_Int opts)
+Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
+        ARGIN(const char * const outfile), Parrot_Int opts)
 {
     EMBED_API_CALLIN(interp_pmc, interp)
     PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
@@ -244,7 +251,8 @@ Parrot_api_disassemble_bytecode(ARGMOD(PMC *interp_pmc), ARGIN(PMC *pbc), ARGIN(
 
 PARROT_API
 Parrot_Int
-Parrot_api_build_argv_array(ARGMOD(PMC *interp_pmc), Parrot_Int argc, ARGIN(char **argv), ARGOUT(PMC **args))
+Parrot_api_build_argv_array(Parrot_PMC interp_pmc, Parrot_Int argc,
+        ARGIN(char ** argv), ARGOUT(Parrot_PMC * args))
 {
     ASSERT_ARGS(Parrot_api_build_argv_array)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -263,7 +271,7 @@ Parrot_api_build_argv_array(ARGMOD(PMC *interp_pmc), Parrot_Int argc, ARGIN(char
 
 PARROT_API
 Parrot_Int
-Parrot_api_set_warnings(ARGMOD(PMC *interp_pmc), Parrot_Int flags)
+Parrot_api_set_warnings(Parrot_PMC interp_pmc, Parrot_Int flags)
 {
     ASSERT_ARGS(Parrot_api_set_warnings)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -274,7 +282,8 @@ Parrot_api_set_warnings(ARGMOD(PMC *interp_pmc), Parrot_Int flags)
 
 PARROT_API
 Parrot_Int
-Parrot_api_set_output_file(ARGMOD(PMC *interp_pmc), ARGIN_NULLOK(const char * filename))
+Parrot_api_set_output_file(Parrot_PMC interp_pmc,
+        ARGIN_NULLOK(const char * filename))
 {
     ASSERT_ARGS(Parrot_api_set_output_file)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -287,7 +296,8 @@ Parrot_api_set_output_file(ARGMOD(PMC *interp_pmc), ARGIN_NULLOK(const char * fi
 
 PARROT_API
 Parrot_Int
-Parrot_api_add_library_search_path(ARGMOD(PMC *interp_pmc), ARGIN(const char *path))
+Parrot_api_add_library_search_path(Parrot_PMC interp_pmc,
+        ARGIN(const char *path))
 {
     //ASSERT_ARGS(Parrot_api_add_library_search_path)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -297,7 +307,8 @@ Parrot_api_add_library_search_path(ARGMOD(PMC *interp_pmc), ARGIN(const char *pa
 
 PARROT_API
 Parrot_Int
-Parrot_api_add_include_search_path(ARGMOD(PMC *interp_pmc), ARGIN(const char *path))
+Parrot_api_add_include_search_path(Parrot_PMC interp_pmc,
+        ARGIN(const char *path))
 {
     //ASSERT_ARGS(Parrot_api_add_include_search_path)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -307,7 +318,8 @@ Parrot_api_add_include_search_path(ARGMOD(PMC *interp_pmc), ARGIN(const char *pa
 
 PARROT_API
 Parrot_Int
-Parrot_api_add_dynext_search_path(ARGMOD(PMC *interp_pmc), ARGIN(const char *path))
+Parrot_api_add_dynext_search_path(Parrot_PMC interp_pmc,
+        ARGIN(const char *path))
 {
     //ASSERT_ARGS(Parrot_api_add_dynext_search_path)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -329,7 +341,8 @@ passed as argument and set to C<PIO_INVALID_HANDLE> is ignored.
 
 PARROT_API
 Parrot_Int
-Parrot_api_set_stdhandles(ARGIN(PMC *interp_pmc), Parrot_Int stdin, Parrot_Int stdout, Parrot_Int stderr)
+Parrot_api_set_stdhandles(Parrot_PMC interp_pmc, Parrot_Int stdin,
+        Parrot_Int stdout, Parrot_Int stderr)
 {
     ASSERT_ARGS(Parrot_api_set_stdhandles)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -358,7 +371,8 @@ Parrot_api_set_stdhandles(ARGIN(PMC *interp_pmc), Parrot_Int stdin, Parrot_Int s
 
 PARROT_API
 Parrot_Int
-Parrot_api_get_runtime_path(Parrot_PMC interp_pmc, ARGOUT(Parrot_String *runtime))
+Parrot_api_get_runtime_path(Parrot_PMC interp_pmc,
+        ARGOUT(Parrot_String *runtime))
 {
     EMBED_API_CALLIN(interp_pmc, interp)
     *runtime = Parrot_get_runtime_path(interp);
