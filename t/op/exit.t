@@ -57,9 +57,7 @@ TODO: {
 CODE
 
 }
-TODO: {
-    local $TODO = 'pbc exits with 1 by default';
-    # Should we be using this file?
+{
     my $pbc = File::Spec->catfile(qw/ t native_pbc integer_1.pbc /);
     pbc_exit_code_is($pbc, 0, 'pbc exits with 0 by default');
 }
