@@ -19,6 +19,7 @@ use Parrot::Headerizer::Functions qw(
     read_file
     write_file
     qualify_sourcefile
+    replace_pod_item
     no_both_PARROT_EXPORT_and_PARROT_INLINE
     validate_prototype_args
     no_both_static_and_PARROT_EXPORT
@@ -35,7 +36,7 @@ use Parrot::Headerizer::Functions qw(
 use IO::CaptureOutput qw| capture |;
 
 my $cwd = cwd();
-my (@ofiles, $rv);
+my (@ofiles, $rv, $expected);
 
 # process_argv()
 eval {
@@ -235,7 +236,73 @@ like($@, qr/$ofile doesn't look like an object file/,
     is( $hfile, 'none', "As expected, no header file" );
 }
 
-my ($name, $parrot_inline, $parrot_api);
+# replace_pod_item()
+my ($text_in, $text_out, $name, $heading, $cfile_name);
+{
+    $name = 'Parrot_list_destroy';
+    $text_in = "alpha\n=item C< $name >\n\n";
+    $heading = 'item C<void Parrot_list_destroy(PARROT_INTERP, Linked_List* list)>';
+    $cfile_name = 'src/list.c';
+    $expected = "alpha\n$heading\n\n";
+    $text_out = replace_pod_item( {
+        text        => $text_in,
+        name        => $name,
+        heading     => $heading,
+        cfile_name  => $cfile_name,
+    } );
+    is( $text_out, $expected,
+        "POD heading transformed as expected" );
+}
+
+{
+    $name = 'Parrot_list_destroy';
+    $text_in = "alpha\n=item C<foobar>\n\n";
+    $heading = 'item C<void Parrot_list_destroy(PARROT_INTERP, Linked_List* list)>';
+    $cfile_name = 'src/list.c';
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub {
+                $text_out = replace_pod_item( {
+                    text        => $text_in,
+                    name        => $name,
+                    heading     => $heading,
+                    cfile_name  => $cfile_name,
+                } );
+            },
+            \$stdout,
+            \$stderr,
+        );
+        like($stderr, qr/$cfile_name: $name has no POD/,
+            "Got expected warning");
+    }
+}
+
+{
+    $name = 'yy_Parrot_list_destroy';
+    $text_in = "alpha\n=item C<foobar>\n\n";
+    $heading = 'item C<void Parrot_list_destroy(PARROT_INTERP, Linked_List* list)>';
+    $cfile_name = 'src/list.c';
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub {
+                $text_out = replace_pod_item( {
+                    text        => $text_in,
+                    name        => $name,
+                    heading     => $heading,
+                    cfile_name  => $cfile_name,
+                } );
+            },
+            \$stdout,
+            \$stderr,
+        );
+        ok(! $stderr, "yacc files exempt from POD requirement");
+    }
+}
+
+# no_both_PARROT_EXPORT_and_PARROT_INLINE()
+my ($text, $parrot_inline, $parrot_api);
 {
     local $@ = '';
     $filename = 'foobar';
@@ -347,7 +414,7 @@ my ($return_type_in, $return_type_out, $is_static);
 }
 
 # handle_split_declaration()
-my ($function_decl, $line_len, $expected);
+my ($function_decl, $line_len);
 my @first_list = qw(
     alpha beta gamma delta epsilon zeta eta theta
     iota kappa lambda mu nu xi omicron

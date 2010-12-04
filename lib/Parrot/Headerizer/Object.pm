@@ -32,6 +32,7 @@ use Parrot::Headerizer::Functions qw(
     read_file
     write_file
     qualify_sourcefile
+    replace_pod_item
     no_both_PARROT_EXPORT_and_PARROT_INLINE
     validate_prototype_args
     no_both_static_and_PARROT_EXPORT
@@ -240,10 +241,12 @@ sub extract_function_declarations_and_update_source {
         my $name = $specs->{name};
 
         my $heading = $self->generate_documentation_signature($decl);
-
-        $text =~ s/=item C<[^>]*\b$name\b[^>]*>\n+/$heading\n\n/sm or do {
-            warn "$cfile_name: $name has no POD\n" unless $name =~ /^yy/; # lexer funcs don't have to have POD
-        }
+        $text = replace_pod_item( {
+            text        => $text,
+            name        => $name,
+            heading     => $heading,
+            cfile_name  => $cfile_name,
+        } );
     }
     open( my $fhout, '>', $cfile_name ) or die "Can't create $cfile_name: $!";
     print {$fhout} $text;

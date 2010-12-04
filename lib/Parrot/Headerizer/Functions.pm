@@ -11,6 +11,7 @@ our @EXPORT_OK = qw(
     read_file
     write_file
     qualify_sourcefile
+    replace_pod_item
     no_both_PARROT_EXPORT_and_PARROT_INLINE
     validate_prototype_args
     no_both_static_and_PARROT_EXPORT
@@ -226,6 +227,28 @@ sub qualify_sourcefile {
     }
 
     return ($sourcefile, $source_code, $hfile);
+}
+
+=pod
+
+    $text = replace_pod_item( {
+        text        => $text,
+        name        => $name,
+        heading     => $heading,
+        cfile_name  => $cfile_name,
+    } );
+
+=cut
+
+sub replace_pod_item {
+    my $args = shift;
+    $args->{text} =~ s/=item C<[^>]*\b$args->{name}\b[^>]*>\n+/$args->{heading}\n\n/sm
+        or do {
+            warn "$args->{cfile_name}: $args->{name} has no POD\n"
+                # lexer funcs don't have to have POD
+                unless $args->{name} =~ /^yy/;
+    };
+    return $args->{text};
 }
 
 =pod
