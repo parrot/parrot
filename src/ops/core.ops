@@ -440,11 +440,11 @@ inline op returncc() :flow {
 }
 
 inline op capture_lex(invar PMC) {
-    Parrot_capture_lex(interp, $1);
+    Parrot_sub_capture_lex(interp, $1);
 }
 
 inline op newclosure(out PMC, invar PMC) {
-    $1 = parrot_new_closure(interp, $2);
+    $1 = Parrot_sub_new_closure(interp, $2);
 }
 
 =back

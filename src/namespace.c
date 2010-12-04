@@ -688,7 +688,7 @@ Parrot_ns_find_named_item(PARROT_INTERP, ARGIN(STRING *name), SHIM(void *next))
 {
     ASSERT_ARGS(Parrot_ns_find_named_item)
     PMC * const ctx     = CURRENT_CONTEXT(interp);
-    PMC * const lex_pad = Parrot_find_pad(interp, name, ctx);
+    PMC * const lex_pad = Parrot_sub_find_pad(interp, name, ctx);
     PMC * g = PMCNULL;
 
     if (!PMC_IS_NULL(lex_pad)) {
