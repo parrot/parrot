@@ -67,11 +67,11 @@ print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     Parrot_io_eprintf(tracer, "# %s coroutine '%Ss'",
         !(PObj_get_FLAGS(sub_pmc) & SUB_FLAG_CORO_FF) ?
         "Calling" : "yielding from",
-        Parrot_full_sub_name(interp, sub_pmc));
+        Parrot_sub_full_sub_name(interp, sub_pmc));
 
     if (!PMC_IS_NULL(ctx) && (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_CORO_FF)) {
         Parrot_io_eprintf(tracer, " to '%Ss'",
-                Parrot_full_sub_name(interp,
+                Parrot_sub_full_sub_name(interp,
                     Parrot_pcc_get_sub(interp, Parrot_pcc_get_caller_ctx(interp, ctx))));
     }
 
