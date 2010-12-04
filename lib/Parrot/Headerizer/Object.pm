@@ -18,9 +18,7 @@ Parrot::Headerizer::Object - Parrot Header Generation functionality
 C<Parrot::Headerizer::Object> knows how to extract all kinds of information out
 of C-language files.
 
-=head2 Class Methods
-
-=over 4
+=head1 METHODS
 
 =cut
 
@@ -47,7 +45,7 @@ use Parrot::Headerizer::Functions qw(
     add_headerizer_markers
 );
 
-=item C<new()>
+=head2 C<new()>
 
 Constructor of headerizer objects.
 
@@ -100,27 +98,27 @@ sub get_sources {
     my %api;
     # Walk the object files and find corresponding source (either .c or .pmc)
     for my $ofile (@ofiles) {
-    
+
         # Skip files in the src/ops/ subdirectory.
         next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/ || # if run by hand...
                 $ofile =~ m{^src/ops};                     # ... or by makefile
-    
+
         $ofile =~ s/\\/\//g;
-    
+
         my $is_yacc = ($ofile =~ /\.y$/);
         if ( !$is_yacc ) {
             my $sfile = $ofile;
             $sfile    =~ s/\Q$PConfig{o}\E$/.s/;
             next if -f $sfile;
         }
-    
+
         my ($sourcefile, $source_code, $hfile) =
             qualify_sourcefile( {
                 ofile           => $ofile,
                 PConfig         => \%PConfig,
                 is_yacc         => $is_yacc,
             } );
-    
+
         my @decls;
         if ( $self->{macro_match} ) {
             @decls = $self->extract_function_declarations( $source_code );
@@ -129,7 +127,7 @@ sub get_sources {
             @decls =
             $self->extract_function_declarations_and_update_source( $sourcefile );
         }
-    
+
         for my $decl (@decls) {
             my $components =
                 $self->function_components_from_declaration( $sourcefile, $decl );
@@ -149,7 +147,7 @@ sub get_sources {
     $self->{api} = \%api;
 }
 
-=item C<extract_function_declarations()>
+=head2 C<extract_function_declarations()>
 
     $headerizer->extract_function_declarations($text)
 
@@ -254,7 +252,7 @@ sub extract_function_declarations_and_update_source {
     return @func_declarations;
 }
 
-=item C<function_components_from_declaration($file, $proto)>
+=head2 C<function_components_from_declaration($file, $proto)>
 
 $file => the filename
 $proto => the function declaration
@@ -360,7 +358,7 @@ sub function_components_from_declaration {
     };
 }
 
-=item C<generate_documentation_signature>
+=head2 C<generate_documentation_signature>
 
 Given an extracted function signature, return a modified
 version suitable for inclusion in POD documentation.
@@ -407,7 +405,7 @@ sub generate_documentation_signature {
     }
 }
 
-=item C<valid_macro()>
+=head2 C<valid_macro()>
 
     $headerizer->valid_macro( $macro )
 
@@ -422,7 +420,7 @@ sub valid_macro {
     return exists $self->{valid_macros}{$macro};
 }
 
-=item C<valid_macros()>
+=head2 C<valid_macros()>
 
     $headerizer->valid_macros()
 
@@ -438,7 +436,7 @@ sub valid_macros {
     return @macros;
 }
 
-=item C<squawk($file, $func, $error)>
+=head2 C<squawk($file, $func, $error)>
 
 Headerizer-specific ways of complaining if something went wrong.
 
@@ -481,27 +479,27 @@ sub process_sources {
         # Update all the .h files
         for my $hfile ( sort keys %sourcefiles ) {
             my $sourcefiles = $sourcefiles{$hfile};
-    
+
             my $header = read_file($hfile);
-    
+
             for my $cfile ( sort keys %{$sourcefiles} ) {
                 my @funcs = @{ $sourcefiles->{$cfile} };
                 @funcs = grep { not $_->{is_static} } @funcs;    # skip statics
                 $header = $self->replace_headerized_declarations(
                     $header, $cfile, $hfile, @funcs );
             }
-    
+
             write_file( $hfile, $header );
         }
-    
+
         # Update all the .c files in place
         for my $cfile ( sort keys %sourcefiles_with_statics ) {
             my @funcs = @{ $sourcefiles_with_statics{$cfile} };
             @funcs = grep { $_->{is_static} } @funcs;
-    
+
             my $source = read_file($cfile);
             $source = $self->replace_headerized_declarations( $source, 'static', $cfile, @funcs );
-    
+
             write_file( $cfile, $source );
         }
         $self->{message} = "Headerization complete.";
@@ -663,11 +661,6 @@ sub print_warnings {
         print "$nwarnings warnings in $nwarningfuncs funcs in $nwarningfiles C files\n";
     }
 }
-
-
-=back
-
-=cut
 
 1;
 

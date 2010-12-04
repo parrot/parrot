@@ -84,7 +84,7 @@ is(@ofiles, 3, "Got expected number of ofiles");
     is($lines_read[2], 'world', "Got third line");
     chdir $cwd or die "Unable to chdir: $!";
 }
-    
+
 my $filename = 'foobar';
 eval {
     read_file($filename);
@@ -105,7 +105,7 @@ eval {
 };
 like($@, qr/$ofile doesn't look like an object file/,
     "Got expected die message for non-object, non-yacc file" );
-    
+
 # Testing Needs We don't really need a .o file, we just need its name.
 # However, we do need one .c file and one .pmc file.  In order to have the
 # codingstd tests skip these, we should name them .in and then copy them into
@@ -147,7 +147,7 @@ like($@, qr/$ofile doesn't look like an object file/,
             is_yacc         => 0,
         } );
     is( $sourcefile, $expected_cfile, "Got expected C source file" );
-    like( $source_code, qr/This file has 'none'/, 
+    like( $source_code, qr/This file has 'none'/,
         "Got expected source code" );
     is( $hfile, 'none', "As expected, no header file" );
 }
@@ -189,7 +189,7 @@ like($@, qr/$ofile doesn't look like an object file/,
         } );
     chdir $cwd;
     is( $sourcefile, $expected_cfile, "Got expected C source file" );
-    like( $source_code, qr/This file has a valid HEADERIZER HFILE/, 
+    like( $source_code, qr/This file has a valid HEADERIZER HFILE/,
         "Got expected source code" );
     is( $hfile, "$stub.h", "Got expected header file" );
 }
@@ -212,7 +212,7 @@ like($@, qr/$ofile doesn't look like an object file/,
         } );
     chdir $cwd;
     is( $sourcefile, $expected_cfile, "Got expected PMC file" );
-    like( $source_code, qr/This file has a valid HEADERIZER HFILE/, 
+    like( $source_code, qr/This file has a valid HEADERIZER HFILE/,
         "Got expected source code" );
     is( $hfile, "$stub.h", "Got expected header file" );
 }
@@ -705,7 +705,7 @@ sub touchfile {
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable subroutines found in 
+The files in this directory test the publicly callable subroutines found in
 F<lib/Parrot/Headerizer/Functions.pm>.  By doing so, they help test the functionality
 of the F<tools/dev/headerizer.pl> utility.
 

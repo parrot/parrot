@@ -381,7 +381,7 @@ sub touchfile {
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable subroutines found in 
+The files in this directory test the publicly callable subroutines found in
 F<lib/Parrot/Headerizer.pm>.  By doing so, they help test the functionality
 of the F<tools/dev/headerizer.pl> utility.
 
