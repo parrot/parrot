@@ -124,6 +124,7 @@ main(int argc, const char *argv[])
     int          pir_argc;
     const char **pir_argv;
     const char  *core = "slow";
+    int run_pbc = 0;
     Parrot_Init_Args *initargs;
     Parrot_Int trace = 0;
 
@@ -145,18 +146,17 @@ main(int argc, const char *argv[])
 
     /* Parse flags */
     sourcefile = parseflags(interp, argc, argv, &pir_argc, &pir_argv, &core, &trace);
-    if (!Parrot_api_set_runcore(interp, core, trace)) {
+    if (!Parrot_api_set_runcore(interp, core, trace))
         show_last_error_and_exit(interp);
-    }
 
-    if (imcc_run_api(interp, sourcefile, argc, argv, &bytecodepmc)) {
-        if (!Parrot_api_build_argv_array(interp, pir_argc, pir_argv, &argsarray)) {
-            fprintf(stderr, "PARROT VM: Could not load or run bytecode");
+    if (!Parrot_api_wrap_imcc_hack(interp, sourcefile, argc, argv, &bytecodepmc, &run_pbc, imcc_run_api))
+        show_last_error_and_exit(interp);
+
+    if (run_pbc) {
+        if (!Parrot_api_build_argv_array(interp, pir_argc, pir_argv, &argsarray))
             show_last_error_and_exit(interp);
-        }
-        if (!Parrot_api_run_bytecode(interp, bytecodepmc, argsarray)) {
+        if (!Parrot_api_run_bytecode(interp, bytecodepmc, argsarray))
             show_last_error_and_exit(interp);
-        }
     }
 
     /* Clean-up after ourselves */
@@ -173,7 +173,6 @@ show_last_error_and_exit(Parrot_PMC interp)
 
     if (!(Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg) &&
           Parrot_api_get_exception_backtrace(interp, exception, &backtrace))) {
-        fprintf(stderr, "PARROT VM: Cannot recover\n");
         exit(EXIT_FAILURE);
     }
 

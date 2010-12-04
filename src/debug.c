@@ -128,10 +128,9 @@ static void no_such_register(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 static STRING * PDB_get_continuation_backtrace(PARROT_INTERP,
-    ARGMOD(PMC * sub),
+    ARGMOD_NULLOK(PMC * sub),
     ARGMOD(PMC * ctx))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(* sub)
         FUNC_MODIFIES(* ctx);
@@ -175,7 +174,6 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 #define ASSERT_ARGS_PDB_get_continuation_backtrace \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(sub) \
     , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_skip_whitespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cmd))
@@ -3324,7 +3322,7 @@ PDB_backtrace(PARROT_INTERP)
 }
 
 static STRING *
-PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD(PMC * sub), ARGMOD(PMC * ctx))
+PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD_NULLOK(PMC * sub), ARGMOD(PMC * ctx))
 {
     ASSERT_ARGS(PDB_get_continuation_backtrace)
     STRING *str;

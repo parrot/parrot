@@ -375,4 +375,12 @@ Parrot_api_set_configuration_hash(Parrot_PMC interp_pmc, Parrot_PMC confighash)
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
+PARROT_API
+Parrot_Int
+Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, const char * sourcefile, int argc, const char **argv, Parrot_PMC* bytecodepmc, int *result, imcc_hack_func_t func)
+{
+    EMBED_API_CALLIN(interp_pmc, interp)
+    *result = func(interp_pmc, sourcefile, argc, argv, bytecodepmc);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
 

@@ -38,6 +38,12 @@ void Parrot_x_jump_out(PARROT_INTERP, int status)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+void Parrot_x_jump_out_error(PARROT_INTERP, int status)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 void Parrot_x_on_exit(PARROT_INTERP,
     ARGIN(exit_handler_f function),
     ARGIN_NULLOK(void *arg))
@@ -47,6 +53,8 @@ void Parrot_x_on_exit(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_x_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_x_jump_out __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_x_jump_out_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_x_on_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

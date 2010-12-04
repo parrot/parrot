@@ -14,6 +14,8 @@
 #include "parrot/config.h"
 #include "parrot/core_types.h"
 
+typedef int (*imcc_hack_func_t)(Parrot_PMC, const char *, int, const char **, Parrot_PMC*);
+
 #define PARROT_API PARROT_EXPORT
 
 /* having a modified version of PARROT_ASSERT which resolves as an integer
@@ -248,6 +250,16 @@ Parrot_Int Parrot_api_set_warnings(
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*interp_pmc);
 
+PARROT_API
+Parrot_Int Parrot_api_wrap_imcc_hack(
+    Parrot_PMC interp_pmc,
+    const char * sourcefile,
+    int argc,
+    const char **argv,
+    Parrot_PMC* bytecodepmc,
+    int *result,
+    imcc_hack_func_t func);
+
 #define ASSERT_ARGS_Parrot_api_add_dynext_search_path \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
@@ -318,6 +330,7 @@ Parrot_Int Parrot_api_set_warnings(
        PARROT_ASSERT_ARG(interp_pmc))
 #define ASSERT_ARGS_Parrot_api_set_warnings __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc))
+#define ASSERT_ARGS_Parrot_api_wrap_imcc_hack __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/api.c */
 
