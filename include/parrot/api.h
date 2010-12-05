@@ -55,9 +55,9 @@ typedef struct _Parrot_Init_Args {
 
 #define GET_INIT_STRUCT(i) do {\
         void * __stacktop = NULL; \
-        (i) = (Parrot_Init_Args*)calloc(1,sizeof(Parrot_Init_Args)); \
+        (i) = (Parrot_Init_Args*)calloc(1,sizeof (Parrot_Init_Args)); \
         (i)->stacktop = &__stacktop; \
-    } while(0)
+    } while (0)
 
 /* HEADERIZER BEGIN: src/embed/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -456,3 +456,9 @@ imcc_run_api(ARGMOD(Parrot_PMC interp_pmc), ARGIN(const char *sourcefile), int a
 
 #endif /* PARROT_API_H_GUARD */
 
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
