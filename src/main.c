@@ -150,7 +150,8 @@ main(int argc, const char *argv[])
     if (!Parrot_api_set_runcore(interp, core, trace))
         show_last_error_and_exit(interp);
 
-    if (!Parrot_api_wrap_imcc_hack(interp, sourcefile, argc, argv, &bytecodepmc, &run_pbc, imcc_run_api))
+    if (!Parrot_api_wrap_imcc_hack(
+        interp, sourcefile, argc, argv, &bytecodepmc, &run_pbc, imcc_run_api))
         show_last_error_and_exit(interp);
 
     if (run_pbc) {

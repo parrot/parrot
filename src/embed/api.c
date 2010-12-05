@@ -1,3 +1,18 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+
+=head1 NAME
+
+src/embed/api.c - TO COME
+
+=head1 DESCRIPTION
+
+TO COME.
+
+=cut
+
+*/
+
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
 #include "parrot/embed.h"
@@ -62,7 +77,8 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
     }
     initialize_interpreter(interp_raw, stacktop_ptr);
     iglobals = interp_raw->iglobals;
-    *interp = VTABLE_get_pmc_keyed_int(interp_raw, interp_raw->iglobals, (Parrot_Int)IGLOBALS_INTERPRETER);
+    *interp = VTABLE_get_pmc_keyed_int(
+            interp_raw, interp_raw->iglobals, (Parrot_Int)IGLOBALS_INTERPRETER);
     return !PMC_IS_NULL(*interp);
 }
 
@@ -79,7 +95,8 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
     } else {
         if (!strcmp(corename, "slow") || !strcmp(corename, "bounds"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
-        else if (!strcmp(corename, "fast") || !strcmp(corename, "jit") || !strcmp(corename, "function"))
+        else if (!strcmp(corename, "fast") ||
+            !strcmp(corename, "jit") || !strcmp(corename, "function"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "fast"));
         else if (!strcmp(corename, "exec"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "exec"));
@@ -437,3 +454,9 @@ Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, const char * sourcefile,
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

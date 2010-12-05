@@ -3346,7 +3346,8 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD_NULLOK(PMC * sub), ARGMOD(P
                     if ((!PMC_IS_NULL(pfile)) && (!PMC_IS_NULL(pline))) {
                         STRING * const file = VTABLE_get_string(interp, pfile);
                         INTVAL line = VTABLE_get_integer(interp, pline);
-                        STRING * const fmt = Parrot_sprintf_c(interp, " (%Ss:%li)", file, (long)line);
+                        STRING * const fmt =
+                            Parrot_sprintf_c(interp, " (%Ss:%li)", file, (long)line);
                         VTABLE_push_string(interp, output, fmt);
                     }
                 }
@@ -3394,7 +3395,8 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD_NULLOK(PMC * sub), ARGMOD(P
                 ++rec_level;
         }
         else if (rec_level != 0) {
-            STRING * const fmt = Parrot_sprintf_c(interp, "... call repeated %d times\n", rec_level);
+            STRING * const fmt =
+                Parrot_sprintf_c(interp, "... call repeated %d times\n", rec_level);
             VTABLE_push_string(interp, output, fmt);
             rec_level = 0;
         }
@@ -3416,7 +3418,8 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD_NULLOK(PMC * sub), ARGMOD(P
                     if ((!PMC_IS_NULL(pfile)) && (!PMC_IS_NULL(pline))) {
                         STRING *file = VTABLE_get_string(interp, pfile);
                         INTVAL line = VTABLE_get_integer(interp, pline);
-                        STRING * const fmt = Parrot_sprintf_c(interp, " (%Ss:%li)", file, (long)line);
+                        STRING * const fmt =
+                            Parrot_sprintf_c(interp, " (%Ss:%li)", file, (long)line);
                         VTABLE_push_string(interp, output, fmt);
                     }
                 }
