@@ -52,7 +52,9 @@ PMC* Parrot_hll_get_HLL_namespace(PARROT_INTERP, int hll_id)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-INTVAL Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
+INTVAL Parrot_hll_get_HLL_type(PARROT_INTERP,
+    INTVAL hll_id,
+    INTVAL core_type)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -74,7 +76,8 @@ void Parrot_hll_register_HLL_type(PARROT_INTERP,
 void Parrot_hll_init_HLL(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_hll_get_ctx_HLL_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_hll_get_ctx_HLL_namespace \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_hll_get_ctx_HLL_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
