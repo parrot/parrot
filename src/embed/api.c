@@ -59,7 +59,7 @@ Parrot_Int
 Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
         ARGIN_NULLOK(Parrot_Init_Args *args), ARGOUT(Parrot_PMC *interp))
 {
-    ASSERT_ARGS(Parrot_api_make_interpreter)
+    //ASSERT_ARGS(Parrot_api_make_interpreter)
     int alt_stacktop;
     Parrot_Interp interp_raw;
     void *stacktop_ptr = &alt_stacktop;
@@ -88,7 +88,7 @@ Parrot_Int
 Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
         Parrot_UInt trace)
 {
-    ASSERT_ARGS(Parrot_api_set_runcore)
+    //ASSERT_ARGS(Parrot_api_set_runcore)
     EMBED_API_CALLIN(interp_pmc, interp)
     if (trace) {
         Parrot_pcc_trace_flags_on(interp, interp->ctx, trace);
@@ -118,7 +118,7 @@ PARROT_API
 Parrot_Int
 Parrot_api_debug_flag(Parrot_PMC interp_pmc, Parrot_Int flags, Parrot_Int set)
 {
-    ASSERT_ARGS(Parrot_api_debug_flag)
+    //ASSERT_ARGS(Parrot_api_debug_flag)
     EMBED_API_CALLIN(interp_pmc, interp)
     if (set)
         interp->debug_flags |= flags;
@@ -131,7 +131,7 @@ PARROT_API
 Parrot_Int
 Parrot_api_flag(Parrot_PMC interp_pmc, Parrot_Int flags, Parrot_Int set)
 {
-    ASSERT_ARGS(Parrot_api_flag)
+    //ASSERT_ARGS(Parrot_api_flag)
     EMBED_API_CALLIN(interp_pmc, interp)
     if (set) {
         Interp_flags_SET(interp, flags);
@@ -147,7 +147,7 @@ PARROT_API
 Parrot_Int
 Parrot_api_set_executable_name(Parrot_PMC interp_pmc, ARGIN(const char * name))
 {
-    ASSERT_ARGS(Parrot_api_set_executable_name)
+    //ASSERT_ARGS(Parrot_api_set_executable_name)
     EMBED_API_CALLIN(interp_pmc, interp)
     STRING * const name_str = Parrot_str_new(interp, name, 0);
     PMC * const name_pmc = Parrot_pmc_new(interp, enum_class_String);
@@ -161,7 +161,7 @@ PARROT_API
 Parrot_Int
 Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
 {
-    ASSERT_ARGS(Parrot_api_destroy_interpreter)
+    //ASSERT_ARGS(Parrot_api_destroy_interpreter)
     EMBED_API_CALLIN(interp_pmc, interp)
     Parrot_destroy(interp);
     Parrot_x_exit(interp, 0);
@@ -181,14 +181,15 @@ Load a bytecode file and return a bytecode PMC.
 
 */
 
-// TODO: This only works with the inital bytecode. After this we should use
-//       Parrot_append_bytecode or something similar
+/* TODO: This only works with the inital bytecode. After this we should use
+       Parrot_append_bytecode or something similar */
+
 PARROT_API
 Parrot_Int
 Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
         ARGIN(const char *filename), ARGOUT(Parrot_PMC * pbc))
 {
-    ASSERT_ARGS(Parrot_api_load_bytecode_file)
+    //ASSERT_ARGS(Parrot_api_load_bytecode_file)
     EMBED_API_CALLIN(interp_pmc, interp)
     PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
     if (!pf)
@@ -218,9 +219,10 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
-// Load the bytecode into the interpreter, but don't execute it
-// TODO: This only works with the inital bytecode. After this we should use
-//       Parrot_append_bytecode or something similar
+/* Load the bytecode into the interpreter, but don't execute it */
+/* TODO: This only works with the inital bytecode. After this we should use
+       Parrot_append_bytecode or something similar */
+
 PARROT_API
 Parrot_Int
 Parrot_api_ready_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
@@ -252,7 +254,7 @@ Parrot_Int
 Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     Parrot_PMC mainargs)
 {
-    ASSERT_ARGS(Parrot_api_run_bytecode)
+    //ASSERT_ARGS(Parrot_api_run_bytecode)
     EMBED_API_CALLIN(interp_pmc, interp)
     PMC * main_sub = NULL;
 
@@ -306,7 +308,7 @@ Parrot_Int
 Parrot_api_build_argv_array(Parrot_PMC interp_pmc, Parrot_Int argc,
         ARGIN(char ** argv), ARGOUT(Parrot_PMC * args))
 {
-    ASSERT_ARGS(Parrot_api_build_argv_array)
+    //ASSERT_ARGS(Parrot_api_build_argv_array)
     EMBED_API_CALLIN(interp_pmc, interp)
     PMC * const userargv = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     Parrot_Int i;
@@ -325,7 +327,7 @@ PARROT_API
 Parrot_Int
 Parrot_api_set_warnings(Parrot_PMC interp_pmc, Parrot_Int flags)
 {
-    ASSERT_ARGS(Parrot_api_set_warnings)
+    //ASSERT_ARGS(Parrot_api_set_warnings)
     EMBED_API_CALLIN(interp_pmc, interp)
     /* Activates the given warnings.  (Macro from warnings.h.) */
     PARROT_WARNINGS_on(interp, flags);
@@ -337,7 +339,7 @@ Parrot_Int
 Parrot_api_set_output_file(Parrot_PMC interp_pmc,
         ARGIN_NULLOK(const char * filename))
 {
-    ASSERT_ARGS(Parrot_api_set_output_file)
+    //ASSERT_ARGS(Parrot_api_set_output_file)
     EMBED_API_CALLIN(interp_pmc, interp)
     if (!filename && !interp->output_file)
         interp->output_file = "-";
@@ -396,7 +398,7 @@ Parrot_Int
 Parrot_api_set_stdhandles(Parrot_PMC interp_pmc, Parrot_Int stdin,
         Parrot_Int stdout, Parrot_Int stderr)
 {
-    ASSERT_ARGS(Parrot_api_set_stdhandles)
+    //ASSERT_ARGS(Parrot_api_set_stdhandles)
     EMBED_API_CALLIN(interp_pmc, interp)
     void *dummy;
 

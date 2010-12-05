@@ -62,21 +62,6 @@ typedef struct _Parrot_Init_Args {
 /* HEADERIZER BEGIN: src/embed/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-// TODO: This only works with the inital bytecode. After this we should use // Parrot_append_bytecode or something similar PARROT_API Parrot_Int Parrot_api_load_bytecode_file(
-    Parrot_PMC interp_pmc,
-    ARGIN(const char *filename),
-    ARGOUT(Parrot_PMC * pbc))
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(* pbc);
-
-// Load the bytecode into the interpreter, but don't execute it // TODO: This only works with the inital bytecode. After this we should use // Parrot_append_bytecode or something similar PARROT_API Parrot_Int Parrot_api_ready_bytecode(
-    Parrot_PMC interp_pmc,
-    Parrot_PMC pbc,
-    ARGOUT(Parrot_PMC *main_sub))
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*main_sub);
-
 PARROT_API
 Parrot_Int Parrot_api_add_dynext_search_path(
     Parrot_PMC interp_pmc,
@@ -170,6 +155,15 @@ Parrot_Int Parrot_api_load_bytecode_bytes(
         FUNC_MODIFIES(* pbcpmc);
 
 PARROT_API
+Parrot_Int Parrot_api_load_bytecode_file(
+    Parrot_PMC interp_pmc,
+    ARGIN(const char *filename),
+    ARGOUT(Parrot_PMC * pbc))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* pbc);
+
+PARROT_API
 Parrot_Int Parrot_api_make_interpreter(
     Parrot_PMC parent,
     Parrot_Int flags,
@@ -177,6 +171,14 @@ Parrot_Int Parrot_api_make_interpreter(
     ARGOUT(Parrot_PMC *interp))
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*interp);
+
+PARROT_API
+Parrot_Int Parrot_api_ready_bytecode(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pbc,
+    ARGOUT(Parrot_PMC *main_sub))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*main_sub);
 
 PARROT_API
 Parrot_Int Parrot_api_run_bytecode(
@@ -227,13 +229,6 @@ Parrot_Int Parrot_api_wrap_imcc_hack(
     int *result,
     imcc_hack_func_t func);
 
-#define ASSERT_ARGS_// Parrot_append_bytecode or something similar PARROT_API Parrot_Int Parrot_api_load_bytecode_file \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filename) \
-    , PARROT_ASSERT_ARG(pbc))
-#define ASSERT_ARGS_// TODO: This only works with the inital bytecode. After this we should use // Parrot_append_bytecode or something similar PARROT_API Parrot_Int Parrot_api_ready_bytecode \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(main_sub))
 #define ASSERT_ARGS_Parrot_api_add_dynext_search_path \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(path))
@@ -267,8 +262,13 @@ Parrot_Int Parrot_api_wrap_imcc_hack(
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pbc) \
     , PARROT_ASSERT_ARG(pbcpmc))
+#define ASSERT_ARGS_Parrot_api_load_bytecode_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(filename) \
+    , PARROT_ASSERT_ARG(pbc))
 #define ASSERT_ARGS_Parrot_api_make_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_api_ready_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(main_sub))
 #define ASSERT_ARGS_Parrot_api_run_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_set_configuration_hash \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
