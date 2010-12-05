@@ -112,6 +112,15 @@ that will be included in your next commit) :
 The command C<git add> is not only for adding new files, just keep that in mind.
 It tells git "add the state of these files to my staging area."
 
+If you are trying to add files that are in .gitignore, you can do that with
+the --force flag:
+
+    git add --force ports/foo
+
+NOTE: Make sure these files should actually be added. Most files in .gitignore should
+never be added, but some, such as some files in "ports/" will need need the --force
+flag.
+
 Now for actually creating your commit! Since Git is a distributed version control
 system, committing code is seperate from sending your changes to a remote server.
 Keep this in mind if you are used to Subversion or similar VCS's, where committing
