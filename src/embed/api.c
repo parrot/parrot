@@ -33,7 +33,8 @@ Parrot_api_get_result(Parrot_PMC interp_pmc, ARGOUT(Parrot_Int *is_error),
     if (PMC_IS_NULL(exception)) {
         *is_error = 0;
         *errmsg = STRINGNULL;
-    } else {
+    }
+    else {
         *is_error = !interp->exit_code;
         *errmsg = VTABLE_get_string(interp, *exception);
     }
@@ -92,7 +93,8 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
     if (trace) {
         Parrot_pcc_trace_flags_on(interp, interp->ctx, trace);
         Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
-    } else {
+    }
+    else {
         if (!strcmp(corename, "slow") || !strcmp(corename, "bounds"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
         else if (!strcmp(corename, "fast") ||
@@ -167,6 +169,8 @@ Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
 }
 
 /*
+
+=over 4
 
 =item C<PARROT_API Parrot_Int Parrot_api_load_bytecode_file(Parrot_PMC
 interp_pmc, const char *filename, Parrot_PMC * pbc)>
@@ -453,6 +457,10 @@ Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, const char * sourcefile,
     *result = func(interp_pmc, sourcefile, argc, argv, bytecodepmc);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
+
+=back
+
+=cut
 
 /*
  * Local variables:

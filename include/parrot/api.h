@@ -446,3 +446,9 @@ imcc_run_api(ARGMOD(Parrot_PMC interp_pmc), ARGIN(const char *sourcefile), int a
 
 #endif /* PARROT_API_H_GUARD */
 
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
