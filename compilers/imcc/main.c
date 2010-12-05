@@ -641,7 +641,7 @@ int
 imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(const char *sourcefile), int argc,
         ARGIN(const char **argv), ARGOUT(PMC **pbcpmc))
 {
-    Interp * interp = VTABLE_get_pointer(NULL, interp_pmc);
+    Interp * interp = (Interp *)VTABLE_get_pointer(NULL, interp_pmc);
     return imcc_run(interp, sourcefile, argc, argv, pbcpmc);
 }
 

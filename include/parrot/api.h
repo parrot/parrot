@@ -84,7 +84,7 @@ PARROT_API
 Parrot_Int Parrot_api_build_argv_array(
     Parrot_PMC interp_pmc,
     Parrot_Int argc,
-    ARGIN(char ** argv),
+    ARGIN(const char ** argv),
     ARGOUT(Parrot_PMC * args))
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)

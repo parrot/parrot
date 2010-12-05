@@ -30,7 +30,7 @@ Parrot_api_get_result(Parrot_PMC interp_pmc, ARGOUT(Parrot_Int *is_error),
     EMBED_API_CALLIN(interp_pmc, interp)
     *exit_code = interp->exit_code;
     *exception = interp->final_exception;
-    if (PMC_IS_NULL(exception)) {
+    if (PMC_IS_NULL(*exception)) {
         *is_error = 0;
         *errmsg = STRINGNULL;
     }
@@ -284,7 +284,7 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
 
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, mainargs);
-    Parrot_ext_call(interp, main_sub, "P->", mainargs);
+    Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", mainargs);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -306,7 +306,7 @@ Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
 PARROT_API
 Parrot_Int
 Parrot_api_build_argv_array(Parrot_PMC interp_pmc, Parrot_Int argc,
-        ARGIN(char ** argv), ARGOUT(Parrot_PMC * args))
+        ARGIN(const char ** argv), ARGOUT(Parrot_PMC * args))
 {
     //ASSERT_ARGS(Parrot_api_build_argv_array)
     EMBED_API_CALLIN(interp_pmc, interp)

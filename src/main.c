@@ -24,6 +24,8 @@ Start Parrot
 #include "parrot/longopt.h"
 #include "parrot/api.h"
 
+extern int Parrot_set_config_hash(Parrot_PMC interp_pmc);
+
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
@@ -213,7 +215,7 @@ PARROT_PURE_FUNCTION
 static int
 is_all_digits(ARGIN(const char *s))
 {
-    ASSERT_ARGS(is_all_digits);
+    //ASSERT_ARGS(is_all_digits);
     for (; *s; ++s)
         if (!isdigit((unsigned char)*s))
             return 0;
@@ -236,7 +238,7 @@ PARROT_PURE_FUNCTION
 static int
 is_all_hex_digits(ARGIN(const char *s))
 {
-    ASSERT_ARGS(is_all_hex_digits);
+    //ASSERT_ARGS(is_all_hex_digits);
     for (; *s; ++s)
         if (!isxdigit(*s))
             return 0;
@@ -256,7 +258,7 @@ Outputs usage error message.
 static void
 usage(ARGMOD(FILE *fp))
 {
-    ASSERT_ARGS(usage)
+    //ASSERT_ARGS(usage)
     fprintf(fp,
             "parrot -[acEGhprtvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
             "[-O [level]] [-R runcore] [-o FILE] <file>\n");
@@ -275,7 +277,7 @@ Print out list of debugging flag values.
 static void
 help_debug(void)
 {
-    ASSERT_ARGS(help_debug)
+    //ASSERT_ARGS(help_debug)
     /* split printf for C89 compliance on string length */
     printf(
     "--imcc-debug -d [Flags] ...\n"
@@ -320,7 +322,7 @@ Print out "help" list of options.
 static void
 help(void)
 {
-    ASSERT_ARGS(help)
+    //ASSERT_ARGS(help)
     /* split printf for C89 compliance on string length */
     printf(
     "parrot [Options] <file>\n"
@@ -427,7 +429,7 @@ Print out parrot version number.
 static void
 Parrot_version(void)
 {
-    ASSERT_ARGS(Parrot_version)
+    //ASSERT_ARGS(Parrot_version)
     printf("This is Parrot version " PARROT_VERSION);
     printf(" built for " PARROT_ARCHNAME ".\n");
     printf("Copyright (C) 2001-2010, Parrot Foundation.\n\
@@ -454,7 +456,7 @@ Parse minimal subset of args required for initializing interpreter.
 static void
 parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const char *argv[]))
 {
-    ASSERT_ARGS(parseflags_minimal)
+    //ASSERT_ARGS(parseflags_minimal)
 
     int pos = 0;
 
@@ -553,7 +555,7 @@ parseflags(Parrot_PMC interp,
         ARGOUT(int *pgm_argc), ARGOUT(const char ***pgm_argv),
         ARGMOD(const char **core), ARGMOD(Parrot_Int *trace))
 {
-    ASSERT_ARGS(parseflags)
+    //ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int status;
     int result = 1;
