@@ -172,8 +172,8 @@ Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
 
 =over 4
 
-=item C<PARROT_API Parrot_Int Parrot_api_load_bytecode_file(Parrot_PMC
-interp_pmc, const char *filename, Parrot_PMC * pbc)>
+=item C<Parrot_Int Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc, const
+char *filename, Parrot_PMC * pbc)>
 
 Load a bytecode file and return a bytecode PMC.
 
@@ -383,8 +383,8 @@ Parrot_api_add_dynext_search_path(Parrot_PMC interp_pmc,
 
 /*
 
-=item C<PARROT_API Parrot_Int Parrot_api_set_stdhandles(Parrot_PMC interp_pmc,
-Parrot_Int stdin, Parrot_Int stdout, Parrot_Int stderr)>
+=item C<Parrot_Int Parrot_api_set_stdhandles(Parrot_PMC interp_pmc, Parrot_Int
+stdin, Parrot_Int stdout, Parrot_Int stderr)>
 
 Set the std file descriptors for the embedded interpreter. Any file descriptor
 passed as argument and set to C<PIO_INVALID_HANDLE> is ignored.
