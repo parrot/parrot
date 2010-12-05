@@ -458,9 +458,12 @@ Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, const char * sourcefile,
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
+/*
+
 =back
 
 =cut
+*/
 
 /*
  * Local variables:
