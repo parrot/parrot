@@ -40,7 +40,7 @@ Parrot_api_get_exception_backtrace(Parrot_PMC interp_pmc,
 
 PARROT_API
 Parrot_Int
-Parrot_api_make_interpreter(Parrot_PMC interp_pmc, Parrot_Int flags,
+Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
         ARGIN_NULLOK(Parrot_Init_Args *args), ARGOUT(Parrot_PMC *interp))
 {
     ASSERT_ARGS(Parrot_api_make_interpreter)
@@ -151,8 +151,8 @@ Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
 
 /*
 
-=item C<PARROT_API Parrot_Int Parrot_api_load_bytecode_file(PMC *interp_pmc,
-const char *filename, PMC **pbc)>
+=item C<PARROT_API Parrot_Int Parrot_api_load_bytecode_file(Parrot_PMC
+interp_pmc, const char *filename, Parrot_PMC * pbc)>
 
 Load a bytecode file and return a bytecode PMC.
 
@@ -160,6 +160,8 @@ Load a bytecode file and return a bytecode PMC.
 
 */
 
+// TODO: This only works with the inital bytecode. After this we should use
+//       Parrot_append_bytecode or something similar
 PARROT_API
 Parrot_Int
 Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
@@ -195,6 +197,35 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
+// Load the bytecode into the interpreter, but don't execute it
+// TODO: This only works with the inital bytecode. After this we should use
+//       Parrot_append_bytecode or something similar
+PARROT_API
+Parrot_Int
+Parrot_api_ready_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
+        ARGOUT(Parrot_PMC *main_sub))
+{
+    EMBED_API_CALLIN(interp_pmc, interp)
+    PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
+
+    /* Debugging mode nonsense. */
+    if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
+         Parrot_io_eprintf(interp, "*** Parrot VM: %Ss core ***\n",
+                 interp->run_core->name);
+    }
+
+    if (!pf)
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
+    if (pf->cur_cs != NULL)
+        Parrot_pbc_load(interp, pf);
+    PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
+    PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
+    PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+    *main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+    Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
 PARROT_API
 Parrot_Int
 Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
@@ -210,7 +241,7 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
          Parrot_io_eprintf(interp, "*** Parrot VM: %Ss core ***\n",
                  interp->run_core->name);
-     }
+    }
 
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
@@ -329,7 +360,7 @@ Parrot_api_add_dynext_search_path(Parrot_PMC interp_pmc,
 
 /*
 
-=item C<PARROT_API Parrot_Int Parrot_api_set_stdhandles(PMC *interp_pmc,
+=item C<PARROT_API Parrot_Int Parrot_api_set_stdhandles(Parrot_PMC interp_pmc,
 Parrot_Int stdin, Parrot_Int stdout, Parrot_Int stderr)>
 
 Set the std file descriptors for the embedded interpreter. Any file descriptor
