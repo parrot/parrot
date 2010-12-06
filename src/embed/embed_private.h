@@ -5,6 +5,7 @@
 #include "pmc/pmc_parrotinterpreter.h"
 
 #define GET_RAW_INTERP(p) ((Parrot_ParrotInterpreter_attributes*)(p)->data)->interp;
+
 #define EMBED_API_CALLIN(p, i)                                     \
     void * _oldtop;                                                \
     Parrot_jump_buff env;                                          \
@@ -14,9 +15,11 @@
         (i)->lo_var_ptr = &_oldtop;                                \
     (i)->api_jmp_buf = &env;                                       \
     if (setjmp(env)) {                                             \
+        (i)->api_jmp_buf = NULL;                                   \
         return !interp->exit_code;                                 \
     } else {                                                       \
         {
+
 #define EMBED_API_CALLOUT(p, i)                                    \
         }                                                          \
         (i)->api_jmp_buf = NULL;                                   \

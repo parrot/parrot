@@ -99,22 +99,19 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 
     STRING * const message     = already_dying ? STRINGNULL :
             VTABLE_get_string(interp, exception);
-    INTVAL         exit_status = 1;
     const INTVAL   severity    = already_dying ? EXCEPT_fatal :
             VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
 
-    interp->final_error = message;
-    if (already_dying) {
-        //fflush(stderr);
-        //fprintf(stderr, "\n***FATAL ERROR: Exception thrown while dying from previous unhandled Exception\n");
-        Parrot_x_exit(interp, EXCEPT_fatal);
-    }
+    if (already_dying)
+        Parrot_x_jump_out(interp, 1);
     else {
         /* In some cases we have a fatal exception before the IO system
          * is completely initialized. Do some attempt to output the
          * message to stderr, to help diagnosing. */
         const int use_perr = !PMC_IS_NULL(Parrot_io_STDERR(interp));
         already_dying = 1;
+        interp->final_exception = exception;
+        interp->exit_code = 1;
 
         /* flush interpreter output to get things printed in order */
         if (!PMC_IS_NULL(Parrot_io_STDOUT(interp)))
@@ -130,29 +127,14 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
             }
         }
 
-        if (STRING_length(message)) {
-            if (use_perr)
-                Parrot_io_eprintf(interp, "%S\n", message);
-            else {
-                char * const msg = Parrot_str_to_cstring(interp, message);
-                fflush(stderr);
-                fprintf(stderr, "\n%s\n", msg);
-                Parrot_str_free_cstring(msg);
-            }
 
-            /* caution against output swap (with PDB_backtrace) */
-            fflush(stderr);
-            PDB_backtrace(interp);
-        }
-        else if (severity == EXCEPT_exit) {
+        if (severity == EXCEPT_exit) {
             /* TODO: get exit status based on type */
-            exit_status = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "exit_code"));
+            interp->exit_code = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "exit_code"));
         }
-        else {
-            Parrot_io_eprintf(interp, "No exception handler and no message\n");
-            /* caution against output swap (with PDB_backtrace) */
-            fflush(stderr);
-            PDB_backtrace(interp);
+        else if (!STRING_length(message)) {
+            STRING * const newmessage = CONST_STRING(interp, "No exception handler and no message\n");
+            VTABLE_set_string_native(interp, exception, newmessage);
         }
 
     }
@@ -168,12 +150,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
     if (interp->thread_data && interp->thread_data->tid)
         pt_thread_detach(interp->thread_data->tid);
 
-    /*
-     * only main should run the destroy functions - exit handler chain
-     * is freed during Parrot_x_exit
-     */
-    interp->final_error = message;
-    Parrot_x_exit(interp, exit_status);
+    Parrot_x_jump_out(interp, 1);
 }
 
 /*
@@ -362,8 +339,10 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     PMC        * const handler      =
                              Parrot_cx_find_handler_local(interp, exception);
 
-    if (PMC_IS_NULL(handler))
+    if (PMC_IS_NULL(handler)) {
+        VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), CURRENT_CONTEXT(interp));
         die_from_exception(interp, exception);
+    }
 
     if (Interp_debug_TEST(interp, PARROT_BACKTRACE_DEBUG_FLAG)) {
         STRING * const exit_code = CONST_STRING(interp, "exit_code");

@@ -14,6 +14,7 @@
 #include "parrot/config.h"
 #include "parrot/core_types.h"
 
+typedef int (*imcc_hack_func_t)(Parrot_PMC, const char *, int, const char **, Parrot_PMC*);
 
 #define PARROT_API PARROT_EXPORT
 
@@ -54,79 +55,71 @@ typedef struct _Parrot_Init_Args {
 
 #define GET_INIT_STRUCT(i) do {\
         void * __stacktop = NULL; \
-        (i) = (Parrot_Init_Args*)calloc(1,sizeof(Parrot_Init_Args)); \
+        (i) = (Parrot_Init_Args*)calloc(1,sizeof (Parrot_Init_Args)); \
         (i)->stacktop = &__stacktop; \
-    } while(0)
+    } while (0)
 
 /* HEADERIZER BEGIN: src/embed/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
 Parrot_Int Parrot_api_add_dynext_search_path(
-    ARGMOD(PMC *interp_pmc),
+    Parrot_PMC interp_pmc,
     ARGIN(const char *path))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*interp_pmc);
+        __attribute__nonnull__(2);
 
 PARROT_API
 Parrot_Int Parrot_api_add_include_search_path(
-    ARGMOD(PMC *interp_pmc),
+    Parrot_PMC interp_pmc,
     ARGIN(const char *path))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*interp_pmc);
+        __attribute__nonnull__(2);
 
 PARROT_API
 Parrot_Int Parrot_api_add_library_search_path(
-    ARGMOD(PMC *interp_pmc),
+    Parrot_PMC interp_pmc,
     ARGIN(const char *path))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*interp_pmc);
+        __attribute__nonnull__(2);
 
 PARROT_API
 Parrot_Int Parrot_api_build_argv_array(
-    ARGMOD(PMC *interp_pmc),
+    Parrot_PMC interp_pmc,
     Parrot_Int argc,
-    ARGIN(char **argv),
-    ARGOUT(PMC **args))
-        __attribute__nonnull__(1)
+    ARGIN(const char ** argv),
+    ARGOUT(Parrot_PMC * args))
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*interp_pmc)
-        FUNC_MODIFIES(*args);
+        FUNC_MODIFIES(* args);
 
 PARROT_API
 Parrot_Int Parrot_api_debug_flag(
-    ARGMOD(PMC *interp_pmc),
+    Parrot_PMC interp_pmc,
     Parrot_Int flags,
-    Parrot_Int set)
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*interp_pmc);
+    Parrot_Int set);
 
 PARROT_API
-Parrot_Int Parrot_api_destroy_interpreter(ARGIN(PMC *interp_pmc))
-        __attribute__nonnull__(1);
+Parrot_Int Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc);
 
 PARROT_API
 Parrot_Int Parrot_api_disassemble_bytecode(
-    ARGMOD(PMC *interp_pmc),
-    ARGIN(PMC *pbc),
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pbc,
     ARGIN(const char * const outfile),
     Parrot_Int opts)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*interp_pmc);
+        __attribute__nonnull__(3);
 
 PARROT_API
 Parrot_Int Parrot_api_flag(
-    ARGMOD(PMC *interp_pmc),
+    Parrot_PMC interp_pmc,
     Parrot_Int flags,
-    Parrot_Int set)
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*interp_pmc);
+    Parrot_Int set);
+
+PARROT_API
+Parrot_Int Parrot_api_get_exception_backtrace(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC exception,
+    ARGOUT(Parrot_String * bt))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* bt);
 
 PARROT_API
 Parrot_Int Parrot_api_get_compiler(
@@ -140,16 +133,17 @@ Parrot_Int Parrot_api_get_compiler(
 
 PARROT_API
 Parrot_Int Parrot_api_get_result(
-    ARGMOD(PMC * interp_pmc),
+    Parrot_PMC interp_pmc,
     ARGOUT(Parrot_Int *is_error),
+    ARGOUT(Parrot_PMC * exception),
     ARGOUT(Parrot_Int *exit_code),
     ARGOUT(Parrot_String * errmsg))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(* interp_pmc)
+        __attribute__nonnull__(5)
         FUNC_MODIFIES(*is_error)
+        FUNC_MODIFIES(* exception)
         FUNC_MODIFIES(*exit_code)
         FUNC_MODIFIES(* errmsg);
 
@@ -162,26 +156,22 @@ Parrot_Int Parrot_api_get_runtime_path(
 
 PARROT_API
 Parrot_Int Parrot_api_load_bytecode_bytes(
-    ARGMOD(PMC *interp_pmc),
+    Parrot_PMC interp_pmc,
     ARGIN(const unsigned char * const pbc),
     Parrot_Int bytecode_size,
-    ARGOUT(PMC **pbcpmc))
-        __attribute__nonnull__(1)
+    ARGOUT(Parrot_PMC * pbcpmc))
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*interp_pmc)
-        FUNC_MODIFIES(*pbcpmc);
+        FUNC_MODIFIES(* pbcpmc);
 
 PARROT_API
 Parrot_Int Parrot_api_load_bytecode_file(
-    ARGMOD(PMC *interp_pmc),
+    Parrot_PMC interp_pmc,
     ARGIN(const char *filename),
-    ARGOUT(PMC **pbc))
-        __attribute__nonnull__(1)
+    ARGOUT(Parrot_PMC * pbc))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*interp_pmc)
-        FUNC_MODIFIES(*pbc);
+        FUNC_MODIFIES(* pbc);
 
 PARROT_API
 Parrot_Int Parrot_api_load_language(
@@ -192,22 +182,26 @@ Parrot_Int Parrot_api_load_language(
 
 PARROT_API
 Parrot_Int Parrot_api_make_interpreter(
-    ARGIN_NULLOK(PMC *parent),
+    Parrot_PMC parent,
     Parrot_Int flags,
     ARGIN_NULLOK(Parrot_Init_Args *args),
-    ARGOUT(PMC **interp))
+    ARGOUT(Parrot_PMC *interp))
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*interp);
 
 PARROT_API
-Parrot_Int Parrot_api_run_bytecode(
-    ARGMOD(PMC *interp_pmc),
-    ARGIN(PMC *pbc),
-    ARGIN(PMC *mainargs))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
+Parrot_Int Parrot_api_ready_bytecode(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pbc,
+    ARGOUT(Parrot_PMC *main_sub))
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*interp_pmc);
+        FUNC_MODIFIES(*main_sub);
+
+PARROT_API
+Parrot_Int Parrot_api_run_bytecode(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pbc,
+    Parrot_PMC mainargs);
 
 PARROT_API
 Parrot_Int Parrot_api_set_configuration_hash(
@@ -216,64 +210,60 @@ Parrot_Int Parrot_api_set_configuration_hash(
 
 PARROT_API
 Parrot_Int Parrot_api_set_executable_name(
-    ARGMOD(PMC *interp_pmc),
+    Parrot_PMC interp_pmc,
     ARGIN(const char * name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*interp_pmc);
+        __attribute__nonnull__(2);
 
 PARROT_API
 Parrot_Int Parrot_api_set_output_file(
-    ARGMOD(PMC *interp_pmc),
-    ARGIN_NULLOK(const char * filename))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*interp_pmc);
+    Parrot_PMC interp_pmc,
+    ARGIN_NULLOK(const char * filename));
 
 PARROT_API
 Parrot_Int Parrot_api_set_runcore(
-    ARGIN(PMC *interp_pmc),
-    const char * corename,
+    Parrot_PMC interp_pmc,
+    ARGIN(const char * corename),
     Parrot_UInt trace)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(2);
 
 PARROT_API
 Parrot_Int Parrot_api_set_stdhandles(
-    ARGIN(PMC *interp_pmc),
+    Parrot_PMC interp_pmc,
     Parrot_Int stdin,
     Parrot_Int stdout,
-    Parrot_Int stderr)
-        __attribute__nonnull__(1);
+    Parrot_Int stderr);
 
 PARROT_API
-Parrot_Int Parrot_api_set_warnings(
-    ARGMOD(PMC *interp_pmc),
-    Parrot_Int flags)
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*interp_pmc);
+Parrot_Int Parrot_api_set_warnings(Parrot_PMC interp_pmc, Parrot_Int flags);
+
+PARROT_API
+Parrot_Int Parrot_api_wrap_imcc_hack(
+    Parrot_PMC interp_pmc,
+    const char * sourcefile,
+    int argc,
+    const char **argv,
+    Parrot_PMC* bytecodepmc,
+    int *result,
+    imcc_hack_func_t func);
 
 #define ASSERT_ARGS_Parrot_api_add_dynext_search_path \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc) \
-    , PARROT_ASSERT_ARG(path))
+       PARROT_ASSERT_ARG(path))
 #define ASSERT_ARGS_Parrot_api_add_include_search_path \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc) \
-    , PARROT_ASSERT_ARG(path))
+       PARROT_ASSERT_ARG(path))
 #define ASSERT_ARGS_Parrot_api_add_library_search_path \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc) \
-    , PARROT_ASSERT_ARG(path))
+       PARROT_ASSERT_ARG(path))
 #define ASSERT_ARGS_Parrot_api_build_argv_array __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc) \
-    , PARROT_ASSERT_ARG(argv) \
+       PARROT_ASSERT_ARG(argv) \
     , PARROT_ASSERT_ARG(args))
-#define ASSERT_ARGS_Parrot_api_debug_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc))
+#define ASSERT_ARGS_Parrot_api_debug_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_destroy_interpreter \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc))
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_disassemble_bytecode \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+<<<<<<< HEAD
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(pbc) \
     , PARROT_ASSERT_ARG(outfile))
@@ -283,45 +273,46 @@ Parrot_Int Parrot_api_set_warnings(
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(lang) \
     , PARROT_ASSERT_ARG(compiler))
+=======
+       PARROT_ASSERT_ARG(outfile))
+#define ASSERT_ARGS_Parrot_api_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_get_exception_backtrace \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(bt))
+>>>>>>> 5a8f9555372db6f0a977969ba7daafda207efe1c
 #define ASSERT_ARGS_Parrot_api_get_result __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc) \
-    , PARROT_ASSERT_ARG(is_error) \
+       PARROT_ASSERT_ARG(is_error) \
+    , PARROT_ASSERT_ARG(exception) \
     , PARROT_ASSERT_ARG(exit_code) \
     , PARROT_ASSERT_ARG(errmsg))
 #define ASSERT_ARGS_Parrot_api_get_runtime_path __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runtime))
 #define ASSERT_ARGS_Parrot_api_load_bytecode_bytes \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc) \
-    , PARROT_ASSERT_ARG(pbc) \
+       PARROT_ASSERT_ARG(pbc) \
     , PARROT_ASSERT_ARG(pbcpmc))
 #define ASSERT_ARGS_Parrot_api_load_bytecode_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc) \
-    , PARROT_ASSERT_ARG(filename) \
+       PARROT_ASSERT_ARG(filename) \
     , PARROT_ASSERT_ARG(pbc))
 #define ASSERT_ARGS_Parrot_api_load_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(lang))
 #define ASSERT_ARGS_Parrot_api_make_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_api_run_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc) \
-    , PARROT_ASSERT_ARG(pbc) \
-    , PARROT_ASSERT_ARG(mainargs))
+#define ASSERT_ARGS_Parrot_api_ready_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(main_sub))
+#define ASSERT_ARGS_Parrot_api_run_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_set_configuration_hash \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_set_executable_name \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc) \
-    , PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_Parrot_api_set_output_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc))
+       PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_Parrot_api_set_output_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_set_runcore __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc))
-#define ASSERT_ARGS_Parrot_api_set_stdhandles __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc))
-#define ASSERT_ARGS_Parrot_api_set_warnings __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc))
+       PARROT_ASSERT_ARG(corename))
+#define ASSERT_ARGS_Parrot_api_set_stdhandles __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_set_warnings __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_wrap_imcc_hack __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/api.c */
 
@@ -384,6 +375,19 @@ Parrot_Int Parrot_api_string_import_binary(
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
+Parrot_Int Parrot_api_add_exception_handler(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC handler);
+
+PARROT_API
+Parrot_Int Parrot_api_call_sub(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC sub_pmc,
+    ARGIN(const char * signature),
+    ...)
+        __attribute__nonnull__(3);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_deserialize(
     Parrot_PMC interp_pmc,
     Parrot_String fpmc,
@@ -402,20 +406,75 @@ Parrot_Int Parrot_api_pmc_deserialize_bytes(
         FUNC_MODIFIES(* pmc);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_get_float(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pmc,
+    ARGOUT(Parrot_Float * value))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* value);
+
+PARROT_API
+Parrot_Int Parrot_api_pmc_get_integer(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pmc,
+    ARGOUT(Parrot_Int * value))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* value);
+
+PARROT_API
+Parrot_Int Parrot_api_pmc_get_string(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pmc,
+    ARGOUT(Parrot_String * str))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* str);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_null(
     Parrot_PMC interp_pmc,
     ARGMOD(Parrot_PMC *pmctonull))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmctonull);
 
+PARROT_API
+Parrot_Int Parrot_api_pmc_set_float(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pmc,
+    Parrot_Float value);
+
+PARROT_API
+Parrot_Int Parrot_api_pmc_set_integer(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pmc,
+    Parrot_Int value);
+
+PARROT_API
+Parrot_Int Parrot_api_pmc_set_string(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pmc,
+    Parrot_String value);
+
+#define ASSERT_ARGS_Parrot_api_add_exception_handler \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_call_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_api_pmc_deserialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_api_pmc_deserialize_bytes \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(fpmc) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_Parrot_api_pmc_get_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_Parrot_api_pmc_get_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_Parrot_api_pmc_get_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_Parrot_api_pmc_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pmctonull))
+#define ASSERT_ARGS_Parrot_api_pmc_set_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_pmc_set_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_pmc_set_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/pmc.c */
 
@@ -429,3 +488,9 @@ imcc_run_api(ARGMOD(Parrot_PMC interp_pmc), ARGIN(const char *sourcefile), int a
 
 #endif /* PARROT_API_H_GUARD */
 
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

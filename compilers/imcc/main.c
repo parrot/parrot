@@ -623,7 +623,7 @@ compile_to_bytecode(PARROT_INTERP,
         fprintf(stderr, "error:imcc:%s", error_str);
         IMCC_print_inc(interp);
         Parrot_str_free_cstring(error_str);
-        Parrot_x_exit(interp, IMCC_FATAL_EXCEPTION);
+        Parrot_x_jump_out_error(interp, IMCC_FATAL_EXCEPTION);
     }
 
     imc_cleanup(interp, yyscanner);
@@ -641,7 +641,7 @@ int
 imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(const char *sourcefile), int argc,
         ARGIN(const char **argv), ARGOUT(PMC **pbcpmc))
 {
-    Interp * interp = VTABLE_get_pointer(NULL, interp_pmc);
+    Interp * interp = (Interp *)VTABLE_get_pointer(NULL, interp_pmc);
     return imcc_run(interp, sourcefile, argc, argv, pbcpmc);
 }
 

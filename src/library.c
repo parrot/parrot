@@ -243,8 +243,10 @@ Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)
     STRING * versionlib = NULL;
     STRING * entry = NULL;
     STRING * builddir = NULL;
-    PMC * const lib_paths =  VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_LIB_PATHS);
-    PMC * const config_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_CONFIG_HASH);
+    PMC * const lib_paths =
+        VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_LIB_PATHS);
+    PMC * const config_hash =
+        VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_CONFIG_HASH);
     PMC * paths;
 
     if (VTABLE_elements(interp, config_hash)) {

@@ -24,14 +24,13 @@ Start Parrot
 #include "parrot/longopt.h"
 #include "parrot/api.h"
 
-
+extern int Parrot_set_config_hash(Parrot_PMC interp_pmc);
 
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void show_last_error_and_exit(Parrot_PMC interp);
 static void help(void);
 static void help_debug(void);
 PARROT_WARN_UNUSED_RESULT
@@ -72,11 +71,17 @@ static void parseflags_minimal(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(* initargs);
 
+static void print_parrot_string(
+    Parrot_PMC interp,
+    FILE *vector,
+    Parrot_String str,
+    int newline);
+
+static void show_last_error_and_exit(Parrot_PMC interp);
 static void usage(ARGMOD(FILE *fp))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*fp);
 
-#define ASSERT_ARGS_show_last_error_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_help_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_is_all_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -93,6 +98,8 @@ static void usage(ARGMOD(FILE *fp))
 #define ASSERT_ARGS_parseflags_minimal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(initargs) \
     , PARROT_ASSERT_ARG(argv))
+#define ASSERT_ARGS_print_parrot_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_show_last_error_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(fp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -120,6 +127,7 @@ main(int argc, const char *argv[])
     int          pir_argc;
     const char **pir_argv;
     const char  *core = "slow";
+    int run_pbc = 0;
     Parrot_Init_Args *initargs;
     Parrot_Int trace = 0;
 
@@ -141,18 +149,18 @@ main(int argc, const char *argv[])
 
     /* Parse flags */
     sourcefile = parseflags(interp, argc, argv, &pir_argc, &pir_argv, &core, &trace);
-    if (!Parrot_api_set_runcore(interp, core, trace)) {
+    if (!Parrot_api_set_runcore(interp, core, trace))
         show_last_error_and_exit(interp);
-    }
 
-    if (imcc_run_api(interp, sourcefile, argc, argv, &bytecodepmc)) {
-        if (!Parrot_api_build_argv_array(interp, pir_argc, pir_argv, &argsarray)) {
-            fprintf(stderr, "PARROT VM: Could not load or run bytecode");
+    if (!Parrot_api_wrap_imcc_hack(
+        interp, sourcefile, argc, argv, &bytecodepmc, &run_pbc, imcc_run_api))
+        show_last_error_and_exit(interp);
+
+    if (run_pbc) {
+        if (!Parrot_api_build_argv_array(interp, pir_argc, pir_argv, &argsarray))
             show_last_error_and_exit(interp);
-        }
-        if (!Parrot_api_run_bytecode(interp, bytecodepmc, argsarray)) {
+        if (!Parrot_api_run_bytecode(interp, bytecodepmc, argsarray))
             show_last_error_and_exit(interp);
-        }
     }
 
     /* Clean-up after ourselves */
@@ -163,21 +171,32 @@ main(int argc, const char *argv[])
 static void
 show_last_error_and_exit(Parrot_PMC interp)
 {
-    Parrot_String errmsg;
-    Parrot_Int exit_code;
-    Parrot_Int is_error;
-    if (!Parrot_api_get_result(interp, &is_error, &exit_code, &errmsg)){
-        fprintf(stderr, "PARROT VM: Cannot recover\n");
+    Parrot_String errmsg, backtrace;
+    Parrot_Int exit_code, is_error;
+    Parrot_PMC exception;
+
+    if (!(Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg) &&
+          Parrot_api_get_exception_backtrace(interp, exception, &backtrace))) {
         exit(EXIT_FAILURE);
     }
 
-    /* if (errmsg) { */
-    /*     char * errmsg_raw; */
-    /*     Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw); */
-    /*     fprintf(stderr, "PARROT VM: %s\n", errmsg_raw); */
-    /*     Parrot_api_string_free_exported_ascii(interp, errmsg_raw); */
-    /* } */
+    print_parrot_string(interp, stderr, errmsg, 1);
+    print_parrot_string(interp, stderr, backtrace, 0);
+
     exit(exit_code);
+}
+
+static void
+print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline)
+{
+    char * msg_raw;
+    if (!str)
+        return;
+    Parrot_api_string_export_ascii(interp, str, &msg_raw);
+    if (msg_raw) {
+        fprintf(vector, "%s%s", msg_raw, newline ? "\n" : "");
+        Parrot_api_string_free_exported_ascii(interp, msg_raw);
+    }
 }
 
 /*
@@ -196,7 +215,7 @@ PARROT_PURE_FUNCTION
 static int
 is_all_digits(ARGIN(const char *s))
 {
-    ASSERT_ARGS(is_all_digits);
+    //ASSERT_ARGS(is_all_digits);
     for (; *s; ++s)
         if (!isdigit((unsigned char)*s))
             return 0;
@@ -219,7 +238,7 @@ PARROT_PURE_FUNCTION
 static int
 is_all_hex_digits(ARGIN(const char *s))
 {
-    ASSERT_ARGS(is_all_hex_digits);
+    //ASSERT_ARGS(is_all_hex_digits);
     for (; *s; ++s)
         if (!isxdigit(*s))
             return 0;
@@ -239,7 +258,7 @@ Outputs usage error message.
 static void
 usage(ARGMOD(FILE *fp))
 {
-    ASSERT_ARGS(usage)
+    //ASSERT_ARGS(usage)
     fprintf(fp,
             "parrot -[acEGhprtvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
             "[-O [level]] [-R runcore] [-o FILE] <file>\n");
@@ -258,7 +277,7 @@ Print out list of debugging flag values.
 static void
 help_debug(void)
 {
-    ASSERT_ARGS(help_debug)
+    //ASSERT_ARGS(help_debug)
     /* split printf for C89 compliance on string length */
     printf(
     "--imcc-debug -d [Flags] ...\n"
@@ -303,7 +322,7 @@ Print out "help" list of options.
 static void
 help(void)
 {
-    ASSERT_ARGS(help)
+    //ASSERT_ARGS(help)
     /* split printf for C89 compliance on string length */
     printf(
     "parrot [Options] <file>\n"
@@ -410,7 +429,7 @@ Print out parrot version number.
 static void
 Parrot_version(void)
 {
-    ASSERT_ARGS(Parrot_version)
+    //ASSERT_ARGS(Parrot_version)
     printf("This is Parrot version " PARROT_VERSION);
     printf(" built for " PARROT_ARCHNAME ".\n");
     printf("Copyright (C) 2001-2010, Parrot Foundation.\n\
@@ -437,7 +456,7 @@ Parse minimal subset of args required for initializing interpreter.
 static void
 parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const char *argv[]))
 {
-    ASSERT_ARGS(parseflags_minimal)
+    //ASSERT_ARGS(parseflags_minimal)
 
     int pos = 0;
 
@@ -536,7 +555,7 @@ parseflags(Parrot_PMC interp,
         ARGOUT(int *pgm_argc), ARGOUT(const char ***pgm_argv),
         ARGMOD(const char **core), ARGMOD(Parrot_Int *trace))
 {
-    ASSERT_ARGS(parseflags)
+    //ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int status;
     int result = 1;

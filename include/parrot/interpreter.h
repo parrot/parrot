@@ -267,8 +267,8 @@ struct parrot_interp_t {
      * inside the invoke these get moved to the context structure */
     PMC *current_cont;                        /* the return continuation PMC */
     Parrot_jump_buff *api_jmp_buf;            /* jmp point out of Parrot */
-    STRING * final_error;                     /* string to hold the final error message */
-    Parrot_Int exit_code;
+    PMC * final_exception;                    /* Final exception PMC */
+    INTVAL exit_code;
 };
 
 /* typedef struct parrot_interp_t Interp;    done in parrot.h so that
