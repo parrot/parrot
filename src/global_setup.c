@@ -38,16 +38,16 @@ static unsigned int parrot_config_size_stored = 0;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void Parrot_gbl_setup_2(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 static void Parrot_gbl_set_config_hash_interpreter(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_gbl_setup_2 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+static void Parrot_gbl_setup_2(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_Parrot_gbl_set_config_hash_interpreter \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_gbl_setup_2 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */

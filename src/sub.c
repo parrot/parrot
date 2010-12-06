@@ -105,8 +105,8 @@ Parrot_sub_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
 
 /*
 
-=item C<int Parrot_sub_context_get_info(PARROT_INTERP, PMC *ctx, Parrot_Context_info
-*info)>
+=item C<int Parrot_sub_context_get_info(PARROT_INTERP, PMC *ctx,
+Parrot_Context_info *info)>
 
 Takes pointers to a context and its information table.
 Populates the table and returns 0 or 1. XXX needs explanation
@@ -358,7 +358,8 @@ Parrot_sub_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(PMC *ctx))
 
 /*
 
-=item C<PMC* Parrot_sub_find_dynamic_pad(PARROT_INTERP, STRING *lex_name, PMC *ctx)>
+=item C<PMC* Parrot_sub_find_dynamic_pad(PARROT_INTERP, STRING *lex_name, PMC
+*ctx)>
 
 Locate the LexPad containing the given C<lex_name> in C<ctx> and
 its caller pads.  Return PMCNULL on failure.
@@ -493,7 +494,8 @@ Parrot_sub_continuation_check(PARROT_INTERP, ARGIN(const PMC *pmc))
 
 /*
 
-=item C<void Parrot_sub_continuation_rewind_environment(PARROT_INTERP, PMC *pmc)>
+=item C<void Parrot_sub_continuation_rewind_environment(PARROT_INTERP, PMC
+*pmc)>
 
 Restores the appropriate context for the continuation.
 

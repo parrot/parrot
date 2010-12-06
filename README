@@ -67,15 +67,10 @@ To get a copy of the Parrot Git repository:
 
     git clone git://github.com/parrot/parrot.git
 
-To fetch the repo and checkout a specific branch:
+This will checkout the master branch by default. To create a local branch
+that tracks the branch "some_branch":
 
-    git clone git://github.com/parrot/parrot.git -b <branch>, e.g:
-
-    git clone git://github.com/parrot/parrot.git -b gsoc_threads
-
-This command is equivalent to the first C<git clone> command, along with a
-
-    git checkout master
+    git checkout -b --track some_branch origin/some_branch
 
 All the above URLs are read-only. If you are a Parrot core developer, then
 use the read-write URL:

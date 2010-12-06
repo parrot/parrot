@@ -2718,6 +2718,7 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
     for (u = 0; u < byte_code->n_libdeps; u++) {
         STRING *libname = PF_fetch_string(interp, self->pf, &cursor);
         PMC    *lib_pmc = Parrot_dyn_load_lib(interp, libname, NULL);
+        byte_code->libdeps[u] = libname;
     }
 
     for (i = 0; i < byte_code->op_mapping.n_libs; i++) {
