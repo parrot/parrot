@@ -129,6 +129,16 @@ Parrot_Int Parrot_api_flag(
         FUNC_MODIFIES(*interp_pmc);
 
 PARROT_API
+Parrot_Int Parrot_api_get_compiler(
+    ARGIN(Parrot_PMC interp_pmc),
+    ARGIN(Parrot_String *lang),
+    ARGOUT(PMC **compiler))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*compiler);
+
+PARROT_API
 Parrot_Int Parrot_api_get_result(
     ARGMOD(PMC * interp_pmc),
     ARGOUT(Parrot_Int *is_error),
@@ -172,6 +182,13 @@ Parrot_Int Parrot_api_load_bytecode_file(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*interp_pmc)
         FUNC_MODIFIES(*pbc);
+
+PARROT_API
+Parrot_Int Parrot_api_load_language(
+    ARGIN(Parrot_PMC interp_pmc),
+    ARGIN(Parrot_String *lang))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 Parrot_Int Parrot_api_make_interpreter(
@@ -262,6 +279,10 @@ Parrot_Int Parrot_api_set_warnings(
     , PARROT_ASSERT_ARG(outfile))
 #define ASSERT_ARGS_Parrot_api_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc))
+#define ASSERT_ARGS_Parrot_api_get_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp_pmc) \
+    , PARROT_ASSERT_ARG(lang) \
+    , PARROT_ASSERT_ARG(compiler))
 #define ASSERT_ARGS_Parrot_api_get_result __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(is_error) \
@@ -278,6 +299,9 @@ Parrot_Int Parrot_api_set_warnings(
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(filename) \
     , PARROT_ASSERT_ARG(pbc))
+#define ASSERT_ARGS_Parrot_api_load_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp_pmc) \
+    , PARROT_ASSERT_ARG(lang))
 #define ASSERT_ARGS_Parrot_api_make_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_api_run_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
