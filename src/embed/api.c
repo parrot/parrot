@@ -464,7 +464,6 @@ Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, const char * sourcefile,
 
 =back
 
-<<<<<<< HEAD
 /*
 
 =item C<PARROT_API Parrot_Int Parrot_api_load_language(Parrot_PMC interp_pmc,
@@ -512,8 +511,11 @@ Parrot_api_get_compiler(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String *lang)
     *compiler = VTABLE_get_pmc_keyed_str(interp, compreg_hash, lang_pmc);
     EMBED_API_CALLOUT(interp_pmc, interp); 
 }
-=======
+
+/*
+
 =cut
+
 */
 
 /*
@@ -522,4 +524,4 @@ Parrot_api_get_compiler(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String *lang)
  * End:
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
->>>>>>> 5a8f9555372db6f0a977969ba7daafda207efe1c
+
