@@ -383,8 +383,8 @@ Parrot_api_add_dynext_search_path(Parrot_PMC interp_pmc,
 
 /*
 
-=item C<Parrot_Int Parrot_api_set_stdhandles(Parrot_PMC interp_pmc, Parrot_Int
-stdin, Parrot_Int stdout, Parrot_Int stderr)>
+=item C<Parrot_Int Parrot_api_set_stdhandles(Parrot_PMC interp_pmc, Parrot_Int in, Parrot_Int out,
+Parrot_Int err)>
 
 Set the std file descriptors for the embedded interpreter. Any file descriptor
 passed as argument and set to C<PIO_INVALID_HANDLE> is ignored.
@@ -395,28 +395,28 @@ passed as argument and set to C<PIO_INVALID_HANDLE> is ignored.
 
 PARROT_API
 Parrot_Int
-Parrot_api_set_stdhandles(Parrot_PMC interp_pmc, Parrot_Int stdin,
-        Parrot_Int stdout, Parrot_Int stderr)
+Parrot_api_set_stdhandles(Parrot_PMC interp_pmc, Parrot_Int in,
+    Parrot_Int out, Parrot_Int err)
 {
     //ASSERT_ARGS(Parrot_api_set_stdhandles)
     EMBED_API_CALLIN(interp_pmc, interp)
     void *dummy;
 
-    if(PIO_INVALID_HANDLE != (PIOHANDLE)stdin) {
+    if(PIO_INVALID_HANDLE != (PIOHANDLE)in) {
         PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
-        Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)stdin);
+        Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)in);
         dummy = (void *)Parrot_io_stdhandle(interp,PIO_STDIN_FILENO,pmc);
     }
 
-    if(PIO_INVALID_HANDLE != (PIOHANDLE)stdout) {
+    if(PIO_INVALID_HANDLE != (PIOHANDLE)out) {
         PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
-        Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)stdout);
+        Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)out);
         dummy = (void *)Parrot_io_stdhandle(interp,PIO_STDOUT_FILENO,pmc);
     }
 
-    if(PIO_INVALID_HANDLE != (PIOHANDLE)stderr) {
+    if(PIO_INVALID_HANDLE != (PIOHANDLE)err) {
         PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
-        Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)stderr);
+        Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)err);
         dummy = (void *)Parrot_io_stdhandle(interp,PIO_STDERR_FILENO,pmc);
     }
 
@@ -474,8 +474,7 @@ interpreter.
 
 PARROT_API
 Parrot_Int
-Parrot_api_load_language(ARGIN(Parrot_PMC interp_pmc),
-                         ARGIN(Parrot_String *lang))
+Parrot_api_load_language(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String *lang))
 {
     ASSERT_ARGS(Parrot_api_load_language)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -497,7 +496,7 @@ Parrot_api_load_language(ARGIN(Parrot_PMC interp_pmc),
 PARROT_API
 Parrot_Int
 Parrot_api_get_compiler(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String *type),
-                        ARGOUT(PMC **compiler)) 
+    ARGOUT(PMC **compiler))
 {
     ASSERT_ARGS(Parrot_api_get_compiler)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -519,7 +518,7 @@ Parrot_api_get_compiler(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String *type)
 PARROT_API
 Parrot_Int
 Parrot_api_set_compiler(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String *type),
-                        ARGIN(PMC *compiler)) 
+    ARGIN(PMC *compiler))
 {
     ASSERT_ARGS(Parrot_api_set_compiler)
     EMBED_API_CALLIN(interp_pmc, interp)
