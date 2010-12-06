@@ -55,13 +55,10 @@ sub runstep {
     # Stage 1:
     foreach my $orig ( qw|
         archname
-        ccflags
         d_socklen_t
-        optimize
         osvers
         scriptdirexp
         sig_name
-        sPRIgldbl
         sPRIgldbl
     | ) {
         $conf->data->set( qq|${orig}_provisional| => $Config{$orig} );
@@ -76,9 +73,6 @@ sub runstep {
     # variables and stash them for later lookups.  Name them according
     # to their 'use English' names as documented in 'perlvar'.)
     $conf->data->set( OSNAME_provisional => $^O );
-
-    my $ccdlflags = $Config{ccdlflags};
-    $ccdlflags =~ s/\s*-Wl,-rpath,\S*//g if $conf->options->get('disable-rpath');
 
     # escape spaces in build directory
     my $build_dir =  abs_path($FindBin::Bin);

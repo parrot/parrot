@@ -49,12 +49,7 @@ sub runstep {
     my $options;
     if ( $optimize eq "1" ) {
         # start with perl5's flags ...
-        $options = $conf->data->get('optimize_provisional');
-
-        # ... but gcc 4.1 doesn't like -mcpu=xx, i.e. it's deprecated
-        if ( defined $gccversion and $gccversion > 3.3 ) {
-            $options =~ s/-mcpu=/-march=/;
-        }
+        $options = '-O2';
     }
     else {
         # use the command line verbatim
