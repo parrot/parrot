@@ -33,7 +33,7 @@ sub runstep {
 
     $conf->debug("(optimization options: init::optimize)\n");
 
-    # A plain --optimize means use perl5's $Config{optimize}.  If an argument
+    # A plain --optimize means use -O2.  If an argument
     # is given, however, use that instead.
     my $optimize = $conf->options->get('optimize');
 
@@ -48,7 +48,6 @@ sub runstep {
 
     my $options;
     if ( $optimize eq "1" ) {
-        # start with perl5's flags ...
         $options = '-O2';
     }
     else {
