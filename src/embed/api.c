@@ -462,12 +462,8 @@ Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, const char * sourcefile,
 
 /*
 
-=back
-
-/*
-
-=item C<PARROT_API Parrot_Int Parrot_api_load_language(Parrot_PMC interp_pmc,
-Parrot_String *lang)>
+=item C<Parrot_Int Parrot_api_load_language(Parrot_PMC interp_pmc, Parrot_String
+*lang)>
 
 Load the compiler libraries for a given high-level language into the
 interpreter.
@@ -483,7 +479,7 @@ Parrot_api_load_language(ARGIN(Parrot_PMC interp_pmc),
 {
     ASSERT_ARGS(Parrot_api_load_language)
     EMBED_API_CALLIN(interp_pmc, interp)
-    STRING * const lang_pmc = Parrot_str_new(interp, lang, strlen(lang));    
+    STRING * const lang_pmc = Parrot_str_new(interp, lang, strlen((char*)lang));
     Parrot_load_language(interp, lang_pmc);
     EMBED_API_CALLOUT(interp_pmc, interp); 
 }
@@ -491,8 +487,8 @@ Parrot_api_load_language(ARGIN(Parrot_PMC interp_pmc),
 
 /*
 
-=item C<PARROT_API Parrot_Int Parrot_api_get_compiler(Parrot_PMC interp_pmc,
-Parrot_String *lang, PMC **compiler) >
+=item C<Parrot_Int Parrot_api_get_compiler(Parrot_PMC interp_pmc, Parrot_String
+*type, PMC **compiler) >
 
 =cut
 
@@ -500,15 +496,35 @@ Parrot_String *lang, PMC **compiler) >
 
 PARROT_API
 Parrot_Int
-Parrot_api_get_compiler(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String *lang),
+Parrot_api_get_compiler(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String *type),
                         ARGOUT(PMC **compiler)) 
 {
     ASSERT_ARGS(Parrot_api_get_compiler)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PMC * const compreg_hash = VTABLE_get_pmc_keyed_int(interp,
-            interp->iglobals, IGLOBALS_COMPREG_HASH);
-    STRING * const lang_pmc = Parrot_str_new(interp, lang, strlen(lang));
-    *compiler = VTABLE_get_pmc_keyed_str(interp, compreg_hash, lang_pmc);
+    STRING * const type_pmc = Parrot_str_new(interp, type, strlen(type));
+    *compiler = Parrot_get_compiler(interp, type_pmc);
+    EMBED_API_CALLOUT(interp_pmc, interp); 
+}
+
+
+/*
+
+=item C<Parrot_Int Parrot_api_set_compiler(Parrot_PMC interp_pmc, Parrot_String
+*type, PMC *compiler) >
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_set_compiler(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String *type),
+                        ARGIN(PMC *compiler)) 
+{
+    ASSERT_ARGS(Parrot_api_set_compiler)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    STRING * const type_pmc = Parrot_str_new(interp, type, strlen((char*)type));
+    Parrot_set_compiler(interp, type_pmc, compiler);
     EMBED_API_CALLOUT(interp_pmc, interp); 
 }
 
