@@ -55,7 +55,8 @@ There are 2 Git ports on Windows:
 msysgit 	    http://code.google.com/p/msysgit/downloads/list
 TortoiseGit 	http://code.google.com/p/tortoisegit/downloads/list
 
-Macintosh OS X
+Macintosh OS X:
+
 An Internet search will locate a variety of git installers for Mac OS X,
 including this:
 
