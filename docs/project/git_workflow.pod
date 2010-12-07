@@ -60,6 +60,22 @@ branch:
 
   git checkout username/foo
 
+If you would like to checkout a branch that already exists, first make sure
+to get the lastest commits with:
+
+  git fetch
+
+Then use this syntax to track the remote branch with a local branch:
+
+  git checkout -b username/foo origin/username/foo
+
+If you are using a very old version of Git, such as 1.5.x.x or older, you will
+want to tell it to track the remote branch:
+
+  git checkout -b --track username/foo origin/username/foo
+
+Tracking remote branches is the default in Git 1.6.x.x and higher.
+
 =head2 Pushing branches and tags
 
 If you want to push your local branch user/branch to origin:
