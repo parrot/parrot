@@ -72,7 +72,7 @@ Then use this syntax to track the remote branch with a local branch:
 If you are using a very old version of Git, such as 1.5.x.x or older, you will
 want to tell it to track the remote branch:
 
-  git checkout -b --track username/foo origin/username/foo
+  git checkout --track -b username/foo origin/username/foo
 
 Tracking remote branches is the default in Git 1.6.x.x and higher.
 
