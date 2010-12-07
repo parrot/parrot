@@ -106,7 +106,8 @@ Parrot_gbl_set_config_hash_interpreter(PARROT_INTERP)
         ||  parrot_config_stored[15] != PARROT_PBC_MINOR)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_STRING_REPRESENTATION,
-                "Version %d.%d of config hash is invalid, expected %d.%d. You're probably linking against an incompatible libparrot.",
+                "Version %d.%d of config hash is invalid, expected %d.%d. "
+                "You're probably linking against an incompatible libparrot.",
                 parrot_config_stored[14], parrot_config_stored[15],
                 PARROT_PBC_MAJOR, PARROT_PBC_MINOR);
 
