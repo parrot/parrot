@@ -95,7 +95,22 @@ Parrot_gbl_set_config_hash_interpreter(PARROT_INTERP)
     PMC *config_hash = NULL;
 
     if (parrot_config_size_stored > 1) {
-        STRING * const config_string =
+        STRING *config_string;
+
+        if (parrot_config_size_stored < 16)
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_STRING_REPRESENTATION,
+                "Invalid config hash");
+
+        if (parrot_config_stored[14] != PARROT_PBC_MAJOR
+        ||  parrot_config_stored[15] != PARROT_PBC_MINOR)
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_STRING_REPRESENTATION,
+                "Version %d.%d of config hash is invalid, expected %d.%d. You're probably linking against an incompatible libparrot.",
+                parrot_config_stored[14], parrot_config_stored[15],
+                PARROT_PBC_MAJOR, PARROT_PBC_MINOR);
+
+        config_string =
             Parrot_str_new_init(interp,
                                (const char *)parrot_config_stored, parrot_config_size_stored,
                                Parrot_binary_encoding_ptr,
