@@ -200,7 +200,7 @@ sub runstep {
         $conf->data->set(
             cc                  => 'gcc',
             ccflags             => '-DWIN32',
-            libs                => '-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion',
+            libs                => '-lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion',
             parrot_is_shared    => 1,
             has_dynamic_linking => 1,
             libparrot_ldflags   => "\"$build_dir\\libparrot.dll\"",
