@@ -383,8 +383,8 @@ Parrot_api_add_dynext_search_path(Parrot_PMC interp_pmc,
 
 /*
 
-=item C<Parrot_Int Parrot_api_set_stdhandles(Parrot_PMC interp_pmc, Parrot_Int in, Parrot_Int out,
-Parrot_Int err)>
+=item C<Parrot_Int Parrot_api_set_stdhandles(Parrot_PMC interp_pmc, Parrot_Int
+in, Parrot_Int out, Parrot_Int err)>
 
 Set the std file descriptors for the embedded interpreter. Any file descriptor
 passed as argument and set to C<PIO_INVALID_HANDLE> is ignored.
@@ -487,7 +487,7 @@ Parrot_api_load_language(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String *lang
 /*
 
 =item C<Parrot_Int Parrot_api_get_compiler(Parrot_PMC interp_pmc, Parrot_String
-*type, PMC **compiler) >
+*type, PMC **compiler)>
 
 =cut
 
@@ -509,7 +509,7 @@ Parrot_api_get_compiler(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String *type)
 /*
 
 =item C<Parrot_Int Parrot_api_set_compiler(Parrot_PMC interp_pmc, Parrot_String
-*type, PMC *compiler) >
+*type, PMC *compiler)>
 
 =cut
 

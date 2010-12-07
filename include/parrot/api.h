@@ -238,9 +238,9 @@ Parrot_Int Parrot_api_set_runcore(
 PARROT_API
 Parrot_Int Parrot_api_set_stdhandles(
     Parrot_PMC interp_pmc,
-    Parrot_Int stdin,
-    Parrot_Int stdout,
-    Parrot_Int stderr);
+    Parrot_Int in,
+    Parrot_Int out,
+    Parrot_Int err);
 
 PARROT_API
 Parrot_Int Parrot_api_set_warnings(Parrot_PMC interp_pmc, Parrot_Int flags);
