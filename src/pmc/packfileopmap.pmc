@@ -48,6 +48,8 @@ Create empty PackfileOpMap for a given op library.
         Parrot_PackfileOpMap_attributes *attrs =
             PMC_data_typed(SELF, Parrot_PackfileOpMap_attributes*);
 
+        PObj_custom_mark_SET(SELF);
+
         attrs->op_maps    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         attrs->map_cache  = Parrot_pmc_new(INTERP, enum_class_Hash);
         attrs->op_count   = 0;
@@ -152,23 +154,6 @@ Marks the object as live.
         VTABLE_mark(INTERP, attrs->map_cache);
     }
 
-
-/*
-
-=item C<void destroy()>
-
-Clean up anything used by this PMC.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        Parrot_PackfileOpMap_attributes *attrs =
-            PMC_data_typed(SELF, Parrot_PackfileOpMap_attributes*);
-        VTABLE_destroy(INTERP, attrs->op_maps);
-        VTABLE_destroy(INTERP, attrs->map_cache);
-    }
 
 /*
 
