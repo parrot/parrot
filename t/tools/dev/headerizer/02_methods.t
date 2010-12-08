@@ -410,6 +410,7 @@ $self->squawk($file, $func, $error[1]);
             "attrs_from_args(): Got expected warning for unprotected argument");
         $self->{warnings} = {};
     }
+    chdir $cwd or croak "Unable to chdir back after testing";
 }
 
 {
@@ -456,6 +457,7 @@ $self->squawk($file, $func, $error[1]);
         );
         ok(! $stdout, "No warnings from lexer auto-generated functions");
     }
+    chdir $cwd or croak "Unable to chdir back after testing";
 }
 
 pass("Completed all tests in $0");
