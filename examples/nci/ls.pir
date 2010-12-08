@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2008, Parrot Foundation.
+# Copyright (C) 2005-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -28,7 +28,10 @@ List the content of the directory 'docs'.
      set $P2["d_fileno"], .DATATYPE_INT64
      push $P2, 0
      push $P2, 0
-     set $P2["d_reclen"], .DATATYPE_SHORT
+     set $P2["d_off"], .DATATYPE_INT64
+     push $P2, 0
+     push $P2, 0
+     set $P2["d_reclen"], .DATATYPE_INT16
      push $P2, 0
      push $P2, 0
      set $P2["d_type"], .DATATYPE_CHAR
@@ -39,7 +42,7 @@ List the content of the directory 'docs'.
      push $P2, 0           # 11
 lp_dir:
      entry = readdir(curdir)
-     $I0 = get_addr entry
+     $I0 = defined entry
      unless $I0 goto done
      assign entry, $P2
 
