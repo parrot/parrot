@@ -27,7 +27,7 @@ libraries that the ops come from.
 /* HEADERIZER END: static */
 
 
-pmclass PackfileOpMap extends PackfileSegment auto_attrs {
+pmclass PackfileOpMap auto_attrs {
     ATTR PMC    *op_maps;   /* RPA of Hashes of op lib maps */
     ATTR PMC    *map_cache; /* Hash mapping full op names to numbers */
     ATTR INTVAL  op_count;  /* number of mapped ops*/
@@ -47,7 +47,7 @@ Create empty PackfileOpMap for a given op library.
         STRING *oplib_name, *oplib_str, *lib_ops, *table_ops, *core_ops_str;
         Parrot_PackfileOpMap_attributes *attrs =
             PMC_data_typed(SELF, Parrot_PackfileOpMap_attributes*);
-        
+
         attrs->op_maps    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         attrs->map_cache  = Parrot_pmc_new(INTERP, enum_class_Hash);
         attrs->op_count   = 0;
@@ -69,8 +69,6 @@ Create empty PackfileOpMap for a given op library.
         VTABLE_set_pmc_keyed_str(INTERP, core_ops_info, table_ops,
                 Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray));
         VTABLE_push_pmc(INTERP, attrs->op_maps, core_ops_info);
-
-        SUPER();
     }
 
 /*
@@ -152,8 +150,6 @@ Marks the object as live.
             PMC_data_typed(SELF, Parrot_PackfileOpMap_attributes*);
         VTABLE_mark(INTERP, attrs->op_maps);
         VTABLE_mark(INTERP, attrs->map_cache);
-
-        SUPER();
     }
 
 
@@ -172,8 +168,6 @@ Clean up anything used by this PMC.
             PMC_data_typed(SELF, Parrot_PackfileOpMap_attributes*);
         VTABLE_destroy(INTERP, attrs->op_maps);
         VTABLE_destroy(INTERP, attrs->map_cache);
-
-        SUPER();
     }
 
 /*
