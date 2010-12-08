@@ -25,13 +25,13 @@ List the content of the directory 'docs'.
 
      .include "datatypes.pasm"
      new $P2, 'OrderedHash'
-     set $P2["d_fileno"], .DATATYPE_INT64
+     set $P2["d_fileno"], .DATATYPE_LONG
      push $P2, 0
      push $P2, 0
-     set $P2["d_off"], .DATATYPE_INT64
+     set $P2["d_off"], .DATATYPE_LONG
      push $P2, 0
      push $P2, 0
-     set $P2["d_reclen"], .DATATYPE_INT16
+     set $P2["d_reclen"], .DATATYPE_SHORT
      push $P2, 0
      push $P2, 0
      set $P2["d_type"], .DATATYPE_CHAR
