@@ -359,6 +359,105 @@ $self->squawk($file, $func, $error[1]);
     chdir $cwd or croak "Unable to chdir back after testing";
 }
 
+# attrs_from_args()
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    chdir $tdir or croak "Unable to chdir during testing";
+
+    my $stub = 'list';
+    my $srcdir    = File::Spec->catpath( $tdir, 'src' );
+    mkpath( $srcdir, 0, 0777 );
+    my $srco      = File::Spec->catfile( $srcdir, "$stub.o" );
+    touchfile($srco);
+    my $srcc      = File::Spec->catfile( $srcdir, "$stub.c" );
+    copy "$cwd/t/tools/dev/headerizer/testlib/list.in" => $srcc
+        or croak "Unable to copy";
+    my $incdir    = File::Spec->catpath( $tdir, 'include', 'parrot' );
+    mkpath( $incdir, 0, 0777 );
+    my $inch      = File::Spec->catfile( $incdir, "$stub.h" );
+    copy "$cwd/t/tools/dev/headerizer/testlib/list_h.in" => $inch
+        or croak "Unable to copy";
+
+    $self = Parrot::Headerizer::Object->new();
+    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self->get_sources($srco);
+    ok( keys %{$self->{sourcefiles}},
+        "sourcefiles" );
+    ok( ! keys %{$self->{sourcefiles_with_statics}},
+        "no sourcefiles_with_statics" );
+    ok( ! keys %{$self->{api}},
+        "no api" );
+
+    my ($func, $arg);
+    $func = {
+        'name'  => 'alpha',
+        'file'  => 'my_sourcefile.c',
+    };
+    $arg = '*beta';
+    $self->attrs_from_args($func, ($arg));
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_warnings(); },
+            \$stdout,
+            \$stderr,
+        );
+        like($stdout, qr/$func->{file}/s,
+            "attrs_from_args(): Got expected warning for unprotected argument");
+        like($stdout, qr/$func->{name}:/s,
+            "attrs_from_args(): Got expected warning for unprotected argument");
+        like($stdout, qr/1 warnings/s,
+            "attrs_from_args(): Got expected warning for unprotected argument");
+        $self->{warnings} = {};
+    }
+}
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    chdir $tdir or croak "Unable to chdir during testing";
+
+    my $stub = 'list';
+    my $srcdir    = File::Spec->catpath( $tdir, 'src' );
+    mkpath( $srcdir, 0, 0777 );
+    my $srco      = File::Spec->catfile( $srcdir, "$stub.o" );
+    touchfile($srco);
+    my $srcc      = File::Spec->catfile( $srcdir, "$stub.c" );
+    copy "$cwd/t/tools/dev/headerizer/testlib/list.in" => $srcc
+        or croak "Unable to copy";
+    my $incdir    = File::Spec->catpath( $tdir, 'include', 'parrot' );
+    mkpath( $incdir, 0, 0777 );
+    my $inch      = File::Spec->catfile( $incdir, "$stub.h" );
+    copy "$cwd/t/tools/dev/headerizer/testlib/list_h.in" => $inch
+        or croak "Unable to copy";
+
+    $self = Parrot::Headerizer::Object->new();
+    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self->get_sources($srco);
+    ok( keys %{$self->{sourcefiles}},
+        "sourcefiles" );
+    ok( ! keys %{$self->{sourcefiles_with_statics}},
+        "no sourcefiles_with_statics" );
+    ok( ! keys %{$self->{api}},
+        "no api" );
+
+    my ($func, $arg);
+    $func = {
+        'name'  => 'yy_alpha',
+        'file'  => 'my_sourcefile.c',
+    };
+    $arg = '*beta';
+    $self->attrs_from_args($func, ($arg));
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_warnings(); },
+            \$stdout,
+            \$stderr,
+        );
+        ok(! $stdout, "No warnings from lexer auto-generated functions");
+    }
+}
+
 pass("Completed all tests in $0");
 
 sub touchfile {
