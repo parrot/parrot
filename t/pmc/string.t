@@ -18,7 +18,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(148)
+    plan(153)
 
     set_or_get_strings()
     setting_integers()
@@ -61,6 +61,7 @@ Tests the C<String> PMC.
     assign_null_string()
     access_keyed()
     exists_keyed()
+    test_unescape()
     # END_OF_TESTS
 .end
 
@@ -619,6 +620,14 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
 
     is( t, 'TAACGSTAACGS', 'trans' )
     is( s, 'atugcsATUGCS', "trans doesn't touch source string")
+    
+    $I0 = 1
+    push_eh GOOD1
+    $P0.'trans'(unicode:"abc", tr_00)
+    $I0 = 0
+GOOD1:
+    pop_eh
+    ok( $I0, 'trans throws exception with non-ascii' )
 .end
 
 # create tr table at compile-time
@@ -681,6 +690,14 @@ loop:
   $S1 = substr $S0, 3, 3
   $I0 = $P0.'is_integer'($S1)
   ok( $I0, '... substr' )
+  
+  $I0 = 1
+  push_eh GOOD1
+  $P0.'is_integer'(unicode:"123")
+  $I0 = 0
+GOOD1:
+  pop_eh
+  ok( $I0, 'is_integer throws exception with non-ascii' )
 .end
 
 .sub instantiate_str
@@ -904,6 +921,23 @@ check:
     i = -2
     r = exists s[i]
     is(r, 0, 'exists_keyed negative out of bounds')
+.end
+
+.sub test_unescape
+    .local pmc s1, s2
+    
+    s1 = new['String']
+    s1 = '\n'
+    s2 = s1.'unescape'('ascii')
+    is( s2, "\n", "unescape('\\n') == \"\\n\"" )
+    
+    s1 = '\x41\x42'
+    s2 = s1.'unescape'('ascii')
+    is( s2, 'AB', "unescape('\\x41\\x42') == 'AB'" )
+    
+    s1 = '\u0043\u0044'
+    s2 = s1.'unescape'('ascii')
+    is( s2, 'CD', "unescape('\\u0043\\u0044') == 'CD'" )
 .end
 
 # Local Variables:
