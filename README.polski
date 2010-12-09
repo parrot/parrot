@@ -1,43 +1,44 @@
-To jest Parrot, versja 2.10.1
+To jest Parrot, wersja 2.10.1
 -----------------------------
 
-Prawa autorskie (C) Parrot należą do 2001-2010, Parrot Foundation.
+Prawa autorskie (C) Parrota należą do 2001-2010, Parrot Foundation.
 
 INFORMACJA O LICENCJI
 ---------------------
 
 Ten kod jest rozpowszechniany na warunkach licencji Artistic License 2.0.
-Więcej szczegółów znajduje się w pliku LICENCE, gdzie można znaleść cały
+Więcej szczegółów znajduje się w pliku LICENCE, gdzie można znaleźć cały
 tekst licencji.
 
-PRZEGLĄD
---------
-Parrot jest maszyną wirtualną, zaprojektowaną aby efektywnie kompilować
+OPIS
+----
+
+Parrot jest maszyną wirtualną, zaprojektowaną, aby efektywnie kompilować
 i wykonywać kod języków dynamicznych.
 
 WYMAGANIA
 ---------
 
-Potrzebujesz kompilatora języka C, linker, i oczywiście program make.
+Potrzebujesz kompilator języka C, linker, i oczywiście program make.
 
 Jeśli będziesz linkował z biblioteką ICU, musisz ją ściągnąć i zainstalować
-przed konfigurowaniem Parrot. Pobierz ją z http://site.icu-project.org/download
+przed konfigurowaniem Parrota. Pobierz ją z http://site.icu-project.org/download
 
-Potrzebujesz również Perl 5.8.4 lub nowszego, i Storable 2.12 lub nowszego,
+Potrzebujesz również Perla 5.8.4 lub nowszego, i Storable 2.12 lub nowszego,
 aby uruchamiać różne skrypty konfiguracji i budowania.
 
-Na większości platform, które od początku wspieramy, Parrot powinien zbudować
-się sam. Lista głównych platform znajduje się w docs/parrot.pod. Plik PLATFORMS
-przechowuje informacje dotyczące raportów z platform, na których Parrot
-został zbudowany i testowany.
+Na większości z platform, które wspieramy od początku, Parrot powinien zbudować
+się sam. Lista wspieranych platform znajduje się w docs/parrot.pod.
+Plik PLATFORMS przechowuje informacje dotyczące raportów z platform, na
+których Parrot był zbudowany i testowany.
 
 JAK UZYSKAĆ PARROT Z GITHUB
 ---------------------------
 I.  Zainstaluj Git.
 
 Linux:
-Metoda instalacji zależy od twojej dystrybucji. Aby zainstalować powinieneś
-uruchomić (jako root, albo sudo <komenda>):
+Metoda instalacji zależy od twojej dystrybucji. Instalacja rozpocznie się po
+wpisaniu (jako root, albo sudo <komenda>):
 
 Na Ubuntu/Debianie (oparte na apt):
 
@@ -59,7 +60,7 @@ TortoiseGit 	http://code.google.com/p/tortoisegit/downloads/list
 
 Macintosh OS X:
 
-Przeszukanie internetu pozwoli znaleść wiele różnych instalatorów git dla
+Przejrzenie internetu pozwoli znaleźć wiele różnych instalatorów git dla
 Mac OS X, w tym: 
 
     http://help.github.com/mac-git-installation/
@@ -76,7 +77,7 @@ która śledzi gałąź "some_branch":
     git checkout -b --track some_branch origin/some_branch
 
 Wszystkie powyższe adresy URL służą jedynie do ściągania danych. Jeśli jesteś
-deweloperem jądra Parrot, użyj adresu, który pozwoli na odczytywanie i zapis:
+deweloperem jądra Parrot, użyj adresu, który pozwoli na odczyt i zapis:
 
     git clone git@github.com:parrot/parrot.git
 
@@ -85,12 +86,12 @@ Możesz zobaczyć listę wszystkich gałęzi na http://github.com/parrot/parrot
 INSTRUKCJE
 ----------
 
-Na początek, wypakuj tarballa Parrot (jeśli to czytasz, to prawdopodobnie
+Na początek, wypakuj tarballa Parrota (jeśli to czytasz, to prawdopodobnie
 już to zrobiłeś) i wpisz
 
     perl Configure.pl
 
-aby uruchomić skrypt Configure. Skrypt ten wypakowuje konfigurację
+aby uruchomić skrypt Configure. Skrypt ten odczyta konfigurację
 z uruchomionego programu perl5. Możliwe, że będziesz musiał jawnie pokazać
 Configure.pl którego kompilatora i linkera ma użyć. Na przykład, aby
 kompilować pliki C za pomocą 'cc', pliki C++ za pomocą 'CC', a linkować
@@ -98,25 +99,25 @@ wszystko za pomocą 'CC', należy wpisać
 
     perl Configure.pl --cc=cc --cxx=CC --link=CC --ld=CC
 
-Zajrzyj do "perl Configure.pl --help", aby poznać więcej opcji i do
+Uruchom "perl Configure.pl --help", aby poznać więcej opcji i do
 docs/configuration.pod po więcej szczegółów.
 
 W systemach podobnych do HPUX, które nie posiadają inet_pton, należy uruchomić
 
     perl Configure.pl --define=inet_aton
 
-Działający Configure.pl wygeneruje nagłówek config.h, moduł Parrot:Config,
+Configure.pl wygeneruje nagłówek config.h, moduł Parrot:Config,
 pliki zależne od platformy i wiele plików Makefile.
 
 Plik "myconfig" posiada przegląd ustawień konfiguracji.
 
-Następnie, uruchom make. (Configure.pl powie, którą wersję make poleca dla twojego systemu)
+Następnie uruchom make. (Configure.pl poda, którą wersję make'a zaleca dla twojego systemu)
 
-Teraz interpreter powinien budować program. Jeśli budujesz bibliotekę ICU
-(co jest domyślne dla większości systemów), powinieneś w zamian użyć
-GNU make (lub czegoś, co jest z nim kompatybilne).
+Teraz interpreter powinien zbudować program. Jeśli budujesz bibliotekę ICU
+(co jest domyślne dla większości systemów), powinieneś użyć GNU make
+(lub czegoś, co jest z nim kompatybilne).
 
-Możesz przetestować Parrot za pomocą "make test". Możesz uruchomić testy
+Możesz przetestować Parrota za pomocą "make test". Możesz uruchomić testy
 równolegle za pomocą "make TEST_JOBS=3 test".
 
 Możesz uruchomić pełną gamę testów za pomocą
@@ -130,19 +131,19 @@ Możesz zainstalować Parrot za pomocą:
 
     make install
 
-Domyślnie, ta komenda instaluje w /usr/local, a plik wykonywalny Parrot
-umieszcza w /usr/local/bin. Jeśli chcesz zainstalować Parrot w innym miejscu,
+Domyślnie, ta komenda instaluje Parrota w /usr/local, a jego plik wykonywalny
+umieszcza w /usr/local/bin. Jeśli chcesz zainstalować Parrota w innym miejscu,
 użyj:
 
     perl Configure.pl --prefix=/home/joe/bird
     make install
 
-Ale zwróć uwagę na to, że biblioteki dynamiczne nie będą znalezione dla
-niestandardowych lokalizacji, chyba że ustawisz LD_LIBRARY_PATH, albo coś
-podobnego.
+Zwróć uwagę na to, że biblioteki dynamiczne nie będą znalezione
+w niestandardowych lokalizacjach, chyba że ustawisz LD_LIBRARY_PATH,
+albo coś podobnego.
 
 Zajrzyj do docs/parrot.pod i docs/intro.pod, aby dowiedzieć się, co dalej.
-Jeśli masz jakiekolwiek problemy, spójrz do rodziału "How To Submit A
+Jeśli masz jakiekolwiek problemy, spójrz do rozdziału "How To Submit A
 Bug Report" w docs/submissions.pod. Te dokumenty są w formacie POD.
 Możesz je obejrzeć za pomocą komendy:
 
@@ -151,7 +152,7 @@ Możesz je obejrzeć za pomocą komendy:
 ZMIANY
 ------
 
-Dokumentacja zmian zauważalnych przez użytkownika pomiędzy tą,
+Spis zmian zauważalnych przez użytkownika pomiędzy tą,
 a poprzednimi wersjami znajduje się w pliku NEWS.
 
 LISTY DYSKUSYJNE
@@ -163,19 +164,19 @@ http://lists.parrot.org/mailman/listinfo/parrot-users .
 Lista dyskusyjna jest dostępna pod adresem
 http://lists.parrot.org/pipermail/parrot-users/ .
 
-Aby uzyskać informację na temat dyskusji deweloperskich, spójrz
-w docs/gettingstarted.pod.
+Aby uzyskać informację na temat list dyskusyjnych deweloperów, zajrzyj
+do docs/gettingstarted.pod.
 
 PRZEKAZANIE OPINII, PATCHA, itd.
 --------------------------------
 
-Zajrzyj do docs/submissions.pod, aby uzyskać więcej informacji na temat
-zgłaszania błędów i wysyłania patchy.
+Zajrzyj do docs/submissions.pod po więcej informacji na temat
+zgłaszania błędów i wysyłania patchów.
 
 STRONY INTERNETOWE
 ------------------
 
-Następujące strony przechowują wszelkie informacje o Parrot, jakie mogą
+Następujące strony przechowują wszelkie informacje o Parrocie, jakie mogą
 być Ci potrzebne:
     http://www.parrot.org/
     http://trac.parrot.org/
