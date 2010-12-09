@@ -25,7 +25,7 @@ Jeśli będziesz linkował z biblioteką ICU, musisz ją ściągnąć i zainstal
 przed konfigurowaniem Parrota. Pobierz ją z http://site.icu-project.org/download
 
 Potrzebujesz również Perla 5.8.4 lub nowszego, i Storable 2.12 lub nowszego,
-aby uruchamiać różne skrypty konfiguracji i budowania.
+aby uruchamiać różne skrypty służące do konfiguracji i budowania.
 
 Na większości z platform, które wspieramy od początku, Parrot powinien zbudować
 się sam. Lista wspieranych platform znajduje się w docs/parrot.pod.
