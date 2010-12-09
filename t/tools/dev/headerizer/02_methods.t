@@ -187,19 +187,7 @@ $self->squawk($file, $func, $error[1]);
     my $tdir = tempdir( CLEANUP => 1 );
     chdir $tdir or croak "Unable to chdir during testing";
 
-    my $stub = 'list';
-    my $srcdir    = File::Spec->catpath( $tdir, 'src' );
-    mkpath( $srcdir, 0, 0777 );
-    my $srco      = File::Spec->catfile( $srcdir, "$stub.o" );
-    touchfile($srco);
-    my $srcc      = File::Spec->catfile( $srcdir, "$stub.c" );
-    copy "$cwd/t/tools/dev/headerizer/testlib/list.in" => $srcc
-        or croak "Unable to copy";
-    my $incdir    = File::Spec->catpath( $tdir, 'include', 'parrot' );
-    mkpath( $incdir, 0, 0777 );
-    my $inch      = File::Spec->catfile( $incdir, "$stub.h" );
-    copy "$cwd/t/tools/dev/headerizer/testlib/list_h.in" => $inch
-        or croak "Unable to copy";
+    my $srco = setup_src_list_test($cwd, $tdir);
 
     $self = Parrot::Headerizer::Object->new();
     isa_ok( $self, 'Parrot::Headerizer::Object' );
@@ -230,19 +218,7 @@ $self->squawk($file, $func, $error[1]);
     my $tdir = tempdir( CLEANUP => 1 );
     chdir $tdir or croak "Unable to chdir during testing";
 
-    my $stub = 'list';
-    my $srcdir    = File::Spec->catpath( $tdir, 'src' );
-    mkpath( $srcdir, 0, 0777 );
-    my $srco      = File::Spec->catfile( $srcdir, "$stub.o" );
-    touchfile($srco);
-    my $srcc      = File::Spec->catfile( $srcdir, "$stub.c" );
-    copy "$cwd/t/tools/dev/headerizer/testlib/list.in" => $srcc
-        or croak "Unable to copy";
-    my $incdir    = File::Spec->catpath( $tdir, 'include', 'parrot' );
-    mkpath( $incdir, 0, 0777 );
-    my $inch      = File::Spec->catfile( $incdir, "$stub.h" );
-    copy "$cwd/t/tools/dev/headerizer/testlib/list_h.in" => $inch
-        or croak "Unable to copy";
+    my $srco = setup_src_list_test($cwd, $tdir);
 
     my $macro = 'PARROT_CAN_RETURN_NULL';
     $self = Parrot::Headerizer::Object->new( {
@@ -364,19 +340,7 @@ $self->squawk($file, $func, $error[1]);
     my $tdir = tempdir( CLEANUP => 1 );
     chdir $tdir or croak "Unable to chdir during testing";
 
-    my $stub = 'list';
-    my $srcdir    = File::Spec->catpath( $tdir, 'src' );
-    mkpath( $srcdir, 0, 0777 );
-    my $srco      = File::Spec->catfile( $srcdir, "$stub.o" );
-    touchfile($srco);
-    my $srcc      = File::Spec->catfile( $srcdir, "$stub.c" );
-    copy "$cwd/t/tools/dev/headerizer/testlib/list.in" => $srcc
-        or croak "Unable to copy";
-    my $incdir    = File::Spec->catpath( $tdir, 'include', 'parrot' );
-    mkpath( $incdir, 0, 0777 );
-    my $inch      = File::Spec->catfile( $incdir, "$stub.h" );
-    copy "$cwd/t/tools/dev/headerizer/testlib/list_h.in" => $inch
-        or croak "Unable to copy";
+    my $srco = setup_src_list_test($cwd, $tdir);
 
     $self = Parrot::Headerizer::Object->new();
     isa_ok( $self, 'Parrot::Headerizer::Object' );
@@ -417,19 +381,7 @@ $self->squawk($file, $func, $error[1]);
     my $tdir = tempdir( CLEANUP => 1 );
     chdir $tdir or croak "Unable to chdir during testing";
 
-    my $stub = 'list';
-    my $srcdir    = File::Spec->catpath( $tdir, 'src' );
-    mkpath( $srcdir, 0, 0777 );
-    my $srco      = File::Spec->catfile( $srcdir, "$stub.o" );
-    touchfile($srco);
-    my $srcc      = File::Spec->catfile( $srcdir, "$stub.c" );
-    copy "$cwd/t/tools/dev/headerizer/testlib/list.in" => $srcc
-        or croak "Unable to copy";
-    my $incdir    = File::Spec->catpath( $tdir, 'include', 'parrot' );
-    mkpath( $incdir, 0, 0777 );
-    my $inch      = File::Spec->catfile( $incdir, "$stub.h" );
-    copy "$cwd/t/tools/dev/headerizer/testlib/list_h.in" => $inch
-        or croak "Unable to copy";
+    my $srco = setup_src_list_test($cwd, $tdir);
 
     $self = Parrot::Headerizer::Object->new();
     isa_ok( $self, 'Parrot::Headerizer::Object' );
@@ -460,6 +412,279 @@ $self->squawk($file, $func, $error[1]);
     chdir $cwd or croak "Unable to chdir back after testing";
 }
 
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    chdir $tdir or croak "Unable to chdir during testing";
+
+    my $srco = setup_src_list_test($cwd, $tdir);
+
+    $self = Parrot::Headerizer::Object->new();
+    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self->get_sources($srco);
+    ok( keys %{$self->{sourcefiles}},
+        "sourcefiles" );
+    ok( ! keys %{$self->{sourcefiles_with_statics}},
+        "no sourcefiles_with_statics" );
+    ok( ! keys %{$self->{api}},
+        "no api" );
+
+    my ($func, $arg);
+    $func = {
+        'name'  => 'alpha',
+        'file'  => 'my_sourcefile.c',
+    };
+    $arg = 'const *beta ARGMOD';
+    $self->attrs_from_args($func, ($arg));
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_warnings(); },
+            \$stdout,
+            \$stderr,
+        );
+        like($stdout, qr/$func->{file}/s,
+            "attrs_from_args(): Got expected warning for const clash");
+        like($stdout, qr/$func->{name}:/s,
+            "attrs_from_args(): Got expected warning for const clash");
+        like($stdout, qr/1 warnings/s,
+            "attrs_from_args(): Got expected warning for const clash");
+    }
+    $self->{warnings} = {};
+
+    $arg = 'const **beta ARGMOD';
+    $self->attrs_from_args($func, ($arg));
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_warnings(); },
+            \$stdout,
+            \$stderr,
+        );
+        ok(! $stdout, "No warnings in double asterisk case");
+    }
+    $self->{warnings} = {};
+
+    $arg = '*beta ARGMOD';
+    $self->attrs_from_args($func, ($arg));
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_warnings(); },
+            \$stdout,
+            \$stderr,
+        );
+        ok(! $stdout, "No warnings in non-const case");
+    }
+    $self->{warnings} = {};
+
+    $arg = 'const *beta ARGIN';
+    $self->attrs_from_args($func, ($arg));
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_warnings(); },
+            \$stdout,
+            \$stderr,
+        );
+        ok(! $stdout, "No warnings in non-ARGMOD/ARGOUT case");
+    }
+    $self->{warnings} = {};
+
+    $arg = 'const beta ARGOUT';
+    $self->attrs_from_args($func, ($arg));
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_warnings(); },
+            \$stdout,
+            \$stderr,
+        );
+        ok(! $stdout, "No warnings in non-asterisk case");
+    }
+    $self->{warnings} = {};
+
+    chdir $cwd or croak "Unable to chdir back after testing";
+}
+
+# check_pointer_return_type()
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    chdir $tdir or croak "Unable to chdir during testing";
+
+    my $srco = setup_src_list_test($cwd, $tdir);
+
+    $self = Parrot::Headerizer::Object->new();
+    isa_ok( $self, 'Parrot::Headerizer::Object' );
+
+    my ($return_type, %macros, $name, $file);
+
+    $return_type = '*pointer';
+    %macros = ();
+    $name = 'somefunc';
+    $file = 'my_sourcefile.c';
+    $self->check_pointer_return_type( {
+        return_type     => $return_type,
+        macros          => \%macros,
+        name            => $name,
+        file            => $file,
+    } );
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_warnings(); },
+            \$stdout,
+            \$stderr,
+        );
+        like($stdout, qr/$file/s,
+            "check_pointer_return_type(): Got expected warning for missing macro");
+        like($stdout, qr/$name:/s,
+            "check_pointer_return_type(): Got expected warning for missing macro");
+        like($stdout, qr/1 warnings/s,
+            "check_pointer_return_type(): Got expected warning for missing macro");
+    }
+    $self->{warnings} = {};
+
+    $return_type = '*pointer';
+    %macros = ();
+    $name = 'yy_somefunc';
+    $file = 'my_yacc';
+    $self->check_pointer_return_type( {
+        return_type     => $return_type,
+        macros          => \%macros,
+        name            => $name,
+        file            => $file,
+    } );
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_warnings(); },
+            \$stdout,
+            \$stderr,
+        );
+        ok(! $stdout, "No warnings, as expected: yacc case");
+    }
+    $self->{warnings} = {};
+
+    $return_type = '*pointer';
+    %macros = ( PARROT_CAN_RETURN_NULL => 1);
+    $name = 'somefunc';
+    $file = 'my_sourcefile.c';
+    $self->check_pointer_return_type( {
+        return_type     => $return_type,
+        macros          => \%macros,
+        name            => $name,
+        file            => $file,
+    } );
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_warnings(); },
+            \$stdout,
+            \$stderr,
+        );
+        ok(! $stdout, "No warnings, as expected");
+    }
+    $self->{warnings} = {};
+
+    $return_type = '*pointer';
+    %macros = ( PARROT_CANNOT_RETURN_NULL => 1);
+    $name = 'somefunc';
+    $file = 'my_sourcefile.c';
+    $self->check_pointer_return_type( {
+        return_type     => $return_type,
+        macros          => \%macros,
+        name            => $name,
+        file            => $file,
+    } );
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_warnings(); },
+            \$stdout,
+            \$stderr,
+        );
+        ok(! $stdout, "No warnings, as expected");
+    }
+    $self->{warnings} = {};
+
+    $return_type = '*pointer';
+    %macros = ( PARROT_CANNOT_RETURN_NULL => 1);
+    $name = 'somefunc';
+    $file = 'my_sourcefile.c';
+    $self->check_pointer_return_type( {
+        return_type     => $return_type,
+        macros          => \%macros,
+        name            => $name,
+        file            => $file,
+    } );
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_warnings(); },
+            \$stdout,
+            \$stderr,
+        );
+        ok(! $stdout, "No warnings, as expected");
+    }
+    $self->{warnings} = {};
+
+    $return_type = '*pointer';
+    %macros = (
+        PARROT_CAN_RETURN_NULL => 1,
+        PARROT_CANNOT_RETURN_NULL => 1,
+    );
+    $name = 'somefunc';
+    $file = 'my_sourcefile.c';
+    $self->check_pointer_return_type( {
+        return_type     => $return_type,
+        macros          => \%macros,
+        name            => $name,
+        file            => $file,
+    } );
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_warnings(); },
+            \$stdout,
+            \$stderr,
+        );
+        like($stdout, qr/$file/s,
+            "check_pointer_return_type(): Got expected warning for contradictory macros");
+        like($stdout, qr/$name:/s,
+            "check_pointer_return_type(): Got expected warning for contradictory macros");
+        like($stdout, qr/Can't have both/s,
+            "check_pointer_return_type(): Got expected warning for contradictory macros");
+    }
+    $self->{warnings} = {};
+
+    $return_type = 'not_a_pointer';
+    %macros = (
+        PARROT_CAN_RETURN_NULL => 1,
+        PARROT_CANNOT_RETURN_NULL => 1,
+    );
+    $name = 'somefunc';
+    $file = 'my_sourcefile.c';
+    $self->check_pointer_return_type( {
+        return_type     => $return_type,
+        macros          => \%macros,
+        name            => $name,
+        file            => $file,
+    } );
+    {
+        my ($stdout, $stderr);
+        capture(
+            sub { $self->print_warnings(); },
+            \$stdout,
+            \$stderr,
+        );
+        ok(! $stdout, "No warnings, as expected");
+    }
+    $self->{warnings} = {};
+
+    chdir $cwd or croak "Unable to chdir back after testing";
+}
+
+
 pass("Completed all tests in $0");
 
 sub touchfile {
@@ -468,6 +693,24 @@ sub touchfile {
     print $IN "\n";
     close $IN or croak "Unable to close after writing";
     return 1;
+}
+
+sub setup_src_list_test {
+    my ($cwd, $tdir) = @_;
+    my $stub = 'list';
+    my $srcdir    = File::Spec->catpath( $tdir, 'src' );
+    mkpath( $srcdir, 0, 0777 );
+    my $srco      = File::Spec->catfile( $srcdir, "$stub.o" );
+    touchfile($srco);
+    my $srcc      = File::Spec->catfile( $srcdir, "$stub.c" );
+    copy "$cwd/t/tools/dev/headerizer/testlib/list.in" => $srcc
+        or croak "Unable to copy";
+    my $incdir    = File::Spec->catpath( $tdir, 'include', 'parrot' );
+    mkpath( $incdir, 0, 0777 );
+    my $inch      = File::Spec->catfile( $incdir, "$stub.h" );
+    copy "$cwd/t/tools/dev/headerizer/testlib/list_h.in" => $inch
+        or croak "Unable to copy";
+    return $srco;
 }
 
 ################### DOCUMENTATION ###################

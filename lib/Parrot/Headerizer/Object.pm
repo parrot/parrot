@@ -335,18 +335,12 @@ sub function_components_from_declaration {
             $is_ignorable = 1;
         }
     }
-    if ( $return_type =~ /\*/ ) {
-        if ( !$macros{PARROT_CAN_RETURN_NULL} && !$macros{PARROT_CANNOT_RETURN_NULL} ) {
-            if ( $name !~ /^yy/ ) { # Don't complain about lexer-created functions
-                $self->squawk( $file, $name,
-                    'Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found.' );
-            }
-        }
-        elsif ( $macros{PARROT_CAN_RETURN_NULL} && $macros{PARROT_CANNOT_RETURN_NULL} ) {
-            $self->squawk( $file, $name,
-                q{Can't have both PARROT_CAN_RETURN_NULL and PARROT_CANNOT_RETURN_NULL together.} );
-        }
-    }
+    $self->check_pointer_return_type( {
+        return_type     => $return_type,
+        macros          => \%macros,
+        name            => $name,
+        file            => $file,
+    } );
 
     return {
         file         => $file,
@@ -359,6 +353,33 @@ sub function_components_from_declaration {
         is_ignorable => $is_ignorable,
         return_type  => $return_type,
     };
+}
+
+=head2 C<check_pointer_return_type()>
+
+    $self->check_pointer_return_type( {
+        return_type     => $return_type,
+        macros          => \%macros,
+        name            => $name,
+        file            => $file,
+    } );
+
+=cut
+
+sub check_pointer_return_type {
+    my ($self, $args) = @_;
+    if ( $args->{return_type} =~ /\*/ ) {
+        if ( !$args->{macros}->{PARROT_CAN_RETURN_NULL} && !$args->{macros}->{PARROT_CANNOT_RETURN_NULL} ) {
+            if ( $args->{name} !~ /^yy/ ) { # Don't complain about lexer-created functions
+                $self->squawk( $args->{file}, $args->{name},
+                    'Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found.' );
+            }
+        }
+        elsif ( $args->{macros}->{PARROT_CAN_RETURN_NULL} && $args->{macros}->{PARROT_CANNOT_RETURN_NULL} ) {
+            $self->squawk( $args->{file}, $args->{name},
+                q{Can't have both PARROT_CAN_RETURN_NULL and PARROT_CANNOT_RETURN_NULL together.} );
+        }
+    }
 }
 
 =head2 C<generate_documentation_signature>
