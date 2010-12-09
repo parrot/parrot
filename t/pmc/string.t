@@ -92,7 +92,7 @@ Tests the C<String> PMC.
         set $P0, "0xFFFFFF"
         set $S0, $P0
         is( $S0, "0xFFFFFF", 'String obj set with literal hex string' )
-        
+
         new $P1, ['Float']
         set $P1, 3.14159
         setref $P0, $P1
@@ -381,18 +381,18 @@ TRUE5:  nok( $I0, 'uninitialized String is false' )
     new $P2, ['Integer']
     set $P1, "10"
     set $P2, 10
-    
+
     cmp_num $I0, $P1, $P2
     is( $I0, 0, 'cmp_num "10"(String PMC), 10(Integer PMC) = 0' )
-    
+
     set $P2, 20
     cmp_num $I0, $P1, $P2
     is( $I0, -1, 'cmp_num "10", 20 = -1' )
-    
+
     set $P2, 5
     cmp_num $I0, $P1, $P2
     is( $I0, 1, 'cmp_num "10", 5 = 1' )
-    
+
     set $P1, "asd"
     cmp_num $I0, $P1, $P2
     is( $I0, -1, 'cmp_num "asd", 5 = -1' )
@@ -450,7 +450,7 @@ TRUE5:  nok( $I0, 'uninitialized String is false' )
         new $P2, ['Float']
         set $P1, "124"
         set $P2, 124
-        
+
         set $I0, 1
         eq_num $P2, $P1, OK1
         set $I0, 0
@@ -567,18 +567,18 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
 
 .sub test_set_bool
     new $P0, ['String']
-    
+
     set $P0, "1"
     not $P0
     is( $P0, "0", 'not "1" = "0"' )
-    
+
     not $P0
     is( $P0, "1", 'not "0" = "1"' )
-    
+
     set $P0, "false"
     not $P0
     is( $P0, "0", 'not "false" = "0"' )
-    
+
     set $P0, 0
     not $P0
     is( $P0, "1", 'not 0 = "1"' )
