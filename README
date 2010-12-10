@@ -40,15 +40,15 @@ I. Tienes que instalar Git.
 Linux:
 El método depende de su distribución. Para instalar se debe ejecutar (como root o sudo <cmd>):
 
-On Ubuntu/Debian (apt-based):
+En Ubuntu/Debian (apt-based):
 
-    apt-get instala git-core
+    apt-get install git-core
 
-On Red Hat, Fedora (rpm-based):
+En Red Hat, Fedora (rpm-based):
 
-    yum instala git
+    yum install git
 
-on Gentoo (portage):
+En Gentoo (portage):
 
     emerge-av dev-vcs/git
 
@@ -95,7 +95,7 @@ para ejecutar el script de configuración. La secuencia de comandos Configure.pl
 configuración
 de la ejecución programa Perl5.  Puede que tenga que decirle explícitamente a Configure.pl
 que compilador y enlazador de usar Por ejemplo, para compilar archivos de C con 'cc',
-C + archivos con "CC", y todo vínculo con "CC", escribiría
+C++ archivos con "CC", y todo vínculo con "CC", escribiría
 
     perl Configure.pl --cc=cc --cxx=CC --link=CC --ld=CC
 
