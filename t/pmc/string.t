@@ -621,13 +621,15 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
     is( t, 'TAACGSTAACGS', 'trans' )
     is( s, 'atugcsATUGCS', "trans doesn't touch source string")
     
+    push_eh THROWN
     $I0 = 1
-    push_eh GOOD1
     $P0.'trans'(unicode:"abc", tr_00)
+    goto TEST
+THROWN:
     $I0 = 0
-GOOD1:
+TEST:
     pop_eh
-    ok( $I0, 'trans throws exception with non-ascii' )
+    todo( $I0, 'trans throws exception with non-ascii' )
 .end
 
 # create tr table at compile-time
@@ -691,13 +693,15 @@ loop:
   $I0 = $P0.'is_integer'($S1)
   ok( $I0, '... substr' )
   
+  push_eh THROWN
   $I0 = 1
-  push_eh GOOD1
   $P0.'is_integer'(unicode:"123")
+  goto TEST
+THROWN:
   $I0 = 0
-GOOD1:
+TEST:
   pop_eh
-  ok( $I0, 'is_integer throws exception with non-ascii' )
+  todo( $I0, 'is_integer throws exception with non-ascii' )
 .end
 
 .sub instantiate_str
