@@ -1,177 +1,183 @@
-This is Parrot, version 2.10.1
+LÉASE
+------------------------
+
+Esta es la versión Parrot, 2.10.1
 -----------------------------
 
-Parrot is Copyright (C) 2001-2010, Parrot Foundation.
+Parrot Bajo Los Derechos del Autor (C) 2001-2010, Parrot Foundation.
 
 
-LICENSE INFORMATION
+INFORMACIÓN DE LICENCIA
 -------------------
 
-This code is distributed under the terms of the Artistic License 2.0.
-For more details, see the full text of the license in the file LICENSE.
+Este código se distribuye bajo los términos de la Licencia Artística 2.0.
+Para más detalles, vea el texto completo de la licencia en el archivo de licencia.
 
-OVERVIEW
+RESUMEN
 --------
-Parrot is a virtual machine designed to efficiently compile and execute
-bytecode for dynamic languages.
+Parrot es una máquina virtual diseñada para compilar y ejecutar de manera eficiente
+bytecode para lenguajes dinámicos.
 
-PREREQUISITES
+REQUISITOS PREVIOS
 -------------
 
-You need a C compiler, a linker, and a make program of course.
+Usted necesita un compilador C, enlazador, y porspuesto, un programa.
 
-If you will be linking with the ICU library you have to download and install it
-before configuring Parrot. Get it from http://site.icu-project.org/download
+Si va a vincular con la biblioteca de la UCI  tienes que descargarlo e instalarlo
+antes de configurar Parrot. Se puede obtener desde el sitio http://site.icu-project.org/download
 
-You also need Perl 5.8.4 or newer, and Storable 2.12 or newer
-for running various configure and build scripts.
+Usted también necesita Perl 5.8.4 o posterior, y almacenable 2.12 o más reciente
+para el funcionamiento de diversos configura y crea secuencias de comandos.
 
-For most of the platforms that we are supporting initially, Parrot should build
-out of the box. docs/parrot.pod lists the core platforms. PLATFORMS provides
-reports on the platforms on which Parrot has been built and tested.
+Para la mayoría de las plataformas que nos están apoyando inicialmente, Parrot debe construir
+afuera de la caja. docs / parrot.pod listas de las plataformas principales. PLATAFORMAS proporcionan
+informes sobre las plataformas en las que Parrot ha sido construido y probado.
 
-HOW TO GET PARROT FROM GITHUB
+COMO CONSEGUIR PARROT DESDE GITHUB
 -----------------------------
-I.  Install Git.
+I. Tienes que instalar Git.
 
 Linux:
-The method depends on your distribution. To install you should execute (as root or sudo <cmd>):
+El método depende de su distribución. Para instalar se debe ejecutar (como root o sudo <cmd>):
 
 On Ubuntu/Debian (apt-based):
 
-    apt-get install git-core
+    apt-get instala git-core
 
 On Red Hat, Fedora (rpm-based):
 
-    yum install git
+    yum instala git
 
 on Gentoo (portage):
 
-    emerge -av dev-vcs/git
+    emerge-av dev-vcs/git
 
 Windows:
-There are 2 Git ports on Windows:
+Hay dos puertos de Git en Windows:
 
 msysgit 	    http://code.google.com/p/msysgit/downloads/list
 TortoiseGit 	http://code.google.com/p/tortoisegit/downloads/list
 
 Macintosh OS X:
 
-An Internet search will locate a variety of git installers for Mac OS X,
-including this:
+Una búsqueda en Internet se localizara una variedad de instaladores de git para Mac OS X,
+http://help.github.com/mac-git-installation/
 
-    http://help.github.com/mac-git-installation/
+II.  Para obtener Parrot desde Github.com
 
-II.  Obtaining Parrot from github.com
-
-To get a copy of the Parrot Git repository:
+Para obtener una copia del repositorio Git Parrot:
 
     git clone git://github.com/parrot/parrot.git
-
-This will checkout the master branch by default. To create a local branch
-that tracks the branch "some_branch":
+Esto echa un vistazo a la Branch principal de forma predeterminada. Para crear una sección local
+que sigue la sucursal  "some_branch":
 
     git checkout -b --track some_branch origin/some_branch
 
-All the above URLs are read-only. If you are a Parrot core developer, then
-use the read-write URL:
+Todas las URL anteriores son de sólo lectura. Si usted es un desarrollador principal Parrot, a 
+
+continuación,
+utilize la lectura y escritura URL:
 
     git clone git@github.com:parrot/parrot.git
 
-You can view the list of branches at http://github.com/parrot/parrot
+Puede ver la lista de Branch en http://github.com/parrot/parrot
 
 INSTRUCTIONS
 ------------
+Por ahora, descomprima el archivo tar Parrot, (si estás leyendo esto, usted
+probablemente ya lo ha hecho) y escriba
 
-For now, unpack your Parrot tarball, (if you're reading this, you've
-probably already done that) and type
 
     perl Configure.pl
 
-to run the Configure script. The Configure.pl script extracts configuration
-from the running perl5 program.  You may need to explicitly tell Configure.pl
-which compiler and linker to use.  For example, to compile C files with 'cc',
-C++ files with 'CC', and link everything together with 'CC', you would type
+para ejecutar el script de configuración. La secuencia de comandos Configure.pl extrae la 
+
+configuración
+de la ejecución programa Perl5.  Puede que tenga que decirle explícitamente a Configure.pl
+que compilador y enlazador de usar Por ejemplo, para compilar archivos de C con 'cc',
+C + archivos con "CC", y todo vínculo con "CC", escribiría
 
     perl Configure.pl --cc=cc --cxx=CC --link=CC --ld=CC
 
-See "perl Configure.pl --help" for more options and docs/configuration.pod
-for more details.
+Consulte "perl Configure.pl - help" para obtener más opciones y docs / configuration.pod
+para más detalles.
 
-For systems like HPUX that don't have inet_pton please run
+Para los sistemas como HP / UX que no tienen inet_pton por favor, ejecute
 
     perl Configure.pl --define=inet_aton
 
-Running Configure.pl will generate a config.h header, a Parrot::Config
-module, platform files and many Makefiles.
+Ejecutando Config.pl generará un encabezado config.h, al modulo Parrot::Config
+, los archivos de la plataforma y muchos Makefiles 
 
-The file "myconfig" has an overview of configure settings.
+El archivo "myconfig" tiene una visión general de la configuración.
 
-Next, run make. (Configure.pl will tell you which version of make it
-recommends for your system.)
+A continuación, ejecute make. (Configure.pl le dirá qué versión de make
+recomienda para su sistema.)
 
-Now, the interpreter should build.  If you are building the ICU library
-(this is the default on most systems), you need to use GNU make instead
-(or something compatible with it).
+Ahora, el intérprete debe construir. Si usted está construyendo la biblioteca de la UCI
+(Este es el defecto en la mayoría de sistemas), es necesario utilizar GNU Make en lugar
+(O algo compatible con él).
 
-You can test Parrot by running "make test". You can run the tests in parallel
-with "make TEST_JOBS=3 test".
+Puede probar Parrot ejecutando "make test". Puede ejecutar las pruebas en paralelo
+con "make TEST_JOBS = 3 prueba".
 
-You can run the full test suite with
+Puede ejecutar la suite de pruebas con
 
-    make fulltest
+make fulltest
 
-Note: PLATFORMS contains notes about whether test failures are expected
-on your system.
+Nota: PLATAFORMAS contiene notas acerca de si se esperan fallas de prueba
+en tu sistema
 
-You can install Parrot with:
+Puede instalar Parrot con:
 
     make install
 
-By default, this installs in /usr/local, with the Parrot executable in
-/usr/local/bin. If you want to install Parrot into another location use:
+By default, this installs in /usr/local, con el ejecutable de Parrot en
+/usr/local/bin. Si desea instalar Parrot en otro lugar de uso:
 
     perl Configure.pl --prefix=/home/joe/bird
     make install
 
-But please note that dynamic libs will not be found for non-standard
-locations unless you set LD_LIBRARY_PATH or similar.
+Pero tenga en cuenta que bibliotecas dinámicas no se pueden encontrar en lugares no estándar
+a menos que establezca LD_LIBRARY_PATH o algo similar.
 
-Look at docs/parrot.pod and docs/intro.pod for where to go from here.  If you
-have any problems, see the section "How To Submit A Bug Report" in
-docs/submissions.pod.  These documents are in POD format. You can view these
-files with the command:
+vease docs/parrot.pod and docs/intro.pod para dónde ir desde aquí.  Si encuentra cualquier problema, 
+
+consulte la sección "Cómo presentar una informe de errores" en
+docs/submissions.pod.  Estos documentos están en formato POD. Usted puede ver estos
+archivos con el comando:
 
     perldoc -F docs/intro.pod
 
-CHANGES
+CAMBIOS
 -------
 
-For documentation on the user-visible changes between this version and
-previous versions, please see NEWS.
+Para obtener documentación sobre los cambios visibles para el usuario entre esta versión y la
+versiones anteriores, consulte NOTICIAS.
 
-MAILING LISTS
+LISTAS DE CORREO
 -------------
 
-The Parrot user mailing list is parrot-users@lists.parrot.org. Subscribe by
-filling out the form at http://lists.parrot.org/mailman/listinfo/parrot-users .
-The list is archived at http://lists.parrot.org/pipermail/parrot-users/ .
+La lista de correo de usuarios Parrot es parrot-users@lists.parrot.org. Subscribase  llenando el 
 
-For development discussions see the information in docs/gettingstarted.pod.
+formulario en http://lists.parrot.org/mailman/listinfo/parrot-users .
+La lista se archiva en http://lists.parrot.org/pipermail/parrot-users/.
 
-FEEDBACK, PATCHES, etc.
+Para debates de desarollo vea la informacion en docs/gettingstarted.pod.
+
+COMENTARIOS, PARCHES, etc.
 -----------------------
 
-See docs/submissions.pod for more information on reporting bugs and
-submitting patches.
+Vea docs / submissions.pod para obtener más información sobre cómo informar errores y
+el envío de parches.
 
-WEB SITES
+SITIOS WEB
 ---------
 
-The following web sites have all the information you need about Parrot:
+Los siguientes sitios web contienen toda la información que necesita sobre Parrot:
     http://www.parrot.org/
     http://trac.parrot.org/
     http://docs.parrot.org/
 
-Have fun,
-   The Parrot Team.
+   Que se diviertan,
+   El equipo de Parrot.
