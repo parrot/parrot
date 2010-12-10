@@ -629,7 +629,7 @@ THROWN:
     $I0 = 0
 TEST:
     pop_eh
-    todo( $I0, 'trans throws exception with non-ascii' )
+    todo( $I0, 'trans works with unicode' )
 .end
 
 # create tr table at compile-time
@@ -701,7 +701,7 @@ THROWN:
   $I0 = 0
 TEST:
   pop_eh
-  todo( $I0, 'is_integer throws exception with non-ascii' )
+  todo( $I0, 'is_integer works with unicode' )
 .end
 
 .sub instantiate_str
