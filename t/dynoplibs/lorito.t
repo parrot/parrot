@@ -21,6 +21,8 @@ Tests loritio.ops
     .include 'test_more.pir'
     plan(1)
     ok(1,"load lorito_ops")
+    $P0 = context
+    isa_ok($P0,'Context')
 .end
 
 # Local Variables:

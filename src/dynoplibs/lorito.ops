@@ -25,13 +25,14 @@ between Duke, chromatic, Allison and cotto on 10. December 2010.
 
 All opcodes will take 4 arguments, but there will be an implict 1st argument
 of the current Context to each opcode, so in practice, only 3 arguments
-are passed to opcodes.
+are passed to opcodes. "Context is the new interp."
 
 
 =cut
 
-op context() {
-    CURRENT_CONTEXT(interp);
+op context(out PMC) {
+    PMC * ctx = CURRENT_CONTEXT(interp);
+    return ctx;
 }
 
 
