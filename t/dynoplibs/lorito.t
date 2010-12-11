@@ -19,10 +19,13 @@ Tests loritio.ops
 
 .sub main :main
     .include 'test_more.pir'
-    plan(2)
+    plan(3)
     ok(1,"load lorito_ops")
     $P0 = context
     isa_ok($P0,'CallContext')
+    $P1 = new 'CallContext'
+    call $P1, $P0
+    isa_ok($P1, 'CallContext')
 .end
 
 # Local Variables:
