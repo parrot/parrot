@@ -10,6 +10,16 @@ use Tie::Function;
 use DateTime::Format::ISO8601;
 use DateTime::TimeZone::Local;
 
+=head1 NAME
+
+tools/dev/github_post_receive.pl
+
+=head1 DESCRIPTION
+
+a post-receive script to send commit diffs to parrot developers
+
+=cut 
+
 my $q = CGI->new;
 print $q->header;
 
