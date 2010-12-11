@@ -1228,6 +1228,7 @@ PARROT_DOES_NOT_RETURN
 static void
 entry_type_must_be_pmc(PARROT_INTERP)
 {
+    ASSERT_ARGS(entry_type_must_be_pmc)
     Parrot_ex_throw_from_c_args(interp, NULL,
             EXCEPTION_INVALID_OPERATION,
             "Hash entry type must be PMC for multipart keys.");
@@ -1237,6 +1238,7 @@ PARROT_DOES_NOT_RETURN
 static void
 cannot_autovivify_nested(PARROT_INTERP)
 {
+    ASSERT_ARGS(cannot_autovivify_nested)
     Parrot_ex_throw_from_c_args(interp, NULL,
             EXCEPTION_INVALID_OPERATION,
             "Cannot autovivify nested hashes");
