@@ -44,7 +44,7 @@ are passed to opcodes. "Context is the new interp."
 
 op context(out PMC) {
     PMC * ctx = CURRENT_CONTEXT(interp);
-    return ctx;
+    $1 = ctx;
 }
 
 
