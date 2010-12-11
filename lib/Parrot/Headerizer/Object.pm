@@ -63,15 +63,22 @@ use Parrot::Headerizer::Functions qw(
 
 =item * Purpose
 
-Constructor of headerizer objects.
+Constructor of headerizer object.  The object is initialized with a list of
+valid C<PARROT_XXX> macros.
 
 =item * Arguments
+
+    $headerizer = Parrot::Headerizer::Object->new();
+
+No mandatory arguments, but one special use-case takes a hash reference.
 
     $headerizer = Parrot::Headerizer::Object->new( {
         macro_match => $macro_match, # optional
     } );
 
-None mandatory, but optionally takes a hash reference.
+Currently, the only meaningful element in that hash reference is
+C<macro_match>.  See C<process_sources()> below for discussion of how that is
+used.
 
 =item * Return Value
 
@@ -124,8 +131,9 @@ sub new {
 
 =item * Purpose
 
-Identify the source code files which need to have header informationn
-extracted.
+Identify the source code files which need to have header information
+extracted.  The header information is extracted and stored inside the
+headerizer object in appropriate ways.
 
 =item * Arguments
 
@@ -219,6 +227,9 @@ List of strings holding function declarations.
 
 =item * Comment
 
+Called within C<get_sources()>, but also called on its own within
+F<t/codingstd/c_function_docs.t>.
+
 =back
 
 =cut
@@ -308,6 +319,10 @@ List of strings holding function declarations.
 
 =item * Comment
 
+Called within C<get_sources()>.  Wraps around
+C<extract_function_declarations()> but differs from that method by generating
+signatures, correcting POD, etc.
+
 =back
 
 =cut
@@ -346,7 +361,7 @@ sub extract_function_declarations_and_update_source {
 
 =item * Purpose
 
-Create a data structure in which information about a particular function can
+Creates a data structure in which information about a particular function can
 be looked up.
 
 =item * Arguments
@@ -366,6 +381,12 @@ Returns a reference to a hash of these function components:
     is_api
     is_ignorable
     return_type
+
+=item * Comment
+
+Currently called within both
+C<extract_function_declarations()> and
+C<extract_function_declarations_and_update_source()>.
 
 =back
 
@@ -483,13 +504,15 @@ No defined return value.
 sub check_pointer_return_type {
     my ($self, $args) = @_;
     if ( $args->{return_type} =~ /\*/ ) {
-        if ( !$args->{macros}->{PARROT_CAN_RETURN_NULL} && !$args->{macros}->{PARROT_CANNOT_RETURN_NULL} ) {
+        if ( !$args->{macros}->{PARROT_CAN_RETURN_NULL} &&
+             !$args->{macros}->{PARROT_CANNOT_RETURN_NULL} ) {
             if ( $args->{name} !~ /^yy/ ) { # Don't complain about lexer-created functions
                 $self->squawk( $args->{file}, $args->{name},
                     'Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found.' );
             }
         }
-        elsif ( $args->{macros}->{PARROT_CAN_RETURN_NULL} && $args->{macros}->{PARROT_CANNOT_RETURN_NULL} ) {
+        elsif ( $args->{macros}->{PARROT_CAN_RETURN_NULL} &&
+                $args->{macros}->{PARROT_CANNOT_RETURN_NULL} ) {
             $self->squawk( $args->{file}, $args->{name},
                 q{Can't have both PARROT_CAN_RETURN_NULL and PARROT_CANNOT_RETURN_NULL together.} );
         }
@@ -665,7 +688,8 @@ sub squawk {
 =item * Purpose
 
 Once the source files needing headerization have been identified, this method
-serves as a wrapper around that headerization.
+serves as a wrapper around that headerization.  Both C<.h> and C<.c> files are
+handled.
 
 =item * Arguments
 
@@ -674,6 +698,13 @@ None.
 =item * Return Value
 
 None.
+
+=item * Comment
+
+If a hash reference with an element named C<macro_match> was passed to
+C<new()>, C<process_sources()> merely prints to C<STDOUT> a list of files and
+functions using the macro named as the value of that element.  No
+headerization or revision of headers is performed.
 
 =back
 
@@ -697,7 +728,8 @@ sub process_sources {
         my $s = $nfuncs == 1 ? '' : 's';
         $self->{message} = "$nfuncs $self->{macro_match} function$s";
     }
-    else { # Normal headerization and updating
+    # Normal headerization and updating
+    else {
         # Update all the .h files
         for my $hfile ( sort keys %sourcefiles ) {
             my $sourcefiles = $sourcefiles{$hfile};
@@ -733,6 +765,7 @@ sub process_sources {
 =over 4
 
 =item * Purpose
+
 
 =item * Arguments
 
@@ -776,9 +809,21 @@ sub replace_headerized_declarations {
 
 =item * Purpose
 
+Composes proper function declarations.
+
 =item * Arguments
 
+    @function_decls = $self->make_function_decls(@funcs);
+
+List of functions.
+
 =item * Return Value
+
+List of function declarations.
+
+=item * Comment
+
+Called within C<replace_headerized_declarations()>.
 
 =back
 
@@ -840,9 +885,22 @@ sub make_function_decls {
 
 =item * Purpose
 
+Adds to headers strings of the form C<__attribute__nonnull__(1)>.
+
 =item * Arguments
 
+    @attrs   = $headerizer->attrs_from_args( $func, @args );
+
+List whose first element is a hash reference holding characteristics about a
+given function, followed by list of arguments.
+
 =item * Return Value
+
+List.
+
+=item * Comment
+
+Called within C<make_function_decls()>.
 
 =back
 
@@ -878,6 +936,27 @@ sub attrs_from_args {
     return (@attrs,@mods);
 }
 
+=head2 C<print_final_message()>
+
+=over 4
+
+=item * Purpose
+
+Prints a concluding message whose content reflects either normal headerization
+or macro matching.
+
+=item * Arguments
+
+None.
+
+=item * Return Value
+
+Implicitly returns true value upon success.
+
+=back
+
+=cut
+
 sub print_final_message {
     my $self = shift;
     if ($self->{message} ne '') {
@@ -900,8 +979,6 @@ None.
 =item * Return Value
 
 Implicitly returns true value upon success.
-
-=item * Comment
 
 =back
 
