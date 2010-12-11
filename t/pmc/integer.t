@@ -47,12 +47,38 @@ Tests the Integer PMC.
     test_cmp_RT59336()
     test_cmp_num()
 
-    #test_autopromotion_to_BigInt()
-    #test_sub_BigInt()
-    #test_mul_BigInt()
-    #test_div_BigInt()
-    #test_mod_BigInt()
-    #test_neg_BigInt()
+    $I0 = has_bigint()
+    unless $I0 goto no_bigint
+    test_autopromotion_to_BigInt()
+    test_sub_BigInt()
+    test_mul_BigInt()
+    test_div_BigInt()
+    test_mod_BigInt()
+    test_neg_BigInt()
+    goto done_bigint_tests
+  no_bigint:
+    skip_n_bigint_tests(20)
+  done_bigint_tests:
+.end
+
+.sub has_bigint
+    push_eh _dont_have_bigint
+    $P0 = new ['BigInt']
+    pop_eh
+    .return(1)
+  _dont_have_bigint:
+    pop_eh
+    .return(0)
+.end
+
+.sub skip_n_bigint_tests
+    .param int n
+  loop_top:
+    if n == 0 goto _done
+    skip("No BigInt library")
+    n = n - 1
+    goto loop_top
+  _done:
 .end
 
 .sub test_init
