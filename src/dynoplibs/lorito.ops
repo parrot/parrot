@@ -6,6 +6,10 @@
 ** lorito.ops
 */
 
+BEGIN_OPS_PREAMBLE
+
+END_OPS_PREAMBLE
+
 =head1 NAME
 
 lorito.ops - Prototype Lortio M0 opcodes
