@@ -5,18 +5,29 @@ package Parrot::Headerizer::Object;
 
 =head1 NAME
 
-Parrot::Headerizer::Object - Parrot Header Generation functionality
+Parrot::Headerizer::Object - Parrot header generation functionality
 
 =head1 SYNOPSIS
 
     use Parrot::Headerizer::Object;
 
-    my $headerizer = Parrot::Headerizer::Object->new();
+    $headerizer = Parrot::Headerizer::Object->new( {
+        macro_match => $macro_match, # optional
+    } );
+
+    $headerizer->get_sources(@ofiles);
+    $headerizer->process_sources();
+    $headerizer->print_final_message();
+    $headerizer->print_warnings();
+
+    @function_decls = $headerizer->extract_function_declarations($buf);
+    $escaped_decl = $headerizer->generate_documentation_signature($function_decl);
 
 =head1 DESCRIPTION
 
 C<Parrot::Headerizer::Object> knows how to extract all kinds of information out
-of C-language files.
+of C-language files.  Its methods are used in F<tools/dev/headerizer.pl> and
+F<t/codingstd/c_function_docs.t>.
 
 =head1 METHODS
 
@@ -48,7 +59,25 @@ use Parrot::Headerizer::Functions qw(
 
 =head2 C<new()>
 
+=over 4
+
+=item * Purpose
+
 Constructor of headerizer objects.
+
+=item * Arguments
+
+    $headerizer = Parrot::Headerizer::Object->new( {
+        macro_match => $macro_match, # optional
+    } );
+
+None mandatory, but optionally takes a hash reference.
+
+=item * Return Value
+
+Parrot::Headerizer::Object object.
+
+=back
 
 =cut
 
@@ -90,6 +119,27 @@ sub new {
     };
     return bless $args, $class;
 }
+
+=over 4
+
+=item * Purpose
+
+Identify the source code files which need to have header informationn
+extracted.
+
+=item * Arguments
+
+    $headerizer->get_sources(@ofiles);
+
+List of names of C object (C<.o>) files.
+
+=item * Return Value
+
+No defined return value.
+
+=back
+
+=cut
 
 sub get_sources {
     my $self = shift;
@@ -150,10 +200,26 @@ sub get_sources {
 
 =head2 C<extract_function_declarations()>
 
-    $headerizer->extract_function_declarations($text)
+=over 4
+
+=item * Purpose
 
 Extracts the function declarations from the text argument, and returns an
 array of strings containing the function declarations.
+
+=item * Arguments
+
+    @function_decls = $headerizer->extract_function_declarations($text)
+
+String holding the slurped-in content of a source code file.
+
+=item * Return Value
+
+List of strings holding function declarations.
+
+=item * Comment
+
+=back
 
 =cut
 
@@ -220,10 +286,29 @@ sub extract_function_declarations {
     return @funcs;
 }
 
-=head2 extract_function_declaration_and_update_source( $cfile_name )
+=head2 C<extract_function_declaration_and_update_source()>
 
-Extract all the function declarations from the C file specified by
-I<$cfile_name>, and update the comment blocks within.
+=over 4
+
+=item * Purpose
+
+Extract all the function declarations from a source code file and update the
+comment blocks within it.
+
+=item * Arguments
+
+    @function_declarations =
+        $headerizer->extract_function_declaration_and_update_source($cfile_name);
+
+String holding source code filename.
+
+=item * Return Value
+
+List of strings holding function declarations.
+
+=item * Comment
+
+=back
 
 =cut
 
@@ -257,20 +342,32 @@ sub extract_function_declarations_and_update_source {
 
 =head2 C<function_components_from_declaration($file, $proto)>
 
-$file => the filename
-$proto => the function declaration
+=over 4
 
-Returns an anonymous hash of function components:
+=item * Purpose
 
-        file         => $file,
-        name         => $name,
-        args         => \@args,
-        macros       => \@macros,
-        is_static    => $is_static,
-        is_inline    => $parrot_inline,
-        is_api       => $parrot_api,
-        is_ignorable => $is_ignorable,
-        return_type  => $return_type,
+Create a data structure in which information about a particular function can
+be looked up.
+
+=item * Arguments
+
+List of two strings, the filename and the function declaration.
+
+=item * Return Value
+
+Returns a reference to a hash of these function components:
+
+    file
+    name
+    args
+    macros
+    is_static
+    is_inline
+    is_api
+    is_ignorable
+    return_type
+
+=back
 
 =cut
 
@@ -357,12 +454,29 @@ sub function_components_from_declaration {
 
 =head2 C<check_pointer_return_type()>
 
-    $self->check_pointer_return_type( {
+=over 4
+
+=item * Purpose
+
+Performs some validation in the case where a function's return value is a
+pointer.
+
+=item * Arguments
+
+    $headerizer->check_pointer_return_type( {
         return_type     => $return_type,
         macros          => \%macros,
         name            => $name,
         file            => $file,
     } );
+
+Reference to a hash with the four elements listed above.
+
+=item * Return Value
+
+No defined return value.
+
+=back
 
 =cut
 
@@ -382,10 +496,26 @@ sub check_pointer_return_type {
     }
 }
 
-=head2 C<generate_documentation_signature>
+=head2 C<generate_documentation_signature()>
+
+=over 4
+
+=item * Purpose
 
 Given an extracted function signature, return a modified
 version suitable for inclusion in POD documentation.
+
+=item * Arguments
+
+    $heading = $headerizer->generate_documentation_signature($decl);
+
+String holding a function declaration.
+
+=item * Return Value
+
+String holding a function header, split over multiple lines as needed.
+
+=back
 
 =cut
 
@@ -431,9 +561,23 @@ sub generate_documentation_signature {
 
 =head2 C<valid_macro()>
 
+=over 4
+
+=item * Purpose
+
+Tests the validity of a given macro.
+
+=item * Arguments
+
     $headerizer->valid_macro( $macro )
 
-Returns a boolean saying whether I<$macro> is a valid C<PARROT_XXX> macro.
+String holding a macro.
+
+=item * Return Value
+
+Boolean: true value for valid macro; false value for invalid macro.
+
+=back
 
 =cut
 
@@ -446,9 +590,23 @@ sub valid_macro {
 
 =head2 C<valid_macros()>
 
-    $headerizer->valid_macros()
+=over 4
 
-Returns a list of all the valid C<PARROT_XXX> macros.
+=item * Purpose
+
+Identify all valid macros whose names are of the form C<PARROT_XXX>.
+
+=item * Arguments
+
+    @marcros = $headerizer->valid_macros();
+
+None.
+
+=item * Return Value
+
+List of all the valid C<PARROT_XXX> macros.
+
+=back
 
 =cut
 
@@ -460,13 +618,32 @@ sub valid_macros {
     return @macros;
 }
 
-=head2 C<squawk($file, $func, $error)>
+=head2 C<squawk()>
 
-Headerizer-specific ways of complaining if something went wrong.
+=over 4
 
-$file => filename
-$func => function name
-$error => error message text
+=item * Purpose
+
+Builds a data structure with headerizer-specific ways of complaining if
+something went wrong.
+
+=item * Arguments
+
+    $headerizer->squawk($file, $func, $error);
+
+List of 3 arguments:  the file containing the error; the function containing
+the error; the text of the error message.
+
+=item * Return Value
+
+Undefined value.
+
+=item * Comment
+
+C<squawk()> does not print any warnings or errors itself.  Use
+C<print_warnings()> to report those.
+
+=back
 
 =cut
 
@@ -480,6 +657,27 @@ sub squawk {
 
     return;
 }
+
+=head2 C<process_sources()>
+
+=over 4
+
+=item * Purpose
+
+Once the source files needing headerization have been identified, this method
+serves as a wrapper around that headerization.
+
+=item * Arguments
+
+None.
+
+=item * Return Value
+
+None.
+
+=back
+
+=cut
 
 sub process_sources {
     my ($self) = @_;
@@ -530,6 +728,20 @@ sub process_sources {
     }
 }
 
+=head2 C<replace_headerized_declarations()>
+
+=over 4
+
+=item * Purpose
+
+=item * Arguments
+
+=item * Return Value
+
+=back
+
+=cut
+
 sub replace_headerized_declarations {
     my $self = shift;
     my $source_code = shift;
@@ -558,6 +770,19 @@ sub replace_headerized_declarations {
     return add_headerizer_markers( $markers_args );
 }
 
+=head2 C<make_function_decls()>
+
+=over 4
+
+=item * Purpose
+
+=item * Arguments
+
+=item * Return Value
+
+=back
+
+=cut
 
 sub make_function_decls {
     my $self = shift;
@@ -609,6 +834,20 @@ sub make_function_decls {
     return @decls;
 }
 
+=head2 C<attrs_from_args()>
+
+=over 4
+
+=item * Purpose
+
+=item * Arguments
+
+=item * Return Value
+
+=back
+
+=cut
+
 sub attrs_from_args {
     my $self = shift;
     my $func = shift;
@@ -652,9 +891,15 @@ sub print_final_message {
 
 =item * Purpose
 
+Print all warnings accumulated in the course of the headerization process.
+
 =item * Arguments
 
+None.
+
 =item * Return Value
+
+Implicitly returns true value upon success.
 
 =item * Comment
 
