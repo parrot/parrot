@@ -23,6 +23,7 @@ NEWS                                                        [main]doc
 PBC_COMPAT                                                  [main]doc
 PLATFORMS                                                   [devel]doc
 README                                                      [devel]doc
+README.espanol                                              []
 README.polski                                               []
 README_cygwin.pod                                           [devel]doc
 README_win32.pod                                            [devel]doc

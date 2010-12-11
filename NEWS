@@ -7,8 +7,10 @@ New in 2.11.0
  + PIRC
    - left the nest and is currently at https://github.com/parrot/pirc/
  + Community
-   - README translated into the following languages:
-        Polish
+   - Our README was translated into the following languages,
+    by Google Code-In students and mentors:
+        Polish      README.polski
+        Spanish     README.espanol
 
 New in 2.10.0
 - Core
