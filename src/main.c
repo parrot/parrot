@@ -472,7 +472,7 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
                 exit(EXIT_FAILURE);
             }
             arg = argv[pos];
-            initargs->gc_system = (char *)arg;
+            initargs->gc_system = arg;
             break;
         }
 

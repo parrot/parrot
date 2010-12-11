@@ -897,7 +897,7 @@ $(INSTALLABLEPARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     src/install_config$(O) \
     $(PARROT)
 	$(LINK) @ld_out@$@ \
-    src/main$(O) src/install_config$(O) \
+    src/main$(O) src/install_config$(O) include/parrot/api.h \
     @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
@@ -1548,7 +1548,8 @@ src/main$(O) : \
     $(INC_DIR)/runcore_api.h \
     src/gc/gc_private.h \
     src/main.c \
-    src/gc/variable_size_pool.h
+    src/gc/variable_size_pool.h \
+    include/parrot/api.h
 
 src/multidispatch$(O) : \
     src/multidispatch.c \
