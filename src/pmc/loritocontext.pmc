@@ -1,0 +1,378 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+
+=head1 NAME
+
+src/pmc/loritocontext.pmc - LoritoContext PMC
+
+=head1 DESCRIPTION
+
+A C<LoritoContext> has a copy of the interpreter's context at the location where
+the LoritoContext was constructed.  See the L<Glossary|docs/glossary.pod> for
+more information.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+
+#include "parrot/oplib/ops.h"
+#include "pmc/pmc_sub.h"
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+
+/*
+ * A LoritoContext (and an ExceptionHandler) has in its context a pointer
+ * to the register frame, which contains active objects.
+ * Additionally ct->current_cont has the continuation of the caller.
+ */
+
+pmclass LoritoContext auto_attrs provides invokable {
+    /* continuation destination */
+    ATTR PackFile_ByteCode *seg;             /* bytecode segment */
+    ATTR opcode_t          *address;         /* start of bytecode, addr to continue */
+    ATTR PMC               *to_ctx;          /* pointer to dest context */
+    ATTR PMC               *to_call_object;  /* pointer to CallSignature */
+    /* a LoritoContext keeps the from_ctx alive */
+    ATTR PMC               *from_ctx;        /* sub, this cont is returning from */
+    ATTR int                runloop_id;      /* id of the creating runloop. */
+    ATTR int                invoked;         /* flag when a handler has been invoked. */
+
+/*
+
+=item C<void init()>
+
+Initializes the continuation.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        PMC * const to_ctx = CURRENT_CONTEXT(INTERP);
+
+        SET_ATTR_to_ctx(INTERP, SELF, to_ctx);
+        SET_ATTR_to_call_object(INTERP, SELF, Parrot_pcc_get_signature(INTERP, to_ctx));
+        SET_ATTR_from_ctx(INTERP, SELF, CURRENT_CONTEXT(INTERP));
+        SET_ATTR_runloop_id(INTERP, SELF, 0);
+        SET_ATTR_seg(INTERP, SELF, INTERP->code);
+        SET_ATTR_address(INTERP, SELF, NULL);
+
+        PObj_custom_mark_SET(SELF);
+    }
+
+
+/*
+
+=item C<void init_pmc(PMC *continuation)>
+
+Initializes the continuation with values from the provided continuation.
+
+=cut
+
+*/
+
+
+    /* if they pass in a PMC to initialize with */
+    VTABLE void init_pmc(PMC *values) {
+        PMC               *to_ctx;
+        opcode_t          *address;
+        PackFile_ByteCode *seg;
+
+        GET_ATTR_to_ctx(INTERP, values, to_ctx);
+        SET_ATTR_to_ctx(INTERP, SELF, to_ctx);
+        SET_ATTR_to_call_object(INTERP, SELF, Parrot_pcc_get_signature(INTERP, to_ctx));
+
+        SET_ATTR_from_ctx(INTERP, SELF, CURRENT_CONTEXT(INTERP));
+        SET_ATTR_runloop_id(INTERP, SELF, 0);
+
+        GET_ATTR_seg(INTERP, values, seg);
+        SET_ATTR_seg(INTERP, SELF, seg);
+
+        GET_ATTR_address(INTERP, values, address);
+        SET_ATTR_address(INTERP, SELF, address);
+
+        PObj_custom_mark_SET(SELF);
+    }
+
+
+/*
+
+=item C<void mark()>
+
+Marks the continuation as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        PMC *tmp;
+
+        /* If LoritoContext wasn't fully constructed yet */
+        if (!PMC_data(SELF))
+            return;
+
+        GET_ATTR_to_ctx(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
+        GET_ATTR_to_call_object(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
+        GET_ATTR_from_ctx(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+    }
+
+
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the continuation.
+
+=cut
+
+*/
+
+    VTABLE PMC *clone() {
+        /* Start to prepare for subclassable continuations */
+        return Parrot_pmc_new_init(INTERP, SELF->vtable->base_type, SELF);
+    }
+
+
+/*
+
+=item C<PMC *set_pmc()>
+
+Assigns context.
+
+=cut
+
+*/
+    VTABLE void set_pmc(PMC *src) {
+        STRUCT_COPY(PMC_data_typed(SELF, Parrot_LoritoContext_attributes *),
+                    PMC_data_typed(src,  Parrot_LoritoContext_attributes *));
+    }
+
+/*
+
+=item C<void set_pointer(void *value)>
+
+Sets the pointer to the given return instruction and captures the runloop id
+for any returned values.
+
+=cut
+
+*/
+
+    VTABLE void set_pointer(void *value) {
+        SET_ATTR_address(INTERP, SELF, (opcode_t *)value);
+        SET_ATTR_runloop_id(INTERP, SELF, INTERP->current_runloop_id);
+    }
+
+
+/*
+
+=item C<void *get_pointer()>
+
+Returns the pointer to the return instruction.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer() {
+        opcode_t          *address;
+
+        GET_ATTR_address(INTERP, SELF, address);
+        return address;
+    }
+
+
+/*
+
+=item C<INTVAL defined()>
+
+=item C<INTVAL get_bool()>
+
+Returns whether the subroutine is defined.
+
+=cut
+
+*/
+
+    VTABLE INTVAL defined() {
+        opcode_t          *address;
+
+        GET_ATTR_address(INTERP, SELF, address);
+        return address != NULL;
+    }
+
+
+    VTABLE INTVAL get_bool() {
+        opcode_t          *address;
+
+        GET_ATTR_address(INTERP, SELF, address);
+        return address != NULL;
+    }
+
+
+/*
+
+=item C<opcode_t *invoke(void *next)>
+
+Restores the context of the interpreter and returns the branch
+destination to continue execution.
+
+=cut
+
+*/
+
+    VTABLE opcode_t *invoke(void *next) {
+        PMC * const        from_obj = Parrot_pcc_get_signature(INTERP, CURRENT_CONTEXT(INTERP));
+        PMC               *to_ctx, *call_obj;
+        opcode_t          *pc;
+        PackFile_ByteCode *seg;
+        UNUSED(next)
+
+        GET_ATTR_seg(INTERP, SELF, seg);
+        GET_ATTR_address(INTERP, SELF, pc);
+        GET_ATTR_to_ctx(INTERP, SELF, to_ctx);
+        GET_ATTR_to_call_object(INTERP, SELF, call_obj);
+
+        Parrot_sub_continuation_check(INTERP, SELF);
+        Parrot_sub_continuation_rewind_environment(INTERP, SELF);
+
+        if (!PMC_IS_NULL(from_obj))
+            Parrot_pcc_set_signature(INTERP, CURRENT_CONTEXT(INTERP), from_obj);
+
+        /* switch segment */
+        if (INTERP->code != seg)
+            Parrot_switch_to_cs(INTERP, seg, 1);
+
+        return pc;
+    }
+
+
+/*
+
+=item C<STRING *get_string()>
+
+Experimental: returns caller info as a STRING.
+
+=cut
+
+*/
+
+    VTABLE STRING *get_string() {
+        PMC *to_ctx;
+
+        GET_ATTR_to_ctx(INTERP, SELF, to_ctx);
+        return Parrot_sub_Context_infostr(INTERP, to_ctx);
+    }
+
+
+/*
+
+=item C<INTVAL rid()>
+
+Experimental: return the runloop_id value.
+
+=cut
+
+*/
+
+    METHOD rid() {
+        INTVAL runloop_id;
+        GET_ATTR_runloop_id(INTERP, SELF, runloop_id);
+        RETURN(INTVAL runloop_id);
+    }
+
+/*
+
+=item C<PMC *caller()>
+
+Experimental: return callers PMC or PMCNULL if none.
+
+=cut
+
+*/
+
+    METHOD caller() {
+        PMC *to_ctx, *caller;
+
+        GET_ATTR_to_ctx(INTERP, SELF, to_ctx);
+
+        caller = Parrot_pcc_get_sub(INTERP, to_ctx);
+
+        if (!caller)
+            caller = PMCNULL;
+        else {
+            Parrot_Sub_attributes *sub;
+            PMC_get_sub(INTERP, caller, sub);
+            if (!sub->seg)
+                caller = PMCNULL;
+        }
+
+        RETURN(PMC *caller);
+
+    }
+
+
+/*
+
+=item C<PMC *continuation()>
+
+Experimental: returns continuation PMC of this LoritoContext or PMCNULL if none.
+
+=cut
+
+*/
+
+    METHOD continuation() {
+        PMC *to_ctx, *cont;
+
+        GET_ATTR_to_ctx(INTERP, SELF, to_ctx);
+
+        cont = Parrot_pcc_get_continuation(INTERP, to_ctx);
+
+        if (cont)
+            RETURN(PMC *cont);
+
+        RETURN(PMC *PMCNULL);
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
