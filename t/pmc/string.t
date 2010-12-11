@@ -620,7 +620,7 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
 
     is( t, 'TAACGSTAACGS', 'trans' )
     is( s, 'atugcsATUGCS', "trans doesn't touch source string")
-    
+
     push_eh THROWN
     $I0 = 1
     $P0.'trans'(unicode:"abc", tr_00)
@@ -692,7 +692,7 @@ loop:
   $S1 = substr $S0, 3, 3
   $I0 = $P0.'is_integer'($S1)
   ok( $I0, '... substr' )
-  
+
   push_eh THROWN
   $I0 = 1
   $P0.'is_integer'(unicode:"123")
@@ -929,16 +929,16 @@ check:
 
 .sub test_unescape
     .local pmc s1, s2
-    
+
     s1 = new['String']
     s1 = '\n'
     s2 = s1.'unescape'('ascii')
     is( s2, "\n", "unescape('\\n') == \"\\n\"" )
-    
+
     s1 = '\x41\x42'
     s2 = s1.'unescape'('ascii')
     is( s2, 'AB', "unescape('\\x41\\x42') == 'AB'" )
-    
+
     s1 = '\u0043\u0044'
     s2 = s1.'unescape'('ascii')
     is( s2, 'CD', "unescape('\\u0043\\u0044') == 'CD'" )
