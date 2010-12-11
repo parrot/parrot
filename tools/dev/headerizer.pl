@@ -91,6 +91,15 @@ $headerizer->print_final_message();
 $headerizer->print_warnings();
 
 
+=head1 AUTHOR
+
+The original headerizer program was created by Andy Lester in May 2006, with
+assistance from Jerry Gay and others.  In the last half of 2010, Most of the
+code was refactored into F<lib/Parrot/Headerizer/Object.pm> and
+F<lib/Parrot/Headerizer/Functions.pm> by James E Keenan.
+
+=cut
+
 # From earlier documentation:
 # * Generate docs from funcs
 # * Somehow handle static functions in the source file

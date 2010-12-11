@@ -48,7 +48,6 @@ use Parrot::Headerizer::Functions qw(
     validate_prototype_args
     no_both_static_and_PARROT_EXPORT
     handle_split_declaration
-    asserts_from_args
     shim_test
     handle_modified_args
     add_newline_if_multiline

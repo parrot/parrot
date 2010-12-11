@@ -5,7 +5,6 @@ package Parrot::Headerizer::Functions;
 use strict;
 use warnings;
 use base qw( Exporter );
-use Data::Dumper;$Data::Dumper::Indent=1;
 our @EXPORT_OK = qw(
     process_argv
     read_file
@@ -32,11 +31,22 @@ Parrot::Headerizer::Functions - Functions used in headerizer programs
 =head1 SYNOPSIS
 
     use Parrot::Headerizer::Functions qw(
-        print_headerizer_warnings
+        process_argv
         read_file
         write_file
         qualify_sourcefile
+        replace_pod_item
+        no_both_PARROT_EXPORT_and_PARROT_INLINE
+        validate_prototype_args
+        no_both_static_and_PARROT_EXPORT
+        handle_split_declaration
         asserts_from_args
+        shim_test
+        handle_modified_args
+        add_asserts_to_declarations
+        add_newline_if_multiline
+        func_modifies
+        add_headerizer_markers
     );
 
 =head1 DESCRIPTION
@@ -52,7 +62,7 @@ F<tools/dev/headerizer.pl>.
 
 =item * Purpose
 
-Validate list of object files provided as arguments.
+Validate (mostly, deduplicate) list of names of object files provided as arguments.
 
 =item * Arguments
 
@@ -62,9 +72,8 @@ List of files specified on the command-line.
 
 =item * Return Value
 
-Validated list of object files.
-
-=item * Comment
+Deduplicated list of object files.  Dies if no filenames were specified as
+arguments.
 
 =back
 
@@ -229,7 +238,16 @@ sub qualify_sourcefile {
     return ($sourcefile, $source_code, $hfile);
 }
 
-=pod
+=head2 C<replace_pod_item()>
+
+=over 4
+
+=item * Purpose
+
+In the course of headerizing, replaces a POD C<=item>-type line with a heading
+created by C<generate_documentation_signature()>.
+
+=item * Arguments
 
     $text = replace_pod_item( {
         text        => $text,
@@ -237,6 +255,12 @@ sub qualify_sourcefile {
         heading     => $heading,
         cfile_name  => $cfile_name,
     } );
+
+=item * Return Value
+
+String holding modified text of file.
+
+=back
 
 =cut
 
@@ -251,7 +275,16 @@ sub replace_pod_item {
     return $args->{text};
 }
 
-=pod
+=head2 C<no_both_PARROT_EXPORT_and_PARROT_INLINE()>
+
+=over 4
+
+=item * Purpose
+
+Checks that a given Parrot function cannot simultaneously have both of the
+macros in the function's name.
+
+=item * Arguments
 
     no_both_PARROT_EXPORT_and_PARROT_INLINE( {
         file            => $file,
@@ -259,6 +292,12 @@ sub replace_pod_item {
         parrot_inline   => $parrot_inline,
         parrot_api      => $parrot_api,
     } );
+
+=item * Return Value
+
+Returns true value upon success.
+
+=back
 
 =cut
 
@@ -270,9 +309,21 @@ sub no_both_PARROT_EXPORT_and_PARROT_INLINE {
     return 1;
 }
 
-=pod
+=head2 C<validate_prototype_args()>
+
+=over 4
+
+=item * Purpose
+
+Performs some validation on prototype arguments.
+
+=item * Arguments
 
     @args = validate_prototype_args( $args, $proto );
+
+=item * Return Value
+
+=back
 
 =cut
 
@@ -289,7 +340,16 @@ sub validate_prototype_args {
     return @args;
 }
 
-=pod
+=head2 C<no_both_static_and_PARROT_EXPORT()>
+
+=over 4
+
+=item * Purpose
+
+Checks that a given function cannot be simultaneously labelled as both static
+and C<PARROT_EXPORT>.
+
+=item * Arguments
 
     ($return_type, $is_static) = no_both_static_and_PARROT_EXPORT( {
         file            => $file,
@@ -297,6 +357,13 @@ sub validate_prototype_args {
         return_type     => $return_type,
         parrot_api      => $parrot_api,
     } );
+
+=item * Return Value
+
+List of two items: String holding the return type; Boolean indicating whether
+function is static or not.
+
+=back
 
 =cut
 
@@ -309,12 +376,27 @@ sub no_both_static_and_PARROT_EXPORT {
     return ($args->{return_type}, $is_static);
 }
 
-=pod
+=head2 C<handle_split_declaration()>
 
-    my $split_decl = handle_split_declaration(
+=over 4
+
+=item * Purpose
+
+Reformats declarations with appropriate line breaks to avoid long, unwieldy
+lines.
+
+=item * Arguments
+
+    $split_decl = handle_split_declaration(
         $function_decl,
         $line_len,
     );
+
+=item * Return Value
+
+String holding declaration, broken into shorter lines as needed.
+
+=back
 
 =cut
 
@@ -338,6 +420,32 @@ sub handle_split_declaration {
 
     return $split_decl;
 }
+
+=head2 C<asserts_from_args()>
+
+=over 4
+
+=item * Purpose
+
+Compose assertions to be added to headers.
+
+=item * Arguments
+
+    @asserts = asserts_from_args( @this_functions_args );
+
+List of function arguments.
+
+=item * Return Value
+
+List of strings holding assertions to be added to that function's header.
+
+=item * Comment
+
+Called within C<add_asserts_to_declarations()>.
+
+=back
+
+=cut
 
 sub asserts_from_args {
     my @args = @_;
@@ -368,9 +476,26 @@ sub asserts_from_args {
     return (@asserts);
 }
 
-=pod
+=head2 C<shim_test()>
 
-    my @modified_args = shim_test($func, \@args);
+=over 4
+
+=item * Purpose
+
+Determine whether an argument needs to include C<SHIM> or <NULLOK>.
+
+=item * Arguments
+
+    @modified_args = shim_test($func, \@args);
+
+List of two elements: hash reference holding function characteristics;
+reference to array holding list of arguments.
+
+=item * Return Value
+
+List of modified arguments.
+
+=back
 
 =cut
 
@@ -390,6 +515,30 @@ sub shim_test {
     }
     return @args;
 }
+
+=head2 C<handle_modified_args()>
+
+=over 4
+
+=item * Purpose
+
+Performs some modifications of arguments.
+
+=item * Arguments
+
+    ($decl, $multiline) = handle_modified_args($decl, \@modified_args);
+
+List of two arguments: string holding a declaration; reference to an array of
+modified arguments.
+
+=item * Return Value
+
+List of two elements:  String holding declaration, modified as needed; Boolean
+indicating whether declaration runs over more than one line (multiline) or not.
+
+=back
+
+=cut
 
 sub handle_modified_args {
     my ($decl, $modified_args_ref) = @_;
@@ -411,12 +560,59 @@ sub handle_modified_args {
     return ($decl, $multiline);
 }
 
-#        $decl .= $multiline ? ";\n" : ";";
+=head2 C<add_newline_if_multiline()>
+
+=over 4
+
+=item * Purpose
+
+Guarantee proper formatting of multiline declarations.
+
+=item * Arguments
+
+    $decl = add_newline_if_multiline($decl, $multiline);
+
+List of two arguments: String holding declaration; scalar holding Boolean
+indicating whether declaration runs over more than one line or not.
+
+=item * Return Value
+
+String holding the declaration, with an additional newline added as needed.
+
+=back
+
+=cut
+
 sub add_newline_if_multiline {
     my ($decl, $multiline) = @_;
     $decl .= $multiline ? ";\n" : ";";
     return $decl;
 }
+
+=head2 C<add_asserts_to_declarations()>
+
+=over 4
+
+=item * Purpose
+
+Formulates an assertion, where needed.  Currently, assertions begin like this:
+
+    #define ASSERT_ARGS_
+
+=item * Arguments
+
+    @decls = add_asserts_to_declarations( \@funcs, \@decls );
+
+List of two arguments: Reference to array of hash references holding
+characteristics of functions; reference to array of declarations.
+
+=item * Return Value
+
+List of strings holding declarations.
+
+=back
+
+=cut
 
 sub add_asserts_to_declarations {
     my ($funcs_ref, $decls_ref) = @_;
@@ -441,9 +637,26 @@ sub add_asserts_to_declarations {
     return @{ $decls_ref };
 }
 
-=pod
+=head2 C<func_modifies()>
+
+=over 4
+
+=item * Purpose
+
+Add C<FUNC_MODIFIES> where needed.
+
+=item * Arguments
 
    @mods = func_modifies($arg, \@mods);
+
+List of two items: String holding function text; reference to array of
+modifications.
+
+=item * Return Value
+
+Augmented list of modifications.
+
+=back
 
 =cut
 
@@ -462,14 +675,32 @@ sub func_modifies {
     }
     return @mods;
 }
-=pod
 
-    return add_headerizer_markers( {
+
+=head2 C<add_headerizer_markers()>
+
+=over 4
+
+=item * Purpose
+
+Takes headerizer markers in source code files (like C<HEADERIZER_BEGIN> and
+C<HEADERIZER END>) and formulates appropriate variants to be placed in the
+headerfile.
+
+=item * Arguments
+
+    $source_code = add_headerizer_markers( {
         function_decls  => \@function_decls,
         sourcefile      => $sourcefile,
         hfile           => $hfile,
         code            => $source_code,
     } );
+
+=item * Return Value
+
+String holding modified source code.
+
+=back
 
 =cut
 
