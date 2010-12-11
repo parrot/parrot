@@ -1,0 +1,47 @@
+/*
+ * Copyright (C) 2010, Parrot Foundation.
+ */
+
+/*
+** lorito.ops
+*/
+
+=head1 NAME
+
+lorito.ops - Prototype Lortio M0 opcodes
+
+=cut
+
+=head1 DESCRIPTION
+
+Lorito M0 opcodes
+
+=cut
+
+=head1 HISTORY
+
+Initial version by Jonathan "Duke" Leto, as discussed at a meeting
+between Duke, chromatic, Allison and cotto on 10. December 2010.
+
+All opcodes will take 4 arguments, but there will be an implict 1st argument
+of the current Context to each opcode, so in practice, only 3 arguments
+are passed to opcodes.
+
+
+=cut
+
+op context() {
+    CURRENT_CONTEXT(interp);
+}
+
+
+=back
+
+=cut
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

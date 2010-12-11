@@ -111,3 +111,18 @@ src/dynoplibs/io_ops.h: src/dynoplibs/io_ops.c
 
 src/dynoplibs/io_ops.c: src/dynoplibs/io.ops $(OPS2C)
 	$(OPS2C) --dynamic src/dynoplibs/io.ops --quiet
+
+#########################
+
+$(DYNEXT_DIR)/lorito_ops$(LOAD_EXT): src/dynoplibs/lorito_ops$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ src/dynoplibs/lorito_ops$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/lorito_ops$(O): $(DYNOP_O_DEPS) \
+    src/dynoplibs/lorito_ops.c src/dynoplibs/lorito_ops.h
+
+src/dynoplibs/lorito_ops.h: src/dynoplibs/lorito_ops.c
+
+src/dynoplibs/lorito_ops.c: src/dynoplibs/lorito.ops $(OPS2C)
+	$(OPS2C) --dynamic src/dynoplibs/lorito.ops --quiet
