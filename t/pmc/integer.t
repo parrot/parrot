@@ -46,6 +46,13 @@ Tests the Integer PMC.
     test_cmp_subclass()
     test_cmp_RT59336()
     test_cmp_num()
+
+    #test_autopromotion_to_BigInt()
+    #test_sub_BigInt()
+    #test_mul_BigInt()
+    #test_div_BigInt()
+    #test_mod_BigInt()
+    #test_neg_BigInt()
 .end
 
 .sub test_init
@@ -101,38 +108,52 @@ CODE
     .sub main
         .include "errors.pasm"
         errorson .PARROT_ERRORS_OVERFLOW_FLAG
-        
+
         $P0 = new ['Integer']
         $P0 = 2048
         $P0 *= 2048
         $P0 *= 2048
-        say $P0
     .end
 CODE
 
-    .include 'sysinfo.pasm'
-    .local pmc bigint_1
-    int_1 = new ['Integer']
-    bigint_1 = new ['BigInt']
-    
-    $I0 = sysinfo .SYSINFO_PARROT_INTMIN
-    int_1 = $I0
-    bigint_1 = int_1 - 1
-    
-    dec int_1
-    $P0 = typeof int_1
-    is(int_1, bigint_1, 'dec integer overflow promotion')
-    is($P0, 'BigInt', 'dec integer overflow type check')
-    
     int_1 = new ['Integer']
     int_1 = -57494
     int_1 = abs int_1
     is(int_1, 57494, 'absolute value, assignment')
-    
+
     int_1 = new ['Integer']
     int_1 = 6
     abs int_1
-    is(int_1, 6, 'absolute value, in-place')    
+    is(int_1, 6, 'absolute value, in-place')
+.end
+
+.sub test_autopromotion_to_BigInt
+    push_eh _dont_have_bigint_library
+    .include 'sysinfo.pasm'
+    .local pmc bigint_1
+    .local pmc int_1
+
+    int_1 = new ['Integer']
+    bigint_1 = new ['BigInt']
+
+    $I0 = sysinfo .SYSINFO_PARROT_INTMIN
+    int_1 = $I0
+    bigint_1 = int_1 - 1
+    pop_eh
+
+    dec int_1
+    $P0 = typeof int_1
+    is(int_1, bigint_1, 'dec integer overflow promotion')
+    is($P0, 'BigInt', 'dec integer overflow type check')
+
+    goto _have_bigint_library
+  _dont_have_bigint_library:
+    pop_eh
+
+    # TODO: What should we do here?
+    ok(1, "no bigint library")
+    ok(1, "no bigint library")
+  _have_bigint_library:
 .end
 
 .sub test_truthiness_and_definedness
@@ -356,14 +377,14 @@ fin:
    set $P1, 4
    add $P0, $P1
    is($P0, "4+0i", 'add complex number')
-   
+
    new $P0, ['Integer']
    new $P1, ['Float']
    set $P0, 31
    set $P1, 20.1
    add $P0, $P1
    is($P0, 51, 'add DEFAULT')
-   
+
    new $P0, ['Integer']
    set $P0, 2
    add $P0, 3.14159
@@ -371,14 +392,16 @@ fin:
    is($P0, 10, 'add_float')
 .end
 
-.sub test_sub
+.sub test_sub_BigInt
     $P0 = new ['BigInt']
     $P0 = 424124
     $P1 = new ['Integer']
     $P1 = 424125
     sub $P1, $P1, $P0
     is($P1, 1, 'BigInt sub (no exception)')
-    
+.end
+
+.sub test_sub
     $P0 = new ['Float']
     $P0 = 3.1
     $P1 = new ['Integer']
@@ -390,31 +413,31 @@ fin:
     $P0 = -1073741824
     sub $P0, $P0, 1073741825
     is($P0, -2147483649, 'BigInt sub overflow')
-    
+
     $P0 = new ['Integer']
     $P0 = -1073741824
     sub $P0, 1073741825
     is($P0, -2147483649, 'i_subtract_int overflow')
-    
+
     $P0 = new ['Integer']
     $P1 = new ['Integer']
     $P0 = -1073741824
     $P1 = 1073741825
     sub $P0, $P1
     is($P0, -2147483649, 'i_subtract overflow')
-    
+
     $P0 = new ['Integer']
     $P0 = 5
     sub $P0, 4.5
     is($P0, .5, 'i_subtract_float')
-    
+
     $P0 = new ['Integer']
     $P1 = new ['Complex']
     $P0 = 0
     $P1 = "4+2i"
     sub $P0, $P1
     is($P0, "-4-2i", 'subtract Complex number')
-    
+
     $P0 = new ['Integer']
     $P1 = new ['Float']
     $P0 = 5
@@ -430,28 +453,18 @@ fin:
     $P1 = "256"
     mul $P0, $P0, $P1
     is($P0, 256, 'multiply Integer PMC by String PMC')
-    
+
     $P1 = new ['Float']
     $P0 = 2
     $P1 = 3.14
     mul $P0, $P0, $P1
     is($P0, 6, 'multiply Integer PMC by Float PMC')
-    
+
     $P1 = new ['Integer']
     $P1 = 4
     mul $P0, $P1
     is($P0, 24, 'i_multiply Integer PMC by Integer PMC')
 
-    $P0 = new ['Integer']
-    $P1 = new ['BigInt']
-    $P2 = new ['Integer']
-    $P0 = 24
-    $P1 = 2
-    $P2 = 48
-    mul $P0, $P1
-    $I0 = iseq $P0, $P2
-    todo($I0, 'i_multiply Integer PMC by BigInt PMC', 'unresolved bug, see TT #1887')
-    
     $P0 = new ['Integer']
     $P1 = new ['Complex']
     $P2 = new ['Complex']
@@ -461,28 +474,42 @@ fin:
     mul $P0, $P1
     $I0 = iseq $P0, $P2
     todo($I0, 'i_multiply Integer PMC by Complex PMC', 'unresolved bug, see TT #1887')
-    
+
     $P0 = new ['Integer']
     $P1 = new ['Float']
     $P0 = 2
     $P1 = 3.5
     mul $P0, $P1
     is($P0, 7, 'i_multiply Integer PMC by DEFAULT')
-    
-    $P0 = new ['Integer']
-    $P0 = 1073741824
-    mul $P0, 2
-    $P1 = typeof $P0
-    is($P0, 2147483648, 'i_multiply_int overflow promotion')
-    is($P1, 'BigInt', 'i_multiple_int overflow type check')
-    
+
+
+
     $P0 = new ['Integer']
     $P0 = 2
     mul $P0, 5.5
     is($P0, 11, 'i_multiply_float')
 .end
 
-.sub test_div
+.sub test_mul_BigInt
+    $P0 = new ['Integer']
+    $P1 = new ['BigInt']
+    $P2 = new ['Integer']
+    $P0 = 24
+    $P1 = 2
+    $P2 = 48
+    mul $P0, $P1
+    $I0 = iseq $P0, $P2
+    todo($I0, 'i_multiply Integer PMC by BigInt PMC', 'unresolved bug, see TT #1887')
+
+    $P0 = new ['Integer']
+    $P0 = 1073741824
+    mul $P0, 2
+    $P1 = typeof $P0
+    is($P0, 2147483648, 'i_multiply_int overflow promotion')
+    is($P1, 'BigInt', 'i_multiple_int overflow type check')
+.end
+
+.sub test_div_BigInt
     $P0 = new ['Integer']
     $P1 = new ['BigInt']
     $P0 = 50
@@ -491,7 +518,36 @@ fin:
     $P3 = typeof $P2
     is($P2, 2, 'divide overflow promotion')
     is($P3, 'BigInt', 'divide overflow type check')
-    
+
+    $P0 = new ['Integer']
+    $P1 = new ['BigInt']
+    $P0 = 50
+    $P1 = 25
+    div $P0, $P1
+    $P2 = typeof $P0
+    is($P0, 2, 'i_divide overflow promotion')
+    is($P2, 'BigInt', 'i_divide overflow type check')
+
+    $P0 = new ['Integer']
+    $P1 = new ['BigInt']
+    $P0 = 10
+    $P1 = 7
+    $P0 = fdiv $P0, $P1
+    $P2 = typeof $P0
+    is($P0, 1, 'floor_divide overflow promotion')
+    is($P2, 'BigInt', 'floor_divide overflow type check')
+
+    $P0 = new ['Integer']
+    $P1 = new ['BigInt']
+    $P0 = 20
+    $P1 = 9
+    fdiv $P0, $P1
+    $P2 = typeof $P0
+    is($P0, 2, 'i_floor_divide overflow promotion')
+    is($P2, 'BigInt', 'i_floor_divide overflow type check')
+.end
+
+.sub test_div
     throws_substring(<<'CODE', 'float division by zero', 'divide by 0 (Float PMC)')
     .sub main
         $P0 = new ['Integer']
@@ -504,21 +560,12 @@ fin:
 CODE
 
     $P0 = new ['Integer']
-    $P1 = new ['BigInt']
-    $P0 = 50
-    $P1 = 25
-    div $P0, $P1
-    $P2 = typeof $P0
-    is($P0, 2, 'i_divide overflow promotion')
-    is($P2, 'BigInt', 'i_divide overflow type check')
-    
-    $P0 = new ['Integer']
     $P1 = new ['Float']
     $P0 = 50
     $P1 = .5
     div $P0, $P1
     is($P0, 100, 'i_divide DEFAULT multi')
-    
+
     throws_substring(<<'CODE', 'float division by zero', 'i_divide by 0 (Float PMC)')
     .sub main
         $P0 = new ['Integer']
@@ -529,16 +576,7 @@ CODE
         say $P0
     .end
 CODE
-    
-    $P0 = new ['Integer']
-    $P1 = new ['BigInt']
-    $P0 = 10
-    $P1 = 7
-    $P0 = fdiv $P0, $P1
-    $P2 = typeof $P0
-    is($P0, 1, 'floor_divide overflow promotion')
-    is($P2, 'BigInt', 'floor_divide overflow type check')
-    
+
     throws_substring(<<'CODE', 'float division by zero', 'floor_divide by 0 (Float PMC)')
     .sub main
         $P0 = new ['Integer']
@@ -558,12 +596,12 @@ CODE
         say $P0
     .end
 CODE
-    
+
     $P0 = new ['Integer']
     $P0 = 22
     $P0 = fdiv $P0, 7
     is($P0, 3, 'floor_divide INTVAL')
-    
+
     throws_substring(<<'CODE', 'float division by zero', 'floor_divide by 0 (INTVAL)')
     .sub main
         $P0 = new ['Integer']
@@ -572,23 +610,14 @@ CODE
         say $P0
     .end
 CODE
-    
-    $P0 = new ['Integer']
-    $P1 = new ['BigInt']
-    $P0 = 20
-    $P1 = 9
-    fdiv $P0, $P1
-    $P2 = typeof $P0
-    is($P0, 2, 'i_floor_divide overflow promotion')
-    is($P2, 'BigInt', 'i_floor_divide overflow type check')
-    
+
     $P0 = new ['Integer']
     $P1 = new ['Float']
     $P0 = 20
     $P1 = 2.3
     fdiv $P0, $P1
     is($P0, 8, 'i_floor_divide DEFAULT multi')
-    
+
     throws_substring(<<'CODE', 'float division by zero', 'i_floor_divide by 0 (DEFAULT)')
     .sub main
         $P0 = new ['Integer']
@@ -599,11 +628,11 @@ CODE
         say $P0
     .end
 CODE
-    
+
     $P0 = 20
     fdiv $P0, 7
     is($P0, 2, 'i_floor_divide INTVAL multi')
-    
+
     throws_substring(<<'CODE', 'float division by zero', 'i_floor_divide by 0 INTVAL multi')
     .sub main
         $P0 = new ['Integer']
@@ -612,11 +641,11 @@ CODE
         say $P0
     .end
 CODE
-    
+
     $P0 = 20
     fdiv $P0, 2.3
     is($P0, 8, 'i_floor_divide FLOATVAL multi')
-    
+
     throws_substring(<<'CODE', 'float division by zero', 'i_floor_divide by 0 FLOATVAL multi')
     .sub main
         $P0 = new ['Integer']
@@ -625,7 +654,7 @@ CODE
         say $P0
     .end
 CODE
-    
+
 .end
 
 .sub test_arithmetic
@@ -648,7 +677,7 @@ CODE
     is($P2,0)
 .end
 
-.sub test_mod
+.sub test_mod_BigInt
     $P0 = new ['Integer']
     $P1 = new ['BigInt']
     $P0 = 7
@@ -657,7 +686,18 @@ CODE
     $P2 = typeof $P0
     is($P0, 2, 'modulus overflow promotion')
     is($P2, 'BigInt', 'modulus overflow type check')
-    
+
+    $P0 = new ['Integer']
+    $P1 = new ['BigInt']
+    $P0 = 7
+    $P1 = 5
+    mod $P0, $P1
+    $P2 = typeof $P0
+    is($P0, 2, 'i_modulus overflow promotion')
+    is($P2, 'BigInt', 'i_modulus overflow type check')
+.end
+
+.sub test_mod
     throws_substring(<<'CODE', 'int modulus by zero', 'modulus by 0 DEFAULT multi')
     .sub main
         $P0 = new ['Integer']
@@ -668,12 +708,12 @@ CODE
         say $P0
     .end
 CODE
-    
+
     $P0 = new ['Integer']
     $P0 = 7
     $P0 = mod $P0, 4
     is($P0, 3, 'modulus INTVAL multi')
-    
+
     throws_substring(<<'CODE', 'int modulus by zero', 'modulus by 0 INTVAL multi')
     .sub main
         $P0 = new ['Integer']
@@ -690,23 +730,14 @@ CODE
         say $P0
     .end
 CODE
-    
-    $P0 = new ['Integer']
-    $P1 = new ['BigInt']
-    $P0 = 7
-    $P1 = 5
-    mod $P0, $P1
-    $P2 = typeof $P0
-    is($P0, 2, 'i_modulus overflow promotion')
-    is($P2, 'BigInt', 'i_modulus overflow type check')
-    
+
     $P0 = new ['Integer']
     $P1 = new ['Float']
     $P0 = 7
     $P1 = 5
     mod $P0, $P1
     is($P0, 2, 'i_modulus DEFAULT multi')
-    
+
     throws_substring(<<'CODE', 'int modulus by zero', 'i_modulus by 0 DEFAULT multi')
     .sub main
         $P0 = new ['Integer']
@@ -717,7 +748,7 @@ CODE
         say $P0
     .end
 CODE
-    
+
     $P0 = new ['Integer']
     $P0 = 7
     mod $P0, 4
@@ -725,7 +756,7 @@ CODE
     $P0 = 7
     mod $P0, 3.0
     is($P0, 1, 'i_modulus FLOATVAL multi')
-    
+
     throws_substring(<<'CODE', 'int modulus by zero', 'i_modulus by 0 INTVAL multi')
     .sub main
         $P0 = new ['Integer']
@@ -744,23 +775,25 @@ CODE
 CODE
 .end
 
-.sub test_neg
+.sub test_neg_BigInt
     .include 'sysinfo.pasm'
-    
+
     $P0 = new ['Integer']
     $P1 = new ['BigInt']
-    
+
     $I0 = sysinfo .SYSINFO_PARROT_INTMIN
-    
+
     $P0 = $I0
     $P1 = $I0
     neg $P1
-    
+
     $P0 = neg $P0
     $P2 = typeof $P0
     is($P0, $P1, 'neg integer overflow promotion')
     is($P2, 'BigInt', 'neg integer overflow type check')
-    
+.end
+
+.sub test_neg
     $P0 = new ['Integer']
     $P0 = -3
     neg $P0
@@ -862,7 +895,7 @@ fin:
     $P1 = new ['String']
     $P0 = 23
     $P1 = "23.4"
-    
+
     $I0 = cmp_num $P0, $P1
     is($I0, -1, 'cmp_num 23(Integer PMC), "23.4"(String PMC) = -1')
     $P1 = "23e-2"
@@ -882,7 +915,7 @@ fin:
     $P0 = 245
     $I0 = cmp_num $P0, $P1
     is($I0, 1, 'cmp_num 245(Integer PMC), "0"(String PMC) = 1')
-    
+
     $P1 = new ['Float']
     $P1 = 2.6
     $I0 = cmp_num $P0, $P1
@@ -893,7 +926,7 @@ fin:
     $P1 = 245
     $I0 = cmp_num $P0, $P1
     is($I0, 0, 'cmp_num 245(Integer PMC), 245(Float PMC) = 0')
-    
+
     $P1 = new ['Integer']
     $P1 = 300
     $I0 = cmp_num $P0, $P1
