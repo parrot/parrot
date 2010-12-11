@@ -23,6 +23,7 @@ NEWS                                                        [main]doc
 PBC_COMPAT                                                  [main]doc
 PLATFORMS                                                   [devel]doc
 README                                                      [devel]doc
+README.deutsch                                              []
 README.espanol                                              []
 README.polski                                               []
 README_cygwin.pod                                           [devel]doc
@@ -428,6 +429,7 @@ docs/project/core_inclusion.pod                             [doc]
 docs/project/debian_packaging_guide.pod                     [doc]
 docs/project/git_terminology.pod                            [doc]
 docs/project/git_workflow.pod                               [doc]
+docs/project/merge_review_guidelines.pod                    [doc]
 docs/project/metacommitter_guide.pod                        [doc]
 docs/project/release_manager_guide.pod                      [doc]
 docs/project/roles_responsibilities.pod                     [doc]
