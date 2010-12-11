@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config qw(%PConfig);
 use Parrot::Distribution;
-use Parrot::Headerizer;
+use Parrot::Headerizer::Object;
 
 =head1 NAME
 
@@ -30,7 +30,7 @@ declared.
 =cut
 
 my $DIST = Parrot::Distribution->new;
-my $headerizer = Parrot::Headerizer->new;
+my $headerizer = Parrot::Headerizer::Object->new;
 
 my @files = @ARGV ? @ARGV :
     map {s/^$PConfig{build_dir}\///; $_}
@@ -132,6 +132,7 @@ src/pmc/object.pmc
 src/pmc/sub.pmc
 src/pmc/threadinterpreter.pmc
 src/pmc/unmanagedstruct.pmc
+t/tools/dev/headerizer/testlib/nci_pmc.in
 
 # Local Variables:
 #   mode: cperl
