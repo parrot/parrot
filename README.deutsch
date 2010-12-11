@@ -30,9 +30,9 @@ Für alle PLattformen die wir unterstüzen sollte Parrot ohne Änderung
 gebrauchbar sein. docs/parrot.pod zeigt unsere unterstützten Plattformen. PLATFORMS stellt
 Berichte zur Verfügung über die Plattformen für welche Parrot gebaut wurde.
 
-WIE MAN PARROT VON GIT INSTALLIERT
+WIE MAN PARROT VON GITHUB INSTALLIERT
 ----------------------------------
-I.  Git installiere:
+I.  Git installieren:
 
 Linux:
 Die Methode ist abhängig auf ihre Distribution. Zum installieren solltest du dies ausführen: (als root oder sudo <cmd>):
@@ -67,7 +67,7 @@ Um eine Kopie der Parrot git Repository zu holen:
 
     git clone git://github.com/parrot/parrot.git
 
-Dies wird von Anfang an als Master ausführen. Um ein lokaler Branch zu kreieren 
+Dies wird von Anfang an als Master ausführen. Um ein lokaler Branch zu kreiren
 dass den Branch "some_branch" trackt:
 
     git checkout -b --track some_branch origin/some_branch
@@ -83,12 +83,12 @@ http://github.com/parrot
 ANLEITUNGEN
 ------------
 
-Für jetzt, packe dein Parrot tarball aus, (wen du dies liest, hast du das
-wahrscheinlich schon gemacht und schreibe:
+Für jetzt, packe dein Parrot tarball aus, (wenn du dies liest, hast du das
+wahrscheinlich schon gemacht) und schreibe:
 
     perl Configure.pl
 
-Führe den Configure Script aus. Der Configure.pl Script nimmt Konfiguration
+um den Configure Script auszuführen. Der Configure.pl Script nimmt Konfiguration
 heraus vom laufenden perl5 Programm  Du must dem Konfiguration erklären genau
 welche Compiler Und Linker zu benutzen. Zum Beispiel, Compile C Dateien mit 'cc',
 C++ Dateien mit 'CC', und verbindet alles zumsammen mit 'CC', würdest du
@@ -106,18 +106,18 @@ Für Systeme wie HPUX die nicht inet_pton haben, fürhe dies aus:
 Configure.pl ausführen wird einen config.h Header configurieren, ein Parrot::Config
 Model, Plattform Dateien und viele Makefiles.
 
-Die Datei "myconfig" hat eine Übersicht über Konfiguration Einstellungen 
+Die Datei "myconfig" hat eine Übersicht über Konfiguration Einstellungen. 
 Als nächstes, führe make aus. (Configure.pl wird dir sagen welche Version von make it
 für dein System optimiert ist.)
 
-Als nächstes soll der build gemacht werden.  Wenn du den ICU Library machst,
+Als nächstes soll der Build gemacht werden.  Wenn du den ICU Library machst,
 (Dies ist default bei den meisten Systemen), brauchst du GNU make
-(oderr etwas kompatibel damit).
+(oder etwas kompatibel damit).
 
 Du kannst Parrot ausführen indem du "make test" ausführst. Du kannst die Tests mit 
 "make TEST_JOBS=3 test" gleichzeitig ausführen.
 
-Du kannst den test suite selbst ausführen:
+Du kannst den ganzen Test Suite ausführen:
 
     make fulltest
 
@@ -135,7 +135,7 @@ Bei default installiert dies bei /usr/local, mit dem Parrot Programm in
     make install
 
 Merke dir dass dynamische libs nicht gefunden werden für nicht-standarde
-Orte ausser du LD_LIBRARY_PATH benützt oder etwas ähnliches
+Orte ausser du LD_LIBRARY_PATH benützt oder etwas ähnliches.
 
 Schaue bei docs/parrot.pod and docs/intro.pod wie du von hier weitermachen sollst.  Wenn du
 irgendwelche Probleme hast, siehe den Abteil "How To Submit A Bug Report" in
@@ -148,7 +148,7 @@ Dateien sehen mit dem Command:
 ----------
 
 Für Dokumentationen über die user-sichtbare Änderungen zwischen dieser Version und
-alte Versions, siehe NEWS.
+alte Versionen, siehe NEWS.
 
 MAILING LISTEN
 --------------
