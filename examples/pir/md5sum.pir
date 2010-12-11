@@ -1,3 +1,5 @@
+# Copyright (C) 2010, Parrot Foundation.
+
 .sub main
       .param pmc argv
       load_bytecode "Digest/MD5.pbc"
@@ -17,5 +19,10 @@
       $P1 = _md5sum($S0)
       $S0 = _md5_hex($P1)
       say $S0
-  .end
+.end
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
