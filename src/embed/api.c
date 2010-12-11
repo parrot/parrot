@@ -402,22 +402,22 @@ Parrot_api_set_stdhandles(Parrot_PMC interp_pmc, Parrot_Int in,
     EMBED_API_CALLIN(interp_pmc, interp)
     void *dummy;
 
-    if(PIO_INVALID_HANDLE != (PIOHANDLE)in) {
+    if (PIO_INVALID_HANDLE != (PIOHANDLE)in) {
         PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
         Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)in);
-        dummy = (void *)Parrot_io_stdhandle(interp,PIO_STDIN_FILENO,pmc);
+        dummy = (void *)Parrot_io_stdhandle(interp, PIO_STDIN_FILENO, pmc);
     }
 
-    if(PIO_INVALID_HANDLE != (PIOHANDLE)out) {
+    if (PIO_INVALID_HANDLE != (PIOHANDLE)out) {
         PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
         Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)out);
-        dummy = (void *)Parrot_io_stdhandle(interp,PIO_STDOUT_FILENO,pmc);
+        dummy = (void *)Parrot_io_stdhandle(interp, PIO_STDOUT_FILENO, pmc);
     }
 
-    if(PIO_INVALID_HANDLE != (PIOHANDLE)err) {
+    if (PIO_INVALID_HANDLE != (PIOHANDLE)err) {
         PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
         Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)err);
-        dummy = (void *)Parrot_io_stdhandle(interp,PIO_STDERR_FILENO,pmc);
+        dummy = (void *)Parrot_io_stdhandle(interp, PIO_STDERR_FILENO, pmc);
     }
 
     EMBED_API_CALLOUT(interp_pmc, interp)
@@ -480,7 +480,7 @@ Parrot_api_load_language(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String *lang
     EMBED_API_CALLIN(interp_pmc, interp)
     STRING * const lang_pmc = Parrot_str_new(interp, lang, strlen((char*)lang));
     Parrot_load_language(interp, lang_pmc);
-    EMBED_API_CALLOUT(interp_pmc, interp); 
+    EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
 
@@ -502,7 +502,7 @@ Parrot_api_get_compiler(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String *type)
     EMBED_API_CALLIN(interp_pmc, interp)
     STRING * const type_pmc = Parrot_str_new(interp, type, strlen(type));
     *compiler = Parrot_get_compiler(interp, type_pmc);
-    EMBED_API_CALLOUT(interp_pmc, interp); 
+    EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
 
@@ -524,10 +524,12 @@ Parrot_api_set_compiler(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String *type)
     EMBED_API_CALLIN(interp_pmc, interp)
     STRING * const type_pmc = Parrot_str_new(interp, type, strlen((char*)type));
     Parrot_set_compiler(interp, type_pmc, compiler);
-    EMBED_API_CALLOUT(interp_pmc, interp); 
+    EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
 /*
+
+=back
 
 =cut
 

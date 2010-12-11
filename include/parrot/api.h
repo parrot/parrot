@@ -55,7 +55,7 @@ typedef struct _Parrot_Init_Args {
 
 #define GET_INIT_STRUCT(i) do {\
         void * __stacktop = NULL; \
-        (i) = (Parrot_Init_Args*)calloc(1,sizeof (Parrot_Init_Args)); \
+        (i) = (Parrot_Init_Args*)calloc(1, sizeof (Parrot_Init_Args)); \
         (i)->stacktop = &__stacktop; \
     } while (0)
 
