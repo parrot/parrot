@@ -1,0 +1,63 @@
+/*
+** lorito_m0.ops
+*/
+
+BEGIN_OPS_PREAMBLE
+
+END_OPS_PREAMBLE
+
+=head1 NAME
+
+lorito_m0.ops - Lorito's M0 ops
+
+=cut
+
+=head1 DESCRIPTION
+
+Lorito's most basic opcodes.  These are the ops with zero magic, zero security
+filtering, and zero complexity.  From these ops we build all other ops and
+PMCs, and these ops we port to other backends to enable JIT and AOT and other
+magic.
+
+There is no magic here, only a handful of primitives.
+
+=cut
+
+
+=head2 Lorito M0 Ops
+
+=over 4
+
+=cut
+
+
+=item B<m0_noop>()
+
+Does nothing, the Lorito way!
+
+=cut
+
+inline op m0_noop() :M0 {
+}
+
+=back
+
+=cut
+
+=head1 COPYRIGHT
+
+Copyright (C) 2010, The Parrot Foundation.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license as Parrot
+itself.
+
+=cut
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
