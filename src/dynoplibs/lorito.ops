@@ -18,6 +18,18 @@ Lorito M0 opcodes
 
 =cut
 
+=head1 DOCUMENTATION
+
+Proposed Lorito opcodes
+
+https://github.com/atrodo/lorito/blob/master/ops.pod
+
+Yet Another Lorito prototype
+
+https://github.com/ekiru/yalp-asm
+
+=cut
+
 =head1 HISTORY
 
 Initial version by Jonathan "Duke" Leto, as discussed at a meeting
@@ -35,10 +47,6 @@ op context(out PMC) {
     return ctx;
 }
 
-
-=back
-
-=cut
 
 /*
  * Local variables:
