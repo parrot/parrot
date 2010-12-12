@@ -924,11 +924,35 @@ install_config.fpmc : myconfig config_lib.pir $(PARROT)
 	@echo "Invoking Parrot to generate install_config.fpmc"
 	$(PARROT) config_lib.pir --install > $@
 
-src/parrot_config$(O) : $(PARROT_H_HEADERS) src/parrot_config.c
+src/parrot_config$(O) : \
+    $(INC_DIR)/api.h \
+    $(INC_DIR)/compiler.h \
+    $(INC_DIR)/config.h \
+    $(INC_DIR)/core_types.h \
+    $(INC_DIR)/feature.h \
+    $(INC_DIR)/has_header.h \
+    $(INC_DIR)/platform_limits.h \
+    src/parrot_config.c
 
-src/install_config$(O) : $(PARROT_H_HEADERS) src/install_config.c
+src/install_config$(O) : \
+    $(INC_DIR)/api.h \
+    $(INC_DIR)/compiler.h \
+    $(INC_DIR)/config.h \
+    $(INC_DIR)/core_types.h \
+    $(INC_DIR)/feature.h \
+    $(INC_DIR)/has_header.h \
+    $(INC_DIR)/platform_limits.h \
+    src/install_config.c
 
-src/null_config$(O) : $(PARROT_H_HEADERS) src/null_config.c
+src/null_config$(O) : \
+    $(INC_DIR)/api.h \
+    $(INC_DIR)/compiler.h \
+    $(INC_DIR)/config.h \
+    $(INC_DIR)/core_types.h \
+    $(INC_DIR)/feature.h \
+    $(INC_DIR)/has_header.h \
+    $(INC_DIR)/platform_limits.h \
+    src/null_config.c
 
 src/list$(O) : \
     $(PARROT_H_HEADERS) \
@@ -1025,9 +1049,10 @@ $(INSTALLABLEPROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
 # Parrot Debugger
 #
 
-src/parrot_debugger$(O) : $(PARROT_H_HEADERS) src/parrot_debugger.c \
-	$(INC_DIR)/embed.h \
-	$(INC_DIR)/runcore_api.h
+src/parrot_debugger$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/parrot_debugger.c \
+    $(INC_DIR)/runcore_api.h
 
 $(PDB) : src/parrot_debugger$(O) src/parrot_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -1047,8 +1072,16 @@ $(INSTALLABLEPDB) : src/parrot_debugger$(O) $(LIBPARROT) src/parrot_config$(O)
 # Parrot Disassembler
 #
 
-src/pbc_disassemble$(O) : $(PARROT_H_HEADERS) \
-    src/pbc_disassemble.c
+src/pbc_disassemble$(O) : \
+    $(INC_DIR)/api.h \
+    $(INC_DIR)/compiler.h \
+    $(INC_DIR)/config.h \
+    $(INC_DIR)/core_types.h \
+    $(INC_DIR)/feature.h \
+    $(INC_DIR)/has_header.h \
+    $(INC_DIR)/longopt.h \
+    $(INC_DIR)/platform_limits.h \
+    src/pbc_disassemble.c \
 
 $(DIS) : src/pbc_disassemble$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -1079,6 +1112,8 @@ $(PDUMP) : src/pbc_dump$(O) src/packdump$(O) $(LIBPARROT)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 src/pbc_dump$(O) : \
+    $(INC_DIR)/api.h \
+    $(INC_DIR)/longopt.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(PARROT_H_HEADERS) \
@@ -1419,7 +1454,11 @@ src/string/api$(O) : $(PARROT_H_HEADERS) src/string/api.str \
 
 src/string/primitives$(O) : $(PARROT_H_HEADERS) src/string/primitives.c
 
-src/longopt$(O) : $(PARROT_H_HEADERS) src/longopt.c
+src/longopt$(O) : \
+    $(PARROT_H_HEADERS) \
+    $(INC_DIR)/api.h \
+    $(INC_DIR)/longopt.h \
+    src/longopt.c
 
 src/dynext$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/dynext.h \
 	src/dynext.str include/pmc/pmc_parrotlibrary.h src/dynext.c
@@ -1518,12 +1557,16 @@ src/call/ops$(O) : $(INC_DIR)/oplib/ops.h \
 	$(PARROT_H_HEADERS) include/pmc/pmc_continuation.h \
 	$(INC_DIR)/runcore_api.h src/call/ops.c
 
-src/io/api$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
-	src/io/api.c \
-	src/io/api.str include/pmc/pmc_filehandle.h \
-	include/pmc/pmc_stringhandle.h \
-	$(INC_DIR)/extend.h \
-	$(INC_DIR)/extend_vtable.h
+src/io/api$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/io/io_private.h \
+    src/io/api.c \
+    src/io/api.str \
+    include/pmc/pmc_filehandle.h \
+    include/pmc/pmc_stringhandle.h \
+    include/pmc/pmc_socket.h \
+    $(INC_DIR)/extend.h \
+    $(INC_DIR)/extend_vtable.h
 
 src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c
 
@@ -1541,15 +1584,15 @@ src/io/win32$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
 src/gc/alloc_memory$(O) : $(PARROT_H_HEADERS) src/gc/alloc_memory.c
 
 src/main$(O) : \
-    $(INC_DIR)/imcc.h \
-    $(PARROT_H_HEADERS) \
-    $(INC_DIR)/embed.h \
     $(INC_DIR)/api.h \
-    $(INC_DIR)/runcore_api.h \
-    src/gc/gc_private.h \
-    src/main.c \
-    src/gc/variable_size_pool.h \
-    include/parrot/api.h
+    $(INC_DIR)/compiler.h \
+    $(INC_DIR)/config.h \
+    $(INC_DIR)/core_types.h \
+    $(INC_DIR)/feature.h \
+    $(INC_DIR)/has_header.h \
+    $(INC_DIR)/longopt.h \
+    $(INC_DIR)/platform_limits.h \
+    src/main.c
 
 src/multidispatch$(O) : \
     src/multidispatch.c \
@@ -1600,29 +1643,47 @@ src/runcore/cores$(O) : src/runcore/cores.str \
 	$(INC_DIR)/runcore_api.h $(INC_DIR)/runcore_trace.h \
 	$(PARROT_H_HEADERS)
 
-src/embed$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/embed.h \
-        src/embed.c src/embed.str \
-        $(INC_DIR)/oplib/ops.h $(INC_DIR)/runcore_api.h \
-        $(INC_DIR)/extend.h \
-        $(INC_DIR)/extend_vtable.h \
-        $(INC_DIR)/oplib/core_ops.h \
-        compilers/imcc/imc.h \
-        compilers/imcc/cfg.h \
-        compilers/imcc/debug.h \
-        compilers/imcc/instructions.h \
-        compilers/imcc/sets.h \
-        compilers/imcc/symreg.h \
-        compilers/imcc/unit.h \
-		include/pmc/pmc_sub.h
+src/embed$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/embed.c \
+    src/embed.str \
+    $(INC_DIR)/oplib/ops.h \
+    $(INC_DIR)/extend.h \
+    $(INC_DIR)/embed.h \
+    $(INC_DIR)/runcore_api.h \
+    $(INC_DIR)/extend_vtable.h \
+    $(INC_DIR)/oplib/core_ops.h \
+    compilers/imcc/imc.h \
+    compilers/imcc/cfg.h \
+    compilers/imcc/debug.h \
+    compilers/imcc/instructions.h \
+    compilers/imcc/sets.h \
+    compilers/imcc/symreg.h \
+    compilers/imcc/unit.h \
+    include/pmc/pmc_sub.h
 
-src/embed/api$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/api.h \
-		src/embed/api.c src/embed/embed_private.h
+src/embed/api$(O) : \
+    $(PARROT_H_HEADERS) \
+    $(INC_DIR)/api.h \
+    $(INC_DIR)/embed.h \
+    $(INC_DIR)/runcore_api.h \
+    src/embed/api.c \
+    src/embed/embed_private.h \
+    include/pmc/pmc_parrotinterpreter.h
 
-src/embed/strings$(O) :  $(PARROT_H_HEADERS) $(INC_DIR)/api.h \
-		src/embed/strings.c src/embed/embed_private.h
+src/embed/strings$(O) : \
+    $(PARROT_H_HEADERS) \
+    $(INC_DIR)/api.h \
+    src/embed/strings.c \
+    src/embed/embed_private.h \
+    include/pmc/pmc_parrotinterpreter.h
 
-src/embed/pmc$(O) :  $(PARROT_H_HEADERS) $(INC_DIR)/api.h \
-		src/embed/strings.c src/embed/embed_private.h
+src/embed/pmc$(O) : \
+    $(PARROT_H_HEADERS) \
+    $(INC_DIR)/api.h \
+    src/embed/pmc.c \
+    src/embed/embed_private.h \
+    include/pmc/pmc_parrotinterpreter.h
 
 src/dataypes$(O) : $(GENERAL_H_FILES) src/dataypes.c
 
@@ -1722,7 +1783,8 @@ src/string/encoding/ucs4$(O) : $(PARROT_H_HEADERS) \
     src/string/unicode.h
 
 src/pbc_merge$(O) : \
-    $(INC_DIR)/embed.h \
+    $(INC_DIR)/api.h \
+    $(INC_DIR)/longopt.h \
     src/pbc_merge.c \
     include/pmc/pmc_sub.h \
     $(INC_DIR)/oplib/ops.h \
