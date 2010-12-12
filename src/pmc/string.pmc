@@ -245,10 +245,6 @@ they match.
         return (INTVAL)(STRING_equal(INTERP, str_val, v));
     }
 
-    MULTI INTVAL is_equal(PMC *value) {
-        return SELF.is_equal(value);
-    }
-
 /*
 
 =item C<INTVAL is_equal_num(PMC *value)>

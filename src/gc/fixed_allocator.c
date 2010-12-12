@@ -437,10 +437,10 @@ allocate_new_pool_arena(ARGMOD(Pool_Allocator *pool))
     pool->num_free_objects += num_items;
     pool->total_objects    += num_items;
 
-    if (pool->lo_arena_ptr > new_arena)
+    if (pool->lo_arena_ptr > (void *)new_arena)
         pool->lo_arena_ptr = new_arena;
 
-    if (pool->hi_arena_ptr < (char *)new_arena + GC_FIXED_SIZE_POOL_SIZE)
+    if ((char *)pool->hi_arena_ptr < (char *)new_arena + GC_FIXED_SIZE_POOL_SIZE)
         pool->hi_arena_ptr = (char *)new_arena + GC_FIXED_SIZE_POOL_SIZE;
 }
 

@@ -30,7 +30,7 @@ about the structure of the frozen bytecode.
 #include "parrot/dynext.h"
 #include "parrot/runcore_api.h"
 #include "../compilers/imcc/imc.h"
-#include "packfile.str"
+#include "api.str"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_key.h"
 #include "pmc/pmc_callcontext.h"
