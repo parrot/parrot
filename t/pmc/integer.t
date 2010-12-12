@@ -15,6 +15,16 @@ Tests the Integer PMC.
 
 =cut
 
+.sub '' :anon :immediate
+    $P0 = loadlib 'sys_ops'
+    $I0 = defined $P0
+    if $I0 goto ok
+    load_bytecode 'Test/Builder.pir'
+    $P1 = new ['Test';'Builder']
+    $P1.'skip_all'("couldn't load sys_ops")
+  ok:
+.end
+
 .loadlib 'sys_ops'
 
 .sub 'test' :main
