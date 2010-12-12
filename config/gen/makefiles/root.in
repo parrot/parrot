@@ -1064,13 +1064,13 @@ $(INSTALLABLEDIS) : src/pbc_disassemble$(O) \
 #
 # Parrot Dump
 #
-src/packdump$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_sub.h \
-    include/pmc/pmc_key.h src/packdump.c
+frontend/pbc_dump/packdump$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_sub.h \
+    include/pmc/pmc_key.h frontend/pbc_dump/packdump.c
 
-$(PDUMP) : frontend/pbc_dump/main$(O) src/packdump$(O) $(LIBPARROT)
+$(PDUMP) : frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     frontend/pbc_dump/main$(O) \
-    src/packdump$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+    frontend/pbc_dump/packdump$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 frontend/pbc_dump/main$(O) : \
@@ -1081,11 +1081,11 @@ frontend/pbc_dump/main$(O) : \
     $(INC_DIR)/runcore_api.h \
     frontend/pbc_dump/main.c
 
-$(INSTALLABLEPDUMP) : frontend/pbc_dump/main$(O) src/packdump$(O) \
+$(INSTALLABLEPDUMP) : frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) \
 	src/install_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     frontend/pbc_dump/main$(O) \
-    src/packdump$(O) \
+    frontend/pbc_dump/packdump$(O) \
     @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
@@ -2062,7 +2062,7 @@ prog-clean :
     parrot-prove.pbc parrot-prove.c parrot-prove$(O) parrot-prove$(EXE) \
     parrot_config$(EXE) parrot_config.c parrot_config$(O) parrot_config.pbc \
     compilers/imcc/main$(O) \
-    $(PDUMP) frontend/pbc_dump/main$(O) src/packdump$(O) \
+    $(PDUMP) frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) \
     $(PDB) frontend/parrot_debugger/main$(O) \
     $(PBC_MERGE) frontend/pbc_merge/main$(O) \
     $(DIS) src/pbc_disassemble$(O)
@@ -2100,7 +2100,7 @@ archclean: dynext-clean
     $(INSTALLABLECONFIG) \
     $(INSTALLABLENQP) \
     compilers/imcc/main$(O) \
-    $(PDUMP) frontend/pbc_dump/main$(O) src/packdump$(O) \
+    $(PDUMP) frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) \
     $(PDB) frontend/parrot_debugger/main$(O) \
     $(PBC_MERGE) frontend/pbc_merge/main$(O) \
     $(DIS) src/pbc_disassemble$(O) \
@@ -2729,7 +2729,7 @@ cagecritic:
 HEADERIZER_O_FILES = \
     $(O_FILES) \
     frontend/parrot/main$(O) \
-    src/packdump$(O) \
+    frontend/pbc_dump/packdump$(O) \
     frontend/pbc_merge/main$(O) \
 
 headerizer : src/core_pmcs.c

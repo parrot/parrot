@@ -8,6 +8,11 @@ examples/nci/ls.pir - a directory lister
 
 List the content of the directory 'docs'.
 
+This program uses the 'dirent' structure, whose content is not fully
+standarized, thus may need modifications depending on platform.
+
+In this encarnation it works on linux i386 and amd64 systems.
+
 =cut
 
 .sub _main :main

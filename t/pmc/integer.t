@@ -20,7 +20,7 @@ Tests the Integer PMC.
 .sub 'test' :main
     .include 'test_more.pir'
 
-    plan(137)
+    plan(141)
     test_init()
     test_basic_math()
     test_truthiness_and_definedness()
@@ -50,6 +50,7 @@ Tests the Integer PMC.
     $I0 = has_bigint()
     unless $I0 goto no_bigint
     test_autopromotion_to_BigInt()
+    test_add_BigInt()
     test_sub_BigInt()
     test_mul_BigInt()
     test_div_BigInt()
@@ -57,7 +58,7 @@ Tests the Integer PMC.
     test_neg_BigInt()
     goto done_bigint_tests
   no_bigint:
-    skip_n_bigint_tests(20)
+    skip_n_bigint_tests(28)
   done_bigint_tests:
 .end
 
@@ -131,14 +132,16 @@ CODE
     is(int_1, 5, '... neg')
 
     throws_substring(<<'CODE', 'Integer overflow', 'mul integer overflow')
+
     .sub main
-        .include "errors.pasm"
+        .include 'errors.pasm'
         errorson .PARROT_ERRORS_OVERFLOW_FLAG
+        .include 'sysinfo.pasm'
+        $I0 = sysinfo .SYSINFO_PARROT_INTMAX
 
         $P0 = new ['Integer']
-        $P0 = 2048
-        $P0 *= 2048
-        $P0 *= 2048
+        $P0 = $I0
+        $P0 *= 2
     .end
 CODE
 
@@ -165,7 +168,6 @@ CODE
     $I0 = sysinfo .SYSINFO_PARROT_INTMIN
     int_1 = $I0
     bigint_1 = int_1 - 1
-    pop_eh
 
     dec int_1
     $P0 = typeof int_1
@@ -377,6 +379,20 @@ OK4:
 fin:
 .end
 
+.sub test_add_BigInt
+   .include 'sysinfo.pasm'
+   new $P0, ['Integer']
+   new $P1, ['BigInt']
+   sysinfo $I0, .SYSINFO_PARROT_INTMAX
+   set $P0, $I0
+   set $P1, $I0
+   add $P0, $P0, 1
+   add $P1, $P1, 1
+   typeof $P2, $P0
+   is($P0, $P1, 'add integer overflow promotion')
+   is($P2, 'BigInt', 'add integer overflow type check')
+.end
+
 .sub test_add
    new $P0, ['Integer']
    set $P0, 5
@@ -391,11 +407,6 @@ fin:
    add $P2, $P1, $P0
    set $S0, $P2
    is($S0,50)
-
-   new $P0, ['Integer']
-   set $P0, 1073741824
-   add $P0, $P0, 1073741824
-   is($P0, 2147483648, 'add integer overflow')
 
    new $P0, ['Integer']
    new $P1, ['Complex']
@@ -425,6 +436,34 @@ fin:
     $P1 = 424125
     sub $P1, $P1, $P0
     is($P1, 1, 'BigInt sub (no exception)')
+
+    .include 'sysinfo.pasm'
+    $P0 = new ['Integer']
+    $P1 = new ['BigInt']
+    $I0 = sysinfo .SYSINFO_PARROT_INTMIN
+    $P0 = $I0
+    $P1 = $I0
+    sub $P0, $P0, 1
+    sub $P1, $P1, 1
+    typeof $P2, $P0
+    is($P0, $P1, 'subtract overflow promotion')
+    is($P2, 'BigInt', 'subtract overflow type check')
+
+    $P0 = new ['Integer']
+    $P0 = $I0
+    sub $P0, 1
+    typeof $P2, $P0
+    is($P0, $P1, 'i_subtract_int overflow promotion')
+    is($P2, 'BigInt', 'i_subtract_int overflow type check')
+
+    $P0 = new ['Integer']
+    $P2 = new ['Integer']
+    $P0 = $I0
+    $P2 = 1
+    sub $P0, $P2
+    typeof $P3, $P0
+    is($P0, $P1, 'i_subtract overflow promotion')
+    is($P3, 'BigInt', 'i_subtract overflow type check')
 .end
 
 .sub test_sub
@@ -434,23 +473,6 @@ fin:
     $P1 = 10
     sub $P1, $P1, $P0
     is($P1, 6.9, 'DEFAULT sub')
-
-    $P0 = new ['Integer']
-    $P0 = -1073741824
-    sub $P0, $P0, 1073741825
-    is($P0, -2147483649, 'BigInt sub overflow')
-
-    $P0 = new ['Integer']
-    $P0 = -1073741824
-    sub $P0, 1073741825
-    is($P0, -2147483649, 'i_subtract_int overflow')
-
-    $P0 = new ['Integer']
-    $P1 = new ['Integer']
-    $P0 = -1073741824
-    $P1 = 1073741825
-    sub $P0, $P1
-    is($P0, -2147483649, 'i_subtract overflow')
 
     $P0 = new ['Integer']
     $P0 = 5
@@ -508,8 +530,6 @@ fin:
     mul $P0, $P1
     is($P0, 7, 'i_multiply Integer PMC by DEFAULT')
 
-
-
     $P0 = new ['Integer']
     $P0 = 2
     mul $P0, 5.5
@@ -527,12 +547,16 @@ fin:
     $I0 = iseq $P0, $P2
     todo($I0, 'i_multiply Integer PMC by BigInt PMC', 'unresolved bug, see TT #1887')
 
+    .include 'sysinfo.pasm'
     $P0 = new ['Integer']
-    $P0 = 1073741824
+    $I0 = sysinfo .SYSINFO_PARROT_INTMAX
+    $P0 = $I0
+    $P1 = $I0
     mul $P0, 2
-    $P1 = typeof $P0
-    is($P0, 2147483648, 'i_multiply_int overflow promotion')
-    is($P1, 'BigInt', 'i_multiple_int overflow type check')
+    mul $P1, 2
+    $P2 = typeof $P0
+    is($P0, $P1, 'i_multiply_int overflow promotion')
+    is($P2, 'BigInt', 'i_multiple_int overflow type check')
 .end
 
 .sub test_div_BigInt
