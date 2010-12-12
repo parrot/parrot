@@ -5,13 +5,14 @@ Parrot ist Kopiergeschützt (C) 2001-2010, Parrot Foundation.
 
 
 LIZENZ INFORMATION
--------------------
+------------------
 
 Dieser Code ist veröffentlicht unter den Bedingungen von Artistic License 2.0.
 Für mehr details, lesen sie die Datei LICENSE.
 
 ÜBERSICHT
---------
+---------
+
 Parrot ist eine virtuelle Maschine gebaut um effektiv
 bytecode für dynamisch Sprachen auszuführen.
 
@@ -26,16 +27,17 @@ bevor du Parrot konfigurierst. Dies ist hier verfügbar: http://site.icu-project
 Du wirst auch Perl 5.8.4 gebrauchen, und Storable 2.12 oder neuer
 um einige Konfigurationen auszuführen oder Build Scripts.
 
-Für alle PLattformen die wir unterstüzen sollte Parrot ohne Änderung
-gebrauchbar sein. docs/parrot.pod zeigt unsere unterstützten Plattformen. PLATFORMS stellt
-Berichte zur Verfügung über die Plattformen für welche Parrot gebaut wurde.
+Für fast alle PLattformen die wir unterstüzen sollte Parrot ohne Änderung
+gebrauchbar sein. docs/parrot.pod zeigt unsere unterstützten Plattformen. PLATFORMS 
+stellt Berichte zur Verfügung über die Plattformen für welche Parrot gebaut wurde.
 
 WIE MAN PARROT VON GITHUB INSTALLIERT
 ----------------------------------
 I.  Git installieren:
 
 Linux:
-Die Methode ist abhängig auf ihre Distribution. Zum installieren solltest du dies ausführen: (als root oder sudo <cmd>):
+Die Methode ist abhängig auf ihre Distribution. Zum installieren solltest du dies 
+ausführen: (als root oder sudo <cmd>):
 
 Auf Ubuntu/Debian (apt-based):
 
@@ -81,7 +83,7 @@ Du kannst eine komplette Liste der Branches finden unter:
 http://github.com/parrot
 
 ANLEITUNGEN
-------------
+-----------
 
 Für jetzt, packe dein Parrot tarball aus, (wenn du dies liest, hast du das
 wahrscheinlich schon gemacht) und schreibe:
@@ -137,8 +139,8 @@ Bei default installiert dies bei /usr/local, mit dem Parrot Programm in
 Merke dir dass dynamische libs nicht gefunden werden für nicht-standarde
 Orte ausser du LD_LIBRARY_PATH benützt oder etwas ähnliches.
 
-Schaue bei docs/parrot.pod and docs/intro.pod wie du von hier weitermachen sollst.  Wenn du
-irgendwelche Probleme hast, siehe den Abteil "How To Submit A Bug Report" in
+Schaue bei docs/parrot.pod and docs/intro.pod wie du von hier weitermachen sollst. 
+Wenn du irgendwelche Probleme hast, siehe den Abteil "How To Submit A Bug Report" in
 docs/submissions.pod. Diese Dokumente sind in POD format. Du kannst diese
 Dateien sehen mit dem Command:
 
@@ -153,8 +155,8 @@ alte Versionen, siehe NEWS.
 MAILING LISTEN
 --------------
 
-Die Parrot user Mailing Liste ist parrot-users@lists.parrot.org. Abonniere mit dem Formular bei
-http://lists.parrot.org/mailman/listinfo/parrot-users .
+Die Parrot user Mailing Liste ist parrot-users@lists.parrot.org. Abonniere mit dem 
+Formular bei http://lists.parrot.org/mailman/listinfo/parrot-users .
 Die Liste ist archived bei http://lists.parrot.org/pipermail/parrot-users/ .
 
 Für Entwickler Diskussionen siehe die Information bei docs/gettingstarted.pod.
