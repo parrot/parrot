@@ -419,6 +419,20 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .param pmc response
     .param string str
     .param int chunked
+
+    .local int    chunk_len
+    .local int    chunk_sum
+    .local int    chunk_len_idx
+
+    .local string data   
+    .local string chunk
+    .local string chunk_len_hex
+    .local string final_buffer
+
+    chunk_sum = 0
+    final_buffer  = ''
+    
+    $S0 = str
     $I0 = index str, "\r\n\r\n"
     if $I0 < 0 goto L1
     $I0 += 4
@@ -427,26 +441,48 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $I0 = index str, "\n\n"
     if $I0 < 0 goto L4
     $I0 += 2
+
   L2:
-    if chunked == 0 goto L3
-    # Proccess chunks into a single block
-    say "Chunking together"
-    $S0 = substr str, $I0 # 1000\r\n.data etc
-    $I1 = index $S0, "\r\n"
-    $S1 = substr $S0, 0, $I1
-    
-    $P1 = box $S1
-    #$S3 = get_number $P1, 16
-    say $S3
-    $S2 = "Chunk " . $S1
-    say $S2
-    
-    $I2 = $P1.'to_int'(16)
-    say $I2
-    $I0 += $I2
-    if $I2 != 0 goto L2
-  L3:
     $S0 = substr str, $I0
+    if chunked == 0 goto L3
+    data = $S0
+  Lchunki:
+    # Step 1) Get Chunk Length
+    # Find first delimiter, then extract data in between.    
+    chunk_len_idx = index data, "\r\n"
+    chunk_len_hex = substr data, 0, chunk_len_idx
+    
+    # Box chunk_len_hex, and convert to integer (hex digits so radix 16).
+    $P0 = box chunk_len_hex
+    chunk_len = $P0.'to_int'(16)
+        
+    # Step 1a) If length is 0, return (L22 cleans up and returns)
+    if chunk_len == 0 goto L22
+    
+    # Step 1b) Chunk-Sum (you heard right, Chunk-Sum)
+    chunk_sum += chunk_len
+    
+    # Step 2) Extract chunk into final_buffer
+    $I1 = chunk_len_idx + 2
+    chunk = substr data, $I1, chunk_len
+    final_buffer = final_buffer . chunk
+    # Update $S0 for final result (L3 sets $S0 as .content)
+    $S0 = final_buffer
+    
+    # Increment data pointer, then Rinse and Repeat
+    # We must increment chunk_len by len(chunk_len_hex) + 4
+    # to skip over current chunk information and its delimiters,
+    # so data always points the next chunk_length
+    chunk_len += chunk_len_idx # The length of the hex string. (the CHUNK_HEX in \r\nCHUNK_HEX\r\n)
+    chunk_len += 4             # The length of the delimters (the \r\n's in \r\nCHUNK_HEX\r\n)
+    data = substr data, chunk_len
+    goto Lchunki
+  L22:
+    # Chunk-Sum Sanity check 
+    $I0 = length $S0
+    if $I0 == chunk_sum goto L3
+    say "Something has gone terribly wrong..."    
+  L3:
     $P0 = box $S0
     setattribute response, 'content', $P0
     .return ($S0)
@@ -555,8 +591,6 @@ see http://search.cpan.org/~gaas/libwww-perl/
     goto L23
   Lchunked:
     # Chunked encoding, so we keep reading until we see a "0\r\n"
-    say "Handling Chunked Encoding..."
-    # Chunked=True
     chunked = 1
     $S0 = buf
     $I0 = index $S0, "\r\n0\r\n"
