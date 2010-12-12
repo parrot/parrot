@@ -208,7 +208,8 @@ Returns True if the is in the list
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 INTVAL
-Parrot_list_contains(SHIM_INTERP, ARGIN(const Linked_List *list), ARGIN(const List_Item_Header *item))
+Parrot_list_contains(SHIM_INTERP,
+                     ARGIN(const Linked_List *list), ARGIN(const List_Item_Header *item))
 {
     ASSERT_ARGS(Parrot_list_contains)
 
