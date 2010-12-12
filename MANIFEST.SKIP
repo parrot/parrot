@@ -310,6 +310,8 @@
 ^/frontend/parrot_debugger/main\.o/
 ^/frontend/pbc_dump/main\.o$
 ^/frontend/pbc_dump/main\.o/
+^/frontend/pbc_dump/packdump\.o$
+^/frontend/pbc_dump/packdump\.o/
 ^/frontend/pbc_merge/main\.o$
 ^/frontend/pbc_merge/main\.o/
 ^/include/parrot/.*\.tmp$
