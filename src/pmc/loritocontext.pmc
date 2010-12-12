@@ -47,16 +47,14 @@ more information.
  */
 
 pmclass LoritoContext auto_attrs provides invokable {
-    /* continuation destination */
-    ATTR PackFile_ByteCode *seg;             /* bytecode segment */
-    ATTR opcode_t          *address;         /* start of bytecode, addr to continue */
-    ATTR PMC               *to_ctx;          /* pointer to dest context */
-    ATTR PMC               *to_call_object;  /* pointer to CallSignature */
-    /* a LoritoContext keeps the from_ctx alive */
-    ATTR PMC               *from_ctx;        /* sub, this cont is returning from */
-    ATTR int                runloop_id;      /* id of the creating runloop. */
-    ATTR int                invoked;         /* flag when a handler has been invoked. */
-
+    ATTR PMC      *caller_ctx;         /* caller context */
+    ATTR opcode_t *current_pc;         /* program counter of Sub invocation */
+    ATTR opcode_t *out_pc;             /* program counter to jump to */
+    ATTR opcode_t *eh_pc;              /* program counter of error handler */
+    ATTR void     *registers;          /* pointer to allocated registers */
+    ATTR Regs_ni   bp;                 /* pointers to FLOATVAL & INTVAL */
+    ATTR Regs_ps   bp_ps;              /* pointers to PMC & STR */
+    ATTR UINTVAL   n_regs_used[4];     /* INSP in PBC points to Sub */
 /*
 
 =item C<void init()>
