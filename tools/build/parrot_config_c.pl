@@ -44,10 +44,7 @@ print << "EOF";
 #include <stdio.h>
 #include "parrot/api.h"
 
-void
-Parrot_gbl_set_config_hash_internal (const unsigned char* parrot_config,
-                                 unsigned int parrot_config_size);
-
+int Parrot_set_config_hash(Parrot_PMC interp_pmc);
 
 static const unsigned char parrot_config[] = {
 EOF
