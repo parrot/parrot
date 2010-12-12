@@ -299,6 +299,12 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .param pmc headers
     .param pmc url
     .param pmc proxy
+    
+    # FIXME: 
+    # There should be no Connection header, because in HTTP/1.1 all
+    # connections are keep-alive by default.
+    headers['Connection'] = "Keep-Alive"
+    
     # Extract 'Host' header
     .local string host
     host = url.'authority'()
@@ -412,19 +418,39 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .sub '_parse_response_content' :method
     .param pmc response
     .param string str
+    .param int chunked
     $I0 = index str, "\r\n\r\n"
     if $I0 < 0 goto L1
     $I0 += 4
     goto L2
   L1:
     $I0 = index str, "\n\n"
-    if $I0 < 0 goto L3
+    if $I0 < 0 goto L4
     $I0 += 2
   L2:
+    if chunked == 0 goto L3
+    # Proccess chunks into a single block
+    say "Chunking together"
+    $S0 = substr str, $I0 # 1000\r\n.data etc
+    $I1 = index $S0, "\r\n"
+    $S1 = substr $S0, 0, $I1
+    
+    $P1 = box $S1
+    #$S3 = get_number $P1, 16
+    say $S3
+    $S2 = "Chunk " . $S1
+    say $S2
+    
+    $I2 = $P1.'to_int'(16)
+    say $I2
+    $I0 += $I2
+    if $I2 != 0 goto L2
+  L3:
     $S0 = substr str, $I0
     $P0 = box $S0
     setattribute response, 'content', $P0
-  L3:
+    .return ($S0)
+  L4:
 .end
 
 =item request
@@ -435,6 +461,8 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .param pmc request
     .param pmc proxy
 
+    .local int    chunked
+    chunked = 0
     .local string method
     method = request.'method'()
     .local pmc url
@@ -511,6 +539,8 @@ see http://search.cpan.org/~gaas/libwww-perl/
     header_length = self.'_parse_response_headers'(response, buf)
     $I0 = response.'is_success'()
     unless $I0 goto L22
+    $S0 = response.'get_header'('Transfer-Encoding')
+    if $S0 == 'chunked' goto Lchunked
     $S0 = response.'get_header'('Content-Length')
     if $S0 == '' goto L21
     content_length = $S0
@@ -523,9 +553,20 @@ see http://search.cpan.org/~gaas/libwww-perl/
     if $S0 == '' goto L22
     push buf, $S0
     goto L23
+  Lchunked:
+    # Chunked encoding, so we keep reading until we see a "0\r\n"
+    say "Handling Chunked Encoding..."
+    # Chunked=True
+    chunked = 1
+    $S0 = buf
+    $I0 = index $S0, "\r\n0\r\n"
+    # If it isn't found, keep recv'ing until we find it.
+    if $I0 == -1 goto L21
+    # Ok, the data has been all sent (except for the footer-headers).
+    goto L22
   L22:
     sock.'close'()
-    self.'_parse_response_content'(response, buf)
+    self.'_parse_response_content'(response, buf, chunked)
     .return (response)
 .end
 
