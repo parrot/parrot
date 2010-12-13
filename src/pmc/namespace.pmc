@@ -1129,7 +1129,7 @@ NOTE: exporting 'default' set of items is not yet implemented.
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
-                "can't handle argument of type %s", what->vtable->base_type);
+                "can't handle argument of type %Ss", what->vtable->whoami);
     }
 
 /*
