@@ -32,7 +32,7 @@ mais novo para executar os scripts de configuração e de compilação.
 
 Para a maioria das plataformas que nós damos suporte, Parrot consegue ser
 compilado sem a necessidade de pacotes adicionais. docs/parrot.pod contém
-uma lista com estas plataformas. O arquivo PLATAFORMS dispõe de relatórios
+uma lista com estas plataformas. O arquivo PLATFORMS dispõe de relatórios
 sobre as plataformas a qual o Parrot já foi compilado e testado.
 
 COMO INSTALAR O PARROT PELO GITHUB
