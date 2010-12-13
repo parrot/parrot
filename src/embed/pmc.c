@@ -10,8 +10,7 @@ Parrot_api_pmc_deserialize(Parrot_PMC interp_pmc, Parrot_String fpmc,
         ARGOUT(Parrot_PMC * pmc))
 {
     EMBED_API_CALLIN(interp_pmc, interp)
-    PMC * const config = Parrot_thaw(interp, fpmc);
-    Parrot_set_config_hash_pmc(interp, config);
+    *pmc = Parrot_thaw(interp, fpmc);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
@@ -24,8 +23,7 @@ Parrot_api_pmc_deserialize_bytes(Parrot_PMC interp_pmc,
     EMBED_API_CALLIN(interp_pmc, interp)
     STRING * const fpmc_str = Parrot_str_new_init(interp, (const char *)fpmc,
         length, Parrot_binary_encoding_ptr, PObj_external_FLAG);
-    PMC * const config = Parrot_thaw(interp, fpmc_str);
-    Parrot_set_config_hash_pmc(interp, config);
+    *pmc = Parrot_thaw(interp, fpmc_str);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 

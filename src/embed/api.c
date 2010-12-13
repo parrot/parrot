@@ -63,7 +63,6 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
     int alt_stacktop;
     Parrot_Interp interp_raw;
     void *stacktop_ptr = &alt_stacktop;
-    PMC * iglobals;
     const Parrot_Interp parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
     interp_raw = allocate_interpreter(parent_raw, flags);
     if (args) {
@@ -77,7 +76,6 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
             interp_raw->hash_seed = args->hash_seed;
     }
     initialize_interpreter(interp_raw, stacktop_ptr);
-    iglobals = interp_raw->iglobals;
     *interp = VTABLE_get_pmc_keyed_int(
             interp_raw, interp_raw->iglobals, (Parrot_Int)IGLOBALS_INTERPRETER);
     return !PMC_IS_NULL(*interp);
@@ -419,6 +417,7 @@ Parrot_api_set_stdhandles(Parrot_PMC interp_pmc, Parrot_Int in,
         Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)err);
         dummy = (void *)Parrot_io_stdhandle(interp, PIO_STDERR_FILENO, pmc);
     }
+    UNUSED(dummy);
 
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
