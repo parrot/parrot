@@ -32,13 +32,13 @@ Parrot_Int
 Parrot_api_string_export_wchar(Parrot_PMC interp_pmc, ARGIN(Parrot_String string), ARGOUT(wchar_t ** strout))
 {
     char *cstr;
-	size_t len;
+    size_t len;
     wchar_t *wstrout;
 
     EMBED_API_CALLIN(interp_pmc, interp);
     if(!STRING_IS_NULL(string)) {
         cstr = Parrot_str_to_cstring(interp, string);
-		len = strlen(cstr);
+        len = strlen(cstr);
 
         wstrout = (wchar_t *) malloc (sizeof(wchar_t) * len + 1);
         mbstowcs(wstrout, cstr, len);
@@ -76,11 +76,11 @@ Parrot_Int
 Parrot_api_string_import_wchar(Parrot_PMC interp_pmc, ARGIN(wchar_t * str), ARGOUT(Parrot_String * out))
 {
     char *cstr;
-	size_t len;
+    size_t len;
 
     EMBED_API_CALLIN(interp_pmc, interp);
 
-	len = wcslen(str);
+    len = wcslen(str);
 
     cstr = (char *) malloc (sizeof(char) * len + 1);
     wcstombs(cstr, str, len);
