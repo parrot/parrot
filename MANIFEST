@@ -1108,6 +1108,8 @@ lib/Pod/Simple/TranscodeDumb.pm                             []
 lib/Pod/Simple/TranscodeSmart.pm                            []
 lib/Pod/Simple/XHTML.pm                                     []
 lib/Pod/Simple/XMLOutStream.pm                              []
+md5task/main_m.pir                                          []
+md5task/main_nfio.pir                                       []
 parrotbug                                                   []
 runtime/parrot/bin/prove.pir                                [library]
 runtime/parrot/dynext/README                                []doc
@@ -2067,6 +2069,7 @@ t/tools/pmc2cutils/05-gen_c.t                               [test]
 t/tools/pmc2cutils/08-pmc-pm.t                              [test]
 t/tools/pmc2cutils/README                                   []doc
 t/tools/testdata                                            [test]
+test_data                                                   []
 tools/build/README                                          []doc
 tools/build/c2str.pl                                        []
 tools/build/fixup_gen_file.pl                               []
