@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006, Parrot Foundation.
+# Copyright (C) 2010, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -12,11 +12,11 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/src/string.t - Parrot API string operations
+t/src/embed/strings.t - Parrot API string operations
 
 =head1 SYNPOSIS
 
-    % prove t/src/string.t
+    % prove t/src/embed/strings.t
 
 =head1 DESCRIPTION
 
