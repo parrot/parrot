@@ -39,9 +39,9 @@ doc-prep:
 	$(MKPATH) ops
 	$(TOUCH) doc-prep
 
-packfile-c.pod: ../src/packfile.c
-#IF(new_perldoc):	$(PERLDOC_BIN) -ud packfile-c.pod ../src/packfile.c
-#ELSE:	$(PERLDOC_BIN) -u ../src/packfile.c > packfile-c.pod
+packfile-c.pod: ../src/packfile/api.c
+#IF(new_perldoc):	$(PERLDOC_BIN) -ud packfile-c.pod ../src/packfile/api.c
+#ELSE:	$(PERLDOC_BIN) -u ../src/packfile/api.c > packfile-c.pod
 
 clean:
 	$(RM_F) packfile-c.pod $(POD) doc-prep
