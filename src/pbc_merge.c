@@ -42,6 +42,7 @@ segments from the input PBC files.
 #include "parrot/oplib/ops.h"
 #include "parrot/oplib/core_ops.h"
 #include "pmc/pmc_sub.h"
+#include "parrot/embed.h"
 
 /* This struct describes an input file. */
 typedef struct pbc_merge_input {
