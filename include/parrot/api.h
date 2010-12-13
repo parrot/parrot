@@ -10,6 +10,7 @@
 #define PARROT_API_H_GUARD
 
 #include <stdlib.h>
+#include <wchar.h>
 #include "parrot/compiler.h"
 #include "parrot/config.h"
 #include "parrot/core_types.h"
@@ -320,9 +321,24 @@ Parrot_Int Parrot_api_string_export_ascii(
         FUNC_MODIFIES(* strout);
 
 PARROT_API
+Parrot_Int Parrot_api_string_export_wchar(
+    Parrot_PMC interp_pmc,
+    ARGIN(Parrot_String string),
+    ARGOUT(wchar_t ** strout))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* strout);
+
+PARROT_API
 Parrot_Int Parrot_api_string_free_exported_ascii(
     Parrot_PMC interp_pmc,
     ARGIN(char * const str))
+        __attribute__nonnull__(2);
+
+PARROT_API
+Parrot_Int Parrot_api_string_free_exported_wchar(
+    Parrot_PMC interp_pmc,
+    ARGIN(wchar_t * const str))
         __attribute__nonnull__(2);
 
 PARROT_API
@@ -344,11 +360,27 @@ Parrot_Int Parrot_api_string_import_binary(
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*out);
 
+PARROT_API
+Parrot_Int Parrot_api_string_import_wchar(
+    Parrot_PMC interp_pmc,
+    ARGIN(wchar_t * str),
+    ARGOUT(Parrot_String * out))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* out);
+
 #define ASSERT_ARGS_Parrot_api_string_export_ascii \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(string) \
     , PARROT_ASSERT_ARG(strout))
+#define ASSERT_ARGS_Parrot_api_string_export_wchar \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(string) \
+    , PARROT_ASSERT_ARG(strout))
 #define ASSERT_ARGS_Parrot_api_string_free_exported_ascii \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(str))
+#define ASSERT_ARGS_Parrot_api_string_free_exported_wchar \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_Parrot_api_string_import_ascii \
@@ -358,6 +390,10 @@ Parrot_Int Parrot_api_string_import_binary(
 #define ASSERT_ARGS_Parrot_api_string_import_binary \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(bytes) \
+    , PARROT_ASSERT_ARG(out))
+#define ASSERT_ARGS_Parrot_api_string_import_wchar \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(out))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/strings.c */
