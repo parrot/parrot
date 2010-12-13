@@ -55,7 +55,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(74)
+    plan(75)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -594,6 +594,22 @@ CODE
             ar = new ['ResizableStringArray']
             push ar, 'baz'
             nsa = new ['Null']
+            nsb = get_namespace ['Foo']
+            nsb.'export_to'(nsa, ar)
+        .end
+CODE
+
+    errormsg = "can't handle argument of type"
+    description = "export_to() invalid 'what' type"
+    throws_substring(<<"CODE", errormsg, description)
+        .sub 'test' :main
+            .local pmc nsa, nsb, ar
+
+            # To trigger the condition we need something of an unexpected
+            # type which elements vtable function does not return 0
+            ar = new ['String']
+            ar = 'boo'
+            nsa = get_namespace
             nsb = get_namespace ['Foo']
             nsb.'export_to'(nsa, ar)
         .end
