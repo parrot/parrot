@@ -187,10 +187,10 @@ init_world(PARROT_INTERP)
     VTABLE_set_pmc_keyed_int(interp, iglobals,
             (INTVAL)IGLOBALS_INTERPRETER, self);
 
-    Parrot_gbl_set_config_hash_interpreter(interp);
-
     /* lib search paths */
     parrot_init_library_paths(interp);
+
+    Parrot_gbl_set_config_hash_interpreter(interp);
 
     /* load_bytecode and dynlib loaded hash */
     pmc = Parrot_pmc_new(interp, enum_class_Hash);
