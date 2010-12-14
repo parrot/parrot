@@ -6,7 +6,7 @@ use warnings;
 
 use Getopt::Long;
 use lib qw( lib );
-use Parrot::Headerizer::Object;
+use Parrot::Headerizer;
 use Parrot::Headerizer::Functions qw(
     process_argv
 );
@@ -80,7 +80,7 @@ GetOptions(
 ) or exit(1);
 
 my @ofiles = process_argv(@ARGV);
-my $headerizer = Parrot::Headerizer::Object->new( {
+my $headerizer = Parrot::Headerizer->new( {
     macro_match => $macro_match,
 } );
 
@@ -94,7 +94,7 @@ $headerizer->print_warnings();
 
 The original headerizer program was created by Andy Lester in May 2006, with
 assistance from Jerry Gay and others.  In the last half of 2010, Most of the
-code was refactored into F<lib/Parrot/Headerizer/Object.pm> and
+code was refactored into F<lib/Parrot/Headerizer.pm> and
 F<lib/Parrot/Headerizer/Functions.pm> by James E Keenan.
 
 =cut

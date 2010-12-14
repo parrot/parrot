@@ -1,17 +1,17 @@
 # Copyright (C) 2004-2010, Parrot Foundation.
 # $Id$
 
-package Parrot::Headerizer::Object;
+package Parrot::Headerizer;
 
 =head1 NAME
 
-Parrot::Headerizer::Object - Parrot header generation functionality
+Parrot::Headerizer - Parrot header generation functionality
 
 =head1 SYNOPSIS
 
-    use Parrot::Headerizer::Object;
+    use Parrot::Headerizer;
 
-    $headerizer = Parrot::Headerizer::Object->new( {
+    $headerizer = Parrot::Headerizer->new( {
         macro_match => $macro_match, # optional
     } );
 
@@ -25,7 +25,7 @@ Parrot::Headerizer::Object - Parrot header generation functionality
 
 =head1 DESCRIPTION
 
-C<Parrot::Headerizer::Object> knows how to extract all kinds of information out
+C<Parrot::Headerizer> knows how to extract all kinds of information out
 of C-language files.  Its methods are used in F<tools/dev/headerizer.pl> and
 F<t/codingstd/c_function_docs.t>.
 
@@ -67,11 +67,11 @@ valid C<PARROT_XXX> macros.
 
 =item * Arguments
 
-    $headerizer = Parrot::Headerizer::Object->new();
+    $headerizer = Parrot::Headerizer->new();
 
 No mandatory arguments, but one special use-case takes a hash reference.
 
-    $headerizer = Parrot::Headerizer::Object->new( {
+    $headerizer = Parrot::Headerizer->new( {
         macro_match => $macro_match, # optional
     } );
 
@@ -81,7 +81,7 @@ used.
 
 =item * Return Value
 
-Parrot::Headerizer::Object object.
+Parrot::Headerizer object.
 
 =back
 
@@ -90,7 +90,7 @@ Parrot::Headerizer::Object object.
 sub new {
     my ($class, $args) = @_;
     if (defined $args) {
-        die "Argument to Parrot::Headerizer::Object must be hashref"
+        die "Argument to Parrot::Headerizer must be hashref"
             unless reftype($args) eq 'HASH';
     }
     else {

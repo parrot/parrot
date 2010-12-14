@@ -14,20 +14,20 @@ use File::Temp qw( tempdir );
 use Test::More qw(no_plan); # tests => 46;
 use lib qw( lib );
 use Parrot::Headerizer::Functions qw( read_file );
-use Parrot::Headerizer::Object;
+use Parrot::Headerizer;
 use IO::CaptureOutput qw| capture |;
 
 my $cwd = cwd();
 my $self;
-eval { $self = Parrot::Headerizer::Object->new([]); };
-like($@, qr/Argument to Parrot::Headerizer::Object must be hashref/,
+eval { $self = Parrot::Headerizer->new([]); };
+like($@, qr/Argument to Parrot::Headerizer must be hashref/,
     "Got expected error message for bad argument to constructor" );
 
-$self = Parrot::Headerizer::Object->new({ macro_match => 1});
-isa_ok( $self, 'Parrot::Headerizer::Object' );
+$self = Parrot::Headerizer->new({ macro_match => 1});
+isa_ok( $self, 'Parrot::Headerizer' );
 
-$self = Parrot::Headerizer::Object->new();
-isa_ok( $self, 'Parrot::Headerizer::Object' );
+$self = Parrot::Headerizer->new();
+isa_ok( $self, 'Parrot::Headerizer' );
 ok( $self->valid_macro( 'PARROT_EXPORT' ),
     "valid_macro() confirmed validity of macro" );
 ok(! $self->valid_macro( 'PARROT_FOOBAR' ),
@@ -145,8 +145,8 @@ $self->squawk($file, $func, $error[1]);
     mkpath( $srcopsdir, 0, 0777 );
     my $srcopso   = File::Spec->catfile( $srcopsdir, 'ops.o' );
     touchfile($srcopso);
-    $self = Parrot::Headerizer::Object->new();
-    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self = Parrot::Headerizer->new();
+    isa_ok( $self, 'Parrot::Headerizer' );
     $self->get_sources($srcopso);
     ok( ! keys %{$self->{sourcefiles}},
         "Skipped file in src/ops/ -> no sourcefiles" );
@@ -169,8 +169,8 @@ $self->squawk($file, $func, $error[1]);
     touchfile($srco);
     my $srcs   = File::Spec->catfile( $srcdir, 'other.s' );
     touchfile($srcs);
-    $self = Parrot::Headerizer::Object->new();
-    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self = Parrot::Headerizer->new();
+    isa_ok( $self, 'Parrot::Headerizer' );
     $self->get_sources($srco);
     ok( ! keys %{$self->{sourcefiles}},
         "Skipped file in src/ -> no sourcefiles" );
@@ -189,8 +189,8 @@ $self->squawk($file, $func, $error[1]);
 
     my $srco = setup_src_list_test($cwd, $tdir);
 
-    $self = Parrot::Headerizer::Object->new();
-    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self = Parrot::Headerizer->new();
+    isa_ok( $self, 'Parrot::Headerizer' );
     $self->get_sources($srco);
     ok( keys %{$self->{sourcefiles}},
         "sourcefiles" );
@@ -221,10 +221,10 @@ $self->squawk($file, $func, $error[1]);
     my $srco = setup_src_list_test($cwd, $tdir);
 
     my $macro = 'PARROT_CAN_RETURN_NULL';
-    $self = Parrot::Headerizer::Object->new( {
+    $self = Parrot::Headerizer->new( {
         macro_match => $macro,
     } );
-    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    isa_ok( $self, 'Parrot::Headerizer' );
     $self->get_sources($srco);
     ok( keys %{$self->{sourcefiles}},
         "sourcefiles" );
@@ -270,8 +270,8 @@ $self->squawk($file, $func, $error[1]);
     copy "$cwd/t/tools/dev/headerizer/testlib/${stub}_pmc.in" => $srcc
         or croak "Unable to copy";
 
-    $self = Parrot::Headerizer::Object->new();
-    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self = Parrot::Headerizer->new();
+    isa_ok( $self, 'Parrot::Headerizer' );
     $self->get_sources($srco);
     ok( ! keys %{$self->{sourcefiles}},
         "no sourcefiles" );
@@ -308,8 +308,8 @@ $self->squawk($file, $func, $error[1]);
     copy "$cwd/t/tools/dev/headerizer/testlib/${stub}_pmc.in" => $srcc
         or croak "Unable to copy";
 
-    $self = Parrot::Headerizer::Object->new();
-    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self = Parrot::Headerizer->new();
+    isa_ok( $self, 'Parrot::Headerizer' );
     $self->get_sources($srco);
     ok( ! keys %{$self->{sourcefiles}},
         "no sourcefiles" );
@@ -342,8 +342,8 @@ $self->squawk($file, $func, $error[1]);
 
     my $srco = setup_src_list_test($cwd, $tdir);
 
-    $self = Parrot::Headerizer::Object->new();
-    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self = Parrot::Headerizer->new();
+    isa_ok( $self, 'Parrot::Headerizer' );
     $self->get_sources($srco);
     ok( keys %{$self->{sourcefiles}},
         "sourcefiles" );
@@ -383,8 +383,8 @@ $self->squawk($file, $func, $error[1]);
 
     my $srco = setup_src_list_test($cwd, $tdir);
 
-    $self = Parrot::Headerizer::Object->new();
-    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self = Parrot::Headerizer->new();
+    isa_ok( $self, 'Parrot::Headerizer' );
     $self->get_sources($srco);
     ok( keys %{$self->{sourcefiles}},
         "sourcefiles" );
@@ -418,8 +418,8 @@ $self->squawk($file, $func, $error[1]);
 
     my $srco = setup_src_list_test($cwd, $tdir);
 
-    $self = Parrot::Headerizer::Object->new();
-    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self = Parrot::Headerizer->new();
+    isa_ok( $self, 'Parrot::Headerizer' );
     $self->get_sources($srco);
     ok( keys %{$self->{sourcefiles}},
         "sourcefiles" );
@@ -513,8 +513,8 @@ $self->squawk($file, $func, $error[1]);
 
     my $srco = setup_src_list_test($cwd, $tdir);
 
-    $self = Parrot::Headerizer::Object->new();
-    isa_ok( $self, 'Parrot::Headerizer::Object' );
+    $self = Parrot::Headerizer->new();
+    isa_ok( $self, 'Parrot::Headerizer' );
 
     my ($return_type, %macros, $name, $file);
 
@@ -717,7 +717,7 @@ sub setup_src_list_test {
 
 =head1 NAME
 
-02_methods.t - Test functions in Parrot::Headerizer::Object.
+02_methods.t - Test functions in Parrot::Headerizer.
 
 =head1 SYNOPSIS
 

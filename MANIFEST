@@ -1034,7 +1034,7 @@ lib/Parrot/Harness/DefaultTests.pm                          [devel]lib
 lib/Parrot/Harness/Options.pm                               [devel]lib
 lib/Parrot/Harness/Smoke.pm                                 [devel]lib
 lib/Parrot/Headerizer/Functions.pm                          [devel]lib
-lib/Parrot/Headerizer/Object.pm                             [devel]lib
+lib/Parrot/Headerizer.pm                                    [devel]lib
 lib/Parrot/IO/Directory.pm                                  [devel]lib
 lib/Parrot/IO/File.pm                                       [devel]lib
 lib/Parrot/IO/Path.pm                                       [devel]lib
