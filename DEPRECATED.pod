@@ -130,6 +130,12 @@ Used to test the experimental function Parrot_getpid
 
 L<https://trac.parrot.org/parrot/ticket/1564>
 
+=item Complex PMC [eligible in 3.1]
+
+This perennially broken PMC will be removed.
+
+L<http://trac.parrot.org/parrot/ticket/1892>
+
 =back
 
 =head1 Opcodes
