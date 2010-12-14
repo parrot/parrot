@@ -57,7 +57,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(76)
+    plan(78)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -152,6 +152,10 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     $P1 = get_class $P0
     $I0 = isnull $P1
     is($I0, 0, "get_class on a NameSpace returns something")
+
+    $P9 = $P0.'get_class'()
+    $I0 = issame $P9, $P1
+    ok($I0, "Namespace get_class method gives same result as get_class op")
 
     # Create object from class from NameSpace
     push_eh eh
@@ -593,6 +597,15 @@ CODE
     # Test del_var. It will delete any type of thing
 .end
 
+.sub export_empty_name_in_hash
+    .local pmc nsa, nsb, h
+    nsa = get_namespace
+    nsb = get_namespace ['Foo']
+    h = new ['Hash']
+    h[''] = 'foo'
+    nsb.'export_to'(nsa, h)
+.end
+
 .sub 'export_to_method'
     .local string errormsg, description
 
@@ -664,7 +677,11 @@ CODE
             nsb = get_namespace ['Foo']
             nsb.'export_to'(nsa, ar)
         .end
+
 CODE
+
+    .const 'Sub' empty_name_hash = 'export_empty_name_in_hash'
+    throws_type(empty_name_hash, .EXCEPTION_INVALID_OPERATION, 'export from hash with empty key')
 
 # Things to add: successful export_to with non-empty array, successful
 # export_to with non-empty hash. both of these things across HLL boundaries
