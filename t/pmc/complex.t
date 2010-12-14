@@ -20,7 +20,7 @@ Tests the Complex PMC.
     .include 'fp_equality.pasm'
     .include "iglobals.pasm"
 
-    plan(588)
+    plan(604)
 
     string_parsing()
     exception_malformed_string__real_part()
@@ -81,6 +81,7 @@ Tests the Complex PMC.
     atanh_of_complex_numbers()
     acoth_of_complex_numbers()
     acsch_of_complex_numbers()
+    asech_of_complex_numbers()
     add_using_subclass_of_complex_bug_59630()
     provides_complex()
 
@@ -1303,6 +1304,25 @@ todo:
     .complex_op_is("2-3i", "0.157355+0.229963i", 'acsch' )
     .complex_op_is("-2+3i", "-0.157355-0.229963i", 'acsch' )
     .complex_op_is("-2-3i", "-0.157355+0.229963i", 'acsch' )
+.end
+
+.sub asech_of_complex_numbers
+    .complex_op_is("-2+0i", "-0.000000+2.094395i", 'asech' )
+    .complex_op_is("-1+0i", "-0.000000+3.141593i", 'asech' )
+    .complex_op_is("-0.5+0i", "1.316958+3.141593i", 'asech' )
+    .complex_op_is("0.5+0i", "1.316958+0.000000i", 'asech' )
+    .complex_op_is("1+0i", "-0.000000+0.000000i", 'asech' )
+    .complex_op_is("2+0i", "-0.000000+1.047198i", 'asech' )
+    .complex_op_is("0-2i", "0.481212+1.570796i", 'asech' )
+    .complex_op_is("0-1i", "0.881374+1.570796i", 'asech' )
+    .complex_op_is("0-0.5i", "1.443635+1.570796i", 'asech' )
+    .complex_op_is("0+0.5i", "1.443635-1.570796i", 'asech' )
+    .complex_op_is("0+1i", "0.881374-1.570796i", 'asech' )
+    .complex_op_is("0+2i", "0.481212-1.570796i", 'asech' )
+    .complex_op_is("2+3i", "0.231335-1.420411i", 'asech' )
+    .complex_op_is("2-3i", "0.231335+1.420411i", 'asech' )
+    .complex_op_is("-2+3i", "0.231335-1.721182i", 'asech' )
+    .complex_op_is("-2-3i", "0.231335+1.721182i", 'asech' )
 .end
 
 .sub add_using_subclass_of_complex_bug_59630
