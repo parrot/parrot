@@ -990,7 +990,7 @@ Records a passing test if the PMC passed in is null, fails otherwise.
   done:
 .end
 
-=item C<throws_type( invokable, type, description)
+=item C<throws_type( invokable, type, description)>
 
 Recores a passing test if calling the invokable throws an exception of the
 expected type, fails otherwise.
@@ -1001,7 +1001,7 @@ expected type, fails otherwise.
     .param pmc invokable
     .param int type
     .param string description :optional
-    
+
     .local pmc test, ex
     .local string msg, exmsg
     .local int extype
