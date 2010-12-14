@@ -412,6 +412,17 @@ This is to exclude automatically generated C-language files Parrot might have.
             include/parrot/opsenum.h
             src/gc/malloc.c
             src/ops/core_ops.c
+            t/tools/dev/headerizer/testlib/fixedbooleanarray_pmc.in
+            t/tools/dev/headerizer/testlib/function_decls.in
+            t/tools/dev/headerizer/testlib/hvalidheader.in
+            t/tools/dev/headerizer/testlib/imcc.in
+            t/tools/dev/headerizer/testlib/lack_directive.in
+            t/tools/dev/headerizer/testlib/list.in
+            t/tools/dev/headerizer/testlib/list_h.in
+            t/tools/dev/headerizer/testlib/missingheaderfile.in
+            t/tools/dev/headerizer/testlib/nci_pmc.in
+            t/tools/dev/headerizer/testlib/none.in
+            t/tools/dev/headerizer/testlib/validheader.in
             } unless @exemptions;
 
         my $path = -f $file ? $file : $file->path;

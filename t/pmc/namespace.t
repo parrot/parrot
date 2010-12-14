@@ -51,11 +51,13 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 =cut
 
+.include 'except_types.pasm'
+
 .namespace []
 
 .sub main :main
     .include 'test_more.pir'
-    plan(74)
+    plan(78)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -151,6 +153,10 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     $I0 = isnull $P1
     is($I0, 0, "get_class on a NameSpace returns something")
 
+    $P9 = $P0.'get_class'()
+    $I0 = issame $P9, $P1
+    ok($I0, "Namespace get_class method gives same result as get_class op")
+
     # Create object from class from NameSpace
     push_eh eh
     $P2 = new $P1
@@ -165,6 +171,12 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     $S0 = typeof $P2
     is($S0, "Foo", "Object created from class has name of NameSpace")
 
+.end
+
+.sub namespace_lookup_invalidkeytype
+    $P0 = get_root_namespace
+    $P2 = new ['Boolean']
+    $P0[$P2] = $P2
 .end
 
 .sub keyed_namespace_lookup
@@ -199,6 +211,9 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     is($I0, 0, "can lookup namespace by string")
     # TODO: Get the function from this namespace and call it to verify we have
     #       the correct one.
+
+    .const 'Sub' invalidkey = 'namespace_lookup_invalidkeytype'
+    throws_type(invalidkey, .EXCEPTION_GLOBAL_NOT_FOUND, 'namespace lookup with invalid key')
 .end
 
 # L<PDD21//>
@@ -582,6 +597,15 @@ CODE
     # Test del_var. It will delete any type of thing
 .end
 
+.sub export_empty_name_in_hash
+    .local pmc nsa, nsb, h
+    nsa = get_namespace
+    nsb = get_namespace ['Foo']
+    h = new ['Hash']
+    h[''] = 'foo'
+    nsb.'export_to'(nsa, h)
+.end
+
 .sub 'export_to_method'
     .local string errormsg, description
 
@@ -594,6 +618,22 @@ CODE
             ar = new ['ResizableStringArray']
             push ar, 'baz'
             nsa = new ['Null']
+            nsb = get_namespace ['Foo']
+            nsb.'export_to'(nsa, ar)
+        .end
+CODE
+
+    errormsg = "can't handle argument of type"
+    description = "export_to() invalid 'what' type"
+    throws_substring(<<"CODE", errormsg, description)
+        .sub 'test' :main
+            .local pmc nsa, nsb, ar
+
+            # To trigger the condition we need something of an unexpected
+            # type which elements vtable function does not return 0
+            ar = new ['String']
+            ar = 'boo'
+            nsa = get_namespace
             nsb = get_namespace ['Foo']
             nsb.'export_to'(nsa, ar)
         .end
@@ -637,7 +677,11 @@ CODE
             nsb = get_namespace ['Foo']
             nsb.'export_to'(nsa, ar)
         .end
+
 CODE
+
+    .const 'Sub' empty_name_hash = 'export_empty_name_in_hash'
+    throws_type(empty_name_hash, .EXCEPTION_INVALID_OPERATION, 'export from hash with empty key')
 
 # Things to add: successful export_to with non-empty array, successful
 # export_to with non-empty hash. both of these things across HLL boundaries

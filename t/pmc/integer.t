@@ -15,10 +15,14 @@ Tests the Integer PMC.
 
 =cut
 
-.loadlib 'sys_ops'
+.const string MAXINT = 'MAXINT'
+.const string MININT = 'MININT'
+.const string NO_SYSINFO = 'This test requires sysinfo'
 
 .sub 'test' :main
     .include 'test_more.pir'
+
+    get_max_min()
 
     plan(141)
     test_init()
@@ -60,6 +64,50 @@ Tests the Integer PMC.
   no_bigint:
     skip_n_bigint_tests(28)
   done_bigint_tests:
+.end
+
+# Get INTVAL max and min values from sysinfo only if the sys_ops lib is
+# available and leaving them as zero otherwise (that happens during corestes,
+# for example).
+# The test that needs the values are skipped based on this.
+.sub get_max_min
+    .local string code
+
+    code = <<'CODE'
+.loadlib 'sys_ops'
+.include 'sysinfo.pasm'
+.sub aux_get_max
+    .local int m
+    .local pmc pm
+    m = sysinfo .SYSINFO_PARROT_INTMAX
+    pm = box m
+    set_hll_global 'MAXINT', pm
+    m = sysinfo .SYSINFO_PARROT_INTMIN
+    pm = box m
+    set_hll_global 'MININT', pm
+.end
+CODE
+
+    .local pmc m
+    m = box 0
+    set_hll_global MAXINT, m
+    m = box 0
+    set_hll_global MININT, m
+    .local pmc pircomp
+    push_eh catch
+    pircomp = compreg 'PIR'
+    if null pircomp goto done
+    .local pmc getit
+    getit = pircomp(code)
+    getit()
+    goto done
+  catch:
+    .local pmc ex
+    .get_results(ex)
+    finalize ex
+
+  done:
+    pop_eh
 .end
 
 .sub has_bigint
@@ -131,6 +179,10 @@ CODE
     neg int_1
     is(int_1, 5, '... neg')
 
+    $P9 = get_hll_global MININT
+    $I0 = $P9
+    unless $I0 goto skip
+
     throws_substring(<<'CODE', 'Integer overflow', 'mul integer overflow')
 
     .sub main
@@ -144,7 +196,12 @@ CODE
         $P0 *= 2
     .end
 CODE
+    goto more
 
+  skip:
+    skip(1, NO_SYSINFO)
+
+  more:
     int_1 = new ['Integer']
     int_1 = -57494
     int_1 = abs int_1
@@ -158,14 +215,16 @@ CODE
 
 .sub test_autopromotion_to_BigInt
     push_eh _dont_have_bigint_library
-    .include 'sysinfo.pasm'
     .local pmc bigint_1
     .local pmc int_1
 
     int_1 = new ['Integer']
     bigint_1 = new ['BigInt']
 
-    $I0 = sysinfo .SYSINFO_PARROT_INTMIN
+    $P9 = get_hll_global MININT
+    $I0 = $P9
+    unless $I0 goto skip
+
     int_1 = $I0
     bigint_1 = int_1 - 1
 
@@ -182,6 +241,10 @@ CODE
     ok(1, "no bigint library")
     ok(1, "no bigint library")
   _have_bigint_library:
+    goto end
+  skip:
+    skip(2, NO_SYSINFO)
+  end:
 .end
 
 .sub test_truthiness_and_definedness
@@ -380,17 +443,22 @@ fin:
 .end
 
 .sub test_add_BigInt
-   .include 'sysinfo.pasm'
-   new $P0, ['Integer']
-   new $P1, ['BigInt']
-   sysinfo $I0, .SYSINFO_PARROT_INTMAX
-   set $P0, $I0
-   set $P1, $I0
-   add $P0, $P0, 1
-   add $P1, $P1, 1
-   typeof $P2, $P0
-   is($P0, $P1, 'add integer overflow promotion')
-   is($P2, 'BigInt', 'add integer overflow type check')
+    $P9 = get_hll_global MAXINT
+    $I0 = $P9
+    unless $I0 goto skip
+    new $P0, ['Integer']
+    new $P1, ['BigInt']
+    set $P0, $I0
+    set $P1, $I0
+    add $P0, $P0, 1
+    add $P1, $P1, 1
+    typeof $P2, $P0
+    is($P0, $P1, 'add integer overflow promotion')
+    is($P2, 'BigInt', 'add integer overflow type check')
+    goto end
+  skip:
+    skip(2, NO_SYSINFO)
+  end:
 .end
 
 .sub test_add
@@ -437,10 +505,11 @@ fin:
     sub $P1, $P1, $P0
     is($P1, 1, 'BigInt sub (no exception)')
 
-    .include 'sysinfo.pasm'
     $P0 = new ['Integer']
     $P1 = new ['BigInt']
-    $I0 = sysinfo .SYSINFO_PARROT_INTMIN
+    $P9 = get_hll_global MININT
+    $I0 = $P9
+    unless $I0 goto skip
     $P0 = $I0
     $P1 = $I0
     sub $P0, $P0, 1
@@ -464,6 +533,10 @@ fin:
     typeof $P3, $P0
     is($P0, $P1, 'i_subtract overflow promotion')
     is($P3, 'BigInt', 'i_subtract overflow type check')
+    goto end
+  skip:
+    skip(6, NO_SYSINFO)
+  end:
 .end
 
 .sub test_sub
@@ -547,9 +620,10 @@ fin:
     $I0 = iseq $P0, $P2
     todo($I0, 'i_multiply Integer PMC by BigInt PMC', 'unresolved bug, see TT #1887')
 
-    .include 'sysinfo.pasm'
     $P0 = new ['Integer']
-    $I0 = sysinfo .SYSINFO_PARROT_INTMAX
+    $P9 = get_hll_global MAXINT
+    $I0 = $P9
+    unless $I0 goto skip
     $P0 = $I0
     $P1 = $I0
     mul $P0, 2
@@ -557,6 +631,10 @@ fin:
     $P2 = typeof $P0
     is($P0, $P1, 'i_multiply_int overflow promotion')
     is($P2, 'BigInt', 'i_multiple_int overflow type check')
+    goto end
+  skip:
+    skip(2, NO_SYSINFO)
+  end:
 .end
 
 .sub test_div_BigInt
@@ -826,12 +904,12 @@ CODE
 .end
 
 .sub test_neg_BigInt
-    .include 'sysinfo.pasm'
-
     $P0 = new ['Integer']
     $P1 = new ['BigInt']
 
-    $I0 = sysinfo .SYSINFO_PARROT_INTMIN
+    $P9 = get_hll_global MININT
+    $I0 = $P9
+    unless $I0 goto skip
 
     $P0 = $I0
     $P1 = $I0
@@ -841,6 +919,10 @@ CODE
     $P2 = typeof $P0
     is($P0, $P1, 'neg integer overflow promotion')
     is($P2, 'BigInt', 'neg integer overflow type check')
+    goto end
+  skip:
+    skip(2, NO_SYSINFO)
+  end:
 .end
 
 .sub test_neg

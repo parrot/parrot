@@ -1033,6 +1033,7 @@ lib/Parrot/H2inc.pm                                         [devel]lib
 lib/Parrot/Harness/DefaultTests.pm                          [devel]lib
 lib/Parrot/Harness/Options.pm                               [devel]lib
 lib/Parrot/Harness/Smoke.pm                                 [devel]lib
+lib/Parrot/Headerizer/Functions.pm                          [devel]lib
 lib/Parrot/Headerizer.pm                                    [devel]lib
 lib/Parrot/IO/Directory.pm                                  [devel]lib
 lib/Parrot/IO/File.pm                                       [devel]lib
@@ -2018,6 +2019,19 @@ t/steps/inter/yacc-01.t                                     [test]
 t/steps/inter/yacc-02.t                                     [test]
 t/stress/gc.t                                               [test]
 t/tools/create_language.t                                   [test]
+t/tools/dev/headerizer/01_functions.t                       [test]
+t/tools/dev/headerizer/02_methods.t                         [test]
+t/tools/dev/headerizer/testlib/fixedbooleanarray_pmc.in     [test]
+t/tools/dev/headerizer/testlib/function_decls.in            [test]
+t/tools/dev/headerizer/testlib/hvalidheader.in              [test]
+t/tools/dev/headerizer/testlib/imcc.in                      [test]
+t/tools/dev/headerizer/testlib/lack_directive.in            [test]
+t/tools/dev/headerizer/testlib/list.in                      [test]
+t/tools/dev/headerizer/testlib/list_h.in                    [test]
+t/tools/dev/headerizer/testlib/missingheaderfile.in         [test]
+t/tools/dev/headerizer/testlib/nci_pmc.in                   [test]
+t/tools/dev/headerizer/testlib/none.in                      [test]
+t/tools/dev/headerizer/testlib/validheader.in               [test]
 t/tools/dev/pmctree.t                                       [test]
 t/tools/dev/searchops.t                                     [test]
 t/tools/dev/searchops/samples.pm                            [test]
