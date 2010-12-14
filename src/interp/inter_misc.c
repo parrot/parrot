@@ -179,7 +179,7 @@ Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
 
 /*
 
-=item C<PMC * Parrot_set_compiler(PARROT_INTERP, STRING *type, PMC *compiler)>
+=item C<void Parrot_set_compiler(PARROT_INTERP, STRING *type, PMC *compiler)>
 
 Register a parser/compiler PMC.
 
@@ -188,7 +188,7 @@ Register a parser/compiler PMC.
 */
 
 PARROT_EXPORT
-PMC *
+void
 Parrot_set_compiler(PARROT_INTERP, ARGIN(STRING *type), ARGIN(PMC *compiler))
 {
     ASSERT_ARGS(Parrot_set_compiler)
