@@ -894,10 +894,10 @@ $(MINIPARROT) : src/main$(O) include/parrot/api.h include/parrot/longopt.h $(LIB
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(INSTALLABLEPARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
-    src/install_config$(O) \
+    src/install_config$(O) src/longopt$(O) \
     $(PARROT)
 	$(LINK) @ld_out@$@ \
-    src/main$(O) src/install_config$(O) include/parrot/api.h \
+    src/main$(O) src/install_config$(O) src/longopt$(O) \
     @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
