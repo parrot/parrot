@@ -1,5 +1,4 @@
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 
 .HLL 'parrot'
 .namespace ['Parrot';'Compiler']

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2009-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -528,10 +527,10 @@ ARGIN(PMC *ctx_pmc))
     INTVAL line_num = hash_value_to_int(interp, runcore->line_cache,
             parrot_hash_get(interp, runcore->line_cache, ctx->current_pc));
 
-    /* Parrot_Sub_get_line_from_pc eats up about 20-30% of execution time
+    /* Parrot_sub_get_line_from_pc eats up about 20-30% of execution time
      * *with* this cache in place. */
     if (line_num == 0) {
-        line_num = Parrot_Sub_get_line_from_pc(interp,
+        line_num = Parrot_sub_get_line_from_pc(interp,
                 Parrot_pcc_get_sub(interp, ctx_pmc), ctx->current_pc);
         parrot_hash_put(interp, runcore->line_cache, ctx->current_pc, (void *) line_num);
     }
@@ -763,7 +762,7 @@ ARGIN(PMC* ctx_pmc), ARGIN(opcode_t *pc))
 
     ASSERT_ARGS(get_filename_cstr)
 
-    STRING *filename = Parrot_Sub_get_filename_from_pc(interp,
+    STRING *filename = Parrot_sub_get_filename_from_pc(interp,
             Parrot_pcc_get_sub(interp, ctx_pmc), pc);
     char *filename_cstr = Parrot_str_to_cstring(interp, filename);
 
@@ -938,5 +937,5 @@ destroy_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

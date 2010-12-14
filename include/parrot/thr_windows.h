@@ -1,7 +1,5 @@
 /* thread.h
  *  Copyright (C) 2001-2003, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the api header for the windows thread primitives
  *  Data Structure and Algorithms:
@@ -132,5 +130,5 @@ struct timespec {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

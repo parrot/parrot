@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2008-2009, Parrot Foundation.
-$Id$
 
 =pod
 
@@ -89,7 +88,7 @@ static void rat_add_integer(PARROT_INTERP, PMC *self, int value) {
 
 =item C<static void rat_add_float(PARROT_INTERP, PMC *self, double value)>
 
-Adds a float "value" to a Rational-PMC in-place. "value" is first conveted to a
+Adds a float "value" to a Rational-PMC in-place. "value" is first converted to a
 rational using GMPs mpq_set_d-function. This is meant to be exact.
 
 =cut
@@ -112,7 +111,7 @@ static void rat_add_float(PARROT_INTERP, PMC *self, double value) {
 
 =item C<static void rat_multiply_integer(PARROT_INTERP, PMC *self, int value)>
 
-Multiplys a Rational-PMC with an integer "value" in-place.
+Multiplies a Rational-PMC with an integer "value" in-place.
 
 =cut
 
@@ -1062,5 +1061,5 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

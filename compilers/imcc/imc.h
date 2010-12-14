@@ -1,9 +1,6 @@
 /*
- * $Id$
  * Copyright (C) 2002-2009, Parrot Foundation.
  */
-
-/* $Id$ */
 
 #ifndef PARROT_IMCC_IMC_H_GUARD
 #define PARROT_IMCC_IMC_H_GUARD
@@ -625,5 +622,5 @@ FILE * imc_yyin_get(void *yyscanner);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

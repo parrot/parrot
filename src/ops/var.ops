@@ -1,5 +1,4 @@
 /*
- * $Id$
 ** var.ops
 */
 
@@ -42,7 +41,7 @@ Parrot's LexPad throws an exception for unknown names.
 op store_lex(in STR, invar PMC) {
     PMC     * const ctx      = CURRENT_CONTEXT(interp);
     STRING  * const lex_name = $1;
-    PMC     * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
+    PMC     * const lex_pad  = Parrot_sub_find_pad(interp, lex_name, ctx);
 
     if (PMC_IS_NULL(lex_pad)) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
@@ -71,7 +70,7 @@ op store_dynamic_lex(in STR, invar PMC) {
     PMC     * const lex_pad  =
         PMC_IS_NULL(ctx)
             ? PMCNULL
-            : Parrot_find_dynamic_pad(interp, lex_name, ctx);
+            : Parrot_sub_find_dynamic_pad(interp, lex_name, ctx);
 
     if (PMC_IS_NULL(lex_pad)) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
@@ -94,7 +93,7 @@ Null PMC if the variable is not found.
 op find_lex(out PMC, in STR) {
     PMC     * const ctx      = CURRENT_CONTEXT(interp);
     STRING  * const lex_name = $2;
-    PMC     * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
+    PMC     * const lex_pad  = Parrot_sub_find_pad(interp, lex_name, ctx);
 
     PMC * const result =
         PMC_IS_NULL(lex_pad)
@@ -121,7 +120,7 @@ op find_dynamic_lex(out PMC, in STR) {
     PMC     * const lex_pad  =
         PMC_IS_NULL(ctx)
             ? PMCNULL
-            : Parrot_find_dynamic_pad(interp, lex_name, ctx);
+            : Parrot_sub_find_dynamic_pad(interp, lex_name, ctx);
     PMC     * const result =
         PMC_IS_NULL(lex_pad)
             ? PMCNULL
@@ -147,7 +146,7 @@ op find_caller_lex(out PMC, in STR) {
             !PMC_IS_NULL(ctx) && PMC_IS_NULL(result);
             ctx = Parrot_pcc_get_caller_ctx(interp, ctx))
     {
-        PMC * const lex_pad = Parrot_find_pad(interp, lex_name, ctx);
+        PMC * const lex_pad = Parrot_sub_find_pad(interp, lex_name, ctx);
         if (!PMC_IS_NULL(lex_pad)) {
             result = VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
         }
@@ -202,12 +201,12 @@ null.
 =cut
 
 op get_hll_namespace(out PMC) {
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     $1 = hll_ns;
 }
 
 op get_hll_namespace(out PMC, in PMC) {
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     if (PMC_IS_NULL(hll_ns))
         $1 = PMCNULL;
     else {
@@ -298,12 +297,12 @@ global doesn't exist, $1 is set to null.
 =cut
 
 op get_hll_global(out PMC, in STR) {
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     $1 = Parrot_ns_find_global_from_op(interp, hll_ns, $2, expr NEXT());
 }
 
 op get_hll_global(out PMC, in PMC, in STR) {
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     if (PMC_IS_NULL(hll_ns)) {
         $1 = hll_ns;
     }
@@ -394,12 +393,12 @@ does not exist, it is created.
 =cut
 
 op set_hll_global(in STR, invar PMC) {
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     Parrot_ns_set_global(interp, hll_ns, $1, $2);
 }
 
 op set_hll_global(in PMC, in STR, invar PMC) {
-    PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(interp);
+    PMC * const hll_ns = Parrot_hll_get_ctx_HLL_namespace(interp);
     PMC * const ns     = Parrot_ns_make_namespace_keyed(interp, hll_ns, $1);
 
     Parrot_ns_set_global(interp, ns, $2, $3);
@@ -507,5 +506,5 @@ as the Parrot interpreter itself.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

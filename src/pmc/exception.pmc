@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -127,6 +126,21 @@ Initializes the exception with default values.
         SET_ATTR_handler_iter(INTERP, SELF, PMCNULL);
         SET_ATTR_handler_ctx(INTERP, SELF, PMCNULL);
         SET_ATTR_thrower(INTERP, SELF, PMCNULL);
+    }
+
+/*
+
+=item C<void init_int()>
+
+Initializes the exception with default values and the specified type.
+
+=cut
+
+*/
+
+    VTABLE void init_int(INTVAL type) {
+        SELF.init();
+        SET_ATTR_type(INTERP, SELF, type);
     }
 
 /*
@@ -885,5 +899,5 @@ getAttrEnum(PARROT_INTERP, ARGIN(const STRING *name))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

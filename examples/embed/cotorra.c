@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2009-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -292,5 +291,5 @@ int main(int argc, const char **argv)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

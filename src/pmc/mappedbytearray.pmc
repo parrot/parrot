@@ -1,0 +1,604 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+
+=head1 NAME
+
+src/pmc/mappedbytearray.pmc - Mapped byte array
+
+=head1 DESCRIPTION
+
+A memory mapped file or shared memory segment accesible as array of bytes.
+
+Bare minimal functionality available, only for posix platforms
+(tested on linux).
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "../src/io/io_private.h"
+#include "../src/string/unicode.h"
+
+#define CAN_READ  1
+#define CAN_WRITE 2
+
+#ifdef PARROT_HAS_HEADER_SYSMMAN
+#  include <sys/mman.h>
+#  define ENABLED
+#else
+#  ifdef __MINGW32__
+#    define ENABLED
+#    define MAPW32
+#  endif
+#endif
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_CANNOT_RETURN_NULL
+static STRING * build_string(PARROT_INTERP,
+    ARGIN_NULLOK(const unsigned char *content),
+    INTVAL size,
+    ARGIN_NULLOK(const STR_VTABLE *encoding))
+        __attribute__nonnull__(1);
+
+PARROT_CAN_RETURN_NULL
+static void * mapfromfilehandle(
+    PIOHANDLE handle,
+    unsigned long size,
+    int flag);
+
+PARROT_CAN_RETURN_NULL
+static void * mapfromfilename(PARROT_INTERP,
+    ARGIN(STRING *name),
+    ARGMOD(unsigned long *size),
+    int flag)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*size);
+
+PARROT_DOES_NOT_RETURN
+static void unavailable(PARROT_INTERP, ARGIN(const char *msg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_build_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_mapfromfilehandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_mapfromfilename __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(size))
+#define ASSERT_ARGS_unavailable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(msg))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+pmclass MappedByteArray auto_attrs {
+    ATTR unsigned char *buffer;
+    ATTR UINTVAL size;
+
+/*
+
+=head2 Vtable Functions
+
+=over 4
+
+=item C<init()>
+
+Initialize without doing any mapping.
+
+=item C<init_pmc(PMC *init)>
+
+The argument must be a String PMC with a file name. Maps the whole file.
+
+Other options still not available.
+
+=item C<destroy()>
+
+Free all resources used.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        #ifdef ENABLED
+        PObj_custom_destroy_SET(SELF);
+        #endif
+    }
+
+    VTABLE void init_pmc(PMC * init) {
+        #ifdef ENABLED
+        void *mapping = NULL;
+        PObj_custom_destroy_SET(SELF);
+        if (VTABLE_isa(INTERP, init, CONST_STRING(INTERP, "String"))) {
+            unsigned long length = 0;
+            STRING *name = VTABLE_get_string(INTERP, init);
+        #  ifdef MAPW32
+        #  else
+            mapping = mapfromfilename(interp, name, &length, CAN_READ);
+            if (mapping == 0 || mapping == (void *)-1)
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                        EXCEPTION_INVALID_OPERATION,
+                        "mmap failed: %s", strerror(errno));
+        #  endif
+            PObj_custom_destroy_SET(SELF);
+            SET_ATTR_size(INTERP, SELF, length);
+            SET_ATTR_buffer(INTERP, SELF, (unsigned char*)mapping);
+        }
+        else {
+            unavailable(INTERP, "*feature unknown or not implemented yet*");
+        }
+        #else
+        unavailable(INTERP, "MappedByteArray");
+        #endif
+    }
+
+    VTABLE void destroy() {
+        #ifdef ENABLED
+        unsigned char *buffer;
+        UINTVAL size;
+        GET_ATTR_size(INTERP, SELF, size);
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        if (size > 0) {
+        #  ifdef MAPW32
+            UnmapViewOfFile(buffer);
+        #  else
+            munmap(buffer, size);
+        #  endif
+        }
+        #endif
+    }
+
+/*
+
+=item C<get_bool()>
+
+Return true if active, false otherwise.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_bool() {
+        #ifdef ENABLED
+        unsigned char *buffer;
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        return buffer != NULL;
+        #else
+        return 0;
+        #endif
+    }
+
+
+/*
+
+=item C<elements()>
+
+Return the size of the mapped area.
+
+=cut
+
+*/
+
+    VTABLE INTVAL elements() {
+        #ifdef ENABLED
+        UINTVAL size;
+        GET_ATTR_size(INTERP, SELF, size);
+        return size;
+        #else
+        return 0;
+        #endif
+    }
+
+
+/*
+
+=item C<get_integer_keyed_int(INTVAL pos)>
+
+Get the byte at pos.
+
+=item C<set_integer_keyed_int(INTVAL pos, INTVAL value)>
+
+Set the byte at pos to value.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer_keyed_int(INTVAL pos) {
+        INTVAL size;
+        unsigned char *buffer;
+        GET_ATTR_size(INTERP, SELF, size);
+        if (size <= 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "not mapped");
+        if (pos < 0 || pos >= size)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_OUT_OF_BOUNDS,
+                    "index out of mapped");
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        return buffer[pos];
+    }
+
+    VTABLE void set_integer_keyed_int(INTVAL pos, INTVAL value) {
+        INTVAL size;
+        unsigned char *buffer;
+        GET_ATTR_size(INTERP, SELF, size);
+        if (size <= 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "not mapped");
+        if (pos < 0 || pos >= size)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_OUT_OF_BOUNDS,
+                    "index out of mapped");
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        buffer[pos] = value;
+    }
+
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<supported()>
+
+Return 0 if file mapping is not supported, non zero otherwise.
+
+=cut
+
+*/
+
+    METHOD supported()
+    {
+        #ifdef ENABLED
+        RETURN(INTVAL 1);
+        #else
+        RETURN(INTVAL 0);
+        #endif
+    }
+
+/*
+
+=item C<open(STRING *filename, STRING *mode :optional)>
+
+Map a file by its name. The mode argument can be "r", "w" or "rw",
+"r" is assumed if omitted.
+
+=cut
+
+*/
+
+    METHOD open(STRING *filename, STRING *mode :optional)
+    {
+        #ifdef ENABLED
+        unsigned long length = 0;
+        int flag = 0;
+        void *mapping;
+        if (STRING_IS_NULL(mode))
+            flag = CAN_READ;
+        else {
+            INTVAL len = Parrot_str_length(INTERP, mode);
+            INTVAL i;
+            for (i = 0; i < len; ++i) {
+                switch (STRING_ord(INTERP, mode, i)) {
+                  case 'r':
+                    flag |= CAN_READ;
+                    break;
+                  case 'w':
+                    flag |= CAN_WRITE;
+                    break;
+                  default:
+                    Parrot_ex_throw_from_c_args(INTERP, NULL,
+                            EXCEPTION_INVALID_OPERATION,
+                            "invalid open mapped mode");
+                }
+            }
+        }
+        mapping = mapfromfilename(interp, filename, &length, flag);
+        if (mapping == 0 || mapping == (void *)-1)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "mmap failed: %s", strerror(errno));
+        SET_ATTR_size(INTERP, SELF, length);
+        SET_ATTR_buffer(INTERP, SELF, (unsigned char*)mapping);
+        #endif
+        RETURN(void);
+    }
+
+/*
+
+=item C<close()>
+
+Close the mapping. Return 0 if the mapping was opened aand the unmap operation
+does not fail, non zero otherwise.
+
+=cut
+
+*/
+
+    METHOD close()
+    {
+        INTVAL result = 1;
+        #ifdef ENABLED
+        unsigned char *buffer;
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        if (buffer) {
+            INTVAL size;
+            GET_ATTR_size(INTERP, SELF, size);
+        #  ifdef MAPW32
+            result = ! UnmapViewOfFile(buffer);
+        #  else
+            result = munmap(buffer, size);
+        #  endif
+            if (result == 0) {
+                buffer = NULL;
+                SET_ATTR_buffer(INTERP, SELF, buffer);
+                SET_ATTR_size(INTERP, SELF, 0);
+            }
+        }
+        #endif
+        RETURN(INTVAL result);
+    }
+
+/*
+
+=item C<get_string(INTVAL pos, INTVAL bytelength, STRING *encodingname)>
+
+Get a string from the buffer content with the specified encoding.
+
+=cut
+
+*/
+
+    METHOD get_string(INTVAL pos, INTVAL bytelength, STRING *encodingname)
+    {
+        #ifdef ENABLED
+        STRING *result;
+        unsigned char *buffer;
+        INTVAL size;
+        const STR_VTABLE *encoding = Parrot_get_encoding(INTERP,
+            Parrot_encoding_number(INTERP, encodingname));
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        GET_ATTR_size(INTERP, SELF, size);
+        if (pos < 0 || bytelength < 0 || size < 0 || pos + bytelength > size)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_OUT_OF_BOUNDS,
+                    "get_string: index out of mapped");
+        result = build_string(INTERP, buffer + pos, bytelength, encoding);
+        RETURN(STRING *result);
+        #endif
+    }
+
+/*
+
+=item C<get_utf8(INTVAL pos, INTVAL length)>
+
+Get a utf8 string from the buffer content with the specified lenght
+in codepoints.
+
+=cut
+
+*/
+
+    METHOD get_utf8(INTVAL pos, INTVAL length)
+    {
+        #ifdef ENABLED
+        STRING *result;
+        unsigned char *buffer;
+        INTVAL size;
+        INTVAL curpos;
+        INTVAL charlen;
+        unsigned char c;
+        GET_ATTR_buffer(INTERP, SELF, buffer);
+        GET_ATTR_size(INTERP, SELF, size);
+        for (curpos = pos; length > 0; --length) {
+            if (curpos < 0 || curpos >= size)
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                        EXCEPTION_OUT_OF_BOUNDS,
+                        "get_utf8: index out of mapped");
+            c = buffer[curpos];
+            charlen = Parrot_utf8skip[c];
+            curpos += charlen;
+        }
+        result = build_string(INTERP, buffer + pos, curpos - pos, Parrot_utf8_encoding_ptr);
+        RETURN(STRING *result);
+        #endif
+    }
+
+} /* pmclass end */
+
+/*
+
+=back
+
+=head2 Helper functions
+
+=over 4
+
+=item C<static void unavailable(PARROT_INTERP, const char *msg)>
+
+Throws appropiately for functionality not available in the current platform.
+
+=item C<static void * mapfromfilehandle(PIOHANDLE handle, unsigned long size,
+int flag)>
+
+Maps a file by its OS handle.
+
+=item C<static void * mapfromfilename(PARROT_INTERP, STRING *name, unsigned long
+*size, int flag)>
+
+Maps a file by its filename, throw if the file can't be opened.
+
+=cut
+
+*/
+
+PARROT_DOES_NOT_RETURN
+static void
+unavailable(PARROT_INTERP, ARGIN(const char *msg))
+{
+    ASSERT_ARGS(unavailable)
+
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+            "%s not implemented in this platform", msg);
+}
+
+PARROT_CAN_RETURN_NULL
+static void *
+mapfromfilehandle(PIOHANDLE handle, unsigned long size, int flag)
+{
+    ASSERT_ARGS(mapfromfilehandle)
+
+    void *mapping = (void *)-1;
+    #ifdef ENABLED
+    #  ifdef MAPW32
+    HANDLE hmapping;
+    DWORD prot, access;
+    if (flag & CAN_WRITE) {
+        prot = PAGE_READWRITE;
+        access = FILE_MAP_WRITE;
+    }
+    else {
+        prot = PAGE_READONLY;
+        access = FILE_MAP_READ;
+    }
+    hmapping = CreateFileMapping(handle, NULL, prot, 0, size, NULL);
+    if (hmapping != NULL) {
+        mapping = MapViewOfFile(hmapping, access, 0, 0, size);
+        CloseHandle(hmapping);
+    }
+    #  else
+    int prot = 0;
+    if (flag & CAN_READ) prot |= PROT_READ;
+    if (flag & CAN_WRITE) prot |= PROT_WRITE;
+    mapping = mmap(0, size, prot, MAP_SHARED, handle, 0);
+    #  endif
+    #endif
+    return mapping;
+}
+
+PARROT_CAN_RETURN_NULL
+static void *
+mapfromfilename(PARROT_INTERP, ARGIN(STRING *name), ARGMOD(unsigned long *size), int flag)
+{
+    ASSERT_ARGS(mapfromfilename)
+
+    void *mapping = (void *)-1;
+    #ifdef ENABLED
+    PIOHANDLE handle;
+    #  ifdef MAPW32
+    DWORD openmode = 0;
+    switch (flag & (CAN_READ | CAN_WRITE)) {
+      case CAN_READ:
+        openmode = GENERIC_READ;
+        break;
+      case CAN_READ | CAN_WRITE:
+      case CAN_WRITE:
+        openmode = GENERIC_READ | GENERIC_WRITE;
+        break;
+      default:
+        /* Should never happen, invalid modes must be caught before
+         * calling this function.
+         */
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INTERNAL_NOT_IMPLEMENTED, "invalid mmap mode");
+    }
+    {
+        char * name_str = Parrot_str_to_cstring(interp, name);
+        handle = CreateFile(name_str, openmode, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        Parrot_str_free_cstring(name_str);
+    }
+    #  else
+    int openmode = 0;
+    switch (flag & (CAN_READ | CAN_WRITE)) {
+      case CAN_READ:
+        openmode = O_RDONLY;
+        break;
+      case CAN_READ | CAN_WRITE:
+      case CAN_WRITE:
+        openmode = O_RDWR;
+        break;
+      default:
+        /* Should never happen, invalid modes must be caught before
+         * calling this function.
+         */
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INTERNAL_NOT_IMPLEMENTED, "invalid mmap mode");
+    }
+    {
+        char * name_str = Parrot_str_to_cstring(interp, name);
+        handle = open(name_str, openmode);
+        Parrot_str_free_cstring(name_str);
+    }
+    #  endif
+    if (handle == PIO_INVALID_HANDLE)
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION, "cannot open file '%Ss'", name);
+    if (*size == 0) {
+    #  ifdef MAPW32
+        *size = (unsigned long)GetFileSize(handle, NULL);
+    #  else
+        *size = lseek(handle, 0, SEEK_END);
+    #  endif
+    }
+    mapping = mapfromfilehandle(handle, *size, flag);
+
+    #endif
+
+    return mapping;
+}
+
+/*
+
+=item C<static STRING * build_string(PARROT_INTERP, const unsigned char
+*content, INTVAL size, const STR_VTABLE *encoding)>
+
+Build a string from the buffer content with the encoding specified.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static STRING *
+build_string(PARROT_INTERP, ARGIN_NULLOK(const unsigned char *content),
+        INTVAL size,
+        ARGIN_NULLOK(const STR_VTABLE *encoding))
+{
+    ASSERT_ARGS(build_string)
+    if (encoding == NULL)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
+                "Invalid encoding");
+    else
+        return Parrot_str_new_init(interp,
+                (const char *)content, size, encoding, 0);
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
+

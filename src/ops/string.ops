@@ -1,7 +1,14 @@
 /*
- * $Id$
 ** string.ops
 */
+
+BEGIN_OPS_PREAMBLE
+
+#if PARROT_HAS_ICU
+#  include <unicode/uchar.h>
+#endif
+
+END_OPS_PREAMBLE
 
 =head1 NAME
 
@@ -453,52 +460,6 @@ op split(out PMC, in STR, in STR) :base_core {
 }
 
 
-=item B<charset>(out INT, in STR)
-
-Return the charset number $1 of string $2.
-
-=item B<charsetname>(out STR, in INT)
-
-Return the name $1 of charset number $2.
-If charset number $2 is not found, name $1 is set to null.
-
-=item B<find_charset>(out INT, in STR)
-
-Return the charset number of the charset named $2. If the charset doesn't
-exist, throw an exception.
-
-=item B<trans_charset>(out STR, in STR, in INT)
-
-Create a string $1 from $2 with the specified charset.
-
-Both functions may throw an exception on information loss.
-
-=cut
-
-op charset(out INT, in STR) :base_core {
-    $1 = Parrot_encoding_number_of_str(interp, $2);
-}
-
-op charsetname(out STR, in INT) :base_core {
-    $1 = Parrot_encoding_name(interp, $2);
-}
-
-op find_charset(out INT, in STR) :base_core {
-    const INTVAL n = Parrot_encoding_number(interp, $2);
-    if (n < 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
-                EXCEPTION_INVALID_CHARTYPE,
-                "charset '%Ss' not found", $2);
-        goto ADDRESS(handler);
-    }
-    $1 = n;
-}
-
-op trans_charset(out STR, in STR, in INT) {
-    $1 = Parrot_str_change_charset(interp, $2, $3);
-}
-
-
 =item B<encoding>(out INT, in STR)
 
 Return the encoding number $1 of string $2.
@@ -605,6 +566,27 @@ op compose(out STR, in STR) {
 }
 
 
+=item B<find_codepoint>(out INT, in STR)
+
+Set $1 to the codepoint with the name given in $2, or -1 if there is none.
+Requires ICU lib, otherwise exception is thrown.
+
+=cut
+
+op find_codepoint(out INT, in STR) {
+#if PARROT_HAS_ICU
+    UErrorCode   err       = U_ZERO_ERROR;
+    char * const cstr      = Parrot_str_to_cstring(interp, $2);
+    UChar32      codepoint = u_charFromName(U_EXTENDED_CHAR_NAME, cstr, &err);
+    Parrot_str_free_cstring(cstr);
+    $1 = U_SUCCESS(err) ? (INTVAL) codepoint : -1;
+#else
+    opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
+    goto ADDRESS(dest);
+#endif
+}
+
 =back
 
 =head1 COPYRIGHT
@@ -622,5 +604,5 @@ as the Parrot interpreter itself.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

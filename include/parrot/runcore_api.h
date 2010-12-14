@@ -1,7 +1,5 @@
 /* runcore_api.h
  *  Copyright (C) 2001-2009, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Functions and macros to dispatch opcodes.
  */
@@ -167,5 +165,5 @@ void Parrot_runcore_slow_init(PARROT_INTERP)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

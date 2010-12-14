@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -1585,7 +1584,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "set_args via explicit continuation" );
     result = "not ok 2\n"
     .local pmc cont
     cont = new 'Continuation'
-    set_addr cont, cont_dest
+    set_label cont, cont_dest
     bar(cont, "ok 1\n")
     print "oops\n"
 cont_dest:
@@ -1612,7 +1611,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall explicit continuation, no args" )
     result = "not ok 2\n"
     .local pmc cont
     cont = new 'Continuation'
-    set_addr cont, cont_dest
+    set_label cont, cont_dest
     bar(cont, "ok 1\n")
     print "oops\n"
 cont_dest:
@@ -1641,7 +1640,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "newclosure followed by tailcall" );
         .lex "MAIN-CONT", $P41
         $I42 = 10
         $P41 = new 'Continuation'
-        set_addr $P41, L2
+        set_label $P41, L2
         goto L3
 L2:
         get_results '0', $P45

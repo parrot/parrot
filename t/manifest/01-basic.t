@@ -1,12 +1,11 @@
 #! perl
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 # 01-basic.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 12;
 use Carp;
 use Cwd;
 use File::Temp qw( tempdir );
@@ -27,8 +26,6 @@ SKIP: {
     my $mani = Parrot::Manifest->new( { script => $script, } );
     isa_ok( $mani, 'Parrot::Manifest' );
 
-    ok( scalar( @{ $mani->{dirs} } ),
-        "Parrot::Manifest constructor used 'status' command to find at least 1 directory." );
     ok( scalar( @{ $mani->{versioned_files} } ),
         "Parrot::Manifest constructor used 'status' command to find at least 1 versioned file." );
 

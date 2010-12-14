@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -459,7 +458,7 @@ handle_errs:
     ## Take a continuation.
     .local pmc cont
     cont = new ['Continuation']
-    set_addr cont, over_there
+    set_label cont, over_there
     print "    returning from foo\n"
     .return (cont)
 over_there:

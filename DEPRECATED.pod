@@ -1,5 +1,3 @@
-# $Id$
-
 =head1 Purpose
 
 Provide a list of deprecated and experimental items in parrot.
@@ -51,17 +49,13 @@ L<https://trac.parrot.org/parrot/ticket/1580>
 
 L<https://trac.parrot.org/parrot/ticket/1599>
 
-=item CodeString [eligible in 2.7]
+=item MappedByteArray [experimental]
 
-L<http://trac.parrot.org/parrot/ticket/1633>
+L<https://trac.parrot.org/parrot/ticket/1877>
 
 =item multiple dispatch within core PMCs [eligible in 1.1]
 
 L<https://trac.parrot.org/parrot/ticket/452>
-
-=item Method stdhandle in ParrotInterpreter [experimental]
-
-L<https://trac.parrot.org/parrot/ticket/264>
 
 =item Overriding vtable invoke in PIR objects [experimental]
 
@@ -82,7 +76,7 @@ L<https://trac.parrot.org/parrot/ticket/1551>
 
 =item UnManagedStruct initializer structure [eligible in 2.4]
 
-The initializer structure will cease to be an array of triples. In stead, an
+The initializer structure will cease to be an array of triples. Instead, an
 array of flags (no counts or offsets), or a string representation of the same
 information may be used.
 
@@ -114,13 +108,6 @@ will not auto-vivify nested hashes and return PMCNULL early.
 
 L<https://trac.parrot.org/parrot/ticket/1561>
 
-=item Method lower on String [eligible in 2.7]
-
-Use the downcase opcode or subclass with a method name consistent with your
-HLL.
-
-L<http://trac.parrot.org/parrot/ticket/1606>
-
 =item Method unescape on String [experimental]
 
 This is a helper method for testing of Parrot_str_unescape_string.
@@ -142,6 +129,12 @@ L<https://trac.parrot.org/parrot/ticket/1655>
 Used to test the experimental function Parrot_getpid
 
 L<https://trac.parrot.org/parrot/ticket/1564>
+
+=item Complex PMC [eligible in 3.1]
+
+This perennially broken PMC will be removed.
+
+L<http://trac.parrot.org/parrot/ticket/1892>
 
 =back
 
@@ -217,36 +210,12 @@ These will be changed to allow more flexibility in types.
 
 L<https://trac.parrot.org/parrot/ticket/1565>
 
-=item find_lex [eligible in 2.4]
-
-find_lex will not throw exception for non-existing lexicals.
-
-L<https://trac.parrot.org/parrot/ticket/1207>
-
 =item inplace string updates. [eligible in 2.4]
 
 All "inplace" string update ops are deprecated. E.g. "chopn_s", etc.
 Part of COW removal.
 
 L<https://trac.parrot.org/parrot/ticket/1540>
-
-=item find_codepoint [experimental]
-
-Intended to replace the CodeString charname_to_ord method.
-
-L<https://trac.parrot.org/parrot/ticket/1629>
-
-=item All opcodes that modify non-argument registers. [eligible in 2.7]
-
-E.g. "cleari", etc.
-
-L<https://trac.parrot.org/parrot/ticket/1642>
-
-=item exchange [eligible in 2.7]
-
-This op is too low level for Parrot in its current form.
-
-L<https://trac.parrot.org/parrot/ticket/1643>
 
 =item finalize [experimental]
 
@@ -303,22 +272,6 @@ L<https://trac.parrot.org/parrot/ticket/1091>
 =item implicit optional named parameters [eligible in 2.1]
 
 L<https://trac.parrot.org/parrot/ticket/1103>
-
-=item :unique_reg flag [eligible in 2.7]
-
-L<https://trac.parrot.org/parrot/ticket/1622>
-
-=item .nci_call [eligible in 2.7]
-
-As of the latest PCC changes, there is nothing special about calling an NCI sub.
-
-L<https://trac.parrot.org/parrot/ticket/1623>
-
-=item .meth_call [eligible in 2.7]
-
-As of the latest PCC changes, this does nothing different from '.call'.
-
-L<https://trac.parrot.org/parrot/ticket/1624>
 
 =item :main Sub behaviour and selection. [eligible in 2.7]
 
@@ -394,6 +347,17 @@ Get process id, experimental.
 
 L<https://trac.parrot.org/parrot/ticket/1564>
 
+=item Parrot_load_bytecode_file [experimental]
+
+Load a .pbc file into the interpreter. Experimental.
+
+=item GC timely destruction [eligible in 3.1]
+
+All PIR ops and internal semantics related to timely destruction of PMCs
+is deprecated.
+
+L<http://trac.parrot.org/parrot/ticket/1800>
+
 =back
 
 =head1 Compiler tools
@@ -436,13 +400,13 @@ use a different detection mechanism or eliminate it altogether.
 
 L<https://trac.parrot.org/parrot/ticket/463>
 
-=item PAST::Val node generation [eligible in 1.5] 
+=item PAST::Val node generation [eligible in 1.5]
 
-The PAST::Compiler may generate the code for PAST::Val nodes 
-(i.e., constants) at the beginning of the block (Parrot sub) instead 
-of the location where they occur in the PAST tree. 
+The PAST::Compiler may generate the code for PAST::Val nodes
+(i.e., constants) at the beginning of the block (Parrot sub) instead
+of the location where they occur in the PAST tree.
 
-L<https://trac.parrot.org/parrot/ticket/868> 
+L<https://trac.parrot.org/parrot/ticket/868>
 
 =item Meta-model implementation used by PCT [eligible in 2.7]
 
@@ -491,6 +455,12 @@ L<https://trac.parrot.org/parrot/ticket/754>
 =item OpenGL bindings and libraries [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/852>
+
+=item pkg-config support [eligible in 3.1]
+
+Use C<parrot_config> instead.
+
+L<http://trac.parrot.org/parrot/ticket/1853>
 
 =back
 

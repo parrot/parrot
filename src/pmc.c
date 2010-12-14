@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -120,7 +119,7 @@ Parrot_pmc_destroy(PARROT_INTERP, ARGMOD(PMC *pmc))
 
     PObj_gc_CLEAR(pmc);
 
-    if (pmc->vtable->attr_size)
+    if (pmc->vtable->attr_size && PMC_data(pmc))
         Parrot_gc_free_pmc_attributes(interp, pmc);
     else
         PMC_data(pmc) = NULL;
@@ -713,7 +712,7 @@ Parrot_pmc_get_new_vtable_index(PARROT_INTERP)
 
     /* Have we overflowed the table? */
     if (type_id >= interp->n_vtable_alloced)
-        parrot_realloc_vtables(interp);
+        Parrot_vtbl_realloc_vtables(interp);
 
     return type_id;
 }
@@ -785,7 +784,7 @@ Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
                 return VTABLE_get_integer(interp, item);
         }
         else
-            return Parrot_get_datatype_enum(interp, name);
+            return Parrot_dt_get_datatype_enum(interp, name);
     }
 }
 
@@ -906,7 +905,7 @@ Parrot_pmc_create_mro(PARROT_INTERP, INTVAL type)
         if (!vtable->_namespace) {
             /* need a namespace Hash, anchor at parent, name it */
             PMC * const ns     = Parrot_pmc_new(interp,
-                    Parrot_get_ctx_HLL_type(interp, enum_class_NameSpace));
+                    Parrot_hll_get_ctx_HLL_type(interp, enum_class_NameSpace));
             vtable->_namespace = ns;
 
             /* anchor at parent, aka current_namespace, that is 'parrot' */
@@ -1038,5 +1037,5 @@ C<5.1.0.14.2.20011008152120.02158148@pop.sidhe.org>
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

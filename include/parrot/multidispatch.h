@@ -1,7 +1,5 @@
 /* multidispatch.h
  *  Copyright (C) 2003-2007, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the API header for the mmd subsystem
  *  Data Structure and Algorithms:
@@ -291,5 +289,5 @@ PMC * Parrot_mmd_sort_manhattan_by_sig_pmc(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -49,6 +48,7 @@ Create empty PackfileDebug.
     VTABLE void init() {
         SUPER();
         SET_ATTR_type(INTERP, SELF, PF_DEBUG_SEG);
+        Parrot_warn_experimental(interp, "PackfileDebug is experimental");
     }
 
 /*
@@ -206,5 +206,5 @@ Get the filename mapping n.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

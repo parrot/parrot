@@ -1,7 +1,5 @@
 /* memory.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the API header for the memory subsystem
  *  Data Structure and Algorithms:
@@ -122,5 +120,5 @@ char * mem_sys_strdup(ARGIN(const char *src))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

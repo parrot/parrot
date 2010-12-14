@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 TITLE
 
@@ -70,6 +69,7 @@ undefined values) is undefined, and may be rather funky.
     .local pmc CONF
     CONF = new 'FileHandle'
     push_eh error
+    CONF.'encoding'('binary')
     .local string image
     image = CONF.'readall'(conf_file)
     pop_eh

@@ -1,5 +1,4 @@
 /*
- * $Id$
  *
  * Intermediate Code Compiler for Parrot.
  *
@@ -333,7 +332,6 @@ do_pre_process(PARROT_INTERP, yyscan_t yyscanner)
             case NEED_LEX:      printf(":lex");break;
             case METHOD:        printf(":method");break;
 
-            case UNIQUE_REG:    printf(":unique_reg");break;
             case ADV_FLAT:      printf(":flat");break;
             case ADV_SLURPY:    printf(":slurpy");break;
             case ADV_OPTIONAL:  printf(":optional");break;
@@ -573,7 +571,7 @@ compile_to_bytecode(PARROT_INTERP,
         fprintf(stderr, "error:imcc:%s", error_str);
         IMCC_print_inc(interp);
         Parrot_str_free_cstring(error_str);
-        Parrot_exit(interp, IMCC_FATAL_EXCEPTION);
+        Parrot_x_exit(interp, IMCC_FATAL_EXCEPTION);
     }
 
     imc_cleanup(interp, yyscanner);
@@ -646,11 +644,9 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
     /* If the input file is Parrot bytecode, then we simply read it
        into a packfile, which Parrot then loads */
     if (STATE_LOAD_PBC(interp)) {
-        PackFile * const pf = Parrot_pbc_read(interp, sourcefile, 0);
-
-        if (!pf)
+        const int loaded = Parrot_load_bytecode_file(interp, sourcefile);
+        if (!loaded)
             IMCC_fatal_standalone(interp, 1, "main: Packfile loading failed\n");
-        Parrot_pbc_load(interp, pf);
     }
     else
         compile_to_bytecode(interp, sourcefile, output_file, yyscanner);
@@ -708,5 +704,5 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

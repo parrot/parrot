@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -88,7 +87,7 @@ Create new Fixed_Allocator.
 
 Destroy Fixed_Allocator.
 
-=item C<void* Parrot_gc_fixed_allocator_allocate(PARROT_INTERP, Fixed_Allocator
+=item C<void * Parrot_gc_fixed_allocator_allocate(PARROT_INTERP, Fixed_Allocator
 *allocator, size_t size)>
 
 Allocate fixed size memory from Fixed_Allocator.
@@ -123,11 +122,14 @@ Parrot_gc_fixed_allocator_destroy(PARROT_INTERP, ARGFREE_NOTNULL(Fixed_Allocator
             Parrot_gc_pool_destroy(interp, allocator->pools[i]);
         }
     }
+
+    mem_sys_free(allocator->pools);
+    mem_sys_free(allocator);
 }
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-void*
+void *
 Parrot_gc_fixed_allocator_allocate(PARROT_INTERP,
         ARGIN(Fixed_Allocator *allocator),
         size_t size)
@@ -136,11 +138,23 @@ Parrot_gc_fixed_allocator_allocate(PARROT_INTERP,
 
     /* We always align size to 4/8 bytes. */
     const size_t index = (size - 1) / sizeof (void *);
-    void   *ret;
     PARROT_ASSERT(size);
 
-    if (index >= allocator->num_pools) {
-        size_t new_size = index + 1;
+    if (index < allocator->num_pools) {
+        Pool_Allocator *pool = allocator->pools[index];
+
+        if (!pool) {
+            const size_t alloc_size = (index + 1) * sizeof (void *);
+            allocator->pools[index] = pool
+                                    = Parrot_gc_pool_new(interp, alloc_size);
+        }
+
+        return pool_allocate(pool);
+    }
+    else {
+        const size_t new_size   = index + 1;
+        const size_t alloc_size = new_size * sizeof (void *);
+
         /* (re)allocate pools */
         if (allocator->num_pools)
             allocator->pools = mem_internal_realloc_n_zeroed_typed(
@@ -150,18 +164,12 @@ Parrot_gc_fixed_allocator_allocate(PARROT_INTERP,
             allocator->pools = mem_internal_allocate_n_zeroed_typed(new_size,
                                     Pool_Allocator *);
 
-        allocator->num_pools = new_size;
-    }
-
-    if (! allocator->pools[index]) {
-        const size_t alloc_size = (index + 1) * sizeof (void *);
+        allocator->num_pools    = new_size;
         allocator->pools[index] = Parrot_gc_pool_new(interp, alloc_size);
     }
 
-    ret = pool_allocate(allocator->pools[index]);
-
-    /* memset ret to 0 here? */
-    return ret;
+    /* memset return value to 0 here? */
+    return pool_allocate(allocator->pools[index]);
 }
 
 
@@ -316,6 +324,7 @@ get_free_list_item(ARGMOD(Pool_Allocator *pool))
 
     Pool_Allocator_Free_List * const item = pool->free_list;
     pool->free_list = item->next;
+    --pool->num_free_objects;
     return item;
 }
 
@@ -332,6 +341,7 @@ get_newfree_list_item(ARGMOD(Pool_Allocator *pool))
     if (pool->newfree >= pool->newlast)
         pool->newfree = NULL;
 
+    --pool->num_free_objects;
     return item;
 }
 
@@ -340,21 +350,14 @@ static void *
 pool_allocate(ARGMOD(Pool_Allocator *pool))
 {
     ASSERT_ARGS(pool_allocate)
-    Pool_Allocator_Free_List *item;
 
     if (pool->free_list)
-        item = (Pool_Allocator_Free_List*)get_free_list_item(pool);
+        return get_free_list_item(pool);
 
-    else if (pool->newfree)
-        item = (Pool_Allocator_Free_List*)get_newfree_list_item(pool);
-
-    else {
+    if (!pool->newfree)
         allocate_new_pool_arena(pool);
-        item = (Pool_Allocator_Free_List*)get_newfree_list_item(pool);
-    }
 
-    --pool->num_free_objects;
-    return (void *)item;
+    return get_newfree_list_item(pool);
 }
 
 static void
@@ -378,24 +381,22 @@ static int
 pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
 {
     ASSERT_ARGS(pool_is_owned)
-    Pool_Allocator_Arena *arena = pool->top_arena;
-    size_t                a_size;
 
-    if (ptr < pool->lo_arena_ptr || ptr > pool->hi_arena_ptr)
-        return 0;
+    if (ptr >= pool->lo_arena_ptr && ptr <= pool->hi_arena_ptr) {
+        /* We can cache this value. All arenas are same size */
+        const ptrdiff_t a_size = arena_size(pool);
+        Pool_Allocator_Arena *arena = pool->top_arena;
+        while (arena) {
+            const ptrdiff_t ptr_diff =
+                (ptrdiff_t)ptr - (ptrdiff_t)(arena + 1);
 
-    /* We can cache this value. All arenas are same size */
-    a_size = arena_size(pool);
-    while (arena) {
-        const ptrdiff_t ptr_diff =
-            (ptrdiff_t)ptr - (ptrdiff_t)(arena + 1);
+            if (0 <= ptr_diff
+                  && ptr_diff < a_size
+                  && ptr_diff % pool->object_size == 0)
+                return 1;
 
-        if (0 <= ptr_diff
-              && ptr_diff < a_size
-              && ptr_diff % pool->object_size == 0)
-            return 1;
-
-        arena = arena->next;
+            arena = arena->next;
+        }
     }
 
     return 0;
@@ -436,11 +437,11 @@ allocate_new_pool_arena(ARGMOD(Pool_Allocator *pool))
     pool->num_free_objects += num_items;
     pool->total_objects    += num_items;
 
-    if (pool->lo_arena_ptr > new_arena)
+    if (pool->lo_arena_ptr > (void *)new_arena)
         pool->lo_arena_ptr = new_arena;
 
-    if (pool->hi_arena_ptr < (char*)new_arena + GC_FIXED_SIZE_POOL_SIZE)
-        pool->hi_arena_ptr = new_arena + GC_FIXED_SIZE_POOL_SIZE;
+    if ((char *)pool->hi_arena_ptr < (char *)new_arena + GC_FIXED_SIZE_POOL_SIZE)
+        pool->hi_arena_ptr = (char *)new_arena + GC_FIXED_SIZE_POOL_SIZE;
 }
 
 /*
@@ -482,5 +483,5 @@ arena_size(ARGIN(const Pool_Allocator *self))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

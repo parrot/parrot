@@ -1,7 +1,5 @@
 /* parrot.h
  *  Copyright (C) 2001-2009, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     General header file includes for the parrot interpreter
  *  Data Structure and Algorithms:
@@ -106,6 +104,10 @@ typedef jmp_buf Parrot_jump_buff;
 #  include <limits.h>
 #endif /* PARROT_HAS_HEADER_LIMITS */
 
+#ifdef PARROT_HAS_LIBFFI
+#  include <ffi.h>
+#endif
+
 #define NUM_REGISTERS 32
 #define PARROT_MAGIC 0x13155a1
 
@@ -149,7 +151,7 @@ typedef struct parrot_interp_t Interp;
  * some compilers don't like lvalue casts, so macroize them
  *
  * NOTE: Under no circumstances is it permitted to use this macro on types
- *       that are not effectivly guaranteed to be compatible.
+ *       that are not effectively guaranteed to be compatible.
  *       Good:  int->unsigned; long->unsigned long; struct*->struct*; char*->void*
  *       Bad:   integral->pointer;  struct*->char*
  */
@@ -294,5 +296,5 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

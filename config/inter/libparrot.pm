@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2007, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -85,7 +84,7 @@ sub runstep {
                                      && $parrot_is_shared
                                      && $conf->data->get('rpath') )
         ? $conf->data->get('rpath')
-            . $conf->data->get('build_dir')
+            . '"' . $conf->data->get('build_dir') . '"'
             . '/'
             . $conf->data->get('blib_dir')
         : ''
@@ -97,7 +96,7 @@ sub runstep {
                                     && $parrot_is_shared
                                     && $conf->data->get('rpath') )
         ? $conf->data->get('rpath')
-            . $conf->data->get('libdir')
+            . '"' . $conf->data->get('libdir') . '"'
         : ''
     );
 

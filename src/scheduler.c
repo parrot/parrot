@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2007-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -9,7 +8,7 @@ src/scheduler.c - The core routines for the concurrency scheduler
 =head1 DESCRIPTION
 
 Each interpreter has a concurrency scheduler element in its core struct. The
-scheduler is responsible for receiveing, dispatching, and monitoring events,
+scheduler is responsible for receiving, dispatching, and monitoring events,
 exceptions, async I/O, and concurrent tasks (threads).
 
 =cut
@@ -65,7 +64,7 @@ Functions to interface with the concurrency scheduler.
 
 =item C<void Parrot_cx_init_scheduler(PARROT_INTERP)>
 
-Initalize the concurrency scheduler for the interpreter.
+Initialize the concurrency scheduler for the interpreter.
 
 =cut
 
@@ -874,10 +873,11 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
          */
         context = Parrot_pcc_get_caller_ctx(interp, keep_context);
         keep_context = NULL;
-        if (context && !PMC_IS_NULL(Parrot_pcc_get_handlers(interp, context)))
-            iter = VTABLE_get_iter(interp, Parrot_pcc_get_handlers(interp, context));
-        else
-            iter = PMCNULL;
+        if (context) {
+            PMC * const handlers = Parrot_pcc_get_handlers(interp, context);
+            if (!PMC_IS_NULL(handlers))
+                iter = VTABLE_get_iter(interp, handlers);
+        }
     }
     else {
         ++already_doing;
@@ -890,9 +890,11 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
             context = (PMC *)VTABLE_get_pointer(interp, task);
         }
         else {
+            PMC * handlers;
             context = CURRENT_CONTEXT(interp);
-            if (!PMC_IS_NULL(Parrot_pcc_get_handlers(interp, context)))
-                iter = VTABLE_get_iter(interp, Parrot_pcc_get_handlers(interp, context));
+            handlers = Parrot_pcc_get_handlers(interp, context);
+            if (!PMC_IS_NULL(handlers))
+                iter = VTABLE_get_iter(interp, handlers);
         }
     }
 
@@ -922,8 +924,11 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 
         /* Continue the search in the next context up the chain. */
         context = Parrot_pcc_get_caller_ctx(interp, context);
-        if (context && !PMC_IS_NULL(Parrot_pcc_get_handlers(interp, context)))
-            iter = VTABLE_get_iter(interp, Parrot_pcc_get_handlers(interp, context));
+        if (context) {
+            PMC * const handlers = Parrot_pcc_get_handlers(interp, context);
+            iter = PMC_IS_NULL(handlers) ? PMCNULL :
+                    VTABLE_get_iter(interp, handlers);
+        }
         else
             iter = PMCNULL;
     }
@@ -1159,5 +1164,5 @@ scheduler_process_messages(PARROT_INTERP, ARGMOD(PMC *scheduler))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

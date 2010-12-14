@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2007-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -18,8 +17,6 @@ Handles class and object manipulation.
 
 */
 
-#define PARROT_IN_OO_C
-#define PARROT_IN_OBJECTS_C /* To get the vtable.h imports we want. */
 #include "parrot/parrot.h"
 #include "parrot/oo_private.h"
 #include "pmc/pmc_class.h"
@@ -1428,5 +1425,5 @@ F<docs/pdds/pdd15_objects.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

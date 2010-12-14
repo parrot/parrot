@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2008-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -214,21 +213,6 @@ stored for mocking.
         RETURN(PMC *SELF);
     }
 
-/*
-
-=item C<METHOD close()>
-
-Reset some core data for the StringHandle, but don't delete the string data, as
-it may be wanted later (for capturing the results).
-
-=cut
-
-*/
-
-    METHOD close() {
-        SET_ATTR_read_offset(INTERP, SELF, 0);
-        RETURN(INTVAL 0);
-    }
 
 /*
 
@@ -248,37 +232,6 @@ Check if the StringHandle is open.
         RETURN(INTVAL status);
     }
 
-/*
-
-=item C<METHOD read(INTVAL bytes)>
-
-Read the entire contents of the stringhandle and return it in a string. The
-C<bytes> argument is currently ignored.
-
-=cut
-
-*/
-
-    METHOD read(INTVAL length) {
-        STRING * const string_result = Parrot_io_reads(INTERP, SELF, length);
-        RETURN(STRING *string_result);
-    }
-
-/*
-
-=item C<METHOD readline()>
-
-Read a line from the stringhandle and return it in a string. (Currently only
-responds to "\n" newlines.)
-
-=cut
-
-*/
-
-    METHOD readline() {
-        STRING * const string_result = Parrot_io_readline(INTERP, SELF);
-        RETURN(STRING *string_result);
-    }
 
 /*
 
@@ -532,5 +485,5 @@ value.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

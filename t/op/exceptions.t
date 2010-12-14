@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -65,7 +64,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh eh - throw" );
     print "main\n"
     new P29, 'ExceptionHandler'
-    set_addr P29, _handler
+    set_label P29, _handler
     push_eh P29
     new P30, 'Exception'
     throw P30
@@ -161,7 +160,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw - message" );
     push_eh _handler
 
     new P30, 'Exception'
-    set P30, "something happend"
+    set P30, "something happened"
     throw P30
     print "not reached\n"
     end
@@ -175,17 +174,17 @@ _handler:
 CODE
 main
 caught it
-something happend
+something happened
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
     new P0, 'Exception'
-    set P0, "something happend"
+    set P0, "something happened"
     throw P0
     print "not reached\n"
     end
 CODE
-/something happend/
+/something happened/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
@@ -216,7 +215,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers" );
     push_eh _handler2
 
     new P30, 'Exception'
-    set P30, "something happend"
+    set P30, "something happened"
     throw P30
     print "not reached\n"
     end
@@ -237,7 +236,7 @@ _handler2:
 CODE
 main
 caught it in 2
-something happend
+something happened
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers, throw next" );
@@ -246,7 +245,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers, throw next" );
     push_eh _handler2
 
     new P30, 'Exception'
-    set P30, "something happend"
+    set P30, "something happened"
     throw P30
     print "not reached\n"
     end
@@ -268,9 +267,9 @@ _handler2:
 CODE
 main
 caught it in 2
-something happend
+something happened
 caught it in 1
-something happend
+something happened
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUT, "die" );

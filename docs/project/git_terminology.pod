@@ -1,0 +1,119 @@
+=head1 NAME
+
+docs/project/git_terminology.pod - Git Terminology
+
+=head1 DESCRIPTION
+
+This document describes terms that are used in F<docs/project/git_workflow.pod>
+and contains generally useful things to know about Git.
+
+=head1 INTRODUCTION
+
+Before learning any terminology, there are a few very basic things that
+should be understood about Git, which will provide a foundation for
+understanding anything else.
+
+A Git repository is a Directed Acyclic Graph (DAG), where each node in the
+graph is a commit, with zero or more parents. A root commit of a
+repository has zero parents, others have at least one parent. A repository
+may have any number of root commits, but many have only one. If a commit has
+more than one parent, that means it was the result of a merge.
+
+Each commit is uniquely identified by a SHA1 sum. You may refer to any commit
+by the first few characters of a SHA1 sum, as long as it is unique. If it is
+not unique, C<git> will complain loudly. Usually 6-7 characters of a SHA1 is
+sufficient, but this number increases as the number of commits in a repo
+grows.
+
+There are three distinct "places" in a Git repository, which are referred to
+as the index, the working copy, and the staging area. The index is the actual
+DAG, where all the history of the repo is stored. This lives in the .git
+directory of a repository. The "working copy" are the actual files on the
+filesystem. The staging area is where things that will be included in the
+next commit live, which happens to be inside the .git directory as well.
+When you type C<git add foo>, you are adding the file/directory foo to the
+staging area. When you type C<git log> you are asking the index to show
+you a log of all commits. When you run a non-git command in a repo, such
+as C<rm foo>, you are modifying the working copy.
+
+The most important thing to learn when understanding a C<git> command is whether
+it operates on the index, working copy, staging area or a combination of the
+three. Also note that certain C<git> commands can operate on different areas
+when given different command-line options.
+
+=head1 HELPING YOURSELF
+
+Git comes with extensive documentation. To get the short help summary for a git
+command, do C<git cmd -h>. To see the manual for a git command, type C<git help
+cmd>, where "cmd" is the name of the command you want to look up.
+
+=head1 TERMS
+
+=head2 branch
+
+Noun. A symbolic name referring to a commit SHA1. The master branch is just a branch
+called master, it is not special in any way except that it is the default.
+
+Verb. To create a divergent history of commits from a given commit, branch or tag.
+
+=head2 clone
+
+Verb. The term used for copying a remote repo locally, which contains the entire
+history of the git repo being cloned.
+
+=head2 commit-ish, committish
+
+Noun. A general term for a way to describe a set of commits.
+
+=head2 rebase
+
+Verb. Update the local index with changes from a remote, then replay local changes,
+in order, on top of them. This prevents "useless merge commits", such as:
+
+    Merge branch 'master' of github.com:parrot/parrot
+
+The C<git pull --rebase> command can be used to update your master branch from
+the remote called 'origin'. There is also a C<git rebase> command that can be
+used to rebase branches onto each other.
+
+=head2 remote
+
+Noun. A remote is basically a URL with metadata that describes where changes are
+pushed/pulled from.  A git repo may have any number of remotes. The default
+remote is where the repo was originally cloned from and it has the name
+"origin".
+
+=head2 repo
+
+Noun. Short for repository.
+
+=head2 SHA1
+
+Noun. Secure Hash Algorithm 1. Also called a SHA1 sum or SHA1 hash. Every git commit
+is uniquely identified by a SHA1. This is roughly similar to a Subversion
+Revision, but it is not an integer and does not increase linearly, because git
+commits can have any number of parents.
+
+=head2 tag
+
+Noun. A symbolic name for a SHA1. A tag is like a variable, which points to a specific SHA1.
+Tags can change, but usually they don't. A tag is akin to a domain name, which points to
+an IP address. Run C<git help tag> for more information.
+
+Verb. The process of giving a sha1 a symbolic name, such as giving commit 9560334cf the symbolic
+name "RELEASE_42_0_1".
+
+=head2 topic branch
+
+Noun. Any branch that is not the master branch.
+
+=head1 SEE ALSO
+
+F<docs/project/git_workflow.pod>
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -189,7 +188,8 @@ Parrot_io_flush_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
      */
     if (buffer_flags & PIO_BF_WRITEBUF) {
         size_t  to_write = buffer_next - buffer_start;
-        STRING *s        = Parrot_str_new(interp, (char *)buffer_start, to_write);
+        STRING *s        = Parrot_str_new_init(interp, (char *)buffer_start,
+                to_write, Parrot_binary_encoding_ptr, 0);
         /* Flush to next layer */
         long wrote = PIO_WRITE(interp, filehandle, s);
         if (wrote == (long)to_write) {
@@ -232,7 +232,7 @@ Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
     char    *buf  = (char *) Parrot_io_get_buffer_start(interp, filehandle);
     size_t   size = Parrot_io_get_buffer_size(interp, filehandle);
     STRING  *s    = Parrot_str_new_init(interp, buf, size,
-                        Parrot_default_encoding_ptr,
+                        Parrot_binary_encoding_ptr,
                         PObj_external_FLAG);
     size_t   got  = PIO_READ(interp, filehandle, &s);
 
@@ -335,12 +335,13 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         size_t got;
 
         if (len >= Parrot_io_get_buffer_size(interp, filehandle)) {
-            STRING *sf;
+            STRING *sf  = Parrot_str_new_noinit(interp, len);
 
-            s->strlen = s->bufused = current + len;
-            sf        = STRING_substr(interp, s, current, len);
-            got       = PIO_READ(interp, filehandle, &sf);
-            s->strlen = s->bufused = current + got;
+            sf->bufused = len;
+            got         = PIO_READ(interp, filehandle, &sf);
+            s->strlen   = s->bufused = current + got;
+
+            memcpy(s->strstart + current, sf->strstart, got);
 
             Parrot_io_set_file_position(interp, filehandle,
                     (got + Parrot_io_get_file_position(interp, filehandle)));
@@ -469,8 +470,10 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
 
     /* fill empty buffer */
     if (!(buffer_flags & PIO_BF_READBUF)) {
-        if (Parrot_io_fill_readbuf(interp, filehandle) == 0)
+        if (Parrot_io_fill_readbuf(interp, filehandle) == 0) {
+            s->bufused = 0;
             return 0;
+        }
     }
 
     /* Retrieve filled buffer */
@@ -761,5 +764,5 @@ F<src/io/io_private.h>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

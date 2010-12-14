@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2003-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -246,10 +245,6 @@ they match.
         return (INTVAL)(STRING_equal(INTERP, str_val, v));
     }
 
-    MULTI INTVAL is_equal(PMC *value) {
-        return SELF.is_equal(value);
-    }
-
 /*
 
 =item C<INTVAL is_equal_num(PMC *value)>
@@ -404,7 +399,7 @@ numbers count from the end.
         GET_ATTR_str_val(INTERP, SELF, str_val);
         n = Parrot_str_length(INTERP, str_val);
 
-        return (INTVAL)((k >= 0 && k <= n) || (k < 0 && -k <= n));
+        return (INTVAL)((k >= 0 && k < n) || (k < 0 && -k <= n));
     }
 
 /*
@@ -532,7 +527,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
 */
 
     METHOD to_int(INTVAL base) {
-        PMC * const result = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const result = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                         enum_class_Integer));
 
         /* TODO verify encoding */
@@ -652,26 +647,6 @@ Used to unarchive the string.
 =head2 NCI methods
 
 =over 4
-
-=item C<PMC *lower()>
-
-Downcase this string
-
-=cut
-
-*/
-
-    METHOD lower() {
-        STRING *str_val;
-        STRING *s;
-
-        GET_ATTR_str_val(INTERP, SELF, str_val);
-        s = Parrot_str_downcase(INTERP, str_val);
-
-        RETURN(STRING *s);
-    }
-
-/*
 
 =item C<void trans(STRING *src, PMC *trams_table)>
 
@@ -837,6 +812,7 @@ EXPERIMENTAL, for testing only. See TT #1628
         STRING * const src = VTABLE_get_string(INTERP, SELF);
         STRING * const dest = Parrot_str_unescape_string(INTERP, src,
                 encoding, 0);
+        Parrot_warn_experimental(INTERP, "Method unescape on String is experimental");
         RETURN(STRING *dest);
     }
 
@@ -855,5 +831,5 @@ EXPERIMENTAL, for testing only. See TT #1628
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

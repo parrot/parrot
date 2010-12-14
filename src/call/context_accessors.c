@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -777,5 +776,5 @@ Parrot_pcc_get_pmc_constant_func(SHIM_INTERP, ARGIN(PMC *ctx), INTVAL idx)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

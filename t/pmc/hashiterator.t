@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -49,7 +48,7 @@ well.
     i = 1
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
-    set_addr eh, catch
+    set_label eh, catch
     push_eh catch
     $P0 = shift it
     i = 0
@@ -99,7 +98,7 @@ well.
     i = 1
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
-    set_addr eh, catch
+    set_label eh, catch
     push_eh catch
     it = 987 # Arbitrary value, let's hope we never use
     i = 0
@@ -117,7 +116,7 @@ well.
     oh = new ['Hash']
     it = iter oh
 
-    # This chekcs the de facto behavior for code coverage purposes.
+    # This checks the de facto behavior for code coverage purposes.
     cl = clone it
     result = isnull cl
     ok(result, 'clone of HashIterator gives null')

@@ -1,20 +1,17 @@
 /*
 Copyright (C) 2003-2009, Parrot Foundation.
-$Id$
+ */
 
-=head1 NAME
+/*
+ * Sample SubProxy class
+ *
+ * s. src/dynpmc/main.pasm for usage
+ */
 
-src/dynpmc/subproxy.pmc
-
-=head1 DESCRIPTION
-
-Sample SubProxy class
-
-see src/dynpmc/main.pasm for usage
-
-=cut
-
-*/
+/*
+ * the real class enum is created at load time
+ */
+#define enum_class_SubProxy -1
 
 pmclass SubProxy dynpmc extends Sub auto_attrs {
 
@@ -42,7 +39,7 @@ pmclass SubProxy dynpmc extends Sub auto_attrs {
             if (!file)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "SubProxy: no file");
 
-            sub_pmc = key_next(INTERP, key);
+            sub_pmc = Parrot_key_next(INTERP, key);
             if (!sub_pmc)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "SubProxy: no sub");
 
@@ -70,5 +67,5 @@ pmclass SubProxy dynpmc extends Sub auto_attrs {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

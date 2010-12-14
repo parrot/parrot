@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -615,8 +614,10 @@ JSON
 }
 OUT
 
+# Note that the original example has a trailig zero in a floating point value,
+# but we shouldn't check that the processed output match that.
 json_dump_is(
-    <<'JSON', <<'OUT', 'another example taken from the RFC', todo => 'check number precision' );
+    <<'JSON', <<'OUT', 'another example taken from the RFC' );
 [{"precision":"zip","Latitude":37.7668,"Longitude":-122.3959,"Address":"","City":"SAN FRANCISCO","State":"CA","Zip":"94107","Country":"US"},{"precision":"zip","Latitude":37.371991,"Longitude":-122.026020,"Address":"","City":"SUNNYVALE", "State":"CA", "Zip":"94085", "Country":"US"}]
 JSON
 "JSON" => ResizablePMCArray (size:2) [
@@ -635,7 +636,7 @@ JSON
         "City" => "SUNNYVALE",
         "Country" => "US",
         "Latitude" => 37.371991,
-        "Longitude" => -122.026020,
+        "Longitude" => -122.02602,
         "State" => "CA",
         "Zip" => "94085",
         "precision" => "zip"

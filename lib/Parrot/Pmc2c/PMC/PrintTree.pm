@@ -1,6 +1,5 @@
 package Parrot::Pmc2c::PMC::PrintTree;
 # Copyright (C) 2007, Parrot Foundation.
-# $Id$
 use strict;
 use warnings;
 use base 'Parrot::Pmc2c::Pmc2cMain';

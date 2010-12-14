@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2003-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -140,13 +139,13 @@ Returns a Parrot string representation of the number.
 
     VTABLE void set_integer_native(INTVAL value) {
         Parrot_pmc_reuse(INTERP, SELF,
-            Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer), 0);
+            Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_Integer), 0);
         SELF.set_integer_native(value);
     }
 
     VTABLE void set_bool(INTVAL value) {
         Parrot_pmc_reuse(INTERP, SELF,
-            Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean), 0);
+            Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_Boolean), 0);
         SELF.set_bool(value);
     }
 
@@ -178,7 +177,7 @@ Note that this method morphs the number into a C<String>.
 
     VTABLE void set_string_native(STRING *value) {
         Parrot_pmc_reuse(INTERP, SELF,
-            Parrot_get_ctx_HLL_type(INTERP, enum_class_String), 0);
+            Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_String), 0);
         SELF.set_string_native(value);
     }
 
@@ -459,7 +458,7 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
 
     METHOD cos() {
         PMC * const d  = Parrot_pmc_new(INTERP,
-                Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
+                Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_Float));
         SET_ATTR_fv(INTERP, d, cos(SELF.get_number()));
         RETURN(PMC *d);
     }
@@ -561,5 +560,5 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

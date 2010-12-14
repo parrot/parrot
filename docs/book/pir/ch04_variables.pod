@@ -1750,7 +1750,7 @@ virtual root for the currently selected HLL.
   $P0 = get_hll_namespace
 
 Each of these three opcodes can take a key argument to retrieve a namespace
-under the currenly selected namespace, root namespace, or HLL root namespace:
+under the currently selected namespace, root namespace, or HLL root namespace:
 
   $P0 = get_namespace ["Duck"]
   $P0 = get_root_namespace ["General";"Electric"]

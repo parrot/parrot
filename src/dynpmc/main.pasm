@@ -1,5 +1,4 @@
 # Copyright (C) 2003-2009, Parrot Foundation.
-# $Id$
 
 # experimental subproxy class test
 # the bytecode loading is deferred until the subproxy object is

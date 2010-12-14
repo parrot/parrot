@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2008, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -175,6 +174,23 @@ from a port number (integer) and an address (string).
         RETURN(PMC * res);
     }
 
+
+/*
+
+=item C<METHOD is_closed()>
+
+Test if the socket is closed.
+
+=cut
+
+*/
+
+    METHOD is_closed() {
+        const INTVAL status = VTABLE_get_bool(INTERP, SELF);
+        RETURN(INTVAL status);
+    }
+
+
 /*
 
 =item C<connect(PMC * address)>
@@ -199,28 +215,6 @@ connected socket object.]
 
 /*
 
-=item C<close()>
-
-Close a socket.
-
-=cut
-
-*/
-
-    METHOD close() {
-        INTVAL result = -1;
-        if (PARROT_SOCKET(SELF)) {
-            Parrot_Socket_attributes *data_struct = PARROT_SOCKET(SELF);
-
-            if (data_struct->os_handle != PIO_INVALID_HANDLE)
-                result = Parrot_io_close_piohandle(INTERP, data_struct->os_handle);
-            data_struct->os_handle = PIO_INVALID_HANDLE;
-        }
-        RETURN(INTVAL result);
-    }
-
-/*
-
 =item C<recv()>
 
 Receives a message from a connected socket object. It returns
@@ -237,7 +231,7 @@ string containing the received message.
 
     METHOD recv() {
         STRING * result;
-        INTVAL read = Parrot_io_recv(INTERP, SELF, &result);
+        result = Parrot_io_reads(INTERP, SELF, 0);
         RETURN(STRING * result);
     }
 
@@ -341,5 +335,5 @@ but continues to send new connection events until the socket is closed.]
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -45,14 +44,12 @@ static int gc_ms_active_sized_buffers(ARGIN(const Memory_Pools *mem_pools))
         __attribute__nonnull__(1);
 
 static void gc_ms_add_free_object(PARROT_INTERP,
-    ARGMOD(Memory_Pools *mem_pools),
+    SHIM(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
     ARGIN(void *to_add))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*pool);
 
 static void gc_ms_alloc_objects(PARROT_INTERP,
@@ -86,6 +83,7 @@ PARROT_CAN_RETURN_NULL
 static PMC* gc_ms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING* gc_ms_allocate_string_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
@@ -157,9 +155,11 @@ static unsigned int gc_ms_is_blocked_GC_mark(PARROT_INTERP)
 static unsigned int gc_ms_is_blocked_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static int gc_ms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static int gc_ms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         __attribute__nonnull__(1);
 
@@ -180,10 +180,9 @@ static void gc_ms_mark_special(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(2);
 
 static void gc_ms_more_traceable_objects(PARROT_INTERP,
-    ARGIN(Memory_Pools *mem_pools),
+    SHIM(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
 
@@ -265,7 +264,6 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
        PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_gc_ms_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(to_add))
 #define ASSERT_ARGS_gc_ms_alloc_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -336,7 +334,6 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_ms_more_traceable_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_gc_ms_pool_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool))
@@ -532,12 +529,13 @@ consumption.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int
 Parrot_gc_ms_needed(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_gc_ms_needed)
 
-    const Memory_Pools * const mem_pools = interp->mem_pools;
     size_t dynamic_threshold;
 
     /* new_mem is the additional amount of memory used since the last GC */
@@ -850,6 +848,7 @@ return True if *ptr is contained in the pool
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 gc_ms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
@@ -867,6 +866,7 @@ establish if string *ptr is owned
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 gc_ms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
@@ -892,6 +892,8 @@ Allocate new STRING header from pool.
 =cut
 
 */
+
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING*
 gc_ms_allocate_string_header(PARROT_INTERP, UINTVAL flags)
@@ -902,7 +904,7 @@ gc_ms_allocate_string_header(PARROT_INTERP, UINTVAL flags)
             ? interp->mem_pools->constant_string_header_pool
             : interp->mem_pools->string_header_pool;
 
-    STRING *s = (STRING *)pool->get_free_object(interp, interp->mem_pools, pool);
+    STRING * const s = (STRING *)pool->get_free_object(interp, interp->mem_pools, pool);
     memset(s, 0, sizeof (STRING));
     return s;
 }
@@ -1510,7 +1512,7 @@ that doesn't work, allocate a new arena.
 
 static void
 gc_ms_more_traceable_objects(PARROT_INTERP,
-        ARGIN(Memory_Pools *mem_pools),
+        SHIM(Memory_Pools *mem_pools),
         ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_more_traceable_objects)
@@ -1543,7 +1545,7 @@ the PObj flags to indicate that the item is free.
 
 static void
 gc_ms_add_free_object(PARROT_INTERP,
-        ARGMOD(Memory_Pools *mem_pools),
+        SHIM(Memory_Pools *mem_pools),
         ARGMOD(Fixed_Size_Pool *pool),
         ARGIN(void *to_add))
 {
@@ -1792,6 +1794,8 @@ returns stats as required by enum which
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 size_t
 Parrot_gc_get_info(PARROT_INTERP, Interpinfo_enum which, ARGIN(GC_Statistics *stats))
 {
@@ -1929,5 +1933,5 @@ gc_ms_iterate_live_strings(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

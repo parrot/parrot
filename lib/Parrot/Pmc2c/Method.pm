@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2008, Parrot Foundation.
-# $Id$
 package Parrot::Pmc2c::Method;
 use strict;
 use warnings;
@@ -65,8 +64,8 @@ sub mmd_rights {
 }
 
 #getters/setters
-for my $x qw( name parent_name type return_type body mmds symbol mmd_prefix mmd_table mmd_name
-    right attrs decorators parameters ) {
+for my $x ( qw( name parent_name type return_type body mmds symbol mmd_prefix mmd_table mmd_name
+    right attrs decorators parameters ) ) {
     my $code = <<'EOC';
 sub REPLACE {
     my ( $self, $value ) = @_;

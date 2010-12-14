@@ -1,11 +1,10 @@
 #! perl
 # Copyright (C) 2007, Parrot Foundation.
-# $Id$
 # auto/ipv6-01.t
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests =>  5;
+use Test::More tests => 12;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::ipv6');

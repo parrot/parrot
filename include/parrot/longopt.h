@@ -1,7 +1,5 @@
 /* longopt.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Command line option parsing (for pre-initialized code)
  */
@@ -84,5 +82,5 @@ const struct longopt_opt_decl * Parrot_cmd_options(void);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

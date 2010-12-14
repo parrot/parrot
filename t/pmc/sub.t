@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -67,7 +66,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Continuation" );
     set P5, 3
     set_global "foo", P5
     new P1, ['Continuation']
-    set_addr P1, endcont
+    set_label P1, endcont
 endcont:
     get_global P4, "foo"
     print "here "
@@ -99,7 +98,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "definedness of Continuation" );
     defined I1, P1
     print I1
     print "\n"
-    set_addr P1, cont
+    set_label P1, cont
     defined I1, P1
     print I1
     print "\n"
@@ -147,7 +146,7 @@ ok:
 .pcc_sub _the_sub:
     print "in sub\n"
     get_global P0, "_next_sub"
-    get_addr I0, P0
+    get_label I0, P0
     jump I0
     print "never here\n"
 

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -207,7 +206,7 @@ Set an exterior constant table to use for cross-referencing constants.
 
 =item C<INTVAL shift_integer()>
 
-Retreive an integer as the next item from the image.
+Retrieve an integer as the next item from the image.
 
 =cut
 
@@ -228,7 +227,7 @@ Retreive an integer as the next item from the image.
 
 =item C<FLOATVAL shift_float()>
 
-Retreive a float as the next item from the image.
+Retrieve a float as the next item from the image.
 
 =cut
 
@@ -248,7 +247,7 @@ Retreive a float as the next item from the image.
 
 =item C<STRING *shift_string()>
 
-Retreive a string as the next item from the image.
+Retrieve a string as the next item from the image.
 
 =cut
 
@@ -285,7 +284,7 @@ Retreive a string as the next item from the image.
 
 =item C<PMC *shift_pmc()>
 
-Retreive a PMC as the next item from the image.
+Retrieve a PMC as the next item from the image.
 
 =cut
 
@@ -312,10 +311,6 @@ Retreive a PMC as the next item from the image.
                     if (type <= 0 || type > INTERP->n_vtable_max)
                         Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                                 "Unknown PMC type to thaw %d", type);
-
-                    /* workaround to keep ParrotInterpreter PBC hack working */
-                    if (type == enum_class_ParrotInterpreter)
-                        PObj_flag_CLEAR(private1, SELF);
 
                     pmc = Parrot_pmc_new_noinit(INTERP, type);
 
@@ -345,6 +340,6 @@ Retreive a PMC as the next item from the image.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

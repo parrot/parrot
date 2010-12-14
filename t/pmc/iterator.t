@@ -1,13 +1,12 @@
 #!perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 27;
 
 =head1 NAME
 
@@ -33,6 +32,184 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "new iter" );
 CODE
 ok 1
 OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "new iter fails (init)" );
+    push_eh THROWN
+    new P0, ['ResizablePMCArray']
+    new P1, ['Iterator'], P0
+    print "not "
+THROWN:
+    pop_eh
+    print "ok 1\n"
+    end
+CODE
+ok 1
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "keyed access on String and Hash PMCs" );
+    new P0, ['String']
+    set P0, "I am a very long string."
+    new P2, ['Integer']
+    set P2, 1
+    iter P1, P0
+    set I0, P1[P2]
+    eq I0, 32, OK1
+    print "not "
+OK1:print "ok 1\n"
+
+    set P2, 0
+    set I0, P1[P2]
+    eq I0, 73, OK2
+    print "not "
+OK2:print "ok 2\n"
+
+    set P2, 5
+    set S0, P1[P2]
+    eq S0, 'a', OK3
+    print "not "
+OK3:print "ok 3\n"
+
+    new P0, ['Hash']
+    set P0['derp'], 3.257
+    set P0['herp'], 2
+    iter P1, P0
+    set P2, 'herp'
+    set N0, P1[P2]
+    eq N0, 2, OK4
+    print "not "
+OK4:print "ok 4\n"
+
+    set P2, 'derp'
+    set N0, P1[P2]
+    eq N0, 3.257, OK5
+    print "not "
+OK5:print "ok 5\n"
+    end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "keyed exist and defined on String and Hash PMCs" );
+    new P0, ['String']
+    set P0, 'somelongstring'
+    iter P1, P0
+
+    new P2, ['Integer']
+    set P2, 2
+    exists I0, P1[P2]
+    eq I0, 1, OK1
+    print "not "
+OK1:print "ok 1\n"
+
+    set P2, 20
+    exists I0, P1[P2]
+    eq I0, 0, OK2
+    print "not "
+OK2:print "ok 2\n"
+
+    defined I0, P1
+    eq I0, 1, OK3
+    print "not "
+OK3:print "ok 3\n"
+
+
+    new P0, ['Hash']
+    set P0['something'], 'stringg'
+    set P0['nothing'], 'something'
+    iter P1, P0
+    set P2, 'something'
+    defined I0, P1[P2]
+    eq I0, 1, OK4
+    print "not "
+OK4:print "ok 4\n"
+
+    set P2, 'somenothing'
+    defined I0, P1[P2]
+    eq I0, 0, OK5
+    print "not "
+OK5:print "ok 5\n"
+    end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "get_iter" );
+    new P0, ['ResizableIntegerArray']
+    push P0, 20
+    iter P1, P0
+    iter P2, P1
+
+    issame I0, P1, P2
+    eq I0, 1, OK
+    print "not "
+OK: print "ok\n"
+    end
+CODE
+ok
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "next()" );
+.sub _main
+    .local pmc str, str2, iterate
+    str = new ['String']
+    str = '0hey'
+    iterate = iter str
+
+    str2 = iterate.'next'()
+    eq str2, '0', OK1
+    print "not "
+OK1:print "ok 1 - next returns first character\n"
+
+    eq str, '0hey', OK2
+    print "not "
+OK2:print "ok 2 - does not touch input\n"
+
+    str2 = iterate.'next'()
+    eq str2, 'h', OK3
+    print "not "
+OK3:print "ok 3 - next returns second character\n"
+.end
+CODE
+ok 1 - next returns first character
+ok 2 - does not touch input
+ok 3 - next returns second character
+OUTPUT
+
+TODO: {
+pir_output_is( <<'CODE', <<'OUTPUT', "custom subclass, set_integer_native", todo => "subclassing init VTABLE method is not properly overridden." );
+
+.sub _main :main
+    .local pmc myiter, inst
+    myiter = subclass 'Iterator', 'MyIter'
+    #myiter = newclass 'MyIter'
+    inst = new ['MyIter']
+
+    push_eh THROWN
+    inst = 1
+    print "not "
+THROWN:
+    pop_eh
+    print "ok\n"
+.end
+
+.namespace ["MyIter"]
+.sub init :vtable
+    print "init\n"
+    .return()
+.end
+
+CODE
+ok
+OUTPUT
+}
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "int test" );
     .include "iterator.pasm"

@@ -1,7 +1,5 @@
 /* library.h
  *  Copyright (C) 2004, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *      Contains accessor functions for the _parrotlib bytecode interface
  *  Data Structure and Algorithms:
@@ -128,5 +126,5 @@ STRING * parrot_split_path_ext(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

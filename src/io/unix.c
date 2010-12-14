@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -525,8 +524,8 @@ Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
               case EINTR:
                 continue;
               default:
-                s->bufused = s->strlen = 0;
-                return bytes;
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                        "Read error: %s", strerror(errno));
             }
         }
         else {
@@ -642,7 +641,7 @@ Parrot_io_seek_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 =item C<PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, PMC *filehandle)>
 
-Returns the current read/write position on C<*io>'s file discriptor.
+Returns the current read/write position on C<*io>'s file descriptor.
 
 =cut
 
@@ -849,5 +848,5 @@ F<include/parrot/io_unix.h>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

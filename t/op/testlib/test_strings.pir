@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 
 .sub 'get_hellos'
     $P0 = new ['ResizableStringArray']

@@ -117,5 +117,7 @@ Starred release numbers indicate supported releases.
 
  Gerd        2.9.0 *        2010-Oct-19     "Red-masked"
  cotto       2.9.1          2010-Oct-19     (bugfix release)
+ tcurtis     2.10.0         2010-Nov-16     "Pesquet's"
+ Gerd        2.10.1         2010-Nov-18     (bugfix release)
 
 =cut

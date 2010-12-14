@@ -1,5 +1,4 @@
 # Copyright (C) 2007-2009, Parrot Foundation.
-# $Id$
 package Parrot::Configure::Options::Conf::Shared;
 
 use strict;
@@ -73,12 +72,14 @@ our @shared_valid_options = qw{
     verbose-step
     version
     without-crypto
+    without-core-nci-thunks
     without-extra-nci-thunks
     without-gdbm
     without-gettext
     without-gmp
     without-icu
     without-opengl
+    without-libffi
     without-readline
     without-pcre
     without-threads

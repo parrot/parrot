@@ -1,7 +1,5 @@
 /* encoding.h
  *  Copyright (C) 2004-2007, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the header for the generic encoding functions
  *  Data Structure and Algorithms:
@@ -151,5 +149,5 @@ void Parrot_str_internal_register_encoding_names(PARROT_INTERP)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

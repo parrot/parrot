@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2003-2010, Parrot Foundation.
  */
 
@@ -87,5 +86,5 @@ struct IMC_Unit {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

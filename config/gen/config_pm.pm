@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -64,6 +63,13 @@ sub runstep {
     $conf->append_configure_log($gen_pm);
     open( my $OUT, ">", $gen_pm )
         or die "Can't open $gen_pm: $!";
+
+    # add some keys convenient for embedders
+    $conf->data->add( ' ', 'embed-cflags' =>
+        '-I' . $conf->data->get('includedir') . $conf->data->get('versiondir') );
+    $conf->data->add( ' ', 'embed-ldflags' =>
+        '-L' . $conf->data->get('libdir') . ' -lparrot ' . $conf->data->get('icu_shared') .
+        ' ' . $conf->data->get('libs') );
 
     # escape spaces in current directory
     my $cwd = cwd();

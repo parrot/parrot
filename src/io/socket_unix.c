@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -349,11 +348,10 @@ Parrot_io_recv_unix(PARROT_INTERP, ARGMOD(PMC *socket), ARGOUT(STRING **s))
 AGAIN:
     if ((error = recv(io->os_handle, buf, 2048, 0)) >= 0) {
         bytesread += error;
-        /* The encoding should probably be 'binary', but right now httpd.pir
-         * only works with 'ascii'
-         */
         *s = Parrot_str_new_init(interp, buf, bytesread,
-                Parrot_ascii_encoding_ptr, 0);
+                Parrot_binary_encoding_ptr, 0);
+        /* Hack to make Rakudo and UTF-8 work */
+        (*s)->encoding = Parrot_ascii_encoding_ptr;
         return bytesread;
     }
     else {
@@ -504,5 +502,5 @@ F<include/parrot/io_unix.h>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

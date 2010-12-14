@@ -1,7 +1,6 @@
 #!./parrot-nqp
 
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 INIT {
     pir::load_bytecode('ProfTest.pbc');
@@ -175,7 +174,7 @@ CODE
 
     .local pmc eh
     eh = new ["ExceptionHandler"]
-    set_addr eh, handler
+    set_label eh, handler
     push_eh eh
 
     f = comp(s)

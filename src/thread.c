@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -392,7 +391,7 @@ pt_thread_wait_with(PARROT_INTERP, ARGMOD(Parrot_mutex *mutex))
         pt_suspend_self_for_gc(interp);
 
         LOCK(*mutex);
-        /* since we unlocked the mutex something bad may have occured */
+        /* since we unlocked the mutex something bad may have occurred */
         return;
     }
 
@@ -696,7 +695,7 @@ pt_transfer_sub(ARGOUT(Parrot_Interp d), ARGIN(Parrot_Interp s), ARGIN(PMC *sub)
     ASSERT_ARGS(pt_transfer_sub)
 #if defined THREAD_DEBUG && THREAD_DEBUG
     Parrot_io_eprintf(s, "copying over subroutine [%Ss]\n",
-        Parrot_full_sub_name(s, sub));
+        Parrot_sub_full_sub_name(s, sub));
 #endif
     return make_local_copy(d, s, sub);
 }
@@ -1654,5 +1653,5 @@ Parrot_shared_gc_unblock(PARROT_INTERP)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

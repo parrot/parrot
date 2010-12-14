@@ -1,5 +1,4 @@
 /*
- * $Id$
 ** core.ops
 */
 
@@ -50,7 +49,7 @@ internal use only; don't emit these opcodes.
 
 =item B<end>()
 
-Halts the interpreter. (Must be op #0, CORE_OPS_end). See also B<exit>.
+Halts the interpreter. See also B<exit>.
 
 =cut
 
@@ -64,26 +63,22 @@ inline op end() :base_core :check_event :flow {
 =item B<noop>()
 
 Does nothing other than waste an iota of time and 32 bits of bytecode space.
-(Must be op #1, CORE_OPS_noop)
 
 =item B<check_events>()
 
 Check the event queue and run event handlers if there are unhandled events.
 Note: This opcode is mainly for testing. It should not be necessary to ever
 use it explicitly.
-(Must be op #3, CORE_OPS_check_events).
 
 =item B<check_events__>()
 
 Check the event queue and run event handlers if there are unhandled events.
 Note: Do B<not> use this opcode. It is for internal use only.
-(Must be op #4, CORE_OPS_check_events__).
 
 =item B<wrapper__>()
 
 Internal opcode to wrap unknown ops from loaded opcode libs.
 Don't use.
-(Must be op #5, CORE_OPS_wrapper__).
 
 =item B<load_bytecode>(in STR)
 
@@ -441,11 +436,11 @@ inline op returncc() :flow {
 }
 
 inline op capture_lex(invar PMC) {
-    Parrot_capture_lex(interp, $1);
+    Parrot_sub_capture_lex(interp, $1);
 }
 
 inline op newclosure(out PMC, invar PMC) {
-    $1 = parrot_new_closure(interp, $2);
+    $1 = Parrot_sub_new_closure(interp, $2);
 }
 
 =back
@@ -933,24 +928,25 @@ inline op gc_debug(in INT) {
 
 Fetch some piece of information about the interpreter and put it in $1.
 Possible values for $2 are defined in F<runtime/parrot/include/interpinfo.pasm>.
-The valid constants for each return value are:
+The valid constants for each return value are (excluding the the .INTERPINFO_
+prefix):
 
 =over 4
 
 =item B<interpinfo>(out INT, in INT)
 
-.TOTAL_MEM_ALLOC, .GC_MARK_RUNS, .GC_COLLECT_RUNS, .ACTIVE_PMCS, .ACTIVE_BUFFERS,
-.TOTAL_PMCS, .TOTAL_BUFFERS, .HEADER_ALLOCS_SINCE_COLLECT,
-.MEM_ALLOCS_SINCE_COLLECT, .TOTAL_COPIED, .IMPATIENT_PMCS, .GC_LAZY_MARK_RUNS,
-.EXTENDED_PMCS, .CURRENT_RUNCORE
+TOTAL_MEM_ALLOC, GC_MARK_RUNS, GC_COLLECT_RUNS, ACTIVE_PMCS, ACTIVE_BUFFERS,
+TOTAL_PMCS, TOTAL_BUFFERS, HEADER_ALLOCS_SINCE_COLLECT,
+MEM_ALLOCS_SINCE_COLLECT, TOTAL_COPIED, IMPATIENT_PMCS, GC_LAZY_MARK_RUNS,
+EXTENDED_PMCS, CURRENT_RUNCORE
 
 =item B<interpinfo>(out PMC, in INT)
 
-.CURRENT_SUB, .CURRENT_CONT, .CURRENT_OBJECT, .CURRENT_LEXPAD
+CURRENT_SUB, CURRENT_CONT, CURRENT_OBJECT, CURRENT_LEXPAD
 
 =item B<interpinfo>(out STR, in INT)
 
-.EXECUTABLE_FULLNAME, .EXECUTABLE_BASENAME, .RUNTIME_PREFIX
+EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME, RUNTIME_PREFIX
 
 =back
 
@@ -1248,11 +1244,11 @@ the callback function.
 =cut
 
 inline op loadlib(out PMC, in STR) {
-    $1 = Parrot_load_lib(interp, $2, NULL);
+    $1 = Parrot_dyn_load_lib(interp, $2, NULL);
 }
 
 inline op loadlib(out PMC, in STR, in PMC) {
-    $1 = Parrot_load_lib(interp, $2, $3);
+    $1 = Parrot_dyn_load_lib(interp, $2, $3);
 }
 
 op dlfunc(out PMC, invar PMC, in STR, in STR) {
@@ -1266,7 +1262,7 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data($2))->dl_handle;
     }
 
-    ptr = Parrot_dlsym_str(interp, dl_handle, $3);
+    ptr = Parrot_dyn_dlsym_str(interp, dl_handle, $3);
     p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
@@ -1291,7 +1287,7 @@ op dlvar(out PMC, invar PMC, in STR) {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data($2))->dl_handle;
     }
 
-    p = Parrot_dlsym_str(interp, dl_handle, $3);
+    p = Parrot_dyn_dlsym_str(interp, dl_handle, $3);
 
     if (p == NULL) {
         const char * const err = Parrot_dlerror();
@@ -1396,7 +1392,7 @@ as the Parrot interpreter itself.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 
 

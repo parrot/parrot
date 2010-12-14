@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -68,7 +67,7 @@ TODO: {
 pir_exit_code_is( <<'CODE', 2, "pir exit code isn't exception type" );
 .sub main
     $P0 = new ['ExceptionHandler']
-    set_addr $P0, catcher
+    set_label $P0, catcher
     $P0.'handle_types'(2)
     push_eh $P0
     exit 2

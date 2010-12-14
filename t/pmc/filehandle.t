@@ -1,13 +1,12 @@
 #!perl
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -115,7 +114,7 @@ pir_output_is( <<'CODE', <<'OUT', 'wrong open' );
     i = 1
     eh = new['ExceptionHandler']
     eh = .EXCEPTION_PIO_ERROR
-    set_addr eh, catchnoname
+    set_label eh, catchnoname
     push_eh eh
     fh = new['FileHandle']
     # Open without filename
@@ -128,7 +127,7 @@ pir_output_is( <<'CODE', <<'OUT', 'wrong open' );
     say i
 
     i = 0
-    set_addr eh, catchreopen
+    set_label eh, catchreopen
     fh.'open'('README')
     i = 1
     # Open already opened
@@ -632,7 +631,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "readall - failure conditions" );
     fh = new ['FileHandle']
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_PIO_ERROR)
-    set_addr eh, catch1
+    set_label eh, catch1
     push_eh eh
     # Using unopened FileHandle
     fh.'readall'()
@@ -642,7 +641,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "readall - failure conditions" );
     finalize eh
     say 'caught unopened'
   test2:
-    set_addr eh, catch2
+    set_label eh, catch2
     fh.'open'('README')
     # Using opened FileHandle with the filepath option
     fh.'readall'('README')
@@ -824,6 +823,17 @@ ok 4
 ok 5
 ok 6
 OUTPUT
+
+# FileHandle use file descriptor, get_fd should not return -1
+pir_output_is( <<'CODE', <<'OUT', 'get_fd method' );
+.sub test :main
+    new $P0, ['FileHandle']
+    $N0 = $P0.'get_fd'()
+    say $N0
+.end
+CODE
+-1
+OUT
 
 # TT #1178
 # L<PDD22/I\/O PMC API/=item get_fd>

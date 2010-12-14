@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -73,7 +72,7 @@ out-of-bounds test. Checks INT and PMC keys.
     is($P0, 7, "shrinking via int assignment to RBA works")
 
     new $P1, ['ExceptionHandler']
-    set_addr $P1, caught
+    set_label $P1, caught
     $P1.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
     push_eh $P1
     $P0 = -1
@@ -127,7 +126,7 @@ caught:
     new $P0, ['ResizableBooleanArray']
     new $P1, ['ExceptionHandler']
 
-    set_addr $P1, caught
+    set_label $P1, caught
     $P1.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
     push_eh $P1
 
@@ -151,7 +150,7 @@ end:
     is($I0, 0, "negative index retrieval is 0")
 
     new $P1, ['ExceptionHandler']
-    set_addr $P1, caught
+    set_label $P1, caught
     $P1.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
     push_eh $P1
     set $I0, $P0[-2]
@@ -310,7 +309,7 @@ caught:
     $P0 = new ['ResizableBooleanArray']
     $P1 = new ['ExceptionHandler']
 
-    set_addr $P1, caught
+    set_label $P1, caught
     $P1.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
     push_eh $P1
     pop $I0, $P0
@@ -400,7 +399,7 @@ shift_loop:
     $P0 = new ['ResizableBooleanArray']
     $P1 = new ['ExceptionHandler']
 
-    set_addr $P1, caught
+    set_label $P1, caught
     $P1.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
     push_eh $P1
 

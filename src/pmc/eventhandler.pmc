@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2007-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -305,5 +304,5 @@ Report whether the event handler can handle a particular type of event.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

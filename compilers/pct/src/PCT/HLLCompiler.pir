@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -25,7 +24,6 @@ running compilers from a command line.
 .namespace [ 'PCT';'HLLCompiler' ]
 
 .include 'cclass.pasm'
-.include 'stdio.pasm'
 .include 'iglobals.pasm'
 
 .sub 'init' :vtable :method
@@ -342,7 +340,7 @@ when the stage corresponding to target has been reached.
     $N1 = time
     $N2 = $N1 - $N0
     $P0 = getinterp
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'("Stage '")
     $P1.'print'(stagename)
     $P1.'print'("': ")
@@ -380,15 +378,6 @@ to any options and return the resulting parse tree.
   tcode_loop:
     unless tcode_it goto transcode_done
     tcode = shift tcode_it
-    push_eh tcode_enc
-    $I0 = find_charset tcode
-    $S0 = source
-    $S0 = trans_charset $S0, $I0
-    assign source, $S0
-    pop_eh
-    goto transcode_done
-  tcode_enc:
-    pop_eh
     push_eh tcode_fail
     $I0 = find_encoding tcode
     $S0 = source
@@ -629,13 +618,13 @@ specifies the encoding to use for the input (e.g., "utf8").
     # on startup show the welcome message
     $P0 = self.'commandline_banner'()
     $P1 = getinterp
-    $P2 = $P1.'stdhandle'(.PIO_STDERR_FILENO)
+    $P2 = $P1.'stderr_handle'()
     $P2.'print'($P0)
 
     .local pmc stdin
     .local int has_readline
     $P0 = getinterp
-    stdin = $P0.'stdhandle'(.PIO_STDIN_FILENO)
+    stdin = $P0.'stdin_handle'()
     encoding = adverbs['encoding']
     if encoding == 'fixed_8' goto interactive_loop
     unless encoding goto interactive_loop
@@ -906,7 +895,7 @@ Generic method for compilers invoked from a shell command line.
     .local string output
     .local pmc ofh
     $P0 = getinterp
-    ofh = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    ofh = $P0.'stdout_handle'()
     output = adverbs['output']
     if output == '' goto save_output_1
     if output == '-' goto save_output_1
@@ -936,7 +925,7 @@ Generic method for compilers invoked from a shell command line.
     .get_results ($P0)
     pop_eh
     $P1 = getinterp
-    $P1 = $P1.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P1.'stderr_handle'()
     $I0 = $P0['severity']
     if $I0 == .EXCEPT_EXIT goto do_exit
     $S0 = self.'backtrace'($P0)

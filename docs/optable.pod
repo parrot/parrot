@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2007, Parrot Foundation.
-# $Id$
 
 =head1 ***** WARNING *****
 
@@ -219,8 +218,7 @@ None.
 
 =head1 EXAMPLES
 
-  languages/perl6/src/grammar_optok.pg
-  languages/cardinal/src/cardinal_optok.pg
+None.
 
 =head1 ATTACHMENTS
 
@@ -236,12 +234,10 @@ None.
   http://en.wikipedia.org/wiki/Associativity
   http://en.wikipedia.org/wiki/Bottom-up_parsing
   http://www.ozonehouse.com/mark/blog/code/PeriodicTable.html
-  http://dev.perl.org/perl6/doc/design/syn/S03.html
+  http://perlcabal.org/syn/S03.html
 
   compilers/tge
   compilers/past
-  languages/perl6/src/PAST.pir
-  languages/perl6/src/POST.pir
 
 =cut
 

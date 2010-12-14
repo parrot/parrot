@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2007-2010, Parrot Foundation.
- * $Id$
  */
 
 #ifndef PARROT_IMCC_H_GUARD
@@ -15,5 +14,5 @@ PARROT_EXPORT void imcc_run_pbc(PARROT_INTERP, const char *outputfile, int argc,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

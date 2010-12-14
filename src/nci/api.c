@@ -1,6 +1,5 @@
 /* nci.c
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -95,5 +94,5 @@ build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

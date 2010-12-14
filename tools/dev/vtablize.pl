@@ -1,5 +1,4 @@
 #! perl -pi.bak
-# $Id$
 # Copyright (C) 2008-2009, Parrot Foundation.
 
 =head1 NAME

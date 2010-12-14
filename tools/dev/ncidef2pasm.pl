@@ -1,7 +1,6 @@
 #! perl
 
 # Copyright (C) 2003-2007, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -99,7 +98,7 @@ Taken from an I register
 
 =item f
 
-Paramter is a float
+Parameter is a float
 
 Taken from an N register.
 
@@ -111,7 +110,7 @@ Taken from an N register.
 
 =item t
 
-Paramter is a char *, presumably a C string
+Parameter is a char *, presumably a C string
 
 Taken from an S register
 

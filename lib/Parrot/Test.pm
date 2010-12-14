@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -401,10 +400,14 @@ sub write_code_to_file {
     return;
 }
 
+{
+    no warnings 'once';
 # We can inherit from other modules, so we do so.
 *plan = \&Test::More::plan;
 *skip = \&Test::More::skip;
 *slurp_file = \&Parrot::BuildUtil::slurp_file;
+
+}
 
 sub convert_line_endings {
     my ($text) = @_;
@@ -493,7 +496,7 @@ sub generate_languages_functions {
             }
 
             # The generated files are left in the t/* directories.
-            # Let 'make clean' and 'svn:ignore' take care of them.
+            # Let 'make clean' and '.gitignore' take care of them.
 
             return;
         };
@@ -633,10 +636,10 @@ sub _run_test_file {
         $run_exec = 1;
         my $pbc_f = per_test( '.pbc', $test_no );
         my $o_f = per_test( '_pbcexe' . $PConfig{o}, $test_no );
-        my $exe_f =
-            per_test( '_pbcexe' . $PConfig{exe}, $test_no )
-            ;    # Make cleanup and svn:ignore more simple
-        my $exec_f = per_test( '_pbcexe', $test_no );    # Make cleanup and svn:ignore more simple
+
+        # make cleanup and .gitignore more simple
+        my $exe_f = per_test( '_pbcexe' . $PConfig{exe}, $test_no );
+        my $exec_f = per_test( '_pbcexe', $test_no );
         $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
 
         run_command(
@@ -701,8 +704,6 @@ sub _generate_test_functions {
     my $path_to_parrot = path_to_parrot();
     my $parrot         = File::Spec->join( File::Spec->curdir(),
                             'parrot' . $PConfig{exe} );
-    my $pirc           = File::Spec->join( File::Spec->curdir(),
-                            qw( compilers pirc ), "pirc$PConfig{exe}" );
 
     ##### 1: Parrot test map #####
     my %parrot_test_map = map {
@@ -785,11 +786,6 @@ sub _generate_test_functions {
         pir_2_pasm_isnt    => 'isnt_eq',
         pir_2_pasm_like    => 'like',
         pir_2_pasm_unlike  => 'unlike',
-
-        pirc_2_pasm_is     => 'is_eq',
-        pirc_2_pasm_isnt   => 'isnt_eq',
-        pirc_2_pasm_like   => 'like',
-        pirc_2_pasm_unlike => 'unlike',
     );
 
     foreach my $func ( keys %pir_2_pasm_test_map ) {
@@ -827,8 +823,6 @@ sub _generate_test_functions {
                 $args   .= " $opt --output=$out_f";
                 $args    =~ s/--run-exec//;
                 $cmd       = qq{$parrot $args "$code_f"};
-            } elsif ($func =~ /^pirc_/) {
-                $cmd       = qq{$pirc -b -x "$code_f"};
             }
 
             write_code_to_file( $code, $code_f );

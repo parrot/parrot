@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2002-2009, Parrot Foundation.
  */
 
@@ -473,5 +472,5 @@ char * symreg_to_str(ARGIN(const SymReg *s))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

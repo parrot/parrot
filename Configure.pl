@@ -1,7 +1,6 @@
 #! perl
 
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 use 5.008;
 use strict;
@@ -631,7 +630,6 @@ configuration file.
     auto::signal
     auto::socklen_t
     auto::env
-    auto::extra_nci_thunks
     auto::gmp
     auto::readline
     auto::pcre

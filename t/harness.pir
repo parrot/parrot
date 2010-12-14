@@ -1,6 +1,5 @@
 #!parrot
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 .sub 'main' :main
     .param pmc argv
@@ -111,7 +110,7 @@ HELP
     .local int nb
     $I0 = opts['code-tests']
     unless $I0 goto L1
-    .const string developing_tests = 't/distro/file_metadata.t t/codingstd/*.t'
+    .const string developing_tests = 't/codingstd/*.t'
     files = glob(developing_tests)
     goto L2
   L1:
@@ -218,7 +217,13 @@ TEST
     .local string submitter
     submitter = _get_submitter(config, env)
     $P0['Submitter'] = submitter
-    _add_subversion_info($P0)
+    $I0 = exists config['sha1']
+    unless $I0 goto L2
+    .local string sha1
+    sha1 = config['sha1']
+    $P0['Git sha1'] = sha1
+  L2:
+    _add_git_info($P0)
     .return ($P0)
 .end
 
@@ -284,35 +289,36 @@ TEST
 
 .include 'cclass.pasm'
 
-.sub '_add_subversion_info' :anon
+.sub '_add_git_info' :anon
     .param pmc hash
-    $I0 = file_exists('.svn')
+    $I0 = file_exists('.git')
     unless $I0 goto L1
     $P0 = new 'FileHandle'
-    $P0.'open'('svn info', 'pr')
+    $P0.'open'('git branch', 'pr')
     $S0 = $P0.'readall'()
     $P0.'close'()
     $I0 = length $S0
-    $S1 = 'trunk'
-    $I1 = index $S0, '/branches/'
+    $I1 = index $S0, '*'
     unless $I1 >= 0 goto L2
-    $I1 += 10
+    $I1 += 1
+    $I1 = find_not_cclass .CCLASS_WHITESPACE, $S0, $I1, $I0
     $I2 = find_cclass .CCLASS_WHITESPACE, $S0, $I1, $I0
     $I3 = $I2 - $I1
     $S1 = substr $S0, $I1, $I3
-  L2:
     hash['Branch'] = $S1
-    $P0.'open'('svn status', 'pr')
+  L2:
+    $P0.'open'('git status', 'pr')
     $P1 = new 'ResizableStringArray'
   L3:
     $S0 = $P0.'readline'()
     if $S0 == '' goto L4
-    $I0 = index $S0, 'M'
-    unless $I0 == 0 goto L3
+    $I1 = index $S0, 'modified:'
+    unless $I1 > 0 goto L3
+    $I1 += 9
     $S0 = chomp($S0)
     $I0 = length $S0
-    $I0 = find_not_cclass .CCLASS_WHITESPACE, $S0, 2, $I0
-    $S0 = substr $S0, $I0
+    $I1 = find_not_cclass .CCLASS_WHITESPACE, $S0, $I1, $I0
+    $S0 = substr $S0, $I1
     push $P1, $S0
     goto L3
   L4:
@@ -338,15 +344,18 @@ TEST
     config = $P0[.IGLOBALS_CONFIG_HASH]
     .local pmc contents
     contents = new 'ResizablePMCArray' # by couple
-    push contents, 'architecture'
+    push contents, 'Architecture'
     $S0 = config['cpuarch']
     push contents, $S0
-    push contents, 'platform'
+    push contents, 'Platform'
     $S0 = config['osname']
     push contents, $S0
+    $I0 = exists config['git_describe']
+    unless $I0 goto L0
     push contents, 'revision'
-    $S0 = config['revision']
+    $S0 = config['git_describe']
     push contents, $S0
+  L0:
     push contents, 'tags'
     $S0 = _get_tags(env_data)
     push contents, $S0

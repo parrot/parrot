@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*
  * Copyright (C) 2004-2008, Parrot Foundation.
  */
@@ -249,5 +247,5 @@ japh_compiler(PARROT_INTERP, const char *program)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

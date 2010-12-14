@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -95,19 +94,19 @@ end:
     push_eh eh1
     set $P0[1], -7
     pop_eh
-    ok(0, "no exception raised when setting nonexistant element")
+    ok(0, "no exception raised when setting nonexistent element")
     goto after_eh1
 eh1:
-    ok(1, "exception raised when setting nonexistant element")
+    ok(1, "exception raised when setting nonexistent element")
 after_eh1:
 
     push_eh eh2
     set $I0, $P0[1]
     pop_eh
-    ok(0, "no exception raised when getting nonexistant element")
+    ok(0, "no exception raised when getting nonexistent element")
     goto after_eh2
 eh2:
-    ok(1, "exception raised when getting nonexistant element")
+    ok(1, "exception raised when getting nonexistent element")
 after_eh2:
 .end
 

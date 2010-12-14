@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -125,6 +124,7 @@ static void no_such_register(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_PURE_FUNCTION
 static const char * skip_whitespace(ARGIN(const char *cmd))
         __attribute__nonnull__(1);
 
@@ -443,7 +443,7 @@ In echo mode the script commands are written to stderr before executing."
         & dbg_gcdebug,
         "toggle gcdebug mode",
 "Toggle gcdebug mode.\n\n\
-In gcdebug mode a garbage collection cycle is run before each opcocde,\n\
+In gcdebug mode a garbage collection cycle is run before each opcode,\n\
 same as using the gcdebug core."
     },
     cmd_help = {
@@ -631,6 +631,7 @@ Return a pointer to the first non-whitespace character in C<cmd>.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_PURE_FUNCTION
 static const char *
 skip_whitespace(ARGIN(const char *cmd))
 {
@@ -898,8 +899,8 @@ Parrot_debugger_start(PARROT_INTERP, ARGIN_NULLOK(opcode_t * cur_opcode))
     debugger_cmdline(interp);
 
     if (interp->pdb->state & PDB_EXIT) {
-        TRACEDEB_MSG("Parrot_debugger_start Parrot_exit");
-        Parrot_exit(interp, 0);
+        TRACEDEB_MSG("Parrot_debugger_start Parrot_x_exit");
+        Parrot_x_exit(interp, 0);
     }
     TRACEDEB_MSG("Parrot_debugger_start ends");
 }
@@ -3266,7 +3267,7 @@ PDB_backtrace(PARROT_INTERP)
     PMC *ctx = CURRENT_CONTEXT(interp);
 
     if (!PMC_IS_NULL(sub)) {
-        str = Parrot_Context_infostr(interp, ctx);
+        str = Parrot_sub_Context_infostr(interp, ctx);
         if (str) {
             Parrot_io_eprintf(interp, "%Ss", str);
             if (interp->code->annotations) {
@@ -3308,7 +3309,7 @@ PDB_backtrace(PARROT_INTERP)
             break;
 
 
-        str = Parrot_Context_infostr(interp, Parrot_pcc_get_caller_ctx(interp, ctx));
+        str = Parrot_sub_Context_infostr(interp, Parrot_pcc_get_caller_ctx(interp, ctx));
 
 
         if (!str)
@@ -3550,5 +3551,5 @@ runs of course in the C<debugee>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -87,8 +86,7 @@ loop:	ge $I0, $I2, getout
 	mod $I31,$I0,100
 	if $I31, skip
         $P0 = getinterp
-        .include 'stdio.pasm'
-        $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+        $P1 = $P0.'stderr_handle'()
 	print $P1, "."
 skip:
 

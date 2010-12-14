@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -218,7 +217,7 @@ BEGIN {
         header => { c => { file_exts => ['h'] }, },
     );
 
-    my @ignore_dirs = qw{ .svn };
+    my @ignore_dirs = qw{ .git };
 
     for my $class ( keys %file_class ) {
         for my $type ( keys %{ $file_class{$class} } ) {
@@ -406,28 +405,6 @@ This is to exclude automatically generated C-language files Parrot might have.
             compilers/imcc/imclexer.c
             compilers/imcc/imcparser.c
             compilers/imcc/imcparser.h
-            compilers/pirc/src/main.c
-            compilers/pirc/src/pir.l
-            compilers/pirc/src/pir.y
-            compilers/pirc/src/pasm.l
-            compilers/pirc/src/pasm.y
-            compilers/pirc/src/pircompiler.h
-            compilers/pirc/src/pirlexer.c
-            compilers/pirc/src/pirlexer.h
-            compilers/pirc/src/pirparser.c
-            compilers/pirc/src/pirparser.h
-            compilers/pirc/src/pircompunit.c
-            compilers/pirc/src/pircompunit.h
-            compilers/pirc/src/hdocprep.l
-            compilers/pirc/src/hdocprep.c
-            compilers/pirc/macro/lexer.h
-            compilers/pirc/macro/macro.h
-            compilers/pirc/macro/macro.l
-            compilers/pirc/macro/macro.y
-            compilers/pirc/macro/macrolexer.c
-            compilers/pirc/macro/macrolexer.h
-            compilers/pirc/macro/macroparser.c
-            compilers/pirc/macro/macroparser.h
             include/parrot/config.h
             include/parrot/has_header.h
             include/parrot/oplib/core_ops.h
@@ -435,6 +412,17 @@ This is to exclude automatically generated C-language files Parrot might have.
             include/parrot/opsenum.h
             src/gc/malloc.c
             src/ops/core_ops.c
+            t/tools/dev/headerizer/testlib/fixedbooleanarray_pmc.in
+            t/tools/dev/headerizer/testlib/function_decls.in
+            t/tools/dev/headerizer/testlib/hvalidheader.in
+            t/tools/dev/headerizer/testlib/imcc.in
+            t/tools/dev/headerizer/testlib/lack_directive.in
+            t/tools/dev/headerizer/testlib/list.in
+            t/tools/dev/headerizer/testlib/list_h.in
+            t/tools/dev/headerizer/testlib/missingheaderfile.in
+            t/tools/dev/headerizer/testlib/nci_pmc.in
+            t/tools/dev/headerizer/testlib/none.in
+            t/tools/dev/headerizer/testlib/validheader.in
             } unless @exemptions;
 
         my $path = -f $file ? $file : $file->path;

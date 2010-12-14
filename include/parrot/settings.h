@@ -1,7 +1,5 @@
 /* settings.h
  *  Copyright (C) 2001-2004, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Overall settings for Parrot
  *  Data Structure and Algorithms:
@@ -57,5 +55,5 @@
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

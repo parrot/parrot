@@ -1,5 +1,4 @@
 /*
- * $Id$
 ** math.ops
 */
 
@@ -491,11 +490,11 @@ References:
 =cut
 
 op mod(inout INT, in INT) :base_core {
-    $1 = intval_mod($1, $2);
+    $1 = Parrot_util_intval_mod($1, $2);
 }
 
 op mod(inout NUM, in NUM) :base_core {
-    $1 = floatval_mod($1, $2);
+    $1 = Parrot_util_floatval_mod($1, $2);
 }
 
 inline op mod(invar PMC, invar PMC) :base_core {
@@ -511,11 +510,11 @@ inline op mod(invar PMC, in NUM) :base_core {
 }
 
 op mod(out INT, in INT, in INT) :base_core {
-    $1 = intval_mod($2, $3);
+    $1 = Parrot_util_intval_mod($2, $3);
 }
 
 op mod(out NUM, in NUM, in NUM) :base_core {
-    $1 = floatval_mod($2, $3);
+    $1 = Parrot_util_floatval_mod($2, $3);
 }
 
 inline op mod(invar PMC, invar PMC, invar PMC) :base_core {
@@ -743,5 +742,5 @@ as the Parrot interpreter itself.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

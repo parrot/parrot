@@ -1,7 +1,5 @@
 /* atomic.h
  *  Copyright (C) 2006-2008, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This header implements portable atomic operations.
  *  Data Structure and Algorithms:
@@ -86,5 +84,5 @@ typedef struct Parrot_atomic_integer {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
