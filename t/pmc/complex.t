@@ -20,7 +20,7 @@ Tests the Complex PMC.
     .include 'fp_equality.pasm'
     .include "iglobals.pasm"
 
-    plan(460)
+    plan(557)
 
     string_parsing()
     exception_malformed_string__real_part()
@@ -36,6 +36,7 @@ Tests the Complex PMC.
     get_int_or_num_or_bool()
     test_get_keyed()
     exception_get_keyed__invalid_string_key()
+    exception_set_keyed__invalid_string_key()
     exception_get_keyed__invalid_numeric_key()
     set_int_or_num()
     set_keyed()
@@ -56,6 +57,7 @@ Tests the Complex PMC.
     ln_of_complex_numbers()
     exp_of_complex_numbers()
     sqrt_of_complex_numbers()
+    pow_of_complex_numbers()
     sin_of_complex_numbers()
     cos_of_complex_numbers()
     tan_of_complex_numbers()
@@ -74,6 +76,9 @@ Tests the Complex PMC.
     coth_of_complex_numbers()
     sech_of_complex_numbers()
     csch_of_complex_numbers()
+    asinh_of_complex_numbers()
+    acosh_of_complex_numbers()
+    atanh_of_complex_numbers()
     add_using_subclass_of_complex_bug_59630()
     provides_complex()
 
@@ -336,6 +341,11 @@ handler:
     set $P0, "2 - 3i"
     div $P1, $P0, 0.5
     is( $P1, "4-6i", '2-3i / 0.5 = 4-6i' )
+
+    set $P0, "4 + 0i"
+    set $P1, "2 + 0i"
+    div $P0, $P0, $P1
+    is( $P1, "2+0i", '4+0i / 2+0i = 2+0i' )
 .end
 
 .sub complex_divide_by_zero_Complex
@@ -417,6 +427,11 @@ handler:
         set $I1, $P0[$P1]
         is( $I0, "-3", 'get real portion -> Int' )
         is( $I1, "1", 'get imag portion -> Int' )
+
+        set $P4, $P0[0]
+        set $P5, $P0[1]
+        is( $P4, "-3.3", 'get real portion using get_pmc_keyed')
+        is( $P5, "1.2", 'get imag portion using get_pmc_keyed')
 .end
 
 .sub exception_get_keyed__invalid_string_key
@@ -424,6 +439,15 @@ handler:
     set $P0, "5 + 3.5i"
     push_eh handler
         set $N0, $P0["Foo55"]
+handler:
+    .exception_is( "Complex: key is neither 'real' or 'imag'" )
+.end
+
+.sub exception_set_keyed__invalid_string_key
+    $P0 = new ['Complex']
+    set $P0, "5 + 3.5i"
+    push_eh handler
+        set $P0["Foo55"], 1
 handler:
     .exception_is( "Complex: key is neither 'real' or 'imag'" )
 .end
@@ -481,6 +505,7 @@ handler:
 .sub test_is_equal
     $P0 = new ['Complex']
     $P1 = new ['Complex']
+    $P2 = new ['Float']
 
     set $P0, "2 + 3j"
     set $P1["real"], 2
@@ -489,6 +514,12 @@ handler:
     is( $P0, $P1, 'create new Complex from real/imag and test eq' )
     set $P1, 0
     isnt( $P0, $P1, '... now make sure it ne to 0' )
+
+    set $P2, 2
+    isnt( $P0, $P2, 'test ne between Complex (with imag) and Float' )
+
+    set $P0, "2 + 0i"
+    is( $P0, $P2, 'test eq between Complex (w/o imag) and Float' )
 .end
 
 .sub test_complex_abs
@@ -661,6 +692,24 @@ handler:
     is( $S3, $S1, $S4 )
 .endm
 
+.macro complex_pow_is( val, res, pow )
+    $P1 = new ['Complex']
+    $P2 = new ['Complex']
+    set $P1, .val
+
+    set $S0, .val
+    set $S1, .res
+    set $S2, .pow
+
+    $P2 = $P1. 'pow'($S2)
+    $S3 = sprintf "%f%+fi", $P2
+
+    concat $S4, $S0, " ^ "
+    concat $S4, $S4, $S2
+
+    is( $S3, $S1, $S4 )
+.endm
+
 .macro complex_op_todo( val, res, op, todo )
     $P1 = new ['Complex']
     $P2 = new ['Complex']
@@ -749,6 +798,53 @@ handler:
     .complex_op_is( "2-3i", "1.674149-0.895977i", 'sqrt' )
     .complex_op_is( "-2+3i", "0.895977+1.674149i", 'sqrt' )
     .complex_op_is( "-2-3i", "0.895977-1.674149i", 'sqrt' )
+.end
+
+.sub pow_of_complex_numbers
+    .complex_pow_is( "2", "1.000000+0.000000i", 0 )
+    .complex_pow_is( "2", "2.000000+0.000000i", 1 )
+    .complex_pow_is( "2", "4.000000+0.000000i", 2 )
+    .complex_pow_is( "2", "8.000000+0.000000i", 3 )
+    .complex_pow_is( "2", "0.500000-0.000000i", -1 )
+    .complex_pow_is( "2", "0.250000-0.000000i", -2 )
+    .complex_pow_is( "2", "5.656854+0.000000i", 2.5 )
+    .complex_pow_is( "-2", "1.000000+0.000000i", 0 )
+    .complex_pow_is( "-2", "-2.000000+0.000000i", 1 )
+    .complex_pow_is( "-2", "4.000000-0.000000i", 2 )
+    .complex_pow_is( "-2", "-8.000000+0.000000i", 3 )
+    .complex_pow_is( "-2", "-0.500000-0.000000i", -1 )
+    .complex_pow_is( "-2", "0.250000+0.000000i", -2 )
+    .complex_pow_is( "-2", "0.000000-0.176777i", -2.5 )
+    .complex_pow_is( "0.5", "1.000000+0.000000i", 0 )
+    .complex_pow_is( "0.5", "0.500000+0.000000i", 1 )
+    .complex_pow_is( "0.5", "0.250000+0.000000i", 2 )
+    .complex_pow_is( "0.5", "2.000000-0.000000i", -1 )
+    .complex_pow_is( "0.5", "4.000000-0.000000i", -2 )
+    .complex_pow_is( "0.5", "5.656854-0.000000i", -2.5 )
+    .complex_pow_is( "-0.5", "1.000000+0.000000i", 0 )
+    .complex_pow_is( "-0.5", "-0.500000+0.000000i", 1 )
+    .complex_pow_is( "-0.5", "0.250000-0.000000i", 2 )
+    .complex_pow_is( "-0.5", "-2.000000-0.000000i", -1 )
+    .complex_pow_is( "-0.5", "4.000000+0.000000i", -2 )
+    .complex_pow_is( "-0.5", "0.000000-5.656854i", -2.5 )
+    .complex_pow_is( "3i", "1.000000+0.000000i", 0 )
+    .complex_pow_is( "3i", "0.000000+3.000000i", 1 )
+    .complex_pow_is( "3i", "-9.000000+0.000000i", 2 )
+    .complex_pow_is( "3i", "0.000000-0.333333i", -1 )
+    .complex_pow_is( "3i", "-0.111111-0.000000i", -2 )
+    .complex_pow_is( "3i", "-0.045361+0.045361i", -2.5 )
+    .complex_pow_is( "0.5+2i", "1.000000+0.000000i", 0 )
+    .complex_pow_is( "0.5+2i", "0.500000+2.000000i", 1 )
+    .complex_pow_is( "0.5+2i", "-3.750000+2.000000i", 2 )
+    .complex_pow_is( "0.5+2i", "0.117647-0.470588i", -1 )
+    .complex_pow_is( "0.5+2i", "-0.207612-0.110727i", -2 )
+    .complex_pow_is( "0.5+2i", "-0.161431+0.028201i", -2.5 )
+    .complex_pow_is( "-0.5-0.5i", "1.000000-0.000000i", 0 )
+    .complex_pow_is( "-0.5-0.5i", "-0.500000-0.500000i", 1 )
+    .complex_pow_is( "-0.5-0.5i", "-0.000000+0.500000i", 2 )
+    .complex_pow_is( "-0.5-0.5i", "-1.000000+1.000000i", -1 )
+    .complex_pow_is( "-0.5-0.5i", "-0.000000-2.000000i", -2 )
+    .complex_pow_is( "-0.5-0.5i", "2.197368-0.910180i", -2.5 )
 .end
 
 .sub sin_of_complex_numbers
@@ -1112,6 +1208,62 @@ todo:
     .complex_op_is("2-3i", "-0.272549+0.040301i", 'csch' )
     .complex_op_is("-2+3i", "0.272549-0.040301i", 'csch' )
     .complex_op_is("-2-3i", "0.272549+0.040301i", 'csch' )
+.end
+
+.sub asinh_of_complex_numbers
+    .complex_op_is("-2+0i", "-1.443635+0.000000i", 'asinh' )
+    .complex_op_is("-1+0i", "-0.881374+0.000000i", 'asinh' )
+    .complex_op_is("-0.5+0i", "-0.481212+0.000000i", 'asinh' )
+    .complex_op_is("0.5+0i", "0.481212+0.000000i", 'asinh' )
+    .complex_op_is("1+0i", "0.881374+0.000000i", 'asinh' )
+    .complex_op_is("2+0i", "1.443635+0.000000i", 'asinh' )
+    .complex_op_is("0-2i", "-1.316958-1.570796i", 'asinh' )
+    .complex_op_is("0-1i", "-0.000000-1.570796i", 'asinh' )
+    .complex_op_is("0-0.5i", "-0.000000-0.523599i", 'asinh' )
+    .complex_op_is("0+0.5i", "-0.000000+0.523599i", 'asinh' )
+    .complex_op_is("0+1i", "-0.000000+1.570796i", 'asinh' )
+    .complex_op_is("0+2i", "1.316958+1.570796i", 'asinh' )
+    .complex_op_is("2+3i", "1.968638+0.964659i", 'asinh' )
+    .complex_op_is("2-3i", "1.968638-0.964659i", 'asinh' )
+    .complex_op_is("-2+3i", "-1.968638+0.964659i", 'asinh' )
+    .complex_op_is("-2-3i", "-1.968638-0.964659i", 'asinh' )
+.end
+
+.sub acosh_of_complex_numbers
+    .complex_op_is("-2+0i", "1.316958+3.141593i", 'acosh' )
+    .complex_op_is("-1+0i", "-0.000000+3.141593i", 'acosh' )
+    .complex_op_is("-0.5+0i", "-0.000000+2.094395i", 'acosh' )
+    .complex_op_is("0.5+0i", "-0.000000+1.047198i", 'acosh' )
+    .complex_op_is("1+0i", "-0.000000+0.000000i", 'acosh' )
+    .complex_op_is("2+0i", "-1.316958+0.000000i", 'acosh' )
+    .complex_op_is("0-2i", "1.443635-1.570796i", 'acosh' )
+    .complex_op_is("0-1i", "0.881374-1.570796i", 'acosh' )
+    .complex_op_is("0-0.5i", "0.481212-1.570796i", 'acosh' )
+    .complex_op_is("0+0.5i", "0.481212+1.570796i", 'acosh' )
+    .complex_op_is("0+1i", "0.881374+1.570796i", 'acosh' )
+    .complex_op_is("0+2i", "1.443635+1.570796i", 'acosh' )
+    .complex_op_is("2+3i", "1.983387+1.000144i", 'acosh' )
+    .complex_op_is("2-3i", "1.983387-1.000144i", 'acosh' )
+    .complex_op_is("-2+3i", "1.983387+2.141449i", 'acosh' )
+    .complex_op_is("-2-3i", "1.983387-2.141449i", 'acosh' )
+.end
+
+.sub atanh_of_complex_numbers
+    .complex_op_is("-2+0i", "-0.549306+1.570796i", 'atanh' )
+    .complex_op_is("-0.5+0i", "-0.549306+0.000000i", 'atanh' )
+    .complex_op_is("0.5+0i", "0.549306+0.000000i", 'atanh' )
+    .complex_op_is("1+0i", "Inf+0.000000i", 'atanh' )
+    .complex_op_is("2+0i", "0.549306-1.570796i", 'atanh' )
+    .complex_op_is("0-2i", "-0.000000-1.107149i", 'atanh' )
+    .complex_op_is("0-1i", "-0.000000-0.785398i", 'atanh' )
+    .complex_op_is("0-0.5i", "-0.000000-0.463648i", 'atanh' )
+    .complex_op_is("0+0.5i", "-0.000000+0.463648i", 'atanh' )
+    .complex_op_is("0+1i", "-0.000000+0.785398i", 'atanh' )
+    .complex_op_is("0+2i", "-0.000000+1.107149i", 'atanh' )
+    .complex_op_is("2+3i", "0.146947+1.338973i", 'atanh' )
+    .complex_op_is("2-3i", "0.146947-1.338973i", 'atanh' )
+    .complex_op_is("-2+3i", "-0.146947+1.338973i", 'atanh' )
+    .complex_op_is("-2-3i", "-0.146947-1.338973i", 'atanh' )
 .end
 
 .sub add_using_subclass_of_complex_bug_59630
