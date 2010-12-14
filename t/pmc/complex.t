@@ -20,7 +20,7 @@ Tests the Complex PMC.
     .include 'fp_equality.pasm'
     .include "iglobals.pasm"
 
-    plan(557)
+    plan(588)
 
     string_parsing()
     exception_malformed_string__real_part()
@@ -79,6 +79,8 @@ Tests the Complex PMC.
     asinh_of_complex_numbers()
     acosh_of_complex_numbers()
     atanh_of_complex_numbers()
+    acoth_of_complex_numbers()
+    acsch_of_complex_numbers()
     add_using_subclass_of_complex_bug_59630()
     provides_complex()
 
@@ -1264,6 +1266,43 @@ todo:
     .complex_op_is("2-3i", "0.146947-1.338973i", 'atanh' )
     .complex_op_is("-2+3i", "-0.146947+1.338973i", 'atanh' )
     .complex_op_is("-2-3i", "-0.146947-1.338973i", 'atanh' )
+.end
+
+.sub acoth_of_complex_numbers
+    .complex_op_is("-2+0i", "-0.549306+0.000000i", 'acoth' )
+    .complex_op_is("-0.5+0i", "-0.549306+1.570796i", 'acoth' )
+    .complex_op_is("0.5+0i", "0.549306-1.570796i", 'acoth' )
+    .complex_op_is("1+0i", "Inf+0.000000i", 'acoth' )
+    .complex_op_is("2+0i", "0.549306+0.000000i", 'acoth' )
+    .complex_op_is("0-2i", "-0.000000+0.463648i", 'acoth' )
+    .complex_op_is("0-1i", "-0.000000+0.785398i", 'acoth' )
+    .complex_op_is("0-0.5i", "-0.000000+1.107149i", 'acoth' )
+    .complex_op_is("0+0.5i", "-0.000000-1.107149i", 'acoth' )
+    .complex_op_is("0+1i", "-0.000000-0.785398i", 'acoth' )
+    .complex_op_is("0+2i", "-0.000000-0.463648i", 'acoth' )
+    .complex_op_is("2+3i", "0.146947-0.231824i", 'acoth' )
+    .complex_op_is("2-3i", "0.146947+0.231824i", 'acoth' )
+    .complex_op_is("-2+3i", "-0.146947-0.231824i", 'acoth' )
+    .complex_op_is("-2-3i", "-0.146947+0.231824i", 'acoth' )
+.end
+
+.sub acsch_of_complex_numbers
+    .complex_op_is("-2+0i", "-0.481212+0.000000i", 'acsch' )
+    .complex_op_is("-1+0i", "-0.881374+0.000000i", 'acsch' )
+    .complex_op_is("-0.5+0i", "-1.443635+0.000000i", 'acsch' )
+    .complex_op_is("0.5+0i", "1.443635+0.000000i", 'acsch' )
+    .complex_op_is("1+0i", "0.881374+0.000000i", 'acsch' )
+    .complex_op_is("2+0i", "0.481212+0.000000i", 'acsch' )
+    .complex_op_is("0-2i", "-0.000000+0.523599i", 'acsch' )
+    .complex_op_is("0-1i", "-0.000000+1.570796i", 'acsch' )
+    .complex_op_is("0-0.5i", "1.316958+1.570796i", 'acsch' )
+    .complex_op_is("0+0.5i", "-1.316958-1.570796i", 'acsch' )
+    .complex_op_is("0+1i", "-0.000000-1.570796i", 'acsch' )
+    .complex_op_is("0+2i", "-0.000000-0.523599i", 'acsch' )
+    .complex_op_is("2+3i", "0.157355-0.229963i", 'acsch' )
+    .complex_op_is("2-3i", "0.157355+0.229963i", 'acsch' )
+    .complex_op_is("-2+3i", "-0.157355-0.229963i", 'acsch' )
+    .complex_op_is("-2-3i", "-0.157355+0.229963i", 'acsch' )
 .end
 
 .sub add_using_subclass_of_complex_bug_59630
