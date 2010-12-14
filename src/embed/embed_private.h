@@ -5,19 +5,21 @@
 #include "pmc/pmc_parrotinterpreter.h"
 
 #define GET_RAW_INTERP(p) ((Parrot_ParrotInterpreter_attributes*)(p)->data)->interp;
+#define GET_INTERP(p) PMC_IS_NULL(p) ? NULL : GET_RAW_INTERP(p);
 
-#define EMBED_API_CALLIN(p, i)                                     \
-    void * _oldtop;                                                \
-    Parrot_jump_buff env;                                          \
-    Parrot_Interp (i) = PMC_IS_NULL(p) ? NULL : GET_RAW_INTERP(p); \
-    _oldtop = (i)->lo_var_ptr;                                     \
-    if (_oldtop == NULL)                                           \
-        (i)->lo_var_ptr = &_oldtop;                                \
-    (i)->api_jmp_buf = &env;                                       \
-    if (setjmp(env)) {                                             \
-        (i)->api_jmp_buf = NULL;                                   \
-        return !interp->exit_code;                                 \
-    } else {                                                       \
+#define EMBED_API_CALLIN(p, i)                   \
+    void * _oldtop;                              \
+    Parrot_jump_buff env;                        \
+    Interp * const (i) = GET_INTERP(p);          \
+    _oldtop = (i)->lo_var_ptr;                   \
+    if (_oldtop == NULL)                         \
+        (i)->lo_var_ptr = &_oldtop;              \
+    (i)->api_jmp_buf = &env;                     \
+    if (setjmp(env)) {                           \
+        Interp * const __interp = GET_INTERP(p); \
+        __interp->api_jmp_buf = NULL;            \
+        return !__interp->exit_code;             \
+    } else {                                     \
         {
 
 #define EMBED_API_CALLOUT(p, i)                                    \

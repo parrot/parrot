@@ -1790,6 +1790,7 @@ src/pbc_merge$(O) : \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/runcore_api.h \
+    $(INC_DIR)/embed.h \
     $(PARROT_H_HEADERS)
 
 src/io/filehandle$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_filehandle.h \

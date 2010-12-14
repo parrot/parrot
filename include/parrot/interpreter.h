@@ -498,7 +498,7 @@ void Parrot_mark_method_writes(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-PMC * Parrot_set_compiler(PARROT_INTERP,
+void Parrot_set_compiler(PARROT_INTERP,
     ARGIN(STRING *type),
     ARGIN(PMC *compiler))
         __attribute__nonnull__(1)
