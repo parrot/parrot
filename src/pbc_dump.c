@@ -59,6 +59,7 @@ efficiency on reading non-native PBCs.
 #include "parrot/longopt.h"
 #include "parrot/oplib/ops.h"
 #include "parrot/oplib/core_ops.h"
+#include "parrot/embed.h"
 
 /*
 

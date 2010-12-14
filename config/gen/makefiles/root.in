@@ -1114,6 +1114,7 @@ $(PDUMP) : src/pbc_dump$(O) src/packdump$(O) $(LIBPARROT)
 src/pbc_dump$(O) : \
     $(INC_DIR)/api.h \
     $(INC_DIR)/longopt.h \
+    $(INC_DIR)/embed.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(PARROT_H_HEADERS) \
