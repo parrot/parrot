@@ -51,11 +51,13 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 =cut
 
+.include 'except_types.pasm'
+
 .namespace []
 
 .sub main :main
     .include 'test_more.pir'
-    plan(75)
+    plan(76)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -167,6 +169,12 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .end
 
+.sub namespace_lookup_invalidkeytype
+    $P0 = get_root_namespace
+    $P2 = new ['Boolean']
+    $P0[$P2] = $P2
+.end
+
 .sub keyed_namespace_lookup
     # Tests to verify behavior of TT #1449
     $P0 = get_root_namespace
@@ -199,6 +207,9 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     is($I0, 0, "can lookup namespace by string")
     # TODO: Get the function from this namespace and call it to verify we have
     #       the correct one.
+
+    .const 'Sub' invalidkey = 'namespace_lookup_invalidkeytype'
+    throws_type(invalidkey, .EXCEPTION_GLOBAL_NOT_FOUND, 'namespace lookup with invalid key')
 .end
 
 # L<PDD21//>
