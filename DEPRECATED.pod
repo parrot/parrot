@@ -41,10 +41,6 @@ deprecations specifically by including this snippet:
 
 =over 4
 
-=item GzipHandle [experimental]
-
-L<https://trac.parrot.org/parrot/ticket/1580>
-
 =item PackfileDebug [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/1599>
