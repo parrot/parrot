@@ -57,7 +57,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(78)
+    plan(82)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -156,6 +156,10 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     $P9 = $P0.'get_class'()
     $I0 = issame $P9, $P1
     ok($I0, "Namespace get_class method gives same result as get_class op")
+
+    $P8 = get_namespace
+    $P9 = $P8.'get_class'()
+    is_null($P9, "Namespace get_class gives NULL for non class namespace")
 
     # Create object from class from NameSpace
     push_eh eh
@@ -606,6 +610,33 @@ CODE
     nsb.'export_to'(nsa, h)
 .end
 
+.sub export_not_found_in_hash
+    .local pmc nsa, nsb, h
+    nsa = get_namespace
+    nsb = get_namespace ['Foo']
+    h = new ['Hash']
+    h["somethingthatshouldn'tbeinthenamespace"] = 'foo'
+    nsb.'export_to'(nsa, h)
+.end
+
+.sub export_empty_name_in_array
+    .local pmc nsa, nsb, h
+    nsa = get_namespace
+    nsb = get_namespace ['Foo']
+    h = new ['FixedStringArray'], 1
+    h[0] = ''
+    nsb.'export_to'(nsa, h)
+.end
+
+.sub export_not_found_in_array
+    .local pmc nsa, nsb, h
+    nsa = get_namespace
+    nsb = get_namespace ['Foo']
+    h = new ['FixedStringArray'], 1
+    h[0] = "somethingthatshouldn'tbeinthenamespace"
+    nsb.'export_to'(nsa, h)
+.end
+
 .sub 'export_to_method'
     .local string errormsg, description
 
@@ -682,6 +713,15 @@ CODE
 
     .const 'Sub' empty_name_hash = 'export_empty_name_in_hash'
     throws_type(empty_name_hash, .EXCEPTION_INVALID_OPERATION, 'export from hash with empty key')
+
+    .const 'Sub' not_found_hash = 'export_not_found_in_hash'
+    throws_type(not_found_hash, .EXCEPTION_GLOBAL_NOT_FOUND, 'export from hash with key not found')
+
+    .const 'Sub' empty_name_array = 'export_empty_name_in_array'
+    throws_type(empty_name_array, .EXCEPTION_INVALID_OPERATION, 'export from array with empty value')
+
+    .const 'Sub' not_found_array = 'export_not_found_in_array'
+    throws_type(not_found_array, .EXCEPTION_GLOBAL_NOT_FOUND, 'export from array with value not found')
 
 # Things to add: successful export_to with non-empty array, successful
 # export_to with non-empty hash. both of these things across HLL boundaries
