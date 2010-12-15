@@ -19,7 +19,7 @@ Tests the BigInt PMC.
 
     .include 'test_more.pir'
 
-    plan(41)
+    plan(64)
     check_libgmp_good()
 
     set_and_get()
@@ -29,11 +29,13 @@ Tests the BigInt PMC.
     division()
     negation()
     division_by_zero()
+    floor_division()
     negate_min_integer()
     absolute_value()
     absolute_min_integer()
     overflow_coercion()
     pow()
+    compare()
     interface()
     boolean()
     pi()
@@ -154,6 +156,22 @@ OK7:
     say 'set_str/get_str 1230000000000'
 
 OK8:
+
+    $P0 = new ['BigInt']
+    $P0 = '12345678987654321'
+    $S0 = $P0[8]
+    eq $S0, '536705214244372261', OK9
+    $I1 = 0
+    say 'get_string_keyed 12345678987654321'
+
+OK9:
+
+    $P0[8] = '536705214244372261'
+    eq $P0, '12345678987654321', OK10
+    $I1 = 0
+    say 'set_string_keyed 536705214244372261'
+
+OK10:
     ok($I1, 'set and get combinations')
 .end
 
@@ -201,22 +219,52 @@ OK4:
 
     $I1 = 1
     $P0 = '12345678987654321'
-    $P1 = new ['Integer']
-    $P1 = 12345
-    $P2 = add $P0, $P1
+    $I0 = 12345
+    $P2 = add $P0, $I0
     eq $P2, '12345678987666666', OK5
     $I1 = 0
     say 'add 12345678987654321+12345 wrong'
 OK5:
    ok($I1, 'add(bigint,integer)')
+
+   $P0 = new ['BigInt']
+   $P0 = '12345678900000000'
+   $P1 = new ['BigInt']
+   $P1 = '87654321'
+   $P2 = new ['BigInt']
+   $P2 = '12345678987654321'
+   add $P0, $P1
+   eq $P0, $P2, OK6
+   $I1 = 0
+   say 'add 12345678900000000+87654321 wrong'
+OK6:
+   ok($I1, 'i_add(bigint,bigint)')
+
+   $P0 = '12345678900000000'
+   add $P0, 87654321
+   eq $P0, $P2, OK7
+   $I1 = 0
+   say 'add 12345678900000000+87654321 for nativeint wrong'
+OK7:
+   ok($I1, 'i_add(bigint,nativeint)')
+
+   $P0 = '12345678900000000'
+   $P1 = new ['Integer']
+   $P1 = 87654321
+   add $P0, $P1
+   eq $P0, $P2, OK8
+   $I1 = 0
+   say 'add 12345678900000000+87654321 for integer wrong'
+OK8:
+   ok($I1, 'i_add(bigint,integer)')
 .end
 
 .sub subtraction
     $I1 = 1
     $P0 = new ['BigInt']
-    $P0 = 12345678
+    $P0 = '12345678'
     $P1 = new ['BigInt']
-    $P1 = 5678
+    $P1 = '5678'
     $P2 = new ['BigInt']
     $P2 = sub $P0, $P1
     $I0 = $P2
@@ -300,6 +348,36 @@ OK8:
     say 'sub 9876543219876543-44 wrong'
 OK9:
     ok($I1, 'sub(bigint,integer)')
+
+    $P0 = new ['BigInt']
+    $P0 = '12345678987654321'
+    $P1 = new ['BigInt']
+    $P1 = '123456789'
+    $P2 = new ['BigInt']
+    $P2 = '12345678864197532'
+    sub $P0, $P1
+    eq $P0, $P2, OK11
+    $I1 = 0
+    say 'i_sub 12345678987654321-123456789 is wrong'
+OK10:
+    ok($I1, 'i_sub(bigint,bigint)')
+    $P0 = '12345678987654321'
+    sub $P0, 123456789
+    eq $P0, $P2, OK11
+    $I1 = 0
+    say 'i_sub 12345678987654321-123456789 with nativeint is wrong'
+OK11:
+    ok($I1, 'i_sub(bigint,nativeint)')
+
+    $P0 = '12345678987654321'
+    $P1 = new ['Integer']
+    $P1 = 123456789
+    sub $P0, $P1
+    eq $P0, $P2, OK12
+    $I1 = 0
+    say 'i_sub 12345678987654321-123456789 with integer is wrong'
+OK12: 
+    ok($I1, 'i_sub(bigint,integer)')
 .end
 
 .sub multiplication
@@ -319,13 +397,28 @@ OK9:
     is($P2, '999999000000', 'mul(bigint,nativeint)')
 
     $P0 = new ['BigInt']
-    $P0 = 999999
+    $P0 = '999999'
     $P1 = new ['Integer']
     $P1 = 1000000
     $P2 = new ['BigInt']
     $P2 = mul $P0, $P1
     $S0 = $P2
     is($S0, '999999000000', 'mul(bigint,integer)')
+
+    $P1 = new ['BigInt']
+    $P1 = 1000000
+    mul $P0, $P1
+    is($P0, '999999000000', 'i_mul(bigint,bigint)')
+
+    $P0 = 999999
+    mul $P0, 1000000
+    is($P0, '999999000000', 'i_mul(bigint,nativeint)')
+
+    $P0 = 999999
+    $P1 = new ['Integer']
+    $P1 = 1000000
+    mul $P0, $P1
+    is($P0, '999999000000', 'i_mul(bigint,integer)')
 .end
 
 .sub division
@@ -404,9 +497,8 @@ OK6:
 OK7:
 
     $P0 = '100000000000000'
-    $P4 = new ['Integer']
-    $P4 = 10000000
-    $P1 = div $P0, $P4
+    $I0 = 10000000
+    $P1 = div $P0, $I0
     $P2 = 10000000
     eq $P1, $P2, OK8
     $I1 = 0
@@ -415,16 +507,89 @@ OK8:
     ok($I1, 'div(bigint,integer)')
     $I1 = 1
 
-    $P0 = new ['BigInt']
-    $P0 = '1000000000000000000000'
-    $P1 = new ['BigInt']
-    $P2 = new ['Integer']
-    $P2 = 50
-    $P1 = mod $P0, $P2
-    eq $P1, 0, OK9
+    $P0 = '100000000000000'
+    $I0 = -10000000
+    $P1 = div $P0, $I0
+    $P2 = -10000000
+    eq $P1, $P2, OK9
+    $I1 = 0
+    say 'div 10000000000000/-10000000 wrong'
 OK9:
-    ok($I1, 'mod(bigint,integer)')
+    ok($I1, 'div(bigint,-integer)')
+    $I1 = 1
 
+    $P1 = new ['BigInt']
+    $P1 = 10000000
+    div $P0, $P1
+    eq $P0, 10000000, OK10
+    $I1 = 0
+    say 'div 10000000000000/10000000 wrong'
+OK10:
+    ok($I1, 'i_div(bigint,bigint)')
+    $I1 = 1
+
+    $P0 = 100000000000000
+    div $P0, 10000000
+    eq $P0, 10000000, OK11
+    $I1 = 0
+    say 'div 10000000000000/10000000 with nativeint wrong'
+OK11:
+    ok($I1, 'i_div(bigint,nativeint)')
+    $I1 = 1
+
+    $P0 = 100000000000000
+    $P1 = new ['Integer']
+    $P1 = 10000000
+    div $P0, $P1
+    eq $P0, 10000000, OK12
+    $I1 = 0
+    say 'div 10000000000000/10000000 with integer wrong'
+OK12:
+    ok($I1, 'i_div(bigint,integer)')
+    $I1 = 1
+
+    $P0 = new ['BigInt']
+    $P0 = '12345678987654321'
+    $P1 = new ['BigInt']
+    $P2 = '50'
+    $P1 = mod $P0, $P2
+    eq $P1, 21, OK13
+    $I1 = 0
+    say 'mod 12345678987654321%50 wrong'
+OK13:
+    ok($I1, 'mod(bigint,integer)')
+    $I1 = 1
+
+    $P2 = -50
+    $P1 = mod $P0, $P2
+    eq $P1, 21, OK14
+    $I1 = 0
+    say 'mod 12345678987654321%-50 wrong'
+OK14:
+    ok($I1, 'mod(bigint,-integer)')
+    $I1 = 1
+
+    $P0 = '12345678987654321'
+    $P1 = new ['BigInt']
+    $P1 = '50'
+    mod $P0, $P1
+    eq $P0, 21, OK15
+    $I1 = 0
+    say 'mod 12345678987654321%50 wrong'
+OK15:
+    ok($I1, 'i_mod(bigint,bigint)')
+    $I1 = 1
+
+    $P0 = '12345678987654321'
+    $P1 = new ['Integer']
+    $P1 = 50
+    mod $P0, $P1
+    eq $P0, 21, OK16
+    $I1 = 0
+    say 'mod 12345678987654321%50 with integer wrong'
+OK16:
+    ok($I1, 'i_mod(bigint,integer)')
+    $I1 = 1
 .end
 
 .sub division_by_zero
@@ -516,6 +681,71 @@ OK4:
     ok($I1, 'mod(bigint,integer 0) throws "Divide by zero" exception')
     $I1 = 1
 
+.end
+
+.sub floor_division
+    $I1 = 1
+    $P0 = new ['BigInt']
+    $P1 = new ['BigInt']
+    $P2 = new ['BigInt']
+    $P0 = '12345678987654321'
+    $P1 = '987654321'
+    $P2 = fdiv $P0, $P1
+    eq $P2, 12499999, OK1
+    $I1 = 0
+    say 'fdiv 12345678987654321/987654321 is wrong'
+OK1:
+    ok($I1, 'fdiv(bigint,bigint)')
+    $I1 = 1
+
+    $P2 = fdiv $P0, 123456789
+    eq $P2, 100000000, OK2
+    $I1 = 0
+    say 'fdiv 12345678987654321/123456789 is wrong'
+OK2:
+    ok($I1, 'fdiv(bigint,nativeint)')
+    $I1 = 1
+
+    $P1 = new ['Integer']
+    $P1 = 123456789
+    $P2 = fdiv $P0, $P1
+    eq $P2, 100000000, OK3
+    $I1 = 0
+    say 'fdiv 12345678987654321/int 123456789 is wrong'
+OK3:
+   ok($I1, 'fdiv(bigint,integer)')
+   $I1 = 1
+
+   $P0 = '12345678987654321'
+   $P1 = new ['BigInt']
+   $P1 = '987654321'
+   fdiv $P0, $P1
+   eq $P0, 12499999, OK4
+   $I1 = 0
+   say 'fdiv 12345678987654321/987654321 is wrong'
+OK4:
+   ok($I1, 'i_fdiv(bigint,bigint)')
+   $I1 = 1
+
+   $P0 = '12345678987654321'
+   fdiv $P0, 987654321
+   eq $P0, 12499999, OK5
+   $I1 = 0
+   say 'fdiv 12345678987654321/987654321 with nativeint is wrong'
+OK5:
+   ok($I1, 'i_fdiv(bigint,nativeint)')
+   $I1 = 1
+
+   $P0 = '12345678987654321'
+   $P1 = new ['Integer']
+   $P1 = 987654321
+   fdiv $P0, $P1
+   eq $P0, 12499999, OK6
+   $I1 = 0
+   say 'fdiv 12345678987654321/987654321 with integer is wrong'
+OK6:
+   ok($I1, 'i_fdiv(bigint,integer)')
+   $I1 = 1
 .end
 
 .sub negation
@@ -878,6 +1108,20 @@ OK:
 OK2:
     ok($I1, 'pow(bigint, bigint)')
     $I1 = 1
+.end
+
+.sub compare
+   $P0 = new ['BigInt']
+   $P1 = new ['BigInt']
+   $P0 = '1000000000'
+   $P1 = '10000000000'
+   $I0 = cmp $P0, $P1
+   is($I0, -1, 'cmp(bigint,bigint)')
+
+   $P1 = new['Integer']
+   $P1 = 10000
+   $I0 = cmp $P0, $P1
+   is($I0, 1, 'cmp(bigint,int)')
 .end
 
 .sub interface
