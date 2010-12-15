@@ -835,6 +835,25 @@ handler:
     todo( $I0, $S4 )
 .endm
 
+.macro complex_pow_todo( val, res, pow, todo )
+    $P1 = new ['Complex']
+    $P2 = new ['Complex']
+    set $P1, .val
+
+    set $S0, .val
+    set $S1, .res
+    set $S2, .pow
+
+    $P2 = $P1. 'pow'($S2)
+    $S3 = sprintf "%f%+fi", $P2
+
+    concat $S4, $S0, " ^ "
+    concat $S4, $S4, $S2
+
+    $I0 = iseq $S1, $S3
+    todo( $I0, $S4 )
+.endm
+
 .sub ln_of_complex_numbers
     .complex_op_is("-2+0i", "0.693147+3.141593i", 'ln' )
     .complex_op_is("-1+0i", "0.000000+3.141593i", 'ln' )
