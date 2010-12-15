@@ -20,7 +20,7 @@ Tests the Complex PMC.
     .include 'fp_equality.pasm'
     .include "iglobals.pasm"
 
-    plan(611)
+    plan(617)
 
     string_parsing()
     exception_malformed_string__real_part()
@@ -311,6 +311,10 @@ handler:
     set $P0, "2 + 3i"
     mul $P0, $P0, $P0
     is( $P0, "-5+12i", '2+3i x 2+3i = -5+12i' )
+    
+    set $P0, "2 + 3i"
+    mul $P0, $P0
+    is( $P0, "-5+12i", '2+3i x (in-place) 2+3i = -5+12i' )
 
     set $P0, "5 - 2i"
     set $P1, "5 + 2i"
@@ -328,10 +332,19 @@ handler:
     set $P2, 0.5
     mul $P1, $P0, $P2
     is( $P1, "1-1i", '2-2i x 0.5 = 1-1i' )
+    
+    set $P0, "2 - 2i"
+    set $P2, 0.5
+    mul $P0, $P2
+    is( $P0, "1-1i", '2-2i x (in-place) 0.5 = 1-1i' )
 
     set $P0, "1 - i"
     mul $P1, $P0, 2
     is( $P1, "2-2i", '1-i x literal 2 = 2-2i' )
+    
+    set $P0, "1 - i"
+    mul $P0, 2
+    is( $P0, "2-2i", '1-i x (in-place) literal 2 = 2-2i' )
 
     set $P0, "-1 + i"
     mul $P1, $P0, -1.0
@@ -354,6 +367,10 @@ handler:
     set $P0, "2 + 3i"
     div $P0, $P0, $P0
     is( $P0, "1+0i", '2+3i / 2+3i = 1+0i' )
+    
+    set $P0, "2 + 3i"
+    div $P0, $P0
+    is( $P0, "1+0i", '2+3i / (in-place) 2+3i = 1+0i' )
 
     set $P0, "3 + 5i"
     set $P1, "5 - 3i"
@@ -371,10 +388,19 @@ handler:
     set $P2, 3.0
     div $P1, $P0, $P2
     is( $P1, "-1+2i", '-3+6i / 3.0 = -1+2i' )
+    
+    set $P0, "-3 + 6i"
+    set $P2, 3.0
+    div $P0, $P2
+    is( $P0, "-1+2i", '-3+6i / (in-place) 3.0 = -1+2i' )
 
     set $P0, "-2 + 3i"
     div $P1, $P0, 2
     is( $P1, "-1+1.5i", '-2+3i / 2 = -1+1.5i' )
+    
+    set $P0, "-2 + 3i"
+    div $P0, 2
+    is( $P0, "-1+1.5i", '-2+3i / (in-place) 2 = -1+1.5i' )
 
     set $P0, "2 - 3i"
     div $P1, $P0, 0.5
