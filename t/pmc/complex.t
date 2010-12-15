@@ -905,37 +905,33 @@ handler:
 .end
 
 .sub pow_of_complex_numbers
+    .local pmc config_hash, interp
+    .local string has_negative_zero
+    interp = getinterp
+    config_hash = interp[.IGLOBALS_CONFIG_HASH]
+    has_negative_zero = config_hash["has_negative_zero"]
+
     .complex_pow_is( "2", "1.000000+0.000000i", 0 )
     .complex_pow_is( "2", "2.000000+0.000000i", 1 )
     .complex_pow_is( "2", "4.000000+0.000000i", 2 )
     .complex_pow_is( "2", "8.000000+0.000000i", 3 )
-    .complex_pow_is( "2", "0.500000-0.000000i", -1 )
-    .complex_pow_is( "2", "0.250000-0.000000i", -2 )
     .complex_pow_is( "2", "5.656854+0.000000i", 2.5 )
     .complex_pow_is( "-2", "1.000000+0.000000i", 0 )
     .complex_pow_is( "-2", "-2.000000+0.000000i", 1 )
-    .complex_pow_is( "-2", "4.000000-0.000000i", 2 )
     .complex_pow_is( "-2", "-8.000000+0.000000i", 3 )
-    .complex_pow_is( "-2", "-0.500000-0.000000i", -1 )
     .complex_pow_is( "-2", "0.250000+0.000000i", -2 )
     .complex_pow_is( "-2", "0.000000-0.176777i", -2.5 )
     .complex_pow_is( "0.5", "1.000000+0.000000i", 0 )
     .complex_pow_is( "0.5", "0.500000+0.000000i", 1 )
     .complex_pow_is( "0.5", "0.250000+0.000000i", 2 )
-    .complex_pow_is( "0.5", "2.000000-0.000000i", -1 )
-    .complex_pow_is( "0.5", "4.000000-0.000000i", -2 )
-    .complex_pow_is( "0.5", "5.656854-0.000000i", -2.5 )
     .complex_pow_is( "-0.5", "1.000000+0.000000i", 0 )
     .complex_pow_is( "-0.5", "-0.500000+0.000000i", 1 )
-    .complex_pow_is( "-0.5", "0.250000-0.000000i", 2 )
-    .complex_pow_is( "-0.5", "-2.000000-0.000000i", -1 )
     .complex_pow_is( "-0.5", "4.000000+0.000000i", -2 )
     .complex_pow_is( "-0.5", "0.000000-5.656854i", -2.5 )
     .complex_pow_is( "3i", "1.000000+0.000000i", 0 )
     .complex_pow_is( "3i", "0.000000+3.000000i", 1 )
     .complex_pow_is( "3i", "-9.000000+0.000000i", 2 )
     .complex_pow_is( "3i", "0.000000-0.333333i", -1 )
-    .complex_pow_is( "3i", "-0.111111-0.000000i", -2 )
     .complex_pow_is( "3i", "-0.045361+0.045361i", -2.5 )
     .complex_pow_is( "0.5+2i", "1.000000+0.000000i", 0 )
     .complex_pow_is( "0.5+2i", "0.500000+2.000000i", 1 )
@@ -943,12 +939,41 @@ handler:
     .complex_pow_is( "0.5+2i", "0.117647-0.470588i", -1 )
     .complex_pow_is( "0.5+2i", "-0.207612-0.110727i", -2 )
     .complex_pow_is( "0.5+2i", "-0.161431+0.028201i", -2.5 )
-    .complex_pow_is( "-0.5-0.5i", "1.000000-0.000000i", 0 )
     .complex_pow_is( "-0.5-0.5i", "-0.500000-0.500000i", 1 )
-    .complex_pow_is( "-0.5-0.5i", "-0.000000+0.500000i", 2 )
     .complex_pow_is( "-0.5-0.5i", "-1.000000+1.000000i", -1 )
-    .complex_pow_is( "-0.5-0.5i", "-0.000000-2.000000i", -2 )
     .complex_pow_is( "-0.5-0.5i", "2.197368-0.910180i", -2.5 )
+
+    unless has_negative_zero goto todo
+    .complex_pow_is( "2", "0.500000-0.000000i", -1 )
+    .complex_pow_is( "2", "0.250000-0.000000i", -2 )
+    .complex_pow_is( "-0.5", "0.250000-0.000000i", 2 )
+    .complex_pow_is( "-0.5", "-2.000000-0.000000i", -1 )
+    .complex_pow_is( "-2", "4.000000-0.000000i", 2 )
+    .complex_pow_is( "-2", "-0.500000-0.000000i", -1 )
+    .complex_pow_is( "0.5", "2.000000-0.000000i", -1 )
+    .complex_pow_is( "0.5", "4.000000-0.000000i", -2 )
+    .complex_pow_is( "0.5", "5.656854-0.000000i", -2.5 )
+    .complex_pow_is( "3i", "-0.111111-0.000000i", -2 )
+    .complex_pow_is( "-0.5-0.5i", "1.000000-0.000000i", 0 )
+    .complex_pow_is( "-0.5-0.5i", "-0.000000+0.500000i", 2 )
+    .complex_pow_is( "-0.5-0.5i", "-0.000000-2.000000i", -2 )
+    .return()
+
+todo:
+    .complex_pow_todo( "2", "0.500000-0.000000i", -1, 'TT #313' )
+    .complex_pow_todo( "2", "0.250000-0.000000i", -2, 'TT #313' )
+    .complex_pow_todo( "-0.5", "0.250000-0.000000i", 2, 'TT #313' )
+    .complex_pow_todo( "-0.5", "-2.000000-0.000000i", -1, 'TT #313' )
+    .complex_pow_todo( "-2", "4.000000-0.000000i", 2, 'TT #313' )
+    .complex_pow_todo( "-2", "-0.500000-0.000000i", -1, 'TT #313' )
+    .complex_pow_todo( "0.5", "2.000000-0.000000i", -1, 'TT #313' )
+    .complex_pow_todo( "0.5", "4.000000-0.000000i", -2, 'TT #313' )
+    .complex_pow_todo( "0.5", "5.656854-0.000000i", -2.5, 'TT #313' )
+    .complex_pow_todo( "3i", "-0.111111-0.000000i", -2, 'TT #313' )
+    .complex_pow_todo( "-0.5-0.5i", "1.000000-0.000000i", 0, 'TT #313' )
+    .complex_pow_todo( "-0.5-0.5i", "-0.000000+0.500000i", 2, 'TT #313' )
+    .complex_pow_todo( "-0.5-0.5i", "-0.000000-2.000000i", -2, 'TT #313' )
+    .return()
 .end
 
 .sub sin_of_complex_numbers
@@ -1315,6 +1340,12 @@ todo:
 .end
 
 .sub asinh_of_complex_numbers
+    .local pmc config_hash, interp
+    .local string has_negative_zero
+    interp = getinterp
+    config_hash = interp[.IGLOBALS_CONFIG_HASH]
+    has_negative_zero = config_hash["has_negative_zero"]
+
     .complex_op_is("-2+0i", "-1.443635+0.000000i", 'asinh' )
     .complex_op_is("-1+0i", "-0.881374+0.000000i", 'asinh' )
     .complex_op_is("-0.5+0i", "-0.481212+0.000000i", 'asinh' )
@@ -1322,23 +1353,35 @@ todo:
     .complex_op_is("1+0i", "0.881374+0.000000i", 'asinh' )
     .complex_op_is("2+0i", "1.443635+0.000000i", 'asinh' )
     .complex_op_is("0-2i", "-1.316958-1.570796i", 'asinh' )
-    .complex_op_is("0-1i", "-0.000000-1.570796i", 'asinh' )
-    .complex_op_is("0-0.5i", "-0.000000-0.523599i", 'asinh' )
-    .complex_op_is("0+0.5i", "-0.000000+0.523599i", 'asinh' )
-    .complex_op_is("0+1i", "-0.000000+1.570796i", 'asinh' )
     .complex_op_is("0+2i", "1.316958+1.570796i", 'asinh' )
     .complex_op_is("2+3i", "1.968638+0.964659i", 'asinh' )
     .complex_op_is("2-3i", "1.968638-0.964659i", 'asinh' )
     .complex_op_is("-2+3i", "-1.968638+0.964659i", 'asinh' )
     .complex_op_is("-2-3i", "-1.968638-0.964659i", 'asinh' )
+
+    unless has_negative_zero goto todo
+    .complex_op_is("0-1i", "-0.000000-1.570796i", 'asinh' )
+    .complex_op_is("0-0.5i", "-0.000000-0.523599i", 'asinh' )
+    .complex_op_is("0+0.5i", "-0.000000+0.523599i", 'asinh' )
+    .complex_op_is("0+1i", "-0.000000+1.570796i", 'asinh' )
+    .return()
+
+todo:
+    .complex_op_todo("0-1i", "-0.000000-1.570796i", 'asinh', 'TT #313' )
+    .complex_op_todo("0-0.5i", "-0.000000-0.523599i", 'asinh', 'TT #313' )
+    .complex_op_todo("0+0.5i", "-0.000000+0.523599i", 'asinh', 'TT #313' )
+    .complex_op_todo("0+1i", "-0.000000+1.570796i", 'asinh', 'TT #313' )
+    .return()
 .end
 
 .sub acosh_of_complex_numbers
+    .local pmc config_hash, interp
+    .local string has_negative_zero
+    interp = getinterp
+    config_hash = interp[.IGLOBALS_CONFIG_HASH]
+    has_negative_zero = config_hash["has_negative_zero"]
+
     .complex_op_is("-2+0i", "1.316958+3.141593i", 'acosh' )
-    .complex_op_is("-1+0i", "-0.000000+3.141593i", 'acosh' )
-    .complex_op_is("-0.5+0i", "-0.000000+2.094395i", 'acosh' )
-    .complex_op_is("0.5+0i", "-0.000000+1.047198i", 'acosh' )
-    .complex_op_is("1+0i", "-0.000000+0.000000i", 'acosh' )
     .complex_op_is("2+0i", "-1.316958+0.000000i", 'acosh' )
     .complex_op_todo("0-2i", "1.443635-1.570796i", 'acosh', "TT #1891" )
     .complex_op_todo("0-1i", "0.881374-1.570796i", 'acosh', "TT #1891" )
@@ -1350,70 +1393,138 @@ todo:
     .complex_op_todo("2-3i", "1.983387-1.000144i", 'acosh', "TT #1891" )
     .complex_op_is("-2+3i", "1.983387+2.141449i", 'acosh' )
     .complex_op_todo("-2-3i", "1.983387-2.141449i", 'acosh', "TT #1891" )
+
+    unless has_negative_zero goto todo
+    .complex_op_is("-1+0i", "-0.000000+3.141593i", 'acosh' )
+    .complex_op_is("-0.5+0i", "-0.000000+2.094395i", 'acosh' )
+    .complex_op_is("0.5+0i", "-0.000000+1.047198i", 'acosh' )
+    .complex_op_is("1+0i", "-0.000000+0.000000i", 'acosh' )
+    .return()
+
+todo:
+    .complex_op_todo("-1+0i", "-0.000000+3.141593i", 'acosh', 'TT #313' )
+    .complex_op_todo("-0.5+0i", "-0.000000+2.094395i", 'acosh', 'TT #313' )
+    .complex_op_todo("0.5+0i", "-0.000000+1.047198i", 'acosh', 'TT #313' )
+    .complex_op_todo("1+0i", "-0.000000+0.000000i", 'acosh', 'TT #313' )
+    .return()
 .end
 
 .sub atanh_of_complex_numbers
+    .local pmc config_hash, interp
+    .local string has_negative_zero
+    interp = getinterp
+    config_hash = interp[.IGLOBALS_CONFIG_HASH]
+    has_negative_zero = config_hash["has_negative_zero"]
+
     .complex_op_todo("-2+0i", "-0.549306+1.570796i", 'atanh', "TT #1891" )
     .complex_op_is("-0.5+0i", "-0.549306+0.000000i", 'atanh' )
     .complex_op_is("0.5+0i", "0.549306+0.000000i", 'atanh' )
     .complex_op_is("1+0i", "Inf+0.000000i", 'atanh' )
     .complex_op_is("2+0i", "0.549306-1.570796i", 'atanh' )
+    .complex_op_is("2+3i", "0.146947+1.338973i", 'atanh' )
+    .complex_op_is("2-3i", "0.146947-1.338973i", 'atanh' )
+    .complex_op_is("-2+3i", "-0.146947+1.338973i", 'atanh' )
+    .complex_op_is("-2-3i", "-0.146947-1.338973i", 'atanh' )
+
+    unless has_negative_zero goto todo
     .complex_op_is("0-2i", "-0.000000-1.107149i", 'atanh' )
     .complex_op_is("0-1i", "-0.000000-0.785398i", 'atanh' )
     .complex_op_is("0-0.5i", "-0.000000-0.463648i", 'atanh' )
     .complex_op_is("0+0.5i", "-0.000000+0.463648i", 'atanh' )
     .complex_op_is("0+1i", "-0.000000+0.785398i", 'atanh' )
     .complex_op_is("0+2i", "-0.000000+1.107149i", 'atanh' )
-    .complex_op_is("2+3i", "0.146947+1.338973i", 'atanh' )
-    .complex_op_is("2-3i", "0.146947-1.338973i", 'atanh' )
-    .complex_op_is("-2+3i", "-0.146947+1.338973i", 'atanh' )
-    .complex_op_is("-2-3i", "-0.146947-1.338973i", 'atanh' )
+    .return()
+
+todo:
+    .complex_op_todo("0-2i", "-0.000000-1.107149i", 'atanh', 'TT #313' )
+    .complex_op_todo("0-1i", "-0.000000-0.785398i", 'atanh', 'TT #313' )
+    .complex_op_todo("0-0.5i", "-0.000000-0.463648i", 'atanh', 'TT #313' )
+    .complex_op_todo("0+0.5i", "-0.000000+0.463648i", 'atanh', 'TT #313' )
+    .complex_op_todo("0+1i", "-0.000000+0.785398i", 'atanh', 'TT #313' )
+    .complex_op_todo("0+2i", "-0.000000+1.107149i", 'atanh', 'TT #313' )
+    .return()
 .end
 
 .sub acoth_of_complex_numbers
+    .local pmc config_hash, interp
+    .local string has_negative_zero
+    interp = getinterp
+    config_hash = interp[.IGLOBALS_CONFIG_HASH]
+    has_negative_zero = config_hash["has_negative_zero"]
+
     .complex_op_is("-2+0i", "-0.549306+0.000000i", 'acoth' )
     .complex_op_todo("-0.5+0i", "-0.549306+1.570796i", 'acoth', "TT #1891" )
     .complex_op_is("0.5+0i", "0.549306-1.570796i", 'acoth' )
     .complex_op_is("1+0i", "Inf+0.000000i", 'acoth' )
     .complex_op_is("2+0i", "0.549306+0.000000i", 'acoth' )
+    .complex_op_is("2+3i", "0.146947-0.231824i", 'acoth' )
+    .complex_op_is("2-3i", "0.146947+0.231824i", 'acoth' )
+    .complex_op_is("-2+3i", "-0.146947-0.231824i", 'acoth' )
+    .complex_op_is("-2-3i", "-0.146947+0.231824i", 'acoth' )
+
+    unless has_negative_zero goto todo
     .complex_op_is("0-2i", "-0.000000+0.463648i", 'acoth' )
     .complex_op_is("0-1i", "-0.000000+0.785398i", 'acoth' )
     .complex_op_is("0-0.5i", "-0.000000+1.107149i", 'acoth' )
     .complex_op_is("0+0.5i", "-0.000000-1.107149i", 'acoth' )
     .complex_op_is("0+1i", "-0.000000-0.785398i", 'acoth' )
     .complex_op_is("0+2i", "-0.000000-0.463648i", 'acoth' )
-    .complex_op_is("2+3i", "0.146947-0.231824i", 'acoth' )
-    .complex_op_is("2-3i", "0.146947+0.231824i", 'acoth' )
-    .complex_op_is("-2+3i", "-0.146947-0.231824i", 'acoth' )
-    .complex_op_is("-2-3i", "-0.146947+0.231824i", 'acoth' )
+    .return()
+
+todo:
+    .complex_op_todo("0-2i", "-0.000000+0.463648i", 'acoth', 'TT #313' )
+    .complex_op_todo("0-1i", "-0.000000+0.785398i", 'acoth', 'TT #313' )
+    .complex_op_todo("0-0.5i", "-0.000000+1.107149i", 'acoth', 'TT #313' )
+    .complex_op_todo("0+0.5i", "-0.000000-1.107149i", 'acoth', 'TT #313' )
+    .complex_op_todo("0+1i", "-0.000000-0.785398i", 'acoth', 'TT #313' )
+    .complex_op_todo("0+2i", "-0.000000-0.463648i", 'acoth', 'TT #313' )
+    .return()
 .end
 
 .sub acsch_of_complex_numbers
+    .local pmc config_hash, interp
+    .local string has_negative_zero
+    interp = getinterp
+    config_hash = interp[.IGLOBALS_CONFIG_HASH]
+    has_negative_zero = config_hash["has_negative_zero"]
+
     .complex_op_is("-2+0i", "-0.481212+0.000000i", 'acsch' )
     .complex_op_is("-1+0i", "-0.881374+0.000000i", 'acsch' )
     .complex_op_is("-0.5+0i", "-1.443635+0.000000i", 'acsch' )
     .complex_op_is("0.5+0i", "1.443635+0.000000i", 'acsch' )
     .complex_op_is("1+0i", "0.881374+0.000000i", 'acsch' )
     .complex_op_is("2+0i", "0.481212+0.000000i", 'acsch' )
-    .complex_op_is("0-2i", "-0.000000+0.523599i", 'acsch' )
-    .complex_op_is("0-1i", "-0.000000+1.570796i", 'acsch' )
     .complex_op_is("0-0.5i", "1.316958+1.570796i", 'acsch' )
     .complex_op_is("0+0.5i", "-1.316958-1.570796i", 'acsch' )
-    .complex_op_is("0+1i", "-0.000000-1.570796i", 'acsch' )
-    .complex_op_is("0+2i", "-0.000000-0.523599i", 'acsch' )
     .complex_op_is("2+3i", "0.157355-0.229963i", 'acsch' )
     .complex_op_is("2-3i", "0.157355+0.229963i", 'acsch' )
     .complex_op_is("-2+3i", "-0.157355-0.229963i", 'acsch' )
     .complex_op_is("-2-3i", "-0.157355+0.229963i", 'acsch' )
+
+    unless has_negative_zero goto todo
+    .complex_op_is("0+1i", "-0.000000-1.570796i", 'acsch' )
+    .complex_op_is("0+2i", "-0.000000-0.523599i", 'acsch' )
+    .complex_op_is("0-2i", "-0.000000+0.523599i", 'acsch' )
+    .complex_op_is("0-1i", "-0.000000+1.570796i", 'acsch' )
+    .return()
+
+todo:
+    .complex_op_todo("0+1i", "-0.000000-1.570796i", 'acsch', 'TT #313' )
+    .complex_op_todo("0+2i", "-0.000000-0.523599i", 'acsch', 'TT #313' )
+    .complex_op_todo("0-2i", "-0.000000+0.523599i", 'acsch', 'TT #313' )
+    .complex_op_todo("0-1i", "-0.000000+1.570796i", 'acsch', 'TT #313' )
+    .return()
 .end
 
 .sub asech_of_complex_numbers
-    .complex_op_is("-2+0i", "-0.000000+2.094395i", 'asech' )
-    .complex_op_is("-1+0i", "-0.000000+3.141593i", 'asech' )
+    .local pmc config_hash, interp
+    .local string has_negative_zero
+    interp = getinterp
+    config_hash = interp[.IGLOBALS_CONFIG_HASH]
+    has_negative_zero = config_hash["has_negative_zero"]
+
     .complex_op_is("-0.5+0i", "1.316958+3.141593i", 'asech' )
     .complex_op_todo("0.5+0i", "1.316958+0.000000i", 'asech', "TT #1891" )
-    .complex_op_is("1+0i", "-0.000000+0.000000i", 'asech' )
-    .complex_op_is("2+0i", "-0.000000+1.047198i", 'asech' )
     .complex_op_is("0-2i", "0.481212+1.570796i", 'asech' )
     .complex_op_is("0-1i", "0.881374+1.570796i", 'asech' )
     .complex_op_is("0-0.5i", "1.443635+1.570796i", 'asech' )
@@ -1424,6 +1535,20 @@ todo:
     .complex_op_is("2-3i", "0.231335+1.420411i", 'asech' )
     .complex_op_todo("-2+3i", "0.231335-1.721182i", 'asech', "TT #1891" )
     .complex_op_is("-2-3i", "0.231335+1.721182i", 'asech' )
+
+    unless has_negative_zero goto todo
+    .complex_op_is("-2+0i", "-0.000000+2.094395i", 'asech' )
+    .complex_op_is("-1+0i", "-0.000000+3.141593i", 'asech' )
+    .complex_op_is("1+0i", "-0.000000+0.000000i", 'asech' )
+    .complex_op_is("2+0i", "-0.000000+1.047198i", 'asech' )
+    .return()
+
+todo:
+    .complex_op_todo("-2+0i", "-0.000000+2.094395i", 'asech', 'TT #313' )
+    .complex_op_todo("-1+0i", "-0.000000+3.141593i", 'asech', 'TT #313' )
+    .complex_op_todo("1+0i", "-0.000000+0.000000i", 'asech', 'TT #313' )
+    .complex_op_todo("2+0i", "-0.000000+1.047198i", 'asech', 'TT #313' )
+    .return()
 .end
 
 .sub add_using_subclass_of_complex_bug_59630
