@@ -20,8 +20,9 @@ Tests the Complex PMC.
     .include 'fp_equality.pasm'
     .include "iglobals.pasm"
 
-    plan(620)
+    plan(626)
 
+    test_init_pmc()
     string_parsing()
     exception_malformed_string__real_part()
     exception_malformed_string__imaginary_part()
@@ -97,6 +98,25 @@ Tests the Complex PMC.
     message = exception['message']
     is( message, .M, .M )
 .endm
+
+.sub test_init_pmc
+    $P0 = new ['FixedFloatArray'], 2
+    set $P0[0], -1.7
+    set $P0[1], 1.1
+    $P1 = new ['Complex'], $P0
+    is( $P1, "-1.7+1.1i", 'init from FixedFloatArray' )
+
+    $P0 = new ['FixedIntegerArray'], 2
+    set $P0[0], -1
+    set $P0[1], 1
+    $P1 = new ['Complex'], $P0
+    is( $P1, "-1+1i", 'init from FixedIntegerArray' )
+
+    $P0 = new ['String']
+    set $P0, "2+3i"
+    $P1 = new ['Complex'], $P0
+    is( $P1, "2+3i", 'init from String' )
+.end
 
 .sub string_parsing
     $P0 = new ['Complex']
@@ -222,20 +242,24 @@ handler:
     is( $P1, "0+3i", '3+3i plus -3 is 0+3i' )
     add $P1, $P3, $P0
     is( $P1, "0+3i", '-2 plus 3+3i is 0+3i' )
-    
+
     set $P0, "2 + 2i"
     set $P1, "1 + 1i"
     add $P0, $P1
     is( $P0, "3+3i", '2+2i plus (in-place) 1+1i is 3+3i' )
-    
+
     set $P0, "-0.5-2i"
     set $P1, "0.3i"
     add $P0, $P1
     is( $P0, "-0.5-1.7i", '-0.5-2i plus (in-place) 0.3i is -0.5-2i' )
-    
+
     set $P0, "-0.5-2i"
-    set $P3, 5
-    add $P0, $P3
+    set $P2, "5"
+    add $P0, $P2
+    is( $P0, "4.5-2i", '-0.5-2i plus (in-place) 5 (int pmc) is 4.5-2i' )
+
+    set $P0, "-0.5-2i"
+    add $P0, 5
     is( $P0, "4.5-2i", '-0.5-2i plus (in-place) 5 (int) is 4.5-2i' )
 .end
 
@@ -280,25 +304,23 @@ handler:
     is( $P1, "-1024-3i", '1024-3i minus 2048 is -1024-3i' )
     sub $P1, $P3, $P0
     is( $P1, "1024+3i", '2048 minus 1024-3i is 1024+3i' )
-    
+
     set $P0, "2 + 2i"
     set $P1, "1 + 1i"
     sub $P0, $P1
     is( $P0, "1+1i", '2+2i minus (in-place) 1+1i is 1+1i' )
-    
+
     set $P0, "-0.5-2i"
     set $P1, "0.3i"
     sub $P0, $P1
     is( $P0, "-0.5-2.3i", '-0.5-2i minus (in-place) 0.3i is -0.5-2.3i' )
-    
+
     set $P0, "-0.5-2i"
-    set $P3, 5
-    sub $P0, $P3
+    sub $P0, 5
     is( $P0, "-5.5-2i", '-0.5-2i minus (in-place) 5 (int) is -5.5-2i' )
-    
+
     set $P0, "-0.5-2i"
-    set $P2, 2.5
-    sub $P0, $P2
+    sub $P0, 2.5
     is( $P0, "-3-2i", '-0.5-2i minus (in-place) 2.5 (float) is -3-2i' )
 .end
 
@@ -311,7 +333,7 @@ handler:
     set $P0, "2 + 3i"
     mul $P0, $P0, $P0
     is( $P0, "-5+12i", '2+3i x 2+3i = -5+12i' )
-    
+
     set $P0, "2 + 3i"
     mul $P0, $P0
     is( $P0, "-5+12i", '2+3i x (in-place) 2+3i = -5+12i' )
@@ -332,16 +354,20 @@ handler:
     set $P2, 0.5
     mul $P1, $P0, $P2
     is( $P1, "1-1i", '2-2i x 0.5 = 1-1i' )
-    
+
     set $P0, "2 - 2i"
-    set $P2, 0.5
-    mul $P0, $P2
+    mul $P0, 0.5
     is( $P0, "1-1i", '2-2i x (in-place) 0.5 = 1-1i' )
 
     set $P0, "1 - i"
     mul $P1, $P0, 2
     is( $P1, "2-2i", '1-i x literal 2 = 2-2i' )
-    
+
+    set $P0, "1 - i"
+    set $P2, "2"
+    mul $P0, $P2
+    is( $P0, "2-2i", '1-i x (in-place) literal 2 = 2-2i' )
+
     set $P0, "1 - i"
     mul $P0, 2
     is( $P0, "2-2i", '1-i x (in-place) literal 2 = 2-2i' )
@@ -367,7 +393,7 @@ handler:
     set $P0, "2 + 3i"
     div $P0, $P0, $P0
     is( $P0, "1+0i", '2+3i / 2+3i = 1+0i' )
-    
+
     set $P0, "2 + 3i"
     div $P0, $P0
     is( $P0, "1+0i", '2+3i / (in-place) 2+3i = 1+0i' )
@@ -388,16 +414,20 @@ handler:
     set $P2, 3.0
     div $P1, $P0, $P2
     is( $P1, "-1+2i", '-3+6i / 3.0 = -1+2i' )
-    
+
     set $P0, "-3 + 6i"
-    set $P2, 3.0
+    div $P0, 3.0
+    is( $P0, "-1+2i", '-3+6i / (in-place) 3.0 = -1+2i' )
+
+    set $P0, "-3 + 6i"
+    set $P2, "3.0"
     div $P0, $P2
     is( $P0, "-1+2i", '-3+6i / (in-place) 3.0 = -1+2i' )
 
     set $P0, "-2 + 3i"
     div $P1, $P0, 2
     is( $P1, "-1+1.5i", '-2+3i / 2 = -1+1.5i' )
-    
+
     set $P0, "-2 + 3i"
     div $P0, 2
     is( $P0, "-1+1.5i", '-2+3i / (in-place) 2 = -1+1.5i' )
@@ -592,7 +622,7 @@ handler:
     $P1 = new ['Undef']
     abs $P1, $P0
     is( $P1, "5", 'abs 4+3j -> 5' )
-    
+
     abs $P0
     is( $P1, "5", 'abs (in-place) 4+3j -> 5' )
 .end
@@ -665,10 +695,10 @@ handler:
      set $N1, $P1[1]
      .fp_eq_ok($N0, -1.3, 'test complex negative')
      .fp_eq_ok($N1, -1.7, '... and the imag port')
-     
+
      neg $P0
      is( $P0, "-1.3-1.7i", 'test in-place neg on 1.3+1.7i' )
-     
+
      set $P0, "-1.3 - 1.7i"
      neg $P0
      is( $P0, "1.3+1.7i", 'test in-place neg on -1.3-1.7i' )
