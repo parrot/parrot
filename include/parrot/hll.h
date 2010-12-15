@@ -11,6 +11,10 @@
 #ifndef PARROT_HLL_H_GUARD
 #define PARROT_HLL_H_GUARD
 
+/* Temporary defines to help keep some symbols around during the rename
+   transition. TT #443. Can be removed after 2.11 */
+#define Parrot_get_ctx_HLL_namespace Parrot_hll_get_ctx_HLL_namespace
+
 /* this invalid HLL type means "no HLL" when passed to the below functions */
 #define PARROT_HLL_NONE -1
 
@@ -48,7 +52,9 @@ PMC* Parrot_hll_get_HLL_namespace(PARROT_INTERP, int hll_id)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-INTVAL Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
+INTVAL Parrot_hll_get_HLL_type(PARROT_INTERP,
+    INTVAL hll_id,
+    INTVAL core_type)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -70,7 +76,8 @@ void Parrot_hll_register_HLL_type(PARROT_INTERP,
 void Parrot_hll_init_HLL(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_hll_get_ctx_HLL_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_hll_get_ctx_HLL_namespace \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_hll_get_ctx_HLL_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

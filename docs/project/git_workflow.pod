@@ -8,19 +8,19 @@ docs/project/git_workflow.pod - How to use Git to work on Parrot
 
 To minimize the disruption of feature development on language and tool
 developers, all major changes to Parrot core take place in a branch. Ideally,
-branches are short-lived, and contain the smallest set of changes possible.
-It is also good practice to have "atomic" commits, in the sense that each
-commit does one thing, so that it makes it easier to accept/revert some
-things while keeping others. Git provides many powerful tools in the
-maintainence of branches. This document aims to provide everything a Parrot
-developer needs to know about Git to successfully create a branch, work on
-it, keep it in sync with changes on master and finally merge the branch.
+branches are short-lived, and contain the smallest set of changes possible.  It
+is also good practice to have "atomic" commits, in the sense that each commit
+does one thing, so that it makes it easier to accept/revert some things while
+keeping others. Git provides many powerful tools in the maintenance of
+branches. This document aims to provide everything a Parrot developer needs to
+know about Git to successfully create a branch, work on it, keep it in sync
+with changes on master and finally merge the branch.
 
 =head2 Cloning the Git Repository
 
-To get the full version history Parrot, which is called "cloning a repository",
-you will use the C<git clone> command. This will show how to clone the repo from
-L<http://github.com> :
+To get the full version history of Parrot, which is called "cloning a
+repository", you will use the C<git clone> command. This will show how to clone
+the repo from L<http://github.com>:
 
   git clone git://github.com/parrot/parrot.git
 
@@ -59,6 +59,22 @@ To checkout (or "switch to", as it is commonly referred to) the username/foo
 branch:
 
   git checkout username/foo
+
+If you would like to checkout a branch that already exists, first make sure to
+get the latest commits with:
+
+  git fetch
+
+Then use this syntax to track the remote branch with a local branch:
+
+  git checkout -b username/foo origin/username/foo
+
+If you are using a very old version of Git, such as 1.5.x.x or older, you will
+want to tell it to track the remote branch:
+
+  git checkout --track -b username/foo origin/username/foo
+
+Tracking remote branches is the default in Git 1.6.x.x and higher.
 
 =head2 Pushing branches and tags
 
@@ -103,19 +119,28 @@ or other branches.
 
 =head2 How to commit
 
-Let's say you modified the file foo.c and added the file bar.c and you want to commit
-these changes. To add these changes to the staging area (the list of stuff 
-that will be included in your next commit) :
+Let's say you modified the file foo.c and added the file bar.c and you want to
+commit these changes. To add these changes to the staging area (the list of
+stuff that will be included in your next commit):
 
   git add foo.c bar.c
 
 The command C<git add> is not only for adding new files, just keep that in mind.
 It tells git "add the state of these files to my staging area."
 
-Now for actually creating your commit! Since Git is a distributed version control
-system, committing code is seperate from sending your changes to a remote server.
-Keep this in mind if you are used to Subversion or similar VCS's, where committing
-and sending changes are tied together.
+If you are trying to add files that are in .gitignore, you can do that with
+the --force flag:
+
+    git add --force ports/foo
+
+NOTE: Make sure these files should actually be added. Most files in .gitignore
+should never be added, but some, such as some files in "ports/" will need need
+the --force flag.
+
+Now for actually creating your commit! Since Git is a distributed version
+control system, committing code is separate from sending your changes to a
+remote server.  Keep this in mind if you are used to Subversion or similar
+VCS's, where committing and sending changes are tied together.
 
   git commit -m "This is an awesome and detailed commit message"
 
@@ -138,7 +163,7 @@ C<-a> flag:
 
     git commit -a -m "awesome and informative commit message"
 
-Be carefult with C<git commit -a>, it could add files that you do not mean
+Be careful with C<git commit -a>, it could add files that you do not mean
 to include. Verify that the contents of your most recent commit look sane with:
 
     git show
@@ -152,21 +177,23 @@ To update your local git index from origin:
 
     git fetch
 
-If you are following multiple remotes, you can fetch updates from all of them with
+If you are following multiple remotes, you can fetch updates from all of them
+with:
 
     git fetch --all
 
 Note that this command requires a recent (1.7.x.x) version of git.
 
-The command C<git fetch> only modifies the index, not your working copy or staging
-area. To update your working copy of the branch bobby/tables
+The command C<git fetch> only modifies the index, not your working copy or
+staging area. To update your working copy of the branch bobby/tables:
 
   git checkout bobby/tables         # make sure we are on the branch
   git rebase origin/bobby/tables    # get the latest sql injections
 
-If you have a topic branch and want to pick up the most recent changes in master
-since the topic branch diverged, you can merge the master branch into the topic
-branch. In this case, we assume the topic branch is called parrot/beak:
+If you have a topic branch and want to pick up the most recent changes in
+master since the topic branch diverged, you can merge the master branch into
+the topic branch. In this case, we assume the topic branch is called
+parrot/beak:
 
   git checkout parrot/beak          # make sure we are on the branch
   git merge master                  # merge master into parrot/beak
@@ -177,7 +204,8 @@ branch.
 =head2 Preparing to Merge a Branch
 
 Post to parrot-dev@lists.parrot.org letting people know that you're about to
-merge a branch.
+merge a branch. Follow the guidelines in
+L<docs/project/merge_review_guidelines.pod>, especially:
 
 =over
 
@@ -206,7 +234,7 @@ want tested.
 =head2 Merging a Branch
 
 When you're ready to merge your changes back into master, use the C<git merge>
-command. First, make sure you are on the master branch with
+command. First, make sure you are on the master branch with:
 
   git checkout master
 
@@ -237,13 +265,79 @@ and mention the branch.
 Why use "--no-ff" ? This flag mean "no fast forwards". Usually fast forwards
 are good, but if there is a branch that has all the commits of master, plus
 a few more, when you merge without --no-ff, there will be no merge commit.
-Git is smart enought to "fast forward." But for the purpose of looking at
+Git is smart enough to "fast forward." But for the purpose of looking at
 history, Parrot would like to always have a merge commit for a merge, even
 if it *could* be fast-forwarded.
 
 This flag is only needed when merging branches into master. It is optional
 for other merge cases, but it won't hurt. If it is simpler to think about,
 you can always use "--no-ff" when merging.
+
+=head2 Merging Code From Forks
+
+NOTE: This is not official policy, and could change at any time.
+
+If you are merging code from non-core committers, Parrot would like to see
+"Signed-off-by" lines on each commit, so it is clear that one person wrote the
+code and someone else is taking responsibility for merging the code.
+
+To merge in a pull request on Github, the following method should be used.
+Follow the first two steps on the Github pull request page, i.e:
+
+    # 1) Make a new branch to pull stuff into
+    git checkout -b someguy-newbranch master
+
+    # 2) Pull in changes from the branch of a forked repo
+    # and switch to newbranch
+    git pull https://github.com/someguy/parrot.git newbranch
+
+Then you will follow this procedure:
+
+    # 3) let's look at a diff OPTIONAL
+    git diff master    # look at a diff
+
+    # 4) let's make a patch of the difference between this branch and master
+    git format-patch master --stdout > foo.patch
+
+    # 5) Switch back to the master branch
+    git checkout master
+
+    # 6) does the patch apply? OPTIONAL
+    git apply --check gci.patch
+
+    # 7) Actually merge in the changes with Signed-Off-By lines
+    git am --signoff gci.patch
+
+After doing this, you will the new commits in master with
+your Signed-Off-By lines. Run the tests and if they all pass, push
+your changes upstream. If they don't, and you want others to take
+a look at stuff, create a new branch from your local master:
+
+    # make a new branch
+    git checkout -b my_new_branch
+
+    # push it upstream
+    git push origin my_new_branch
+
+At this point, your local master has commits that are now in
+my_new_branch, so you should reset master back to before you
+applied the patch. You can do this by looking at the output
+of C<git log> and finding the most recent SHA1 before your
+branch, then doing:
+
+    git reset --hard $sha1
+
+Be careful with C<git reset>! Make sure there are no untracked
+files that you care about BEFORE YOUR RUN C<git reset>.
+
+The use of reset can be avoided if you create a new branch
+before applying the patch, and then merging that branch
+to master before pushing.
+
+Also note that you will have to manually close the Github
+pull request, since adding Signed-Off-By lines changes
+the SHA1's which Github uses to automatically close
+pull requests.
 
 =head2 Announcing a Merge
 
@@ -260,12 +354,12 @@ test that piece fully.
 
 =head2 Deleting a Branch
 
-After merging a branch, you will have a local copy of the merged branch, as well
-as a copy of the branch on your remote. To remove the local branch:
+After merging a branch, you will have a local copy of the merged branch, as
+well as a copy of the branch on your remote. To remove the local branch:
 
   git branch -d user/foo
 
-To remove the remote branch user/foo on the remote origin :
+To remove the remote branch user/foo on the remote origin:
 
   git push origin :user/foo
 
@@ -273,8 +367,8 @@ This follows the general pattern of
 
   git push origin local_branch_name:remote_branch_name
 
-When local_branch_name is empty, you are pushing "nothing" to the remote branch,
-which deletes it.
+When local_branch_name is empty, you are pushing "nothing" to the remote
+branch, which deletes it.
 
 =cut
 

@@ -21,7 +21,7 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(67)
+    plan(81)
 
     test_get_pmc()
     test_clone()
@@ -34,7 +34,7 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
     get_keyed(iso-8859-1:"a\x{e4}c\x{f6}e\x{fc}g", utf8:"ä", utf8:"ö", utf8:"ü")
     get_keyed(binary:"a\x{e4}c\x{f6}e\x{fc}g", utf8:"ä", utf8:"ö", utf8:"ü")
     get_keyed(utf8:"aäc\x{20123}eüg", utf8:"ä", utf8:"\x{20123}", utf8:"ü")
-    get_keyed(utf16:"aäcöe\x{20abc}g", utf8:"ä", utf8:"ö", utf8:"\x{20abc}")
+    get_keyed(utf16:"aä\x{20456}öe\x{20abc}g", utf8:"ä", utf8:"ö", utf8:"\x{20abc}")
     get_keyed(ucs2:"aäcöe\x{beef}g", utf8:"ä", utf8:"ö", utf8:"\x{beef}")
     get_keyed(ucs4:"a\x{20789}cöeüg", utf8:"\x{20789}", utf8:"ö", utf8:"ü")
 
@@ -261,7 +261,13 @@ end:
     result = 0
     i1 = it[0]
     c = chr i1
-    is(c, c3, 'get_integer_keyed_int')
+    is(c, c3, 'get_integer_keyed_int - zero')
+    i1 = it[2]
+    c = chr i1
+    is(c, c5, 'get_integer_keyed_int - pos')
+    i1 = it[-2]
+    c = chr i1
+    is(c, c1, 'get_integer_keyed_int - neg')
 
     set_label eh, catch2
     i1 = it[-20]

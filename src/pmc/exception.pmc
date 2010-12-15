@@ -130,6 +130,21 @@ Initializes the exception with default values.
 
 /*
 
+=item C<void init_int()>
+
+Initializes the exception with default values and the specified type.
+
+=cut
+
+*/
+
+    VTABLE void init_int(INTVAL type) {
+        SELF.init();
+        SET_ATTR_type(INTERP, SELF, type);
+    }
+
+/*
+
 =item C<void init_pmc()>
 
 Initializes the exception with supplied values.

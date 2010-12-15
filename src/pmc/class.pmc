@@ -88,7 +88,6 @@ An empty ResizablePMCArray PMC is allocated during initialization.
 
 */
 
-#define PARROT_IN_OBJECTS_C /* To get the vtable.h imports we want. */
 #include "parrot/oo_private.h"
 #include "pmc/pmc_object.h"
 #include "pmc/pmc_namespace.h"
@@ -1316,8 +1315,7 @@ Creates a new PMC object of the type of the class and calls init().
                         "in the resolve list, but not supplied", check_meth);
             }
 
-            /* Build full parents list.
-             * TT #1256:  Need pluggable MRO, for now always do C3. */
+            /* Build full parents list. */
             calculate_mro(INTERP, SELF, num_parents);
             build_attrib_index(INTERP, SELF);
 

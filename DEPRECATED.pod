@@ -49,6 +49,10 @@ L<https://trac.parrot.org/parrot/ticket/1580>
 
 L<https://trac.parrot.org/parrot/ticket/1599>
 
+=item MappedByteArray [experimental]
+
+L<https://trac.parrot.org/parrot/ticket/1877>
+
 =item multiple dispatch within core PMCs [eligible in 1.1]
 
 L<https://trac.parrot.org/parrot/ticket/452>
@@ -125,6 +129,12 @@ L<https://trac.parrot.org/parrot/ticket/1655>
 Used to test the experimental function Parrot_getpid
 
 L<https://trac.parrot.org/parrot/ticket/1564>
+
+=item Complex PMC [eligible in 3.1]
+
+This perennially broken PMC will be removed.
+
+L<http://trac.parrot.org/parrot/ticket/1892>
 
 =back
 

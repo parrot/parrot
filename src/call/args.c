@@ -1452,6 +1452,7 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
                 case 'N': flags = PARROT_ARG_FLOATVAL; ++set; break;
                 case 'S': flags = PARROT_ARG_STRING;   ++set; break;
                 case 'P': flags = PARROT_ARG_PMC;      ++set; break;
+                case ' ': break;
                 default:
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
@@ -1470,6 +1471,7 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
                 case 'o': flags |= PARROT_ARG_OPTIONAL;     break;
                 case 'p': flags |= PARROT_ARG_OPT_FLAG;     break;
                 case 's': flags |= PARROT_ARG_SLURPY_ARRAY; break;
+                case ' ': break;
                 default:
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,

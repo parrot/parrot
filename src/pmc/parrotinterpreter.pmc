@@ -803,6 +803,7 @@ This method is experimental. See TT #1564.
 
     METHOD getpid() {
         INTVAL id = Parrot_getpid();
+        Parrot_warn_experimental(INTERP, "Method getpid on ParrotInterpreter is experimental");
         RETURN(INTVAL id);
     }
 

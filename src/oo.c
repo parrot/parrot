@@ -17,8 +17,6 @@ Handles class and object manipulation.
 
 */
 
-#define PARROT_IN_OO_C
-#define PARROT_IN_OBJECTS_C /* To get the vtable.h imports we want. */
 #include "parrot/parrot.h"
 #include "parrot/oo_private.h"
 #include "pmc/pmc_class.h"

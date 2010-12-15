@@ -3267,7 +3267,7 @@ PDB_backtrace(PARROT_INTERP)
     PMC *ctx = CURRENT_CONTEXT(interp);
 
     if (!PMC_IS_NULL(sub)) {
-        str = Parrot_Context_infostr(interp, ctx);
+        str = Parrot_sub_Context_infostr(interp, ctx);
         if (str) {
             Parrot_io_eprintf(interp, "%Ss", str);
             if (interp->code->annotations) {
@@ -3309,7 +3309,7 @@ PDB_backtrace(PARROT_INTERP)
             break;
 
 
-        str = Parrot_Context_infostr(interp, Parrot_pcc_get_caller_ctx(interp, ctx));
+        str = Parrot_sub_Context_infostr(interp, Parrot_pcc_get_caller_ctx(interp, ctx));
 
 
         if (!str)

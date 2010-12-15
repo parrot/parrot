@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 12;
 use Carp;
 use Cwd;
 use File::Temp qw( tempdir );
@@ -25,12 +25,6 @@ SKIP: {
 
     my $mani = Parrot::Manifest->new( { script => $script, } );
     isa_ok( $mani, 'Parrot::Manifest' );
-
-    TODO: {
-        local $TODO = "fails at the moment after git migration";
-        ok( scalar( @{ $mani->{dirs} } ),
-            "Parrot::Manifest constructor used 'status' command to find at least 1 directory." );
-    };
 
     ok( scalar( @{ $mani->{versioned_files} } ),
         "Parrot::Manifest constructor used 'status' command to find at least 1 versioned file." );

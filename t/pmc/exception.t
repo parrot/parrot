@@ -19,9 +19,10 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(43)
+    plan(44)
     test_bool()
     test_int()
+    test_new_int()
     test_integer_keyed()
     test_string_keyed()
     test_attrs()
@@ -50,6 +51,14 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     $P0 = 42
     $I0 = $P0
     is($I0, 42, 'set/get integer on Exception')
+.end
+
+.sub test_new_int
+    .local pmc ex
+    ex = new ['Exception'], .EXCEPTION_SYNTAX_ERROR
+    .local int value
+    value = ex['type']
+    is(value, .EXCEPTION_SYNTAX_ERROR, 'new with int argument sets type')
 .end
 
 .sub test_integer_keyed

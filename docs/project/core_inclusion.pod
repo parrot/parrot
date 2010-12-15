@@ -68,7 +68,8 @@ other systems?
 external project would?
 
 
-=item * How will the addition impact Parrot's runtime characteristics, e.g. its memory usage, speed, startup time, etc?
+=item * How will the addition impact Parrot's runtime characteristics,
+e.g. its memory usage, speed, startup time, etc?
 
 
 =item * What drawbacks will result from including the addition in core?

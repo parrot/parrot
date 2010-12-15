@@ -33,13 +33,14 @@ pmclass GzipHandle extends Handle dynpmc auto_attrs {
 
 =item C<void init()>
 
-Initializes a newly created FileHandle object.
+Initializes a newly created GzipHandle object.
 
 =cut
 
 */
     VTABLE void init() {
         PARROT_GZIPHANDLE(SELF)->file = NULL;
+        Parrot_warn_experimental(interp, "GzipHandle is experimental");
     }
 
 /*
@@ -117,7 +118,7 @@ Close the gziphandle.
 
 =item C<METHOD eof()>
 
-Returns true if the filehandle is at end-of-file, returns false otherwise.
+Returns true if the gziphandle is at end-of-file, returns false otherwise.
 
 =cut
 

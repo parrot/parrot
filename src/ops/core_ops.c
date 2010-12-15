@@ -105,7 +105,7 @@ static op_func_t core_op_func_table[1074] = {
   Parrot_yield,                                      /*     27 */
   Parrot_tailcall_p,                                 /*     28 */
   Parrot_returncc,                                   /*     29 */
-  Parrot_capture_lex_p,                              /*     30 */
+  Parrot_sub_capture_lex_p,                              /*     30 */
   Parrot_newclosure_p_p,                             /*     31 */
   Parrot_set_args_pc,                                /*     32 */
   Parrot_get_params_pc,                              /*     33 */
@@ -1553,7 +1553,7 @@ static op_info_t core_op_info_table[1074] = {
     /* type PARROT_INLINE_OP, */
     "capture_lex",
     "capture_lex_p",
-    "Parrot_capture_lex_p",
+    "Parrot_sub_capture_lex_p",
     /* "",  body */
     0,
     2,
@@ -15388,16 +15388,16 @@ Parrot_returncc(opcode_t *cur_opcode, PARROT_INTERP)  {
 }
 
 opcode_t *
-Parrot_capture_lex_p(opcode_t *cur_opcode, PARROT_INTERP)  {
+Parrot_sub_capture_lex_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    Parrot_capture_lex(interp, PREG(1));
+    Parrot_sub_capture_lex(interp, PREG(1));
 
 return (opcode_t *)cur_opcode + 2;}
 
 opcode_t *
 Parrot_newclosure_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = parrot_new_closure(interp, PREG(2));
+    PREG(1) = Parrot_sub_new_closure(interp, PREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
@@ -16048,6 +16048,7 @@ opcode_t *
 Parrot_loadlib_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PREG(1) = Parrot_dyn_load_lib(interp, SREG(2), PREG(3));
+    Parrot_warn_experimental(interp, "Parrot_loadlib_p_s_p is experimental");
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -23513,7 +23514,7 @@ Parrot_store_lex_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC     * const ctx      = CURRENT_CONTEXT(interp);
     STRING  * const lex_name = SREG(1);
-    PMC     * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
+    PMC     * const lex_pad  = Parrot_sub_find_pad(interp, lex_name, ctx);
 
     if (PMC_IS_NULL(lex_pad)) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
@@ -23529,7 +23530,7 @@ Parrot_store_lex_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC     * const ctx      = CURRENT_CONTEXT(interp);
     STRING  * const lex_name = SCONST(1);
-    PMC     * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
+    PMC     * const lex_pad  = Parrot_sub_find_pad(interp, lex_name, ctx);
 
     if (PMC_IS_NULL(lex_pad)) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
@@ -23549,7 +23550,7 @@ Parrot_store_dynamic_lex_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     PMC     * const lex_pad  =
         PMC_IS_NULL(ctx)
             ? PMCNULL
-            : Parrot_find_dynamic_pad(interp, lex_name, ctx);
+            : Parrot_sub_find_dynamic_pad(interp, lex_name, ctx);
 
     if (PMC_IS_NULL(lex_pad)) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
@@ -23569,7 +23570,7 @@ Parrot_store_dynamic_lex_sc_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     PMC     * const lex_pad  =
         PMC_IS_NULL(ctx)
             ? PMCNULL
-            : Parrot_find_dynamic_pad(interp, lex_name, ctx);
+            : Parrot_sub_find_dynamic_pad(interp, lex_name, ctx);
 
     if (PMC_IS_NULL(lex_pad)) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
@@ -23585,7 +23586,7 @@ Parrot_find_lex_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC     * const ctx      = CURRENT_CONTEXT(interp);
     STRING  * const lex_name = SREG(2);
-    PMC     * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
+    PMC     * const lex_pad  = Parrot_sub_find_pad(interp, lex_name, ctx);
 
     PMC * const result =
         PMC_IS_NULL(lex_pad)
@@ -23600,7 +23601,7 @@ Parrot_find_lex_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PMC     * const ctx      = CURRENT_CONTEXT(interp);
     STRING  * const lex_name = SCONST(2);
-    PMC     * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
+    PMC     * const lex_pad  = Parrot_sub_find_pad(interp, lex_name, ctx);
 
     PMC * const result =
         PMC_IS_NULL(lex_pad)
@@ -23619,7 +23620,7 @@ Parrot_find_dynamic_lex_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
     PMC     * const lex_pad  =
         PMC_IS_NULL(ctx)
             ? PMCNULL
-            : Parrot_find_dynamic_pad(interp, lex_name, ctx);
+            : Parrot_sub_find_dynamic_pad(interp, lex_name, ctx);
     PMC     * const result =
         PMC_IS_NULL(lex_pad)
             ? PMCNULL
@@ -23637,7 +23638,7 @@ Parrot_find_dynamic_lex_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
     PMC     * const lex_pad  =
         PMC_IS_NULL(ctx)
             ? PMCNULL
-            : Parrot_find_dynamic_pad(interp, lex_name, ctx);
+            : Parrot_sub_find_dynamic_pad(interp, lex_name, ctx);
     PMC     * const result =
         PMC_IS_NULL(lex_pad)
             ? PMCNULL
@@ -23657,7 +23658,7 @@ Parrot_find_caller_lex_p_s(opcode_t *cur_opcode, PARROT_INTERP)  {
             !PMC_IS_NULL(ctx) && PMC_IS_NULL(result);
             ctx = Parrot_pcc_get_caller_ctx(interp, ctx))
     {
-        PMC * const lex_pad = Parrot_find_pad(interp, lex_name, ctx);
+        PMC * const lex_pad = Parrot_sub_find_pad(interp, lex_name, ctx);
         if (!PMC_IS_NULL(lex_pad)) {
             result = VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
         }
@@ -23678,7 +23679,7 @@ Parrot_find_caller_lex_p_sc(opcode_t *cur_opcode, PARROT_INTERP)  {
             !PMC_IS_NULL(ctx) && PMC_IS_NULL(result);
             ctx = Parrot_pcc_get_caller_ctx(interp, ctx))
     {
-        PMC * const lex_pad = Parrot_find_pad(interp, lex_name, ctx);
+        PMC * const lex_pad = Parrot_sub_find_pad(interp, lex_name, ctx);
         if (!PMC_IS_NULL(lex_pad)) {
             result = VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
         }

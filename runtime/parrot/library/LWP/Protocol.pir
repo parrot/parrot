@@ -18,6 +18,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .namespace ['LWP';'Protocol']
 
 .sub '' :init :load :anon
+    load_bytecode 'osutils.pbc'
     load_bytecode 'HTTP/Message.pbc'
     $P0 = newclass ['LWP';'Protocol']
     $P0.'add_attribute'('scheme')
@@ -110,7 +111,6 @@ see http://search.cpan.org/~gaas/libwww-perl/
     setattribute $P0, 'message', $P1
     .return ($P0)
   L1:
-    load_bytecode 'osutils.pbc'
     .local string method
     method = request.'method'()
     $P0 = get_hll_global ['LWP';'Protocol';'file'], method
@@ -284,21 +284,11 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $P0 = subclass ['LWP';'Protocol'], ['LWP';'Protocol';'http']
 .end
 
-.sub '_new_socket' :method
-    .param string host
-    .param int port
-    .local pmc sock, addr
-    sock = new 'Socket'
-    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    addr = sock.'sockaddr'(host, port)
-    sock.'connect'(addr)
-    .return (sock)
-.end
-
 .sub '_fixup_header' :method
     .param pmc headers
     .param pmc url
     .param pmc proxy
+
     # Extract 'Host' header
     .local string host
     host = url.'authority'()
@@ -326,6 +316,11 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $S0 = 'Basic ' . $S0
     headers['Proxy-Authorization'] = $S0
   L2:
+
+    $I0 = exists headers['Connection']
+    if $I0 goto L3
+    headers['Connection'] = 'Keep-Alive'
+  L3:
 .end
 
 .sub '_format_request'
@@ -354,32 +349,20 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .return ($P0)
 .end
 
-.sub '_parse_response_headers' :method
+.sub '_receive_status_line'
+    .param pmc sock
     .param pmc response
-    .param string str
-    .local string sep
-    sep = "\r\n"
-    $I0 = index str, "\r"
-    unless $I0 < 0 goto L0
-    sep = "\n"
-  L0:
-    $S0 = sep . sep
-    $I0 = index str, $S0
-    if $I0 < 0 goto L1
-    str = substr str, 0, $I0
-  L1:
-
-    $P0 = split sep, str
     .local string status_line
-    status_line = shift $P0
+    status_line = sock.'readline'()
+    status_line = chomp(status_line)
     $I0 = index status_line, " "
-    if $I0 < 0 goto L2
+    if $I0 < 0 goto L1
     $S0 = substr status_line, 0, $I0
     $P1 = box $S0
     setattribute response, 'protocol', $P1
     $I1 = $I0 + 1
     $I0 = index status_line, " ", $I1
-    if $I0 < 0 goto L2
+    if $I0 < 0 goto L1
     $I2 = $I0 - $I1
     $S0 = substr status_line, $I1, $I2
     $P1 = box $S0
@@ -388,43 +371,30 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $S0 = substr status_line, $I0
     $P1 = box $S0
     setattribute response, 'message', $P1
-
-    $P3 = new ['HTTP';'Headers']
-  L3:
-    unless $P0 goto L4
-    $S0 = shift $P0
-    $I0 = index $S0, ": "
-    if $I0 < 0 goto L3
-    $S1 = substr $S0, 0, $I0
-    $I0 += 2
-    $S2 = substr $S0, $I0
-    $P3[$S1] = $S2
-    goto L3
-  L4:
-    setattribute response, 'headers', $P3
-
-    $I0 = length str
-    .return ($I0)
-  L2:
+    .return (1)
+  L1:
+    $P1 = box status_line
+    setattribute response, 'message', $P1
     .return (0)
 .end
 
-.sub '_parse_response_content' :method
+.sub '_receive_headers'
+    .param pmc sock
     .param pmc response
-    .param string str
-    $I0 = index str, "\r\n\r\n"
-    if $I0 < 0 goto L1
-    $I0 += 4
-    goto L2
+    .local pmc headers
+    headers = getattribute response, 'headers'
   L1:
-    $I0 = index str, "\n\n"
-    if $I0 < 0 goto L3
+    $S0 = sock.'readline'()
+    $S0 = chomp($S0)
+    if $S0 == '' goto L2
+    $I0 = index $S0, ": "
+    if $I0 < 0 goto L1
+    $S1 = substr $S0, 0, $I0
     $I0 += 2
+    $S2 = substr $S0, $I0
+    headers[$S1] = $S2
+    goto L1
   L2:
-    $S0 = substr str, $I0
-    $P0 = box $S0
-    setattribute response, 'content', $P0
-  L3:
 .end
 
 =item request
@@ -464,69 +434,221 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
     # connect to remote site
     .local pmc sock
-    sock = self.'_new_socket'(host, port)
+    $P0 = get_hll_global ['LWP';'Protocol';'socket'], 'create'
+    sock = $P0(host, port)
 
     .local pmc request_headers
     request_headers = request.'headers'()
     self.'_fixup_header'(request_headers, url, proxy)
 
-    .local pmc ua
-    ua = self.'ua'()
     $S0 = _format_request(method, fullpath, request_headers)
-    sock.'send'($S0)
+    sock.'puts'($S0)
 
     .local pmc response
     response = new ['HTTP';'Response']
     .local string content
     content = request.'content'()
     unless content goto L11
-    .local int content_length
-    content_length = length content
-    $I0 = 0
-  L12:
-    unless $I0 < content_length goto L11
-    $S0 = substr content, $I0, 8192
-    $I1 = sock.'send'($S0)
-    if $I1 >= 0 goto L13
+    $I1 = sock.'puts'(content)
+    if $I1 >= 0 goto L11
     $P0 = box RC_INTERNAL_SERVER_ERROR
     setattribute response, 'code', $P0
     $P0 = box "I/O error"
     setattribute response, 'message', $P0
     .return (response)
-  L13:
-    $I0 += $I1
-    $N0 = $I0 / content_length
-    goto L12
   L11:
 
+    .local pmc ua
+    ua = self.'ua'()
+    ua.'progress'('tick', request)
+    $I0 = _receive_status_line(sock, response)
+    unless $I0 == 0 goto L21
+    .return (response)
+  L21:
+    .local pmc headers
+    headers = new ['HTTP';'Headers']
+    setattribute response, 'headers', headers
+    _receive_headers(sock, response)
     .local pmc buf
     buf = new 'StringBuilder'
-    .local int header_length
+    $S0 = response.'get_header'('Transfer-Encoding')
+    $I0 = index $S0, 'chunked'
+    unless $I0 < 0 goto L51
+    .local int content_length
     content_length = 0
-  L21:
+    $S0 = response.'get_header'('Content-Length')
+    if $S0 == '' goto L22
+    content_length = $S0
+  L22:
+    unless content_length == 0 goto L41
+  L31:
     ua.'progress'('tick', request)
     $S0 = sock.'recv'()
-    if $S0 == '' goto L22
+    if $S0 == '' goto L23
     push buf, $S0
-    header_length = self.'_parse_response_headers'(response, buf)
-    $I0 = response.'is_success'()
-    unless $I0 goto L22
-    $S0 = response.'get_header'('Content-Length')
-    if $S0 == '' goto L21
-    content_length = $S0
-  L23:
+    goto L31
+  L41:
     $I0 = buf.'get_string_length'()
-    $I0 -= header_length
     $N0 = $I0 / content_length
     ua.'progress'($N0, request)
+    if $I0 >= content_length goto L23
     $S0 = sock.'recv'()
-    if $S0 == '' goto L22
+    if $S0 == '' goto L23
     push buf, $S0
-    goto L23
-  L22:
+    goto L41
+  L51:
+    .local int chunk_length
+    $S0 = sock.'readline'()
+    $S0 = chomp($S0)
+    $P0 = box $S0
+    chunk_length = $P0.'to_int'(16)
+    if chunk_length == 0 goto L52
+    ua.'progress'('tick', request)
+    $S0 = sock.'read'(chunk_length)
+    push buf, $S0
+    sock.'readline'()
+    goto L51
+  L52:
+    _receive_headers(sock, response) # trailers
+  L23:
+    $S0 = buf
+    $P0 = box $S0
+    setattribute response, 'content', $P0
     sock.'close'()
-    self.'_parse_response_content'(response, buf)
     .return (response)
+.end
+
+=back
+
+=head3 Class LWP;Protocol;socket
+
+=over 4
+
+=cut
+
+.namespace ['LWP';'Protocol';'socket']
+
+.sub '' :init :load :anon
+    $P0 = newclass ['LWP';'Protocol';'socket']
+    $P0.'add_attribute'('sock')
+    $P0.'add_attribute'('buff')
+.end
+
+.sub 'create'
+    .param string host
+    .param int port
+    $P0 = new ['LWP';'Protocol';'socket']
+    .local pmc sock, addr
+    sock = new 'Socket'
+    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
+    addr = sock.'sockaddr'(host, port)
+    sock.'connect'(addr)
+    setattribute $P0, 'sock', sock
+    $P1 = box ''
+    setattribute $P0, 'buff', $P1
+    .return ($P0)
+.end
+
+.sub 'close' :method
+    .local pmc sock
+    sock = getattribute self, 'sock'
+    .tailcall sock.'close'()
+.end
+
+.sub 'send' :method
+    .param string buf 
+    .local pmc sock
+    sock = getattribute self, 'sock'
+    .tailcall sock.'send'(buf)
+.end
+
+.sub 'puts' :method
+    .param string buf 
+    .local pmc sock
+    sock = getattribute self, 'sock'
+    .local int len
+    len = length buf
+    $I0 = 0
+  L11:
+    unless $I0 < len goto L12
+    $S0 = substr buf, $I0, 8192
+    $I1 = sock.'send'($S0)
+    unless $I1 < 0 goto L13
+    .return ($I1)
+  L13:
+    $I0 += $I1
+    goto L11
+  L12:
+    .return (len)
+.end
+
+.sub 'recv' :method
+    .local pmc buff
+    buff = getattribute self, 'buff'
+    $S0 = buff
+    if $S0 == '' goto L1
+    $P1 = box ''
+    setattribute self, 'buff', $P1
+    .return ($S0)
+  L1:
+    .local pmc sock
+    sock = getattribute self, 'sock'
+    .tailcall sock.'recv'()
+.end
+
+.sub 'read' :method
+    .param int n
+    .local pmc buff
+    buff = getattribute self, 'buff'
+    $S0 = buff
+    $I0 = length $S0
+    unless n <= $I0 goto L1
+  L2:
+    $S1 = substr $S0, 0, n
+    $I1 = $I0 - n
+    $S2 = substr $S0, n, $I1
+    $P1 = box $S2
+    setattribute self, 'buff', $P1
+    .return ($S1)
+  L1:
+    .local pmc sock
+    sock = getattribute self, 'sock'
+    $P0 = new 'StringBuilder'
+  L3:
+    push $P0, $S0
+    $I0 = $P0.'get_string_length'()
+    unless $I0 < n goto L4
+    $S0 = sock.'recv'()
+    goto L3
+  L4:
+    $S0 = $P0
+    goto L2
+.end
+
+.sub 'readline' :method
+    .local pmc buff
+    buff = getattribute self, 'buff'
+    $S0 = buff
+    $I0 = index $S0, "\n"
+    if $I0 < 0 goto L1
+  L2:
+    inc $I0
+    $S1 = substr $S0, 0, $I0
+    $I1 = length $S0
+    $I1 -= $I0
+    $S2 = substr $S0, $I0, $I1
+    $P1 = box $S2
+    setattribute self, 'buff', $P1
+    .return ($S1)
+  L1:
+    .local pmc sock
+    sock = getattribute self, 'sock'
+  L3:
+    $S1 = sock.'recv'()
+    $S0 .= $S1
+    $I0 = index $S0, "\n"
+    if $I0 < 0 goto L3
+    goto L2
 .end
 
 =back
