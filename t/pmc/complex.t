@@ -20,7 +20,7 @@ Tests the Complex PMC.
     .include 'fp_equality.pasm'
     .include "iglobals.pasm"
 
-    plan(604)
+    plan(611)
 
     string_parsing()
     exception_malformed_string__real_part()
@@ -222,6 +222,21 @@ handler:
     is( $P1, "0+3i", '3+3i plus -3 is 0+3i' )
     add $P1, $P3, $P0
     is( $P1, "0+3i", '-2 plus 3+3i is 0+3i' )
+    
+    set $P0, "2 + 2i"
+    set $P1, "1 + 1i"
+    add $P0, $P1
+    is( $P0, "3+3i", '2+2i plus (in-place) 1+1i is 3+3i' )
+    
+    set $P0, "-0.5-2i"
+    set $P1, "0.3i"
+    add $P0, $P1
+    is( $P0, "-0.5-1.7i", '-0.5-2i plus (in-place) 0.3i is -0.5-2i' )
+    
+    set $P0, "-0.5-2i"
+    set $P3, 5
+    add $P0, $P3
+    is( $P0, "4.5-2i", '-0.5-2i plus (in-place) 5 (int) is 4.5-2i' )
 .end
 
 .sub test_complex_subtract
@@ -265,6 +280,26 @@ handler:
     is( $P1, "-1024-3i", '1024-3i minus 2048 is -1024-3i' )
     sub $P1, $P3, $P0
     is( $P1, "1024+3i", '2048 minus 1024-3i is 1024+3i' )
+    
+    set $P0, "2 + 2i"
+    set $P1, "1 + 1i"
+    sub $P0, $P1
+    is( $P0, "1+1i", '2+2i minus (in-place) 1+1i is 1+1i' )
+    
+    set $P0, "-0.5-2i"
+    set $P1, "0.3i"
+    sub $P0, $P1
+    is( $P0, "-0.5-2.3i", '-0.5-2i minus (in-place) 0.3i is -0.5-2.3i' )
+    
+    set $P0, "-0.5-2i"
+    set $P3, 5
+    sub $P0, $P3
+    is( $P0, "-5.5-2i", '-0.5-2i minus (in-place) 5 (int) is -5.5-2i' )
+    
+    set $P0, "-0.5-2i"
+    set $P2, 2.5
+    sub $P0, $P2
+    is( $P0, "-3-2i", '-0.5-2i minus (in-place) 2.5 (float) is -3-2i' )
 .end
 
 .sub test_complex_multiply
