@@ -556,14 +556,14 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .end
 
 .sub 'send' :method
-    .param string buf 
+    .param string buf
     .local pmc sock
     sock = getattribute self, 'sock'
     .tailcall sock.'send'(buf)
 .end
 
 .sub 'puts' :method
-    .param string buf 
+    .param string buf
     .local pmc sock
     sock = getattribute self, 'sock'
     .local int len
