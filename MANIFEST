@@ -2164,7 +2164,6 @@ tools/docs/filename_and_chapter.pl                          []
 tools/docs/make_html_docs.pl                                []
 tools/docs/mk_chm.pl                                        []
 tools/docs/ops_summary.pl                                   []
-tools/docs/write_docs.pl                                    []
 tools/install/smoke.pl                                      []
 tools/install/smoke_languages.pl                            []
 tools/release/README                                        []doc
