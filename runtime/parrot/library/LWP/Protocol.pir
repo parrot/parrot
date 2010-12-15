@@ -284,6 +284,17 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $P0 = subclass ['LWP';'Protocol'], ['LWP';'Protocol';'http']
 .end
 
+.sub '_new_socket'
+    .param string host
+    .param int port
+    .local pmc sock, addr
+    sock = new 'Socket'
+    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
+    addr = sock.'sockaddr'(host, port)
+    sock.'connect'(addr)
+    .return (sock)
+.end
+
 .sub '_fixup_header' :method
     .param pmc headers
     .param pmc url
@@ -380,9 +391,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
 .sub '_receive_headers'
     .param pmc sock
-    .param pmc response
-    .local pmc headers
-    headers = getattribute response, 'headers'
+    .param pmc headers
   L1:
     $S0 = sock.'readline'()
     $S0 = chomp($S0)
@@ -434,8 +443,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
     # connect to remote site
     .local pmc sock
-    $P0 = get_hll_global ['LWP';'Protocol';'socket'], 'create'
-    sock = $P0(host, port)
+    sock = _new_socket(host, port)
 
     .local pmc request_headers
     request_headers = request.'headers'()
@@ -468,7 +476,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .local pmc headers
     headers = new ['HTTP';'Headers']
     setattribute response, 'headers', headers
-    _receive_headers(sock, response)
+    _receive_headers(sock, headers)
     .local pmc buf
     buf = new 'StringBuilder'
     $S0 = response.'get_header'('Transfer-Encoding')
@@ -509,146 +517,13 @@ see http://search.cpan.org/~gaas/libwww-perl/
     sock.'readline'()
     goto L51
   L52:
-    _receive_headers(sock, response) # trailers
+    _receive_headers(sock, headers) # trailers
   L23:
     $S0 = buf
     $P0 = box $S0
     setattribute response, 'content', $P0
     sock.'close'()
     .return (response)
-.end
-
-=back
-
-=head3 Class LWP;Protocol;socket
-
-=over 4
-
-=cut
-
-.namespace ['LWP';'Protocol';'socket']
-
-.sub '' :init :load :anon
-    $P0 = newclass ['LWP';'Protocol';'socket']
-    $P0.'add_attribute'('sock')
-    $P0.'add_attribute'('buff')
-.end
-
-.sub 'create'
-    .param string host
-    .param int port
-    $P0 = new ['LWP';'Protocol';'socket']
-    .local pmc sock, addr
-    sock = new 'Socket'
-    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    addr = sock.'sockaddr'(host, port)
-    sock.'connect'(addr)
-    setattribute $P0, 'sock', sock
-    $P1 = box ''
-    setattribute $P0, 'buff', $P1
-    .return ($P0)
-.end
-
-.sub 'close' :method
-    .local pmc sock
-    sock = getattribute self, 'sock'
-    .tailcall sock.'close'()
-.end
-
-.sub 'send' :method
-    .param string buf
-    .local pmc sock
-    sock = getattribute self, 'sock'
-    .tailcall sock.'send'(buf)
-.end
-
-.sub 'puts' :method
-    .param string buf
-    .local pmc sock
-    sock = getattribute self, 'sock'
-    .local int len
-    len = length buf
-    $I0 = 0
-  L11:
-    unless $I0 < len goto L12
-    $S0 = substr buf, $I0, 8192
-    $I1 = sock.'send'($S0)
-    unless $I1 < 0 goto L13
-    .return ($I1)
-  L13:
-    $I0 += $I1
-    goto L11
-  L12:
-    .return (len)
-.end
-
-.sub 'recv' :method
-    .local pmc buff
-    buff = getattribute self, 'buff'
-    $S0 = buff
-    if $S0 == '' goto L1
-    $P1 = box ''
-    setattribute self, 'buff', $P1
-    .return ($S0)
-  L1:
-    .local pmc sock
-    sock = getattribute self, 'sock'
-    .tailcall sock.'recv'()
-.end
-
-.sub 'read' :method
-    .param int n
-    .local pmc buff
-    buff = getattribute self, 'buff'
-    $S0 = buff
-    $I0 = length $S0
-    unless n <= $I0 goto L1
-  L2:
-    $S1 = substr $S0, 0, n
-    $I1 = $I0 - n
-    $S2 = substr $S0, n, $I1
-    $P1 = box $S2
-    setattribute self, 'buff', $P1
-    .return ($S1)
-  L1:
-    .local pmc sock
-    sock = getattribute self, 'sock'
-    $P0 = new 'StringBuilder'
-  L3:
-    push $P0, $S0
-    $I0 = $P0.'get_string_length'()
-    unless $I0 < n goto L4
-    $S0 = sock.'recv'()
-    goto L3
-  L4:
-    $S0 = $P0
-    goto L2
-.end
-
-.sub 'readline' :method
-    .local pmc buff
-    buff = getattribute self, 'buff'
-    $S0 = buff
-    $I0 = index $S0, "\n"
-    if $I0 < 0 goto L1
-  L2:
-    inc $I0
-    $S1 = substr $S0, 0, $I0
-    $I1 = length $S0
-    $I1 -= $I0
-    $S2 = substr $S0, $I0, $I1
-    $P1 = box $S2
-    setattribute self, 'buff', $P1
-    .return ($S1)
-  L1:
-    .local pmc sock
-    sock = getattribute self, 'sock'
-  L3:
-    $S1 = sock.'recv'()
-    $S0 .= $S1
-    $I0 = index $S0, "\n"
-    if $I0 < 0 goto L3
-    goto L2
 .end
 
 =back
