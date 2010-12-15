@@ -19,7 +19,7 @@ Tests the BigInt PMC.
 
     .include 'test_more.pir'
 
-    plan(36)
+    plan(41)
     check_libgmp_good()
 
     set_and_get()
@@ -33,6 +33,7 @@ Tests the BigInt PMC.
     absolute_value()
     absolute_min_integer()
     overflow_coercion()
+    pow()
     interface()
     boolean()
     pi()
@@ -198,6 +199,16 @@ OK3:
 OK4:
     ok($I1, 'add(bigint,nativeint)')
 
+    $I1 = 1
+    $P0 = '12345678987654321'
+    $P1 = new ['Integer']
+    $P1 = 12345
+    $P2 = add $P0, $P1
+    eq $P2, '12345678987666666', OK5
+    $I1 = 0
+    say 'add 12345678987654321+12345 wrong'
+OK5:
+   ok($I1, 'add(bigint,integer)')
 .end
 
 .sub subtraction
@@ -306,6 +317,15 @@ OK9:
     $P2 = new ['BigInt']
     $P2 = mul $P0, 1000000
     is($P2, '999999000000', 'mul(bigint,nativeint)')
+
+    $P0 = new ['BigInt']
+    $P0 = 999999
+    $P1 = new ['Integer']
+    $P1 = 1000000
+    $P2 = new ['BigInt']
+    $P2 = mul $P0, $P1
+    $S0 = $P2
+    is($S0, '999999000000', 'mul(bigint,integer)')
 .end
 
 .sub division
@@ -393,6 +413,17 @@ OK7:
     say 'div 100000000000000/10000000 wrong'
 OK8:
     ok($I1, 'div(bigint,integer)')
+    $I1 = 1
+
+    $P0 = new ['BigInt']
+    $P0 = '1000000000000000000000'
+    $P1 = new ['BigInt']
+    $P2 = new ['Integer']
+    $P2 = 50
+    $P1 = mod $P0, $P2
+    eq $P1, 0, OK9
+OK9:
+    ok($I1, 'mod(bigint,integer)')
 
 .end
 
@@ -483,6 +514,7 @@ E4:
     say ' is wrong exception type'
 OK4:
     ok($I1, 'mod(bigint,integer 0) throws "Divide by zero" exception')
+    $I1 = 1
 
 .end
 
@@ -820,6 +852,32 @@ k27:
     $P1 = $I3
 
 ex:
+.end
+
+.sub pow
+    $I1 = 1
+    $P0 = new ['BigInt']
+    $P0 = '100000'
+    $P1 = new ['Integer']
+    $P1 = 2
+    $P3 = new ['BigInt']
+    $P3 = $P0.'pow'($P1)
+    eq $P3, 1e10, OK
+    $I1 = 0
+    say '1e10 to the power of 2 wrong'
+OK:
+    ok($I1, 'pow(bigint, integer)')
+    $I1 = 1
+    $P1 = new ['BigInt']
+    $P0 = '100000'
+    $P1 = '2'
+    $P3 = $P0.'pow'($P1)
+    eq $P3, 1e10, OK2
+    $I1 = 0
+    say '1e10 to the power of bigint 2 is wrong'
+OK2:
+    ok($I1, 'pow(bigint, bigint)')
+    $I1 = 1
 .end
 
 .sub interface
