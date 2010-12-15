@@ -120,12 +120,6 @@ use C<get_bool> internally. Rakudo seems to depend on logical ops on PMCs.
 
 L<https://trac.parrot.org/parrot/ticket/1655>
 
-=item Method getpid on ParrotInterpreter [experimental]
-
-Used to test the experimental function Parrot_getpid
-
-L<https://trac.parrot.org/parrot/ticket/1564>
-
 =item Complex PMC [eligible in 3.1]
 
 This perennially broken PMC will be removed.
@@ -336,12 +330,6 @@ This function is an experimental addition to enhance and maybe replace
 Parrot_str_unescape
 
 L<https://trac.parrot.org/parrot/ticket/1628>
-
-=item Parrot_getpid [experimental]
-
-Get process id, experimental.
-
-L<https://trac.parrot.org/parrot/ticket/1564>
 
 =item Parrot_load_bytecode_file [experimental]
 
