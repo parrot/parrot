@@ -20,7 +20,7 @@ Tests the Complex PMC.
     .include 'fp_equality.pasm'
     .include "iglobals.pasm"
 
-    plan(617)
+    plan(619)
 
     string_parsing()
     exception_malformed_string__real_part()
@@ -662,6 +662,13 @@ handler:
      set $N1, $P1[1]
      .fp_eq_ok($N0, -1.3, 'test complex negative')
      .fp_eq_ok($N1, -1.7, '... and the imag port')
+     
+     neg $P0
+     is( $P0, "-1.3-1.7i", 'test in-place neg on 1.3+1.7i' )
+     
+     set $P0, "-1.3 - 1.7i"
+     neg $P0
+     is( $P0, "1.3+1.7i", 'test in-place neg on -1.3-1.7i' )
 .end
 
 .sub test_clone
