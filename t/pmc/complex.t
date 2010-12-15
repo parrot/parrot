@@ -20,7 +20,7 @@ Tests the Complex PMC.
     .include 'fp_equality.pasm'
     .include "iglobals.pasm"
 
-    plan(619)
+    plan(620)
 
     string_parsing()
     exception_malformed_string__real_part()
@@ -592,6 +592,9 @@ handler:
     $P1 = new ['Undef']
     abs $P1, $P0
     is( $P1, "5", 'abs 4+3j -> 5' )
+    
+    abs $P0
+    is( $P1, "5", 'abs (in-place) 4+3j -> 5' )
 .end
 
 .sub check_whether_interface_is_done
