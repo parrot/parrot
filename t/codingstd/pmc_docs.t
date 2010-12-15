@@ -132,6 +132,7 @@ src/pmc/object.pmc
 src/pmc/sub.pmc
 src/pmc/threadinterpreter.pmc
 src/pmc/unmanagedstruct.pmc
+t/tools/dev/headerizer/testlib/nci_pmc.in
 
 # Local Variables:
 #   mode: cperl

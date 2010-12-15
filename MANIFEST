@@ -23,6 +23,8 @@ NEWS                                                        [main]doc
 PBC_COMPAT                                                  [main]doc
 PLATFORMS                                                   [devel]doc
 README                                                      [devel]doc
+README.deutsch                                              []
+README.espanol                                              []
 README.polski                                               []
 README_cygwin.pod                                           [devel]doc
 README_win32.pod                                            [devel]doc
@@ -427,6 +429,7 @@ docs/project/core_inclusion.pod                             [doc]
 docs/project/debian_packaging_guide.pod                     [doc]
 docs/project/git_terminology.pod                            [doc]
 docs/project/git_workflow.pod                               [doc]
+docs/project/merge_review_guidelines.pod                    [doc]
 docs/project/metacommitter_guide.pod                        [doc]
 docs/project/release_manager_guide.pod                      [doc]
 docs/project/roles_responsibilities.pod                     [doc]
@@ -903,6 +906,7 @@ ext/nqp-rx/t/p6regex/rx_syntax                              [test]
 frontend/parrot/main.c                                      []
 frontend/parrot_debugger/main.c                             []
 frontend/pbc_dump/main.c                                    []
+frontend/pbc_dump/packdump.c                                []
 frontend/pbc_merge/main.c                                   []
 include/parrot/atomic.h                                     [main]include
 include/parrot/atomic/fallback.h                            [main]include
@@ -1029,6 +1033,7 @@ lib/Parrot/H2inc.pm                                         [devel]lib
 lib/Parrot/Harness/DefaultTests.pm                          [devel]lib
 lib/Parrot/Harness/Options.pm                               [devel]lib
 lib/Parrot/Harness/Smoke.pm                                 [devel]lib
+lib/Parrot/Headerizer/Functions.pm                          [devel]lib
 lib/Parrot/Headerizer.pm                                    [devel]lib
 lib/Parrot/IO/Directory.pm                                  [devel]lib
 lib/Parrot/IO/File.pm                                       [devel]lib
@@ -1317,11 +1322,11 @@ src/ops/set.ops                                             []
 src/ops/string.ops                                          []
 src/ops/sys.ops                                             []
 src/ops/var.ops                                             []
-src/packdump.c                                              []
-src/packfile.c                                              []
+src/packfile/api.c                                          []
 src/packfile/byteorder.h                                    []
+src/packfile/object_serialization.c                         []
+src/packfile/output.c                                       []
 src/packfile/pf_items.c                                     []
-src/packout.c                                               []
 src/pbc_disassemble.c                                       []
 src/pmc.c                                                   []
 src/pmc/addrregistry.pmc                                    []
@@ -1410,7 +1415,6 @@ src/pmc/threadinterpreter.pmc                               []
 src/pmc/timer.pmc                                           []
 src/pmc/undef.pmc                                           []
 src/pmc/unmanagedstruct.pmc                                 []
-src/pmc_freeze.c                                            []
 src/pointer_array.c                                         []
 src/runcore/cores.c                                         []
 src/runcore/main.c                                          []
@@ -2015,6 +2019,19 @@ t/steps/inter/yacc-01.t                                     [test]
 t/steps/inter/yacc-02.t                                     [test]
 t/stress/gc.t                                               [test]
 t/tools/create_language.t                                   [test]
+t/tools/dev/headerizer/01_functions.t                       [test]
+t/tools/dev/headerizer/02_methods.t                         [test]
+t/tools/dev/headerizer/testlib/fixedbooleanarray_pmc.in     [test]
+t/tools/dev/headerizer/testlib/function_decls.in            [test]
+t/tools/dev/headerizer/testlib/hvalidheader.in              [test]
+t/tools/dev/headerizer/testlib/imcc.in                      [test]
+t/tools/dev/headerizer/testlib/lack_directive.in            [test]
+t/tools/dev/headerizer/testlib/list.in                      [test]
+t/tools/dev/headerizer/testlib/list_h.in                    [test]
+t/tools/dev/headerizer/testlib/missingheaderfile.in         [test]
+t/tools/dev/headerizer/testlib/nci_pmc.in                   [test]
+t/tools/dev/headerizer/testlib/none.in                      [test]
+t/tools/dev/headerizer/testlib/validheader.in               [test]
 t/tools/dev/pmctree.t                                       [test]
 t/tools/dev/searchops.t                                     [test]
 t/tools/dev/searchops/samples.pm                            [test]
@@ -2089,6 +2106,7 @@ tools/dev/gen_charset_tables.pl                             []
 tools/dev/gen_class.pl                                      []
 tools/dev/gen_makefile.pl                                   [devel]
 tools/dev/gen_valgrind_suppressions.pl                      []
+tools/dev/github_post_receive.pl                            []
 tools/dev/headerizer.pl                                     []
 tools/dev/install_dev_files.pl                              []
 tools/dev/install_doc_files.pl                              []

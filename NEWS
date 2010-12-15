@@ -2,13 +2,20 @@ New in 2.11.0
 - Core
  + Just In Time native call frame generation using LibFFI
  + PIR op find_codepoint is no longer experimental, it is now supported
- + Several public functions in libparrot have been brought up to standard naming conventions.
+ + Several public functions in libparrot have been brought up to standard
+   naming conventions.
 - Languages
  + PIRC
    - left the nest and is currently at https://github.com/parrot/pirc/
  + Community
-   - README translated into the following languages:
-        Polish
+   - Our README was translated into the following languages
+    by Google Code-In students and mentors:
+        Polish      README.polski
+        Spanish     README.espanol
+        German      README.deutsch
+- Documentation
+- Tests
+ + Test coverage increase on PMCs: String, Integer
 
 New in 2.10.0
 - Core

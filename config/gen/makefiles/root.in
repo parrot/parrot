@@ -495,10 +495,8 @@ INTERP_O_FILES = \
 #IF(has_core_nci_thunks):  src/nci/core_thunks$(O) \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks$(O) \
     src/oo$(O) \
-    src/packfile$(O) \
-    src/packout$(O) \
     src/platform$(O) \
-    src/pmc_freeze$(O) \
+    src/packfile/object_serialization$(O) \
     src/pmc$(O) \
     src/runcore/main$(O)  \
     src/runcore/cores$(O) \
@@ -513,6 +511,8 @@ INTERP_O_FILES = \
     src/utils$(O) \
     src/vtables$(O) \
     src/warnings$(O) \
+    src/packfile/api$(O) \
+    src/packfile/output$(O) \
     src/packfile/pf_items$(O) \
     @TEMP_atomic_o@ \
     @TEMP_gc_o@ \
@@ -700,10 +700,10 @@ STR_FILES = \
 #IF(has_core_nci_thunks):  src/nci/core_thunks.str \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks.str \
     src/nci/signatures.str \
-    src/packfile.str \
+    src/packfile/api.str \
+    src/packfile/object_serialization.str \
     src/packfile/pf_items.str \
     src/pmc.str \
-    src/pmc_freeze.str \
     src/oo.str \
     src/runcore/cores.str \
     src/runcore/main.str \
@@ -1064,13 +1064,13 @@ $(INSTALLABLEDIS) : src/pbc_disassemble$(O) \
 #
 # Parrot Dump
 #
-src/packdump$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_sub.h \
-    include/pmc/pmc_key.h src/packdump.c
+frontend/pbc_dump/packdump$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_sub.h \
+    include/pmc/pmc_key.h frontend/pbc_dump/packdump.c
 
-$(PDUMP) : frontend/pbc_dump/main$(O) src/packdump$(O) $(LIBPARROT)
+$(PDUMP) : frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     frontend/pbc_dump/main$(O) \
-    src/packdump$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+    frontend/pbc_dump/packdump$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 frontend/pbc_dump/main$(O) : \
@@ -1081,11 +1081,11 @@ frontend/pbc_dump/main$(O) : \
     $(INC_DIR)/runcore_api.h \
     frontend/pbc_dump/main.c
 
-$(INSTALLABLEPDUMP) : frontend/pbc_dump/main$(O) src/packdump$(O) \
+$(INSTALLABLEPDUMP) : frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) \
 	src/install_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     frontend/pbc_dump/main$(O) \
-    src/packdump$(O) \
+    frontend/pbc_dump/packdump$(O) \
     @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
@@ -1295,7 +1295,7 @@ src/namespace$(O) : $(PARROT_H_HEADERS) src/namespace.str src/namespace.c \
 src/pmc$(O) : include/pmc/pmc_class.h src/pmc.c \
 	src/pmc.str $(PARROT_H_HEADERS)
 
-src/pmc_freeze$(O) : $(PARROT_H_HEADERS) src/pmc_freeze.str src/pmc_freeze.c
+src/packfile/object_serialization$(O) : $(PARROT_H_HEADERS) src/packfile/object_serialization.str src/packfile/object_serialization.c
 
 src/hash$(O) : $(PARROT_H_HEADERS) src/hash.c
 
@@ -1555,9 +1555,9 @@ src/multidispatch$(O) : \
     include/pmc/pmc_nci.h \
     include/pmc/pmc_sub.h
 
-src/packfile$(O) : \
-    src/packfile.str \
-    src/packfile.c \
+src/packfile/api$(O) : \
+    src/packfile/api.str \
+    src/packfile/api.c \
     include/pmc/pmc_sub.h \
     include/pmc/pmc_key.h \
     include/pmc/pmc_parrotlibrary.h \
@@ -1577,13 +1577,13 @@ src/packfile$(O) : \
     $(PARROT_H_HEADERS) \
     $(INC_DIR)/runcore_api.h
 
+src/packfile/output$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_key.h src/packfile/output.c
+
 src/packfile/pf_items$(O) : \
     $(PARROT_H_HEADERS) \
     src/packfile/byteorder.h \
     src/packfile/pf_items.str \
     src/packfile/pf_items.c
-
-src/packout$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_key.h src/packout.c
 
 src/parrot$(O) : $(GENERAL_H_FILES)
 
@@ -1837,16 +1837,16 @@ RUNCORE_TEST_FILES = \
     --runcore-tests
 SRC_TEST_FILES = \
     t/src/*.t
-TOOLS_TEST_FILES = \
-    t/tools/*.t
+TOOLS_TEST_DIR = t/tools
+TOOLS_TEST_FILES = $(TOOLS_TEST_DIR)/tools/*.t
 LIBRARY_TEST_FILES = @library_tests@
-PMC2CUTILS_DIR = t/tools/pmc2cutils
+PMC2CUTILS_DIR = $(TOOLS_TEST_DIR)/pmc2cutils
 HARNESS_DIR = t/pharness
 BUILDTOOLS_TEST_FILES = \
     $(PMC2CUTILS_DIR)/*.t \
     $(HARNESS_DIR)/*.t
 MANIFEST_DIR = t/manifest
-INSTALL_TOOLS_DIR = t/tools/install
+INSTALL_TOOLS_DIR = $(TOOLS_TEST_DIR)/install
 MANIFEST_TEST_FILES = \
     $(MANIFEST_DIR)/*.t \
     $(INSTALL_TOOLS_DIR)/*.t
@@ -1859,6 +1859,7 @@ PBC_TEST_FILES = \
     t/op/testlib/test_strings.pbc \
     t/pmc/testlib/annotations.pbc \
     t/pmc/testlib/number.pbc
+HEADERIZER_TEST_FILES = $(TOOLS_TEST_DIR)/dev/headerizer/*.t
 
 # pbc files used for several tests;
 # not needed for build, hence this target is not included in 'all'
@@ -1921,7 +1922,8 @@ fulltest :
 	benchmark_tests \
 	manifest_tests \
 	examples_tests \
-	distro_tests
+	distro_tests \
+	headerizer_tests
 
 # bounds checking, slow core
 testb : test_prep
@@ -2007,6 +2009,10 @@ distro_tests : test_prep
 configure_tests :
 	$(PERL) t/harness $(CONFIGURE_TEST_FILES)
 
+# headerizer tests
+headerizer_tests : test_prep
+	$(PERL) t/harness $(HEADERIZER_TEST_FILES)
+
 # library tests - tests run by make test but not by make fulltest or make cover
 library_tests : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(LIBRARY_TEST_FILES)
@@ -2062,7 +2068,7 @@ prog-clean :
     parrot-prove.pbc parrot-prove.c parrot-prove$(O) parrot-prove$(EXE) \
     parrot_config$(EXE) parrot_config.c parrot_config$(O) parrot_config.pbc \
     compilers/imcc/main$(O) \
-    $(PDUMP) frontend/pbc_dump/main$(O) src/packdump$(O) \
+    $(PDUMP) frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) \
     $(PDB) frontend/parrot_debugger/main$(O) \
     $(PBC_MERGE) frontend/pbc_merge/main$(O) \
     $(DIS) src/pbc_disassemble$(O)
@@ -2100,7 +2106,7 @@ archclean: dynext-clean
     $(INSTALLABLECONFIG) \
     $(INSTALLABLENQP) \
     compilers/imcc/main$(O) \
-    $(PDUMP) frontend/pbc_dump/main$(O) src/packdump$(O) \
+    $(PDUMP) frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) \
     $(PDB) frontend/parrot_debugger/main$(O) \
     $(PBC_MERGE) frontend/pbc_merge/main$(O) \
     $(DIS) src/pbc_disassemble$(O) \
@@ -2729,7 +2735,7 @@ cagecritic:
 HEADERIZER_O_FILES = \
     $(O_FILES) \
     frontend/parrot/main$(O) \
-    src/packdump$(O) \
+    frontend/pbc_dump/packdump$(O) \
     frontend/pbc_merge/main$(O) \
 
 headerizer : src/core_pmcs.c
