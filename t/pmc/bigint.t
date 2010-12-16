@@ -19,9 +19,17 @@ Tests the BigInt PMC.
 
     .include 'test_more.pir'
 
-    plan(64)
-    check_libgmp_good()
+    .local int num_tests
+    num_tests = 64
+    plan(num_tests)
 
+    .local int good
+    good = check_libgmp_good()
+    if good goto do_tests
+    skip(num_tests)
+    goto done
+
+  do_tests:
     set_and_get()
     addition()
     subtraction()
@@ -41,6 +49,7 @@ Tests the BigInt PMC.
     pi()
     bugfixes()
 
+  done:
 .end
 
 .include 'iglobals.pasm'
@@ -75,19 +84,15 @@ Tests the BigInt PMC.
 
 Config2:
     diag( 'Suitable GMP version [', $S3, '] available' )
-    goto ret
+    .return(1)
 
 NoLibGMP:
     diag( 'No BigInt Lib configured' )
-    skip(36)
-    exit 0
+    .return(0)
 
 OldLibGMP:
     diag( 'Buggy GMP version [', $S3, '] with huge digit multiply - please upgrade' )
-    skip(36)
-    exit 0
-
-ret:
+    .return(0)
 .end
 
 .sub set_and_get
