@@ -1980,6 +1980,24 @@ testexec: test_prep
 src_tests :
 	$(PERL) t/harness $(SRC_TEST_FILES)
 
+dynoplibs_tests :
+	$(PERL) t/harness $(DYNOPLIBS_TEST_FILES)
+
+dynpmc_tests :
+	$(PERL) t/harness $(DYNPMC_TEST_FILES)
+
+oo_tests :
+	$(PERL) t/harness $(OO_TEST_FILES)
+
+op_tests :
+	$(PERL) t/harness $(OP_TEST_FILES)
+
+pir_tests :
+	$(PERL) t/harness $(PIR_TEST_FILES)
+
+pmc_tests :
+	$(PERL) t/harness $(PMC_TEST_FILES)
+
 # Command line and various environments
 run_tests :
 	$(PERL) t/harness $(RUN_TEST_FILES)
@@ -2483,10 +2501,11 @@ COVER_SRC_DIRS = \
     src/pmc \
     src/runcore \
     src/string \
-    src/string/encoding
+    src/string/encoding \
+    compilers/imcc
+
 COVER_DIRS = \
     $(COVER_SRC_DIRS) \
-    compilers/imcc \
     $(BUILD_DIR)
 
 cover: \
@@ -2535,6 +2554,24 @@ cover-testr: cover.dummy
 cover-src: cover.dummy
 	-@make@ src_tests
 
+cover-dynoplibs: cover.dummy
+	-@make@ dynoplibs_tests
+
+cover-dynpmc: cover.dummy
+	-@make@ dynpmc_tests
+
+cover-oo: cover.dummy
+	-@make@ oo_tests
+
+cover-op: cover.dummy
+	-@make@ op_tests
+
+cover-pir: cover.dummy
+	-@make@ pir_tests
+
+cover-pmc: cover.dummy
+	-@make@ pmc_tests
+
 cover-run: cover.dummy
 	-@make@ run_tests
 
@@ -2561,6 +2598,28 @@ cover-distro: cover.dummy
 
 cover-clean:
 	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
+
+quickcover: \
+    cover.dummy \
+    all \
+    cover-src \
+    cover-dynoplibs \
+    cover-dynpmc \
+    cover-oo \
+    cover-op \
+    cover-pir
+
+#    cover-pir \
+#    cover-pmc
+#	build_dir=$$PWD; \
+#    for dir in $(COVER_SRC_DIRS); \
+#    do \
+#	cd $$dir; \
+#	gcov *.c; \
+#	cd $$build_dir; \
+#	gcov2perl $$dir/*.gcov; \
+#    done
+#	cover -ignore_re '^\/usr\/local\/bin'
 
 ###############################################################################
 #
