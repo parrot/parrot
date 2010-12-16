@@ -2455,23 +2455,25 @@ splint : all
 		| grep -v 'Source code error generation point'
 
 COVER_FLAGS = -fprofile-arcs -ftest-coverage
-COVER_DIRS = \
+COVER_SRC_DIRS = \
     src \
     src/call \
     src/dynoplibs \
     src/dynpmc \
     src/gc \
     src/interp \
+    src/io \
     src/ops \
     src/packfile \
     src/pmc \
     src/runcore \
     src/string \
-    src/string/encoding \
+    src/string/encoding
+COVER_DIRS = \
+    $(COVER_SRC_DIRS) \
+    compilers/imcc \
     $(BUILD_DIR) \
-    $(BUILD_DIR)/t/perl \
-    src/io \
-    compilers/imcc
+    $(BUILD_DIR)/t/perl
 
 cover: \
     cover.dummy \
