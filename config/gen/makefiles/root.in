@@ -2487,8 +2487,7 @@ COVER_SRC_DIRS = \
 COVER_DIRS = \
     $(COVER_SRC_DIRS) \
     compilers/imcc \
-    $(BUILD_DIR) \
-    $(BUILD_DIR)/t/perl
+    $(BUILD_DIR)
 
 cover: \
     cover.dummy \
