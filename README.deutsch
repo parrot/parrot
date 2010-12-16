@@ -1,27 +1,28 @@
-Das ist Parrot, version 2.10.1
-------------------------------
+Parrot-Version 2.10.1
+---------------------
 
-Parrot ist Kopiergeschützt (C) 2001-2010, Parrot Foundation.
+Parrot ist lizenziert (C) 2001-2010, Parrot Foundation.
 
 
 LIZENZ INFORMATION
 -------------------
 
-Dieser Code ist veröffentlicht unter den Bedingungen von Artistic License 2.0.
-Für mehr details, lesen sie die Datei LICENSE.
+Dieser Code ist veröffentlicht unter den Bedingungen der Artistic Lizenz 2.0.
+Mehr Details lesen Sie in der Datei LICENSE.
 
 ÜBERSICHT
---------
-Parrot ist eine virtuelle Maschine gebaut um effektiv
-bytecode für dynamisch Sprachen auszuführen.
+---------
+Parrot ist eine virtuelle Maschine, gebaut um effizienten Bytecode für
+dynamische Sprachen zu erzeugen und auszuführen.
 
-ANFORDERUNGEN
--------------
+NOTWENDIGE VORAUSSETZUNGEN
+--------------------------
 
-Du brauchst ein C Kompiler,ein Linker, und natürlich ein make Programm.
+Sie brauchen einen C-Compiler, einen Linker und natürlich ein make-Programm.
 
-Wenn du mit der ICU library verbinden wirst musst du dies herunterladen und installieren
-bevor du Parrot konfigurierst. Dies ist hier verfügbar: http://site.icu-project.org/download
+Wenn Sie Parrot mit der ICU-Bibliothek zusammenbinden möchten, müssen Sie diese
+herunterladen und installieren bevor Sie Parrot konfigurieren.
+Diese ist hier verfügbar: http://site.icu-project.org/download
 
 Du wirst auch Perl 5.8.4 gebrauchen, und Storable 2.12 oder neuer
 um einige Konfigurationen auszuführen oder Build Scripts.
