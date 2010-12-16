@@ -1823,43 +1823,58 @@ editor-clean :
 # The --running-make-test argument is currently used by long-running tests
 # to disable GC_DEBUG.
 EXTRA_TEST_ARGS = --gc-debug
-DISTRO_TEST_FILES = \
-    t/distro/*.t
+
+# Directories holding tests
+DYNOPLIBS_TESTS_DIR = t/dynoplibs
+DYNPMC_TESTS_DIR = t/dynpmc
+INSTALL_TOOLS_TESTS_DIR = $(TOOLS_TESTS_DIR)/install
+OO_TESTS_DIR = t/oo
+OP_TESTS_DIR = t/op
+PIR_TESTS_DIR = t/pir
+PMC_TESTS_DIR = t/pmc
+HARNESS_TESTS_DIR = t/pharness
+MANIFEST_TESTS_DIR = t/manifest
+PMC2CUTILS_TESTS_DIR = $(TOOLS_TESTS_DIR)/pmc2cutils
+TOOLS_TESTS_DIR = t/tools
+
 BENCHMARK_TEST_FILES = \
     t/benchmark/*.t
-PERL_TEST_FILES = \
-    t/perl/*.t
+BUILDTOOLS_TEST_FILES = \
+    $(PMC2CUTILS_TESTS_DIR)/*.t \
+    $(HARNESS_TESTS_DIR)/*.t
 CODINGSTD_TEST_FILES = \
     t/codingstd/*.t
+CONFIGURE_TEST_FILES = \
+    t/configure/*.t \
+    t/steps/*.t
+DISTRO_TEST_FILES = \
+    t/distro/*.t
+DYNOPLIBS_TEST_FILES = $(DYNOPLIBS_TESTS_DIR)/*.t
+DYNPMC_TEST_FILES = $(DYNPMC_TESTS_DIR)/*.t
+EXAMPLES_TEST_FILES = \
+    t/examples/*.t
+HEADERIZER_TEST_FILES = $(TOOLS_TESTS_DIR)/dev/headerizer/*.t
+LIBRARY_TEST_FILES = @library_tests@
+MANIFEST_TEST_FILES = \
+    $(MANIFEST_TESTS_DIR)/*.t \
+    $(INSTALL_TOOLS_TESTS_DIR)/*.t
+OO_TEST_FILES = $(OO_TESTS_DIR)/*.t
+OP_TEST_FILES = $(OP_TESTS_DIR)/*.t
+PBC_TEST_FILES = \
+    t/op/testlib/test_strings.pbc \
+    t/pmc/testlib/annotations.pbc \
+    t/pmc/testlib/number.pbc
+PERL_TEST_FILES = \
+    t/perl/*.t
+PIR_TEST_FILES = $(PIR_TESTS_DIR)/*.t
+PMC_TEST_FILES = $(PMC_TESTS_DIR)/*.t
 RUN_TEST_FILES = \
     t/run/*.t
 RUNCORE_TEST_FILES = \
     --runcore-tests
 SRC_TEST_FILES = \
     t/src/*.t
-TOOLS_TEST_DIR = t/tools
-TOOLS_TEST_FILES = $(TOOLS_TEST_DIR)/tools/*.t
-LIBRARY_TEST_FILES = @library_tests@
-PMC2CUTILS_DIR = $(TOOLS_TEST_DIR)/pmc2cutils
-HARNESS_DIR = t/pharness
-BUILDTOOLS_TEST_FILES = \
-    $(PMC2CUTILS_DIR)/*.t \
-    $(HARNESS_DIR)/*.t
-MANIFEST_DIR = t/manifest
-INSTALL_TOOLS_DIR = $(TOOLS_TEST_DIR)/install
-MANIFEST_TEST_FILES = \
-    $(MANIFEST_DIR)/*.t \
-    $(INSTALL_TOOLS_DIR)/*.t
-EXAMPLES_TEST_FILES = \
-    t/examples/*.t
-CONFIGURE_TEST_FILES = \
-    t/configure/*.t \
-    t/steps/*.t
-PBC_TEST_FILES = \
-    t/op/testlib/test_strings.pbc \
-    t/pmc/testlib/annotations.pbc \
-    t/pmc/testlib/number.pbc
-HEADERIZER_TEST_FILES = $(TOOLS_TEST_DIR)/dev/headerizer/*.t
+TOOLS_TEST_FILES = $(TOOLS_TESTS_DIR)/tools/*.t
 
 # pbc files used for several tests;
 # not needed for build, hence this target is not included in 'all'
