@@ -57,7 +57,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(84)
+    plan(85)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -610,6 +610,17 @@ CODE
     $S0 = $P1()
     is($S0, "", "find_var finds the correct sub")
 
+    $P0 = get_namespace ["FooSub"]
+    $P1 = $P0.'get_sym'("Bar")
+    $P2 = get_namespace ["FooSub";"Bar"]
+    $I0 = isnull $P1
+    $I1 = $I0
+    $I0 = isnull $P2
+    $I1 += $I0
+    $I0 = issame $P1, $P2
+    $I1 += $I0
+    is ($I0, 0, "get_sym gets a .sub and not a namespace with same name")
+
     # Test del_namespace. Test that it deletes an existing namespace, and that
     # it won't delete something that isn't a namespace
 
@@ -771,6 +782,14 @@ CODE
 .namespace ["Foo";"Bar";"Baz"]
 .sub 'widget'
     .return("Foo::Bar::Baz")
+.end
+
+# Nested namespace and a sub with same name
+.namespace ["FooSub"]
+.sub 'Bar'
+.end
+.namespace ["FooSub";"Bar"]
+.sub 'boo'
 .end
 
 # Namespace with :vtable
