@@ -1028,10 +1028,11 @@ expected type, fails otherwise.
     exmsg = ex['message']
     finalize ex
     pop_eh
-    concat msg, "throws expected type (exception message is is: '"
-    concat msg, exmsg
-    concat msg, "')"
+    concat msg, "throws expected type"
+    exmsg = concat 'exception message is: "', exmsg
+    concat exmsg, '")'
     is(extype, type, msg)
+    diag(exmsg)
   end:
 .end
 
