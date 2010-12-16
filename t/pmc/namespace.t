@@ -57,13 +57,14 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(82)
+    plan(84)
 
     create_namespace_pmc()
     verify_namespace_type()
     get_namespace_class()
     keyed_namespace_lookup()
     get_global_opcode()
+    inspect_opcode()
     get_sub_from_namespace_hash()
     access_sub_in_namespace()
     get_namespace_from_sub()
@@ -329,6 +330,23 @@ CODE
   end_test10:
     pop_eh
 
+.end
+
+.sub inspect_opcode_unknown_value
+    .local pmc ns
+    ns = get_namespace
+    $P0 = inspect ns, 'introspectionvaluethatshouldnotexist'
+.end
+
+.sub 'inspect_opcode'
+    .local pmc ns, value
+    ns = get_namespace ['WithVtable']
+    value = inspect ns, 'vtable_overrides'
+    $I0 = elements value
+    is($I0, 1, 'inspect vtable overrides from namespace')
+
+    .const 'Sub' unknown_value = 'inspect_opcode_unknown_value'
+    throws_type(unknown_value, .EXCEPTION_INVALID_OPERATION, 'inspect with invalid introspection value')
 .end
 
 .sub 'get_sub_from_namespace_hash'
@@ -753,6 +771,12 @@ CODE
 .namespace ["Foo";"Bar";"Baz"]
 .sub 'widget'
     .return("Foo::Bar::Baz")
+.end
+
+# Namespace with :vtable
+.namespace ["WithVtable"]
+.sub 'get_string' :anon :vtable
+    .return('something')
 .end
 
 # Namespace specified in ISO-8859-1
