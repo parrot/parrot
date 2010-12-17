@@ -449,6 +449,15 @@ Parrot_Int Parrot_api_pmc_get_integer(
         FUNC_MODIFIES(* value);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_get_keyed_int(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pmc,
+    Parrot_Int key,
+    ARGOUT(Parrot_PMC * value))
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* value);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_get_string(
     Parrot_PMC interp_pmc,
     Parrot_PMC pmc,
@@ -476,6 +485,13 @@ Parrot_Int Parrot_api_pmc_set_integer(
     Parrot_Int value);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_set_keyed_int(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pmc,
+    Parrot_Int key,
+    Parrot_PMC value);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_set_string(
     Parrot_PMC interp_pmc,
     Parrot_PMC pmc,
@@ -495,12 +511,15 @@ Parrot_Int Parrot_api_pmc_set_string(
        PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_Parrot_api_pmc_get_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_Parrot_api_pmc_get_keyed_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_Parrot_api_pmc_get_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_Parrot_api_pmc_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pmctonull))
 #define ASSERT_ARGS_Parrot_api_pmc_set_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_pmc_set_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_pmc_set_keyed_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_pmc_set_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/pmc.c */
