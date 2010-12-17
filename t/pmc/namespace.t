@@ -57,7 +57,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(85)
+    plan(88)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -194,6 +194,9 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     is($I0, 0, "can lookup nested namespace by Key")
     # TODO: Get the function from this namespace and call it to verify we have
     #       the correct one.
+    $P1 = $P0["parrot";"Fool";"Baz"]
+    $I0 = isnull $P1
+    is($I0, 1, "can lookup nested namespace by Key - not found")
 
     # Array lookup
     $P1 = new ['ResizableStringArray']
@@ -216,6 +219,17 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     is($I0, 0, "can lookup namespace by string")
     # TODO: Get the function from this namespace and call it to verify we have
     #       the correct one.
+
+    # String PMC lookup
+    $P3 = new ["String"]
+    $P3 = "Foo"
+    $P2 = $P1[$P3]
+    $I0 = isnull $P2
+    is($I0, 0, "can lookup namespace by String PMC")
+    $P3 = "NotFoo"
+    $P2 = $P1[$P3]
+    $I0 = isnull $P2
+    is($I0, 1, "can lookup namespace by String PMC - not found")
 
     .const 'Sub' invalidkey = 'namespace_lookup_invalidkeytype'
     throws_type(invalidkey, .EXCEPTION_GLOBAL_NOT_FOUND, 'namespace lookup with invalid key')
