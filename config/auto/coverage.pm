@@ -65,9 +65,7 @@ sub runstep {
         $self->set_result("lacking @utils_lacking");
     }
     else {
-        foreach my $util (keys %utils_needed) {
-            $conf->data->set( "has_$util" => 1 );
-        }
+        $conf->data->set( "has_coverage_tools" => 1 );
         $self->set_result('yes');
     }
     return 1;
@@ -128,7 +126,6 @@ sub _initial_content_check {
     my ($conf, $content, $util) = @_;
     if (! defined $content) {
         $conf->data->set(
-            "has_$util"             => 0,
             "TEMP_$util"            => '',
             "TEMP_${util}_build"    => '',
         );
