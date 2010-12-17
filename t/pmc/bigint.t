@@ -381,7 +381,7 @@ OK11:
     eq $P0, $P2, OK12
     $I1 = 0
     say 'i_sub 12345678987654321-123456789 with integer is wrong'
-OK12: 
+OK12:
     ok($I1, 'i_sub(bigint,integer)')
 .end
 
