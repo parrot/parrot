@@ -124,6 +124,7 @@ int main(int argc, char* argv[])
 
     Parrot_pmc_destroy(interp, p_str);
     Parrot_pmc_destroy(interp, p_keyedstr);
+    Parrot_pmc_destroy(interp, p_idx);
     Parrot_pmc_destroy(interp, interpmc);
 
     return 0;
