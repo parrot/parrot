@@ -82,16 +82,6 @@ Parrot_Int Parrot_api_add_library_search_path(
         __attribute__nonnull__(2);
 
 PARROT_API
-Parrot_Int Parrot_api_build_argv_array(
-    Parrot_PMC interp_pmc,
-    Parrot_Int argc,
-    ARGIN(const char ** argv),
-    ARGOUT(Parrot_PMC * args))
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(* args);
-
-PARROT_API
 Parrot_Int Parrot_api_debug_flag(
     Parrot_PMC interp_pmc,
     Parrot_Int flags,
@@ -258,9 +248,6 @@ Parrot_Int Parrot_api_wrap_imcc_hack(
 #define ASSERT_ARGS_Parrot_api_add_library_search_path \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(path))
-#define ASSERT_ARGS_Parrot_api_build_argv_array __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(argv) \
-    , PARROT_ASSERT_ARG(args))
 #define ASSERT_ARGS_Parrot_api_debug_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_destroy_interpreter \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -497,6 +484,16 @@ Parrot_Int Parrot_api_pmc_set_string(
     Parrot_PMC pmc,
     Parrot_String value);
 
+PARROT_API
+Parrot_Int Parrot_api_pmc_wrap_string_array(
+    Parrot_PMC interp_pmc,
+    Parrot_Int argc,
+    ARGIN(const char ** argv),
+    ARGOUT(Parrot_PMC * args))
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* args);
+
 #define ASSERT_ARGS_Parrot_api_add_exception_handler \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_call_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -521,6 +518,10 @@ Parrot_Int Parrot_api_pmc_set_string(
 #define ASSERT_ARGS_Parrot_api_pmc_set_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_pmc_set_keyed_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_pmc_set_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_pmc_wrap_string_array \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(argv) \
+    , PARROT_ASSERT_ARG(args))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/pmc.c */
 

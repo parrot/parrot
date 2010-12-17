@@ -157,7 +157,7 @@ main(int argc, const char *argv[])
         show_last_error_and_exit(interp);
 
     if (run_pbc) {
-        if (!Parrot_api_build_argv_array(interp, pir_argc, pir_argv, &argsarray))
+        if (!Parrot_api_pmc_wrap_string_array(interp, pir_argc, pir_argv, &argsarray))
             show_last_error_and_exit(interp);
         if (!Parrot_api_run_bytecode(interp, bytecodepmc, argsarray))
             show_last_error_and_exit(interp);
