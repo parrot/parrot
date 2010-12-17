@@ -37,9 +37,10 @@ WIE MAN PARROT VON GITHUB HERUNTERLÄDT
 --------------------------------------
 I.  Git installieren:
 
-Linux:
+- Linux
+
 Die Methode ist abhängig von ihrer Distribution. Zum Installieren sollten Sie
-folgendes ausführen (als root oder mit dem Befehl "sudo <cmd>"):
+Folgendes ausführen (als root oder mit dem Befehl "sudo <cmd>"):
 
 Bei Ubuntu/Debian (apt-basiert):
 
@@ -53,12 +54,14 @@ Bei Gentoo (portage-basiert):
 
     emerge -av dev-vcs/git
 
-Windows: Es gibt zwei Git-Varianten für Windows:
+- Windows
+
+Es gibt zwei Git-Varianten für Windows:
 
 msysgit 	    http://code.google.com/p/msysgit/downloads/list
 TortoiseGit 	http://code.google.com/p/tortoisegit/downloads/list
 
-Macintosh OS X:
+- Macintosh OS X
 
 Eine Suche im Internet wird eine Menge an Git-Programmen für Mac OS X
 zum Vorschein bringen, unter anderem diese:
@@ -71,112 +74,117 @@ Eine Kopie des Parrot git Repository anlegen:
 
     git clone git://github.com/parrot/parrot.git
 
-Dadurch wird voreingestellt ein "checkout" das Anzeigen vom master-Zweig
-veranlasst. Um einen lokalen Zweig anzulegen, der den Inhalt von dem Zweig
-mit dem Namen "some_branch" enthält:
+Dadurch wird voreingestellt ein "checkout" vom master-Zweig veranlasst, das
+heißt der master-Zweig steht zur Verfügung. Um einen lokalen Zweig anzulegen,
+der den Inhalt von dem Zweig mit dem Namen "some_branch" enthält:
 
     git checkout -b --track some_branch origin/some_branch
 
 Alle bis hierhin erwähnten URLs gewähren nur lesenden Zugriff. Wenn Sie ein
-Parrot core Entwickler sind, dann benützen Sie die folgende read-write URL:
+Parrot-core-Entwickler sind, dann benutzen Sie die folgende read-write URL:
 
     git clone git@github.com:parrot/parrot.git
 
-Sie können eine komplette Liste der Zweige finden unter:
+Sie finden eine komplette Liste der Zweige unter:
 http://github.com/parrot/parrot
 
 ANLEITUNG
 ---------
 
-Als erstes, packen Sie ein Parrot tar-Archiv aus oder nutzen git, (wenn Sie
+Als erstes packen Sie ein Parrot tar-Archiv aus oder nutzen git, (wenn Sie
 dies lesen, haben Sie das wahrscheinlich schon gemacht) und geben ein:
 
     perl Configure.pl
 
-um das Configure Script auszuführen. Der Configure.pl Script nimmt Konfiguration
-heraus vom laufenden perl5 Programm  Du must dem Konfiguration erklären genau
-welche Compiler Und Linker zu benutzen. Zum Beispiel, Compile C Dateien mit 'cc',
-C++ Dateien mit 'CC', und verbindet alles zumsammen mit 'CC', würdest du
-schreiben:
+um die Konfiguration zu starten. Das Script "Configure.pl" übernimmt teilweise
+Einstellungen von Perl 5 und analysiert das vorhandene System. Manchmal mag
+es notwendig sein den Compiler und Linker genau zu specifizieren.
+Zum Beispiel, zum Kompiliern von C-Dateien mit 'cc', C++ Dateien mit 'CC' und
+alles zusammen binden mit 'CC', müssten Sie eingeben:
 
     perl Configure.pl --cc=cc --cxx=CC --link=CC --ld=CC
 
 Siehe "perl Configure.pl --help" für mehr Optionen und docs/configuration.pod
 für mehr Details.
 
-Für Systeme wie HPUX die nicht inet_pton haben, fürhe dies aus:
+Für Systeme wie HPUX die nicht inet_pton besitzen, führen Sie dies aus:
 
     perl Configure.pl --define=inet_aton
 
-Configure.pl ausführen wird einen config.h Header configurieren, ein Parrot::Config
-Model, Plattform Dateien und viele Makefiles.
+Das Ausführen von Configure.pl bewirkt das Generieren von der Header-Datei
+config.h, dem Modul Parrot::Config, Plattform Dateien und vielen Makefiles.
 
-Die Datei "myconfig" hat eine Übersicht über Konfiguration Einstellungen.
-Als nächstes, führe make aus. (Configure.pl wird dir sagen welche Version von make it
-für dein System optimiert ist.)
+Die Datei "myconfig" enthält eine Übersicht über Konfigurations-Einstellungen.
+Führen Sie als nächstes "make" aus. (Configure.pl gibt an, welche make-Variante
+auf ihrem System die geeigneste ist.)
 
-Als nächstes soll der Build gemacht werden.  Wenn du den ICU Library machst,
-(Dies ist default bei den meisten Systemen), brauchst du GNU make
-(oder etwas kompatibel damit).
+Als nächstes soll der Build gemacht werden. Wenn Sie die ICU-Bibliothek
+erstellen (dies ist default bei den meisten Systemen), brauchen Sie GNU make
+(oder etwas dazu kompatibles).
 
-Du kannst Parrot ausführen indem du "make test" ausführst. Du kannst die Tests mit
-"make TEST_JOBS=3 test" gleichzeitig ausführen.
+Sie können Parrot testen indem Sie "make test" ausführen. Sie können die Tests
+mit "make TEST_JOBS=3 test" gleichzeitig ausführen.
 
-Du kannst den ganzen Test Suite ausführen:
+Sie können die komplette Test-Suite ausführen:
 
     make fulltest
 
-Merke: PLATFORMS beinhaltet Notzizen ob die Tests auf deinem System
-erfolgreich sein werden
+Merke: PLATFORMS beinhaltet Notizen, ob die Tests auf ihrem System
+erfolgreich sein werden.
 
-Du kannst Parrot installieren mit:
+Sie können Parrot installieren mit:
 
     make install
 
-Bei default installiert dies bei /usr/local, mit dem Parrot Programm in
-/usr/local/bin. Wenn du Parrot irgendwo anderst installieren willst, benützte:
+Bei default installiert dies unter /usr/local und das Parrot Programm in
+/usr/local/bin. Wenn Sie Parrot an einer anderen Stelle installieren wollen,
+benutze:
 
     perl Configure.pl --prefix=/home/joe/bird
     make install
 
-Merke dir dass dynamische libs nicht gefunden werden für nicht-standarde
-Orte ausser du LD_LIBRARY_PATH benützt oder etwas ähnliches.
+Beachten Sie, dass dynamische Bibliotheken an nicht-standard Plätzen nicht
+gefunden werden, ausser Sie setzen die Variable LD_LIBRARY_PATH oder machen
+etwas ähnliches.
 
-Schaue bei docs/parrot.pod and docs/intro.pod wie du von hier weitermachen sollst.  Wenn du
-irgendwelche Probleme hast, siehe den Abteil "How To Submit A Bug Report" in
-docs/submissions.pod. Diese Dokumente sind in POD format. Du kannst diese
-Dateien sehen mit dem Command:
+Die nächsten Schritte finden Sie in den Dateien "docs/parrot.pod" und
+"docs/intro.pod". Bei irgendwelchen Problemen senden Sie bitte einen
+Bug-Bericht. Mehr Information dazu finden Sie im Abschnitt
+"How To Submit A Bug Report" der Datei "docs/submissions.pod". Diese
+Dokumente sind in POD-Format. Diese Dateien lassen sich gut ansehen mit dem
+Kommando:
 
     perldoc -F docs/intro.pod
 
 ÄNDERUNGEN
 ----------
 
-Für Dokumentationen über die user-sichtbare Änderungen zwischen dieser Version und
-alte Versionen, siehe NEWS.
+Dokumentation über die Nutzer betreffenden Änderungen zwischen dieser Version
+und ältern Versionen enthält die Datei "NEWS".
 
 MAILING LISTEN
 --------------
 
-Die Parrot user Mailing Liste ist parrot-users@lists.parrot.org. Abonniere mit dem Formular bei
-http://lists.parrot.org/mailman/listinfo/parrot-users .
-Die Liste ist archived bei http://lists.parrot.org/pipermail/parrot-users/ .
+Die Parrot-Nutzer-Mailing-Liste ist: parrot-users@lists.parrot.org
+Zum Abonnieren dient das Formular unter der URL:
+http://lists.parrot.org/mailman/listinfo/parrot-users
+Die Liste ist archiviert unter: http://lists.parrot.org/pipermail/parrot-users/
 
-Für Entwickler Diskussionen siehe die Information bei docs/gettingstarted.pod.
+Für Entwickler Diskussionen siehe die Information in docs/gettingstarted.pod.
 
 BERICHTE, PATCHES, usw.
 -----------------------
 
-Siehe ocs/submissions.pod für mehr Information über wie man Bugs und Patches
-reportiert.
+Über das Berichten von Bugs und Einreichen von Patches finden Sie Informationen
+in der Datei "docs/submissions.pod".
 
 WEBSEITEN
 ---------
 
-Die folgenden Webseiten haben Information über Parrot:
+Die folgenden Webseiten geben alle Informationen, die Sie brauchen, über Parrot:
     http://www.parrot.org/
     http://trac.parrot.org/
     http://docs.parrot.org/
 
 Viel Spass,
-   The Parrot Team.
+   das Parrot-Team
