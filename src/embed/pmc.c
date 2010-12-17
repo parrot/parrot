@@ -160,13 +160,15 @@ Parrot_api_pmc_wrap_string_array(Parrot_PMC interp_pmc, Parrot_Int argc,
     //ASSERT_ARGS(Parrot_api_build_argv_array)
     EMBED_API_CALLIN(interp_pmc, interp)
     PMC * const userargv = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
-    Parrot_Int i;
 
-    for (i = 0; i < argc; ++i) {
-        /* Run through argv, adding everything to the array */
-        STRING * const arg = Parrot_str_new_init(interp, argv[i], strlen(argv[i]),
-                Parrot_utf8_encoding_ptr, PObj_external_FLAG);
-        VTABLE_push_string(interp, userargv, arg);
+    if (argv != NULL && argc > 0) {
+        Parrot_Int i = 0;
+        for (; i < argc; ++i) {
+            /* Run through argv, adding everything to the array */
+            STRING * const arg = Parrot_str_new_init(interp, argv[i], strlen(argv[i]),
+                    Parrot_utf8_encoding_ptr, PObj_external_FLAG);
+            VTABLE_push_string(interp, userargv, arg);
+        }
     }
     *args = userargv;
     EMBED_API_CALLOUT(interp_pmc, interp)
