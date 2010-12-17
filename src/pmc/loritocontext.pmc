@@ -44,10 +44,14 @@ more information.
  * A LoritoContext (and an ExceptionHandler) has in its context a pointer
  * to the register frame, which contains active objects.
  * Additionally ct->current_cont has the continuation of the caller.
+
+    http://reparrot.blogspot.com/2010/12/notes-from-lorito-braindump-contexts.html
+
  */
 
 pmclass LoritoContext auto_attrs provides invokable {
     ATTR PMC      *caller_ctx;         /* caller context */
+    ATTR PMC      *exception_payload;
     ATTR opcode_t *current_pc;         /* program counter of Sub invocation */
     ATTR opcode_t *out_pc;             /* program counter to jump to */
     ATTR opcode_t *eh_pc;              /* program counter of error handler */
