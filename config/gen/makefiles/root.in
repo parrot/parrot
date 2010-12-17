@@ -35,6 +35,7 @@ DATA_DIR        = "@datadir@"
 DOC_DIR         = "@docdir@"
 VERSION_DIR     = "@versiondir@"
 SRC_DIR         = "@srcdir@"
+COVERAGE_DIR    = "@coveragedir@"
 
 ###############################################################################
 #
@@ -1905,6 +1906,9 @@ test : test_core
 test_core: test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS)
 
+test_runcore: test_prep
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(RUNCORE_TEST_FILES)
+
 # run the test suite, create a TAP archive and send it off to smolder
 smolder_test : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --archive --send-to-smolder
@@ -2224,7 +2228,7 @@ test-clean :
 realclean : clean
 	$(RM_RF) \
     $(CONFIGURE_GENERATED_FILES) \
-    cover_db
+    $(COVERAGE_DIR)
 
 distclean : realclean
 
@@ -2488,7 +2492,8 @@ splint : all
 		| grep -v 'Source code error generation point'
 
 COVER_FLAGS = -fprofile-arcs -ftest-coverage
-COVER_SRC_DIRS = \
+
+COVER_DIRS = \
     src \
     src/call \
     src/dynoplibs \
@@ -2496,17 +2501,20 @@ COVER_SRC_DIRS = \
     src/gc \
     src/interp \
     src/io \
+    src/nci \
     src/ops \
     src/packfile \
     src/pmc \
     src/runcore \
     src/string \
     src/string/encoding \
-    compilers/imcc
-
-COVER_DIRS = \
-    $(COVER_SRC_DIRS) \
-    $(BUILD_DIR)
+    $(BUILD_DIR) \
+    $(BUILD_DIR)/t/perl \
+    compilers/imcc \
+    frontend/parrot \
+    frontend/parrot_debugger \
+    frontend/pbc_dump \
+    frontend/pbc_merge
 
 cover: \
     cover.dummy \
@@ -2528,13 +2536,29 @@ cover: \
 	cd $$dir; \
 	gcov *.c; \
 	cd $$build_dir; \
-	gcov2perl $$dir/*.gcov; \
+	gcov2perl -db $(COVERAGE_DIR) $$dir/*.gcov; \
     done
-	cover -ignore_re '^\/usr\/local\/bin'
+	cover $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
+
+quickcover: \
+    cover.dummy \
+    cover-test_runcore
+	build_dir=$$PWD; \
+    for dir in $(COVER_DIRS); \
+    do \
+	cd $$dir; \
+	gcov *.c; \
+	cd $$build_dir; \
+	gcov2perl -db $(COVERAGE_DIR) $$dir/*.gcov; \
+    done
+	cover $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
 
 cover.dummy:
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
     --linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
+
+cover-test_runcore: cover.dummy
+	-@make@ test_runcore
 
 cover-testb: cover.dummy
 	-@make@ testb
@@ -2598,28 +2622,6 @@ cover-distro: cover.dummy
 
 cover-clean:
 	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
-
-quickcover: \
-    cover.dummy \
-    all \
-    cover-src \
-    cover-dynoplibs \
-    cover-dynpmc \
-    cover-oo \
-    cover-op \
-    cover-pir
-
-#    cover-pir \
-#    cover-pmc
-#	build_dir=$$PWD; \
-#    for dir in $(COVER_SRC_DIRS); \
-#    do \
-#	cd $$dir; \
-#	gcov *.c; \
-#	cd $$build_dir; \
-#	gcov2perl $$dir/*.gcov; \
-#    done
-#	cover -ignore_re '^\/usr\/local\/bin'
 
 ###############################################################################
 #
