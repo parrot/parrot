@@ -47,11 +47,15 @@ more information.
 
     http://reparrot.blogspot.com/2010/12/notes-from-lorito-braindump-contexts.html
 
+    http://6guts.wordpress.com/2010/10/15/slides-and-a-few-words-on-representation-polymorphism/
+
  */
 
 pmclass LoritoContext auto_attrs provides invokable {
     ATTR PMC      *caller_ctx;         /* caller context */
-    ATTR PMC      *exception_payload;
+    ATTR PMC      *exception_payload;  /* Exception Payload */
+    ATTR PMC      *REPR;               /* in-memory REPResentation */
+    ATTR PMC      *HOW;                /* Higher Order Workings of an object */
     ATTR opcode_t *current_pc;         /* program counter of Sub invocation */
     ATTR opcode_t *out_pc;             /* program counter to jump to */
     ATTR opcode_t *eh_pc;              /* program counter of error handler */
