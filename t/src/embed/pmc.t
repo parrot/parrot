@@ -28,16 +28,18 @@ plan tests => 1;
 
 c_output_is( <<'CODE', <<'OUTPUT', "get/set_keyed_int" );
 
-#include <parrot/parrot.h>
-#include <parrot/embed.h>
-#include <parrot/api.h>
+#include "parrot/api.h"
 #include <stdio.h>
 
 int main(int argc, char* argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
-    Parrot_PMC interpmc = Parrot_pmc_new(interp, enum_class_ParrotInterpreter);
+    char * c_outstr = NULL;
+    Parrot_Init_Args *initargs = NULL;
+    GET_INIT_STRUCT(initargs);
+    Parrot_PMC interpmc = NULL;
+    Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
 
+    // TODO: Use a real API function for this.
     Parrot_PMC p_str = Parrot_pmc_new(interp, enum_class_String), p_keyedstr = NULL;
 
     Parrot_String s_teststr = NULL, s_outstr = NULL;
@@ -46,7 +48,8 @@ int main(int argc, char* argv[])
 
     Parrot_api_pmc_get_keyed_int(interpmc, p_str, 0, &p_keyedstr);
     Parrot_api_pmc_get_string(interpmc, p_keyedstr, &s_outstr);
-    if (strcmp(Parrot_str_to_cstring(interp, s_outstr), "I") != 0) {
+    Parrot_api_string_export_ascii(interpmc, s_outstr, &c_outstr);
+    if (strcmp(c_outstr, "I") != 0) {
         printf("Failed indexing a String PMC\n");
         return EXIT_FAILURE;
     }
@@ -58,17 +61,13 @@ int main(int argc, char* argv[])
 
     Parrot_api_pmc_set_keyed_int(interpmc, p_str, 0, p_keyedstr);
     Parrot_api_pmc_get_string(interpmc, p_str, &s_outstr);
-
-    if (strcmp(Parrot_str_to_cstring(interp, s_outstr), "i am a string.") != 0) {
+    Parrot_api_string_export_ascii(interpmc, s_outstr, &c_outstr);
+    if (strcmp(c_outstr, "i am a string.") != 0) {
         printf("Failed int-index setting a String PMC\n");
        return EXIT_FAILURE;
     }
 
     printf("ok 2\n");
-
-    Parrot_pmc_destroy(interp, p_str);
-    Parrot_pmc_destroy(interp, p_keyedstr);
-    Parrot_pmc_destroy(interp, interpmc);
 
     return 0;
 }
