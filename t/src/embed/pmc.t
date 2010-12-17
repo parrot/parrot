@@ -35,16 +35,15 @@ int main(int argc, char* argv[])
 {
     char * c_outstr = NULL;
     Parrot_Init_Args *initargs = NULL;
-    GET_INIT_STRUCT(initargs);
     Parrot_PMC interpmc = NULL;
+    Parrot_PMC p_str = NULL, p_keyedstr = NULL;
+    Parrot_String s_teststr = NULL, s_outstr = NULL;
+
+    GET_INIT_STRUCT(initargs);
     Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
 
-    // TODO: Use a real API function for this.
-    Parrot_PMC p_str = Parrot_pmc_new(interp, enum_class_String), p_keyedstr = NULL;
-
-    Parrot_String s_teststr = NULL, s_outstr = NULL;
     Parrot_api_string_import_ascii(interpmc, "I am a string.", &s_teststr);
-    Parrot_api_pmc_set_string(interpmc, p_str, s_teststr);
+    Parrot_api_pmc_box_string(interpmc, s_teststr, &p_str);
 
     Parrot_api_pmc_get_keyed_int(interpmc, p_str, 0, &p_keyedstr);
     Parrot_api_pmc_get_string(interpmc, p_keyedstr, &s_outstr);

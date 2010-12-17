@@ -402,6 +402,14 @@ Parrot_Int Parrot_api_call_sub(
         __attribute__nonnull__(3);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_box_string(
+    Parrot_PMC interp_pmc,
+    Parrot_String str,
+    ARGOUT(Parrot_PMC * str_pmc))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* str_pmc);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_deserialize(
     Parrot_PMC interp_pmc,
     Parrot_String fpmc,
@@ -498,6 +506,8 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_call_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(signature))
+#define ASSERT_ARGS_Parrot_api_pmc_box_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(str_pmc))
 #define ASSERT_ARGS_Parrot_api_pmc_deserialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_api_pmc_deserialize_bytes \

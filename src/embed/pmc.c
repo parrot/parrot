@@ -118,6 +118,19 @@ Parrot_api_pmc_set_keyed_int(Parrot_PMC interp_pmc, Parrot_PMC pmc,
 
 PARROT_API
 Parrot_Int
+Parrot_api_pmc_box_string(Parrot_PMC interp_pmc, Parrot_String str,
+    ARGOUT(Parrot_PMC * str_pmc))
+{
+    EMBED_API_CALLIN(interp_pmc, interp)
+    *str_pmc = Parrot_pmc_new(interp, enum_class_String);
+    VTABLE_set_string_native(interp, *str_pmc, str);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+/* TODO: Box int and Box float */
+
+PARROT_API
+Parrot_Int
 Parrot_api_add_exception_handler(Parrot_PMC interp_pmc, Parrot_PMC handler)
 {
     EMBED_API_CALLIN(interp_pmc, interp)
