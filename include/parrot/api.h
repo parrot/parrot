@@ -178,6 +178,14 @@ Parrot_Int Parrot_api_load_language(
     Parrot_String lang);
 
 PARROT_API
+Parrot_Int Parrot_api_lookup_class(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC key,
+    ARGOUT(Parrot_PMC * p_class))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* p_class);
+
+PARROT_API
 Parrot_Int Parrot_api_make_interpreter(
     Parrot_PMC parent,
     Parrot_Int flags,
@@ -288,6 +296,8 @@ Parrot_Int Parrot_api_wrap_imcc_hack(
        PARROT_ASSERT_ARG(filename) \
     , PARROT_ASSERT_ARG(pbc))
 #define ASSERT_ARGS_Parrot_api_load_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_lookup_class __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(p_class))
 #define ASSERT_ARGS_Parrot_api_make_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_api_ready_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -475,6 +485,15 @@ Parrot_Int Parrot_api_pmc_get_string(
         FUNC_MODIFIES(* str);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_new_from_class(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC p_class,
+    Parrot_PMC init,
+    ARGOUT(Parrot_PMC * pmc))
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* pmc);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_null(
     Parrot_PMC interp_pmc,
     ARGMOD(Parrot_PMC *pmctonull))
@@ -533,6 +552,8 @@ Parrot_Int Parrot_api_pmc_set_string(
        PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_Parrot_api_pmc_get_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(str))
+#define ASSERT_ARGS_Parrot_api_pmc_new_from_class __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_api_pmc_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pmctonull))
 #define ASSERT_ARGS_Parrot_api_pmc_set_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)

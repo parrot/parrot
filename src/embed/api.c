@@ -525,6 +525,90 @@ Parrot_api_set_compiler(Parrot_PMC interp_pmc, Parrot_String type,
 
 /*
 
+=item C<Parrot_Int Parrot_api_lookup_class(Parrot_PMC interp_pmc, Parrot_PMC
+key, Parrot_PMC * p_class)>
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_lookup_class(Parrot_PMC interp_pmc, Parrot_PMC key, ARGOUT(Parrot_PMC * p_class))
+{
+    EMBED_API_CALLIN(interp_pmc, interp)
+    *p_class = PMCNULL;
+
+    if(PMC_IS_NULL(key))
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Null key passed to get_class");
+
+    if (PObj_is_class_TEST(key))
+        *p_class = key;
+    else {
+        /* Fast select of behavior based on type of the lookup key */
+        switch (key->vtable->base_type) {
+            case enum_class_NameSpace:
+                *p_class = VTABLE_get_class(interp, key);
+                break;
+            case enum_class_String:
+            case enum_class_Key:
+            case enum_class_ResizableStringArray:
+            {
+                PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace, Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
+                PMC * const ns     = Parrot_ns_get_namespace_keyed(interp, hll_ns, key);
+
+                if (!PMC_IS_NULL(ns))
+                    *p_class = VTABLE_get_class(interp, ns);
+            }
+            default:
+                break;
+        }
+    }
+
+    /* If the PMCProxy doesn't exist yet for the given key, we look up the
+       type ID here and create a new one */
+    if (PMC_IS_NULL(*p_class)) {
+        INTVAL type;
+        const INTVAL base_type = key->vtable->base_type;
+        Parrot_PMC type_class;
+
+        /* This is a hack! All PMCs should be able to be handled through
+           a single codepath, and all of them should be able to avoid
+           stringification because it's so imprecise. */
+        if (base_type == enum_class_Key
+         || base_type == enum_class_ResizableStringArray
+         || base_type == enum_class_String)
+            type = Parrot_pmc_get_type(interp, key);
+        else
+            type = Parrot_pmc_get_type_str(interp, VTABLE_get_string(interp, key));
+
+        /* Check if not a PMC or invalid type number */
+        if (type > interp->n_vtable_max || type <= 0)
+            Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not find PMC, or invalid type.");
+
+        type_class = interp->vtables[type]->pmc_class;
+        if (type != enum_class_Class && type_class->vtable->base_type == enum_class_Class) {
+            *p_class = type_class;
+        }
+        else {
+            PMC * const parrot_hll = Parrot_ns_get_namespace_keyed_str(interp, interp->root_namespace, Parrot_str_new_constant(interp, "parrot"));
+            PMC * const pmc_ns = Parrot_ns_make_namespace_keyed_str(interp, parrot_hll, interp->vtables[type]->whoami);
+            PMC * proxy = VTABLE_get_class(interp, pmc_ns);
+
+            /* Create proxy if not found */
+            if (PMC_IS_NULL(proxy)) {
+                proxy = Parrot_pmc_new_init_int(interp, enum_class_PMCProxy, type);
+                Parrot_pcc_invoke_method_from_c_args(interp, pmc_ns, Parrot_str_new_constant(interp, "set_class"), "P->", proxy);
+            }
+            *p_class = proxy;
+        }
+    }
+
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+/*
+
 =back
 
 =cut
