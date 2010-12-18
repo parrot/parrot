@@ -2228,7 +2228,7 @@ test-clean :
 realclean : clean
 	$(RM_RF) \
     $(CONFIGURE_GENERATED_FILES) \
-    $(COVERAGE_DIR)
+    cover_db
 
 distclean : realclean
 
