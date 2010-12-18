@@ -2462,15 +2462,20 @@ COVER_DIRS = \
     src/dynpmc \
     src/gc \
     src/interp \
+    src/io \
+    src/nci \
     src/ops \
     src/packfile \
     src/pmc \
     src/runcore \
     src/string \
     src/string/encoding \
+    frontend/parrot \
+    frontend/parrot_debugger \
+    frontend/pbc_dump \
+    frontend/pbc_merge \
     $(BUILD_DIR) \
     $(BUILD_DIR)/t/perl \
-    src/io \
     compilers/imcc
 
 cover: \
@@ -2544,7 +2549,7 @@ cover-distro: cover.dummy
 	-@make@ distro_tests
 
 cover-clean:
-	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
+	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) t/src ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
 
 ###############################################################################
 #
