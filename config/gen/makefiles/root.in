@@ -2516,6 +2516,10 @@ COVER_DIRS = \
     frontend/pbc_dump \
     frontend/pbc_merge
 
+COVER       = @cover@
+GCOV        = @gcov@
+GCOV2PERL   = @gcov2perl@
+
 cover: \
     cover.dummy \
     cover-testb \
@@ -2531,27 +2535,29 @@ cover: \
     cover-examples \
     cover-distro
 	build_dir=$$PWD; \
+    $(COVER) -delete; \
     for dir in $(COVER_DIRS); \
     do \
 	cd $$dir; \
-	gcov *.c; \
+	$(GCOV) *.c; \
 	cd $$build_dir; \
-	gcov2perl -db $(COVERAGE_DIR) $$dir/*.gcov; \
+	$(GCOVER2PERL) -db $(COVERAGE_DIR) $$dir/*.gcov; \
     done
-	cover $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
+	$(COVER) $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
 
 quickcover: \
     cover.dummy \
     cover-test_runcore
 	build_dir=$$PWD; \
+    $(COVER) -delete; \
     for dir in $(COVER_DIRS); \
     do \
 	cd $$dir; \
-	gcov *.c; \
+	$(GCOV) *.c; \
 	cd $$build_dir; \
-	gcov2perl -db $(COVERAGE_DIR) $$dir/*.gcov; \
+	$(GCOV2PERL) -db $(COVERAGE_DIR) $$dir/*.gcov; \
     done
-	cover $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
+	$(COVER) $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
 
 cover.dummy:
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
