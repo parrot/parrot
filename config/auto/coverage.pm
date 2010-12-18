@@ -7,9 +7,13 @@ config/auto/coverage- Check whether coverage analysis tools are present
 =head1 DESCRIPTION
 
 Coverage analysis is the measurement of the extent to which a program's source
-code is exercised by its tests.  In Parrot, we can perform coverage analysis
+code is exercised by its tests.
+
+In Parrot, we can perform coverage analysis
 on our Parrot source code (well, at least on F<.c> and F<.pmc> files) and on
-the Perl 5 components used in our tools.  To conduct such analysis, we need
+the Perl 5 components used in our tools.
+
+To conduct such analysis, we need
 the C coverage utility F<gcov> and two utilities, F<cover> and F<gcov2perl>,
 which are included in the Devel-Cover distribution from CPAN.  (Paul
 Johnson++).  This configuration step determines whether those utilities are
@@ -57,6 +61,12 @@ sub runstep {
 }
 
 1;
+
+=head1 REFERENCES
+
+L<http://search.cpan.org/dist/Devel-Cover/>.
+
+=cut
 
 # Local Variables:
 #   mode: cperl
