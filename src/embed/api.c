@@ -21,6 +21,29 @@ TO COME.
 
 /* HEADERIZER HFILE: include/parrot/api.h */
 
+
+/*
+
+=item C<Parrot_Int Parrot_api_get_result(Parrot_PMC interp_pmc, ARGOUT(Parrot_Int *is_error),
+ARGOUT(Parrot_PMC * exception), ARGOUT(Parrot_Int *exit_code), ARGOUT(Parrot_String * errmsg))>
+
+Gets the results of the last API function call and stores the results in C<is_error>, 
+C<exception>, C<exit_code> and C<errmsg>. This function returns a true value if this
+call is successful and false value otherwise. The stored information is as follow:
+
+C<is_error> a true value if an unhandled exception was thrown or the program terminated 
+with an error condition and a false value otherwise.
+
+C<exception> the last exception thrown.
+
+C<exit_code> the exit code of the running program.
+
+C<errmsg> contains an string with the last error message.
+
+=cut
+
+*/
+
 PARROT_API
 Parrot_Int
 Parrot_api_get_result(Parrot_PMC interp_pmc, ARGOUT(Parrot_Int *is_error),
@@ -43,6 +66,19 @@ Parrot_api_get_result(Parrot_PMC interp_pmc, ARGOUT(Parrot_Int *is_error),
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
+/*
+
+=item C<Parrot_Int Parrot_api_get_exception_backtrace(Parrot_PMC interp_pmc,
+Parrot_PMC exception, ARGOUT(Parrot_String * bt))>
+
+Gets the backtrace of the interpreter's call chain for the given exception C<expcetion>
+and stores the results in string C<bt>. This function returns a true value if this
+call is successful and false value otherwise.
+
+=cut
+
+*/
+
 PARROT_API
 Parrot_Int
 Parrot_api_get_exception_backtrace(Parrot_PMC interp_pmc,
@@ -53,6 +89,21 @@ Parrot_api_get_exception_backtrace(Parrot_PMC interp_pmc,
     *bt = bts;
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
+
+
+/*
+
+=item C<Parrot_Int Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
+ARGIN_NULLOK(Parrot_Init_Args *args), ARGOUT(Parrot_PMC *interp))>
+
+Creates a new interpreter and stores it in C<interp>. It takes three optional parameters
+the new interpreter's C<flags>, the initialization paremeters C<args> and the C<parent> 
+interpreter. This function returns a true value if this call is successful and false 
+value otherwise.
+
+=cut
+
+*/
 
 PARROT_API
 Parrot_Int
@@ -80,6 +131,19 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
             interp_raw, interp_raw->iglobals, (Parrot_Int)IGLOBALS_INTERPRETER);
     return !PMC_IS_NULL(*interp);
 }
+
+/*
+
+=item C<Parrot_Int Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
+Parrot_UInt trace)>
+
+Sets the C<interp_pmc>'s bytecode running core, the core is specified by the C<corename>
+parameter. This function returns a true value if this call is successful and false value 
+otherwise.
+
+=cut
+
+*/
 
 PARROT_API
 Parrot_Int
@@ -112,6 +176,18 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
+/*
+
+=item C<Parrot_Int Parrot_api_debug_flag(Parrot_PMC interp_pmc, Parrot_Int flags, Parrot_Int set)>
+
+Set/Unset the C<interp_pmc>'s debug flags. If C<set> is in a true value debug flags are set
+otherwise debug flags are cleared. This function returns a true value if this call is successful 
+and false value otherwise.
+
+=cut
+
+*/
+
 PARROT_API
 Parrot_Int
 Parrot_api_debug_flag(Parrot_PMC interp_pmc, Parrot_Int flags, Parrot_Int set)
@@ -124,6 +200,18 @@ Parrot_api_debug_flag(Parrot_PMC interp_pmc, Parrot_Int flags, Parrot_Int set)
         interp->debug_flags &= ~flags;
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
+
+/*
+
+=item C<Parrot_Int Parrot_api_flag(Parrot_PMC interp_pmc, Parrot_Int flags, Parrot_Int set)>
+
+Set/Unset the C<interp_pmc>'s general flags. If C<set> is in a true value general flags are
+set otherwise passed flags are cleared. This function returns a true value if this call is 
+successful and false value otherwise.
+
+=cut
+
+*/
 
 PARROT_API
 Parrot_Int
@@ -141,6 +229,17 @@ Parrot_api_flag(Parrot_PMC interp_pmc, Parrot_Int flags, Parrot_Int set)
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
+/*
+
+=item C<Parrot_Int Parrot_api_set_executable_name(Parrot_PMC interp_pmc, ARGIN(const char * name))>
+
+Sets the executable name for the C<interp_pmc> interpreter. This function returns a true
+value if this call is successful and false value otherwise.
+
+=cut
+
+*/
+
 PARROT_API
 Parrot_Int
 Parrot_api_set_executable_name(Parrot_PMC interp_pmc, ARGIN(const char * name))
@@ -155,6 +254,17 @@ Parrot_api_set_executable_name(Parrot_PMC interp_pmc, ARGIN(const char * name))
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
+/*
+
+=item C<Parrot_Int Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)>
+
+Destroys the C<interp_pmc> interpreter, freeing the memory structures allocated for it.
+This function returns a true value if this call is successful and false value otherwise.
+
+=cut
+
+*/
+
 PARROT_API
 Parrot_Int
 Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
@@ -168,12 +278,11 @@ Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
 
 /*
 
-=over 4
-
 =item C<Parrot_Int Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc, const
 char *filename, Parrot_PMC * pbc)>
 
-Load a bytecode file and return a bytecode PMC.
+Load a bytecode file and return a bytecode PMC. This function returns a true value
+if this call is successful and false value otherwise.
 
 =cut
 
@@ -197,6 +306,19 @@ Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
     VTABLE_set_pointer(interp, *pbc, pf);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
+
+/*
+
+=item C<Parrot_Int Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
+ARGIN(const unsigned char * const pbc), Parrot_Int bytecode_size,
+ARGOUT(Parrot_PMC * pbcpmc))>
+
+
+This function returns a true value if this call is successful and false value otherwise.
+
+=cut
+
+*/
 
 PARROT_API
 Parrot_Int
