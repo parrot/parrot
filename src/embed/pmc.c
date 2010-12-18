@@ -78,7 +78,8 @@ Parrot_api_pmc_get_keyed_int(Parrot_PMC interp_pmc, Parrot_PMC pmc,
 
 PARROT_API
 Parrot_Int
-Parrot_api_pmc_get_keyed_string(Parrot_PMC interp_pmc, Parrot_PMC pmc, Parrot_String key, ARGOUT(Parrot_PMC * value))
+Parrot_api_pmc_get_keyed_string(Parrot_PMC interp_pmc, Parrot_PMC pmc,
+        Parrot_String key, ARGOUT(Parrot_PMC * value))
 {
     EMBED_API_CALLIN(interp_pmc, interp)
     *value = VTABLE_get_pmc_keyed_str(interp, pmc, key);
@@ -127,7 +128,8 @@ Parrot_api_pmc_set_keyed_int(Parrot_PMC interp_pmc, Parrot_PMC pmc,
 
 PARROT_API
 Parrot_Int
-Parrot_api_pmc_set_keyed_string(Parrot_PMC interp_pmc, Parrot_PMC pmc, Parrot_String key, Parrot_PMC value)
+Parrot_api_pmc_set_keyed_string(Parrot_PMC interp_pmc, Parrot_PMC pmc,
+        Parrot_String key, Parrot_PMC value)
 {
     EMBED_API_CALLIN(interp_pmc, interp)
     VTABLE_set_pmc_keyed_str(interp, pmc, key, value);
@@ -137,7 +139,7 @@ Parrot_api_pmc_set_keyed_string(Parrot_PMC interp_pmc, Parrot_PMC pmc, Parrot_St
 PARROT_API
 Parrot_Int
 Parrot_api_pmc_box_string(Parrot_PMC interp_pmc, Parrot_String str,
-    ARGOUT(Parrot_PMC * str_pmc))
+        ARGOUT(Parrot_PMC * str_pmc))
 {
     EMBED_API_CALLIN(interp_pmc, interp)
     *str_pmc = Parrot_pmc_new(interp, enum_class_String);
@@ -188,4 +190,23 @@ Parrot_api_pmc_wrap_string_array(Parrot_PMC interp_pmc, Parrot_Int argc,
     }
     *args = userargv;
     EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_get_class(Parrot_PMC interp_pmc, Parrot_PMC key,
+        ARGOUT(Parrot_PMC *class))
+{
+    EMBED_API_CALLIN(interp_pmc, interp);
+    *class = Parrot_oo_get_class(interp, key);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_new(Parrot_PMC interp_pmc, Parrot_PMC class, ARGOUT(Parrot_PMC *pmc))
+{
+    EMBED_API_CALLIN(interp_pmc, interp);
+    *pmc = VTABLE_instantiate(interp, class, PMCNULL);
+    EMBED_API_CALLOUT(interp_pmc, interp);
 }

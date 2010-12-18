@@ -69,8 +69,6 @@ OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', "Tests get_keyed_string and set_keyed_string" );
 
-#include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/api.h>
 #include <stdio.h>
 
@@ -78,40 +76,43 @@ c_output_is( <<'CODE', <<'OUTPUT', "Tests get_keyed_string and set_keyed_string"
 
 int main(int argc, char* argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
-
-    Parrot_PMC interp_pmc = Parrot_pmc_new(interp, enum_class_ParrotInterpreter);
-    Parrot_PMC hash_pmc = Parrot_pmc_new(interp, enum_class_Hash);
-    Parrot_PMC str_pmc = Parrot_pmc_new(interp, enum_class_String);
-
-    Parrot_String test_str = Parrot_str_new(interp, TEST_STR, 0);
-    Parrot_api_pmc_set_string(interp_pmc, str_pmc, test_str);
-
-    Parrot_String idx_str = Parrot_str_new(interp, "name", 0);
-    Parrot_api_pmc_set_keyed_string(interp_pmc, hash_pmc, idx_str, str_pmc);
-
+    Parrot_Init_Args *initargs = NULL;
+    Parrot_PMC interp_pmc = NULL;
+    Parrot_String name_hash = NULL;
+    Parrot_PMC name_hash_pmc = NULL;
+    Parrot_PMC class_hash = NULL;
+    Parrot_PMC hash_pmc = NULL;
+    Parrot_String test_str = NULL;
+    Parrot_String idx_str = NULL;
+    Parrot_PMC str_pmc = NULL;
     Parrot_PMC str_pmc_out = NULL;
     Parrot_String str_out = NULL;
+    char * str_out_c = NULL;
 
+    GET_INIT_STRUCT(initargs);
+    Parrot_api_make_interpreter(NULL, 0, initargs, &interp_pmc);
+
+    Parrot_api_string_import_ascii(interp_pmc, "Hash", &name_hash);
+    Parrot_api_pmc_box_string(interp_pmc, name_hash, &name_hash_pmc);
+    Parrot_api_pmc_get_class(interp_pmc, name_hash_pmc, &class_hash);
+    Parrot_api_pmc_new(interp_pmc, class_hash, &hash_pmc);
+
+    Parrot_api_string_import_ascii(interp_pmc, TEST_STR, &test_str);
+    Parrot_api_string_import_ascii(interp_pmc, "name", &idx_str);
+
+    Parrot_api_pmc_box_string(interp_pmc, test_str, &str_pmc);
+    Parrot_api_pmc_set_keyed_string(interp_pmc, hash_pmc, idx_str, str_pmc);
     Parrot_api_pmc_get_keyed_string(interp_pmc, hash_pmc, idx_str, &str_pmc_out);
     Parrot_api_pmc_get_string(interp_pmc, str_pmc_out, &str_out);
+    Parrot_api_string_export_ascii(interp_pmc, str_out, &str_out_c);
 
-    if (strcmp(Parrot_str_to_cstring(interp, str_out), TEST_STR) != 0) {
-        printf("Failed accessing a keyed Hash PMC\n");
-        return EXIT_FAILURE;
-    }
-
-    printf("ok 1\n");
-
-    Parrot_pmc_destroy(interp, interp_pmc);
-    Parrot_pmc_destroy(interp, hash_pmc);
-    Parrot_pmc_destroy(interp, str_pmc);
+    printf("%s\n", str_out_c);
 
     return 0;
 }
 
 CODE
-ok 1
+The quick brown fox jumps over the lazy dog
 OUTPUT
 
 # Local Variables:
