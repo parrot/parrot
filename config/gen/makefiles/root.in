@@ -2508,13 +2508,13 @@ COVER_DIRS = \
     src/runcore \
     src/string \
     src/string/encoding \
-    . \
-    ./t/perl \
-    compilers/imcc \
     frontend/parrot \
     frontend/parrot_debugger \
     frontend/pbc_dump \
-    frontend/pbc_merge
+    frontend/pbc_merge \
+    . \
+    ./t/perl \
+    compilers/imcc
 
 COVER       = @cover@
 GCOV        = @gcov@
@@ -2627,7 +2627,7 @@ cover-distro: cover.dummy
 	-@make@ distro_tests
 
 cover-clean:
-	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
+	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) t/src ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
 
 ###############################################################################
 #
