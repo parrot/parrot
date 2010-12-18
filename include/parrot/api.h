@@ -394,6 +394,14 @@ Parrot_Int Parrot_api_add_exception_handler(
     Parrot_PMC handler);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_box_integer(
+    Parrot_PMC interp_pmc,
+    Parrot_Int value,
+    ARGOUT(Parrot_PMC * int_pmc))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* int_pmc);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_box_string(
     Parrot_PMC interp_pmc,
     Parrot_String str,
@@ -551,6 +559,8 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
 
 #define ASSERT_ARGS_Parrot_api_add_exception_handler \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_pmc_box_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(int_pmc))
 #define ASSERT_ARGS_Parrot_api_pmc_box_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(str_pmc))
 #define ASSERT_ARGS_Parrot_api_pmc_deserialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
