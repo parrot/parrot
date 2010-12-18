@@ -57,12 +57,13 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(88)
+    plan(90)
 
     create_namespace_pmc()
     verify_namespace_type()
     get_namespace_class()
     keyed_namespace_lookup()
+    keyed_int_namespace_lookup()
     get_global_opcode()
     inspect_opcode()
     get_sub_from_namespace_hash()
@@ -233,6 +234,21 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
     .const 'Sub' invalidkey = 'namespace_lookup_invalidkeytype'
     throws_type(invalidkey, .EXCEPTION_GLOBAL_NOT_FOUND, 'namespace lookup with invalid key')
+.end
+
+.sub keyed_int_namespace_lookup
+    $P0 = get_root_namespace
+    $P1 = $P0[0]
+    $I0 = isnull $P1
+    is($I0, 1, "root namespace keyed_int returns NULL")
+
+    # This value must be hardcoded here, update the test if the
+    # vtable numbers change
+    .const int I_VTABLE_GET_STRING = 76
+    $P0 = get_namespace ["WithVtable"]
+    $P1 = $P0[I_VTABLE_GET_STRING]
+    $I0 = isnull $P1
+    is($I0, 0, "namespace keyed_int returns a :vtable sub")
 .end
 
 # L<PDD21//>
