@@ -2508,8 +2508,8 @@ COVER_DIRS = \
     src/runcore \
     src/string \
     src/string/encoding \
-    $(BUILD_DIR) \
-    $(BUILD_DIR)/t/perl \
+    . \
+    ./t/perl \
     compilers/imcc \
     frontend/parrot \
     frontend/parrot_debugger \
