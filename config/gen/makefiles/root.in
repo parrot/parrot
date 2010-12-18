@@ -2537,7 +2537,7 @@ cover: \
 	gcov *.c; \
 	cd $$build_dir; \
 	gcov2perl $$dir/*.gcov; \
-    done 
+    done
 	cover -ignore_re '^\/usr\/local\/bin'
 
 QUICKCOVER_DIRS = \
