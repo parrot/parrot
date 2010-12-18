@@ -445,6 +445,15 @@ Parrot_Int Parrot_api_pmc_get_keyed_int(
         FUNC_MODIFIES(* value);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_get_keyed_string(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pmc,
+    Parrot_String key,
+    ARGOUT(Parrot_PMC * value))
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* value);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_get_string(
     Parrot_PMC interp_pmc,
     Parrot_PMC pmc,
@@ -485,6 +494,13 @@ Parrot_Int Parrot_api_pmc_set_keyed_int(
     Parrot_PMC value);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_set_keyed_string(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pmc,
+    Parrot_String key,
+    Parrot_PMC value);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_set_string(
     Parrot_PMC interp_pmc,
     Parrot_PMC pmc,
@@ -516,6 +532,9 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
        PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_Parrot_api_pmc_get_keyed_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_Parrot_api_pmc_get_keyed_string \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_Parrot_api_pmc_get_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_Parrot_api_pmc_invoke __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -524,6 +543,8 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
 #define ASSERT_ARGS_Parrot_api_pmc_set_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_pmc_set_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_pmc_set_keyed_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_pmc_set_keyed_string \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_pmc_set_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_pmc_wrap_string_array \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
