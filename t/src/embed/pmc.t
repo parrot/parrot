@@ -115,6 +115,63 @@ CODE
 The quick brown fox jumps over the lazy dog
 OUTPUT
 
+c_output_is( <<'CODE', <<'OUTPUT', "get/set_keyed" );
+
+#include <parrot/parrot.h>
+#include <parrot/embed.h>
+#include <parrot/api.h>
+#include <stdio.h>
+
+int main(int argc, char* argv[])
+{
+    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_PMC interpmc = Parrot_pmc_new(interp, enum_class_ParrotInterpreter);
+
+    Parrot_PMC p_str = Parrot_pmc_new(interp, enum_class_String), p_keyedstr = NULL, p_idx = Parrot_pmc_new(interp, enum_class_Integer);
+
+    Parrot_String s_teststr = NULL, s_outstr = NULL;
+    Parrot_api_string_import_ascii(interpmc, "I am a string.", &s_teststr);
+    Parrot_api_pmc_set_string(interpmc, p_str, s_teststr);
+
+    Parrot_api_pmc_set_integer(interpmc, p_idx, 1);
+
+    Parrot_api_pmc_get_keyed(interpmc, p_str, p_idx, &p_keyedstr);
+    Parrot_api_pmc_get_string(interpmc, p_keyedstr, &s_outstr);
+    if (strcmp(Parrot_str_to_cstring(interp, s_outstr), " ") != 0) {
+        printf("Failed indexing a String PMC\n");
+        return EXIT_FAILURE;
+    }
+
+    printf("ok 1\n");
+
+    Parrot_api_string_import_ascii(interpmc, "n", &s_teststr);
+    Parrot_api_pmc_set_string(interpmc, p_keyedstr, s_teststr);
+
+    Parrot_api_pmc_set_integer(interpmc, p_idx, 3);
+
+    Parrot_api_pmc_set_keyed(interpmc, p_str, p_idx, p_keyedstr);
+    Parrot_api_pmc_get_string(interpmc, p_str, &s_outstr);
+
+    if (strcmp(Parrot_str_to_cstring(interp, s_outstr), "I an a string.") != 0) {
+        printf("Failed PMC-index setting a String PMC\n");
+       return EXIT_FAILURE;
+    }
+
+    printf("ok 2\n");
+
+    Parrot_pmc_destroy(interp, p_str);
+    Parrot_pmc_destroy(interp, p_keyedstr);
+    Parrot_pmc_destroy(interp, p_idx);
+    Parrot_pmc_destroy(interp, interpmc);
+
+    return 0;
+}
+
+CODE
+ok 1
+ok 2
+OUTPUT
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

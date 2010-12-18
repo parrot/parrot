@@ -68,6 +68,16 @@ Parrot_api_pmc_get_float(Parrot_PMC interp_pmc, Parrot_PMC pmc,
 
 PARROT_API
 Parrot_Int
+Parrot_api_pmc_get_keyed(Parrot_PMC interp_pmc, Parrot_PMC pmc,
+    Parrot_PMC key, ARGOUT(Parrot_PMC * value))
+{
+    EMBED_API_CALLIN(interp_pmc, interp)
+    *value = VTABLE_get_pmc_keyed(interp, pmc, key);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+PARROT_API
+Parrot_Int
 Parrot_api_pmc_get_keyed_int(Parrot_PMC interp_pmc, Parrot_PMC pmc,
     Parrot_Int key, ARGOUT(Parrot_PMC * value))
 {
@@ -113,6 +123,16 @@ Parrot_api_pmc_set_float(Parrot_PMC interp_pmc, Parrot_PMC pmc,
 {
     EMBED_API_CALLIN(interp_pmc, interp)
     VTABLE_set_number_native(interp, pmc, value);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_set_keyed(Parrot_PMC interp_pmc, Parrot_PMC pmc,
+    Parrot_PMC key, Parrot_PMC value)
+{
+    EMBED_API_CALLIN(interp_pmc, interp)
+    VTABLE_set_pmc_keyed(interp, pmc, key, value);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
