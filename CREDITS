@@ -323,6 +323,11 @@ N: Dave Woldrich
 D: Win32 build fixes
 E: dave@woldrich.com
 
+N: David Czech
+U: kapace
+E: davidczech510@gmail.com
+D: increasing EventHandler test coverage
+
 N: David M. Lloyd
 U: dmlloyd
 E: dmlloyd@tds.net
