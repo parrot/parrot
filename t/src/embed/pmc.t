@@ -24,7 +24,7 @@ Tests PMC API support.
 
 =cut
 
-plan tests => 3;
+plan tests => 4;
 
 c_output_is( <<'CODE', <<'OUTPUT', "get/set_keyed_int" );
 
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     Parrot_api_string_import_ascii(interpmc, "I am a string.", &s_teststr);
     Parrot_api_pmc_box_string(interpmc, s_teststr, &p_str);
 
-    Parrot_api_pmc_get_keyed_int(interpmc, p_pmc, 0, &p_keyedstr);
+    Parrot_api_pmc_get_keyed_int(interpmc, p_str, 0, &p_keyedstr);
     Parrot_api_pmc_get_string(interpmc, p_keyedstr, &s_outstr);
     Parrot_api_string_export_ascii(interpmc, s_outstr, &c_outstr);
     printf("%s\n", c_outstr);
@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
     Parrot_api_string_import_ascii(interp_pmc, "Hash", &name_hash);
     Parrot_api_pmc_box_string(interp_pmc, name_hash, &name_hash_pmc);
     Parrot_api_pmc_get_class(interp_pmc, name_hash_pmc, &class_hash);
-    Parrot_api_pmc_new(interp_pmc, class_hash, &hash_pmc);
+    Parrot_api_pmc_new_from_class(interp_pmc, class_hash, NULL, &hash_pmc);
 
     Parrot_api_string_import_ascii(interp_pmc, TEST_STR, &test_str);
     Parrot_api_string_import_ascii(interp_pmc, "name", &idx_str);
@@ -188,10 +188,10 @@ int main(int argc, char* argv[])
     Parrot_PMC p_key, p_class, p_pmc;
 
     char* string_class[] = { "String" };
-    Parrot_api_build_argv_array(interpmc, 1, string_class, &p_key);
+    Parrot_api_pmc_wrap_string_array(interpmc, 1, string_class, &p_key);
 
-    Parrot_api_lookup_class(interpmc, p_key, &p_class);
-    Parrot_api_pmc_new_from_class(interpmc, p_class, PMCNULL, &p_pmc);
+    Parrot_api_pmc_get_class(interpmc, p_key, &p_class);
+    Parrot_api_pmc_new_from_class(interpmc, p_class, NULL, &p_pmc);
 
     Parrot_api_string_import_ascii(interpmc, "This is a string!", &s_str);
     Parrot_api_pmc_set_string(interpmc, p_pmc, s_str);
@@ -204,10 +204,10 @@ int main(int argc, char* argv[])
     printf("ok 1\n");
 
     char* float_class[] = { "Float" };
-    Parrot_api_build_argv_array(interpmc, 1, float_class, &p_key);
+    Parrot_api_pmc_wrap_string_array(interpmc, 1, float_class, &p_key);
 
-    Parrot_api_lookup_class(interpmc, p_key, &p_class);
-    Parrot_api_pmc_new_from_class(interpmc, p_class, PMCNULL, &p_pmc);
+    Parrot_api_pmc_get_class(interpmc, p_key, &p_class);
+    Parrot_api_pmc_new_from_class(interpmc, p_class, NULL, &p_pmc);
 
     Parrot_api_pmc_set_float(interpmc, p_pmc, 3.1415);
     Parrot_api_pmc_get_string(interpmc, p_pmc, &s_str2);

@@ -9,6 +9,8 @@ Parrot_Int
 Parrot_api_pmc_new_from_class(Parrot_PMC interp_pmc, Parrot_PMC p_class, Parrot_PMC init, ARGOUT(Parrot_PMC * pmc))
 {
     EMBED_API_CALLIN(interp_pmc, interp)
+    if (init == NULL)
+        init = PMCNULL;
     *pmc = VTABLE_instantiate(interp, p_class, init);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
