@@ -6,6 +6,15 @@
 
 PARROT_API
 Parrot_Int
+Parrot_api_pmc_new_from_class(Parrot_PMC interp_pmc, Parrot_PMC p_class, Parrot_PMC init, ARGOUT(Parrot_PMC * pmc))
+{
+    EMBED_API_CALLIN(interp_pmc, interp)
+    *pmc = VTABLE_instantiate(interp, p_class, init);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+PARROT_API
+Parrot_Int
 Parrot_api_pmc_deserialize(Parrot_PMC interp_pmc, Parrot_String fpmc,
         ARGOUT(Parrot_PMC * pmc))
 {
@@ -219,14 +228,5 @@ Parrot_api_pmc_get_class(Parrot_PMC interp_pmc, Parrot_PMC key,
 {
     EMBED_API_CALLIN(interp_pmc, interp);
     *class = Parrot_oo_get_class(interp, key);
-    EMBED_API_CALLOUT(interp_pmc, interp);
-}
-
-PARROT_API
-Parrot_Int
-Parrot_api_pmc_new(Parrot_PMC interp_pmc, Parrot_PMC class, ARGOUT(Parrot_PMC *pmc))
-{
-    EMBED_API_CALLIN(interp_pmc, interp);
-    *pmc = VTABLE_instantiate(interp, class, PMCNULL);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }

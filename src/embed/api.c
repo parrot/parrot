@@ -502,6 +502,7 @@ Parrot_api_set_compiler(Parrot_PMC interp_pmc, Parrot_String type,
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
+
 /*
 
 =back
