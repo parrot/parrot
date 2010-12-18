@@ -425,26 +425,6 @@ Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
 
 PARROT_API
 Parrot_Int
-Parrot_api_build_argv_array(Parrot_PMC interp_pmc, Parrot_Int argc,
-        ARGIN(const char ** argv), ARGOUT(Parrot_PMC * args))
-{
-    //ASSERT_ARGS(Parrot_api_build_argv_array)
-    EMBED_API_CALLIN(interp_pmc, interp)
-    PMC * const userargv = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
-    Parrot_Int i;
-
-    for (i = 0; i < argc; ++i) {
-        /* Run through argv, adding everything to the array */
-        STRING * const arg = Parrot_str_new_init(interp, argv[i], strlen(argv[i]),
-                Parrot_utf8_encoding_ptr, PObj_external_FLAG);
-        VTABLE_push_string(interp, userargv, arg);
-    }
-    *args = userargv;
-    EMBED_API_CALLOUT(interp_pmc, interp)
-}
-
-PARROT_API
-Parrot_Int
 Parrot_api_set_warnings(Parrot_PMC interp_pmc, Parrot_Int flags)
 {
     //ASSERT_ARGS(Parrot_api_set_warnings)
@@ -623,7 +603,6 @@ Parrot_api_get_compiler(Parrot_PMC interp_pmc, Parrot_String type,
     *compiler = Parrot_get_compiler(interp, type);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
-
 
 /*
 
