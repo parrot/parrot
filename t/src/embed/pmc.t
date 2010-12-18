@@ -162,19 +162,22 @@ OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', "PMC lookup/instantiation" );
 
-#include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/api.h>
 #include <stdio.h>
 
 int main(int argc, char* argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
-    Parrot_PMC interpmc = Parrot_pmc_new(interp, enum_class_ParrotInterpreter);
+    Parrot_Init_Args *initargs = NULL;
+    Parrot_PMC interpmc = NULL;
     Parrot_String s_str, s_str2;
     Parrot_PMC p_key, p_class, p_pmc;
-
     char* string_class[] = { "String" };
+    char* float_class[] = { "Float" };
+    char *c_out;
+
+    GET_INIT_STRUCT(initargs);
+    Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+
     Parrot_api_pmc_wrap_string_array(interpmc, 1, string_class, &p_key);
 
     Parrot_api_pmc_get_class(interpmc, p_key, &p_class);
@@ -183,14 +186,9 @@ int main(int argc, char* argv[])
     Parrot_api_string_import_ascii(interpmc, "This is a string!", &s_str);
     Parrot_api_pmc_set_string(interpmc, p_pmc, s_str);
     Parrot_api_pmc_get_string(interpmc, p_pmc, &s_str2);
-    if (strcmp(Parrot_str_to_cstring(interp, s_str2), "This is a string!") != 0) {
-        printf("Failed instantiating, setting, and getting a String PMC\n");
-        return EXIT_FAILURE;
-    }
+    Parrot_api_string_export_ascii(interpmc, s_str2, &c_out);
+    printf("%s\n", c_out);
 
-    printf("ok 1\n");
-
-    char* float_class[] = { "Float" };
     Parrot_api_pmc_wrap_string_array(interpmc, 1, float_class, &p_key);
 
     Parrot_api_pmc_get_class(interpmc, p_key, &p_class);
@@ -198,19 +196,14 @@ int main(int argc, char* argv[])
 
     Parrot_api_pmc_set_float(interpmc, p_pmc, 3.1415);
     Parrot_api_pmc_get_string(interpmc, p_pmc, &s_str2);
-    if (strcmp(Parrot_str_to_cstring(interp, s_str2), "3.1415") != 0) {
-        printf("Failed instantiating, setting, and getting a Float PMC\n");
-        return EXIT_FAILURE;
-    }
-
-    Parrot_pmc_destroy(interp, p_key);
-    Parrot_pmc_destroy(interp, p_class);
-    Parrot_pmc_destroy(interp, p_pmc);
+    Parrot_api_string_export_ascii(interpmc, s_str2, &c_out);
+    printf("%s\n", c_out);
 
     return 0;
 }
 CODE
-ok 1
+This is a string!
+3.1415
 OUTPUT
 
 # Local Variables:
