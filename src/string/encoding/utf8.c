@@ -74,9 +74,18 @@ static UINTVAL utf8_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL utf8_scan(PARROT_INTERP, ARGIN(const STRING *src))
+static INTVAL utf8_partial_scan(PARROT_INTERP,
+    ARGMOD(STRING *src),
+    INTVAL count,
+    INTVAL delim)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*src);
+
+static void utf8_scan(PARROT_INTERP, ARGMOD(STRING *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*src);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -116,6 +125,9 @@ static STRING * utf8_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_utf8_ord __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_utf8_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_utf8_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -187,7 +199,7 @@ utf8_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 
 /*
 
-=item C<static UINTVAL utf8_scan(PARROT_INTERP, const STRING *src)>
+=item C<static void utf8_scan(PARROT_INTERP, STRING *src)>
 
 Returns the number of characters in string C<str> by scanning the string.
 
@@ -195,24 +207,53 @@ Returns the number of characters in string C<str> by scanning the string.
 
 */
 
-static UINTVAL
-utf8_scan(PARROT_INTERP, ARGIN(const STRING *src))
+static void
+utf8_scan(PARROT_INTERP, ARGMOD(STRING *src))
 {
     ASSERT_ARGS(utf8_scan)
+    const UINTVAL orig_bufused = src->bufused;
+
+    utf8_partial_scan(interp, src, -1, -1);
+
+    if (src->bufused != orig_bufused)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
+            "Unaligned end in UTF-8 string\n");
+}
+
+
+/*
+
+=item C<static INTVAL utf8_partial_scan(PARROT_INTERP, STRING *src, INTVAL
+count, INTVAL delim)>
+
+Partial scan of UTF-8 string
+
+=cut
+
+*/
+
+static INTVAL
+utf8_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
+        INTVAL delim)
+{
+    ASSERT_ARGS(utf8_partial_scan)
     const utf8_t *u8ptr = (const utf8_t *)src->strstart;
     const utf8_t *u8end = (const utf8_t *)(src->strstart + src->bufused);
-    UINTVAL characters = 0;
+    UINTVAL characters  = 0;
+    UINTVAL max_chars   = count >= 0 ? (UINTVAL)count : src->bufused;
+    UINTVAL needed      = 0;
 
-    while (u8ptr < u8end) {
+    while (u8ptr < u8end && characters < max_chars) {
         UINTVAL c = *u8ptr;
 
         if (UTF8_IS_START(c)) {
             size_t len = UTF8SKIP(u8ptr);
             size_t count;
 
-            if (u8ptr + len > u8end)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
-                    "Unaligned end in UTF-8 string\n");
+            if (u8ptr + len > u8end) {
+                needed = u8ptr + len - u8end;
+                break;
+            }
 
             /* Check for overlong forms */
             if (UTF8_IS_OVERLONG(c, u8ptr[1]))
@@ -242,9 +283,15 @@ utf8_scan(PARROT_INTERP, ARGIN(const STRING *src))
 
         ++u8ptr;
         ++characters;
+
+        if (c == (UINTVAL)delim)
+            break;
     }
 
-    return characters;
+    src->bufused = (const char *)u8ptr - (const char *)src->strstart;
+    src->strlen  = characters;
+
+    return needed;
 }
 
 
@@ -528,6 +575,7 @@ static STR_VTABLE Parrot_utf8_encoding = {
     encoding_hash,
 
     utf8_scan,
+    utf8_partial_scan,
     utf8_ord,
     encoding_substr,
 

@@ -31,9 +31,18 @@ PARROT_CANNOT_RETURN_NULL
 static STRING* binary_error(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
 
-static UINTVAL binary_scan(PARROT_INTERP, ARGIN(const STRING *src))
+static INTVAL binary_partial_scan(PARROT_INTERP,
+    ARGMOD(STRING *src),
+    INTVAL count,
+    INTVAL delim)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*src);
+
+static void binary_scan(PARROT_INTERP, ARGMOD(STRING *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*src);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* binary_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
@@ -44,6 +53,9 @@ static STRING* binary_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_binary_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_binary_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_binary_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -124,7 +136,7 @@ binary_chr(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<static UINTVAL binary_scan(PARROT_INTERP, const STRING *src)>
+=item C<static void binary_scan(PARROT_INTERP, STRING *src)>
 
 Returns the number of codepoints in string C<src>. No scanning needed
 for fixed encodings.
@@ -133,12 +145,51 @@ for fixed encodings.
 
 */
 
-static UINTVAL
-binary_scan(PARROT_INTERP, ARGIN(const STRING *src))
+static void
+binary_scan(PARROT_INTERP, ARGMOD(STRING *src))
 {
     ASSERT_ARGS(binary_scan)
 
-    return src->bufused;
+    src->strlen = src->bufused;
+}
+
+
+/*
+
+=item C<static INTVAL binary_partial_scan(PARROT_INTERP, STRING *src, INTVAL
+count, INTVAL delim)>
+
+Partial scan of binary string. Stops after C<count> bytes or if character
+C<delim> is found. Setting C<count> or C<delim> to -1 disables these tests.
+
+=cut
+
+*/
+
+static INTVAL
+binary_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
+        INTVAL delim)
+{
+    ASSERT_ARGS(binary_partial_scan)
+    size_t i;
+    size_t len = src->bufused;
+
+    if (count >= 0 && (UINTVAL)count < len)
+        len = count;
+
+    if (delim >= 0) {
+        for (i = 0; i < len; ++i) {
+            if (src->strstart[i] == delim) {
+                len = i + 1;
+                break;
+            }
+        }
+    }
+
+    src->bufused = len;
+    src->strlen  = len;
+
+    return 0;
 }
 
 
@@ -158,6 +209,7 @@ static STR_VTABLE Parrot_binary_encoding = {
     fixed8_hash,
 
     binary_scan,
+    binary_partial_scan,
     fixed8_ord,
     fixed_substr,
 

@@ -46,11 +46,6 @@ PARROT_WARN_UNUSED_RESULT
 static size_t null_hash(SHIM_INTERP, ARGIN(const STRING *s), size_t hashval)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
-static UINTVAL null_scan(PARROT_INTERP, ARGIN(const STRING *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 #define ASSERT_ARGS_null_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(lhs) \
@@ -63,9 +58,6 @@ static UINTVAL null_scan(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_null_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_null_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -154,25 +146,6 @@ null_hash(SHIM_INTERP, ARGIN(const STRING *s), size_t hashval)
 }
 
 
-/*
-
-=item C<static UINTVAL null_scan(PARROT_INTERP, const STRING *src)>
-
-Scans the null string. Always returns 0.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static UINTVAL
-null_scan(PARROT_INTERP, ARGIN(const STRING *src))
-{
-    ASSERT_ARGS(null_scan)
-    return 0;
-}
-
-
 static STR_VTABLE Parrot_null_encoding = {
     0,
     "null",
@@ -188,7 +161,8 @@ static STR_VTABLE Parrot_null_encoding = {
     (str_vtable_rindex_t)null_error,
     null_hash,
 
-    null_scan,
+    (str_vtable_scan_t)null_error,
+    (str_vtable_partial_scan_t)null_error,
     (str_vtable_ord_t)null_error,
     (str_vtable_substr_t)null_error,
 

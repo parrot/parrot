@@ -70,10 +70,18 @@ static UINTVAL ucs2_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
-static UINTVAL ucs2_scan(PARROT_INTERP, ARGIN(const STRING *src))
+static INTVAL ucs2_partial_scan(PARROT_INTERP,
+    ARGMOD(STRING *src),
+    INTVAL count,
+    INTVAL delim)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*src);
+
+static void ucs2_scan(PARROT_INTERP, ARGMOD(STRING *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*src);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -98,6 +106,9 @@ static STRING * ucs2_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_ucs2_iter_skip __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_ucs2_ord __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_ucs2_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ucs2_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -166,7 +177,7 @@ ucs2_check_codepoint(PARROT_INTERP, UINTVAL c)
 
 /*
 
-=item C<static UINTVAL ucs2_scan(PARROT_INTERP, const STRING *src)>
+=item C<static void ucs2_scan(PARROT_INTERP, STRING *src)>
 
 Returns the number of codepoints in string C<src>.
 
@@ -174,9 +185,8 @@ Returns the number of codepoints in string C<src>.
 
 */
 
-PARROT_WARN_UNUSED_RESULT
-static UINTVAL
-ucs2_scan(PARROT_INTERP, ARGIN(const STRING *src))
+static void
+ucs2_scan(PARROT_INTERP, ARGMOD(STRING *src))
 {
     ASSERT_ARGS(ucs2_scan)
     const utf16_t * const ptr = (utf16_t *)src->strstart;
@@ -191,8 +201,48 @@ ucs2_scan(PARROT_INTERP, ARGIN(const STRING *src))
         ucs2_check_codepoint(interp, ptr[i]);
     }
 
-    return len;
+    src->strlen = len;
 }
+
+
+/*
+
+=item C<static INTVAL ucs2_partial_scan(PARROT_INTERP, STRING *src, INTVAL
+count, INTVAL delim)>
+
+Partial scan of UCS-2 string
+
+=cut
+
+*/
+
+static INTVAL
+ucs2_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
+        INTVAL delim)
+{
+    ASSERT_ARGS(ucs2_scan)
+    const utf16_t * const ptr = (utf16_t *)src->strstart;
+    UINTVAL               len = src->bufused >> 1;
+    UINTVAL               i;
+
+    if (count >= 0 && (UINTVAL)count < len)
+        len = count;
+
+    for (i = 0; i < len; ++i) {
+        ucs2_check_codepoint(interp, ptr[i]);
+
+        if (ptr[i] == delim) {
+            len = i + 1;
+            break;
+        }
+    }
+
+    src->bufused = len << 1;
+    src->strlen  = len;
+
+    return 0;
+}
+
 
 /*
 
@@ -361,6 +411,7 @@ static STR_VTABLE Parrot_ucs2_encoding = {
     ucs2_hash,
 
     ucs2_scan,
+    ucs2_partial_scan,
     ucs2_ord,
     fixed_substr,
 

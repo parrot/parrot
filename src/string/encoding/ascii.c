@@ -39,10 +39,18 @@ static STRING* ascii_downcase_first(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
-static UINTVAL ascii_scan(PARROT_INTERP, ARGIN(const STRING *src))
+static INTVAL ascii_partial_scan(PARROT_INTERP,
+    ARGMOD(STRING *src),
+    INTVAL count,
+    INTVAL delim)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*src);
+
+static void ascii_scan(PARROT_INTERP, ARGMOD(STRING *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*src);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* ascii_titlecase(PARROT_INTERP, ARGIN(const STRING *src))
@@ -76,6 +84,9 @@ static STRING* ascii_upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ascii_downcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_ascii_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ascii_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -145,7 +156,7 @@ ascii_chr(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<static UINTVAL ascii_scan(PARROT_INTERP, const STRING *src)>
+=item C<static void ascii_scan(PARROT_INTERP, STRING *src)>
 
 Returns the number of codepoints in string C<src>.
 
@@ -153,9 +164,8 @@ Returns the number of codepoints in string C<src>.
 
 */
 
-PARROT_WARN_UNUSED_RESULT
-static UINTVAL
-ascii_scan(PARROT_INTERP, ARGIN(const STRING *src))
+static void
+ascii_scan(PARROT_INTERP, ARGMOD(STRING *src))
 {
     ASSERT_ARGS(ascii_scan)
     unsigned char *p = (unsigned char *)src->strstart;
@@ -167,7 +177,49 @@ ascii_scan(PARROT_INTERP, ARGIN(const STRING *src))
                 "Invalid character in ASCII string");
     }
 
-    return src->bufused;
+    src->strlen = src->bufused;
+}
+
+
+/*
+
+=item C<static INTVAL ascii_partial_scan(PARROT_INTERP, STRING *src, INTVAL
+count, INTVAL delim)>
+
+Partial scan of ascii string. Stops after C<count> bytes or if character
+C<delim> is found. Setting C<count> or C<delim> to -1 disables these tests.
+
+=cut
+
+*/
+
+static INTVAL
+ascii_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
+        INTVAL delim)
+{
+    ASSERT_ARGS(ascii_partial_scan)
+    unsigned char *p = (unsigned char *)src->strstart;
+    size_t i;
+    size_t len = src->bufused;
+
+    if (count >= 0 && (UINTVAL)count < len)
+        len = count;
+
+    for (i = 0; i < len; ++i) {
+        if (p[i] >= 0x80)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_STRING_REPRESENTATION,
+                "Invalid character in ASCII string");
+
+        if (p[i] == delim) {
+            len = i + 1;
+            break;
+        }
+    }
+
+    src->bufused = len;
+    src->strlen  = len;
+
+    return 0;
 }
 
 
@@ -358,6 +410,7 @@ static STR_VTABLE Parrot_ascii_encoding = {
     fixed8_hash,
 
     ascii_scan,
+    ascii_partial_scan,
     fixed8_ord,
     fixed_substr,
 

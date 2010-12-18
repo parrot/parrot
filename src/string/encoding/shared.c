@@ -1433,7 +1433,7 @@ unicode_convert_case(PARROT_INTERP, ARGIN(const STRING *src), int mode)
 
     dest->bufused = convert_case_buf(interp, dest->strstart, dest_len,
                                      src->strstart, src->bufused, mode);
-    dest->strlen  = STRING_scan(interp, dest);
+    STRING_scan(interp, dest);
 
     /* downgrade if possible */
     if (dest->bufused == dest->strlen * 2)

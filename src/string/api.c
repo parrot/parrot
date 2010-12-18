@@ -716,7 +716,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
         Buffer_bufstart(s) = s->strstart = PARROT_const_cast(char *, buffer);
         Buffer_buflen(s)   = s->bufused  = len;
 
-        s->strlen = STRING_scan(interp, s);
+        STRING_scan(interp, s);
 
         return s;
     }
@@ -726,7 +726,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
     if (buffer && len) {
         mem_sys_memcopy(s->strstart, buffer, len);
         s->bufused = len;
-        s->strlen = STRING_scan(interp, s);
+        STRING_scan(interp, s);
     }
     else
         s->strlen = s->bufused = 0;

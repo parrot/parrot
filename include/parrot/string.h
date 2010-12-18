@@ -35,6 +35,7 @@
 #define STRING_hash(i, src, seed) ((src)->encoding)->hash((i), (src), (seed))
 
 #define STRING_scan(i, src) ((src)->encoding)->scan((i), (src))
+#define STRING_partial_scan(i, src, count, delim) ((src)->encoding)->scan((i), (src), (count), (delim))
 #define STRING_ord(i, src, offset) ((src)->encoding)->ord((i), (src), (offset))
 #define STRING_substr(i, src, offset, count) ((src)->encoding)->substr((i), (src), (offset), (count))
 
@@ -90,7 +91,8 @@ typedef INTVAL   (*str_vtable_index_t)(PARROT_INTERP, ARGIN(const STRING *src), 
 typedef INTVAL   (*str_vtable_rindex_t)(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *search_string), INTVAL offset);
 typedef size_t   (*str_vtable_hash_t)(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval);
 
-typedef UINTVAL  (*str_vtable_scan_t)(PARROT_INTERP, ARGIN(const STRING *src));
+typedef void     (*str_vtable_scan_t)(PARROT_INTERP, ARGMOD(STRING *src));
+typedef INTVAL   (*str_vtable_partial_scan_t)(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count, INTVAL delim);
 typedef UINTVAL  (*str_vtable_ord_t)(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset);
 typedef STRING * (*str_vtable_substr_t)(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL count);
 
@@ -134,6 +136,7 @@ struct _str_vtable {
     str_vtable_hash_t                   hash;
 
     str_vtable_scan_t                   scan;
+    str_vtable_partial_scan_t           partial_scan;
     str_vtable_ord_t                    ord;
     str_vtable_substr_t                 substr;
 
