@@ -24,7 +24,7 @@ Tests PMC API support.
 
 =cut
 
-plan tests => 2;
+plan tests => 3;
 
 c_output_is( <<'CODE', <<'OUTPUT', "get/set_keyed_int" );
 
