@@ -2512,13 +2512,9 @@ COVER_DIRS = \
     frontend/parrot_debugger \
     frontend/pbc_dump \
     frontend/pbc_merge \
-    . \
-    ./t/perl \
+    $(BUILD_DIR) \
+    $(BUILD_DIR)/t/perl \
     compilers/imcc
-
-COVER       = @cover@
-GCOV        = @gcov@
-GCOV2PERL   = @gcov2perl@
 
 cover: \
     cover.dummy \
@@ -2535,22 +2531,46 @@ cover: \
     cover-examples \
     cover-distro
 	build_dir=$$PWD; \
-    $(COVER) -delete; \
     for dir in $(COVER_DIRS); \
     do \
 	cd $$dir; \
-	$(GCOV) *.c; \
+	gcov *.c; \
 	cd $$build_dir; \
-	$(GCOVER2PERL) -db $(COVERAGE_DIR) $$dir/*.gcov; \
-    done
-	$(COVER) $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
+	gcov2perl $$dir/*.gcov; \
+    done 
+	cover -ignore_re '^\/usr\/local\/bin'
+
+QUICKCOVER_DIRS = \
+    src \
+    src/call \
+    src/dynoplibs \
+    src/dynpmc \
+    src/gc \
+    src/interp \
+    src/io \
+    src/nci \
+    src/ops \
+    src/packfile \
+    src/pmc \
+    src/runcore \
+    src/string \
+    src/string/encoding \
+    frontend/parrot \
+    frontend/parrot_debugger \
+    frontend/pbc_dump \
+    frontend/pbc_merge \
+    compilers/imcc
+
+COVER       = @cover@
+GCOV        = @gcov@
+GCOV2PERL   = @gcov2perl@
 
 quickcover: \
     cover.dummy \
     cover-test_runcore
 	build_dir=$$PWD; \
     $(COVER) -delete; \
-    for dir in $(COVER_DIRS); \
+    for dir in $(QUICKCOVER_DIRS); \
     do \
 	cd $$dir; \
 	$(GCOV) *.c; \
@@ -2627,7 +2647,7 @@ cover-distro: cover.dummy
 	-@make@ distro_tests
 
 cover-clean:
-	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) t/src ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
+	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) $(QUICKCOVER_DIRS) t/src ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
 
 ###############################################################################
 #
