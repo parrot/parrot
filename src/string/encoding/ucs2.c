@@ -220,7 +220,7 @@ static INTVAL
 ucs2_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
         INTVAL delim)
 {
-    ASSERT_ARGS(ucs2_scan)
+    ASSERT_ARGS(ucs2_partial_scan)
     const utf16_t * const ptr = (utf16_t *)src->strstart;
     UINTVAL               len = src->bufused >> 1;
     UINTVAL               i;

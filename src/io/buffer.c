@@ -478,7 +478,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
 
     part.encoding = s->encoding;
 
-    while(1) {
+    while (1) {
         const size_t buffer_size = buffer_end - buffer_next;
         size_t       chunk_size, new_size, decoded_bytes;
         INTVAL       got, res;
