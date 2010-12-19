@@ -35,6 +35,7 @@ DATA_DIR        = "@datadir@"
 DOC_DIR         = "@docdir@"
 VERSION_DIR     = "@versiondir@"
 SRC_DIR         = "@srcdir@"
+COVERAGE_DIR    = "@coveragedir@"
 
 ###############################################################################
 #
@@ -1823,43 +1824,58 @@ editor-clean :
 # The --running-make-test argument is currently used by long-running tests
 # to disable GC_DEBUG.
 EXTRA_TEST_ARGS = --gc-debug
-DISTRO_TEST_FILES = \
-    t/distro/*.t
+
+# Directories holding tests
+DYNOPLIBS_TESTS_DIR = t/dynoplibs
+DYNPMC_TESTS_DIR = t/dynpmc
+INSTALL_TOOLS_TESTS_DIR = $(TOOLS_TESTS_DIR)/install
+OO_TESTS_DIR = t/oo
+OP_TESTS_DIR = t/op
+PIR_TESTS_DIR = t/pir
+PMC_TESTS_DIR = t/pmc
+HARNESS_TESTS_DIR = t/pharness
+MANIFEST_TESTS_DIR = t/manifest
+PMC2CUTILS_TESTS_DIR = $(TOOLS_TESTS_DIR)/pmc2cutils
+TOOLS_TESTS_DIR = t/tools
+
 BENCHMARK_TEST_FILES = \
     t/benchmark/*.t
-PERL_TEST_FILES = \
-    t/perl/*.t
+BUILDTOOLS_TEST_FILES = \
+    $(PMC2CUTILS_TESTS_DIR)/*.t \
+    $(HARNESS_TESTS_DIR)/*.t
 CODINGSTD_TEST_FILES = \
     t/codingstd/*.t
+CONFIGURE_TEST_FILES = \
+    t/configure/*.t \
+    t/steps/*.t
+DISTRO_TEST_FILES = \
+    t/distro/*.t
+DYNOPLIBS_TEST_FILES = $(DYNOPLIBS_TESTS_DIR)/*.t
+DYNPMC_TEST_FILES = $(DYNPMC_TESTS_DIR)/*.t
+EXAMPLES_TEST_FILES = \
+    t/examples/*.t
+HEADERIZER_TEST_FILES = $(TOOLS_TESTS_DIR)/dev/headerizer/*.t
+LIBRARY_TEST_FILES = @library_tests@
+MANIFEST_TEST_FILES = \
+    $(MANIFEST_TESTS_DIR)/*.t \
+    $(INSTALL_TOOLS_TESTS_DIR)/*.t
+OO_TEST_FILES = $(OO_TESTS_DIR)/*.t
+OP_TEST_FILES = $(OP_TESTS_DIR)/*.t
+PBC_TEST_FILES = \
+    t/op/testlib/test_strings.pbc \
+    t/pmc/testlib/annotations.pbc \
+    t/pmc/testlib/number.pbc
+PERL_TEST_FILES = \
+    t/perl/*.t
+PIR_TEST_FILES = $(PIR_TESTS_DIR)/*.t
+PMC_TEST_FILES = $(PMC_TESTS_DIR)/*.t
 RUN_TEST_FILES = \
     t/run/*.t
 RUNCORE_TEST_FILES = \
     --runcore-tests
 SRC_TEST_FILES = \
     t/src/*.t
-TOOLS_TEST_DIR = t/tools
-TOOLS_TEST_FILES = $(TOOLS_TEST_DIR)/tools/*.t
-LIBRARY_TEST_FILES = @library_tests@
-PMC2CUTILS_DIR = $(TOOLS_TEST_DIR)/pmc2cutils
-HARNESS_DIR = t/pharness
-BUILDTOOLS_TEST_FILES = \
-    $(PMC2CUTILS_DIR)/*.t \
-    $(HARNESS_DIR)/*.t
-MANIFEST_DIR = t/manifest
-INSTALL_TOOLS_DIR = $(TOOLS_TEST_DIR)/install
-MANIFEST_TEST_FILES = \
-    $(MANIFEST_DIR)/*.t \
-    $(INSTALL_TOOLS_DIR)/*.t
-EXAMPLES_TEST_FILES = \
-    t/examples/*.t
-CONFIGURE_TEST_FILES = \
-    t/configure/*.t \
-    t/steps/*.t
-PBC_TEST_FILES = \
-    t/op/testlib/test_strings.pbc \
-    t/pmc/testlib/annotations.pbc \
-    t/pmc/testlib/number.pbc
-HEADERIZER_TEST_FILES = $(TOOLS_TEST_DIR)/dev/headerizer/*.t
+TOOLS_TEST_FILES = $(TOOLS_TESTS_DIR)/tools/*.t
 
 # pbc files used for several tests;
 # not needed for build, hence this target is not included in 'all'
@@ -1889,6 +1905,9 @@ test : test_core
 # Test Parrot core.
 test_core: test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS)
+
+test_runcore: test_prep
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(RUNCORE_TEST_FILES)
 
 # run the test suite, create a TAP archive and send it off to smolder
 smolder_test : test_prep
@@ -1964,6 +1983,24 @@ testexec: test_prep
 # Test that need to be compiled by the C-compiler
 src_tests :
 	$(PERL) t/harness $(SRC_TEST_FILES)
+
+dynoplibs_tests :
+	$(PERL) t/harness $(DYNOPLIBS_TEST_FILES)
+
+dynpmc_tests :
+	$(PERL) t/harness $(DYNPMC_TEST_FILES)
+
+oo_tests :
+	$(PERL) t/harness $(OO_TEST_FILES)
+
+op_tests :
+	$(PERL) t/harness $(OP_TEST_FILES)
+
+pir_tests :
+	$(PERL) t/harness $(PIR_TEST_FILES)
+
+pmc_tests :
+	$(PERL) t/harness $(PMC_TEST_FILES)
 
 # Command line and various environments
 run_tests :
@@ -2455,6 +2492,7 @@ splint : all
 		| grep -v 'Source code error generation point'
 
 COVER_FLAGS = -fprofile-arcs -ftest-coverage
+
 COVER_DIRS = \
     src \
     src/call \
@@ -2502,9 +2540,51 @@ cover: \
     done
 	cover -ignore_re '^\/usr\/local\/bin'
 
+QUICKCOVER_DIRS = \
+    src \
+    src/call \
+    src/dynoplibs \
+    src/dynpmc \
+    src/gc \
+    src/interp \
+    src/io \
+    src/nci \
+    src/ops \
+    src/packfile \
+    src/pmc \
+    src/runcore \
+    src/string \
+    src/string/encoding \
+    frontend/parrot \
+    frontend/parrot_debugger \
+    frontend/pbc_dump \
+    frontend/pbc_merge \
+    compilers/imcc
+
+COVER       = @cover@
+GCOV        = @gcov@
+GCOV2PERL   = @gcov2perl@
+
+quickcover: \
+    cover.dummy \
+    cover-test_runcore
+	build_dir=$$PWD; \
+    $(COVER) -delete; \
+    for dir in $(QUICKCOVER_DIRS); \
+    do \
+	cd $$dir; \
+	$(GCOV) *.c; \
+	cd $$build_dir; \
+	$(GCOV2PERL) -db $(COVERAGE_DIR) $$dir/*.gcov; \
+    done
+	$(COVER) $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
+
 cover.dummy:
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
     --linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
+
+cover-test_runcore: cover.dummy
+	-@make@ test_runcore
 
 cover-testb: cover.dummy
 	-@make@ testb
@@ -2523,6 +2603,24 @@ cover-testr: cover.dummy
 
 cover-src: cover.dummy
 	-@make@ src_tests
+
+cover-dynoplibs: cover.dummy
+	-@make@ dynoplibs_tests
+
+cover-dynpmc: cover.dummy
+	-@make@ dynpmc_tests
+
+cover-oo: cover.dummy
+	-@make@ oo_tests
+
+cover-op: cover.dummy
+	-@make@ op_tests
+
+cover-pir: cover.dummy
+	-@make@ pir_tests
+
+cover-pmc: cover.dummy
+	-@make@ pmc_tests
 
 cover-run: cover.dummy
 	-@make@ run_tests
@@ -2549,7 +2647,7 @@ cover-distro: cover.dummy
 	-@make@ distro_tests
 
 cover-clean:
-	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) t/src ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
+	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) $(QUICKCOVER_DIRS) t/src ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
 
 ###############################################################################
 #

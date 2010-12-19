@@ -17,6 +17,7 @@ our @shared_valid_options = qw{
     ccflags
     ccwarn
     configure_trace
+    coveragedir
     cxx
     darwin_no_fink
     darwin_no_macports
