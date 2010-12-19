@@ -24,7 +24,7 @@ Tests PMC API support.
 
 =cut
 
-plan tests => 2;
+plan tests => 4;
 
 c_output_is( <<'CODE', <<'OUTPUT', "get/set_keyed_int" );
 
@@ -66,7 +66,6 @@ I
 i am a string.
 OUTPUT
 
-
 c_output_is( <<'CODE', <<'OUTPUT', "Tests get_keyed_string and set_keyed_string" );
 
 #include <parrot/api.h>
@@ -95,7 +94,7 @@ int main(int argc, char* argv[])
     Parrot_api_string_import_ascii(interp_pmc, "Hash", &name_hash);
     Parrot_api_pmc_box_string(interp_pmc, name_hash, &name_hash_pmc);
     Parrot_api_pmc_get_class(interp_pmc, name_hash_pmc, &class_hash);
-    Parrot_api_pmc_new(interp_pmc, class_hash, &hash_pmc);
+    Parrot_api_pmc_new_from_class(interp_pmc, class_hash, NULL, &hash_pmc);
 
     Parrot_api_string_import_ascii(interp_pmc, TEST_STR, &test_str);
     Parrot_api_string_import_ascii(interp_pmc, "name", &idx_str);
@@ -113,6 +112,98 @@ int main(int argc, char* argv[])
 
 CODE
 The quick brown fox jumps over the lazy dog
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', "get/set_keyed" );
+
+#include <parrot/api.h>
+#include <stdio.h>
+
+int main(int argc, char* argv[])
+{
+    Parrot_Init_Args *initargs = NULL;
+    Parrot_PMC interpmc = NULL;
+    Parrot_PMC p_pmc = NULL;
+    Parrot_String s_teststr = NULL, s_outstr = NULL;
+    Parrot_PMC p_keyedstr = NULL;
+    Parrot_PMC p_idx = NULL;
+    char * c_out = NULL;
+
+    GET_INIT_STRUCT(initargs);
+    Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+
+    Parrot_api_string_import_ascii(interpmc, "I am a string.", &s_teststr);
+    Parrot_api_pmc_box_string(interpmc, s_teststr, &p_pmc);
+
+    Parrot_api_pmc_box_integer(interpmc, 2, &p_idx);
+
+    Parrot_api_pmc_get_keyed(interpmc, p_pmc, p_idx, &p_keyedstr);
+    Parrot_api_pmc_get_string(interpmc, p_keyedstr, &s_outstr);
+    Parrot_api_string_export_ascii(interpmc, s_outstr, &c_out);
+    printf("%s\n", c_out);
+
+
+    Parrot_api_string_import_ascii(interpmc, "n", &s_teststr);
+    Parrot_api_pmc_set_string(interpmc, p_keyedstr, s_teststr);
+    Parrot_api_pmc_set_integer(interpmc, p_idx, 3);
+
+    Parrot_api_pmc_set_keyed(interpmc, p_pmc, p_idx, p_keyedstr);
+    Parrot_api_pmc_get_string(interpmc, p_pmc, &s_outstr);
+    Parrot_api_string_export_ascii(interpmc, s_outstr, &c_out);
+    printf("%s\n", c_out);
+
+    return 0;
+}
+
+CODE
+a
+I an a string.
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', "PMC lookup/instantiation" );
+
+#include <parrot/api.h>
+#include <stdio.h>
+
+int main(int argc, char* argv[])
+{
+    Parrot_Init_Args *initargs = NULL;
+    Parrot_PMC interpmc = NULL;
+    Parrot_String s_str, s_str2;
+    Parrot_PMC p_key, p_class, p_pmc;
+    char* string_class[] = { "String" };
+    char* float_class[] = { "Float" };
+    char *c_out;
+
+    GET_INIT_STRUCT(initargs);
+    Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+
+    Parrot_api_pmc_wrap_string_array(interpmc, 1, string_class, &p_key);
+
+    Parrot_api_pmc_get_class(interpmc, p_key, &p_class);
+    Parrot_api_pmc_new_from_class(interpmc, p_class, NULL, &p_pmc);
+
+    Parrot_api_string_import_ascii(interpmc, "This is a string!", &s_str);
+    Parrot_api_pmc_set_string(interpmc, p_pmc, s_str);
+    Parrot_api_pmc_get_string(interpmc, p_pmc, &s_str2);
+    Parrot_api_string_export_ascii(interpmc, s_str2, &c_out);
+    printf("%s\n", c_out);
+
+    Parrot_api_pmc_wrap_string_array(interpmc, 1, float_class, &p_key);
+
+    Parrot_api_pmc_get_class(interpmc, p_key, &p_class);
+    Parrot_api_pmc_new_from_class(interpmc, p_class, NULL, &p_pmc);
+
+    Parrot_api_pmc_set_float(interpmc, p_pmc, 3.1415);
+    Parrot_api_pmc_get_string(interpmc, p_pmc, &s_str2);
+    Parrot_api_string_export_ascii(interpmc, s_str2, &c_out);
+    printf("%s\n", c_out);
+
+    return 0;
+}
+CODE
+This is a string!
+3.1415
 OUTPUT
 
 # Local Variables:

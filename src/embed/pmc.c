@@ -25,6 +25,32 @@ This file implements PMC functions of the Parrot embedding interface.
 
 /*
 
+=item C<Parrot_Int Parrot_api_pmc_new_from_class(Parrot_PMC interp_pmc,
+Parrot_PMC class_pmc, Parrot_PMC init, Parrot_PMC * pmc)>
+
+Instantiate a new PMC of C<class_pmc> using C<init> values PMC and stores the
+brand new object in C<pmc>. This function returns a true value if this call is
+successful and false value otherwise.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_new_from_class(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC class_pmc),
+        ARGIN(Parrot_PMC init), ARGOUT(Parrot_PMC * pmc))
+{
+    ASSERT_ARGS(Parrot_api_pmc_new_from_class)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    if (init == NULL)
+        init = PMCNULL;
+    *pmc = VTABLE_instantiate(interp, class_pmc, init);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+/*
+
 =item C<Parrot_Int Parrot_api_pmc_deserialize(Parrot_PMC interp_pmc,
 Parrot_String fpmc, Parrot_PMC * pmc)>
 
@@ -358,7 +384,32 @@ Parrot_api_pmc_box_string(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String str)
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
-/* TODO: Box int and Box float */
+/*
+
+=item C<Parrot_Int Parrot_api_pmc_box_integer(Parrot_PMC interp_pmc, Parrot_Int
+value, Parrot_PMC * int_pmc)>
+
+Wraps the integer C<str> into a PMC and stores the results in C<int_pmc>. This
+function returns a true value if this call is successful and false value
+otherwise.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_box_integer(Parrot_PMC interp_pmc, Parrot_Int value,
+        ARGOUT(Parrot_PMC * int_pmc))
+{
+    ASSERT_ARGS(Parrot_api_pmc_box_integer)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    *int_pmc = Parrot_pmc_new(interp, enum_class_Integer);
+    VTABLE_set_integer_native(interp, *int_pmc, value);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+/* TODO: Box float */
 
 /*
 
@@ -465,30 +516,6 @@ Parrot_api_pmc_get_class(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC key),
     ASSERT_ARGS(Parrot_api_pmc_get_class)
     EMBED_API_CALLIN(interp_pmc, interp)
     *class_pmc = Parrot_oo_get_class(interp, key);
-    EMBED_API_CALLOUT(interp_pmc, interp);
-}
-
-/*
-
-=item C<Parrot_Int Parrot_api_pmc_new(Parrot_PMC interp_pmc, Parrot_PMC
-class_pmc, Parrot_PMC *pmc)>
-
-Instantiate a new PMC of C<class_pmc> and stores the brand new object in C<pmc>.
-This function returns a true value if this call is successful and false value
-otherwise.
-
-=cut
-
-*/
-
-PARROT_API
-Parrot_Int
-Parrot_api_pmc_new(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC class_pmc),
-        ARGOUT(Parrot_PMC *pmc))
-{
-    ASSERT_ARGS(Parrot_api_pmc_new)
-    EMBED_API_CALLIN(interp_pmc, interp)
-    *pmc = VTABLE_instantiate(interp, class_pmc, PMCNULL);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 

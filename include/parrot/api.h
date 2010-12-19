@@ -408,6 +408,14 @@ Parrot_Int Parrot_api_add_exception_handler(
         __attribute__nonnull__(2);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_box_integer(
+    Parrot_PMC interp_pmc,
+    Parrot_Int value,
+    ARGOUT(Parrot_PMC * int_pmc))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* int_pmc);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_box_string(
     ARGIN(Parrot_PMC interp_pmc),
     ARGIN(Parrot_String str),
@@ -511,14 +519,16 @@ Parrot_Int Parrot_api_pmc_invoke(
         __attribute__nonnull__(3);
 
 PARROT_API
-Parrot_Int Parrot_api_pmc_new(
+Parrot_Int Parrot_api_pmc_new_from_class(
     ARGIN(Parrot_PMC interp_pmc),
     ARGIN(Parrot_PMC class_pmc),
-    ARGOUT(Parrot_PMC *pmc))
+    ARGIN(Parrot_PMC init),
+    ARGOUT(Parrot_PMC * pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pmc);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* pmc);
 
 PARROT_API
 Parrot_Int Parrot_api_pmc_null(
@@ -589,6 +599,8 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(handler))
+#define ASSERT_ARGS_Parrot_api_pmc_box_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(int_pmc))
 #define ASSERT_ARGS_Parrot_api_pmc_box_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(str) \
@@ -632,9 +644,10 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(sub) \
     , PARROT_ASSERT_ARG(signature))
-#define ASSERT_ARGS_Parrot_api_pmc_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_api_pmc_new_from_class __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(class_pmc) \
+    , PARROT_ASSERT_ARG(init) \
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_api_pmc_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
