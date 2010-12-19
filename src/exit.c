@@ -52,9 +52,9 @@ Parrot_x_on_exit(PARROT_INTERP, ARGIN(exit_handler_f function), ARGIN_NULLOK(voi
 
 /*
 
-=item C<void Parrot_x_exit(PARROT_INTERP, int status)>
+=item C<void Parrot_x_jump_out(PARROT_INTERP, int status)>
 
-Exit, calling any registered exit handlers.
+Jumps out returning to the caller api function.
 
 =cut
 
@@ -74,6 +74,16 @@ Parrot_x_jump_out(PARROT_INTERP, int status)
         exit(status);
 }
 
+/*
+
+=item C<void Parrot_x_jump_out_error(PARROT_INTERP, int status)>
+
+Jumps out returning to the caller api function indicating an error condition.
+
+=cut
+
+*/
+
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
@@ -86,6 +96,16 @@ Parrot_x_jump_out_error(PARROT_INTERP, int status)
     interp->final_exception = PMCNULL;
     Parrot_x_jump_out(interp, status);
 }
+
+/*
+
+=item C<void Parrot_x_exit(PARROT_INTERP, int status)>
+
+Exit, calling any registered exit handlers.
+
+=cut
+
+*/
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN

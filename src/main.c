@@ -134,8 +134,8 @@ main(int argc, const char *argv[])
     GET_INIT_STRUCT(initargs);
     /* internationalization setup */
     /* setlocale(LC_ALL, ""); */
-    //PARROT_BINDTEXTDOMAIN(PACKAGE, LOCALEDIR);
-    //PARROT_TEXTDOMAIN(PACKAGE);
+    /* PARROT_BINDTEXTDOMAIN(PACKAGE, LOCALEDIR); */
+    /* PARROT_TEXTDOMAIN(PACKAGE); */
 
     /* Parse minimal subset of flags */
     parseflags_minimal(initargs, argc, argv);
@@ -168,9 +168,20 @@ main(int argc, const char *argv[])
     exit(EXIT_SUCCESS);
 }
 
+/*
+
+=item C<static void show_last_error_and_exit(Parrot_PMC interp)>
+
+Prints out the C<interp>'s last error and exits.
+
+=cut
+
+*/
+
 static void
 show_last_error_and_exit(Parrot_PMC interp)
 {
+    ASSERT_ARGS(show_last_error_and_exit)
     Parrot_String errmsg, backtrace;
     Parrot_Int exit_code, is_error;
     Parrot_PMC exception;
@@ -186,9 +197,22 @@ show_last_error_and_exit(Parrot_PMC interp)
     exit(exit_code);
 }
 
+/*
+
+=item C<static void print_parrot_string(Parrot_PMC interp, FILE *vector,
+Parrot_String str, int newline)>
+
+Prints C<str> parrot string into the file handle C<vector> and an optional new
+line if C<newline> is set to a true value.
+
+=cut
+
+*/
+
 static void
 print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline)
 {
+    ASSERT_ARGS(print_parrot_string)
     char * msg_raw;
     if (!str)
         return;
@@ -215,7 +239,7 @@ PARROT_PURE_FUNCTION
 static int
 is_all_digits(ARGIN(const char *s))
 {
-    //ASSERT_ARGS(is_all_digits);
+    ASSERT_ARGS(is_all_digits)
     for (; *s; ++s)
         if (!isdigit((unsigned char)*s))
             return 0;
@@ -238,7 +262,7 @@ PARROT_PURE_FUNCTION
 static int
 is_all_hex_digits(ARGIN(const char *s))
 {
-    //ASSERT_ARGS(is_all_hex_digits);
+    ASSERT_ARGS(is_all_hex_digits);
     for (; *s; ++s)
         if (!isxdigit(*s))
             return 0;
@@ -258,7 +282,7 @@ Outputs usage error message.
 static void
 usage(ARGMOD(FILE *fp))
 {
-    //ASSERT_ARGS(usage)
+    ASSERT_ARGS(usage)
     fprintf(fp,
             "parrot -[acEGhprtvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
             "[-O [level]] [-R runcore] [-o FILE] <file>\n");
@@ -277,7 +301,7 @@ Print out list of debugging flag values.
 static void
 help_debug(void)
 {
-    //ASSERT_ARGS(help_debug)
+    ASSERT_ARGS(help_debug)
     /* split printf for C89 compliance on string length */
     printf(
     "--imcc-debug -d [Flags] ...\n"
@@ -322,7 +346,7 @@ Print out "help" list of options.
 static void
 help(void)
 {
-    //ASSERT_ARGS(help)
+    ASSERT_ARGS(help)
     /* split printf for C89 compliance on string length */
     printf(
     "parrot [Options] <file>\n"
@@ -366,7 +390,7 @@ help(void)
 
 /*
 
-=item C<const struct longopt_opt_decl * Parrot_cmd_options(void)>
+=item C<static const struct longopt_opt_decl * Parrot_cmd_options(void)>
 
 Set up the const struct declaration for cmd_options
 
@@ -374,12 +398,12 @@ Set up the const struct declaration for cmd_options
 
 */
 
-// TODO: Weed out the options that are not used by this executable
+/* TODO: Weed out the options that are not used by this executable */
+
 static
 const struct longopt_opt_decl *
 Parrot_cmd_options(void)
 {
-    //ASSERT_ARGS(Parrot_cmd_options)
     static const struct longopt_opt_decl cmd_options[] = {
         { '.', '.', (OPTION_flags)0, { "--wait" } },
         { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
@@ -429,7 +453,7 @@ Print out parrot version number.
 static void
 Parrot_version(void)
 {
-    //ASSERT_ARGS(Parrot_version)
+    ASSERT_ARGS(Parrot_version)
     printf("This is Parrot version " PARROT_VERSION);
     printf(" built for " PARROT_ARCHNAME ".\n");
     printf("Copyright (C) 2001-2010, Parrot Foundation.\n\
@@ -456,7 +480,7 @@ Parse minimal subset of args required for initializing interpreter.
 static void
 parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const char *argv[]))
 {
-    //ASSERT_ARGS(parseflags_minimal)
+    ASSERT_ARGS(parseflags_minimal)
 
     int pos = 0;
 
@@ -555,7 +579,7 @@ parseflags(Parrot_PMC interp,
         ARGOUT(int *pgm_argc), ARGOUT(const char ***pgm_argv),
         ARGMOD(const char **core), ARGMOD(Parrot_Int *trace))
 {
-    //ASSERT_ARGS(parseflags)
+    ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int status;
     int result = 1;
@@ -579,19 +603,19 @@ parseflags(Parrot_PMC interp,
           case 't':
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
                 const unsigned long _temp = strtoul(opt.opt_arg, NULL, 16);
-                //const Parrot_trace_flags _temp_flag = (Parrot_trace_flags)_temp;
+                /* const Parrot_trace_flags _temp_flag = (Parrot_trace_flags)_temp; */
                 const Parrot_Int _temp_flag = _temp;
                 *trace = _temp_flag;
             }
             else
                 *trace = 0x01;
-                //*trace = PARROT_TRACE_OPS_FLAG;
+                /* *trace = PARROT_TRACE_OPS_FLAG; */
             break;
           case 'D':
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))
                 Parrot_api_debug_flag(interp, strtoul(opt.opt_arg, NULL, 16), 1);
             else
-                //Parrot_api_debug_flag(interp, PARROT_MEM_STAT_DEBUG_FLAG, 1);
+                /* Parrot_api_debug_flag(interp, PARROT_MEM_STAT_DEBUG_FLAG, 1); */
                 Parrot_api_debug_flag(interp, 0x01, 1);
             break;
 
@@ -626,17 +650,17 @@ parseflags(Parrot_PMC interp,
           case OPT_GC_DEBUG:
           /*
 #if DISABLE_GC_DEBUG
-            //Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
+            // Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
             Parrot_warn(interp, 0xFFFF,
                 "PARROT_GC_DEBUG is set but the binary was compiled "
                 "with DISABLE_GC_DEBUG.");
 #endif
             */
-            //Parrot_api_flag(interp, PARROT_GC_DEBUG_FLAG, 1);
+            /* Parrot_api_flag(interp, PARROT_GC_DEBUG_FLAG, 1); */
             Parrot_api_flag(interp, 0x10, 1);
             break;
           case OPT_DESTROY_FLAG:
-            //Parrot_api_flag(interp, PARROT_DESTROY_FLAG, 1);
+            /* Parrot_api_flag(interp, PARROT_DESTROY_FLAG, 1); */
             Parrot_api_flag(interp, 0x200, 1);
             break;
           case 'I':
@@ -649,7 +673,7 @@ parseflags(Parrot_PMC interp,
             result = Parrot_api_add_dynext_search_path(interp, opt.opt_arg);
             break;
           case 'w':
-            //result = Parrot_api_set_warnings(interp, PARROT_WARNINGS_ALL_FLAG);
+            /* result = Parrot_api_set_warnings(interp, PARROT_WARNINGS_ALL_FLAG); */
             result = Parrot_api_set_warnings(interp, 0xFFFF);
             break;
           case 'o':

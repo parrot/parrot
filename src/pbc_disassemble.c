@@ -136,8 +136,8 @@ main(int argc, const char *argv[])
     argc -= opt.opt_index;
     argv += opt.opt_index;
 
-    // What to do about this debug flag?
-    //pf = Parrot_pbc_read(interp, argc ? *argv : "-", debug);
+    /* What to do about this debug flag? */
+    /* pf = Parrot_pbc_read(interp, argc ? *argv : "-", debug); */
 
     if (!(Parrot_api_load_bytecode_file(interp, argc ? *argv : "-", &pbc) &&
           Parrot_api_disassemble_bytecode(interp, pbc, outfile, option) &&
@@ -147,6 +147,16 @@ main(int argc, const char *argv[])
     }
     exit(EXIT_SUCCESS);
 }
+
+/*
+
+=item C<static void show_last_error_and_exit(Parrot_PMC interp)>
+
+Prints out the C<interp>'s last error and exits.
+
+=cut
+
+*/
 
 static void
 show_last_error_and_exit(Parrot_PMC interp)
