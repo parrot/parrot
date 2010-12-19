@@ -908,6 +908,7 @@ frontend/parrot_debugger/main.c                             []
 frontend/pbc_dump/main.c                                    []
 frontend/pbc_dump/packdump.c                                []
 frontend/pbc_merge/main.c                                   []
+include/parrot/api.h                                        [main]include
 include/parrot/atomic.h                                     [main]include
 include/parrot/atomic/fallback.h                            [main]include
 include/parrot/atomic/gcc_pcc.h                             [main]include
@@ -923,7 +924,6 @@ include/parrot/datatypes.h                                  [main]include
 include/parrot/debugger.h                                   [main]include
 include/parrot/dynext.h                                     [main]include
 include/parrot/embed.h                                      [main]include
-include/parrot/api.h                                        [main]include
 include/parrot/encoding.h                                   [main]include
 include/parrot/enums.h                                      [main]include
 include/parrot/exceptions.h                                 [main]include
@@ -1255,6 +1255,9 @@ src/dynpmc/rotest.pmc                                       []
 src/dynpmc/subproxy.pmc                                     []
 src/embed.c                                                 []
 src/embed/api.c                                             []
+src/embed/embed_private.h                                   []
+src/embed/pmc.c                                             []
+src/embed/strings.c                                         []
 src/exceptions.c                                            []
 src/exit.c                                                  []
 src/extend.c                                                []
@@ -1942,6 +1945,8 @@ t/src/README                                                []doc
 t/src/atomic.t                                              [test]
 t/src/basic.t                                               [test]
 t/src/embed.t                                               [test]
+t/src/embed/pmc.t                                           [test]
+t/src/embed/strings.t                                       [test]
 t/src/exit.t                                                [test]
 t/src/extend.t                                              [test]
 t/src/pointer_array.t                                       [test]

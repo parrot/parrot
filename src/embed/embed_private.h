@@ -1,6 +1,11 @@
+/* api.h
+ *  Copyright (C) 2001-2010, Parrot Foundation.
+ *  Overview:
+ *     Parrot embed API's private macros
+ */
 
-#ifndef PARROT_EMBED_PRIVATE_H
-#define PARROT_EMBED_PRIVATE_H
+#ifndef PARROT_EMBED_PRIVATE_H_GUARD
+#define PARROT_EMBED_PRIVATE_H_GUARD
 
 #include "pmc/pmc_parrotinterpreter.h"
 
@@ -19,7 +24,8 @@
         Interp * const __interp = GET_INTERP(p); \
         __interp->api_jmp_buf = NULL;            \
         return !__interp->exit_code;             \
-    } else {                                     \
+    }                                            \
+    else {                                       \
         {
 
 #define EMBED_API_CALLOUT(p, i)                                    \
@@ -32,4 +38,11 @@
         return 1;                                                  \
     }
 
-#endif /* PARROT_EMBED_PRIVATE_H */
+#endif /* PARROT_EMBED_PRIVATE_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

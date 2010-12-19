@@ -3262,10 +3262,22 @@ PDB_help(PARROT_INTERP, ARGIN(const char *command))
     }
 }
 
+/*
+
+=item C<STRING * Parrot_dbg_get_exception_backtrace(PARROT_INTERP, PMC *
+exception)>
+
+Returns an string containing the backtrace of the interpreter's call chain for a given exception.
+
+=cut
+
+*/
+
+
 STRING *
 Parrot_dbg_get_exception_backtrace(PARROT_INTERP, ARGMOD(PMC * exception))
 {
-    ASSERT_ARGS(PDB_backtrace)
+    ASSERT_ARGS(Parrot_dbg_get_exception_backtrace)
     STRING           *str;
     PMC              *old       = PMCNULL;
     int               rec_level = 0;
@@ -3282,9 +3294,20 @@ Parrot_dbg_get_exception_backtrace(PARROT_INTERP, ARGMOD(PMC * exception))
     }
 }
 
+/*
+
+=item C<static PMC * get_exception_context(PARROT_INTERP, PMC * exception)>
+
+Returns the context in which the exception was generated.
+
+=cut
+
+*/
+
 static PMC *
 get_exception_context(PARROT_INTERP, ARGMOD(PMC * exception))
 {
+    ASSERT_ARGS(get_exception_context)
     PMC * const thrower = VTABLE_get_attr_str(interp, exception, CONST_STRING(interp, "thrower"));
     if (!PMC_IS_NULL(thrower))
         return thrower;
@@ -3320,6 +3343,18 @@ PDB_backtrace(PARROT_INTERP)
     STRING * const bt = PDB_get_continuation_backtrace(interp, sub, ctx);
     Parrot_io_eprintf(interp, "%Ss", bt);
 }
+
+/*
+
+=item C<static STRING * PDB_get_continuation_backtrace(PARROT_INTERP, PMC * sub,
+PMC * ctx)>
+
+Returns an string with the backtrace of interpreter's call chain for the given sub including
+context information.
+
+=cut
+
+*/
 
 static STRING *
 PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD_NULLOK(PMC * sub), ARGMOD(PMC * ctx))

@@ -59,7 +59,7 @@ static void Parrot_gbl_setup_2(PARROT_INTERP)
 =item C<void Parrot_gbl_set_config_hash_internal(const unsigned char*
 parrot_config, unsigned int parrot_config_size)>
 
-Called by Parrot_set_config_hash with the serialised hash which
+Called by Parrot_set_config_hash with the serialized hash which
 will be used in subsequently created Interpreters.
 
 =cut
@@ -76,6 +76,17 @@ Parrot_gbl_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
         parrot_config_size_stored = parrot_config_size;
     }
 }
+
+/*
+
+=item C<void Parrot_set_config_hash_pmc(PARROT_INTERP, PMC * config)>
+
+Called by embed API with the pmc hash which will be used in subsequently created
+Interpreters.
+
+=cut
+
+*/
 
 void
 Parrot_set_config_hash_pmc(PARROT_INTERP, ARGMOD(PMC * config))

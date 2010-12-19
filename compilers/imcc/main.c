@@ -156,12 +156,13 @@ Set up the const struct declaration for cmd_options
 
 */
 
-// TODO: Weed out the options that IMCC doesn't use, and rename this function
-//       to something more imcc-ish
+/* TODO: Weed out the options that IMCC doesn't use, and rename this function
+         to something more imcc-ish
+*/
+
 static const struct longopt_opt_decl *
 Parrot_cmd_options(void)
 {
-    //ASSERT_ARGS(Parrot_cmd_options)
     static const struct longopt_opt_decl cmd_options[] = {
         { '.', '.', (OPTION_flags)0, { "--wait" } },
         { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
@@ -635,6 +636,18 @@ compile_to_bytecode(PARROT_INTERP,
         PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     return pf;
 }
+
+/*
+
+=item C<int imcc_run_api(PMC * interp_pmc, const char *sourcefile, int argc,
+const char **argv, PMC **pbcpmc)>
+
+This is a wrapper around C<imcc_run> function in which the input parameter is a
+PMC interpreter.
+
+=cut
+
+*/
 
 PARROT_API
 int

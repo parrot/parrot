@@ -235,6 +235,16 @@ parrot_init_library_paths(PARROT_INTERP)
 #endif
 }
 
+/*
+
+=item C<void Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)>
+
+Updates library paths from the config hash stored in the interpreter.
+
+=cut
+
+*/
+
 PARROT_EXPORT
 void
 Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)
