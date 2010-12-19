@@ -431,6 +431,8 @@
 /t/op/testlib/*.pbc
 /t/perl/Parrot_Test_1.pasm
 /t/perl/Parrot_Test_1.pir
+/t/perl/*.gcda
+/t/perl/*.gcno
 /t/pmc/*.out
 /t/pmc/*.pasm
 /t/pmc/*.pbc
@@ -438,6 +440,8 @@
 /t/pmc/*_pbcexe*
 /t/pmc/testlib/*.pbc
 /t/src/*_*
+/t/src/*.gcov
+/t/src/*.gcdada
 /t/stress/*.out
 /t/stress/*.pasm
 /t/stress/*.pbc
