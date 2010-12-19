@@ -447,6 +447,15 @@ Parrot_Int Parrot_api_pmc_deserialize_bytes(
         FUNC_MODIFIES(* pmc);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_find_method(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC object,
+    Parrot_String name,
+    ARGOUT(Parrot_PMC *method))
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*method);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_get_class(
     ARGIN(Parrot_PMC interp_pmc),
     ARGIN(Parrot_PMC key),
@@ -614,6 +623,8 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(fpmc) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_Parrot_api_pmc_find_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(method))
 #define ASSERT_ARGS_Parrot_api_pmc_get_class __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(key) \

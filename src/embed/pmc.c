@@ -458,7 +458,7 @@ Parrot_api_pmc_invoke(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC sub),
         CURRENT_CONTEXT(interp));
     Parrot_pcc_invoke_from_sig_object(interp, sub, signature);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_call_obj);
-    EMBED_API_CALLOUT(interp_pmc, interp);
+    EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
 /*
@@ -520,6 +520,15 @@ Parrot_api_pmc_get_class(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC key),
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_find_method(Parrot_PMC interp_pmc, Parrot_PMC object, Parrot_String name, ARGOUT(Parrot_PMC *method))
+{
+    EMBED_API_CALLIN(interp_pmc, interp);
+    *method = VTABLE_find_method(interp, object, name);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
 /*
 
 =back
@@ -534,4 +543,3 @@ Parrot_api_pmc_get_class(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC key),
  * End:
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
-
