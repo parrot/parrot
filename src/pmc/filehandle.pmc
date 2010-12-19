@@ -434,15 +434,11 @@ filehandle when finished.
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot readall without a file name or open filehandle");
 
-            /* Do line buffering on the filehandle */
-            if (!(PARROT_FILEHANDLE(SELF)->flags & PIO_F_LINEBUF))
-                Parrot_io_setlinebuf(INTERP, SELF);
-
             sb = Parrot_pmc_new_init_int(interp, enum_class_StringBuilder,
                     4096);
 
             do {
-                STRING * const part = Parrot_io_reads(INTERP, SELF, 0);
+                STRING * const part = Parrot_io_reads(INTERP, SELF, 4096);
                 VTABLE_push_string(interp, sb, part);
             } while (!Parrot_io_eof(INTERP, SELF));
 

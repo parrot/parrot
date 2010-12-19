@@ -288,10 +288,6 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
     buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
 
-    /* line buffered read */
-    if (Parrot_io_get_flags(interp, filehandle) & PIO_F_LINEBUF)
-        return Parrot_io_readline_buffer(interp, filehandle, buf);
-
     if (*buf == NULL)
         *buf = Parrot_str_new_noinit(interp, 2048);
 
@@ -468,9 +464,12 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
 
     /* fill empty buffer */
     if (!(buffer_flags & PIO_BF_READBUF)) {
-        if (Parrot_io_fill_readbuf(interp, filehandle) == 0) {
+        /* promote to buffered if unbuffered */
+        if (Parrot_io_get_buffer_size(interp, filehandle) == 0)
+            Parrot_io_setbuf(interp, filehandle, 1);
+
+        if (Parrot_io_fill_readbuf(interp, filehandle) == 0)
             return 0;
-        }
     }
 
     /* Retrieve filled buffer */
