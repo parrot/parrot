@@ -32,6 +32,7 @@ void Parrot_gbl_register_core_pmcs(PARROT_INTERP, PMC* registry);
 
 static const unsigned char* parrot_config_stored = NULL;
 static unsigned int parrot_config_size_stored = 0;
+static PMC * parrot_config_hash_global = NULL;
 
 /* HEADERIZER HFILE: include/parrot/global_setup.h */
 
@@ -65,14 +66,24 @@ will be used in subsequently created Interpreters.
 
 */
 
-PARROT_EXPORT
 void
 Parrot_gbl_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
                                  unsigned int parrot_config_size)
 {
     ASSERT_ARGS(Parrot_gbl_set_config_hash_internal)
-    parrot_config_stored      = parrot_config;
-    parrot_config_size_stored = parrot_config_size;
+    if (parrot_config_stored != NULL) {
+        parrot_config_stored      = parrot_config;
+        parrot_config_size_stored = parrot_config_size;
+    }
+}
+
+void
+Parrot_set_config_hash_pmc(PARROT_INTERP, ARGMOD(PMC * config))
+{
+    ASSERT_ARGS(Parrot_set_config_hash_pmc)
+    parrot_config_hash_global = config;
+    if (!PMC_IS_NULL(config))
+        Parrot_gbl_set_config_hash_interpreter(interp);
 }
 
 /*
@@ -92,39 +103,20 @@ Parrot_gbl_set_config_hash_interpreter(PARROT_INTERP)
     ASSERT_ARGS(Parrot_gbl_set_config_hash_interpreter)
     PMC *iglobals = interp->iglobals;
 
-    PMC *config_hash = NULL;
-
-    if (parrot_config_size_stored > 1) {
-        STRING *config_string;
-
-        if (parrot_config_size_stored < 16)
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_INVALID_STRING_REPRESENTATION,
-                "Invalid config hash");
-
-        if (parrot_config_stored[14] != PARROT_PBC_MAJOR
-        ||  parrot_config_stored[15] != PARROT_PBC_MINOR)
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_INVALID_STRING_REPRESENTATION,
-                "Version %d.%d of config hash is invalid, expected %d.%d. "
-                "You're probably linking against an incompatible libparrot.",
-                parrot_config_stored[14], parrot_config_stored[15],
-                PARROT_PBC_MAJOR, PARROT_PBC_MINOR);
-
-        config_string =
-            Parrot_str_new_init(interp,
-                               (const char *)parrot_config_stored, parrot_config_size_stored,
-                               Parrot_binary_encoding_ptr,
-                               PObj_external_FLAG|PObj_constant_FLAG);
-
-        config_hash = Parrot_thaw(interp, config_string);
-    }
-    else {
+    PMC *config_hash = parrot_config_hash_global;
+    if (config_hash == NULL)
         config_hash = Parrot_pmc_new(interp, enum_class_Hash);
+    else {
+        /* On initialization, we probably set up an empty hash for our first
+           interpreter. We should use this branch here to insert some sane
+           defaults so that things do not go crazy if the user forgets to set
+           the config hash later */
     }
 
     VTABLE_set_pmc_keyed_int(interp, iglobals,
                              (INTVAL) IGLOBALS_CONFIG_HASH, config_hash);
+    if (!PMC_IS_NULL(config_hash) && VTABLE_elements(interp, config_hash))
+        Parrot_lib_update_paths_from_config_hash(interp);
 }
 
 /*
@@ -195,10 +187,10 @@ init_world(PARROT_INTERP)
     VTABLE_set_pmc_keyed_int(interp, iglobals,
             (INTVAL)IGLOBALS_INTERPRETER, self);
 
-    Parrot_gbl_set_config_hash_interpreter(interp);
-
     /* lib search paths */
     parrot_init_library_paths(interp);
+
+    Parrot_gbl_set_config_hash_interpreter(interp);
 
     /* load_bytecode and dynlib loaded hash */
     pmc = Parrot_pmc_new(interp, enum_class_Hash);

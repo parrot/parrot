@@ -25877,7 +25877,7 @@ op_lib_t core_op_lib = {
   1073,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
-  get_op          /* op_code() */ 
+  get_op          /* op_code() */
 };
 
 /*

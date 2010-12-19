@@ -47,7 +47,6 @@ DYNPMC_H_FILES = \
     include/parrot/io.h \
     include/parrot/key.h \
     include/parrot/library.h \
-    include/parrot/longopt.h \
     include/parrot/memory.h \
     include/parrot/misc.h \
     include/parrot/multidispatch.h \
@@ -76,9 +75,7 @@ DYNPMC_H_FILES = \
     include/parrot/vtable.h \
     include/parrot/vtables.h \
     include/parrot/warnings.h \
-    include/pmc/pmc_callcontext.h \
-    include/pmc/pmc_continuation.h \
-    include/pmc/pmc_default.h
+    include/pmc/pmc_callcontext.h
 
 #IF(win32 and cc==gcc):LIB_ZLIB = -lz
 #ELSIF(win32):LIB_ZLIB = zlib.lib
