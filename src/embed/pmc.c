@@ -39,7 +39,7 @@ successful and false value otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_pmc_new_from_class(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC class_pmc),
-        ARGIN(Parrot_PMC init), ARGOUT(Parrot_PMC * pmc))
+        ARGIN_NULLOK(Parrot_PMC init), ARGOUT(Parrot_PMC * pmc))
 {
     ASSERT_ARGS(Parrot_api_pmc_new_from_class)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -197,6 +197,29 @@ Parrot_api_pmc_get_float(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc),
 
 /*
 
+=item C<Parrot_Int Parrot_api_pmc_get_keyed(Parrot_PMC interp_pmc, Parrot_PMC
+pmc, Parrot_PMC key, Parrot_PMC * value)>
+
+Lookup the value in the aggregate C<pmc> with the PMC C<key>. Return C<1> on
+success, C<0> on failure.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_get_keyed(Parrot_PMC interp_pmc, Parrot_PMC pmc,
+    Parrot_PMC key, ARGOUT(Parrot_PMC * value))
+{
+    ASSERT_ARGS(Parrot_api_pmc_get_keyed)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    *value = VTABLE_get_pmc_keyed(interp, pmc, key);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+/*
+
 =item C<Parrot_Int Parrot_api_pmc_get_keyed_int(Parrot_PMC interp_pmc,
 Parrot_PMC pmc, Parrot_Int key, Parrot_PMC * value)>
 
@@ -309,6 +332,29 @@ Parrot_api_pmc_set_float(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc),
     ASSERT_ARGS(Parrot_api_pmc_set_float)
     EMBED_API_CALLIN(interp_pmc, interp)
     VTABLE_set_number_native(interp, pmc, value);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+/*
+
+=item C<Parrot_Int Parrot_api_pmc_set_keyed_int(Parrot_PMC interp_pmc,
+Parrot_PMC pmc, Parrot_Int key, Parrot_PMC value)>
+
+Sets the value in aggregate C<pmc> using the PMC C<key>. Returns 1 on success,
+0 on failure.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_set_keyed(Parrot_PMC interp_pmc, Parrot_PMC pmc,
+    Parrot_PMC key, Parrot_PMC value)
+{
+    ASSERT_ARGS(Parrot_api_pmc_set_keyed)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    VTABLE_set_pmc_keyed(interp, pmc, key, value);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
