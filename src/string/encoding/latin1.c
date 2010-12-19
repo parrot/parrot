@@ -424,9 +424,10 @@ latin1_titlecase_first(PARROT_INTERP, ARGIN(const STRING *src))
 
 
 static STR_VTABLE Parrot_latin1_encoding = {
-    0,
+    -1,
     "iso-8859-1",
     NULL,
+    1, /* Bytes per unit */
     1, /* Max bytes per codepoint */
 
     latin1_to_encoding,

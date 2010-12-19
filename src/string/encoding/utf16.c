@@ -576,9 +576,10 @@ utf16_iter_set_and_advance(PARROT_INTERP,
 
 
 static STR_VTABLE Parrot_utf16_encoding = {
-    0,
+    -1,
     "utf16",
     NULL,
+    2, /* Bytes per unit */
     4, /* Max bytes per codepoint */
 
     utf16_to_encoding,

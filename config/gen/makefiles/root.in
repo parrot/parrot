@@ -437,7 +437,6 @@ ENCODING_O_FILES = \
 IO_O_FILES = \
     src/io/core$(O) \
     src/io/api$(O) \
-    src/io/utf8$(O) \
     src/io/buffer$(O) \
     src/io/unix$(O) \
     src/io/win32$(O) \
@@ -1529,9 +1528,6 @@ src/io/portable$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/portable.c
 
 src/io/unix$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
     include/pmc/pmc_filehandle.h src/io/unix.c
-
-src/io/utf8$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/string/unicode.h \
-    src/io/utf8.c
 
 src/io/win32$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
     include/pmc/pmc_filehandle.h src/io/win32.c

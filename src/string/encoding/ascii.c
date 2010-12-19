@@ -395,9 +395,10 @@ ascii_titlecase_first(PARROT_INTERP, ARGIN(const STRING *src))
 }
 
 static STR_VTABLE Parrot_ascii_encoding = {
-    0,
+    -1,
     "ascii",
     NULL,
+    1, /* Bytes per unit */
     1, /* Max bytes per codepoint */
 
     ascii_to_encoding,

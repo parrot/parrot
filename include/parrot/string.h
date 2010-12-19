@@ -35,7 +35,7 @@
 #define STRING_hash(i, src, seed) ((src)->encoding)->hash((i), (src), (seed))
 
 #define STRING_scan(i, src) ((src)->encoding)->scan((i), (src))
-#define STRING_partial_scan(i, src, count, delim) ((src)->encoding)->scan((i), (src), (count), (delim))
+#define STRING_partial_scan(i, src, count, delim) ((src)->encoding)->partial_scan((i), (src), (count), (delim))
 #define STRING_ord(i, src, offset) ((src)->encoding)->ord((i), (src), (offset))
 #define STRING_substr(i, src, offset, count) ((src)->encoding)->substr((i), (src), (offset), (count))
 
@@ -124,6 +124,7 @@ struct _str_vtable {
     int         num;
     const char *name;
     STRING     *name_str;
+    UINTVAL     bytes_per_unit;
     UINTVAL     max_bytes_per_codepoint;
 
     str_vtable_to_encoding_t            to_encoding;

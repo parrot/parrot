@@ -544,38 +544,6 @@ size_t Parrot_io_write_buffer(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/buffer.c */
 
-/* io/utf8.c - UTF-8 functions */
-/* HEADERIZER BEGIN: src/io/utf8.c */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-size_t Parrot_io_read_utf8(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    ARGMOD(STRING **buf))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*filehandle)
-        FUNC_MODIFIES(*buf);
-
-size_t Parrot_io_write_utf8(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    ARGIN(const STRING *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*filehandle);
-
-#define ASSERT_ARGS_Parrot_io_read_utf8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle) \
-    , PARROT_ASSERT_ARG(buf))
-#define ASSERT_ARGS_Parrot_io_write_utf8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle) \
-    , PARROT_ASSERT_ARG(s))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/io/utf8.c */
-
 /* io/filehandle.c - utility functions for FileHandle PMC */
 /* HEADERIZER BEGIN: src/io/filehandle.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

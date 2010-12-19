@@ -560,10 +560,11 @@ utf8_iter_set_and_advance(PARROT_INTERP,
 
 
 static STR_VTABLE Parrot_utf8_encoding = {
-    0,
+    -1,
     "utf8",
     NULL,
-    UTF8_MAXLEN, /* Max bytes per codepoint */
+    1, /* Bytes per unit */
+    4, /* Max bytes per codepoint */
 
     utf8_to_encoding,
     unicode_chr,

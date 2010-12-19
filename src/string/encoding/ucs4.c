@@ -404,9 +404,10 @@ ucs4_hash(SHIM_INTERP, ARGIN(const STRING *src), size_t hashval)
 
 
 static STR_VTABLE Parrot_ucs4_encoding = {
-    0,
+    -1,
     "ucs4",
     NULL,
+    4, /* Bytes per unit */
     4, /* Max bytes per codepoint */
 
     ucs4_to_encoding,

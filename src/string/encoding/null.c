@@ -147,9 +147,10 @@ null_hash(SHIM_INTERP, ARGIN(const STRING *s), size_t hashval)
 
 
 static STR_VTABLE Parrot_null_encoding = {
-    0,
+    -1,
     "null",
     NULL,
+    1, /* Bytes per unit */
     1, /* Max bytes per codepoint */
 
     (str_vtable_to_encoding_t)null_error,

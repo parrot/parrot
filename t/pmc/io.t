@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 33;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -671,6 +671,46 @@ T\xc3\xb6
 tsch \xe2\x82\xac
 utf8
 T\xc3\xb6tsch \xe2\x82\xac100
+OUTPUT
+
+pir_output_is( sprintf(<<'CODE', $temp_file), <<"OUTPUT", "utf16 io" );
+.const string temp_file = '%s'
+.sub main :main
+    .local pmc pio
+
+    pio = new ['FileHandle']
+    pio.'open'(temp_file, 'w')
+    pio.'encoding'("utf16")
+    pio.'print'(utf8:"abc \x{1d004} def")
+    $I0 = pio.'tell'()
+    say $I0
+    pio.'close'()
+
+    pio.'open'(temp_file, 'r')
+    pio.'encoding'("utf16")
+    $S0 = pio.'read'(9)
+    $I0 = iseq $S0, ucs4:"abc \x{1d004}"
+    say $I0
+    $S1 = pio.'read'(1)
+    $I0 = iseq $S1, ' '
+    say $I0
+    $S0 .= $S1
+    $S1 = pio.'read'(1024) # read the rest of the file (much shorter than 1K)
+    $S0 .= $S1
+    $I0 = iseq $S0, ucs4:"abc \x{1d004} def"
+    say $I0
+    pio.'close'()
+
+    $I1 = encoding $S0
+    $S2 = encodingname $I1
+    say $S2
+.end
+CODE
+20
+1
+1
+1
+utf16
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "PIO.readall() - classmeth" );

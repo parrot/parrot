@@ -194,9 +194,10 @@ binary_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
 
 
 static STR_VTABLE Parrot_binary_encoding = {
-    0,
+    -1,
     "binary",
     NULL,
+    1, /* Bytes per unit */
     1, /* Max bytes per codepoint */
 
     binary_to_encoding,

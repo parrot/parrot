@@ -396,9 +396,10 @@ ucs2_hash(SHIM_INTERP, ARGIN(const STRING *src), size_t hashval)
 }
 
 static STR_VTABLE Parrot_ucs2_encoding = {
-    0,
+    -1,
     "ucs2",
     NULL,
+    2, /* Bytes per unit */
     2, /* Max bytes per codepoint */
 
     ucs2_to_encoding,
