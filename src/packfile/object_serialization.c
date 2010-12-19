@@ -187,6 +187,7 @@ is valid. Throws exceptions if not.
 void
 Parrot_pf_verify_image_string(PARROT_INTERP, ARGIN(STRING *image))
 {
+    ASSERT_ARGS(Parrot_pf_verify_image_string)
     if (STRING_length(image) < 16)
         Parrot_ex_throw_from_c_args(interp, NULL,
             EXCEPTION_INVALID_STRING_REPRESENTATION,
