@@ -105,6 +105,19 @@ implementation, and malloc wrappers for various purposes. These are unused.
 
 #endif
 
+PARROT_EXPORT
+void
+Parrot_gc_set_system_type(PARROT_INTERP, const char *name)
+{
+    //ASSERT_ARGS(Parrot_gc_set_system_type)
+    if (STREQ(name, "MS"))
+        interp->gc_sys->sys_type = MS;
+    if (STREQ(name, "MS2"))
+        interp->gc_sys->sys_type = MS2;
+    if (STREQ(name, "INF"))
+        interp->gc_sys->sys_type = INF;
+}
+
 /*
 
 =item C<void Parrot_gc_mark_PObj_alive(PARROT_INTERP, PObj *obj)>

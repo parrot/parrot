@@ -163,17 +163,17 @@ struct _handler_node_t; /* forward def - exit.h */
 
 /* The actual interpreter structure */
 struct parrot_interp_t {
-    PMC           *ctx;                       /* current Context */
+    PMC                 *ctx;                 /* current Context */
 
-    struct Memory_Pools *mem_pools;                /* Pointer to this interpreter's
+    struct Memory_Pools *mem_pools;           /* Pointer to this interpreter's
                                                * arena */
 
-    struct GC_Subsystem *gc_sys;              /*functions and data specific
-                                                  to current GC subsystem*/
-    UINTVAL gc_threshold;                     /* maximum percentage of memory
+    struct GC_Subsystem *gc_sys;              /* functions and data specific
+                                                 to current GC subsystem*/
+    UINTVAL  gc_threshold;                    /* maximum percentage of memory
                                                  wasted by GC */
 
-    PMC *gc_registry;                         /* root set of registered PMCs */
+    PMC     *gc_registry;                     /* root set of registered PMCs */
 
     PMC     *class_hash;                      /* Hash of classes */
     VTABLE **vtables;                         /* array of vtable ptrs */
@@ -188,7 +188,7 @@ struct parrot_interp_t {
     int         n_libs;                       /* count of libs below */
     op_lib_t  **all_op_libs;                  /* all loaded opcode libraries */
 
-    INTVAL flags;                             /* Various interpreter flags that
+    INTVAL      flags;                        /* Various interpreter flags that
                                                * signal that runops should do
                                                * something */
 
@@ -198,33 +198,32 @@ struct parrot_interp_t {
     struct runcore_t **cores;                 /* array of known runcores */
     UINTVAL            num_cores;             /* number of known runcores */
 
-    INTVAL resume_flag;
-    size_t resume_offset;
+    INTVAL             resume_flag;
+    size_t             resume_offset;
 
-    PackFile_ByteCode *code;                  /* The code we are executing */
-    struct PackFile          *initial_pf;     /* first created PF  */
+    PackFile_ByteCode  *code;                 /* The code we are executing */
+    struct PackFile    *initial_pf;           /* first created PF  */
 
     struct _imc_info_t *imc_info;             /* imcc data */
     Hash               *op_hash;              /* mapping from op names to op_info_t */
 
+    const char         *output_file;          /* where to write output */
 
-    const char *output_file;                  /* where to write output */
+    PDB_t *pdb;                               /* debug /trace system */
 
-    PDB_t  *pdb;                              /* debug /trace system */
+    PMC   *dynamic_env;                       /* Dynamic environment stack */
 
-    PMC * dynamic_env;                        /* Dynamic environment stack */
-
-    void *lo_var_ptr;                         /* Pointer to memory on runops
+    void  *lo_var_ptr;                        /* Pointer to memory on runops
                                                * system stack */
 
     Interp *parent_interpreter;
 
     /* per interpreter global vars */
-    INTVAL world_inited;                      /* world_init_once() is done */
+    INTVAL  world_inited;                     /* world_init_once() is done */
 
     UINTVAL hash_seed;                        /* STRING hash seed */
 
-    PMC *iglobals;                      /* FixedPMCArray of PMCs, containing: */
+    PMC    *iglobals;                         /* FixedPMCArray of PMCs, containing: */
     /* 0:   PMC *Parrot_base_classname_hash; hash containing name->base_type */
     /* 1:   PMC *Parrot_compreg_hash;    hash containing assembler/compilers */
     /* 2:   PMC *Argv;                   list of argv */
@@ -267,6 +266,9 @@ struct parrot_interp_t {
     /* during a call sequencer the caller fills these objects
      * inside the invoke these get moved to the context structure */
     PMC *current_cont;                        /* the return continuation PMC */
+    Parrot_jump_buff *api_jmp_buf;            /* jmp point out of Parrot */
+    PMC * final_exception;                    /* Final exception PMC */
+    INTVAL exit_code;
 };
 
 /* typedef struct parrot_interp_t Interp;    done in parrot.h so that
@@ -484,10 +486,23 @@ void Parrot_compreg(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PMC * Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void Parrot_mark_method_writes(PARROT_INTERP,
     int type,
     ARGIN(const char *name))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+void Parrot_set_compiler(PARROT_INTERP,
+    ARGIN(STRING *type),
+    ARGIN(PMC *compiler))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
@@ -526,9 +541,16 @@ void register_nci_method(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(type) \
     , PARROT_ASSERT_ARG(func))
+#define ASSERT_ARGS_Parrot_get_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(type))
 #define ASSERT_ARGS_Parrot_mark_method_writes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_Parrot_set_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(type) \
+    , PARROT_ASSERT_ARG(compiler))
 #define ASSERT_ARGS_register_native_pcc_method_in_ns \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
