@@ -568,8 +568,9 @@ really a public API.
             return VTABLE_get_pmc_keyed(INTERP, ns, key);
         }
         else if (VTABLE_does(INTERP, key, CONST_STRING(INTERP, "array"))) {
-            INTVAL i = 0;
-            while (!PMC_IS_NULL(ns) && VTABLE_elements(INTERP, key)) {
+            const INTVAL elements = VTABLE_elements(INTERP, key);
+            INTVAL i;
+            for (i = 0; i < elements && !PMC_IS_NULL(ns); ++i) {
                 STRING * const name = VTABLE_get_string_keyed_int(INTERP, key, i);
                 if (STRING_IS_NULL(name)) {
                     ns = PMCNULL;
@@ -577,7 +578,6 @@ really a public API.
                     break;
                 }
                 ns = Parrot_ns_get_namespace_keyed_str(INTERP, ns, name);
-                ++i;
             }
             return ns;
         }
