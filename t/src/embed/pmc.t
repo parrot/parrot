@@ -24,7 +24,7 @@ Tests PMC API support.
 
 =cut
 
-plan tests => 4;
+plan tests => 5;
 
 c_output_is( <<'CODE', <<'OUTPUT', "get/set_keyed_int" );
 
@@ -204,6 +204,63 @@ int main(int argc, char* argv[])
 CODE
 This is a string!
 3.1415
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', "PMC find_method" );
+
+#include <parrot/api.h>
+#include <stdio.h>
+
+int main(int argc, char* argv[])
+{
+    Parrot_Init_Args *initargs = NULL;
+    Parrot_PMC interpmc = NULL;
+    Parrot_PMC p_pmc = NULL, p_method = NULL, p_signature = NULL, p_classname = NULL;
+    Parrot_PMC p_call_class = NULL, p_toreplace = NULL, p_replacestring = NULL;
+    Parrot_String s_teststr = NULL, s_outstr = NULL, s_method = NULL, s_classname = NULL;
+    Parrot_String s_signstring = NULL, s_toreplace = NULL, s_replacestring = NULL;
+    Parrot_PMC p_keyedstr = NULL;
+    Parrot_PMC p_idx = NULL;
+    char * c_out = NULL;
+
+    GET_INIT_STRUCT(initargs);
+    Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+
+    Parrot_api_string_import_ascii(interpmc, "I love Microsoft!", &s_teststr);
+    Parrot_api_pmc_box_string(interpmc, s_teststr, &p_pmc);
+
+    Parrot_api_string_import_ascii(interpmc, "replace", &s_teststr);
+    Parrot_api_pmc_find_method(interpmc, p_pmc, s_teststr, &p_method);
+    if(p_method != NULL) {
+        Parrot_api_string_import_ascii(interpmc, "CallContext", &s_classname);
+        Parrot_api_pmc_box_string(interpmc, s_classname, &p_classname);
+        Parrot_api_pmc_get_class(interpmc, p_classname, &p_call_class);
+        Parrot_api_pmc_new_from_class(interpmc, p_call_class, NULL, &p_signature);
+
+        Parrot_api_string_import_ascii(interpmc, "PiSS->", &s_signstring);
+        Parrot_api_pmc_set_string(interpmc, p_signature, s_signstring);
+        Parrot_api_pmc_set_keyed_int(interpmc, p_signature, 0, p_pmc);
+
+        Parrot_api_string_import_ascii(interpmc, "Microsoft", &s_toreplace);
+        Parrot_api_pmc_box_string(interpmc, s_toreplace, &p_toreplace);
+        Parrot_api_pmc_set_keyed_int(interpmc, p_signature, 1, p_toreplace);
+
+        Parrot_api_string_import_ascii(interpmc, "the Open Source community", &s_replacestring);
+        Parrot_api_pmc_box_string(interpmc, s_replacestring, &p_replacestring);
+        Parrot_api_pmc_set_keyed_int(interpmc, p_signature, 2, p_replacestring);
+
+        Parrot_api_pmc_invoke(interpmc, p_method, p_signature);
+        Parrot_api_pmc_get_string(interpmc, p_pmc, &s_outstr);
+        Parrot_api_string_export_ascii(interpmc, s_outstr, &c_out);
+        printf("%s\n", c_out);
+    }
+    else printf("error\n");
+
+    return 0;
+}
+
+CODE
+I love the Open Source community!
 OUTPUT
 
 # Local Variables:

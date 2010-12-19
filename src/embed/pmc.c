@@ -204,7 +204,7 @@ PARROT_API
 Parrot_Int
 Parrot_api_pmc_invoke(Parrot_PMC interp_pmc, Parrot_PMC sub, Parrot_PMC signature)
 {
-    EMBED_API_CALLIN(interp_pmc, interp);
+    EMBED_API_CALLIN(interp_pmc, interp)
     PMC  * const old_call_obj = Parrot_pcc_get_signature(interp,
         CURRENT_CONTEXT(interp));
     Parrot_pcc_invoke_from_sig_object(interp, sub, signature);
@@ -241,5 +241,15 @@ Parrot_api_pmc_get_class(Parrot_PMC interp_pmc, Parrot_PMC key,
 {
     EMBED_API_CALLIN(interp_pmc, interp);
     *class = Parrot_oo_get_class(interp, key);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_find_method(Parrot_PMC interp_pmc, Parrot_PMC object, Parrot_String name, ARGOUT(Parrot_PMC *method))
+{
+    EMBED_API_CALLIN(interp_pmc, interp);
+    *method = VTABLE_find_method(interp, object, name);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
