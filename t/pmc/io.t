@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -759,6 +759,54 @@ ok:
 .end
 CODE
 ok
+OUTPUT
+
+pir_output_is( <<"CODE", <<"OUTPUT", "utf16 readline" );
+.sub main :main
+    .local int i, len
+    .local string str, c
+    .local pmc pio
+
+    getstdout \$P0
+    \$P0.'encoding'('ascii')
+
+    str = 'a'
+    c = chr 0x1d001
+    i = 0
+loop:
+    str .= c
+    inc i
+    if i < 8000 goto loop
+    str .= "\\nline 2\\n"
+
+    pio = new ['FileHandle']
+    pio.'open'("$temp_file", 'w')
+    pio.'encoding'('utf16')
+    print pio, str
+    len = pio.'tell'()
+    say len
+    pio.'close'()
+
+    pio = new ['FileHandle']
+    pio.'open'("$temp_file", 'r')
+    pio.'encoding'('utf16')
+
+    str = pio.'readline'()
+    len = length str
+    say len
+    i = ord str, 5678
+    say i
+
+    str = pio.'readline'()
+    print str
+
+    pio.'close'()
+.end
+CODE
+32018
+8002
+118785
+line 2
 OUTPUT
 
 # Local Variables:

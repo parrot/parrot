@@ -453,25 +453,22 @@ size_t
 Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING **buf))
 {
     ASSERT_ARGS(Parrot_io_readline_buffer)
-    size_t l;
-    unsigned char *out_buf;
-    unsigned char *buf_start;
     const INTVAL   buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
     unsigned char *buffer_next;
     unsigned char *buffer_end;
-    size_t len;
-    STRING *s;
+    STRING        *s;
+    STRING         part;
 
     if (*buf == NULL) {
         *buf = Parrot_gc_new_string_header(interp, 0);
     }
     s = *buf;
-    s->strlen = 0;
+    s->bufused = 0;
+    s->strlen  = 0;
 
     /* fill empty buffer */
     if (!(buffer_flags & PIO_BF_READBUF)) {
         if (Parrot_io_fill_readbuf(interp, filehandle) == 0) {
-            s->bufused = 0;
             return 0;
         }
     }
@@ -480,56 +477,106 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
     buffer_next = Parrot_io_get_buffer_next(interp, filehandle);
     buffer_end  = Parrot_io_get_buffer_end(interp, filehandle);
 
-    buf_start = buffer_next;
+    part.encoding = s->encoding;
 
-    for (l = 0; buffer_next < buffer_end;) {
-        ++l;
-        if (io_is_end_of_line((char *)buffer_next)) {
-            Parrot_io_set_buffer_next(interp, filehandle, ++buffer_next);
+    while(1) {
+        const size_t buffer_size = buffer_end - buffer_next;
+        size_t       chunk_size, new_size, decoded_bytes;
+        INTVAL       got, res;
+
+        /* Partial scan of buffer */
+
+        part.strstart = (char *)buffer_next;
+        part.bufused  = buffer_end - buffer_next;
+
+        res = STRING_partial_scan(interp, &part, -1, '\n');
+
+        /* Append buffer to result */
+
+        if (res < 0)
+            /* End of line, use only part of buffer */
+            chunk_size = part.bufused;
+        else
+            /* Copy whole buffer, might copy partial characters */
+            chunk_size = buffer_size;
+
+        decoded_bytes = s->bufused + part.bufused;
+        new_size      = s->bufused + chunk_size;
+
+        if (s->strstart)
+            Parrot_gc_reallocate_string_storage(interp, s, new_size);
+        else
+            Parrot_gc_allocate_string_storage(interp, s, new_size);
+
+        memcpy(s->strstart + s->bufused, buffer_next, chunk_size);
+
+        s->bufused  = new_size;
+        s->strlen  += part.strlen;
+
+        if (res < 0) {
+            /* End of line */
+            buffer_next += chunk_size;
+            Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
             break;
         }
 
-        Parrot_io_set_buffer_next(interp, filehandle, ++buffer_next);
+        /* Refill buffer */
 
-        /* if there is a buffer, readline is called by the read opcode
-         * - return just that part
-         */
-        if (s->bufused && l == s->bufused)
-            break;
-        /* buffer completed; copy out and refill */
-        if (buffer_next == buffer_end) {
-            len = buffer_end - buf_start;
-            if (s->bufused < l) {
-                if (s->strstart) {
-                    Parrot_gc_reallocate_string_storage(interp, s, l);
-                }
-                else {
-                    Parrot_gc_allocate_string_storage(interp, s, l);
-                }
+        got = Parrot_io_fill_readbuf(interp, filehandle);
+
+        if (got == 0) {
+            /* End of file */
+
+            if (part.bufused == buffer_size) {
+                buffer_next = buffer_end;
+                break;
             }
-            out_buf = (unsigned char*)s->strstart + s->strlen;
-            memcpy(out_buf, buf_start, len);
-            s->strlen = s->bufused = l;
-            if (Parrot_io_fill_readbuf(interp, filehandle) == 0)
-                return l;
+            else {
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_CHARACTER,
+                    "Unaligned end in %s string\n", s->encoding->name);
+            }
+        }
 
-            buffer_next = Parrot_io_get_buffer_next(interp, filehandle);
-            buffer_end  = Parrot_io_get_buffer_end(interp, filehandle);
-            buf_start = Parrot_io_get_buffer_start(interp, filehandle);
+        buffer_next = Parrot_io_get_buffer_next(interp, filehandle);
+        buffer_end  = Parrot_io_get_buffer_end(interp, filehandle);
+
+        if (part.bufused < buffer_size) {
+            /* Handle character split across buffers */
+
+            size_t bytes_l = s->bufused - decoded_bytes;
+            size_t bytes_r = got < 3 ? got : 3;
+
+            /* First, copy enough bytes to complete character */
+            memcpy(s->strstart + s->bufused, buffer_next, bytes_r);
+
+            /* Partial scan of single character */
+
+            part.strstart = s->strstart + decoded_bytes;
+            part.bufused  = bytes_l + bytes_r;
+
+            res = STRING_partial_scan(interp, &part, 1, '\n');
+
+            if (part.bufused == 0)
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_CHARACTER,
+                    "Unaligned end in %s string\n", s->encoding->name);
+
+            PARROT_ASSERT(part.strlen == 1);
+
+            bytes_r = part.bufused - bytes_l;
+
+            s->bufused  += bytes_r;
+            s->strlen   += 1;
+
+            buffer_next += bytes_r;
+
+            if (res < 0 || (size_t)got == bytes_r) {
+                Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
+                break;
+            }
         }
     }
-    if (s->bufused < l) {
-        if (s->strstart) {
-            Parrot_gc_reallocate_string_storage(interp, s, l);
-        }
-        else {
-            Parrot_gc_allocate_string_storage(interp, s, l);
-        }
-    }
-    out_buf = (unsigned char*)s->strstart + s->strlen;
-    len = buffer_next - buf_start;
-    memcpy(out_buf, buf_start, len);
-    s->strlen = s->bufused = l;
 
     /* check if buffer is finished */
     if (buffer_next == buffer_end) {
@@ -541,9 +588,9 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
     }
 
     Parrot_io_set_file_position(interp, filehandle,
-            l + Parrot_io_get_file_position(interp, filehandle));
+            s->bufused + Parrot_io_get_file_position(interp, filehandle));
 
-    return l;
+    return s->bufused;
 }
 
 /*

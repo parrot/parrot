@@ -194,6 +194,7 @@ latin1_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
     ASSERT_ARGS(latin1_partial_scan)
     size_t i;
     size_t len = src->bufused;
+    INTVAL res = 0;
 
     if (count >= 0 && (UINTVAL)count < len)
         len = count;
@@ -202,6 +203,7 @@ latin1_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
         for (i = 0; i < len; ++i) {
             if (src->strstart[i] == delim) {
                 len = i + 1;
+                res = -1;
                 break;
             }
         }
@@ -210,7 +212,7 @@ latin1_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
     src->bufused = len;
     src->strlen  = len;
 
-    return 0;
+    return res;
 }
 
 

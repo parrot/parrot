@@ -201,6 +201,7 @@ ascii_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
     unsigned char *p = (unsigned char *)src->strstart;
     size_t i;
     size_t len = src->bufused;
+    INTVAL res = 0;
 
     if (count >= 0 && (UINTVAL)count < len)
         len = count;
@@ -212,6 +213,7 @@ ascii_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
 
         if (p[i] == delim) {
             len = i + 1;
+            res = -1;
             break;
         }
     }
@@ -219,7 +221,7 @@ ascii_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
     src->bufused = len;
     src->strlen  = len;
 
-    return 0;
+    return res;
 }
 
 

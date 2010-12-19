@@ -258,8 +258,8 @@ utf16_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
     const utf16_t *p         = (utf16_t *)src->strstart;
     UINTVAL        len       = 0;
     UINTVAL        max_chars = count >= 0 ? (UINTVAL)count : src->bufused;
-    UINTVAL        needed    = 0;
     UINTVAL        i, n;
+    INTVAL         res       = 0;
 
     n = src->bufused >> 1;
 
@@ -269,7 +269,7 @@ utf16_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
         if (UNICODE_IS_HIGH_SURROGATE(c)) {
             if (i + 1 >= n) {
                 /* Two more bytes needed */
-                needed = 2;
+                res = 2;
                 break;
             }
 
@@ -293,14 +293,17 @@ utf16_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
 
         ++len;
 
-        if (c == (UINTVAL)delim)
+        if (c == (UINTVAL)delim) {
+            i   += 1;
+            res  = -1;
             break;
+        }
     }
 
     src->bufused = i << 1;
     src->strlen  = len;
 
-    return needed;
+    return res;
 }
 
 

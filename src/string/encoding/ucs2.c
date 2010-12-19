@@ -224,6 +224,7 @@ ucs2_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
     const utf16_t * const ptr = (utf16_t *)src->strstart;
     UINTVAL               len = src->bufused >> 1;
     UINTVAL               i;
+    INTVAL                res = 0;
 
     if (count >= 0 && (UINTVAL)count < len)
         len = count;
@@ -233,6 +234,7 @@ ucs2_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
 
         if (ptr[i] == delim) {
             len = i + 1;
+            res = -1;
             break;
         }
     }
@@ -240,7 +242,7 @@ ucs2_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
     src->bufused = len << 1;
     src->strlen  = len;
 
-    return 0;
+    return res;
 }
 
 

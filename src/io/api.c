@@ -428,8 +428,8 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
 
         result           = Parrot_str_new_noinit(interp, length);
         result->bufused  = length;
-        bytes_read       = Parrot_io_read_buffer(interp, pmc, &result);
         result->encoding = encoding;
+        bytes_read       = Parrot_io_read_buffer(interp, pmc, &result);
 
         if (bytes_read & (encoding->bytes_per_unit - 1))
             Parrot_ex_throw_from_c_args(interp, NULL,

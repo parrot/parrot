@@ -241,7 +241,7 @@ utf8_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
     const utf8_t *u8end = (const utf8_t *)(src->strstart + src->bufused);
     UINTVAL characters  = 0;
     UINTVAL max_chars   = count >= 0 ? (UINTVAL)count : src->bufused;
-    UINTVAL needed      = 0;
+    INTVAL  res         = 0;
 
     while (u8ptr < u8end && characters < max_chars) {
         UINTVAL c = *u8ptr;
@@ -251,7 +251,7 @@ utf8_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
             size_t count;
 
             if (u8ptr + len > u8end) {
-                needed = u8ptr + len - u8end;
+                res = u8ptr + len - u8end;
                 break;
             }
 
@@ -284,14 +284,16 @@ utf8_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
         ++u8ptr;
         ++characters;
 
-        if (c == (UINTVAL)delim)
+        if (c == (UINTVAL)delim) {
+            res = -1;
             break;
+        }
     }
 
     src->bufused = (const char *)u8ptr - (const char *)src->strstart;
     src->strlen  = characters;
 
-    return needed;
+    return res;
 }
 
 
