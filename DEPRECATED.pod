@@ -251,10 +251,6 @@ Assigning to registers [experimental]
 
 =over 4
 
-=item Assignment syntax with opcodes [eligible in 1.1]
-
-L<https://trac.parrot.org/parrot/ticket/906>
-
 =item continuation-based ExceptionHandlers [eligible in 2.1]
 
 L<https://trac.parrot.org/parrot/ticket/1091>
