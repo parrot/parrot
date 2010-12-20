@@ -239,9 +239,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     /* same with errors */
     PARROT_ERRORS_off(interp, PARROT_ERRORS_ALL_FLAG);
 
-    /* undefined globals are errors by default */
-    PARROT_ERRORS_on(interp, PARROT_ERRORS_GLOBALS_FLAG);
-
     /* param count mismatch is an error by default */
     PARROT_ERRORS_on(interp, PARROT_ERRORS_PARAM_COUNT_FLAG);
 
