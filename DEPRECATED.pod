@@ -284,6 +284,21 @@ L<https://trac.parrot.org/parrot/ticket/1033>
 L<https://trac.parrot.org/parrot/ticket/1704>
 L<https://trac.parrot.org/parrot/ticket/1705>
 
+=item C<:load> and C<:init> Sub flags doing different things [eligible in 3.1]
+
+Currently, C<:init> and C<:load> flagged Subs get called depending on the way a
+PIR file has been loaded. This distinction is silly and will cease to be. The
+C<:load> flag will be triggered both for scenarios. C<:init> becomes a no-op for
+a deprecation cycle (see below).
+
+L<https://trac.parrot.org/parrot/ticket/1895>
+
+=item C<:init> Sub flag [eligible in 3.4]
+
+At this point, C<:init> is a no-op, and will therefore be removed.
+
+L<https://trac.parrot.org/parrot/ticket/1896>
+
 =back
 
 =head1 Functions
