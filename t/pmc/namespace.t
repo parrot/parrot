@@ -57,7 +57,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(91)
+    plan(92)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -213,6 +213,11 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     is($I0, 1, "can lookup nested namespace by RSA - isa NameSpace")
     # TODO: Get the function from this namespace and call it to verify we have
     #       the correct one.
+    null $S0
+    $P1[3] = $S0
+    $P2 = $P0[$P1]
+    $I0 = isnull $P2
+    is($I0, 1, "lookup nested namespace by RSA with a null element")
 
     # String lookup
     $P1 = $P0["parrot"]
