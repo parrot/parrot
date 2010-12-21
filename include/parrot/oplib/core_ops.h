@@ -51,7 +51,7 @@ op_lib_t *Parrot_DynOp_core_2_10_1(PARROT_INTERP, long init);
  opcode_t * Parrot_yield(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_tailcall_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_returncc(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_sub_capture_lex_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_capture_lex_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_newclosure_p_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_set_args_pc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_get_params_pc(opcode_t *, PARROT_INTERP);
