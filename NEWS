@@ -16,6 +16,10 @@ New in 2.11.0
 - Documentation
 - Tests
  + Test coverage increase on PMCs: String, Integer
+ + 'make quickcover' target added to speed up most essential
+    parts of coverage analysis
+ + 'tools/dev/headerizer.pl' refactored to improve maintainability
+    (no change in functionality)
 
 New in 2.10.0
 - Core
