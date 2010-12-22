@@ -2519,7 +2519,6 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
     Parrot_gc_allocate_string_storage(interp, result, reserved);
     result->bufused = reserved;
 
-    Parrot_warn_experimental(interp, "Parrot_str_unescape_string is experimental");
     STRING_ITER_INIT(interp, &itersrc);
     STRING_ITER_INIT(interp, &iterdest);
     while (itersrc.bytepos < srclen) {

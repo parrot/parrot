@@ -104,12 +104,6 @@ will not auto-vivify nested hashes and return PMCNULL early.
 
 L<https://trac.parrot.org/parrot/ticket/1561>
 
-=item Method unescape on String [experimental]
-
-This is a helper method for testing of Parrot_str_unescape_string.
-
-L<https://trac.parrot.org/parrot/ticket/1628>
-
 =item logical_* vtables [eligiblie in 2.7]
 
 These can be replaced by C<get_bool> and intval ops unless you're using them for
@@ -330,13 +324,6 @@ COW strings are to be removed. All "inplace" string modification
 functions and all "inplace" string ops are deprecated.
 
 L<https://trac.parrot.org/parrot/ticket/1540>
-
-=item Parrot_str_unescape_string [experimental]
-
-This function is an experimental addition to enhance and maybe replace
-Parrot_str_unescape
-
-L<https://trac.parrot.org/parrot/ticket/1628>
 
 =item Parrot_load_bytecode_file [experimental]
 
