@@ -79,9 +79,8 @@ functionality, those can usually be added with relative ease.
 
 =head2 Using the Embedding API
 
-Using the Embedding API brings with it some rules that the embedding
-developer must follow, and some conventions that the embedding developer
-should follow unless it's unreasonable to do so.
+The embedding API follows certain guidelines that should be understood by
+users, and followed by developers:
 
 =over 4
 
@@ -89,12 +88,17 @@ should follow unless it's unreasonable to do so.
 Parrot_PMC, Parrot_String, Parrot_Int, and Parrot_Float. The first two of
 these are pointers and should be treated as opaque.
 
+=item * Where possible and reasonable, functions should take Parrot_Strings
+instead of raw C C<char*> or C<wchar_t*> types. Functions do exist to easily
+convert between C types and Parrot_String.
+
 =item * PMCs are the primary data item. Anything more complicated than an
-integer or string will be passed as a PMC.
+integer or string will be passed as a PMC. Some integers and strings will be
+wrapped up in a PMC and passed.
 
 =item * The number of API functions will stay relatively small. The purpose of
 the API is not to provide the most efficient use of libparrot, but instead
-the most general and abstracted one.
+the most general, stable and abstracted one.
 
 =item * Calls into libparrot carry a performance overhead because we have to
 do error handling, stack manipulation, data marshalling, etc. It is best to
@@ -111,7 +115,7 @@ responsibility of the embedder.
 =item * File descriptors and resource handles are typically owned by whoever
 opens them first. If the embedding application tells libparrot to open a file
 with a FileHandle PMC, libparrot will keep and manage that file descriptor.
-Functionality may be provide to import and export sharable resources like
+Functionality may be provided to import and export sharable resources like
 these.
 
 =item * Resources such as allocated memory are managed by whoever creates
@@ -124,6 +128,13 @@ will be copied to a new memory buffer.
 =item * libparrot will not output error information to C<stderr> unless
 specifically requested to. Instead, libparrot will gather all error
 information and make it available to the user through function calls.
+
+=item * API calls should be nestable. Unhandled exceptions or other error
+conditions should cause a jump back to the inner-most API call. The interpreter
+should be able to recover from errors in inner-most frames and continue
+executing.
+
+I<Note: Currently, the API does not support nested calls. This is planned>
 
 =back
 
@@ -140,7 +151,9 @@ developers of it should follow:
 
 =item * It should never be possible to crash or corrupt the interpreter when
 following the interface as documented. The interpreter should be able to be
-used and reused until it is explicitly destroyed.
+used and reused until it is explicitly destroyed. The interpreter should
+be reusable after it deals with an unhandled exception, including EXCEPT_exit
+exceptions.
 
 =item * It should never be possible for libparrot to crash, corrupt, or
 forcibly exit the embedding application. Also, libparrot should never use
@@ -158,6 +171,12 @@ All API functions are named C<Parrot_api_*>.
 =item * The return value of every API function should be an integer value. The
 return value should be 1 on success, and 0 on failure. No other results should
 be returned.
+
+The marker C<PARROT_API> is special and is used to denote API functions. This
+macro sets the function up to be exported from the shared library and may
+also provide some hints to the compiler.
+
+All API functions return a Parrot_Int to signal status.
 
 =back
 
