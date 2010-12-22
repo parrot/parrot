@@ -25,12 +25,18 @@ Extending gives libparrot more features, and allows your code to execute from
 inside libparrot. From that location, the extending application has full
 access to the available power and features of libparrot. This includes
 knowledge about internal structure definitions, and internal-only functions
-and subsystems.
+and subsystems. Because extending code is so closely tied to the internals
+of libparrot, it will be more affected by changes in libparrot itself. Also,
+the stability of extending code is tied to the stability of libparrot: If either
+crashes, the other will likely crash with it.
 
 Embedding, on the other hand, has much more limited access to libparrot. All
 embedding applications must use the official embedding API, which is
 limited and abstracted by design. Embedding applications must treat all
-pointers and structures returned from the API as being opaque.
+pointers and structures returned from the API as being opaque. This abstraction
+buys stability. Changes to the internals of libparrot are unlikely to cause
+changes in embedding code. If libparrot crashes or suffers an unrecoverable
+error, it can return control to the embedding application more gracefully.
 
 =head3 The Embedding API
 
