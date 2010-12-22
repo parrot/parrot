@@ -316,6 +316,10 @@ internal buffer is copied to a freshly allocated memory block and returned.
 When you are done with the string, there is an associated free function to
 deallocate that memory.
 
+The second type of string API functions are functions to perform operations on
+strings. These could be operations such as string analysis or string
+manipulation.
+
 =head2 References
 
 =cut
