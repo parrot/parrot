@@ -125,6 +125,8 @@ will be copied to a new memory buffer.
 specifically requested to. Instead, libparrot will gather all error
 information and make it available to the user through function calls.
 
+=back
+
 =head2 Implementation
 
 The embedding API has two goals: To allow access to libparrot as a dynamic
