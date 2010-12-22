@@ -206,8 +206,9 @@ they can be returned from a compiler, they can be loaded from PBC, or they can
 be constructed on the fly.
 
 I<Note: There are PackFile PMCs which represent bytecode, but the PBC object
-returned or consumed by any individual API function may have a different type.
-Treat these objects as opaque until a good interface for them is worked out.>
+returned or consumed by any individual compiler or API function may have a
+different type. Treat these objects as opaque until a good interface for them
+is worked out.>
 
 Once a PBC PMC is obtained, several things can be done with it: It can be
 loaded into libparrot as a library and individual calls can be made into it.
@@ -215,3 +216,85 @@ It can also be executed directly as an application, which will trigger the
 C<:main> function, if any. The PMC can also be written out to a .pbc file for
 later use.
 
+Currently there are two functions to get a bytecode PMC.
+
+    Parrot_api_load_bytecode(interp, filename, *pbc)
+    Parrot_api_load_bytecode_bytes(interp, bytecode, size, *pbc)
+
+The first function loads bytecode from a file. The second loads bytecode in
+from an in-memory byte array. Both return a bytecode PMC. That PMC can be
+passed as an argument to any of the following functions:
+
+    Parrot_api_ready_bytecode(interp, pbc, *main_sub)
+    Parrot_api_run_bytecode(interp, pbc, args)
+    Parrot_api_disassemble_bytecode(interp, pbc, outfilename, opts)
+
+C<Parrot_api_ready_bytecode> loads the bytecode into memory and returns a
+reference to the C<:main> Sub PMC, if any. It does not automatically execute
+the bytecode. C<Parrot_api_run_bytecode> loads bytecode and automatically
+executes C<:main> with the given arguments, and sets these arguments in the
+IGLOBALS array for later access. C<Parrot_api_disassemble_bytecode> is used
+primarily by the pbc_disassemble frontend.
+
+=head3 Settings and Configuration
+
+The interpreter is configured in many ways. When the interpreter is created
+there is a structure C<Parrot_Init_Args> that we can use to optionally change
+some of the low-level internal options of the interpreter. Thereafter, we can
+set configurations using the Config Hash or a series of API calls.
+
+The Configuration hash is a hash of named settings that can be set in the
+interpreter. The primary purpose of this is to help set information such as
+standard search paths. The configuration hash will also be available from the
+interpreter's IGLOBALS array, and may be used by various tools and utilities
+to inform certain decisions. To set a configuration hash, call
+
+    Parrot_api_set_configuration_hash
+
+This function is only really intended to be called once per interpreter. It
+is possible to set a new configuration hash at any time, but settings from
+the old hash will not be removed first. Currently, the configuration hash is
+set as a global, and any interpreter created after a config hash is set will
+automatically inherit the last set configuration hash. Setting a new config
+hash on a child interpreter does not affect any existing interpreters.
+
+In addition to the configuration hash, library search paths can be appended
+to through the following functions:
+
+    Parrot_api_add_library_search_path
+    Parrot_api_add_include_search_path
+    Parrot_api_add_dynext_search_path
+
+There is currently no way to remove search paths once set, or to examine the
+complete list of search paths. This may be added later.
+
+=head3 Strings and PMCs
+
+Embedding API functions which perform general operations on any PMC are
+named C<Parrot_api_pmc_*> and are located in the file C<src/embed/pmc.c>.
+Functions which perform general operations on a Parrot String are named
+C<Parrot_api_string_*> and are located in the file C<src/embed/strings.c>.
+
+PMC functions are general and explicitly limited. The API does not, and does
+not want to, provide complete access to the entire suite of internal
+operations and VTABLEs. The API does not provide convenience methods to do
+all operations in a single call. Some common operations may take multiple
+API calls to perform.
+
+String operations are broken down into two types: The first are the set of
+functions used to marshall between C-level strings and Parrot Strings. Import
+functions take a C string (char* or wchar_t*), and copy their contents into a
+new String buffer. Export functions perform the opposite operation: The
+internal buffer is copied to a freshly allocated memory block and returned.
+When you are done with the string, there is an associated free function to
+deallocate that memory.
+
+=head2 References
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
+vim: expandtab shiftwidth=4:
