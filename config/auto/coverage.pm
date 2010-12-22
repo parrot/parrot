@@ -44,11 +44,21 @@ sub runstep {
 
     my %utils_needed = map { $_ => undef } qw( gcov gcov2perl cover );
     foreach my $util (keys %utils_needed) {
-        $utils_needed{$util} = which($util);
+        my $which_util = which($util);
+        if ($which_util) {
+            $utils_needed{$util} = which($util);
+        }
+        else {
+            $utils_needed{$util} = "echo '$util needed but not found' && exit 1";
+        }
     }
     my @utils_lacking = grep { ! defined $utils_needed{$_} } keys %utils_needed;
     if (@utils_lacking) {
         $self->set_result("lacking @utils_lacking");
+        $conf->data->set(
+            "has_coverage_tools" => 0,
+            %utils_needed,
+        );
     }
     else {
         $conf->data->set(
