@@ -802,7 +802,8 @@ Parrot_io_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
             encoding = Parrot_get_encoding(interp,
                 Parrot_encoding_number(interp, encoding_str));
 
-            if (s->encoding != encoding)
+            if (encoding != s->encoding
+            &&  encoding != Parrot_binary_encoding_ptr)
                 s = encoding->to_encoding(interp, s);
         }
 
