@@ -641,10 +641,11 @@ Parrot_gc_ms2_init(PARROT_INTERP)
         self->fixed_size_allocator = Parrot_gc_fixed_allocator_new(interp);
 
         self->gc_threshold = Parrot_sysmem_amount(interp) / 8;
+
+        Parrot_gc_str_initialize(interp, &self->string_gc);
     }
 
     interp->gc_sys->gc_private = self;
-    Parrot_gc_str_initialize(interp, &self->string_gc);
 }
 
 
