@@ -50,7 +50,7 @@ sub runstep {
             $utils_needed{$util} = which($util);
         }
         else {
-            $utils_needed{$util} = "echo '$util needed but not found' && exit 1";
+            $utils_needed{$util} = "echo '$util needed but not found'; exit 1";
             push @utils_lacking, $util;
         }
     }
