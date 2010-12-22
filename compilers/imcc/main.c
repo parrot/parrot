@@ -571,6 +571,7 @@ compile_to_bytecode(PARROT_INTERP,
         fprintf(stderr, "error:imcc:%s", error_str);
         IMCC_print_inc(interp);
         Parrot_str_free_cstring(error_str);
+        imc_cleanup(interp, yyscanner);
         Parrot_x_exit(interp, IMCC_FATAL_EXCEPTION);
     }
 
