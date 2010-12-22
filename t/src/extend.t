@@ -10,6 +10,9 @@ use Parrot::Test::Util 'create_tempfile';
 
 use Parrot::Test;
 use Parrot::Config;
+use File::Spec::Functions;
+
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
 plan tests => 18;
 
@@ -26,6 +29,7 @@ t/src/extend.t - Parrot Extension API
 Tests the extension API.
 
 =cut
+
 
 c_output_is( <<'CODE', <<'OUTPUT', 'set/get_intreg' );
 

@@ -61,12 +61,9 @@ Tests the Socket PMC.
 .end
 
 .sub test_readline
-    throws_substring(<<'CODE', 'not implemented', 'Socket readline is not implemented')
-    .sub main
-        new $P0, ['Socket']
-        $P0.'readline'()
-    .end
-CODE
+    new $P0, ['Socket']
+    $N0 = $P0.'readline'()
+    is($N0, 0, 'Socket readline returns 0 when not connected')
 .end
 
 .sub test_bool

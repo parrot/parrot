@@ -1003,11 +1003,6 @@ access these from PASM, include F<errors.pasm>.  The current categories are:
 
 =over 4
 
-=item .PARROT_ERRORS_GLOBALS_FLAG
-
-Throw an exception if a global doesn't exist. This
-flag is not used by Parrot and is deprecated.
-
 =item .PARROT_ERRORS_OVERFLOW_FLAG
 
 When performing arithmetic on Integer PMCs, throw a math overflow exception

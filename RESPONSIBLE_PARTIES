@@ -12,7 +12,13 @@ https://trac.parrot.org/parrot/wiki/Languages for language authors/maintainers.
 Project Team
 ------------
 
-Architect                       Allison Randal
+Architect                       Christoph Otto
+
+Product Manager                 Andrew Whitworth
+
+Project Manager                 Jim Keenan
+
+Community Manager               Jonathan Leto
 
 Release Manager                 Bob Rogers
                                 Patrick Michaud
@@ -35,6 +41,10 @@ Metacommitter                   Allison Randal
                                 Will Coleda
                                 chromatic
                                 Jeff Horwitz
+                                Andrew Whitworth
+                                Jim Keenan
+                                Jonathan Leto
+                                Julian Albo
 
 
 Committers

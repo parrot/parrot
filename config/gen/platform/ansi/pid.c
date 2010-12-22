@@ -19,7 +19,9 @@ Parrot process id functions.
 
 =item C<UINTVAL Parrot_getpid(void)>
 
-Parrot wrapper around standard library C<getpid()> function, returning an UINTVAL.
+Parrot wrapper around standard library C<getpid()> function.
+
+Return 0 in platforms unsupported or without a pid concept.
 
 =cut
 

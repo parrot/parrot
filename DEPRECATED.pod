@@ -41,10 +41,6 @@ deprecations specifically by including this snippet:
 
 =over 4
 
-=item GzipHandle [experimental]
-
-L<https://trac.parrot.org/parrot/ticket/1580>
-
 =item PackfileDebug [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/1599>
@@ -123,12 +119,6 @@ Logical vtables are removed in r49012, and logical ops on PMCs are converted to
 use C<get_bool> internally. Rakudo seems to depend on logical ops on PMCs.
 
 L<https://trac.parrot.org/parrot/ticket/1655>
-
-=item Method getpid on ParrotInterpreter [experimental]
-
-Used to test the experimental function Parrot_getpid
-
-L<https://trac.parrot.org/parrot/ticket/1564>
 
 =item Complex PMC [eligible in 3.1]
 
@@ -229,10 +219,6 @@ These fall out from the logical vtables deprecation.
 
 L<https://trac.parrot.org/parrot/ticket/1655>
 
-=item errorson, errorsoff operations [eligible in 2.10]
-
-The C<.PARROT_ERRORS_GLOBAL_FLAG> flag will be eliminated. It is not used by Parrot.
-
 =back
 
 =head1 Bytecode
@@ -260,10 +246,6 @@ Assigning to registers [experimental]
 =head1 PIR syntax
 
 =over 4
-
-=item Assignment syntax with opcodes [eligible in 1.1]
-
-L<https://trac.parrot.org/parrot/ticket/906>
 
 =item continuation-based ExceptionHandlers [eligible in 2.1]
 
@@ -293,6 +275,21 @@ this be the only .param declaration in the sub.
 L<https://trac.parrot.org/parrot/ticket/1033>
 L<https://trac.parrot.org/parrot/ticket/1704>
 L<https://trac.parrot.org/parrot/ticket/1705>
+
+=item C<:load> and C<:init> Sub flags doing different things [eligible in 3.1]
+
+Currently, C<:init> and C<:load> flagged Subs get called depending on the way a
+PIR file has been loaded. This distinction is silly and will cease to be. The
+C<:load> flag will be triggered both for scenarios. C<:init> becomes a no-op for
+a deprecation cycle (see below).
+
+L<https://trac.parrot.org/parrot/ticket/1895>
+
+=item C<:init> Sub flag [eligible in 3.4]
+
+At this point, C<:init> is a no-op, and will therefore be removed.
+
+L<https://trac.parrot.org/parrot/ticket/1896>
 
 =back
 
@@ -340,12 +337,6 @@ This function is an experimental addition to enhance and maybe replace
 Parrot_str_unescape
 
 L<https://trac.parrot.org/parrot/ticket/1628>
-
-=item Parrot_getpid [experimental]
-
-Get process id, experimental.
-
-L<https://trac.parrot.org/parrot/ticket/1564>
 
 =item Parrot_load_bytecode_file [experimental]
 

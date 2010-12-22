@@ -105,7 +105,7 @@ static op_func_t core_op_func_table[1074] = {
   Parrot_yield,                                      /*     27 */
   Parrot_tailcall_p,                                 /*     28 */
   Parrot_returncc,                                   /*     29 */
-  Parrot_sub_capture_lex_p,                              /*     30 */
+  Parrot_capture_lex_p,                              /*     30 */
   Parrot_newclosure_p_p,                             /*     31 */
   Parrot_set_args_pc,                                /*     32 */
   Parrot_get_params_pc,                              /*     33 */
@@ -1553,7 +1553,7 @@ static op_info_t core_op_info_table[1074] = {
     /* type PARROT_INLINE_OP, */
     "capture_lex",
     "capture_lex_p",
-    "Parrot_sub_capture_lex_p",
+    "Parrot_capture_lex_p",
     /* "",  body */
     0,
     2,
@@ -15388,7 +15388,7 @@ Parrot_returncc(opcode_t *cur_opcode, PARROT_INTERP)  {
 }
 
 opcode_t *
-Parrot_sub_capture_lex_p(opcode_t *cur_opcode, PARROT_INTERP)  {
+Parrot_capture_lex_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     Parrot_sub_capture_lex(interp, PREG(1));
 
@@ -16048,7 +16048,6 @@ opcode_t *
 Parrot_loadlib_p_s_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     PREG(1) = Parrot_dyn_load_lib(interp, SREG(2), PREG(3));
-    Parrot_warn_experimental(interp, "Parrot_loadlib_p_s_p is experimental");
 
 return (opcode_t *)cur_opcode + 4;}
 
@@ -25427,7 +25426,8 @@ Parrot_new_p_s_i(opcode_t *cur_opcode, PARROT_INTERP)  {
                           : PMCNULL;
 
     if (!PMC_IS_NULL(_class)) {
-        PMC *initial = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
+        PMC *initial = Parrot_pmc_new(interp,
+                                      Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
         VTABLE_set_integer_native(interp, initial, IREG(3));
         PREG(1) = VTABLE_instantiate(interp, _class, initial);
     }
@@ -25452,7 +25452,8 @@ Parrot_new_p_sc_i(opcode_t *cur_opcode, PARROT_INTERP)  {
                           : PMCNULL;
 
     if (!PMC_IS_NULL(_class)) {
-        PMC *initial = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
+        PMC *initial = Parrot_pmc_new(interp,
+                                      Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
         VTABLE_set_integer_native(interp, initial, IREG(3));
         PREG(1) = VTABLE_instantiate(interp, _class, initial);
     }
@@ -25477,7 +25478,8 @@ Parrot_new_p_s_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
                           : PMCNULL;
 
     if (!PMC_IS_NULL(_class)) {
-        PMC *initial = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
+        PMC *initial = Parrot_pmc_new(interp,
+                                      Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
         VTABLE_set_integer_native(interp, initial, ICONST(3));
         PREG(1) = VTABLE_instantiate(interp, _class, initial);
     }
@@ -25502,7 +25504,8 @@ Parrot_new_p_sc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
                           : PMCNULL;
 
     if (!PMC_IS_NULL(_class)) {
-        PMC *initial = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
+        PMC *initial = Parrot_pmc_new(interp,
+                                      Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
         VTABLE_set_integer_native(interp, initial, ICONST(3));
         PREG(1) = VTABLE_instantiate(interp, _class, initial);
     }
@@ -25788,6 +25791,7 @@ Parrot_finalize_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     /* Go to the next op after loop unrolling */
     opcode_t * const dest = cur_opcode + 2;
     PMC *eh = PMCNULL;
+    Parrot_warn_experimental(interp, "finalize is experimental");
     if (!PMC_IS_NULL(PREG(1))) {
         /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
         if (VTABLE_isa(interp, PREG(1), Parrot_str_new_constant(interp, "ExceptionHandler")))
@@ -25827,6 +25831,7 @@ Parrot_finalize_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     /* Go to the next op after loop unrolling */
     opcode_t * const dest = cur_opcode + 2;
     PMC *eh = PMCNULL;
+    Parrot_warn_experimental(interp, "finalize is experimental");
     if (!PMC_IS_NULL(PCONST(1))) {
         /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
         if (VTABLE_isa(interp, PCONST(1), Parrot_str_new_constant(interp, "ExceptionHandler")))
@@ -25872,8 +25877,8 @@ op_lib_t core_op_lib = {
   PARROT_FUNCTION_CORE,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
   2,    /* major_version */
-  10,    /* minor_version */
-  1,    /* patch_version */
+  11,    /* minor_version */
+  0,    /* patch_version */
   1073,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
@@ -25999,7 +26004,7 @@ static void hop_deinit(PARROT_INTERP)
     hop_buckets = NULL;
 }PARROT_EXPORT
 op_lib_t *
-Parrot_DynOp_core_2_10_1(PARROT_INTERP, long init) {
+Parrot_DynOp_core_2_11_0(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 
@@ -26028,7 +26033,7 @@ Parrot_lib_core_ops_load(PARROT_INTERP)
 
 {
     PMC *const lib = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
-    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_2_10_1;
+    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_2_11_0;
     dynop_register(interp, lib);
     return lib;
 }

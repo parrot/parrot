@@ -92,7 +92,7 @@ E: yDNA@cpan.org
 N: Andrew Whitworth
 D: Internals development
 D: Documentation
-D: Release manager for 0.8.2, 1.3.0, 1.5.0 and 2.4.0
+D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0 and 2.11.0
 E: wknight8111@gmail.com
 U: Whiteknight
 
@@ -530,7 +530,7 @@ E: zhuomingliang@yahoo.com.cn
 D: Bugfixes, cage cleaning
 
 N: John Harrison
-E: ash@greatethaninfinity.com 
+E: ash@greatethaninfinity.com
 U: ash_
 
 N: John J. Trammell

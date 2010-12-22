@@ -1014,8 +1014,6 @@ gc_ms2_mark_live_objects(PARROT_INTERP, ARGIN(MarkSweep_GC *self),
 {
     ASSERT_ARGS(gc_ms2_mark_live_objects)
 
-    pmc_alloc_struct *tmp;
-
     /* Allocate list for gray objects */
     self->new_objects = Parrot_pa_new(interp);
 
@@ -1054,8 +1052,7 @@ static void
 gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms2_mark_and_sweep)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    size_t            counter;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     /* GC is blocked */
     if (self->gc_mark_block_level)
@@ -1088,7 +1085,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     /* Replace objects with new_objects. Ignoring "constant" one */
     do {
-        Parrot_Pointer_Array *tmp = self->objects;
+        Parrot_Pointer_Array * const tmp = self->objects;
         self->objects = self->new_objects;
         Parrot_pa_destroy(interp, tmp);
     } while (0);
