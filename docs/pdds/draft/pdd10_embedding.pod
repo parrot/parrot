@@ -71,7 +71,7 @@ The API also provides a powerful abstraction layer between the libparrot
 internals developers and the embedding application developers. The API is
 sufficiently abstracted and detached enough that even large changes to the
 internals of libparrot are unlikely to require any changes in the embedding
-application. For instance, libparrot could completely change it's entire
+application. For instance, libparrot could completely change its entire
 object model implementation and not cause a change to the API at all.
 
 While limited, the API is not static. If embedders need new features or
@@ -101,7 +101,7 @@ the API is not to provide the most efficient use of libparrot, but instead
 the most general, stable and abstracted one.
 
 =item * Calls into libparrot carry a performance overhead because we have to
-do error handling, stack manipulation, data marshalling, etc. It is best to
+do error handling, stack manipulation, data marshaling, etc. It is best to
 do less work through the API, and more work through bytecode and the runcore.
 
 =item * The embed API uses a single header file: L<include/parrot/api.h>.
@@ -162,7 +162,7 @@ C<stdout>, C<stdin>, and C<stderr>.
 
 =item * Each API function should have a single purpose, and should avoid
 duplication of functionality as much as possible. A course-grained API is
-preferrable to a fine-grained one, even if some performance must be
+preferable to a fine-grained one, even if some performance must be
 sacrificed.
 
 =item * names must be consistent in the API documentation and the examples.
@@ -309,7 +309,7 @@ all operations in a single call. Some common operations may take multiple
 API calls to perform.
 
 String operations are broken down into two types: The first are the set of
-functions used to marshall between C-level strings and Parrot Strings. Import
+functions used to marshal between C-level strings and Parrot Strings. Import
 functions take a C string (char* or wchar_t*), and copy their contents into a
 new String buffer. Export functions perform the opposite operation: The
 internal buffer is copied to a freshly allocated memory block and returned.
