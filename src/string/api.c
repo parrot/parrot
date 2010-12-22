@@ -59,6 +59,11 @@ static const STR_VTABLE * string_rep_compatible(SHIM_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_MALLOC
+PARROT_CAN_RETURN_NULL
+static char * string_to_cstring_nullable(SHIM_INTERP,
+    ARGIN_NULLOK(const STRING *s));
+
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 static void throw_illegal_escape(PARROT_INTERP)
@@ -69,6 +74,7 @@ static void throw_illegal_escape(PARROT_INTERP)
 #define ASSERT_ARGS_string_rep_compatible __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(a) \
     , PARROT_ASSERT_ARG(b))
+#define ASSERT_ARGS_string_to_cstring_nullable __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_throw_illegal_escape __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -629,57 +635,6 @@ Parrot_str_new_constant(PARROT_INTERP, ARGIN(const char *buffer))
 
 /*
 
-=item C<STRING * string_make(PARROT_INTERP, const char *buffer, UINTVAL len,
-const char *encoding_name, UINTVAL flags)>
-
-Creates and returns a new Parrot string using C<len> bytes of string data read
-from C<buffer>.
-
-The value of C<encoding_name> specifies the string's representation.
-The currently recognized values are:
-
-    'iso-8859-1'
-    'ascii'
-    'binary'
-    'unicode'
-
-The encoding is implicitly guessed; C<unicode> implies the C<utf-8> encoding,
-and the other three assume C<fixed-8> encoding.
-
-If C<encoding_name> is unspecified, the default encoding 'ascii' will be used.
-
-The value of C<flags> is optionally one or more C<PObj_*> flags C<OR>-ed
-together.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING *
-string_make(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
-        UINTVAL len, ARGIN_NULLOK(const char *encoding_name), UINTVAL flags)
-{
-    ASSERT_ARGS(string_make)
-    const STR_VTABLE *encoding;
-
-    if (encoding_name) {
-        encoding = Parrot_find_encoding(interp, encoding_name);
-        if (!encoding)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "Can't make '%s' encoding strings", encoding_name);
-    }
-    else
-        encoding = Parrot_default_encoding_ptr;
-
-    return Parrot_str_new_init(interp, buffer, len, encoding, flags);
-}
-
-
-/*
-
 =item C<STRING * Parrot_str_new_init(PARROT_INTERP, const char *buffer, UINTVAL
 len, const STR_VTABLE *encoding, UINTVAL flags)>
 
@@ -824,31 +779,6 @@ Parrot_str_find_index(PARROT_INTERP, ARGIN(const STRING *src),
 
 /*
 
-=item C<INTVAL string_ord(PARROT_INTERP, const STRING *s, INTVAL idx)>
-
-Returns the codepoint at a given index into a string. Negative indexes are
-treated as counting from the end of the string.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-INTVAL
-string_ord(PARROT_INTERP, ARGIN(const STRING *s), INTVAL idx)
-{
-    ASSERT_ARGS(string_ord)
-
-    if (s == NULL)
-        s = STRINGNULL;
-
-    return STRING_ord(interp, s, idx);
-}
-
-
-/*
-
 =item C<STRING * Parrot_str_chr(PARROT_INTERP, UINTVAL character)>
 
 Returns a single-character Parrot string.
@@ -871,29 +801,6 @@ Parrot_str_chr(PARROT_INTERP, UINTVAL character)
         return Parrot_latin1_encoding_ptr->chr(interp, character);
     else
         return Parrot_ascii_encoding_ptr->chr(interp, character);
-}
-
-
-/*
-
-=item C<STRING * string_chr(PARROT_INTERP, UINTVAL character)>
-
-Returns a single-character Parrot string.
-
-Deprecated, use Parrot_str_chr instead.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING *
-string_chr(PARROT_INTERP, UINTVAL character)
-{
-    ASSERT_ARGS(string_chr)
-    return Parrot_str_chr(interp, character);
 }
 
 
@@ -2120,7 +2027,8 @@ Parrot_str_to_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
 /*
 
-=item C<char * string_to_cstring_nullable(PARROT_INTERP, const STRING *s)>
+=item C<static char * string_to_cstring_nullable(PARROT_INTERP, const STRING
+*s)>
 
 Returns a C string for the specified Parrot string. Use
 C<Parrot_str_free_cstring()> to free the string, if it's not NULL. Failure to
@@ -2131,10 +2039,9 @@ NULL will result in embarrassment for you.
 
 */
 
-PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-char *
+static char *
 string_to_cstring_nullable(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(string_to_cstring_nullable)
