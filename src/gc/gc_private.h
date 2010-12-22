@@ -583,10 +583,9 @@ void gc_ms_reallocate_string_storage(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-size_t Parrot_gc_get_info(PARROT_INTERP,
+size_t Parrot_gc_get_info(SHIM_INTERP,
     Interpinfo_enum which,
     ARGIN(GC_Statistics *stats))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 void Parrot_gc_ms_init(PARROT_INTERP)
@@ -629,8 +628,7 @@ int Parrot_gc_ms_needed(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_Parrot_gc_get_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(stats))
+       PARROT_ASSERT_ARG(stats))
 #define ASSERT_ARGS_Parrot_gc_ms_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_ms_needed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

@@ -129,6 +129,7 @@ Parrot_nci_libffi_register(PARROT_INTERP)
 
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FB_CB, nci_framebuilder_callback);
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FB_UD, nci_framebuilder_userdata);
+    Parrot_warn_experimental(interp, "NCI_FB_CB and NCI_DB_UD in iglobals are experimental");
 }
 
 

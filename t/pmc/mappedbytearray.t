@@ -17,7 +17,7 @@ Tests the MappedByteArray PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    .const int inittests = 3
+    .const int inittests = 4
     .const int moretests = 1
     .local int alltests
     alltests = inittests + moretests
@@ -50,6 +50,12 @@ Tests the MappedByteArray PMC.
     r = 1
   check:
     ok(r, 'get_bool gives false when unopened')
+    r = elements mm
+    is(r, 0, 'elements is zero when unopened')
+
+    # Make sure the destroy vtable is covered
+    null mm
+    sweep 1
 .end
 
 # Test the 'supported' method and return its result.

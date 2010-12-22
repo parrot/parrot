@@ -232,37 +232,6 @@ Check if the StringHandle is open.
         RETURN(INTVAL status);
     }
 
-/*
-
-=item C<METHOD read(INTVAL bytes)>
-
-Read the entire contents of the stringhandle and return it in a string. The
-C<bytes> argument is currently ignored.
-
-=cut
-
-*/
-
-    METHOD read(INTVAL length) {
-        STRING * const string_result = Parrot_io_reads(INTERP, SELF, length);
-        RETURN(STRING *string_result);
-    }
-
-/*
-
-=item C<METHOD readline()>
-
-Read a line from the stringhandle and return it in a string. (Currently only
-responds to "\n" newlines.)
-
-=cut
-
-*/
-
-    METHOD readline() {
-        STRING * const string_result = Parrot_io_readline(INTERP, SELF);
-        RETURN(STRING *string_result);
-    }
 
 /*
 

@@ -10,13 +10,14 @@
 /* Warning flags */
 /* &gen_from_enum(warnings.pasm)  */
 typedef enum {
-    PARROT_WARNINGS_ALL_FLAG        = 0xFF,
-    PARROT_WARNINGS_NONE_FLAG       = 0x00,
-    PARROT_WARNINGS_UNDEF_FLAG      = 0x01,
-    PARROT_WARNINGS_IO_FLAG         = 0x02,
-    PARROT_WARNINGS_PLATFORM_FLAG   = 0x04,
-    PARROT_WARNINGS_DYNEXT_FLAG     = 0x08,
-    PARROT_WARNINGS_DEPRECATED_FLAG = 0x10
+    PARROT_WARNINGS_ALL_FLAG          = 0xFF,
+    PARROT_WARNINGS_NONE_FLAG         = 0x00,
+    PARROT_WARNINGS_UNDEF_FLAG        = 0x01,
+    PARROT_WARNINGS_IO_FLAG           = 0x02,
+    PARROT_WARNINGS_PLATFORM_FLAG     = 0x04,
+    PARROT_WARNINGS_DYNEXT_FLAG       = 0x08,
+    PARROT_WARNINGS_DEPRECATED_FLAG   = 0x10,
+    PARROT_WARNINGS_EXPERIMENTAL_FLAG = 0x20
 } Warnings_classes;
 
 /* &end_gen */
@@ -25,7 +26,6 @@ typedef enum {
 /* &gen_from_enum(errors.pasm)  */
 typedef enum {
     PARROT_ERRORS_NONE_FLAG         = 0x00,
-    PARROT_ERRORS_GLOBALS_FLAG      = 0x01,
     PARROT_ERRORS_OVERFLOW_FLAG     = 0x02,
     PARROT_ERRORS_PARAM_COUNT_FLAG  = 0x04,
     PARROT_ERRORS_RESULT_COUNT_FLAG = 0x08,
@@ -65,6 +65,11 @@ void Parrot_warn_deprecated(PARROT_INTERP, ARGIN(const char *message))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+void Parrot_warn_experimental(PARROT_INTERP, ARGIN(const char *message))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void print_pbc_location(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -72,6 +77,9 @@ void print_pbc_location(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(message))
 #define ASSERT_ARGS_Parrot_warn_deprecated __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(message))
+#define ASSERT_ARGS_Parrot_warn_experimental __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(message))
 #define ASSERT_ARGS_print_pbc_location __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

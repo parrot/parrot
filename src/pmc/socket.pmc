@@ -26,6 +26,7 @@ The Socket PMC performs network I/O operations.
 pmclass Socket extends Handle provides socket auto_attrs {
     ATTR PMC *local;           /* Local addr                   */
     ATTR PMC *remote;          /* Remote addr                  */
+    ATTR STRING *buf;
 
 /*
 
@@ -43,6 +44,7 @@ Initializes a newly created Socket object.
 
         data_struct->local  = PMCNULL;
         data_struct->remote = PMCNULL;
+        data_struct->buf    = STRINGNULL;
 
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -84,6 +86,7 @@ Mark active socket handle data as live.
         if (data) {
             Parrot_gc_mark_PMC_alive(INTERP, data->local);
             Parrot_gc_mark_PMC_alive(INTERP, data->remote);
+            Parrot_gc_mark_STRING_alive(INTERP, data->buf);
         }
     }
 /*
@@ -174,6 +177,23 @@ from a port number (integer) and an address (string).
         RETURN(PMC * res);
     }
 
+
+/*
+
+=item C<METHOD is_closed()>
+
+Test if the socket is closed.
+
+=cut
+
+*/
+
+    METHOD is_closed() {
+        const INTVAL status = VTABLE_get_bool(INTERP, SELF);
+        RETURN(INTVAL status);
+    }
+
+
 /*
 
 =item C<connect(PMC * address)>
@@ -214,7 +234,14 @@ string containing the received message.
 
     METHOD recv() {
         STRING * result;
-        INTVAL read = Parrot_io_recv(INTERP, SELF, &result);
+        GET_ATTR_buf(INTERP, SELF, result);
+
+        if (result != STRINGNULL && Parrot_str_length(INTERP, result) > 0) {
+            SET_ATTR_buf(INTERP, SELF, STRINGNULL);
+        }
+        else {
+            result = Parrot_io_reads(INTERP, SELF, 0);
+        }
         RETURN(STRING * result);
     }
 
@@ -302,6 +329,90 @@ but continues to send new connection events until the socket is closed.]
     METHOD accept() {
         PMC * res = Parrot_io_accept(INTERP, SELF);
         RETURN(PMC * res);
+    }
+
+/*
+
+=item C<METHOD read(INTVAL bytes)>
+
+Read the given number of bytes from the socket and return them in a string.
+
+=cut
+
+*/
+
+    METHOD read(INTVAL nb) {
+        STRING *result;
+        STRING *buf;
+        GET_ATTR_buf(INTERP, SELF, buf);
+
+        if (buf == STRINGNULL)
+            buf = Parrot_io_reads(INTERP, SELF, 0);
+
+        while (Parrot_str_length(INTERP, buf) < nb) {
+            STRING *more = Parrot_io_reads(INTERP, SELF, 0);
+            if (Parrot_str_length(INTERP, more) == 0) {
+                SET_ATTR_buf(INTERP, SELF, STRINGNULL);
+                RETURN(STRING *buf);
+            }
+            buf = Parrot_str_concat(INTERP, buf, more);
+        }
+
+        result = Parrot_str_substr(INTERP, buf, 0, nb);
+        buf = Parrot_str_substr(INTERP, buf, nb, Parrot_str_length(INTERP, buf) - nb);
+        SET_ATTR_buf(INTERP, SELF, buf);
+        RETURN(STRING *result);
+    }
+
+
+/*
+
+=item C<METHOD readline()>
+
+Read a line from the socket and return it in a string.
+
+=cut
+
+*/
+
+    METHOD readline() {
+        INTVAL idx;
+        STRING *result;
+        STRING *buf;
+        GET_ATTR_buf(INTERP, SELF, buf);
+
+        if (buf == STRINGNULL)
+            buf = Parrot_io_reads(INTERP, SELF, 0);
+
+        while ((idx = Parrot_str_find_index(INTERP, buf, CONST_STRING(INTERP, "\n"), 0)) < 0) {
+            STRING *more = Parrot_io_reads(INTERP, SELF, 0);
+            if (Parrot_str_length(INTERP, more) == 0) {
+                SET_ATTR_buf(INTERP, SELF, STRINGNULL);
+                RETURN(STRING *buf);
+            }
+            buf = Parrot_str_concat(INTERP, buf, more);
+        }
+
+        idx++;
+        result = Parrot_str_substr(INTERP, buf, 0, idx);
+        buf = Parrot_str_substr(INTERP, buf, idx, Parrot_str_length(INTERP, buf) - idx);
+        SET_ATTR_buf(INTERP, SELF, buf);
+        RETURN(STRING *result);
+    }
+
+/*
+
+=item C<METHOD puts(STRING *buf)>
+
+Print the string to the socket.
+
+=cut
+
+*/
+
+    METHOD puts(STRING *buf) {
+        INTVAL res = Parrot_io_send(INTERP, SELF, buf);
+        RETURN(INTVAL res);
     }
 
 /*

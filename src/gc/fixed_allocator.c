@@ -381,24 +381,22 @@ static int
 pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
 {
     ASSERT_ARGS(pool_is_owned)
-    Pool_Allocator_Arena *arena = pool->top_arena;
-    size_t                a_size;
 
-    if (ptr < pool->lo_arena_ptr || ptr > pool->hi_arena_ptr)
-        return 0;
+    if (ptr >= pool->lo_arena_ptr && ptr <= pool->hi_arena_ptr) {
+        /* We can cache this value. All arenas are same size */
+        const ptrdiff_t a_size = arena_size(pool);
+        Pool_Allocator_Arena *arena = pool->top_arena;
+        while (arena) {
+            const ptrdiff_t ptr_diff =
+                (ptrdiff_t)ptr - (ptrdiff_t)(arena + 1);
 
-    /* We can cache this value. All arenas are same size */
-    a_size = arena_size(pool);
-    while (arena) {
-        const ptrdiff_t ptr_diff =
-            (ptrdiff_t)ptr - (ptrdiff_t)(arena + 1);
+            if (0 <= ptr_diff
+                  && ptr_diff < a_size
+                  && ptr_diff % pool->object_size == 0)
+                return 1;
 
-        if (0 <= ptr_diff
-              && ptr_diff < a_size
-              && ptr_diff % pool->object_size == 0)
-            return 1;
-
-        arena = arena->next;
+            arena = arena->next;
+        }
     }
 
     return 0;
@@ -439,11 +437,11 @@ allocate_new_pool_arena(ARGMOD(Pool_Allocator *pool))
     pool->num_free_objects += num_items;
     pool->total_objects    += num_items;
 
-    if (pool->lo_arena_ptr > new_arena)
+    if (pool->lo_arena_ptr > (void *)new_arena)
         pool->lo_arena_ptr = new_arena;
 
-    if (pool->hi_arena_ptr < (char *)new_arena + GC_FIXED_SIZE_POOL_SIZE)
-        pool->hi_arena_ptr = new_arena + GC_FIXED_SIZE_POOL_SIZE;
+    if ((char *)pool->hi_arena_ptr < (char *)new_arena + GC_FIXED_SIZE_POOL_SIZE)
+        pool->hi_arena_ptr = (char *)new_arena + GC_FIXED_SIZE_POOL_SIZE;
 }
 
 /*

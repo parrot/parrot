@@ -44,6 +44,60 @@ a new F<src/io/io_string.c>.
 
 =over 4
 
+=item C<INTVAL Parrot_io_parse_open_flags(PARROT_INTERP, const STRING
+*mode_str)>
+
+Parses a Parrot string for file open mode flags (C<r> for read, C<w> for write,
+C<a> for append, and C<p> for pipe) and returns the combined generic bit flags.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_io_parse_open_flags(PARROT_INTERP, ARGIN_NULLOK(const STRING *mode_str))
+{
+    ASSERT_ARGS(Parrot_io_parse_open_flags)
+    INTVAL i, mode_len;
+    INTVAL flags = 0;
+
+    if (STRING_IS_NULL(mode_str))
+        return PIO_F_READ;
+
+    mode_len = Parrot_str_byte_length(interp, mode_str);
+
+    for (i = 0; i < mode_len; ++i) {
+        const INTVAL s = STRING_ord(interp, mode_str, i);
+        switch (s) {
+          case 'r':
+            flags |= PIO_F_READ;
+            break;
+          case 'w':
+            flags |= PIO_F_WRITE;
+            if (!(flags & PIO_F_APPEND)) /* don't truncate if appending */
+                flags |= PIO_F_TRUNC;
+            break;
+          case 'a':
+            flags |= PIO_F_APPEND;
+            flags |= PIO_F_WRITE;
+            if ((flags & PIO_F_TRUNC)) /* don't truncate if appending */
+                flags &= ~PIO_F_TRUNC;
+            break;
+          case 'p':
+            flags |= PIO_F_PIPE;
+            break;
+          default:
+            break;
+        }
+    }
+
+    return flags;
+}
+
+/*
+
 =item C<PMC * Parrot_io_stdhandle(PARROT_INTERP, INTVAL fileno, PMC *newhandle)>
 
 Get the current standard IO object with the specified filenumber. If the
@@ -327,7 +381,7 @@ Parrot_io_flush(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
 
 =item C<STRING * Parrot_io_reads(PARROT_INTERP, PMC *pmc, size_t length)>
 
-Return a new C<STRING*> holding up to C<len> bytes read from the filehandle
+Return a new C<STRING*> holding up to C<len> bytes read from the handle
 PMC. Calls the C<read> method on the filehandle PMC.
 
 =cut
@@ -398,6 +452,9 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
             SETATTR_StringHandle_read_offset(interp, pmc, offset + read_length);
         }
     }
+    else if (pmc->vtable->base_type == enum_class_Socket) {
+        INTVAL read = Parrot_io_recv(interp, pmc, &result);
+    }
     else
         Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "read"), "I->S", length, &result);
     return result;
@@ -454,6 +511,10 @@ Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
 
         result = STRING_substr(interp, result, offset, read_length);
         SETATTR_StringHandle_read_offset(interp, pmc, newline_pos + 1);
+    }
+    else if (pmc->vtable->base_type == enum_class_Socket) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                "Parrot_io_readline on Socket not implemented");
     }
     else
         Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "readline"), "->S", &result);

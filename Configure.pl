@@ -196,6 +196,11 @@ run the tests described in C<--test=build>.
 Store the results of each configuration step in a Storable F<.sto> file on
 disk, for later analysis by F<Parrot::Configure::Trace> methods.
 
+=item C<--coveragedir>
+
+In preparation for calling C<make quickcover> to perform coverage analysis,
+provide a user-specified directory for top level of HTML output.
+
 =item Operating system-specific configuration options
 
 =over 4

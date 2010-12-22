@@ -338,7 +338,7 @@ get_max_pmc_address(ARGIN_NULLOK(const Memory_Pools *mem_pools))
     ASSERT_ARGS(get_max_pmc_address)
     return mem_pools
             ? mem_pools->pmc_pool->end_arena_memory
-            : -1;
+            : (size_t)-1;
 }
 
 

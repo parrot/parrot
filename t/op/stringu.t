@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 46;
+use Parrot::Test tests => 47;
 use Parrot::Config;
 
 =head1 NAME
@@ -593,6 +593,31 @@ pir_output_is( <<'CODE', <<'OUT', 'concatenation of utf8 and iso-8859-1 (TT #752
     say "equal"
 
     $S0 = utf8:"\u263b\u00e5"
+    $S3 = concat $S2, $S1
+    if $S0 == $S3 goto equal_2
+    print "not "
+  equal_2:
+    say "equal"
+.end
+CODE
+equal
+equal
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'concatenation of utf8 and ucs4' );
+.sub 'main'
+
+    $S1 = utf8:"\u263a"
+    $S2 = ucs4:"\u263b"
+
+    $S0 = utf8:"\u263a\u263b"
+    $S3 = concat $S1, $S2
+    if $S0 == $S3 goto equal_1
+    print "not "
+  equal_1:
+    say "equal"
+
+    $S0 = utf8:"\u263b\u263a"
     $S3 = concat $S2, $S1
     if $S0 == $S3 goto equal_2
     print "not "

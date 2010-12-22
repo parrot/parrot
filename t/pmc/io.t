@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 32;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -485,6 +485,23 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', 'seek/tell' );
 CODE
 ok 1
 Hello Parrot!
+OUTPUT
+
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', 'readline and tell' );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P0 = new ['FileHandle']
+
+    $P0.'open'(temp_file, 'r')
+    $S0 = $P0.'readline'()
+    print $S0
+    $I0 = $P0.'tell'()
+    say $I0
+    $P0.'close'()
+.end
+CODE
+Hello Parrot!
+14
 OUTPUT
 
 pir_error_output_like( sprintf(<<'CODE', $temp_file), <<'OUTPUT', '32bit seek: exception' );

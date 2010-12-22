@@ -423,8 +423,6 @@ pasm_output_is( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i utf8 to ucs4" );
     set S0, utf8:"\x{fc}_\x{20202}"
     find_encoding I0, "ucs4"
     trans_encoding S1, S0, I0
-    # also test ucs4 to ucs4 conversion
-    trans_encoding S1, S1, I0
     iseq I1, S0, S1
     print I1
     print "\n"
@@ -738,7 +736,7 @@ CODE
 OUTPUT
 
 SKIP: {
-    skip( 'no ICU lib', 8 ) unless $PConfig{has_icu};
+    skip( 'no ICU lib', 10 ) unless $PConfig{has_icu};
 
     pir_output_is( <<'CODE', <<"OUTPUT", "unicode downcase" );
 .sub main :main

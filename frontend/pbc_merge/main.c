@@ -279,6 +279,22 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
 }
 
 
+static void
+ensure_libdep(PARROT_INTERP, PackFile_ByteCode *bc, STRING *lib) {
+    int i;
+    for (i = 0; i < bc->n_libdeps; i++) {
+        if (Parrot_str_equal(interp, bc->libdeps[i], lib)) {
+            return;
+        }
+    }
+
+    /* not found, add to libdeps list */
+    bc->libdeps = mem_gc_realloc_n_typed_zeroed(interp, bc->libdeps, bc->n_libdeps + 1,
+                                                bc->n_libdeps, STRING *);
+    bc->libdeps[bc->n_libdeps] = lib;
+    bc->n_libdeps++;
+}
+
 /*
 
 =item C<static PackFile_ByteCode* pbc_merge_bytecode(PARROT_INTERP,
@@ -298,7 +314,7 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                    int num_inputs, ARGMOD(PackFile *pf))
 {
     ASSERT_ARGS(pbc_merge_bytecode)
-    int i;
+    int i, j;
     opcode_t *bc    = mem_gc_allocate_typed(interp, opcode_t);
     opcode_t cursor = 0;
 
@@ -334,6 +350,10 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
         /* Update cursor. */
         cursor += in_seg->base.size;
+
+        /* Update libdeps. */
+        for (j = 0; j < in_seg->n_libdeps; j++)
+            ensure_libdep(interp, bc_seg, in_seg->libdeps[j]);
     }
 
     /* Stash produced bytecode. */

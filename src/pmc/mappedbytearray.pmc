@@ -114,10 +114,10 @@ Free all resources used.
 
     VTABLE void init_pmc(PMC * init) {
         #ifdef ENABLED
+        void *mapping = NULL;
         PObj_custom_destroy_SET(SELF);
         if (VTABLE_isa(INTERP, init, CONST_STRING(INTERP, "String"))) {
             unsigned long length = 0;
-            void *mapping = NULL;
             STRING *name = VTABLE_get_string(INTERP, init);
         #  ifdef MAPW32
         #  else
@@ -410,7 +410,6 @@ in codepoints.
                         "get_utf8: index out of mapped");
             c = buffer[curpos];
             charlen = Parrot_utf8skip[c];
-            fprintf(stderr, "%i\n", (int)charlen);
             curpos += charlen;
         }
         result = build_string(INTERP, buffer + pos, curpos - pos, Parrot_utf8_encoding_ptr);
@@ -462,8 +461,8 @@ mapfromfilehandle(PIOHANDLE handle, unsigned long size, int flag)
 {
     ASSERT_ARGS(mapfromfilehandle)
 
-    #ifdef ENABLED
     void *mapping = (void *)-1;
+    #ifdef ENABLED
     #  ifdef MAPW32
     HANDLE hmapping;
     DWORD prot, access;
