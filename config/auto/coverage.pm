@@ -43,6 +43,7 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my %utils_needed = map { $_ => undef } qw( gcov gcov2perl cover );
+    my @utils_lacking;
     foreach my $util (keys %utils_needed) {
         my $which_util = which($util);
         if ($which_util) {
@@ -50,10 +51,13 @@ sub runstep {
         }
         else {
             $utils_needed{$util} = "echo '$util needed but not found' && exit 1";
+            push @utils_lacking, $util;
         }
     }
-    my @utils_lacking = grep { ! defined $utils_needed{$_} } keys %utils_needed;
     if (@utils_lacking) {
+        $utils_needed{'have_cover'} =
+            'echo "The following tools are needed for coverage testing: '.join(', ',@utils_lacking).
+            '"; echo "Please install Devel::Cover."; exit 1';
         $self->set_result("lacking @utils_lacking");
         $conf->data->set(
             "has_coverage_tools" => 0,
@@ -61,6 +65,7 @@ sub runstep {
         );
     }
     else {
+        $utils_needed{'have_cover'} = 'exit 0';
         $conf->data->set(
             "has_coverage_tools" => 1,
             %utils_needed,

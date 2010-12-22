@@ -2561,6 +2561,7 @@ QUICKCOVER_DIRS = \
     frontend/pbc_merge \
     compilers/imcc
 
+HAVE_COVER  = @have_cover@
 COVER       = @cover@
 GCOV        = @gcov@
 GCOV2PERL   = @gcov2perl@
@@ -2580,6 +2581,7 @@ quickcover: \
 	$(COVER) $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
 
 cover.dummy:
+	$(HAVE_COVER) \
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
     --linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
 
