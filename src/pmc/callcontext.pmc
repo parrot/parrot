@@ -356,8 +356,7 @@ autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
         VTABLE_set_number_native(interp, result, CELL_FLOAT(cell));
         break;
       case STRINGCELL:
-        result = Parrot_pmc_new(interp, HLL_TYPE(enum_class_String));
-        VTABLE_set_string_native(interp, result, CELL_STRING(cell));
+        result = Parrot_pmc_box_string(interp, CELL_STRING(cell));
         break;
       case PMCCELL:
         result = CELL_PMC(cell);
