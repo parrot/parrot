@@ -823,8 +823,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_io_get_flags>
 
-=item C<Parrot_io_get_last_file_position>
-
 =item C<Parrot_io_get_os_handle>
 
 =item C<Parrot_io_init>
