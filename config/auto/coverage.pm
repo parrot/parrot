@@ -50,14 +50,16 @@ sub runstep {
             $utils_needed{$util} = which($util);
         }
         else {
-            $utils_needed{$util} = "echo '$util needed but not found'; exit 1";
+            $utils_needed{$util} =
+                '$(PERL) -e "print \"'.$util.' needed but not found.\\n\"; exit 1;"';
             push @utils_lacking, $util;
         }
     }
     if (@utils_lacking) {
         $utils_needed{'have_cover'} =
-            'echo "The following tools are needed for coverage testing: '.join(', ',@utils_lacking).
-            '"; echo "Please install Devel::Cover."; exit 1';
+            '$(PERL) -e "print \"The following tools are needed for coverage testing: '.
+            join(', ',@utils_lacking).
+            '\\n\"; print \"Please install Devel::Cover.\\n\"; exit 1;"';
         $self->set_result("lacking @utils_lacking");
         $conf->data->set(
             "has_coverage_tools" => 0,
