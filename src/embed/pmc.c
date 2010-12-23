@@ -379,8 +379,7 @@ Parrot_api_pmc_box_string(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String str)
 {
     ASSERT_ARGS(Parrot_api_pmc_box_string)
     EMBED_API_CALLIN(interp_pmc, interp)
-    *str_pmc = Parrot_pmc_new(interp, enum_class_String);
-    VTABLE_set_string_native(interp, *str_pmc, str);
+    *str_pmc = Parrot_pmc_box_string(interp, str);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
