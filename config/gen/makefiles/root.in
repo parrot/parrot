@@ -2580,10 +2580,12 @@ quickcover: \
     done
 	$(COVER) $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
 
-cover.dummy:
-	$(HAVE_COVER) \
+cover.dummy: have-cover
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
     --linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
+
+have-cover:
+	$(HAVE_COVER)
 
 cover-test_runcore: cover.dummy
 	-@make@ test_runcore
