@@ -19,7 +19,7 @@ DYNPMC_FOO_OBJS = \
     src/dynpmc/foo$(O) \
     src/dynpmc/foo2$(O)
 
-DYNPMC_H_FILES = \
+DYNPMC_H_FILES_MIN = \
     include/parrot/caches.h \
     include/parrot/call.h \
     include/parrot/cclass.h \
@@ -76,7 +76,10 @@ DYNPMC_H_FILES = \
     include/parrot/vtable.h \
     include/parrot/vtables.h \
     include/parrot/warnings.h \
-    include/pmc/pmc_callcontext.h \
+    include/pmc/pmc_callcontext.h
+
+DYNPMC_H_FILES = \
+    $(DYNPMC_H_FILES_MIN) \
     include/pmc/pmc_continuation.h \
     include/pmc/pmc_default.h
 
