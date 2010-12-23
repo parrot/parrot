@@ -337,8 +337,8 @@ Parrot_api_pmc_set_float(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc),
 
 /*
 
-=item C<Parrot_Int Parrot_api_pmc_set_keyed_int(Parrot_PMC interp_pmc,
-Parrot_PMC pmc, Parrot_Int key, Parrot_PMC value)>
+=item C<Parrot_Int Parrot_api_pmc_set_keyed(Parrot_PMC interp_pmc,
+Parrot_PMC pmc, Parrot_PMC key, Parrot_PMC value)>
 
 Sets the value in aggregate C<pmc> using the PMC C<key>. Returns 1 on success,
 0 on failure.
@@ -558,6 +558,7 @@ otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_pmc_get_class(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC key),
+
         ARGOUT(Parrot_PMC *class_pmc))
 {
     ASSERT_ARGS(Parrot_api_pmc_get_class)
@@ -566,10 +567,23 @@ Parrot_api_pmc_get_class(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC key),
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
+/*
+
+=item C<Parrot_Int Parrot_api_pmc_find_method(Parrot_PMC interp_pmc,
+Parrot_PMC object, Parrot_String name, Parrot_PMC *method)>
+
+Find a method PMC by name on the given object PMC.
+
+=cut
+
+*/
+
 PARROT_API
 Parrot_Int
-Parrot_api_pmc_find_method(Parrot_PMC interp_pmc, Parrot_PMC object, Parrot_String name, ARGOUT(Parrot_PMC *method))
+Parrot_api_pmc_find_method(Parrot_PMC interp_pmc, Parrot_PMC object,
+        Parrot_String name, ARGOUT(Parrot_PMC *method))
 {
+    ASSERT_ARGS(Parrot_api_pmc_find_method)
     EMBED_API_CALLIN(interp_pmc, interp);
     *method = VTABLE_find_method(interp, object, name);
     EMBED_API_CALLOUT(interp_pmc, interp);

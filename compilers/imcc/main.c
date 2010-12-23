@@ -165,6 +165,7 @@ Set up the const struct declaration for cmd_options
 static const struct longopt_opt_decl *
 Parrot_cmd_options(void)
 {
+    ASSERT_ARGS(Parrot_cmd_options)
     static const struct longopt_opt_decl cmd_options[] = {
         { '.', '.', (OPTION_flags)0, { "--wait" } },
         { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
