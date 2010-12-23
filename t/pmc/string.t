@@ -664,7 +664,6 @@ loop:
     $P0 = box unicode:"科ムウオ"
     $P0.'reverse'()
     is( $P0, unicode:"オウム科", 'reverse unicode string')
-
 .end
 
 .sub is_integer__check_integer

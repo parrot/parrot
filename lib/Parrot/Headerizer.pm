@@ -121,6 +121,8 @@ sub new {
 
         PARROT_HOT
         PARROT_COLD
+
+        PARROT_API
         )
     };
     return bless $args, $class;

@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 7;
 
 =head1 NAME
 
@@ -56,12 +56,6 @@ TODO: {
         set I0, 0
 CODE
 
-}
-TODO: {
-    local $TODO = 'pbc exits with 1 by default';
-    # Should we be using this file?
-    my $pbc = File::Spec->catfile(qw/ t native_pbc integer_1.pbc /);
-    pbc_exit_code_is($pbc, 0, 'pbc exits with 0 by default');
 }
 
 pir_exit_code_is( <<'CODE', 2, "pir exit code isn't exception type" );

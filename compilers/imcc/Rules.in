@@ -157,6 +157,8 @@ compilers/imcc/main$(O) : \
     $(INC_DIR)/imcc.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/runcore_api.h \
+    $(INC_DIR)/api.h \
+    $(INC_DIR)/longopt.h \
     $(PARROT_H_HEADERS)
 
 ## SUFFIX OVERRIDE - Warnings (This is generated code)

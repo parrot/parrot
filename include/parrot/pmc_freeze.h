@@ -301,6 +301,10 @@ PMC* Parrot_thaw_pbc(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*cursor);
 
+void Parrot_pf_verify_image_string(PARROT_INTERP, ARGIN(STRING *image))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 void Parrot_visit_loop_thawfinish(PARROT_INTERP, ARGIN(PMC *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -340,6 +344,9 @@ void Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct) \
     , PARROT_ASSERT_ARG(cursor))
+#define ASSERT_ARGS_Parrot_pf_verify_image_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(image))
 #define ASSERT_ARGS_Parrot_visit_loop_thawfinish __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))

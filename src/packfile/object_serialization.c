@@ -173,6 +173,40 @@ Parrot_freeze_strings(PARROT_INTERP, ARGIN(PMC *pmc))
     return VTABLE_get_pmc(interp, visitor);
 }
 
+/*
+
+=item C<void Parrot_pf_verify_image_string(PARROT_INTERP, STRING *image)>
+
+Perform some quick sanity checks on a packfile image string to verify that it
+is valid. Throws exceptions if not.
+
+=cut
+
+*/
+
+void
+Parrot_pf_verify_image_string(PARROT_INTERP, ARGIN(STRING *image))
+{
+    ASSERT_ARGS(Parrot_pf_verify_image_string)
+    if (STRING_length(image) < 16)
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INVALID_STRING_REPRESENTATION,
+            "Cannot deserialize PMC. Incorrect Length.");
+    else {
+        const char major = image->strstart[14];
+        const char minor = image->strstart[15];
+
+        if (major == PARROT_PBC_MAJOR && minor == PARROT_PBC_MINOR)
+            return;
+
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INVALID_STRING_REPRESENTATION,
+            "Version %d.%d of serialized PMC is invalid. Expected %d.%d. "
+            "You're probably linking against an incompatible libparrot.",
+            major, minor, PARROT_PBC_MAJOR, PARROT_PBC_MINOR);
+    }
+}
+
 
 /*
 
