@@ -33,7 +33,7 @@ are not reported on. The number in parentheses indicates how many were found.
 =head1 REQUIREMENTS
 
 A built parrot (Configure and make) to generate all files so we can analyze
-them. 
+them.
 
 =head1 BUGS
 
@@ -43,7 +43,7 @@ and C<.h> files at the moment.
 =cut
 
 if (! -e 'Makefile') {
-    plan(skip_all => 
+    plan(skip_all =>
         'no Makefile found; This test requires a full build for analysis.');
     exit;
 }
@@ -285,7 +285,7 @@ sub is_list_same {
                 delete $got{$file};
                 delete $exp{$file};
             }
-        }       
+        }
     }
 
     my $extras  = scalar(keys %got);
