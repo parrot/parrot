@@ -15,6 +15,9 @@ t/codingstd/perlcritic.t - use perlcritic for perl coding stds.
  # test specific files
  % perl t/codingstd/perlcritic.t src/foo.pl lib/parrot/bar.pm
 
+ # Skip perlcritic when running a testing target.
+ % PARROT_TEST_NO_PERLCRITIC=1 make codetest
+
 =head1 DESCRIPTION
 
 By default, tests all perl source files for some very specific perl coding
