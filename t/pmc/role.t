@@ -20,7 +20,7 @@ Tests the Role PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(5)
+    plan(6)
 
 
     $P0 = new ['Role']
@@ -30,6 +30,11 @@ Tests the Role PMC.
     $I0 = isa $P0, 'Role'
     is($I0, 1, 'isa Role')
 
+    $P0 = new ['Hash']
+    $P0['name'] = 'Flob'
+    $P0['namespace'] = 'Bob'
+    $P1 = new ['Role'], $P0
+    ok(1, 'Created a Role using an autobased namespace')
 
     $P0 = new ['Hash']
     $P0['name'] = 'Wob'
