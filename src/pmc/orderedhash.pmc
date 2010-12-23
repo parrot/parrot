@@ -378,9 +378,6 @@ Main set function.
             /* We have old entry. Just update value */
             PMC * const nextkey = Parrot_key_next(INTERP, key);
             if (nextkey) {
-                /* XXX old_value is unused.  Should we be storing this at all? */
-                PMC * const old_value = VTABLE_get_pmc_keyed_int(INTERP, list_entry,
-                        ORDERED_HASH_ITEM_VALUE);
                 VTABLE_set_pmc_keyed(INTERP, value, nextkey, value);
             }
             else

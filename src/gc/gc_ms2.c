@@ -1233,7 +1233,6 @@ gc_ms2_is_ptr_owned(PARROT_INTERP,
         ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_ms2_is_ptr_owned)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     PObj             *obj  = (PObj *)ptr;
     pmc_alloc_struct *item = PMC2PAC(ptr);
 

@@ -1414,6 +1414,7 @@ src/hll$(O) : $(PARROT_H_HEADERS) src/hll.str $(INC_DIR)/dynext.h src/hll.c
 
 src/platform$(O) : \
     $(PARROT_H_HEADERS) \
+    $(INC_DIR)/sysmem.h \
     src/platform.c
 
 #IF(platform_asm):src/platform_asm$(O) : $(PARROT_H_HEADERS)
