@@ -791,6 +791,28 @@ Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
 
 /*
 
+=item C<PMC * Parrot_pmc_box_string(PARROT_INTERP, STRING *string)>
+
+Boxes a STRING C<string> into a String PMC.
+
+=cut
+
+*/
+
+PARROT_HOT
+PARROT_INLINE
+PMC *
+Parrot_pmc_box_string(PARROT_INTERP, ARGIN(STRING *string))
+{
+    ASSERT_ARGS(Parrot_pmc_box_string)
+    PMC * ret = Parrot_pmc_new(interp, enum_class_String);
+    VTABLE_set_string_native(interp, ret, string);
+
+    return ret;
+}
+
+/*
+
 =item C<INTVAL Parrot_pmc_get_type(PARROT_INTERP, PMC *name)>
 
 Returns the PMC type for C<name>.

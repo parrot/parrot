@@ -660,8 +660,7 @@ op box(out PMC, in NUM) {
 }
 
 op box(out PMC, in STR) {
-    $1 = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
-    VTABLE_set_string_native(interp, $1, $2);
+    $1 = Parrot_pmc_box_string(interp, $2);
 }
 
 ########################################
