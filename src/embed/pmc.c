@@ -337,8 +337,8 @@ Parrot_api_pmc_set_float(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc),
 
 /*
 
-=item C<Parrot_Int Parrot_api_pmc_set_keyed(Parrot_PMC interp_pmc,
-Parrot_PMC pmc, Parrot_PMC key, Parrot_PMC value)>
+=item C<Parrot_Int Parrot_api_pmc_set_keyed(Parrot_PMC interp_pmc, Parrot_PMC
+pmc, Parrot_PMC key, Parrot_PMC value)>
 
 Sets the value in aggregate C<pmc> using the PMC C<key>. Returns 1 on success,
 0 on failure.
@@ -558,7 +558,6 @@ otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_pmc_get_class(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC key),
-
         ARGOUT(Parrot_PMC *class_pmc))
 {
     ASSERT_ARGS(Parrot_api_pmc_get_class)
@@ -569,8 +568,8 @@ Parrot_api_pmc_get_class(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC key),
 
 /*
 
-=item C<Parrot_Int Parrot_api_pmc_find_method(Parrot_PMC interp_pmc,
-Parrot_PMC object, Parrot_String name, Parrot_PMC *method)>
+=item C<Parrot_Int Parrot_api_pmc_find_method(Parrot_PMC interp_pmc, Parrot_PMC
+object, Parrot_String name, Parrot_PMC *method)>
 
 Find a method PMC by name on the given object PMC.
 
