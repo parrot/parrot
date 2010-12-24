@@ -49,8 +49,9 @@ typedef int (*imcc_hack_func_t)(Parrot_PMC, const char *, int, const char **, Pa
 
 typedef struct _Parrot_Init_Args {
     void *stacktop;
-    const char * gc_system;
-    Parrot_Int gc_threshold;
+    const char *gc_system;
+    Parrot_Int gc_dynamic_threshold;
+    Parrot_Int gc_min_threshold;
     Parrot_UInt hash_seed;
 } Parrot_Init_Args;
 
@@ -170,8 +171,9 @@ PARROT_API
 Parrot_Int Parrot_api_make_interpreter(
     Parrot_PMC parent,
     Parrot_Int flags,
-    ARGIN_NULLOK(Parrot_Init_Args *args),
+    ARGIN(Parrot_Init_Args *args),
     ARGOUT(Parrot_PMC *interp))
+        __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*interp);
 
@@ -274,7 +276,8 @@ Parrot_Int Parrot_api_wrap_imcc_hack(
     , PARROT_ASSERT_ARG(pbc))
 #define ASSERT_ARGS_Parrot_api_load_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_make_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(args) \
+    , PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_api_ready_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(main_sub))
 #define ASSERT_ARGS_Parrot_api_run_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)

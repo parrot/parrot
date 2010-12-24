@@ -107,30 +107,6 @@ implementation, and malloc wrappers for various purposes. These are unused.
 
 /*
 
-=item C<void Parrot_gc_set_system_type(PARROT_INTERP, const char *name)>
-
-Sets the type specified by C<name> of garbage collector.
-
-=cut
-
-*/
-
-
-PARROT_EXPORT
-void
-Parrot_gc_set_system_type(PARROT_INTERP, const char *name)
-{
-    ASSERT_ARGS(Parrot_gc_set_system_type)
-    if (STREQ(name, "MS"))
-        interp->gc_sys->sys_type = MS;
-    if (STREQ(name, "MS2"))
-        interp->gc_sys->sys_type = MS2;
-    if (STREQ(name, "INF"))
-        interp->gc_sys->sys_type = INF;
-}
-
-/*
-
 =item C<void Parrot_gc_mark_PObj_alive(PARROT_INTERP, PObj *obj)>
 
 Marks the PObj as "alive" for the Garbage Collector. Takes a pointer to a PObj,
@@ -200,7 +176,7 @@ Parrot_gc_mark_STRING_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(STRING *obj))
 
 /*
 
-=item C<void Parrot_gc_initialize(PARROT_INTERP, void *stacktop)>
+=item C<void Parrot_gc_initialize(PARROT_INTERP, Parrot_GC_Init_Args *args)>
 
 Initializes the memory allocator and the garbage collection subsystem.
 Calls the initialization function associated with each collector, which
@@ -214,27 +190,29 @@ stack scanning during a garbage collection run.
 */
 
 void
-Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
+Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_gc_initialize)
 
-    interp->lo_var_ptr                    = stacktop;
+    interp->lo_var_ptr = args->stacktop;
 
     /*Call appropriate initialization function for GC subsystem*/
-    switch (interp->gc_sys->sys_type) {
-      case MS:
-        Parrot_gc_ms_init(interp);
-        break;
-      case INF:
-        Parrot_gc_inf_init(interp);
-        break;
-      case MS2:
-        Parrot_gc_ms2_init(interp);
-        break;
-      default:
+    if (args->system == NULL
+    ||  STREQ(args->system, "MS2")) {
+        interp->gc_sys->sys_type = MS2;
+        Parrot_gc_ms2_init(interp, args);
+    }
+    else if (STREQ(args->system, "MS")) {
+        interp->gc_sys->sys_type = MS;
+        Parrot_gc_ms_init(interp, args);
+    }
+    else if (STREQ(args->system, "INF")) {
+        interp->gc_sys->sys_type = INF;
+        Parrot_gc_inf_init(interp, args);
+    }
+    else {
         /*die horribly because of invalid GC core specified*/
-        break;
-    };
+    }
 
     /* Assertions that GC subsystem has complete API */
     PARROT_ASSERT(interp->gc_sys->do_gc_mark);

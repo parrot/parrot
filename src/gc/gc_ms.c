@@ -373,7 +373,7 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
 
 =over 4
 
-=item C<void Parrot_gc_ms_init(PARROT_INTERP)>
+=item C<void Parrot_gc_ms_init(PARROT_INTERP, Parrot_GC_Init_Args *args)>
 
 Initialize the state structures of the gc system. Called immediately before
 creation of memory pools. This function must set the function pointers
@@ -385,7 +385,7 @@ C<more_object_fn>.
 */
 
 void
-Parrot_gc_ms_init(PARROT_INTERP)
+Parrot_gc_ms_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_gc_ms_init)
 
@@ -547,7 +547,7 @@ Parrot_gc_ms_needed(PARROT_INTERP)
     /* The dynamic threshold is a configurable percentage of the amount of
        memory used after the last GC */
     dynamic_threshold = (size_t)(interp->gc_sys->stats.mem_used_last_collect *
-                                 (0.01 * interp->gc_threshold));
+                                 0.25);
 
     return new_mem > dynamic_threshold;
 }

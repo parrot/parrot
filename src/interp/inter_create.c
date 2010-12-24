@@ -88,8 +88,11 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 {
     ASSERT_ARGS(make_interpreter)
     int stacktop;
+    Parrot_GC_Init_Args args;
     Interp * const interp = allocate_interpreter(parent, flags);
-    initialize_interpreter(interp, (void*)&stacktop);
+    memset(&args, 0, sizeof (args));
+    args.stacktop = &stacktop;
+    initialize_interpreter(interp, &args);
     return interp;
 }
 
@@ -161,10 +164,6 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     IMCC_INFO(interp) = mem_internal_allocate_zeroed_typed(imc_info_t);
 
     interp->gc_sys           = mem_internal_allocate_zeroed_typed(GC_Subsystem);
-    interp->gc_sys->sys_type = parent
-                                    ? parent->gc_sys->sys_type
-                                    : PARROT_GC_DEFAULT_TYPE;
-    interp->gc_threshold     = GC_DYNAMIC_THRESHOLD_DEFAULT;
 
     /* Done. Return and be done with it */
     return interp;
@@ -172,7 +171,8 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 
 /*
 
-=item C<Parrot_Interp initialize_interpreter(PARROT_INTERP, void *stacktop)>
+=item C<Parrot_Interp initialize_interpreter(PARROT_INTERP, Parrot_GC_Init_Args
+*args)>
 
 Initialize previously allocated interpreter.
 
@@ -183,12 +183,12 @@ Initialize previously allocated interpreter.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Interp
-initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
+initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(initialize_interpreter)
 
     /* Set up the memory allocation system */
-    Parrot_gc_initialize(interp, stacktop);
+    Parrot_gc_initialize(interp, args);
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
 

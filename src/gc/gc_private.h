@@ -46,6 +46,7 @@ extern void *flush_reg_store(void);
 
 #define POOL_MAX_BYTES                         65536 * 128
 #define GC_SIZE_THRESHOLD                      1024  * 1024
+#define GC_DEFAULT_DYNAMIC_THRESHOLD           75
 
 #define PMC_HEADERS_PER_ALLOC     4096 * 10 / sizeof (PMC)
 #define BUFFER_HEADERS_PER_ALLOC  4096      / sizeof (Buffer)
@@ -582,7 +583,7 @@ size_t Parrot_gc_get_info(SHIM_INTERP,
     ARGIN(GC_Statistics *stats))
         __attribute__nonnull__(3);
 
-void Parrot_gc_ms_init(PARROT_INTERP)
+void Parrot_gc_ms_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -633,7 +634,7 @@ int Parrot_gc_ms_needed(PARROT_INTERP)
 /* HEADERIZER BEGIN: src/gc/gc_inf.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void Parrot_gc_inf_init(PARROT_INTERP)
+void Parrot_gc_inf_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_gc_inf_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -647,14 +648,16 @@ void Parrot_gc_inf_init(PARROT_INTERP)
 void Parrot_gc_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
-void Parrot_gc_ms2_init(PARROT_INTERP)
-        __attribute__nonnull__(1);
+void Parrot_gc_ms2_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_Parrot_gc_maybe_mark_and_sweep \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_ms2_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(args))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/gc_ms2.c */
 

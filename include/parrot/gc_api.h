@@ -31,7 +31,12 @@
 
 #define ALIGNED_STRING_SIZE(len) (((len) + sizeof (void*) + WORD_ALIGN_1) & WORD_ALIGN_MASK)
 
-#define GC_DYNAMIC_THRESHOLD_DEFAULT 75
+typedef struct _Parrot_GC_Init_Args {
+    void *stacktop;
+    const char *system;
+    Parrot_Int dynamic_threshold;
+    Parrot_Int min_threshold;
+} Parrot_GC_Init_Args;
 
 typedef enum _gc_sys_type_enum {
     MS,  /* mark and sweep */
@@ -167,10 +172,6 @@ void * Parrot_gc_reallocate_memory_chunk_with_interior_pointers(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_gc_set_system_type(PARROT_INTERP, const char *name)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 unsigned int Parrot_is_blocked_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -276,7 +277,7 @@ size_t Parrot_gc_headers_alloc_since_last_collect(PARROT_INTERP)
 UINTVAL Parrot_gc_impatient_pmcs(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
+void Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -362,8 +363,6 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_gc_reallocate_memory_chunk_with_interior_pointers \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_gc_set_system_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_is_blocked_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_is_blocked_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -433,7 +432,7 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_initialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(stacktop))
+    , PARROT_ASSERT_ARG(args))
 #define ASSERT_ARGS_Parrot_gc_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_mem_alloc_since_last_collect \

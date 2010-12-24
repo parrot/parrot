@@ -53,7 +53,11 @@ typedef struct MarkSweep_GC {
     /* String GC */
     struct String_GC        string_gc;
 
-    /* Number of allocated objects before trigger gc */
+    /* Maximum percentage of memory wasted */
+    size_t dynamic_threshold;
+    /* Minimum GC threhshold */
+    size_t min_threshold;
+    /* Number of allocated bytes before GC is triggered */
     size_t gc_threshold;
 
     /* GC blocking */
@@ -537,7 +541,7 @@ gc_ms2_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
 
 /*
 
-=item C<void Parrot_gc_ms2_init(PARROT_INTERP)>
+=item C<void Parrot_gc_ms2_init(PARROT_INTERP, Parrot_GC_Init_Args *args)>
 
 Initializes the infinite memory collector. Installs the necessary function
 pointers into the Memory_Pools structure. The two most important are the
@@ -551,7 +555,7 @@ finalization is necessary.
 */
 
 void
-Parrot_gc_ms2_init(PARROT_INTERP)
+Parrot_gc_ms2_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_gc_ms2_init)
     struct MarkSweep_GC *self;
@@ -633,7 +637,13 @@ Parrot_gc_ms2_init(PARROT_INTERP)
 
         self->fixed_size_allocator = Parrot_gc_fixed_allocator_new(interp);
 
-        self->gc_threshold = GC_SIZE_THRESHOLD;
+        self->dynamic_threshold = args->dynamic_threshold
+                                ? args->dynamic_threshold
+                                : GC_DEFAULT_DYNAMIC_THRESHOLD;
+        self->min_threshold     = args->min_threshold
+                                ? args->min_threshold
+                                : Parrot_sysmem_amount(interp) / 8;
+        self->gc_threshold      = self->min_threshold;
 
         Parrot_gc_str_initialize(interp, &self->string_gc);
     }
@@ -1077,11 +1087,10 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     /* The dynamic threshold is a configurable percentage of the amount of
        memory used after the last GC */
     threshold = (size_t)(stats->mem_used_last_collect *
-                         (0.01 * interp->gc_threshold));
+                         (0.01 * self->dynamic_threshold));
 
-    /* Minimum threshold is GC_SIZE_THRESHOLD */
-    if (threshold < GC_SIZE_THRESHOLD)
-        threshold = GC_SIZE_THRESHOLD;
+    if (threshold < self->min_threshold)
+        threshold = self->min_threshold;
 
     self->gc_threshold = stats->mem_used_last_collect + threshold;
 

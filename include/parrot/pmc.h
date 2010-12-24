@@ -147,9 +147,8 @@ PMC * Parrot_pmc_reuse_init(PARROT_INTERP,
 
 PARROT_HOT
 PARROT_INLINE
-PMC * Parrot_pmc_box_string(PARROT_INTERP, ARGIN(STRING *string))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+PMC * Parrot_pmc_box_string(PARROT_INTERP, ARGIN_NULLOK(STRING *string))
+        __attribute__nonnull__(1);
 
 void Parrot_pmc_free_temporary(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
