@@ -2574,6 +2574,7 @@ COVER_DIRS = \
     src/call \
     src/dynoplibs \
     src/dynpmc \
+    src/embed \
     src/gc \
     src/interp \
     src/io \
@@ -2621,6 +2622,7 @@ QUICKCOVER_DIRS = \
     src/call \
     src/dynoplibs \
     src/dynpmc \
+    src/embed \
     src/gc \
     src/interp \
     src/io \
