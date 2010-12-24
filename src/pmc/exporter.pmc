@@ -327,9 +327,12 @@ Throws an exception upon error.
                     "source namespace not set");
 
         GET_ATTR_ns_dest(INTERP, SELF, ns_dest);
-        if (PMC_IS_NULL(ns_dest))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                    "destination namespace not set");
+
+        /* This condition must never happen, destination is set during init and
+         * attempts to change it with wrong values are rejected.
+         * Even if it gets changed for unexpected reasons, "export_to" will
+         * catch the problem. */
+        PARROT_ASSERT(!PMC_IS_NULL(ns_dest));
 
         GET_ATTR_globals(INTERP, SELF, ns_globals);
 
