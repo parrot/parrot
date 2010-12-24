@@ -1795,5 +1795,5 @@ C<<PF_size_<type>()>> - return the needed size in C<opcode_t> units.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

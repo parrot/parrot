@@ -58,12 +58,9 @@ the program invoking Parrot::Manifest, for use in messages.
 
 =cut
 
-# ...the results go into $self->{dirs} and $self->{versioned_files}
 sub new {
     my $class   = shift;
     my $argsref = shift;
-
-    my $self = bless( {}, $class );
 
     my %data = (
         id         => '$' . 'Id$',
@@ -79,24 +76,15 @@ sub new {
 
     # grab the versioned resources:
     my @versioned_files;
-    my @dirs;
     my @versioned_output = split /\n/, $lsfiles;
     for my $filename (@versioned_output) {
         next if $filename =~ m[/\.git|^blib|^ports];
-        if ( -d $filename ) {
-            push @dirs, $filename;
-        }
-        else {
-            push @versioned_files, $filename;
-        }
+        push @versioned_files, $filename;
     }
-    $data{dirs}            = \@dirs;
     $data{versioned_files} = \@versioned_files;
 
-    # initialize the object from the prepared values (Damian, p. 98)
-    %$self = %data;
+    return bless( \%data, $class );
 
-    return $self;
 }
 
 =head2 prepare_manifest

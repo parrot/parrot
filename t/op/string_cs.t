@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 53;
+use Parrot::Test tests => 58;
 use Parrot::Config;
 
 =head1 NAME
@@ -388,6 +388,58 @@ CODE
 /Lossy conversion/
 OUTPUT
 
+pasm_error_output_like( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i utf-16 to ucs-2 - lossy" );
+    set S1, utf16:"abc\x{10101}def"
+    find_encoding I0, "ucs2"
+    trans_encoding S2, S1, I0
+    print "never\n"
+    end
+CODE
+/Lossy conversion/
+OUTPUT
+
+pasm_output_is( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i iso-8859-1 to ucs4" );
+    set S0, iso-8859-1:"abc_ä_"
+    find_encoding I0, "ucs4"
+    trans_encoding S1, S0, I0
+    iseq I1, S0, S1
+    print I1
+    print "\n"
+    encoding I0, S1
+    encodingname S2, I0
+    print S2
+    print "\n"
+    length I2, S1
+    print I2
+    print "\n"
+    end
+CODE
+1
+ucs4
+6
+OUTPUT
+
+pasm_output_is( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i utf8 to ucs4" );
+    set S0, utf8:"\x{fc}_\x{20202}"
+    find_encoding I0, "ucs4"
+    trans_encoding S1, S0, I0
+    iseq I1, S0, S1
+    print I1
+    print "\n"
+    encoding I0, S1
+    encodingname S2, I0
+    print S2
+    print "\n"
+    length I2, S1
+    print I2
+    print "\n"
+    end
+CODE
+1
+ucs4
+3
+OUTPUT
+
 pir_output_is( <<'CODE', <<'OUTPUT', "bug #34661 literal" );
 .sub main :main
     $S0 = utf8:"\"]\nif I3 == "
@@ -684,7 +736,7 @@ CODE
 OUTPUT
 
 SKIP: {
-    skip( 'no ICU lib', 8 ) unless $PConfig{has_icu};
+    skip( 'no ICU lib', 10 ) unless $PConfig{has_icu};
 
     pir_output_is( <<'CODE', <<"OUTPUT", "unicode downcase" );
 .sub main :main
@@ -754,10 +806,50 @@ OUTPUT
     $P0.'encoding'("utf8") # set utf8 output
     print $S1
     print "\n"
+    length $I0, $S1
+    print $I0
+    print "\n"
     end
 .end
 CODE
 HACEK J J\xcc\x8c
+10
+OUTPUT
+
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode titlecase to combined char" );
+.sub main :main
+    set $S1, utf8:"hacek j \u01f0"
+    titlecase $S1, $S1
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
+    print "\n"
+    length $I0, $S1
+    print $I0
+    print "\n"
+    end
+.end
+CODE
+Hacek J J\xcc\x8c
+10
+OUTPUT
+
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode downcase to combined char" );
+.sub main :main
+    set $S1, utf8:"I WITH DOT ABOVE \u0130"
+    downcase $S1, $S1
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
+    print "\n"
+    length $I0, $S1
+    print $I0
+    print "\n"
+    end
+.end
+CODE
+i with dot above i\xcc\x87
+19
 OUTPUT
 
     # charset/unicode.c

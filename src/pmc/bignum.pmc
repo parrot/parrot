@@ -1808,7 +1808,7 @@ TODO: Only supports Integer values for now.
         bignum_div_bignum_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
     }
     MULTI void i_divide(Float value) {
-        bignum_div_bignum_float(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
+        bignum_div_bignum_float(INTERP, SELF, VTABLE_get_number(INTERP, value), SELF);
     }
     MULTI void i_divide(DEFAULT value) {
          Parrot_ex_throw_from_c_args(INTERP, NULL,
@@ -1983,5 +1983,5 @@ Set C<dest> to the negated value of C<SELF>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

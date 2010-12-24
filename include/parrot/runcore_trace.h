@@ -61,5 +61,5 @@ void trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

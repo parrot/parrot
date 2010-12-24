@@ -161,7 +161,7 @@ Parrot_gc_trace_root(PARROT_INTERP,
     PObj    *obj;
 
     /* note: adding locals here did cause increased GC runs */
-    mark_context_start();
+    Parrot_sub_mark_context_start();
 
     if (trace == GC_TRACE_SYSTEM_ONLY) {
         trace_system_areas(interp, mem_pools);
@@ -221,6 +221,9 @@ Parrot_gc_trace_root(PARROT_INTERP,
 
     /* Walk the iodata */
     Parrot_IOData_mark(interp, interp->piodata);
+
+    if (!PMC_IS_NULL(interp->final_exception))
+        Parrot_gc_mark_PMC_alive(interp, interp->final_exception);
 
     if (trace == GC_TRACE_FULL)
         trace_system_areas(interp, mem_pools);
@@ -867,5 +870,5 @@ F<include/parrot/mark_sweep.h>, F<docs/memory_internals.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

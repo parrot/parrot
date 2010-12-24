@@ -372,5 +372,5 @@ Sets the floating-point value associated with C<key> to C<value>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

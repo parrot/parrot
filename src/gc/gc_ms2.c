@@ -634,10 +634,11 @@ Parrot_gc_ms2_init(PARROT_INTERP)
         self->fixed_size_allocator = Parrot_gc_fixed_allocator_new(interp);
 
         self->gc_threshold = GC_SIZE_THRESHOLD;
+
+        Parrot_gc_str_initialize(interp, &self->string_gc);
     }
 
     interp->gc_sys->gc_private = self;
-    Parrot_gc_str_initialize(interp, &self->string_gc);
 }
 
 
@@ -992,8 +993,6 @@ gc_ms2_mark_live_objects(PARROT_INTERP, ARGIN(MarkSweep_GC *self),
 {
     ASSERT_ARGS(gc_ms2_mark_live_objects)
 
-    pmc_alloc_struct *tmp;
-
     /* Allocate list for gray objects */
     self->new_objects = Parrot_pa_new(interp);
 
@@ -1032,9 +1031,9 @@ static void
 gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms2_mark_and_sweep)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    GC_Statistics    *stats;
-    size_t            threshold;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    GC_Statistics       *stats;
+    size_t               threshold;
 
     /* GC is blocked */
     if (self->gc_mark_block_level)
@@ -1063,7 +1062,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     /* Replace objects with new_objects. Ignoring "constant" one */
     do {
-        Parrot_Pointer_Array *tmp = self->objects;
+        Parrot_Pointer_Array * const tmp = self->objects;
         self->objects = self->new_objects;
         Parrot_pa_destroy(interp, tmp);
     } while (0);
@@ -1247,7 +1246,6 @@ gc_ms2_is_ptr_owned(PARROT_INTERP,
         ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_ms2_is_ptr_owned)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     PObj             *obj  = (PObj *)ptr;
     pmc_alloc_struct *item = PMC2PAC(ptr);
 
@@ -1497,5 +1495,5 @@ gc_ms2_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

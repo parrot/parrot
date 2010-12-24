@@ -1347,5 +1347,5 @@ make_basic_block(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

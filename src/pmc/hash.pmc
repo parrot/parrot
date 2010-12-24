@@ -51,6 +51,14 @@ These are the vtable functions for the Hash PMC.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_DOES_NOT_RETURN
+static void cannot_autovivify_nested(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_DOES_NOT_RETURN
+static void entry_type_must_be_pmc(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC* get_next_hash(PARROT_INTERP,
@@ -61,6 +69,10 @@ static PMC* get_next_hash(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*hash);
 
+#define ASSERT_ARGS_cannot_autovivify_nested __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_entry_type_must_be_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_next_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash) \
@@ -88,8 +100,7 @@ get_next_hash(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
     HashBucket *bucket;
 
     if (hash->entry_type != enum_type_PMC)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "Hash entry type must be PMC for multipart keys.");
+        entry_type_must_be_pmc(interp);
 
     bucket = parrot_hash_get_bucket(interp, hash, key);
 
@@ -468,8 +479,7 @@ Returns the integer value for the element at C<*key>.
             return hash_value_to_int(INTERP, hash, b->value);
 
         if (hash->entry_type != enum_type_PMC)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Hash entry type must be PMC for multipart keys.");
+            entry_type_must_be_pmc(INTERP);
 
         /* Recursively call to enclosed aggregate */
         return VTABLE_get_integer_keyed(INTERP, (PMC *)b->value, key);
@@ -502,9 +512,7 @@ Returns the integer value for the element at C<*key>.
         else {
             PMC * const next_hash = get_next_hash(INTERP, hash, hash_key);
             if (PMC_IS_NULL(next_hash))
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "Cannot autovivify nested hashes");
+                cannot_autovivify_nested(INTERP);
             VTABLE_set_integer_keyed(INTERP, next_hash, key, value);
         }
     }
@@ -593,8 +601,7 @@ Returns the floating-point value for the element at C<*key>.
             return hash_value_to_number(INTERP, hash, b->value);
 
         if (hash->entry_type != enum_type_PMC)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Hash entry type must be PMC for multipart keys.");
+            entry_type_must_be_pmc(INTERP);
 
         return VTABLE_get_number_keyed(INTERP, (PMC *)b->value, key);
     }
@@ -658,8 +665,7 @@ Returns the string value for the element at C<*key>.
             return hash_value_to_string(INTERP, hash, b->value);
 
         if (hash->entry_type != enum_type_PMC)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Hash entry type must be PMC for multipart keys.");
+            entry_type_must_be_pmc(INTERP);
 
         /* Recursively call to enclosed aggregate */
         return VTABLE_get_string_keyed(INTERP, (PMC *)b->value, key);
@@ -697,9 +703,7 @@ Returns the string value for the element at C<*key>.
         else {
             PMC * const next_hash = get_next_hash(INTERP, hash, hash_key);
             if (PMC_IS_NULL(next_hash))
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "Cannot autovivify nested hashes");
+                cannot_autovivify_nested(INTERP);
             VTABLE_set_string_keyed(INTERP, next_hash, key, value);
         }
     }
@@ -806,8 +810,7 @@ Returns the PMC value for the element at C<*key>.
             return hash_value_to_pmc(INTERP, hash, b->value);
 
         if (hash->entry_type != enum_type_PMC)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Hash entry type must be PMC for multipart keys.");
+            entry_type_must_be_pmc(INTERP);
 
         /* Recursively call to enclosed aggregate */
         return VTABLE_get_pmc_keyed(INTERP, (PMC *)b->value, key);
@@ -840,9 +843,7 @@ Returns the PMC value for the element at C<*key>.
         else {
             PMC * const next_hash = get_next_hash(INTERP, hash, hash_key);
             if (PMC_IS_NULL(next_hash))
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "Cannot autovivify nested hashes");
+                cannot_autovivify_nested(INTERP);
             VTABLE_set_number_keyed(INTERP, next_hash, key, value);
         }
     }
@@ -902,9 +903,7 @@ Sets C<value> as the value for C<*key>.
         else {
             PMC * const next_hash = get_next_hash(INTERP, hash, hash_key);
             if (PMC_IS_NULL(next_hash))
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "Cannot autovivify nested hashes");
+                cannot_autovivify_nested(INTERP);
             VTABLE_set_pmc_keyed(INTERP, next_hash, key, value);
         }
     }
@@ -979,9 +978,7 @@ Returns whether a key C<*key> exists in the hash.
             return 1;
 
         if (h->entry_type != enum_type_PMC)
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
-                EXCEPTION_INVALID_OPERATION,
-                "Hash entry type must be PMC for multipart keys.");
+            entry_type_must_be_pmc(INTERP);
 
         return VTABLE_exists_keyed(INTERP, (PMC *)b->value, key);
     }
@@ -1031,9 +1028,7 @@ Returns whether the value for C<*key> is defined.
             return VTABLE_defined(INTERP, hash_value_to_pmc(INTERP, h, b->value));
 
         if (h->entry_type != enum_type_PMC)
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
-                EXCEPTION_INVALID_OPERATION,
-                "Hash entry type must be PMC for multipart keys.");
+            entry_type_must_be_pmc(INTERP);
 
         return VTABLE_defined_keyed(INTERP, (PMC *)b->value, key);
     }
@@ -1078,9 +1073,7 @@ Deletes the element associated with C<*key>.
         }
 
         if (h->entry_type != enum_type_PMC)
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
-                EXCEPTION_INVALID_OPERATION,
-                "Hash entry type must be PMC for multipart keys.");
+            entry_type_must_be_pmc(INTERP);
 
         VTABLE_delete_keyed(INTERP, (PMC *)b->value, key);
     }
@@ -1221,6 +1214,40 @@ Used to unarchive the hash.
 
 =back
 
+=head1 Auxiliar functions
+
+=over 4
+
+=item C<static void entry_type_must_be_pmc(PARROT_INTERP)>
+
+=item C<static void cannot_autovivify_nested(PARROT_INTERP)>
+
+*/
+
+PARROT_DOES_NOT_RETURN
+static void
+entry_type_must_be_pmc(PARROT_INTERP)
+{
+    ASSERT_ARGS(entry_type_must_be_pmc)
+    Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INVALID_OPERATION,
+            "Hash entry type must be PMC for multipart keys.");
+}
+
+PARROT_DOES_NOT_RETURN
+static void
+cannot_autovivify_nested(PARROT_INTERP)
+{
+    ASSERT_ARGS(cannot_autovivify_nested)
+    Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INVALID_OPERATION,
+            "Cannot autovivify nested hashes");
+}
+
+/*
+
+=back
+
 =head1 SEE ALSO
 
 F<docs/pdds/pdd08_keys.pod>.
@@ -1233,5 +1260,5 @@ F<docs/pdds/pdd08_keys.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

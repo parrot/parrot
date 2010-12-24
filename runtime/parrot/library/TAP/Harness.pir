@@ -382,8 +382,9 @@ files or streams into an archive file (C<.tar.gz>).
     if value == '' goto L6
     $S0 .= "\n  "
     $S0 .= key
-    $S0 .= ": "
+    $S0 .= ": '"
     $S0 .= value
+    $S0 .= "'"
     goto L6
   L5:
     $S0 .= "\n"

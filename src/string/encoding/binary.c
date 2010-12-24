@@ -179,8 +179,7 @@ static STR_VTABLE Parrot_binary_encoding = {
     fixed8_iter_get,
     fixed8_iter_skip,
     fixed8_iter_get_and_advance,
-    fixed8_iter_set_and_advance,
-    fixed8_iter_set_position
+    fixed8_iter_set_and_advance
 };
 
 STR_VTABLE *Parrot_binary_encoding_ptr = &Parrot_binary_encoding;
@@ -190,5 +189,5 @@ STR_VTABLE *Parrot_binary_encoding_ptr = &Parrot_binary_encoding;
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

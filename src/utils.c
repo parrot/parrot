@@ -558,7 +558,7 @@ Parrot_util_tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
     ASSERT_ARGS(Parrot_util_tm_to_array)
 
     PMC * const Array = Parrot_pmc_new(interp,
-        Parrot_get_ctx_HLL_type(interp, enum_class_FixedIntegerArray));
+        Parrot_hll_get_ctx_HLL_type(interp, enum_class_FixedIntegerArray));
     VTABLE_set_integer_native(interp, Array, 9);
 
     VTABLE_set_integer_keyed_int(interp, Array, 0, tm->tm_sec);
@@ -1008,5 +1008,5 @@ Parrot_util_quicksort(PARROT_INTERP, ARGMOD(void **data), UINTVAL n, ARGIN(PMC *
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

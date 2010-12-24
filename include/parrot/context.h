@@ -552,5 +552,5 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -38,10 +38,11 @@ segments from the input PBC files.
 #define PARROT_IN_EXTENSION
 
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
+#include "parrot/longopt.h"
 #include "parrot/oplib/ops.h"
 #include "parrot/oplib/core_ops.h"
 #include "pmc/pmc_sub.h"
+#include "parrot/embed.h"
 
 /* This struct describes an input file. */
 typedef struct pbc_merge_input {
@@ -279,6 +280,22 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
 }
 
 
+static void
+ensure_libdep(PARROT_INTERP, PackFile_ByteCode *bc, STRING *lib) {
+    int i;
+    for (i = 0; i < bc->n_libdeps; i++) {
+        if (Parrot_str_equal(interp, bc->libdeps[i], lib)) {
+            return;
+        }
+    }
+
+    /* not found, add to libdeps list */
+    bc->libdeps = mem_gc_realloc_n_typed_zeroed(interp, bc->libdeps, bc->n_libdeps + 1,
+                                                bc->n_libdeps, STRING *);
+    bc->libdeps[bc->n_libdeps] = lib;
+    bc->n_libdeps++;
+}
+
 /*
 
 =item C<static PackFile_ByteCode* pbc_merge_bytecode(PARROT_INTERP,
@@ -298,7 +315,7 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                    int num_inputs, ARGMOD(PackFile *pf))
 {
     ASSERT_ARGS(pbc_merge_bytecode)
-    int i;
+    int i, j;
     opcode_t *bc    = mem_gc_allocate_typed(interp, opcode_t);
     opcode_t cursor = 0;
 
@@ -334,6 +351,10 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
         /* Update cursor. */
         cursor += in_seg->base.size;
+
+        /* Update libdeps. */
+        for (j = 0; j < in_seg->n_libdeps; j++)
+            ensure_libdep(interp, bc_seg, in_seg->libdeps[j]);
     }
 
     /* Stash produced bytecode. */
@@ -839,7 +860,7 @@ main(int argc, const char **argv)
     if (argc < 4) {
         help(interp);
     }
-    while ((status = longopt_get(interp, argc, argv, options, &opt)) > 0) {
+    while ((status = longopt_get(argc, argv, options, &opt)) > 0) {
         switch (opt.opt_id) {
             case 'o':
                 if (output_file == NULL)
@@ -900,5 +921,5 @@ main(int argc, const char **argv)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

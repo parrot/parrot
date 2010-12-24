@@ -111,5 +111,5 @@ void Parrot_nci_sig_to_pcc(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

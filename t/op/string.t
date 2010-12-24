@@ -1611,6 +1611,19 @@ catch2:
     pop_eh
 null2:
     is ($S9, "Can't upcase NULL string", 'upcase inplace null')
+
+    push_eh catch3
+    null $S9
+    set $S0, binary:"abCD012yz"
+    upcase $S1, $S0
+    pop_eh
+    goto null3
+catch3:
+    .get_results($P9)
+    $S9 = $P9['message']
+    pop_eh
+null3:
+    is ($S9, "Invalid operation on binary string", 'upcase binary')
 .end
 
 .sub test_downcase

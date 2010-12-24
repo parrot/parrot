@@ -109,5 +109,5 @@ long parrot_i386_xadd(volatile long *l, long amount);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

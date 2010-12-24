@@ -147,6 +147,65 @@ Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type), ARGIN(Parrot_compiler_func_t 
     VTABLE_set_pointer_keyed_str(interp, nci, sc, (void *)func);
 }
 
+
+
+/*
+
+=item C<PMC * Parrot_get_compiler(PARROT_INTERP, STRING *type)>
+
+Get a compiler PMC.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PMC *
+Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
+{
+    ASSERT_ARGS(Parrot_get_compiler)
+    PMC    * const iglobals = interp->iglobals;
+    PMC    * hash           = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+                              IGLOBALS_COMPREG_HASH);
+
+    if (PMC_IS_NULL(hash)) {
+        /* No compiler has been registered yet */
+        return NULL;
+    }
+
+    /* Fetch the compiler */
+    return VTABLE_get_pmc_keyed_str(interp, hash, type);
+}
+
+/*
+
+=item C<void Parrot_set_compiler(PARROT_INTERP, STRING *type, PMC *compiler)>
+
+Register a parser/compiler PMC.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_set_compiler(PARROT_INTERP, ARGIN(STRING *type), ARGIN(PMC *compiler))
+{
+    ASSERT_ARGS(Parrot_set_compiler)
+    PMC    * const iglobals = interp->iglobals;
+    PMC    * hash           = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+                              IGLOBALS_COMPREG_HASH);
+
+    if (PMC_IS_NULL(hash)) {
+        hash = Parrot_pmc_new_noinit(interp, enum_class_Hash);
+        VTABLE_init(interp, hash);
+        VTABLE_set_pmc_keyed_int(interp, iglobals,
+                (INTVAL)IGLOBALS_COMPREG_HASH, hash);
+    }
+
+    VTABLE_set_pmc_keyed_str(interp, hash, type, compiler);
+}
+
 /*
 
 =item C<void * Parrot_compile_file(PARROT_INTERP, const char *fullname, STRING
@@ -337,6 +396,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
             return Parrot_get_runtime_path(interp);
         case GC_SYS_NAME: {
             STRING * name = Parrot_gc_sys_name(interp);
+            Parrot_warn_experimental(interp, "GC_SYS_NAME option is experimental");
             return name;
         }
       default:
@@ -349,5 +409,5 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

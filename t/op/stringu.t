@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 40;
+use Parrot::Test tests => 47;
 use Parrot::Config;
 
 =head1 NAME
@@ -228,6 +228,56 @@ OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "UTF8 as malformed ascii" );
     set S0, ascii:"«"
+    length I0, S0
+    print I0
+    print "\n"
+    end
+CODE
+/Invalid character/
+OUTPUT
+
+pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UTF-8" );
+    set S0, utf8:"\x{D888}"
+    length I0, S0
+    print I0
+    print "\n"
+    end
+CODE
+/Invalid character/
+OUTPUT
+
+pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UTF-16" );
+    set S0, utf16:"\x{FDDA}"
+    length I0, S0
+    print I0
+    print "\n"
+    end
+CODE
+/Invalid character/
+OUTPUT
+
+pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UTF-16" );
+    set S0, utf16:"\x{3FFFE}"
+    length I0, S0
+    print I0
+    print "\n"
+    end
+CODE
+/Invalid character/
+OUTPUT
+
+pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UCS-2" );
+    set S0, ucs2:"\x{12345}"
+    length I0, S0
+    print I0
+    print "\n"
+    end
+CODE
+/Invalid character/
+OUTPUT
+
+pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UCS-4" );
+    set S0, ucs4:"\x{130000}"
     length I0, S0
     print I0
     print "\n"
@@ -554,6 +604,31 @@ equal
 equal
 OUT
 
+pir_output_is( <<'CODE', <<'OUT', 'concatenation of utf8 and ucs4' );
+.sub 'main'
+
+    $S1 = utf8:"\u263a"
+    $S2 = ucs4:"\u263b"
+
+    $S0 = utf8:"\u263a\u263b"
+    $S3 = concat $S1, $S2
+    if $S0 == $S3 goto equal_1
+    print "not "
+  equal_1:
+    say "equal"
+
+    $S0 = utf8:"\u263b\u263a"
+    $S3 = concat $S2, $S1
+    if $S0 == $S3 goto equal_2
+    print "not "
+  equal_2:
+    say "equal"
+.end
+CODE
+equal
+equal
+OUT
+
 pir_output_is( <<'CODE', <<'OUT', 'join mixed encodings' );
 .sub 'main'
     new $P0, 'ResizablePMCArray'
@@ -574,6 +649,7 @@ pir_output_is( <<'CODE', <<'OUT', 'illegal utf8 chars' );
     'test_chars'(binary:"\x41\x80\x41")
     'test_chars'(binary:"\x41\xBF\x41")
     'test_chars'(binary:"\x41\xC1\xBF")
+    'test_chars'(binary:"\x41\xC2\x41")
     'test_chars'(binary:"\x41\xF5\xA1\xA2\xA3")
     'test_chars'(binary:"\x41\xFE\x41")
 
@@ -620,6 +696,7 @@ pir_output_is( <<'CODE', <<'OUT', 'illegal utf8 chars' );
     pop_eh
 .end
 CODE
+Malformed UTF-8 string
 Malformed UTF-8 string
 Malformed UTF-8 string
 Malformed UTF-8 string
@@ -1044,6 +1121,39 @@ CODE
 0x2673
 OUT
 }
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'ord with Unicode encodings' );
+.sub 'main'
+    test(utf8:"a\uBABEb c\uBEEFd")
+    test(utf16:"a\uBABEb c\uBEEFd")
+    test(ucs2:"a\uBABEb c\uBEEFd")
+    test(ucs4:"a\uBABEb c\uBEEFd")
+.end
+
+.sub 'test'
+    .param string str
+    .local int c
+
+    c = ord str, -2
+    say c
+
+    push_eh handler
+    c = ord str, 100
+    print "not "
+handler:
+    say "ok"
+    pop_eh
+.end
+CODE
+48879
+ok
+48879
+ok
+48879
+ok
+48879
+ok
+OUTPUT
 
 # Local Variables:
 #   mode: cperl

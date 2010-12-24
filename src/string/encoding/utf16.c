@@ -67,15 +67,6 @@ static void utf16_iter_set_and_advance(PARROT_INTERP,
         FUNC_MODIFIES(*str)
         FUNC_MODIFIES(*i);
 
-static void utf16_iter_set_position(PARROT_INTERP,
-    ARGIN(const STRING *str),
-    ARGMOD(String_iter *i),
-    UINTVAL pos)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*i);
-
 static void utf16_iter_skip(PARROT_INTERP,
     ARGIN(const STRING *str),
     ARGMOD(String_iter *i),
@@ -131,10 +122,6 @@ static STRING * utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_utf16_iter_set_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(str) \
-    , PARROT_ASSERT_ARG(i))
-#define ASSERT_ARGS_utf16_iter_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(i))
@@ -545,68 +532,6 @@ utf16_iter_set_and_advance(PARROT_INTERP,
     PARROT_ASSERT(i->bytepos <= str->bufused);
 }
 
-/*
-
-=item C<static void utf16_iter_set_position(PARROT_INTERP, const STRING *str,
-String_iter *i, UINTVAL pos)>
-
-Moves the string iterator C<i> to the position C<pos> in the string.
-
-=cut
-
-*/
-
-static void
-utf16_iter_set_position(PARROT_INTERP,
-    ARGIN(const STRING *str), ARGMOD(String_iter *i), UINTVAL pos)
-{
-    ASSERT_ARGS(utf16_iter_set_position)
-    const utf16_t *ptr;
-
-    if (pos == 0) {
-        i->charpos = 0;
-        i->bytepos = 0;
-        return;
-    }
-
-    PARROT_ASSERT(pos <= str->strlen);
-
-    /*
-     * we know the byte offsets of three positions: start, current and end
-     * now find the shortest way to reach pos
-     */
-    if (pos < i->charpos) {
-        if (pos <= (i->charpos >> 1)) {
-            /* go forward from start */
-            ptr = (utf16_t *)str->strstart;
-            ptr = utf16_skip_forward(ptr, pos);
-        }
-        else {
-            /* go backward from current */
-            ptr = (utf16_t *)(str->strstart + i->bytepos);
-            ptr = utf16_skip_backward(ptr, i->charpos - pos);
-        }
-    }
-    else {
-        const UINTVAL  len = str->strlen;
-        if (pos <= i->charpos + ((len - i->charpos) >> 1)) {
-            /* go forward from current */
-            ptr = (utf16_t *)(str->strstart + i->bytepos);
-            ptr = utf16_skip_forward(ptr, pos - i->charpos);
-        }
-        else {
-            /* go backward from end */
-            ptr = (utf16_t *)(str->strstart + str->bufused);
-            ptr = utf16_skip_backward(ptr, len - pos);
-        }
-    }
-
-    i->charpos = pos;
-    i->bytepos = (const char *)ptr - (const char *)str->strstart;
-
-    PARROT_ASSERT(i->bytepos <= str->bufused);
-}
-
 
 static STR_VTABLE Parrot_utf16_encoding = {
     0,
@@ -645,8 +570,7 @@ static STR_VTABLE Parrot_utf16_encoding = {
     utf16_iter_get,
     utf16_iter_skip,
     utf16_iter_get_and_advance,
-    utf16_iter_set_and_advance,
-    utf16_iter_set_position
+    utf16_iter_set_and_advance
 };
 
 STR_VTABLE *Parrot_utf16_encoding_ptr = &Parrot_utf16_encoding;
@@ -673,5 +597,5 @@ F<docs/string.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

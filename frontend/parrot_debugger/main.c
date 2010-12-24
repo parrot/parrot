@@ -142,7 +142,6 @@ and C<debug_break> ops in F<ops/debug.ops>.
 #include <string.h>
 #include <ctype.h>
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
 #include "parrot/debugger.h"
 #include "parrot/runcore_api.h"
 
@@ -351,5 +350,5 @@ Renamed from F<pdb.c> on 2008.7.15
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

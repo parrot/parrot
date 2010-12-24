@@ -31,6 +31,7 @@ Auxiliar function to avoid repeating the size evaluation.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_INLINE
+PARROT_CONST_FUNCTION
 static UINTVAL get_size_in_bytes(UINTVAL size);
 
 #define ASSERT_ARGS_get_size_in_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -38,6 +39,7 @@ static UINTVAL get_size_in_bytes(UINTVAL size);
 /* HEADERIZER END: static */
 
 PARROT_INLINE
+PARROT_CONST_FUNCTION
 static UINTVAL
 get_size_in_bytes(UINTVAL size)
 {
@@ -125,7 +127,7 @@ Creates and returns a copy of the array.
 */
 
     VTABLE PMC *clone() {
-        unsigned char * my_bit_array, * clone_bit_array;
+        unsigned char * my_bit_array;
         UINTVAL         resize_threshold, size;
         PMC *   const   dest   = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -134,6 +136,7 @@ Creates and returns a copy of the array.
         GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
 
         if (my_bit_array) {
+            unsigned char * clone_bit_array;
             const size_t size_in_bytes = get_size_in_bytes(resize_threshold);
 
             SET_ATTR_size(INTERP, dest, size);
@@ -272,13 +275,12 @@ Returns the Parrot string representation of the array.
 */
 
     VTABLE STRING *get_string() {
-        STRING *zero, *one;
         STRING *str   = STRINGNULL;
         UINTVAL i;
-        UINTVAL elems = SELF.elements();
+        const UINTVAL elems = SELF.elements();
 
-        zero = CONST_STRING(INTERP, "0");
-        one  = CONST_STRING(INTERP, "1");
+        STRING * const zero = CONST_STRING(INTERP, "0");
+        STRING * const one  = CONST_STRING(INTERP, "1");
 
         for (i = 0; i < elems; ++i) {
             if (SELF.get_integer_keyed_int((INTVAL)i))
@@ -638,5 +640,5 @@ F<docs/pdds/pdd17_basic_types.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

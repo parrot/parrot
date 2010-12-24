@@ -24,6 +24,6 @@ extern const INTVAL Parrot_iso_8859_1_typetable[256];
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

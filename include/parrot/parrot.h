@@ -280,7 +280,6 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 #include "parrot/nci.h"
 #include "parrot/thread.h"
 #include "parrot/scheduler.h"
-#include "parrot/longopt.h"
 #include "parrot/oo.h"
 #include "parrot/vtables.h"
 #include "parrot/multidispatch.h"
@@ -296,5 +295,5 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

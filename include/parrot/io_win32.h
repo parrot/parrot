@@ -306,5 +306,5 @@ INTVAL Parrot_io_socket_win32(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

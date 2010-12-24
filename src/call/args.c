@@ -823,7 +823,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 }
 
                 collect_positional = Parrot_pmc_new_init_int(interp,
-                    Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray),
+                    Parrot_hll_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray),
                     num_positionals);
 
                 for (j = 0; arg_index < positional_args; ++arg_index)
@@ -999,7 +999,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         /* Collected ("slurpy") named parameter */
         if (param_flags & PARROT_ARG_SLURPY_ARRAY) {
             PMC * const collect_named = Parrot_pmc_new(interp,
-                    Parrot_get_ctx_HLL_type(interp, enum_class_Hash));
+                    Parrot_hll_get_ctx_HLL_type(interp, enum_class_Hash));
             PMC * const named_arg_list = VTABLE_get_attr_str(interp, call_object, CONST_STRING(interp, "named"));
 
             if (!PMC_IS_NULL(named_arg_list)) {
@@ -1452,6 +1452,7 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
                 case 'N': flags = PARROT_ARG_FLOATVAL; ++set; break;
                 case 'S': flags = PARROT_ARG_STRING;   ++set; break;
                 case 'P': flags = PARROT_ARG_PMC;      ++set; break;
+                case ' ': break;
                 default:
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
@@ -1470,6 +1471,7 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
                 case 'o': flags |= PARROT_ARG_OPTIONAL;     break;
                 case 'p': flags |= PARROT_ARG_OPT_FLAG;     break;
                 case 's': flags |= PARROT_ARG_SLURPY_ARRAY; break;
+                case ' ': break;
                 default:
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
@@ -1840,5 +1842,5 @@ F<include/parrot/call.h>, F<src/call/ops.c>, F<src/call/pcc.c>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

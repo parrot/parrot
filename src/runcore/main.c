@@ -338,7 +338,7 @@ parrot_hash_oplib(PARROT_INTERP, ARGIN(op_lib_t *lib))
 {
     ASSERT_ARGS(parrot_hash_oplib)
 
-    size_t i;
+    int i;
 
     for (i = 0; i < lib->op_count; i++) {
         op_info_t *op = &lib->op_info_table[i];
@@ -416,8 +416,8 @@ enable_event_checking(PARROT_INTERP)
                                         cs->op_count, op_func_t);
 
         for (i = interp->evc_func_table_size; i < cs->op_count; i++)
-            interp->evc_func_table[i] = (op_func_t)
-                D2FPTR(((void**)core_lib->op_func_table)[CORE_OPS_check_events__]);
+            interp->evc_func_table[i] =
+                core_lib->op_func_table[PARROT_OP_check_events__];
 
         interp->evc_func_table_size = cs->op_count;
     }
@@ -445,5 +445,5 @@ F<src/interp/inter_create.c>, F<src/interp/inter_misc.c>, F<src/call/ops.c>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

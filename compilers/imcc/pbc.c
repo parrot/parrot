@@ -1218,7 +1218,7 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub_pmc),
     PMC                 *lex_info    = NULL;
     SymHash             *hsh         = &unit->hash;
     PackFile_ConstTable *ct          = interp->code->const_table;
-    const INTVAL         lex_info_id = Parrot_get_ctx_HLL_type(interp,
+    const INTVAL         lex_info_id = Parrot_hll_get_ctx_HLL_type(interp,
                                         enum_class_LexInfo);
     unsigned int        i;
 
@@ -1423,7 +1423,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     }
     else {
         /* use a possible type mapping for the Sub PMCs, and create it */
-        const INTVAL type = Parrot_get_ctx_HLL_type(interp,
+        const INTVAL type = Parrot_hll_get_ctx_HLL_type(interp,
                                 r->pcc_sub->yield
                                     ? enum_class_Coroutine
                                     : enum_class_Sub);
@@ -2431,5 +2431,5 @@ e_pbc_close(PARROT_INTERP, SHIM(void *param))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

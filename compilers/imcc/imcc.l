@@ -1464,5 +1464,5 @@ handle_identifier(PARROT_INTERP, YYSTYPE *valp, const char *text)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

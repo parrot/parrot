@@ -1198,7 +1198,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     /* get byte position of the part that will be replaced */
     STRING_ITER_INIT(interp, &iter);
 
-    STRING_iter_set_position(interp, src, &iter, true_offset);
+    STRING_iter_skip(interp, src, &iter, true_offset);
     start_byte = iter.bytepos;
     start_char = iter.charpos;
 
@@ -2519,6 +2519,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
     Parrot_gc_allocate_string_storage(interp, result, reserved);
     result->bufused = reserved;
 
+    Parrot_warn_experimental(interp, "Parrot_str_unescape_string is experimental");
     STRING_ITER_INIT(interp, &itersrc);
     STRING_ITER_INIT(interp, &iterdest);
     while (itersrc.bytepos < srclen) {
@@ -3083,7 +3084,7 @@ Parrot_str_split(PARROT_INTERP,
         return PMCNULL;
 
     res  = Parrot_pmc_new(interp,
-            Parrot_get_ctx_HLL_type(interp, enum_class_ResizableStringArray));
+            Parrot_hll_get_ctx_HLL_type(interp, enum_class_ResizableStringArray));
     slen = Parrot_str_length(interp, str);
 
     if (!slen)
@@ -3283,5 +3284,5 @@ Parrot_str_gc_unregister(PARROT_INTERP, ARGIN(STRING *s))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -171,8 +171,7 @@ static void gc_ms_iterate_live_strings(PARROT_INTERP,
 static void gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
-static void gc_ms_mark_pobj_header(PARROT_INTERP, ARGMOD_NULLOK(PObj *obj))
-        __attribute__nonnull__(1)
+static void gc_ms_mark_pobj_header(SHIM_INTERP, ARGMOD_NULLOK(PObj *obj))
         FUNC_MODIFIES(*obj);
 
 static void gc_ms_mark_special(PARROT_INTERP, ARGIN(PMC *pmc))
@@ -327,8 +326,7 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_ms_mark_pobj_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms_mark_pobj_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_ms_mark_special __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -940,7 +938,7 @@ mark *obj as live
 */
 
 static void
-gc_ms_mark_pobj_header(PARROT_INTERP, ARGMOD_NULLOK(PObj *obj))
+gc_ms_mark_pobj_header(SHIM_INTERP, ARGMOD_NULLOK(PObj *obj))
 {
     ASSERT_ARGS(gc_ms_mark_pobj_header)
     if (obj) {
@@ -1795,7 +1793,7 @@ returns stats as required by enum which
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 size_t
-Parrot_gc_get_info(PARROT_INTERP, Interpinfo_enum which, ARGIN(GC_Statistics *stats))
+Parrot_gc_get_info(SHIM_INTERP, Interpinfo_enum which, ARGIN(GC_Statistics *stats))
 {
     ASSERT_ARGS(Parrot_gc_get_info)
 
@@ -1931,5 +1929,5 @@ gc_ms_iterate_live_strings(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

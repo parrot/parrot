@@ -85,6 +85,6 @@ STRING * IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

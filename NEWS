@@ -2,10 +2,33 @@ New in 2.11.0
 - Core
  + Just In Time native call frame generation using LibFFI
  + PIR op find_codepoint is no longer experimental, it is now supported
- + Several public functions in libparrot have been brought up to standard naming conventions.
+ + Several public functions in libparrot have been brought up to standard
+   naming conventions.
+ + Improved linked-list implementation in GC
+ + set_addr opcode is being replaced with the new set_label opcode in core libraries
+ + Removed deprecated CodeString PMC
+ + Added close, is_closed, read, readline methods to Socket
+ + Added experimental MappedByteArray PMC type
+ + Added Parrot_warn_experimental, to warn the user about experimental features
+ + Code for frontend executables moved from src/ to frontend/
+ + Support for chunked receive in LWP library.
+ + Added a "quickcover" make target
 - Languages
-  + PIRC
-    - left the nest and is currently at https://github.com/parrot/pirc/
+ + PIRC
+   - left the nest and is currently at https://github.com/parrot/pirc/
+ + Community
+   - Our README was translated into the following languages
+    by Google Code-In students and mentors:
+        Polish      README.polski
+        Spanish     README.espanol
+        German      README.deutsch
+- Documentation
+- Tests
+ + Test coverage increase on PMCs: String, Integer, NameSpace, Complex, EventHandler
+ + 'make quickcover' target added to speed up most essential
+    parts of coverage analysis
+ + 'tools/dev/headerizer.pl' refactored to improve maintainability
+    (no change in functionality)
 
 New in 2.10.0
 - Core

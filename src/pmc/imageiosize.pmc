@@ -201,7 +201,6 @@ Pushes the string C<*v> onto the end of the image.
     VTABLE void push_string(STRING *v) {
         if (PObj_flag_TEST(private1, SELF)) {
             /* store a reference to constant table entry of string */
-            PMC *v_pmc = Parrot_key_new_string(interp, v);
             PackFile_ConstTable *table = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
             int idx = PackFile_ConstTable_rlookup_str(INTERP, table, v);
 
@@ -284,5 +283,5 @@ hasn't been seen yet, it is also pushed onto the todo list.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

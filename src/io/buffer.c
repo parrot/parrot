@@ -540,6 +540,9 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
         Parrot_io_set_buffer_end(interp, filehandle, NULL);
     }
 
+    Parrot_io_set_file_position(interp, filehandle,
+            l + Parrot_io_get_file_position(interp, filehandle));
+
     return l;
 }
 
@@ -764,5 +767,5 @@ F<src/io/io_private.h>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

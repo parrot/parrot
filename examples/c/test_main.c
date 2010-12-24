@@ -123,7 +123,7 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
     setopt(PARROT_CGOTO_FLAG);
 #endif
 
-    while (longopt_get(interp, *argc, *argv, options, &opt)) {
+    while (longopt_get(*argc, *argv, options, &opt)) {
         if (opt.opt_id == -1) {
             fprintf(stderr, "parrot: %s\n", opt.opt_error);
             Parrot_x_exit(interp, 1);
@@ -278,6 +278,6 @@ performs that role.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

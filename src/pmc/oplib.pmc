@@ -92,7 +92,7 @@ pmclass OpLib auto_attrs {
     VTABLE PMC* get_pmc_keyed_int(INTVAL value) {
         op_lib_t *oplib;
         GET_ATTR_oplib(INTERP, SELF, oplib);
-        if ((UINTVAL)value >= oplib->op_count ||
+        if (value >= oplib->op_count ||
                      value <  0) {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "OpLib `%s': Opcode index %d out of bounds", oplib->name, value);
@@ -121,7 +121,7 @@ pmclass OpLib auto_attrs {
         op_lib_t  *oplib;
         op_info_t *table;
         PMC *result = PMCNULL;
-        UINTVAL i;
+        INTVAL i;
 
         GET_ATTR_oplib(INTERP, SELF, oplib);
         table = oplib->op_info_table;
@@ -141,5 +141,5 @@ pmclass OpLib auto_attrs {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

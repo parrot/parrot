@@ -69,12 +69,6 @@ static PMC* is_loaded(PARROT_INTERP, ARGIN(STRING *path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PMC * make_string_pmc(PARROT_INTERP, ARGIN(STRING *string))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_CANNOT_RETURN_NULL
 static PMC * run_init_lib(PARROT_INTERP,
     ARGIN(void *handle),
@@ -122,9 +116,6 @@ static void store_lib_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_is_loaded __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
-#define ASSERT_ARGS_make_string_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(string))
 #define ASSERT_ARGS_run_init_lib __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
@@ -489,7 +480,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
     PMC * context = Parrot_push_context(interp, regs_used);
     Parrot_pcc_set_HLL(interp, context, parrot_hll_id);
     Parrot_pcc_set_namespace(interp, context,
-            Parrot_get_HLL_namespace(interp, parrot_hll_id));
+            Parrot_hll_get_HLL_namespace(interp, parrot_hll_id));
 
     if (!STRING_IS_NULL(lib_name)) {
         STRING * const load_name       = Parrot_sprintf_c(interp,
@@ -561,29 +552,6 @@ clone_string_into(ARGMOD(Interp *d), ARGIN(Interp *s), ARGIN(PMC *value))
 
 /*
 
-=item C<static PMC * make_string_pmc(PARROT_INTERP, STRING *string)>
-
-Converts a STRING C<string> into a String PMC.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PMC *
-make_string_pmc(PARROT_INTERP, ARGIN(STRING *string))
-{
-    ASSERT_ARGS(make_string_pmc)
-    PMC * const ret = Parrot_pmc_new_constant(interp, enum_class_String);
-    VTABLE_set_string_native(interp, ret, string);
-
-    return ret;
-}
-
-
-/*
-
 =item C<PMC * Parrot_dyn_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc)>
 
 Clones a ParrotLibrary PMC C<lib_pmc> from interpreter C<s> into interpreter
@@ -624,9 +592,9 @@ Parrot_dyn_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_p
                                         enum_class_ParrotLibrary);
 
         PMC_data(new_lib_pmc) = handle;
-        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_filename"), make_string_pmc(d, wo_ext));
-        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_lib_name"), make_string_pmc(d, lib_name));
-        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_type"), make_string_pmc(d, ops));
+        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_filename"), Parrot_pmc_box_string(d, wo_ext));
+        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_lib_name"), Parrot_pmc_box_string(d, lib_name));
+        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_type"), Parrot_pmc_box_string(d, ops));
 
         /* fixup d->all_op_libs, if necessary */
         if (d->n_libs != s->n_libs) {
@@ -747,5 +715,5 @@ F<include/parrot/dynext.h> and F<src/pmc/parrotlibrary.pmc>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

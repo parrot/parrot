@@ -155,5 +155,5 @@ Pool_Allocator * Parrot_gc_pool_new(SHIM_INTERP, size_t object_size);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
