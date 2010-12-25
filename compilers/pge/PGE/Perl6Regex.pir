@@ -258,7 +258,7 @@ and someday may be refactored to a different location.
     goto scan_xco_char_digits
   scan_xco_char_end:
     $S1 = chr decnum
-    concat literal, $S1
+    literal = concat literal, $S1
     unless isbracketed goto scan_xco_end
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
     $S0 = substr target, pos, 1
@@ -1329,7 +1329,7 @@ Parse a modifier.
     mob['isnegated'] = 1
   assert_pos:
     mob['iszerowidth'] = 1
-    concat close, '>'
+    close = concat close, '>'
     inc len
   have_close:
     $I0 = index target, close, pos
