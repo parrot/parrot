@@ -223,7 +223,7 @@ out-of-bounds test. Checks INT and PMC keys.
   loop:
     unless $P1 goto loop_end
     $S2 = shift $P1
-    concat $S0, $S2
+    $S0 = concat $S0, $S2
     goto loop
   loop_end:
     is($S0, "424344", "Iteration works")
