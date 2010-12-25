@@ -96,7 +96,7 @@ Tests the Socket PMC.
     $S1 = 'Socket'
     diag($S0)
     $I0 = iseq $S0, $S1
-    todo($I0, 'Cloned PMC has correct type TT#1820')
+    ok($I0, 'Cloned PMC has correct type TT#1820')
 .end
 
 .sub test_tcp_socket
