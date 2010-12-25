@@ -2015,6 +2015,13 @@ get_results:
 op_assign:
      target assign_op var
          { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, $2, 2, $1, $3); }
+   | target CONCAT_ASSIGN var
+         {
+             if ($1->set == 'P')
+                 $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "concat", 2, $1, $3);
+             else
+                 $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "concat", 3, $1, $1, $3);
+         }
    ;
 
 assign_op:
@@ -2024,7 +2031,6 @@ assign_op:
    | DIV_ASSIGN                { $$ = (char *)"div"; }
    | MOD_ASSIGN                { $$ = (char *)"mod"; }
    | FDIV_ASSIGN               { $$ = (char *)"fdiv"; }
-   | CONCAT_ASSIGN             { $$ = (char *)"concat"; }
    | BAND_ASSIGN               { $$ = (char *)"band"; }
    | BOR_ASSIGN                { $$ = (char *)"bor"; }
    | BXOR_ASSIGN               { $$ = (char *)"bxor"; }
