@@ -18,7 +18,6 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(36)
 
     test_set_size()
     test_reset_size()
@@ -34,6 +33,9 @@ out-of-bounds test. Checks INT and PMC keys.
     test_sort()
     test_new_style_init()
     test_invalid_init_tt1509()
+    test_custom_cmp()
+
+    done_testing()
 .end
 
 .sub 'test_new_style_init'
@@ -300,6 +302,26 @@ CODE
         $P0 = new 'FixedIntegerArray', -10
     .end
 CODE
+.end
+
+.sub test_custom_cmp
+    $P0 = new ['FixedIntegerArray']
+    $P0 = 3
+    $P0[0] = 1
+    $P0[1] = 2
+    $P0[2] = 3
+    $P1 = get_global 'sorter'
+    $P0.'sort'($P1)
+    $S0 = join ' ', $P0
+    is( $S0, '1 2 3', 'FIA sorted with custom cmp function' )
+.end
+
+.sub sorter
+    .param pmc a
+    .param pmc b
+
+    $I0 = a > b
+    .return ($I0)
 .end
 
 

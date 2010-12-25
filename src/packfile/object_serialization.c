@@ -96,31 +96,6 @@ Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTabl
 
 /*
 
-=item C<UINTVAL Parrot_freeze_size(PARROT_INTERP, PMC *pmc)>
-
-Gets the size of an image to be frozen without allocating a large buffer.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-UINTVAL
-Parrot_freeze_size(PARROT_INTERP, ARGIN(PMC *pmc))
-{
-    ASSERT_ARGS(Parrot_freeze_size)
-    PMC    *pmc_result;
-    PMC    * const visitor = Parrot_pmc_new(interp, enum_class_ImageIOSize);
-    VTABLE_set_pmc(interp, visitor, pmc);
-    pmc_result = VTABLE_get_pmc(interp, visitor);
-
-    return VTABLE_get_integer(interp, pmc_result);
-}
-
-
-/*
-
 =item C<UINTVAL Parrot_freeze_pbc_size(PARROT_INTERP, PMC *pmc, const
 PackFile_ConstTable *pf)>
 

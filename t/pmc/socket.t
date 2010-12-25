@@ -89,11 +89,12 @@ Tests the Socket PMC.
     new $P0, ['Socket']
     $P1 = $P0."sockaddr"("localhost", 1234)
 
-    $P2 = clone $P1
+    $P2 = clone $P0
     ok(1, 'Cloned a Socket PMC')
 
     $S0 = typeof $P2
     $S1 = 'Socket'
+    diag($S0)
     $I0 = iseq $S0, $S1
     todo($I0, 'Cloned PMC has correct type TT#1820')
 .end
