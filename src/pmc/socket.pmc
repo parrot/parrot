@@ -64,8 +64,10 @@ Create a copy of the socket handle.
         Parrot_Socket_attributes * const old_struct = PARROT_SOCKET(SELF);
         Parrot_Socket_attributes * const data_struct = PARROT_SOCKET(copy);
 
-        data_struct->local      = VTABLE_clone(INTERP, old_struct->local);
-        data_struct->remote     = VTABLE_clone(INTERP, old_struct->remote);
+        if (!PMC_IS_NULL(old_struct->local))
+            data_struct->local      = VTABLE_clone(INTERP, old_struct->local);
+        if (!PMC_IS_NULL(old_struct->remote))
+            data_struct->remote     = VTABLE_clone(INTERP, old_struct->remote);
 
         return copy;
     }
