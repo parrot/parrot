@@ -163,7 +163,9 @@ PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_pmc_new_temporary(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
-INTVAL Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
+INTVAL Parrot_pmc_type_does(PARROT_INTERP,
+    ARGIN(const STRING *role),
+    INTVAL type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
