@@ -2847,9 +2847,8 @@ src/extra_nci_thunks.c : src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
 	$(NCI_THUNK_GEN) --dynext --no-warn-dups \
 		--output=src/extra_nci_thunks.c <src/nci/extra_thunks.nci
 
-bootstrap-nci : src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
-	$(NCI_THUNK_GEN) --core --loader-name=Parrot_nci_load_extra_thunks --no-warn-dups \
-		--output=src/nci/extra_thunks.c <src/nci/extra_thunks.nci
+bootstrap-nci : src/nci/core_thunks.nci src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
+	$(PERL) $(DEV_TOOLS_DIR)/mk_nci_thunks.pl
 
 ## SUFFIX OVERRIDE
 src/extra_nci_thunks$(O) : $(PARROT_H_HEADERS) src/extra_nci_thunks.c \
