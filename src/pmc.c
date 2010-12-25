@@ -801,6 +801,7 @@ Boxes a STRING C<string> into a String PMC.
 
 PARROT_HOT
 PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_pmc_box_string(PARROT_INTERP, ARGIN(STRING *string))
 {
