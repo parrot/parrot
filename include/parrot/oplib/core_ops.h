@@ -809,8 +809,6 @@ op_lib_t *Parrot_DynOp_core_2_11_0(PARROT_INTERP, long init);
  opcode_t * Parrot_chopn_s_sc_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_chopn_s_s_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_chopn_s_sc_ic(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_concat_s_s(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_concat_s_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_concat_p_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_concat_p_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_concat_p_sc(opcode_t *, PARROT_INTERP);
