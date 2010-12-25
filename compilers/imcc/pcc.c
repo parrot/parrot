@@ -863,6 +863,9 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
     }
 
     arg = sub->pcc_sub->sub;
+    if (arg == NULL)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Subroutine is not defined");
 
     if (meth_call) {
         meth = arg;
