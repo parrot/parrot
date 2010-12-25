@@ -43,10 +43,6 @@ static void print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC* set_current_sub(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_CANNOT_RETURN_NULL
 static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -55,8 +51,6 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(output))
 #define ASSERT_ARGS_print_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_set_current_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_setup_argv __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -115,7 +109,7 @@ Parrot_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
 {
     ASSERT_ARGS(Parrot_init_stacktop)
     interp->lo_var_ptr = stack_top;
-    init_world_once(interp);
+    Parrot_gbl_init_world_once(interp);
 }
 
 
@@ -630,6 +624,7 @@ Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
     ASSERT_ARGS(Parrot_load_bytecode_file)
     PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
 
+    Parrot_warn_experimental(interp, "Parrot_load_bytecode_file is experimental");
     if (!pf)
         return 0;
     Parrot_pbc_load(interp, pf);
@@ -723,7 +718,7 @@ print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
 
 /*
 
-=item C<static PMC* set_current_sub(PARROT_INTERP)>
+=item C<PMC* set_current_sub(PARROT_INTERP)>
 
 Search the fixup table for a PMC matching the argument.  On a match,
 set up the appropriate context.
@@ -736,7 +731,7 @@ pointer to the PMC.
 */
 
 PARROT_CANNOT_RETURN_NULL
-static PMC*
+PMC*
 set_current_sub(PARROT_INTERP)
 {
     ASSERT_ARGS(set_current_sub)
@@ -1171,5 +1166,5 @@ F<include/parrot/embed.h> and F<docs/embed.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

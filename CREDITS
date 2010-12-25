@@ -92,7 +92,7 @@ E: yDNA@cpan.org
 N: Andrew Whitworth
 D: Internals development
 D: Documentation
-D: Release manager for 0.8.2, 1.3.0, 1.5.0 and 2.4.0
+D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0 and 2.11.0
 E: wknight8111@gmail.com
 U: Whiteknight
 
@@ -366,6 +366,12 @@ W: http://eric.lubow.org/
 N: Felix Gallo
 D: delegate.pmc patch
 
+N: Fernando Brito
+E: email@fernandobrito.com
+D: GCI Student
+U: fbrito
+S: João Pessoa, Brazil
+
 N: Flavio Poletti
 D: SmartLink patch for Moose after 0.43
 
@@ -524,7 +530,7 @@ E: zhuomingliang@yahoo.com.cn
 D: Bugfixes, cage cleaning
 
 N: John Harrison
-E: ash@greatethaninfinity.com 
+E: ash@greatethaninfinity.com
 U: ash_
 
 N: John J. Trammell
@@ -791,6 +797,11 @@ U: nwellnhof
 
 N: Nikolay Ananiev
 D: Win32 build fix
+
+N: Nolan Lum
+E: nol888@gmail.com
+D: Test coverage improvement.
+U: Yuki`N
 
 N: Norman Nunley
 D: Shaving a Ponie

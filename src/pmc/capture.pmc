@@ -844,5 +844,5 @@ Initial version                  - Patrick Michaud 2006-11-03
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

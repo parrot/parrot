@@ -65,15 +65,15 @@ Creates and returns a clone of the key.
             switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
               case KEY_integer_FLAG:
               case KEY_integer_FLAG | KEY_register_FLAG:
-                key_set_integer(INTERP, dkey, key_integer(INTERP, key));
+                Parrot_key_set_integer(INTERP, dkey, Parrot_key_integer(INTERP, key));
                 break;
               case KEY_number_FLAG:
               case KEY_number_FLAG | KEY_register_FLAG:
-                key_set_number(INTERP, dkey, key_number(INTERP, key));
+                Parrot_key_set_number(INTERP, dkey, Parrot_key_number(INTERP, key));
                 break;
               case KEY_string_FLAG:
               case KEY_string_FLAG | KEY_register_FLAG:
-                key_set_string(INTERP, dkey, VTABLE_get_string(INTERP, key));
+                Parrot_key_set_string(INTERP, dkey, VTABLE_get_string(INTERP, key));
                 break;
               case KEY_pmc_FLAG:
               case KEY_pmc_FLAG | KEY_register_FLAG:
@@ -83,11 +83,11 @@ Creates and returns a clone of the key.
                 break;
             }
 
-            key = key_next(INTERP, key);
+            key = Parrot_key_next(INTERP, key);
 
             if (key) {
-                PMC * const p = key_new(INTERP);
-                key_append(INTERP, dkey, p);
+                PMC * const p = Parrot_key_new(INTERP);
+                Parrot_key_append(INTERP, dkey, p);
                 dkey = p;
             }
         }
@@ -106,7 +106,7 @@ Marks the key as live.
 */
 
     VTABLE void mark() {
-        key_mark(INTERP, SELF);
+        Parrot_key_mark(INTERP, SELF);
     }
 
 /*
@@ -120,7 +120,7 @@ Returns the integer value of the key.
 */
 
     VTABLE INTVAL get_integer() {
-        return key_integer(INTERP, SELF);
+        return Parrot_key_integer(INTERP, SELF);
     }
 
 /*
@@ -134,7 +134,7 @@ Returns the floating-point number value of the key.
 */
 
     VTABLE FLOATVAL get_number() {
-        return key_number(INTERP, SELF);
+        return Parrot_key_number(INTERP, SELF);
     }
 
 /*
@@ -148,9 +148,9 @@ Returns the Parrot string value of the key.
 */
 
     VTABLE STRING *get_string() {
-        /* key_string() is only useful if this PMC has a key type */
+        /* Parrot_key_string() is only useful if this PMC has a key type */
         if (PObj_get_FLAGS(SELF) & KEY_type_FLAGS)
-            return key_string(INTERP, SELF);
+            return Parrot_key_string(INTERP, SELF);
 
         return CONST_STRING(INTERP, "");
     }
@@ -166,7 +166,7 @@ Returns the PMC value of the key.
 */
 
     VTABLE PMC *get_pmc() {
-        return key_pmc(INTERP, SELF);
+        return Parrot_key_pmc(INTERP, SELF);
     }
 
 /*
@@ -178,7 +178,7 @@ Returns the PMC value of the key.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        key_set_integer(INTERP, SELF, value);
+        Parrot_key_set_integer(INTERP, SELF, value);
     }
 
 /*
@@ -192,7 +192,7 @@ Sets the value of the key to C<value>.
 */
 
     VTABLE void set_number_native(FLOATVAL value) {
-        key_set_number(INTERP, SELF, value);
+        Parrot_key_set_number(INTERP, SELF, value);
     }
 
 /*
@@ -205,7 +205,7 @@ Sets the value of the key to C<value>.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        key_set_string(INTERP, SELF, value);
+        Parrot_key_set_string(INTERP, SELF, value);
     }
 
 /*
@@ -238,7 +238,7 @@ Appends C<*value> to the key.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can only push another Key onto a Key PMC.");
 
-        key_append(INTERP, SELF, value);
+        Parrot_key_append(INTERP, SELF, value);
     }
 
 /*
@@ -411,7 +411,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
     }
 
     VTABLE STRING* get_repr() {
-        return key_set_to_string(INTERP, SELF);
+        return Parrot_key_set_to_string(INTERP, SELF);
     }
 
 /*
@@ -422,7 +422,7 @@ Set key to hold particular register.
 =cut
 */
     METHOD set_register(INTVAL reg_no, INTVAL reg_type) {
-        key_set_register(INTERP, SELF, reg_no, reg_type);
+        Parrot_key_set_register(INTERP, SELF, reg_no, reg_type);
     }
 
 }
@@ -439,5 +439,5 @@ Set key to hold particular register.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

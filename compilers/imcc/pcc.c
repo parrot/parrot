@@ -438,13 +438,16 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
 
     /* check if there is a return */
     if (unit->last_ins->type          & (ITPCCSUB)
-    &&  unit->last_ins->symreg_count == 1
-    && (sub = unit->last_ins->symregs[0])
-    &&  sub->pcc_sub
-    && !sub->pcc_sub->object
-       /* s. src/inter_call.c:119 */
-    && sub->pcc_sub->tailcall)
-        return;
+    &&  unit->last_ins->symreg_count == 1) {
+        sub = unit->last_ins->symregs[0];
+
+        if (sub->pcc_sub
+        && !sub->pcc_sub->object
+        /* s. src/inter_call.c:119 */
+        && sub->pcc_sub->tailcall) {
+            return;
+        }
+    }
 
     if (unit->last_ins->type != (ITPCCSUB|ITLABEL)
     && STRNEQ(unit->last_ins->opname, "ret")
@@ -931,5 +934,5 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

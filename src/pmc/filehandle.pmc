@@ -291,21 +291,6 @@ Returns a boolean value indicating whether C<SELF> is a console/tty.
         RETURN(INTVAL isatty);
     }
 
-/*
-
-=item C<METHOD close()>
-
-Close the filehandle.
-
-=cut
-
-*/
-
-    METHOD close() {
-        const INTVAL status = Parrot_io_close(INTERP, SELF);
-        RETURN(INTVAL status);
-    }
-
 
 /*
 
@@ -320,39 +305,6 @@ Test if the filehandle is closed.
     METHOD is_closed() {
         const INTVAL status = Parrot_io_is_closed(INTERP, SELF);
         RETURN(INTVAL status);
-    }
-
-
-/*
-
-=item C<METHOD read(INTVAL bytes)>
-
-Read the given number of bytes from the filehandle and return them in a string.
-
-=cut
-
-*/
-
-    METHOD read(INTVAL length) {
-        STRING * const string_result = Parrot_io_reads(INTERP, SELF, length);
-
-        RETURN(STRING *string_result);
-    }
-
-
-/*
-
-=item C<METHOD readline()>
-
-Read a line from the filehandle and return it in a string.
-
-=cut
-
-*/
-
-    METHOD readline() {
-        STRING * const string_result = Parrot_io_readline(INTERP, SELF);
-        RETURN(STRING *string_result);
     }
 
 
@@ -390,8 +342,6 @@ Read a line from the filehandle and return it in a string.
             else
                 string_result = Parrot_str_new_init(INTERP, r, strlen(r), enc, 0);
             free(r);
-            if (enc != NULL)
-                STRING_validate(INTERP, string_result);
         }
 #else
         if (got_prompt) {
@@ -698,29 +648,6 @@ If this is a pipe, return the exit status of the child process.
 
 /*
 
-=item C<METHOD get_fd()>
-
-Retrieve the integer file descriptor for the FileHandle (only available on
-platforms that use integer file descriptors).
-
-=cut
-
-*/
-
-    METHOD get_fd() {
-#ifndef PIO_OS_STDIO
-        PIOHANDLE os_handle;
-        INTVAL    fd;
-        GET_ATTR_os_handle(INTERP, SELF, os_handle);
-        fd = (INTVAL)os_handle;
-        RETURN(INTVAL fd);
-#endif /*PIO_OS_STDIO*/
-
-        RETURN(INTVAL -1);
-    }
-
-/*
-
 =item C<METHOD tell()>
 
 Get the file position of the stream. 2 C<INTVAL>s are returned. The first is
@@ -798,5 +725,5 @@ Returns the next byte from the stream, but does not remove it.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

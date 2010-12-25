@@ -873,10 +873,11 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
          */
         context = Parrot_pcc_get_caller_ctx(interp, keep_context);
         keep_context = NULL;
-        if (context && !PMC_IS_NULL(Parrot_pcc_get_handlers(interp, context)))
-            iter = VTABLE_get_iter(interp, Parrot_pcc_get_handlers(interp, context));
-        else
-            iter = PMCNULL;
+        if (context) {
+            PMC * const handlers = Parrot_pcc_get_handlers(interp, context);
+            if (!PMC_IS_NULL(handlers))
+                iter = VTABLE_get_iter(interp, handlers);
+        }
     }
     else {
         ++already_doing;
@@ -889,9 +890,11 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
             context = (PMC *)VTABLE_get_pointer(interp, task);
         }
         else {
+            PMC * handlers;
             context = CURRENT_CONTEXT(interp);
-            if (!PMC_IS_NULL(Parrot_pcc_get_handlers(interp, context)))
-                iter = VTABLE_get_iter(interp, Parrot_pcc_get_handlers(interp, context));
+            handlers = Parrot_pcc_get_handlers(interp, context);
+            if (!PMC_IS_NULL(handlers))
+                iter = VTABLE_get_iter(interp, handlers);
         }
     }
 
@@ -921,8 +924,11 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 
         /* Continue the search in the next context up the chain. */
         context = Parrot_pcc_get_caller_ctx(interp, context);
-        if (context && !PMC_IS_NULL(Parrot_pcc_get_handlers(interp, context)))
-            iter = VTABLE_get_iter(interp, Parrot_pcc_get_handlers(interp, context));
+        if (context) {
+            PMC * const handlers = Parrot_pcc_get_handlers(interp, context);
+            iter = PMC_IS_NULL(handlers) ? PMCNULL :
+                    VTABLE_get_iter(interp, handlers);
+        }
         else
             iter = PMCNULL;
     }
@@ -1158,5 +1164,5 @@ scheduler_process_messages(PARROT_INTERP, ARGMOD(PMC *scheduler))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

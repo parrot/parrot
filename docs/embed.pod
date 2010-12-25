@@ -717,7 +717,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_freeze_at_destruct>
 
-=item C<Parrot_full_sub_name>
+=item C<Parrot_sub_full_sub_name>
 
 =item C<parrot_gc_context>
 
@@ -727,9 +727,9 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_gc_mark_PObj_alive>
 
-=item C<Parrot_get_ctx_HLL_namespace>
+=item C<Parrot_hll_get_ctx_HLL_namespace>
 
-=item C<Parrot_get_ctx_HLL_type>
+=item C<Parrot_hll_get_ctx_HLL_type>
 
 =item C<Parrot_dt_get_datatype_enum>
 
@@ -739,13 +739,13 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_ns_get_global>
 
-=item C<Parrot_get_HLL_id>
+=item C<Parrot_hll_get_HLL_id>
 
-=item C<Parrot_get_HLL_name>
+=item C<Parrot_hll_get_HLL_name>
 
-=item C<Parrot_get_HLL_namespace>
+=item C<Parrot_hll_get_HLL_namespace>
 
-=item C<Parrot_get_HLL_type>
+=item C<Parrot_hll_get_HLL_type>
 
 =item C<Parrot_get_intreg>
 
@@ -1415,13 +1415,13 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_util_range_rand>
 
-=item C<Parrot_regenerate_HLL_namespaces>
+=item C<Parrot_hll_regenerate_HLL_namespaces>
 
 =item C<Parrot_register_encoding>
 
-=item C<Parrot_register_HLL>
+=item C<Parrot_hll_register_HLL>
 
-=item C<Parrot_register_HLL_type>
+=item C<Parrot_hll_register_HLL_type>
 
 =item C<Parrot_util_register_move>
 
@@ -1439,7 +1439,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_secret_snprintf>
 
-=item C<Parrot_set_config_hash_internal>
+=item C<Parrot_gbl_set_config_hash_internal>
 
 =item C<Parrot_set_context_threshold>
 

@@ -12,8 +12,8 @@
 #define PARROT_UNICODE_H_GUARD
 
 typedef unsigned char utf8_t;
-typedef unsigned short utf16_t;
-typedef unsigned long utf32_t;
+typedef Parrot_UInt2  utf16_t;
+typedef Parrot_Int4   utf32_t;
 
 #define UNICODE_SURROGATE_FIRST         0xD800u
 #define UNICODE_SURROGATE_LAST          0xDFFFu
@@ -31,6 +31,14 @@ typedef unsigned long utf32_t;
 #define UNICODE_IS_LOW_SURROGATE(c)    ((c) >= UNICODE_LOW_SURROGATE_FIRST && \
                                         (c) <= UNICODE_LOW_SURROGATE_LAST)
 #define UNICODE_IS_INVARIANT(c)        ((c) <  0x80u)
+#define UNICODE_IS_NON_CHARACTER(c)   (((c) &  0xFFFEu) == 0xFFFEu || \
+                                       ((c) >= 0xFDD0u && (c) <= 0xFDEFu))
+#define UNICODE_IS_INVALID(c)          ((c) >= UNICODE_SURROGATE_FIRST && \
+                                       ((c) <= 0xFDEFu ? \
+                                        (c) <= UNICODE_SURROGATE_LAST || \
+                                        (c) >= 0xFDD0u : \
+                                       ((c) &  0xFFFEu) == 0xFFFEu || \
+                                        (c) >  0x10FFFFu))
 
 #define UNICODE_HIGH_SURROGATE(c) \
   ((((c) - 0x10000u) >> UNICODE_HIGH_SURROGATE_SHIFT) + UNICODE_HIGH_SURROGATE_FIRST)
@@ -41,8 +49,8 @@ typedef unsigned long utf32_t;
     ((low) - UNICODE_LOW_SURROGATE_FIRST) + 0x10000u)
 
 #define UNISKIP(uv) ((uv) < 0x80    ? 1 : \
-                      (uv) < 0x800   ? 2 : \
-                      (uv) < 0x10000 ? 3 : 4)
+                     (uv) < 0x800   ? 2 : \
+                     (uv) < 0x10000 ? 3 : 4)
 
 #define UTF16SKIP(s) (UNICODE_IS_HIGH_SURROGATE(*(s)) ? 2 : 1)
 
@@ -62,7 +70,7 @@ typedef unsigned long utf32_t;
 
  */
 
-#define UTF8_IS_START(c)                ((c) >= 0xC0u && (c) <= 0xFDu)
+#define UTF8_IS_START(c)                ((c) >= 0xC2u && (c) <= 0xF4u)
 #define UTF8_IS_CONTINUATION(c)         ((c) >= 0x80u && (c) <= 0xBFu)
 #define UTF8_IS_CONTINUED(c)            ((c) &  0x80u)
 
@@ -73,6 +81,9 @@ typedef unsigned long utf32_t;
 #define UTF8_ACCUMULATION_SHIFT          6
 #define UTF8_CONTINUATION_MASK           0x3Fu
 #define UTF8_ACCUMULATE(old, new)       (((old) << UTF8_ACCUMULATION_SHIFT) | ((new) & UTF8_CONTINUATION_MASK))
+
+#define UTF8_IS_OVERLONG(c1, c2)       (((c1) == 0xE0u && (c2) < 0xA0u) || \
+                                        ((c1) == 0xF0u && (c2) < 0x90u))
 
 extern const char Parrot_utf8skip[256];
 
@@ -88,5 +99,5 @@ extern const char Parrot_utf8skip[256];
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

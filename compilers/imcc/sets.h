@@ -118,6 +118,6 @@ Set * set_union(PARROT_INTERP, ARGIN(const Set *s1), ARGIN(const Set *s2))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

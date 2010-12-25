@@ -1253,7 +1253,7 @@ Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
         d = sqrt(re*re + im*im);
 
         dest = Parrot_pmc_new(INTERP,
-            Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
+            Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_Float));
 
         VTABLE_set_number_native(INTERP, dest, d);
         return dest;
@@ -1928,5 +1928,5 @@ x ^ y = exp(y * ln x))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

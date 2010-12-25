@@ -20,7 +20,7 @@ generated from F<src/vtable.tbl> by F<tools/build/pmc2c.pl>.
 
 */
 
-#define INT2KEY(i, k) key_new_integer((i), (k))
+#define INT2KEY(i, k) Parrot_key_new_integer((i), (k))
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
@@ -312,7 +312,10 @@ make_prop_hash(PARROT_INTERP, ARGMOD(PMC *self))
 {
     ASSERT_ARGS(make_prop_hash)
 
-    PMC * const prop = Parrot_pmc_new(interp, enum_class_Hash);
+    PMC * const prop = PObj_constant_TEST(self)
+                       ? Parrot_pmc_new_constant(interp, enum_class_Hash)
+                       : Parrot_pmc_new(interp, enum_class_Hash);
+
     propagate_std_props(interp, self, prop);
     return prop;
 }
@@ -1996,5 +1999,5 @@ Default fallback. Performs a multiple dispatch call for 'i_repeat_int'.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -186,9 +186,11 @@ static int gc_ms2_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 
 static int gc_ms2_is_ptr_owned(PARROT_INTERP,
     ARGIN_NULLOK(void *ptr),
-    ARGIN(Pool_Allocator *pool))
+    ARGIN(Pool_Allocator *pool),
+    ARGIN(Parrot_Pointer_Array *list))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 static int gc_ms2_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         __attribute__nonnull__(1);
@@ -326,7 +328,8 @@ static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_is_ptr_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pool))
+    , PARROT_ASSERT_ARG(pool) \
+    , PARROT_ASSERT_ARG(list))
 #define ASSERT_ARGS_gc_ms2_is_string_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_iterate_live_strings __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -638,10 +641,11 @@ Parrot_gc_ms2_init(PARROT_INTERP)
         self->fixed_size_allocator = Parrot_gc_fixed_allocator_new(interp);
 
         self->gc_threshold = Parrot_sysmem_amount(interp) / 8;
+
+        Parrot_gc_str_initialize(interp, &self->string_gc);
     }
 
     interp->gc_sys->gc_private = self;
-    Parrot_gc_str_initialize(interp, &self->string_gc);
 }
 
 
@@ -750,8 +754,10 @@ gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
     /* mark it live */
     PObj_live_SET(pmc);
 
-    Parrot_pa_remove(interp, self->objects, item->ptr);
-    item->ptr = Parrot_pa_insert(interp, self->new_objects, item);
+    if (!PObj_constant_TEST(pmc)) {
+        Parrot_pa_remove(interp, self->objects, item->ptr);
+        item->ptr = Parrot_pa_insert(interp, self->new_objects, item);
+    }
 
 }
 
@@ -771,7 +777,7 @@ gc_ms2_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_ms2_is_pmc_ptr)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    return gc_ms2_is_ptr_owned(interp, ptr, self->pmc_allocator);
+    return gc_ms2_is_ptr_owned(interp, ptr, self->pmc_allocator, self->objects);
 }
 
 /*
@@ -876,7 +882,7 @@ gc_ms2_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_ms2_is_string_ptr)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    return gc_ms2_is_ptr_owned(interp, ptr, self->string_allocator);
+    return gc_ms2_is_ptr_owned(interp, ptr, self->string_allocator, self->strings);
 }
 
 
@@ -1009,8 +1015,6 @@ gc_ms2_mark_live_objects(PARROT_INTERP, ARGIN(MarkSweep_GC *self),
 {
     ASSERT_ARGS(gc_ms2_mark_live_objects)
 
-    pmc_alloc_struct *tmp;
-
     /* Allocate list for gray objects */
     self->new_objects = Parrot_pa_new(interp);
 
@@ -1049,8 +1053,7 @@ static void
 gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms2_mark_and_sweep)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    size_t            counter;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     /* GC is blocked */
     if (self->gc_mark_block_level)
@@ -1083,7 +1086,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     /* Replace objects with new_objects. Ignoring "constant" one */
     do {
-        Parrot_Pointer_Array *tmp = self->objects;
+        Parrot_Pointer_Array * const tmp = self->objects;
         self->objects = self->new_objects;
         Parrot_pa_destroy(interp, tmp);
     } while (0);
@@ -1215,7 +1218,7 @@ gc_ms2_sweep_string_pool(PARROT_INTERP,
 /*
 
 =item C<static int gc_ms2_is_ptr_owned(PARROT_INTERP, void *ptr, Pool_Allocator
-*pool)>
+*pool, Parrot_Pointer_Array *list)>
 
 Helper function to check that we own PObj
 
@@ -1224,11 +1227,12 @@ Helper function to check that we own PObj
 */
 
 static int
-gc_ms2_is_ptr_owned(PARROT_INTERP, ARGIN_NULLOK(void *ptr),
-    ARGIN(Pool_Allocator *pool))
+gc_ms2_is_ptr_owned(PARROT_INTERP,
+        ARGIN_NULLOK(void *ptr),
+        ARGIN(Pool_Allocator *pool),
+        ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_ms2_is_ptr_owned)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     PObj             *obj  = (PObj *)ptr;
     pmc_alloc_struct *item = PMC2PAC(ptr);
 
@@ -1243,10 +1247,7 @@ gc_ms2_is_ptr_owned(PARROT_INTERP, ARGIN_NULLOK(void *ptr),
         return 0;
 
     /* Pool.is_owned isn't precise enough (yet) */
-    if (Parrot_pa_is_owned(interp, self->objects, item, item->ptr))
-        return 1;
-
-    return 0;
+    return Parrot_pa_is_owned(interp, list, item, item->ptr);
 }
 
 
@@ -1481,5 +1482,5 @@ gc_ms2_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

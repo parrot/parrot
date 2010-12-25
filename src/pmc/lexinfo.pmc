@@ -127,5 +127,5 @@ F<docs/pdds/pdd20_lexical_vars.pod>, F<src/classes/lexpad.pmc>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

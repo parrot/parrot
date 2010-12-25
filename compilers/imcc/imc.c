@@ -289,5 +289,5 @@ imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

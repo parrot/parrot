@@ -282,7 +282,7 @@ char_offset_key(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *key), ARGOUT(int *typ
 #endif
 
     ix   = key_2_idx(interp, pmc, key);
-    next = key_next(interp, key);
+    next = Parrot_key_next(interp, key);
     p    = char_offset_int(interp, pmc, ix, type);
     ix  *= 3;
 
@@ -314,8 +314,8 @@ char_offset_key(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *key), ARGOUT(int *typ
 
         /* array of structs */
         if (max > 1) {
-            if (key_next(interp, next))
-                next = key_next(interp, next);
+            if (Parrot_key_next(interp, next))
+                next = Parrot_key_next(interp, next);
 
             offs = VTABLE_get_integer(interp, init);
 
@@ -1217,5 +1217,5 @@ F<docs/pmc/struct.pod>
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -791,6 +791,28 @@ Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
 
 /*
 
+=item C<PMC * Parrot_pmc_box_string(PARROT_INTERP, STRING *string)>
+
+Boxes a STRING C<string> into a String PMC.
+
+=cut
+
+*/
+
+PARROT_HOT
+PARROT_INLINE
+PMC *
+Parrot_pmc_box_string(PARROT_INTERP, ARGIN(STRING *string))
+{
+    ASSERT_ARGS(Parrot_pmc_box_string)
+    PMC * ret = Parrot_pmc_new(interp, enum_class_String);
+    VTABLE_set_string_native(interp, ret, string);
+
+    return ret;
+}
+
+/*
+
 =item C<INTVAL Parrot_pmc_get_type(PARROT_INTERP, PMC *name)>
 
 Returns the PMC type for C<name>.
@@ -905,7 +927,7 @@ Parrot_pmc_create_mro(PARROT_INTERP, INTVAL type)
         if (!vtable->_namespace) {
             /* need a namespace Hash, anchor at parent, name it */
             PMC * const ns     = Parrot_pmc_new(interp,
-                    Parrot_get_ctx_HLL_type(interp, enum_class_NameSpace));
+                    Parrot_hll_get_ctx_HLL_type(interp, enum_class_NameSpace));
             vtable->_namespace = ns;
 
             /* anchor at parent, aka current_namespace, that is 'parrot' */
@@ -1037,5 +1059,5 @@ C<5.1.0.14.2.20011008152120.02158148@pop.sidhe.org>
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

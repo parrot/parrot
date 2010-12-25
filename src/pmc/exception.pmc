@@ -130,6 +130,21 @@ Initializes the exception with default values.
 
 /*
 
+=item C<void init_int()>
+
+Initializes the exception with default values and the specified type.
+
+=cut
+
+*/
+
+    VTABLE void init_int(INTVAL type) {
+        SELF.init();
+        SET_ATTR_type(INTERP, SELF, type);
+    }
+
+/*
+
 =item C<void init_pmc()>
 
 Initializes the exception with supplied values.
@@ -624,6 +639,9 @@ Retrieve an attribute value for the exception object.
           case attr_handler_iter:
             GET_ATTR_handler_iter(INTERP, SELF, value);
             break;
+          case attr_thrower:
+            GET_ATTR_thrower(INTERP, SELF, value);
+            break;
           case attr_NONE:
             /* If unknown attribute name, throw an exception. */
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
@@ -884,5 +902,5 @@ getAttrEnum(PARROT_INTERP, ARGIN(const STRING *name))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

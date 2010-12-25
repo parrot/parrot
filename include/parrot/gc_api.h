@@ -33,6 +33,13 @@
 
 #define GC_DYNAMIC_THRESHOLD_DEFAULT 25
 
+typedef enum _gc_sys_type_enum {
+    MS,  /* mark and sweep */
+    INF, /* infinite memory core */
+    TMS, /* tricolor mark and sweep */
+    MS2
+} gc_sys_type_enum;
+
 /* pool iteration */
 typedef enum {
     POOL_PMC    = 0x01,
@@ -157,6 +164,10 @@ void * Parrot_gc_reallocate_memory_chunk_with_interior_pointers(PARROT_INTERP,
     ARGFREE(void *data),
     size_t newsize,
     size_t oldsize)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_gc_set_system_type(PARROT_INTERP, const char *name)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -351,6 +362,8 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_gc_reallocate_memory_chunk_with_interior_pointers \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_gc_set_system_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_is_blocked_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_is_blocked_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -480,5 +493,5 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

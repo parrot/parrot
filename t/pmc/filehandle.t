@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -823,6 +823,17 @@ ok 4
 ok 5
 ok 6
 OUTPUT
+
+# FileHandle use file descriptor, get_fd should not return -1
+pir_output_is( <<'CODE', <<'OUT', 'get_fd method' );
+.sub test :main
+    new $P0, ['FileHandle']
+    $N0 = $P0.'get_fd'()
+    say $N0
+.end
+CODE
+-1
+OUT
 
 # TT #1178
 # L<PDD22/I\/O PMC API/=item get_fd>

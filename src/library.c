@@ -160,8 +160,6 @@ parrot_init_library_paths(PARROT_INTERP)
     ASSERT_ARGS(parrot_init_library_paths)
     PMC    *paths;
     STRING *entry;
-    STRING *versionlib      = NULL;
-    STRING *builddir        = NULL;
     PMC * const iglobals    = interp->iglobals;
     PMC * const config_hash = VTABLE_get_pmc_keyed_int(interp, iglobals,
                                 (INTVAL)IGLOBALS_CONFIG_HASH);
@@ -172,21 +170,6 @@ parrot_init_library_paths(PARROT_INTERP)
     VTABLE_set_pmc_keyed_int(interp, iglobals,
             IGLOBALS_LIB_PATHS, lib_paths);
 
-    if (VTABLE_elements(interp, config_hash)) {
-        STRING * const libkey      = CONST_STRING(interp, "libdir");
-        STRING * const verkey      = CONST_STRING(interp, "versiondir");
-        STRING * const builddirkey = CONST_STRING(interp, "build_dir");
-        STRING * const installed   = CONST_STRING(interp, "installed");
-
-        versionlib = VTABLE_get_string_keyed_str(interp, config_hash, libkey);
-        entry      = VTABLE_get_string_keyed_str(interp, config_hash, verkey);
-        versionlib = Parrot_str_concat(interp, versionlib, entry);
-
-        if (!VTABLE_get_integer_keyed_str(interp, config_hash, installed))
-            builddir = VTABLE_get_string_keyed_str(interp,
-                                config_hash, builddirkey);
-    }
-
     /* each is an array of strings */
     /* define include paths */
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
@@ -195,23 +178,14 @@ parrot_init_library_paths(PARROT_INTERP)
     { /* EXPERIMENTAL: add include path from environment */
         const char *envvar = Parrot_getenv(interp,
                                            Parrot_str_new_constant(interp, "PARROT_INCLUDE"));
+        Parrot_warn_experimental(interp, "PARROT_INCLUDE environment variable is experimental");
         if (envvar != NULL  && envvar[0]) {
             entry = Parrot_str_new(interp, envvar, 0);
             VTABLE_push_string(interp, paths, entry);
         }
     }
-    if (!STRING_IS_NULL(builddir)) {
-        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/"));
-        VTABLE_push_string(interp, paths, entry);
-        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/include/"));
-        VTABLE_push_string(interp, paths, entry);
-    }
     entry = CONST_STRING(interp, "./");
     VTABLE_push_string(interp, paths, entry);
-    if (!STRING_IS_NULL(versionlib)) {
-        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/include/"));
-        VTABLE_push_string(interp, paths, entry);
-    }
 
     /* define library paths */
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
@@ -220,51 +194,28 @@ parrot_init_library_paths(PARROT_INTERP)
     { /* EXPERIMENTAL: add library path from environment */
         const char *envvar = Parrot_getenv(interp,
                                            Parrot_str_new_constant(interp, "PARROT_LIBRARY"));
+        Parrot_warn_experimental(interp, "PARROT_LIBRARY environment variable is experimental");
         if (envvar != NULL && envvar[0]) {
             entry = Parrot_str_new(interp, envvar, 0);
             VTABLE_push_string(interp, paths, entry);
         }
     }
-    if (!STRING_IS_NULL(builddir)) {
-        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/library/"));
-        VTABLE_push_string(interp, paths, entry);
-    }
     entry = CONST_STRING(interp, "./");
     VTABLE_push_string(interp, paths, entry);
-    if (!STRING_IS_NULL(versionlib)) {
-        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/library/"));
-        VTABLE_push_string(interp, paths, entry);
-    }
 
     /* define languages paths */
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_LANG, paths);
-    if (!STRING_IS_NULL(builddir)) {
-        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/languages/"));
-        VTABLE_push_string(interp, paths, entry);
-    }
     entry = CONST_STRING(interp, "./");
     VTABLE_push_string(interp, paths, entry);
-    if (!STRING_IS_NULL(versionlib)) {
-        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/languages/"));
-        VTABLE_push_string(interp, paths, entry);
-    }
 
     /* define dynext paths */
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_DYNEXT, paths);
-    if (!STRING_IS_NULL(builddir)) {
-        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/dynext/"));
-        VTABLE_push_string(interp, paths, entry);
-    }
     entry = CONST_STRING(interp, "dynext/");
     VTABLE_push_string(interp, paths, entry);
-    if (!STRING_IS_NULL(versionlib)) {
-        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/dynext/"));
-        VTABLE_push_string(interp, paths, entry);
-    }
 
     /* shared exts */
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
@@ -283,6 +234,89 @@ parrot_init_library_paths(PARROT_INTERP)
     PARROT_PLATFORM_LIB_PATH_INIT_HOOK(interp, lib_paths);
 #endif
 }
+
+/*
+
+=item C<void Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)>
+
+Updates library paths from the config hash stored in the interpreter.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_lib_update_paths_from_config_hash)
+    STRING * versionlib = NULL;
+    STRING * entry = NULL;
+    STRING * builddir = NULL;
+    PMC * const lib_paths =
+        VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_LIB_PATHS);
+    PMC * const config_hash =
+        VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_CONFIG_HASH);
+    PMC * paths;
+
+    if (VTABLE_elements(interp, config_hash)) {
+        STRING * const libkey      = CONST_STRING(interp, "libdir");
+        STRING * const verkey      = CONST_STRING(interp, "versiondir");
+        STRING * const builddirkey = CONST_STRING(interp, "build_dir");
+        STRING * const installed   = CONST_STRING(interp, "installed");
+
+        versionlib = VTABLE_get_string_keyed_str(interp, config_hash, libkey);
+        entry      = VTABLE_get_string_keyed_str(interp, config_hash, verkey);
+        versionlib = Parrot_str_concat(interp, versionlib, entry);
+
+        if (!VTABLE_get_integer_keyed_str(interp, config_hash, installed))
+            builddir = VTABLE_get_string_keyed_str(interp,
+                                config_hash, builddirkey);
+    }
+
+    paths = VTABLE_get_pmc_keyed_int(interp, lib_paths, PARROT_LIB_PATH_INCLUDE);
+    if (!STRING_IS_NULL(builddir)) {
+        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/"));
+        VTABLE_push_string(interp, paths, entry);
+        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/include/"));
+        VTABLE_push_string(interp, paths, entry);
+    }
+    if (!STRING_IS_NULL(versionlib)) {
+        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/include/"));
+        VTABLE_push_string(interp, paths, entry);
+    }
+
+    paths = VTABLE_get_pmc_keyed_int(interp, lib_paths, PARROT_LIB_PATH_LIBRARY);
+    if (!STRING_IS_NULL(builddir)) {
+        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/library/"));
+        VTABLE_push_string(interp, paths, entry);
+    }
+    if (!STRING_IS_NULL(versionlib)) {
+        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/library/"));
+        VTABLE_push_string(interp, paths, entry);
+    }
+
+    paths = VTABLE_get_pmc_keyed_int(interp, lib_paths, PARROT_LIB_PATH_LANG);
+    if (!STRING_IS_NULL(builddir)) {
+        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/languages/"));
+        VTABLE_push_string(interp, paths, entry);
+    }
+    if (!STRING_IS_NULL(versionlib)) {
+        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/languages/"));
+        VTABLE_push_string(interp, paths, entry);
+    }
+
+    paths = VTABLE_get_pmc_keyed_int(interp, lib_paths, PARROT_LIB_PATH_DYNEXT);
+    if (!STRING_IS_NULL(builddir)) {
+        entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/dynext/"));
+        VTABLE_push_string(interp, paths, entry);
+    }
+    if (!STRING_IS_NULL(versionlib)) {
+        entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/dynext/"));
+        VTABLE_push_string(interp, paths, entry);
+    }
+}
+
 
 /*
 
@@ -841,12 +875,9 @@ parrot_split_path_ext(PARROT_INTERP, ARGMOD(STRING *in),
     /* This is a quick fix for TT #65
      * TODO: redo it with the string reimplementation
      */
-    STRING * const slash1 = Parrot_str_new_init(interp, "/", 1,
-            in->encoding, PObj_external_FLAG|PObj_constant_FLAG);
-    STRING * const slash2 = Parrot_str_new_init(interp, "\\", 1,
-            in->encoding, PObj_external_FLAG|PObj_constant_FLAG);
-    STRING * const dot    = Parrot_str_new_init(interp, ".", 1,
-            in->encoding, PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const slash1 = CONST_STRING(interp, "/");
+    STRING * const slash2 = CONST_STRING(interp, "\\");
+    STRING * const dot    = CONST_STRING(interp, ".");
 
     const INTVAL len = Parrot_str_byte_length(interp, in);
     STRING *stem;
@@ -903,5 +934,5 @@ F<include/parrot/library.h>
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

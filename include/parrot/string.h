@@ -33,7 +33,6 @@
 #define STRING_index(interp, src, search, offset) ((src)->encoding)->index((interp), (src), (search), (offset))
 #define STRING_rindex(interp, src, search, offset) ((src)->encoding)->rindex((interp), (src), (search), (offset))
 #define STRING_hash(i, src, seed) ((src)->encoding)->hash((i), (src), (seed))
-#define STRING_validate(interp, src) ((src)->encoding)->validate((interp), (src))
 
 #define STRING_scan(i, src) ((src)->encoding)->scan((i), (src))
 #define STRING_ord(i, src, offset) ((src)->encoding)->ord((i), (src), (offset))
@@ -59,7 +58,6 @@
 #define STRING_iter_skip(i, str, iter, skip) ((str)->encoding)->iter_skip((i), (str), (iter), (skip))
 #define STRING_iter_get_and_advance(i, str, iter) ((str)->encoding)->iter_get_and_advance((i), (str), (iter))
 #define STRING_iter_set_and_advance(i, str, iter, c) ((str)->encoding)->iter_set_and_advance((i), (str), (iter), (c))
-#define STRING_iter_set_position(i, str, iter, pos) ((str)->encoding)->iter_set_position((i), (str), (iter), (pos))
 
 /* stringinfo parameters */
 
@@ -91,7 +89,6 @@ typedef INTVAL   (*str_vtable_compare_t)(PARROT_INTERP, ARGIN(const STRING *lhs)
 typedef INTVAL   (*str_vtable_index_t)(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *search_string), INTVAL offset);
 typedef INTVAL   (*str_vtable_rindex_t)(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *search_string), INTVAL offset);
 typedef size_t   (*str_vtable_hash_t)(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval);
-typedef UINTVAL  (*str_vtable_validate_t)(PARROT_INTERP, ARGIN(const STRING *src));
 
 typedef UINTVAL  (*str_vtable_scan_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef UINTVAL  (*str_vtable_ord_t)(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset);
@@ -120,7 +117,6 @@ typedef UINTVAL  (*str_vtable_iter_get_t)(PARROT_INTERP, const STRING *str, cons
 typedef void     (*str_vtable_iter_skip_t)(PARROT_INTERP, const STRING *str, String_iter *i, INTVAL skip);
 typedef UINTVAL  (*str_vtable_iter_get_and_advance_t)(PARROT_INTERP, const STRING *str, String_iter *i);
 typedef void     (*str_vtable_iter_set_and_advance_t)(PARROT_INTERP, STRING *str, String_iter *i, UINTVAL c);
-typedef void     (*str_vtable_iter_set_position_t)(PARROT_INTERP, const STRING *str, String_iter *i, UINTVAL pos);
 
 struct _str_vtable {
     int         num;
@@ -136,7 +132,6 @@ struct _str_vtable {
     str_vtable_index_t                  index;
     str_vtable_rindex_t                 rindex;
     str_vtable_hash_t                   hash;
-    str_vtable_validate_t               validate;
 
     str_vtable_scan_t                   scan;
     str_vtable_ord_t                    ord;
@@ -161,7 +156,6 @@ struct _str_vtable {
     str_vtable_iter_skip_t              iter_skip;
     str_vtable_iter_get_and_advance_t   iter_get_and_advance;
     str_vtable_iter_set_and_advance_t   iter_set_and_advance;
-    str_vtable_iter_set_position_t      iter_set_position;
 };
 
 typedef struct _str_vtable STR_VTABLE;
@@ -173,5 +167,5 @@ typedef struct _str_vtable STR_VTABLE;
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

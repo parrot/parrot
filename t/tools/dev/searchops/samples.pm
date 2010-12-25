@@ -39,7 +39,7 @@ pseudo-core.ops - Parrot Core Ops
 
 =item B<end>()
 
-Halts the interpreter. (Must be op #0, CORE_OPS_end). See also B<exit>.
+Halts the interpreter. See also B<exit>.
 
 =cut
 

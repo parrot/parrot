@@ -48,7 +48,6 @@ appropriate type.
             VTABLE_set_pmc(INTERP, SELF, other);
         }
         else {
-            PMC * const class_  = PARROT_OBJECT(other)->_class;
             PMC        *clone   = VTABLE_clone(INTERP, other);
             void       *attrs   = PMC_data(clone);
             PMC        *meta    = PMC_metadata(clone);
@@ -286,5 +285,5 @@ Returns 1 if the C<*value> is an Undef PMC, 0 otherwise.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -429,10 +429,9 @@ The calendar of releases is available at the comp.lang.parrot google calendar,
 visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
- - Dec 21, 2010 - 2.11  - whiteknight
  - Jan 18, 2011 - 3.0*  - cotto
  - Feb 15, 2011 - 3.1   - mikehh
- - Mar 15, 2011 - 3.2   - ??
+ - Mar 15, 2011 - 3.2   - gerd
  - Apr 19, 2011 - 3.3*  - ??
  - May 17, 2011 - 3.4   - ??
  - Jun 21, 2011 - 3.5   - ??

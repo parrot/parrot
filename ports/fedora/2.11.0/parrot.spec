@@ -1,12 +1,12 @@
 Name:           parrot
-Version:        2.6.0
-Release:        2%{?dist}
-Summary:        a virtual machine
+Version:        2.11.0
+Release:        1%{?dist}
+Summary:        A virtual machine
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            http://www.parrot.org/
 
-Source0:        ftp://ftp.parrot.org/pub/parrot/releases/stable/%{version}/parrot-%{version}.tar.gz
+Source0:        ftp://ftp.parrot.org/pub/parrot/releases/devel/%{version}/parrot-%{version}.tar.gz
 Source1:        %{name}.desk.in.tar.gz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -17,6 +17,8 @@ BuildRequires:  gdbm-devel
 BuildRequires:  libicu-devel
 BuildRequires:  perl(Test::Harness)
 BuildRequires:  perl(Test::Simple)
+BuildRequires:  perl(Devel::Cover)
+BuildRequires:  procps
 BuildRequires:  ctags
 BuildRequires:  openssl-devel
 BuildRequires:  flex
@@ -25,6 +27,12 @@ BuildRequires:  bison
 BuildRequires:  perl(Pod::PseudoPod::LaTeX), texlive-latex
 # Needed to desktop-file-install usage
 BuildRequires:  desktop-file-utils
+
+
+# Needs to build with OpenGL
+#BuildRequires:  mesa-libGL
+#BuildRequires:  mesa-libGLU-devel
+#BuildRequires:  freeglut-devel
  
 
 %package docs
@@ -130,7 +138,7 @@ chmod +x %{__perl_provides}
 # to find his parrot-library in "blib/lib" 
 export LD_LIBRARY_PATH=$( pwd )/blib/lib
 
-# pbc_to_exe would not build if %{_smp_mflags} would used
+# pbc_to_exe would not build if %%{_smp_mflags} would used
 make
 make html pdf
 
@@ -158,7 +166,7 @@ for var in 'parrot docs/running.pod' 'parrot_debugger src/parrot_debugger.c' \
            'pbc_disassemble src/pbc_disassemble.c' 'pbc_dump src/pbc_dump.c' \
            'pbc_merge src/pbc_merge.c' 'pbc_to_exe tools/dev/pbc_to_exe.pir' \
            'parrot_config tools/build/parrot_config_c.pl' \
-           'parrot-nqp compilers/nqp/README.pod'
+           'parrot-nqp ext/nqp-rx/README'    # evtl. docs/book/pct/ch05_nqp.pod
 do
     MAN_NAME=`echo $var | %{__perl} -na -e 'print $F[0]'`
     MAN_SOURCE=`echo $var | %{__perl} -na -e 'print $F[1]'`
@@ -181,8 +189,12 @@ find docs examples -type f -exec chmod 644 {} \;
 # With changed permissions the dependencies will be found
 find %{RPM_PAR_LIB_DIR}dynext -type f -name '*.so' -exec chmod 755 {} \;
 
-# Remove module that should be install instead (perl(File::Which))
+# Remove files that are already provided with the module: perl(File::Which)
 rm -rf %{RPM_PAR_LIB_DIR}tools/lib/File
+
+# Change the perl5 'use lib' command to find Parrot::Config in the
+# subdirectory 'tools/lib' of the RPM location
+%{__sed} -i -e '67 s&use lib "$Bin/../../lib"\; # build location&use lib '"'"'%{_libdir}/%{name}/%{version}/tools/lib'"'"'\; # RPM location&' ${RPM_PAR_LIB_DIR}tools/dev/mk_language_shell.pl
 
 
 # Added to reduce output errors when using rpmlint
@@ -251,6 +263,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc ChangeLog CREDITS NEWS PBC_COMPAT PLATFORMS README
 %doc RESPONSIBLE_PARTIES TODO LICENSE
+%doc README.deutsch README.espanol README.polski
 %{_bindir}/parrot
 %{_libdir}/parrot/
 %exclude %{_libdir}/parrot/%{version}/tools
@@ -301,7 +314,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Wed Jul 21 2010 Gerd Pokorra <gp@zimt.uni-siegen.de> 2.6.0-2
+* Wed Dec 22 2010 Gerd Pokorra <gp@zimt.uni-siegen.de> 2.11.0-1
+- updated to 2.11.0
+- added BuildRequires perl(Devel::Cover), procps
+
+* Wed Jul 21 2010 Gerd Pokorra <gp@zimt.uni-siegen.de> 2.6.0-1
 - updated to 2.6.0
 - add vim files for syntax-highlighting and automatic indenting
 - so requires "vim-common" is added
@@ -359,9 +376,6 @@ rm -rf $RPM_BUILD_ROOT
 
 * Tue Dec 16 2008 Whiteknight <wknight8111@gmail.com> 0.8.2
 - updated to 0.8.2
-
-* Wed Feb 20 2008 Patrick Michaud <pmichaud@pobox.com> 0.5.3
-- Update to 0.5.3.
 
 * Sat Mar 10 2007 Steven Pritchard <steve@kspei.com> 0.4.9-1
 - BuildRequires ncurses-devel.

@@ -48,6 +48,7 @@ Create empty PackfileDebug.
     VTABLE void init() {
         SUPER();
         SET_ATTR_type(INTERP, SELF, PF_DEBUG_SEG);
+        Parrot_warn_experimental(interp, "PackfileDebug is experimental");
     }
 
 /*
@@ -90,7 +91,6 @@ Set pointer to underlying PackFile_ConstTable
         PMC *mapping_filename = Parrot_pmc_new_init_int(INTERP,
                                                       enum_class_FixedIntegerArray, num_mappings);
         INTVAL i;
-        STRING *t = CONST_STRING(INTERP, "test");
 
         SUPER(pointer);
         for (i = 0; i < num_mappings; ++i) {
@@ -205,5 +205,5 @@ Get the filename mapping n.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -39,7 +39,7 @@ sub runstep {
     $conf->data->set( revision => $revision );
 
     if ( defined $revision ) {
-        $self->set_result("$revision");
+        $self->set_result($revision);
     }
     else {
         $self->set_result("done");

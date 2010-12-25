@@ -67,11 +67,82 @@ subtypes that are or can be tty.
         RETURN(INTVAL 0);
     }
 
+/*
+
+=item C<METHOD get_fd()>
+
+Retrieve the integer file descriptor for the Handle (only available on
+platforms that use integer file descriptors).
+
+=cut
+
+*/
+
+    METHOD get_fd() {
+#ifndef PIO_OS_STDIO
+        PIOHANDLE os_handle;
+        INTVAL    fd;
+        GET_ATTR_os_handle(INTERP, SELF, os_handle);
+        fd = (INTVAL)os_handle;
+        RETURN(INTVAL fd);
+#endif /*PIO_OS_STDIO*/
+
+        RETURN(INTVAL -1);
+    }
+
+
+/*
+
+=item C<METHOD read(INTVAL bytes)>
+
+Read the given number of bytes from the handle and return them in a string.
+
+=cut
+
+*/
+
+    METHOD read(INTVAL length) {
+        STRING * const string_result = Parrot_io_reads(INTERP, SELF, length);
+        RETURN(STRING *string_result);
+    }
+
+
+/*
+
+=item C<METHOD readline()>
+
+Read a line from the handle and return it in a string.
+
+=cut
+
+*/
+
+    METHOD readline() {
+        STRING * const string_result = Parrot_io_readline(INTERP, SELF);
+        RETURN(STRING *string_result);
+    }
+
+
+/*
+
+=item C<METHOD close()>
+
+Close the handle.
+
+=cut
+
+*/
+
+    METHOD close() {
+        const INTVAL status = Parrot_io_close(INTERP, SELF);
+        RETURN(INTVAL status);
+    }
+
 }
 
 /*
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
