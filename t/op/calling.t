@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 99;
+use Parrot::Test tests => 102;
 
 =head1 NAME
 
@@ -2591,6 +2591,42 @@ p3
 p1
 p2
 p1
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "Don't coerce NULL PMCs into values");
+.sub main :main
+    foo($P0)
+.end
+
+.sub foo
+    .param string arg
+.end
+CODE
+/Null PMC access/
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "Don't coerce NULL PMCs into values");
+.sub main :main
+    foo($P0)
+.end
+
+.sub foo
+    .param int arg
+.end
+CODE
+/Null PMC access/
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "Don't coerce NULL PMCs into values");
+.sub main :main
+    foo($P0)
+.end
+
+.sub foo
+    .param num arg
+.end
+CODE
+/Null PMC access/
 OUTPUT
 
 # Local Variables:

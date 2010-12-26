@@ -257,9 +257,7 @@ autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
       case STRINGCELL:
         return CELL_STRING(cell) ? Parrot_str_to_int(interp, CELL_STRING(cell)) : 0;
       case PMCCELL:
-        return PMC_IS_NULL(CELL_PMC(cell))
-                ? 0
-                : VTABLE_get_integer(interp, CELL_PMC(cell));
+        return VTABLE_get_integer(interp, CELL_PMC(cell));
       default:
         break;
     }
@@ -288,9 +286,7 @@ autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
       case STRINGCELL:
         return CELL_STRING(cell) ? Parrot_str_to_num(interp, CELL_STRING(cell)) : 0.0;
       case PMCCELL:
-        return PMC_IS_NULL(CELL_PMC(cell))
-                ? 0.0
-                : VTABLE_get_number(interp, CELL_PMC(cell));
+        return VTABLE_get_number(interp, CELL_PMC(cell));
       default:
         break;
     }
@@ -320,9 +316,7 @@ autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
       case STRINGCELL:
         return CELL_STRING(cell);
       case PMCCELL:
-        return PMC_IS_NULL(CELL_PMC(cell))
-                ? NULL
-                : VTABLE_get_string(interp, CELL_PMC(cell));
+        return VTABLE_get_string(interp, CELL_PMC(cell));
       default:
         break;
     }
