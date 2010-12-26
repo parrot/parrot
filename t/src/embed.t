@@ -241,8 +241,7 @@ c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello wor
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler;
-    Parrot_String errstr;
+    Parrot_String compiler, errstr;
     Parrot_PMC code;
 
     /* Create the interpreter and show a message using parrot io */
@@ -387,16 +386,8 @@ c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "returning
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler;
-    Parrot_String errstr;
-    Parrot_PMC code;
-    Parrot_PMC rootns;
-    Parrot_String parrotname;
-    Parrot_PMC parrotns;
-    Parrot_String subname;
-    Parrot_PMC sub;
-    Parrot_String msg;
-    Parrot_PMC ret;
+    Parrot_PMC code, rootns, parrotns, sub, ret;
+    Parrot_String compiler, errstr, parrotname, subname, msg;
 
     /* Create the interpreter */
     interp = Parrot_new(NULL);
@@ -425,12 +416,13 @@ int main(void)
     );
 
     /* Get parrot namespace */
-    rootns = Parrot_get_root_namespace(interp);
+    rootns     = Parrot_get_root_namespace(interp);
     parrotname = createstring(interp, "parrot");
-    parrotns = Parrot_PMC_get_pmc_keyed_str(interp, rootns,  parrotname);
+    parrotns   = Parrot_PMC_get_pmc_keyed_str(interp, rootns,  parrotname);
+
     /* Get the sub */
     subname = createstring(interp, "hello");
-    sub = Parrot_PMC_get_pmc_keyed_str(interp, parrotns,  subname);
+    sub     = Parrot_PMC_get_pmc_keyed_str(interp, parrotns,  subname);
 
     /* Execute it */
     msg = createstring(interp, "Hello, ");
