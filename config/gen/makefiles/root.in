@@ -1951,7 +1951,8 @@ RUN_TEST_FILES = \
 RUNCORE_TEST_FILES = \
     --runcore-tests
 SRC_TEST_FILES = \
-    t/src/*.t
+    t/src/*.t \
+    t/src/embed/*.t
 TOOLS_TEST_FILES = $(TOOLS_TESTS_DIR)/tools/*.t
 
 # pbc files used for several tests;
