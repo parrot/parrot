@@ -335,6 +335,18 @@ is deprecated.
 
 L<http://trac.parrot.org/parrot/ticket/1800>
 
+=item Non-const STRING* arguments [eligible in 3.1]
+
+Due immutable nature of STRINGs we are changing internal handling to use only
+const STRING pointers. It will improve optimizations possibilities by compiler,
+make parrot const-correct, etc.
+
+Passing of non-const STRING* arguments is deprecated and will be changed to
+const STRING*. This includes (but not limited to) all string API functions,
+VTABLEs, PCC, etc.
+
+L<http://trac.parrot.org/parrot/ticket/1906>
+
 =back
 
 =head1 Compiler tools
