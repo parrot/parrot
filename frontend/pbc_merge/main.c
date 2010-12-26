@@ -772,10 +772,11 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     }
 
     /* Merge the various stuff. */
-    ct                = pbc_merge_constants(interp, inputs, num_inputs, merged);
-    bc = interp->code = pbc_merge_bytecode(interp, inputs, num_inputs, merged);
+    bc = pbc_merge_bytecode(interp, inputs, num_inputs, merged);
+    ct = pbc_merge_constants(interp, inputs, num_inputs, merged);
     bc->const_table = ct;
     ct->code        = bc;
+    interp->code    = bc;
 
     pbc_merge_debugs(interp, inputs, num_inputs, merged, bc);
 
