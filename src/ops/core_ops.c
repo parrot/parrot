@@ -21294,32 +21294,28 @@ return (opcode_t *)cur_opcode + 2;}
 opcode_t *
 Parrot_box_p_i(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
-    VTABLE_set_integer_native(interp, PREG(1), IREG(2));
+    PREG(1) = Parrot_pmc_box_integer(interp, IREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_box_p_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
-    VTABLE_set_integer_native(interp, PREG(1), ICONST(2));
+    PREG(1) = Parrot_pmc_box_integer(interp, ICONST(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_box_p_n(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Float));
-    VTABLE_set_number_native(interp, PREG(1), NREG(2));
+    PREG(1) = Parrot_pmc_box_number(interp, NREG(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
 opcode_t *
 Parrot_box_p_nc(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
-    PREG(1) = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Float));
-    VTABLE_set_number_native(interp, PREG(1), NCONST(2));
+    PREG(1) = Parrot_pmc_box_number(interp, NCONST(2));
 
 return (opcode_t *)cur_opcode + 3;}
 
