@@ -285,6 +285,12 @@ At this point, C<:init> is a no-op, and will therefore be removed.
 
 L<https://trac.parrot.org/parrot/ticket/1896>
 
+=item encoding:charset:"" string literals [eligible in 3.1]
+
+This form of string literals will be removed.
+
+L<https://trac.parrot.org/parrot/ticket/1808>
+
 =back
 
 =head1 Functions
@@ -335,6 +341,12 @@ All PIR ops and internal semantics related to timely destruction of PMCs
 is deprecated.
 
 L<http://trac.parrot.org/parrot/ticket/1800>
+
+=item Old string_* functions [eligible in 3.0]
+
+The old string_* functions will be removed.
+
+L<http://trac.parrot.org/parrot/ticket/1809>
 
 =back
 
