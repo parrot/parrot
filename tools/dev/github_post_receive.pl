@@ -29,9 +29,15 @@ my $github = Net::GitHub->new(
 
 my $from = 'brito@localhost';
 my @send_list = ( 'b11046@pjjkp.com' );
+my $auth_token = 'abc123';
 
 my $q = CGI->new;
 print $q->header;
+
+if( $q->param('token') ne $auth_token ) {
+    print $q->h1("'token' GET param is wrong");
+    die();
+}
 
 if( my $p_json = $q->param('payload') ) {
     my $p = JSON::Any->new->decode( $p_json );
