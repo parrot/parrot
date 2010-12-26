@@ -103,15 +103,12 @@ PARROT_CANNOT_RETURN_NULL
 static PackFile_ConstTable* pbc_merge_constants(PARROT_INTERP,
     ARGMOD(pbc_merge_input **inputs),
     int num_inputs,
-    ARGMOD(PackFile *pf),
-    ARGMOD(PackFile_ByteCode *bc))
+    ARGMOD(PackFile *pf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
         FUNC_MODIFIES(*inputs)
-        FUNC_MODIFIES(*pf)
-        FUNC_MODIFIES(*bc);
+        FUNC_MODIFIES(*pf);
 
 static void pbc_merge_debugs(PARROT_INTERP,
     ARGMOD(pbc_merge_input **inputs),
@@ -157,8 +154,7 @@ static void pbc_merge_write(PARROT_INTERP,
 #define ASSERT_ARGS_pbc_merge_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs) \
-    , PARROT_ASSERT_ARG(pf) \
-    , PARROT_ASSERT_ARG(bc))
+    , PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_pbc_merge_debugs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs) \
@@ -355,6 +351,17 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         /* Update libdeps. */
         for (j = 0; j < in_seg->n_libdeps; j++)
             ensure_libdep(interp, bc_seg, in_seg->libdeps[j]);
+
+        /* Update main_sub. */
+        if (in_seg->main_sub >= 0) {
+            if (bc_seg->main_sub < 0)
+                bc_seg->main_sub = in_seg->main_sub + inputs[i]->pmc.const_start;
+            else
+                Parrot_io_eprintf(interp,
+                    "PBC Merge: multiple :main subs encountered, using first "
+                    "and ignoring sub found in `%s'",
+                    inputs[i]->filename);
+        }
     }
 
     /* Stash produced bytecode. */
@@ -368,7 +375,7 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 /*
 
 =item C<static PackFile_ConstTable* pbc_merge_constants(PARROT_INTERP,
-pbc_merge_input **inputs, int num_inputs, PackFile *pf, PackFile_ByteCode *bc)>
+pbc_merge_input **inputs, int num_inputs, PackFile *pf)>
 
 This function merges the constants tables from the input PBC files.
 
@@ -380,8 +387,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_ConstTable*
 pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
-                    int num_inputs, ARGMOD(PackFile *pf),
-                    ARGMOD(PackFile_ByteCode *bc))
+                    int num_inputs, ARGMOD(PackFile *pf))
 {
     ASSERT_ARGS(pbc_merge_constants)
 
@@ -476,8 +482,6 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     const_seg->str.constants   = str_constants;
     const_seg->pmc.const_count = pmc_cursor;
     const_seg->pmc.constants   = pmc_constants;
-    const_seg->code            = bc;
-    bc->const_table            = const_seg;
     return const_seg;
 }
 
@@ -768,9 +772,10 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     }
 
     /* Merge the various stuff. */
+    ct                = pbc_merge_constants(interp, inputs, num_inputs, merged);
     bc = interp->code = pbc_merge_bytecode(interp, inputs, num_inputs, merged);
-    ct = pbc_merge_constants(interp, inputs, num_inputs, merged, bc);
-    UNUSED(ct);
+    bc->const_table = ct;
+    ct->code        = bc;
 
     pbc_merge_debugs(interp, inputs, num_inputs, merged, bc);
 
