@@ -732,27 +732,10 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
             run_sub(interp, sub_pmc);
         }
         break;
-      default:
-        if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MAIN) {
-            if ((interp->resume_flag   &  RESUME_INITIAL)
-             &&  interp->resume_offset == 0) {
-                void           *ptr   = VTABLE_get_pointer(interp, sub_pmc);
-                const ptrdiff_t code  = (ptrdiff_t) sub->seg->base.data;
 
-                interp->resume_offset = ((ptrdiff_t)ptr - code)
-                                      / sizeof (opcode_t *);
-
-                PObj_get_FLAGS(sub_pmc)      &= ~SUB_FLAG_PF_MAIN;
-                Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), sub_pmc);
-            }
-            else {
-                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
-                                ":main sub not allowed\n");
-            }
-        }
-
+      case PBC_MAIN:
         /* run :init tagged functions */
-        if (action == PBC_MAIN && Sub_comp_INIT_TEST(sub)) {
+        if (Sub_comp_INIT_TEST(sub)) {
             /* if loaded no need for init */
             Sub_comp_INIT_CLEAR(sub);
 
@@ -762,6 +745,9 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
             run_sub(interp, sub_pmc);
             interp->resume_flag = RESUME_INITIAL;
         }
+        break;
+
+      default:
         break;
     }
 
@@ -939,6 +925,23 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
                 if (action == PBC_IMMEDIATE && !PMC_IS_NULL(result)) {
                     ct->pmc.constants[i] = result;
                 }
+            }
+        }
+    }
+
+    if (interp->resume_flag & RESUME_INITIAL) {
+        if (action == PBC_PBC
+        ||  action == PBC_MAIN) {
+            if (self->main_sub < 0)
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+                    "No main sub found");
+            {
+                PMC  *main            = ct->pmc.constants[self->main_sub];
+                Parrot_Sub_attributes *main_attrs;
+                opcode_t *ptr         = (opcode_t *)VTABLE_get_pointer(interp, main);
+                PMC_get_sub(interp, main, main_attrs);
+                interp->resume_offset = (ptr - main_attrs->seg->base.data);
+                Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), main);
             }
         }
     }
