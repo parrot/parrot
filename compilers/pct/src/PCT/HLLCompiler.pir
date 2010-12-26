@@ -646,7 +646,7 @@ specifies the encoding to use for the input (e.g., "utf8").
     code = stdin.'readline_interactive'(prompt)
     if null code goto interactive_end
     unless code goto interactive_loop
-    concat code, "\n"
+    code = concat code, "\n"
     push_eh interactive_trap
     $P0 = self.'eval'(code, adverbs :flat :named)
     pop_eh
@@ -754,7 +754,7 @@ options are passed to the evaluator.
     ifh.'encoding'(encoding)
   iter_loop_1:
     $S0 = ifh.'readall'(iname)
-    code .= $S0
+    code = concat code, $S0
     ifh.'close'()
     goto iter_loop
   iter_end:

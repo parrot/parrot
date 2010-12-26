@@ -34,7 +34,7 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 void * Parrot_dyn_dlsym_str(PARROT_INTERP,
     ARGIN_NULLOK(void *handle),
-    ARGIN_NULLOK(STRING *symbol))
+    ARGIN_NULLOK(const STRING *symbol))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -48,7 +48,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_dyn_load_lib(PARROT_INTERP,
-    ARGIN_NULLOK(STRING *lib),
+    ARGIN_NULLOK(const STRING *lib),
     ARGIN_NULLOK(PMC *parameters))
         __attribute__nonnull__(1);
 

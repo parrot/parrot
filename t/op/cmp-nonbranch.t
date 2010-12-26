@@ -43,7 +43,7 @@ Tests all non-branching conditional operators.
 
 .macro CONCAT_RES()
     $S98 = $I1
-    concat res, $S98
+    res = concat res, $S98
 .endm
 
 
@@ -1182,17 +1182,17 @@ EXP
 
   test_it:
     $S99 = $I1
-    concat res, $S99
-    concat res, "\n"
+    res = concat res, $S99
+    res = concat res, "\n"
     $S99 = $I2
-    concat res, $S99
-    concat res, "\n"
+    res = concat res, $S99
+    res = concat res, "\n"
     $S99 = $I3
-    concat res, $S99
-    concat res, "\n"
+    res = concat res, $S99
+    res = concat res, "\n"
     $S99 = $I4
-    concat res, $S99
-    concat res, "\n"
+    res = concat res, $S99
+    res = concat res, "\n"
 
     set $I5, 9
     set $I6, 10
@@ -1201,14 +1201,14 @@ EXP
     cmp $I2, $I0, $I6
     cmp $I3, $I0, $I7
     $S99 = $I1
-    concat res, $S99
-    concat res, "\n"
+    res = concat res, $S99
+    res = concat res, "\n"
     $S99 = $I2
-    concat res, $S99
-    concat res, "\n"
+    res = concat res, $S99
+    res = concat res, "\n"
     $S99 = $I3
-    concat res, $S99
-    concat res, "\n"
+    res = concat res, $S99
+    res = concat res, "\n"
 
     is(exp, res, desc)
 .end

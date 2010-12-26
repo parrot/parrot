@@ -227,13 +227,13 @@ Returns the TAP-compatible string representation of this test.
     set report, 'not '
 
   PASSED:
-    concat report, 'ok '
-    concat report, number_string
+    report = concat report, 'ok '
+    report = concat report, number_string
 
     unless desc_string goto REPORT
 
-    concat report, ' - '
-    concat report, desc_string
+    report = concat report, ' - '
+    report = concat report, desc_string
 
   REPORT:
     .return( report )
@@ -300,9 +300,9 @@ Returns the TAP-compatible string representation of this test.
     number_string = number
     reason_string = reason
 
-    concat report, number_string
-    concat report, ' #skip '
-    concat report, reason_string
+    report = concat report, number_string
+    report = concat report, ' #skip '
+    report = concat report, reason_string
 
     .return( report )
 .end
@@ -334,13 +334,13 @@ Returns the TAP-compatible string representation of this test.
     report      = 'not '
 
   PASSED:
-    concat report, 'ok '
+    report = concat report, 'ok '
     $S0 = number
-    concat report, $S0
-    concat report, ' # TODO '
+    report = concat report, $S0
+    report = concat report, ' # TODO '
 
     $S0 = self.'reason'()
-    concat report, $S0
+    report = concat report, $S0
 
     if passed goto REPORT
     # Build long explanation why

@@ -90,12 +90,6 @@ PARROT_WARN_UNUSED_RESULT
 static PMC* box_number(PARROT_INTERP, FLOATVAL val)
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC* box_string(PARROT_INTERP, ARGIN(STRING *str))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void find_bounds(PARROT_INTERP,
     ARGIN(PMC *pmc_hash),
     ARGMOD(PMC **first),
@@ -117,9 +111,6 @@ static PMC* get_list_item(PARROT_INTERP, ARGIN(PMC *self), INTVAL idx)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_box_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_box_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_find_bounds __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc_hash) \
@@ -202,29 +193,6 @@ find_bounds(PARROT_INTERP, ARGIN(PMC *pmc_hash), ARGMOD(PMC **first), ARGMOD(PMC
 }
 
 /* Helpers for boxing values */
-
-/*
-
-=item C<static PMC* box_string(PARROT_INTERP, STRING *str)>
-
-Helper function to box STRING
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC*
-box_string(PARROT_INTERP, ARGIN(STRING *str))
-{
-    ASSERT_ARGS(box_string)
-
-    PMC * const ret = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp,
-                enum_class_String));
-    VTABLE_set_string_native(interp, ret, str);
-    return ret;
-}
 
 /*
 
@@ -378,9 +346,6 @@ Main set function.
             /* We have old entry. Just update value */
             PMC * const nextkey = Parrot_key_next(INTERP, key);
             if (nextkey) {
-                /* XXX old_value is unused.  Should we be storing this at all? */
-                PMC * const old_value = VTABLE_get_pmc_keyed_int(INTERP, list_entry,
-                        ORDERED_HASH_ITEM_VALUE);
                 VTABLE_set_pmc_keyed(INTERP, value, nextkey, value);
             }
             else
@@ -431,7 +396,7 @@ Sets the PMC value of the element at index C<key> to C<val>.
     }
 
     VTABLE void set_string_keyed(PMC *key, STRING *value) {
-        PMC * const v = box_string(INTERP, value);
+        PMC * const v = Parrot_pmc_box_string(INTERP, value);
         SELF.set_pmc_keyed(key, v);
     }
 
@@ -463,7 +428,7 @@ Sets the PMC value of the element at index C<key> to C<val>.
     }
 
     VTABLE void set_string_keyed_str(STRING *key, STRING *value) {
-        PMC * const v = box_string(INTERP, value);
+        PMC * const v = Parrot_pmc_box_string(INTERP, value);
         STATICSELF.set_pmc_keyed_str(key, v);
     }
 
@@ -812,7 +777,7 @@ Deletes the key C<*key> from the hash.
     }
 
     VTABLE void delete_keyed_str(STRING *key) {
-        STATICSELF.delete_keyed(box_string(INTERP, key));
+        STATICSELF.delete_keyed(Parrot_pmc_box_string(INTERP, key));
     }
 
     VTABLE void delete_keyed_int(INTVAL idx) {

@@ -1196,11 +1196,11 @@ lp:
     set $S1, $P0[$S0]
     is( $S1, "one", 'lookup via str in reg' )
 
-    concat $S0, "b"
+    $S0 = concat $S0, "b"
     set $S1, $P0[$S0]
     is( $S1, "two", 'lookup via concated str in reg' )
 
-    concat $S0, "c"
+    $S0 = concat $S0, "c"
     set $S1, $P0[$S0]
     is( $S1, "three", 'lookup via concated^2 str in reg' )
 .end

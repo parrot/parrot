@@ -96,31 +96,6 @@ Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTabl
 
 /*
 
-=item C<UINTVAL Parrot_freeze_size(PARROT_INTERP, PMC *pmc)>
-
-Gets the size of an image to be frozen without allocating a large buffer.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-UINTVAL
-Parrot_freeze_size(PARROT_INTERP, ARGIN(PMC *pmc))
-{
-    ASSERT_ARGS(Parrot_freeze_size)
-    PMC    *pmc_result;
-    PMC    * const visitor = Parrot_pmc_new(interp, enum_class_ImageIOSize);
-    VTABLE_set_pmc(interp, visitor, pmc);
-    pmc_result = VTABLE_get_pmc(interp, visitor);
-
-    return VTABLE_get_integer(interp, pmc_result);
-}
-
-
-/*
-
 =item C<UINTVAL Parrot_freeze_pbc_size(PARROT_INTERP, PMC *pmc, const
 PackFile_ConstTable *pf)>
 
@@ -171,6 +146,40 @@ Parrot_freeze_strings(PARROT_INTERP, ARGIN(PMC *pmc))
     PMC * const visitor = Parrot_pmc_new(interp, enum_class_ImageIOStrings);
     VTABLE_set_pmc(interp, visitor, pmc);
     return VTABLE_get_pmc(interp, visitor);
+}
+
+/*
+
+=item C<void Parrot_pf_verify_image_string(PARROT_INTERP, STRING *image)>
+
+Perform some quick sanity checks on a packfile image string to verify that it
+is valid. Throws exceptions if not.
+
+=cut
+
+*/
+
+void
+Parrot_pf_verify_image_string(PARROT_INTERP, ARGIN(STRING *image))
+{
+    ASSERT_ARGS(Parrot_pf_verify_image_string)
+    if (STRING_length(image) < 16)
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INVALID_STRING_REPRESENTATION,
+            "Cannot deserialize PMC. Incorrect Length.");
+    else {
+        const char major = image->strstart[14];
+        const char minor = image->strstart[15];
+
+        if (major == PARROT_PBC_MAJOR && minor == PARROT_PBC_MINOR)
+            return;
+
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INVALID_STRING_REPRESENTATION,
+            "Version %d.%d of serialized PMC is invalid. Expected %d.%d. "
+            "You're probably linking against an incompatible libparrot.",
+            major, minor, PARROT_PBC_MAJOR, PARROT_PBC_MINOR);
+    }
 }
 
 
