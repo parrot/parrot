@@ -200,13 +200,6 @@ These will be changed to allow more flexibility in types.
 
 L<https://trac.parrot.org/parrot/ticket/1565>
 
-=item inplace string updates. [eligible in 2.4]
-
-All "inplace" string update ops are deprecated. E.g. "chopn_s", etc.
-Part of COW removal.
-
-L<https://trac.parrot.org/parrot/ticket/1540>
-
 =item finalize [experimental]
 
 Finalize exception handler, unrolling inner runloops if needed.
@@ -323,13 +316,6 @@ All STRING modification functions will return a STRING pointer; capture and use
 this rather than relying on in-place modification of an existing pointer.
 
 L<https://trac.parrot.org/parrot/ticket/1584>
-
-=item STRING COW [eligible in 2.4]
-
-COW strings are to be removed. All "inplace" string modification
-functions and all "inplace" string ops are deprecated.
-
-L<https://trac.parrot.org/parrot/ticket/1540>
 
 =item Parrot_str_unescape_string [experimental]
 
