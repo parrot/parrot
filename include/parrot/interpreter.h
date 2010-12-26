@@ -278,7 +278,6 @@ struct parrot_interp_t {
 typedef enum {
     RESUME_NONE         = 0x00,
     RESUME_RESTART      = 0x01,
-    RESUME_ISJ          = 0x02,
     RESUME_INITIAL      = 0x04
 } resume_flag_enum;
 
