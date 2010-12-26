@@ -16,8 +16,6 @@ This script writes the HTML documentation for Parrot.
 
 =cut
 
-use 5.12.0;
-
 use warnings;
 
 # as long as we have a separate docs/ makefile, this will be run from
@@ -56,7 +54,7 @@ foreach my $index_file (@json_index_files) {
         $section = $json->decode($contents);
     };
     if ($@) {
-        say STDERR "Error in $index_file:";
+        printf STDERR "Error in $index_file:\n";
         die $@;
     }
 
