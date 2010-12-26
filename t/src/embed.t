@@ -146,6 +146,7 @@ my $common = linedirective(__LINE__) . <<'CODE';
 #include <string.h>
 #include "parrot/embed.h"
 #include "parrot/extend.h"
+#include "parrot/extend_vtable.h"
 
 static void fail(const char *msg);
 static Parrot_String createstring(Parrot_Interp interp, const char * value);
@@ -268,6 +269,38 @@ int main(void)
 CODE
 Hello, parrot
 Hello, pir
+OUTPUT
+
+
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_i_absolute" );
+
+int main(void)
+{
+    Parrot_Interp interp;
+    Parrot_String compiler, errstr;
+    Parrot_PMC pmc;
+    Parrot_Int type, value;
+
+    /* Create the interpreter and show a message using parrot io */
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+
+    type = Parrot_PMC_typenum(interp, "Integer");
+    pmc  = Parrot_PMC_new(interp, type);
+
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+
+    Parrot_PMC_i_absolute(interp, pmc);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+    Parrot_destroy(interp);
+    printf("Done!\n");
+    return 0;
+}
+CODE
+42
+Done!
 OUTPUT
 
 c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from a sub" );
