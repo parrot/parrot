@@ -561,6 +561,7 @@ typedef struct _imc_info_t {
     int                   compiler_state;         /* see PBC_* flags */
     int                   verbose;
     int                   write_pbc;
+    int                   seen_main;              /* seen an explicitly :main-flagged sub */
     opcode_t              npc;
 } imc_info_t;
 
