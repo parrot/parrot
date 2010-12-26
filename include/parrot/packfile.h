@@ -248,6 +248,7 @@ struct PackFile_ByteCode {
     PackFile_Segment              base;
     struct PackFile_Debug        *debugs;
     PackFile_ConstTable          *const_table;
+    INTVAL                        main_sub;        /* index into constant table of main sub */
     struct PackFile_Annotations  *annotations;
     PackFile_ByteCode_OpMapping   op_mapping;      /* opcode mapping information */
     size_t                        op_count;        /* number of ops in the func table */

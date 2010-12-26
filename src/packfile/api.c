@@ -2579,7 +2579,8 @@ static PackFile_Segment *
 byte_code_new(PARROT_INTERP, SHIM(PackFile *pf), SHIM(STRING *name), SHIM(int add))
 {
     ASSERT_ARGS(byte_code_new)
-    PackFile_ByteCode * const byte_code = mem_gc_allocate_zeroed_typed(interp, PackFile_ByteCode);
+    PackFile_ByteCode *byte_code = mem_gc_allocate_zeroed_typed(interp, PackFile_ByteCode);
+    byte_code->main_sub          = -1;
 
     return (PackFile_Segment *) byte_code;
 }
@@ -2607,7 +2608,7 @@ byte_code_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *self))
     int i;
     unsigned int u;
 
-    size = 3; /* op_count + n_libs + n_libdeps*/
+    size = 4; /* main_sub + op_count + n_libs + n_libdeps*/
 
     for (u = 0; u < byte_code->n_libdeps; u++)
         size += PF_size_string(byte_code->libdeps[u]);
@@ -2647,6 +2648,8 @@ byte_code_pack(SHIM_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cur
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
     int i;
     unsigned int u;
+
+    *cursor++ = byte_code->main_sub;
 
     *cursor++ = byte_code->n_libdeps;
     *cursor++ = byte_code->op_count;
@@ -2698,6 +2701,8 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
     int i;
     unsigned int u;
     size_t total_ops = 0;
+
+    byte_code->main_sub          = PF_fetch_opcode(self->pf, &cursor);
 
     byte_code->n_libdeps         = PF_fetch_opcode(self->pf, &cursor);
     byte_code->libdeps           = mem_gc_allocate_n_zeroed_typed(interp,
