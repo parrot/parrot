@@ -190,13 +190,11 @@ CODE
 3
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', 'die in immediate, TT #629');
+pir_exit_code_is( <<'CODE', 1, 'die in immediate, TT #629');
 .sub 'foo' :immediate
   die 'no'
 .end
 CODE
-/no\ncurrent inst.*:[\d-]+\)$/
-OUT
 
 pir_error_output_like( <<'CODE', <<'OUT', 'No segfault from syntax error');
 .sub 'main'
