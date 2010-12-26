@@ -24,12 +24,12 @@ a post-receive script to send commit diffs to parrot developers
 
 
 my $github = Net::GitHub->new(
-    owner => 'fernandobrito', repo => 'parrot'
+    owner => 'parrot', repo => 'parrot'
 );
 
 my $from = 'brito@localhost';
 my @send_list = ( 'b11046@pjjkp.com' );
-my $auth_token = 'abc123';
+my $auth_token = 'change_me';
 
 my $q = CGI->new;
 print $q->header;
@@ -100,11 +100,11 @@ EOF
 
     foreach my $to ( @send_list ) {
         sendmail( %mail, To => $to )
-            or print $q->p("error sending to $to: $Mail::Sendmail::error");
+            or warn "error sending to $to: $Mail::Sendmail::error";
     }
 
-    print $q->p(%mail);
-    print $q->p("OK. Log says:\n", $Mail::Sendmail::log);
+    # print $q->p(%mail);
+    # print $q->p("OK. Log says:\n", $Mail::Sendmail::log);
 }
 
 sub short_commitname {
