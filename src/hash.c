@@ -49,19 +49,6 @@ static void expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*hash);
 
-PARROT_CANNOT_RETURN_NULL
-static PMC* get_integer_pmc(PARROT_INTERP, INTVAL value)
-        __attribute__nonnull__(1);
-
-PARROT_CANNOT_RETURN_NULL
-static PMC* get_number_pmc(PARROT_INTERP, FLOATVAL value)
-        __attribute__nonnull__(1);
-
-PARROT_CANNOT_RETURN_NULL
-static PMC * get_string_pmc(PARROT_INTERP, ARGIN(STRING *value))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
@@ -184,13 +171,6 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 #define ASSERT_ARGS_expand_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
-#define ASSERT_ARGS_get_integer_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_get_number_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_get_string_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_hash_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
@@ -1633,71 +1613,6 @@ parrot_hash_clone_prunable(PARROT_INTERP, ARGIN(const Hash *hash),
 
 /*
 
-=item C<static PMC* get_integer_pmc(PARROT_INTERP, INTVAL value)>
-
-Lookup the PMC type which is used for storing native integers.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-static PMC*
-get_integer_pmc(PARROT_INTERP, INTVAL value)
-{
-    ASSERT_ARGS(get_integer_pmc)
-    PMC * const ret = Parrot_pmc_new(interp,
-                                     Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
-    VTABLE_set_integer_native(interp, ret, value);
-    return ret;
-}
-
-
-/*
-
-=item C<static PMC* get_number_pmc(PARROT_INTERP, FLOATVAL value)>
-
-Lookup the PMC type which is used for floating point numbers.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-static PMC*
-get_number_pmc(PARROT_INTERP, FLOATVAL value)
-{
-    ASSERT_ARGS(get_number_pmc)
-    PMC * const ret = Parrot_pmc_new(interp,
-                                     Parrot_hll_get_ctx_HLL_type(interp, enum_class_Float));
-    VTABLE_set_number_native(interp, ret, value);
-    return ret;
-}
-
-/*
-
-=item C<static PMC * get_string_pmc(PARROT_INTERP, STRING *value)>
-
-Lookup the PMC type which is used for storing strings.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-static PMC *
-get_string_pmc(PARROT_INTERP, ARGIN(STRING *value))
-{
-    ASSERT_ARGS(get_string_pmc)
-    PMC * const ret = Parrot_pmc_new(interp,
-                                     Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
-    VTABLE_set_string_native(interp, ret, value);
-    return ret;
-}
-
-
-/*
-
 Poor-man polymorphic functions to convert something to something.
 
 There is bunch of functions to convert from passed value to stored keys type and to/from
@@ -1733,7 +1648,7 @@ hash_key_from_int(PARROT_INTERP, ARGIN(const Hash *hash), INTVAL key)
         /* Currently PMCs are stringified */
       case Hash_key_type_PMC:
       case Hash_key_type_PMC_ptr:
-        ret = (void *)get_integer_pmc(interp, key);
+        ret = (void *)Parrot_pmc_box_integer(interp, key);
         break;
       case Hash_key_type_STRING:
       case Hash_key_type_STRING_enc:
@@ -1774,7 +1689,7 @@ hash_key_from_string(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(STRING *key))
 
       case Hash_key_type_PMC:
       case Hash_key_type_PMC_ptr:
-        ret = get_string_pmc(interp, key);
+        ret = Parrot_pmc_box_string(interp, key);
         break;
 
       case Hash_key_type_STRING:
@@ -1819,13 +1734,13 @@ hash_key_from_pmc(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(PMC *key))
             if (key->vtable->base_type == enum_class_Key)
                 switch (Parrot_key_type(interp, key)) {
                   case KEY_integer_FLAG:
-                    key = get_integer_pmc(interp, Parrot_key_integer(interp, key));
+                    key = Parrot_pmc_box_integer(interp, Parrot_key_integer(interp, key));
                     break;
                   case KEY_string_FLAG:
-                    key = get_string_pmc(interp, Parrot_key_string(interp, key));
+                    key = Parrot_pmc_box_string(interp, Parrot_key_string(interp, key));
                     break;
                   case KEY_number_FLAG:
-                    key = get_number_pmc(interp, Parrot_key_number(interp, key));
+                    key = Parrot_pmc_box_number(interp, Parrot_key_number(interp, key));
                     break;
                   case KEY_pmc_FLAG:
                     key = Parrot_key_pmc(interp, key);
@@ -1948,7 +1863,7 @@ hash_key_to_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(void *key))
     PMC *ret;
     switch (hash->key_type) {
       case Hash_key_type_int:
-        ret = get_integer_pmc(interp, (INTVAL)key);
+        ret = Parrot_pmc_box_integer(interp, (INTVAL)key);
         break;
       case Hash_key_type_PMC:
       case Hash_key_type_PMC_ptr:
@@ -1956,7 +1871,7 @@ hash_key_to_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(void *key))
         break;
       case Hash_key_type_STRING:
       case Hash_key_type_STRING_enc:
-        ret = get_string_pmc(interp, (STRING*)key);
+        ret = Parrot_pmc_box_string(interp, (STRING*)key);
         break;
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
@@ -1991,7 +1906,7 @@ hash_value_from_int(PARROT_INTERP, ARGIN(const Hash *hash), INTVAL value)
         break;
       case enum_type_PMC:
         {
-            PMC * const tmp = get_integer_pmc(interp, value);
+            PMC * const tmp = Parrot_pmc_box_integer(interp, value);
             ret = (void *)tmp;
         }
         break;
@@ -2036,8 +1951,9 @@ hash_value_from_string(PARROT_INTERP, ARGIN(const Hash *hash),
         break;
       case enum_type_PMC:
         {
-            PMC * const s = STRING_IS_NULL(value) ?
-                   PMCNULL : get_string_pmc(interp, value);
+            PMC * const s = STRING_IS_NULL(value)
+                            ? PMCNULL
+                            : Parrot_pmc_box_string(interp, value);
             ret = (void *)s;
         }
         break;
@@ -2116,7 +2032,7 @@ hash_value_from_number(PARROT_INTERP, ARGIN(const Hash *hash), FLOATVAL value)
         break;
       case enum_type_PMC:
         {
-            PMC * const tmp = get_number_pmc(interp, value);
+            PMC * const tmp = Parrot_pmc_box_number(interp, value);
             ret = (void *)tmp;
         }
         break;
@@ -2212,10 +2128,10 @@ hash_value_to_pmc(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(void *val
     PMC *ret;
     switch (hash->entry_type) {
       case enum_type_INTVAL:
-        ret = get_integer_pmc(interp, (INTVAL)value);
+        ret = Parrot_pmc_box_integer(interp, (INTVAL)value);
         break;
       case enum_type_STRING:
-        ret = get_string_pmc(interp, (STRING*)value);
+        ret = Parrot_pmc_box_string(interp, (STRING*)value);
         break;
       case enum_type_PMC:
         ret = (PMC *)value;
