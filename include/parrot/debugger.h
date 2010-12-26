@@ -196,7 +196,8 @@ void Parrot_debugger_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
+void Parrot_debugger_load(PARROT_INTERP,
+    ARGIN_NULLOK(const STRING *filename))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT

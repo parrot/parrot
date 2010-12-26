@@ -858,7 +858,7 @@ Parrot_debugger_destroy(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_debugger_load(PARROT_INTERP, STRING *filename)>
+=item C<void Parrot_debugger_load(PARROT_INTERP, const STRING *filename)>
 
 Loads a Parrot source file for the current program.
 
@@ -868,7 +868,7 @@ Loads a Parrot source file for the current program.
 
 PARROT_EXPORT
 void
-Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
+Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(const STRING *filename))
 {
     ASSERT_ARGS(Parrot_debugger_load)
     char *file;
