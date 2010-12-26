@@ -813,6 +813,55 @@ Parrot_pmc_box_string(PARROT_INTERP, ARGIN_NULLOK(STRING *string))
     return ret;
 }
 
+
+/*
+
+=item C<PMC* Parrot_pmc_box_number(PARROT_INTERP, FLOATVAL value)>
+
+Lookup the PMC type which is used for floating point numbers.
+
+=cut
+
+*/
+
+PARROT_HOT
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_pmc_box_number(PARROT_INTERP, FLOATVAL value)
+{
+    ASSERT_ARGS(Parrot_pmc_box_number)
+    PMC * const ret = Parrot_pmc_new(interp,
+                                     Parrot_hll_get_ctx_HLL_type(interp, enum_class_Float));
+    VTABLE_set_number_native(interp, ret, value);
+    return ret;
+}
+
+
+/*
+
+=item C<PMC* Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)>
+
+Lookup the PMC type which is used for storing native integers.
+
+=cut
+
+*/
+
+PARROT_HOT
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)
+{
+    ASSERT_ARGS(Parrot_pmc_box_integer)
+    PMC * const ret = Parrot_pmc_new(interp,
+                                     Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
+    VTABLE_set_integer_native(interp, ret, value);
+    return ret;
+}
+
+
 /*
 
 =item C<INTVAL Parrot_pmc_get_type(PARROT_INTERP, PMC *name)>

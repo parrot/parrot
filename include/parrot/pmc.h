@@ -148,6 +148,18 @@ PMC * Parrot_pmc_reuse_init(PARROT_INTERP,
 PARROT_HOT
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)
+        __attribute__nonnull__(1);
+
+PARROT_HOT
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_pmc_box_number(PARROT_INTERP, FLOATVAL value)
+        __attribute__nonnull__(1);
+
+PARROT_HOT
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_pmc_box_string(PARROT_INTERP, ARGIN_NULLOK(STRING *string))
         __attribute__nonnull__(1);
 
@@ -219,6 +231,10 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(init))
+#define ASSERT_ARGS_Parrot_pmc_box_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pmc_box_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pmc_box_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pmc_free_temporary __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
