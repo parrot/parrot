@@ -23,7 +23,7 @@ Tests the creation and invocation of Perl6 multi subs.
     test_multisub()
     test_handling_flat_parameters()
     test_set_pmc_keyed_int()
-    test_get_pmc_keyed()
+    test_exception_get_iter_invalid_arg_type()
     test_exception_set_pmc_keyed_int()
     test_exception_set_integer_keyed_int()
     test_exception_set_string_keyed_int()
@@ -82,12 +82,13 @@ Tests the creation and invocation of Perl6 multi subs.
     ok($P0, "set pmc_keyed_int")
 .end
 
-.sub test_get_pmc_keyed
+.sub test_exception_get_iter_invalid_arg_type
     get_global $P0, "foo"
-    $P1 = $P0[0]
 
-    $S0 = typeof $P1
-    is($S0, 'Sub', 'get pmc_keyed' )
+    push_eh handler
+    		$P1 = $P0.'get_iter'(2.2)
+handler:
+    .exception_is( "attempt to call get_iter method with invalid arg type.\n" )
 .end
 
 .sub test_exception_set_pmc_keyed_int
