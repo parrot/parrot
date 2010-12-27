@@ -17,6 +17,7 @@ Tests the creation and invocation of Perl6 multi subs.
 
 .sub main :main
     .include 'test_more.pir'
+    .include 'except_types.pasm'
 
     plan( 15 )
 
@@ -85,10 +86,16 @@ Tests the creation and invocation of Perl6 multi subs.
 .sub test_exception_get_iter_invalid_arg_type
     get_global $P0, "foo"
 
-    push_eh handler
-    		$P1 = $P0.'get_iter'(2.2)
-handler:
-    .exception_is( "attempt to call get_iter method with invalid arg type.\n" )
+    $I99 = 0
+    push_eh catch
+    $P1 = $P0.'get_iter'(2.2)
+    goto done
+  catch:
+    .get_results($P99)
+    $I98 = $P99['type']
+    $I99 = iseq $I98, .EXCEPTION_INVALID_OPERATION
+  done:
+    ok($I99, 'exception on get_iter_invalid_arg_type')
 .end
 
 .sub test_exception_set_pmc_keyed_int
@@ -96,48 +103,78 @@ handler:
     $P1 = new ['String']
     $P1 = "foo"
 
-    push_eh handler
-        $P0[0] = $P1
-handler:
-    .exception_is( 'attempt to set non Sub PMC' )
+    $I99 = 0
+    push_eh catch
+    $P0[0] = $P1
+    goto done
+  catch:
+    .get_results($P99)
+    $I98 = $P99['type']
+    $I99 = iseq $I98, .EXCEPTION_INVALID_OPERATION
+  done:
+    ok($I99, 'exception on set_pmc_keyed_int')
 .end
 
 .sub test_exception_set_integer_keyed_int
     $P0 = new ['MultiSub']
 
-    push_eh handler
-        $P0[0] = 42
-handler:
-    .exception_is( 'attempt to set non Sub PMC' )
+    $I99 = 0
+    push_eh catch
+    $P0[0] = 42
+    goto done
+  catch:
+    .get_results($P99)
+    $I98 = $P99['type']
+    $I99 = iseq $I98, .EXCEPTION_INVALID_OPERATION
+  done:
+    ok($I99, 'exception on set_integer_keyed_int')
 .end
 
 .sub test_exception_set_string_keyed_int
     $P0 = new ['MultiSub']
 
-    push_eh handler
-        $P0[0] = "abcd"
-handler:
-    .exception_is( 'attempt to set non Sub PMC' )
+    $I99 = 0
+    push_eh catch
+    $P0[0] = "foo"
+    goto done
+  catch:
+    .get_results($P99)
+    $I98 = $P99['type']
+    $I99 = iseq $I98, .EXCEPTION_INVALID_OPERATION
+  done:
+    ok($I99, 'exception on set_string_keyed_int')
 .end
 
 .sub test_exception_set_number_keyed_int
     $P0 = new ['MultiSub']
 
-    push_eh handler
-        $P0[0] = 42.2
-handler:
-    .exception_is( 'attempt to set non Sub PMC' )
+    $I99 = 0
+    push_eh catch
+    $P0[0] = 42.2
+    goto done
+  catch:
+    .get_results($P99)
+    $I98 = $P99['type']
+    $I99 = iseq $I98, .EXCEPTION_INVALID_OPERATION
+  done:
+    ok($I99, 'exception on set_number_keyed_int')
 .end
 
 .sub test_exception_push_pmc
     $P0 = new ['MultiSub']
-    $P1 = new ['Complex']
-    $P1 = "1+1i"
+    $P1 = new ['String']
+    $P1 = "foo"
 
-    push_eh handler
-        push $P0, $P1
-handler:
-    .exception_is( 'attempt to push non Sub PMC' )
+    $I99 = 0
+    push_eh catch
+    push $P0, $P1
+    goto done
+  catch:
+    .get_results($P99)
+    $I98 = $P99['type']
+    $I99 = iseq $I98, .EXCEPTION_INVALID_OPERATION
+  done:
+    ok($I99, 'exception on push_pmc')
 .end
 
 .sub foo :multi()
