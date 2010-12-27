@@ -18,14 +18,17 @@ Tests the creation and invocation of Perl6 multi subs.
 .sub main :main
     .include 'test_more.pir'
 
-    plan( 12 )
+    plan( 15 )
 
     test_multisub()
     test_handling_flat_parameters()
+    test_set_pmc_keyed_int()
+    test_get_pmc_keyed()
     test_exception_set_pmc_keyed_int()
     test_exception_set_integer_keyed_int()
     test_exception_set_string_keyed_int()
     test_exception_set_number_keyed_int()
+    test_exception_push_pmc()
 .end
 
 .macro exception_is ( M )
@@ -71,10 +74,26 @@ Tests the creation and invocation of Perl6 multi subs.
     is($S0, "testing 42, goodbye", "Int and String double :flat")
 .end
 
+.sub test_set_pmc_keyed_int
+    $P0 = new ['MultiSub']
+    $P1 = new ['Sub']
+
+    $P0[0] = $P1
+    ok($P0, "set pmc_keyed_int")
+.end
+
+.sub test_get_pmc_keyed
+    get_global $P0, "foo"
+    $P1 = $P0[0]
+
+    $S0 = typeof $P1
+    is($S0, 'Sub', 'get pmc_keyed' )
+.end
+
 .sub test_exception_set_pmc_keyed_int
     $P0 = new ['MultiSub']
-    $P1 = new ['Complex']
-    $P1 = "1+1i"
+    $P1 = new ['String']
+    $P1 = "foo"
 
     push_eh handler
         $P0[0] = $P1
@@ -107,6 +126,17 @@ handler:
         $P0[0] = 42.2
 handler:
     .exception_is( 'attempt to set non Sub PMC' )
+.end
+
+.sub test_exception_push_pmc
+    $P0 = new ['MultiSub']
+    $P1 = new ['Complex']
+    $P1 = "1+1i"
+
+    push_eh handler
+        push $P0, $P1
+handler:
+    .exception_is( 'attempt to push non Sub PMC' )
 .end
 
 .sub foo :multi()
