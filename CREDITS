@@ -718,8 +718,8 @@ D: Some Env PMC method implementations and tests
 
 N: Matt Rajca
 E: mattmatt.rajca@me.com
-A: mattrajca 
-D: Code refactoring
+A: mattrajca
+D: Code refactoring, increasing test coverage
 
 N: Mattia Barbon
 D: Win32 fixes, dynamic PMC creation and loading
