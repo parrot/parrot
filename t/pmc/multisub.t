@@ -21,6 +21,11 @@ Tests the creation and invocation of Perl6 multi subs.
 
     plan( 8 )
 
+    test_multisub()
+    test_handling_flat_parameters()
+.end
+
+.sub test_multisub
     $P0 = new ['MultiSub']
     $I0 = defined $P0
     ok($I0, "create PMC")
@@ -36,7 +41,9 @@ Tests the creation and invocation of Perl6 multi subs.
     is($S0, "testing 5", "single int variant")
     $S0 = foo(42, "goodbye")
     is($S0, "testing 42, goodbye", "int and string variant")
+.end
 
+.sub test_handling_flat_parameters
     ## Test handling of :flat parameters.
     $P0 = new ['ResizablePMCArray']
     push $P0, 42
@@ -50,7 +57,6 @@ Tests the creation and invocation of Perl6 multi subs.
     push $P2, "goodbye"
     $S0 = foo($P1 :flat, $P2 :flat)
     is($S0, "testing 42, goodbye", "Int and String double :flat")
-
 .end
 
 .sub foo :multi()
