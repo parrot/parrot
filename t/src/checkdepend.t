@@ -13,7 +13,7 @@ use Test::More;
 
 =head1 NAME
 
-t/codingstd/checkdepend.t
+t/src/checkdepend.t
 
 =head1 DESCRIPTION
 
@@ -33,7 +33,7 @@ are not reported on. The number in parentheses indicates how many were found.
 =head1 REQUIREMENTS
 
 A built parrot (Configure and make) to generate all files so we can analyze
-them.
+them. (That's why it's in t/src/ instead of t/codingstd)
 
 =head1 BUGS
 
