@@ -32,15 +32,6 @@ Tests the creation and invocation of Perl6 multi subs.
     test_exception_push_pmc()
 .end
 
-.macro exception_is ( M )
-    .local pmc exception
-    .local string message
-    .get_results (exception)
-
-    message = exception['message']
-    is( message, .M, .M )
-.endm
-
 .sub test_multisub
     $P0 = new ['MultiSub']
     $I0 = defined $P0
