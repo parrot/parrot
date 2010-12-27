@@ -42,7 +42,7 @@ CODE
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - Null PMC access" );
-.sub main
+.sub main :main
     print "ok 1\n"
     a()
     print "not ok 10\n"
@@ -84,7 +84,7 @@ OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - method not found" );
 .namespace ["Test1"]
-.sub main
+.sub main :main
     print "ok 1\n"
     foo()
     print "not ok 5\n"
@@ -107,7 +107,7 @@ OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - division by 0" );
 .namespace ["Test2"]
-.sub main
+.sub main :main
     print "ok 1\n"
     foo()
     print "not ok 3\n"
@@ -127,7 +127,7 @@ called from Sub 'parrot;Test2;main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - recursion 1" );
-.sub main
+.sub main :main
     main()
 .end
 CODE
@@ -138,7 +138,7 @@ called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - recursion 2" );
-.sub main
+.sub main :main
     rec(91)
 .end
 .sub rec

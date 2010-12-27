@@ -26,7 +26,7 @@ Tests file formats.
 
 .sub test_fileformat_dos
     lives_ok( <<"CODE", 'fileformat dos')
-.sub main
+.sub main :main
     $I0 = 42\r\n
 .end
 CODE
@@ -34,7 +34,7 @@ CODE
 
 .sub test_fileformat_dos_ctrl_z
     lives_ok( <<"CODE", 'fileformat dos w ctrl-z')
-.sub main
+.sub main :main
     $I0 = 42\r\n\cZ
 .end
 CODE

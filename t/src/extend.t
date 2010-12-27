@@ -679,7 +679,7 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_Interp   interp    = Parrot_new(NULL);
-    const char      *code      = ".sub foo\nprint\"Hello from foo!\\n\"\n.end\n";
+    const char      *code      = ".sub foo :main\nprint\"Hello from foo!\\n\"\n.end\n";
     Parrot_PMC      retval;
     Parrot_PMC      sub;
     Parrot_String   code_type, error, foo_name;

@@ -10,7 +10,7 @@ INIT {
 plan(13);
 
 my $pir_code :=
-'.sub main
+'.sub main :main
   say "what"
 .end';
 
@@ -164,7 +164,7 @@ my $uncaught_c_ex := '
 .sub main :main
     .local string s
     s = <<"CODE"
-    .sub main
+    .sub main :main
         $P0 = new ["FixedPMCArray"], -10 #throw a C-level exception
     .end
 CODE

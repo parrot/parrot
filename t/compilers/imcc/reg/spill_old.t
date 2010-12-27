@@ -212,7 +212,7 @@ sub repeat {
     return $code;
 }
 my $template2 = <<'TEMPLATE';
-.sub _main
+.sub _main :main
     =LOCALS=
     =INITS=
     _sub(=ARGS=)

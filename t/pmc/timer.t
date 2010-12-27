@@ -25,6 +25,7 @@ Tests the Timer PMC.
 $ENV{TEST_PROG_ARGS} ||= '';
 
 pasm_output_is( <<'CODE', <<'OUT', "Timer setup" );
+.pcc_sub :main main:
 .include "timer.pasm"
     new P0, ['Timer']
     set P0[.PARROT_TIMER_SEC], 7
@@ -52,6 +53,7 @@ ok 3
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "Timer setup - initializer" );
+.pcc_sub :main main:
 .include "timer.pasm"
     new P1, ['FixedPMCArray']
     set P1, 4
@@ -90,6 +92,7 @@ SKIP: {
     skip( "No thread enabled", 3 ) unless ( $PConfig{HAS_THREADS} );
 
     pasm_output_like( <<'CODE', <<'OUT', "Timer setup - initializer/start" );
+    .pcc_sub :main main:
 .include "timer.pasm"
     new P1, ['FixedPMCArray']
     set P1, 6
@@ -114,6 +117,7 @@ CODE
 OUT
 
     pasm_output_is( <<'CODE', <<'OUT', "Timer setup - initializer/start/stop" );
+    .pcc_sub :main main:
 .include "timer.pasm"
     new P1, ['FixedPMCArray']
     set P1, 6
@@ -143,6 +147,7 @@ OUT
     my @todo = $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ ?
        ( todo => 'TT #1316, add scheduler features to JIT' ) : ();
     pasm_output_is( <<'CODE', <<'OUT', "Timer setup - initializer/start/repeat" , @todo );
+    .pcc_sub :main main:
 .include "timer.pasm"
     new P1, ['FixedPMCArray']
     set P1, 8
@@ -178,7 +183,7 @@ OUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
-.sub _main
+.sub _main :main
     .local pmc pmc1
     pmc1 = new ['Timer']
     .local int bool1

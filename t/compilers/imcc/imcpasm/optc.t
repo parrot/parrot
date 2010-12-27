@@ -13,7 +13,7 @@ use Test::More;
 ##############################
 
 pir_output_is( <<'CODE', <<'OUT', "karl trivial test" );
-.sub _main
+.sub _main :main
     $I1 = foo(10)
     print $I1
     print "\n"
@@ -32,7 +32,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "karl spot bug 1" );
-.sub _main
+.sub _main :main
     foo(0, 1, 2, 3,4)
 .end
 .sub foo
@@ -62,7 +62,7 @@ i 9 j 1 k 2 l 3
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "karl tailcall 3 args" );
-.sub _main
+.sub _main :main
     foo(0, 1, 2, 3)
 .end
 .sub foo
@@ -87,7 +87,7 @@ i 2 j 1 k 1
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "cycle no exit 1" );
-.sub _main
+.sub _main :main
     foo(0, 1, 2, 3, 4, 5)
 .end
 .sub foo
@@ -121,7 +121,7 @@ i 5 j 1 k 2 l 3 m 4
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "cycle no exit 2" );
-.sub _main
+.sub _main :main
     foo(0, 1, 2, 3, 4, 5)
 .end
 .sub foo
@@ -155,7 +155,7 @@ i 5 j 4 k 2 l 1 m 3
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "2 unconnected cycles no exit " );
-.sub _main
+.sub _main :main
     foo(0, 1, 2, 3, 4, 5)
 .end
 .sub foo
@@ -189,7 +189,7 @@ i 3 j 5 k 1 l 2 m 4
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "cycle with exit 1" );
-.sub _main
+.sub _main :main
     foo(0, 1, 2, 3, 4, 5)
 .end
 .sub foo
@@ -223,7 +223,7 @@ i 2 j 1 k 2 l 1 m 2
 OUT
 
 pir_2_pasm_like( <<'CODE', <<'OUT', "in P param" );
-.sub _main
+.sub _main :main
     $P0 = new 'Undef'
     $P0 = 42
     foo($P0)
@@ -253,7 +253,7 @@ foo:
 OUT
 
 pir_2_pasm_like( <<'CODE', <<'OUT', "tailcall 2" );
-.sub _main
+.sub _main :main
     foo(1, 2)
 .end
 .sub foo
@@ -268,7 +268,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "tailcall 3 args" );
-.sub _main
+.sub _main :main
     foo(0, 1, 2, 3)
 .end
 .sub foo
@@ -302,7 +302,7 @@ foreach $x (@b) {
     $y = $x;
     $y =~ tr/ijk/123/;
     pir_output_is( <<"CODE", <<"OUT", "tailcall 3 args $x" );
-.sub _main
+.sub _main :main
     foo(0, 1, 2, 3)
 .end
 .sub foo
@@ -334,7 +334,7 @@ foreach $x (@b) {
     $y = $x;
     $y =~ tr/ijkl/1234/;
     pir_output_is( <<"CODE", <<"OUT", "tailcall 4 args $x" );
-.sub _main
+.sub _main :main
     foo(0, 1, 2, 3, 4)
 .end
 .sub foo
@@ -370,7 +370,7 @@ foreach $x (@b) {
     $y = $x;
     $y =~ tr/ij/12/;
     pir_output_is( <<"CODE", <<"OUT", "tailcall 2 args $x" );
-.sub _main
+.sub _main :main
     foo(0, 1, 2)
 .end
 .sub foo
