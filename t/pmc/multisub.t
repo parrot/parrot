@@ -15,15 +15,27 @@ Tests the creation and invocation of Perl6 multi subs.
 
 =cut
 
-
 .sub main :main
     .include 'test_more.pir'
 
-    plan( 8 )
+    plan( 12 )
 
     test_multisub()
     test_handling_flat_parameters()
+    test_exception_set_pmc_keyed_int()
+    test_exception_set_integer_keyed_int()
+    test_exception_set_string_keyed_int()
+    test_exception_set_number_keyed_int()
 .end
+
+.macro exception_is ( M )
+    .local pmc exception
+    .local string message
+    .get_results (exception)
+
+    message = exception['message']
+    is( message, .M, .M )
+.endm
 
 .sub test_multisub
     $P0 = new ['MultiSub']
@@ -57,6 +69,44 @@ Tests the creation and invocation of Perl6 multi subs.
     push $P2, "goodbye"
     $S0 = foo($P1 :flat, $P2 :flat)
     is($S0, "testing 42, goodbye", "Int and String double :flat")
+.end
+
+.sub test_exception_set_pmc_keyed_int
+    $P0 = new ['MultiSub']
+    $P1 = new ['Complex']
+    $P1 = "1+1i"
+
+    push_eh handler
+        $P0[0] = $P1
+handler:
+    .exception_is( 'attempt to set non Sub PMC' )
+.end
+
+.sub test_exception_set_integer_keyed_int
+    $P0 = new ['MultiSub']
+
+    push_eh handler
+        $P0[0] = 42
+handler:
+    .exception_is( 'attempt to set non Sub PMC' )
+.end
+
+.sub test_exception_set_string_keyed_int
+    $P0 = new ['MultiSub']
+
+    push_eh handler
+        $P0[0] = "abcd"
+handler:
+    .exception_is( 'attempt to set non Sub PMC' )
+.end
+
+.sub test_exception_set_number_keyed_int
+    $P0 = new ['MultiSub']
+
+    push_eh handler
+        $P0[0] = 42.2
+handler:
+    .exception_is( 'attempt to set non Sub PMC' )
 .end
 
 .sub foo :multi()
