@@ -556,6 +556,22 @@ Parrot_Int Parrot_api_pmc_null(
         FUNC_MODIFIES(*pmctonull);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_serialize(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC object,
+    ARGOUT(Parrot_String * frozen))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
+Parrot_Int Parrot_api_pmc_unserialize(
+    Parrot_PMC interp_pmc,
+    Parrot_String object,
+    ARGOUT(Parrot_PMC * pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_set_float(
     ARGIN(Parrot_PMC interp_pmc),
     ARGIN(Parrot_PMC pmc),
@@ -640,6 +656,10 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_api_pmc_find_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(method))
+#define ASSERT_ARGS_Parrot_api_pmc_serialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(object))
+#define ASSERT_ARGS_Parrot_api_pmc_unserialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(object))
 #define ASSERT_ARGS_Parrot_api_pmc_get_class __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(key) \

@@ -24,7 +24,7 @@ Tests PMC API support.
 
 =cut
 
-plan tests => 5;
+plan tests => 6;
 
 c_output_is( <<'CODE', <<'OUTPUT', "get/set_keyed_int" );
 
@@ -261,6 +261,47 @@ int main(int argc, char* argv[])
 
 CODE
 I love the Open Source community!
+OUTPUT
+
+
+c_output_is( <<'CODE', <<'OUTPUT', "Test Freeze/thaw" );
+
+#include "parrot/api.h"
+#include <stdio.h>
+
+int main(int argc, char* argv[])
+{
+    char * c_outstr = NULL;
+    Parrot_Init_Args *initargs = NULL;
+    Parrot_PMC interpmc = NULL;
+    Parrot_PMC p_str = NULL, p_keyedstr = NULL, p_str_thawed = NULL;
+    Parrot_String s_teststr = NULL, s_outstr = NULL, s_frozen = NULL;
+
+    GET_INIT_STRUCT(initargs);
+    Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+
+    Parrot_api_string_import_ascii(interpmc, "I am a string.", &s_teststr);
+    Parrot_api_pmc_box_string(interpmc, s_teststr, &p_str);
+
+    Parrot_api_pmc_serialize(interpmc, p_str, &s_frozen);
+    Parrot_api_pmc_unserialize(interpmc, s_frozen, &p_str_thawed);
+
+    //Parrot_api_pmc_get_keyed_int(interpmc, p_str_thawed, 0, &p_keyedstr);
+    Parrot_api_pmc_get_string(interpmc, p_str_thawed, &s_outstr);
+    Parrot_api_string_export_ascii(interpmc, s_outstr, &c_outstr);
+    printf("Frozen and thawed: %s\n", c_outstr);
+
+    //Parrot_api_pmc_get_keyed_int(interpmc, p_str, 0, &p_keyedstr);
+    Parrot_api_pmc_get_string(interpmc, p_str, &s_outstr);
+    Parrot_api_string_export_ascii(interpmc, s_outstr, &c_outstr);
+    printf("%s\n", c_outstr);
+
+        return 0;
+}
+
+CODE
+Frozen and thawed: I am a string.
+I am a string.
 OUTPUT
 
 # Local Variables:
