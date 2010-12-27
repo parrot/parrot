@@ -469,7 +469,7 @@ value if this call is successful and false value otherwise.
 
 */
 
-PARROT_API
+/*PARROT_API
 Parrot_Int
 Parrot_api_add_exception_handler(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC handler))
 {
@@ -477,7 +477,7 @@ Parrot_api_add_exception_handler(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC 
     EMBED_API_CALLIN(interp_pmc, interp)
     Parrot_cx_add_handler(interp, handler);
     EMBED_API_CALLOUT(interp_pmc, interp)
-}
+}*/
 
 /*
 
