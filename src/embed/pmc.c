@@ -611,28 +611,6 @@ Parrot_api_pmc_serialize (Parrot_PMC interp_pmc, Parrot_PMC object,
 
 /*
 
-=item C<Parrot_Int Parrot_api_pmc_unserialize(Parrot_PMC interp_pmc, Parrot_String
-object, Parrot_PMC *thawed)>
-
-Unserialize an archived String back into a PMC. Also known as thawing or unpickling.
-
-=cut
-
-*/
-
-PARROT_API
-Parrot_Int
-Parrot_api_pmc_unserialize (Parrot_PMC interp_pmc, Parrot_String object,
-        ARGOUT(Parrot_PMC *thawed))
-{
-    ASSERT_ARGS(Parrot_api_pmc_unserialize)
-    EMBED_API_CALLIN(interp_pmc, interp);
-    *thawed =  Parrot_thaw(interp, object);
-    EMBED_API_CALLOUT(interp_pmc, interp);
-}
-
-/*
-
 =back
 
 =cut

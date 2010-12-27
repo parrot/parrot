@@ -276,7 +276,8 @@ int main(int argc, char* argv[])
     Parrot_PMC interpmc = NULL;
     Parrot_PMC p_str = NULL, p_keyedstr = NULL, p_str_thawed = NULL;
     Parrot_String s_teststr = NULL, s_outstr = NULL, s_frozen = NULL;
-
+    Parrot_Int len;
+    
     GET_INIT_STRUCT(initargs);
     Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
 
@@ -284,7 +285,9 @@ int main(int argc, char* argv[])
     Parrot_api_pmc_box_string(interpmc, s_teststr, &p_str);
 
     Parrot_api_pmc_serialize(interpmc, p_str, &s_frozen);
-    Parrot_api_pmc_unserialize(interpmc, s_frozen, &p_str_thawed);
+    len = Parrot_str_byte_length(interpmc, s_frozen);
+    Parrot_api_string_export_ascii(interpmc, s_frozen, &c_outstr);
+    Parrot_api_pmc_deserialize_bytes(interpmc, c_outstr, len, &p_str_thawed);
 
     //Parrot_api_pmc_get_keyed_int(interpmc, p_str_thawed, 0, &p_keyedstr);
     Parrot_api_pmc_get_string(interpmc, p_str_thawed, &s_outstr);
