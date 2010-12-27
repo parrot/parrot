@@ -289,12 +289,10 @@ int main(int argc, char* argv[])
     Parrot_api_string_export_ascii(interpmc, s_frozen, &c_outstr);
     Parrot_api_pmc_deserialize_bytes(interpmc, c_outstr, len, &p_str_thawed);
 
-    //Parrot_api_pmc_get_keyed_int(interpmc, p_str_thawed, 0, &p_keyedstr);
     Parrot_api_pmc_get_string(interpmc, p_str_thawed, &s_outstr);
     Parrot_api_string_export_ascii(interpmc, s_outstr, &c_outstr);
     printf("Frozen and thawed: %s\n", c_outstr);
 
-    //Parrot_api_pmc_get_keyed_int(interpmc, p_str, 0, &p_keyedstr);
     Parrot_api_pmc_get_string(interpmc, p_str, &s_outstr);
     Parrot_api_string_export_ascii(interpmc, s_outstr, &c_outstr);
     printf("%s\n", c_outstr);
