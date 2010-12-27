@@ -20,7 +20,7 @@ Tests the BigInt PMC.
     .include 'test_more.pir'
 
     .local int num_tests
-    num_tests = 64
+    num_tests = 65
     plan(num_tests)
 
     .local int good
@@ -30,6 +30,7 @@ Tests the BigInt PMC.
     goto done
 
   do_tests:
+    clear()
     set_and_get()
     addition()
     subtraction()
@@ -93,6 +94,14 @@ NoLibGMP:
 OldLibGMP:
     diag( 'Buggy GMP version [', $S3, '] with huge digit multiply - please upgrade' )
     .return(0)
+.end
+
+.sub clear
+    $P0 = new ['BigInt']
+    $P0 = 99999999
+    null $P0
+
+    sweep 1
 .end
 
 .sub set_and_get
@@ -1127,6 +1136,11 @@ OK2:
    $P1 = 10000
    $I0 = cmp $P0, $P1
    is($I0, 1, 'cmp(bigint,int)')
+
+   $P2 = new ['Float']
+   $P2 = 10000
+   $I0 = cmp $P0, $P2
+   is($I0, 1, 'cmp(bigint,float)')
 .end
 
 .sub interface
