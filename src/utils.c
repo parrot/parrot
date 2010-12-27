@@ -53,11 +53,13 @@ static void _srand48(long seed);
 static INTVAL COMPARE(PARROT_INTERP,
     ARGIN(void *a),
     ARGIN(void *b),
-    ARGIN(PMC *cmp))
+    ARGIN(PMC *cmp),
+    ARGIN(const char * cmp_signature))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 static void next_rand(_rand_buf X);
 static void process_cycle_without_exit(
@@ -81,7 +83,8 @@ static void rec_climb_back_and_mark(
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(a) \
     , PARROT_ASSERT_ARG(b) \
-    , PARROT_ASSERT_ARG(cmp))
+    , PARROT_ASSERT_ARG(cmp) \
+    , PARROT_ASSERT_ARG(cmp_signature))
 #define ASSERT_ARGS_next_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_process_cycle_without_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(c))
@@ -905,7 +908,8 @@ typedef INTVAL (*sort_func_t)(PARROT_INTERP, void *, void *);
 
 /*
 
-=item C<static INTVAL COMPARE(PARROT_INTERP, void *a, void *b, PMC *cmp)>
+=item C<static INTVAL COMPARE(PARROT_INTERP, void *a, void *b, PMC *cmp, const
+char * cmp_signature)>
 
 General PMC comparison function. Takes two PMCs. Returns 0 if they are equal,
 returns 1 if C<a> is bigger, and returns -1 if C<b> is bigger.
@@ -919,7 +923,9 @@ returns 1 if C<a> is bigger, and returns -1 if C<b> is bigger.
 /* comparisons that never change. We ought to precompute everything. */
 /* XXX We should be able to guarantee that *a and *b never change via const parameters. */
 static INTVAL
-COMPARE(PARROT_INTERP, ARGIN(void *a), ARGIN(void *b), ARGIN(PMC *cmp))
+COMPARE(PARROT_INTERP, ARGIN(void *a), ARGIN(void *b),
+        ARGIN(PMC *cmp),
+        ARGIN(const char * cmp_signature))
 {
     ASSERT_ARGS(COMPARE)
     INTVAL result = 0;
@@ -931,23 +937,26 @@ COMPARE(PARROT_INTERP, ARGIN(void *a), ARGIN(void *b), ARGIN(PMC *cmp))
         return f(interp, a, b);
     }
 
-    Parrot_ext_call(interp, cmp, "PP->I", a, b, &result);
+    Parrot_ext_call(interp, cmp, cmp_signature, a, b, &result);
     return result;
 }
 
 /*
 
 =item C<void Parrot_util_quicksort(PARROT_INTERP, void **data, UINTVAL n, PMC
-*cmp)>
+*cmp, const char * cmp_signature)>
 
 Perform a quicksort on a PMC array.
 
+cmp_signature is PCC signature for C<cmp>. E.g. C<II->I> for FIA.
 =cut
 
 */
 
 void
-Parrot_util_quicksort(PARROT_INTERP, ARGMOD(void **data), UINTVAL n, ARGIN(PMC *cmp))
+Parrot_util_quicksort(PARROT_INTERP, ARGMOD(void **data), UINTVAL n,
+        ARGIN(PMC *cmp),
+        ARGIN(const char * cmp_signature))
 {
     ASSERT_ARGS(Parrot_util_quicksort)
     while (n > 1) {
@@ -962,11 +971,11 @@ Parrot_util_quicksort(PARROT_INTERP, ARGMOD(void **data), UINTVAL n, ARGIN(PMC *
         for (i = 0, j = n; ;) {
             do
                 --j;
-            while (j > 0 && COMPARE(interp, data[j], data[0], cmp) > 0);
+            while (j > 0 && COMPARE(interp, data[j], data[0], cmp, cmp_signature) > 0);
 
             do
                 ++i;
-            while (i < j && COMPARE(interp, data[i], data[0], cmp) < 0);
+            while (i < j && COMPARE(interp, data[i], data[0], cmp, cmp_signature) < 0);
 
             if (i >= j)
                 break;
@@ -986,12 +995,12 @@ Parrot_util_quicksort(PARROT_INTERP, ARGMOD(void **data), UINTVAL n, ARGIN(PMC *
         rn = n - ++j;
 
         if (ln < rn) {
-            Parrot_util_quicksort(interp, data, ln, cmp);
+            Parrot_util_quicksort(interp, data, ln, cmp, cmp_signature);
             data += j;
             n = rn;
         }
         else {
-            Parrot_util_quicksort(interp, data + j, rn, cmp);
+            Parrot_util_quicksort(interp, data + j, rn, cmp, cmp_signature);
             n = ln;
         }
     }

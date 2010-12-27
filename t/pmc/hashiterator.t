@@ -22,7 +22,7 @@ well.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(10)
+    plan(11)
 
     iter_over_empty_hash()
     iter_over_single_element()
@@ -37,6 +37,9 @@ well.
     it   = new 'HashIterator', hash
     $I0  = isfalse it
     ok($I0, "Iterator for empty Hash is empty")
+
+    $I0  = elements it
+    is($I0, 0, "Iterator for empty Hash has 0 elements")
 
     # shift_pmc throws on empty Hash but shift_string doesn't.
 

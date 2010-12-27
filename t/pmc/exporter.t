@@ -291,16 +291,18 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'import - null destination' );
 .include 'except_types.pasm'
 .sub 'test' :main
-    $P0 = new ['Exporter']
-    $P1 = get_namespace
-    null $P2
+    load_bytecode 'Test/More.pbc'
+    .local pmc exporter, src, dest, excep
+    exporter = new ['Exporter']
+    src = get_namespace [ 'Test'; 'More' ]
+    null dest
     push_eh catch
-    $P0.'import'($P1, $P2)
+    exporter.'import'(src :named('source'), dest :named('destination'), 'plan ok' :named('globals') )
     say 'not thrown'
     goto end
   catch:
-    .get_results($P3)
-    $I0 = $P3['type']
+    .get_results(excep)
+    $I0 = excep['type']
     $I1 = iseq $I0, .EXCEPTION_INVALID_OPERATION
     print 'Exception type is as expected: '
     say $I1

@@ -96,7 +96,7 @@ IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
     va_start(ap, fmt);
     imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
     va_end(ap);
-    Parrot_x_exit(interp, code);
+    Parrot_x_jump_out_error(interp, code);
 }
 
 /*

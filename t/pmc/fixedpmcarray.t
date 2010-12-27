@@ -306,11 +306,11 @@ out-of-bounds test. Checks INT and PMC keys.
     .local string s, aux
     s = get_repr_fpa_n(0)
     aux = get_repr_fpa_n(1)
-    concat s, aux
+    s = concat s, aux
     aux = get_repr_fpa_n(2)
-    concat s, aux
+    s = concat s, aux
     aux = get_repr_fpa_n(3)
-    concat s, aux
+    s = concat s, aux
     substring(s,'()(0)(0, 1)(0, 1, 2)','get_repr')
 .end
 

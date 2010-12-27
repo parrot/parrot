@@ -72,6 +72,7 @@ Parrot_pa_destroy(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
     for (i = 0; i < self->total_chunks; i++)
         mem_sys_free(self->chunks[i]);
     mem_sys_free(self->chunks);
+    mem_sys_free(self);
 }
 
 /*

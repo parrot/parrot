@@ -47,7 +47,6 @@ DYNPMC_H_FILES_MIN = \
     include/parrot/io.h \
     include/parrot/key.h \
     include/parrot/library.h \
-    include/parrot/longopt.h \
     include/parrot/memory.h \
     include/parrot/misc.h \
     include/parrot/multidispatch.h \

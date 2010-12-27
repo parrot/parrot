@@ -56,9 +56,10 @@ efficiency on reading non-native PBCs.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
+#include "parrot/longopt.h"
 #include "parrot/oplib/ops.h"
 #include "parrot/oplib/core_ops.h"
+#include "parrot/embed.h"
 
 /*
 
@@ -350,7 +351,7 @@ main(int argc, const char **argv)
     /* init and set top of stack */
     Parrot_init_stacktop(interp, &status);
 
-    while ((status = longopt_get(interp, argc, argv, opt_options, &opt)) > 0) {
+    while ((status = longopt_get(argc, argv, opt_options, &opt)) > 0) {
         switch (opt.opt_id) {
 #if TRACE_PACKFILE
           case 'D':

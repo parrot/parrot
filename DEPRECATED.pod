@@ -200,13 +200,6 @@ These will be changed to allow more flexibility in types.
 
 L<https://trac.parrot.org/parrot/ticket/1565>
 
-=item inplace string updates. [eligible in 2.4]
-
-All "inplace" string update ops are deprecated. E.g. "chopn_s", etc.
-Part of COW removal.
-
-L<https://trac.parrot.org/parrot/ticket/1540>
-
 =item finalize [experimental]
 
 Finalize exception handler, unrolling inner runloops if needed.
@@ -324,13 +317,6 @@ this rather than relying on in-place modification of an existing pointer.
 
 L<https://trac.parrot.org/parrot/ticket/1584>
 
-=item STRING COW [eligible in 2.4]
-
-COW strings are to be removed. All "inplace" string modification
-functions and all "inplace" string ops are deprecated.
-
-L<https://trac.parrot.org/parrot/ticket/1540>
-
 =item Parrot_str_unescape_string [experimental]
 
 This function is an experimental addition to enhance and maybe replace
@@ -348,6 +334,18 @@ All PIR ops and internal semantics related to timely destruction of PMCs
 is deprecated.
 
 L<http://trac.parrot.org/parrot/ticket/1800>
+
+=item Non-const STRING* arguments [eligible in 3.1]
+
+Due immutable nature of STRINGs we are changing internal handling to use only
+const STRING pointers. It will improve optimizations possibilities by compiler,
+make parrot const-correct, etc.
+
+Passing of non-const STRING* arguments is deprecated and will be changed to
+const STRING*. This includes (but not limited to) all string API functions,
+VTABLEs, PCC, etc.
+
+L<http://trac.parrot.org/parrot/ticket/1906>
 
 =back
 

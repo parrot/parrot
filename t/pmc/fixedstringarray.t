@@ -292,7 +292,7 @@ out-of-bounds test. Checks INT and PMC keys.
   loop:
     unless $P1 goto loop_end
     $S2 = shift $P1
-    concat $S0, $S2
+    $S0 = concat $S0, $S2
     goto loop
   loop_end:
     is($S0, "foobarbaz", "Iteration works")
@@ -318,7 +318,7 @@ out-of-bounds test. Checks INT and PMC keys.
   loop:
     unless it goto loop_end
     s = shift it
-    concat $S0, s
+    $S0 = concat $S0, s
     goto loop
   loop_end:
     is($S0, "42434499101", "get_iter works")
