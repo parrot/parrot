@@ -24,7 +24,7 @@ Tests file formats.
 
 .sub test_fileformat_unix
     lives_ok( <<'CODE', 'fileformat unix' )
-.sub main :main
+.sub main
     print "# testing\n"
 .end
 CODE

@@ -31,7 +31,7 @@ my $nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=fast/
 
 pasm_output_like( <<'CODE', <<"OUTPUT", "getline, getfile" );
 .loadlib 'debug_ops'
-.pcc_sub main:
+.pcc_sub :main main:
     getfile S0
     getline I0
     say S0

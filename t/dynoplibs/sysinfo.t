@@ -87,6 +87,7 @@ my @setup = (
 foreach ( @setup ) {
     if ( $_->{reg_type} eq 'I' ) {
         pasm_output_is( <<"CODE", $PConfig{$_->{pconfig_key}}, "PASM sysinfo  $_->{desc}" );
+    .pcc_sub :main main:
     .loadlib 'sys_ops'
     sysinfo_i_ic I1, $_->{pasm_key}
     print I1
@@ -103,6 +104,7 @@ CODE
     }
     else {
         pasm_output_is( <<"CODE", $PConfig{$_->{pconfig_key}}, "sysinfo $_->{desc}" );
+    .pcc_sub :main main:
     .loadlib 'sys_ops'
     sysinfo_s_ic S1, $_->{pasm_key}
     print S1
@@ -133,6 +135,7 @@ SKIP:
         TODO: {
             local $TODO = "Not Currently Implemented";
             pasm_output_is( <<'CODE', $osname, "sysinfo OS version string" );
+    .pcc_sub :main main:
     .loadlib 'sys_ops'
     sysinfo_s_ic S1, 5
     print S1
@@ -142,6 +145,7 @@ CODE
             my ( $osvername, $major, $minor, $id ) = Win32::GetOSVersion();
 
             pasm_output_is( <<'CODE', "$major.$minor", "sysinfo OS version number string" );
+    .pcc_sub :main main:
     .loadlib 'sys_ops'
     sysinfo_s_ic S1, 6
     print S1

@@ -44,7 +44,7 @@
 .sub test_dies_ok
     test_pass( 'dies_ok passes when there is an error' )
     dies_ok( <<'CODE', 'dies_ok passes when there is an error' )
-.sub main :main
+.sub main
     die 'I did it for the lulz'
 .end
 CODE
@@ -52,7 +52,7 @@ CODE
 
     test_fail( 'dies_ok fails when there is no error' )
     dies_ok( <<'CODE', 'dies_ok fails when there is no error' )
-.sub main :main
+.sub main
     $I0 = 42
 .end
 CODE
@@ -61,7 +61,7 @@ CODE
 
     test_pass( 'dies_ok passes when there is an error with diagnostic message' )
     dies_ok( <<'CODE', 'dies_ok passes when there is an error with diagnostic message' )
-.sub main :main
+.sub main
     die 'I did it for the lulz'
 .end
 CODE
@@ -70,7 +70,7 @@ CODE
 
     test_fail( 'dies_ok fails when there is no error with diagnostic message' )
     dies_ok( <<'CODE', 'dies_ok fails when there is no error with diagnostic message' )
-.sub main :main
+.sub main
     $I0 = 42
 .end
 CODE
@@ -83,7 +83,7 @@ CODE
 
     test_pass( 'lives_ok passes when there is no error' )
     lives_ok( <<'CODE', 'lives_ok passes when there is no error' )
-.sub main :main
+.sub main
     $I0 = 42
 .end
 CODE
@@ -91,7 +91,7 @@ CODE
 
     test_fail( 'lives_ok fails when there is an error')
     lives_ok( <<'CODE', 'lives_ok fails when there is an error')
-.sub main :main
+.sub main
     die 'I did it for the lulz'
 .end
 CODE
@@ -100,7 +100,7 @@ CODE
 
     test_pass( 'lives_ok passes when there is no error (with diagnostic message)' )
     lives_ok( <<'CODE', 'lives_ok passes when there is no error (with diagnostic message)' )
-.sub main :main
+.sub main
     $I0 = 42
 .end
 CODE
@@ -109,7 +109,7 @@ CODE
 
     test_fail( 'lives_ok fails when there is an error (with diagnostic message)' )
     lives_ok( <<'CODE', 'lives_ok fails when there is an error (with diagnostic message)' )
-.sub main :main
+.sub main
     die 'I did it for the lulz'
 .end
 CODE
@@ -121,7 +121,7 @@ CODE
 
     test_fail('throws_like fails when there is no error')
     throws_like( <<'CODE', 'somejunk', 'throws_like fails when there is no error')
-.sub main :main
+.sub main
     $I0 = 42
 .end
 CODE
@@ -130,7 +130,7 @@ CODE
 
     test_pass('throws_like passes when error matches pattern')
     throws_like( <<'CODE', 'for\ the\ lulz','throws_like passes when error matches pattern')
-.sub main :main
+.sub main
     die 'I did it for the lulz'
 .end
 CODE
@@ -138,7 +138,7 @@ CODE
 
     test_fail( 'throws_like fails when error does not match pattern' )
     throws_like( <<'CODE', 'for\ the\ lulz','throws_like fails when error does not match pattern')
-.sub main :main
+.sub main
     die 'DO NOT WANT'
 .end
 CODE
