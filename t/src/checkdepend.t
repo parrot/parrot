@@ -49,7 +49,7 @@ if (! -e 'Makefile') {
 }
 
 my @incfiles = [];
-find( \&wanted, qw/src compilers include/);
+find( \&wanted, qw/src compilers include frontend/);
 
 our %deps;
 

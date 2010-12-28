@@ -1050,9 +1050,10 @@ $(INSTALLABLEPROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
 # Parrot Debugger
 #
 
-frontend/parrot_debugger/main$(O) : $(PARROT_H_HEADERS) frontend/parrot_debugger/main.c \
-	$(INC_DIR)/embed.h \
-	$(INC_DIR)/runcore_api.h
+frontend/parrot_debugger/main$(O) : \
+    $(PARROT_H_HEADERS) \
+    frontend/parrot_debugger/main.c \
+    $(INC_DIR)/runcore_api.h
 
 $(PDB) : frontend/parrot_debugger/main$(O) src/parrot_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -1111,7 +1112,9 @@ $(PDUMP) : frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) $(LIBPARROT
     frontend/pbc_dump/packdump$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-frontend/pbc_dump/main$(O) : $(INC_DIR)/api.h \
+frontend/pbc_dump/main$(O) : \
+    $(INC_DIR)/longopt.h \
+    $(INC_DIR)/api.h \
     $(INC_DIR)/embed.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/oplib/core_ops.h \
@@ -1582,6 +1585,7 @@ src/io/win32$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
 src/gc/alloc_memory$(O) : $(PARROT_H_HEADERS) src/gc/alloc_memory.c
 
 frontend/parrot/main$(O) : \
+    $(INC_DIR)/platform_limits.h \
     $(INC_DIR)/api.h \
     $(INC_DIR)/compiler.h \
     $(INC_DIR)/config.h \
@@ -1788,7 +1792,6 @@ frontend/pbc_merge/main$(O) : \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/runcore_api.h \
-    $(INC_DIR)/embed.h \
     $(PARROT_H_HEADERS)
 
 src/io/filehandle$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_filehandle.h \
