@@ -2308,7 +2308,9 @@ test-clean :
     "t/*/*.pasm" \
     "t/*/*_pbcexe*" \
     "t/*/*.pir" \
-    "t/*/*.stabs.s"
+    "t/*/*.stabs.s" \
+    "t/src/embed/*$(O)" \
+    "t/src/embed/*.out"
 	$(RM_F) \
     "t/library/*.pbc" \
     "t/dynoplibs/*.pbc" \
@@ -2319,9 +2321,13 @@ test-clean :
     "t/stress/*.pbc" \
     "t/tools/*.pbc"
 	$(RM_F) \
-    "t/src/*.c" \
-    "t/src/*.pdb" \
-    "t/src/*.manifest"
+     "t/src/*.c" \
+     "t/src/*.pdb" \
+     "t/src/*.manifest"
+	$(RM_F) \
+     "t/src/embed/*.c" \
+     "t/src/embed/*.pdb" \
+     "t/src/embed/*.manifest"
 	$(RM_F) \
      "t/tools/pmc2c.t_*" \
      "t/tools/pmc2c.pmc_t_*" \
@@ -2770,7 +2776,7 @@ cover-distro: cover.dummy
 	-@make@ distro_tests
 
 cover-clean:
-	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) $(QUICKCOVER_DIRS) t/src ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
+	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) $(QUICKCOVER_DIRS) t/src t/src/embed ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
 
 ###############################################################################
 #
