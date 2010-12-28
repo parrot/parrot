@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -71,6 +71,16 @@ pir_exit_code_is( <<'CODE', 2, "pir exit code isn't exception type" );
     exit 10
 .end
 CODE
+
+my $exit_3_snippet = <<'CODE';
+.sub main :main
+    exit 3
+.end
+CODE
+
+pir_exit_code_is($exit_3_snippet, 3, "exit 3 causes exit code 3");
+pir_error_output_like($exit_3_snippet, '/^\s*$/', "exit opcode causes no error message to print");
+
 
 # Local Variables:
 #   mode: cperl

@@ -65,7 +65,9 @@ Parrot_api_get_result(Parrot_PMC interp_pmc, ARGOUT(Parrot_Int *is_error),
         *errmsg = STRINGNULL;
     }
     else {
-        *is_error = !interp->exit_code;
+        STRING * const severity_str = Parrot_str_new(interp, "severity", 0);
+        INTVAL severity = VTABLE_get_integer_keyed_str(interp, *exception, severity_str);
+        *is_error = (severity != EXCEPT_exit);
         *errmsg = VTABLE_get_string(interp, *exception);
     }
     interp->final_exception = PMCNULL;
