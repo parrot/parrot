@@ -410,34 +410,6 @@ PARROT_MALLOC
 STRING * Parrot_str_upcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
 
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING * string_chr(PARROT_INTERP, UINTVAL character)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING * string_make(PARROT_INTERP,
-    ARGIN_NULLOK(const char *buffer),
-    UINTVAL len,
-    ARGIN_NULLOK(const char *encoding_name),
-    UINTVAL flags)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-INTVAL string_ord(PARROT_INTERP, ARGIN(const STRING *s), INTVAL idx)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
-char * string_to_cstring_nullable(SHIM_INTERP,
-    ARGIN_NULLOK(const STRING *s));
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING* Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
@@ -621,14 +593,6 @@ STRING * Parrot_str_iter_substr(PARROT_INTERP,
     , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_str_upcase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_string_chr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_string_make __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_string_ord __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_string_to_cstring_nullable __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_str_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
