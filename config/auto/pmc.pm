@@ -320,15 +320,19 @@ sub get_includes {
     my @retval;
     local $_;
     while (<$fh>) {
-        next unless /^\s*#include\s+["<](.*)[">]\s+$/;
+        next unless /^\s*#include\s+"(.*)"\s+$/;
         my $include = $1;
-        if ($include =~ m{^(\.|parrot/)}) { # main parrot include dir
+        if ($include =~ m{^parrot}) { # main parrot include dir
+          next if $include eq "parrot/parrot.h"; # already implicit everywhere. 
+          next if $include eq "parrot/io.h";     # already implicit everywhere. 
           $include = "include/" . $include;
         } elsif ($include =~ m/^pmc_|\.str$/) { # local pmc header
           $include = "src/pmc/" . $include;
-        } elsif ($include =~ m/^pmc\/pmc_|\.h$/) { # local pmc header
+        } elsif ($include =~ m/^pmc\/pmc_/) { # local pmc header
           $include = "include/" . $include;
-        } # else it's probably a system header, don't depend on it.
+        } elsif ($include =~ m{^\.\./}) { # relative to include/ dir...
+          $include =~ s{^\.\./}{};
+        }
         push @retval, $include;
     }
 
