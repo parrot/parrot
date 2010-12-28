@@ -1846,56 +1846,6 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
 
 @TEMP_gc_c@
 
-PMC_H_FILES = \
-    $(INC_DIR)/cclass.h \
-    $(INC_DIR)/multidispatch.h \
-    $(INC_DIR)/call.h \
-    $(INC_DIR)/exit.h \
-    $(INC_DIR)/pobj.h \
-    $(INC_DIR)/extend_vtable.h \
-    $(INC_DIR)/memory.h \
-    $(INC_DIR)/key.h \
-    $(INC_DIR)/oo.h \
-    $(INC_DIR)/feature.h \
-    $(INC_DIR)/oplib.h \
-    $(INC_DIR)/library.h \
-    $(INC_DIR)/thread.h \
-    $(INC_DIR)/string.h \
-    $(INC_DIR)/settings.h \
-    $(INC_DIR)/namespace.h \
-    $(INC_DIR)/extend.h \
-    $(INC_DIR)/pbcversion.h \
-    $(INC_DIR)/core_types.h \
-    $(INC_DIR)/interpreter.h \
-    $(INC_DIR)/io.h \
-    $(INC_DIR)/context.h \
-    $(INC_DIR)/parrot.h \
-    $(INC_DIR)/enums.h \
-    $(INC_DIR)/encoding.h \
-    $(INC_DIR)/vtable.h \
-    $(INC_DIR)/scheduler.h \
-    $(INC_DIR)/pmc.h \
-    $(INC_DIR)/datatypes.h \
-    $(INC_DIR)/core_pmcs.h \
-    $(INC_DIR)/misc.h \
-    $(INC_DIR)/sub.h \
-    $(INC_DIR)/platform.h \
-    $(INC_DIR)/pmc_freeze.h \
-    $(INC_DIR)/global_setup.h \
-    $(INC_DIR)/gc_api.h \
-    $(INC_DIR)/nci.h \
-    $(INC_DIR)/vtables.h \
-    $(INC_DIR)/has_header.h \
-    $(INC_DIR)/warnings.h \
-    $(INC_DIR)/op.h \
-    $(INC_DIR)/platform_limits.h \
-    $(INC_DIR)/stat.h \
-    $(INC_DIR)/debugger.h \
-    $(INC_DIR)/caches.h \
-    $(INC_DIR)/config.h \
-    $(INC_DIR)/platform_interface.h \
-    $(INC_DIR)/hll.h
-
 @TEMP_pmc_build@
 
 # $(CONFIGURE_GENERATED_FILES) : Configure.pl
