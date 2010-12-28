@@ -39,9 +39,6 @@ for my $dir (@ARGV) {
     # Run gcov with all C files in $dir
 
     for my $path (glob("$dir/*.c")) {
-        $path =~ m'\/([^/]+)\z' or next;
-        my $c_file = $1;
-
         # Remove old gcov files
         system("rm -f *.gcov");
 

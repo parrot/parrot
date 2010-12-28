@@ -2696,10 +2696,26 @@ cover: \
     done
 	$(COVER) $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
 
-quickcover_new: \
+cover_new: \
     cover.dummy \
     cover-test_core
-	$(PERL) tools/dev/make_cover.pl $(COVER_DIRS)
+	$(PERL) $(DEV_TOOLS_DIR)/make_cover.pl $(COVER_DIRS)
+
+fullcover_new: \
+    cover.dummy \
+    cover-testb \
+    cover-testf \
+    cover-testr \
+    cover-src \
+    cover-run \
+    cover-perl \
+    cover-extra \
+    cover-codingstd \
+    cover-benchmark \
+    cover-manifest \
+    cover-examples \
+    cover-distro
+	$(PERL) $(DEV_TOOLS_DIR)/make_cover.pl $(COVER_DIRS)
 
 cover.dummy: have-cover
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
