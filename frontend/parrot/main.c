@@ -186,13 +186,14 @@ show_last_error_and_exit(Parrot_PMC interp)
     Parrot_Int exit_code, is_error;
     Parrot_PMC exception;
 
-    if (!(Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg) &&
-          Parrot_api_get_exception_backtrace(interp, exception, &backtrace))) {
+    if (!Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg))
         exit(EXIT_FAILURE);
+    if (is_error) {
+        if (!Parrot_api_get_exception_backtrace(interp, exception, &backtrace))
+            exit(EXIT_FAILURE);
+        print_parrot_string(interp, stderr, errmsg, 1);
+        print_parrot_string(interp, stderr, backtrace, 0);
     }
-
-    print_parrot_string(interp, stderr, errmsg, 1);
-    print_parrot_string(interp, stderr, backtrace, 0);
 
     exit(exit_code);
 }

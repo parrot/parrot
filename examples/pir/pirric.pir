@@ -1,4 +1,4 @@
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2010, Parrot Foundation.
 #
 # pirric.pir
 # A rudimentary old style Basic interpreter for parrot
@@ -323,7 +323,7 @@ good:
     .local pmc excep, message, severity
     message = new 'String'
     message = 'ERROR: '
-    concat message, msg
+    message = concat message, msg
     severity = new 'Integer'
     severity = .EXCEPT_ERROR
     excep = new 'Exception'
@@ -2275,7 +2275,7 @@ loop:
     .local string snum
     snum = ''
 
-    concat snum, c
+    snum = concat snum, c
     #say value
 nextnum:
     ge i, l, endnum
@@ -2288,7 +2288,7 @@ nextnum:
     lt $I0, $I1, endnum
     inc i
 
-    concat snum, c
+    snum = concat snum, c
     #say value
     goto nextnum
 endnum:
@@ -2299,7 +2299,7 @@ endnum:
     goto doit
 
 floatnum:
-    concat snum, c
+    snum = concat snum, c
     inc i
 nextfloat:
     ge i, l, endfloat
@@ -2310,7 +2310,7 @@ nextfloat:
     $I1 = ord '0'
     lt $I0, $I1, endfloat
     inc i
-    concat snum, c
+    snum = concat snum, c
     goto nextfloat
 
 endfloat:
@@ -2326,7 +2326,7 @@ operator:
     goto endtoken
 
 nextchar:
-    concat result, c
+    result = concat result, c
     ge i, l, endtoken
     c = substr line, i , 1
     eq c, ' ', endtoken
@@ -2359,14 +2359,14 @@ str:
     c = substr line, i, 1
     inc i
     eq c, '"', checkquote
-    concat result, c
+    result = concat result, c
     goto str
 checkquote:
     ge i, l, endstr
     c = substr line, i, 1
     ne c, '"', endstr
     inc i
-    concat result, c
+    result = concat result, c
     goto str
 endstr:
     objres = new 'Literal'

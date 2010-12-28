@@ -24,7 +24,7 @@ well.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(174)
+    plan(175)
 
     initial_hash_tests()
     more_than_one_hash()
@@ -271,6 +271,9 @@ check:
     set $P0["0"], 1
     set $I0, $P0
     is( $I0, 2, 'hash size of 2' )
+
+    $I1 = elements $P0
+    is( $I1, $I0, "'elements' gives the same result" )
 .end
 
 .sub stress_test_loop_set_check

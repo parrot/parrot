@@ -82,7 +82,7 @@
 
     # padding with spaces to 80 chars if needed
     $S0 = repeat ' ', 80
-    concat str, $S0
+    str = concat str, $S0
 
     # truncate to 80 chars
     str = replace str, 80, -1, ''
