@@ -18,9 +18,12 @@ Tests the EventHandler PMC used by the event system.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(5)
+    plan(7)
 
     create_an_event_and_set_attributes()
+    initializer_arg_type_exception()
+    get_string_null()
+    mark()
     # Invoke broken, see below.
     #invoke_eventhandler()
 .end
@@ -75,6 +78,44 @@ Tests the EventHandler PMC used by the event system.
   bad_args:
     ok( 1, 'Exception with bad initializer' )
 
+.end
+
+.sub initializer_arg_type_exception
+    .local pmc eh
+    $P0 = new ['String']
+    $P0 = 'foo'
+
+  push_eh E1
+    eh = new ['EventHandler'], $P0
+    $I1 = 0
+    say 'Failed to throw exception'
+  E1:
+    pop_eh
+    get_results '0', $P0
+    $S0 = $P0
+    eq $S0, "EventHandler initializer must be Sub or Hash", OK1
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+  OK1:
+    ok($I1, 'Expected exception from initializer with invalid arg type')
+    $I1 = 1
+.end
+
+.sub mark
+    .local pmc eh
+    eh = new ['EventHandler']
+
+    # Exercise mark vtable
+    sweep 1
+.end
+
+.sub get_string_null
+    .local pmc eh
+    eh  = new ['EventHandler']
+
+    $S0 = eh
+    is( $S0, '', 'Event type confirmed (as null)' )
 .end
 
 #.sub invoke_eventhandler
