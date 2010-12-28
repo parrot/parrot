@@ -192,7 +192,7 @@ show_last_error_and_exit(Parrot_PMC interp)
         if (!Parrot_api_get_exception_backtrace(interp, exception, &backtrace))
             exit(EXIT_FAILURE);
         print_parrot_string(interp, stderr, errmsg, 1);
-    print_parrot_string(interp, stderr, backtrace, 0);
+        print_parrot_string(interp, stderr, backtrace, 0);
     }
 
     exit(exit_code);
