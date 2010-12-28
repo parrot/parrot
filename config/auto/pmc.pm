@@ -113,10 +113,10 @@ END
         my $optimize  = $conf->data->get('optimize');
 
         foreach my $header (split ' ', $parent_headers) {
-            $o_deps{$header} = 1; 
+            $o_deps{$header} = 1;
         }
         foreach my $header (split ' ', $include_headers) {
-            $o_deps{$header} = 1; 
+            $o_deps{$header} = 1;
         }
 
         # includes of includes
@@ -335,8 +335,8 @@ sub get_includes {
         next unless /^\s*#include\s+"(.*)"\s+$/;
         my $include = $1;
         if ($include =~ m{^parrot}) { # main parrot include dir
-          next if $include eq "parrot/parrot.h"; # already implicit everywhere. 
-          next if $include eq "parrot/io.h";     # already implicit everywhere. 
+          next if $include eq "parrot/parrot.h"; # already implicit everywhere.
+          next if $include eq "parrot/io.h";     # already implicit everywhere.
           $include = "include/" . $include;
         } elsif ($include =~ m/^pmc_|\.str$/) { # local pmc header
           $include = "src/pmc/" . $include;
