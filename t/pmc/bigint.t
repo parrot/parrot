@@ -20,7 +20,7 @@ Tests the BigInt PMC.
     .include 'test_more.pir'
 
     .local int num_tests
-    num_tests = 65
+    num_tests = 66
     plan(num_tests)
 
     .local int good
@@ -392,6 +392,14 @@ OK11:
     say 'i_sub 12345678987654321-123456789 with integer is wrong'
 OK12:
     ok($I1, 'i_sub(bigint,integer)')
+
+    $P0 = '11111111111111111'
+    dec $P0
+    eq $P0, 11111111111111110, OK13
+    $I1 = 0
+    say 'decrement is wrong'
+OK13:
+    ok($I1, 'decrement')
 .end
 
 .sub multiplication
