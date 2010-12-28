@@ -409,10 +409,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/cclass.h \
 	include/pmc/pmc_callcontext.h
 
-# generated list of header files
-GENERAL_H_FILES   = $(GEN_HEADERS) \
-
-
 CLASS_PMC_FILES   = @TEMP_pmc_classes_pmc@
 CLASS_O_FILES     = @TEMP_pmc_classes_o@
 CLASS_STR_FILES   = @TEMP_pmc_classes_str@
@@ -1000,7 +996,7 @@ O_FILES = \
 lib_deps_object : $(O_FILES)
 	$(PERL) $(DEV_TOOLS_DIR)/lib_deps.pl object $(O_FILES)
 
-lib_deps_source : $(GENERAL_H_FILES)
+lib_deps_source : $(GEN_HEADERS)
 	$(PERL) $(DEV_TOOLS_DIR)/lib_deps.pl source all_source
 
 lib_deps : lib_deps_object lib_deps_source
@@ -1631,7 +1627,7 @@ src/packfile/pf_items$(O) : \
     src/packfile/pf_items.str \
     src/packfile/pf_items.c
 
-src/parrot$(O) : $(GENERAL_H_FILES)
+src/parrot$(O) : $(GEN_HEADERS)
 
 src/runcore/cores$(O) : src/runcore/cores.str \
 	src/runcore/cores.c \
@@ -1683,7 +1679,7 @@ src/embed/pmc$(O) : \
     src/embed/embed_private.h \
     include/pmc/pmc_parrotinterpreter.h
 
-src/dataypes$(O) : $(GENERAL_H_FILES) src/dataypes.c
+src/dataypes$(O) : $(GEN_HEADERS) src/dataypes.c
 
 src/exit$(O) : $(PARROT_H_HEADERS) src/exit.c
 
