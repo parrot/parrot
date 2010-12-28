@@ -54,9 +54,8 @@ find( \&wanted, qw/src compilers include frontend/);
 our %deps;
 
 foreach my $file (sort grep /\.[hc]$/, @incfiles) {
-    # For now, skip any files that have generated dependencies
+    # For now, skip some files that have generated dependencies
     next if $file =~ m{src/pmc/};
-    next if $file =~ m{src/string/encoding/};
 
     open my $fh, '<', $file;
     my $guts;

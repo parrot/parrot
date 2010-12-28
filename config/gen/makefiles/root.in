@@ -1753,34 +1753,65 @@ src/spf_render$(O) : $(PARROT_H_HEADERS) src/spf_render.str src/spf_render.c
 
 src/spf_vtable$(O) : $(PARROT_H_HEADERS) src/spf_vtable.str src/spf_vtable.c
 
-src/string/encoding$(O) : $(PARROT_H_HEADERS) src/string/encoding.c
+src/string/encoding$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/string/encoding.c
 
-src/string/encoding/tables$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/tables.h
-src/string/encoding/shared$(O) : $(PARROT_H_HEADERS) \
+src/string/encoding/tables$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/string/encoding/tables.h \
+    src/string/encoding/tables.c
+
+src/string/encoding/shared$(O) : \
+    $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
+    src/string/encoding/shared.c \
     src/string/encoding/tables.h
-src/string/encoding/null$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/shared.h
-src/string/encoding/ascii$(O) : $(PARROT_H_HEADERS) \
+
+src/string/encoding/null$(O) : \
+    $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
+    src/string/encoding/null.c \
+
+src/string/encoding/ascii$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/string/encoding/shared.h \
+    src/string/encoding/ascii.c \
     src/string/encoding/tables.h
-src/string/encoding/latin1$(O) : $(PARROT_H_HEADERS) \
+
+src/string/encoding/latin1$(O) : \
+    $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
+    src/string/encoding/latin1.c \
     src/string/encoding/tables.h
-src/string/encoding/binary$(O) : $(PARROT_H_HEADERS) \
-    src/string/encoding/shared.h
-src/string/encoding/utf8$(O) : $(PARROT_H_HEADERS) \
+
+src/string/encoding/binary$(O) : \
+    $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
+    src/string/encoding/binary.c
+
+src/string/encoding/utf8$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/string/encoding/shared.h \
+    src/string/encoding/utf8.c \
     src/string/unicode.h
-src/string/encoding/utf16$(O) : $(PARROT_H_HEADERS) \
+
+src/string/encoding/utf16$(O) : \
+    $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
+    src/string/encoding/utf16.c \
     src/string/unicode.h
-src/string/encoding/ucs2$(O) : $(PARROT_H_HEADERS) \
+
+src/string/encoding/ucs2$(O) : \
+    $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
+    src/string/encoding/ucs2.c \
     src/string/unicode.h
-src/string/encoding/ucs4$(O) : $(PARROT_H_HEADERS) \
+
+src/string/encoding/ucs4$(O) : \
+    $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
+    src/string/encoding/ucs4.c \
     src/string/unicode.h
 
 frontend/pbc_merge/main$(O) : \
