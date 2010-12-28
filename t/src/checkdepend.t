@@ -56,7 +56,7 @@ our %deps;
 foreach my $file (sort grep /\.[hc]$/, @incfiles) {
     # For now, skip any files that have generated dependencies
     next if $file =~ m{src/pmc/};
-    next if $file =~ m{src/string/(charset|encoding)/};
+    next if $file =~ m{src/string/encoding/};
 
     open my $fh, '<', $file;
     my $guts;
