@@ -2691,6 +2691,11 @@ quickcover: \
     done
 	$(COVER) $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
 
+quickcover_new: \
+    cover.dummy \
+    cover-test_core
+	$(PERL) tools/dev/make_cover.pl $(COVER_DIRS)
+
 cover.dummy: have-cover
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
     --linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
@@ -2700,6 +2705,9 @@ have-cover:
 
 cover-test_runcore: cover.dummy
 	-@make@ test_runcore
+
+cover-test_core: cover.dummy
+	-@make@ test_core
 
 cover-testb: cover.dummy
 	-@make@ testb
