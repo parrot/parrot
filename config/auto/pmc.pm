@@ -107,7 +107,7 @@ src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \$(PMC2C_FILES) $
 include/pmc/pmc_$pmc.h: src/pmc/$pmc.c
 
 ## SUFFIX OVERRIDE -Warnings
-src/pmc/$pmc\$(O): include/pmc/pmc_$pmc.h src/pmc/$pmc.str \$(NONGEN_HEADERS) \\
+src/pmc/$pmc\$(O): include/pmc/pmc_$pmc.h src/pmc/$pmc.str \\
     $parent_headers $include_headers include/pmc/pmc_continuation.h \\
     include/pmc/pmc_callcontext.h include/pmc/pmc_fixedintegerarray.h \\
     src/pmc/$pmc.c
