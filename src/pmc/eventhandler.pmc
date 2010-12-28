@@ -239,7 +239,7 @@ Runs the contained code, if any; this is what handles the event.
         opcode_t * real_next = NULL;
 
         if (!e)
-            return next;
+            return (opcode_t *)next;
 
         if (!PMC_IS_NULL(e->interp))
             target_interp = PMC_data_typed(e->interp, Interp *);

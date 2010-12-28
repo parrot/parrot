@@ -401,13 +401,6 @@ Parrot_Int Parrot_api_string_import_wchar(
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
-Parrot_Int Parrot_api_add_exception_handler(
-    ARGIN(Parrot_PMC interp_pmc),
-    ARGIN(Parrot_PMC handler))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_API
 Parrot_Int Parrot_api_pmc_box_integer(
     Parrot_PMC interp_pmc,
     Parrot_Int value,
@@ -619,10 +612,6 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
         __attribute__nonnull__(4)
         FUNC_MODIFIES(* args);
 
-#define ASSERT_ARGS_Parrot_api_add_exception_handler \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc) \
-    , PARROT_ASSERT_ARG(handler))
 #define ASSERT_ARGS_Parrot_api_pmc_box_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(int_pmc))
 #define ASSERT_ARGS_Parrot_api_pmc_box_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
