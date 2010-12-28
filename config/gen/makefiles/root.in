@@ -2592,11 +2592,6 @@ COVER_DIRS = \
     $(BUILD_DIR)/t/perl \
     compilers/imcc
 
-HAVE_COVER  = @have_cover@
-COVER       = @cover@
-GCOV        = @gcov@
-GCOV2PERL   = @gcov2perl@
-
 cover: \
     cover.dummy \
     cover-testb \
@@ -2611,42 +2606,56 @@ cover: \
     cover-manifest \
     cover-examples \
     cover-distro
-	for dir in $(COVER_DIRS); \
+	build_dir=$$PWD; \
+    for dir in $(COVER_DIRS); \
     do \
-	for file in $$dir/*.c; \
-	do \
-	    $(GCOV) -o $$dir $$file; \
-	done \
+	cd $$dir; \
+	gcov *.c; \
+	cd $$build_dir; \
+	gcov2perl $$dir/*.gcov; \
     done
-	if [ -n "$(GCOV2PERL)" -a -n "$(COVER)" ]; \
-    then \
-	$(COVER) -delete $(COVERAGE_DIR); \
-	$(GCOV2PERL) -db $(COVERAGE_DIR) *.gcov; \
-	$(COVER) -no-gcov $(COVERAGE_DIR); \
-    else \
-	echo "gcov2perl and cover not found."; \
-	echo "Install Devel::Cover for HTML coverage reports."; \
-    fi
+	cover -ignore_re '^\/usr\/local\/bin'
+
+QUICKCOVER_DIRS = \
+    src \
+    src/call \
+    src/dynoplibs \
+    src/dynpmc \
+    src/embed \
+    src/gc \
+    src/interp \
+    src/io \
+    src/nci \
+    src/ops \
+    src/packfile \
+    src/pmc \
+    src/runcore \
+    src/string \
+    src/string/encoding \
+    frontend/parrot \
+    frontend/parrot_debugger \
+    frontend/pbc_dump \
+    frontend/pbc_merge \
+    compilers/imcc
+
+HAVE_COVER  = @have_cover@
+COVER       = @cover@
+GCOV        = @gcov@
+GCOV2PERL   = @gcov2perl@
 
 quickcover: \
     cover.dummy \
-    cover-test_core
-	for dir in $(COVER_DIRS); \
+    cover-test_runcore
+	build_dir=$$PWD; \
+    $(COVER) -delete; \
+    for dir in $(QUICKCOVER_DIRS); \
     do \
-	for file in $$dir/*.c; \
-	do \
-	    $(GCOV) -o $$dir $$file; \
-	done \
+	cd $$dir; \
+	$(GCOV) *.c; \
+	cd $$build_dir; \
+	$(GCOV2PERL) -db $(COVERAGE_DIR) $$dir/*.gcov; \
     done
-	if [ -n "$(GCOV2PERL)" -a -n "$(COVER)" ]; \
-    then \
-	$(COVER) -delete $(COVERAGE_DIR); \
-	$(GCOV2PERL) -db $(COVERAGE_DIR) *.gcov; \
-	$(COVER) -no-gcov $(COVERAGE_DIR); \
-    else \
-	echo "gcov2perl and cover not found."; \
-	echo "Install Devel::Cover for HTML coverage reports."; \
-    fi
+	$(COVER) $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
 
 cover.dummy: have-cover
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
@@ -2655,8 +2664,8 @@ cover.dummy: have-cover
 have-cover:
 	$(HAVE_COVER)
 
-cover-test_core: cover.dummy
-	-@make@ test_core
+cover-test_runcore: cover.dummy
+	-@make@ test_runcore
 
 cover-testb: cover.dummy
 	-@make@ testb
@@ -2719,7 +2728,7 @@ cover-distro: cover.dummy
 	-@make@ distro_tests
 
 cover-clean:
-	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) t/src ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
+	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) $(QUICKCOVER_DIRS) t/src ) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
 
 ###############################################################################
 #
