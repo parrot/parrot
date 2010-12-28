@@ -20,7 +20,7 @@ Tests the BigInt PMC.
     .include 'test_more.pir'
 
     .local int num_tests
-    num_tests = 70
+    num_tests = 73
     plan(num_tests)
 
     .local int good
@@ -683,6 +683,36 @@ OK15:
 OK16:
     ok($I1, 'i_mod(bigint,integer)')
     $I1 = 1
+
+    $P2 = new ['String']
+    push_eh E1
+        $P1 = mod $P0, $P2
+        $I1 = 0
+        say 'Failed to throw exception'
+E1:
+    pop_eh
+    get_results '0', $S0
+    eq $S0, "BigInt: no multiple dispatch variant 'modulus' for String", OK17
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK17:
+    ok($I1, 'mod(bigint,string) throws exception')
+    $I1 = 1
+
+    push_eh E2
+        mod $P0, $P2
+        $I1 = 0
+        say 'Failed to throw exception'
+E2:
+    pop_eh
+    get_results '0', $S0
+    eq $S0, "BigInt: no multiple dispatch variant 'i_modulus' for String", OK18
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK18:
+    ok($I1, 'i_mod(bigint,string) throws exception')
 .end
 
 .sub division_by_zero
@@ -1204,22 +1234,39 @@ OK2:
 .end
 
 .sub compare
-   $P0 = new ['BigInt']
-   $P1 = new ['BigInt']
-   $P0 = '1000000000'
-   $P1 = '10000000000'
-   $I0 = cmp $P0, $P1
-   is($I0, -1, 'cmp(bigint,bigint)')
+    $P0 = new ['BigInt']
+    $P1 = new ['BigInt']
+    $P0 = '1000000000'
+    $P1 = '10000000000'
+    $I0 = cmp $P0, $P1
+    is($I0, -1, 'cmp(bigint,bigint)')
 
-   $P1 = new['Integer']
-   $P1 = 10000
-   $I0 = cmp $P0, $P1
-   is($I0, 1, 'cmp(bigint,int)')
+    $P1 = new['Integer']
+    $P1 = 10000
+    $I0 = cmp $P0, $P1
+    is($I0, 1, 'cmp(bigint,int)')
 
-   $P2 = new ['Float']
-   $P2 = 10000
-   $I0 = cmp $P0, $P2
-   is($I0, 1, 'cmp(bigint,float)')
+    $P2 = new ['Float']
+    $P2 = 10000
+    $I0 = cmp $P0, $P2
+    is($I0, 1, 'cmp(bigint,float)')
+
+    $I1 = 1
+    $P3 = new ['String']
+    $P2 = "10000"
+    push_eh E1
+        $I0 = cmp $P0, $P2
+        $I1 = 0
+        say 'Failed to throw exception'
+E1:
+    pop_eh
+    get_results '0', $S0
+    eq $S0, "BigInt: no multiple dispatch variant 'cmp' for String", OK1
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK1:
+    ok($I1, 'cmp(bigint,string) throws exception')
 .end
 
 .sub interface
