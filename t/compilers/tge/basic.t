@@ -71,6 +71,7 @@ testing a few basic components of TGE::Grammar and TGE::Tree
     lives_ok(<<'CODE', '"Malformed string" in r11890 under Linux i386')
 .sub main :main
     load_bytecode "TGE.pbc"
+    .return ()
 .end
 CODE
 .end
