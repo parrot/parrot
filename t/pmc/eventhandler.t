@@ -18,10 +18,11 @@ Tests the EventHandler PMC used by the event system.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(7)
+    plan(8)
 
     create_an_event_and_set_attributes()
-    initializer_arg_type_exception()
+    exception_initializer_arg_type()
+    exception_invoke_without_code()
     get_string_null()
     mark()
     # Invoke broken, see below.
@@ -80,7 +81,7 @@ Tests the EventHandler PMC used by the event system.
 
 .end
 
-.sub initializer_arg_type_exception
+.sub exception_initializer_arg_type
     .local pmc eh
     $P0 = new ['String']
     $P0 = 'foo'
@@ -99,6 +100,27 @@ Tests the EventHandler PMC used by the event system.
     say ' is wrong exception type'
   OK1:
     ok($I1, 'Expected exception from initializer with invalid arg type')
+    $I1 = 1
+.end
+
+.sub exception_invoke_without_code
+    .local pmc eh
+    eh = new ['EventHandler'], $P0
+
+  push_eh E1
+    eh()
+    $I1 = 0
+    say 'Failed to throw exception'
+  E1:
+    pop_eh
+    get_results '0', $P0
+    $S0 = $P0
+    eq $S0, "No code object to execute in EventHandler", OK1
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+  OK1:
+    ok($I1, 'Expected exception on invoke without code')
     $I1 = 1
 .end
 
