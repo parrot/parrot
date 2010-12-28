@@ -2615,7 +2615,7 @@ cover: \
     do \
 	for file in $$dir/*.c; \
 	do \
-	    $(GCOV) -p -o $$dir $$file; \
+	    $(GCOV) -o $$dir $$file; \
 	done \
     done
 	if [ -n "$(GCOV2PERL)" -a -n "$(COVER)" ]; \
@@ -2635,7 +2635,7 @@ quickcover: \
     do \
 	for file in $$dir/*.c; \
 	do \
-	    $(GCOV) -p -o $$dir $$file; \
+	    $(GCOV) -o $$dir $$file; \
 	done \
     done
 	if [ -n "$(GCOV2PERL)" -a -n "$(COVER)" ]; \
