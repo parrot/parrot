@@ -247,9 +247,9 @@ LOOP:
     .local string ret
 
     ret = strings[0]
-    concat ret, " "
+    ret = concat ret, " "
     str = strings[1]
-    concat ret, str
+    ret = concat ret, str
 
     .return(ret)
 .end
@@ -757,8 +757,8 @@ LOOP:
 
     mul i, 2
     set tmp, i
-    concat str, " * 2 = "
-    concat str, tmp
+    str = concat str, " * 2 = "
+    str = concat str, tmp
 
     .return(str)
 

@@ -650,18 +650,15 @@ Create a HLL-mapped PMC containing the provided primitive.
 =cut
 
 op box(out PMC, in INT) {
-    $1 = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
-    VTABLE_set_integer_native(interp, $1, $2);
+    $1 = Parrot_pmc_box_integer(interp, $2);
 }
 
 op box(out PMC, in NUM) {
-    $1 = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Float));
-    VTABLE_set_number_native(interp, $1, $2);
+    $1 = Parrot_pmc_box_number(interp, $2);
 }
 
 op box(out PMC, in STR) {
-    $1 = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
-    VTABLE_set_string_native(interp, $1, $2);
+    $1 = Parrot_pmc_box_string(interp, $2);
 }
 
 ########################################

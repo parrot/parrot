@@ -42,7 +42,7 @@ enum USAGE {
 
 typedef struct _SymReg {
     char                *name;
-    char                *subid;
+    struct _SymReg      *subid;
     struct _SymReg      *nextkey;       /* keys */
     struct _SymReg      *reg;           /* key->register for VTREGKEYs */
     struct pcc_sub_t    *pcc_sub;       /* PCC subroutine */

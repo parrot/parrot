@@ -19,7 +19,7 @@
 #include "parrot/runcore_api.h"
 
 PARROT_EXPORT
-op_lib_t *Parrot_DynOp_core_2_10_1(PARROT_INTERP, long init);
+op_lib_t *Parrot_DynOp_core_2_11_0(PARROT_INTERP, long init);
 
  opcode_t * Parrot_end(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_noop(opcode_t *, PARROT_INTERP);
@@ -51,7 +51,7 @@ op_lib_t *Parrot_DynOp_core_2_10_1(PARROT_INTERP, long init);
  opcode_t * Parrot_yield(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_tailcall_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_returncc(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_sub_capture_lex_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_capture_lex_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_newclosure_p_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_set_args_pc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_get_params_pc(opcode_t *, PARROT_INTERP);
@@ -809,8 +809,6 @@ op_lib_t *Parrot_DynOp_core_2_10_1(PARROT_INTERP, long init);
  opcode_t * Parrot_chopn_s_sc_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_chopn_s_s_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_chopn_s_sc_ic(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_concat_s_s(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_concat_s_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_concat_p_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_concat_p_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_concat_p_sc(opcode_t *, PARROT_INTERP);

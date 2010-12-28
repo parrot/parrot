@@ -210,7 +210,7 @@ NOT_IN_CACHE:
     # (in general, it will not, let it override the general ones below)
     typeof temp, _dump
     set func, "pmc"
-    concat func, temp
+    func = concat func, temp
     can ret, self, func
     if ret goto DUMP
 

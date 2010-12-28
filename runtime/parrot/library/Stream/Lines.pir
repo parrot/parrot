@@ -157,7 +157,7 @@ BUFFER_END:
     if_null str, END
 
     # concat to the buffer
-    concat buffer, str
+    buffer = concat buffer, str
     temp = buffer
     setattribute self, 'line_buffer', temp
     code = 1

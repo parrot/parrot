@@ -1012,13 +1012,13 @@ expected type, fails otherwise.
     unless $I0 goto setmsg
     msg = description
   setmsg:
-    concat msg, ': '
+    msg = concat msg, ': '
 
     push_eh catch
     invokable()
 
     pop_eh
-    concat msg, "expected to throw but doesn't"
+    msg = concat msg, "expected to throw but doesn't"
     ok(0, msg)
     goto end
 
@@ -1028,9 +1028,9 @@ expected type, fails otherwise.
     exmsg = ex['message']
     finalize ex
     pop_eh
-    concat msg, "throws expected type"
+    msg = concat msg, "throws expected type"
     exmsg = concat 'exception message is: "', exmsg
-    concat exmsg, '")'
+    msg = concat exmsg, '")'
     is(extype, type, msg)
     diag(exmsg)
   end:

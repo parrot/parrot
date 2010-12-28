@@ -119,5 +119,6 @@ Starred release numbers indicate supported releases.
  cotto       2.9.1          2010-Oct-19     (bugfix release)
  tcurtis     2.10.0         2010-Nov-16     "Pesquet's"
  Gerd        2.10.1         2010-Nov-18     (bugfix release)
+ Whiteknight 2.11.0         2010-Dec-21     "At The ROFLBBQ"
 
 =cut

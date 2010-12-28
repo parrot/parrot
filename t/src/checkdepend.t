@@ -1,20 +1,19 @@
 #! perl
 
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2010, Parrot Foundation.
 
 use strict;
 use warnings;
 
 use Cwd qw(abs_path getcwd realpath);
 use Fatal qw(open);
+use File::Find;
 use File::Spec;
 use Test::More;
-use Test::Harness;
-use Test::Differences;
 
 =head1 NAME
 
-tools/dev/checkdepend.pl
+t/src/checkdepend.t
 
 =head1 DESCRIPTION
 
@@ -26,30 +25,37 @@ If called with C<--dump>, no tests are run, and the pre-processed makefile
 is dumped (in lieu of having C<cc>'s C<-E> for C<make>. This option is only
 intended to be used by developers examining the build process.
 
+The test's output shows the extra dependencies recorded for "got", and the
+missing dependencies for "expected" - any dependencies that match up exactly
+are not reported on. The number in parentheses indicates how many were found.
+(Useful for identifying when a requirement is included multiple times.)
+
 =head1 REQUIREMENTS
 
 A built parrot (Configure and make) to generate all files so we can analyze
-them. App::Ack is used to find the files, and Test::Differences is used to
-make the test output usable - these non standard modules make this an
-optional test.
+them. (That's why it's in t/src/ instead of t/codingstd)
 
 =head1 BUGS
 
-See L<http://trac.parrot.org/parrot/wiki/BuildTaskList>
+See L<http://trac.parrot.org/parrot/wiki/BuildTaskList>. Only checks C<.c>
+and C<.h> files at the moment.
 
 =cut
 
-die 'no Makefile found; This tool requires a full build for analysis.'
-    unless -e 'Makefile';
+if (! -e 'Makefile') {
+    plan(skip_all =>
+        'no Makefile found; This test requires a full build for analysis.');
+    exit;
+}
 
-my @incfiles = split /\n/, `ack -fa src compilers include  | ack '\\.(c|h|pir)\$'`;
+my @incfiles = [];
+find( \&wanted, qw/src compilers include frontend/);
 
 our %deps;
 
 foreach my $file (sort grep /\.[hc]$/, @incfiles) {
-    # For now, skip any files that have generated dependencies
+    # For now, skip some files that have generated dependencies
     next if $file =~ m{src/pmc/};
-    next if $file =~ m{src/string/(charset|encoding)/};
 
     open my $fh, '<', $file;
     my $guts;
@@ -91,64 +97,6 @@ foreach my $file (sort grep /\.[hc]$/, @incfiles) {
     # needed. However, missing it when it is needed causes pain.
     if ($file =~ /\.c$/) {
         push @{$deps{$file}}, $file;
-    }
-}
-
-foreach my $file (sort grep /\.pir$/, @incfiles) {
-    open my $fh, '<', $file;
-    my $guts;
-    {
-        local $/;
-        $guts = <$fh>;
-    }
-
-    # Ignore anything inside a # - comment.
-    $guts =~ s{^#.*$}{}gm;
-    # Ignore anything inside pod.
-    $guts =~ s{^=.*^=cut$}{}gsm;
-    # Ignore anything inside strings that are assigned to a variable.
-    # (Avoid clobbering the strings used in .include 'foo.pir', etc.)
-    $guts =~ s{=\s*'[^']*'\s*$}{}gm;
-    $guts =~ s{=\s*"(?:[^"\\]|\\.)*"\s*$}{}gm;
-    # TT #1418:  also, heredocs (wheeeee!)
-
-    my @includes;
-    while ($guts =~ m/(?:\.include|\bload_bytecode)\s+(["'])(.*)\1/g) {
-        push @includes, $2;
-    }
-
-    # Canonicalize each of these includes.
-
-    $deps{$file} = [ ];
-    foreach my $include (@includes) {
-        # same dir as file?
-        my $file_dir = (File::Spec->splitpath($file))[1];
-        my $make_dep = collapse_path(File::Spec->catfile($file_dir, $include));
-        if (defined($make_dep) && -f $make_dep) {
-            push @{$deps{$file}}, $make_dep;
-            next;
-        }
-
-        # global 'runtime' dir?
-        $make_dep = collapse_path(File::Spec->catfile('runtime/parrot/include', $include));
-        if (defined($make_dep) && -f $make_dep) {
-            push @{$deps{$file}}, $make_dep;
-            next;
-        }
-        $make_dep = collapse_path(File::Spec->catfile('runtime/parrot/library', $include));
-        if (defined($make_dep) && -f $make_dep) {
-            push @{$deps{$file}}, $make_dep;
-            next;
-        }
-
-        # relative to top level?
-        $make_dep = collapse_path(File::Spec->catfile($include));
-        if (defined($make_dep) && -f $make_dep) {
-            push @{$deps{$file}}, $make_dep;
-            next;
-        }
-
-        diag "couldn't find $include, included from $file";
     }
 }
 
@@ -229,7 +177,7 @@ if (@ARGV && $ARGV[0] eq '--dump') {
     exit 0;
 }
 
-my $test_count = grep {/\.(c|pir)$/} (keys %deps);
+my $test_count = grep {/\.(c)$/} (keys %deps);
 
 plan( tests => $test_count );
 
@@ -243,8 +191,7 @@ plan( tests => $test_count );
 my @files = keys %deps;
 @files = @ARGV if @ARGV;
 
-check_files($rules, \@files, '.c',   $vars{O});
-check_files($rules, \@files, '.pir', '.pbc');
+check_files($rules, \@files, '.c', $vars{O});
 
 sub check_files {
 
@@ -271,10 +218,10 @@ sub check_files {
             $extra_info = "($active_makefile: line $active_line_num)";
         }
 
-        $rule_deps        = join "\n", sort split /\s+/, $rule_deps;
-        my $expected_deps = join "\n", sort (get_deps($file));
+        my @rule_deps     = split /\s+/, $rule_deps;
+        my @expected_deps = (get_deps($file));
 
-        eq_or_diff_text($rule_deps, $expected_deps, "$file $extra_info.", {context => 0});
+        is_list_same(\@rule_deps, \@expected_deps, "$file $extra_info.");
     }
 }
 
@@ -313,6 +260,58 @@ sub get_deps {
     }
 
     return keys %all_deps;
+}
+
+# I'd rather use Test::Differences, but this lets us skip a dependency.
+
+sub is_list_same {
+    my $got = shift;
+    my $exp = shift;
+    my $test = shift;
+
+    # keep track of the number of times something appears to
+    # avoid redundant includes)
+
+    my(%got, %exp);
+    for my $file (@$got) { $got{$file}++ };
+    for my $file (@$exp) { $exp{$file}++ };
+
+    # Remove any elements found in both
+    my @gots = keys %got;
+    foreach my $file (@gots) {
+        if (exists $exp{$file}) {
+            if ($exp{$file} == $got{$file}) {
+                delete $got{$file};
+                delete $exp{$file};
+            }
+        }
+    }
+
+    my $extras  = scalar(keys %got);
+    my $missing = scalar(keys %exp);
+
+    if ($extras == 0 && $missing == 0) {
+        pass($test);
+        return;
+    }
+
+    my $got_msg = "";
+    for my $file (keys %got) {
+        $got_msg .= "$file($got{$file})\n";
+    }
+    my $exp_msg = "";
+    for my $file (keys %exp) {
+        $exp_msg .= "$file($exp{$file})\n";
+    }
+
+    is ($got_msg, $exp_msg, $test);
+    return;
+}
+
+sub wanted {
+    if ($File::Find::name =~ /\.(c|h)$/) {
+        push @incfiles, $File::Find::name;
+    }
 }
 
 # Local Variables:

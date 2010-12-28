@@ -1315,8 +1315,8 @@ sub:
         {
           IMCC_INFO(interp)->cur_call->pcc_sub->pragma = $5;
           if (!IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid) {
-            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = mem_sys_strdup(
-            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->name);
+            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid =
+                IMCC_INFO(interp)->cur_unit->instructions->symregs[0];
           }
         }
      sub_params
@@ -1447,9 +1447,10 @@ subid:
          }
    | SUBID '(' any_string ')'
          {
+           SymReg *r = mk_const(interp, $3, 'S');
            $$ = 0;
-           IMCC_INFO(interp)->cur_unit->subid = mk_const(interp, $3, 'S');
-           IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = str_dup_remove_quotes($3);
+           IMCC_INFO(interp)->cur_unit->subid = r;
+           IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = r;
            mem_sys_free($3);
          }
    ;
@@ -2015,6 +2016,13 @@ get_results:
 op_assign:
      target assign_op var
          { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, $2, 2, $1, $3); }
+   | target CONCAT_ASSIGN var
+         {
+             if ($1->set == 'P')
+                 $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "concat", 2, $1, $3);
+             else
+                 $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "concat", 3, $1, $1, $3);
+         }
    ;
 
 assign_op:
@@ -2024,7 +2032,6 @@ assign_op:
    | DIV_ASSIGN                { $$ = (char *)"div"; }
    | MOD_ASSIGN                { $$ = (char *)"mod"; }
    | FDIV_ASSIGN               { $$ = (char *)"fdiv"; }
-   | CONCAT_ASSIGN             { $$ = (char *)"concat"; }
    | BAND_ASSIGN               { $$ = (char *)"band"; }
    | BOR_ASSIGN                { $$ = (char *)"bor"; }
    | BXOR_ASSIGN               { $$ = (char *)"bxor"; }

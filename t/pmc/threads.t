@@ -327,7 +327,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE only" );
     test3 = get_hll_global ['Test3'], 'test3'
     test3()
     .local pmc test4
-    errorsoff .PARROT_ERRORS_GLOBALS_FLAG
     test4 = get_global 'test4'
     if null test4 goto okay
     print "not "
