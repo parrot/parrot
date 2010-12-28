@@ -96,6 +96,25 @@ END
         my $cc_o_out  = $conf->data->get('cc_o_out');
         my $warnings  = $conf->data->get('ccwarn');
         my $optimize  = $conf->data->get('optimize');
+        my %o_deps    = ( 
+            "include/pmc/pmc_callcontext.h" => 1,
+            "src/pmc/$pmc.c" => 1,
+            "src/pmc/$pmc.str" => 1,
+            "include/pmc/pmc_$pmc.h" => 1,
+        );
+        foreach my $header (split ' ', $parent_headers) {
+            $o_deps{$header} = 1; 
+        }
+        foreach my $header (split ' ', $include_headers) {
+            $o_deps{$header} = 1; 
+        }
+
+        print Dumper(\%o_deps); use Data::Dumper;
+        my $o_deps = "";
+        foreach my $header (keys %o_deps) {
+            $o_deps .= "    $header \\\n";
+        }
+
 
         $TEMP_pmc_build .= <<END
 src/pmc/$pmc.c : src/pmc/$pmc.dump
@@ -107,10 +126,8 @@ src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \$(PMC2C_FILES) $
 include/pmc/pmc_$pmc.h: src/pmc/$pmc.c
 
 ## SUFFIX OVERRIDE -Warnings
-src/pmc/$pmc\$(O): include/pmc/pmc_$pmc.h src/pmc/$pmc.str \\
-    $parent_headers $include_headers include/pmc/pmc_continuation.h \\
-    include/pmc/pmc_callcontext.h include/pmc/pmc_fixedintegerarray.h \\
-    src/pmc/$pmc.c
+src/pmc/$pmc\$(O): \\
+$o_deps    \$(PMC_H_FILES)
 \t\$(CC) \$(CFLAGS) $optimize $cc_shared $warnings -I\$(\@D) $cc_o_out\$@ -c src/pmc/$pmc.c
 
 END
