@@ -109,7 +109,6 @@ END
             $o_deps{$header} = 1; 
         }
 
-        print Dumper(\%o_deps); use Data::Dumper;
         my $o_deps = "";
         foreach my $header (keys %o_deps) {
             $o_deps .= "    $header \\\n";
