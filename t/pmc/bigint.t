@@ -20,7 +20,7 @@ Tests the BigInt PMC.
     .include 'test_more.pir'
 
     .local int num_tests
-    num_tests = 66
+    num_tests = 68
     plan(num_tests)
 
     .local int good
@@ -239,38 +239,73 @@ OK4:
     $I1 = 0
     say 'add 12345678987654321+12345 wrong'
 OK5:
-   ok($I1, 'add(bigint,integer)')
+    ok($I1, 'add(bigint,integer)')
 
-   $P0 = new ['BigInt']
-   $P0 = '12345678900000000'
-   $P1 = new ['BigInt']
-   $P1 = '87654321'
-   $P2 = new ['BigInt']
-   $P2 = '12345678987654321'
-   add $P0, $P1
-   eq $P0, $P2, OK6
-   $I1 = 0
-   say 'add 12345678900000000+87654321 wrong'
+    $P0 = new ['BigInt']
+    $P0 = '12345678900000000'
+    $P1 = new ['BigInt']
+    $P1 = '87654321'
+    $P2 = new ['BigInt']
+    $P2 = '12345678987654321'
+    add $P0, $P1
+    eq $P0, $P2, OK6
+    $I1 = 0
+    say 'add 12345678900000000+87654321 wrong'
 OK6:
-   ok($I1, 'i_add(bigint,bigint)')
+    ok($I1, 'i_add(bigint,bigint)')
 
-   $P0 = '12345678900000000'
-   add $P0, 87654321
-   eq $P0, $P2, OK7
-   $I1 = 0
-   say 'add 12345678900000000+87654321 for nativeint wrong'
+    $P0 = '12345678900000000'
+    add $P0, 87654321
+    eq $P0, $P2, OK7
+    $I1 = 0
+    say 'add 12345678900000000+87654321 for nativeint wrong'
 OK7:
-   ok($I1, 'i_add(bigint,nativeint)')
+    ok($I1, 'i_add(bigint,nativeint)')
 
-   $P0 = '12345678900000000'
-   $P1 = new ['Integer']
-   $P1 = 87654321
-   add $P0, $P1
-   eq $P0, $P2, OK8
-   $I1 = 0
-   say 'add 12345678900000000+87654321 for integer wrong'
+    $P0 = '12345678900000000'
+    $P1 = new ['Integer']
+    $P1 = 87654321
+    add $P0, $P1
+    eq $P0, $P2, OK8
+    $I1 = 0
+    say 'add 12345678900000000+87654321 for integer wrong'
 OK8:
-   ok($I1, 'i_add(bigint,integer)')
+    ok($I1, 'i_add(bigint,integer)')
+
+    $P0 = '12345678900000000'
+    $P1 = new ['Float']
+    $P1 = 1.1
+    push_eh E1
+      add $P0, $P0, $P1
+      $I1 = 0
+      say 'Failed to throw exception'
+E1:
+    pop_eh
+    get_results '0', $P0
+    $S0 = $P0
+    eq $S0, "BigInt: no multiple dispatch variant 'add' for Float", OK9
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK9:
+    ok($I1, 'add(bigint,float) throws exception')
+    $I1 = 1
+
+    push_eh E2
+      add $P0, $P1
+      $I1 = 0
+      say 'Failed to throw exception'
+E2:
+    pop_eh
+    get_results '0', $P0
+    $S0 = $P0
+    eq $S0, "Multiple Dispatch: No suitable candidate found for 'i_add', with signature 'PP'", OK10
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK10:
+    ok($I1, 'i_add(bigint,float) throws exception')
+    $I1 = 1
 .end
 
 .sub subtraction
