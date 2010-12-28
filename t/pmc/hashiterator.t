@@ -17,17 +17,19 @@ well.
 
 =cut
 
+.include 'hash_key_type.pasm'
 .include 'except_types.pasm'
 
 .sub main :main
     .include 'test_more.pir'
 
-    plan(11)
+    plan(12)
 
     iter_over_empty_hash()
     iter_over_single_element()
     iter_over_single_element_with_checks()
     iter_invalid_type()
+    iter_hash_keyed_int()
     iter_clone()
 .end
 
@@ -111,6 +113,24 @@ well.
   report:
     pop_eh
     ok(i, 'setting invalid type throws')
+.end
+
+.sub iter_hash_keyed_int
+    .local pmc hash, it, value
+    .local int check
+    hash = new ['Hash']
+    hash = .Hash_key_type_int
+    hash[0] = 'a'
+    hash[1] = 'b'
+    hash['0'] = 'x'
+    it = iter hash
+    value = shift it
+    value = shift it
+    check = 0
+    if it goto report
+    check = 1
+  report:
+    is(check, 1, 'iterate over hash with int key type')
 .end
 
 .sub iter_clone
