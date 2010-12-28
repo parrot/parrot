@@ -11,7 +11,6 @@ my @steps = qw(
     init::defaults
     init::install
     init::hints
-    init::headers
     inter::progs
     inter::make
     inter::lex
