@@ -48,7 +48,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_dyn_load_lib(PARROT_INTERP,
-    ARGIN_NULLOK(const STRING *lib),
+    ARGIN_NULLOK(STRING *lib),
     ARGIN_NULLOK(PMC *parameters))
         __attribute__nonnull__(1);
 
