@@ -2949,7 +2949,8 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
 
 /*
 
-=item C<PMC* Parrot_str_split(PARROT_INTERP, const STRING *delim, STRING *str)>
+=item C<PMC* Parrot_str_split(PARROT_INTERP, const STRING *delim, const STRING
+*str)>
 
 Splits the string C<str> at the delimiter C<delim>, returning a
 C<ResizableStringArray>, or his mapped type in the current HLL, of results.
@@ -2964,7 +2965,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC*
 Parrot_str_split(PARROT_INTERP,
-    ARGIN_NULLOK(const STRING *delim), ARGIN_NULLOK(STRING *str))
+    ARGIN_NULLOK(const STRING *delim), ARGIN_NULLOK(const STRING *str))
 {
     ASSERT_ARGS(Parrot_str_split)
     PMC     *res;

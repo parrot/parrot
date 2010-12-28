@@ -827,7 +827,8 @@ help :
 	@echo "  apilist:           Show list of PARROT_API functions"
 	@echo "  exportlist:        Show list of PARROT_EXPORT functions"
 	@echo "  malloclist:        Show list of PARROT_MALLOC functions"
-	@echo "  cover:             Run test suite coverage analysis."
+	@echo "  quickcover:        Run test suite coverage analysis (core)."
+	@echo "  cover:             Run test suite coverage analysis (full)."
 	@echo "  tags-vi:           Create tags for the vi editor."
 	@echo "  tags-emacs:        Create tags for the Emacs editor."
 	@echo "  perlcritic:        Check Perl code with Perl::Critic."
@@ -1947,7 +1948,8 @@ RUN_TEST_FILES = \
 RUNCORE_TEST_FILES = \
     --runcore-tests
 SRC_TEST_FILES = \
-    t/src/*.t
+    t/src/*.t \
+    t/src/embed/*.t
 TOOLS_TEST_FILES = $(TOOLS_TESTS_DIR)/tools/*.t
 
 # pbc files used for several tests;

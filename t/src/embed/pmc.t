@@ -24,7 +24,7 @@ Tests PMC API support.
 
 =cut
 
-plan tests => 5;
+plan tests => 6;
 
 c_output_is( <<'CODE', <<'OUTPUT', "get/set_keyed_int" );
 
@@ -64,6 +64,45 @@ int main(int argc, char* argv[])
 CODE
 I
 i am a string.
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', "pmc_get_{string|float}" );
+
+#include "parrot/api.h"
+#include <stdio.h>
+
+int main(int argc, char* argv[])
+{
+    Parrot_Int i_out;
+    Parrot_Float f_out;
+    Parrot_Init_Args *initargs = NULL;
+    Parrot_PMC interpmc = NULL;
+    Parrot_PMC p_float = NULL;
+    Parrot_PMC p_key = NULL, p_class = NULL;
+    Parrot_String s_numstr = NULL;
+    char * float_class[] = { "Float" };
+
+    GET_INIT_STRUCT(initargs);
+    Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+
+    Parrot_api_string_import_ascii(interpmc, "3.14159", &s_numstr);
+
+    Parrot_api_pmc_wrap_string_array(interpmc, 1, float_class, &p_key);
+    Parrot_api_pmc_get_class(interpmc, p_key, &p_class);
+    Parrot_api_pmc_new_from_class(interpmc, p_class, NULL, &p_float);
+
+    Parrot_api_pmc_set_string(interpmc, p_float, s_numstr);
+    Parrot_api_pmc_get_integer(interpmc, p_float, &i_out);
+    Parrot_api_pmc_get_float(interpmc, p_float, &f_out);
+
+    printf("%d\n", i_out);
+    printf("%.5f\n", f_out);
+    return 0;
+}
+
+CODE
+3
+3.14159
 OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', "Tests get_keyed_string and set_keyed_string" );
