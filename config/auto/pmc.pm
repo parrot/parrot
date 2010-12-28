@@ -85,23 +85,28 @@ END
         # add dependencies that result from METHOD usage.
         my $pmc_fname = catfile('src', 'pmc', "$pmc.pmc");
         my $pccmethod_depend = '';
+        my %o_deps    = ( 
+            "include/pmc/pmc_callcontext.h" => 1,
+            "include/pmc/pmc_continuation.h" => 1,
+            "src/pmc/$pmc.c" => 1,
+            "src/pmc/$pmc.str" => 1,
+            "include/pmc/pmc_$pmc.h" => 1,
+
+        );
+
         if (contains_pccmethod($pmc_fname)) {
             $pccmethod_depend = 'lib/Parrot/Pmc2c/PCCMETHOD.pm';
             if ($pmc ne 'fixedintegerarray') {
                 $pccmethod_depend .= ' include/pmc/pmc_fixedintegerarray.h';
             }
         }
+
         my $include_headers = get_includes($pmc_fname);
         my $cc_shared = $conf->data->get('cc_shared');
         my $cc_o_out  = $conf->data->get('cc_o_out');
         my $warnings  = $conf->data->get('ccwarn');
         my $optimize  = $conf->data->get('optimize');
-        my %o_deps    = ( 
-            "include/pmc/pmc_callcontext.h" => 1,
-            "src/pmc/$pmc.c" => 1,
-            "src/pmc/$pmc.str" => 1,
-            "include/pmc/pmc_$pmc.h" => 1,
-        );
+
         foreach my $header (split ' ', $parent_headers) {
             $o_deps{$header} = 1; 
         }
