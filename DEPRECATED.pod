@@ -104,12 +104,6 @@ will not auto-vivify nested hashes and return PMCNULL early.
 
 L<https://trac.parrot.org/parrot/ticket/1561>
 
-=item Method unescape on String [experimental]
-
-This is a helper method for testing of Parrot_str_unescape_string.
-
-L<https://trac.parrot.org/parrot/ticket/1628>
-
 =item logical_* vtables [eligiblie in 2.7]
 
 These can be replaced by C<get_bool> and intval ops unless you're using them for
@@ -284,6 +278,12 @@ At this point, C<:init> is a no-op, and will therefore be removed.
 
 L<https://trac.parrot.org/parrot/ticket/1896>
 
+=item encoding:charset:"" string literals [eligible in 3.1]
+
+This form of string literals will be removed.
+
+L<https://trac.parrot.org/parrot/ticket/1808>
+
 =back
 
 =head1 Functions
@@ -317,13 +317,6 @@ this rather than relying on in-place modification of an existing pointer.
 
 L<https://trac.parrot.org/parrot/ticket/1584>
 
-=item Parrot_str_unescape_string [experimental]
-
-This function is an experimental addition to enhance and maybe replace
-Parrot_str_unescape
-
-L<https://trac.parrot.org/parrot/ticket/1628>
-
 =item Parrot_load_bytecode_file [experimental]
 
 Load a .pbc file into the interpreter. Experimental.
@@ -346,6 +339,12 @@ const STRING*. This includes (but not limited to) all string API functions,
 VTABLEs, PCC, etc.
 
 L<http://trac.parrot.org/parrot/ticket/1906>
+
+=item Old string_* functions [eligible in 3.0]
+
+The old string_* functions will be removed.
+
+L<http://trac.parrot.org/parrot/ticket/1809>
 
 =back
 
