@@ -75,12 +75,12 @@ static UINTVAL utf8_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
         __attribute__nonnull__(2);
 
 static INTVAL utf8_partial_scan(PARROT_INTERP,
-    ARGMOD(STRING *src),
-    INTVAL count,
-    INTVAL delim)
+    ARGIN(const char *buf),
+    ARGMOD(Parrot_String_Bounds *bounds))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*src);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*bounds);
 
 static void utf8_scan(PARROT_INTERP, ARGMOD(STRING *src))
         __attribute__nonnull__(1)
@@ -129,7 +129,8 @@ static STRING * utf8_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_utf8_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(buf) \
+    , PARROT_ASSERT_ARG(bounds))
 #define ASSERT_ARGS_utf8_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -211,20 +212,26 @@ static void
 utf8_scan(PARROT_INTERP, ARGMOD(STRING *src))
 {
     ASSERT_ARGS(utf8_scan)
-    const UINTVAL orig_bufused = src->bufused;
+    Parrot_String_Bounds bounds;
 
-    utf8_partial_scan(interp, src, -1, -1);
+    bounds.bytes = src->bufused;
+    bounds.chars = -1;
+    bounds.delim = -1;
 
-    if (src->bufused != orig_bufused)
+    utf8_partial_scan(interp, src->strstart, &bounds);
+
+    if (bounds.bytes != src->bufused)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
             "Unaligned end in UTF-8 string\n");
+
+    src->strlen = bounds.chars;
 }
 
 
 /*
 
-=item C<static INTVAL utf8_partial_scan(PARROT_INTERP, STRING *src, INTVAL
-count, INTVAL delim)>
+=item C<static INTVAL utf8_partial_scan(PARROT_INTERP, const char *buf,
+Parrot_String_Bounds *bounds)>
 
 Partial scan of UTF-8 string
 
@@ -233,43 +240,49 @@ Partial scan of UTF-8 string
 */
 
 static INTVAL
-utf8_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
-        INTVAL delim)
+utf8_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
+        ARGMOD(Parrot_String_Bounds *bounds))
 {
     ASSERT_ARGS(utf8_partial_scan)
-    const utf8_t *u8ptr = (const utf8_t *)src->strstart;
-    const utf8_t *u8end = (const utf8_t *)(src->strstart + src->bufused);
-    UINTVAL characters  = 0;
-    UINTVAL max_chars   = count >= 0 ? (UINTVAL)count : src->bufused;
-    INTVAL  res         = 0;
+    const utf8_t * const p         = (const utf8_t *)buf;
+    UINTVAL              len       = bounds->bytes;
+    INTVAL               max_chars = bounds->chars;
+    const INTVAL         delim     = bounds->delim;
+    INTVAL               c         = -1;
+    INTVAL               chars     = 0;
+    INTVAL               res       = 0;
+    UINTVAL              i;
 
-    while (u8ptr < u8end && characters < max_chars) {
-        UINTVAL c = *u8ptr;
+    if (max_chars < 0)
+        max_chars = len;
+
+    for (i = 0; i < len && chars < max_chars; ++i) {
+        c = p[i];
 
         if (UTF8_IS_START(c)) {
-            size_t len = UTF8SKIP(u8ptr);
-            size_t count;
+            UINTVAL len2 = UTF8SKIP(p + i);
+            UINTVAL count;
 
-            if (u8ptr + len > u8end) {
-                res = u8ptr + len - u8end;
+            if (i + len2 > len) {
+                res = i + len2 - len;
                 break;
             }
 
             /* Check for overlong forms */
-            if (UTF8_IS_OVERLONG(c, u8ptr[1]))
+            if (UTF8_IS_OVERLONG(c, p[i+1]))
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
                     "Overlong form in UTF-8 string\n");
 
             c &= UTF8_START_MASK(len);
 
-            for (count = 1; count < len; ++count) {
-                ++u8ptr;
+            for (count = 1; count < len2; ++count) {
+                ++i;
 
-                if (!UTF8_IS_CONTINUATION(*u8ptr))
+                if (!UTF8_IS_CONTINUATION(p[i]))
                     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
                         "Malformed UTF-8 string\n");
 
-                c = UTF8_ACCUMULATE(c, *u8ptr);
+                c = UTF8_ACCUMULATE(c, p[i]);
             }
 
             if (UNICODE_IS_INVALID(c))
@@ -281,17 +294,17 @@ utf8_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
                 "Malformed UTF-8 string\n");
         }
 
-        ++u8ptr;
-        ++characters;
+        ++chars;
 
-        if (c == (UINTVAL)delim) {
-            res = -1;
+        if (c == delim) {
+            i += 1;
             break;
         }
     }
 
-    src->bufused = (const char *)u8ptr - (const char *)src->strstart;
-    src->strlen  = characters;
+    bounds->bytes = i;
+    bounds->chars = chars;
+    bounds->delim = c;
 
     return res;
 }

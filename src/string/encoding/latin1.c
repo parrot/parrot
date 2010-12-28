@@ -40,12 +40,12 @@ static STRING* latin1_downcase_first(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static INTVAL latin1_partial_scan(PARROT_INTERP,
-    ARGMOD(STRING *src),
-    INTVAL count,
-    INTVAL delim)
+    ARGIN(const char *buf),
+    ARGMOD(Parrot_String_Bounds *bounds))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*src);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*bounds);
 
 static void latin1_scan(PARROT_INTERP, ARGMOD(STRING *src))
         __attribute__nonnull__(1)
@@ -89,7 +89,8 @@ static STRING* latin1_upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_latin1_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(buf) \
+    , PARROT_ASSERT_ARG(bounds))
 #define ASSERT_ARGS_latin1_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -177,8 +178,8 @@ latin1_scan(PARROT_INTERP, ARGMOD(STRING *src))
 
 /*
 
-=item C<static INTVAL latin1_partial_scan(PARROT_INTERP, STRING *src, INTVAL
-count, INTVAL delim)>
+=item C<static INTVAL latin1_partial_scan(PARROT_INTERP, const char *buf,
+Parrot_String_Bounds *bounds)>
 
 Partial scan of latin1 string. Stops after C<count> bytes or if character
 C<delim> is found. Setting C<count> or C<delim> to -1 disables these tests.
@@ -188,31 +189,38 @@ C<delim> is found. Setting C<count> or C<delim> to -1 disables these tests.
 */
 
 static INTVAL
-latin1_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
-        INTVAL delim)
+latin1_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
+        ARGMOD(Parrot_String_Bounds *bounds))
 {
     ASSERT_ARGS(latin1_partial_scan)
-    size_t i;
-    size_t len = src->bufused;
-    INTVAL res = 0;
+    UINTVAL       i;
+    UINTVAL       len   = bounds->bytes;
+    const INTVAL  chars = bounds->chars;
+    const INTVAL  delim = bounds->delim;
+    INTVAL        c     = -1;
 
-    if (count >= 0 && (UINTVAL)count < len)
-        len = count;
+    if (chars >= 0 && (UINTVAL)chars < len)
+        len = chars;
 
     if (delim >= 0) {
         for (i = 0; i < len; ++i) {
-            if (src->strstart[i] == delim) {
+            c = (unsigned char)buf[i];
+
+            if (c == delim) {
                 len = i + 1;
-                res = -1;
                 break;
             }
         }
     }
+    else {
+        c = buf[len-1];
+    }
 
-    src->bufused = len;
-    src->strlen  = len;
+    bounds->bytes = len;
+    bounds->chars = len;
+    bounds->delim = c;
 
-    return res;
+    return 0;
 }
 
 

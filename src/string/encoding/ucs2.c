@@ -71,12 +71,12 @@ static UINTVAL ucs2_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
         __attribute__nonnull__(2);
 
 static INTVAL ucs2_partial_scan(PARROT_INTERP,
-    ARGMOD(STRING *src),
-    INTVAL count,
-    INTVAL delim)
+    ARGIN(const char *buf),
+    ARGMOD(Parrot_String_Bounds *bounds))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*src);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*bounds);
 
 static void ucs2_scan(PARROT_INTERP, ARGMOD(STRING *src))
         __attribute__nonnull__(1)
@@ -110,7 +110,8 @@ static STRING * ucs2_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ucs2_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(buf) \
+    , PARROT_ASSERT_ARG(bounds))
 #define ASSERT_ARGS_ucs2_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -207,8 +208,8 @@ ucs2_scan(PARROT_INTERP, ARGMOD(STRING *src))
 
 /*
 
-=item C<static INTVAL ucs2_partial_scan(PARROT_INTERP, STRING *src, INTVAL
-count, INTVAL delim)>
+=item C<static INTVAL ucs2_partial_scan(PARROT_INTERP, const char *buf,
+Parrot_String_Bounds *bounds)>
 
 Partial scan of UCS-2 string
 
@@ -217,32 +218,36 @@ Partial scan of UCS-2 string
 */
 
 static INTVAL
-ucs2_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
-        INTVAL delim)
+ucs2_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
+        ARGMOD(Parrot_String_Bounds *bounds))
 {
     ASSERT_ARGS(ucs2_partial_scan)
-    const utf16_t * const ptr = (utf16_t *)src->strstart;
-    UINTVAL               len = src->bufused >> 1;
+    const utf16_t * const ptr   = (const utf16_t *)buf;
+    UINTVAL               len   = bounds->bytes >> 1;
+    const INTVAL          chars = bounds->chars;
+    const INTVAL          delim = bounds->delim;
+    INTVAL                c     = -1;
     UINTVAL               i;
-    INTVAL                res = 0;
 
-    if (count >= 0 && (UINTVAL)count < len)
-        len = count;
+    if (chars >= 0 && (UINTVAL)chars < len)
+        len = chars;
 
     for (i = 0; i < len; ++i) {
-        ucs2_check_codepoint(interp, ptr[i]);
+        c = ptr[i];
 
-        if (ptr[i] == delim) {
+        ucs2_check_codepoint(interp, c);
+
+        if (c == delim) {
             len = i + 1;
-            res = -1;
             break;
         }
     }
 
-    src->bufused = len << 1;
-    src->strlen  = len;
+    bounds->bytes = len << 1;
+    bounds->chars = len;
+    bounds->delim = c;
 
-    return res;
+    return 0;
 }
 
 

@@ -35,7 +35,6 @@
 #define STRING_hash(i, src, seed) ((src)->encoding)->hash((i), (src), (seed))
 
 #define STRING_scan(i, src) ((src)->encoding)->scan((i), (src))
-#define STRING_partial_scan(i, src, count, delim) ((src)->encoding)->partial_scan((i), (src), (count), (delim))
 #define STRING_ord(i, src, offset) ((src)->encoding)->ord((i), (src), (offset))
 #define STRING_substr(i, src, offset, count) ((src)->encoding)->substr((i), (src), (offset), (count))
 
@@ -81,6 +80,12 @@ typedef struct string_iterator_t {
     UINTVAL charpos;
 } String_iter;
 
+typedef struct _Parrot_String_Bounds {
+    UINTVAL bytes;
+    INTVAL  chars;
+    INTVAL  delim;
+} Parrot_String_Bounds;
+
 /* constructors */
 typedef STRING * (*str_vtable_to_encoding_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef STRING * (*str_vtable_chr_t)(PARROT_INTERP, UINTVAL codepoint);
@@ -92,7 +97,7 @@ typedef INTVAL   (*str_vtable_rindex_t)(PARROT_INTERP, ARGIN(const STRING *src),
 typedef size_t   (*str_vtable_hash_t)(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval);
 
 typedef void     (*str_vtable_scan_t)(PARROT_INTERP, ARGMOD(STRING *src));
-typedef INTVAL   (*str_vtable_partial_scan_t)(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count, INTVAL delim);
+typedef INTVAL   (*str_vtable_partial_scan_t)(PARROT_INTERP, ARGIN(const char *buf), ARGMOD(Parrot_String_Bounds *bounds));
 typedef UINTVAL  (*str_vtable_ord_t)(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset);
 typedef STRING * (*str_vtable_substr_t)(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL count);
 

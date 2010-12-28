@@ -453,7 +453,6 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
     unsigned char *buffer_next;
     unsigned char *buffer_end;
     STRING        *s;
-    STRING         part;
 
     if (*buf == NULL) {
         *buf = Parrot_gc_new_string_header(interp, 0);
@@ -476,30 +475,31 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
     buffer_next = Parrot_io_get_buffer_next(interp, filehandle);
     buffer_end  = Parrot_io_get_buffer_end(interp, filehandle);
 
-    part.encoding = s->encoding;
-
     while (1) {
+        Parrot_String_Bounds bounds;
+
         const size_t buffer_size = buffer_end - buffer_next;
         size_t       chunk_size, new_size, decoded_bytes;
-        INTVAL       got, res;
+        INTVAL       got;
 
         /* Partial scan of buffer */
 
-        part.strstart = (char *)buffer_next;
-        part.bufused  = buffer_end - buffer_next;
+        bounds.bytes = buffer_end - buffer_next;
+        bounds.chars = -1;
+        bounds.delim = '\n';
 
-        res = STRING_partial_scan(interp, &part, -1, '\n');
+        s->encoding->partial_scan(interp, buffer_next, &bounds);
 
         /* Append buffer to result */
 
-        if (res < 0)
+        if (bounds.delim == '\n')
             /* End of line, use only part of buffer */
-            chunk_size = part.bufused;
+            chunk_size = bounds.bytes;
         else
             /* Copy whole buffer, might copy partial characters */
             chunk_size = buffer_size;
 
-        decoded_bytes = s->bufused + part.bufused;
+        decoded_bytes = s->bufused + bounds.bytes;
         new_size      = s->bufused + chunk_size;
 
         if (s->strstart)
@@ -510,9 +510,9 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
         memcpy(s->strstart + s->bufused, buffer_next, chunk_size);
 
         s->bufused  = new_size;
-        s->strlen  += part.strlen;
+        s->strlen  += bounds.chars;
 
-        if (res < 0) {
+        if (bounds.delim == '\n') {
             /* End of line */
             buffer_next += chunk_size;
             Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
@@ -526,7 +526,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
         if (got == 0) {
             /* End of file */
 
-            if (part.bufused == buffer_size) {
+            if (bounds.bytes == buffer_size) {
                 buffer_next = buffer_end;
                 break;
             }
@@ -540,7 +540,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
         buffer_next = Parrot_io_get_buffer_next(interp, filehandle);
         buffer_end  = Parrot_io_get_buffer_end(interp, filehandle);
 
-        if (part.bufused < buffer_size) {
+        if (bounds.bytes < buffer_size) {
             /* Handle character split across buffers */
 
             size_t bytes_l = s->bufused - decoded_bytes;
@@ -551,26 +551,28 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
 
             /* Partial scan of single character */
 
-            part.strstart = s->strstart + decoded_bytes;
-            part.bufused  = bytes_l + bytes_r;
+            bounds.bytes = bytes_l + bytes_r;
+            bounds.chars = 1;
+            bounds.delim = '\n';
 
-            res = STRING_partial_scan(interp, &part, 1, '\n');
+            s->encoding->partial_scan(interp, s->strstart + decoded_bytes,
+                                      &bounds);
 
-            if (part.bufused == 0)
+            if (bounds.bytes == 0)
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_CHARACTER,
                     "Unaligned end in %s string\n", s->encoding->name);
 
-            PARROT_ASSERT(part.strlen == 1);
+            PARROT_ASSERT(bounds.chars == 1);
 
-            bytes_r = part.bufused - bytes_l;
+            bytes_r = bounds.bytes - bytes_l;
 
             s->bufused  += bytes_r;
             s->strlen   += 1;
 
             buffer_next += bytes_r;
 
-            if (res < 0 || (size_t)got == bytes_r) {
+            if (bounds.delim == '\n' || (size_t)got == bytes_r) {
                 Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
                 break;
             }

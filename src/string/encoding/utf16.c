@@ -83,12 +83,12 @@ static UINTVAL utf16_ord(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static INTVAL utf16_partial_scan(PARROT_INTERP,
-    ARGMOD(STRING *src),
-    INTVAL count,
-    INTVAL delim)
+    ARGIN(const char *buf),
+    ARGMOD(Parrot_String_Bounds *bounds))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*src);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*bounds);
 
 static void utf16_scan(PARROT_INTERP, ARGMOD(STRING *src))
         __attribute__nonnull__(1)
@@ -142,7 +142,8 @@ static STRING * utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_utf16_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(buf) \
+    , PARROT_ASSERT_ARG(bounds))
 #define ASSERT_ARGS_utf16_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -229,20 +230,26 @@ static void
 utf16_scan(PARROT_INTERP, ARGMOD(STRING *src))
 {
     ASSERT_ARGS(utf16_scan)
-    const UINTVAL orig_bufused = src->bufused;
+    Parrot_String_Bounds bounds;
 
-    utf16_partial_scan(interp, src, -1, -1);
+    bounds.bytes = src->bufused;
+    bounds.chars = -1;
+    bounds.delim = -1;
 
-    if (src->bufused != orig_bufused)
+    utf16_partial_scan(interp, src->strstart, &bounds);
+
+    if (bounds.bytes != src->bufused)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF16,
             "Unaligned end in UTF-16 string\n");
+
+    src->strlen = bounds.chars;
 }
 
 
 /*
 
-=item C<static INTVAL utf16_partial_scan(PARROT_INTERP, STRING *src, INTVAL
-count, INTVAL delim)>
+=item C<static INTVAL utf16_partial_scan(PARROT_INTERP, const char *buf,
+Parrot_String_Bounds *bounds)>
 
 Partial scan of UTF-16 string
 
@@ -251,23 +258,27 @@ Partial scan of UTF-16 string
 */
 
 static INTVAL
-utf16_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
-        INTVAL delim)
+utf16_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
+        ARGMOD(Parrot_String_Bounds *bounds))
 {
     ASSERT_ARGS(utf16_partial_scan)
-    const utf16_t *p         = (utf16_t *)src->strstart;
-    UINTVAL        len       = 0;
-    UINTVAL        max_chars = count >= 0 ? (UINTVAL)count : src->bufused;
-    UINTVAL        i, n;
-    INTVAL         res       = 0;
+    const utf16_t * const p         = (const utf16_t *)buf;
+    UINTVAL               len       = bounds->bytes >> 1;
+    INTVAL                max_chars = bounds->chars;
+    const INTVAL          delim     = bounds->delim;
+    INTVAL                c         = -1;
+    INTVAL                chars     = 0;
+    INTVAL                res       = 0;
+    UINTVAL               i;
 
-    n = src->bufused >> 1;
+    if (max_chars < 0)
+        max_chars = len;
 
-    for (i = 0; i < n && len < max_chars; ++i) {
-        UINTVAL c = p[i];
+    for (i = 0; i < len && chars < max_chars; ++i) {
+        c = p[i];
 
         if (UNICODE_IS_HIGH_SURROGATE(c)) {
-            if (i + 1 >= n) {
+            if (i + 1 >= len) {
                 /* Two more bytes needed */
                 res = 2;
                 break;
@@ -291,17 +302,17 @@ utf16_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
                 "Non-character in UTF-16 string\n");
 
-        ++len;
+        ++chars;
 
-        if (c == (UINTVAL)delim) {
-            i   += 1;
-            res  = -1;
+        if (c == delim) {
+            i += 1;
             break;
         }
     }
 
-    src->bufused = i << 1;
-    src->strlen  = len;
+    bounds->bytes = i << 1;
+    bounds->chars = chars;
+    bounds->delim = c;
 
     return res;
 }

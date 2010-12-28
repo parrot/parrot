@@ -15,14 +15,14 @@ typedef unsigned char utf8_t;
 typedef Parrot_UInt2  utf16_t;
 typedef Parrot_Int4   utf32_t;
 
-#define UNICODE_SURROGATE_FIRST         0xD800u
-#define UNICODE_SURROGATE_LAST          0xDFFFu
-#define UNICODE_HIGH_SURROGATE_FIRST    0xD800u
-#define UNICODE_HIGH_SURROGATE_LAST     0xDBFFu
+#define UNICODE_SURROGATE_FIRST         0xD800
+#define UNICODE_SURROGATE_LAST          0xDFFF
+#define UNICODE_HIGH_SURROGATE_FIRST    0xD800
+#define UNICODE_HIGH_SURROGATE_LAST     0xDBFF
 #define UNICODE_HIGH_SURROGATE_SHIFT    10
-#define UNICODE_LOW_SURROGATE_FIRST     0xDC00u
-#define UNICODE_LOW_SURROGATE_LAST      0xDFFFu
-#define UNICODE_LOW_SURROGATE_MASK      0x3FFu
+#define UNICODE_LOW_SURROGATE_FIRST     0xDC00
+#define UNICODE_LOW_SURROGATE_LAST      0xDFFF
+#define UNICODE_LOW_SURROGATE_MASK      0x3FF
 
 #define UNICODE_IS_SURROGATE(c)        ((c) >= UNICODE_SURROGATE_FIRST && \
                                         (c) <= UNICODE_SURROGATE_LAST)
@@ -30,23 +30,23 @@ typedef Parrot_Int4   utf32_t;
                                         (c) <= UNICODE_HIGH_SURROGATE_LAST)
 #define UNICODE_IS_LOW_SURROGATE(c)    ((c) >= UNICODE_LOW_SURROGATE_FIRST && \
                                         (c) <= UNICODE_LOW_SURROGATE_LAST)
-#define UNICODE_IS_INVARIANT(c)        ((c) <  0x80u)
-#define UNICODE_IS_NON_CHARACTER(c)   (((c) &  0xFFFEu) == 0xFFFEu || \
-                                       ((c) >= 0xFDD0u && (c) <= 0xFDEFu))
+#define UNICODE_IS_INVARIANT(c)        ((c) <  0x80)
+#define UNICODE_IS_NON_CHARACTER(c)   (((c) &  0xFFFE) == 0xFFFE || \
+                                       ((c) >= 0xFDD0 && (c) <= 0xFDEF))
 #define UNICODE_IS_INVALID(c)          ((c) >= UNICODE_SURROGATE_FIRST && \
-                                       ((c) <= 0xFDEFu ? \
+                                       ((c) <= 0xFDEF ? \
                                         (c) <= UNICODE_SURROGATE_LAST || \
-                                        (c) >= 0xFDD0u : \
-                                       ((c) &  0xFFFEu) == 0xFFFEu || \
-                                        (c) >  0x10FFFFu))
+                                        (c) >= 0xFDD0 : \
+                                       ((c) &  0xFFFE) == 0xFFFE || \
+                                        (c) >  0x10FFFF))
 
 #define UNICODE_HIGH_SURROGATE(c) \
-  ((((c) - 0x10000u) >> UNICODE_HIGH_SURROGATE_SHIFT) + UNICODE_HIGH_SURROGATE_FIRST)
+  ((((c) - 0x10000) >> UNICODE_HIGH_SURROGATE_SHIFT) + UNICODE_HIGH_SURROGATE_FIRST)
 #define UNICODE_LOW_SURROGATE(c) \
-  ((((c) - 0x10000u) & UNICODE_LOW_SURROGATE_MASK) + UNICODE_LOW_SURROGATE_FIRST)
+  ((((c) - 0x10000) & UNICODE_LOW_SURROGATE_MASK) + UNICODE_LOW_SURROGATE_FIRST)
 #define UNICODE_DECODE_SURROGATE(high, low) \
   ((((high) - UNICODE_HIGH_SURROGATE_FIRST) << UNICODE_HIGH_SURROGATE_SHIFT) + \
-    ((low) - UNICODE_LOW_SURROGATE_FIRST) + 0x10000u)
+    ((low) - UNICODE_LOW_SURROGATE_FIRST) + 0x10000)
 
 #define UNISKIP(uv) ((uv) < 0x80    ? 1 : \
                      (uv) < 0x800   ? 2 : \
@@ -70,20 +70,20 @@ typedef Parrot_Int4   utf32_t;
 
  */
 
-#define UTF8_IS_START(c)                ((c) >= 0xC2u && (c) <= 0xF4u)
-#define UTF8_IS_CONTINUATION(c)         ((c) >= 0x80u && (c) <= 0xBFu)
-#define UTF8_IS_CONTINUED(c)            ((c) &  0x80u)
+#define UTF8_IS_START(c)                ((c) >= 0xC2 && (c) <= 0xF4)
+#define UTF8_IS_CONTINUATION(c)         ((c) >= 0x80 && (c) <= 0xBF)
+#define UTF8_IS_CONTINUED(c)            ((c) &  0x80)
 
-#define UTF8_START_MARK(len) (len == 1 ? 0 : (0x7Eu << (7-len)) & 0xFF)
-#define UTF8_START_MASK(len) (len == 1 ? 0x7Fu : 0x1Fu >> (len-2))
+#define UTF8_START_MARK(len) (len == 1 ? 0 : (0x7E << (7-len)) & 0xFF)
+#define UTF8_START_MASK(len) (len == 1 ? 0x7F : 0x1F >> (len-2))
 
-#define UTF8_CONTINUATION_MARK           0x80u
+#define UTF8_CONTINUATION_MARK           0x80
 #define UTF8_ACCUMULATION_SHIFT          6
-#define UTF8_CONTINUATION_MASK           0x3Fu
+#define UTF8_CONTINUATION_MASK           0x3F
 #define UTF8_ACCUMULATE(old, new)       (((old) << UTF8_ACCUMULATION_SHIFT) | ((new) & UTF8_CONTINUATION_MASK))
 
-#define UTF8_IS_OVERLONG(c1, c2)       (((c1) == 0xE0u && (c2) < 0xA0u) || \
-                                        ((c1) == 0xF0u && (c2) < 0x90u))
+#define UTF8_IS_OVERLONG(c1, c2)       (((c1) == 0xE0 && (c2) < 0xA0) || \
+                                        ((c1) == 0xF0 && (c2) < 0x90))
 
 extern const char Parrot_utf8skip[256];
 

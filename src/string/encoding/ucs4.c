@@ -67,12 +67,12 @@ static UINTVAL ucs4_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
         __attribute__nonnull__(2);
 
 static INTVAL ucs4_partial_scan(PARROT_INTERP,
-    ARGMOD(STRING *src),
-    INTVAL count,
-    INTVAL delim)
+    ARGIN(const char *buf),
+    ARGMOD(Parrot_String_Bounds *bounds))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*src);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*bounds);
 
 static void ucs4_scan(PARROT_INTERP, ARGMOD(STRING *src))
         __attribute__nonnull__(1)
@@ -104,7 +104,8 @@ static STRING * ucs4_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_ucs4_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(buf) \
+    , PARROT_ASSERT_ARG(bounds))
 #define ASSERT_ARGS_ucs4_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -204,8 +205,8 @@ ucs4_scan(PARROT_INTERP, ARGMOD(STRING *src))
 
 /*
 
-=item C<static INTVAL ucs4_partial_scan(PARROT_INTERP, STRING *src, INTVAL
-count, INTVAL delim)>
+=item C<static INTVAL ucs4_partial_scan(PARROT_INTERP, const char *buf,
+Parrot_String_Bounds *bounds)>
 
 Partial scan of UCS-4 string
 
@@ -214,36 +215,38 @@ Partial scan of UCS-4 string
 */
 
 static INTVAL
-ucs4_partial_scan(PARROT_INTERP, ARGMOD(STRING *src), INTVAL count,
-        INTVAL delim)
+ucs4_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
+        ARGMOD(Parrot_String_Bounds *bounds))
 {
     ASSERT_ARGS(ucs4_partial_scan)
-    const utf32_t * const ptr = (utf32_t *)src->strstart;
-    UINTVAL               len = src->bufused >> 2;
+    const utf32_t * const ptr = (const utf32_t *)buf;
+    UINTVAL               len   = bounds->bytes >> 1;
+    const INTVAL          chars = bounds->chars;
+    const INTVAL          delim = bounds->delim;
+    INTVAL                c     = -1;
     UINTVAL               i;
-    INTVAL                res = 0;
 
-    if (count >= 0 && (UINTVAL)count < len)
-        len = count;
+    if (chars >= 0 && (UINTVAL)chars < len)
+        len = chars;
 
     for (i = 0; i < len; ++i) {
-        UINTVAL c = ptr[i];
+        c = ptr[i];
 
         if (UNICODE_IS_INVALID(c))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
                     "Invalid character in UCS-4 string\n");
 
-        if (c == (UINTVAL)delim) {
+        if (c == delim) {
             len = i + 1;
-            res = -1;
             break;
         }
     }
 
-    src->bufused = len << 2;
-    src->strlen  = len;
+    bounds->bytes = len << 2;
+    bounds->chars = len;
+    bounds->delim = c;
 
-    return res;
+    return 0;
 }
 
 

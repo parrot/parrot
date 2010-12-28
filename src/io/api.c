@@ -477,7 +477,17 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
             STRING_scan(interp, result);
         }
         else {
-            INTVAL needed = STRING_partial_scan(interp, result, -1, -1);
+            Parrot_String_Bounds bounds;
+            INTVAL               needed;
+
+            bounds.bytes = result->bufused;
+            bounds.chars = -1;
+            bounds.delim = -1;
+
+            needed = encoding->partial_scan(interp, result->strstart, &bounds);
+
+            result->bufused = bounds.bytes;
+            result->strlen  = bounds.chars;
 
             /* Read and append remaining bytes in case of a partial result */
             if (needed > 0) {
