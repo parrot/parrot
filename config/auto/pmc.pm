@@ -119,6 +119,13 @@ END
             $o_deps{$header} = 1; 
         }
 
+        # includes of includes
+        # (cheat. The right way to handle this is to do what
+        # checkdepend.t does.)
+        if (exists $o_deps{'include/parrot/oplib/core_ops.h'} ) {
+            $o_deps{'include/parrot/runcore_api.h'} = 1;
+        }
+
         my $o_deps = "    " . join(" \\\n    ", keys %o_deps);
         $TEMP_pmc_build .= <<END
 src/pmc/$pmc.c : src/pmc/$pmc.dump
