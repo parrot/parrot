@@ -338,10 +338,7 @@ utf16_skip_forward(ARGIN(const utf16_t *p), UINTVAL count)
     UINTVAL i;
 
     for (i = 0; i < count; ++i) {
-        if (UNICODE_IS_HIGH_SURROGATE(*p))
-            p += 2;
-        else
-            p += 1;
+        p += UTF16SKIP(*p);
     }
 
     return p;

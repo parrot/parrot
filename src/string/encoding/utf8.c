@@ -260,7 +260,7 @@ utf8_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
         c = p[i];
 
         if (UTF8_IS_START(c)) {
-            UINTVAL len2 = UTF8SKIP(p + i);
+            UINTVAL len2 = Parrot_utf8skip[c];
             UINTVAL count;
 
             if (i + len2 > len) {
@@ -273,7 +273,7 @@ utf8_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
                     "Overlong form in UTF-8 string\n");
 
-            c &= UTF8_START_MASK(len);
+            c &= UTF8_START_MASK(len2);
 
             for (count = 1; count < len2; ++count) {
                 ++i;
@@ -357,10 +357,11 @@ utf8_decode(PARROT_INTERP, ARGIN(const utf8_t *ptr))
     UINTVAL c = *u8ptr;
 
     if (UTF8_IS_START(c)) {
-        UINTVAL len = UTF8SKIP(u8ptr);
+        UINTVAL len = Parrot_utf8skip[c];
         UINTVAL count;
 
         c &= UTF8_START_MASK(len);
+
         for (count = 1; count < len; ++count) {
             ++u8ptr;
 
@@ -387,19 +388,27 @@ static utf8_t *
 utf8_encode(PARROT_INTERP, ARGMOD(utf8_t *ptr), UINTVAL c)
 {
     ASSERT_ARGS(utf8_encode)
-    const UINTVAL  len = UNISKIP(c);
-    utf8_t        *end = ptr + len - 1;
+    UINTVAL  len;
+    utf8_t  *end;
+
+    if (c < 0x80) {
+        *ptr = c;
+        return ptr + 1;
+    }
 
     if (UNICODE_IS_INVALID(c))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
                 "Invalid character for UTF-8 encoding\n");
+
+    len = UNISKIP(c);
+    end = ptr + len - 1;
 
     while (end > ptr) {
         *end-- = (c & UTF8_CONTINUATION_MASK) | UTF8_CONTINUATION_MARK;
         c >>= UTF8_ACCUMULATION_SHIFT;
     }
 
-    *end = (c & UTF8_START_MASK(len)) | UTF8_START_MARK(len);
+    *end = c | UTF8_START_MARK(len);
 
     return ptr + len;
 }
@@ -422,7 +431,7 @@ utf8_skip_forward(ARGIN(const utf8_t *ptr), UINTVAL n)
     ASSERT_ARGS(utf8_skip_forward)
 
     while (n-- > 0) {
-        ptr += UTF8SKIP(ptr);
+        ptr += Parrot_utf8skip[*ptr];
     }
 
     return ptr;
@@ -539,7 +548,7 @@ utf8_iter_get_and_advance(PARROT_INTERP,
     UINTVAL       c   = utf8_decode(interp, ptr);
 
     i->charpos += 1;
-    i->bytepos += UTF8SKIP(ptr);
+    i->bytepos += Parrot_utf8skip[*ptr];
 
     PARROT_ASSERT(i->bytepos <= str->bufused);
 
