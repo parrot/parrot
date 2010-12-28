@@ -18,7 +18,7 @@ Bare minimal functionality available, only for posix platforms
 
 #include "parrot/parrot.h"
 #include "../src/io/io_private.h"
-#include "../src/string/unicode.h"
+#include "../src/string/encoding/unicode.h"
 
 #define CAN_READ  1
 #define CAN_WRITE 2

@@ -18,7 +18,7 @@ UCS-4 encoding
 */
 
 #include "parrot/parrot.h"
-#include "../unicode.h"
+#include "unicode.h"
 #include "shared.h"
 
 /* HEADERIZER HFILE: none */

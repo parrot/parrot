@@ -18,7 +18,7 @@ UTF-8 (L<http://www.utf-8.com/>).
 */
 
 #include "parrot/parrot.h"
-#include "../unicode.h"
+#include "unicode.h"
 #include "shared.h"
 
 /* HEADERIZER HFILE: none */

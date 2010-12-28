@@ -1790,25 +1790,25 @@ src/string/encoding/utf8$(O) : \
     $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/utf8.c \
-    src/string/unicode.h
+    src/string/encoding/unicode.h
 
 src/string/encoding/utf16$(O) : \
     $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/utf16.c \
-    src/string/unicode.h
+    src/string/encoding/unicode.h
 
 src/string/encoding/ucs2$(O) : \
     $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/ucs2.c \
-    src/string/unicode.h
+    src/string/encoding/unicode.h
 
 src/string/encoding/ucs4$(O) : \
     $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/ucs4.c \
-    src/string/unicode.h
+    src/string/encoding/unicode.h
 
 frontend/pbc_merge/main$(O) : \
     $(INC_DIR)/embed.h \
