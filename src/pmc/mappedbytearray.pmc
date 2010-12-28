@@ -18,7 +18,6 @@ Bare minimal functionality available, only for posix platforms
 
 #include "parrot/parrot.h"
 #include "../src/io/io_private.h"
-#include "../src/string/encoding/unicode.h"
 
 #define CAN_READ  1
 #define CAN_WRITE 2
@@ -395,24 +394,25 @@ in codepoints.
     METHOD get_utf8(INTVAL pos, INTVAL length)
     {
         #ifdef ENABLED
+        Parrot_String_Bounds bounds;
         STRING *result;
         unsigned char *buffer;
         INTVAL size;
-        INTVAL curpos;
-        INTVAL charlen;
-        unsigned char c;
         GET_ATTR_buffer(INTERP, SELF, buffer);
         GET_ATTR_size(INTERP, SELF, size);
-        for (curpos = pos; length > 0; --length) {
-            if (curpos < 0 || curpos >= size)
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
-                        EXCEPTION_OUT_OF_BOUNDS,
-                        "get_utf8: index out of mapped");
-            c = buffer[curpos];
-            charlen = Parrot_utf8skip[c];
-            curpos += charlen;
-        }
-        result = build_string(INTERP, buffer + pos, curpos - pos, Parrot_utf8_encoding_ptr);
+        bounds.bytes = size - pos;
+        bounds.chars = length;
+        bounds.delim = -1;
+        Parrot_utf8_encoding_ptr->partial_scan(INTERP, buffer + pos, &bounds);
+        if (bounds.chars < length)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_OUT_OF_BOUNDS,
+                    "get_utf8: index out of mapped");
+        result = Parrot_str_new_noinit(INTERP, bounds.bytes);
+        result->encoding = Parrot_utf8_encoding_ptr;
+        result->bufused  = bounds.bytes;
+        result->strlen   = bounds.chars;
+        memcpy(result->strstart, buffer + pos, bounds.bytes);
         RETURN(STRING *result);
         #endif
     }
