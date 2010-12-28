@@ -20,7 +20,7 @@ Tests the BigInt PMC.
     .include 'test_more.pir'
 
     .local int num_tests
-    num_tests = 68
+    num_tests = 70
     plan(num_tests)
 
     .local int good
@@ -476,6 +476,42 @@ OK13:
     $P1 = 1000000
     mul $P0, $P1
     is($P0, '999999000000', 'i_mul(bigint,integer)')
+
+    $I1 = 1
+    $P0 = '12345678900000000'
+    $P1 = new ['Float']
+    $P1 = 1.1
+    push_eh E1
+      mul $P0, $P0, $P1
+      $I1 = 0
+      say 'Failed to throw exception'
+E1:
+    pop_eh
+    get_results '0', $P0
+    $S0 = $P0
+    eq $S0, "BigInt: no multiple dispatch variant 'multiply' for Float", OK1
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK1:
+    ok($I1, 'multiply(bigint,float) throws exception')
+    $I1 = 1
+
+    push_eh E2
+      mul $P0, $P1
+      $I1 = 0
+      say 'Failed to throw exception'
+E2:
+    pop_eh
+    get_results '0', $P0
+    $S0 = $P0
+    eq $S0, "Multiple Dispatch: No suitable candidate found for 'i_multiply', with signature 'PP'", OK2
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK2:
+    ok($I1, 'i_multiply(bigint,float) throws exception')
+    $I1 = 1
 .end
 
 .sub division
