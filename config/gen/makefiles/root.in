@@ -2592,6 +2592,11 @@ COVER_DIRS = \
     $(BUILD_DIR)/t/perl \
     compilers/imcc
 
+HAVE_COVER  = @have_cover@
+COVER       = @cover@
+GCOV        = @gcov@
+GCOV2PERL   = @gcov2perl@
+
 cover: \
     cover.dummy \
     cover-testb \
@@ -2605,20 +2610,27 @@ cover: \
     cover-benchmark \
     cover-manifest \
     cover-examples \
-    cover-distro \
-    cover-report
+    cover-distro
+	for dir in $(COVER_DIRS); \
+    do \
+	for file in $$dir/*.c; \
+	do \
+	    $(GCOV) -p -o $$dir $$file; \
+	done \
+    done
+	if [ -n "$(GCOV2PERL)" -a -n "$(COVER)" ]; \
+    then \
+	$(COVER) -delete $(COVERAGE_DIR); \
+	$(GCOV2PERL) -db $(COVERAGE_DIR) *.gcov; \
+	$(COVER) -no-gcov $(COVERAGE_DIR); \
+    else \
+	echo "gcov2perl and cover not found."; \
+	echo "Install Devel::Cover for HTML coverage reports."; \
+    fi
 
 quickcover: \
     cover.dummy \
-    cover-test_core \
-    cover-report
-
-HAVE_COVER  = @have_cover@
-COVER       = @cover@
-GCOV        = @gcov@
-GCOV2PERL   = @gcov2perl@
-
-cover-report:
+    cover-test_core
 	for dir in $(COVER_DIRS); \
     do \
 	for file in $$dir/*.c; \
