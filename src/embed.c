@@ -1155,7 +1155,7 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code)
 length, const unsigned char *bytes)>
 
 Legacy function for setting the configuration hash as an array of bytes for
-the old API. New programs should not use this. They should use he new API and
+the old API. New programs should not use this. They should use the new API and
 C<Parrot_api_set_configuration_hash>
 
 =cut
