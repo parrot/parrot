@@ -77,6 +77,12 @@ static void pbc_fixup_bytecode(PARROT_INTERP,
         FUNC_MODIFIES(*inputs)
         FUNC_MODIFIES(*bc);
 
+static void pbc_fixup_constants(PARROT_INTERP,
+    pbc_merge_input **inputs,
+    int num_inputs,
+    PackFile_ConstTable *ct)
+        __attribute__nonnull__(1);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile* pbc_merge_begin(PARROT_INTERP,
@@ -144,6 +150,8 @@ static void pbc_merge_write(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs) \
     , PARROT_ASSERT_ARG(bc))
+#define ASSERT_ARGS_pbc_fixup_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_pbc_merge_begin __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs))
@@ -721,10 +729,11 @@ Fixup constants. This includes correcting pointers into bytecode.
 
 */
 
-static void pbc_fixup_constants(PARROT_INTERP, pbc_merge_input **inputs,
+static void
+pbc_fixup_constants(PARROT_INTERP, pbc_merge_input **inputs,
                                 int num_inputs, PackFile_ConstTable *ct)
 {
-    // ASSERT_ARGS(pbc_fixup_constants)
+    ASSERT_ARGS(pbc_fixup_constants)
     int i, j;
 
     /* Loop over input files. */
