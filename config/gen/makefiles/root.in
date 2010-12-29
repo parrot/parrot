@@ -1046,7 +1046,8 @@ $(INSTALLABLEPROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
 frontend/parrot_debugger/main$(O) : \
     $(PARROT_H_HEADERS) \
     frontend/parrot_debugger/main.c \
-    $(INC_DIR)/runcore_api.h
+    $(INC_DIR)/runcore_api.h \
+    $(INC_DIR)/embed.h
 
 $(PDB) : frontend/parrot_debugger/main$(O) src/parrot_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
