@@ -18,7 +18,7 @@ Tests the MappedByteArray PMC.
 .sub main :main
     .include 'test_more.pir'
     .const int inittests = 4
-    .const int moretests = 1
+    .const int moretests = 2
     .local int alltests
     alltests = inittests + moretests
     plan(alltests)
@@ -33,7 +33,7 @@ Tests the MappedByteArray PMC.
 
   more:
     ok(1, "Mapped files are supported")
-
+    test_read()
   end:
 .end
 
@@ -66,6 +66,17 @@ Tests the MappedByteArray PMC.
     r = mm.'supported'()
     ok(1, "method 'supported' called")
     .return(r)
+.end
+
+# Test reading a file
+.sub test_read
+    .local pmc mm
+    
+    mm = new ['MappedByteArray']
+    mm."open"("t/pmc/testfile","r")
+    $I1 = elements mm
+    $S0 = mm.'get_string'(0, $I1, 'utf8')
+    is($S0, "This is a test", "Reading Test file successful")
 .end
 
 # Local Variables:
