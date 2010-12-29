@@ -71,7 +71,7 @@ Tests the MappedByteArray PMC.
 # Test reading a file
 .sub test_read
     .local pmc mm
-    
+
     mm = new ['MappedByteArray']
     mm."open"("t/pmc/testfile","r")
     $I1 = elements mm
