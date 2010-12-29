@@ -791,6 +791,79 @@ Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
 
 /*
 
+=item C<PMC * Parrot_pmc_box_string(PARROT_INTERP, STRING *string)>
+
+Boxes a STRING C<string> into a String PMC.
+
+=cut
+
+*/
+
+PARROT_HOT
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pmc_box_string(PARROT_INTERP, ARGIN_NULLOK(STRING *string))
+{
+    ASSERT_ARGS(Parrot_pmc_box_string)
+    PMC * ret = Parrot_pmc_new(interp,
+                        Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
+    VTABLE_set_string_native(interp, ret, string);
+
+    return ret;
+}
+
+
+/*
+
+=item C<PMC* Parrot_pmc_box_number(PARROT_INTERP, FLOATVAL value)>
+
+Lookup the PMC type which is used for floating point numbers.
+
+=cut
+
+*/
+
+PARROT_HOT
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_pmc_box_number(PARROT_INTERP, FLOATVAL value)
+{
+    ASSERT_ARGS(Parrot_pmc_box_number)
+    PMC * const ret = Parrot_pmc_new(interp,
+                                     Parrot_hll_get_ctx_HLL_type(interp, enum_class_Float));
+    VTABLE_set_number_native(interp, ret, value);
+    return ret;
+}
+
+
+/*
+
+=item C<PMC* Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)>
+
+Lookup the PMC type which is used for storing native integers.
+
+=cut
+
+*/
+
+PARROT_HOT
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)
+{
+    ASSERT_ARGS(Parrot_pmc_box_integer)
+    PMC * const ret = Parrot_pmc_new(interp,
+                                     Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
+    VTABLE_set_integer_native(interp, ret, value);
+    return ret;
+}
+
+
+/*
+
 =item C<INTVAL Parrot_pmc_get_type(PARROT_INTERP, PMC *name)>
 
 Returns the PMC type for C<name>.
@@ -974,7 +1047,8 @@ Parrot_pmc_gc_unregister(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_pmc_type_does(PARROT_INTERP, STRING *role, INTVAL type)>
+=item C<INTVAL Parrot_pmc_type_does(PARROT_INTERP, const STRING *role, INTVAL
+type)>
 
 Checks to see if PMCs of the given type does the given role. Checks
 C<<vtable->provides_str>> to find a match.
@@ -985,7 +1059,7 @@ Returns true (1) if B<role> is found, false (0) otherwise.
 */
 
 INTVAL
-Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
+Parrot_pmc_type_does(PARROT_INTERP, ARGIN(const STRING *role), INTVAL type)
 {
     ASSERT_ARGS(Parrot_pmc_type_does)
 

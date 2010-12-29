@@ -41,17 +41,12 @@ print << "EOF";
  *
  */
 
-#include "parrot/parrot.h"
+#include <stdio.h>
+#include "parrot/api.h"
 
-/* proto is in embed.h, but we don't include anything here, which
- * could pull in some globals
- */
-void Parrot_set_config_hash(void);
-
-void
-Parrot_gbl_set_config_hash_internal (const unsigned char* parrot_config,
-                                 unsigned int parrot_config_size);
-
+int Parrot_set_config_hash(Parrot_PMC interp_pmc);
+unsigned char * Parrot_get_config_hash_bytes();
+int Parrot_get_config_hash_length();
 
 static const unsigned char parrot_config[] = {
 EOF
@@ -86,10 +81,27 @@ else {
 print << "EOF";
 }; /* parrot_config */
 
-void
-Parrot_set_config_hash(void)
+unsigned char*
+Parrot_get_config_hash_bytes()
 {
-    Parrot_gbl_set_config_hash_internal(parrot_config, sizeof(parrot_config));
+    return (unsigned char*)parrot_config;
+}
+
+int
+Parrot_get_config_hash_length()
+{
+    return sizeof(parrot_config);
+}
+
+int
+Parrot_set_config_hash(Parrot_PMC interp_pmc)
+{
+    Parrot_PMC config = NULL;
+    if (sizeof(parrot_config) <= 1)
+        return 1;
+    return Parrot_api_pmc_null(interp_pmc, &config) &&
+           Parrot_api_pmc_deserialize_bytes(interp_pmc, parrot_config, sizeof(parrot_config), &config) &&
+           Parrot_api_set_configuration_hash(interp_pmc, config);
 }
 EOF
 

@@ -148,6 +148,8 @@ and C<debug_break> ops in F<ops/debug.ops>.
 
 static void PDB_printwelcome(void);
 static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[]);
+const unsigned char * Parrot_get_config_hash_bytes();
+int Parrot_get_config_hash_length();
 
 /*
 
@@ -167,19 +169,17 @@ main(int argc, const char *argv[])
     Parrot_Interp     interp;
     PDB_t *pdb;
     const char       *scriptname = NULL;
-
-    Parrot_set_config_hash();
+    const unsigned char * configbytes = Parrot_get_config_hash_bytes();
+    const int configlength = Parrot_get_config_hash_length();
 
     interp = Parrot_new(NULL);
 
     Parrot_set_executable_name(interp, Parrot_str_new(interp, argv[0], 0));
 
+    Parrot_set_configuration_hash_legacy(interp, configlength, configbytes);
+
     Parrot_debugger_init(interp);
-
     pdb = interp->pdb;
-
-    /*Parrot_set_config_hash();  TODO link with cfg */
-
     pdb->state       = PDB_ENTER;
 
     Parrot_block_GC_mark(interp);

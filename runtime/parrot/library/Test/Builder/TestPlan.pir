@@ -180,7 +180,7 @@ plan.
     expect = expect_int
 
     header = '1..'
-    concat header, expect
+    header = concat header, expect
 
     .return( header )
 .end
@@ -209,10 +209,10 @@ plan.
     footer        = ''
 
     if ran == expect goto PLAN_MATCHED
-    concat footer, 'Expected '
-    concat footer, expect_string
-    concat footer, ' but ran '
-    concat footer, ran_string
+    footer = concat footer, 'Expected '
+    footer = concat footer, expect_string
+    footer = concat footer, ' but ran '
+    footer = concat footer, ran_string
 
   PLAN_MATCHED:
     .return( footer )
@@ -235,7 +235,7 @@ plan.
     footer           = "1.."
     tests_run_string = tests_run
 
-    concat footer, tests_run_string
+    footer = concat footer, tests_run_string
     .return( footer )
 .end
 

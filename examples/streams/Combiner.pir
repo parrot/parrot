@@ -115,9 +115,9 @@ of the Combiner stream.
     .local string ret
 
     ret = strings[0]
-    concat ret, " "
+    ret = concat ret, " "
     str = strings[1]
-    concat ret, str
+    ret = concat ret, str
 
     .return(ret)
 .end
@@ -132,7 +132,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2009, Parrot Foundation.
+Copyright (C) 2004-2010, Parrot Foundation.
 
 =cut
 

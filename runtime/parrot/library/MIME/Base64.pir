@@ -99,9 +99,9 @@ then a warning is generated if perl is running under -w.
 
     # Fill up with with null bytes
     if len_mod_3 == 0 goto END_1
-        concat plain, ascii:"\0"
+        plain = concat plain, ascii:"\0"
         if len_mod_3 == 2 goto END_1
-            concat plain, ascii:"\0"
+            plain = concat plain, ascii:"\0"
     END_1:
 
     base64 = ''
@@ -146,16 +146,16 @@ then a warning is generated if perl is running under -w.
 	# output is larger than input
 	tmp_int_1 = six_to_eight[six_0]
 	s_tmp_1 = chr tmp_int_1
-	concat base64, s_tmp_1
+	base64 = concat base64, s_tmp_1
 	tmp_int_1 = six_to_eight[six_1]
 	s_tmp_1 = chr tmp_int_1
-	concat base64, s_tmp_1
+	base64 = concat base64, s_tmp_1
 	tmp_int_1 = six_to_eight[six_2]
 	s_tmp_1 = chr tmp_int_1
-	concat base64, s_tmp_1
+	base64 = concat base64, s_tmp_1
 	tmp_int_1 = six_to_eight[six_3]
 	s_tmp_1 = chr tmp_int_1
-	concat base64, s_tmp_1
+	base64 = concat base64, s_tmp_1
 
 
     goto START_3
@@ -195,7 +195,7 @@ then a warning is generated if perl is running under -w.
 	tmp_int_2 = eight_to_six[tmp_int_1]
 	if tmp_int_2 == -1 goto START_5
 	s_tmp_1 = chr tmp_int_1
-	concat base64_cleaned, s_tmp_1
+	base64_cleaned = concat base64_cleaned, s_tmp_1
     goto START_5
     END_5:
 
@@ -204,7 +204,7 @@ then a warning is generated if perl is running under -w.
     len_mod_4 = len % 4
 
     # make sure that there are dummy bits beyond
-    concat base64_cleaned, ascii:"\0\0\0"
+    base64_cleaned = concat base64_cleaned, ascii:"\0\0\0"
 
     .local int    eight_0, eight_1, eight_2
     .local int    six_0, six_1, six_2, six_3
@@ -247,11 +247,11 @@ then a warning is generated if perl is running under -w.
 	# write 3*8 bits
 	# output is larger than input
 	s_tmp_1 = chr eight_0
-	concat plain, s_tmp_1
+	plain = concat plain, s_tmp_1
 	s_tmp_1 = chr eight_1
-	concat plain, s_tmp_1
+	plain = concat plain, s_tmp_1
 	s_tmp_1 = chr eight_2
-	concat plain, s_tmp_1
+	plain = concat plain, s_tmp_1
 
     goto START_2
     END_2:

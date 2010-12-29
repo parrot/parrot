@@ -397,10 +397,6 @@ This is to exclude automatically generated C-language files Parrot might have.
         my ( $self, $file ) = @_;
 
         push @exemptions => map { File::Spec->canonpath($_) } qw{
-            config/auto/cpu/i386/memcpy_mmx.c
-            config/auto/cpu/i386/memcpy_mmx_in.c
-            config/auto/cpu/i386/memcpy_sse.c
-            config/auto/cpu/i386/memcpy_sse_in.c
             config/gen/config_h/feature_h.in
             compilers/imcc/imclexer.c
             compilers/imcc/imcparser.c

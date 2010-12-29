@@ -104,29 +104,29 @@ HOUR:
     $I0 = $P0[.TM_HOUR]
     cmod $I0, $I0, 10
     $S1 = $I0
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
 
     # minutes
-    concat $S0, $S2
+    $S0 = concat $S0, $S2
     $I0 = $P0[.TM_MIN]
     $I0 /= 10
     $S1 = $I0
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
     $I0 = $P0[.TM_MIN]
     cmod $I0, $I0, 10
     $S1 = $I0
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
 
     # seconds
-    concat $S0, $S2
+    $S0 = concat $S0, $S2
     $I0 = $P0[.TM_SEC]
     $I0 /= 10
     $S1 = $I0
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
     $I0 = $P0[.TM_SEC]
     cmod $I0, $I0, 10
     $S1 = $I0
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
 
     # set the time
     $P0 = get_global "LCD"
@@ -147,7 +147,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2010, Parrot Foundation.
 
 =cut
 

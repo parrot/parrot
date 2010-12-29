@@ -205,7 +205,7 @@ to enforce whitespace between lexical words.
     goto literal_xdo_char_loop
   literal_xdo_char_end:
     $S1 = chr codepoint
-    concat literal, $S1
+    literal = concat literal, $S1
     unless isbracketed goto literal_xdo_end
     if $S0 == ']' goto literal_xdo_end
     if $S0 != ',' goto fail

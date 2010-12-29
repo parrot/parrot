@@ -43,10 +43,6 @@ static void print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC* set_current_sub(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_CANNOT_RETURN_NULL
 static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -55,8 +51,6 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(output))
 #define ASSERT_ARGS_print_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_set_current_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_setup_argv __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -724,7 +718,7 @@ print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
 
 /*
 
-=item C<static PMC* set_current_sub(PARROT_INTERP)>
+=item C<PMC* set_current_sub(PARROT_INTERP)>
 
 Search the fixup table for a PMC matching the argument.  On a match,
 set up the appropriate context.
@@ -737,7 +731,7 @@ pointer to the PMC.
 */
 
 PARROT_CANNOT_RETURN_NULL
-static PMC*
+PMC*
 set_current_sub(PARROT_INTERP)
 {
     ASSERT_ARGS(set_current_sub)
@@ -1155,6 +1149,31 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code)
     return NULL;
 }
 
+/*
+
+=item C<void Parrot_set_configuration_hash_legacy(PARROT_INTERP, const int
+length, const unsigned char *bytes)>
+
+Legacy function for setting the configuration hash as an array of bytes for
+the old API. New programs should not use this. They should use he new API and
+C<Parrot_api_set_configuration_hash>
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_set_configuration_hash_legacy(PARROT_INTERP, const int length,
+        const unsigned char *bytes)
+{
+    ASSERT_ARGS(Parrot_set_configuration_hash_legacy)
+    STRING * const fpmc_str = Parrot_str_new_init(interp, (const char *)bytes,
+        length, Parrot_binary_encoding_ptr, PObj_external_FLAG);
+    PMC * const pmc = Parrot_thaw(interp, fpmc_str);
+    Parrot_set_config_hash_pmc(interp, pmc);
+    Parrot_lib_update_paths_from_config_hash(interp);
+}
 
 /*
 

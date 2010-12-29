@@ -21,6 +21,7 @@ Get system memory information.
 */
 #include <sys/sysctl.h>
 #include <stdio.h>
+#include "parrot/sysmem.h"
 
 /*
 

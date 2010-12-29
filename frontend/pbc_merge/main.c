@@ -38,10 +38,11 @@ segments from the input PBC files.
 #define PARROT_IN_EXTENSION
 
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
+#include "parrot/longopt.h"
 #include "parrot/oplib/ops.h"
 #include "parrot/oplib/core_ops.h"
 #include "pmc/pmc_sub.h"
+#include "parrot/embed.h"
 
 /* This struct describes an input file. */
 typedef struct pbc_merge_input {
@@ -859,7 +860,7 @@ main(int argc, const char **argv)
     if (argc < 4) {
         help(interp);
     }
-    while ((status = longopt_get(interp, argc, argv, options, &opt)) > 0) {
+    while ((status = longopt_get(argc, argv, options, &opt)) > 0) {
         switch (opt.opt_id) {
             case 'o':
                 if (output_file == NULL)

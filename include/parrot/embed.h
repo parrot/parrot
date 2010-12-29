@@ -23,11 +23,6 @@ typedef enum {
     enum_DIS_HEADER    = 2
 } Parrot_disassemble_options;
 
-/* Parrot_set_config_hash exists in *_config.o (e.g install_config.o),
-   so if you make this call then you will need to link with it in
-   addition to libparrot */
-void Parrot_set_config_hash(void);
-
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
@@ -120,6 +115,12 @@ void Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+void Parrot_set_configuration_hash_legacy(PARROT_INTERP,
+    const int length,
+    const unsigned char *bytes)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 void Parrot_set_debug(PARROT_INTERP, Parrot_UInt flag)
         __attribute__nonnull__(1);
 
@@ -158,6 +159,10 @@ PARROT_PURE_FUNCTION
 Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
+PMC* set_current_sub(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_Parrot_clear_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_clear_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -193,6 +198,9 @@ Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)
 #define ASSERT_ARGS_Parrot_runcode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(argv))
+#define ASSERT_ARGS_Parrot_set_configuration_hash_legacy \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_set_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_set_executable_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -210,6 +218,8 @@ Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)
 #define ASSERT_ARGS_Parrot_test_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_test_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_set_current_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed.c */
