@@ -75,7 +75,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname, no ext" 
     ## convert cwd to an absolute pathname without the extension, and load it.
     ## this should always find the version in the build directory, since that's
     ## the only place "make test" will work.
-    $S0 = concat "/runtime/parrot/dynext/foo_group"
+    $S0 .= "/runtime/parrot/dynext/foo_group"
     loadlib $P1, $S0
 
     ## ensure that we can still make Foo instances.
