@@ -1149,6 +1149,30 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code)
     return NULL;
 }
 
+/*
+
+=item C<void Parrot_set_configuration_hash_legacy(PARROT_INTERP, const int
+length, const unsigned char *bytes)>
+
+Legacy function for setting the configuration hash as an array of bytes for
+the old API. New programs should not use this. They should use he new API and
+C<Parrot_api_set_configuration_hash>
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_set_configuration_hash_legacy(PARROT_INTERP, const int length,
+        const unsigned char *bytes)
+{
+    STRING * const fpmc_str = Parrot_str_new_init(interp, (const char *)bytes,
+        length, Parrot_binary_encoding_ptr, PObj_external_FLAG);
+    PMC * const pmc = Parrot_thaw(interp, fpmc_str);
+    Parrot_set_config_hash_pmc(interp, pmc);
+    Parrot_lib_update_paths_from_config_hash(interp);
+}
 
 /*
 

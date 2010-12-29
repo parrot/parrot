@@ -45,6 +45,8 @@ print << "EOF";
 #include "parrot/api.h"
 
 int Parrot_set_config_hash(Parrot_PMC interp_pmc);
+unsigned char * Parrot_get_config_hash_bytes();
+int Parrot_get_config_hash_length();
 
 static const unsigned char parrot_config[] = {
 EOF
@@ -78,6 +80,18 @@ else {
 
 print << "EOF";
 }; /* parrot_config */
+
+unsigned char*
+Parrot_get_config_hash_bytes()
+{
+    return (unsigned char*)parrot_config;
+}
+
+int
+Parrot_get_config_hash_length()
+{
+    return sizeof(parrot_config);
+}
 
 int
 Parrot_set_config_hash(Parrot_PMC interp_pmc)
