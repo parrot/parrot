@@ -17,8 +17,6 @@
     print '# Copyright (C) '
     print year
     say   ' Parrot Foundation.'
-    print '# $'
-    say   'Id: $'
     say ''
     say ".sub 'main' :main"
     say '    # For Parrot developers.'
