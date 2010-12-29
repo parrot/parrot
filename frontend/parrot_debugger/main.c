@@ -175,7 +175,7 @@ main(int argc, const char *argv[])
     interp = Parrot_new(NULL);
 
     Parrot_set_executable_name(interp, Parrot_str_new(interp, argv[0], 0));
-    
+
     Parrot_set_configuration_hash_legacy(interp, configlength, configbytes);
 
     Parrot_debugger_init(interp);
