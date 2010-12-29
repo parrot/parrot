@@ -589,6 +589,28 @@ Parrot_api_pmc_find_method(Parrot_PMC interp_pmc, Parrot_PMC object,
 
 /*
 
+=item C<Parrot_Int Parrot_api_pmc_serialize(Parrot_PMC interp_pmc, Parrot_PMC
+object, Parrot_String *frozen)>
+
+Serialize a PMC into an archived String format. Also known as freezing or pickling.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_serialize (Parrot_PMC interp_pmc, Parrot_PMC object,
+        ARGOUT(Parrot_String *frozen))
+{
+    ASSERT_ARGS(Parrot_api_pmc_serialize)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    *frozen =  Parrot_freeze(interp, object);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+/*
+
 =back
 
 =cut
