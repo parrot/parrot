@@ -1167,6 +1167,7 @@ void
 Parrot_set_configuration_hash_legacy(PARROT_INTERP, const int length,
         const unsigned char *bytes)
 {
+    ASSERT_ARGS(Parrot_set_configuration_hash_legacy)
     STRING * const fpmc_str = Parrot_str_new_init(interp, (const char *)bytes,
         length, Parrot_binary_encoding_ptr, PObj_external_FLAG);
     PMC * const pmc = Parrot_thaw(interp, fpmc_str);
