@@ -69,20 +69,21 @@ Initializes a newly created FileHandle object.
         Parrot_FileHandle_attributes * const data_struct =
             PMC_data_typed(SELF, Parrot_FileHandle_attributes *);
 
-        data_struct->flags         = 0;
-        data_struct->filename      = NULL;
-        data_struct->mode          = NULL;
-        data_struct->encoding      = NULL;
-        data_struct->process_id    = 0;
-        data_struct->exit_status   = 0;
-        data_struct->file_size     = 0;
-        data_struct->file_pos      = piooffsetzero;
-        data_struct->last_pos      = piooffsetzero;
-        data_struct->buffer_size   = 0;
-        data_struct->buffer_flags  = 0;
-        data_struct->buffer_start  = NULL;
-        data_struct->buffer_end    = NULL;
-        data_struct->buffer_next   = NULL;
+        data_struct->record_separator = '\n';
+        data_struct->flags            = 0;
+        data_struct->filename         = NULL;
+        data_struct->mode             = NULL;
+        data_struct->encoding         = NULL;
+        data_struct->process_id       = 0;
+        data_struct->exit_status      = 0;
+        data_struct->file_size        = 0;
+        data_struct->file_pos         = piooffsetzero;
+        data_struct->last_pos         = piooffsetzero;
+        data_struct->buffer_size      = 0;
+        data_struct->buffer_flags     = 0;
+        data_struct->buffer_start     = NULL;
+        data_struct->buffer_end       = NULL;
+        data_struct->buffer_next      = NULL;
 
         /* Initialize the os_handle to the platform-specific value for closed */
         data_struct->os_handle     = (PIOHANDLE) PIO_INVALID_HANDLE;

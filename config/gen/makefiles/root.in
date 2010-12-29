@@ -1568,7 +1568,8 @@ src/io/api$(O) : \
     $(INC_DIR)/extend.h \
     $(INC_DIR)/extend_vtable.h
 
-src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c
+src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c \
+    include/pmc/pmc_handle.h
 
 src/io/portable$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/portable.c
 

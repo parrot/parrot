@@ -19,6 +19,7 @@ This file implements a collection of utility functions for I/O buffering.
 
 #include "parrot/parrot.h"
 #include "io_private.h"
+#include "pmc/pmc_handle.h"
 
 /* HEADERIZER HFILE: include/parrot/io.h */
 /* HEADERIZER BEGIN: static */
@@ -153,7 +154,6 @@ Parrot_io_setlinebuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
     filehandle_flags &= ~PIO_F_BLKBUF;
     filehandle_flags |= PIO_F_LINEBUF;
     Parrot_io_set_flags(interp, filehandle, filehandle_flags);
-/*    Parrot_io_set_record_separator(interp, filehandle, '\n'); */
     return 0;
 
 }
@@ -453,6 +453,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
     unsigned char *buffer_next;
     unsigned char *buffer_end;
     STRING        *s;
+    INTVAL         rs;
 
     if (*buf == NULL) {
         *buf = Parrot_gc_new_string_header(interp, 0);
@@ -475,6 +476,8 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
     buffer_next = Parrot_io_get_buffer_next(interp, filehandle);
     buffer_end  = Parrot_io_get_buffer_end(interp, filehandle);
 
+    GETATTR_Handle_record_separator(interp, filehandle, rs);
+
     while (1) {
         Parrot_String_Bounds bounds;
 
@@ -486,13 +489,13 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
 
         bounds.bytes = buffer_end - buffer_next;
         bounds.chars = -1;
-        bounds.delim = '\n';
+        bounds.delim = rs;
 
         s->encoding->partial_scan(interp, buffer_next, &bounds);
 
         /* Append buffer to result */
 
-        if (bounds.delim == '\n')
+        if (bounds.delim == rs)
             /* End of line, use only part of buffer */
             chunk_size = bounds.bytes;
         else
@@ -512,7 +515,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
         s->bufused  = new_size;
         s->strlen  += bounds.chars;
 
-        if (bounds.delim == '\n') {
+        if (bounds.delim == rs) {
             /* End of line */
             buffer_next += chunk_size;
             Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
@@ -553,7 +556,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
 
             bounds.bytes = bytes_l + bytes_r;
             bounds.chars = 1;
-            bounds.delim = '\n';
+            bounds.delim = rs;
 
             s->encoding->partial_scan(interp, s->strstart + decoded_bytes,
                                       &bounds);
@@ -572,7 +575,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
 
             buffer_next += bytes_r;
 
-            if (bounds.delim == '\n' || (size_t)got == bytes_r) {
+            if (bounds.delim == rs || (size_t)got == bytes_r) {
                 Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
                 break;
             }
