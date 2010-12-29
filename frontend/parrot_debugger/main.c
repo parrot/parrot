@@ -179,11 +179,7 @@ main(int argc, const char *argv[])
     Parrot_set_configuration_hash_legacy(interp, configlength, configbytes);
 
     Parrot_debugger_init(interp);
-
     pdb = interp->pdb;
-
-    /*Parrot_set_config_hash();  TODO link with cfg */
-
     pdb->state       = PDB_ENTER;
 
     Parrot_block_GC_mark(interp);
