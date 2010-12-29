@@ -7,7 +7,8 @@ src/embed.c - The Parrot embedding interface
 
 =head1 DESCRIPTION
 
-This file implements the Parrot embedding interface.
+This file implements the old Parrot embedding interface.  Its days are
+numbered.  You probably want src/embed/api.c
 
 =head2 Functions
 
