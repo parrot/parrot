@@ -2967,7 +2967,7 @@ HEADERIZER_O_FILES = \
     frontend/pbc_dump/packdump$(O) \
     frontend/pbc_merge/main$(O) \
 
-headerizer : src/core_pmcs.c
+headerizer : src/core_pmcs.c src/extend_vtable.c
 	$(HEADERIZER) $(HEADERIZER_O_FILES) compilers/imcc/imcc.y
 
 apilist: src/core_pmcs.c
