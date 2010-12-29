@@ -41,7 +41,7 @@ while(<$hacks>) {
 
         # Process context for HTML, then do some stuff to it too.
         $context = encode_entities($context);
-        $context =~ s/hack/<strong>hack<\/strong>/ig;
+        $context =~ s/hack/<strong><font color="red">hack<\/font><\/strong>/ig;
 
         # See if we have an incomplete multi-line comment.
         my $begin = $context =~ /\/\*/ && !($context =~ /\*\//);
