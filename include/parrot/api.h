@@ -297,6 +297,14 @@ Parrot_Int Parrot_api_wrap_imcc_hack(
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
+Parrot_Int Parrot_api_string_byte_length(
+    Parrot_PMC interp_pmc,
+    Parrot_String str,
+    ARGOUT(Parrot_Int * len))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* len);
+
+PARROT_API
 Parrot_Int Parrot_api_string_export_ascii(
     ARGIN(Parrot_PMC interp_pmc),
     ARGIN(Parrot_String string),
@@ -361,6 +369,8 @@ Parrot_Int Parrot_api_string_import_wchar(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(* out);
 
+#define ASSERT_ARGS_Parrot_api_string_byte_length __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(len))
 #define ASSERT_ARGS_Parrot_api_string_export_ascii \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
@@ -552,9 +562,9 @@ PARROT_API
 Parrot_Int Parrot_api_pmc_serialize(
     Parrot_PMC interp_pmc,
     Parrot_PMC object,
-    ARGOUT(Parrot_String * frozen))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+    ARGOUT(Parrot_String *frozen))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*frozen);
 
 PARROT_API
 Parrot_Int Parrot_api_pmc_set_float(
@@ -637,8 +647,6 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_api_pmc_find_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(method))
-#define ASSERT_ARGS_Parrot_api_pmc_serialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(object))
 #define ASSERT_ARGS_Parrot_api_pmc_get_class __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(key) \
@@ -678,6 +686,8 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
 #define ASSERT_ARGS_Parrot_api_pmc_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(pmctonull))
+#define ASSERT_ARGS_Parrot_api_pmc_serialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(frozen))
 #define ASSERT_ARGS_Parrot_api_pmc_set_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(pmc))
