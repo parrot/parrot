@@ -18,7 +18,7 @@ Tests the MappedByteArray PMC.
 .sub main :main
     .include 'test_more.pir'
     .const int inittests = 4
-    .const int moretests = 2
+    .const int moretests = 6
     .local int alltests
     alltests = inittests + moretests
     plan(alltests)
@@ -33,6 +33,7 @@ Tests the MappedByteArray PMC.
 
   more:
     ok(1, "Mapped files are supported")
+    test_init_pmc()
     test_read()
   end:
 .end
@@ -68,15 +69,46 @@ Tests the MappedByteArray PMC.
     .return(r)
 .end
 
+# Test initializing a PMC with a file name
+.sub test_init_pmc
+    .local pmc filename
+    filename = new ['String']
+    filename = "t/pmc/testfile"
+
+    .local pmc mm
+    mm = new ['MappedByteArray'], filename
+
+    $I0 = elements mm
+
+    $S0 = mm.'get_utf8'(0, $I0)
+    is( $S0, "This is a test", "Reading test file with get_utf8 successful" )
+
+    $I1 = mm."close"()
+    is( $I1, 0, 'Closed and unmapped testfile' )
+.end
+
 # Test reading a file
 .sub test_read
     .local pmc mm
-
     mm = new ['MappedByteArray']
-    mm."open"("t/pmc/testfile","r")
-    $I1 = elements mm
-    $S0 = mm.'get_string'(0, $I1, 'utf8')
-    is($S0, "This is a test", "Reading Test file successful")
+    mm."open"("t/pmc/testfile","rw")
+
+    $I0 = elements mm
+
+    $S0 = mm.'get_string'(0, $I0, 'utf8')
+    is( $S0, "This is a test", "Reading test file with get_string successful" )
+
+    $I1 = mm[0]
+
+    mm[0] = 5
+    $I2 = mm[0]
+
+    is( $I2, 5, 'Testing get/set_integer_keyed_int' )
+
+    mm[0] = $I1
+
+    $I3 = mm."close"()
+    is( $I3, 0, 'Closed and unmapped testfile' )
 .end
 
 # Local Variables:
