@@ -39,6 +39,8 @@ c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_vsnprintf" )
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
 #include "parrot/misc.h"
 
 void fail(const char *msg);
@@ -71,6 +73,8 @@ c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_vsnprintf wi
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
 #include "parrot/misc.h"
 
 void fail(const char *msg);
