@@ -22,6 +22,14 @@ Tests the ParrotLibrary PMC.
 
     new $P0, ['ParrotLibrary']
     ok(1, 'Instantiated a ParrotLibrary PMC')
+
+    set_addr $P0, 123
+    
+    $P1 = clone $P0
+    
+    null $P0
+    sweep 1    
+    
 .end
 
 # Local Variables:
