@@ -7,7 +7,6 @@ init::manifest nomanicheck
 init::defaults
 init::install
 init::hints verbose-step
-init::headers
 inter::progs
 inter::make
 inter::lex

@@ -136,10 +136,11 @@ void parrot_hash_clone(PARROT_INTERP,
         FUNC_MODIFIES(*dest);
 
 PARROT_EXPORT
-void parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
+void parrot_hash_delete(PARROT_INTERP,
+    ARGMOD(Hash *hash),
+    ARGIN_NULLOK(void *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         FUNC_MODIFIES(*hash);
 
 PARROT_EXPORT
@@ -374,8 +375,7 @@ Hash * Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
     , PARROT_ASSERT_ARG(dest))
 #define ASSERT_ARGS_parrot_hash_delete __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(hash) \
-    , PARROT_ASSERT_ARG(key))
+    , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_parrot_hash_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))

@@ -88,7 +88,7 @@ Creates and returns a clone of the library.
             PObj_custom_destroy_SET(dest);
         }
 
-        if (PMC_metadata(SELF))
+        if (!PMC_IS_NULL(PMC_metadata(SELF)))
             PMC_metadata(dest) = VTABLE_clone(INTERP, PMC_metadata(SELF));
 
         return dest;

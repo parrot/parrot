@@ -9,6 +9,12 @@ use File::Spec;
 
 use Test::More;
 
+=head1 BUGS
+
+This isn't part of t/src/checkdepend.t
+
+=cut
+
 my $pmc_dir  = File::Spec->catfile(qw( src pmc *.pmc ));
 my @pmcs     = grep { contains_pccmethod($_) } glob($pmc_dir);
 my $find_pmc = join( '|', map { s/\.pmc/\.dump/; quotemeta( $_ ) } @pmcs );
@@ -32,7 +38,7 @@ sub contains_pccmethod {
 
     local $_;
     while (<$fh>) {
-        next unless /METHOD/;
+        next unless /\bMETHOD\b/;
         return 1;
     }
 

@@ -553,7 +553,7 @@ for example, wish to designate only a few steps for verbose output:
 
     ...
     init::hints verbose-step
-    init::headers
+    ...
     inter::progs fatal-step
     ...
     auto::gcc verbose-step
@@ -600,7 +600,6 @@ configuration file.
     init::defaults
     init::install
     init::hints verbose-step
-    init::headers
     inter::progs
     inter::make
     inter::lex

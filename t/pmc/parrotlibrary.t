@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -17,11 +17,24 @@ Tests the ParrotLibrary PMC.
 
 .sub main :main
     .include 'test_more.pir'
+    .local int clone_ok
 
-    plan(1)
+    plan(2)
 
     new $P0, ['ParrotLibrary']
     ok(1, 'Instantiated a ParrotLibrary PMC')
+
+    set_addr $P0, 123
+    clone_ok = 0
+
+    push_eh broken_clone
+        $P1 = clone $P0
+    pop_eh
+    clone_ok = 1
+
+  broken_clone:
+    ok(clone_ok, "ParrotLibrary Clone")
+
 .end
 
 # Local Variables:

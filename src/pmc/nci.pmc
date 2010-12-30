@@ -140,11 +140,8 @@ Sets the specified function pointer and signature (C<*key>).
 
         /* ensure that the STRING signature is constant */
         if (!PObj_constant_TEST(key)) {
-            char * const key_c      = Parrot_str_to_cstring(INTERP, key);
-            const size_t key_length = Parrot_str_byte_length(interp, key);
-            key                     = Parrot_str_new_init(interp, key_c, key_length,
-                                        Parrot_default_encoding_ptr, PObj_constant_FLAG);
-            Parrot_str_free_cstring(key_c);
+            key = Parrot_str_new_init(interp, key->strstart, key->bufused,
+                                      key->encoding, PObj_constant_FLAG);
         }
 
         nci_info->sig_str = key;
