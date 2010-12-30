@@ -222,6 +222,27 @@ Parrot_api_string_import_binary(ARGIN(Parrot_PMC interp_pmc), ARGIN(const unsign
 
 /*
 
+=item C<Parrot_Int Parrot_api_string_byte_length(Parrot_PMC interp_pmc,
+Parrot_String str, Parrot_Int * len)>
+
+Returns the byte length of a string.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_string_byte_length(Parrot_PMC interp_pmc, Parrot_String str,
+        ARGOUT(Parrot_Int * len))
+{
+    EMBED_API_CALLIN(interp_pmc, interp)
+    *len = Parrot_str_byte_length(interp, str);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+/*
+
 =back
 
 =cut
