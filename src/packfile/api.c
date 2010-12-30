@@ -734,12 +734,11 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
         break;
 
       case PBC_MAIN:
-        /* run :init tagged functions */
-        if (Sub_comp_INIT_TEST(sub)) {
-            /* if loaded no need for init */
+        /* run :init/:load tagged functions */
+        if (Sub_comp_INIT_TEST(sub)
+        ||  PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_LOAD) {
+            /* only run :init/:load subs once */
             Sub_comp_INIT_CLEAR(sub);
-
-            /* if inited no need for load */
             PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
 
             run_sub(interp, sub_pmc);
