@@ -213,7 +213,6 @@ main(int argc, const char *argv[])
             Parrot_compile_file(interp, filename, &errmsg);
             if (errmsg)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1, "%S", errmsg);
-            PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
 
             /* load the source for debugger list */
             PDB_load_source(interp, filename);
