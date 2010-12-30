@@ -33,7 +33,7 @@ Tests the ParrotLibrary PMC.
     clone_ok = 1
 
   broken_clone:
-    todo(clone_ok, "ParrotLibrary Clone")
+    ok(clone_ok, "ParrotLibrary Clone")
 
   end:
     null $P0
