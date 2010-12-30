@@ -28,12 +28,15 @@ Tests the ParrotLibrary PMC.
     push_eh broken_clone
         $P1 = clone $P0
     pop_eh
-
+    goto end
+  
+  broken_clone:
+    nok(1, "ParrotLibrary Clone fails")
+  
+  end:
+    ok (1,"Parrot Clone OK")
     null $P0
     sweep 1
-
-    broken_clone:
-        todo(0, "ParrotLibrary Clone fails, see TT #")
 .end
 
 # Local Variables:
