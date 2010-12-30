@@ -27,6 +27,7 @@ C<Continuation> PMCs.
 =cut
 
 my @todo;
+my $testr = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "PASM subs - invokecc" );
     .const 'Sub' P0 = "func"
@@ -893,7 +894,9 @@ caller 1 main
 ok
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUT', ':immediate :postcomp' );
+SKIP: {
+    skip ':immediate/:postcomp only happen on compilation', 1 if $testr;
+    pir_output_is( <<'CODE', <<'OUT', ':immediate :postcomp' );
 .sub optc :immediate :postcomp
     print "initial\n"
 .end
@@ -905,6 +908,7 @@ initial
 initial
 main
 OUT
+}
 
 pir_output_like( <<'CODE', <<'OUTPUT', ':anon' );
 .sub main :main
@@ -1130,7 +1134,9 @@ CODE
 /Stringifying an Undef PMC/
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', ':postcomp' );
+SKIP: {
+    skip ':immediate/:postcomp only happen on compilation', 1 if $testr;
+    pir_output_is( <<'CODE', <<'OUTPUT', ':postcomp' );
 .sub main :main
     say 'main'
 .end
@@ -1153,6 +1159,7 @@ pc
 pc2
 main
 OUTPUT
+}
 
 # see also #38964
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names, compilation' );
@@ -1437,7 +1444,7 @@ I can has outer from eval?
 OUTPUT
 
 $ENV{TEST_PROG_ARGS} ||= '';
-@todo = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/
+@todo = $testr
     ? ( todo => 'lexicals not thawed properly from PBC, TT #1171' )
     : ();
 pir_output_is( <<'CODE', <<'OUTPUT', ':outer with identical sub names', @todo );

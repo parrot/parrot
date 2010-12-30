@@ -404,8 +404,6 @@ Parrot_api_ready_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
     if (pf->cur_cs != NULL)
         Parrot_pbc_load(interp, pf);
-    PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
-    PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
     *main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
     Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
@@ -446,8 +444,6 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
     if (pf->cur_cs != NULL)
         Parrot_pbc_load(interp, pf);
-    PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
-    PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
     main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
 

@@ -1505,7 +1505,7 @@ Deletes the key from the hash.
 
 PARROT_EXPORT
 void
-parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
+parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN_NULLOK(void *key))
 {
     ASSERT_ARGS(parrot_hash_delete)
     const UINTVAL hashval = key_hash(interp, hash, key) & hash->mask;

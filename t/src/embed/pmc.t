@@ -316,7 +316,7 @@ int main(int argc, char* argv[])
     Parrot_PMC p_str = NULL, p_keyedstr = NULL, p_str_thawed = NULL;
     Parrot_String s_teststr = NULL, s_outstr = NULL, s_frozen = NULL;
     Parrot_Int len;
-    
+
     GET_INIT_STRUCT(initargs);
     Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
 

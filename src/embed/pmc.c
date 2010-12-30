@@ -600,7 +600,7 @@ Serialize a PMC into an archived String format. Also known as freezing or pickli
 
 PARROT_API
 Parrot_Int
-Parrot_api_pmc_serialize (Parrot_PMC interp_pmc, Parrot_PMC object,
+Parrot_api_pmc_serialize(Parrot_PMC interp_pmc, Parrot_PMC object,
         ARGOUT(Parrot_String *frozen))
 {
     ASSERT_ARGS(Parrot_api_pmc_serialize)

@@ -137,8 +137,9 @@ PackFile_pack(PARROT_INTERP, ARGMOD(PackFile *self), ARGOUT(opcode_t *cursor))
     size = seg->op_count;
     ret = PackFile_Segment_pack(interp, seg, cursor);
     if ((size_t)(ret - cursor) != size) {
-        Parrot_io_eprintf(interp, "PackFile_pack segment '%Ss' used size %d "
-                "but reported %d\n", seg->name, (int)(ret-cursor), (int)size);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                "PackFile_pack segment '%Ss' used size %d but reported %d\n",
+                seg->name, (int)(ret-cursor), (int)size);
     }
 }
 
