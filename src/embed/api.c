@@ -718,9 +718,9 @@ otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, const char * sourcefile,
-    int argc, const char **argv, Parrot_PMC* bytecodepmc, int *result,
-    imcc_hack_func_t func)
+Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, ARGIN(const char * sourcefile),
+    int argc, ARGIN(const char **argv), ARGMOD(Parrot_PMC* bytecodepmc),
+    ARGOUT(int *result), imcc_hack_func_t func)
 {
     ASSERT_ARGS(Parrot_api_wrap_imcc_hack)
     EMBED_API_CALLIN(interp_pmc, interp)

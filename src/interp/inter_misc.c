@@ -160,6 +160,8 @@ Get a compiler PMC.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
 {
@@ -170,7 +172,7 @@ Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
 
     if (PMC_IS_NULL(hash)) {
         /* No compiler has been registered yet */
-        return NULL;
+        return PMCNULL;
     }
 
     /* Fetch the compiler */

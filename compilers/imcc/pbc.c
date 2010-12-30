@@ -610,7 +610,7 @@ add libdeps to byte code
 */
 
 void
-imcc_pbc_add_libdep(PARROT_INTERP, STRING *libname)
+imcc_pbc_add_libdep(PARROT_INTERP, ARGIN(STRING *libname))
 {
     ASSERT_ARGS(imcc_pbc_add_libdep)
 

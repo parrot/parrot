@@ -44,6 +44,8 @@ extern int yydebug;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PackFile * compile_to_bytecode(PARROT_INTERP,
     ARGIN(const char * const sourcefile),
     ARGIN_NULLOK(const char * const output_file),
@@ -89,7 +91,10 @@ PARROT_PURE_FUNCTION
 static int is_all_hex_digits(ARGIN(const char *s))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static const struct longopt_opt_decl * Parrot_cmd_options(void);
+
 #define ASSERT_ARGS_compile_to_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sourcefile) \
@@ -162,6 +167,8 @@ Set up the const struct declaration for cmd_options
          to something more imcc-ish
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static const struct longopt_opt_decl *
 Parrot_cmd_options(void)
 {
@@ -585,6 +592,8 @@ Compile source code into bytecode (or die trying).
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PackFile *
 compile_to_bytecode(PARROT_INTERP,
                     ARGIN(const char * const sourcefile),

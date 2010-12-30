@@ -231,12 +231,18 @@ Parrot_Int Parrot_api_set_warnings(Parrot_PMC interp_pmc, Parrot_Int flags);
 PARROT_API
 Parrot_Int Parrot_api_wrap_imcc_hack(
     Parrot_PMC interp_pmc,
-    const char * sourcefile,
+    ARGIN(const char * sourcefile),
     int argc,
-    const char **argv,
-    Parrot_PMC* bytecodepmc,
-    int *result,
-    imcc_hack_func_t func);
+    ARGIN(const char **argv),
+    ARGMOD(Parrot_PMC* bytecodepmc),
+    ARGOUT(int *result),
+    imcc_hack_func_t func)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        __attribute__nonnull__(6)
+        FUNC_MODIFIES(* bytecodepmc)
+        FUNC_MODIFIES(*result);
 
 #define ASSERT_ARGS_Parrot_api_add_dynext_search_path \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -289,7 +295,11 @@ Parrot_Int Parrot_api_wrap_imcc_hack(
        PARROT_ASSERT_ARG(corename))
 #define ASSERT_ARGS_Parrot_api_set_stdhandles __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_set_warnings __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_api_wrap_imcc_hack __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_wrap_imcc_hack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(sourcefile) \
+    , PARROT_ASSERT_ARG(argv) \
+    , PARROT_ASSERT_ARG(bytecodepmc) \
+    , PARROT_ASSERT_ARG(result))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/api.c */
 

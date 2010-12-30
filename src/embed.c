@@ -1166,7 +1166,7 @@ C<Parrot_api_set_configuration_hash>
 PARROT_EXPORT
 void
 Parrot_set_configuration_hash_legacy(PARROT_INTERP, const int length,
-        const unsigned char *bytes)
+        ARGIN(const unsigned char *bytes))
 {
     ASSERT_ARGS(Parrot_set_configuration_hash_legacy)
     STRING * const fpmc_str = Parrot_str_new_init(interp, (const char *)bytes,
