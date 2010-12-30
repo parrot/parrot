@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -110,7 +110,7 @@ Tests mainly morphing undef to other types.
 .sub verify_equality
     .local pmc pmc1
     pmc1 = new ['Undef']
-    
+
     .local pmc pmc2
     pmc2 = new ['String']
 
