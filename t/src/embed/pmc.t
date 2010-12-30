@@ -326,7 +326,7 @@ int main(int argc, char* argv[])
     Parrot_api_pmc_serialize(interpmc, p_str, &s_frozen);
     Parrot_api_string_byte_length(interpmc, s_frozen, &len);
     Parrot_api_string_export_ascii(interpmc, s_frozen, &c_outstr);
-    Parrot_api_pmc_deserialize_bytes(interpmc, c_outstr, len, &p_str_thawed);
+    Parrot_api_pmc_deserialize_bytes(interpmc, (const unsigned char *)c_outstr, len, &p_str_thawed);
 
     Parrot_api_pmc_get_string(interpmc, p_str_thawed, &s_outstr);
     Parrot_api_string_export_ascii(interpmc, s_outstr, &c_outstr);
