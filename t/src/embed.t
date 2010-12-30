@@ -303,7 +303,7 @@ CODE
 Done!
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_increment" );
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_(increment|decrement)" );
 
 int main(void)
 {
@@ -325,12 +325,17 @@ int main(void)
     Parrot_PMC_increment(interp, pmc);
     value = Parrot_PMC_get_integer(interp, pmc);
     printf("%d\n", (int) value);
+
+    Parrot_PMC_decrement(interp, pmc);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
     Parrot_destroy(interp);
     printf("Done!\n");
     return 0;
 }
 CODE
 -41
+-42
 Done!
 OUTPUT
 
