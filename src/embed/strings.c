@@ -236,6 +236,8 @@ Parrot_Int
 Parrot_api_string_byte_length(Parrot_PMC interp_pmc, Parrot_String str,
         ARGOUT(Parrot_Int * len))
 {
+    ASSERT_ARGS(Parrot_api_string_byte_length)
+
     EMBED_API_CALLIN(interp_pmc, interp)
     *len = Parrot_str_byte_length(interp, str);
     EMBED_API_CALLOUT(interp_pmc, interp)
