@@ -685,8 +685,6 @@ The created key = "\1idx".
 
 =item C<INTVAL defined_keyed(PMC *key)>
 
-=item C<INTVAL defined_keyed_str(STRING *key)>
-
 =item C<INTVAL defined_keyed_int(INTVAL key)>
 
 =cut
@@ -700,17 +698,6 @@ The created key = "\1idx".
             return 0;
         return VTABLE_defined(INTERP, item);
     }
-
-/*
-    DEAD VTABLE
-
-    VTABLE INTVAL defined_keyed_str(STRING *key) {
-        PMC * const item = STATICSELF.get_pmc_keyed_str(key);
-        if (PMC_IS_NULL(item))
-            return 0;
-        return VTABLE_defined(INTERP, item);
-    }
-*/
 
     VTABLE INTVAL defined_keyed_int(INTVAL idx) {
         PMC * item;
