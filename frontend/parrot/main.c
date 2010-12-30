@@ -43,7 +43,11 @@ PARROT_PURE_FUNCTION
 static int is_all_hex_digits(ARGIN(const char *s))
         __attribute__nonnull__(1);
 
-static void Parrot_confess(char * condition, char * file, unsigned int line);
+static void Parrot_confess(
+    const char * condition,
+    const char * file,
+    unsigned int line);
+
 static void Parrot_version(void);
 PARROT_CAN_RETURN_NULL
 static const char * parseflags(
@@ -274,8 +278,8 @@ is_all_hex_digits(ARGIN(const char *s))
 
 /*
 
-=item C<static void Parrot_confess(char * condition, char * file, unsigned int
-line)>
+=item C<static void Parrot_confess(const char * condition, const char * file,
+unsigned int line)>
 
 Prints an error
 
@@ -284,7 +288,7 @@ Prints an error
 */
 
 static void
-Parrot_confess(char * condition, char * file, unsigned int line)
+Parrot_confess(const char * condition, const char * file, unsigned int line)
 {
     fprintf(stderr, "Parrot Error: %s (%s:%d)\n", condition, file, line);
 }

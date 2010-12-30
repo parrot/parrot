@@ -350,11 +350,11 @@ get_search_paths(PARROT_INTERP, enum_lib_paths which)
     return VTABLE_get_pmc_keyed_int(interp, lib_paths, which);
 }
 
-static const char path_separator = '/';
+static const int path_separator = '/';
 
 #ifdef WIN32
 
-static const char win32_path_separator = '\\';
+static const int win32_path_separator = '\\';
 
 #endif
 
@@ -480,7 +480,7 @@ path_guarantee_trailing_separator(PARROT_INTERP, ARGMOD(STRING *path))
     ASSERT_ARGS(path_guarantee_trailing_separator)
 
     /* make sure the path has a trailing slash before appending the file */
-    if (STRING_ord(interp, path, -1) != path_separator)
+    if (STRING_ord(interp, path, -1) != (UINTVAL)path_separator)
         path = Parrot_str_concat(interp, path,
                 Parrot_str_chr(interp, path_separator));
 
