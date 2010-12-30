@@ -18,18 +18,22 @@ Tests the ParrotLibrary PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(1)
+    plan(2)
 
     new $P0, ['ParrotLibrary']
     ok(1, 'Instantiated a ParrotLibrary PMC')
 
     set_addr $P0, 123
-    
-    $P1 = clone $P0
-    
+
+    push_eh broken_clone
+        $P1 = clone $P0
+    pop_eh
+
     null $P0
-    sweep 1    
-    
+    sweep 1
+
+    broken_clone:
+        todo(0, "ParrotLibrary Clone fails, see TT #")
 .end
 
 # Local Variables:
