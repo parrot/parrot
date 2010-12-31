@@ -82,6 +82,10 @@ pir_output_is( <<'CODE', <<'OUT', "create a task and set attributes" );
 
     $P2 = get_global 'code'
     setattribute $P0, 'code', $P2
+
+    # Make sure the mark vtable is exercised
+    sweep 1
+
     end
   .end
 
