@@ -875,10 +875,6 @@ PackFile_ByteCode * Parrot_switch_to_cs(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * PF_create_default_segs(PARROT_INTERP,
@@ -1033,8 +1029,6 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
 #define ASSERT_ARGS_Parrot_switch_to_cs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(new_cs))
-#define ASSERT_ARGS_Parrot_switch_to_cs_by_nr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PF_create_default_segs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(file_name))

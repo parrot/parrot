@@ -3201,44 +3201,6 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug),
 
 /*
 
-=item C<void Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)>
-
-Switches the current bytecode segment to the segment keyed by number C<seg>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)
-{
-    ASSERT_ARGS(Parrot_switch_to_cs_by_nr)
-    const PackFile_Directory * const dir      = interp->code->base.dir;
-    const size_t                     num_segs = dir->num_segments;
-
-    size_t   i;
-    opcode_t n;
-
-    /* TODO make an index of code segments for faster look up */
-    for (i = n = 0; i < num_segs; ++i) {
-        if (dir->segments[i]->type == PF_BYTEC_SEG) {
-            if (n == seg) {
-                Parrot_switch_to_cs(interp, (PackFile_ByteCode *)
-                        dir->segments[i], 1);
-                return;
-            }
-            ++n;
-        }
-    }
-
-    Parrot_ex_throw_from_c_args(interp, NULL, 1,
-        "Segment number %d not found\n", (int)seg);
-}
-
-
-/*
-
 =item C<PackFile_ByteCode * Parrot_switch_to_cs(PARROT_INTERP, PackFile_ByteCode
 *new_cs, int really)>
 
