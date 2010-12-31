@@ -242,6 +242,7 @@ Tests the Class PMC.
     attribs['foo'] = 'bar'
 
     .const 'Sub' meth_to_add = 'foo'
+    .const 'Sub' another_meth_to_add = 'foobar'
 
     class.'add_method'( 'foo', meth_to_add )
     attribs = class.'methods'()
@@ -276,15 +277,22 @@ t_class_meth:
 
     $I0 = 1
     push_eh t_existing_method
-    class.'add_method'( 'foo' )
+    # Adding the same method with the same name is OK
+    class.'add_method'( 'foo', meth_to_add )
+    class.'add_method'( 'foo', meth_to_add )
+
+    # Adding another method with the same name should raise exception
+    class.'add_method'( 'foo', another_meth_to_add )
     $I0 = 0
     pop_eh
-
   t_existing_method:
     ok($I0, 'add_method() with existing method name fails')
 .end
 
 .sub 'foo' :method
+    .return ('bar')
+.end
+.sub 'foobar' :method
     .return ('bar')
 .end
 
