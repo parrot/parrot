@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 73;
+use Parrot::Test tests => 78;
 use Parrot::Config;
 
 =head1 NAME
@@ -1270,6 +1270,20 @@ CODE
 ok
 OUTPUT
 
+pir_error_output_like( <<'CODE', <<'OUTPUT', "assign exception" );
+.sub a
+  $P0 = get_global 'ok'
+
+  $P1 = new ['String']
+  assign $P0, $P1
+.end
+
+.sub ok
+.end
+CODE
+/Can't assign a non-Sub type to a Sub/
+OUTPUT
+
 pir_output_is( <<'CODE', <<'OUTPUT', 'destroy' );
 .sub main :main
     $P0 = get_global 'ok'
@@ -1700,6 +1714,28 @@ thawed
 hi
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', 'comp_flags method' );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $I0 = $P0.'comp_flags'()
+    say $I0
+.end
+CODE
+0
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'pf_flags method' );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $I0 = $P0.'pf_flags'()
+    say $I0
+.end
+CODE
+0
+OUTPUT
+
 pir_output_is( <<'CODE', <<'OUTPUT', 'init_pmc' );
 .sub 'main'
     .local pmc init, s, regs, arg_info
@@ -1792,6 +1828,60 @@ pos_slurpy 2
 named_required 3
 named_optional 5
 named_slurpy 8
+OUTPUT
+
+pir_output_like( <<'CODE', <<'OUTPUT', 'inspect return a hash' );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $P1 = inspect $P0
+    say $P1
+.end
+CODE
+/Hash/
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'inspect return hash with values' );
+.sub 'main' :main
+    $P0 = get_global 'foo'
+
+    $P1 = inspect $P0
+
+    print 'pos_required '
+    $S0 = $P1['pos_required']
+    say $S0
+
+    print 'pos_optional '
+    $S0 = $P1['pos_optional']
+    say $S0
+
+    print 'pos_slurpy '
+    $S0 = $P1['pos_slurpy']
+    say $S0
+
+    print 'named_required '
+    $S0 = $P1['named_required']
+    say $S0
+
+    print 'named_optional '
+    $S0 = $P1['named_optional']
+    say $S0
+
+    print 'named_slurpy '
+    $S0 = $P1['named_slurpy']
+    say $S0
+.end
+
+.sub foo
+    say 'bar'
+.end
+CODE
+pos_required 0
+pos_optional 0
+pos_slurpy 0
+named_required 0
+named_optional 0
+named_slurpy 0
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUT', 'interface' );
