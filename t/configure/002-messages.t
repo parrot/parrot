@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use Carp;
-use Test::More tests => 10;
+use Test::More tests => 13;
 use lib qw( lib );
 use Parrot::Configure::Messages qw|
     print_introduction
@@ -40,8 +40,9 @@ my $make_version   = 'gnu make';
     my $pseudo_conf = {
         log => [],
     };
+    my $args = {};
     capture(
-        sub { $rv = print_conclusion($pseudo_conf, $make_version); },
+        sub { $rv = print_conclusion($pseudo_conf, $make_version, $args); },
         \$stdout,
     );
     ok( $rv, "print_conclusion() returned true" );
@@ -52,23 +53,43 @@ my $make_version   = 'gnu make';
 }
 
 {
-    my ( $rv, $stdout );
+    my ( $rv, $stdout, $stderr );
+    my $pseudo_conf = {
+        log => [],
+    };
+    my $args = { silent => 1 };
+    capture(
+        sub { $rv = print_conclusion($pseudo_conf, $make_version, $args); },
+        \$stdout,
+        \$stderr,
+    );
+    ok( $rv, "print_conclusion() returned true" );
+
+    # Following test is definitive.
+    ok( ! $stdout, "Configure.pl operated silently, as requested" );
+}
+
+{
+    my ( $rv, $stdout, $stderr );
     my $pseudo_conf = {
         log => [
             undef,
             {   step    => q{init::manifest} },
         ],
     };
+    my $args = {};
     capture(
-        sub { $rv = print_conclusion($pseudo_conf, $make_version); },
+        sub { $rv = print_conclusion($pseudo_conf, $make_version, $args); },
         \$stdout,
+        \$stderr,
     );
     ok(! defined $rv, "print_conclusion() returned undefined value" );
 
-    like( $stdout,
+    ok( ! $stdout,
+        "Because of the error, nothing printed to standard output");
+    like( $stderr,
         qr/During configuration the following steps failed:.*init::manifest/s,
         "Got expected message re configuration step failure" );
-
 }
 
 pass("Completed all tests in $0");
