@@ -230,7 +230,7 @@ int
 is_op(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(is_op)
-    return parrot_hash_exists(interp, interp->op_hash, (void *)name);
+    return parrot_hash_exists(interp, interp->op_hash, name);
 }
 
 /*
