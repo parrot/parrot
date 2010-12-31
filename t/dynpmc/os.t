@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -454,6 +454,23 @@ CODE
 /link.* failed for OS PMC:/
 OUT
 }
+
+my $uid = system "id -u";
+
+# test get_user_id
+pir_output_is( <<'CODE', <<"OUT", 'Test chdir' );
+.sub main :main
+	$P0 = loadlib 'os'
+	$P1 = new ['OS']
+
+	$S1 = $P1."get_user_id"()
+	say $S1
+
+	end
+.end
+CODE
+$uid
+OUT
 
 # Local Variables:
 #   mode: cperl

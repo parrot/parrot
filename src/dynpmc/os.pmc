@@ -599,6 +599,14 @@ Returns the ID number of the current user. This is platform-dependent.
         RETURN(INTVAL uid);
     }
 
+/*
+
+=item C<can_execute(STRING *filename)>
+
+=cut
+
+*/
+
     METHOD can_execute(STRING *filename) {
         char * const file = Parrot_str_to_cstring(INTERP, filename);
         INTVAL can = 0;
