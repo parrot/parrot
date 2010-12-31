@@ -151,6 +151,7 @@ INTVAL Parrot_Run_OS_Command_Argv(Interp*, struct PMC *);
  * user information
  */
 
+PARROT_EXPORT
 UINTVAL Parrot_get_user_id();
 
 #endif /* PARROT_PLATFORM_INTERFACE_H_GUARD */
