@@ -136,7 +136,7 @@ static size_t key_hash_STRING(PARROT_INTERP,
 PARROT_CAN_RETURN_NULL
 static HashBucket * parrot_hash_get_bucket_string(PARROT_INTERP,
     ARGIN(const Hash *hash),
-    ARGIN(STRING *s),
+    ARGIN(const STRING *s),
     UINTVAL hashval)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -1289,12 +1289,13 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(cons
         return NULL;
 
     if (hash->key_type == Hash_key_type_STRING) {
-        STRING * const s       = (STRING *)PARROT_const_cast(void *, key);
-        const size_t   hashval = key_hash_STRING(interp, s, hash->seed);
+        const STRING * const str = (const STRING *)key;
+        const size_t hashval = key_hash_STRING(interp, str, hash->seed);
 
-        return parrot_hash_get_bucket_string(interp, hash, s, hashval);
+        return parrot_hash_get_bucket_string(interp, hash, str, hashval);
     }
     else {
+        /* The const casts are needed for PMC keys */
         const size_t hashval = key_hash(interp, hash,
                                     PARROT_const_cast(void *, key));
         HashBucket  *bucket  = hash->index[hashval & hash->mask];
@@ -1359,7 +1360,7 @@ parrot_hash_exists(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(const void *key
 /*
 
 =item C<static HashBucket * parrot_hash_get_bucket_string(PARROT_INTERP, const
-Hash *hash, STRING *s, UINTVAL hashval)>
+Hash *hash, const STRING *s, UINTVAL hashval)>
 
 Given a hash, a STRING key, and the hashval of the key, returns the appropriate
 bucket of the hash for the key.  This assumes buckets are already available, so
@@ -1372,7 +1373,7 @@ ensure the hash has storage before calling this function.
 PARROT_CAN_RETURN_NULL
 static HashBucket *
 parrot_hash_get_bucket_string(PARROT_INTERP, ARGIN(const Hash *hash),
-        ARGIN(STRING *s), UINTVAL hashval)
+        ARGIN(const STRING *s), UINTVAL hashval)
 {
     ASSERT_ARGS(parrot_hash_get_bucket_string)
     HashBucket *bucket = hash->index[hashval & hash->mask];
