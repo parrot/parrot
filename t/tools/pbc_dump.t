@@ -126,6 +126,20 @@ unlink('inc_a.pir');
 unlink('inc_b.pir');
 unlink('inc_c.pir');
 
+my $annotated_pir = <<'PIR'
+.sub 'main' :main
+  .annotate 'line', 1
+  .annotate 'hello', 'world'
+  .local int i
+  i = 123
+  .annotate 'hello', 'dragon'
+  .annotate 'line', 441
+  dec i
+  .annotate 'goodbye', 'parrot'
+  .annoate 'line', 12
+.end
+PIR
+
 =head1 HELPER SUBROUTINES
 
 =head2 dump_output_like

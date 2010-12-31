@@ -18,7 +18,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(83)
+    plan(84)
     test_setting_array_size()
     test_assign_from_another()
     test_assign_self()
