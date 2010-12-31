@@ -50,7 +50,7 @@ static void * dlopen_string(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING * get_path(PARROT_INTERP,
-    ARGIN(const STRING *lib),
+    ARGIN(STRING *lib),
     Parrot_dlopen_flags flags,
     ARGOUT(void **handle),
     ARGIN(const STRING *wo_ext),
@@ -64,15 +64,15 @@ static STRING * get_path(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC* is_loaded(PARROT_INTERP, ARGIN(const STRING *path))
+static PMC* is_loaded(PARROT_INTERP, ARGIN(STRING *path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 static PMC * run_init_lib(PARROT_INTERP,
     ARGIN(void *handle),
-    ARGIN(const STRING *lib_name),
-    ARGIN(const STRING *wo_ext))
+    ARGIN(STRING *lib_name),
+    ARGIN(STRING *wo_ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -81,7 +81,7 @@ static PMC * run_init_lib(PARROT_INTERP,
 static void set_cstring_prop(PARROT_INTERP,
     ARGMOD(PMC *lib_pmc),
     ARGIN(const char *what),
-    ARGIN(const STRING *name))
+    ARGIN(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -90,9 +90,9 @@ static void set_cstring_prop(PARROT_INTERP,
 
 static void store_lib_pmc(PARROT_INTERP,
     ARGIN(PMC *lib_pmc),
-    ARGIN(const STRING *path),
-    ARGIN(const STRING *type),
-    ARGIN(const STRING *lib_name))
+    ARGIN(STRING *path),
+    ARGIN(STRING *type),
+    ARGIN(STRING *lib_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -140,7 +140,7 @@ static void store_lib_pmc(PARROT_INTERP,
 /*
 
 =item C<static void set_cstring_prop(PARROT_INTERP, PMC *lib_pmc, const char
-*what, const STRING *name)>
+*what, STRING *name)>
 
 Sets a property C<name> with value C<what> on the C<ParrotLibrary> C<lib_pmc>.
 
@@ -150,7 +150,7 @@ Sets a property C<name> with value C<what> on the C<ParrotLibrary> C<lib_pmc>.
 
 static void
 set_cstring_prop(PARROT_INTERP, ARGMOD(PMC *lib_pmc), ARGIN(const char *what),
-        ARGIN(const STRING *name))
+        ARGIN(STRING *name))
 {
     ASSERT_ARGS(set_cstring_prop)
     STRING * const key  = Parrot_str_new_constant(interp, what);
@@ -163,8 +163,8 @@ set_cstring_prop(PARROT_INTERP, ARGMOD(PMC *lib_pmc), ARGIN(const char *what),
 
 /*
 
-=item C<static void store_lib_pmc(PARROT_INTERP, PMC *lib_pmc, const STRING
-*path, const STRING *type, const STRING *lib_name)>
+=item C<static void store_lib_pmc(PARROT_INTERP, PMC *lib_pmc, STRING *path,
+STRING *type, STRING *lib_name)>
 
 Stores a C<ParrotLibrary> PMC in the interpreter's C<iglobals>.
 
@@ -173,8 +173,8 @@ Stores a C<ParrotLibrary> PMC in the interpreter's C<iglobals>.
 */
 
 static void
-store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(const STRING *path),
-        ARGIN(const STRING *type), ARGIN(const STRING *lib_name))
+store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(STRING *path),
+        ARGIN(STRING *type), ARGIN(STRING *lib_name))
 {
     ASSERT_ARGS(store_lib_pmc)
     PMC * const iglobals = interp->iglobals;
@@ -194,7 +194,7 @@ store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(const STRING *path),
 
 /*
 
-=item C<static PMC* is_loaded(PARROT_INTERP, const STRING *path)>
+=item C<static PMC* is_loaded(PARROT_INTERP, STRING *path)>
 
 Returns a C<ParrotLibrary> PMC with the given filename path, if it exists.
 Otherwise returns PMCNULL.
@@ -206,7 +206,7 @@ Otherwise returns PMCNULL.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC*
-is_loaded(PARROT_INTERP, ARGIN(const STRING *path))
+is_loaded(PARROT_INTERP, ARGIN(STRING *path))
 {
     ASSERT_ARGS(is_loaded)
     PMC * const iglobals = interp->iglobals;
@@ -244,9 +244,8 @@ dlopen_string(PARROT_INTERP, Parrot_dlopen_flags flags, ARGIN(const STRING *path
 
 /*
 
-=item C<static STRING * get_path(PARROT_INTERP, const STRING *lib,
-Parrot_dlopen_flags flags, void **handle, const STRING *wo_ext, const STRING
-*ext)>
+=item C<static STRING * get_path(PARROT_INTERP, STRING *lib, Parrot_dlopen_flags
+flags, void **handle, const STRING *wo_ext, const STRING *ext)>
 
 Returns path and handle of a dynamic lib, setting lib_name to just the filestem
 (i.e. without path or extension) as a freshly-allocated C string.
@@ -258,7 +257,7 @@ Returns path and handle of a dynamic lib, setting lib_name to just the filestem
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING *
-get_path(PARROT_INTERP, ARGIN(const STRING *lib), Parrot_dlopen_flags flags,
+get_path(PARROT_INTERP, ARGIN(STRING *lib), Parrot_dlopen_flags flags,
         ARGOUT(void **handle), ARGIN(const STRING *wo_ext), ARGIN(const STRING *ext))
 {
     ASSERT_ARGS(get_path)
@@ -453,8 +452,8 @@ Parrot_dyn_dlsym_str(PARROT_INTERP,
 
 /*
 
-=item C<static PMC * run_init_lib(PARROT_INTERP, void *handle, const STRING
-*lib_name, const STRING *wo_ext)>
+=item C<static PMC * run_init_lib(PARROT_INTERP, void *handle, STRING *lib_name,
+STRING *wo_ext)>
 
 Loads and initializes a new library and returns a ParrotLibrary PMC.  Takes the
 name of a library C<lib_name>, that is loaded with handle C<handle>.  Calls the
@@ -467,7 +466,7 @@ necessary initialization routines, if any.
 PARROT_CANNOT_RETURN_NULL
 static PMC *
 run_init_lib(PARROT_INTERP, ARGIN(void *handle),
-        ARGIN(const STRING *lib_name), ARGIN(const STRING *wo_ext))
+        ARGIN(STRING *lib_name), ARGIN(STRING *wo_ext))
 {
     ASSERT_ARGS(run_init_lib)
     STRING *type;
@@ -539,14 +538,9 @@ static STRING *
 clone_string_into(ARGMOD(Interp *d), ARGIN(Interp *s), ARGIN(PMC *value))
 {
     ASSERT_ARGS(clone_string_into)
-    STRING * const  orig    = VTABLE_get_string(s, value);
-    char   * const  raw_str = Parrot_str_to_cstring(s, orig);
-    STRING * const  ret     =
-        Parrot_str_new_init(d, raw_str, strlen(raw_str),
-            Parrot_default_encoding_ptr,
-            PObj_constant_FLAG);
-    Parrot_str_free_cstring(raw_str);
-    return ret;
+    STRING * const  str = VTABLE_get_string(s, value);
+    return Parrot_str_new_init(d, str->strstart, str->bufused,
+            str->encoding, PObj_constant_FLAG);
 }
 
 
@@ -621,8 +615,7 @@ Parrot_dyn_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_p
 
 /*
 
-=item C<PMC * Parrot_dyn_load_lib(PARROT_INTERP, const STRING *lib, PMC
-*parameters)>
+=item C<PMC * Parrot_dyn_load_lib(PARROT_INTERP, STRING *lib, PMC *parameters)>
 
 Dynamic library loader.
 
@@ -652,7 +645,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_dyn_load_lib(PARROT_INTERP,
-        ARGIN_NULLOK(const STRING *lib),
+        ARGIN_NULLOK(STRING *lib),
         ARGIN_NULLOK(PMC *parameters))
 {
     ASSERT_ARGS(Parrot_dyn_load_lib)

@@ -485,6 +485,8 @@ void Parrot_compreg(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

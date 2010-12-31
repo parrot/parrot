@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 69;
+use Parrot::Test tests => 78;
 use Parrot::Config;
 
 =head1 NAME
@@ -26,6 +26,8 @@ C<Continuation> PMCs.
 
 =cut
 
+$ENV{TEST_PROG_ARGS} ||= '';
+my $testr = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
 my @todo;
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "PASM subs - invokecc" );
@@ -890,7 +892,9 @@ caller 1 main
 ok
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUT', ':immediate :postcomp' );
+SKIP: {
+    skip ':immediate/:postcomp only happen on compilation', 1 if $testr;
+    pir_output_is( <<'CODE', <<'OUT', ':immediate :postcomp' );
 .sub optc :immediate :postcomp
     print "initial\n"
 .end
@@ -902,6 +906,7 @@ initial
 initial
 main
 OUT
+}
 
 pir_output_like( <<'CODE', <<'OUTPUT', ':anon' );
 .sub main :main
@@ -1127,7 +1132,9 @@ CODE
 /Stringifying an Undef PMC/
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', ':postcomp' );
+SKIP: {
+    skip ':immediate/:postcomp only happen on compilation', 1 if $testr;
+    pir_output_is( <<'CODE', <<'OUTPUT', ':postcomp' );
 .sub main :main
     say 'main'
 .end
@@ -1150,6 +1157,7 @@ pc
 pc2
 main
 OUTPUT
+}
 
 # see also #38964
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names, compilation' );
@@ -1255,6 +1263,38 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'assign' );
 
 .sub ok
     say "ok"
+.end
+CODE
+ok
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "assign exception" );
+.sub a :main
+  $P0 = get_global 'ok'
+
+  $P1 = new ['String']
+  assign $P0, $P1
+.end
+
+.sub ok
+.end
+CODE
+/Can't assign a non-Sub type to a Sub/
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'destroy' );
+.sub main :main
+    $P0 = get_global 'ok'
+
+    # Make sure destroy is exercised
+    null $P0
+    sweep 1
+
+    say "ok"
+.end
+
+.sub ok
+    say "nothing"
 .end
 CODE
 ok
@@ -1433,8 +1473,7 @@ CODE
 I can has outer from eval?
 OUTPUT
 
-$ENV{TEST_PROG_ARGS} ||= '';
-@todo = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/
+@todo = $testr
     ? ( todo => 'lexicals not thawed properly from PBC, TT #1171' )
     : ();
 pir_output_is( <<'CODE', <<'OUTPUT', ':outer with identical sub names', @todo );
@@ -1521,6 +1560,48 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_string null check' );
     say 'ok'
 .end
 CODE
+ok
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'set_string_native' );
+.sub 'main' :main
+    $P0 = get_global 'original'
+    $P0()
+
+    $P0 = 'new_name'
+    $S0 = $P0
+    say $S0
+
+    $P0()
+.end
+
+.sub 'original'
+    say 'inside'
+.end
+CODE
+inside
+new_name
+inside
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'get_integer_keyed' );
+.sub 'main' :main
+    $P0 = get_global 'original'
+    $P0()
+
+    $I0 = $P0[0]
+
+    if $I0, ok
+
+  ok:
+    say 'ok'
+.end
+
+.sub 'original'
+    say 'inside'
+.end
+CODE
+inside
 ok
 OUTPUT
 
@@ -1630,13 +1711,49 @@ thawed
 hi
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', 'comp_flags method returns 0 for new Subs' );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $I0 = $P0.'comp_flags'()
+    say $I0
+.end
+CODE
+0
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'pf_flags method returns 0 for new Subs' );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $I0 = $P0.'pf_flags'()
+    say $I0
+.end
+CODE
+0
+OUTPUT
+
 pir_output_is( <<'CODE', <<'OUTPUT', 'init_pmc' );
 .sub 'main' :main
     .local pmc init, s, regs, arg_info
 
     init = new ['Hash']
-    init['start_offs']  = 42
-    init['end_offs']    = 115200
+    init['start_offs']     = 42
+    init['end_offs']       = 115200
+    init['HLL_id']         = 0
+    init['namespace_name'] = ''
+    init['namespace_stash'] = ''
+    init['name']           = 'foo'
+    init['method_name']    = 'bar'
+    init['ns_entry_name']  = 'ns_entry_name'
+    init['subid']          = 'subid'
+    init['vtable_index']   = -1
+    init['multi_signature'] = ''
+    init['lex_info']       = ''
+    init['outer_sub']      = ''
+    init['comp_flags']     = 0
+    init['pf_flags']       = 0
+
 
     regs = new ['FixedIntegerArray']
     regs = 4
@@ -1722,6 +1839,70 @@ pos_slurpy 2
 named_required 3
 named_optional 5
 named_slurpy 8
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "inspect unknown introspection value exception" );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $P1 = inspect $P0, 'foo_bar'
+.end
+CODE
+/Unknown introspection value 'foo_bar'/
+OUTPUT
+
+pir_output_like( <<'CODE', <<'OUTPUT', 'inspect return a hash' );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $P1 = inspect $P0
+    say $P1
+.end
+CODE
+/Hash/
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'inspect return hash with values' );
+.sub 'main' :main
+    $P0 = get_global 'foo'
+
+    $P1 = inspect $P0
+
+    print 'pos_required '
+    $S0 = $P1['pos_required']
+    say $S0
+
+    print 'pos_optional '
+    $S0 = $P1['pos_optional']
+    say $S0
+
+    print 'pos_slurpy '
+    $S0 = $P1['pos_slurpy']
+    say $S0
+
+    print 'named_required '
+    $S0 = $P1['named_required']
+    say $S0
+
+    print 'named_optional '
+    $S0 = $P1['named_optional']
+    say $S0
+
+    print 'named_slurpy '
+    $S0 = $P1['named_slurpy']
+    say $S0
+.end
+
+.sub foo
+    say 'bar'
+.end
+CODE
+pos_required 0
+pos_optional 0
+pos_slurpy 0
+named_required 0
+named_optional 0
+named_slurpy 0
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUT', 'interface' );

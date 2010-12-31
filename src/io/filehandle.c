@@ -540,32 +540,6 @@ Parrot_io_get_file_position(SHIM_INTERP, ARGIN(const PMC *filehandle))
 
 /*
 
-=item C<PIOOFF_T Parrot_io_get_last_file_position(PARROT_INTERP, const PMC
-*filehandle)>
-
-Get the C<file_pos> attribute of the FileHandle object, which stores
-the current file position of the filehandle.
-
-Currently, this pokes directly into the C struct of the FileHandle PMC. This
-needs to change to a general interface that can be used by all subclasses and
-polymorphic equivalents of FileHandle. For now, hiding it behind a function, so
-it can be cleanly changed later.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PIOOFF_T
-Parrot_io_get_last_file_position(SHIM_INTERP, ARGIN(const PMC *filehandle))
-{
-    ASSERT_ARGS(Parrot_io_get_last_file_position)
-    return PARROT_FILEHANDLE(filehandle)->last_pos;
-}
-
-/*
-
 =item C<void Parrot_io_set_file_position(PARROT_INTERP, PMC *filehandle,
 PIOOFF_T file_pos)>
 

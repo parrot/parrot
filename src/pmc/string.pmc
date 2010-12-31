@@ -189,13 +189,9 @@ Sets the value of the string to that of the specified C<string>.
             value = STRINGNULL;
 
         /* Only allow constant PMCs to embed constant strings */
-        if (PObj_constant_TEST(SELF) && !PObj_constant_TEST(value)) {
-            char * const copy = Parrot_str_to_cstring(INTERP, value);
-            value             = Parrot_str_new_init(INTERP, copy, strlen(copy),
-                Parrot_default_encoding_ptr,
-                PObj_constant_FLAG);
-            Parrot_str_free_cstring(copy);
-        }
+        if (PObj_constant_TEST(SELF) && !PObj_constant_TEST(value))
+            value = Parrot_str_new_init(INTERP, value->strstart, value->bufused,
+                                        value->encoding, PObj_constant_FLAG);
 
         SET_ATTR_str_val(INTERP, SELF, value);
     }
@@ -530,19 +526,19 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
         PMC * const result = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                         enum_class_Integer));
 
-        /* TODO verify encoding */
+        String_iter   iter;
         const STRING *me  = VTABLE_get_string(INTERP, SELF);
-        char  * const str = Parrot_str_to_cstring(INTERP, me);
         UINTVAL       i   = 0;
-        size_t        j   = 0;
-        size_t        len = strlen(str);
+        size_t        len = STRING_length(me);
 
         if (base < 2 || base > 36)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "invalid conversion to int - bad base %d", base);
 
-        while (j < len) {
-            const unsigned char c = str[j];
+        STRING_ITER_INIT(interp, &iter);
+
+        while (iter.charpos < len) {
+            int c = STRING_iter_get_and_advance(interp, me, &iter);
             int dig;
 
             if (isdigit((unsigned char)c))
@@ -552,23 +548,15 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
             else if (c >= 'A' && c <= 'Z')
                 dig = c - 'A' + 10;
             else
-                break;
+                dig = base;
 
             if (dig >= base)
-                break;
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                        "invalid conversion to int - bad char %c", c);
 
             i = i * base + dig;
-            ++j;
         }
 
-        if (j < len) {
-            const char ch = str[j];
-            Parrot_str_free_cstring(str);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                    "invalid conversion to int - bad char %c", ch);
-        }
-
-        Parrot_str_free_cstring(str);
         /* TODO: autopromote to BigInt instead of casting away the high bit */
         VTABLE_set_integer_native(INTERP, result, (INTVAL)i);
         RETURN(PMC *result);

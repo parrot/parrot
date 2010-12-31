@@ -86,7 +86,7 @@
     $S1 = substr $S0, i, 1
     if $S1 < '0' goto _IO__INPUT_INT__NAN
     if $S1 > '9' goto _IO__INPUT_INT__NAN
-    concat buf, $S1
+    buf = concat buf, $S1
     inc i
     if i < len goto _IO__INPUT_INT__NEXT_CHAR
 

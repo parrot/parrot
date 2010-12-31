@@ -978,10 +978,9 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
 #endif
 
     if (packed_size < PACKFILE_HEADER_BYTES) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: "
-            "Buffer length %d is shorter than PACKFILE_HEADER_BYTES %d\n",
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+        "PackFile_unpack: Buffer length %d is shorter than PACKFILE_HEADER_BYTES %d.",
             packed_size, PACKFILE_HEADER_BYTES);
-        return 0;
     }
 
     self->src  = packed;
@@ -992,9 +991,8 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
 
     /* Ensure the magic is correct. */
     if (memcmp(header->magic, "\376PBC\r\n\032\n", 8) != 0) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: "
-            "This is not a valid Parrot bytecode file\n");
-        return 0;
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+        "PackFile_unpack: This is not a valid Parrot bytecode file.");
     }
 
     /* Ensure the bytecode version is one we can read. Currently, we only
@@ -1005,11 +1003,11 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
      * NOTE: (ASTERISK) is *, we don't want to fool the C preprocessor. */
     if (header->bc_major != PARROT_PBC_MAJOR
     ||  header->bc_minor != PARROT_PBC_MINOR) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: This Parrot cannot read "
-            "bytecode files with version %d.%d.\n",
-            header->bc_major, header->bc_minor);
         if (!(self->options & PFOPT_UTILS))
-            return 0;
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PARROT_USAGE_ERROR,
+                    "PackFile_unpack: This Parrot cannot read bytecode "
+                    "files with version %d.%d.",
+                    header->bc_major, header->bc_minor);
     }
 
     /* Check wordsize, byte order and floating point number type are valid. */
@@ -1232,47 +1230,6 @@ PackFile_find_segment(PARROT_INTERP, ARGIN_NULLOK(PackFile_Directory *dir),
                         return seg;
                 }
             }
-        }
-    }
-
-    return NULL;
-}
-
-
-/*
-
-=item C<PackFile_Segment * PackFile_remove_segment_by_name(PARROT_INTERP,
-PackFile_Directory *dir, STRING *name)>
-
-Finds, removes, and returns the segment with name C<name> in the
-C<PackFile_Directory>.  The caller is responsible for destroying the segment.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PackFile_Segment *
-PackFile_remove_segment_by_name(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
-                                ARGIN(STRING *name))
-{
-    ASSERT_ARGS(PackFile_remove_segment_by_name)
-    size_t i;
-
-    for (i = 0; i < dir->num_segments; ++i) {
-        PackFile_Segment * const seg = dir->segments[i];
-        if (STRING_equal(interp, seg->name, name)) {
-            dir->num_segments--;
-
-            if (i != dir->num_segments) {
-                /* We're not the last segment, so we need to move things */
-                memmove(&dir->segments[i], &dir->segments[i+1],
-                       (dir->num_segments - i) * sizeof (PackFile_Segment *));
-            }
-
-            return seg;
         }
     }
 
@@ -3205,44 +3162,6 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug),
 
     /* Otherwise, no mappings == no filename. */
     return CONST_STRING(interp, "(unknown file)");
-}
-
-
-/*
-
-=item C<void Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)>
-
-Switches the current bytecode segment to the segment keyed by number C<seg>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)
-{
-    ASSERT_ARGS(Parrot_switch_to_cs_by_nr)
-    const PackFile_Directory * const dir      = interp->code->base.dir;
-    const size_t                     num_segs = dir->num_segments;
-
-    size_t   i;
-    opcode_t n;
-
-    /* TODO make an index of code segments for faster look up */
-    for (i = n = 0; i < num_segs; ++i) {
-        if (dir->segments[i]->type == PF_BYTEC_SEG) {
-            if (n == seg) {
-                Parrot_switch_to_cs(interp, (PackFile_ByteCode *)
-                        dir->segments[i], 1);
-                return;
-            }
-            ++n;
-        }
-    }
-
-    Parrot_ex_throw_from_c_args(interp, NULL, 1,
-        "Segment number %d not found\n", (int)seg);
 }
 
 

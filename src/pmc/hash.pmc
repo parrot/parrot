@@ -387,23 +387,16 @@ Return a representation of the hash contents.
         VTABLE_push_string(INTERP, sb, CONST_STRING(INTERP, "{"));
 
         for (j = 0; j < n; ++j) {
-            STRING * const key      = VTABLE_shift_string(INTERP, iter);
-            char *   const key_str  = Parrot_str_to_cstring(INTERP, key);
-            const size_t   str_len  = strlen(key_str);
-            size_t         i;
-            int            all_digit = 1;
+            STRING * const key = VTABLE_shift_string(INTERP, iter);
+            INTVAL         len = STRING_length(key);
+            INTVAL         idx;
             PMC           *val;
 
-            for (i = 0; i < str_len; ++i) {
-                if (!isdigit((unsigned char)key_str[i])) {
-                    all_digit = 0;
-                    break;
-                }
-            }
+            idx = STRING_find_not_cclass(interp, enum_cclass_numeric,
+                                         key, 0, len);
 
-            Parrot_str_free_cstring(key_str);
-
-            if (all_digit) {
+            if (idx >= len) {
+                /* Only digits */
                 VTABLE_push_string(INTERP, sb, key);
             }
             else {
