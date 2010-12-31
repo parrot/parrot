@@ -19,7 +19,7 @@ Tests the Class PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-     plan(76)
+     plan(78)
      'new op'()
      'class flag'()
      'name'()
@@ -29,6 +29,7 @@ Tests the Class PMC.
      'set_attr/get_attr'()
      'add_method'()
      'remove_method'()
+     'find_method'()
      'parents'()
      'roles'()
      'inspect'()
@@ -52,7 +53,6 @@ Tests the Class PMC.
     ok(1, "$P0 = new ['Class']")
     isa_ok(class, 'Class')
 .end
-
 
 # L<PDD15/Class PMC API/'Class PMCs also have the "I am a class" flag set on them.'>
 .sub 'class flag'
@@ -319,6 +319,27 @@ t_class_meth:
     pop_eh
   t_remove_inexistent_method:
     ok($I0, 'remove_method() with inexistent method fails')
+.end
+
+# L<PDD15/Class PMC API/=item find_method>
+.sub 'find_method'
+    .local pmc class
+    .local int test_val
+
+    class = new ['Class']
+
+    .const 'Sub' meth_to_add = 'foo'
+
+    class.'add_method'( 'foo1', meth_to_add )
+    class.'add_method'( 'foo2', meth_to_add )
+    class.'add_method'( 'foo3', meth_to_add )
+
+    $P0 = class.'find_method'( 'foo2' )
+    is($P0, 'foo', 'find_method() found the method')
+
+    $P0 = class.'find_method'( 'zzzz' )
+    $I0 = isnull $P0
+    ok($I0, 'find_method() returned null for inexistent method')
 .end
 
 # L<PDD15/Class PMC API/=item parents>
