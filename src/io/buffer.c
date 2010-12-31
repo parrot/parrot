@@ -449,6 +449,8 @@ size_t
 Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING **buf))
 {
     ASSERT_ARGS(Parrot_io_readline_buffer)
+    static const size_t max_split_bytes = 3;
+
     INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
     unsigned char *buffer_next;
     unsigned char *buffer_end;
@@ -488,7 +490,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
         Parrot_String_Bounds bounds;
 
         const size_t buffer_size = buffer_end - buffer_next;
-        size_t       chunk_size, new_size, decoded_bytes;
+        size_t       chunk_size, new_size, alloc_size, decoded_bytes;
         INTVAL       got;
 
         /* Partial scan of buffer */
@@ -510,11 +512,13 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
 
         decoded_bytes = s->bufused + bounds.bytes;
         new_size      = s->bufused + chunk_size;
+        /* Additional space for multi-byte char split across buffers */
+        alloc_size    = new_size + max_split_bytes;
 
         if (s->strstart)
-            Parrot_gc_reallocate_string_storage(interp, s, new_size);
+            Parrot_gc_reallocate_string_storage(interp, s, alloc_size);
         else
-            Parrot_gc_allocate_string_storage(interp, s, new_size);
+            Parrot_gc_allocate_string_storage(interp, s, alloc_size);
 
         memcpy(s->strstart + s->bufused, buffer_next, chunk_size);
 
@@ -553,7 +557,8 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
             /* Handle character split across buffers */
 
             size_t bytes_l = s->bufused - decoded_bytes;
-            size_t bytes_r = got < 3 ? got : 3;
+            size_t bytes_r = (size_t)got < max_split_bytes
+                           ? got : max_split_bytes;
 
             /* First, copy enough bytes to complete character */
             memcpy(s->strstart + s->bufused, buffer_next, bytes_r);
