@@ -562,7 +562,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed_int" );
 
-.sub _main
+.sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
 
@@ -581,7 +581,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_number_keyed_int" );
 
-.sub _main
+.sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
 
@@ -600,7 +600,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_pmc_keyed_int (negative index)" );
 
-.sub _main
+.sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
 
@@ -623,7 +623,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash delete_keyed_str" );
 
-.sub _main
+.sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
 
@@ -645,7 +645,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash push_string" );
 
-.sub _main
+.sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
 
@@ -665,7 +665,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash push_float" );
 
-.sub _main
+.sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
 
@@ -685,7 +685,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash get_string_keyed" );
 
-.sub _main
+.sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
 
@@ -706,7 +706,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash get_number" );
 
-.sub _main
+.sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
 
