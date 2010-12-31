@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 70;
+use Parrot::Test tests => 73;
 use Parrot::Config;
 
 =head1 NAME
@@ -1270,6 +1270,24 @@ CODE
 ok
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', 'destroy' );
+.sub main :main
+    $P0 = get_global 'ok'
+
+    # Make sure destroy is exercised
+    null $P0
+    sweep 1
+
+    say "ok"
+.end
+
+.sub ok
+    say "nothing"
+.end
+CODE
+ok
+OUTPUT
+
 pir_output_is( <<'CODE', <<'OUTPUT', 'assign w/:outer' );
 .sub main :main
     $P0 = get_global 'ok'
@@ -1531,6 +1549,48 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_string null check' );
     say 'ok'
 .end
 CODE
+ok
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'set_string_native' );
+.sub 'main'
+    $P0 = get_global 'original'
+    $P0()
+
+    $P0 = 'new_name'
+    $S0 = $P0
+    say $S0
+
+    $P0()
+.end
+
+.sub 'original'
+    say 'inside'
+.end
+CODE
+inside
+new_name
+inside
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'get_integer_keyed' );
+.sub 'main'
+    $P0 = get_global 'original'
+    $P0()
+
+    $I0 = $P0[0]
+
+    if $I0, ok
+
+  ok:
+    say 'ok'
+.end
+
+.sub 'original'
+    say 'inside'
+.end
+CODE
+inside
 ok
 OUTPUT
 
