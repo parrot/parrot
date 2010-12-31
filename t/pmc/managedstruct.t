@@ -17,13 +17,16 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(24)
+    plan(25)
 
     set_managedstruct_size()
     element_access()
     named_element_access_int16()
     nested_struct_offsets()
     interface_check()
+    destroy_custom()
+    #clone_custom()
+    realloc_free()
 .end
 
 .sub set_managedstruct_size
@@ -197,6 +200,36 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
     is(bool1, 1, "ManagedStruct does scalar")
     does bool1, pmc1, "no_interface"
     is(bool1, 0, "ManagedStruct doesn't do no_interface")
+.end
+
+.sub destroy_custom
+    .local pmc pmc1
+    pmc1 = new ['ManagedStruct']
+    
+    
+    $P0 = get_global 'test_handler'
+    # I'm not sure how to set custom_destroy func?
+    #setattribute pmc1, "custom_free_func", $P0
+
+    null pmc1
+    sweep 1
+.end
+
+.sub custom_destroyer
+    say "ManagedStruct being custom destroyed here"
+    #ok()
+.end
+
+.sub realloc_free 
+    .local pmc pmc1
+    pmc1 = new ['ManagedStruct']
+
+    # Allocate memory for the ms
+    pmc1 = 1337
+    # And free is by setting it to zero.
+    pmc1 = 0
+    
+    ok(1, "Allocate and free")
 .end
 
 # Local Variables:
