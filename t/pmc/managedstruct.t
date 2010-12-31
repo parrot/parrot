@@ -205,8 +205,8 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 .sub destroy_custom
     .local pmc pmc1
     pmc1 = new ['ManagedStruct']
-    
-    
+
+
     $P0 = get_global 'test_handler'
     # I'm not sure how to set custom_destroy func?
     #setattribute pmc1, "custom_free_func", $P0
@@ -220,7 +220,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
     #ok()
 .end
 
-.sub realloc_free 
+.sub realloc_free
     .local pmc pmc1
     pmc1 = new ['ManagedStruct']
 
@@ -228,7 +228,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
     pmc1 = 1337
     # And free is by setting it to zero.
     pmc1 = 0
-    
+
     ok(1, "Allocate and free")
 .end
 
