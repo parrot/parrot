@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -107,6 +107,31 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "init with wrong initializer type" 
 .end
 CODE
 /Task initializer must be a Hash/
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "set_string_native set type of task" );
+.sub main :main
+    $P0 = new ['Task']
+
+    $P1 = getattribute $P0, 'type'
+    say $P1
+
+    $P2 = new ['String']
+    $P2 = "new_type"
+    setattribute $P0, 'type', $P2
+
+    $P1 = getattribute $P0, 'type'
+    say $P1
+
+    $P0 = "newer_type"
+
+    $P1 = getattribute $P0, 'type'
+    say $P1
+.end
+CODE
+
+new_type
+newer_type
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUT', 'create a task and set attributes in init' );
