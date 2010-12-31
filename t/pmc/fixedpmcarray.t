@@ -235,6 +235,14 @@ out-of-bounds test. Checks INT and PMC keys.
     elem_out_string = matrix[0;0]
     is(elem_out_string,128)
 
+    throws_substring(<<'CODE', 'Cannot autovivify nested arrays', 'Autovivification of nested arrays fails')
+    .sub main
+        $P0 = new ['FixedPMCArray']
+        $P0 = 1
+        $P0[0;0] = 1.2
+    .end
+CODE
+
 .end
 
 .sub test_equality
