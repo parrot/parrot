@@ -1750,8 +1750,22 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'init_pmc' );
     .local pmc init, s, regs, arg_info
 
     init = new ['Hash']
-    init['start_offs']  = 42
-    init['end_offs']    = 115200
+    init['start_offs']     = 42
+    init['end_offs']       = 115200
+    init['HLL_id']         = 0
+    init['namespace_name'] = ''
+    init['namespace_stash'] = ''
+    init['name']           = 'foo'
+    init['method_name']    = 'bar'
+    init['ns_entry_name']  = 'ns_entry_name'
+    init['subid']          = 'subid'
+    init['vtable_index']   = -1
+    init['multi_signature'] = ''
+    init['lex_info']       = ''
+    init['outer_sub']      = ''
+    init['comp_flags']     = 0
+    init['pf_flags']       = 0
+
 
     regs = new ['FixedIntegerArray']
     regs = 4
