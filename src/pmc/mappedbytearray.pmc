@@ -634,8 +634,8 @@ get_encoded_chars(PARROT_INTERP, ARGIN(PMC *self), INTVAL pos, INTVAL length,
                 EXCEPTION_OUT_OF_BOUNDS,
                 "get_chars: index out of bounds");
 
-    return Parrot_str_extract_chars(interp, buffer + pos, size - pos, length,
-                encoding);
+    return Parrot_str_extract_chars(interp, (char *)buffer + pos, size - pos,
+                length, encoding);
 }
 
 /*

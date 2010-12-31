@@ -497,7 +497,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
         bounds.chars = -1;
         bounds.delim = rs;
 
-        s->encoding->partial_scan(interp, buffer_next, &bounds);
+        s->encoding->partial_scan(interp, (char *)buffer_next, &bounds);
 
         /* Append buffer to result */
 
