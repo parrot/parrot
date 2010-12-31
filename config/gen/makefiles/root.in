@@ -2136,7 +2136,7 @@ examples_tests : test_prep
 moretests: test_prep \
     test \
     examples_tests \
-	nocritic_codetest
+    nocritic_codetest
 
 # benchmark tests
 benchmark_tests : test_prep
