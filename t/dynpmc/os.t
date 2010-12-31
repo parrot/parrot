@@ -455,16 +455,16 @@ CODE
 OUT
 }
 
-my $uid = system "id -u";
+my $uid = getpwnam(getpwent());
 
 # test get_user_id
-pir_output_is( <<'CODE', <<"OUT", 'Test chdir' );
+pir_output_is( <<'CODE', <<"OUT", 'Test get_user_id' );
 .sub main :main
 	$P0 = loadlib 'os'
 	$P1 = new ['OS']
 
-	$S1 = $P1."get_user_id"()
-	say $S1
+	$I0 = $P1."get_user_id"()
+	say $I0
 
 	end
 .end
