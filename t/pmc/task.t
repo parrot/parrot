@@ -44,6 +44,14 @@ pir_output_is( <<'CODE', <<'OUT', "create a task and set attributes" );
     print $P3
     print "\n"
 
+    $P2 = new ['String']
+    $P2 = "sub event"
+    setattribute $P0, 'subtype', $P2
+
+    $P3 = getattribute $P0, 'subtype'
+    print $P3
+    print "\n"
+
     $P2 = new ['Integer']
     $P2 = 10
     setattribute $P0, 'priority', $P2
@@ -67,12 +75,24 @@ pir_output_is( <<'CODE', <<'OUT', "create a task and set attributes" );
     $P3 = getattribute $P0, 'birthtime'
     print $P3
     print "\n"
+
+    $P2 = new ['String']
+    $P2 = "aditional data"
+    setattribute $P0, 'data', $P2
+
+    $P2 = get_global 'code'
+    setattribute $P0, 'code', $P2
     end
+  .end
+
+  .sub code
+    say "sub"
   .end
 CODE
 created
 inprocess
 event
+sub event
 10
 7405
 1.1
