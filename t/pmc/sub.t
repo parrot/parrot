@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 80;
+use Parrot::Test tests => 79;
 use Parrot::Config;
 
 =head1 NAME
@@ -1282,15 +1282,6 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "assign exception" );
 .end
 CODE
 /Can't assign a non-Sub type to a Sub/
-OUTPUT
-
-pir_error_output_like( <<'CODE', <<'OUTPUT', "set_pointer exception" );
-.sub a
-  $P0 = new ['Sub']
-  $P0.'set_pointer'()
-.end
-CODE
-/Method 'set_pointer' not found for invocant of class 'Sub'/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'destroy' );
