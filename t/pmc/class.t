@@ -19,7 +19,7 @@ Tests the Class PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-     plan(78)
+     plan(87)
      'new op'()
      'class flag'()
      'name'()
@@ -30,6 +30,7 @@ Tests the Class PMC.
      'add_method'()
      'remove_method'()
      'find_method'()
+     'vtable_override'()
      'parents'()
      'roles'()
      'inspect'()
@@ -342,6 +343,44 @@ t_class_meth:
     ok($I0, 'find_method() returned null for inexistent method')
 .end
 
+# L<PDD15/Class PMC API/=item add_vtable_override>
+.sub 'vtable_override'
+    .local pmc class, obj
+    class = new ['Class']
+
+    $P0 = get_global 'new_add_role'
+    class.'add_vtable_override'('add_role', $P0)
+    ok(1, 'add_vtable_override() overrode a vtable')
+
+    obj = class.'new'()
+
+    $P0 = class.'inspect'('vtable_overrides')
+    $S0 = $P0['add_role']
+    is($S0, 'new_add_role', 'add_vtable_override() confirmed by inspect()')
+
+    $P0 = new ['Role']
+    addrole obj, $P0
+
+    $I0 = 1
+    push_eh t_duplicated_override
+    class.'add_vtable_override'('add_role', $P0)
+    $I0 = 0
+    pop_eh
+  t_duplicated_override:
+    ok($I0, 'add_vtable_override() with duplicated name fails')
+
+    $I0 = 1
+    push_eh t_invalid_name
+    class.'add_vtable_override'('zzz', $P0)
+    $I0 = 0
+    pop_eh
+  t_invalid_name:
+    ok($I0, 'add_vtable_override() with invalid name fails')
+.end
+.sub 'new_add_role'
+    ok(1, 'overridden vtable method called')
+.end
+
 # L<PDD15/Class PMC API/=item parents>
 .sub 'parents'
     .local pmc class, parents
@@ -401,6 +440,25 @@ t_class_meth:
     result = class.'inspect'('attributes')
     test_val = elements result
     is(test_val, 1, 'inspect() "attributes" param returns correctly sized value')
+
+    result = class.'inspect'('id')
+    is(result, '99', 'inspect() "id" returns expected default value')
+
+    result = class.'inspect'('attrib_index')
+    $I0 = isnull result
+    ok($I0, 'inspect() "attrib_index" returns expected default value')
+
+    result = class.'inspect'('vtable_overrides')
+    $S0 = typeof result
+    is($S0, 'Hash', 'inspect() "vtable_overrides" param returns expected value')
+
+    $I0 = 1
+    push_eh t_inexistent_attribute
+    result = class.'inspect'('zzzzzz')
+    $I0 = 0
+    pop_eh
+  t_inexistent_attribute:
+    ok($I0, 'inspect() with inexistent attribute fails')
 .end
 # TODO more tests
 
