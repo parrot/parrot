@@ -152,7 +152,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL parrot_hash_exists(PARROT_INTERP,
     ARGIN(const Hash *hash),
-    ARGIN(void *key))
+    ARGIN(const void *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
