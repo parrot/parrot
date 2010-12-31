@@ -117,8 +117,9 @@ void Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
 PARROT_EXPORT
 void Parrot_set_configuration_hash_legacy(PARROT_INTERP,
     const int length,
-    const unsigned char *bytes)
-        __attribute__nonnull__(1);
+    ARGIN(const unsigned char *bytes))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 void Parrot_set_debug(PARROT_INTERP, Parrot_UInt flag)
@@ -200,7 +201,8 @@ PMC* set_current_sub(PARROT_INTERP)
     , PARROT_ASSERT_ARG(argv))
 #define ASSERT_ARGS_Parrot_set_configuration_hash_legacy \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(bytes))
 #define ASSERT_ARGS_Parrot_set_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_set_executable_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

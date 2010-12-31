@@ -286,6 +286,7 @@
 /src/*.str
 /src/asmfun.*
 /src/core_pmcs.c
+/src/embed/*.o
 /src/exec_cpu.c
 /src/exec_dep.c
 /src/exec_dep.h

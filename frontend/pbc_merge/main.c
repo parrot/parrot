@@ -282,7 +282,7 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
 
 static void
 ensure_libdep(PARROT_INTERP, PackFile_ByteCode *bc, STRING *lib) {
-    int i;
+    size_t i;
     for (i = 0; i < bc->n_libdeps; i++) {
         if (Parrot_str_equal(interp, bc->libdeps[i], lib)) {
             return;
@@ -315,7 +315,8 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                    int num_inputs, ARGMOD(PackFile *pf))
 {
     ASSERT_ARGS(pbc_merge_bytecode)
-    int i, j;
+    int i;
+    size_t j;
     opcode_t *bc    = mem_gc_allocate_typed(interp, opcode_t);
     opcode_t cursor = 0;
 

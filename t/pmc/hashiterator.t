@@ -23,7 +23,7 @@ well.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(12)
+    plan(14)
 
     iter_over_empty_hash()
     iter_over_single_element()
@@ -31,6 +31,7 @@ well.
     iter_invalid_type()
     iter_hash_keyed_int()
     iter_clone()
+    iter_and_delete()
 .end
 
 .sub 'iter_over_empty_hash'
@@ -143,6 +144,48 @@ well.
     cl = clone it
     result = isnull cl
     ok(result, 'clone of HashIterator gives null')
+.end
+
+.sub iter_and_delete
+    .local pmc hash, it, value
+    .local int check
+
+    hash = new ['Hash']
+    hash = .Hash_key_type_int
+    hash[1] = 'a'
+    hash[2] = 'b'
+    hash[3] = 'c'
+    it = iter hash
+    delete hash[1]
+    delete hash[2]
+    delete hash[3]
+    check = 0
+    push_eh catch_int
+    value = shift it
+    goto report_int
+  catch_int:
+    check = 1
+  report_int:
+    ok(check, 'iterate over int hash with deleted keys')
+    pop_eh
+
+    hash = new ['Hash']
+    hash['x'] = 'a'
+    hash['y'] = 'b'
+    hash['z'] = 'c'
+    it = iter hash
+    delete hash['x']
+    delete hash['y']
+    delete hash['z']
+    check = 0
+    push_eh catch
+    value = shift it
+    goto report
+  catch:
+    check = 1
+  report:
+    ok(check, 'iterate over string hash with deleted keys')
+    pop_eh
 .end
 
 # Local Variables:

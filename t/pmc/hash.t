@@ -24,7 +24,7 @@ well.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(175)
+    plan(176)
 
     initial_hash_tests()
     more_than_one_hash()
@@ -1353,6 +1353,11 @@ postit_end:
     # '42 parrots' numifies to '42'. So check it
     $S0 = hash[42]
     is($S0, 'Wins!', 'Key was numified again')
+
+    # delete key 0
+    delete hash[0]
+    $S0 = hash[0]
+    is($S0, '', 'Item with key 0 deleted')
 .end
 
 # Check that we can set various value types and they properly converted

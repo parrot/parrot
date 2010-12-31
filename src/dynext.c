@@ -538,14 +538,9 @@ static STRING *
 clone_string_into(ARGMOD(Interp *d), ARGIN(Interp *s), ARGIN(PMC *value))
 {
     ASSERT_ARGS(clone_string_into)
-    STRING * const  orig    = VTABLE_get_string(s, value);
-    char   * const  raw_str = Parrot_str_to_cstring(s, orig);
-    STRING * const  ret     =
-        Parrot_str_new_init(d, raw_str, strlen(raw_str),
-            Parrot_default_encoding_ptr,
-            PObj_constant_FLAG);
-    Parrot_str_free_cstring(raw_str);
-    return ret;
+    STRING * const  str = VTABLE_get_string(s, value);
+    return Parrot_str_new_init(d, str->strstart, str->bufused,
+            str->encoding, PObj_constant_FLAG);
 }
 
 
