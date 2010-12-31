@@ -348,6 +348,37 @@ as the string argument.
         RETURN(STRING *result);
     }
 
+/*
+
+=item C<get_chars(int pos, int length, string encoding)>
+
+Get a string from the buffer content with the specified encoding and
+length in codepoints.
+
+=cut
+
+*/
+
+    METHOD get_chars(INTVAL pos, INTVAL length, STRING *encodingname)
+    {
+        const STR_VTABLE *encoding = Parrot_find_encoding_by_string(INTERP, encodingname);
+        STRING           *result;
+        unsigned char    *content;
+        INTVAL            size;
+
+        GET_ATTR_content(interp, SELF, content);
+        GET_ATTR_size(interp, SELF, size);
+
+        if (pos < 0 || pos > size)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_OUT_OF_BOUNDS,
+                    "get_chars: index out of bounds");
+
+        result = Parrot_str_extract_chars(INTERP, (char *)content + pos,
+                    size - pos, length, encoding);
+        RETURN(STRING *result);
+    }
+
 } /* pmclass end */
 
 /*

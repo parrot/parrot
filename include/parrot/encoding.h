@@ -78,6 +78,14 @@ PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
+const STR_VTABLE * Parrot_find_encoding_by_string(SHIM_INTERP,
+    ARGIN(STRING *encodingname))
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 const STR_VTABLE* Parrot_get_encoding(SHIM_INTERP,
     INTVAL number_of_encoding);
 
@@ -123,6 +131,9 @@ void Parrot_str_internal_register_encoding_names(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_encodings_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_find_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(encodingname))
+#define ASSERT_ARGS_Parrot_find_encoding_by_string \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(encodingname))
 #define ASSERT_ARGS_Parrot_get_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_load_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

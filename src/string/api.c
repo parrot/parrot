@@ -692,6 +692,50 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
 
 /*
 
+=item C<STRING * Parrot_str_extract_chars(PARROT_INTERP, const char *buffer,
+UINTVAL len, INTVAL chars, const STR_VTABLE *encoding)>
+
+Extracts C<chars> characters from C<buffer> containing C<len> bytes.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_str_extract_chars(PARROT_INTERP, ARGIN(const char *buffer),
+        UINTVAL len, INTVAL chars, ARGIN(const STR_VTABLE *encoding))
+{
+    ASSERT_ARGS(Parrot_str_extract_chars)
+    Parrot_String_Bounds  bounds;
+    STRING               *result;
+
+    bounds.bytes = len;
+    bounds.chars = chars;
+    bounds.delim = -1;
+
+    encoding->partial_scan(interp, buffer, &bounds);
+
+    if (bounds.chars < chars)
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_OUT_OF_BOUNDS,
+                "extract_chars: index out of bounds");
+
+    result = Parrot_str_new_noinit(interp, bounds.bytes);
+
+    result->encoding = encoding;
+    result->bufused  = bounds.bytes;
+    result->strlen   = bounds.chars;
+
+    memcpy(result->strstart, buffer, bounds.bytes);
+
+    return result;
+}
+
+
+/*
+
 =back
 
 =head2 Ordinary user-visible string operations

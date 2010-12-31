@@ -18,7 +18,7 @@ Tests the MappedByteArray PMC.
 .sub main :main
     .include 'test_more.pir'
     .const int inittests = 4
-    .const int moretests = 6
+    .const int moretests = 9
     .local int alltests
     alltests = inittests + moretests
     plan(alltests)
@@ -79,9 +79,7 @@ Tests the MappedByteArray PMC.
     mm = new ['MappedByteArray'], filename
 
     $I0 = elements mm
-
-    $S0 = mm.'get_utf8'(0, $I0)
-    is( $S0, "This is a test", "Reading test file with get_utf8 successful" )
+    is( $I0, 43, "Number of elements" )
 
     $I1 = mm."close"()
     is( $I1, 0, 'Closed and unmapped testfile' )
@@ -95,8 +93,38 @@ Tests the MappedByteArray PMC.
 
     $I0 = elements mm
 
-    $S0 = mm.'get_string'(0, $I0, 'utf8')
+    $S0 = mm.'get_string'(0, 14, 'ascii')
     is( $S0, "This is a test", "Reading test file with get_string successful" )
+
+    $S0 = mm.'get_utf8'(16, 23)
+    is( $S0, utf8:"Ärger, Ökonom, Übermut!", "Reading test file with get_utf8 successful" )
+
+    .local string message
+    push_eh catch
+    $S0 = mm.'get_utf8'(17, 4)
+    goto report
+  catch:
+    .local pmc exception
+    .get_results(exception)
+    message = exception
+  report:
+    $I0 = index message, 'Malformed UTF-8'
+    $I1 = $I0 != -1
+    ok( $I1, 'Invalid UTF-8' )
+    pop_eh
+
+    push_eh catch2
+    $S0 = mm.'get_utf8'(0, 200)
+    goto report2
+  catch2:
+    .local pmc exception
+    .get_results(exception)
+    message = exception
+  report2:
+    $I0 = index message, 'out of bounds'
+    $I1 = $I0 != -1
+    ok( $I1, 'Out of bounds access' )
+    pop_eh
 
     $I1 = mm[0]
 
