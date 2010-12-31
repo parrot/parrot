@@ -41,7 +41,7 @@ a new F<src/io/io_string.c>.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
-static const STR_VTABLE * get_encoding(PARROT_INTERP, ARGIN(const PMC *pmc))
+static const STR_VTABLE * get_encoding(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -394,7 +394,7 @@ Parrot_io_flush(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
 
 /*
 
-=item C<static const STR_VTABLE * get_encoding(PARROT_INTERP, const PMC *pmc)>
+=item C<static const STR_VTABLE * get_encoding(PARROT_INTERP, PMC *pmc)>
 
 Get the encoding vtable of a filehandle PMC
 
@@ -404,7 +404,7 @@ Get the encoding vtable of a filehandle PMC
 
 PARROT_CANNOT_RETURN_NULL
 static const STR_VTABLE *
-get_encoding(PARROT_INTERP, ARGIN(const PMC *pmc))
+get_encoding(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(get_encoding)
     STRING           *encoding_str;
@@ -415,8 +415,7 @@ get_encoding(PARROT_INTERP, ARGIN(const PMC *pmc))
     if (STRING_IS_NULL(encoding_str))
         encoding = Parrot_default_encoding_ptr;
     else
-        encoding = Parrot_get_encoding(interp,
-            Parrot_encoding_number(interp, encoding_str));
+        encoding = Parrot_find_encoding_by_string(interp, encoding_str);
 
     return encoding;
 }
@@ -809,8 +808,7 @@ Parrot_io_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
          */
 
         if (!STRING_IS_NULL(encoding_str)) {
-            encoding = Parrot_get_encoding(interp,
-                Parrot_encoding_number(interp, encoding_str));
+            encoding = Parrot_find_encoding_by_string(interp, encoding_str);
 
             if (encoding != s->encoding
             &&  encoding != Parrot_binary_encoding_ptr)

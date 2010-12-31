@@ -317,8 +317,7 @@ Create a string with the buffer content and the encoding specified.
         STRING *result;
         unsigned char *content;
         INTVAL size;
-        const STR_VTABLE *encoding = Parrot_get_encoding(INTERP,
-            Parrot_encoding_number(INTERP, encodingname));
+        const STR_VTABLE *encoding = Parrot_find_encoding_by_string(INTERP, encodingname);
         GET_ATTR_content(INTERP, SELF, content);
         GET_ATTR_size(INTERP, SELF, size);
         result = build_string(INTERP, content, size, encoding);

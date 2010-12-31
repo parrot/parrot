@@ -337,7 +337,7 @@ Read a line from the filehandle and return it in a string.
             if (*r)
                 add_history(r);
             if (!STRING_IS_NULL(encoding))
-                enc = Parrot_get_encoding(INTERP, Parrot_encoding_number(INTERP, encoding));
+                enc = Parrot_find_encoding_by_string(INTERP, encoding);
             if (enc == NULL)
                 string_result = Parrot_str_new(INTERP, r, 0);
             else
