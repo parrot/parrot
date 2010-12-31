@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 78;
+use Parrot::Test tests => 80;
 use Parrot::Config;
 
 =head1 NAME
@@ -1284,6 +1284,15 @@ CODE
 /Can't assign a non-Sub type to a Sub/
 OUTPUT
 
+pir_error_output_like( <<'CODE', <<'OUTPUT', "set_pointer exception" );
+.sub a
+  $P0 = new ['Sub']
+  $P0.'set_pointer'()
+.end
+CODE
+/Method 'set_pointer' not found for invocant of class 'Sub'/
+OUTPUT
+
 pir_output_is( <<'CODE', <<'OUTPUT', 'destroy' );
 .sub main :main
     $P0 = get_global 'ok'
@@ -1714,7 +1723,7 @@ thawed
 hi
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'comp_flags method' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'comp_flags method returns 0 for new Subs' );
 .sub 'main' :main
     $P0 = new ['Sub']
 
@@ -1725,7 +1734,7 @@ CODE
 0
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'pf_flags method' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'pf_flags method returns 0 for new Subs' );
 .sub 'main' :main
     $P0 = new ['Sub']
 
@@ -1828,6 +1837,16 @@ pos_slurpy 2
 named_required 3
 named_optional 5
 named_slurpy 8
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "inspect unknown introspection value exception" );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $P1 = inspect $P0, 'foo_bar'
+.end
+CODE
+/Unknown introspection value 'foo_bar'/
 OUTPUT
 
 pir_output_like( <<'CODE', <<'OUTPUT', 'inspect return a hash' );
