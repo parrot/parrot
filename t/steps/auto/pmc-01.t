@@ -75,7 +75,7 @@ my $cwd = cwd();
     close $IN2 or croak "Unable to close file after writing: $!";
     ok( !  defined (
             auto::pmc::contains_pccmethod($pmc_sans_PCCMETHOD)
-        ), "Internal subroutine contains_pccmethod returns true as expected"
+        ), "Internal subroutine contains_pccmethod returns undefined as expected"
     );
 
     my $file = 'foobar';

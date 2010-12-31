@@ -1068,14 +1068,9 @@ $(INSTALLABLEPDB) : frontend/parrot_debugger/main$(O) $(LIBPARROT) src/parrot_co
 #
 
 src/pbc_disassemble$(O) : \
+    $(PARROT_H_HEADERS) \
     $(INC_DIR)/api.h \
-    $(INC_DIR)/compiler.h \
-    $(INC_DIR)/config.h \
-    $(INC_DIR)/core_types.h \
-    $(INC_DIR)/feature.h \
-    $(INC_DIR)/has_header.h \
     $(INC_DIR)/longopt.h \
-    $(INC_DIR)/platform_limits.h \
     src/pbc_disassemble.c \
 
 $(DIS) : src/pbc_disassemble$(O) $(LIBPARROT)
