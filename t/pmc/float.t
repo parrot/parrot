@@ -15,7 +15,7 @@ Tests the Float PMC.
 
 =cut
 
-.const int TESTS = 166
+.const int TESTS = 177
 .const num PRECISION = 0.000001
 
 .sub 'test' :main
@@ -38,10 +38,14 @@ Tests the Float PMC.
     integer_subtraction()
     integer_multiplication()
     integer_division()
+    integer_modulus()
     number_addition()
     number_subtraction()
     number_multiplication()
     number_division()
+    number_modulus()
+    pmc_division()
+    pmc_modulus()
     increment_decrement()
     'neg'()
     negative_zero()
@@ -260,8 +264,11 @@ Tests the Float PMC.
     $P0 *= -1
     is($P0, -10.0, 'Basic integer arithmetic: multiplication (2)', PRECISION)
 
+    $P1 = $P0 * 2
+    is($P1, -20.0, 'Basic integer arithmetic: multiplication (3)', PRECISION)
+
     $P0 *= 0
-    is($P0, 0.0, 'Basic integer arithmetic: multiplication (3)', PRECISION)
+    is($P0, 0.0, 'Basic integer arithmetic: multiplication (4)', PRECISION)
 .end
 
 .sub 'integer_division'
@@ -275,6 +282,17 @@ Tests the Float PMC.
     is($P0, 0.01, 'Basic integer arithmetic: division (2)', PRECISION)
 .end
 
+.sub 'integer_modulus'
+    $P0 = new ['Float']
+
+    $P0 = 200.0
+    $P0 %= 21
+    is($P0, 11.0, 'Basic integer arithmetic: modulus (1)', PRECISION)
+
+    $P1 = $P0 % 4
+    is($P1, 3.0, 'Basic integer arithmetic: modulus (2)', PRECISION)
+.end
+
 .sub 'number_addition'
     $P0 = new ['Float']
 
@@ -284,6 +302,9 @@ Tests the Float PMC.
 
     $P0 += -2.4
     is($P0, -1.199, 'Basic numeric arithmetic: addition (2)', PRECISION)
+
+    $P1 = $P0 + 1.399
+    is($P1, 0.2, 'Basic numeric arithmetic: addition (3)', PRECISION)
 .end
 
 .sub 'number_subtraction'
@@ -295,6 +316,9 @@ Tests the Float PMC.
 
     $P0 -= -0.01
     is($P0, 100.0, 'Basic numeric arithmetic: subtraction (2)', PRECISION)
+
+    $P1 = $P0 - 52.5
+    is($P1, 47.5, 'Basic numeric arithmetic: subtraction (3)', PRECISION)
 .end
 
 .sub 'number_multiplication'
@@ -307,8 +331,11 @@ Tests the Float PMC.
     $P0 *= -2.6
     is($P0, -0.3211, 'Basic numeric arithmetic: multiplication (2)', PRECISION)
 
+    $P1 = $P0 * 2.9
+    is($P1, -0.93119, 'Basic numeric arithmetic: multiplication (3)', PRECISION)
+
     $P0 *= 0.0
-    is($P0, 0.0, 'Basic numeric arithmetic: multiplication (3)', PRECISION)
+    is($P0, 0.0, 'Basic numeric arithmetic: multiplication (4)', PRECISION)
 .end
 
 .sub 'number_division'
@@ -320,6 +347,42 @@ Tests the Float PMC.
 
     $P0 /= 4000.0
     is($P0, 50000.0, 'Basic numeric arithmetic: division (2)', PRECISION)
+.end
+
+.sub 'number_modulus'
+    $P0 = new ['Float']
+
+    $P0 = 21.5
+    $P0 %= 2.0
+    is($P0, 1.5, 'Basic numeric arithmetic: modulus (1)', PRECISION)
+
+    $P1 = $P0 % 0.2
+    is($P1, 0.1, 'Basic numeric arithmetic: modulus (2)', PRECISION)
+.end
+
+.sub 'pmc_division'
+    $P0 = new ['Float']
+
+    $P1 = new ['Float']
+    $P1 = 5.6
+
+    $P0 = 24.5
+    $P0 /= $P1
+    is($P0, 4.375, 'Basic pmc arithmetic: division (1)', PRECISION)
+.end
+
+.sub 'pmc_modulus'
+    $P0 = new ['Float']
+
+    $P1 = new ['Float']
+    $P1 = 7.0
+
+    $P0 = 24.5
+    $P0 %= $P1
+    is($P0, 3.5, 'Basic pmc arithmetic: modulus (1)', PRECISION)
+
+    $P2 = $P0 % $P1
+    is($P2, 3.5, 'Basic pmc arithmetic: modulus (2)', PRECISION)
 .end
 
 .sub 'increment_decrement'
