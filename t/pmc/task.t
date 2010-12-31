@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 =head1 NAME
 
@@ -77,6 +77,17 @@ event
 7405
 1.1
 OUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "init with wrong initializer type" );
+.sub main :main
+    $P0 = new ['String']
+    $P0 = 'foo'
+
+    $P1 = new ['Task'], $P0
+.end
+CODE
+/Task initializer must be a Hash/
+OUTPUT
 
 pir_output_is( <<'CODE', <<'OUT', 'create a task and set attributes in init' );
   .sub main :main
