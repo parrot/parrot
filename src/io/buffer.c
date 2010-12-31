@@ -449,11 +449,17 @@ size_t
 Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING **buf))
 {
     ASSERT_ARGS(Parrot_io_readline_buffer)
-    const INTVAL   buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
+    INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
     unsigned char *buffer_next;
     unsigned char *buffer_end;
     STRING        *s;
     INTVAL         rs;
+
+    /* write buffer flush */
+    if (buffer_flags & PIO_BF_WRITEBUF) {
+        Parrot_io_flush_buffer(interp, filehandle);
+        buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
+    }
 
     if (*buf == NULL) {
         *buf = Parrot_gc_new_string_header(interp, 0);
