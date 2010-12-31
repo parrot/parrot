@@ -15,7 +15,7 @@ unspecified).
 
 =cut
 
-.sub _main
+.sub _main :main
     .param pmc argv
     .local int argc
     argc = argv
