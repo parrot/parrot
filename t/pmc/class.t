@@ -19,7 +19,7 @@ Tests the Class PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-     plan(73)
+     plan(76)
      'new op'()
      'class flag'()
      'name'()
@@ -28,6 +28,7 @@ Tests the Class PMC.
      'add_attribute'()
      'set_attr/get_attr'()
      'add_method'()
+     'remove_method'()
      'parents'()
      'roles'()
      'inspect'()
@@ -286,6 +287,39 @@ t_class_meth:
     .return ('bar')
 .end
 
+# L<PDD15/Class PMC API/=item remove_method>
+.sub 'remove_method'
+    .local pmc class, attribs
+    .local int test_val
+
+    class = new ['Class']
+
+    $I0 = 1
+    push_eh t_no_args
+    class.'remove_method'()
+    $I0 = 0
+    pop_eh
+  t_no_args:
+    ok($I0, 'remove_method() with no args fails')
+
+    .const 'Sub' meth_to_add = 'foo'
+
+    class.'add_method'( 'foo', meth_to_add )
+    class.'remove_method'( 'foo' )
+
+    attribs = class.'methods'()
+
+    test_val = exists attribs['foo']
+    is(test_val, 0, 'remove_method() removed the method')
+
+    $I0 = 1
+    push_eh t_remove_inexistent_method
+    class.'remove_method'( 'bar' )
+    $I0 = 0
+    pop_eh
+  t_remove_inexistent_method:
+    ok($I0, 'remove_method() with inexistent method fails')
+.end
 
 # L<PDD15/Class PMC API/=item parents>
 .sub 'parents'
