@@ -1237,47 +1237,6 @@ PackFile_find_segment(PARROT_INTERP, ARGIN_NULLOK(PackFile_Directory *dir),
 
 /*
 
-=item C<PackFile_Segment * PackFile_remove_segment_by_name(PARROT_INTERP,
-PackFile_Directory *dir, STRING *name)>
-
-Finds, removes, and returns the segment with name C<name> in the
-C<PackFile_Directory>.  The caller is responsible for destroying the segment.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PackFile_Segment *
-PackFile_remove_segment_by_name(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
-                                ARGIN(STRING *name))
-{
-    ASSERT_ARGS(PackFile_remove_segment_by_name)
-    size_t i;
-
-    for (i = 0; i < dir->num_segments; ++i) {
-        PackFile_Segment * const seg = dir->segments[i];
-        if (STRING_equal(interp, seg->name, name)) {
-            dir->num_segments--;
-
-            if (i != dir->num_segments) {
-                /* We're not the last segment, so we need to move things */
-                memmove(&dir->segments[i], &dir->segments[i+1],
-                       (dir->num_segments - i) * sizeof (PackFile_Segment *));
-            }
-
-            return seg;
-        }
-    }
-
-    return NULL;
-}
-
-
-/*
-
 =back
 
 =head2 PackFile Structure Functions
