@@ -628,12 +628,6 @@ INTVAL Parrot_io_get_flags(SHIM_INTERP, ARGIN(PMC *filehandle))
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PIOOFF_T Parrot_io_get_last_file_position(SHIM_INTERP,
-    ARGIN(const PMC *filehandle))
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
 PIOHANDLE Parrot_io_get_os_handle(SHIM_INTERP, ARGIN(const PMC *filehandle))
         __attribute__nonnull__(2);
 
@@ -747,9 +741,6 @@ void Parrot_io_set_buffer_start(SHIM_INTERP,
 #define ASSERT_ARGS_Parrot_io_get_file_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_get_last_file_position \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_get_os_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(filehandle))

@@ -18,11 +18,10 @@ Tests the EventHandler PMC used by the event system.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(5)
+    plan(6)
 
     create_an_event_and_set_attributes()
-    # Invoke broken, see below.
-    #invoke_eventhandler()
+    invoke_eventhandler()
 .end
 
 .sub create_an_event_and_set_attributes
@@ -77,26 +76,23 @@ Tests the EventHandler PMC used by the event system.
 
 .end
 
-#.sub invoke_eventhandler
-#    .local pmc eh
-#    .local pmc code
-#
-#    code = get_global 'test_handler'
-#    eh   = new ['EventHandler'], code
-#
-#    print "Invoking eh\n"
-#    # Unsure of the arguments that should be passed, but seems to crash regardless
-#    # EventHandler's VTABLE_invoke() broken?
-#    # See ticket http://trac.parrot.org/parrot/ticket/1894
-#    eh()
-#.end
+.sub invoke_eventhandler
+    .local pmc eh
+    .local pmc code
+
+    code = get_global 'test_handler'
+    eh   = new ['EventHandler'], code
+
+    # See ticket http://trac.parrot.org/parrot/ticket/1894
+    eh()
+.end
 
 .sub my_handler
 .end
 
-#.sub test_handler
-#    ok ( 1, 'Invoked Exception handler.' )
-#.end
+.sub test_handler
+    ok ( 1, 'Invoked Exception handler.' )
+.end
 
 # Local Variables:
 #   mode: pir

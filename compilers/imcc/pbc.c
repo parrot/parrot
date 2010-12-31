@@ -610,7 +610,7 @@ add libdeps to byte code
 */
 
 void
-imcc_pbc_add_libdep(PARROT_INTERP, STRING *libname)
+imcc_pbc_add_libdep(PARROT_INTERP, ARGIN(STRING *libname))
 {
     ASSERT_ARGS(imcc_pbc_add_libdep)
 
@@ -1621,7 +1621,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
 
     {
         STRING *name      = Parrot_key_set_to_string(interp, head);
-        const char *cname = Parrot_str_to_cstring(interp, name);
+        char *cname       = Parrot_str_to_cstring(interp, name);
         SymReg * const r  = _get_sym(&IMCC_INFO(interp)->globals->cs->key_consts, cname);
 
         if (r) {
@@ -1632,7 +1632,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
             store_key_const(interp, cname, k);
         }
 
-        Parrot_str_free_cstring((char *)cname);
+        Parrot_str_free_cstring(cname);
     }
 
     /* single 'S' keys already have their color assigned */

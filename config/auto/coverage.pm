@@ -49,20 +49,17 @@ sub runstep {
         if ($which_util) {
             $utils_needed{$util} = which($util);
         }
-        elsif ($util eq 'gcov') {
+        else {
             $utils_needed{$util} =
                 '$(PERL) -e "print \"'.$util.' needed but not found.\\n\"; exit 1;"';
             push @utils_lacking, $util;
-        }
-        else {
-            $utils_needed{$util} = '';
         }
     }
     if (@utils_lacking) {
         $utils_needed{'have_cover'} =
             '$(PERL) -e "print \"The following tools are needed for coverage testing: '.
             join(', ',@utils_lacking).
-            '\\n\"; exit 1;"';
+            '\\n\"; print \"Please install Devel::Cover.\\n\"; exit 1;"';
         $self->set_result("lacking @utils_lacking");
         $conf->data->set(
             "has_coverage_tools" => 0,

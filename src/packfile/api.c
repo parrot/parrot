@@ -976,10 +976,9 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
 #endif
 
     if (packed_size < PACKFILE_HEADER_BYTES) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: "
-            "Buffer length %d is shorter than PACKFILE_HEADER_BYTES %d\n",
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+        "PackFile_unpack: Buffer length %d is shorter than PACKFILE_HEADER_BYTES %d.",
             packed_size, PACKFILE_HEADER_BYTES);
-        return 0;
     }
 
     self->src  = packed;
@@ -990,9 +989,8 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
 
     /* Ensure the magic is correct. */
     if (memcmp(header->magic, "\376PBC\r\n\032\n", 8) != 0) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: "
-            "This is not a valid Parrot bytecode file\n");
-        return 0;
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+        "PackFile_unpack: This is not a valid Parrot bytecode file.");
     }
 
     /* Ensure the bytecode version is one we can read. Currently, we only
@@ -1003,11 +1001,11 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
      * NOTE: (ASTERISK) is *, we don't want to fool the C preprocessor. */
     if (header->bc_major != PARROT_PBC_MAJOR
     ||  header->bc_minor != PARROT_PBC_MINOR) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: This Parrot cannot read "
-            "bytecode files with version %d.%d.\n",
-            header->bc_major, header->bc_minor);
         if (!(self->options & PFOPT_UTILS))
-            return 0;
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PARROT_USAGE_ERROR,
+                    "PackFile_unpack: This Parrot cannot read bytecode "
+                    "files with version %d.%d.",
+                    header->bc_major, header->bc_minor);
     }
 
     /* Check wordsize, byte order and floating point number type are valid. */

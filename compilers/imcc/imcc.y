@@ -927,6 +927,8 @@ add_pcc_named_return(PARROT_INTERP,
 
 =item C<static void adv_named_set(PARROT_INTERP, const char *name)>
 
+=item C<static void adv_named_set_u(PARROT_INTERP, const char *name)>
+
 Sets the name of the current named argument.
 
 C<adv_named_set_u> is the Unicode version of this function.

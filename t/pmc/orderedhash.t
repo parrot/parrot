@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 31;
 
 =head1 NAME
 
@@ -546,6 +546,169 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "delete and access remaining" );
 CODE
 P0["b"]: B
 P0["b"]: B
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed_int" );
+
+.sub _main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    $S0 = 'hello'
+    hash1[0] = $S0
+
+    $S1 = hash1[0]
+
+    print $S1
+    print "\n"
+    end
+.end
+CODE
+hello
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_number_keyed_int" );
+
+.sub _main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    $N0 = 35.5
+    hash1[0] = $N0
+
+    $N1 = hash1[0]
+
+    print $N1
+    print "\n"
+    end
+.end
+CODE
+35.5
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_pmc_keyed_int (negative index)" );
+
+.sub _main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    push hash1, 6
+
+    .local pmc integer1
+    integer1 = new ['Integer']
+    integer1 = 5
+
+    hash1[-1] = integer1
+    $P0 = hash1[-1]
+
+    print $P0
+    print "\n"
+    end
+.end
+CODE
+5
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash delete_keyed_str" );
+
+.sub _main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    hash1["one"] = 2
+    hash1["two"] = 5
+    hash1["three"] = 7
+
+    delete hash1["three"]
+
+    $I0 = elements hash1
+
+    print $I0
+    print "\n"
+    end
+.end
+CODE
+2
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash push_string" );
+
+.sub _main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    $N0 = 21.5
+    hash1[0] = $N0
+
+    push hash1, "alpha"
+    $S0 = hash1[1]
+
+    print $S0
+    print "\n"
+    end
+.end
+CODE
+alpha
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash push_float" );
+
+.sub _main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    $N0 = 21.5
+    hash1[0] = $N0
+
+    push hash1, 72.2
+    $N0 = hash1[1]
+
+    print $N0
+    print "\n"
+    end
+.end
+CODE
+72.2
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash get_string_keyed" );
+
+.sub _main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    .local pmc integer1
+    integer1 = new ['Integer']
+    integer1 = 5
+
+    hash1[integer1] = "hello"
+    $S0 = hash1[integer1]
+
+    print $S0
+    print "\n"
+    end
+.end
+CODE
+hello
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash get_number" );
+
+.sub _main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    push hash1, 5
+    push hash1, "alpha"
+
+    $N0 = hash1
+
+    print $N0
+    print "\n"
+    end
+.end
+CODE
+2
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );

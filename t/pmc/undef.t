@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ Tests mainly morphing undef to other types.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(24)
+    plan(27)
 
     morph_to_string()
     undef_pmc_is_false()
@@ -26,8 +26,10 @@ Tests mainly morphing undef to other types.
     undef_pmc_morph_to_string()
     undef_pmc_morph_to_integer()
     undef_pmc_morph_to_float()
+    verify_equality()
     string_pmc_morph_to_undef()
     undef_pmc_set_to_integer_native()
+    undef_pmc_set_to_number_native()
     undef_pmc_isa_after_assignment()
     check_whether_interface_is_done()
     verify_clone_works()
@@ -105,6 +107,17 @@ Tests mainly morphing undef to other types.
     is( float1, -7777.777000, 'PMC Undef morph to int then float' )
 .end
 
+.sub verify_equality
+    .local pmc pmc1
+    pmc1 = new ['Undef']
+
+    .local pmc pmc2
+    pmc2 = new ['String']
+
+    $I0 = pmc1 == pmc2
+    is( $I0, 0, 'PMC Undef and PMC String are unequal' )
+.end
+
 .sub string_pmc_morph_to_undef
     .local pmc pmc1
     pmc1 = new ['String']
@@ -123,6 +136,16 @@ Tests mainly morphing undef to other types.
     .local int pmc1_is_a
     pmc1_is_a = isa pmc1, "Integer"
     ok( pmc1_is_a, 'PMC Undef set to int isa Integer' )
+.end
+
+.sub undef_pmc_set_to_number_native
+    .local pmc pmc1
+    pmc1 = new ['Undef']
+    pmc1 = 52.23
+    is( pmc1, 52.23, 'PMC Undef set to float gives float' )
+
+    $I0 = isa pmc1, "Float"
+    ok( $I0, 'PMC Undef set to float isa Float' )
 .end
 
 .sub undef_pmc_isa_after_assignment

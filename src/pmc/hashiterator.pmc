@@ -78,33 +78,45 @@ advance_to_next(PARROT_INTERP, ARGMOD(PMC *self))
 {
     ASSERT_ARGS(advance_to_next)
     Parrot_HashIterator_attributes * const attrs  = PARROT_HASHITERATOR(self);
+
+    if (attrs->elements <= 0) {
+        attrs->elements = -1;
+        return;
+    }
+
     if (attrs->parrot_hash->key_type == Hash_key_type_int
     ||  attrs->parrot_hash->key_type == Hash_key_type_ptr
-    ||  attrs->parrot_hash->key_type == Hash_key_type_cstring){
+    ||  attrs->parrot_hash->key_type == Hash_key_type_cstring) {
         /* indexed scan */
-        if (attrs->elements){
-            if (attrs->bucket)
-                attrs->bucket = attrs->bucket->next;
-            while (!attrs->bucket) {
-                /* If there is no more buckets */
-                if (attrs->pos == attrs->total_buckets)
-                    break;
-                attrs->bucket = attrs->parrot_hash->index[attrs->pos++];
+        if (attrs->bucket)
+            attrs->bucket = attrs->bucket->next;
+        while (!attrs->bucket) {
+            /* Check pos overflow, can happen if items are deleted */
+            if (attrs->pos == attrs->total_buckets) {
+                attrs->elements = 0;
+                break;
             }
+            attrs->bucket = attrs->parrot_hash->index[attrs->pos++];
         }
     }
-    else{
+    else {
         /* linear scan */
+        int n_buckets = N_BUCKETS(attrs->total_buckets);
+
         if (!attrs->bucket)
             attrs->bucket = attrs->parrot_hash->buckets;
-        while (attrs->elements > 0) {
+        while (attrs->pos < n_buckets) {
             attrs->bucket = attrs->parrot_hash->buckets + attrs->pos++;
             if (attrs->bucket->key)
                 break;
         }
+        /* Can happen if items are deleted */
+        if (!attrs->bucket->key)
+            attrs->elements = 0;
     }
 
     --attrs->elements;
+
     return;
 }
 

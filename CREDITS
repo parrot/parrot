@@ -1054,6 +1054,11 @@ D: Nicer command line handling in ops2c.pl
 N: Tony Payne
 D: Example hanoi.pasm
 
+N: Tony Young
+E: rofflwaffls@gmail.com
+A: rfw
+D: increasing PMC test coverage
+
 N: Tyler Curtis
 U: tcurtis
 E: tyler.l.curtis@gmail.com
