@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 =head1 NAME
 
@@ -138,6 +138,23 @@ event
 10
 7405
 1.1
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'create a task and get invalid attribut (exception)' );
+  .sub main :main
+    $P0 = new ['Task']
+
+    $P0 = getattribute $P0, 'foobar'
+    isnull $I0, $P0
+
+    if $I0, ok
+    say 'fail'
+
+  ok:
+    say 'ok'
+  .end
+CODE
+ok
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "freeze and thaw a task" );
