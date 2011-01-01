@@ -198,7 +198,7 @@ sub _set_implementations {
         hires_timer.c
         pid.c
         sysmem.c
-	uid.c
+        uid.c
         /;
 
     my $plat_c = q{src/platform.c};
