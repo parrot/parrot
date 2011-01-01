@@ -557,7 +557,7 @@ Returns whether the class does the role with the given C<*rolename>.
 
 =item C<INTVAL does_pmc(PMC *role)>
 
-Returns whether the class does the givne C<*role>.
+Returns whether the class does the given C<*role>.
 
 =cut
 
