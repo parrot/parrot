@@ -126,26 +126,28 @@ Create a copy of the filehandle.
         data_struct->file_pos       = old_struct->file_pos;
         data_struct->last_pos       = old_struct->last_pos;
 
-        /* The buffer is special; we have to check to make sure we're setting the right mode. */
-        if (data_struct->flags & PIO_F_LINEBUF)
-            Parrot_io_setlinebuf(INTERP, SELF);
-        else if (data_struct->flags & PIO_F_BLKBUF)
-            Parrot_io_setbuf(INTERP, SELF, PIO_UNBOUND);
-        else
-            Parrot_io_setbuf(INTERP, SELF, old_struct->buffer_size);
+        /* Duplicate the file handle. */
+        data_struct->os_handle = (PIOHANDLE)Parrot_dup(old_struct->os_handle);
 
-        /* This shouldn't be needed due to setbuf calls above but just in case. */
-        data_struct->buffer_flags = old_struct->buffer_flags;
+        /* We need to correctly allocate a buffer, so we check for the buffering mode. */
+        if (data_struct->flags & PIO_F_LINEBUF)
+            Parrot_io_setbuf(INTERP, copy, PIO_LINEBUFSIZE);
+        else
+            Parrot_io_setbuf(INTERP, copy, old_struct->buffer_size);
+
+        /* Transfer only read/write flags on the buffer. */
+        data_struct->buffer_flags &= ~(PIO_BF_READBUF & PIO_BF_WRITEBUF);
+        data_struct->buffer_flags |= old_struct->buffer_flags &
+            (PIO_BF_READBUF & PIO_BF_WRITEBUF);
 
         /* Then after we've set the buffer mode we can memcpy the data over. */
-        if (data_struct->buffer_size > 0)
+        if (old_struct->buffer_size > 0)
             memcpy(data_struct->buffer_start, old_struct->buffer_start,
                 old_struct->buffer_end - old_struct->buffer_start);
 
-        data_struct->buffer_next = old_struct->buffer_next;
-
-        /* Finally duplicate the file handle. */
-        data_struct->os_handle = (PIOHANDLE)Parrot_dup(old_struct->os_handle);
+        /* This is an offset, so we must do math to get a new offset. */
+        data_struct->buffer_next = data_struct->buffer_start +
+            (old_struct->buffer_next - old_struct->buffer_start);
 
         return copy;
     }
