@@ -12,16 +12,61 @@ t/dynoplibs/time.t - Time Dynops
 .sub main :main
     .include 'test_more.pir'
 
-    plan(10)
+    plan(19)
 
     test_gmtime_s_i()
-    test_time_n_vs_time_i()
     test_decodetime_p_i()
     test_localtime_s_i()
     test_decodelocaltime_p_i()
+    test_gmtime_s_ic()
+    test_time_n_vs_time_ic()
+    test_decodetime_p_ic()
+    test_localtime_s_ic()
+    test_decodelocaltime_p_ic()
 .end
 
 .sub test_gmtime_s_i
+    $I1 = 0
+    $S0 = gmtime $I1
+    $I0 = isnull $S0
+    is($I0, 0, "gmtime string is not null")
+    is($S0, "Thu Jan  1 00:00:00 1970\n", "correct epoch")
+    $I1 = length $S0
+    is($I1, 25, "string is the correct length")
+.end
+
+.sub test_decodetime_p_i
+    $I1 = 0
+    $P0 = decodetime $I1
+    $I0 = $P0
+    is($I0, 9, "decodetime result has 9 values")
+    $S0 = typeof $P0
+    # TODO: Actually, this should return whatever HLL type replaces
+    # FixedIntegerArray. We should test this behavior with a new HLL
+    is($S0, "FixedIntegerArray", "decodetime returns the correct PMC type")
+.end
+
+.sub test_localtime_s_i
+    $I1 = 0
+    $S0 = localtime $I1
+    $I0 = isnull $S0
+    is($I0, 0, "localtime string is not a null string")
+    $I0 = length $S0
+    is($I0, 25, "localtime string is the correct length")
+.end
+
+.sub test_decodelocaltime_p_i
+    $I1 = 0
+    $P0 = decodelocaltime $I1
+    $I0 = $P0
+    is($I0, 9, "decodelocaltime result has 9 values")
+    $S0 = typeof $P0
+    # TODO: Actually, this should return whatever HLL type replaces
+    # FixedIntegerArray. We should test this behavior with a new HLL
+    is($S0, "FixedIntegerArray", "decodelocaltime returns the correct PMC type")
+.end
+
+.sub test_gmtime_s_ic
     $S0 = gmtime 0
     $I0 = isnull $S0
     is($I0, 0, "gmtime string is not null")
@@ -30,7 +75,7 @@ t/dynoplibs/time.t - Time Dynops
     is($I1, 25, "string is the correct length")
 .end
 
-.sub test_time_n_vs_time_i
+.sub test_time_n_vs_time_ic
     .local int time_int
     time_int = time
 
@@ -53,7 +98,7 @@ t/dynoplibs/time.t - Time Dynops
     .return()
 .end
 
-.sub test_decodetime_p_i
+.sub test_decodetime_p_ic
     $P0 = decodetime 0
     $I0 = $P0
     is($I0, 9, "decodetime result has 9 values")
@@ -63,7 +108,7 @@ t/dynoplibs/time.t - Time Dynops
     is($S0, "FixedIntegerArray", "decodetime returns the correct PMC type")
 .end
 
-.sub test_localtime_s_i
+.sub test_localtime_s_ic
     $S0 = localtime 0
     $I0 = isnull $S0
     is($I0, 0, "localtime string is not a null string")
@@ -71,7 +116,7 @@ t/dynoplibs/time.t - Time Dynops
     is($I0, 25, "localtime string is the correct length")
 .end
 
-.sub test_decodelocaltime_p_i
+.sub test_decodelocaltime_p_ic
     $P0 = decodelocaltime 0
     $I0 = $P0
     is($I0, 9, "decodelocaltime result has 9 values")
