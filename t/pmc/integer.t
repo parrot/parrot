@@ -24,7 +24,7 @@ Tests the Integer PMC.
 
     get_max_min()
 
-    plan(141)
+    plan(143)
     test_init()
     test_basic_math()
     test_truthiness_and_definedness()
@@ -62,7 +62,7 @@ Tests the Integer PMC.
     test_neg_BigInt()
     goto done_bigint_tests
   no_bigint:
-    skip_n_bigint_tests(28)
+    skip_n_bigint_tests(30)
   done_bigint_tests:
 .end
 
@@ -455,9 +455,16 @@ fin:
     typeof $P2, $P0
     is($P0, $P1, 'add integer overflow promotion')
     is($P2, 'BigInt', 'add integer overflow type check')
+
+    new $P0, ['Integer']
+    set $P0, $I0
+    add $P0, 1
+    typeof $P2, $P0
+    is($P0, $P1, 'i_add integer overflow promotion')
+    is($P2, 'BigInt', 'i_add integer overflow type check')
     goto end
   skip:
-    skip(2, NO_SYSINFO)
+    skip(4, NO_SYSINFO)
   end:
 .end
 
