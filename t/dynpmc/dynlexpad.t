@@ -203,9 +203,6 @@ ok 2
 ok 3
 OUTPUT
 
-TODO: {
-    local $TODO = "iterator not implemented for DynLexPads; TT #1028";
-
 pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - iterator" );
 
 .loadlib 'dynlexpad'
@@ -223,13 +220,18 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - iterator" );
 .sub 'test' :main
 
     .local pmc str1,str2,str3
+
+    str1 = box 'pants'
+    str2 = box 'shorts'
+    str3 = box 'skirt'
+
     .lex 'a', str1
     .lex 'b', str2
     .lex 'c', str3
 
-    str1 = box 'pants'
-    str2 = box 'pants'
-    str3 = box 'pants'
+    store_lex 'a', str1
+    store_lex 'b', str2
+    store_lex 'c', str3
 
     .local pmc interp
     interp = getinterp
@@ -243,7 +245,7 @@ iter_loop:
     unless iterator goto iter_done
     .local pmc key
     key = shift iterator
-    .local string value
+    .local pmc value
     value = dlp[key]
     say value
     goto iter_loop
@@ -251,10 +253,9 @@ iter_done:
 .end
 CODE
 pants
-pants
-pants
+shorts
+skirt
 OUTPUT
-}
 
 # Local Variables:
 #   mode: cperl
