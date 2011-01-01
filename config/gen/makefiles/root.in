@@ -1621,6 +1621,7 @@ src/packfile/api$(O) : \
 
 src/packfile/execute$(O) : \
     $(PARROT_H_HEADERS) \
+	include/parrot/runcore_api.h \
     src/packfile/execute.str \
     src/packfile/execute.c \
     src/packfile/packfile_private.h \
