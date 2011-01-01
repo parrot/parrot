@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -470,6 +470,25 @@ pir_output_is( <<'CODE', <<"OUT", 'Test get_user_id' );
 .end
 CODE
 $uid
+OUT
+
+# test can_execute
+pir_output_is( <<'CODE', <<"OUT", 'Test can_execute' );
+.sub main :main
+	$P0 = loadlib 'os'
+	$P1 = new ['OS']
+
+	$I0 = $P1."can_execute"("parrot")
+	say $I0
+
+	$I1 = $P1."can_execute"("MANIFEST")
+	say $I1
+
+	end
+.end
+CODE
+1
+0
 OUT
 
 # Local Variables:
