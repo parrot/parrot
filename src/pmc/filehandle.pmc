@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2010, Parrot Foundation.
+Copyright (C) 2008-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -109,6 +109,40 @@ Create a copy of the filehandle.
         Parrot_FileHandle_attributes * const data_struct
             = PARROT_FILEHANDLE(copy);
 
+        /* Properly clone string data. */
+        if (old_struct->filename != NULL)
+            data_struct->filename   = Parrot_str_clone(INTERP, old_struct->filename);
+        if (old_struct->mode != NULL)
+            data_struct->mode       = Parrot_str_clone(INTERP, old_struct->mode);
+        if (old_struct->encoding != NULL)
+            data_struct->encoding   = Parrot_str_clone(INTERP, old_struct->encoding);
+
+        /* Copy over some metadata */
+        data_struct->process_id     = old_struct->process_id;
+        data_struct->exit_status    = old_struct->exit_status;
+        data_struct->file_size      = old_struct->file_size;
+        data_struct->file_pos       = old_struct->file_pos;
+        data_struct->last_pos       = old_struct->last_pos;
+
+        /* The buffer is special; we have to check to make sure we're setting the right mode. */
+        if (data_struct->flags & PIO_F_LINEBUF)
+            Parrot_io_setlinebuf(INTERP, SELF);
+        else if (data_struct->flags & PIO_F_BLKBUF)
+            Parrot_io_setbuf(INTERP, SELF, PIO_UNBOUND);
+        else
+            Parrot_io_setbuf(INTERP, SELF, old_struct->buffer_size);
+
+        /* This shouldn't be needed due to setbuf calls above but just in case. */
+        data_struct->buffer_flags = old_struct->buffer_flags;
+
+        /* Then after we've set the buffer mode we can memcpy the data over. */
+        if (data_struct->buffer_size > 0)
+            memcpy(data_struct->buffer_start, old_struct->buffer_start,
+                old_struct->buffer_end - old_struct->buffer_start);
+
+        data_struct->buffer_next = old_struct->buffer_next;
+
+        /* Finally duplicate the file handle. */
         data_struct->os_handle = (PIOHANDLE)Parrot_dup(old_struct->os_handle);
 
         return copy;
