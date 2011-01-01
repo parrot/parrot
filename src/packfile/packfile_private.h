@@ -14,24 +14,15 @@ that are only for use in the packfile and don't need to be included in the rest 
 Parrot.
 */
 
-
+#ifndef PARROT_PACKFILE_PRIVATE_H_GUARD
+#define PARROT_PACKFILE_PRIVATE_H_GUARD
 
 /* HEADERIZER BEGIN: src/packfile/execute.c */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void do_sub_pragmas(PARROT_INTERP,
-    ARGIN(PackFile_ByteCode *self),
-    pbc_action_enum_t action,
-    ARGIN_NULLOK(PMC *eval_pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-#define ASSERT_ARGS_do_sub_pragmas __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/packfile/execute.c */
 
+
+#endif // PARROT_PACKFILE_PRIVATE_H_GUARD
 
 /*
  * Local variables:

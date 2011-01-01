@@ -22,8 +22,8 @@ This file contain some private functions relating to executing functions.
 #include "execute.str"
 
 
-
-/* HEADERIZER HFILE: src/packfile/packfile_private.h */
+/* This is temporary, to make do_sub_pragmas public... */
+/* HEADERIZER HFILE: include/parrot/packfile.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
