@@ -58,7 +58,7 @@ Tests the Role PMC.
 
     $S0 = $P1
     is($S0, "Wob", "name through get_string correct")
-    
+
     # Test init with attributes in the init hash.
     $P1 = new ['FixedStringArray']
     $P1 = 1
@@ -78,7 +78,7 @@ Tests the Role PMC.
     $P0 = new ['Role'], $P2
     $S0 = $P0."inspect"('namespace')
     is($S0, "Bob", "Init with just namespace")
-    
+
     # Test mark()
     sweep 1
 .end
