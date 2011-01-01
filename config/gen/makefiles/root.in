@@ -789,6 +789,7 @@ help :
 	@echo "  buildtools_tests:  Test build tool pmc2c.pl."
 	@echo "  manifest_tests:    Test code underlying mk_manifest_and_skip.pl."
 	@echo "  examples_tests:    Test the example scripts."
+	@echo "  moretests:         Run standard suite, examples and most coding standards tests."
 	@echo ""
 	@echo "Smoke Testing:"
 	@echo "  smolder_test:      Run the test suite and send report to the smolder server"
@@ -2108,6 +2109,9 @@ run_tests :
 perl_tests :
 	$(PERL) t/harness $(PERL_TEST_FILES)
 
+nocritic_codetest :
+	PARROT_TEST_NO_PERLCRITIC=1 $(PERL) t/harness $(EXTRA_TEST_ARGS) --code-tests
+
 codetest :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --code-tests
 
@@ -2127,6 +2131,12 @@ manifest_tests :
 
 examples_tests : test_prep
 	$(PERL) t/harness $(EXAMPLES_TEST_FILES)
+
+# moretests: Good to use before branch merges
+moretests: test_prep \
+    test \
+    examples_tests \
+    nocritic_codetest
 
 # benchmark tests
 benchmark_tests : test_prep
