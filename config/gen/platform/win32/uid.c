@@ -19,7 +19,7 @@ Get information about the current user
 
 =over 4
 
-=item C<UINTVAL Parrot_get_user_id()>
+=item C<UINTVAL Parrot_get_user_id(void)>
 
 Get user id - returns 0 for Win32
 
@@ -28,7 +28,7 @@ Get user id - returns 0 for Win32
 */
 
 UINTVAL
-Parrot_get_user_id()
+Parrot_get_user_id(void)
 {
     /* Win32 doesn't have a notion of current user name */
     return (UINTVAL)0;
