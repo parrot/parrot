@@ -1010,21 +1010,18 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
 
     /* Check wordsize, byte order and floating point number type are valid. */
     if (header->wordsize != 4 && header->wordsize != 8) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: Invalid wordsize %d\n",
-                    header->wordsize);
-        return 0;
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "PackFile_unpack: Invalid wordsize %d\n", header->wordsize);
     }
 
     if (header->byteorder != 0 && header->byteorder != 1) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: Invalid byte ordering %d\n",
-                    header->byteorder);
-        return 0;
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "PackFile_unpack: Invalid byte ordering %d\n", header->byteorder);
     }
 
     if (header->floattype > FLOATTYPE_MAX) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: Invalid floattype %d\n",
-                    header->floattype);
-        return 0;
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "PackFile_unpack: Invalid floattype %d\n", header->floattype);
     }
 
     /* Describe what was read for debugging. */
@@ -1045,10 +1042,9 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     }
     else if (header->uuid_type == 1) {
         if (packed_size < (size_t) PACKFILE_HEADER_BYTES + header->uuid_size) {
-            Parrot_io_eprintf(NULL, "PackFile_unpack: "
-                    "Buffer length %d is shorter than PACKFILE_HEADER_BYTES + uuid_size %d\n",
-                    packed_size, PACKFILE_HEADER_BYTES + header->uuid_size);
-            return 0;
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                "PackFile_unpack: Buffer length %d is shorter than PACKFILE_HEADER_BYTES "
+                "+ uuid_size %d\n", packed_size, PACKFILE_HEADER_BYTES + header->uuid_size);
         }
 
 
@@ -1065,8 +1061,8 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     }
     else
         /* Don't know this UUID type. */
-        Parrot_io_eprintf(NULL, "PackFile_unpack: Invalid UUID type %d\n",
-                    header->uuid_type);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "PackFile_unpack: Invalid UUID type %d\n", header->uuid_type);
 
     /* Set cursor to position after what we've read, allowing for padding to a
      * 16 byte boundary. */
@@ -1086,9 +1082,9 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     header->dir_format = PF_fetch_opcode(self, &cursor);
 
     if (header->dir_format != PF_DIR_FORMAT) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: Dir format was %d not %d\n",
-                    header->dir_format, PF_DIR_FORMAT);
-        return 0;
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "PackFile_unpack: Dir format was %d not %d\n",
+            header->dir_format, PF_DIR_FORMAT);
     }
 
     /* Padding. */
@@ -1228,47 +1224,6 @@ PackFile_find_segment(PARROT_INTERP, ARGIN_NULLOK(PackFile_Directory *dir),
                         return seg;
                 }
             }
-        }
-    }
-
-    return NULL;
-}
-
-
-/*
-
-=item C<PackFile_Segment * PackFile_remove_segment_by_name(PARROT_INTERP,
-PackFile_Directory *dir, STRING *name)>
-
-Finds, removes, and returns the segment with name C<name> in the
-C<PackFile_Directory>.  The caller is responsible for destroying the segment.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PackFile_Segment *
-PackFile_remove_segment_by_name(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
-                                ARGIN(STRING *name))
-{
-    ASSERT_ARGS(PackFile_remove_segment_by_name)
-    size_t i;
-
-    for (i = 0; i < dir->num_segments; ++i) {
-        PackFile_Segment * const seg = dir->segments[i];
-        if (STRING_equal(interp, seg->name, name)) {
-            dir->num_segments--;
-
-            if (i != dir->num_segments) {
-                /* We're not the last segment, so we need to move things */
-                memmove(&dir->segments[i], &dir->segments[i+1],
-                       (dir->num_segments - i) * sizeof (PackFile_Segment *));
-            }
-
-            return seg;
         }
     }
 
@@ -1499,9 +1454,8 @@ default_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode
     self->data = mem_gc_allocate_n_typed(interp, self->size, opcode_t);
 
     if (!self->data) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: Unable to allocate data memory!\n");
-        self->size = 0;
-        return NULL;
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
+            "PackFile_unpack: Unable to allocate data memory!\n");
     }
 
     if (!self->pf->need_endianize && !self->pf->need_wordsize) {
@@ -2087,10 +2041,10 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         opcode = PF_fetch_opcode(pf, &pos);
 
         if (seg->op_count != opcode) {
-            Parrot_io_eprintf(interp,
-                     "%Ss: Size in directory %d doesn't match size %d "
-                     "at offset 0x%x\n", seg->name, (int)seg->op_count,
-                     (int)opcode, (int)seg->file_offset);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                "%Ss: Size in directory %d doesn't match size %d "
+                "at offset 0x%x\n", seg->name, (int)seg->op_count,
+                (int)opcode, (int)seg->file_offset);
         }
 
         if (i) {
@@ -2129,9 +2083,8 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         pos    = PackFile_Segment_unpack(interp, dir->segments[i], cursor);
 
         if (!pos) {
-            Parrot_io_eprintf(interp, "PackFile_unpack segment '%Ss' failed\n",
-                    dir->segments[i]->name);
-            return NULL;
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                "PackFile_unpack segment '%Ss' failed\n", dir->segments[i]->name);
         }
         else {
             TRACE_PRINTF_VAL(("PackFile_Segment_unpack ok. pos=0x%x\n", pos));
@@ -3201,44 +3154,6 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug),
 
 /*
 
-=item C<void Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)>
-
-Switches the current bytecode segment to the segment keyed by number C<seg>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)
-{
-    ASSERT_ARGS(Parrot_switch_to_cs_by_nr)
-    const PackFile_Directory * const dir      = interp->code->base.dir;
-    const size_t                     num_segs = dir->num_segments;
-
-    size_t   i;
-    opcode_t n;
-
-    /* TODO make an index of code segments for faster look up */
-    for (i = n = 0; i < num_segs; ++i) {
-        if (dir->segments[i]->type == PF_BYTEC_SEG) {
-            if (n == seg) {
-                Parrot_switch_to_cs(interp, (PackFile_ByteCode *)
-                        dir->segments[i], 1);
-                return;
-            }
-            ++n;
-        }
-    }
-
-    Parrot_ex_throw_from_c_args(interp, NULL, 1,
-        "Segment number %d not found\n", (int)seg);
-}
-
-
-/*
-
 =item C<PackFile_ByteCode * Parrot_switch_to_cs(PARROT_INTERP, PackFile_ByteCode
 *new_cs, int really)>
 
@@ -3539,10 +3454,8 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
     return cursor;
 
   err:
-    Parrot_io_eprintf(interp,
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
         "PackFile_ConstTable_unpack: Could not allocate memory for array!\n");
-    PackFile_ConstTable_clear(interp, self);
-    return NULL;
 }
 
 

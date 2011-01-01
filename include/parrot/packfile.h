@@ -742,17 +742,6 @@ PackFile * PackFile_new_dummy(PARROT_INTERP, ARGIN(STRING *name))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PackFile_Segment * PackFile_remove_segment_by_name(PARROT_INTERP,
-    ARGMOD(PackFile_Directory *dir),
-    ARGIN(STRING *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*dir);
-
-PARROT_EXPORT
 void PackFile_Segment_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -875,10 +864,6 @@ PackFile_ByteCode * Parrot_switch_to_cs(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * PF_create_default_segs(PARROT_INTERP,
@@ -982,11 +967,6 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
 #define ASSERT_ARGS_PackFile_new_dummy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_PackFile_remove_segment_by_name \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(dir) \
-    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_PackFile_Segment_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -1033,8 +1013,6 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
 #define ASSERT_ARGS_Parrot_switch_to_cs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(new_cs))
-#define ASSERT_ARGS_Parrot_switch_to_cs_by_nr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PF_create_default_segs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(file_name))

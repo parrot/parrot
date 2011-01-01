@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 70;
+use Parrot::Test tests => 79;
 use Parrot::Config;
 
 =head1 NAME
@@ -1270,6 +1270,38 @@ CODE
 ok
 OUTPUT
 
+pir_error_output_like( <<'CODE', <<'OUTPUT', "assign exception" );
+.sub a
+  $P0 = get_global 'ok'
+
+  $P1 = new ['String']
+  assign $P0, $P1
+.end
+
+.sub ok
+.end
+CODE
+/Can't assign a non-Sub type to a Sub/
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'destroy' );
+.sub main :main
+    $P0 = get_global 'ok'
+
+    # Make sure destroy is exercised
+    null $P0
+    sweep 1
+
+    say "ok"
+.end
+
+.sub ok
+    say "nothing"
+.end
+CODE
+ok
+OUTPUT
+
 pir_output_is( <<'CODE', <<'OUTPUT', 'assign w/:outer' );
 .sub main :main
     $P0 = get_global 'ok'
@@ -1534,6 +1566,48 @@ CODE
 ok
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', 'set_string_native' );
+.sub 'main'
+    $P0 = get_global 'original'
+    $P0()
+
+    $P0 = 'new_name'
+    $S0 = $P0
+    say $S0
+
+    $P0()
+.end
+
+.sub 'original'
+    say 'inside'
+.end
+CODE
+inside
+new_name
+inside
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'get_integer_keyed' );
+.sub 'main'
+    $P0 = get_global 'original'
+    $P0()
+
+    $I0 = $P0[0]
+
+    if $I0, ok
+
+  ok:
+    say 'ok'
+.end
+
+.sub 'original'
+    say 'inside'
+.end
+CODE
+inside
+ok
+OUTPUT
+
 pir_output_is( <<'CODE', <<'OUTPUT', 'use of :init sub pointed to by a :outer in compreg' );
 .sub 'comptest'
     $S0 = <<'PIR'
@@ -1640,13 +1714,49 @@ thawed
 hi
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', 'comp_flags method returns 0 for new Subs' );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $I0 = $P0.'comp_flags'()
+    say $I0
+.end
+CODE
+0
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'pf_flags method returns 0 for new Subs' );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $I0 = $P0.'pf_flags'()
+    say $I0
+.end
+CODE
+0
+OUTPUT
+
 pir_output_is( <<'CODE', <<'OUTPUT', 'init_pmc' );
 .sub 'main'
     .local pmc init, s, regs, arg_info
 
     init = new ['Hash']
-    init['start_offs']  = 42
-    init['end_offs']    = 115200
+    init['start_offs']     = 42
+    init['end_offs']       = 115200
+    init['HLL_id']         = 0
+    init['namespace_name'] = ''
+    init['namespace_stash'] = ''
+    init['name']           = 'foo'
+    init['method_name']    = 'bar'
+    init['ns_entry_name']  = 'ns_entry_name'
+    init['subid']          = 'subid'
+    init['vtable_index']   = -1
+    init['multi_signature'] = ''
+    init['lex_info']       = ''
+    init['outer_sub']      = ''
+    init['comp_flags']     = 0
+    init['pf_flags']       = 0
+
 
     regs = new ['FixedIntegerArray']
     regs = 4
@@ -1732,6 +1842,70 @@ pos_slurpy 2
 named_required 3
 named_optional 5
 named_slurpy 8
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "inspect unknown introspection value exception" );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $P1 = inspect $P0, 'foo_bar'
+.end
+CODE
+/Unknown introspection value 'foo_bar'/
+OUTPUT
+
+pir_output_like( <<'CODE', <<'OUTPUT', 'inspect return a hash' );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $P1 = inspect $P0
+    say $P1
+.end
+CODE
+/Hash/
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'inspect return hash with values' );
+.sub 'main' :main
+    $P0 = get_global 'foo'
+
+    $P1 = inspect $P0
+
+    print 'pos_required '
+    $S0 = $P1['pos_required']
+    say $S0
+
+    print 'pos_optional '
+    $S0 = $P1['pos_optional']
+    say $S0
+
+    print 'pos_slurpy '
+    $S0 = $P1['pos_slurpy']
+    say $S0
+
+    print 'named_required '
+    $S0 = $P1['named_required']
+    say $S0
+
+    print 'named_optional '
+    $S0 = $P1['named_optional']
+    say $S0
+
+    print 'named_slurpy '
+    $S0 = $P1['named_slurpy']
+    say $S0
+.end
+
+.sub foo
+    say 'bar'
+.end
+CODE
+pos_required 0
+pos_optional 0
+pos_slurpy 0
+named_required 0
+named_optional 0
+named_slurpy 0
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUT', 'interface' );

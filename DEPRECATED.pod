@@ -120,6 +120,13 @@ This perennially broken PMC will be removed.
 
 L<http://trac.parrot.org/parrot/ticket/1892>
 
+=item Scalar PMC [eligible in 3.1]
+
+The Scalar PMC can be removed, so long as the behaviors of PMCs which inherit
+from it do not change.
+
+L<https://trac.parrot.org/parrot/ticket/1754>
+
 =back
 
 =head1 Opcodes
