@@ -19,6 +19,10 @@ Get information about the current user
 
 =over 4
 
+=item C<UINTVAL Parrot_get_user_id()>
+
+Get user id - returns 0 for Win32
+
 =cut
 
 */
