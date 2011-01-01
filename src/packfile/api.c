@@ -699,7 +699,7 @@ PackFile_Header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
     /* Ensure the magic is correct. */
     if (memcmp(self->magic, "\376PBC\r\n\032\n", 8) != 0) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-        "PackFile_unpack: This is not a valid Parrot bytecode file.");
+        "PackFile_Header_validate: This is not a valid Parrot bytecode file.");
     }
 
     /* Ensure the bytecode version is one we can read. Currently, we only
@@ -712,7 +712,7 @@ PackFile_Header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
     ||  self->bc_minor != PARROT_PBC_MINOR) {
         if (!(pf_options & PFOPT_UTILS))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PARROT_USAGE_ERROR,
-                    "PackFile_unpack: This Parrot cannot read bytecode "
+                    "PackFile_Header_validate: This Parrot cannot read bytecode "
                     "files with version %d.%d.",
                     self->bc_major, self->bc_minor);
     }
@@ -720,17 +720,17 @@ PackFile_Header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
     /* Check wordsize, byte order and floating point number type are valid. */
     if (self->wordsize != 4 && self->wordsize != 8) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_unpack: Invalid wordsize %d\n", self->wordsize);
+            "PackFile_Header_validate: Invalid wordsize %d\n", self->wordsize);
     }
 
     if (self->byteorder != 0 && self->byteorder != 1) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_unpack: Invalid byte ordering %d\n", self->byteorder);
+            "PackFile_Header_validate: Invalid byte ordering %d\n", self->byteorder);
     }
 
     if (self->floattype > FLOATTYPE_MAX) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_unpack: Invalid floattype %d\n", self->floattype);
+            "PackFile_Header_validate: Invalid floattype %d\n", self->floattype);
     }
 }
 
