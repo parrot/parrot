@@ -66,26 +66,26 @@ Initializes a newly created FileHandle object.
 */
 
     VTABLE void init() {
-        Parrot_FileHandle_attributes * const data_struct =
+        Parrot_FileHandle_attributes * const attrs =
             PMC_data_typed(SELF, Parrot_FileHandle_attributes *);
 
-        data_struct->flags         = 0;
-        data_struct->filename      = NULL;
-        data_struct->mode          = NULL;
-        data_struct->encoding      = NULL;
-        data_struct->process_id    = 0;
-        data_struct->exit_status   = 0;
-        data_struct->file_size     = 0;
-        data_struct->file_pos      = piooffsetzero;
-        data_struct->last_pos      = piooffsetzero;
-        data_struct->buffer_size   = 0;
-        data_struct->buffer_flags  = 0;
-        data_struct->buffer_start  = NULL;
-        data_struct->buffer_end    = NULL;
-        data_struct->buffer_next   = NULL;
+        attrs->flags         = 0;
+        attrs->filename      = NULL;
+        attrs->mode          = NULL;
+        attrs->encoding      = NULL;
+        attrs->process_id    = 0;
+        attrs->exit_status   = 0;
+        attrs->file_size     = 0;
+        attrs->file_pos      = piooffsetzero;
+        attrs->last_pos      = piooffsetzero;
+        attrs->buffer_size   = 0;
+        attrs->buffer_flags  = 0;
+        attrs->buffer_start  = NULL;
+        attrs->buffer_end    = NULL;
+        attrs->buffer_next   = NULL;
 
         /* Initialize the os_handle to the platform-specific value for closed */
-        data_struct->os_handle     = (PIOHANDLE) PIO_INVALID_HANDLE;
+        attrs->os_handle     = (PIOHANDLE) PIO_INVALID_HANDLE;
 
         PObj_custom_mark_SET(SELF);
         PObj_custom_destroy_SET(SELF);
@@ -103,51 +103,51 @@ Create a copy of the filehandle.
 */
 
     VTABLE PMC *clone() {
-        Parrot_FileHandle_attributes * const old_struct
+        Parrot_FileHandle_attributes * const old_attrs
             = PARROT_FILEHANDLE(SELF);
-        PMC * const copy = Parrot_io_new_pmc(INTERP, old_struct->flags);
-        Parrot_FileHandle_attributes * const data_struct
+        PMC * const copy = Parrot_io_new_pmc(INTERP, old_attrs->flags);
+        Parrot_FileHandle_attributes * const new_attrs
             = PARROT_FILEHANDLE(copy);
 
         /* Properly clone string data. */
-        data_struct->filename       = old_struct->filename;
-        data_struct->mode           = old_struct->mode;
-        data_struct->encoding       = old_struct->encoding;
+        new_attrs->filename       = old_attrs->filename;
+        new_attrs->mode           = old_attrs->mode;
+        new_attrs->encoding       = old_attrs->encoding;
 
         /* Prevent GC of the strings. */
-        Parrot_gc_mark_STRING_alive(INTERP, data_struct->filename);
-        Parrot_gc_mark_STRING_alive(INTERP, data_struct->mode);
-        Parrot_gc_mark_STRING_alive(INTERP, data_struct->encoding);
+        Parrot_gc_mark_STRING_alive(INTERP, new_attrs->filename);
+        Parrot_gc_mark_STRING_alive(INTERP, new_attrs->mode);
+        Parrot_gc_mark_STRING_alive(INTERP, new_attrs->encoding);
 
         /* Copy over some metadata */
-        data_struct->process_id     = old_struct->process_id;
-        data_struct->exit_status    = old_struct->exit_status;
-        data_struct->file_size      = old_struct->file_size;
-        data_struct->file_pos       = old_struct->file_pos;
-        data_struct->last_pos       = old_struct->last_pos;
+        new_attrs->process_id     = old_attrs->process_id;
+        new_attrs->exit_status    = old_attrs->exit_status;
+        new_attrs->file_size      = old_attrs->file_size;
+        new_attrs->file_pos       = old_attrs->file_pos;
+        new_attrs->last_pos       = old_attrs->last_pos;
 
         /* Duplicate the file handle. */
-        data_struct->os_handle = (PIOHANDLE)Parrot_dup(old_struct->os_handle);
+        new_attrs->os_handle = (PIOHANDLE)Parrot_dup(old_attrs->os_handle);
 
         /* We need to correctly allocate a buffer, so we check for the buffering mode. */
-        if (data_struct->flags & PIO_F_LINEBUF)
+        if (new_attrs->flags & PIO_F_LINEBUF)
             Parrot_io_setbuf(INTERP, copy, PIO_LINEBUFSIZE);
         else
-            Parrot_io_setbuf(INTERP, copy, old_struct->buffer_size);
+            Parrot_io_setbuf(INTERP, copy, old_attrs->buffer_size);
 
         /* Transfer only read/write flags on the buffer. */
-        data_struct->buffer_flags &= ~(PIO_BF_READBUF & PIO_BF_WRITEBUF);
-        data_struct->buffer_flags |= old_struct->buffer_flags &
+        new_attrs->buffer_flags &= ~(PIO_BF_READBUF & PIO_BF_WRITEBUF);
+        new_attrs->buffer_flags |= old_attrs->buffer_flags &
             (PIO_BF_READBUF & PIO_BF_WRITEBUF);
 
         /* Then after we've set the buffer mode we can memcpy the data over. */
-        if (old_struct->buffer_size > 0)
-            memcpy(data_struct->buffer_start, old_struct->buffer_start,
-                old_struct->buffer_end - old_struct->buffer_start);
+        if (old_attrs->buffer_size > 0)
+            memcpy(new_attrs->buffer_start, old_attrs->buffer_start,
+                old_attrs->buffer_end - old_attrs->buffer_start);
 
         /* This is an offset, so we must do math to get a new offset. */
-        data_struct->buffer_next = data_struct->buffer_start +
-            (old_struct->buffer_next - old_struct->buffer_start);
+        new_attrs->buffer_next = new_attrs->buffer_start +
+            (old_attrs->buffer_next - old_attrs->buffer_start);
 
         return copy;
     }
@@ -164,12 +164,12 @@ Mark active filehandle data as live.
 */
 
     VTABLE void mark() {
-        Parrot_FileHandle_attributes * const data_struct
+        Parrot_FileHandle_attributes * const attrs
             = PARROT_FILEHANDLE(SELF);
 
-        Parrot_gc_mark_STRING_alive(INTERP, data_struct->mode);
-        Parrot_gc_mark_STRING_alive(INTERP, data_struct->filename);
-        Parrot_gc_mark_STRING_alive(INTERP, data_struct->encoding);
+        Parrot_gc_mark_STRING_alive(INTERP, attrs->mode);
+        Parrot_gc_mark_STRING_alive(INTERP, attrs->filename);
+        Parrot_gc_mark_STRING_alive(INTERP, attrs->encoding);
     }
 
 
@@ -184,17 +184,17 @@ Free structures.
 */
     VTABLE void destroy() {
         if (PARROT_FILEHANDLE(SELF)) {
-            Parrot_FileHandle_attributes *data_struct = PARROT_FILEHANDLE(SELF);
+            Parrot_FileHandle_attributes *attrs = PARROT_FILEHANDLE(SELF);
 
             if (!Parrot_io_is_closed_filehandle(INTERP, SELF)) {
-                if (data_struct->flags & PIO_F_SHARED)
+                if (attrs->flags & PIO_F_SHARED)
                     Parrot_io_flush_filehandle(INTERP, SELF);
                 else
                     Parrot_io_close_filehandle(INTERP, SELF);
             }
 
-            if (data_struct->buffer_start)
-                mem_gc_free(INTERP, data_struct->buffer_start);
+            if (attrs->buffer_start)
+                mem_gc_free(INTERP, attrs->buffer_start);
         }
     }
 
