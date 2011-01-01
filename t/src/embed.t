@@ -34,11 +34,45 @@ sub linedirective
     return "#line " . $linenum . ' "' . __FILE__ . '"' . "\n";
 }
 
+my $common = linedirective(__LINE__) . <<'CODE';
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+#include "parrot/extend_vtable.h"
+
+static void fail(const char *msg);
+static Parrot_String createstring(Parrot_Interp interp, const char * value);
+static Parrot_Interp new_interp();
+
+static void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+static Parrot_String createstring(Parrot_Interp interp, const char * value)
+{
+    return Parrot_new_string(interp, value, strlen(value), (const char*)NULL, 0);
+}
+
+static Parrot_Interp new_interp()
+{
+    Parrot_Interp interp = Parrot_new(NULL);
+    if (!interp)
+        fail("Cannot create parrot interpreter");
+    return interp;
+
+}
+
+CODE
+
+
 c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, using just the embed.h header" );
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "parrot/embed.h"
 
 void fail(const char *msg);
@@ -68,7 +102,6 @@ c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, crea
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "parrot/embed.h"
 
 void fail(const char *msg);
@@ -139,30 +172,6 @@ CODE
 Done
 Really done
 OUTPUT
-
-my $common = linedirective(__LINE__) . <<'CODE';
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "parrot/embed.h"
-#include "parrot/extend.h"
-#include "parrot/extend_vtable.h"
-
-static void fail(const char *msg);
-static Parrot_String createstring(Parrot_Interp interp, const char * value);
-
-static void fail(const char *msg)
-{
-    fprintf(stderr, "failed: %s\n", msg);
-    exit(EXIT_FAILURE);
-}
-
-static Parrot_String createstring(Parrot_Interp interp, const char * value)
-{
-    return Parrot_new_string(interp, value, strlen(value), (const char*)NULL, 0);
-}
-
-CODE
 
 c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when an opcode is given improper arguments');
 
@@ -277,14 +286,11 @@ c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PM
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler, errstr;
     Parrot_PMC pmc;
     Parrot_Int type, value;
 
-    /* Create the interpreter and show a message using parrot io */
-    interp = Parrot_new(NULL);
-    if (! interp)
-        fail("Cannot create parrot interpreter");
+    /* Create the interpreter */
+    interp = new_interp();
 
     type = Parrot_PMC_typenum(interp, "Integer");
     pmc  = Parrot_PMC_new(interp, type);
@@ -308,14 +314,11 @@ c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PM
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler, errstr;
     Parrot_PMC pmc;
     Parrot_Int type, value;
 
-    /* Create the interpreter and show a message using parrot io */
-    interp = Parrot_new(NULL);
-    if (! interp)
-        fail("Cannot create parrot interpreter");
+    /* Create the interpreter */
+    interp = new_interp();
 
     type = Parrot_PMC_typenum(interp, "Integer");
     pmc  = Parrot_PMC_new(interp, type);
@@ -344,14 +347,11 @@ c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PM
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler, errstr;
     Parrot_PMC pmc;
     Parrot_Int type, value;
 
-    /* Create the interpreter and show a message using parrot io */
-    interp = Parrot_new(NULL);
-    if (! interp)
-        fail("Cannot create parrot interpreter");
+    /* Create the interpreter */
+    interp = new_interp();
 
     type = Parrot_PMC_typenum(interp, "Integer");
     pmc  = Parrot_PMC_new(interp, type);
@@ -376,14 +376,11 @@ c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PM
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler, errstr;
     Parrot_PMC pmc, pmc2, pmc3;
     Parrot_Int type, value;
 
-    /* Create the interpreter and show a message using parrot io */
-    interp = Parrot_new(NULL);
-    if (! interp)
-        fail("Cannot create parrot interpreter");
+    /* Create the interpreter */
+    interp = new_interp();
 
     type = Parrot_PMC_typenum(interp, "Integer");
     pmc  = Parrot_PMC_new(interp, type);
@@ -392,7 +389,7 @@ int main(void)
 
     Parrot_PMC_set_integer_native(interp, pmc,  50);
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
-    //Parrot_PMC_set_integer_native(interp, pmc3, 0);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
 
     Parrot_PMC_modulus(interp, pmc, pmc2, pmc3);
     value = Parrot_PMC_get_integer(interp, pmc);
@@ -417,14 +414,11 @@ c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PM
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler, errstr;
     Parrot_PMC pmc, pmc2;
     Parrot_Int type, value;
 
-    /* Create the interpreter and show a message using parrot io */
-    interp = Parrot_new(NULL);
-    if (! interp)
-        fail("Cannot create parrot interpreter");
+    /* Create the interpreter */
+    interp = new_interp();
 
     type = Parrot_PMC_typenum(interp, "Integer");
     pmc  = Parrot_PMC_new(interp, type);
