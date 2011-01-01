@@ -189,7 +189,7 @@ event
 1.1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'create a task and get invalid attribut' );
+pir_output_is( <<'CODE', <<'OUT', 'create a task and get invalid attribute' );
   .sub main :main
     $P0 = new ['Task']
 
