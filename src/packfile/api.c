@@ -678,6 +678,65 @@ mark_const_subs(PARROT_INTERP)
 
 /*
 
+=item C<void PackFile_Header_validate(PARROT_INTERP, const PackFile_Header
+*self, INTVAL pf_options)>
+
+Validates a C<PackFile_Header>, ensuring that the magic number is valid and
+that Parrot can read this bytecode version.
+
+Raises an exception if the header doesn't validate.
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+PackFile_Header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
+                INTVAL pf_options)
+{
+    ASSERT_ARGS(PackFile_Header_validate)
+
+    /* Ensure the magic is correct. */
+    if (memcmp(self->magic, "\376PBC\r\n\032\n", 8) != 0) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+        "PackFile_unpack: This is not a valid Parrot bytecode file.");
+    }
+
+    /* Ensure the bytecode version is one we can read. Currently, we only
+     * support bytecode versions matching the current one.
+     *
+     * tools/dev/pbc_header.pl --upd t/native_pbc/(ASTERISK).pbc
+     * stamps version and fingerprint in the native tests.
+     * NOTE: (ASTERISK) is *, we don't want to fool the C preprocessor. */
+    if (self->bc_major != PARROT_PBC_MAJOR
+    ||  self->bc_minor != PARROT_PBC_MINOR) {
+        if (!(pf_options & PFOPT_UTILS))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PARROT_USAGE_ERROR,
+                    "PackFile_unpack: This Parrot cannot read bytecode "
+                    "files with version %d.%d.",
+                    self->bc_major, self->bc_minor);
+    }
+
+    /* Check wordsize, byte order and floating point number type are valid. */
+    if (self->wordsize != 4 && self->wordsize != 8) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "PackFile_unpack: Invalid wordsize %d\n", self->wordsize);
+    }
+
+    if (self->byteorder != 0 && self->byteorder != 1) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "PackFile_unpack: Invalid byte ordering %d\n", self->byteorder);
+    }
+
+    if (self->floattype > FLOATTYPE_MAX) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "PackFile_unpack: Invalid floattype %d\n", self->floattype);
+    }
+}
+
+
+/*
+
 =item C<opcode_t PackFile_unpack(PARROT_INTERP, PackFile *self, const opcode_t
 *packed, size_t packed_size)>
 
@@ -718,42 +777,8 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     /* Extract the header. */
     memcpy(header, packed, PACKFILE_HEADER_BYTES);
 
-    /* Ensure the magic is correct. */
-    if (memcmp(header->magic, "\376PBC\r\n\032\n", 8) != 0) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-        "PackFile_unpack: This is not a valid Parrot bytecode file.");
-    }
-
-    /* Ensure the bytecode version is one we can read. Currently, we only
-     * support bytecode versions matching the current one.
-     *
-     * tools/dev/pbc_header.pl --upd t/native_pbc/(ASTERISK).pbc
-     * stamps version and fingerprint in the native tests.
-     * NOTE: (ASTERISK) is *, we don't want to fool the C preprocessor. */
-    if (header->bc_major != PARROT_PBC_MAJOR
-    ||  header->bc_minor != PARROT_PBC_MINOR) {
-        if (!(self->options & PFOPT_UTILS))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PARROT_USAGE_ERROR,
-                    "PackFile_unpack: This Parrot cannot read bytecode "
-                    "files with version %d.%d.",
-                    header->bc_major, header->bc_minor);
-    }
-
-    /* Check wordsize, byte order and floating point number type are valid. */
-    if (header->wordsize != 4 && header->wordsize != 8) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_unpack: Invalid wordsize %d\n", header->wordsize);
-    }
-
-    if (header->byteorder != 0 && header->byteorder != 1) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_unpack: Invalid byte ordering %d\n", header->byteorder);
-    }
-
-    if (header->floattype > FLOATTYPE_MAX) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_unpack: Invalid floattype %d\n", header->floattype);
-    }
+    /* Validate the header. */
+    PackFile_Header_validate(interp, self->header, self->options);
 
     /* Describe what was read for debugging. */
     TRACE_PRINTF(("PackFile_unpack: Wordsize %d.\n", header->wordsize));

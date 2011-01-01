@@ -713,6 +713,13 @@ void PackFile_funcs_register(SHIM_INTERP,
         FUNC_MODIFIES(*pf);
 
 PARROT_EXPORT
+void PackFile_Header_validate(PARROT_INTERP,
+    ARGIN(const PackFile_Header *self),
+    INTVAL pf_options)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 INTVAL PackFile_map_segments(PARROT_INTERP,
     ARGIN(const PackFile_Directory *dir),
     PackFile_map_segments_func_t callback,
@@ -948,6 +955,9 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_funcs_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pf))
+#define ASSERT_ARGS_PackFile_Header_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_map_segments __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dir))
