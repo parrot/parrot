@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 19;
+plan tests => 20;
 
 =head1 NAME
 
@@ -369,6 +369,49 @@ CODE
 42
 Done!
 OUTPUT
+
+# Bug in modulus? Needs a TT
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_modulus" );
+
+int main(void)
+{
+    Parrot_Interp interp;
+    Parrot_String compiler, errstr;
+    Parrot_PMC pmc, pmc2, pmc3;
+    Parrot_Int type, value;
+
+    /* Create the interpreter and show a message using parrot io */
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+
+    type = Parrot_PMC_typenum(interp, "Integer");
+    pmc  = Parrot_PMC_new(interp, type);
+    pmc2 = Parrot_PMC_new(interp, type);
+    pmc3 = Parrot_PMC_new(interp, type);
+
+    Parrot_PMC_set_integer_native(interp, pmc,  50);
+    Parrot_PMC_set_integer_native(interp, pmc2, 42);
+    //Parrot_PMC_set_integer_native(interp, pmc3, 0);
+
+    Parrot_PMC_modulus(interp, pmc, pmc2, pmc3);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+    value = Parrot_PMC_get_integer(interp, pmc2);
+    printf("%d\n", (int) value);
+    value = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", (int) value);
+    Parrot_destroy(interp);
+    printf("Done!\n");
+    return 0;
+}
+CODE
+50
+42
+8
+Done!
+OUTPUT
+
 c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_i_add" );
 
 int main(void)
