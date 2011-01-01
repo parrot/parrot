@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -101,7 +101,7 @@ finally3:
 eh4:
     .get_results($P2)
     is($P2, "Illegal type in initializer for struct", "error correctly thrown for bad initializer type")
-finally4: 
+finally4:
     pop_eh
 
     set $P1['x'], .DATATYPE_INT16
