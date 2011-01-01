@@ -16,7 +16,7 @@ a variety of keys and values.
 
 =cut
 
-.const int TESTS = 53
+.const int TESTS = 55
 
 .sub 'test' :main
     .include 'test_more.pir'
@@ -32,6 +32,7 @@ a variety of keys and values.
     test_get_number()
     test_keyed_int_delegation()
     test_list_delegation()
+    test_set_capture()
 .end
 
 .sub 'test_new_capture'
@@ -314,6 +315,31 @@ a variety of keys and values.
     is($I0, 0, 'list method delegation')
 .end
 
+.sub 'test_set_capture'
+    .local pmc capt
+    .local pmc capt2
+    $P1 = new ['String']
+    
+    capt = new ['Capture']
+    capt2 = new ['Capture']
+
+    capt[0] = 1337
+    
+    setref capt2, capt
+    
+    $I0 = capt2[0]
+    is($I0, 1337, "Set PMC values correct")
+    
+    $P0 = new ['Role']
+    push_eh set_badpmc
+        setref capt, $P0
+    pop_eh
+    goto finally
+    set_badpmc:
+        .get_results($P1)
+        ok(1, "Bad set_pmc handled properly")
+    finally:
+.end
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
