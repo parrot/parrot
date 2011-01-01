@@ -19,7 +19,7 @@ Tests the Class PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-     plan(87)
+     plan(88)
      'new op'()
      'class flag'()
      'name'()
@@ -37,6 +37,7 @@ Tests the Class PMC.
      'clone'()
      'clone_pmc'()
      'new with init hash'()
+     'new with init hash exceptions'()
      'isa'()
      'does'()
      'more does'()
@@ -536,7 +537,7 @@ t_class_meth:
 
 
 .sub 'new with init hash'
-    .local pmc class, init_hash, attrs, methods, meth_to_add, class_instance
+    .local pmc class, init_hash, attrs, methods, meth_to_add, class_instance, role, roles
     .local pmc attr_val, result
     init_hash = new ['Hash']
 
@@ -551,6 +552,16 @@ t_class_meth:
     meth_to_add = get_global 'add'
     methods['add'] = meth_to_add
     init_hash['methods'] = methods
+
+    # And a role
+    $P0 = new ['Hash']
+    $P0['name'] = 'Flob'
+    $P0['namespace'] = 'Bob'
+    role = new ['Role'], $P0
+
+    roles = new ['ResizablePMCArray']
+    roles[0] = role
+    init_hash['roles'] = roles
 
     class = new ['Class'], init_hash
     ok(1, 'new() created new class with attributes and methods supplied')
@@ -570,6 +581,22 @@ t_class_meth:
     # Call method.
     result = class_instance.'add'()
     is(result, 42, 'new() added method returns expected value')
+.end
+
+.sub 'new with init hash exceptions'
+    .local pmc class, init_hash, null_pmc
+    null_pmc = new ['Null']
+
+    init_hash = new ['Hash']
+    init_hash['name'] = ""
+
+    $I0 = 1
+    push_eh t_invalid_name
+    class = new ['Class'], init_hash
+    $I0 = 0
+    pop_eh
+  t_invalid_name:
+    ok($I0, 'new() with invalid name raises exception')
 .end
 
 .sub add :method :nsentry('add')
