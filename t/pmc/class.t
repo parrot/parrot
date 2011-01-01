@@ -19,7 +19,7 @@ Tests the Class PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-     plan(88)
+     plan(90)
      'new op'()
      'class flag'()
      'name'()
@@ -55,6 +55,7 @@ Tests the Class PMC.
     ok(1, "$P0 = new ['Class']")
     isa_ok(class, 'Class')
 .end
+
 
 # L<PDD15/Class PMC API/'Class PMCs also have the "I am a class" flag set on them.'>
 .sub 'class flag'
@@ -158,7 +159,7 @@ Tests the Class PMC.
 
 # L<PDD15/Class PMC API/=item add_attribute>
 .sub 'add_attribute'
-    .local pmc class, attribs
+    .local pmc class, attribs, object
     .local int test_val
     class = new ['Class']
 
@@ -189,6 +190,16 @@ Tests the Class PMC.
 
   t_existing_attribute:
     ok($I0, 'add_attribute() with existing attribute name fails')
+
+    push_eh t_after_instantiation
+    $I0 = 1
+    object = class.'new'()
+    class.'add_attribute'( 'bar', 'Integer' )
+    $I0 = 0
+    pop_eh
+
+  t_after_instantiation:
+    ok($I0, 'add_attribute() after instantiation fails')
 .end
 
 
@@ -741,6 +752,16 @@ t_class_meth:
     addparent $P2, $P0
     addparent $P2, $P1
     ok(1, 'inheritance of two different anonymous classes works')
+
+    push_eh t_after_instantiation
+    $I0 = 1
+    $P3 = $P2.'new'()
+    addparent $P2, $P1
+    $I0 = 0
+    pop_eh
+
+  t_after_instantiation:
+    ok($I0, 'addparent VTABLE after instantiation fails')
 .end
 
 .sub 'method_cache_tt1497'
