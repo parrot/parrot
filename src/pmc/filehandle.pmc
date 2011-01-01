@@ -110,12 +110,14 @@ Create a copy of the filehandle.
             = PARROT_FILEHANDLE(copy);
 
         /* Properly clone string data. */
-        if (old_struct->filename != NULL)
-            data_struct->filename   = Parrot_str_clone(INTERP, old_struct->filename);
-        if (old_struct->mode != NULL)
-            data_struct->mode       = Parrot_str_clone(INTERP, old_struct->mode);
-        if (old_struct->encoding != NULL)
-            data_struct->encoding   = Parrot_str_clone(INTERP, old_struct->encoding);
+        data_struct->filename       = old_struct->filename;
+        data_struct->mode           = old_struct->mode;
+        data_struct->encoding       = old_struct->encoding;
+
+        /* Prevent GC of the strings. */
+        Parrot_gc_mark_STRING_alive(INTERP, data_struct->filename);
+        Parrot_gc_mark_STRING_alive(INTERP, data_struct->mode);
+        Parrot_gc_mark_STRING_alive(INTERP, data_struct->encoding);
 
         /* Copy over some metadata */
         data_struct->process_id     = old_struct->process_id;
