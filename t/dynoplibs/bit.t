@@ -21,7 +21,7 @@ number types.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(98)
+    plan(112)
 
     bnot_p_p_creates_destination()
     band_1()
@@ -36,6 +36,7 @@ number types.
     bors_3()
     bors_cow()
     shl_1()
+    bxor_1()
     bxors_null_string()
     bxors_2()
     bxors_3()
@@ -306,6 +307,33 @@ number types.
     is( $P0, 2, 'shl_p_i' )
 .end
 
+.sub bxor_1
+    $P0 = box 3
+    $I0 = 3
+    bxor $P0, $I0
+    is( $P0, 0, 'bxor_p_i' )
+
+    $P0 = box 3
+    bxor $P0, 3
+    is( $P0, 0, 'bxor_p_ic' )
+
+    $P0 = box 3
+    bxor $P0, $P0
+    is( $P0, 0, 'bxor_p_p' )
+
+    $P0 = box 3
+    bxor $P0, $P0, $I0
+    is( $P0, 0, 'bxor_p_p_i' )
+
+    $P0 = box 3
+    bxor $P0, $P0, 3
+    is( $P0, 0, 'bxor_p_p_ic' )
+
+    $P0 = box 3
+    bxor $P0, $P0, $P0
+    is( $P0, 0, 'bxor_p_p_p' )
+.end
+
 .sub bxors_null_string
     null $S1
     null $S2
@@ -364,6 +392,16 @@ number types.
     $S1 = bxors $S1, $S2
     is( $S1, "ABCX", 'bxors 2' )
     is( $S2, "   X", 'bxors 2' )
+
+    box $P0, "a2c"
+    set $S0, "Dw"
+    bxors $P0, $S0
+    is( $P0, "%Ec", 'bxors 2' )
+    is( $S0, "Dw", 'bxors 2' )
+
+    box $P0, "a2c"
+    bxors $P0, "Dw"
+    is( $P0, "%Ec", 'bxors 2' )
 .end
 
 .sub bxors_3
@@ -380,6 +418,23 @@ number types.
     is( $S0, "ABCY", 'bxors 3' )
     is( $S1, "abc", 'bxors 3' )
     is( $S2, "   Y", 'bxors 3' )
+
+    set $S0, "abc"
+    bxors $S0, "   Y", $S0
+    is( $S0, "ABCY", 'bxors 3' )
+
+    bxors $S0, "abc", "   Y"
+    is( $S0, "ABCY", 'bxors 3' )
+
+    box $P0, "abc"
+    set $S0, "   Y"
+    bxors $P0, $P0, $S0
+    is( $P0, "ABCY", 'bxors 3' )
+    is( $S0, "   Y", 'bxors 3' )
+
+    box $P0, "abc"
+    bxors $P0, $P0, "   Y"
+    is( $P0, "ABCY", 'bxors 3' )
 .end
 
 .sub bxors_cow
