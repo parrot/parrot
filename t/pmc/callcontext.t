@@ -18,7 +18,7 @@ Tests the CallContext PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(59)
+    plan(65)
 
     test_instantiate()
     test_get_set_attrs()
@@ -26,6 +26,7 @@ Tests the CallContext PMC.
     test_indexed_boxing()
     test_keyed_access()
     test_shift_access()
+    test_shift_acess_empty()
     test_exists()
     test_clone()
     test_short_sign()
@@ -52,6 +53,15 @@ Tests the CallContext PMC.
     ok(1, 'set arg_flags attribute')
     getattribute $P1, $P0, 'arg_flags'
     is($P5,'cheese', 'got arg_flags attribute')
+
+    $P5 = 'nothing'
+    push_eh eh
+    $I0 = 1
+    setattribute $P0, 'unexisting_attribute_123', $P5
+    $I0 = 0
+eh:
+    pop_eh
+    ok($I0, 'exception when set an unexisting attribute')
 .end
 
 .sub 'test_indexed_access'
@@ -175,6 +185,9 @@ Tests the CallContext PMC.
     $I0 = elements $P1
     is( $I0, 4, 'elements after set_*_keyed' )
 
+    $P4 = $P0['baz']
+    is($P4, '2.22', 'get_pmc_keyed with boxing')
+
     $P3 = new ['CallContext']
     $I1 = $P0['unexisting']
     is($I1, 0, 'get_integer_keyed whith empty CallContext')
@@ -189,7 +202,6 @@ Tests the CallContext PMC.
     $P3 = $P0['unexisting']
     null $P4
     is($P3, $P4, 'get_pmc_keyed whith empty CallContext')
-
 .end
 
 .sub 'test_exists'
@@ -227,6 +239,13 @@ Tests the CallContext PMC.
     $P0['floatval'] = 3.14159
     $P0 = 'PISS'
 
+    $P2 = new['String']
+    $P2 = 'return attr'
+    setattribute $P0, 'return_flags', $P2
+    $P3 = new['String']
+    $P3 = 'arg attr'
+    setattribute $P0, 'arg_flags', $P3
+
     $P1 = clone $P0
 
     $I2 = $P1[0]
@@ -237,6 +256,11 @@ Tests the CallContext PMC.
     is($N2, 3.14159, 'clone - named number cloned')
     $S3 = $P0
     is($S3, 'PISS', 'clone - with a short signature string')
+
+    getattribute $P4, $P0, 'return_flags'
+    is($P4,'return attr', 'clone - with return_flags attribute')
+    getattribute $P4, $P0, 'arg_flags'
+    is($P4,'arg attr', 'clone - with arg_flags attribute')
 .end
 
 .sub 'test_shift_access'
@@ -271,6 +295,29 @@ Tests the CallContext PMC.
 
     is($S2, 'Fred', '... but not convert when unnecessary')    
 .end
+
+
+.sub 'test_shift_acess_empty'
+    $P0 = new['CallContext']
+    $I0 = 1
+    push_eh first_eh
+    $P1 = shift $P0
+    $I0 = 0
+
+first_eh:
+    pop_eh
+    ok($I0, 'exception when shift_pmc an empty CallContext')
+    
+    push_eh second_eh
+    $I0 = 1
+    $S0 = shift $P0
+    $I0 = 0    
+
+second_eh:
+    pop_eh
+    ok($I0, 'exception when shift_string an empty CallContext')
+.end
+
 
 .sub 'test_short_sign'
     $P0 = new ['CallContext']
