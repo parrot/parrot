@@ -49,7 +49,8 @@ if (! -e 'Makefile') {
 }
 
 my @incfiles = [];
-find( \&wanted, qw/src compilers include frontend/);
+find( { wanted => \&wanted, no_chdir => 1 },
+      qw/src compilers include frontend/ );
 
 our %deps;
 
@@ -80,8 +81,9 @@ foreach my $file (sort grep /\.[hc]$/, @incfiles) {
         for my $path (@include_dirs) {
             next if $found;
 
-            my $make_dep = collapse_path(File::Spec->catfile($path, $include));
+            my $make_dep = File::Spec->catfile($path, $include);
             if (defined($make_dep) && -f $make_dep) {
+                $make_dep = collapse_path($make_dep);
                 push @{$deps{$file}}, $make_dep;
                 $found = 1;
             }

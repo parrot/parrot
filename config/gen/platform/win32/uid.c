@@ -3,7 +3,6 @@
  */
 
 #include "parrot/parrot.h"
-#include "windows.h"
 
 /*
 
