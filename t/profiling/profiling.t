@@ -214,6 +214,9 @@ $matcher := ProfTest::Matcher.new(
 
 ok( $matcher.matches($prof), "profile shows 'say' inside nqp sub");
 
+# XXX workaround nqp-rx not generating :main
+Q:PIR { exit 0 };
+
 #convenience subs to avoid repetitive typing and visual noise
 
 sub version(*@p, *%n) { ProfTest::Want::Version.new(|@p, |%n) }
