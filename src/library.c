@@ -363,7 +363,7 @@ is_abs_path(PARROT_INTERP, ARGIN(const STRING *file))
         return 1;
 
     if (len >= 3
-    &&  isalpha(c)
+    &&  isalpha((unsigned char)c)
     &&  STRING_ord(interp, file, 1) == ':') {
         INTVAL c2 = STRING_ord(interp, file, 2);
         if (c2 == path_separator || c2 == win32_path_separator)
