@@ -61,7 +61,7 @@ sub go {
         or die  "Can't find disassembler '$DISASSEMBLER';"
               . "did you remember to make parrot first?\n";
 
-    my @dis = `$DISASSEMBLER $pbc`;
+    my @dis = `"$DISASSEMBLER" $pbc`;
     die "No disassembly; errors: $?, $!" unless @dis;
 
     my $cur_file = '';

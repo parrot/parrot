@@ -81,7 +81,7 @@ method build_pir_profile() {
         $hash_seed_opt := '--hash-seed=1234';
     }
 
-    my $cli := "$parrot_exe $hash_seed_opt --runcore profiling $tmp_pir";
+    my $cli := "\"$parrot_exe\" $hash_seed_opt --runcore profiling $tmp_pir";
 
     my $pipe := pir::new__p_sc('FileHandle');
     $pipe.open($cli, "rp");

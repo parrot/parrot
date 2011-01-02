@@ -627,10 +627,7 @@ END_OF_FUNCTION
     includedir = concat includepath, versiondir
   done_includedir:
 
-    pathquote  = ''
-    unless osname == 'MSWin32' goto not_windows
     pathquote  = '"'
-  not_windows:
 
     .local string compile
     compile  = cc
@@ -689,9 +686,12 @@ END_OF_FUNCTION
     versiondir   = $P0['versiondir']
 
     .local string config, pathquote, exeprefix
+    pathquote  = '"'
     if installed == '1' goto config_installed
     exeprefix = substr exefile, 0, 12
-    config     = concat build_dir, slash
+    config     = pathquote
+    config    .= build_dir
+    config    .= slash
     config    .= 'src'
     config    .= slash
     if install goto config_to_install
@@ -709,10 +709,7 @@ END_OF_FUNCTION
     config    .= 'parrot_config'
  config_cont:
     config    .= o
-    pathquote  = ''
-    unless osname == 'MSWin32' goto not_windows
-    pathquote  = '"'
-  not_windows:
+    config    .= pathquote
 
     link .= ' '
     link .= ld_out

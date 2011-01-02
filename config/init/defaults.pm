@@ -80,9 +80,7 @@ sub runstep {
     my $ccdlflags = $Config{ccdlflags};
     $ccdlflags =~ s/\s*-Wl,-rpath,\S*//g if $conf->options->get('disable-rpath');
 
-    # escape spaces in build directory
     my $build_dir =  abs_path($FindBin::Bin);
-    $build_dir    =~ s{ }{\\ }g;
 
     my $cc_option = $conf->options->get('cc');
     # We need a Glossary somewhere!

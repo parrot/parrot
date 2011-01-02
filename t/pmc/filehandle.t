@@ -728,15 +728,18 @@ pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
     interp = getinterp
     conf = interp[.IGLOBALS_CONFIG_HASH]
 
-    cmd = conf['build_dir']
+    cmd = '"'
 
     .local string aux
+    aux = conf['build_dir']
+    cmd .= aux
     aux = conf['slash']
     cmd .= aux
     aux = conf['test_prog']
     cmd .= aux
     aux = conf['exe']
     cmd .= aux
+    cmd .= '"'
 
     pipe = new ['FileHandle']
     pipe.'open'(cmd, "rp")

@@ -110,7 +110,9 @@ Tests various io opcodes.
     conf = interp[.IGLOBALS_CONFIG_HASH]
 
     .local string command
-    command = conf['build_dir']
+    command = '"'
+    $S0 = conf['build_dir']
+    command .= $S0
 
     .local string aux
     aux = conf['slash']
@@ -119,7 +121,7 @@ Tests various io opcodes.
     command .= aux
     aux = conf['exe']
     command .= aux
-    command .= ' -V'
+    command .= '" -V'
 
     .local pmc pipe
     pipe = open command, 'rp'
@@ -145,9 +147,11 @@ Tests various io opcodes.
     conf = interp[.IGLOBALS_CONFIG_HASH]
 
     .local string command
-    command = conf['build_dir']
-
     .local string aux
+    command = '"'
+    aux = conf['build_dir']
+    command .= aux
+
     aux = conf['slash']
     command .= aux
     .local string filename
@@ -157,8 +161,9 @@ Tests various io opcodes.
     command .= aux
     aux = conf['exe']
     command .= aux
-    command .= ' '
+    command .= '" '
     command .= filename
+    command .= '"'
 
     .local pmc pipe
     pipe = open command, 'wp'
