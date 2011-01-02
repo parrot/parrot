@@ -22,7 +22,7 @@ Tests various transcendental operations
     .local num epsilon
     epsilon = _epsilon()
 
-    plan(101)
+    plan(111)
 
     test_sin_n(epsilon)
     test_sin_i(epsilon)
@@ -54,9 +54,12 @@ Tests various transcendental operations
     test_tanh_i(epsilon)
     test_exp_n(epsilon)
     test_ln_n(epsilon)
+    test_log2_n(epsilon)
     test_log10_n(epsilon)
+    test_pow_p_p_p()
     test_pow_p_p_i()
     test_pow_p_p_n()
+    test_pow_n_nc_i(epsilon)
     integer_overflow_with_pow()
     e_raised_pi_time_i__plus_1_equal_0()
 .end
@@ -393,6 +396,18 @@ Tests various transcendental operations
     is($N2, 0.693147, "ln(2.0)", epsilon)
 .end
 
+.sub test_log2_n
+    .param num epsilon
+    .local num result
+
+    $N1 = 16.0
+    $N2 = log2 $N1
+    is($N2, 4.0, "ln(2.0)", epsilon)
+
+    $N2 = log2 16.0
+    is($N2, 4.0, "ln(2.0)", epsilon)
+.end
+
 .sub test_log10_n
     .param num epsilon
     .local num result
@@ -405,14 +420,34 @@ Tests various transcendental operations
     is($N2, 2.0, "log10(100.0)", epsilon)
 .end
 
-.sub test_pow_p_p_i
+.sub test_pow_p_p_p
     $P1 = new ['Integer']
     $P1 = 2
     $P2 = new ['Integer']
+    $P2 = 2
+    null $P3
+    $P3 = pow $P1, $P2
+    is($P3, 4, "pow(2, 2) with null register")
+
+    $P3 = pow $P1, $P2
+    is($P3, 4, "pow(2, 2)")
+.end
+
+.sub test_pow_p_p_i
+    $P1 = new ['Integer']
+    $P1 = 2
+    null $P2
     $P2 = pow $P1, 2
-    is($P2, 4, "pow(2, 2)")
+    is($P2, 4, "pow(2, const 2) with null register")
+
+    $P2 = pow $P1, 2
+    is($P2, 4, "pow(2, const 2)")
 
     $I1 = 2
+    null $P2
+    $P2 = pow $P1, $I1
+    is($P2, 4, "pow(2, 2) with null register")
+
     $P2 = pow $P1, $I1
     is($P2, 4, "pow(2, 2)")
 .end
@@ -420,13 +455,32 @@ Tests various transcendental operations
 .sub test_pow_p_p_n
     $P1 = new ['Integer']
     $P1 = 2
-    $P2 = new ['Integer']
+    null $P2
     $P2 = pow $P1, 2.0
-    is($P2, 4, "pow(2, 2.0)")
+    is($P2, 4, "pow(2, const 2.0) with null register")
+
+    $P2 = pow $P1, 2.0
+    is($P2, 4, "pow(2, const 2.0)")
 
     $N1 = 2.0
+    null $P2
+    $P2 = pow $P1, $N1
+    is($P2, 4, "pow(2, 2.0) with null register")
+
     $P2 = pow $P1, $N1
     is($P2, 4, "pow(2, 2.0)")
+.end
+
+.sub test_pow_n_nc_i
+   .param num epsilon
+
+   $I1 = 2
+   $N0 = pow 2.0, $I1
+   is($N0, 4, "pow(2, 2)")
+
+   $I1 = -2
+   $N0 = pow 2.0, $I1
+   is($N0, 0.25, "pow(2, -2)", epsilon)
 .end
 
 .sub integer_overflow_with_pow
