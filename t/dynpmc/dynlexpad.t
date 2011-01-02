@@ -203,59 +203,63 @@ ok 2
 ok 3
 OUTPUT
 
-pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - iterator", todo => 'not yet implemented' );
+SKIP:
+{
+    skip "iterator support not in master", 1;
+    pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - iterator" );
 
-.loadlib 'dynlexpad'
-.sub 'onload' :immediate
-    .local pmc interp
-    interp = getinterp
+    .loadlib 'dynlexpad'
+    .sub 'onload' :immediate
+        .local pmc interp
+        interp = getinterp
 
-    .local pmc core
-    core = get_class 'LexPad'
-    .local pmc hll
-    hll = get_class 'DynLexPad'
-    interp.'hll_map'(core,hll)
-.end
+        .local pmc core
+        core = get_class 'LexPad'
+        .local pmc hll
+        hll = get_class 'DynLexPad'
+        interp.'hll_map'(core,hll)
+    .end
 
-.sub 'test' :main
+    .sub 'test' :main
 
-    .local pmc str1,str2,str3
+        .local pmc str1,str2,str3
 
-    str1 = box 'pants'
-    str2 = box 'shorts'
-    str3 = box 'skirt'
+        str1 = box 'pants'
+        str2 = box 'shorts'
+        str3 = box 'skirt'
 
-    .lex 'a', str1
-    .lex 'b', str2
-    .lex 'c', str3
+        .lex 'a', str1
+        .lex 'b', str2
+        .lex 'c', str3
 
-    store_lex 'a', str1
-    store_lex 'b', str2
-    store_lex 'c', str3
+        store_lex 'a', str1
+        store_lex 'b', str2
+        store_lex 'c', str3
 
-    .local pmc interp
-    interp = getinterp
+        .local pmc interp
+        interp = getinterp
 
-    .local pmc dlp
-    dlp    = interp['lexpad']
+        .local pmc dlp
+        dlp    = interp['lexpad']
 
-    .local pmc iterator
-    iterator = iter dlp
-iter_loop:
-    unless iterator goto iter_done
-    .local pmc key
-    key = shift iterator
-    .local pmc value
-    value = dlp[key]
-    say value
-    goto iter_loop
-iter_done:
-.end
+        .local pmc iterator
+        iterator = iter dlp
+    iter_loop:
+        unless iterator goto iter_done
+        .local pmc key
+        key = shift iterator
+        .local pmc value
+        value = dlp[key]
+        say value
+        goto iter_loop
+    iter_done:
+    .end
 CODE
 pants
 shorts
 skirt
 OUTPUT
+}
 
 # Local Variables:
 #   mode: cperl
