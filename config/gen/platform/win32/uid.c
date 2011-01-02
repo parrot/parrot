@@ -2,8 +2,8 @@
  * Copyright (C) 2010, Parrot Foundation.
  */
 
-#include <unistd.h>
 #include "parrot/parrot.h"
+#include "windows.h"
 
 /*
 
@@ -30,7 +30,7 @@ Get user id - returns 0 for Win32
 UINTVAL
 Parrot_get_user_id(void)
 {
-    /* Win32 doesn't have a notion of current user name */
+    /* Win32 doesn't have a notion of current user id */
     return (UINTVAL)0;
 }
 
