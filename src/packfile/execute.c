@@ -16,6 +16,7 @@ This file contain some private functions relating to executing functions.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "parrot/packfile.h"
 #include "pmc/pmc_sub.h"
 #include "packfile_private.h"
