@@ -86,6 +86,7 @@ our @EXPORT_OK = qw(
     t/compilers/opsc/*.t
     t/compilers/data_json/*.t
     t/dynoplibs/*.t
+    t/dynpmc/*.t
     t/library/*.t
     t/tools/*.t
     t/profiling/*.t
