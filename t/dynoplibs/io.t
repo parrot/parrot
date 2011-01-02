@@ -15,7 +15,7 @@ Tests various io opcodes.
 
 =cut
 
-.const int TESTS = 12
+.const int TESTS = 27
 
 .loadlib 'io_ops'
 
@@ -30,6 +30,11 @@ Tests various io opcodes.
     open_null_mode()
     open_pipe_for_reading()
     getfd_fdopen()
+    test_fdopen_p_ic_s()
+    test_fdopen_p_ic_sc()
+    test_fdopen_p_i_s()
+    test_open_p_s_s()
+    test_seek_tell()
     printerr_tests()
     stat_tests()
 
@@ -159,7 +164,7 @@ Tests various io opcodes.
     pipe = open command, 'wp'
     unless pipe goto open_pipe_for_writing_failed
 
-    pipe.'puts'("ok 9 - open pipe for writing\n")
+    ok(1, 'open pipe for writing')
     close pipe
     .return ()
 
@@ -179,6 +184,86 @@ Tests various io opcodes.
     fdopen $P1, $I0, 'w'
     $I0 = defined $P1
     ok($I0, 'fdopen - no close')
+.end
+
+.sub 'test_fdopen_p_ic_s'
+    $S0 = 'w'
+    fdopen $P0, 1, $S0
+    $I0 = defined $P0
+    ok($I0, 'fdopen_p_ic_s')
+.end
+
+.sub 'test_fdopen_p_ic_sc'
+    fdopen $P0, 1, 'w'
+    $I0 = defined $P0
+    ok($I0, 'fdopen_p_ic_sc')
+.end
+
+.sub 'test_fdopen_p_i_s'
+    getstdout $P0
+    $S0 = 'w'
+    $I0 = $P0.'get_fd'()
+    fdopen $P1, $I0, $S0
+    $I0 = defined $P1
+    ok($I0, 'fdopen_p_i_s')
+.end
+
+.sub 'test_open_p_s_s'
+    $S0 = "README"
+    $S1 = "r"
+    $P0 = open $S0, $S1
+    $I0 = defined $P0
+    ok($I0, "open_p_s_s")
+.end
+
+.sub 'test_seek_tell'
+    $P0 = open "README", "r"
+    $I0 = tell $P0
+    is( $I0, 0, 'tell_i_p' )
+
+    $I0 = 4 # offset
+    $I1 = 1 # from current pos
+    seek $P0, $I0, $I1
+
+    $I2 = tell $P0
+    is( $I2, $I0, 'seek_p_i_i' )
+
+    seek $P0, 4, $I1
+    $I2 = tell $P0
+    is( $I2, 8, 'seek_p_ic_i' )
+
+    seek $P0, $I0, 1
+    $I2 = tell $P0
+    is( $I2, 12, 'seek_p_i_ic' )
+
+    seek $P0, 0, $I0, $I1
+    $I2 = tell $P0
+    is( $I2, 16, 'seek_p_ic_i_i' )
+
+    $I3 = 0 # high order intval
+    seek $P0, $I3, $I0, $I1
+    $I2 = tell $P0
+    is( $I2, 20, 'seek_p_i_i_i' )
+
+    seek $P0, $I3, 4, $I1
+    $I2 = tell $P0
+    is( $I2, 24, 'seek_p_i_ic_i' )
+
+    seek $P0, 0, 4, $I1
+    $I2 = tell $P0
+    is( $I2, 28, 'seek_p_ic_ic_i' )
+
+    seek $P0, $I3, $I0, 1
+    $I2 = tell $P0
+    is( $I2, 32, 'seek_p_i_i_ic' )
+
+    seek $P0, 0, $I0, 1
+    $I2 = tell $P0
+    is( $I2, 36, 'seek_p_ic_i_ic' )
+
+    seek $P0, $I3, 4, 1
+    $I2 = tell $P0
+    is( $I2, 40, 'seek_p_i_ic_ic' )
 .end
 
 .sub 'read_on_null'
@@ -203,7 +288,7 @@ Tests various io opcodes.
     print "not "
 
 _readline_handler:
-        print "ok 10\n"
+        ok(1, '_readline_handler')
         pop_eh
 
     push_eh _read_handler
@@ -211,7 +296,7 @@ _readline_handler:
     print "not "
 
 _read_handler:
-        print "ok 11\n"
+        ok(1, '_read_handler')
         pop_eh
 
     push_eh _print_handler
@@ -219,7 +304,7 @@ _read_handler:
     print "not "
 
 _print_handler:
-        print "ok 12\n"
+        ok(1, '_print_handler')
         pop_eh
 .end
 
