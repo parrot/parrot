@@ -577,7 +577,7 @@ ok 1 - $S0 = $P0.mode() # get read mode
 OUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "clone preserves all attributes of filehandle" );
-.sub main
+.sub main :main
     .local pmc fh,fh_clone
     .local string line1, line2
 

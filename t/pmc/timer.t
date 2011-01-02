@@ -58,6 +58,9 @@ OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "Timer param test/invoke" );
 .include "timer.pasm"
+
+.pcc_sub :main main:
+
     new P0, ['Timer']
 
     set P0[.PARROT_TIMER_INTERVAL], 2.2
