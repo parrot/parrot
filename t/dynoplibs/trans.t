@@ -22,7 +22,7 @@ Tests various transcendental operations
     .local num epsilon
     epsilon = _epsilon()
 
-    plan(77)
+    plan(101)
 
     test_sin_n(epsilon)
     test_sin_i(epsilon)
@@ -44,8 +44,19 @@ Tests various transcendental operations
     test_acos_i(epsilon)
     test_asec_n(epsilon)
     test_asec_i(epsilon)
+    test_sinh_n(epsilon)
+    test_sinh_i(epsilon)
     test_cosh_n(epsilon)
     test_cosh_i(epsilon)
+    test_sech_n(epsilon)
+    test_sech_i(epsilon)
+    test_tanh_n(epsilon)
+    test_tanh_i(epsilon)
+    test_exp_n(epsilon)
+    test_ln_n(epsilon)
+    test_log10_n(epsilon)
+    test_pow_p_p_i()
+    test_pow_p_p_n()
     integer_overflow_with_pow()
     e_raised_pi_time_i__plus_1_equal_0()
 .end
@@ -166,6 +177,9 @@ Tests various transcendental operations
     $N1 = 1.0
     $N2 = sec $N1
     is($N2, 1.850816, "sec(1.0)", epsilon)
+
+    $N2 = sec 1.0
+    is($N2, 1.850816, "sec(1.0)", epsilon)
 .end
 
 .sub test_sec_i
@@ -221,6 +235,9 @@ Tests various transcendental operations
     $N1 = 1.0
     $N2 = asin $N1
     is($N2, pi2, "asin(1.0)", epsilon)
+
+    $N2 = asin 1.0
+    is($N2, pi2, "asin(1.0)", epsilon)
 .end
 
 .sub test_asin_i
@@ -240,6 +257,9 @@ Tests various transcendental operations
     $N1 = 1.0
     $N2 = acos $N1
     is($N2, 0.0, "acos(1.0)", epsilon)
+
+    $N2 = acos 1.0
+    is($N2, 0.0, "acos(1.0)", epsilon)
 .end
 
 .sub test_acos_i
@@ -256,6 +276,9 @@ Tests various transcendental operations
     $N1 = 1.0
     $N2 = asec $N1
     is($N2, 0.0, "asec(1.0)", epsilon)
+
+    $N2 = asec 1.0
+    is($N2, 0.0, "asec(1.0)", epsilon)
 .end
 
 .sub test_asec_i
@@ -266,12 +289,35 @@ Tests various transcendental operations
     is($N1, 0.0, "asec(1)", epsilon)
 .end
 
+.sub test_sinh_n
+    .param num epsilon
+    .local num result
+
+    $N1 = 1.0
+    $N2 = sinh $N1
+    is($N2, 1.175201, "sinh(1.0)", epsilon)
+
+    $N2 = sinh 1.0
+    is($N2, 1.175201, "sinh(1.0)", epsilon)
+.end
+
+.sub test_sinh_i
+    .param num epsilon
+
+    $I1 = 1
+    $N1 = sinh $I1
+    is($N1, 1.175201, "sinh(1)", epsilon)
+.end
+
 .sub test_cosh_n
     .param num epsilon
     .local num result
 
     $N1 = 1.0
     $N2 = cosh $N1
+    is($N2, 1.543081, "cosh(1.0)", epsilon)
+
+    $N2 = cosh 1.0
     is($N2, 1.543081, "cosh(1.0)", epsilon)
 .end
 
@@ -281,6 +327,106 @@ Tests various transcendental operations
     $I1 = 1
     $N1 = cosh $I1
     is($N1, 1.543081, "cosh(1)", epsilon)
+.end
+
+.sub test_sech_n
+    .param num epsilon
+    .local num result
+
+    $N1 = 1.0
+    $N2 = sech $N1
+    is($N2, 0.648054, "sech(1.0)", epsilon)
+
+    $N2 = sech 1.0
+    is($N2, 0.648054, "sech(1.0)", epsilon)
+.end
+
+.sub test_sech_i
+    .param num epsilon
+
+    $I1 = 1
+    $N1 = sech $I1
+    is($N1, 0.648054, "sech(1)", epsilon)
+.end
+
+.sub test_tanh_n
+    .param num epsilon
+    .local num result
+
+    $N1 = 1.0
+    $N2 = tanh $N1
+    is($N2, 0.761594, "tanh(1.0)", epsilon)
+
+    $N2 = tanh 1.0
+    is($N2, 0.761594, "tanh(1.0)", epsilon)
+.end
+
+.sub test_tanh_i
+    .param num epsilon
+
+    $I1 = 1
+    $N1 = tanh $I1
+    is($N1, 0.761594, "tanh(1)", epsilon)
+.end
+
+.sub test_exp_n
+    .param num epsilon
+    .local num result
+
+    $N1 = 2.0
+    $N2 = exp $N1
+    is($N2, 7.389056, "exp(2.0)", epsilon)
+
+    $N2 = exp 2.0
+    is($N2, 7.389056, "exp(2.0)", epsilon)
+.end
+
+.sub test_ln_n
+    .param num epsilon
+    .local num result
+
+    $N1 = 2.0
+    $N2 = ln $N1
+    is($N2, 0.693147, "ln(2.0)", epsilon)
+
+    $N2 = ln 2.0
+    is($N2, 0.693147, "ln(2.0)", epsilon)
+.end
+
+.sub test_log10_n
+    .param num epsilon
+    .local num result
+
+    $N1 = 100.0
+    $N2 = log10 $N1
+    is($N2, 2.0, "log10(100.0)", epsilon)
+
+    $N2 = log10 100.0
+    is($N2, 2.0, "log10(100.0)", epsilon)
+.end
+
+.sub test_pow_p_p_i
+    $P1 = new ['Integer']
+    $P1 = 2
+    $P2 = new ['Integer']
+    $P2 = pow $P1, 2
+    is($P2, 4, "pow(2, 2)")
+
+    $I1 = 2
+    $P2 = pow $P1, $I1
+    is($P2, 4, "pow(2, 2)")
+.end
+
+.sub test_pow_p_p_n
+    $P1 = new ['Integer']
+    $P1 = 2
+    $P2 = new ['Integer']
+    $P2 = pow $P1, 2.0
+    is($P2, 4, "pow(2, 2.0)")
+
+    $N1 = 2.0
+    $P2 = pow $P1, $N1
+    is($P2, 4, "pow(2, 2.0)")
 .end
 
 .sub integer_overflow_with_pow
