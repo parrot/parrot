@@ -713,6 +713,29 @@ void PackFile_funcs_register(SHIM_INTERP,
         FUNC_MODIFIES(*pf);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+void PackFile_Header_read_uuid(PARROT_INTERP,
+    ARGMOD(PackFile_Header *self),
+    ARGIN(const opcode_t *packed),
+    size_t packed_size)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+int PackFile_Header_unpack(PARROT_INTERP,
+    ARGMOD(PackFile_Header *self),
+    ARGIN(const opcode_t *packed),
+    size_t packed_size,
+    INTVAL pf_options)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self);
+
+PARROT_EXPORT
 void PackFile_Header_validate(PARROT_INTERP,
     ARGIN(const PackFile_Header *self),
     INTVAL pf_options)
@@ -955,6 +978,14 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_funcs_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pf))
+#define ASSERT_ARGS_PackFile_Header_read_uuid __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(packed))
+#define ASSERT_ARGS_PackFile_Header_unpack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(packed))
 #define ASSERT_ARGS_PackFile_Header_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
