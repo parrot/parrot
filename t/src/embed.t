@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 23;
+plan tests => 24;
 
 =head1 NAME
 
@@ -527,6 +527,40 @@ CODE
 1
 Done!
 OUTPUT
+
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_subtract" );
+
+int main(void)
+{
+    Parrot_Interp interp;
+    Parrot_PMC pmc, pmc2, difference;
+    Parrot_Int type, value;
+
+    /* Create the interpreter */
+    interp = new_interp();
+
+    type = Parrot_PMC_typenum(interp, "Integer");
+    pmc  = Parrot_PMC_new(interp, type);
+    pmc2 = Parrot_PMC_new(interp, type);
+
+    Parrot_PMC_set_integer_native(interp, pmc,  52);
+    Parrot_PMC_set_integer_native(interp, pmc2, 10);
+
+    difference = Parrot_PMC_subtract(interp, pmc, pmc2, difference);
+    Parrot_io_printf(interp, "%P\n", difference);
+    difference = Parrot_PMC_subtract(interp, pmc2, pmc, difference);
+    Parrot_io_printf(interp, "%P\n", difference);
+
+    Parrot_destroy(interp);
+    printf("Done!\n");
+    return 0;
+}
+CODE
+42
+-42
+Done!
+OUTPUT
+
 
 c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_i_add" );
 
