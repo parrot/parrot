@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -575,6 +575,33 @@ pir_output_is( <<'CODE', <<'OUT', 'mode' );
 CODE
 ok 1 - $S0 = $P0.mode() # get read mode
 OUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "clone preserves all attributes of filehandle" );
+.sub main
+    .local pmc fh,fh_clone
+    .local string line1, line2
+
+    fh = new ['FileHandle']
+    fh.'open'('README')
+
+    line1 = fh.'readline'()
+
+    fh_clone = clone fh
+    line2 = fh_clone.'readline'()
+
+    $I0 = line1 == line2
+    say $I0
+
+    fh_clone.'seek'(0, 0)
+    line2 = fh_clone.'readline'()
+
+    $I0 = line1 == line2
+    say $I0
+.end
+CODE
+0
+1
+OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall - closed filehandle" );
 .sub main :main
