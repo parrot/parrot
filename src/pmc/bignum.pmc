@@ -55,8 +55,8 @@ value)>
 
 =item C<static void bignum_set_double(PARROT_INTERP, PMC *self, double value)>
 
-=item C<static void bignum_set_str(PARROT_INTERP, PMC *self, const char *value,
-int base)>
+=item C<static void bignum_set_str(PARROT_INTERP, PMC *self, const STRING
+*value, int base)>
 
 =item C<static void bignum_set_bigint(PARROT_INTERP, PMC *self, struct BIGINT
 *value)>
@@ -397,7 +397,7 @@ static void bignum_set_si(PARROT_INTERP, ARGIN(PMC *self), long value)
 
 static void bignum_set_str(PARROT_INTERP,
     ARGIN(PMC *self),
-    ARGIN(const char *value),
+    ARGIN(const STRING *value),
     int base)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -661,12 +661,14 @@ bignum_set_double(PARROT_INTERP, ARGIN(PMC *self), double value) {
 }
 
 static void
-bignum_set_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(const char *value), int base) {
+bignum_set_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(const STRING *value), int base) {
     ASSERT_ARGS(bignum_set_str)
 
+    char * const s = Parrot_str_to_cstring(interp, value);
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
-    mpf_set_str(bn->b, value, base);
+    mpf_set_str(bn->b, s, base);
+    Parrot_str_free_cstring(s);
 }
 
 
@@ -1116,7 +1118,7 @@ bignum_set_double(PARROT_INTERP, ARGIN(PMC *self), double value) {
 }
 
 static void
-bignum_set_str(PARROT_INTERP, ARGIN(PMC *self), const char *value, int base) {
+bignum_set_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(const STRING *value), int base) {
     THROW_NYI;
 }
 
@@ -1370,15 +1372,11 @@ Same assume number base C<base>.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        char * const s = Parrot_str_to_cstring(INTERP, value);
-        bignum_set_str(INTERP, SELF, s, 10);
-        Parrot_str_free_cstring(s);
+        bignum_set_str(INTERP, SELF, value, 10);
     }
 
     VTABLE void set_string_keyed_int(INTVAL base, STRING *value) {
-        char * const s = Parrot_str_to_cstring(INTERP, value);
-        bignum_set_str(INTERP, SELF, s, base);
-        Parrot_str_free_cstring(s);
+        bignum_set_str(INTERP, SELF, value, base);
     }
 /*
 

@@ -18,7 +18,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(83)
+    plan(84)
     test_setting_array_size()
     test_assign_from_another()
     test_assign_self()
@@ -235,6 +235,14 @@ out-of-bounds test. Checks INT and PMC keys.
     elem_out_string = matrix[0;0]
     is(elem_out_string,128)
 
+    throws_substring(<<'CODE', 'Cannot autovivify nested arrays', 'Autovivification of nested arrays fails')
+    .sub main
+        $P0 = new ['FixedPMCArray']
+        $P0 = 1
+        $P0[0;0] = 1.2
+    .end
+CODE
+
 .end
 
 .sub test_equality
@@ -306,11 +314,11 @@ out-of-bounds test. Checks INT and PMC keys.
     .local string s, aux
     s = get_repr_fpa_n(0)
     aux = get_repr_fpa_n(1)
-    concat s, aux
+    s = concat s, aux
     aux = get_repr_fpa_n(2)
-    concat s, aux
+    s = concat s, aux
     aux = get_repr_fpa_n(3)
-    concat s, aux
+    s = concat s, aux
     substring(s,'()(0)(0, 1)(0, 1, 2)','get_repr')
 .end
 

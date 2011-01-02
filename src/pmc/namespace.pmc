@@ -226,8 +226,8 @@ maybe_add_sub_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
 
 /*
 
-=item C<static void add_nci_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key,
-PMC *value)>
+=item C<static void add_native_to_namespace(PARROT_INTERP, PMC *SELF, STRING
+*key, PMC *value)>
 
 =cut
 

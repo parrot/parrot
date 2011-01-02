@@ -40,7 +40,7 @@ it should be.  No, I'm not proud of it, but it works for now.
     $I0 = length str
     if $I0 < 48 goto have_str
     str = substr str, 0, 48
-    str .= '...'
+    str = concat str, '...'
   have_str:
     str = escape str
 

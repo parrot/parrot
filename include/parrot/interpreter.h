@@ -278,7 +278,6 @@ struct parrot_interp_t {
 typedef enum {
     RESUME_NONE         = 0x00,
     RESUME_RESTART      = 0x01,
-    RESUME_ISJ          = 0x02,
     RESUME_INITIAL      = 0x04
 } resume_flag_enum;
 
@@ -486,6 +485,8 @@ void Parrot_compreg(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

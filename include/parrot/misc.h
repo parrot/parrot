@@ -101,10 +101,12 @@ INTVAL Parrot_util_intval_mod(INTVAL i2, INTVAL i3);
 void Parrot_util_quicksort(PARROT_INTERP,
     ARGMOD(void **data),
     UINTVAL n,
-    ARGIN(PMC *cmp))
+    ARGIN(PMC *cmp),
+    ARGIN(const char * cmp_signature))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
         FUNC_MODIFIES(*data);
 
 #define ASSERT_ARGS_Parrot_util_byte_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -131,7 +133,8 @@ void Parrot_util_quicksort(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_util_quicksort __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(data) \
-    , PARROT_ASSERT_ARG(cmp))
+    , PARROT_ASSERT_ARG(cmp) \
+    , PARROT_ASSERT_ARG(cmp_signature))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/utils.c */
 

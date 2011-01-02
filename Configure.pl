@@ -5,6 +5,7 @@
 use 5.008;
 use strict;
 use warnings;
+use Data::Dumper;$Data::Dumper::Indent=1;
 use lib 'lib';
 
 use Parrot::Configure;
@@ -41,6 +42,7 @@ my ($args, $steps_list_ref) = process_options(
     }
 );
 exit(1) unless defined $args;
+#print STDERR Dumper $args;
 
 my $opttest = Parrot::Configure::Options::Test->new($args);
 
@@ -51,7 +53,8 @@ $opttest->run_configure_tests( get_preconfiguration_tests() );
 my $parrot_version = $Parrot::Configure::Options::Conf::parrot_version;
 
 # from Parrot::Configure::Messages
-print_introduction($parrot_version);
+print_introduction($parrot_version)
+    unless $args->{silent};
 
 # Update revision number if needed
 Parrot::Revision::update();
@@ -79,7 +82,7 @@ $opttest->run_build_tests( get_postconfiguration_tests() );
 
 my $make = $conf->data->get('make');
 # from Parrot::Configure::Messages
-( print_conclusion( $conf, $make ) ) ? exit 0 : exit 1;
+( print_conclusion( $conf, $make, $args ) ) ? exit 0 : exit 1;
 
 ################### DOCUMENTATION ###################
 
@@ -198,7 +201,7 @@ disk, for later analysis by F<Parrot::Configure::Trace> methods.
 
 =item C<--coveragedir>
 
-In preparation for calling C<make quickcover> to perform coverage analysis,
+In preparation for calling C<make cover> to perform coverage analysis,
 provide a user-specified directory for top level of HTML output.
 
 =item Operating system-specific configuration options
@@ -553,7 +556,7 @@ for example, wish to designate only a few steps for verbose output:
 
     ...
     init::hints verbose-step
-    init::headers
+    ...
     inter::progs fatal-step
     ...
     auto::gcc verbose-step
@@ -600,7 +603,6 @@ configuration file.
     init::defaults
     init::install
     init::hints verbose-step
-    init::headers
     inter::progs
     inter::make
     inter::lex

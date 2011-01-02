@@ -118,7 +118,7 @@ Sets the type specified by C<name> of garbage collector.
 
 PARROT_EXPORT
 void
-Parrot_gc_set_system_type(PARROT_INTERP, const char *name)
+Parrot_gc_set_system_type(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(Parrot_gc_set_system_type)
     if (STREQ(name, "MS"))

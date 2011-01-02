@@ -218,7 +218,7 @@ compilers/imcc/symreg$(O) : \
 
 # imcc file dependencies
 #
-# The .flag files are needed because we keep some derived files in SVN,
+# The .flag files are needed because we keep some generated files in Git,
 # which does not keep accurate timestamps on the files, relative to each other.
 # Note that YACC or LEX may be null commands, so we must `touch` all the
 # target files, instead of just the .flag files.
@@ -232,3 +232,9 @@ compilers/imcc/imcc.y.flag compilers/imcc/imcparser.c compilers/imcc/imcparser.h
 compilers/imcc/imcc.l.flag compilers/imcc/imclexer.c : compilers/imcc/imcc.l
 	$(LEX) -ocompilers/imcc/imclexer.c compilers/imcc/imcc.l
 	$(TOUCH) compilers/imcc/imcc.l.flag compilers/imcc/imclexer.c
+
+# Needed for parallel builds. The rules above might still be executed multiple
+# times, but not in parallel.
+compilers/imcc/imcparser.c : compilers/imcc/imcc.y.flag
+compilers/imcc/imcparser.h : compilers/imcc/imcparser.c
+compilers/imcc/imclexer.c : compilers/imcc/imcc.l.flag

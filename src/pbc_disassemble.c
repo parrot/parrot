@@ -28,7 +28,7 @@ Without non-option arguments it reads the pbc from STDIN.
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "parrot/api.h"
+#include "parrot/parrot.h"
 #include "parrot/longopt.h"
 
 #define PFOPT_UTILS 1

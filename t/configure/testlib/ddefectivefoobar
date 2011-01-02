@@ -9,7 +9,6 @@ init::manifest nomanicheck
 init::defaults
 init::install
 init::hints verbose-step fatal-step foobar
-init::headers
 inter::progs
 inter::make
 inter::lex

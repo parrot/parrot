@@ -13,7 +13,7 @@ use Test::More;
 
 =head1 NAME
 
-t/codingstd/checkdepend.t
+t/src/checkdepend.t
 
 =head1 DESCRIPTION
 
@@ -33,7 +33,7 @@ are not reported on. The number in parentheses indicates how many were found.
 =head1 REQUIREMENTS
 
 A built parrot (Configure and make) to generate all files so we can analyze
-them.
+them. (That's why it's in t/src/ instead of t/codingstd)
 
 =head1 BUGS
 
@@ -49,15 +49,11 @@ if (! -e 'Makefile') {
 }
 
 my @incfiles = [];
-find( \&wanted, qw/src compilers include/);
+find( \&wanted, qw/src compilers include frontend/);
 
 our %deps;
 
 foreach my $file (sort grep /\.[hc]$/, @incfiles) {
-    # For now, skip any files that have generated dependencies
-    next if $file =~ m{src/pmc/};
-    next if $file =~ m{src/string/(charset|encoding)/};
-
     open my $fh, '<', $file;
     my $guts;
     {

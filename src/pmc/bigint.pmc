@@ -233,7 +233,7 @@ static void bigint_set_self(PARROT_INTERP,
 
 static void bigint_set_str(PARROT_INTERP,
     ARGMOD(PMC *self),
-    ARGIN(const char *value),
+    ARGIN(const STRING *value),
     int base)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -484,21 +484,23 @@ bigint_set_double(PARROT_INTERP, ARGMOD(PMC *self), double value)
 
 /*
 
-=item C<static void bigint_set_str(PARROT_INTERP, PMC *self, const char *value,
-int base)>
+=item C<static void bigint_set_str(PARROT_INTERP, PMC *self, const STRING
+*value, int base)>
 
 =cut
 
 */
 
 static void
-bigint_set_str(PARROT_INTERP, ARGMOD(PMC *self), ARGIN(const char *value), int base)
+bigint_set_str(PARROT_INTERP, ARGMOD(PMC *self), ARGIN(const STRING *value), int base)
 {
     ASSERT_ARGS(bigint_set_str)
 
+    char * const s = Parrot_str_to_cstring(interp, value);
     BIGINT *bi;
     GETATTR_BigInt_bi(interp, self, bi);
-    mpz_set_str(bi->b, value, base);
+    mpz_set_str(bi->b, s, base);
+    Parrot_str_free_cstring(s);
 }
 
 /*
@@ -1078,7 +1080,7 @@ bigint_set_double(PARROT_INTERP, ARGIN(PMC *self), double value) {
 }
 
 static void
-bigint_set_str(PARROT_INTERP, ARGIN(PMC *self), char *value, int base) {
+bigint_set_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(const STRING *value), int base) {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
         "no bigint lib loaded");
 }
@@ -1315,15 +1317,11 @@ Same assume number base C<base>.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        char * const s = Parrot_str_to_cstring(INTERP, value);
-        bigint_set_str(INTERP, SELF, s, 10);
-        Parrot_str_free_cstring(s);
+        bigint_set_str(INTERP, SELF, value, 10);
     }
 
     VTABLE void set_string_keyed_int(INTVAL base, STRING *value) {
-        char * const s = Parrot_str_to_cstring(INTERP, value);
-        bigint_set_str(INTERP, SELF, s, base);
-        Parrot_str_free_cstring(s);
+        bigint_set_str(INTERP, SELF, value, base);
     }
 /*
 

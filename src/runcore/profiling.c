@@ -629,7 +629,7 @@ store_postop_time(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
 
     ASSERT_ARGS(store_postop_time)
 
-    if (interp->current_runloop_level-1 >= runcore->time_size) {
+    if (interp->current_runloop_level-1 >= (int)runcore->time_size) {
         runcore->time_size *= 2;
         runcore->time = mem_gc_realloc_n_typed(interp,
                 runcore->time, runcore->time_size + 1, UHUGEINTVAL);

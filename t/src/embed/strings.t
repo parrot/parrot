@@ -55,7 +55,6 @@ int main(int argc, char* argv[])
 
     wchar_t *wcout;
     Parrot_api_string_export_wchar(pmc, str, &wcout);
-    Parrot_pmc_destroy(interp, pmc);
 
     if (wcscmp(wcout, TEST_STR_L) != 0) {
         printf("Failed to export a wchar string from a Parrot_string");
@@ -64,11 +63,25 @@ int main(int argc, char* argv[])
 
     printf("ok 2\n");
 
+    const unsigned char bytes[5] = { 'h', 'e', 'l', 'l', 'o' };
+    Parrot_api_string_import_binary(pmc, bytes, 5, &str);
+
+    if (strcmp(Parrot_str_to_cstring(interp, str), "hello") != 0) {
+        printf("Failed to import a binary string into a Parrot_string");
+        return EXIT_FAILURE;
+    }
+
+    printf("ok 3\n");
+
+    Parrot_api_string_free_exported_wchar(pmc, wcout);
+    Parrot_pmc_destroy(interp, pmc);
+
     return EXIT_SUCCESS;
 }
 CODE
 ok 1
 ok 2
+ok 3
 OUTPUT
 
 # Local Variables:

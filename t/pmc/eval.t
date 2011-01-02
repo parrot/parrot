@@ -39,9 +39,9 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "call subs in evaled code " );
     set S5, ".pcc_sub _foo:\n"
-    concat S5, "print \"foo\\n\"\n"
-    concat S5, "set_returns \"()\"\n"
-    concat S5, "returncc\n"
+    concat S5, S5, "print \"foo\\n\"\n"
+    concat S5, S5, "set_returns \"()\"\n"
+    concat S5, S5, "returncc\n"
     compreg P1, "PASM"
     set_args "0", S5
     invokecc P1
@@ -60,13 +60,13 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "call 2 subs in evaled code " );
     set S5, ".pcc_sub _foo:\n"
-    concat S5, "print \"foo\\n\"\n"
-    concat S5, "set_returns \"()\"\n"
-    concat S5, "returncc\n"
-    concat S5, ".pcc_sub _bar:\n"
-    concat S5, "print \"bar\\n\"\n"
-    concat S5, "set_returns \"()\"\n"
-    concat S5, "returncc\n"
+    concat S5, S5, "print \"foo\\n\"\n"
+    concat S5, S5, "set_returns \"()\"\n"
+    concat S5, S5, "returncc\n"
+    concat S5, S5, ".pcc_sub _bar:\n"
+    concat S5, S5, "print \"bar\\n\"\n"
+    concat S5, S5, "set_returns \"()\"\n"
+    concat S5, S5, "returncc\n"
     compreg P1, "PASM"
     set_args "0", S5
     invokecc P1

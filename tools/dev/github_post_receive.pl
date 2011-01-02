@@ -7,7 +7,7 @@ use warnings;
 use CGI;
 use JSON::Any;
 use Mail::Sendmail;
-use Tie::Function;
+use Net::GitHub;
 
 use DateTime::Format::ISO8601;
 use DateTime::TimeZone::Local;
@@ -22,15 +22,25 @@ a post-receive script to send commit diffs to parrot developers
 
 =cut
 
+
+my $github = Net::GitHub->new(
+    owner => 'fernandobrito', repo => 'parrot'
+);
+
+my $from = 'brito@localhost';
+my @send_list = ( 'b11046@pjjkp.com' );
+my $auth_token = 'abc123';
+
 my $q = CGI->new;
 print $q->header;
 
-if( my $p = $q->param('payload') ) {
-    $p = JSON::Any->new->decode( $p );
-    #use Data::Dumper;
-    #warn Dumper $p;
+if( $q->param('token') ne $auth_token ) {
+    print $q->h1("'token' GET param is wrong");
+    die();
+}
 
-    #tie my %short, 'Tie::Function' => sub { substr( shift(), 0, 8 ) };
+if( my $p_json = $q->param('payload') ) {
+    my $p = JSON::Any->new->decode( $p_json );
 
     my $commits =
         join '',
@@ -48,18 +58,23 @@ if( my $p = $q->param('payload') ) {
                 $file_change_count = "$file_change_count ".($file_change_count > 1 ? 'files changed' : 'file changed');
                 my $file_changes = join "\n", @file_changes;
 
+                my $diff = diff_from_github_api($c{id});
+
                 $c{message} = indent($c{message});
 
                 <<EOF;
-commit $c{id}
-$c{url}
 Author:  $c{author}{name} <$c{author}{email}>
 Date:    $c{timestamp}
+commit $c{id}
+$c{url}
 
 $c{message}
 
+$file_change_count:
 $file_changes
- $file_change_count
+
+$diff
+==================
 
 EOF
     } @{$p->{commits}};
@@ -70,26 +85,26 @@ EOF
     my $commit_cnt = scalar @{$p->{commits}};
     $commit_cnt = "$commit_cnt ".( $commit_cnt > 1 ? 'commits' : 'commit' );
 
-    my %mail = ( From    => 'github-commits@bugs.sgn.cornell.edu',
+    my %mail = ( From => $from,
                  Subject => "[$p->{repository}{owner}{name}/$p->{repository}{name}($head)] $commit_cnt - GitHub",
                  Message => <<EOF,
 HEAD is now $p->{after}
 Home:    $p->{repository}->{url}
 Browse:  $p->{repository}->{url}/tree/$head
 Commits: $p->{repository}->{url}/commits/$head
-------------------
+==================
 
 $commits
 EOF
                );
 
-    my @send_list = ( 'parrot-commits@lists.parrot.org' );
     foreach my $to ( @send_list ) {
         sendmail( %mail, To => $to )
-            or warn "error sending to $to: $Mail::Sendmail::error";
+            or print $q->p("error sending to $to: $Mail::Sendmail::error");
     }
 
-    #print "OK. Log says:\n", $Mail::Sendmail::log;
+    print $q->p(%mail);
+    print $q->p("OK. Log says:\n", $Mail::Sendmail::log);
 }
 
 sub short_commitname {
@@ -108,6 +123,19 @@ sub fmt_time {
     my $d = DateTime::Format::ISO8601->parse_datetime( shift );
     $d->set_time_zone(DateTime::TimeZone::Local->TimeZone() );
     return $d->strftime(q|%a %m/%d/%y, %I:%m %p %Z|);
+}
+
+sub diff_from_github_api {
+    my $sha1 = shift;
+    my $output = '';
+
+    my $co_details = $github->commit->show( $sha1 );
+
+    for my $files_changed (@{$co_details->{modified}}) {
+        $output .= $files_changed->{diff} . "\n";
+    }
+
+    return $output;
 }
 
 # Local Variables:

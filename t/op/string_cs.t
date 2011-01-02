@@ -631,7 +631,7 @@ pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 append" );
     set S1, iso-8859-1:"Tötsch"
     find_encoding I0, "utf16"
     trans_encoding S1, S1, I0
-    concat S1, " Leo"
+    concat S1, S1, " Leo"
     length I0, S1
     print I0
     print ' '
@@ -725,7 +725,7 @@ pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 index, latin1 search" );
     index I0, S1, S2
     print I0
     print "\n"
-    concat S1, S2
+    concat S1, S1, S2
     index I0, S1, S2, 2
     print I0
     print "\n"

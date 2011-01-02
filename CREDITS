@@ -323,6 +323,11 @@ N: Dave Woldrich
 D: Win32 build fixes
 E: dave@woldrich.com
 
+N: David Czech
+U: kapace
+E: davidczech510@gmail.com
+D: increasing EventHandler test coverage
+
 N: David M. Lloyd
 U: dmlloyd
 E: dmlloyd@tds.net
@@ -712,7 +717,9 @@ N: Matt Kennedy
 D: Some Env PMC method implementations and tests
 
 N: Matt Rajca
-D: Code refactoring
+E: mattmatt.rajca@me.com
+A: mattrajca
+D: Code refactoring, increasing test coverage
 
 N: Mattia Barbon
 D: Win32 fixes, dynamic PMC creation and loading
@@ -1046,6 +1053,11 @@ D: Nicer command line handling in ops2c.pl
 
 N: Tony Payne
 D: Example hanoi.pasm
+
+N: Tony Young
+E: rofflwaffls@gmail.com
+U: rfw
+D: increasing PMC test coverage
 
 N: Tyler Curtis
 U: tcurtis

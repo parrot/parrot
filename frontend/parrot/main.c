@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2010, Parrot Foundation.
+Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -43,6 +43,17 @@ PARROT_PURE_FUNCTION
 static int is_all_hex_digits(ARGIN(const char *s))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static const struct longopt_opt_decl * Parrot_cmd_options(void);
+
+static void Parrot_confess(
+    ARGIN(const char * condition),
+    ARGIN(const char * file),
+    unsigned int line)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void Parrot_version(void);
 PARROT_CAN_RETURN_NULL
 static const char * parseflags(
@@ -73,9 +84,11 @@ static void parseflags_minimal(
 
 static void print_parrot_string(
     Parrot_PMC interp,
-    FILE *vector,
+    ARGMOD(FILE *vector),
     Parrot_String str,
-    int newline);
+    int newline)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*vector);
 
 static void show_last_error_and_exit(Parrot_PMC interp);
 static void usage(ARGMOD(FILE *fp))
@@ -88,6 +101,10 @@ static void usage(ARGMOD(FILE *fp))
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_is_all_hex_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_cmd_options __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_confess __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(condition) \
+    , PARROT_ASSERT_ARG(file))
 #define ASSERT_ARGS_Parrot_version __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_parseflags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(argv) \
@@ -98,7 +115,8 @@ static void usage(ARGMOD(FILE *fp))
 #define ASSERT_ARGS_parseflags_minimal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(initargs) \
     , PARROT_ASSERT_ARG(argv))
-#define ASSERT_ARGS_print_parrot_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_print_parrot_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(vector))
 #define ASSERT_ARGS_show_last_error_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(fp))
@@ -186,13 +204,14 @@ show_last_error_and_exit(Parrot_PMC interp)
     Parrot_Int exit_code, is_error;
     Parrot_PMC exception;
 
-    if (!(Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg) &&
-          Parrot_api_get_exception_backtrace(interp, exception, &backtrace))) {
+    if (!Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg))
         exit(EXIT_FAILURE);
+    if (is_error) {
+        if (!Parrot_api_get_exception_backtrace(interp, exception, &backtrace))
+            exit(EXIT_FAILURE);
+        print_parrot_string(interp, stderr, errmsg, 1);
+        print_parrot_string(interp, stderr, backtrace, 0);
     }
-
-    print_parrot_string(interp, stderr, errmsg, 1);
-    print_parrot_string(interp, stderr, backtrace, 0);
 
     exit(exit_code);
 }
@@ -210,7 +229,8 @@ line if C<newline> is set to a true value.
 */
 
 static void
-print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline)
+print_parrot_string(Parrot_PMC interp, ARGMOD(FILE *vector), Parrot_String str,
+        int newline)
 {
     ASSERT_ARGS(print_parrot_string)
     char * msg_raw;
@@ -267,6 +287,24 @@ is_all_hex_digits(ARGIN(const char *s))
         if (!isxdigit(*s))
             return 0;
     return 1;
+}
+
+/*
+
+=item C<static void Parrot_confess(const char * condition, const char * file,
+unsigned int line)>
+
+Prints an error
+
+=cut
+
+*/
+
+static void
+Parrot_confess(ARGIN(const char * condition), ARGIN(const char * file),
+        unsigned int line)
+{
+    fprintf(stderr, "Parrot Error: %s (%s:%d)\n", condition, file, line);
 }
 
 /*
@@ -400,10 +438,12 @@ Set up the const struct declaration for cmd_options
 
 /* TODO: Weed out the options that are not used by this executable */
 
-static
-const struct longopt_opt_decl *
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static const struct longopt_opt_decl *
 Parrot_cmd_options(void)
 {
+    ASSERT_ARGS(Parrot_cmd_options)
     static const struct longopt_opt_decl cmd_options[] = {
         { '.', '.', (OPTION_flags)0, { "--wait" } },
         { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
@@ -456,7 +496,7 @@ Parrot_version(void)
     ASSERT_ARGS(Parrot_version)
     printf("This is Parrot version " PARROT_VERSION);
     printf(" built for " PARROT_ARCHNAME ".\n");
-    printf("Copyright (C) 2001-2010, Parrot Foundation.\n\
+    printf("Copyright (C) 2001-2011, Parrot Foundation.\n\
 \n\
 This code is distributed under the terms of the Artistic License 2.0.\
 \n\

@@ -65,7 +65,9 @@ Parrot_api_get_result(Parrot_PMC interp_pmc, ARGOUT(Parrot_Int *is_error),
         *errmsg = STRINGNULL;
     }
     else {
-        *is_error = !interp->exit_code;
+        STRING * const severity_str = Parrot_str_new(interp, "severity", 0);
+        INTVAL severity = VTABLE_get_integer_keyed_str(interp, *exception, severity_str);
+        *is_error = (severity != EXCEPT_exit);
         *errmsg = VTABLE_get_string(interp, *exception);
     }
     interp->final_exception = PMCNULL;
@@ -282,10 +284,24 @@ Parrot_Int
 Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
 {
     ASSERT_ARGS(Parrot_api_destroy_interpreter)
-    EMBED_API_CALLIN(interp_pmc, interp)
-    Parrot_destroy(interp);
-    Parrot_x_exit(interp, 0);
-    EMBED_API_CALLOUT(interp_pmc, interp);
+    void * _oldtop;
+    Parrot_jump_buff env;
+    Interp * const interp = GET_INTERP(interp_pmc);
+    _oldtop = interp->lo_var_ptr;
+    if (_oldtop == NULL)
+        interp->lo_var_ptr = &_oldtop;
+    interp->api_jmp_buf = &env;
+    if (setjmp(env)) {
+        /* We can't check for potential errors because the interpreter
+         * might have been destroyed. */
+        return 1;
+    }
+    else {
+        Parrot_destroy(interp);
+        Parrot_x_exit(interp, 0);
+        /* Never reached, x_exit calls longjmp */
+        return 1;
+    }
 }
 
 /*
@@ -388,8 +404,6 @@ Parrot_api_ready_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
     if (pf->cur_cs != NULL)
         Parrot_pbc_load(interp, pf);
-    PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
-    PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
     *main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
     Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
@@ -430,8 +444,6 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
     if (pf->cur_cs != NULL)
         Parrot_pbc_load(interp, pf);
-    PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
-    PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
     main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
 
@@ -706,9 +718,9 @@ otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, const char * sourcefile,
-    int argc, const char **argv, Parrot_PMC* bytecodepmc, int *result,
-    imcc_hack_func_t func)
+Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, ARGIN(const char * sourcefile),
+    int argc, ARGIN(const char **argv), ARGMOD(Parrot_PMC* bytecodepmc),
+    ARGOUT(int *result), imcc_hack_func_t func)
 {
     ASSERT_ARGS(Parrot_api_wrap_imcc_hack)
     EMBED_API_CALLIN(interp_pmc, interp)

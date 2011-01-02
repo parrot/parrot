@@ -7,7 +7,8 @@ src/embed.c - The Parrot embedding interface
 
 =head1 DESCRIPTION
 
-This file implements the Parrot embedding interface.
+This file implements the old Parrot embedding interface.  Its days are
+numbered.  You probably want src/embed/api.c
 
 =head2 Functions
 
@@ -564,7 +565,6 @@ again:
     /* Set :main routine */
     if (!(pf->options & PFOPT_HEADERONLY))
         do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
-
     /* Prederefing the sub/the bytecode is done in switch_to_cs before
      * actual usage of the segment */
 
@@ -1149,6 +1149,31 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code)
     return NULL;
 }
 
+/*
+
+=item C<void Parrot_set_configuration_hash_legacy(PARROT_INTERP, const int
+length, const unsigned char *bytes)>
+
+Legacy function for setting the configuration hash as an array of bytes for
+the old API. New programs should not use this. They should use the new API and
+C<Parrot_api_set_configuration_hash>
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_set_configuration_hash_legacy(PARROT_INTERP, const int length,
+        ARGIN(const unsigned char *bytes))
+{
+    ASSERT_ARGS(Parrot_set_configuration_hash_legacy)
+    STRING * const fpmc_str = Parrot_str_new_init(interp, (const char *)bytes,
+        length, Parrot_binary_encoding_ptr, PObj_external_FLAG);
+    PMC * const pmc = Parrot_thaw(interp, fpmc_str);
+    Parrot_set_config_hash_pmc(interp, pmc);
+    Parrot_lib_update_paths_from_config_hash(interp);
+}
 
 /*
 
