@@ -12,6 +12,7 @@ src/packfile/execute.c - Parrot PackFile API
 This file contain some private functions relating to executing functions.
 
 =cut
+
 */
 
 #include "parrot/parrot.h"
@@ -62,6 +63,8 @@ static int sub_pragma(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 /*
+
+=over 4
 
 =item C<static PMC* run_sub(PARROT_INTERP, PMC *sub_pmc)>
 
@@ -249,6 +252,8 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
 
 Checks B<sub_pmc>'s pragmas (e.g. flags like C<:load>, C<:main>, etc.)
 returning 1 if the sub should be run for C<action>, a C<pbc_action_enum_t>.
+
+=back
 
 =cut
 

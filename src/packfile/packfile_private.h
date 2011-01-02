@@ -22,7 +22,7 @@ Parrot.
 /* HEADERIZER END: src/packfile/execute.c */
 
 
-#endif // PARROT_PACKFILE_PRIVATE_H_GUARD
+#endif /* PARROT_PACKFILE_PRIVATE_H_GUARD */
 
 /*
  * Local variables:

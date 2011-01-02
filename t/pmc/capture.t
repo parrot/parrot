@@ -319,17 +319,17 @@ a variety of keys and values.
     .local pmc capt
     .local pmc capt2
     $P1 = new ['String']
-    
+
     capt = new ['Capture']
     capt2 = new ['Capture']
 
     capt[0] = 1337
-    
+
     setref capt2, capt
-    
+
     $I0 = capt2[0]
     is($I0, 1337, "Set PMC values correct")
-    
+
     $P0 = new ['Role']
     push_eh set_badpmc
         setref capt, $P0
