@@ -678,7 +678,7 @@ mark_const_subs(PARROT_INTERP)
 
 /*
 
-=item C<void PackFile_Header_validate(PARROT_INTERP, const PackFile_Header
+=item C<void PackFile_header_validate(PARROT_INTERP, const PackFile_Header
 *self, INTVAL pf_options)>
 
 Validates a C<PackFile_Header>, ensuring that the magic number is valid and
@@ -691,15 +691,15 @@ Raises an exception if the header doesn't validate.
 
 PARROT_EXPORT
 void
-PackFile_Header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
+PackFile_header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
                 INTVAL pf_options)
 {
-    ASSERT_ARGS(PackFile_Header_validate)
+    ASSERT_ARGS(PackFile_header_validate)
 
     /* Ensure the magic is correct. */
     if (memcmp(self->magic, "\376PBC\r\n\032\n", 8) != 0) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-        "PackFile_unpack: This is not a valid Parrot bytecode file.");
+        "PackFile_header_validate: This is not a valid Parrot bytecode file.");
     }
 
     /* Ensure the bytecode version is one we can read. Currently, we only
@@ -712,7 +712,7 @@ PackFile_Header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
     ||  self->bc_minor != PARROT_PBC_MINOR) {
         if (!(pf_options & PFOPT_UTILS))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PARROT_USAGE_ERROR,
-                    "PackFile_unpack: This Parrot cannot read bytecode "
+                    "PackFile_header_validate: This Parrot cannot read bytecode "
                     "files with version %d.%d.",
                     self->bc_major, self->bc_minor);
     }
@@ -720,17 +720,17 @@ PackFile_Header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
     /* Check wordsize, byte order and floating point number type are valid. */
     if (self->wordsize != 4 && self->wordsize != 8) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_unpack: Invalid wordsize %d\n", self->wordsize);
+            "PackFile_header_validate: Invalid wordsize %d\n", self->wordsize);
     }
 
     if (self->byteorder != 0 && self->byteorder != 1) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_unpack: Invalid byte ordering %d\n", self->byteorder);
+            "PackFile_header_validate: Invalid byte ordering %d\n", self->byteorder);
     }
 
     if (self->floattype > FLOATTYPE_MAX) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_unpack: Invalid floattype %d\n", self->floattype);
+            "PackFile_header_validate: Invalid floattype %d\n", self->floattype);
     }
 }
 
@@ -778,7 +778,7 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     memcpy(header, packed, PACKFILE_HEADER_BYTES);
 
     /* Validate the header. */
-    PackFile_Header_validate(interp, self->header, self->options);
+    PackFile_header_validate(interp, self->header, self->options);
 
     /* Describe what was read for debugging. */
     TRACE_PRINTF(("PackFile_unpack: Wordsize %d.\n", header->wordsize));
