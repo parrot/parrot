@@ -18,7 +18,7 @@ Creates a counter stream that generates numbers from 0 to 9.
 
 =cut
 
-.sub _main
+.sub _main :main
     .local pmc stream
     .local pmc filter
 

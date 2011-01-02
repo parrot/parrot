@@ -732,36 +732,21 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
             run_sub(interp, sub_pmc);
         }
         break;
-      default:
-        if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MAIN) {
-            if ((interp->resume_flag   &  RESUME_INITIAL)
-             &&  interp->resume_offset == 0) {
-                void           *ptr   = VTABLE_get_pointer(interp, sub_pmc);
-                const ptrdiff_t code  = (ptrdiff_t) sub->seg->base.data;
 
-                interp->resume_offset = ((ptrdiff_t)ptr - code)
-                                      / sizeof (opcode_t *);
-
-                PObj_get_FLAGS(sub_pmc)      &= ~SUB_FLAG_PF_MAIN;
-                Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), sub_pmc);
-            }
-            else {
-                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
-                                ":main sub not allowed\n");
-            }
-        }
-
-        /* run :init tagged functions */
-        if (action == PBC_MAIN && Sub_comp_INIT_TEST(sub)) {
-            /* if loaded no need for init */
+      case PBC_MAIN:
+        /* run :init/:load tagged functions */
+        if (Sub_comp_INIT_TEST(sub)
+        ||  PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_LOAD) {
+            /* only run :init/:load subs once */
             Sub_comp_INIT_CLEAR(sub);
-
-            /* if inited no need for load */
             PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
 
             run_sub(interp, sub_pmc);
             interp->resume_flag = RESUME_INITIAL;
         }
+        break;
+
+      default:
         break;
     }
 
@@ -939,6 +924,23 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
                 if (action == PBC_IMMEDIATE && !PMC_IS_NULL(result)) {
                     ct->pmc.constants[i] = result;
                 }
+            }
+        }
+    }
+
+    if (interp->resume_flag & RESUME_INITIAL) {
+        if (action == PBC_PBC
+        ||  action == PBC_MAIN) {
+            if (self->main_sub < 0)
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+                    "No main sub found");
+            {
+                PMC  *main            = ct->pmc.constants[self->main_sub];
+                Parrot_Sub_attributes *main_attrs;
+                opcode_t *ptr         = (opcode_t *)VTABLE_get_pointer(interp, main);
+                PMC_get_sub(interp, main, main_attrs);
+                interp->resume_offset = (ptr - main_attrs->seg->base.data);
+                Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), main);
             }
         }
     }
@@ -2555,7 +2557,8 @@ static PackFile_Segment *
 byte_code_new(PARROT_INTERP, SHIM(PackFile *pf), SHIM(STRING *name), SHIM(int add))
 {
     ASSERT_ARGS(byte_code_new)
-    PackFile_ByteCode * const byte_code = mem_gc_allocate_zeroed_typed(interp, PackFile_ByteCode);
+    PackFile_ByteCode *byte_code = mem_gc_allocate_zeroed_typed(interp, PackFile_ByteCode);
+    byte_code->main_sub          = -1;
 
     return (PackFile_Segment *) byte_code;
 }
@@ -2583,7 +2586,7 @@ byte_code_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *self))
     int i;
     unsigned int u;
 
-    size = 3; /* op_count + n_libs + n_libdeps*/
+    size = 4; /* main_sub + op_count + n_libs + n_libdeps*/
 
     for (u = 0; u < byte_code->n_libdeps; u++)
         size += PF_size_string(byte_code->libdeps[u]);
@@ -2623,6 +2626,8 @@ byte_code_pack(SHIM_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cur
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
     int i;
     unsigned int u;
+
+    *cursor++ = byte_code->main_sub;
 
     *cursor++ = byte_code->n_libdeps;
     *cursor++ = byte_code->op_count;
@@ -2674,6 +2679,8 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
     int i;
     unsigned int u;
     size_t total_ops = 0;
+
+    byte_code->main_sub          = PF_fetch_opcode(self->pf, &cursor);
 
     byte_code->n_libdeps         = PF_fetch_opcode(self->pf, &cursor);
     byte_code->libdeps           = mem_gc_allocate_n_zeroed_typed(interp,

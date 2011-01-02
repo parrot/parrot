@@ -14,7 +14,7 @@ my $output;
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "branch opt if" );
-.sub _main
+.sub _main :main
     if $I0 goto L1
     branch L2
 L1: noop
@@ -32,7 +32,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "branch opt gt" );
-.sub _main
+.sub _main :main
     if $I0 > 1 goto L1
     branch L2
 L1: noop
@@ -50,7 +50,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "branch reorg" );
-.sub _main
+.sub _main :main
     if $I0 > 1 goto L1
     noop
     branch L2
@@ -97,7 +97,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "unused local label" );
-.sub _main
+.sub _main :main
     branch L2
 L2: end
 .end
@@ -110,7 +110,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "unused global label" );
-.sub _main
+.sub _main :main
     branch _L2
 _L2:    end
 .end
@@ -248,7 +248,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant add" );
-.sub _main
+.sub _main :main
    add $I0, 10, 15
    add $N0, 10.0, 15.0
    end
@@ -264,7 +264,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant sub" );
-.sub _main
+.sub _main :main
    sub $I0, 10, 15
    sub $N0, 10.0, 15.0
    end
@@ -280,7 +280,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant mul" );
-.sub _main
+.sub _main :main
    mul $I0, 10, 15
    mul $N0, 10.0, 15.0
    end
@@ -296,7 +296,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant div" );
-.sub _main
+.sub _main :main
    div $I0, 10, 5
    div $N0, 10.0, 5.0
    end
@@ -312,7 +312,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant mod" );
-.sub _main
+.sub _main :main
    mod $I0, 33, 10
    mod $N0, 33.0, 10.0
    end
@@ -328,7 +328,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant eq taken" );
-.sub _main
+.sub _main :main
    eq 10, 10, L1
    set $I0, 5
 L1:end
@@ -342,7 +342,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant eq not taken" );
-.sub _main
+.sub _main :main
    eq 10, 20, L1
    set $I0, 5
 L1:end
@@ -357,7 +357,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant eq taken" );
-.sub _main
+.sub _main :main
    eq 10.0, 10.0, L1
    set $I0, 5
 L1:end
@@ -371,7 +371,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant eq not taken" );
-.sub _main
+.sub _main :main
    eq 10.0, 20.0, L1
    set $I0, 5
 L1:end
@@ -386,7 +386,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant eq taken" );
-.sub _main
+.sub _main :main
    eq "xy", "xy", L1
    set $I0, 5
 L1:end
@@ -400,7 +400,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant eq not taken" );
-.sub _main
+.sub _main :main
    eq "ab", "ba", L1
    set $I0, 5
 L1:end
@@ -415,7 +415,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant ne taken" );
-.sub _main
+.sub _main :main
    ne 10, 20, L1
    set $I0, 5
 L1:end
@@ -444,7 +444,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant gt taken" );
-.sub _main
+.sub _main :main
    gt "xy", "ap", L1
    set $I0, 5
 L1:end
@@ -473,7 +473,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant ge taken" );
-.sub _main
+.sub _main :main
    ge "xy", "xy", L1
    set $I0, 5
 L1:end
@@ -487,7 +487,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant ge not taken" );
-.sub _main
+.sub _main :main
    gt "ab", "ba", L1
    set $I0, 5
 L1:end
@@ -502,7 +502,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant lt taken" );
-.sub _main
+.sub _main :main
    lt "xx", "xy", L1
    set $I0, 5
 L1:end
@@ -516,7 +516,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant lt not taken" );
-.sub _main
+.sub _main :main
    lt "ba", "ba", L1
    set $I0, 5
 L1:end
@@ -531,7 +531,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant le taken" );
-.sub _main
+.sub _main :main
    le "xy", "xy", L1
    set $I0, 5
 L1:end
@@ -545,7 +545,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant le not taken" );
-.sub _main
+.sub _main :main
    le "bb", "ba", L1
    set $I0, 5
 L1:end
@@ -560,7 +560,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant if taken" );
-.sub _main
+.sub _main :main
    if 10, L1
    set $I0, 5
 L1:end
@@ -574,7 +574,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant if not taken" );
-.sub _main
+.sub _main :main
    if 0, L1
    set $I0, 5
 L1:end
@@ -618,7 +618,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant mix add" );
-.sub _main
+.sub _main :main
    add $N0, 10.0, 15
    end
 .end
@@ -632,7 +632,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant unary abs" );
-.sub _main
+.sub _main :main
    abs $I0, -10
    end
 .end
@@ -646,7 +646,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant set" );
-.sub _main
+.sub _main :main
    set $N0, 5
    end
 .end
@@ -660,7 +660,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength set I, 0" );
-.sub _main
+.sub _main :main
    set $I0, 0
    end
 .end
@@ -674,7 +674,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength set N, 0" );
-.sub _main
+.sub _main :main
    set $N0, 0.0
    end
 .end
@@ -688,7 +688,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "no strength set N, -0" );
-.sub _main
+.sub _main :main
    set $N0, -0.0
    end
 .end
@@ -702,7 +702,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength add I, 0" );
-.sub _main
+.sub _main :main
    add $I0, 0
    end
 .end
@@ -715,7 +715,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength add I, I, 0" );
-.sub _main
+.sub _main :main
    add $I0, $I1, 0
    end
 .end
@@ -729,7 +729,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength add I, 0, I" );
-.sub _main
+.sub _main :main
    add $I0, 0, $I1
    end
 .end
@@ -743,7 +743,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength add I, 1" );
-.sub _main
+.sub _main :main
    add $I0, 1
    end
 .end
@@ -757,7 +757,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength add N, 0, N" );
-.sub _main
+.sub _main :main
    add $N0, 0.0, $N1
    end
 .end
@@ -771,7 +771,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength add N, 1" );
-.sub _main
+.sub _main :main
    add $N0, 1
    end
 .end
@@ -785,7 +785,7 @@ OUT
 
 ###############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength sub I, 0" );
-.sub _main
+.sub _main :main
    sub $I0, 0
    end
 .end
@@ -798,7 +798,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength sub I, I, 0" );
-.sub _main
+.sub _main :main
    sub $I0, $I1, 0
    end
 .end
@@ -812,7 +812,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength sub I, 0, I" );
-.sub _main
+.sub _main :main
    sub $I0, 0, $I1
    end
 .end
@@ -826,7 +826,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength sub I, 1" );
-.sub _main
+.sub _main :main
    sub $I0, 1
    end
 .end
@@ -840,7 +840,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength sub N, N, 0" );
-.sub _main
+.sub _main :main
    sub $N0, $N1, 0
    end
 .end
@@ -854,7 +854,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength sub N, 1" );
-.sub _main
+.sub _main :main
    sub $N0, 1
    end
 .end
@@ -868,7 +868,7 @@ OUT
 
 #############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength mul I, 0" );
-.sub _main
+.sub _main :main
    mul $I0, 0
    end
 .end
@@ -882,7 +882,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength mul I, I, 0" );
-.sub _main
+.sub _main :main
    mul $I0, $I1, 0
    end
 .end
@@ -896,7 +896,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength mul I, 0, I" );
-.sub _main
+.sub _main :main
    mul $I0, 0, $I1
    end
 .end
@@ -910,7 +910,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength mul N, 0, N" );
-.sub _main
+.sub _main :main
    mul $N0, 0.0, $N1
    end
 .end
@@ -924,7 +924,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength mul I, 1" );
-.sub _main
+.sub _main :main
    mul $I0, 1
    end
 .end
@@ -937,7 +937,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength mul I, I, 1" );
-.sub _main
+.sub _main :main
    mul $I0, $I1, 1
    end
 .end
@@ -951,7 +951,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength mul I, 1, I" );
-.sub _main
+.sub _main :main
    mul $I0, 1, $I1
    end
 .end
@@ -965,7 +965,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength mul N, 1, N" );
-.sub _main
+.sub _main :main
    mul $N0, 1.0, $N1
    end
 .end
@@ -979,7 +979,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength div I, 1" );
-.sub _main
+.sub _main :main
    div $I0, 1
    end
 .end
@@ -992,7 +992,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength div I, I, 1" );
-.sub _main
+.sub _main :main
    div $I0, $I1, 1
    end
 .end
@@ -1006,7 +1006,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength div I, 1, I" );
-.sub _main
+.sub _main :main
    div $I0, 1, $I1
    end
 .end
@@ -1020,7 +1020,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength div N, 1" );
-.sub _main
+.sub _main :main
    div $N0, 1
    end
 .end
@@ -1033,7 +1033,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength div N, N, 1" );
-.sub _main
+.sub _main :main
    div $N0, $N1, 1
    end
 .end
@@ -1047,7 +1047,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength fdiv I, 1" );
-.sub _main
+.sub _main :main
    fdiv $I0, 1
    end
 .end
@@ -1060,7 +1060,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength fdiv I, I, 1" );
-.sub _main
+.sub _main :main
    fdiv $I0, $I1, 1
    end
 .end
@@ -1074,7 +1074,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength fdiv I, 1, I" );
-.sub _main
+.sub _main :main
    fdiv $I0, 1, $I1
    end
 .end
@@ -1088,7 +1088,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength fdiv N, 1" );
-.sub _main
+.sub _main :main
    fdiv $N0, 1
    end
 .end
@@ -1101,7 +1101,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "strength fdiv N, N, 1" );
-.sub _main
+.sub _main :main
    fdiv $N0, $N1, 1
    end
 .end
@@ -1115,7 +1115,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "multiple const syms" );
-.sub _main
+.sub _main :main
    set $I0, 0
    set $I1, 1
    add $N0, -1.0, 2
@@ -1151,7 +1151,7 @@ _main:
 ';
 
 pir_2_pasm_like( <<'CODE', $output, "constant add big nums" );
-.sub _main
+.sub _main :main
    add $N0, 10.0e20, 15.0e21
    end
 .end
@@ -1161,7 +1161,7 @@ CODE
 SKIP: {
     skip( "constant concat N/Y", 1 );
     pir_2_pasm_is( <<'CODE', <<'OUT', "constant concat" );
-.sub _main
+.sub _main :main
    concat $S0, "Parrot ", "rocks"
    end
 .end

@@ -108,7 +108,7 @@ close $INC2;
 open my $INC3, '>', "inc_c.pir";
 print $INC3 <<'EOF';
 .namespace [ 'TclDict' ]
-.sub class_init :anon :load
+.sub class_init :anon :load :main
     say "wut"
 .end
 EOF

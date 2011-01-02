@@ -685,7 +685,7 @@ caught reopen
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on closed filehandle" );
-.sub 'main'
+.sub 'main' :main
     .local pmc ifh
     ifh = new ['FileHandle']
     ifh.'encoding'('utf8')
@@ -702,7 +702,7 @@ utf8
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on opened filehandle" );
-.sub 'main'
+.sub 'main' :main
     .local pmc ifh
     ifh = new ['FileHandle']
     ifh.'encoding'('utf8')
@@ -721,7 +721,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
 .include 'iglobals.pasm'
-.sub 'main'
+.sub 'main' :main
     .local pmc pipe, conf, interp
     .local string cmd
 

@@ -145,6 +145,7 @@ ok 3
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "const I/N mismatch" );
+.pcc_sub :main main:
     set I0, 2.0
     print I0
     print "\n"
@@ -575,7 +576,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "const int" );
 .const int c = 12
-.sub test
+.sub test :main
     .local num a
     a = 96
     # Uncomment this line, and the c symbol is 'forgotten'

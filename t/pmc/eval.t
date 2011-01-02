@@ -25,6 +25,7 @@ Tests on-the-fly PASM, PIR and PAST compilation and invocation.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "eval_sc" );
+.pcc_sub :main main:
     compreg P1, "PASM"	# get compiler
     set_args "0", "print \"in eval\\n\"\nset_returns \"()\"\nreturncc\n"
     invokecc P1			# compile
@@ -38,6 +39,7 @@ back again
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "call subs in evaled code " );
+.pcc_sub :main main:
     set S5, ".pcc_sub _foo:\n"
     concat S5, S5, "print \"foo\\n\"\n"
     concat S5, S5, "set_returns \"()\"\n"
@@ -59,6 +61,7 @@ back
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "call 2 subs in evaled code " );
+.pcc_sub :main main:
     set S5, ".pcc_sub _foo:\n"
     concat S5, S5, "print \"foo\\n\"\n"
     concat S5, S5, "set_returns \"()\"\n"
@@ -292,7 +295,7 @@ OUTPUT
 (my $temp2_name = $temp2_pbc) =~ s/\.pbc$//;
 
 pir_output_is( <<"CODE", <<'OUTPUT', "check loaded lib hash" );
-.sub main
+.sub main :main
   load_bytecode "$temp_pbc"
   load_bytecode "$temp2_pbc"
   .local pmc pbc_hash, interp

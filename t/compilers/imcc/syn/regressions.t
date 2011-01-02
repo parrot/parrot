@@ -16,7 +16,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'cannot constant fold div by 0');
-.sub fold_by_zero
+.sub fold_by_zero :main
   push_eh ok1
     $I1 = 1/0
   pop_eh
@@ -181,7 +181,7 @@ OUT
 
 my $register = "9" x 4096;
 pir_output_is( <<"CODE", <<'OUT', 'long register numbers in PIR (TT #1025)');
-.sub main
+.sub main :main
       \$P$register = new 'Integer'
       \$P$register = 3
   say \$P$register
@@ -190,13 +190,11 @@ CODE
 3
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', 'die in immediate, TT #629');
+pir_exit_code_is( <<'CODE', 1, 'die in immediate, TT #629');
 .sub 'foo' :immediate
   die 'no'
 .end
 CODE
-/no\ncurrent inst.*:[\d-]+\)$/
-OUT
 
 pir_error_output_like( <<'CODE', <<'OUT', 'No segfault from syntax error');
 .sub 'main'
@@ -244,7 +242,7 @@ OUT
 SKIP: {
     skip("No limit on key size", 1);
     pir_error_output_like( <<'CODE', <<'OUT', 'over long keys should not segfault (TT #641)');
-.sub main
+.sub main :main
  $P0 = new [0;0;0;0;0;0;0;0;0;0;0;0] # more than MAX_KEY_LEN.
 .end
 CODE
