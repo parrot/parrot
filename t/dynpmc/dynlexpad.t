@@ -203,7 +203,7 @@ ok 2
 ok 3
 OUTPUT
 
-pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - iterator" );
+pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - iterator", todo => 'not yet implemented' );
 
 .loadlib 'dynlexpad'
 .sub 'onload' :immediate
