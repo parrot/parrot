@@ -293,7 +293,7 @@ eh:
     $P0[0] = 'Fred'
     $S2 = shift $P0
 
-    is($S2, 'Fred', '... but not convert when unnecessary')    
+    is($S2, 'Fred', '... but not convert when unnecessary')
 .end
 
 
@@ -307,11 +307,11 @@ eh:
 first_eh:
     pop_eh
     ok($I0, 'exception when shift_pmc an empty CallContext')
-    
+
     push_eh second_eh
     $I0 = 1
     $S0 = shift $P0
-    $I0 = 0    
+    $I0 = 0
 
 second_eh:
     pop_eh

@@ -485,7 +485,7 @@ my ($ra, $rb, $wa, $wb, $xa, $xb);
 
 SKIP: {
     skip 'no file modes on Win32', 1 if $MSWin32;
-    
+
     # test can_read
     $ra = -r "test_f_a" ? 1 : 0;
     $rb = -r "test_f_b" ? 1 : 0;
