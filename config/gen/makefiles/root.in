@@ -490,6 +490,7 @@ INTERP_O_FILES = \
     src/oo$(O) \
     src/platform$(O) \
     src/packfile/object_serialization$(O) \
+    src/packfile/execute$(O) \
     src/pmc$(O) \
     src/runcore/main$(O)  \
     src/runcore/cores$(O) \
@@ -694,6 +695,7 @@ STR_FILES = \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks.str \
     src/nci/signatures.str \
     src/packfile/api.str \
+    src/packfile/execute.str \
     src/packfile/object_serialization.str \
     src/packfile/pf_items.str \
     src/pmc.str \
@@ -789,6 +791,7 @@ help :
 	@echo "  buildtools_tests:  Test build tool pmc2c.pl."
 	@echo "  manifest_tests:    Test code underlying mk_manifest_and_skip.pl."
 	@echo "  examples_tests:    Test the example scripts."
+	@echo "  moretests:         Run standard suite, examples and most coding standards tests."
 	@echo ""
 	@echo "Smoke Testing:"
 	@echo "  smolder_test:      Run the test suite and send report to the smolder server"
@@ -820,8 +823,8 @@ help :
 	@echo "  apilist:           Show list of PARROT_API functions"
 	@echo "  exportlist:        Show list of PARROT_EXPORT functions"
 	@echo "  malloclist:        Show list of PARROT_MALLOC functions"
-	@echo "  quickcover:        Run test suite coverage analysis (core)."
-	@echo "  cover:             Run test suite coverage analysis (full)."
+	@echo "  cover:             Run test suite coverage analysis (core)."
+	@echo "  fullcover:         Run test suite coverage analysis (full)."
 	@echo "  tags-vi:           Create tags for the vi editor."
 	@echo "  tags-emacs:        Create tags for the Emacs editor."
 	@echo "  perlcritic:        Check Perl code with Perl::Critic."
@@ -1594,6 +1597,7 @@ src/multidispatch$(O) : \
 src/packfile/api$(O) : \
     src/packfile/api.str \
     src/packfile/api.c \
+    src/packfile/packfile_private.h \
     include/pmc/pmc_sub.h \
     include/pmc/pmc_key.h \
     include/pmc/pmc_parrotlibrary.h \
@@ -1612,6 +1616,17 @@ src/packfile/api$(O) : \
     $(INC_DIR)/extend_vtable.h \
     $(PARROT_H_HEADERS) \
     $(INC_DIR)/runcore_api.h
+
+src/packfile/execute$(O) : \
+    $(PARROT_H_HEADERS) \
+    $(INC_DIR)/extend.h \
+    $(INC_DIR)/extend_vtable.h \
+    include/parrot/runcore_api.h \
+    src/packfile/execute.str \
+    src/packfile/execute.c \
+    src/packfile/packfile_private.h \
+    include/pmc/pmc_sub.h
+
 
 src/packfile/output$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_key.h src/packfile/output.c
 
@@ -2107,6 +2122,9 @@ run_tests :
 perl_tests :
 	$(PERL) t/harness $(PERL_TEST_FILES)
 
+nocritic_codetest :
+	PARROT_TEST_NO_PERLCRITIC=1 $(PERL) t/harness $(EXTRA_TEST_ARGS) --code-tests
+
 codetest :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --code-tests
 
@@ -2126,6 +2144,12 @@ manifest_tests :
 
 examples_tests : test_prep
 	$(PERL) t/harness $(EXAMPLES_TEST_FILES)
+
+# moretests: Good to use before branch merges
+moretests: test_prep \
+    test \
+    examples_tests \
+    nocritic_codetest
 
 # benchmark tests
 benchmark_tests : test_prep
@@ -2147,7 +2171,7 @@ configure_tests :
 headerizer_tests : test_prep
 	$(PERL) t/harness $(HEADERIZER_TEST_FILES)
 
-# library tests - tests run by make test but not by make fulltest or make cover
+# library tests - tests run by make test but not by make fulltest or make fullcover
 library_tests : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(LIBRARY_TEST_FILES)
 
@@ -2596,7 +2620,7 @@ splint : all
 
 COVER_FLAGS = -fprofile-arcs -ftest-coverage
 
-COVER_DIRS = \
+FULLCOVER_DIRS = \
     src \
     src/call \
     src/dynoplibs \
@@ -2620,7 +2644,7 @@ COVER_DIRS = \
     $(BUILD_DIR)/t/perl \
     compilers/imcc
 
-cover: \
+fullcover: \
     cover.dummy \
     cover-testb \
     cover-testf \
@@ -2635,7 +2659,7 @@ cover: \
     cover-examples \
     cover-distro
 	build_dir=$$PWD; \
-    for dir in $(COVER_DIRS); \
+    for dir in $(FULLCOVER_DIRS); \
     do \
 	cd $$dir; \
 	gcov *.c; \
@@ -2644,7 +2668,7 @@ cover: \
     done
 	cover -ignore_re '^\/usr\/local\/bin'
 
-QUICKCOVER_DIRS = \
+COVER_DIRS = \
     src \
     src/call \
     src/dynoplibs \
@@ -2671,12 +2695,12 @@ COVER       = @cover@
 GCOV        = @gcov@
 GCOV2PERL   = @gcov2perl@
 
-quickcover: \
+cover: \
     cover.dummy \
     cover-test_runcore
 	build_dir=$$PWD; \
     $(COVER) -delete; \
-    for dir in $(QUICKCOVER_DIRS); \
+    for dir in $(COVER_DIRS); \
     do \
 	cd $$dir; \
 	$(GCOV) *.c; \

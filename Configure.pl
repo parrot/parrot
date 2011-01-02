@@ -201,7 +201,7 @@ disk, for later analysis by F<Parrot::Configure::Trace> methods.
 
 =item C<--coveragedir>
 
-In preparation for calling C<make quickcover> to perform coverage analysis,
+In preparation for calling C<make cover> to perform coverage analysis,
 provide a user-specified directory for top level of HTML output.
 
 =item Operating system-specific configuration options

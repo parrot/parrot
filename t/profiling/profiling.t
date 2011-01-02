@@ -219,9 +219,9 @@ ok( $matcher.matches($prof), "profile shows 'say' inside nqp sub");
 sub version(*@p, *%n) { ProfTest::Want::Version.new(|@p, |%n) }
 sub cli(*@p, *%n)     { ProfTest::Want::CLI.new(|@p, |%n) }
 sub eor(*@p, *%n)     { ProfTest::Want::EndOfRunloop.new(|@p, |%n) }
-sub op(*@p, *%n)      { ProfTest::Want::Op.new(|@p, |%n) }
+sub op(*@p, *%n)      { ProfTest::Want::Op.new(|@p) }
 sub cs(*@p, *%n)      { ProfTest::Want::CS.new(|@p, |%n) }
-sub any(*@p, *%n)     { ProfTest::Want::Any.new(|@p, |%n) }
+sub any(*@p, *%n)     { ProfTest::Want::Any.new(|@p) }
 
 # Local Variables:
 #   mode: perl6

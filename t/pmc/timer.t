@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Parrot::Config;
 
 =head1 NAME
@@ -44,6 +44,10 @@ ok2:
     print "not "
 ok3:
     print "ok 3\n"
+
+    # ensure destroy() is called.
+    null P0
+    sweep 1
     end
 CODE
 ok 1
@@ -51,14 +55,74 @@ ok 2
 ok 3
 OUT
 
+pasm_output_is( <<'CODE', <<'OUT', "Timer param test/invoke" );
+.include "timer.pasm"
+    new P0, ['Timer']
+
+    set P0[.PARROT_TIMER_INTERVAL], 2.2
+    set P0[.PARROT_TIMER_INTERVAL], 2
+
+    set I0, P0[.PARROT_TIMER_INTERVAL]
+    say I0
+
+    set I0, P0[99999]
+    say I0
+
+    set N0, P0[99999]
+    say N0
+
+    get_global P1, "_timer_sub"
+    set P0[.PARROT_TIMER_HANDLER], P1
+    null P1
+
+    set P1, P0[.PARROT_TIMER_HANDLER]
+    unless_null P1, ok1
+    print "not "
+ok1:say "ok 1"
+
+    set P1, P0[99999]
+    if_null P1, ok2
+    print "not "
+ok2:say "ok 2"
+
+    push_eh ok3
+    set P0[99999], 2
+    print "no "
+ok3:pop_eh
+    say "exception 1"
+
+    push_eh ok4
+    set P0[99999], 2.2
+    print "no "
+ok4:pop_eh
+    say "exception 2"
+
+    invokecc P0
+    end
+
+.pcc_sub _timer_sub:
+    say "hello world"
+    returncc
+CODE
+2
+-1
+-1
+ok 1
+ok 2
+exception 1
+exception 2
+hello world
+OUT
+
 pasm_output_is( <<'CODE', <<'OUT', "Timer setup - initializer" );
 .include "timer.pasm"
     new P1, ['FixedPMCArray']
-    set P1, 4
+    set P1, 5
     set P1[0], .PARROT_TIMER_SEC
     set P1[1], 8
     set P1[2], .PARROT_TIMER_USEC
     set P1[3], 400000
+    set P1[4], 24829375976 # test default case
 
     new P0, ['Timer'], P1
     set I0, P0[.PARROT_TIMER_SEC]

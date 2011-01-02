@@ -35,17 +35,30 @@ use Parrot::Config;
 use File::Spec;
 use Parrot::Test;
 
-my $path;
+my ($path, $exefile);
 
 BEGIN {
     $path = File::Spec->catfile( ".", "pbc_disassemble" );
-    my $exefile = $path . $PConfig{exe};
+    $exefile = $path . $PConfig{exe};
     unless ( -f $exefile ) {
         plan skip_all => "pbc_disassemble hasn't been built. Run make parrot_utils";
         exit(0);
     }
-    plan tests => 6;
+    plan tests => 9;
 }
+
+my $helpregex = <<OUTPUT;
+/pbc_disassemble - dump or convert parrot bytecode [(]PBC[)] files
+usage:
+pbc_disassemble .* [[]file.pbc[]]
+pbc_disassemble -o converted[.]pasm file[.]pbc
+\\s+(-.*\\s+[.]{3}\\s+.*
+)+/m
+OUTPUT
+
+disassemble_raw_output_like( "--help", $helpregex, "pbc_disassemble help message");
+disassemble_raw_output_like( "--thisisnotarealoption", $helpregex, "pbc_disassemble bad option");
+disassemble_raw_output_like( "-h -b -o - -?", $helpregex, "pbc_disassemble every option");
 
 disassemble_output_like( <<PIR, "pir", qr/PMC_CONST.*set_n_nc.*print_n/ms, 'pbc_disassemble numeric ops');
 .sub main :main
@@ -109,6 +122,14 @@ and the optional test diagnostic.
 sub disassemble_output_like {
     pbc_postprocess_output_like($path, @_ );
 }
+
+sub disassemble_raw_output_like {
+    my ($options, $snippet, $desc)  = @_;
+    my $out = `$exefile $options`;
+    like( $out, $snippet, $desc );
+    return;
+}
+
 
 # Local Variables:
 #   mode: cperl
