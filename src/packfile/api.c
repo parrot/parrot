@@ -871,7 +871,6 @@ mark_const_subs(PARROT_INTERP)
     }
 }
 
-
 /*
 
 =item C<void do_sub_pragmas(PARROT_INTERP, PackFile_ByteCode *self,
@@ -946,10 +945,9 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
     }
 }
 
-
 /*
 
-=item C<void PackFile_header_validate(PARROT_INTERP, const PackFile_Header
+=item C<void PackFile_Header_validate(PARROT_INTERP, const PackFile_Header
 *self, INTVAL pf_options)>
 
 Validates a C<PackFile_Header>, ensuring that the magic number is valid and
@@ -962,15 +960,15 @@ Raises an exception if the header doesn't validate.
 
 PARROT_EXPORT
 void
-PackFile_header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
+PackFile_Header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
                 INTVAL pf_options)
 {
-    ASSERT_ARGS(PackFile_header_validate)
+    ASSERT_ARGS(PackFile_Header_validate)
 
     /* Ensure the magic is correct. */
     if (memcmp(self->magic, "\376PBC\r\n\032\n", 8) != 0) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-        "PackFile_header_validate: This is not a valid Parrot bytecode file.");
+        "PackFile_Header_validate: This is not a valid Parrot bytecode file.");
     }
 
     /* Ensure the bytecode version is one we can read. Currently, we only
@@ -983,7 +981,7 @@ PackFile_header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
     ||  self->bc_minor != PARROT_PBC_MINOR) {
         if (!(pf_options & PFOPT_UTILS))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PARROT_USAGE_ERROR,
-                    "PackFile_header_validate: This Parrot cannot read bytecode "
+                    "PackFile_Header_validate: This Parrot cannot read bytecode "
                     "files with version %d.%d.",
                     self->bc_major, self->bc_minor);
     }
@@ -991,18 +989,122 @@ PackFile_header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
     /* Check wordsize, byte order and floating point number type are valid. */
     if (self->wordsize != 4 && self->wordsize != 8) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_header_validate: Invalid wordsize %d\n", self->wordsize);
+            "PackFile_Header_validate: Invalid wordsize %d\n", self->wordsize);
     }
 
     if (self->byteorder != 0 && self->byteorder != 1) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_header_validate: Invalid byte ordering %d\n", self->byteorder);
+            "PackFile_Header_validate: Invalid byte ordering %d\n", self->byteorder);
     }
 
     if (self->floattype > FLOATTYPE_MAX) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_header_validate: Invalid floattype %d\n", self->floattype);
+            "PackFile_Header_validate: Invalid floattype %d\n", self->floattype);
     }
+}
+
+
+/*
+
+=item C<void PackFile_Header_read_uuid(PARROT_INTERP, PackFile_Header *self,
+const opcode_t *packed, size_t packed_size)>
+
+Reads a C<PackFile_Header>'s UUID from a block of memory and verifies that it is valid.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+void
+PackFile_Header_read_uuid(PARROT_INTERP, ARGMOD(PackFile_Header *self),
+                ARGIN(const opcode_t *packed), size_t packed_size)
+{
+    ASSERT_ARGS(PackFile_Header_read_uuid)
+
+    /* Check the UUID type is valid and, if needed, read a UUID. */
+    if (self->uuid_type == 0) {
+        /* No UUID; fine, nothing more to do. */
+    }
+    else if (self->uuid_type == 1) {
+        if (packed_size < (size_t) PACKFILE_HEADER_BYTES + self->uuid_size) {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                "PackFile_Header_read_uuid: Buffer length %d is shorter than PACKFILE_HEADER_BYTES "
+                "+ uuid_size %d\n", packed_size, PACKFILE_HEADER_BYTES + self->uuid_size);
+        }
+
+        /* Read in the UUID. We'll put it in a NULL-terminated string, just in
+         * case people use it that way. */
+        self->uuid_data = mem_gc_allocate_n_typed(interp,
+                self->uuid_size + 1, unsigned char);
+
+        memcpy(self->uuid_data, packed + PACKFILE_HEADER_BYTES,
+                self->uuid_size);
+
+        /* NULL terminate */
+        self->uuid_data[self->uuid_size] = '\0';
+    }
+    else
+        /* Don't know this UUID type. */
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "PackFile_unpack: Invalid UUID type %d\n", self->uuid_type);
+}
+
+
+/*
+
+=item C<int PackFile_Header_unpack(PARROT_INTERP, PackFile_Header *self, const
+opcode_t *packed, size_t packed_size, INTVAL pf_options)>
+
+Unpacks a C<PackFile_Header> from a block of memory and perform some validation
+to check that the head is correct.
+
+Returns size of unpacked header.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+int
+PackFile_Header_unpack(PARROT_INTERP, ARGMOD(PackFile_Header *self),
+                ARGIN(const opcode_t *packed), size_t packed_size,
+                INTVAL pf_options)
+{
+    ASSERT_ARGS(PackFile_Header_unpack)
+
+    /* Verify that the packfile isn't too small to contain a proper header */
+    if (packed_size < PACKFILE_HEADER_BYTES) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+        "PackFile_unpack: Buffer length %d is shorter than PACKFILE_HEADER_BYTES %d.",
+            packed_size, PACKFILE_HEADER_BYTES);
+    }
+
+    /* Extract the header. */
+    memcpy(self, packed, PACKFILE_HEADER_BYTES);
+
+    /* Validate the header. */
+    PackFile_Header_validate(interp, self, pf_options);
+
+    /* Extract the header's UUID. */
+    PackFile_Header_read_uuid(interp, self, packed, packed_size)
+
+    /* Describe what was read for debugging. */
+    TRACE_PRINTF(("PackFile_Header_unpack: Wordsize %d.\n", self->wordsize));
+    TRACE_PRINTF(("PackFile_Header_unpack: Floattype %d (%s).\n",
+                  self->floattype,
+                  self->floattype == FLOATTYPE_8
+                      ? FLOATTYPE_8_NAME
+                      : self->floattype == FLOATTYPE_16
+                          ? FLOATTYPE_16_NAME
+                          : FLOATTYPE_12_NAME));
+    TRACE_PRINTF(("PackFile_Header_unpack: Byteorder %d (%sendian).\n",
+                  self->byteorder, self->byteorder ? "big " : "little-"));
+
+    /* Return the number of bytes in the header */
+    return PACKFILE_HEADER_BYTES + self->uuid_size;
 }
 
 
@@ -1036,64 +1138,15 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     PackFile        * const pf  = self;
 #endif
 
-    if (packed_size < PACKFILE_HEADER_BYTES) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-        "PackFile_unpack: Buffer length %d is shorter than PACKFILE_HEADER_BYTES %d.",
-            packed_size, PACKFILE_HEADER_BYTES);
-    }
-
     self->src  = packed;
     self->size = packed_size;
 
-    /* Extract the header. */
-    memcpy(header, packed, PACKFILE_HEADER_BYTES);
-
-    /* Validate the header. */
-    PackFile_header_validate(interp, self->header, self->options);
-
-    /* Describe what was read for debugging. */
-    TRACE_PRINTF(("PackFile_unpack: Wordsize %d.\n", header->wordsize));
-    TRACE_PRINTF(("PackFile_unpack: Floattype %d (%s).\n",
-                  header->floattype,
-                  header->floattype == FLOATTYPE_8
-                      ? FLOATTYPE_8_NAME
-                      : header->floattype == FLOATTYPE_16
-                          ? FLOATTYPE_16_NAME
-                          : FLOATTYPE_12_NAME));
-    TRACE_PRINTF(("PackFile_unpack: Byteorder %d (%sendian).\n",
-                  header->byteorder, header->byteorder ? "big " : "little-"));
-
-    /* Check the UUID type is valid and, if needed, read a UUID. */
-    if (header->uuid_type == 0) {
-        /* No UUID; fine, nothing more to do. */
-    }
-    else if (header->uuid_type == 1) {
-        if (packed_size < (size_t) PACKFILE_HEADER_BYTES + header->uuid_size) {
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-                "PackFile_unpack: Buffer length %d is shorter than PACKFILE_HEADER_BYTES "
-                "+ uuid_size %d\n", packed_size, PACKFILE_HEADER_BYTES + header->uuid_size);
-        }
-
-
-        /* Read in the UUID. We'll put it in a NULL-terminated string, just in
-         * case people use it that way. */
-        header->uuid_data = mem_gc_allocate_n_typed(interp,
-                header->uuid_size + 1, unsigned char);
-
-        memcpy(header->uuid_data, packed + PACKFILE_HEADER_BYTES,
-                header->uuid_size);
-
-        /* NULL terminate */
-        header->uuid_data[header->uuid_size] = '\0';
-    }
-    else
-        /* Don't know this UUID type. */
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_unpack: Invalid UUID type %d\n", header->uuid_type);
+    /* Unpack the header */
+    header_read_length = PackFile_Header_unpack(interp, self->header, packed,
+                packed_size, self->options);
 
     /* Set cursor to position after what we've read, allowing for padding to a
      * 16 byte boundary. */
-    header_read_length  = PACKFILE_HEADER_BYTES + header->uuid_size;
     header_read_length += PAD_16_B(header_read_length);
     cursor              = packed + (header_read_length / sizeof (opcode_t));
     TRACE_PRINTF(("PackFile_unpack: pad=%d\n",
