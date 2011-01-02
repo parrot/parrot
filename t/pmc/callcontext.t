@@ -18,7 +18,7 @@ Tests the CallContext PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(55)
+    plan(59)
 
     test_instantiate()
     test_get_set_attrs()
@@ -29,6 +29,7 @@ Tests the CallContext PMC.
     test_exists()
     test_clone()
     test_short_sign()
+    test_named_args('Int' => 10, 'Num' => 3.14, 'Str' => 'A String', 'Pmc' => 'A String PMC')
 .end
 
 .sub 'test_instantiate'
@@ -290,6 +291,19 @@ Tests the CallContext PMC.
     $P0 = 'NISP'
     $S2 = $P0
     is($S2, 'NISP', 'set short signature')
+.end
+
+
+.sub 'test_named_args'
+    .param int i :named('Int')
+    .param num n :named('Num')
+    .param string s :named('Str')
+    .param pmc p :named('Pmc')
+
+    is( i, 10, 'set/get_intval_keyed_str' )
+    is( n, 3.14, 'set/get_number_keyed_str' )
+    is( s, 'A String', 'set/get_string_keyed_str' )
+    is( p, 'A String PMC', 'set/get_pmc_keyed_str' )
 .end
 
 # Local Variables:
