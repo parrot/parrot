@@ -329,7 +329,8 @@ Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
     PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not load packfile");
-    do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);    *pbc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+    do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
+    *pbc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, *pbc, pf);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
