@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 22;
+plan tests => 23;
 
 =head1 NAME
 
@@ -489,6 +489,42 @@ CODE
 50
 42
 8
+Done!
+OUTPUT
+
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal" );
+
+int main(void)
+{
+    Parrot_Interp interp;
+    Parrot_PMC pmc, pmc2;
+    Parrot_Int type, value, is_equal;
+
+    /* Create the interpreter */
+    interp = new_interp();
+
+    type = Parrot_PMC_typenum(interp, "Integer");
+    pmc  = Parrot_PMC_new(interp, type);
+    pmc2 = Parrot_PMC_new(interp, type);
+
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 42);
+
+    is_equal = Parrot_PMC_is_equal(interp, pmc, pmc2);
+    printf("%d\n", (int) is_equal);
+
+    Parrot_PMC_set_integer_native(interp, pmc2, -42);
+
+    is_equal = Parrot_PMC_is_equal(interp, pmc, pmc2);
+    printf("%d\n", (int) is_equal);
+
+    Parrot_destroy(interp);
+    printf("Done!\n");
+    return 0;
+}
+CODE
+0
+1
 Done!
 OUTPUT
 
