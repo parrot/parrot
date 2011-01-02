@@ -1016,7 +1016,6 @@ Reads a C<PackFile_Header>'s UUID from a block of memory and verifies that it is
 */
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
 void
 PackFile_Header_read_uuid(PARROT_INTERP, ARGMOD(PackFile_Header *self),
                 ARGIN(const opcode_t *packed), size_t packed_size)
