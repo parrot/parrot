@@ -454,7 +454,6 @@ CODE
 Done!
 OUTPUT
 
-# Bug in modulus? Needs a TT
 c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_modulus" );
 
 int main(void)
