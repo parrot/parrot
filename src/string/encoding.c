@@ -130,7 +130,7 @@ PARROT_CAN_RETURN_NULL
 const STR_VTABLE *
 Parrot_find_encoding_by_string(PARROT_INTERP, ARGIN(STRING *encodingname))
 {
-    ASSERT_ARGS(Parrot_find_encoding)
+    ASSERT_ARGS(Parrot_find_encoding_by_string)
     const int n = n_encodings;
     int i;
 
