@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 20;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -472,24 +472,93 @@ CODE
 $uid
 OUT
 
-# test can_execute
-pir_output_is( <<'CODE', <<"OUT", 'Test can_execute' );
-.sub main :main
-	$P0 = loadlib 'os'
-	$P1 = new ['OS']
+open my $fa, ">", "test_f_a";
+close $fa;
 
-	$I0 = $P1."can_execute"("parrot")
-	say $I0
+open my $fb, ">", "test_f_b";
+close $fb;
 
-	$I1 = $P1."can_execute"("MANIFEST")
-	say $I1
+chmod 0777, "test_f_a";
+chmod 0000, "test_f_b";
 
-	end
-.end
+my ($ra, $rb, $wa, $wb, $xa, $xb);
+
+SKIP: {
+    skip 'no file modes on Win32', 1 if $MSWin32;
+    
+    # test can_read
+    $ra = -r "test_f_a" ? 1 : 0;
+    $rb = -r "test_f_b" ? 1 : 0;
+    pir_output_is( <<'CODE', <<"OUT", 'Test can_read' );
+    .sub main :main
+	    $P0 = loadlib 'os'
+	    $P1 = new ['OS']
+
+	    $I0 = $P1."can_read"("test_f_a")
+	    say $I0
+
+	    $I1 = $P1."can_read"("test_f_b")
+	    say $I1
+
+	    end
+    .end
 CODE
-1
-0
+$ra
+$rb
 OUT
+}
+
+SKIP : {
+    skip 'no file modes on Win32', 1 if $MSWin32;
+
+    # test can_write
+    $wa = -w "test_f_a" ? 1 : 0;
+    $wb = -w "test_f_b" ? 1 : 0;
+    pir_output_is( <<'CODE', <<"OUT", 'Test can_write' );
+    .sub main :main
+	    $P0 = loadlib 'os'
+	    $P1 = new ['OS']
+
+	    $I0 = $P1."can_write"("test_f_a")
+	    say $I0
+
+	    $I1 = $P1."can_write"("test_f_b")
+	    say $I1
+
+	    end
+    .end
+CODE
+$wa
+$wb
+OUT
+}
+
+SKIP : {
+    skip 'no file modes on Win32', 1 if $MSWin32;
+
+    # test can_execute
+    $xa = -x "test_f_a" ? 1 : 0;
+    $xb = -x "test_f_b" ? 1 : 0;
+    pir_output_is( <<'CODE', <<"OUT", 'Test can_execute' );
+    .sub main :main
+	    $P0 = loadlib 'os'
+	    $P1 = new ['OS']
+
+	    $I0 = $P1."can_execute"("test_f_a")
+	    say $I0
+
+	    $I1 = $P1."can_execute"("test_f_b")
+	    say $I1
+
+	    end
+    .end
+CODE
+$xa
+$xb
+OUT
+}
+
+unlink "test_f_a", "test_f_b";
 
 # Local Variables:
 #   mode: cperl
