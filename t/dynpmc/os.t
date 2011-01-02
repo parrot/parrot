@@ -455,18 +455,18 @@ CODE
 OUT
 }
 
-my $uid = getpwnam(getpwent());
+my $uid = getpwnam(getlogin());
 
 # test get_user_id
 pir_output_is( <<'CODE', <<"OUT", 'Test get_user_id' );
 .sub main :main
-	$P0 = loadlib 'os'
-	$P1 = new ['OS']
+    $P0 = loadlib 'os'
+    $P1 = new ['OS']
 
-	$I0 = $P1."get_user_id"()
-	say $I0
+    $I0 = $P1."get_user_id"()
+    say $I0
 
-	end
+    end
 .end
 CODE
 $uid
