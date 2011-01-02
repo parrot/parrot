@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 24;
+plan tests => 25;
 
 =head1 NAME
 
@@ -367,6 +367,49 @@ int main(void)
 }
 CODE
 42
+Done!
+OUTPUT
+
+
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_floor_divide" );
+
+int main(void)
+{
+    Parrot_Interp interp;
+    Parrot_PMC pmc, pmc2, pmc3;
+    Parrot_Int type, value;
+
+    /* Create the interpreter */
+    interp = new_interp();
+
+    type = Parrot_PMC_typenum(interp, "Integer");
+    pmc  = Parrot_PMC_new(interp, type);
+    pmc2 = Parrot_PMC_new(interp, type);
+    pmc3 = Parrot_PMC_new(interp, type);
+
+    Parrot_PMC_set_integer_native(interp, pmc,  7);
+    Parrot_PMC_set_integer_native(interp, pmc2, 3);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    pmc3 = Parrot_PMC_floor_divide(interp, pmc, pmc2, pmc3);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+    value = Parrot_PMC_get_integer(interp, pmc2);
+    printf("%d\n", (int) value);
+    value = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", (int) value);
+    Parrot_destroy(interp);
+    printf("Done!\n");
+    return 0;
+}
+CODE
+7
+3
+2
 Done!
 OUTPUT
 
