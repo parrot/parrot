@@ -722,7 +722,6 @@ void PackFile_funcs_register(SHIM_INTERP,
         FUNC_MODIFIES(*pf);
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
 void PackFile_Header_read_uuid(PARROT_INTERP,
     ARGMOD(PackFile_Header *self),
     ARGIN(const opcode_t *packed),
