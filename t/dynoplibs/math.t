@@ -29,7 +29,7 @@ Tests math.ops
 .sub main :main
     .include 'test_more.pir'
     .include 'fp_equality.pasm'
-    plan(53)
+    plan(66)
     ok(1, "load math_ops")
     rand $I0
     test_2_arg_int()
@@ -54,9 +54,12 @@ Tests math.ops
     test_exception_cmod_n_n_nc_by_zero()
     test_cmod()
     test_cmod_num()
+    test_cmod_p_p_i()
+    test_cmod_p_p_p()
     test_cmod_i_i_i_by_zero()
     test_cmod_i_ic_i_by_zero()
     test_cmod_i_i_ic_by_zero()
+    test_cmod_i_ic_ic_by_zero()
     test_cmod_float_integer_pmc_nan()
 .end
 
@@ -412,6 +415,91 @@ finish:
 
     $N2 = cmod 7.0, 4.0
     is( $N2, "3", 'cmod_n_nc_nc' )
+
+    $N3 = 4.0
+    $N2 = cmod 7.0, $N3
+    is( $N2, 3, 'cmod_n_nc_n')
+
+    $N4 = 7.0
+    $N2 = cmod $N4, 4.0
+    is( $N2, 3, 'cmod_n_n_nc' )
+
+throws_substring(<<"CODE", "Divide by zero", "cmod_n_nc_nc by zero")
+    .sub main
+        $N2 = cmod 7.0, 0.0
+    .end
+CODE
+
+    $P0 = new ['Integer']
+    $P0 = 7
+    $P1 = new ['Integer']
+    $P1 = cmod $P0, 4.0
+    is($P1, 3, "cmod_p_p_nc")
+
+throws_substring(<<"CODE", "Divide by zero", "cmod_p_p_nc by zero")
+    .sub main
+	$P2 = cmod $P0, 0.0
+    .end
+CODE
+
+throws_substring(<<"CODE", "Divide by zero", "cmod_p_p_n by zero")
+    .sub main
+        $N0 = 0.0
+	$P2 = cmod $P0, $N0
+    .end
+CODE
+
+.end
+
+.sub test_cmod_p_p_i
+    $P0 = new ['Integer']
+    $P0 = 7
+    $P1 = new ['Integer']
+    $P1 = cmod $P0, 4
+    is($P1, 3, "cmod_p_p_ic")
+
+    $I0 = 4
+    $P1 = cmod $P0, $I0
+    is($P1, 3, "cmod_p_p_i")
+
+    throws_substring(<<"CODE", "Divide by zero", "cmod_p_p_ic by zero")
+    .sub main
+        $P1 = cmod $P0, 0
+    .end
+CODE
+
+    throws_substring(<<"CODE", "Divide by zero", "cmod_p_p_i by zero")
+    .sub main
+        $I0 = 0
+        $P1 = cmod $P0, $I0
+    .end
+CODE
+.end
+
+.sub test_cmod_p_p_p
+    $P0 = new ['Integer']
+    $P0 = 7
+
+    $P1 = new ['Integer']
+    $P1 = 4
+
+    $P2 = new ['Integer']
+    $P2 = cmod $P0, $P1
+
+    is($P2, 3, "cmod_p_p_p")
+
+    throws_substring(<<"CODE", "Divide by zero", "cmod_p_p_p by zero")
+    .sub main
+        $P0 = new ['Integer']
+        $P0 = 7
+
+        $P1 = new ['Integer']
+        $P1 = 0
+
+        $P2 = new ['Integer']
+        $P2 = cmod $P0, $P1
+    .end
+CODE
 .end
 
 .sub 'test_cmod_i_i_i_by_zero'
@@ -458,6 +546,21 @@ finish:
 
   test_cmod_i_i_ic_by_zero_end:
     ok($I3, 'cmod_i_i_ic by zero')
+.end
+
+.sub 'test_cmod_i_ic_ic_by_zero'
+    push_eh eh
+    $I2 = cmod 1, 0
+    pop_eh
+    $I3 = 0
+    goto finally
+
+  eh:
+    $I3 = 1
+
+  finally:
+    pop_eh
+    ok($I3, 'cmod_i_ic_ic by zero')
 .end
 
 .sub test_cmod_float_integer_pmc_nan
