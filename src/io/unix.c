@@ -738,7 +738,7 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
             close(STDIN_FILENO);
             close(fds[1]);
 
-            if (Parrot_dup(fds[0]) != STDIN_FILENO)
+            if (dup(fds[0]) != STDIN_FILENO)
                 exit(EXIT_FAILURE);
         }
         else {
@@ -747,9 +747,9 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
             close(STDERR_FILENO);
             close(fds[0]);
 
-            if (Parrot_dup(fds[1]) != STDOUT_FILENO)
+            if (dup(fds[1]) != STDOUT_FILENO)
                 exit(EXIT_FAILURE);
-            if (Parrot_dup(fds[1]) != STDERR_FILENO)
+            if (dup(fds[1]) != STDERR_FILENO)
                 exit(EXIT_FAILURE);
         }
 

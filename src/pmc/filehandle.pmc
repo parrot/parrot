@@ -127,23 +127,7 @@ Create a copy of the filehandle.
         new_attrs->last_pos       = old_attrs->last_pos;
 
         /* Duplicate the file handle. */
-#ifdef PIO_OS_WIN32
-        {
-            HANDLE current_process = GetCurrentProcess();
-            HANDLE new_handle = INVALID_HANDLE_VALUE;
-            DuplicateHandle(current_process,
-                (HANDLE)old_attrs->os_handle,
-                current_process,
-                &new_handle,
-                0,
-                FALSE,
-                DUPLICATE_SAME_ACCESS);
-            new_attrs->os_handle = new_handle;
-        }
-#else
-        new_attrs->os_handle = (PIOHANDLE)Parrot_dup(old_attrs->os_handle);
-#endif
-
+        new_attrs->os_handle = PIO_DUP(interp, old_attrs->os_handle);
 
         /* We need to correctly allocate a buffer, so we check for the buffering mode. */
         if (new_attrs->flags & PIO_F_LINEBUF)

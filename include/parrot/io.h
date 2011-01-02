@@ -101,13 +101,6 @@ extern PIOOFF_T piooffsetzero;
 
 typedef struct _ParrotIOData ParrotIOData;
 
-#ifdef _MSC_VER
-/* Win32/MSVC has a deprecation warning about dup() in favor of _dup(). */
-#  define Parrot_dup(x) (PIOHANDLE)_dup((int)(x))
-#else /* !_MSC_VER */
-#  define Parrot_dup(x) (PIOHANDLE)dup((int)(x))
-#endif /* _MSC_VER */
-
 extern INTVAL pio_errno;
 
 /* io/core.c - interpreter initialization/destruction functions */

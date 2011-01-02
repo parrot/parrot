@@ -145,6 +145,7 @@ size_t Parrot_io_write_portable(PARROT_INTERP,
     Parrot_io_fdopen_portable((interp), (pmc), (handle), (flags))
 #define PIO_OPEN_PIPE(interp, pmc, file, flags) \
     Parrot_io_open_pipe_portable((interp), (pmc), (file), (flags))
+#define PIO_DUP(interp, handle) (PIOHANDLE)dup((int)(handle))
 #define PIO_CLOSE(interp, pmc) Parrot_io_close_portable((interp), (pmc))
 #define PIO_IS_CLOSED(interp, pmc) Parrot_io_is_closed_portable((interp), (pmc))
 #define PIO_READ(interp, pmc, buf) Parrot_io_read_portable((interp), (pmc), (buf))
