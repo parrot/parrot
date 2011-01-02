@@ -311,6 +311,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
     INTVAL         *int_array;
     INTVAL          arg_count;
     INTVAL          arg_index = 0;
+    INTVAL          arg_named_count = 0;
 
     if (PMC_IS_NULL(signature))
         call_object = Parrot_pmc_new(interp, enum_class_CallContext);
@@ -328,6 +329,11 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
         const INTVAL arg_flags = int_array[arg_index];
         const INTVAL constant  = PARROT_ARG_CONSTANT_ISSET(arg_flags);
         const INTVAL raw_index = raw_args[arg_index + 2];
+
+        if (arg_named_count && !(arg_flags & PARROT_ARG_NAME))
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "named arguments must follow all positional arguments");
 
         switch (PARROT_ARG_TYPE_MASK_MASK(arg_flags)) {
           case PARROT_ARG_INTVAL:
@@ -357,6 +363,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
 
                 if (arg_flags & PARROT_ARG_NAME) {
                     ++arg_index;
+                    ++arg_named_count;
                     if (!PMC_IS_NULL(call_object)
                          && VTABLE_exists_keyed_str(interp, call_object, string_value)) {
                         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -777,28 +784,8 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     /* First iterate over positional args and positional parameters. */
     GETATTR_CallContext_num_positionals(interp, call_object, positional_args);
 
-    while (1) {
-        INTVAL param_flags;
-
-        /* Check if we've used up all the parameters. */
-        if (param_index >= param_count) {
-            /* We've used up all arguments and parameters; we're done. */
-            if (arg_index >= positional_args)
-                break;
-            else if (err_check) {
-                /* We've used up all the parameters, but have extra positional
-                 * args left over. */
-                if (named_used_list != NULL)
-                    parrot_hash_destroy(interp, named_used_list);
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "too many positional arguments: %d passed, %d expected",
-                    positional_args, param_index);
-            }
-            return;
-        }
-
-        param_flags = raw_params[param_index];
+    while (param_index < param_count) {
+        INTVAL param_flags = raw_params[param_index];
 
         /* If it's a call_sig, we're done. */
         if (param_flags & PARROT_ARG_CALL_SIG)
@@ -960,6 +947,17 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         ++param_index;
     }
 
+    if (err_check && arg_index < positional_args) {
+        /* We have extra positional args left over. */
+        if (named_used_list != NULL)
+            parrot_hash_destroy(interp, named_used_list);
+
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INVALID_OPERATION,
+            "too many positional arguments: %d passed, %d expected",
+            positional_args, arg_index);
+    }
+
     /* Now iterate over the named arguments and parameters. */
     while (param_index < param_count) {
         STRING *param_name;
@@ -972,28 +970,6 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION,
                 "named parameters must follow all positional parameters");
-        }
-
-        if (arg_index < positional_args) {
-            PMC *arg_sig;
-
-            GETATTR_CallContext_arg_flags(interp, call_object, arg_sig);
-
-            if (named_used_list != NULL)
-                parrot_hash_destroy(interp, named_used_list);
-
-            /* We've used up all the positional parameters, but have extra
-             * positional args left over. */
-            if (VTABLE_get_integer_keyed_int(interp, arg_sig, arg_index) & PARROT_ARG_NAME){
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "named arguments must follow all positional arguments");
-            }
-
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_INVALID_OPERATION,
-                "too many positional arguments: %d passed, %d expected",
-                positional_args, param_index);
         }
 
         /* Collected ("slurpy") named parameter */

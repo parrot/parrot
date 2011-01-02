@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 102;
+use Parrot::Test tests => 103;
 
 =head1 NAME
 
@@ -1213,6 +1213,22 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "too many args via :flat" );
 .end
 CODE
 /too many positional arguments: 5 passed, 4 expected/
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "too many args and :optional" );
+.sub _fn1
+    .param pmc one
+    .param pmc two
+    .param pmc opt        :optional
+    .param int have_opt   :opt_flag
+.end
+.sub main :main
+    .include "errors.pasm"
+    errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
+    $P35 = _fn1(1, 2, 3, 4)
+.end
+CODE
+/too many positional arguments: 4 passed, 3 expected/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "too few args via :flat" );
