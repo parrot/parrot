@@ -491,7 +491,6 @@ INTERP_O_FILES = \
     src/oo$(O) \
     src/platform$(O) \
     src/packfile/object_serialization$(O) \
-    src/packfile/execute$(O) \
     src/pmc$(O) \
     src/runcore/main$(O)  \
     src/runcore/cores$(O) \
@@ -696,7 +695,6 @@ STR_FILES = \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks.str \
     src/nci/signatures.str \
     src/packfile/api.str \
-    src/packfile/execute.str \
     src/packfile/object_serialization.str \
     src/packfile/pf_items.str \
     src/pmc.str \
@@ -1599,7 +1597,6 @@ src/multidispatch$(O) : \
 src/packfile/api$(O) : \
     src/packfile/api.str \
     src/packfile/api.c \
-    src/packfile/packfile_private.h \
     include/pmc/pmc_sub.h \
     include/pmc/pmc_key.h \
     include/pmc/pmc_parrotlibrary.h \
@@ -1618,17 +1615,6 @@ src/packfile/api$(O) : \
     $(INC_DIR)/extend_vtable.h \
     $(PARROT_H_HEADERS) \
     $(INC_DIR)/runcore_api.h
-
-src/packfile/execute$(O) : \
-    $(PARROT_H_HEADERS) \
-    $(INC_DIR)/extend.h \
-    $(INC_DIR)/extend_vtable.h \
-    include/parrot/runcore_api.h \
-    src/packfile/execute.str \
-    src/packfile/execute.c \
-    src/packfile/packfile_private.h \
-    include/pmc/pmc_sub.h
-
 
 src/packfile/output$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_key.h src/packfile/output.c
 
