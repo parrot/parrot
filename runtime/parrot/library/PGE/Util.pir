@@ -37,6 +37,7 @@ of the match.
 .sub 'die'
     .param pmc mob                                 # match object
     .param pmc list            :slurpy             # message arguments
+    .param pmc dba             :slurpy :named
 
     .local pmc it
     .local string message
