@@ -1,5 +1,5 @@
 
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 class ProfTest::PIRProfile is Hash;
 

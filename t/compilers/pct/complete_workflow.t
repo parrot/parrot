@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2011, Parrot Foundation.
 
 use strict;
 use warnings;
