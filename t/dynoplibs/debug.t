@@ -47,7 +47,7 @@ sub pir_stdin_error_output_is {
     # Slurp and compare the output.
     my $result = do {
         local $/;
-        open(my $in, '-|', "$parrot $code_file 2>&1 1>/dev/null < $input_file")
+        open(my $in, '-|', "$parrot $code_file 2>&1 < $input_file")
             or die "bug";
         <$in>;
     };
@@ -136,8 +136,10 @@ INPUT
 .end
 CODE
 
+(pdb) print I0
 1
 
+(pdb) quit
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - Null PMC access" );
