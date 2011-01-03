@@ -3,6 +3,9 @@ import gdb.types
 import gdb
 import re
 import itertools
+"""
+Parrot Pretty Printing Support (P.P.P.S. E_NEEDSMOREMAGIC)
+"""
 
 class ParrotPrinter(PrettyPrinter):
     """
@@ -53,9 +56,15 @@ class ParrotPrinter(PrettyPrinter):
                 self.val = val
 
             def to_string(self):
+                """
+                Returns the plain string.
+                """
                 return _parrot_str_to_str(self.val)
 
             def display_hint(self):
+                """
+                GDB display hint.
+                """
                 return "string"
 
     class ParrotPMCPrinter(SubPrettyPrinter):
@@ -70,46 +79,79 @@ class ParrotPrinter(PrettyPrinter):
                 self.pmc_name = _parrot_str_to_str(self.val['vtable'].dereference()['whoami'])
 
             def to_string(self):
+                """
+                Returns a string representation of val.
+                """
                 return 'PMC<%s>' % self.pmc_name
 
             def children(self):
+                """
+                Pretty-print the attributes, resolved dynamically.
+                """
                 try:
                     attr_name = 'Parrot_%s_attributes' % self.pmc_name
                     attr_type = gdb.lookup_type(attr_name).pointer()
 
                     attrs = self.val['data'].cast(attr_type).dereference()
 
-                    # Python iterator magic.
-                    name_value_tuples = PMCIterator(attrs)
-                    names = itertools.imap(lambda val: ("attr-name", val[0]), name_value_tuples)
-                    values = itertools.imap(lambda val: ("attr-value", val[1]), name_value_tuples)
+                    '''
+                    Something ridiculous happens here. I take a list of tuples:
+                            [ ("key1", "val1"), ("key2", "val2") ]
 
-                    # Something ridiculous happens here.
-                    # I take [0, 2, 4] and [1, 3, 5], turn it into
-                    # [(0, 1), (2, 3), (4, 5)], and then that into
-                    # [0, 1, 2, 3, 4, 5]. Only the numbers are tuples. Magic.
-                    # What we go through for 100% lazy iteration.
-                    return itertools.chain.from_iterable(itertools.izip(names, values))
+                    and turn it, in one iteration, into:
+                            [
+                                [("name", "key1"), ("value", "val1")],
+                                [("name", "key2"), ("value", "val2")]
+                            ]
+
+                    That, in turn, is mutated into one list.
+                            [
+                                ("name", "key1"), ("value", "val1"),
+                                ("name", "key2"), ("value", "val2")
+                            ]
+
+                    What we go through for 100% lazy iteration.
+                    '''
+                    name_value_tuples = PMCIterator(attrs)
+                    nv_iter = itertools.imap(lambda val: [ ("name", val[0]), ("value", val[1]) ],
+                        name_value_tuples)
+                    nv_chain = itertools.chain.from_iterable(nv_iter)
+
+                    return nv_chain
                 except RuntimeError as e:
-                    return ( ( "", "" ) ).__iter__()
+                    return [ ( "__ERROR__", "Unable to resolve attribute struct." ) ].__iter__()
 
             def display_hint(self):
+                """
+                GDB display hint.
+                """
                 return 'map'
 
 class PMCIterator(object):
     def __init__(self, attrs):
+        """
+        Iterate over a PMC attrs field.
+        """
         self.attrs = attrs
         self.iterobj = attrs.type.fields().__iter__()
 
     def __iter__(self):
+        """
+        Iterators should return themselves on __iter__()
+        """
         return self
 
     def next(self):
+        """
+        Returns the next attribute.
+        """
         nextattr = self.iterobj.next()
-        #print "[[[%s]]]" % nextattr.name
         return (nextattr.name, self.attrs[nextattr.name])
 
 def _parrot_str_to_str(val):
+    """
+    Encoding-safe way of turning a Parrot string into a Python string.
+    """
     encoding = val['encoding'].dereference()
     encoding_name = encoding['name'].string()
     length = val['strlen']
