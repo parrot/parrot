@@ -427,7 +427,7 @@ CODE
     $I0 = 4
 
     setstdin $P0
-    ok('can setstdin')
+    ok(1, 'can setstdin')
 
     $S0 = read $I0
     $I1 = tell $P0
