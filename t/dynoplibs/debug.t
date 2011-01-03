@@ -5,7 +5,10 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 12;
+use Parrot::Config;
+
+use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
 
@@ -22,6 +25,35 @@ as well as backtrace tests.
 
 =cut
 
+sub pir_stdin_error_output_is {
+    my ($input_string, $code, $expected_output, $test_name) = @_;
+
+    my $stuff = sub {
+        # Put the string on a file.
+        my $string = shift;
+
+        my (undef, $file) = create_tempfile(UNLINK => 1);
+        open(my $out, '>', $file) or die "bug";
+        binmode $out;
+        print $out $string;
+        return $file;
+    };
+
+    # Write the input and code strings.
+    my $input_file = $stuff->($input_string);
+    my $code_file = $stuff->($code);
+
+    my $parrot = ".$PConfig{slash}parrot$PConfig{exe}";
+    # Slurp and compare the output.
+    my $result = do {
+        local $/;
+        open(my $in, '-|', "$parrot $code_file 2>&1 1>/dev/null < $input_file")
+            or die "bug";
+        <$in>;
+    };
+    Test::More::is($result, $expected_output, $test_name);
+}
+
 $ENV{TEST_PROG_ARGS} ||= '';
 my $nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=fast/
     ? "\\(unknown file\\)\n-1" : "debug_\\d+\\.pasm\n\\d";
@@ -36,9 +68,76 @@ pasm_output_like( <<'CODE', <<"OUTPUT", "getline, getfile" );
     getline I0
     say S0
     say I0
-    end
+end
 CODE
 /$nolineno/
+OUTPUT
+
+pir_output_like( <<'CODE', <<"OUTPUT", "debug_print" );
+.loadlib 'debug_ops'
+.sub main :main
+    debug_init
+    $I0 = 1
+    $S0 = "foo"
+    $N0 = 3.1
+    $P0 = new ['String']
+    $P0 = "bar"
+    debug_print
+.end
+CODE
+/
+  I0 = 1
+
+  N0 = 3.1
+
+  S0 = foo
+
+  P0 = String=PMC[(]0x[a-f0-9]+ Str:"bar"[)]
+/
+OUTPUT
+
+open STDERR, ">>&STDOUT";
+pir_output_like( <<'CODE', <<"OUTPUT", "debug_print without debugger" );
+.loadlib 'debug_ops'
+.sub main :main
+    push_eh eh
+    debug_print
+    goto finally
+eh:
+    .get_results($P0)
+    say $P0
+finally:
+    pop_eh
+.end
+CODE
+/Initialize debugger with debug_init before using debug_print/
+OUTPUT
+
+pir_output_like( <<'CODE', <<"OUTPUT", "debug_backtrace" );
+.loadlib 'debug_ops'
+.sub main :main
+    debug_init
+    backtrace
+    say "ok"
+.end
+CODE
+/ok/
+OUTPUT
+
+pir_stdin_error_output_is( <<'INPUT', <<'CODE', <<'OUTPUT', "debug_break" );
+print I0
+quit
+INPUT
+.loadlib 'debug_ops'
+.sub main :main
+    debug_init
+    $I0 = 1
+    debug_break
+.end
+CODE
+
+1
+
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - Null PMC access" );
