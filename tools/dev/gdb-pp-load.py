@@ -1,4 +1,9 @@
 import gdb.printing
-import parrot-pp
+import sys
 
-gdb.printing.register_pretty_printer(gdb.current_objfile(), parrot-pp.build_pretty_printer())
+if not 'blib/lib' in sys.path:
+    sys.path.append('blib/lib')
+
+from GDBPrettyPrint import ParrotPrinter
+
+gdb.printing.register_pretty_printer(gdb.current_objfile(), ParrotPrinter())
