@@ -687,9 +687,9 @@ END_OF_FUNCTION
 
     .local string config, pathquote, exeprefix
     pathquote  = '"'
+    config     = pathquote
     if installed == '1' goto config_installed
     exeprefix = substr exefile, 0, 12
-    config     = pathquote
     config    .= build_dir
     config    .= slash
     config    .= 'src'
@@ -704,7 +704,8 @@ END_OF_FUNCTION
  config_installed:
     rpath      = $P0['rpath_lib']
     libparrot  = $P0['inst_libparrot_linkflags']
-    config     = concat libdir, versiondir
+    config    .= libdir
+    config    .= versiondir
     config    .= slash
     config    .= 'parrot_config'
  config_cont:
