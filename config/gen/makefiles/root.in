@@ -1025,7 +1025,9 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 		$(O_FILES) $(C_LIBS) $(ICU_SHARED)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(libparrot_shared_alias):	( cd @blib_dir@ ; ln -sf @libparrot_shared@ @libparrot_shared_alias@ )
-
+	$(CP) tools/dev/gdb-pp-load.py @blib_dir@/@libparrot_shared@-gdb.py
+	$(CP) tools/dev/gdb-pp.py @blib_dir@/GDBPrettyPrint.py
+	@echo '' > @blib_dir@/__init__.py
 
 $(INSTALLABLECONFIG) : src/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
