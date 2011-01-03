@@ -859,7 +859,7 @@ $(PARROT) : frontend/parrot/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     $(MINIPARROT)
 	$(LINK) @ld_out@$@ \
 	frontend/parrot/main$(O) src/parrot_config$(O) src/longopt$(O) \
-	@rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
+	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(PBC_TO_EXE) : $(DEV_TOOLS_DIR)/pbc_to_exe.pir runtime/parrot/library/config.pir $(PARROT) $(DYNEXT_DIR)/os$(LOAD_EXT) $(DYNEXT_DIR)/file$(LOAD_EXT)
@@ -885,7 +885,7 @@ $(PARROT_CONFIG) : $(DEV_TOOLS_DIR)/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 $(MINIPARROT) : frontend/parrot/main$(O) include/parrot/api.h include/parrot/longopt.h $(LIBPARROT) \
     src/null_config$(O) src/longopt$(O)
 	$(LINK) @ld_out@$@ frontend/parrot/main$(O) src/null_config$(O) src/longopt$(O) \
-	@rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(INSTALLABLEPARROT) : frontend/parrot/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
@@ -1054,7 +1054,7 @@ $(PDB) : frontend/parrot_debugger/main$(O) src/parrot_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     frontend/parrot_debugger/main$(O) \
     src/parrot_config$(O) \
-    @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+    $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(INSTALLABLEPDB) : frontend/parrot_debugger/main$(O) $(LIBPARROT) src/parrot_config$(O)
@@ -1078,7 +1078,7 @@ $(DIS) : src/pbc_disassemble$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     src/pbc_disassemble$(O) \
     src/longopt$(O) \
-    @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+    $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(INSTALLABLEDIS) : src/pbc_disassemble$(O) \
@@ -1099,7 +1099,7 @@ $(PDUMP) : frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) $(LIBPARROT
 	$(LINK) @ld_out@$@ \
     frontend/pbc_dump/main$(O) \
     src/longopt$(O) \
-    frontend/pbc_dump/packdump$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+    frontend/pbc_dump/packdump$(O) $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 frontend/pbc_dump/main$(O) : \
@@ -1132,7 +1132,7 @@ $(PBC_MERGE) : frontend/pbc_merge/main$(O) $(LIBPARROT) src/parrot_config$(O)
     frontend/pbc_merge/main$(O) \
     src/parrot_config$(O) \
     src/longopt$(O) \
-    @rpath_blib@ $(ALL_PARROT_LIBS) $(LINK_DYNAMIC) $(LINKFLAGS)
+    $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINK_DYNAMIC) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(INSTALLABLEPBC_MERGE) : frontend/pbc_merge/main$(O) $(LIBPARROT) $(INSTALLABLECONFIG)
@@ -2871,7 +2871,7 @@ win32-inno-installer : world installable
 ###############################################################################
 
 exec : src/parrot_config$(O) $(LIBPARROT)
-	$(LINK) @ld_out@$(EXEC)$(EXE) $(EXEC)$(O) src/parrot_config$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	$(LINK) @ld_out@$(EXEC)$(EXE) $(EXEC)$(O) src/parrot_config$(O) $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 ###### OS depend targets ##########
 
