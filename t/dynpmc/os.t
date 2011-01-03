@@ -455,22 +455,20 @@ CODE
 OUT
 }
 
-my $uid = getpwnam(getlogin());
+use English '$UID';
 
 # test get_user_id
-pir_output_is( <<'CODE', <<"OUT", 'Test get_user_id' );
+pir_output_is( <<'CODE', $UID, 'Test get_user_id' );
 .sub main :main
     $P0 = loadlib 'os'
     $P1 = new ['OS']
 
     $I0 = $P1."get_user_id"()
-    say $I0
+    print $I0
 
     end
 .end
 CODE
-$uid
-OUT
 
 open my $fa, ">", "test_f_a";
 close $fa;

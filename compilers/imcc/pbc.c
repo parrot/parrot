@@ -1531,9 +1531,13 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
                                    : Parrot_str_new(interp, "*none*", 0));
         }
 
-        if (r->pcc_sub->pragma & P_MAIN
-        &&  interp->code->main_sub < 0)
+        if (r->pcc_sub->pragma & P_MAIN && !IMCC_INFO(interp)->seen_main) {
+            IMCC_INFO(interp)->seen_main = 1;
             interp->code->main_sub = k;
+        }
+        else if (interp->code->main_sub < 0) {
+            interp->code->main_sub = k;
+        }
 
         return k;
     }
