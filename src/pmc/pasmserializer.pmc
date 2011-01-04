@@ -1,0 +1,240 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1
+
+src/pmc/pasmserializer - PASM Object Serializer
+
+=head1 DESCRIPTION
+
+Freezes and thaws PMCs using a text format suitable for use in PASM.
+
+=head2 Vtables
+
+=over 4
+
+=cut
+
+*/
+
+/* HEADERIZER HFILE: none */
+
+pmclass PASMSerializer auto_attrs {
+    ATTR PMC     *buffer;
+    ATTR PMC     *seen;
+    ATTR PMC     *todo;
+    ATTR UINTVAL  id;
+    ATTR INTVAL   action;
+
+/*
+
+=item C<void init()>
+
+Initialize the serializer.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        PARROT_PASMSERIALIZER(SELF)->buffer = PMCNULL;
+        PARROT_PASMSERIALIZER(SELF)->todo   = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        PARROT_PASMSERIALIZER(SELF)->seen   = PMCNULL;
+        PARROT_PASMSERIALIZER(SELF)->id     = 0;
+
+        PObj_custom_mark_SET(SELF);
+    }
+
+/*
+
+=item C<void mark()>
+
+Mark the PMC as alive.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_gc_mark_PMC_alive(INTERP, PARROT_PASMSERIALIZER(SELF)->buffer);
+        Parrot_gc_mark_PMC_alive(INTERP, PARROT_PASMSERIALIZER(SELF)->todo);
+        Parrot_gc_mark_PMC_alive(INTERP, PARROT_PASMSERIALIZER(SELF)->seen);
+    }
+
+/*
+
+=item C<PMC *get_iter()>
+
+Get the C<todo> list for this freeze/thaw for iterating over.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_iter() {
+        return PARROT_PASMSERIALIZER(SELF)->todo;
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Get the flags describing this visit action
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        return PARROT_PASMSERIALIZER(SELF)->action;
+    }
+
+/*
+
+=item C<void push_integer(INTVAL v)>
+
+=item C<void push_float(FLOATVAL v)>
+
+=item C<void push_string(STRING *v)>
+
+=item C<void push_pmc(PMC *v)>
+
+Push data item C<v> onto the end of the image being frozen.
+
+=cut
+
+*/
+
+    VTABLE void push_integer(INTVAL v) {
+        PMC *buf = PARROT_PASMSERIALIZER(SELF)->buffer;
+        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
+        VTABLE_push_string(INTERP, buf, Parrot_str_from_int(INTERP, v));
+        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
+    }
+
+    VTABLE void push_float(FLOATVAL v) {
+        PMC *buf = PARROT_PASMSERIALIZER(SELF)->buffer;
+        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
+        VTABLE_push_string(INTERP, buf, Parrot_str_from_num(INTERP, v));
+        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
+    }
+
+    VTABLE void push_string(STRING *v) {
+        PMC *buf = PARROT_PASMSERIALIZER(SELF)->buffer;
+        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
+        if (STRING_IS_NULL(v)) {
+            VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, "STRINGNULL"));
+        }
+        else {
+            VTABLE_push_string(INTERP, buf,
+                    Parrot_encoding_name(INTERP, Parrot_encoding_number_of_str(INTERP, v)));
+            VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, ":\""));
+            VTABLE_push_string(INTERP, buf, Parrot_str_escape(INTERP, v));
+            VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, "\""));
+        }
+        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
+    }
+
+    VTABLE void push_pmc(PMC *v) {
+        PMC    *buf       = PARROT_PASMSERIALIZER(SELF)->buffer;
+        PMC    *seen      = PARROT_PASMSERIALIZER(SELF)->seen;
+        INTVAL  id;
+        INTVAL  was_seen;
+
+        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
+
+        if (PMC_IS_NULL(v)) {
+            id = 0;
+            was_seen = 1;
+        }
+        else {
+            was_seen = VTABLE_exists_keyed(INTERP, seen, v);
+            if (was_seen)
+                id = VTABLE_get_integer_keyed(INTERP, seen, v);
+            else
+                id = ++PARROT_PASMSERIALIZER(SELF)->id;
+        }
+
+        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, "$"));
+        VTABLE_push_string(INTERP, buf, Parrot_str_from_int(INTERP, id));
+
+        if (!was_seen) {
+            VTABLE_set_integer_keyed(INTERP, seen, v, id);
+            VTABLE_push_pmc(INTERP, PARROT_PASMSERIALIZER(SELF)->todo, v);
+
+            VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, ":"));
+            VTABLE_push_string(INTERP, buf, VTABLE_name(INTERP, v));
+        }
+
+        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
+    }
+
+/*
+
+=item C<STRING *get_string()>
+
+Get the serialized image as a string (after freezing).
+
+=cut
+
+*/
+
+    VTABLE STRING *get_string() {
+        return VTABLE_get_string(INTERP, PARROT_PASMSERIALIZER(SELF)->buffer);
+    }
+
+/*
+
+=item C<void set_pmc(PMC *p)>
+
+Freeze the PMC C<p> into the buffer.
+
+=cut
+
+*/
+
+    VTABLE void set_pmc(PMC *p) {
+        PARROT_PASMSERIALIZER(SELF)->action = VISIT_FREEZE_NORMAL;
+        PARROT_PASMSERIALIZER(SELF)->buffer = Parrot_pmc_new(INTERP, enum_class_StringBuilder);
+        PARROT_PASMSERIALIZER(SELF)->seen   = Parrot_pmc_new(INTERP, enum_class_Hash);
+        VTABLE_set_pointer(INTERP, PARROT_PASMSERIALIZER(SELF)->seen,
+                parrot_new_intval_hash(INTERP));
+        SELF.push_pmc(p);
+
+        // Parrot_visit_loop_visit(INTERP, SELF);
+        {
+            INTVAL i;
+            PMC *buf  = PARROT_PASMSERIALIZER(SELF)->buffer;
+            PMC *todo = VTABLE_get_iter(INTERP, SELF);
+            for (i = 0; i < VTABLE_elements(INTERP, todo); i++) {
+                PMC *current = VTABLE_get_pmc_keyed_int(INTERP, todo, i);
+
+                VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, "\n$"));
+                VTABLE_push_string(INTERP, buf, Parrot_str_from_int(INTERP, i + 1));
+                VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, ":["));
+
+                VTABLE_freeze(INTERP, current, SELF);
+                VTABLE_visit(INTERP, current, SELF);
+                VISIT_PMC(INTERP, SELF, PMC_metadata(current));
+
+                VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, "]"));
+            }
+        }
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
