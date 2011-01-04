@@ -537,16 +537,35 @@ OUTPUT
     .const string description = 'stat failed'
     .include "stat.pasm"
 
-    $I0 = stat 'parrot', .STAT_FILESIZE
+    $S0 = sysinfo .SYSINFO_PARROT_OS
+    if $S0 == 'MSWin32' goto run_win32_stat_tests
+    goto run_unix_stat_tests
+  
+  run_win32_stat_tests:
+    $I0 = stat "parrot.exe", .STAT_FILESIZE
     ok(1, 'can stat_i_sc_ic')
+    
+    $S0 = 'parrot.exe'
+    $I0 = stat $S0, $I1
+    ok(1, 'can stat_i_s_i')
+
+    $I1 = .STAT_FILESIZE
+    $I0 = stat 'parrot.exe', $I1
+    ok(1, 'can stat_i_sc_i')
+    
+    goto done_stat_filename_tests
+  run_unix_stat_tests:
+    $I0 = stat "parrot", .STAT_FILESIZE
+    ok(1, 'can stat_i_sc_ic')
+    
+    $S0 = 'parrot'
+    $I0 = stat $S0, $I1
+    ok(1, 'can stat_i_s_i')
 
     $I1 = .STAT_FILESIZE
     $I0 = stat 'parrot', $I1
     ok(1, 'can stat_i_sc_i')
-
-    $S0 = 'parrot'
-    $I0 = stat $S0, $I1
-    ok(1, 'can stat_i_s_i')
+  done_stat_filename_tests:
 
     $I2 = 1
     $I0 = stat $I2, $I1
