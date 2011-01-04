@@ -193,7 +193,7 @@ Test if the socket is closed.
 */
 
     METHOD is_closed() {
-        const INTVAL status = VTABLE_get_bool(INTERP, SELF);
+        const INTVAL status = !VTABLE_get_bool(INTERP, SELF);
         RETURN(INTVAL status);
     }
 
