@@ -262,9 +262,8 @@ ok( !-d $xpto, "Test that rm removed the directory" );
 rmdir $xpto if -d $xpto;    # this way next test doesn't fail if this one does
 
 mkdir "test-bad-rm";
-chdir "test-bad-rm";
-symlink "bad", "bad";
-chdir "..";
+open my $testfile, ">test-bad-rm/bad";
+close $testfile;
 
 pir_output_like( <<'CODE', <<'OUT', 'Test bad rm calls' );
 .sub main :main
