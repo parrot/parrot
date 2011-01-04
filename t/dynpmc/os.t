@@ -75,12 +75,12 @@ mkdir "test-bad-cwd";
 
 pir_error_output_like( <<'CODE', <<"OUT", 'Test bad cwd' );
 .sub main :main
-	$P0 = loadlib 'os'
-	$P1 = new ['OS']
+        $P0 = loadlib 'os'
+        $P1 = new ['OS']
 
-	$P1.'chdir'('test-bad-cwd')
-	$P1.'rm'('../test-bad-cwd')
-	$S0 = $P1.'cwd'()
+        $P1.'chdir'('test-bad-cwd')
+        $P1.'rm'('../test-bad-cwd')
+        $S0 = $P1.'cwd'()
 .end
 CODE
 /No such file or directory/
@@ -113,7 +113,7 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
         $S2 = downcase $S1
         say $S2
 
-	end
+        end
 .end
 CODE
 $upcwd
@@ -150,11 +150,11 @@ OUT
 
 pir_error_output_like( <<'CODE', <<"OUT", 'Test bad chdir' );
 .sub main :main
-	$P0 = loadlib 'os'
-	$P1 = new ['OS']
+        $P0 = loadlib 'os'
+        $P1 = new ['OS']
 
-	$S1 = repeat "-!", 10
-	$P1."chdir"($S1)
+        $S1 = repeat "-!", 10
+        $P1."chdir"($S1)
 .end
 CODE
 /No such file or directory/
@@ -225,10 +225,10 @@ OUT
 
 pir_error_output_like( <<'CODE', <<"OUT", 'Test bad mkdir' );
 .sub main :main
-	$P0 = loadlib 'os'
-	$P1 = new ['OS']
+        $P0 = loadlib 'os'
+        $P1 = new ['OS']
 
-	$P1."mkdir"(".", 0)
+        $P1."mkdir"(".", 0)
 .end
 CODE
 /File exists/i
@@ -266,26 +266,26 @@ pir_output_like( <<'CODE', <<'OUT', 'Test bad rm calls' );
         $P0 = loadlib 'os'
         $P1 = new ['OS']
 
-	push_eh eh1
-	$P1."rm"('test-bad-rm')
-	say "failed"
-	goto finally1
+        push_eh eh1
+        $P1."rm"('test-bad-rm')
+        say "failed"
+        goto finally1
 eh1:
-	.get_results($P2)
-	say $P2
+        .get_results($P2)
+        say $P2
 finally1:
-	pop_eh
+        pop_eh
 
-	$P1."chdir"("..")
-	push_eh eh2
-	$P1."rm"('non existent!!!!')
-	say "failed"
-	goto finally2
+        $P1."chdir"("..")
+        push_eh eh2
+        $P1."rm"('non existent!!!!')
+        say "failed"
+        goto finally2
 eh2:
-	.get_results($P2)
-	say $P2
+        .get_results($P2)
+        say $P2
 finally2:
-	pop_eh
+        pop_eh
 .end
 CODE
 /Directory not empty
@@ -351,9 +351,9 @@ CODE
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'test bad stat');
 .sub main :main
-	$P0 = loadlib 'os'
-	$P1 = new ['OS']
-	$P2 = $P1."stat"("non-existent something")
+        $P0 = loadlib 'os'
+        $P1 = new ['OS']
+        $P2 = $P1."stat"("non-existent something")
 .end
 CODE
 /No such file or directory/
@@ -383,7 +383,12 @@ CODE
     open my $fileh, ">silly-dir-with-silly-names/\xfesillyname";
     close $fileh;
 
-    pir_output_is( <<'CODE', <<"OUTPUT", 'Test OS.readdir' );
+    opendir my $IN, 'silly-dir-with-silly-names';
+    my @entries2 = readdir $IN;
+    closedir $IN;
+    my $entries2 = join( ' ', @entries2 ) . "\n";
+
+    pir_output_is( <<'CODE', $entries2, 'Test OS.readdir with ord >127' );
 .sub main :main
     $P0 = loadlib 'os'
     $P1 = new ['OS']
@@ -394,8 +399,6 @@ CODE
     print "\n"
 .end
 CODE
-\xfesillyname . ..
-OUTPUT
 
     unlink "silly-dir-with-silly-names/\xfesillyname";
     rmdir "silly-dir-with-silly-names";
@@ -466,7 +469,7 @@ SKIP: {
         $S2 = sprintf $S1, $P2
         print $S2
 
-	$P3 = $P1."lstat"("non-existant file")
+        $P3 = $P1."lstat"("non-existant file")
 
         end
 .end
@@ -510,7 +513,7 @@ SKIP: {
 
         print "ok\n"
 
-	$P1."symlink"($S1, $S2)
+        $P1."symlink"($S1, $S2)
 
         end
 .end
@@ -605,10 +608,10 @@ SKIP: {
         $P0 = loadlib 'os'
         $P1 = new ['OS']
 
-	$I0 = $P1.'umask'(0)
-	say $I0
-	$I1 = $P1.'umask'($I0)
-	say $I1
+        $I0 = $P1.'umask'(0)
+        say $I0
+        $I1 = $P1.'umask'($I0)
+        say $I1
         end
 .end
 CODE
@@ -635,12 +638,12 @@ SKIP: {
         $P0 = loadlib 'os'
         $P1 = new ['OS']
 
-	$P1.'chdir'('my-super-chroot')
-	$P1.'chroot'('.')
-	$S0 = $P1.'cwd'()
-	say $S0
+        $P1.'chdir'('my-super-chroot')
+        $P1.'chroot'('.')
+        $S0 = $P1.'cwd'()
+        say $S0
 
-	$P1.'chroot'('loop')
+        $P1.'chroot'('loop')
 .end
 CODE
 /\/
@@ -681,13 +684,13 @@ SKIP: {
     # test chmod
     pir_output_is( <<'CODE', <<"OUT", 'Test chmod' );
     .sub main :main
-	    $P0 = loadlib 'os'
-	    $P1 = new ['OS']
+            $P0 = loadlib 'os'
+            $P1 = new ['OS']
 
-	    $P1."chmod"("test_f_c", 420)
-	    say "ok"
+            $P1."chmod"("test_f_c", 420)
+            say "ok"
 
-	    end
+            end
     .end
 CODE
 ok
@@ -700,13 +703,13 @@ OUT
     # test chmod
     pir_error_output_like( <<'CODE', <<"OUT", 'Test chmod' );
     .sub main :main
-	    $P0 = loadlib 'os'
-	    $P1 = new ['OS']
+            $P0 = loadlib 'os'
+            $P1 = new ['OS']
 
-	    $P1."chmod"("this is another non-existent directory", 420)
-	    say "ok"
+            $P1."chmod"("this is another non-existent directory", 420)
+            say "ok"
 
-	    end
+            end
     .end
 CODE
 /No such file or directory/
@@ -719,16 +722,16 @@ OUT
     $rb = -r "test_f_b" ? 1 : 0;
     pir_output_is( <<'CODE', <<"OUT", 'Test can_read' );
     .sub main :main
-	    $P0 = loadlib 'os'
-	    $P1 = new ['OS']
+            $P0 = loadlib 'os'
+            $P1 = new ['OS']
 
-	    $I0 = $P1."can_read"("test_f_a")
-	    say $I0
+            $I0 = $P1."can_read"("test_f_a")
+            say $I0
 
-	    $I1 = $P1."can_read"("test_f_b")
-	    say $I1
+            $I1 = $P1."can_read"("test_f_b")
+            say $I1
 
-	    end
+            end
     .end
 CODE
 $ra
@@ -740,16 +743,16 @@ OUT
     $wb = -w "test_f_b" ? 1 : 0;
     pir_output_is( <<'CODE', <<"OUT", 'Test can_write' );
     .sub main :main
-	    $P0 = loadlib 'os'
-	    $P1 = new ['OS']
+            $P0 = loadlib 'os'
+            $P1 = new ['OS']
 
-	    $I0 = $P1."can_write"("test_f_a")
-	    say $I0
+            $I0 = $P1."can_write"("test_f_a")
+            say $I0
 
-	    $I1 = $P1."can_write"("test_f_b")
-	    say $I1
+            $I1 = $P1."can_write"("test_f_b")
+            say $I1
 
-	    end
+            end
     .end
 CODE
 $wa
@@ -761,16 +764,16 @@ OUT
     $xb = -x "test_f_b" ? 1 : 0;
     pir_output_is( <<'CODE', <<"OUT", 'Test can_execute' );
     .sub main :main
-	    $P0 = loadlib 'os'
-	    $P1 = new ['OS']
+            $P0 = loadlib 'os'
+            $P1 = new ['OS']
 
-	    $I0 = $P1."can_execute"("test_f_a")
-	    say $I0
+            $I0 = $P1."can_execute"("test_f_a")
+            say $I0
 
-	    $I1 = $P1."can_execute"("test_f_b")
-	    say $I1
+            $I1 = $P1."can_execute"("test_f_b")
+            say $I1
 
-	    end
+            end
     .end
 CODE
 $xa
