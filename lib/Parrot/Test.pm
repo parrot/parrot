@@ -588,8 +588,8 @@ if the output matches the expected result.
 
 =cut
 
-sub pir_stdin_output_is {
-    my ($input_string, $code, $expected_output, $description) = @_;
+sub _pir_stdin_output_slurp {
+    my ($input_string, $code, $expected_ouptut) = @_;
 
     my $stuff = sub {
         # Put the string on a file.
@@ -614,35 +614,21 @@ sub pir_stdin_output_is {
             or die "bug";
         <$in>;
     };
+
+    return $result;
+}
+
+sub pir_stdin_output_is {
+    my ($input_string, $code, $expected_output, $description) = @_;
+
+    my $result = _pir_stdin_output_slurp($input_string, $code, $expected_output);
     Test::More::is($result, $expected_output, $description);
 }
 
 sub pir_stdin_output_like {
     my ($input_string, $code, $expected_output, $description) = @_;
 
-    my $stuff = sub {
-        # Put the string on a file.
-        my $string = shift;
-
-        my (undef, $file) = create_tempfile(UNLINK => 1);
-        open(my $out, '>', $file) or die "bug";
-        binmode $out;
-        print $out $string;
-        return $file;
-    };
-
-    # Write the input and code strings.
-    my $input_file = $stuff->($input_string);
-    my $code_file = $stuff->($code);
-
-    my $parrot = ".$PConfig{slash}parrot$PConfig{exe}";
-    # Slurp and compare the output.
-    my $result = do {
-        local $/;
-        open(my $in, '-|', "$parrot $code_file 2>&1 < $input_file")
-            or die "bug";
-        <$in>;
-    };
+    my $result = _pir_stdin_output_slurp($input_string, $code, $expected_output);
     Test::More::like($result, $expected_output, $description);
 }
 
