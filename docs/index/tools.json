@@ -45,7 +45,6 @@
       },
       {
          "source" : [
-            "tools/dev/list_unjitted.pl",
             "tools/dev/gen_class.pl",
             "tools/dev/nm.pl",
             "tools/dev/ncidef2pasm.pl",
