@@ -126,7 +126,7 @@ Parrot_io_socket_is_closed(SHIM_INTERP, ARGMOD(PMC *socket))
 
 /*
 
-=item C<void Parrot_io_socket_initialize_handle(SHIM_INTERP, ARGMOD(PMC *socket))
+=item C<void Parrot_io_socket_initialize_handle(SHIM_INTERP, ARGMOD(PMC *socket))>
 
 Initialize a Socket PMC
 
