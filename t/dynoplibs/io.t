@@ -20,7 +20,7 @@ Tests various io opcodes.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(68)
+    plan(64)
 
     read_on_null()
     open_delegates_to_filehandle_pmc()
