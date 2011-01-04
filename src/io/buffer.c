@@ -558,7 +558,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
 
             size_t bytes_l = s->bufused - decoded_bytes;
             size_t bytes_r = (size_t)got < max_split_bytes
-                           ? got : max_split_bytes;
+                           ? (size_t)got : max_split_bytes;
 
             /* First, copy enough bytes to complete character */
             memcpy(s->strstart + s->bufused, buffer_next, bytes_r);
