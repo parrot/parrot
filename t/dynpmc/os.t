@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -71,20 +71,25 @@ OUT
 
 # test bad cwd
 
-mkdir "test-bad-cwd";
+SKIP:
+{
+    skip 'windows doesn\'t like having the rug pulled from underneath it', 1 if ($MSWin32 || $cygwin);
+    mkdir "test-bad-cwd";
 
-pir_error_output_like( <<'CODE', <<"OUT", 'Test bad cwd' );
-.sub main :main
-        $P0 = loadlib 'os'
-        $P1 = new ['OS']
+    pir_error_output_like( <<'CODE', <<"OUT", 'Test bad cwd' );
+    .sub main :main
+            $P0 = loadlib 'os'
+            $P1 = new ['OS']
 
-        $P1.'chdir'('test-bad-cwd')
-        $P1.'rm'('../test-bad-cwd')
-        $S0 = $P1.'cwd'()
-.end
+            $P1.'chdir'('test-bad-cwd')
+            $P1.'rm'('../test-bad-cwd')
+            $S0 = $P1.'cwd'()
+    .end
 CODE
 /No such file or directory/
 OUT
+}
+
 #  TEST chdir
 chdir "src";
 my $upcwd = File::Spec->canonpath(getcwd);
@@ -257,9 +262,8 @@ ok( !-d $xpto, "Test that rm removed the directory" );
 rmdir $xpto if -d $xpto;    # this way next test doesn't fail if this one does
 
 mkdir "test-bad-rm";
-chdir "test-bad-rm";
-symlink "bad", "bad";
-chdir "..";
+open my $testfile, ">test-bad-rm/bad";
+close $testfile;
 
 pir_output_like( <<'CODE', <<'OUT', 'Test bad rm calls' );
 .sub main :main
@@ -278,7 +282,7 @@ finally1:
 
         $P1."chdir"("..")
         push_eh eh2
-        $P1."rm"('non existent!!!!')
+        $P1."rm"('non-existent-directory')
         say "failed"
         goto finally2
 eh2:
@@ -361,7 +365,7 @@ OUTPUT
 
 # test readdir
 SKIP: {
-    skip 'not implemented on windows yet', 2 if ( $MSWin32 && $MSVC );
+    skip 'not implemented on windows yet', 3 if ( $MSWin32 && $MSVC );
 
     opendir my $IN, 'docs';
     my @entries = readdir $IN;
@@ -380,12 +384,12 @@ SKIP: {
 CODE
 
     mkdir 'silly-dir-with-silly-names';
-    open my $fileh, ">silly-dir-with-silly-names/\xfesillyname";
+    open my $fileh, ">silly-dir-with-silly-names/sillyname\x{263A}";
     close $fileh;
 
-    opendir my $IN, 'silly-dir-with-silly-names';
-    my @entries2 = readdir $IN;
-    closedir $IN;
+    opendir my $IN2, 'silly-dir-with-silly-names';
+    my @entries2 = readdir $IN2;
+    closedir $IN2;
     my $entries2 = join( ' ', @entries2 ) . "\n";
 
     pir_output_is( <<'CODE', $entries2, 'Test OS.readdir with ord >127' );
@@ -400,7 +404,7 @@ CODE
 .end
 CODE
 
-    unlink "silly-dir-with-silly-names/\xfesillyname";
+    unlink "silly-dir-with-silly-names/sillyname\x{263A}";
     rmdir "silly-dir-with-silly-names";
 
     pir_error_output_like( <<'CODE', <<'OUTPUT', 'Test bad OS.readdir' );
@@ -419,22 +423,25 @@ OUTPUT
 open my $FILE, ">", "____some_test_file";
 close $FILE;
 pir_output_is( <<'CODE', <<"OUT", 'Test OS.rename' );
-.loadlib 'io_ops'
 .sub main :main
     $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P1.'rename'('____some_test_file', '___some_other_file')
-    $I0 = stat '___some_other_file', 0
-    print $I0
-    print "\n"
-    $P1.'rm'('___some_other_file')
+    say "ok"
 .end
 CODE
-1
+ok
 OUT
 
+if(-f '___some_other_file')
+{
+    ok(1, "file was really renamed");
+    unlink '___some_other_file';
+} else {
+    ok(0, "file wasn't renamed");
+}
+
 pir_error_output_like( <<'CODE', <<"OUT", 'Test bad OS.rename' );
-.loadlib 'io_ops'
 .sub main :main
     $P0 = loadlib 'os'
     $P1 = new ['OS']
@@ -667,7 +674,7 @@ pir_output_is( <<'CODE', $UID, 'Test get_user_id' );
 CODE
 
 SKIP: {
-    skip 'no file modes on Win32', 6 if $MSWin32;
+    skip 'no file modes on Win32', 6 if ($MSWin32 || $cygwin);
 
     open my $fa, ">", "test_f_a";
     close $fa;
