@@ -25,35 +25,6 @@ as well as backtrace tests.
 
 =cut
 
-sub pir_stdin_error_output_is {
-    my ($input_string, $code, $expected_output, $test_name) = @_;
-
-    my $stuff = sub {
-        # Put the string on a file.
-        my $string = shift;
-
-        my (undef, $file) = create_tempfile(UNLINK => 1);
-        open(my $out, '>', $file) or die "bug";
-        binmode $out;
-        print $out $string;
-        return $file;
-    };
-
-    # Write the input and code strings.
-    my $input_file = $stuff->($input_string);
-    my $code_file = $stuff->($code);
-
-    my $parrot = ".$PConfig{slash}parrot$PConfig{exe}";
-    # Slurp and compare the output.
-    my $result = do {
-        local $/;
-        open(my $in, '-|', "$parrot $code_file 2>&1 < $input_file")
-            or die "bug";
-        <$in>;
-    };
-    Test::More::is($result, $expected_output, $test_name);
-}
-
 $ENV{TEST_PROG_ARGS} ||= '';
 my $nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=fast/
     ? "\\(unknown file\\)\n-1" : "debug_\\d+\\.pasm\n\\d";
@@ -124,7 +95,7 @@ CODE
 /ok/
 OUTPUT
 
-pir_stdin_error_output_is( <<'INPUT', <<'CODE', <<'OUTPUT', "debug_break" );
+pir_stdin_output_like( <<'INPUT', <<'CODE', qr/[(]pdb[)] (print I0\n)?1/, "debug_break" );
 print I0
 quit
 INPUT
@@ -135,12 +106,6 @@ INPUT
     debug_break
 .end
 CODE
-
-(pdb) print I0
-1
-
-(pdb) quit
-OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - Null PMC access" );
 .sub main :main
