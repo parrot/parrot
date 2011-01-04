@@ -437,7 +437,8 @@ if(-f '___some_other_file')
 {
     ok(1, "file was really renamed");
     unlink '___some_other_file';
-} else {
+}
+else {
     ok(0, "file wasn't renamed");
 }
 
