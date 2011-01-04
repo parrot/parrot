@@ -134,6 +134,13 @@ See ticket for list and replacement suggestions.
 
 L<http://trac.parrot.org/parrot/ticket/1931>
 
+=item FixedPMCArray set_pmc vtable [eligible in 3.1]
+
+set_pmc on FPA will be removed. The assign op, which uses this vtable will cease
+to work on this type.
+
+L<http://trac.parrot.org/parrot/ticket/1904>
+
 =back
 
 =head1 Opcodes
