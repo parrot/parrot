@@ -37,6 +37,20 @@ a new F<src/io/io_string.c>.
 #include <stdarg.h>
 
 /* HEADERIZER HFILE: include/parrot/io.h */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_CANNOT_RETURN_NULL
+static const STR_VTABLE * get_encoding(PARROT_INTERP, ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_get_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 
 /*
 
@@ -377,6 +391,36 @@ Parrot_io_flush(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
         Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "flush"), "->");
 }
 
+
+/*
+
+=item C<static const STR_VTABLE * get_encoding(PARROT_INTERP, PMC *pmc)>
+
+Get the encoding vtable of a filehandle PMC
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static const STR_VTABLE *
+get_encoding(PARROT_INTERP, ARGIN(PMC *pmc))
+{
+    ASSERT_ARGS(get_encoding)
+    STRING           *encoding_str;
+    const STR_VTABLE *encoding;
+
+    GETATTR_FileHandle_encoding(interp, pmc, encoding_str);
+
+    if (STRING_IS_NULL(encoding_str))
+        encoding = Parrot_default_encoding_ptr;
+    else
+        encoding = Parrot_find_encoding_by_string(interp, encoding_str);
+
+    return encoding;
+}
+
+
 /*
 
 =item C<STRING * Parrot_io_reads(PARROT_INTERP, PMC *pmc, size_t length)>
@@ -387,7 +431,6 @@ PMC. Calls the C<read> method on the filehandle PMC.
 =cut
 
 */
-
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -401,30 +444,71 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Attempt to read from null or invalid PMC");
     if (pmc->vtable->base_type == enum_class_FileHandle) {
-        INTVAL ignored;
-        INTVAL flags;
-        STRING *encoding_str;
+        INTVAL            bytes_read;
+        INTVAL            flags;
+        const STR_VTABLE *encoding;
+
         GETATTR_FileHandle_flags(interp, pmc, flags);
-        GETATTR_FileHandle_encoding(interp, pmc, encoding_str);
 
         if (Parrot_io_is_closed_filehandle(interp, pmc)
         || !(flags & PIO_F_READ))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot read from a closed or non-readable filehandle");
 
-        result = Parrot_str_new_noinit(interp, length);
-        result->bufused = length;
+        encoding = get_encoding(interp, pmc);
 
-        if (Parrot_str_equal(interp, encoding_str, CONST_STRING(interp, "utf8")))
-            ignored = Parrot_io_read_utf8(interp, pmc, &result);
+        /* Round up length to unit size of encoding */
+        if (encoding->bytes_per_unit > 1)
+            length = (length + encoding->bytes_per_unit - 1)
+                   & ~(encoding->bytes_per_unit - 1);
+
+        result           = Parrot_str_new_noinit(interp, length);
+        result->bufused  = length;
+        result->encoding = encoding;
+        bytes_read       = Parrot_io_read_buffer(interp, pmc, &result);
+
+        if (bytes_read & (encoding->bytes_per_unit - 1))
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_CHARACTER,
+                "Unaligned end in %s string\n", encoding->name);
+
+        if (encoding->bytes_per_unit == encoding->max_bytes_per_codepoint) {
+            STRING_scan(interp, result);
+        }
         else {
-            ignored = Parrot_io_read_buffer(interp, pmc, &result);
+            Parrot_String_Bounds bounds;
+            INTVAL               needed;
 
-            if (!STRING_IS_NULL(encoding_str))
-                result->encoding = Parrot_get_encoding(interp,
-                    Parrot_encoding_number(interp, encoding_str));
+            bounds.bytes = result->bufused;
+            bounds.chars = -1;
+            bounds.delim = -1;
 
-            result->strlen = STRING_scan(interp, result);
+            needed = encoding->partial_scan(interp, result->strstart, &bounds);
+
+            result->bufused = bounds.bytes;
+            result->strlen  = bounds.chars;
+
+            /* Read and append remaining bytes in case of a partial result */
+            if (needed > 0) {
+                INTVAL  rest_read, total_bytes;
+                STRING *rest = Parrot_str_new_init(interp, NULL, needed,
+                                    Parrot_binary_encoding_ptr, 0);
+
+                rest->bufused = needed;
+                rest_read     = Parrot_io_read_buffer(interp, pmc, &rest);
+
+                if (rest_read < needed)
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_CHARACTER,
+                        "Unaligned end in %s string\n", encoding->name);
+
+                total_bytes = bytes_read + needed;
+                Parrot_gc_reallocate_string_storage(interp, result, total_bytes);
+                mem_sys_memcopy(result->strstart + bytes_read, rest->strstart, needed);
+
+                result->bufused  = total_bytes;
+                result->strlen  += 1;
+            }
         }
     }
     else if (pmc->vtable->base_type == enum_class_StringHandle) {
@@ -481,15 +565,20 @@ Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(Parrot_io_readline)
     STRING *result;
     if (pmc->vtable->base_type == enum_class_FileHandle) {
-        INTVAL flags;
-        if (Parrot_io_is_closed_filehandle(interp, pmc))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot read from a closed filehandle");
-        GETATTR_FileHandle_flags(interp, pmc, flags);
-        if (!(flags & PIO_F_LINEBUF))
-            Parrot_io_setlinebuf(interp, pmc);
+        INTVAL            flags;
+        size_t            ignored;
 
-        result = Parrot_io_reads(interp, pmc, 0);
+        GETATTR_FileHandle_flags(interp, pmc, flags);
+
+        if (Parrot_io_is_closed_filehandle(interp, pmc)
+        || !(flags & PIO_F_READ))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Cannot read from a closed or non-readable filehandle");
+
+        result = Parrot_str_new_init(interp, NULL, 0,
+                                     get_encoding(interp, pmc), 0);
+
+        ignored = Parrot_io_readline_buffer(interp, pmc, &result);
     }
     else if (pmc->vtable->base_type == enum_class_StringHandle) {
         INTVAL offset, newline_pos, read_length, orig_length;
@@ -698,7 +787,10 @@ Parrot_io_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Cannot write to null PMC");
     if (pmc->vtable->base_type == enum_class_FileHandle) {
-        INTVAL flags;
+        INTVAL            flags;
+        STRING           *encoding_str;
+        const STR_VTABLE *encoding;
+
         GETATTR_FileHandle_flags(interp, pmc, flags);
 
         if (!(flags & PIO_F_WRITE))
@@ -706,10 +798,24 @@ Parrot_io_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
                 "FileHandle is not opened for writing");
         if (STRING_IS_NULL(s))
             return 0;
-        if (Parrot_io_is_encoding(interp, pmc, CONST_STRING(interp, "utf8")))
-            result = Parrot_io_write_utf8(interp, pmc, s);
-        else
-            result = Parrot_io_write_buffer(interp, pmc, s);
+
+        GETATTR_FileHandle_encoding(interp, pmc, encoding_str);
+
+        /*
+         * If no encoding is set, the binary representation of the string
+         * is written as is. It might be better to use a default encoding
+         * in that case.
+         */
+
+        if (!STRING_IS_NULL(encoding_str)) {
+            encoding = Parrot_find_encoding_by_string(interp, encoding_str);
+
+            if (encoding != s->encoding
+            &&  encoding != Parrot_binary_encoding_ptr)
+                s = encoding->to_encoding(interp, s);
+        }
+
+        result = Parrot_io_write_buffer(interp, pmc, s);
     }
     else
         Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "puts"), "S->I", s, &result);

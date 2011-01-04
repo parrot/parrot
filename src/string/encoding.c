@@ -16,6 +16,7 @@ These are parrot's generic encoding handling functions
 */
 
 #include "parrot/encoding.h"
+#include "encoding.str"
 
 STR_VTABLE *Parrot_default_encoding_ptr = NULL;
 
@@ -79,7 +80,7 @@ Parrot_new_encoding(PARROT_INTERP)
 =item C<const STR_VTABLE * Parrot_find_encoding(PARROT_INTERP, const char
 *encodingname)>
 
-Finds an encoding with the name C<encodingname>. Returns the encoding
+Finds an encoding with the C string name C<encodingname>. Returns the encoding
 if it is successfully found, returns NULL otherwise.
 
 =cut
@@ -107,6 +108,47 @@ Parrot_find_encoding(SHIM_INTERP, ARGIN(const char *encodingname))
 
     return NULL;
 }
+
+
+/*
+
+=item C<const STR_VTABLE * Parrot_find_encoding_by_string(PARROT_INTERP, STRING
+*encodingname)>
+
+Finds an encoding with the STRING name C<encodingname>. Returns the encoding
+if it is successfully found, throws an exception otherwise. Returns the
+default encoding for the NULL string.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+const STR_VTABLE *
+Parrot_find_encoding_by_string(PARROT_INTERP, ARGIN(STRING *encodingname))
+{
+    ASSERT_ARGS(Parrot_find_encoding_by_string)
+    const int n = n_encodings;
+    int i;
+
+    if (STRING_IS_NULL(encodingname))
+        return Parrot_default_encoding_ptr;
+
+    for (i = 0; i < n; ++i)
+        if (STRING_equal(interp, encodings[i]->name_str, encodingname))
+            return encodings[i];
+
+    /* backwards compatibility */
+    if (STRING_equal(interp, encodingname, CONST_STRING(interp, "unicode")))
+        return Parrot_utf8_encoding_ptr;
+
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
+            "invalid encoding '%Ss'", encodingname);
+}
+
 
 /*
 
@@ -305,6 +347,7 @@ Parrot_str_internal_register_encoding_names(PARROT_INTERP)
     for (n = 0; n < n_encodings; ++n)
         encodings[n]->name_str =
             Parrot_str_new_constant(interp, encodings[n]->name);
+    /* Can't use CONST_STRING here, not setup yet? */
     unicode_str = Parrot_str_new_constant(interp, "unicode");
     fixed_8_str = Parrot_str_new_constant(interp, "fixed_8");
 }

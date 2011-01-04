@@ -69,20 +69,21 @@ Initializes a newly created FileHandle object.
         Parrot_FileHandle_attributes * const attrs =
             PMC_data_typed(SELF, Parrot_FileHandle_attributes *);
 
-        attrs->flags         = 0;
-        attrs->filename      = NULL;
-        attrs->mode          = NULL;
-        attrs->encoding      = NULL;
-        attrs->process_id    = 0;
-        attrs->exit_status   = 0;
-        attrs->file_size     = 0;
-        attrs->file_pos      = piooffsetzero;
-        attrs->last_pos      = piooffsetzero;
-        attrs->buffer_size   = 0;
-        attrs->buffer_flags  = 0;
-        attrs->buffer_start  = NULL;
-        attrs->buffer_end    = NULL;
-        attrs->buffer_next   = NULL;
+        attrs->record_separator = '\n';
+        attrs->flags            = 0;
+        attrs->filename         = NULL;
+        attrs->mode             = NULL;
+        attrs->encoding         = NULL;
+        attrs->process_id       = 0;
+        attrs->exit_status      = 0;
+        attrs->file_size        = 0;
+        attrs->file_pos         = piooffsetzero;
+        attrs->last_pos         = piooffsetzero;
+        attrs->buffer_size      = 0;
+        attrs->buffer_flags     = 0;
+        attrs->buffer_start     = NULL;
+        attrs->buffer_end       = NULL;
+        attrs->buffer_next      = NULL;
 
         /* Initialize the os_handle to the platform-specific value for closed */
         attrs->os_handle     = (PIOHANDLE) PIO_INVALID_HANDLE;
@@ -374,7 +375,7 @@ Read a line from the filehandle and return it in a string.
             if (*r)
                 add_history(r);
             if (!STRING_IS_NULL(encoding))
-                enc = Parrot_get_encoding(INTERP, Parrot_encoding_number(INTERP, encoding));
+                enc = Parrot_find_encoding_by_string(INTERP, encoding);
             if (enc == NULL)
                 string_result = Parrot_str_new(INTERP, r, 0);
             else
@@ -474,15 +475,11 @@ filehandle when finished.
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot readall without a file name or open filehandle");
 
-            /* Do line buffering on the filehandle */
-            if (!(PARROT_FILEHANDLE(SELF)->flags & PIO_F_LINEBUF))
-                Parrot_io_setlinebuf(INTERP, SELF);
-
             sb = Parrot_pmc_new_init_int(interp, enum_class_StringBuilder,
                     4096);
 
             do {
-                STRING * const part = Parrot_io_reads(INTERP, SELF, 0);
+                STRING * const part = Parrot_io_reads(INTERP, SELF, 4096);
                 VTABLE_push_string(interp, sb, part);
             } while (!Parrot_io_eof(INTERP, SELF));
 

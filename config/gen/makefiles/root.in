@@ -428,7 +428,6 @@ ENCODING_O_FILES = \
 IO_O_FILES = \
     src/io/core$(O) \
     src/io/api$(O) \
-    src/io/utf8$(O) \
     src/io/buffer$(O) \
     src/io/unix$(O) \
     src/io/win32$(O) \
@@ -706,6 +705,7 @@ STR_FILES = \
     src/spf_render.str \
     src/spf_vtable.str \
     src/string/api.str \
+    src/string/encoding.str \
     src/sub.str \
     src/embed.str \
     \
@@ -1561,15 +1561,13 @@ src/io/api$(O) : \
     $(INC_DIR)/extend.h \
     $(INC_DIR)/extend_vtable.h
 
-src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c
+src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c \
+    include/pmc/pmc_handle.h
 
 src/io/portable$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/portable.c
 
 src/io/unix$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
     include/pmc/pmc_filehandle.h src/io/unix.c
-
-src/io/utf8$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/string/unicode.h \
-    src/io/utf8.c
 
 src/io/win32$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
     include/pmc/pmc_filehandle.h src/io/win32.c
@@ -1747,7 +1745,8 @@ src/spf_vtable$(O) : $(PARROT_H_HEADERS) src/spf_vtable.str src/spf_vtable.c
 
 src/string/encoding$(O) : \
     $(PARROT_H_HEADERS) \
-    src/string/encoding.c
+    src/string/encoding.c \
+    src/string/encoding.str
 
 src/string/encoding/tables$(O) : \
     $(PARROT_H_HEADERS) \
@@ -1786,25 +1785,25 @@ src/string/encoding/utf8$(O) : \
     $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/utf8.c \
-    src/string/unicode.h
+    src/string/encoding/unicode.h
 
 src/string/encoding/utf16$(O) : \
     $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/utf16.c \
-    src/string/unicode.h
+    src/string/encoding/unicode.h
 
 src/string/encoding/ucs2$(O) : \
     $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/ucs2.c \
-    src/string/unicode.h
+    src/string/encoding/unicode.h
 
 src/string/encoding/ucs4$(O) : \
     $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/ucs4.c \
-    src/string/unicode.h
+    src/string/encoding/unicode.h
 
 frontend/pbc_merge/main$(O) : \
     $(INC_DIR)/embed.h \
