@@ -7,7 +7,7 @@ use lib qw( . lib ../lib ../../lib );
 use Parrot::Test tests => 3;
 
 pir_2_pasm_is( <<'CODE', <<'OUT', "unreachable 1" );
-.sub _test
+.sub _test :main
    print "ok\n"
    end
    noop
@@ -22,7 +22,7 @@ _test:
 OUT
 
 pir_2_pasm_is( <<'CODE', <<'OUT', "unreachable 2" );
-.sub _test
+.sub _test :main
   print "ok\n"
   end
   noop
@@ -37,7 +37,7 @@ _test:
 OUT
 
 pir_2_pasm_is( <<'CODE', <<'OUT', "unreachable 3" );
-.sub _test
+.sub _test :main
   goto L
   print "ok\n"
 L:
