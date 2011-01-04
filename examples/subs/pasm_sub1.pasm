@@ -24,6 +24,7 @@ F<docs/pdds/pdd03_calling_conventions.pod>
 
 =cut
 
+.pcc_sub :main main:
     # Fetch a subroutine object
     .const 'Sub' P0 = "_sub"
 

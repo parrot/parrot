@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, Parrot Foundation.
+# Copyright (C) 2005-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -122,11 +122,11 @@ sub runstep {
     # This version uses the -lparrot in the build directory.
     unless ( defined( $conf->data->get('libparrot_linkflags') ) ) {
         $conf->data->set(libparrot_linkflags =>
-        '-L'
+        '-L"'
         . $conf->data->get('build_dir')
         . '/'
         . $conf->data->get('blib_dir')
-        . ' -lparrot'
+        . '" -lparrot'
         );
     }
 

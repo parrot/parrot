@@ -44,7 +44,7 @@ BEGIN {
         plan skip_all => "pbc_dump hasn't been built. Run make parrot_utils";
         exit(0);
     }
-    plan tests => 13;
+    plan tests => 16;
 }
 
 dump_output_like( <<PIR, "pir", [qr/CONSTANT_t/, qr/BYTECODE_t/], 'pbc_dump basic sanity');
@@ -108,7 +108,7 @@ close $INC2;
 open my $INC3, '>', "inc_c.pir";
 print $INC3 <<'EOF';
 .namespace [ 'TclDict' ]
-.sub class_init :anon :load
+.sub class_init :anon :load :main
     say "wut"
 .end
 EOF
@@ -125,6 +125,24 @@ PIR
 unlink('inc_a.pir');
 unlink('inc_b.pir');
 unlink('inc_c.pir');
+
+my $annotated_pir = <<'PIR';
+.sub 'main' :main
+  .annotate 'line', 1
+  .annotate 'hello', 'world'
+  .local int i
+  i = 123
+  .annotate 'hello', 'dragon'
+  .annotate 'line', 441
+  dec i
+  .annotate 'goodbye', 'cactus'
+  .annotate 'num', 12.9
+.end
+PIR
+
+dump_output_like($annotated_pir, "pir", qr/_ANN/s, 'dump output contains annotations segments');
+dump_output_like($annotated_pir, "pir", qr/NAME => line.*NAME => hello.*NAME => goodbye/s, 'annotation names are present');
+dump_output_like($annotated_pir, "pir", qr/dragon/s, 'annotation values are present');
 
 =head1 HELPER SUBROUTINES
 

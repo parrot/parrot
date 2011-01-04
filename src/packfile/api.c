@@ -732,36 +732,21 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
             run_sub(interp, sub_pmc);
         }
         break;
-      default:
-        if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MAIN) {
-            if ((interp->resume_flag   &  RESUME_INITIAL)
-             &&  interp->resume_offset == 0) {
-                void           *ptr   = VTABLE_get_pointer(interp, sub_pmc);
-                const ptrdiff_t code  = (ptrdiff_t) sub->seg->base.data;
 
-                interp->resume_offset = ((ptrdiff_t)ptr - code)
-                                      / sizeof (opcode_t *);
-
-                PObj_get_FLAGS(sub_pmc)      &= ~SUB_FLAG_PF_MAIN;
-                Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), sub_pmc);
-            }
-            else {
-                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
-                                ":main sub not allowed\n");
-            }
-        }
-
-        /* run :init tagged functions */
-        if (action == PBC_MAIN && Sub_comp_INIT_TEST(sub)) {
-            /* if loaded no need for init */
+      case PBC_MAIN:
+        /* run :init/:load tagged functions */
+        if (Sub_comp_INIT_TEST(sub)
+        ||  PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_LOAD) {
+            /* only run :init/:load subs once */
             Sub_comp_INIT_CLEAR(sub);
-
-            /* if inited no need for load */
             PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
 
             run_sub(interp, sub_pmc);
             interp->resume_flag = RESUME_INITIAL;
         }
+        break;
+
+      default:
         break;
     }
 
@@ -886,7 +871,6 @@ mark_const_subs(PARROT_INTERP)
     }
 }
 
-
 /*
 
 =item C<void do_sub_pragmas(PARROT_INTERP, PackFile_ByteCode *self,
@@ -942,6 +926,184 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
             }
         }
     }
+
+    if (interp->resume_flag & RESUME_INITIAL) {
+        if (action == PBC_PBC
+        ||  action == PBC_MAIN) {
+            if (self->main_sub < 0)
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+                    "No main sub found");
+            {
+                PMC  *main            = ct->pmc.constants[self->main_sub];
+                Parrot_Sub_attributes *main_attrs;
+                opcode_t *ptr         = (opcode_t *)VTABLE_get_pointer(interp, main);
+                PMC_get_sub(interp, main, main_attrs);
+                interp->resume_offset = (ptr - main_attrs->seg->base.data);
+                Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), main);
+            }
+        }
+    }
+}
+
+/*
+
+=item C<void PackFile_Header_validate(PARROT_INTERP, const PackFile_Header
+*self, INTVAL pf_options)>
+
+Validates a C<PackFile_Header>, ensuring that the magic number is valid and
+that Parrot can read this bytecode version.
+
+Raises an exception if the header doesn't validate.
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+PackFile_Header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
+                INTVAL pf_options)
+{
+    ASSERT_ARGS(PackFile_Header_validate)
+
+    /* Ensure the magic is correct. */
+    if (memcmp(self->magic, "\376PBC\r\n\032\n", 8) != 0) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+        "PackFile_Header_validate: This is not a valid Parrot bytecode file.");
+    }
+
+    /* Ensure the bytecode version is one we can read. Currently, we only
+     * support bytecode versions matching the current one.
+     *
+     * tools/dev/pbc_header.pl --upd t/native_pbc/(ASTERISK).pbc
+     * stamps version and fingerprint in the native tests.
+     * NOTE: (ASTERISK) is *, we don't want to fool the C preprocessor. */
+    if (self->bc_major != PARROT_PBC_MAJOR
+    ||  self->bc_minor != PARROT_PBC_MINOR) {
+        if (!(pf_options & PFOPT_UTILS))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PARROT_USAGE_ERROR,
+                    "PackFile_Header_validate: This Parrot cannot read bytecode "
+                    "files with version %d.%d.",
+                    self->bc_major, self->bc_minor);
+    }
+
+    /* Check wordsize, byte order and floating point number type are valid. */
+    if (self->wordsize != 4 && self->wordsize != 8) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "PackFile_Header_validate: Invalid wordsize %d\n", self->wordsize);
+    }
+
+    if (self->byteorder != 0 && self->byteorder != 1) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "PackFile_Header_validate: Invalid byte ordering %d\n", self->byteorder);
+    }
+
+    if (self->floattype > FLOATTYPE_MAX) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "PackFile_Header_validate: Invalid floattype %d\n", self->floattype);
+    }
+}
+
+
+/*
+
+=item C<void PackFile_Header_read_uuid(PARROT_INTERP, PackFile_Header *self,
+const opcode_t *packed, size_t packed_size)>
+
+Reads a C<PackFile_Header>'s UUID from a block of memory and verifies that it is valid.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+PackFile_Header_read_uuid(PARROT_INTERP, ARGMOD(PackFile_Header *self),
+                ARGIN(const opcode_t *packed), size_t packed_size)
+{
+    ASSERT_ARGS(PackFile_Header_read_uuid)
+
+    /* Check the UUID type is valid and, if needed, read a UUID. */
+    if (self->uuid_type == 0) {
+        /* No UUID; fine, nothing more to do. */
+    }
+    else if (self->uuid_type == 1) {
+        if (packed_size < (size_t) PACKFILE_HEADER_BYTES + self->uuid_size) {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                "PackFile_Header_read_uuid: Buffer length %d is shorter than PACKFILE_HEADER_BYTES "
+                "+ uuid_size %d\n", packed_size, PACKFILE_HEADER_BYTES + self->uuid_size);
+        }
+
+        /* Read in the UUID. We'll put it in a NULL-terminated string, just in
+         * case people use it that way. */
+        self->uuid_data = mem_gc_allocate_n_typed(interp,
+                self->uuid_size + 1, unsigned char);
+
+        memcpy(self->uuid_data, packed + PACKFILE_HEADER_BYTES,
+                self->uuid_size);
+
+        /* NULL terminate */
+        self->uuid_data[self->uuid_size] = '\0';
+    }
+    else
+        /* Don't know this UUID type. */
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "PackFile_unpack: Invalid UUID type %d\n", self->uuid_type);
+}
+
+
+/*
+
+=item C<int PackFile_Header_unpack(PARROT_INTERP, PackFile_Header *self, const
+opcode_t *packed, size_t packed_size, INTVAL pf_options)>
+
+Unpacks a C<PackFile_Header> from a block of memory and perform some validation
+to check that the head is correct.
+
+Returns size of unpacked header.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+int
+PackFile_Header_unpack(PARROT_INTERP, ARGMOD(PackFile_Header *self),
+                ARGIN(const opcode_t *packed), size_t packed_size,
+                INTVAL pf_options)
+{
+    ASSERT_ARGS(PackFile_Header_unpack)
+
+    /* Verify that the packfile isn't too small to contain a proper header */
+    if (packed_size < PACKFILE_HEADER_BYTES) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+        "PackFile_unpack: Buffer length %d is shorter than PACKFILE_HEADER_BYTES %d.",
+            packed_size, PACKFILE_HEADER_BYTES);
+    }
+
+    /* Extract the header. */
+    memcpy(self, packed, PACKFILE_HEADER_BYTES);
+
+    /* Validate the header. */
+    PackFile_Header_validate(interp, self, pf_options);
+
+    /* Extract the header's UUID. */
+    PackFile_Header_read_uuid(interp, self, packed, packed_size)
+
+    /* Describe what was read for debugging. */
+    TRACE_PRINTF(("PackFile_Header_unpack: Wordsize %d.\n", self->wordsize));
+    TRACE_PRINTF(("PackFile_Header_unpack: Floattype %d (%s).\n",
+                  self->floattype,
+                  self->floattype == FLOATTYPE_8
+                      ? FLOATTYPE_8_NAME
+                      : self->floattype == FLOATTYPE_16
+                          ? FLOATTYPE_16_NAME
+                          : FLOATTYPE_12_NAME));
+    TRACE_PRINTF(("PackFile_Header_unpack: Byteorder %d (%sendian).\n",
+                  self->byteorder, self->byteorder ? "big " : "little-"));
+
+    /* Return the number of bytes in the header */
+    return PACKFILE_HEADER_BYTES + self->uuid_size;
 }
 
 
@@ -975,104 +1137,15 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     PackFile        * const pf  = self;
 #endif
 
-    if (packed_size < PACKFILE_HEADER_BYTES) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: "
-            "Buffer length %d is shorter than PACKFILE_HEADER_BYTES %d\n",
-            packed_size, PACKFILE_HEADER_BYTES);
-        return 0;
-    }
-
     self->src  = packed;
     self->size = packed_size;
 
-    /* Extract the header. */
-    memcpy(header, packed, PACKFILE_HEADER_BYTES);
-
-    /* Ensure the magic is correct. */
-    if (memcmp(header->magic, "\376PBC\r\n\032\n", 8) != 0) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: "
-            "This is not a valid Parrot bytecode file\n");
-        return 0;
-    }
-
-    /* Ensure the bytecode version is one we can read. Currently, we only
-     * support bytecode versions matching the current one.
-     *
-     * tools/dev/pbc_header.pl --upd t/native_pbc/(ASTERISK).pbc
-     * stamps version and fingerprint in the native tests.
-     * NOTE: (ASTERISK) is *, we don't want to fool the C preprocessor. */
-    if (header->bc_major != PARROT_PBC_MAJOR
-    ||  header->bc_minor != PARROT_PBC_MINOR) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: This Parrot cannot read "
-            "bytecode files with version %d.%d.\n",
-            header->bc_major, header->bc_minor);
-        if (!(self->options & PFOPT_UTILS))
-            return 0;
-    }
-
-    /* Check wordsize, byte order and floating point number type are valid. */
-    if (header->wordsize != 4 && header->wordsize != 8) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: Invalid wordsize %d\n",
-                    header->wordsize);
-        return 0;
-    }
-
-    if (header->byteorder != 0 && header->byteorder != 1) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: Invalid byte ordering %d\n",
-                    header->byteorder);
-        return 0;
-    }
-
-    if (header->floattype > FLOATTYPE_MAX) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: Invalid floattype %d\n",
-                    header->floattype);
-        return 0;
-    }
-
-    /* Describe what was read for debugging. */
-    TRACE_PRINTF(("PackFile_unpack: Wordsize %d.\n", header->wordsize));
-    TRACE_PRINTF(("PackFile_unpack: Floattype %d (%s).\n",
-                  header->floattype,
-                  header->floattype == FLOATTYPE_8
-                      ? FLOATTYPE_8_NAME
-                      : header->floattype == FLOATTYPE_16
-                          ? FLOATTYPE_16_NAME
-                          : FLOATTYPE_12_NAME));
-    TRACE_PRINTF(("PackFile_unpack: Byteorder %d (%sendian).\n",
-                  header->byteorder, header->byteorder ? "big " : "little-"));
-
-    /* Check the UUID type is valid and, if needed, read a UUID. */
-    if (header->uuid_type == 0) {
-        /* No UUID; fine, nothing more to do. */
-    }
-    else if (header->uuid_type == 1) {
-        if (packed_size < (size_t) PACKFILE_HEADER_BYTES + header->uuid_size) {
-            Parrot_io_eprintf(NULL, "PackFile_unpack: "
-                    "Buffer length %d is shorter than PACKFILE_HEADER_BYTES + uuid_size %d\n",
-                    packed_size, PACKFILE_HEADER_BYTES + header->uuid_size);
-            return 0;
-        }
-
-
-        /* Read in the UUID. We'll put it in a NULL-terminated string, just in
-         * case people use it that way. */
-        header->uuid_data = mem_gc_allocate_n_typed(interp,
-                header->uuid_size + 1, unsigned char);
-
-        memcpy(header->uuid_data, packed + PACKFILE_HEADER_BYTES,
-                header->uuid_size);
-
-        /* NULL terminate */
-        header->uuid_data[header->uuid_size] = '\0';
-    }
-    else
-        /* Don't know this UUID type. */
-        Parrot_io_eprintf(NULL, "PackFile_unpack: Invalid UUID type %d\n",
-                    header->uuid_type);
+    /* Unpack the header */
+    header_read_length = PackFile_Header_unpack(interp, self->header, packed,
+                packed_size, self->options);
 
     /* Set cursor to position after what we've read, allowing for padding to a
      * 16 byte boundary. */
-    header_read_length  = PACKFILE_HEADER_BYTES + header->uuid_size;
     header_read_length += PAD_16_B(header_read_length);
     cursor              = packed + (header_read_length / sizeof (opcode_t));
     TRACE_PRINTF(("PackFile_unpack: pad=%d\n",
@@ -1088,9 +1161,9 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     header->dir_format = PF_fetch_opcode(self, &cursor);
 
     if (header->dir_format != PF_DIR_FORMAT) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: Dir format was %d not %d\n",
-                    header->dir_format, PF_DIR_FORMAT);
-        return 0;
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "PackFile_unpack: Dir format was %d not %d\n",
+            header->dir_format, PF_DIR_FORMAT);
     }
 
     /* Padding. */
@@ -1230,47 +1303,6 @@ PackFile_find_segment(PARROT_INTERP, ARGIN_NULLOK(PackFile_Directory *dir),
                         return seg;
                 }
             }
-        }
-    }
-
-    return NULL;
-}
-
-
-/*
-
-=item C<PackFile_Segment * PackFile_remove_segment_by_name(PARROT_INTERP,
-PackFile_Directory *dir, STRING *name)>
-
-Finds, removes, and returns the segment with name C<name> in the
-C<PackFile_Directory>.  The caller is responsible for destroying the segment.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PackFile_Segment *
-PackFile_remove_segment_by_name(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
-                                ARGIN(STRING *name))
-{
-    ASSERT_ARGS(PackFile_remove_segment_by_name)
-    size_t i;
-
-    for (i = 0; i < dir->num_segments; ++i) {
-        PackFile_Segment * const seg = dir->segments[i];
-        if (STRING_equal(interp, seg->name, name)) {
-            dir->num_segments--;
-
-            if (i != dir->num_segments) {
-                /* We're not the last segment, so we need to move things */
-                memmove(&dir->segments[i], &dir->segments[i+1],
-                       (dir->num_segments - i) * sizeof (PackFile_Segment *));
-            }
-
-            return seg;
         }
     }
 
@@ -1501,9 +1533,8 @@ default_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode
     self->data = mem_gc_allocate_n_typed(interp, self->size, opcode_t);
 
     if (!self->data) {
-        Parrot_io_eprintf(NULL, "PackFile_unpack: Unable to allocate data memory!\n");
-        self->size = 0;
-        return NULL;
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
+            "PackFile_unpack: Unable to allocate data memory!\n");
     }
 
     if (!self->pf->need_endianize && !self->pf->need_wordsize) {
@@ -2089,10 +2120,10 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         opcode = PF_fetch_opcode(pf, &pos);
 
         if (seg->op_count != opcode) {
-            Parrot_io_eprintf(interp,
-                     "%Ss: Size in directory %d doesn't match size %d "
-                     "at offset 0x%x\n", seg->name, (int)seg->op_count,
-                     (int)opcode, (int)seg->file_offset);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                "%Ss: Size in directory %d doesn't match size %d "
+                "at offset 0x%x\n", seg->name, (int)seg->op_count,
+                (int)opcode, (int)seg->file_offset);
         }
 
         if (i) {
@@ -2131,9 +2162,8 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         pos    = PackFile_Segment_unpack(interp, dir->segments[i], cursor);
 
         if (!pos) {
-            Parrot_io_eprintf(interp, "PackFile_unpack segment '%Ss' failed\n",
-                    dir->segments[i]->name);
-            return NULL;
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                "PackFile_unpack segment '%Ss' failed\n", dir->segments[i]->name);
         }
         else {
             TRACE_PRINTF_VAL(("PackFile_Segment_unpack ok. pos=0x%x\n", pos));
@@ -2579,7 +2609,8 @@ static PackFile_Segment *
 byte_code_new(PARROT_INTERP, SHIM(PackFile *pf), SHIM(STRING *name), SHIM(int add))
 {
     ASSERT_ARGS(byte_code_new)
-    PackFile_ByteCode * const byte_code = mem_gc_allocate_zeroed_typed(interp, PackFile_ByteCode);
+    PackFile_ByteCode *byte_code = mem_gc_allocate_zeroed_typed(interp, PackFile_ByteCode);
+    byte_code->main_sub          = -1;
 
     return (PackFile_Segment *) byte_code;
 }
@@ -2607,7 +2638,7 @@ byte_code_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *self))
     int i;
     unsigned int u;
 
-    size = 3; /* op_count + n_libs + n_libdeps*/
+    size = 4; /* main_sub + op_count + n_libs + n_libdeps*/
 
     for (u = 0; u < byte_code->n_libdeps; u++)
         size += PF_size_string(byte_code->libdeps[u]);
@@ -2647,6 +2678,8 @@ byte_code_pack(SHIM_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cur
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
     int i;
     unsigned int u;
+
+    *cursor++ = byte_code->main_sub;
 
     *cursor++ = byte_code->n_libdeps;
     *cursor++ = byte_code->op_count;
@@ -2698,6 +2731,8 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
     int i;
     unsigned int u;
     size_t total_ops = 0;
+
+    byte_code->main_sub          = PF_fetch_opcode(self->pf, &cursor);
 
     byte_code->n_libdeps         = PF_fetch_opcode(self->pf, &cursor);
     byte_code->libdeps           = mem_gc_allocate_n_zeroed_typed(interp,
@@ -3203,44 +3238,6 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug),
 
 /*
 
-=item C<void Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)>
-
-Switches the current bytecode segment to the segment keyed by number C<seg>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)
-{
-    ASSERT_ARGS(Parrot_switch_to_cs_by_nr)
-    const PackFile_Directory * const dir      = interp->code->base.dir;
-    const size_t                     num_segs = dir->num_segments;
-
-    size_t   i;
-    opcode_t n;
-
-    /* TODO make an index of code segments for faster look up */
-    for (i = n = 0; i < num_segs; ++i) {
-        if (dir->segments[i]->type == PF_BYTEC_SEG) {
-            if (n == seg) {
-                Parrot_switch_to_cs(interp, (PackFile_ByteCode *)
-                        dir->segments[i], 1);
-                return;
-            }
-            ++n;
-        }
-    }
-
-    Parrot_ex_throw_from_c_args(interp, NULL, 1,
-        "Segment number %d not found\n", (int)seg);
-}
-
-
-/*
-
 =item C<PackFile_ByteCode * Parrot_switch_to_cs(PARROT_INTERP, PackFile_ByteCode
 *new_cs, int really)>
 
@@ -3541,10 +3538,8 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
     return cursor;
 
   err:
-    Parrot_io_eprintf(interp,
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
         "PackFile_ConstTable_unpack: Could not allocate memory for array!\n");
-    PackFile_ConstTable_clear(interp, self);
-    return NULL;
 }
 
 

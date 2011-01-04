@@ -7,7 +7,8 @@ src/embed.c - The Parrot embedding interface
 
 =head1 DESCRIPTION
 
-This file implements the Parrot embedding interface.
+This file implements the old Parrot embedding interface.  Its days are
+numbered.  You probably want src/embed/api.c
 
 =head2 Functions
 
@@ -1155,7 +1156,7 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code)
 length, const unsigned char *bytes)>
 
 Legacy function for setting the configuration hash as an array of bytes for
-the old API. New programs should not use this. They should use he new API and
+the old API. New programs should not use this. They should use the new API and
 C<Parrot_api_set_configuration_hash>
 
 =cut
@@ -1165,7 +1166,7 @@ C<Parrot_api_set_configuration_hash>
 PARROT_EXPORT
 void
 Parrot_set_configuration_hash_legacy(PARROT_INTERP, const int length,
-        const unsigned char *bytes)
+        ARGIN(const unsigned char *bytes))
 {
     ASSERT_ARGS(Parrot_set_configuration_hash_legacy)
     STRING * const fpmc_str = Parrot_str_new_init(interp, (const char *)bytes,

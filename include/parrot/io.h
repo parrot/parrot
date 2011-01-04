@@ -101,13 +101,6 @@ extern PIOOFF_T piooffsetzero;
 
 typedef struct _ParrotIOData ParrotIOData;
 
-#ifdef _MSC_VER
-/* Win32/MSVC has a deprecation warning about dup() in favor of _dup(). */
-#  define Parrot_dup(x) (PIOHANDLE)_dup((int)(x))
-#else /* !_MSC_VER */
-#  define Parrot_dup(x) (PIOHANDLE)dup((int)(x))
-#endif /* _MSC_VER */
-
 extern INTVAL pio_errno;
 
 /* io/core.c - interpreter initialization/destruction functions */
@@ -544,38 +537,6 @@ size_t Parrot_io_write_buffer(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/buffer.c */
 
-/* io/utf8.c - UTF-8 functions */
-/* HEADERIZER BEGIN: src/io/utf8.c */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-size_t Parrot_io_read_utf8(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    ARGMOD(STRING **buf))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*filehandle)
-        FUNC_MODIFIES(*buf);
-
-size_t Parrot_io_write_utf8(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    ARGIN(const STRING *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*filehandle);
-
-#define ASSERT_ARGS_Parrot_io_read_utf8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle) \
-    , PARROT_ASSERT_ARG(buf))
-#define ASSERT_ARGS_Parrot_io_write_utf8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle) \
-    , PARROT_ASSERT_ARG(s))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/io/utf8.c */
-
 /* io/filehandle.c - utility functions for FileHandle PMC */
 /* HEADERIZER BEGIN: src/io/filehandle.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -624,12 +585,6 @@ PIOOFF_T Parrot_io_get_file_size(SHIM_INTERP, ARGIN(PMC *filehandle))
 
 PARROT_EXPORT
 INTVAL Parrot_io_get_flags(SHIM_INTERP, ARGIN(PMC *filehandle))
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PIOOFF_T Parrot_io_get_last_file_position(SHIM_INTERP,
-    ARGIN(const PMC *filehandle))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -747,9 +702,6 @@ void Parrot_io_set_buffer_start(SHIM_INTERP,
 #define ASSERT_ARGS_Parrot_io_get_file_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_get_last_file_position \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_get_os_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(filehandle))

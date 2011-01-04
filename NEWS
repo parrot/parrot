@@ -1,3 +1,11 @@
+New in 3.0.0
+- Core
+ + Added a new embedding API in "parrot/api.h"
+ + Removed autovivification behavior from ResizablePMCArray
+ + Packfile manipulation functions now throw exceptions on error instead of printing error details directly to stderr
+ + Test coverage for several PMC types has been significantly increased
+ + Test coverage for several internal subsystems has been increased
+
 New in 2.11.0
 - Core
  + Just In Time native call frame generation using LibFFI

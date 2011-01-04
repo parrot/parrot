@@ -428,7 +428,6 @@ ENCODING_O_FILES = \
 IO_O_FILES = \
     src/io/core$(O) \
     src/io/api$(O) \
-    src/io/utf8$(O) \
     src/io/buffer$(O) \
     src/io/unix$(O) \
     src/io/win32$(O) \
@@ -706,6 +705,7 @@ STR_FILES = \
     src/spf_render.str \
     src/spf_vtable.str \
     src/string/api.str \
+    src/string/encoding.str \
     src/sub.str \
     src/embed.str \
     \
@@ -789,6 +789,7 @@ help :
 	@echo "  buildtools_tests:  Test build tool pmc2c.pl."
 	@echo "  manifest_tests:    Test code underlying mk_manifest_and_skip.pl."
 	@echo "  examples_tests:    Test the example scripts."
+	@echo "  moretests:         Run standard suite, examples and most coding standards tests."
 	@echo ""
 	@echo "Smoke Testing:"
 	@echo "  smolder_test:      Run the test suite and send report to the smolder server"
@@ -820,8 +821,8 @@ help :
 	@echo "  apilist:           Show list of PARROT_API functions"
 	@echo "  exportlist:        Show list of PARROT_EXPORT functions"
 	@echo "  malloclist:        Show list of PARROT_MALLOC functions"
-	@echo "  quickcover:        Run test suite coverage analysis (core)."
-	@echo "  cover:             Run test suite coverage analysis (full)."
+	@echo "  cover:             Run test suite coverage analysis (core)."
+	@echo "  fullcover:         Run test suite coverage analysis (full)."
 	@echo "  tags-vi:           Create tags for the vi editor."
 	@echo "  tags-emacs:        Create tags for the Emacs editor."
 	@echo "  perlcritic:        Check Perl code with Perl::Critic."
@@ -1024,7 +1025,9 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 		$(O_FILES) $(C_LIBS) $(ICU_SHARED)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(libparrot_shared_alias):	( cd @blib_dir@ ; ln -sf @libparrot_shared@ @libparrot_shared_alias@ )
-
+	$(CP) tools/dev/gdb-pp-load.py @blib_dir@/@libparrot_shared@-gdb.py
+	$(CP) tools/dev/gdb-pp.py @blib_dir@/GDBPrettyPrint.py
+	@echo '' > @blib_dir@/__init__.py
 
 $(INSTALLABLECONFIG) : src/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
@@ -1068,14 +1071,9 @@ $(INSTALLABLEPDB) : frontend/parrot_debugger/main$(O) $(LIBPARROT) src/parrot_co
 #
 
 src/pbc_disassemble$(O) : \
+    $(PARROT_H_HEADERS) \
     $(INC_DIR)/api.h \
-    $(INC_DIR)/compiler.h \
-    $(INC_DIR)/config.h \
-    $(INC_DIR)/core_types.h \
-    $(INC_DIR)/feature.h \
-    $(INC_DIR)/has_header.h \
     $(INC_DIR)/longopt.h \
-    $(INC_DIR)/platform_limits.h \
     src/pbc_disassemble.c \
 
 $(DIS) : src/pbc_disassemble$(O) $(LIBPARROT)
@@ -1563,15 +1561,13 @@ src/io/api$(O) : \
     $(INC_DIR)/extend.h \
     $(INC_DIR)/extend_vtable.h
 
-src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c
+src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c \
+    include/pmc/pmc_handle.h
 
 src/io/portable$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/portable.c
 
 src/io/unix$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
     include/pmc/pmc_filehandle.h src/io/unix.c
-
-src/io/utf8$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/string/unicode.h \
-    src/io/utf8.c
 
 src/io/win32$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
     include/pmc/pmc_filehandle.h src/io/win32.c
@@ -1749,7 +1745,8 @@ src/spf_vtable$(O) : $(PARROT_H_HEADERS) src/spf_vtable.str src/spf_vtable.c
 
 src/string/encoding$(O) : \
     $(PARROT_H_HEADERS) \
-    src/string/encoding.c
+    src/string/encoding.c \
+    src/string/encoding.str
 
 src/string/encoding/tables$(O) : \
     $(PARROT_H_HEADERS) \
@@ -1788,25 +1785,25 @@ src/string/encoding/utf8$(O) : \
     $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/utf8.c \
-    src/string/unicode.h
+    src/string/encoding/unicode.h
 
 src/string/encoding/utf16$(O) : \
     $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/utf16.c \
-    src/string/unicode.h
+    src/string/encoding/unicode.h
 
 src/string/encoding/ucs2$(O) : \
     $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/ucs2.c \
-    src/string/unicode.h
+    src/string/encoding/unicode.h
 
 src/string/encoding/ucs4$(O) : \
     $(PARROT_H_HEADERS) \
     src/string/encoding/shared.h \
     src/string/encoding/ucs4.c \
-    src/string/unicode.h
+    src/string/encoding/unicode.h
 
 frontend/pbc_merge/main$(O) : \
     $(INC_DIR)/embed.h \
@@ -2113,6 +2110,9 @@ run_tests :
 perl_tests :
 	$(PERL) t/harness $(PERL_TEST_FILES)
 
+nocritic_codetest :
+	PARROT_TEST_NO_PERLCRITIC=1 $(PERL) t/harness $(EXTRA_TEST_ARGS) --code-tests
+
 codetest :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --code-tests
 
@@ -2132,6 +2132,12 @@ manifest_tests :
 
 examples_tests : test_prep
 	$(PERL) t/harness $(EXAMPLES_TEST_FILES)
+
+# moretests: Good to use before branch merges
+moretests: test_prep \
+    test \
+    examples_tests \
+    nocritic_codetest
 
 # benchmark tests
 benchmark_tests : test_prep
@@ -2153,7 +2159,7 @@ configure_tests :
 headerizer_tests : test_prep
 	$(PERL) t/harness $(HEADERIZER_TEST_FILES)
 
-# library tests - tests run by make test but not by make fulltest or make cover
+# library tests - tests run by make test but not by make fulltest or make fullcover
 library_tests : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(LIBRARY_TEST_FILES)
 
@@ -2602,7 +2608,7 @@ splint : all
 
 COVER_FLAGS = -fprofile-arcs -ftest-coverage
 
-COVER_DIRS = \
+FULLCOVER_DIRS = \
     src \
     src/call \
     src/dynoplibs \
@@ -2626,7 +2632,7 @@ COVER_DIRS = \
     $(BUILD_DIR)/t/perl \
     compilers/imcc
 
-cover: \
+fullcover: \
     cover.dummy \
     cover-testb \
     cover-testf \
@@ -2641,7 +2647,7 @@ cover: \
     cover-examples \
     cover-distro
 	build_dir=$$PWD; \
-    for dir in $(COVER_DIRS); \
+    for dir in $(FULLCOVER_DIRS); \
     do \
 	cd $$dir; \
 	gcov *.c; \
@@ -2650,7 +2656,7 @@ cover: \
     done
 	cover -ignore_re '^\/usr\/local\/bin'
 
-QUICKCOVER_DIRS = \
+COVER_DIRS = \
     src \
     src/call \
     src/dynoplibs \
@@ -2677,12 +2683,12 @@ COVER       = @cover@
 GCOV        = @gcov@
 GCOV2PERL   = @gcov2perl@
 
-quickcover: \
+cover: \
     cover.dummy \
     cover-test_runcore
 	build_dir=$$PWD; \
     $(COVER) -delete; \
-    for dir in $(QUICKCOVER_DIRS); \
+    for dir in $(COVER_DIRS); \
     do \
 	cd $$dir; \
 	$(GCOV) *.c; \
@@ -2691,10 +2697,26 @@ quickcover: \
     done
 	$(COVER) $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
 
-quickcover_new: \
+cover_new: \
     cover.dummy \
     cover-test_core
-	$(PERL) tools/dev/make_cover.pl $(COVER_DIRS)
+	$(PERL) $(DEV_TOOLS_DIR)/make_cover.pl $(COVER_DIRS)
+
+fullcover_new: \
+    cover.dummy \
+    cover-testb \
+    cover-testf \
+    cover-testr \
+    cover-src \
+    cover-run \
+    cover-perl \
+    cover-extra \
+    cover-codingstd \
+    cover-benchmark \
+    cover-manifest \
+    cover-examples \
+    cover-distro
+	$(PERL) $(DEV_TOOLS_DIR)/make_cover.pl $(COVER_DIRS)
 
 cover.dummy: have-cover
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \

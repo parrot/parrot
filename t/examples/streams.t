@@ -143,7 +143,7 @@ read:[   21 stream for it. Then it combines the stream with a stream providing l
 read:[   22 ]
 read:[   23 =cut]
 read:[   24 ]
-read:[   25 .sub _main]
+read:[   25 .sub _main :main]
 read:[   26     .param pmc argv]
 read:[   27     .local int argc]
 read:[   28     .local pmc file]

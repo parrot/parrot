@@ -31,7 +31,7 @@ for my $a (@streams) {
     #
     pir_output_is( <<"CODE", <<"OUT", "load and create a Stream;$a" );
 
-.sub _main
+.sub _main :main
     print "loading '$a'...\\n"
     load_bytecode 'Stream/$a.pbc'
     print "loaded\\n"
@@ -179,7 +179,7 @@ OUT
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::Combiner" );
 
-.sub _main
+.sub _main :main
     .local pmc counter
     .local pmc text
     .local pmc combined
@@ -267,7 +267,7 @@ OUT
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::Coroutine" );
 
-.sub _main
+.sub _main :main
     .local pmc stream
 
     load_bytecode 'Stream/Base.pbc'
@@ -333,7 +333,7 @@ OUT
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::ParrotIO" );
 
-.sub _main
+.sub _main :main
     .local pmc file
     .local pmc lines
     .local pmc counter
@@ -699,7 +699,7 @@ OUT
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::Filter" );
 
-.sub _main
+.sub _main :main
     .local pmc stream
     .local pmc filter
 
@@ -785,7 +785,7 @@ OUT
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::include" );
 
-.sub _main
+.sub _main :main
     .local pmc stream
 
     load_bytecode 'Stream/Sub.pbc'
@@ -890,7 +890,7 @@ OUT
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::Lines" );
 
-.sub _main
+.sub _main :main
     .local pmc stream
     .local pmc lines
 
@@ -1353,7 +1353,7 @@ OUT
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::Sub" );
 
-.sub _main
+.sub _main :main
     .local pmc stream
 
     load_bytecode 'Stream/Base.pbc'

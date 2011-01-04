@@ -75,11 +75,10 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING* Parrot_locate_runtime_file_str(PARROT_INTERP,
-    ARGMOD(STRING *file),
+    ARGIN(STRING *file),
     enum_runtime_ft type)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*file);
+        __attribute__nonnull__(2);
 
 void parrot_init_library_paths(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -87,14 +86,13 @@ void parrot_init_library_paths(PARROT_INTERP)
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * parrot_split_path_ext(PARROT_INTERP,
-    ARGMOD(STRING *in),
+    ARGIN(STRING *in),
     ARGOUT(STRING **wo_ext),
     ARGOUT(STRING **ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*in)
         FUNC_MODIFIES(*wo_ext)
         FUNC_MODIFIES(*ext);
 

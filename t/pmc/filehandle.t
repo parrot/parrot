@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2011, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 26;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -363,15 +363,47 @@ OUT
 # TT #1204 pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - asynchronous', todo => 'not yet implemented' );
 
 # L<PDD22/I\/O PMC API/=item record_separator>
-pir_output_is( <<'CODE', <<'OUT', 'record_separator', todo => 'not yet implemented' );
+pir_output_is( <<"CODE", <<'OUT', 'record_separator' );
 .sub 'test' :main
-    $P0 = new ['FileHandle']
+    \$P0 = new ['FileHandle']
+    \$P0.'open'('$temp_file', 'rw')
 
-    $S0 = $P0.'record_separator'()
-    if $S0 == "\n" goto ok_1
+    \$S0 = \$P0.'record_separator'()
+    if \$S0 == "\\n" goto ok_1
     print 'not '
   ok_1:
-    say 'ok 1 - $S0 = $P1.record_separator() # default'
+    say 'ok 1 - \$S0 = \$P1.record_separator() # default'
+
+    \$S99 = 'a'
+    \$P0.'record_separator'(\$S99)
+    \$S0 = \$P0.'record_separator'()
+    if \$S0 == \$S99 goto ok_2
+    print 'not '
+  ok_2:
+    say 'ok 2 - \$P0.record_separator(\$S1)'
+
+    \$P0.'print'(123)
+    \$S0 = \$P0.'record_separator'()
+    \$P0.'print'(\$S0)
+    \$P0.'print'(456)
+
+    \$P0.'seek'(0, 0)
+    \$S0 = \$P0.'readline'()
+    if \$S0 == '123a' goto ok_3
+    print 'not '
+  ok_3:
+    say 'ok 3 - \$P0.record_separator() # .readline works as expected'
+.end
+CODE
+ok 1 - $S0 = $P1.record_separator() # default
+ok 2 - $P0.record_separator($S1)
+ok 3 - $P0.record_separator() # .readline works as expected
+OUT
+
+# L<PDD22/I\/O PMC API/=item record_separator>
+pir_output_is( <<'CODE', <<'OUT', 'record_separator, multiple chars', todo => 'not yet implemented' );
+.sub 'test' :main
+    $P0 = new ['FileHandle']
 
     $S99 = 'abc'
     $P0.'record_separator'($S99)
@@ -379,7 +411,7 @@ pir_output_is( <<'CODE', <<'OUT', 'record_separator', todo => 'not yet implement
     if $S0 == $S99 goto ok_2
     print 'not '
   ok_2:
-    say 'ok 2 - $P0.record_separator($S1)'
+    say 'ok 1 - $P0.record_separator($S1)'
 
     $P0.'print'(123)
     $S0 = $P0.'record_separator'()
@@ -390,12 +422,11 @@ pir_output_is( <<'CODE', <<'OUT', 'record_separator', todo => 'not yet implement
     if $S0 == '123abc' goto ok_3
     print 'not '
   ok_3:
-    say 'ok 3 - $P0.record_separator() # .readline works as expected'
+    say 'ok 2 - $P0.record_separator() # .readline works as expected'
 .end
 CODE
-ok 1 - $S0 = $P1.record_separator() # default
-ok 2 - $P0.record_separator($S1)
-ok 3 - $P0.record_separator() # .readline works as expected
+ok 1 - $P0.record_separator($S1)
+ok 2 - $P0.record_separator() # .readline works as expected
 OUT
 
 # L<PDD22/I\/O PMC API/=item buffer_type>
@@ -576,6 +607,33 @@ CODE
 ok 1 - $S0 = $P0.mode() # get read mode
 OUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', "clone preserves all attributes of filehandle" );
+.sub main :main
+    .local pmc fh,fh_clone
+    .local string line1, line2
+
+    fh = new ['FileHandle']
+    fh.'open'('README')
+
+    line1 = fh.'readline'()
+
+    fh_clone = clone fh
+    line2 = fh_clone.'readline'()
+
+    $I0 = line1 == line2
+    say $I0
+
+    fh_clone.'seek'(0, 0)
+    line2 = fh_clone.'readline'()
+
+    $I0 = line1 == line2
+    say $I0
+.end
+CODE
+0
+1
+OUTPUT
+
 pir_output_is( <<"CODE", <<"OUTPUT", "readall - closed filehandle" );
 .sub main :main
     \$S0 = <<"EOS"
@@ -658,7 +716,7 @@ caught reopen
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on closed filehandle" );
-.sub 'main'
+.sub 'main' :main
     .local pmc ifh
     ifh = new ['FileHandle']
     ifh.'encoding'('utf8')
@@ -675,7 +733,7 @@ utf8
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on opened filehandle" );
-.sub 'main'
+.sub 'main' :main
     .local pmc ifh
     ifh = new ['FileHandle']
     ifh.'encoding'('utf8')
@@ -694,22 +752,25 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
 .include 'iglobals.pasm'
-.sub 'main'
+.sub 'main' :main
     .local pmc pipe, conf, interp
     .local string cmd
 
     interp = getinterp
     conf = interp[.IGLOBALS_CONFIG_HASH]
 
-    cmd = conf['build_dir']
+    cmd = '"'
 
     .local string aux
+    aux = conf['build_dir']
+    cmd .= aux
     aux = conf['slash']
     cmd .= aux
     aux = conf['test_prog']
     cmd .= aux
     aux = conf['exe']
     cmd .= aux
+    cmd .= '"'
 
     pipe = new ['FileHandle']
     pipe.'open'(cmd, "rp")

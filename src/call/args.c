@@ -129,6 +129,14 @@ static INTVAL* intval_param_from_op(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_COLD
+PARROT_DOES_NOT_RETURN
+static void named_argument_arity_error(PARROT_INTERP,
+    int named_arg_count,
+    Hash *named_used_list,
+    PMC *named_arg_list)
+        __attribute__nonnull__(1);
+
 PARROT_WARN_UNUSED_RESULT
 static FLOATVAL numval_constant_from_op(PARROT_INTERP,
     ARGIN(const opcode_t *raw_params),
@@ -252,6 +260,8 @@ static STRING** string_param_from_op(PARROT_INTERP,
 #define ASSERT_ARGS_intval_param_from_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(raw_params))
+#define ASSERT_ARGS_named_argument_arity_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_numval_constant_from_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(raw_params))
@@ -311,6 +321,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
     INTVAL         *int_array;
     INTVAL          arg_count;
     INTVAL          arg_index = 0;
+    INTVAL          arg_named_count = 0;
 
     if (PMC_IS_NULL(signature))
         call_object = Parrot_pmc_new(interp, enum_class_CallContext);
@@ -328,6 +339,11 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
         const INTVAL arg_flags = int_array[arg_index];
         const INTVAL constant  = PARROT_ARG_CONSTANT_ISSET(arg_flags);
         const INTVAL raw_index = raw_args[arg_index + 2];
+
+        if (arg_named_count && !(arg_flags & PARROT_ARG_NAME))
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "named arguments must follow all positional arguments");
 
         switch (PARROT_ARG_TYPE_MASK_MASK(arg_flags)) {
           case PARROT_ARG_INTVAL:
@@ -357,6 +373,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
 
                 if (arg_flags & PARROT_ARG_NAME) {
                     ++arg_index;
+                    ++arg_named_count;
                     if (!PMC_IS_NULL(call_object)
                          && VTABLE_exists_keyed_str(interp, call_object, string_value)) {
                         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -777,28 +794,8 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     /* First iterate over positional args and positional parameters. */
     GETATTR_CallContext_num_positionals(interp, call_object, positional_args);
 
-    while (1) {
-        INTVAL param_flags;
-
-        /* Check if we've used up all the parameters. */
-        if (param_index >= param_count) {
-            /* We've used up all arguments and parameters; we're done. */
-            if (arg_index >= positional_args)
-                break;
-            else if (err_check) {
-                /* We've used up all the parameters, but have extra positional
-                 * args left over. */
-                if (named_used_list != NULL)
-                    parrot_hash_destroy(interp, named_used_list);
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "too many positional arguments: %d passed, %d expected",
-                    positional_args, param_index);
-            }
-            return;
-        }
-
-        param_flags = raw_params[param_index];
+    while (param_index < param_count) {
+        INTVAL param_flags = raw_params[param_index];
 
         /* If it's a call_sig, we're done. */
         if (param_flags & PARROT_ARG_CALL_SIG)
@@ -861,7 +858,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 param_flags = raw_params[param_index];
 
                 /* Mark the name as used, cannot be filled again. */
-                if (named_used_list==NULL) /* Only created if needed. */
+                if (named_used_list == NULL) /* Only created if needed. */
                     named_used_list = parrot_create_hash(interp,
                             enum_type_INTVAL, Hash_key_type_STRING);
 
@@ -960,6 +957,17 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         ++param_index;
     }
 
+    if (err_check && arg_index < positional_args) {
+        /* We have extra positional args left over. */
+        if (named_used_list != NULL)
+            parrot_hash_destroy(interp, named_used_list);
+
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INVALID_OPERATION,
+            "too many positional arguments: %d passed, %d expected",
+            positional_args, arg_index);
+    }
+
     /* Now iterate over the named arguments and parameters. */
     while (param_index < param_count) {
         STRING *param_name;
@@ -972,28 +980,6 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION,
                 "named parameters must follow all positional parameters");
-        }
-
-        if (arg_index < positional_args) {
-            PMC *arg_sig;
-
-            GETATTR_CallContext_arg_flags(interp, call_object, arg_sig);
-
-            if (named_used_list != NULL)
-                parrot_hash_destroy(interp, named_used_list);
-
-            /* We've used up all the positional parameters, but have extra
-             * positional args left over. */
-            if (VTABLE_get_integer_keyed_int(interp, arg_sig, arg_index) & PARROT_ARG_NAME){
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "named arguments must follow all positional arguments");
-            }
-
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_INVALID_OPERATION,
-                "too many positional arguments: %d passed, %d expected",
-                positional_args, param_index);
         }
 
         /* Collected ("slurpy") named parameter */
@@ -1152,49 +1138,59 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         if (!PMC_IS_NULL(named_arg_list)) {
             const INTVAL named_arg_count = VTABLE_elements(interp, named_arg_list);
 
-            if (named_used_list==NULL){
-                if (named_used_list != NULL)
-                    parrot_hash_destroy(interp, named_used_list);
-
-                return;
-
-                /* The 'return' above is a temporary hack to duplicate an old
-                 * bug, and will be replaced by the exception below at the next
-                 * deprecation point, see TT #1103
-
+            if (named_used_list == NULL) {
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "too many named arguments: %d passed, 0 used",
                     named_arg_count);
-                 */
             }
 
-            if (named_arg_count > named_count) {
-                /* At this point we know we have named arguments that weren't
-                 * assigned to parameters. We're going to throw an exception
-                 * anyway, so spend a little extra effort to tell the user
-                 * *which* named argument is extra. */
-                INTVAL named_arg_index;
-
-                /* Named argument iteration. */
-                for (named_arg_index = 0; named_arg_index < named_arg_count; ++named_arg_index) {
-                    STRING * const name = VTABLE_get_string_keyed_int(interp,
-                            named_arg_list, named_arg_index);
-
-                    if (!parrot_hash_exists(interp, named_used_list, name)) {
-                        if (named_used_list != NULL)
-                            parrot_hash_destroy(interp, named_used_list);
-                        Parrot_ex_throw_from_c_args(interp, NULL,
-                                EXCEPTION_INVALID_OPERATION,
-                                "too many named arguments: '%S' not used",
-                                name);
-                    }
-                }
-            }
+            if (named_arg_count > named_count)
+                named_argument_arity_error(interp,
+                                           named_arg_count, named_used_list, named_arg_list);
         }
     }
     if (named_used_list != NULL)
         parrot_hash_destroy(interp, named_used_list);
+}
+
+/*
+
+=item C<static void named_argument_arity_error(PARROT_INTERP, int
+named_arg_count, Hash *named_used_list, PMC *named_arg_list)>
+
+In the case of a mismatch between passed and expected named arguments, throw
+a helpful exception.
+
+=cut
+
+*/
+
+PARROT_COLD
+PARROT_DOES_NOT_RETURN
+static void
+named_argument_arity_error(PARROT_INTERP, int named_arg_count,
+        Hash *named_used_list, PMC *named_arg_list)
+{
+    ASSERT_ARGS(named_argument_arity_error)
+    INTVAL named_arg_index;
+
+    /* Named argument iteration. */
+    for (named_arg_index = 0; named_arg_index < named_arg_count; ++named_arg_index) {
+        STRING * const name = VTABLE_get_string_keyed_int(interp,
+                named_arg_list, named_arg_index);
+
+        if (!parrot_hash_exists(interp, named_used_list, name)) {
+            parrot_hash_destroy(interp, named_used_list);
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "too many named arguments: '%S' not used",
+                    name);
+        }
+    }
+    parrot_hash_destroy(interp, named_used_list);
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        "Invalid named arguments, unspecified error");
 }
 
 

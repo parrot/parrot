@@ -404,8 +404,6 @@ Parrot_api_ready_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
     if (pf->cur_cs != NULL)
         Parrot_pbc_load(interp, pf);
-    PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
-    PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
     *main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
     Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
@@ -446,8 +444,6 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
     if (pf->cur_cs != NULL)
         Parrot_pbc_load(interp, pf);
-    PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
-    PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
     main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
 
@@ -722,9 +718,9 @@ otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, const char * sourcefile,
-    int argc, const char **argv, Parrot_PMC* bytecodepmc, int *result,
-    imcc_hack_func_t func)
+Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, ARGIN(const char * sourcefile),
+    int argc, ARGIN(const char **argv), ARGMOD(Parrot_PMC* bytecodepmc),
+    ARGOUT(int *result), imcc_hack_func_t func)
 {
     ASSERT_ARGS(Parrot_api_wrap_imcc_hack)
     EMBED_API_CALLIN(interp_pmc, interp)

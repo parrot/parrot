@@ -46,10 +46,10 @@ type in C<make cover> and leave to make a sandwich and something to drink
 because it's probably going to take a I<long> time to run. If you run into
 trouble, C<make fulltest> may be of some assistance.
 
-=head1 Quickcover
+=head1 Cover
 
-If you have run C<make cover> before, you know how long it takes to execute
-that command. Recently a new tool C<make quickcover> has been added that is
+If you have run C<make fullcover> before, you know how long it takes to execute
+that command. Recently a new tool C<make cover> has been added that is
 much faster, but does not run tests in all runcores.
 
 =cut

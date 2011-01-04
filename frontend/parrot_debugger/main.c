@@ -148,8 +148,8 @@ and C<debug_break> ops in F<ops/debug.ops>.
 
 static void PDB_printwelcome(void);
 static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[]);
-const unsigned char * Parrot_get_config_hash_bytes();
-int Parrot_get_config_hash_length();
+const unsigned char * Parrot_get_config_hash_bytes(void);
+int Parrot_get_config_hash_length(void);
 
 /*
 
@@ -213,7 +213,6 @@ main(int argc, const char *argv[])
             Parrot_compile_file(interp, filename, &errmsg);
             if (errmsg)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1, "%S", errmsg);
-            PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
 
             /* load the source for debugger list */
             PDB_load_source(interp, filename);

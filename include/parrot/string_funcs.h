@@ -418,6 +418,17 @@ STRING* Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_str_extract_chars(PARROT_INTERP,
+    ARGIN(const char *buffer),
+    UINTVAL len,
+    INTVAL chars,
+    ARGIN(const STR_VTABLE *encoding))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(5);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_from_int_base(PARROT_INTERP,
     ARGOUT(char *tc),
     HUGEINTVAL num,
@@ -596,6 +607,10 @@ STRING * Parrot_str_iter_substr(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_str_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_str_extract_chars __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(buffer) \
+    , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_Parrot_str_from_int_base __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(tc))
