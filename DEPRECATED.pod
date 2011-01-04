@@ -127,6 +127,13 @@ from it do not change.
 
 L<https://trac.parrot.org/parrot/ticket/1754>
 
+=item "Advanced" NCI parameter types [eligible in 3.1]
+
+Many NCI parameter types that implement complex functionalities will be removed.
+See ticket for list and replacement suggestions.
+
+L<http://trac.parrot.org/parrot/ticket/1931>
+
 =back
 
 =head1 Opcodes
