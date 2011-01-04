@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -262,7 +262,7 @@ ok( !-d $xpto, "Test that rm removed the directory" );
 rmdir $xpto if -d $xpto;    # this way next test doesn't fail if this one does
 
 mkdir "test-bad-rm";
-open my $testfile, ">test-bad-rm/bad";
+open my $testfile, '>', "test-bad-rm/bad";
 close $testfile;
 
 pir_output_like( <<'CODE', <<'OUT', 'Test bad rm calls' );
@@ -384,7 +384,7 @@ SKIP: {
 CODE
 
     mkdir 'silly-dir-with-silly-names';
-    open my $fileh, ">silly-dir-with-silly-names/sillyname\x{263A}";
+    open my $fileh, '>', "silly-dir-with-silly-names/sillyname\x{263A}";
     close $fileh;
 
     opendir my $IN2, 'silly-dir-with-silly-names';
