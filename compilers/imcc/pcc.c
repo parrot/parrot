@@ -428,11 +428,9 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
         unshift_self(interp, sub, self);
     }
 
-    /* Don't generate any parameter checking code if there
-     * are no named arguments.  */
     nargs = sub->pcc_sub->nargs;
 
-    if (nargs)
+    if (nargs || !(sub->pcc_sub->pragma & P_MAIN))
         ins = pcc_get_args(interp, unit, ins, "get_params", nargs,
                 sub->pcc_sub->args, sub->pcc_sub->arg_flags);
 
