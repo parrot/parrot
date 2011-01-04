@@ -848,7 +848,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 param_flags = raw_params[param_index];
 
                 /* Mark the name as used, cannot be filled again. */
-                if (named_used_list==NULL) /* Only created if needed. */
+                if (named_used_list == NULL) /* Only created if needed. */
                     named_used_list = parrot_create_hash(interp,
                             enum_type_INTVAL, Hash_key_type_STRING);
 
@@ -1128,21 +1128,11 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         if (!PMC_IS_NULL(named_arg_list)) {
             const INTVAL named_arg_count = VTABLE_elements(interp, named_arg_list);
 
-            if (named_used_list==NULL){
-                if (named_used_list != NULL)
-                    parrot_hash_destroy(interp, named_used_list);
-
-                return;
-
-                /* The 'return' above is a temporary hack to duplicate an old
-                 * bug, and will be replaced by the exception below at the next
-                 * deprecation point, see TT #1103
-
+            if (named_used_list == NULL) {
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "too many named arguments: %d passed, 0 used",
                     named_arg_count);
-                 */
             }
 
             if (named_arg_count > named_count) {
