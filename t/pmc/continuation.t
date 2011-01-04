@@ -17,13 +17,14 @@ Tests the Continuation PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(5)
+    plan(8)
 
     test_new()
     invoke_with_init()
     returns_tt1511()
     returns_tt1528()
     experimental_caller()
+    get_pointer_and_string()
 .end
 
 .sub test_new
@@ -146,6 +147,26 @@ end:
    cc = new 'Continuation'
    $S0 = cc.'caller'()
    is($S0, 'experimental_caller', 'continuation caller is experimental_caller')
+.end
+
+.sub get_pointer_and_string
+   # Create and initialize a Continuation
+   .local pmc cc
+   cc = new 'Continuation'
+   set_label cc, dummy
+
+   # Test get_string vtable.
+   $S0 = cc
+   is($S0,"current instr.: 'get_pointer_and_string' pc 403 (t/pmc/continuation.t:159)", "get_string")
+
+   $P1 = cc."continuation"()
+   $S0 = typeof $P1
+   is($S0, "Continuation", "continuation method")
+
+   $I0 = get_addr cc
+   $I1 = set_addr dummy
+   is($I0, $I1, "set/get_addr")
+   dummy:
 .end
 
 # end of tests.
