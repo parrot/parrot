@@ -365,7 +365,7 @@ OUTPUT
 
 # test readdir
 SKIP: {
-    skip 'not implemented on windows yet', 2 if ( $MSWin32 && $MSVC );
+    skip 'not implemented on windows yet', 3 if ( $MSWin32 && $MSVC );
 
     opendir my $IN, 'docs';
     my @entries = readdir $IN;
