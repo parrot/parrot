@@ -45,9 +45,9 @@ Initializes a newly created Socket object.
         data_struct->local  = PMCNULL;
         data_struct->remote = PMCNULL;
         data_struct->buf    = STRINGNULL;
-        
+
         Parrot_io_socket_initialize_handle(INTERP, SELF);
-        
+
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -352,7 +352,7 @@ Read the given number of bytes from the socket and return them in a string.
 
         if (Parrot_io_socket_is_closed(INTERP, SELF))
             RETURN(STRING * STRINGNULL);
-        
+
         if (buf == STRINGNULL)
             buf = Parrot_io_reads(INTERP, SELF, 0);
 
@@ -390,7 +390,7 @@ Read a line from the socket and return it in a string.
 
         if (Parrot_io_socket_is_closed(INTERP, SELF))
             RETURN(STRING * STRINGNULL);
-        
+
         if (buf == STRINGNULL)
             buf = Parrot_io_reads(INTERP, SELF, 0);
 

@@ -825,11 +825,16 @@ INTVAL Parrot_io_socket(PARROT_INTERP,
         FUNC_MODIFIES(*socket);
 
 PARROT_EXPORT
+void Parrot_io_socket_initialize_handle(SHIM_INTERP, ARGMOD(PMC *socket))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*socket);
+
+PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-INTVAL Parrot_io_socket_is_closed(ARGMOD(PMC *socket))
-        __attribute__nonnull__(1)
+INTVAL Parrot_io_socket_is_closed(SHIM_INTERP, ARGMOD(PMC *socket))
+        __attribute__nonnull__(2)
         FUNC_MODIFIES(*socket);
 
 #define ASSERT_ARGS_Parrot_io_accept __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -861,6 +866,9 @@ INTVAL Parrot_io_socket_is_closed(ARGMOD(PMC *socket))
     , PARROT_ASSERT_ARG(buf))
 #define ASSERT_ARGS_Parrot_io_socket __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_io_socket_initialize_handle \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(socket))
 #define ASSERT_ARGS_Parrot_io_socket_is_closed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(socket))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
