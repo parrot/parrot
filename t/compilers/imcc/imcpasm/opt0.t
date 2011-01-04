@@ -18,6 +18,7 @@ CODE
 # IMCC does produce b0rken PASM files
 # see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _:
+  get_params
   sub N0, 2, N1
   div N0, 2, N1
   set_returns
@@ -34,6 +35,7 @@ CODE
 # IMCC does produce b0rken PASM files
 # see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _test:
+  get_params
   noop
   end
 OUT
@@ -48,6 +50,7 @@ CODE
 # IMCC does produce b0rken PASM files
 # see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _test:
+  get_params
   noop
   exit 0
 OUT
@@ -61,6 +64,7 @@ CODE
 # IMCC does produce b0rken PASM files
 # see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _test:
+  get_params
   noop
   set_returns
   returncc
