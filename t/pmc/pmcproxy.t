@@ -158,6 +158,7 @@ Tests the PMCProxy PMC.
 .end
 
 .sub no_add_role_non_vtable
+    .param pmc args :slurpy
     #XXX: If this fails to be overridden, the only indicator will be
     #that the wrong number of tests ran.  It'd be better if a test tested that
     #this sub was called.  The same applies to vtable_method_override.
