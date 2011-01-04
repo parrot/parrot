@@ -28,7 +28,7 @@ These are the primary interface functions for working with socket objects.
 
 /*
 
-=item C<INTVAL Parrot_io_socket_is_closed(PMC *socket)>
+=item C<INTVAL Parrot_io_socket_is_closed(PARROT_INTERP, PMC *socket)>
 
 Returns 1 if the socket is closed, 0 if it is open.
 
@@ -110,7 +110,7 @@ PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 INTVAL
-Parrot_io_socket_is_closed(ARGMOD(PMC *socket))
+Parrot_io_socket_is_closed(SHIM_INTERP, ARGMOD(PMC *socket))
 {
     ASSERT_ARGS(Parrot_io_socket_is_closed)
 #ifdef PIO_OS_WIN32
@@ -121,6 +121,32 @@ Parrot_io_socket_is_closed(ARGMOD(PMC *socket))
 #endif
 #ifdef PIO_OS_STDIO
     return (PARROT_SOCKET(socket)->os_handle == (PIOHANDLE)NULL);
+#endif
+}
+
+/*
+
+=item C<void Parrot_io_socket_initialize_handle(SHIM_INTERP, ARGMOD(PMC *socket))
+
+Initialize a Socket PMC
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_io_socket_initialize_handle(SHIM_INTERP, ARGMOD(PMC *socket))
+{
+    ASSERT_ARGS(Parrot_io_socket_initialize_handle)
+#ifdef PIO_OS_WIN32
+    PARROT_SOCKET(socket)->os_handle = (PIOHANDLE)INVALID_HANDLE_VALUE;
+#endif
+#ifdef PIO_OS_UNIX
+    PARROT_SOCKET(socket)->os_handle = (PIOHANDLE)-1;
+#endif
+#ifdef PIO_OS_STDIO
+    PARROT_SOCKET(socket)->os_handle = (PIOHANDLE)NULL;
 #endif
 }
 
@@ -211,7 +237,7 @@ INTVAL
 Parrot_io_recv(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buf))
 {
     ASSERT_ARGS(Parrot_io_recv)
-    if (Parrot_io_socket_is_closed(pmc))
+    if (Parrot_io_socket_is_closed(interp, pmc))
         return -1;
 
     return PIO_RECV(interp, pmc, buf);
@@ -234,7 +260,7 @@ INTVAL
 Parrot_io_send(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *buf))
 {
     ASSERT_ARGS(Parrot_io_send)
-    if (Parrot_io_socket_is_closed(pmc))
+    if (Parrot_io_socket_is_closed(interp, pmc))
         return -1;
 
     return PIO_SEND(interp, pmc, buf);
@@ -255,7 +281,7 @@ INTVAL
 Parrot_io_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 {
     ASSERT_ARGS(Parrot_io_connect)
-    if (Parrot_io_socket_is_closed(pmc))
+    if (Parrot_io_socket_is_closed(interp, pmc))
         return -1;
 
     return PIO_CONNECT(interp, pmc, address);
@@ -277,7 +303,7 @@ INTVAL
 Parrot_io_bind(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 {
     ASSERT_ARGS(Parrot_io_bind)
-    if (Parrot_io_socket_is_closed(pmc))
+    if (Parrot_io_socket_is_closed(interp, pmc))
         return -1;
 
     return PIO_BIND(interp, pmc, address);
@@ -299,7 +325,7 @@ INTVAL
 Parrot_io_listen(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL backlog)
 {
     ASSERT_ARGS(Parrot_io_listen)
-    if (Parrot_io_socket_is_closed(pmc))
+    if (Parrot_io_socket_is_closed(interp, pmc))
         return -1;
 
     return PIO_LISTEN(interp, pmc, backlog);
@@ -323,7 +349,7 @@ PMC *
 Parrot_io_accept(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_accept)
-    if (Parrot_io_socket_is_closed(pmc))
+    if (Parrot_io_socket_is_closed(interp, pmc))
         return PMCNULL;
 
     return PIO_ACCEPT(interp, pmc);
