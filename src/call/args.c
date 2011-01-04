@@ -1180,12 +1180,16 @@ named_argument_arity_error(PARROT_INTERP, int named_arg_count,
                 named_arg_list, named_arg_index);
 
         if (!parrot_hash_exists(interp, named_used_list, name)) {
+            parrot_hash_destroy(interp, named_used_list);
             Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "too many named arguments: '%S' not used",
                     name);
         }
     }
+    parrot_hash_destroy(interp, named_used_list);
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        "Invalid named arguments, unspecified error");
 }
 
 
