@@ -146,7 +146,8 @@ Push data item C<v> onto the end of the image being frozen.
         INTVAL  id;
         INTVAL  was_seen;
 
-        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
+        if (PARROT_PASMSERIALIZER(SELF)->id)
+            push_sep(INTERP, SELF);
 
         if (PMC_IS_NULL(v)) {
             id = 0;
