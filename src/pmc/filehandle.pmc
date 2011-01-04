@@ -389,23 +389,25 @@ Read a line from the filehandle and return it in a string.
             Parrot_str_free_cstring(prompt_cstring);
         }
 
-        if (!(PARROT_FILEHANDLE(SELF)->flags & PIO_F_LINEBUF))
-            Parrot_io_setlinebuf(INTERP, SELF);
+        string_result = Parrot_io_readline(INTERP, SELF);
 
-        string_result = Parrot_io_reads(INTERP, SELF, 0);
+        {
+            INTVAL len = STRING_length(string_result);
 
-        if (string_result) {
-            UINTVAL len = Parrot_str_byte_length(INTERP, string_result);
-            if (len < 1)
+            if (len == 0) {
                 string_result = NULL;
+            }
             else {
-                while (len > 0
-                &&    (((char *)string_result->strstart)[len - 1] == '\n'
-                  ||   ((char *)string_result->strstart)[len - 1] == '\r')) {
-                        --len;
-                        --string_result->strlen;
-                        --string_result->bufused;
+                while (len > 0) {
+                    const INTVAL c = STRING_ord(interp, string_result, len - 1);
+
+                    if (c != '\n' && c != '\r')
+                        break;
+
+                    --len;
                 }
+
+                string_result = STRING_substr(interp, string_result, 0, len);
             }
         }
 #endif

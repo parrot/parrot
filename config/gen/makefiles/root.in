@@ -490,7 +490,6 @@ INTERP_O_FILES = \
     src/oo$(O) \
     src/platform$(O) \
     src/packfile/object_serialization$(O) \
-    src/packfile/execute$(O) \
     src/pmc$(O) \
     src/runcore/main$(O)  \
     src/runcore/cores$(O) \
@@ -695,7 +694,6 @@ STR_FILES = \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks.str \
     src/nci/signatures.str \
     src/packfile/api.str \
-    src/packfile/execute.str \
     src/packfile/object_serialization.str \
     src/packfile/pf_items.str \
     src/pmc.str \
@@ -1027,7 +1025,9 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 		$(O_FILES) $(C_LIBS) $(ICU_SHARED)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(libparrot_shared_alias):	( cd @blib_dir@ ; ln -sf @libparrot_shared@ @libparrot_shared_alias@ )
-
+	$(CP) tools/dev/gdb-pp-load.py @blib_dir@/@libparrot_shared@-gdb.py
+	$(CP) tools/dev/gdb-pp.py @blib_dir@/GDBPrettyPrint.py
+	@echo '' > @blib_dir@/__init__.py
 
 $(INSTALLABLECONFIG) : src/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
@@ -1597,7 +1597,6 @@ src/multidispatch$(O) : \
 src/packfile/api$(O) : \
     src/packfile/api.str \
     src/packfile/api.c \
-    src/packfile/packfile_private.h \
     include/pmc/pmc_sub.h \
     include/pmc/pmc_key.h \
     include/pmc/pmc_parrotlibrary.h \
@@ -1616,17 +1615,6 @@ src/packfile/api$(O) : \
     $(INC_DIR)/extend_vtable.h \
     $(PARROT_H_HEADERS) \
     $(INC_DIR)/runcore_api.h
-
-src/packfile/execute$(O) : \
-    $(PARROT_H_HEADERS) \
-    $(INC_DIR)/extend.h \
-    $(INC_DIR)/extend_vtable.h \
-    include/parrot/runcore_api.h \
-    src/packfile/execute.str \
-    src/packfile/execute.c \
-    src/packfile/packfile_private.h \
-    include/pmc/pmc_sub.h
-
 
 src/packfile/output$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_key.h src/packfile/output.c
 
@@ -2709,10 +2697,26 @@ cover: \
     done
 	$(COVER) $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
 
-quickcover_new: \
+cover_new: \
     cover.dummy \
     cover-test_core
-	$(PERL) tools/dev/make_cover.pl $(COVER_DIRS)
+	$(PERL) $(DEV_TOOLS_DIR)/make_cover.pl $(COVER_DIRS)
+
+fullcover_new: \
+    cover.dummy \
+    cover-testb \
+    cover-testf \
+    cover-testr \
+    cover-src \
+    cover-run \
+    cover-perl \
+    cover-extra \
+    cover-codingstd \
+    cover-benchmark \
+    cover-manifest \
+    cover-examples \
+    cover-distro
+	$(PERL) $(DEV_TOOLS_DIR)/make_cover.pl $(COVER_DIRS)
 
 cover.dummy: have-cover
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \

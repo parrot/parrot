@@ -77,6 +77,7 @@ OUTPUT
 SKIP: {
     skip( "clone not finished yet", 1 );
     pasm_output_is( <<"CODE", <<'OUTPUT', "clone" );
+    .pcc_sub :main main:
     open P0, "$temp_file", 'r'
     clone P1, P0
     read S0, P1, 1024
@@ -250,7 +251,7 @@ Parrot overwrites
 OUTPUT
 
 pir_output_is( <<"CODE", '', "Parrot_io_flush on buffer full" );
-.sub "main"
+.sub 'main' :main
    set \$I0, 0
    set \$I1, 10000
 
@@ -321,7 +322,7 @@ OUTPUT
 pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', 'I/O buffering' );
 .const string temp_file = '%s'
 
-.sub main
+.sub main :main
     .local string filename
     filename = temp_file
     $P1 = new ['FileHandle']
@@ -444,6 +445,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'callmethod puts' );
+.pcc_sub :main main:
     getinterp P0                 # invocant
     set_args "0", P0
     callmethodcc P0, "stderr_handle"
@@ -573,7 +575,7 @@ ok 1
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', "substr after reading from file" );
-.sub _main
+.sub _main :main
     # Write something into a file
     .local pmc out
     out = new ['FileHandle']
@@ -601,7 +603,7 @@ OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', "multiple substr after reading from file" );
 
-.sub _main
+.sub _main :main
     # Write something into a file
     .local pmc out
     out = new ['FileHandle']

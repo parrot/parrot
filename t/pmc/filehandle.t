@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -608,7 +608,7 @@ ok 1 - $S0 = $P0.mode() # get read mode
 OUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "clone preserves all attributes of filehandle" );
-.sub main
+.sub main :main
     .local pmc fh,fh_clone
     .local string line1, line2
 
@@ -716,7 +716,7 @@ caught reopen
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on closed filehandle" );
-.sub 'main'
+.sub 'main' :main
     .local pmc ifh
     ifh = new ['FileHandle']
     ifh.'encoding'('utf8')
@@ -733,7 +733,7 @@ utf8
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on opened filehandle" );
-.sub 'main'
+.sub 'main' :main
     .local pmc ifh
     ifh = new ['FileHandle']
     ifh.'encoding'('utf8')
@@ -752,22 +752,25 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
 .include 'iglobals.pasm'
-.sub 'main'
+.sub 'main' :main
     .local pmc pipe, conf, interp
     .local string cmd
 
     interp = getinterp
     conf = interp[.IGLOBALS_CONFIG_HASH]
 
-    cmd = conf['build_dir']
+    cmd = '"'
 
     .local string aux
+    aux = conf['build_dir']
+    cmd .= aux
     aux = conf['slash']
     cmd .= aux
     aux = conf['test_prog']
     cmd .= aux
     aux = conf['exe']
     cmd .= aux
+    cmd .= '"'
 
     pipe = new ['FileHandle']
     pipe.'open'(cmd, "rp")

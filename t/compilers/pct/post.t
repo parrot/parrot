@@ -10,7 +10,7 @@ use Parrot::Test tests => 8;
 foreach my $name (qw(Op Ops Sub Label)) {
     my $module = "'POST';'$name'";
     my $code   = <<'CODE'
-.sub _main
+.sub _main :main
     load_bytecode 'PCT.pbc'
     load_bytecode 'dumper.pbc'
     .local pmc node
@@ -47,7 +47,7 @@ OUT
 }
 
 pir_output_is( <<'CODE', <<'OUT', 'dump POST::Op node in visual format' );
-.sub _main
+.sub _main :main
     load_bytecode 'PCT.pbc'
     load_bytecode 'dumper.pbc'
     .local pmc node
@@ -67,7 +67,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'dump POST::Label node in visual format' );
-.sub _main
+.sub _main :main
     load_bytecode 'PCT.pbc'
     load_bytecode 'dumper.pbc'
     .local pmc node
@@ -83,7 +83,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'Generate :multi' );
-.sub _main
+.sub _main :main
     load_bytecode 'PCT.pbc'
     load_bytecode 'dumper.pbc'
     .local pmc node
@@ -115,7 +115,7 @@ OUT
 
 
 pir_output_is( <<'CODE', <<'OUT', 'Generate directives' );
-.sub _main
+.sub _main :main
     load_bytecode 'PCT.pbc'
     load_bytecode 'dumper.pbc'
     .local pmc node

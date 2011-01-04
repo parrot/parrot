@@ -248,6 +248,7 @@ struct PackFile_ByteCode {
     PackFile_Segment              base;
     struct PackFile_Debug        *debugs;
     PackFile_ConstTable          *const_table;
+    INTVAL                        main_sub;        /* index into constant table of main sub */
     struct PackFile_Annotations  *annotations;
     PackFile_ByteCode_OpMapping   op_mapping;      /* opcode mapping information */
     size_t                        op_count;        /* number of ops in the func table */
@@ -629,6 +630,14 @@ void PackFile_ConstTable_dump(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+void do_sub_pragmas(PARROT_INTERP,
+    ARGIN(PackFile_ByteCode *self),
+    pbc_action_enum_t action,
+    ARGIN_NULLOK(PMC *eval_pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void PackFile_add_segment(PARROT_INTERP,
     ARGMOD(PackFile_Directory *dir),
     ARGMOD(PackFile_Segment *seg))
@@ -713,7 +722,29 @@ void PackFile_funcs_register(SHIM_INTERP,
         FUNC_MODIFIES(*pf);
 
 PARROT_EXPORT
-void PackFile_header_validate(PARROT_INTERP,
+void PackFile_Header_read_uuid(PARROT_INTERP,
+    ARGMOD(PackFile_Header *self),
+    ARGIN(const opcode_t *packed),
+    size_t packed_size)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+int PackFile_Header_unpack(PARROT_INTERP,
+    ARGMOD(PackFile_Header *self),
+    ARGIN(const opcode_t *packed),
+    size_t packed_size,
+    INTVAL pf_options)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self);
+
+PARROT_EXPORT
+void PackFile_Header_validate(PARROT_INTERP,
     ARGIN(const PackFile_Header *self),
     INTVAL pf_options)
         __attribute__nonnull__(1)
@@ -924,6 +955,9 @@ const opcode_t * PackFile_Annotations_unpack(PARROT_INTERP,
 void Parrot_trace_eprintf(ARGIN(const char *s), ...)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_do_sub_pragmas __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_add_segment __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dir) \
@@ -955,7 +989,15 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_funcs_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pf))
-#define ASSERT_ARGS_PackFile_header_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_PackFile_Header_read_uuid __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(packed))
+#define ASSERT_ARGS_PackFile_Header_unpack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(packed))
+#define ASSERT_ARGS_PackFile_Header_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_map_segments __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

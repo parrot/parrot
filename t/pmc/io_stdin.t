@@ -9,8 +9,6 @@ use Test::More tests => 3;
 use Parrot::Test;
 use Parrot::Config;
 
-use Parrot::Test::Util 'create_tempfile';
-
 =head1 NAME
 
 t/pmc/stdin-io.t - IO Ops from stdin
@@ -24,35 +22,6 @@ t/pmc/stdin-io.t - IO Ops from stdin
 Tests the Parrot IO operations from stdin.
 
 =cut
-
-sub pir_stdin_output_is {
-    my ($input_string, $code, $expected_output, $test_name) = @_;
-
-    my $stuff = sub {
-        # Put the string on a file.
-        my $string = shift;
-
-        my (undef, $file) = create_tempfile(UNLINK => 1);
-        open(my $out, '>', $file) or die "bug";
-        binmode $out;
-        print $out $string;
-        return $file;
-    };
-
-    # Write the input and code strings.
-    my $input_file = $stuff->($input_string);
-    my $code_file = $stuff->($code);
-
-    my $parrot = ".$PConfig{slash}parrot$PConfig{exe}";
-    # Slurp and compare the output.
-    my $result = do {
-        local $/;
-        open(my $in, '-|', "$parrot $code_file < $input_file")
-            or die "bug";
-        <$in>;
-    };
-    Test::More::is($result, $expected_output, $test_name);
-}
 
 pir_stdin_output_is(<<'INPUT', <<'CODE', <<'OUTPUT', 'simple stdin use');
 foo

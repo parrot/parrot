@@ -25,7 +25,7 @@ Creates the 3 Stream objects and dumps the combined stream.
 
 =cut
 
-.sub _main
+.sub _main :main
     .local pmc counter
     .local pmc text
     .local pmc combined

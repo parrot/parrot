@@ -72,6 +72,7 @@ if ( $PConfig{gmp} ) {
 }
 
 pasm_output_is( <<'CODE', <<'OUT', "create" );
+.pcc_sub :main main:
    new P0, ['BigNum']
    say "ok"
    end
@@ -80,6 +81,7 @@ ok
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "set/get int" );
+.pcc_sub :main main:
    new P0, ['BigNum']
    set P0, 999999
    set I1, P0
@@ -100,6 +102,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "set/get keyed string" );
+.pcc_sub :main main:
     new P0, ['BigNum']
     set P0, 14
     set S0, P0[16]
@@ -120,6 +123,7 @@ e
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "destroy on copy" );
+.pcc_sub :main main:
     new P0, ['BigNum']
     new P1, ['BigNum']
     set P0, 4183
@@ -132,6 +136,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "clone equality" );
+.pcc_sub :main main:
     .include 'fp_equality.pasm'
     new P0, ['BigNum']
     set P0, 56.743
@@ -147,6 +152,7 @@ ok
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "inc/dec" );
+.pcc_sub :main main:
     .include 'fp_equality.pasm'
     new P0, ['BigNum']
     set P0, 5.5
@@ -169,6 +175,7 @@ ok 2
 OUT
 
 pasm_output_is( <<"CODE", <<'OUT', "set int, get double" );
+.pcc_sub :main main:
      .include 'fp_equality.pasm'
      new P0, ['BigNum']
      set P0, 999999
@@ -204,6 +211,7 @@ OUT
 
 my @todo_str = ( todo => "bignum strings");
 pasm_output_is( <<'CODE', <<'OUT', "set double, get str", @todo_str );
+.pcc_sub :main main:
    new P0, ['BigNum']
    set P0, 1.23e12
    say P0
@@ -216,6 +224,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "add", @todo_str);
+.pcc_sub :main main:
    new P0, ['BigNum']
    set P0, 999999.5
    new P1, ['BigNum']
@@ -255,6 +264,7 @@ exception thrown
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "i_add", @todo_str );
+.pcc_sub :main main:
    new P0, ['BigNum']
    new P1, ['Float']
    set P0, 400
@@ -305,6 +315,7 @@ exception thrown
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "add_int", @todo_str );
+.pcc_sub :main main:
    new P0, ['BigNum']
    set P0, 999999
    new P2, ['BigNum']
@@ -322,6 +333,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub bignum" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, 12345678
      new P1, ['BigNum']
@@ -353,6 +365,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub native int" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, 12345678
      new P2, ['BigNum']
@@ -375,6 +388,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub other int" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, 12345678
      new P1, ['Integer']
@@ -424,6 +438,7 @@ ok 5
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "i_subtract", todo => 'undiagnosed bug in i_subtract routine with immediate values' );
+.pcc_sub :main main:
     .include 'fp_equality.pasm'
     new P0, ['BigNum']
     new P1, ['BigNum']
@@ -486,6 +501,7 @@ ok 6
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUT', "mul", @todo_str );
+.pcc_sub :main main:
    new P0, ['BigNum']
    set P0, 999.999
    new P1, ['BigNum']
@@ -524,6 +540,7 @@ exception thrown
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "i_multiply", @todo_str );
+.pcc_sub :main main:
    new P0, ['BigNum']
    set P0, 50
    new P1, ['BigNum']
@@ -576,6 +593,7 @@ exception thrown
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "mul_float", @todo_str);
+.pcc_sub :main main:
    new P0, ['BigNum']
    set P0, 999.999
    mul P2, P0, 10.000005
@@ -586,6 +604,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "div bignum" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, "100000000000000000000"
      new P1, ['BigNum']
@@ -627,6 +646,7 @@ ok 4
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "div native int" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, "100000000000000000000"
      new P1, ['BigNum']
@@ -650,6 +670,7 @@ ok 2
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "div other int" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, "100000000000000000000"
      new P1, ['BigNum']
@@ -677,6 +698,7 @@ ok 2
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "div float" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, "100000000000000000000"
      new P1, ['BigNum']
@@ -700,6 +722,7 @@ ok 2
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "i_divide" );
+.pcc_sub :main main:
     .include 'fp_equality.pasm'
     new P0, ['BigNum']
     new P1, ['BigNum']
@@ -754,6 +777,7 @@ ok 4
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "floor_divide", todo => 'undiagnosed bug in floor division; no floor division is actually done.' );
+.pcc_sub :main main:
     .include 'fp_equality.pasm'
     new P0, ['BigNum']
     new P1, ['Integer']
@@ -825,6 +849,7 @@ ok 5
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "equality and comparison" );
+.pcc_sub :main main:
     new P0, ['BigNum']
     new P1, ['BigNum']
     set P0, 3
@@ -866,7 +891,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "pow method" );
 .include 'fp_equality.pasm'
-.sub main
+.sub main :main
     $P0 = new ['BigNum']
     $P1 = new ['Integer']
     $P0 = 5
@@ -950,6 +975,7 @@ OUTPUT
     }
 
     pasm_output_is( <<CODE, <<OUT, "add overflow Integer" );
+    .pcc_sub :main main:
    new P0, ['Integer']
    set P0, $a
    new P1, ['Integer']
@@ -978,6 +1004,7 @@ ok
 OUT
 
     pasm_output_is( <<CODE, <<OUT, "add overflow Integer" );
+    .pcc_sub :main main:
    new P0, ['Integer']
    set P0, $a
    new P1, ['Integer']
@@ -1006,6 +1033,7 @@ ok
 OUT
 
     pasm_output_is( <<"CODE", <<'OUT', "set overflow Integer" );
+    .pcc_sub :main main:
    push_eh THROWN
    new P0, ['BigNum']
    set P0, $d
@@ -1021,6 +1049,7 @@ OUT
 }
 
 pasm_output_is( <<'CODE', <<'OUT', "abs", @todo_str );
+.pcc_sub :main main:
    new P0, ['BigNum']
    set P0, "-1230000000000"
    new P1, ['Undef']
@@ -1038,7 +1067,7 @@ OUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
-.sub _main
+.sub _main :main
     .local pmc pmc1
     pmc1 = new ['BigNum']
     .local int bool1
@@ -1054,6 +1083,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Truth" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, "123456789123456789"
      if P0, OK1
@@ -1070,6 +1100,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "neg" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      new P1, ['BigNum']
      set P0, "123456789123456789"

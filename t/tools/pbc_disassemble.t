@@ -44,7 +44,7 @@ BEGIN {
         plan skip_all => "pbc_disassemble hasn't been built. Run make parrot_utils";
         exit(0);
     }
-    plan tests => 9;
+    plan tests => 10;
 }
 
 my $helpregex = <<OUTPUT;
@@ -59,6 +59,12 @@ OUTPUT
 disassemble_raw_output_like( "--help", $helpregex, "pbc_disassemble help message");
 disassemble_raw_output_like( "--thisisnotarealoption", $helpregex, "pbc_disassemble bad option");
 disassemble_raw_output_like( "-h -b -o - -?", $helpregex, "pbc_disassemble every option");
+
+my $errorregex = <<OUTPUT;
+/Error during disassembly\nPackFile_Header_validate: This is not a valid Parrot bytecode file./m
+OUTPUT
+
+disassemble_raw_output_like( "-o del.pasm pbc_disassemble", $errorregex, "pbc_disassemble bad bytecode file");
 
 disassemble_output_like( <<PIR, "pir", qr/PMC_CONST.*set_n_nc.*print_n/ms, 'pbc_disassemble numeric ops');
 .sub main :main
@@ -125,7 +131,7 @@ sub disassemble_output_like {
 
 sub disassemble_raw_output_like {
     my ($options, $snippet, $desc)  = @_;
-    my $out = `$exefile $options`;
+    my $out = `$exefile $options 2>&1`;
     like( $out, $snippet, $desc );
     return;
 }

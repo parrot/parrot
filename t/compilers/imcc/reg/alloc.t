@@ -35,7 +35,7 @@ Hi
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "alligator 2 - r9629" );
-.sub xyz
+.sub xyz :main
     .local pmc args
     args = new 'ResizablePMCArray'
     push args, "abc"
@@ -63,7 +63,7 @@ def
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "Explicit large register: S, PIR" );
-.sub main
+.sub main :main
   $S32 = "ok\n"
   print $S32
 .end
@@ -72,7 +72,7 @@ ok
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "Explicit large register: N, PIR" );
-.sub main
+.sub main :main
   $N32 = 3.8
   print $N32
   print "\n"
@@ -82,7 +82,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "Explicit large register: I, PIR" );
-.sub main
+.sub main :main
   $I32 = 123
   print $I32
   print "\n"
@@ -92,7 +92,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "Explicit large register: P, PIR" );
-.sub main
+.sub main :main
   $P32 = new 'String'
   $P32 = "ok\n"
   print $P32
@@ -102,6 +102,7 @@ ok
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: S, PASM" );
+.pcc_sub :main main:
   set S32, "ok\n"
   print S32
   end
@@ -110,6 +111,7 @@ ok
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: N, PASM" );
+.pcc_sub :main main:
   set N32, 3.8
   print N32
   print "\n"
@@ -119,6 +121,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: I, PASM" );
+.pcc_sub :main main:
   set I32, 123
   print I32
   print "\n"
@@ -128,6 +131,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: P, PASM" );
+.pcc_sub :main main:
   new P32, 'String'
   set P32, "ok\n"
   print P32

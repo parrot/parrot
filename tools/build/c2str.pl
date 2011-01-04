@@ -18,7 +18,6 @@ use lib 'lib';
 
 use Fcntl qw( :DEFAULT :flock );
 use Text::Balanced qw(extract_delimited);
-use Getopt::Long ();
 use IO::File ();
 
 my $outfile          = 'all_cstring.str';
@@ -33,17 +32,16 @@ flock( $ALL, LOCK_EX ) or die "Can't lock '$outfile': $!\n";
 
 $ALL->seek(2, 0); # in case its been appended to while we waited for the lock
 
-my ( $result, $do_all, $do_init, $file );
-$result = Getopt::Long::GetOptions(
-    "all"  => \$do_all,
-    "init" => \$do_init,
-);
+my ( $do_all, $do_init, $file );
+$do_all  = 1 if $ARGV[0] eq "--all";
+$do_init = 1 if $ARGV[0] eq "--init";
 
 $do_all and do {
     read_all();
     create_c_include();
     exit;
 };
+
 $do_init and do {
     close $ALL;
     unlink $outfile;

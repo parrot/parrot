@@ -35,9 +35,9 @@ sub runstep {
 
     # A plain --optimize means use perl5's $Config{optimize}.  If an argument
     # is given, however, use that instead.
-    my $optimize = $conf->options->get('optimize');
+    my $request_optimize = $conf->options->get('optimize');
 
-    if (! defined $optimize) {
+    if (! defined $request_optimize) {
         $self->set_result('no');
         $conf->debug("(none requested) ");
         return 1;
@@ -47,7 +47,7 @@ sub runstep {
     my $gccversion = $conf->data->get( 'gccversion' );
 
     my $options;
-    if ( $optimize eq "1" ) {
+    if ( $request_optimize ) {
         # start with perl5's flags ...
         $options = $conf->data->get('optimize_provisional');
 
@@ -58,7 +58,7 @@ sub runstep {
     }
     else {
         # use the command line verbatim
-        $options = $optimize;
+        $options = $request_optimize;
     }
 
     # save the options, however we got them.
