@@ -574,20 +574,6 @@ sub pbc_postprocess_output_like {
 
 }
 
-=over
-
-=item C<pir_stdin_output_is($input_string, $code, $expected, $description)>
-
-Runs the PIR code while piping data into its standard input and passes the test
-if a string comparison of output with the expected result is true.
-
-=item C<pir_stdin_output_like($input_string, $code, $expected, $description)>
-
-Runs the PIR code while piping data into its standard input and passes the test
-if the output matches the expected result.
-
-=cut
-
 sub _pir_stdin_output_slurp {
     my ($input_string, $code, $expected_ouptut) = @_;
 
@@ -618,12 +604,30 @@ sub _pir_stdin_output_slurp {
     return $result;
 }
 
+=over
+
+=item C<pir_stdin_output_is($input_string, $code, $expected, $description)>
+
+Runs the PIR code while piping data into its standard input and passes the test
+if a string comparison of output with the expected result is true.
+
+=cut
+
 sub pir_stdin_output_is {
     my ($input_string, $code, $expected_output, $description) = @_;
 
     my $result = _pir_stdin_output_slurp($input_string, $code, $expected_output);
     Test::More::is($result, $expected_output, $description);
 }
+
+=item C<pir_stdin_output_like($input_string, $code, $expected, $description)>
+
+Runs the PIR code while piping data into its standard input and passes the test
+if the output matches the expected result.
+
+=back
+
+=cut
 
 sub pir_stdin_output_like {
     my ($input_string, $code, $expected_output, $description) = @_;
