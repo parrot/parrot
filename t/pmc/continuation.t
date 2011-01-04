@@ -17,7 +17,7 @@ Tests the Continuation PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(8)
+    plan(9)
 
     test_new()
     invoke_with_init()
@@ -157,7 +157,11 @@ end:
 
    # Test get_string vtable.
    $S0 = cc
-   is($S0,"current instr.: 'get_pointer_and_string' pc 403 (t/pmc/continuation.t:159)", "get_string")
+   $I0 = index $S0, 'get_pointer_and_string'
+   isnt($I0, -1,  "Continuation's stringification has name of current function")
+
+   $I0 = index $S0, 't/pmc/continuation.t'
+   isnt($I0, -1, "Continuation's stringification has name of current file")
 
    $P1 = cc."continuation"()
    $S0 = typeof $P1
