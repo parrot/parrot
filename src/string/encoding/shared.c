@@ -1244,8 +1244,8 @@ fixed8_iter_set_and_advance(PARROT_INTERP,
     ptr[iter->charpos++] = c;
     iter->bytepos++;
 
-	if (str->bufused < iter->bytepos)
-		str->bufused = iter->bytepos;
+    if (str->bufused < iter->bytepos)
+        str->bufused = iter->bytepos;
 }
 
 
