@@ -25,8 +25,8 @@ pir_output_like(<<'CODE', <<'OUT', 'PASMSerialize(FIA)');
 .end
 CODE
 /
-    \s [$]1: FixedIntegerArray \s \n
-    [$]1: \[ \s (?: \d+ \s+ )+ [$]0 \s \] \n
+    \s [$]1: FixedIntegerArray           \n
+    [$]1: \[ \s (?: \d+ \s )+ [$]0 \s \] \n
 /mx
 OUT
 
@@ -48,14 +48,14 @@ pir_output_like(<<'CODE', <<'OUT', 'PASMSerialize(RPA)');
 .end
 CODE
 /
-    \s [$]1: ResizablePMCArray \s \n
+    \s [$]1: ResizablePMCArray \n
     (?:
         [$]\d+: \[ \s (?: (?: -? \d+ (?: [.] \d+ )? (?: e \d+ )?
                             | \w+:"(?: [^"] | \\ ")*"
                             | STRINGNULL
                             | [$]\d+ (?: : \w+)?
                             )
-         \s+ )+ [$]0 \s \] \n
+                          \s )+ [$]0 \s \] \n
     ){3}
 /mx
 OUT

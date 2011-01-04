@@ -18,6 +18,13 @@ Freezes and thaws PMCs using a text format suitable for use in PASM.
 
 */
 
+static void
+push_sep(PARROT_INTERP, PMC *self)
+{
+    PMC *buf = PARROT_PASMSERIALIZER(self)->buffer;
+    VTABLE_push_string(interp, buf, CONST_STRING(interp, " "));
+}
+
 /* HEADERIZER HFILE: none */
 
 pmclass PASMSerializer auto_attrs {
@@ -108,21 +115,19 @@ Push data item C<v> onto the end of the image being frozen.
 
     VTABLE void push_integer(INTVAL v) {
         PMC *buf = PARROT_PASMSERIALIZER(SELF)->buffer;
-        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
+        push_sep(INTERP, SELF);
         VTABLE_push_string(INTERP, buf, Parrot_str_from_int(INTERP, v));
-        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
     }
 
     VTABLE void push_float(FLOATVAL v) {
         PMC *buf = PARROT_PASMSERIALIZER(SELF)->buffer;
-        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
+        push_sep(INTERP, SELF);
         VTABLE_push_string(INTERP, buf, Parrot_str_from_num(INTERP, v));
-        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
     }
 
     VTABLE void push_string(STRING *v) {
         PMC *buf = PARROT_PASMSERIALIZER(SELF)->buffer;
-        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
+        push_sep(INTERP, SELF);
         if (STRING_IS_NULL(v)) {
             VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, "STRINGNULL"));
         }
@@ -133,7 +138,6 @@ Push data item C<v> onto the end of the image being frozen.
             VTABLE_push_string(INTERP, buf, Parrot_str_escape(INTERP, v));
             VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, "\""));
         }
-        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
     }
 
     VTABLE void push_pmc(PMC *v) {
@@ -166,8 +170,6 @@ Push data item C<v> onto the end of the image being frozen.
             VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, ":"));
             VTABLE_push_string(INTERP, buf, VTABLE_name(INTERP, v));
         }
-
-        VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " "));
     }
 
 /*
@@ -218,7 +220,7 @@ Freeze the PMC C<p> into the buffer.
                 VTABLE_visit(INTERP, current, SELF);
                 VISIT_PMC(INTERP, SELF, PMC_metadata(current));
 
-                VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, "]"));
+                VTABLE_push_string(INTERP, buf, CONST_STRING(INTERP, " ]"));
             }
         }
     }
