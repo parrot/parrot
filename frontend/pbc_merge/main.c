@@ -365,11 +365,16 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         if (in_seg->main_sub >= 0) {
             if (bc_seg->main_sub < 0)
                 bc_seg->main_sub = in_seg->main_sub + inputs[i]->pmc.const_start;
+            /*
+            XXX hide incessant warning messages triggered by implicit :main
+            this can be added when TT #1704 is implemented
+
             else
                 Parrot_io_eprintf(interp,
                     "PBC Merge: multiple :main subs encountered, using first "
                     "and ignoring sub found in `%s'",
                     inputs[i]->filename);
+            */
         }
     }
 
