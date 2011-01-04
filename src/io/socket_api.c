@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -126,7 +126,7 @@ Parrot_io_socket_is_closed(SHIM_INTERP, ARGMOD(PMC *socket))
 
 /*
 
-=item C<void Parrot_io_socket_initialize_handle(SHIM_INTERP, ARGMOD(PMC *socket))>
+=item C<void Parrot_io_socket_initialize_handle(PARROT_INTERP, PMC *socket)>
 
 Initialize a Socket PMC
 
