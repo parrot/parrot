@@ -96,7 +96,6 @@ F<src/io/api.c>,
 F<src/io/buffer.c>,
 F<src/io/portable.c>,
 F<src/io/unix.c>,
-F<src/io/utf8.c>,
 F<src/io/io_win32.c>.
 
 =cut

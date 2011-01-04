@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 5;
 
 =head1 NAME
 
@@ -168,42 +168,6 @@ OUT
 # TT #1204 test reading long chunks, eof, and across newlines
 
 # TT #1204 pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - asynchronous', todo => 'not yet implemented' );
-
-# L<PDD22/I\/O PMC API/=item record_separator>
-pir_output_is( <<'CODE', <<'OUT', 'record_separator', todo => 'not yet implemented' );
-.sub 'test' :main
-    $P0 = new ['FileHandle']
-
-    $S0 = $P0.record_separator()
-    if $S0 == "\n" goto ok_1
-    print 'not '
-  ok_1:
-    say 'ok 1 - $S0 = $P1.record_separator() # default'
-
-    $S99 = 'abc'
-    $P0.record_separator($S99)
-    $S0 = $P0.record_separator()
-    if $S0 == $S99 goto ok_2
-    print 'not '
-  ok_2:
-    say 'ok 2 - $P0.record_separator($S1)'
-
-    $P0.print(123)
-    $S0 = $P0.record_separator()
-    $P0.print($S0)
-    $P0.print(456)
-
-    $S0 = $P0.readline()
-    if $S0 == '123abc' goto ok_3
-    print 'not '
-  ok_3:
-    say 'ok 3 - $P0.record_separator() # .readline works as expected'
-.end
-CODE
-ok 1 - $S0 = $P1.record_separator() # default
-ok 2 - $P0.record_separator($S1)
-ok 3 - $P0.record_separator() # .readline works as expected
-OUT
 
 # L<PDD22/I\/O PMC API/=item buffer_type>
 pir_output_is( <<'CODE', <<'OUT', 'buffer_type', todo => 'not yet implemented' );
