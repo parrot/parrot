@@ -624,7 +624,7 @@ fin:
     $P2 = 48
     mul $P0, $P1
     $I0 = iseq $P0, $P2
-    todo($I0, 'i_multiply Integer PMC by BigInt PMC', 'unresolved bug, see TT #1887')
+    ok($I0, 'i_multiply Integer PMC by BigInt PMC')
 
     $P0 = new ['Integer']
     $P9 = get_hll_global MAXINT
