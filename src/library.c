@@ -806,6 +806,7 @@ extension and C<ext> to the extension or NULL.
 
 */
 
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *

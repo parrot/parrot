@@ -80,9 +80,7 @@ STRING* Parrot_locate_runtime_file_str(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void parrot_init_library_paths(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * parrot_split_path_ext(PARROT_INTERP,
@@ -95,6 +93,9 @@ STRING * parrot_split_path_ext(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*wo_ext)
         FUNC_MODIFIES(*ext);
+
+void parrot_init_library_paths(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_get_runtime_path __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -115,13 +116,13 @@ STRING * parrot_split_path_ext(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(file))
-#define ASSERT_ARGS_parrot_init_library_paths __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_parrot_split_path_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(in) \
     , PARROT_ASSERT_ARG(wo_ext) \
     , PARROT_ASSERT_ARG(ext))
+#define ASSERT_ARGS_parrot_init_library_paths __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/library.c */
 
