@@ -675,7 +675,7 @@ pir_output_is( <<'CODE', $UID, 'Test get_user_id' );
 CODE
 
 SKIP: {
-    skip 'no file modes on Win32', 6 if ($MSWin32 || $cygwin);
+    skip 'no file modes on Win32', 3 if ($MSWin32 || $cygwin);
 
     open my $fa, ">", "test_f_a";
     close $fa;
@@ -723,29 +723,28 @@ CODE
 /No such file or directory/
 OUT
 
-    my ($ra, $rb, $wa, $wb, $xa, $xb);
+}
 
-    # test can_read
-    $ra = -r "test_f_a" ? 1 : 0;
-    $rb = -r "test_f_b" ? 1 : 0;
-    pir_output_is( <<'CODE', <<"OUT", 'Test can_read' );
-    .sub main :main
-            $P0 = loadlib 'os'
-            $P1 = new ['OS']
+my ($ra, $rb, $wa, $wb, $xa, $xb);
 
-            $I0 = $P1."can_read"("test_f_a")
-            say $I0
+# test can_read
+$ra = -r "README" ? 1 : 0;
+pir_output_is( <<'CODE', <<"OUT", 'Test can_read' );
+.sub main :main
+    $P0 = loadlib 'os'
+    $P1 = new ['OS']
 
-            $I1 = $P1."can_read"("test_f_b")
-            say $I1
+    $I0 = $P1."can_read"("README")
+    say $I0
 
-            end
-    .end
+    end
+.end
 CODE
 $ra
-$rb
 OUT
 
+TODO: {
+    local $TODO = "Cannot test writability on Win32" if $MSWin32;
     # test can_write
     $wa = -w "test_f_a" ? 1 : 0;
     $wb = -w "test_f_b" ? 1 : 0;
@@ -766,30 +765,32 @@ CODE
 $wa
 $wb
 OUT
+}
 
-    # test can_execute
-    $xa = -x "test_f_a" ? 1 : 0;
-    $xb = -x "test_f_b" ? 1 : 0;
-    pir_output_is( <<'CODE', <<"OUT", 'Test can_execute' );
-    .sub main :main
-            $P0 = loadlib 'os'
-            $P1 = new ['OS']
+# test can_execute
+$xa = -x "README" ? 1 : 0;
+my $parrot_exe_name = $MSWin32 ? "parrot.exe" : "parrot";
+$xb = -x $parrot_exe_name ? 1 : 0;
+pir_output_is( <<"CODE", <<"OUT", 'Test can_execute' );
+.sub main :main
+        \$P0 = loadlib 'os'
+        \$P1 = new ['OS']
 
-            $I0 = $P1."can_execute"("test_f_a")
-            say $I0
+        \$I0 = \$P1."can_execute"("README")
+        say \$I0
 
-            $I1 = $P1."can_execute"("test_f_b")
-            say $I1
+        \$I1 = \$P1."can_execute"("$parrot_exe_name")
+        say \$I1
 
-            end
-    .end
+        end
+.end
 CODE
 $xa
 $xb
 OUT
 
 unlink "test_f_a", "test_f_b", "test_f_c";
-}
+
 
 
 # Local Variables:
