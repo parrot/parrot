@@ -247,6 +247,20 @@ Unpack a serialized segment string.
 
 /*
 
+=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+
+Fetch an integer's worth of data from the segment.
+
+=cut
+
+*/
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key)  {
+        return VTABLE_get_integer_keyed_int(INTERP,
+                PARROT_PACKFILEBYTECODESEGMENT(SELF)->ops, key);
+    }
+
+/*
+
 =back
 
 =cut
