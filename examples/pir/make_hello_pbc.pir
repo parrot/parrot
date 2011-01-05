@@ -48,7 +48,7 @@
 
     op = new ['ResizablePMCArray']
     op[0] = 'set_returns_pc'
-    op[1] = 0x001 # id of FIA
+    op[1] = 0x000 # id of FIA
     push pfbc, op
 
     op = new ['ResizablePMCArray']
