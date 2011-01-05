@@ -23,6 +23,44 @@ use Parrot::Revision;
 
 $| = 1;    # $OUTPUT_AUTOFLUSH = 1;
 
+sub tee {
+    # Try forking.
+    my $pid = open(STDOUT, "|-");
+    die "cannot fork: $!" unless defined $pid;
+
+    if ($pid) {
+        # Parent redirects stderr to stdout and returns.
+        open(STDERR, ">&STDOUT");
+    }
+    else {
+        # Child opens the log file and then exits when the parent does.
+        die "cannot open config.log for writing: $!" unless open(my $handle, ">", "config.log");
+
+        select($handle);
+        $| = 1;
+
+        while(sysread(*STDIN, $_, 2048) > 0) {
+            # Log prompt responses to file as well.
+            if(/^<promptanswer (.*)>\n(.*)$/) {
+                print "$1\n";
+
+                # If we slurped some extra data, print that normally.
+                if($2) {
+                    print $2;
+                    print STDOUT $2;
+                }
+
+                next;
+            }
+
+            print $_;
+            print STDOUT $_;
+        }
+        exit;
+    }
+}
+tee();
+
 # Install Option text was taken from:
 #
 # autoconf (GNU Autoconf) 2.59
