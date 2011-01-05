@@ -96,6 +96,14 @@ Tests the PackfileOpMap PMC.
     $P0 = loadlib 'math_ops'
     ($I0) = opmap.'load_lib'('math_ops')
     ok(1, "load_lib works with 'math_ops'")
+
+    $I0 = opmap['say_sc']
+    # First mapped op should be 0
+    is($I0, 0, "Can map say_sc from core_ops")
+
+    $I0 = opmap['cmod_i_i_i']
+    is($I0, 1, "Can map cmod_i_i_i from math_ops")
+
 .end
 
 
