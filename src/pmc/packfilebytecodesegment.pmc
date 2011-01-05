@@ -84,11 +84,14 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
 */
 
     VTABLE void *get_pointer() {
-        INTVAL i, bc_seg_size, lib_count;
+        INTVAL op_count, lib_count;
+        size_t i;
 
         STRING *oplib_name = CONST_STRING(INTERP, "oplib_name");
         STRING *lib_ops    = CONST_STRING(INTERP, "lib_ops");
-        PMC    *ops;
+        PMC    *ops, *op_map;
+
+        PackFile_ByteCode_OpMapping * mapping;
 
         /* ByteCode to return */
         PackFile_ByteCode * const bc = mem_gc_allocate_zeroed_typed(interp, PackFile_ByteCode);
@@ -106,6 +109,21 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
             bc->base.data[i] = VTABLE_get_integer_keyed_int(INTERP, ops, i);
         }
 
+        /* Create various dynop mapping related structures */
+        GET_ATTR_op_map(INTERP, SELF, op_map);
+        op_count = VTABLE_get_integer(INTERP, op_map);
+
+        bc->op_count = op_count;
+        bc->op_func_table = mem_gc_allocate_n_zeroed_typed(interp, op_count, op_func_t);
+        /* TODO Fill it */
+
+        bc->op_info_table = mem_gc_allocate_n_zeroed_typed(interp, op_count, op_info_t*);
+        /* TODO Fill it */
+
+        /* Construct mappings */
+        mapping = VTABLE_get_pointer(INTERP, op_map);
+        memcpy(&bc->op_mapping, mapping, sizeof (PackFile_ByteCode_OpMapping));
+        /* Don't free "mapping". Caller will do it */
 
         return bc;
     }

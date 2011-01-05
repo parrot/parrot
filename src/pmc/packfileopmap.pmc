@@ -228,6 +228,36 @@ Ensure that an op library is loaded and accessible to this OpMap.
         RETURN (INTVAL 1);
     }
 
+
+/*
+=item C<get_pointer>
+
+Construct PackFile_ByteCode_OpMapping.
+
+=cut
+*/
+
+    VTABLE void *get_pointer() {
+        PMC                         *op_maps;
+        PackFile_ByteCode_OpMapping *m;
+        INTVAL                       i;
+
+        GET_ATTR_op_maps(INTERP, SELF, op_maps);
+
+        /* Allocate OpMapping. Caller must free results */
+        m = mem_gc_allocate_zeroed_typed(INTERP, PackFile_ByteCode_OpMapping);
+
+        m->n_libs = VTABLE_get_integer(INTERP, op_maps);
+        m->libs   = mem_gc_allocate_n_zeroed_typed(INTERP, m->n_libs,
+                            PackFile_ByteCode_OpMappingEntry);
+
+        /* Fill OpMappingEntry */
+        for (i = 0; i < m->n_libs; i++) {
+        }
+
+        return m;
+    }
+
 }
 
 
