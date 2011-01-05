@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -32,6 +32,16 @@ files and directories.
 #endif
 
 #ifdef _MSC_VER
+/*
+
+=item C<static int win32_can_execute(PARROT_INTERP, STRING *filename)>
+
+tests if a win32 file is executable
+
+=cut
+
+*/
+
 static int
 win32_can_execute(PARROT_INTERP, STRING *filename)
 {
@@ -50,7 +60,7 @@ win32_can_execute(PARROT_INTERP, STRING *filename)
         return 0;
     ext = Parrot_str_upcase(interp, ext);
     ext = Parrot_str_concat(interp, dot, ext);
-    
+
     for (i = 0; i < elems; i++) {
         STRING * const test_ext = VTABLE_get_string_keyed_int(interp, pathext_pmc, i);
         if (Parrot_str_equal(interp, ext, test_ext))
