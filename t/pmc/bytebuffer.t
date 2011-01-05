@@ -21,7 +21,7 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(45)
+    plan(46)
 
     test_init()
     test_set_string()
@@ -363,8 +363,16 @@ catch_content:
 end:
 .end
 
+.sub get_chars_outofbounds
+    .local pmc bb
+    .local string s
+    bb = new ['ByteBuffer']
+    bb = 'a'
+    s = bb.'get_chars'(2, 1, 'ascii')
+.end
+
 .sub test_get_chars
-    .local pmc bb, it, arr
+    .local pmc bb
     .local string s
     bb = new ['ByteBuffer']
 
@@ -391,6 +399,9 @@ end:
     is( s, utf16:"Grü", 'get_chars ucs4' )
     s = bb.'get_chars'(8, 3, 'ucs4')
     is( s, utf16:"üße", 'get_chars ucs4' )
+
+    .const 'Sub' get_chars_oob = 'get_chars_outofbounds'
+    throws_type(get_chars_oob, .EXCEPTION_OUT_OF_BOUNDS, 'get_chars out of bounds')
 .end
 
 # Local Variables:
