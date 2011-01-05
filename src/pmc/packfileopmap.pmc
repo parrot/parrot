@@ -255,6 +255,34 @@ Construct PackFile_ByteCode_OpMapping.
 
         /* Fill OpMappingEntry */
         for (i = 0; i < m->n_libs; i++) {
+            INTVAL j;
+            PackFile_ByteCode_OpMappingEntry *om = &m->libs[i];
+            PMC *mapping = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
+
+            STRING *tmp;
+            PMC    *oplib, *table_ops, *lib_ops;
+
+            tmp     = CONST_STRING(INTERP, "oplib");
+            oplib   = VTABLE_get_pmc_keyed_str(INTERP, mapping, tmp);
+            om->lib = (op_lib_t *)VTABLE_get_pointer(INTERP, oplib);
+
+            tmp       = CONST_STRING(INTERP, "table_ops");
+            table_ops = VTABLE_get_pmc_keyed_str(INTERP, mapping, tmp);
+
+            om->n_ops = VTABLE_get_integer(INTERP, table_ops);
+
+            om->table_ops = mem_gc_allocate_n_zeroed_typed(INTERP, om->n_ops, opcode_t);
+            for (j = 0; j < om->n_ops; j++) {
+                om->table_ops[j] = VTABLE_get_integer_keyed_int(INTERP, table_ops, j);
+            }
+
+            tmp = CONST_STRING(INTERP, "lib_ops");
+            lib_ops     = VTABLE_get_pmc_keyed_str(INTERP, mapping, tmp);
+            om->lib_ops = mem_gc_allocate_n_zeroed_typed(INTERP, om->n_ops, opcode_t);
+            for (j = 0; j < om->n_ops; j++) {
+                om->lib_ops[j] = VTABLE_get_integer_keyed_int(INTERP, lib_ops, j);
+            }
+
         }
 
         return m;
