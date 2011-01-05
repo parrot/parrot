@@ -26,11 +26,11 @@ Tests the PackfileOpMap PMC.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    'plan'(7)
 
     'sanity'()
     'basic'()
     'load_lib'()
+    'done_testing'()
 .end
 
 
@@ -67,12 +67,16 @@ Tests the PackfileOpMap PMC.
     pop_eh
 
     $I0 = opmap['say_sc']
+    # First mapped op should be 0
+    is($I0, 0, "First mapped op is 0")
     $I1 = opmap['say_sc']
     is($I0, $I1, "opmap always return same value for a given op")
 
     $I0 = opmap['returncc']
+    is($I0, 1, "Second mapped op is 1")
     $I0 = opmap['issame_i_p_p']
     $I0 = opmap['cmp_i_i_i']
+    is($I0, 3, "Forth mapped op is 3")
 
     $I0 = opmap
     is($I0, 4, "opmap correctly reports the number of mapped ops")
