@@ -4529,6 +4529,31 @@ Return the whole config
     .return ($S0)
 .end
 
+=item get_submitter
+
+=cut
+
+.sub 'get_submitter'
+    .local pmc env
+    env = new 'Env'
+    $I0 = exists env['SMOLDER_SUBMITTER']
+    unless $I0 goto L1
+    $S0 = env['SMOLDER_SUBMITTER']
+    .return ($S0)
+  L1:
+    .local string me
+    $P0 = get_config()
+    $I0 = exists $P0['win32']
+    unless $I0 goto L2
+    me = env['USERNAME']
+    goto L3
+  L2:
+    me = env['LOGNAME']
+  L3:
+    $S0 = me . '@unknown'
+    .return ($S0)
+.end
+
 =item cc_run
 
 =cut

@@ -103,6 +103,7 @@ to enforce whitespace between lexical words.
 .include 'cclass.pasm'
 
 .sub 'ww' :method
+    .param pmc adverbs         :slurpy :named
     .local pmc mob
     .local int pos
     .local string target
