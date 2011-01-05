@@ -199,7 +199,7 @@ Ensure that an op library is loaded and accessible to this OpMap.
 
         for (i = 0; i < op_map_count; i++) {
             PMC *map = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
-            if (Parrot_str_equal(INTERP, lib_name, 
+            if (Parrot_str_equal(INTERP, lib_name,
                         VTABLE_get_string_keyed_str(INTERP, map, oplib_name))) {
                 RETURN(INTVAL 1);
             }

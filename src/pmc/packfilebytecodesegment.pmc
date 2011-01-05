@@ -154,7 +154,7 @@ an op and the remaining PMCs being Integers.
                     "PMC passed to push_pmc is not array-like");
         }
 
-        op_num = VTABLE_get_integer_keyed_str(INTERP, attrs->op_map, 
+        op_num = VTABLE_get_integer_keyed_str(INTERP, attrs->op_map,
                  VTABLE_get_string_keyed_int(INTERP, p, 0));
 
         if (op_num == -1) {
@@ -214,7 +214,7 @@ bytecode segment.
 
 =back
 
-=head2 Packfile Interface Methods 
+=head2 Packfile Interface Methods
 
 =over 4
 
