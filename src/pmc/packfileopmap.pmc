@@ -95,7 +95,7 @@ already in the map, a new map will be created.
             return VTABLE_get_integer_keyed(INTERP, map_cache, key);
         }
 
-        key_str = key_string(INTERP, key);
+        key_str = Parrot_key_string(INTERP, key);
         oplib_str = CONST_STRING(INTERP, "oplib");
         GET_ATTR_op_maps(INTERP, SELF, op_maps);
         op_map_count = VTABLE_elements(INTERP, op_maps);
@@ -137,7 +137,7 @@ already in the map, a new map will be created.
     }
 
     VTABLE INTVAL get_integer_keyed_str(STRING *str_key) {
-        PMC *pmc_key = key_new_string(INTERP, str_key);
+        PMC *pmc_key = Parrot_key_new_string(INTERP, str_key);
         return SELF.get_integer_keyed(pmc_key);
     }
 
