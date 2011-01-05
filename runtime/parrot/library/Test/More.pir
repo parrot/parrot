@@ -1030,7 +1030,7 @@ expected type, fails otherwise.
     pop_eh
     msg = concat msg, "throws expected type"
     exmsg = concat 'exception message is: "', exmsg
-    msg = concat exmsg, '")'
+    exmsg = concat exmsg, '"'
     is(extype, type, msg)
     diag(exmsg)
   end:
