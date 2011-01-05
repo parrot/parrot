@@ -31,7 +31,7 @@ files and directories.
 #  include <unistd.h>
 #endif
 
-#ifdef _MSC_VER
+#ifdef WIN32
 /*
 
 =item C<static int win32_can_execute(PARROT_INTERP, STRING *filename)>
