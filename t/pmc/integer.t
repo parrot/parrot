@@ -600,8 +600,7 @@ fin:
     $P1 = "2+4i"
     $P2 = "4+8i"
     mul $P0, $P1
-    $I0 = iseq $P0, $P2
-    todo($I0, 'i_multiply Integer PMC by Complex PMC', 'unresolved bug, see TT #1887')
+    is($P0, $P2, 'i_multiply Integer PMC by Complex PMC')
 
     $P0 = new ['Integer']
     $P1 = new ['Float']
