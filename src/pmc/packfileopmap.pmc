@@ -201,7 +201,7 @@ Ensure that an op library is loaded and accessible to this OpMap.
             PMC *map = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
             if (Parrot_str_equal(INTERP, lib_name, 
                         VTABLE_get_string_keyed_str(INTERP, map, oplib_name))) {
-                RETURN (INTVAL 1);
+                RETURN(INTVAL 1);
             }
         }
 
@@ -226,7 +226,7 @@ Ensure that an op library is loaded and accessible to this OpMap.
                 Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray));
         VTABLE_push_pmc(INTERP, attrs->op_maps, ops_info);
 
-        RETURN (INTVAL 1);
+        RETURN(INTVAL 1);
     }
 
 

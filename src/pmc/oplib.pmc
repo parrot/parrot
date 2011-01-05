@@ -146,7 +146,7 @@ pmclass OpLib auto_attrs {
         VTABLE_push_integer(INTERP, version_array, oplib->major_version);
         VTABLE_push_integer(INTERP, version_array, oplib->minor_version);
         VTABLE_push_integer(INTERP, version_array, oplib->patch_version);
-        RETURN (PMC *version_array);
+        RETURN(PMC *version_array);
     }
 }
 
