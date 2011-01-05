@@ -875,9 +875,21 @@ mark_const_subs(PARROT_INTERP)
     }
 }
 
+
+/*
+
+=item C<static PMC * packfile_main(PARROT_INTERP, PackFile_ByteCode *bc)>
+
+Access the main function of a bytecode segment.
+
+=cut
+
+*/
+
 static PMC *
 packfile_main(PARROT_INTERP, PackFile_ByteCode *bc)
 {
+    ASSERT_ARGS(packfile_main)
     PackFile_ConstTable *ct = bc->const_table;
     return ct->pmc.constants[bc->main_sub];
 }
