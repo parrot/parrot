@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -318,8 +317,7 @@ Create a string with the buffer content and the encoding specified.
         STRING *result;
         unsigned char *content;
         INTVAL size;
-        const STR_VTABLE *encoding = Parrot_get_encoding(INTERP,
-            Parrot_encoding_number(INTERP, encodingname));
+        const STR_VTABLE *encoding = Parrot_find_encoding_by_string(INTERP, encodingname);
         GET_ATTR_content(INTERP, SELF, content);
         GET_ATTR_size(INTERP, SELF, size);
         result = build_string(INTERP, content, size, encoding);
@@ -346,6 +344,37 @@ as the string argument.
         GET_ATTR_content(INTERP, SELF, content);
         GET_ATTR_size(INTERP, SELF, size);
         result = build_string(INTERP, content, size, encoding);
+        RETURN(STRING *result);
+    }
+
+/*
+
+=item C<get_chars(int pos, int length, string encoding)>
+
+Get a string from the buffer content with the specified encoding and
+length in codepoints.
+
+=cut
+
+*/
+
+    METHOD get_chars(INTVAL pos, INTVAL length, STRING *encodingname)
+    {
+        const STR_VTABLE *encoding = Parrot_find_encoding_by_string(INTERP, encodingname);
+        STRING           *result;
+        unsigned char    *content;
+        INTVAL            size;
+
+        GET_ATTR_content(interp, SELF, content);
+        GET_ATTR_size(interp, SELF, size);
+
+        if (pos < 0 || pos > size)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_OUT_OF_BOUNDS,
+                    "get_chars: index out of bounds");
+
+        result = Parrot_str_extract_chars(INTERP, (char *)content + pos,
+                    size - pos, length, encoding);
         RETURN(STRING *result);
     }
 
@@ -399,10 +428,6 @@ build_string(PARROT_INTERP, ARGIN_NULLOK(const unsigned char *content),
     else {
         STRING * const result = Parrot_str_new_init(interp,
                 (const char *)content, size, encoding, 0);
-        if (!STRING_validate(interp, result))
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_STRING_REPRESENTATION,
-                    "Invalid buffer content");
         return result;
     }
 }
@@ -419,5 +444,5 @@ build_string(PARROT_INTERP, ARGIN_NULLOK(const unsigned char *content),
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

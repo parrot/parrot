@@ -1,5 +1,4 @@
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -679,6 +678,8 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     setattribute self, 'parse_errors', $P0
     $P0 = box 0
     setattribute self, 'tests_run', $P0
+    $P0 = box 0
+    setattribute self, 'tests_planned', $P0
     $P0 = get_global ['TAP';'Parser'], 'LEGAL_CALLBACK'
     setattribute self, 'ok_callbacks', $P0
 .end
@@ -1086,8 +1087,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     goto L5
   L2:
     $P0 = getinterp
-    .include 'stdio.pasm'
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'("Unhandled token type: ")
     $P1.'print'(type)
     $P1.'print'("\n")
@@ -1232,9 +1232,9 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     tests_run = $P0
 
     $P0 = getattribute self, 'tests_planned'
-    if null $P0 goto L11
     .local int tests_planned
     tests_planned = $P0
+    unless tests_planned goto L11
     unless tests_run > tests_planned goto L11
     $P0 = new 'Boolean'
     set $P0, 1

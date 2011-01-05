@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2005-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -20,7 +19,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 30;
+use Test::More tests => 31;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -102,6 +101,9 @@ my $exit   = $? & 127;
 like( $output, qr/--gc-threshold needs an argument/,
                  '--gc-threshold needs argument warning' );
 is( $exit, 0, '... and should not crash' );
+
+# Test --leak-test
+is( qx{$PARROT --leak-test "$first_pir_file"}, "first\n", '--leak-test' );
 
 # clean up temporary files
 unlink $first_pir_file;

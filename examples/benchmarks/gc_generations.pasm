@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2003, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -34,6 +33,7 @@ prints out some statistics indicating:
 
 =cut
 
+.pcc_sub :main main:
 	set I0, 70
 	set I2, 70
 	set I4, 70

@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 =head1 TITLE
 
@@ -26,11 +25,7 @@ code. It is a possible target language for compilers targeting
 the Parrot Virtual Machine. PIR is halfway between
 a High Level Language (HLL) and Parrot Assembly (PASM).
 
-IMCC is the current implementation of the PIR language. A PGE-based implementation
-can be found in languages/PIR. A completely handwritten, recursive-descent parser
-in C can be found in compilers/pirc. Both the PGE-based parser and pirc are
-a bit different, as it is very difficult to implement the exact language that IMCC
-implements. Note too, that they are merely parsers, and not finished compilers.
+IMCC is the current implementation of the PIR language.
 
 =head2 What is the history of IMCC?
 

@@ -9,7 +9,6 @@
  *
  * Grammar of the PIR language parser.
  *
- * $Id$
  *
  */
 
@@ -928,6 +927,8 @@ add_pcc_named_return(PARROT_INTERP,
 
 =item C<static void adv_named_set(PARROT_INTERP, const char *name)>
 
+=item C<static void adv_named_set_u(PARROT_INTERP, const char *name)>
+
 Sets the name of the current named argument.
 
 C<adv_named_set_u> is the Unicode version of this function.
@@ -971,12 +972,18 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 {
     ASSERT_ARGS(do_loadlib)
     STRING * const s       = Parrot_str_unescape(interp, lib + 1, '"', NULL);
-    PMC    * const lib_pmc = Parrot_load_lib(interp, s, NULL);
+    PMC    * const lib_pmc = Parrot_dyn_load_lib(interp, s, NULL);
     if (PMC_IS_NULL(lib_pmc) || !VTABLE_get_bool(interp, lib_pmc)) {
         IMCC_fataly(interp, EXCEPTION_LIBRARY_ERROR,
             "loadlib directive could not find library `%S'", s);
     }
-    Parrot_register_HLL_lib(interp, s);
+
+    /* store non-dynoplib library deps here, dynoplibs are treated separately for now */
+    if (!STRING_equal(interp,
+            VTABLE_get_string(interp,
+                VTABLE_getprop(interp, lib_pmc, Parrot_str_new_constant(interp, "_type"))),
+            Parrot_str_new_constant(interp, "Ops")))
+        imcc_pbc_add_libdep(interp, s);
 }
 
 /* HEADERIZER STOP */
@@ -1012,17 +1019,16 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <t> POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA ESUB DOTDOT
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
-%token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
+%token <t> PCC_BEGIN_YIELD PCC_END_YIELD INVOCANT
 %token <t> MAIN LOAD INIT IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
 %token <t> MULTI VTABLE_METHOD LOADLIB SUB_INSTANCE_OF SUBID
 %token <t> NS_ENTRY
-%token <t> UNIQUE_REG
 %token <s> LABEL
 %token <t> EMIT EOM
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
 %token <s> STRINGC INTC FLOATC USTRINGC
 %token <s> PARROT_OP
-%type <t> type hll_def return_or_yield comma_or_goto opt_unique_reg
+%type <t> type hll_def return_or_yield comma_or_goto
 %type <i> program
 %type <i> class_namespace
 %type <i> constdef sub emit pcc_ret pcc_yield
@@ -1148,7 +1154,7 @@ hll_def:
          {
             STRING * const hll_name = Parrot_str_unescape(interp, $2 + 1, '"', NULL);
             Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp),
-                Parrot_register_HLL(interp, hll_name));
+                Parrot_hll_register_HLL(interp, hll_name));
 
             IMCC_INFO(interp)->cur_namespace = NULL;
             mem_sys_free($2);
@@ -1311,8 +1317,8 @@ sub:
         {
           IMCC_INFO(interp)->cur_call->pcc_sub->pragma = $5;
           if (!IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid) {
-            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = mem_sys_strdup(
-            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->name);
+            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid =
+                IMCC_INFO(interp)->cur_unit->instructions->symregs[0];
           }
         }
      sub_params
@@ -1443,9 +1449,10 @@ subid:
          }
    | SUBID '(' any_string ')'
          {
+           SymReg *r = mk_const(interp, $3, 'S');
            $$ = 0;
-           IMCC_INFO(interp)->cur_unit->subid = mk_const(interp, $3, 'S');
-           IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = str_dup_remove_quotes($3);
+           IMCC_INFO(interp)->cur_unit->subid = r;
+           IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = r;
            mem_sys_free($3);
          }
    ;
@@ -1580,29 +1587,6 @@ pcc_call:
          {
            add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
          }
-   | NCI_CALL var '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
-         }
-   | METH_CALL target '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
-         }
-   | METH_CALL STRINGC '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, mk_const(interp, $2, 'S'));
-         }
-   | METH_CALL target COMMA var '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
-           add_pcc_cc(IMCC_INFO(interp)->cur_call, $4);
-         }
-   | METH_CALL STRINGC COMMA var '\n'
-         {
-           add_pcc_sub(IMCC_INFO(interp)->cur_call, mk_const(interp, $2, 'S'));
-           add_pcc_cc(IMCC_INFO(interp)->cur_call, $4);
-         }
-   ;
 
 
 pcc_args:
@@ -1657,7 +1641,6 @@ paramtype:
    | ADV_NAMED                  { $$ = VT_NAMED; }
    | ADV_NAMED '(' STRINGC ')'  { adv_named_set(interp, $3);   $$ = VT_NAMED; mem_sys_free($3); }
    | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = VT_NAMED; mem_sys_free($3); }
-   | UNIQUE_REG                 { $$ = 0; }
    | ADV_CALL_SIG               { $$ = VT_CALL_SIG; }
    ;
 
@@ -1845,19 +1828,13 @@ id_list :
    ;
 
 id_list_id :
-     IDENTIFIER opt_unique_reg
+     IDENTIFIER
          {
            IdList* const l = mem_gc_allocate_n_zeroed_typed(interp, 1, IdList);
            l->id           = $1;
            $$ = l;
          }
    ;
-
-opt_unique_reg:
-     /* empty */
-   | UNIQUE_REG
-   ;
-
 
 labeled_inst:
      assignment
@@ -2041,6 +2018,13 @@ get_results:
 op_assign:
      target assign_op var
          { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, $2, 2, $1, $3); }
+   | target CONCAT_ASSIGN var
+         {
+             if ($1->set == 'P')
+                 $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "concat", 2, $1, $3);
+             else
+                 $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "concat", 3, $1, $1, $3);
+         }
    ;
 
 assign_op:
@@ -2050,7 +2034,6 @@ assign_op:
    | DIV_ASSIGN                { $$ = (char *)"div"; }
    | MOD_ASSIGN                { $$ = (char *)"mod"; }
    | FDIV_ASSIGN               { $$ = (char *)"fdiv"; }
-   | CONCAT_ASSIGN             { $$ = (char *)"concat"; }
    | BAND_ASSIGN               { $$ = (char *)"band"; }
    | BOR_ASSIGN                { $$ = (char *)"bor"; }
    | BXOR_ASSIGN               { $$ = (char *)"bxor"; }
@@ -2443,5 +2426,5 @@ int yyerror(void *yyscanner, PARROT_INTERP, const char *s)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

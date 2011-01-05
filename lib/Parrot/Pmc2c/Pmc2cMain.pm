@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
-# $Id$
 
 package Parrot::Pmc2c::Pmc2cMain;
 
@@ -94,7 +93,7 @@ sub new {
     unshift @{ $allargsref->{include} },
         '.', "$allargsref->{bin}/../..", "$allargsref->{bin}/../../src/pmc", "$allargsref->{bin}/../../src/dynpmc";
 
-    foreach my $opt qw(nolines) {
+    foreach my $opt ( qw(nolines) ) {
         if ( !defined $allargsref->{opt}{$opt} ) {
             $allargsref->{opt}{$opt} = 0;
         }

@@ -1,12 +1,11 @@
 #! perl
 # Copyright (C) 2001-2006, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 31;
 
 =head1 NAME
 
@@ -23,6 +22,7 @@ Tests the C<OrderedHash> PMC.
 =cut
 
 pasm_output_is( <<'CODE', <<OUT, "init" );
+.pcc_sub :main main:
     new P0, ['OrderedHash']
     print "ok 1\n"
     set I0, P0
@@ -36,6 +36,7 @@ ok 2
 OUT
 
 pasm_output_is( <<'CODE', <<OUT, "set keys, get idx" );
+.pcc_sub :main main:
     new P0, ['OrderedHash']
     new P1, ['String']
     set P1, "ok 1\n"
@@ -77,6 +78,7 @@ ok 2
 OUT
 
 pasm_output_is( <<'CODE', <<OUT, "iterate" );
+.pcc_sub :main main:
     .include "iterator.pasm"
     new P0, ['OrderedHash']
     new P1, ['String']
@@ -118,6 +120,7 @@ ok 1
 OUT
 
 pasm_output_is( <<'CODE', <<OUT, "idx only" );
+.pcc_sub :main main:
     new P0, ['OrderedHash']
     new P1, ['String']
     set P1, "ok 1\n"
@@ -137,6 +140,7 @@ ok 2
 OUT
 
 pasm_output_is( <<'CODE', <<OUT, "set keys, get idx - cloned" );
+.pcc_sub :main main:
     new P10, ['OrderedHash']
     new P1, ['String']
     set P1, "ok 1\n"
@@ -191,6 +195,7 @@ ok 1
 OUT
 
 pasm_output_is( <<'CODE', <<OUT, "exists_keyed" );
+.pcc_sub :main main:
     new P0, ['OrderedHash']
     new P1, ['Integer']
     set P0["key"], P1
@@ -216,6 +221,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<OUT, "defined_keyed" );
+.pcc_sub :main main:
     new P0, ['OrderedHash']
     new P1, ['Undef']
     set P0["key"], P1
@@ -254,6 +260,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<OUT, "delete" );
+.pcc_sub :main main:
     .include "iterator.pasm"
     new P0, ['OrderedHash']
     new P1, ['String']
@@ -297,6 +304,7 @@ ok 3
 OUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "delete with int keys" );
+.pcc_sub :main main:
     new P0, ['OrderedHash']
     set P0["abc"], "Foo"
     set P0["def"], 12.6
@@ -317,6 +325,7 @@ CODE
 OUTPUT
 
 pasm_output_like( <<'CODE', '/[axj]/', "iterate over keys" );
+.pcc_sub :main main:
     .include "iterator.pasm"
     new P0, ['OrderedHash']
     new P1, ['String']
@@ -341,6 +350,7 @@ end_iter:
 CODE
 
 pasm_output_like( <<'CODE', <<'OUT', "iterate over keys, get value" );
+.pcc_sub :main main:
     .include "iterator.pasm"
     new P0, ['OrderedHash']
     new P1, ['String']
@@ -371,7 +381,7 @@ OUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash in PIR with PMC value" );
 
-.sub _main
+.sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
     .local pmc val_in
@@ -392,7 +402,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_integer_keyed" );
 
-.sub _main
+.sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
     hash1["X"] = 14
@@ -410,7 +420,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed" );
 
-.sub _main
+.sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
     .local string val1
@@ -430,7 +440,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed" );
 
-.sub _main
+.sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
     hash1["X"] = '14'
@@ -449,7 +459,7 @@ OUTPUT
 # actually Parrot_OrderedHash_set_string_keyed is used, why ?
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed_str" );
 
-.sub _main
+.sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
     .local string key1
@@ -470,7 +480,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_number_keyed" );
 
-.sub _main
+.sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
     .local string key1
@@ -491,7 +501,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash get_integer" );
 
-.sub _main
+.sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
 
@@ -525,6 +535,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "delete and access remaining" );
+.pcc_sub :main main:
     new P0, ['OrderedHash']
     new P1, ['String']
     set P1, "A"
@@ -549,9 +560,172 @@ P0["b"]: B
 P0["b"]: B
 OUTPUT
 
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed_int" );
+
+.sub _main :main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    $S0 = 'hello'
+    hash1[0] = $S0
+
+    $S1 = hash1[0]
+
+    print $S1
+    print "\n"
+    end
+.end
+CODE
+hello
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_number_keyed_int" );
+
+.sub _main :main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    $N0 = 35.5
+    hash1[0] = $N0
+
+    $N1 = hash1[0]
+
+    print $N1
+    print "\n"
+    end
+.end
+CODE
+35.5
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_pmc_keyed_int (negative index)" );
+
+.sub _main :main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    push hash1, 6
+
+    .local pmc integer1
+    integer1 = new ['Integer']
+    integer1 = 5
+
+    hash1[-1] = integer1
+    $P0 = hash1[-1]
+
+    print $P0
+    print "\n"
+    end
+.end
+CODE
+5
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash delete_keyed_str" );
+
+.sub _main :main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    hash1["one"] = 2
+    hash1["two"] = 5
+    hash1["three"] = 7
+
+    delete hash1["three"]
+
+    $I0 = elements hash1
+
+    print $I0
+    print "\n"
+    end
+.end
+CODE
+2
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash push_string" );
+
+.sub _main :main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    $N0 = 21.5
+    hash1[0] = $N0
+
+    push hash1, "alpha"
+    $S0 = hash1[1]
+
+    print $S0
+    print "\n"
+    end
+.end
+CODE
+alpha
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash push_float" );
+
+.sub _main :main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    $N0 = 21.5
+    hash1[0] = $N0
+
+    push hash1, 72.2
+    $N0 = hash1[1]
+
+    print $N0
+    print "\n"
+    end
+.end
+CODE
+72.2
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash get_string_keyed" );
+
+.sub _main :main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    .local pmc integer1
+    integer1 = new ['Integer']
+    integer1 = 5
+
+    hash1[integer1] = "hello"
+    $S0 = hash1[integer1]
+
+    print $S0
+    print "\n"
+    end
+.end
+CODE
+hello
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash get_number" );
+
+.sub _main :main
+    .local pmc hash1
+    hash1 = new ['OrderedHash']
+
+    push hash1, 5
+    push hash1, "alpha"
+
+    $N0 = hash1
+
+    print $N0
+    print "\n"
+    end
+.end
+CODE
+2
+OUTPUT
+
 pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
-.sub _main
+.sub _main :main
     .local pmc pmc1
     pmc1 = new ['OrderedHash']
     .local int bool1
@@ -577,6 +751,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_integer_keyed" );
+.pcc_sub :main main:
     new P0, ['OrderedHash']
     set P0["Foo"], 10
     set P0["Bar"], 20
@@ -601,6 +776,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_number_keyed" );
+.pcc_sub :main main:
      new P0, ['OrderedHash']
      set N0, 12.3
      set N1, 45.1
@@ -631,6 +807,7 @@ ok 4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw 1" );
+.pcc_sub :main main:
     new P0, ['OrderedHash']
     set P0["a"], "Foo\n"
     set P0["b"], "Bar\n"

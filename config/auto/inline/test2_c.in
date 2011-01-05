@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2003-2009, Parrot Foundation.
-$Id$
 
 test to check if compiler supports __inline
 */
@@ -21,5 +20,5 @@ main() {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2003-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -287,14 +286,14 @@ Morphs the integer to a C<String> and sets the value from C<value>.
 
     VTABLE void set_number_native(FLOATVAL value) {
         Parrot_pmc_reuse(INTERP, SELF,
-            Parrot_get_ctx_HLL_type(INTERP, enum_class_Float), 0);
+            Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_Float), 0);
         SELF.set_number_native(value);
     }
 
 
     VTABLE void set_bool(INTVAL value) {
         Parrot_pmc_reuse(INTERP, SELF,
-            Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean), 0);
+            Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_Boolean), 0);
         SELF.set_bool(value);
     }
 
@@ -302,7 +301,7 @@ Morphs the integer to a C<String> and sets the value from C<value>.
 
     VTABLE void set_string_native(STRING *value) {
         Parrot_pmc_reuse(INTERP, SELF,
-            Parrot_get_ctx_HLL_type(INTERP, enum_class_String), 0);
+            Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_String), 0);
         SELF.set_string_native(value);
     }
 
@@ -926,7 +925,7 @@ Calculates modulus in place.
                     "int modulus by zero");
 
         return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
-                intval_mod(SELF.get_integer(), d));
+                Parrot_util_intval_mod(SELF.get_integer(), d));
     }
 
 
@@ -936,7 +935,7 @@ Calculates modulus in place.
                     "int modulus by zero");
 
         return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
-                intval_mod(SELF.get_integer(), value));
+                Parrot_util_intval_mod(SELF.get_integer(), value));
     }
 
 
@@ -946,7 +945,7 @@ Calculates modulus in place.
                     "int modulus by zero");
 
         return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
-                intval_mod(SELF.get_integer(), (INTVAL)value));
+                Parrot_util_intval_mod(SELF.get_integer(), (INTVAL)value));
     }
 
 
@@ -965,7 +964,7 @@ Calculates modulus in place.
                     "int modulus by zero");
 
         VTABLE_set_integer_native(INTERP, SELF,
-                intval_mod(SELF.get_integer(), d));
+                Parrot_util_intval_mod(SELF.get_integer(), d));
     }
 
 
@@ -975,7 +974,7 @@ Calculates modulus in place.
                     "int modulus by zero");
 
         VTABLE_set_integer_native(INTERP, SELF,
-                intval_mod(SELF.get_integer() , value));
+                Parrot_util_intval_mod(SELF.get_integer() , value));
     }
 
 
@@ -985,7 +984,7 @@ Calculates modulus in place.
                     "int modulus by zero");
 
         VTABLE_set_integer_native(INTERP, SELF,
-                intval_mod(SELF.get_integer() , (INTVAL)value));
+                Parrot_util_intval_mod(SELF.get_integer() , (INTVAL)value));
     }
 
 /*
@@ -1305,5 +1304,5 @@ Used to unarchive the integer.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -219,7 +218,7 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
             break;
           case KEY_string_FLAG:
             {
-            const STRING * const s = key_string(interp, key);
+            const STRING * const s = Parrot_key_string(interp, key);
             STRING * const escaped = Parrot_str_escape_truncate(interp, s, 20);
 
             if (escaped)
@@ -552,5 +551,5 @@ F<src/trace.h>
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

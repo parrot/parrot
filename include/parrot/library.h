@@ -1,7 +1,5 @@
 /* library.h
  *  Copyright (C) 2004, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *      Contains accessor functions for the _parrotlib bytecode interface
  *  Data Structure and Algorithms:
@@ -60,6 +58,10 @@ void Parrot_lib_add_path_from_cstring(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+void Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PARROT_MALLOC
@@ -73,11 +75,10 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING* Parrot_locate_runtime_file_str(PARROT_INTERP,
-    ARGMOD(STRING *file),
+    ARGIN(STRING *file),
     enum_runtime_ft type)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*file);
+        __attribute__nonnull__(2);
 
 void parrot_init_library_paths(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -85,14 +86,13 @@ void parrot_init_library_paths(PARROT_INTERP)
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * parrot_split_path_ext(PARROT_INTERP,
-    ARGMOD(STRING *in),
+    ARGIN(STRING *in),
     ARGOUT(STRING **wo_ext),
     ARGOUT(STRING **ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*in)
         FUNC_MODIFIES(*wo_ext)
         FUNC_MODIFIES(*ext);
 
@@ -105,6 +105,9 @@ STRING * parrot_split_path_ext(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
+#define ASSERT_ARGS_Parrot_lib_update_paths_from_config_hash \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_locate_runtime_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(file_name))
@@ -128,5 +131,5 @@ STRING * parrot_split_path_ext(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

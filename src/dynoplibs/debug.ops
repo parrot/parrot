@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2002-2008, Parrot Foundation.
  */
 
@@ -118,7 +117,7 @@ Get the current line number.
 
 inline op getline(out INT) {
     Parrot_Context_info info;
-    Parrot_Context_get_info(interp, CURRENT_CONTEXT(interp), &info);
+    Parrot_sub_context_get_info(interp, CURRENT_CONTEXT(interp), &info);
     $1 = info.line;
 }
 
@@ -130,7 +129,7 @@ Get the name of the current file.
 
 inline op getfile(out STR) {
     Parrot_Context_info info;
-    Parrot_Context_get_info(interp, CURRENT_CONTEXT(interp), &info);
+    Parrot_sub_context_get_info(interp, CURRENT_CONTEXT(interp), &info);
     $1 = info.file;
 }
 
@@ -142,5 +141,5 @@ inline op getfile(out STR) {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

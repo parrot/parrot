@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 PDD 17: Polymorphic Containers
 
@@ -565,7 +564,7 @@ Used by C<freeze> and C<thaw> to visit the contents of the PMC.
 
 Mark a PMC as shared and read-only.
 
-[NOTE: these seem to be used interchangably, should be distinguished or
+[NOTE: these seem to be used interchangeably, should be distinguished or
 merged.]
 
 =back

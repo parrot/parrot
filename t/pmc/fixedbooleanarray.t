@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -49,6 +48,10 @@ out-of-bounds test. Checks INT and PMC keys.
     $P0 = 1
     $I0 = $P0
     is($I0, 1, 'size set to 1')
+
+    # Make sure destroy is exercised
+    null $P0
+    sweep 1
 .end
 
 .sub 'resizing_not_allowed'
@@ -346,13 +349,13 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub test_invalid_init_tt1509
     throws_substring(<<'CODE', 'FixedBooleanArray: Cannot set array size to a negative number (-10)', 'New style init does not dump core for negative array lengths')
-    .sub main
+    .sub main :main
         $P0 = new ['FixedBooleanArray'], -10
     .end
 CODE
 
     throws_substring(<<'CODE', 'FixedBooleanArray: Cannot set array size to a negative number (-10)', 'New style init (key constant) does not dump core for negative array lengths')
-    .sub main
+    .sub main :main
         $P0 = new 'FixedBooleanArray', -10
     .end
 CODE

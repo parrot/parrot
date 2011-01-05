@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2010, Parrot Foundation.
-# $Id$
 
 package Parrot::Pmc2c::PCCMETHOD;
 use strict;
@@ -413,7 +412,6 @@ sub rewrite_pccmethod {
 
     $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     PMC * const _ctx         = CURRENT_CONTEXT(interp);
-    PMC * const _ccont       = Parrot_pcc_get_continuation(interp, _ctx);
     PMC * const _call_object = Parrot_pcc_get_signature(interp, _ctx);
     PMC * _ret_object;
 

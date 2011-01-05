@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
-# $Id$
 
 # all timings Athlon 800, gcc 2.95.2
 
@@ -19,7 +18,7 @@
 # parrot -R jit oo2-prop.pasm                     2.6
 
 .namespace [ "Foo" ]
-.sub 'main'
+.sub 'main' :main
     newclass $P1, "Foo"
     addattribute $P1, ".i"
     addattribute $P1, ".j"

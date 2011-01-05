@@ -1,7 +1,5 @@
 /* io.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *      Parrot IO subsystem
  *  Data Structure and Algorithms:
@@ -102,13 +100,6 @@ typedef long PIOOFF_T;
 extern PIOOFF_T piooffsetzero;
 
 typedef struct _ParrotIOData ParrotIOData;
-
-#ifdef _MSC_VER
-/* Win32/MSVC has a deprecation warning about dup() in favor of _dup(). */
-#  define Parrot_dup(x) (PIOHANDLE)_dup((int)(x))
-#else /* !_MSC_VER */
-#  define Parrot_dup(x) (PIOHANDLE)dup((int)(x))
-#endif /* _MSC_VER */
 
 extern INTVAL pio_errno;
 
@@ -237,6 +228,12 @@ PMC * Parrot_io_open(PARROT_INTERP,
     ARGIN_NULLOK(PMC *pmc),
     ARGIN_NULLOK(STRING *path),
     ARGIN_NULLOK(STRING *mode))
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_io_parse_open_flags(PARROT_INTERP,
+    ARGIN_NULLOK(const STRING *mode_str))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -383,6 +380,8 @@ PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
 #define ASSERT_ARGS_Parrot_io_new_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_io_parse_open_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_peek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -538,38 +537,6 @@ size_t Parrot_io_write_buffer(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/buffer.c */
 
-/* io/utf8.c - UTF-8 functions */
-/* HEADERIZER BEGIN: src/io/utf8.c */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-size_t Parrot_io_read_utf8(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    ARGMOD(STRING **buf))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*filehandle)
-        FUNC_MODIFIES(*buf);
-
-size_t Parrot_io_write_utf8(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    ARGIN(const STRING *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*filehandle);
-
-#define ASSERT_ARGS_Parrot_io_read_utf8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle) \
-    , PARROT_ASSERT_ARG(buf))
-#define ASSERT_ARGS_Parrot_io_write_utf8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle) \
-    , PARROT_ASSERT_ARG(s))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/io/utf8.c */
-
 /* io/filehandle.c - utility functions for FileHandle PMC */
 /* HEADERIZER BEGIN: src/io/filehandle.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -622,12 +589,6 @@ INTVAL Parrot_io_get_flags(SHIM_INTERP, ARGIN(PMC *filehandle))
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PIOOFF_T Parrot_io_get_last_file_position(SHIM_INTERP,
-    ARGIN(const PMC *filehandle))
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
 PIOHANDLE Parrot_io_get_os_handle(SHIM_INTERP, ARGIN(const PMC *filehandle))
         __attribute__nonnull__(2);
 
@@ -645,12 +606,6 @@ INTVAL Parrot_io_is_encoding(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_io_parse_open_flags(PARROT_INTERP,
-    ARGIN_NULLOK(const STRING *mode_str))
-        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 void Parrot_io_set_file_position(SHIM_INTERP,
@@ -748,9 +703,6 @@ void Parrot_io_set_buffer_start(SHIM_INTERP,
        PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_get_last_file_position \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_get_os_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_is_closed_filehandle \
@@ -761,8 +713,6 @@ void Parrot_io_set_buffer_start(SHIM_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filehandle) \
     , PARROT_ASSERT_ARG(value))
-#define ASSERT_ARGS_Parrot_io_parse_open_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_set_file_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_set_file_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -875,11 +825,16 @@ INTVAL Parrot_io_socket(PARROT_INTERP,
         FUNC_MODIFIES(*socket);
 
 PARROT_EXPORT
+void Parrot_io_socket_initialize_handle(SHIM_INTERP, ARGMOD(PMC *socket))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*socket);
+
+PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-INTVAL Parrot_io_socket_is_closed(ARGMOD(PMC *socket))
-        __attribute__nonnull__(1)
+INTVAL Parrot_io_socket_is_closed(SHIM_INTERP, ARGMOD(PMC *socket))
+        __attribute__nonnull__(2)
         FUNC_MODIFIES(*socket);
 
 #define ASSERT_ARGS_Parrot_io_accept __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -911,6 +866,9 @@ INTVAL Parrot_io_socket_is_closed(ARGMOD(PMC *socket))
     , PARROT_ASSERT_ARG(buf))
 #define ASSERT_ARGS_Parrot_io_socket __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_io_socket_initialize_handle \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(socket))
 #define ASSERT_ARGS_Parrot_io_socket_is_closed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(socket))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -962,5 +920,5 @@ typedef enum {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

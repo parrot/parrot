@@ -144,11 +144,11 @@ foo '-'? bar			foo - bar	n	basic non-match
 # todo :pugs<feature>
 :x(0) \d			123456		y	repetition (:x)
 # todo :pugs<feature>
-:nth(3) a \d			a1a2a3		y	nth occurance (:nth)
+:nth(3) a \d			a1a2a3		y	nth occurrence (:nth)
 # todo :pge<feature>
-:nth(4) a \d			a1a2a3		n	nth occurance (:nth)
+:nth(4) a \d			a1a2a3		n	nth occurrence (:nth)
 # todo :pge<feature>
-:nth(0) a \d			a1a2a3		n	nth occurance (:nth)
+:nth(0) a \d			a1a2a3		n	nth occurrence (:nth)
 :s^[\d+ ]* abc			11 12 13 abc	y	<?ws> before closing bracket
 
 ## vim: noexpandtab tabstop=4 shiftwidth=4

@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 Include Example
 
@@ -14,7 +13,7 @@ Creates a counter stream and dumps it.
 
 =cut
 
-.sub _main
+.sub _main :main
     .local pmc stream
 
     load_bytecode 'Stream/Sub.pbc'

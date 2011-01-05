@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -148,6 +147,67 @@ Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type), ARGIN(Parrot_compiler_func_t 
     VTABLE_set_pointer_keyed_str(interp, nci, sc, (void *)func);
 }
 
+
+
+/*
+
+=item C<PMC * Parrot_get_compiler(PARROT_INTERP, STRING *type)>
+
+Get a compiler PMC.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
+{
+    ASSERT_ARGS(Parrot_get_compiler)
+    PMC    * const iglobals = interp->iglobals;
+    PMC    * hash           = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+                              IGLOBALS_COMPREG_HASH);
+
+    if (PMC_IS_NULL(hash)) {
+        /* No compiler has been registered yet */
+        return PMCNULL;
+    }
+
+    /* Fetch the compiler */
+    return VTABLE_get_pmc_keyed_str(interp, hash, type);
+}
+
+/*
+
+=item C<void Parrot_set_compiler(PARROT_INTERP, STRING *type, PMC *compiler)>
+
+Register a parser/compiler PMC.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_set_compiler(PARROT_INTERP, ARGIN(STRING *type), ARGIN(PMC *compiler))
+{
+    ASSERT_ARGS(Parrot_set_compiler)
+    PMC    * const iglobals = interp->iglobals;
+    PMC    * hash           = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+                              IGLOBALS_COMPREG_HASH);
+
+    if (PMC_IS_NULL(hash)) {
+        hash = Parrot_pmc_new_noinit(interp, enum_class_Hash);
+        VTABLE_init(interp, hash);
+        VTABLE_set_pmc_keyed_int(interp, iglobals,
+                (INTVAL)IGLOBALS_COMPREG_HASH, hash);
+    }
+
+    VTABLE_set_pmc_keyed_str(interp, hash, type, compiler);
+}
+
 /*
 
 =item C<void * Parrot_compile_file(PARROT_INTERP, const char *fullname, STRING
@@ -283,7 +343,7 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
 Takes an interpreter name and an information type as arguments.
 Returns corresponding information strings about the interpreter:
 the full pathname, executable name, or the file stem,
-(or throws an error exception, if the type is not recognised).
+(or throws an error exception, if the type is not recognized).
 Valid types are EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME,
 and RUNTIME_PREFIX.
 
@@ -315,29 +375,27 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
 
             else {
                 /* Need to strip back to what follows the final / or \. */
-                STRING * const fullname   = VTABLE_get_string(interp, exe_name);
-                char   * const fullname_c = Parrot_str_to_cstring(interp, fullname);
-                int            pos        = strlen(fullname_c) - 1;
-                STRING *basename;
+                STRING * const fullname = VTABLE_get_string(interp, exe_name);
+                const int      len      = STRING_length(fullname);
+                int            pos;
 
-                while (pos              >  0
-                &&     fullname_c[pos] != '/'
-                &&     fullname_c[pos] != '\\')
-                    --pos;
+                for (pos = len - 1; pos > 0; --pos) {
+                    const INTVAL c = STRING_ord(interp, fullname, pos);
 
-                if (pos > 0)
-                    ++pos;
+                    if (c == '/' || c == '\\') {
+                        ++pos;
+                        break;
+                    }
+                }
 
-                basename = Parrot_str_new(interp, fullname_c + pos, 0);
-                Parrot_str_free_cstring(fullname_c);
-
-                return basename;
+                return Parrot_str_substr(interp, fullname, pos, len - pos);
             }
         }
         case RUNTIME_PREFIX:
             return Parrot_get_runtime_path(interp);
         case GC_SYS_NAME: {
             STRING * name = Parrot_gc_sys_name(interp);
+            Parrot_warn_experimental(interp, "GC_SYS_NAME option is experimental");
             return name;
         }
       default:
@@ -350,5 +408,5 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

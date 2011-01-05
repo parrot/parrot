@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -29,6 +28,7 @@ files and directories.
 #  include <dirent.h>
 #else
 #  include <dirent.h>
+#  include <unistd.h>
 #endif
 
 /* XXX Check if we need to deallocate strerror strings */
@@ -496,7 +496,18 @@ reads entries from a directory.
         }
 
         while ((dirent = readdir(dir)) != NULL) {
-            VTABLE_push_string(INTERP, array, Parrot_str_new(INTERP, dirent->d_name, 0));
+            /* We don't have yet a good way to know what encoding should be
+             * used. In the meantime, use binary when there is any non ascii
+             * character */
+            const char *const name = dirent->d_name;
+            STR_VTABLE *encoding;
+            size_t l = strlen(name);
+            size_t i;
+            for (i = 0; i < l; ++i)
+                if ((unsigned char)name[i] > 127)
+                    break;
+            encoding = i == l ? Parrot_ascii_encoding_ptr : Parrot_binary_encoding_ptr;
+            VTABLE_push_string(INTERP, array, Parrot_str_new_init(INTERP, name, l, encoding, 0));
         }
 
         closedir(dir);
@@ -584,6 +595,65 @@ thrown.
         }
     }
 
+/*
+
+=item C<get_user_id()>
+
+Returns the ID number of the current user. This is platform-dependent.
+
+=cut
+
+*/
+
+    METHOD get_user_id() {
+        const UINTVAL uid = Parrot_get_user_id();
+        RETURN(INTVAL uid);
+    }
+
+/*
+
+=item C<can_execute(STRING *filename)>
+
+=cut
+
+*/
+
+    METHOD can_execute(STRING *filename) {
+        char * const file = Parrot_str_to_cstring(INTERP, filename);
+        INTVAL can = 0;
+#ifndef WIN32
+        can = access(file, X_OK) + 1;
+#else
+        /* TODO: Win32 */
+#endif
+        Parrot_str_free_cstring(file);
+        RETURN(INTVAL can);
+    }
+
+    METHOD can_read(STRING *filename) {
+        char * const file = Parrot_str_to_cstring(INTERP, filename);
+        INTVAL can = 0;
+#ifndef WIN32
+        can = access(file, R_OK) + 1;
+#else
+        /* TODO: Win32 */
+#endif
+        Parrot_str_free_cstring(file);
+        RETURN(INTVAL can);
+    }
+
+    METHOD can_write(STRING *filename) {
+        char * const file = Parrot_str_to_cstring(INTERP, filename);
+        INTVAL can = 0;
+#ifndef WIN32
+        can = access(file, W_OK) + 1;
+#else
+        /* TODO: Win32 */
+#endif
+        Parrot_str_free_cstring(file);
+        RETURN(INTVAL can);
+    }
+
 }
 
 /*
@@ -603,5 +673,5 @@ thrown.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

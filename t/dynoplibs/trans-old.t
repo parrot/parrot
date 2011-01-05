@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -30,6 +29,7 @@ Tests the transcendental mathematical operations.
 # to LABEL if abs(n,n) < epsilon
 
 pasm_output_is( <<"CODE", <<OUTPUT, "sinh" );
+.pcc_sub :main main:
         .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 1.0
@@ -51,6 +51,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "tanh" );
+.pcc_sub :main main:
         .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 1.0
@@ -72,6 +73,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "sech" );
+.pcc_sub :main main:
         .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 1.0
@@ -93,6 +95,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, 'atan2' );
+.pcc_sub :main main:
         .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N0, 0.0
@@ -204,6 +207,7 @@ ok 16
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'atan, part 2' );
+.pcc_sub :main main:
         .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         atan N4, -0.0, -0.0
@@ -216,6 +220,7 @@ ok 1
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "log2" );
+.pcc_sub :main main:
         .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 10.0
@@ -237,6 +242,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "log10" );
+.pcc_sub :main main:
         .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 15.0
@@ -258,6 +264,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "ln" );
+.pcc_sub :main main:
         .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 10.0
@@ -278,6 +285,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "exp" );
+.pcc_sub :main main:
         .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 10.0
@@ -298,6 +306,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "pow" );
+.pcc_sub :main main:
         .loadlib 'trans_ops'
         .include 'fp_equality.pasm'
         set N1, 3.0
@@ -410,6 +419,7 @@ ok 16
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "sqrt" );
+.pcc_sub :main main:
        .include 'fp_equality.pasm'
        set N1, 9.0
        sqrt N2, N1
@@ -430,6 +440,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "pow_n_n_ic" );
+.pcc_sub :main main:
     .loadlib 'trans_ops'
     set N0, 2.0
     pow N1, N0, 0
@@ -486,6 +497,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "pow_n_n_i" );
+.pcc_sub :main main:
     .loadlib 'trans_ops'
     set N0, 2.0
     set I0, 0

@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -285,12 +284,14 @@ use IO::File ();
 use lib qw( lib );
 use Parrot::BuildUtil ();
 use Parrot::Config;
+use Parrot::Test::Util 'create_tempfile';
 
 require Exporter;
 require Test::Builder;
 require Test::More;
 
-our @EXPORT = qw( plan run_command skip slurp_file pbc_postprocess_output_like );
+our @EXPORT = qw( plan run_command skip slurp_file pbc_postprocess_output_like
+                  pir_stdin_output_is pir_stdin_output_like );
 
 use base qw( Exporter );
 
@@ -401,10 +402,14 @@ sub write_code_to_file {
     return;
 }
 
+{
+    no warnings 'once';
 # We can inherit from other modules, so we do so.
 *plan = \&Test::More::plan;
 *skip = \&Test::More::skip;
 *slurp_file = \&Parrot::BuildUtil::slurp_file;
+
+}
 
 sub convert_line_endings {
     my ($text) = @_;
@@ -493,7 +498,7 @@ sub generate_languages_functions {
             }
 
             # The generated files are left in the t/* directories.
-            # Let 'make clean' and 'svn:ignore' take care of them.
+            # Let 'make clean' and '.gitignore' take care of them.
 
             return;
         };
@@ -569,6 +574,68 @@ sub pbc_postprocess_output_like {
 
 }
 
+sub _pir_stdin_output_slurp {
+    my ($input_string, $code, $expected_ouptut) = @_;
+
+    my $stuff = sub {
+        # Put the string on a file.
+        my $string = shift;
+
+        my (undef, $file) = create_tempfile(UNLINK => 1);
+        open(my $out, '>', $file) or die "bug";
+        binmode $out;
+        print $out $string;
+        return $file;
+    };
+
+    # Write the input and code strings.
+    my $input_file = $stuff->($input_string);
+    my $code_file = $stuff->($code);
+
+    my $parrot = ".$PConfig{slash}parrot$PConfig{exe}";
+    # Slurp and compare the output.
+    my $result = do {
+        local $/;
+        open(my $in, '-|', "$parrot $code_file 2>&1 < $input_file")
+            or die "bug";
+        <$in>;
+    };
+
+    return $result;
+}
+
+=over
+
+=item C<pir_stdin_output_is($input_string, $code, $expected, $description)>
+
+Runs the PIR code while piping data into its standard input and passes the test
+if a string comparison of output with the expected result is true.
+
+=cut
+
+sub pir_stdin_output_is {
+    my ($input_string, $code, $expected_output, $description) = @_;
+
+    my $result = _pir_stdin_output_slurp($input_string, $code, $expected_output);
+    Test::More::is($result, $expected_output, $description);
+}
+
+=item C<pir_stdin_output_like($input_string, $code, $expected, $description)>
+
+Runs the PIR code while piping data into its standard input and passes the test
+if the output matches the expected result.
+
+=back
+
+=cut
+
+sub pir_stdin_output_like {
+    my ($input_string, $code, $expected_output, $description) = @_;
+
+    my $result = _pir_stdin_output_slurp($input_string, $code, $expected_output);
+    Test::More::like($result, $expected_output, $description);
+}
+
 # The following methods are private.  They should not be used by modules
 # inheriting from Parrot::Test.
 
@@ -633,10 +700,10 @@ sub _run_test_file {
         $run_exec = 1;
         my $pbc_f = per_test( '.pbc', $test_no );
         my $o_f = per_test( '_pbcexe' . $PConfig{o}, $test_no );
-        my $exe_f =
-            per_test( '_pbcexe' . $PConfig{exe}, $test_no )
-            ;    # Make cleanup and svn:ignore more simple
-        my $exec_f = per_test( '_pbcexe', $test_no );    # Make cleanup and svn:ignore more simple
+
+        # make cleanup and .gitignore more simple
+        my $exe_f = per_test( '_pbcexe' . $PConfig{exe}, $test_no );
+        my $exec_f = per_test( '_pbcexe', $test_no );
         $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
 
         run_command(
@@ -701,8 +768,6 @@ sub _generate_test_functions {
     my $path_to_parrot = path_to_parrot();
     my $parrot         = File::Spec->join( File::Spec->curdir(),
                             'parrot' . $PConfig{exe} );
-    my $pirc           = File::Spec->join( File::Spec->curdir(),
-                            qw( compilers pirc ), "pirc$PConfig{exe}" );
 
     ##### 1: Parrot test map #####
     my %parrot_test_map = map {
@@ -785,11 +850,6 @@ sub _generate_test_functions {
         pir_2_pasm_isnt    => 'isnt_eq',
         pir_2_pasm_like    => 'like',
         pir_2_pasm_unlike  => 'unlike',
-
-        pirc_2_pasm_is     => 'is_eq',
-        pirc_2_pasm_isnt   => 'isnt_eq',
-        pirc_2_pasm_like   => 'like',
-        pirc_2_pasm_unlike => 'unlike',
     );
 
     foreach my $func ( keys %pir_2_pasm_test_map ) {
@@ -827,8 +887,6 @@ sub _generate_test_functions {
                 $args   .= " $opt --output=$out_f";
                 $args    =~ s/--run-exec//;
                 $cmd       = qq{$parrot $args "$code_f"};
-            } elsif ($func =~ /^pirc_/) {
-                $cmd       = qq{$pirc -b -x "$code_f"};
             }
 
             write_code_to_file( $code, $code_f );

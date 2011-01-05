@@ -1,7 +1,5 @@
 /* namespace.h
  *  Copyright (C) 2004-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *      Contains accessor functions for globals
  *  Data Structure and Algorithms:
@@ -184,6 +182,6 @@ void Parrot_ns_store_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

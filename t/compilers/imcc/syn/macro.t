@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -186,6 +185,7 @@ pir_output_is( <<'CODE', 'foo', 'constant defined and used' );
 CODE
 
 pasm_output_is( <<'CODE', 'foo', 'constant defined, used in a macro call' );
+.pcc_sub :main main:
 .macro_const FOO S0
 .macro answer (bar)
   print .bar
@@ -233,6 +233,7 @@ ENDF
 close $FOO;
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'basic include macro' );
+.pcc_sub :main main:
 .include "macro.tempfile_$$"
   print S0
 
@@ -259,6 +260,7 @@ ENDF
 close $FOO;
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'include a file defining a macro' );
+.pcc_sub :main main:
 .include "macro.tempfile_$$"
  .multiply(12,13)
  print P2
@@ -595,7 +597,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro label outside of macro decla
 .label $endwhile:
 .endm
 
-.sub main
+.sub main :main
 .While($I0 < 3, {
 say $I0
 goto .$endwhile

@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -242,8 +241,6 @@ EOM
     # finally the name mapping
     $macros .= <<'EOM';
 
-#ifdef PARROT_IN_OBJECTS_C
-
 #define PARROT_VTABLE_LOW 9
 
 static PARROT_OBSERVER const char * const Parrot_vtable_slot_names[] = {
@@ -273,7 +270,6 @@ EOM
 
 #define NUM_VTABLE_FUNCTIONS $num_vtable_funcs
 
-#endif /* PARROT_IN_OBJECTS_C */
 EOM
 
     $macros;

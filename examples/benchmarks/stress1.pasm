@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2006, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -15,6 +14,8 @@ Creates 500 arrays with 20000 elements each. Prints out the number of
 GC runs made.
 
 =cut
+
+.pcc_sub :main main:
 
 # Our master loop, I20 times
 	set I20, 10

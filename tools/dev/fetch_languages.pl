@@ -1,5 +1,4 @@
 # Copyright (C) 2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -56,8 +55,8 @@ my @hlls = (
 
     {
         name       => 'bf',
-        scm        => 'SVN',
-        repository => 'https://svn.parrot.org/languages/bf/trunk'
+        scm        => 'GIT',
+        repository => 'git://github.com/parrot/bf.git'
     },
 
     {
@@ -68,8 +67,8 @@ my @hlls = (
 
     {
         name       => 'c99',
-        scm        => 'SVN',
-        repository => 'https://svn.parrot.org/languages/c99/trunk'
+        scm        => 'GIT',
+        repository => 'git://github.com/parrot/c99.git'
     },
 
     {
@@ -80,8 +79,8 @@ my @hlls = (
 
     {
         name       => 'chitchat',
-        scm        => 'SVN',
-        repository => 'https://svn.parrot.org/languages/chitchat/trunk'
+        scm        => 'GIT',
+        repository => 'git://github.com/parrot/chitchat.git'
     },
 
     {
@@ -104,14 +103,14 @@ my @hlls = (
 
     {
         name       => 'ecmascript',
-        scm        => 'SVN',
-        repository => 'https://svn.parrot.org/languages/ecmascript/trunk'
+        scm        => 'GIT',
+        repository => 'git://github.com/parrot/ecmascript.git'
     },
 
     {
         name       => 'forth',
-        scm        => 'SVN',
-        repository => 'https://svn.parrot.org/languages/forth/trunk'
+        scm        => 'GIT',
+        repository => 'git://github.com/parrot/forth.git'
     },
 
     {
@@ -164,14 +163,14 @@ my @hlls = (
 
     {
         name       => 'lisp',
-        scm        => 'SVN',
-        repository => 'https://svn.parrot.org/languages/lisp/trunk'
+        scm        => 'GIT',
+        repository => 'git://github.com/parrot/lisp.git'
     },
 
     {
         name       => 'lolcode',
-        scm        => 'SVN',
-        repository => 'https://svn.parrot.org/languages/lolcode/trunk'
+        scm        => 'GIT',
+        repository => 'git://github.com/parrot/lolcode.git'
     },
 
     {
@@ -200,8 +199,8 @@ my @hlls = (
 
     {
         name       => 'ook',
-        scm        => 'SVN',
-        repository => 'https://svn.parrot.org/languages/ook/trunk'
+        scm        => 'GIT',
+        repository => 'git://github.com/parrot/ook.git'
     },
 
     {
@@ -218,8 +217,8 @@ my @hlls = (
 
     {
         name       => 'pheme',
-        scm        => 'SVN',
-        repository => 'https://svn.parrot.org/languages/pheme/trunk'
+        scm        => 'GIT',
+        repository => 'git://github.com/parrot/pheme.git'
     },
 
     {
@@ -260,8 +259,8 @@ my @hlls = (
 
     {
         name       => 'punie',
-        scm        => 'SVN',
-        repository => 'https://svn.parrot.org/languages/punie/trunk'
+        scm        => 'GIT',
+        repository => 'git://github.com/parrot/punie.git'
     },
 
     {

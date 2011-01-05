@@ -1,5 +1,4 @@
-# Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
+# Copyright (C) 2009-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -2173,7 +2172,7 @@ the server. The default is "parrot-autobot:qa_rocks"
     $S0 = config['osname']
     push contents, $S0
     push contents, 'revision'
-    $S0 = config['revision']
+    $S0 = config['git_describe']
     push contents, $S0
     $I0 = exists kv['smolder_tags']
     unless $I0 goto L2
@@ -4266,18 +4265,21 @@ Return the whole config
 
 .sub 'get_executable'
     .param string name
+    $S0 = '"'
     $P0 = get_config()
     $I0 = $P0['installed']
     unless $I0 goto L1
-    $S0 = $P0['bindir']
+    $S1 = $P0['bindir']
     goto L2
   L1:
-    $S0 = $P0['prefix']
+    $S1 = $P0['prefix']
   L2:
+    $S0 .= $S1
     $S0 .= '/'
     $S0 .= name
     $S1 = $P0['exe']
     $S0 .= $S1
+    $S0 .= '"'
     .return ($S0)
 .end
 

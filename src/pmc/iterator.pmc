@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -207,9 +206,7 @@ Restart iterator
 
 */
     VTABLE void set_integer_native(INTVAL value) {
-        PMC *self = SELF;
         PARROT_FAILURE("Iterator: implementation have to override this method");
-
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Iterator: unimplemented method");
     }
@@ -227,5 +224,5 @@ Restart iterator
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

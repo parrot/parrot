@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -55,7 +54,7 @@ t/pmc/oplib.t - OpLib PMC
     is(i, 0, 'last opcode exists')
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
-    set_addr eh, catch
+    set_label eh, catch
     push_eh eh
     op = oplib[n]
     nok(1, 'out of bounds opcode number should throw')
@@ -94,7 +93,7 @@ t/pmc/oplib.t - OpLib PMC
     is($I0, 0, "got end opcode data")
 
     $I0 = elements op
-    is($I0, TESTED_OP_ELEMS, "the opcode tested has the expected lenght")
+    is($I0, TESTED_OP_ELEMS, "the opcode tested has the expected length")
 
     # Using a String PMC
     name = new ['String']

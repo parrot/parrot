@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -68,11 +67,11 @@ print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     Parrot_io_eprintf(tracer, "# %s coroutine '%Ss'",
         !(PObj_get_FLAGS(sub_pmc) & SUB_FLAG_CORO_FF) ?
         "Calling" : "yielding from",
-        Parrot_full_sub_name(interp, sub_pmc));
+        Parrot_sub_full_sub_name(interp, sub_pmc));
 
     if (!PMC_IS_NULL(ctx) && (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_CORO_FF)) {
         Parrot_io_eprintf(tracer, " to '%Ss'",
-                Parrot_full_sub_name(interp,
+                Parrot_sub_full_sub_name(interp,
                     Parrot_pcc_get_sub(interp, Parrot_pcc_get_caller_ctx(interp, ctx))));
     }
 
@@ -209,7 +208,7 @@ Swaps the "context".
 
             /* create pad if needed */
             if (!PMC_IS_NULL(lex_info)) {
-                const INTVAL hlltype = Parrot_get_ctx_HLL_type(INTERP, enum_class_LexPad);
+                const INTVAL hlltype = Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_LexPad);
                 PMC * const lexpad = Parrot_pmc_new_init(INTERP, hlltype, lex_info);
                 Parrot_pcc_set_lex_pad(INTERP, ctx, lexpad);
                 VTABLE_set_pointer(INTERP, lexpad, ctx);
@@ -314,5 +313,5 @@ Swaps the "context".
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

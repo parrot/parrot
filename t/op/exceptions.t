@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -23,6 +22,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh label - pop_eh" );
+.pcc_sub :main main:
     push_eh _handler
     print "ok 1\n"
     pop_eh
@@ -36,6 +36,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh eh - pop_eh" );
+.pcc_sub :main main:
     new P29, 'ExceptionHandler'
     push_eh P29
     print "ok 1\n"
@@ -48,6 +49,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw" );
+.pcc_sub :main main:
     print "main\n"
     push_eh _handler
     new P30, 'Exception'
@@ -63,9 +65,10 @@ caught it
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh eh - throw" );
+.pcc_sub :main main:
     print "main\n"
     new P29, 'ExceptionHandler'
-    set_addr P29, _handler
+    set_label P29, _handler
     push_eh P29
     new P30, 'Exception'
     throw P30
@@ -80,6 +83,7 @@ caught it
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_results" );
+.pcc_sub :main main:
     print "main\n"
     push_eh handler
     new P1, 'Exception'
@@ -107,6 +111,7 @@ just pining
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_results - be sure registers are ok" );
+.pcc_sub :main main:
 # see also #38459
     print "main\n"
     new P0, 'Integer'
@@ -157,11 +162,12 @@ just pining
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw - message" );
+.pcc_sub :main main:
     print "main\n"
     push_eh _handler
 
     new P30, 'Exception'
-    set P30, "something happend"
+    set P30, "something happened"
     throw P30
     print "not reached\n"
     end
@@ -175,20 +181,22 @@ _handler:
 CODE
 main
 caught it
-something happend
+something happened
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
+.pcc_sub :main main:
     new P0, 'Exception'
-    set P0, "something happend"
+    set P0, "something happened"
     throw P0
     print "not reached\n"
     end
 CODE
-/something happend/
+/something happened/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
+.pcc_sub :main main:
     push_eh _handler
     new P0, 'Exception'
     pop_eh
@@ -202,6 +210,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
+.pcc_sub :main main:
     new P0, 'Exception'
     throw P0
     print "not reached\n"
@@ -211,12 +220,13 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers" );
+.pcc_sub :main main:
     print "main\n"
     push_eh _handler1
     push_eh _handler2
 
     new P30, 'Exception'
-    set P30, "something happend"
+    set P30, "something happened"
     throw P30
     print "not reached\n"
     end
@@ -237,16 +247,17 @@ _handler2:
 CODE
 main
 caught it in 2
-something happend
+something happened
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers, throw next" );
+.pcc_sub :main main:
     print "main\n"
     push_eh _handler1
     push_eh _handler2
 
     new P30, 'Exception'
-    set P30, "something happend"
+    set P30, "something happened"
     throw P30
     print "not reached\n"
     end
@@ -268,12 +279,13 @@ _handler2:
 CODE
 main
 caught it in 2
-something happend
+something happened
 caught it in 1
-something happend
+something happened
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUT, "die" );
+.pcc_sub :main main:
     push_eh _handler
     die 3, 100
     print "not reached\n"
@@ -286,6 +298,7 @@ caught it
 OUT
 
 pasm_output_is( <<'CODE', <<OUT, "die, error, severity" );
+.pcc_sub :main main:
     push_eh _handler
     die 3, 100
     print "not reached\n"
@@ -304,6 +317,7 @@ severity 3
 OUT
 
 pasm_error_output_like( <<'CODE', <<OUT, "die - no handler" );
+.pcc_sub :main main:
     die 3, 100
     print "not reached\n"
     end
@@ -315,6 +329,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', '', "exit exception" );
+.pcc_sub :main main:
     noop
     exit 0
     print "not reached\n"
@@ -322,6 +337,7 @@ pasm_output_is( <<'CODE', '', "exit exception" );
 CODE
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw" );
+.pcc_sub :main main:
     print "main\n"
     push_eh handler
     print "ok\n"

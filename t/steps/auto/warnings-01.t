@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2007, Parrot Foundation.
-# $Id$
 # auto/warnings-01.t
 
 use strict;
@@ -71,7 +70,7 @@ $conf->replenish($serialized);
 # Simulate case where --cage warnings are requested
 $conf->options->set( verbose => undef );
 $step = test_step_constructor_and_description($conf);
-$conf->data->set( gccversion => 'defined' );
+$conf->data->set( gccversion => '4.0' );
 $conf->data->set( 'g++' => undef );
 $conf->options->set( cage => 1 );
 ok($step->runstep($conf), "runstep() returned true value");

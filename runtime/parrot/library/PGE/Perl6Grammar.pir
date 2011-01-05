@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 
 =head1 TITLE
 
@@ -145,9 +144,9 @@ the output to the correct output file.
     nstable = new 'Hash'
     ns = new 'String'
     $P0 = new 'Hash'
-    $P1 = new 'CodeString'
+    $P1 = new 'StringBuilder'
     $P0['optable'] = $P1
-    $P1 = new 'CodeString'
+    $P1 = new 'StringBuilder'
     $P0['rule'] = $P1
     nstable[''] = $P0
 
@@ -164,7 +163,7 @@ the output to the correct output file.
     unless match goto stmt_end
     unless match > '' goto stmt_end
     $S0 = match['cmd']
-    concat $S0, '_stmt'
+    $S0 = concat $S0, '_stmt'
     $P0 = find_name $S0
     $P0(match, ns, nstable)
     goto stmt_loop
@@ -172,8 +171,8 @@ the output to the correct output file.
 
     .local pmc initpir, rulepir, it, ns
     .local string namespace
-    initpir = new 'CodeString'
-    rulepir = new 'CodeString'
+    initpir = new 'StringBuilder'
+    rulepir = new 'StringBuilder'
     it = iter nstable
   iter_loop:
     unless it goto iter_end
@@ -185,8 +184,9 @@ the output to the correct output file.
     if namespace == '' goto ns_optable
     .local string inherit
     inherit = ns['inherit']
-    $S0 = initpir.'unique'('onload_')
-    initpir.'emit'(<<'        CODE', namespace, inherit, $S0)
+    $P0 = get_root_global ['parrot';'PGE';'Util'], 'unique'
+    $S0 = $P0('onload_')
+    initpir.'append_format'(<<'        CODE', namespace, inherit, $S0)
           ## namespace %0
           .local pmc p6meta
           p6meta = get_root_global ['parrot'], 'P6metaclass'
@@ -198,23 +198,24 @@ the output to the correct output file.
   ns_optable:
     $P0 = ns['optable']
     if $P0 == '' goto iter_loop
-    initpir.'emit'("          optable = root_new ['parrot';'PGE';'OPTable']")
+    initpir.'append_format'("          optable = root_new ['parrot';'PGE';'OPTable']\n")
     $S0 = namespace
     $P1 = split '::', $S0
-    $P1 = initpir.'key'($P1 :flat)
-    initpir.'emit'("          set_hll_global %0, '$optable', optable", $P1)
+    $P2 = get_root_global ['parrot';'PGE';'Util'], 'pir_key_escape'
+    $P1 = $P2($P1 :flat)
+    initpir.'append_format'("          set_hll_global %0, '$optable', optable\n", $P1)
     initpir .= $P0
     goto iter_loop
   iter_end:
 
     .local pmc out
-    out = new 'CodeString'
+    out = new 'StringBuilder'
     if initpir == '' goto out_rule
-    out.'emit'("      .sub '__onload' :load :init")
-    out.'emit'("          .local pmc optable")
+    out.'append_format'("      .sub '__onload' :load :init\n")
+    out.'append_format'("          .local pmc optable\n")
     out .= initpir
-    out.'emit'("          .return ()")
-    out.'emit'("      .end")
+    out.'append_format'("          .return ()\n")
+    out.'append_format'("      .end\n")
   out_rule:
     out .= rulepir
 
@@ -253,9 +254,9 @@ the output to the correct output file.
     .local pmc ns
     ns = new 'Hash'
     ns['inherit'] = inherit
-    $P1 = new 'CodeString'
+    $P1 = new 'StringBuilder'
     ns['optable'] = $P1
-    $P1 = new 'CodeString'
+    $P1 = new 'StringBuilder'
     ns['rule'] = $P1
     nstable[name] = ns
 
@@ -299,11 +300,12 @@ the output to the correct output file.
     goto with_rulepir
   rulepir_optable:
     ##   this is a special rule generated via the 'is optable' trait
-    rulepir = new 'CodeString'
+    rulepir = new 'StringBuilder'
     $S0 = namespace
     $P0 = split '::', $S0
-    $P0 = rulepir.'key'($P0 :flat)
-    rulepir.'emit'(<<'      END', $P0, name)
+    $P1 = get_root_global ['parrot';'PGE';'Util'], 'pir_key_escape'
+    $P0 = $P1($P0 :flat)
+    rulepir.'append_format'(<<'      END', $P0, name)
       .namespace %0
       .sub "%1"
         .param pmc mob
@@ -318,7 +320,7 @@ the output to the correct output file.
     .local pmc code
     $P0 = nstable[namespace]
     code = $P0['rule']
-    code.'emit'("\n## <%0::%1>\n", namespace, name)
+    code.'append_format'("\n## <%0::%1>\n", namespace, name)
     code .= rulepir
     .return ()
 .end
@@ -380,26 +382,29 @@ the output to the correct output file.
     goto trait_sub
   trait_arg:
     if trait == 'parsed' goto trait_sub
-    arg = optable.'escape'(arg)
+    $P0 = get_root_global ['parrot';'PGE';'Util'], 'pir_str_escape'
+    arg = $P0(arg)
     goto trait_arg_done
   trait_sub:
     $S0 = namespace
     $P0 = split '::', $S0
-    $P0 = optable.'key'($P0 :flat)
-    optable.'emit'("          $P0 = get_hll_global %0, '%1'", $P0, arg)
+    $P1 = get_root_global ['parrot';'PGE';'Util'], 'pir_key_escape'
+    $P0 = $P1($P0 :flat)
+    optable.'append_format'("          $P0 = get_hll_global %0, '%1'\n", $P0, arg)
     arg = '$P0'
     goto trait_arg_done
   trait_arg_null:
     arg = '1'
   trait_arg_done:
-    concat traitlist, ", '"
-    concat traitlist, trait
-    concat traitlist, "'=>"
-    concat traitlist, arg
+    traitlist = concat traitlist, ", '"
+    traitlist = concat traitlist, trait
+    traitlist = concat traitlist, "'=>"
+    traitlist = concat traitlist, arg
     goto trait_loop
   trait_end:
-    name = optable.'escape'(name)
-    optable.'emit'("          optable.'newtok'(%0%1)", name, traitlist)
+    $P0 = get_root_global ['parrot';'PGE';'Util'], 'pir_str_escape'
+    name = $P0(name)
+    optable.'append_format'("          optable.'newtok'(%0%1)\n", name, traitlist)
   .return ()
 .end
 

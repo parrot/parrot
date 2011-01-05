@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -95,19 +94,19 @@ end:
     push_eh eh1
     set $P0[1], -7
     pop_eh
-    ok(0, "no exception raised when setting nonexistant element")
+    ok(0, "no exception raised when setting nonexistent element")
     goto after_eh1
 eh1:
-    ok(1, "exception raised when setting nonexistant element")
+    ok(1, "exception raised when setting nonexistent element")
 after_eh1:
 
     push_eh eh2
     set $I0, $P0[1]
     pop_eh
-    ok(0, "no exception raised when getting nonexistant element")
+    ok(0, "no exception raised when getting nonexistent element")
     goto after_eh2
 eh2:
-    ok(1, "exception raised when getting nonexistant element")
+    ok(1, "exception raised when getting nonexistent element")
 after_eh2:
 .end
 
@@ -261,13 +260,13 @@ loop:
 
 .sub test_invalid_init_tt1509
     throws_substring(<<'CODE', 'FixedFloatArray: Cannot set array size to a negative number (-10)', 'New style init does not dump core for negative array lengths')
-    .sub main
+    .sub main :main
         $P0 = new ['FixedFloatArray'], -10
     .end
 CODE
 
     throws_substring(<<'CODE', 'FixedFloatArray: Cannot set array size to a negative number (-10)', 'New style init (key constant) does not dump core for negative array lengths')
-    .sub main
+    .sub main :main
         $P0 = new 'FixedFloatArray', -10
     .end
 CODE

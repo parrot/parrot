@@ -1,7 +1,5 @@
 /* caches.h
  *  Copyright (C) 2001-2004, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Cache and direct freelist handling for various items.
  *  Data Structure and Algorithms:
@@ -42,5 +40,5 @@ typedef struct _Caches {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

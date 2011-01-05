@@ -1,9 +1,6 @@
 /*
- * $Id$
  * Copyright (C) 2002-2009, Parrot Foundation.
  */
-
-/* $Id$ */
 
 #ifndef PARROT_IMCC_IMC_H_GUARD
 #define PARROT_IMCC_IMC_H_GUARD
@@ -564,6 +561,7 @@ typedef struct _imc_info_t {
     int                   compiler_state;         /* see PBC_* flags */
     int                   verbose;
     int                   write_pbc;
+    int                   seen_main;
     opcode_t              npc;
 } imc_info_t;
 
@@ -625,5 +623,5 @@ FILE * imc_yyin_get(void *yyscanner);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,15 +1,6 @@
 /*
- * $Id$
 ** experimental.ops
 */
-
-BEGIN_OPS_PREAMBLE
-
-#if PARROT_HAS_ICU
-#  include <unicode/uchar.h>
-#endif
-
-END_OPS_PREAMBLE
 
 =head1 NAME
 
@@ -263,7 +254,8 @@ op new(out PMC, in STR, in INT) {
                           : PMCNULL;
 
     if (!PMC_IS_NULL(_class)) {
-        PMC *initial = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+        PMC *initial = Parrot_pmc_new(interp,
+                                      Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
         VTABLE_set_integer_native(interp, initial, $3);
         $1 = VTABLE_instantiate(interp, _class, initial);
     }
@@ -291,7 +283,7 @@ op new(out PMC, in PMC, in INT) {
         PMC * const _class = Parrot_oo_get_class(interp, name_key);
         if (!PMC_IS_NULL(_class)) {
             PMC *initial = Parrot_pmc_new(interp,
-                Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+                Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
             VTABLE_set_integer_native(interp, initial, $3);
             $1 = VTABLE_instantiate(interp, _class, initial);
         }
@@ -329,7 +321,7 @@ op root_new(out PMC, in PMC, in INT) {
         PMC * const _class   = Parrot_oo_get_class(interp, ns);
         if (!PMC_IS_NULL(_class)) {
             PMC *initial = Parrot_pmc_new(interp,
-                Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+                Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
             VTABLE_set_integer_native(interp, initial, $3);
             $1 = VTABLE_instantiate(interp, _class, initial);
         }
@@ -348,27 +340,6 @@ op root_new(out PMC, in PMC, in INT) {
     }
 }
 
-=item B<find_codepoint>(out INT, in STR)
-
-Set $1 to the codepoint with the name given in $2, or -1 if there is none.
-Requires ICU lib, otherwise exception is thrown.
-
-=cut
-
-op find_codepoint(out INT, in STR) {
-#if PARROT_HAS_ICU
-    UErrorCode   err       = U_ZERO_ERROR;
-    char * const cstr      = Parrot_str_to_cstring(interp, $2);
-    UChar32      codepoint = u_charFromName(U_EXTENDED_CHAR_NAME, cstr, &err);
-    Parrot_str_free_cstring(cstr);
-    $1 = U_SUCCESS(err) ? (INTVAL) codepoint : -1;
-#else
-    opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
-        EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
-    goto ADDRESS(dest);
-#endif
-}
-
 =item B<finalize>(in PMC)
 
 Finalize exception handling, freeing any information needed to resume
@@ -382,6 +353,7 @@ op finalize(in PMC) {
     /* Go to the next op after loop unrolling */
     opcode_t * const dest = expr NEXT();
     PMC *eh = PMCNULL;
+    Parrot_warn_experimental(interp, "finalize is experimental");
     if (!PMC_IS_NULL($1)) {
         /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
         if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "ExceptionHandler")))
@@ -432,5 +404,5 @@ as the Parrot interp itself.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

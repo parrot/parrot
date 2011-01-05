@@ -1,12 +1,11 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
-# $Id$
 
 # beginn
 #use strict;
 #
 #use warnings;
 
-.sub main
+.sub main :main
 
 .local string _string
 _string = "just another perl hacker"

@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -177,11 +176,10 @@ sub new {
             '',
             $self->c_item(
                 '',
-                'sources' => [ 'string/primitives', 'string/api' ],
-                'headers' => [ 'string', 'string_funcs', 'string_primitives' ]
+                'sources' => [ 'string/api' ],
+                'headers' => [ 'string', 'string_funcs' ]
             ),
             $self->c_item( 'String encodings', 'contents' => ['src/string/encoding'] ),
-            $self->c_item( 'String charset',   'contents' => ['src/string/charset'] ),
             $self->c_item(
                 'Miscellaneous, <code>sprintf</code> and utility functions.',
                 'pairs'   => ['misc'],

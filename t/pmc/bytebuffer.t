@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -22,7 +21,7 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(38)
+    plan(45)
 
     test_init()
     test_set_string()
@@ -33,6 +32,7 @@ Tests C<ByteBuffer> PMC..
     test_alloc()
     test_iterate()
     test_invalid()
+    test_get_chars()
 .end
 
 ################################################################
@@ -152,27 +152,10 @@ end:
     is(n, 4, "getting ascii from buffer gives correct length")
     is(s, "abcd", "getting ascii from buffer gives correct content")
 
-    $I0 = hasicu()
-    unless $I0 goto skip_it
-
     bb = new ['ByteBuffer']
 
     # Upper case n tilde: codepoint 0xD1, utf8 encoding 0xC3, 0x91
-    #bb = utf16:"\x{D1}"
-    # Can't do that, or the program can't be compiled without ICU.
-    # Fill the buffer with bytes instead.
-
-    # Get endianess to set the bytes in the appropiate order.
-    # *** XXX *** Need report from big endian platforms.
-    big = isbigendian()
-    if big goto isbig
-    bb[0] = 0xD1
-    bb[1] = 0x00
-    goto doit
-isbig:
-    bb[0] = 0x00
-    bb[1] = 0xD1
-doit:
+    bb = utf16:"\x{D1}"
     s = bb.'get_string'('utf16')
     n = length s
     is(n, 1, "getting utf16 from buffer gives correct length")
@@ -186,10 +169,6 @@ doit:
     is(n, 1, "getting utf8 from buffer gives correct length")
     n = ord s
     is(n, 0xD1, "getting utf8 from buffer gives correct codepoint")
-    goto end
-skip_it:
-    skip(4, "this test needs ICU")
-end:
 .end
 
 .sub test_push
@@ -261,7 +240,7 @@ end:
     .local pmc eh
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
-    set_addr eh, catch_negative
+    set_label eh, catch_negative
     n = 1
     push_eh eh
     bb = -1
@@ -280,10 +259,7 @@ test_negative:
     .local pmc bb
     .local int i, big, pos, b0, b1, c
 
-    $I0 = hasicu()
-    unless $I0 goto skip_it
-
-    # Get endianess to set the bytes in the appropiate order.
+    # Get endianess to set the bytes in the appropriate order.
     # *** XXX *** Need report from big endian platforms.
     big = isbigendian()
 
@@ -329,9 +305,6 @@ loopcheck:
 failed:
     say i
     ok(0, "reallocation")
-    goto end
-skip_it:
-    skip(1, "this test needs ICU")
 end:
 .end
 
@@ -360,7 +333,7 @@ donearray:
     .local pmc bb, eh, ex
     .local string s
     eh = new ['ExceptionHandler'], .EXCEPTION_INVALID_ENCODING
-    set_addr eh, catch_encoding
+    set_label eh, catch_encoding
     push_eh eh
     bb = new ['ByteBuffer']
     bb = 'something'
@@ -376,7 +349,7 @@ catch_encoding:
 check_content:
     bb[0] = 128 # Out of ascii range
     eh = new ['ExceptionHandler'], .EXCEPTION_INVALID_STRING_REPRESENTATION
-    set_addr eh, catch_content
+    set_label eh, catch_content
     push_eh eh
     s = bb.'get_string'('ascii')
     pop_eh
@@ -388,6 +361,36 @@ catch_content:
     pop_eh
     ok(1, "get_string with invalid content throws")
 end:
+.end
+
+.sub test_get_chars
+    .local pmc bb, it, arr
+    .local string s
+    bb = new ['ByteBuffer']
+
+    bb = 'plain ascii string'
+    s = bb.'get_chars'(6, 5, 'ascii')
+    is( s, 'ascii', 'get_chars ascii' )
+
+    bb = iso-8859-1:"D\x{E9}p\x{EA}che"
+    s = bb.'get_chars'(1, 3, 'iso-8859-1')
+    is( s, utf8:"épê", 'get_chars iso-8859-1' )
+
+    bb = binary:"D\x{E9}p\x{EA}che"
+    s = bb.'get_chars'(3, 3, 'binary')
+    is( s, utf8:"êch", 'get_chars binary' )
+
+    bb = ucs2:"Grüße"
+    s = bb.'get_chars'(0, 3, 'ucs2')
+    is( s, utf8:"Grü", 'get_chars ucs2' )
+    s = bb.'get_chars'(4, 3, 'ucs2')
+    is( s, utf8:"üße", 'get_chars ucs2' )
+
+    bb = ucs4:"Grüße"
+    s = bb.'get_chars'(0, 3, 'ucs4')
+    is( s, utf16:"Grü", 'get_chars ucs4' )
+    s = bb.'get_chars'(8, 3, 'ucs4')
+    is( s, utf16:"üße", 'get_chars ucs4' )
 .end
 
 # Local Variables:

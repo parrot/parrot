@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2005, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -32,6 +31,7 @@ L<https://rt.perl.org/rt3/Ticket/Display.html?id=31197>
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "integer literals in PASM" );
+.pcc_sub :main main:
         print 0x2A
         print "\n"
         print 0X2A

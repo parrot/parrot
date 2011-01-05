@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2007, Parrot Foundation.
-# $Id$
 # 028-option_or_data.t
 
 use strict;
@@ -9,8 +8,9 @@ use warnings;
 use Test::More tests => 12;
 use Carp;
 use lib qw( lib );
-use config::init::defaults;
-use config::init::install;
+use lib qw( config );
+use init::defaults;
+use init::install;
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);

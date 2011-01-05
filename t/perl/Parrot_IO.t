@@ -1,12 +1,11 @@
 #! perl
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
-use Test::More 'tests' => 58;
+use Test::More 'tests' => 56;
 
 use Parrot::Distribution;
 use File::Spec::Functions ':ALL';
@@ -171,19 +170,6 @@ is( $f3->read, "hello\nworld", 'append and scalar read' );
 is( $a[1], "world", 'array read' );
 
 ok( $f3->modified_since($time), 'modified_since' );
-
-SKIP: {
-    my $nul = File::Spec->devnull;
-
-    skip( 'keywords not expanded in non-svn checkouts', 2 )
-        unless Parrot::Distribution->new->is_svn_co();
-
-    $f = Parrot::IO::File->new( catfile( 'lib', 'Parrot', 'IO', 'File.pm' ) );
-    ok( $f->has_svn_id(), 'has_svn_id' );
-
-    ok($f->svn_id() =~ /^(?:\$)Id:.*?File.pm \d+ \d{4}-\d\d-\d\d.*?[^\$]+ \$$/,
-       'svn_id');
-}
 
 $f3->delete();
 @a = $d2->files();

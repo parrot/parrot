@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -29,6 +28,7 @@ foreach (qw( core_thunks extra_thunks )) {
             "--core " .
             "--loader-name=$loader_name " .
             "--output=$c_file " .
+            "--no-warn-dups " .
             "<$nci_file "
     );
 }

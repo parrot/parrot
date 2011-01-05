@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -558,7 +557,7 @@ Returns whether the class does the role with the given C<*rolename>.
 
 =item C<INTVAL does_pmc(PMC *role)>
 
-Returns whether the class does the givne C<*role>.
+Returns whether the class does the given C<*role>.
 
 =cut
 
@@ -828,5 +827,5 @@ F<docs/pdds/pdd15_objects.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,168 +1,183 @@
 # Copyright (c) 2001-2010, Parrot Foundation.
-# $Id$
 
-=head1 [DRAFT] PDD10: Embedding and Extending
+=head1 PDD10: Embedding
 
 =head2 Abstract
 
-What we believe people will do when embedding and extending Parrot, why they
-do it, and how.
-
-{{ NOTE: some of this will later move into pdds 11 & 12, but for now
-just want to get the stub checked in. }}
+Parrot, more precisely libparrot, can be embedded into applications to provide
+a dynamic language runtime. A perfect example of this embedding is in the
+Parrot executable, which is a thin wrapper around libparrot.
 
 =head2 Version
 
-$Revision$
+Version 1
 
 =head2 Description
 
-Why embed:
+=head3 Difference Between Embedding and Extending
+
+Embedding and Extending (PDD 11) are similar concepts. In both, we write code
+that interfaces with libparrot. In an embedding situation we write an
+application which loads and calls libparrot. In an extending situation,
+libparrot loads and calls your module.
+
+Extending gives libparrot more features, and allows your code to execute from
+inside libparrot. From that location, the extending application has full
+access to the available power and features of libparrot. This includes
+knowledge about internal structure definitions, and internal-only functions
+and subsystems. Because extending code is so closely tied to the internals
+of libparrot, it will be more affected by changes in libparrot itself. Also,
+the stability of extending code is tied to the stability of libparrot: If
+either crashes, the other will likely crash with it.
+
+Embedding, on the other hand, has much more limited access to libparrot. All
+embedding applications must use the official embedding API, which is
+limited and abstracted by design. Embedding applications must treat all
+pointers and structures returned from the API as being opaque. This
+abstraction buys stability. Changes to the internals of libparrot are unlikely
+to cause changes in embedding code. If libparrot crashes or suffers an
+unrecoverable error, it can return control to the embedding application more
+gracefully.
+
+=head3 The Embedding API
+
+The Embedding API is a special set of functions found in the C<src/embed/>
+directory. These functions may not be used internally by libparrot, embedding
+applications may not use any other functions. Breaking either of these rules
+can have serious implications for application stability.
+
+Prior to the implementation of the new API, when libparrot had an unhandled
+exception it would call the C C<exit()> library function to close the
+application. This is undesirable because embedding applications want the
+ability to handle errors and recover from problems in libparrot. The new API
+provides error handling capabilities for cases of unhandled exceptions,
+including both expected EXCEPT_exit and other types of error-related
+exceptions.
+
+The embedding API also makes sure certain details are in place, including
+stack markers for the GC. Calling into libparrot without setting a valid
+stack marker could cause serious (and difficult to diagnose) errors.
+
+The embedding API provides relatively limited interaction with libparrot, at
+least from the point of view of an internals developer or an extension
+developer. There are many reasons for this. First and foremost, the full power
+of libparrot is almost always available through the runcore. If you want to
+do something with Parrot, it is almost always easier and preferred to write
+your code in a language which targets Parrot, compile it down to bytecode, and
+load that bytecode into Parrot to execute. Almost all applications of
+libparrot will involve bytecode execution at some level, and this is where
+most operations become possible.
+
+The API also provides a powerful abstraction layer between the libparrot
+internals developers and the embedding application developers. The API is
+sufficiently abstracted and detached enough that even large changes to the
+internals of libparrot are unlikely to require any changes in the embedding
+application. For instance, libparrot could completely change its entire
+object model implementation and not cause a change to the API at all.
+
+While limited, the API is not static. If embedders need new features or
+functionality, those can usually be added with relative ease.
+
+=head2 Using the Embedding API
+
+The embedding API follows certain guidelines that should be understood by
+users, and followed by developers:
 
 =over 4
 
-=item * access to special features/libraries/languages Parrot provides
+=item * The embed API operates mostly on the 4 core Parrot data types:
+Parrot_PMC, Parrot_String, Parrot_Int, and Parrot_Float. The first two of
+these are pointers and should be treated as opaque.
 
-=item * need an interpreter for a DSL or existing language
+=item * Where possible and reasonable, functions should take Parrot_Strings
+instead of raw C C<char*> or C<wchar_t*> types. Functions do exist to easily
+convert between C types and Parrot_String.
 
-=item * want to run Parrot on another platform or environment (dedicated
-hardware, in a web server, et cetera)
+=item * PMCs are the primary data item. Anything more complicated than an
+integer or string will be passed as a PMC. Some integers and strings will be
+wrapped up in a PMC and passed.
 
-=back
+=item * The number of API functions will stay relatively small. The purpose of
+the API is not to provide the most efficient use of libparrot, but instead
+the most general, stable and abstracted one.
 
-Why extend:
+=item * Calls into libparrot carry a performance overhead because we have to
+do error handling, stack manipulation, data marshaling, etc. It is best to
+do less work through the API, and more work through bytecode and the runcore.
 
-=over 4
+=item * The embed API uses a single header file: L<include/parrot/api.h>.
+Embedding applications should use only this header file and no other header
+files from Parrot. Embedding applications should NOT use
+L<include/parrot/parrot.h> or L<include/parrot/embed.h>, or any other files.
 
-=item * need something NCI doesn't provide
+=item * libparrot does little to no signal handling. Those are typically the
+responsibility of the embedder.
 
-=item * writing a custom PMC
+=item * File descriptors and resource handles are typically owned by whoever
+opens them first. If the embedding application tells libparrot to open a file
+with a FileHandle PMC, libparrot will keep and manage that file descriptor.
+Functionality may be provided to import and export sharable resources like
+these.
 
-=back
+=item * Resources such as allocated memory are managed by whoever creates
+them. If the embedding application allocates a structure and passes it in to
+libparrot, the embedding application is in charge of managing and freeing that
+structure. If libparrot allocates data, it will be in charge of managing and
+freeing it. In many cases, data passed to or from libparrot through the API
+will be copied to a new memory buffer.
 
-Philosophical rules:
+=item * libparrot will not output error information to C<stderr> unless
+specifically requested to. Instead, libparrot will gather all error
+information and make it available to the user through function calls.
 
-=over 4
+=item * API calls should be nestable. Unhandled exceptions or other error
+conditions should cause a jump back to the inner-most API call. The
+interpreter should be able to recover from errors in inner-most frames and
+continue executing.
 
-=item * only ever use opaque pointers
-
-=item * should be able to communicate through PMCs
-
-=item * minimize conversions to and from C data
-
-=over 4
-
-=item * perhaps macros; Ruby does this fairly well and Perl 5 does this
-poorly
-
-=item * minimize the number of necessary functions
-
-=item * probably can follow core Parrot code to some extent, but beware the
-Perl 5 problem
-
-=over 4
-
-=item * do not expose Parrot internals that may change
-
-=over 4
-
-=item * minimize the number of headers used
-
-=item * minimize the number of Parrot types exposed
-
-=item * follow boundaries similar to those of PIR where possible
-
-=back
-
-=item * probably includes vtable functions on PMCs
+I<Note: Currently, the API does not support nested calls. This is planned>
 
 =back
-
-=back
-
-=back
-
-Gotchas:
-
-=over 4
-
-=item * who handles signals?
-
-=item * who owns file descriptors and other Unix resources?
-
-=item * is there an exception boundary?
-
-=item * namespace issues -- especially key related
-
-=item * probably a continuation/control flow boundary
-
-=item * packfiles and subroutines probably too much information for
-either
-
-=item * do not let MMD and other implementation details escape
-
-=item * okay to require some PBC/PIR/PASM for handling round-trip data
-
-=item * Parrot should not spew errors to STDERR when embedded
-
-=item * who allocates and deallocates resources passed through the boundary
-level?
-
-=item * should be access to Parrot's event loop when embedded
-
-=item * passing var args to Parrot subs likely painful
-
-=over 4
-
-=item * perhaps macros/functions to add parameters to call
-
-=item * build up a call signature somehow?
-
-=item * some abstraction for a call frame?
-
-=back
-
-=item * compiling code from a string should return the PMC Sub entry point
-(:main)
-
-=item * are there still directory path, loading, and deployment issues?
-
-=item * how do dynamic oplibs and custom PMCs interact?
-
-=item * what's the best way to handle character sets and Unicode?
-
-=back
-
-=head2 Definitions
-
-Embedding - using libparrot from within another program, likely with a
-C/NCI/FFI interface
-
-Extending - writing Parrot extensions, likely through C or another language
-
-In practice, there is little difference between the two; mostly in terms of
-who has control.  The necessary interfaces should stay the same.
 
 =head2 Implementation
 
-Implementation details.
+The embedding API has two goals: To allow access to libparrot as a dynamic
+language runtime and bytecode interpreter, and to encapsulate implementation
+details internal to libparrot from the embedding application.
 
-Simplicity is the main goal; it should be almost trivial to embed Parrot in an
-existing application.  It must be trivial to do the right thing; the APIs must
-make it so much easier to work correctly than to make mistakes.  This means,
-in particular, that:
+There are several guidelines for the embedding API implementation that
+developers of it should follow:
 
 =over 4
 
-=item * it should never be possible to crash or corrupt the interpreter when
-following the interface as documented
+=item * It should never be possible to crash or corrupt the interpreter when
+following the interface as documented. The interpreter should be able to be
+used and reused until it is explicitly destroyed. The interpreter should
+be reusable after it deals with an unhandled exception, including EXCEPT_exit
+exceptions.
 
-=item * each API call or element should have a single purpose
+=item * It should never be possible for libparrot to crash, corrupt, or
+forcibly exit the embedding application. Also, libparrot should never use
+resources which haven't been assigned to it, such as standard IO handles
+C<stdout>, C<stdin>, and C<stderr>.
 
-=item * names must be consistent in the API documentation and the examples
+=item * Each API function should have a single purpose, and should avoid
+duplication of functionality as much as possible. A course-grained API is
+preferable to a fine-grained one, even if some performance must be
+sacrificed.
 
-=item * it I<should> be possible to embed Parrot I<within> Parrot through NCI,
-as a test both of the sanity of the external interface as well as NCI
+=item * names must be consistent in the API documentation and the examples.
+All API functions are named C<Parrot_api_*>.
+
+=item * The return value of every API function should be an integer value. The
+return value should be 1 on success, and 0 on failure. No other results should
+be returned.
+
+The marker C<PARROT_API> is special and is used to denote API functions. This
+macro sets the function up to be exported from the shared library and may
+also provide some hints to the compiler.
+
+All API functions return a Parrot_Int to signal status.
 
 =back
 
@@ -170,84 +185,143 @@ as a test both of the sanity of the external interface as well as NCI
 
 It is the external code's duty to create, manage, and destroy interpreters.
 
-C<Parrot_new( NULL )> returns an opaque pointer to a new interpreter:
+C<Parrot_api_make_interpreter> returns an opaque pointer to a new interpreter,
+with some options set in it. The definition of C<Parrot_api_make_interpreter>
+is as follows:
 
-  Parrot_Interp Parrot_new(Parrot_Interp parent);
+    Parrot_Int
+    Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
+            Parrot_Init_Args *args, Parrot_PMC * interp);
 
-C<parent> can be NULL for the I<first> interpreter created.  All subsequent
-calls to this function should pass an existing interpreter.
+A common usage pattern for making an interpreter is:
 
-I<Note: it is not clear what happens if you fail to do so; is there a way to
-detect this in the interface and give a warning?>
+    Parrot_PMC interp = NULL;
+    Parrot_Init_Args *args = NULL;
+    GET_INIT_ARGS(args);
+    if (!Parrot_api_make_interpreter(NULL, 0, args, &interp)) {
+        fprintf(stderr, "Could not create interpreter");
+        exit(EXIT_FAILURE);
+    }
 
-C<Parrot_destroy ( interp )> destroys an interpreter and frees its resources.
+C<parent> can be NULL for the I<first> interpreter created, or where the
+interpreter does not have a logical parent. If a parent is provided, the new
+interpreter will have a child/parent relationship with the parent interp.
 
-  void Parrot_destroy(Parrot_Interp);
+The C<flags> parameter contains a bit-wise combination of certain startup
+flags that govern interpreter creation. It is safe to set this to 0 unless
+special needs require it to be otherwise.
 
-I<Note: It is not clear what happens if this interpreter has active children.>
+The C<args> parameter is a structure containing a series of options that must
+be set on the interpreter during initialization. These options, many of which
+deal with the memory subsystem and other deep internals can typically be
+ignored. C<args> can be C<NULL> if no special options need to be set.
+
+The new interpreter PMC is returned in the last parameter.
+
+C<Parrot_api_destroy_interpreter ( interp )> destroys an interpreter and frees
+its resources.
+
+    Parrot_Int Parrot_api_destroy_interpreter(Parrot_Interp);
+
+It is a good idea to destroy child interpreters before destroying their
+parents.
 
 =head3 Working with Source Code and PBC Files
 
-Perhaps the most common case for working with code is loading it from an
-external file.  This may often be PBC, but it must also be possible to load
-code with any registered compiler.  This I<must> be a single-stage operation:
+libparrot natively executes .pbc bytecode files. These are manipulated in
+Parrot through a PMC interface. PBC PMCs can be obtained in a number of ways:
+they can be returned from a compiler, they can be loaded from PBC, or they can
+be constructed on the fly.
 
-  Parrot_PMC Parrot_load_bytecode( Parrot_Interp, const char *filepath );
+I<Note: There are PackFile PMCs which represent bytecode, but the PBC object
+returned or consumed by any individual compiler or API function may have a
+different type. Treat these objects as opaque until a good interface for them
+is worked out.>
 
-  Parrot_PMC Parrot_load_hll_code( Parrot_Interp, const char *compiler,
-                                                  const char *filepath );
+Once a PBC PMC is obtained, several things can be done with it: It can be
+loaded into libparrot as a library and individual calls can be made into it.
+It can also be executed directly as an application, which will trigger the
+C<:main> function, if any. The PMC can also be written out to a .pbc file for
+later use.
 
-The PMC returned will be the Sub PMC representing the entry point into the
-code.  That is, it will be the PMC representing the C<:main> subroutine, if
-one exists, or the first subroutine in the file.
+Currently there are two functions to get a bytecode PMC.
 
-If there is an error -- such that the file does not exist, the compiler is
-unknown, or there was a compilation or invalid bytecode error -- the PMC
-should be an Exception PMC instead.
+    Parrot_api_load_bytecode(interp, filename, *pbc)
+    Parrot_api_load_bytecode_bytes(interp, bytecode, size, *pbc)
 
-I<Note: I suppose NULL would work as well; it might be more C-like.  Continue
-considering.>
+The first function loads bytecode from a file. The second loads bytecode in
+from an in-memory byte array. Both return a bytecode PMC. That PMC can be
+passed as an argument to any of the following functions:
 
-I<Note also: the current C<Parrot_pbc_read()> and C<Parrot_pbc_load()> exposes
-the details of packfiles to the external API and uses two operations to
-perform a single logical operation.>
+    Parrot_api_ready_bytecode(interp, pbc, *main_sub)
+    Parrot_api_run_bytecode(interp, pbc, args)
+    Parrot_api_disassemble_bytecode(interp, pbc, outfilename, opts)
 
-I<Note: it may be worth reconsidering these names, if
-C<Parrot_load_bytecode()> can load PBC, PIR, and PASM files without having a
-compiler named explicitly.>
+C<Parrot_api_ready_bytecode> loads the bytecode into memory and returns a
+reference to the C<:main> Sub PMC, if any. It does not automatically execute
+the bytecode. C<Parrot_api_run_bytecode> loads bytecode and automatically
+executes C<:main> with the given arguments, and sets these arguments in the
+IGLOBALS array for later access. C<Parrot_api_disassemble_bytecode> is used
+primarily by the pbc_disassemble frontend.
 
-Compiling source code generated or read from the host application is also
-possible:
+=head3 Settings and Configuration
 
-  Parrot_PMC Parrot_compile_string( Parrot_Interp, Parrot_String compiler,
-                                                   const char *code,
-                                                   Parrot_String error );
+The interpreter is configured in many ways. When the interpreter is created
+there is a structure C<Parrot_Init_Args> that we can use to optionally change
+some of the low-level internal options of the interpreter. Thereafter, we can
+set configurations using the Config Hash or a series of API calls.
 
-The potential return values are the same as for loading code from disk.
+The Configuration hash is a hash of named settings that can be set in the
+interpreter. The primary purpose of this is to help set information such as
+standard search paths. The configuration hash will also be available from the
+interpreter's IGLOBALS array, and may be used by various tools and utilities
+to inform certain decisions. To set a configuration hash, call
 
-I<Note: this declaration should move from F<interpreter.h> to F<embed.h>.>
+    Parrot_api_set_configuration_hash
 
-=head3 Working with PMCs
+This function is only really intended to be called once per interpreter. It
+is possible to set a new configuration hash at any time, but settings from
+the old hash will not be removed first. Currently, the configuration hash is
+set as a global, and any interpreter created after a config hash is set will
+automatically inherit the last set configuration hash. Setting a new config
+hash on a child interpreter does not affect any existing interpreters.
 
-TBD.
+In addition to the configuration hash, library search paths can be appended
+to through the following functions:
 
-=head3 Calling Functions
+    Parrot_api_add_library_search_path
+    Parrot_api_add_include_search_path
+    Parrot_api_add_dynext_search_path
 
-TBD.
+There is currently no way to remove search paths once set, or to examine the
+complete list of search paths. This may be added later.
 
-=head3 Calling Opcodes
+=head3 Strings and PMCs
 
-TBD.
+Embedding API functions which perform general operations on any PMC are
+named C<Parrot_api_pmc_*> and are located in the file C<src/embed/pmc.c>.
+Functions which perform general operations on a Parrot String are named
+C<Parrot_api_string_*> and are located in the file C<src/embed/strings.c>.
 
-=head2 Language Notes
+PMC functions are general and explicitly limited. The API does not, and does
+not want to, provide complete access to the entire suite of internal
+operations and VTABLEs. The API does not provide convenience methods to do
+all operations in a single call. Some common operations may take multiple
+API calls to perform.
 
-It should be possible to register a compiler for an HLL with an interpreter
-such that it is possible to load source code written in that language or pass
-source code to an interpreter successfully.
+String operations are broken down into two types: The first are the set of
+functions used to marshal between C-level strings and Parrot Strings. Import
+functions take a C string (char* or wchar_t*), and copy their contents into a
+new String buffer. Export functions perform the opposite operation: The
+internal buffer is copied to a freshly allocated memory block and returned.
+When you are done with the string, there is an associated free function to
+deallocate that memory.
+
+The second type of string API functions are functions to perform operations on
+strings. These could be operations such as string analysis or string
+manipulation.
 
 =head2 References
-
-None.
 
 =cut
 
@@ -255,3 +329,4 @@ __END__
 Local Variables:
   fill-column:78
 End:
+vim: expandtab shiftwidth=4:

@@ -83,6 +83,7 @@ binary-indep: build install
 	dh_compress -pparrot-doc -X.pod
 	dh_compress -plibparrot-dev
 	dh_fixperms -i
+	chmod +x debian/parrot-devel/usr/lib/parrot/$(VERSION)/tools/dev/mk_language_shell.pl
 	dh_installdeb -i
 	dh_gencontrol -i
 	dh_md5sums -i

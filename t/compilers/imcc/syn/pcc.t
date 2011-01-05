@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -171,7 +170,7 @@ pir_output_is( <<'CODE', <<'OUT', "coroutine iterator" );
   .local int i
   i=5
   new $P1, 'Continuation'
-  set_addr $P1, after_loop
+  set_label $P1, after_loop
 loop:
   $I2 = _addtwo($P1, i)
     print $I2
@@ -257,7 +256,7 @@ done in main
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', ".set_arg :flat" );
-.sub _main
+.sub _main :main
     .local pmc x, y, z, ar, ar2
     x = new 'String'
     x = "first\n"
@@ -313,7 +312,7 @@ last
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "foo (arg :flat)" );
-.sub _main
+.sub _main :main
     .local pmc x, y, z, ar, ar2
     x = new 'String'
     x = "first\n"
@@ -384,7 +383,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "multi 1" );
-.sub foo :multi()
+.sub foo :multi() :main
     print "ok 1\n"
 .end
 .sub f1 :multi(int)
@@ -399,14 +398,14 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "\:main defined twice" );
 .sub foo :main
-        set $S0, 'not ok'
+        set $S0, 'ok'
         print $S0
         print "\r\n"
         end
 .end
 
 .sub bar :main
-        set $S0, 'ok'
+        set $S0, 'not ok'
         print $S0
         print "\r\n"
         end
@@ -416,7 +415,7 @@ ok
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "\:anon subpragma, syntax only" );
-.sub anon :anon
+.sub anon :anon :main
     print "ok\n"
 .end
 CODE
@@ -563,7 +562,7 @@ ok 2 - Unicode method names allowed
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'named parameters');
-.sub main
+.sub main :main
 .local pmc foo
 foo = get_global 'foo'
 
@@ -594,7 +593,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'escape sequences in sub names, TT #1125' );
-.sub 'main'
+.sub 'main' :main
     say "xyz:<\" \">"
     .const 'Sub' $P0 = 'foo'
     say $P0
@@ -622,7 +621,7 @@ xyz:<\>
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', ':named should default to param name');
-.sub main
+.sub main :main
   $I0 = 'incr'('value'=>3)
   say $I0
 .end

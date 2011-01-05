@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2004-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -49,7 +48,6 @@ appropriate type.
             VTABLE_set_pmc(INTERP, SELF, other);
         }
         else {
-            PMC * const class_  = PARROT_OBJECT(other)->_class;
             PMC        *clone   = VTABLE_clone(INTERP, other);
             void       *attrs   = PMC_data(clone);
             PMC        *meta    = PMC_metadata(clone);
@@ -226,23 +224,6 @@ Unknown. (TODO)
 
 /*
 
-=item C<PMC *share_ro()>
-
-Unknown. (TODO)
-
-=cut
-
-*/
-
-    VTABLE PMC *share_ro() {
-        if (PObj_is_PMC_shared_TEST(SELF))
-            return SELF;
-        else
-            return pt_shared_fixup(INTERP, SELF);
-    }
-
-/*
-
 =item C<PMC *clone()>
 
 Clones the current Undef PMC.
@@ -287,5 +268,5 @@ Returns 1 if the C<*value> is an Undef PMC, 0 otherwise.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

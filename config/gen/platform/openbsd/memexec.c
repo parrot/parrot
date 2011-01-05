@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2004-2010, Parrot Foundation.
  */
 
@@ -100,5 +99,5 @@ mem_realloc_executable(void* oldp, size_t oldsize, size_t newsize)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

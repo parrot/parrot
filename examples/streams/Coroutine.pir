@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 Coroutine Example
 
@@ -22,7 +21,7 @@ Creates a coroutine stream and dumps it.
 
 =cut
 
-.sub _main
+.sub _main :main
     .local pmc stream
     .local pmc temp
 

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -217,12 +216,12 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     /* initialize classes - this needs mmd func table */
     interp->HLL_info = NULL;
 
-    Parrot_initialize_core_vtables(interp);
+    Parrot_vtbl_initialize_core_vtables(interp);
 
     /* create the root set registry */
     interp->gc_registry     = Parrot_pmc_new(interp, enum_class_AddrRegistry);
 
-    init_world_once(interp);
+    Parrot_gbl_init_world_once(interp);
 
     /* context data */
     if (is_env_var_set(interp, CONST_STRING(interp, "PARROT_GC_DEBUG"))) {
@@ -239,9 +238,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
 
     /* same with errors */
     PARROT_ERRORS_off(interp, PARROT_ERRORS_ALL_FLAG);
-
-    /* undefined globals are errors by default */
-    PARROT_ERRORS_on(interp, PARROT_ERRORS_GLOBALS_FLAG);
 
     /* param count mismatch is an error by default */
     PARROT_ERRORS_on(interp, PARROT_ERRORS_PARAM_COUNT_FLAG);
@@ -300,7 +296,7 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
      * Threaded interpreters are destructed when the thread ends
      */
     if (!Interp_flags_TEST(interp, PARROT_IS_THREAD))
-        Parrot_on_exit(interp, Parrot_really_destroy, NULL);
+        Parrot_x_on_exit(interp, Parrot_really_destroy, NULL);
 #endif
 
     return interp;
@@ -386,8 +382,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     if (interp->thread_data)
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
 
-    Parrot_gc_mark_and_sweep(interp, GC_finish_FLAG);
-
     /*
      * that doesn't get rid of constant PMCs like these in vtable->data
      * so if such a PMC needs destroying, we get a memory leak, like for
@@ -428,6 +422,8 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         Parrot_gc_destroy_child_interp(interp->parent_interpreter, interp);
     }
 
+    Parrot_gc_mark_and_sweep(interp, GC_finish_FLAG);
+
     /* MMD cache */
     Parrot_mmd_cache_destroy(interp, interp->op_mmd_cache);
 
@@ -439,6 +435,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     /* packfile */
     if (interp->initial_pf)
         PackFile_destroy(interp, interp->initial_pf);
+
     /* cache structure */
     destroy_object_cache(interp);
 
@@ -462,9 +459,9 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
             parrot_hash_destroy(interp, interp->op_hash);
 
         /* free vtables */
-        parrot_free_vtables(interp);
+        Parrot_vtbl_free_vtables(interp);
 
-        /* Finalyze GC */
+        /* Finalize GC */
         Parrot_gc_finalize(interp);
 
         MUTEX_DESTROY(interpreter_array_mutex);
@@ -485,7 +482,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
                 interp->thread_data = NULL;
             }
 
-            parrot_free_vtables(interp);
+            Parrot_vtbl_free_vtables(interp);
 
             /* Finalyze GC */
             Parrot_gc_finalize(interp);
@@ -493,8 +490,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
             mem_internal_free(interp);
         }
     }
-
-    interp->op_hash = NULL;
 }
 
 
@@ -514,5 +509,5 @@ L<include/parrot/interpreter.h>, L<src/interp/interpreter.c>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

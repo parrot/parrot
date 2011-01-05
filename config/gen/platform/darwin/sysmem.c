@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2010, Parrot Foundation.
  */
 
@@ -22,12 +21,13 @@ Get system memory information.
 */
 #include <sys/sysctl.h>
 #include <stdio.h>
+#include "parrot/sysmem.h"
 
 /*
 
 =item C<size_t Parrot_sysmem_amount(PARROT_INTERP)>
 
-Get information about available physycal memory.
+Get information about available physical memory.
 
 =cut
 
@@ -41,7 +41,7 @@ Parrot_sysmem_amount(PARROT_INTERP)
     char         *err_msg;
     unsigned long length = sizeof (memsize) ;
 
-    int selection[2] = { CTL_HW, HW_MEMSIZE} ;
+    int selection[2] = { CTL_HW, HW_PHYSMEM } ;
 
     err = sysctl(selection, 2, &memsize, &length, NULL, 0) ;
 
@@ -66,5 +66,5 @@ Parrot_sysmem_amount(PARROT_INTERP)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

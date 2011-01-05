@@ -1,5 +1,4 @@
-# Copyright (C) 2005-2008, Parrot Foundation.
-# $Id$
+# Copyright (C) 2005-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -8,6 +7,11 @@ examples/nci/ls.pir - a directory lister
 =head1 DESCRIPTION
 
 List the content of the directory 'docs'.
+
+This program uses the 'dirent' structure, whose content is not fully
+standarized, thus may need modifications depending on platform.
+
+In this encarnation it works on linux i386 and amd64 systems.
 
 =cut
 
@@ -26,7 +30,10 @@ List the content of the directory 'docs'.
 
      .include "datatypes.pasm"
      new $P2, 'OrderedHash'
-     set $P2["d_fileno"], .DATATYPE_INT64
+     set $P2["d_fileno"], .DATATYPE_LONG
+     push $P2, 0
+     push $P2, 0
+     set $P2["d_off"], .DATATYPE_LONG
      push $P2, 0
      push $P2, 0
      set $P2["d_reclen"], .DATATYPE_SHORT
@@ -40,7 +47,7 @@ List the content of the directory 'docs'.
      push $P2, 0           # 11
 lp_dir:
      entry = readdir(curdir)
-     $I0 = get_addr entry
+     $I0 = defined entry
      unless $I0 goto done
      assign entry, $P2
 

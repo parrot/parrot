@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2003-2010, Parrot Foundation.
- * $Id$
  */
 
 #ifndef PARROT_PLATFORM_INTERFACE_H_GUARD
@@ -54,15 +53,23 @@ void *mem_realloc_executable(void *, size_t, size_t);
 ** Process ID
 */
 
+PARROT_EXPORT
 UINTVAL Parrot_getpid(void);
 
 /*
 ** Time
 */
 
+PARROT_EXPORT
 void Parrot_sleep(unsigned int seconds);
+
+PARROT_EXPORT
 void Parrot_usleep(unsigned int microseconds);
+
+PARROT_EXPORT
 INTVAL Parrot_intval_time(void);
+
+PARROT_EXPORT
 FLOATVAL Parrot_floatval_time(void);
 
 PARROT_EXPORT
@@ -78,8 +85,13 @@ char* Parrot_asctime_r(const struct tm*, char *);
  * Env
  */
 
+PARROT_EXPORT
 void Parrot_setenv(PARROT_INTERP, STRING *name, STRING *value);
+
+PARROT_EXPORT
 void Parrot_unsetenv(PARROT_INTERP, STRING *name);
+
+PARROT_EXPORT
 char * Parrot_getenv(PARROT_INTERP, STRING *name);
 
 /*
@@ -140,13 +152,27 @@ int get_sys_timer_ms(void *handle);
  * high-resolution timer support
  */
 
+PARROT_EXPORT
 UHUGEINTVAL Parrot_hires_get_time(void);
+
+PARROT_EXPORT
 UINTVAL     Parrot_hires_get_tick_duration(void);
 
 
 struct parrot_string_t;
+
+PARROT_EXPORT
 INTVAL Parrot_Run_OS_Command(Interp*, struct parrot_string_t *);
+
+PARROT_EXPORT
 INTVAL Parrot_Run_OS_Command_Argv(Interp*, struct PMC *);
+
+/*
+ * user information
+ */
+
+PARROT_EXPORT
+UINTVAL Parrot_get_user_id(void);
 
 #endif /* PARROT_PLATFORM_INTERFACE_H_GUARD */
 
@@ -154,5 +180,5 @@ INTVAL Parrot_Run_OS_Command_Argv(Interp*, struct PMC *);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

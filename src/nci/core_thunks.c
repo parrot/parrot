@@ -9,8 +9,6 @@
 
 /* src/nci/core_thunks.c
  *  Copyright (C) 2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Native Call Interface routines. The code needed to build a
  *     parrot to C call frame is in here
@@ -1324,6 +1322,6 @@ Parrot_nci_load_core_thunks(PARROT_INTERP)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

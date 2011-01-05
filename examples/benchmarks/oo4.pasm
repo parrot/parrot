@@ -1,8 +1,8 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
-# $Id$
 
 .namespace [ "Foo" ]
 
+.pcc_sub :main main:
     newclass P1, "Foo"
     addattribute P1, ".i"
     addattribute P1, ".j"

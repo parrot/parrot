@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 Lines Example
 
@@ -14,7 +13,7 @@ Creates a stream and pipes it through a Stream::Lines stream.
 
 =cut
 
-.sub _main
+.sub _main :main
     .local pmc stream
     .local pmc lines
 

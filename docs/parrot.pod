@@ -1,5 +1,4 @@
-# Copyright (C) 2001-2005, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -115,8 +114,10 @@ Documentation for C<parrot_debugger>, the Parrot debugger.
 
 Parrot compiles and runs on a large number of platforms, including all common
 ones. The Parrot team is committed to supporting the following combinations as
-"core platforms": Linux (x86), Win32 (x86), OS X (x86 and PPC), Cygwin, Tru64,
-OpenVMS (Alpha), FreeBSD (x86).
+"core platforms": Linux (x86), Win32 (x86), OS X (x86 and PPC), Cygwin,
+FreeBSD (x86), NetBSD, OpenBSD, Solaris.
+Here x86 includes the x86_64 architecture. x86 describes that Parrot is
+supported to run on a 32-bit and 64-bit (AMD64 and Intel 64) CPU.
 
 =head2 Authors
 
@@ -136,7 +137,7 @@ See:
 
 =item * L<https://trac.parrot.org/>
 
-=item * L<https://svn.parrot.org/>
+=item * L<http://github.com/parrot/parrot>
 
 =back
 

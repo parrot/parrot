@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2007-2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -9,7 +8,7 @@ use 5.008;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 7;
+use Test::More tests => 6;
 
 =head1 NAME
 
@@ -72,7 +71,6 @@ my $exe;
 my $out;
 my $FH;
 my $parrot = quote(catfile($bindir, 'parrot'));
-my $pirc = quote(catfile($bindir, 'pirc'));
 my $nqp = quote(catfile($bindir, 'parrot-nqp'));
 
 #
@@ -117,23 +115,6 @@ close $FH;
 $out = `$parrot $libdir/PGE/Perl6Grammar.pbc $filename`;
 ok($out =~ /## <WSpace::TOP>/, "check PGE");
 unlink($filename);
-
-SKIP:
-{
-skip("pirc", 1) unless (-e $pirc);
-$filename = 'test.pir';
-open $FH, '>', $filename
-        or die "Can't open $filename ($!).\n";
-print $FH <<'PIR';
-.sub main
-    say "hello world!"
-.end
-PIR
-close $FH;
-$out = `$pirc -n $filename`;
-ok($out eq "ok\n", "check pirc");
-unlink($filename);
-}
 
 $filename = 'test.nqp';
 open $FH, '>', $filename

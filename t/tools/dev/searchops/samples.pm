@@ -1,6 +1,5 @@
 package samples;
 # Copyright (C) 2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -13,7 +12,6 @@ our @EXPORT_OK = qw($core $debug $mangled $string);
 
 $core = q{
 /*
- * $Id$
 ** pseudo-core.ops
 */
 
@@ -41,7 +39,7 @@ pseudo-core.ops - Parrot Core Ops
 
 =item B<end>()
 
-Halts the interpreter. (Must be op #0, CORE_OPS_end). See also B<exit>.
+Halts the interpreter. See also B<exit>.
 
 =cut
 
@@ -117,7 +115,7 @@ Load a dynamic link library named $2 and store it in $1.
 =cut
 
 inline op loadlib(out PMC, in STR) {
-    $1 = Parrot_load_lib(interp, $2, NULL);
+    $1 = Parrot_dyn_load_lib(interp, $2, NULL);
 }
 
 =back
@@ -145,7 +143,6 @@ as the Parrot interpreter itself.
 
  $debug = q{
 /*
- * $Id$
  * Copyright (C) 2002-2008, Parrot Foundation.
  */
 
@@ -208,7 +205,6 @@ op debug_load(inconst STR) :base_debug {
 
  $mangled = q{
 /*
- * $Id$
 ** string.ops
 */
 
@@ -266,7 +262,6 @@ as the Parrot interpreter itself.
 
 $string = q{
 /*
- * $Id$
 ** pseudo-string.ops
 */
 

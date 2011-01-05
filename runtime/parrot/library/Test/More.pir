@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -989,6 +988,52 @@ Records a passing test if the PMC passed in is null, fails otherwise.
     diagnostic = _make_diagnostic( v_string, 'null')
     test.'diag'( diagnostic )
   done:
+.end
+
+=item C<throws_type( invokable, type, description)>
+
+Recores a passing test if calling the invokable throws an exception of the
+expected type, fails otherwise.
+
+=cut
+
+.sub throws_type
+    .param pmc invokable
+    .param int type
+    .param string description :optional
+
+    .local pmc test, ex
+    .local string msg, exmsg
+    .local int extype
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
+    msg = ''
+    if null description goto setmsg
+    $I0 = length description
+    unless $I0 goto setmsg
+    msg = description
+  setmsg:
+    msg = concat msg, ': '
+
+    push_eh catch
+    invokable()
+
+    pop_eh
+    msg = concat msg, "expected to throw but doesn't"
+    ok(0, msg)
+    goto end
+
+  catch:
+    .get_results(ex)
+    extype = ex['type']
+    exmsg = ex['message']
+    finalize ex
+    pop_eh
+    msg = concat msg, "throws expected type"
+    exmsg = concat 'exception message is: "', exmsg
+    msg = concat exmsg, '")'
+    is(extype, type, msg)
+    diag(exmsg)
+  end:
 .end
 
 =item C<dies_ok( codestring, description )>

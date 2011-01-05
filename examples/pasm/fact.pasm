@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2003, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -26,7 +25,7 @@ of the now missing C<clonei>.
 
 =cut
 
-main:
+.pcc_sub :main main:
     new P10, 'ResizableIntegerArray'
 	set 	I1,0
 	## P9 is used as a stack for temporaries.

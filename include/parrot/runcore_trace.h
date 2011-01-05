@@ -1,7 +1,5 @@
 /* runcore_trace.h
  *  Copyright (C) 2001-2009, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Tracing runcore.
  *  Data Structure and Algorithms:
@@ -63,5 +61,5 @@ void trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

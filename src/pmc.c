@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -120,7 +119,7 @@ Parrot_pmc_destroy(PARROT_INTERP, ARGMOD(PMC *pmc))
 
     PObj_gc_CLEAR(pmc);
 
-    if (pmc->vtable->attr_size)
+    if (pmc->vtable->attr_size && PMC_data(pmc))
         Parrot_gc_free_pmc_attributes(interp, pmc);
     else
         PMC_data(pmc) = NULL;
@@ -713,7 +712,7 @@ Parrot_pmc_get_new_vtable_index(PARROT_INTERP)
 
     /* Have we overflowed the table? */
     if (type_id >= interp->n_vtable_alloced)
-        parrot_realloc_vtables(interp);
+        Parrot_vtbl_realloc_vtables(interp);
 
     return type_id;
 }
@@ -785,8 +784,81 @@ Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
                 return VTABLE_get_integer(interp, item);
         }
         else
-            return Parrot_get_datatype_enum(interp, name);
+            return Parrot_dt_get_datatype_enum(interp, name);
     }
+}
+
+
+/*
+
+=item C<PMC * Parrot_pmc_box_string(PARROT_INTERP, STRING *string)>
+
+Boxes a STRING C<string> into a String PMC.
+
+=cut
+
+*/
+
+PARROT_HOT
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pmc_box_string(PARROT_INTERP, ARGIN_NULLOK(STRING *string))
+{
+    ASSERT_ARGS(Parrot_pmc_box_string)
+    PMC * ret = Parrot_pmc_new(interp,
+                        Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
+    VTABLE_set_string_native(interp, ret, string);
+
+    return ret;
+}
+
+
+/*
+
+=item C<PMC* Parrot_pmc_box_number(PARROT_INTERP, FLOATVAL value)>
+
+Lookup the PMC type which is used for floating point numbers.
+
+=cut
+
+*/
+
+PARROT_HOT
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_pmc_box_number(PARROT_INTERP, FLOATVAL value)
+{
+    ASSERT_ARGS(Parrot_pmc_box_number)
+    PMC * const ret = Parrot_pmc_new(interp,
+                                     Parrot_hll_get_ctx_HLL_type(interp, enum_class_Float));
+    VTABLE_set_number_native(interp, ret, value);
+    return ret;
+}
+
+
+/*
+
+=item C<PMC* Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)>
+
+Lookup the PMC type which is used for storing native integers.
+
+=cut
+
+*/
+
+PARROT_HOT
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)
+{
+    ASSERT_ARGS(Parrot_pmc_box_integer)
+    PMC * const ret = Parrot_pmc_new(interp,
+                                     Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
+    VTABLE_set_integer_native(interp, ret, value);
+    return ret;
 }
 
 
@@ -906,7 +978,7 @@ Parrot_pmc_create_mro(PARROT_INTERP, INTVAL type)
         if (!vtable->_namespace) {
             /* need a namespace Hash, anchor at parent, name it */
             PMC * const ns     = Parrot_pmc_new(interp,
-                    Parrot_get_ctx_HLL_type(interp, enum_class_NameSpace));
+                    Parrot_hll_get_ctx_HLL_type(interp, enum_class_NameSpace));
             vtable->_namespace = ns;
 
             /* anchor at parent, aka current_namespace, that is 'parrot' */
@@ -975,7 +1047,8 @@ Parrot_pmc_gc_unregister(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_pmc_type_does(PARROT_INTERP, STRING *role, INTVAL type)>
+=item C<INTVAL Parrot_pmc_type_does(PARROT_INTERP, const STRING *role, INTVAL
+type)>
 
 Checks to see if PMCs of the given type does the given role. Checks
 C<<vtable->provides_str>> to find a match.
@@ -986,7 +1059,7 @@ Returns true (1) if B<role> is found, false (0) otherwise.
 */
 
 INTVAL
-Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
+Parrot_pmc_type_does(PARROT_INTERP, ARGIN(const STRING *role), INTVAL type)
 {
     ASSERT_ARGS(Parrot_pmc_type_does)
 
@@ -1038,5 +1111,5 @@ C<5.1.0.14.2.20011008152120.02158148@pop.sidhe.org>
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -175,7 +174,7 @@ sub import {
             :                      ();
         $harness_options{verbosity} =                    $options{verbosity} || 0;
         $harness_options{jobs}      = $ENV{TEST_JOBS} || $options{jobs}      || 1;
-
+        print $harness_options{exec} . "\n";
         TAP::Harness->new( \%harness_options )->runtests( @files );
 
         return;

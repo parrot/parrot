@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2009, Parrot Foundation.
-# $Id$
 
 =head1 TITLE
 
@@ -243,8 +242,7 @@ and someday may be refactored to a different location.
     $I0 = namepos - pos
     $S0 = substr target, pos, $I0
     $S0 = 'trim'($S0)
-    $P0 = new 'CodeString'
-    decnum = $P0.'charname_to_ord'($S0)
+    decnum = find_codepoint $S0
     if decnum < 0 goto err_unicode_name
     pos = namepos
     goto scan_xco_char_end
@@ -260,7 +258,7 @@ and someday may be refactored to a different location.
     goto scan_xco_char_digits
   scan_xco_char_end:
     $S1 = chr decnum
-    concat literal, $S1
+    literal = concat literal, $S1
     unless isbracketed goto scan_xco_end
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
     $S0 = substr target, pos, 1
@@ -585,6 +583,8 @@ Parses a whitespace term.
 
 .sub 'parse_term_ws'
     .param pmc mob
+    .param pmc adverbs         :slurpy :named
+
     .local string target
     .local int pos, lastpos
     (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::WS')
@@ -623,6 +623,8 @@ combinations.
 
 .sub 'parse_quant'
     .param pmc mob
+    .param pmc adverbs         :slurpy :named
+
     .local string target
     .local pmc key
     .local int pos, lastpos
@@ -778,6 +780,8 @@ Throw an exception for quantifiers in term position.
 
 .sub 'parse_quant_error'
     .param pmc mob
+    .param pmc adverbs         :slurpy :named
+
     .local int pos
     pos = mob.'to'()
     'parse_error'(mob, pos, "Quantifier follows nothing in regex")
@@ -793,6 +797,8 @@ anchors, and match subscripts.
 
 .sub "parse_dollar"
     .param pmc mob
+    .param pmc adverbs         :slurpy :named
+
     .local string target
     .local int pos, lastpos
     .local string cname
@@ -894,6 +900,8 @@ Parses a subrule token.
 
 .sub 'parse_subrule'
     .param pmc mob
+    .param pmc adverbs         :slurpy :named
+
     .local string target
     .local pmc mobsave
     .local int pos, lastpos
@@ -1006,6 +1014,7 @@ Extract an enumerated character list.
 .sub 'parse_enumcharclass'
     .param pmc mob
     .param pmc adverbs         :slurpy :named
+
     .local string target
     .local pmc term
     .local string op
@@ -1183,6 +1192,8 @@ Parses '...' literals.
 
 .sub 'parse_quoted_literal'
     .param pmc mob
+    .param pmc adverbs         :slurpy :named
+
     .local int pos, lastpos
     .local string target
     (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
@@ -1220,6 +1231,8 @@ Parse a goal.
 
 .sub 'parse_goal'
     .param pmc mob
+    .param pmc adverbs         :slurpy :named
+
     .local int pos, lastpos
     .local string target
     (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Concat')
@@ -1270,6 +1283,8 @@ Parse a modifier.
 
 .sub 'parse_modifier'
     .param pmc mob
+    .param pmc adverbs         :slurpy :named
+
     .local int pos, lastpos
     .local string target, value
     .local string key
@@ -1309,6 +1324,8 @@ Parse a modifier.
 
 .sub 'parse_closure'
     .param pmc mob
+    .param pmc adverbs         :slurpy :named
+
     .local pmc key
     key = mob['KEY']
     .local string target
@@ -1331,7 +1348,7 @@ Parse a modifier.
     mob['isnegated'] = 1
   assert_pos:
     mob['iszerowidth'] = 1
-    concat close, '>'
+    close = concat close, '>'
     inc len
   have_close:
     $I0 = index target, close, pos
@@ -1350,6 +1367,8 @@ Parse a modifier.
 
 .sub 'parse_action'
     .param pmc mob
+    .param pmc adverbs         :slurpy :named
+
     .local string target
     .local int pos, keypos
     (mob, pos, target) = mob.'new'(mob, 'grammar' => 'PGE::Exp::Action')

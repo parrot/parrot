@@ -1,12 +1,11 @@
 #! perl
 # Copyright (C) 2005, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Parrot::Config;
 
 =head1 NAME
@@ -37,6 +36,17 @@ CODE
 42
 OUTPUT
 
+pir_output_is( << 'CODE', << 'OUTPUT', "ParrotLibrary props survive GC" );
+.sub main :main
+    loadlib $P1, 'foo_group'
+    sweep 1
+    $P2 = getprop '_type', $P1
+    say $P2
+.end
+CODE
+PMC
+OUTPUT
+
 pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname, no ext" );
 .sub main :main
     ## load a relative pathname without the extension.  loadlib will convert the
@@ -65,7 +75,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname, no ext" 
     ## convert cwd to an absolute pathname without the extension, and load it.
     ## this should always find the version in the build directory, since that's
     ## the only place "make test" will work.
-    $S0 = concat "/runtime/parrot/dynext/foo_group"
+    $S0 .= "/runtime/parrot/dynext/foo_group"
     loadlib $P1, $S0
 
     ## ensure that we can still make Foo instances.

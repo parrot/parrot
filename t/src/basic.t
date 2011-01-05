@@ -1,12 +1,16 @@
 #! perl
-# Copyright (C) 2001-2006, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 3;
+use Parrot::Test;
+use File::Spec::Functions;
+
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
+
+plan tests => 3;
 
 =head1 NAME
 
@@ -73,7 +77,7 @@ main(int argc, const char* argv[])
     Parrot_run_native(interp, the_test);
 
     Parrot_io_eprintf(interp, "back\n");
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
     return 0;
 }
 

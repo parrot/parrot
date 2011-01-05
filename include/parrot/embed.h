@@ -1,7 +1,5 @@
 /* embed.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the Parrot embedding system--the only part of Parrot that
  *     the outside world should see.
@@ -25,16 +23,11 @@ typedef enum {
     enum_DIS_HEADER    = 2
 } Parrot_disassemble_options;
 
-/* Parrot_set_config_hash exists in *_config.o (e.g install_config.o),
-   so if you make this call then you will need to link with it in
-   addition to libparrot */
-void Parrot_set_config_hash(void);
-
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 void
-Parrot_exit(PARROT_INTERP, int status);
+Parrot_x_exit(PARROT_INTERP, int status);
 
 PARROT_EXPORT
 void Parrot_destroy(PARROT_INTERP)
@@ -87,6 +80,11 @@ void Parrot_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+int Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
 Parrot_Interp Parrot_new(ARGIN_NULLOK(Parrot_Interp parent));
@@ -113,6 +111,13 @@ void Parrot_run_native(PARROT_INTERP, native_func_t func)
 
 PARROT_EXPORT
 void Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+void Parrot_set_configuration_hash_legacy(PARROT_INTERP,
+    const int length,
+    ARGIN(const unsigned char *bytes))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -155,6 +160,10 @@ PARROT_PURE_FUNCTION
 Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
+PMC* set_current_sub(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_Parrot_clear_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_clear_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -174,6 +183,9 @@ Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)
 #define ASSERT_ARGS_Parrot_init_stacktop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(stack_top))
+#define ASSERT_ARGS_Parrot_load_bytecode_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(filename))
 #define ASSERT_ARGS_Parrot_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_pbc_fixup_loaded __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -187,6 +199,10 @@ Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)
 #define ASSERT_ARGS_Parrot_runcode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(argv))
+#define ASSERT_ARGS_Parrot_set_configuration_hash_legacy \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(bytes))
 #define ASSERT_ARGS_Parrot_set_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_set_executable_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -205,6 +221,8 @@ Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_test_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_set_current_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed.c */
 
@@ -215,5 +233,5 @@ Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

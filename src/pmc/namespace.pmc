@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2005-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -227,8 +226,8 @@ maybe_add_sub_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
 
 /*
 
-=item C<static void add_nci_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key,
-PMC *value)>
+=item C<static void add_native_to_namespace(PARROT_INTERP, PMC *SELF, STRING
+*key, PMC *value)>
 
 =cut
 
@@ -569,8 +568,9 @@ really a public API.
             return VTABLE_get_pmc_keyed(INTERP, ns, key);
         }
         else if (VTABLE_does(INTERP, key, CONST_STRING(INTERP, "array"))) {
-            INTVAL i = 0;
-            while (!PMC_IS_NULL(ns) && VTABLE_elements(INTERP, key)) {
+            const INTVAL elements = VTABLE_elements(INTERP, key);
+            INTVAL i;
+            for (i = 0; i < elements && !PMC_IS_NULL(ns); ++i) {
                 STRING * const name = VTABLE_get_string_keyed_int(INTERP, key, i);
                 if (STRING_IS_NULL(name)) {
                     ns = PMCNULL;
@@ -578,7 +578,6 @@ really a public API.
                     break;
                 }
                 ns = Parrot_ns_get_namespace_keyed_str(INTERP, ns, name);
-                ++i;
             }
             return ns;
         }
@@ -1065,11 +1064,11 @@ NOTE: exporting 'default' set of items is not yet implemented.
         STRING * const s_array = CONST_STRING(INTERP, "array");
 
         if (PMC_IS_NULL(dest))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "destination namespace not specified");
 
         if (PMC_IS_NULL(what) || !VTABLE_elements(INTERP, what))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "exporting default object set not yet implemented");
 
         /* if "what" does "hash", we extract string key/value pairs,
@@ -1086,7 +1085,7 @@ NOTE: exporting 'default' set of items is not yet implemented.
                 STRING * const src_name = VTABLE_shift_string(INTERP, iter);
 
                 if (STRING_IS_NULL(src_name) || STRING_IS_EMPTY(src_name))
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                         "source object name not specified");
 
                 if (PMC_IS_NULL(VTABLE_get_pmc_keyed_str(INTERP, what, src_name))) {
@@ -1101,7 +1100,7 @@ NOTE: exporting 'default' set of items is not yet implemented.
                 object = VTABLE_get_pmc_keyed_str(INTERP, SELF, src_name);
 
                 if (PMC_IS_NULL(object))
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
                         "object '%Ss' not found in current namespace", src_name);
 
                 VTABLE_set_pmc_keyed_str(INTERP, dest, dest_name, object);
@@ -1116,21 +1115,21 @@ NOTE: exporting 'default' set of items is not yet implemented.
                 STRING * const name = VTABLE_get_string_keyed_int(INTERP, what, i);
 
                 if (STRING_IS_NULL(name) || STRING_IS_EMPTY(name))
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                         "object name not specified");
 
                 object = VTABLE_get_pmc_keyed_str(INTERP, SELF, name);
 
                 if (PMC_IS_NULL(object))
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
                         "object '%Ss' not found in current namespace", name);
 
                 VTABLE_set_pmc_keyed_str(INTERP, dest, name, object);
             }
         }
         else
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
-                "can't handle argument of type %s", what->vtable->base_type);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "can't handle argument of type %Ss", what->vtable->whoami);
     }
 
 /*
@@ -1240,5 +1239,5 @@ F<docs/pdds/pdd21_namespaces.pod>
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

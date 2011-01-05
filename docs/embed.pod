@@ -1,5 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -17,6 +16,7 @@ embed.pod - Parrot embedding system
 
         interp = Parrot_new(NULL);
         if (!interp) {
+            fprintf(stderr, "Cannot create Parrot interpreter!\n");
             return 1;
         }
 
@@ -70,21 +70,64 @@ line.
 
 =item C<Parrot_Int>
 
+Parrot's integer numeric type.
+
 =item C<Parrot_Float>
+
+Parrot's floating point numeric type.
 
 =item C<Parrot_UInt>
 
-Parrot's numeric types.
+Parrot's unsigned integer numeric type.
 
 =back
 
-=head2 Constants
+=head2 Function signatures
 
-Not documented yet.
+What is a function signature? It is a string which represents the calling and
+return conventions of a function. It is a very succinct representation of the
+answer to the question "How do I call this function and what does it
+return?".
 
-=head2 Type signatures
+All function signatures follow the form of:
 
-    TODO: Write about signature strings
+    Foo->Bar
+
+where C<Foo> and C<Bar> are a list of zero or more Parrot datatypes. C<Foo>
+and C<Bar> are individually called 'type signatures'. The datatypes on the
+left of the arrow are function arguments being passed in and the datatypes on
+the right are the datatype being returned. No spaces are allowed in a
+function signature.
+
+There are four datatypes that can be used in Parrot function signatures:
+
+    I <=> Parrot_Int
+    N <=> Parrot_Float (Numeric)
+    S <=> Parrot_String
+    P <=> Parrot_PMC
+
+Here are some example function signatures and what they mean:
+
+   INN->N   In: Integer, two Numerics    Out: Numeric
+   SIN->S   In: String, Integer, Numeric Out: String
+   P->S     In: PMC                      Out: String
+   PiP->S   In: PMC (method call)        Out: String
+   NN->N    In: Two Numerics             Out: Numeric
+   I->I     In: Integer                  Out: Integer
+   I->N     In: Integer                  Out: Numeric
+   N->P     In: Numeric                  Out: PMC
+   Pi->     In: none (method call)       Out: none
+   ->I      In: none                     Out: Integer
+   ->       In: none                     Out: none
+
+TODO: Multiple return values?
+
+
+There is also the C<Pi> datatype, which may only appear at the beginning of a
+function signature. It stands for "PMC invocant" and basically means SELF. C<Pi>
+will only be used if calling a method on an object.
+
+Parrot function signature are mostly used when calling C<Parrot_ext_call>.
 
 =head2 Interpreter initialization and destruction
 
@@ -107,24 +150,39 @@ flags include:
 
 =item PARROT_NO_FLAGS
 
+The default. No flags.
+
 =item PARROT_BOUNDS_FLAG
+
+True if byte code bounds should be tracked.
 
 =item PARROT_GC_DEBUG_FLAG
 
+True if debugging memory management.
+
 =item PARROT_EXTERN_CODE_FLAG
+
+True if reusing another interpreters code.
 
 =item PARROT_DESTROY_FLAG
 
+True if the last interpreter shall cleanup.
+
 =item PARROT_IS_THREAD
+
+True if interpreter is a thread.
 
 =item PARROT_THR_COPY_INTERP
 
+True if thread start copies interpreter state.
+
 =item PARROT_THR_THREAD_POOL
+
+True if type3 threads are being used.
 
 =back
 
-See F<interpreter.h> for the definition of these flags (TODO: document flag
-definitions here).
+These are defined in F<interpreter.h>.
 
 =item C<void Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)>
 
@@ -185,16 +243,16 @@ See <Parrot_really_destroy()>.
 Destroys an interpreter, regardless of the environment.  The exit code is
 currently unused.
 
-=item C<void Parrot_exit(PARROT_INTERP, int status)>
+=item C<void Parrot_x_exit(PARROT_INTERP, int status)>
 
 Destroys the interpreter and exits with an exit code of C<status>.  Before
 exiting, the function calls all registered exit handlers in LIFO order.
 C<Parrot_really_destroy()> is usually called as the last exit handler.
 
-=item C<void Parrot_on_exit(PARROT_INTERP,
+=item C<void Parrot_x_on_exit(PARROT_INTERP,
                             void (*handler)(Parrot_Interp, int, void *), void *arg)>
 
-Registers an exit handler to be called from C<Parrot_exit()> in LIFO order.
+Registers an exit handler to be called from C<Parrot_x_exit()> in LIFO order.
 The handler function should accept as arguments an interpreter, an integer
 exit code, and an argument (which can be NULL).
 
@@ -314,7 +372,7 @@ Not documented yet.
 
 =item C<void Parrot_ext_call(PARROT_INTERP, Parrot_PMC sub, const_char *signature, varargs ...)>
 
-Call a Parrot subroutine using the supplied signature. Variables to be filled
+Call a Parrot subroutine using the supplied function signature. Variables to be filled
 with return values are passed as references in the varargs list, after all
 arguments.
 
@@ -347,7 +405,7 @@ supplying an argument.
 
 Methods are called using the same API function as calling a subroutine. The
 first argument should be the object that the method will be invoked on, and it
-should have the signature "Pi".
+should have the signature "Pi", which stands for "PMC invocant".
 
 =back
 
@@ -372,64 +430,26 @@ Because the location of these files can vary from platform to platform, and
 build to build, a general method is provided to find out the necessary flags to
 use.
 
-pkg-config is a helper tool, now common on many platforms, which many packages
-have adopted to provide the necessary compiler and linker flags required to
-build against a library. parrot will install a file called F<parrot.pc> which
-can be queried using pkg-config.
+C<parrot_config> is the helper tool for determining anything related to parrot
+configuration, determining compiler and linker flags to build against parrot is
+no different.
 
-To start with, find out what version of parrot is installed by running
-pkg-config with the C<--modversion> flag. If this command fails with an error,
-skip to the end of this section.
+To start, you should find C<parrot_config> in the path or allow your user to
+provide this location for you. You can check this by running C<parrot_config> with
+C<VERSION> as the argument to determine the version of parrot you are working with.
 
-  pkg-config --modversion parrot
+To determine the necessary C compiler flags, use C<embed-cflags>:
 
-To find out the necessary C<-I> flags, use C<--cflags>:
+  parrot_config embed-cflags
 
-  pkg-config --cflags parrot
+... and to find the necessary linker flags, use C<embed-ldflags>:
 
-... and to find the necessary C<-L> and C<-l> flags, use C<--libs>:
+  parrot_config embed-ldflags
 
-  pkg-config --libs parrot
+The C<parrot_config> command can be incorporated with a compile as shown here
+performing both compiling and linking in one step.
 
-Where both compiling and linking are performed in one step, query both sets of
-flags with:
-
-  pkg-config --cflags --libs parrot
-
-The pkg-config command can be incorporated with a compile as shown here.
-
-  cc src/disassemble.c `pkg-config --cflags --libs parrot`
-
-Most applications will probably choose to run pkg-config as part of a
-configure script, so if you are using autoconf you could use a test
-such as this.
-
-  PARROT_REQUIRED_VERSION=0.4.1
-  AC_SUBST(PARROT_REQUIRED_VERSION)
-  PKG_CHECK_MODULES(PARROT, parrot >= $PARROT_REQUIRED_VERSION,
-                    [AC_DEFINE([HAVE_PARROT], 1, [define if have parrot])])
-  AC_SUBST(PARROT_LIBS)
-  AC_SUBST(PARROT_CFLAGS)
-
-If parrot has been installed system-wide, then any of the previous
-lines should have returned the relevant flags. If it is not installed
-in one of the standard places that pkg-config looks, then you will get
-an error message.
-
-  pkg-config --libs parrot
-  Package parrot was not found in the pkg-config search path.
-  Perhaps you should add the directory containing `parrot.pc'
-  to the PKG_CONFIG_PATH environment variable
-  No package 'parrot' found
-
-As stated in the error message, use an environment variable to make pkg-config
-look in more locations.
-
-  export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-
-The last part of the variable will almost certainly be F<.../lib/pkgconfig>.
-Set this variable in your login scripts if you need it to be available in
-future.
+  cc src/disassemble.c `parrot_config embed-cflags` `parrot_config embed-ldflags`
 
 =head1 EXAMPLES
 
@@ -545,9 +565,9 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_block_GC_sweep>
 
-=item C<Parrot_byte_index>
+=item C<Parrot_util_byte_index>
 
-=item C<Parrot_byte_rindex>
+=item C<Parrot_util_byte_rindex>
 
 =item C<Parrot_callback_C>
 
@@ -560,14 +580,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_clear_debug>
 
 =item C<Parrot_clear_flag>
-
-=item C<Parrot_clear_i>
-
-=item C<Parrot_clear_n>
-
-=item C<Parrot_clear_p>
-
-=item C<Parrot_clear_s>
 
 =item C<Parrot_clear_trace>
 
@@ -659,7 +671,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_ex_build_exception>
 
-=item C<Parrot_exit>
+=item C<Parrot_x_exit>
 
 =item C<Parrot_ex_mark_unhandled>
 
@@ -693,7 +705,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_ns_find_named_item>
 
-=item C<Parrot_float_rand>
+=item C<Parrot_util_float_rand>
 
 =item C<Parrot_fprintf>
 
@@ -705,7 +717,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_freeze_at_destruct>
 
-=item C<Parrot_full_sub_name>
+=item C<Parrot_sub_full_sub_name>
 
 =item C<parrot_gc_context>
 
@@ -715,25 +727,25 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_gc_mark_PObj_alive>
 
-=item C<Parrot_get_ctx_HLL_namespace>
+=item C<Parrot_hll_get_ctx_HLL_namespace>
 
-=item C<Parrot_get_ctx_HLL_type>
+=item C<Parrot_hll_get_ctx_HLL_type>
 
-=item C<Parrot_get_datatype_enum>
+=item C<Parrot_dt_get_datatype_enum>
 
-=item C<Parrot_get_datatype_name>
+=item C<Parrot_dt_get_datatype_name>
 
 =item C<Parrot_get_encoding>
 
 =item C<Parrot_ns_get_global>
 
-=item C<Parrot_get_HLL_id>
+=item C<Parrot_hll_get_HLL_id>
 
-=item C<Parrot_get_HLL_name>
+=item C<Parrot_hll_get_HLL_name>
 
-=item C<Parrot_get_HLL_namespace>
+=item C<Parrot_hll_get_HLL_namespace>
 
-=item C<Parrot_get_HLL_type>
+=item C<Parrot_hll_get_HLL_type>
 
 =item C<Parrot_get_intreg>
 
@@ -765,7 +777,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_init_stacktop>
 
-=item C<Parrot_int_rand>
+=item C<Parrot_util_int_rand>
 
 =item C<Parrot_invalidate_method_cache>
 
@@ -810,8 +822,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_io_get_file_size>
 
 =item C<Parrot_io_get_flags>
-
-=item C<Parrot_io_get_last_file_position>
 
 =item C<Parrot_io_get_os_handle>
 
@@ -897,7 +907,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_load_language>
 
-=item C<Parrot_load_lib>
+=item C<Parrot_dyn_load_lib>
 
 =item C<Parrot_locate_runtime_file>
 
@@ -939,7 +949,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_ns_get_name>
 
-=item C<Parrot_on_exit>
+=item C<Parrot_x_on_exit>
 
 =item C<Parrot_oo_get_class>
 
@@ -1401,19 +1411,17 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_push_mark>
 
-=item C<Parrot_range_rand>
+=item C<Parrot_util_range_rand>
 
-=item C<Parrot_regenerate_HLL_namespaces>
+=item C<Parrot_hll_regenerate_HLL_namespaces>
 
 =item C<Parrot_register_encoding>
 
-=item C<Parrot_register_HLL>
+=item C<Parrot_hll_register_HLL>
 
-=item C<Parrot_register_HLL_lib>
+=item C<Parrot_hll_register_HLL_type>
 
-=item C<Parrot_register_HLL_type>
-
-=item C<Parrot_register_move>
+=item C<Parrot_util_register_move>
 
 =item C<Parrot_register_pmc>
 
@@ -1429,7 +1437,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_secret_snprintf>
 
-=item C<Parrot_set_config_hash_internal>
+=item C<Parrot_gbl_set_config_hash_internal>
 
 =item C<Parrot_set_context_threshold>
 
@@ -1467,7 +1475,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_sprintf_s>
 
-=item C<Parrot_srand>
+=item C<Parrot_util_srand>
 
 =item C<Parrot_ns_store_global>
 
@@ -1573,7 +1581,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_thaw_constants>
 
-=item C<Parrot_uint_rand>
+=item C<Parrot_util_uint_rand>
 
 =item C<Parrot_unblock_GC_mark>
 
@@ -1618,7 +1626,5 @@ The list may also be augmented if additional functionality is required.
 =head1 SEE ALSO
 
 F<src/main.c> and F<t/src/*.t> for Parrot's use of the embedding system.
-
-L<http://pkgconfig.freedesktop.org/wiki/> A pkg-config page
 
 =cut

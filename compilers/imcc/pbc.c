@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2002-2010, Parrot Foundation.
- * $Id$
  */
 
 #include "imc.h"
@@ -367,7 +366,7 @@ e_pbc_open(PARROT_INTERP, SHIM(const char *param))
         clear_sym_hash(&IMCC_INFO(interp)->globals->cs->key_consts);
     else {
         /* register cleanup code */
-        Parrot_on_exit(interp, imcc_globals_destroy, NULL);
+        Parrot_x_on_exit(interp, imcc_globals_destroy, NULL);
     }
 
     /* free previous cached key constants if any */
@@ -391,16 +390,6 @@ e_pbc_open(PARROT_INTERP, SHIM(const char *param))
         PMC        *self;
 
         cs->seg = interp->code = PF_create_default_segs(interp, name, 1);
-
-        /*
-         * create a PMC constant holding the interpreter state
-         *
-         * see also ParrotInterpreter.thaw and .thawfinish
-         * currently just HLL_info is saved/restored
-         */
-        self = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
-                IGLOBALS_INTERPRETER);
-        (void) add_const_table_pmc(interp, self);
     }
 
     IMCC_INFO(interp)->globals->cs = cs;
@@ -610,6 +599,41 @@ get_code_size(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_lin
     return code_size;
 }
 
+/*
+
+=item C<void imcc_pbc_add_libdep(PARROT_INTERP, STRING *libname)>
+
+add libdeps to byte code
+
+=cut
+
+*/
+
+void
+imcc_pbc_add_libdep(PARROT_INTERP, ARGIN(STRING *libname))
+{
+    ASSERT_ARGS(imcc_pbc_add_libdep)
+
+    PackFile_ByteCode *bc      = interp->code;
+    size_t i;
+
+    /* bail out early if compiling to text format */
+    if (!bc)
+        return;
+
+    /* check if already present (avoids duplicates) */
+    for (i = 0; i < bc->n_libdeps; i++) {
+        if (STRING_equal(interp, libname, bc->libdeps[i]))
+            return;
+    }
+
+    bc->n_libdeps++;
+    bc->libdeps = mem_gc_realloc_n_typed_zeroed(interp, bc->libdeps,
+                            bc->n_libdeps, bc->n_libdeps - 1,
+                            STRING *);
+    bc->libdeps[bc->n_libdeps - 1] = libname;
+}
+
 
 /*
 
@@ -754,7 +778,7 @@ find_sub_by_subid(PARROT_INTERP, ARGIN(const char *lookup),
         const SymReg * const r = s->unit->instructions->symregs[0];
 
         /* if subid matches - ok */
-        if (r && (r->subid && (strcmp(r->subid, lookup) == 0)))
+        if (r && (r->subid && (strcmp(r->subid->name, lookup) == 0)))
             return s;
 
         *pc += s->size;
@@ -892,77 +916,22 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
     if (r->type & VT_ENCODED) {
         /*
          * the lexer parses:   foo:"string"
-         * get first part as charset, rest as string
+         * get first part as encoding, rest as string
          */
-        STRING     *s;
-        const STR_VTABLE *s_encoding;
-        const STR_VTABLE *src_encoding;
         #define MAX_NAME 31
-        char charset_name[MAX_NAME + 1];
         char encoding_name[MAX_NAME + 1];
-        char * p = strchr(r->name, '"');
-        char * p2 = strchr(r->name, ':');
-        PARROT_ASSERT(p && p[-1] == ':');
-        if (p2 < p -1) {
-            /* Handle the old 'encoding:charset' format by trying
-             * encoding as well as charset */
-            strncpy(encoding_name, buf, p2 - buf);
-            encoding_name[p2-buf] = '\0';
-            strncpy(charset_name, p2 +1, p - p2 - 2);
-            charset_name[p- p2 - 2] = '\0';
-            /*fprintf(stderr, "%s:%s\n", charset_name, encoding_name);*/
-            s_encoding = Parrot_find_encoding(interp, encoding_name);
-            if (s_encoding == NULL) {
-                s_encoding = Parrot_find_encoding(interp, charset_name);
-                if (s_encoding == NULL)
-                    Parrot_ex_throw_from_c_args(interp, NULL,
-                            EXCEPTION_INVALID_STRING_REPRESENTATION,
-                            "Unknown encoding '%s:%s'",
-                            encoding_name, charset_name);
-            }
-        }
-        else {
-            strncpy(encoding_name, buf, p - buf - 1);
-            encoding_name[p - buf - 1] = '\0';
-            charset_name[0] = '\0';
-            /*fprintf(stderr, "%s\n", encoding_name);*/
-            s_encoding = Parrot_find_encoding(interp, encoding_name);
-            if (s_encoding == NULL)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_STRING_REPRESENTATION,
-                        "Unknown encoding '%s'", encoding_name);
-        }
-        if (s_encoding->max_bytes_per_codepoint == 1)
-            src_encoding = Parrot_ascii_encoding_ptr;
-        else
-            src_encoding = Parrot_utf8_encoding_ptr;
+        char * p = strchr(buf, '"');
+        size_t len;
 
-        /* past delim */
-        buf     = p + 1;
-        if (strcmp(charset_name, "unicode") == 0 && strcmp(encoding_name, "utf8") == 0) {
-            /* Special case needed for backward compatibility with utf8 literals
-             * using \xHH\xHH byte sequences */
-            s = Parrot_str_unescape(interp, buf, '"', "utf8:unicode");
-        }
-        else {
-            p       = buf;
-            p2      = strchr(buf, '"');
-            while (p2 != NULL) {
-               p  = p2;
-               p2 = strchr(p + 1, '"');
-            }
-            {
-                STRING * aux = Parrot_str_new_init(interp, buf, p - buf,
-                        src_encoding, 0);
-                s = Parrot_str_unescape_string(interp, aux,
-                        s_encoding, PObj_constant_FLAG);
-                if (!STRING_validate(interp, s))
-                       Parrot_ex_throw_from_c_args(interp, NULL,
-                               EXCEPTION_INVALID_STRING_REPRESENTATION,
-                               "Malformed string");
-            }
-        }
-        return s;
+        PARROT_ASSERT(p && p[-1] == ':');
+
+        len = p - buf - 1;
+        if (len > MAX_NAME)
+            len = MAX_NAME;
+        memcpy(encoding_name, buf, len);
+        encoding_name[len] = '\0';
+
+        return Parrot_str_unescape(interp, p + 1, '"', encoding_name);
     }
     else if (*buf == '"') {
         buf++;
@@ -1198,7 +1167,7 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub_pmc),
     PMC                 *lex_info    = NULL;
     SymHash             *hsh         = &unit->hash;
     PackFile_ConstTable *ct          = interp->code->const_table;
-    const INTVAL         lex_info_id = Parrot_get_ctx_HLL_type(interp,
+    const INTVAL         lex_info_id = Parrot_hll_get_ctx_HLL_type(interp,
                                         enum_class_LexInfo);
     unsigned int        i;
 
@@ -1403,7 +1372,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     }
     else {
         /* use a possible type mapping for the Sub PMCs, and create it */
-        const INTVAL type = Parrot_get_ctx_HLL_type(interp,
+        const INTVAL type = Parrot_hll_get_ctx_HLL_type(interp,
                                 r->pcc_sub->yield
                                     ? enum_class_Coroutine
                                     : enum_class_Sub);
@@ -1562,6 +1531,14 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
                                    : Parrot_str_new(interp, "*none*", 0));
         }
 
+        if (r->pcc_sub->pragma & P_MAIN && !IMCC_INFO(interp)->seen_main) {
+            IMCC_INFO(interp)->seen_main = 1;
+            interp->code->main_sub = k;
+        }
+        else if (interp->code->main_sub < 0) {
+            interp->code->main_sub = k;
+        }
+
         return k;
     }
 }
@@ -1616,9 +1593,9 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
             regno = r->color >= 0 ? r->color : -1 - r->color;
 
             if (r->set == 'I')
-                key_set_register(interp, tail, regno, KEY_integer_FLAG);
+                Parrot_key_set_register(interp, tail, regno, KEY_integer_FLAG);
             else if (r->set == 'S')
-                key_set_register(interp, tail, regno, KEY_string_FLAG);
+                Parrot_key_set_register(interp, tail, regno, KEY_string_FLAG);
             else
                 IMCC_fatal(interp, 1, "build_key: wrong register set\n");
 
@@ -1634,11 +1611,11 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
             switch (r->set) {
               case 'S':                       /* P["key"] */
                 /* str constant */
-                key_set_string(interp, tail, ct->str.constants[r->color]);
+                Parrot_key_set_string(interp, tail, ct->str.constants[r->color]);
                 break;
               case 'I':                       /* P[;42;..] */
                 /* int constant */
-                key_set_integer(interp, tail, atol(r->name));
+                Parrot_key_set_integer(interp, tail, atol(r->name));
                 break;
               default:
                 IMCC_fatal(interp, 1, "build_key: unknown set\n");
@@ -1651,8 +1628,8 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
     }
 
     {
-        STRING *name      = key_set_to_string(interp, head);
-        const char *cname = Parrot_str_to_cstring(interp, name);
+        STRING *name      = Parrot_key_set_to_string(interp, head);
+        char *cname       = Parrot_str_to_cstring(interp, name);
         SymReg * const r  = _get_sym(&IMCC_INFO(interp)->globals->cs->key_consts, cname);
 
         if (r) {
@@ -1663,7 +1640,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
             store_key_const(interp, cname, k);
         }
 
-        Parrot_str_free_cstring((char *)cname);
+        Parrot_str_free_cstring(cname);
     }
 
     /* single 'S' keys already have their color assigned */
@@ -2411,5 +2388,5 @@ e_pbc_close(PARROT_INTERP, SHIM(void *param))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

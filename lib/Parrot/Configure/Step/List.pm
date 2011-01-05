@@ -1,18 +1,16 @@
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 package Parrot::Configure::Step::List;
 use strict;
 use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw( get_steps_list );
 
-# EDIT HERE TO ADD NEW TESTS
+# Add new Configure.pl probes here
 my @steps = qw(
     init::manifest
     init::defaults
     init::install
     init::hints
-    init::headers
     inter::progs
     inter::make
     inter::lex
@@ -58,10 +56,15 @@ my @steps = qw(
     auto::gettext
     auto::snprintf
     auto::perldoc
+    auto::coverage
     auto::pod2man
     auto::ctags
     auto::revision
+    auto::sha1
+    auto::git_describe
     auto::icu
+    auto::libffi
+    auto::ipv6
     gen::config_h
     gen::core_pmcs
     gen::opengl

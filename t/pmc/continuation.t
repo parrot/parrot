@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -18,12 +17,14 @@ Tests the Continuation PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(4)
+    plan(9)
 
     test_new()
     invoke_with_init()
     returns_tt1511()
     returns_tt1528()
+    experimental_caller()
+    get_pointer_and_string()
 .end
 
 .sub test_new
@@ -33,7 +34,7 @@ Tests the Continuation PMC.
 
 .sub invoke_with_init
     $P0 = new ['Continuation']
-    set_addr $P0, L1
+    set_label $P0, L1
     $P0()
     ok(0, "didn't call continuation")
     goto end
@@ -56,7 +57,7 @@ end:
     chosen = shift options
 
     cc = new 'Continuation'
-    set_addr cc, recurse
+    set_label cc, recurse
     paths = get_global '!paths'
     push paths, cc
 
@@ -112,7 +113,7 @@ end:
 
     # Install top-level cc in global.
     cc = new 'Continuation'
-    set_addr cc, final_failure
+    set_label cc, final_failure
     set_global '!topcc', cc
 
     $P0 = new 'ResizableStringArray'
@@ -129,7 +130,7 @@ end:
 
     # Install top-level cc in global.
     cc = new 'Continuation'
-    set_addr cc, final_failure
+    set_label cc, final_failure
     set_global '!topcc', cc
 
     $P0 = new 'ResizableStringArray'
@@ -139,6 +140,37 @@ end:
   final_failure:
     $S0 = join '', $P0
     is('lala nyny bosbos ', $S0, 'Results processed correctly - without .tailcall')
+.end
+
+.sub experimental_caller
+   .local pmc cc
+   cc = new 'Continuation'
+   $S0 = cc.'caller'()
+   is($S0, 'experimental_caller', 'continuation caller is experimental_caller')
+.end
+
+.sub get_pointer_and_string
+   # Create and initialize a Continuation
+   .local pmc cc
+   cc = new 'Continuation'
+   set_label cc, dummy
+
+   # Test get_string vtable.
+   $S0 = cc
+   $I0 = index $S0, 'get_pointer_and_string'
+   isnt($I0, -1,  "Continuation's stringification has name of current function")
+
+   $I0 = index $S0, 't/pmc/continuation.t'
+   isnt($I0, -1, "Continuation's stringification has name of current file")
+
+   $P1 = cc."continuation"()
+   $S0 = typeof $P1
+   is($S0, "Continuation", "continuation method")
+
+   $I0 = get_addr cc
+   $I1 = set_addr dummy
+   is($I0, $I1, "set/get_addr")
+   dummy:
 .end
 
 # end of tests.

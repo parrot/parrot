@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2007, Parrot Foundation.
-# $Id$
 package Parrot::Configure::Trace;
 use strict;
 use warnings;
@@ -316,7 +315,7 @@ Hash reference:
 
 =item * Purpose
 
-Provide a list of the values which a given attribute in the C<{options}->{c}>
+Provide a list of the values which a given attribute in the C<{options}-E<gt>{c}>
 part of the Parrot::Configure object takes over the course of the
 configuration steps.
 
@@ -329,7 +328,7 @@ optional.
 =item * Return Value
 
 Array reference.  Element C<n> of this array holds the value of the attribute
-in the C<{options}->{c}> part of the Parrot::Configure object at configuration
+in the C<{options}-E<gt>{c}> part of the Parrot::Configure object at configuration
 step C<n + 1>.
 
 If, however, C<verbose> is set, each element C<n> of the array holds a hash
@@ -345,7 +344,7 @@ the value is the value of the attribute at step C<n + 1>.
 =item * Purpose
 
 Provide a list of the values which a given attribute in the
-C<{options}->{triggers}> part of the Parrot::Configure object takes over the
+C<{options}-E<gt>{triggers}> part of the Parrot::Configure object takes over the
 course of the configuration steps.
 
 =item * Arguments
@@ -357,7 +356,7 @@ optional.
 =item * Return Value
 
 Array reference.  Element C<n> of this array holds the value of the attribute
-in the C<{options}->{triggers}> part of the Parrot::Configure object at
+in the C<{options}-E<gt>{triggers}> part of the Parrot::Configure object at
 configuration step C<n + 1>.
 
 If, however, C<verbose> is set, each element C<n> of the array holds a hash
@@ -372,7 +371,7 @@ the value is the value of the attribute at step C<n + 1>.
 
 =item * Purpose
 
-Provide a list of the values which a given attribute in the C<{data}->{c}>
+Provide a list of the values which a given attribute in the C<{data}-E<gt>{c}>
 part of the Parrot::Configure object takes over the course of the
 configuration steps.
 
@@ -385,7 +384,7 @@ optional.
 =item * Return Value
 
 Array reference.  Element C<n> of this array holds the value of the attribute
-in the C<{data}->{c}> part of the Parrot::Configure object at configuration
+in the C<{data}-E<gt>{c}> part of the Parrot::Configure object at configuration
 step C<n + 1>.
 
 If, however, C<verbose> is set, each element C<n> of the array holds a hash
@@ -401,7 +400,7 @@ the value is the value of the attribute at step C<n + 1>.
 =item * Purpose
 
 Provide a list of those configuration steps where the value of a given
-attribute in the C<{data}->{c}> part of the Parrot::Configure object changed
+attribute in the C<{data}-E<gt>{c}> part of the Parrot::Configure object changed
 from that in effect at the conclusion of the previous configuration step.
 
 =item * Arguments
@@ -453,7 +452,7 @@ changed.  Nothing is reported if nothing changed.
 =item * Purpose
 
 Provide a list of the values which a given attribute in the
-C<{data}->{triggers}> part of the Parrot::Configure object takes over the
+C<{data}-E<gt>{triggers}> part of the Parrot::Configure object takes over the
 course of the configuration steps.
 
 =item * Arguments
@@ -465,7 +464,7 @@ optional.
 =item * Return Value
 
 Array reference.  Element C<n> of this array holds the value of the attribute
-in the C<{data}->{triggers}> part of the Parrot::Configure object at
+in the C<{data}-E<gt>{triggers}> part of the Parrot::Configure object at
 configuration step C<n + 1>.
 
 If, however, C<verbose> is set, each element C<n> of the array holds a hash

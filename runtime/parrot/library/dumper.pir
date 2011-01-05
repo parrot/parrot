@@ -1,4 +1,3 @@
-# $Id$
 # Copyright (C) 2004-2009, Parrot Foundation.
 
 =head1 TITLE
@@ -163,9 +162,7 @@ Returns the global dumper instance used by the non object interface.
     end
 TYPE_OK:
 
-    errorsoff .PARROT_ERRORS_GLOBALS_FLAG
     self = get_hll_global ['Data'; 'Dumper'], 'global'
-    errorson .PARROT_ERRORS_GLOBALS_FLAG
     if null self goto create_type
 
 create_type:

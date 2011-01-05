@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2006-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -260,7 +259,7 @@ pir_output_is( <<'CODE', <<'OUT', 'puts' );
 
     # puts to SH not opened
     result = 0
-    set_addr eh, handle1
+    set_label eh, handle1
     sh.'puts'('something')
     result = 1
     goto done1
@@ -271,7 +270,7 @@ done1:
 
     # puts to SH opened for reading
     result = 0
-    set_addr eh, handle2
+    set_label eh, handle2
     sh.'open'('mockname', 'r')
     sh.'puts'('something')
     result = 1
@@ -644,7 +643,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<"OUTPUT", "is_closed" );
-.sub main
+.sub main :main
     .local pmc sh
     .local int i
     sh = new ['StringHandle']
@@ -660,7 +659,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'StringHandle is not a tty' );
-.sub main
+.sub main :main
     .local pmc sh
     .local int i
     sh = new ['StringHandle']
@@ -673,7 +672,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on closed stringhandle" );
-.sub 'main'
+.sub 'main' :main
     .local pmc ifh
     ifh = new ['StringHandle']
     ifh.'encoding'('utf8')
@@ -690,7 +689,7 @@ utf8
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on opened stringhandle" );
-.sub 'main'
+.sub 'main' :main
     .local pmc ifh
     ifh = new ['StringHandle']
     ifh.'encoding'('utf8')
@@ -708,7 +707,7 @@ utf8
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "clone an uninitialized stringhandle" );
-.sub 'main'
+.sub 'main' :main
     $P0 = new ['StringHandle']
     $P1 = clone $P0
     say "ok"

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -77,14 +76,6 @@ typedef struct GC_MS_PObj_Wrapper {
     size_t flags;
     struct GC_MS_PObj_Wrapper * next_ptr;
 } GC_MS_PObj_Wrapper;
-
-
-typedef enum _gc_sys_type_enum {
-    MS,  /* mark and sweep */
-    INF, /* infinite memory core */
-    TMS, /* tricolor mark and sweep */
-    MS2
-} gc_sys_type_enum;
 
 /* how often to skip a full GC when this pool has nothing free */
 typedef enum _gc_skip_type_enum {
@@ -387,12 +378,10 @@ void initialize_fixed_size_pools(PARROT_INTERP,
         FUNC_MODIFIES(*mem_pools);
 
 void mark_special(PARROT_INTERP,
-    ARGMOD(Memory_Pools *mem_pools),
+    SHIM(Memory_Pools *mem_pools),
     ARGIN(PMC *obj))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*mem_pools);
+        __attribute__nonnull__(3);
 
 void Parrot_add_to_free_list(SHIM_INTERP,
     ARGMOD(Fixed_Size_Pool *pool),
@@ -453,7 +442,6 @@ int Parrot_gc_trace_root(PARROT_INTERP,
     , PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_mark_special __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(obj))
 #define ASSERT_ARGS_Parrot_add_to_free_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool) \
@@ -585,15 +573,18 @@ void gc_ms_reallocate_string_storage(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-size_t Parrot_gc_get_info(PARROT_INTERP,
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+size_t Parrot_gc_get_info(SHIM_INTERP,
     Interpinfo_enum which,
     ARGIN(GC_Statistics *stats))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 void Parrot_gc_ms_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int Parrot_gc_ms_needed(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -629,8 +620,7 @@ int Parrot_gc_ms_needed(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_Parrot_gc_get_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(stats))
+       PARROT_ASSERT_ARG(stats))
 #define ASSERT_ARGS_Parrot_gc_ms_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_ms_needed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -760,5 +750,5 @@ void Parrot_gc_str_reallocate_string_storage(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

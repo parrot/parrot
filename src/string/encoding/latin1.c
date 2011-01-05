@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2004-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -40,28 +39,18 @@ static STRING* latin1_downcase_first(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL latin1_find_cclass(PARROT_INTERP,
-    INTVAL flags,
-    ARGIN(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
+static INTVAL latin1_partial_scan(PARROT_INTERP,
+    ARGIN(const char *buf),
+    ARGMOD(Parrot_String_Bounds *bounds))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*bounds);
 
-static INTVAL latin1_find_not_cclass(PARROT_INTERP,
-    INTVAL flags,
-    ARGIN(const STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
+static void latin1_scan(PARROT_INTERP, ARGMOD(STRING *src))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-static INTVAL latin1_is_cclass(PARROT_INTERP,
-    INTVAL flags,
-    ARGIN(const STRING *src),
-    UINTVAL offset)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*src);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* latin1_titlecase(PARROT_INTERP, ARGIN(const STRING *src))
@@ -90,10 +79,6 @@ static STRING* latin1_upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL latin1_validate(PARROT_INTERP, ARGIN(const STRING *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 #define ASSERT_ARGS_latin1_chr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_latin1_downcase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -102,13 +87,11 @@ static UINTVAL latin1_validate(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_latin1_downcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_latin1_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_latin1_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_latin1_find_not_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_latin1_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+    , PARROT_ASSERT_ARG(buf) \
+    , PARROT_ASSERT_ARG(bounds))
+#define ASSERT_ARGS_latin1_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_latin1_titlecase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -124,9 +107,6 @@ static UINTVAL latin1_validate(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_latin1_upcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_latin1_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -149,35 +129,8 @@ static STRING *
 latin1_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(latin1_to_encoding)
-    STRING      *dest;
 
-    if (STRING_max_bytes_per_codepoint(src) == 1) {
-        dest           = Parrot_str_clone(interp, src);
-        dest->encoding = Parrot_latin1_encoding_ptr;
-    }
-    else {
-        String_iter  iter;
-        unsigned char *p;
-        const UINTVAL len = src->strlen;
-
-        dest = Parrot_str_new_init(interp, NULL, len,
-                Parrot_latin1_encoding_ptr, 0);
-        p    = (unsigned char *)dest->strstart;
-        STRING_ITER_INIT(interp, &iter);
-
-        while (iter.charpos < len) {
-            const UINTVAL c = STRING_iter_get_and_advance(interp, src, &iter);
-            if (c >= 0x100)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LOSSY_CONVERSION,
-                    "lossy conversion to iso-8559-1");
-            *p++ = c;
-        }
-
-        dest->bufused = len;
-        dest->strlen  = len;
-    }
-
-    return dest;
+    return fixed8_to_encoding(interp, src, Parrot_latin1_encoding_ptr);
 }
 
 
@@ -205,116 +158,69 @@ latin1_chr(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<static UINTVAL latin1_validate(PARROT_INTERP, const STRING *src)>
+=item C<static void latin1_scan(PARROT_INTERP, STRING *src)>
 
-Returns 1 if the STRING C<src> is a valid ISO-8859-1 STRING. Returns 0 otherwise.
+Returns the number of codepoints in string C<src>. No scanning needed
+for fixed encodings.
 
 =cut
 
 */
 
-static UINTVAL
-latin1_validate(PARROT_INTERP, ARGIN(const STRING *src))
+static void
+latin1_scan(PARROT_INTERP, ARGMOD(STRING *src))
 {
-    ASSERT_ARGS(latin1_validate)
-    INTVAL offset;
-    const INTVAL length =  Parrot_str_length(interp, src);
+    ASSERT_ARGS(latin1_scan)
 
-    for (offset = 0; offset < length; ++offset) {
-        const UINTVAL codepoint = STRING_ord(interp, src, offset);
-        if (codepoint >= 0x100)
-            return 0;
-    }
-    return 1;
+    src->strlen = src->bufused;
 }
 
 
 /*
 
-=item C<static INTVAL latin1_is_cclass(PARROT_INTERP, INTVAL flags, const STRING
-*src, UINTVAL offset)>
+=item C<static INTVAL latin1_partial_scan(PARROT_INTERP, const char *buf,
+Parrot_String_Bounds *bounds)>
 
-Returns Boolean.
+Partial scan of latin1 string. Stops after C<count> bytes or if character
+C<delim> is found. Setting C<count> or C<delim> to -1 disables these tests.
 
 =cut
 
 */
 
 static INTVAL
-latin1_is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offset)
+latin1_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
+        ARGMOD(Parrot_String_Bounds *bounds))
 {
-    ASSERT_ARGS(latin1_is_cclass)
-    UINTVAL codepoint;
+    ASSERT_ARGS(latin1_partial_scan)
+    UINTVAL       i;
+    UINTVAL       len   = bounds->bytes;
+    const INTVAL  chars = bounds->chars;
+    const INTVAL  delim = bounds->delim;
+    INTVAL        c     = -1;
 
-    if (offset >= src->strlen) return 0;
-    codepoint = STRING_ord(interp, src, offset);
+    if (chars >= 0 && (UINTVAL)chars < len)
+        len = chars;
 
-    if (codepoint >= sizeof (Parrot_ascii_typetable) /
-                     sizeof (Parrot_ascii_typetable[0])) {
-        return 0;
-    }
-    return (Parrot_iso_8859_1_typetable[codepoint] & flags) ? 1 : 0;
-}
+    if (delim >= 0) {
+        for (i = 0; i < len; ++i) {
+            c = (unsigned char)buf[i];
 
-
-/*
-
-=item C<static INTVAL latin1_find_cclass(PARROT_INTERP, INTVAL flags, const
-STRING *src, UINTVAL offset, UINTVAL count)>
-
-Find a character in the given character class.  Delegates to the find_cclass
-method of the encoding plugin.
-
-=cut
-
-*/
-
-static INTVAL
-latin1_find_cclass(PARROT_INTERP, INTVAL flags,
-                ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
-{
-    ASSERT_ARGS(latin1_find_cclass)
-    const unsigned char *contents = (const unsigned char *)src->strstart;
-    UINTVAL pos = offset;
-    UINTVAL end = offset + count;
-
-    end = src->strlen < end ? src->strlen : end;
-    for (; pos < end; ++pos) {
-        if ((Parrot_iso_8859_1_typetable[contents[pos]] & flags) != 0) {
-            return pos;
+            if (c == delim) {
+                len = i + 1;
+                break;
+            }
         }
     }
-    return end;
-}
-
-
-/*
-
-=item C<static INTVAL latin1_find_not_cclass(PARROT_INTERP, INTVAL flags, const
-STRING *src, UINTVAL offset, UINTVAL count)>
-
-Returns C<INTVAL>.
-
-=cut
-
-*/
-
-static INTVAL
-latin1_find_not_cclass(PARROT_INTERP, INTVAL flags,
-                ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
-{
-    ASSERT_ARGS(latin1_find_not_cclass)
-    const unsigned char *contents = (const unsigned char *)src->strstart;
-    UINTVAL pos = offset;
-    UINTVAL end = offset + count;
-
-    end = src->strlen < end ? src->strlen : end;
-    for (; pos < end; ++pos) {
-        if ((Parrot_iso_8859_1_typetable[contents[pos]] & flags) == 0) {
-            return pos;
-        }
+    else {
+        c = buf[len-1];
     }
-    return end;
+
+    bounds->bytes = len;
+    bounds->chars = len;
+    bounds->delim = c;
+
+    return 0;
 }
 
 
@@ -528,9 +434,10 @@ latin1_titlecase_first(PARROT_INTERP, ARGIN(const STRING *src))
 
 
 static STR_VTABLE Parrot_latin1_encoding = {
-    0,
+    -1,
     "iso-8859-1",
     NULL,
+    1, /* Bytes per unit */
     1, /* Max bytes per codepoint */
 
     latin1_to_encoding,
@@ -541,15 +448,15 @@ static STR_VTABLE Parrot_latin1_encoding = {
     fixed8_index,
     fixed8_rindex,
     fixed8_hash,
-    latin1_validate,
 
-    fixed8_scan,
+    latin1_scan,
+    latin1_partial_scan,
     fixed8_ord,
     fixed_substr,
 
-    latin1_is_cclass,
-    latin1_find_cclass,
-    latin1_find_not_cclass,
+    fixed8_is_cclass,
+    fixed8_find_cclass,
+    fixed8_find_not_cclass,
 
     encoding_get_graphemes,
     fixed8_compose,
@@ -565,8 +472,7 @@ static STR_VTABLE Parrot_latin1_encoding = {
     fixed8_iter_get,
     fixed8_iter_skip,
     fixed8_iter_get_and_advance,
-    fixed8_iter_set_and_advance,
-    fixed8_iter_set_position
+    fixed8_iter_set_and_advance
 };
 
 STR_VTABLE *Parrot_latin1_encoding_ptr = &Parrot_latin1_encoding;
@@ -576,5 +482,5 @@ STR_VTABLE *Parrot_latin1_encoding_ptr = &Parrot_latin1_encoding;
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

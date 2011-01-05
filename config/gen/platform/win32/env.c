@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2004-2008, Parrot Foundation.
  */
 
@@ -146,5 +145,5 @@ Parrot_unsetenv(PARROT_INTERP, STRING *name)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

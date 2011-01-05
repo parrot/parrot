@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -36,17 +35,36 @@ use Parrot::Config;
 use File::Spec;
 use Parrot::Test;
 
-my $path;
+my ($path, $exefile);
 
 BEGIN {
     $path = File::Spec->catfile( ".", "pbc_disassemble" );
-    my $exefile = $path . $PConfig{exe};
+    $exefile = $path . $PConfig{exe};
     unless ( -f $exefile ) {
         plan skip_all => "pbc_disassemble hasn't been built. Run make parrot_utils";
         exit(0);
     }
-    plan tests => 6;
+    plan tests => 10;
 }
+
+my $helpregex = <<OUTPUT;
+/pbc_disassemble - dump or convert parrot bytecode [(]PBC[)] files
+usage:
+pbc_disassemble .* [[]file.pbc[]]
+pbc_disassemble -o converted[.]pasm file[.]pbc
+\\s+(-.*\\s+[.]{3}\\s+.*
+)+/m
+OUTPUT
+
+disassemble_raw_output_like( "--help", $helpregex, "pbc_disassemble help message");
+disassemble_raw_output_like( "--thisisnotarealoption", $helpregex, "pbc_disassemble bad option");
+disassemble_raw_output_like( "-h -b -o - -?", $helpregex, "pbc_disassemble every option");
+
+my $errorregex = <<OUTPUT;
+/Error during disassembly\nPackFile_Header_validate: This is not a valid Parrot bytecode file./m
+OUTPUT
+
+disassemble_raw_output_like( "-o del.pasm pbc_disassemble", $errorregex, "pbc_disassemble bad bytecode file");
 
 disassemble_output_like( <<PIR, "pir", qr/PMC_CONST.*set_n_nc.*print_n/ms, 'pbc_disassemble numeric ops');
 .sub main :main
@@ -86,16 +104,13 @@ disassemble_output_like( <<PIR, "pir", qr/set_s_sc S0,utf8:"Hello"/ms, 'pbc_disa
 .end
 PIR
 
-SKIP: {
-    skip( 'no ICU lib', 1 ) unless $PConfig{has_icu};
-    my $utf16 = pack('S*', unpack('C*', 'Hello'));
-    $utf16 =~ s/\0/\\\\0/g;
-    disassemble_output_like( <<PIR, "pir", qr/set_s_sc S0,utf16:"$utf16"/ms, 'pbc_disassemble utf16 string');
+my $utf16 = pack('S*', unpack('C*', 'Hello'));
+$utf16 =~ s/\0/\\\\0/g;
+disassemble_output_like( <<PIR, "pir", qr/set_s_sc S0,utf16:"$utf16"/ms, 'pbc_disassemble utf16 string');
 .sub main :main
     \$S0 = utf16:"Hello"
 .end
 PIR
-}
 
 =head1 HELPER SUBROUTINES
 
@@ -113,6 +128,14 @@ and the optional test diagnostic.
 sub disassemble_output_like {
     pbc_postprocess_output_like($path, @_ );
 }
+
+sub disassemble_raw_output_like {
+    my ($options, $snippet, $desc)  = @_;
+    my $out = `$exefile $options 2>&1`;
+    like( $out, $snippet, $desc );
+    return;
+}
+
 
 # Local Variables:
 #   mode: cperl

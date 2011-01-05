@@ -1,6 +1,5 @@
 #! parrot
-# Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
+# Copyright (C) 2009-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -31,29 +30,11 @@ Compile bytecode to executable.
     .local string cfile
     .local string objfile
     .local string exefile
-    .local int    runcore
+    .local string runcore
     .local int    install
 
     (infile, cfile, objfile, exefile, runcore, install) = 'handle_args'(argv)
     unless infile > '' goto err_infile
-
-    .local string code_type
-    code_type = 'determine_code_type'()
-
-    .local string codestring
-    if code_type == 'gcc'  goto code_for_gcc
-    if code_type == 'msvc' goto code_for_msvc
-    goto code_for_default
-  code_for_gcc:
-    codestring = 'generate_code_gcc'(infile)
-    goto code_end
-  code_for_msvc:
-    codestring = 'generate_code_msvc'(infile)
-    goto code_end
-  code_for_default:
-    codestring = 'generate_code'(infile)
-  code_end:
-
 
   open_outfile:
     .local pmc outfh
@@ -61,57 +42,109 @@ Compile bytecode to executable.
     outfh.'open'(cfile, 'w')
     unless outfh goto err_outfh
     print outfh, <<'HEADER'
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "parrot/api.h"
 const void * get_program_code(void);
+int Parrot_set_config_hash(Parrot_PMC interp_pmc);
+static void show_last_error_and_exit(Parrot_PMC interp);
+static void
+    print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline);
+    #define TRACE 0
 HEADER
 
-    print outfh, codestring
+    .local string code_type
+    code_type = 'determine_code_type'()
 
-    print outfh, '#define RUNCORE '
+    if code_type == 'gcc'  goto code_for_gcc
+    if code_type == 'msvc' goto code_for_msvc
+    goto code_for_default
+  code_for_gcc:
+    'generate_code_gcc'(infile, outfh)
+    goto code_end
+  code_for_msvc:
+    'generate_code_msvc'(infile, outfh)
+    goto code_end
+  code_for_default:
+    'generate_code'(infile, outfh)
+  code_end:
+
+    print outfh, '#define RUNCORE "'
     print outfh, runcore
-    print outfh, "\n"
+    print outfh, "\"\n"
 
     print outfh, <<'MAIN'
         int main(int argc, const char *argv[])
         {
-            PackFile     *pf;
-            Parrot_Interp interp;
+            PMC * interp;
+            PMC * pbc;
+            PMC * argsarray;
             const unsigned char *program_code_addr;
+            Parrot_Init_Args *initargs;
+            GET_INIT_STRUCT(initargs);
 
             program_code_addr = (const unsigned char *)get_program_code();
             if (!program_code_addr)
-                return 1;
+                exit(EXIT_FAILURE);
 
-            Parrot_set_config_hash();
+            if (!(Parrot_api_make_interpreter(NULL, 0, initargs, &interp) &&
+                  Parrot_set_config_hash(interp) &&
+                  Parrot_api_set_executable_name(interp, argv[0]) &&
+                  Parrot_api_set_runcore(interp, RUNCORE, TRACE))) {
+                fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
+                show_last_error_and_exit(interp);
+            }
 
-            interp = Parrot_new( NULL );
-            if (!interp)
-                return 1;
+            //Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
 
-            Parrot_init_stacktop(interp, &interp);
-            Parrot_set_executable_name(interp,
-                Parrot_str_new(interp, argv[0], 0));
-            Parrot_set_run_core(interp, (Parrot_Run_core_t)RUNCORE);
-            Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
+            if (!Parrot_api_load_bytecode_bytes(interp, program_code_addr, bytecode_size, &pbc)) {
+                fprintf(stderr, "PARROT VM: Could not load bytecode");
+                show_last_error_and_exit(interp);
+            }
+            if (!Parrot_api_pmc_wrap_string_array(interp, argc, argv, &argsarray)) {
+                fprintf(stderr, "PARROT VM: Could not build args array");
+                show_last_error_and_exit(interp);
+            }
+            if (!Parrot_api_run_bytecode(interp, pbc, argsarray)) {
+                show_last_error_and_exit(interp);
+            }
 
-            pf = PackFile_new(interp, 0);
-            if (!pf)
-                return 1;
-
-            if (!PackFile_unpack(interp, pf,
-                    (const opcode_t *)program_code_addr, bytecode_size))
-                return 1;
-
-            do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
-
-            Parrot_pbc_load(interp, pf);
-
-            PackFile_fixup_subs(interp, PBC_MAIN, NULL);
-            Parrot_runcode(interp, argc, argv);
-            Parrot_destroy(interp);
-            Parrot_exit(interp, 0);
+            Parrot_api_destroy_interpreter(interp);
+            exit(EXIT_SUCCESS);
         }
+
+        static void
+        show_last_error_and_exit(Parrot_PMC interp)
+        {
+            Parrot_String errmsg, backtrace;
+            Parrot_Int exit_code, is_error;
+            Parrot_PMC exception;
+
+            if (!Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg))
+                exit(EXIT_FAILURE);
+            if (is_error) {
+                if (!Parrot_api_get_exception_backtrace(interp, exception, &backtrace))
+                    exit(EXIT_FAILURE);
+                print_parrot_string(interp, stderr, errmsg, 1);
+                print_parrot_string(interp, stderr, backtrace, 0);
+            }
+
+            exit(exit_code);
+        }
+
+        static void
+        print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline)
+        {
+            char * msg_raw;
+            if (!str)
+                return;
+            Parrot_api_string_export_ascii(interp, str, &msg_raw);
+            if (msg_raw) {
+                fprintf(vector, "%s%s", msg_raw, newline ? "\n" : "");
+                Parrot_api_string_free_exported_ascii(interp, msg_raw);
+            }
+        }
+
 MAIN
 
 
@@ -223,17 +256,17 @@ HELP
         end_installable:
     end_outfile:
 
-    .local int runcore_code
+    .local string runcore_code
     unless runcore == 'slow' goto end_slow_core
-        runcore_code = .PARROT_SLOW_CORE
+        runcore_code = 'slow'
         goto done_runcore
     end_slow_core:
     unless runcore == 'fast' goto end_fast_core
-        runcore_code = .PARROT_FAST_CORE
+        runcore_code = 'fast'
         goto done_runcore
     end_fast_core:
     unless runcore == '' goto end_unspecified_core
-        runcore_code = .PARROT_FAST_CORE
+        runcore_code = 'fast'
         goto done_runcore
     end_unspecified_core:
         # invalid runcore name
@@ -272,16 +305,15 @@ HELP
 
 .sub 'generate_code'
     .param string infile
+    .param pmc    outfh
     .local pmc ifh
     ifh = new ['FileHandle']
-    ifh.'open'(infile, 'r')
+    ifh.'open'(infile, 'rb')
     unless ifh goto err_infile
 
-    .local pmc codestring
     .local int size
 
-    codestring = new [ 'StringBuilder' ]
-    push codestring, "const Parrot_UInt1 program_code[] = {"
+    print outfh, "const Parrot_UInt1 program_code[] = {"
     size = 0
 
   read_loop:
@@ -298,13 +330,13 @@ HELP
     unless pos < pbclength goto code_done
     $I0 = ord pbcstring, pos
     $S0 = $I0
-    push codestring, $S0
-    push codestring, ','
+    print outfh, $S0
+    print outfh, ','
     inc pos
     inc size
     $I0 = size % 32
     unless $I0 == 0 goto code_loop
-    push codestring, "\n"
+    print outfh, "\n"
     goto code_loop
   code_done:
     goto read_loop
@@ -312,19 +344,18 @@ HELP
   read_done:
     ifh.'close'()
 
-    push codestring, "\n};\n\nconst size_t bytecode_size = "
+    print outfh, "\n};\n\nconst size_t bytecode_size = "
     $S0 = size
-    push codestring, $S0
-    push codestring, ";\n"
-    push codestring, <<'END_OF_FUNCTION'
+    print outfh, $S0
+    print outfh, ";\n"
+    print outfh, <<'END_OF_FUNCTION'
         const void * get_program_code(void)
         {
             return program_code;
         }
 END_OF_FUNCTION
 
-    $S0 = codestring
-    .return ($S0)
+    .return ()
 
   err_infile:
     die "cannot open infile"
@@ -362,21 +393,19 @@ END_OF_FUNCTION
 
 .sub 'generate_code_gcc'
     .param string infile
+    .param pmc    outfh
     .local pmc ifh
     ifh = new ['FileHandle']
-    ifh.'open'(infile, 'r')
+    ifh.'open'(infile, 'rb')
     unless ifh goto err_infile
 
     .local pmc encoding_table
     encoding_table = 'generate_encoding_table'()
 
-    .local pmc codestring
     .local int size
 
-    codestring = new ['StringBuilder']
-
-    push codestring, "const char * program_code =\n"
-    push codestring, '"'
+    print outfh, "const char * program_code =\n"
+    print outfh, '"'
     size = 0
 
   read_loop:
@@ -393,14 +422,14 @@ END_OF_FUNCTION
     unless pos < pbclength goto code_done
     $I0 = ord pbcstring, pos
     $S0 = encoding_table[$I0]
-    push codestring, $S0
+    print outfh, $S0
     inc pos
     inc size
     $I0 = size % 32
     unless $I0 == 0 goto code_loop
-    push codestring, '"'
-    push codestring, "\n"
-    push codestring, '"'
+    print outfh, '"'
+    print outfh, "\n"
+    print outfh, '"'
     goto code_loop
   code_done:
     goto read_loop
@@ -408,22 +437,21 @@ END_OF_FUNCTION
   read_done:
     ifh.'close'()
 
-    push codestring, '"'
-    push codestring, "\n;\n\n"
-    push codestring, "const size_t bytecode_size = "
+    print outfh, '"'
+    print outfh, "\n;\n\n"
+    print outfh, "const size_t bytecode_size = "
     $S0 = size
-    push codestring, $S0
-    push codestring, ";\n"
+    print outfh, $S0
+    print outfh, ";\n"
 
-    push codestring, <<'END_OF_FUNCTION'
+    print outfh, <<'END_OF_FUNCTION'
         const void * get_program_code(void)
         {
             return program_code;
         }
 END_OF_FUNCTION
 
-    $S0 = codestring
-    .return ($S0)
+    .return ()
 
   err_infile:
     die "cannot open infile"
@@ -467,6 +495,7 @@ END_OF_FUNCTION
 # this sub creates supplemental .rc and .RES files.
 .sub 'generate_code_msvc'
     .param string pbc_path
+    .param pmc    outfh
 
     .local string rc_path
     .local string res_path
@@ -505,16 +534,14 @@ END_OF_DEFINES
     pbc_size = $P2[7]
 
 
-    .local pmc codestring
-    codestring  = new [ 'StringBuilder' ]
-    push codestring, "#include <windows.h>\n"
-    push codestring, rc_constant_defines
-    push codestring, "const unsigned int bytecode_size = "
+    print outfh, "#include <windows.h>\n"
+    print outfh, rc_constant_defines
+    print outfh, "const unsigned int bytecode_size = "
     $S0 = pbc_size
-    push codestring, $S0
-    push codestring, ";\n"
+    print outfh, $S0
+    print outfh, ";\n"
 
-    push codestring, <<'END_OF_FUNCTION'
+    print outfh, <<'END_OF_FUNCTION'
         const void * get_program_code(void)
         {
             HRSRC   hResource;
@@ -558,8 +585,8 @@ END_OF_FUNCTION
     die "RC command failed"
 
   rc_ok:
-    $S0 = codestring
-    .return ($S0)
+
+    .return ()
 
   err_h_open:
     die "cannot open .h file"
@@ -600,10 +627,7 @@ END_OF_FUNCTION
     includedir = concat includepath, versiondir
   done_includedir:
 
-    pathquote  = ''
-    unless osname == 'MSWin32' goto not_windows
     pathquote  = '"'
-  not_windows:
 
     .local string compile
     compile  = cc
@@ -662,9 +686,12 @@ END_OF_FUNCTION
     versiondir   = $P0['versiondir']
 
     .local string config, pathquote, exeprefix
+    pathquote  = '"'
+    config     = pathquote
     if installed == '1' goto config_installed
     exeprefix = substr exefile, 0, 12
-    config     = concat build_dir, slash
+    config    .= build_dir
+    config    .= slash
     config    .= 'src'
     config    .= slash
     if install goto config_to_install
@@ -677,15 +704,13 @@ END_OF_FUNCTION
  config_installed:
     rpath      = $P0['rpath_lib']
     libparrot  = $P0['inst_libparrot_linkflags']
-    config     = concat libdir, versiondir
+    config    .= libdir
+    config    .= versiondir
     config    .= slash
     config    .= 'parrot_config'
  config_cont:
     config    .= o
-    pathquote  = ''
-    unless osname == 'MSWin32' goto not_windows
-    pathquote  = '"'
-  not_windows:
+    config    .= pathquote
 
     link .= ' '
     link .= ld_out

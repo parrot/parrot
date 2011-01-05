@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2008, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -97,7 +96,6 @@ F<src/io/api.c>,
 F<src/io/buffer.c>,
 F<src/io/portable.c>,
 F<src/io/unix.c>,
-F<src/io/utf8.c>,
 F<src/io/io_win32.c>.
 
 =cut
@@ -109,5 +107,5 @@ F<src/io/io_win32.c>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2006, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -15,6 +14,7 @@ Freeze/thaw an ResizablePMCArray.
 
 =cut
 
+.pcc_sub :main main:
     new P0, 'ResizablePMCArray'
     set I0, 100000
     time N0

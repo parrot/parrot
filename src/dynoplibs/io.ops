@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2010, Parrot Foundation.
 ** io.ops
 */
@@ -175,7 +174,7 @@ position is beyond 2 GiB
 =item B<tell>(out INT, out INT, invar PMC)
 
 64bit tell:
-Get the current file positon of stream $3 in two parts of 32-bit each
+Get the current file position of stream $3 in two parts of 32-bit each
 ($1 = pos >> 32, $2 = pos & 0xffffffff).
 
 =cut
@@ -338,5 +337,5 @@ inline op setstderr(invar PMC) :base_io {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

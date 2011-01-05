@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2005, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -19,6 +18,8 @@ F<docs/ops/core.pod>
 F<docs/pdds/pdd03_calling_conventions.pod>
 
 =cut
+
+.pcc_sub :main main:
 
 # create a coro and save it on the user stack
 .const 'Sub' P0 =  "MYCOROUTINE"

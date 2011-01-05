@@ -1,6 +1,5 @@
 #!perl
-# Copyright (C) 2008, Parrot Foundation.
-# $Id$
+# Copyright (C) 2008-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -25,7 +24,7 @@ pct/complete_workflow.t - PCT tests
 Special cases in grammars and actions should be tested here.
 
 This test script builds a parser from a grammar syntax file.
-After that acctions are added from a NQP class file.
+After that actions are added from a NQP class file.
 After that the generated compiler is tested against a sample input.
 
 =cut
@@ -369,7 +368,7 @@ EOT
     # that is passed to pir_output_is().
     ( my $gen_parser_fn = $pg_fn ) =~s/pg$/pir/;
     my $rv = Parrot::Test::run_command(
-       qq{$PARROT $PERL6GRAMMAR --output=$gen_parser_fn $pg_fn},
+       qq{"$PARROT" "$PERL6GRAMMAR" --output="$gen_parser_fn" "$pg_fn"},
     );
     is( $rv, 0, "$test_name: generated PIR successfully" );
     ok( -e $gen_parser_fn, "$test_name: generated parser file exists" );
@@ -404,7 +403,7 @@ EOT
     # compile the actions
     ( my $gen_actions_fn = $pm_fn ) =~s/pm$/pir/;
     $rv = Parrot::Test::run_command(
-        qq{$PARROT $NQP --target=pir --output=$gen_actions_fn $pm_fn},
+        qq{"$PARROT" "$NQP" --target=pir --output="$gen_actions_fn" "$pm_fn"},
     );
     is( $rv, 0, "$test_name: generated PIR successfully" );
     ok( -e $gen_actions_fn, "$test_name: generated actions file exists" );

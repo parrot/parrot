@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2008, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -27,6 +26,7 @@ The Socket PMC performs network I/O operations.
 pmclass Socket extends Handle provides socket auto_attrs {
     ATTR PMC *local;           /* Local addr                   */
     ATTR PMC *remote;          /* Remote addr                  */
+    ATTR STRING *buf;
 
 /*
 
@@ -44,6 +44,9 @@ Initializes a newly created Socket object.
 
         data_struct->local  = PMCNULL;
         data_struct->remote = PMCNULL;
+        data_struct->buf    = STRINGNULL;
+
+        Parrot_io_socket_initialize_handle(INTERP, SELF);
 
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -63,8 +66,10 @@ Create a copy of the socket handle.
         Parrot_Socket_attributes * const old_struct = PARROT_SOCKET(SELF);
         Parrot_Socket_attributes * const data_struct = PARROT_SOCKET(copy);
 
-        data_struct->local      = VTABLE_clone(INTERP, old_struct->local);
-        data_struct->remote     = VTABLE_clone(INTERP, old_struct->remote);
+        if (!PMC_IS_NULL(old_struct->local))
+            data_struct->local      = VTABLE_clone(INTERP, old_struct->local);
+        if (!PMC_IS_NULL(old_struct->remote))
+            data_struct->remote     = VTABLE_clone(INTERP, old_struct->remote);
 
         return copy;
     }
@@ -85,6 +90,7 @@ Mark active socket handle data as live.
         if (data) {
             Parrot_gc_mark_PMC_alive(INTERP, data->local);
             Parrot_gc_mark_PMC_alive(INTERP, data->remote);
+            Parrot_gc_mark_STRING_alive(INTERP, data->buf);
         }
     }
 /*
@@ -117,7 +123,7 @@ Returns whether the Socket is currently open.
 */
 
     VTABLE INTVAL get_bool() {
-        return !Parrot_io_socket_is_closed(SELF);
+        return !Parrot_io_socket_is_closed(INTERP, SELF);
     }
 
 /*
@@ -175,6 +181,23 @@ from a port number (integer) and an address (string).
         RETURN(PMC * res);
     }
 
+
+/*
+
+=item C<METHOD is_closed()>
+
+Test if the socket is closed.
+
+=cut
+
+*/
+
+    METHOD is_closed() {
+        const INTVAL status = !VTABLE_get_bool(INTERP, SELF);
+        RETURN(INTVAL status);
+    }
+
+
 /*
 
 =item C<connect(PMC * address)>
@@ -199,28 +222,6 @@ connected socket object.]
 
 /*
 
-=item C<close()>
-
-Close a socket.
-
-=cut
-
-*/
-
-    METHOD close() {
-        INTVAL result = -1;
-        if (PARROT_SOCKET(SELF)) {
-            Parrot_Socket_attributes *data_struct = PARROT_SOCKET(SELF);
-
-            if (data_struct->os_handle != PIO_INVALID_HANDLE)
-                result = Parrot_io_close_piohandle(INTERP, data_struct->os_handle);
-            data_struct->os_handle = PIO_INVALID_HANDLE;
-        }
-        RETURN(INTVAL result);
-    }
-
-/*
-
 =item C<recv()>
 
 Receives a message from a connected socket object. It returns
@@ -237,7 +238,14 @@ string containing the received message.
 
     METHOD recv() {
         STRING * result;
-        INTVAL read = Parrot_io_recv(INTERP, SELF, &result);
+        GET_ATTR_buf(INTERP, SELF, result);
+
+        if (result != STRINGNULL && Parrot_str_length(INTERP, result) > 0) {
+            SET_ATTR_buf(INTERP, SELF, STRINGNULL);
+        }
+        else {
+            result = Parrot_io_reads(INTERP, SELF, 0);
+        }
         RETURN(STRING * result);
     }
 
@@ -329,6 +337,96 @@ but continues to send new connection events until the socket is closed.]
 
 /*
 
+=item C<METHOD read(INTVAL bytes)>
+
+Read the given number of bytes from the socket and return them in a string.
+
+=cut
+
+*/
+
+    METHOD read(INTVAL nb) {
+        STRING *result;
+        STRING *buf;
+        GET_ATTR_buf(INTERP, SELF, buf);
+
+        if (Parrot_io_socket_is_closed(INTERP, SELF))
+            RETURN(STRING * STRINGNULL);
+
+        if (buf == STRINGNULL)
+            buf = Parrot_io_reads(INTERP, SELF, 0);
+
+        while (Parrot_str_length(INTERP, buf) < nb) {
+            STRING *more = Parrot_io_reads(INTERP, SELF, 0);
+            if (Parrot_str_length(INTERP, more) == 0) {
+                SET_ATTR_buf(INTERP, SELF, STRINGNULL);
+                RETURN(STRING *buf);
+            }
+            buf = Parrot_str_concat(INTERP, buf, more);
+        }
+
+        result = Parrot_str_substr(INTERP, buf, 0, nb);
+        buf = Parrot_str_substr(INTERP, buf, nb, Parrot_str_length(INTERP, buf) - nb);
+        SET_ATTR_buf(INTERP, SELF, buf);
+        RETURN(STRING *result);
+    }
+
+
+/*
+
+=item C<METHOD readline()>
+
+Read a line from the socket and return it in a string.
+
+=cut
+
+*/
+
+    METHOD readline() {
+        INTVAL idx;
+        STRING *result;
+        STRING *buf;
+        GET_ATTR_buf(INTERP, SELF, buf);
+
+        if (Parrot_io_socket_is_closed(INTERP, SELF))
+            RETURN(STRING * STRINGNULL);
+
+        if (buf == STRINGNULL)
+            buf = Parrot_io_reads(INTERP, SELF, 0);
+
+        while ((idx = Parrot_str_find_index(INTERP, buf, CONST_STRING(INTERP, "\n"), 0)) < 0) {
+            STRING *more = Parrot_io_reads(INTERP, SELF, 0);
+            if (Parrot_str_length(INTERP, more) == 0) {
+                SET_ATTR_buf(INTERP, SELF, STRINGNULL);
+                RETURN(STRING *buf);
+            }
+            buf = Parrot_str_concat(INTERP, buf, more);
+        }
+
+        idx++;
+        result = Parrot_str_substr(INTERP, buf, 0, idx);
+        buf = Parrot_str_substr(INTERP, buf, idx, Parrot_str_length(INTERP, buf) - idx);
+        SET_ATTR_buf(INTERP, SELF, buf);
+        RETURN(STRING *result);
+    }
+
+/*
+
+=item C<METHOD puts(STRING *buf)>
+
+Print the string to the socket.
+
+=cut
+
+*/
+
+    METHOD puts(STRING *buf) {
+        INTVAL res = Parrot_io_send(INTERP, SELF, buf);
+        RETURN(INTVAL res);
+    }
+
+/*
+
 =back
 
 =cut
@@ -341,5 +439,5 @@ but continues to send new connection events until the socket is closed.]
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

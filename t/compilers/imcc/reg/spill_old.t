@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -213,7 +212,7 @@ sub repeat {
     return $code;
 }
 my $template2 = <<'TEMPLATE';
-.sub _main
+.sub _main :main
     =LOCALS=
     =INITS=
     _sub(=ARGS=)

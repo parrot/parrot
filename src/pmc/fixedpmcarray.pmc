@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -29,6 +28,15 @@ never be set for user arrays.
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_DOES_NOT_RETURN
+static void cannot_autovivify_nested(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_cannot_autovivify_nested __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 pmclass FixedPMCArray auto_attrs provides array {
@@ -55,7 +63,7 @@ Sort this array, optionally using the provided cmp_func
                 Parrot_pcc_invoke_method_from_c_args(INTERP, parent, CONST_STRING(INTERP, "sort"), "P->", cmp_func);
             }
             else
-                Parrot_quicksort(INTERP, (void **)PMC_array(SELF), n, cmp_func);
+                Parrot_util_quicksort(INTERP, (void **)PMC_array(SELF), n, cmp_func, "PP->I");
         }
         RETURN(PMC *SELF);
     }
@@ -345,7 +353,7 @@ Returns the PMC value of the element at index C<*key>.
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
         const INTVAL k        = VTABLE_get_integer(INTERP, key);
-        PMC   * const nextkey = key_next(INTERP, key);
+        PMC   * const nextkey = Parrot_key_next(INTERP, key);
         PMC   *box;
 
         if (!nextkey)
@@ -353,8 +361,9 @@ Returns the PMC value of the element at index C<*key>.
 
         box = SELF.get_pmc_keyed_int(k);
 
-        if (box == NULL)
-            box = Parrot_pmc_new(INTERP, enum_class_Undef);
+        /* TT #1561, return NULL early if we must autovivify. */
+        if (PMC_IS_NULL(box))
+            return PMCNULL;
 
         return VTABLE_get_pmc_keyed(INTERP, box, nextkey);
     }
@@ -427,7 +436,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        PMC * const val = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const val = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_Integer));
 
         VTABLE_set_integer_native(INTERP, val, value);
@@ -445,7 +454,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
-        PMC * const val = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const val = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_Integer));
 
         VTABLE_set_integer_native(INTERP, val, value);
@@ -466,7 +475,7 @@ C<value>.
 */
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        PMC * const val = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const val = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_Float));
 
         VTABLE_set_number_native(INTERP, val, value);
@@ -486,7 +495,7 @@ C<value>.
 
     VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
         const INTVAL k        = VTABLE_get_integer(INTERP, key);
-        PMC   * const nextkey = key_next(INTERP, key);
+        PMC   * const nextkey = Parrot_key_next(INTERP, key);
 
         if (nextkey == NULL) {
             SELF.set_number_keyed_int(k, value);
@@ -494,9 +503,8 @@ C<value>.
         else {
             PMC *box = SELF.get_pmc_keyed_int(k);
 
-            /* TT #1295: autovivify an Array and insert it in SELF */
-            if (!box)
-                box = Parrot_pmc_new(INTERP, SELF.type());
+            if (PMC_IS_NULL(box))
+                cannot_autovivify_nested(INTERP);
 
             VTABLE_set_number_keyed(INTERP, box, nextkey, value);
         }
@@ -513,7 +521,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
-        PMC * const val = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const val = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_String));
 
         VTABLE_set_string_native(INTERP, val, value);
@@ -532,7 +540,7 @@ C<value>.
 */
 
     VTABLE void set_string_keyed(PMC *key, STRING *value) {
-        PMC * const val = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const val = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_String));
 
         VTABLE_set_string_native(INTERP, val, value);
@@ -574,7 +582,7 @@ Sets the PMC at index C<key> to C<value>.
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
-        PMC   *nextkey = key_next(INTERP, key);
+        PMC   *nextkey = Parrot_key_next(INTERP, key);
 
         if (!nextkey) {
             SELF.set_pmc_keyed_int(k, value);
@@ -582,9 +590,8 @@ Sets the PMC at index C<key> to C<value>.
         else {
             PMC *box = SELF.get_pmc_keyed_int(k);
 
-            /* TT #1295: autovivify an Array and insert it in SELF */
-            if (!box)
-                box = Parrot_pmc_new(INTERP, SELF.type());
+            if (PMC_IS_NULL(box))
+                cannot_autovivify_nested(INTERP);
 
             VTABLE_set_pmc_keyed(INTERP, box, nextkey, value);
         }
@@ -730,13 +737,13 @@ Used to unarchive the array.
     }
 
     VTABLE void freeze(PMC *info) {
-        SUPER(info);
         VTABLE_push_integer(INTERP, info, VTABLE_elements(INTERP, SELF));
     }
 
     VTABLE void thaw(PMC *info) {
-        SUPER(info);
         SELF.set_integer_native(VTABLE_shift_integer(INTERP, info));
+        /* Thawed array was created from pmc_new_noinit */
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
@@ -782,6 +789,28 @@ Mark the array.
 
 }
 
+/*
+
+=back
+
+=head1 Auxiliar functions
+
+=over 4
+
+=item C<static void cannot_autovivify_nested(PARROT_INTERP)>
+
+*/
+
+PARROT_DOES_NOT_RETURN
+static void
+cannot_autovivify_nested(PARROT_INTERP)
+{
+    ASSERT_ARGS(cannot_autovivify_nested)
+    Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INVALID_OPERATION,
+            "Cannot autovivify nested arrays");
+}
+
 
 /*
 
@@ -799,5 +828,5 @@ F<docs/pdds/pdd17_basic_types.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

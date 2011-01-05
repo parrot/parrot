@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -112,7 +111,7 @@ END_C
 
     print {$OUT} <<'END_C';
 
-void Parrot_initialize_core_pmcs(PARROT_INTERP, int pass)
+void Parrot_gbl_initialize_core_pmcs(PARROT_INTERP, int pass)
 {
     /* first the PMC with the highest enum
      * this reduces MMD table resize action */
@@ -132,7 +131,7 @@ static void register_pmc(PARROT_INTERP, ARGIN(PMC *registry), int pmc_id)
 }
 
 void
-Parrot_register_core_pmcs(PARROT_INTERP, ARGIN(PMC *registry))
+Parrot_gbl_register_core_pmcs(PARROT_INTERP, ARGIN(PMC *registry))
 {
 END_C
 

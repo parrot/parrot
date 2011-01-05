@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -29,6 +28,7 @@ $year += 1900;
 # don't run this test 1 tick before the year changes #'
 
 pasm_output_is( <<'CODE', $year, "decodelocaltime" );
+.pcc_sub :main main:
 .loadlib 'sys_ops'
     time I0
     decodelocaltime P0, I0

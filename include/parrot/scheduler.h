@@ -1,7 +1,5 @@
 /* scheduler.h
  *  Copyright (C) 2007, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Parrot concurrency scheduler header stuff
  *  Data Structure and Algorithms:
@@ -274,5 +272,5 @@ typedef enum {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

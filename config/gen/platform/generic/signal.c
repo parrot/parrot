@@ -1,5 +1,4 @@
 /*
- * $Id$
  * Copyright (C) 2004-2007, Parrot Foundation.
  */
 
@@ -54,5 +53,5 @@ Parrot_set_sighandler(int signum, Parrot_sighandler_t handler)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

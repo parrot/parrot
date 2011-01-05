@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2006-2007, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -66,7 +65,7 @@ CODE
     value = new 'ROTest'
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS, .EXCEPTION_METHOD_NOT_FOUND)
-    set_addr eh, eh_label
+    set_label eh, eh_label
 
     #READONLYTEST
     push_eh eh

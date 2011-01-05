@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -175,7 +174,7 @@ close $FOO;
 system_or_die( $PARROT, '-o', $temp_pbc, $temp_pir );
 
 pir_output_is( <<"CODE", <<'OUT', 'call sub in external pbc' );
-.sub _sub1
+.sub _sub1 :main
     say "sub1"
     load_bytecode "$temp_pbc"
     say "loaded"
@@ -209,7 +208,7 @@ close $FOO;
 system_or_die( $PARROT, '-o', $temp_pbc, $temp_pir );
 
 pir_output_is( <<"CODE", <<'OUT', 'call sub in external pbc, return' );
-.sub _sub1
+.sub _sub1 :main
     say "sub1"
     load_bytecode "$temp_pbc"
     say "loaded"
@@ -246,7 +245,7 @@ close $FOO;
 system($PARROT, '-o', $temp_pbc, $temp_pir);
 
 pir_output_is( <<"CODE", <<'OUT', 'call sub in external pbc with 2 subs' );
-.sub _sub1
+.sub _sub1 :main
     say "sub1"
     load_bytecode "$temp_pbc"
     say "loaded"
@@ -276,7 +275,7 @@ close $FOO;
 # compile it
 
 pir_output_is( <<"CODE", <<'OUT', 'call sub in external pir, return' );
-.sub _sub1
+.sub _sub1 :main
     say "sub1"
     load_bytecode "$temp_pir"
     say "loaded"
@@ -295,7 +294,7 @@ back
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'call internal sub like external' );
-.sub _sub1
+.sub _sub1 :main
     print "sub1\n"
     $P0 = get_global "_sub2"
     .begin_call
@@ -320,7 +319,7 @@ OUT
 ($FOO, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $FOO <<'ENDF';
-.sub _sub1
+.sub _sub1 :main
     say "sub1"
     $P0 = get_global "_sub2"
     .begin_call

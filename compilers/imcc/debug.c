@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2002-2010, Parrot Foundation.
- * $Id$
  */
 
 /*
@@ -97,7 +96,7 @@ IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
     va_start(ap, fmt);
     imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
     va_end(ap);
-    Parrot_exit(interp, code);
+    Parrot_x_jump_out_error(interp, code);
 }
 
 /*
@@ -463,5 +462,5 @@ dump_dominance_frontiers(ARGIN(const IMC_Unit *unit))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

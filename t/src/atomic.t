@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2006, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -10,6 +9,7 @@ use lib qw(. lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 use Parrot::Config;
+use File::Spec::Functions;
 
 =head1 NAME
 
@@ -26,6 +26,8 @@ Tests atomic operation support.
 =cut
 
 # generic tests
+
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
 plan tests => 4;
 

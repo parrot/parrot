@@ -1,5 +1,4 @@
 # Copyright (C) 2007-2009, Parrot Foundation.
-# $Id$
 
 =head1 Config::JSON
 
@@ -34,6 +33,7 @@ If the data is not valid, an exception will be thrown.
     throw $P0
 
   slurp_file:
+    fh.'encoding'('utf8')
     text = fh.'readall'()
 
     # Convert the text to an object and return it.

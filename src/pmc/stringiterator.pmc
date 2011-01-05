@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -156,11 +155,12 @@ Reset the Iterator. C<value> must be one of
         GET_ATTR_str_val(INTERP, SELF, str_val);
         if (value == ITERATE_FROM_START) {
             SET_ATTR_reverse(INTERP, SELF, 0);
-            STRING_iter_set_position(INTERP, str_val, iter, 0);
+            STRING_ITER_INIT(INTERP, iter);
         }
         else if (value == ITERATE_FROM_END) {
             SET_ATTR_reverse(INTERP, SELF, 1);
-            STRING_iter_set_position(INTERP, str_val, iter, str_val->strlen);
+            iter->bytepos = str_val->bufused;
+            iter->charpos = str_val->strlen;
         }
         else {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -179,7 +179,7 @@ Returns this Iterator's string.
 */
 
     VTABLE PMC *get_pmc() {
-        PMC * const string = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(
+        PMC * const string = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(
             interp, enum_class_String));
         STRING *str_val;
 
@@ -208,7 +208,7 @@ Shift next character from C<string> as PMC.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        ret = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp, enum_class_String));
+        ret = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
         STRING_iter_skip(INTERP, str_val, iter, 1);
         substr = Parrot_str_iter_substr(INTERP, str_val, &old_iter, iter);
         VTABLE_set_string_native(INTERP, ret, substr);
@@ -280,7 +280,7 @@ Shift "next" character from C<string> for reverse iterator as PMC.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        ret = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp, enum_class_String));
+        ret = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
         STRING_iter_skip(INTERP, str_val, iter, -1);
         substr = Parrot_str_iter_substr(INTERP, str_val, iter, &old_iter);
         VTABLE_set_string_native(INTERP, ret, substr);
@@ -400,5 +400,5 @@ Get string value of current position plus idx.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

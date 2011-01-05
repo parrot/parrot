@@ -2,10 +2,6 @@
 
 Parrot::Exception - Auxiliary methods for Exceptions
 
-=head1 VERSION
-
- $Id$
-
 =head1 SYNOPSIS
 
         load_bytecode 'Parrot/Exception.pbc'

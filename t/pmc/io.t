@@ -1,13 +1,12 @@
 #! perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 34;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -78,6 +77,7 @@ OUTPUT
 SKIP: {
     skip( "clone not finished yet", 1 );
     pasm_output_is( <<"CODE", <<'OUTPUT', "clone" );
+    .pcc_sub :main main:
     open P0, "$temp_file", 'r'
     clone P1, P0
     read S0, P1, 1024
@@ -251,7 +251,7 @@ Parrot overwrites
 OUTPUT
 
 pir_output_is( <<"CODE", '', "Parrot_io_flush on buffer full" );
-.sub "main"
+.sub 'main' :main
    set \$I0, 0
    set \$I1, 10000
 
@@ -291,10 +291,28 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "turn off buffering" )
     print $P0, "Howdy World\n"
 
     $P0.'close'()
+
+    $P0 = new ['FileHandle']
+    $P0.'open'(temp_file, 'r')
+
+#   set buffer type
+    $P0.'buffer_type'('unbuffered')
+
+#   get buffer type
+    $S0 = $P0.'buffer_type'()
+    print $S0
+    print "\n"
+
+    $S0 = $P0.'read'(50)
+    print $S0
+
+    $P0.'close'()
     end
 .end
 CODE
 unbuffered
+unbuffered
+Howdy World
 OUTPUT
 
 file_content_is( $temp_file, <<'OUTPUT', 'unbuffered file contents' );
@@ -304,7 +322,7 @@ OUTPUT
 pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', 'I/O buffering' );
 .const string temp_file = '%s'
 
-.sub main
+.sub main :main
     .local string filename
     filename = temp_file
     $P1 = new ['FileHandle']
@@ -365,21 +383,20 @@ OUTPUT
 
 # TT #1178
 pir_output_is( <<'CODE', <<'OUT', 'standard file descriptors' );
-.include 'stdio.pasm'
 .sub main :main
     $P99 = getinterp
-    $P0  = $P99.'stdhandle'(.PIO_STDIN_FILENO)
+    $P0  = $P99.'stdin_handle'()
     $I0  = $P0.'get_fd'()
     # I0 is 0 on Unix and non-Null on stdio and win32
     print "ok 1\n"
 
-    $P1 = $P99.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P1 = $P99.'stdout_handle'()
     $I1 = $P1.'get_fd'()
     if $I1, OK_2
     print "not "
 OK_2:
     say "ok 2"
-    $P2 = $P99.'stdhandle'(.PIO_STDERR_FILENO)
+    $P2 = $P99.'stderr_handle'()
     $I2 = $P2.'get_fd'()
     if $I2, OK_3
     print "not "
@@ -393,10 +410,9 @@ ok 3
 OUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'puts method' );
-.include 'stdio.pasm'
 .sub main :main
     $P0 = getinterp
-    $P2 = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+    $P2 = $P0.'stdout_handle'()
     can $I0, $P2, "puts"
     if $I0, ok1
     print "not "
@@ -410,13 +426,12 @@ ok 2
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'puts method - PIR' );
-.include 'stdio.pasm'
 .sub main :main
    .local string s
    s = "ok 2\n"
    .local pmc io
    $P0 = getinterp
-   io = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+   io = $P0.'stdout_handle'()
    $I0 = can io, "puts"
    if $I0 goto ok1
    print "not "
@@ -430,11 +445,10 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'callmethod puts' );
-.include 'stdio.pasm'
+.pcc_sub :main main:
     getinterp P0                 # invocant
-    set I0, .PIO_STDERR_FILENO   # 1st argument
-    set_args "0,0", P0, I0
-    callmethodcc P0, "stdhandle"
+    set_args "0", P0
+    callmethodcc P0, "stderr_handle"
     get_results "0", P2          # STDERR
 
     set S0, "puts"               # method
@@ -473,6 +487,23 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', 'seek/tell' );
 CODE
 ok 1
 Hello Parrot!
+OUTPUT
+
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', 'readline and tell' );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P0 = new ['FileHandle']
+
+    $P0.'open'(temp_file, 'r')
+    $S0 = $P0.'readline'()
+    print $S0
+    $I0 = $P0.'tell'()
+    say $I0
+    $P0.'close'()
+.end
+CODE
+Hello Parrot!
+14
 OUTPUT
 
 pir_error_output_like( sprintf(<<'CODE', $temp_file), <<'OUTPUT', '32bit seek: exception' );
@@ -544,7 +575,7 @@ ok 1
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', "substr after reading from file" );
-.sub _main
+.sub _main :main
     # Write something into a file
     .local pmc out
     out = new ['FileHandle']
@@ -572,7 +603,7 @@ OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', "multiple substr after reading from file" );
 
-.sub _main
+.sub _main :main
     # Write something into a file
     .local pmc out
     out = new ['FileHandle']
@@ -644,6 +675,46 @@ utf8
 T\xc3\xb6tsch \xe2\x82\xac100
 OUTPUT
 
+pir_output_is( sprintf(<<'CODE', $temp_file), <<"OUTPUT", "utf16 io" );
+.const string temp_file = '%s'
+.sub main :main
+    .local pmc pio
+
+    pio = new ['FileHandle']
+    pio.'open'(temp_file, 'w')
+    pio.'encoding'("utf16")
+    pio.'print'(utf8:"abc \x{1d004} def")
+    $I0 = pio.'tell'()
+    say $I0
+    pio.'close'()
+
+    pio.'open'(temp_file, 'r')
+    pio.'encoding'("utf16")
+    $S0 = pio.'read'(9)
+    $I0 = iseq $S0, ucs4:"abc \x{1d004}"
+    say $I0
+    $S1 = pio.'read'(1)
+    $I0 = iseq $S1, ' '
+    say $I0
+    $S0 .= $S1
+    $S1 = pio.'read'(1024) # read the rest of the file (much shorter than 1K)
+    $S0 .= $S1
+    $I0 = iseq $S0, ucs4:"abc \x{1d004} def"
+    say $I0
+    pio.'close'()
+
+    $I1 = encoding $S0
+    $S2 = encodingname $I1
+    say $S2
+.end
+CODE
+20
+1
+1
+1
+utf16
+OUTPUT
+
 pir_output_is( <<"CODE", <<"OUTPUT", "PIO.readall() - classmeth" );
 .sub main :main
     \$S0 = <<"EOS"
@@ -690,6 +761,54 @@ ok:
 .end
 CODE
 ok
+OUTPUT
+
+pir_output_is( <<"CODE", <<"OUTPUT", "utf16 readline" );
+.sub main :main
+    .local int i, len
+    .local string str, c
+    .local pmc pio
+
+    getstdout \$P0
+    \$P0.'encoding'('ascii')
+
+    str = 'a'
+    c = chr 0x1d001
+    i = 0
+loop:
+    str .= c
+    inc i
+    if i < 8000 goto loop
+    str .= "\\nline 2\\n"
+
+    pio = new ['FileHandle']
+    pio.'open'("$temp_file", 'w')
+    pio.'encoding'('utf16')
+    print pio, str
+    len = pio.'tell'()
+    say len
+    pio.'close'()
+
+    pio = new ['FileHandle']
+    pio.'open'("$temp_file", 'r')
+    pio.'encoding'('utf16')
+
+    str = pio.'readline'()
+    len = length str
+    say len
+    i = ord str, 5678
+    say i
+
+    str = pio.'readline'()
+    print str
+
+    pio.'close'()
+.end
+CODE
+32018
+8002
+118785
+line 2
 OUTPUT
 
 # Local Variables:

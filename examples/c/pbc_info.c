@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -89,7 +88,7 @@ main(SHIM(int argc), char *argv[])
     printf("%s\n", pf->directory.base.name);
     PackFile_map_segments(interp, &pf->directory, iter, (void*)2);
 
-    Parrot_exit(interp, 0);
+    Parrot_x_exit(interp, 0);
 }
 
 /*
@@ -109,6 +108,6 @@ F<src/packfile.c>, F<include/parrot/packfile.h>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 

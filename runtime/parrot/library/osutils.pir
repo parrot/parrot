@@ -1,5 +1,4 @@
 # Copyright (C) 2009-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -198,6 +197,10 @@ osutils - Parrot OS Utilities
   L2:
     $I0 = newer(dst, src)
     if $I0 goto L3
+    $I0 = stat dst, .STAT_EXISTS
+    unless $I0 goto L4
+    unlink(dst, verbose :named('verbose'))
+  L4:
     cp(src, dst, verbose :named('verbose'))
     unless has_exe goto L3
     unless exe goto L3
@@ -226,6 +229,7 @@ osutils - Parrot OS Utilities
     say dst
   L1:
     $P0 = new 'FileHandle'
+    $P0.'encoding'('binary')
     push_eh _handler1
     $S0 = $P0.'readall'(src)
     pop_eh
@@ -572,7 +576,12 @@ osutils - Parrot OS Utilities
 
 .sub 'slurp'
     .param string filename
+    .param string encoding      :named('encoding') :optional
+    .param int has_encoding     :opt_flag
     $P0 = new 'FileHandle'
+    unless has_encoding goto L1
+    $P0.'encoding'(encoding)
+  L1:
     push_eh _handler
     $S0 = $P0.'readall'(filename)
     pop_eh
@@ -768,6 +777,7 @@ osutils - Parrot OS Utilities
     .param string filename
     .local pmc fh, gh
     fh = new 'FileHandle'
+    fh.'encoding'('binary')
     push_eh _handler1
     $S0 = fh.'readall'(filename)
     $I0 = length $S0

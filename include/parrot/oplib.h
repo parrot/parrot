@@ -1,7 +1,5 @@
 /* oplib.h
  *  Copyright (C) 2001-2003, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Header file for op libraries.
  *  Data Structure and Algorithms:
@@ -43,23 +41,11 @@ typedef enum {
 /* when init = true initialize, else de_initialize */
 typedef op_lib_t *(*oplib_init_f)(PARROT_INTERP, long init);
 
-/* core.ops special opcode numbers */
-typedef enum {
-    CORE_OPS_end,               /* halt the runloop */
-    CORE_OPS_noop,              /* do nothing */
-    CORE_OPS_check_events,      /* explicit event check */
-    CORE_OPS_check_events__,    /* inserted into op dispatch when an event
-                                   got scheduled */
-    CORE_OPS_wrapper__          /* inserted by dynop_register for new ops */
-        /* 2 more reserved */
-} special_core_ops_enum;
-
-
 #endif /* PARROT_OPLIB_H_GUARD */
 
 /*
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

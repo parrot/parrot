@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -71,7 +70,7 @@ pmclass OpLib auto_attrs {
     }
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
-        STRING *str_key = key_string(INTERP, key);
+        STRING *str_key = Parrot_key_string(INTERP, key);
         return SELF.get_integer_keyed_str(str_key);
     }
 
@@ -155,5 +154,5 @@ pmclass OpLib auto_attrs {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

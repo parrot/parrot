@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2007, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -46,7 +45,6 @@ sub new {
         $self->new_group( 'TGE',  'the Tree Grammar Engine',                   'compilers/tge' ),
         $self->new_group( 'PCT',  'Parrot Compiler Toolkit',    'compilers/pct' ),
         $self->new_group( 'JSON', 'JavaScript Object Notation', 'compilers/data_json' ),
-        $self->new_group( 'PIRC', 'a PIR Compiler',             'compilers/pirc' ),
         $self->new_group( 'NCIGEN', 'Native Call Interface Generator', 'compilers/ncigen' ),
     );
 }

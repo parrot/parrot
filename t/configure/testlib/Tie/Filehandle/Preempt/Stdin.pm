@@ -1,7 +1,6 @@
 package Tie::Filehandle::Preempt::Stdin;
 
 # Copyright (C) 2007, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;

@@ -1,14 +1,13 @@
 #!perl
 # Copyright (C) 2005-2008, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 10;
 
 pir_output_is( <<'CODE', <<'OUT', "alligator" );
-# if the side-effect of set_addr/continuation isn't
+# if the side-effect of set_label/continuation isn't
 # detected this program prints "Hi\nalligator\n"
 
 .sub main :main
@@ -20,7 +19,7 @@ lab:
     dec $I0
     unless $I0 goto ex
     new $P1, 'Continuation'
-    set_addr $P1, lab
+    set_label $P1, lab
     $P2 = find_name "alligator"
     set_args "0", $P1
     invokecc $P2
@@ -36,7 +35,7 @@ Hi
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "alligator 2 - r9629" );
-.sub xyz
+.sub xyz :main
     .local pmc args
     args = new 'ResizablePMCArray'
     push args, "abc"
@@ -63,29 +62,8 @@ abc
 def
 OUT
 
-pir_2_pasm_is( <<'CODE', <<'OUT', ":unique_reg" );
-.sub main
-    .param int i :unique_reg
-    .local int j :unique_reg
-    .local int k :unique_reg
-    i = 5
-    j = 2
-    k = j * 2
-.end
-CODE
-# IMCC does produce b0rken PASM files
-# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
-main:
-        get_params
-        set I0, 5
-        set I1, 2
-        mul I2, I1, 2
-        set_returns
-        returncc
-OUT
-
 pir_output_is( <<'CODE', <<'OUT', "Explicit large register: S, PIR" );
-.sub main
+.sub main :main
   $S32 = "ok\n"
   print $S32
 .end
@@ -94,7 +72,7 @@ ok
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "Explicit large register: N, PIR" );
-.sub main
+.sub main :main
   $N32 = 3.8
   print $N32
   print "\n"
@@ -104,7 +82,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "Explicit large register: I, PIR" );
-.sub main
+.sub main :main
   $I32 = 123
   print $I32
   print "\n"
@@ -114,7 +92,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "Explicit large register: P, PIR" );
-.sub main
+.sub main :main
   $P32 = new 'String'
   $P32 = "ok\n"
   print $P32
@@ -124,6 +102,7 @@ ok
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: S, PASM" );
+.pcc_sub :main main:
   set S32, "ok\n"
   print S32
   end
@@ -132,6 +111,7 @@ ok
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: N, PASM" );
+.pcc_sub :main main:
   set N32, 3.8
   print N32
   print "\n"
@@ -141,6 +121,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: I, PASM" );
+.pcc_sub :main main:
   set I32, 123
   print I32
   print "\n"
@@ -150,6 +131,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: P, PASM" );
+.pcc_sub :main main:
   new P32, 'String'
   set P32, "ok\n"
   print P32

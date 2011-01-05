@@ -1,5 +1,4 @@
 # Copyright (C) 2001-2003, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -15,6 +14,8 @@ Calculates all the prime numbers up to 50000 and prints out the number
 of primes, the last one found, and the time taken.
 
 =cut
+
+.pcc_sub :main main:
 
 # I1 holds the number we're currently checking for primality
 	set     I1, 1

@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -57,18 +56,16 @@ STDERR by default.
 	.local pmc output
 	.local pmc diag_output
 
-        .include 'stdio.pasm'
-
 	output = args['output']
 	unless null output goto CHECK_ERROR_OUTPUT
         $P0 = getinterp
-        output = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+        output = $P0.'stdout_handle'()
 
   CHECK_ERROR_OUTPUT:
 	diag_output = args['diag_output']
 	unless null diag_output goto SET_OUTPUT
         $P0 = getinterp
-        diag_output = $P0.'stdhandle'(.PIO_STDOUT_FILENO)
+        diag_output = $P0.'stdout_handle'()
 
   SET_OUTPUT:
 	setattribute self, "output", output
@@ -152,7 +149,7 @@ unescaped newlines.
 
 	.local string new_line
 	new_line = '# '
-	concat new_line, line
+	new_line = concat new_line, line
 	lines[i] = new_line
 
   LINE_OK:
@@ -161,7 +158,7 @@ unescaped newlines.
 	if i < num_lines goto LOOP
 
 	message = join '', lines
-	concat message, "\n"
+	message = concat message, "\n"
 
 	.return( message )
 .end
@@ -190,9 +187,7 @@ unescaped newlines.
 	first_char = substr message, 0, 1
 	if first_char == '#' goto WRITE_MESSAGE
 
-	first_char = '# '
-	concat first_char, message
-	message = first_char
+	message = concat '# ', message
 
   WRITE_MESSAGE:
 	.local pmc diag_output

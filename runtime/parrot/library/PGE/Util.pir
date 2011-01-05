@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2009, Parrot Foundation.
-# $Id$
 
 =head1 TITLE
 
@@ -38,6 +37,7 @@ of the match.
 .sub 'die'
     .param pmc mob                                 # match object
     .param pmc list            :slurpy             # message arguments
+    .param pmc dba             :slurpy :named
 
     .local pmc it
     .local string message
@@ -133,8 +133,7 @@ Emits the list of messages to stderr.
     message .= "\n"
   emit_message:
     $P0 = getinterp
-    .include 'stdio.pasm'
-    $P1 = $P0.'stdhandle'(.PIO_STDERR_FILENO)
+    $P1 = $P0.'stderr_handle'()
     $P1.'print'(message)
 
     mob.'to'(pos)
@@ -187,8 +186,6 @@ string is treated as '0'.
 
 Split the string where the regex matches, returning an array. Optionally limit
 the number of splits.
-
-=back
 
 =cut
 
@@ -247,6 +244,88 @@ split_end:
 end:
    .return (result)
 .end
+
+=item unique()
+
+Returns a unique integer on every call.
+
+=cut
+
+.sub '_unique' :anon :immediate
+    $P0 = new ['Integer'], 0
+    .return ($P0)
+.end
+
+.sub 'unique'
+    .param string fmt :optional
+    .const 'Sub' $P0 = '_unique'
+    $I0 = $P0
+    inc $P0
+    $S0 = $I0
+    $S0 = concat fmt, $S0
+    .return ($S0)
+.end
+
+=item pir_str_escape(string)
+
+Returns a PIR string for a given string contents.
+
+NOTE: this does B<NOT> securely escape strings.
+
+=cut
+
+.sub 'pir_str_escape'
+    .param string str
+
+    $S0 = escape str
+    $S0 = concat '"', $S0
+    $S0 = concat $S0, '"'
+
+    $I0 = index $S0, "\\x"
+    $I0 = $I0 == -1
+    $I1 = index $S0, "\\u"
+    $I1 = $I1 == -1
+    $I2 = and $I0, $I1
+    if $I2 goto done_unicode
+        $S0 = concat "unicode:", $S0
+    done_unicode:
+
+    .return ($S0)
+.end
+
+
+=item pir_key_escape(args)
+
+Constructs a PIR key using the strings passed as arguments.
+For example, C<pir_key_escape('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
+
+=cut
+
+.sub 'pir_key_escape'
+    .param pmc args :slurpy
+    .local pmc retv, it
+    .local string sep
+    retv = new 'StringBuilder'
+    it   = iter args
+    push retv, '['
+    sep = ''
+  loop:
+    unless it goto end_loop
+    push retv, sep
+    $S0 = shift it
+    $S0 = 'pir_str_escape'($S0)
+    push retv, $S0
+    sep = ';'
+    goto loop
+  end_loop:
+    push retv, ']'
+    .return (retv)
+.end
+
+=back
+
+=cut
+
 
 # Local Variables:
 #   mode: pir

@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -17,7 +16,7 @@ iterating over Hash. Just check that we create it.
 
 =cut
 
-.sub 'main'
+.sub 'main' :main
     .include 'test_more.pir'
 
     plan(6)

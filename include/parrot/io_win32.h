@@ -1,7 +1,5 @@
 /* io_win32.h
  *  Copyright (C) 2001-2003, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *      Parrot IO subsystem
  *  Data Structure and Algorithms:
@@ -28,6 +26,10 @@ INTVAL Parrot_io_close_win32(PARROT_INTERP, ARGMOD(PMC *filehandle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*filehandle);
+
+PARROT_WARN_UNUSED_RESULT
+PIOHANDLE Parrot_io_dup_win32(PARROT_INTERP, PIOHANDLE handle)
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -121,6 +123,8 @@ size_t Parrot_io_write_win32(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_close_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filehandle))
+#define ASSERT_ARGS_Parrot_io_dup_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_fdopen_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_flush_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -271,6 +275,7 @@ INTVAL Parrot_io_socket_win32(PARROT_INTERP,
     Parrot_io_fdopen_win32((interp), (pmc), (handle), (flags))
 #define PIO_OPEN_PIPE(interp, pmc, file, flags) \
     Parrot_io_open_pipe_win32((interp), (pmc), (file), (flags))
+#define PIO_DUP(interp, handle) Parrot_io_dup_win32((interp), (handle))
 #define PIO_CLOSE(interp, pmc) Parrot_io_close_win32((interp), (pmc))
 #define PIO_CLOSE_PIOHANDLE(interp, handle) Parrot_io_close_piohandle_win32((interp), (handle))
 #define PIO_IS_CLOSED(interp, pmc) Parrot_io_is_closed_win32((interp), (pmc))
@@ -308,5 +313,5 @@ INTVAL Parrot_io_socket_win32(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

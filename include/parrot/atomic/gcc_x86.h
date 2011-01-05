@@ -1,7 +1,5 @@
 /* atomic/gcc_x86.h
  *  Copyright (C) 2006-2008, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This header provides an implementation of atomic
  *     operations on x86 platforms with GCC-style
@@ -111,5 +109,5 @@ long parrot_i386_xadd(volatile long *l, long amount);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

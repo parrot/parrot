@@ -1,6 +1,5 @@
 #!perl
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
@@ -11,6 +10,9 @@ use Parrot::Test::Util 'create_tempfile';
 
 use Parrot::Test;
 use Parrot::Config;
+use File::Spec::Functions;
+
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
 plan tests => 18;
 
@@ -27,6 +29,7 @@ t/src/extend.t - Parrot Extension API
 Tests the extension API.
 
 =cut
+
 
 c_output_is( <<'CODE', <<'OUTPUT', 'set/get_intreg' );
 
@@ -676,7 +679,7 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_Interp   interp    = Parrot_new(NULL);
-    const char      *code      = ".sub foo\nprint\"Hello from foo!\\n\"\n.end\n";
+    const char      *code      = ".sub foo :main\nprint\"Hello from foo!\\n\"\n.end\n";
     Parrot_PMC      retval;
     Parrot_PMC      sub;
     Parrot_String   code_type, error, foo_name;
@@ -755,13 +758,13 @@ CODE
 Result is 300.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_new/Parrot_exit cycles' );
+c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_new/Parrot_x_exit cycles' );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-/* this is Parrot_exit without the exit()
+/* this is Parrot_x_exit without the exit()
  * it will call Parrot_really_destroy() as an exit handler
  */
 void interp_cleanup(Parrot_Interp, int);

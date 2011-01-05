@@ -1,5 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -30,7 +29,7 @@ sub _init {
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 CODA
     return \%data;
@@ -199,6 +198,7 @@ sub _set_implementations {
         hires_timer.c
         pid.c
         sysmem.c
+        uid.c
         /;
 
     my $plat_c = q{src/platform.c};

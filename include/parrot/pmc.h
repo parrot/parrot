@@ -1,7 +1,5 @@
 /* pmc.h
  *  Copyright (C) 2001-2007, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     This is the api header for the pmc subsystem
  *  Data Structure and Algorithms:
@@ -147,6 +145,24 @@ PMC * Parrot_pmc_reuse_init(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
+PARROT_HOT
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)
+        __attribute__nonnull__(1);
+
+PARROT_HOT
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_pmc_box_number(PARROT_INTERP, FLOATVAL value)
+        __attribute__nonnull__(1);
+
+PARROT_HOT
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_pmc_box_string(PARROT_INTERP, ARGIN_NULLOK(STRING *string))
+        __attribute__nonnull__(1);
+
 void Parrot_pmc_free_temporary(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -159,7 +175,9 @@ PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_pmc_new_temporary(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
-INTVAL Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
+INTVAL Parrot_pmc_type_does(PARROT_INTERP,
+    ARGIN(const STRING *role),
+    INTVAL type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -213,6 +231,12 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(init))
+#define ASSERT_ARGS_Parrot_pmc_box_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pmc_box_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pmc_box_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pmc_free_temporary __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -254,5 +278,5 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -292,6 +291,35 @@ Parrot_io_fdopen_win32(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
 
 /*
 
+=item C<PIOHANDLE Parrot_io_dup_win32(PARROT_INTERP, PIOHANDLE handle)>
+
+Duplicates file handle C<handle>.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PIOHANDLE
+Parrot_io_dup_win32(PARROT_INTERP, PIOHANDLE handle)
+{
+    ASSERT_ARGS(Parrot_io_dup_win32)
+    HANDLE current_process = GetCurrentProcess();
+    HANDLE new_handle      = INVALID_HANDLE_VALUE;
+
+    DuplicateHandle(current_process,
+        (HANDLE)handle,
+        current_process,
+        &new_handle,
+        0,
+        FALSE,
+        DUPLICATE_SAME_ACCESS);
+
+    return new_handle;
+}
+
+/*
+
 =item C<INTVAL Parrot_io_close_piohandle_win32(PARROT_INTERP, PIOHANDLE handle)>
 
 Calls C<CloseHandle()> to close the given file descriptor.  Returns 0 on
@@ -457,7 +485,7 @@ Parrot_io_read_win32(PARROT_INTERP,
                     (Parrot_io_get_flags(interp, filehandle) | PIO_F_EOF));
     }
     else {
-        /* FIXME : An error occured */
+        /* FIXME : An error occurred */
             Parrot_io_set_flags(interp, filehandle,
                     (Parrot_io_get_flags(interp, filehandle) | PIO_F_EOF));
     }
@@ -773,5 +801,5 @@ F<include/parrot/io_win32.h>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,5 +1,4 @@
 # Copyright (C) 2006-2008, Parrot Foundation.
-# $Id$
 
 .namespace ['CGI'; 'QueryHash']
 
@@ -70,8 +69,7 @@ Get parameters for POST method.
         content_length  = my_env['CONTENT_LENGTH']
         len             = content_length
         $P0             = getinterp
-        .include 'stdio.pasm'
-        in              = $P0.'stdhandle'(.PIO_STDIN_FILENO)
+        in              = $P0.'stdin_handle'()
         query           = in.'read'(len)
         in.'close'()
         #_dumper( query, 'queryPOST:' )
@@ -194,7 +192,7 @@ NOT_A_PLUS:
         goto INC_IN
 
 INC_IN:
-    concat out, char_out
+    out = concat out, char_out
     inc pos_in
     goto START
 

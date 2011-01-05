@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -94,28 +93,25 @@ void
 die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(die_from_exception)
-    /* Avoid anyhting that can throw if we are already throwing from
+    /* Avoid anything that can throw if we are already throwing from
      * a previous call to this function */
     static int already_dying = 0;
 
     STRING * const message     = already_dying ? STRINGNULL :
             VTABLE_get_string(interp, exception);
-    INTVAL         exit_status = 1;
     const INTVAL   severity    = already_dying ? EXCEPT_fatal :
             VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
 
-
-    if (already_dying) {
-        fflush(stderr);
-        fprintf(stderr, "\n***FATAL ERROR: "
-                "Exception thrown while dying from previous unhandled Exception\n");
-    }
+    if (already_dying)
+        Parrot_x_jump_out(interp, 1);
     else {
         /* In some cases we have a fatal exception before the IO system
          * is completely initialized. Do some attempt to output the
          * message to stderr, to help diagnosing. */
-        int use_perr = !PMC_IS_NULL(Parrot_io_STDERR(interp));
+        const int use_perr = !PMC_IS_NULL(Parrot_io_STDERR(interp));
         already_dying = 1;
+        interp->final_exception = exception;
+        interp->exit_code = 1;
 
         /* flush interpreter output to get things printed in order */
         if (!PMC_IS_NULL(Parrot_io_STDOUT(interp)))
@@ -124,36 +120,21 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
             Parrot_io_flush(interp, Parrot_io_STDERR(interp));
 
         if (interp->pdb) {
-            Interp * interpdeb = interp->pdb->debugger;
+            Interp * const interpdeb = interp->pdb->debugger;
             if (interpdeb) {
                 Parrot_io_flush(interpdeb, Parrot_io_STDOUT(interpdeb));
                 Parrot_io_flush(interpdeb, Parrot_io_STDERR(interpdeb));
             }
         }
 
-        if (STRING_length(message)) {
-            if (use_perr)
-                Parrot_io_eprintf(interp, "%S\n", message);
-            else {
-                char * const msg = Parrot_str_to_cstring(interp, message);
-                fflush(stderr);
-                fprintf(stderr, "\n%s\n", msg);
-                Parrot_str_free_cstring(msg);
-            }
 
-            /* caution against output swap (with PDB_backtrace) */
-            fflush(stderr);
-            PDB_backtrace(interp);
-        }
-        else if (severity == EXCEPT_exit) {
+        if (severity == EXCEPT_exit) {
             /* TODO: get exit status based on type */
-            exit_status = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "exit_code"));
+            interp->exit_code = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "exit_code"));
         }
-        else {
-            Parrot_io_eprintf(interp, "No exception handler and no message\n");
-            /* caution against output swap (with PDB_backtrace) */
-            fflush(stderr);
-            PDB_backtrace(interp);
+        else if (!STRING_length(message)) {
+            STRING * const newmessage = CONST_STRING(interp, "No exception handler and no message\n");
+            VTABLE_set_string_native(interp, exception, newmessage);
         }
 
     }
@@ -162,18 +143,14 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
      * returning NULL from here returns resume address NULL to the
      * runloop, which will terminate the thread function finally
      *
-     * TT #1287 this check should better be in Parrot_exit
+     * TT #1287 this check should better be in Parrot_x_exit
      */
 
     /* no exception handler, but this is not the main thread */
     if (interp->thread_data && interp->thread_data->tid)
         pt_thread_detach(interp->thread_data->tid);
 
-    /*
-     * only main should run the destroy functions - exit handler chain
-     * is freed during Parrot_exit
-     */
-    Parrot_exit(interp, exit_status);
+    Parrot_x_jump_out(interp, 1);
 }
 
 /*
@@ -357,19 +334,20 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(Parrot_ex_throw_from_c)
 
-    Parrot_runloop    *return_point = interp->current_runloop;
+    Parrot_runloop * const return_point = interp->current_runloop;
     opcode_t *address;
     PMC        * const handler      =
                              Parrot_cx_find_handler_local(interp, exception);
 
-    if (PMC_IS_NULL(handler))
+    if (PMC_IS_NULL(handler)) {
+        VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), CURRENT_CONTEXT(interp));
         die_from_exception(interp, exception);
+    }
 
     if (Interp_debug_TEST(interp, PARROT_BACKTRACE_DEBUG_FLAG)) {
         STRING * const exit_code = CONST_STRING(interp, "exit_code");
         STRING * const msg       = VTABLE_get_string(interp, exception);
-        int            exitcode  = VTABLE_get_integer_keyed_str(interp,
-                                        exception, exit_code);
+        const int exitcode       = VTABLE_get_integer_keyed_str(interp, exception, exit_code);
 
         Parrot_io_eprintf(interp,
             "Parrot_ex_throw_from_c (severity:%d error:%d): %Ss\n",
@@ -656,7 +634,7 @@ of the error would interfere with the exception system).
 This involves printing an error message to stderr, and calling C<exit> to exit
 the process with the given exitcode. It is not possible for Parrot bytecode to
 intercept a fatal error (for that, use C<Parrot_ex_throw_from_c_args>).
-C<exit_fatal> does not call C<Parrot_exit> to invoke exit handlers (that would
+C<exit_fatal> does not call C<Parrot_x_exit> to invoke exit handlers (that would
 require an interpreter).
 
 =cut
@@ -765,5 +743,5 @@ F<include/parrot/exceptions.h>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -1,7 +1,5 @@
 /* hash.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     Hashtable implementation
  */
@@ -88,8 +86,8 @@ struct _hash {
 
 #define parrot_hash_iterate_indexed(_hash, _code)                           \
 {                                                                           \
-    UINTVAL _loc;                                                           \
-    if ((_hash)->entries){                                                  \
+    if ((_hash)->entries) {                                                 \
+        UINTVAL _loc;                                                       \
         for (_loc = 0; _loc <= (_hash)->mask; ++_loc) {                     \
             HashBucket *_bucket = (_hash)->index[_loc];                     \
             while (_bucket) {                                               \
@@ -138,10 +136,11 @@ void parrot_hash_clone(PARROT_INTERP,
         FUNC_MODIFIES(*dest);
 
 PARROT_EXPORT
-void parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
+void parrot_hash_delete(PARROT_INTERP,
+    ARGMOD(Hash *hash),
+    ARGIN_NULLOK(void *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         FUNC_MODIFIES(*hash);
 
 PARROT_EXPORT
@@ -153,7 +152,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL parrot_hash_exists(PARROT_INTERP,
     ARGIN(const Hash *hash),
-    ARGIN(void *key))
+    ARGIN(const void *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -376,8 +375,7 @@ Hash * Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
     , PARROT_ASSERT_ARG(dest))
 #define ASSERT_ARGS_parrot_hash_delete __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(hash) \
-    , PARROT_ASSERT_ARG(key))
+    , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_parrot_hash_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
@@ -484,5 +482,5 @@ Hash * Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

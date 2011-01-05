@@ -1,14 +1,13 @@
 #!./parrot
 # Copyright (C) 2007-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
-t/oo/compositon.t - test role composition
+t/oo/composition.t - test role composition
 
 =head1 SYNOPSIS
 
-    % prove t/oo/compositon.t
+    % prove t/oo/composition.t
 
 =head1 DESCRIPTION
 
@@ -142,7 +141,7 @@ Tests role composition in the OO implementation.
   try:
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT)
-    set_addr eh, catch
+    set_label eh, catch
 
     push_eh eh
     $P2.'add_role'($P1)
@@ -172,7 +171,7 @@ Tests role composition in the OO implementation.
   try:
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT)
-    set_addr eh, catch
+    set_label eh, catch
 
     push_eh eh
     $P1.'add_role'($P0)
@@ -323,7 +322,7 @@ Tests role composition in the OO implementation.
   try:
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT)
-    set_addr eh, catch
+    set_label eh, catch
 
     push_eh eh
     BurninatorBoss.'add_role'(Burninator)

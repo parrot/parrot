@@ -77,7 +77,7 @@ By default, Parrot stores all subroutines in the namespace currently
 active at the point of their declaration. The C<:anon>X<:anon subroutine
 modifier> modifier tells Parrot not to store the subroutine in the
 namespace. The C<:nsentry>X<:nsentry subroutine modifier> modifier stores
-the subroutine in the currenly active namespace with a different name.
+the subroutine in the currently active namespace with a different name.
 For example, Parrot will store this subroutine in the current namespace
 as C<bar>, not C<foo>:
 

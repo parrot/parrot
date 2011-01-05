@@ -1,7 +1,5 @@
 /* exit.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *
  *  Data Structure and Algorithms:
@@ -30,19 +28,35 @@ typedef struct _handler_node_t {
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
-void Parrot_exit(PARROT_INTERP, int status)
+void Parrot_x_exit(PARROT_INTERP, int status)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_on_exit(PARROT_INTERP,
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+void Parrot_x_jump_out(PARROT_INTERP, int status)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+void Parrot_x_jump_out_error(PARROT_INTERP, int status)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_x_on_exit(PARROT_INTERP,
     ARGIN(exit_handler_f function),
     ARGIN_NULLOK(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_Parrot_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_x_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_on_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_x_jump_out __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_x_jump_out_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_x_on_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(function))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -54,5 +68,5 @@ void Parrot_on_exit(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

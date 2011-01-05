@@ -1,7 +1,5 @@
 /* pmc_freeze.h
  *  Copyright (C) 2001-2003, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *     PMC freeze and thaw interface
  *  Data Structure and Algorithms:
@@ -103,7 +101,7 @@ typedef enum {
  * public interfaces
  */
 
-/* HEADERIZER BEGIN: src/pmc_freeze.c */
+/* HEADERIZER BEGIN: src/packfile/object_serialization.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
@@ -143,12 +141,6 @@ UINTVAL Parrot_freeze_pbc_size(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-UINTVAL Parrot_freeze_size(PARROT_INTERP, ARGIN(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_freeze_strings(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
@@ -179,6 +171,10 @@ PMC* Parrot_thaw_pbc(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*cursor);
 
+void Parrot_pf_verify_image_string(PARROT_INTERP, ARGIN(STRING *image))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 void Parrot_visit_loop_thawfinish(PARROT_INTERP, ARGIN(PMC *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -202,9 +198,6 @@ void Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(pf))
-#define ASSERT_ARGS_Parrot_freeze_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_freeze_strings __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -218,6 +211,9 @@ void Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct) \
     , PARROT_ASSERT_ARG(cursor))
+#define ASSERT_ARGS_Parrot_pf_verify_image_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(image))
 #define ASSERT_ARGS_Parrot_visit_loop_thawfinish __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))
@@ -225,7 +221,7 @@ void Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/pmc_freeze.c */
+/* HEADERIZER END: src/packfile/object_serialization.c */
 
 #endif /* PARROT_PMC_FREEZE_H_GUARD */
 
@@ -233,5 +229,5 @@ void Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

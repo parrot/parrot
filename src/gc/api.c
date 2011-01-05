@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -105,6 +104,30 @@ implementation, and malloc wrappers for various purposes. These are unused.
 #if ! DISABLE_GC_DEBUG
 
 #endif
+
+/*
+
+=item C<void Parrot_gc_set_system_type(PARROT_INTERP, const char *name)>
+
+Sets the type specified by C<name> of garbage collector.
+
+=cut
+
+*/
+
+
+PARROT_EXPORT
+void
+Parrot_gc_set_system_type(PARROT_INTERP, ARGIN(const char *name))
+{
+    ASSERT_ARGS(Parrot_gc_set_system_type)
+    if (STREQ(name, "MS"))
+        interp->gc_sys->sys_type = MS;
+    if (STREQ(name, "MS2"))
+        interp->gc_sys->sys_type = MS2;
+    if (STREQ(name, "INF"))
+        interp->gc_sys->sys_type = INF;
+}
 
 /*
 
@@ -1030,5 +1053,5 @@ Initial version by Mike Lambert on 2002.05.27.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

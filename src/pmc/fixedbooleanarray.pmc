@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -32,6 +31,7 @@ Auxiliar function to avoid repeating the size evaluation.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_INLINE
+PARROT_CONST_FUNCTION
 static UINTVAL get_size_in_bytes(UINTVAL size);
 
 #define ASSERT_ARGS_get_size_in_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -39,6 +39,7 @@ static UINTVAL get_size_in_bytes(UINTVAL size);
 /* HEADERIZER END: static */
 
 PARROT_INLINE
+PARROT_CONST_FUNCTION
 static UINTVAL
 get_size_in_bytes(UINTVAL size)
 {
@@ -126,7 +127,7 @@ Creates and returns a copy of the array.
 */
 
     VTABLE PMC *clone() {
-        unsigned char * my_bit_array, * clone_bit_array;
+        unsigned char * my_bit_array;
         UINTVAL         resize_threshold, size;
         PMC *   const   dest   = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -135,6 +136,7 @@ Creates and returns a copy of the array.
         GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
 
         if (my_bit_array) {
+            unsigned char * clone_bit_array;
             const size_t size_in_bytes = get_size_in_bytes(resize_threshold);
 
             SET_ATTR_size(INTERP, dest, size);
@@ -273,13 +275,12 @@ Returns the Parrot string representation of the array.
 */
 
     VTABLE STRING *get_string() {
-        STRING *zero, *one;
         STRING *str   = STRINGNULL;
         UINTVAL i;
-        UINTVAL elems = SELF.elements();
+        const UINTVAL elems = SELF.elements();
 
-        zero = CONST_STRING(INTERP, "0");
-        one  = CONST_STRING(INTERP, "1");
+        STRING * const zero = CONST_STRING(INTERP, "0");
+        STRING * const one  = CONST_STRING(INTERP, "1");
 
         for (i = 0; i < elems; ++i) {
             if (SELF.get_integer_keyed_int((INTVAL)i))
@@ -559,8 +560,9 @@ Used to archive the string.
         GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
         GET_ATTR_bit_array(INTERP, SELF, bit_array);
 
-        s = Parrot_str_new(INTERP, (char*)bit_array,
-                (resize_threshold / BITS_PER_CHAR));
+        s = Parrot_str_new_init(INTERP, (char*)bit_array,
+                (resize_threshold / BITS_PER_CHAR),
+                Parrot_binary_encoding_ptr, 0);
 
         VTABLE_push_integer(INTERP, info, size);
         VTABLE_push_string(INTERP, info, s);
@@ -579,15 +581,19 @@ Used to unarchive the string.
         SUPER(info);
 
         {
-            const INTVAL    size      = VTABLE_shift_integer(INTERP, info);
-            STRING * const  s         = VTABLE_shift_string(INTERP, info);
+            const INTVAL    size          = VTABLE_shift_integer(INTERP, info);
+            STRING * const  s             = VTABLE_shift_string(INTERP, info);
+            const size_t    size_in_bytes = get_size_in_bytes(size);
+            unsigned char  *bit_array;
 
-            unsigned char * const bit_array = (unsigned char *)Parrot_str_to_cstring(INTERP, s);
-            const UINTVAL   threshold = Parrot_str_byte_length(INTERP, s) * BITS_PER_CHAR;
+            SELF.set_integer_native(size);
 
-            SET_ATTR_size(INTERP, SELF, size);
-            SET_ATTR_resize_threshold(INTERP, SELF, threshold);
-            SET_ATTR_bit_array(INTERP, SELF, bit_array);
+            if (s->bufused < size_in_bytes)
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_BAD_BUFFER_SIZE,
+                    "FixedBooleanArray: invalid buffer size during thaw");
+
+            GET_ATTR_bit_array(INTERP, SELF, bit_array);
+            memcpy(bit_array, s->strstart, size_in_bytes);
         }
     }
 
@@ -601,7 +607,7 @@ Used to unarchive the string.
 
 =item C<METHOD fill(INTVAL fill)>
 
-Sets all of the entires to true if fill is a true value, otherwise
+Sets all of the entries to true if fill is a true value, otherwise
 sets them all to false.
 
 =cut
@@ -638,5 +644,5 @@ F<docs/pdds/pdd17_basic_types.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

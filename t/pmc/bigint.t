@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -20,9 +19,18 @@ Tests the BigInt PMC.
 
     .include 'test_more.pir'
 
-    plan(36)
-    check_libgmp_good()
+    .local int num_tests
+    num_tests = 73
+    plan(num_tests)
 
+    .local int good
+    good = check_libgmp_good()
+    if good goto do_tests
+    skip(num_tests)
+    goto done
+
+  do_tests:
+    clear()
     set_and_get()
     addition()
     subtraction()
@@ -30,15 +38,19 @@ Tests the BigInt PMC.
     division()
     negation()
     division_by_zero()
+    floor_division()
     negate_min_integer()
     absolute_value()
     absolute_min_integer()
     overflow_coercion()
+    pow()
+    compare()
     interface()
     boolean()
     pi()
     bugfixes()
 
+  done:
 .end
 
 .include 'iglobals.pasm'
@@ -73,19 +85,23 @@ Tests the BigInt PMC.
 
 Config2:
     diag( 'Suitable GMP version [', $S3, '] available' )
-    goto ret
+    .return(1)
 
 NoLibGMP:
     diag( 'No BigInt Lib configured' )
-    skip(36)
-    exit 0
+    .return(0)
 
 OldLibGMP:
     diag( 'Buggy GMP version [', $S3, '] with huge digit multiply - please upgrade' )
-    skip(36)
-    exit 0
+    .return(0)
+.end
 
-ret:
+.sub clear
+    $P0 = new ['BigInt']
+    $P0 = 99999999
+    null $P0
+
+    sweep 1
 .end
 
 .sub set_and_get
@@ -154,6 +170,22 @@ OK7:
     say 'set_str/get_str 1230000000000'
 
 OK8:
+
+    $P0 = new ['BigInt']
+    $P0 = '12345678987654321'
+    $S0 = $P0[8]
+    eq $S0, '536705214244372261', OK9
+    $I1 = 0
+    say 'get_string_keyed 12345678987654321'
+
+OK9:
+
+    $P0[8] = '536705214244372261'
+    eq $P0, '12345678987654321', OK10
+    $I1 = 0
+    say 'set_string_keyed 536705214244372261'
+
+OK10:
     ok($I1, 'set and get combinations')
 .end
 
@@ -199,14 +231,89 @@ OK3:
 OK4:
     ok($I1, 'add(bigint,nativeint)')
 
+    $I1 = 1
+    $P0 = '12345678987654321'
+    $I0 = 12345
+    $P2 = add $P0, $I0
+    eq $P2, '12345678987666666', OK5
+    $I1 = 0
+    say 'add 12345678987654321+12345 wrong'
+OK5:
+    ok($I1, 'add(bigint,integer)')
+
+    $P0 = new ['BigInt']
+    $P0 = '12345678900000000'
+    $P1 = new ['BigInt']
+    $P1 = '87654321'
+    $P2 = new ['BigInt']
+    $P2 = '12345678987654321'
+    add $P0, $P1
+    eq $P0, $P2, OK6
+    $I1 = 0
+    say 'add 12345678900000000+87654321 wrong'
+OK6:
+    ok($I1, 'i_add(bigint,bigint)')
+
+    $P0 = '12345678900000000'
+    add $P0, 87654321
+    eq $P0, $P2, OK7
+    $I1 = 0
+    say 'add 12345678900000000+87654321 for nativeint wrong'
+OK7:
+    ok($I1, 'i_add(bigint,nativeint)')
+
+    $P0 = '12345678900000000'
+    $P1 = new ['Integer']
+    $P1 = 87654321
+    add $P0, $P1
+    eq $P0, $P2, OK8
+    $I1 = 0
+    say 'add 12345678900000000+87654321 for integer wrong'
+OK8:
+    ok($I1, 'i_add(bigint,integer)')
+
+    $P0 = '12345678900000000'
+    $P1 = new ['Float']
+    $P1 = 1.1
+    push_eh E1
+      add $P0, $P0, $P1
+      $I1 = 0
+      say 'Failed to throw exception'
+E1:
+    pop_eh
+    get_results '0', $P0
+    $S0 = $P0
+    eq $S0, "BigInt: no multiple dispatch variant 'add' for Float", OK9
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK9:
+    ok($I1, 'add(bigint,float) throws exception')
+    $I1 = 1
+
+    push_eh E2
+      add $P0, $P1
+      $I1 = 0
+      say 'Failed to throw exception'
+E2:
+    pop_eh
+    get_results '0', $P0
+    $S0 = $P0
+    eq $S0, "Multiple Dispatch: No suitable candidate found for 'i_add', with signature 'PP'", OK10
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK10:
+    ok($I1, 'i_add(bigint,float) throws exception')
+    $I1 = 1
 .end
 
 .sub subtraction
     $I1 = 1
     $P0 = new ['BigInt']
-    $P0 = 12345678
+    $P0 = '12345678'
     $P1 = new ['BigInt']
-    $P1 = 5678
+    $P1 = '5678'
     $P2 = new ['BigInt']
     $P2 = sub $P0, $P1
     $I0 = $P2
@@ -290,6 +397,44 @@ OK8:
     say 'sub 9876543219876543-44 wrong'
 OK9:
     ok($I1, 'sub(bigint,integer)')
+
+    $P0 = new ['BigInt']
+    $P0 = '12345678987654321'
+    $P1 = new ['BigInt']
+    $P1 = '123456789'
+    $P2 = new ['BigInt']
+    $P2 = '12345678864197532'
+    sub $P0, $P1
+    eq $P0, $P2, OK11
+    $I1 = 0
+    say 'i_sub 12345678987654321-123456789 is wrong'
+OK10:
+    ok($I1, 'i_sub(bigint,bigint)')
+    $P0 = '12345678987654321'
+    sub $P0, 123456789
+    eq $P0, $P2, OK11
+    $I1 = 0
+    say 'i_sub 12345678987654321-123456789 with nativeint is wrong'
+OK11:
+    ok($I1, 'i_sub(bigint,nativeint)')
+
+    $P0 = '12345678987654321'
+    $P1 = new ['Integer']
+    $P1 = 123456789
+    sub $P0, $P1
+    eq $P0, $P2, OK12
+    $I1 = 0
+    say 'i_sub 12345678987654321-123456789 with integer is wrong'
+OK12:
+    ok($I1, 'i_sub(bigint,integer)')
+
+    $P0 = '11111111111111111'
+    dec $P0
+    eq $P0, 11111111111111110, OK13
+    $I1 = 0
+    say 'decrement is wrong'
+OK13:
+    ok($I1, 'decrement')
 .end
 
 .sub multiplication
@@ -307,6 +452,66 @@ OK9:
     $P2 = new ['BigInt']
     $P2 = mul $P0, 1000000
     is($P2, '999999000000', 'mul(bigint,nativeint)')
+
+    $P0 = new ['BigInt']
+    $P0 = '999999'
+    $P1 = new ['Integer']
+    $P1 = 1000000
+    $P2 = new ['BigInt']
+    $P2 = mul $P0, $P1
+    $S0 = $P2
+    is($S0, '999999000000', 'mul(bigint,integer)')
+
+    $P1 = new ['BigInt']
+    $P1 = 1000000
+    mul $P0, $P1
+    is($P0, '999999000000', 'i_mul(bigint,bigint)')
+
+    $P0 = 999999
+    mul $P0, 1000000
+    is($P0, '999999000000', 'i_mul(bigint,nativeint)')
+
+    $P0 = 999999
+    $P1 = new ['Integer']
+    $P1 = 1000000
+    mul $P0, $P1
+    is($P0, '999999000000', 'i_mul(bigint,integer)')
+
+    $I1 = 1
+    $P0 = '12345678900000000'
+    $P1 = new ['Float']
+    $P1 = 1.1
+    push_eh E1
+      mul $P0, $P0, $P1
+      $I1 = 0
+      say 'Failed to throw exception'
+E1:
+    pop_eh
+    get_results '0', $P0
+    $S0 = $P0
+    eq $S0, "BigInt: no multiple dispatch variant 'multiply' for Float", OK1
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK1:
+    ok($I1, 'multiply(bigint,float) throws exception')
+    $I1 = 1
+
+    push_eh E2
+      mul $P0, $P1
+      $I1 = 0
+      say 'Failed to throw exception'
+E2:
+    pop_eh
+    get_results '0', $P0
+    $S0 = $P0
+    eq $S0, "Multiple Dispatch: No suitable candidate found for 'i_multiply', with signature 'PP'", OK2
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK2:
+    ok($I1, 'i_multiply(bigint,float) throws exception')
+    $I1 = 1
 .end
 
 .sub division
@@ -385,16 +590,129 @@ OK6:
 OK7:
 
     $P0 = '100000000000000'
-    $P4 = new ['Integer']
-    $P4 = 10000000
-    $P1 = div $P0, $P4
+    $I0 = 10000000
+    $P1 = div $P0, $I0
     $P2 = 10000000
     eq $P1, $P2, OK8
     $I1 = 0
     say 'div 100000000000000/10000000 wrong'
 OK8:
     ok($I1, 'div(bigint,integer)')
+    $I1 = 1
 
+    $P0 = '100000000000000'
+    $I0 = -10000000
+    $P1 = div $P0, $I0
+    $P2 = -10000000
+    eq $P1, $P2, OK9
+    $I1 = 0
+    say 'div 10000000000000/-10000000 wrong'
+OK9:
+    ok($I1, 'div(bigint,-integer)')
+    $I1 = 1
+
+    $P1 = new ['BigInt']
+    $P1 = 10000000
+    div $P0, $P1
+    eq $P0, 10000000, OK10
+    $I1 = 0
+    say 'div 10000000000000/10000000 wrong'
+OK10:
+    ok($I1, 'i_div(bigint,bigint)')
+    $I1 = 1
+
+    $P0 = 100000000000000
+    div $P0, 10000000
+    eq $P0, 10000000, OK11
+    $I1 = 0
+    say 'div 10000000000000/10000000 with nativeint wrong'
+OK11:
+    ok($I1, 'i_div(bigint,nativeint)')
+    $I1 = 1
+
+    $P0 = 100000000000000
+    $P1 = new ['Integer']
+    $P1 = 10000000
+    div $P0, $P1
+    eq $P0, 10000000, OK12
+    $I1 = 0
+    say 'div 10000000000000/10000000 with integer wrong'
+OK12:
+    ok($I1, 'i_div(bigint,integer)')
+    $I1 = 1
+
+    $P0 = new ['BigInt']
+    $P0 = '12345678987654321'
+    $P1 = new ['BigInt']
+    $P2 = '50'
+    $P1 = mod $P0, $P2
+    eq $P1, 21, OK13
+    $I1 = 0
+    say 'mod 12345678987654321%50 wrong'
+OK13:
+    ok($I1, 'mod(bigint,integer)')
+    $I1 = 1
+
+    $P2 = -50
+    $P1 = mod $P0, $P2
+    eq $P1, 21, OK14
+    $I1 = 0
+    say 'mod 12345678987654321%-50 wrong'
+OK14:
+    ok($I1, 'mod(bigint,-integer)')
+    $I1 = 1
+
+    $P0 = '12345678987654321'
+    $P1 = new ['BigInt']
+    $P1 = '50'
+    mod $P0, $P1
+    eq $P0, 21, OK15
+    $I1 = 0
+    say 'mod 12345678987654321%50 wrong'
+OK15:
+    ok($I1, 'i_mod(bigint,bigint)')
+    $I1 = 1
+
+    $P0 = '12345678987654321'
+    $P1 = new ['Integer']
+    $P1 = 50
+    mod $P0, $P1
+    eq $P0, 21, OK16
+    $I1 = 0
+    say 'mod 12345678987654321%50 with integer wrong'
+OK16:
+    ok($I1, 'i_mod(bigint,integer)')
+    $I1 = 1
+
+    $P2 = new ['String']
+    push_eh E1
+        $P1 = mod $P0, $P2
+        $I1 = 0
+        say 'Failed to throw exception'
+E1:
+    pop_eh
+    get_results '0', $S0
+    eq $S0, "BigInt: no multiple dispatch variant 'modulus' for String", OK17
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK17:
+    ok($I1, 'mod(bigint,string) throws exception')
+    $I1 = 1
+
+    push_eh E2
+        mod $P0, $P2
+        $I1 = 0
+        say 'Failed to throw exception'
+E2:
+    pop_eh
+    get_results '0', $S0
+    eq $S0, "BigInt: no multiple dispatch variant 'i_modulus' for String", OK18
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK18:
+    ok($I1, 'i_mod(bigint,string) throws exception')
 .end
 
 .sub division_by_zero
@@ -484,7 +802,73 @@ E4:
     say ' is wrong exception type'
 OK4:
     ok($I1, 'mod(bigint,integer 0) throws "Divide by zero" exception')
+    $I1 = 1
 
+.end
+
+.sub floor_division
+    $I1 = 1
+    $P0 = new ['BigInt']
+    $P1 = new ['BigInt']
+    $P2 = new ['BigInt']
+    $P0 = '12345678987654321'
+    $P1 = '987654321'
+    $P2 = fdiv $P0, $P1
+    eq $P2, 12499999, OK1
+    $I1 = 0
+    say 'fdiv 12345678987654321/987654321 is wrong'
+OK1:
+    ok($I1, 'fdiv(bigint,bigint)')
+    $I1 = 1
+
+    $P2 = fdiv $P0, 123456789
+    eq $P2, 100000000, OK2
+    $I1 = 0
+    say 'fdiv 12345678987654321/123456789 is wrong'
+OK2:
+    ok($I1, 'fdiv(bigint,nativeint)')
+    $I1 = 1
+
+    $P1 = new ['Integer']
+    $P1 = 123456789
+    $P2 = fdiv $P0, $P1
+    eq $P2, 100000000, OK3
+    $I1 = 0
+    say 'fdiv 12345678987654321/int 123456789 is wrong'
+OK3:
+   ok($I1, 'fdiv(bigint,integer)')
+   $I1 = 1
+
+   $P0 = '12345678987654321'
+   $P1 = new ['BigInt']
+   $P1 = '987654321'
+   fdiv $P0, $P1
+   eq $P0, 12499999, OK4
+   $I1 = 0
+   say 'fdiv 12345678987654321/987654321 is wrong'
+OK4:
+   ok($I1, 'i_fdiv(bigint,bigint)')
+   $I1 = 1
+
+   $P0 = '12345678987654321'
+   fdiv $P0, 987654321
+   eq $P0, 12499999, OK5
+   $I1 = 0
+   say 'fdiv 12345678987654321/987654321 with nativeint is wrong'
+OK5:
+   ok($I1, 'i_fdiv(bigint,nativeint)')
+   $I1 = 1
+
+   $P0 = '12345678987654321'
+   $P1 = new ['Integer']
+   $P1 = 987654321
+   fdiv $P0, $P1
+   eq $P0, 12499999, OK6
+   $I1 = 0
+   say 'fdiv 12345678987654321/987654321 with integer is wrong'
+OK6:
+   ok($I1, 'i_fdiv(bigint,integer)')
+   $I1 = 1
 .end
 
 .sub negation
@@ -821,6 +1205,68 @@ k27:
     $P1 = $I3
 
 ex:
+.end
+
+.sub pow
+    $I1 = 1
+    $P0 = new ['BigInt']
+    $P0 = '100000'
+    $P1 = new ['Integer']
+    $P1 = 2
+    $P3 = new ['BigInt']
+    $P3 = $P0.'pow'($P1)
+    eq $P3, 1e10, OK
+    $I1 = 0
+    say '1e10 to the power of 2 wrong'
+OK:
+    ok($I1, 'pow(bigint, integer)')
+    $I1 = 1
+    $P1 = new ['BigInt']
+    $P0 = '100000'
+    $P1 = '2'
+    $P3 = $P0.'pow'($P1)
+    eq $P3, 1e10, OK2
+    $I1 = 0
+    say '1e10 to the power of bigint 2 is wrong'
+OK2:
+    ok($I1, 'pow(bigint, bigint)')
+    $I1 = 1
+.end
+
+.sub compare
+    $P0 = new ['BigInt']
+    $P1 = new ['BigInt']
+    $P0 = '1000000000'
+    $P1 = '10000000000'
+    $I0 = cmp $P0, $P1
+    is($I0, -1, 'cmp(bigint,bigint)')
+
+    $P1 = new['Integer']
+    $P1 = 10000
+    $I0 = cmp $P0, $P1
+    is($I0, 1, 'cmp(bigint,int)')
+
+    $P2 = new ['Float']
+    $P2 = 10000
+    $I0 = cmp $P0, $P2
+    is($I0, 1, 'cmp(bigint,float)')
+
+    $I1 = 1
+    $P3 = new ['String']
+    $P2 = "10000"
+    push_eh E1
+        $I0 = cmp $P0, $P2
+        $I1 = 0
+        say 'Failed to throw exception'
+E1:
+    pop_eh
+    get_results '0', $S0
+    eq $S0, "BigInt: no multiple dispatch variant 'cmp' for String", OK1
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK1:
+    ok($I1, 'cmp(bigint,string) throws exception')
 .end
 
 .sub interface

@@ -1,5 +1,4 @@
 # Copyright (C) 2005-2009, Parrot Foundation.
-# $Id$
 
 =head1 Title
 
@@ -135,23 +134,23 @@ LOOP:
     if i >= j goto FIN
 
     eq tmp, "\\", ESC
-    concat ret, tmp
+    ret = concat ret, tmp
     goto LOOP
 
 ESC:
     substr tmp, str, i, 1
     inc i
     eq tmp, "n", LF
-    concat ret, tmp
+    ret = concat ret, tmp
     goto UNESC
 LF:
-    concat ret, "\n"
+    ret = concat ret, "\n"
 UNESC:
     if i >= j goto END
     goto LOOP
 
 FIN:
-    concat ret, tmp
+    ret = concat ret, tmp
 END:
     .return(ret)
 .end

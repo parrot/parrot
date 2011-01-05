@@ -1,6 +1,5 @@
 /*
 Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
 
 =head1 NAME
 
@@ -8,7 +7,8 @@ src/embed.c - The Parrot embedding interface
 
 =head1 DESCRIPTION
 
-This file implements the Parrot embedding interface.
+This file implements the old Parrot embedding interface.  Its days are
+numbered.  You probably want src/embed/api.c
 
 =head2 Functions
 
@@ -44,10 +44,6 @@ static void print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC* set_current_sub(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_CANNOT_RETURN_NULL
 static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -56,8 +52,6 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(output))
 #define ASSERT_ARGS_print_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_set_current_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_setup_argv __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -116,7 +110,7 @@ Parrot_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
 {
     ASSERT_ARGS(Parrot_init_stacktop)
     interp->lo_var_ptr = stack_top;
-    init_world_once(interp);
+    Parrot_gbl_init_world_once(interp);
 }
 
 
@@ -591,6 +585,9 @@ again:
 
 Loads the C<PackFile> returned by C<Parrot_pbc_read()>.
 
+TODO: We don't do any error or sanity checking here. The packfile pointer
+should be a valid packfile, not simply a non-null pointer
+
 =cut
 
 */
@@ -609,6 +606,31 @@ Parrot_pbc_load(PARROT_INTERP, ARGIN(Parrot_PackFile pf))
     interp->code       = pf->cur_cs;
 }
 
+/*
+
+=item C<int Parrot_load_bytecode_file(PARROT_INTERP, const char *filename)>
+
+Load a bytecode file into the interpreter by name. Returns C<0> on failure,
+Success otherwise. Writes error information to the interpreter's error file
+stream.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+int
+Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
+{
+    ASSERT_ARGS(Parrot_load_bytecode_file)
+    PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
+
+    Parrot_warn_experimental(interp, "Parrot_load_bytecode_file is experimental");
+    if (!pf)
+        return 0;
+    Parrot_pbc_load(interp, pf);
+    return 1;
+}
 
 /*
 
@@ -697,7 +719,7 @@ print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
 
 /*
 
-=item C<static PMC* set_current_sub(PARROT_INTERP)>
+=item C<PMC* set_current_sub(PARROT_INTERP)>
 
 Search the fixup table for a PMC matching the argument.  On a match,
 set up the appropriate context.
@@ -710,7 +732,7 @@ pointer to the PMC.
 */
 
 PARROT_CANNOT_RETURN_NULL
-static PMC*
+PMC*
 set_current_sub(PARROT_INTERP)
 {
     ASSERT_ARGS(set_current_sub)
@@ -748,7 +770,7 @@ set_current_sub(PARROT_INTERP)
     }
 
     /* If we didn't find anything, put a dummy PMC into current_sub.
-       The default values set by SUb.init are appropiate for the
+       The default values set by SUb.init are appropriate for the
        dummy, don't need additional settings. */
     new_sub_pmc = Parrot_pmc_new(interp, enum_class_Sub);
     Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), new_sub_pmc);
@@ -795,7 +817,7 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
      * If any profile information was gathered, print it out
      * before exiting, then print debug infos if turned on.
      */
-    Parrot_on_exit(interp, print_debug,   NULL);
+    Parrot_x_on_exit(interp, print_debug,   NULL);
 
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */
     main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
@@ -1128,6 +1150,31 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code)
     return NULL;
 }
 
+/*
+
+=item C<void Parrot_set_configuration_hash_legacy(PARROT_INTERP, const int
+length, const unsigned char *bytes)>
+
+Legacy function for setting the configuration hash as an array of bytes for
+the old API. New programs should not use this. They should use the new API and
+C<Parrot_api_set_configuration_hash>
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_set_configuration_hash_legacy(PARROT_INTERP, const int length,
+        ARGIN(const unsigned char *bytes))
+{
+    ASSERT_ARGS(Parrot_set_configuration_hash_legacy)
+    STRING * const fpmc_str = Parrot_str_new_init(interp, (const char *)bytes,
+        length, Parrot_binary_encoding_ptr, PObj_external_FLAG);
+    PMC * const pmc = Parrot_thaw(interp, fpmc_str);
+    Parrot_set_config_hash_pmc(interp, pmc);
+    Parrot_lib_update_paths_from_config_hash(interp);
+}
 
 /*
 
@@ -1145,5 +1192,5 @@ F<include/parrot/embed.h> and F<docs/embed.pod>.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

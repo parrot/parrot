@@ -1,5 +1,4 @@
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -408,7 +407,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
     content = ''
     if file == '' goto L8
     load_bytecode 'osutils.pbc'
-    content = slurp(file)
+    content = slurp(file, 'binary' :named('encoding'))
     $I0 = exists h['Content-Type']
     if $I0 goto L8
     h['Content-Type'] = 'application/octet-stream'

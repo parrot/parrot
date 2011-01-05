@@ -1,5 +1,4 @@
 # Copyright (C) 2002-2009, Parrot Foundation.
-# $Id$
 
 # ** string mode
 
@@ -40,7 +39,7 @@
     if $I0 > 0 goto _IO__INPUT_CHAR__SUBSTR
 
     $P1 = getinterp
-    $P1 = $P1.'stdhandle'(.PIO_STDIN_FILENO)
+    $P1 = $P1.'stdin_handle'()
     $S0 = $P1.'readline'()
     $S0 = chopn $S0, 1
 
@@ -73,7 +72,7 @@
     if len > 0 goto _IO__INPUT_INT__PARSE_INPUT
 
     $P1 = getinterp
-    $P1 = $P1.'stdhandle'(.PIO_STDIN_FILENO)
+    $P1 = $P1.'stdin_handle'()
     $S0 = $P1.'readline'()
     $S0 = chopn $S0, 1
     len = length $S0
@@ -87,7 +86,7 @@
     $S1 = substr $S0, i, 1
     if $S1 < '0' goto _IO__INPUT_INT__NAN
     if $S1 > '9' goto _IO__INPUT_INT__NAN
-    concat buf, $S1
+    buf = concat buf, $S1
     inc i
     if i < len goto _IO__INPUT_INT__NEXT_CHAR
 

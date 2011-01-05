@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2002-2009, Parrot Foundation.
- * $Id$
  */
 
 #ifndef PARROT_IMCC_DEBUG_H_GUARD
@@ -128,5 +127,5 @@ void IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

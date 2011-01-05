@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2002-2009, Parrot Foundation.
- * $Id$
  */
 
 #ifndef PARROT_IMCC_PARSER_H_GUARD
@@ -55,5 +54,5 @@ int at_eof(yyscan_t yyscanner);
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

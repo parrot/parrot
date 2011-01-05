@@ -1,7 +1,5 @@
 /* io_unix.h
  *  Copyright (C) 2001-2003, Parrot Foundation.
- *  SVN Info
- *     $Id$
  *  Overview:
  *      Parrot IO subsystem
  *  Data Structure and Algorithms:
@@ -283,6 +281,7 @@ INTVAL Parrot_io_socket_unix(PARROT_INTERP,
     Parrot_io_fdopen_unix((interp), (pmc), (handle), (flags))
 #define PIO_OPEN_PIPE(interp, pmc, file, flags) \
     Parrot_io_open_pipe_unix((interp), (pmc), (file), (flags))
+#define PIO_DUP(interp, handle) (PIOHANDLE)dup((int)(handle))
 #define PIO_CLOSE(interp, pmc) Parrot_io_close_unix((interp), (pmc))
 #define PIO_CLOSE_PIOHANDLE(interp, handle) Parrot_io_close_piohandle_unix((interp), (handle))
 #define PIO_IS_CLOSED(interp, pmc) Parrot_io_is_closed_unix((interp), (pmc))
@@ -320,5 +319,5 @@ INTVAL Parrot_io_socket_unix(PARROT_INTERP,
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
