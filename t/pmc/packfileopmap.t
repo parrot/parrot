@@ -93,8 +93,9 @@ Tests the PackfileOpMap PMC.
     ok(1, "load_lib works with 'core_ops' a second time")
 
     #not sure how to make this work
-    #($I0) = opmap.'load_lib'('math_ops')
-    #ok(1, "load_lib works with 'math_ops'")
+    $P0 = loadlib 'math_ops'
+    ($I0) = opmap.'load_lib'('math_ops')
+    ok(1, "load_lib works with 'math_ops'")
 .end
 
 

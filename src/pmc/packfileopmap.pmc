@@ -205,15 +205,11 @@ Ensure that an op library is loaded and accessible to this OpMap.
         /* create a new OpLib etc */
         lib_name_pmc = Parrot_pmc_new(INTERP, enum_class_String);
         VTABLE_set_string_native(INTERP, lib_name_pmc, lib_name);
+        /* OpLib.init will throw exception on failure */
         oplib = Parrot_pmc_new_init(INTERP, enum_class_OpLib, lib_name_pmc);
 
-        if (!VTABLE_get_bool(INTERP, oplib)) {
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_LIBRARY_ERROR,
-                    "Couldn't load op library '%Ss'.", lib_name);
-        }
-
         attrs = PMC_data_typed(SELF, Parrot_PackfileOpMap_attributes*);
-        
+
         lib_ops   = CONST_STRING(INTERP, "lib_ops");
         table_ops = CONST_STRING(INTERP, "table_ops");
         oplib_str = CONST_STRING(INTERP, "oplib");
