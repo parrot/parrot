@@ -26,8 +26,8 @@ lab:
 ex:
 .end
 .sub alligator
-    get_params "0", $P0
-    invokecc $P0
+    .param pmc foo
+    invokecc foo
 .end
 CODE
 Hi

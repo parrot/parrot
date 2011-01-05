@@ -48,9 +48,8 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
 .end
 
 .sub _funcall
-    .local pmc function
-    .local pmc argv
-    get_params "0,0x20", function, argv
+    .param pmc function
+    .param pmc argv :slurpy
     print "[doing _funcall]\n"
     $I33 = defined function
     if $I33 goto doit
@@ -64,9 +63,8 @@ doit:
 
 ## Return quotient and remainder as two integers.
 .sub _floor
-    .local pmc arg1
-    .local pmc arg2
-    get_params "0,0", arg1, arg2
+    .param pmc arg1
+    .param pmc arg2
     $P1 = new 'Integer'
     $P1 = arg1 / arg2
     ## truncate.
@@ -80,9 +78,8 @@ doit:
 
 ## Return the sum and the two arguments as three integers.
 .sub _fib_step
-    .local pmc arg1
-    .local pmc arg2
-    get_params "0,0", arg1, arg2
+    .param pmc arg1
+    .param pmc arg2
     $P1 = new 'Integer'
     $P1 = arg1 + arg2
     set_returns "0,0,0", $P1, arg1, arg2

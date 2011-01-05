@@ -121,10 +121,12 @@ test flags on PIR subs
 .end
 
 .sub 'xyz' :multi(Integer) :subid('above')
+    .param pmc lure
     .return('xyz above')
 .end
 
 .sub 'xyz' :multi(String) :subid('below')
+    .param pmc lure
     .return('xyz below')
 .end
 

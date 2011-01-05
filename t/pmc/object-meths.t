@@ -747,6 +747,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "method cache invalidation" );
     print o
 .end
 .sub ok2
+    .param pmc self
     .return("ok 2\n")
 .end
 .namespace [ "Foo" ]
@@ -1070,6 +1071,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "overloading find_method vtable" );
 .end
 
 .sub foo
+  .param pmc lure
   print "foo was called\n"
 .end
 

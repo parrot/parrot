@@ -1666,21 +1666,22 @@ ERROR:
 .end
 
 .sub _call_back
-  get_params "0,0", $P5, $P6
+  .param pmc arg1
+  .param pmc arg2
   print "in callback\n"
   print "user data: "
-  print $P5
+  print arg1
   print "\n"
 
-  # P6 is a UnManagedStruct PMC containing a pointer to an integer
+  # arg2 is a UnManagedStruct PMC containing a pointer to an integer
   new $P2, ['ResizablePMCArray']
   push $P2, .DATATYPE_INT
   push $P2, 0
   push $P2, 0
-  assign $P6, $P2
+  assign arg2, $P2
 
   # print referenced integer in libnci_test.so
-  $I17 = $P6[0]
+  $I17 = arg2[0]
   print "external data: "
   print $I17
   print "\n"

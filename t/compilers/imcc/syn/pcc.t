@@ -511,8 +511,13 @@ OUT
 
 my $too_many_args = <<'CODE';
 .sub main :main
+    push_eh eh
     'foo'(_ARGS_)
+    goto no_eh
+eh:
+    pop_eh
     say "didn't segfault"
+no_eh:
 .end
 
 .sub foo

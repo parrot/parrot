@@ -398,6 +398,8 @@ t_class_meth:
     ok($I0, 'add_vtable_override() with invalid name fails')
 .end
 .sub 'new_add_role'
+    .param pmc lure1
+    .param pmc lure2
     ok(1, 'overridden vtable method called')
 .end
 
@@ -817,10 +819,12 @@ t_class_meth:
 .end
 
 .sub 'foo1'
+    .param pmc self
     .return(1)
 .end
 
 .sub 'foo2'
+    .param pmc self
     .return(2)
 .end
 

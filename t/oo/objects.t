@@ -263,11 +263,13 @@ Tests the object/class subsystem.
 .end
 
 .sub sayFoo31
+    .param pmc self
     ok( 1, 'called method added before creating obj' )
 .end
 
 .namespace ['Bar31']
 .sub sayBar31
+    .param pmc self
     ok( 1, 'called method added after created obj' )
 .end
 
@@ -1638,38 +1640,40 @@ end:
 
 # set(obj: Pvalue, Iattr_idx)
 .sub Foo54__set
-    get_params "0,0", $P5, $S4
+    .param pmc arg1
+    .param string arg2
     ok( 1, "in Foo54__set" )
     interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
-    setattribute $P2, $S4, $P5
+    setattribute $P2, arg2, arg1
     set_returns ""
     returncc
 .end
 
 # Pattr = get(obj: Iattr_idx)
 .sub Foo54__get
-    get_params "0", $S4
+    .param string arg
     ok( 1, "in Foo54__get" )
     interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
-    getattribute $P5, $P2, $S4
+    getattribute $P5, $P2, arg
     set_returns "0", $P5
     returncc
 .end
 
 .sub Bar54__set
-    get_params "0,0", $P5, $S4
+    .param pmc arg1
+    .param string arg2
     interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
     ok( 1, "in Bar54__set" )
-    setattribute $P2, $S4, $P5
+    setattribute $P2, arg2, arg1
     set_returns ""
     returncc
 .end
 
 .sub Bar54__get
-    get_params "0", $S4
+    .param string arg
     ok( 1, "in Bar54__get" )
     interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
-    getattribute $P5, $P2, $S4
+    getattribute $P5, $P2, arg
     set_returns "0", $P5
     returncc
 .end
@@ -1757,18 +1761,21 @@ end:
 
 # set(obj: Pvalue, SClass, Sattr)
 .sub set
-    get_params "0,0,0", $P5, $S4, $S5
+    .param pmc value
+    .param string classname
+    .param string attrname
     interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
-    setattribute $P2, $S5, $P5
+    setattribute $P2, attrname, value
     set_returns ""
     returncc
 .end
 
 # Pattr = get(obj: SClass, Sattr)
 .sub get
-    get_params "0,0", $S4, $S5
+    .param string classname
+    .param string attrname
     interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
-    getattribute $P5, $P2, $S5
+    getattribute $P5, $P2, attrname
     set_returns "0", $P5
     returncc
 .end

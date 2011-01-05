@@ -46,12 +46,14 @@ Tests role composition in the OO implementation.
     .return('Snake!')
 .end
 .sub fire
+    .param pmc self
     .return("You're FIRED!")
 .end
 .sub fire2
     .return('BURNINATION!')
 .end
 .sub give_payrise
+    .param pmc self
     .return('You all get a pay rise of 0.0005%.')
 .end
 

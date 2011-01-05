@@ -267,8 +267,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "use it in PIR" );
     invokecc $P1
 .end
 .sub foo
-    get_params "0", $P0
-    print $P0
+    .param pmc arg
+    print arg
 .end
 CODE
 hello
@@ -341,8 +341,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "use it in PIR" );
     invokecc $P1
 .end
 .sub foo
-    get_params "0", $P0
-    print $P0
+    .param pmc arg
+    print arg
 .end
 CODE
 hello
@@ -358,14 +358,14 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - autobox" );
     invokecc $P1
 .end
 .sub foo
-    get_params "0x20", $P0
-    $S0 = $P0[0]
+    .param pmc slurpy_arg :slurpy
+    $S0 = slurpy_arg[0]
     print $S0
     print ' '
-    $S0 = $P0[1]
+    $S0 = slurpy_arg[1]
     print $S0
     print ' '
-    $S0 = $P0[2]
+    $S0 = slurpy_arg[2]
     print $S0
     print "\n"
 .end
@@ -419,14 +419,18 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - fetch" );
     invokecc $P10
 .end
 .sub foo
-    get_params "0,0,0,0", $P0, $I0, $S0, $N0
-    print $P0
+    .param pmc arg_pmc
+    .param int arg_int
+    .param string arg_str
+    .param num arg_num
+
+    print arg_pmc
     print ' '
-    print $I0
+    print arg_int
     print ' '
-    print $S0
+    print arg_str
     print ' '
-    print $N0
+    print arg_num
     print "\n"
     returncc
 .end
@@ -445,15 +449,16 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too few" );
     invokecc $P1
 .end
 .sub foo
-    get_params "0,0", $P0, $P1
+    .param pmc arg1
+    .param pmc arg2
     print $P0
 .end
 CODE
 /too few positional arguments/
 OUTPUT
 
-pir_output_like(
-    <<'CODE', <<'OUTPUT', "argc mismatch, too many - no getparams", todo => 'no get_params at all' );
+pir_error_output_like(
+    <<'CODE', <<'OUTPUT', "argc mismatch, too many - no getparams");
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
@@ -463,7 +468,7 @@ pir_output_like(
     print "nada"
 .end
 CODE
-/too many arguments passed/
+/too many positional arguments/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - force get_params" );
@@ -507,15 +512,9 @@ pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - catch exceptio
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     $P0 = new 'String'
     $P0 = "hello\n"
-    find_name $P1, "foo"
-    set_args "0,0", $P0, 77
-    invokecc $P1
-.end
-.sub foo
     push_eh arg_handler
-    get_params "0", $P0
-    print $P0
-    print "never\n"
+    foo($P0, 77)
+    goto no_eh
 arg_handler:
     get_results "0", $P1
     $S0 = $P1
@@ -524,6 +523,13 @@ arg_handler:
 #    $S1 = typeof $P1
 #    print "\nexception type: "
 #    print $S1
+no_eh:
+.end
+.sub foo
+    .param pmc arg
+    print arg
+    print "never\n"
+
 .end
 CODE
 /^caught: too many positional arguments/
@@ -540,9 +546,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "argc mismatch, optional" );
     invokecc $P1
 .end
 .sub foo
-    get_params "0,0x80,0x100", $P0, $P1, $I0
-    print $P0
-    if_null $P1, ok
+    .param pmc arg1
+    .param pmc arg2 :optional
+    .param int flag_arg2 :opt_flag
+    print arg1
+    if_null arg2, ok
     print "not "
 ok:
     print "ok\n"
@@ -646,9 +654,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 2 - pass arg" );
     tailcall b
 .end
 .sub bar
-    get_params "0", $S0
+    .param string arg
     print "bar\n"
-    print $S0
+    print arg
     set_returns "0", "bar_ret\n"
     returncc
 .end
@@ -675,9 +683,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 3 - pass arg" );
     tailcall b
 .end
 .sub bar
-    get_params "0", $S0
+    .param string arg
     print "bar\n"
-    print $S0
+    print arg
     set_returns "0", "bar_ret\n"
     returncc
 .end
@@ -717,8 +725,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "optional args" );
     invokecc $P1
 .end
 .sub foo
-    get_params "0x80, 0x100", $P1, $I0
-    unless_null $P1, ok
+    .param pmc arg :optional
+    .param int flag_arg :opt_flag
+    unless_null arg, ok
     print "not "
 ok:
     print "ok\n"
@@ -735,10 +744,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pir uses no ops" );
 .end
 
 .sub foo
-    get_params "0, 0", $I16, $I17
-    print $I16
+    .param int arg1
+    .param int arg2
+    print arg1
     print "\n"
-    print $I17
+    print arg2
     print "\n"
     set_returns ""
     returncc
@@ -808,30 +818,36 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - native" );
     foo_string(42, "42", 42.20)
 .end
 .sub foo_int
-    get_params "0,0,0", $I0, $I1, $I2
-    print $I0
+    .param int arg1
+    .param int arg2
+    .param int arg3
+    print arg1
     print ' '
-    print $I1
+    print arg2
     print ' '
-    print $I2
+    print arg3
     print "\n"
 .end
 .sub foo_float
-    get_params "0,0,0", $N0, $N1, $N2
-    print $N0
+    .param num arg1
+    .param num arg2
+    .param num arg3
+    print arg1
     print ' '
-    print $N1
+    print arg2
     print ' '
-    print $N2
+    print arg3
     print "\n"
 .end
 .sub foo_string
-    get_params "0,0,0", $S0, $S1, $S2
-    print $S0
+    .param string arg1
+    .param string arg2
+    .param string arg3
+    print arg1
     print ' '
-    print $S1
+    print arg2
     print ' '
-    print $S2
+    print arg3
     print "\n"
 .end
 CODE
@@ -1353,7 +1369,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall - overlapping Ix" );
     tailcall b
 .end
 .sub bar
-    get_params "0,0", $I0, $I1
+    .param int arg1
+    .param int arg2
+    $I0 = arg1
+    $I1 = arg2
     .return ($I0, $I1)
 .end
 CODE
@@ -2451,7 +2470,7 @@ CODE
 2
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "arg mismatch with no params", todo=> 'TT #1033' );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "arg mismatch with no params");
 .sub main :main
   foo(1)
 .end
@@ -2459,7 +2478,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "arg mismatch with no params", todo
 .sub foo
 .end
 CODE
-/too many arguments passed\(1\) - 0 params expected/
+/too many positional arguments: 1 passed, 0 expected/
 OUTPUT
 
 # See Rakudo queue http://rt.perl.org/rt3/Ticket/Display.html?id=62730

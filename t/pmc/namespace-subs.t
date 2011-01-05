@@ -148,12 +148,15 @@ specified behavior for :method, :vtable, :nsentry, and :anon.
 
 .namespace ['MultiSubTest']
 .sub 'multisubtest' :multi(int)
+    .param pmc lure
    .return("called int variant")
 .end
 .sub 'multisubtest' :multi(string)
+    .param pmc lure
    .return("called string variant")
 .end
 .sub 'multisubtest' :anon :multi(num)
+    .param pmc lure
    .return("called num variant")
 .end
 

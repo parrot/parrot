@@ -1025,11 +1025,14 @@ pir_output_is( <<'CODE', <<'OUTPUT', "multisub w/o .HLL" );
 .end
 
 .sub 'foo' :multi(Integer)
+    .param pmc lure
     print "foo(Integer)\n"
     .return (0)
 .end
 
 .sub 'foo' :multi(ResizablePMCArray, _)
+    .param pmc lure1
+    .param pmc lure2
     print "foo(ResizablePMCArray,_)\n"
     .return (0)
 .end
@@ -1053,11 +1056,14 @@ pir_output_is( <<'CODE', <<'OUTPUT', "multisub w/ .HLL, rt #39161" );
 .end
 
 .sub 'foo' :multi(Integer)
+    .param pmc lure
     print "foo(Integer)\n"
     .return (0)
 .end
 
 .sub 'foo' :multi(ResizablePMCArray, _)
+    .param pmc lure1
+    .param pmc lure2
     print "foo(ResizablePMCArray,_)\n"
     .return (0)
 .end
@@ -1089,10 +1095,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', "multisub w/ flatten" );
 .end
 
 .sub 'foo' :multi(Integer)
+    .param pmc lure
     print "foo(Integer)\n"
 .end
 
 .sub 'foo' :multi(String)
+    .param pmc lure
     print "foo(String)\n"
 .end
 CODE
@@ -1133,10 +1141,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', "keyed class name and multi" );
 .end
 
 .sub 'foo' :multi( [ 'Some'; 'Class' ])
+    .param pmc lure
     print "Called multi for class\n"
 .end
 
 .sub 'foo' :multi(_)
+    .param pmc lure
     print "Called wrong multi\n"
 .end
 CODE
@@ -1328,9 +1338,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "multi-dispatch on PMCNULL" );
     foo($P0)
 .end
 .sub foo :multi(String)
+    .param pmc lure
     say "string"
 .end
 .sub foo :multi(_)
+    .param pmc lure
     say "any"
 .end
 CODE
