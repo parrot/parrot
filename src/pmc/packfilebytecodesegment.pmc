@@ -212,11 +212,11 @@ bytecode segment.
 
 /*
 
+=back
+
+=head2 Packfile Interface Methods 
+
 =over 4
-
-=item Packfile Interface Methods 
-
-=back 4
 
 =item C<STRING *pack()>
 
