@@ -1532,12 +1532,14 @@ Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP,
         return;
     else {
         /* Broke encapuslation. Direct poking into CallContext is much faster */
-        PMC * return_flags;
+        PMC * temp;
 
         /* Store raw signature */
-        GETATTR_CallContext_return_flags(interp, parent, return_flags);
-        SETATTR_CallContext_return_flags(interp, tailcall, return_flags);
+        GETATTR_CallContext_return_flags(interp, parent, temp);
+        SETATTR_CallContext_return_flags(interp, tailcall, temp);
 
+        GETATTR_CallContext_current_cont(interp, parent, temp);
+        SETATTR_CallContext_current_cont(interp, tailcall, temp);
     }
 }
 

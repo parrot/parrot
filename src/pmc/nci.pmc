@@ -255,8 +255,20 @@ class, the PMC arguments are shifted down.
 
         GET_ATTR_fb_info(INTERP, SELF, fb_info);
 
-        func(INTERP, SELF, fb_info);
         cont = INTERP->current_cont;
+        func(INTERP, SELF, fb_info);
+
+        /* We've cached the old value of the return continuation. The function
+           might change this, but that is not likely. IF the function does
+           change the return continuation value to something valid, we can use
+           it. */
+        {
+            PMC * const new_cont = INTERP->current_cont;
+            if (new_cont != cont) {
+                if (new_cont != NEED_CONTINUATION)
+                    cont = new_cont;
+            }
+        }
 
         /*
          * If the NCI function was tailcalled, the return result
