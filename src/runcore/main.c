@@ -342,11 +342,11 @@ parrot_hash_oplib(PARROT_INTERP, ARGIN(op_lib_t *lib))
 
     for (i = 0; i < lib->op_count; i++) {
         op_info_t *op = &lib->op_info_table[i];
-        Parrot_hsh_put(interp, interp->op_hash, (void *)op->full_name,
+        Parrot_hash_put(interp, interp->op_hash, (void *)op->full_name,
                                                  (void *)op);
 
-        if (!Parrot_hsh_exists(interp, interp->op_hash, (void *)op->name))
-            Parrot_hsh_put(interp, interp->op_hash, (void *)op->name,
+        if (!Parrot_hash_exists(interp, interp->op_hash, (void *)op->name))
+            Parrot_hash_put(interp, interp->op_hash, (void *)op->name,
                                                      (void *)op);
     }
 }

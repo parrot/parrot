@@ -293,9 +293,9 @@ add_multi_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
 
                 GETATTR_NameSpace_hash(interp, SELF, hash);
 
-                Parrot_hsh_put(interp, hash,
-                    Parrot_hsh_key_from_string(interp, hash, key),
-                    Parrot_hsh_value_from_pmc(interp, hash, value));
+                Parrot_hash_put(interp, hash,
+                    Parrot_hash_key_from_string(interp, hash, key),
+                    Parrot_hash_value_from_pmc(interp, hash, value));
             }
         }
     }
@@ -345,7 +345,7 @@ Initialize a C<NameSpace> PMC.
         PARROT_NAMESPACE(SELF)->vtable  = PMCNULL;
         PARROT_NAMESPACE(SELF)->methods = PMCNULL;
         PARROT_NAMESPACE(SELF)->_class  = PMCNULL;
-        SELF.set_pointer(Parrot_hsh_new_hash(INTERP));
+        SELF.set_pointer(Parrot_hash_new_hash(INTERP));
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -362,7 +362,7 @@ Marks the namespace as live.
         Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
 
         if (nsinfo->hash)
-            Parrot_hsh_mark_hash(INTERP, nsinfo->hash);
+            Parrot_hash_mark_hash(INTERP, nsinfo->hash);
 
         Parrot_gc_mark_PMC_alive(INTERP, nsinfo->parent);
         Parrot_gc_mark_PMC_alive(INTERP, nsinfo->_class);
@@ -437,7 +437,7 @@ really a public API.
         /* If it's a multi-sub and the first in this NS... */
         add_multi_to_namespace(INTERP, SELF, key, value);
 
-        old = (PMC *)Parrot_hsh_get(INTERP, (Hash *)SELF.get_pointer(), key);
+        old = (PMC *)Parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
 
         if (!old)
             SUPER(key, value);
@@ -475,7 +475,7 @@ really a public API.
                 VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_var_sub,
                                          old);
 
-                Parrot_hsh_put(INTERP, (Hash *)SELF.get_pointer(), key, new_tuple);
+                Parrot_hash_put(INTERP, (Hash *)SELF.get_pointer(), key, new_tuple);
                 /* distinction from a plain FPA, which doesn't extend the
                  * namespace storage */
             }
@@ -483,7 +483,7 @@ really a public API.
         else if (new_tuple) {
             VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_ns, old);
             VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_var_sub, value);
-            Parrot_hsh_put(INTERP, (Hash *)SELF.get_pointer(), key, new_tuple);
+            Parrot_hash_put(INTERP, (Hash *)SELF.get_pointer(), key, new_tuple);
         }
     }
 
@@ -530,7 +530,7 @@ really a public API.
 
     VTABLE PMC *get_pmc_keyed_str(STRING *key) {
         Hash * const hash = (Hash *)SELF.get_pointer();
-        PMC *ns = (PMC *)Parrot_hsh_get(INTERP, hash, key);
+        PMC *ns = (PMC *)Parrot_hash_get(INTERP, hash, key);
 
         if (!ns)
             return PMCNULL;
@@ -619,7 +619,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
 */
 
     VTABLE void *get_pointer_keyed_str(STRING *key) {
-        PMC *ns = (PMC *)Parrot_hsh_get(INTERP, (Hash *)SELF.get_pointer(), key);
+        PMC *ns = (PMC *)Parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
 
         /* Be extra careful about returning PMCNULL */
         if (! PMC_IS_NULL(ns)) {
@@ -884,7 +884,7 @@ Return the namespace with the given name.
 
     METHOD find_namespace(STRING *key) {
         STRING * const s_ns = CONST_STRING(INTERP, "NameSpace");
-        PMC    * const ns   = (PMC *)Parrot_hsh_get(INTERP, (Hash *)SELF.get_pointer(),
+        PMC    * const ns   = (PMC *)Parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(),
                                                      key);
 
         if (!ns)
@@ -909,7 +909,7 @@ Return the Sub PMC with the given name.
 
     METHOD find_sub(STRING *key) {
         STRING * const s_sub = CONST_STRING(INTERP, "Sub");
-        PMC    * const sub   = (PMC *)Parrot_hsh_get(INTERP, (Hash *)SELF.get_pointer(),
+        PMC    * const sub   = (PMC *)Parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(),
                                                       key);
 
         if (!sub)
@@ -933,7 +933,7 @@ Return the PMC with the given name.
 */
 
     METHOD find_var(STRING *key) {
-        PMC * const val = (PMC *)Parrot_hsh_get(INTERP, (Hash *)SELF.get_pointer(), key);
+        PMC * const val = (PMC *)Parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
 
         if (!val)
             RETURN(PMC *PMCNULL);
@@ -955,7 +955,7 @@ does not delete the PMC.
 
     METHOD del_namespace(STRING *name) {
         Hash   * const hash = (Hash *)SELF.get_pointer();
-        PMC    * const ns   = (PMC *)Parrot_hsh_get(INTERP, hash, name);
+        PMC    * const ns   = (PMC *)Parrot_hash_get(INTERP, hash, name);
         STRING * const s_ns = CONST_STRING(INTERP, "NameSpace");
 
         if (PMC_IS_NULL(ns))
@@ -966,7 +966,7 @@ does not delete the PMC.
                 "Invalid type %d for '%Ss' in del_namespace()",
                 ns->vtable->base_type, name);
 
-        Parrot_hsh_delete(INTERP, hash, name);
+        Parrot_hash_delete(INTERP, hash, name);
     }
 
 /*
@@ -983,7 +983,7 @@ delete the PMC.
 
     METHOD del_sub(STRING *name) {
         Hash   * const hash  = (Hash *)SELF.get_pointer();
-        PMC    * const sub   = (PMC *)Parrot_hsh_get(INTERP, hash, name);
+        PMC    * const sub   = (PMC *)Parrot_hash_get(INTERP, hash, name);
         STRING * const s_sub = CONST_STRING(INTERP, "Sub");
 
         if (PMC_IS_NULL(sub))
@@ -994,7 +994,7 @@ delete the PMC.
                 "Invalid type %d for '%Ss' in del_sub()",
                 sub->vtable->base_type, name);
 
-        Parrot_hsh_delete(INTERP, hash, name);
+        Parrot_hash_delete(INTERP, hash, name);
     }
 
 /*
@@ -1008,7 +1008,7 @@ Deletes the contained variable-like PMC with the given name.
 */
 
     METHOD del_var(STRING *name) {
-        Parrot_hsh_delete(INTERP, (Hash *)SELF.get_pointer(), name);
+        Parrot_hash_delete(INTERP, (Hash *)SELF.get_pointer(), name);
     }
 
 /*
@@ -1023,7 +1023,7 @@ to retrieve symbols, if a NameSpace with the same name exists.
 */
 
     METHOD get_sym(STRING *key) {
-        PMC *ns = (PMC *)Parrot_hsh_get(INTERP, (Hash *)SELF.get_pointer(), key);
+        PMC *ns = (PMC *)Parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
 
         if (!ns)
             RETURN(PMC *PMCNULL);

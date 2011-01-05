@@ -233,8 +233,8 @@ key_2_idx(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *key))
         if (types->vtable->base_type == enum_class_OrderedHash) {
             Hash       * const hash = (Hash *)VTABLE_get_pointer(interp,
                     VTABLE_get_pmc(interp, types));
-            HashBucket * const b    = Parrot_hsh_get_bucket(interp, hash,
-                    Parrot_hsh_key_from_string(interp, hash, VTABLE_get_string(interp, key)));
+            HashBucket * const b    = Parrot_hash_get_bucket(interp, hash,
+                    Parrot_hash_key_from_string(interp, hash, VTABLE_get_string(interp, key)));
 
             if (!b)
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,

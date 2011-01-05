@@ -51,7 +51,7 @@ Initializes the PMC.
 
         PARROT_IMAGEIOSIZE(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
         VTABLE_set_pointer(INTERP, PARROT_IMAGEIOSIZE(SELF)->seen,
-            Parrot_hsh_new_intval_hash(INTERP));
+            Parrot_hash_new_intval_hash(INTERP));
 
         PObj_flag_CLEAR(private1, SELF);
 
@@ -76,7 +76,7 @@ Initializes the PMC with a pre-existing C<PackFile_ConstTable>.
 
         PARROT_IMAGEIOSIZE(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
         VTABLE_set_pointer(INTERP, PARROT_IMAGEIOSIZE(SELF)->seen,
-            Parrot_hsh_new_intval_hash(INTERP));
+            Parrot_hash_new_intval_hash(INTERP));
 
         PObj_flag_SET(private1, SELF);
 
@@ -243,7 +243,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
 
         if (!PMC_IS_NULL(v)) {
             Hash * const hash = (Hash *)VTABLE_get_pointer(INTERP, PARROT_IMAGEIOSIZE(SELF)->seen);
-            HashBucket * const b = Parrot_hsh_get_bucket(INTERP, hash, v);
+            HashBucket * const b = Parrot_hash_get_bucket(INTERP, hash, v);
             is_new = !b;
         }
 
@@ -252,7 +252,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
         if (is_new) {
             Hash * const hash = (Hash *)VTABLE_get_pointer(INTERP, PARROT_IMAGEIOSIZE(SELF)->seen);
 
-            Parrot_hsh_put(INTERP, hash, v, v);
+            Parrot_hash_put(INTERP, hash, v, v);
 
             VTABLE_push_integer(INTERP, SELF, v->vtable->base_type);
             VTABLE_push_pmc(INTERP, PARROT_IMAGEIOSIZE(SELF)->todo, v);

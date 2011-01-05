@@ -3348,11 +3348,11 @@ find_constants(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct))
         PARROT_ASSERT(interp->thread_data);
 
         if (!interp->thread_data->const_tables) {
-            interp->thread_data->const_tables = Parrot_hsh_new_pointer_hash(interp);
+            interp->thread_data->const_tables = Parrot_hash_new_pointer_hash(interp);
         }
 
         tables = interp->thread_data->const_tables;
-        new_ct = (PackFile_ConstTable *)Parrot_hsh_get(interp, tables, ct);
+        new_ct = (PackFile_ConstTable *)Parrot_hash_get(interp, tables, ct);
 
         if (!new_ct) {
             /* need to construct it */
@@ -3381,7 +3381,7 @@ find_constants(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct))
             for (i = 0; i < new_ct->pmc.const_count; ++i)
                 clone_constant(interp, &new_ct->pmc.constants[i]);
 
-            Parrot_hsh_put(interp, tables, ct, new_ct);
+            Parrot_hash_put(interp, tables, ct, new_ct);
         }
 
         return new_ct;
@@ -3420,7 +3420,7 @@ Parrot_destroy_constants(PARROT_INTERP)
         PackFile_ConstTable * const ct        = (PackFile_ConstTable *)_bucket->value;
         PackFile_ConstTable_clear(interp, ct);
         mem_gc_free(interp, ct););
-    Parrot_hsh_destroy(interp, hash);
+    Parrot_hash_destroy(interp, hash);
 }
 
 /*
@@ -3462,7 +3462,7 @@ PackFile_ConstTable_clear(PARROT_INTERP, ARGMOD(PackFile_ConstTable *self))
     }
 
     if (self->string_hash) {
-        Parrot_hsh_destroy(interp, self->string_hash);
+        Parrot_hash_destroy(interp, self->string_hash);
         self->string_hash = NULL;
     }
 

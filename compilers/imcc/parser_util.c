@@ -210,7 +210,7 @@ check_op(PARROT_INTERP, ARGOUT(op_info_t **op_info), ARGOUT(char *fullname),
 {
     ASSERT_ARGS(check_op)
     op_fullname(fullname, name, r, narg, keyvec);
-    *op_info = (op_info_t *)Parrot_hsh_get(interp, interp->op_hash, fullname);
+    *op_info = (op_info_t *)Parrot_hash_get(interp, interp->op_hash, fullname);
     if (*op_info && !STREQ((*op_info)->full_name, fullname))
         *op_info = NULL;
 }
@@ -230,7 +230,7 @@ int
 is_op(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(is_op)
-    return Parrot_hsh_exists(interp, interp->op_hash, (void *)name);
+    return Parrot_hash_exists(interp, interp->op_hash, (void *)name);
 }
 
 /*
@@ -272,7 +272,7 @@ var_arg_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     }
 
     op_fullname(fullname, name, r, 1, 0);
-    op = (op_info_t *)Parrot_hsh_get(interp, interp->op_hash, fullname);
+    op = (op_info_t *)Parrot_hash_get(interp, interp->op_hash, fullname);
 
     PARROT_ASSERT(op && STREQ(op->full_name, fullname));
 
@@ -336,13 +336,13 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         char fullname[64] = "", format[128] = "";
 
         op_fullname(fullname, name, r, n, keyvec);
-        op = (op_info_t *)Parrot_hsh_get(interp, interp->op_hash, fullname);
+        op = (op_info_t *)Parrot_hash_get(interp, interp->op_hash, fullname);
         if (op && !STREQ(op->full_name, fullname))
             op = NULL;
 
         /* maybe we have a fullname */
         if (!op) {
-            op = (op_info_t *)Parrot_hsh_get(interp, interp->op_hash, name);
+            op = (op_info_t *)Parrot_hash_get(interp, interp->op_hash, name);
             if (op && !STREQ(op->full_name, name))
                 op = NULL;
         }
@@ -353,7 +353,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
             if (n_name) {
                 name = n_name;
                 op_fullname(fullname, name, r, n, keyvec);
-                op = (op_info_t *)Parrot_hsh_get(interp, interp->op_hash, fullname);
+                op = (op_info_t *)Parrot_hash_get(interp, interp->op_hash, fullname);
                 if (op && !STREQ(op->full_name, fullname))
                     op = NULL;
             }
@@ -1047,7 +1047,7 @@ try_find_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     if (changed) {
         op_info_t *op;
         op_fullname(fullname, name, r, n, keyvec);
-        op = (op_info_t *)Parrot_hsh_get(interp, interp->op_hash, fullname);
+        op = (op_info_t *)Parrot_hash_get(interp, interp->op_hash, fullname);
         if (op && !STREQ(op->full_name, fullname))
             op = NULL;
         return op;
@@ -1151,7 +1151,7 @@ imcc_init(PARROT_INTERP)
 
 =item C<static void imcc_destroy_macro_values(void *value)>
 
-A callback for Parrot_hsh_chash_destroy_values() to free all macro-allocated memory.
+A callback for Parrot_hash_chash_destroy_values() to free all macro-allocated memory.
 
 =cut
 
@@ -1194,7 +1194,7 @@ imcc_destroy(PARROT_INTERP)
     Hash * const macros = IMCC_INFO(interp)->macros;
 
     if (macros)
-        Parrot_hsh_chash_destroy_values(interp, macros, imcc_destroy_macro_values);
+        Parrot_hash_chash_destroy_values(interp, macros, imcc_destroy_macro_values);
 
     if (IMCC_INFO(interp)->globals)
         mem_sys_free(IMCC_INFO(interp)->globals);

@@ -262,7 +262,7 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     runcore->profiling_flags = 0;
     runcore->runloop_count   = 0;
     runcore->time_size       = 32;
-    runcore->line_cache      = Parrot_hsh_new_pointer_hash(interp);
+    runcore->line_cache      = Parrot_hash_new_pointer_hash(interp);
     runcore->time            = mem_gc_allocate_n_typed(interp, runcore->time_size,
                                                     UHUGEINTVAL);
 
@@ -524,15 +524,15 @@ ARGIN(PMC *ctx_pmc))
 
     Parrot_Context *ctx = PMC_data_typed(ctx_pmc, Parrot_Context *);
 
-    INTVAL line_num = Parrot_hsh_value_to_int(interp, runcore->line_cache,
-            Parrot_hsh_get(interp, runcore->line_cache, ctx->current_pc));
+    INTVAL line_num = Parrot_hash_value_to_int(interp, runcore->line_cache,
+            Parrot_hash_get(interp, runcore->line_cache, ctx->current_pc));
 
     /* Parrot_Sub_get_line_from_pc eats up about 20-30% of execution time
      * *with* this cache in place. */
     if (line_num == 0) {
         line_num = Parrot_Sub_get_line_from_pc(interp,
                 Parrot_pcc_get_sub(interp, ctx_pmc), ctx->current_pc);
-        Parrot_hsh_put(interp, runcore->line_cache, ctx->current_pc, (void *) line_num);
+        Parrot_hash_put(interp, runcore->line_cache, ctx->current_pc, (void *) line_num);
     }
     return line_num;
 }
@@ -918,7 +918,7 @@ destroy_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore)
         "output from this file.\n", filename_cstr);
 
     Parrot_str_free_cstring(filename_cstr);
-    Parrot_hsh_destroy(interp, runcore->line_cache);
+    Parrot_hash_destroy(interp, runcore->line_cache);
 
     if (runcore->output_fn != record_values_none)
         fclose(runcore->profile_fd);

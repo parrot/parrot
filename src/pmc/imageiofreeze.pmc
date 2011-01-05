@@ -241,7 +241,7 @@ Initializes the PMC.
     VTABLE void init() {
         PARROT_IMAGEIOFREEZE(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
         VTABLE_set_pointer(INTERP, PARROT_IMAGEIOFREEZE(SELF)->seen,
-            Parrot_hsh_new_intval_hash(INTERP));
+            Parrot_hash_new_intval_hash(INTERP));
 
         PARROT_IMAGEIOFREEZE(SELF)->todo =
             Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
@@ -430,7 +430,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
         else {
             Hash * const hash = (Hash *)VTABLE_get_pointer(INTERP,
                     PARROT_IMAGEIOFREEZE(SELF)->seen);
-            HashBucket * const b = Parrot_hsh_get_bucket(INTERP, hash, v);
+            HashBucket * const b = Parrot_hash_get_bucket(INTERP, hash, v);
 
             if (b) {
                 id = (UINTVAL)b->value;
@@ -456,7 +456,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
                     ? (INTVAL) enum_class_Object
                     : v->vtable->base_type);
 
-            Parrot_hsh_put(INTERP, hash, v, (void *)id);
+            Parrot_hash_put(INTERP, hash, v, (void *)id);
             VTABLE_push_pmc(INTERP, PARROT_IMAGEIOFREEZE(SELF)->todo, v);
         }
     }
