@@ -126,7 +126,9 @@ already in the map, a new map will be created.
             VTABLE_push_integer(INTERP, table_ops, op_count);
             VTABLE_push_integer(INTERP, lib_ops, op_num);
 
-            return op_num;
+            SET_ATTR_op_count(INTERP, SELF, op_count + 1);
+
+            return op_count;
         }
         return -1;
     }
