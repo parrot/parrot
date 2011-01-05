@@ -109,9 +109,9 @@ already in the map, a new map will be created.
             PMC *oplib  = VTABLE_get_pmc_keyed_str(INTERP, op_map, oplib_str);
             INTVAL op_num = VTABLE_get_integer_keyed(INTERP, oplib, key);
 
+            /* Not in this oplib */
             if (op_num == -1) {
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                        "Couldn't find '%Ss' op.", key_str);
+                continue;
             }
 
             table_ops_str = CONST_STRING(INTERP, "table_ops");
@@ -130,6 +130,9 @@ already in the map, a new map will be created.
 
             return op_count;
         }
+
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                        "Couldn't find '%Ss' op.", key_str);
         return -1;
     }
 
