@@ -195,41 +195,6 @@ Destroy anything in this segment that need destroying.
 
 /*
 
-=back
-
-=head2 Packfile Interface Methods
-
-=over 4
-
-=item C<STRING *pack()>
-
-Serialize the segment.
-
-=cut
-
-*/
-    METHOD pack() {
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
-                                    "PackfileBytecodeSegment.pack() not implemented yet.");
-    }
-
-
-/*
-
-=item C<void unpack(STRING *data)>
-
-Unpack a serialized segment string.
-
-=cut
-
-*/
-    METHOD unpack(STRING *data) {
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
-                                    "PackfileBytecodeSegment.unpack() not implemented yet.");
-    }
-
-/*
-
 =item C<INTVAL get_integer_keyed_int(INTVAL key)>
 
 =item C<INTVAL get_pmc_keyed_int(INTVAL key)>
@@ -310,6 +275,40 @@ Set an integer's worth of data in the segment.
         RETURN(INTVAL main_sub);
     }
 
+/*
+
+=back
+
+=head2 Packfile Interface Methods
+
+=over 4
+
+=item C<STRING *pack()>
+
+Serialize the segment.
+
+=cut
+
+*/
+    METHOD pack() {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+                                    "PackfileBytecodeSegment.pack() not implemented yet.");
+    }
+
+
+/*
+
+=item C<void unpack(STRING *data)>
+
+Unpack a serialized segment string.
+
+=cut
+
+*/
+    METHOD unpack(STRING *data) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+                                    "PackfileBytecodeSegment.unpack() not implemented yet.");
+    }
 /*
 
 =item C<void load_lib()>
