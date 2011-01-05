@@ -381,7 +381,7 @@ loop_end:
     code .= "_"
     $S2 = rule["name"]
     code .= $S2
-    code .= "' :method :main\n"
+    code .= "' :method\n"
     code .= "    .param pmc tree\n"
     code .= "    .param pmc node\n"
     $S3 = rule["action"]
