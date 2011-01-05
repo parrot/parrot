@@ -28,7 +28,7 @@ spec.
 
 #include "pmc/pmc_packfileopmap.h"
 
-pmclass PackfileBytecodeSegment auto_attrs extends PackfileSegment{
+pmclass PackfileBytecodeSegment auto_attrs extends PackfileSegment {
     ATTR PMC  *ops;    /* RIA of executable opcodes */
     ATTR PMC  *op_map; /* OpMap PMC */
 
@@ -85,12 +85,27 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
 
     VTABLE void *get_pointer() {
         INTVAL i, bc_seg_size, lib_count;
+
         STRING *oplib_name = CONST_STRING(INTERP, "oplib_name");
         STRING *lib_ops    = CONST_STRING(INTERP, "lib_ops");
+        PMC    *ops;
+
         /* ByteCode to return */
         PackFile_ByteCode * const bc = mem_gc_allocate_zeroed_typed(interp, PackFile_ByteCode);
+        bc->base.type = PF_BYTEC_SEG;
 
         /* Create proper ByteCode structure from internal PMCs */
+
+        /* Copy ops into ByteCode */
+        GET_ATTR_ops(INTERP, SELF, ops);
+        bc->base.size = VTABLE_get_integer(INTERP, ops);
+        bc->base.data = mem_gc_allocate_n_typed(INTERP, bc->base.size, opcode_t);
+
+        /* Not very efficient... */
+        for (i = 0; i < bc->base.size; ++i) {
+            bc->base.data[i] = VTABLE_get_integer_keyed_int(INTERP, ops, i);
+        }
+
 
         return bc;
     }
