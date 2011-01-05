@@ -16,21 +16,7 @@
     pfdir = pf.'get_directory'()
 
     # We need some constants
-    # Interpreter.
     pfconst = new 'PackfileConstantTable'
-
-    # "Hello World" string
-    pfconst[0] = "Hello World"
-
-    # "hello" function name
-    pfconst[1] = "hello"
-
-    # "hello.pir" is our pir file which we are "compiling"
-    pfconst[2] = "hello.pir"
-
-    # Empty FIA for handling returns from "hello"
-    $P0 = new 'FixedIntegerArray'
-    pfconst[0] = $P0
 
     # We will need Sub PMC as well but will deal with it later.
     # Add PackfileConstantTable into directory.
@@ -41,14 +27,18 @@
     .local pmc op
 
     # Here is our function
-    op = new ['ResizablePMCArray']
+    op    = new ['ResizablePMCArray']
     op[0] = 'say_sc'
-    op[1] = 0x000 # constant id for "Hello, world"
+    $I0   = pfconst.'get_or_create_constant'("Hello, world")
+    op[1] = $I0
     push pfbc, op
 
-    op = new ['ResizablePMCArray']
+    # Empty FIA for handling returns from "hello"
+    $P0   = new 'FixedIntegerArray'
+    op    = new ['ResizablePMCArray']
     op[0] = 'set_returns_pc'
-    op[1] = 0x000 # id of FIA
+    $I0   = pfconst.'get_or_create_constant'($P0)
+    op[1] = $I0
     push pfbc, op
 
     op = new ['ResizablePMCArray']
@@ -70,8 +60,9 @@
     $P0['vtable_index'] = -1 # It required to store sub in namespace
 
     $P1 = new 'Sub', $P0
+
     # and store it in PackfileConstantTable
-    pfconst[1] = $P1
+    push pfconst, $P1
 
     # Now pack Packfile and save it
     $S0 = pf
