@@ -211,7 +211,7 @@ the output to the correct output file.
     .local pmc out
     out = new 'StringBuilder'
     if initpir == '' goto out_rule
-    out.'append_format'("      .sub '__onload' :load :main\n")
+    out.'append_format'("      .sub '__onload' :load :init\n")
     out.'append_format'("          .local pmc optable\n")
     out .= initpir
     out.'append_format'("          .return ()\n")
