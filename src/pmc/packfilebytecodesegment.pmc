@@ -287,6 +287,26 @@ Get the number of elements in the array.
         return STATICSELF.elements();
     }
 
+/*
+
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
+
+Set an integer's worth of data in the segment.
+
+=cut
+
+*/
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value)  {
+        VTABLE_set_integer_keyed_int(INTERP,
+            PARROT_PACKFILEBYTECODESEGMENT(SELF)->ops, key, value);
+    }
+
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+        SELF.set_integer_keyed_int(
+            VTABLE_get_integer(INTERP, key),
+            VTABLE_get_integer(INTERP, value));
+    }
+
 
     METHOD main_sub(INTVAL main_sub :optional, INTVAL got_main :opt_flag) {
         if (got_main) {
