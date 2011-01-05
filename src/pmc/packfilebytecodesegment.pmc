@@ -195,25 +195,6 @@ Destroy anything in this segment that need destroying.
 
 /*
 
-=item C<void load_lib()>
-
-Load a dynop library so that ops contained in that library can be used in this
-bytecode segment.
-
-=cut
-
-*/
-
-    METHOD void load_lib(STRING *lib_name) {
-        Parrot_PackfileBytecodeSegment_attributes * attrs =
-            PARROT_PACKFILEBYTECODESEGMENT(SELF);
-        Parrot_pcc_invoke_method_from_c_args(INTERP, SELF, CONST_STRING(INTERP, "load_lib"),
-                "S->", lib_name);
-    }
-
-
-/*
-
 =back
 
 =head2 Packfile Interface Methods
@@ -327,6 +308,38 @@ Set an integer's worth of data in the segment.
         }
         GET_ATTR_main_sub(INTERP, SELF, main_sub);
         RETURN(INTVAL main_sub);
+    }
+
+/*
+
+=item C<void load_lib()>
+
+Load a dynop library so that ops contained in that library can be used in this
+bytecode segment.
+
+=cut
+
+*/
+
+    METHOD void load_lib(STRING *lib_name) {
+        Parrot_PackfileBytecodeSegment_attributes * attrs =
+            PARROT_PACKFILEBYTECODESEGMENT(SELF);
+        Parrot_pcc_invoke_method_from_c_args(INTERP, SELF, CONST_STRING(INTERP, "load_lib"),
+                "S->", lib_name);
+    }
+
+/*
+=item C<PMC* opmap()>
+
+Return PackfileOpMap for this BytecodeSegment.
+
+=cut
+*/
+
+    METHOD PMC* opmap() {
+        PMC *op_map;
+        GET_ATTR_op_map(INTERP, SELF, op_map);
+        RETURN(PMC* op_map);
     }
 
 /*
