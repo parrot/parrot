@@ -28,7 +28,7 @@
     # Here is our function
     op    = new ['ResizablePMCArray']
     op[0] = 'say_sc'
-    $I0   = pfconst.'get_or_create_constant'("Hello, world")
+    $I0   = pfconst.'get_or_create_constant'("Hello, World")
     op[1] = $I0
     push pfbc, op
 
