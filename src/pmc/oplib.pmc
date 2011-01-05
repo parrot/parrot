@@ -114,6 +114,12 @@ pmclass OpLib auto_attrs {
         return STATICSELF.elements();
     }
 
+    VTABLE void* get_pointer() {
+        op_lib_t *oplib;
+        GET_ATTR_oplib(INTERP, SELF, oplib);
+        return oplib;
+    }
+
     METHOD op_family(STRING *shortname) {
         char * const sname = Parrot_str_to_cstring(INTERP, shortname);
         op_lib_t  *oplib;
