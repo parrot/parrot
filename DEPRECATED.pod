@@ -215,12 +215,6 @@ These will be changed to allow more flexibility in types.
 
 L<https://trac.parrot.org/parrot/ticket/1565>
 
-=item finalize [experimental]
-
-Finalize exception handler, unrolling inner runloops if needed.
-
-L<https://trac.parrot.org/parrot/ticket/1635>
-
 =item logical PMC ops [eligible in 2.7]
 
 These fall out from the logical vtables deprecation.
