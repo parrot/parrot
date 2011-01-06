@@ -67,11 +67,13 @@ Marks the object as live.
 */
 
     VTABLE void mark() {
-        Parrot_PackfileBytecodeSegment_attributes * attrs =
-                PARROT_PACKFILEBYTECODESEGMENT(SELF);
+        PMC *tmp;
 
-        Parrot_gc_mark_PMC_alive(INTERP, attrs->op_map);
-        Parrot_gc_mark_PMC_alive(INTERP, attrs->ops);
+        GET_ATTR_op_map(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
+        GET_ATTR_ops(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
 
         SUPER();
     }

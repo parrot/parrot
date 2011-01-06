@@ -45,8 +45,7 @@ Create empty PackfileOpMap for a given op library.
     VTABLE void init() {
         PMC *core_ops_info, *core_ops_pmc;
         STRING *oplib_name, *oplib_str, *lib_ops, *table_ops, *core_ops_str;
-        Parrot_PackfileOpMap_attributes *attrs =
-            PMC_data_typed(SELF, Parrot_PackfileOpMap_attributes*);
+        Parrot_PackfileOpMap_attributes *attrs = PARROT_PACKFILEOPMAP(SELF);
 
         PObj_custom_mark_SET(SELF);
 
@@ -225,7 +224,8 @@ Ensure that an op library is loaded and accessible to this OpMap.
         PMC *op_maps, *ops_info, *oplib, *lib_name_pmc;
         INTVAL i, op_map_count;
         STRING *oplib_name, *lib_ops, *table_ops, *oplib_str;
-        Parrot_PackfileOpMap_attributes *attrs;
+        Parrot_PackfileOpMap_attributes *attrs =
+                PARROT_PACKFILEOPMAP(SELF);
 
         oplib_name = CONST_STRING(INTERP, "oplib_name");
 
@@ -245,8 +245,6 @@ Ensure that an op library is loaded and accessible to this OpMap.
         VTABLE_set_string_native(INTERP, lib_name_pmc, lib_name);
         /* OpLib.init will throw exception on failure */
         oplib = Parrot_pmc_new_init(INTERP, enum_class_OpLib, lib_name_pmc);
-
-        attrs = PMC_data_typed(SELF, Parrot_PackfileOpMap_attributes*);
 
         lib_ops   = CONST_STRING(INTERP, "lib_ops");
         table_ops = CONST_STRING(INTERP, "table_ops");
