@@ -310,47 +310,19 @@ Hello, pir
 OUTPUT
 
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_i_absolute" );
-
-int main(void)
-{
-    Parrot_Interp interp;
-    Parrot_PMC pmc;
-    Parrot_Int type, value;
-
-    /* Create the interpreter */
-    interp = new_interp();
-
-    type = Parrot_PMC_typenum(interp, "Integer");
-    pmc  = Parrot_PMC_new(interp, type);
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_absolute" );
 
     Parrot_PMC_set_integer_native(interp, pmc, -42);
-
     Parrot_PMC_i_absolute(interp, pmc);
+
     value = Parrot_PMC_get_integer(interp, pmc);
     printf("%d\n", (int) value);
-    Parrot_destroy(interp);
-    printf("Done!\n");
-    return 0;
-}
 CODE
 42
 Done!
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_(increment|decrement)" );
-
-int main(void)
-{
-    Parrot_Interp interp;
-    Parrot_PMC pmc;
-    Parrot_Int type, value;
-
-    /* Create the interpreter */
-    interp = new_interp();
-
-    type = Parrot_PMC_typenum(interp, "Integer");
-    pmc  = Parrot_PMC_new(interp, type);
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(increment|decrement)" );
 
     Parrot_PMC_set_integer_native(interp, pmc, -42);
 
@@ -361,61 +333,25 @@ int main(void)
     Parrot_PMC_decrement(interp, pmc);
     value = Parrot_PMC_get_integer(interp, pmc);
     printf("%d\n", (int) value);
-    Parrot_destroy(interp);
-    printf("Done!\n");
-    return 0;
-}
 CODE
 -41
 -42
 Done!
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_i_neg" );
-
-int main(void)
-{
-    Parrot_Interp interp;
-    Parrot_PMC pmc;
-    Parrot_Int type, value;
-
-    /* Create the interpreter */
-    interp = new_interp();
-
-    type = Parrot_PMC_typenum(interp, "Integer");
-    pmc  = Parrot_PMC_new(interp, type);
-
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_neg" );
     Parrot_PMC_set_integer_native(interp, pmc, -42);
 
     Parrot_PMC_i_neg(interp, pmc);
     value = Parrot_PMC_get_integer(interp, pmc);
     printf("%d\n", (int) value);
-    Parrot_destroy(interp);
-    printf("Done!\n");
-    return 0;
-}
 CODE
 42
 Done!
 OUTPUT
 
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_floor_divide" );
-
-int main(void)
-{
-    Parrot_Interp interp;
-    Parrot_PMC pmc, pmc2, pmc3;
-    Parrot_Int type, value;
-
-    /* Create the interpreter */
-    interp = new_interp();
-
-    type = Parrot_PMC_typenum(interp, "Integer");
-    pmc  = Parrot_PMC_new(interp, type);
-    pmc2 = Parrot_PMC_new(interp, type);
-    pmc3 = Parrot_PMC_new(interp, type);
-
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_floor_divide" );
     Parrot_PMC_set_integer_native(interp, pmc,  7);
     Parrot_PMC_set_integer_native(interp, pmc2, 3);
     Parrot_PMC_set_integer_native(interp, pmc3, 0);
@@ -431,10 +367,6 @@ int main(void)
     printf("%d\n", (int) value);
     value = Parrot_PMC_get_integer(interp, pmc3);
     printf("%d\n", (int) value);
-    Parrot_destroy(interp);
-    printf("Done!\n");
-    return 0;
-}
 CODE
 7
 3
@@ -442,21 +374,7 @@ CODE
 Done!
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_multiply" );
-
-int main(void)
-{
-    Parrot_Interp interp;
-    Parrot_PMC pmc, pmc2, pmc3;
-    Parrot_Int type, value;
-
-    /* Create the interpreter */
-    interp = new_interp();
-
-    type = Parrot_PMC_typenum(interp, "Integer");
-    pmc  = Parrot_PMC_new(interp, type);
-    pmc2 = Parrot_PMC_new(interp, type);
-    pmc3 = Parrot_PMC_new(interp, type);
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_multiply" );
 
     Parrot_PMC_set_integer_native(interp, pmc,  21);
     Parrot_PMC_set_integer_native(interp, pmc2, 2);
@@ -473,10 +391,6 @@ int main(void)
     printf("%d\n", (int) value);
     value = Parrot_PMC_get_integer(interp, pmc3);
     printf("%d\n", (int) value);
-    Parrot_destroy(interp);
-    printf("Done!\n");
-    return 0;
-}
 CODE
 21
 2
@@ -484,22 +398,7 @@ CODE
 Done!
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_divide" );
-
-int main(void)
-{
-    Parrot_Interp interp;
-    Parrot_PMC pmc, pmc2, pmc3;
-    Parrot_Int type, value;
-
-    /* Create the interpreter */
-    interp = new_interp();
-
-    type = Parrot_PMC_typenum(interp, "Integer");
-    pmc  = Parrot_PMC_new(interp, type);
-    pmc2 = Parrot_PMC_new(interp, type);
-    pmc3 = Parrot_PMC_new(interp, type);
-
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_divide" );
     Parrot_PMC_set_integer_native(interp, pmc,  42);
     Parrot_PMC_set_integer_native(interp, pmc2, 21);
     Parrot_PMC_set_integer_native(interp, pmc3, 0);
@@ -515,10 +414,6 @@ int main(void)
     printf("%d\n", (int) value);
     value = Parrot_PMC_get_integer(interp, pmc3);
     printf("%d\n", (int) value);
-    Parrot_destroy(interp);
-    printf("Done!\n");
-    return 0;
-}
 CODE
 42
 21
@@ -545,69 +440,33 @@ CODE
 Done!
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal" );
-
-int main(void)
-{
-    Parrot_Interp interp;
-    Parrot_PMC pmc, pmc2;
-    Parrot_Int type, value, is_equal;
-
-    /* Create the interpreter */
-    interp = new_interp();
-
-    type = Parrot_PMC_typenum(interp, "Integer");
-    pmc  = Parrot_PMC_new(interp, type);
-    pmc2 = Parrot_PMC_new(interp, type);
-
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal" );
     Parrot_PMC_set_integer_native(interp, pmc, -42);
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
 
-    is_equal = Parrot_PMC_is_equal(interp, pmc, pmc2);
-    printf("%d\n", (int) is_equal);
+    pmc3 = Parrot_PMC_is_equal(interp, pmc, pmc2);
+    printf("%d\n", (int) pmc3);
 
     Parrot_PMC_set_integer_native(interp, pmc2, -42);
 
-    is_equal = Parrot_PMC_is_equal(interp, pmc, pmc2);
-    printf("%d\n", (int) is_equal);
-
-    Parrot_destroy(interp);
-    printf("Done!\n");
-    return 0;
-}
+    pmc3 = Parrot_PMC_is_equal(interp, pmc, pmc2);
+    printf("%d\n", (int) pmc3);
 CODE
 0
 1
 Done!
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_subtract" );
-
-int main(void)
-{
-    Parrot_Interp interp;
-    Parrot_PMC pmc, pmc2, difference;
-    Parrot_Int type, value;
-
-    /* Create the interpreter */
-    interp = new_interp();
-
-    type = Parrot_PMC_typenum(interp, "Integer");
-    pmc  = Parrot_PMC_new(interp, type);
-    pmc2 = Parrot_PMC_new(interp, type);
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_subtract" );
 
     Parrot_PMC_set_integer_native(interp, pmc,  52);
     Parrot_PMC_set_integer_native(interp, pmc2, 10);
 
-    difference = Parrot_PMC_subtract(interp, pmc, pmc2, difference);
-    Parrot_io_printf(interp, "%P\n", difference);
-    difference = Parrot_PMC_subtract(interp, pmc2, pmc, difference);
-    Parrot_io_printf(interp, "%P\n", difference);
+    pmc3 = Parrot_PMC_subtract(interp, pmc, pmc2, pmc3);
+    Parrot_io_printf(interp, "%P\n", pmc3);
+    pmc3 = Parrot_PMC_subtract(interp, pmc2, pmc, pmc3);
+    Parrot_io_printf(interp, "%P\n", pmc3);
 
-    Parrot_destroy(interp);
-    printf("Done!\n");
-    return 0;
-}
 CODE
 42
 -42
@@ -615,42 +474,23 @@ Done!
 OUTPUT
 
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_cmp" );
-
-int main(void)
-{
-    Parrot_Interp interp;
-    Parrot_PMC pmc, pmc2;
-    Parrot_Int type, value, cmp;
-
-    /* Create the interpreter */
-    interp = new_interp();
-
-    type = Parrot_PMC_typenum(interp, "Integer");
-    pmc  = Parrot_PMC_new(interp, type);
-    pmc2 = Parrot_PMC_new(interp, type);
-
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_cmp" );
     Parrot_PMC_set_integer_native(interp, pmc, 42);
     Parrot_PMC_set_integer_native(interp, pmc2, 17);
 
-    cmp = Parrot_PMC_cmp(interp, pmc, pmc2);
-    Parrot_io_printf(interp,"%d\n", cmp );
+    pmc3 = Parrot_PMC_cmp(interp, pmc, pmc2);
+    Parrot_io_printf(interp,"%d\n", pmc3 );
 
     Parrot_PMC_set_integer_native(interp, pmc, 17);
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
 
-    cmp = Parrot_PMC_cmp(interp, pmc, pmc2);
-    Parrot_io_printf(interp,"%d\n", cmp );
+    pmc3 = Parrot_PMC_cmp(interp, pmc, pmc2);
+    Parrot_io_printf(interp,"%d\n", pmc3 );
 
     Parrot_PMC_set_integer_native(interp, pmc, 42);
 
-    cmp = Parrot_PMC_cmp(interp, pmc, pmc2);
-    Parrot_io_printf(interp,"%d\n", cmp );
-
-    Parrot_destroy(interp);
-    printf("Done!\n");
-    return 0;
-}
+    pmc3 = Parrot_PMC_cmp(interp, pmc, pmc2);
+    Parrot_io_printf(interp,"%d\n", pmc3 );
 CODE
 1
 -1
@@ -658,31 +498,13 @@ CODE
 Done!
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_i_add" );
-
-int main(void)
-{
-    Parrot_Interp interp;
-    Parrot_PMC pmc, pmc2;
-    Parrot_Int type, value;
-
-    /* Create the interpreter */
-    interp = new_interp();
-
-    type = Parrot_PMC_typenum(interp, "Integer");
-    pmc  = Parrot_PMC_new(interp, type);
-    pmc2 = Parrot_PMC_new(interp, type);
-
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_add" );
     Parrot_PMC_set_integer_native(interp, pmc, -42);
     Parrot_PMC_set_integer_native(interp, pmc2, 1000);
 
     Parrot_PMC_i_add(interp, pmc, pmc2);
     value = Parrot_PMC_get_integer(interp, pmc);
     printf("%d\n", (int) value);
-    Parrot_destroy(interp);
-    printf("Done!\n");
-    return 0;
-}
 CODE
 958
 Done!
