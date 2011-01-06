@@ -253,10 +253,16 @@ pasm_output_is( <<'CODE', <<OUT, "defined_keyed" );
     set P3, 1
     defined I0, P0[P3]
     print I0
+
+    null P1
+    set P0[1], P1
+    defined I0, P0[1]
+    print I0
+
     print "\n"
     end
 CODE
-0000001110
+00000011100
 OUT
 
 pasm_output_is( <<'CODE', <<OUT, "delete" );
@@ -606,21 +612,34 @@ pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_pmc_keyed_int (negative 
     .local pmc hash1
     hash1 = new ['OrderedHash']
 
-    push hash1, 6
+    push hash1, 999 # hash[0]
+    push hash1, 1   # hash[1]
+    push hash1, 999 # hash[2]
 
-    .local pmc integer1
-    integer1 = new ['Integer']
-    integer1 = 5
+    .local pmc integer0, integer2
+    integer0 = new ['Integer']
+    integer0 = 0
 
-    hash1[-1] = integer1
-    $P0 = hash1[-1]
+    hash1[-4] = integer0 # modify hash[0] to 0
 
+    integer2 = new ['Integer']
+    integer2 = 2
+
+    hash1[-1] = integer2 # modify hash[2] to 2
+
+    $P0 = hash1[-4]
+    print $P0
+    $P0 = hash1[0]
+    print $P0
+    $P0 = hash1[1]
+    print $P0
+    $P0 = hash1[2]
     print $P0
     print "\n"
     end
 .end
 CODE
-5
+0012
 OUTPUT
 
 # actually Parrot_OrderedHash_delete_keyed is used
