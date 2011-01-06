@@ -272,11 +272,13 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
               ARGMOD(STRING **buf))
 {
     ASSERT_ARGS(Parrot_io_read_buffer)
-    unsigned char *buffer_start, *buffer_next, *buffer_end;
+    unsigned char *buffer_next, *buffer_end;
     STRING        *s;
     size_t         len;
+    size_t         got;
     size_t         current      = 0;
     INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
+    PIOOFF_T       file_pos     = Parrot_io_get_file_position(interp, filehandle);
 
     /* write buffer flush */
     if (buffer_flags & PIO_BF_WRITEBUF) {
@@ -284,7 +286,6 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
     }
 
-    buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
     buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
     buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
 
@@ -300,10 +301,6 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         current            = avail < len ? avail : len;
 
         memcpy(s->strstart, buffer_next, current);
-        buffer_next += current;
-        Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-        Parrot_io_set_file_position(interp, filehandle, (current +
-                Parrot_io_get_file_position(interp, filehandle)));
 
         /* buffer completed */
         if (current == avail) {
@@ -312,54 +309,52 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
             /* Reset next and end */
             Parrot_io_set_buffer_end(interp, filehandle, NULL);
-            Parrot_io_set_buffer_next(interp, filehandle, buffer_start);
+            buffer_next = Parrot_io_get_buffer_start(interp, filehandle);
         }
+        else {
+            buffer_next += current;
+        }
+
+        Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
+
+        file_pos += current;
 
         /* requested length satisfied */
         if (len == current) {
             s->strlen = s->bufused = len;
-            return current;
+            Parrot_io_set_file_position(interp, filehandle, file_pos);
+            return len;
         }
-        else {
-            /* more data needed */
-            len -= current;
-        }
+
+        /* more data needed */
+        len -= current;
+    }
+
+    /* buffer is now empty */
+
+    if (len >= Parrot_io_get_buffer_size(interp, filehandle)) {
+        STRING *sf  = Parrot_str_new_noinit(interp, len);
+
+        sf->bufused = len;
+        got         = PIO_READ(interp, filehandle, &sf);
+        s->strlen   = s->bufused = current + got;
+
+        memcpy(s->strstart + current, sf->strstart, got);
+
+        Parrot_io_set_file_position(interp, filehandle, file_pos + got);
+        return current + got;
     }
 
     /* (re)fill the readbuffer */
-    if (!(buffer_flags & PIO_BF_READBUF)) {
-        size_t got;
-
-        if (len >= Parrot_io_get_buffer_size(interp, filehandle)) {
-            STRING *sf  = Parrot_str_new_noinit(interp, len);
-
-            sf->bufused = len;
-            got         = PIO_READ(interp, filehandle, &sf);
-            s->strlen   = s->bufused = current + got;
-
-            memcpy(s->strstart + current, sf->strstart, got);
-
-            Parrot_io_set_file_position(interp, filehandle,
-                    (got + Parrot_io_get_file_position(interp, filehandle)));
-            return current + got;
-        }
-
-        got = Parrot_io_fill_readbuf(interp, filehandle);
-        len = (len < got) ? len : got;
-    }
+    got = Parrot_io_fill_readbuf(interp, filehandle);
+    if (got < len)
+        len = got;
 
     /* read from the read_buffer */
-    buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
     buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-    buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
 
     memcpy(s->strstart + current, buffer_next, len);
-    s->strlen    = s->bufused = current + len;
-    buffer_next += len;
-
-    Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-    Parrot_io_set_file_position(interp, filehandle,
-            (len + Parrot_io_get_file_position(interp, filehandle)));
+    s->strlen = s->bufused = current + len;
 
     /* is the buffer is completely empty ? */
     if (buffer_next == buffer_end) {
@@ -367,8 +362,14 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
                 (buffer_flags & ~PIO_BF_READBUF));
         /* Reset next and end */
         Parrot_io_set_buffer_end(interp, filehandle, NULL);
-        Parrot_io_set_buffer_next(interp, filehandle, buffer_start);
+        buffer_next = Parrot_io_get_buffer_start(interp, filehandle);
     }
+    else {
+        buffer_next += len;
+    }
+
+    Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
+    Parrot_io_set_file_position(interp, filehandle, file_pos + len);
 
     return current + len;
 }
