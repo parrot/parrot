@@ -617,7 +617,7 @@ pmc, Parrot_Int alive)>
 Force the alive status of a PMC with respect to Parrot's Garbage collector.
 if C<alive> is non-zero, the PMC becomes immune to garbage collection. This is
 important if you have a reference to a PMC which is used by places that the
-GC does not search. If C<alive> is zero, the PMC loses it's protection and
+GC does not search. If C<alive> is zero, the PMC loses its protection and
 can be reclaimed by the GC like normal if it falls out of scope.
 
 =cut
