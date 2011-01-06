@@ -275,6 +275,8 @@ pasm_output_is( <<'CODE', <<OUT, "delete" );
 
     delete P0["a"]
 
+    delete P0["idontexist"]
+
     iter P2, P0
     set P2, .ITERATE_FROM_START_KEYS
 iter_loop:
@@ -621,6 +623,7 @@ CODE
 5
 OUTPUT
 
+# actually Parrot_OrderedHash_delete_keyed is used
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash delete_keyed_str" );
 
 .sub _main :main
