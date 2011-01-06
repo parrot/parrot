@@ -177,24 +177,6 @@ an op and the remaining PMCs being Integers.
 
 /*
 
-=item C<void destroy()>
-
-Destroy anything in this segment that need destroying.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        Parrot_PackfileBytecodeSegment_attributes * attrs =
-            PARROT_PACKFILEBYTECODESEGMENT(SELF);
-        VTABLE_destroy(INTERP, attrs->op_map);
-        VTABLE_destroy(INTERP, attrs->ops);
-        SUPER();
-    }
-
-/*
-
 =item C<INTVAL get_integer_keyed_int(INTVAL key)>
 
 =item C<INTVAL get_pmc_keyed_int(INTVAL key)>
