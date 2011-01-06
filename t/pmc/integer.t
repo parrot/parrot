@@ -24,7 +24,7 @@ Tests the Integer PMC.
 
     get_max_min()
 
-    plan(143)
+    plan(142)
     test_init()
     test_basic_math()
     test_truthiness_and_definedness()
@@ -592,15 +592,6 @@ fin:
     $P1 = 4
     mul $P0, $P1
     is($P0, 24, 'i_multiply Integer PMC by Integer PMC')
-
-    $P0 = new ['Integer']
-    $P1 = new ['Complex']
-    $P2 = new ['Complex']
-    $P0 = 2
-    $P1 = "2+4i"
-    $P2 = "4+8i"
-    mul $P0, $P1
-    is($P0, $P2, 'i_multiply Integer PMC by Complex PMC')
 
     $P0 = new ['Integer']
     $P1 = new ['Float']
