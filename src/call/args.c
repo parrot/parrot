@@ -133,9 +133,12 @@ PARROT_COLD
 PARROT_DOES_NOT_RETURN
 static void named_argument_arity_error(PARROT_INTERP,
     int named_arg_count,
-    Hash *named_used_list,
-    PMC *named_arg_list)
-        __attribute__nonnull__(1);
+    ARGMOD(Hash *named_used_list),
+    ARGIN(PMC *named_arg_list))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*named_used_list);
 
 PARROT_WARN_UNUSED_RESULT
 static FLOATVAL numval_constant_from_op(PARROT_INTERP,
@@ -261,7 +264,9 @@ static STRING** string_param_from_op(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(raw_params))
 #define ASSERT_ARGS_named_argument_arity_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(named_used_list) \
+    , PARROT_ASSERT_ARG(named_arg_list))
 #define ASSERT_ARGS_numval_constant_from_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(raw_params))
@@ -1170,7 +1175,7 @@ PARROT_COLD
 PARROT_DOES_NOT_RETURN
 static void
 named_argument_arity_error(PARROT_INTERP, int named_arg_count,
-        Hash *named_used_list, PMC *named_arg_list)
+        ARGMOD(Hash *named_used_list), ARGIN(PMC *named_arg_list))
 {
     ASSERT_ARGS(named_argument_arity_error)
     INTVAL named_arg_index;

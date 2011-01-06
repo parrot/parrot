@@ -253,8 +253,10 @@ static PMC * PackFile_Constant_unpack_pmc(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static PMC * packfile_main(PARROT_INTERP, PackFile_ByteCode *bc)
-        __attribute__nonnull__(1);
+PARROT_CANNOT_RETURN_NULL
+static PMC * packfile_main(PARROT_INTERP, ARGIN(PackFile_ByteCode *bc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void PackFile_set_header(ARGOUT(PackFile_Header *header))
         __attribute__nonnull__(1)
@@ -424,7 +426,8 @@ static int sub_pragma(PARROT_INTERP,
     , PARROT_ASSERT_ARG(constt) \
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_packfile_main __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_PackFile_set_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_pf_debug_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -886,8 +889,9 @@ Access the main function of a bytecode segment.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static PMC *
-packfile_main(PARROT_INTERP, PackFile_ByteCode *bc)
+packfile_main(PARROT_INTERP, ARGIN(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(packfile_main)
     PackFile_ConstTable *ct = bc->const_table;
