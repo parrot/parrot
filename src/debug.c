@@ -3284,12 +3284,9 @@ STRING *
 Parrot_dbg_get_exception_backtrace(PARROT_INTERP, ARGMOD(PMC * exception))
 {
     ASSERT_ARGS(Parrot_dbg_get_exception_backtrace)
-    STRING           *str;
-    PMC              *old       = PMCNULL;
-    int               rec_level = 0;
-    int               limit_count = 0;
 
     PMC * const ctx = get_exception_context(interp, exception);
+
     if (PMC_IS_NULL(ctx))
         return STRINGNULL;
     else {
