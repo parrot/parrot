@@ -214,7 +214,7 @@ our sub subst ($text, $regex, $repl, :$global?) {
 }
 
 =begin item split
-Splits C<$text> on occurrences of C<$regex>
+Splits C<$text> on occurences of C<$regex>
 =end item
 
 # our sub split ($regex, $text) {
@@ -254,13 +254,32 @@ IO Methods and Functions
 
 =end
 
+=begin item open
+Open file.
+=end item
+
+sub open($filename, :$r, :$w, :$a, :$bin) {
+    my $mode := $w ?? 'w' !! ($a ?? 'wa' !! 'r');
+    my $handle := pir::new__Ps('FileHandle');
+    $handle.open($filename, $mode);
+    $handle.encoding($bin ?? 'binary' !! 'utf8');
+    $handle;
+}
+
+=begin item close
+Close handle
+=end item
+
+sub close($handle) {
+    $handle.close();
+}
+
 =begin item slurp
 Returns the contents of C<$filename> as a single string.
 =end item
 
 our sub slurp ($filename) {
-    my $handle := pir::new__Ps('FileHandle');
-    $handle.open($filename, 'r');
+    my $handle := open($filename, :r);
     my $contents := $handle.readall;
     $handle.close();
     $contents;
