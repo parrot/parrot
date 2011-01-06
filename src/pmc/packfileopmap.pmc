@@ -160,7 +160,7 @@ Get Op PMC by name.
         for (i = 0; i < op_map_count; i++) {
             PMC *op_map = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
             PMC *oplib  = VTABLE_get_pmc_keyed_str(INTERP, op_map, oplib_str);
-            PMC *op     = VTABLE_get_integer_keyed(INTERP, oplib, nmae);
+            PMC *op     = VTABLE_get_pmc_keyed_str(INTERP, oplib, name);
 
             if (!PMC_IS_NULL(op))
                 return op;
@@ -172,7 +172,7 @@ Get Op PMC by name.
     }
 
     VTABLE PMC* get_pmc_keyed(PMC *key) {
-        return STATICSELF.get_pmc_keyed_str(INTERP, Parrot_key_string(INTERP, key));
+        return STATICSELF.get_pmc_keyed_str(Parrot_key_string(INTERP, key));
     }
 
 
