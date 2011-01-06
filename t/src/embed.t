@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 26;
+plan tests => 29;
 
 =head1 NAME
 
@@ -78,13 +78,16 @@ int main(void)
 {
     Parrot_Interp interp;
     Parrot_PMC pmc, pmc2, pmc3;
-    Parrot_Int type, value;
+    Parrot_Int type, value, integer;
+    Parrot_String string;
+
     interp = new_interp();
 
-    type = Parrot_PMC_typenum(interp, "Integer");
-    pmc  = Parrot_PMC_new(interp, type);
-    pmc2 = Parrot_PMC_new(interp, type);
-    pmc3 = Parrot_PMC_new(interp, type);
+    type   = Parrot_PMC_typenum(interp, "Integer");
+    pmc    = Parrot_PMC_new(interp, type);
+    pmc2   = Parrot_PMC_new(interp, type);
+    pmc3   = Parrot_PMC_new(interp, type);
+    string = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
 
 $code
 
@@ -440,6 +443,22 @@ CODE
 Done!
 OUTPUT
 
+# TODO: Does this look right?
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_defined" );
+    Parrot_PMC_set_integer_native(interp, pmc2, -42);
+
+    integer = Parrot_PMC_defined(interp, pmc);
+    printf("%d\n", (int) integer);
+
+    integer = Parrot_PMC_defined(interp, pmc2);
+    printf("%d\n", (int) integer);
+
+CODE
+1
+1
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal" );
     Parrot_PMC_set_integer_native(interp, pmc, -42);
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
@@ -507,6 +526,36 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_add" );
     printf("%d\n", (int) value);
 CODE
 958
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_add" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 1000);
+
+    pmc3 = Parrot_PMC_add(interp, pmc, pmc2, pmc3);
+    value = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", (int) value);
+CODE
+958
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_assign_pmc" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 1000);
+    Parrot_PMC_set_integer_native(interp, pmc3, 420);
+
+    value = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", (int) value);
+
+    Parrot_PMC_assign_pmc(interp, pmc3, pmc);
+
+    value = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", (int) value);
+CODE
+420
+-42
 Done!
 OUTPUT
 
