@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 32;
 
 =head1 NAME
 
@@ -743,6 +743,85 @@ pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash get_number" );
 .end
 CODE
 2
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "set, get, exists compound keys" );
+
+.sub _main :main
+    .local pmc hash, hash_inside
+    hash = new ['OrderedHash']
+    hash_inside = new ['OrderedHash']
+
+    hash_inside["aa"] = "aa"
+    hash["a"] = hash_inside
+    hash["a";"ab"] = "ab"
+    hash["a";"ac"] = "ac"
+    hash["a";"ad"] = "ad"
+    hash["b"] = "b"
+    hash["c"] = "c"
+    hash["d"] = "d"
+    print "ok - set\n"
+
+    print "elements: "
+    $I0 = elements hash
+    print $I0
+    print "\n"
+
+    print "get: "
+    $P2 = hash["a";"aa"]
+    print $P2
+    $P2 = hash["a";"ab"]
+    print $P2
+    print "\n"
+
+    print "exists: "
+    exists $I0, hash[0;0]
+    print $I0
+    exists $I0, hash[2]
+    print $I0
+    exists $I0, hash["a"; "ab"]
+    print $I0
+    exists $I0, hash["a"; "ac"]
+    print $I0
+    exists $I0, hash["a"; 0]
+    print $I0
+    exists $I0, hash["a"; 1]
+    print $I0
+
+    exists $I0, hash["zzzz"; "zzzz"]
+    print $I0
+    exists $I0, hash[99]
+    print $I0
+    exists $I0, hash[0;99]
+    print $I0
+    print "\n"
+
+    delete hash[0;0]
+    print "ok - delete\n"
+
+    print "exists: "
+    exists $I0, hash[0;0]
+    print $I0
+    print "\n"
+
+    delete hash["b"]
+    delete hash["c"]
+
+    print "elements: "
+    $I0 = elements hash
+    print $I0
+    print "\n"
+
+    end
+.end
+CODE
+ok - set
+elements: 4
+get: 11
+exists: 111111000
+ok - delete
+exists: 0
+elements: 2
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
