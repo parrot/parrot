@@ -599,15 +599,6 @@ INTVAL Parrot_io_is_closed_filehandle(PARROT_INTERP, ARGIN(const PMC *pmc))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_io_is_encoding(PARROT_INTERP,
-    ARGIN(const PMC *filehandle),
-    ARGIN(STRING *value))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_EXPORT
 void Parrot_io_set_file_position(SHIM_INTERP,
     ARGMOD(PMC *filehandle),
     PIOOFF_T file_pos)
@@ -709,10 +700,6 @@ void Parrot_io_set_buffer_start(SHIM_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_Parrot_io_is_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle) \
-    , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_Parrot_io_set_file_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_set_file_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
