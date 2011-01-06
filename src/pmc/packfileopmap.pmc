@@ -187,10 +187,11 @@ Marks the object as live.
 */
 
     VTABLE void mark() {
-        Parrot_PackfileOpMap_attributes *attrs =
-            PMC_data_typed(SELF, Parrot_PackfileOpMap_attributes*);
-        VTABLE_mark(INTERP, attrs->op_maps);
-        VTABLE_mark(INTERP, attrs->map_cache);
+        PMC *tmp;
+        GET_ATTR_op_maps(INTERP, SELF, tmp);
+        VTABLE_mark(INTERP, tmp);
+        GET_ATTR_map_cache(INTERP, SELF, tmp);
+        VTABLE_mark(INTERP, tmp);
     }
 
 
