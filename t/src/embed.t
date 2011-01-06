@@ -34,6 +34,7 @@ sub linedirective
     return "#line " . $linenum . ' "' . __FILE__ . '"' . "\n";
 }
 
+
 my $common = linedirective(__LINE__) . <<'CODE';
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,6 +69,34 @@ static Parrot_Interp new_interp()
 
 CODE
 
+sub extend_vtable_output_is
+{
+    my ($code, $expected_output, $msg) = @_;
+    c_output_is(
+        $common . linedirective(__LINE__) . <<CODE,
+int main(void)
+{
+    Parrot_Interp interp;
+    Parrot_PMC pmc, pmc2, pmc3;
+    Parrot_Int type, value;
+    interp = new_interp();
+
+    type = Parrot_PMC_typenum(interp, "Integer");
+    pmc  = Parrot_PMC_new(interp, type);
+    pmc2 = Parrot_PMC_new(interp, type);
+    pmc3 = Parrot_PMC_new(interp, type);
+
+$code
+
+    Parrot_destroy(interp);
+    printf("Done!\\n");
+    return 0;
+}
+CODE
+        $expected_output, $msg
+    );
+
+}
 
 c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, using just the embed.h header" );
 
@@ -497,22 +526,7 @@ CODE
 Done!
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_PMC_modulus" );
-
-int main(void)
-{
-    Parrot_Interp interp;
-    Parrot_PMC pmc, pmc2, pmc3;
-    Parrot_Int type, value;
-
-    /* Create the interpreter */
-    interp = new_interp();
-
-    type = Parrot_PMC_typenum(interp, "Integer");
-    pmc  = Parrot_PMC_new(interp, type);
-    pmc2 = Parrot_PMC_new(interp, type);
-    pmc3 = Parrot_PMC_new(interp, type);
-
+extend_vtable_output_is(<<'CODE',<<'OUTPUT', "Parrot_PMC_modulus" );
     Parrot_PMC_set_integer_native(interp, pmc,  50);
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
     Parrot_PMC_set_integer_native(interp, pmc3, 0);
@@ -524,10 +538,6 @@ int main(void)
     printf("%d\n", (int) value);
     value = Parrot_PMC_get_integer(interp, pmc3);
     printf("%d\n", (int) value);
-    Parrot_destroy(interp);
-    printf("Done!\n");
-    return 0;
-}
 CODE
 50
 42
