@@ -189,9 +189,9 @@ Marks the object as live.
     VTABLE void mark() {
         PMC *tmp;
         GET_ATTR_op_maps(INTERP, SELF, tmp);
-        VTABLE_mark(INTERP, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
         GET_ATTR_map_cache(INTERP, SELF, tmp);
-        VTABLE_mark(INTERP, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
     }
 
 
