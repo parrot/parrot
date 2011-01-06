@@ -611,6 +611,34 @@ Parrot_api_pmc_serialize(Parrot_PMC interp_pmc, Parrot_PMC object,
 
 /*
 
+=item C<Parrot_Int Parrot_api_pmc_keep_alive(Parrot_PMC interp_pmc, Parrot_PMC
+pmc, Parrot_Int alive)>
+
+Force the alive status of a PMC with respect to Parrot's Garbage collector.
+if C<alive> is non-zero, the PMC becomes immune to garbage collection. This is
+important if you have a reference to a PMC which is used by places that the
+GC does not search. If C<alive> is zero, the PMC loses it's protection and
+can be reclaimed by the GC like normal if it falls out of scope.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_keep_alive(Parrot_PMC interp_pmc, Parrot_PMC pmc, Parrot_Int alive)
+{
+    ASSERT_ARGS(Parrot_api_pmc_keep_alive)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    if (alive)
+        Parrot_pmc_gc_register(interp, pmc);
+    else
+        Parrot_pmc_gc_unregister(interp, pmc);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+/*
+
 =back
 
 =cut
