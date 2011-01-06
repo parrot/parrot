@@ -833,7 +833,8 @@ PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-INTVAL Parrot_io_socket_is_closed(SHIM_INTERP, ARGMOD(PMC *socket))
+INTVAL Parrot_io_socket_is_closed(PARROT_INTERP, ARGMOD(PMC *socket))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*socket);
 
@@ -870,7 +871,8 @@ INTVAL Parrot_io_socket_is_closed(SHIM_INTERP, ARGMOD(PMC *socket))
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(socket))
 #define ASSERT_ARGS_Parrot_io_socket_is_closed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(socket))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(socket))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/socket_api.c */
 

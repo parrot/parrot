@@ -110,18 +110,10 @@ PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 INTVAL
-Parrot_io_socket_is_closed(SHIM_INTERP, ARGMOD(PMC *socket))
+Parrot_io_socket_is_closed(PARROT_INTERP, ARGMOD(PMC *socket))
 {
     ASSERT_ARGS(Parrot_io_socket_is_closed)
-#ifdef PIO_OS_WIN32
-    return (PARROT_SOCKET(socket)->os_handle == (PIOHANDLE)INVALID_HANDLE_VALUE);
-#endif
-#ifdef PIO_OS_UNIX
-    return (PARROT_SOCKET(socket)->os_handle == (PIOHANDLE)-1);
-#endif
-#ifdef PIO_OS_STDIO
-    return (PARROT_SOCKET(socket)->os_handle == (PIOHANDLE)NULL);
-#endif
+    return PIO_IS_CLOSED(interp, socket);
 }
 
 /*
@@ -139,15 +131,7 @@ void
 Parrot_io_socket_initialize_handle(SHIM_INTERP, ARGMOD(PMC *socket))
 {
     ASSERT_ARGS(Parrot_io_socket_initialize_handle)
-#ifdef PIO_OS_WIN32
-    PARROT_SOCKET(socket)->os_handle = (PIOHANDLE)INVALID_HANDLE_VALUE;
-#endif
-#ifdef PIO_OS_UNIX
-    PARROT_SOCKET(socket)->os_handle = (PIOHANDLE)-1;
-#endif
-#ifdef PIO_OS_STDIO
-    PARROT_SOCKET(socket)->os_handle = (PIOHANDLE)NULL;
-#endif
+    PARROT_SOCKET(socket)->os_handle = (PIOHANDLE)PIO_INVALID_HANDLE;
 }
 
 /*
