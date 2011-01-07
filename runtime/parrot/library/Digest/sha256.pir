@@ -30,6 +30,13 @@ or
   $P0 = sha256sum("bar")
   $S0 = sha256_hex($P0)
 
+or using the object oriented interface:
+
+  load_bytecode "Digest/sha256.pbc"
+  $P0 = new ['Digest';"SHA256"]
+  $P0."sha_sum"("blah")
+  $P0."sha_print"()
+
 =head1 DESCRIPTION
 
 This is a pure Parrot sha256 hash routine. You should run it with the JIT
@@ -74,6 +81,52 @@ consumption which should be resolved soon.
     set_global "sha256_hex", f
     f = get_hll_global ['Digest'], '_sha256_print'
     set_global "sha256_print", f
+.end
+
+.namespace ['Digest';'SHA256']
+
+# Create Object Oriented interface
+.sub '' :init :load :anon
+    $P0 = newclass ['Digest';'SHA256']
+    $P0.'add_attribute'('context')
+.end
+=head2 C<sha256sum( str )>
+
+Pass in a string, returns an Integer array with the resulting SHA256, and
+stores the result in an attribute.
+
+=cut
+
+.sub 'sha_sum' :method
+    .param string str
+    $P0 = sha256sum (str)
+    setattribute self, 'context', $P0
+    .return ($P0)
+.end
+
+=head2 C<sha256_hex( )>
+
+Uses the Integer array from _sha256sum to return the checksum as string.
+
+=cut
+
+.sub 'sha_hex' :method
+    $P0 = getattribute self, 'context'
+    $S0 = sha256_hex($P0)
+    .return ($S0)
+.end
+
+=head2 C<sha256_print( )>
+
+Uses the Integer array from _sha256sum to print the checksum. Returns the checksum as a string.
+
+=cut
+
+.sub 'sha_print' :method
+    $P0 = getattribute self, 'context'
+    $S0 = sha256_hex($P0)
+    say $S0
+    .return ($S0)
 .end
 
 ###########################################################################

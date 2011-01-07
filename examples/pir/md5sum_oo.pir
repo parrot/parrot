@@ -15,7 +15,7 @@
       say 'getting the data from the Mapped Byte Array...'
       $I1 = elements mba
       $S0 = mba.'get_string'(0, $I1, 'binary')
-    
+
       $P0 = new ["Digest";"MD5"]
       $P0."md5sum"($S0)
       $P0."md5_print"()
