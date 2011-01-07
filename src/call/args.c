@@ -1143,16 +1143,9 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         if (!PMC_IS_NULL(named_arg_list)) {
             const INTVAL named_arg_count = VTABLE_elements(interp, named_arg_list);
 
-            if (named_used_list == NULL) {
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "too many named arguments: %d passed, 0 used",
-                    named_arg_count);
-            }
-
-            if (named_arg_count > named_count)
-                named_argument_arity_error(interp,
-                                           named_arg_count, named_used_list, named_arg_list);
+            if (named_used_list == NULL || named_arg_count > named_count)
+                named_argument_arity_error(interp, named_arg_count,
+                                           named_used_list, named_arg_list);
         }
     }
     if (named_used_list != NULL)
@@ -1179,6 +1172,13 @@ named_argument_arity_error(PARROT_INTERP, int named_arg_count,
 {
     ASSERT_ARGS(named_argument_arity_error)
     INTVAL named_arg_index;
+
+    if (named_used_list == NULL) {
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INVALID_OPERATION,
+            "too many named arguments: %d passed, 0 used",
+            named_arg_count);
+    }
 
     /* Named argument iteration. */
     for (named_arg_index = 0; named_arg_index < named_arg_count; ++named_arg_index) {
