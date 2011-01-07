@@ -902,24 +902,23 @@ CODE
     test_diag( 'Want: zzz' )
     test_test( 'todo (as "is(PMC, String)" param) test should fail, marked as TODO' )
 
+    .local pmc left
+    .local pmc right
+
     # is pass (PMC, PMC)
     test_out( 'ok 23 # TODO todo reason' )
-    $P0 = new ['BigNum']
-    $P0 = "123"
-    $P1 = new ['BigNum']
-    $P1 = "123"
-    is( $P0, $P1, 'passing test', 'todo' => 'todo reason' )
+    null left
+    null right
+    is( left, right, 'passing test', 'todo' => 'todo reason' )
     test_test( 'todo (as "is(PMC, PMC)" param) test should pass, marked as TODO' )
 
     # is fail (PMC, PMC)
     test_out( "not ok 24 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
-    $P0 = new ['BigNum']
-    $P0 = "123"
-    $P1 = new ['BigNum']
-    $P1 = "999"
-    is( $P0, $P1, 'failing test', 'todo' => 'todo reason' )
-    test_diag( 'Have: 123' )
-    test_diag( 'Want: 999' )
+    left  = new 'String'
+    left = 'left'
+    is( left, right, 'failing test', 'todo' => 'todo reason' )
+    test_diag( 'Have: left' )
+    test_diag( 'Want: null' )
     test_test( 'todo (as "is(PMC, PMC)" param) test should fail, marked as TODO' )
 
 .end
