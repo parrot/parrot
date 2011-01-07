@@ -92,17 +92,23 @@ Tests the PackfileOpMap PMC.
     ($I0) = opmap.'load_lib'('core_ops')
     ok(1, "load_lib works with 'core_ops' a second time")
 
-    #not sure how to make this work
-    $P0 = loadlib 'math_ops'
-    ($I0) = opmap.'load_lib'('math_ops')
-    ok(1, "load_lib works with 'math_ops'")
 
     $I0 = opmap['say_sc']
     # First mapped op should be 0
     is($I0, 0, "Can map say_sc from core_ops")
 
+    # After make corevm dynoplib isn't built yet.
+    # Catch exception and ignore rest of tests.
+    push_eh no_math_ops
+    $P0 = loadlib 'math_ops'
+    ($I0) = opmap.'load_lib'('math_ops')
+    ok(1, "load_lib works with 'math_ops'")
+
     $I0 = opmap['cmod_i_i_i']
     is($I0, 1, "Can map cmod_i_i_i from math_ops")
+
+  no_math_ops:
+    pop_eh
 
 .end
 
