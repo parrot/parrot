@@ -94,11 +94,13 @@ INTVAL Parrot_io_pipe_unix(SHIM_INTERP,
 
 size_t Parrot_io_read_unix(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
-    ARGIN(STRING **buf))
+    ARGMOD(char *buf),
+    size_t len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*filehandle);
+        FUNC_MODIFIES(*filehandle)
+        FUNC_MODIFIES(*buf);
 
 PIOOFF_T Parrot_io_seek_unix(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
@@ -285,7 +287,7 @@ INTVAL Parrot_io_socket_unix(PARROT_INTERP,
 #define PIO_CLOSE(interp, pmc) Parrot_io_close_unix((interp), (pmc))
 #define PIO_CLOSE_PIOHANDLE(interp, handle) Parrot_io_close_piohandle_unix((interp), (handle))
 #define PIO_IS_CLOSED(interp, pmc) Parrot_io_is_closed_unix((interp), (pmc))
-#define PIO_READ(interp, pmc, buf) Parrot_io_read_unix((interp), (pmc), (buf))
+#define PIO_READ(interp, pmc, buf, len) Parrot_io_read_unix((interp), (pmc), (buf), (len))
 #define PIO_WRITE(interp, pmc, str) Parrot_io_write_unix((interp), (pmc), (str))
 #define PIO_SEEK(interp, pmc, offset, start) \
     Parrot_io_seek_unix((interp), (pmc), (offset), (start))

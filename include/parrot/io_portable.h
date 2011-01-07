@@ -75,10 +75,12 @@ size_t Parrot_io_peek_portable(PARROT_INTERP,
 
 size_t Parrot_io_read_portable(PARROT_INTERP,
     ARGIN(PMC *filehandle),
-    ARGIN(STRING **buf))
+    ARGMOD(char *buf),
+    size_t len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*buf);
 
 PIOOFF_T Parrot_io_seek_portable(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
@@ -158,7 +160,7 @@ size_t Parrot_io_write_portable(PARROT_INTERP,
 #define PIO_CLOSE(interp, pmc) Parrot_io_close_portable((interp), (pmc))
 #define PIO_CLOSE_PIOHANDLE(interp, handle) Parrot_io_unimplemented_portable(interp)
 #define PIO_IS_CLOSED(interp, pmc) Parrot_io_is_closed_portable((interp), (pmc))
-#define PIO_READ(interp, pmc, buf) Parrot_io_read_portable((interp), (pmc), (buf))
+#define PIO_READ(interp, pmc, buf, len) Parrot_io_read_portable((interp), (pmc), (buf), (len))
 #define PIO_WRITE(interp, pmc, str) Parrot_io_write_portable((interp), (pmc), (str))
 #define PIO_SEEK(interp, pmc, offset, start) \
     Parrot_io_seek_portable((interp), (pmc), (offset), (start))

@@ -354,8 +354,8 @@ Parrot_io_flush_portable(PARROT_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<size_t Parrot_io_read_portable(PARROT_INTERP, PMC *filehandle, STRING
-**buf)>
+=item C<size_t Parrot_io_read_portable(PARROT_INTERP, PMC *filehandle, char
+*buf, size_t len)>
 
 Reads from the given filehandle into the provided STRING, returning the number
 of bytes read.
@@ -366,16 +366,11 @@ of bytes read.
 
 size_t
 Parrot_io_read_portable(PARROT_INTERP, ARGIN(PMC *filehandle),
-              ARGIN(STRING **buf))
+              ARGMOD(char *buf), size_t len)
 {
     ASSERT_ARGS(Parrot_io_read_portable)
     FILE   * const fptr   = (FILE *)Parrot_io_get_os_handle(interp, filehandle);
-    STRING * const s      = Parrot_io_make_string(interp, buf, 2048);
-    void   * const buffer = Buffer_bufstart(s);
-    const   size_t len    = s->bufused;
-    const   size_t bytes  = fread(buffer, 1, len, fptr);
-
-    s->bufused = s->strlen = bytes;
+    const   size_t bytes  = fread(buf, 1, len, fptr);
 
     if (bytes != len) {
         if (feof(fptr))
