@@ -123,13 +123,22 @@ recording it with the optional test description in C<description>.
 
 .sub ok
     .param pmc    passed
-    .param string description     :optional
+    .param string description                 :optional
+    .param string todo         :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     $I0 = istrue passed
+
+    if todo goto to_do
     test.'ok'( $I0, description )
+    goto done
+
+  to_do:
+    test.'todo'( $I0, description, todo )
+
+  done:
 .end
 
 =item C<nok( passed, description )>
@@ -140,8 +149,9 @@ C<passed>, recording it with the optional test description in C<description>.
 =cut
 
 .sub nok
-    .param pmc passed
-    .param string description :optional
+    .param pmc    passed
+    .param string description                 :optional
+    .param string todo         :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -149,7 +159,14 @@ C<passed>, recording it with the optional test description in C<description>.
     .local int reverse_passed
     reverse_passed = isfalse passed
 
+    if todo goto to_do
     test.'ok'( reverse_passed, description )
+    goto done
+
+  to_do:
+    test.'todo'( reverse_passed, description, todo )
+
+  done:
 .end
 
 =item C<is( left, right, description )>

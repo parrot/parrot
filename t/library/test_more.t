@@ -21,10 +21,11 @@
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 117 )
+    plan( 121 )
 
     test_skip()
     test_todo()
+    test_todo_as_param()
     test_ok()
     test_nok()
     test_is()
@@ -815,6 +816,26 @@ CODE
     test_out( "not ok 12 # TODO \n\tFailed (TODO) test ''" )
     todo( 0 )
     test_test( 'todo test with no description or reason' )
+
+.end
+
+.sub test_todo_as_param
+
+    test_out( 'ok 13 # TODO todo reason' )
+    ok( 1, 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "ok" param) test should pass, marked as TODO' )
+
+    test_out( "not ok 14 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    ok( 0, 'failing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "ok" param) test should fail, marked as TODO' )
+
+    test_out( 'ok 15 # TODO todo reason' )
+    nok( 0, 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "nok" param) test should pass, marked as TODO' )
+
+    test_out( "not ok 16 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    nok( 1, 'failing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "nok" param) test should fail, marked as TODO' )
 
 .end
 
