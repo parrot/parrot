@@ -21,7 +21,7 @@
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 145 )
+    plan( 149 )
 
     test_skip()
     test_todo()
@@ -33,6 +33,8 @@
     test_todo_is_deeply()
     test_todo_isa_ok()
     test_todo_throws_like()
+    test_todo_lives_ok()
+    test_todo_dies_ok()
     test_ok()
     test_nok()
     test_is()
@@ -1042,24 +1044,66 @@ CODE
 
 .end
 
+
 .sub test_todo_throws_like
     test_out( "not ok 39 # TODO todo reason\n\tFailed (TODO) test 'throws_like fails when there is no error'" )
     throws_like( <<'CODE', 'somejunk', 'throws_like fails when there is no error', 'todo' => 'todo reason')
-.sub main
+  .sub main
     $I0 = 42
-.end
+  .end
 CODE
     test_diag( 'no error thrown' )
     test_test( 'todo (as "throws_like()" param) test should fail, marked as TODO' )
 
     test_out( 'ok 40 # TODO todo reason' )
     throws_like( <<'CODE', 'for\ the\ lulz','throws_like passes when error matches pattern', 'todo' => 'todo reason')
-.sub main
+  .sub main
     die 'I did it for the lulz'
-.end
+  .end
 CODE
     test_test( 'todo (as "throws_like()" param) test should pass, marked as TODO' )
 .end
+
+
+.sub test_todo_lives_ok
+    test_out( 'ok 41 # TODO todo reason' )
+    lives_ok( <<'CODE', 'lives_ok passes when there is no error', 'todo' => 'todo reason' )
+  .sub main
+    $I0 = 42
+  .end
+CODE
+    test_test( 'todo (as "lives_ok()" param) test should pass, marked as TODO' )
+
+    test_out( "not ok 42 # TODO todo reason\n\tFailed (TODO) test 'lives_ok fails when there is an error'" )
+    lives_ok( <<'CODE', 'lives_ok fails when there is an error', 'todo' => 'todo reason' )
+  .sub main
+    die 'I did it for the lulz'
+  .end
+CODE
+    test_diag( 'I did it for the lulz' )
+    test_test( 'todo (as "lives_ok()" param) test should fail, marked as TODO' )
+.end
+
+
+.sub test_todo_dies_ok
+    test_out( 'ok 43 # TODO todo reason' )
+    dies_ok( <<'CODE', 'dies_ok passes when there is an error', 'todo' => 'todo reason' )
+  .sub main
+    die 'I did it for the lulz'
+  .end
+CODE
+    test_test( 'todo (as "dies_ok()" param) test should fail, marked as TODO' )
+
+    test_out( "not ok 44 # TODO todo reason\n\tFailed (TODO) test 'dies_ok fails when there is no error'" )
+    dies_ok( <<'CODE', 'dies_ok fails when there is no error', 'todo' => 'todo reason' )
+  .sub main
+    $I0 = 42
+  .end
+CODE
+    test_diag( 'no error thrown' )
+    test_test( 'todo (as "dies_ok()" param) test should fail, marked as TODO' )
+.end
+
 
 .sub test_isa_ok
     .local pmc dog, terrier, daschund, Spot, Sossy
