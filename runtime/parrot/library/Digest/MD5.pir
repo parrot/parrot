@@ -21,7 +21,7 @@ or
   load_bytecode "Digest/MD5.pbc"
   $P0 = _md5sum("bar")
   $S0 = _md5_hex($P0)
-  
+
 or using the Object interface:
 
   load_bytecode "Digest/MD5.pbc"
