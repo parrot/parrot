@@ -456,12 +456,13 @@ size_t Parrot_io_peek_buffer(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 size_t Parrot_io_read_buffer(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
-    ARGMOD(STRING **buf))
+    ARGMOD(char *dest),
+    size_t len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*filehandle)
-        FUNC_MODIFIES(*buf);
+        FUNC_MODIFIES(*dest);
 
 PARROT_WARN_UNUSED_RESULT
 size_t Parrot_io_readline_buffer(PARROT_INTERP,
@@ -516,7 +517,7 @@ size_t Parrot_io_write_buffer(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_read_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filehandle) \
-    , PARROT_ASSERT_ARG(buf))
+    , PARROT_ASSERT_ARG(dest))
 #define ASSERT_ARGS_Parrot_io_readline_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filehandle) \
