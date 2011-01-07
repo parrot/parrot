@@ -131,11 +131,11 @@ recording it with the optional test description in C<description>.
 
     $I0 = istrue passed
 
-    if todo goto to_do
+    if todo goto todo_l
     test.'ok'( $I0, description )
     goto done
 
-  to_do:
+  todo_l:
     test.'todo'( $I0, description, todo )
 
   done:
@@ -159,11 +159,11 @@ C<passed>, recording it with the optional test description in C<description>.
     .local int reverse_passed
     reverse_passed = isfalse passed
 
-    if todo goto to_do
+    if todo goto todo_l
     test.'ok'( reverse_passed, description )
     goto done
 
-  to_do:
+  todo_l:
     test.'todo'( reverse_passed, description, todo )
 
   done:
@@ -215,6 +215,7 @@ will pass.
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -229,8 +230,14 @@ will pass.
 
     pass = iseq l, r
 
-report:
+  report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
@@ -241,12 +248,12 @@ report:
     if null left goto r_str
     l_string    = left
 
-r_str:
+  r_str:
     r_string    = 'null'
     if null right goto diag
     r_string    = right
 
-diag:
+  diag:
     diagnostic = _make_diagnostic( l_string, r_string )
     test.'diag'( diagnostic )
   done:
@@ -262,6 +269,7 @@ diag:
     .param int    have_desc   :opt_flag
     .param num    precision   :optional
     .param int    have_prec   :opt_flag
+    .param string todo        :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -287,7 +295,13 @@ diag:
     pass = isle diff, precision
 
   report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
@@ -314,6 +328,7 @@ diag:
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -327,8 +342,14 @@ diag:
     r = right
     pass = iseq l, r
 
-report:
+  report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
@@ -339,12 +360,12 @@ report:
     if null left goto r_str
     l_string    = left
 
-r_str:
+  r_str:
     r_string    = 'null'
     if null right goto diag
     r_string    = right
 
-diag:
+  diag:
     diagnostic = _make_diagnostic( l_string, r_string )
     test.'diag'( diagnostic )
   done:
@@ -355,6 +376,7 @@ diag:
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -393,7 +415,13 @@ diag:
     goto result
 
   result:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
