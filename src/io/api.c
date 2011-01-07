@@ -140,33 +140,6 @@ Parrot_io_stdhandle(PARROT_INTERP, INTVAL fileno, ARGIN_NULLOK(PMC *newhandle))
     return result;
 }
 
-/*
-
-=item C<PMC * Parrot_io_new_pmc(PARROT_INTERP, INTVAL flags)>
-
-Creates a new I/O filehandle object. The value of C<flags> is set
-in the returned PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-Parrot_io_new_pmc(PARROT_INTERP, INTVAL flags)
-{
-    ASSERT_ARGS(Parrot_io_new_pmc)
-    PMC * const new_io = Parrot_pmc_new(interp, enum_class_FileHandle);
-
-    Parrot_io_set_flags(interp, new_io, flags);
-
-    return new_io;
-}
-
-
-
 
 /*
 
@@ -189,34 +162,77 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
         ARGIN_NULLOK(STRING *path), ARGIN_NULLOK(STRING *mode))
 {
     ASSERT_ARGS(Parrot_io_open)
-    PMC *new_filehandle, *filehandle;
+    PMC *filehandle;
     const INTVAL typenum = Parrot_hll_get_ctx_HLL_type(interp,
                                                    Parrot_PMC_typenum(interp, "FileHandle"));
     if (PMC_IS_NULL(pmc)) {
-        new_filehandle = Parrot_pmc_new(interp, typenum);
+        filehandle = Parrot_pmc_new(interp, typenum);
     }
     else
-        new_filehandle = pmc;
+        filehandle = pmc;
 
-    if (new_filehandle->vtable->base_type == typenum) {
-        const INTVAL flags = Parrot_io_parse_open_flags(interp, mode);
+    if (STRING_IS_NULL(path))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                        "Cannot open filehandle, no path");
+
+    if (filehandle->vtable->base_type == typenum) {
+        INTVAL    flags     = Parrot_io_parse_open_flags(interp, mode);
+        PIOHANDLE os_handle;
+
         /* TODO: a filehandle shouldn't allow a NULL path. */
-        PARROT_ASSERT(new_filehandle->vtable->base_type == typenum);
-        filehandle = PIO_OPEN(interp, new_filehandle, path, flags);
-        if (PMC_IS_NULL(filehandle))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Unable to open filehandle from path '%S'", path);
+
         PARROT_ASSERT(filehandle->vtable->base_type == typenum);
-        SETATTR_FileHandle_flags(interp, new_filehandle, flags);
-        SETATTR_FileHandle_filename(interp, new_filehandle, path);
-        SETATTR_FileHandle_mode(interp, new_filehandle, mode);
-        if (!STRING_IS_NULL(mode)
-        &&  STRING_index(interp, mode, CONST_STRING(interp, "b"), 0) >= 0)
-            SETATTR_FileHandle_encoding(interp, new_filehandle, CONST_STRING(interp, "binary"));
+
+        if (flags & PIO_F_PIPE) {
+            const int f_read  = (flags & PIO_F_READ) != 0;
+            const int f_write = (flags & PIO_F_WRITE) != 0;
+            INTVAL    pid;
+
+            if (f_read == f_write)
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                    "Invalid pipe mode: %X", flags);
+
+            os_handle = PIO_OPEN_PIPE(interp, path, flags, &pid);
+
+            /* Save the pid of the child, we'll wait for it when closing */
+            VTABLE_set_integer_keyed_int(interp, filehandle, 0, pid);
+        }
+        else {
+            if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "Invalid mode for file open");
+
+            os_handle = PIO_OPEN(interp, path, flags);
+
+            if (os_handle == PIO_INVALID_HANDLE)
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                    "Unable to open filehandle from path '%Ss'", path);
+
+            flags |= PIO_F_FILE;
+
+            /* Set generic flag here if is a terminal then
+             * FileHandle can know how to setup buffering.
+             * STDIN, STDOUT, STDERR would be in this case
+             * so we would setup linebuffering.
+             */
+            if (PIO_IS_TTY(interp, os_handle))
+                flags |= PIO_F_CONSOLE;
+        }
+
+        if (STRING_IS_NULL(mode))
+            mode = CONST_STRING(interp, "r");
+        else if (STRING_index(interp, mode, CONST_STRING(interp, "b"), 0) >= 0)
+            SETATTR_FileHandle_encoding(interp, filehandle, CONST_STRING(interp, "binary"));
+
+        SETATTR_FileHandle_os_handle(interp, filehandle, os_handle);
+        SETATTR_FileHandle_flags(interp, filehandle, flags);
+        SETATTR_FileHandle_filename(interp, filehandle, path);
+        SETATTR_FileHandle_mode(interp, filehandle, mode);
+
         Parrot_io_setbuf(interp, filehandle, PIO_UNBOUND);
     }
     else
-        Parrot_pcc_invoke_method_from_c_args(interp, new_filehandle, CONST_STRING(interp, "open"), "SS->P", path, mode, &filehandle);
+        Parrot_pcc_invoke_method_from_c_args(interp, filehandle, CONST_STRING(interp, "open"), "SS->P", path, mode, &filehandle);
     return filehandle;
 }
 
@@ -249,11 +265,7 @@ Parrot_io_fdopen(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), PIOHANDLE fd,
     if (!flags)
         return PMCNULL;
 
-    new_filehandle = PIO_FDOPEN(interp, pmc, fd, flags);
-
-    if (PMC_IS_NULL(new_filehandle))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Unable to open filehandle from file descriptor");
+    new_filehandle = Parrot_io_fdopen_flags(interp, pmc, fd, flags);
 
     if (Parrot_io_get_flags(interp, new_filehandle) & PIO_F_CONSOLE)
         Parrot_io_setlinebuf(interp, new_filehandle);
@@ -262,6 +274,47 @@ Parrot_io_fdopen(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), PIOHANDLE fd,
 
     return new_filehandle;
 }
+
+
+/*
+
+=item C<PMC * Parrot_io_fdopen_flags(PARROT_INTERP, PMC *filehandle, PIOHANDLE
+fd, INTVAL flags)>
+
+Creates and returns a C<FileHandle> PMC for a given set of flags on an
+existing, open file descriptor.
+
+This is used particularly to initialize the C<STD*> IO handles onto the
+OS IO handles (0, 1, 2).
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_io_fdopen_flags(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
+        PIOHANDLE fd, INTVAL flags)
+{
+    ASSERT_ARGS(Parrot_io_fdopen_flags)
+
+    if (PIO_IS_TTY(interp, fd))
+        flags |= PIO_F_CONSOLE;
+
+    /* fdopened files are always shared */
+    flags |= PIO_F_SHARED;
+
+    if (PMC_IS_NULL(filehandle))
+        filehandle = Parrot_pmc_new(interp, enum_class_FileHandle);
+
+    Parrot_io_set_flags(interp, filehandle, flags);
+    Parrot_io_set_os_handle(interp, filehandle, fd);
+
+    return filehandle;
+}
+
 
 /*
 

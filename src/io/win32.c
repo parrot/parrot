@@ -35,7 +35,7 @@ Win32 System Programming, 2nd Edition.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static INTVAL convert_flags_to_win32(
+static void convert_flags_to_win32(
     INTVAL flags,
     ARGOUT(DWORD * fdwAccess),
     ARGOUT(DWORD * fdwShareMode),
@@ -47,14 +47,10 @@ static INTVAL convert_flags_to_win32(
         FUNC_MODIFIES(* fdwShareMode)
         FUNC_MODIFIES(* fdwCreate);
 
-PARROT_WARN_UNUSED_RESULT
-static INTVAL io_is_tty_win32(PIOHANDLE fd);
-
 #define ASSERT_ARGS_convert_flags_to_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(fdwAccess) \
     , PARROT_ASSERT_ARG(fdwShareMode) \
     , PARROT_ASSERT_ARG(fdwCreate))
-#define ASSERT_ARGS_io_is_tty_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -64,7 +60,7 @@ static INTVAL io_is_tty_win32(PIOHANDLE fd);
 
 /*
 
-=item C<static INTVAL convert_flags_to_win32(INTVAL flags, DWORD * fdwAccess,
+=item C<static void convert_flags_to_win32(INTVAL flags, DWORD * fdwAccess,
 DWORD * fdwShareMode, DWORD * fdwCreate)>
 
 Convert to platform-specific bit open flags.
@@ -73,7 +69,7 @@ Convert to platform-specific bit open flags.
 
 */
 
-static INTVAL
+static void
 convert_flags_to_win32(INTVAL flags, ARGOUT(DWORD * fdwAccess),
                ARGOUT(DWORD * fdwShareMode), ARGOUT(DWORD * fdwCreate))
 {
@@ -115,7 +111,6 @@ convert_flags_to_win32(INTVAL flags, ARGOUT(DWORD * fdwAccess),
     if (flags & PIO_F_APPEND) {
         /* dealt with specially in _write and _puts */
     }
-    return 1;
 }
 
 /*
@@ -137,19 +132,19 @@ Parrot_io_init_win32(PARROT_INTERP)
     int ret;
 
     if ((h = GetStdHandle(STD_INPUT_HANDLE)) != INVALID_HANDLE_VALUE) {
-        _PIO_STDIN(interp) = Parrot_io_fdopen_win32(interp, PMCNULL, h, PIO_F_READ);
+        _PIO_STDIN(interp) = Parrot_io_fdopen_flags(interp, PMCNULL, h, PIO_F_READ);
     }
     else {
         _PIO_STDIN(interp) = PMCNULL;
     }
     if ((h = GetStdHandle(STD_OUTPUT_HANDLE)) != INVALID_HANDLE_VALUE) {
-        _PIO_STDOUT(interp) = Parrot_io_fdopen_win32(interp, PMCNULL, h, PIO_F_WRITE);
+        _PIO_STDOUT(interp) = Parrot_io_fdopen_flags(interp, PMCNULL, h, PIO_F_WRITE);
     }
     else {
         _PIO_STDOUT(interp) = PMCNULL;
     }
     if ((h = GetStdHandle(STD_ERROR_HANDLE)) != INVALID_HANDLE_VALUE) {
-        _PIO_STDERR(interp) = Parrot_io_fdopen_win32(interp, PMCNULL, h, PIO_F_WRITE);
+        _PIO_STDERR(interp) = Parrot_io_fdopen_flags(interp, PMCNULL, h, PIO_F_WRITE);
     }
     else {
         _PIO_STDERR(interp) = PMCNULL;
@@ -186,8 +181,8 @@ Parrot_io_getblksize_win32(SHIM(PIOHANDLE fd))
 
 /*
 
-=item C<PMC * Parrot_io_open_win32(PARROT_INTERP, PMC *filehandle, STRING *path,
-INTVAL flags)>
+=item C<PIOHANDLE Parrot_io_open_win32(PARROT_INTERP, STRING *path, INTVAL
+flags)>
 
 Calls C<CreateFile()> to open C<*spath> with the Win32 translation of
 C<flags>.
@@ -197,9 +192,8 @@ C<flags>.
 */
 
 PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_io_open_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
-               ARGIN(STRING *path), INTVAL flags)
+PIOHANDLE
+Parrot_io_open_win32(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_open_win32)
     DWORD fAcc, fShare, fCreat;
@@ -210,19 +204,10 @@ Parrot_io_open_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
         fprintf(stderr, "Parrot_io_open_win32: %s\n", spath);
     }
 #  endif
-    if (flags & PIO_F_PIPE)
-        return Parrot_io_open_pipe_win32(interp, filehandle, path, flags);
-
-    if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
-        return NULL;
 
     /* Set open flags - <, >, >>, +<, +> */
     /* add ? and ! for block/non-block */
-    if (convert_flags_to_win32(flags, &fAcc, &fShare, &fCreat) < 0)
-        return NULL;
-
-    /* Only files for now */
-    flags |= PIO_F_FILE;
+    convert_flags_to_win32(flags, &fAcc, &fShare, &fCreat);
 
     { /* enclosing scope for temporary C string */
         char * const spath = Parrot_str_to_cstring(interp, path);
@@ -230,63 +215,8 @@ Parrot_io_open_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
                     FILE_ATTRIBUTE_NORMAL, NULL);
         Parrot_str_free_cstring(spath);
     }
-    if (fd != INVALID_HANDLE_VALUE) {
-        PMC *io;
-        if (PMC_IS_NULL(filehandle))
-            io = Parrot_io_new_pmc(interp, flags);
-        else {
-            io = filehandle;
-            Parrot_io_set_flags(interp, io, flags);
-        }
 
-        Parrot_io_set_os_handle(interp, io, fd);
-        return io;
-    }
-    else {
-        int err = GetLastError();
-        if (err) {
-            errno = err;
-        }
-    }
-
-    return PMCNULL;
-}
-
-/*
-
-=item C<PMC * Parrot_io_fdopen_win32(PARROT_INTERP, PMC *filehandle, PIOHANDLE
-fd, INTVAL flags)>
-
-Returns a new C<PMC> with C<fd> as its file descriptor.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-Parrot_io_fdopen_win32(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
-        PIOHANDLE fd, INTVAL flags)
-{
-    ASSERT_ARGS(Parrot_io_fdopen_win32)
-    PMC *io;
-
-    if (io_is_tty_win32(fd))
-        flags |= PIO_F_CONSOLE;
-
-    /* fdopened files are always shared */
-    flags |= PIO_F_SHARED;
-
-    if (PMC_IS_NULL(filehandle))
-        io = Parrot_io_new_pmc(interp, flags);
-    else {
-        io = filehandle;
-        Parrot_io_set_flags(interp, io, flags);
-    }
-
-    Parrot_io_set_os_handle(interp, io, fd);
-    return io;
+    return fd;
 }
 
 /*
@@ -400,7 +330,7 @@ Parrot_io_is_closed_win32(PARROT_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<static INTVAL io_is_tty_win32(PIOHANDLE fd)>
+=item C<INTVAL Parrot_io_is_tty_win32(PARROT_INTERP, PIOHANDLE fd)>
 
 Returns whether C<fd> is a console/tty.
 
@@ -409,10 +339,10 @@ Returns whether C<fd> is a console/tty.
 */
 
 PARROT_WARN_UNUSED_RESULT
-static INTVAL
-io_is_tty_win32(PIOHANDLE fd)
+INTVAL
+Parrot_io_is_tty_win32(SHIM_INTERP, PIOHANDLE fd)
 {
-    ASSERT_ARGS(io_is_tty_win32)
+    ASSERT_ARGS(Parrot_io_is_tty_win32)
     const DWORD ftype = GetFileType(fd);
     return (ftype == FILE_TYPE_CHAR);
 }
@@ -630,8 +560,8 @@ Parrot_io_peek_win32(PARROT_INTERP,
 
 /*
 
-=item C<PMC * Parrot_io_open_pipe_win32(PARROT_INTERP, PMC *filehandle, STRING
-*command, int flags)>
+=item C<PIOHANDLE Parrot_io_open_pipe_win32(PARROT_INTERP, STRING *command,
+INTVAL flags, INTVAL *pid)>
 
 Open a pipe. Not implemented for this platform.
 
@@ -640,10 +570,9 @@ Open a pipe. Not implemented for this platform.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_io_open_pipe_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
-        ARGIN(STRING *command), int flags)
+PIOHANDLE
+Parrot_io_open_pipe_win32(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
+        ARGOUT(INTVAL *pid))
 {
     ASSERT_ARGS(Parrot_io_open_pipe_win32)
 
@@ -657,13 +586,8 @@ Parrot_io_open_pipe_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
     PROCESS_INFORMATION procinfo;
     char *cmd = NULL;
     const char *comspec;
-    PMC *io = PMC_IS_NULL(filehandle) ? Parrot_io_new_pmc(interp, flags) : filehandle;
     STRING *auxcomm;
-    int f_read = (flags & PIO_F_READ) != 0;
-    int f_write = (flags & PIO_F_WRITE) != 0;
-    if (f_read == f_write)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Invalid pipe mode: %X", flags);
+    PIOHANDLE os_handle;
 
     procinfo.hThread = INVALID_HANDLE_VALUE;
     procinfo.hProcess = INVALID_HANDLE_VALUE;
@@ -683,7 +607,7 @@ Parrot_io_open_pipe_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
     start.dwFlags = STARTF_USESTDHANDLES;
     if (CreatePipe(&hread, &hwrite, NULL, 0) == 0)
         goto fail;
-    if (DuplicateHandle(current, f_read ? hwrite : hread,
+    if (DuplicateHandle(current, flags & PIO_F_READ ? hwrite : hread,
             current, &hchild,
             0, TRUE,
             DUPLICATE_CLOSE_SOURCE | DUPLICATE_SAME_ACCESS)
@@ -692,7 +616,7 @@ Parrot_io_open_pipe_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
     if (hchild == INVALID_HANDLE_VALUE)
         goto fail;
 
-    if (f_read) {
+    if (flags & PIO_F_READ) {
         /* Redirect input to NULL. This is to avoid
          * interferences in case both the child and
          * the parent tries to read from stdin.
@@ -716,19 +640,22 @@ Parrot_io_open_pipe_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
             NULL, NULL, TRUE, 0,
             NULL, NULL, &start, &procinfo) == 0)
         goto fail;
-    if (f_read) {
-        Parrot_io_set_os_handle(interp, io, hread);
+
+    if (flags & PIO_F_READ) {
+        os_handle = hread;
         CloseHandle(hwrite);
     }
     else {
-        Parrot_io_set_os_handle(interp, io, hwrite);
+        os_handle = hwrite;
         CloseHandle(hread);
     }
 
     Parrot_str_free_cstring(cmd);
     CloseHandle(procinfo.hThread);
-    VTABLE_set_integer_keyed_int(interp, io, 0, (INTVAL)procinfo.hProcess);
-    return io;
+
+    *pid = (INTVAL)procinfo.hProcess;
+
+    return os_handle;
 
 fail:
     if (cmd != NULL)

@@ -45,9 +45,7 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 PARROT_CONST_FUNCTION
 static int convert_flags_to_unix(INTVAL flags);
 
-static INTVAL io_is_tty_unix(PIOHANDLE fd);
 #define ASSERT_ARGS_convert_flags_to_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_io_is_tty_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -57,8 +55,7 @@ static INTVAL io_is_tty_unix(PIOHANDLE fd);
 =item C<static int convert_flags_to_unix(INTVAL flags)>
 
 Returns a UNIX-specific interpretation of C<flags> suitable for passing
-to C<open()> and C<fopen()> in C<Parrot_io_open_unix()> and
-C<Parrot_io_fdopen_unix()> respectively.
+to C<open()> and C<fopen()> in C<Parrot_io_open_unix()>.
 
 =cut
 
@@ -109,17 +106,17 @@ Parrot_io_init_unix(PARROT_INTERP)
     if (d != NULL && d->table != NULL) {
         PMC *filehandle;
 
-        filehandle = Parrot_io_fdopen_unix(interp, PMCNULL, STDIN_FILENO, PIO_F_READ);
+        filehandle = Parrot_io_fdopen_flags(interp, PMCNULL, STDIN_FILENO, PIO_F_READ);
         if (PMC_IS_NULL(filehandle))
             return -1;
         _PIO_STDIN(interp) = filehandle;
 
-        filehandle = Parrot_io_fdopen_unix(interp, PMCNULL, STDOUT_FILENO, PIO_F_WRITE);
+        filehandle = Parrot_io_fdopen_flags(interp, PMCNULL, STDOUT_FILENO, PIO_F_WRITE);
         if (PMC_IS_NULL(filehandle))
             return -1;
         _PIO_STDOUT(interp) = filehandle;
 
-        filehandle = Parrot_io_fdopen_unix(interp, PMCNULL, STDERR_FILENO, PIO_F_WRITE);
+        filehandle = Parrot_io_fdopen_flags(interp, PMCNULL, STDERR_FILENO, PIO_F_WRITE);
         if (PMC_IS_NULL(filehandle))
             return -1;
         _PIO_STDERR(interp) = filehandle;
@@ -132,8 +129,8 @@ Parrot_io_init_unix(PARROT_INTERP)
 
 /*
 
-=item C<PMC * Parrot_io_open_unix(PARROT_INTERP, PMC *filehandle, STRING *path,
-INTVAL flags)>
+=item C<PIOHANDLE Parrot_io_open_unix(PARROT_INTERP, STRING *path, INTVAL
+flags)>
 
 Opens a string C<path>. C<flags> is a bitwise C<or> combination of C<PIO_F_*>
 flag values.
@@ -143,109 +140,35 @@ flag values.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_io_open_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
-              ARGIN(STRING *path), INTVAL flags)
+PIOHANDLE
+Parrot_io_open_unix(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_open_unix)
-    int oflags;
-    PIOHANDLE fd;
-    char *spath;
-
-    if (flags & PIO_F_PIPE)
-        return Parrot_io_open_pipe_unix(interp, filehandle, path, flags);
-
-    if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                                "Invalid mode for file open");
+    struct stat  buf;
+    int          oflags;
+    PIOHANDLE    fd;
+    char        *spath;
 
     oflags = convert_flags_to_unix(flags);
-    spath = Parrot_str_to_cstring(interp, path);
+    spath  = Parrot_str_to_cstring(interp, path);
 
-    /* Only files for now */
-    flags |= PIO_F_FILE;
-
-    /* Try open with no create first */
-    while ((fd = open(spath, oflags & (O_WRONLY | O_RDWR | O_APPEND), DEFAULT_OPEN_MODE))
-           < 0 && errno == EINTR)
+    while ((fd = open(spath, oflags, DEFAULT_OPEN_MODE)) < 0
+    &&      errno == EINTR)
         errno = 0;
 
-    /* File open */
-    if (fd >= 0) {
-        /*
-         * Now check if we specified O_CREAT|O_EXCL or not.
-         * If so, we must return NULL, else either use the
-         * descriptor or create the file.
-         */
-        if ((oflags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL)) {
-            close(fd);
+    Parrot_str_free_cstring(spath);
 
-            /* returning before C string freed */
-            Parrot_str_free_cstring(spath);
-            return PMCNULL;
-        }
+    if (fd < 0)
+        return PIO_INVALID_HANDLE;
 
-        /* Check for truncate?  */
-        if (oflags & O_TRUNC) {
-            int tfd;
-            while ((tfd = creat(spath, PIO_DEFAULTMODE)) < 0 && errno == EINTR)
-                errno = 0;
-            if (tfd > 0)
-                close(tfd);
-        }
-    }
-    else if (oflags & O_CREAT) {
-        /* O_CREAT and file doesn't exist. */
-        while ((fd = creat(spath, PIO_DEFAULTMODE)) < 0 && errno == EINTR)
-            errno = 0;
-        if (!(oflags & O_WRONLY)) {
-            if (fd > 0)
-                close(fd);
-
-            /* File created, reopen with read+write */
-            while ((fd = open(spath, oflags & (O_WRONLY | O_RDWR),
-                              DEFAULT_OPEN_MODE)) < 0 && errno == EINTR)
-                errno = 0;
-        }
-    }
-    else {
-        /* File doesn't exist and O_CREAT not specified */
+    /* Don't open directories */
+    if (fstat(fd, &buf) == -1
+    || (buf.st_mode & S_IFMT) == S_IFDIR) {
+        close(fd);
+        return PIO_INVALID_HANDLE;
     }
 
-    Parrot_str_free_cstring(spath); /* done with C string */
-
-    if (fd >= 0) {
-        struct stat buf;
-        if (fstat(fd, &buf) == -1) {
-            close(fd);
-            return PMCNULL;
-        }
-        if ((buf.st_mode & S_IFMT) == S_IFDIR) {
-            close(fd);
-            errno = EISDIR;
-            return PMCNULL;
-        }
-        /* Set generic flag here if is a terminal then
-         * FileHandle can know how to setup buffering.
-         * STDIN, STDOUT, STDERR would be in this case
-         * so we would setup linebuffering.
-         */
-        if (io_is_tty_unix(fd))
-            flags |= PIO_F_CONSOLE;
-
-        if (PMC_IS_NULL(filehandle)) {
-            PMC * const io = Parrot_io_new_pmc(interp, flags);
-            Parrot_io_set_os_handle(interp, io, fd);
-            return io;
-        }
-        else {
-            Parrot_io_set_flags(interp, filehandle, flags);
-            Parrot_io_set_os_handle(interp, filehandle, fd);
-            return filehandle;
-        }
-    }
-    return PMCNULL;
+    return fd;
 }
 
 #  if PARROT_ASYNC_DEVEL
@@ -289,41 +212,6 @@ Parrot_io_async_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), INTVAL b)
 }
 
 #  endif
-
-/*
-
-=item C<PMC * Parrot_io_fdopen_unix(PARROT_INTERP, PMC *filehandle, PIOHANDLE
-fd, INTVAL flags)>
-
-Returns a new C<FileHandle> PMC with the file descriptor passed in.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-Parrot_io_fdopen_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle), PIOHANDLE fd, INTVAL flags)
-{
-    ASSERT_ARGS(Parrot_io_fdopen_unix)
-    if (io_is_tty_unix(fd))
-        flags |= PIO_F_CONSOLE;
-
-    /* fdopened files are always shared */
-    flags |= PIO_F_SHARED;
-
-    if (PMC_IS_NULL(filehandle)) {
-        PMC * const io = Parrot_io_new_pmc(interp, flags);
-        Parrot_io_set_os_handle(interp, io, fd);
-        return io;
-    }
-    else {
-        Parrot_io_set_flags(interp, filehandle, flags);
-        Parrot_io_set_os_handle(interp, filehandle, fd);
-        return filehandle;
-    }
-}
 
 /*
 
@@ -407,7 +295,7 @@ Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(const PMC *filehandle))
 
 /*
 
-=item C<static INTVAL io_is_tty_unix(PIOHANDLE fd)>
+=item C<INTVAL Parrot_io_is_tty_unix(PARROT_INTERP, PIOHANDLE fd)>
 
 Returns a boolean value indicating whether C<fd> is a console/tty.
 
@@ -415,10 +303,11 @@ Returns a boolean value indicating whether C<fd> is a console/tty.
 
 */
 
-static INTVAL
-io_is_tty_unix(PIOHANDLE fd)
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_io_is_tty_unix(SHIM_INTERP, PIOHANDLE fd)
 {
-    ASSERT_ARGS(io_is_tty_unix)
+    ASSERT_ARGS(Parrot_io_is_tty_unix)
     return isatty(fd);
 }
 
@@ -653,8 +542,8 @@ Parrot_io_tell_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
 
 /*
 
-=item C<PMC * Parrot_io_open_pipe_unix(PARROT_INTERP, PMC *filehandle, STRING
-*command, int flags)>
+=item C<PIOHANDLE Parrot_io_open_pipe_unix(PARROT_INTERP, STRING *command,
+INTVAL flags, INTVAL *pid_out)>
 
 Very limited C<exec> for now.
 
@@ -663,10 +552,9 @@ Very limited C<exec> for now.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
-        ARGIN(STRING *command), int flags)
+PIOHANDLE
+Parrot_io_open_pipe_unix(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
+        ARGOUT(INTVAL *pid_out))
 {
     ASSERT_ARGS(Parrot_io_open_pipe_unix)
     /*
@@ -676,11 +564,6 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 #  ifdef PARROT_HAS_HEADER_UNISTD
     int pid;
     int fds[2];
-    const int f_read  = (flags & PIO_F_READ) != 0;
-    const int f_write = (flags & PIO_F_WRITE) != 0;
-    if (f_read == f_write)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Invalid pipe mode: %X", flags);
 
     if (pipe(fds) < 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
@@ -695,27 +578,18 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
             "fork failed: %s", strerror(errno));
     }
     else if (pid > 0) {
-        /* Parent - return IO stream */
-        PMC *io;
-        if (PMC_IS_NULL(filehandle))
-            io = Parrot_io_new_pmc(interp, flags & (PIO_F_READ|PIO_F_WRITE));
-        else
-            io = filehandle;
+        *pid_out = pid;
 
-        /* Save the pid of the child, we'll wait for it when closing */
-        VTABLE_set_integer_keyed_int(interp, io, 0, pid);
-
-        if (f_read) {
+        if (flags & PIO_F_READ) {
             /* close this writer's end of pipe */
             close(fds[1]);
-            Parrot_io_set_os_handle(interp, io, fds[0]);
+            return fds[0];
         }
         else {  /* assume write only for now */
             /* close this reader's end */
             close(fds[0]);
-            Parrot_io_set_os_handle(interp, io, fds[1]);
+            return fds[1];
         }
-        return io;
     }
     else /* (pid == 0) */ {
         /* Child - exec process */
@@ -727,15 +601,7 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
         static char auxarg0[] = "/bin/sh";
         static char auxarg1[] = "-c";
 
-        if (f_write) {
-            /* the other end is writing - we read from the pipe */
-            close(STDIN_FILENO);
-            close(fds[1]);
-
-            if (dup(fds[0]) != STDIN_FILENO)
-                exit(EXIT_FAILURE);
-        }
-        else {
+        if (flags & PIO_F_READ) {
             /* XXX redirect stdout, stderr to pipe */
             close(STDOUT_FILENO);
             close(STDERR_FILENO);
@@ -744,6 +610,14 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
             if (dup(fds[1]) != STDOUT_FILENO)
                 exit(EXIT_FAILURE);
             if (dup(fds[1]) != STDERR_FILENO)
+                exit(EXIT_FAILURE);
+        }
+        else {
+            /* the other end is writing - we read from the pipe */
+            close(STDIN_FILENO);
+            close(fds[1]);
+
+            if (dup(fds[0]) != STDIN_FILENO)
                 exit(EXIT_FAILURE);
         }
 

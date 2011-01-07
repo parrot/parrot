@@ -168,6 +168,7 @@ size_t Parrot_io_write_portable(PARROT_INTERP,
 #define PIO_PEEK(interp, pmc, buf) Parrot_io_peek_portable((interp), (pmc), (buf))
 #define PIO_FLUSH(interp, pmc) Parrot_io_flush_portable((interp), (pmc))
 #define PIO_GETBLKSIZE(handle) Parrot_io_getblksize_portable((handle))
+#define PIO_IS_TTY(interp, handle) Parrot_io_unimplemented_portable(interp)
 
 #define PIO_POLL(interp, pmc, which, sec, usec) Parrot_io_unimplemented_portable(interp)
 #define PIO_PIPE(interp, reader, writer) Parrot_io_unimplemented_portable(interp)
