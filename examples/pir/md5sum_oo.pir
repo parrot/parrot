@@ -16,9 +16,9 @@
       $I1 = elements mba
       $S0 = mba.'get_string'(0, $I1, 'binary')
 
-      $P1 = _md5sum($S0)
-      $S0 = _md5_hex($P1)
-      say $S0
+      $P0 = new ["Digest";"MD5"]
+      $P0."md5sum"($S0)
+      $P0."md5_print"()
 .end
 
 # Local Variables:
