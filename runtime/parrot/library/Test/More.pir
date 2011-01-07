@@ -454,6 +454,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -470,7 +471,13 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     pass = 1
 
   report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
@@ -491,6 +498,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -507,7 +515,13 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     pass = 1
 
   report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
@@ -528,6 +542,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -544,7 +559,13 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     pass = 1
 
   report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
@@ -565,6 +586,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -578,7 +600,13 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     pass = isne left, right
 
   report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
