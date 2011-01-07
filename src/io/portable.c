@@ -489,7 +489,7 @@ Throws an exception for unimplemented functions.
 INTVAL
 Parrot_io_unimplemented_portable(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_io_init_portable)
+    ASSERT_ARGS(Parrot_io_unimplemented_portable)
 
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
         "IO function unimplemented");
