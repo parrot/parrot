@@ -778,11 +778,8 @@ Returns the next byte from the stream, but does not remove it.
 */
 
     METHOD peek() {
-        STRING *s = NULL;
-        if (Parrot_io_peek(INTERP, SELF, &s) < 0)
-            RETURN(STRING* STRINGNULL);
-        else
-            RETURN(STRING* s);
+        STRING *s = Parrot_io_peek(INTERP, SELF);
+        RETURN(STRING* s);
     }
 
 /*

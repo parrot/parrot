@@ -583,10 +583,8 @@ Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot read from a closed or non-readable filehandle");
 
-        result = Parrot_str_new_init(interp, NULL, 0,
-                                     get_encoding(interp, pmc), 0);
-
-        ignored = Parrot_io_readline_buffer(interp, pmc, &result);
+        result = Parrot_io_readline_buffer(interp, pmc,
+                    get_encoding(interp, pmc));
     }
     else if (pmc->vtable->base_type == enum_class_StringHandle) {
         INTVAL offset, newline_pos, read_length, orig_length;
@@ -697,7 +695,7 @@ Parrot_io_tell(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_io_peek(PARROT_INTERP, PMC *pmc, STRING **buffer)>
+=item C<STRING * Parrot_io_peek(PARROT_INTERP, PMC *pmc)>
 
 Retrieve the next character in the stream without modifying the stream. Calls
 the platform-specific implementation of 'peek'.
@@ -708,14 +706,25 @@ the platform-specific implementation of 'peek'.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-INTVAL
-Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buffer))
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_peek)
-    if (Parrot_io_is_closed(interp, pmc))
-        return -1;
+    STRING *res;
+    INTVAL  c;
 
-    return Parrot_io_peek_buffer(interp, pmc, buffer);
+    if (Parrot_io_is_closed(interp, pmc))
+        c = -1;
+    else
+        c = Parrot_io_peek_buffer(interp, pmc);
+
+    if (c == -1)
+        res = STRINGNULL;
+    else
+        res = Parrot_str_chr(interp, c);
+
+    return res;
 }
 
 /*

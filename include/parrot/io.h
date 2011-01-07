@@ -238,14 +238,11 @@ INTVAL Parrot_io_parse_open_flags(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_io_peek(PARROT_INTERP,
-    ARGMOD(PMC *pmc),
-    ARGOUT(STRING **buffer))
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pmc)
-        FUNC_MODIFIES(*buffer);
+        FUNC_MODIFIES(*pmc);
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
@@ -385,8 +382,7 @@ PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_peek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc) \
-    , PARROT_ASSERT_ARG(buffer))
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_io_printf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
@@ -444,14 +440,10 @@ INTVAL Parrot_io_flush_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
 INTVAL Parrot_io_init_buffer(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-size_t Parrot_io_peek_buffer(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    ARGOUT(STRING **buf))
+INTVAL Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*filehandle)
-        FUNC_MODIFIES(*buf);
+        FUNC_MODIFIES(*filehandle);
 
 PARROT_WARN_UNUSED_RESULT
 size_t Parrot_io_read_buffer(PARROT_INTERP,
@@ -465,14 +457,14 @@ size_t Parrot_io_read_buffer(PARROT_INTERP,
         FUNC_MODIFIES(*dest);
 
 PARROT_WARN_UNUSED_RESULT
-size_t Parrot_io_readline_buffer(PARROT_INTERP,
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_io_readline_buffer(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
-    ARGOUT(STRING **buf))
+    ARGIN(const STR_VTABLE *encoding))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*filehandle)
-        FUNC_MODIFIES(*buf);
+        FUNC_MODIFIES(*filehandle);
 
 PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
@@ -512,8 +504,7 @@ size_t Parrot_io_write_buffer(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_peek_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle) \
-    , PARROT_ASSERT_ARG(buf))
+    , PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_read_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filehandle) \
@@ -521,7 +512,7 @@ size_t Parrot_io_write_buffer(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_readline_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filehandle) \
-    , PARROT_ASSERT_ARG(buf))
+    , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_Parrot_io_seek_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filehandle))

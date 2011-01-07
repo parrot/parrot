@@ -351,22 +351,20 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 /*
 
-=item C<size_t Parrot_io_peek_buffer(PARROT_INTERP, PMC *filehandle, STRING
-**buf)>
+=item C<INTVAL Parrot_io_peek_buffer(PARROT_INTERP, PMC *filehandle)>
 
 Retrieve the next character in the buffer without modifying the stream.
+Return -1 ar EOF.
 
 =cut
 
 */
 
-size_t
-Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
-        ARGOUT(STRING **buf))
+INTVAL
+Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_peek_buffer)
     unsigned char *buffer_next;
-    STRING * const s            = Parrot_io_make_string(interp, buf, 1);
     UINTVAL        len          = 1;
     INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
 
@@ -376,42 +374,31 @@ Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
     }
 
-    buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-
     /* (re)fill the buffer */
     if (! (buffer_flags & PIO_BF_READBUF)) {
         size_t got;
 
         /* promote to buffered if unbuffered */
-        if (Parrot_io_get_buffer_size(interp, filehandle) == 0) {
+        if (Parrot_io_get_buffer_size(interp, filehandle) == 0)
             Parrot_io_setbuf(interp, filehandle, 1);
-            return Parrot_io_peek_buffer(interp, filehandle, buf);
-        }
 
         /* Parrot_io_fill_readbuf() can return -1, but len should be positive */
         got = Parrot_io_fill_readbuf(interp, filehandle);
 
-        /* avoid signedness problems between size_t got and UINTVAL len */
-        if (len > got) {
-            if (got > 0)
-                len = (UINTVAL)got;
-            else
-                len = 0;
-        }
+        if (got <= 0)
+            return -1;
     }
 
-    /* if we got any data, then copy out the next byte */
-    memmove(s->strstart, buffer_next, len);
-    s->bufused = s->strlen = len;
+    buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
 
-    return len;
+    return *buffer_next;
 }
 
 
 /*
 
-=item C<size_t Parrot_io_readline_buffer(PARROT_INTERP, PMC *filehandle, STRING
-**buf)>
+=item C<STRING * Parrot_io_readline_buffer(PARROT_INTERP, PMC *filehandle, const
+STR_VTABLE *encoding)>
 
 This is called from C<Parrot_io_read_buffer()> to do line buffered reading if
 that is what is required.
@@ -421,8 +408,10 @@ that is what is required.
 */
 
 PARROT_WARN_UNUSED_RESULT
-size_t
-Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING **buf))
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
+        ARGIN(const STR_VTABLE *encoding))
 {
     ASSERT_ARGS(Parrot_io_readline_buffer)
     static const size_t max_split_bytes = 3;
@@ -439,12 +428,10 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
     }
 
-    if (*buf == NULL) {
-        *buf = Parrot_gc_new_string_header(interp, 0);
-    }
-    s = *buf;
-    s->bufused = 0;
-    s->strlen  = 0;
+    s           = Parrot_gc_new_string_header(interp, 0);
+    s->bufused  = 0;
+    s->strlen   = 0;
+    s->encoding = encoding;
 
     /* fill empty buffer */
     if (!(buffer_flags & PIO_BF_READBUF)) {
@@ -453,7 +440,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
             Parrot_io_setbuf(interp, filehandle, 1);
 
         if (Parrot_io_fill_readbuf(interp, filehandle) == 0)
-            return 0;
+            return s;
     }
 
     /* Retrieve filled buffer */
@@ -475,7 +462,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
         bounds.chars = -1;
         bounds.delim = rs;
 
-        s->encoding->partial_scan(interp, (char *)buffer_next, &bounds);
+        encoding->partial_scan(interp, (char *)buffer_next, &bounds);
 
         /* Append buffer to result */
 
@@ -522,7 +509,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
             else {
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_CHARACTER,
-                    "Unaligned end in %s string\n", s->encoding->name);
+                    "Unaligned end in %s string\n", encoding->name);
             }
         }
 
@@ -545,13 +532,13 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
             bounds.chars = 1;
             bounds.delim = rs;
 
-            s->encoding->partial_scan(interp, s->strstart + decoded_bytes,
+            encoding->partial_scan(interp, s->strstart + decoded_bytes,
                                       &bounds);
 
             if (bounds.bytes == 0)
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_CHARACTER,
-                    "Unaligned end in %s string\n", s->encoding->name);
+                    "Unaligned end in %s string\n", encoding->name);
 
             PARROT_ASSERT(bounds.chars == 1);
 
@@ -581,7 +568,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
     Parrot_io_set_file_position(interp, filehandle,
             s->bufused + Parrot_io_get_file_position(interp, filehandle));
 
-    return s->bufused;
+    return s;
 }
 
 /*
