@@ -91,7 +91,8 @@ INTVAL Parrot_io_pipe_win32(SHIM_INTERP,
 
 size_t Parrot_io_read_win32(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
-    ARGOUT(STRING **buf))
+    ARGMOD(char *buf),
+    size_t len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -279,7 +280,7 @@ INTVAL Parrot_io_socket_win32(PARROT_INTERP,
 #define PIO_CLOSE(interp, pmc) Parrot_io_close_win32((interp), (pmc))
 #define PIO_CLOSE_PIOHANDLE(interp, handle) Parrot_io_close_piohandle_win32((interp), (handle))
 #define PIO_IS_CLOSED(interp, pmc) Parrot_io_is_closed_win32((interp), (pmc))
-#define PIO_READ(interp, pmc, buf) Parrot_io_read_win32((interp), (pmc), (buf))
+#define PIO_READ(interp, pmc, buf, len) Parrot_io_read_win32((interp), (pmc), (buf), (len))
 #define PIO_WRITE(interp, pmc, str) Parrot_io_write_win32((interp), (pmc), (str))
 #define PIO_SEEK(interp, pmc, offset, start) \
     Parrot_io_seek_win32((interp), (pmc), (offset), (start))
