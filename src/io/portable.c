@@ -97,19 +97,15 @@ INTVAL
 Parrot_io_init_portable(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_io_init_portable)
-#  ifdef PIO_OS_STDIO
     /* Only set standard handles if stdio is the OS IO */
-    PIO_STDIN(interp)
+    _PIO_STDIN(interp)
         = Parrot_io_fdopen_portable(interp, PMCNULL, stdin, PIO_F_READ);
 
-    PIO_STDOUT(interp)
+    _PIO_STDOUT(interp)
         = Parrot_io_fdopen_portable(interp, PMCNULL, stdout, PIO_F_WRITE);
 
-    PIO_STDERR(interp)
+    _PIO_STDERR(interp)
         = Parrot_io_fdopen_portable(interp, PMCNULL, stderr, PIO_F_WRITE);
-#  else  /* PIO_OS_STDIO */
-    UNUSED(interp);
-#  endif /* PIO_OS_STDIO */
     return 0;
 }
 
@@ -162,7 +158,7 @@ Parrot_io_open_portable(PARROT_INTERP, ARGMOD(PMC *filehandle),
             flags |= PIO_F_CONSOLE;
 
         if (PMC_IS_NULL(filehandle))
-            io = Parrot_io_new_pmc(interp, flags, 0);
+            io = Parrot_io_new_pmc(interp, flags);
         else
             io = filehandle;
 
@@ -205,7 +201,7 @@ Parrot_io_fdopen_portable(PARROT_INTERP, ARGMOD(PMC *filehandle),
     else
         io = filehandle;
 
-    Parrot_io_set_os_handle(interp, filehandle, (PIOHANDLE)fptr);
+    Parrot_io_set_os_handle(interp, io, (PIOHANDLE)fptr);
 
     return io;
 }
@@ -241,7 +237,8 @@ Parrot_io_close_portable(PARROT_INTERP, ARGMOD(PMC *filehandle))
 
 /*
 
-=item C<INTVAL Parrot_io_is_closed_portable(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_is_closed_portable(PARROT_INTERP, const PMC
+*filehandle)>
 
 Tests whether the filehandle has been closed.
 
@@ -250,7 +247,7 @@ Tests whether the filehandle has been closed.
 */
 
 INTVAL
-Parrot_io_is_closed_portable(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_is_closed_portable(PARROT_INTERP, ARGIN(const PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_is_closed_portable)
     if (Parrot_io_get_os_handle(interp, filehandle) == (PIOHANDLE)NULL)
@@ -348,7 +345,7 @@ Flushes the underlying file descriptor of the given IO PMC.
 */
 
 INTVAL
-Parrot_io_flush_portable(SHIM_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_flush_portable(PARROT_INTERP, ARGIN(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_flush_portable)
     return fflush((FILE *)Parrot_io_get_os_handle(interp, filehandle));
@@ -426,10 +423,11 @@ PIOOFF_T
 Parrot_io_seek_portable(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(Parrot_io_seek_portable)
-    errno = 0;
+    PIOOFF_T pos;
 
-    const PIOOFF_T pos = fseek(
-            (FILE *)Parrot_io_get_os_handle(interp, filehandle), (long)offset, whence);
+    errno = 0;
+    pos   = fseek((FILE *)Parrot_io_get_os_handle(interp, filehandle),
+                (long)offset, whence);
 
     if (pos >= 0)
         Parrot_io_set_file_position(interp, filehandle, pos);
@@ -482,6 +480,26 @@ Parrot_io_open_pipe_portable(PARROT_INTERP, SHIM(PMC *filehandle),
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
         "pipe() not implemented");
 }
+
+/*
+
+=item C<INTVAL Parrot_io_unimplemented_portable(PARROT_INTERP)>
+
+Throws an exception for unimplemented functions.
+
+=cut
+
+*/
+
+INTVAL
+Parrot_io_unimplemented_portable(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_io_init_portable)
+
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        "IO function unimplemented");
+}
+
 
 #endif /* PIO_OS_STDIO */
 

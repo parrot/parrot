@@ -306,6 +306,8 @@ INTVAL Parrot_io_socket_win32(PARROT_INTERP,
     Parrot_io_listen_win32((interp), (pmc), (backlog))
 #define PIO_ACCEPT(interp, pmc) \
     Parrot_io_accept_win32((interp), (pmc))
+#define PIO_SOCKADDR_IN(interp, addr, port) \
+    Parrot_io_sockaddr_in((interp), (addr), (port))
 
 #endif /* PARROT_IO_WIN32_H_GUARD */
 

@@ -312,6 +312,8 @@ INTVAL Parrot_io_socket_unix(PARROT_INTERP,
     Parrot_io_listen_unix((interp), (pmc), (backlog))
 #define PIO_ACCEPT(interp, pmc) \
     Parrot_io_accept_unix((interp), (pmc))
+#define PIO_SOCKADDR_IN(interp, addr, port) \
+    Parrot_io_sockaddr_in((interp), (addr), (port))
 
 #endif /* PARROT_IO_UNIX_H_GUARD */
 
