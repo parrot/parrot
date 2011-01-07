@@ -29,7 +29,7 @@ regressions in the parrot VM, JIT and GC
     load_bytecode "Digest/MD5.pbc"
 
     .include 'test_more.pir'
-    plan(519)
+    plan(518)
 
     test_miscellaneous_words()
     test_funny_chars()
