@@ -653,6 +653,7 @@ This handles comparisons of array-like and hash-like structures.
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local int    result
     .local pmc diagnosis
@@ -685,7 +686,12 @@ This handles comparisons of array-like and hash-like structures.
     goto report_result
 
   report_result:
+    if todo goto todo_l
     test.'ok'( result, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( result, description, todo )
+  after_todo_l:
 
     unless result goto report_diagnostic
     .return( result )
@@ -1168,6 +1174,7 @@ Passes a test if the PIR does not throw any exception, fails a test otherwise.
 .sub lives_ok
     .param string target
     .param string description :optional
+    .param string todo        :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -1188,7 +1195,12 @@ Passes a test if the PIR does not throw any exception, fails a test otherwise.
     pop_eh
 
     # if it doesn't throw an exception pass
+    if todo goto todo_l
     test.'ok'( 1, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( 1, description, todo )
+  after_todo_l:
 
     goto done
 
@@ -1349,6 +1361,7 @@ optional test description in C<description>.
     .param string target
     .param string pattern
     .param string description :optional
+    .param string todo        :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -1391,7 +1404,13 @@ optional test description in C<description>.
     pass = 1
 
   report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     test.'diag'( diagnostic )
@@ -1483,6 +1502,7 @@ Bad input: "C<test that the return from Foo is correct type>"
     .param pmc class_name
     .param pmc object_name :optional
     .param int got_name :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -1503,7 +1523,14 @@ Bad input: "C<test that the return from Foo is correct type>"
     description .= $S0
 
     $I0 = isa thingy, class_name
+
+    if todo goto todo_l
     test.'ok'($I0, description)
+    goto after_todo_l
+  todo_l:
+    test.'todo'( $I0, description, todo )
+  after_todo_l:
+
     if $I0 goto out
     diagnostic .= " isn't a "
     $S1 = class_name
