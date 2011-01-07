@@ -1164,7 +1164,13 @@ Passes a test if the PIR code throws any exception, fails a test otherwise.
     .get_results (ex)
     pop_eh
     error_msg = ex
+
+    if todo goto todo_l2
     test.'ok'( 1, description )
+    goto after_todo_l2
+  todo_l2:
+    test.'todo'( 1, description, todo )
+  after_todo_l2:
 
   done:
 
@@ -1218,7 +1224,14 @@ Passes a test if the PIR does not throw any exception, fails a test otherwise.
     .get_results (ex)
     pop_eh
     error_msg = ex
+
+    if todo goto todo_l2
     test.'ok'( 0, description )
+    goto after_todo_l2
+  todo_l2:
+    test.'todo'( 0, description, todo )
+  after_todo_l2:
+
     test.'diag'(error_msg)
 
   done:
