@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -228,9 +228,9 @@ size_t
 Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_fill_readbuf)
-    char    *buf  = (char *) Parrot_io_get_buffer_start(interp, filehandle);
-    size_t   size = Parrot_io_get_buffer_size(interp, filehandle);
-    size_t   got  = PIO_READ(interp, filehandle, buf, size);
+    unsigned char    *buf  = Parrot_io_get_buffer_start(interp, filehandle);
+    size_t            size = Parrot_io_get_buffer_size(interp, filehandle);
+    size_t            got  = PIO_READ(interp, filehandle, (char *)buf, size);
 
     /* nothing to get */
     if (got == 0)
