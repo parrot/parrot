@@ -1125,6 +1125,7 @@ Passes a test if the PIR code throws any exception, fails a test otherwise.
 .sub dies_ok
     .param string target
     .param string description :optional
+    .param string todo        :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -1145,9 +1146,14 @@ Passes a test if the PIR code throws any exception, fails a test otherwise.
     pop_eh
 
     # if it doesn't throw an exception fail
+    if todo goto todo_l
     test.'ok'( 0, description )
-    test.'diag'('no error thrown')
+    goto after_todo_l
+  todo_l:
+    test.'todo'( 0, description, todo )
+  after_todo_l:
 
+    test.'diag'('no error thrown')
     goto done
 
   handler:
@@ -1231,6 +1237,7 @@ an exception that matches the pattern, fails the test otherwise.
     .param string target
     .param string pattern
     .param string description :optional
+    .param string todo        :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -1251,9 +1258,14 @@ an exception that matches the pattern, fails the test otherwise.
     pop_eh
 
     # if it doesn't throw an exception, fail
+    if todo goto todo_l
     test.'ok'( 0, description )
-    test.'diag'( 'no error thrown' )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( 0, description, todo )
+  after_todo_l:
 
+    test.'diag'('no error thrown')
     goto done
 
   handler:
