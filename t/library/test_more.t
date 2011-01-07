@@ -21,7 +21,7 @@
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 141 )
+    plan( 145 )
 
     test_skip()
     test_todo()
@@ -31,6 +31,8 @@
     test_todo_isnt()
     test_todo_like()
     test_todo_is_deeply()
+    test_todo_isa_ok()
+    test_todo_throws_like()
     test_ok()
     test_nok()
     test_is()
@@ -1016,6 +1018,47 @@ CODE
     is_deeply( left, right, 'comparing two pmc arrays', 'todo' => 'todo reason' )
     test_test( 'todo (as "is_deeply()" param) test should fail, marked as TODO' )
 
+.end
+
+.sub test_todo_isa_ok
+
+    .local pmc dog, terrier, daschund, Spot, Sossy
+
+    dog = newclass "dog_class"
+    terrier = subclass dog, "terrier_sub"
+    daschund = subclass dog, "daschund_sub"
+
+    Spot = new "terrier_sub"
+    Sossy = new "daschund_sub"
+
+    test_out( 'ok 37 # TODO todo reason' )
+    isa_ok(Spot, "terrier_sub", "Spot", 'todo' => 'todo reason')
+    test_test( 'todo (as "isa_ok()" param) test should pass, marked as TODO' )
+
+    test_out( "not ok 38 # TODO todo reason\n\tFailed (TODO) test 'Spot isa daschund_sub'" )
+    test_diag( "Spot isn't a daschund_sub it's a terrier_sub" )
+    isa_ok(Spot, 'daschund_sub', "Spot", 'todo' => 'todo reason')
+    test_test( 'todo (as "isa_ok()" param) test should fail, marked as TODO' )
+
+.end
+
+.sub test_todo_throws_like
+    test_out( "not ok 39 # TODO todo reason\n\tFailed (TODO) test 'throws_like fails when there is no error'" )
+    throws_like( <<'CODE', 'somejunk', 'throws_like fails when there is no error', 'todo' => 'todo reason')
+.sub main
+    $I0 = 42
+.end
+CODE
+    test_diag( 'no error thrown' )
+    test_test( 'todo (as "throws_like()" param) test should fail, marked as TODO' )
+
+    test_out( 'ok 40 # TODO todo reason' )
+    throws_like( <<'CODE', 'for\ the\ lulz','throws_like passes when error matches pattern', 'todo' => 'todo reason')
+.sub main
+    die 'I did it for the lulz'
+.end
+CODE
+    test_test( 'todo (as "throws_like()" param) test should pass, marked as TODO' )
 .end
 
 .sub test_isa_ok
