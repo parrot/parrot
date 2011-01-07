@@ -1464,35 +1464,6 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
     return pf;
 }
 
-
-/*
-
-=item C<PackFile * PackFile_new_dummy(PARROT_INTERP, STRING *name)>
-
-Creates a new (initial) dummy PackFile. This is necessary if the interpreter
-doesn't load any bytecode but instead uses C<Parrot_compile_string>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PackFile *
-PackFile_new_dummy(PARROT_INTERP, ARGIN(STRING *name))
-{
-    ASSERT_ARGS(PackFile_new_dummy)
-
-    PackFile * const pf = PackFile_new(interp, 0);
-    interp->initial_pf  = pf;
-    interp->code        = pf->cur_cs
-                        = PF_create_default_segs(interp, name, 1);
-
-    return pf;
-}
-
-
 /*
 
 =item C<void PackFile_funcs_register(PARROT_INTERP, PackFile *pf, UINTVAL type,
@@ -4365,8 +4336,11 @@ PackFile_append_pbc(PARROT_INTERP, ARGIN_NULLOK(const char *filename))
     if (pf) {
         /* An embedder can try to load_bytecode without having an initial_pf */
         if (!interp->initial_pf) {
-            interp->initial_pf = PackFile_new_dummy(interp, CONST_STRING(interp, "dummy"));
-            /* PackFile_new_dummy must never fail */
+            PackFile * const pf = PackFile_new(interp, 0);
+            STRING * const name = CONST_STRING(interp, "dummy");
+            interp->initial_pf  = pf;
+            interp->code        = pf->cur_cs
+                                = PF_create_default_segs(interp, name, 1);
             PARROT_ASSERT(interp->initial_pf);
         }
         PackFile_add_segment(interp, &interp->initial_pf->directory,

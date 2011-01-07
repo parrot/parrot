@@ -1131,15 +1131,6 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code)
     /* For the benefit of embedders that do not load any pbc
      * before compiling a string */
 
-    if (!interp->initial_pf) {
-        /* SIDE EFFECT: PackFile_new_dummy sets interp->initial_pf */
-        interp->initial_pf = PackFile_new_dummy(interp, CONST_STRING(interp, "compile_string"));
-        /* Assumption: there is no valid reason to fail to create it.
-         * If the assumption changes, replace the assertion with a
-         * runtime check */
-        PARROT_ASSERT(interp->initial_pf);
-    }
-
     if (STRING_equal(interp, CONST_STRING(interp, "PIR"), type))
         return IMCC_compile_pir_s(interp, code, error);
 
