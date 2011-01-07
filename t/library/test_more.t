@@ -21,11 +21,14 @@
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 129 )
+    plan( 137 )
 
     test_skip()
     test_todo()
-    test_todo_as_param()
+    test_todo_ok()
+    test_todo_nok()
+    test_todo_is()
+    test_todo_isnt()
     test_ok()
     test_nok()
     test_is()
@@ -819,7 +822,7 @@ CODE
 
 .end
 
-.sub test_todo_as_param
+.sub test_todo_ok
 
     test_out( 'ok 13 # TODO todo reason' )
     ok( 1, 'passing test', 'todo' => 'todo reason' )
@@ -829,6 +832,10 @@ CODE
     ok( 0, 'failing test', 'todo' => 'todo reason' )
     test_test( 'todo (as "ok" param) test should fail, marked as TODO' )
 
+.end
+
+.sub test_todo_nok
+
     test_out( 'ok 15 # TODO todo reason' )
     nok( 0, 'passing test', 'todo' => 'todo reason' )
     test_test( 'todo (as "nok" param) test should pass, marked as TODO' )
@@ -836,6 +843,10 @@ CODE
     test_out( "not ok 16 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
     nok( 1, 'failing test', 'todo' => 'todo reason' )
     test_test( 'todo (as "nok" param) test should fail, marked as TODO' )
+
+.end
+
+.sub test_todo_is
 
     # is pass (PMC, Integer)
     test_out( 'ok 17 # TODO todo reason' )
@@ -904,6 +915,66 @@ CODE
     test_diag( 'Have: 123' )
     test_diag( 'Want: 999' )
     test_test( 'todo (as "is(PMC, PMC)" param) test should fail, marked as TODO' )
+
+.end
+
+.sub test_todo_isnt
+
+    # isnt pass (Integer, Integer)
+    test_out( 'ok 25 # TODO todo reason' )
+    isnt( 1, 2, 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "isnt(Int, Int)" param) test should pass, marked as TODO' )
+
+    # isnt fail (Integer, Integer)
+    test_out( "not ok 26 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    isnt( 1, 1, 'failing test', 'todo' => 'todo reason' )
+    test_diag( 'Have: 1' )
+    test_diag( 'Want: not 1' )
+    test_test( 'todo (as "isnt(Int, Int)" param) test should fail, marked as TODO' )
+
+    # isnt pass (Float, Float)
+    test_out( 'ok 27 # TODO todo reason' )
+    isnt( 1.1, 2.2, 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "isnt(Float, Float)" param) test should pass, marked as TODO' )
+
+    # isnt fail (Float, Float)
+    test_out( "not ok 28 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    isnt( 1.1, 1.1, 'failing test', 'todo' => 'todo reason' )
+    test_diag( 'Have: 1.1' )
+    test_diag( 'Want: not 1.1' )
+    test_test( 'todo (as "isnt(Float, Float)" param) test should fail, marked as TODO' )
+
+    # isnt pass (String, String)
+    test_out( 'ok 29 # TODO todo reason' )
+    isnt( "foobar", "zzz", 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "isnt(String, String)" param) test should pass, marked as TODO' )
+
+    # isnt fail (String, String)
+    test_out( "not ok 30 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    isnt( "foobar", "foobar", 'failing test', 'todo' => 'todo reason' )
+    test_diag( 'Have: foobar' )
+    test_diag( 'Want: not foobar' )
+    test_test( 'todo (as "isnt(String, String)" param) test should fail, marked as TODO' )
+
+    # isnt pass (PMC, PMC)
+    test_out( 'ok 31 # TODO todo reason' )
+    $P0 = new ['BigNum']
+    $P0 = "123"
+    $P1 = new ['BigNum']
+    $P1 = "999"
+    isnt( $P0, $P1, 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "isnt(PMC, PMC)" param) test should pass, marked as TODO' )
+
+    # isnt fail (PMC, PMC)
+    test_out( "not ok 32 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    $P0 = new ['BigNum']
+    $P0 = "123"
+    $P1 = new ['BigNum']
+    $P1 = "123"
+    isnt( $P0, $P1, 'failing test', 'todo' => 'todo reason' )
+    test_diag( 'Have: 123' )
+    test_diag( 'Want: not 123' )
+    test_test( 'todo (as "isnt(PMC, PMC)" param) test should fail, marked as TODO' )
 .end
 
 .sub test_isa_ok
