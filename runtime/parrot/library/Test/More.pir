@@ -1274,7 +1274,13 @@ an exception that matches the pattern, fails the test otherwise.
     .get_results (ex)
     pop_eh
     error_msg = ex
+
+    if todo goto todo_l2
     like(error_msg, pattern, description)
+    goto after_todo_l2
+  todo_l2:
+    like(error_msg, pattern, description, 'todo' => todo)
+  after_todo_l2:
 
   done:
 .end
