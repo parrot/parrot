@@ -21,7 +21,7 @@
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 137 )
+    plan( 141 )
 
     test_skip()
     test_todo()
@@ -29,6 +29,8 @@
     test_todo_nok()
     test_todo_is()
     test_todo_isnt()
+    test_todo_like()
+    test_todo_is_deeply()
     test_ok()
     test_nok()
     test_is()
@@ -975,6 +977,45 @@ CODE
     test_diag( 'Have: 123' )
     test_diag( 'Want: not 123' )
     test_test( 'todo (as "isnt(PMC, PMC)" param) test should fail, marked as TODO' )
+
+.end
+
+.sub test_todo_like
+
+    test_out( 'ok 33 # TODO todo reason' )
+    like( 'abcdef', '<[c]>', 'testing like()', 'todo' => 'todo reason' )
+    test_test( 'todo (as "like()" param) test should pass, marked as TODO' )
+
+    test_out( "not ok 34 # TODO todo reason\n\tFailed (TODO) test 'testing like()'" )
+    like( 'abcdef', '<[z]>', 'testing like()', 'todo' => 'todo reason' )
+    test_diag( "match failed: target 'abcdef' does not match pattern '<[z]>'" )
+    test_test( 'todo (as "like()" param) test should fail, marked as TODO' )
+
+.end
+
+.sub test_todo_is_deeply
+
+    .local pmc left
+    .local pmc right
+    left  = new 'ResizablePMCArray'
+    right = new 'ResizablePMCArray'
+
+    push left,  7
+    push right, 7
+    push left,  'seven'
+    push right, 'seven'
+
+    test_out( 'ok 35 # TODO todo reason' )
+    is_deeply( left, right, 'comparing two pmc arrays', 'todo' => 'todo reason' )
+    test_test( 'todo (as "is_deeply()" param) test should pass, marked as TODO' )
+
+    push left, '9 - 2'
+
+    test_out( "not ok 36 # TODO todo reason\n\tFailed (TODO) test 'comparing two pmc arrays'" )
+    test_diag( 'Mismatch: expected 3 elements, received 2' )
+    is_deeply( left, right, 'comparing two pmc arrays', 'todo' => 'todo reason' )
+    test_test( 'todo (as "is_deeply()" param) test should fail, marked as TODO' )
+
 .end
 
 .sub test_isa_ok
