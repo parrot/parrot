@@ -448,8 +448,8 @@ Parrot_io_flush_win32(PARROT_INTERP, ARGMOD(PMC *filehandle))
 
 /*
 
-=item C<size_t Parrot_io_read_win32(PARROT_INTERP, PMC *filehandle, STRING
-**buf)>
+=item C<size_t Parrot_io_read_win32(PARROT_INTERP, PMC *filehandle, char *buf,
+size_t len)>
 
 Calls C<ReadFile()> to read up to C<len> bytes from C<*io>'s file
 descriptor to the memory starting at C<buffer>.
@@ -461,22 +461,15 @@ descriptor to the memory starting at C<buffer>.
 size_t
 Parrot_io_read_win32(PARROT_INTERP,
         ARGMOD(PMC *filehandle),
-        ARGOUT(STRING **buf))
+        ARGMOD(char *buf),
+        size_t len)
 {
     ASSERT_ARGS(Parrot_io_read_win32)
     DWORD countread;
-    void *buffer;
-    size_t len;
-    STRING *s;
-
-    s = Parrot_io_make_string(interp, buf, 2048);
-    len = s->bufused;
-    buffer = Buffer_bufstart(s);
 
     if (ReadFile(Parrot_io_get_os_handle(interp, filehandle),
-                (LPVOID) buffer, (DWORD) len, &countread, NULL)) {
+                (LPVOID) buf, (DWORD) len, &countread, NULL)) {
         if (countread > 0) {
-            s->bufused = s->strlen = countread;
             return (size_t)countread;
         }
         else if (len > 0)
@@ -490,7 +483,6 @@ Parrot_io_read_win32(PARROT_INTERP,
                     (Parrot_io_get_flags(interp, filehandle) | PIO_F_EOF));
     }
 
-    s->bufused = s->strlen = 0;
     return 0;
 }
 

@@ -1979,15 +1979,15 @@ TOOLS_TEST_FILES = $(TOOLS_TESTS_DIR)/tools/*.t
 
 # pbc files used for several tests;
 # not needed for build, hence this target is not included in 'all'
-pbctestfiles: $(PARROT) $(PBC_TEST_FILES)
+pbctestfiles: $(PBC_TEST_FILES)
 
-t/pmc/testlib/number.pbc: t/pmc/testlib/number.pasm
+t/pmc/testlib/number.pbc: $(PARROT) t/pmc/testlib/number.pasm
 	$(PARROT) -o t/pmc/testlib/number.pbc t/pmc/testlib/number.pasm
 
-t/pmc/testlib/annotations.pbc: t/pmc/testlib/annotations.pir
+t/pmc/testlib/annotations.pbc: $(PARROT) t/pmc/testlib/annotations.pir
 	$(PARROT) -o t/pmc/testlib/annotations.pbc t/pmc/testlib/annotations.pir
 
-t/op/testlib/test_strings.pbc: t/op/testlib/test_strings.pir
+t/op/testlib/test_strings.pbc: $(PARROT) t/op/testlib/test_strings.pir
 	$(PARROT) -o t/op/testlib/test_strings.pbc t/op/testlib/test_strings.pir
 
 # Common prep for all test targets.

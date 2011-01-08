@@ -491,8 +491,8 @@ Parrot_io_flush_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
 
 /*
 
-=item C<size_t Parrot_io_read_unix(PARROT_INTERP, PMC *filehandle, STRING
-**buf)>
+=item C<size_t Parrot_io_read_unix(PARROT_INTERP, PMC *filehandle, char *buf,
+size_t len)>
 
 Calls C<read()> to return up to C<len> bytes in the memory starting at
 C<buffer>.
@@ -503,20 +503,15 @@ C<buffer>.
 
 size_t
 Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
-              ARGIN(STRING **buf))
+              ARGMOD(char *buf), size_t len)
 {
     ASSERT_ARGS(Parrot_io_read_unix)
     const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
     const INTVAL file_flags = Parrot_io_get_flags(interp, filehandle);
-    STRING * const s = Parrot_io_make_string(interp, buf, 2048);
-
-    const size_t len = s->bufused;
-    void * const buffer = Buffer_bufstart(s);
 
     for (;;) {
-        const int bytes = read(file_descriptor, buffer, len);
+        const int bytes = read(file_descriptor, buf, len);
         if (bytes > 0) {
-            s->bufused = s->strlen = bytes;
             return bytes;
         }
         else if (bytes < 0) {
@@ -532,7 +527,6 @@ Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
             /* Read returned 0, EOF if len requested > 0 */
             if (len > 0 || (file_flags & PIO_F_LINEBUF))
                 Parrot_io_set_flags(interp, filehandle, (file_flags | PIO_F_EOF));
-            s->bufused = s->strlen = 0;
             return bytes;
         }
     }

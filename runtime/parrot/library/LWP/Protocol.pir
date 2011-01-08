@@ -454,8 +454,11 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
     .local pmc response
     response = new ['HTTP';'Response']
+    .local pmc pcontent
     .local string content
-    content = request.'content'()
+    pcontent = request.'content'()
+    if null pcontent goto L11
+    content = pcontent
     unless content goto L11
     $I1 = sock.'puts'(content)
     if $I1 >= 0 goto L11

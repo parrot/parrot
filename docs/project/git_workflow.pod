@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -46,6 +46,9 @@ To create a branch and check it out, use the C<git checkout -b> command.
 Please note that branches are first created locally, and then pushed
 to any number of remotes. A branch cannot be seen by anyone else
 until it is pushed to a remote.
+
+Branches in git are very "light-weight", i.e. they take up virtually
+no extra space (unlike in Subversion), so please use them liberally.
 
 Current convention is to create branch names of the form username/foo.
 
@@ -272,6 +275,69 @@ if it *could* be fast-forwarded.
 This flag is only needed when merging branches into master. It is optional
 for other merge cases, but it won't hurt. If it is simpler to think about,
 you can always use "--no-ff" when merging.
+
+=head2 Maintain A Fork
+
+If you fork Parrot on github, you will have a copy of the entire history
+of Parrot, which you can sync with the main parrot git repo as often as
+you want.
+
+First Rule:
+
+    Don't Commit To Master In Your Fork
+
+Create a branch (with git checkout -b branch) and do any development in that.
+
+Next, you will add the main parrot.git repo as a remote called "upstream"
+
+    git remote add upstream git://github.com/parrot/parrot.git
+
+You may call this remote anything you like, but for the purposes of this
+document, we will always refer to is as "upstream".
+
+We now want to get a copy of the index from upstream. If you are using
+a recent git (1.7.x.x or higher) you can update your copy of the index
+of all remotes with
+
+    git fetch --all
+
+If you have an elderly git, you can give the fetch command the name of
+the remote to fetch:
+
+    git fetch upstream
+
+Now you need to update your working copy, and specifically, the master
+branch, so make sure you are on the master branch of your fork
+
+    git checkout master
+
+and then sync up with upstream master
+
+    git rebase upstream/master
+
+There is no possibility of conflicts here *if you didn't commit to master*.
+If you get conflicts at this step, you are doing something wrong. Stop
+and ask someone for help.
+
+It is in your best interest to sync up your master branch with upstream before
+creating new branches from master, since that will minimize the possibilities
+of conflicts when merging the branch back to master later on.
+
+Second Rule:
+
+    Don't Rebase Branches Against Each Other
+
+For instance, if you are on branch 'foo' and you do
+
+    git rebase upstream/master
+
+you will be entering a world of pain. Don't do it. If you are smart
+enough to know when it is OK to do this, you don't need this document.
+
+This workflow to maintain a fork will make submitting pull requests
+"Just Work" and if you plan to submit pull requests, this workflow
+is required. If you don't want to submit pull requests, do whatever
+ye will.
 
 =head2 Merging Code From Forks
 

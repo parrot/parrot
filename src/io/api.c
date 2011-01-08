@@ -462,10 +462,12 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
             length = (length + encoding->bytes_per_unit - 1)
                    & ~(encoding->bytes_per_unit - 1);
 
-        result           = Parrot_str_new_noinit(interp, length);
+        /* Allocate 3 bytes more for partial multi-byte characters */
+        result           = Parrot_str_new_noinit(interp, length + 3);
         result->bufused  = length;
         result->encoding = encoding;
-        bytes_read       = Parrot_io_read_buffer(interp, pmc, &result);
+        bytes_read       = Parrot_io_read_buffer(interp, pmc,
+                                result->strstart, length);
 
         if (bytes_read & (encoding->bytes_per_unit - 1))
             Parrot_ex_throw_from_c_args(interp, NULL,
@@ -473,13 +475,14 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
                 "Unaligned end in %s string\n", encoding->name);
 
         if (encoding->bytes_per_unit == encoding->max_bytes_per_codepoint) {
+            result->bufused = bytes_read;
             STRING_scan(interp, result);
         }
         else {
             Parrot_String_Bounds bounds;
             INTVAL               needed;
 
-            bounds.bytes = result->bufused;
+            bounds.bytes = bytes_read;
             bounds.chars = -1;
             bounds.delim = -1;
 
@@ -490,23 +493,28 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
 
             /* Read and append remaining bytes in case of a partial result */
             if (needed > 0) {
-                INTVAL  rest_read, total_bytes;
-                STRING *rest = Parrot_str_new_init(interp, NULL, needed,
-                                    Parrot_binary_encoding_ptr, 0);
-
-                rest->bufused = needed;
-                rest_read     = Parrot_io_read_buffer(interp, pmc, &rest);
+                INTVAL rest_read = Parrot_io_read_buffer(interp, pmc,
+                                        result->strstart + bytes_read, needed);
 
                 if (rest_read < needed)
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_CHARACTER,
                         "Unaligned end in %s string\n", encoding->name);
 
-                total_bytes = bytes_read + needed;
-                Parrot_gc_reallocate_string_storage(interp, result, total_bytes);
-                mem_sys_memcopy(result->strstart + bytes_read, rest->strstart, needed);
+                /* Check if character is valid */
 
-                result->bufused  = total_bytes;
+                bounds.bytes = bytes_read + needed - result->bufused;
+                bounds.chars = 1;
+                bounds.delim = -1;
+
+                encoding->partial_scan(interp,
+                        result->strstart + result->bufused, &bounds);
+
+                PARROT_ASSERT(result->bufused + bounds.bytes ==
+                              bytes_read + needed);
+                PARROT_ASSERT(bounds.chars == 1);
+
+                result->bufused += bounds.bytes;
                 result->strlen  += 1;
             }
         }
@@ -575,10 +583,8 @@ Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot read from a closed or non-readable filehandle");
 
-        result = Parrot_str_new_init(interp, NULL, 0,
-                                     get_encoding(interp, pmc), 0);
-
-        ignored = Parrot_io_readline_buffer(interp, pmc, &result);
+        result = Parrot_io_readline_buffer(interp, pmc,
+                    get_encoding(interp, pmc));
     }
     else if (pmc->vtable->base_type == enum_class_StringHandle) {
         INTVAL offset, newline_pos, read_length, orig_length;
@@ -689,7 +695,7 @@ Parrot_io_tell(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_io_peek(PARROT_INTERP, PMC *pmc, STRING **buffer)>
+=item C<STRING * Parrot_io_peek(PARROT_INTERP, PMC *pmc)>
 
 Retrieve the next character in the stream without modifying the stream. Calls
 the platform-specific implementation of 'peek'.
@@ -700,14 +706,25 @@ the platform-specific implementation of 'peek'.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-INTVAL
-Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buffer))
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_peek)
-    if (Parrot_io_is_closed(interp, pmc))
-        return -1;
+    STRING *res;
+    INTVAL  c;
 
-    return Parrot_io_peek_buffer(interp, pmc, buffer);
+    if (Parrot_io_is_closed(interp, pmc))
+        c = -1;
+    else
+        c = Parrot_io_peek_buffer(interp, pmc);
+
+    if (c == -1)
+        res = STRINGNULL;
+    else
+        res = Parrot_str_chr(interp, c);
+
+    return res;
 }
 
 /*

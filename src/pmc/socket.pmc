@@ -46,6 +46,8 @@ Initializes a newly created Socket object.
         data_struct->remote = PMCNULL;
         data_struct->buf    = STRINGNULL;
 
+        Parrot_io_socket_initialize_handle(INTERP, SELF);
+
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -121,7 +123,7 @@ Returns whether the Socket is currently open.
 */
 
     VTABLE INTVAL get_bool() {
-        return !Parrot_io_socket_is_closed(SELF);
+        return !Parrot_io_socket_is_closed(INTERP, SELF);
     }
 
 /*
@@ -175,7 +177,7 @@ from a port number (integer) and an address (string).
 */
 
     METHOD sockaddr(STRING * address, INTVAL port) {
-        PMC * res = Parrot_io_sockaddr_in(INTERP, address, port);
+        PMC * res = PIO_SOCKADDR_IN(INTERP, address, port);
         RETURN(PMC * res);
     }
 
@@ -191,7 +193,7 @@ Test if the socket is closed.
 */
 
     METHOD is_closed() {
-        const INTVAL status = VTABLE_get_bool(INTERP, SELF);
+        const INTVAL status = !VTABLE_get_bool(INTERP, SELF);
         RETURN(INTVAL status);
     }
 
@@ -348,6 +350,9 @@ Read the given number of bytes from the socket and return them in a string.
         STRING *buf;
         GET_ATTR_buf(INTERP, SELF, buf);
 
+        if (Parrot_io_socket_is_closed(INTERP, SELF))
+            RETURN(STRING * STRINGNULL);
+
         if (buf == STRINGNULL)
             buf = Parrot_io_reads(INTERP, SELF, 0);
 
@@ -382,6 +387,9 @@ Read a line from the socket and return it in a string.
         STRING *result;
         STRING *buf;
         GET_ATTR_buf(INTERP, SELF, buf);
+
+        if (Parrot_io_socket_is_closed(INTERP, SELF))
+            RETURN(STRING * STRINGNULL);
 
         if (buf == STRINGNULL)
             buf = Parrot_io_reads(INTERP, SELF, 0);

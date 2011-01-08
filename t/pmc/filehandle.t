@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -217,6 +217,33 @@ pir_output_is(
 CODE
 ok 1 - $S0 = $P1.read($I2)
 ok 2 - $S0 = $P1.read($I2) # again on same stream
+OUT
+
+pir_output_is(
+    <<'CODE', <<'OUT', 'read_bytes - synchronous' );
+.sub 'test' :main
+    .local pmc fh, bb
+
+    fh = new ['FileHandle']
+    fh.'open'('README')
+
+    bb = fh.'read_bytes'(14)
+    $S0 = bb.'get_string'('ascii')
+    if $S0 == 'This is Parrot' goto ok_1
+    print 'not '
+  ok_1:
+    say 'ok 1 - read_bytes'
+
+    bb = fh.'read_bytes'(9)  # bytes
+    $S0 = bb.'get_string'('utf8')
+    if $S0 == ', version' goto ok_2
+    print 'not '
+  ok_2:
+    say 'ok 2 - read_bytes # again on same stream'
+.end
+CODE
+ok 1 - read_bytes
+ok 2 - read_bytes # again on same stream
 OUT
 
 # L<PDD22/I\/O PMC API/=item print>

@@ -2619,7 +2619,7 @@ Parrot_str_unescape(PARROT_INTERP,
 {
     ASSERT_ARGS(Parrot_str_unescape)
 
-    STRING           *src, *result;
+    STRING           *src;
     const STR_VTABLE *encoding, *src_encoding;
 
     /* does the encoding have a character set? */

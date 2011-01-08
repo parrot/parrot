@@ -253,6 +253,11 @@ static PMC * PackFile_Constant_unpack_pmc(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_CANNOT_RETURN_NULL
+static PMC * packfile_main(PARROT_INTERP, ARGIN(PackFile_ByteCode *bc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void PackFile_set_header(ARGOUT(PackFile_Header *header))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*header);
@@ -420,6 +425,9 @@ static int sub_pragma(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(constt) \
     , PARROT_ASSERT_ARG(cursor))
+#define ASSERT_ARGS_packfile_main __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_PackFile_set_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_pf_debug_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -725,18 +733,17 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
 
       case PBC_LOADED:
         if (PObj_get_FLAGS(sub_pmc) &   SUB_FLAG_PF_LOAD) {
+            /* only run :init/:load subs once */
+            Sub_comp_INIT_CLEAR(sub);
             PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
 
-            /* if loaded no need for init */
-            Sub_comp_INIT_CLEAR(sub);
             run_sub(interp, sub_pmc);
         }
         break;
 
       case PBC_MAIN:
         /* run :init/:load tagged functions */
-        if (Sub_comp_INIT_TEST(sub)
-        ||  PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_LOAD) {
+        if (Sub_comp_INIT_TEST(sub)) {
             /* only run :init/:load subs once */
             Sub_comp_INIT_CLEAR(sub);
             PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
@@ -871,6 +878,26 @@ mark_const_subs(PARROT_INTERP)
     }
 }
 
+
+/*
+
+=item C<static PMC * packfile_main(PARROT_INTERP, PackFile_ByteCode *bc)>
+
+Access the main function of a bytecode segment.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static PMC *
+packfile_main(PARROT_INTERP, ARGIN(PackFile_ByteCode *bc))
+{
+    ASSERT_ARGS(packfile_main)
+    PackFile_ConstTable *ct = bc->const_table;
+    return ct->pmc.constants[bc->main_sub];
+}
+
 /*
 
 =item C<void do_sub_pragmas(PARROT_INTERP, PackFile_ByteCode *self,
@@ -934,7 +961,7 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
                     "No main sub found");
             {
-                PMC  *main            = ct->pmc.constants[self->main_sub];
+                PMC  *main            = packfile_main(interp, self);
                 Parrot_Sub_attributes *main_attrs;
                 opcode_t *ptr         = (opcode_t *)VTABLE_get_pointer(interp, main);
                 PMC_get_sub(interp, main, main_attrs);

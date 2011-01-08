@@ -64,7 +64,7 @@ my $errorregex = <<OUTPUT;
 /Error during disassembly\nPackFile_Header_validate: This is not a valid Parrot bytecode file./m
 OUTPUT
 
-disassemble_raw_output_like( "-o del.pasm pbc_disassemble", $errorregex, "pbc_disassemble bad bytecode file");
+disassemble_raw_output_like( "-o del.pasm pbc_disassemble$PConfig{exe}", $errorregex, "pbc_disassemble bad bytecode file");
 
 disassemble_output_like( <<PIR, "pir", qr/PMC_CONST.*set_n_nc.*print_n/ms, 'pbc_disassemble numeric ops');
 .sub main :main

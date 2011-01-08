@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ Tests the Integer PMC.
 
     get_max_min()
 
-    plan(143)
+    plan(142)
     test_init()
     test_basic_math()
     test_truthiness_and_definedness()
@@ -594,16 +594,6 @@ fin:
     is($P0, 24, 'i_multiply Integer PMC by Integer PMC')
 
     $P0 = new ['Integer']
-    $P1 = new ['Complex']
-    $P2 = new ['Complex']
-    $P0 = 2
-    $P1 = "2+4i"
-    $P2 = "4+8i"
-    mul $P0, $P1
-    $I0 = iseq $P0, $P2
-    todo($I0, 'i_multiply Integer PMC by Complex PMC', 'unresolved bug, see TT #1887')
-
-    $P0 = new ['Integer']
     $P1 = new ['Float']
     $P0 = 2
     $P1 = 3.5
@@ -625,7 +615,7 @@ fin:
     $P2 = 48
     mul $P0, $P1
     $I0 = iseq $P0, $P2
-    todo($I0, 'i_multiply Integer PMC by BigInt PMC', 'unresolved bug, see TT #1887')
+    ok($I0, 'i_multiply Integer PMC by BigInt PMC')
 
     $P0 = new ['Integer']
     $P9 = get_hll_global MAXINT

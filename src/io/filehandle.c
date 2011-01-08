@@ -568,39 +568,6 @@ Parrot_io_set_file_position(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOOFF_T file_
 
 /*
 
-=item C<INTVAL Parrot_io_is_encoding(PARROT_INTERP, const PMC *filehandle,
-STRING *value)>
-
-Check whether the encoding attribute of the filehandle matches a passed in
-string.
-
-Currently, this pokes directly into the C struct of the FileHandle PMC. This
-needs to change to a general interface that can be used by all subclasses and
-polymorphic equivalents of FileHandle. For now, hiding it behind a function, so
-it can be cleanly changed later.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-INTVAL
-Parrot_io_is_encoding(PARROT_INTERP, ARGIN(const PMC *filehandle), ARGIN(STRING *value))
-{
-    ASSERT_ARGS(Parrot_io_is_encoding)
-    Parrot_FileHandle_attributes * const handle_struct = PARROT_FILEHANDLE(filehandle);
-    if (STRING_IS_NULL(handle_struct->encoding))
-        return 0;
-
-    if (STRING_equal(interp, value, handle_struct->encoding))
-        return 1;
-
-    return 0;
-}
-
-/*
-
 =item C<INTVAL Parrot_io_close_filehandle(PARROT_INTERP, PMC *pmc)>
 
 Flushes and closes the C<FileHandle> PMC C<*pmc>, but leaves the object intact
