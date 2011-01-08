@@ -634,6 +634,8 @@ parseflags(Parrot_PMC interp,
     }
 
     while ((status = longopt_get(argc, argv, Parrot_cmd_options(), &opt)) > 0) {
+        Parrot_String str;
+
         switch (opt.opt_id) {
           case 'R':
             *core = opt.opt_arg;
@@ -721,7 +723,8 @@ parseflags(Parrot_PMC interp,
             result = Parrot_api_set_warnings(interp, 0xFFFF);
             break;
           case 'o':
-            result = Parrot_api_set_output_file(interp, opt.opt_arg);
+            Parrot_api_string_import(interp, opt.opt_arg, "utf8", &str);
+            result = Parrot_api_set_output_file(interp, str);
             break;
           case OPT_PBC_OUTPUT:
             result = Parrot_api_set_output_file(interp, NULL);

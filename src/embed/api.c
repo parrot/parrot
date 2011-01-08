@@ -515,8 +515,8 @@ Parrot_api_set_warnings(Parrot_PMC interp_pmc, Parrot_Int flags)
 
 /*
 
-=item C<Parrot_Int Parrot_api_set_output_file(Parrot_PMC interp_pmc, const char
-* filename)>
+=item C<Parrot_Int Parrot_api_set_output_file(Parrot_PMC interp_pmc,
+Parrot_String filename)>
 
 Sets the C<interp_pmc>'s output file name specified by C<filename>. This function
 returns a true value if this call is successful and false value otherwise.
@@ -528,12 +528,12 @@ returns a true value if this call is successful and false value otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_set_output_file(Parrot_PMC interp_pmc,
-        ARGIN_NULLOK(const char * filename))
+        ARGIN_NULLOK(Parrot_String filename))
 {
     ASSERT_ARGS(Parrot_api_set_output_file)
     EMBED_API_CALLIN(interp_pmc, interp)
-    if (!filename && !interp->output_file)
-        interp->output_file = "-";
+    if (STRING_IS_NULL(filename) && !interp->output_file)
+        interp->output_file = Parrot_str_new(interp, "-", 1);
     else
         interp->output_file = filename;
     EMBED_API_CALLOUT(interp_pmc, interp)

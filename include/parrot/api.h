@@ -209,7 +209,7 @@ Parrot_Int Parrot_api_set_executable_name(
 PARROT_API
 Parrot_Int Parrot_api_set_output_file(
     Parrot_PMC interp_pmc,
-    ARGIN_NULLOK(const char * filename));
+    ARGIN_NULLOK(Parrot_String filename));
 
 PARROT_API
 Parrot_Int Parrot_api_set_runcore(

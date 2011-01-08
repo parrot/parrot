@@ -207,7 +207,7 @@ struct parrot_interp_t {
     struct _imc_info_t *imc_info;             /* imcc data */
     Hash               *op_hash;              /* mapping from op names to op_info_t */
 
-    const char         *output_file;          /* where to write output */
+    STRING             *output_file;          /* where to write output */
 
     PDB_t *pdb;                               /* debug /trace system */
 

@@ -50,9 +50,8 @@ static int e_file_emit(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-static int e_file_open(PARROT_INTERP, ARGIN(const char *param))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static int e_file_open(PARROT_INTERP, SHIM(const char *param))
+        __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_e_file_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -60,8 +59,7 @@ static int e_file_open(PARROT_INTERP, ARGIN(const char *param))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ins))
 #define ASSERT_ARGS_e_file_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(param))
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -688,9 +686,6 @@ ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
     return len;
 }
 
-/* for debug */
-static char *output;
-
 /*
 
 =item C<static int e_file_open(PARROT_INTERP, const char *param)>
@@ -702,19 +697,11 @@ Prints a message to STDOUT.
 */
 
 static int
-e_file_open(PARROT_INTERP, ARGIN(const char *param))
+e_file_open(PARROT_INTERP, SHIM(const char *param))
 {
     ASSERT_ARGS(e_file_open)
     DECL_CONST_CAST;
 
-    if (!STREQ(param, "-")) {
-        FILE *newfile = freopen(param, "w", stdout);
-        if (!newfile)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
-                "Cannot reopen stdout: %s'\n", strerror(errno));
-    }
-
-    output = PARROT_const_cast(char *, param);
     Parrot_io_printf(interp, "# IMCC does produce b0rken PASM files\n");
     Parrot_io_printf(interp, "# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392\n");
     return 1;
@@ -736,7 +723,7 @@ e_file_close(PARROT_INTERP, SHIM(void *param))
     ASSERT_ARGS(e_file_close)
     printf("\n\n");
     fclose(stdout);
-    IMCC_info(interp, 1, "assembly module %s written.\n", output);
+    IMCC_info(interp, 1, "assembly module written.\n");
     return 0;
 }
 
