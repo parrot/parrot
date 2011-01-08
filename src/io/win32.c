@@ -127,28 +127,9 @@ INTVAL
 Parrot_io_init_win32(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_io_init_win32)
-    HANDLE h;
     struct WSAData sockinfo;
     int ret;
 
-    if ((h = GetStdHandle(STD_INPUT_HANDLE)) != INVALID_HANDLE_VALUE) {
-        _PIO_STDIN(interp) = Parrot_io_fdopen_flags(interp, PMCNULL, h, PIO_F_READ);
-    }
-    else {
-        _PIO_STDIN(interp) = PMCNULL;
-    }
-    if ((h = GetStdHandle(STD_OUTPUT_HANDLE)) != INVALID_HANDLE_VALUE) {
-        _PIO_STDOUT(interp) = Parrot_io_fdopen_flags(interp, PMCNULL, h, PIO_F_WRITE);
-    }
-    else {
-        _PIO_STDOUT(interp) = PMCNULL;
-    }
-    if ((h = GetStdHandle(STD_ERROR_HANDLE)) != INVALID_HANDLE_VALUE) {
-        _PIO_STDERR(interp) = Parrot_io_fdopen_flags(interp, PMCNULL, h, PIO_F_WRITE);
-    }
-    else {
-        _PIO_STDERR(interp) = PMCNULL;
-    }
     /* Start Winsock
      * no idea where or whether destroy it
      */
@@ -159,6 +140,37 @@ Parrot_io_init_win32(PARROT_INTERP)
         return -4;
     }
     return 0;
+}
+
+/*
+
+=item C<PIOHANDLE Parrot_io_stdhandle_win32(PARROT_INTERP, INTVAL fileno)>
+
+Returns a standard file handle.
+
+=cut
+
+*/
+
+PIOHANDLE
+Parrot_io_stdhandle_win32(PARROT_INTERP, INTVAL fileno)
+{
+    ASSERT_ARGS(Parrot_io_stdhandle_win32)
+    DWORD nStdHandle;
+
+    switch (fileno) {
+      case PIO_STDIN_FILENO:
+        nStdHandle = STD_INPUT_HANDLE;
+        break;
+      case PIO_STDOUT_FILENO:
+        nStdHandle = STD_OUTPUT_HANDLE;
+        break;
+      case PIO_STDERR_FILENO:
+        nStdHandle = STD_ERROR_HANDLE;
+        break;
+    }
+
+    return GetStdHandle(nStdHandle);
 }
 
 /*

@@ -102,30 +102,41 @@ INTVAL
 Parrot_io_init_unix(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_io_init_unix)
-    ParrotIOData * const d = interp->piodata;
-    if (d != NULL && d->table != NULL) {
-        PMC *filehandle;
 
-        filehandle = Parrot_io_fdopen_flags(interp, PMCNULL, STDIN_FILENO, PIO_F_READ);
-        if (PMC_IS_NULL(filehandle))
-            return -1;
-        _PIO_STDIN(interp) = filehandle;
-
-        filehandle = Parrot_io_fdopen_flags(interp, PMCNULL, STDOUT_FILENO, PIO_F_WRITE);
-        if (PMC_IS_NULL(filehandle))
-            return -1;
-        _PIO_STDOUT(interp) = filehandle;
-
-        filehandle = Parrot_io_fdopen_flags(interp, PMCNULL, STDERR_FILENO, PIO_F_WRITE);
-        if (PMC_IS_NULL(filehandle))
-            return -1;
-        _PIO_STDERR(interp) = filehandle;
-
-        return 0;
-    }
-    return -1;
+    return 0;
 }
 
+
+/*
+
+=item C<PIOHANDLE Parrot_io_stdhandle_unix(PARROT_INTERP, INTVAL fileno)>
+
+Returns a standard file handle.
+
+=cut
+
+*/
+
+PIOHANDLE
+Parrot_io_stdhandle_unix(PARROT_INTERP, INTVAL fileno)
+{
+    ASSERT_ARGS(Parrot_io_stdhandle_unix)
+    PIOHANDLE os_handle;
+
+    switch (fileno) {
+      case PIO_STDIN_FILENO:
+        os_handle = STDIN_FILENO;
+        break;
+      case PIO_STDOUT_FILENO:
+        os_handle = STDOUT_FILENO;
+        break;
+      case PIO_STDERR_FILENO:
+        os_handle = STDERR_FILENO;
+        break;
+    }
+
+    return os_handle;
+}
 
 /*
 

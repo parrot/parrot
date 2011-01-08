@@ -100,6 +100,9 @@ PIOOFF_T Parrot_io_seek_unix(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*filehandle);
 
+PIOHANDLE Parrot_io_stdhandle_unix(PARROT_INTERP, INTVAL fileno)
+        __attribute__nonnull__(1);
+
 PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -149,6 +152,8 @@ size_t Parrot_io_write_unix(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_seek_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filehandle))
+#define ASSERT_ARGS_Parrot_io_stdhandle_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_tell_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filehandle))
@@ -266,6 +271,7 @@ INTVAL Parrot_io_socket_unix(PARROT_INTERP,
 
 
 #define PIO_INIT(interp) Parrot_io_init_unix((interp))
+#define PIO_STDHANDLE(interp, fileno) Parrot_io_stdhandle_unix((interp), (fileno))
 #define PIO_OPEN(interp, file, flags) \
     Parrot_io_open_unix((interp), (file), (flags))
 #define PIO_OPEN_PIPE(interp, file, flags, pid) \
