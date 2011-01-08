@@ -45,9 +45,17 @@ compilers/pct/src/PAST/Node.pbc : compilers/pct/src/PAST/Node.pir $(PARROT)
 compilers/pct/src/PAST/Compiler.pbc : compilers/pct/src/PAST/Compiler.pir $(PARROT)
 	$(PARROT) -o $@ compilers/pct/src/PAST/Compiler.pir
 
-compilers/pct/src/POST/Node.pbc : compilers/pct/src/POST/Node.pir $(PARROT)
-	$(PARROT) -o $@ compilers/pct/src/POST/Node.pir
-
 compilers/pct/src/POST/Compiler.pbc : compilers/pct/src/POST/Compiler.pir $(PARROT)
 	$(PARROT) -o $@ compilers/pct/src/POST/Compiler.pir
+
+compilers/pct/src/POST/Node.pbc : $(PARROT) \
+		compilers/pct/src/POST/Node.pir \
+		compilers/pct/src/POST/Call.pir
+	$(PARROT) -o $@ \
+		compilers/pct/src/POST/Node.pir \
+		compilers/pct/src/POST/Call.pir
+
+# It should be special "bootstrap-pct" target
+bootstrap-pct:
+	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Call.pir compilers/pct/src/POST/Call.pm
 
