@@ -139,6 +139,15 @@ our multi method compiler($val) { self<compiler> := $val }
 our multi method compiler_args()     { self<compiler_args> }
 our multi method compiler_args($val) { self<compiler_args> := $val }
 
+our multi method subid($value)      { self<subid> := $value }
+our multi method subid() {
+    my $value := self<subid>;
+    unless pir::defined__ip($value) {
+        $value := self.unique('post');
+        self<subid> := $value;
+    }
+    $value;
+}
 
 our method set_flag($name, $val) { self{$name} := $val; $val }
 
