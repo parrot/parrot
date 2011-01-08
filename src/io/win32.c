@@ -468,8 +468,8 @@ fail:
 
 /*
 
-=item C<PIOOFF_T Parrot_io_seek_win32(PARROT_INTERP, PMC *filehandle, PIOOFF_T
-off, INTVAL whence)>
+=item C<PIOOFF_T Parrot_io_seek_win32(PARROT_INTERP, PIOHANDLE os_handle,
+PIOOFF_T off, INTVAL whence)>
 
 Hard seek.
 
@@ -482,8 +482,8 @@ C<whence>.
 */
 
 PIOOFF_T
-Parrot_io_seek_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
-               PIOOFF_T off, INTVAL whence)
+Parrot_io_seek_win32(PARROT_INTERP, PIOHANDLE os_handle,
+        PIOOFF_T off, INTVAL whence)
 {
     ASSERT_ARGS(Parrot_io_seek_win32)
     LARGE_INTEGER offset;
@@ -492,17 +492,17 @@ Parrot_io_seek_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
     /* offset.HighPart gets overwritten */
     offset.LowPart = SetFilePointer(Parrot_io_get_os_handle(interp, filehandle),
                                     offset.LowPart, &offset.HighPart, whence);
-    if (offset.LowPart == 0xFFFFFFFF && (GetLastError() != NO_ERROR)) {
+    if (offset.LowPart == INVALID_SET_FILE_POINTER
+    &&  GetLastError() != NO_ERROR) {
         /* Error - exception */
         return -1;
     }
-    Parrot_io_set_file_position(interp, filehandle, offset.QuadPart);
     return offset.QuadPart;
 }
 
 /*
 
-=item C<PIOOFF_T Parrot_io_tell_win32(PARROT_INTERP, PMC *filehandle)>
+=item C<PIOOFF_T Parrot_io_tell_win32(PARROT_INTERP, PIOHANDLE os_handle)>
 
 Returns the current read/write position of C<*io>'s file descriptor.
 
@@ -511,14 +511,13 @@ Returns the current read/write position of C<*io>'s file descriptor.
 */
 
 PIOOFF_T
-Parrot_io_tell_win32(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_tell_win32(PARROT_INTERP, PIOHANDLE os_handle)
 {
     ASSERT_ARGS(Parrot_io_tell_win32)
     LARGE_INTEGER p;
 
     p.QuadPart = piooffsetzero;
-    p.LowPart = SetFilePointer(Parrot_io_get_os_handle(interp, filehandle),
-                               0, &p.HighPart, FILE_CURRENT);
+    p.LowPart = SetFilePointer(os_handle, 0, &p.HighPart, FILE_CURRENT);
     if (p.LowPart == 0xFFFFFFFF && GetLastError() != NO_ERROR) {
         /* FIXME: Error - exception */
     }

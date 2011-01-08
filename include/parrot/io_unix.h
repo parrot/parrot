@@ -81,20 +81,16 @@ size_t Parrot_io_read_unix(PARROT_INTERP,
         FUNC_MODIFIES(*buf);
 
 PIOOFF_T Parrot_io_seek_unix(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
+    PIOHANDLE os_handle,
     PIOOFF_T offset,
     INTVAL whence)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
+        __attribute__nonnull__(1);
 
 PIOHANDLE Parrot_io_stdhandle_unix(PARROT_INTERP, INTVAL fileno)
         __attribute__nonnull__(1);
 
-PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
+PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, PIOHANDLE os_handle)
+        __attribute__nonnull__(1);
 
 size_t Parrot_io_write_unix(PARROT_INTERP,
     PIOHANDLE os_handle,
@@ -132,13 +128,11 @@ size_t Parrot_io_write_unix(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buf))
 #define ASSERT_ARGS_Parrot_io_seek_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_stdhandle_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_tell_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_write_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buf))

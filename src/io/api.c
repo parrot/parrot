@@ -497,7 +497,7 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Attempt to read from null or invalid PMC");
     if (pmc->vtable->base_type == enum_class_FileHandle) {
-        INTVAL            bytes_read;
+        UINTVAL           bytes_read;
         INTVAL            flags;
         const STR_VTABLE *encoding;
 
@@ -743,7 +743,7 @@ Parrot_io_tell(PARROT_INTERP, ARGMOD(PMC *pmc))
         return -1;
 
     return Parrot_io_get_file_position(interp, pmc);
-    /* return PIO_TELL(interp, pmc); */
+    /* return PIO_TELL(interp, os_handle); */
 }
 
 /*

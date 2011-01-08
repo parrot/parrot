@@ -284,7 +284,7 @@ Closes C<*io>'s file descriptor.
 INTVAL
 Parrot_io_pipe_wait_unix(PARROT_INTERP, INTVAL pid)
 {
-    ASSERT_ARGS(Parrot_io_close_unix)
+    ASSERT_ARGS(Parrot_io_pipe_wait_unix)
     int status;
 
     waitpid(pid, &status, 0);
@@ -464,8 +464,8 @@ Parrot_io_write_unix(PARROT_INTERP, PIOHANDLE os_handle,
 
 /*
 
-=item C<PIOOFF_T Parrot_io_seek_unix(PARROT_INTERP, PMC *filehandle, PIOOFF_T
-offset, INTVAL whence)>
+=item C<PIOOFF_T Parrot_io_seek_unix(PARROT_INTERP, PIOHANDLE os_handle,
+PIOOFF_T offset, INTVAL whence)>
 
 Hard seek.
 
@@ -477,46 +477,18 @@ descriptor to C<offset> bytes from the location indicated by C<whence>.
 */
 
 PIOOFF_T
-Parrot_io_seek_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
-              PIOOFF_T offset, INTVAL whence)
+Parrot_io_seek_unix(PARROT_INTERP, PIOHANDLE os_handle,
+        PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(Parrot_io_seek_unix)
-    PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
-    const PIOOFF_T pos        = lseek(file_descriptor, offset, whence);
+    const PIOOFF_T pos = lseek(os_handle, offset, whence);
 
-    if (pos >= 0) {
-        switch (whence) {
-          case SEEK_SET:
-            if (offset > Parrot_io_get_file_size(interp, filehandle)) {
-                Parrot_io_set_file_size(interp, filehandle, offset);
-            }
-            break;
-          case SEEK_CUR:
-            {
-                const PIOOFF_T avail = offset
-                        + Parrot_io_get_buffer_next(interp, filehandle)
-                        - Parrot_io_get_buffer_start(interp, filehandle);
-                if (avail > Parrot_io_get_file_size(interp, filehandle)) {
-                    Parrot_io_set_file_size(interp, filehandle, avail);
-                }
-             }
-            break;
-          case SEEK_END:
-          default:
-            break;
-        }
-
-        Parrot_io_set_file_position(interp, filehandle, pos);
-    }
-    /* Seek clears EOF */
-    Parrot_io_set_flags(interp, filehandle,
-            (Parrot_io_get_flags(interp, filehandle) & ~PIO_F_EOF));
     return pos;
 }
 
 /*
 
-=item C<PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, PMC *filehandle)>
+=item C<PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, PIOHANDLE os_handle)>
 
 Returns the current read/write position on C<*io>'s file descriptor.
 
@@ -525,11 +497,10 @@ Returns the current read/write position on C<*io>'s file descriptor.
 */
 
 PIOOFF_T
-Parrot_io_tell_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
+Parrot_io_tell_unix(PARROT_INTERP, PIOHANDLE os_handle)
 {
     ASSERT_ARGS(Parrot_io_tell_unix)
-    PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
-    const PIOOFF_T pos = lseek(file_descriptor, (PIOOFF_T)0, SEEK_CUR);
+    const PIOOFF_T pos = lseek(os_handle, (PIOOFF_T)0, SEEK_CUR);
 
     return pos;
 }

@@ -78,19 +78,16 @@ size_t Parrot_io_read_win32(PARROT_INTERP,
         FUNC_MODIFIES(*buf);
 
 PIOOFF_T Parrot_io_seek_win32(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
+    PIOHANDLE os_handle,
     PIOOFF_T off,
     INTVAL whence)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
+        __attribute__nonnull__(1);
 
 PIOHANDLE Parrot_io_stdhandle_win32(PARROT_INTERP, INTVAL fileno)
         __attribute__nonnull__(1);
 
-PIOOFF_T Parrot_io_tell_win32(PARROT_INTERP, ARGIN(PMC *filehandle))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+PIOOFF_T Parrot_io_tell_win32(PARROT_INTERP, PIOHANDLE os_handle)
+        __attribute__nonnull__(1);
 
 size_t Parrot_io_write_win32(PARROT_INTERP,
     PIOHANDLE os_handle,
@@ -128,13 +125,11 @@ size_t Parrot_io_write_win32(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buf))
 #define ASSERT_ARGS_Parrot_io_seek_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_stdhandle_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_tell_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_write_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buf))
