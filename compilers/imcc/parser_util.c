@@ -587,7 +587,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
         IMCC_INFO(interp)->state->next = NULL;
 
     IMCC_INFO(interp)->state->pasm_file = pasm_file;
-    IMCC_INFO(interp)->state->file      = Parrot_str_to_cstring(interp, name);
+    IMCC_INFO(interp)->state->file      = name;
     IMCC_INFO(interp)->expect_pasm      = 0;
 
     compile_string(interp, s, yyscanner);
@@ -796,7 +796,7 @@ imcc_compile_pir_ex(PARROT_INTERP, ARGIN(const char *s))
 
 /*
 
-=item C<void * imcc_compile_file(PARROT_INTERP, const char *fullname, STRING
+=item C<void * imcc_compile_file(PARROT_INTERP, STRING *fullname, STRING
 **error_message)>
 
 Compile a file by filename (can be either PASM or IMCC code)
@@ -808,16 +808,14 @@ Compile a file by filename (can be either PASM or IMCC code)
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void *
-imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
+imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
         ARGOUT(STRING **error_message))
 {
     ASSERT_ARGS(imcc_compile_file)
     PackFile_ByteCode  * const cs_save  = interp->code;
     PackFile_ByteCode         *cs       = NULL;
     struct _imc_info_t        *imc_info = NULL;
-    const char                *ext;
-    FILE                      *fp;
-    STRING                    *fs;
+    PIOHANDLE                  fp;
     PMC                       *newcontext;
 
     /* need at least 3 regs for compilation of constant math e.g.
@@ -832,25 +830,17 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
         IMCC_INFO(interp) = imc_info;
     }
 
-    fs = Parrot_str_new_init(interp, fullname, strlen(fullname),
-            Parrot_default_encoding_ptr, 0);
-
-    if (Parrot_stat_info_intval(interp, fs, STAT_ISDIR))
+    if (Parrot_stat_info_intval(interp, fullname, STAT_ISDIR))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
-            "imcc_compile_file: '%s' is a directory\n", fullname);
+            "imcc_compile_file: '%Ss' is a directory\n", fullname);
 
-    fp = fopen(fullname, "r");
-    if (!fp)
+    fp = PIO_OPEN(interp, fullname, PIO_F_READ);
+    if (fp == PIO_INVALID_HANDLE)
         IMCC_fatal(interp, EXCEPTION_EXTERNAL_ERROR,
-                "imcc_compile_file: couldn't open '%s'\n", fullname);
+                "imcc_compile_file: couldn't open '%Ss'\n", fullname);
 
     IMCC_push_parser_state(interp);
-    {
-        /* Store a copy, in order to know how to free it later */
-        char *copyname                 = mem_sys_strdup(fullname);
-        IMCC_INFO(interp)->state->file = copyname;
-        ext                            = strrchr(copyname, '.');
-    }
+    IMCC_INFO(interp)->state->file = fullname;
 
     /* start over; let the start of line rule increment this to 1 */
     IMCC_INFO(interp)->line = 0;
@@ -868,7 +858,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
     IMCC_INFO(interp)->cur_namespace = NULL;
     interp->code                     = NULL;
 
-    if (ext && STREQ(ext, ".pasm")) {
+    if (imcc_string_ends_with(interp, fullname, ".pasm")) {
         void *yyscanner;
         yylex_init_extra(interp, &yyscanner);
 
@@ -1203,6 +1193,35 @@ imcc_destroy(PARROT_INTERP)
 
     if (eval_nr != 0)
         MUTEX_DESTROY(eval_nr_lock);
+}
+
+/*
+
+=item C<int imcc_string_ends_with(PARROT_INTERP, const STRING *str, const char
+*ext)>
+
+Checks whether string C<str> has extension C<ext>.
+
+=cut
+
+*/
+
+int
+imcc_string_ends_with(PARROT_INTERP, ARGIN(const STRING *str),
+        ARGIN(const char *ext))
+{
+    ASSERT_ARGS(imcc_string_ends_with)
+    STRING *ext_str = Parrot_str_new(interp, ext, 0);
+    STRING *substr;
+    INTVAL  ext_len = STRING_length(ext_str);
+    INTVAL  len     = STRING_length(str);
+
+    if (ext_len >= len)
+        return 0;
+
+    substr = STRING_substr(interp, str, len - ext_len, ext_len);
+
+    return STRING_equal(interp, substr, ext_str);
 }
 
 /*

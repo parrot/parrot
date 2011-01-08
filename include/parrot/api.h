@@ -15,7 +15,7 @@
 #include "parrot/config.h"
 #include "parrot/core_types.h"
 
-typedef int (*imcc_hack_func_t)(Parrot_PMC, const char *, int, const char **, Parrot_PMC*);
+typedef int (*imcc_hack_func_t)(Parrot_PMC, Parrot_String, int, const char **, Parrot_PMC*);
 
 #define PARROT_API PARROT_EXPORT
 
@@ -231,7 +231,7 @@ Parrot_Int Parrot_api_set_warnings(Parrot_PMC interp_pmc, Parrot_Int flags);
 PARROT_API
 Parrot_Int Parrot_api_wrap_imcc_hack(
     Parrot_PMC interp_pmc,
-    ARGIN(const char * sourcefile),
+    ARGIN(Parrot_String sourcefile),
     int argc,
     ARGIN(const char **argv),
     ARGMOD(Parrot_PMC* bytecodepmc),
@@ -349,6 +349,18 @@ Parrot_Int Parrot_api_string_free_exported_wchar(
         __attribute__nonnull__(2);
 
 PARROT_API
+Parrot_Int Parrot_api_string_import(
+    ARGIN(Parrot_PMC interp_pmc),
+    ARGIN(const char * str),
+    ARGIN(const char *encoding_name),
+    ARGOUT(Parrot_String * out))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* out);
+
+PARROT_API
 Parrot_Int Parrot_api_string_import_ascii(
     ARGIN(Parrot_PMC interp_pmc),
     ARGIN(const char * str),
@@ -399,6 +411,11 @@ Parrot_Int Parrot_api_string_import_wchar(
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(str))
+#define ASSERT_ARGS_Parrot_api_string_import __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp_pmc) \
+    , PARROT_ASSERT_ARG(str) \
+    , PARROT_ASSERT_ARG(encoding_name) \
+    , PARROT_ASSERT_ARG(out))
 #define ASSERT_ARGS_Parrot_api_string_import_ascii \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
@@ -739,8 +756,8 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
 
 PARROT_API
 int
-imcc_run_api(ARGMOD(Parrot_PMC interp_pmc), ARGIN(const char *sourcefile), int argc,
-        ARGIN(const char **argv), ARGOUT(PMC **pbcpmc));
+imcc_run_api(ARGMOD(Parrot_PMC interp_pmc), ARGIN(Parrot_String sourcefile),
+        int argc, ARGIN(const char **argv), ARGOUT(PMC **pbcpmc));
 
 #endif /* PARROT_API_H_GUARD */
 

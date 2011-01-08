@@ -77,6 +77,23 @@
 
 #define PIO_NR_OPEN 256         /* Size of an "IO handle table" */
 
+/* IO object flags */
+#define PIO_F_READ      00000001
+#define PIO_F_WRITE     00000002
+#define PIO_F_APPEND    00000004
+#define PIO_F_TRUNC     00000010
+#define PIO_F_EOF       00000020
+#define PIO_F_FILE      00000100
+#define PIO_F_PIPE      00000200
+#define PIO_F_SOCKET    00000400
+#define PIO_F_CONSOLE   00001000        /* A terminal                   */
+#define PIO_F_READLINE  00002000        /* user interactive readline    */
+#define PIO_F_LINEBUF   00010000        /* Flushes on newline           */
+#define PIO_F_BLKBUF    00020000
+#define PIO_F_SOFT_SP   00040000        /* Python softspace */
+#define PIO_F_SHARED    00100000        /* Stream shares a file handle  */
+#define PIO_F_ASYNC     01000000        /* In Parrot async is default   */
+
 /* This is temporary until subs/code refs are done..*/
 typedef void *DummyCodeRef;
 

@@ -385,9 +385,8 @@ e_pbc_open(PARROT_INTERP, SHIM(const char *param))
 
     /* we need some segments */
     if (!interp->code) {
-        const char *n    = IMCC_INFO(interp)->state->file;
-        STRING     *name = Parrot_str_new(interp, n, strlen(n));
-        PMC        *self;
+        STRING *name = IMCC_INFO(interp)->state->file;
+        PMC    *self;
 
         cs->seg = interp->code = PF_create_default_segs(interp, name, 1);
     }

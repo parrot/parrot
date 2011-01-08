@@ -67,7 +67,7 @@ static macro_t *find_macro(PARROT_INTERP, ARGIN(const char *name));
 static void scan_string(macro_frame_t *frame, ARGIN(const char *expansion),
         ARGMOD(void *yyscanner));
 
-static void scan_file(PARROT_INTERP, ARGIN(struct macro_frame_t *frame), ARGMOD(FILE *file),
+static void scan_file(PARROT_INTERP, ARGIN(struct macro_frame_t *frame), PIOHANDLE file,
         ARGMOD(void *yyscanner));
 
 static int destroy_frame(macro_frame_t *frame, ARGMOD(void *yyscanner));
@@ -79,7 +79,7 @@ static int read_macro(YYSTYPE *valp, PARROT_INTERP, ARGMOD(void *yyscanner));
 
 static int expand_macro(PARROT_INTERP, ARGIN(const char *name), ARGMOD(void *yyscanner));
 
-static void include_file(PARROT_INTERP, char *file_name, ARGMOD(void *yyscanner));
+static void include_file(PARROT_INTERP, ARGIN(STRING *file_name), ARGMOD(void *yyscanner));
 
 static int handle_identifier(PARROT_INTERP, YYSTYPE *valp, ARGIN(const char *id));
 
@@ -179,13 +179,12 @@ SP              [ ]
         /* Newline in the heredoc. Realloc and cat on. */
         IMCC_INFO(interp)->heredoc_content =
             (char*)mem_sys_realloc(IMCC_INFO(interp)->heredoc_content,
-                            strlen(IMCC_INFO(interp)->heredoc_content) +
-                            strlen(yytext) + 2);
+                            strlen(IMCC_INFO(interp)->heredoc_content) + 3);
         strcpy(IMCC_INFO(interp)->heredoc_content +
-               strlen(IMCC_INFO(interp)->heredoc_content), yytext);
+               strlen(IMCC_INFO(interp)->heredoc_content), "\n");
     }
 
-<heredoc2>.* {
+<heredoc2>([^\r\n]|\r[^\n])* {
         SET_LINE_NUMBER;
         /* Are we at the end of the heredoc? */
         if (STREQ(IMCC_INFO(interp)->heredoc_end, yytext)) {
@@ -223,11 +222,14 @@ SP              [ ]
     }
 
 <cmt2>[^"]+ {
+        STRING *str;
+
         yy_pop_state(yyscanner);
         yy_push_state(cmt3, yyscanner);
 
-        IMCC_INFO(interp)->frames->s.file = mem_sys_strdup(yytext);
-        IMCC_INFO(interp)->cur_unit->file = mem_sys_strdup(yytext);
+        str = Parrot_str_new(interp, yytext,0);
+        IMCC_INFO(interp)->frames->s.file = str;
+        IMCC_INFO(interp)->cur_unit->file = str;
 
         return FILECOMMENT;
     }
@@ -447,6 +449,7 @@ SP              [ ]
 
 <emit,INITIAL>".include" {
         const int c = yylex(valp, yyscanner, interp);
+        STRING *filename;
 
         if (c != STRINGC)
             return c;
@@ -454,7 +457,8 @@ SP              [ ]
         /* STRINGCs have a mem_sys_strdup()ed valp->s */
         mem_sys_free(valp->s);
         YYCHOP();
-        include_file(interp, yytext + 1, yyscanner);
+        filename = Parrot_str_new(interp, yytext + 1, 0);
+        include_file(interp, filename, yyscanner);
     }
 
 <emit,INITIAL>{ID}"$:" {
@@ -756,7 +760,7 @@ new_frame(PARROT_INTERP) {
     if (IMCC_INFO(interp)->frames) {
         tmp->s.pasm_file = IMCC_INFO(interp)->frames->s.pasm_file;
         if (IMCC_INFO(interp)->frames->s.file)
-            tmp->s.file = mem_sys_strdup(IMCC_INFO(interp)->frames->s.file);
+            tmp->s.file = IMCC_INFO(interp)->frames->s.file;
     }
 
     tmp->s.interp = interp;
@@ -798,7 +802,6 @@ destroy_frame(struct macro_frame_t *frame, void *yyscanner)
     } else
         ret = frame->s.line;
 
-    mem_sys_free(frame->s.file);
     mem_sys_free(frame);
 
     if (buffer != NULL)
@@ -1118,12 +1121,7 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
         /* When an error occurs, then report it as being in a macro */
         frame->is_macro = 1;
 
-        /* remember macro name for error reporting
-         * first free any filename allocated in new_frame() */
-        if (frame->s.file)
-            mem_sys_free(frame->s.file);
-
-        frame->s.file            = mem_sys_strdup(name);
+        frame->s.file = Parrot_str_new(interp, name, 0);
 
         /* whitespace can be safely ignored */
         do {
@@ -1201,43 +1199,36 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
 }
 
 static void
-include_file(PARROT_INTERP, char *file_name, void *yyscanner)
+include_file(PARROT_INTERP, ARGIN(STRING *file_name), void *yyscanner)
 {
     yyguts_t      * const yyg   = (yyguts_t *)yyscanner;
     macro_frame_t * const frame = new_frame(interp);
-    char *s              = Parrot_locate_runtime_file(interp, file_name,
-                                   PARROT_RUNTIME_FT_INCLUDE);
-    char *ext;
-    FILE *file;
+    STRING               *s     = Parrot_locate_runtime_file_str(interp,
+                                    file_name, PARROT_RUNTIME_FT_INCLUDE);
+    char      *ext;
+    PIOHANDLE  file;
 
-    if (!s || !(file = fopen(s, "r"))) {
-        if (frame->s.file)
-            mem_sys_free(frame->s.file);
+    if (STRING_IS_NULL(s)
+    ||  (file = PIO_OPEN(interp, s, PIO_F_READ)) == PIO_INVALID_HANDLE) {
         IMCC_fataly(interp, EXCEPTION_EXTERNAL_ERROR, strerror(errno));
     }
 
-    if (frame->s.file)
-        mem_sys_free(frame->s.file);
-    mem_sys_free(s);
-    frame->s.file            = mem_sys_strdup(file_name);
-    ext                      = strrchr(file_name, '.');
+    frame->s.file = file_name;
 
-    if (ext) {
-        if (STREQ(ext, ".pasm")) {
-            frame->s.pasm_file = 1;
-            BEGIN(emit);
-        }
-        else if (STREQ(ext, ".pir")) {
-            frame->s.pasm_file = 0;
-            BEGIN(INITIAL);
-        }
+    if (imcc_string_ends_with(interp, file_name, ".pasm")) {
+        frame->s.pasm_file = 1;
+        BEGIN(emit);
+    }
+    else if (imcc_string_ends_with(interp, file_name, ".pir")) {
+        frame->s.pasm_file = 0;
+        BEGIN(INITIAL);
     }
 
     scan_file(interp, frame, file, yyscanner);
 }
 
 static void
-scan_file(PARROT_INTERP, macro_frame_t *frame, FILE *file, void *yyscanner)
+scan_file(PARROT_INTERP, macro_frame_t *frame, PIOHANDLE file, void *yyscanner)
 {
     yyguts_t * const yyg      = (yyguts_t *)yyscanner;
     const      int   oldline  = IMCC_INFO(interp)->line;
@@ -1249,7 +1240,7 @@ scan_file(PARROT_INTERP, macro_frame_t *frame, FILE *file, void *yyscanner)
     /* let the start of line rule increment this to 1 */
     IMCC_INFO(interp)->line   = 0;
 
-    imc_yyin_set(file, yyscanner);
+    imc_yyin_set(interp, file, yyscanner);
 
     IMCC_INFO(interp)->line   = oldline;
 }
@@ -1291,7 +1282,7 @@ IMCC_pop_parser_state(PARROT_INTERP, void *yyscanner)
 }
 
 void
-compile_file(PARROT_INTERP, FILE *file, void *yyscanner)
+compile_file(PARROT_INTERP, PIOHANDLE file, void *yyscanner)
 {
     yyguts_t * const yyg = (yyguts_t *)yyscanner;
     YY_BUFFER_STATE  volatile buffer;
@@ -1299,7 +1290,7 @@ compile_file(PARROT_INTERP, FILE *file, void *yyscanner)
     IMCC_INFO(interp)->frames->s.next = NULL;
     buffer                            = YY_CURRENT_BUFFER;
 
-    imc_yyin_set(file, yyscanner);
+    imc_yyin_set(interp, file, yyscanner);
 
     emit_open(interp, 1, NULL);
 
@@ -1355,19 +1346,19 @@ void
 IMCC_print_inc(PARROT_INTERP)
 {
     macro_frame_t *f;
-    const char    *old = IMCC_INFO(interp)->frames->s.file;
+    STRING        *old = IMCC_INFO(interp)->frames->s.file;
 
     if (IMCC_INFO(interp)->frames && IMCC_INFO(interp)->frames->is_macro)
-        fprintf(stderr, "\n\tin macro '.%s' line %d\n",
+        IMCC_warning(interp, "\n\tin macro '.%Ss' line %d\n",
                 IMCC_INFO(interp)->frames->s.file, IMCC_INFO(interp)->line);
     else
-        fprintf(stderr, "\n\tin file '%s' line %d\n",
+        IMCC_warning(interp, "\n\tin file '%Ss' line %d\n",
                 IMCC_INFO(interp)->frames->s.file, IMCC_INFO(interp)->line);
 
 
     for (f = IMCC_INFO(interp)->frames; f; f = (macro_frame_t *)f->s.next) {
-        if (!STREQ(f->s.file, old)) {
-            fprintf(stderr, "\tincluded from '%s' line %d\n",
+        if (!STRING_equal(interp, f->s.file, old)) {
+            IMCC_warning(interp, "\tincluded from '%Ss' line %d\n",
                     f->s.file, f->s.line);
         }
 
@@ -1388,7 +1379,9 @@ parser does not have access to the lexer's private bits.
 void
 set_filename(PARROT_INTERP, char * const filename)
 {
-    IMCC_INFO(interp)->frames->s.file = filename;
+    STRING *str = Parrot_str_new(interp, filename, 0);
+
+    IMCC_INFO(interp)->frames->s.file = str;
 
     /* in case .line is used outside a .sub, then this
      * can't be done; hence the check.
@@ -1398,12 +1391,12 @@ set_filename(PARROT_INTERP, char * const filename)
      * During the parse, the STRINGC is already mem_sys_strdup()ed once.
      */
     if (IMCC_INFO(interp)->cur_unit)
-        IMCC_INFO(interp)->cur_unit->file = mem_sys_strdup(filename);
+        IMCC_INFO(interp)->cur_unit->file = str;
 }
 
 /* Functions to set and get yyin, as we can't decorate it for export
    (since it is defined in a file generated by yacc/bison). */
-void imc_yyin_set(FILE *file, void *yyscanner)
+void imc_yyin_set(PARROT_INTERP, PIOHANDLE file, void *yyscanner)
 {
     static const size_t buf_size = 4096;
 
@@ -1413,7 +1406,7 @@ void imc_yyin_set(FILE *file, void *yyscanner)
     size_t  len = 0;
     size_t  count;
 
-    while ((count = fread(buf + len, 1, buf_size, file)) > 0) {
+    while ((count = PIO_READ(interp, file, buf + len, buf_size)) > 0) {
         len += count;
 
         if (count < buf_size)
@@ -1422,18 +1415,12 @@ void imc_yyin_set(FILE *file, void *yyscanner)
         buf = (char *)mem_sys_realloc(buf, len + buf_size);
     }
 
-    fclose(file);
+    PIO_CLOSE(interp, file);
 
     b = yy_scan_bytes(buf, len, yyscanner);
     b->yy_bs_lineno = 1;
 
     mem_sys_free(buf);
-}
-
-FILE* imc_yyin_get(void *yyscanner)
-{
-    const yyguts_t * const yyg = (yyguts_t *)yyscanner;
-    return yyg->yyin_r;
 }
 
 /* return true if scanner is at EOF */

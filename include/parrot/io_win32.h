@@ -11,6 +11,10 @@
 #ifndef PARROT_IO_WIN32_H_GUARD
 #define PARROT_IO_WIN32_H_GUARD
 
+#ifdef WIN32
+#  include <windows.h>
+#endif
+
 typedef Parrot_WIN32_HANDLE PIOHANDLE;
 typedef Parrot_OFF_T PIOOFF_T;
 

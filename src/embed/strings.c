@@ -138,6 +138,31 @@ Parrot_api_string_free_exported_wchar(ARGIN(Parrot_PMC interp_pmc), ARGIN(wchar_
 
 /*
 
+=item C<Parrot_Int Parrot_api_string_import(Parrot_PMC interp_pmc, const char *
+str, const char *encoding_name, Parrot_String * out)>
+
+Transforms string C<str> into a Parrot_String and stores the result in C<out>
+using the encoding named C<encoding_name>. This function returns a true value
+if this call is successful and false value otherwise.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_string_import(ARGIN(Parrot_PMC interp_pmc), ARGIN(const char * str),
+        ARGIN(const char *encoding_name), ARGOUT(Parrot_String * out))
+{
+    ASSERT_ARGS(Parrot_api_string_import)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    const STR_VTABLE *encoding = Parrot_find_encoding(interp, encoding_name);
+    *out = Parrot_str_new_init(interp, str, strlen(str), encoding, 0);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+/*
+
 =item C<Parrot_Int Parrot_api_string_import_ascii(Parrot_PMC interp_pmc, const
 char * str, Parrot_String * out)>
 

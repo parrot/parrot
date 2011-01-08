@@ -136,18 +136,19 @@ The entry point from the command line into Parrot.
 int
 main(int argc, const char *argv[])
 {
-    int          stacktop;
-    const char  *sourcefile;
-    Parrot_PMC   interp;
-    Parrot_PMC   bytecodepmc;
-    Parrot_PMC   argsarray;
-    int          status;
-    int          pir_argc;
-    const char **pir_argv;
-    const char  *core = "slow";
-    int run_pbc = 0;
+    int               stacktop;
+    const char       *sourcefile;
+    Parrot_PMC        interp;
+    Parrot_PMC        bytecodepmc;
+    Parrot_PMC        argsarray;
+    int               status;
+    int               pir_argc;
+    const char      **pir_argv;
+    const char       *core = "slow";
+    int               run_pbc = 0;
     Parrot_Init_Args *initargs;
-    Parrot_Int trace = 0;
+    Parrot_Int        trace = 0;
+    Parrot_String     source_str;
 
     GET_INIT_STRUCT(initargs);
     /* internationalization setup */
@@ -170,8 +171,11 @@ main(int argc, const char *argv[])
     if (!Parrot_api_set_runcore(interp, core, trace))
         show_last_error_and_exit(interp);
 
+    if (!Parrot_api_string_import(interp, sourcefile, "utf8", &source_str))
+        show_last_error_and_exit(interp);
+
     if (!Parrot_api_wrap_imcc_hack(
-        interp, sourcefile, argc, argv, &bytecodepmc, &run_pbc, imcc_run_api))
+        interp, source_str, argc, argv, &bytecodepmc, &run_pbc, imcc_run_api))
         show_last_error_and_exit(interp);
 
     if (run_pbc) {

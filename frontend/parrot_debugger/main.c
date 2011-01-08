@@ -207,10 +207,11 @@ main(int argc, const char *argv[])
         }
         else {
             STRING          *errmsg = NULL;
+            STRING          *str    = Parrot_str_new(interp, filename, 0);
             Parrot_PackFile  pf     = PackFile_new(interp, 0);
 
             Parrot_pbc_load(interp, pf);
-            Parrot_compile_file(interp, filename, &errmsg);
+            Parrot_compile_file(interp, str, &errmsg);
             if (errmsg)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1, "%S", errmsg);
 
