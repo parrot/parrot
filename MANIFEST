@@ -2053,8 +2053,6 @@ t/tools/dump_pbc.t                                          [test]
 t/tools/install/01-create_directories.t                     [test]
 t/tools/install/02-install_files.t                          [test]
 t/tools/install/03-lines_to_files.t                         [test]
-t/tools/install/dev_overall.t                               [test]
-t/tools/install/overall.t                                   [test]
 t/tools/install/testlib/LICENSE                             [test]
 t/tools/install/testlib/MANIFEST.1defective                 [test]
 t/tools/install/testlib/README                              []doc
