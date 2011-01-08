@@ -20,7 +20,7 @@ Tests the BigInt PMC.
     .include 'test_more.pir'
 
     .local int num_tests
-    num_tests = 73
+    num_tests = 89
     plan(num_tests)
 
     .local int good
@@ -31,6 +31,7 @@ Tests the BigInt PMC.
 
   do_tests:
     clear()
+    test_set_pmc()
     set_and_get()
     addition()
     subtraction()
@@ -48,6 +49,8 @@ Tests the BigInt PMC.
     interface()
     boolean()
     pi()
+    is_equal()
+    get_long()
     bugfixes()
 
   done:
@@ -102,6 +105,17 @@ OldLibGMP:
     null $P0
 
     sweep 1
+.end
+
+.sub test_set_pmc
+    skip(1, "causes a segfault")
+    goto SKIP
+    $P0 = new ['BigInt']
+    $P1 = new ['BigNum']
+    $P1 = 1234
+    assign $P0, $P1
+    is($P0, "12345", "can set_pmc")
+SKIP:
 .end
 
 .sub set_and_get
@@ -281,8 +295,8 @@ OK8:
       say 'Failed to throw exception'
 E1:
     pop_eh
-    get_results '0', $P0
-    $S0 = $P0
+    get_results '0', $P5
+    $S0 = $P5
     eq $S0, "BigInt: no multiple dispatch variant 'add' for Float", OK9
     $I1 = 0
     print $S0
@@ -292,20 +306,37 @@ OK9:
     $I1 = 1
 
     push_eh E2
-      add $P0, $P1
+      add $P0, 1.1
       $I1 = 0
       say 'Failed to throw exception'
 E2:
     pop_eh
-    get_results '0', $P0
-    $S0 = $P0
-    eq $S0, "Multiple Dispatch: No suitable candidate found for 'i_add', with signature 'PP'", OK10
+    get_results '0', $P5
+    $S0 = $P5
+    eq $S0, "BigInt: no multiple dispatch variant 'i_add_float' for FLOATVAL", OK10
     $I1 = 0
     print $S0
     say ' is wrong exception type'
 OK10:
     ok($I1, 'i_add(bigint,float) throws exception')
     $I1 = 1
+
+    $P1 = new ['String']
+    $P1 = "eheh"
+    push_eh E3
+      add $P0, $P1
+      $I1 = 0
+      say 'Failed to throw exception'
+E3:
+    pop_eh
+    get_results '0', $P5
+    $S0 = $P5
+    eq $S0, "BigInt: no multiple dispatch variant 'i_add' for String", OK11
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK11:
+    ok($I1, "i_add(bigint,string) throws exception")
 .end
 
 .sub subtraction
@@ -435,6 +466,40 @@ OK12:
     say 'decrement is wrong'
 OK13:
     ok($I1, 'decrement')
+
+    push_eh E1
+    sub $P0, 1.1
+E1:
+    pop_eh
+    .get_results($P2)
+    is($P2, "BigInt: no multiple dispatch variant 'i_subtract_float' for FLOATVAL", "i_sub(bigint,float) throws exception")
+
+    $P1 = new ['String']
+    $P1 = "sdagsdg"
+    push_eh E2
+    sub $P0, $P1
+E2:
+    pop_eh
+    .get_results($P2)
+    is($P2, "BigInt: no multiple dispatch variant 'i_subtract' for String", "i_sub(bigint,string) throws exception")
+
+    $P1 = new ['Float']
+    $P1 = 1.1
+    push_eh E3
+    sub $P0, $P0, $P1
+E3:
+    pop_eh
+    .get_results($P2)
+    is($P2, "BigInt: no multiple dispatch variant 'subtract' for Float", "sub(bigint,float) throws exception")
+
+    $P1 = new ['String']
+    $P1 = "sdagsdg"
+    push_eh E4
+    sub $P0, $P0, $P1
+E4:
+    pop_eh
+    .get_results($P2)
+    is($P2, "BigInt: no multiple dispatch variant 'subtract' for String", "sub(bigint,string) throws exception")
 .end
 
 .sub multiplication
@@ -487,8 +552,8 @@ OK13:
       say 'Failed to throw exception'
 E1:
     pop_eh
-    get_results '0', $P0
-    $S0 = $P0
+    get_results '0', $P5
+    $S0 = $P5
     eq $S0, "BigInt: no multiple dispatch variant 'multiply' for Float", OK1
     $I1 = 0
     print $S0
@@ -498,20 +563,38 @@ OK1:
     $I1 = 1
 
     push_eh E2
-      mul $P0, $P1
+      mul $P0, 0.1
       $I1 = 0
       say 'Failed to throw exception'
 E2:
     pop_eh
-    get_results '0', $P0
-    $S0 = $P0
-    eq $S0, "Multiple Dispatch: No suitable candidate found for 'i_multiply', with signature 'PP'", OK2
+    get_results '0', $P5
+    $S0 = $P5
+    eq $S0, "BigInt: no multiple dispatch variant 'i_multiply_float' for FLOATVAL", OK2
     $I1 = 0
     print $S0
     say ' is wrong exception type'
 OK2:
     ok($I1, 'i_multiply(bigint,float) throws exception')
     $I1 = 1
+
+    $P1 = new ['Float']
+    $P1 = 1.1
+    push_eh E3
+    mul $P0, $P1
+E3:
+    pop_eh
+    .get_results($P2)
+    is($P2, "BigInt: no multiple dispatch variant 'i_multiply' for Float", "i_mul(bigint,float) throws exception")
+
+    $P1 = new ['String']
+    $P1 = "sdagsdg"
+    push_eh E4
+    mul $P0, $P1
+E4:
+    pop_eh
+    .get_results($P2)
+    is($P2, "BigInt: no multiple dispatch variant 'i_multiply' for String", "i_mul(bigint,string) throws exception")
 .end
 
 .sub division
@@ -713,6 +796,33 @@ E2:
     say ' is wrong exception type'
 OK18:
     ok($I1, 'i_mod(bigint,string) throws exception')
+
+    $P1 = new ['Float']
+    $P1 = 1.1
+    push_eh E3
+    div $P0, $P1
+E3:
+    pop_eh
+    .get_results($P2)
+    is($P2, "BigInt: no multiple dispatch variant 'i_divide' for Float", "i_div(bigint,float) throws exception")
+
+    $P1 = new ['String']
+    $P1 = "sdagsdg"
+    push_eh E4
+    div $P0, $P1
+E4:
+    pop_eh
+    .get_results($P2)
+    is($P2, "BigInt: no multiple dispatch variant 'i_divide' for String", "i_div(bigint,string) throws exception")
+
+    $P1 = new ['String']
+    $P1 = "sdagsdg"
+    push_eh E5
+    div $P0, $P0, $P1
+E5:
+    pop_eh
+    .get_results($P2)
+    is($P2, "BigInt: no multiple dispatch variant 'divide' for String", "div(bigint,string) throws exception")
 .end
 
 .sub division_by_zero
@@ -869,6 +979,32 @@ OK5:
 OK6:
    ok($I1, 'i_fdiv(bigint,integer)')
    $I1 = 1
+
+   $P1 = new ['Float']
+   $P1 = 1.1
+   push_eh E1
+   fdiv $P0, $P0, $P1
+E1:
+   .get_results($P2)
+   pop_eh
+   is($P2, "BigInt: no multiple dispatch variant 'floor_divide' for Float", "fdiv(bigint,float) throws exception")
+
+   $P1 = new ['Float']
+   $P1 = 1.1
+   push_eh E2
+   fdiv $P0, $P1
+E2:
+   .get_results($P2)
+   pop_eh
+   is($P2, "BigInt: no multiple dispatch variant 'i_floor_divide' for Float", "i_fdiv(bigint,float) throws exception")
+
+   $P0 = new ['BigInt']
+   $P0 = '1234'
+   $P1 = new ['BigInt']
+   $P1 = '-32'
+   fdiv $P0, $P1
+
+   is($P0, '-39', 'fdiv with negative')
 .end
 
 .sub negation
@@ -1292,6 +1428,28 @@ OK1:
 OK2:
 
     ok($I0, 'truth and falsehood')
+.end
+
+.sub get_long
+throws_substring(<<"CODE", "bigint_get_long: number too big", "get_long too long")
+    .sub main
+        $P0 = new ['BigInt']
+        $P0 = '1231549878697654564312124648674864867864545613215649876453121216549874564321561321321546'
+        $I0 = $P0
+    .end
+CODE
+.end
+
+.sub is_equal
+throws_substring(<<"CODE", "BigInt: no multiple dispatch variant 'is_equal' for String", "is_equal(bigint, string)1")
+    .sub main
+        $P0 = new ['BigInt']
+        $P1 = new ['String']
+        $P1 = "bad"
+        eq $P0, $P1, ok
+        ok:
+    .end
+CODE
 .end
 
 # How this next test was originally written in Python:
