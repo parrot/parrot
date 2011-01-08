@@ -50,10 +50,26 @@ compilers/pct/src/POST/Compiler.pbc : compilers/pct/src/POST/Compiler.pir $(PARR
 
 compilers/pct/src/POST/Node.pbc : $(PARROT) \
 		compilers/pct/src/POST/Node.pir \
-		compilers/pct/src/POST/Call.pir
+		compilers/pct/src/POST/Call.pir \
+		compilers/pct/src/POST/Constant.pir \
+		compilers/pct/src/POST/File.pir \
+		compilers/pct/src/POST/Key.pir \
+		compilers/pct/src/POST/Label.pir \
+		compilers/pct/src/POST/Register.pir \
+		compilers/pct/src/POST/String.pir \
+		compilers/pct/src/POST/Sub.pir \
+		compilers/pct/src/POST/Value.pir
 	$(PARROT) -o $@ \
 		compilers/pct/src/POST/Node.pir \
-		compilers/pct/src/POST/Call.pir
+		compilers/pct/src/POST/Call.pir \
+		compilers/pct/src/POST/Constant.pir \
+		compilers/pct/src/POST/File.pir \
+		compilers/pct/src/POST/Key.pir \
+		compilers/pct/src/POST/Label.pir \
+		compilers/pct/src/POST/Register.pir \
+		compilers/pct/src/POST/String.pir \
+		compilers/pct/src/POST/Sub.pir \
+		compilers/pct/src/POST/Value.pir
 
 # It should be special "bootstrap-pct" target
 bootstrap-pct:
