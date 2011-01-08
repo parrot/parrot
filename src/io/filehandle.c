@@ -582,15 +582,29 @@ INTVAL
 Parrot_io_close_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_close_filehandle)
-    INTVAL result;
+    const PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, pmc);
+    INTVAL          result;
+    INTVAL          flags;
 
-    if (Parrot_io_is_closed_filehandle(interp, pmc))
+    if (os_handle == PIO_INVALID_HANDLE)
         return -1;
 
     Parrot_io_flush_buffer(interp, pmc);
     PIO_FLUSH(interp, pmc);
 
-    result = PIO_CLOSE(interp, pmc);
+    result = PIO_CLOSE(interp, os_handle);
+    flags  = Parrot_io_get_flags(interp, pmc);
+
+    if (flags & PIO_F_PIPE) {
+        INTVAL pid;
+        INTVAL status;
+
+        GETATTR_FileHandle_process_id(interp, pmc, pid);
+        status = PIO_PIPE_WAIT(interp, pid);
+        SETATTR_FileHandle_exit_status(interp, pmc, status);
+    }
+
+    Parrot_io_set_os_handle(interp, pmc, PIO_INVALID_HANDLE);
     Parrot_io_clear_buffer(interp, pmc);
 
     return result;
@@ -612,7 +626,9 @@ INTVAL
 Parrot_io_is_closed_filehandle(PARROT_INTERP, ARGIN(const PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_is_closed_filehandle)
-    return PIO_IS_CLOSED(interp, pmc);
+    const PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, pmc);
+
+    return os_handle == PIO_INVALID_HANDLE;
 }
 
 /*

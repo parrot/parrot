@@ -284,7 +284,7 @@ Parrot_io_close_piohandle_win32(PARROT_INTERP, PIOHANDLE handle)
 
 /*
 
-=item C<INTVAL Parrot_io_close_win32(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_close_win32(PARROT_INTERP, PIOHANDLE os_handle)>
 
 Calls C<CloseHandle()> to close C<*io>'s file descriptor.
 
@@ -293,52 +293,47 @@ Calls C<CloseHandle()> to close C<*io>'s file descriptor.
 */
 
 INTVAL
-Parrot_io_close_win32(PARROT_INTERP, ARGMOD(PMC *filehandle))
+Parrot_io_close_win32(PARROT_INTERP, PIOHANDLE os_handle)
 {
     ASSERT_ARGS(Parrot_io_close_win32)
     UINTVAL result = 0;
     PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, filehandle);
+
     if (os_handle != INVALID_HANDLE_VALUE) {
-        int flags = Parrot_io_get_flags(interp, filehandle);
         if (CloseHandle(os_handle) == 0)
             result = GetLastError();
-        Parrot_io_set_os_handle(interp, filehandle, INVALID_HANDLE_VALUE);
-
-        if (flags & PIO_F_PIPE) {
-            INTVAL procid  = VTABLE_get_integer_keyed_int(interp, filehandle, 0);
-            HANDLE process = (HANDLE) procid;
-            DWORD  status  = WaitForSingleObject(process, INFINITE);
-            DWORD  exit_code;
-
-            if (status != WAIT_FAILED && GetExitCodeProcess(process, &exit_code))
-                SETATTR_FileHandle_exit_status(interp, filehandle, exit_code);
-            else
-                SETATTR_FileHandle_exit_status(interp, filehandle, 1);
-            CloseHandle(process);
-        }
     }
+
     return (result != 0);
 }
 
+
 /*
 
-=item C<INTVAL Parrot_io_is_closed_win32(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_pipe_wait_win32(PARROT_INTERP, INTVAL procid)>
 
-Test whether the filehandle has been closed.
+Calls C<CloseHandle()> to close C<*io>'s file descriptor.
 
 =cut
 
 */
 
 INTVAL
-Parrot_io_is_closed_win32(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_pipe_wait_win32(PARROT_INTERP, INTVAL procid)
 {
-    ASSERT_ARGS(Parrot_io_is_closed_win32)
-    if (Parrot_io_get_os_handle(interp, filehandle) == INVALID_HANDLE_VALUE)
-        return 1;
+    ASSERT_ARGS(Parrot_io_pipe_wait_win32)
+    HANDLE process = (HANDLE)procid;
+    DWORD  status  = WaitForSingleObject(process, INFINITE);
+    DWORD  exit_code;
 
-    return 0;
+    if (status == WAIT_FAILED || !GetExitCodeProcess(process, &exit_code))
+        exit_code = 1;
+
+    CloseHandle(process);
+
+    return exit_code;
 }
+
 
 /*
 

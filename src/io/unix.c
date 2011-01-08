@@ -226,7 +226,7 @@ Parrot_io_async_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), INTVAL b)
 
 /*
 
-=item C<INTVAL Parrot_io_close_unix(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_close_unix(PARROT_INTERP, PIOHANDLE file_descriptor)>
 
 Closes C<*io>'s file descriptor.
 
@@ -235,34 +235,19 @@ Closes C<*io>'s file descriptor.
 */
 
 INTVAL
-Parrot_io_close_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
+Parrot_io_close_unix(PARROT_INTERP, PIOHANDLE file_descriptor)
 {
     ASSERT_ARGS(Parrot_io_close_unix)
     INTVAL result = 0;
-    const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
-    const int flags = Parrot_io_get_flags(interp, filehandle);
 
     /* BSD and Solaris need explicit fsync() */
     if (file_descriptor >= 0) {
         fsync(file_descriptor);
+
         if (close(file_descriptor) != 0)
             result = errno;
-
-        /* Wait for the child after closing the
-         * handle, to let it notice the closing and finish */
-        if (flags & PIO_F_PIPE) {
-            int status;
-            waitpid(VTABLE_get_integer_keyed_int(interp, filehandle, 0), &status, 0);
-            if (WIFEXITED(status)) {
-                SETATTR_FileHandle_exit_status(interp, filehandle, WEXITSTATUS(status));
-            }
-            else {
-                /* abnormal termination means non-zero exit status */
-                SETATTR_FileHandle_exit_status(interp, filehandle, 1);
-            }
-        }
     }
-    Parrot_io_set_os_handle(interp, filehandle, -1);
+
     return result;
 }
 
@@ -284,25 +269,36 @@ Parrot_io_close_piohandle_unix(SHIM_INTERP, PIOHANDLE handle)
     return close(handle);
 }
 
+
 /*
 
-=item C<INTVAL Parrot_io_is_closed_unix(PARROT_INTERP, const PMC *filehandle)>
+=item C<INTVAL Parrot_io_pipe_wait_unix(PARROT_INTERP, INTVAL pid)>
 
-Test whether the filehandle has been closed.
+Closes C<*io>'s file descriptor.
 
 =cut
 
 */
 
 INTVAL
-Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(const PMC *filehandle))
+Parrot_io_pipe_wait_unix(PARROT_INTERP, INTVAL pid)
 {
-    ASSERT_ARGS(Parrot_io_is_closed_unix)
-    if (Parrot_io_get_os_handle(interp, filehandle) == -1)
-        return 1;
+    ASSERT_ARGS(Parrot_io_close_unix)
+    int status;
 
-    return 0;
+    waitpid(pid, &status, 0);
+
+    if (WIFEXITED(status)) {
+        status = WEXITSTATUS(status);
+    }
+    else {
+        /* abnormal termination means non-zero exit status */
+        status = 1;
+    }
+
+    return status;
 }
+
 
 /*
 
