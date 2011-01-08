@@ -153,46 +153,6 @@ Get/set the opcode type for this node.
 
 .namespace [ 'POST';'Sub' ]
 
-.sub 'blocktype' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('blocktype', value, has_value)
-.end
-
-
-.sub 'namespace' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('namespace', value, has_value)
-.end
-
-
-.sub 'hll' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('hll', value, has_value)
-.end
-
-
-.sub 'loadlibs' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('loadlibs', value, has_value)
-.end
-
-
-.sub 'outer' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('outer', value, has_value)
-.end
-
-.sub 'multi' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('multi', value, has_value)
-.end
-
 
 .sub 'subid' :method
     .param pmc value           :optional
@@ -206,26 +166,6 @@ Get/set the opcode type for this node.
     .tailcall self.'attr'('subid', value, has_value)
 .end
 
-
-.sub 'pirflags' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('pirflags', value, has_value)
-.end
-
-
-.sub 'compiler' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('compiler', value, has_value)
-.end
-
-
-.sub 'compiler_args' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('compiler_args', value, has_value)
-.end
 
 
 .sub 'add_param' :method

@@ -106,12 +106,39 @@ our multi method is_method($val) { self<method> := ?$val }
 our multi method lex()        { self<lex> // 0 }
 our multi method lex($val)    { self<lex> := ?$val }
 
-
 our multi method nsentry()     { self<nsentry> }
 our multi method nsentry($val) { self<nsentry> := $val }
 
 our multi method vtable()     { self<vtable> // -1 }
 our multi method vtable($val) { self<vtable> := $val; $val }
+
+our multi method blocktype()     { self<blocktype> }
+our multi method blocktype($val) { self<blocktype> := $val }
+
+our multi method namespace()     { self<namespace> }
+our multi method namespace($val) { self<namespace> := $val }
+
+our multi method hll()     { self<hll> }
+our multi method hll($val) { self<hll> := $val }
+
+our multi method loadlibs()     { self<loadlibs> }
+our multi method loadlibs($val) { self<loadlibs> := $val }
+
+our multi method outer()     { self<outer> }
+our multi method outer($val) { self<outer> := $val }
+
+our multi method multi()     { self<multi> }
+our multi method multi($val) { self<multi> := $val }
+
+our multi method pirflags()     { self<pirflags> }
+our multi method pirflags($val) { self<pirflags> := $val }
+
+our multi method compiler()     { self<compiler> }
+our multi method compiler($val) { self<compiler> := $val }
+
+our multi method compiler_args()     { self<compiler_args> }
+our multi method compiler_args($val) { self<compiler_args> := $val }
+
 
 our method set_flag($name, $val) { self{$name} := $val; $val }
 
