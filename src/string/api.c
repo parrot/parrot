@@ -692,6 +692,44 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
 
 /*
 
+=item C<STRING *Parrot_str_from_platform_cstring(PARROT_INTERP, char *c)>
+
+Convert a C string, encoded in the platform's assumed encoding, to a Parrot
+string.
+
+=cut
+
+*/
+
+STRING *
+Parrot_str_from_platform_cstring(PARROT_INTERP, char *c)
+{
+    return Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(c),
+                                Parrot_platform_encoding_ptr, 0);
+}
+
+
+/*
+
+=item C<char *Parrot_str_to_platform_cstring(PARROT_INTERP, STRING *s)>
+
+Obtain a C string, encoded in the platform's assumed encoding, from a Parrot
+string.
+
+=cut
+
+*/
+
+char *
+Parrot_str_to_platform_cstring(PARROT_INTERP, STRING *s)
+{
+    STRING *s_plat = Parrot_str_change_encoding(interp, s, Parrot_platform_encoding_ptr->num);
+    return Parrot_str_to_cstring(interp, s_plat);
+}
+
+
+/*
+
 =item C<STRING * Parrot_str_extract_chars(PARROT_INTERP, const char *buffer,
 UINTVAL len, INTVAL chars, const STR_VTABLE *encoding)>
 

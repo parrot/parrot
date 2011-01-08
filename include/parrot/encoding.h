@@ -22,6 +22,7 @@ PARROT_DATA STR_VTABLE *Parrot_ucs2_encoding_ptr;
 PARROT_DATA STR_VTABLE *Parrot_ucs4_encoding_ptr;
 
 PARROT_DATA STR_VTABLE *Parrot_default_encoding_ptr;
+PARROT_DATA STR_VTABLE *Parrot_platform_encoding_ptr;
 
 #ifdef PARROT_IN_CORE
 PARROT_DATA STR_VTABLE *Parrot_null_encoding_ptr;
