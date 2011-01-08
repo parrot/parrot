@@ -36,28 +36,21 @@ Set up Environment vars
 void
 Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)
 {
-    char * const name  = Parrot_str_to_cstring(interp, str_name);
-    char * const value = Parrot_str_to_cstring(interp, str_value);
 #ifdef PARROT_HAS_SETENV
+    char * const name  = Parrot_str_to_platform_cstring(interp, str_name);
+    char * const value = Parrot_str_to_platform_cstring(interp, str_value);
     setenv(name, value, 1);
-#else
-    int name_len = strlen(name);
-    int val_len = strlen(value);
-
-    char *envs = malloc(name_len + 1 + val_len + 1);
-    if (envs == NULL)
-        return;
-
-    /* Save a bit of time, by using the fact we already have the
-       lengths, avoiding strcat */
-    strcpy(envs, name);
-    strcpy(envs + name_len, "=");
-    strcpy(envs + name_len + 1, value);
-
-    putenv(envs);
-#endif
     Parrot_str_free_cstring(name);
     Parrot_str_free_cstring(value);
+#else
+    STRING *str_eq   = Parrot_str_new_constant(interp, "=");
+    STRING *str_envs = Parrot_str_concat(interp,
+                            Parrot_str_concat(interp, str_name, str_eq),
+                            str_value);
+    char *envs = Parrot_str_to_platform_cstring(interp, str_envs);
+    putenv(envs);
+    Parrot_str_free_cstring(envs);
+#endif
 }
 
 /*
@@ -74,7 +67,7 @@ void
 Parrot_unsetenv(PARROT_INTERP, STRING *str_name)
 {
 #ifdef PARROT_HAS_UNSETENV
-    char * const name = Parrot_str_to_cstring(interp, str_name);
+    char * const name = Parrot_str_to_platform_cstring(interp, str_name);
     unsetenv(name);
     Parrot_str_free_cstring(name);
 #else
@@ -95,7 +88,7 @@ Get Environment vars
 char *
 Parrot_getenv(PARROT_INTERP, STRING *str_name)
 {
-    char * const name  = Parrot_str_to_cstring(interp, str_name);
+    char * const name  = Parrot_str_to_platform_cstring(interp, str_name);
     char        *value = getenv(name);
     Parrot_str_free_cstring(name);
     return value;
