@@ -13,7 +13,6 @@ our multi method position()       { self.attr('position', undef,  0); }
 # Labels are always int constants.
 our multi method type()           { 'ic' }
 
-# Not currently used method.
 method result($value?) {
     unless pir::defined__ip($value) {
         $value := self<value>;
