@@ -201,19 +201,6 @@ Get/set the opcode type for this node.
 .end
 
 
-.sub 'add_directive' :method
-    .param string line
-    .local string dlist
-    dlist = self['directives']
-    $I0 = index dlist, line
-    unless $I0 < 0 goto done
-    dlist = concat dlist, line
-    dlist = concat dlist, "\n"
-    self['directives'] = dlist
-  done:
-    .return ()
-.end
-
 .namespace []
 .include 'compilers/pct/src/POST/Call.pir'
 .include 'compilers/pct/src/POST/Value.pir'

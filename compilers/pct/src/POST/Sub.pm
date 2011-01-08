@@ -162,6 +162,13 @@ our method full_name() {
     }
 };
 
+method add_directive($line) {
+    my $dlist := self<directives>;
+    if pir::index__iss($dlist, $line) < 0 {
+        self<directives> := ~$dlist ~ ~$line ~ "\n";
+    }
+}
+
 INIT {
     pir::load_bytecode('nqp-setting.pbc');
 }
