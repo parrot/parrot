@@ -704,8 +704,11 @@ string.
 STRING *
 Parrot_str_from_platform_cstring(PARROT_INTERP, char *c)
 {
-    return Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(c),
-                                Parrot_platform_encoding_ptr, 0);
+    if (!c)
+        return STRINGNULL;
+    else
+        return Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(c),
+                                    Parrot_platform_encoding_ptr, 0);
 }
 
 
@@ -723,8 +726,13 @@ string.
 char *
 Parrot_str_to_platform_cstring(PARROT_INTERP, STRING *s)
 {
-    STRING *s_plat = Parrot_str_change_encoding(interp, s, Parrot_platform_encoding_ptr->num);
-    return Parrot_str_to_cstring(interp, s_plat);
+    if (STRING_IS_NULL(s)) {
+        return NULL;
+    }
+    else {
+        STRING *s_plat = Parrot_str_change_encoding(interp, s, Parrot_platform_encoding_ptr->num);
+        return Parrot_str_to_cstring(interp, s_plat);
+    }
 }
 
 
