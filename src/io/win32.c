@@ -356,7 +356,7 @@ Parrot_io_is_tty_win32(SHIM_INTERP, PIOHANDLE fd)
 
 /*
 
-=item C<INTVAL Parrot_io_flush_win32(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_flush_win32(PARROT_INTERP, PIOHANDLE os_handle)>
 
 Calls C<FlushFileBuffers()> to flush C<*io>'s file descriptor.
 
@@ -365,7 +365,7 @@ Calls C<FlushFileBuffers()> to flush C<*io>'s file descriptor.
 */
 
 INTVAL
-Parrot_io_flush_win32(PARROT_INTERP, ARGMOD(PMC *filehandle))
+Parrot_io_flush_win32(PARROT_INTERP, PIOHANDLE os_handle)
 {
     ASSERT_ARGS(Parrot_io_flush_win32)
     /*
@@ -380,13 +380,13 @@ Parrot_io_flush_win32(PARROT_INTERP, ARGMOD(PMC *filehandle))
      * console output. That is because console output is not buffered.
      * The function returns TRUE, but it does nothing.
      */
-    return FlushFileBuffers(Parrot_io_get_os_handle(interp, filehandle));
+    return FlushFileBuffers(os_handle);
 }
 
 /*
 
-=item C<size_t Parrot_io_read_win32(PARROT_INTERP, PMC *filehandle, char *buf,
-size_t len)>
+=item C<size_t Parrot_io_read_win32(PARROT_INTERP, PIOHANDLE os_handle, char
+*buf, size_t len)>
 
 Calls C<ReadFile()> to read up to C<len> bytes from C<*io>'s file
 descriptor to the memory starting at C<buffer>.
@@ -396,31 +396,19 @@ descriptor to the memory starting at C<buffer>.
 */
 
 size_t
-Parrot_io_read_win32(PARROT_INTERP,
-        ARGMOD(PMC *filehandle),
-        ARGMOD(char *buf),
-        size_t len)
+Parrot_io_read_win32(PARROT_INTERP, PIOHANDLE os_handle,
+        ARGMOD(char *buf), size_t len)
 {
     ASSERT_ARGS(Parrot_io_read_win32)
     DWORD countread;
+    BOOL  success = ReadFile(os_handle, (LPVOID)buf, (DWORD)len,
+                        &countread, NULL);
 
-    if (ReadFile(Parrot_io_get_os_handle(interp, filehandle),
-                (LPVOID) buf, (DWORD) len, &countread, NULL)) {
-        if (countread > 0) {
-            return (size_t)countread;
-        }
-        else if (len > 0)
-            /* EOF if read 0 and bytes were requested */
-            Parrot_io_set_flags(interp, filehandle,
-                    (Parrot_io_get_flags(interp, filehandle) | PIO_F_EOF));
-    }
-    else {
-        /* FIXME : An error occurred */
-            Parrot_io_set_flags(interp, filehandle,
-                    (Parrot_io_get_flags(interp, filehandle) | PIO_F_EOF));
-    }
+    if (!success) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Read error: %d", GetLastError());
 
-    return 0;
+    return countread;
 }
 
 /*

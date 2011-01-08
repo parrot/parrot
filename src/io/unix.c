@@ -366,7 +366,7 @@ Parrot_io_getblksize_unix(PIOHANDLE fd)
 
 /*
 
-=item C<INTVAL Parrot_io_flush_unix(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_flush_unix(PARROT_INTERP, PIOHANDLE os_handle)>
 
 At lowest layer all we can do for C<flush> is to ask the kernel to
 C<sync()>.
@@ -378,17 +378,16 @@ XXX: Is it necessary to C<sync()> here?
 */
 
 INTVAL
-Parrot_io_flush_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
+Parrot_io_flush_unix(PARROT_INTERP, PIOHANDLE os_handle)
 {
     ASSERT_ARGS(Parrot_io_flush_unix)
-    const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
-    return fsync(file_descriptor);
+    return fsync(os_handle);
 }
 
 /*
 
-=item C<size_t Parrot_io_read_unix(PARROT_INTERP, PMC *filehandle, char *buf,
-size_t len)>
+=item C<size_t Parrot_io_read_unix(PARROT_INTERP, PIOHANDLE os_handle, char
+*buf, size_t len)>
 
 Calls C<read()> to return up to C<len> bytes in the memory starting at
 C<buffer>.
@@ -398,33 +397,20 @@ C<buffer>.
 */
 
 size_t
-Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
-              ARGMOD(char *buf), size_t len)
+Parrot_io_read_unix(PARROT_INTERP, PIOHANDLE os_handle,
+        ARGMOD(char *buf), size_t len)
 {
     ASSERT_ARGS(Parrot_io_read_unix)
-    const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
-    const INTVAL file_flags = Parrot_io_get_flags(interp, filehandle);
 
     for (;;) {
-        const int bytes = read(file_descriptor, buf, len);
-        if (bytes > 0) {
+        const int bytes = read(os_handle, buf, len);
+
+        if (bytes >= 0)
             return bytes;
-        }
-        else if (bytes < 0) {
-            switch (errno) {
-              case EINTR:
-                continue;
-              default:
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                        "Read error: %s", strerror(errno));
-            }
-        }
-        else {
-            /* Read returned 0, EOF if len requested > 0 */
-            if (len > 0 || (file_flags & PIO_F_LINEBUF))
-                Parrot_io_set_flags(interp, filehandle, (file_flags | PIO_F_EOF));
-            return bytes;
-        }
+
+        if (errno != EINTR)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                    "Read error: %s", strerror(errno));
     }
 }
 

@@ -32,10 +32,8 @@ INTVAL Parrot_io_close_piohandle_unix(SHIM_INTERP, PIOHANDLE handle);
 INTVAL Parrot_io_close_unix(PARROT_INTERP, PIOHANDLE file_descriptor)
         __attribute__nonnull__(1);
 
-INTVAL Parrot_io_flush_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
+INTVAL Parrot_io_flush_unix(PARROT_INTERP, PIOHANDLE os_handle)
+        __attribute__nonnull__(1);
 
 INTVAL Parrot_io_getblksize_unix(PIOHANDLE fd);
 INTVAL Parrot_io_init_unix(PARROT_INTERP)
@@ -75,13 +73,11 @@ INTVAL Parrot_io_pipe_wait_unix(PARROT_INTERP, INTVAL pid)
         __attribute__nonnull__(1);
 
 size_t Parrot_io_read_unix(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
+    PIOHANDLE os_handle,
     ARGMOD(char *buf),
     size_t len)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*filehandle)
         FUNC_MODIFIES(*buf);
 
 PIOOFF_T Parrot_io_seek_unix(PARROT_INTERP,
@@ -115,8 +111,7 @@ size_t Parrot_io_write_unix(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_close_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_flush_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_getblksize_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_io_init_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -135,7 +130,6 @@ size_t Parrot_io_write_unix(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_read_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle) \
     , PARROT_ASSERT_ARG(buf))
 #define ASSERT_ARGS_Parrot_io_seek_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -268,12 +262,12 @@ INTVAL Parrot_io_socket_unix(PARROT_INTERP,
 #define PIO_CLOSE(interp, handle) Parrot_io_close_unix((interp), (handle))
 #define PIO_CLOSE_PIOHANDLE(interp, handle) Parrot_io_close_piohandle_unix((interp), (handle))
 #define PIO_PIPE_WAIT(interp, pid) Parrot_io_pipe_wait_unix((interp), (pid))
-#define PIO_READ(interp, pmc, buf, len) Parrot_io_read_unix((interp), (pmc), (buf), (len))
+#define PIO_READ(interp, handle, buf, len) Parrot_io_read_unix((interp), (handle), (buf), (len))
 #define PIO_WRITE(interp, pmc, str) Parrot_io_write_unix((interp), (pmc), (str))
 #define PIO_SEEK(interp, pmc, offset, start) \
     Parrot_io_seek_unix((interp), (pmc), (offset), (start))
 #define PIO_TELL(interp, pmc) Parrot_io_tell_unix((interp), (pmc))
-#define PIO_FLUSH(interp, pmc) Parrot_io_flush_unix((interp), (pmc))
+#define PIO_FLUSH(interp, handle) Parrot_io_flush_unix((interp), (handle))
 #define PIO_GETBLKSIZE(handle) Parrot_io_getblksize_unix((handle))
 #define PIO_IS_TTY(interp, handle) \
     Parrot_io_is_tty_unix((interp), (handle))

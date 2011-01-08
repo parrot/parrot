@@ -590,7 +590,7 @@ Parrot_io_close_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
         return -1;
 
     Parrot_io_flush_buffer(interp, pmc);
-    PIO_FLUSH(interp, pmc);
+    PIO_FLUSH(interp, os_handle);
 
     result = PIO_CLOSE(interp, os_handle);
     flags  = Parrot_io_get_flags(interp, pmc);
@@ -646,11 +646,13 @@ void
 Parrot_io_flush_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_flush_filehandle)
-    if (Parrot_io_is_closed(interp, pmc))
+    const PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, pmc);
+
+    if (os_handle == PIO_INVALID_HANDLE)
         return;
 
     Parrot_io_flush_buffer(interp, pmc);
-    PIO_FLUSH(interp, pmc);
+    PIO_FLUSH(interp, os_handle);
 }
 
 /*

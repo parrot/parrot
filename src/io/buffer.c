@@ -230,11 +230,18 @@ Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
     ASSERT_ARGS(Parrot_io_fill_readbuf)
     unsigned char    *buf  = Parrot_io_get_buffer_start(interp, filehandle);
     size_t            size = Parrot_io_get_buffer_size(interp, filehandle);
-    size_t            got  = PIO_READ(interp, filehandle, (char *)buf, size);
+    size_t            got;
+    PIOHANDLE os_handle;
+
+    GETATTR_Handle_os_handle(interp, filehandle, os_handle);
+    got = PIO_READ(interp, os_handle, (char *)buf, size);
 
     /* nothing to get */
-    if (got == 0)
+    if (got == 0) {
+        const INTVAL file_flags = Parrot_io_get_flags(interp, filehandle);
+        Parrot_io_set_flags(interp, filehandle, file_flags | PIO_F_EOF);
         return 0;
+    }
 
     Parrot_io_set_buffer_end(interp, filehandle, buf + got);
     Parrot_io_set_buffer_next(interp, filehandle, buf);
@@ -315,7 +322,16 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     /* buffer is now empty */
 
     if (len >= Parrot_io_get_buffer_size(interp, filehandle)) {
-        got = PIO_READ(interp, filehandle, dest + current, len);
+        PIOHANDLE os_handle;
+
+        GETATTR_Handle_os_handle(interp, filehandle, os_handle);
+        got = PIO_READ(interp, os_handle, dest + current, len);
+
+        if (got == 0) {
+            const INTVAL file_flags = Parrot_io_get_flags(interp, filehandle);
+            Parrot_io_set_flags(interp, filehandle, file_flags | PIO_F_EOF);
+        }
+
         Parrot_io_set_file_position(interp, filehandle, file_pos + got);
 
         return current + got;
