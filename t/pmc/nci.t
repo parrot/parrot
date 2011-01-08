@@ -35,7 +35,7 @@ SKIP: {
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
         plan skip_all => "Please make libnci_test$PConfig{load_ext}";
     }
-    plan tests => 71;
+    plan tests => 73;
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'load library fails' );
 .sub test :main
@@ -115,6 +115,68 @@ FUNC_END:
 CODE
 libnci_test was successfully loaded
 undefined
+OUTPUT
+
+    pir_output_is( << 'CODE', << 'OUTPUT', "dlfunc function is defined" );
+
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib library_name
+    unless libnci_test goto NOT_LOADED
+    print "libnci_test was successfully loaded\n"
+    .local pmc func
+    func = dlfunc libnci_test, "nci_dd", "dd"
+    .local int def
+    def = defined func
+    print def
+NOT_LOADED:
+    print "\n"
+.end
+CODE
+libnci_test was successfully loaded
+1
+OUTPUT
+
+    pir_output_is( << 'CODE', << 'OUTPUT', "dlfunc function pointer" );
+
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib library_name
+    unless libnci_test goto NOT_LOADED
+    print "libnci_test was successfully loaded\n"
+
+    $P0 = dlfunc libnci_test, "nci_dd", "dd"
+
+    $I0 = get_addr $P0
+    $I1 = $P0
+
+    $P1 = clone $P0
+
+    $I2 = get_addr $P1
+    $I3 = $P1
+
+    $I4 = $I0 == $I2
+    print $I4
+    print "\n"
+
+    $I4 = $I1 == $I3
+    print $I4
+    print "\n"
+
+    $I0 = istrue $P0
+    print $I0
+NOT_LOADED:
+    print "\n"
+.end
+CODE
+libnci_test was successfully loaded
+1
+1
+1
 OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_c - return a char in an INTEGER register" );
