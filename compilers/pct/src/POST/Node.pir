@@ -18,7 +18,6 @@ for compiling programs in Parrot.
     ##  create POST classes
     p6meta = new 'P6metaclass'
     base = p6meta.'new_class'('POST::Node', 'parent'=>'PCT::Node')
-    p6meta.'new_class'('POST::Op', 'parent'=>base)
     p6meta.'new_class'('POST::Ops', 'parent'=>base)
     p6meta.'new_class'('POST::Sub', 'parent'=>base)
 
@@ -124,32 +123,7 @@ C<POST::Compiler.escape>.)
 
 =back
 
-=head2 POST::Op
-
-C<POST::Op> nodes represents any PIR opcodes.
-
-=over 4
-
-=item pirop([opcode])
-
-Get/set the opcode type for this node.
-
 =cut
-
-.namespace [ 'POST';'Op' ]
-
-.sub 'pirop' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('pirop', value, has_value)
-.end
-
-.sub 'inline' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('inline', value, has_value)
-.end
-
 
 .namespace [ 'POST';'Sub' ]
 
@@ -213,6 +187,8 @@ Get/set the opcode type for this node.
 
 .include 'compilers/pct/src/POST/Label.pir'
 .include 'compilers/pct/src/POST/Sub.pir'
+
+.include 'compilers/pct/src/POST/Op.pir'
 
 =back
 
