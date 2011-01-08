@@ -307,6 +307,18 @@ Get/set the opcode type for this node.
     .return ()
 .end
 
+.namespace []
+.include 'compilers/pct/src/POST/Call.pir'
+.include 'compilers/pct/src/POST/Value.pir'
+.include 'compilers/pct/src/POST/Constant.pir'
+.include 'compilers/pct/src/POST/Register.pir'
+
+.include 'compilers/pct/src/POST/File.pir'
+.include 'compilers/pct/src/POST/Key.pir'
+.include 'compilers/pct/src/POST/String.pir'
+
+.include 'compilers/pct/src/POST/Label.pir'
+.include 'compilers/pct/src/POST/Sub.pir'
 
 =back
 
