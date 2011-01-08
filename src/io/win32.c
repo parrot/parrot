@@ -295,7 +295,6 @@ Parrot_io_close_win32(PARROT_INTERP, PIOHANDLE os_handle)
 {
     ASSERT_ARGS(Parrot_io_close_win32)
     UINTVAL result = 0;
-    PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, filehandle);
 
     if (os_handle != INVALID_HANDLE_VALUE) {
         if (CloseHandle(os_handle) == 0)
@@ -403,8 +402,12 @@ Parrot_io_read_win32(PARROT_INTERP, PIOHANDLE os_handle,
                         &countread, NULL);
 
     if (!success) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Read error: %d", GetLastError());
+        DWORD err = GetLastError();
+
+        if (err != ERROR_BROKEN_PIPE)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                    "Read error: %d", err);
+    }
 
     return countread;
 }
@@ -429,8 +432,6 @@ Parrot_io_write_win32(PARROT_INTERP, PIOHANDLE os_handle,
     ASSERT_ARGS(Parrot_io_write_win32)
     DWORD countwrote = 0;
     DWORD err;
-    void * const buffer = s->strstart;
-    DWORD len = (DWORD) s->bufused;
 
     if (WriteFile(os_handle, (LPCSTR)buf, len, &countwrote, NULL))
         return countwrote;
@@ -490,8 +491,8 @@ Parrot_io_seek_win32(PARROT_INTERP, PIOHANDLE os_handle,
 
     offset.QuadPart = off;
     /* offset.HighPart gets overwritten */
-    offset.LowPart = SetFilePointer(Parrot_io_get_os_handle(interp, filehandle),
-                                    offset.LowPart, &offset.HighPart, whence);
+    offset.LowPart = SetFilePointer(os_handle, offset.LowPart,
+                        &offset.HighPart, whence);
     if (offset.LowPart == INVALID_SET_FILE_POINTER
     &&  GetLastError() != NO_ERROR) {
         /* Error - exception */
