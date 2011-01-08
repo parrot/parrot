@@ -21,7 +21,7 @@ number types.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(112)
+    plan(125)
 
     bnot_p_p_creates_destination()
     band_1()
@@ -31,11 +31,16 @@ number types.
     bands_4()
     bands_cow()
     bor_1()
+    bor_2()
     bors_null_string()
     bors_2()
     bors_3()
     bors_cow()
     shl_1()
+    shl_2()
+    shl_3()
+    shr_1()
+    shr_2()
     bxor_1()
     bxors_null_string()
     bxors_2()
@@ -199,6 +204,17 @@ number types.
     is( $P2, 3, 'bor_p_p_p' )
 .end
 
+.sub bor_2
+    $I0 = 40
+    $P0 = box 20
+    bor $P0, $I0
+    is( $P0, 60, 'bor_p_i' )
+
+    $P0 = box 30
+    bor $P0, 40
+    is( $P0, 62, 'bor_p_ic' )
+.end
+
 .sub bors_null_string
     null $S1
     null $S2
@@ -305,6 +321,80 @@ number types.
     $I0 = 1
     shl $P0, $I0
     is( $P0, 2, 'shl_p_i' )
+.end
+
+.sub shl_2
+    $P0 = new ['Integer']
+    $P0 = 1
+    shl $P0, 2
+    is( $P0, 4, 'shl_p_ic' )
+
+    $P0 = 1
+
+    $P1 = new ['Integer']
+    $P1 = 2
+    shl $P0, $P1
+    is( $P0, 4, 'shl_p_p' )
+.end
+
+.sub shl_3
+    $P0 = new ['Integer']
+    $P0 = 1
+
+    $P1 = new ['Integer']
+
+    $P1 = shl $P0, 2
+    is( $P1, 4, 'shl_p_p_ic' )
+
+    $I0 = 3
+    $P1 = shl $P0, $I0
+    is( $P1, 8, 'shl_p_p_i' )
+
+    $P2 = new ['Integer']
+    $P2 = 4
+
+    $P1 = shl $P0, $P2
+    is( $P1, 16, 'shl_p_p_p' )
+.end
+
+.sub shr_1
+    $P0 = new ['Integer']
+    $P0 = 16
+    shr $P0, 2
+    is( $P0, 4, 'shr_p_ic' )
+
+    $P0 = 16
+
+    $I0 = 3
+    shr $P0, $I0
+    is( $P0, 2, 'shr_p_i' )
+
+    $P0 = 16
+
+    $P1 = new ['Integer']
+    $P1 = 4
+    shr $P0, $P1
+    is( $P0, 1, 'shr_p_p' )
+.end
+
+.sub shr_2
+    $P0 = new ['Integer']
+    $P0 = 16
+
+    $P1 = new ['Integer']
+
+    $P1 = shr $P0, 2
+    is( $P1, 4, 'shr_p_p_ic' )
+
+    $I0 = 3
+    $P1 = shr $P0, $I0
+    is( $P1, 2, 'shr_p_p_i' )
+
+    $P2 = new ['Integer']
+    $P2 = 4
+
+    $P1 = shr $P0, $P2
+    is( $P1, 1, 'shr_p_p_p' )
 .end
 
 .sub bxor_1
