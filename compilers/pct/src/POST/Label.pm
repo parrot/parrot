@@ -1,4 +1,4 @@
-module POST::Label;
+class POST::Label is POST::Node;
 
 =item C<declared>
 Set to 1 of we did see label: inside.
@@ -13,4 +13,15 @@ our multi method position()       { self.attr('position', undef,  0); }
 # Labels are always int constants.
 our multi method type()           { 'ic' }
 
+# Not currently used method.
+method result($value?) {
+    unless pir::defined__ip($value) {
+        $value := self<value>;
+        unless pir::defined__ip($value) {
+            $value := self.unique(self.name);
+        }
+    }
+    self<value> := $value;
+    $value;
+}
 # vim: ft=perl6

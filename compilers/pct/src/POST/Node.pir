@@ -20,7 +20,6 @@ for compiling programs in Parrot.
     base = p6meta.'new_class'('POST::Node', 'parent'=>'PCT::Node')
     p6meta.'new_class'('POST::Op', 'parent'=>base)
     p6meta.'new_class'('POST::Ops', 'parent'=>base)
-    p6meta.'new_class'('POST::Label', 'parent'=>base)
     p6meta.'new_class'('POST::Sub', 'parent'=>base)
 
     $P0 = new 'ResizableStringArray'
@@ -149,24 +148,6 @@ Get/set the opcode type for this node.
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .tailcall self.'attr'('inline', value, has_value)
-.end
-
-
-.namespace [ 'POST';'Label' ]
-
-.sub 'result' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    if has_value goto set_value
-    value = self['result']
-    unless null value goto end
-    .local string name
-    name = self.'name'()
-    value = self.'unique'(name)
-  set_value:
-    self['result'] = value
-  end:
-    .return (value)
 .end
 
 
