@@ -2098,7 +2098,6 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
 
     for (i = 0; i < dir->num_segments; ++i) {
         PackFile_Segment *seg;
-        char             *buf;
         STRING           *name;
         size_t            opcode;
 
@@ -2110,13 +2109,10 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         TRACE_PRINTF_VAL(("Segment type %d.\n", type));
 
         /* get name */
-        buf = PF_fetch_cstring(interp, pf, &cursor);
-        TRACE_PRINTF_VAL(("Segment name \"%s\".\n", name));
+        name = PF_fetch_string(interp, pf, &cursor);
 
         /* create it */
-        name = Parrot_str_new(interp, buf, strlen(buf));
         seg  = PackFile_Segment_new_seg(interp, dir, type, name, 0);
-        mem_gc_free(interp, buf);
 
         seg->file_offset = PF_fetch_opcode(pf, &cursor);
         TRACE_PRINTF_VAL(("Segment file_offset %ld.\n", seg->file_offset));
@@ -2340,11 +2336,9 @@ directory_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     size = 1 + default_packed_size(self);
 
     for (i = 0; i < dir->num_segments; ++i) {
-        char * const name = Parrot_str_to_cstring(interp, dir->segments[i]->name);
         /* type, offset, size */
         size += 3;
-        size += PF_size_cstring(name);
-        Parrot_str_free_cstring(name);
+        size += PF_size_string(dir->segments[i]->name);
     }
 
     /* pad/align it */
@@ -2396,13 +2390,11 @@ directory_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cu
 
     for (i = 0; i < num_segs; i++) {
         const PackFile_Segment * const seg = dir->segments[i];
-        char * const name = Parrot_str_to_cstring(interp, seg->name);
 
         *cursor++ = seg->type;
-        cursor = PF_store_cstring(cursor, name);
+        cursor = PF_store_string(cursor, seg->name);
         *cursor++ = seg->file_offset;
         *cursor++ = seg->op_count;
-        Parrot_str_free_cstring(name);
     }
 
     TRACE_PRINTF_ALIGN(("-ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
