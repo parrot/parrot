@@ -75,7 +75,7 @@ compilers/pct/src/POST/Node.pbc : $(PARROT) \
 		compilers/pct/src/POST/Value.pir
 
 # It should be special "bootstrap-pct" target
-bootstrap-pct:
+bootstrap-pct: $(NQP_RX)
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Call.pir compilers/pct/src/POST/Call.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Constant.pir compilers/pct/src/POST/Constant.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/File.pir compilers/pct/src/POST/File.pm
