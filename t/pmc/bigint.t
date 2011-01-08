@@ -68,7 +68,7 @@ Tests the BigInt PMC.
     $P2 = $P1['gmp']
     $I1 = isnull $P2
     if $I1, NoLibGMP
-    say '# This Parrot uses GMP'
+    diag('# This Parrot uses GMP')
 
     # check version is >= 4.1.4
     $P0 = new ['BigInt']
@@ -126,7 +126,7 @@ SKIP:
     $I2 = $P0
     eq $I0, $I2, OK1
     $I1 = 0
-    say 'set_int/get_int 999999 wrong'
+    diag('set_int/get_int 999999 wrong')
 OK1:
 
     $P0 = new ['BigInt']
@@ -136,7 +136,7 @@ OK1:
     $I2 = $S0
     eq $I0, $I2, OK2
     $I1 = 0
-    say 'set_int/get_str 999999 wrong'
+    diag('set_int/get_str 999999 wrong')
 OK2:
 
     $P0 = new ['BigInt']
@@ -144,28 +144,28 @@ OK2:
     $N1 = $P0
     .fp_eq($N1, 999999.0, OK3)
     $I1 = 0
-    say 'set_int/get_num 999999 wrong'
+    diag('set_int/get_num 999999 wrong')
 OK3:
 
     $P0 = -999999
     $N1 = $P0
     .fp_eq($N1, -999999.0, OK4)
     $I1 = 0
-    say 'set_int/get_num -999999 wrong'
+    diag('set_int/get_num -999999 wrong')
 OK4:
 
     $P0 = 2147483646
     $N1 = $P0
     .fp_eq($N1, 2.147483646e9, OK5)
     $I1 = 0
-    say 'set_int/get_num 2^31-1 wrong'
+    diag('set_int/get_num 2^31-1 wrong')
 OK5:
 
     $P0 = -2147483646
     $N1 = $P0
     .fp_eq($N1, -2.147483646e9, OK6)
     $I1 = 0
-    say 'set_int/get_num 2-2^31 wrong'
+    diag('set_int/get_num 2-2^31 wrong')
 OK6:
 
     $P0 = new ['BigInt']
@@ -173,7 +173,7 @@ OK6:
     $S0 = $P0
     eq $S0, '1230000000000', OK7
     $I1 = 0
-    say 'set_num/get_str 1230000000000'
+    diag('set_num/get_str 1230000000000')
 OK7:
 
     $P0 = new ['BigInt']
@@ -181,7 +181,7 @@ OK7:
     $S0 = $P0
     eq $S0, '1230000000000', OK8
     $I1 = 0
-    say 'set_str/get_str 1230000000000'
+    diag('set_str/get_str 1230000000000')
 
 OK8:
 
@@ -190,14 +190,14 @@ OK8:
     $S0 = $P0[8]
     eq $S0, '536705214244372261', OK9
     $I1 = 0
-    say 'get_string_keyed 12345678987654321'
+    diag('get_string_keyed 12345678987654321')
 
 OK9:
 
     $P0[8] = '536705214244372261'
     eq $P0, '12345678987654321', OK10
     $I1 = 0
-    say 'set_string_keyed 536705214244372261'
+    diag('set_string_keyed 536705214244372261')
 
 OK10:
     ok($I1, 'set and get combinations')
@@ -214,7 +214,7 @@ OK10:
     $S0 = $P2
     eq $S0, '1999999', OK1
     $I1 = 0
-    say 'add 999999+1000000 wrong'
+    diag('add 999999+1000000 wrong')
 OK1:
 
     $P0 = '12345678987654321'
@@ -223,7 +223,7 @@ OK1:
     $S0 = $P2
     eq $S0,'22345678987654321',OK2
     $I1 = 0
-    say 'add 12345678987654321+10000000000000000 wrong'
+    diag('add 12345678987654321+10000000000000000 wrong')
 OK2:
     ok($I1, 'add(bigint,bigint)')
 
@@ -233,7 +233,7 @@ OK2:
     $S0 = $P2
     eq $S0,'1999999',OK3
     $I1 = 0
-    say 'add 999999+1000000 wrong'
+    diag('add 999999+1000000 wrong')
 OK3:
 
     $P0 = '100000000000000000000'
@@ -241,7 +241,7 @@ OK3:
     $S0 = $P2
     eq $S0,'100000000000001000000',OK4
     $I1 = 0
-    say 'add 100000000000000000000+1000000 wrong'
+    diag('add 100000000000000000000+1000000 wrong')
 OK4:
     ok($I1, 'add(bigint,nativeint)')
 
@@ -251,7 +251,7 @@ OK4:
     $P2 = add $P0, $I0
     eq $P2, '12345678987666666', OK5
     $I1 = 0
-    say 'add 12345678987654321+12345 wrong'
+    diag('add 12345678987654321+12345 wrong')
 OK5:
     ok($I1, 'add(bigint,integer)')
 
@@ -264,7 +264,7 @@ OK5:
     add $P0, $P1
     eq $P0, $P2, OK6
     $I1 = 0
-    say 'add 12345678900000000+87654321 wrong'
+    diag('add 12345678900000000+87654321 wrong')
 OK6:
     ok($I1, 'i_add(bigint,bigint)')
 
@@ -272,7 +272,7 @@ OK6:
     add $P0, 87654321
     eq $P0, $P2, OK7
     $I1 = 0
-    say 'add 12345678900000000+87654321 for nativeint wrong'
+    diag('add 12345678900000000+87654321 for nativeint wrong')
 OK7:
     ok($I1, 'i_add(bigint,nativeint)')
 
@@ -282,7 +282,7 @@ OK7:
     add $P0, $P1
     eq $P0, $P2, OK8
     $I1 = 0
-    say 'add 12345678900000000+87654321 for integer wrong'
+    diag('add 12345678900000000+87654321 for integer wrong')
 OK8:
     ok($I1, 'i_add(bigint,integer)')
 
@@ -292,7 +292,7 @@ OK8:
     push_eh E1
       add $P0, $P0, $P1
       $I1 = 0
-      say 'Failed to throw exception'
+      diag('Failed to throw exception')
 E1:
     pop_eh
     get_results '0', $P5
@@ -300,7 +300,7 @@ E1:
     eq $S0, "BigInt: no multiple dispatch variant 'add' for Float", OK9
     $I1 = 0
     print $S0
-    say ' is wrong exception type'
+    diag(' is wrong exception type')
 OK9:
     ok($I1, 'add(bigint,float) throws exception')
     $I1 = 1
@@ -308,7 +308,7 @@ OK9:
     push_eh E2
       add $P0, 1.1
       $I1 = 0
-      say 'Failed to throw exception'
+      diag('Failed to throw exception')
 E2:
     pop_eh
     get_results '0', $P5
@@ -316,7 +316,7 @@ E2:
     eq $S0, "BigInt: no multiple dispatch variant 'i_add_float' for FLOATVAL", OK10
     $I1 = 0
     print $S0
-    say ' is wrong exception type'
+    diag(' is wrong exception type')
 OK10:
     ok($I1, 'i_add(bigint,float) throws exception')
     $I1 = 1
@@ -326,7 +326,7 @@ OK10:
     push_eh E3
       add $P0, $P1
       $I1 = 0
-      say 'Failed to throw exception'
+      diag('Failed to throw exception')
 E3:
     pop_eh
     get_results '0', $P5
@@ -334,7 +334,7 @@ E3:
     eq $S0, "BigInt: no multiple dispatch variant 'i_add' for String", OK11
     $I1 = 0
     print $S0
-    say ' is wrong exception type'
+    diag(' is wrong exception type')
 OK11:
     ok($I1, "i_add(bigint,string) throws exception")
 .end
@@ -350,7 +350,7 @@ OK11:
     $I0 = $P2
     eq $I0, 12340000, OK1
     $I1 = 0
-    say 'sub 12345678-5678 wrong'
+    diag('sub 12345678-5678 wrong')
 OK1:
 
     $P0 = '123456789012345678'
@@ -359,7 +359,7 @@ OK1:
     $P3 = '123456789012340000'
     eq $P2, $P3, OK2
     $I1 = 0
-    say 'sub 123456789012345678-5678 wrong'
+    diag('sub 123456789012345678-5678 wrong')
 OK2:
 
     $P1 = '223456789012345678'
@@ -367,7 +367,7 @@ OK2:
     $P3 = '-100000000000000000'
     eq $P2, $P3, OK3
     $I1 = 0
-    say 'sub 123456789012345678-(-100000000000000000) wrong'
+    diag('sub 123456789012345678-(-100000000000000000) wrong')
 OK3:
     ok($I1, 'sub(bigint,bigint)')
     $I1 = 1
@@ -377,7 +377,7 @@ OK3:
     $I0 = $P2
     eq $I0, 12340000, OK4
     $I1 = 0
-    say 'sub 12345678-5678 wrong'
+    diag('sub 12345678-5678 wrong')
 OK4:
 
     $P0 = '123456789012345678'
@@ -386,7 +386,7 @@ OK4:
     $P3 = '123456789012340000'
     eq $P2, $P3, OK5
     $I1 = 0
-    say 'sub 123456789012345678-5678 wrong'
+    diag('sub 123456789012345678-5678 wrong')
 OK5:
 
     $P0 = new ['BigInt']
@@ -398,7 +398,7 @@ OK5:
     $I0 = $P2
     eq $I0, 12340000, OK6
     $I1 = 0
-    say 'sub 12345678-5678 wrong'
+    diag('sub 12345678-5678 wrong')
 OK6:
 
     $P0 = '123456789012345678'
@@ -407,7 +407,7 @@ OK6:
     $P3 = '123456789012340000'
     eq $P2, $P3, OK7
     $I1 = 0
-    say 'sub 123456789012345678-5678 wrong'
+    diag('sub 123456789012345678-5678 wrong')
 OK7:
 
     $P0 = 9876543
@@ -417,7 +417,7 @@ OK7:
     $I0 = $P2
     eq $I0, 9876499, OK8
     $I1 = 0
-    say 'sub 9876543-44 wrong'
+    diag('sub 9876543-44 wrong')
 OK8:
 
     $P0 = '9876543219876543'
@@ -425,7 +425,7 @@ OK8:
     $P3 = '9876543219876499'
     eq $P3, $P2, OK9
     $I1 = 0
-    say 'sub 9876543219876543-44 wrong'
+    diag('sub 9876543219876543-44 wrong')
 OK9:
     ok($I1, 'sub(bigint,integer)')
 
@@ -438,14 +438,14 @@ OK9:
     sub $P0, $P1
     eq $P0, $P2, OK11
     $I1 = 0
-    say 'i_sub 12345678987654321-123456789 is wrong'
+    diag('i_sub 12345678987654321-123456789 is wrong')
 OK10:
     ok($I1, 'i_sub(bigint,bigint)')
     $P0 = '12345678987654321'
     sub $P0, 123456789
     eq $P0, $P2, OK11
     $I1 = 0
-    say 'i_sub 12345678987654321-123456789 with nativeint is wrong'
+    diag('i_sub 12345678987654321-123456789 with nativeint is wrong')
 OK11:
     ok($I1, 'i_sub(bigint,nativeint)')
 
@@ -455,7 +455,7 @@ OK11:
     sub $P0, $P1
     eq $P0, $P2, OK12
     $I1 = 0
-    say 'i_sub 12345678987654321-123456789 with integer is wrong'
+    diag('i_sub 12345678987654321-123456789 with integer is wrong')
 OK12:
     ok($I1, 'i_sub(bigint,integer)')
 
@@ -463,7 +463,7 @@ OK12:
     dec $P0
     eq $P0, 11111111111111110, OK13
     $I1 = 0
-    say 'decrement is wrong'
+    diag('decrement is wrong')
 OK13:
     ok($I1, 'decrement')
 
@@ -549,7 +549,7 @@ E4:
     push_eh E1
       mul $P0, $P0, $P1
       $I1 = 0
-      say 'Failed to throw exception'
+      diag('Failed to throw exception')
 E1:
     pop_eh
     get_results '0', $P5
@@ -557,7 +557,7 @@ E1:
     eq $S0, "BigInt: no multiple dispatch variant 'multiply' for Float", OK1
     $I1 = 0
     print $S0
-    say ' is wrong exception type'
+    diag(' is wrong exception type')
 OK1:
     ok($I1, 'multiply(bigint,float) throws exception')
     $I1 = 1
@@ -565,7 +565,7 @@ OK1:
     push_eh E2
       mul $P0, 0.1
       $I1 = 0
-      say 'Failed to throw exception'
+      diag('Failed to throw exception')
 E2:
     pop_eh
     get_results '0', $P5
@@ -573,7 +573,7 @@ E2:
     eq $S0, "BigInt: no multiple dispatch variant 'i_multiply_float' for FLOATVAL", OK2
     $I1 = 0
     print $S0
-    say ' is wrong exception type'
+    diag(' is wrong exception type')
 OK2:
     ok($I1, 'i_multiply(bigint,float) throws exception')
     $I1 = 1
@@ -608,7 +608,7 @@ E4:
     $I0 = $P2
     eq $I0, 1, OK1
     $I1 = 0
-    say 'div 100000000000000000000/100000000000000000000 wrong'
+    diag('div 100000000000000000000/100000000000000000000 wrong')
 OK1:
 
     $P3 = new ['BigInt']
@@ -617,7 +617,7 @@ OK1:
     $P2 = div $P0, $P1
     eq $P2, $P3, OK2
     $I1 = 0
-    say 'div 100000000000000000000/10000000 wrong'
+    diag('div 100000000000000000000/10000000 wrong')
 OK2:
 
     $P1 = 10
@@ -625,7 +625,7 @@ OK2:
     $P2 = div $P0, $P1
     eq $P2, $P3, OK3
     $I1 = 0
-    say 'div 100000000000000000000/10 wrong'
+    diag('div 100000000000000000000/10 wrong')
 OK3:
 
     $P1 = -1
@@ -633,7 +633,7 @@ OK3:
     $P2 = div $P0, $P1
     eq $P2, $P3, OK4
     $I1 = 0
-    say 'div 100000000000000000000/(-1) wrong'
+    diag('div 100000000000000000000/(-1) wrong')
 OK4:
     ok($I1, 'div(bigint,bigint)')
     $I1 = 1
@@ -646,7 +646,7 @@ OK4:
     $P2 = '10000000000000000000'
     eq $P1, $P2, OK5
     $I1 = 0
-    say 'div 100000000000000000000/10 wrong'
+    diag('div 100000000000000000000/10 wrong')
 OK5:
 
     $P0 = '100000000000000'
@@ -654,7 +654,7 @@ OK5:
     $P2 = 10000000
     eq $P1, $P2, OK6
     $I1 = 0
-    say 'div 100000000000000/10000000 wrong'
+    diag('div 100000000000000/10000000 wrong')
 OK6:
     ok($I1, 'div(bigint,nativeint)')
     $I1 = 1
@@ -669,7 +669,7 @@ OK6:
     $P2 = '10000000000000000000'
     eq $P1, $P2, OK7
     $I1 = 0
-    say 'div 100000000000000000000/10 wrong'
+    diag('div 100000000000000000000/10 wrong')
 OK7:
 
     $P0 = '100000000000000'
@@ -678,7 +678,7 @@ OK7:
     $P2 = 10000000
     eq $P1, $P2, OK8
     $I1 = 0
-    say 'div 100000000000000/10000000 wrong'
+    diag('div 100000000000000/10000000 wrong')
 OK8:
     ok($I1, 'div(bigint,integer)')
     $I1 = 1
@@ -689,7 +689,7 @@ OK8:
     $P2 = -10000000
     eq $P1, $P2, OK9
     $I1 = 0
-    say 'div 10000000000000/-10000000 wrong'
+    diag('div 10000000000000/-10000000 wrong')
 OK9:
     ok($I1, 'div(bigint,-integer)')
     $I1 = 1
@@ -699,7 +699,7 @@ OK9:
     div $P0, $P1
     eq $P0, 10000000, OK10
     $I1 = 0
-    say 'div 10000000000000/10000000 wrong'
+    diag('div 10000000000000/10000000 wrong')
 OK10:
     ok($I1, 'i_div(bigint,bigint)')
     $I1 = 1
@@ -708,7 +708,7 @@ OK10:
     div $P0, 10000000
     eq $P0, 10000000, OK11
     $I1 = 0
-    say 'div 10000000000000/10000000 with nativeint wrong'
+    diag('div 10000000000000/10000000 with nativeint wrong')
 OK11:
     ok($I1, 'i_div(bigint,nativeint)')
     $I1 = 1
@@ -719,7 +719,7 @@ OK11:
     div $P0, $P1
     eq $P0, 10000000, OK12
     $I1 = 0
-    say 'div 10000000000000/10000000 with integer wrong'
+    diag('div 10000000000000/10000000 with integer wrong')
 OK12:
     ok($I1, 'i_div(bigint,integer)')
     $I1 = 1
@@ -731,7 +731,7 @@ OK12:
     $P1 = mod $P0, $P2
     eq $P1, 21, OK13
     $I1 = 0
-    say 'mod 12345678987654321%50 wrong'
+    diag('mod 12345678987654321%50 wrong')
 OK13:
     ok($I1, 'mod(bigint,integer)')
     $I1 = 1
@@ -740,7 +740,7 @@ OK13:
     $P1 = mod $P0, $P2
     eq $P1, 21, OK14
     $I1 = 0
-    say 'mod 12345678987654321%-50 wrong'
+    diag('mod 12345678987654321%-50 wrong')
 OK14:
     ok($I1, 'mod(bigint,-integer)')
     $I1 = 1
@@ -751,7 +751,7 @@ OK14:
     mod $P0, $P1
     eq $P0, 21, OK15
     $I1 = 0
-    say 'mod 12345678987654321%50 wrong'
+    diag('mod 12345678987654321%50 wrong')
 OK15:
     ok($I1, 'i_mod(bigint,bigint)')
     $I1 = 1
@@ -762,7 +762,7 @@ OK15:
     mod $P0, $P1
     eq $P0, 21, OK16
     $I1 = 0
-    say 'mod 12345678987654321%50 with integer wrong'
+    diag('mod 12345678987654321%50 with integer wrong')
 OK16:
     ok($I1, 'i_mod(bigint,integer)')
     $I1 = 1
@@ -771,14 +771,14 @@ OK16:
     push_eh E1
         $P1 = mod $P0, $P2
         $I1 = 0
-        say 'Failed to throw exception'
+        diag('Failed to throw exception')
 E1:
     pop_eh
     get_results '0', $S0
     eq $S0, "BigInt: no multiple dispatch variant 'modulus' for String", OK17
     $I1 = 0
     print $S0
-    say ' is wrong exception type'
+    diag(' is wrong exception type')
 OK17:
     ok($I1, 'mod(bigint,string) throws exception')
     $I1 = 1
@@ -786,14 +786,14 @@ OK17:
     push_eh E2
         mod $P0, $P2
         $I1 = 0
-        say 'Failed to throw exception'
+        diag('Failed to throw exception')
 E2:
     pop_eh
     get_results '0', $S0
     eq $S0, "BigInt: no multiple dispatch variant 'i_modulus' for String", OK18
     $I1 = 0
     print $S0
-    say ' is wrong exception type'
+    diag(' is wrong exception type')
 OK18:
     ok($I1, 'i_mod(bigint,string) throws exception')
 
@@ -836,7 +836,7 @@ E5:
     push_eh E1
         $P1 = div $P0, $P2
         $I1 = 0
-        say 'Failed to throw exception'
+        diag('Failed to throw exception')
 E1:
     pop_eh
     get_results '0', $P0
@@ -844,7 +844,7 @@ E1:
     eq $S0, 'Divide by zero', OK1
     $I1 = 0
     print $S0
-    say ' is wrong exception type'
+    diag(' is wrong exception type')
 OK1:
     ok($I1, 'div(bigint,bigint 0) throws "Divide by zero" exception')
     $I1 = 1
@@ -858,7 +858,7 @@ OK1:
     push_eh E2
         $P1 = mod $P0, $P2
         $I1 = 0
-        say 'Failed to throw exception'
+        diag('Failed to throw exception')
 E2:
     pop_eh
     get_results '0', $P0
@@ -866,7 +866,7 @@ E2:
     eq $S0, 'Divide by zero', OK2
     $I1 = 0
     print $S0
-    say ' is wrong exception type'
+    diag(' is wrong exception type')
 OK2:
     ok($I1, 'mod(bigint,bigint 0) throws "Divide by zero" exception')
     $I1 = 1
@@ -880,7 +880,7 @@ OK2:
     push_eh E3
         $P1 = div $P0, $P2
         $I1 = 0
-        say 'Failed to throw exception'
+        diag('Failed to throw exception')
 E3:
     pop_eh
     get_results '0', $P0
@@ -888,7 +888,7 @@ E3:
     eq $S0, 'Divide by zero', OK3
     $I1 = 0
     print $S0
-    say ' is wrong exception type'
+    diag(' is wrong exception type')
 OK3:
     ok($I1, 'div(bigint,integer 0) throws "Divide by zero" exception')
     $I1 = 1
@@ -902,18 +902,17 @@ OK3:
     push_eh E4
         $P1 = mod $P0, $P2
         $I1 = 0
-        say 'Failed to throw exception'
+        diag('Failed to throw exception')
 E4:
     pop_eh
     get_results '0', $S0
     eq $S0, 'Divide by zero', OK4
     $I1 = 0
     print $S0
-    say ' is wrong exception type'
+    diag(' is wrong exception type')
 OK4:
     ok($I1, 'mod(bigint,integer 0) throws "Divide by zero" exception')
     $I1 = 1
-
 .end
 
 .sub floor_division
@@ -926,7 +925,7 @@ OK4:
     $P2 = fdiv $P0, $P1
     eq $P2, 12499999, OK1
     $I1 = 0
-    say 'fdiv 12345678987654321/987654321 is wrong'
+    diag('fdiv 12345678987654321/987654321 is wrong')
 OK1:
     ok($I1, 'fdiv(bigint,bigint)')
     $I1 = 1
@@ -934,7 +933,7 @@ OK1:
     $P2 = fdiv $P0, 123456789
     eq $P2, 100000000, OK2
     $I1 = 0
-    say 'fdiv 12345678987654321/123456789 is wrong'
+    diag('fdiv 12345678987654321/123456789 is wrong')
 OK2:
     ok($I1, 'fdiv(bigint,nativeint)')
     $I1 = 1
@@ -944,7 +943,7 @@ OK2:
     $P2 = fdiv $P0, $P1
     eq $P2, 100000000, OK3
     $I1 = 0
-    say 'fdiv 12345678987654321/int 123456789 is wrong'
+    diag('fdiv 12345678987654321/int 123456789 is wrong')
 OK3:
    ok($I1, 'fdiv(bigint,integer)')
    $I1 = 1
@@ -955,7 +954,7 @@ OK3:
    fdiv $P0, $P1
    eq $P0, 12499999, OK4
    $I1 = 0
-   say 'fdiv 12345678987654321/987654321 is wrong'
+   diag('fdiv 12345678987654321/987654321 is wrong')
 OK4:
    ok($I1, 'i_fdiv(bigint,bigint)')
    $I1 = 1
@@ -964,7 +963,7 @@ OK4:
    fdiv $P0, 987654321
    eq $P0, 12499999, OK5
    $I1 = 0
-   say 'fdiv 12345678987654321/987654321 with nativeint is wrong'
+   diag('fdiv 12345678987654321/987654321 with nativeint is wrong')
 OK5:
    ok($I1, 'i_fdiv(bigint,nativeint)')
    $I1 = 1
@@ -975,7 +974,7 @@ OK5:
    fdiv $P0, $P1
    eq $P0, 12499999, OK6
    $I1 = 0
-   say 'fdiv 12345678987654321/987654321 with integer is wrong'
+   diag('fdiv 12345678987654321/987654321 with integer is wrong')
 OK6:
    ok($I1, 'i_fdiv(bigint,integer)')
    $I1 = 1
@@ -1103,7 +1102,7 @@ OK2:
     eq $I0, 8, sz8
     eq $I0, 4, sz4
     print 'Cannot cope with sizeof(INTVAL) == '
-    say $I0
+    diag($I0)
     skip(43)
     exit 1
 
@@ -1143,7 +1142,7 @@ esz:
     print $I9
     print '...'
     print $I5
-    say ']'
+    diag(']')
 
     # Checking upper bound by incremental increase
     $I1 = 1
@@ -1155,34 +1154,34 @@ esz:
     $S0 = typeof $P0
     eq $S0, 'Integer', k0
     $I1 = 0
-    say "typeof != 'Integer'"
+    diag("typeof != 'Integer'")
 k0:
     $S0 = $P0
     eq $S0, $S5, k1         # MaxInt
     $I1 = 0
-    say 'value != MaxInt'
+    diag('value != MaxInt')
 k1:
     $P0 = add $P0, $P1
     $S0 = typeof $P0
     eq $S0, 'BigInt', k2
     $I1 = 0
-    say "typeof != 'BigInt'"
+    diag("typeof != 'BigInt'")
 k2:
     $S0 = $P0
     eq $S0, $S6, k3         # MaxInt+1
     $I1 = 0
-    say 'value != MaxInt+1'
+    diag('value != MaxInt+1')
 k3:
     $P0 = add $P0, $P1
     $S0 = typeof $P0
     eq $S0, 'BigInt', k4
     $I1 = 0
-    say "typeof != 'BigInt'"
+    diag("typeof != 'BigInt'")
 k4:
     $S0 = $P0
     eq $S0, $S7, k5         # MaxInt+2
     $I1 = 0
-    say 'value != MaxInt+2'
+    diag('value != MaxInt+2')
 k5:
 
     # Checking upper bound by increased steps
@@ -1193,12 +1192,12 @@ k5:
     $S0 = typeof $P2
     eq $S0, 'Integer', k6
     $I1 = 0
-    say "typeof != 'Integer'"
+    diag("typeof != 'Integer'")
 k6:
     $S0 = $P2
     eq $S0, $S5, k7         # MaxInt
     $I1 = 0
-    say 'value != MaxInt'
+    diag('value != MaxInt')
 k7:
     inc $P1
     $P2 = new ['Integer']
@@ -1206,12 +1205,12 @@ k7:
     $S0 = typeof $P2
     eq $S0, 'BigInt', k8
     $I1 = 0
-    say "typeof != 'BigInt'"
+    diag("typeof != 'BigInt'")
 k8:
     $S0 = $P2
     eq $S0, $S6, k9         # MaxInt+1
     $I1 = 0
-    say 'value != MaxInt+1'
+    diag('value != MaxInt+1')
 k9:
     add $P1, 1
     $P2 = new ['Integer']
@@ -1219,12 +1218,12 @@ k9:
     $S0 = typeof $P2
     eq $S0, 'BigInt', k10
     $I1 = 0
-    say "typeof != 'BigInt'"
+    diag("typeof != 'BigInt'")
 k10:
     $S0 = $P2
     eq $S0, $S7, k11         # MaxInt+2
     $I1 = 0
-    say 'value != MaxInt+2'
+    diag('value != MaxInt+2')
 k11:
     ok($I1, 'integer addition converts MaxInt+1 to BigInt')
 
@@ -1353,7 +1352,7 @@ ex:
     $P3 = $P0.'pow'($P1)
     eq $P3, 1e10, OK
     $I1 = 0
-    say '1e10 to the power of 2 wrong'
+    diag('1e10 to the power of 2 wrong')
 OK:
     ok($I1, 'pow(bigint, integer)')
     $I1 = 1
@@ -1363,7 +1362,7 @@ OK:
     $P3 = $P0.'pow'($P1)
     eq $P3, 1e10, OK2
     $I1 = 0
-    say '1e10 to the power of bigint 2 is wrong'
+    diag('1e10 to the power of bigint 2 is wrong')
 OK2:
     ok($I1, 'pow(bigint, bigint)')
     $I1 = 1
@@ -1393,14 +1392,14 @@ OK2:
     push_eh E1
         $I0 = cmp $P0, $P2
         $I1 = 0
-        say 'Failed to throw exception'
+        diag('Failed to throw exception')
 E1:
     pop_eh
     get_results '0', $S0
     eq $S0, "BigInt: no multiple dispatch variant 'cmp' for String", OK1
     $I1 = 0
     print $S0
-    say ' is wrong exception type'
+    diag(' is wrong exception type')
 OK1:
     ok($I1, 'cmp(bigint,string) throws exception')
 .end
@@ -1582,7 +1581,7 @@ stop:
         print $S1
         print ' at position '
         print $I3
-        say '.'
+        diag('.')
     ret:
 .end
 
