@@ -92,7 +92,7 @@ PARROT_EXPORT
 void Parrot_unsetenv(PARROT_INTERP, STRING *name);
 
 PARROT_EXPORT
-char * Parrot_getenv(PARROT_INTERP, STRING *name);
+STRING * Parrot_getenv(PARROT_INTERP, STRING *name);
 
 /*
 ** Dynamic Loading:

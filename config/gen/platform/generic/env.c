@@ -77,7 +77,7 @@ Parrot_unsetenv(PARROT_INTERP, STRING *str_name)
 
 /*
 
-=item C<char * Parrot_getenv(PARROT_INTERP, STRING *str_name)>
+=item C<STRING * Parrot_getenv(PARROT_INTERP, STRING *str_name)>
 
 Get Environment vars
 
@@ -85,13 +85,13 @@ Get Environment vars
 
 */
 
-char *
+STRING *
 Parrot_getenv(PARROT_INTERP, STRING *str_name)
 {
     char * const name  = Parrot_str_to_platform_cstring(interp, str_name);
     char        *value = getenv(name);
     Parrot_str_free_cstring(name);
-    return value;
+    return Parrot_str_from_platform_cstring(interp, value);
 }
 
 /*

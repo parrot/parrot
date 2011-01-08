@@ -41,7 +41,8 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
     char* const cmd   = (char *)mem_sys_allocate(command->strlen + 4);
-    char* const shell = Parrot_getenv(interp, Parrot_str_new(interp, "ComSpec", strlen("ComSpec")));
+    char* const shell = Parrot_str_to_cstring(interp,
+                            Parrot_getenv(interp, Parrot_str_new(interp, "ComSpec", strlen("ComSpec")));
     char* const cmdin = Parrot_str_to_cstring(interp, command);
 
     strcpy(cmd, "/c ");
