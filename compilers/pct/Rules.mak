@@ -45,8 +45,11 @@ compilers/pct/src/PAST/Node.pbc : compilers/pct/src/PAST/Node.pir $(PARROT)
 compilers/pct/src/PAST/Compiler.pbc : compilers/pct/src/PAST/Compiler.pir $(PARROT)
 	$(PARROT) -o $@ compilers/pct/src/PAST/Compiler.pir
 
-compilers/pct/src/POST/Compiler.pbc : compilers/pct/src/POST/Compiler.pir $(PARROT)
-	$(PARROT) -o $@ compilers/pct/src/POST/Compiler.pir
+compilers/pct/src/POST/Compiler.pbc : $(PARROT) \
+		compilers/pct/src/POST/Compiler.pir \
+		compilers/pct/src/POST/VanillaAllocator.pir
+	$(PARROT) -o $@ compilers/pct/src/POST/Compiler.pir \
+		compilers/pct/src/POST/VanillaAllocator.pir
 
 compilers/pct/src/POST/Node.pbc : $(PARROT) \
 		compilers/pct/src/POST/Node.pir \
