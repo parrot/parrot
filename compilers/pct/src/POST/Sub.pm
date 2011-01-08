@@ -74,13 +74,6 @@ our multi method constant_index($idx) { self<constant_index> := $idx; $idx }
 =Modifiers
 Various sub modifiers.
 
-=item C<namespace>
-=item C<hll>
-=item C<outer>
-=item C<multi>
-=item C<subid>
-Declared in "old" POST.
-
 our multi method main()     { self<main> // 0 }
 our multi method main($val) { self<main> := ?$val }
 
