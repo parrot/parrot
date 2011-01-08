@@ -19,4 +19,4 @@ our multi method regno($param) { self.attr('regno', $param, 1); }
 our multi method regno()       { self.attr('regno', undef,  0); }
 
 
-# vim: ft=perl6
+# vim: expandtab shiftwidth=4 ft=perl6

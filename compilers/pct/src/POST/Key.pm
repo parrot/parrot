@@ -115,4 +115,5 @@ our method to_pmc(%context) {
     @res;
 }
 
-# vim: ft=perl6
+
+# vim: expandtab shiftwidth=4 ft=perl6

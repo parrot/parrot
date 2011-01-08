@@ -173,4 +173,5 @@ INIT {
     pir::load_bytecode('nqp-setting.pbc');
 }
 
-# vim: ft=perl6
+
+# vim: expandtab shiftwidth=4 ft=perl6

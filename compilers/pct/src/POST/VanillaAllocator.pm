@@ -33,4 +33,4 @@ our method process(POST::Sub $sub) {
     @n_regs_used;
 }
 
-# vim: ft=perl6
+# vim: expandtab shiftwidth=4 ft=perl6

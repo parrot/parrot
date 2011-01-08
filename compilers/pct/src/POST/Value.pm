@@ -32,4 +32,4 @@ our multi method modifier()       { self.attr('modifier', undef,  0); }
 
 our multi method declared()    { 0 };
 
-# vim: ft=perl6
+# vim: expandtab shiftwidth=4 ft=perl6

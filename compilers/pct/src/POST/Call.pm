@@ -25,4 +25,4 @@ our multi method calltype($param)   { self.attr('calltype', $param, 1); }
 our multi method calltype()         { self.attr('calltype', undef,  0); }
 
 
-# vim: ft=perl6
+# vim: expandtab shiftwidth=4 ft=perl6

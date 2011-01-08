@@ -13,3 +13,5 @@ our multi method pirop()            { self.attr('pirop', undef,  0); }
 our multi method inline($param)     { self.attr('inline', $param, 1); }
 our multi method inline()           { self.attr('inline', undef,  0); }
 
+
+# vim: expandtab shiftwidth=4 ft=perl6
