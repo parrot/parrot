@@ -192,7 +192,6 @@ sub _set_implementations {
         math.c
         signal.c
         itimer.c
-        memexec.c
         exec.c
         misc.c
         hires_timer.c
