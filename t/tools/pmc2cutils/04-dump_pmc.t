@@ -4,6 +4,7 @@
 
 use strict;
 use warnings;
+use Carp;
 
 BEGIN {
     use FindBin qw($Bin);
@@ -43,7 +44,11 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles     = glob("$main::topdir/src/pmc/*.pmc");
+    my @pmcfiles;
+    opendir my $DIRH, "$main::topdir/src/pmc"
+        or croak "Unable to open directory for reading";
+    @pmcfiles = map { qq|$main::topdir/src/pmc/$_| } grep { ! m/^\./ } readdir $DIRH;
+    closedir $DIRH or croak;
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {

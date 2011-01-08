@@ -83,10 +83,10 @@ sub runstep {
     $conf->data->set( rpath_blib => ( ! $disable_rpath
                                      && $parrot_is_shared
                                      && $conf->data->get('rpath') )
-        ? $conf->data->get('rpath')
-            . '"' . $conf->data->get('build_dir') . '"'
+        ? '"' . $conf->data->get('rpath')
+            . $conf->data->get('build_dir')
             . '/'
-            . $conf->data->get('blib_dir')
+            . $conf->data->get('blib_dir') . '"'
         : ''
     );
 
