@@ -64,11 +64,6 @@ PIOHANDLE Parrot_io_open_win32(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-size_t Parrot_io_peek_win32(PARROT_INTERP,
-    SHIM(PMC *filehandle),
-    SHIM(STRING **buf))
-        __attribute__nonnull__(1);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 INTVAL Parrot_io_pipe_win32(SHIM_INTERP,
@@ -136,8 +131,6 @@ size_t Parrot_io_write_win32(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_open_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
-#define ASSERT_ARGS_Parrot_io_peek_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_pipe_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(reader) \
     , PARROT_ASSERT_ARG(writer))
@@ -277,7 +270,6 @@ INTVAL Parrot_io_socket_win32(PARROT_INTERP,
 #define PIO_SEEK(interp, pmc, offset, start) \
     Parrot_io_seek_win32((interp), (pmc), (offset), (start))
 #define PIO_TELL(interp, pmc) Parrot_io_tell_win32((interp), (pmc))
-#define PIO_PEEK(interp, pmc, buf) Parrot_io_peek_win32((interp), (pmc), (buf))
 #define PIO_FLUSH(interp, pmc) Parrot_io_flush_win32((interp), (pmc))
 #define PIO_GETBLKSIZE(handle) Parrot_io_getblksize_win32((handle))
 #define PIO_IS_TTY(interp, handle) \

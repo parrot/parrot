@@ -67,11 +67,6 @@ PIOHANDLE Parrot_io_open_unix(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-size_t Parrot_io_peek_unix(PARROT_INTERP,
-    SHIM(PMC *filehandle),
-    SHIM(STRING **buf))
-        __attribute__nonnull__(1);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 INTVAL Parrot_io_pipe_unix(SHIM_INTERP,
@@ -140,8 +135,6 @@ size_t Parrot_io_write_unix(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_open_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
-#define ASSERT_ARGS_Parrot_io_peek_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_pipe_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(reader) \
     , PARROT_ASSERT_ARG(writer))
@@ -285,7 +278,6 @@ INTVAL Parrot_io_socket_unix(PARROT_INTERP,
 #define PIO_SEEK(interp, pmc, offset, start) \
     Parrot_io_seek_unix((interp), (pmc), (offset), (start))
 #define PIO_TELL(interp, pmc) Parrot_io_tell_unix((interp), (pmc))
-#define PIO_PEEK(interp, pmc, buf) Parrot_io_peek_unix((interp), (pmc), (buf))
 #define PIO_FLUSH(interp, pmc) Parrot_io_flush_unix((interp), (pmc))
 #define PIO_GETBLKSIZE(handle) Parrot_io_getblksize_unix((handle))
 #define PIO_IS_TTY(interp, handle) \

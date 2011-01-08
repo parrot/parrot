@@ -655,29 +655,6 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
 
 /*
 
-=item C<size_t Parrot_io_peek_unix(PARROT_INTERP, PMC *filehandle, STRING
-**buf)>
-
-Retrieve the next character in the stream without modifying the stream. Not
-implemented on this platform.
-
-=cut
-
-*/
-
-size_t
-Parrot_io_peek_unix(PARROT_INTERP,
-        SHIM(PMC *filehandle),
-        SHIM(STRING **buf))
-{
-    ASSERT_ARGS(Parrot_io_peek_unix)
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-        "peek() not implemented");
-}
-
-
-/*
-
 =item C<INTVAL Parrot_io_pipe_unix(PARROT_INTERP, PIOHANDLE *reader, PIOHANDLE
 *writer)>
 
