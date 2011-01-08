@@ -97,10 +97,10 @@ PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
         FUNC_MODIFIES(*filehandle);
 
 size_t Parrot_io_write_unix(PARROT_INTERP,
-    ARGIN(PMC *filehandle),
-    ARGIN(const STRING *s))
+    PIOHANDLE os_handle,
+    ARGIN(const char *buf),
+    size_t len)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_Parrot_io_async_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -141,8 +141,7 @@ size_t Parrot_io_write_unix(PARROT_INTERP,
     , PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_write_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle) \
-    , PARROT_ASSERT_ARG(s))
+    , PARROT_ASSERT_ARG(buf))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/unix.c */
 
@@ -263,7 +262,7 @@ INTVAL Parrot_io_socket_unix(PARROT_INTERP,
 #define PIO_CLOSE_PIOHANDLE(interp, handle) Parrot_io_close_piohandle_unix((interp), (handle))
 #define PIO_PIPE_WAIT(interp, pid) Parrot_io_pipe_wait_unix((interp), (pid))
 #define PIO_READ(interp, handle, buf, len) Parrot_io_read_unix((interp), (handle), (buf), (len))
-#define PIO_WRITE(interp, pmc, str) Parrot_io_write_unix((interp), (pmc), (str))
+#define PIO_WRITE(interp, handle, buf, len) Parrot_io_write_unix((interp), (handle), (buf), (len))
 #define PIO_SEEK(interp, pmc, offset, start) \
     Parrot_io_seek_unix((interp), (pmc), (offset), (start))
 #define PIO_TELL(interp, pmc) Parrot_io_tell_unix((interp), (pmc))

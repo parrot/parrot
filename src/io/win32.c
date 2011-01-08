@@ -108,9 +108,6 @@ convert_flags_to_win32(INTVAL flags, ARGOUT(DWORD * fdwAccess),
     }
 
     *fdwShareMode = dwDefaultShareMode;
-    if (flags & PIO_F_APPEND) {
-        /* dealt with specially in _write and _puts */
-    }
 }
 
 /*
@@ -160,6 +157,7 @@ Parrot_io_stdhandle_win32(PARROT_INTERP, INTVAL fileno)
 
     switch (fileno) {
       case PIO_STDIN_FILENO:
+      default:
         nStdHandle = STD_INPUT_HANDLE;
         break;
       case PIO_STDOUT_FILENO:
@@ -413,8 +411,8 @@ Parrot_io_read_win32(PARROT_INTERP, PIOHANDLE os_handle,
 
 /*
 
-=item C<size_t Parrot_io_write_win32(PARROT_INTERP, PMC *filehandle, const
-STRING *s)>
+=item C<size_t Parrot_io_write_win32(PARROT_INTERP, PIOHANDLE os_handle, const
+char *buf, size_t len)>
 
 Calls C<WriteFile()> to write C<len> bytes from the memory starting at
 C<buffer> to C<*io>'s file descriptor. Returns C<(size_t)-1> on
@@ -425,51 +423,47 @@ failure.
 */
 
 size_t
-Parrot_io_write_win32(PARROT_INTERP, ARGIN(PMC *filehandle), ARGIN(const STRING *s))
+Parrot_io_write_win32(PARROT_INTERP, PIOHANDLE os_handle,
+        ARGIN(const char *buf), size_t len)
 {
     ASSERT_ARGS(Parrot_io_write_win32)
     DWORD countwrote = 0;
     DWORD err;
     void * const buffer = s->strstart;
     DWORD len = (DWORD) s->bufused;
-    PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, filehandle);
 
-    /* do it by hand, Win32 hasn't any specific flag */
-    if (Parrot_io_get_flags(interp, filehandle) & PIO_F_APPEND) {
-        LARGE_INTEGER p;
-        p.LowPart = 0;
-        p.HighPart = 0;
-        p.LowPart = SetFilePointer(os_handle, p.LowPart,
-                                   &p.HighPart, FILE_END);
-        if (p.LowPart == 0xFFFFFFFF && (GetLastError() != NO_ERROR)) {
-            /* Error - exception */
-            return (size_t)-1;
-        }
-    }
-
-    if (WriteFile(os_handle, (LPCSTR) buffer, len, &countwrote, NULL))
+    if (WriteFile(os_handle, (LPCSTR)buf, len, &countwrote, NULL))
         return countwrote;
 
     /* Write may have failed because of small buffers,
      * see TT #710 for example.
      * Let's try writing in small chunks */
     if ((err = GetLastError()) == ERROR_NOT_ENOUGH_MEMORY || err == ERROR_INVALID_USER_BUFFER) {
-        DWORD chunk = 4096; /* Arbitrarily choosen value */
+        DWORD chunk   = 4096; /* Arbitrarily choosen value */
+        DWORD written = 0;
+
         if (len < chunk)
             goto fail;
+
         while (len > 0) {
             if (chunk > len)
                 chunk = len;
-            if (WriteFile(os_handle, (LPCSTR) buffer, chunk, &countwrote, NULL) == 0 ||
-                    countwrote != chunk)
+            if (WriteFile(os_handle, (LPCSTR) buf, chunk, &countwrote, NULL) == 0)
                 goto fail;
-            len -= chunk;
+
+            buf     += countwrote;
+            len     -= countwrote;
+            written += countwrote;
+
+            if (countwrote < chunk)
+                break;
         }
-        return len;
+
+        return written;
     }
 fail:
-    /* FIXME: Set error flag */
-    return (size_t)-1;
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Write error: %d", GetLastError());
 }
 
 /*

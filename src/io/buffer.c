@@ -187,11 +187,14 @@ Parrot_io_flush_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
      * Write flush
      */
     if (buffer_flags & PIO_BF_WRITEBUF) {
-        size_t  to_write = buffer_next - buffer_start;
-        STRING *s        = Parrot_str_new_init(interp, (char *)buffer_start,
-                to_write, Parrot_binary_encoding_ptr, 0);
         /* Flush to next layer */
-        long wrote = PIO_WRITE(interp, filehandle, s);
+        size_t    to_write = buffer_next - buffer_start;
+        size_t    wrote;
+        PIOHANDLE os_handle;
+
+        GETATTR_Handle_os_handle(interp, filehandle, os_handle);
+        wrote = PIO_WRITE(interp, os_handle, buffer_start, to_write);
+
         if (wrote == (long)to_write) {
             Parrot_io_set_buffer_next(interp, filehandle, buffer_start);
             /* Release buffer */
@@ -606,17 +609,29 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRIN
     unsigned char *       buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
     const size_t          buffer_size  = Parrot_io_get_buffer_size(interp, filehandle);
     INTVAL                buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
+    INTVAL                flags        = Parrot_io_get_flags(interp, filehandle);
     const size_t          len          = s->bufused;
     int                   need_flush;
     size_t                avail;
+    PIOHANDLE             os_handle;
 
     if (len <= 0)
         return 0;
+
+    GETATTR_Handle_os_handle(interp, filehandle, os_handle);
+
+#ifdef PIO_OS_WIN32
+    /* Win32 doesn't support append */
+    if (flags & PIO_F_APPEND) {
+        PIO_SEEK(interp, os_handle, 0, SEEK_END);
+    }
+#endif
 
     if (buffer_flags & PIO_BF_WRITEBUF)
         avail = buffer_size - (buffer_next - buffer_start);
 
     else if (buffer_flags & PIO_BF_READBUF) {
+        /* Urgent TODO: Seek back to correct position */
         buffer_flags &= ~PIO_BF_READBUF;
         Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
         buffer_next = buffer_start;
@@ -650,13 +665,15 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRIN
      * FIXME: This is badly optimized, will fixup later.
      */
     if (need_flush || len >= buffer_size) {
-        long wrote;
+        size_t    wrote;
 
         /* Write through, skip buffer. */
         Parrot_io_flush_buffer(interp, filehandle);
-        wrote = PIO_WRITE(interp, filehandle, s);
 
-        if (wrote == (long)len) {
+        wrote = PIO_WRITE(interp, os_handle, s->strstart, len);
+
+        if (wrote == len) {
+            /* TODO: Set correct position for PIO_F_APPEND */
             Parrot_io_set_file_position(interp, filehandle, (wrote +
                         Parrot_io_get_file_position(interp, filehandle)));
             return wrote;

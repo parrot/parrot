@@ -125,6 +125,7 @@ Parrot_io_stdhandle_unix(PARROT_INTERP, INTVAL fileno)
 
     switch (fileno) {
       case PIO_STDIN_FILENO:
+      default:
         os_handle = STDIN_FILENO;
         break;
       case PIO_STDOUT_FILENO:
@@ -416,8 +417,8 @@ Parrot_io_read_unix(PARROT_INTERP, PIOHANDLE os_handle,
 
 /*
 
-=item C<size_t Parrot_io_write_unix(PARROT_INTERP, PMC *filehandle, const STRING
-*s)>
+=item C<size_t Parrot_io_write_unix(PARROT_INTERP, PIOHANDLE os_handle, const
+char *buf, size_t len)>
 
 Calls C<write()> to write C<len> bytes from the memory starting at
 C<buffer> to the file descriptor in C<*io>.
@@ -427,37 +428,37 @@ C<buffer> to the file descriptor in C<*io>.
 */
 
 size_t
-Parrot_io_write_unix(PARROT_INTERP, ARGIN(PMC *filehandle), ARGIN(const STRING *s))
+Parrot_io_write_unix(PARROT_INTERP, PIOHANDLE os_handle,
+        ARGIN(const char *buf), size_t len)
 {
     ASSERT_ARGS(Parrot_io_write_unix)
-    const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
-    const char * const buffer = s->strstart;
-    const char * ptr          = buffer;
+    const char *ptr      = buf;
+    size_t      to_write = len;
+    size_t      written  = 0;
 
-    size_t to_write = s->bufused;
-    size_t written  = 0;
-
-  write_through:
     while (to_write > 0) {
-        const int err = write(file_descriptor, ptr, to_write);
-        if (err >= 0) {
-            ptr += err;
-            to_write -= err;
-            written += err;
+        const int count = write(os_handle, ptr, to_write);
+
+        if (count >= 0) {
+            ptr      += count;
+            to_write -= count;
+            written  += count;
         }
         else {
             switch (errno) {
             case EINTR:
-                goto write_through;
+                continue;
 #  ifdef EAGAIN
             case EAGAIN:
-                return written;
+                break;
 #  endif
             default:
-                return (size_t)-1;
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                        "Write error: %s", strerror(errno));
             }
         }
     }
+
     return written;
 }
 
