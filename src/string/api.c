@@ -2092,9 +2092,11 @@ string_to_cstring_nullable(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
     if (STRING_IS_NULL(s))
         return NULL;
     else {
-        char * const p = (char*)mem_internal_allocate(s->bufused + 1);
+        char * const p = (char*)mem_internal_allocate(s->bufused + 2);
         memcpy(p, s->strstart, s->bufused);
-        p[s->bufused] = '\0';
+        /* Two trailing NULs for wide char strings */
+        p[s->bufused]   = '\0';
+        p[s->bufused+1] = '\0';
         return p;
     }
 }

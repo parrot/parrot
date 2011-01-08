@@ -206,8 +206,9 @@ PIOHANDLE
 Parrot_io_open_win32(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_open_win32)
-    DWORD fAcc, fShare, fCreat;
-    PIOHANDLE fd;
+    DWORD      fAcc, fShare, fCreat;
+    PIOHANDLE  fd;
+    char      *spath;
 
 #  if 0
     if ((Interp_flags_TEST(interp, PARROT_DEBUG_FLAG)) != 0) {
@@ -219,12 +220,22 @@ Parrot_io_open_win32(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
     /* add ? and ! for block/non-block */
     convert_flags_to_win32(flags, &fAcc, &fShare, &fCreat);
 
-    { /* enclosing scope for temporary C string */
-        char * const spath = Parrot_str_to_cstring(interp, path);
+    if (path->encoding == Parrot_ascii_encoding_ptr) {
+        spath = Parrot_str_to_cstring(interp, path);
         fd = CreateFile(spath, fAcc, fShare, NULL, fCreat,
                     FILE_ATTRIBUTE_NORMAL, NULL);
-        Parrot_str_free_cstring(spath);
     }
+    else {
+        if (path->encoding != Parrot_ucs2_encoding_ptr
+        &&  path->encoding != Parrot_utf16_encoding_ptr)
+            path = Parrot_utf16_encoding_ptr->to_encoding(interp, path);
+
+        spath = Parrot_str_to_cstring(interp, path);
+        fd = CreateFileW((LPCWSTR)spath, fAcc, fShare, NULL, fCreat,
+                    FILE_ATTRIBUTE_NORMAL, NULL);
+    }
+
+    Parrot_str_free_cstring(spath);
 
     return fd;
 }
