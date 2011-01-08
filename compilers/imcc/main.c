@@ -546,11 +546,14 @@ determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile),
             UNSET_STATE_WRITE_PBC(interp);
         }
         else if (!STATE_LOAD_PBC(interp)) {
-            if (!(imc_yyin_set(fopen(sourcefile, "r"), yyscanner)))    {
+            FILE *file = fopen(sourcefile, "r");
+
+            if (!file)
                 IMCC_fatal_standalone(interp, EXCEPTION_EXTERNAL_ERROR,
                                       "Error reading source file %s.\n",
                                       sourcefile);
-            }
+
+            imc_yyin_set(file, yyscanner);
 
             if (ext && STREQ(ext, ".pasm"))
                 SET_STATE_PASM_FILE(interp);
@@ -641,8 +644,6 @@ compile_to_bytecode(PARROT_INTERP,
 
     imc_cleanup(interp, yyscanner);
 
-    fclose(imc_yyin_get(yyscanner));
-
     IMCC_info(interp, 1, "%ld lines compiled.\n", IMCC_INFO(interp)->line);
     if (per_pbc && !IMCC_INFO(interp)->write_pbc)
         PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
@@ -727,7 +728,7 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
     if (IMCC_INFO(interp)->verbose) {
         IMCC_info(interp, 1, "debug = 0x%x\n", IMCC_INFO(interp)->debug);
         IMCC_info(interp, 1, "Reading %s\n",
-                  imc_yyin_get(yyscanner) == stdin ? "stdin":sourcefile);
+                  STREQ(sourcefile, "-") ? "stdin": sourcefile);
     }
 
     /* If the input file is Parrot bytecode, then we simply read it

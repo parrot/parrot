@@ -459,7 +459,6 @@ struct parser_state_t {
     struct parser_state_t *next;
     Interp                *interp;
     char                  *file;
-    FILE                  *handle;
     int                    line;
     int                    pasm_file;       /* pasm_file mode of this frame */
 };
@@ -613,7 +612,7 @@ typedef struct macro_t {
 #define UNSET_STATE_RUN_FROM_FILE(i) (COMPILER_STATE(i) &= ~PBC_RUN_FILE)
 
 /* imclexer.c */
-FILE * imc_yyin_set(FILE *new_yyin, void *yyscanner);
+void   imc_yyin_set(FILE *new_yyin, void *yyscanner);
 FILE * imc_yyin_get(void *yyscanner);
 
 #endif /* PARROT_IMCC_IMC_H_GUARD */
