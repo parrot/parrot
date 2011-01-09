@@ -137,7 +137,7 @@ foreach my $page (keys %pages) {
     open my $out_fh, '>', $outfile;
 
     # set up and output header
-    my $nav_HTML = qq{<a href="$target_dir/index.html">Home</a>};
+    my $nav_HTML = qq{<a href="index.html">Home</a>};
     print $out_fh Parrot::Docs::HTMLPage->header($title, $nav_HTML, $resource_dir);
 
     foreach my $section (@{$page->{content}}) {
