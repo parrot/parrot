@@ -704,6 +704,7 @@ string.
 STRING *
 Parrot_str_from_platform_cstring(PARROT_INTERP, char *c)
 {
+    ASSERT_ARGS(Parrot_str_from_platform_cstring)
     if (!c)
         return STRINGNULL;
     else
@@ -726,6 +727,7 @@ string.
 char *
 Parrot_str_to_platform_cstring(PARROT_INTERP, STRING *s)
 {
+    ASSERT_ARGS(Parrot_str_to_platform_cstring)
     if (STRING_IS_NULL(s)) {
         return NULL;
     }
