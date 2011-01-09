@@ -963,18 +963,18 @@ CODE
 
     # isnt pass (PMC, PMC)
     test_out( 'ok 31 # TODO todo reason' )
-    $P0 = new ['BigNum']
+    $P0 = new ['String']
     $P0 = "123"
-    $P1 = new ['BigNum']
+    $P1 = new ['String']
     $P1 = "999"
     isnt( $P0, $P1, 'passing test', 'todo' => 'todo reason' )
     test_test( 'todo (as "isnt(PMC, PMC)" param) test should pass, marked as TODO' )
 
     # isnt fail (PMC, PMC)
     test_out( "not ok 32 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
-    $P0 = new ['BigNum']
+    $P0 = new ['String']
     $P0 = "123"
-    $P1 = new ['BigNum']
+    $P1 = new ['String']
     $P1 = "123"
     isnt( $P0, $P1, 'failing test', 'todo' => 'todo reason' )
     test_diag( 'Have: 123' )

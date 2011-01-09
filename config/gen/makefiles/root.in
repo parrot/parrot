@@ -837,9 +837,9 @@ help :
 	@echo "  hello:             'Hello World' as an executable."
 	@echo ""
 
-world : all parrot_utils
+world : parrot_utils
 
-parrot_utils : $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) src/install_config$(O) $(PROVE) $(OPS2C)
+parrot_utils : all $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) src/install_config$(O) $(PROVE) $(OPS2C)
 
 installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPROVE) $(INSTALLABLEOPS2C)
 

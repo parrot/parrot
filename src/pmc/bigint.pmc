@@ -1334,7 +1334,13 @@ Sets the value of the integer to the integer value of C<*value>.
 */
 
     VTABLE void set_pmc(PMC *value) {
-        bigint_set_self(INTERP, SELF, bigint_get_self(INTERP, value));
+        if (value->vtable->base_type == enum_class_BigInt) {
+            bigint_set_self(INTERP, SELF, bigint_get_self(INTERP, value));
+        }
+        else {
+            INTVAL i = VTABLE_get_integer(INTERP, value);
+            bigint_set_long(INTERP, SELF, (long)i);
+        }
     }
 
 /*
