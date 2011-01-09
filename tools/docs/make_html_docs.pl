@@ -1,6 +1,5 @@
 #! perl
-# Copyright (C) 2010, Parrot Foundation.
-# $Id$
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -32,6 +31,7 @@ use File::Spec;
 use Getopt::Long;
 use JSON;
 use Parrot::Docs::PodToHtml;
+use Parrot::Docs::HTMLPage;
 
 my ( $version );
 
@@ -39,7 +39,8 @@ die unless GetOptions( 'version=s' => \$version );
 
 die "Usage: $0 --version\n" unless $version;
 
-my $target_dir = 'docs/html';
+my $target_dir   = 'docs/html';
+my $resource_dir = '../resources';
 
 my $json = JSON->new();
 
@@ -72,9 +73,12 @@ foreach my $index_file (@json_index_files) {
         };
 
         my %sources;
+        my @sources_list;
+
         foreach my $source_elem (@raw_sources) {
-            foreach my $file (glob($source_elem)) {
+            foreach my $file (sort glob($source_elem)) {
                 $sources{$file} = 1;
+                push @sources_list, ($file)
             }
         }
 
@@ -83,8 +87,15 @@ foreach my $index_file (@json_index_files) {
             foreach my $exclusion (@{$chunk->{exclude}}) {
                 delete $sources{$exclusion}
             }
+            # remove exclusions from @sources_list
+            my @no_exclusions;
+            foreach my $not_excluded (@sources_list) {
+                push @no_exclusions, ($not_excluded) if $sources{$not_excluded};
+            }
+            @sources_list = @no_exclusions;
         }
         $chunk->{input_files} = [keys %sources];
+        $chunk->{sorted_list} = \@sources_list;
     }
     $pages{lc $section->{page}} = $section;
 }
@@ -95,10 +106,12 @@ foreach my $page (keys %pages) {
         foreach my $source (@{$section->{input_files}}) {
             if ($source =~ /^:(.*)/) {
                 # Indicates link to other page.
-                my $link = $1;
-                if (! exists $pages{lc $link}) {
+                my $link = lc $1;
+                if (! exists $pages{$link}) {
                     die "invalid link $source specified.\n";
                 }
+                # assuming a link only in one page
+                $pages{$link}->{parent} = $page;
             }
             else {
                 transform_input($source, $page->{page}, $page->{title});
@@ -107,7 +120,51 @@ foreach my $page (keys %pages) {
     }
 }
 
-my %generated;
+
+my %file_titles;
+#
+# generate index/header pages
+#
+
+foreach my $page (keys %pages) {
+    my $outfilename = $page;
+    $page = $pages{$page};
+    my $title = $page->{title};
+
+    my $outfile = File::Spec->catfile($target_dir, $outfilename) . '.html';
+    my $dir = File::Path::make_path(File::Basename::dirname($outfile));
+
+    open my $out_fh, '>', $outfile;
+
+    # set up and output header
+    my $nav_HTML = qq{<a href="$target_dir/index.html">Home</a>};
+    print $out_fh Parrot::Docs::HTMLPage->header($title, $nav_HTML, $resource_dir);
+
+    foreach my $section (@{$page->{content}}) {
+        # output Section title
+        print $out_fh "<h2>$section->{title}</h2>\n\n<ul>";
+
+        foreach my $source (@{$section->{sorted_list}}) {
+            if ($source =~ /^:(.*)/) {
+                my $link = lc $1;
+                # output link with title
+                print $out_fh qq(<li><a href="$link.html">$pages{$link}->{title}</a></li>\n);
+            }
+            else {
+                # output source and name (from title)
+                print $out_fh qq(<li><a href="$source.html">$file_titles{$source}</a></li>\n);
+            }
+        }
+        print $out_fh "</ul>\n\n";
+    }
+    # output footer
+    print $out_fh Parrot::Docs::HTMLPage->footer('', $resource_dir, $version);
+}
+
+#
+# transform individual files from .pod to .html
+#
+
 sub transform_input {
     my ($input, $parent, $parent_title) = @_;
 
@@ -133,8 +190,6 @@ sub transform_input {
     $formatter->parse_file($input);
     warn "$input generated no HTML output\n"
         unless $formatter->content_seen;
-
-    $generated{$input} = 1;
 }
 
 exit 0;
