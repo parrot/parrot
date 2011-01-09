@@ -777,7 +777,7 @@ help :
 	@echo "  codetest:          Run file metadata and coding standards tests."
 	@echo "  fulltest:          Run the full test suite under many runcores."
 	@echo "  test<runcore>:     Run the test suite with a specified runcore."
-	@echo "                     Valid runcores are b, C, f, g, j, r, S."
+	@echo "                     Valid runcores are b, f, g, j, r."
 	@echo "  src_tests:         Run test in C-file."
 	@echo "  run_tests:         Command line and various environments."
 	@echo "  perl_tests:        Test the Perl modules in the distribution."
@@ -2121,7 +2121,7 @@ codingstd_tests :
 	$(PERL) t/harness $(CODINGSTD_TEST_FILES)
 
 # Run standard test suite with warnings enabled.
-warnings_tests:
+warnings_tests: test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -w $(RUNCORE_TEST_FILES)
 
 buildtools_tests : corevm
