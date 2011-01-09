@@ -572,7 +572,7 @@ number types.
 
     $I0 = bnot 11
     is($I0, -12, "bnot_i_ic")
-    
+
     $P0 = new ["Integer"]
     $P0 = 12
     bnot $P0
@@ -641,7 +641,7 @@ number types.
     $I0 = 0
     rot_i_ic_ic_ic $I0, 20, 1, 32
     is ($I0, 40, "rot_i_ic_ic_ic")
-    
+
     rot_i_ic_ic_ic $I0, 27, -3, 32
     is($I0, 1610612739, "rot_i_ic_ic_ic")
 .end
