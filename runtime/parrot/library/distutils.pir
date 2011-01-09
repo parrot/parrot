@@ -201,6 +201,7 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
 =cut
 
 .loadlib 'sys_ops'
+.include 'errors.pasm'
 
 .sub '__onload' :load :init :anon
     load_bytecode 'osutils.pbc'
@@ -344,6 +345,9 @@ Entry point.
     .param pmc args :slurpy
     .param pmc kv :slurpy :named
     .local pmc steps
+
+    errorsoff .PARROT_ERRORS_PARAM_COUNT_FLAG
+
     steps = new 'ResizableStringArray'
     $P0 = iter args
   L1:
