@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Parrot::Config;
 
 =head1 NAME
@@ -231,6 +231,32 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad count" );
 .end
 CODE
 1
+OUTPUT
+
+pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad destroy" );
+.sub 'test' :main
+    foo()
+.end
+
+.sub meh
+.end
+
+.sub foo
+    $P0 = get_global "meh"
+    $P1 = new ['LexInfo'], $P0
+    $P2 = new ['DynLexPad'], $P1
+
+    $P3 = $P2['a']
+    $I0 = isnull $P3
+    say $I0
+
+    null $P2
+    sweep 1
+    say "ok"
+.end
+CODE
+1
+ok
 OUTPUT
 
 pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad exists" );
