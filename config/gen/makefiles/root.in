@@ -377,6 +377,9 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/memory.h \
 	$(INC_DIR)/packfile.h \
 	$(INC_DIR)/io.h \
+	$(INC_DIR)/io_portable.h \
+	$(INC_DIR)/io_unix.h \
+	$(INC_DIR)/io_win32.h \
 	$(INC_DIR)/op.h \
 	$(INC_DIR)/pmc.h \
 	$(INC_DIR)/gc_api.h \
@@ -388,6 +391,11 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/exit.h \
 	$(INC_DIR)/nci.h \
 	$(INC_DIR)/thread.h \
+	$(INC_DIR)/atomic.h \
+	$(INC_DIR)/atomic/fallback.h \
+	$(INC_DIR)/atomic/gcc_pcc.h \
+	$(INC_DIR)/atomic/gcc_x86.h \
+	$(INC_DIR)/atomic/sparc.h \
 	$(INC_DIR)/scheduler.h \
 	$(INC_DIR)/oo.h \
 	$(INC_DIR)/vtables.h \
@@ -1462,7 +1470,6 @@ src/exceptions$(O) : $(PARROT_H_HEADERS) \
 
 src/thread$(O) : \
     $(PARROT_H_HEADERS) \
-    $(INC_DIR)/atomic.h \
     $(INC_DIR)/extend.h \
     $(INC_DIR)/extend_vtable.h \
     src/thread.c \
@@ -1684,7 +1691,8 @@ src/nci/api$(O) : src/nci/api.str \
 	src/nci/api.c \
 	$(PARROT_H_HEADERS)
 
-src/nci/core_thunks$(O) : src/nci/core_thunks.c \
+src/nci/core_thunks$(O) : src/nci/core_thunks.str \
+	src/nci/core_thunks.c \
 	$(PARROT_H_HEADERS) \
 	include/pmc/pmc_nci.h
 
@@ -1698,6 +1706,7 @@ src/nci/libffi$(O) : src/nci/libffi.c \
 src/nci/extra_thunks$(O) : \
     $(PARROT_H_HEADERS) \
     include/pmc/pmc_nci.h \
+    src/nci/extra_thunks.str \
     src/nci/extra_thunks.c
 	$(CC) $(CFLAGS) @optimize::src/nci/extra_thunks.c@ @ccwarn::src/nci/extra_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/nci/extra_thunks.c
 
@@ -1823,8 +1832,7 @@ src/gc/malloc_trace$(O) : src/gc/malloc.c src/gc/malloc_trace.c
 
 src/packfile/pf_items$(O) : $(PARROT_H_HEADERS) src/packfile/pf_items.c
 
-src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic/gcc_x86.h \
-    src/atomic/gcc_x86.c
+src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) src/atomic/gcc_x86.c
 
 # core_ops depends upon config.h so that it gets updated along with
 # updates to config.h's version numbers
