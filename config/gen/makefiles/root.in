@@ -2068,10 +2068,6 @@ testj : test_prep
 testr : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -r $(RUNCORE_TEST_FILES)
 
-# normal core, write and run PASM
-testp : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -r $(RUNCORE_TEST_FILES)
-
 # normal core, optimization level 1
 testO1 : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -O1 $(RUNCORE_TEST_FILES)
