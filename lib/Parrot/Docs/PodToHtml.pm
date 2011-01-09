@@ -1,5 +1,4 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
-# $Id$
+# Copyright (C) 2004-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -31,6 +30,8 @@ use base qw( Pod::Simple::HTML );
 our $VERSION = '1.0';
 
 use Parrot::Docs::HTMLPage;
+
+my $page_title;
 
 =item C<new()>
 
@@ -92,6 +93,7 @@ sub do_beginning {
         }
     }
 
+
     # Figure out what the relative docroot will be and setup
     # our breadcrumbs & resource paths.
 
@@ -112,6 +114,8 @@ sub do_beginning {
         );
 
     $self->version_tag_comment;
+
+    $page_title = $title;
 
     return 1;
 }
@@ -672,6 +676,18 @@ sub href_path {
     $path =~ s|\\+|/|go;
 
     return $path;
+}
+
+=item C<return_page_title()>
+
+Return the title in $page_title from do_begining
+
+=cut
+
+sub return_page_title {
+    my $self = shift;
+
+    return $page_title;
 }
 
 =back
