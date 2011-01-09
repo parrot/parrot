@@ -862,7 +862,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
                 /* Mark the name as used, cannot be filled again. */
                 if (named_used_list==NULL) /* Only created if needed. */
-                    named_used_list = Parrot_hash_create_hash(interp,
+                    named_used_list = Parrot_hash_create(interp,
                             enum_type_INTVAL, Hash_key_type_STRING);
 
                 Parrot_hash_put(interp, named_used_list, param_name, (void *)1);
@@ -1019,7 +1019,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
                         /* Mark the name as used, cannot be filled again. */
                         if (named_used_list==NULL) /* Only created if needed. */
-                            named_used_list = Parrot_hash_create_hash(interp,
+                            named_used_list = Parrot_hash_create(interp,
                                     enum_type_INTVAL, Hash_key_type_STRING);
 
                         Parrot_hash_put(interp, named_used_list, name, (void *)1);
@@ -1057,7 +1057,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
                 /* Mark the name as used, cannot be filled again. */
                 if (named_used_list==NULL) /* Only created if needed. */
-                    named_used_list = Parrot_hash_create_hash(interp,
+                    named_used_list = Parrot_hash_create(interp,
                             enum_type_INTVAL, Hash_key_type_STRING);
 
                 Parrot_hash_put(interp, named_used_list, param_name, (void *)1);

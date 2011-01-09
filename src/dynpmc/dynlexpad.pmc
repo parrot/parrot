@@ -49,7 +49,7 @@ lexinfo.
         else
             attrs->init = NULL;
 
-        hash             = Parrot_hash_new_hash(INTERP);
+        hash             = Parrot_hash_new(INTERP);
         attrs->hash      = hash;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -211,7 +211,7 @@ Marks the lexpad hash as live.
         PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
         Parrot_gc_mark_PMC_alive(INTERP, std_pad);
         if (PARROT_DYNLEXPAD(SELF)->hash)
-            Parrot_hash_mark_hash(INTERP, PARROT_DYNLEXPAD(SELF)->hash);
+            Parrot_hash_mark(INTERP, PARROT_DYNLEXPAD(SELF)->hash);
     }
 
 

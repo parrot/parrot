@@ -879,7 +879,7 @@ EOC
     else {
         $cout .= <<"EOC";
     if (isa == NULL) {
-        isa = Parrot_hash_new_hash(interp);
+        isa = Parrot_hash_new(interp);
     }
 EOC
     }

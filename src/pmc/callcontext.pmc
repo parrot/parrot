@@ -387,7 +387,7 @@ get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
     GETATTR_CallContext_hash(interp, SELF, hash);
 
     if (!hash) {
-        hash = Parrot_hash_create_hash(interp,
+        hash = Parrot_hash_create(interp,
             enum_type_ptr,
             Hash_key_type_STRING);
 

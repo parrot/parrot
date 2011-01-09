@@ -662,7 +662,7 @@ arguments. The class is attached to the current HLL namespace.
         _class->vtable_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
         _class->parent_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
 
-        _class->isa_cache        = Parrot_hash_create_hash(INTERP,
+        _class->isa_cache        = Parrot_hash_create(INTERP,
             enum_type_INTVAL, Hash_key_type_PMC_ptr);
 
 
@@ -768,7 +768,7 @@ Marks any referenced strings and PMCs in the structure as live.
         Parrot_gc_mark_PMC_alive(INTERP, _class->resolve_method);
         Parrot_gc_mark_PMC_alive(INTERP, _class->meth_cache);
         if (_class->isa_cache)
-            Parrot_hash_mark_hash(INTERP, _class->isa_cache);
+            Parrot_hash_mark(INTERP, _class->isa_cache);
     }
 
 

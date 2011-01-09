@@ -126,7 +126,7 @@ Free hash structure.
         Parrot_Hash_attributes * const attr =
             (Parrot_Hash_attributes *) PMC_data(SELF);
 
-        attr->hash            = Parrot_hash_new_hash(INTERP);
+        attr->hash            = Parrot_hash_new(INTERP);
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -134,7 +134,7 @@ Free hash structure.
         Parrot_Hash_attributes * const attr =
             (Parrot_Hash_attributes *) PMC_data(SELF);
 
-        attr->hash = Parrot_hash_create_hash(INTERP,
+        attr->hash = Parrot_hash_create(INTERP,
                 (PARROT_DATA_TYPE)value_type,
                 Hash_key_type_STRING);
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -159,7 +159,7 @@ Marks the hash as live.
     VTABLE void mark() {
         Hash * const hash = (Hash *)SELF.get_pointer();
         if (hash && hash->entries)
-            Parrot_hash_mark_hash(INTERP, hash);
+            Parrot_hash_mark(INTERP, hash);
     }
 
 /*
@@ -224,17 +224,17 @@ NB: this method will destroy all old data!
                                     : enum_type_PMC;
 
         if (type == Hash_key_type_STRING)
-            new_hash = Parrot_hash_create_hash(INTERP,
+            new_hash = Parrot_hash_create(INTERP,
                     entry_type,
                     Hash_key_type_STRING);
         else if (type == Hash_key_type_int)
             /* new_int_hash set BOTH keys and values to INTVAL */
-            new_hash = Parrot_hash_create_hash(INTERP,
+            new_hash = Parrot_hash_create(INTERP,
                     entry_type,
                     Hash_key_type_int);
         else if (type == Hash_key_type_PMC)
             /* new_int_hash set BOTH keys and values to INTVAL */
-            new_hash = Parrot_hash_create_hash(INTERP,
+            new_hash = Parrot_hash_create(INTERP,
                     entry_type,
                     Hash_key_type_PMC);
         else
@@ -295,7 +295,7 @@ NB: this method will destroy all old data!
           case enum_type_INTVAL:
           case enum_type_STRING:
           case enum_type_PMC:
-            new_hash = Parrot_hash_create_hash(INTERP,
+            new_hash = Parrot_hash_create(INTERP,
                         (PARROT_DATA_TYPE)type,
                         old_hash ? old_hash->key_type : Hash_key_type_STRING);
             break;

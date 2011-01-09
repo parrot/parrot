@@ -143,7 +143,7 @@ Parrot_str_init(PARROT_INTERP)
     }
 
     /* Set up the cstring cache, then load the basic encodings */
-    const_cstring_hash          = Parrot_hash_create_hash_sized(interp,
+    const_cstring_hash          = Parrot_hash_create_sized(interp,
                                         enum_type_PMC,
                                         Hash_key_type_cstring,
                                         n_parrot_cstrings);

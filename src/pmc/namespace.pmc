@@ -345,7 +345,7 @@ Initialize a C<NameSpace> PMC.
         PARROT_NAMESPACE(SELF)->vtable  = PMCNULL;
         PARROT_NAMESPACE(SELF)->methods = PMCNULL;
         PARROT_NAMESPACE(SELF)->_class  = PMCNULL;
-        SELF.set_pointer(Parrot_hash_new_hash(INTERP));
+        SELF.set_pointer(Parrot_hash_new(INTERP));
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -362,7 +362,7 @@ Marks the namespace as live.
         Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
 
         if (nsinfo->hash)
-            Parrot_hash_mark_hash(INTERP, nsinfo->hash);
+            Parrot_hash_mark(INTERP, nsinfo->hash);
 
         Parrot_gc_mark_PMC_alive(INTERP, nsinfo->parent);
         Parrot_gc_mark_PMC_alive(INTERP, nsinfo->_class);

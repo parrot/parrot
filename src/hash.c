@@ -526,7 +526,7 @@ hash_compare(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(void *a),
 
 /*
 
-=item C<void Parrot_hash_dump_hash(PARROT_INTERP, const Hash *hash)>
+=item C<void Parrot_hash_dump(PARROT_INTERP, const Hash *hash)>
 
 Prints out the hash in human-readable form, at least once someone implements
 this.
@@ -537,15 +537,15 @@ this.
 
 PARROT_EXPORT
 void
-Parrot_hash_dump_hash(SHIM_INTERP, SHIM(const Hash *hash))
+Parrot_hash_dump(SHIM_INTERP, SHIM(const Hash *hash))
 {
-    ASSERT_ARGS(Parrot_hash_dump_hash)
+    ASSERT_ARGS(Parrot_hash_dump)
 }
 
 
 /*
 
-=item C<void Parrot_hash_mark_hash(PARROT_INTERP, Hash *hash)>
+=item C<void Parrot_hash_mark(PARROT_INTERP, Hash *hash)>
 
 Marks the hash and its contents as live.  Assumes that key and value are
 non-null in all buckets.
@@ -556,9 +556,9 @@ non-null in all buckets.
 
 PARROT_EXPORT
 void
-Parrot_hash_mark_hash(PARROT_INTERP, ARGMOD(Hash *hash))
+Parrot_hash_mark(PARROT_INTERP, ARGMOD(Hash *hash))
 {
-    ASSERT_ARGS(Parrot_hash_mark_hash)
+    ASSERT_ARGS(Parrot_hash_mark)
     int mark_key   = 0;
     int mark_value = 0;
 
@@ -701,7 +701,7 @@ Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
     const Hash_key_type     key_type    = (Hash_key_type)VTABLE_shift_integer(interp, info);
     const PARROT_DATA_TYPE  entry_type  = (PARROT_DATA_TYPE)VTABLE_shift_integer(interp, info);
     size_t                  entry_index;
-    Hash *hash = Parrot_hash_create_hash_sized(interp, entry_type, key_type, num_entries);
+    Hash *hash = Parrot_hash_create_sized(interp, entry_type, key_type, num_entries);
 
     /* special case for great speed */
     if (key_type   == Hash_key_type_STRING
@@ -1035,7 +1035,7 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
 
 /*
 
-=item C<Hash* Parrot_hash_new_hash(PARROT_INTERP)>
+=item C<Hash* Parrot_hash_new(PARROT_INTERP)>
 
 Creates a new Parrot STRING hash.
 
@@ -1046,10 +1046,10 @@ Creates a new Parrot STRING hash.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Hash*
-Parrot_hash_new_hash(PARROT_INTERP)
+Parrot_hash_new(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_hash_new_hash)
-    return Parrot_hash_create_hash(interp,
+    ASSERT_ARGS(Parrot_hash_new)
+    return Parrot_hash_create(interp,
             enum_type_PMC,
             Hash_key_type_STRING);
 }
@@ -1071,7 +1071,7 @@ Hash*
 Parrot_hash_new_cstring_hash(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_hash_new_cstring_hash)
-    return Parrot_hash_create_hash(interp,
+    return Parrot_hash_create(interp,
             enum_type_PMC,
             Hash_key_type_cstring);
 }
@@ -1093,7 +1093,7 @@ Hash *
 Parrot_hash_new_pointer_hash(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_hash_new_pointer_hash)
-    return Parrot_hash_create_hash(interp,
+    return Parrot_hash_create(interp,
             enum_type_ptr,
             Hash_key_type_ptr);
 }
@@ -1118,14 +1118,14 @@ Hash*
 Parrot_hash_new_intval_hash(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_hash_new_intval_hash)
-    return Parrot_hash_create_hash(interp,
+    return Parrot_hash_create(interp,
             enum_type_INTVAL,
             Hash_key_type_int);
 }
 
 /*
 
-=item C<Hash * Parrot_hash_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type,
+=item C<Hash * Parrot_hash_create(PARROT_INTERP, PARROT_DATA_TYPE val_type,
 Hash_key_type hkey_type)>
 
 Creates and initializes a hash.  Function pointers determine its behaviors.
@@ -1139,9 +1139,9 @@ Memory from this function must be freed.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Hash *
-Parrot_hash_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_type)
+Parrot_hash_create(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_type)
 {
-    ASSERT_ARGS(Parrot_hash_create_hash)
+    ASSERT_ARGS(Parrot_hash_create)
     Hash * const hash = (Hash*) Parrot_gc_allocate_fixed_size_storage(interp, sizeof (Hash));
 
     hash->entry_type = val_type;
@@ -1159,10 +1159,10 @@ Parrot_hash_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type 
 
 /*
 
-=item C<Hash * Parrot_hash_create_hash_sized(PARROT_INTERP, PARROT_DATA_TYPE
+=item C<Hash * Parrot_hash_create_sized(PARROT_INTERP, PARROT_DATA_TYPE
 val_type, Hash_key_type hkey_type, UINTVAL size)>
 
-Creates and initializes a hash, similar to C<Parrot_hash_create_hash>.
+Creates and initializes a hash, similar to C<Parrot_hash_create>.
 
 Preallocates at least C<size> buckets.
 
@@ -1173,12 +1173,12 @@ Preallocates at least C<size> buckets.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Hash *
-Parrot_hash_create_hash_sized(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_type,
+Parrot_hash_create_sized(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_type,
         UINTVAL size)
 {
-    ASSERT_ARGS(Parrot_hash_create_hash_sized)
+    ASSERT_ARGS(Parrot_hash_create_sized)
 
-    Hash *hash = Parrot_hash_create_hash(interp, val_type, hkey_type);
+    Hash *hash = Parrot_hash_create(interp, val_type, hkey_type);
     allocate_buckets(interp, hash, size);
     return hash;
 }

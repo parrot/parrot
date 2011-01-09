@@ -1100,7 +1100,7 @@ Parrot_mmd_cache_create(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_mmd_cache_create)
     /* String hash. */
-    Hash *cache = Parrot_hash_new_hash(interp);
+    Hash *cache = Parrot_hash_new(interp);
     return cache;
 }
 
@@ -1328,7 +1328,7 @@ Parrot_mmd_cache_mark(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
     /* As a small future optimization, note that we only *really* need to mark
     * keys - the candidates will be referenced outside the cache, provided it's
     * invalidated properly. */
-    Parrot_hash_mark_hash(interp, cache);
+    Parrot_hash_mark(interp, cache);
 }
 
 
