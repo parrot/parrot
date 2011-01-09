@@ -2013,7 +2013,7 @@ test_runcore: test_prep
 smolder_test : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --archive --send-to-smolder
 
-smolder_coretest : corevm
+smolder_coretest : corevm pbctestfiles
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --core-tests --archive --send-to-smolder
 
 smoke : smolder_test
