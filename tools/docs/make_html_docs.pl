@@ -190,6 +190,10 @@ sub transform_input {
     $formatter->parse_file($input);
     warn "$input generated no HTML output\n"
         unless $formatter->content_seen;
+
+    my $page_title = $formatter->return_page_title();
+
+    $file_titles{$input} = $page_title;
 }
 
 exit 0;
