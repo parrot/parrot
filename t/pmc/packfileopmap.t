@@ -80,6 +80,18 @@ Tests the PackfileOpMap PMC.
 
     $I0 = opmap
     is($I0, 4, "opmap correctly reports the number of mapped ops")
+
+    $P0 = opmap['say_sc']
+    $S0 = $P0
+    is($S0, 'say_sc', 'opmap returns the correct named op')
+
+    push_eh invalid_op_name
+    $P0 = opmap['speak_ne']
+    ok(0, 'opmap throws an exception on invalid op name')
+
+  invalid_op_name:
+    ok(1, 'caught invalid op name')
+    pop_eh
 .end
 
 .sub 'load_lib'
