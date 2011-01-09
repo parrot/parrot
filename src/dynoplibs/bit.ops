@@ -412,13 +412,16 @@ inline op rot(out INT, in INT, in INT, inconst INT) {
     const INTVAL r = $2;
     INTVAL s = $3;
     const INTVAL w = $4;
-    INTVAL d, t;
+    INTVAL d, t, m, i;
     if (s < 0)
         s += w;
     d = r << s;
+    for(i = 0, m = 0; i < w; i++)
+        m |= (1 << i);
+    d &= m;
     t = w - s;
     t = (INTVAL)((UINTVAL)r >> t);
-    d |= t;
+    d = (d | t) & m;
     $1 = d;
 }
 

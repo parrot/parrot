@@ -602,7 +602,8 @@ ROUND_LOOP:
     tmp = context[0] # b = a;
     context[1] = tmp
 
-    tmp = T1 + T2 # a = T1 + T2;
+    tmp = T1 # a = T1 + T2;
+    .add_no_carry(tmp, T2)
     context[0] = tmp
 
     inc counter
