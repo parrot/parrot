@@ -40,7 +40,7 @@ Parrot_init_platform_encoding(PARROT_INTERP)
 
 /*
 
-=item C<size_t Parrot_str_platfrom_strlen(PARROT_INTERP, const char *s)>
+=item C<size_t Parrot_str_platform_strlen(PARROT_INTERP, const char *s)>
 
 Get the length of a platform-encoded C string.
 
