@@ -72,9 +72,9 @@ Initializes a newly created FileHandle object.
 
         attrs->record_separator = '\n';
         attrs->flags            = 0;
-        attrs->filename         = NULL;
-        attrs->mode             = NULL;
-        attrs->encoding         = NULL;
+        attrs->filename         = STRINGNULL;
+        attrs->mode             = STRINGNULL;
+        attrs->encoding         = STRINGNULL;
         attrs->process_id       = 0;
         attrs->exit_status      = 0;
         attrs->file_size        = 0;
@@ -107,7 +107,7 @@ Create a copy of the filehandle.
     VTABLE PMC *clone() {
         Parrot_FileHandle_attributes * const old_attrs
             = PARROT_FILEHANDLE(SELF);
-        PMC * const copy = Parrot_io_new_pmc(INTERP, old_attrs->flags);
+        PMC * const copy = Parrot_pmc_new(interp, enum_class_FileHandle);
         Parrot_FileHandle_attributes * const new_attrs
             = PARROT_FILEHANDLE(copy);
 
@@ -122,6 +122,7 @@ Create a copy of the filehandle.
         Parrot_gc_mark_STRING_alive(INTERP, new_attrs->encoding);
 
         /* Copy over some metadata */
+        new_attrs->flags          = old_attrs->flags;
         new_attrs->process_id     = old_attrs->process_id;
         new_attrs->exit_status    = old_attrs->exit_status;
         new_attrs->file_size      = old_attrs->file_size;
@@ -285,32 +286,18 @@ filehandle, rather than modifying the invocant).
     METHOD open(STRING *filename :optional, INTVAL got_filename :opt_flag,
         STRING *mode :optional, INTVAL got_mode :opt_flag) {
         PMC    *filehandle;
-        STRING *open_filename, *open_mode;
 
         if (!Parrot_io_is_closed_filehandle(INTERP, SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                                 "Cannot reopen already open filehandle");
 
-        if (got_mode && !STRING_IS_NULL(mode))
-            SET_ATTR_mode(INTERP, SELF, mode);
+        if (!got_mode || STRING_IS_NULL(mode))
+            GET_ATTR_mode(INTERP, SELF, mode);
 
-        if (got_filename && !STRING_IS_NULL(filename))
-            SET_ATTR_filename(INTERP, SELF, filename);
+        if (!got_filename || STRING_IS_NULL(filename))
+            GET_ATTR_filename(INTERP, SELF, filename);
 
-        /* Open the file. With no options, reopen the same file as before */
-        GET_ATTR_filename(INTERP, SELF, open_filename);
-        GET_ATTR_mode(INTERP, SELF, open_mode);
-
-        if (STRING_IS_NULL(open_filename))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                            "Cannot open filehandle, no filename");
-
-        if (STRING_IS_NULL(open_mode)) {
-            open_mode = CONST_STRING(INTERP, "r");
-            SET_ATTR_mode(INTERP, SELF, open_mode);
-        }
-
-        filehandle = Parrot_io_open(INTERP, SELF, open_filename, open_mode);
+        filehandle = Parrot_io_open(INTERP, SELF, filename, mode);
 
         RETURN(PMC *filehandle);
     }

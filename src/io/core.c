@@ -52,8 +52,19 @@ Parrot_io_init(PARROT_INTERP)
     if (interp->piodata) {
         /* memsub system is up and running: */
         /* Init IO stacks and handles for interp instance.  */
-        PIO_INIT(interp);
+        PIOHANDLE os_handle;
 
+        os_handle           = PIO_STDHANDLE(interp, PIO_STDIN_FILENO);
+        _PIO_STDIN(interp)  = Parrot_io_fdopen_flags(interp, PMCNULL,
+                                os_handle, PIO_F_READ);
+
+        os_handle           = PIO_STDHANDLE(interp, PIO_STDOUT_FILENO);
+        _PIO_STDOUT(interp) = Parrot_io_fdopen_flags(interp, PMCNULL,
+                                os_handle, PIO_F_WRITE);
+
+        os_handle           = PIO_STDHANDLE(interp, PIO_STDERR_FILENO);
+        _PIO_STDERR(interp) = Parrot_io_fdopen_flags(interp, PMCNULL,
+                                os_handle, PIO_F_WRITE);
 
         if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
             Parrot_io_eprintf(NULL, "I/O system initialized.\n");

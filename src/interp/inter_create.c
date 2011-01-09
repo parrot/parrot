@@ -456,7 +456,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
         /* get rid of ops */
         if (interp->op_hash)
-            parrot_hash_destroy(interp, interp->op_hash);
+            Parrot_hash_destroy(interp, interp->op_hash);
 
         /* free vtables */
         Parrot_vtbl_free_vtables(interp);

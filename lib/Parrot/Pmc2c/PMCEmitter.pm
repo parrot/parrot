@@ -879,12 +879,12 @@ EOC
     else {
         $cout .= <<"EOC";
     if (isa == NULL) {
-        isa = parrot_new_hash(interp);
+        isa = Parrot_hash_new(interp);
     }
 EOC
     }
     $cout .= <<"EOC";
-    parrot_hash_put(interp, isa, (void *)(CONST_STRING_GEN(interp, "$classname")), PMCNULL);
+    Parrot_hash_put(interp, isa, (void *)(CONST_STRING_GEN(interp, "$classname")), PMCNULL);
     return isa;
 }
 
