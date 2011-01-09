@@ -299,8 +299,8 @@ E1:
     $S0 = $P5
     eq $S0, "BigInt: no multiple dispatch variant 'add' for Float", OK9
     $I1 = 0
-    print $S0
-    diag(' is wrong exception type')
+    $S0 = concat $S0, ' is wrong exception type'
+    diag($S0)
 OK9:
     ok($I1, 'add(bigint,float) throws exception')
     $I1 = 1
@@ -315,8 +315,8 @@ E2:
     $S0 = $P5
     eq $S0, "BigInt: no multiple dispatch variant 'i_add_float' for FLOATVAL", OK10
     $I1 = 0
-    print $S0
-    diag(' is wrong exception type')
+    $S0 = concat $S0, ' is wrong exception type'
+    diag($S0)
 OK10:
     ok($I1, 'i_add(bigint,float) throws exception')
     $I1 = 1
@@ -333,8 +333,8 @@ E3:
     $S0 = $P5
     eq $S0, "BigInt: no multiple dispatch variant 'i_add' for String", OK11
     $I1 = 0
-    print $S0
-    diag(' is wrong exception type')
+    $S0 = concat $S0, ' is wrong exception type'
+    diag($S0)
 OK11:
     ok($I1, "i_add(bigint,string) throws exception")
 .end
@@ -556,8 +556,8 @@ E1:
     $S0 = $P5
     eq $S0, "BigInt: no multiple dispatch variant 'multiply' for Float", OK1
     $I1 = 0
-    print $S0
-    diag(' is wrong exception type')
+    $S0 = concat $S0, ' is wrong exception type'
+    diag($S0)
 OK1:
     ok($I1, 'multiply(bigint,float) throws exception')
     $I1 = 1
@@ -572,8 +572,8 @@ E2:
     $S0 = $P5
     eq $S0, "BigInt: no multiple dispatch variant 'i_multiply_float' for FLOATVAL", OK2
     $I1 = 0
-    print $S0
-    diag(' is wrong exception type')
+    $S0 = concat $S0, ' is wrong exception type'
+    diag($S0)
 OK2:
     ok($I1, 'i_multiply(bigint,float) throws exception')
     $I1 = 1
@@ -777,8 +777,8 @@ E1:
     get_results '0', $S0
     eq $S0, "BigInt: no multiple dispatch variant 'modulus' for String", OK17
     $I1 = 0
-    print $S0
-    diag(' is wrong exception type')
+    $S0 = concat $S0,' is wrong exception type'
+    diag($S0)
 OK17:
     ok($I1, 'mod(bigint,string) throws exception')
     $I1 = 1
@@ -792,8 +792,8 @@ E2:
     get_results '0', $S0
     eq $S0, "BigInt: no multiple dispatch variant 'i_modulus' for String", OK18
     $I1 = 0
-    print $S0
-    diag(' is wrong exception type')
+    $S0 = concat $S0,' is wrong exception type'
+    diag($S0)
 OK18:
     ok($I1, 'i_mod(bigint,string) throws exception')
 
@@ -843,8 +843,8 @@ E1:
     $S0 = $P0
     eq $S0, 'Divide by zero', OK1
     $I1 = 0
-    print $S0
-    diag(' is wrong exception type')
+    $S0 = concat $S0, ' is wrong exception type'
+    diag($S0)
 OK1:
     ok($I1, 'div(bigint,bigint 0) throws "Divide by zero" exception')
     $I1 = 1
@@ -865,8 +865,8 @@ E2:
     $S0 = $P0
     eq $S0, 'Divide by zero', OK2
     $I1 = 0
-    print $S0
-    diag(' is wrong exception type')
+    $S0 = concat $S0, ' is wrong exception type'
+    diag($S0)
 OK2:
     ok($I1, 'mod(bigint,bigint 0) throws "Divide by zero" exception')
     $I1 = 1
@@ -887,8 +887,8 @@ E3:
     $S0 = $P0
     eq $S0, 'Divide by zero', OK3
     $I1 = 0
-    print $S0
-    diag(' is wrong exception type')
+    $S0 = concat $S0, ' is wrong exception type'
+    diag($S0)
 OK3:
     ok($I1, 'div(bigint,integer 0) throws "Divide by zero" exception')
     $I1 = 1
@@ -908,8 +908,8 @@ E4:
     get_results '0', $S0
     eq $S0, 'Divide by zero', OK4
     $I1 = 0
-    print $S0
-    diag(' is wrong exception type')
+    $S0 = concat $S0, ' is wrong exception type'
+    diag($S0)
 OK4:
     ok($I1, 'mod(bigint,integer 0) throws "Divide by zero" exception')
     $I1 = 1
@@ -1101,8 +1101,9 @@ OK2:
     $I0 = $P4['intvalsize']
     eq $I0, 8, sz8
     eq $I0, 4, sz4
-    print 'Cannot cope with sizeof(INTVAL) == '
-    diag($I0)
+    $S1 = $I0
+    $S0 = concat 'Cannot cope with sizeof(INTVAL) == ', $S1
+    diag($S0)
     skip(43)
     exit 1
 
@@ -1135,14 +1136,18 @@ sz4:
     goto esz
 
 esz:
-    print '# Using '
+    $S0 = '# Using '
     $I0 = mul $I0, 8
-    print $I0
-    print '-bit Integers ['
-    print $I9
-    print '...'
-    print $I5
-    diag(']')
+    $S1 = $I0
+    $S0 = concat $S0, $S1
+    $S0 = concat $S0, '-bit Integers ['
+    $S1 = $I9
+    $S0 = concat $S0, $S1
+    $S0 = concat $S0, '...'
+    $S1 = $I5
+    $S0 = concat $S0, $S1
+    $S0 = concat $S0, ']'
+    diag($S0)
 
     # Checking upper bound by incremental increase
     $I1 = 1
@@ -1398,8 +1403,8 @@ E1:
     get_results '0', $S0
     eq $S0, "BigInt: no multiple dispatch variant 'cmp' for String", OK1
     $I1 = 0
-    print $S0
-    diag(' is wrong exception type')
+    $S0 = concat $S0, ' is wrong exception type'
+    diag($S0)
 OK1:
     ok($I1, 'cmp(bigint,string) throws exception')
 .end
@@ -1575,13 +1580,15 @@ skip_ws:
 stop:
     is($I0, $I1, 'Computed 1000 digits of PI (using coroutine)')
     eq $I0, $I1, ret
-        print 'Wrong digit '
-        print $I0
-        print ' should have been '
-        print $S1
-        print ' at position '
-        print $I3
-        diag('.')
+        $S2 = $I0
+        $S0 = concat 'Wrong digit ', $S1
+        $S0 = concat $S0, ' should have been '
+        $S0 = concat $S0, $S1
+        $S0 = concat $S0, ' at position '
+        $S2 = $I3
+        $S0 = concat $S0, $S2
+        $S0 = concat $S0, '.'
+        diag($S0)
     ret:
 .end
 
