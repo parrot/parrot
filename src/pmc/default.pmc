@@ -983,7 +983,7 @@ true (1) is returned; otherwise, false (0) is returned.
         else {
             Hash   * const isa_hash = SELF->vtable->isa_hash;
             STRING * const pmc_name = VTABLE_get_string(INTERP, lookup);
-            return parrot_hash_exists(INTERP, isa_hash, pmc_name);
+            return Parrot_hash_exists(INTERP, isa_hash, pmc_name);
         }
     }
 
@@ -1007,7 +1007,7 @@ true (1) is returned; otherwise, false (0) is returned.
             if (!isa_hash)
                 return STRING_equal(INTERP, SELF->vtable->whoami, _class);
 
-            return parrot_hash_exists(INTERP, isa_hash, (void *)_class);
+            return Parrot_hash_exists(INTERP, isa_hash, (void *)_class);
         }
     }
 

@@ -1070,8 +1070,8 @@ define_macro(PARROT_INTERP, ARGIN(const char *name), ARGIN(const params_t *param
         m = mem_gc_allocate_zeroed_typed(interp, macro_t);
 
         if (!IMCC_INFO(interp)->macros)
-            IMCC_INFO(interp)->macros = parrot_new_cstring_hash(interp);
-        parrot_hash_put(interp, IMCC_INFO(interp)->macros,
+            IMCC_INFO(interp)->macros = Parrot_hash_new_cstring_hash(interp);
+        Parrot_hash_put(interp, IMCC_INFO(interp)->macros,
             PARROT_const_cast(char *, name), m);
     }
 
@@ -1090,7 +1090,7 @@ find_macro(PARROT_INTERP, const char *name)
     if (!IMCC_INFO(interp)->macros)
         return NULL;
 
-    return (macro_t *)parrot_hash_get(interp, IMCC_INFO(interp)->macros, name);
+    return (macro_t *)Parrot_hash_get(interp, IMCC_INFO(interp)->macros, name);
 }
 
 static int
