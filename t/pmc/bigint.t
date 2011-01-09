@@ -108,14 +108,11 @@ OldLibGMP:
 .end
 
 .sub test_set_pmc
-    skip(1, "causes a segfault")
-    goto SKIP
     $P0 = new ['BigInt']
     $P1 = new ['BigNum']
-    $P1 = 1234
+    $P1 = 12345
     assign $P0, $P1
     is($P0, "12345", "can set_pmc")
-SKIP:
 .end
 
 .sub set_and_get
