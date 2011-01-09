@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 10;
 use Parrot::Config;
 
 =head1 NAME
@@ -34,6 +34,16 @@ not_loaded:
 .end
 CODE
 ok
+OUTPUT
+
+pir_error_output_like( << 'CODE', << 'OUTPUT', "init" );
+.sub main :main
+    .local pmc lib
+    lib = loadlib "dynlexpad"
+    $P0 = new ['DynLexPad']
+.end
+CODE
+/don't create me like this/
 OUTPUT
 
 my $loadlib = <<'EOC';
@@ -201,6 +211,52 @@ CODE
 ok 1
 ok 2
 ok 3
+OUTPUT
+
+pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad count" );
+.sub 'test' :main
+    foo()
+.end
+
+.sub foo
+    .lex 'a', $P0               # static lexical
+    $P0 = new 'String'
+    store_lex 'a', $P0          # and a dynamic one
+
+    $P1 = getinterp
+    $P2 = $P1['lexpad']
+
+    $I0 = elements $P2
+    say $I0
+.end
+CODE
+1
+OUTPUT
+
+pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad exists" );
+.sub 'test' :main
+    foo()
+.end
+
+.sub foo
+    .lex 'a', $P0
+    $P0 = new 'String'
+    store_lex 'a', $P0
+
+    $P1 = getinterp
+    $P2 = $P1['lexpad']
+
+    $P3 = new ['String']
+    $P3 = "q"
+    $I0 = exists $P2[$P3]
+    say $I0
+
+    $I1 = exists $P2['a']
+    say $I1
+.end
+CODE
+0
+1
 OUTPUT
 
 pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - iterator" );
