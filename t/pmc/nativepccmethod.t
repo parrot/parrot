@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-t/pmc/nativepccmethod.t - Keys
+t/pmc/nativepccmethod.t - NativePCCMethods
 
 =head1 SYNOPSIS
 
