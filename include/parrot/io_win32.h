@@ -11,8 +11,8 @@
 #ifndef PARROT_IO_WIN32_H_GUARD
 #define PARROT_IO_WIN32_H_GUARD
 
-typedef Parrot_WIN32_HANDLE PIOHANDLE;
-typedef Parrot_OFF_T PIOOFF_T;
+typedef void *PIOHANDLE;
+typedef HUGEINTVAL PIOOFF_T;
 
 #define PIO_INVALID_HANDLE INVALID_HANDLE_VALUE
 
@@ -278,6 +278,34 @@ INTVAL Parrot_io_socket_win32(PARROT_INTERP,
     Parrot_io_accept_win32((interp), (pmc))
 #define PIO_SOCKADDR_IN(interp, addr, port) \
     Parrot_io_sockaddr_in((interp), (addr), (port))
+
+#ifndef S_IFMT
+#  ifdef _S_IFMT
+#    define S_IFMT _S_IFMT
+#  else
+#    define S_IFMT 0170000
+#  endif
+#endif
+
+#ifndef S_IFBLK
+#  define S_IFBLK 0060000
+#endif
+
+#ifndef S_ISBLK
+#  define S_ISBLK(m) (((m) & S_IFMT) == S_IFBLK)
+#endif
+
+#ifndef S_ISCHR
+#  define S_ISCHR(m) (((m) & S_IFMT) == S_IFCHR)
+#endif
+
+#ifndef S_ISDIR
+#  define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#endif
+
+#ifndef S_ISREG
+#  define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+#endif
 
 #endif /* PARROT_IO_WIN32_H_GUARD */
 

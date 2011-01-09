@@ -11,8 +11,15 @@
 #ifndef PARROT_THREAD_H_GUARD
 #define PARROT_THREAD_H_GUARD
 
-#  include "parrot/parrot.h"
-#  include "parrot/atomic.h"
+#include "parrot/parrot.h"
+
+#ifdef _WIN32
+#  include "parrot/thr_windows.h"
+#else
+#  include "parrot/thr_pthread.h"
+#endif
+
+#include "parrot/atomic.h"
 
 #ifndef PARROT_HAS_THREADS
 

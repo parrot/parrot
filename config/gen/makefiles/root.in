@@ -156,8 +156,6 @@ GEN_MAKEFILES = \
 
 GEN_CONFIGS = \
     $(INC_DIR)/config.h \
-    $(INC_DIR)/platform.h \
-    $(INC_DIR)/platform_limits.h \
     $(INC_DIR)/has_header.h \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/core_pmcs.h \
@@ -167,8 +165,6 @@ GEN_CONFIGS = \
     lib/Parrot/PMC.pm \
     runtime/parrot/include/config.fpmc \
     $(LIBRARY_DIR)/config.pir \
-    src/platform.c \
-#IF(platform_asm):    src/platform_asm.s \
 #IF(has_opengl):    src/glut_nci_thunks.nci \
 #IF(has_glut):    src/glut_callbacks.c \
     src/core_pmcs.c \
@@ -360,7 +356,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/config.h \
 	$(INC_DIR)/settings.h \
 	$(INC_DIR)/enums.h \
-	$(INC_DIR)/platform.h \
 	$(INC_DIR)/platform_interface.h \
 	$(INC_DIR)/global_setup.h \
 	$(INC_DIR)/caches.h \
@@ -406,7 +401,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/hll.h \
 	$(INC_DIR)/pbcversion.h \
 	$(INC_DIR)/pobj.h \
-	$(INC_DIR)/platform_limits.h \
 	$(INC_DIR)/has_header.h \
 	$(INC_DIR)/oplib.h \
 	$(INC_DIR)/feature.h \
@@ -496,7 +490,6 @@ INTERP_O_FILES = \
 #IF(has_core_nci_thunks):  src/nci/core_thunks$(O) \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks$(O) \
     src/oo$(O) \
-    src/platform$(O) \
     src/packfile/object_serialization$(O) \
     src/pmc$(O) \
     src/runcore/main$(O)  \
@@ -515,10 +508,9 @@ INTERP_O_FILES = \
     src/packfile/output$(O) \
     src/packfile/pf_items$(O) \
     src/longopt$(O) \
+    @TEMP_platform_o@ \
     @TEMP_atomic_o@ \
     @TEMP_gc_o@ \
-#IF(platform_asm):    src/platform_asm$(O) \
-
 
 OPS_FILES = @ops@
 
@@ -934,7 +926,6 @@ src/parrot_config$(O) : \
     $(INC_DIR)/core_types.h \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/has_header.h \
-    $(INC_DIR)/platform_limits.h \
     src/parrot_config.c
 
 src/install_config$(O) : \
@@ -944,7 +935,6 @@ src/install_config$(O) : \
     $(INC_DIR)/core_types.h \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/has_header.h \
-    $(INC_DIR)/platform_limits.h \
     src/install_config.c
 
 src/null_config$(O) : \
@@ -954,7 +944,6 @@ src/null_config$(O) : \
     $(INC_DIR)/core_types.h \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/has_header.h \
-    $(INC_DIR)/platform_limits.h \
     src/null_config.c
 
 src/list$(O) : \
@@ -1377,8 +1366,7 @@ src/gc/gc_ms2$(O) : \
     src/gc/fixed_allocator.h \
     src/gc/gc_ms2.c \
     $(INC_DIR)/pointer_array.h \
-    src/gc/variable_size_pool.h \
-    $(INC_DIR)/sysmem.h
+    src/gc/variable_size_pool.h
 
 src/gc/api$(O) : \
     $(PARROT_H_HEADERS) \
@@ -1415,13 +1403,6 @@ src/gc/string_gc$(O) : $(PARROT_H_HEADERS) \
 
 src/hll$(O) : $(PARROT_H_HEADERS) src/hll.str $(INC_DIR)/dynext.h src/hll.c
 
-src/platform$(O) : \
-    $(PARROT_H_HEADERS) \
-    $(INC_DIR)/sysmem.h \
-    src/platform.c
-
-#IF(platform_asm):src/platform_asm$(O) : $(PARROT_H_HEADERS)
-#IF(platform_asm):
 src/core_pmcs$(O) : $(PARROT_H_HEADERS) src/core_pmcs.c
 
 src/runcore/trace$(O) : \
@@ -1582,7 +1563,6 @@ src/io/win32$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
 src/gc/alloc_memory$(O) : $(PARROT_H_HEADERS) src/gc/alloc_memory.c
 
 frontend/parrot/main$(O) : \
-    $(INC_DIR)/platform_limits.h \
     $(INC_DIR)/api.h \
     $(INC_DIR)/compiler.h \
     $(INC_DIR)/config.h \
@@ -1632,6 +1612,70 @@ src/packfile/pf_items$(O) : \
     src/packfile/pf_items.c
 
 src/parrot$(O) : $(GEN_HEADERS)
+
+src/platform/ansi/dl$(O) : src/platform/ansi/dl.c $(PARROT_H_HEADERS)
+
+src/platform/ansi/exec$(O) : src/platform/ansi/exec.c $(PARROT_H_HEADERS)
+
+src/platform/ansi/pid$(O) : src/platform/ansi/pid.c $(PARROT_H_HEADERS)
+
+src/platform/ansi/time$(O) : src/platform/ansi/time.c $(PARROT_H_HEADERS)
+
+src/platform/cygwin/math$(O) : src/platform/cygwin/math.c $(PARROT_H_HEADERS)
+
+src/platform/darwin/hires_timer$(O) : src/platform/darwin/hires_timer.c $(PARROT_H_HEADERS)
+
+src/platform/darwin/sysmem$(O) : src/platform/darwin/sysmem.c $(PARROT_H_HEADERS)
+
+src/platform/generic/dl$(O) : src/platform/generic/dl.c $(PARROT_H_HEADERS)
+
+src/platform/generic/env$(O) : src/platform/generic/env.c $(PARROT_H_HEADERS)
+
+src/platform/generic/exec$(O) : src/platform/generic/exec.c $(PARROT_H_HEADERS)
+
+src/platform/generic/hires_timer$(O) : src/platform/generic/hires_timer.c $(PARROT_H_HEADERS)
+
+src/platform/generic/itimer$(O) : src/platform/generic/itimer.c $(PARROT_H_HEADERS)
+
+src/platform/generic/math$(O) : src/platform/generic/math.c $(PARROT_H_HEADERS)
+
+src/platform/generic/misc$(O) : src/platform/generic/misc.c $(PARROT_H_HEADERS)
+
+src/platform/generic/pid$(O) : src/platform/generic/pid.c $(PARROT_H_HEADERS)
+
+src/platform/generic/stat$(O) : src/platform/generic/stat.c $(PARROT_H_HEADERS)
+
+src/platform/generic/sysmem$(O) : src/platform/generic/sysmem.c $(PARROT_H_HEADERS)
+
+src/platform/generic/time$(O) : src/platform/generic/time.c $(PARROT_H_HEADERS)
+
+src/platform/generic/uid$(O) : src/platform/generic/uid.c $(PARROT_H_HEADERS)
+
+src/platform/netbsd/misc$(O) : src/platform/netbsd/misc.c $(PARROT_H_HEADERS)
+
+src/platform/openbsd/math$(O) : src/platform/openbsd/math.c $(PARROT_H_HEADERS)
+
+src/platform/solaris/math$(O) : src/platform/solaris/math.c $(PARROT_H_HEADERS)
+
+src/platform/solaris/time$(O) : src/platform/solaris/time.c $(PARROT_H_HEADERS)
+
+src/platform/win32/dl$(O) : src/platform/win32/dl.c $(PARROT_H_HEADERS)
+
+src/platform/win32/env$(O) : src/platform/win32/env.c $(PARROT_H_HEADERS)
+
+src/platform/win32/exec$(O) : src/platform/win32/exec.c $(PARROT_H_HEADERS)
+
+src/platform/win32/hires_timer$(O) : src/platform/win32/hires_timer.c $(PARROT_H_HEADERS)
+
+src/platform/win32/misc$(O) : src/platform/win32/misc.c $(PARROT_H_HEADERS)
+
+src/platform/win32/pid$(O) : src/platform/win32/pid.c $(PARROT_H_HEADERS)
+
+src/platform/win32/sysmem$(O) : src/platform/win32/sysmem.c $(PARROT_H_HEADERS)
+
+src/platform/win32/time$(O) : src/platform/win32/time.c $(PARROT_H_HEADERS)
+
+src/platform/win32/uid$(O) : src/platform/win32/uid.c $(PARROT_H_HEADERS)
 
 src/runcore/cores$(O) : src/runcore/cores.str \
 	src/runcore/cores.c \

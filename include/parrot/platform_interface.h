@@ -10,6 +10,42 @@
 #include "parrot/config.h"
 #include "parrot/interpreter.h"
 
+#include <math.h>
+
+#if PARROT_HAS_HEADER_LIMITS
+#  include <limits.h>
+#endif
+
+#ifdef _MSC_VER
+
+#  ifndef LLONG_MAX
+#    define LLONG_MAX _I64_MAX
+#  endif
+#  ifndef LLONG_MIN
+#    define LLONG_MIN _I64_MIN
+#  endif
+
+#  if _MSC_VER >= 1400
+#    define strdup _strdup
+#  endif
+
+/* These disable certain Level 4 Warnings */
+#  pragma warning(disable: 4100) /* disables 'unreferenced formal parameter'
+                                  * warnings */
+#  pragma warning(disable: 4115) /* disables 'named type definition in
+                                  * parentheses' warnings triggered in VC98
+                                  * include files */
+#  pragma warning(disable: 4505) /* disables 'unreferenced local function has
+                                  * been removed' warnings in header files */
+
+#endif /* _MSC_VER */
+
+/*
+ * init
+ */
+
+void Parrot_platform_init_code(void);
+
 /*
 ** I/O:
 */
@@ -122,13 +158,6 @@ void *Parrot_dlsym(void *handle, const char *symbol);
 int Parrot_dlclose(void *handle);
 
 /*
- * signal handling
- */
-#ifndef PARROT_HAS_HEADER_SIGNAL
-#  define Parrot_set_sighandler(s, h)
-#endif
-
-/*
  * system timer
  */
 
@@ -173,6 +202,13 @@ INTVAL Parrot_Run_OS_Command_Argv(Interp*, struct PMC *);
 
 PARROT_EXPORT
 UINTVAL Parrot_get_user_id(void);
+
+/*
+ * system memory
+ */
+
+PARROT_EXPORT
+size_t Parrot_sysmem_amount(Interp*);
 
 #endif /* PARROT_PLATFORM_INTERFACE_H_GUARD */
 

@@ -66,9 +66,7 @@ DYNPMC_H_FILES_MIN = \
     include/parrot/packfile.h \
     include/parrot/parrot.h \
     include/parrot/pbcversion.h \
-    include/parrot/platform.h \
     include/parrot/platform_interface.h \
-    include/parrot/platform_limits.h \
     include/parrot/pmc.h \
     include/parrot/pmc_freeze.h \
     include/parrot/pobj.h \

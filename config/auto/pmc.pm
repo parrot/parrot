@@ -421,7 +421,6 @@ include/parrot/datatypes.h
 include/parrot/core_pmcs.h
 include/parrot/misc.h
 include/parrot/sub.h
-include/parrot/platform.h
 include/parrot/pmc_freeze.h
 include/parrot/global_setup.h
 include/parrot/gc_api.h
@@ -430,7 +429,6 @@ include/parrot/vtables.h
 include/parrot/has_header.h
 include/parrot/warnings.h
 include/parrot/op.h
-include/parrot/platform_limits.h
 include/parrot/stat.h
 include/parrot/debugger.h
 include/parrot/caches.h
