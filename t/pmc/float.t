@@ -15,7 +15,7 @@ Tests the Float PMC.
 
 =cut
 
-.const int TESTS = 177
+.const int TESTS = 181
 .const num PRECISION = 0.000001
 
 .sub 'test' :main
@@ -137,6 +137,12 @@ Tests the Float PMC.
     $P0 = new ['Float']
     $P0 = "12.49"
     is($P0, 12.49, 'setting value from String', PRECISION)
+
+    $P0 = new ['Float']
+    $P1 = new ['String']
+    $P1 = "12345"
+    setref $P0, $P1
+    is($P0, "12345", "can set_pmc")
 .end
 
 .sub 'add_number_to_self'
@@ -763,6 +769,20 @@ Tests the Float PMC.
 
     $I0 = cmp $P1, $N3
     is($I0, -1, 'comparison ops: cmp_p_n: lt')
+
+    $P2 = new ['String']
+
+    $P2 = "123.45"
+    $I0 = cmp_num $P1, $P2
+    is($I0, 0, 'comparison ops: cmp_p_p: equality')
+
+    $P2 = "-1.0"
+    $I0 = cmp_num $P1, $P2
+    is($I0, 1, 'comparison ops: cmp_p_p: gt')
+
+    $P2 = "200.0"
+    $I0 = cmp_num $P1, $P2
+    is($I0, -1, 'comparison ops: cmp_p_p: lt')
 .end
 
 .sub 'isgt'
