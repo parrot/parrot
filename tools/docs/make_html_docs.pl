@@ -26,7 +26,7 @@ use lib 'lib';
 use Fatal qw/open close/;
 
 use File::Basename qw/basename dirname/;
-use File::Path qw/make_path/;
+use File::Path;
 use File::Spec;
 use Getopt::Long;
 use JSON;
@@ -132,7 +132,9 @@ foreach my $page (keys %pages) {
     my $title = $page->{title};
 
     my $outfile = File::Spec->catfile($target_dir, $outfilename) . '.html';
-    my $dir = File::Path::make_path(File::Basename::dirname($outfile));
+
+    # replace make_path with legacy functional mkpath to accomodate older versions of Perl
+    my $dir = File::Path::mkpath(File::Basename::dirname($outfile));
 
     open my $out_fh, '>', $outfile;
 
@@ -182,7 +184,8 @@ sub transform_input {
 
     my $outfile = File::Spec->catfile($target_dir, $input) . '.html';
 
-    my $dir = File::Path::make_path(File::Basename::dirname($outfile));
+    # replace make_path with legacy functional mkpath to accomodate older versions of Perl
+    my $dir = File::Path::mkpath(File::Basename::dirname($outfile));
 
     open my $out_fh, '>', $outfile;
 
