@@ -706,6 +706,7 @@ string.
 
 */
 
+PARROT_EXPORT
 STRING *
 Parrot_str_from_platform_cstring(PARROT_INTERP, char *c)
 {
@@ -729,6 +730,7 @@ string.
 
 */
 
+PARROT_EXPORT
 char *
 Parrot_str_to_platform_cstring(PARROT_INTERP, STRING *s)
 {
