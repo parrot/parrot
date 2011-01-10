@@ -184,57 +184,6 @@ Parrot_io_get_flags(SHIM_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<void Parrot_io_set_file_size(PARROT_INTERP, PMC *filehandle, PIOOFF_T
-file_size)>
-
-Set the C<file_size> attribute of the FileHandle object, which stores the
-current file size.
-
-Currently, this pokes directly into the C struct of the FileHandle PMC. This
-needs to change to a general interface that can be used by all subclasses and
-polymorphic equivalents of FileHandle. For now, hiding it behind a function, so
-it can be cleanly changed later.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_io_set_file_size(SHIM_INTERP, ARGIN(PMC *filehandle), PIOOFF_T file_size)
-{
-    ASSERT_ARGS(Parrot_io_set_file_size)
-    PARROT_FILEHANDLE(filehandle)->file_size = file_size;
-}
-
-
-/*
-
-=item C<PIOOFF_T Parrot_io_get_file_size(PARROT_INTERP, PMC *filehandle)>
-
-Get the C<file_size> attribute of the FileHandle object, which stores the
-current file size.
-
-
-Currently, this pokes directly into the C struct of the FileHandle PMC. This
-needs to change to a general interface that can be used by all subclasses and
-polymorphic equivalents of FileHandle. For now, hiding it behind a function, so
-it can be cleanly changed later.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PIOOFF_T
-Parrot_io_get_file_size(SHIM_INTERP, ARGIN(PMC *filehandle))
-{
-    ASSERT_ARGS(Parrot_io_get_file_size)
-    return PARROT_FILEHANDLE(filehandle)->file_size;
-}
-
-/*
-
 =item C<void Parrot_io_set_buffer_start(PARROT_INTERP, PMC *filehandle, unsigned
 char *new_start)>
 
