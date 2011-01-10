@@ -9,13 +9,13 @@ $(LIBRARY_DIR)/PCT/PAST.pbc : compilers/pct/src/PAST.pir $(PARROT) $(PBC_MERGE) 
     compilers/pct/src/PCT/Node.pbc \
     compilers/pct/src/PAST/Node.pbc \
     compilers/pct/src/PAST/Compiler.pbc \
-    compilers/pct/src/POST/Node.pbc \
+    compilers/pct/src/POST/Nodes.pbc \
     compilers/pct/src/POST/Compiler.pbc
 	$(PBC_MERGE) -o $@ \
 	compilers/pct/src/PCT/Node.pbc \
 	compilers/pct/src/PAST/Node.pbc \
 	compilers/pct/src/PAST/Compiler.pbc \
-	compilers/pct/src/POST/Node.pbc \
+	compilers/pct/src/POST/Nodes.pbc \
 	compilers/pct/src/POST/Compiler.pbc
 
 $(LIBRARY_DIR)/PCT/Grammar.pbc : compilers/pct/src/PCT/Grammar.pir $(PARROT) \
@@ -51,7 +51,8 @@ compilers/pct/src/POST/Compiler.pbc : $(PARROT) \
 	$(PARROT) -o $@ compilers/pct/src/POST/Compiler.pir \
 		compilers/pct/src/POST/VanillaAllocator.pir
 
-compilers/pct/src/POST/Node.pbc : $(PARROT) \
+compilers/pct/src/POST/Nodes.pbc : $(PARROT) \
+		compilers/pct/src/POST/Nodes.pir \
 		compilers/pct/src/POST/Node.pir \
 		compilers/pct/src/POST/Call.pir \
 		compilers/pct/src/POST/Constant.pir \
@@ -65,7 +66,7 @@ compilers/pct/src/POST/Node.pbc : $(PARROT) \
 		compilers/pct/src/POST/Sub.pir \
 		compilers/pct/src/POST/Value.pir
 	$(PARROT) -o $@ \
-		compilers/pct/src/POST/Node.pir
+		compilers/pct/src/POST/Nodes.pir
 
 # It should be special "bootstrap-pct" target
 bootstrap-pct: $(NQP_RX)

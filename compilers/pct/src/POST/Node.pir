@@ -114,21 +114,6 @@ C<POST::Compiler.escape>.)
 
 =cut
 
-.namespace []
-.include 'compilers/pct/src/POST/Call.pir'
-.include 'compilers/pct/src/POST/Value.pir'
-.include 'compilers/pct/src/POST/Constant.pir'
-.include 'compilers/pct/src/POST/Register.pir'
-
-.include 'compilers/pct/src/POST/File.pir'
-.include 'compilers/pct/src/POST/Key.pir'
-.include 'compilers/pct/src/POST/String.pir'
-
-.include 'compilers/pct/src/POST/Label.pir'
-.include 'compilers/pct/src/POST/Sub.pir'
-
-.include 'compilers/pct/src/POST/Op.pir'
-.include 'compilers/pct/src/POST/Ops.pir'
 
 =back
 
