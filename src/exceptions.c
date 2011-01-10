@@ -722,6 +722,16 @@ describe them as well.\n\n");
     DUMPCORE();
 }
 
+/*
+
+=item C<void Parrot_ex_update_for_rethrow(PARROT_INTERP, PMC * ex)>
+
+Update an exception PMC so that it can be rethrown.
+
+=cut
+
+*/
+
 static void
 Parrot_ex_update_for_rethrow(PARROT_INTERP, ARGMOD(PMC * ex))
 {
@@ -738,6 +748,17 @@ Parrot_ex_update_for_rethrow(PARROT_INTERP, ARGMOD(PMC * ex))
 
     Parrot_ex_mark_unhandled(interp, exception);
 }
+
+/*
+
+=item C<STRING * Parrot_ex_build_complete_backtrace_string(PARROT_INTERP, PMC * ex)>
+
+Get a complete backtrace string for an exception PMC, including backtraces
+from all previous rethrow points.
+
+=cut
+
+*/
 
 STRING *
 Parrot_ex_build_complete_backtrace_string(PARROT_INTERP, ARGIN(PMC * ex))
