@@ -532,8 +532,7 @@ Parrot_api_pmc_wrap_string_array(ARGIN(Parrot_PMC interp_pmc), ARGIN_NULLOK(Parr
         Parrot_Int i = 0;
         for (; i < argc; ++i) {
             /* Run through argv, adding everything to the array */
-            STRING * const arg = Parrot_str_new_init(interp, argv[i], strlen(argv[i]),
-                    Parrot_utf8_encoding_ptr, PObj_external_FLAG);
+            STRING * const arg = Parrot_str_from_platform_cstring(interp, argv[i]);
             VTABLE_push_string(interp, userargv, arg);
         }
     }

@@ -259,7 +259,7 @@ Parrot_api_set_executable_name(Parrot_PMC interp_pmc, ARGIN(const char * name))
 {
     ASSERT_ARGS(Parrot_api_set_executable_name)
     EMBED_API_CALLIN(interp_pmc, interp)
-    STRING * const name_str = Parrot_str_new(interp, name, 0);
+    STRING * const name_str = Parrot_str_from_platform_cstring(interp, name);
     PMC * const name_pmc = Parrot_pmc_new(interp, enum_class_String);
     VTABLE_set_string_native(interp, name_pmc, name_str);
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE,

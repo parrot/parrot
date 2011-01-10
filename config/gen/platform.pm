@@ -186,6 +186,7 @@ sub _set_implementations {
     my $platform = $conf->data->get('platform');
     my @impls = qw/
         time.c
+        encoding.c
         env.c
         dl.c
         stat.c
