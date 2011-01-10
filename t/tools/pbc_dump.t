@@ -166,7 +166,15 @@ my (undef,  $pbcpack_file) = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 
 print $pir_i <<'EOF';
 .sub main :main
-    print 'Hello World'
+    $P0 = new ['Hash']
+    $P0['mykey'] = 'myvalue'
+    $P0['mykey';0] = 2
+
+    $P1 = new ['FixedStringArray'], 1
+    $P1[0] = "first"
+
+    .const 'String' s = "Hello World"
+    print s
 .end
 EOF
 close $pir_i;
@@ -175,7 +183,7 @@ close $pir_i;
 system($PARROT, '-o', $pbc_file, $pir_file);
 
 # Test -n option
-dump_raw_output_like("-n " . $pbc_file, qr/0002:  print_sc.*0002:  end/s, "pbc_dump -n command");
+dump_raw_output_like("-n " . $pbc_file, qr/000a:  end/s, "pbc_dump -n command");
 
 # Test -t option
 dump_raw_output_like("-t " . $pbc_file, qr/HEADER.*DIRECTORY.*BYTECODE.*CONSTANT/s, "pbc_dump -t command");
