@@ -461,9 +461,7 @@ opcode_t *
 Parrot_ex_rethrow_from_op(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(Parrot_ex_rethrow_from_op)
-
-    Parrot_ex_mark_unhandled(interp, exception);
-
+    Parrot_ex_update_for_rethrow(interp, exception);
     return Parrot_ex_throw_from_op(interp, exception, NULL);
 }
 
@@ -485,8 +483,7 @@ void
 Parrot_ex_rethrow_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(Parrot_ex_rethrow_from_c)
-    Parrot_ex_mark_unhandled(interp, exception);
-
+    Parrot_ex_update_for_rethrow(interp, exception);
     Parrot_ex_throw_from_c(interp, exception);
 }
 
@@ -723,6 +720,47 @@ describe them as well.\n\n");
     fprintf(stderr, "\nDumping Core...\n");
 
     DUMPCORE();
+}
+
+static void
+Parrot_ex_update_for_rethrow(PARROT_INTERP, ARGMOD(PMC * ex))
+{
+    ASSERT_ARGS(Parrot_ex_update_for_rethrow)
+    STRING * const bt_strings_str = CONST_STRING(interp, "bt_strings);
+    PMC * bt_strings = VTABLE_get_pmc_keyed_str(interp, exception, bt_strings_str);
+    STRING * const prev_backtrace = Parrot_dbg_get_exception_backtrace(interp, exception);
+
+    if (PMC_IS_NULL(bt_strings)) {
+        bt_strings = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+        VTABLE_set_pmc_keyed_str(interp, exception, bt_strings_str, bt_strings);
+    }
+    VTABLE_push_str(interp, bt_strings, prev_backtrace);
+
+    Parrot_ex_mark_unhandled(interp, exception);
+}
+
+STRING *
+Parrot_ex_build_complete_backtrace_string(PARROT_INTERP, ARGIN(PMC * ex))
+{
+    ASSERT_ARGS(Parrot_ex_build_complete_backtrace_string)
+    STRING * const cur_bt = Parrot_dbg_get_exception_backtrace(interp, ex);
+    PMC * const all_bt = VTABLE_get_pmc_keyed_str(interp, ex, CONST_STRING(interp, "bt_strings"));
+    INTVAL elems, i;
+    PMC * builder;
+    if (PMC_IS_NULL(all_bt))
+        return cur_bt;
+
+    elems = VTABLE_elements(interp, all_bt);
+    builder = Parrot_pmc_new(interp, enum_class_StringBuilder);
+    VTABLE_push_str(interp, builder, cur_bt);
+    for (i = 0; i < elems; i++) {
+        STRING * const i_bt = VTABLE_get_string_keyed_int(interp, all_bt, i);
+        if (STRING_IS_NULL(i_bt))
+            continue;
+        VTABLE_push_str(interp, builder, CONST_STRING(interp, "thrown from:"));
+        VTABLE_push_str(interp, builder, i_bt);
+    }
+    return VTABLE_get_string(interp, builder);
 }
 
 

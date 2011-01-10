@@ -95,8 +95,10 @@ Parrot_api_get_exception_backtrace(Parrot_PMC interp_pmc,
 {
     ASSERT_ARGS(Parrot_api_get_exception_backtrace)
     EMBED_API_CALLIN(interp_pmc, interp)
-    STRING * const bts = Parrot_dbg_get_exception_backtrace(interp, exception);
-    *bt = bts;
+    if (PMC_IS_NULL(exception))
+        *bt = STRINGNULL;
+    else
+        *bt = Parrot_ex_get_complete_backtrace_string(interp, exception);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
