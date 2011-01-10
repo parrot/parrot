@@ -20,7 +20,7 @@ INIT {
 =item C<process>
 Allocate registers. Returns 4-elements list with number of used INSP registers.
 
-our method process(POST::Sub $sub) {
+method process(POST::Sub $sub) {
     my @n_regs_used := (0, 0, 0, 0);
     for $sub.symtable {
         # TODO Skip constants.

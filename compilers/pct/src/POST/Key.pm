@@ -6,7 +6,7 @@ This stub class (almost) exists to give a unique class for mmd in POST::Compiler
 A POST::Key represents a single (possibly compound) key such as [1] or ['Foo';'Bar';'Buz'].
 =end Description
 
-our method Str() {
+method Str() {
     '[' ~ @(self).map(sub($p) { $p<value> }).join(';') ~ ']';
 }
 
@@ -24,7 +24,7 @@ string parts.
 # This method is so ugly due workaround for PCC "mis-behavior".
 # PCC will try to clone fresh Key which can reference non-existing 
 # registers, etc.
-our method to_pmc(%context) {
+method to_pmc(%context) {
     my @keys;
     my $constants := %context<constants>;
 

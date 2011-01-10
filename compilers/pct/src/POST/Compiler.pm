@@ -29,7 +29,7 @@ If the string contains any non-ASCII characters, then it's
 prefixed with 'unicode:'.  (This method just delegates to
 PAST::Compiler.escape, which does the same thing.)
 
-our method escape($str) {
+method escape($str) {
     PAST::Compiler.escape($str);
 }
 
@@ -37,7 +37,7 @@ our method escape($str) {
 Constructs a PIR key using the strings passed as arguments.
 For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
 
-our method key_pir(*@args) {
+method key_pir(*@args) {
     #'[' ~ join(';', map(-> $_ { self.escape($_) }, @args)) ~ ']';
     Q:PIR {
     .local pmc args
@@ -67,7 +67,7 @@ our method key_pir(*@args) {
     }
 }
 
-our method to_pir($post, *%adverbs) {
+method to_pir($post, *%adverbs) {
     Q:PIR {
     .local pmc post
     .local pmc adverbs
@@ -102,7 +102,7 @@ our method to_pir($post, *%adverbs) {
 =item pir_children(node)
 Return generated PIR for C<node> and all of its children.
 
-our method pir_children($node) {
+method pir_children($node) {
     Q:PIR {
     .local pmc node
     find_lex node, '$node'
@@ -134,7 +134,7 @@ our method pir_children($node) {
 Return generated pir for any POST::Node.  Returns
 the generated pir of C<node>'s children.
 
-our multi method pir($node) {
+multi method pir($node) {
     self.pir_children($node);
 }
 
@@ -142,7 +142,7 @@ our multi method pir($node) {
 =item pir(POST::Op node)
 Return pir for an operation node.
 
-our multi method __pir(POST::Op $node) {
+multi method __pir(POST::Op $node) {
     Q:PIR {
     .local pmc node
     find_lex node, '$node'
@@ -223,7 +223,7 @@ our multi method __pir(POST::Op $node) {
 =item pir(POST::Label node)
 Generate a label.
 
-our multi method _pir(POST::Label $node) {
+multi method _pir(POST::Label $node) {
     my $subpir := pir::find_caller_lex__PS('$SUBPIR');
     $subpir.append_format("  %0:\n", $node.result());
 }
@@ -234,7 +234,7 @@ Generate PIR for C<node>, storing the result into the compiler's
 C<$!code> attribute and returning any code needed to look up
 the sub.
 
-our multi method _pir(POST::Sub $node) {
+multi method _pir(POST::Sub $node) {
     Q:PIR {
     .local pmc node
     find_lex node, '$node'
@@ -391,7 +391,7 @@ our multi method _pir(POST::Sub $node) {
     }
 }
 
-our method hll_pir($node, *%options) {
+method hll_pir($node, *%options) {
     Q:PIR {
     .local pmc node
     .local pmc options
@@ -457,11 +457,11 @@ method pbc($post, %adverbs) {
 ##########################################
 # Emiting pbc
 
-our multi method to_pbc(Undef $what, %context) {
+multi method to_pbc(Undef $what, %context) {
     # Do nothing.
 }
 
-our multi method to_pbc(POST::Sub $sub, %context) {
+multi method to_pbc(POST::Sub $sub, %context) {
     # Store current Sub in context to resolve symbols and constants.
     %context<sub> := $sub;
 
@@ -576,7 +576,7 @@ our multi method to_pbc(POST::Sub $sub, %context) {
     }
 }
 
-our multi method to_pbc(POST::Op $op, %context) {
+multi method to_pbc(POST::Op $op, %context) {
     # Generate full name
     my $fullname := $op.pirop;
     self.debug("Short name $fullname") if %context<DEBUG>;
@@ -602,13 +602,13 @@ our multi method to_pbc(POST::Op $op, %context) {
 }
 
 # Some PIR sugar produces nested Nodes.
-our multi method to_pbc(POST::Node $node, %context) {
+multi method to_pbc(POST::Node $node, %context) {
     for @($node) {
         self.to_pbc($_, %context);
     }
 }
 
-our multi method to_pbc(POST::Label $l, %context) {
+multi method to_pbc(POST::Label $l, %context) {
     my $bc := %context<bytecode>;
     self.panic("Trying to emit undelcared label!") unless $l.declared;
 
@@ -622,7 +622,7 @@ our multi method to_pbc(POST::Label $l, %context) {
     }
 }
 
-our multi method to_pbc(POST::Call $call, %context) {
+multi method to_pbc(POST::Call $call, %context) {
     my $bc       := %context<bytecode>;
     my $calltype := $call.calltype;
     my $is_tailcall := $calltype eq 'tailcall';
@@ -721,7 +721,7 @@ our multi method to_pbc(POST::Call $call, %context) {
 ##########
 # Generating parts of Op
 
-our multi method to_op(POST::Key $key, %context) {
+multi method to_op(POST::Key $key, %context) {
 
     self.debug("Want key") if %context<DEBUG>;
     my $key_pmc := $key.to_pmc(%context)[0];
@@ -748,7 +748,7 @@ our multi method to_op(POST::Key $key, %context) {
     $idx;
 }
 
-our multi method to_op(POST::Constant $op, %context) {
+multi method to_op(POST::Constant $op, %context) {
     my $idx;
     my $type := $op.type;
     if $type eq 'ic' || $type eq 'kic' {
@@ -765,7 +765,7 @@ our multi method to_op(POST::Constant $op, %context) {
     $idx;
 }
 
-our multi method to_op(POST::String $str, %context) {
+multi method to_op(POST::String $str, %context) {
     my $idx;
     my $type := $str.type;
     if $type ne 'sc' {
@@ -794,17 +794,17 @@ our multi method to_op(POST::String $str, %context) {
     $idx;
 }
 
-our multi method to_op(POST::Value $val, %context) {
+multi method to_op(POST::Value $val, %context) {
     # Redirect to real value. POST::Value is just reference.
     my $orig := self.get_register($val.name, %context);
     self.to_op($orig, %context);
 }
 
-our multi method to_op(POST::Register $reg, %context) {
+multi method to_op(POST::Register $reg, %context) {
     $reg.regno;
 }
 
-our multi method to_op(POST::Label $l, %context) {
+multi method to_op(POST::Label $l, %context) {
     # Usage of Label. Put into todolist and reserve space.
     my $bc  := %context<bytecode>;
     my $pos := +$bc;
@@ -827,7 +827,7 @@ our multi method to_op(POST::Label $l, %context) {
 ##########################################
 # PCC related functions
 
-our method build_pcc_call($opname, @args, %context) {
+method build_pcc_call($opname, @args, %context) {
     my $bc        := %context<bytecode>;
     my $signature := self.build_args_signature(@args, %context);
     my $sig_idx   := %context<constants>.get_or_create_pmc($signature);
@@ -853,7 +853,7 @@ our method build_pcc_call($opname, @args, %context) {
     $bc.push(@op);
 }
 
-our method build_args_signature(@args, %context) {
+method build_args_signature(@args, %context) {
     my @sig;
     for @args -> $arg {
         # build_single_arg can return 2 values, but @a.push can't handle it
@@ -885,7 +885,7 @@ our method build_args_signature(@args, %context) {
     $signature;
 }
 
-our method build_single_arg($arg, %context) {
+method build_single_arg($arg, %context) {
     # Build call signature arg according to PDD03
     # POST::Value doesn't have .type. Lookup in symbols.
     my $type := $arg.type // self.get_register($arg.name, %context).type;
@@ -927,7 +927,7 @@ our method build_single_arg($arg, %context) {
 
 
 # XXX This is required only for PAST->POST generated tree.
-our method enumerate_subs(POST::File $post) {
+method enumerate_subs(POST::File $post) {
     for @($post) -> $sub {
         # XXX Should we emit warning on duplicates?
         $post.sub($sub.full_name, $sub) if $sub.isa(POST::Sub);
@@ -935,7 +935,7 @@ our method enumerate_subs(POST::File $post) {
 }
 
 # Declare as multi to get "static" typecheck.
-our method create_sub_pf_flags(POST::Sub $sub, %context) {
+method create_sub_pf_flags(POST::Sub $sub, %context) {
     # This constants aren't exposed. So keep reference here.
     # SUB_FLAG_IS_OUTER     = PObj_private1_FLAG == 0x01
     # SUB_FLAG_PF_ANON      = PObj_private3_FLAG == 0x08
@@ -956,7 +956,7 @@ our method create_sub_pf_flags(POST::Sub $sub, %context) {
     $res;
 }
 
-our method create_sub_comp_flags(POST::Sub $sub, %context) {
+method create_sub_comp_flags(POST::Sub $sub, %context) {
     #    SUB_COMP_FLAG_VTABLE    = SUB_COMP_FLAG_BIT_1   == 0x02
     #    SUB_COMP_FLAG_METHOD    = SUB_COMP_FLAG_BIT_2   == 0x04
     #    SUB_COMP_FLAG_PF_INIT   = SUB_COMP_FLAG_BIT_10  == 0x400
@@ -972,7 +972,7 @@ our method create_sub_comp_flags(POST::Sub $sub, %context) {
     $res;
 }
 
-our method fixup_labels($sub, $labels_todo, $bc, %context) {
+method fixup_labels($sub, $labels_todo, $bc, %context) {
     self.debug("Fixup labels") if %context<DEBUG>;
     for $labels_todo -> $kv {
         my $offset := $kv.key;
@@ -989,7 +989,7 @@ our method fixup_labels($sub, $labels_todo, $bc, %context) {
 }
 
 # Get register from symbol table with validation
-our method get_register($name, %context) {
+method get_register($name, %context) {
     my $reg := %context<sub>.symbol($name);
     if !$reg {
         self.panic("Register '{ $name }' not predeclared in '{ %context<sub>.name }'");
@@ -1003,7 +1003,7 @@ method debug(*@args) {
     }
 }
 
-our method create_context($past, %adverbs) {
+method create_context($past, %adverbs) {
     my %context;
 
     %context<compiler> := self;

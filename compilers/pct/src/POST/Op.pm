@@ -7,11 +7,11 @@ C<POST::Op> nodes represents any PIR opcodes.
 =item pirop([opcode])
 Get/set the opcode type for this node.
 
-our multi method pirop($param)      { self.attr('pirop', $param, 1); }
-our multi method pirop()            { self.attr('pirop', undef,  0); }
+multi method pirop($param)      { self.attr('pirop', $param, 1); }
+multi method pirop()            { self.attr('pirop', undef,  0); }
 
-our multi method inline($param)     { self.attr('inline', $param, 1); }
-our multi method inline()           { self.attr('inline', undef,  0); }
+multi method inline($param)     { self.attr('inline', $param, 1); }
+multi method inline()           { self.attr('inline', undef,  0); }
 
 
 # vim: expandtab shiftwidth=4 ft=perl6

@@ -7,7 +7,7 @@ Single compiled file. Use to store global constants, e.g. Subs and .global_const
 =item C<sub($name, $value?)
 Get or set Sub declared in file.
 
-our method sub($name, $value?) {
+method sub($name, $value?) {
     my %subs := self<subs>;
     unless %subs {
         self<subs> := hash();
