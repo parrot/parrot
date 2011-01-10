@@ -142,7 +142,7 @@ multi method pir($node) {
 =item pir(POST::Op node)
 Return pir for an operation node.
 
-multi method __pir(POST::Op $node) {
+multi method pir(POST::Op $node) {
     Q:PIR {
     .local pmc node
     find_lex node, '$node'
@@ -172,32 +172,32 @@ multi method __pir(POST::Op $node) {
     if pirop == 'inline' goto pirop_inline
 
   pirop_opcode:
-    fmt = "    %n %,\n"
+    fmt = "    %%n %%,\n"
     name = pirop
     goto pirop_emit
 
   pirop_call:
-    fmt = "    %r%n(%,)\n"
+    fmt = "    %%r%%n(%%,)\n"
     name = shift arglist
     goto pirop_emit
 
   pirop_callmethod:
-    fmt = "    %r%i.%n(%,)\n"
+    fmt = "    %%r%%i.%%n(%%,)\n"
     name = shift arglist
     invocant = shift arglist
     goto pirop_emit
 
   pirop_return:
-    fmt = "    .return (%,)\n"
+    fmt = "    .return (%%,)\n"
     goto pirop_emit
 
   pirop_yield:
-    fmt = "    .yield (%,)\n"
+    fmt = "    .yield (%%,)\n"
     goto pirop_emit
 
   pirop_tailcall:
     name = shift arglist
-    fmt = "    .tailcall %n(%,)\n"
+    fmt = "    .tailcall %%n(%%,)\n"
     goto pirop_emit
 
   pirop_inline:
@@ -212,7 +212,7 @@ multi method __pir(POST::Op $node) {
     subline = find_caller_lex '$SUBLINE'
     line    = find_caller_lex '$LINE'
     if subline == line goto done_line
-    subpir.'append_format'(".annotate 'line', %0\n", line)
+    subpir.'append_format'(".annotate 'line', %%0\n", line)
     assign subline, line
   done_line:
     subpir.'append_format'(fmt, arglist :flat, 'r'=>result, 'n'=>name, 'i'=>invocant, 't'=>result)
@@ -223,7 +223,7 @@ multi method __pir(POST::Op $node) {
 =item pir(POST::Label node)
 Generate a label.
 
-multi method _pir(POST::Label $node) {
+multi method pir(POST::Label $node) {
     my $subpir := pir::find_caller_lex__PS('$SUBPIR');
     $subpir.append_format("  %0:\n", $node.result());
 }
