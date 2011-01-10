@@ -64,13 +64,15 @@ compilers/pct/src/POST/Nodes.pbc : $(PARROT) \
 		compilers/pct/src/POST/Register.pir \
 		compilers/pct/src/POST/String.pir \
 		compilers/pct/src/POST/Sub.pir \
-		compilers/pct/src/POST/Value.pir \
-		compilers/pct/src/POST/Compiler2.pir
+		compilers/pct/src/POST/Value.pir
 	$(PARROT) -o $@ \
 		compilers/pct/src/POST/Nodes.pir
 
 # It should be special "bootstrap-pct" target
 bootstrap-pct: $(NQP_RX)
+	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Compiler.pir compilers/pct/src/POST/Compiler.pm
+	$(NQP_RX) --target=pir -o compilers/pct/src/POST/VanillaAllocator.pir compilers/pct/src/POST/VanillaAllocator.pm
+
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Call.pir compilers/pct/src/POST/Call.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Constant.pir compilers/pct/src/POST/Constant.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/File.pir compilers/pct/src/POST/File.pm
@@ -82,5 +84,4 @@ bootstrap-pct: $(NQP_RX)
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/String.pir compilers/pct/src/POST/String.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Sub.pir compilers/pct/src/POST/Sub.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Value.pir compilers/pct/src/POST/Value.pm
-	$(NQP_RX) --target=pir -o compilers/pct/src/POST/VanillaAllocator.pir compilers/pct/src/POST/VanillaAllocator.pm
 

@@ -1,4 +1,4 @@
-module POST::Compiler is PCT::HLLCompiler;
+class POST::Compiler is PCT::HLLCompiler;
 
 =begin NAME
 
@@ -13,14 +13,18 @@ PIR, PBC or an Eval PMC (bytecode).
 
 =end DESCRIPTION
 
-#our $HLL;
-#our $?NAMESPACE;
+has $?HLL;
+has $?NAMESPACE;
 
-#INIT {
-#    POST::Compiler.language('POST');
-#    POST::Compiler.stages(<pir evalpmc>);
-#    $HLL := '';
-#}
+INIT {
+    POST::Compiler.language('POST');
+    POST::Compiler.stages(<pir evalpmc>);
+    #$?HLL := '';
+    Q:PIR {
+        %r = new ['String']
+        set_global '$?HLL', %r
+    }
+}
 
 
 =item C<escape(string str)>

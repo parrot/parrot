@@ -17,8 +17,6 @@
 .include 'compilers/pct/src/POST/Op.pir'
 .include 'compilers/pct/src/POST/Ops.pir'
 
-.include 'compilers/pct/src/POST/Compiler2.pir'
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
