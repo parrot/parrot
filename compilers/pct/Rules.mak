@@ -59,6 +59,7 @@ compilers/pct/src/POST/Node.pbc : $(PARROT) \
 		compilers/pct/src/POST/Key.pir \
 		compilers/pct/src/POST/Label.pir \
 		compilers/pct/src/POST/Op.pir \
+		compilers/pct/src/POST/Ops.pir \
 		compilers/pct/src/POST/Register.pir \
 		compilers/pct/src/POST/String.pir \
 		compilers/pct/src/POST/Sub.pir \
@@ -74,6 +75,7 @@ bootstrap-pct: $(NQP_RX)
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Key.pir compilers/pct/src/POST/Key.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Label.pir compilers/pct/src/POST/Label.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Op.pir compilers/pct/src/POST/Op.pm
+	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Ops.pir compilers/pct/src/POST/Ops.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Register.pir compilers/pct/src/POST/Register.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/String.pir compilers/pct/src/POST/String.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Sub.pir compilers/pct/src/POST/Sub.pm

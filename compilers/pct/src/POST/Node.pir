@@ -18,7 +18,6 @@ for compiling programs in Parrot.
     ##  create POST classes
     p6meta = new 'P6metaclass'
     base = p6meta.'new_class'('POST::Node', 'parent'=>'PCT::Node')
-    p6meta.'new_class'('POST::Ops', 'parent'=>base)
 
     .return ()
 .end
@@ -129,6 +128,7 @@ C<POST::Compiler.escape>.)
 .include 'compilers/pct/src/POST/Sub.pir'
 
 .include 'compilers/pct/src/POST/Op.pir'
+.include 'compilers/pct/src/POST/Ops.pir'
 
 =back
 
