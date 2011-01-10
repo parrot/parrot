@@ -195,7 +195,7 @@ STRING * Parrot_str_from_num(PARROT_INTERP, FLOATVAL f)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-STRING * Parrot_str_from_platform_cstring(PARROT_INTERP, char *c)
+STRING * Parrot_str_from_platform_cstring(PARROT_INTERP, const char *c)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
