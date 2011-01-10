@@ -300,7 +300,7 @@
 /src/null_config.c
 /src/parrot_config.c
 /src/parrot_config.h
-/src/platform/*.o
+/src/platform/*/*.o
 /src/revision.c
 /src/atomic/*.o
 /src/call/*.o
