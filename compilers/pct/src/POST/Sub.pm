@@ -1,4 +1,4 @@
-module POST::Sub;
+class POST::Sub is POST::Node;
 
 our @paramfmt;
 INIT {
@@ -170,6 +170,58 @@ method add_directive($line) {
     my $dlist := self<directives>;
     if pir::index__iss($dlist, $line) < 0 {
         self<directives> := ~$dlist ~ ~$line ~ "\n";
+    }
+}
+
+# XXX Rewrite into NQP
+method add_param($pname, *%adverbs) {
+    Q:PIR {
+    .local pmc pname
+    .local pmc adverbs
+
+    find_lex pname, '$pname'
+    find_lex adverbs, '%adverbs'
+
+    .local int optional, slurpy, call_sig
+    .local string named
+    optional = adverbs['optional']
+    slurpy = adverbs['slurpy']
+    named = adverbs['named']
+    call_sig = adverbs['call_sig']
+
+    .local int paramseq
+    paramseq = isne optional, 0
+    unless slurpy goto slurpy_done
+    paramseq += 2
+  slurpy_done:
+    unless named goto named_done
+    paramseq += 4
+  named_done:
+    unless call_sig goto call_sig_done
+    paramseq += 8
+  call_sig_done:
+
+    .local pmc paramlist
+    paramlist = self['paramlist']
+    unless null paramlist goto have_paramlist
+    paramlist = new 'ResizablePMCArray'
+    self['paramlist'] = paramlist
+  have_paramlist:
+
+    .local pmc code
+    code = paramlist[paramseq]
+    unless null code goto have_code
+    code = new 'StringBuilder'
+    paramlist[paramseq] = code
+  have_code:
+
+    .local pmc paramfmt
+    paramfmt = get_hll_global ['POST';'Sub'], '@paramfmt'
+    $S0 = paramfmt[paramseq]
+    named = self.'escape'(named)
+    code.'append_format'($S0, pname, named)
+
+    .return ()
     }
 }
 

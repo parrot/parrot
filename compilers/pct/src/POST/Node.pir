@@ -19,7 +19,6 @@ for compiling programs in Parrot.
     p6meta = new 'P6metaclass'
     base = p6meta.'new_class'('POST::Node', 'parent'=>'PCT::Node')
     p6meta.'new_class'('POST::Ops', 'parent'=>base)
-    p6meta.'new_class'('POST::Sub', 'parent'=>base)
 
     .return ()
 .end
@@ -115,56 +114,6 @@ C<POST::Compiler.escape>.)
 =back
 
 =cut
-
-.namespace [ 'POST';'Sub' ]
-
-
-.sub 'add_param' :method
-    .param pmc pname
-    .param pmc adverbs         :slurpy :named
-
-    .local int optional, slurpy, call_sig
-    .local string named
-    optional = adverbs['optional']
-    slurpy = adverbs['slurpy']
-    named = adverbs['named']
-    call_sig = adverbs['call_sig']
-
-    .local int paramseq
-    paramseq = isne optional, 0
-    unless slurpy goto slurpy_done
-    paramseq += 2
-  slurpy_done:
-    unless named goto named_done
-    paramseq += 4
-  named_done:
-    unless call_sig goto call_sig_done
-    paramseq += 8
-  call_sig_done:
-
-    .local pmc paramlist
-    paramlist = self['paramlist']
-    unless null paramlist goto have_paramlist
-    paramlist = new 'ResizablePMCArray'
-    self['paramlist'] = paramlist
-  have_paramlist:
-
-    .local pmc code
-    code = paramlist[paramseq]
-    unless null code goto have_code
-    code = new 'StringBuilder'
-    paramlist[paramseq] = code
-  have_code:
-
-    .local pmc paramfmt
-    paramfmt = get_hll_global ['POST';'Sub'], '@paramfmt'
-    $S0 = paramfmt[paramseq]
-    named = self.'escape'(named)
-    code.'append_format'($S0, pname, named)
-
-    .return ()
-.end
-
 
 .namespace []
 .include 'compilers/pct/src/POST/Call.pir'
