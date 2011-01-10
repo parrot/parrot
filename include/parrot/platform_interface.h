@@ -118,6 +118,12 @@ int Parrot_dlclose(void *handle);
 #endif
 
 /*
+ * encoding
+ */
+void Parrot_init_platform_encoding(PARROT_INTERP);
+size_t Parrot_str_platform_strlen(PARROT_INTERP, const char *s);
+
+/*
  * system timer
  */
 
