@@ -73,7 +73,7 @@ foreach my $file (sort grep /\.[hc]$/, @incfiles) {
     foreach my $include (@includes) {
         my $found;
 
-        # These depend on the platform, skip for now
+        # These depend on the platform, skip for now (TT #1944)
         next if $include =~ m'^parrot/thr_';
 
         my @include_dirs;
