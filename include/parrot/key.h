@@ -78,12 +78,6 @@ PMC * Parrot_key_new_integer(PARROT_INTERP, INTVAL value)
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_key_new_number(PARROT_INTERP, FLOATVAL value)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_key_new_string(PARROT_INTERP, ARGIN(STRING *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -96,12 +90,6 @@ PMC * Parrot_key_next(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-FLOATVAL Parrot_key_number(PARROT_INTERP, ARGIN(PMC *key))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_key_pmc(PARROT_INTERP, ARGIN(PMC *key))
@@ -110,12 +98,6 @@ PMC * Parrot_key_pmc(PARROT_INTERP, ARGIN(PMC *key))
 
 PARROT_EXPORT
 void Parrot_key_set_integer(PARROT_INTERP, ARGMOD(PMC *key), INTVAL value)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*key);
-
-PARROT_EXPORT
-void Parrot_key_set_number(PARROT_INTERP, ARGMOD(PMC *key), FLOATVAL value)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*key);
@@ -173,24 +155,16 @@ INTVAL Parrot_key_type(SHIM_INTERP, ARGIN(const PMC *key))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_key_new_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_key_new_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_key_new_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_Parrot_key_next __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(key))
-#define ASSERT_ARGS_Parrot_key_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_Parrot_key_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_Parrot_key_set_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(key))
-#define ASSERT_ARGS_Parrot_key_set_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_Parrot_key_set_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
