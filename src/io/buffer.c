@@ -771,9 +771,6 @@ Parrot_io_seek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     GETATTR_Handle_os_handle(interp, filehandle, os_handle);
     offset = PIO_SEEK(interp, os_handle, offset, whence);
 
-    if (offset > Parrot_io_get_file_size(interp, filehandle))
-        Parrot_io_set_file_size(interp, filehandle, offset);
-
     /* Seek clears EOF */
     Parrot_io_set_flags(interp, filehandle,
             (Parrot_io_get_flags(interp, filehandle) & ~PIO_F_EOF));

@@ -42,7 +42,6 @@ pmclass FileHandle extends Handle auto_attrs {
     ATTR STRING *encoding;            /* The encoding for read/write  */
     ATTR INTVAL process_id;           /* Child process on pipes       */
     ATTR INTVAL exit_status;          /* Child exit status on pipes   */
-    ATTR PIOOFF_T file_size;          /* Current file size            */
     ATTR PIOOFF_T file_pos;           /* Current real file pointer    */
     ATTR PIOOFF_T last_pos;           /* Last file position           */
     ATTR size_t buffer_size;          /* Buffer size                  */
@@ -77,7 +76,6 @@ Initializes a newly created FileHandle object.
         attrs->encoding         = STRINGNULL;
         attrs->process_id       = 0;
         attrs->exit_status      = 0;
-        attrs->file_size        = 0;
         attrs->file_pos         = piooffsetzero;
         attrs->last_pos         = piooffsetzero;
         attrs->buffer_size      = 0;
@@ -125,7 +123,6 @@ Create a copy of the filehandle.
         new_attrs->flags          = old_attrs->flags;
         new_attrs->process_id     = old_attrs->process_id;
         new_attrs->exit_status    = old_attrs->exit_status;
-        new_attrs->file_size      = old_attrs->file_size;
         new_attrs->file_pos       = old_attrs->file_pos;
         new_attrs->last_pos       = old_attrs->last_pos;
 
