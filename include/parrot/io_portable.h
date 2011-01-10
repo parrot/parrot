@@ -66,13 +66,6 @@ PMC * Parrot_io_open_portable(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*filehandle);
 
-size_t Parrot_io_peek_portable(PARROT_INTERP,
-    ARGIN(PMC *filehandle),
-    ARGIN(STRING **buf))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 size_t Parrot_io_read_portable(PARROT_INTERP,
     ARGIN(PMC *filehandle),
     ARGMOD(char *buf),
@@ -125,10 +118,6 @@ size_t Parrot_io_write_portable(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filehandle) \
     , PARROT_ASSERT_ARG(path))
-#define ASSERT_ARGS_Parrot_io_peek_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle) \
-    , PARROT_ASSERT_ARG(buf))
 #define ASSERT_ARGS_Parrot_io_read_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filehandle) \
@@ -165,9 +154,9 @@ size_t Parrot_io_write_portable(PARROT_INTERP,
 #define PIO_SEEK(interp, pmc, offset, start) \
     Parrot_io_seek_portable((interp), (pmc), (offset), (start))
 #define PIO_TELL(interp, pmc) Parrot_io_tell_portable((interp), (pmc))
-#define PIO_PEEK(interp, pmc, buf) Parrot_io_peek_portable((interp), (pmc), (buf))
 #define PIO_FLUSH(interp, pmc) Parrot_io_flush_portable((interp), (pmc))
 #define PIO_GETBLKSIZE(handle) Parrot_io_getblksize_portable((handle))
+#define PIO_IS_TTY(interp, handle) Parrot_io_unimplemented_portable(interp)
 
 #define PIO_POLL(interp, pmc, which, sec, usec) Parrot_io_unimplemented_portable(interp)
 #define PIO_PIPE(interp, reader, writer) Parrot_io_unimplemented_portable(interp)

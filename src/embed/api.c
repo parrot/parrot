@@ -620,6 +620,8 @@ a true value if this call is successful and false value otherwise.
 =cut
 
 */
+/* Whiteknight told me that theres no way to test this for now, so it should be
+commented out, for now.
 
 PARROT_API
 Parrot_Int
@@ -650,7 +652,7 @@ Parrot_api_set_stdhandles(Parrot_PMC interp_pmc, Parrot_Int in,
     UNUSED(dummy);
 
     EMBED_API_CALLOUT(interp_pmc, interp)
-}
+}*/
 
 /*
 

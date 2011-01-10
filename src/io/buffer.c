@@ -187,12 +187,15 @@ Parrot_io_flush_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
      * Write flush
      */
     if (buffer_flags & PIO_BF_WRITEBUF) {
-        size_t  to_write = buffer_next - buffer_start;
-        STRING *s        = Parrot_str_new_init(interp, (char *)buffer_start,
-                to_write, Parrot_binary_encoding_ptr, 0);
         /* Flush to next layer */
-        long wrote = PIO_WRITE(interp, filehandle, s);
-        if (wrote == (long)to_write) {
+        size_t    to_write = buffer_next - buffer_start;
+        size_t    wrote;
+        PIOHANDLE os_handle;
+
+        GETATTR_Handle_os_handle(interp, filehandle, os_handle);
+        wrote = PIO_WRITE(interp, os_handle, (char *)buffer_start, to_write);
+
+        if (wrote == to_write) {
             Parrot_io_set_buffer_next(interp, filehandle, buffer_start);
             /* Release buffer */
             Parrot_io_set_buffer_flags(interp, filehandle, (buffer_flags & ~PIO_BF_WRITEBUF));
@@ -230,11 +233,18 @@ Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
     ASSERT_ARGS(Parrot_io_fill_readbuf)
     unsigned char    *buf  = Parrot_io_get_buffer_start(interp, filehandle);
     size_t            size = Parrot_io_get_buffer_size(interp, filehandle);
-    size_t            got  = PIO_READ(interp, filehandle, (char *)buf, size);
+    size_t            got;
+    PIOHANDLE         os_handle;
+
+    GETATTR_Handle_os_handle(interp, filehandle, os_handle);
+    got = PIO_READ(interp, os_handle, (char *)buf, size);
 
     /* nothing to get */
-    if (got == 0)
+    if (got == 0) {
+        const INTVAL file_flags = Parrot_io_get_flags(interp, filehandle);
+        Parrot_io_set_flags(interp, filehandle, file_flags | PIO_F_EOF);
         return 0;
+    }
 
     Parrot_io_set_buffer_end(interp, filehandle, buf + got);
     Parrot_io_set_buffer_next(interp, filehandle, buf);
@@ -315,7 +325,16 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     /* buffer is now empty */
 
     if (len >= Parrot_io_get_buffer_size(interp, filehandle)) {
-        got = PIO_READ(interp, filehandle, dest + current, len);
+        PIOHANDLE os_handle;
+
+        GETATTR_Handle_os_handle(interp, filehandle, os_handle);
+        got = PIO_READ(interp, os_handle, dest + current, len);
+
+        if (got == 0) {
+            const INTVAL file_flags = Parrot_io_get_flags(interp, filehandle);
+            Parrot_io_set_flags(interp, filehandle, file_flags | PIO_F_EOF);
+        }
+
         Parrot_io_set_file_position(interp, filehandle, file_pos + got);
 
         return current + got;
@@ -590,17 +609,28 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRIN
     unsigned char *       buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
     const size_t          buffer_size  = Parrot_io_get_buffer_size(interp, filehandle);
     INTVAL                buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
+    INTVAL                flags        = Parrot_io_get_flags(interp, filehandle);
     const size_t          len          = s->bufused;
     int                   need_flush;
     size_t                avail;
+    PIOHANDLE             os_handle;
+    PIOOFF_T              file_pos;
 
     if (len <= 0)
         return 0;
+
+    GETATTR_Handle_os_handle(interp, filehandle, os_handle);
 
     if (buffer_flags & PIO_BF_WRITEBUF)
         avail = buffer_size - (buffer_next - buffer_start);
 
     else if (buffer_flags & PIO_BF_READBUF) {
+        if (!(flags & PIO_F_APPEND)) {
+            /* Seek back to file position */
+            file_pos = Parrot_io_get_file_position(interp, filehandle);
+            PIO_SEEK(interp, os_handle, file_pos, SEEK_SET);
+        }
+
         buffer_flags &= ~PIO_BF_READBUF;
         Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
         buffer_next = buffer_start;
@@ -614,7 +644,16 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRIN
      * If any, we should flush */
     need_flush = 0;
 
-    if (Parrot_io_get_flags(interp, filehandle) & PIO_F_LINEBUF) {
+    if (flags & PIO_F_APPEND) {
+        /* Buffering would break append semantics */
+        need_flush = 1;
+
+#ifdef PIO_OS_WIN32
+        /* Win32 doesn't support append */
+        PIO_SEEK(interp, os_handle, 0, SEEK_END);
+#endif
+    }
+    else if (Parrot_io_get_flags(interp, filehandle) & PIO_F_LINEBUF) {
         /* scan from end, it's likely that EOL is at end of string */
         const char *p = (char*)(s->strstart) + len - 1;
         size_t      i;
@@ -631,61 +670,56 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRIN
      * Large writes (multiples of blocksize) should write
      * through generally for best performance, else you are
      * just doing extra memcpys.
-     * FIXME: This is badly optimized, will fixup later.
      */
     if (need_flush || len >= buffer_size) {
-        long wrote;
+        size_t    wrote;
 
         /* Write through, skip buffer. */
         Parrot_io_flush_buffer(interp, filehandle);
-        wrote = PIO_WRITE(interp, filehandle, s);
 
-        if (wrote == (long)len) {
-            Parrot_io_set_file_position(interp, filehandle, (wrote +
-                        Parrot_io_get_file_position(interp, filehandle)));
-            return wrote;
-        }
-        /* Write error */
-        else
+        wrote = PIO_WRITE(interp, os_handle, s->strstart, len);
+
+        if (wrote != len)
             return (size_t)-1;
     }
-    else if (avail > len) {
+    else if (len < avail) {
         buffer_flags |= PIO_BF_WRITEBUF;
         Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
 
-        memmove(buffer_next, s->strstart, len);
+        memcpy(buffer_next, s->strstart, len);
         buffer_next += len;
         Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-        Parrot_io_set_file_position(interp, filehandle, (len +
-                    Parrot_io_get_file_position(interp, filehandle)));
-        return len;
     }
     else {
+        /* Now we have avail <= len < buffer_size, so there is a non-empty
+         * write buffer */
         const unsigned int diff = (int)(len - avail);
 
-        buffer_flags |= PIO_BF_WRITEBUF;
-        Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
-
         /* Fill remainder, flush, then try to buffer more */
-        memmove(buffer_next, s->strstart, avail);
+        memcpy(buffer_next, s->strstart, avail);
         buffer_next += avail;
         Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-        Parrot_io_set_file_position(interp, filehandle, (avail +
-                    Parrot_io_get_file_position(interp, filehandle)));
         Parrot_io_flush_buffer(interp, filehandle);
 
-        buffer_flags |= PIO_BF_WRITEBUF;
-        Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
+        if (diff > 0) {
+            buffer_flags |= PIO_BF_WRITEBUF;
+            Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
 
-        buffer_next = Parrot_io_get_buffer_next(interp, filehandle);
-        memmove(buffer_start, (s->strstart + avail), diff);
+            memcpy(buffer_start, s->strstart + avail, diff);
 
-        buffer_next += diff;
-        Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-        Parrot_io_set_file_position(interp, filehandle, (diff +
-                    Parrot_io_get_file_position(interp, filehandle)));
-        return len;
+            buffer_next = buffer_start + diff;
+            Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
+        }
     }
+
+    if (flags & PIO_F_APPEND)
+        file_pos = PIO_TELL(interp, os_handle);
+    else
+        file_pos = Parrot_io_get_file_position(interp, filehandle) + len;
+
+    Parrot_io_set_file_position(interp, filehandle, file_pos);
+
+    return len;
 }
 
 
@@ -705,44 +739,45 @@ Parrot_io_seek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(Parrot_io_seek_buffer)
-    PIOOFF_T newpos;
-    PIOOFF_T file_pos = Parrot_io_get_file_position(interp, filehandle);
-    unsigned char *buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
-    unsigned char *buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-    unsigned char *buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
+    INTVAL    buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
+    PIOOFF_T  file_pos     = Parrot_io_get_file_position(interp, filehandle);
+    PIOHANDLE os_handle;
 
-    switch (whence) {
-      case SEEK_SET:
-        newpos = offset;
-        break;
-      case SEEK_CUR:
-        newpos = file_pos + offset;
-        break;
-      case SEEK_END:
-        newpos = PIO_SEEK(interp, filehandle, offset,
-                               whence);
-        if (newpos == -1)
-            return -1;
-
-        break;
-      default:
-        /* XXX: somehow report the illegal whence value */
-        return -1;
+    if (whence == SEEK_CUR) {
+        /* Don't use SEEK_CUR, filehandle may be ahead of file_pos */
+        offset += file_pos;
+        whence  = SEEK_SET;
     }
 
-    if ((newpos < file_pos - (buffer_next - buffer_start))
-        || (newpos >= file_pos + (buffer_end - buffer_next))) {
-        Parrot_io_flush_buffer(interp, filehandle);
-        newpos = PIO_SEEK(interp, filehandle, newpos, SEEK_SET);
-    }
-    else {
-        buffer_next += newpos - file_pos;
-        Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
+    if (buffer_flags & PIO_BF_READBUF
+    &&  whence != SEEK_END) {
+        /* Try to seek inside the read buffer */
+        unsigned char *buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
+        unsigned char *buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
+        unsigned char *buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
+
+        if (offset >= file_pos - (buffer_next - buffer_start)
+        &&  offset <  file_pos + (buffer_end  - buffer_next)) {
+            buffer_next += offset - file_pos;
+            Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
+            Parrot_io_set_file_position(interp, filehandle, offset);
+
+            return offset;
+        }
     }
 
-    Parrot_io_set_file_position(interp, filehandle, newpos);
+    Parrot_io_flush_buffer(interp, filehandle);
 
-    return newpos;
+    GETATTR_Handle_os_handle(interp, filehandle, os_handle);
+    offset = PIO_SEEK(interp, os_handle, offset, whence);
+
+    /* Seek clears EOF */
+    Parrot_io_set_flags(interp, filehandle,
+            (Parrot_io_get_flags(interp, filehandle) & ~PIO_F_EOF));
+
+    Parrot_io_set_file_position(interp, filehandle, offset);
+
+    return offset;
 }
 
 /*

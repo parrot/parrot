@@ -280,41 +280,6 @@ io_is_tty_portable(PIOHANDLE fptr)
 
 /*
 
-=item C<size_t Parrot_io_peek_portable(PARROT_INTERP, PMC *filehandle, STRING
-**buf)>
-
-Retrieves the next character in the stream without modifying the stream.
-
-=cut
-
-*/
-
-size_t
-Parrot_io_peek_portable(PARROT_INTERP,
-        ARGIN(PMC *filehandle),
-        ARGIN(STRING **buf))
-{
-    ASSERT_ARGS(Parrot_io_peek_portable)
-    FILE   * const fptr  = (FILE *)Parrot_io_get_os_handle(interp, filehandle);
-    STRING * const s     = Parrot_io_make_string(interp, buf, 1);
-
-    /* read the next byte into the buffer */
-    const size_t   bytes = fread(s->strstart, 1, 1, fptr);
-
-    /* if we got anything from the stream, push it back on */
-    if (bytes) {
-        s->bufused = s->strlen = 1;
-        ungetc(*(char *)s->strstart, fptr);
-    }
-    else
-        s->bufused = s->strlen = 1;
-
-    return bytes;
-}
-
-
-/*
-
 =item C<INTVAL Parrot_io_getblksize_portable(PIOHANDLE fptr)>
 
 Returns the block size of the given file descriptor.

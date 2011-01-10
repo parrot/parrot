@@ -21,7 +21,7 @@ number types.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(112)
+    plan(139)
 
     bnot_p_p_creates_destination()
     band_1()
@@ -31,11 +31,17 @@ number types.
     bands_4()
     bands_cow()
     bor_1()
+    bor_2()
     bors_null_string()
     bors_2()
     bors_3()
     bors_cow()
     shl_1()
+    shl_2()
+    shl_3()
+    shr_1()
+    shr_2()
+    lsr_1()
     bxor_1()
     bxors_null_string()
     bxors_2()
@@ -44,6 +50,8 @@ number types.
     bnots_null_string()
     bnots_2()
     bnots_cow()
+    bnot_1()
+    rot_1()
     # END_OF_TESTS
 
 .end
@@ -199,6 +207,17 @@ number types.
     is( $P2, 3, 'bor_p_p_p' )
 .end
 
+.sub bor_2
+    $I0 = 40
+    $P0 = box 20
+    bor $P0, $I0
+    is( $P0, 60, 'bor_p_i' )
+
+    $P0 = box 30
+    bor $P0, 40
+    is( $P0, 62, 'bor_p_ic' )
+.end
+
 .sub bors_null_string
     null $S1
     null $S2
@@ -305,6 +324,108 @@ number types.
     $I0 = 1
     shl $P0, $I0
     is( $P0, 2, 'shl_p_i' )
+.end
+
+.sub shl_2
+    $P0 = new ['Integer']
+    $P0 = 1
+    shl $P0, 2
+    is( $P0, 4, 'shl_p_ic' )
+
+    $P0 = 1
+
+    $P1 = new ['Integer']
+    $P1 = 2
+    shl $P0, $P1
+    is( $P0, 4, 'shl_p_p' )
+.end
+
+.sub shl_3
+    $P0 = new ['Integer']
+    $P0 = 1
+
+    $P1 = new ['Integer']
+
+    $P1 = shl $P0, 2
+    is( $P1, 4, 'shl_p_p_ic' )
+
+    $I0 = 3
+    $P1 = shl $P0, $I0
+    is( $P1, 8, 'shl_p_p_i' )
+
+    $P2 = new ['Integer']
+    $P2 = 4
+
+    $P1 = shl $P0, $P2
+    is( $P1, 16, 'shl_p_p_p' )
+.end
+
+.sub shr_1
+    $P0 = new ['Integer']
+    $P0 = 16
+    shr $P0, 2
+    is( $P0, 4, 'shr_p_ic' )
+
+    $P0 = 16
+
+    $I0 = 3
+    shr $P0, $I0
+    is( $P0, 2, 'shr_p_i' )
+
+    $P0 = 16
+
+    $P1 = new ['Integer']
+    $P1 = 4
+    shr $P0, $P1
+    is( $P0, 1, 'shr_p_p' )
+.end
+
+.sub shr_2
+    $P0 = new ['Integer']
+    $P0 = 16
+
+    $P1 = new ['Integer']
+
+    $P1 = shr $P0, 2
+    is( $P1, 4, 'shr_p_p_ic' )
+
+    $I0 = 3
+    $P1 = shr $P0, $I0
+    is( $P1, 2, 'shr_p_p_i' )
+
+    $P2 = new ['Integer']
+    $P2 = 4
+
+    $P1 = shr $P0, $P2
+    is( $P1, 1, 'shr_p_p_p' )
+.end
+
+.sub lsr_1
+    $P0 = new ["Integer"]
+    $P1 = new ["Integer"]
+    $I0 = 1
+    $P0 = 4
+    $P1 = 8
+
+    lsr_p_i $P0, $I0
+    is($P0, 2, "lsr_p_i")
+
+    lsr_p_ic $P0, 1
+    is($P0, 1, "lsr_p_ic")
+
+    lsr_p_p $P1, $P0
+    is($P1, 4, "lsr_p_p")
+
+    $I0 = 1
+    lsr_p_p_i $P1, $P1, $I0
+    is($P1, 2, "lsr_p_p_i")
+
+    lsr_p_p_ic $P1, $P1, 1
+    is($P1, 1, "lsr_p_p_ic")
+
+    $P1 = 4
+    lsr_p_p_p $P1, $P1, $P0
+    is($P1, 2, "lsr_p_p_p")
 .end
 
 .sub bxor_1
@@ -444,6 +565,20 @@ number types.
     is( $S2, "foo", 'bxors COW' )
 .end
 
+.sub bnot_1
+    $I0 = 10
+    bnot $I0
+    is($I0, -11, "bnot_i")
+
+    $I0 = bnot 11
+    is($I0, -12, "bnot_i_ic")
+
+    $P0 = new ["Integer"]
+    $P0 = 12
+    bnot $P0
+    is($P0, -13, "bnot_p")
+.end
+
 .sub bnots_null_string
     null $S1
     null $S2
@@ -483,6 +618,32 @@ number types.
     substr $S2, $S1, 0, 3
     bnots $S1, $S1
     is( $S2, "foo", 'bnots COW' )
+.end
+
+.sub rot_1
+    # Test basic rotation, really just a shift
+    $I0 = 0
+    $I1 = 10 # 10 rot 1 should be 20 (just a shift)
+    $I2 = 1
+    rot_i_i_i_ic $I0, $I1, $I2, 32
+    is ($I0, 20, "rot_i_i_i_ic")
+
+    # Reverse the rotation, shift the other way
+    $I2 = -1
+    rot_i_i_i_ic $I0, $I0, $I2, 32
+    is ($I0, 10, "rot_i_i_i_ic reverse")
+
+    $I0 = 0
+    $I1 = -1
+    rot_i_ic_i_ic $I0, 20, $I1, 32
+    is ($I0, 10, "rot_i_ic_i_ic")
+
+    $I0 = 0
+    rot_i_ic_ic_ic $I0, 20, 1, 32
+    is ($I0, 40, "rot_i_ic_ic_ic")
+
+    rot_i_ic_ic_ic $I0, 27, -3, 32
+    is($I0, 1610612739, "rot_i_ic_ic_ic")
 .end
 
 # Local Variables:

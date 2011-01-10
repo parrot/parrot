@@ -512,7 +512,7 @@ dissect_aggregate_arg(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(PMC *aggreg
         parrot_hash_iterate(hash,
             VTABLE_set_pmc_keyed_str(interp, call_object,
                 (STRING *)_bucket->key,
-                hash_value_to_pmc(interp, hash, _bucket->value));)
+                Parrot_hash_value_to_pmc(interp, hash, _bucket->value));)
     }
     else {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -816,7 +816,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                     num_positionals = 0;
                 if (named_count > 0){
                     if (named_used_list != NULL)
-                        parrot_hash_destroy(interp, named_used_list);
+                        Parrot_hash_destroy(interp, named_used_list);
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
                         "named parameters must follow all positional parameters");
@@ -844,7 +844,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 STRING *param_name;
                 if (!(param_flags & PARROT_ARG_STRING)){
                     if (named_used_list != NULL)
-                        parrot_hash_destroy(interp, named_used_list);
+                        Parrot_hash_destroy(interp, named_used_list);
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
                         "named parameters must have a name specified");
@@ -862,14 +862,14 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
                 /* Mark the name as used, cannot be filled again. */
                 if (named_used_list == NULL) /* Only created if needed. */
-                    named_used_list = parrot_create_hash(interp,
+                    named_used_list = Parrot_hash_create(interp,
                             enum_type_INTVAL, Hash_key_type_STRING);
 
-                parrot_hash_put(interp, named_used_list, param_name, (void *)1);
+                Parrot_hash_put(interp, named_used_list, param_name, (void *)1);
             }
             else if (named_count > 0){
                 if (named_used_list != NULL)
-                    parrot_hash_destroy(interp, named_used_list);
+                    Parrot_hash_destroy(interp, named_used_list);
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "named parameters must follow all positional parameters");
@@ -897,7 +897,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 break;
               default:
                 if (named_used_list != NULL)
-                    parrot_hash_destroy(interp, named_used_list);
+                    Parrot_hash_destroy(interp, named_used_list);
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION, "invalid parameter type");
                 break;
@@ -946,7 +946,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
             if (err_check){
                 if (named_used_list != NULL)
-                    parrot_hash_destroy(interp, named_used_list);
+                    Parrot_hash_destroy(interp, named_used_list);
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "too few positional arguments: "
@@ -979,7 +979,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         /* All remaining parameters must be named. */
         if (!(param_flags & PARROT_ARG_NAME)){
             if (named_used_list != NULL)
-                parrot_hash_destroy(interp, named_used_list);
+                Parrot_hash_destroy(interp, named_used_list);
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION,
                 "named parameters must follow all positional parameters");
@@ -1001,17 +1001,17 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                             named_arg_list, named_arg_index);
 
                     if ((named_used_list == NULL)
-                    || !parrot_hash_exists(interp, named_used_list, name)) {
+                    || !Parrot_hash_exists(interp, named_used_list, name)) {
 
                         VTABLE_set_pmc_keyed_str(interp, collect_named, name,
                                 VTABLE_get_pmc_keyed_str(interp, call_object, name));
 
                         /* Mark the name as used, cannot be filled again. */
                         if (named_used_list==NULL) /* Only created if needed. */
-                            named_used_list = parrot_create_hash(interp,
+                            named_used_list = Parrot_hash_create(interp,
                                     enum_type_INTVAL, Hash_key_type_STRING);
 
-                        parrot_hash_put(interp, named_used_list, name, (void *)1);
+                        Parrot_hash_put(interp, named_used_list, name, (void *)1);
 
                         ++named_count;
                     }
@@ -1025,7 +1025,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         /* Store the name. */
         if (!(param_flags & PARROT_ARG_STRING)){
             if (named_used_list != NULL)
-                parrot_hash_destroy(interp, named_used_list);
+                Parrot_hash_destroy(interp, named_used_list);
             Parrot_ex_throw_from_c_args(interp, NULL,
                EXCEPTION_INVALID_OPERATION,
                "named parameters must have a name specified");
@@ -1046,10 +1046,10 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
                 /* Mark the name as used, cannot be filled again. */
                 if (named_used_list==NULL) /* Only created if needed. */
-                    named_used_list = parrot_create_hash(interp,
+                    named_used_list = Parrot_hash_create(interp,
                             enum_type_INTVAL, Hash_key_type_STRING);
 
-                parrot_hash_put(interp, named_used_list, param_name, (void *)1);
+                Parrot_hash_put(interp, named_used_list, param_name, (void *)1);
                 ++named_count;
 
                 /* Fill the named parameter. */
@@ -1072,7 +1072,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                     break;
                   default:
                     if (named_used_list != NULL)
-                        parrot_hash_destroy(interp, named_used_list);
+                        Parrot_hash_destroy(interp, named_used_list);
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION, "invalid parameter type");
                     break;
@@ -1111,7 +1111,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             else {
                 if (err_check){
                     if (named_used_list != NULL)
-                        parrot_hash_destroy(interp, named_used_list);
+                        Parrot_hash_destroy(interp, named_used_list);
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
                         "too few named arguments: "
@@ -1132,7 +1132,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         GETATTR_CallContext_hash(interp, call_object, h);
         if (!h || !h->entries){
             if (named_used_list != NULL)
-                parrot_hash_destroy(interp, named_used_list);
+                Parrot_hash_destroy(interp, named_used_list);
             return;
         }
 
@@ -1147,7 +1147,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         }
     }
     if (named_used_list != NULL)
-        parrot_hash_destroy(interp, named_used_list);
+        Parrot_hash_destroy(interp, named_used_list);
 }
 
 /*
@@ -1184,18 +1184,17 @@ named_argument_arity_error(PARROT_INTERP, int named_arg_count,
                 named_arg_list, named_arg_index);
 
         if (!parrot_hash_exists(interp, named_used_list, name)) {
-            parrot_hash_destroy(interp, named_used_list);
+            Parrot_hash_destroy(interp, named_used_list);
             Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "too many named arguments: '%S' not used",
                     name);
         }
     }
-    parrot_hash_destroy(interp, named_used_list);
+    Parrot_hash_destroy(interp, named_used_list);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
         "Invalid named arguments, unspecified error");
 }
-
 
 /*
 

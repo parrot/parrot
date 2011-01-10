@@ -1,6 +1,7 @@
 # Copyright (C) 2010, Parrot Foundation.
 #
 # Parrot SHA-2 library; Gerd Pokorra <gp@zimt.uni-siegen.de>
+#           modified by Nolan Lum <nol888@gmail.com>
 #
 # Based on sha256.c, from sha256sum
 #           written by David Madore
@@ -154,7 +155,16 @@ Uses the Integer array from _sha256sum to print the checksum. Returns the checks
 
 ###########################################################################
 
-# Create an internal scratchpad buffer
+# Some helper macros
+
+.macro add_no_carry(x, y)
+    .x += .y
+    .x &= 0xFFFFFFFF
+.endm
+
+###########################################################################
+
+# Create the data buffer, padding as necessary.
 
 .sub _sha256_create_buffer
     .param string str
@@ -207,8 +217,6 @@ string_char:
      inc subcounter
      if subcounter != 4 goto create_buffer_loop
 
-     word = _byte_order (word)
-
      buffer[slow_counter] = word
 
      word       = 0
@@ -227,8 +235,6 @@ create_buffer_break:
      $I0    = 8*subcounter
      word <<= $I0
 
-     word = _byte_order (word)
-
      buffer[slow_counter] = word
 
 complete:
@@ -237,7 +243,6 @@ complete:
 
      $I0 = len << 3
      dec words
-     $I0 = _byte_order ($I0)
      buffer[words] = $I0
 
      $I0 = len >>> 29
@@ -344,15 +349,12 @@ complete:
     .param int x
     .param int n
 
-    .local int extension, result
-    extension = shr x, n
-
-    result = 32 - n
-    result = shl x, result
-    # For 64-bit architectures, to remove leading 32-bit
-    result = band result, 0xffffffff
-
-    result = bor extension, result
+    .local int result, extension
+    extension = x >>> n
+    n = 32 - n
+    result = x << n
+    result &= 0xFFFFFFFF # Maintain 32-bits
+    result |= extension
 
     .return (result)
 .end
@@ -406,7 +408,7 @@ complete:
     result = _rotate_right( value, 18 )
     result = bxor intermediate, result
 
-    intermediate = shr value, 3
+    intermediate = value >>> 3
     result = bxor intermediate, result
 
     .return (result)
@@ -423,74 +425,8 @@ complete:
     result = _rotate_right( value, 19 )
     result = bxor intermediate, result
 
-    intermediate = shr value, 10
+    intermediate = value >>> 10
     result = bxor intermediate, result
-
-    .return (result)
-.end
-
-###########################################################################
-
-.sub _byte_order
-    # If the byte oder (byte sex) is big-endian, then nothing is to do
-    # here, that is not implemented and has to been fixed
-    .param int w
-    .local int part1, part2, part3, part4
-
-    part1 = w & 0x000000ff
-    part2 = w & 0x0000ff00
-    part3 = w & 0x00ff0000
-    part4 = w & 0xff000000
-
-    part1 = part1 <<  24
-    part2 = part2 <<  8
-    part3 = part3 >>> 8
-    part4 = part4 >>> 24
-
-    part1 |= part2
-    part1 |= part3
-    part1 |= part4
-
-    # For 64-bit architectures
-    part1 = part1 & 0xffffffff
-
-    .return (part1)
-.end
-
-###########################################################################
-
-.sub _W_from_t
-    .param pmc message
-    .param int m_index
-
-    .local int tmp, result
-
-    tmp = m_index - 2
-    tmp = band tmp, 0x0f
-    tmp = message[tmp]
-    tmp = _sigma1 (tmp)
-
-    result = m_index - 7
-    result = band result, 0x0f
-    result = message[result]
-
-    result += tmp
-
-    tmp = m_index - 15
-    tmp = band tmp, 0x0f
-    tmp = message[tmp]
-    tmp = _sigma0 (tmp)
-
-    result += tmp
-
-    tmp = band m_index, 0x0f
-    tmp = message[tmp]
-
-    result += tmp
-    result = band result, 0xffffffff
-
-    tmp = band m_index, 0x0f
-    message[tmp] = result
 
     .return (result)
 .end
@@ -499,7 +435,7 @@ complete:
 
 .sub _sha256_process_block
     .param pmc context
-    .param pmc buffer
+    .param pmc block
 
     .local int a_save, b_save, c_save, d_save, e_save, f_save, g_save, h_save
     a_save = context[0]
@@ -580,108 +516,128 @@ complete:
     K[62] = 0xbef9a3f7
     K[63] = 0xc67178f2
 
-    .local int Ki, T1, T2, tmp
-    .local pmc M_t
-    M_t = new 'FixedIntegerArray'
-    M_t = 16
-    .local int counter
+    .local pmc W
+    W = new 'FixedIntegerArray'
+    W = 64
+
+    .local int counter, Wtmp, Wcur
     counter = 0
 
-LOOP:   if counter > 63 goto DONE
-    # part 1 from the calculation of T1
-    tmp = _Sigma_1 (context)
-    T1 = context[7]
-    T1 += tmp
-    tmp = _Ch (context)
-    T1 += tmp
-    Ki = K [counter]
-    T1 = T1 + Ki
-    T1 = band T1, 0xffffffff
-
-    # calculataion of T2
-    T2 = _Sigma_0 (context)
-    tmp = _Maj (context)
-    T2 += tmp
-    T2 = band T2, 0xffffffff
-
-    if counter < 16 goto NIL_TO_15
-
-    # calculation of W(t) from 16 to 63
-    tmp = _W_from_t (M_t, counter)
-    T1 += tmp
-
-    goto COMMON_CHANGE_PART
-
-NIL_TO_15:
-    # part 2 from the calculation of T1
-    # change the byte-order
-    tmp = buffer[counter]
-    tmp = _byte_order(tmp)
-
-    # add to the message block
-    M_t[counter] = tmp
-
-    T1 = T1 + tmp       # that is T1
-    T1 = band T1, 0xffffffff
-
-COMMON_CHANGE_PART:
-    # set context for next round
-    tmp = context[6]
-    context[7] = tmp            # h=g
-    tmp = context[5]
-    context[6] = tmp            # g=f
-    tmp = context[4]
-    context[5] = tmp            # f=e
-    tmp = context[3]
-    tmp += T1
-    tmp = tmp & 0xffffffff
-    context[4] = tmp            # e=d+T1
-    tmp = context[2]
-    context[3] = tmp            # d=c
-    tmp = context[1]
-    context[2] = tmp            # c=b
-    tmp = context[0]
-    context[1] = tmp            # b=a
-    tmp = T1 + T2
-    tmp = tmp & 0xffffffff
-    context[0] = tmp            # a=T1+T2
+COPY_LOOP:
+    # Copy data directly
+    Wcur = block[counter]
+    W[counter] = Wcur
 
     inc counter
-    goto LOOP
+    if counter < 16 goto COPY_LOOP
 
-DONE:
+EXPAND_LOOP:
+    Wtmp = counter - 2
+    Wtmp = W[Wtmp]
+    Wtmp = _sigma1(Wtmp)
+    Wcur = Wtmp
+
+    Wtmp = counter - 7
+    Wtmp = W[Wtmp]
+    Wcur += Wtmp
+
+    Wtmp = counter - 15
+    Wtmp = W[Wtmp]
+    Wtmp = _sigma0(Wtmp)
+    Wcur += Wtmp
+
+    Wtmp = counter - 16
+    Wtmp = W[Wtmp]
+    Wcur += Wtmp
+
+    W[counter] = Wcur
+
+    inc counter
+    if counter < 64 goto EXPAND_LOOP
+
+    # Perform 64 rounds of hash computation.
+    counter = 0
+    .local int T1, T2, tmp
+
+ROUND_LOOP:
+    T1 = context[7]
+    tmp = _Sigma_1(context)
+    T1 += tmp
+    tmp = _Ch(context)
+    T1 += tmp
+    tmp = K[counter]
+    T1 += tmp
+    tmp = W[counter]
+    T1 += tmp
+    T1 &= 0xFFFFFFFF
+
+    T2 = _Sigma_0(context)
+    tmp = _Maj(context)
+    T2 += tmp
+    T2 &= 0xFFFFFFFF
+
+    tmp = context[6] # h = g;
+    context[7] = tmp
+
+    tmp = context[5] # g = f;
+    context[6] = tmp
+
+    tmp = context[4] # f = e;
+    context[5] = tmp
+
+    tmp = context[3] # e = d + T1;
+    .add_no_carry(tmp, T1)
+    context[4] = tmp
+
+    tmp = context[2] # d = c;
+    context[3] = tmp
+
+    tmp = context[1] # c = b;
+    context[2] = tmp
+
+    tmp = context[0] # b = a;
+    context[1] = tmp
+
+    tmp = T1 + T2 # a = T1 + T2;
+    context[0] = tmp
+
+    inc counter
+    if counter < 64 goto ROUND_LOOP
+
+
+
+    # Combine with the old state.
     tmp = context[0]
-    a_save += tmp
-    a_save = a_save & 0xffffffff
-    context[0] = a_save
+    .add_no_carry(tmp, a_save)
+    context[0] = tmp
+
     tmp = context[1]
-    b_save += tmp
-    b_save = b_save & 0xffffffff
-    context[1] = b_save
+    .add_no_carry(tmp, b_save)
+    context[1] = tmp
+
     tmp = context[2]
-    c_save += tmp
-    c_save = c_save & 0xffffffff
-    context[2] = c_save
+    .add_no_carry(tmp, c_save)
+    context[2] = tmp
+
     tmp = context[3]
-    d_save += tmp
-    d_save = d_save & 0xffffffff
-    context[3] = d_save
+    .add_no_carry(tmp, d_save)
+    context[3] = tmp
+
     tmp = context[4]
-    e_save += tmp
-    e_save = e_save & 0xffffffff
-    context[4] = e_save
+    .add_no_carry(tmp, e_save)
+    context[4] = tmp
+
     tmp = context[5]
-    f_save += tmp
-    f_save = f_save & 0xffffffff
-    context[5] = f_save
+    .add_no_carry(tmp, f_save)
+    context[5] = tmp
+
     tmp = context[6]
-    g_save += tmp
-    g_save = g_save & 0xffffffff
-    context[6] = g_save
+    .add_no_carry(tmp, g_save)
+    context[6] = tmp
+
     tmp = context[7]
-    h_save += tmp
-    h_save = h_save & 0xffffffff
-    context[7] = h_save
+    .add_no_carry(tmp, h_save)
+    context[7] = tmp
 .end
 
 ###########################################################################

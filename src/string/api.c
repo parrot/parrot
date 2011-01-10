@@ -33,6 +33,8 @@ members, beside setting C<bufstart>/C<buflen> for external strings.
 STRING *STRINGNULL;
 #endif
 
+#define DEBUG_HASH_SEED 0
+
 #define nonnull_encoding_name(s) (s) ? (s)->encoding->name : "null string"
 #define ASSERT_STRING_SANITY(s) \
     PARROT_ASSERT((s)->encoding); \
@@ -137,6 +139,9 @@ Parrot_str_init(PARROT_INTERP)
         /* TT #64 - use an entropy source once available */
         Parrot_util_srand(Parrot_intval_time());
         interp->hash_seed = Parrot_util_uint_rand(0);
+#if DEBUG_HASH_SEED
+        fprintf(stderr, "HASH SEED: %x\n", interp->hash_seed);
+#endif
     }
 
     /* initialize the constant string table */
@@ -149,7 +154,7 @@ Parrot_str_init(PARROT_INTERP)
     }
 
     /* Set up the cstring cache, then load the basic encodings */
-    const_cstring_hash          = parrot_create_hash_sized(interp,
+    const_cstring_hash          = Parrot_hash_create_sized(interp,
                                         enum_type_PMC,
                                         Hash_key_type_cstring,
                                         n_parrot_cstrings);
@@ -174,7 +179,7 @@ Parrot_str_init(PARROT_INTERP)
                 parrot_cstrings[i].len,
                 Parrot_default_encoding_ptr,
                 PObj_external_FLAG|PObj_constant_FLAG);
-        parrot_hash_put(interp, const_cstring_hash,
+        Parrot_hash_put(interp, const_cstring_hash,
             PARROT_const_cast(char *, parrot_cstrings[i].string), (void *)s);
         interp->const_cstring_table[i] = s;
     }
@@ -202,7 +207,7 @@ Parrot_str_finish(PARROT_INTERP)
         mem_internal_free(interp->const_cstring_table);
         interp->const_cstring_table = NULL;
         Parrot_deinit_encodings(interp);
-        parrot_hash_destroy(interp, interp->const_cstring_hash);
+        Parrot_hash_destroy(interp, interp->const_cstring_hash);
     }
 }
 
@@ -616,7 +621,7 @@ Parrot_str_new_constant(PARROT_INTERP, ARGIN(const char *buffer))
     ASSERT_ARGS(Parrot_str_new_constant)
     DECL_CONST_CAST;
     Hash   * const cstring_cache = (Hash *)interp->const_cstring_hash;
-    STRING *s                    = (STRING *)parrot_hash_get(interp,
+    STRING *s                    = (STRING *)Parrot_hash_get(interp,
                                         cstring_cache, buffer);
 
     if (s)
@@ -626,7 +631,7 @@ Parrot_str_new_constant(PARROT_INTERP, ARGIN(const char *buffer))
                        Parrot_default_encoding_ptr,
                        PObj_external_FLAG|PObj_constant_FLAG);
 
-    parrot_hash_put(interp, cstring_cache,
+    Parrot_hash_put(interp, cstring_cache,
         PARROT_const_cast(char *, buffer), (void *)s);
 
     return s;
@@ -2092,9 +2097,11 @@ string_to_cstring_nullable(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
     if (STRING_IS_NULL(s))
         return NULL;
     else {
-        char * const p = (char*)mem_internal_allocate(s->bufused + 1);
+        char * const p = (char*)mem_internal_allocate(s->bufused + 2);
         memcpy(p, s->strstart, s->bufused);
-        p[s->bufused] = '\0';
+        /* Two trailing NULs for wide char strings */
+        p[s->bufused]   = '\0';
+        p[s->bufused+1] = '\0';
         return p;
     }
 }
