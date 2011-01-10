@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 30;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -1000,6 +1000,75 @@ CODE
 ok 1 - read/seek 3 bytes
 ok 2 - read/seek eof
 ok 3 - read/seek tell
+OUT
+
+# The code path we want to test here is a bit hard to trigger
+pir_output_is( <<"CODE", <<'OUT', 'partial multibyte char in buffer' );
+.sub test :main
+    .local pmc fh
+    .local string str, line
+    .local int pos, i
+
+    fh = new 'FileHandle'
+    fh.'open'('$temp_file', 'rw')
+
+    # set a buffer size of 6000 and utf8 encoding
+    fh.'buffer_size'(6000)
+    fh.'encoding'('utf8')
+
+    # write 599 lines, 5990 bytes
+    i = 0
+  print_loop:
+    fh.'print'("123456789\\n")
+    inc i
+    if i < 599 goto print_loop
+
+    # now write a final line with a utf8 character that will be split
+    # across buffers
+    line = utf8:"123456789\\x{2022}"
+    fh.'print'(line)
+
+    str = read_600_lines(fh)
+    i = iseq str, line
+    say i
+
+    str = fh.'readline'()
+    i = length str
+    say i
+
+    # test it again with a different setting
+
+    fh.'seek'(1, -12)
+    line = utf8:"12345678\\x{2022}#############\\n"
+    fh.'print'(line)
+    fh.'print'("####\\n###########\\n")
+
+    str = read_600_lines(fh)
+    i = iseq str, line
+    say i
+
+    fh.'close'()
+.end
+
+.sub read_600_lines
+    .param pmc fh
+    .local int i
+    .local string str
+
+    fh.'seek'(0, 0)
+
+    i = 0
+  read_loop:
+    str = fh.'readline'()
+    inc i
+    if i < 600 goto read_loop
+
+    .return (str)
+.end
+CODE
+1
+0
+1
 OUT
 
 # TT #1178
