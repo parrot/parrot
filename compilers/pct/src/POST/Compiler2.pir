@@ -1,6 +1,6 @@
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1294661331.09424")
+.sub "_block11"  :anon :subid("10_1294661401.97402")
 .annotate 'line', 0
     get_hll_global $P14, ["POST";"Compiler"], "_block13" 
     capture_lex $P14
@@ -17,77 +17,77 @@
     $P1495 = $P14()
 .annotate 'line', 1
     .return ($P1495)
-    .const 'Sub' $P1497 = "64_1294661331.09424" 
+    .const 'Sub' $P1497 = "64_1294661401.97402" 
     .return ($P1497)
 .end
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block13"  :subid("11_1294661331.09424") :outer("10_1294661331.09424")
+.sub "_block13"  :subid("11_1294661401.97402") :outer("10_1294661401.97402")
 .annotate 'line', 32
-    .const 'Sub' $P1451 = "62_1294661331.09424" 
+    .const 'Sub' $P1451 = "62_1294661401.97402" 
     capture_lex $P1451
-    .const 'Sub' $P1435 = "60_1294661331.09424" 
+    .const 'Sub' $P1435 = "60_1294661401.97402" 
     capture_lex $P1435
-    .const 'Sub' $P1408 = "59_1294661331.09424" 
+    .const 'Sub' $P1408 = "59_1294661401.97402" 
     capture_lex $P1408
-    .const 'Sub' $P1330 = "57_1294661331.09424" 
+    .const 'Sub' $P1330 = "57_1294661401.97402" 
     capture_lex $P1330
-    .const 'Sub' $P1294 = "56_1294661331.09424" 
+    .const 'Sub' $P1294 = "56_1294661401.97402" 
     capture_lex $P1294
-    .const 'Sub' $P1242 = "55_1294661331.09424" 
+    .const 'Sub' $P1242 = "55_1294661401.97402" 
     capture_lex $P1242
-    .const 'Sub' $P1216 = "53_1294661331.09424" 
+    .const 'Sub' $P1216 = "53_1294661401.97402" 
     capture_lex $P1216
-    .const 'Sub' $P1097 = "52_1294661331.09424" 
+    .const 'Sub' $P1097 = "52_1294661401.97402" 
     capture_lex $P1097
-    .const 'Sub' $P1029 = "48_1294661331.09424" 
+    .const 'Sub' $P1029 = "48_1294661401.97402" 
     capture_lex $P1029
-    .const 'Sub' $P953 = "45_1294661331.09424" 
+    .const 'Sub' $P953 = "45_1294661401.97402" 
     capture_lex $P953
-    .const 'Sub' $P913 = "44_1294661331.09424" 
+    .const 'Sub' $P913 = "44_1294661401.97402" 
     capture_lex $P913
-    .const 'Sub' $P905 = "43_1294661331.09424" 
+    .const 'Sub' $P905 = "43_1294661401.97402" 
     capture_lex $P905
-    .const 'Sub' $P889 = "42_1294661331.09424" 
+    .const 'Sub' $P889 = "42_1294661401.97402" 
     capture_lex $P889
-    .const 'Sub' $P844 = "40_1294661331.09424" 
+    .const 'Sub' $P844 = "40_1294661401.97402" 
     capture_lex $P844
-    .const 'Sub' $P804 = "39_1294661331.09424" 
+    .const 'Sub' $P804 = "39_1294661401.97402" 
     capture_lex $P804
-    .const 'Sub' $P779 = "38_1294661331.09424" 
+    .const 'Sub' $P779 = "38_1294661401.97402" 
     capture_lex $P779
-    .const 'Sub' $P543 = "34_1294661331.09424" 
+    .const 'Sub' $P543 = "34_1294661401.97402" 
     capture_lex $P543
-    .const 'Sub' $P497 = "32_1294661331.09424" 
+    .const 'Sub' $P497 = "32_1294661401.97402" 
     capture_lex $P497
-    .const 'Sub' $P476 = "30_1294661331.09424" 
+    .const 'Sub' $P476 = "30_1294661401.97402" 
     capture_lex $P476
-    .const 'Sub' $P384 = "27_1294661331.09424" 
+    .const 'Sub' $P384 = "27_1294661401.97402" 
     capture_lex $P384
-    .const 'Sub' $P117 = "24_1294661331.09424" 
+    .const 'Sub' $P117 = "24_1294661401.97402" 
     capture_lex $P117
-    .const 'Sub' $P111 = "23_1294661331.09424" 
+    .const 'Sub' $P111 = "23_1294661401.97402" 
     capture_lex $P111
-    .const 'Sub' $P77 = "21_1294661331.09424" 
+    .const 'Sub' $P77 = "21_1294661401.97402" 
     capture_lex $P77
-    .const 'Sub' $P71 = "20_1294661331.09424" 
+    .const 'Sub' $P71 = "20_1294661401.97402" 
     capture_lex $P71
-    .const 'Sub' $P66 = "19_1294661331.09424" 
+    .const 'Sub' $P66 = "19_1294661401.97402" 
     capture_lex $P66
-    .const 'Sub' $P53 = "18_1294661331.09424" 
+    .const 'Sub' $P53 = "18_1294661401.97402" 
     capture_lex $P53
-    .const 'Sub' $P47 = "17_1294661331.09424" 
+    .const 'Sub' $P47 = "17_1294661401.97402" 
     capture_lex $P47
-    .const 'Sub' $P39 = "16_1294661331.09424" 
+    .const 'Sub' $P39 = "16_1294661401.97402" 
     capture_lex $P39
-    .const 'Sub' $P34 = "15_1294661331.09424" 
+    .const 'Sub' $P34 = "15_1294661401.97402" 
     capture_lex $P34
-    .const 'Sub' $P28 = "14_1294661331.09424" 
+    .const 'Sub' $P28 = "14_1294661401.97402" 
     capture_lex $P28
-    .const 'Sub' $P23 = "13_1294661331.09424" 
+    .const 'Sub' $P23 = "13_1294661401.97402" 
     capture_lex $P23
-    .const 'Sub' $P15 = "12_1294661331.09424" 
+    .const 'Sub' $P15 = "12_1294661401.97402" 
     capture_lex $P15
     $P0 = find_dynamic_lex "$*CTXSAVE"
     if null $P0 goto ctxsave_done
@@ -96,13 +96,13 @@
     $P0."ctxsave"()
   ctxsave_done:
     .return ()
-    .const 'Sub' $P1492 = "63_1294661331.09424" 
+    .const 'Sub' $P1492 = "63_1294661401.97402" 
     .return ($P1492)
 .end
 
 
 .namespace ["POST";"Compiler"]
-.sub "" :load :init :subid("post65") :outer("11_1294661331.09424")
+.sub "" :load :init :subid("post65") :outer("11_1294661401.97402")
 .annotate 'line', 32
     get_hll_global $P14, ["POST";"Compiler"], "_block13" 
     .local pmc block
@@ -114,7 +114,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "escape" :nsentry :subid("12_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "escape" :nsentry :subid("12_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_18
 .annotate 'line', 32
     new $P17, ['ExceptionHandler'], .CONTROL_RETURN
@@ -138,7 +138,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "key_pir" :nsentry :subid("13_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "key_pir" :nsentry :subid("13_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_26 :slurpy
 .annotate 'line', 40
     new $P25, ['ExceptionHandler'], .CONTROL_RETURN
@@ -185,7 +185,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "to_pir" :nsentry :subid("14_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "to_pir" :nsentry :subid("14_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_31
     .param pmc param_32 :slurpy :named
 .annotate 'line', 70
@@ -237,7 +237,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "_pir_children" :nsentry :subid("15_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "pir_children" :nsentry :subid("15_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_37
 .annotate 'line', 105
     new $P36, ['ExceptionHandler'], .CONTROL_RETURN
@@ -283,7 +283,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "_pir" :nsentry :subid("16_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,_)
+.sub "_pir" :nsentry :subid("16_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,_)
     .param pmc param_42
 .annotate 'line', 137
     new $P41, ['ExceptionHandler'], .CONTROL_RETURN
@@ -307,7 +307,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "__pir" :nsentry :subid("17_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,["POST";"Op"])
+.sub "__pir" :nsentry :subid("17_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,["POST";"Op"])
     .param pmc param_50
 .annotate 'line', 145
     new $P49, ['ExceptionHandler'], .CONTROL_RETURN
@@ -402,7 +402,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "_pir" :nsentry :subid("18_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,["POST";"Label"])
+.sub "_pir" :nsentry :subid("18_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,["POST";"Label"])
     .param pmc param_56
 .annotate 'line', 226
     new $P55, ['ExceptionHandler'], .CONTROL_RETURN
@@ -435,7 +435,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "_pir" :nsentry :subid("19_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,["POST";"Sub"])
+.sub "_pir" :nsentry :subid("19_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,["POST";"Sub"])
     .param pmc param_69
 .annotate 'line', 237
     new $P68, ['ExceptionHandler'], .CONTROL_RETURN
@@ -610,7 +610,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "hll_pir" :nsentry :subid("20_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "hll_pir" :nsentry :subid("20_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_74
     .param pmc param_75 :slurpy :named
 .annotate 'line', 394
@@ -655,11 +655,11 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "pbc"  :subid("21_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "pbc"  :subid("21_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_80
     .param pmc param_81
 .annotate 'line', 436
-    .const 'Sub' $P99 = "22_1294661331.09424" 
+    .const 'Sub' $P99 = "22_1294661401.97402" 
     capture_lex $P99
     new $P79, ['ExceptionHandler'], .CONTROL_RETURN
     set_addr $P79, control_78
@@ -710,7 +710,7 @@
     unless $P93, loop105_done
     shift $P97, $P93
   loop105_redo:
-    .const 'Sub' $P99 = "22_1294661331.09424" 
+    .const 'Sub' $P99 = "22_1294661401.97402" 
     capture_lex $P99
     $P99($P97)
   loop105_next:
@@ -743,7 +743,7 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block98"  :anon :subid("22_1294661331.09424") :outer("21_1294661331.09424")
+.sub "_block98"  :anon :subid("22_1294661401.97402") :outer("21_1294661401.97402")
     .param pmc param_100
 .annotate 'line', 450
     .lex "$s", param_100
@@ -759,7 +759,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "to_pbc" :nsentry :subid("23_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,["Undef"],_)
+.sub "to_pbc" :nsentry :subid("23_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,["Undef"],_)
     .param pmc param_114
     .param pmc param_115
 .annotate 'line', 460
@@ -780,13 +780,13 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "to_pbc" :nsentry :subid("24_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,["POST";"Sub"],_)
+.sub "to_pbc" :nsentry :subid("24_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,["POST";"Sub"],_)
     .param pmc param_120
     .param pmc param_121
 .annotate 'line', 464
-    .const 'Sub' $P286 = "26_1294661331.09424" 
+    .const 'Sub' $P286 = "26_1294661401.97402" 
     capture_lex $P286
-    .const 'Sub' $P207 = "25_1294661331.09424" 
+    .const 'Sub' $P207 = "25_1294661401.97402" 
     capture_lex $P207
     new $P119, ['ExceptionHandler'], .CONTROL_RETURN
     set_addr $P119, control_118
@@ -1026,7 +1026,7 @@
     unless $P201, loop213_done
     shift $P205, $P201
   loop213_redo:
-    .const 'Sub' $P207 = "25_1294661331.09424" 
+    .const 'Sub' $P207 = "25_1294661401.97402" 
     capture_lex $P207
     $P207($P205)
   loop213_next:
@@ -1187,7 +1187,7 @@
     $P283 = $P282."namespace"()
     $P284 = "defined"($P283)
     unless $P284, if_281_end
-    .const 'Sub' $P286 = "26_1294661331.09424" 
+    .const 'Sub' $P286 = "26_1294661401.97402" 
     capture_lex $P286
     $P286()
   if_281_end:
@@ -1433,7 +1433,7 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block206"  :anon :subid("25_1294661331.09424") :outer("24_1294661331.09424")
+.sub "_block206"  :anon :subid("25_1294661401.97402") :outer("24_1294661401.97402")
     .param pmc param_208
 .annotate 'line', 498
     .lex "$_", param_208
@@ -1448,7 +1448,7 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block285"  :anon :subid("26_1294661331.09424") :outer("24_1294661331.09424")
+.sub "_block285"  :anon :subid("26_1294661401.97402") :outer("24_1294661401.97402")
 .annotate 'line', 540
     new $P287, "Undef"
     .lex "$nskey", $P287
@@ -1488,13 +1488,13 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "to_pbc" :nsentry :subid("27_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,["POST";"Op"],_)
+.sub "to_pbc" :nsentry :subid("27_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,["POST";"Op"],_)
     .param pmc param_387
     .param pmc param_388
 .annotate 'line', 579
-    .const 'Sub' $P451 = "29_1294661331.09424" 
+    .const 'Sub' $P451 = "29_1294661401.97402" 
     capture_lex $P451
-    .const 'Sub' $P406 = "28_1294661331.09424" 
+    .const 'Sub' $P406 = "28_1294661401.97402" 
     capture_lex $P406
     new $P386, ['ExceptionHandler'], .CONTROL_RETURN
     set_addr $P386, control_385
@@ -1543,7 +1543,7 @@
     unless $P400, loop426_done
     shift $P404, $P400
   loop426_redo:
-    .const 'Sub' $P406 = "28_1294661331.09424" 
+    .const 'Sub' $P406 = "28_1294661401.97402" 
     capture_lex $P406
     $P406($P404)
   loop426_next:
@@ -1618,7 +1618,7 @@
     unless $P445, loop459_done
     shift $P449, $P445
   loop459_redo:
-    .const 'Sub' $P451 = "29_1294661331.09424" 
+    .const 'Sub' $P451 = "29_1294661401.97402" 
     capture_lex $P451
     $P451($P449)
   loop459_next:
@@ -1673,7 +1673,7 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block405"  :anon :subid("28_1294661331.09424") :outer("27_1294661331.09424")
+.sub "_block405"  :anon :subid("28_1294661401.97402") :outer("27_1294661401.97402")
     .param pmc param_408
 .annotate 'line', 585
     new $P407, "Undef"
@@ -1710,7 +1710,7 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block450"  :anon :subid("29_1294661331.09424") :outer("27_1294661331.09424")
+.sub "_block450"  :anon :subid("29_1294661401.97402") :outer("27_1294661401.97402")
     .param pmc param_452
 .annotate 'line', 597
     .lex "$_", param_452
@@ -1728,11 +1728,11 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "to_pbc" :nsentry :subid("30_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,["POST";"Node"],_)
+.sub "to_pbc" :nsentry :subid("30_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,["POST";"Node"],_)
     .param pmc param_479
     .param pmc param_480
 .annotate 'line', 605
-    .const 'Sub' $P487 = "31_1294661331.09424" 
+    .const 'Sub' $P487 = "31_1294661401.97402" 
     capture_lex $P487
     new $P478, ['ExceptionHandler'], .CONTROL_RETURN
     set_addr $P478, control_477
@@ -1754,7 +1754,7 @@
     unless $P481, loop493_done
     shift $P485, $P481
   loop493_redo:
-    .const 'Sub' $P487 = "31_1294661331.09424" 
+    .const 'Sub' $P487 = "31_1294661401.97402" 
     capture_lex $P487
     $P487($P485)
   loop493_next:
@@ -1779,7 +1779,7 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block486"  :anon :subid("31_1294661331.09424") :outer("30_1294661331.09424")
+.sub "_block486"  :anon :subid("31_1294661401.97402") :outer("30_1294661401.97402")
     .param pmc param_488
 .annotate 'line', 606
     .lex "$_", param_488
@@ -1795,11 +1795,11 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "to_pbc" :nsentry :subid("32_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,["POST";"Label"],_)
+.sub "to_pbc" :nsentry :subid("32_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,["POST";"Label"],_)
     .param pmc param_500
     .param pmc param_501
 .annotate 'line', 611
-    .const 'Sub' $P533 = "33_1294661331.09424" 
+    .const 'Sub' $P533 = "33_1294661401.97402" 
     capture_lex $P533
     new $P499, ['ExceptionHandler'], .CONTROL_RETURN
     set_addr $P499, control_498
@@ -1876,7 +1876,7 @@
     unless $P527, loop539_done
     shift $P531, $P527
   loop539_redo:
-    .const 'Sub' $P533 = "33_1294661331.09424" 
+    .const 'Sub' $P533 = "33_1294661401.97402" 
     capture_lex $P533
     $P533($P531)
   loop539_next:
@@ -1901,7 +1901,7 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block532"  :anon :subid("33_1294661331.09424") :outer("32_1294661331.09424")
+.sub "_block532"  :anon :subid("33_1294661401.97402") :outer("32_1294661401.97402")
     .param pmc param_534
 .annotate 'line', 620
     .lex "$_", param_534
@@ -1917,11 +1917,11 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "to_pbc" :nsentry :subid("34_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,["POST";"Call"],_)
+.sub "to_pbc" :nsentry :subid("34_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,["POST";"Call"],_)
     .param pmc param_546
     .param pmc param_547
 .annotate 'line', 625
-    .const 'Sub' $P612 = "35_1294661331.09424" 
+    .const 'Sub' $P612 = "35_1294661401.97402" 
     capture_lex $P612
     new $P545, ['ExceptionHandler'], .CONTROL_RETURN
     set_addr $P545, control_544
@@ -2093,7 +2093,7 @@
     $P587 = $P586."invocant"()
     if $P587, if_585
 .annotate 'line', 652
-    .const 'Sub' $P612 = "35_1294661331.09424" 
+    .const 'Sub' $P612 = "35_1294661401.97402" 
     capture_lex $P612
     $P612()
     goto if_585_end
@@ -2178,9 +2178,9 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block611"  :anon :subid("35_1294661331.09424") :outer("34_1294661331.09424")
+.sub "_block611"  :anon :subid("35_1294661401.97402") :outer("34_1294661401.97402")
 .annotate 'line', 652
-    .const 'Sub' $P624 = "36_1294661331.09424" 
+    .const 'Sub' $P624 = "36_1294661401.97402" 
     capture_lex $P624
 .annotate 'line', 653
     new $P613, "Undef"
@@ -2203,7 +2203,7 @@
     get_hll_global $P621, ["POST"], "Constant"
     $P622 = $P620."isa"($P621)
     unless $P622, if_618_end
-    .const 'Sub' $P624 = "36_1294661331.09424" 
+    .const 'Sub' $P624 = "36_1294661401.97402" 
     capture_lex $P624
     $P624()
   if_618_end:
@@ -2335,9 +2335,9 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block623"  :anon :subid("36_1294661331.09424") :outer("35_1294661331.09424")
+.sub "_block623"  :anon :subid("36_1294661401.97402") :outer("35_1294661401.97402")
 .annotate 'line', 655
-    .const 'Sub' $P660 = "37_1294661331.09424" 
+    .const 'Sub' $P660 = "37_1294661401.97402" 
     capture_lex $P660
 .annotate 'line', 658
     new $P625, "Undef"
@@ -2426,7 +2426,7 @@
     set $P656, $P658
     goto if_657_end
   if_657:
-    .const 'Sub' $P660 = "37_1294661331.09424" 
+    .const 'Sub' $P660 = "37_1294661401.97402" 
     capture_lex $P660
     $P691 = $P660()
     set $P656, $P691
@@ -2437,7 +2437,7 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block659"  :anon :subid("37_1294661331.09424") :outer("36_1294661331.09424")
+.sub "_block659"  :anon :subid("37_1294661401.97402") :outer("36_1294661401.97402")
 .annotate 'line', 664
     new $P661, "Undef"
     .lex "$idx", $P661
@@ -2518,7 +2518,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "to_op" :nsentry :subid("38_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,["POST";"Key"],_)
+.sub "to_op" :nsentry :subid("38_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,["POST";"Key"],_)
     .param pmc param_782
     .param pmc param_783
 .annotate 'line', 724
@@ -2609,7 +2609,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "to_op" :nsentry :subid("39_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,["POST";"Constant"],_)
+.sub "to_op" :nsentry :subid("39_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,["POST";"Constant"],_)
     .param pmc param_807
     .param pmc param_808
 .annotate 'line', 751
@@ -2710,11 +2710,11 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "to_op" :nsentry :subid("40_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,["POST";"String"],_)
+.sub "to_op" :nsentry :subid("40_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,["POST";"String"],_)
     .param pmc param_847
     .param pmc param_848
 .annotate 'line', 768
-    .const 'Sub' $P874 = "41_1294661331.09424" 
+    .const 'Sub' $P874 = "41_1294661401.97402" 
     capture_lex $P874
     new $P846, ['ExceptionHandler'], .CONTROL_RETURN
     set_addr $P846, control_845
@@ -2760,7 +2760,7 @@
   if_861_end:
     if $P860, if_859
 .annotate 'line', 777
-    .const 'Sub' $P874 = "41_1294661331.09424" 
+    .const 'Sub' $P874 = "41_1294661401.97402" 
     capture_lex $P874
     $P874()
     goto if_859_end
@@ -2792,7 +2792,7 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block873"  :anon :subid("41_1294661331.09424") :outer("40_1294661331.09424")
+.sub "_block873"  :anon :subid("41_1294661401.97402") :outer("40_1294661401.97402")
 .annotate 'line', 779
     new $P875, "Undef"
     .lex "$bb", $P875
@@ -2839,7 +2839,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "to_op" :nsentry :subid("42_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,["POST";"Value"],_)
+.sub "to_op" :nsentry :subid("42_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,["POST";"Value"],_)
     .param pmc param_892
     .param pmc param_893
 .annotate 'line', 797
@@ -2875,7 +2875,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "to_op" :nsentry :subid("43_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,["POST";"Register"],_)
+.sub "to_op" :nsentry :subid("43_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,["POST";"Register"],_)
     .param pmc param_908
     .param pmc param_909
 .annotate 'line', 803
@@ -2900,7 +2900,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "to_op" :nsentry :subid("44_1294661331.09424") :method :outer("11_1294661331.09424") :multi(_,["POST";"Label"],_)
+.sub "to_op" :nsentry :subid("44_1294661401.97402") :method :outer("11_1294661401.97402") :multi(_,["POST";"Label"],_)
     .param pmc param_916
     .param pmc param_917
 .annotate 'line', 807
@@ -3010,12 +3010,12 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "build_pcc_call" :nsentry :subid("45_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "build_pcc_call" :nsentry :subid("45_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_956
     .param pmc param_957
     .param pmc param_958
 .annotate 'line', 830
-    .const 'Sub' $P993 = "46_1294661331.09424" 
+    .const 'Sub' $P993 = "46_1294661401.97402" 
     capture_lex $P993
     new $P955, ['ExceptionHandler'], .CONTROL_RETURN
     set_addr $P955, control_954
@@ -3113,7 +3113,7 @@
     unless $P988, loop1022_done
     shift $P991, $P988
   loop1022_redo:
-    .const 'Sub' $P993 = "46_1294661331.09424" 
+    .const 'Sub' $P993 = "46_1294661401.97402" 
     capture_lex $P993
     $P993($P991)
   loop1022_next:
@@ -3142,10 +3142,10 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block992"  :anon :subid("46_1294661331.09424") :outer("45_1294661331.09424")
+.sub "_block992"  :anon :subid("46_1294661401.97402") :outer("45_1294661401.97402")
     .param pmc param_994
 .annotate 'line', 842
-    .const 'Sub' $P1000 = "47_1294661331.09424" 
+    .const 'Sub' $P1000 = "47_1294661401.97402" 
     capture_lex $P1000
     .lex "$arg", param_994
 .annotate 'line', 844
@@ -3153,7 +3153,7 @@
     $P997 = $P996."modifier"()
     isa $I998, $P997, "Hash"
     unless $I998, if_995_end
-    .const 'Sub' $P1000 = "47_1294661331.09424" 
+    .const 'Sub' $P1000 = "47_1294661401.97402" 
     capture_lex $P1000
     $P1000()
   if_995_end:
@@ -3170,7 +3170,7 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block999"  :anon :subid("47_1294661331.09424") :outer("46_1294661331.09424")
+.sub "_block999"  :anon :subid("47_1294661401.97402") :outer("46_1294661401.97402")
 .annotate 'line', 845
     new $P1001, "Undef"
     .lex "$name", $P1001
@@ -3209,13 +3209,13 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "build_args_signature" :nsentry :subid("48_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "build_args_signature" :nsentry :subid("48_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_1032
     .param pmc param_1033
 .annotate 'line', 856
-    .const 'Sub' $P1084 = "51_1294661331.09424" 
+    .const 'Sub' $P1084 = "51_1294661401.97402" 
     capture_lex $P1084
-    .const 'Sub' $P1044 = "49_1294661331.09424" 
+    .const 'Sub' $P1044 = "49_1294661401.97402" 
     capture_lex $P1044
     new $P1031, ['ExceptionHandler'], .CONTROL_RETURN
     set_addr $P1031, control_1030
@@ -3250,7 +3250,7 @@
     unless $P1039, loop1071_done
     shift $P1042, $P1039
   loop1071_redo:
-    .const 'Sub' $P1044 = "49_1294661331.09424" 
+    .const 'Sub' $P1044 = "49_1294661401.97402" 
     capture_lex $P1044
     $P1044($P1042)
   loop1071_next:
@@ -3295,7 +3295,7 @@
     unless $P1079, loop1092_done
     shift $P1082, $P1079
   loop1092_redo:
-    .const 'Sub' $P1084 = "51_1294661331.09424" 
+    .const 'Sub' $P1084 = "51_1294661401.97402" 
     capture_lex $P1084
     $P1084($P1082)
   loop1092_next:
@@ -3322,10 +3322,10 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "_block1043"  :anon :subid("49_1294661331.09424") :outer("48_1294661331.09424")
+.sub "_block1043"  :anon :subid("49_1294661401.97402") :outer("48_1294661401.97402")
     .param pmc param_1045
 .annotate 'line', 858
-    .const 'Sub' $P1063 = "50_1294661331.09424" 
+    .const 'Sub' $P1063 = "50_1294661401.97402" 
     capture_lex $P1063
     .lex "$arg", param_1045
 .annotate 'line', 860
@@ -3353,7 +3353,7 @@
     unless $P1058, loop1068_done
     shift $P1061, $P1058
   loop1068_redo:
-    .const 'Sub' $P1063 = "50_1294661331.09424" 
+    .const 'Sub' $P1063 = "50_1294661401.97402" 
     capture_lex $P1063
     $P1063($P1061)
   loop1068_next:
@@ -3385,7 +3385,7 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block1062"  :anon :subid("50_1294661331.09424") :outer("49_1294661331.09424")
+.sub "_block1062"  :anon :subid("50_1294661401.97402") :outer("49_1294661401.97402")
     .param pmc param_1064
 .annotate 'line', 865
     .lex "$_", param_1064
@@ -3397,7 +3397,7 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block1083"  :anon :subid("51_1294661331.09424") :outer("48_1294661331.09424")
+.sub "_block1083"  :anon :subid("51_1294661401.97402") :outer("48_1294661401.97402")
     .param pmc param_1085
 .annotate 'line', 880
     .lex "$val", param_1085
@@ -3421,7 +3421,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "build_single_arg" :nsentry :subid("52_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "build_single_arg" :nsentry :subid("52_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_1100
     .param pmc param_1101
 .annotate 'line', 888
@@ -3670,10 +3670,10 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "enumerate_subs" :nsentry :subid("53_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "enumerate_subs" :nsentry :subid("53_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_1219
 .annotate 'line', 930
-    .const 'Sub' $P1226 = "54_1294661331.09424" 
+    .const 'Sub' $P1226 = "54_1294661401.97402" 
     capture_lex $P1226
     new $P1218, ['ExceptionHandler'], .CONTROL_RETURN
     set_addr $P1218, control_1217
@@ -3694,7 +3694,7 @@
     unless $P1220, loop1238_done
     shift $P1224, $P1220
   loop1238_redo:
-    .const 'Sub' $P1226 = "54_1294661331.09424" 
+    .const 'Sub' $P1226 = "54_1294661401.97402" 
     capture_lex $P1226
     $P1226($P1224)
   loop1238_next:
@@ -3719,7 +3719,7 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block1225"  :anon :subid("54_1294661331.09424") :outer("53_1294661331.09424")
+.sub "_block1225"  :anon :subid("54_1294661401.97402") :outer("53_1294661401.97402")
     .param pmc param_1227
 .annotate 'line', 931
     .lex "$sub", param_1227
@@ -3745,7 +3745,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "create_sub_pf_flags" :nsentry :subid("55_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "create_sub_pf_flags" :nsentry :subid("55_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_1245
     .param pmc param_1246
 .annotate 'line', 938
@@ -3845,7 +3845,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "create_sub_comp_flags" :nsentry :subid("56_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "create_sub_comp_flags" :nsentry :subid("56_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_1297
     .param pmc param_1298
 .annotate 'line', 959
@@ -3923,13 +3923,13 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "fixup_labels" :nsentry :subid("57_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "fixup_labels" :nsentry :subid("57_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_1333
     .param pmc param_1334
     .param pmc param_1335
     .param pmc param_1336
 .annotate 'line', 975
-    .const 'Sub' $P1346 = "58_1294661331.09424" 
+    .const 'Sub' $P1346 = "58_1294661401.97402" 
     capture_lex $P1346
     new $P1332, ['ExceptionHandler'], .CONTROL_RETURN
     set_addr $P1332, control_1331
@@ -3965,7 +3965,7 @@
     unless $P1341, loop1404_done
     shift $P1344, $P1341
   loop1404_redo:
-    .const 'Sub' $P1346 = "58_1294661331.09424" 
+    .const 'Sub' $P1346 = "58_1294661401.97402" 
     capture_lex $P1346
     $P1346($P1344)
   loop1404_next:
@@ -3990,7 +3990,7 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block1345"  :anon :subid("58_1294661331.09424") :outer("57_1294661331.09424")
+.sub "_block1345"  :anon :subid("58_1294661401.97402") :outer("57_1294661401.97402")
     .param pmc param_1347
 .annotate 'line', 977
     .lex "$kv", param_1347
@@ -4132,7 +4132,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "get_register" :nsentry :subid("59_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "get_register" :nsentry :subid("59_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_1411
     .param pmc param_1412
 .annotate 'line', 992
@@ -4196,10 +4196,10 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "debug"  :subid("60_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "debug"  :subid("60_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_1438 :slurpy
 .annotate 'line', 1000
-    .const 'Sub' $P1444 = "61_1294661331.09424" 
+    .const 'Sub' $P1444 = "61_1294661401.97402" 
     capture_lex $P1444
     new $P1437, ['ExceptionHandler'], .CONTROL_RETURN
     set_addr $P1437, control_1436
@@ -4219,7 +4219,7 @@
     unless $P1439, loop1447_done
     shift $P1442, $P1439
   loop1447_redo:
-    .const 'Sub' $P1444 = "61_1294661331.09424" 
+    .const 'Sub' $P1444 = "61_1294661401.97402" 
     capture_lex $P1444
     $P1444($P1442)
   loop1447_next:
@@ -4244,7 +4244,7 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block1443"  :anon :subid("61_1294661331.09424") :outer("60_1294661331.09424")
+.sub "_block1443"  :anon :subid("61_1294661401.97402") :outer("60_1294661401.97402")
     .param pmc param_1445
 .annotate 'line', 1001
     .lex "$_", param_1445
@@ -4258,7 +4258,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "create_context" :nsentry :subid("62_1294661331.09424") :method :outer("11_1294661331.09424")
+.sub "create_context" :nsentry :subid("62_1294661401.97402") :method :outer("11_1294661401.97402")
     .param pmc param_1454
     .param pmc param_1455
 .annotate 'line', 1006
@@ -4417,18 +4417,18 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block1491" :load :anon :subid("63_1294661331.09424")
+.sub "_block1491" :load :anon :subid("63_1294661401.97402")
 .annotate 'line', 32
-    .const 'Sub' $P1493 = "11_1294661331.09424" 
+    .const 'Sub' $P1493 = "11_1294661401.97402" 
     $P1494 = $P1493()
     .return ($P1494)
 .end
 
 
 .namespace []
-.sub "_block1496" :load :anon :subid("64_1294661331.09424")
+.sub "_block1496" :load :anon :subid("64_1294661401.97402")
 .annotate 'line', 1
-    .const 'Sub' $P1498 = "10_1294661331.09424" 
+    .const 'Sub' $P1498 = "10_1294661401.97402" 
     $P1499 = $P1498()
     .return ($P1499)
 .end

@@ -102,7 +102,7 @@ our method to_pir($post, *%adverbs) {
 =item pir_children(node)
 Return generated PIR for C<node> and all of its children.
 
-our method _pir_children($node) {
+our method pir_children($node) {
     Q:PIR {
     .local pmc node
     find_lex node, '$node'

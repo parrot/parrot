@@ -33,37 +33,6 @@ PIR or an Eval PMC (bytecode).
 
 
 
-=item pir_children(node)
-
-Return generated PIR for C<node> and all of its children.
-
-=cut
-
-.sub 'pir_children' :method
-    .param pmc node
-    .local pmc line
-    line = find_caller_lex '$LINE'
-    .lex '$LINE', line
-
-    .local pmc iter
-    iter = node.'iterator'()
-  iter_loop:
-    unless iter goto iter_end
-    .local pmc cpost, pos, source
-    cpost = shift iter
-    pos = cpost['pos']
-    if null pos goto done_subline
-    source = cpost['source']
-    if null source goto done_subline
-    line = self.'lineof'(source, pos, 'cache'=>1)
-    inc line
-  done_subline:
-    self.'pir'(cpost)
-    goto iter_loop
-  iter_end:
-.end
-
-
 =item pir(Any node)
 
 Return generated pir for any POST::Node.  Returns
