@@ -98,7 +98,7 @@ Parrot_api_get_exception_backtrace(Parrot_PMC interp_pmc,
     if (PMC_IS_NULL(exception))
         *bt = STRINGNULL;
     else
-        *bt = Parrot_ex_get_complete_backtrace_string(interp, exception);
+        *bt = Parrot_ex_build_complete_backtrace_string(interp, exception);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
