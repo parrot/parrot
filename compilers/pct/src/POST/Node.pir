@@ -21,15 +21,6 @@ for compiling programs in Parrot.
     p6meta.'new_class'('POST::Ops', 'parent'=>base)
     p6meta.'new_class'('POST::Sub', 'parent'=>base)
 
-    $P0 = new 'ResizableStringArray'
-    $P0[0] = "    .param pmc %0\n"
-    $P0[1] = "    .param pmc %0 :optional\n    .param int has_%0 :opt_flag\n"
-    $P0[2] = "    .param pmc %0 :slurpy\n"
-    $P0[4] = "    .param pmc %0 :named(%1)\n"
-    $P0[5] = "    .param pmc %0 :optional :named(%1)\n    .param int has_%0 :opt_flag\n"
-    $P0[6] = "    .param pmc %0 :slurpy :named\n"
-    $P0[8] = "    .param pmc %0 :call_sig\n"
-    set_hll_global ['POST';'Sub'], '%!paramfmt', $P0
     .return ()
 .end
 
@@ -166,7 +157,7 @@ C<POST::Compiler.escape>.)
   have_code:
 
     .local pmc paramfmt
-    paramfmt = get_hll_global ['POST';'Sub'], '%!paramfmt'
+    paramfmt = get_hll_global ['POST';'Sub'], '@paramfmt'
     $S0 = paramfmt[paramseq]
     named = self.'escape'(named)
     code.'append_format'($S0, pname, named)
