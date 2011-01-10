@@ -15,13 +15,11 @@ Tests the Float PMC.
 
 =cut
 
-.const int TESTS = 181
 .const num PRECISION = 0.000001
 
 .sub 'test' :main
     .include 'test_more.pir'
 
-    plan(TESTS)
     basic_assignment()
     add_number_to_self()
     sub_number_from_self()
@@ -89,6 +87,9 @@ Tests the Float PMC.
     cot_method()
     tanh_method()
     sqrt_method()
+    get_bool()
+
+    done_testing()
 .end
 
 .include 'fp_equality.pasm'
@@ -1120,6 +1121,13 @@ Tests the Float PMC.
 .sub 'sqrt_method'
     test_method('sqrt', 16.0, 4.0)
     test_method('sqrt', 2.0, 1.414213562)
+.end
+
+.sub 'get_bool'
+    $P0 = new ['Float']
+    $P0 = 0.0
+    not $P0
+    ok($P0, "Float.get_bool works")
 .end
 
 # Local Variables:
