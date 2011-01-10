@@ -697,7 +697,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
 
 /*
 
-=item C<STRING * Parrot_str_from_platform_cstring(PARROT_INTERP, char *c)>
+=item C<STRING * Parrot_str_from_platform_cstring(PARROT_INTERP, const char *c)>
 
 Convert a C string, encoded in the platform's assumed encoding, to a Parrot
 string.
@@ -708,7 +708,7 @@ string.
 
 PARROT_EXPORT
 STRING *
-Parrot_str_from_platform_cstring(PARROT_INTERP, char *c)
+Parrot_str_from_platform_cstring(PARROT_INTERP, const char *c)
 {
     ASSERT_ARGS(Parrot_str_from_platform_cstring)
     if (!c)
