@@ -129,9 +129,6 @@ Tests the PackfileBytecodeSegment PMC.
     $P1 = $P0."main_sub"()
     $I0 = $P0
     is($I0, 0, "main_sub()")
-
-    # This line seems to hang...
-    #$P0."load_lib"("blah")
 .end
 
 # Local Variables:
