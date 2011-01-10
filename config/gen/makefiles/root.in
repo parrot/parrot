@@ -1629,6 +1629,8 @@ src/platform/darwin/sysmem$(O) : src/platform/darwin/sysmem.c $(PARROT_H_HEADERS
 
 src/platform/generic/dl$(O) : src/platform/generic/dl.c $(PARROT_H_HEADERS)
 
+src/platform/generic/encoding$(O) : src/platform/generic/encoding.c $(PARROT_H_HEADERS)
+
 src/platform/generic/env$(O) : src/platform/generic/env.c $(PARROT_H_HEADERS)
 
 src/platform/generic/exec$(O) : src/platform/generic/exec.c $(PARROT_H_HEADERS)
@@ -1650,6 +1652,8 @@ src/platform/generic/sysmem$(O) : src/platform/generic/sysmem.c $(PARROT_H_HEADE
 src/platform/generic/time$(O) : src/platform/generic/time.c $(PARROT_H_HEADERS)
 
 src/platform/generic/uid$(O) : src/platform/generic/uid.c $(PARROT_H_HEADERS)
+
+src/platform/linux/encoding$(O) : src/platform/linux/encoding.c $(PARROT_H_HEADERS)
 
 src/platform/netbsd/misc$(O) : src/platform/netbsd/misc.c $(PARROT_H_HEADERS)
 

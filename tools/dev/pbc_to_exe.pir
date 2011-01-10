@@ -44,6 +44,7 @@ Compile bytecode to executable.
     print outfh, <<'HEADER'
 #include <stdio.h>
 #include <stdlib.h>
+#include <locale.h>
 #include "parrot/api.h"
 const void * get_program_code(void);
 int Parrot_set_config_hash(Parrot_PMC interp_pmc);
@@ -82,6 +83,8 @@ HEADER
             const unsigned char *program_code_addr;
             Parrot_Init_Args *initargs;
             GET_INIT_STRUCT(initargs);
+
+            setlocale(LC_ALL, "");
 
             program_code_addr = (const unsigned char *)get_program_code();
             if (!program_code_addr)

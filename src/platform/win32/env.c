@@ -89,22 +89,21 @@ Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)
 
 /*
 
-=item C<char * Parrot_getenv(PARROT_INTERP, STRING *str_name)>
+=item C<STRING * Parrot_getenv(PARROT_INTERP, STRING *str_name)>
 
-Gets the environment variable C<str_name>, if it exists. Returns the contents
-of the environment variable in a C<malloc>'d memory location that needs to be
-freed later.
+Gets the environment variable C<str_name>, if it exists.
 
 =cut
 
 */
 
-char *
+STRING *
 Parrot_getenv(PARROT_INTERP, ARGIN(STRING *str_name))
 {
-    char * const name = Parrot_str_to_cstring(interp, str_name);
-    const DWORD size  = GetEnvironmentVariable(name, NULL, 0);
-    char *buffer      = NULL;
+    char   * const name = Parrot_str_to_cstring(interp, str_name);
+    const   DWORD size  = GetEnvironmentVariable(name, NULL, 0);
+    char   *buffer      = NULL;
+    STRING *retv;
 
     if (size == 0) {
         Parrot_str_free_cstring(name);
@@ -113,8 +112,10 @@ Parrot_getenv(PARROT_INTERP, ARGIN(STRING *str_name))
     buffer = (char *)mem_sys_allocate(size);
     GetEnvironmentVariable(name, buffer, size);
     Parrot_str_free_cstring(name);
+    retv = Parrot_str_from_platform_cstring(interp, buffer);
+    mem_sys_free(buffer);
 
-    return buffer;
+    return retv;
 }
 
 /*

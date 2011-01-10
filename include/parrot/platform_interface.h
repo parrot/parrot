@@ -74,17 +74,6 @@ void Parrot_free_memalign(void *);
 #  define Parrot_memalign_if_possible(a, s) Parrot_memalign((a), (s))
 #endif
 
-#ifdef PARROT_HAS_EXEC_PROTECT
-void *mem_alloc_executable(size_t);
-void mem_free_executable(void *, size_t);
-void *mem_realloc_executable(void *, size_t, size_t);
-#else
-#  define mem_alloc_executable mem_internal_allocate
-#  define mem_free_executable(a, b) mem_internal_free(a)
-#  define mem_realloc_executable(a, b, c) mem_internal_realloc((a), (c))
-#endif
-
-
 /*
 ** Process ID
 */
@@ -128,7 +117,7 @@ PARROT_EXPORT
 void Parrot_unsetenv(PARROT_INTERP, STRING *name);
 
 PARROT_EXPORT
-char * Parrot_getenv(PARROT_INTERP, STRING *name);
+STRING * Parrot_getenv(PARROT_INTERP, STRING *name);
 
 /*
 ** Dynamic Loading:
@@ -156,6 +145,12 @@ void *Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags);
 const char *Parrot_dlerror(void);
 void *Parrot_dlsym(void *handle, const char *symbol);
 int Parrot_dlclose(void *handle);
+
+/*
+ * encoding
+ */
+void Parrot_init_platform_encoding(PARROT_INTERP);
+size_t Parrot_str_platform_strlen(PARROT_INTERP, const char *s);
 
 /*
  * system timer

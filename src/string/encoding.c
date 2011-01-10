@@ -18,7 +18,8 @@ These are parrot's generic encoding handling functions
 #include "parrot/encoding.h"
 #include "encoding.str"
 
-STR_VTABLE *Parrot_default_encoding_ptr = NULL;
+STR_VTABLE *Parrot_default_encoding_ptr  = NULL;
+STR_VTABLE *Parrot_platform_encoding_ptr = NULL;
 
 static STR_VTABLE **encodings;
 static int          n_encodings;
@@ -144,6 +145,9 @@ Parrot_find_encoding_by_string(PARROT_INTERP, ARGIN(STRING *encodingname))
     /* backwards compatibility */
     if (STRING_equal(interp, encodingname, CONST_STRING(interp, "unicode")))
         return Parrot_utf8_encoding_ptr;
+
+    if (STRING_equal(interp, encodingname, CONST_STRING(interp, "platform")))
+        return Parrot_platform_encoding_ptr;
 
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
             "invalid encoding '%Ss'", encodingname);
@@ -414,6 +418,7 @@ Parrot_encodings_init(PARROT_INTERP)
     Parrot_register_encoding(interp, Parrot_ucs4_encoding_ptr);
 
     Parrot_default_encoding_ptr = Parrot_ascii_encoding_ptr;
+    Parrot_init_platform_encoding(interp);
 
     /* Now that the plugins are registered, we can create STRING
      * names for them.  */

@@ -1743,9 +1743,6 @@ Parrot_hash_key_from_pmc(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(PMC *key)
                   case KEY_string_FLAG:
                     key = Parrot_pmc_box_string(interp, Parrot_key_string(interp, key));
                     break;
-                  case KEY_number_FLAG:
-                    key = Parrot_pmc_box_number(interp, Parrot_key_number(interp, key));
-                    break;
                   case KEY_pmc_FLAG:
                     key = Parrot_key_pmc(interp, key);
                     break;
