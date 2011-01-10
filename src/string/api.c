@@ -714,7 +714,7 @@ Parrot_str_from_platform_cstring(PARROT_INTERP, char *c)
     if (!c)
         return STRINGNULL;
     else
-        return Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(c),
+        return Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(interp, c),
                                     Parrot_platform_encoding_ptr, 0);
 }
 
