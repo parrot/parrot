@@ -32,33 +32,6 @@ PIR or an Eval PMC (bytecode).
 .end
 
 
-.sub 'to_pir' :method
-    .param pmc post
-    .param pmc adverbs         :slurpy :named
-
-    .local pmc newself
-    newself = new ['POST';'Compiler']
-
-    .local pmc innerpir, line
-    innerpir = new 'StringBuilder'
-    .lex '$CODE', innerpir
-    line = box 0
-    .lex '$LINE', line
-
-    ##  if the root node isn't a Sub, wrap it
-    $I0 = isa post, ['POST';'Sub']
-    if $I0 goto have_sub
-    $P0 = get_hll_global ['POST'], 'Sub'
-    post = $P0.'new'(post, 'name'=>'anon')
-  have_sub:
-
-    ##  now generate the pir
-    newself.'pir'(post)
-
-    ##  and return whatever code was generated
-    .return (innerpir)
-.end
-
 
 =item pir_children(node)
 

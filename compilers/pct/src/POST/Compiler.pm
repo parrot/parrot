@@ -67,7 +67,7 @@ our method key_pir(*@args) {
     }
 }
 
-our method _to_pir($post, *%adverbs) {
+our method to_pir($post, *%adverbs) {
     Q:PIR {
     .local pmc post
     .local pmc adverbs
