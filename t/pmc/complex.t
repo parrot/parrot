@@ -20,7 +20,7 @@ Tests the Complex PMC.
     .include 'fp_equality.pasm'
     .include "iglobals.pasm"
 
-    plan(626)
+    plan(632)
 
     test_init_pmc()
     string_parsing()
@@ -34,6 +34,7 @@ Tests the Complex PMC.
     complex_divide_by_zero_Complex()
     complex_divide_by_zero_Float()
     complex_divide_by_zero_Integer()
+    complex_divide_by_zero_intval()
     get_int_or_num_or_bool()
     test_get_keyed()
     exception_get_keyed__invalid_string_key()
@@ -41,6 +42,7 @@ Tests the Complex PMC.
     exception_get_keyed__invalid_numeric_key()
     set_int_or_num()
     set_keyed()
+    test_set_pmc()
     exception_set_keyed__invalid_key()
     test_is_equal()
     test_complex_abs()
@@ -116,6 +118,13 @@ Tests the Complex PMC.
     set $P0, "2+3i"
     $P1 = new ['Complex'], $P0
     is( $P1, "2+3i", 'init from String' )
+
+    push_eh invalid_initializer
+    $P4 = box 4
+    $P0 = new ['Complex'], $P4
+  invalid_initializer:
+    ok(1, 'cannot init from Integer')
+    pop_eh
 .end
 
 .sub string_parsing
@@ -482,6 +491,16 @@ handler:
     .exception_is( 'Divide by zero' )
 .end
 
+.sub complex_divide_by_zero_intval
+    $P0 = new ['Complex']
+    set $P0, "4+3.5i"
+
+    push_eh handler
+        div $P0, 0
+handler:
+    .exception_is( 'Divide by zero' )
+.end
+
 .sub get_int_or_num_or_bool
         $P0 = new ['Complex']
         set $P0, "2 - 1.5i"
@@ -526,6 +545,10 @@ handler:
         set $P5, $P0[1]
         is( $P4, "-3.3", 'get real portion using get_pmc_keyed')
         is( $P5, "1.2", 'get imag portion using get_pmc_keyed')
+
+        $P2 = box 0
+        $P1 = $P0[$P2]
+        is( $P1, -3.3, 'get_keyed_pmc' )
 .end
 
 .sub exception_get_keyed__invalid_string_key
@@ -586,6 +609,24 @@ handler:
     set $P2, 6
     set $P0["imag"], $P2
     is( $P0, "0.5+6i", '... now using String PMCs' )
+
+    $P2 = box 0
+    $P0[$P2] = 0.2
+    $P3 = $P0["real"]
+    is( $P3, 0.2, 'test set_number_keyed with Integer key' )
+.end
+
+.sub test_set_pmc
+    $P0 = new ['Complex']
+    $P0['real'] = 1
+    $P0['imag'] = 4
+
+    $P1 = new ['Complex']
+    $P1['real'] = 2
+    $P1['imag'] = 3
+
+    assign $P0, $P1
+    is( $P0, "2+3i", 'test set_pmc to another Complex PMC' )
 .end
 
 .sub exception_set_keyed__invalid_key
@@ -614,6 +655,10 @@ handler:
 
     set $P0, "2 + 0i"
     is( $P0, $P2, 'test eq between Complex (w/o imag) and Float' )
+
+    eq $P0, $P2, success
+  success:
+    ok(1, 'test is_equal (with no imag)')
 .end
 
 .sub test_complex_abs
