@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 29;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -950,6 +950,56 @@ pir_output_is( <<"CODE", <<'OUT', 'write after buffered read' );
 CODE
 10
 abcde#####klmno
+OUT
+
+pir_output_is( <<"CODE", <<'OUT', 'small reads and seeks' );
+.sub test :main
+    .local pmc fh
+    .local string str
+    .local int pos, i
+
+    fh = new 'FileHandle'
+    fh.'open'('$temp_file', 'rw')
+
+    i = 0
+  print_loop:
+    fh.'print'('abc123')
+    inc i
+    if i < 5000 goto print_loop
+
+    fh.'seek'(1, -24000)
+
+    i = 0
+  read_loop:
+    str = fh.'read'(3)
+    if str == 'abc' goto read_ok
+    print 'not '
+    goto read_done
+  read_ok:
+    fh.'seek'(1, 3)
+    inc i
+    if i < 4000 goto read_loop
+  read_done:
+    say 'ok 1 - read/seek 3 bytes'
+
+    str = fh.'read'(3)
+    if str == '' goto eof_ok
+    print 'not '
+  eof_ok:
+    say 'ok 2 - read/seek eof'
+
+    pos = fh.'tell'()
+    if pos == 30000 goto tell_ok
+    print 'not '
+  tell_ok:
+    say 'ok 3 - read/seek tell'
+
+    fh.'close'()
+.end
+CODE
+ok 1 - read/seek 3 bytes
+ok 2 - read/seek eof
+ok 3 - read/seek tell
 OUT
 
 # TT #1178

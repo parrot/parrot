@@ -739,41 +739,48 @@ Parrot_io_seek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(Parrot_io_seek_buffer)
-    PIOOFF_T newpos   = offset;
-    PIOOFF_T file_pos = Parrot_io_get_file_position(interp, filehandle);
+    INTVAL    buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
+    PIOOFF_T  file_pos     = Parrot_io_get_file_position(interp, filehandle);
+    PIOHANDLE os_handle;
 
-    unsigned char *buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
-    unsigned char *buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-    unsigned char *buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
+    if (whence == SEEK_CUR) {
+        /* Don't use SEEK_CUR, filehandle may be ahead of file_pos */
+        offset += file_pos;
+        whence  = SEEK_SET;
+    }
 
-    if (whence == SEEK_CUR)
-        newpos = file_pos + offset;
+    if (buffer_flags & PIO_BF_READBUF
+    &&  whence != SEEK_END) {
+        /* Try to seek inside the read buffer */
+        unsigned char *buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
+        unsigned char *buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
+        unsigned char *buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
 
-    if (whence == SEEK_END
-    ||  newpos <  file_pos - (buffer_next - buffer_start)
-    ||  newpos >= file_pos + (buffer_end - buffer_next)) {
-        PIOHANDLE os_handle;
+        if (offset >= file_pos - (buffer_next - buffer_start)
+        &&  offset <  file_pos + (buffer_end  - buffer_next)) {
+            buffer_next += offset - file_pos;
+            Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
+            Parrot_io_set_file_position(interp, filehandle, offset);
 
-        Parrot_io_flush_buffer(interp, filehandle);
-        GETATTR_Handle_os_handle(interp, filehandle, os_handle);
-        newpos = PIO_SEEK(interp, os_handle, offset, whence);
-
-        if (newpos > Parrot_io_get_file_size(interp, filehandle)) {
-            Parrot_io_set_file_size(interp, filehandle, newpos);
+            return offset;
         }
-
-        /* Seek clears EOF */
-        Parrot_io_set_flags(interp, filehandle,
-                (Parrot_io_get_flags(interp, filehandle) & ~PIO_F_EOF));
-    }
-    else {
-        buffer_next += newpos - file_pos;
-        Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
     }
 
-    Parrot_io_set_file_position(interp, filehandle, newpos);
+    Parrot_io_flush_buffer(interp, filehandle);
 
-    return newpos;
+    GETATTR_Handle_os_handle(interp, filehandle, os_handle);
+    offset = PIO_SEEK(interp, os_handle, offset, whence);
+
+    if (offset > Parrot_io_get_file_size(interp, filehandle))
+        Parrot_io_set_file_size(interp, filehandle, offset);
+
+    /* Seek clears EOF */
+    Parrot_io_set_flags(interp, filehandle,
+            (Parrot_io_get_flags(interp, filehandle) & ~PIO_F_EOF));
+
+    Parrot_io_set_file_position(interp, filehandle, offset);
+
+    return offset;
 }
 
 /*
