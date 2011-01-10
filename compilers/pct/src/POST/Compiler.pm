@@ -14,7 +14,7 @@ PIR, PBC or an Eval PMC (bytecode).
 =end DESCRIPTION
 
 #our $HLL;
-#our $NAMESPACE;
+#our $?NAMESPACE;
 
 #INIT {
 #    POST::Compiler.language('POST');
@@ -234,7 +234,7 @@ Generate PIR for C<node>, storing the result into the compiler's
 C<$!code> attribute and returning any code needed to look up
 the sub.
 
-multi method _pir(POST::Sub $node) {
+multi method pir(POST::Sub $node) {
     Q:PIR {
     .local pmc node
     find_lex node, '$node'
@@ -282,21 +282,21 @@ multi method _pir(POST::Sub $node) {
   pirflags_done:
 
     .local pmc outerhll, hll
-    outerhll = get_global '$HLL'
+    outerhll = get_global '$?HLL'
     hll = node.'hll'()
     if hll goto have_hll
     hll = outerhll
   have_hll:
-    set_global '$HLL', hll
+    set_global '$?HLL', hll
 
     .local pmc outerns, ns, nskey
-    outerns = get_global '$NAMESPACE'
+    outerns = get_global '$?NAMESPACE'
     ns = outerns
     $P0 = node.'namespace'()
     unless $P0 goto have_ns
     ns = $P0
   have_ns:
-    set_global '$NAMESPACE', ns
+    set_global '$?NAMESPACE', ns
     nskey = self.'key_pir'(ns)
 
     .local pmc multi
@@ -343,7 +343,7 @@ multi method _pir(POST::Sub $node) {
   subpir_post:
     unless hll goto subpir_loadlibs
     $P0 = self.'escape'(hll)
-    subpir.'append_format'("\n.HLL %0\n", $P0)
+    subpir.'append_format'("\n.HLL %%0\n", $P0)
   subpir_loadlibs:
     $P0 = node.'loadlibs'()
     if null $P0 goto subpir_ns
@@ -353,17 +353,17 @@ multi method _pir(POST::Sub $node) {
     unless $P1 goto subpir_ns
     $P2 = shift $P1
     $P2 = self.'escape'($P2)
-    subpir.'append_format'("\n.loadlib %0\n", $P2)
+    subpir.'append_format'("\n.loadlib %%0\n", $P2)
     goto subpir_loadlibs_loop
   subpir_ns:
-    subpir.'append_format'("\n.namespace %0\n", nskey)
+    subpir.'append_format'("\n.namespace %%0\n", nskey)
   subpir_directives:
     $S0 = node['directives']
     unless $S0 goto subpir_decl
-    subpir.'append_format'("%0", $S0)
+    subpir.'append_format'("%%0", $S0)
   subpir_decl:
     $S0 = self.'escape'(name)
-    subpir.'append_format'(".sub %0 %1\n", $S0, pirflags)
+    subpir.'append_format'(".sub %%0 %%1\n", $S0, pirflags)
     .local pmc paramlist
     paramlist = node['paramlist']
     if null paramlist goto paramlist_done
@@ -386,8 +386,8 @@ multi method _pir(POST::Sub $node) {
     outerpir .= subpir
     outerpir .= innerpir
 
-    set_global '$NAMESPACE', outerns
-    set_global '$HLL', outerhll
+    set_global '$?NAMESPACE', outerns
+    set_global '$?HLL', outerhll
     }
 }
 
