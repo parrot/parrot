@@ -32,54 +32,6 @@ PIR or an Eval PMC (bytecode).
 .end
 
 
-=item C<escape(string str)>
-
-Returns an escaped value of C<str> suitable for including in PIR.
-If the string contains any non-ASCII characters, then it's
-prefixed with 'unicode:'.  (This method just delegates to
-PAST::Compiler.escape, which does the same thing.)
-
-=cut
-
-.sub 'escape' :method
-    .param string str
-    $P0 = get_hll_global ['PAST'], 'Compiler'
-    .tailcall $P0.'escape'(str)
-.end
-
-=item C<key_pir( string name1 [, string name2, ...] )>
-
-Constructs a PIR key using the strings passed as arguments.
-For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
-
-=cut
-
-.sub 'key_pir' :method
-    .param pmc args            :slurpy
-    .local string out, sep
-    out = '['
-    sep = ''
-  args_loop:
-    unless args goto args_done
-    $P0 = shift args
-    if null $P0 goto args_loop
-    $I0 = does $P0, 'array'
-    if $I0 goto args_array
-  args_string:
-    $S0 = self.'escape'($P0)
-    out = concat out, sep
-    out = concat out, $S0
-    sep = ';'
-    goto args_loop
-  args_array:
-    splice args, $P0, 0, 0
-    goto args_loop
-  args_done:
-    out = concat out, ']'
-    .return (out)
-.end
-
-
 .sub 'to_pir' :method
     .param pmc post
     .param pmc adverbs         :slurpy :named
