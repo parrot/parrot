@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -921,6 +921,35 @@ pir_output_is( <<'CODE', <<'OUT', 'get_fd method' );
 .end
 CODE
 -1
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'write after buffered read' );
+.sub test :main
+    .local pmc fh
+    .local string str
+    .local int pos
+
+    fh = new 'FileHandle'
+    fh.'open'('tmp1111', 'rw')
+
+    fh.'print'('abcdefghijklmno')
+    fh.'seek'(0, 0)
+
+    fh.'read'(5)
+    fh.'print'('#####')
+
+    pos = fh.'tell'()
+    say pos
+
+    fh.'seek'(0, 0)
+    str = fh.'readall'()
+    say str
+
+    fh.'close'()
+.end
+CODE
+10
+abcde#####klmno
 OUT
 
 # TT #1178
