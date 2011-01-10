@@ -396,7 +396,7 @@ inline op lsr(invar PMC, invar PMC, invar PMC) :base_core {
     const UINTVAL a = (UINTVAL)VTABLE_get_integer(interp, $2);
     const UINTVAL b = (UINTVAL)VTABLE_get_integer(interp, $3);
     const UINTVAL c = a >> b;
-    VTABLE_set_integer_native(interp, $3, (INTVAL)c);
+    VTABLE_set_integer_native(interp, $1, (INTVAL)c);
 }
 
 =item B<rot>(out INT, in INT, in INT, inconst INT)

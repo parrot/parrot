@@ -210,19 +210,13 @@ remove it from the stream.
 op peek(out STR) :base_io {
     STRING ** const s = &$1;
 
-    *s = NULL;
-    if (Parrot_io_peek(interp, _PIO_STDIN(interp), s) < 0) {
-        $1 = STRINGNULL;
-    }
+    *s = Parrot_io_peek(interp, _PIO_STDIN(interp));
 }
 
 op peek(out STR, invar PMC) :base_io {
     STRING ** const s = &$1;
 
-    *s = NULL;
-    if (Parrot_io_peek(interp, $2, s) < 0) {
-        $1 = STRINGNULL;
-    }
+    *s = Parrot_io_peek(interp, $2);
 }
 
 #########################################

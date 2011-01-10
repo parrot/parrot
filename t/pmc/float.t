@@ -15,13 +15,11 @@ Tests the Float PMC.
 
 =cut
 
-.const int TESTS = 177
 .const num PRECISION = 0.000001
 
 .sub 'test' :main
     .include 'test_more.pir'
 
-    plan(TESTS)
     basic_assignment()
     add_number_to_self()
     sub_number_from_self()
@@ -89,6 +87,9 @@ Tests the Float PMC.
     cot_method()
     tanh_method()
     sqrt_method()
+    get_bool()
+
+    done_testing()
 .end
 
 .include 'fp_equality.pasm'
@@ -137,6 +138,12 @@ Tests the Float PMC.
     $P0 = new ['Float']
     $P0 = "12.49"
     is($P0, 12.49, 'setting value from String', PRECISION)
+
+    $P0 = new ['Float']
+    $P1 = new ['String']
+    $P1 = "12345"
+    setref $P0, $P1
+    is($P0, "12345", "can set_pmc")
 .end
 
 .sub 'add_number_to_self'
@@ -763,6 +770,20 @@ Tests the Float PMC.
 
     $I0 = cmp $P1, $N3
     is($I0, -1, 'comparison ops: cmp_p_n: lt')
+
+    $P2 = new ['String']
+
+    $P2 = "123.45"
+    $I0 = cmp_num $P1, $P2
+    is($I0, 0, 'comparison ops: cmp_p_p: equality')
+
+    $P2 = "-1.0"
+    $I0 = cmp_num $P1, $P2
+    is($I0, 1, 'comparison ops: cmp_p_p: gt')
+
+    $P2 = "200.0"
+    $I0 = cmp_num $P1, $P2
+    is($I0, -1, 'comparison ops: cmp_p_p: lt')
 .end
 
 .sub 'isgt'
@@ -1100,6 +1121,13 @@ Tests the Float PMC.
 .sub 'sqrt_method'
     test_method('sqrt', 16.0, 4.0)
     test_method('sqrt', 2.0, 1.414213562)
+.end
+
+.sub 'get_bool'
+    $P0 = new ['Float']
+    $P0 = 0.0
+    not $P0
+    ok($P0, "Float.get_bool works")
 .end
 
 # Local Variables:

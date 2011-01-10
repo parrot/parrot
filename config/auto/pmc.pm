@@ -332,7 +332,7 @@ sub get_includes {
     my @retval;
     local $_;
     while (<$fh>) {
-        next unless /^\s*#include\s+"(.*)"\s+$/;
+        next unless /^\s*# *include\s+"(.*)"\s+$/;
         my $include = $1;
         if ($include =~ m{^parrot}) { # main parrot include dir
           next if $include eq "parrot/parrot.h"; # already implicit everywhere.
@@ -392,6 +392,11 @@ include/parrot/feature.h
 include/parrot/oplib.h
 include/parrot/library.h
 include/parrot/thread.h
+include/parrot/atomic.h
+include/parrot/atomic/fallback.h
+include/parrot/atomic/gcc_pcc.h
+include/parrot/atomic/gcc_x86.h
+include/parrot/atomic/sparc.h
 include/parrot/string.h
 include/parrot/settings.h
 include/parrot/namespace.h
@@ -400,6 +405,9 @@ include/parrot/pbcversion.h
 include/parrot/core_types.h
 include/parrot/interpreter.h
 include/parrot/io.h
+include/parrot/io_portable.h
+include/parrot/io_unix.h
+include/parrot/io_win32.h
 include/parrot/context.h
 include/parrot/parrot.h
 include/parrot/dynext.h

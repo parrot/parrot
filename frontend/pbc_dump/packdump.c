@@ -236,19 +236,6 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                             Parrot_key_integer(interp, key));
                 Parrot_io_printf(interp, "       },\n");
                 break;
-              case KEY_number_FLAG:
-                {
-                    size_t ct_index;
-                    FLOATVAL n = Parrot_key_number(interp, key);
-
-                    Parrot_io_printf(interp, "        TYPE        => NUMBER\n");
-                    ct_index = PackFile_ConstTable_rlookup_num(interp, ct, n);
-                    Parrot_io_printf(interp, "        PFC_OFFSET  => %ld\n", ct_index);
-                    Parrot_io_printf(interp, "        DATA        => %ld\n",
-                                        ct->num.constants[ct_index]);
-                    Parrot_io_printf(interp, "       },\n");
-                }
-                break;
 
               case KEY_string_FLAG:
                 {
@@ -266,12 +253,6 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
 
               case KEY_integer_FLAG | KEY_register_FLAG:
                 Parrot_io_printf(interp, "        TYPE        => I REGISTER\n");
-                Parrot_io_printf(interp, "        DATA        => %ld\n",
-                            VTABLE_get_integer(interp, key));
-                Parrot_io_printf(interp, "       },\n");
-                break;
-              case KEY_number_FLAG | KEY_register_FLAG:
-                Parrot_io_printf(interp, "        TYPE        => N REGISTER\n");
                 Parrot_io_printf(interp, "        DATA        => %ld\n",
                             VTABLE_get_integer(interp, key));
                 Parrot_io_printf(interp, "       },\n");

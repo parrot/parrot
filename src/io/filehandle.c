@@ -184,57 +184,6 @@ Parrot_io_get_flags(SHIM_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<void Parrot_io_set_file_size(PARROT_INTERP, PMC *filehandle, PIOOFF_T
-file_size)>
-
-Set the C<file_size> attribute of the FileHandle object, which stores the
-current file size.
-
-Currently, this pokes directly into the C struct of the FileHandle PMC. This
-needs to change to a general interface that can be used by all subclasses and
-polymorphic equivalents of FileHandle. For now, hiding it behind a function, so
-it can be cleanly changed later.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_io_set_file_size(SHIM_INTERP, ARGIN(PMC *filehandle), PIOOFF_T file_size)
-{
-    ASSERT_ARGS(Parrot_io_set_file_size)
-    PARROT_FILEHANDLE(filehandle)->file_size = file_size;
-}
-
-
-/*
-
-=item C<PIOOFF_T Parrot_io_get_file_size(PARROT_INTERP, PMC *filehandle)>
-
-Get the C<file_size> attribute of the FileHandle object, which stores the
-current file size.
-
-
-Currently, this pokes directly into the C struct of the FileHandle PMC. This
-needs to change to a general interface that can be used by all subclasses and
-polymorphic equivalents of FileHandle. For now, hiding it behind a function, so
-it can be cleanly changed later.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PIOOFF_T
-Parrot_io_get_file_size(SHIM_INTERP, ARGIN(PMC *filehandle))
-{
-    ASSERT_ARGS(Parrot_io_get_file_size)
-    return PARROT_FILEHANDLE(filehandle)->file_size;
-}
-
-/*
-
 =item C<void Parrot_io_set_buffer_start(PARROT_INTERP, PMC *filehandle, unsigned
 char *new_start)>
 
@@ -582,15 +531,29 @@ INTVAL
 Parrot_io_close_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_close_filehandle)
-    INTVAL result;
+    const PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, pmc);
+    INTVAL          result;
+    INTVAL          flags;
 
-    if (Parrot_io_is_closed_filehandle(interp, pmc))
+    if (os_handle == PIO_INVALID_HANDLE)
         return -1;
 
     Parrot_io_flush_buffer(interp, pmc);
-    PIO_FLUSH(interp, pmc);
+    PIO_FLUSH(interp, os_handle);
 
-    result = PIO_CLOSE(interp, pmc);
+    result = PIO_CLOSE(interp, os_handle);
+    flags  = Parrot_io_get_flags(interp, pmc);
+
+    if (flags & PIO_F_PIPE) {
+        INTVAL pid;
+        INTVAL status;
+
+        GETATTR_FileHandle_process_id(interp, pmc, pid);
+        status = PIO_PIPE_WAIT(interp, pid);
+        SETATTR_FileHandle_exit_status(interp, pmc, status);
+    }
+
+    Parrot_io_set_os_handle(interp, pmc, PIO_INVALID_HANDLE);
     Parrot_io_clear_buffer(interp, pmc);
 
     return result;
@@ -612,7 +575,9 @@ INTVAL
 Parrot_io_is_closed_filehandle(PARROT_INTERP, ARGIN(const PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_is_closed_filehandle)
-    return PIO_IS_CLOSED(interp, pmc);
+    const PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, pmc);
+
+    return os_handle == PIO_INVALID_HANDLE;
 }
 
 /*
@@ -630,11 +595,13 @@ void
 Parrot_io_flush_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_flush_filehandle)
-    if (Parrot_io_is_closed(interp, pmc))
+    const PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, pmc);
+
+    if (os_handle == PIO_INVALID_HANDLE)
         return;
 
     Parrot_io_flush_buffer(interp, pmc);
-    PIO_FLUSH(interp, pmc);
+    PIO_FLUSH(interp, os_handle);
 }
 
 /*

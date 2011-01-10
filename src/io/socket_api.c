@@ -113,7 +113,9 @@ INTVAL
 Parrot_io_socket_is_closed(PARROT_INTERP, ARGMOD(PMC *socket))
 {
     ASSERT_ARGS(Parrot_io_socket_is_closed)
-    return PIO_IS_CLOSED(interp, socket);
+    const PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, socket);
+
+    return os_handle == PIO_INVALID_HANDLE;
 }
 
 /*
