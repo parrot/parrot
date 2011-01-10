@@ -18,13 +18,16 @@ Tests the PackfileBytecodeSegment PMC.
 
 .sub 'test' :main
 .include 'test_more.pir'
-    plan(9)
+    plan(14)
 
     $P0 = new 'PackfileBytecodeSegment'
     isa_ok($P0, 'PackfileBytecodeSegment')
 
     test_basics()
     test_keyed_access()
+    test_pack()
+    test_bad_push()
+    test_methods()
 .end
 
 .sub test_basics
@@ -77,6 +80,58 @@ Tests the PackfileBytecodeSegment PMC.
 
     $P2 = $P0[$P3]
     is( $P2, 6, 'test get_pmc_keyed_pmc' )
+.end
+
+.sub test_pack
+    $P0 = new 'PackfileBytecodeSegment'
+
+    push_eh eh_notimpl1
+        $P0."pack"()
+    eh_notimpl1:
+        ok(0,"pack Not implemented!", "implement pack")
+    pop_eh
+
+    push_eh eh_notimpl2
+        $P0."unpack"("data")
+        goto done
+    pop_eh
+
+    eh_notimpl2:
+        ok(0,"unpack Not implemented!", "implement unpack")
+    done:
+.end
+
+.sub test_bad_push
+    $P0 = new 'PackfileBytecodeSegment'
+
+    $P1 = new 'Integer'
+    push_eh eh_notarray
+        push $P0, $P1
+        goto bad
+    eh_notarray:
+        ok(1,"Exception on bad push")
+        goto done
+    pop_eh
+
+    bad:
+        nok(0,"No exception on bad push")
+    done:
+.end
+
+.sub test_methods
+    $P0 = new 'PackfileBytecodeSegment'
+    $I0 = get_addr $P0
+
+    $P1 =$P0."opmap"()
+    $S0 = typeof $P1
+    is($S0, "PackfileOpMap", "opmap()")
+
+    $P1 = $P0."main_sub"()
+    $I0 = $P0
+    is($I0, 0, "main_sub()")
+
+    # This line seems to hang...
+    #$P0."load_lib"("blah")
 .end
 
 # Local Variables:
