@@ -64,7 +64,8 @@ compilers/pct/src/POST/Nodes.pbc : $(PARROT) \
 		compilers/pct/src/POST/Register.pir \
 		compilers/pct/src/POST/String.pir \
 		compilers/pct/src/POST/Sub.pir \
-		compilers/pct/src/POST/Value.pir
+		compilers/pct/src/POST/Value.pir \
+		compilers/pct/src/POST/Compiler2.pir
 	$(PARROT) -o $@ \
 		compilers/pct/src/POST/Nodes.pir
 
