@@ -411,24 +411,6 @@ the sub.
 .end
 
 
-.sub 'hll_pir' :method
-    .param pmc node
-    .param pmc options         :slurpy :named
-
-    options['target'] = 'pir'
-    $P0 = node.'subid'()
-    options['subid'] = $P0
-    .local pmc source, compiler, pir
-    source = node[0]
-    $S0 = node.'compiler'()
-    compiler = compreg $S0
-    $I0 = isa compiler, 'Sub'
-    if $I0 goto compiler_sub
-    .tailcall compiler.'compile'(source, options :flat :named)
-  compiler_sub:
-    .tailcall compiler(source, options :flat :named)
-.end
-
 =back
 
 =head1 AUTHOR

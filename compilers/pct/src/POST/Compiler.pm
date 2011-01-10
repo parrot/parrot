@@ -391,7 +391,7 @@ our multi method _pir(POST::Sub $node) {
     }
 }
 
-our method _hll_pir($node, *%options) {
+our method hll_pir($node, *%options) {
     Q:PIR {
     .local pmc node
     .local pmc options
