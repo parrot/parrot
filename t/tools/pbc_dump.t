@@ -47,7 +47,7 @@ BEGIN {
         plan skip_all => "pbc_dump hasn't been built. Run make parrot_utils";
         exit(0);
     }
-    plan tests => 24;
+    plan tests => 25;
 }
 
 dump_output_like( <<PIR, "pir", [qr/CONSTANT_t/, qr/BYTECODE_t/], 'pbc_dump basic sanity');
@@ -166,7 +166,8 @@ my (undef,  $pbcpack_file) = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 
 print $pir_i <<'EOF';
 .sub main :main
-    print 'Hello World'
+    .const 'String' s = "Hello World"
+    print s
 .end
 EOF
 close $pir_i;
@@ -175,7 +176,7 @@ close $pir_i;
 system($PARROT, '-o', $pbc_file, $pir_file);
 
 # Test -n option
-dump_raw_output_like("-n " . $pbc_file, qr/0002:  print_sc.*0002:  end/s, "pbc_dump -n command");
+dump_raw_output_like("-n " . $pbc_file, qr/0003:  end/s, "pbc_dump -n command");
 
 # Test -t option
 dump_raw_output_like("-t " . $pbc_file, qr/HEADER.*DIRECTORY.*BYTECODE.*CONSTANT/s, "pbc_dump -t command");
@@ -192,6 +193,31 @@ dump_raw_output_like("-o " . $pbcpack_file . " " . $pbc_file, qr//s, "pbc_dump -
 # Test if the generated pbc file really works
 my $output = `$PARROT $pbc_file 2>&1`;
 is($output, "Hello World", "pbc_dump -o created a file that works");
+
+
+
+# Test PackFile_Constant_dump_pmc on packdump.c
+($pir_i, $pir_file) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
+(undef,  $pbc_file) = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
+
+print $pir_i <<'EOF';
+.sub main :main
+    $P0 = new ['Hash']
+
+    $P0['key';0] = 2
+
+    $I0 = 1
+    $S0 = 'new_key'
+    $P0[$I0; $S0] = 'value'
+
+    print "Hallo Welt"
+.end
+EOF
+close $pir_i;
+
+system($PARROT, '-o', $pbc_file, $pir_file);
+
+dump_raw_output_like("" . $pbc_file, qr/I REGISTER.*S REGISTER/s, "pbc_dump packdump.c");
 
 
 =head1 HELPER SUBROUTINES
