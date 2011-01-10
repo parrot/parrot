@@ -923,14 +923,14 @@ CODE
 -1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'write after buffered read' );
+pir_output_is( <<"CODE", <<'OUT', 'write after buffered read' );
 .sub test :main
     .local pmc fh
     .local string str
     .local int pos
 
     fh = new 'FileHandle'
-    fh.'open'('tmp1111', 'rw')
+    fh.'open'('$temp_file', 'rw')
 
     fh.'print'('abcdefghijklmno')
     fh.'seek'(0, 0)
