@@ -134,7 +134,7 @@ our method pir_children($node) {
 Return generated pir for any POST::Node.  Returns
 the generated pir of C<node>'s children.
 
-our multi method _pir($node) {
+our multi method pir($node) {
     self.pir_children($node);
 }
 

@@ -33,19 +33,6 @@ PIR or an Eval PMC (bytecode).
 
 
 
-=item pir(Any node)
-
-Return generated pir for any POST::Node.  Returns
-the generated pir of C<node>'s children.
-
-=cut
-
-.sub 'pir' :method :multi(_,_)
-    .param pmc node
-    self.'pir_children'(node)
-.end
-
-
 =item pir(POST::Op node)
 
 Return pir for an operation node.
