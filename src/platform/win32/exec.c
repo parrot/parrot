@@ -151,6 +151,23 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
 
 /*
 
+=item C<UINTVAL Parrot_getpid(void)>
+
+Get current process system-wide unique ID, returning an UINTVAL.
+
+=cut
+
+*/
+
+UINTVAL
+Parrot_getpid(void)
+{
+    DWORD pid = GetCurrentProcessId();
+    return (UINTVAL)pid;
+}
+
+/*
+
 =back
 
 =cut

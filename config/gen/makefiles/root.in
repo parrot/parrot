@@ -1596,8 +1596,6 @@ src/platform/ansi/dl$(O) : src/platform/ansi/dl.c $(PARROT_H_HEADERS)
 
 src/platform/ansi/exec$(O) : src/platform/ansi/exec.c $(PARROT_H_HEADERS)
 
-src/platform/ansi/pid$(O) : src/platform/ansi/pid.c $(PARROT_H_HEADERS)
-
 src/platform/ansi/time$(O) : src/platform/ansi/time.c $(PARROT_H_HEADERS)
 
 src/platform/cygwin/math$(O) : src/platform/cygwin/math.c $(PARROT_H_HEADERS)
@@ -1624,8 +1622,6 @@ src/platform/generic/io$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
 src/platform/generic/math$(O) : src/platform/generic/math.c $(PARROT_H_HEADERS)
 
 src/platform/generic/misc$(O) : src/platform/generic/misc.c $(PARROT_H_HEADERS)
-
-src/platform/generic/pid$(O) : src/platform/generic/pid.c $(PARROT_H_HEADERS)
 
 src/platform/generic/socket$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_socket.h \
     src/io/io_private.h src/platform/generic/socket.c
@@ -1660,8 +1656,6 @@ src/platform/win32/io$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
     src/platform/win32/io.c
 
 src/platform/win32/misc$(O) : src/platform/win32/misc.c $(PARROT_H_HEADERS)
-
-src/platform/win32/pid$(O) : src/platform/win32/pid.c $(PARROT_H_HEADERS)
 
 src/platform/win32/socket$(O) : $(PARROT_H_HEADERS) \
 	src/io/io_private.h \

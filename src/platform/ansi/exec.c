@@ -62,6 +62,25 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
 
 /*
 
+=item C<UINTVAL Parrot_getpid(void)>
+
+Parrot wrapper around standard library C<getpid()> function.
+
+Return 0 in platforms unsupported or without a pid concept.
+
+=cut
+
+*/
+
+UINTVAL
+Parrot_getpid(void)
+{
+    Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG, "Parrot_getpid unuseful in this platform");
+    return 0;
+}
+
+/*
+
 =back
 
 =cut

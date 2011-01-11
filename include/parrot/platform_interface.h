@@ -114,8 +114,14 @@ void Parrot_free_memalign(void *);
 #endif
 
 /*
-** Process ID
+** Processes
 */
+
+PARROT_EXPORT
+INTVAL Parrot_Run_OS_Command(Interp*, STRING *);
+
+PARROT_EXPORT
+INTVAL Parrot_Run_OS_Command_Argv(Interp*, PMC *);
 
 PARROT_EXPORT
 UINTVAL Parrot_getpid(void);
@@ -220,15 +226,6 @@ UHUGEINTVAL Parrot_hires_get_time(void);
 
 PARROT_EXPORT
 UINTVAL     Parrot_hires_get_tick_duration(void);
-
-
-struct parrot_string_t;
-
-PARROT_EXPORT
-INTVAL Parrot_Run_OS_Command(Interp*, struct parrot_string_t *);
-
-PARROT_EXPORT
-INTVAL Parrot_Run_OS_Command_Argv(Interp*, struct PMC *);
 
 /*
  * user information

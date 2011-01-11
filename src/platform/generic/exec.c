@@ -133,6 +133,22 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
 
 /*
 
+=item C<UINTVAL Parrot_getpid(void)>
+
+Parrot wrapper around standard library C<getpid()> function, returning an UINTVAL.
+
+=cut
+
+*/
+
+UINTVAL
+Parrot_getpid(void)
+{
+    return getpid();
+}
+
+/*
+
 =back
 
 =cut

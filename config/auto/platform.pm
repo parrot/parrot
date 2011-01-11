@@ -52,7 +52,6 @@ sub _set_implementations {
         exec.c
         misc.c
         hires_timer.c
-        pid.c
         sysmem.c
         uid.c
         asm.s
