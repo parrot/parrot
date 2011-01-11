@@ -715,21 +715,20 @@ Parrot_str_from_platform_cstring(PARROT_INTERP, const char *c)
         return STRINGNULL;
     else {
         STRING *retv;
-        Parrot_jump_buff *prev_jmp = interp->api_jmp_buf;
-        Parrot_jump_buff jmp;
-        interp->api_jmp_buf        = &jmp;
+        Parrot_runloop jmp;
 
-        if (setjmp(jmp)) {
+        if (setjmp(jmp.resume)) {
             /* catch */
-            interp->api_jmp_buf = prev_jmp;
+            Parrot_cx_delete_handler_local(interp, STRINGNULL);
             retv =  Parrot_str_new_init(interp, c, strlen(c),
                                         Parrot_binary_encoding_ptr, 0);
         }
         else {
             /* try */
+            Parrot_ex_add_c_handler(interp, &jmp);
             retv = Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(interp, c),
                                         Parrot_platform_encoding_ptr, 0);
-            interp->api_jmp_buf = prev_jmp;
+            Parrot_cx_delete_handler_local(interp, STRINGNULL);
         }
 
         return retv;
