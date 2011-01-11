@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 29;
+plan tests => 30;
 
 =head1 NAME
 
@@ -80,6 +80,7 @@ int main(void)
     Parrot_PMC pmc, pmc2, pmc3;
     Parrot_Int type, value, integer;
     Parrot_String string;
+    Parrot_Float number;
 
     interp = new_interp();
 
@@ -312,6 +313,18 @@ Hello, parrot
 Hello, pir
 OUTPUT
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_add_float" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+    number = 43.0;
+
+    pmc3 = Parrot_PMC_add_float(interp, pmc, number, pmc3);
+    number = Parrot_PMC_get_number(interp, pmc3);
+    Parrot_io_printf(interp,"%.2f\n", number);
+CODE
+1.00
+Done!
+OUTPUT
+
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_absolute" );
 
@@ -540,6 +553,7 @@ CODE
 958
 Done!
 OUTPUT
+
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_assign_pmc" );
     Parrot_PMC_set_integer_native(interp, pmc, -42);
