@@ -546,7 +546,7 @@ determine_input_file_type(PARROT_INTERP, ARGIN(STRING *sourcefile),
      */
     if (STRING_length(sourcefile) == 1
     &&  STRING_ord(interp, sourcefile, 0) ==  '-') {
-        imc_yyin_set(interp, PIO_STDHANDLE(interp, PIO_STDIN_FILENO), yyscanner);
+        imc_yyin_set(PIO_STDHANDLE(interp, PIO_STDIN_FILENO), yyscanner);
     }
     else {
         if (imcc_string_ends_with(interp, sourcefile, ".pbc")) {
@@ -562,7 +562,7 @@ determine_input_file_type(PARROT_INTERP, ARGIN(STRING *sourcefile),
                                       "Error reading source file %Ss.\n",
                                       sourcefile);
 
-            imc_yyin_set(interp, file, yyscanner);
+            imc_yyin_set(file, yyscanner);
 
             if (imcc_string_ends_with(interp, sourcefile, ".pasm"))
                 SET_STATE_PASM_FILE(interp);
@@ -649,6 +649,8 @@ compile_to_bytecode(PARROT_INTERP,
     }
 
     imc_cleanup(interp, yyscanner);
+
+    PIO_CLOSE(interp, imc_yyin_get(yyscanner));
 
     IMCC_info(interp, 1, "%ld lines compiled.\n", IMCC_INFO(interp)->line);
     if (per_pbc && !IMCC_INFO(interp)->write_pbc)

@@ -882,6 +882,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
     Parrot_pop_context(interp);
 
     imc_cleanup(interp, NULL);
+    PIO_CLOSE(interp, fp);
 
     if (!IMCC_INFO(interp)->error_code)
         cs = interp->code;
