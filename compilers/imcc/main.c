@@ -270,9 +270,8 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN(const char **argv))
             break;
           case 'o':
             UNSET_STATE_RUN_PBC(interp);
-            interp->output_file = Parrot_str_new_init(interp, opt.opt_arg,
-                                        strlen(opt.opt_arg),
-                                        Parrot_utf8_encoding_ptr, 0);
+            interp->output_file = Parrot_str_from_platform_cstring(interp,
+                                        opt.opt_arg);
             break;
 
           case OPT_PBC_OUTPUT:

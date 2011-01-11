@@ -700,9 +700,10 @@ string.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
 STRING *
-Parrot_str_from_platform_cstring(PARROT_INTERP, const char *c)
+Parrot_str_from_platform_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *c))
 {
     ASSERT_ARGS(Parrot_str_from_platform_cstring)
     if (!c)
@@ -715,7 +716,7 @@ Parrot_str_from_platform_cstring(PARROT_INTERP, const char *c)
 
 /*
 
-=item C<char * Parrot_str_to_platform_cstring(PARROT_INTERP, STRING *s)>
+=item C<char * Parrot_str_to_platform_cstring(PARROT_INTERP, const STRING *s)>
 
 Obtain a C string, encoded in the platform's assumed encoding, from a Parrot
 string.
@@ -724,9 +725,10 @@ string.
 
 */
 
+PARROT_CAN_RETURN_NULL
 PARROT_EXPORT
 char *
-Parrot_str_to_platform_cstring(PARROT_INTERP, STRING *s)
+Parrot_str_to_platform_cstring(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_platform_cstring)
     if (STRING_IS_NULL(s)) {

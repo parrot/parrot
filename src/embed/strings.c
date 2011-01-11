@@ -139,11 +139,11 @@ Parrot_api_string_free_exported_wchar(ARGIN(Parrot_PMC interp_pmc), ARGIN(wchar_
 /*
 
 =item C<Parrot_Int Parrot_api_string_import(Parrot_PMC interp_pmc, const char *
-str, const char *encoding_name, Parrot_String * out)>
+str, Parrot_String * out)>
 
 Transforms string C<str> into a Parrot_String and stores the result in C<out>
-using the encoding named C<encoding_name>. This function returns a true value
-if this call is successful and false value otherwise.
+using the platform encoding. This function returns a true value if this call
+is successful and false value otherwise.
 
 =cut
 
@@ -152,12 +152,11 @@ if this call is successful and false value otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_string_import(ARGIN(Parrot_PMC interp_pmc), ARGIN(const char * str),
-        ARGIN(const char *encoding_name), ARGOUT(Parrot_String * out))
+        ARGOUT(Parrot_String * out))
 {
     ASSERT_ARGS(Parrot_api_string_import)
     EMBED_API_CALLIN(interp_pmc, interp)
-    const STR_VTABLE *encoding = Parrot_find_encoding(interp, encoding_name);
-    *out = Parrot_str_new_init(interp, str, strlen(str), encoding, 0);
+    *out = Parrot_str_from_platform_cstring(interp, str);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
@@ -224,11 +223,16 @@ Parrot_api_string_import_wchar(ARGIN(Parrot_PMC interp_pmc), ARGIN(wchar_t * str
 /*
 
 =item C<Parrot_Int Parrot_api_string_import_binary(Parrot_PMC interp_pmc, const
-unsigned char *bytes, Parrot_Int length, Parrot_String *out)>
+unsigned char *bytes, Parrot_Int length, const char *encoding_name,
+Parrot_String *out)>
 
-Transforms the buffer C<bytes> of size C<length> into a Parrot_String and stores
-the result in C<out>. This function returns a true value if this call is
-successful and false value otherwise.
+Transforms the buffer C<bytes> of size C<length> with the encoding
+C<encoding_name> into a Parrot_String and stores the result in C<out>. This
+function returns a true value if this call is successful and false value
+otherwise.
+
+Supported encodings are: "ascii", "iso-8859-1", "binary", "utf8", "utf16",
+"ucs2", and "ucs4".
 
 =cut
 
@@ -237,11 +241,14 @@ successful and false value otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_string_import_binary(ARGIN(Parrot_PMC interp_pmc), ARGIN(const unsigned char *bytes),
-        ARGIN_NULLOK(Parrot_Int length), ARGOUT(Parrot_String *out))
+        ARGIN_NULLOK(Parrot_Int length), ARGIN(const char *encoding_name),
+        ARGOUT(Parrot_String *out))
 {
     ASSERT_ARGS(Parrot_api_string_import_binary)
     EMBED_API_CALLIN(interp_pmc, interp)
-    *out = Parrot_str_new(interp, (const char *)bytes, length);
+    const STR_VTABLE *encoding = Parrot_find_encoding(interp, encoding_name);
+    *out = Parrot_str_new_init(interp, (const char *)bytes, length,
+                encoding, 0);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 

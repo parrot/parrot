@@ -162,8 +162,7 @@ Parrot_io_open_unix(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
     char        *spath;
 
     oflags = convert_flags_to_unix(flags);
-    spath  = Parrot_str_to_encoded_cstring(interp, path,
-                Parrot_utf8_encoding_ptr);
+    spath  = Parrot_str_to_platform_cstring(interp, path);
 
     while ((fd = open(spath, oflags, DEFAULT_OPEN_MODE)) < 0
     &&      errno == EINTR)

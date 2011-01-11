@@ -344,12 +344,10 @@ PARROT_API
 Parrot_Int Parrot_api_string_import(
     ARGIN(Parrot_PMC interp_pmc),
     ARGIN(const char * str),
-    ARGIN(const char *encoding_name),
     ARGOUT(Parrot_String * out))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
         FUNC_MODIFIES(* out);
 
 PARROT_API
@@ -367,10 +365,12 @@ Parrot_Int Parrot_api_string_import_binary(
     ARGIN(Parrot_PMC interp_pmc),
     ARGIN(const unsigned char *bytes),
     ARGIN_NULLOK(Parrot_Int length),
+    ARGIN(const char *encoding_name),
     ARGOUT(Parrot_String *out))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
         FUNC_MODIFIES(*out);
 
 PARROT_API
@@ -406,7 +406,6 @@ Parrot_Int Parrot_api_string_import_wchar(
 #define ASSERT_ARGS_Parrot_api_string_import __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(str) \
-    , PARROT_ASSERT_ARG(encoding_name) \
     , PARROT_ASSERT_ARG(out))
 #define ASSERT_ARGS_Parrot_api_string_import_ascii \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -417,6 +416,7 @@ Parrot_Int Parrot_api_string_import_wchar(
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(bytes) \
+    , PARROT_ASSERT_ARG(encoding_name) \
     , PARROT_ASSERT_ARG(out))
 #define ASSERT_ARGS_Parrot_api_string_import_wchar \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

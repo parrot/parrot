@@ -172,7 +172,7 @@ main(int argc, const char *argv[])
     if (!Parrot_api_set_runcore(interp, core, trace))
         show_last_error_and_exit(interp);
 
-    if (!Parrot_api_string_import(interp, sourcefile, "utf8", &source_str))
+    if (!Parrot_api_string_import(interp, sourcefile, &source_str))
         show_last_error_and_exit(interp);
 
     if (!Parrot_api_wrap_imcc_hack(
@@ -724,7 +724,7 @@ parseflags(Parrot_PMC interp,
             result = Parrot_api_set_warnings(interp, 0xFFFF);
             break;
           case 'o':
-            Parrot_api_string_import(interp, opt.opt_arg, "utf8", &str);
+            Parrot_api_string_import(interp, opt.opt_arg, &str);
             result = Parrot_api_set_output_file(interp, str);
             break;
           case OPT_PBC_OUTPUT:
