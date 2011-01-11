@@ -697,7 +697,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
 
 /*
 
-=item C<STRING * Parrot_str_from_platform_cstring(PARROT_INTERP, char *c)>
+=item C<STRING * Parrot_str_from_platform_cstring(PARROT_INTERP, const char *c)>
 
 Convert a C string, encoded in the platform's assumed encoding, to a Parrot
 string.
@@ -706,15 +706,33 @@ string.
 
 */
 
+PARROT_EXPORT
 STRING *
-Parrot_str_from_platform_cstring(PARROT_INTERP, char *c)
+Parrot_str_from_platform_cstring(PARROT_INTERP, const char *c)
 {
     ASSERT_ARGS(Parrot_str_from_platform_cstring)
     if (!c)
         return STRINGNULL;
-    else
-        return Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(c),
-                                    Parrot_platform_encoding_ptr, 0);
+    else {
+        STRING *retv;
+        Parrot_runloop jmp;
+
+        if (setjmp(jmp.resume)) {
+            /* catch */
+            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+            retv =  Parrot_str_new_init(interp, c, strlen(c),
+                                        Parrot_binary_encoding_ptr, 0);
+        }
+        else {
+            /* try */
+            Parrot_ex_add_c_handler(interp, &jmp);
+            retv = Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(interp, c),
+                                        Parrot_platform_encoding_ptr, 0);
+            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+        }
+
+        return retv;
+    }
 }
 
 
@@ -729,6 +747,7 @@ string.
 
 */
 
+PARROT_EXPORT
 char *
 Parrot_str_to_platform_cstring(PARROT_INTERP, STRING *s)
 {

@@ -221,6 +221,19 @@ These fall out from the logical vtables deprecation.
 
 L<https://trac.parrot.org/parrot/ticket/1655>
 
+=item "constant" PObj [eligible in 3.1]
+
+"constant" PObj (which is never collected) are deprecated. All PMCs and STRINGs
+should be properly marked during GC.
+
+Functions C<Parrot_pmc_new_constant>, C<Parrot_pmc_new_constant_noinit>,
+C<Parrot_pmc_new_constant_init> and C<Parrot_pmc_new_constant_init_int>
+will be removed.
+
+PObj flag C<PObj_constant_FLAG> and related macros will be removed.
+
+L<https://trac.parrot.org/parrot/ticket/1875>
+
 =back
 
 =head1 Bytecode

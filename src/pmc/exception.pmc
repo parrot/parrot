@@ -160,7 +160,7 @@ Initializes the exception with supplied values.
         INTVAL severity_val = EXCEPT_error;
         STRING *message_val = NULL;
 
-        const INTVAL ishash = VTABLE_isa(INTERP, values, CONST_STRING(INTERP, 'Hash'));
+        const INTVAL ishash = VTABLE_isa(INTERP, values, CONST_STRING(INTERP, "Hash"));
 
         STATICSELF.init();
 

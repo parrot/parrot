@@ -18,6 +18,7 @@ Functions controlling Parrot's profiling runcore.
 */
 
 #include "parrot/runcore_api.h"
+#include "parrot/extend.h"
 #include "parrot/embed.h"
 #include "parrot/runcore_profiling.h"
 #include "parrot/oplib/core_ops.h"
@@ -280,8 +281,8 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
             runcore->output_fn = record_values_none;
         }
         else {
-            Parrot_fprintf(stderr, "'%Ss' is not a valid profiling output format.\n", output_str);
-            fprintf(stderr, "Valid values are pprof and none.  The default is pprof.\n");
+            Parrot_eprintf(interp, "'%Ss' is not a valid profiling output format.\n", output_str);
+            Parrot_eprintf(interp, "Valid values are pprof and none.  The default is pprof.\n");
             exit(1);
         }
     }

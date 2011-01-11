@@ -535,18 +535,8 @@ reads entries from a directory.
         }
 
         while ((dirent = readdir(dir)) != NULL) {
-            /* We don't have yet a good way to know what encoding should be
-             * used. In the meantime, use binary when there is any non ascii
-             * character */
             const char *const name = dirent->d_name;
-            STR_VTABLE *encoding;
-            size_t l = strlen(name);
-            size_t i;
-            for (i = 0; i < l; ++i)
-                if ((unsigned char)name[i] > 127)
-                    break;
-            encoding = i == l ? Parrot_ascii_encoding_ptr : Parrot_binary_encoding_ptr;
-            VTABLE_push_string(INTERP, array, Parrot_str_new_init(INTERP, name, l, encoding, 0));
+            VTABLE_push_string(INTERP, array, Parrot_str_from_platform_cstring(INTERP, name));
         }
 
         closedir(dir);
