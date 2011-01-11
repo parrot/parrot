@@ -70,7 +70,7 @@ SKIP: {
         and croak "Unable to execute setup.pir";
     is($build_status, 0,
         "system call to execute setup.pir completed successfully");
-    
+
     my $test_status =
         system("cd $lang_dir && \"$parrot_exe\" setup.pir test $to_dev_null")
         and croak "Unable to execute setup.pir test";
