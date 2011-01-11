@@ -16,7 +16,6 @@ use warnings;
 use strict;
 
 use Fcntl qw( :DEFAULT :flock );
-use Text::Balanced qw(extract_delimited);
 use IO::File ();
 
 my $outfile          = 'all_cstring.str';
@@ -149,8 +148,8 @@ HEADER
             die "CONST_STRING split across lines at $line in $infile\n";
         }
 
-        my $str = extract_delimited;    # $_, '"';
-        $str    = substr $str, 1, -1;
+        my ($str) = m/^\s*"((?:\\"|[^"])*)"/;
+
         ## print STDERR "** '$str' $line\n";
         my $n;
         if ( $n = $known_strings{$str} ) {
