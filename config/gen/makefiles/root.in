@@ -1477,7 +1477,10 @@ src/runcore/profiling$(O) : src/runcore/profiling.str src/runcore/profiling.c \
 	include/pmc/pmc_namespace.h \
 	$(INC_DIR)/oplib/core_ops.h $(INC_DIR)/runcore_api.h \
 	$(INC_DIR)/runcore_profiling.h $(INC_DIR)/embed.h \
-	$(PARROT_H_HEADERS)
+	$(PARROT_H_HEADERS) \
+	$(INC_DIR)/extend.h \
+	$(INC_DIR)/extend_vtable.h
+
 
 src/call/args$(O) : \
 	$(PARROT_H_HEADERS) $(INC_DIR)/oplib/ops.h \
