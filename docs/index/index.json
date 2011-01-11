@@ -26,7 +26,7 @@
       {
          "source" : [
             "docs/book/pct/ch03_compiler_tools.pod",
-            ":PCT_tutorial",
+            ":pct_tutorial",
             "docs/book/pct/ch04_pge.pod",
             "docs/book/pct/ch05_nqp.pod",
             "docs/compiler_faq.pod"
