@@ -25,7 +25,7 @@ Tests the Rational PMC.
     $S0 = config_hash['gmp']
 
     unless $S0 goto no_gmp
-    plan(77)
+    plan(78)
     loadlib $P1, 'rational'
     test_init()
     test_destroy()
@@ -74,6 +74,7 @@ Tests the Rational PMC.
     test_abs()
     test_cmp()
     test_equal()
+    test_equal_int()
     .return()
 
  no_gmp:
@@ -134,6 +135,15 @@ CODE
         ok(0, '== on Rational and String PMC')
     .end
 CODE
+.end
+
+.sub test_equal_int
+    $P0 = new ['Rational']
+    $P0 = "2/1"
+
+    eq $P0, 2, success
+  success:
+    ok(1, 'is_equal on Rational and integer')
 .end
 
 .sub test_cmp

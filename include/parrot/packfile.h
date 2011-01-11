@@ -1164,25 +1164,6 @@ opcode_t PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
 /* HEADERIZER END: src/packfile/output.c */
 
 
-/* This is temporary, to make do_sub_pragmas public... */
-/* HEADERIZER BEGIN: src/packfile/execute.c */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-void do_sub_pragmas(PARROT_INTERP,
-    ARGIN(PackFile_ByteCode *self),
-    pbc_action_enum_t action,
-    ARGIN_NULLOK(PMC *eval_pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-#define ASSERT_ARGS_do_sub_pragmas __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/packfile/execute.c */
-
-
-
 #endif /* PARROT_PACKFILE_H_GUARD */
 
 /*

@@ -163,12 +163,6 @@ an op and the remaining PMCs being Integers.
         op_num = VTABLE_get_integer_keyed_str(INTERP, attrs->op_map,
                  VTABLE_get_string_keyed_int(INTERP, p, 0));
 
-        if (op_num == -1) {
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                    "invalid op name: '%Ss'",
-                    VTABLE_get_string_keyed_int(INTERP, p, 0));
-        }
-
         /* add the things to attrs->ops */
         VTABLE_push_integer(INTERP, attrs->ops, op_num);
         arr_size = VTABLE_elements(INTERP, p);
@@ -259,58 +253,6 @@ Set an integer's worth of data in the segment.
         }
         GET_ATTR_main_sub(INTERP, SELF, main_sub);
         RETURN(INTVAL main_sub);
-    }
-
-/*
-
-=back
-
-=head2 Packfile Interface Methods
-
-=over 4
-
-=item C<STRING *pack()>
-
-Serialize the segment.
-
-=cut
-
-*/
-    METHOD pack() {
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
-                                    "PackfileBytecodeSegment.pack() not implemented yet.");
-    }
-
-
-/*
-
-=item C<void unpack(STRING *data)>
-
-Unpack a serialized segment string.
-
-=cut
-
-*/
-    METHOD unpack(STRING *data) {
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
-                                    "PackfileBytecodeSegment.unpack() not implemented yet.");
-    }
-/*
-
-=item C<void load_lib()>
-
-Load a dynop library so that ops contained in that library can be used in this
-bytecode segment.
-
-=cut
-
-*/
-
-    METHOD void load_lib(STRING *lib_name) {
-        Parrot_PackfileBytecodeSegment_attributes * attrs =
-            PARROT_PACKFILEBYTECODESEGMENT(SELF);
-        Parrot_pcc_invoke_method_from_c_args(INTERP, SELF, CONST_STRING(INTERP, "load_lib"),
-                "S->", lib_name);
     }
 
 /*

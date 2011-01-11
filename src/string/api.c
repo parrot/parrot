@@ -33,6 +33,8 @@ members, beside setting C<bufstart>/C<buflen> for external strings.
 STRING *STRINGNULL;
 #endif
 
+#define DEBUG_HASH_SEED 0
+
 #define nonnull_encoding_name(s) (s) ? (s)->encoding->name : "null string"
 #define ASSERT_STRING_SANITY(s) \
     PARROT_ASSERT((s)->encoding); \
@@ -137,6 +139,9 @@ Parrot_str_init(PARROT_INTERP)
         /* TT #64 - use an entropy source once available */
         Parrot_util_srand(Parrot_intval_time());
         interp->hash_seed = Parrot_util_uint_rand(0);
+#if DEBUG_HASH_SEED
+        fprintf(stderr, "HASH SEED: %x\n", interp->hash_seed);
+#endif
     }
 
     /* initialize the constant string table */
@@ -687,6 +692,73 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
         s->strlen = s->bufused = 0;
 
     return s;
+}
+
+
+/*
+
+=item C<STRING * Parrot_str_from_platform_cstring(PARROT_INTERP, const char *c)>
+
+Convert a C string, encoded in the platform's assumed encoding, to a Parrot
+string.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+STRING *
+Parrot_str_from_platform_cstring(PARROT_INTERP, const char *c)
+{
+    ASSERT_ARGS(Parrot_str_from_platform_cstring)
+    if (!c)
+        return STRINGNULL;
+    else {
+        STRING *retv;
+        Parrot_runloop jmp;
+
+        if (setjmp(jmp.resume)) {
+            /* catch */
+            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+            retv =  Parrot_str_new_init(interp, c, strlen(c),
+                                        Parrot_binary_encoding_ptr, 0);
+        }
+        else {
+            /* try */
+            Parrot_ex_add_c_handler(interp, &jmp);
+            retv = Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(interp, c),
+                                        Parrot_platform_encoding_ptr, 0);
+            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+        }
+
+        return retv;
+    }
+}
+
+
+/*
+
+=item C<char * Parrot_str_to_platform_cstring(PARROT_INTERP, STRING *s)>
+
+Obtain a C string, encoded in the platform's assumed encoding, from a Parrot
+string.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+char *
+Parrot_str_to_platform_cstring(PARROT_INTERP, STRING *s)
+{
+    ASSERT_ARGS(Parrot_str_to_platform_cstring)
+    if (STRING_IS_NULL(s)) {
+        return NULL;
+    }
+    else {
+        STRING *s_plat = Parrot_str_change_encoding(interp, s, Parrot_platform_encoding_ptr->num);
+        return Parrot_str_to_cstring(interp, s_plat);
+    }
 }
 
 
