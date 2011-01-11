@@ -365,7 +365,7 @@ OUTPUT
 
 # test readdir
 SKIP: {
-    skip 'not implemented on windows yet', 2 if ( $MSWin32 && $MSVC );
+    skip 'not implemented on windows yet', 3 if ( $MSWin32 && $MSVC );
 
     opendir my $IN, 'docs';
     my @entries = readdir $IN;
@@ -382,20 +382,6 @@ SKIP: {
     print "\n"
 .end
 CODE
-
-    pir_error_output_like( <<'CODE', <<'OUTPUT', 'Test bad OS.readdir' );
-.sub main :main
-    $P0 = loadlib 'os'
-    $P1 = new ['OS']
-    $P2 = $P1.'readdir'('non-existent directory')
-.end
-CODE
-/No such file or directory/
-OUTPUT
-}
-
-TODO: {
-    local $TODO = 'TT #1836: non-ascii filenames not yet consistently working';
 
     mkdir 'silly-dir-with-silly-names';
     open my $fileh, '>', "silly-dir-with-silly-names/sillyname\x{263A}";
@@ -420,6 +406,16 @@ CODE
 
     unlink "silly-dir-with-silly-names/sillyname\x{263A}";
     rmdir "silly-dir-with-silly-names";
+
+    pir_error_output_like( <<'CODE', <<'OUTPUT', 'Test bad OS.readdir' );
+.sub main :main
+    $P0 = loadlib 'os'
+    $P1 = new ['OS']
+    $P2 = $P1.'readdir'('non-existent directory')
+.end
+CODE
+/No such file or directory/
+OUTPUT
 }
 
 # test rename
