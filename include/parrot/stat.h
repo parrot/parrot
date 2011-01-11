@@ -27,6 +27,7 @@
 #define STAT_BACKUPTIME           9
 #define STAT_UID                 10
 #define STAT_GID                 11
+#define STAT_ISLNK               12
 #define STAT_PLATFORM_DEV        -1
 #define STAT_PLATFORM_INODE      -2
 #define STAT_PLATFORM_MODE       -3
@@ -42,6 +43,7 @@ PARROT_EXPORT PMC *Parrot_stat_info_pmc(Parrot_Interp, STRING *, INTVAL);
 PARROT_EXPORT STRING *Parrot_stat_info_string(Parrot_Interp, STRING *, INTVAL);
 PARROT_EXPORT INTVAL Parrot_stat_info_intval(Parrot_Interp, STRING *, INTVAL);
 PARROT_EXPORT INTVAL Parrot_fstat_info_intval(Parrot_Interp, INTVAL, INTVAL);
+PARROT_EXPORT INTVAL Parrot_lstat_info_intval(Parrot_Interp, STRING *, INTVAL);
 PARROT_EXPORT FLOATVAL Parrot_stat_info_floatval(Parrot_Interp, STRING *, INTVAL);
 
 #endif /* PARROT_STAT_H_GUARD */

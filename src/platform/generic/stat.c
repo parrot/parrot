@@ -28,6 +28,29 @@ File stat stuff
 #  include <sys/stat.h>
 #endif
 
+/* These can probably be removed if we switch win32 to use the Windows API
+ * for stat */
+
+#ifndef S_IFBLK
+#  define S_IFBLK 0060000
+#endif
+
+#ifndef S_ISBLK
+#  define S_ISBLK(m) (((m) & S_IFMT) == S_IFBLK)
+#endif
+
+#ifndef S_ISCHR
+#  define S_ISCHR(m) (((m) & S_IFMT) == S_IFCHR)
+#endif
+
+#ifndef S_ISDIR
+#  define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#endif
+
+#ifndef S_ISREG
+#  define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+#endif
+
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
@@ -167,6 +190,13 @@ stat_common(PARROT_INTERP, ARGIN(struct stat *statbuf), INTVAL thing, int status
       case STAT_ISDEV:
         result = S_ISCHR(statbuf->st_mode) || S_ISBLK(statbuf->st_mode);
         break;
+      case STAT_ISLNK:
+#ifdef S_ISLNK
+        result = S_ISLNK(statbuf->st_mode);
+#else
+        result = 0;
+#endif
+        break;
       case STAT_CREATETIME:
         result = -1;
         break;
@@ -224,6 +254,35 @@ stat_common(PARROT_INTERP, ARGIN(struct stat *statbuf), INTVAL thing, int status
     }
 
     return result;
+}
+
+/*
+
+=item C<INTVAL Parrot_lstat_info_intval(PARROT_INTERP, STRING *file, INTVAL
+thing)>
+
+Returns the lstat field given by C<thing> of file C<file>.
+
+=cut
+
+*/
+
+INTVAL
+Parrot_lstat_info_intval(PARROT_INTERP, STRING *file, INTVAL thing)
+{
+    struct stat statbuf;
+
+    /* Get the name of the file as something we can use */
+    char * const filename = Parrot_str_to_cstring(interp, file);
+
+    /* Everything needs the result of stat, so just go do it */
+#ifdef _WIN32
+    const int status = stat(filename, &statbuf);
+#else
+    const int status = lstat(filename, &statbuf);
+#endif
+    Parrot_str_free_cstring(filename);
+    return stat_common(interp, &statbuf, thing, status);
 }
 
 /*

@@ -167,7 +167,7 @@ Parrot_io_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
 
     /* Don't open directories */
     if (fstat(fd, &buf) == -1
-    || (buf.st_mode & S_IFMT) == S_IFDIR) {
+    ||  S_ISDIR(buf.st_mode)) {
         close(fd);
         return PIO_INVALID_HANDLE;
     }
