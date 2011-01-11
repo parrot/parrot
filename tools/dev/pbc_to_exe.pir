@@ -84,7 +84,7 @@ HEADER
             Parrot_Init_Args *initargs;
             GET_INIT_STRUCT(initargs);
 
-            setlocale(LC_ALL, "");
+            setlocale(LC_CTYPE, "");
 
             program_code_addr = (const unsigned char *)get_program_code();
             if (!program_code_addr)

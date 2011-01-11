@@ -152,7 +152,7 @@ main(int argc, const char *argv[])
 
     GET_INIT_STRUCT(initargs);
     /* internationalization setup */
-    setlocale(LC_ALL, "");
+    setlocale(LC_CTYPE, "");
     /* PARROT_BINDTEXTDOMAIN(PACKAGE, LOCALEDIR); */
     /* PARROT_TEXTDOMAIN(PACKAGE); */
 
