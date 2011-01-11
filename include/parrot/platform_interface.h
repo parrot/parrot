@@ -38,17 +38,6 @@ void Parrot_free_memalign(void *);
 #  define Parrot_memalign_if_possible(a, s) Parrot_memalign((a), (s))
 #endif
 
-#ifdef PARROT_HAS_EXEC_PROTECT
-void *mem_alloc_executable(size_t);
-void mem_free_executable(void *, size_t);
-void *mem_realloc_executable(void *, size_t, size_t);
-#else
-#  define mem_alloc_executable mem_internal_allocate
-#  define mem_free_executable(a, b) mem_internal_free(a)
-#  define mem_realloc_executable(a, b, c) mem_internal_realloc((a), (c))
-#endif
-
-
 /*
 ** Process ID
 */
@@ -127,6 +116,12 @@ int Parrot_dlclose(void *handle);
 #ifndef PARROT_HAS_HEADER_SIGNAL
 #  define Parrot_set_sighandler(s, h)
 #endif
+
+/*
+ * encoding
+ */
+void Parrot_init_platform_encoding(PARROT_INTERP);
+size_t Parrot_str_platform_strlen(PARROT_INTERP, const char *s);
 
 /*
  * system timer

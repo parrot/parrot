@@ -91,9 +91,11 @@ sub runstep {
         libparrot_shared_alias => "libparrot$share_ext",
         rpath                  => "-L",
         libparrot_soname       => "-install_name "
-            . '"'. $lib_dir
+            . '"'
+            . $conf->data->get('libdir')
             . '/libparrot'
-            . $conf->data->get('share_ext') . '"'
+            . $conf->data->get('share_ext')
+            . '"'
     );
 }
 
