@@ -62,7 +62,8 @@ typedef off_t PIOOFF_T;
 
 PIOHANDLE Parrot_io_std_os_handle(PARROT_INTERP, INTVAL fileno);
 PIOHANDLE Parrot_io_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags);
-INTVAL Parrot_io_close(PARROT_INTERP, PIOHANDLE file_descriptor);
+PIOHANDLE Parrot_io_dup(PARROT_INTERP, PIOHANDLE handle);
+INTVAL Parrot_io_close(PARROT_INTERP, PIOHANDLE handle);
 INTVAL Parrot_io_close_piohandle(PARROT_INTERP, PIOHANDLE handle);
 INTVAL Parrot_io_waitpid(PARROT_INTERP, INTVAL pid);
 INTVAL Parrot_io_is_tty(PARROT_INTERP, PIOHANDLE fd);

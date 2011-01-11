@@ -175,6 +175,23 @@ Parrot_io_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
     return fd;
 }
 
+/*
+
+=item C<PIOHANDLE Parrot_io_dup(PARROT_INTERP, PIOHANDLE handle)>
+
+Duplicates file handle C<handle>.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PIOHANDLE
+Parrot_io_dup(PARROT_INTERP, PIOHANDLE handle)
+{
+    return dup(handle);
+}
+
 #if PARROT_ASYNC_DEVEL
 
 /*

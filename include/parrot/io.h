@@ -45,7 +45,7 @@
     Parrot_io_open((interp), (file), (flags))
 #define PIO_OPEN_PIPE(interp, file, flags, pid) \
     Parrot_io_open_pipe((interp), (file), (flags), (pid))
-#define PIO_DUP(interp, handle) (PIOHANDLE)dup((int)(handle))
+#define PIO_DUP(interp, handle) Parrot_io_dup((interp), (handle))
 #define PIO_CLOSE(interp, handle) Parrot_io_close((interp), (handle))
 #define PIO_CLOSE_PIOHANDLE(interp, handle) Parrot_io_close_piohandle((interp), (handle))
 #define PIO_PIPE_WAIT(interp, pid) Parrot_io_waitpid((interp), (pid))
