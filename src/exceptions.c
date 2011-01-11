@@ -115,15 +115,15 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 
         /* flush interpreter output to get things printed in order */
         if (!PMC_IS_NULL(Parrot_io_STDOUT(interp)))
-            Parrot_io_flush(interp, Parrot_io_STDOUT(interp));
+            Parrot_io_flush_handle(interp, Parrot_io_STDOUT(interp));
         if (use_perr)
-            Parrot_io_flush(interp, Parrot_io_STDERR(interp));
+            Parrot_io_flush_handle(interp, Parrot_io_STDERR(interp));
 
         if (interp->pdb) {
             Interp * const interpdeb = interp->pdb->debugger;
             if (interpdeb) {
-                Parrot_io_flush(interpdeb, Parrot_io_STDOUT(interpdeb));
-                Parrot_io_flush(interpdeb, Parrot_io_STDERR(interpdeb));
+                Parrot_io_flush_handle(interpdeb, Parrot_io_STDOUT(interpdeb));
+                Parrot_io_flush_handle(interpdeb, Parrot_io_STDERR(interpdeb));
             }
         }
 

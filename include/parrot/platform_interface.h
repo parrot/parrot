@@ -50,6 +50,45 @@ void Parrot_platform_init_code(void);
 ** I/O:
 */
 
+#ifdef _WIN32
+#  define PIO_INVALID_HANDLE ((void *)-1)
+typedef void *PIOHANDLE;
+typedef HUGEINTVAL PIOOFF_T;
+#else
+#  define PIO_INVALID_HANDLE -1
+typedef INTVAL PIOHANDLE;
+typedef off_t PIOOFF_T;
+#endif
+
+PIOHANDLE Parrot_io_std_os_handle(PARROT_INTERP, INTVAL fileno);
+PIOHANDLE Parrot_io_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags);
+INTVAL Parrot_io_close(PARROT_INTERP, PIOHANDLE file_descriptor);
+INTVAL Parrot_io_close_piohandle(PARROT_INTERP, PIOHANDLE handle);
+INTVAL Parrot_io_waitpid(PARROT_INTERP, INTVAL pid);
+INTVAL Parrot_io_is_tty(PARROT_INTERP, PIOHANDLE fd);
+INTVAL Parrot_io_getblksize(PIOHANDLE fd);
+INTVAL Parrot_io_flush(PARROT_INTERP, PIOHANDLE os_handle);
+size_t Parrot_io_read(PARROT_INTERP, PIOHANDLE os_handle, ARGMOD(char *buf), size_t len);
+size_t Parrot_io_write(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(const char *buf), size_t len);
+PIOOFF_T Parrot_io_seek(PARROT_INTERP, PIOHANDLE os_handle, PIOOFF_T offset, INTVAL whence);
+PIOOFF_T Parrot_io_tell(PARROT_INTERP, PIOHANDLE os_handle);
+PIOHANDLE Parrot_io_open_pipe(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
+        ARGOUT(INTVAL *pid_out));
+INTVAL Parrot_io_pipe(PARROT_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE *writer));
+
+/*
+ * Socket
+ */
+
+PMC *Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port);
+INTVAL Parrot_io_socket(PARROT_INTERP, ARGIN(PMC *s), int fam, int type, int proto);
+INTVAL Parrot_io_connect(PARROT_INTERP, ARGMOD(PMC *socket), ARGIN(PMC *r));
+INTVAL Parrot_io_bind(PARROT_INTERP, ARGMOD(PMC *socket), ARGMOD(PMC *sockaddr));
+INTVAL Parrot_io_listen(SHIM_INTERP, ARGMOD(PMC *socket), INTVAL sec);
+PMC *Parrot_io_accept(PARROT_INTERP, ARGMOD(PMC *socket));
+INTVAL Parrot_io_send(SHIM_INTERP, ARGMOD(PMC *socket), ARGMOD(STRING *s));
+INTVAL Parrot_io_recv(PARROT_INTERP, ARGMOD(PMC *socket), ARGOUT(STRING **s));
+INTVAL Parrot_io_poll(SHIM_INTERP, ARGMOD(PMC *socket), int which, int sec, int usec);
 
 /*
 ** Math:

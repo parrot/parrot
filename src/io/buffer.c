@@ -648,7 +648,7 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRIN
         /* Buffering would break append semantics */
         need_flush = 1;
 
-#ifdef PIO_OS_WIN32
+#ifdef _WIN32
         /* Win32 doesn't support append */
         PIO_SEEK(interp, os_handle, 0, SEEK_END);
 #endif

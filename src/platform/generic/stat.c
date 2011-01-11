@@ -142,6 +142,7 @@ C<STAT_CREATETIME> and C<STAT_BACKUPTIME> are not supported and will return C<-1
 static INTVAL
 stat_common(PARROT_INTERP, ARGIN(struct stat *statbuf), INTVAL thing, int status)
 {
+    ASSERT_ARGS(stat_common)
     INTVAL result = -1;
 
     if (thing == STAT_EXISTS)

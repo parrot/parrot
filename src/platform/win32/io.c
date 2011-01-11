@@ -1,9 +1,9 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/io/win32.c - Win32 I/O utility functions
+src/platform/win32/io.c - Win32 I/O utility functions
 
 =head1 DESCRIPTION
 
@@ -21,17 +21,13 @@ Win32 System Programming, 2nd Edition.
 
 */
 
-#ifdef WIN32
-#  include <windows.h>
-#endif
+#include <windows.h>
 
 #include "parrot/parrot.h"
-#include "pmc/pmc_filehandle.h"
-#include "io_private.h"
+#include "../../io/io_private.h"
 
-#ifdef PIO_OS_WIN32
+/* HEADERIZER HFILE: none */
 
-/* HEADERIZER HFILE: include/parrot/io_win32.h */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -54,9 +50,9 @@ static void convert_flags_to_win32(
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-#  include <tchar.h>
+#include <tchar.h>
 
-#  define PIO_TRACE 0
+#define PIO_TRACE 0
 
 /*
 
@@ -112,36 +108,7 @@ convert_flags_to_win32(INTVAL flags, ARGOUT(DWORD * fdwAccess),
 
 /*
 
-=item C<INTVAL Parrot_io_init_win32(PARROT_INTERP)>
-
-Sets up the standard C<std*> IO handles.
-
-=cut
-
-*/
-
-INTVAL
-Parrot_io_init_win32(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_io_init_win32)
-    struct WSAData sockinfo;
-    int ret;
-
-    /* Start Winsock
-     * no idea where or whether destroy it
-     */
-    ret = WSAStartup(2, &sockinfo);
-    if (ret != 0) {
-        fprintf(stderr, "WSAStartup failed!!\n ErrorCode=%i\n\n",
-                  WSAGetLastError());
-        return -4;
-    }
-    return 0;
-}
-
-/*
-
-=item C<PIOHANDLE Parrot_io_stdhandle_win32(PARROT_INTERP, INTVAL fileno)>
+=item C<PIOHANDLE Parrot_io_std_os_handle(PARROT_INTERP, INTVAL fileno)>
 
 Returns a standard file handle.
 
@@ -150,9 +117,8 @@ Returns a standard file handle.
 */
 
 PIOHANDLE
-Parrot_io_stdhandle_win32(PARROT_INTERP, INTVAL fileno)
+Parrot_io_std_os_handle(PARROT_INTERP, INTVAL fileno)
 {
-    ASSERT_ARGS(Parrot_io_stdhandle_win32)
     DWORD nStdHandle;
 
     switch (fileno) {
@@ -173,7 +139,7 @@ Parrot_io_stdhandle_win32(PARROT_INTERP, INTVAL fileno)
 
 /*
 
-=item C<INTVAL Parrot_io_getblksize_win32(PIOHANDLE fd)>
+=item C<INTVAL Parrot_io_getblksize(PIOHANDLE fd)>
 
 Returns C<PIO_BLKSIZE>.
 
@@ -182,17 +148,15 @@ Returns C<PIO_BLKSIZE>.
 */
 
 INTVAL
-Parrot_io_getblksize_win32(SHIM(PIOHANDLE fd))
+Parrot_io_getblksize(SHIM(PIOHANDLE fd))
 {
-    ASSERT_ARGS(Parrot_io_getblksize_win32)
     /* Hard coded for now */
     return PIO_BLKSIZE;
 }
 
 /*
 
-=item C<PIOHANDLE Parrot_io_open_win32(PARROT_INTERP, STRING *path, INTVAL
-flags)>
+=item C<PIOHANDLE Parrot_io_open(PARROT_INTERP, STRING *path, INTVAL flags)>
 
 Calls C<CreateFile()> to open C<*spath> with the Win32 translation of
 C<flags>.
@@ -203,18 +167,17 @@ C<flags>.
 
 PARROT_CAN_RETURN_NULL
 PIOHANDLE
-Parrot_io_open_win32(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
+Parrot_io_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
 {
-    ASSERT_ARGS(Parrot_io_open_win32)
     DWORD      fAcc, fShare, fCreat;
     PIOHANDLE  fd;
     char      *spath;
 
-#  if 0
+#if 0
     if ((Interp_flags_TEST(interp, PARROT_DEBUG_FLAG)) != 0) {
-        fprintf(stderr, "Parrot_io_open_win32: %s\n", spath);
+        fprintf(stderr, "Parrot_io_open: %s\n", spath);
     }
-#  endif
+#endif
 
     /* Set open flags - <, >, >>, +<, +> */
     /* add ? and ! for block/non-block */
@@ -242,7 +205,7 @@ Parrot_io_open_win32(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_dup_win32(PARROT_INTERP, PIOHANDLE handle)>
+=item C<PIOHANDLE Parrot_io_dup(PARROT_INTERP, PIOHANDLE handle)>
 
 Duplicates file handle C<handle>.
 
@@ -252,9 +215,8 @@ Duplicates file handle C<handle>.
 
 PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
-Parrot_io_dup_win32(PARROT_INTERP, PIOHANDLE handle)
+Parrot_io_dup(PARROT_INTERP, PIOHANDLE handle)
 {
-    ASSERT_ARGS(Parrot_io_dup_win32)
     HANDLE current_process = GetCurrentProcess();
     HANDLE new_handle      = INVALID_HANDLE_VALUE;
 
@@ -271,7 +233,7 @@ Parrot_io_dup_win32(PARROT_INTERP, PIOHANDLE handle)
 
 /*
 
-=item C<INTVAL Parrot_io_close_piohandle_win32(PARROT_INTERP, PIOHANDLE handle)>
+=item C<INTVAL Parrot_io_close_piohandle(PARROT_INTERP, PIOHANDLE handle)>
 
 Calls C<CloseHandle()> to close the given file descriptor.  Returns 0 on
 success, -1 on error.
@@ -281,9 +243,8 @@ success, -1 on error.
 */
 
 INTVAL
-Parrot_io_close_piohandle_win32(PARROT_INTERP, PIOHANDLE handle)
+Parrot_io_close_piohandle(PARROT_INTERP, PIOHANDLE handle)
 {
-    ASSERT_ARGS(Parrot_io_close_piohandle_win32)
 
     if (handle == INVALID_HANDLE_VALUE)
         return -1;
@@ -293,7 +254,7 @@ Parrot_io_close_piohandle_win32(PARROT_INTERP, PIOHANDLE handle)
 
 /*
 
-=item C<INTVAL Parrot_io_close_win32(PARROT_INTERP, PIOHANDLE os_handle)>
+=item C<INTVAL Parrot_io_close(PARROT_INTERP, PIOHANDLE os_handle)>
 
 Calls C<CloseHandle()> to close C<*io>'s file descriptor.
 
@@ -302,9 +263,8 @@ Calls C<CloseHandle()> to close C<*io>'s file descriptor.
 */
 
 INTVAL
-Parrot_io_close_win32(PARROT_INTERP, PIOHANDLE os_handle)
+Parrot_io_close(PARROT_INTERP, PIOHANDLE os_handle)
 {
-    ASSERT_ARGS(Parrot_io_close_win32)
     UINTVAL result = 0;
 
     if (os_handle != INVALID_HANDLE_VALUE) {
@@ -318,7 +278,7 @@ Parrot_io_close_win32(PARROT_INTERP, PIOHANDLE os_handle)
 
 /*
 
-=item C<INTVAL Parrot_io_pipe_wait_win32(PARROT_INTERP, INTVAL procid)>
+=item C<INTVAL Parrot_io_waitpid(PARROT_INTERP, INTVAL procid)>
 
 Calls C<CloseHandle()> to close C<*io>'s file descriptor.
 
@@ -327,9 +287,8 @@ Calls C<CloseHandle()> to close C<*io>'s file descriptor.
 */
 
 INTVAL
-Parrot_io_pipe_wait_win32(PARROT_INTERP, INTVAL procid)
+Parrot_io_waitpid(PARROT_INTERP, INTVAL procid)
 {
-    ASSERT_ARGS(Parrot_io_pipe_wait_win32)
     HANDLE process = (HANDLE)procid;
     DWORD  status  = WaitForSingleObject(process, INFINITE);
     DWORD  exit_code;
@@ -345,7 +304,7 @@ Parrot_io_pipe_wait_win32(PARROT_INTERP, INTVAL procid)
 
 /*
 
-=item C<INTVAL Parrot_io_is_tty_win32(PARROT_INTERP, PIOHANDLE fd)>
+=item C<INTVAL Parrot_io_is_tty(PARROT_INTERP, PIOHANDLE fd)>
 
 Returns whether C<fd> is a console/tty.
 
@@ -355,16 +314,15 @@ Returns whether C<fd> is a console/tty.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_is_tty_win32(SHIM_INTERP, PIOHANDLE fd)
+Parrot_io_is_tty(SHIM_INTERP, PIOHANDLE fd)
 {
-    ASSERT_ARGS(Parrot_io_is_tty_win32)
     const DWORD ftype = GetFileType(fd);
     return (ftype == FILE_TYPE_CHAR);
 }
 
 /*
 
-=item C<INTVAL Parrot_io_flush_win32(PARROT_INTERP, PIOHANDLE os_handle)>
+=item C<INTVAL Parrot_io_flush(PARROT_INTERP, PIOHANDLE os_handle)>
 
 Calls C<FlushFileBuffers()> to flush C<*io>'s file descriptor.
 
@@ -373,9 +331,8 @@ Calls C<FlushFileBuffers()> to flush C<*io>'s file descriptor.
 */
 
 INTVAL
-Parrot_io_flush_win32(PARROT_INTERP, PIOHANDLE os_handle)
+Parrot_io_flush(PARROT_INTERP, PIOHANDLE os_handle)
 {
-    ASSERT_ARGS(Parrot_io_flush_win32)
     /*
      * FlushFileBuffers won't work for console handles. From the MS help file:
      *
@@ -393,8 +350,8 @@ Parrot_io_flush_win32(PARROT_INTERP, PIOHANDLE os_handle)
 
 /*
 
-=item C<size_t Parrot_io_read_win32(PARROT_INTERP, PIOHANDLE os_handle, char
-*buf, size_t len)>
+=item C<size_t Parrot_io_read(PARROT_INTERP, PIOHANDLE os_handle, char *buf,
+size_t len)>
 
 Calls C<ReadFile()> to read up to C<len> bytes from C<*io>'s file
 descriptor to the memory starting at C<buffer>.
@@ -404,10 +361,9 @@ descriptor to the memory starting at C<buffer>.
 */
 
 size_t
-Parrot_io_read_win32(PARROT_INTERP, PIOHANDLE os_handle,
+Parrot_io_read(PARROT_INTERP, PIOHANDLE os_handle,
         ARGMOD(char *buf), size_t len)
 {
-    ASSERT_ARGS(Parrot_io_read_win32)
     DWORD countread;
     BOOL  success = ReadFile(os_handle, (LPVOID)buf, (DWORD)len,
                         &countread, NULL);
@@ -425,8 +381,8 @@ Parrot_io_read_win32(PARROT_INTERP, PIOHANDLE os_handle,
 
 /*
 
-=item C<size_t Parrot_io_write_win32(PARROT_INTERP, PIOHANDLE os_handle, const
-char *buf, size_t len)>
+=item C<size_t Parrot_io_write(PARROT_INTERP, PIOHANDLE os_handle, const char
+*buf, size_t len)>
 
 Calls C<WriteFile()> to write C<len> bytes from the memory starting at
 C<buffer> to C<*io>'s file descriptor. Returns C<(size_t)-1> on
@@ -437,10 +393,9 @@ failure.
 */
 
 size_t
-Parrot_io_write_win32(PARROT_INTERP, PIOHANDLE os_handle,
+Parrot_io_write(PARROT_INTERP, PIOHANDLE os_handle,
         ARGIN(const char *buf), size_t len)
 {
-    ASSERT_ARGS(Parrot_io_write_win32)
     DWORD countwrote = 0;
     DWORD err;
 
@@ -480,8 +435,8 @@ fail:
 
 /*
 
-=item C<PIOOFF_T Parrot_io_seek_win32(PARROT_INTERP, PIOHANDLE os_handle,
-PIOOFF_T off, INTVAL whence)>
+=item C<PIOOFF_T Parrot_io_seek(PARROT_INTERP, PIOHANDLE os_handle, PIOOFF_T
+off, INTVAL whence)>
 
 Hard seek.
 
@@ -494,10 +449,9 @@ C<whence>.
 */
 
 PIOOFF_T
-Parrot_io_seek_win32(PARROT_INTERP, PIOHANDLE os_handle,
+Parrot_io_seek(PARROT_INTERP, PIOHANDLE os_handle,
         PIOOFF_T off, INTVAL whence)
 {
-    ASSERT_ARGS(Parrot_io_seek_win32)
     LARGE_INTEGER offset;
 
     offset.QuadPart = off;
@@ -514,7 +468,7 @@ Parrot_io_seek_win32(PARROT_INTERP, PIOHANDLE os_handle,
 
 /*
 
-=item C<PIOOFF_T Parrot_io_tell_win32(PARROT_INTERP, PIOHANDLE os_handle)>
+=item C<PIOOFF_T Parrot_io_tell(PARROT_INTERP, PIOHANDLE os_handle)>
 
 Returns the current read/write position of C<*io>'s file descriptor.
 
@@ -523,9 +477,8 @@ Returns the current read/write position of C<*io>'s file descriptor.
 */
 
 PIOOFF_T
-Parrot_io_tell_win32(PARROT_INTERP, PIOHANDLE os_handle)
+Parrot_io_tell(PARROT_INTERP, PIOHANDLE os_handle)
 {
-    ASSERT_ARGS(Parrot_io_tell_win32)
     LARGE_INTEGER p;
 
     p.QuadPart = piooffsetzero;
@@ -538,8 +491,8 @@ Parrot_io_tell_win32(PARROT_INTERP, PIOHANDLE os_handle)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_open_pipe_win32(PARROT_INTERP, STRING *command,
-INTVAL flags, INTVAL *pid)>
+=item C<PIOHANDLE Parrot_io_open_pipe(PARROT_INTERP, STRING *command, INTVAL
+flags, INTVAL *pid)>
 
 Open a pipe. Not implemented for this platform.
 
@@ -549,10 +502,9 @@ Open a pipe. Not implemented for this platform.
 
 PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
-Parrot_io_open_pipe_win32(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
+Parrot_io_open_pipe(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
         ARGOUT(INTVAL *pid))
 {
-    ASSERT_ARGS(Parrot_io_open_pipe_win32)
 
     HANDLE current = GetCurrentProcess();
     HANDLE hnull = INVALID_HANDLE_VALUE;
@@ -656,7 +608,7 @@ fail:
 
 /*
 
-=item C<INTVAL Parrot_io_pipe_win32(PARROT_INTERP, PIOHANDLE *reader, PIOHANDLE
+=item C<INTVAL Parrot_io_pipe(PARROT_INTERP, PIOHANDLE *reader, PIOHANDLE
 *writer)>
 
 Uses CreatePipe() to create a matched pair of pipe handles.  Returns 0 on
@@ -669,13 +621,10 @@ success, -1 on failure.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 INTVAL
-Parrot_io_pipe_win32(SHIM_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE *writer))
+Parrot_io_pipe(SHIM_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE *writer))
 {
-    ASSERT_ARGS(Parrot_io_pipe_win32)
     return CreatePipe(reader, writer, NULL, 0) ? 0 : -1;
 }
-
-#endif /* PIO_OS_WIN32 */
 
 /*
 
@@ -683,11 +632,10 @@ Parrot_io_pipe_win32(SHIM_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE *w
 
 =head1 SEE ALSO
 
-F<src/io/unix.c>,
-F<src/io/stdio.c>,
-F<src/io/io.c>,
+F<src/platform/generic/io.c>,
+F<src/io/api.c>,
 F<src/io/io_private.h>.
-F<include/parrot/io_win32.h>.
+F<include/parrot/io.h>.
 
 =cut
 

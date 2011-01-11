@@ -143,8 +143,8 @@ Parrot_io_stdhandle(PARROT_INTERP, INTVAL fileno, ARGIN_NULLOK(PMC *newhandle))
 
 /*
 
-=item C<PMC * Parrot_io_open(PARROT_INTERP, PMC *pmc, STRING *path, STRING
-*mode)>
+=item C<PMC * Parrot_io_open_handle(PARROT_INTERP, PMC *pmc, STRING *path,
+STRING *mode)>
 
 Return an open filehandle for a given string path and flags. Defaults to
 creating a new FileHandle PMC. If a PMC object is passed in, it uses that
@@ -158,10 +158,10 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
+Parrot_io_open_handle(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
         ARGIN_NULLOK(STRING *path), ARGIN_NULLOK(STRING *mode))
 {
-    ASSERT_ARGS(Parrot_io_open)
+    ASSERT_ARGS(Parrot_io_open_handle)
     PMC *filehandle;
     const INTVAL typenum = Parrot_hll_get_ctx_HLL_type(interp,
                                                    Parrot_PMC_typenum(interp, "FileHandle"));
@@ -318,7 +318,7 @@ Parrot_io_fdopen_flags(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
 
 /*
 
-=item C<INTVAL Parrot_io_close(PARROT_INTERP, PMC *pmc)>
+=item C<INTVAL Parrot_io_close_handle(PARROT_INTERP, PMC *pmc)>
 
 Closes the Handle object.
 
@@ -334,9 +334,9 @@ filehandle-PMC object.
 
 PARROT_EXPORT
 INTVAL
-Parrot_io_close(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
+Parrot_io_close_handle(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_close)
+    ASSERT_ARGS(Parrot_io_close_handle)
     INTVAL result = 1;
 
     if (PMC_IS_NULL(pmc))
@@ -364,26 +364,6 @@ Parrot_io_close(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
         Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "close"), "->I", &result);
 
     return result;
-}
-
-
-/*
-
-=item C<INTVAL Parrot_io_close_piohandle(PARROT_INTERP, PIOHANDLE handle)>
-
-Calls close() on the given PIOHANDLE.  This is the low level OS-specific close()
-function, intended to be called directly by PMC destroy() vtables.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-INTVAL
-Parrot_io_close_piohandle(PARROT_INTERP, PIOHANDLE handle)
-{
-    ASSERT_ARGS(Parrot_io_close_piohandle)
-    return PIO_CLOSE_PIOHANDLE(interp, handle);
 }
 
 
@@ -418,7 +398,7 @@ Parrot_io_is_closed(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<void Parrot_io_flush(PARROT_INTERP, PMC *pmc)>
+=item C<void Parrot_io_flush_handle(PARROT_INTERP, PMC *pmc)>
 
 Flushes the C<ParrotIO> PMC C<*pmc>. Calls the C<flush> method on the
 filehandle PMC.
@@ -429,9 +409,9 @@ filehandle PMC.
 
 PARROT_EXPORT
 void
-Parrot_io_flush(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
+Parrot_io_flush_handle(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_flush)
+    ASSERT_ARGS(Parrot_io_flush_handle)
     if (PMC_IS_NULL(pmc))
         return;
 
@@ -598,7 +578,7 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
         }
     }
     else if (pmc->vtable->base_type == enum_class_Socket) {
-        INTVAL read = Parrot_io_recv(interp, pmc, &result);
+        INTVAL read = Parrot_io_recv_handle(interp, pmc, &result);
     }
     else
         Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "read"), "I->S", length, &result);
@@ -671,8 +651,8 @@ Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_io_write(PARROT_INTERP, PMC *pmc, const void *buffer,
-size_t length)>
+=item C<INTVAL Parrot_io_write_handle(PARROT_INTERP, PMC *pmc, const void
+*buffer, size_t length)>
 
 Writes C<len> bytes from C<*buffer> to C<*pmc>.
 
@@ -683,9 +663,9 @@ Writes C<len> bytes from C<*buffer> to C<*pmc>.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_write(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const void *buffer), size_t length)
+Parrot_io_write_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const void *buffer), size_t length)
 {
-    ASSERT_ARGS(Parrot_io_write)
+    ASSERT_ARGS(Parrot_io_write_handle)
     INTVAL result;
     STRING *s;
 
@@ -700,8 +680,8 @@ Parrot_io_write(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const void *buffer), size
 
 /*
 
-=item C<PIOOFF_T Parrot_io_seek(PARROT_INTERP, PMC *pmc, PIOOFF_T offset, INTVAL
-w)>
+=item C<PIOOFF_T Parrot_io_seek_handle(PARROT_INTERP, PMC *pmc, PIOOFF_T offset,
+INTVAL w)>
 
 Moves the read/write position of C<*pmc> to offset C<bytes> from the
 position indicated by C<w>. Typically C<w> will be C<0> for the start of
@@ -714,9 +694,9 @@ the file, C<1> for the current position, and C<2> for the end.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
-Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *pmc), PIOOFF_T offset, INTVAL w)
+Parrot_io_seek_handle(PARROT_INTERP, ARGMOD(PMC *pmc), PIOOFF_T offset, INTVAL w)
 {
-    ASSERT_ARGS(Parrot_io_seek)
+    ASSERT_ARGS(Parrot_io_seek_handle)
     if (Parrot_io_is_closed(interp, pmc))
         return -1;
 
@@ -725,7 +705,7 @@ Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *pmc), PIOOFF_T offset, INTVAL w)
 
 /*
 
-=item C<PIOOFF_T Parrot_io_tell(PARROT_INTERP, PMC *pmc)>
+=item C<PIOOFF_T Parrot_io_tell_handle(PARROT_INTERP, PMC *pmc)>
 
 Returns the current read/write position of C<*pmc>.
 
@@ -736,9 +716,9 @@ Returns the current read/write position of C<*pmc>.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
-Parrot_io_tell(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_io_tell_handle(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_tell)
+    ASSERT_ARGS(Parrot_io_tell_handle)
     if (Parrot_io_is_closed(interp, pmc))
         return -1;
 
@@ -832,7 +812,7 @@ INTVAL
 Parrot_io_puts(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s))
 {
     ASSERT_ARGS(Parrot_io_puts)
-    return Parrot_io_write(interp, pmc, s, strlen(s));
+    return Parrot_io_write_handle(interp, pmc, s, strlen(s));
 }
 
 /*
@@ -1018,7 +998,7 @@ Parrot_io_getfd(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_io_is_tty(PARROT_INTERP, PMC *pmc)>
+=item C<INTVAL Parrot_io_is_tty_handle(PARROT_INTERP, PMC *pmc)>
 
 Returns a boolean value indicating whether C<*pmc> is a console/tty.
 
@@ -1029,9 +1009,9 @@ Returns a boolean value indicating whether C<*pmc> is a console/tty.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_is_tty(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_io_is_tty_handle(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_is_tty)
+    ASSERT_ARGS(Parrot_io_is_tty_handle)
     if (Parrot_io_is_closed(interp, pmc))
         return 0;
 

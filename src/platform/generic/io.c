@@ -1,9 +1,9 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/io/unix.c - UNIX IO utility functions
+src/platform/generic/io.c - UNIX IO utility functions
 
 =head1 DESCRIPTION
 
@@ -28,18 +28,27 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 */
 
 #include "parrot/parrot.h"
-#include "io_private.h"
-#include "pmc/pmc_filehandle.h"
+#include "../../io/io_private.h"
 
-#ifdef PIO_OS_UNIX
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h> /* for pipe() */
 
-#  include <sys/types.h>
-#  include <sys/wait.h>
-#  include <unistd.h> /* for pipe() */
+#define DEFAULT_OPEN_MODE S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH
 
-#  define DEFAULT_OPEN_MODE S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH
+#ifndef STDIN_FILENO
+#  define STDIN_FILENO 0
+#endif
 
-/* HEADERIZER HFILE: include/parrot/io_unix.h */
+#ifndef STDOUT_FILENO
+#  define STDOUT_FILENO 1
+#endif
+
+#ifndef STDERR_FILENO
+#  define STDERR_FILENO 2
+#endif
+
+/* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -91,27 +100,7 @@ convert_flags_to_unix(INTVAL flags)
 
 /*
 
-=item C<INTVAL Parrot_io_init_unix(PARROT_INTERP)>
-
-Sets up the interpreter's standard C<std*> IO handles. Returns C<0> on
-success and C<-1> on error.
-
-=cut
-
-*/
-
-INTVAL
-Parrot_io_init_unix(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_io_init_unix)
-
-    return 0;
-}
-
-
-/*
-
-=item C<PIOHANDLE Parrot_io_stdhandle_unix(PARROT_INTERP, INTVAL fileno)>
+=item C<PIOHANDLE Parrot_io_std_os_handle(PARROT_INTERP, INTVAL fileno)>
 
 Returns a standard file handle.
 
@@ -120,9 +109,8 @@ Returns a standard file handle.
 */
 
 PIOHANDLE
-Parrot_io_stdhandle_unix(PARROT_INTERP, INTVAL fileno)
+Parrot_io_std_os_handle(PARROT_INTERP, INTVAL fileno)
 {
-    ASSERT_ARGS(Parrot_io_stdhandle_unix)
     PIOHANDLE os_handle;
 
     switch (fileno) {
@@ -143,8 +131,7 @@ Parrot_io_stdhandle_unix(PARROT_INTERP, INTVAL fileno)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_open_unix(PARROT_INTERP, STRING *path, INTVAL
-flags)>
+=item C<PIOHANDLE Parrot_io_open(PARROT_INTERP, STRING *path, INTVAL flags)>
 
 Opens a string C<path>. C<flags> is a bitwise C<or> combination of C<PIO_F_*>
 flag values.
@@ -155,9 +142,8 @@ flag values.
 
 PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
-Parrot_io_open_unix(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
+Parrot_io_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
 {
-    ASSERT_ARGS(Parrot_io_open_unix)
     struct stat  buf;
     int          oflags;
     PIOHANDLE    fd;
@@ -189,7 +175,7 @@ Parrot_io_open_unix(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
     return fd;
 }
 
-#  if PARROT_ASYNC_DEVEL
+#if PARROT_ASYNC_DEVEL
 
 /*
 
@@ -210,8 +196,7 @@ Toggles the C<O_ASYNC> flag on the IO file descriptor.
 INTVAL
 Parrot_io_async_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), INTVAL b)
 {
-    ASSERT_ARGS(Parrot_io_async_unix)
-#    if defined(linux)
+#  if defined(linux)
     int rflags;
     PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
 
@@ -222,18 +207,18 @@ Parrot_io_async_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), INTVAL b)
             rflags &= ~O_ASYNC;
         return fcntl(file_descriptor, F_SETFL, rflags);
     }
-#    else
+#  else
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_NOT_IMPLEMENTED,
         "Async support not available");
-#    endif
+#  endif
     return -1;
 }
 
-#  endif
+#endif
 
 /*
 
-=item C<INTVAL Parrot_io_close_unix(PARROT_INTERP, PIOHANDLE file_descriptor)>
+=item C<INTVAL Parrot_io_close(PARROT_INTERP, PIOHANDLE file_descriptor)>
 
 Closes C<*io>'s file descriptor.
 
@@ -242,9 +227,8 @@ Closes C<*io>'s file descriptor.
 */
 
 INTVAL
-Parrot_io_close_unix(PARROT_INTERP, PIOHANDLE file_descriptor)
+Parrot_io_close(PARROT_INTERP, PIOHANDLE file_descriptor)
 {
-    ASSERT_ARGS(Parrot_io_close_unix)
     INTVAL result = 0;
 
     /* BSD and Solaris need explicit fsync() */
@@ -261,7 +245,7 @@ Parrot_io_close_unix(PARROT_INTERP, PIOHANDLE file_descriptor)
 
 /*
 
-=item C<INTVAL Parrot_io_close_piohandle_unix(PARROT_INTERP, PIOHANDLE handle)>
+=item C<INTVAL Parrot_io_close_piohandle(PARROT_INTERP, PIOHANDLE handle)>
 
 Closes the given file descriptor.  Returns 0 on success, -1 on error.
 
@@ -270,16 +254,15 @@ Closes the given file descriptor.  Returns 0 on success, -1 on error.
 */
 
 INTVAL
-Parrot_io_close_piohandle_unix(SHIM_INTERP, PIOHANDLE handle)
+Parrot_io_close_piohandle(SHIM_INTERP, PIOHANDLE handle)
 {
-    ASSERT_ARGS(Parrot_io_close_piohandle_unix)
     return close(handle);
 }
 
 
 /*
 
-=item C<INTVAL Parrot_io_pipe_wait_unix(PARROT_INTERP, INTVAL pid)>
+=item C<INTVAL Parrot_io_waitpid(PARROT_INTERP, INTVAL pid)>
 
 Closes C<*io>'s file descriptor.
 
@@ -288,9 +271,8 @@ Closes C<*io>'s file descriptor.
 */
 
 INTVAL
-Parrot_io_pipe_wait_unix(PARROT_INTERP, INTVAL pid)
+Parrot_io_waitpid(PARROT_INTERP, INTVAL pid)
 {
-    ASSERT_ARGS(Parrot_io_pipe_wait_unix)
     int status;
 
     waitpid(pid, &status, 0);
@@ -309,7 +291,7 @@ Parrot_io_pipe_wait_unix(PARROT_INTERP, INTVAL pid)
 
 /*
 
-=item C<INTVAL Parrot_io_is_tty_unix(PARROT_INTERP, PIOHANDLE fd)>
+=item C<INTVAL Parrot_io_is_tty(PARROT_INTERP, PIOHANDLE fd)>
 
 Returns a boolean value indicating whether C<fd> is a console/tty.
 
@@ -319,15 +301,14 @@ Returns a boolean value indicating whether C<fd> is a console/tty.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_is_tty_unix(SHIM_INTERP, PIOHANDLE fd)
+Parrot_io_is_tty(SHIM_INTERP, PIOHANDLE fd)
 {
-    ASSERT_ARGS(Parrot_io_is_tty_unix)
     return isatty(fd);
 }
 
 /*
 
-=item C<INTVAL Parrot_io_getblksize_unix(PIOHANDLE fd)>
+=item C<INTVAL Parrot_io_getblksize(PIOHANDLE fd)>
 
 Various ways of determining block size.
 
@@ -342,12 +323,11 @@ if it was available at compile time, otherwise C<PIO_BLKSIZE> is returned.
 */
 
 INTVAL
-Parrot_io_getblksize_unix(PIOHANDLE fd)
+Parrot_io_getblksize(PIOHANDLE fd)
 {
-    ASSERT_ARGS(Parrot_io_getblksize_unix)
     if (fd >= 0) {
         /* Try to get the block size of a regular file */
-#  if 0
+#if 0
         /*
          * Is it even worth adding non-portable code here
          * or should we just estimate a nice buffer size?
@@ -361,19 +341,19 @@ Parrot_io_getblksize_unix(PIOHANDLE fd)
                 return sbuf.st_blksize;
             }
         }
-#  endif
+#endif
     }
     /* Try to determine it from general means. */
-#  ifdef BLKSIZE
+#ifdef BLKSIZE
     return BLKSIZE;
-#  else
+#else
     return PIO_BLKSIZE;
-#  endif
+#endif
 }
 
 /*
 
-=item C<INTVAL Parrot_io_flush_unix(PARROT_INTERP, PIOHANDLE os_handle)>
+=item C<INTVAL Parrot_io_flush(PARROT_INTERP, PIOHANDLE os_handle)>
 
 At lowest layer all we can do for C<flush> is to ask the kernel to
 C<sync()>.
@@ -385,16 +365,15 @@ XXX: Is it necessary to C<sync()> here?
 */
 
 INTVAL
-Parrot_io_flush_unix(PARROT_INTERP, PIOHANDLE os_handle)
+Parrot_io_flush(PARROT_INTERP, PIOHANDLE os_handle)
 {
-    ASSERT_ARGS(Parrot_io_flush_unix)
     return fsync(os_handle);
 }
 
 /*
 
-=item C<size_t Parrot_io_read_unix(PARROT_INTERP, PIOHANDLE os_handle, char
-*buf, size_t len)>
+=item C<size_t Parrot_io_read(PARROT_INTERP, PIOHANDLE os_handle, char *buf,
+size_t len)>
 
 Calls C<read()> to return up to C<len> bytes in the memory starting at
 C<buffer>.
@@ -404,10 +383,9 @@ C<buffer>.
 */
 
 size_t
-Parrot_io_read_unix(PARROT_INTERP, PIOHANDLE os_handle,
+Parrot_io_read(PARROT_INTERP, PIOHANDLE os_handle,
         ARGMOD(char *buf), size_t len)
 {
-    ASSERT_ARGS(Parrot_io_read_unix)
 
     for (;;) {
         const int bytes = read(os_handle, buf, len);
@@ -423,8 +401,8 @@ Parrot_io_read_unix(PARROT_INTERP, PIOHANDLE os_handle,
 
 /*
 
-=item C<size_t Parrot_io_write_unix(PARROT_INTERP, PIOHANDLE os_handle, const
-char *buf, size_t len)>
+=item C<size_t Parrot_io_write(PARROT_INTERP, PIOHANDLE os_handle, const char
+*buf, size_t len)>
 
 Calls C<write()> to write C<len> bytes from the memory starting at
 C<buffer> to the file descriptor in C<*io>.
@@ -434,10 +412,9 @@ C<buffer> to the file descriptor in C<*io>.
 */
 
 size_t
-Parrot_io_write_unix(PARROT_INTERP, PIOHANDLE os_handle,
+Parrot_io_write(PARROT_INTERP, PIOHANDLE os_handle,
         ARGIN(const char *buf), size_t len)
 {
-    ASSERT_ARGS(Parrot_io_write_unix)
     const char *ptr      = buf;
     size_t      to_write = len;
     size_t      written  = 0;
@@ -454,10 +431,10 @@ Parrot_io_write_unix(PARROT_INTERP, PIOHANDLE os_handle,
             switch (errno) {
             case EINTR:
                 continue;
-#  ifdef EAGAIN
+#ifdef EAGAIN
             case EAGAIN:
                 break;
-#  endif
+#endif
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                         "Write error: %s", strerror(errno));
@@ -470,8 +447,8 @@ Parrot_io_write_unix(PARROT_INTERP, PIOHANDLE os_handle,
 
 /*
 
-=item C<PIOOFF_T Parrot_io_seek_unix(PARROT_INTERP, PIOHANDLE os_handle,
-PIOOFF_T offset, INTVAL whence)>
+=item C<PIOOFF_T Parrot_io_seek(PARROT_INTERP, PIOHANDLE os_handle, PIOOFF_T
+offset, INTVAL whence)>
 
 Hard seek.
 
@@ -483,10 +460,9 @@ descriptor to C<offset> bytes from the location indicated by C<whence>.
 */
 
 PIOOFF_T
-Parrot_io_seek_unix(PARROT_INTERP, PIOHANDLE os_handle,
+Parrot_io_seek(PARROT_INTERP, PIOHANDLE os_handle,
         PIOOFF_T offset, INTVAL whence)
 {
-    ASSERT_ARGS(Parrot_io_seek_unix)
     const PIOOFF_T pos = lseek(os_handle, offset, whence);
 
     return pos;
@@ -494,7 +470,7 @@ Parrot_io_seek_unix(PARROT_INTERP, PIOHANDLE os_handle,
 
 /*
 
-=item C<PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, PIOHANDLE os_handle)>
+=item C<PIOOFF_T Parrot_io_tell(PARROT_INTERP, PIOHANDLE os_handle)>
 
 Returns the current read/write position on C<*io>'s file descriptor.
 
@@ -503,9 +479,8 @@ Returns the current read/write position on C<*io>'s file descriptor.
 */
 
 PIOOFF_T
-Parrot_io_tell_unix(PARROT_INTERP, PIOHANDLE os_handle)
+Parrot_io_tell(PARROT_INTERP, PIOHANDLE os_handle)
 {
-    ASSERT_ARGS(Parrot_io_tell_unix)
     const PIOOFF_T pos = lseek(os_handle, (PIOOFF_T)0, SEEK_CUR);
 
     return pos;
@@ -513,8 +488,8 @@ Parrot_io_tell_unix(PARROT_INTERP, PIOHANDLE os_handle)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_open_pipe_unix(PARROT_INTERP, STRING *command,
-INTVAL flags, INTVAL *pid_out)>
+=item C<PIOHANDLE Parrot_io_open_pipe(PARROT_INTERP, STRING *command, INTVAL
+flags, INTVAL *pid_out)>
 
 Very limited C<exec> for now.
 
@@ -524,15 +499,14 @@ Very limited C<exec> for now.
 
 PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
-Parrot_io_open_pipe_unix(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
+Parrot_io_open_pipe(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
         ARGOUT(INTVAL *pid_out))
 {
-    ASSERT_ARGS(Parrot_io_open_pipe_unix)
     /*
      * pipe(), fork() should be defined, if this header is present
      *        if that's not true, we need a test
      */
-#  ifdef PARROT_HAS_HEADER_UNISTD
+#ifdef PARROT_HAS_HEADER_UNISTD
     int pid;
     int fds[2];
 
@@ -604,18 +578,18 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
         exit(EXIT_FAILURE);
     }
 
-#  else
+#else
     UNUSED(filehandle);
     UNUSED(command);
     UNUSED(flags);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
         "pipe() unimplemented");
-#  endif
+#endif
 }
 
 /*
 
-=item C<INTVAL Parrot_io_pipe_unix(PARROT_INTERP, PIOHANDLE *reader, PIOHANDLE
+=item C<INTVAL Parrot_io_pipe(PARROT_INTERP, PIOHANDLE *reader, PIOHANDLE
 *writer)>
 
 Uses C<pipe()> to create a matched pair of pipe fds.  Returns 0 on success, -1
@@ -628,9 +602,8 @@ on failure.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 INTVAL
-Parrot_io_pipe_unix(SHIM_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE *writer))
+Parrot_io_pipe(SHIM_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE *writer))
 {
-    ASSERT_ARGS(Parrot_io_pipe_unix)
     int fds[2];
     const int rv = pipe(fds);
 
@@ -641,19 +614,15 @@ Parrot_io_pipe_unix(SHIM_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE *wr
     return rv;
 }
 
-#endif /* PIO_OS_UNIX */
-
 /*
 
 =back
 
 =head1 SEE ALSO
 
-F<src/io/common.c>,
-F<src/io/win32.c>,
-F<src/io/stdio.c>,
+F<src/io/api.c>,
 F<src/io/io_private.h>,
-F<include/parrot/io_unix.h>.
+F<include/parrot/io.h>.
 
 =cut
 

@@ -142,7 +142,7 @@ Returns whether the Socket is currently open.
 
 
     METHOD socket(INTVAL fam, INTVAL type, INTVAL proto) {
-        if (Parrot_io_socket(INTERP, SELF, fam, type, proto) < 0)
+        if (Parrot_io_socket_handle(INTERP, SELF, fam, type, proto) < 0)
             RETURN(PMC * PMCNULL);
         RETURN(PMC * SELF);
     }
@@ -161,7 +161,7 @@ for readable, two for writeable, and four for exceptions.
 
 
     METHOD poll(INTVAL which, INTVAL sec, INTVAL usec) {
-        INTVAL poll = Parrot_io_poll(INTERP, SELF, which, sec, usec);
+        INTVAL poll = Parrot_io_poll_handle(INTERP, SELF, which, sec, usec);
         RETURN(INTVAL poll);
     }
 
@@ -216,7 +216,7 @@ connected socket object.]
 */
 
     METHOD connect(PMC * address) {
-        INTVAL res = Parrot_io_connect(INTERP, SELF, address);
+        INTVAL res = Parrot_io_connect_handle(INTERP, SELF, address);
         RETURN(INTVAL res);
     }
 
@@ -264,7 +264,7 @@ complete, it invokes the callback, passing it a status object.
 */
 
     METHOD send(STRING *buf) {
-        INTVAL res = Parrot_io_send(INTERP, SELF, buf);
+        INTVAL res = Parrot_io_send_handle(INTERP, SELF, buf);
         RETURN(INTVAL res);
     }
 
@@ -287,7 +287,7 @@ bound socket object.]
 */
 
     METHOD bind(PMC *host) {
-        INTVAL res = Parrot_io_bind(INTERP, SELF, host);
+        INTVAL res = Parrot_io_bind_handle(INTERP, SELF, host);
         RETURN(INTVAL res);
     }
 
@@ -307,7 +307,7 @@ the socket object.
 */
 
     METHOD listen(INTVAL backlog) {
-        INTVAL res = Parrot_io_listen(INTERP, SELF, backlog);
+        INTVAL res = Parrot_io_listen_handle(INTERP, SELF, backlog);
         RETURN(INTVAL res);
     }
 
@@ -331,7 +331,7 @@ but continues to send new connection events until the socket is closed.]
 */
 
     METHOD accept() {
-        PMC * res = Parrot_io_accept(INTERP, SELF);
+        PMC * res = Parrot_io_accept_handle(INTERP, SELF);
         RETURN(PMC * res);
     }
 
@@ -421,7 +421,7 @@ Print the string to the socket.
 */
 
     METHOD puts(STRING *buf) {
-        INTVAL res = Parrot_io_send(INTERP, SELF, buf);
+        INTVAL res = Parrot_io_send_handle(INTERP, SELF, buf);
         RETURN(INTVAL res);
     }
 

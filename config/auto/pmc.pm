@@ -405,9 +405,6 @@ include/parrot/pbcversion.h
 include/parrot/core_types.h
 include/parrot/interpreter.h
 include/parrot/io.h
-include/parrot/io_portable.h
-include/parrot/io_unix.h
-include/parrot/io_win32.h
 include/parrot/context.h
 include/parrot/parrot.h
 include/parrot/dynext.h

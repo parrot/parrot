@@ -886,9 +886,6 @@ include/parrot/imageio.h                                    [main]include
 include/parrot/imcc.h                                       [main]include
 include/parrot/interpreter.h                                [main]include
 include/parrot/io.h                                         [main]include
-include/parrot/io_portable.h                                [main]include
-include/parrot/io_unix.h                                    [main]include
-include/parrot/io_win32.h                                   [main]include
 include/parrot/key.h                                        [main]include
 include/parrot/library.h                                    [main]include
 include/parrot/list.h                                       [main]include
@@ -1235,12 +1232,7 @@ src/io/buffer.c                                             []
 src/io/core.c                                               []
 src/io/filehandle.c                                         []
 src/io/io_private.h                                         []
-src/io/portable.c                                           []
 src/io/socket_api.c                                         []
-src/io/socket_unix.c                                        []
-src/io/socket_win32.c                                       []
-src/io/unix.c                                               []
-src/io/win32.c                                              []
 src/key.c                                                   []
 src/libnci_test.def                                         []
 src/library.c                                               []
@@ -1292,9 +1284,11 @@ src/platform/generic/encoding.c                             []
 src/platform/generic/env.c                                  []
 src/platform/generic/exec.c                                 []
 src/platform/generic/hires_timer.c                          []
+src/platform/generic/io.c                                   []
 src/platform/generic/itimer.c                               []
 src/platform/generic/math.c                                 []
 src/platform/generic/pid.c                                  []
+src/platform/generic/socket.c                               []
 src/platform/generic/stat.c                                 []
 src/platform/generic/sysmem.c                               []
 src/platform/generic/time.c                                 []
@@ -1309,8 +1303,10 @@ src/platform/win32/dl.c                                     []
 src/platform/win32/env.c                                    []
 src/platform/win32/exec.c                                   []
 src/platform/win32/hires_timer.c                            []
+src/platform/win32/io.c                                     []
 src/platform/win32/misc.c                                   []
 src/platform/win32/pid.c                                    []
+src/platform/win32/socket.c                                 []
 src/platform/win32/sysmem.c                                 []
 src/platform/win32/time.c                                   []
 src/platform/win32/uid.c                                    []

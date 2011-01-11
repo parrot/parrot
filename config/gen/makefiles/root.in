@@ -372,9 +372,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/memory.h \
 	$(INC_DIR)/packfile.h \
 	$(INC_DIR)/io.h \
-	$(INC_DIR)/io_portable.h \
-	$(INC_DIR)/io_unix.h \
-	$(INC_DIR)/io_win32.h \
 	$(INC_DIR)/op.h \
 	$(INC_DIR)/pmc.h \
 	$(INC_DIR)/gc_api.h \
@@ -431,13 +428,8 @@ IO_O_FILES = \
     src/io/core$(O) \
     src/io/api$(O) \
     src/io/buffer$(O) \
-    src/io/unix$(O) \
-    src/io/win32$(O) \
-    src/io/portable$(O) \
     src/io/filehandle$(O) \
-    src/io/socket_api$(O) \
-    src/io/socket_unix$(O) \
-    src/io/socket_win32$(O)
+    src/io/socket_api$(O)
 
 INTERP_O_FILES = \
     src/string/api$(O) \
@@ -975,14 +967,6 @@ src/io/core$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/core.c
 
 src/io/socket_api$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
     src/io/api.str include/pmc/pmc_socket.h src/io/socket_api.c
-
-src/io/socket_unix$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_socket.h \
-    src/io/io_private.h src/io/socket_unix.c
-
-src/io/socket_win32$(O) : $(PARROT_H_HEADERS) \
-	src/io/io_private.h \
-	include/pmc/pmc_socket.h \
-	src/io/socket_win32.c
 
 O_FILES = \
     $(INTERP_O_FILES) \
@@ -1555,14 +1539,6 @@ src/io/api$(O) : \
 src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c \
     include/pmc/pmc_handle.h
 
-src/io/portable$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/portable.c
-
-src/io/unix$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
-    include/pmc/pmc_filehandle.h src/io/unix.c
-
-src/io/win32$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
-    include/pmc/pmc_filehandle.h src/io/win32.c
-
 src/gc/alloc_memory$(O) : $(PARROT_H_HEADERS) src/gc/alloc_memory.c
 
 frontend/parrot/main$(O) : \
@@ -1642,11 +1618,17 @@ src/platform/generic/hires_timer$(O) : src/platform/generic/hires_timer.c $(PARR
 
 src/platform/generic/itimer$(O) : src/platform/generic/itimer.c $(PARROT_H_HEADERS)
 
+src/platform/generic/io$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
+    src/platform/generic/io.c
+
 src/platform/generic/math$(O) : src/platform/generic/math.c $(PARROT_H_HEADERS)
 
 src/platform/generic/misc$(O) : src/platform/generic/misc.c $(PARROT_H_HEADERS)
 
 src/platform/generic/pid$(O) : src/platform/generic/pid.c $(PARROT_H_HEADERS)
+
+src/platform/generic/socket$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_socket.h \
+    src/io/io_private.h src/platform/generic/socket.c
 
 src/platform/generic/stat$(O) : src/platform/generic/stat.c $(PARROT_H_HEADERS)
 
@@ -1674,9 +1656,17 @@ src/platform/win32/exec$(O) : src/platform/win32/exec.c $(PARROT_H_HEADERS)
 
 src/platform/win32/hires_timer$(O) : src/platform/win32/hires_timer.c $(PARROT_H_HEADERS)
 
+src/platform/win32/io$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
+    src/platform/win32/io.c
+
 src/platform/win32/misc$(O) : src/platform/win32/misc.c $(PARROT_H_HEADERS)
 
 src/platform/win32/pid$(O) : src/platform/win32/pid.c $(PARROT_H_HEADERS)
+
+src/platform/win32/socket$(O) : $(PARROT_H_HEADERS) \
+	src/io/io_private.h \
+	include/pmc/pmc_socket.h \
+	src/platform/win32/socket.c
 
 src/platform/win32/sysmem$(O) : src/platform/win32/sysmem.c $(PARROT_H_HEADERS)
 
