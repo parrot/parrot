@@ -14,7 +14,6 @@ constant string support
 
 use warnings;
 use strict;
-use lib 'lib';
 
 use Fcntl qw( :DEFAULT :flock );
 use Text::Balanced qw(extract_delimited);
