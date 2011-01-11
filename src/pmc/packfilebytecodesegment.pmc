@@ -256,40 +256,6 @@ Set an integer's worth of data in the segment.
     }
 
 /*
-
-=back
-
-=head2 Packfile Interface Methods
-
-=over 4
-
-=item C<STRING *pack()>
-
-Serialize the segment.
-
-=cut
-
-*/
-    METHOD pack() {
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
-                                    "PackfileBytecodeSegment.pack() not implemented yet.");
-    }
-
-
-/*
-
-=item C<void unpack(STRING *data)>
-
-Unpack a serialized segment string.
-
-=cut
-
-*/
-    METHOD unpack(STRING *data) {
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
-                                    "PackfileBytecodeSegment.unpack() not implemented yet.");
-    }
-/*
 =item C<PMC* opmap()>
 
 Return PackfileOpMap for this BytecodeSegment.
