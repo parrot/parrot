@@ -120,10 +120,10 @@ Tests the Complex PMC.
     is( $P1, "2+3i", 'init from String' )
 
     push_eh invalid_initializer
-    $P4 = box 4
+    $P4 = new ['Sub']
     $P0 = new ['Complex'], $P4
   invalid_initializer:
-    ok(1, 'cannot init from Integer')
+    ok(1, 'cannot init from Sub')
     pop_eh
 .end
 
