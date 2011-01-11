@@ -395,7 +395,7 @@ OUTPUT
 }
 
 TODO: {
-    local $TODO = 'non-ascii filenames not yet consistently working';
+    local $TODO = 'TT #1836: non-ascii filenames not yet consistently working';
 
     mkdir 'silly-dir-with-silly-names';
     open my $fileh, '>', "silly-dir-with-silly-names/sillyname\x{263A}";
