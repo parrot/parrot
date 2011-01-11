@@ -20,6 +20,7 @@ use warnings;
 use lib qw(lib);
 
 use Test::More;
+use Carp;
 use IO::File ();
 use Parrot::Config;
 use Parrot::Test;
@@ -47,22 +48,35 @@ my $lang_dir = "test_parrot_language_$$";
 my $test_dir = catfile($lang_dir, "t");
 my $src_dir = catfile($lang_dir, "src");
 my $setup = catfile($lang_dir, "setup.pir");
-my $parrot_exe = catfile($PConfig{build_dir}, $PConfig{test_prog});
+my $installed_parrot  = catfile($PConfig{bindir}, $PConfig{test_prog});
+my $build_parrot      = catfile($PConfig{build_dir}, $PConfig{test_prog});
+my $parrot_exe = (-e $installed_parrot)
+    ? $installed_parrot
+    : $build_parrot;
 my $to_dev_null = $^O =~ /Win/ ? "1> NUL 2>&1" : ">/dev/null 2>&1";
 ok(-e $lang_dir, "$lang_dir dir exists");
 ok(-e $test_dir, "$test_dir dir exists");
 ok(-e $src_dir, "$src_dir dir exists");
 ok(-s $setup, "$setup exists and has nonzero size");
 
-my $build_status = system("cd $lang_dir && \"$parrot_exe\" setup.pir $to_dev_null");
-my $build_error  = $!;
-diag("Faild to execute $parrot_exe setup.pir : $build_error") if $build_status == - 1;
-ok($build_status == 0, "language builds, exit code = " . ($build_status >> 8) );
-
-my $test_status = system("cd $lang_dir && \"$parrot_exe\" setup.pir test $to_dev_null");
-my $test_error  = $!;
-diag("Faild to execute $parrot_exe setup.pir test: $test_error") if $test_status == - 1;
-ok($test_status == 0, "language passes all tests, exit code = " . ($test_status >> 8) );
+SKIP: {
+    my $reason = "tools/dev/mk_language_shell.pl requires installed parrot on Darwin";
+    skip $reason, 2 if (
+        ($PConfig{osname} eq 'darwin') and
+        ($parrot_exe eq $build_parrot)
+    );
+    my $build_status =
+        system("cd $lang_dir && \"$parrot_exe\" setup.pir $to_dev_null")
+        and croak "Unable to execute setup.pir";
+    is($build_status, 0,
+        "system call to execute setup.pir completed successfully");
+    
+    my $test_status =
+        system("cd $lang_dir && \"$parrot_exe\" setup.pir test $to_dev_null")
+        and croak "Unable to execute setup.pir test";
+    is($test_status, 0,
+        "system call to execute setup.pir test completed successfully");
+}
 
 =head1 HELPER SUBROUTINES
 
