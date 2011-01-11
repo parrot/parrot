@@ -351,6 +351,8 @@ complete:
 
     .local int result, extension
     extension = x >>> n
+    extension &= 0xFFFFFFFF
+
     n = 32 - n
     result = x << n
     result &= 0xFFFFFFFF # Maintain 32-bits
@@ -374,6 +376,7 @@ complete:
 
     intermediate = _rotate_right( A, 22 )
     result = bxor intermediate, result
+    result &= 0xFFFFFFFF
 
     .return (result)
 .end
@@ -393,6 +396,7 @@ complete:
 
     intermediate = _rotate_right( E, 25 )
     result = bxor intermediate, result
+    result &= 0xFFFFFFFF
 
     .return (result)
 .end
@@ -410,6 +414,7 @@ complete:
 
     intermediate = value >>> 3
     result = bxor intermediate, result
+    result &= 0xFFFFFFFF
 
     .return (result)
 .end
@@ -427,6 +432,7 @@ complete:
 
     intermediate = value >>> 10
     result = bxor intermediate, result
+    result &= 0xFFFFFFFF
 
     .return (result)
 .end
@@ -539,16 +545,16 @@ EXPAND_LOOP:
 
     Wtmp = counter - 7
     Wtmp = W[Wtmp]
-    Wcur += Wtmp
+    .add_no_carry(Wcur, Wtmp)
 
     Wtmp = counter - 15
     Wtmp = W[Wtmp]
     Wtmp = _sigma0(Wtmp)
-    Wcur += Wtmp
+    .add_no_carry(Wcur, Wtmp)
 
     Wtmp = counter - 16
     Wtmp = W[Wtmp]
-    Wcur += Wtmp
+    .add_no_carry(Wcur, Wtmp)
 
     W[counter] = Wcur
 
@@ -562,19 +568,17 @@ EXPAND_LOOP:
 ROUND_LOOP:
     T1 = context[7]
     tmp = _Sigma_1(context)
-    T1 += tmp
+    .add_no_carry(T1, tmp)
     tmp = _Ch(context)
-    T1 += tmp
+    .add_no_carry(T1, tmp)
     tmp = K[counter]
-    T1 += tmp
+    .add_no_carry(T1, tmp)
     tmp = W[counter]
-    T1 += tmp
-    T1 &= 0xFFFFFFFF
+    .add_no_carry(T1, tmp)
 
     T2 = _Sigma_0(context)
     tmp = _Maj(context)
-    T2 += tmp
-    T2 &= 0xFFFFFFFF
+    .add_no_carry(T2, tmp)
 
     tmp = context[6] # h = g;
     context[7] = tmp
@@ -598,12 +602,12 @@ ROUND_LOOP:
     tmp = context[0] # b = a;
     context[1] = tmp
 
-    tmp = T1 + T2 # a = T1 + T2;
+    tmp = T1 # a = T1 + T2;
+    .add_no_carry(tmp, T2)
     context[0] = tmp
 
     inc counter
     if counter < 64 goto ROUND_LOOP
-
 
 
     # Combine with the old state.

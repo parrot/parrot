@@ -44,7 +44,6 @@ Compile bytecode to executable.
     print outfh, <<'HEADER'
 #include <stdio.h>
 #include <stdlib.h>
-#include <locale.h>
 #include "parrot/api.h"
 const void * get_program_code(void);
 int Parrot_set_config_hash(Parrot_PMC interp_pmc);
@@ -84,8 +83,6 @@ HEADER
             Parrot_Init_Args *initargs;
             GET_INIT_STRUCT(initargs);
 
-            setlocale(LC_ALL, "");
-
             program_code_addr = (const unsigned char *)get_program_code();
             if (!program_code_addr)
                 exit(EXIT_FAILURE);
@@ -97,8 +94,6 @@ HEADER
                 fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
                 show_last_error_and_exit(interp);
             }
-
-            //Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
 
             if (!Parrot_api_load_bytecode_bytes(interp, program_code_addr, bytecode_size, &pbc)) {
                 fprintf(stderr, "PARROT VM: Could not load bytecode");
