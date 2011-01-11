@@ -17,6 +17,16 @@ library functions for handling dynamic libraries.
 
 =over 4
 
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+/* HEADERIZER HFILE: none */
+
+/*
+
 =item C<void * Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)>
 
 Parrot wrapper around C<dlopen>.  B<Not yet implemented.>
@@ -24,8 +34,6 @@ Parrot wrapper around C<dlopen>.  B<Not yet implemented.>
 =cut
 
 */
-
-#include "parrot/parrot.h"
 
 void *
 Parrot_dlopen(const char *filename, SHIM(Parrot_dlopen_flags flags))

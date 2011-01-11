@@ -31,6 +31,8 @@ Mathematical functions.
     _LIB_VERSION_TYPE _LIB_VERSION = _IEEE_;
 #endif
 
+/* HEADERIZER HFILE: none */
+
 #if DOUBLE_SIZE == 2 * INT_SIZE
 /*
 

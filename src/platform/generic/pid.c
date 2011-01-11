@@ -24,6 +24,8 @@ Parrot process id functions.
 #include <sys/types.h>
 #include <unistd.h>
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<UINTVAL Parrot_getpid(void)>

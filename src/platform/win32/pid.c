@@ -23,6 +23,8 @@ Parrot process id functions.
 
 #include <windows.h>
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<UINTVAL Parrot_getpid(void)>

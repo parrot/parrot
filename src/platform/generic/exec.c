@@ -26,6 +26,8 @@ Parrot functions to run operating system commands.
 #include <sys/types.h>
 #include <sys/wait.h>
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<INTVAL Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)>

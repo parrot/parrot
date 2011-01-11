@@ -25,6 +25,8 @@ Get system memory information.
 #include <sys/sysctl.h>
 #include <stdio.h>
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<size_t Parrot_sysmem_amount(PARROT_INTERP)>

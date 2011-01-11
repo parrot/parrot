@@ -22,6 +22,8 @@ Platform C string encoding management
 
 #include "parrot/parrot.h"
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<void Parrot_init_platform_encoding(PARROT_INTERP)>

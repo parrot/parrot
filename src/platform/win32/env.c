@@ -34,6 +34,8 @@ whichever is more convenient.
 
 #include <windows.h>
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<void Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)>

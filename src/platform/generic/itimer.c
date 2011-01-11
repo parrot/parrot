@@ -22,6 +22,8 @@ itimer stuff
 
 #include "parrot/parrot.h"
 
+/* HEADERIZER HFILE: none */
+
 #ifdef PARROT_HAS_SETITIMER
 
 /*
@@ -96,6 +98,7 @@ The returned handle is passed to the other timer functions.
 
 */
 
+PARROT_CAN_RETURN_NULL
 void *
 new_sys_timer_ms(void)
 {

@@ -28,6 +28,8 @@ Parrot functions which wrap around standard library functions for handling dynam
 
 #define PARROT_DLOPEN_FLAGS RTLD_LAZY
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<void * Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)>
@@ -39,6 +41,7 @@ argument and returns a handle to it.
 
 */
 
+PARROT_CAN_RETURN_NULL
 void *
 Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)
 {
@@ -61,6 +64,7 @@ failure in use of C<Parrot_dlopen>, C<Parrot_dlclose> or C<Parrot_dlsym>.
 
 */
 
+PARROT_CAN_RETURN_NULL
 const char *
 Parrot_dlerror(void)
 {
@@ -82,6 +86,7 @@ returns address where symbol is located.
 
 */
 
+PARROT_CAN_RETURN_NULL
 void *
 Parrot_dlsym(void *handle, const char *symbol)
 {

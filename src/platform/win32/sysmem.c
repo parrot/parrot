@@ -42,6 +42,8 @@ typedef struct _MEMORYSTATUSEX {
 WINBASEAPI BOOL WINAPI GlobalMemoryStatusEx(LPMEMORYSTATUSEX);
 #endif
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<size_t Parrot_sysmem_amount(PARROT_INTERP)>

@@ -22,6 +22,8 @@ Functions for dealing with child processes and Execs. (Currently not implemented
 
 #include "parrot/parrot.h"
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<INTVAL Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)>

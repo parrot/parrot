@@ -40,6 +40,8 @@ High-resolution timer support
 #  endif
 #endif
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<UHUGEINTVAL Parrot_hires_get_time(void)>
@@ -50,7 +52,8 @@ Return a high-resolution number representing how long Parrot has been running.
 
 */
 
-UHUGEINTVAL Parrot_hires_get_time(void)
+UHUGEINTVAL
+Parrot_hires_get_time(void)
 {
     struct timespec ts;
     #if _POSIX_TIMERS
@@ -75,7 +78,8 @@ Return the number of ns that each time unit from Parrot_hires_get_time represent
 
 */
 
-UINTVAL Parrot_hires_get_tick_duration(void)
+UINTVAL
+Parrot_hires_get_tick_duration(void)
 {
     return (UINTVAL) 1;
 }

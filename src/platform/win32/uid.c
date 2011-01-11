@@ -24,6 +24,8 @@ Get information about the current user
 
 #include <windows.h>
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<UINTVAL Parrot_get_user_id(void)>

@@ -25,6 +25,8 @@ Environment manipulation stuff
 #include <stdlib.h>
 #include <string.h>
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<void Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)>
@@ -87,6 +89,7 @@ Get Environment vars
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_getenv(PARROT_INTERP, STRING *str_name)
 {

@@ -24,6 +24,8 @@ Time-related functions.
 
 #include <time.h>
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<INTVAL Parrot_intval_time(void)>

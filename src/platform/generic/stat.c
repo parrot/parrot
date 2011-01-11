@@ -28,6 +28,24 @@ File stat stuff
 #  include <sys/stat.h>
 #endif
 
+/* HEADERIZER HFILE: none */
+
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static INTVAL stat_common(PARROT_INTERP,
+    ARGIN(struct stat *statbuf),
+    INTVAL thing,
+    int status)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_stat_common __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(statbuf))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /*
 
 =item C<PMC * Parrot_stat_file(PARROT_INTERP, STRING *filename)>
@@ -38,10 +56,11 @@ B<Not implemented.>  Returns C<NULL>.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_stat_file(SHIM_INTERP, SHIM(STRING *filename))
 {
-    return NULL;
+    return PMCNULL;
 }
 
 /*
@@ -55,10 +74,11 @@ B<Not implemented.>  Returns C<NULL>.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_stat_info_pmc(SHIM_INTERP, SHIM(STRING *filename), SHIM(INTVAL thing))
 {
-    return NULL;
+    return PMCNULL;
 }
 
 /*
@@ -120,7 +140,7 @@ C<STAT_CREATETIME> and C<STAT_BACKUPTIME> are not supported and will return C<-1
 */
 
 static INTVAL
-stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL thing, int status)
+stat_common(PARROT_INTERP, ARGIN(struct stat *statbuf), INTVAL thing, int status)
 {
     INTVAL result = -1;
 
@@ -280,10 +300,11 @@ B<Not implemented.> Returns C<NULL>.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_stat_info_string(SHIM_INTERP, SHIM(STRING *filename), SHIM(INTVAL thing))
 {
-    return NULL;
+    return STRINGNULL;
 }
 
 /*

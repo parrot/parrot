@@ -22,6 +22,8 @@ Miscellaneous helper functions that are specific to NetBSD.
 
 #include "parrot/parrot.h"
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<void Parrot_platform_init_code(void)>

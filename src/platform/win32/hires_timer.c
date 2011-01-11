@@ -24,6 +24,8 @@ High-resolution timer support for win32
 
 #include <windows.h>
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<UHUGEINTVAL Parrot_hires_get_time(void)>

@@ -24,6 +24,8 @@ Functions for working with dynamic libraries under windows.
 
 #include <windows.h>
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<void * Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)>

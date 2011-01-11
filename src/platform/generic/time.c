@@ -26,6 +26,8 @@ Parrot time-related functions.
 #include <sys/time.h>
 #include <unistd.h>
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<INTVAL Parrot_intval_time(void)>
@@ -105,6 +107,7 @@ Parrot wrapper around standard library C<gmtime_r()> function.
 */
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
 struct tm *
 Parrot_gmtime_r(const time_t *t, struct tm *tm)
 {
@@ -122,6 +125,7 @@ Parrot wrapper around standard library C<localtime_r()> function.
 */
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
 struct tm *
 Parrot_localtime_r(const time_t *t, struct tm *tm)
 {
@@ -139,6 +143,7 @@ Parrot wrapper around standard library C<asctime_r()> function.
 */
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
 char*
 Parrot_asctime_r(const struct tm *tm, char *buffer)
 {

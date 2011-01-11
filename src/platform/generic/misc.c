@@ -22,6 +22,8 @@ Miscellaneous helper functions.
 
 #include "parrot/parrot.h"
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<void Parrot_platform_init_code(void)>

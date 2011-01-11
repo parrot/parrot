@@ -25,6 +25,8 @@ Provides access to system time functions for Win32 platforms.
 #include <windows.h>
 #include <time.h>
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<INTVAL Parrot_intval_time(void)>

@@ -24,6 +24,8 @@ Miscellaneous helper functions that are specific to Win32.
 
 #include <windows.h>
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<void Parrot_platform_init_code(void)>
@@ -38,6 +40,17 @@ boxes on Win32.
 void
 Parrot_platform_init_code(void)
 {
+    struct WSAData sockinfo;
+    int ret;
+
+    /* Start Winsock
+     * no idea where or whether destroy it
+     */
+    ret = WSAStartup(2, &sockinfo);
+    if (ret != 0)
+        fprintf(stderr, "WSAStartup failed!!\n ErrorCode=%i\n\n",
+                  WSAGetLastError());
+
     SetErrorMode(SEM_NOGPFAULTERRORBOX);
 }
 

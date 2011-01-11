@@ -26,6 +26,8 @@ Parrot time-related functions.
 #include <sys/time.h>
 #include <unistd.h>
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =item C<INTVAL Parrot_intval_time(void)>
