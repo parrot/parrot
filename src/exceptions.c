@@ -745,12 +745,12 @@ Parrot_ex_update_for_rethrow(PARROT_INTERP, ARGMOD(PMC * ex))
 {
     ASSERT_ARGS(Parrot_ex_update_for_rethrow)
     STRING * const bt_strings_str = CONST_STRING(interp, "bt_strings");
-    PMC * bt_strings = VTABLE_get_pmc_keyed_str(interp, ex, bt_strings_str);
+    PMC * bt_strings = VTABLE_get_attr_str(interp, ex, bt_strings_str);
     STRING * const prev_backtrace = Parrot_dbg_get_exception_backtrace(interp, ex);
 
     if (PMC_IS_NULL(bt_strings)) {
         bt_strings = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
-        VTABLE_set_pmc_keyed_str(interp, ex, bt_strings_str, bt_strings);
+        VTABLE_set_attr_str(interp, ex, bt_strings_str, bt_strings);
     }
     VTABLE_push_string(interp, bt_strings, prev_backtrace);
 
@@ -774,7 +774,7 @@ Parrot_ex_build_complete_backtrace_string(PARROT_INTERP, ARGIN(PMC * ex))
 {
     ASSERT_ARGS(Parrot_ex_build_complete_backtrace_string)
     STRING * const cur_bt = Parrot_dbg_get_exception_backtrace(interp, ex);
-    PMC * const all_bt = VTABLE_get_pmc_keyed_str(interp, ex, CONST_STRING(interp, "bt_strings"));
+    PMC * const all_bt = VTABLE_get_attr_str(interp, ex, CONST_STRING(interp, "bt_strings"));
     INTVAL elems, i;
     PMC * builder;
     if (PMC_IS_NULL(all_bt))
@@ -783,11 +783,11 @@ Parrot_ex_build_complete_backtrace_string(PARROT_INTERP, ARGIN(PMC * ex))
     elems = VTABLE_elements(interp, all_bt);
     builder = Parrot_pmc_new(interp, enum_class_StringBuilder);
     VTABLE_push_string(interp, builder, cur_bt);
-    for (i = 0; i < elems; i++) {
+    for (i = elems - 1; i >= 0; i--) {
         STRING * const i_bt = VTABLE_get_string_keyed_int(interp, all_bt, i);
         if (STRING_IS_NULL(i_bt))
             continue;
-        VTABLE_push_string(interp, builder, CONST_STRING(interp, "thrown from:"));
+        VTABLE_push_string(interp, builder, CONST_STRING(interp, "\nthrown from:\n"));
         VTABLE_push_string(interp, builder, i_bt);
     }
     return VTABLE_get_string(interp, builder);

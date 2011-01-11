@@ -725,7 +725,7 @@ Set an attribute value for the exception object.
             SET_ATTR_thrower(INTERP, SELF, value);
             break;
           case attr_bt_strings:
-            SET_ATTR_thrower(INTERP, SELF, value);
+            SET_ATTR_bt_strings(INTERP, SELF, value);
             break;
           case attr_NONE:
             /* If unknown attribute name, throw an exception. */
