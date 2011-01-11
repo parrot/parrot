@@ -1,6 +1,6 @@
 =head1 NAME
 
-Subs - Parrot Subroutines
+Parrot Subroutines
 
 =head1 VERSION
 
