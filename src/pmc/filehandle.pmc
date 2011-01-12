@@ -347,7 +347,7 @@ Returns a boolean value indicating whether C<SELF> is a console/tty.
 */
 
     METHOD isatty() {
-        const INTVAL isatty = Parrot_io_is_tty(INTERP, SELF);
+        const INTVAL isatty = Parrot_io_is_tty_handle(INTERP, SELF);
         RETURN(INTVAL isatty);
     }
 

@@ -64,7 +64,6 @@ PIOHANDLE Parrot_io_std_os_handle(PARROT_INTERP, INTVAL fileno);
 PIOHANDLE Parrot_io_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags);
 PIOHANDLE Parrot_io_dup(PARROT_INTERP, PIOHANDLE handle);
 INTVAL Parrot_io_close(PARROT_INTERP, PIOHANDLE handle);
-INTVAL Parrot_io_waitpid(PARROT_INTERP, INTVAL pid);
 INTVAL Parrot_io_is_tty(PARROT_INTERP, PIOHANDLE fd);
 INTVAL Parrot_io_getblksize(PIOHANDLE fd);
 INTVAL Parrot_io_flush(PARROT_INTERP, PIOHANDLE os_handle);
@@ -118,6 +117,17 @@ void Parrot_free_memalign(void *);
 ** Processes
 */
 
+typedef enum Parrot_proc_exec_enum {
+    /*
+     * Activates RTLD_GLOBAL on *NIX systems, making symbols from the newly
+     * loaded library visible to other libraries; this is usually needed if
+     * it will load libraries itself.
+     */
+    PARROT_EXEC_STDIN   = 0x01,
+    PARROT_EXEC_STDOUT  = 0x02,
+    PARROT_EXEC_STDERR  = 0x04,
+} Parrot_proc_exec_flags;
+
 PARROT_EXPORT
 INTVAL Parrot_Run_OS_Command(Interp*, STRING *);
 
@@ -126,6 +136,9 @@ INTVAL Parrot_Run_OS_Command_Argv(Interp*, PMC *);
 
 PARROT_EXPORT
 UINTVAL Parrot_getpid(void);
+
+INTVAL Parrot_proc_exec(Interp *, STRING *command, INTVAL flags, PIOHANDLE *handles);
+INTVAL Parrot_proc_waitpid(Interp *, INTVAL pid);
 
 /*
 ** Time

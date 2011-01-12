@@ -262,35 +262,6 @@ Parrot_io_close(PARROT_INTERP, PIOHANDLE file_descriptor)
 
 /*
 
-=item C<INTVAL Parrot_io_waitpid(PARROT_INTERP, INTVAL pid)>
-
-Closes C<*io>'s file descriptor.
-
-=cut
-
-*/
-
-INTVAL
-Parrot_io_waitpid(PARROT_INTERP, INTVAL pid)
-{
-    int status;
-
-    waitpid(pid, &status, 0);
-
-    if (WIFEXITED(status)) {
-        status = WEXITSTATUS(status);
-    }
-    else {
-        /* abnormal termination means non-zero exit status */
-        status = 1;
-    }
-
-    return status;
-}
-
-
-/*
-
 =item C<INTVAL Parrot_io_is_tty(PARROT_INTERP, PIOHANDLE fd)>
 
 Returns a boolean value indicating whether C<fd> is a console/tty.
@@ -502,89 +473,18 @@ PIOHANDLE
 Parrot_io_open_pipe(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
         ARGOUT(INTVAL *pid_out))
 {
-    /*
-     * pipe(), fork() should be defined, if this header is present
-     *        if that's not true, we need a test
-     */
-#ifdef PARROT_HAS_HEADER_UNISTD
-    int pid;
-    int fds[2];
+    PIOHANDLE handles[3];
 
-    if (pipe(fds) < 0)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Error opening pipe: %s", strerror(errno));
-
-    pid = fork();
-    if (pid < 0) {
-        /* fork failed, cleaning up */
-        close(fds[0]);
-        close(fds[1]);
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "fork failed: %s", strerror(errno));
+    if (flags & PIO_F_READ) {
+        *pid_out = Parrot_proc_exec(interp, command, PARROT_EXEC_STDOUT,
+                        handles);
+        return handles[1];
     }
-    else if (pid > 0) {
-        *pid_out = pid;
-
-        if (flags & PIO_F_READ) {
-            /* close this writer's end of pipe */
-            close(fds[1]);
-            return fds[0];
-        }
-        else {  /* assume write only for now */
-            /* close this reader's end */
-            close(fds[0]);
-            return fds[1];
-        }
+    else {
+        *pid_out = Parrot_proc_exec(interp, command, PARROT_EXEC_STDIN,
+                        handles);
+        return handles[0];
     }
-    else /* (pid == 0) */ {
-        /* Child - exec process */
-        char * argv[4];
-        /* C strings for the execv call defined without const to avoid
-         * const problems without copying them.
-         * Please don't change this without testing with a c++ compiler.
-         */
-        static char auxarg0[] = "/bin/sh";
-        static char auxarg1[] = "-c";
-
-        if (flags & PIO_F_READ) {
-            /* XXX redirect stdout, stderr to pipe */
-            close(STDOUT_FILENO);
-            close(STDERR_FILENO);
-            close(fds[0]);
-
-            if (dup(fds[1]) != STDOUT_FILENO)
-                exit(EXIT_FAILURE);
-            if (dup(fds[1]) != STDERR_FILENO)
-                exit(EXIT_FAILURE);
-        }
-        else {
-            /* the other end is writing - we read from the pipe */
-            close(STDIN_FILENO);
-            close(fds[1]);
-
-            if (dup(fds[0]) != STDIN_FILENO)
-                exit(EXIT_FAILURE);
-        }
-
-        argv [0] = auxarg0;
-        argv [1] = auxarg1;
-        argv [2] = Parrot_str_to_cstring(interp, command);
-        argv [3] = NULL;
-        execv(argv [0], argv);
-
-        /* Will never reach this unless exec fails.
-         * No need to clean up, we're just going to exit */
-        perror("execvp");
-        exit(EXIT_FAILURE);
-    }
-
-#else
-    UNUSED(filehandle);
-    UNUSED(command);
-    UNUSED(flags);
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-        "pipe() unimplemented");
-#endif
 }
 
 /*

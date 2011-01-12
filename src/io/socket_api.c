@@ -234,7 +234,7 @@ Parrot_io_recv_handle(PARROT_INTERP, ARGMOD(PMC *pmc), size_t len)
     ASSERT_ARGS(Parrot_io_recv_handle)
     Parrot_Socket_attributes *io = PARROT_SOCKET(pmc);
     STRING *res;
-    size_t  received;
+    INTVAL  received;
 
     if (Parrot_io_socket_is_closed(interp, pmc))
         return STRINGNULL;

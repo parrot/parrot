@@ -48,7 +48,6 @@
 #define PIO_DUP(interp, handle) Parrot_io_dup((interp), (handle))
 #define PIO_CLOSE(interp, handle) Parrot_io_close((interp), (handle))
 #define PIO_CLOSE_PIOHANDLE(interp, handle) Parrot_io_close_piohandle((interp), (handle))
-#define PIO_PIPE_WAIT(interp, pid) Parrot_io_waitpid((interp), (pid))
 #define PIO_READ(interp, handle, buf, len) Parrot_io_read((interp), (handle), (buf), (len))
 #define PIO_WRITE(interp, handle, buf, len) Parrot_io_write((interp), (handle), (buf), (len))
 #define PIO_SEEK(interp, pmc, offset, start) \

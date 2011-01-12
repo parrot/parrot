@@ -149,6 +149,176 @@ Parrot_getpid(void)
 
 /*
 
+=item C<PIOHANDLE Parrot_proc_exec(PARROT_INTERP, STRING *command, INTVAL
+flags, INTVAL *pid_out)>
+
+Execute an external process.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_proc_exec(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
+        ARGMOD(PIOHANDLE *handles))
+{
+    /*
+     * pipe(), fork() should be defined, if this header is present
+     *        if that's not true, we need a test
+     */
+    int pid;
+    int in_fds[2];
+    int out_fds[2];
+    int err_fds[2];
+
+    if (flags & PARROT_EXEC_STDIN
+    &&  pipe(in_fds) < 0)
+        goto error_pipe_in;
+
+    if (flags & PARROT_EXEC_STDOUT
+    &&  pipe(out_fds) < 0)
+        goto error_pipe_out;
+
+    if (flags & PARROT_EXEC_STDERR
+    &&  pipe(err_fds) < 0)
+        goto error_pipe_err;
+
+    pid = fork();
+
+    if (pid < 0)
+        goto error_fork;
+
+    if (pid > 0) {
+        if (flags & PARROT_EXEC_STDIN) {
+            /* close fd for reading */
+            close(in_fds[0]);
+            handles[0] = in_fds[1];
+        }
+
+        if (flags & PARROT_EXEC_STDOUT) {
+            /* close fd for writing */
+            close(out_fds[1]);
+            handles[1] = out_fds[0];
+        }
+
+        if (flags & PARROT_EXEC_STDERR) {
+            /* close fd for writing */
+            close(err_fds[1]);
+            handles[2] = err_fds[0];
+        }
+    }
+    else /* (pid == 0) */ {
+        /* Child - exec process */
+        char * argv[4];
+        /* C strings for the execv call defined without const to avoid
+         * const problems without copying them.
+         * Please don't change this without testing with a c++ compiler.
+         */
+        static char auxarg0[] = "/bin/sh";
+        static char auxarg1[] = "-c";
+
+        if (flags & PARROT_EXEC_STDIN) {
+            /* redirect stdin to pipe */
+            close(in_fds[1]);
+            close(STDIN_FILENO);
+
+            if (dup(in_fds[0]) != STDIN_FILENO)
+                exit(EXIT_FAILURE);
+        }
+
+        if (flags & PARROT_EXEC_STDOUT) {
+            /* redirect stdin to pipe */
+            close(out_fds[0]);
+            close(STDOUT_FILENO);
+
+            if (dup(out_fds[1]) != STDOUT_FILENO)
+                exit(EXIT_FAILURE);
+
+            if (!(flags & PARROT_EXEC_STDERR)) {
+                close(STDERR_FILENO);
+
+                if (dup(out_fds[1]) != STDERR_FILENO)
+                    exit(EXIT_FAILURE);
+            }
+        }
+
+        if (flags & PARROT_EXEC_STDERR) {
+            /* redirect stdin to pipe */
+            close(err_fds[0]);
+            close(STDERR_FILENO);
+
+            if (dup(err_fds[1]) != STDERR_FILENO)
+                exit(EXIT_FAILURE);
+        }
+
+        argv [0] = auxarg0;
+        argv [1] = auxarg1;
+        argv [2] = Parrot_str_to_cstring(interp, command);
+        argv [3] = NULL;
+        execv(argv [0], argv);
+
+        /* Will never reach this unless exec fails.
+         * No need to clean up, we're just going to exit */
+        perror("execvp");
+        exit(EXIT_FAILURE);
+    }
+
+    return pid;
+
+  error_fork:
+    if (flags & PARROT_EXEC_STDERR) {
+        close(err_fds[0]);
+        close(err_fds[1]);
+    }
+
+  error_pipe_err:
+    if (flags & PARROT_EXEC_STDOUT) {
+        close(out_fds[0]);
+        close(out_fds[1]);
+    }
+
+  error_pipe_out:
+    if (flags & PARROT_EXEC_STDIN) {
+        close(in_fds[0]);
+        close(in_fds[1]);
+    }
+
+  error_pipe_in:
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+        "Error executing process: %s", strerror(errno));
+}
+
+/*
+
+=item C<INTVAL Parrot_proc_waitpid(PARROT_INTERP, INTVAL pid)>
+
+Wait for process with C<pid> to exit.
+
+=cut
+
+*/
+
+INTVAL
+Parrot_proc_waitpid(PARROT_INTERP, INTVAL pid)
+{
+    int status;
+
+    waitpid(pid, &status, 0);
+
+    if (WIFEXITED(status)) {
+        status = WEXITSTATUS(status);
+    }
+    else {
+        /* abnormal termination means non-zero exit status */
+        status = 1;
+    }
+
+    return status;
+}
+
+/*
+
 =back
 
 =cut
