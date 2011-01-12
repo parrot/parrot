@@ -49,7 +49,9 @@ Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)
                             str_value);
     char *envs = Parrot_str_to_platform_cstring(interp, str_envs);
     putenv(envs);
-    Parrot_str_free_cstring(envs);
+    /* Can't free envs because the environment may still be
+       using it.
+    */
 #endif
 }
 
