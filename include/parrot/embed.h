@@ -12,7 +12,7 @@
 
 #include "parrot/core_types.h"  /* types used */
 #include "parrot/compiler.h"    /* compiler capabilities */
-#include "parrot/config.h"      /* PARROT_VERSION, PARROT_JIT_CAPABLE... */
+#include "parrot/config.h"      /* PARROT_VERSION... */
 #include "parrot/interpreter.h" /* give us the interpreter flags */
 #include "parrot/warnings.h"    /* give us the warnings flags    */
 

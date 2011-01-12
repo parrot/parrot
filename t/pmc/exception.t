@@ -19,7 +19,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(44)
+    plan(47)
     test_bool()
     test_int()
     test_new_int()
@@ -37,6 +37,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     test_throw_obj()
     test_clone()
     test_throw_clone()
+    test_throw_serialized()
     test_backtrace()
     test_annotations()
 .end
@@ -385,6 +386,57 @@ _handler:
     pay = new ['Integer'], 9875
     ex['payload'] = pay
     exclone = clone ex
+    result = iseq ex, exclone
+    is(result, 1, 'cloned Exception with payload is equal to original')
+
+    result = 0
+    throw exclone
+    goto catchall2
+  catch2:
+    .get_results(exc)
+    getpay = exc['payload']
+    $I0 = getpay
+    if $I0 != 9875 goto catchall2
+    result = 1
+  catchall2:
+    is(result, 1, 'caught a cloned Exception with payload')
+.end
+
+.sub test_throw_serialized
+    .local pmc ex, exclone, eh, ehguard
+    .local int result
+    ex = new ['Exception']
+    ex['type'] = .EXCEPTION_SYNTAX_ERROR
+    $S0     = freeze ex
+    exclone = thaw $S0
+
+    ehguard = new ['ExceptionHandler']
+    set_label ehguard, catchall
+    push_eh ehguard
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_SYNTAX_ERROR)
+    set_label eh, catch
+    result = 0
+    push_eh eh
+    throw exclone
+    goto catchall
+  catch:
+    result = 1
+  catchall:
+    finalize eh
+    finalize ehguard
+    is(result, 1, 'caught a cloned Exception')
+
+    null exclone
+    result = 0
+    .local pmc pay, getpay, exc
+    set_label ehguard, catchall2
+    set_label eh, catch2
+
+    pay = new ['Integer'], 9875
+    ex['payload'] = pay
+    $S0     = freeze ex
+    exclone = thaw $S0
     result = iseq ex, exclone
     is(result, 1, 'cloned Exception with payload is equal to original')
 

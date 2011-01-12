@@ -173,7 +173,7 @@ sub test_pbc_integer {
 # ]
 test_pbc_integer(1, "(4_le) i386 32 bit opcode_t, 4 byte intval, 8 byte double");
 
-# adding --floatval="long double" --jitcapable=0
+# adding --floatval="long double"
 # HEADER => [
 #         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
 #         byteorder = 0   (interpreter's byteorder       = 0)
