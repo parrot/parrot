@@ -240,10 +240,8 @@ Parrot_io_recv_handle(PARROT_INTERP, ARGMOD(PMC *pmc), size_t len)
         return STRINGNULL;
 
     /* This must stay ASCII to make Rakudo and UTF-8 work for now */
-    res = Parrot_str_new_noinit(interp, len);
-
-    received     = Parrot_io_recv(interp, io->os_handle, res->strstart,
-                        res->bufused);
+    res      = Parrot_str_new_noinit(interp, len);
+    received = Parrot_io_recv(interp, io->os_handle, res->strstart, len);
 
     if (received < 0) {
         /* TODO: error handling */
