@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 38;
+plan tests => 49;
 
 =head1 NAME
 
@@ -91,6 +91,9 @@ int main(void)
     string = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
 
 $code
+
+    /* TODO: Properly test this */
+    Parrot_PMC_destroy(interp, pmc);
 
     Parrot_destroy(interp);
     printf("Done!\\n");
@@ -378,6 +381,17 @@ CODE
 Done!
 OUTPUT
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_neg" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+
+    pmc2 = Parrot_PMC_neg(interp, pmc, pmc2);
+    value = Parrot_PMC_get_integer(interp, pmc2);
+    printf("%d\n", (int) value);
+CODE
+42
+Done!
+OUTPUT
+
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_floor_divide" );
     Parrot_PMC_set_integer_native(interp, pmc,  7);
@@ -457,6 +471,93 @@ CODE
 21
 2
 42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_multiply_int" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  21);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+    integer = 2;
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    pmc3 = Parrot_PMC_multiply_int(interp, pmc, integer, pmc3);
+    integer = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", integer);
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_multiply" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  21);
+    Parrot_PMC_set_integer_native(interp, pmc2, 2);
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    Parrot_PMC_i_multiply(interp, pmc, pmc2);
+    integer = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", integer);
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_multiply_int" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  21);
+    integer = 2;
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    Parrot_PMC_i_multiply_int(interp, pmc, integer);
+    integer = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", integer);
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_multiply_float" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  21);
+    number = 2.0;
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    Parrot_PMC_i_multiply_float(interp, pmc, number);
+    number = Parrot_PMC_get_integer(interp, pmc);
+    printf("%.2f\n", number);
+CODE
+42.00
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_multiply_float" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  21);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+    number = 2.0;
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    pmc3 = Parrot_PMC_multiply_float(interp, pmc, number, pmc3);
+    number = Parrot_PMC_get_number(interp, pmc3);
+    printf("%.2f\n", number);
+CODE
+42.00
 Done!
 OUTPUT
 
@@ -610,6 +711,71 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_subtract" );
 CODE
 42
 -42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_subtract" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  52);
+    Parrot_PMC_set_integer_native(interp, pmc2, 10);
+
+    Parrot_PMC_i_subtract(interp, pmc, pmc2);
+    Parrot_io_printf(interp, "%P\n", pmc);
+
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_subtract_int" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  52);
+    integer = 10;
+
+    pmc3 = Parrot_PMC_subtract_int(interp, pmc, integer, pmc3);
+    Parrot_io_printf(interp, "%P\n", pmc3);
+
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_subtract_float" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  52);
+    number = 10.0;
+
+    pmc3 = Parrot_PMC_subtract_float(interp, pmc, number, pmc3);
+    Parrot_io_printf(interp, "%P\n", pmc3);
+
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_subtract_int" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  52);
+    integer = 10;
+
+    Parrot_PMC_i_subtract_int(interp, pmc, integer);
+    Parrot_io_printf(interp, "%P\n", pmc);
+
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_subtract_float" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  52);
+    number = 10.0;
+
+    Parrot_PMC_i_subtract_float(interp, pmc, number);
+    Parrot_io_printf(interp, "%P\n", pmc);
+
+CODE
+42
 Done!
 OUTPUT
 
