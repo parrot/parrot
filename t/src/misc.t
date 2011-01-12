@@ -54,10 +54,10 @@ void fail(const char *msg)
 int main(int argc, const char **argv)
 {
     Parrot_Interp interp;
+    char buf[11];
     interp = Parrot_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
-    char buf[11];
     Parrot_snprintf(interp, buf, 11, "test%d", 123456);
     puts(buf);
 
@@ -88,10 +88,10 @@ void fail(const char *msg)
 int main(int argc, const char **argv)
 {
     Parrot_Interp interp;
+    char *buf = "unchanged";
     interp = Parrot_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
-    char *buf = "unchanged";
     Parrot_snprintf(interp, buf, 0, "");
 
     if (buf == "unchanged") puts("Done");
