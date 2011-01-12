@@ -240,8 +240,8 @@ static void mark_1_ct_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PackFile * PackFile_append_pbc(PARROT_INTERP,
-    ARGIN_NULLOK(const char *filename))
+static PackFile * PackFile_append(PARROT_INTERP,
+    ARGIN_NULLOK(PackFile * const pf))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -419,7 +419,7 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_mark_1_ct_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
-#define ASSERT_ARGS_PackFile_append_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_PackFile_append __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_Constant_unpack_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -4206,7 +4206,8 @@ compile_or_load_file(PARROT_INTERP, ARGIN(STRING *path),
             Parrot_hll_get_HLL_namespace(interp, parrot_hll_id));
 
     if (file_type == PARROT_RUNTIME_FT_PBC) {
-        PackFile * const pf = PackFile_append_pbc(interp, filename);
+        PackFile * pf = Parrot_pbc_read(interp, filename, 0);
+        pf = PackFile_append(interp, pf);
         Parrot_str_free_cstring(filename);
 
         if (!pf)
@@ -4315,8 +4316,8 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 
 /*
 
-=item C<static PackFile * PackFile_append_pbc(PARROT_INTERP, const char
-*filename)>
+=item C<static PackFile * PackFile_append(PARROT_INTERP, PackFile * const
+pf)>
 
 Reads and appends a PBC it to the current directory.  Fixes up sub addresses in
 newly loaded bytecode and runs C<:load> subs.
@@ -4328,10 +4329,9 @@ newly loaded bytecode and runs C<:load> subs.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PackFile *
-PackFile_append_pbc(PARROT_INTERP, ARGIN_NULLOK(const char *filename))
+PackFile_append(PARROT_INTERP, ARGIN_NULLOK(PackFile * const pf))
 {
-    ASSERT_ARGS(PackFile_append_pbc)
-    PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
+    ASSERT_ARGS(PackFile_append)
 
     if (pf) {
         /* An embedder can try to load_bytecode without having an initial_pf */
