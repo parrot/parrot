@@ -59,27 +59,6 @@
 #define PIO_IS_TTY(interp, handle) \
     Parrot_io_is_tty((interp), (handle))
 
-#define PIO_POLL(interp, pmc, which, sec, usec) \
-    Parrot_io_poll((interp), (pmc), (which), (sec), (usec))
-#define PIO_PIPE(interp, reader, writer) \
-    Parrot_io_pipe((interp), (reader), (writer))
-#define PIO_SOCKET(interp, socket, fam, type, proto) \
-    Parrot_io_socket((interp), (socket), (fam), (type), (proto))
-#define PIO_RECV(interp, pmc, buf) \
-    Parrot_io_recv((interp), (pmc), (buf))
-#define PIO_SEND(interp, pmc, buf) \
-    Parrot_io_send((interp), (pmc), (buf))
-#define PIO_CONNECT(interp, pmc, address) \
-    Parrot_io_connect((interp), (pmc), (address))
-#define PIO_BIND(interp, pmc, address) \
-    Parrot_io_bind((interp), (pmc), (address))
-#define PIO_LISTEN(interp, pmc, backlog) \
-    Parrot_io_listen((interp), (pmc), (backlog))
-#define PIO_ACCEPT(interp, pmc) \
-    Parrot_io_accept((interp), (pmc))
-#define PIO_SOCKADDR_IN(interp, addr, port) \
-    Parrot_io_sockaddr_in((interp), (addr), (port))
-
 extern PIOOFF_T piooffsetzero;
 
 typedef struct _ParrotIOData ParrotIOData;
@@ -745,14 +724,11 @@ INTVAL Parrot_io_poll_handle(PARROT_INTERP,
         FUNC_MODIFIES(*pmc);
 
 PARROT_EXPORT
-INTVAL Parrot_io_recv_handle(PARROT_INTERP,
-    ARGMOD(PMC *pmc),
-    ARGOUT(STRING **buf))
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_io_recv_handle(PARROT_INTERP, ARGMOD(PMC *pmc), size_t len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pmc)
-        FUNC_MODIFIES(*buf);
+        FUNC_MODIFIES(*pmc);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -811,8 +787,7 @@ INTVAL Parrot_io_socket_is_closed(PARROT_INTERP, ARGMOD(PMC *socket))
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_io_recv_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc) \
-    , PARROT_ASSERT_ARG(buf))
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_io_send_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \

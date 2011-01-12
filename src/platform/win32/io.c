@@ -233,27 +233,6 @@ Parrot_io_dup(PARROT_INTERP, PIOHANDLE handle)
 
 /*
 
-=item C<INTVAL Parrot_io_close_piohandle(PARROT_INTERP, PIOHANDLE handle)>
-
-Calls C<CloseHandle()> to close the given file descriptor.  Returns 0 on
-success, -1 on error.
-
-=cut
-
-*/
-
-INTVAL
-Parrot_io_close_piohandle(PARROT_INTERP, PIOHANDLE handle)
-{
-
-    if (handle == INVALID_HANDLE_VALUE)
-        return -1;
-
-    return CloseHandle(handle) ? 0 : -1;
-}
-
-/*
-
 =item C<INTVAL Parrot_io_close(PARROT_INTERP, PIOHANDLE os_handle)>
 
 Calls C<CloseHandle()> to close C<*io>'s file descriptor.

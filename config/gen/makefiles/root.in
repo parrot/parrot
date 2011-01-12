@@ -1657,11 +1657,6 @@ src/platform/win32/io$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
 
 src/platform/win32/misc$(O) : src/platform/win32/misc.c $(PARROT_H_HEADERS)
 
-src/platform/win32/socket$(O) : $(PARROT_H_HEADERS) \
-	src/io/io_private.h \
-	include/pmc/pmc_socket.h \
-	src/platform/win32/socket.c
-
 src/platform/win32/sysmem$(O) : src/platform/win32/sysmem.c $(PARROT_H_HEADERS)
 
 src/platform/win32/time$(O) : src/platform/win32/time.c $(PARROT_H_HEADERS)

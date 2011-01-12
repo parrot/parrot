@@ -19,32 +19,47 @@ src/platform/generic/socket.c - UNIX socket functions
 #include "../../io/io_private.h"
 #include "pmc/pmc_socket.h"
 
-#include <sys/socket.h>
+/* Windows defines file handles as void * and sockets as unsigned int.
+ * We use void * for Windows PIOHANDLEs, so we have to cast them for the
+ * socket API.
+ */
+
+#ifdef _WIN32
+
+#  define PIO_INVALID_SOCKET    INVALID_SOCKET
+
+#  define PIO_SOCK_ERRNO        WSAGetLastError()
+
+#  define PIO_SOCK_EINTR        WSAEINTR
+#  define PIO_SOCK_EINPROGRESS  WSAEINPROGRESS
+#  define PIO_SOCK_EISCONN      WSAEISCONN
+#  define PIO_SOCK_ECONNRESET   WSAECONNRESET
+#  define PIO_SOCK_EWOULDBLOCK  WSAEWOULDBLOCK
+
+typedef SOCKET PIOSOCKET;
+
+#else
+
+#  define PIO_INVALID_SOCKET      -1
+
+#  define PIO_SOCK_ERRNO          errno
+
+#  define PIO_SOCK_EINTR          EINTR
+#  define PIO_SOCK_EINPROGRESS    EINPROGRESS
+#  define PIO_SOCK_EISCONN        EISCONN
+#  define PIO_SOCK_ECONNRESET     ECONNRESET
+
+#  ifdef EWOULDBLOCK
+#    define PIO_SOCK_EWOULDBLOCK  EWOULDBLOCK
+#  else
+#    define PIO_SOCK_EWOULDBLOCK  EAGAIN
+#  endif
+
+typedef int PIOSOCKET;
+
+#endif
 
 /* HEADERIZER HFILE: none */
-
-/* HEADERIZER BEGIN: static */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-static void get_sockaddr_in(PARROT_INTERP,
-    ARGIN(PMC * sockaddr),
-    ARGIN(const char* host),
-    int port)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-#define ASSERT_ARGS_get_sockaddr_in __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(sockaddr) \
-    , PARROT_ASSERT_ARG(host))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: static */
-
-/*
-static void get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr),
-    ARGIN(const char* host), ARGIN(int port));
-*/
 
 /*
 
@@ -59,43 +74,13 @@ Very minimal stubs for now, maybe someone will run with these.
 
 =over 4
 
-=item C<PMC * Parrot_io_sockaddr_in(PARROT_INTERP, STRING *addr, INTVAL port)>
-
-C<Parrot_io_sockaddr_in()> is not part of the layer and so must be C<extern>.
-
-XXX: We can probably just write our own routines (C<htons()>,
-C<inet_aton()>, etc.) and take this out of platform specific compilation
-
 =cut
 
 */
 
-/* Helper macros to get sockaddr_in */
-#define SOCKADDR_LOCAL(p) ((struct sockaddr_in*)VTABLE_get_pointer(interp, \
-                PARROT_SOCKET((p))->local))
-#define SOCKADDR_REMOTE(p) ((struct sockaddr_in*)VTABLE_get_pointer(interp, \
-                PARROT_SOCKET((p))->remote))
-
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
-{
-
-    char * const s        = Parrot_str_to_cstring(interp, addr);
-    PMC  * const sockaddr = Parrot_pmc_new(interp, enum_class_Sockaddr);
-
-    get_sockaddr_in(interp, sockaddr, s, port);
-    Parrot_str_free_cstring(s);
-    return sockaddr;
-}
-
-
 /*
 
-=item C<INTVAL Parrot_io_socket(PARROT_INTERP, PMC *s, int fam, int type, int
-proto)>
+=item C<PIOHANDLE Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto)>
 
 Uses C<socket()> to create a socket with the specified address family,
 socket type and protocol number.
@@ -106,23 +91,24 @@ socket type and protocol number.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-INTVAL
-Parrot_io_socket(PARROT_INTERP, ARGIN(PMC *s), int fam, int type, int proto)
+PIOHANDLE
+Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto)
 {
-    const int sock = socket(fam, type, proto);
-    if (sock >= 0) {
-        int i = 1;
-        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &i, sizeof (i));
-        Parrot_io_set_os_handle(interp, s, sock);
-        SOCKADDR_REMOTE(s)->sin_family = fam;
-        return 0;
-    }
-    return -1;
+    const PIOSOCKET sock = socket(fam, type, proto);
+    int i = 1;
+
+    if (sock == PIO_INVALID_SOCKET)
+        return PIO_INVALID_HANDLE;
+
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &i, sizeof (i));
+
+    return (PIOHANDLE)sock;
 }
 
 /*
 
-=item C<INTVAL Parrot_io_connect(PARROT_INTERP, PMC *socket, PMC *r)>
+=item C<INTVAL Parrot_io_connect(PARROT_INTERP, PIOHANDLE os_handle, void
+*addr)>
 
 Connects C<*io>'s socket to address C<*r>.
 
@@ -131,24 +117,17 @@ Connects C<*io>'s socket to address C<*r>.
 */
 
 INTVAL
-Parrot_io_connect(PARROT_INTERP, ARGMOD(PMC *socket), ARGIN(PMC *r))
+Parrot_io_connect(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(void *addr))
 {
-    const Parrot_Socket_attributes * const io = PARROT_SOCKET(socket);
-
-    if (!r)
-        return -1;
-
-    PARROT_SOCKET(socket)->remote = r;
-
 AGAIN:
-    if ((connect(io->os_handle, (struct sockaddr *)SOCKADDR_REMOTE(socket),
+    if ((connect((PIOSOCKET)os_handle, (struct sockaddr *)addr,
             sizeof (struct sockaddr_in))) != 0) {
-        switch (errno) {
-          case EINTR:
+        switch (PIO_SOCK_ERRNO) {
+          case PIO_SOCK_EINTR:
             goto AGAIN;
-          case EINPROGRESS:
+          case PIO_SOCK_EINPROGRESS:
             goto AGAIN;
-          case EISCONN:
+          case PIO_SOCK_EISCONN:
             return 0;
           default:
             return -1;
@@ -160,7 +139,7 @@ AGAIN:
 
 /*
 
-=item C<INTVAL Parrot_io_bind(PARROT_INTERP, PMC *socket, PMC *sockaddr)>
+=item C<INTVAL Parrot_io_bind(PARROT_INTERP, PIOHANDLE os_handle, void *addr)>
 
 Binds C<*io>'s socket to the local address and port specified by C<*l>.
 
@@ -169,19 +148,11 @@ Binds C<*io>'s socket to the local address and port specified by C<*l>.
 */
 
 INTVAL
-Parrot_io_bind(PARROT_INTERP, ARGMOD(PMC *socket), ARGMOD(PMC *sockaddr))
+Parrot_io_bind(PARROT_INTERP, PIOHANDLE os_handle, ARGMOD(void *addr))
 {
-    const Parrot_Socket_attributes * const io = PARROT_SOCKET(socket);
     struct sockaddr_in * saddr;
 
-    if (!sockaddr)
-        return -1;
-
-    PARROT_SOCKET(socket)->local = sockaddr;
-
-    saddr = SOCKADDR_LOCAL(socket);
-
-    if ((bind(io->os_handle, (struct sockaddr *) saddr,
+    if ((bind((PIOSOCKET)os_handle, (struct sockaddr *)addr,
             sizeof (struct sockaddr_in))) == -1) {
         return -1;
     }
@@ -191,7 +162,7 @@ Parrot_io_bind(PARROT_INTERP, ARGMOD(PMC *socket), ARGMOD(PMC *sockaddr))
 
 /*
 
-=item C<INTVAL Parrot_io_listen(PARROT_INTERP, PMC *socket, INTVAL sec)>
+=item C<INTVAL Parrot_io_listen(PARROT_INTERP, PIOHANDLE os_handle, INTVAL sec)>
 
 Listen for new connections. This is only applicable to C<STREAM> or
 C<SEQ> sockets.
@@ -201,10 +172,9 @@ C<SEQ> sockets.
 */
 
 INTVAL
-Parrot_io_listen(SHIM_INTERP, ARGMOD(PMC *socket), INTVAL sec)
+Parrot_io_listen(SHIM_INTERP, PIOHANDLE os_handle, INTVAL sec)
 {
-    const Parrot_Socket_attributes * const io = PARROT_SOCKET(socket);
-    if ((listen(io->os_handle, sec)) == -1) {
+    if ((listen((PIOSOCKET)os_handle, sec)) == -1) {
         return -1;
     }
     return 0;
@@ -212,7 +182,8 @@ Parrot_io_listen(SHIM_INTERP, ARGMOD(PMC *socket), INTVAL sec)
 
 /*
 
-=item C<PMC * Parrot_io_accept(PARROT_INTERP, PMC *socket)>
+=item C<PIOHANDLE Parrot_io_accept(PARROT_INTERP, PIOHANDLE os_handle, void
+*addr)>
 
 Accept a new connection and return a newly created C<ParrotIO> socket.
 
@@ -222,27 +193,17 @@ Accept a new connection and return a newly created C<ParrotIO> socket.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_io_accept(PARROT_INTERP, ARGMOD(PMC *socket))
+PIOHANDLE
+Parrot_io_accept(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(void *addr))
 {
-    Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
-    PMC * newio   = Parrot_io_new_socket_pmc(interp,
-            PIO_F_SOCKET | PIO_F_READ|PIO_F_WRITE);
-    Parrot_Socklen_t    addrlen = sizeof (struct sockaddr_in);
-    struct sockaddr_in *saddr;
+    Parrot_Socklen_t addrlen = sizeof (struct sockaddr_in);
     int newsock;
 
-    PARROT_SOCKET(newio)->local  = PARROT_SOCKET(socket)->local;
-    PARROT_SOCKET(newio)->remote = Parrot_pmc_new(interp, enum_class_Sockaddr);
-    saddr                        = SOCKADDR_REMOTE(newio);
-
-    newsock = accept(io->os_handle, (struct sockaddr *)saddr, &addrlen);
+    newsock = accept((PIOSOCKET)os_handle, (struct sockaddr *)addr, &addrlen);
 
     if (newsock == -1) {
-        return PMCNULL;
+        return -1;
     }
-
-    PARROT_SOCKET(newio)->os_handle = newsock;
 
     /* XXX FIXME: Need to do a getsockname and getpeername here to
      * fill in the sockaddr_in structs for local and peer */
@@ -250,12 +211,13 @@ Parrot_io_accept(PARROT_INTERP, ARGMOD(PMC *socket))
     /* Optionally do a gethostyaddr() to resolve remote IP address.
      * This should be based on an option set in the master socket */
 
-    return newio;
+    return newsock;
 }
 
 /*
 
-=item C<INTVAL Parrot_io_send(PARROT_INTERP, PMC *socket, STRING *s)>
+=item C<INTVAL Parrot_io_send(PARROT_INTERP, PIOHANDLE os_handle, const char
+*buf, size_t len)>
 
 Send the message C<*s> to C<*io>'s connected socket.
 
@@ -264,40 +226,29 @@ Send the message C<*s> to C<*io>'s connected socket.
 */
 
 INTVAL
-Parrot_io_send(SHIM_INTERP, ARGMOD(PMC *socket), ARGMOD(STRING *s))
+Parrot_io_send(SHIM_INTERP, PIOHANDLE os_handle, ARGIN(const char *buf),
+        size_t len)
 {
-    int error, bytes, byteswrote;
-    Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
+    int error, byteswrote;
 
-    bytes = s->bufused;
     byteswrote = 0;
 AGAIN:
-    /*
-     * Ignore encoding issues for now.
-     */
-    if ((error = send(io->os_handle, (char *)s->strstart + byteswrote,
-                    bytes, 0)) >= 0) {
+    if ((error = send((PIOSOCKET)os_handle, buf + byteswrote, len, 0)) >= 0) {
         byteswrote += error;
-        bytes -= error;
-        if (!bytes) {
+        len        -= error;
+        if (!len) {
             return byteswrote;
         }
         goto AGAIN;
     }
     else {
-        switch (errno) {
-          case EINTR:
+        switch (PIO_SOCK_ERRNO) {
+          case PIO_SOCK_EINTR:
+          case PIO_SOCK_EWOULDBLOCK:
             goto AGAIN;
-#ifdef EWOULDBLOCK
-          case EWOULDBLOCK:
-            goto AGAIN;
-#else
-          case EAGAIN:
-            goto AGAIN;
-#endif
           case EPIPE:
             /* XXX why close it here and not below */
-            close(io->os_handle);
+            close((PIOSOCKET)os_handle);
             return -1;
           default:
             return -1;
@@ -307,7 +258,8 @@ AGAIN:
 
 /*
 
-=item C<INTVAL Parrot_io_recv(PARROT_INTERP, PMC *socket, STRING **s)>
+=item C<INTVAL Parrot_io_recv(PARROT_INTERP, PIOHANDLE os_handle, char *buf,
+size_t len)>
 
 Receives a message in C<**s> from C<*io>'s connected socket.
 
@@ -316,41 +268,27 @@ Receives a message in C<**s> from C<*io>'s connected socket.
 */
 
 INTVAL
-Parrot_io_recv(PARROT_INTERP, ARGMOD(PMC *socket), ARGOUT(STRING **s))
+Parrot_io_recv(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(char *buf), size_t len)
 {
     int error;
     unsigned int bytesread = 0;
-    char buf[2048];
-    Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
 
 AGAIN:
-    if ((error = recv(io->os_handle, buf, 2048, 0)) >= 0) {
+    if ((error = recv((PIOSOCKET)os_handle, buf, len, 0)) >= 0) {
         bytesread += error;
-        *s = Parrot_str_new_init(interp, buf, bytesread,
-                Parrot_binary_encoding_ptr, 0);
-        /* Hack to make Rakudo and UTF-8 work */
-        (*s)->encoding = Parrot_ascii_encoding_ptr;
         return bytesread;
     }
     else {
-        switch (errno) {
-          case EINTR:
+        switch (PIO_SOCK_ERRNO) {
+          case PIO_SOCK_EINTR:
+          case PIO_SOCK_EWOULDBLOCK:
             goto AGAIN;
-#ifdef EWOULDBLOCK
-          case EWOULDBLOCK:
-            goto AGAIN;
-#else
-          case EAGAIN:
-            goto AGAIN;
-#endif
-          case ECONNRESET:
+          case PIO_SOCK_ECONNRESET:
             /* XXX why close it on err return result is -1 anyway */
-            close(io->os_handle);
-            *s = Parrot_str_new_noinit(interp, 0);
+            close((PIOSOCKET)os_handle);
             return -1;
           default:
-            close(io->os_handle);
-            *s = Parrot_str_new_noinit(interp, 0);
+            close((PIOSOCKET)os_handle);
             return -1;
         }
     }
@@ -358,8 +296,8 @@ AGAIN:
 
 /*
 
-=item C<INTVAL Parrot_io_poll(PARROT_INTERP, PMC *socket, int which, int sec,
-int usec)>
+=item C<INTVAL Parrot_io_poll(PARROT_INTERP, PIOHANDLE os_handle, int which, int
+sec, int usec)>
 
 Utility function for polling a single IO stream with a timeout.
 
@@ -378,65 +316,71 @@ the read buffer.
 */
 
 INTVAL
-Parrot_io_poll(SHIM_INTERP, ARGMOD(PMC *socket), int which, int sec,
+Parrot_io_poll(SHIM_INTERP, PIOHANDLE os_handle, int which, int sec,
     int usec)
 {
     fd_set r, w, e;
     struct timeval t;
-    const Parrot_Socket_attributes * const io = PARROT_SOCKET(socket);
+    PIOSOCKET sock = (PIOSOCKET)os_handle;
 
     t.tv_sec = sec;
     t.tv_usec = usec;
     FD_ZERO(&r); FD_ZERO(&w); FD_ZERO(&e);
     /* These should be defined in header */
-    if (which & 1) FD_SET(io->os_handle, &r);
-    if (which & 2) FD_SET(io->os_handle, &w);
-    if (which & 4) FD_SET(io->os_handle, &e);
+    if (which & 1) FD_SET(sock, &r);
+    if (which & 2) FD_SET(sock, &w);
+    if (which & 4) FD_SET(sock, &e);
 AGAIN:
-    if ((select(io->os_handle+1, &r, &w, &e, &t)) >= 0) {
+    if ((select(sock + 1, &r, &w, &e, &t)) >= 0) {
         int n;
-        n = (FD_ISSET(io->os_handle, &r) ? 1 : 0);
-        n |= (FD_ISSET(io->os_handle, &w) ? 2 : 0);
-        n |= (FD_ISSET(io->os_handle, &e) ? 4 : 0);
+        n = (FD_ISSET(sock, &r) ? 1 : 0);
+        n |= (FD_ISSET(sock, &w) ? 2 : 0);
+        n |= (FD_ISSET(sock, &e) ? 4 : 0);
         return n;
     }
     else {
-        switch (errno) {
-            case EINTR:        goto AGAIN;
-            default:           return -1;
+        switch (PIO_SOCK_ERRNO) {
+            case PIO_SOCK_EINTR:  goto AGAIN;
+            default:              return -1;
         }
     }
 }
 
 /*
 
-=item C<static void get_sockaddr_in(PARROT_INTERP, PMC * sockaddr, const char*
-host, int port)>
+=item C<void Parrot_io_sockaddr_in(PARROT_INTERP, void *addr, STRING *host_str,
+int port)>
 
-Get a new C<sockaddr_in> structure for the given PMC to connect to the
-specified host and port.
+Fill in a C<sockaddr_in> structure to connect to the specified host and port.
 
 =cut
 
 */
 
-static void
-get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr), ARGIN(const char* host),
-            int port)
+void
+Parrot_io_sockaddr_in(PARROT_INTERP, ARGOUT(void *addr),
+        ARGIN(STRING *host_str), int port)
 {
+    char * const host   = Parrot_str_to_cstring(interp, host_str);
     /* Hard coded to IPv4 for now */
-    const int family = AF_INET;
+    const int    family = AF_INET;
+    int          success;
 
-    struct sockaddr_in * const sa = (struct sockaddr_in*)VTABLE_get_pointer(interp, sockaddr);
-#ifdef PARROT_DEF_INET_ATON
-    if (inet_aton(host, &sa->sin_addr) != 0) {
+    struct sockaddr_in * const sa = (struct sockaddr_in*)addr;
+
+#ifdef _WIN32
+    sa->sin_addr.S_un.S_addr = inet_addr(host);
+    success = sa->sin_addr.S_un.S_addr != -1;
 #else
+#  ifdef PARROT_DEF_INET_ATON
+    success = inet_aton(host, &sa->sin_addr) != 0;
+#  else
     /* positive retval is success */
-    if (inet_pton(family, host, &sa->sin_addr) > 0) {
+    success = inet_pton(family, host, &sa->sin_addr) > 0;
+#  endif
 #endif
-        /* Success converting numeric IP */
-    }
-    else {
+
+    if (!success) {
         /* Maybe it is a hostname, try to lookup */
         /* XXX Check PIO option before doing a name lookup,
          * it may have been toggled off.
@@ -450,9 +394,28 @@ get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr), ARGIN(const char* host),
         memcpy((char*)&sa->sin_addr, he->h_addr, sizeof (sa->sin_addr));
     }
 
+    Parrot_str_free_cstring(host);
+
     sa->sin_family = family;
     sa->sin_port = htons(port);
 }
+
+/*
+
+=item C<INTVAL Parrot_io_close_socket(PARROT_INTERP, PIOHANDLE handle)>
+
+Closes the given file descriptor.  Returns 0 on success, -1 on error.
+
+=cut
+
+*/
+
+INTVAL
+Parrot_io_close_socket(SHIM_INTERP, PIOHANDLE handle)
+{
+    return close((PIOSOCKET)handle);
+}
+
 
 
 /*

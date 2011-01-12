@@ -352,7 +352,7 @@ Parrot_io_close_handle(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
             Parrot_Socket_attributes *data_struct = PARROT_SOCKET(pmc);
 
             if (data_struct->os_handle != PIO_INVALID_HANDLE)
-                result = Parrot_io_close_piohandle(interp, data_struct->os_handle);
+                result = Parrot_io_close_socket(interp, data_struct->os_handle);
             data_struct->os_handle = PIO_INVALID_HANDLE;
         }
     }
@@ -578,7 +578,7 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
         }
     }
     else if (pmc->vtable->base_type == enum_class_Socket) {
-        INTVAL read = Parrot_io_recv_handle(interp, pmc, &result);
+        result = Parrot_io_recv_handle(interp, pmc, length);
     }
     else
         Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "read"), "I->S", length, &result);

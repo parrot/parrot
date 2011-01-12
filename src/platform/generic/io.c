@@ -262,23 +262,6 @@ Parrot_io_close(PARROT_INTERP, PIOHANDLE file_descriptor)
 
 /*
 
-=item C<INTVAL Parrot_io_close_piohandle(PARROT_INTERP, PIOHANDLE handle)>
-
-Closes the given file descriptor.  Returns 0 on success, -1 on error.
-
-=cut
-
-*/
-
-INTVAL
-Parrot_io_close_piohandle(SHIM_INTERP, PIOHANDLE handle)
-{
-    return close(handle);
-}
-
-
-/*
-
 =item C<INTVAL Parrot_io_waitpid(PARROT_INTERP, INTVAL pid)>
 
 Closes C<*io>'s file descriptor.
