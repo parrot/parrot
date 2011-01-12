@@ -246,7 +246,7 @@ string containing the received message.
             SET_ATTR_buf(INTERP, SELF, STRINGNULL);
         }
         else {
-            result = Parrot_io_reads(INTERP, SELF, 0);
+            result = Parrot_io_reads(INTERP, SELF, 2048);
         }
         RETURN(STRING * result);
     }
