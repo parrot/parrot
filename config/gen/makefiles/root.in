@@ -383,6 +383,8 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/exit.h \
 	$(INC_DIR)/nci.h \
 	$(INC_DIR)/thread.h \
+	$(INC_DIR)/thr_pthread.h \
+	$(INC_DIR)/thr_windows.h \
 	$(INC_DIR)/atomic.h \
 	$(INC_DIR)/atomic/fallback.h \
 	$(INC_DIR)/atomic/gcc_pcc.h \
