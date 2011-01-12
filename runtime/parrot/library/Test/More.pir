@@ -1071,8 +1071,11 @@ Records a passing test if the PMC passed in is null, fails otherwise.
 
 =item C<throws_type( invokable, type, description)>
 
-Recores a passing test if calling the invokable throws an exception of the
-expected type, fails otherwise.
+Passes a test if calling the invokable throws an exception of the
+expected type, fails a test otherwise.
+If the invokable parameter is an invokable object, invoke it.
+It it's a String, compile it as PIR code and invokes the result.
+Otherwise, fail the test.
 
 =cut
 
@@ -1083,7 +1086,7 @@ expected type, fails otherwise.
 
     .local pmc test, ex
     .local string msg, exmsg
-    .local int extype
+    .local int check, extype
     get_hll_global test, [ 'Test'; 'More' ], '_test'
     msg = ''
     if null description goto setmsg
@@ -1094,6 +1097,22 @@ expected type, fails otherwise.
     msg = concat msg, ': '
 
     push_eh catch
+
+    check = does invokable, 'invokable'
+    if check goto invokeit
+    check = isa invokable, 'String'
+    unless check goto badinvoke
+    .local pmc compiler
+    .local string source
+    source = invokable
+    compiler = compreg 'PIR'
+    invokable = compiler(source)
+    goto invokeit
+
+  badinvoke:
+    die 'throws_type argument is not invokable'
+
+  invokeit:
     invokable()
 
     pop_eh
