@@ -22,7 +22,7 @@ Tests the globals fetch and store operations.
 =cut
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get namespace" );
-.sub main
+.sub main :main
    .local pmc ns, o
    ns = get_global "Foo"
    o = ns["f"]
@@ -38,7 +38,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "create namespace" );
-.sub main
+.sub main :main
     .local pmc f, x
     f = get_global "f"
     set_global ["Foo"], "x", f
@@ -54,7 +54,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get namespace - nested" );
-.sub main
+.sub main :main
    .local pmc ns, o
    ns = get_hll_namespace ["Foo"; "Bar"]
    o = ns["f"]

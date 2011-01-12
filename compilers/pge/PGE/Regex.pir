@@ -93,6 +93,7 @@ Match a single uppercase character.
 =cut
 
 .sub 'upper' :method
+    .param pmc adverbs         :slurpy :named
     .tailcall '!cclass'(self, .CCLASS_UPPERCASE)
 .end
 
@@ -104,6 +105,7 @@ Match a single lowercase character.
 =cut
 
 .sub "lower" :method
+    .param pmc adverbs         :slurpy :named
     .tailcall '!cclass'(self, .CCLASS_LOWERCASE)
 .end
 
@@ -115,6 +117,7 @@ Match a single digit.
 =cut
 
 .sub "digit" :method
+    .param pmc adverbs         :slurpy :named
     .tailcall '!cclass'(self, .CCLASS_NUMERIC)
 .end
 
@@ -125,6 +128,7 @@ Match a single alphanumeric character.
 =cut
 
 .sub "xdigit" :method
+    .param pmc adverbs         :slurpy :named
     .tailcall '!cclass'(self, .CCLASS_HEXADECIMAL)
 .end
 
@@ -135,6 +139,7 @@ Match a single whitespace character.
 =cut
 
 .sub "space" :method
+    .param pmc adverbs         :slurpy :named
     .tailcall '!cclass'(self, .CCLASS_WHITESPACE)
 .end
 
@@ -145,6 +150,7 @@ Match a single printable character.
 =cut
 
 .sub "print" :method
+    .param pmc adverbs         :slurpy :named
     .tailcall '!cclass'(self, .CCLASS_PRINTING)
 .end
 
@@ -155,6 +161,7 @@ Match a single "graphical" character.
 =cut
 
 .sub "graph" :method
+    .param pmc adverbs         :slurpy :named
     .tailcall '!cclass'(self, .CCLASS_GRAPHICAL)
 .end
 
@@ -165,6 +172,7 @@ Match a single "blank" character.
 =cut
 
 .sub "blank" :method
+    .param pmc adverbs         :slurpy :named
     .tailcall '!cclass'(self, .CCLASS_BLANK)
 .end
 
@@ -175,6 +183,7 @@ Match a single "control" character.
 =cut
 
 .sub "cntrl" :method
+    .param pmc adverbs         :slurpy :named
     .tailcall '!cclass'(self, .CCLASS_CONTROL)
 .end
 
@@ -185,6 +194,7 @@ Match a single punctuation character.
 =cut
 
 .sub "punct" :method
+    .param pmc adverbs         :slurpy :named
     .tailcall '!cclass'(self, .CCLASS_PUNCTUATION)
 .end
 
@@ -195,6 +205,7 @@ Match a single alphanumeric character.
 =cut
 
 .sub "alnum" :method
+    .param pmc adverbs         :slurpy :named
     .tailcall '!cclass'(self, .CCLASS_ALPHANUMERIC)
 .end
 
@@ -206,6 +217,7 @@ Match whitespace between tokens.
 =cut
 
 .sub "ws" :method
+    .param pmc adverbs         :slurpy :named
     .local string target
     .local pmc mob, mfrom, mpos
     .local int rep, pos, lastpos
@@ -272,6 +284,7 @@ Perl 5's \b regex).
 =cut
 
 .sub "wb" :method
+    .param pmc adverbs         :slurpy :named
     .local string target
     .local pmc mob
     .local int pos

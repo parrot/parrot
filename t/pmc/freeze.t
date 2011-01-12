@@ -25,6 +25,7 @@ Tests the freeze/thaw archiving subsystem.
 END { unlink "temp.fpmc"; }
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Integer" );
+.pcc_sub :main main:
     new P1, ['Integer']
     set P1, 777
     freeze S0, P1
@@ -41,6 +42,7 @@ Integer 777
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a String" );
+.pcc_sub :main main:
     new P1, ['String']
     set P1, "foo"
     freeze S0, P1
@@ -67,6 +69,7 @@ String foo
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Float" );
+.pcc_sub :main main:
     new P1, ['Float']
     set P1, 3.14159
     freeze S0, P1
@@ -83,6 +86,7 @@ Float 3.14159
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Hash" );
+.pcc_sub :main main:
     new P1, ['Integer']
     set P1, 666
     new P0, ['Hash']
@@ -113,6 +117,7 @@ Hash 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Hash" );
+.pcc_sub :main main:
     new P1, ['Integer']
     set P1, 666
     new P0, ['Hash']
@@ -143,6 +148,7 @@ Hash 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Integer with prop" );
+.pcc_sub :main main:
     new P1, ['Integer']
     set P1, 666
     new P2, ['Integer']
@@ -167,6 +173,7 @@ Integer 666
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw Array w Integer with prop" );
+.pcc_sub :main main:
     new P0, ['ResizablePMCArray']
     new P1, ['Integer']
     set P1, 666
@@ -205,6 +212,7 @@ ResizablePMCArray 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a NULL pmc" );
+.pcc_sub :main main:
     null P0
     freeze S0, P0
     thaw P10, S0
@@ -218,6 +226,7 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw array w NULL pmc" );
+.pcc_sub :main main:
     new P0, ['ResizablePMCArray']
     null P1
     push P0, P1
@@ -250,6 +259,7 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Sub" );
+.pcc_sub :main main:
     get_global P1, "_foo"
     freeze S0, P1
 
@@ -270,6 +280,7 @@ back
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray" );
+.pcc_sub :main main:
     new P0, ['FixedPMCArray']
     set P0, 3
     new P1, ['Integer']
@@ -312,6 +323,7 @@ ok diff
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray" );
+.pcc_sub :main main:
     new P0, ['FixedPMCArray']
     set P0, 3
     new P1, ['Integer']
@@ -402,6 +414,7 @@ Foo
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw simple class" );
+.pcc_sub :main main:
     newclass P10, "Foo"
     set S10, P10
     print S10
@@ -633,6 +646,7 @@ ok 6
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze Key" );
+.pcc_sub :main main:
     new P0, ['Hash']
     new P1, ['FixedPMCArray']
     set P1, 2

@@ -18,7 +18,7 @@ Tests the MappedByteArray PMC.
 .sub main :main
     .include 'test_more.pir'
     .const int inittests = 4
-    .const int moretests = 16
+    .const int moretests = 18
     .local int alltests
     alltests = inittests + moretests
     plan(alltests)
@@ -80,9 +80,7 @@ Tests the MappedByteArray PMC.
     mm = new ['MappedByteArray'], filename
 
     $I0 = elements mm
-
-    $S0 = mm.'get_utf8'(0, $I0)
-    is( $S0, "This is a test", "Reading test file with get_utf8 successful" )
+    is( $I0, 43, "Number of elements" )
 
     $I1 = mm."close"()
     is( $I1, 0, 'Closed and unmapped testfile' )
@@ -115,10 +113,11 @@ CODE
     mm = new ['MappedByteArray']
     mm."open"("t/pmc/testfile","rw")
 
-    $I0 = elements mm
-
-    $S0 = mm.'get_string'(0, $I0, 'utf8')
+    $S0 = mm.'get_string'(0, 14, 'ascii')
     is( $S0, "This is a test", "Reading test file with get_string successful" )
+
+    $S0 = mm.'get_utf8'(16, 23)
+    is( $S0, utf8:"Ärger, Ökonom, Übermut!", "Reading test file with get_utf8 successful" )
 
     $I1 = mm[0]
 
@@ -132,6 +131,13 @@ CODE
     $I3 = mm."close"()
     is( $I3, 0, 'Closed and unmapped testfile' )
 
+    throws_substring(<<'CODE', 'Malformed UTF-8', 'Invalid UTF-8')
+    .sub main
+        $P0 = new ['MappedByteArray']
+        $P0."open"("t/pmc/testfile","rw")
+        $S0 = $P0.'get_utf8'(17, 4)
+    .end
+CODE
     throws_substring(<<'CODE', 'not mapped', 'get_integer_keyed_int with unmapped MBA')
     .sub main
         $P0 = new ['MappedByteArray']
@@ -167,14 +173,14 @@ CODE
         $S0 = $P0."get_string"(-1, 1, "utf8")
     .end
 CODE
-    throws_substring(<<'CODE', 'get_utf8: index out of mapped', 'get_utf8 out of bounds')
+    throws_substring(<<'CODE', 'index out of bounds', 'get_utf8 out of bounds')
     .sub main
         $P0 = new ['MappedByteArray']
         $P0."open"("t/pmc/testfile", "rw")
         $S0 = $P0."get_utf8"(-1, 2)
     .end
 CODE
-    throws_substring(<<'CODE', 'Invalid encoding', 'get_string Invalid encoding')
+    throws_substring(<<'CODE', 'invalid encoding', 'get_string Invalid encoding')
     .sub main
         $P0 = new ['MappedByteArray']
         $P0."open"("t/pmc/testfile", "rw")

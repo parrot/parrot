@@ -94,34 +94,6 @@ Initialize PMC internals.
         return NULL;
     }
 
-/*
-
-=item C<STRING *pack()>
-
-Serialize the segment.
-
-=cut
-
-*/
-    METHOD pack() {
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
-                                    "PackfileSegment.pack() not implemented yet.");
-    }
-
-
-/*
-
-=item C<void unpack(STRING *data)>
-
-Unpack a serialized segment string.
-
-=cut
-
-*/
-    METHOD unpack(STRING *data) {
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
-                                    "PackfileSegment.unpack() not implemented yet.");
-    }
 
 /*
 

@@ -1167,7 +1167,7 @@ int main(void)
     /* Compile pir */
     compiler = createstring(interp, "PIR");
     code = Parrot_compile_string(interp, compiler,
-".sub externcall\n"
+".sub externcall :main\n"
 "  .param pmc ec\n"
 "  ec()\n"
 "\n"
@@ -1215,7 +1215,7 @@ int main(void)
     /* Compile pir */
     compiler = createstring(interp, "PIR");
     code = Parrot_compile_string(interp, compiler,
-".sub externcall\n"
+".sub externcall :main\n"
 "  hello()\n"
 "\n"
 ".end\n"

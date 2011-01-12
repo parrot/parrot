@@ -18,6 +18,7 @@ Functions controlling Parrot's profiling runcore.
 */
 
 #include "parrot/runcore_api.h"
+#include "parrot/extend.h"
 #include "parrot/embed.h"
 #include "parrot/runcore_profiling.h"
 #include "parrot/oplib/core_ops.h"
@@ -252,7 +253,8 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
 {
     ASSERT_ARGS(init_profiling_core)
 
-    char *profile_filename_cstr, *output_cstr, *env_filename_cstr;
+    char *profile_filename_cstr;
+    STRING *output_str, *env_filename_str;
 
     /* initialize the runcore struct */
     runcore->runops  = (Parrot_runcore_runops_fn_t)  runops_profiling_core;
@@ -262,16 +264,16 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     runcore->profiling_flags = 0;
     runcore->runloop_count   = 0;
     runcore->time_size       = 32;
-    runcore->line_cache      = parrot_new_pointer_hash(interp);
+    runcore->line_cache      = Parrot_hash_new_pointer_hash(interp);
     runcore->time            = mem_gc_allocate_n_typed(interp, runcore->time_size,
                                                     UHUGEINTVAL);
 
     /* figure out what format the output should be in */
-    output_cstr = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_OUTPUT"));
+    output_str = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_OUTPUT"));
 
-    if (output_cstr) {
+    if (!STRING_IS_NULL(output_str)) {
 
-        STRING *profile_format_str = Parrot_str_new(interp, output_cstr, 0);
+        STRING *profile_format_str = output_str;
         if (STRING_equal(interp, profile_format_str, CONST_STRING(interp, "pprof"))) {
             runcore->output_fn = record_values_ascii_pprof;
         }
@@ -279,8 +281,8 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
             runcore->output_fn = record_values_none;
         }
         else {
-            fprintf(stderr, "'%s' is not a valid profiling output format.\n", output_cstr);
-            fprintf(stderr, "Valid values are pprof and none.  The default is pprof.\n");
+            Parrot_eprintf(interp, "'%Ss' is not a valid profiling output format.\n", output_str);
+            Parrot_eprintf(interp, "Valid values are pprof and none.  The default is pprof.\n");
             exit(1);
         }
     }
@@ -289,12 +291,12 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     }
 
     /* figure out where to write the output */
-    env_filename_cstr = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_FILENAME"));
+    env_filename_str = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_FILENAME"));
 
     if (runcore->output_fn != record_values_none) {
-        if (env_filename_cstr) {
+        if (!STRING_IS_NULL(env_filename_str)) {
             STRING  *lc_filename;
-            runcore->profile_filename = Parrot_str_new(interp, env_filename_cstr, 0);
+            runcore->profile_filename = env_filename_str;
             /* this is a little goofy, but it means that we unconditionally free
              * profile_filename later in this function */
             profile_filename_cstr     = Parrot_str_to_cstring(interp, runcore->profile_filename);
@@ -330,11 +332,11 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     }
 
     /* figure out if annotations are wanted */
-    if (Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_ANNOTATIONS"))) {
+    if (!STRING_IS_NULL(Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_ANNOTATIONS")))) {
         Profiling_report_annotations_SET(runcore);
     }
 
-    if (Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_CANONICAL_OUTPUT"))) {
+    if (!STRING_IS_NULL(Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_CANONICAL_OUTPUT")))) {
         Profiling_canonical_output_SET(runcore);
     }
 
@@ -524,15 +526,15 @@ ARGIN(PMC *ctx_pmc))
 
     Parrot_Context *ctx = PMC_data_typed(ctx_pmc, Parrot_Context *);
 
-    INTVAL line_num = hash_value_to_int(interp, runcore->line_cache,
-            parrot_hash_get(interp, runcore->line_cache, ctx->current_pc));
+    INTVAL line_num = Parrot_hash_value_to_int(interp, runcore->line_cache,
+            Parrot_hash_get(interp, runcore->line_cache, ctx->current_pc));
 
     /* Parrot_sub_get_line_from_pc eats up about 20-30% of execution time
      * *with* this cache in place. */
     if (line_num == 0) {
         line_num = Parrot_sub_get_line_from_pc(interp,
                 Parrot_pcc_get_sub(interp, ctx_pmc), ctx->current_pc);
-        parrot_hash_put(interp, runcore->line_cache, ctx->current_pc, (void *) line_num);
+        Parrot_hash_put(interp, runcore->line_cache, ctx->current_pc, (void *) line_num);
     }
     return line_num;
 }
@@ -918,7 +920,7 @@ destroy_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore)
         "output from this file.\n", filename_cstr);
 
     Parrot_str_free_cstring(filename_cstr);
-    parrot_hash_destroy(interp, runcore->line_cache);
+    Parrot_hash_destroy(interp, runcore->line_cache);
 
     if (runcore->output_fn != record_values_none)
         fclose(runcore->profile_fd);

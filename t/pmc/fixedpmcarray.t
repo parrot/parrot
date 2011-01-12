@@ -343,7 +343,7 @@ done:
 
 .sub test_splice_oob
     throws_substring(<<'CODE','FixedPMCArray: index out of bounds','splice oob, offset 0')
-    .sub main
+    .sub main :main
         .local pmc fpa
         fpa = new ['FixedPMCArray']
         fpa = 5
@@ -355,7 +355,7 @@ done:
     .end
 CODE
     throws_substring(<<'CODE','FixedPMCArray: index out of bounds','splice oob, big offset')
-    .sub main
+    .sub main :main
         .local pmc fpa
         fpa = new ['FixedPMCArray']
         fpa = 5
@@ -400,7 +400,7 @@ CODE
 
 .sub test_get_uninitialized
     throws_substring(<<'CODE','Null PMC access in name','get uninitialized')
-    .sub main
+    .sub main :main
         .local pmc arr1
         arr1 = new ['FixedPMCArray']
         arr1 = 2005
@@ -479,14 +479,14 @@ CODE
 
 .sub test_oob_elem
     throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','set out-of-bounds index')
-        .sub main
+        .sub main :main
             new $P0, ['FixedPMCArray']
             set $P0, 1
             set $P0[1], -7
         .end
 CODE
     throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','set out-of-bounds index')
-        .sub main
+        .sub main :main
             new $P0, ['FixedPMCArray']
             set $P0, 1
             set $I0, $P0[1]
@@ -497,14 +497,14 @@ CODE
 
 .sub test_negative_index
     throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','set negative index')
-.sub main
+.sub main :main
     new $P0, ['FixedPMCArray']
     set $P0, 1
     set $P0[-1], -7
 .end
 CODE
     throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','get negative index')
-.sub main
+.sub main :main
     new $P0, ['FixedPMCArray']
     set $P0, 1
     set $I0, $P0[-1]
@@ -557,7 +557,7 @@ CODE
 
 .sub test_tt991
     throws_substring(<<'CODE','FixedPMCArray: Cannot set array size to a negative number','cannot create a negative length array')
-        .sub main
+        .sub main :main
             new $P0, ['FixedPMCArray']
             set $P0, -1
         .end
@@ -608,7 +608,7 @@ CODE
 
 .sub test_resize_exception
     throws_substring(<<'CODE',"FixedPMCArray: Can't resize",'cannot resize FixedPMCArray')
-        .sub main
+        .sub main :main
             new $P0, ['FixedPMCArray']
             set $I0,$P0
             set $P0,1
@@ -617,14 +617,14 @@ CODE
 CODE
 
     throws_substring(<<'CODE',"set_number_native() not implemented in class 'FixedPMCArray'", 'cannot use float as length to FixedPMCArray')
-        .sub main
+        .sub main :main
             new $P0, ['FixedPMCArray']
             set $P0, 42.0
         .end
 CODE
 
     throws_substring(<<'CODE',"set_string_native() not implemented in class 'FixedPMCArray'", 'cannot use string as length to FixedPMCArray')
-        .sub main
+        .sub main :main
             new $P0, ['FixedPMCArray']
             set $P0,"GIGO"
         .end
@@ -633,7 +633,7 @@ CODE
 
 .sub test_assign_non_array
     throws_substring(<<'CODE', "Can't set self from this type",'assign from non-array')
-    .sub main
+    .sub main :main
         .local pmc arr, other
         .local int n
         arr = new ['FixedPMCArray']
@@ -693,13 +693,13 @@ CODE
 
 .sub test_invalid_init_tt1509
     throws_substring(<<'CODE', 'Cannot set array size to a negative number (-10)', 'New style init does not dump core for negative array lengths')
-    .sub main
+    .sub main :main
         $P0 = new ['FixedPMCArray'], -10
     .end
 CODE
 
     throws_substring(<<'CODE', 'Cannot set array size to a negative number (-10)', 'New style init (key constant) does not dump core for negative array lengths')
-    .sub main
+    .sub main :main
         $P0 = new 'FixedPMCArray', -10
     .end
 CODE

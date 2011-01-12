@@ -174,7 +174,7 @@ Parrot_hll_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 
     /* create HLL typemap hash */
     type_hash = Parrot_pmc_new_constant(interp, enum_class_Hash);
-    VTABLE_set_pointer(interp, type_hash, parrot_new_intval_hash(interp));
+    VTABLE_set_pointer(interp, type_hash, Parrot_hash_new_intval_hash(interp));
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_typemap, type_hash);
 
     return idx;

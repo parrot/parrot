@@ -92,11 +92,13 @@ include/pmc/pmc_orderedhashiterator.h            [devel]include
 include/pmc/pmc_packfile.h                       [devel]include
 include/pmc/pmc_packfileannotation.h             [devel]include
 include/pmc/pmc_packfileannotations.h            [devel]include
+include/pmc/pmc_packfilebytecodesegment.h        [devel]include
 include/pmc/pmc_packfileconstanttable.h          [devel]include
 include/pmc/pmc_packfiledebug.h                  [devel]include
 include/pmc/pmc_packfiledirectory.h              [devel]include
 include/pmc/pmc_packfilefixupentry.h             [devel]include
 include/pmc/pmc_packfilefixuptable.h             [devel]include
+include/pmc/pmc_packfileopmap.h                  [devel]include
 include/pmc/pmc_packfilerawsegment.h             [devel]include
 include/pmc/pmc_packfilesegment.h                [devel]include
 include/pmc/pmc_parrotinterpreter.h              [devel]include
@@ -390,11 +392,13 @@ src/pmc/orderedhashiterator.dump                 [devel]src
 src/pmc/packfile.dump                            [devel]src
 src/pmc/packfileannotation.dump                  [devel]src
 src/pmc/packfileannotations.dump                 [devel]src
+src/pmc/packfilebytecodesegment.dump             [devel]src
 src/pmc/packfileconstanttable.dump               [devel]src
 src/pmc/packfiledebug.dump                       [devel]src
 src/pmc/packfiledirectory.dump                   [devel]src
 src/pmc/packfilefixupentry.dump                  [devel]src
 src/pmc/packfilefixuptable.dump                  [devel]src
+src/pmc/packfileopmap.dump                       [devel]src
 src/pmc/packfilerawsegment.dump                  [devel]src
 src/pmc/packfilesegment.dump                     [devel]src
 src/pmc/parrotinterpreter.dump                   [devel]src

@@ -49,7 +49,8 @@ if (! -e 'Makefile') {
 }
 
 my @incfiles = [];
-find( \&wanted, qw/src compilers include frontend/);
+find( { wanted => \&wanted, no_chdir => 1 },
+      qw/src compilers include frontend/ );
 
 our %deps;
 
@@ -64,13 +65,16 @@ foreach my $file (sort grep /\.[hc]$/, @incfiles) {
     # Ignore anything inside a c-style comment.
     $guts =~ s{\Q/*\E.*?\Q*/}{}gm;
 
-    my @includes = $guts =~ m/#include "(.*)"/g;
+    my @includes = $guts =~ m/# *include "(.*)"/g;
 
     # Canonicalize each of these includes.
 
     $deps{$file} = [ ];
     foreach my $include (@includes) {
         my $found;
+
+        # These depend on the platform, skip for now (TT #1944)
+        next if $include =~ m'^parrot/thr_';
 
         my @include_dirs;
         push @include_dirs, (File::Spec->splitpath($file))[1];
@@ -80,8 +84,9 @@ foreach my $file (sort grep /\.[hc]$/, @incfiles) {
         for my $path (@include_dirs) {
             next if $found;
 
-            my $make_dep = collapse_path(File::Spec->catfile($path, $include));
+            my $make_dep = File::Spec->catfile($path, $include);
             if (defined($make_dep) && -f $make_dep) {
+                $make_dep = collapse_path($make_dep);
                 push @{$deps{$file}}, $make_dep;
                 $found = 1;
             }

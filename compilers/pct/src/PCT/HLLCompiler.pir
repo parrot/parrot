@@ -555,7 +555,7 @@ Transform PAST C<source> into POST.
 
     $P0 = compreg 'PIR'
     $P1 = $P0(source)
-    .return ($P1)
+    .return($P1)
 .end
 
 

@@ -391,13 +391,13 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub test_invalid_init_tt1509
     throws_substring(<<'CODE', 'FixedStringArray: Cannot set array size to a negative number (-10)', 'New style init does not dump core for negative array lengths')
-    .sub main
+    .sub main :main
         $P0 = new ['FixedStringArray'], -10
     .end
 CODE
 
     throws_substring(<<'CODE', 'FixedStringArray: Cannot set array size to a negative number (-10)', 'New style init (key constant) does not dump core for negative array lengths')
-    .sub main
+    .sub main :main
         $P0 = new 'FixedStringArray', -10
     .end
 CODE

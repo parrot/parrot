@@ -25,6 +25,7 @@ C<interpinfo> opcode.
 
 # we probably shouldn't just run a label, but this catches a potential seggie
 pasm_output_is( <<'CODE', <<'OUTPUT', "runinterp - new style" );
+.pcc_sub :main main:
     new P0, 'ParrotInterpreter'
     say 'calling'
     # set_addr/invoke ?
@@ -65,8 +66,8 @@ OUTPUT
 # Need to disable GC while trace is on, as there's a non-zero chance that a
 # GC sweep would occur, causing a bonus "GC mark" line in the output, which makes
 # the test fail.
-pasm_output_like(
-    <<'CODE', <<'OUTPUT', "restart trace" );
+pasm_output_like( <<'CODE', <<'OUTPUT', "restart trace" );
+.pcc_sub :main main:
     print "ok 1\n"
     sweepoff
     set I0, 1
@@ -84,6 +85,7 @@ ok\s2\n$/x
 OUTPUT
 
 pasm_output_is( <<'CODE', 'nada:', 'interp - warnings' );
+.pcc_sub :main main:
     new P0, 'Undef'
     set I0, P0
     print "nada:"
@@ -94,6 +96,7 @@ pasm_output_is( <<'CODE', 'nada:', 'interp - warnings' );
 CODE
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "getinterp" );
+.pcc_sub :main main:
     .include "interpinfo.pasm"
     getinterp P0
     print "ok 1\n"
@@ -110,6 +113,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "access argv" );
+.pcc_sub :main main:
     get_params "0", P5
     .include "iglobals.pasm"
     getinterp P1
@@ -133,6 +137,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "check_events" );
+.pcc_sub :main main:
     print "before\n"
     check_events
     print "after\n"

@@ -255,8 +255,8 @@ class, the PMC arguments are shifted down.
 
         GET_ATTR_fb_info(INTERP, SELF, fb_info);
 
-        func(INTERP, SELF, fb_info);
         cont = INTERP->current_cont;
+        func(INTERP, SELF, fb_info);
 
         /*
          * If the NCI function was tailcalled, the return result

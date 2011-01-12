@@ -18,7 +18,6 @@ Bare minimal functionality available, only for posix platforms
 
 #include "parrot/parrot.h"
 #include "../src/io/io_private.h"
-#include "../src/string/unicode.h"
 
 #define CAN_READ  1
 #define CAN_WRITE 2
@@ -41,8 +40,19 @@ PARROT_CANNOT_RETURN_NULL
 static STRING * build_string(PARROT_INTERP,
     ARGIN_NULLOK(const unsigned char *content),
     INTVAL size,
-    ARGIN_NULLOK(const STR_VTABLE *encoding))
-        __attribute__nonnull__(1);
+    ARGIN(const STR_VTABLE *encoding))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4);
+
+PARROT_CANNOT_RETURN_NULL
+static STRING * get_encoded_chars(PARROT_INTERP,
+    ARGIN(PMC *self),
+    INTVAL pos,
+    INTVAL length,
+    ARGIN(const STR_VTABLE *encoding))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(5);
 
 PARROT_CAN_RETURN_NULL
 static void * mapfromfilehandle(
@@ -66,7 +76,12 @@ static void unavailable(PARROT_INTERP, ARGIN(const char *msg))
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_build_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(encoding))
+#define ASSERT_ARGS_get_encoded_chars __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_mapfromfilehandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_mapfromfilename __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -368,8 +383,7 @@ Get a string from the buffer content with the specified encoding.
         STRING *result;
         unsigned char *buffer;
         INTVAL size;
-        const STR_VTABLE *encoding = Parrot_get_encoding(INTERP,
-            Parrot_encoding_number(INTERP, encodingname));
+        const STR_VTABLE *encoding = Parrot_find_encoding_by_string(INTERP, encodingname);
         GET_ATTR_buffer(INTERP, SELF, buffer);
         GET_ATTR_size(INTERP, SELF, size);
         if (pos < 0 || bytelength < 0 || size < 0 || pos + bytelength > size)
@@ -383,9 +397,29 @@ Get a string from the buffer content with the specified encoding.
 
 /*
 
+=item C<get_chars(INTVAL pos, INTVAL length)>
+
+Get a string from the buffer content with the specified encoding and
+length in codepoints.
+
+=cut
+
+*/
+
+    METHOD get_chars(INTVAL pos, INTVAL length, STRING *encodingname)
+    {
+        #ifdef ENABLED
+        STRING *result = get_encoded_chars(INTERP, SELF, pos, length,
+                    Parrot_find_encoding_by_string(INTERP, encodingname));
+        RETURN(STRING *result);
+        #endif
+    }
+
+/*
+
 =item C<get_utf8(INTVAL pos, INTVAL length)>
 
-Get a utf8 string from the buffer content with the specified lenght
+Get a utf8 string from the buffer content with the specified length
 in codepoints.
 
 =cut
@@ -395,24 +429,8 @@ in codepoints.
     METHOD get_utf8(INTVAL pos, INTVAL length)
     {
         #ifdef ENABLED
-        STRING *result;
-        unsigned char *buffer;
-        INTVAL size;
-        INTVAL curpos;
-        INTVAL charlen;
-        unsigned char c;
-        GET_ATTR_buffer(INTERP, SELF, buffer);
-        GET_ATTR_size(INTERP, SELF, size);
-        for (curpos = pos; length > 0; --length) {
-            if (curpos < 0 || curpos >= size)
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
-                        EXCEPTION_OUT_OF_BOUNDS,
-                        "get_utf8: index out of mapped");
-            c = buffer[curpos];
-            charlen = Parrot_utf8skip[c];
-            curpos += charlen;
-        }
-        result = build_string(INTERP, buffer + pos, curpos - pos, Parrot_utf8_encoding_ptr);
+        STRING *result = get_encoded_chars(INTERP, SELF, pos, length,
+                    Parrot_utf8_encoding_ptr);
         RETURN(STRING *result);
         #endif
     }
@@ -576,7 +594,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 build_string(PARROT_INTERP, ARGIN_NULLOK(const unsigned char *content),
         INTVAL size,
-        ARGIN_NULLOK(const STR_VTABLE *encoding))
+        ARGIN(const STR_VTABLE *encoding))
 {
     ASSERT_ARGS(build_string)
     if (encoding == NULL)
@@ -585,6 +603,39 @@ build_string(PARROT_INTERP, ARGIN_NULLOK(const unsigned char *content),
     else
         return Parrot_str_new_init(interp,
                 (const char *)content, size, encoding, 0);
+}
+
+/*
+
+=item C<static STRING * get_encoded_chars(PARROT_INTERP, PMC *self, INTVAL pos,
+INTVAL length, const STR_VTABLE *encoding)>
+
+Return the characters starting at pos in the specified encoding.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static STRING *
+get_encoded_chars(PARROT_INTERP, ARGIN(PMC *self), INTVAL pos, INTVAL length,
+        ARGIN(const STR_VTABLE *encoding))
+{
+    ASSERT_ARGS(get_encoded_chars)
+    STRING               *result;
+    unsigned char        *buffer;
+    INTVAL                size;
+
+    GETATTR_MappedByteArray_buffer(interp, self, buffer);
+    GETATTR_MappedByteArray_size(interp, self, size);
+
+    if (pos < 0 || pos > size)
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_OUT_OF_BOUNDS,
+                "get_chars: index out of bounds");
+
+    return Parrot_str_extract_chars(interp, (char *)buffer + pos, size - pos,
+                length, encoding);
 }
 
 /*

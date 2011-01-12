@@ -565,6 +565,7 @@ again:
     /* Set :main routine */
     if (!(pf->options & PFOPT_HEADERONLY))
         do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
+
     /* Prederefing the sub/the bytecode is done in switch_to_cs before
      * actual usage of the segment */
 

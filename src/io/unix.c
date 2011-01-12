@@ -45,9 +45,7 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 PARROT_CONST_FUNCTION
 static int convert_flags_to_unix(INTVAL flags);
 
-static INTVAL io_is_tty_unix(PIOHANDLE fd);
 #define ASSERT_ARGS_convert_flags_to_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_io_is_tty_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -57,8 +55,7 @@ static INTVAL io_is_tty_unix(PIOHANDLE fd);
 =item C<static int convert_flags_to_unix(INTVAL flags)>
 
 Returns a UNIX-specific interpretation of C<flags> suitable for passing
-to C<open()> and C<fopen()> in C<Parrot_io_open_unix()> and
-C<Parrot_io_fdopen_unix()> respectively.
+to C<open()> and C<fopen()> in C<Parrot_io_open_unix()>.
 
 =cut
 
@@ -105,35 +102,47 @@ INTVAL
 Parrot_io_init_unix(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_io_init_unix)
-    ParrotIOData * const d = interp->piodata;
-    if (d != NULL && d->table != NULL) {
-        PMC *filehandle;
 
-        filehandle = Parrot_io_fdopen_unix(interp, PMCNULL, STDIN_FILENO, PIO_F_READ);
-        if (PMC_IS_NULL(filehandle))
-            return -1;
-        _PIO_STDIN(interp) = filehandle;
-
-        filehandle = Parrot_io_fdopen_unix(interp, PMCNULL, STDOUT_FILENO, PIO_F_WRITE);
-        if (PMC_IS_NULL(filehandle))
-            return -1;
-        _PIO_STDOUT(interp) = filehandle;
-
-        filehandle = Parrot_io_fdopen_unix(interp, PMCNULL, STDERR_FILENO, PIO_F_WRITE);
-        if (PMC_IS_NULL(filehandle))
-            return -1;
-        _PIO_STDERR(interp) = filehandle;
-
-        return 0;
-    }
-    return -1;
+    return 0;
 }
 
 
 /*
 
-=item C<PMC * Parrot_io_open_unix(PARROT_INTERP, PMC *filehandle, STRING *path,
-INTVAL flags)>
+=item C<PIOHANDLE Parrot_io_stdhandle_unix(PARROT_INTERP, INTVAL fileno)>
+
+Returns a standard file handle.
+
+=cut
+
+*/
+
+PIOHANDLE
+Parrot_io_stdhandle_unix(PARROT_INTERP, INTVAL fileno)
+{
+    ASSERT_ARGS(Parrot_io_stdhandle_unix)
+    PIOHANDLE os_handle;
+
+    switch (fileno) {
+      case PIO_STDIN_FILENO:
+      default:
+        os_handle = STDIN_FILENO;
+        break;
+      case PIO_STDOUT_FILENO:
+        os_handle = STDOUT_FILENO;
+        break;
+      case PIO_STDERR_FILENO:
+        os_handle = STDERR_FILENO;
+        break;
+    }
+
+    return os_handle;
+}
+
+/*
+
+=item C<PIOHANDLE Parrot_io_open_unix(PARROT_INTERP, STRING *path, INTVAL
+flags)>
 
 Opens a string C<path>. C<flags> is a bitwise C<or> combination of C<PIO_F_*>
 flag values.
@@ -143,109 +152,39 @@ flag values.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_io_open_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
-              ARGIN(STRING *path), INTVAL flags)
+PIOHANDLE
+Parrot_io_open_unix(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_open_unix)
-    int oflags;
-    PIOHANDLE fd;
-    char *spath;
+    struct stat  buf;
+    int          oflags;
+    PIOHANDLE    fd;
+    char        *spath;
 
-    if (flags & PIO_F_PIPE)
-        return Parrot_io_open_pipe_unix(interp, filehandle, path, flags);
-
-    if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                                "Invalid mode for file open");
+    if (path->encoding != Parrot_ascii_encoding_ptr
+    &&  path->encoding != Parrot_utf8_encoding_ptr)
+        path = Parrot_utf8_encoding_ptr->to_encoding(interp, path);
 
     oflags = convert_flags_to_unix(flags);
-    spath = Parrot_str_to_cstring(interp, path);
+    spath  = Parrot_str_to_cstring(interp, path);
 
-    /* Only files for now */
-    flags |= PIO_F_FILE;
-
-    /* Try open with no create first */
-    while ((fd = open(spath, oflags & (O_WRONLY | O_RDWR | O_APPEND), DEFAULT_OPEN_MODE))
-           < 0 && errno == EINTR)
+    while ((fd = open(spath, oflags, DEFAULT_OPEN_MODE)) < 0
+    &&      errno == EINTR)
         errno = 0;
 
-    /* File open */
-    if (fd >= 0) {
-        /*
-         * Now check if we specified O_CREAT|O_EXCL or not.
-         * If so, we must return NULL, else either use the
-         * descriptor or create the file.
-         */
-        if ((oflags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL)) {
-            close(fd);
+    Parrot_str_free_cstring(spath);
 
-            /* returning before C string freed */
-            Parrot_str_free_cstring(spath);
-            return PMCNULL;
-        }
+    if (fd < 0)
+        return PIO_INVALID_HANDLE;
 
-        /* Check for truncate?  */
-        if (oflags & O_TRUNC) {
-            int tfd;
-            while ((tfd = creat(spath, PIO_DEFAULTMODE)) < 0 && errno == EINTR)
-                errno = 0;
-            if (tfd > 0)
-                close(tfd);
-        }
-    }
-    else if (oflags & O_CREAT) {
-        /* O_CREAT and file doesn't exist. */
-        while ((fd = creat(spath, PIO_DEFAULTMODE)) < 0 && errno == EINTR)
-            errno = 0;
-        if (!(oflags & O_WRONLY)) {
-            if (fd > 0)
-                close(fd);
-
-            /* File created, reopen with read+write */
-            while ((fd = open(spath, oflags & (O_WRONLY | O_RDWR),
-                              DEFAULT_OPEN_MODE)) < 0 && errno == EINTR)
-                errno = 0;
-        }
-    }
-    else {
-        /* File doesn't exist and O_CREAT not specified */
+    /* Don't open directories */
+    if (fstat(fd, &buf) == -1
+    || (buf.st_mode & S_IFMT) == S_IFDIR) {
+        close(fd);
+        return PIO_INVALID_HANDLE;
     }
 
-    Parrot_str_free_cstring(spath); /* done with C string */
-
-    if (fd >= 0) {
-        struct stat buf;
-        if (fstat(fd, &buf) == -1) {
-            close(fd);
-            return PMCNULL;
-        }
-        if ((buf.st_mode & S_IFMT) == S_IFDIR) {
-            close(fd);
-            errno = EISDIR;
-            return PMCNULL;
-        }
-        /* Set generic flag here if is a terminal then
-         * FileHandle can know how to setup buffering.
-         * STDIN, STDOUT, STDERR would be in this case
-         * so we would setup linebuffering.
-         */
-        if (io_is_tty_unix(fd))
-            flags |= PIO_F_CONSOLE;
-
-        if (PMC_IS_NULL(filehandle)) {
-            PMC * const io = Parrot_io_new_pmc(interp, flags);
-            Parrot_io_set_os_handle(interp, io, fd);
-            return io;
-        }
-        else {
-            Parrot_io_set_flags(interp, filehandle, flags);
-            Parrot_io_set_os_handle(interp, filehandle, fd);
-            return filehandle;
-        }
-    }
-    return PMCNULL;
+    return fd;
 }
 
 #  if PARROT_ASYNC_DEVEL
@@ -292,42 +231,7 @@ Parrot_io_async_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), INTVAL b)
 
 /*
 
-=item C<PMC * Parrot_io_fdopen_unix(PARROT_INTERP, PMC *filehandle, PIOHANDLE
-fd, INTVAL flags)>
-
-Returns a new C<FileHandle> PMC with the file descriptor passed in.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-Parrot_io_fdopen_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle), PIOHANDLE fd, INTVAL flags)
-{
-    ASSERT_ARGS(Parrot_io_fdopen_unix)
-    if (io_is_tty_unix(fd))
-        flags |= PIO_F_CONSOLE;
-
-    /* fdopened files are always shared */
-    flags |= PIO_F_SHARED;
-
-    if (PMC_IS_NULL(filehandle)) {
-        PMC * const io = Parrot_io_new_pmc(interp, flags);
-        Parrot_io_set_os_handle(interp, io, fd);
-        return io;
-    }
-    else {
-        Parrot_io_set_flags(interp, filehandle, flags);
-        Parrot_io_set_os_handle(interp, filehandle, fd);
-        return filehandle;
-    }
-}
-
-/*
-
-=item C<INTVAL Parrot_io_close_unix(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_close_unix(PARROT_INTERP, PIOHANDLE file_descriptor)>
 
 Closes C<*io>'s file descriptor.
 
@@ -336,34 +240,19 @@ Closes C<*io>'s file descriptor.
 */
 
 INTVAL
-Parrot_io_close_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
+Parrot_io_close_unix(PARROT_INTERP, PIOHANDLE file_descriptor)
 {
     ASSERT_ARGS(Parrot_io_close_unix)
     INTVAL result = 0;
-    const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
-    const int flags = Parrot_io_get_flags(interp, filehandle);
 
     /* BSD and Solaris need explicit fsync() */
     if (file_descriptor >= 0) {
         fsync(file_descriptor);
+
         if (close(file_descriptor) != 0)
             result = errno;
-
-        /* Wait for the child after closing the
-         * handle, to let it notice the closing and finish */
-        if (flags & PIO_F_PIPE) {
-            int status;
-            waitpid(VTABLE_get_integer_keyed_int(interp, filehandle, 0), &status, 0);
-            if (WIFEXITED(status)) {
-                SETATTR_FileHandle_exit_status(interp, filehandle, WEXITSTATUS(status));
-            }
-            else {
-                /* abnormal termination means non-zero exit status */
-                SETATTR_FileHandle_exit_status(interp, filehandle, 1);
-            }
-        }
     }
-    Parrot_io_set_os_handle(interp, filehandle, -1);
+
     return result;
 }
 
@@ -385,29 +274,40 @@ Parrot_io_close_piohandle_unix(SHIM_INTERP, PIOHANDLE handle)
     return close(handle);
 }
 
+
 /*
 
-=item C<INTVAL Parrot_io_is_closed_unix(PARROT_INTERP, const PMC *filehandle)>
+=item C<INTVAL Parrot_io_pipe_wait_unix(PARROT_INTERP, INTVAL pid)>
 
-Test whether the filehandle has been closed.
+Closes C<*io>'s file descriptor.
 
 =cut
 
 */
 
 INTVAL
-Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(const PMC *filehandle))
+Parrot_io_pipe_wait_unix(PARROT_INTERP, INTVAL pid)
 {
-    ASSERT_ARGS(Parrot_io_is_closed_unix)
-    if (Parrot_io_get_os_handle(interp, filehandle) == -1)
-        return 1;
+    ASSERT_ARGS(Parrot_io_pipe_wait_unix)
+    int status;
 
-    return 0;
+    waitpid(pid, &status, 0);
+
+    if (WIFEXITED(status)) {
+        status = WEXITSTATUS(status);
+    }
+    else {
+        /* abnormal termination means non-zero exit status */
+        status = 1;
+    }
+
+    return status;
 }
+
 
 /*
 
-=item C<static INTVAL io_is_tty_unix(PIOHANDLE fd)>
+=item C<INTVAL Parrot_io_is_tty_unix(PARROT_INTERP, PIOHANDLE fd)>
 
 Returns a boolean value indicating whether C<fd> is a console/tty.
 
@@ -415,10 +315,11 @@ Returns a boolean value indicating whether C<fd> is a console/tty.
 
 */
 
-static INTVAL
-io_is_tty_unix(PIOHANDLE fd)
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_io_is_tty_unix(SHIM_INTERP, PIOHANDLE fd)
 {
-    ASSERT_ARGS(io_is_tty_unix)
+    ASSERT_ARGS(Parrot_io_is_tty_unix)
     return isatty(fd);
 }
 
@@ -470,7 +371,7 @@ Parrot_io_getblksize_unix(PIOHANDLE fd)
 
 /*
 
-=item C<INTVAL Parrot_io_flush_unix(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_flush_unix(PARROT_INTERP, PIOHANDLE os_handle)>
 
 At lowest layer all we can do for C<flush> is to ask the kernel to
 C<sync()>.
@@ -482,17 +383,16 @@ XXX: Is it necessary to C<sync()> here?
 */
 
 INTVAL
-Parrot_io_flush_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
+Parrot_io_flush_unix(PARROT_INTERP, PIOHANDLE os_handle)
 {
     ASSERT_ARGS(Parrot_io_flush_unix)
-    const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
-    return fsync(file_descriptor);
+    return fsync(os_handle);
 }
 
 /*
 
-=item C<size_t Parrot_io_read_unix(PARROT_INTERP, PMC *filehandle, STRING
-**buf)>
+=item C<size_t Parrot_io_read_unix(PARROT_INTERP, PIOHANDLE os_handle, char
+*buf, size_t len)>
 
 Calls C<read()> to return up to C<len> bytes in the memory starting at
 C<buffer>.
@@ -502,46 +402,27 @@ C<buffer>.
 */
 
 size_t
-Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
-              ARGIN(STRING **buf))
+Parrot_io_read_unix(PARROT_INTERP, PIOHANDLE os_handle,
+        ARGMOD(char *buf), size_t len)
 {
     ASSERT_ARGS(Parrot_io_read_unix)
-    const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
-    const INTVAL file_flags = Parrot_io_get_flags(interp, filehandle);
-    STRING * const s = Parrot_io_make_string(interp, buf, 2048);
-
-    const size_t len = s->bufused;
-    void * const buffer = Buffer_bufstart(s);
 
     for (;;) {
-        const int bytes = read(file_descriptor, buffer, len);
-        if (bytes > 0) {
-            s->bufused = s->strlen = bytes;
+        const int bytes = read(os_handle, buf, len);
+
+        if (bytes >= 0)
             return bytes;
-        }
-        else if (bytes < 0) {
-            switch (errno) {
-              case EINTR:
-                continue;
-              default:
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                        "Read error: %s", strerror(errno));
-            }
-        }
-        else {
-            /* Read returned 0, EOF if len requested > 0 */
-            if (len > 0 || (file_flags & PIO_F_LINEBUF))
-                Parrot_io_set_flags(interp, filehandle, (file_flags | PIO_F_EOF));
-            s->bufused = s->strlen = 0;
-            return bytes;
-        }
+
+        if (errno != EINTR)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                    "Read error: %s", strerror(errno));
     }
 }
 
 /*
 
-=item C<size_t Parrot_io_write_unix(PARROT_INTERP, PMC *filehandle, const STRING
-*s)>
+=item C<size_t Parrot_io_write_unix(PARROT_INTERP, PIOHANDLE os_handle, const
+char *buf, size_t len)>
 
 Calls C<write()> to write C<len> bytes from the memory starting at
 C<buffer> to the file descriptor in C<*io>.
@@ -551,44 +432,44 @@ C<buffer> to the file descriptor in C<*io>.
 */
 
 size_t
-Parrot_io_write_unix(PARROT_INTERP, ARGIN(PMC *filehandle), ARGIN(const STRING *s))
+Parrot_io_write_unix(PARROT_INTERP, PIOHANDLE os_handle,
+        ARGIN(const char *buf), size_t len)
 {
     ASSERT_ARGS(Parrot_io_write_unix)
-    const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
-    const char * const buffer = s->strstart;
-    const char * ptr          = buffer;
+    const char *ptr      = buf;
+    size_t      to_write = len;
+    size_t      written  = 0;
 
-    size_t to_write = s->bufused;
-    size_t written  = 0;
-
-  write_through:
     while (to_write > 0) {
-        const int err = write(file_descriptor, ptr, to_write);
-        if (err >= 0) {
-            ptr += err;
-            to_write -= err;
-            written += err;
+        const int count = write(os_handle, ptr, to_write);
+
+        if (count >= 0) {
+            ptr      += count;
+            to_write -= count;
+            written  += count;
         }
         else {
             switch (errno) {
             case EINTR:
-                goto write_through;
+                continue;
 #  ifdef EAGAIN
             case EAGAIN:
-                return written;
+                break;
 #  endif
             default:
-                return (size_t)-1;
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                        "Write error: %s", strerror(errno));
             }
         }
     }
+
     return written;
 }
 
 /*
 
-=item C<PIOOFF_T Parrot_io_seek_unix(PARROT_INTERP, PMC *filehandle, PIOOFF_T
-offset, INTVAL whence)>
+=item C<PIOOFF_T Parrot_io_seek_unix(PARROT_INTERP, PIOHANDLE os_handle,
+PIOOFF_T offset, INTVAL whence)>
 
 Hard seek.
 
@@ -600,46 +481,18 @@ descriptor to C<offset> bytes from the location indicated by C<whence>.
 */
 
 PIOOFF_T
-Parrot_io_seek_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
-              PIOOFF_T offset, INTVAL whence)
+Parrot_io_seek_unix(PARROT_INTERP, PIOHANDLE os_handle,
+        PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(Parrot_io_seek_unix)
-    PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
-    const PIOOFF_T pos        = lseek(file_descriptor, offset, whence);
+    const PIOOFF_T pos = lseek(os_handle, offset, whence);
 
-    if (pos >= 0) {
-        switch (whence) {
-          case SEEK_SET:
-            if (offset > Parrot_io_get_file_size(interp, filehandle)) {
-                Parrot_io_set_file_size(interp, filehandle, offset);
-            }
-            break;
-          case SEEK_CUR:
-            {
-                const PIOOFF_T avail = offset
-                        + Parrot_io_get_buffer_next(interp, filehandle)
-                        - Parrot_io_get_buffer_start(interp, filehandle);
-                if (avail > Parrot_io_get_file_size(interp, filehandle)) {
-                    Parrot_io_set_file_size(interp, filehandle, avail);
-                }
-             }
-            break;
-          case SEEK_END:
-          default:
-            break;
-        }
-
-        Parrot_io_set_file_position(interp, filehandle, pos);
-    }
-    /* Seek clears EOF */
-    Parrot_io_set_flags(interp, filehandle,
-            (Parrot_io_get_flags(interp, filehandle) & ~PIO_F_EOF));
     return pos;
 }
 
 /*
 
-=item C<PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, PMC *filehandle)>
+=item C<PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, PIOHANDLE os_handle)>
 
 Returns the current read/write position on C<*io>'s file descriptor.
 
@@ -648,19 +501,18 @@ Returns the current read/write position on C<*io>'s file descriptor.
 */
 
 PIOOFF_T
-Parrot_io_tell_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
+Parrot_io_tell_unix(PARROT_INTERP, PIOHANDLE os_handle)
 {
     ASSERT_ARGS(Parrot_io_tell_unix)
-    PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
-    const PIOOFF_T pos = lseek(file_descriptor, (PIOOFF_T)0, SEEK_CUR);
+    const PIOOFF_T pos = lseek(os_handle, (PIOOFF_T)0, SEEK_CUR);
 
     return pos;
 }
 
 /*
 
-=item C<PMC * Parrot_io_open_pipe_unix(PARROT_INTERP, PMC *filehandle, STRING
-*command, int flags)>
+=item C<PIOHANDLE Parrot_io_open_pipe_unix(PARROT_INTERP, STRING *command,
+INTVAL flags, INTVAL *pid_out)>
 
 Very limited C<exec> for now.
 
@@ -669,10 +521,9 @@ Very limited C<exec> for now.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
-        ARGIN(STRING *command), int flags)
+PIOHANDLE
+Parrot_io_open_pipe_unix(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
+        ARGOUT(INTVAL *pid_out))
 {
     ASSERT_ARGS(Parrot_io_open_pipe_unix)
     /*
@@ -682,11 +533,6 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 #  ifdef PARROT_HAS_HEADER_UNISTD
     int pid;
     int fds[2];
-    const int f_read  = (flags & PIO_F_READ) != 0;
-    const int f_write = (flags & PIO_F_WRITE) != 0;
-    if (f_read == f_write)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Invalid pipe mode: %X", flags);
 
     if (pipe(fds) < 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
@@ -701,27 +547,18 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
             "fork failed: %s", strerror(errno));
     }
     else if (pid > 0) {
-        /* Parent - return IO stream */
-        PMC *io;
-        if (PMC_IS_NULL(filehandle))
-            io = Parrot_io_new_pmc(interp, flags & (PIO_F_READ|PIO_F_WRITE));
-        else
-            io = filehandle;
+        *pid_out = pid;
 
-        /* Save the pid of the child, we'll wait for it when closing */
-        VTABLE_set_integer_keyed_int(interp, io, 0, pid);
-
-        if (f_read) {
+        if (flags & PIO_F_READ) {
             /* close this writer's end of pipe */
             close(fds[1]);
-            Parrot_io_set_os_handle(interp, io, fds[0]);
+            return fds[0];
         }
         else {  /* assume write only for now */
             /* close this reader's end */
             close(fds[0]);
-            Parrot_io_set_os_handle(interp, io, fds[1]);
+            return fds[1];
         }
-        return io;
     }
     else /* (pid == 0) */ {
         /* Child - exec process */
@@ -733,23 +570,23 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
         static char auxarg0[] = "/bin/sh";
         static char auxarg1[] = "-c";
 
-        if (f_write) {
-            /* the other end is writing - we read from the pipe */
-            close(STDIN_FILENO);
-            close(fds[1]);
-
-            if (Parrot_dup(fds[0]) != STDIN_FILENO)
-                exit(EXIT_FAILURE);
-        }
-        else {
+        if (flags & PIO_F_READ) {
             /* XXX redirect stdout, stderr to pipe */
             close(STDOUT_FILENO);
             close(STDERR_FILENO);
             close(fds[0]);
 
-            if (Parrot_dup(fds[1]) != STDOUT_FILENO)
+            if (dup(fds[1]) != STDOUT_FILENO)
                 exit(EXIT_FAILURE);
-            if (Parrot_dup(fds[1]) != STDERR_FILENO)
+            if (dup(fds[1]) != STDERR_FILENO)
+                exit(EXIT_FAILURE);
+        }
+        else {
+            /* the other end is writing - we read from the pipe */
+            close(STDIN_FILENO);
+            close(fds[1]);
+
+            if (dup(fds[0]) != STDIN_FILENO)
                 exit(EXIT_FAILURE);
         }
 
@@ -773,29 +610,6 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
         "pipe() unimplemented");
 #  endif
 }
-
-/*
-
-=item C<size_t Parrot_io_peek_unix(PARROT_INTERP, PMC *filehandle, STRING
-**buf)>
-
-Retrieve the next character in the stream without modifying the stream. Not
-implemented on this platform.
-
-=cut
-
-*/
-
-size_t
-Parrot_io_peek_unix(PARROT_INTERP,
-        SHIM(PMC *filehandle),
-        SHIM(STRING **buf))
-{
-    ASSERT_ARGS(Parrot_io_peek_unix)
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-        "peek() not implemented");
-}
-
 
 /*
 

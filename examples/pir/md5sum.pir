@@ -1,6 +1,6 @@
 # Copyright (C) 2010, Parrot Foundation.
 
-.sub main
+.sub main :main
       .param pmc argv
       load_bytecode "Digest/MD5.pbc"
       .local pmc mba
