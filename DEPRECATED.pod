@@ -374,6 +374,15 @@ The old string_* functions will be removed.
 
 L<http://trac.parrot.org/parrot/ticket/1809>
 
+=item Old embedding API in src/embed.c
+
+Functions in src/embed.c are deprecated. Functions in that file will
+either be deleted outright if they are superfluous, or will be moved and
+renamed in a way that is more appropriate. The file src/embed.c and
+include/parrot/embed.h will both be deleted eventually.
+
+L<http://trac.parrot.org/parrot/ticket/1910>
+
 =back
 
 =head1 Compiler tools

@@ -229,6 +229,61 @@ information.
 
 /*
 
+=item C<void visit(PMC *visit)>
+
+=item C<void freeze(PMC *visit)>
+
+=item C<void thaw(PMC *visit)>
+
+Implement interfaces required for storage in PBC.
+
+Store only user-supplied, persistable values; not ephemeral data such as
+throwing and handling information.
+
+=cut
+
+*/
+
+    VTABLE void visit(PMC *visit) {
+        VISIT_PMC_ATTR(INTERP, visit, SELF, Exception, payload);
+    }
+
+    VTABLE void freeze(PMC *visit) {
+        INTVAL type, severity, exit_code;
+        STRING *message;
+
+        GET_ATTR_type(INTERP, SELF, type);
+        VTABLE_push_integer(INTERP, visit, type);
+
+        GET_ATTR_severity(INTERP, SELF, severity);
+        VTABLE_push_integer(INTERP, visit, severity);
+
+        GET_ATTR_exit_code(INTERP, SELF, exit_code);
+        VTABLE_push_integer(INTERP, visit, exit_code);
+
+        GET_ATTR_message(INTERP, SELF, message);
+        VTABLE_push_string(INTERP, visit, message);
+    }
+
+    VTABLE void thaw(PMC *visit) {
+        INTVAL type, severity, exit_code;
+        STRING *message;
+
+        type = VTABLE_shift_integer(INTERP, visit);
+        SET_ATTR_type(INTERP, SELF, type);
+
+        severity = VTABLE_shift_integer(INTERP, visit);
+        SET_ATTR_severity(INTERP, SELF, severity);
+
+        exit_code = VTABLE_shift_integer(INTERP, visit);
+        SET_ATTR_exit_code(INTERP, SELF, exit_code);
+
+        message = VTABLE_shift_string(INTERP, visit);
+        SET_ATTR_message(INTERP, SELF, message);
+    }
+
+/*
+
 =item C<void mark()>
 
 Mark any active exception data as live.

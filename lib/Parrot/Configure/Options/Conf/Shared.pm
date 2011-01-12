@@ -26,7 +26,6 @@ our @shared_valid_options = qw{
     define
     disable-rpath
     exec-prefix
-    execcapable
     fatal
     fatal-step
     floatval
@@ -39,7 +38,6 @@ our @shared_valid_options = qw{
     infodir
     inline
     intval
-    jitcapable
     buildframes
     ld
     ldflags

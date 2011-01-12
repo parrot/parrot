@@ -358,17 +358,9 @@ Use the given type for opcodes.
 
 Use the given ops files.
 
-=item C<--jitcapable>
-
-Use JIT system.
-
 =item C<--buildframes>
 
 Dynamically build NCI call frames.
-
-=item C<--execcapable>
-
-Use JIT to emit a native executable.
 
 =back
 
