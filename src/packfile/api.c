@@ -1773,18 +1773,27 @@ PackFile_ByteCode *
 PF_create_default_segs(PARROT_INTERP, ARGIN(STRING *file_name), int add)
 {
     ASSERT_ARGS(PF_create_default_segs)
-    PackFile          * const pf     = interp->initial_pf;
-    PackFile_ByteCode * const cur_cs =
-        (PackFile_ByteCode *)create_seg(interp, &pf->directory,
-            PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME, file_name, add);
 
-    cur_cs->const_table  =
-        (PackFile_ConstTable *)create_seg(interp, &pf->directory,
-            PF_CONST_SEG, CONSTANT_SEGMENT_NAME, file_name, add);
+    /* create an initial_pf if we don't already have one */
+    if (!interp->initial_pf) {
+        PackFile * const pf = PackFile_new(interp, 0);
+        interp->initial_pf  = pf;
+    }
 
-    cur_cs->const_table->code = cur_cs;
+    {
+        PackFile          * const pf     = interp->initial_pf;
+        PackFile_ByteCode * const cur_cs =
+            (PackFile_ByteCode *)create_seg(interp, &pf->directory,
+                PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME, file_name, add);
 
-    return cur_cs;
+        cur_cs->const_table  =
+            (PackFile_ConstTable *)create_seg(interp, &pf->directory,
+                PF_CONST_SEG, CONSTANT_SEGMENT_NAME, file_name, add);
+
+        cur_cs->const_table->code = cur_cs;
+
+        return cur_cs;
+    }
 }
 
 
@@ -4334,13 +4343,9 @@ PackFile_append(PARROT_INTERP, ARGIN_NULLOK(PackFile * const pf))
     ASSERT_ARGS(PackFile_append)
 
     if (pf) {
-        /* An embedder can try to load_bytecode without having an initial_pf */
         if (!interp->initial_pf) {
-            PackFile * const pf = PackFile_new(interp, 0);
             STRING * const name = CONST_STRING(interp, "dummy");
-            interp->initial_pf  = pf;
-            interp->code        = pf->cur_cs
-                                = PF_create_default_segs(interp, name, 1);
+            interp->code = PF_create_default_segs(interp, name, 1);
             PARROT_ASSERT(interp->initial_pf);
         }
         PackFile_add_segment(interp, &interp->initial_pf->directory,
