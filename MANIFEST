@@ -8,6 +8,7 @@
 # See docs/submissions.pod and the documentation in
 # tools/dev/mk_manifest_and_skip.pl on how to recreate this file after SVN
 # has been told about new or deleted files.
+"docs/translations/README.\320\261\321\212\320\273\320\263\320\260\321\200\321\201\320\272\320\270" []doc
 .gitignore                                                  []
 CREDITS                                                     [main]doc
 ChangeLog                                                   []
@@ -23,9 +24,6 @@ NEWS                                                        [main]doc
 PBC_COMPAT                                                  [main]doc
 PLATFORMS                                                   [devel]doc
 README                                                      [devel]doc
-README.deutsch                                              []
-README.espanol                                              []
-README.polski                                               []
 README_cygwin.pod                                           [devel]doc
 README_win32.pod                                            [devel]doc
 RESPONSIBLE_PARTIES                                         [main]doc
@@ -459,6 +457,11 @@ docs/running.pod                                            [doc]
 docs/stability.pod                                          [doc]
 docs/submissions.pod                                        [doc]
 docs/tests.pod                                              [doc]
+docs/translations/README.deutsch                            [doc]
+docs/translations/README.espanol                            [doc]
+docs/translations/README.francais                           [doc]
+docs/translations/README.polski                             [doc]
+docs/translations/README.pt-BR                              [doc]
 docs/user/pir/exceptions.pod                                [doc]
 docs/user/pir/intro.pod                                     [doc]
 docs/user/pir/objects.pod                                   [doc]
@@ -1949,7 +1952,7 @@ t/pmc/testfile                                              [test]
 t/pmc/testlib/annotations.pir                               [test]
 t/pmc/testlib/number.pasm                                   [test]
 t/pmc/testlib/packfile_common.pir                           [test]
-t/pmc/testlib/test_server.pir                              [test]
+t/pmc/testlib/test_server.pir                               [test]
 t/pmc/threads.t                                             [test]
 t/pmc/timer.t                                               [test]
 t/pmc/undef.t                                               [test]
