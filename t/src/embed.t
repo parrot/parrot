@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 59;
+plan tests => 60;
 
 =head1 NAME
 
@@ -578,10 +578,6 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_divide" );
     Parrot_PMC_set_integer_native(interp, pmc2, 21);
     Parrot_PMC_set_integer_native(interp, pmc3, 0);
 
-    /*
-       We must pass in the destination, but the return
-       value of the function must be used. This is broken.
-    */
     pmc3 = Parrot_PMC_divide(interp, pmc, pmc2, pmc3);
     value = Parrot_PMC_get_integer(interp, pmc);
     printf("%d\n", (int) value);
@@ -592,6 +588,19 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_divide" );
 CODE
 42
 21
+2
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_divide" );
+    Parrot_PMC_set_integer_native(interp, pmc,  42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 21);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+
+    Parrot_PMC_i_divide(interp, pmc, pmc2);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+CODE
 2
 Done!
 OUTPUT
