@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2010, Parrot Foundation.
-# 062-sha1_to_cache.t
+# 063-git_describe_to_cache.t
 
 use strict;
 use warnings;
