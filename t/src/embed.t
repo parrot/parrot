@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 60;
+plan tests => 61;
 
 =head1 NAME
 
@@ -589,6 +589,15 @@ CODE
 42
 21
 2
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_visit" );
+    /* TODO: Test this properly */
+    Parrot_PMC_visit(interp, pmc, pmc2);
+    printf("42\n", (int) value);
+CODE
+42
 Done!
 OUTPUT
 
