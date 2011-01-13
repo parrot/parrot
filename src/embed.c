@@ -597,13 +597,7 @@ void
 Parrot_pbc_load(PARROT_INTERP, ARGIN(Parrot_PackFile pf))
 {
     ASSERT_ARGS(Parrot_pbc_load)
-    if (!pf) {
-        Parrot_io_eprintf(interp, "Invalid packfile\n");
-        return;
-    }
-
-    interp->initial_pf = pf;
-    interp->code       = pf->cur_cs;
+    Parrot_pf_set_current_packfile(interp, pf);
 }
 
 /*
@@ -628,7 +622,7 @@ Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
     Parrot_warn_experimental(interp, "Parrot_load_bytecode_file is experimental");
     if (!pf)
         return 0;
-    Parrot_pbc_load(interp, pf);
+    Parrot_pf_set_current_packfile(interp, pf);
     return 1;
 }
 
@@ -1100,7 +1094,7 @@ Parrot_run_native(PARROT_INTERP, native_func_t func)
     pf->cur_cs->op_func_table = op_func_table;
     /* TODO fill out cur_cs with op_mapping */
 
-    Parrot_pbc_load(interp, pf);
+    Parrot_pf_set_current_packfile(interp, pf);
 
     run_native = func;
 

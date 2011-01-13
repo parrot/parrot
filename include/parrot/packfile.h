@@ -878,6 +878,12 @@ PackFile_Debug * Parrot_new_debug_seg(PARROT_INTERP,
         FUNC_MODIFIES(*cs);
 
 PARROT_EXPORT
+void Parrot_pf_set_current_packfile(PARROT_INTERP,
+    ARGIN(PackFile * const pf))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * Parrot_switch_to_cs(PARROT_INTERP,
@@ -944,6 +950,12 @@ const opcode_t * PackFile_Annotations_unpack(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*seg);
+
+PackFile_ByteCode * Parrot_pf_get_current_code_segment(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PackFile * Parrot_pf_get_current_packfile(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 void Parrot_trace_eprintf(ARGIN(const char *s), ...)
         __attribute__nonnull__(1);
@@ -1041,6 +1053,10 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
 #define ASSERT_ARGS_Parrot_new_debug_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cs))
+#define ASSERT_ARGS_Parrot_pf_set_current_packfile \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_Parrot_switch_to_cs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(new_cs))
@@ -1071,6 +1087,12 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(seg) \
     , PARROT_ASSERT_ARG(cursor))
+#define ASSERT_ARGS_Parrot_pf_get_current_code_segment \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pf_get_current_packfile \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_trace_eprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

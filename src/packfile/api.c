@@ -1752,6 +1752,62 @@ create_seg(PARROT_INTERP, ARGMOD(PackFile_Directory *dir), pack_file_types t,
     return seg;
 }
 
+/*
+
+=item C<PackFile * Parrot_pf_get_current_packfile(PARROT_INTERP)>
+
+Get the interpreter's currently active PackFile
+
+=cut
+
+*/
+
+PackFile *
+Parrot_pf_get_current_packfile(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_pf_get_current_packfile)
+    return interp->initial_pf;
+}
+
+/*
+
+=item C<PackFile_ByteCode * Parrot_pf_get_current_code_segment(PARROT_INTERP)>
+
+Get's the interpreter's currently active bytecode segment
+
+=cut
+
+*/
+
+PackFile_ByteCode *
+Parrot_pf_get_current_code_segment(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_pf_get_current_code_segment)
+    return interp->code;
+}
+
+/*
+
+=item C<void Parrot_pf_set_current_packfile(PARROT_INTERP, PackFile * const pf)>
+
+Set's the current packfile for the interpreter.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PackFile * const pf))
+{
+    ASSERT_ARGS(Parrot_pf_set_current_packfile)
+    if (!pf)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Cannot set null packfile");
+
+    interp->initial_pf = pf;
+    interp->code       = pf->cur_cs;
+}
 
 /*
 
@@ -4316,8 +4372,7 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 
 /*
 
-=item C<static PackFile * PackFile_append(PARROT_INTERP, PackFile * const
-pf)>
+=item C<static PackFile * PackFile_append(PARROT_INTERP, PackFile * const pf)>
 
 Reads and appends a PBC it to the current directory.  Fixes up sub addresses in
 newly loaded bytecode and runs C<:load> subs.

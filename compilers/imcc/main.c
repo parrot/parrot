@@ -614,7 +614,7 @@ compile_to_bytecode(PARROT_INTERP,
               opt_desc, opt_level);
 
     pf = PackFile_new(interp, 0);
-    Parrot_pbc_load(interp, pf);
+    Parrot_pf_set_current_packfile(interp, pf);
 
     IMCC_push_parser_state(interp);
     IMCC_INFO(interp)->state->file = mem_sys_strdup(sourcefile);
@@ -736,7 +736,7 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
         pf_raw = Parrot_pbc_read(interp, sourcefile, 0);
         if (!pf_raw)
             IMCC_fatal_standalone(interp, 1, "main: Packfile loading failed\n");
-        Parrot_pbc_load(interp, pf_raw);
+        Parrot_pf_set_current_packfile(interp, pf_raw);
     }
     else
         pf_raw = compile_to_bytecode(interp, sourcefile, output_file, yyscanner);
@@ -755,7 +755,7 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
             pf_raw = Parrot_pbc_read(interp, output_file, 0);
             if (!pf_raw)
                 IMCC_fatal_standalone(interp, 1, "Packfile loading failed\n");
-            Parrot_pbc_load(interp, pf_raw);
+            Parrot_pf_set_current_packfile(interp, pf_raw);
             SET_STATE_LOAD_PBC(interp);
         }
     }

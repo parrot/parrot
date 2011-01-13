@@ -328,7 +328,8 @@ Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
     EMBED_API_CALLIN(interp_pmc, interp)
     PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
     if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not load packfile");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "Could not load packfile");
     do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
     *pbc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, *pbc, pf);
@@ -357,11 +358,11 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
     ASSERT_ARGS(Parrot_api_load_bytecode_bytes)
     EMBED_API_CALLIN(interp_pmc, interp)
     PackFile * const pf = PackFile_new(interp, 0);
-    if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not create packfile");
+    PARROT_ASSERT(pf);
 
     if (!PackFile_unpack(interp, pf, (const opcode_t *)pbc, bytecode_size))
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "could not unpack packfile");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "could not unpack packfile");
     do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
     *pbcpmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, *pbcpmc, pf);
@@ -401,9 +402,10 @@ Parrot_api_ready_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     }
 
     if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
-    if (pf->cur_cs != NULL)
-        Parrot_pbc_load(interp, pf);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not get packfile.");
+    if (pf->cur_cs)
+        Parrot_pf_set_current_packfile(interp, pf);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
     *main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
     Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
@@ -441,9 +443,10 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     }
 
     if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
-    if (pf->cur_cs != NULL)
-        Parrot_pbc_load(interp, pf);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not get packfile.");
+    if (pf->cur_cs)
+        Parrot_pf_set_current_packfile(interp, pf);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
     main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
 
@@ -481,9 +484,10 @@ Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     EMBED_API_CALLIN(interp_pmc, interp)
     PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
     if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
-    if (pf->cur_cs != NULL)
-        Parrot_pbc_load(interp, pf);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not get packfile.");
+    if (pf->cur_cs)
+        Parrot_pf_set_current_packfile(interp, pf);
     /* TODO: Break up the dependency with emebed.c */
     Parrot_disassemble(interp, outfile, (Parrot_disassemble_options)opts);
     EMBED_API_CALLOUT(interp_pmc, interp);
