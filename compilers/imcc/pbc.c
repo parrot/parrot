@@ -2199,6 +2199,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
     int        ok = 0;
     int        i;
     op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(interp);
+    PackFile * const interp_pf = Parrot_pf_get_current_packfile(interp);
     PackFile_ByteCode * const interp_code = Parrot_pf_get_current_code_segment(interp);
 
     /* first instruction, do initialisation ... */
@@ -2268,7 +2269,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
             STRING *name = Parrot_sprintf_c(interp, "%Ss_ANN", interp_code->base.name);
             int      add = interp_code->base.dir ? 1 : 0;
             PackFile_Directory * const dir  = add ? interp_code->base.dir :
-                    &interp->initial_pf->directory;
+                    &interp_pf->directory;
             interp_code->annotations = (PackFile_Annotations *)
                     PackFile_Segment_new_seg(interp, dir,
                         PF_ANNOTATIONS_SEG, name, 1);
