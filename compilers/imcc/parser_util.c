@@ -813,13 +813,13 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
         ARGOUT(STRING **error_message))
 {
     ASSERT_ARGS(imcc_compile_file)
-    PackFile_ByteCode  * const cs_save  = interp->code;
-    PackFile_ByteCode         *cs       = NULL;
-    struct _imc_info_t        *imc_info = NULL;
-    const char                *ext;
-    FILE                      *fp;
-    STRING                    *fs;
-    PMC                       *newcontext;
+    PackFile_ByteCode * const cs_save = Parrot_pf_get_current_code_segment(interp);
+    PackFile_ByteCode        *cs       = NULL;
+    struct _imc_info_t       *imc_info = NULL;
+    const char               *ext;
+    FILE                     *fp;
+    STRING                   *fs;
+    PMC                      *newcontext;
 
     /* need at least 3 regs for compilation of constant math e.g.
      * add_i_ic_ic - see also IMCC_subst_constants() */
@@ -896,7 +896,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
     fclose(fp);
 
     if (!IMCC_INFO(interp)->error_code)
-        cs = interp->code;
+        cs = Parrot_pf_get_current_code_segment(interp);
     else
         *error_message = IMCC_INFO(interp)->error_message;
 
