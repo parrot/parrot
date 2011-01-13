@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 61;
+plan tests => 63;
 
 =head1 NAME
 
@@ -78,6 +78,7 @@ int main(void)
 {
     Parrot_Interp interp;
     Parrot_PMC pmc, pmc2, pmc3, pmc_string;
+    Parrot_PMC rpa;
     Parrot_Int type, value, integer;
     Parrot_String string;
     Parrot_Float number;
@@ -85,6 +86,7 @@ int main(void)
     interp = new_interp();
 
     type   = Parrot_PMC_typenum(interp, "Integer");
+    rpa    = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
     pmc    = Parrot_PMC_new(interp, type);
     pmc2   = Parrot_PMC_new(interp, type);
     pmc3   = Parrot_PMC_new(interp, type);
@@ -981,6 +983,32 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_add" );
     printf("%d\n", (int) value);
 CODE
 958
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(set|get)_bool" );
+    Parrot_PMC_set_bool(interp, pmc, 1);
+    integer = Parrot_PMC_get_bool(interp, pmc);
+    printf("%d\n", (int) integer);
+
+    Parrot_PMC_set_bool(interp, pmc, 0);
+    integer = Parrot_PMC_get_bool(interp, pmc);
+    printf("%d\n", (int) integer);
+CODE
+1
+0
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_type" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+
+    integer = Parrot_PMC_type(interp, pmc);
+
+    if (integer > 0)
+        Parrot_io_printf(interp,"42\n", integer);
+CODE
+42
 Done!
 OUTPUT
 
