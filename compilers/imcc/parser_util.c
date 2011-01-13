@@ -528,6 +528,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
 {
     ASSERT_ARGS(imcc_compile)
     /* imcc always compiles to interp->code
+     * XXX: This is EXTREMELY bad. IMCC should not write to interp->code
      * save old cs, make new
      */
     STRING                *name;
@@ -564,7 +565,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     UNLOCK(eval_nr_lock);
 
     name   = Parrot_sprintf_c(interp, "EVAL_" INTVAL_FMT, eval_number);
-    new_cs = PF_create_default_segs(interp, name, 0);
+    new_cs = PF_create_default_segs(interp, name, 0, 0);
     old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
 
     IMCC_INFO(interp)->cur_namespace = NULL;

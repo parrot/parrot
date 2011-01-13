@@ -326,7 +326,8 @@ static int
 add_const_table_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(add_const_table_pmc)
-    PackFile_ConstTable *ct = interp->code->const_table;
+    PackFile_ByteCode * const bc = Parrot_pf_get_current_code_segment(interp);
+    PackFile_ConstTable * const ct = bc->const_table;
 
     if (!ct->pmc.constants)
         ct->pmc.constants =
@@ -357,6 +358,7 @@ int
 e_pbc_open(PARROT_INTERP, SHIM(const char *param))
 {
     ASSERT_ARGS(e_pbc_open)
+    PackFile_ByteCode * const current_bc = Parrot_pf_get_current_code_segment(interp);
     code_segment_t * const cs = mem_gc_allocate_zeroed_typed(interp, code_segment_t);
 
     if (!IMCC_INFO(interp)->globals)
@@ -384,12 +386,12 @@ e_pbc_open(PARROT_INTERP, SHIM(const char *param))
         cs->prev->next = cs;
 
     /* we need some segments */
-    if (!interp->code) {
+    if (!current_bc) {
         const char *n    = IMCC_INFO(interp)->state->file;
         STRING     *name = Parrot_str_new(interp, n, strlen(n));
         PMC        *self;
 
-        cs->seg = interp->code = PF_create_default_segs(interp, name, 1);
+        cs->seg = PF_create_default_segs(interp, name, 1, 1);
     }
 
     IMCC_INFO(interp)->globals->cs = cs;

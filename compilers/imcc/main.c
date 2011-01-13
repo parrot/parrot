@@ -491,14 +491,15 @@ imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
     size_t    size;
     opcode_t *packed;
     FILE     *fp;
+    PackFile_ByteCode * interp_code = Parrot_pf_get_current_code_segment(interp);
 
     IMCC_info(interp, 1, "Writing %s\n", output_file);
 
-    size = PackFile_pack_size(interp, interp->code->base.pf) *
+    size = PackFile_pack_size(interp, interp_code->base.pf) *
         sizeof (opcode_t);
     IMCC_info(interp, 1, "packed code %d bytes\n", size);
     packed = (opcode_t*) mem_sys_allocate(size);
-    PackFile_pack(interp, interp->code->base.pf, packed);
+    PackFile_pack(interp, interp_code->base.pf, packed);
     if (STREQ(output_file, "-"))
         fp = stdout;
     else if ((fp = fopen(output_file, "wb")) == NULL)
@@ -615,6 +616,9 @@ compile_to_bytecode(PARROT_INTERP,
 
     pf = PackFile_new(interp, 0);
     Parrot_pf_set_current_packfile(interp, pf);
+    /* If I comment out the above two lines and replace with this one below,
+       Parrot builds and all tests pass. */
+    /*pf = Parrot_pf_get_current_packfile(interp);*/
 
     IMCC_push_parser_state(interp);
     IMCC_INFO(interp)->state->file = mem_sys_strdup(sourcefile);

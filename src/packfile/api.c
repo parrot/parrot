@@ -1812,7 +1812,7 @@ Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PackFile * const pf))
 /*
 
 =item C<PackFile_ByteCode * PF_create_default_segs(PARROT_INTERP, STRING
-*file_name, int add)>
+*file_name, int add, int set_def)>
 
 Creates the bytecode and constant segments for C<file_name>. If C<add>
 is true, the current packfile becomes the owner of these segments by adding the
@@ -1826,13 +1826,41 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode *
-PF_create_default_segs(PARROT_INTERP, ARGIN(STRING *file_name), int add)
+PF_create_default_segs(PARROT_INTERP, ARGIN(STRING *file_name), int add, int set_def)
 {
     ASSERT_ARGS(PF_create_default_segs)
-    PackFile          * const pf     = interp->initial_pf;
+    PackFile_ByteCode * const bc = Parrot_pf_create_default_segments(interp,
+        interp->initial_pf, file_name, add);
+    if (set_def)
+        interp->code = bc;
+    return bc;
+}
+
+/*
+
+=item C<PackFile_ByteCode * Parrot_pf_create_default_segments(PARROT_INTERP,
+PackFile * const pf, STRING * file_name, int add)>
+
+Create the default seguments for the given packfile. Return the ByteCode
+segment created.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PackFile_ByteCode *
+Parrot_pf_create_default_segments(PARROT_INTERP, ARGMOD(PackFile * const pf),
+        ARGIN(STRING * file_name), int add)
+{
+    ASSERT_ARGS(Parrot_pf_create_default_segments)
     PackFile_ByteCode * const cur_cs =
         (PackFile_ByteCode *)create_seg(interp, &pf->directory,
             PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME, file_name, add);
+
+    PARROT_ASSERT(cur_cs);
 
     cur_cs->const_table  =
         (PackFile_ConstTable *)create_seg(interp, &pf->directory,
@@ -1842,6 +1870,7 @@ PF_create_default_segs(PARROT_INTERP, ARGIN(STRING *file_name), int add)
 
     return cur_cs;
 }
+
 
 
 /*
@@ -4392,7 +4421,8 @@ PackFile_append(PARROT_INTERP, ARGIN_NULLOK(PackFile * const pf))
     if (pf) {
         if (!interp->code) {
             STRING * const name = CONST_STRING(interp, "dummy");
-            interp->code = PF_create_default_segs(interp, name, 1);
+            interp->code = Parrot_pf_create_default_segments(interp,
+                interp->initial_pf, name, 1);
             PARROT_ASSERT(interp->code);
         }
         PackFile_add_segment(interp, &interp->initial_pf->directory,

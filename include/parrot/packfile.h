@@ -878,6 +878,18 @@ PackFile_Debug * Parrot_new_debug_seg(PARROT_INTERP,
         FUNC_MODIFIES(*cs);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PackFile_ByteCode * Parrot_pf_create_default_segments(PARROT_INTERP,
+    ARGMOD(PackFile * const pf),
+    ARGIN(STRING * file_name),
+    int add)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* const pf);
+
+PARROT_EXPORT
 void Parrot_pf_set_current_packfile(PARROT_INTERP,
     ARGIN(PackFile * const pf))
         __attribute__nonnull__(1)
@@ -897,7 +909,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * PF_create_default_segs(PARROT_INTERP,
     ARGIN(STRING *file_name),
-    int add)
+    int add,
+    int set_def)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -1053,6 +1066,11 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
 #define ASSERT_ARGS_Parrot_new_debug_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cs))
+#define ASSERT_ARGS_Parrot_pf_create_default_segments \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pf) \
+    , PARROT_ASSERT_ARG(file_name))
 #define ASSERT_ARGS_Parrot_pf_set_current_packfile \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
