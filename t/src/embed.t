@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 49;
+plan tests => 52;
 
 =head1 NAME
 
@@ -77,7 +77,7 @@ sub extend_vtable_output_is
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_PMC pmc, pmc2, pmc3;
+    Parrot_PMC pmc, pmc2, pmc3, pmc_string;
     Parrot_Int type, value, integer;
     Parrot_String string;
     Parrot_Float number;
@@ -88,7 +88,7 @@ int main(void)
     pmc    = Parrot_PMC_new(interp, type);
     pmc2   = Parrot_PMC_new(interp, type);
     pmc3   = Parrot_PMC_new(interp, type);
-    string = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
+    pmc_string = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
 
 $code
 
@@ -340,6 +340,18 @@ CODE
 Done!
 OUTPUT
 
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_absolute" );
+
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+    pmc2 = Parrot_PMC_absolute(interp, pmc, pmc2);
+
+    value = Parrot_PMC_get_integer(interp, pmc2);
+    printf("%d\n", (int) value);
+CODE
+42
+Done!
+OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_absolute" );
 
@@ -827,6 +839,18 @@ CODE
 Done!
 OUTPUT
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_add_float" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+    number = 1000.0;
+
+    pmc3 = Parrot_PMC_add_float(interp, pmc, number, pmc3);
+    number = Parrot_PMC_get_number(interp, pmc3);
+    printf("%.2f\n", number);
+CODE
+958.00
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_add" );
     Parrot_PMC_set_integer_native(interp, pmc, -42);
     Parrot_PMC_set_integer_native(interp, pmc2, 1000);
@@ -839,6 +863,21 @@ CODE
 Done!
 OUTPUT
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_can" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+
+    string = createstring(interp, "foo");
+    integer = Parrot_PMC_can(interp,pmc,string);
+    printf("%d\n", (int) integer);
+
+    string = createstring(interp, "add");
+    integer = Parrot_PMC_can(interp,pmc,string);
+    printf("%d\n", (int) integer);
+CODE
+0
+1
+Done!
+OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_assign_pmc" );
     Parrot_PMC_set_integer_native(interp, pmc, -42);
