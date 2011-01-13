@@ -472,7 +472,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         Parrot_String_Bounds bounds;
 
         const size_t buffer_size = buffer_end - buffer_next;
-        size_t       chunk_size, new_size, alloc_size, decoded_bytes;
+        size_t       alloc_size;
         INTVAL       got;
 
         /* Partial scan of buffer */
@@ -485,34 +485,38 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
         /* Append buffer to result */
 
-        if (bounds.delim == rs)
+        if (bounds.delim == rs) {
             /* End of line, use only part of buffer */
-            chunk_size = bounds.bytes;
-        else
-            /* Copy whole buffer, might copy partial characters */
-            chunk_size = buffer_size;
+            alloc_size = s->bufused + bounds.bytes;
 
-        decoded_bytes = s->bufused + bounds.bytes;
-        new_size      = s->bufused + chunk_size;
-        /* Additional space for multi-byte char split across buffers */
-        alloc_size    = new_size + max_split_bytes;
+            if (s->strstart)
+                Parrot_gc_reallocate_string_storage(interp, s, alloc_size);
+            else
+                Parrot_gc_allocate_string_storage(interp, s, alloc_size);
+
+            memcpy(s->strstart + s->bufused, buffer_next, bounds.bytes);
+
+            s->bufused += bounds.bytes;
+            s->strlen  += bounds.chars;
+
+            buffer_next += bounds.bytes;
+            Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
+            break;
+        }
+
+        /* Use additional space for multi-byte char split across buffers */
+        alloc_size = s->bufused + buffer_size + max_split_bytes;
 
         if (s->strstart)
             Parrot_gc_reallocate_string_storage(interp, s, alloc_size);
         else
             Parrot_gc_allocate_string_storage(interp, s, alloc_size);
 
-        memcpy(s->strstart + s->bufused, buffer_next, chunk_size);
+        /* Copy whole buffer, might copy partial characters */
+        memcpy(s->strstart + s->bufused, buffer_next, buffer_size);
 
-        s->bufused  = new_size;
+        s->bufused += bounds.bytes;
         s->strlen  += bounds.chars;
-
-        if (bounds.delim == rs) {
-            /* End of line */
-            buffer_next += chunk_size;
-            Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-            break;
-        }
 
         /* Refill buffer */
 
@@ -526,6 +530,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
                 break;
             }
             else {
+                /* TODO: set file position */
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_CHARACTER,
                     "Unaligned end in %s string\n", encoding->name);
@@ -538,12 +543,14 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         if (bounds.bytes < buffer_size) {
             /* Handle character split across buffers */
 
-            size_t bytes_l = s->bufused - decoded_bytes;
+            size_t bytes_l = buffer_size - bounds.bytes;
             size_t bytes_r = (size_t)got < max_split_bytes
                            ? (size_t)got : max_split_bytes;
 
+            size_t decoded_size = s->bufused;
+
             /* First, copy enough bytes to complete character */
-            memcpy(s->strstart + s->bufused, buffer_next, bytes_r);
+            memcpy(s->strstart + decoded_size + bytes_l, buffer_next, bytes_r);
 
             /* Partial scan of single character */
 
@@ -551,21 +558,40 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
             bounds.chars = 1;
             bounds.delim = rs;
 
-            encoding->partial_scan(interp, s->strstart + decoded_bytes,
-                                      &bounds);
+            encoding->partial_scan(interp, s->strstart + decoded_size,
+                                   &bounds);
 
-            if (bounds.bytes == 0)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_CHARACTER,
-                    "Unaligned end in %s string\n", encoding->name);
+            if (bounds.bytes == 0) {
+                INTVAL flags = Parrot_io_get_flags(interp, filehandle);
+
+                PARROT_ASSERT((size_t)got == bytes_r);
+
+                if (flags & PIO_F_FILE) {
+                    /* TODO: set file position */
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_CHARACTER,
+                        "Unaligned end in %s string\n", encoding->name);
+                }
+
+                /* Tricky case: We didn't receive enough bytes to complete
+                 * the character. So we have to prepend the rest of the old
+                 * buffer.
+                 */
+
+                memmove(buffer_next + bytes_l, buffer_next, got);
+                memcpy(buffer_next, s->strstart + decoded_size, bytes_l);
+
+                buffer_end += bytes_l;
+                Parrot_io_set_buffer_end(interp, filehandle, buffer_end);
+                break;
+            }
 
             PARROT_ASSERT(bounds.chars == 1);
 
-            bytes_r = bounds.bytes - bytes_l;
-
-            s->bufused  += bytes_r;
+            s->bufused  += bounds.bytes;
             s->strlen   += 1;
 
+            bytes_r      = bounds.bytes - bytes_l;
             buffer_next += bytes_r;
 
             if (bounds.delim == rs || (size_t)got == bytes_r) {
