@@ -331,7 +331,7 @@ PackFile_ConstTable_rlookup_pmc(PARROT_INTERP,
         ARGIN(PackFile_ConstTable *ct), ARGIN(PMC *v),
         ARGOUT(INTVAL *constno), ARGOUT(INTVAL *idx))
 {
-    // ASSERT_ARGS(PackFile_ConstTable_rlookup_pmc)
+    ASSERT_ARGS(PackFile_ConstTable_rlookup_pmc)
     PMC *rec;
 
     PARROT_ASSERT(ct->pmc_hash);
