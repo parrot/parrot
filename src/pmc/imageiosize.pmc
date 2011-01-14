@@ -28,6 +28,17 @@ static int check_seen(PARROT_INTERP, PMC *self, PMC *v)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<static int check_seen(PARROT_INTERP, PMC *self, PMC *v)>
+
+Check the seen hash to prevent duplicate serialization.
+
+=cut
+
+*/
+
+
 PARROT_INLINE
 static int
 check_seen(PARROT_INTERP, PMC *self, PMC *v)

@@ -214,6 +214,17 @@ ensure_buffer_size(PARROT_INTERP, ARGIN(PMC *io), size_t len)
 #endif
 }
 
+
+/*
+
+=item C<static UINTVAL check_seen(PARROT_INTERP, PMC *self, PMC *v)>
+
+Check the seen hash to prevent duplicate serialization.
+
+=cut
+
+*/
+
 PARROT_INLINE
 static UINTVAL
 check_seen(PARROT_INTERP, PMC *self, PMC *v)
