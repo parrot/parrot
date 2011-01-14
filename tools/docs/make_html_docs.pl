@@ -140,7 +140,7 @@ foreach my $page (keys %pages) {
 
     # set up and output header
     my $nav_HTML = qq{<a href="index.html">Home</a>};
-    print $out_fh Parrot::Docs::HTMLPage->header($title, $nav_HTML, $resource_dir);
+    print $out_fh Parrot::Docs::HTMLPage->header($title, $nav_HTML, $resource_dir, $version);
 
     foreach my $section (@{$page->{content}}) {
         # output Section title
