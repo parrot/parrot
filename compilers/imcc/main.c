@@ -75,7 +75,7 @@ static void imcc_get_optimization_description(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*opt_desc);
 
-static void imcc_parseflags(PARROT_INTERP,
+static char * imcc_parseflags(PARROT_INTERP,
     int argc,
     ARGIN(const char **argv))
         __attribute__nonnull__(1)
@@ -226,7 +226,8 @@ Parrot_cmd_options(void)
 
 /*
 
-=item C<static void imcc_parseflags(PARROT_INTERP, int argc, const char **argv)>
+=item C<static char * imcc_parseflags(PARROT_INTERP, int argc, const char
+**argv)>
 
 Parse flags ans set approptiate state(s)
 
@@ -234,11 +235,12 @@ Parse flags ans set approptiate state(s)
 
 */
 
-static void
+static char *
 imcc_parseflags(PARROT_INTERP, int argc, ARGIN(const char **argv))
 {
     ASSERT_ARGS(imcc_parseflags)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
+    char * output_file = NULL;
 
     /* default state: run pbc */
     SET_STATE_RUN_PBC(interp);
@@ -283,14 +285,14 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN(const char **argv))
             break;
           case 'o':
             UNSET_STATE_RUN_PBC(interp);
-            interp->output_file = opt.opt_arg;
+            output_file = opt.opt_arg;
             break;
 
           case OPT_PBC_OUTPUT:
             UNSET_STATE_RUN_PBC(interp);
             SET_STATE_WRITE_PBC(interp);
-            if (!interp->output_file)
-                interp->output_file = "-";
+            if (!output_file)
+                output_file = "-";
             break;
 
           case 'O':
@@ -317,6 +319,7 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN(const char **argv))
             break;
         }
     }
+    return output_file;
 }
 
 /*
@@ -481,7 +484,7 @@ imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
     size_t    size;
     opcode_t *packed;
     FILE     *fp;
-    PackFile_ByteCode * interp_code = Parrot_pf_get_current_code_segment(interp);
+    PackFile_ByteCode * const interp_code = Parrot_pf_get_current_code_segment(interp);
 
     IMCC_info(interp, 1, "Writing %s\n", output_file);
 
@@ -682,11 +685,9 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
         ARGIN(const char **argv), ARGOUT(PMC **pbcpmc))
 {
     yyscan_t           yyscanner;
-    const char * const output_file = interp->output_file;
     PackFile * pf_raw = NULL;
     *pbcpmc = PMCNULL;
-
-    imcc_parseflags(interp, argc, argv);
+    const char * output_file = imcc_parseflags(interp, argc, argv);
 
     /* PMCs in IMCC_INFO won't get marked */
     Parrot_block_GC_mark(interp);

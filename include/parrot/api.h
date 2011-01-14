@@ -207,11 +207,6 @@ Parrot_Int Parrot_api_set_executable_name(
         __attribute__nonnull__(2);
 
 PARROT_API
-Parrot_Int Parrot_api_set_output_file(
-    Parrot_PMC interp_pmc,
-    ARGIN_NULLOK(const char * filename));
-
-PARROT_API
 Parrot_Int Parrot_api_set_runcore(
     Parrot_PMC interp_pmc,
     ARGIN(const char * corename),
@@ -283,7 +278,6 @@ Parrot_Int Parrot_api_wrap_imcc_hack(
 #define ASSERT_ARGS_Parrot_api_set_executable_name \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_Parrot_api_set_output_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_set_runcore __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(corename))
 #define ASSERT_ARGS_Parrot_api_set_warnings __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)

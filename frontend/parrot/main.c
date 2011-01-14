@@ -460,14 +460,14 @@ Parrot_cmd_options(void)
         { 'X', 'X', OPTION_required_FLAG, { "--dynext" } },
         { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,
                                      { "--leak-test", "--destroy-at-end" } },
+        { 'o', 'o', OPTION_required_FLAG, { "--output" } },
+        { '\0', OPT_PBC_OUTPUT, (OPTION_flags)0, { "--output-pbc" } },
         { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
         { 'a', 'a', (OPTION_flags)0, { "--pasm" } },
         { 'c', 'c', (OPTION_flags)0, { "--pbc" } },
         { 'd', 'd', OPTION_optional_FLAG, { "--imcc-debug" } },
         { '\0', OPT_HELP_DEBUG, (OPTION_flags)0, { "--help-debug" } },
         { 'h', 'h', (OPTION_flags)0, { "--help" } },
-        { 'o', 'o', OPTION_required_FLAG, { "--output" } },
-        { '\0', OPT_PBC_OUTPUT, (OPTION_flags)0, { "--output-pbc" } },
         { 'r', 'r', (OPTION_flags)0, { "--run-pbc" } },
         { '\0', OPT_RUNTIME_PREFIX, (OPTION_flags)0, { "--runtime-prefix" } },
         { 't', 't', OPTION_optional_FLAG, { "--trace" } },
@@ -715,12 +715,6 @@ parseflags(Parrot_PMC interp,
           case 'w':
             /* result = Parrot_api_set_warnings(interp, PARROT_WARNINGS_ALL_FLAG); */
             result = Parrot_api_set_warnings(interp, 0xFFFF);
-            break;
-          case 'o':
-            result = Parrot_api_set_output_file(interp, opt.opt_arg);
-            break;
-          case OPT_PBC_OUTPUT:
-            result = Parrot_api_set_output_file(interp, NULL);
             break;
           default:
             /* languages handle their arguments later (after being initialized) */
