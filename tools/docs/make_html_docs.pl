@@ -7,7 +7,7 @@ tools/docs/make_html_docs.pl - Write HTML documentation
 
 =head1 SYNOPSIS
 
-    % perl tools/docs/make_html_docs.pl --version
+    % perl tools/docs/make_html_docs.pl [--version=VERSION]
 
 =head1 DESCRIPTION
 
@@ -33,11 +33,9 @@ use JSON;
 use Parrot::Docs::PodToHtml;
 use Parrot::Docs::HTMLPage;
 
-my ( $version );
+my $version='';
 
-die unless GetOptions( 'version=s' => \$version );
-
-die "Usage: $0 --version\n" unless $version;
+GetOptions( 'version=s' => \$version );
 
 my $target_dir   = 'docs/html';
 my $resource_dir = '../resources';
