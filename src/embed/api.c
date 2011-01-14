@@ -317,7 +317,7 @@ returns a true value if this call is successful and false value otherwise.
 */
 
 /* TODO: This only works with the inital bytecode. After this we should use
-       Parrot_append_bytecode or something similar */
+         Parrot_append_bytecode or something similar */
 
 PARROT_API
 Parrot_Int
