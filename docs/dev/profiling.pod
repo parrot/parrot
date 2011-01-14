@@ -1,10 +1,10 @@
 # Copyright (C) 2001-2005, Parrot Foundation.
 
-=head1 Name
+=head1 NAME
 
 docs/dev/profiling.pod - Profiling Parrot
 
-=head1 Description
+=head1 DESCRIPTION
 
 This file documents the use of Parrot's profiling runcore.
 
@@ -54,7 +54,7 @@ profile.  Annotations are necessary when profiling HLL code, but will cause the
 profiling runcore to run more slowly.  By default, they are disabled.  Set this
 value to enable them.
 
-=item C<PARROT_PROFILING_CANONICAL_OUPUT> 
+=item C<PARROT_PROFILING_CANONICAL_OUPUT>
 
 When this is set, the profiling runcore will record all addresses as a single
 constant value and all times as 1.  This options is useful primarily for
