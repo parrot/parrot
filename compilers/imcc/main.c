@@ -31,7 +31,6 @@ IMCC helpers.
 #include "imc.h"
 #include "parrot/embed.h"
 #include "parrot/longopt.h"
-#include "parrot/imcc.h"
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_callcontext.h"
 #include "pbc.h"
@@ -82,6 +81,17 @@ static void imcc_parseflags(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+static int imcc_run(PARROT_INTERP,
+    ARGIN(const char *sourcefile),
+    int argc,
+    ARGIN(const char **argv),
+    ARGOUT(PMC **pbcpmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*pbcpmc);
+
 static void imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -114,6 +124,11 @@ static const struct longopt_opt_decl * Parrot_cmd_options(void);
 #define ASSERT_ARGS_imcc_parseflags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(argv))
+#define ASSERT_ARGS_imcc_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sourcefile) \
+    , PARROT_ASSERT_ARG(argv) \
+    , PARROT_ASSERT_ARG(pbcpmc))
 #define ASSERT_ARGS_imcc_write_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(output_file))
@@ -651,8 +666,8 @@ imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(const char *sourcefile), int argc,
 
 /*
 
-=item C<int imcc_run(PARROT_INTERP, const char *sourcefile, int argc, const char
-**argv, PMC **pbcpmc)>
+=item C<static int imcc_run(PARROT_INTERP, const char *sourcefile, int argc,
+const char **argv, PMC **pbcpmc)>
 
 Entry point of IMCC, as invoked by Parrot's main function.
 Compile source code (if required), write bytecode file (if required)
@@ -662,7 +677,7 @@ and run. This function always returns 0.
 
 */
 
-int
+static int
 imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
         ARGIN(const char **argv), ARGOUT(PMC **pbcpmc))
 {

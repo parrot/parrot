@@ -726,8 +726,7 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/pmc.c */
 
-/* Forward declaration because IMCC is still part of libparrot, but we don't
-   want to include parrot/imcc.h */
+/* Forward declaration because IMCC is still part of libparrot */
 
 PARROT_API
 int

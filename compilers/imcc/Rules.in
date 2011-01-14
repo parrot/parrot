@@ -154,7 +154,6 @@ compilers/imcc/main$(O) : \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
     $(INC_DIR)/embed.h \
-    $(INC_DIR)/imcc.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/runcore_api.h \
     $(INC_DIR)/api.h \
