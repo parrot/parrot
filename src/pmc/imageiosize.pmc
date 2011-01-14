@@ -9,6 +9,10 @@ src/pmc/imageiosize.pmc - ImageIOSize PMC
 
 Gets the size of an ImageIO image without the allocation costs.
 
+=head1 STATIC FUNCTIONS
+
+=over 4
+
 =cut
 
 */
@@ -60,6 +64,8 @@ pmclass ImageIOSize auto_attrs {
     ATTR INTVAL                      size;
 
 /*
+
+=back
 
 =head1 VTABLES
 
