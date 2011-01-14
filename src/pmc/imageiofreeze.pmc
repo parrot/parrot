@@ -333,7 +333,7 @@ Returns the content of the image as a string.
 
 /*
 
-=item C<PMC *get_pmc()>
+=item C<void *get_pointer()>
 
 Returns the seen hash.
 
@@ -341,8 +341,8 @@ Returns the seen hash.
 
 */
 
-    VTABLE PMC *get_pmc() {
-        return PARROT_IMAGEIOFREEZE(SELF)->seen;
+    VTABLE void *get_pointer() {
+        return VTABLE_get_pointer(INTERP, PARROT_IMAGEIOFREEZE(SELF)->seen);
     }
 
 

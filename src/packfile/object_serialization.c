@@ -88,7 +88,7 @@ Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTabl
     VTABLE_set_pmc(interp, visitor, pmc);
 
     image  = VTABLE_get_string(interp, visitor);
-    *seen  = (Hash *)VTABLE_get_pointer(interp, VTABLE_get_pmc(interp, visitor));
+    *seen  = (Hash *)VTABLE_get_pointer(interp, visitor);
     cursor = PF_store_buf(cursor, image);
 
     return cursor;
