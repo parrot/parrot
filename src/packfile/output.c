@@ -155,6 +155,17 @@ PackFile_pack(PARROT_INTERP, ARGMOD(PackFile *self), ARGOUT(opcode_t *cursor))
     }
 }
 
+/*
+
+=item C<static void update_backref_hash(PARROT_INTERP, PackFile_ConstTable *ct,
+Hash *seen, INTVAL constno)>
+
+Update C<ct>'s backref hash with new entries from C<seen>.
+
+=cut
+
+*/
+
 PARROT_INLINE
 static void
 update_backref_hash(PARROT_INTERP, PackFile_ConstTable *ct, Hash *seen, INTVAL constno)
