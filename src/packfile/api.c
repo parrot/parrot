@@ -943,13 +943,11 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
             if (((PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK)
             ||   (Sub_comp_get_FLAGS(sub) & SUB_COMP_FLAG_MASK))
             &&    sub_pragma(interp, action, sub_pmc)) {
-                PMC * const result = do_1_sub_pragma(interp, sub_pmc,
-                        action);
+                PMC * const result = do_1_sub_pragma(interp, sub_pmc, action);
 
                 /* replace Sub PMC with computation results */
-                if (action == PBC_IMMEDIATE && !PMC_IS_NULL(result)) {
+                if (action == PBC_IMMEDIATE && !PMC_IS_NULL(result))
                     ct->pmc.constants[i] = result;
-                }
             }
         }
     }

@@ -533,7 +533,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
      */
     STRING                *name;
     PackFile_ByteCode     *old_cs, *new_cs;
-    PMC                   *sub      = NULL;
+    PMC                   *eval_pmc = NULL;
     struct _imc_info_t    *imc_info = NULL;
     struct parser_state_t *next;
     void                  *yyscanner;
@@ -613,8 +613,8 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
          *
          * TODO if a sub was denoted :main return that instead
          */
-        sub                  = Parrot_pmc_new(interp, enum_class_Eval);
-        PMC_get_sub(interp, sub, sub_data);
+        eval_pmc             = Parrot_pmc_new(interp, enum_class_Eval);
+        PMC_get_sub(interp, eval_pmc, sub_data);
         sub_data->seg        = new_cs;
         sub_data->start_offs = 0;
         sub_data->end_offs   = new_cs->base.size;
@@ -648,13 +648,13 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
 
     /* Now run any :load/:init subs. */
     if (!*error_message)
-        PackFile_fixup_subs(interp, PBC_MAIN, sub);
+        PackFile_fixup_subs(interp, PBC_MAIN, eval_pmc);
 
     /* restore old byte_code, */
     if (old_cs)
         (void)Parrot_switch_to_cs(interp, old_cs, 0);
 
-    return sub;
+    return eval_pmc;
 }
 
 /*
