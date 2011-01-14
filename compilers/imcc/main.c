@@ -451,31 +451,6 @@ imcc_get_optimization_description(const PARROT_INTERP, int opt_level, ARGMOD(cha
 
 /*
 
-=item C<void imcc_run_pbc(PARROT_INTERP, const char *output_file, int argc,
-const char **argv)>
-
-Write out or run Parrot bytecode.
-
-=cut
-
-*/
-
-void
-imcc_run_pbc(PARROT_INTERP, ARGIN_NULLOK(const char *output_file),
-        int argc, ARGIN(const char **argv))
-{
-    /* ASSERT_ARGS(imcc_run_pbc) */
-
-    IMCC_info(interp, 1, "Running...\n");
-
-    /* runs :init functions */
-    PackFile_fixup_subs(interp, PBC_MAIN, NULL);
-
-    Parrot_runcode(interp, argc, argv);
-}
-
-/*
-
 =item C<static void imcc_write_pbc(PARROT_INTERP, const char *output_file)>
 
 Output packed bytecode file.

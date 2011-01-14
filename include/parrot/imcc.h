@@ -6,7 +6,6 @@
 #define PARROT_IMCC_H_GUARD
 
 PARROT_EXPORT int imcc_run(PARROT_INTERP, const char *sourcefile, int argc, const char **argv, ARGOUT(PMC **pbcpmc));
-PARROT_EXPORT void imcc_run_pbc(PARROT_INTERP, const char *outputfile, int argc, const char **argv);
 
 #endif /* PARROT_IMCC_H_GUARD */
 
