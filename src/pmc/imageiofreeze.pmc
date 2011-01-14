@@ -323,20 +323,6 @@ Returns the content of the image as a string.
 
 /*
 
-=item C<VTABLE PMC *get_iter()>
-
-Get the C<todo> list for this freeze/thaw for iterating over.
-
-=cut
-
-*/
-
-    VTABLE PMC *get_iter() {
-        return PARROT_IMAGEIOFREEZE(SELF)->todo;
-    }
-
-/*
-
 =item C<VTABLE INTVAL get_integer()>
 
 Returns the flags describing the visit action.
@@ -479,8 +465,7 @@ Sets the constant table of this ImageIO PMC.
     }
 
 
-    VTABLE void set_pmc(PMC *p)
-    {
+    VTABLE void set_pmc(PMC *p) {
         create_buffer(INTERP, p, SELF);
 
         if (PObj_flag_TEST(private1, SELF)) {
@@ -500,7 +485,16 @@ Sets the constant table of this ImageIO PMC.
         }
 
         STATICSELF.push_pmc(p);
-        Parrot_visit_loop_visit(INTERP, SELF);
+
+        {
+            PMC *todo = PARROT_IMAGEIOFREEZE(SELF)->todo;
+            while (VTABLE_elements(INTERP, todo)) {
+                PMC *current = VTABLE_shift_pmc(INTERP, todo);
+                VTABLE_freeze(INTERP, current, SELF);
+                VTABLE_visit(INTERP,  current, SELF);
+                SELF.push_pmc(PMC_metadata(current));
+            }
+        }
     }
 }
 

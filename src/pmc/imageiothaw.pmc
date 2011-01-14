@@ -128,32 +128,40 @@ Thaws the PMC contained in C<image>.
         }
 
         STATICSELF.shift_pmc();
-        Parrot_visit_loop_visit(INTERP, SELF);
 
-        /* we're done reading the image */
-        PARROT_ASSERT(image->strstart + Parrot_str_byte_length(interp, image) ==
-                    (char *)PARROT_IMAGEIOTHAW(SELF)->curs);
+        {
+            PMC *todo = PARROT_IMAGEIOTHAW(SELF)->todo;
+            INTVAL i, n;
 
-        Parrot_visit_loop_thawfinish(INTERP, SELF);
+            for (i = 0; i < VTABLE_elements(INTERP, todo); i++) {
+                PMC *current = VTABLE_get_pmc_keyed_int(INTERP, todo, i);
+                if (PMC_IS_NULL(current))
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                            EXCEPTION_MALFORMED_PACKFILE,
+                            "NULL current PMC at %d in thaw",
+                            (int)i);
+
+                VTABLE_thaw(INTERP,  current, SELF);
+                VTABLE_visit(INTERP, current, SELF);
+                PMC_metadata(current) = SELF.shift_pmc();
+            }
+
+            n = i;
+
+            /* we're done reading the image */
+            PARROT_ASSERT(image->strstart + Parrot_str_byte_length(interp, image) ==
+                        (char *)PARROT_IMAGEIOTHAW(SELF)->curs);
+
+            for (i = 0; i < n; i++) {
+                PMC *current = VTABLE_get_pmc_keyed_int(INTERP, todo, i);
+                VTABLE_thawfinish(INTERP, current, SELF);
+            }
+        }
 
         if (!PObj_external_TEST(image))
             Parrot_str_unpin(INTERP, image);
     }
 
-
-/*
-
-=item C<PMC *get_iter()>
-
-Gets the todo list for iterating over.
-
-=cut
-
-*/
-
-    VTABLE PMC *get_iter() {
-        return PARROT_IMAGEIOTHAW(SELF)->todo;
-    }
 
 /*
 
