@@ -190,6 +190,14 @@ Parrot_Int Parrot_api_run_bytecode(
     Parrot_PMC mainargs);
 
 PARROT_API
+Parrot_Int Parrot_api_serialize_bytecode_pmc(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pbc,
+    ARGOUT(Parrot_String * bc))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* bc);
+
+PARROT_API
 Parrot_Int Parrot_api_set_compiler(
     Parrot_PMC interp_pmc,
     Parrot_String type,
@@ -277,6 +285,9 @@ Parrot_Int Parrot_api_wrap_imcc_hack(
 #define ASSERT_ARGS_Parrot_api_ready_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(main_sub))
 #define ASSERT_ARGS_Parrot_api_run_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_serialize_bytecode_pmc \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_Parrot_api_set_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_set_configuration_hash \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
