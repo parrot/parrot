@@ -8,7 +8,6 @@
 # See docs/submissions.pod and the documentation in
 # tools/dev/mk_manifest_and_skip.pl on how to recreate this file after SVN
 # has been told about new or deleted files.
-"docs/translations/README.\320\261\321\212\320\273\320\263\320\260\321\200\321\201\320\272\320\270" []doc
 .gitignore                                                  []
 CREDITS                                                     [main]doc
 ChangeLog                                                   []
@@ -457,6 +456,7 @@ docs/running.pod                                            [doc]
 docs/stability.pod                                          [doc]
 docs/submissions.pod                                        [doc]
 docs/tests.pod                                              [doc]
+docs/translations/README.BGR                                [doc]
 docs/translations/README.deutsch                            [doc]
 docs/translations/README.espanol                            [doc]
 docs/translations/README.francais                           [doc]
