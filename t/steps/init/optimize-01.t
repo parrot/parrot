@@ -98,7 +98,7 @@ $step = test_step_constructor_and_description($conf);
 $ret = $step->runstep($conf);
 ok( defined $ret, "runstep() returned defined value" );
 is( $conf->data->get('optimize'), '-O3',
-   "Got optimization level explicitly requested" ); 
+   "Got optimization level explicitly requested" );
 
 $conf->replenish($serialized);
 
