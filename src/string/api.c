@@ -707,8 +707,9 @@ string.
 */
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
 STRING *
-Parrot_str_from_platform_cstring(PARROT_INTERP, const char *c)
+Parrot_str_from_platform_cstring(PARROT_INTERP, ARGIN(const char *c))
 {
     ASSERT_ARGS(Parrot_str_from_platform_cstring)
     if (!c)
@@ -748,15 +749,16 @@ string.
 */
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
 char *
-Parrot_str_to_platform_cstring(PARROT_INTERP, STRING *s)
+Parrot_str_to_platform_cstring(PARROT_INTERP, ARGIN(STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_platform_cstring)
     if (STRING_IS_NULL(s)) {
         return NULL;
     }
     else {
-        STRING *s_plat = Parrot_str_change_encoding(interp, s, Parrot_platform_encoding_ptr->num);
+        STRING * const s_plat = Parrot_str_change_encoding(interp, s, Parrot_platform_encoding_ptr->num);
         return Parrot_str_to_cstring(interp, s_plat);
     }
 }
