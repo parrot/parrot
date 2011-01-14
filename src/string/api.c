@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -707,9 +707,9 @@ string.
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_str_from_platform_cstring(PARROT_INTERP, ARGIN(const char *c))
+Parrot_str_from_platform_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *c))
 {
     ASSERT_ARGS(Parrot_str_from_platform_cstring)
     if (!c)
