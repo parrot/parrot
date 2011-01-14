@@ -758,7 +758,8 @@ Parrot_str_to_platform_cstring(PARROT_INTERP, ARGIN(STRING *s))
         return NULL;
     }
     else {
-        STRING * const s_plat = Parrot_str_change_encoding(interp, s, Parrot_platform_encoding_ptr->num);
+        STRING * const s_plat = Parrot_str_change_encoding(interp,
+                                                           s, Parrot_platform_encoding_ptr->num);
         return Parrot_str_to_cstring(interp, s_plat);
     }
 }
