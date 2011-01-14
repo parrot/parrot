@@ -3562,6 +3562,19 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
     for (i = 0; i < self->pmc.const_count; i++)
         self->pmc.constants[i] = PackFile_Constant_unpack_pmc(interp, self, &cursor);
 
+    for (i = 0; i < self->pmc.const_count; i++) {
+        /* XXX unpack returned the lists of all objects in the object graph
+         * must dereference the first object into the constant slot */
+        PMC             *pmc  = self->pmc.constants[i]
+                              = VTABLE_get_pmc_keyed_int(interp, self->pmc.constants[i], 0);
+        STRING          *_sub = CONST_STRING(interp, "Sub");
+
+        /* magically place subs into namespace stashes
+         * XXX make this explicit with :load subs in PBC */
+        if (VTABLE_isa(interp, pmc, _sub))
+            Parrot_ns_store_sub(interp, pmc);
+    }
+
     return cursor;
 
   err:
@@ -3632,18 +3645,11 @@ PackFile_Constant_unpack_pmc(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
 {
     ASSERT_ARGS(PackFile_Constant_unpack_pmc)
     PackFile * const pf         = constt->base.pf;
-    STRING          *_sub       = CONST_STRING(interp, "Sub");
     PMC             *pmc;
     /* thawing the PMC needs the real packfile in place */
     PackFile_ByteCode * const cs_save = interp->code;
     interp->code                      = pf->cur_cs;
     pmc                               = Parrot_thaw_pbc(interp, constt, cursor);
-
-    /* finally place the sub into some namespace stash
-     * XXX place this code in Sub.thaw ?  */
-    if (VTABLE_isa(interp, pmc, _sub))
-        Parrot_ns_store_sub(interp, pmc);
-
     /* restore code */
     interp->code = cs_save;
 

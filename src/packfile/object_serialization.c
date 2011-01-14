@@ -62,7 +62,7 @@ Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 /*
 
 =item C<opcode_t * Parrot_freeze_pbc(PARROT_INTERP, PMC *pmc, const
-PackFile_ConstTable *pf, opcode_t *cursor)>
+PackFile_ConstTable *pf, opcode_t *cursor, Hash **seen)>
 
 Freezes a PMC to a PackFile.
 
@@ -75,7 +75,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 opcode_t *
 Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf),
-    ARGIN(opcode_t *cursor))
+    ARGIN(opcode_t *cursor), ARGOUT(Hash **seen))
 {
     ASSERT_ARGS(Parrot_freeze_pbc)
     PMC    *visitor;
@@ -88,6 +88,7 @@ Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTabl
     VTABLE_set_pmc(interp, visitor, pmc);
 
     image  = VTABLE_get_string(interp, visitor);
+    *seen  = (Hash *)VTABLE_get_pointer(interp, VTABLE_get_pmc(interp, visitor));
     cursor = PF_store_buf(cursor, image);
 
     return cursor;
@@ -97,7 +98,7 @@ Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTabl
 /*
 
 =item C<UINTVAL Parrot_freeze_pbc_size(PARROT_INTERP, PMC *pmc, const
-PackFile_ConstTable *pf)>
+PackFile_ConstTable *pf, Hash **seen)>
 
 Gets the size of an image if it were created using C<Parrot_freeze_pbc>.
 
@@ -108,7 +109,8 @@ Gets the size of an image if it were created using C<Parrot_freeze_pbc>.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 UINTVAL
-Parrot_freeze_pbc_size(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf))
+Parrot_freeze_pbc_size(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf),
+        ARGOUT(Hash **seen))
 {
     ASSERT_ARGS(Parrot_freeze_pbc_size)
     PMC *pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
@@ -122,6 +124,7 @@ Parrot_freeze_pbc_size(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_Cons
     VTABLE_set_pmc(interp, visitor, pmc);
 
     pmc_result = VTABLE_get_pmc(interp, visitor);
+    *seen      = VTABLE_get_pointer(interp, visitor);
     return VTABLE_get_integer(interp, pmc_result);
 }
 

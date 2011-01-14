@@ -17,6 +17,19 @@ Gets the size of an ImageIO image without the allocation costs.
 
 /* HEADERIZER HFILE: none */
 
+PARROT_INLINE
+static int
+check_seen(PARROT_INTERP, PMC *self, PMC *v)
+{
+    // ASSERT_ARGS(check_seen)
+    Hash       *seen = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOSIZE(self)->seen);
+    HashBucket *b    = Parrot_hash_get_bucket(interp, seen, v);
+    if (b)
+        return 1;
+    else
+        return 0;
+}
+
 pmclass ImageIOSize auto_attrs {
     ATTR PMC                        *seen; /* seen hash */
     ATTR PMC                        *todo; /* todo list */
@@ -224,24 +237,33 @@ hasn't been seen yet, it is also pushed onto the todo list.
 */
 
     VTABLE void push_pmc(PMC *v) {
-        int is_new = 0;
+        if (PMC_IS_NULL(v)
+        ||  check_seen(INTERP, SELF, v))
+            SELF.push_integer(0);
+        else {
+            INTVAL cno, idx;
+            PackFile_ConstTable *ct   = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
+            Hash                *seen = (Hash *)VTABLE_get_pointer(INTERP,
+                                                    PARROT_IMAGEIOSIZE(SELF)->seen);
 
-        if (!PMC_IS_NULL(v)) {
-            Hash * const hash = (Hash *)VTABLE_get_pointer(INTERP, PARROT_IMAGEIOSIZE(SELF)->seen);
-            HashBucket * const b = Parrot_hash_get_bucket(INTERP, hash, v);
-            is_new = !b;
+            if (PObj_flag_TEST(private1, SELF)
+            &&  PackFile_ConstTable_rlookup_pmc(INTERP, ct, v, &cno, &idx)) {
+                SELF.push_integer(0);
+                SELF.push_integer(cno);
+                SELF.push_integer(idx);
+            }
+            else {
+                SELF.push_integer(0);
+                VTABLE_push_integer(INTERP, SELF, v->vtable->base_type);
+                VTABLE_push_pmc(INTERP, PARROT_IMAGEIOSIZE(SELF)->todo, v);
+            }
+
+            Parrot_hash_put(INTERP, seen, v, v);
         }
+    }
 
-        SELF.push_integer(0);
-
-        if (is_new) {
-            Hash * const hash = (Hash *)VTABLE_get_pointer(INTERP, PARROT_IMAGEIOSIZE(SELF)->seen);
-
-            Parrot_hash_put(INTERP, hash, v, v);
-
-            VTABLE_push_integer(INTERP, SELF, v->vtable->base_type);
-            VTABLE_push_pmc(INTERP, PARROT_IMAGEIOSIZE(SELF)->todo, v);
-        }
+    VTABLE void *get_pointer() {
+        return VTABLE_get_pointer(INTERP, PARROT_IMAGEIOSIZE(SELF)->seen);
     }
 
     VTABLE void set_pmc(PMC *p)

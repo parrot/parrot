@@ -30,6 +30,7 @@ Thaws PMCs from packfile images.
 pmclass ImageIOThaw auto_attrs {
     ATTR STRING              *img;
     ATTR opcode_t            *curs;
+    ATTR PMC                 *seen;
     ATTR PMC                 *todo;
     ATTR PackFile            *pf;
     ATTR PackFile_ConstTable *pf_ct;
@@ -45,8 +46,10 @@ Initializes the PMC.
 */
 
     VTABLE void init() {
-        PARROT_IMAGEIOTHAW(SELF)->todo =
+        PARROT_IMAGEIOTHAW(SELF)->seen =
             Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        PARROT_IMAGEIOTHAW(SELF)->todo =
+            Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
 
         PObj_flag_CLEAR(private1, SELF);
 
@@ -82,6 +85,7 @@ Marks the PMC as alive.
 
     VTABLE void mark() {
         Parrot_gc_mark_STRING_alive(INTERP, PARROT_IMAGEIOTHAW(SELF)->img);
+        Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOTHAW(SELF)->seen);
         Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOTHAW(SELF)->todo);
     }
 
@@ -130,11 +134,13 @@ Thaws the PMC contained in C<image>.
         STATICSELF.shift_pmc();
 
         {
+            PMC *seen = PARROT_IMAGEIOTHAW(SELF)->seen;
             PMC *todo = PARROT_IMAGEIOTHAW(SELF)->todo;
             INTVAL i, n;
 
             for (i = 0; i < VTABLE_elements(INTERP, todo); i++) {
-                PMC *current = VTABLE_get_pmc_keyed_int(INTERP, todo, i);
+                INTVAL idx = VTABLE_get_integer_keyed_int(INTERP, todo, i);
+                PMC *current = VTABLE_get_pmc_keyed_int(INTERP, seen, idx);
                 if (PMC_IS_NULL(current))
                     Parrot_ex_throw_from_c_args(interp, NULL,
                             EXCEPTION_MALFORMED_PACKFILE,
@@ -153,7 +159,8 @@ Thaws the PMC contained in C<image>.
                         (char *)PARROT_IMAGEIOTHAW(SELF)->curs);
 
             for (i = 0; i < n; i++) {
-                PMC *current = VTABLE_get_pmc_keyed_int(INTERP, todo, i);
+                INTVAL idx = VTABLE_get_integer_keyed_int(INTERP, todo, i);
+                PMC *current = VTABLE_get_pmc_keyed_int(INTERP, seen, idx);
                 VTABLE_thawfinish(INTERP, current, SELF);
             }
         }
@@ -174,8 +181,10 @@ Get the thawed PMC.
 */
 
     VTABLE PMC *get_pmc() {
-        return VTABLE_get_pmc_keyed_int(INTERP,
-            (PARROT_IMAGEIOTHAW(SELF))->todo, 0);
+        if (PObj_flag_TEST(private1, SELF))
+            return PARROT_IMAGEIOTHAW(SELF)->seen;
+        else
+            return VTABLE_get_pmc_keyed_int(INTERP, (PARROT_IMAGEIOTHAW(SELF))->seen, 0);
     }
 
 
@@ -303,32 +312,45 @@ Retrieve a PMC as the next item from the image.
         const INTVAL   id           = PackID_get_PMCID(n);
         const int      packid_flags = PackID_get_FLAGS(n);
         PMC           *pmc          = PMCNULL;
+        PMC           *seen         = PARROT_IMAGEIOTHAW(SELF)->seen;
         PMC           *todo         = PARROT_IMAGEIOTHAW(SELF)->todo;
 
         switch (packid_flags) {
-            case enum_PackID_seen:
-                if (id) /* got a non-NULL PMC */
-                    pmc = VTABLE_get_pmc_keyed_int(INTERP, todo, id - 1);
+          case enum_PackID_seen:
+            if (id) /* got a non-NULL PMC */
+                pmc = VTABLE_get_pmc_keyed_int(INTERP, seen, id - 1);
+            break;
+          case enum_PackID_pbc_backref:
+            {
+                PackFile_ConstTable *table   = PARROT_IMAGEIOTHAW(SELF)->pf_ct;
+                INTVAL               constno = SELF.shift_integer();
+                INTVAL               idx     = SELF.shift_integer();
+                PMC                 *olist   = table->pmc.constants[constno];
+                pmc                          = VTABLE_get_pmc_keyed_int(INTERP, olist, idx);
+                PARROT_ASSERT(id - 1 == VTABLE_elements(INTERP, seen));
+                VTABLE_set_pmc_keyed_int(INTERP, seen, id - 1, pmc);
                 break;
-            case enum_PackID_normal:
-                {
-                    const INTVAL type = SELF.shift_integer();
+            }
+          case enum_PackID_normal:
+            {
+                const INTVAL type = SELF.shift_integer();
 
-                    PARROT_ASSERT(id - 1 == VTABLE_elements(INTERP, todo));
+                PARROT_ASSERT(id - 1 == VTABLE_elements(INTERP, seen));
 
-                    if (type <= 0 || type > INTERP->n_vtable_max)
-                        Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                                "Unknown PMC type to thaw %d", type);
+                if (type <= 0 || type > INTERP->n_vtable_max)
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                            "Unknown PMC type to thaw %d", type);
 
-                    pmc = Parrot_pmc_new_noinit(INTERP, type);
+                pmc = Parrot_pmc_new_noinit(INTERP, type);
 
-                    VTABLE_set_pmc_keyed_int(INTERP, todo, id - 1, pmc);
-                }
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                        "Unknown PMC id args thaw %d", packid_flags);
-                break;
+                VTABLE_set_pmc_keyed_int(INTERP, seen, id - 1, pmc);
+                VTABLE_push_integer(INTERP, todo, id - 1);
+            }
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                    "Unknown PMC id args thaw %d", packid_flags);
+            break;
         }
 
         return pmc;
