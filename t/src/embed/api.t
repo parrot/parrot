@@ -7,6 +7,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 use File::Spec::Functions;
+use Parrot::Test::Util 'create_tempfile';
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
@@ -128,6 +129,43 @@ CODE
 True
 Done
 OUTPUT
+
+my (undef, $temp_pir)  = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
+my (undef, $temp_pbc)  = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
+open PIR_FILE, $temp_pir, ">";
+print PIR_FILE <<'PIR_CODE';
+.sub main :mainargv
+    say "executed"
+.end
+PIR_CODE
+
+c_output_is( <<"CODE", << 'OUTPUT', "Parrot_api_serialize_bytecode_pmc" );
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/api.h"
+
+void fail(const char *msg);
+
+void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+int main(void) {
+    Parrot_PMC interp;
+    Parrot_PMC bytecode
+    Parrot_Int run_pbc;
+    Parrot_String pbc;
+
+    const char *argv[] = {"$temp_pir"};
+    Parrot_api_make_interpreter(NULL, 0, initargs, &inter);
+
+    Parrot_api_wrap_imcc_hack(interp, sourcefile, 1, argv, &bytecode, &run_pbc, imcc_run_api);
+    Parrot_api_serialize_bytecode_pmc(interp, bytecode, &pbc);
+    // TODO: Write out to a file
+}
 
 # Local Variables:
 #   mode: cperl
