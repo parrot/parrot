@@ -39,7 +39,6 @@
 #define PIO_NR_OPEN 256         /* Size of an "IO handle table" */
 
 /* These macros will be removed */
-#define PIO_INIT(interp) Parrot_io_init((interp))
 #define PIO_STDHANDLE(interp, fileno) Parrot_io_std_os_handle((interp), (fileno))
 #define PIO_OPEN(interp, file, flags) \
     Parrot_io_open((interp), (file), (flags))
