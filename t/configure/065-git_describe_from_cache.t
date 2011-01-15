@@ -17,12 +17,26 @@ use Cwd;
 use File::Copy;
 use File::Path ();
 use File::Temp qw| tempdir |;
-use lib qw( lib );
+use lib ( './lib' );
 
 my $cwd = cwd();
 {
     my $git_describe = "RELEASE_1_0_0-3-g35e41";
-    my ($cache, $libdir) = setup_cache($git_describe, $cwd);
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, "Changed to temporary directory for testing" );
+    my $libdir = qq{$tdir/lib};
+    diag("using $libdir");
+    ok( (File::Path::mkpath( [ $libdir ], 0, 0777 )), "Able to make libdir");
+    local @INC;
+    unshift @INC, $libdir;
+    ok( (File::Path::mkpath( [ qq{$libdir/Parrot/Git} ], 0, 0777 )), "Able to make Parrot dir");
+    ok( (copy qq{$cwd/lib/Parrot/Git/Describe.pm},
+            qq{$libdir/Parrot/Git/Describe.pm}), "Able to copy Parrot::Git::Describe");
+    my $cache = q{.parrot_current_git_describe};
+    open my $FH, ">", $cache
+        or croak "Unable to open $cache for writing";
+    print $FH qq{$git_describe\n};
+    close $FH or croak "Unable to close $cache after writing";
 
     require Parrot::Git::Describe;
     no warnings 'once';
@@ -33,28 +47,6 @@ my $cwd = cwd();
 }
 
 pass("Completed all tests in $0");
-
-##### SUBROUTINES #####
-
-sub setup_cache {
-    my ($git_describe, $cwd) = @_;
-    my $tdir = tempdir( CLEANUP => 1 );
-    ok( chdir $tdir, "Changed to temporary directory for testing" );
-    my $libdir = qq{$tdir/lib};
-    diag("using $libdir");
-    ok( (File::Path::mkpath( [ $libdir ], 0, 0777 )), "Able to make libdir");
-    local @INC;
-    unshift @INC, $libdir;
-    ok( (File::Path::mkpath( [ qq{$libdir/Parrot/Git} ], 0, 0777 )), "Able to make Parrot dir");
-    ok( (copy qq{$cwd/lib/Parrot/Git/Describe.pm},
-            qq{$libdir/Parrot}), "Able to copy Parrot::Git::Describe");
-    my $cache = q{.parrot_current_git_describe};
-    open my $FH, ">", $cache
-        or croak "Unable to open $cache for writing";
-    print $FH qq{$git_describe\n};
-    close $FH or croak "Unable to close $cache after writing";
-    return ($cache, $libdir);
-}
 
 ################### DOCUMENTATION ###################
 
