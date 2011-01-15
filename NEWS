@@ -3,6 +3,7 @@ New in 3.0.0
  + Added a new embedding API in "parrot/api.h"
  + Removed autovivification behavior from ResizablePMCArray
  + Packfile manipulation functions now throw exceptions on error instead of printing error details directly to stderr
+ + Improved Unicode support for file IO
  + Test coverage for several PMC types has been significantly increased
  + Test coverage for several internal subsystems has been increased
 
