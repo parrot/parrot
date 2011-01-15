@@ -83,7 +83,6 @@ B   ... Processor is big endian
 4   ... opcode_t is 4 byte, --m=32 on a 64 bit machine
 
 CGoto ... CGoto runloop is supported
-JIT   ... JIT core is supported
 EXEC  ... compiling to native executables is supported
 Thr   ... Parrot is multi-threaded
 Sig   ... Parrot catches a SIGHUP signal
