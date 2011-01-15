@@ -462,7 +462,8 @@ t_class_meth:
     is(test_val, 1, 'inspect() "attributes" param returns correctly sized value')
 
     result = class.'inspect'('id')
-    is(result, '101', 'inspect() "id" returns expected default value')
+    $I0 = class
+    is(result, $I0, 'inspect() "id" returns expected default value')
 
     result = class.'inspect'('attrib_index')
     $I0 = isnull result
