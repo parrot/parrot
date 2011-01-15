@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 # 063-git_describe_to_cache.t
 
 use strict;
@@ -61,11 +61,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-062-git_describe_to_cache.t - test caching in Parrot::Git::Describe
+063-git_describe_to_cache.t - test caching in Parrot::Git::Describe
 
 =head1 SYNOPSIS
 
-    % prove t/configure/063-sha1_to_cache.t
+    % prove t/configure/063-git_describe_to_cache.t
 
 =head1 DESCRIPTION
 

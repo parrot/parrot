@@ -79,7 +79,6 @@ int main(void)
     Parrot_Interp interp;
     Parrot_PMC pmc, pmc2, pmc3;
     Parrot_Int type, value, integer;
-    Parrot_String string;
     Parrot_Float number;
 
     interp = new_interp();
@@ -88,7 +87,6 @@ int main(void)
     pmc    = Parrot_PMC_new(interp, type);
     pmc2   = Parrot_PMC_new(interp, type);
     pmc3   = Parrot_PMC_new(interp, type);
-    string = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
 
 $code
 
@@ -322,7 +320,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_add_float" );
 
     Parrot_PMC_i_add_float(interp, pmc, number);
     number = Parrot_PMC_get_number(interp, pmc);
-    Parrot_io_printf(interp,"%.2f\n", number);
+    Parrot_printf(interp,"%.2f\n", number);
 CODE
 1.00
 Done!
@@ -334,7 +332,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_add_int" );
 
     pmc3 = Parrot_PMC_add_int(interp, pmc, integer, pmc3);
     integer = Parrot_PMC_get_integer(interp, pmc3);
-    Parrot_io_printf(interp,"%d\n", integer);
+    Parrot_printf(interp,"%d\n", integer);
 CODE
 1
 Done!
@@ -685,13 +683,13 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal" );
     Parrot_PMC_set_integer_native(interp, pmc, -42);
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
 
-    pmc3 = Parrot_PMC_is_equal(interp, pmc, pmc2);
-    printf("%d\n", (int) pmc3);
+    integer = Parrot_PMC_is_equal(interp, pmc, pmc2);
+    printf("%d\n", (int) integer);
 
     Parrot_PMC_set_integer_native(interp, pmc2, -42);
 
-    pmc3 = Parrot_PMC_is_equal(interp, pmc, pmc2);
-    printf("%d\n", (int) pmc3);
+    integer = Parrot_PMC_is_equal(interp, pmc, pmc2);
+    printf("%d\n", (int) integer);
 CODE
 0
 1
@@ -704,9 +702,9 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_subtract" );
     Parrot_PMC_set_integer_native(interp, pmc2, 10);
 
     pmc3 = Parrot_PMC_subtract(interp, pmc, pmc2, pmc3);
-    Parrot_io_printf(interp, "%P\n", pmc3);
+    Parrot_printf(interp, "%P\n", pmc3);
     pmc3 = Parrot_PMC_subtract(interp, pmc2, pmc, pmc3);
-    Parrot_io_printf(interp, "%P\n", pmc3);
+    Parrot_printf(interp, "%P\n", pmc3);
 
 CODE
 42
@@ -720,7 +718,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_subtract" );
     Parrot_PMC_set_integer_native(interp, pmc2, 10);
 
     Parrot_PMC_i_subtract(interp, pmc, pmc2);
-    Parrot_io_printf(interp, "%P\n", pmc);
+    Parrot_printf(interp, "%P\n", pmc);
 
 CODE
 42
@@ -733,7 +731,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_subtract_int" );
     integer = 10;
 
     pmc3 = Parrot_PMC_subtract_int(interp, pmc, integer, pmc3);
-    Parrot_io_printf(interp, "%P\n", pmc3);
+    Parrot_printf(interp, "%P\n", pmc3);
 
 CODE
 42
@@ -746,7 +744,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_subtract_float" );
     number = 10.0;
 
     pmc3 = Parrot_PMC_subtract_float(interp, pmc, number, pmc3);
-    Parrot_io_printf(interp, "%P\n", pmc3);
+    Parrot_printf(interp, "%P\n", pmc3);
 
 CODE
 42
@@ -759,7 +757,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_subtract_int" );
     integer = 10;
 
     Parrot_PMC_i_subtract_int(interp, pmc, integer);
-    Parrot_io_printf(interp, "%P\n", pmc);
+    Parrot_printf(interp, "%P\n", pmc);
 
 CODE
 42
@@ -772,7 +770,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_subtract_float" );
     number = 10.0;
 
     Parrot_PMC_i_subtract_float(interp, pmc, number);
-    Parrot_io_printf(interp, "%P\n", pmc);
+    Parrot_printf(interp, "%P\n", pmc);
 
 CODE
 42
@@ -784,19 +782,19 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_cmp" );
     Parrot_PMC_set_integer_native(interp, pmc, 42);
     Parrot_PMC_set_integer_native(interp, pmc2, 17);
 
-    pmc3 = Parrot_PMC_cmp(interp, pmc, pmc2);
-    Parrot_io_printf(interp,"%d\n", pmc3 );
+    integer = Parrot_PMC_cmp(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", (int) integer);
 
     Parrot_PMC_set_integer_native(interp, pmc, 17);
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
 
-    pmc3 = Parrot_PMC_cmp(interp, pmc, pmc2);
-    Parrot_io_printf(interp,"%d\n", pmc3 );
+    integer = Parrot_PMC_cmp(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", (int) integer);
 
     Parrot_PMC_set_integer_native(interp, pmc, 42);
 
-    pmc3 = Parrot_PMC_cmp(interp, pmc, pmc2);
-    Parrot_io_printf(interp,"%d\n", pmc3 );
+    integer = Parrot_PMC_cmp(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", (int) integer);
 CODE
 1
 -1
