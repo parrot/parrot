@@ -76,7 +76,7 @@ static struct longopt_opt_decl options[] = {
     { 'D', 'D', OPTION_required_FLAG, { "--debug" } },
 #endif
     { 'o', 'o', OPTION_required_FLAG, { "--output" } },
-    {  0 ,  0,  0,                    { NULL } }
+    {  0 ,  0,  OPTION_optional_FLAG, { NULL } }
 };
 
 /*
