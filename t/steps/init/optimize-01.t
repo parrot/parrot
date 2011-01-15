@@ -3,7 +3,7 @@
 # init/optimize-01.t
 use strict;
 use warnings;
-use Test::More tests => 28;
+use Test::More tests => 34;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::optimize');
@@ -68,16 +68,37 @@ $step = test_step_constructor_and_description($conf);
 
 $conf->replenish($serialized);
 
-########## --optimize=O2  ##########
+########## --optimize  ##########
 
+# 'bare' --optimize should mean: default to what Perl 5 uses (typically, -O2),
+# but perhaps with some manipulation due to GCC variations
 ($args, $step_list_ref) = process_options( {
-    argv => [q{--optimize=O2}],
+    argv => [q{--optimize}],
     mode => q{configure},
 } );
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
 $ret = $step->runstep($conf);
 ok( defined $ret, "runstep() returned defined value" );
+my $perl5_setting = $conf->data->get('optimize_provisional');
+like( $conf->data->get('optimize'),
+   qr/$perl5_setting/,
+   "Simple '--optimize' defaulted to Perl 5 optimization level" );
+
+$conf->replenish($serialized);
+
+########## --optimize=O2  ##########
+
+($args, $step_list_ref) = process_options( {
+    argv => [q{--optimize=-O3}],
+    mode => q{configure},
+} );
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+$ret = $step->runstep($conf);
+ok( defined $ret, "runstep() returned defined value" );
+is( $conf->data->get('optimize'), '-O3',
+   "Got optimization level explicitly requested" );
 
 $conf->replenish($serialized);
 

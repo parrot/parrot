@@ -35,35 +35,34 @@ sub runstep {
 
     # A plain --optimize means use perl5's $Config{optimize}.  If an argument
     # is given, however, use that instead.
-    my $request_optimize = $conf->options->get('optimize');
+    my $request_optimize = $conf->options->get('optimize') || '';
 
-    if (! defined $request_optimize) {
+    if (! $request_optimize) {
         $self->set_result('no');
         $conf->debug("(none requested) ");
         return 1;
     }
 
-    $self->set_result('yes');
-    my $gccversion = $conf->data->get( 'gccversion' );
-
-    my $options;
-    if ( $request_optimize ) {
+    my $optimization_level;
+    if ( $request_optimize eq '1' ) {
+        # i.e., if command-line has '--optimize',
         # start with perl5's flags ...
-        $options = $conf->data->get('optimize_provisional');
+        $optimization_level = $conf->data->get('optimize_provisional');
 
         # ... but gcc 4.1 doesn't like -mcpu=xx, i.e. it's deprecated
+        my $gccversion = $conf->data->get( 'gccversion' );
         if ( defined $gccversion and $gccversion > 3.3 ) {
-            $options =~ s/-mcpu=/-march=/;
+            $optimization_level =~ s/-mcpu=/-march=/;
         }
     }
     else {
-        # use the command line verbatim
-        $options = $request_optimize;
+        # Otherwise, use the command-line verbatim, e.g. '--optimize=O3'
+        $optimization_level = $request_optimize;
     }
 
     # save the options, however we got them.
-    $conf->data->set( optimize => $options );
-    $conf->debug("optimize options: ", $options, "\n");
+    $conf->data->set( optimize => $optimization_level );
+    $conf->debug("optimize options: ", $optimization_level, "\n");
 
     # disable debug flags.
     $conf->data->set( cc_debug => '' );
@@ -73,6 +72,7 @@ sub runstep {
     if ($conf->data->get('cpuarch') eq 'amd64') {
         $conf->data->set('optimize::src/gc/system.c','');
     }
+    $self->set_result('yes');
 
     return 1;
 }
