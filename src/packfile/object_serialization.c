@@ -124,7 +124,7 @@ Parrot_freeze_pbc_size(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_Cons
     VTABLE_set_pmc(interp, visitor, pmc);
 
     pmc_result = VTABLE_get_pmc(interp, visitor);
-    *seen      = VTABLE_get_pointer(interp, visitor);
+    *seen      = (Hash *)VTABLE_get_pointer(interp, visitor);
     return VTABLE_get_integer(interp, pmc_result);
 }
 
