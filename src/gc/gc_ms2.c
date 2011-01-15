@@ -113,7 +113,7 @@ static void* gc_ms2_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static PMC* gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
+static PMC* gc_ms2_allocate_pmc_header(PARROT_INTERP, SHIM(UINTVAL flags))
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
@@ -684,11 +684,11 @@ gc_ms2_finalize(PARROT_INTERP)
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static PMC*
-gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
+gc_ms2_allocate_pmc_header(PARROT_INTERP, SHIM(UINTVAL flags))
 {
     ASSERT_ARGS(gc_ms2_allocate_pmc_header)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    Pool_Allocator   *pool = self->pmc_allocator;
+    MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    Pool_Allocator   * const pool = self->pmc_allocator;
     pmc_alloc_struct *ptr;
 
     MAYBE_MARK_AND_SWEEP(interp, self);
