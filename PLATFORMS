@@ -12,6 +12,7 @@ Supported platforms:
 Platform                     B8  Runloops   Feature Comp Test Inst YYYYMMDD
                                 CGoto EXEC   Thr Sig
 --------------------------------------------------------------------------------
+linux-sparc64-gcc-4.3.2      ?                       Y    Y        20110114
 cygwin1.5.25-x86-gcc3.4.4     4   Y    -     -   -   Y    Y     Y  20090315
 darwin8.11.1-x86-gcc4.0.1    ??   Y    ?     ?   ?   Y    Y     N  20091020
 linux-x86-gcc4.1.2                Y    ?     Y   Y   Y    Y     ?  20090419
