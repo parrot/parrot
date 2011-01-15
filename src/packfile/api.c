@@ -3522,8 +3522,9 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
         ARGIN(const opcode_t *cursor))
 {
     ASSERT_ARGS(PackFile_ConstTable_unpack)
-    PackFile_ConstTable * const self = (PackFile_ConstTable *)seg;
-    PackFile            * const pf   = seg->pf;
+    STRING              * const sub_str = CONST_STRING(interp, "Sub");
+    PackFile_ConstTable * const self    = (PackFile_ConstTable *)seg;
+    PackFile            * const pf      = seg->pf;
     opcode_t                    i;
 
     PackFile_ConstTable_clear(interp, self);
@@ -3565,13 +3566,12 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
     for (i = 0; i < self->pmc.const_count; i++) {
         /* XXX unpack returned the lists of all objects in the object graph
          * must dereference the first object into the constant slot */
-        PMC             *pmc  = self->pmc.constants[i]
+        PMC      * const pmc  = self->pmc.constants[i]
                               = VTABLE_get_pmc_keyed_int(interp, self->pmc.constants[i], 0);
-        STRING          *_sub = CONST_STRING(interp, "Sub");
 
         /* magically place subs into namespace stashes
          * XXX make this explicit with :load subs in PBC */
-        if (VTABLE_isa(interp, pmc, _sub))
+        if (VTABLE_isa(interp, pmc, sub_str))
             Parrot_ns_store_sub(interp, pmc);
     }
 
