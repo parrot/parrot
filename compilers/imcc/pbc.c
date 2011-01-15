@@ -1038,13 +1038,13 @@ add_const_str(PARROT_INTERP, ARGIN(STRING *s))
 
         /* initialize rlookup cache */
         if (!ct->string_hash)
-            ct->string_hash = parrot_create_hash(interp,
+            ct->string_hash = Parrot_hash_create(interp,
                     enum_type_INTVAL,
                     Hash_key_type_STRING_enc);
 
         ct->str.constants[ct->str.const_count] = s;
 
-        parrot_hash_put(interp, ct->string_hash, s,
+        Parrot_hash_put(interp, ct->string_hash, s,
             (void *)ct->str.const_count);
 
         return ct->str.const_count++;
@@ -1529,6 +1529,14 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
                     sub->lex_info  ? "yes" : "no",
                     sub->outer_sub ? outer_sub->name
                                    : Parrot_str_new(interp, "*none*", 0));
+        }
+
+        if (r->pcc_sub->pragma & P_MAIN && !IMCC_INFO(interp)->seen_main) {
+            IMCC_INFO(interp)->seen_main = 1;
+            interp->code->main_sub = k;
+        }
+        else if (interp->code->main_sub < 0) {
+            interp->code->main_sub = k;
         }
 
         return k;

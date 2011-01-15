@@ -23,29 +23,31 @@ Test both success and failure exit status.
 =cut
 
 pir_exit_code_is( <<'CODE', 0, 'pir exit with success' );
-.sub main
+.sub main :main
     exit 0
 .end
 CODE
 
 pir_exit_code_is( <<'CODE', 1, 'pir exit with failure' );
-.sub main
+.sub main :main
     exit 1
 .end
 CODE
 
 pasm_exit_code_is( <<'CODE', 1, 'pasm exit with failure' );
+.pcc_sub :main main:
     exit 1
 CODE
 
 pasm_exit_code_is( <<'CODE', 0, 'pasm exit without failure' );
+.pcc_sub :main main:
     exit 0
 CODE
 
 # If you know of a better place to put these tests, please put them there
 
 pir_exit_code_is( <<'CODE', 0, 'pir exits with success by default' );
-.sub main
+.sub main :main
     $S0 = "cheese"
 .end
 CODE
@@ -59,7 +61,7 @@ CODE
 }
 
 pir_exit_code_is( <<'CODE', 2, "pir exit code isn't exception type" );
-.sub main
+.sub main :main
     $P0 = new ['ExceptionHandler']
     set_label $P0, catcher
     $P0.'handle_types'(2)

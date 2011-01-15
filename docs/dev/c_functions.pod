@@ -212,7 +212,7 @@ without wanting to know its value.
     PARROT_EXPORT
     PARROT_PURE_FUNCTION
     INTVAL
-    parrot_hash_size(SHIM_INTERP, NOTNULL(const Hash *hash))
+    Parrot_hash_size(SHIM_INTERP, NOTNULL(const Hash *hash))
     {
         return hash->entries;
     }

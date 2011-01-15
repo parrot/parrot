@@ -70,7 +70,7 @@ Returns the number of newlines (C<\n>) in C<$string>.
 =cut
 
 sub count_newlines {
-    return scalar $_[0] =~ tr/\n//;
+    return $_[0] =~ tr/\n//;
 }
 
 =item C<dont_edit($pmcfile)>

@@ -127,6 +127,20 @@ from it do not change.
 
 L<https://trac.parrot.org/parrot/ticket/1754>
 
+=item "Advanced" NCI parameter types [eligible in 3.1]
+
+Many NCI parameter types that implement complex functionalities will be removed.
+See ticket for list and replacement suggestions.
+
+L<http://trac.parrot.org/parrot/ticket/1931>
+
+=item FixedPMCArray set_pmc vtable [eligible in 3.1]
+
+set_pmc on FPA will be removed. The assign op, which uses this vtable will cease
+to work on this type.
+
+L<http://trac.parrot.org/parrot/ticket/1904>
+
 =back
 
 =head1 Opcodes
@@ -201,17 +215,24 @@ These will be changed to allow more flexibility in types.
 
 L<https://trac.parrot.org/parrot/ticket/1565>
 
-=item finalize [experimental]
-
-Finalize exception handler, unrolling inner runloops if needed.
-
-L<https://trac.parrot.org/parrot/ticket/1635>
-
 =item logical PMC ops [eligible in 2.7]
 
 These fall out from the logical vtables deprecation.
 
 L<https://trac.parrot.org/parrot/ticket/1655>
+
+=item "constant" PObj [eligible in 3.1]
+
+"constant" PObj (which is never collected) are deprecated. All PMCs and STRINGs
+should be properly marked during GC.
+
+Functions C<Parrot_pmc_new_constant>, C<Parrot_pmc_new_constant_noinit>,
+C<Parrot_pmc_new_constant_init> and C<Parrot_pmc_new_constant_init_int>
+will be removed.
+
+PObj flag C<PObj_constant_FLAG> and related macros will be removed.
+
+L<https://trac.parrot.org/parrot/ticket/1875>
 
 =back
 
@@ -230,6 +251,13 @@ L<https://trac.parrot.org/parrot/ticket/451>
 =item PMC numbering [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/451>
+
+=item X-to-Y native PBC reading [eligible in 3.1]
+
+Support for PBC files optimized for alternate platforms will be dropped in
+favour of a universal network PBC format.
+
+L<https://trac.parrot.org/parrot/ticket/1961>
 
 =back
 
@@ -353,9 +381,31 @@ The old string_* functions will be removed.
 
 L<http://trac.parrot.org/parrot/ticket/1809>
 
+=item Old embedding API in src/embed.c
+
+Functions in src/embed.c are deprecated. Functions in that file will
+either be deleted outright if they are superfluous, or will be moved and
+renamed in a way that is more appropriate. The file src/embed.c and
+include/parrot/embed.h will both be deleted eventually.
+
+L<http://trac.parrot.org/parrot/ticket/1910>
+
 =back
 
 =head1 Compiler tools
+
+=head2 IMCC
+
+=over 4
+
+=item PIR compiler availability [eligible in 3.1]
+
+The PIR compiler (currently IMCC) will be extracted to a separately loadable
+component.
+
+L<http://trac.parrot.org/parrot/ticket/1868>
+
+=back
 
 =head2 Parrot Grammar Engine (PGE)
 

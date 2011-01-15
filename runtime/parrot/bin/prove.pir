@@ -14,13 +14,13 @@ came out. It is mostly equivalent to 'prove' from Perl 5.
 
 =head1 SYNOPSIS
 
-  ./parrot-prove t/*.t
+  parrot-prove t/*.t
 
 =head2 OPTIONS
 
 Usage:
 
-  tapir [OPTIONS] <files>
+  parrot-prove [OPTIONS] <files>
 
 =head3 Boolean options
 

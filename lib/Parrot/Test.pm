@@ -284,12 +284,14 @@ use IO::File ();
 use lib qw( lib );
 use Parrot::BuildUtil ();
 use Parrot::Config;
+use Parrot::Test::Util 'create_tempfile';
 
 require Exporter;
 require Test::Builder;
 require Test::More;
 
-our @EXPORT = qw( plan run_command skip slurp_file pbc_postprocess_output_like );
+our @EXPORT = qw( plan run_command skip slurp_file pbc_postprocess_output_like
+                  pir_stdin_output_is pir_stdin_output_like );
 
 use base qw( Exporter );
 
@@ -570,6 +572,68 @@ sub pbc_postprocess_output_like {
         Test::More::like( $output, $check, $diag );
     }
 
+}
+
+sub _pir_stdin_output_slurp {
+    my ($input_string, $code, $expected_ouptut) = @_;
+
+    my $stuff = sub {
+        # Put the string on a file.
+        my $string = shift;
+
+        my (undef, $file) = create_tempfile(UNLINK => 1);
+        open(my $out, '>', $file) or die "bug";
+        binmode $out;
+        print $out $string;
+        return $file;
+    };
+
+    # Write the input and code strings.
+    my $input_file = $stuff->($input_string);
+    my $code_file = $stuff->($code);
+
+    my $parrot = ".$PConfig{slash}parrot$PConfig{exe}";
+    # Slurp and compare the output.
+    my $result = do {
+        local $/;
+        open(my $in, '-|', "$parrot $code_file 2>&1 < $input_file")
+            or die "bug";
+        <$in>;
+    };
+
+    return $result;
+}
+
+=over
+
+=item C<pir_stdin_output_is($input_string, $code, $expected, $description)>
+
+Runs the PIR code while piping data into its standard input and passes the test
+if a string comparison of output with the expected result is true.
+
+=cut
+
+sub pir_stdin_output_is {
+    my ($input_string, $code, $expected_output, $description) = @_;
+
+    my $result = _pir_stdin_output_slurp($input_string, $code, $expected_output);
+    Test::More::is($result, $expected_output, $description);
+}
+
+=item C<pir_stdin_output_like($input_string, $code, $expected, $description)>
+
+Runs the PIR code while piping data into its standard input and passes the test
+if the output matches the expected result.
+
+=back
+
+=cut
+
+sub pir_stdin_output_like {
+    my ($input_string, $code, $expected_output, $description) = @_;
+
+    my $result = _pir_stdin_output_slurp($input_string, $code, $expected_output);
+    Test::More::like($result, $expected_output, $description);
 }
 
 # The following methods are private.  They should not be used by modules

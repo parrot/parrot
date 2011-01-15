@@ -670,22 +670,11 @@ Multiply C<value> with C<SELF> inplace.
 
 */
 
-    MULTI void i_multiply(Integer value) {
-        STATICSELF.i_multiply_int(VTABLE_get_integer(INTERP, value));
-    }
 
-
-    MULTI void i_multiply(BigInt value) {
-        INTERP->vtables[enum_class_BigInt]->multiply_int(INTERP, value, SELF.get_integer(), SELF);
-    }
-
-
-    MULTI void i_multiply(Complex value) {
-        VTABLE_multiply(INTERP, value, SELF, SELF);
-    }
-
-
-    MULTI void i_multiply(DEFAULT value) {
+    VTABLE void i_multiply(PMC * value) {
+        /*
+        VTABLE_i_multiply_int(INTERP, SELF, VTABLE_get_integer(INTERP, value));
+        */
         VTABLE_set_number_native(INTERP, SELF,
                 SELF.get_integer() * VTABLE_get_number(INTERP, value));
     }

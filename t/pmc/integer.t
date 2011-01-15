@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ Tests the Integer PMC.
 
     get_max_min()
 
-    plan(143)
+    plan(142)
     test_init()
     test_basic_math()
     test_truthiness_and_definedness()
@@ -141,7 +141,7 @@ CODE
 
 .sub test_get_as_base_bounds_check
     throws_substring(<<'CODE', 'get_as_base: base out of bounds', 'get_as_base lower bound check')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 42
         $S0 = $P0.'get_as_base'(1)
@@ -149,7 +149,7 @@ CODE
     .end
 CODE
     throws_substring(<<'CODE', 'get_as_base: base out of bounds', 'get_as_base upper bound check')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 42
         $S0 = $P0.'get_as_base'(37)
@@ -185,7 +185,7 @@ CODE
 
     throws_substring(<<'CODE', 'Integer overflow', 'mul integer overflow')
 
-    .sub main
+    .sub main :main
         .include 'errors.pasm'
         errorson .PARROT_ERRORS_OVERFLOW_FLAG
         .include 'sysinfo.pasm'
@@ -594,16 +594,6 @@ fin:
     is($P0, 24, 'i_multiply Integer PMC by Integer PMC')
 
     $P0 = new ['Integer']
-    $P1 = new ['Complex']
-    $P2 = new ['Complex']
-    $P0 = 2
-    $P1 = "2+4i"
-    $P2 = "4+8i"
-    mul $P0, $P1
-    $I0 = iseq $P0, $P2
-    todo($I0, 'i_multiply Integer PMC by Complex PMC', 'unresolved bug, see TT #1887')
-
-    $P0 = new ['Integer']
     $P1 = new ['Float']
     $P0 = 2
     $P1 = 3.5
@@ -625,7 +615,7 @@ fin:
     $P2 = 48
     mul $P0, $P1
     $I0 = iseq $P0, $P2
-    todo($I0, 'i_multiply Integer PMC by BigInt PMC', 'unresolved bug, see TT #1887')
+    ok($I0, 'i_multiply Integer PMC by BigInt PMC')
 
     $P0 = new ['Integer']
     $P9 = get_hll_global MAXINT
@@ -684,7 +674,7 @@ fin:
 
 .sub test_div
     throws_substring(<<'CODE', 'float division by zero', 'divide by 0 (Float PMC)')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P1 = new ['Float']
         $P0 = 50
@@ -702,7 +692,7 @@ CODE
     is($P0, 100, 'i_divide DEFAULT multi')
 
     throws_substring(<<'CODE', 'float division by zero', 'i_divide by 0 (Float PMC)')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P1 = new ['Float']
         $P0 = 50
@@ -713,7 +703,7 @@ CODE
 CODE
 
     throws_substring(<<'CODE', 'float division by zero', 'floor_divide by 0 (Float PMC)')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P1 = new ['Float']
         $P0 = 50
@@ -724,7 +714,7 @@ CODE
 CODE
 
     throws_substring(<<'CODE', 'float division by zero', 'floor_divide by 0 (FLOATVAL)')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 50
         $P0 = fdiv $P0, 0.0
@@ -738,7 +728,7 @@ CODE
     is($P0, 3, 'floor_divide INTVAL')
 
     throws_substring(<<'CODE', 'float division by zero', 'floor_divide by 0 (INTVAL)')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 50
         $P0 = fdiv $P0, 0
@@ -754,7 +744,7 @@ CODE
     is($P0, 8, 'i_floor_divide DEFAULT multi')
 
     throws_substring(<<'CODE', 'float division by zero', 'i_floor_divide by 0 (DEFAULT)')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P1 = new ['Float']
         $P0 = 50
@@ -769,7 +759,7 @@ CODE
     is($P0, 2, 'i_floor_divide INTVAL multi')
 
     throws_substring(<<'CODE', 'float division by zero', 'i_floor_divide by 0 INTVAL multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 50
         fdiv $P0, 0
@@ -782,7 +772,7 @@ CODE
     is($P0, 8, 'i_floor_divide FLOATVAL multi')
 
     throws_substring(<<'CODE', 'float division by zero', 'i_floor_divide by 0 FLOATVAL multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 50
         fdiv $P0, 0.0
@@ -834,7 +824,7 @@ CODE
 
 .sub test_mod
     throws_substring(<<'CODE', 'int modulus by zero', 'modulus by 0 DEFAULT multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P1 = new ['Float']
         $P0 = 7
@@ -850,7 +840,7 @@ CODE
     is($P0, 3, 'modulus INTVAL multi')
 
     throws_substring(<<'CODE', 'int modulus by zero', 'modulus by 0 INTVAL multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 7
         $P0 = mod $P0, 0
@@ -858,7 +848,7 @@ CODE
     .end
 CODE
     throws_substring(<<'CODE', 'int modulus by zero', 'modulus by 0 FLOATVAL multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 7
         $P0 = mod $P0, 0.0
@@ -874,7 +864,7 @@ CODE
     is($P0, 2, 'i_modulus DEFAULT multi')
 
     throws_substring(<<'CODE', 'int modulus by zero', 'i_modulus by 0 DEFAULT multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P1 = new ['Float']
         $P0 = 7
@@ -893,7 +883,7 @@ CODE
     is($P0, 1, 'i_modulus FLOATVAL multi')
 
     throws_substring(<<'CODE', 'int modulus by zero', 'i_modulus by 0 INTVAL multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 7
         mod $P0, 0
@@ -901,7 +891,7 @@ CODE
     .end
 CODE
     throws_substring(<<'CODE', 'int modulus by zero', 'i_modulus by 0 FLOATVAL multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 7
         mod $P0, 0.0

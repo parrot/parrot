@@ -39,6 +39,7 @@ else {
 }
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "interp identity" );
+.pcc_sub :main main:
     getinterp P2
     clone P3, P2
     ne P3, P2, ok1
@@ -103,7 +104,7 @@ loop:
     if $I0 < 2 goto loop
 .end
 
-.sub main
+.sub main :main
     .local pmc threadfunc
     .local pmc thread
     $I5 = 10
@@ -221,7 +222,7 @@ OUTPUT
 
 
 pir_output_is( <<'CODE', <<'OUTPUT', "join, get retval" );
-.sub _main
+.sub _main :main :main
     .const int MAX = 1000
     .local pmc kid
     .local pmc Adder

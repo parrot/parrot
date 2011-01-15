@@ -36,7 +36,7 @@ CODE
     .sub main
         $P0 = box "core_ops"
         $P1 = new ['OpLib'], $P0
-        $P2 = $P1['set']
+        $P2 = $P1['say_sc']
         set $P2, 4
     .end
 CODE
@@ -46,7 +46,7 @@ CODE
     .local pmc lib, op
     $P0 = box "core_ops"
     lib = new ['OpLib'], $P0
-    op = lib['set']
+    op = lib['set_p_i']
 
     set $I0, op[0]
     set $I1, op[100]
@@ -59,7 +59,7 @@ CODE
     .local pmc lib, op
     $P0 = box "core_ops"
     lib = new ['OpLib'], $P0
-    op = lib['set']
+    op = lib['set_p_i']
 
     $S0 = op.'family_name'()
     is($S0, 'set', 'get family_name()')
@@ -67,7 +67,7 @@ CODE
     $S0 = op.'jump'()
     is($S0, '0', 'get jump() for non jump opcode')
 
-    op = lib['branch']
+    op = lib['branch_i']
     $S0 = op.'jump'()
     is($S0, '1', 'get jump() for jump-type opcode')
 
@@ -80,7 +80,7 @@ CODE
     $I0 = elements $P0
     is($I0, 0, 'labels list for opcode with no arguments is empty')
 
-    op = lib['elements']
+    op = lib['elements_i_p']
     $P0 = op.'dirs'()
     $I0 = elements $P0
     is($I0, 2, 'dirs list for opcode with 1 arguments has 2 elements (1 in 1 retval)')

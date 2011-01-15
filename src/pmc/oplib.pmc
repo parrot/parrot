@@ -64,8 +64,6 @@ pmclass OpLib auto_attrs {
 
         GET_ATTR_oplib(INTERP, SELF, oplib);
         num  = oplib->_op_code(INTERP, cstr, 1);
-        if (num == -1)
-            num = oplib->_op_code(INTERP, cstr, 0);
 
         Parrot_str_free_cstring(cstr);
         return num;
@@ -115,8 +113,13 @@ pmclass OpLib auto_attrs {
         return STATICSELF.elements();
     }
 
-    METHOD op_family(STRING *shortname)
-    {
+    VTABLE void* get_pointer() {
+        op_lib_t *oplib;
+        GET_ATTR_oplib(INTERP, SELF, oplib);
+        return oplib;
+    }
+
+    METHOD op_family(STRING *shortname) {
         char * const sname = Parrot_str_to_cstring(INTERP, shortname);
         op_lib_t  *oplib;
         op_info_t *table;
@@ -134,6 +137,16 @@ pmclass OpLib auto_attrs {
         }
         Parrot_str_free_cstring(sname);
         RETURN(PMC *result);
+    }
+
+    METHOD version() {
+        op_lib_t *oplib;
+        PMC *version_array = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
+        GET_ATTR_oplib(INTERP, SELF, oplib);
+        VTABLE_push_integer(INTERP, version_array, oplib->major_version);
+        VTABLE_push_integer(INTERP, version_array, oplib->minor_version);
+        VTABLE_push_integer(INTERP, version_array, oplib->patch_version);
+        RETURN(PMC *version_array);
     }
 }
 

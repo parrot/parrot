@@ -15,7 +15,7 @@ require POSIX;
 
 =head1 NAME
 
-parrotbench - Parrot benchmark
+tools/dev/parrotbench.pl - Parrot benchmark
 
 =head1 SYNOPSIS
 

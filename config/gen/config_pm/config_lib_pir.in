@@ -2,7 +2,7 @@
 
 .include 'datatypes.pasm'
 
-.sub 'main'
+.sub 'main' :main
     get_params "(0)", $P5
     set $I10, $P5     # argv
     set $I11, 0      # flag
