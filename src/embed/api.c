@@ -317,7 +317,7 @@ returns a true value if this call is successful and false value otherwise.
 */
 
 /* TODO: This only works with the inital bytecode. After this we should use
-       Parrot_append_bytecode or something similar */
+         Parrot_append_bytecode or something similar */
 
 PARROT_API
 Parrot_Int
@@ -547,32 +547,6 @@ Parrot_api_set_warnings(Parrot_PMC interp_pmc, Parrot_Int flags)
     EMBED_API_CALLIN(interp_pmc, interp)
     /* Activates the given warnings.  (Macro from warnings.h.) */
     PARROT_WARNINGS_on(interp, flags);
-    EMBED_API_CALLOUT(interp_pmc, interp)
-}
-
-/*
-
-=item C<Parrot_Int Parrot_api_set_output_file(Parrot_PMC interp_pmc, const char
-* filename)>
-
-Sets the C<interp_pmc>'s output file name specified by C<filename>. This function
-returns a true value if this call is successful and false value otherwise.
-
-=cut
-
-*/
-
-PARROT_API
-Parrot_Int
-Parrot_api_set_output_file(Parrot_PMC interp_pmc,
-        ARGIN_NULLOK(const char * filename))
-{
-    ASSERT_ARGS(Parrot_api_set_output_file)
-    EMBED_API_CALLIN(interp_pmc, interp)
-    if (!filename && !interp->output_file)
-        interp->output_file = "-";
-    else
-        interp->output_file = filename;
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 

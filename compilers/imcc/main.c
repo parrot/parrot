@@ -31,7 +31,6 @@ IMCC helpers.
 #include "imc.h"
 #include "parrot/embed.h"
 #include "parrot/longopt.h"
-#include "parrot/imcc.h"
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_callcontext.h"
 #include "pbc.h"
@@ -54,12 +53,10 @@ static PackFile * compile_to_bytecode(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-static void determine_input_file_type(PARROT_INTERP,
-    ARGIN(const char * const sourcefile),
-    ARGIN(yyscan_t yyscanner))
+static FILE* determine_input_file_type(PARROT_INTERP,
+    ARGIN(const char * const sourcefile))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 static void determine_output_file_type(PARROT_INTERP,
     ARGIN(const char *output_file))
@@ -76,11 +73,21 @@ static void imcc_get_optimization_description(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*opt_desc);
 
-static void imcc_parseflags(PARROT_INTERP,
+static char * imcc_parseflags(PARROT_INTERP,
     int argc,
     ARGIN(const char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
+
+static int imcc_run(PARROT_INTERP,
+    ARGIN(const char *sourcefile),
+    ARGIN(const char *output_file),
+    ARGOUT(PMC **pbcpmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*pbcpmc);
 
 static void imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
         __attribute__nonnull__(1)
@@ -101,8 +108,7 @@ static const struct longopt_opt_decl * Parrot_cmd_options(void);
     , PARROT_ASSERT_ARG(yyscanner))
 #define ASSERT_ARGS_determine_input_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(sourcefile) \
-    , PARROT_ASSERT_ARG(yyscanner))
+    , PARROT_ASSERT_ARG(sourcefile))
 #define ASSERT_ARGS_determine_output_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(output_file))
@@ -114,6 +120,11 @@ static const struct longopt_opt_decl * Parrot_cmd_options(void);
 #define ASSERT_ARGS_imcc_parseflags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(argv))
+#define ASSERT_ARGS_imcc_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sourcefile) \
+    , PARROT_ASSERT_ARG(output_file) \
+    , PARROT_ASSERT_ARG(pbcpmc))
 #define ASSERT_ARGS_imcc_write_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(output_file))
@@ -211,7 +222,8 @@ Parrot_cmd_options(void)
 
 /*
 
-=item C<static void imcc_parseflags(PARROT_INTERP, int argc, const char **argv)>
+=item C<static char * imcc_parseflags(PARROT_INTERP, int argc, const char
+**argv)>
 
 Parse flags ans set approptiate state(s)
 
@@ -219,11 +231,12 @@ Parse flags ans set approptiate state(s)
 
 */
 
-static void
+static char *
 imcc_parseflags(PARROT_INTERP, int argc, ARGIN(const char **argv))
 {
     ASSERT_ARGS(imcc_parseflags)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
+    char * output_file = NULL;
 
     /* default state: run pbc */
     SET_STATE_RUN_PBC(interp);
@@ -249,14 +262,6 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN(const char **argv))
           case 'a':
             SET_STATE_PASM_FILE(interp);
             break;
-          case 'r':
-            if (STATE_RUN_PBC(interp))
-                SET_STATE_RUN_FROM_FILE(interp);
-            SET_STATE_RUN_PBC(interp);
-            break;
-          case 'c':
-            SET_STATE_LOAD_PBC(interp);
-            break;
           case 'v':
             IMCC_INFO(interp)->verbose++;
             break;
@@ -268,14 +273,14 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN(const char **argv))
             break;
           case 'o':
             UNSET_STATE_RUN_PBC(interp);
-            interp->output_file = opt.opt_arg;
+            output_file = opt.opt_arg;
             break;
 
           case OPT_PBC_OUTPUT:
             UNSET_STATE_RUN_PBC(interp);
             SET_STATE_WRITE_PBC(interp);
-            if (!interp->output_file)
-                interp->output_file = "-";
+            if (!output_file)
+                output_file = "-";
             break;
 
           case 'O':
@@ -302,6 +307,7 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN(const char **argv))
             break;
         }
     }
+    return output_file;
 }
 
 /*
@@ -466,7 +472,7 @@ imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
     size_t    size;
     opcode_t *packed;
     FILE     *fp;
-    PackFile_ByteCode * interp_code = Parrot_pf_get_current_code_segment(interp);
+    PackFile_ByteCode * const interp_code = Parrot_pf_get_current_code_segment(interp);
 
     IMCC_info(interp, 1, "Writing %s\n", output_file);
 
@@ -491,46 +497,28 @@ imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
 
 /*
 
-=item C<static void determine_input_file_type(PARROT_INTERP, const char * const
-sourcefile, yyscan_t yyscanner)>
+=item C<static FILE* determine_input_file_type(PARROT_INTERP, const char * const
+sourcefile)>
 
-Read in the source and determine whether it's Parrot bytecode or PASM
+Determine whether the sourcefile is a .pir or .pasm file. Sets the appropriate
+flags and returns a C<FILE*> to the opened file.
 
 =cut
 
 */
 
-static void
-determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile),
-                            ARGIN(yyscan_t yyscanner))
+static FILE*
+determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile))
 {
     ASSERT_ARGS(determine_input_file_type)
 
-    /* Read in the source and check the file extension for the input type;
-       a file extension .pbc means it's parrot bytecode;
-       a file extension .pasm means it's parrot assembly (PASM);
-       otherwise, it's assumed to be PIR.
-     */
-    if (STREQ(sourcefile, "-")) {
-        imc_yyin_set(stdin, yyscanner);
-    }
+    if (STREQ(sourcefile, "-"))
+        return stdin;
     else {
-        const char * const ext = strrchr(sourcefile, '.');
-
-        if (ext && (STREQ(ext, ".pbc"))) { /* a PBC file */
-            SET_STATE_LOAD_PBC(interp);
-            UNSET_STATE_WRITE_PBC(interp);
-        }
-        else if (!STATE_LOAD_PBC(interp)) {
-            if (!(imc_yyin_set(fopen(sourcefile, "r"), yyscanner)))    {
-                IMCC_fatal_standalone(interp, EXCEPTION_EXTERNAL_ERROR,
-                                      "Error reading source file %s.\n",
-                                      sourcefile);
-            }
-
-            if (ext && STREQ(ext, ".pasm"))
-                SET_STATE_PASM_FILE(interp);
-        }
+        const char * ext = strrchr(sourcefile, '.');
+        if (ext && STREQ(ext, ".pasm"))
+            SET_STATE_PASM_FILE(interp);
+        return fopen(sourcefile, "r");
     }
 }
 
@@ -646,13 +634,14 @@ imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(const char *sourcefile), int argc,
         ARGIN(const char **argv), ARGOUT(PMC **pbcpmc))
 {
     Interp * interp = (Interp *)VTABLE_get_pointer(NULL, interp_pmc);
-    return imcc_run(interp, sourcefile, argc, argv, pbcpmc);
+    const char * output_file = imcc_parseflags(interp, argc, argv);
+    return imcc_run(interp, sourcefile, output_file, pbcpmc);
 }
 
 /*
 
-=item C<int imcc_run(PARROT_INTERP, const char *sourcefile, int argc, const char
-**argv, PMC **pbcpmc)>
+=item C<static int imcc_run(PARROT_INTERP, const char *sourcefile, const char
+*output_file, PMC **pbcpmc)>
 
 Entry point of IMCC, as invoked by Parrot's main function.
 Compile source code (if required), write bytecode file (if required)
@@ -662,16 +651,13 @@ and run. This function always returns 0.
 
 */
 
-int
-imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
-        ARGIN(const char **argv), ARGOUT(PMC **pbcpmc))
+static int
+imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile),
+        ARGIN(const char *output_file), ARGOUT(PMC **pbcpmc))
 {
     yyscan_t           yyscanner;
-    const char * const output_file = interp->output_file;
     PackFile * pf_raw = NULL;
     *pbcpmc = PMCNULL;
-
-    imcc_parseflags(interp, argc, argv);
 
     /* PMCs in IMCC_INFO won't get marked */
     Parrot_block_GC_mark(interp);
@@ -682,8 +668,13 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
     /* Figure out what kind of source file we have -- if we have one */
     if (!sourcefile || !*sourcefile)
         IMCC_fatal_standalone(interp, 1, "main: No source file specified.\n");
-    else
-        determine_input_file_type(interp, sourcefile, yyscanner);
+    else {
+        FILE * const in_file = determine_input_file_type(interp, sourcefile);
+        if (!imc_yyin_set(in_file, yyscanner))
+            IMCC_fatal_standalone(interp, EXCEPTION_EXTERNAL_ERROR,
+                                  "Error reading source file %s.\n",
+                                  sourcefile);
+    }
 
     if (STATE_PRE_PROCESS(interp)) {
         do_pre_process(interp, yyscanner);
