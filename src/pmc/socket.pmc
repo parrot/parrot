@@ -177,7 +177,7 @@ from a port number (integer) and an address (string).
 */
 
     METHOD sockaddr(STRING * address, INTVAL port) {
-        PMC * res = Parrot_io_sockaddr_in(INTERP, address, port);
+        PMC * res = PIO_SOCKADDR_IN(INTERP, address, port);
         RETURN(PMC * res);
     }
 

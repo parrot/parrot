@@ -286,7 +286,6 @@ Parrot_run_callback(PARROT_INTERP,
     PMC     *signature;
     PMC     *sub;
     STRING  *sig_str;
-    char    *p;
     INTVAL   ch;
     char     pasm_sig[5];
     INTVAL   i_param;

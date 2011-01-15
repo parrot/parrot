@@ -1,8 +1,8 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
 
-=head1 TITLE
+=head1 NAME
 
-bench_op - Benchmark one or more opcodes
+tools/dev/bench_op.pir - Benchmark one or more opcodes
 
 =head1 SYNOPSIS
 

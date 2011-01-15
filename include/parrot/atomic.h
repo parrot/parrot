@@ -47,9 +47,9 @@ typedef struct Parrot_atomic_integer {
 #  define PARROT_ATOMIC_PTR_CAS(result, a, expect, update) \
       do { \
           void * orig; \
-          PARROT_ATOMIC_PTR_GET((a), orig); \
+          PARROT_ATOMIC_PTR_GET(orig, (a)); \
           if ((expect) == (orig)) { \
-              ATOMIC_SET((a), (update)); \
+              PARROT_ATOMIC_PTR_SET((a), (update)); \
               (result) = 1; \
           } \
           else { \
@@ -64,9 +64,9 @@ typedef struct Parrot_atomic_integer {
 #  define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
       do { \
           INTVAL orig; \
-          PARROT_ATOMIC_PTR_GET((a), (orig)); \
+          PARROT_ATOMIC_INT_GET(orig, (a)); \
           if ((expect) == (orig)) { \
-              ATOMIC_SET((a), (update)); \
+              PARROT_ATOMIC_INT_SET((a), (update)); \
               (result) = 1; \
           } \
           else { \

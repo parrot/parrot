@@ -253,8 +253,10 @@ static PMC * PackFile_Constant_unpack_pmc(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static PMC * packfile_main(PARROT_INTERP, PackFile_ByteCode *bc)
-        __attribute__nonnull__(1);
+PARROT_CANNOT_RETURN_NULL
+static PMC * packfile_main(PARROT_INTERP, ARGIN(PackFile_ByteCode *bc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void PackFile_set_header(ARGOUT(PackFile_Header *header))
         __attribute__nonnull__(1)
@@ -424,7 +426,8 @@ static int sub_pragma(PARROT_INTERP,
     , PARROT_ASSERT_ARG(constt) \
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_packfile_main __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_PackFile_set_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_pf_debug_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -886,8 +889,9 @@ Access the main function of a bytecode segment.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static PMC *
-packfile_main(PARROT_INTERP, PackFile_ByteCode *bc)
+packfile_main(PARROT_INTERP, ARGIN(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(packfile_main)
     PackFile_ConstTable *ct = bc->const_table;
@@ -957,12 +961,12 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
                     "No main sub found");
             {
-                PMC  *main            = packfile_main(interp, self);
+                PMC  *mainsub         = packfile_main(interp, self);
                 Parrot_Sub_attributes *main_attrs;
-                opcode_t *ptr         = (opcode_t *)VTABLE_get_pointer(interp, main);
-                PMC_get_sub(interp, main, main_attrs);
+                opcode_t *ptr         = (opcode_t *)VTABLE_get_pointer(interp, mainsub);
+                PMC_get_sub(interp, mainsub, main_attrs);
                 interp->resume_offset = (ptr - main_attrs->seg->base.data);
-                Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), main);
+                Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), mainsub);
             }
         }
     }
@@ -3372,11 +3376,11 @@ find_constants(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct))
         PARROT_ASSERT(interp->thread_data);
 
         if (!interp->thread_data->const_tables) {
-            interp->thread_data->const_tables = parrot_new_pointer_hash(interp);
+            interp->thread_data->const_tables = Parrot_hash_new_pointer_hash(interp);
         }
 
         tables = interp->thread_data->const_tables;
-        new_ct = (PackFile_ConstTable *)parrot_hash_get(interp, tables, ct);
+        new_ct = (PackFile_ConstTable *)Parrot_hash_get(interp, tables, ct);
 
         if (!new_ct) {
             /* need to construct it */
@@ -3405,7 +3409,7 @@ find_constants(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct))
             for (i = 0; i < new_ct->pmc.const_count; ++i)
                 clone_constant(interp, &new_ct->pmc.constants[i]);
 
-            parrot_hash_put(interp, tables, ct, new_ct);
+            Parrot_hash_put(interp, tables, ct, new_ct);
         }
 
         return new_ct;
@@ -3444,7 +3448,7 @@ Parrot_destroy_constants(PARROT_INTERP)
         PackFile_ConstTable * const ct        = (PackFile_ConstTable *)_bucket->value;
         PackFile_ConstTable_clear(interp, ct);
         mem_gc_free(interp, ct););
-    parrot_hash_destroy(interp, hash);
+    Parrot_hash_destroy(interp, hash);
 }
 
 /*
@@ -3486,7 +3490,7 @@ PackFile_ConstTable_clear(PARROT_INTERP, ARGMOD(PackFile_ConstTable *self))
     }
 
     if (self->string_hash) {
-        parrot_hash_destroy(interp, self->string_hash);
+        Parrot_hash_destroy(interp, self->string_hash);
         self->string_hash = NULL;
     }
 

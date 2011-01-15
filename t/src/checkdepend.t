@@ -65,13 +65,16 @@ foreach my $file (sort grep /\.[hc]$/, @incfiles) {
     # Ignore anything inside a c-style comment.
     $guts =~ s{\Q/*\E.*?\Q*/}{}gm;
 
-    my @includes = $guts =~ m/#include "(.*)"/g;
+    my @includes = $guts =~ m/# *include "(.*)"/g;
 
     # Canonicalize each of these includes.
 
     $deps{$file} = [ ];
     foreach my $include (@includes) {
         my $found;
+
+        # These depend on the platform, skip for now (TT #1944)
+        next if $include =~ m'^parrot/thr_';
 
         my @include_dirs;
         push @include_dirs, (File::Spec->splitpath($file))[1];

@@ -74,7 +74,7 @@ my @hlls = (
     {
         name       => 'cardinal',
         scm        => 'GIT',
-        repository => 'git://github.com/cardinal/cardinal.git'
+        repository => 'git://github.com/parrot/cardinal.git'
     },
 
     {

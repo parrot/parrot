@@ -4,6 +4,12 @@
 
 embed.pod - Parrot embedding system
 
+=head1 NOTE
+
+Parrot's embedding API is being replaced with a newer version. This document
+is for the old embedding API and will be phased out over time. Documentation
+for the newer API is located at F<docs/embed_new.pod>.
+
 =head1 SYNOPSIS
 
     #include <parrot/embed.h>

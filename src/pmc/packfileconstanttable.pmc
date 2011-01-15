@@ -277,6 +277,31 @@ Set the constant to the given PMC (or key).
         VTABLE_set_pmc_keyed_int(INTERP, attrs->pmc_constants,  index, value);
     }
 
+
+    VTABLE void push_float(FLOATVAL val) {
+        Parrot_PackfileConstantTable_attributes * const attrs =
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+        VTABLE_set_number_keyed_int(INTERP, SELF,
+                VTABLE_get_integer(INTERP, attrs->num_constants),
+                val);
+    }
+
+    VTABLE void push_string(STRING *val) {
+        Parrot_PackfileConstantTable_attributes * const attrs =
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+        VTABLE_set_string_keyed_int(INTERP, SELF,
+                VTABLE_get_integer(INTERP, attrs->str_constants),
+                val);
+    }
+
+    VTABLE void push_pmc(PMC *val) {
+        Parrot_PackfileConstantTable_attributes * const attrs =
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+        VTABLE_set_pmc_keyed_int(INTERP, SELF,
+                VTABLE_get_integer(INTERP, attrs->pmc_constants),
+                val);
+    }
+
 /*
 
 =item C<void set_main(INTVAL index)>

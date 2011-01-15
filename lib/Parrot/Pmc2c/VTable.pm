@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Storable ();
-use Parrot::Vtable;
+use Parrot::Vtable ();
 use Parrot::Pmc2c::Method ();
 use File::Basename;
 use Cwd qw(cwd);
@@ -19,7 +19,7 @@ sub new {
 
 sub build {
     my ( $self, $filename ) = @_;
-    my $vtable_table = parse_vtable($filename);
+    my $vtable_table = Parrot::Vtable::parse_vtable($filename);
 
     my ( %method_lookup, @methods, @method_names );
 

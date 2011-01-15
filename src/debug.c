@@ -2424,12 +2424,6 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
                         strcpy(&dest[size], buf);
                         size += strlen(buf);
                         break;
-                      case KEY_number_FLAG:
-                        Parrot_snprintf(interp, buf, sizeof (buf),
-                                    FLOATVAL_FMT, VTABLE_get_number(interp, k));
-                        strcpy(&dest[size], buf);
-                        size += strlen(buf);
-                        break;
                       case KEY_string_FLAG:
                         dest[size++] = '"';
                         {
@@ -2445,12 +2439,6 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
                       case KEY_integer_FLAG|KEY_register_FLAG:
                         Parrot_snprintf(interp, buf, sizeof (buf),
                                     "I" INTVAL_FMT, VTABLE_get_integer(interp, k));
-                        strcpy(&dest[size], buf);
-                        size += strlen(buf);
-                        break;
-                      case KEY_number_FLAG|KEY_register_FLAG:
-                        Parrot_snprintf(interp, buf, sizeof (buf),
-                                    "N" INTVAL_FMT, VTABLE_get_integer(interp, k));
                         strcpy(&dest[size], buf);
                         size += strlen(buf);
                         break;
@@ -3284,12 +3272,9 @@ STRING *
 Parrot_dbg_get_exception_backtrace(PARROT_INTERP, ARGMOD(PMC * exception))
 {
     ASSERT_ARGS(Parrot_dbg_get_exception_backtrace)
-    STRING           *str;
-    PMC              *old       = PMCNULL;
-    int               rec_level = 0;
-    int               limit_count = 0;
 
     PMC * const ctx = get_exception_context(interp, exception);
+
     if (PMC_IS_NULL(ctx))
         return STRINGNULL;
     else {

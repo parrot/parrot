@@ -29,58 +29,35 @@ INTVAL Parrot_io_async_unix(PARROT_INTERP,
         FUNC_MODIFIES(*filehandle);
 
 INTVAL Parrot_io_close_piohandle_unix(SHIM_INTERP, PIOHANDLE handle);
-INTVAL Parrot_io_close_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
+INTVAL Parrot_io_close_unix(PARROT_INTERP, PIOHANDLE file_descriptor)
+        __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_io_fdopen_unix(PARROT_INTERP,
-    ARGMOD_NULLOK(PMC *filehandle),
-    PIOHANDLE fd,
-    INTVAL flags)
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*filehandle);
-
-INTVAL Parrot_io_flush_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
+INTVAL Parrot_io_flush_unix(PARROT_INTERP, PIOHANDLE os_handle)
+        __attribute__nonnull__(1);
 
 INTVAL Parrot_io_getblksize_unix(PIOHANDLE fd);
 INTVAL Parrot_io_init_unix(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-INTVAL Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(const PMC *filehandle))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_io_is_tty_unix(SHIM_INTERP, PIOHANDLE fd);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC * Parrot_io_open_pipe_unix(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
+PIOHANDLE Parrot_io_open_pipe_unix(PARROT_INTERP,
     ARGIN(STRING *command),
-    int flags)
+    INTVAL flags,
+    ARGOUT(INTVAL *pid_out))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*filehandle);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*pid_out);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC * Parrot_io_open_unix(PARROT_INTERP,
-    ARGMOD_NULLOK(PMC *filehandle),
+PIOHANDLE Parrot_io_open_unix(PARROT_INTERP,
     ARGIN(STRING *path),
     INTVAL flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*filehandle);
-
-size_t Parrot_io_peek_unix(PARROT_INTERP,
-    SHIM(PMC *filehandle),
-    SHIM(STRING **buf))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -92,32 +69,34 @@ INTVAL Parrot_io_pipe_unix(SHIM_INTERP,
         FUNC_MODIFIES(*reader)
         FUNC_MODIFIES(*writer);
 
+INTVAL Parrot_io_pipe_wait_unix(PARROT_INTERP, INTVAL pid)
+        __attribute__nonnull__(1);
+
 size_t Parrot_io_read_unix(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    ARGIN(STRING **buf))
+    PIOHANDLE os_handle,
+    ARGMOD(char *buf),
+    size_t len)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*filehandle);
+        FUNC_MODIFIES(*buf);
 
 PIOOFF_T Parrot_io_seek_unix(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
+    PIOHANDLE os_handle,
     PIOOFF_T offset,
     INTVAL whence)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
+        __attribute__nonnull__(1);
 
-PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
+PIOHANDLE Parrot_io_stdhandle_unix(PARROT_INTERP, INTVAL fileno)
+        __attribute__nonnull__(1);
+
+PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, PIOHANDLE os_handle)
+        __attribute__nonnull__(1);
 
 size_t Parrot_io_write_unix(PARROT_INTERP,
-    ARGIN(PMC *filehandle),
-    ARGIN(const STRING *s))
+    PIOHANDLE os_handle,
+    ARGIN(const char *buf),
+    size_t len)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_Parrot_io_async_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -126,45 +105,37 @@ size_t Parrot_io_write_unix(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_close_piohandle_unix \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_io_close_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_fdopen_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_flush_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_getblksize_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_io_init_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_io_is_closed_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle))
+#define ASSERT_ARGS_Parrot_io_is_tty_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_io_open_pipe_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle) \
-    , PARROT_ASSERT_ARG(command))
+    , PARROT_ASSERT_ARG(command) \
+    , PARROT_ASSERT_ARG(pid_out))
 #define ASSERT_ARGS_Parrot_io_open_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
-#define ASSERT_ARGS_Parrot_io_peek_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_pipe_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(reader) \
     , PARROT_ASSERT_ARG(writer))
+#define ASSERT_ARGS_Parrot_io_pipe_wait_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_read_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle) \
     , PARROT_ASSERT_ARG(buf))
 #define ASSERT_ARGS_Parrot_io_seek_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle))
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_io_stdhandle_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_tell_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_write_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle) \
-    , PARROT_ASSERT_ARG(s))
+    , PARROT_ASSERT_ARG(buf))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/unix.c */
 
@@ -275,24 +246,24 @@ INTVAL Parrot_io_socket_unix(PARROT_INTERP,
 
 
 #define PIO_INIT(interp) Parrot_io_init_unix((interp))
-#define PIO_OPEN(interp, pmc, file, flags) \
-    Parrot_io_open_unix((interp), (pmc), (file), (flags))
-#define PIO_FDOPEN(interp, pmc, handle, flags) \
-    Parrot_io_fdopen_unix((interp), (pmc), (handle), (flags))
-#define PIO_OPEN_PIPE(interp, pmc, file, flags) \
-    Parrot_io_open_pipe_unix((interp), (pmc), (file), (flags))
+#define PIO_STDHANDLE(interp, fileno) Parrot_io_stdhandle_unix((interp), (fileno))
+#define PIO_OPEN(interp, file, flags) \
+    Parrot_io_open_unix((interp), (file), (flags))
+#define PIO_OPEN_PIPE(interp, file, flags, pid) \
+    Parrot_io_open_pipe_unix((interp), (file), (flags), (pid))
 #define PIO_DUP(interp, handle) (PIOHANDLE)dup((int)(handle))
-#define PIO_CLOSE(interp, pmc) Parrot_io_close_unix((interp), (pmc))
+#define PIO_CLOSE(interp, handle) Parrot_io_close_unix((interp), (handle))
 #define PIO_CLOSE_PIOHANDLE(interp, handle) Parrot_io_close_piohandle_unix((interp), (handle))
-#define PIO_IS_CLOSED(interp, pmc) Parrot_io_is_closed_unix((interp), (pmc))
-#define PIO_READ(interp, pmc, buf) Parrot_io_read_unix((interp), (pmc), (buf))
-#define PIO_WRITE(interp, pmc, str) Parrot_io_write_unix((interp), (pmc), (str))
+#define PIO_PIPE_WAIT(interp, pid) Parrot_io_pipe_wait_unix((interp), (pid))
+#define PIO_READ(interp, handle, buf, len) Parrot_io_read_unix((interp), (handle), (buf), (len))
+#define PIO_WRITE(interp, handle, buf, len) Parrot_io_write_unix((interp), (handle), (buf), (len))
 #define PIO_SEEK(interp, pmc, offset, start) \
     Parrot_io_seek_unix((interp), (pmc), (offset), (start))
 #define PIO_TELL(interp, pmc) Parrot_io_tell_unix((interp), (pmc))
-#define PIO_PEEK(interp, pmc, buf) Parrot_io_peek_unix((interp), (pmc), (buf))
-#define PIO_FLUSH(interp, pmc) Parrot_io_flush_unix((interp), (pmc))
+#define PIO_FLUSH(interp, handle) Parrot_io_flush_unix((interp), (handle))
 #define PIO_GETBLKSIZE(handle) Parrot_io_getblksize_unix((handle))
+#define PIO_IS_TTY(interp, handle) \
+    Parrot_io_is_tty_unix((interp), (handle))
 
 #define PIO_POLL(interp, pmc, which, sec, usec) \
     Parrot_io_poll_unix((interp), (pmc), (which), (sec), (usec))
@@ -312,6 +283,8 @@ INTVAL Parrot_io_socket_unix(PARROT_INTERP,
     Parrot_io_listen_unix((interp), (pmc), (backlog))
 #define PIO_ACCEPT(interp, pmc) \
     Parrot_io_accept_unix((interp), (pmc))
+#define PIO_SOCKADDR_IN(interp, addr, port) \
+    Parrot_io_sockaddr_in((interp), (addr), (port))
 
 #endif /* PARROT_IO_UNIX_H_GUARD */
 
