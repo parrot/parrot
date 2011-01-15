@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Structures - Accessing C Structs from Parrot
+Accessing C Structs from Parrot
 
 =head1 DESCRIPTION
 

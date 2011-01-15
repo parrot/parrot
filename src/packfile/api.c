@@ -961,12 +961,12 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
                     "No main sub found");
             {
-                PMC  *main            = packfile_main(interp, self);
+                PMC  *mainsub         = packfile_main(interp, self);
                 Parrot_Sub_attributes *main_attrs;
-                opcode_t *ptr         = (opcode_t *)VTABLE_get_pointer(interp, main);
-                PMC_get_sub(interp, main, main_attrs);
+                opcode_t *ptr         = (opcode_t *)VTABLE_get_pointer(interp, mainsub);
+                PMC_get_sub(interp, mainsub, main_attrs);
                 interp->resume_offset = (ptr - main_attrs->seg->base.data);
-                Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), main);
+                Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), mainsub);
             }
         }
     }

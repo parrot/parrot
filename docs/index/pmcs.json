@@ -1,0 +1,38 @@
+{
+   "page" : "pmc",
+   "content" : [
+      {
+         "source" : [
+            "tools/dev/gen_class.pl"
+         ],
+         "title" : "Tools"
+      },
+      {
+         "source" : [
+            "src/pmc/default.pmc",
+            "src/pmc/scalar.pmc"
+         ],
+         "title" : "Abstract PMCs"
+      },
+      {
+         "source" : "src/pmc/*.pmc",
+         "title" : "Abstract PMCs",
+         "exclude" : [
+            "src/pmc/default.pmc",
+            "src/pmc/scalar.pmc"
+         ]
+      },
+      {
+         "source" : "src/dynpmc/*.pmc",
+         "title" : "Dynamic PMCs",
+         "exclude" : [
+             "src/dynpmc/rotest.pmc",
+             "src/dynpmc/subproxy.pmc",
+             "src/dynpmc/pccmethod_test.pmc",
+             "src/dynpmc/foo.pmc",
+             "src/dynpmc/foo2.pmc"
+         ]
+      }
+   ],
+   "title" : "PMCs"
+}

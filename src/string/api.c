@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -700,17 +700,34 @@ string.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_str_from_platform_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *c))
 {
     ASSERT_ARGS(Parrot_str_from_platform_cstring)
     if (!c)
         return STRINGNULL;
-    else
-        return Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(interp, c),
-                                    Parrot_platform_encoding_ptr, 0);
+    else {
+        STRING *retv;
+        Parrot_runloop jmp;
+
+        if (setjmp(jmp.resume)) {
+            /* catch */
+            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+            retv =  Parrot_str_new_init(interp, c, strlen(c),
+                                        Parrot_binary_encoding_ptr, 0);
+        }
+        else {
+            /* try */
+            Parrot_ex_add_c_handler(interp, &jmp);
+            retv = Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(interp, c),
+                                        Parrot_platform_encoding_ptr, 0);
+            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+        }
+
+        return retv;
+    }
 }
 
 
@@ -725,8 +742,8 @@ string.
 
 */
 
-PARROT_CAN_RETURN_NULL
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
 char *
 Parrot_str_to_platform_cstring(PARROT_INTERP, ARGIN(const STRING *s))
 {

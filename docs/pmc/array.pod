@@ -1,7 +1,7 @@
 # -*- cperl -*-
 #
 
-=head1 TITLE
+=head1 NAME
 
 Array base class
 
