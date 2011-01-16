@@ -122,8 +122,8 @@ True
 Done
 OUTPUT
 
-my (undef, $temp_pir)  = create_tempfile( SUFFIX => '.pir', UNLINK => 0 );
-my (undef, $temp_pbc)  = create_tempfile( SUFFIX => '.pir', UNLINK => 0 );
+my (undef, $temp_pir)  = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
+my (undef, $temp_pbc)  = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 open PIR_FILE, ">", $temp_pir;
 print PIR_FILE <<'PIR_CODE';
 .sub main :main
