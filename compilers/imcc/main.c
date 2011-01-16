@@ -250,12 +250,7 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN_NULLOK(const char **argv))
             }
             break;
           case 'w':
-            /* FIXME It's not best way to set warnings... */
-            Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
             IMCC_INFO(interp)->imcc_warn = 1;
-            break;
-          case 'G':
-            IMCC_INFO(interp)->gc_off = 1;
             break;
           case 'a':
             SET_STATE_PASM_FILE(interp);
@@ -657,10 +652,6 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile),
     PackFile * pf_raw = NULL;
     *pbcpmc = PMCNULL;
 
-    /* PMCs in IMCC_INFO won't get marked */
-    Parrot_block_GC_mark(interp);
-    Parrot_block_GC_sweep(interp);
-
     yylex_init_extra(interp, &yyscanner);
 
     /* Figure out what kind of source file we have -- if we have one */
@@ -733,11 +724,6 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile),
         PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
     else
         PARROT_WARNINGS_off(interp, PARROT_WARNINGS_ALL_FLAG);
-
-    if (!IMCC_INFO(interp)->gc_off) {
-        Parrot_unblock_GC_mark(interp);
-        Parrot_unblock_GC_sweep(interp);
-    }
 
     yylex_destroy(yyscanner);
 

@@ -807,9 +807,35 @@ Parrot_api_set_compiler(Parrot_PMC interp_pmc, Parrot_String type,
     ASSERT_ARGS(Parrot_api_set_compiler)
     EMBED_API_CALLIN(interp_pmc, interp)
     Parrot_set_compiler(interp, type, compiler);
-    EMBED_API_CALLOUT(interp_pmc, interp);
+    EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
+/*
+
+=item C<Parrot_Int Parrot_api_toggle_gc(Parrot_PMC interp_pmc, Parrot_Int on)>
+
+Turn Parrot's GC on or off.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_toggle_gc(Parrot_PMC interp_pmc, Parrot_Int on)
+{
+    ASSERT_ARGS(Parrot_api_toggle_gc)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    if (on) {
+        Parrot_unblock_GC_mark(interp);
+        Parrot_unblock_GC_sweep(interp);
+    }
+    else {
+        Parrot_block_GC_mark(interp);
+        Parrot_block_GC_sweep(interp);
+    }
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
 
 /*
 

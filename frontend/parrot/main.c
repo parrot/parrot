@@ -30,6 +30,7 @@ struct init_args_t {
     Parrot_Int trace;
     Parrot_Int execute_packfile;
     Parrot_Int have_pbc_file;
+    Parrot_Int turn_gc_off;
 };
 
 extern int Parrot_set_config_hash(Parrot_PMC interp_pmc);
@@ -177,12 +178,17 @@ main(int argc, const char *argv[])
         if (!Parrot_api_load_bytecode_file(interp, parsed_flags.sourcefile,
                                            &bytecodepmc))
             show_last_error_and_exit(interp);
+        if (parsed_flags.turn_gc_off)
+            Parrot_api_toggle_gc(interp, 0);
     }
     else {
+        Parrot_api_toggle_gc(interp, 0);
         if (!Parrot_api_wrap_imcc_hack(interp, parsed_flags.sourcefile, argc, argv,
                                        &bytecodepmc, &parsed_flags.execute_packfile,
                                        imcc_run_api))
             show_last_error_and_exit(interp);
+        if (!parsed_flags.turn_gc_off)
+            Parrot_api_toggle_gc(interp, 1);
     }
 
     if (parsed_flags.execute_packfile) {
@@ -638,6 +644,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     args->execute_packfile = 1;
     args->have_pbc_file = 0;
     args->trace = 0;
+    args->turn_gc_off = 0;
 
     if (argc == 1) {
         usage(stderr);
@@ -651,6 +658,9 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             break;
           case 'g':
             /* Handled in parseflags_minimal */
+            break;
+          case 'G':
+            args->turn_gc_off = 1;
             break;
           case OPT_GC_THRESHOLD:
             /* handled in parseflags_minimal */
