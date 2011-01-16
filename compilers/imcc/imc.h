@@ -221,12 +221,6 @@ PMC * imcc_compile(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC * imcc_compile_pasm(PARROT_INTERP, ARGIN(const char *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
 PMC * imcc_compile_pasm_ex(PARROT_INTERP, ARGIN(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -240,12 +234,6 @@ PMC * IMCC_compile_pasm_s(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*error_message);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * imcc_compile_pir(PARROT_INTERP, ARGIN(const char *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -312,9 +300,6 @@ void op_fullname(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
-void register_compilers(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_imcc_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(fullname) \
@@ -329,9 +314,6 @@ void register_compilers(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s) \
     , PARROT_ASSERT_ARG(error_message))
-#define ASSERT_ARGS_imcc_compile_pasm __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_imcc_compile_pasm_ex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
@@ -339,9 +321,6 @@ void register_compilers(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s) \
     , PARROT_ASSERT_ARG(error_message))
-#define ASSERT_ARGS_imcc_compile_pir __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_imcc_compile_pir_ex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
@@ -369,8 +348,6 @@ void register_compilers(PARROT_INTERP)
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(args))
-#define ASSERT_ARGS_register_compilers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/parser_util.c */
 

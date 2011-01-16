@@ -664,6 +664,8 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
 
 Compile PIR code from a C string. Returns errors in the <STRING> provided.
 
+Called only from src/embed.c:Parrot_compile_string().
+
 =cut
 
 */
@@ -685,6 +687,8 @@ IMCC_compile_pir_s(PARROT_INTERP, ARGIN(const char *s),
 
 Compile PASM code from a C string. Returns errors in the <STRING> provided.
 
+Called only from src/embed.c:Parrot_compile_string().
+
 =cut
 
 */
@@ -704,6 +708,8 @@ IMCC_compile_pasm_s(PARROT_INTERP, ARGIN(const char *s),
 =item C<PMC * imcc_compile_pasm_ex(PARROT_INTERP, const char *s)>
 
 Compile PASM code from a C string. Throws an exception upon errors.
+
+Called only from the PASM compreg
 
 =cut
 
@@ -732,6 +738,8 @@ imcc_compile_pasm_ex(PARROT_INTERP, ARGIN(const char *s))
 
 Compile PIR code from a C string. Throws an exception upon errors.
 
+Called only from the PIR compreg
+
 =cut
 
 */
@@ -759,6 +767,8 @@ imcc_compile_pir_ex(PARROT_INTERP, ARGIN(const char *s))
 **error_message)>
 
 Compile a file by filename (can be either PASM or IMCC code)
+
+Called only from src/interp/inter_misc.c:Parrot_compile_file
 
 =cut
 
@@ -870,30 +880,6 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
     }
 
     return cs;
-}
-
-/*
-
-=item C<void register_compilers(PARROT_INTERP)>
-
-Register additional compilers with the interpreter
-
-=cut
-
-*/
-
-void
-register_compilers(PARROT_INTERP)
-{
-    ASSERT_ARGS(register_compilers)
-    Parrot_compreg(interp, Parrot_str_new_constant(interp, "PASM"), imcc_compile_pasm_ex);
-    Parrot_compreg(interp, Parrot_str_new_constant(interp, "PIR"),  imcc_compile_pir_ex);
-
-    /* It looks like this isn't used anywhere yet */
-    /* TODO: return a Eval PMC, instead of a packfile */
-    /* Parrot_compreg(interp,
-                      Parrot_str_new_constant(interp, "FILE"),
-                      imcc_compile_file ); */
 }
 
 /*
@@ -1103,7 +1089,8 @@ imcc_init(PARROT_INTERP)
     PARROT_ASSERT(IMCC_INFO(interp) != NULL);
 
     /* register PASM and PIR compilers to parrot core */
-    register_compilers(interp);
+    Parrot_compreg(interp, Parrot_str_new_constant(interp, "PASM"), imcc_compile_pasm_ex);
+    Parrot_compreg(interp, Parrot_str_new_constant(interp, "PIR"),  imcc_compile_pir_ex);
 }
 
 /*
