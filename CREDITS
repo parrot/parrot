@@ -299,6 +299,10 @@ N: Damian Miles Knopp
 U: dmknopp
 E: dmknopp@loyola.edu
 
+N: Daniel Kang
+U: jumpyshoes
+D: improve pbc_disassemble's test coverage
+
 N: Dan Sugalski
 U: dan
 D: Architect emeritus (0.0.1-0.1.1)
@@ -678,6 +682,10 @@ D: Many fixes
 U: LylePerl
 D: Win32 and CGI testing
 W: http://perl.bristolbath.org/blog/lyle/
+
+N: Mariano Wahlmann
+E: dichoso@gmail.com
+A: bluescreen
 
 N: Marcelo Serra Castilhos
 E: mhelix@terra.com.br
