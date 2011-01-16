@@ -12,7 +12,7 @@ New in 3.0.0
 - Languages
 - Community
   + tree-optimization library by Tyler L. Curtis, a GSoC student, joined the nest
-    and how lives at http://github.com/parrot/tree-optimization
+    and now lives at http://github.com/parrot/tree-optimization
 - Documentation
   + HTML documentation generation has been rewritten and simplified
   + New section in docs/project/git_workflow.pod about keeping a fork
