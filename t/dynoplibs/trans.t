@@ -493,13 +493,14 @@ Tests various transcendental operations
     config = interp[.IGLOBALS_CONFIG_HASH]
     .local int intvalsize
     intvalsize = config['intvalsize']
-    .local int gmp
+    .local string gmp
     gmp = config['gmp']
 
-    if intvalsize != 4 goto can_test
-    if gmp goto can_test
-        skip(40,'No integer overflow for 32-bit INTVALs without GMP installed')
-        goto end
+    if intvalsize == 4 goto end
+
+    if gmp == 'define' goto can_test
+
+    goto end
 
   can_test:
 
@@ -525,6 +526,7 @@ Tests various transcendental operations
     unless i2 > 40 goto next
 
   end:
+    skip(40,'No integer overflow tests for 32-bit INTVALs')
 .end
 
 .macro sprintf_is(fmt, number, message)
