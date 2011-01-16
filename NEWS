@@ -2,16 +2,24 @@ New in 3.0.0
 - Core
  + Added a new embedding API in "parrot/api.h"
  + Removed autovivification behavior from ResizablePMCArray
- + Packfile manipulation functions now throw exceptions on error instead of printing error details directly to stderr
- + Improved Unicode support for file IO, environment variables, program names, and command-line parameters
+ + Packfile manipulation functions now throw exceptions on error instead of
+    printing error details directly to stderr
+ + Improved Unicode support for file IO, environment variables, program names,
+    and command-line parameters
 - Languages
 - Community
     + tree-optimization library by Tyler L. Curtis, a GSoC student, joined the nest
     and how lives at http://github.com/parrot/tree-optimization
 - Documentation
-    + New section in docs/project/git_workflow.pod about keeping a fork of parrot.git in sync
+    + New section in docs/project/git_workflow.pod about keeping a fork
+      of parrot.git in sync
+    + Translations of our README in various languages are now in the
+      docs/translation directory
 - Tests
     + Increased test coverage of many core PMCs, dynamic PMCs and dynamic opcodes
+    + Jonathan "Duke" Leto set up Debian Linux x86_64 and sparc32 smokers
+        in the GCC Compile Farm, which continually submit smoke reports with
+        different Configure.pl flags and compilers
 
 New in 2.11.0
 - Core
