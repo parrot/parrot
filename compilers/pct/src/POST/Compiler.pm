@@ -146,81 +146,61 @@ multi method pir($node) {
 =item pir(POST::Op node)
 Return pir for an operation node.
 
+our %pirop_handlers := foo => 'bar', baz => 'bang';
+
 multi method pir(POST::Op $node) {
-    Q:PIR {
-    .local pmc node
-    find_lex node, '$node'
-
     ##  determine the type of operation
-    .local string pirop
-    pirop = node.'pirop'()
-
+    my $pirop  := $node.pirop;
     ##  determine if we're storing result
-    .local string result
-    result = node.'result'()
-    unless result goto have_result
-    result = concat result, ' = '
-  have_result:
+    my $result := ~$node.result;
+    $result := $result ~ ' = ' if $result;
 
     ##  get list of arguments to operation
-    .local pmc arglist
-    arglist = node.'list'()
+    my @arglist := $node.list();
 
     ##  get format and arguments based on pirop
-    .local string fmt, name, invocant
-    if pirop == 'call' goto pirop_call
-    if pirop == 'callmethod' goto pirop_callmethod
-    if pirop == 'return' goto pirop_return
-    if pirop == 'yield' goto pirop_yield
-    if pirop == 'tailcall' goto pirop_tailcall
-    if pirop == 'inline' goto pirop_inline
+    my $fmt;
+    my $name;
+    my $invocant;
 
-  pirop_opcode:
-    fmt = "    %%n %%,\n"
-    name = pirop
-    goto pirop_emit
-
-  pirop_call:
-    fmt = "    %%r%%n(%%,)\n"
-    name = shift arglist
-    goto pirop_emit
-
-  pirop_callmethod:
-    fmt = "    %%r%%i.%%n(%%,)\n"
-    name = shift arglist
-    invocant = shift arglist
-    goto pirop_emit
-
-  pirop_return:
-    fmt = "    .return (%%,)\n"
-    goto pirop_emit
-
-  pirop_yield:
-    fmt = "    .yield (%%,)\n"
-    goto pirop_emit
-
-  pirop_tailcall:
-    name = shift arglist
-    fmt = "    .tailcall %%n(%%,)\n"
-    goto pirop_emit
-
-  pirop_inline:
-    fmt = node.'inline'()
-    fmt = concat fmt, "\n"
-    result = node.'result'()
-    goto pirop_emit
-
-  pirop_emit:
-    .local pmc subpir, subline, line
-    subpir  = find_caller_lex '$SUBPIR'
-    subline = find_caller_lex '$SUBLINE'
-    line    = find_caller_lex '$LINE'
-    if subline == line goto done_line
-    subpir.'append_format'(".annotate 'line', %%0\n", line)
-    assign subline, line
-  done_line:
-    subpir.'append_format'(fmt, arglist :flat, 'r'=>result, 'n'=>name, 'i'=>invocant, 't'=>result)
+    if $pirop eq 'call' {
+        $fmt        := "    %r%n(%,)\n";
+        $name       := @arglist.shift;
     }
+    elsif $pirop eq 'callmethod' {
+        $fmt        := "    %r%i.%n(%,)\n";
+        $name       := @arglist.shift;
+        $invocant   := @arglist.shift;
+    }
+    elsif $pirop eq 'return' {
+        $fmt        := "    .return (%,)\n";
+    }
+    elsif $pirop eq 'yield' {
+        $fmt        := "    .yield (%,)\n";
+    }
+    elsif $pirop eq 'tailcall' {
+        $name       := @arglist.shift;
+        $fmt        := "    .tailcall %n(%,)\n";
+    }
+    elsif $pirop eq 'inline' {
+        $fmt        := $node.inline ~ "\n";
+        $result     := $node.result;
+    }
+    else {
+        $fmt   := "    %n %,\n";
+        $name  := $pirop;
+    }
+
+    my $subpir  := pir::find_caller_lex__PS('$SUBPIR');
+    my $subline := pir::find_caller_lex__PS('$SUBLINE');
+    my $line    := pir::find_caller_lex__PS('$LINE');
+
+    if $subline != $line {
+        $subpir.append_format(".annotate 'line', %0\n", ~$line);
+        pir::assign__vPP($subline, $line);
+    }
+
+    $subpir.append_format($fmt, |@arglist, :r($result), :n($name), :i($invocant), :t($result));
 }
 
 
@@ -1050,7 +1030,7 @@ method create_context($past, %adverbs) {
     %context;
 }
 INIT {
-    pir::load_bytecode('nqp-setting.pbc');
+    #pir::load_bytecode('nqp-setting.pbc');
 }
 
 
