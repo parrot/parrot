@@ -16,10 +16,12 @@ Tests the Socket PMC.
 =cut
 
 .include 'socket.pasm'
+.include 'iglobals.pasm'
+
 .sub main :main
     .include 'test_more.pir'
 
-    plan(19)
+    plan(25)
 
     test_init()
     test_get_fd()
@@ -37,6 +39,7 @@ Tests the Socket PMC.
     test_udp_socket6()
     test_raw_udp_socket()
     test_raw_udp_socket6()
+    test_server()
 
 .end
 
@@ -157,6 +160,52 @@ Tests the Socket PMC.
 
     sock.'socket'(.PIO_PF_INET, .PIO_SOCK_RAW, .PIO_PROTO_UDP)
     ok(1, 'Created a raw UDP Socket')
+.end
+
+.sub test_server
+    .local pmc interp, conf, server, sock, address, result
+    .local string command, str
+    .local int status
+
+    interp = getinterp
+    conf = interp[.IGLOBALS_CONFIG_HASH]
+
+    str = conf['osname']
+    if str != 'MSWin32' goto run_tests
+    skip(6, 'Sockets are currently broken on Windows')
+    .return ()
+
+  run_tests:
+    command = '"'
+    str = conf['build_dir']
+    command .= str
+    str = conf['slash']
+    command .= str
+    command .= 'parrot'
+    str = conf['exe']
+    command .= str
+    command .= '" t/pmc/testlib/test_server.pir'
+
+    server = new 'FileHandle'
+    server.'open'(command, 'rp')
+    str = server.'readline'()
+    is(str, "Server started\n", 'Server process started')
+
+    sock = new 'Socket'
+    result = sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
+    ok(result, 'socket')
+    address = sock.'sockaddr'('localhost', 1234)
+    status = sock.'connect'(address)
+    nok(status, 'connect')
+    status = sock.'send'('test message')
+    is(status, '12', 'send')
+    str = sock.'recv'()
+    is(str, 'test message', 'recv')
+    sock.'close'()
+
+    server.'close'()
+    status = server.'exit_status'()
+    nok(status, 'Exit status of server process')
 .end
 
 # Local Variables:

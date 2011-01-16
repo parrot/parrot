@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 15;
+plan tests => 49;
 
 =head1 NAME
 
@@ -34,11 +34,79 @@ sub linedirective
     return "#line " . $linenum . ' "' . __FILE__ . '"' . "\n";
 }
 
+
+my $common = linedirective(__LINE__) . <<'CODE';
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+#include "parrot/extend_vtable.h"
+
+static void fail(const char *msg);
+static Parrot_String createstring(Parrot_Interp interp, const char * value);
+static Parrot_Interp new_interp();
+
+static void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+static Parrot_String createstring(Parrot_Interp interp, const char * value)
+{
+    return Parrot_new_string(interp, value, strlen(value), (const char*)NULL, 0);
+}
+
+static Parrot_Interp new_interp()
+{
+    Parrot_Interp interp = Parrot_new(NULL);
+    if (!interp)
+        fail("Cannot create parrot interpreter");
+    return interp;
+
+}
+
+CODE
+
+sub extend_vtable_output_is
+{
+    my ($code, $expected_output, $msg) = @_;
+    c_output_is(
+        $common . linedirective(__LINE__) . <<CODE,
+int main(void)
+{
+    Parrot_Interp interp;
+    Parrot_PMC pmc, pmc2, pmc3;
+    Parrot_Int type, value, integer;
+    Parrot_Float number;
+
+    interp = new_interp();
+
+    type   = Parrot_PMC_typenum(interp, "Integer");
+    pmc    = Parrot_PMC_new(interp, type);
+    pmc2   = Parrot_PMC_new(interp, type);
+    pmc3   = Parrot_PMC_new(interp, type);
+
+$code
+
+    /* TODO: Properly test this */
+    Parrot_PMC_destroy(interp, pmc);
+
+    Parrot_destroy(interp);
+    printf("Done!\\n");
+    return 0;
+}
+CODE
+        $expected_output, $msg
+    );
+
+}
+
 c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, using just the embed.h header" );
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "parrot/embed.h"
 
 void fail(const char *msg);
@@ -68,7 +136,6 @@ c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, crea
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "parrot/embed.h"
 
 void fail(const char *msg);
@@ -139,29 +206,6 @@ CODE
 Done
 Really done
 OUTPUT
-
-my $common = linedirective(__LINE__) . <<'CODE';
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "parrot/embed.h"
-#include "parrot/extend.h"
-
-static void fail(const char *msg);
-static Parrot_String createstring(Parrot_Interp interp, const char * value);
-
-static void fail(const char *msg)
-{
-    fprintf(stderr, "failed: %s\n", msg);
-    exit(EXIT_FAILURE);
-}
-
-static Parrot_String createstring(Parrot_Interp interp, const char * value)
-{
-    return Parrot_new_string(interp, value, strlen(value), (const char*)NULL, 0);
-}
-
-CODE
 
 c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when an opcode is given improper arguments');
 
@@ -241,8 +285,7 @@ c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello wor
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler;
-    Parrot_String errstr;
+    Parrot_String compiler, errstr;
     Parrot_PMC code;
 
     /* Create the interpreter and show a message using parrot io */
@@ -269,6 +312,548 @@ int main(void)
 CODE
 Hello, parrot
 Hello, pir
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_add_float" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+    number = 43.0;
+
+    Parrot_PMC_i_add_float(interp, pmc, number);
+    number = Parrot_PMC_get_number(interp, pmc);
+    Parrot_printf(interp,"%.2f\n", number);
+CODE
+1.00
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_add_int" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+    integer = 43;
+
+    pmc3 = Parrot_PMC_add_int(interp, pmc, integer, pmc3);
+    integer = Parrot_PMC_get_integer(interp, pmc3);
+    Parrot_printf(interp,"%d\n", integer);
+CODE
+1
+Done!
+OUTPUT
+
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_absolute" );
+
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+    Parrot_PMC_i_absolute(interp, pmc);
+
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(increment|decrement)" );
+
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+
+    Parrot_PMC_increment(interp, pmc);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+
+    Parrot_PMC_decrement(interp, pmc);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+CODE
+-41
+-42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_neg" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+
+    Parrot_PMC_i_neg(interp, pmc);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_neg" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+
+    pmc2 = Parrot_PMC_neg(interp, pmc, pmc2);
+    value = Parrot_PMC_get_integer(interp, pmc2);
+    printf("%d\n", (int) value);
+CODE
+42
+Done!
+OUTPUT
+
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_floor_divide" );
+    Parrot_PMC_set_integer_native(interp, pmc,  7);
+    Parrot_PMC_set_integer_native(interp, pmc2, 3);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    pmc3 = Parrot_PMC_floor_divide(interp, pmc, pmc2, pmc3);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+    value = Parrot_PMC_get_integer(interp, pmc2);
+    printf("%d\n", (int) value);
+    value = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", (int) value);
+CODE
+7
+3
+2
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_floor_divide_float" );
+    Parrot_PMC_set_integer_native(interp, pmc,  7);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+    number = 3.0;
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    pmc3 = Parrot_PMC_floor_divide_float(interp, pmc, number, pmc3);
+    number = Parrot_PMC_get_number(interp, pmc3);
+    printf("%.2f\n", number);
+CODE
+2.00
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_floor_divide_int" );
+    Parrot_PMC_set_integer_native(interp, pmc,  7);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+    integer = 3;
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    pmc3 = Parrot_PMC_floor_divide_float(interp, pmc, integer, pmc3);
+    integer = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", integer);
+CODE
+2
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_multiply" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  21);
+    Parrot_PMC_set_integer_native(interp, pmc2, 2);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    pmc3 = Parrot_PMC_multiply(interp, pmc, pmc2, pmc3);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+    value = Parrot_PMC_get_integer(interp, pmc2);
+    printf("%d\n", (int) value);
+    value = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", (int) value);
+CODE
+21
+2
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_multiply_int" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  21);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+    integer = 2;
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    pmc3 = Parrot_PMC_multiply_int(interp, pmc, integer, pmc3);
+    integer = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", integer);
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_multiply" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  21);
+    Parrot_PMC_set_integer_native(interp, pmc2, 2);
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    Parrot_PMC_i_multiply(interp, pmc, pmc2);
+    integer = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", integer);
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_multiply_int" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  21);
+    integer = 2;
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    Parrot_PMC_i_multiply_int(interp, pmc, integer);
+    integer = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", integer);
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_multiply_float" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  21);
+    number = 2.0;
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    Parrot_PMC_i_multiply_float(interp, pmc, number);
+    number = Parrot_PMC_get_integer(interp, pmc);
+    printf("%.2f\n", number);
+CODE
+42.00
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_multiply_float" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  21);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+    number = 2.0;
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    pmc3 = Parrot_PMC_multiply_float(interp, pmc, number, pmc3);
+    number = Parrot_PMC_get_number(interp, pmc3);
+    printf("%.2f\n", number);
+CODE
+42.00
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_divide" );
+    Parrot_PMC_set_integer_native(interp, pmc,  42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 21);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    pmc3 = Parrot_PMC_divide(interp, pmc, pmc2, pmc3);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+    value = Parrot_PMC_get_integer(interp, pmc2);
+    printf("%d\n", (int) value);
+    value = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", (int) value);
+CODE
+42
+21
+2
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_divide_int" );
+    Parrot_PMC_set_integer_native(interp, pmc,  42);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+    integer = 21;
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    pmc3 = Parrot_PMC_divide_int(interp, pmc, integer, pmc3);
+    integer = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", integer);
+CODE
+2
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_divide_float" );
+    Parrot_PMC_set_integer_native(interp, pmc,  42);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+    number = 21.0;
+
+    /*
+       We must pass in the destination, but the return
+       value of the function must be used. This is broken.
+    */
+    pmc3 = Parrot_PMC_divide_float(interp, pmc, number, pmc3);
+    number = Parrot_PMC_get_number(interp, pmc3);
+    printf("%.2f\n", number);
+CODE
+2.00
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE',<<'OUTPUT', "Parrot_PMC_modulus" );
+    Parrot_PMC_set_integer_native(interp, pmc,  50);
+    Parrot_PMC_set_integer_native(interp, pmc2, 42);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+
+    pmc3 = Parrot_PMC_modulus(interp, pmc, pmc2, pmc3);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+    value = Parrot_PMC_get_integer(interp, pmc2);
+    printf("%d\n", (int) value);
+    value = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", (int) value);
+CODE
+50
+42
+8
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE',<<'OUTPUT', "Parrot_PMC_i_modulus" );
+    Parrot_PMC_set_integer_native(interp, pmc,  50);
+    Parrot_PMC_set_integer_native(interp, pmc2, 42);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+
+    Parrot_PMC_i_modulus(interp, pmc, pmc2);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", value);
+    value = Parrot_PMC_get_integer(interp, pmc2);
+    printf("%d\n", value);
+CODE
+8
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE',<<'OUTPUT', "Parrot_PMC_i_modulus_int" );
+    Parrot_PMC_set_integer_native(interp, pmc,  50);
+    integer = 42;
+
+    Parrot_PMC_i_modulus_int(interp, pmc, integer);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int)value);
+CODE
+8
+Done!
+OUTPUT
+
+# TODO: Does this look right?
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_defined" );
+    Parrot_PMC_set_integer_native(interp, pmc2, -42);
+
+    integer = Parrot_PMC_defined(interp, pmc);
+    printf("%d\n", (int) integer);
+
+    integer = Parrot_PMC_defined(interp, pmc2);
+    printf("%d\n", (int) integer);
+
+CODE
+1
+1
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 42);
+
+    integer = Parrot_PMC_is_equal(interp, pmc, pmc2);
+    printf("%d\n", (int) integer);
+
+    Parrot_PMC_set_integer_native(interp, pmc2, -42);
+
+    integer = Parrot_PMC_is_equal(interp, pmc, pmc2);
+    printf("%d\n", (int) integer);
+CODE
+0
+1
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_subtract" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  52);
+    Parrot_PMC_set_integer_native(interp, pmc2, 10);
+
+    pmc3 = Parrot_PMC_subtract(interp, pmc, pmc2, pmc3);
+    Parrot_printf(interp, "%P\n", pmc3);
+    pmc3 = Parrot_PMC_subtract(interp, pmc2, pmc, pmc3);
+    Parrot_printf(interp, "%P\n", pmc3);
+
+CODE
+42
+-42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_subtract" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  52);
+    Parrot_PMC_set_integer_native(interp, pmc2, 10);
+
+    Parrot_PMC_i_subtract(interp, pmc, pmc2);
+    Parrot_printf(interp, "%P\n", pmc);
+
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_subtract_int" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  52);
+    integer = 10;
+
+    pmc3 = Parrot_PMC_subtract_int(interp, pmc, integer, pmc3);
+    Parrot_printf(interp, "%P\n", pmc3);
+
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_subtract_float" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  52);
+    number = 10.0;
+
+    pmc3 = Parrot_PMC_subtract_float(interp, pmc, number, pmc3);
+    Parrot_printf(interp, "%P\n", pmc3);
+
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_subtract_int" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  52);
+    integer = 10;
+
+    Parrot_PMC_i_subtract_int(interp, pmc, integer);
+    Parrot_printf(interp, "%P\n", pmc);
+
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_subtract_float" );
+
+    Parrot_PMC_set_integer_native(interp, pmc,  52);
+    number = 10.0;
+
+    Parrot_PMC_i_subtract_float(interp, pmc, number);
+    Parrot_printf(interp, "%P\n", pmc);
+
+CODE
+42
+Done!
+OUTPUT
+
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_cmp" );
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 17);
+
+    integer = Parrot_PMC_cmp(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", (int) integer);
+
+    Parrot_PMC_set_integer_native(interp, pmc, 17);
+    Parrot_PMC_set_integer_native(interp, pmc2, 42);
+
+    integer = Parrot_PMC_cmp(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", (int) integer);
+
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+
+    integer = Parrot_PMC_cmp(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", (int) integer);
+CODE
+1
+-1
+0
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_add" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 1000);
+
+    Parrot_PMC_i_add(interp, pmc, pmc2);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+CODE
+958
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_add_int" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+
+    Parrot_PMC_i_add_int(interp, pmc, 1000);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+CODE
+958
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_add" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 1000);
+
+    pmc3 = Parrot_PMC_add(interp, pmc, pmc2, pmc3);
+    value = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", (int) value);
+CODE
+958
+Done!
+OUTPUT
+
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_assign_pmc" );
+    Parrot_PMC_set_integer_native(interp, pmc, -42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 1000);
+    Parrot_PMC_set_integer_native(interp, pmc3, 420);
+
+    value = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", (int) value);
+
+    Parrot_PMC_assign_pmc(interp, pmc3, pmc);
+
+    value = Parrot_PMC_get_integer(interp, pmc3);
+    printf("%d\n", (int) value);
+CODE
+420
+-42
+Done!
 OUTPUT
 
 c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from a sub" );
@@ -387,16 +972,8 @@ c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "returning
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler;
-    Parrot_String errstr;
-    Parrot_PMC code;
-    Parrot_PMC rootns;
-    Parrot_String parrotname;
-    Parrot_PMC parrotns;
-    Parrot_String subname;
-    Parrot_PMC sub;
-    Parrot_String msg;
-    Parrot_PMC ret;
+    Parrot_PMC code, rootns, parrotns, sub, ret;
+    Parrot_String compiler, errstr, parrotname, subname, msg;
 
     /* Create the interpreter */
     interp = Parrot_new(NULL);
@@ -425,12 +1002,13 @@ int main(void)
     );
 
     /* Get parrot namespace */
-    rootns = Parrot_get_root_namespace(interp);
+    rootns     = Parrot_get_root_namespace(interp);
     parrotname = createstring(interp, "parrot");
-    parrotns = Parrot_PMC_get_pmc_keyed_str(interp, rootns,  parrotname);
+    parrotns   = Parrot_PMC_get_pmc_keyed_str(interp, rootns,  parrotname);
+
     /* Get the sub */
     subname = createstring(interp, "hello");
-    sub = Parrot_PMC_get_pmc_keyed_str(interp, parrotns,  subname);
+    sub     = Parrot_PMC_get_pmc_keyed_str(interp, parrotns,  subname);
 
     /* Execute it */
     msg = createstring(interp, "Hello, ");

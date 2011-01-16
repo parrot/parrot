@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -54,10 +54,10 @@ void fail(const char *msg)
 int main(int argc, const char **argv)
 {
     Parrot_Interp interp;
+    char buf[11];
     interp = Parrot_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
-    char buf[11];
     Parrot_snprintf(interp, buf, 11, "test%d", 123456);
     puts(buf);
 
@@ -88,13 +88,13 @@ void fail(const char *msg)
 int main(int argc, const char **argv)
 {
     Parrot_Interp interp;
+    char buf[] = "unchanged";
     interp = Parrot_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
-    char *buf = "unchanged";
     Parrot_snprintf(interp, buf, 0, "");
 
-    if (buf == "unchanged") puts("Done");
+    if (strcmp(buf, "unchanged") == 0) puts("Done");
     else fail(buf);
 
     Parrot_destroy(interp);
