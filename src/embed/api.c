@@ -732,7 +732,7 @@ otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, ARGIN(const char * sourcefile),
-    int argc, ARGIN(const char **argv), ARGMOD(Parrot_PMC* bytecodepmc),
+    int argc, ARGIN_NULLOK(const char **argv), ARGMOD(Parrot_PMC* bytecodepmc),
     ARGOUT(int *result), imcc_hack_func_t func)
 {
     ASSERT_ARGS(Parrot_api_wrap_imcc_hack)

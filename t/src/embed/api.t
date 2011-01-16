@@ -11,7 +11,7 @@ use Parrot::Test::Util 'create_tempfile';
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 1;
+plan tests => 2;
 
 =head1 NAME
 
@@ -93,14 +93,6 @@ c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "get set compiler" )
 
 #include "parrot/api.h"
 
-void fail(const char *msg);
-
-void fail(const char *msg)
-{
-    fprintf(stderr, "failed: %s\n", msg);
-    exit(EXIT_FAILURE);
-}
-
 int main(int argc, const char **argv)
 {
     char * c_outstr = NULL;
@@ -130,11 +122,12 @@ True
 Done
 OUTPUT
 
-my (undef, $temp_pir)  = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
-my (undef, $temp_pbc)  = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
-open PIR_FILE, $temp_pir, ">";
+my (undef, $temp_pir)  = create_tempfile( SUFFIX => '.pir', UNLINK => 0 );
+my (undef, $temp_pbc)  = create_tempfile( SUFFIX => '.pir', UNLINK => 0 );
+open PIR_FILE, ">", $temp_pir;
 print PIR_FILE <<'PIR_CODE';
-.sub main :mainargv
+.sub main :main
+    .param pmc args
     say "executed"
 .end
 PIR_CODE
@@ -145,27 +138,33 @@ c_output_is( <<"CODE", << 'OUTPUT', "Parrot_api_serialize_bytecode_pmc" );
 
 #include "parrot/api.h"
 
-void fail(const char *msg);
-
-void fail(const char *msg)
-{
-    fprintf(stderr, "failed: %s\n", msg);
-    exit(EXIT_FAILURE);
-}
-
 int main(void) {
     Parrot_PMC interp;
-    Parrot_PMC bytecode
+    Parrot_PMC bytecode;
     Parrot_Int run_pbc;
-    Parrot_String pbc;
+    Parrot_String pbc_s;
+    Parrot_Int length;
+    char * pbc_c;
+    FILE * file;
 
-    const char *argv[] = {"$temp_pir"};
-    Parrot_api_make_interpreter(NULL, 0, initargs, &inter);
+    Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
 
-    Parrot_api_wrap_imcc_hack(interp, sourcefile, 1, argv, &bytecode, &run_pbc, imcc_run_api);
-    Parrot_api_serialize_bytecode_pmc(interp, bytecode, &pbc);
-    // TODO: Write out to a file
+    /* Step 1: Take the PIR, and compile it to PBC. Write to file */
+    Parrot_api_wrap_imcc_hack(interp, "$temp_pir", 0, NULL, &bytecode, &run_pbc, imcc_run_api);
+    Parrot_api_serialize_bytecode_pmc(interp, bytecode, &pbc_s);
+    Parrot_api_string_export_ascii(interp, pbc_s, &pbc_c);
+    Parrot_api_string_byte_length(interp, pbc_s, &length);
+    file = fopen("$temp_pbc", "w");
+    fwrite(pbc_c, length, 1, file);
+    fclose(file);
+
+    /* Step 2: Now load in the PIR and execute it */
+    Parrot_api_load_bytecode_file(interp, "$temp_pbc", &bytecode);
+    Parrot_api_run_bytecode(interp, bytecode, NULL);
 }
+CODE
+executed
+OUTPUT
 
 # Local Variables:
 #   mode: cperl

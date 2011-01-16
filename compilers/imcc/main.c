@@ -75,17 +75,15 @@ static void imcc_get_optimization_description(
 
 static char * imcc_parseflags(PARROT_INTERP,
     int argc,
-    ARGIN(const char **argv))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+    ARGIN_NULLOK(const char **argv))
+        __attribute__nonnull__(1);
 
 static int imcc_run(PARROT_INTERP,
     ARGIN(const char *sourcefile),
-    ARGIN(const char *output_file),
+    ARGIN_NULLOK(const char *output_file),
     ARGOUT(PMC **pbcpmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*pbcpmc);
 
@@ -118,12 +116,10 @@ static const struct longopt_opt_decl * Parrot_cmd_options(void);
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(opt_desc))
 #define ASSERT_ARGS_imcc_parseflags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(argv))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_imcc_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sourcefile) \
-    , PARROT_ASSERT_ARG(output_file) \
     , PARROT_ASSERT_ARG(pbcpmc))
 #define ASSERT_ARGS_imcc_write_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -232,7 +228,7 @@ Parse flags ans set approptiate state(s)
 */
 
 static char *
-imcc_parseflags(PARROT_INTERP, int argc, ARGIN(const char **argv))
+imcc_parseflags(PARROT_INTERP, int argc, ARGIN_NULLOK(const char **argv))
 {
     ASSERT_ARGS(imcc_parseflags)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
@@ -240,6 +236,8 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN(const char **argv))
 
     /* default state: run pbc */
     SET_STATE_RUN_PBC(interp);
+    if (!argv)
+        return NULL;
 
     while (longopt_get(argc, argv, Parrot_cmd_options(), &opt) > 0) {
         switch (opt.opt_id) {
@@ -631,7 +629,7 @@ PMC interpreter.
 PARROT_API
 int
 imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(const char *sourcefile), int argc,
-        ARGIN(const char **argv), ARGOUT(PMC **pbcpmc))
+        ARGIN_NULLOK(const char **argv), ARGOUT(PMC **pbcpmc))
 {
     Interp * interp = (Interp *)VTABLE_get_pointer(NULL, interp_pmc);
     const char * output_file = imcc_parseflags(interp, argc, argv);
@@ -653,7 +651,7 @@ and run. This function always returns 0.
 
 static int
 imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile),
-        ARGIN(const char *output_file), ARGOUT(PMC **pbcpmc))
+        ARGIN_NULLOK(const char *output_file), ARGOUT(PMC **pbcpmc))
 {
     yyscan_t           yyscanner;
     PackFile * pf_raw = NULL;

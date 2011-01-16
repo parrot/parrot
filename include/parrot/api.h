@@ -229,12 +229,11 @@ Parrot_Int Parrot_api_wrap_imcc_hack(
     Parrot_PMC interp_pmc,
     ARGIN(const char * sourcefile),
     int argc,
-    ARGIN(const char **argv),
+    ARGIN_NULLOK(const char **argv),
     ARGMOD(Parrot_PMC* bytecodepmc),
     ARGOUT(int *result),
     imcc_hack_func_t func)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
         __attribute__nonnull__(5)
         __attribute__nonnull__(6)
         FUNC_MODIFIES(* bytecodepmc)
@@ -294,7 +293,6 @@ Parrot_Int Parrot_api_wrap_imcc_hack(
 #define ASSERT_ARGS_Parrot_api_set_warnings __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_wrap_imcc_hack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(sourcefile) \
-    , PARROT_ASSERT_ARG(argv) \
     , PARROT_ASSERT_ARG(bytecodepmc) \
     , PARROT_ASSERT_ARG(result))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
