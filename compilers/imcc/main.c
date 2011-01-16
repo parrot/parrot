@@ -249,9 +249,6 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN_NULLOK(const char **argv))
                 IMCC_INFO(interp)->debug++;
             }
             break;
-          case 'w':
-            IMCC_INFO(interp)->imcc_warn = 1;
-            break;
           case 'a':
             SET_STATE_PASM_FILE(interp);
             break;
@@ -718,12 +715,6 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile),
             SET_STATE_LOAD_PBC(interp);
         }
     }
-
-    /* tear down the compilation context */
-    if (IMCC_INFO(interp)->imcc_warn)
-        PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
-    else
-        PARROT_WARNINGS_off(interp, PARROT_WARNINGS_ALL_FLAG);
 
     yylex_destroy(yyscanner);
 
