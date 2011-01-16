@@ -7,8 +7,11 @@ New in 3.0.0
     printing error details directly to stderr
   + Improved Unicode support for file IO, environment variables, program names,
     and command-line parameters
-  + Added gdb pretty-printers for Parrot STRINGs and PMCs (gdb 7.2 or later required)
+  + Added experimental gdb pretty-printers in tools/dev for Parrot STRINGs and PMCs
+    (gdb 7.2 or later is required, as well as Python)
   + Noticably faster build due to c2str.pl improvements
+  + Some bugs in our Digest::sha256 library and bit-related dynamic ops were
+    fixed by GCI student Nolan Lum. Both now work correctly on 32 and 64 bit systems
 - Languages
 - Community
   + tree-optimization library by Tyler L. Curtis, a GSoC student, joined the nest
@@ -20,6 +23,8 @@ New in 3.0.0
   + Translations of our README in various languages are now in the
     docs/translation directory
 - Tests
+  + A better way to write "todo" tests with Test::More was implemented by
+    GCI student Fernando Brito
   + Major increases in test coverage of many core PMCs, dynamic PMCs and
     dynamic opcodes thanks to Google Code-In and the interpid students it
     attracted
