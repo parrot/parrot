@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -500,7 +500,7 @@ Tests various transcendental operations
 
     if gmp == 'define' goto can_test
 
-    goto end
+    goto skipthem
 
   can_test:
 
@@ -524,9 +524,11 @@ Tests various transcendental operations
 # In the meantime, make sure it overflows nicely
 # on 32 bit.
     unless i2 > 40 goto next
+    goto end
 
-  end:
+  skipthem:
     skip(40,'No integer overflow tests for 32-bit INTVALs')
+  end:
 .end
 
 .macro sprintf_is(fmt, number, message)
