@@ -376,28 +376,14 @@ multi method pir(POST::Sub $node) {
 }
 
 method hll_pir($node, *%options) {
-    Q:PIR {
-    .local pmc node
-    .local pmc options
+    %options<target> := 'pir';
+    %options<subid>  := $node.subid;
 
-    find_lex node, '$node'
-    find_lex options, '%options'
-
-    options['target'] = 'pir'
-    $P0 = node.'subid'()
-    options['subid'] = $P0
-    .local pmc source, compiler, pir
-    source = node[0]
-    $S0 = node.'compiler'()
-    compiler = compreg $S0
-    $I0 = isa compiler, 'Sub'
-    if $I0 goto compiler_sub
-    $S0 = compiler.'compile'(source, options :flat :named)
-    .return ($S0)
-  compiler_sub:
-    $S0 = compiler(source, options :flat :named)
-    .return ($S0)
-    }
+    my $source   := $node[0];
+    my $compiler := pir::compreg__PS($node.compiler);
+    pir::isa($compiler, 'Sub')
+        ?? $compiler($source, |%options)
+        !! $compiler.compile($source, |%options);
 }
 
 
