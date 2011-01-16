@@ -664,7 +664,6 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile),
 
     if (STATE_PRE_PROCESS(interp)) {
         do_pre_process(interp, yyscanner);
-        Parrot_destroy(interp);
         yylex_destroy(yyscanner);
 
         return 0;
