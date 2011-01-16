@@ -1,6 +1,6 @@
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1295186272.66713")
+.sub "_block11"  :anon :subid("10_1295186545.74177")
 .annotate 'line', 0
     get_hll_global $P14, ["POST";"VanillaAllocator"], "_block13" 
     capture_lex $P14
@@ -17,15 +17,15 @@
     $P63 = $P14()
 .annotate 'line', 1
     .return ($P63)
-    .const 'Sub' $P65 = "15_1295186272.66713" 
+    .const 'Sub' $P65 = "15_1295186545.74177" 
     .return ($P65)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post16") :outer("10_1295186272.66713")
+.sub "" :load :init :subid("post16") :outer("10_1295186545.74177")
 .annotate 'line', 0
-    .const 'Sub' $P12 = "10_1295186272.66713" 
+    .const 'Sub' $P12 = "10_1295186545.74177" 
     .local pmc block
     set block, $P12
     $P68 = get_root_global ["parrot"], "P6metaclass"
@@ -34,9 +34,9 @@
 
 
 .namespace ["POST";"VanillaAllocator"]
-.sub "_block13"  :subid("11_1295186272.66713") :outer("10_1295186272.66713")
+.sub "_block13"  :subid("11_1295186545.74177") :outer("10_1295186545.74177")
 .annotate 'line', 9
-    .const 'Sub' $P17 = "12_1295186272.66713" 
+    .const 'Sub' $P17 = "12_1295186545.74177" 
     capture_lex $P17
     get_global $P15, "%type2idx"
     unless_null $P15, vivify_18
@@ -51,17 +51,17 @@
   ctxsave_done:
     get_global $P16, "%type2idx"
 .annotate 'line', 23
-    .const 'Sub' $P17 = "12_1295186272.66713" 
+    .const 'Sub' $P17 = "12_1295186545.74177" 
     newclosure $P57, $P17
 .annotate 'line', 9
     .return ($P57)
-    .const 'Sub' $P59 = "14_1295186272.66713" 
+    .const 'Sub' $P59 = "14_1295186545.74177" 
     .return ($P59)
 .end
 
 
 .namespace ["POST";"VanillaAllocator"]
-.sub "" :load :init :subid("post17") :outer("11_1295186272.66713")
+.sub "" :load :init :subid("post17") :outer("11_1295186545.74177")
 .annotate 'line', 9
     get_hll_global $P14, ["POST";"VanillaAllocator"], "_block13" 
     .local pmc block
@@ -74,10 +74,10 @@
 
 .namespace ["POST";"VanillaAllocator"]
 .include "except_types.pasm"
-.sub "process"  :subid("12_1295186272.66713") :method :outer("11_1295186272.66713")
+.sub "process"  :subid("12_1295186545.74177") :method :outer("11_1295186545.74177")
     .param pmc param_20
 .annotate 'line', 23
-    .const 'Sub' $P29 = "13_1295186272.66713" 
+    .const 'Sub' $P29 = "13_1295186545.74177" 
     capture_lex $P29
     new $P19, ['ExceptionHandler'], .CONTROL_RETURN
     set_addr $P19, control_18
@@ -107,7 +107,7 @@
     unless $P23, loop52_done
     shift $P27, $P23
   loop52_redo:
-    .const 'Sub' $P29 = "13_1295186272.66713" 
+    .const 'Sub' $P29 = "13_1295186545.74177" 
     capture_lex $P29
     $P29($P27)
   loop52_next:
@@ -133,7 +133,7 @@
 
 
 .namespace ["POST";"VanillaAllocator"]
-.sub "_block28"  :anon :subid("13_1295186272.66713") :outer("12_1295186272.66713")
+.sub "_block28"  :anon :subid("13_1295186545.74177") :outer("12_1295186545.74177")
     .param pmc param_31
 .annotate 'line', 27
     new $P30, "Undef"
@@ -190,18 +190,18 @@
 
 
 .namespace ["POST";"VanillaAllocator"]
-.sub "_block58" :load :anon :subid("14_1295186272.66713")
+.sub "_block58" :load :anon :subid("14_1295186545.74177")
 .annotate 'line', 9
-    .const 'Sub' $P60 = "11_1295186272.66713" 
+    .const 'Sub' $P60 = "11_1295186545.74177" 
     $P61 = $P60()
     .return ($P61)
 .end
 
 
 .namespace []
-.sub "_block64" :load :anon :subid("15_1295186272.66713")
+.sub "_block64" :load :anon :subid("15_1295186545.74177")
 .annotate 'line', 1
-    .const 'Sub' $P66 = "10_1295186272.66713" 
+    .const 'Sub' $P66 = "10_1295186545.74177" 
     $P67 = $P66()
     .return ($P67)
 .end
