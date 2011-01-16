@@ -659,48 +659,6 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
 
 /*
 
-=item C<PMC * imcc_compile_pasm(PARROT_INTERP, const char *s)>
-
-Note: This function is provided for backward compatibility. This
-function can go away in future.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-imcc_compile_pasm(PARROT_INTERP, ARGIN(const char *s))
-{
-    ASSERT_ARGS(imcc_compile_pasm)
-    STRING *error_message;
-    return imcc_compile(interp, s, 1, &error_message);
-}
-
-/*
-
-=item C<PMC * imcc_compile_pir(PARROT_INTERP, const char *s)>
-
-Note: This function is provided for backward compatibility. This
-function can go away in future.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-imcc_compile_pir(PARROT_INTERP, ARGIN(const char *s))
-{
-    ASSERT_ARGS(imcc_compile_pir)
-    STRING *error_message;
-    return imcc_compile(interp, s, 0, &error_message);
-}
-
-/*
-
 =item C<PMC * IMCC_compile_pir_s(PARROT_INTERP, const char *s, STRING
 **error_message)>
 
