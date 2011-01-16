@@ -724,10 +724,7 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile),
     }
 
     /* should the bytecode be run */
-    if (STATE_RUN_PBC(interp))
-        return 1;
-    else
-        return 0;
+    return STATE_RUN_PBC(interp) ? 1 : 0;
 }
 
 /*
