@@ -496,7 +496,7 @@ Tests various transcendental operations
     .local string gmp
     gmp = config['gmp']
 
-    if intvalsize == 4 goto end
+    if intvalsize == 4 goto skipthem
 
     if gmp == 'define' goto can_test
 
