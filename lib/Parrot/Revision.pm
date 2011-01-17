@@ -76,13 +76,14 @@ sub _get_revision {
         close $FH or die "Unable to close $cache after reading: $!";
     }
     else {
-        $revision = 0;
+        $revision = 1;
         if ( -d '.git' ) {
-            open my $GIT_LOG, 'git log |';
-            while (<$GIT_LOG>) {
+            $revision = 0;
+            open (GIT_LOG, 'git log |');
+            while (<GIT_LOG>) {
                 $revision++ if /^commit/;
             }
-            close $GIT_LOG;
+            close GIT_LOG;
         }
     }
     return $revision;
