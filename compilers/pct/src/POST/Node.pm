@@ -45,8 +45,6 @@ Shortcut for creating and adding a new POST::Op node with opcode
 C<pirop> and any supplied arguments or options.  Returns the
 newly created node.
 
-=cut
-
 method push_pirop($pirop, *@arglist, *%adverbs) {
     %adverbs<pirop> := $pirop;
     my $op := POST::Op.new(|@arglist, |%adverbs);
@@ -58,8 +56,6 @@ method push_pirop($pirop, *@arglist, *%adverbs) {
 =item escape(str)
 Return C<str> as a PIR constant string.  (Deprecated in favor of
 C<PAST::Compiler.escape>.)
-
-=cut
 
 method escape($str) {
     PAST::Compiler.escape($str);
