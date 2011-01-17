@@ -13,6 +13,7 @@ New in 3.0.0
   + Some bugs in our Digest::sha256 library and bit-related dynamic ops were
     fixed by GCI student Nolan Lum. Both now work correctly on 32 and 64 bit systems
 - Languages
+  + Ωη;)XD - OMeta for Winxed https://github.com/plobsing/ohm-eta-wink-kzd
 - Community
   + tree-optimization library by Tyler L. Curtis, a GSoC student, joined the nest
     and now lives at http://github.com/parrot/tree-optimization
