@@ -44,6 +44,9 @@ segments from the input PBC files.
 #include "pmc/pmc_sub.h"
 #include "parrot/embed.h"
 
+extern const unsigned char * Parrot_get_config_hash_bytes(void);
+extern int Parrot_get_config_hash_length(void);
+
 /* This struct describes an input file. */
 typedef struct pbc_merge_input {
     const char *filename;       /* name of the input file */
