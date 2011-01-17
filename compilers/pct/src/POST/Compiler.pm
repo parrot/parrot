@@ -72,35 +72,14 @@ method key_pir(*@args) {
 }
 
 method to_pir($post, *%adverbs) {
-    Q:PIR {
-    .local pmc post
-    .local pmc adverbs
+    my $newself := POST::Compiler.new;
+    my $CODE    := pir::new('StringBuilder');
+    my $LINE    := 0;
 
-    find_lex post, '$post'
-    find_lex adverbs, '%adverbs'
-
-    .local pmc newself
-    newself = new ['POST';'Compiler']
-
-    .local pmc innerpir, line
-    innerpir = new 'StringBuilder'
-    .lex '$CODE', innerpir
-    line = box 0
-    .lex '$LINE', line
-
-    ##  if the root node isn't a Sub, wrap it
-    $I0 = isa post, ['POST';'Sub']
-    if $I0 goto have_sub
-    $P0 = get_hll_global ['POST'], 'Sub'
-    post = $P0.'new'(post, 'name'=>'anon')
-  have_sub:
-
-    ##  now generate the pir
-    newself.'pir'(post)
-
-    ##  and return whatever code was generated
-    .return (innerpir)
+    unless pir::isa($post, POST::Sub) {
+        $post := POST::Sub.new($post, :name<anon>);
     }
+    $newself.pir($post);
 }
 
 =item pir_children(node)
