@@ -77,14 +77,7 @@ sub _get_revision {
     }
     else {
         $revision = 1;
-        if ( -d '.git' ) {
-            $revision = 0;
-            open (GIT_LOG, 'git log |');
-            while (<GIT_LOG>) {
-                $revision++ if /^commit/;
-            }
-            close GIT_LOG;
-        }
+        _print_to_cache($cache, $revision);
     }
     return $revision;
 }
