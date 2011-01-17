@@ -17,6 +17,7 @@ New in 3.0.0
 - Community
   + tree-optimization library by Tyler L. Curtis, a GSoC student, joined the nest
     and now lives at http://github.com/parrot/tree-optimization
+  + Plumage now lives at http://github.com/parrot/plumage, and now is installable
 - Documentation
   + HTML documentation generation has been rewritten and simplified
   + New section in docs/project/git_workflow.pod about keeping a fork
