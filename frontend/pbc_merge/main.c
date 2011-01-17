@@ -907,6 +907,13 @@ main(int argc, const char **argv)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     Interp * const interp = Parrot_new(NULL);
 
+    {
+        const int config_length = Parrot_get_config_hash_length();
+        const unsigned char * const config_bytes =
+            Parrot_get_config_hash_bytes();
+        Parrot_set_configuration_hash_legacy(interp, config_length, config_bytes);
+    }
+
     Parrot_block_GC_mark(interp);
 
     /* Get options, ensuring we have at least one input
