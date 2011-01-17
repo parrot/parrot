@@ -1,8 +1,8 @@
-# Copyright (C) 2005-2011, Parrot Foundation.
+# Copyright (C) 2005-2008, Parrot Foundation.
 
 =head1 NAME
 
-Parrot::Revision - counts commits to git repository of Parrot
+Parrot::Revision - SVN Revision of Parrot
 
 =head1 SYNOPSIS
 
@@ -12,12 +12,11 @@ Parrot::Revision - counts commits to git repository of Parrot
 
 =head1 DESCRIPTION
 
-From the output of
+Get parrot's current and configure time revision.
 
-     git log
-
-counting the commit to Parrot's git repository. The result is similar like
-a SVN Revision.
+We currently always return "1" to tell old HLL's that this version of Parrot is too new for them.
+There is currently no way to say "we are too new for you", so we have to lie again and say we are
+too old.
 
 =cut
 
@@ -32,8 +31,8 @@ our $cache = q{.parrot_current_rev};
 our $current = _get_revision();
 
 sub update {
-    my $prev = 1;
-    my $revision = _get_revision();
+    my $prev = _get_revision();
+    my $revision = 1;
     $current = _handle_update( {
         prev        => $prev,
         revision    => $revision,
@@ -85,7 +84,6 @@ sub _get_revision {
             }
             close $GIT_LOG;
         }
-        _print_to_cache($cache, $revision);
     }
     return $revision;
 }
