@@ -17,8 +17,6 @@ Get or set the result value of this node.  If the result value
 is set to another POST node, then that node's result is used
 as the result of the current node.
 
-=cut
-
 method result($result?) {
     if pir::defined($result) {
         self<result> := $result;
@@ -37,8 +35,6 @@ method result($result?) {
 
 =item get_string()
 Returns the result of the current node as a string.
-
-=cut
 
 method get_string() is pirflags<:vtable('get_string')> {
     self.result();
