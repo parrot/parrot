@@ -896,7 +896,8 @@ merge process and finally writes out the produced packfile.
 */
 
 static struct longopt_opt_decl options[] = {
-    { 'o', 'o', OPTION_required_FLAG, { "--output" } }
+    { 'o', 'o', OPTION_required_FLAG, { "--output" } },
+    {  0 ,  0 , OPTION_optional_FLAG, { NULL       } }
 };
 
 int
