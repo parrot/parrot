@@ -429,6 +429,8 @@ The calendar of releases is available at the comp.lang.parrot google calendar,
 visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
+Versions with a asterisk (*) are supported releases.
+
  - Feb 15, 2011 - 3.1   - mikehh
  - Mar 15, 2011 - 3.2   - gerd
  - Apr 19, 2011 - 3.3*  - whiteknight
@@ -437,7 +439,7 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
  - Jul 19, 2011 - 3.6*  - kid51
  - Aug 16, 2011 - 3.7   - ??
  - Sep 20, 2011 - 3.8   - ??
- - Oct 18, 2011 - 3.9   - ??
+ - Oct 18, 2011 - 3.9*  - dukeleto
  - Nov 15, 2011 - 3.10  - ??
  - Dec 20, 2011 - 3.11  - ??
 
