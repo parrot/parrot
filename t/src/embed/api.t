@@ -161,6 +161,7 @@ int main(void) {
     /* Step 2: Now load in the PIR and execute it */
     Parrot_api_load_bytecode_file(interp, "$temp_pbc", &bytecode);
     Parrot_api_run_bytecode(interp, bytecode, NULL);
+    return 0;
 }
 CODE
 executed
