@@ -115,9 +115,6 @@ IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
 {
     ASSERT_ARGS(IMCC_warning)
     va_list ap;
-    if (IMCC_INFO(interp)->imcc_warn)
-        return;
-
     va_start(ap, fmt);
     imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
     va_end(ap);
