@@ -447,10 +447,6 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         if (STREQ(name, "end") || STREQ(name, "ret")) {
             ins->type |= ITBRANCH | IF_goto;
         }
-        else if (STREQ(name, "warningson")) {
-            /* emit a debug seg, if this op is seen */
-            PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
-        }
         else if (STREQ(name, "yield")) {
             if (!IMCC_INFO(interp)->cur_unit->instructions->symregs[0])
                 IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
