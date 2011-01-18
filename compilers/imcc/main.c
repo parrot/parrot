@@ -3,7 +3,7 @@
  * Intermediate Code Compiler for Parrot.
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
- * Copyright (C) 2003-2010, Parrot Foundation.
+ * Copyright (C) 2003-2011, Parrot Foundation.
  */
 
 /*
@@ -639,6 +639,8 @@ int
 imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(const char *sourcefile), int argc,
         ARGIN_NULLOK(const char **argv), ARGOUT(PMC **pbcpmc))
 {
+    ASSERT_ARGS(imcc_run_api)
+
     Interp * interp = (Interp *)VTABLE_get_pointer(NULL, interp_pmc);
     const char * output_file = imcc_parseflags(interp, argc, argv);
     return imcc_run(interp, sourcefile, output_file, pbcpmc);
@@ -661,6 +663,8 @@ static int
 imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile),
         ARGIN_NULLOK(const char *output_file), ARGOUT(PMC **pbcpmc))
 {
+    ASSERT_ARGS(imcc_run)
+
     yyscan_t           yyscanner;
     PackFile * pf_raw = NULL;
     *pbcpmc = PMCNULL;
