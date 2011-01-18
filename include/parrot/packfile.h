@@ -228,8 +228,9 @@ typedef struct PackFile_ConstTable {
         opcode_t        const_count;
         PMC           **constants;
     } pmc;
-    PackFile_ByteCode  *code;  /* where this segment belongs to */
-    Hash               *string_hash; /* Hash for lookup strings and numbers */
+    PackFile_ByteCode  *code;        /* where this segment belongs to */
+    Hash               *string_hash; /* Hash for lookup of string indices */
+    Hash               *pmc_hash;    /* Hash for lookup of pmc indices */
 } PackFile_ConstTable;
 
 typedef struct PackFile_ByteCode_OpMappingEntry {
@@ -1114,6 +1115,20 @@ int PackFile_ConstTable_rlookup_num(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+int PackFile_ConstTable_rlookup_pmc(PARROT_INTERP,
+    ARGIN(PackFile_ConstTable *ct),
+    ARGIN(PMC *v),
+    ARGOUT(INTVAL *constno),
+    ARGOUT(INTVAL *idx))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*constno)
+        FUNC_MODIFIES(*idx);
+
+PARROT_EXPORT
 int PackFile_ConstTable_rlookup_str(PARROT_INTERP,
     ARGIN(const PackFile_ConstTable *ct),
     ARGIN(STRING *s))
@@ -1148,6 +1163,13 @@ opcode_t PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
+#define ASSERT_ARGS_PackFile_ConstTable_rlookup_pmc \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ct) \
+    , PARROT_ASSERT_ARG(v) \
+    , PARROT_ASSERT_ARG(constno) \
+    , PARROT_ASSERT_ARG(idx))
 #define ASSERT_ARGS_PackFile_ConstTable_rlookup_str \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
