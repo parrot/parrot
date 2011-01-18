@@ -59,7 +59,7 @@ Make sure you have the most recent version of the master branch:
 Also be sure you do not have any local commits that have not yet
 been pushed out and tested thoroughly. You can check for this with
 
-    git log ..origin/master
+    git log origin/master..
 
 If there is no output from that command, then your local master
 and the master on origin are in sync.
@@ -429,7 +429,6 @@ The calendar of releases is available at the comp.lang.parrot google calendar,
 visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
- - Jan 18, 2011 - 3.0*  - cotto
  - Feb 15, 2011 - 3.1   - mikehh
  - Mar 15, 2011 - 3.2   - gerd
  - Apr 19, 2011 - 3.3*  - ??
