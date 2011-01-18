@@ -431,7 +431,7 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
  - Feb 15, 2011 - 3.1   - mikehh
  - Mar 15, 2011 - 3.2   - gerd
- - Apr 19, 2011 - 3.3*  - ??
+ - Apr 19, 2011 - 3.3*  - whiteknight
  - May 17, 2011 - 3.4   - ??
  - Jun 21, 2011 - 3.5   - ??
  - Jul 19, 2011 - 3.6*  - kid51
