@@ -95,8 +95,10 @@ Parrot_api_get_exception_backtrace(Parrot_PMC interp_pmc,
 {
     ASSERT_ARGS(Parrot_api_get_exception_backtrace)
     EMBED_API_CALLIN(interp_pmc, interp)
-    STRING * const bts = Parrot_dbg_get_exception_backtrace(interp, exception);
-    *bt = bts;
+    if (PMC_IS_NULL(exception))
+        *bt = STRINGNULL;
+    else
+        *bt = Parrot_ex_build_complete_backtrace_string(interp, exception);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -306,8 +308,8 @@ Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
 
 /*
 
-=item C<Parrot_Int Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc, const
-char *filename, Parrot_PMC * pbc)>
+=item C<Parrot_Int Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
+Parrot_String filename, Parrot_PMC * pbc)>
 
 Load a bytecode file and stores the resulting bytecode in C<pbc>. This function
 returns a true value if this call is successful and false value otherwise.
@@ -317,18 +319,19 @@ returns a true value if this call is successful and false value otherwise.
 */
 
 /* TODO: This only works with the inital bytecode. After this we should use
-       Parrot_append_bytecode or something similar */
+         Parrot_append_bytecode or something similar */
 
 PARROT_API
 Parrot_Int
 Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
-        ARGIN(const char *filename), ARGOUT(Parrot_PMC * pbc))
+        ARGIN(Parrot_String filename), ARGOUT(Parrot_PMC * pbc))
 {
     ASSERT_ARGS(Parrot_api_load_bytecode_file)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
+    PackFile * const pf = PackFile_read_pbc(interp, filename, 0);
     if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not load packfile");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "Could not load packfile");
     do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
     *pbc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, *pbc, pf);
@@ -357,11 +360,11 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
     ASSERT_ARGS(Parrot_api_load_bytecode_bytes)
     EMBED_API_CALLIN(interp_pmc, interp)
     PackFile * const pf = PackFile_new(interp, 0);
-    if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not create packfile");
+    PARROT_ASSERT(pf);
 
     if (!PackFile_unpack(interp, pf, (const opcode_t *)pbc, bytecode_size))
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "could not unpack packfile");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "could not unpack packfile");
     do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
     *pbcpmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, *pbcpmc, pf);
@@ -401,9 +404,10 @@ Parrot_api_ready_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     }
 
     if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
-    if (pf->cur_cs != NULL)
-        Parrot_pbc_load(interp, pf);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not get packfile.");
+    if (pf->cur_cs)
+        Parrot_pf_set_current_packfile(interp, pf);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
     *main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
     Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
@@ -441,9 +445,10 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     }
 
     if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
-    if (pf->cur_cs != NULL)
-        Parrot_pbc_load(interp, pf);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not get packfile.");
+    if (pf->cur_cs)
+        Parrot_pf_set_current_packfile(interp, pf);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
     main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
 
@@ -481,12 +486,46 @@ Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     EMBED_API_CALLIN(interp_pmc, interp)
     PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
     if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not get packfile");
-    if (pf->cur_cs != NULL)
-        Parrot_pbc_load(interp, pf);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not get packfile.");
+    if (pf->cur_cs)
+        Parrot_pf_set_current_packfile(interp, pf);
     /* TODO: Break up the dependency with emebed.c */
     Parrot_disassemble(interp, outfile, (Parrot_disassemble_options)opts);
     EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+/*
+
+=item C<Parrot_Int Parrot_api_serialize_bytecode_pmc(Parrot_PMC interp_pmc,
+Parrot_PMC pbc, Parrot_String * bc)>
+
+Serialize a packfile PMC into a sequence of bytes suitable for writing out
+to a .pbc file
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_serialize_bytecode_pmc(Parrot_PMC interp_pmc, Parrot_PMC pbc,
+        ARGOUT(Parrot_String * bc))
+{
+    ASSERT_ARGS(Parrot_api_serialize_bytecode_pmc)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
+    if (!pf)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not get packfile.");
+    else {
+        const Parrot_Int size = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
+        opcode_t * const packed = (opcode_t*) mem_sys_allocate(size);
+        PackFile_pack(interp, pf, packed);
+        *bc = Parrot_str_new_init(interp, (const char *)packed, size,
+                Parrot_binary_encoding_ptr, 0);
+    }
+    EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
 /*
@@ -510,32 +549,6 @@ Parrot_api_set_warnings(Parrot_PMC interp_pmc, Parrot_Int flags)
     EMBED_API_CALLIN(interp_pmc, interp)
     /* Activates the given warnings.  (Macro from warnings.h.) */
     PARROT_WARNINGS_on(interp, flags);
-    EMBED_API_CALLOUT(interp_pmc, interp)
-}
-
-/*
-
-=item C<Parrot_Int Parrot_api_set_output_file(Parrot_PMC interp_pmc,
-Parrot_String filename)>
-
-Sets the C<interp_pmc>'s output file name specified by C<filename>. This function
-returns a true value if this call is successful and false value otherwise.
-
-=cut
-
-*/
-
-PARROT_API
-Parrot_Int
-Parrot_api_set_output_file(Parrot_PMC interp_pmc,
-        ARGIN_NULLOK(Parrot_String filename))
-{
-    ASSERT_ARGS(Parrot_api_set_output_file)
-    EMBED_API_CALLIN(interp_pmc, interp)
-    if (STRING_IS_NULL(filename) && !interp->output_file)
-        interp->output_file = Parrot_str_new(interp, "-", 1);
-    else
-        interp->output_file = filename;
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -721,7 +734,7 @@ otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, ARGIN(Parrot_String sourcefile),
-    int argc, ARGIN(const char **argv), ARGMOD(Parrot_PMC* bytecodepmc),
+    int argc, ARGIN_NULLOK(const char **argv), ARGMOD(Parrot_PMC* bytecodepmc),
     ARGOUT(int *result), imcc_hack_func_t func)
 {
     ASSERT_ARGS(Parrot_api_wrap_imcc_hack)
@@ -796,9 +809,35 @@ Parrot_api_set_compiler(Parrot_PMC interp_pmc, Parrot_String type,
     ASSERT_ARGS(Parrot_api_set_compiler)
     EMBED_API_CALLIN(interp_pmc, interp)
     Parrot_set_compiler(interp, type, compiler);
-    EMBED_API_CALLOUT(interp_pmc, interp);
+    EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
+/*
+
+=item C<Parrot_Int Parrot_api_toggle_gc(Parrot_PMC interp_pmc, Parrot_Int on)>
+
+Turn Parrot's GC on or off.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_toggle_gc(Parrot_PMC interp_pmc, Parrot_Int on)
+{
+    ASSERT_ARGS(Parrot_api_toggle_gc)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    if (on) {
+        Parrot_unblock_GC_mark(interp);
+        Parrot_unblock_GC_sweep(interp);
+    }
+    else {
+        Parrot_block_GC_mark(interp);
+        Parrot_block_GC_sweep(interp);
+    }
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
 
 /*
 

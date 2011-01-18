@@ -683,13 +683,13 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal" );
     Parrot_PMC_set_integer_native(interp, pmc, -42);
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
 
-    pmc3 = Parrot_PMC_is_equal(interp, pmc, pmc2);
-    printf("%d\n", (int) pmc3);
+    integer = Parrot_PMC_is_equal(interp, pmc, pmc2);
+    printf("%d\n", (int) integer);
 
     Parrot_PMC_set_integer_native(interp, pmc2, -42);
 
-    pmc3 = Parrot_PMC_is_equal(interp, pmc, pmc2);
-    printf("%d\n", (int) pmc3);
+    integer = Parrot_PMC_is_equal(interp, pmc, pmc2);
+    printf("%d\n", (int) integer);
 CODE
 0
 1
@@ -782,19 +782,19 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_cmp" );
     Parrot_PMC_set_integer_native(interp, pmc, 42);
     Parrot_PMC_set_integer_native(interp, pmc2, 17);
 
-    pmc3 = Parrot_PMC_cmp(interp, pmc, pmc2);
-    Parrot_printf(interp,"%d\n", pmc3 );
+    integer = Parrot_PMC_cmp(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", (int) integer);
 
     Parrot_PMC_set_integer_native(interp, pmc, 17);
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
 
-    pmc3 = Parrot_PMC_cmp(interp, pmc, pmc2);
-    Parrot_printf(interp,"%d\n", pmc3 );
+    integer = Parrot_PMC_cmp(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", (int) integer);
 
     Parrot_PMC_set_integer_native(interp, pmc, 42);
 
-    pmc3 = Parrot_PMC_cmp(interp, pmc, pmc2);
-    Parrot_printf(interp,"%d\n", pmc3 );
+    integer = Parrot_PMC_cmp(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", (int) integer);
 CODE
 1
 -1

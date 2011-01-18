@@ -61,6 +61,114 @@ enum {
 
 #define N_ELEMENTS(x) (sizeof (x)/sizeof ((x)[0]))
 
+/* HEADERIZER BEGIN: compilers/imcc/main.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+void * imcc_compile_file(PARROT_INTERP,
+    ARGIN(STRING *fullname),
+    ARGOUT(STRING **error_message))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*error_message);
+
+PARROT_EXPORT
+int imcc_run_api(
+    ARGMOD(PMC * interp_pmc),
+    ARGIN(STRING *sourcefile),
+    int argc,
+    ARGIN_NULLOK(const char **argv),
+    ARGOUT(PMC **pbcpmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(* interp_pmc)
+        FUNC_MODIFIES(*pbcpmc);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * imcc_compile(PARROT_INTERP,
+    ARGIN(const char *s),
+    int pasm_file,
+    ARGOUT(STRING **error_message))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*error_message);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * imcc_compile_pasm_ex(PARROT_INTERP, ARGIN(const char *s))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * IMCC_compile_pasm_s(PARROT_INTERP,
+    ARGIN(const char *s),
+    ARGOUT(STRING **error_message))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*error_message);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * imcc_compile_pir_ex(PARROT_INTERP, ARGIN(const char *s))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * IMCC_compile_pir_s(PARROT_INTERP,
+    ARGIN(const char *s),
+    ARGOUT(STRING **error_message))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*error_message);
+
+void imcc_destroy(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void imcc_init(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_imcc_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(fullname) \
+    , PARROT_ASSERT_ARG(error_message))
+#define ASSERT_ARGS_imcc_run_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp_pmc) \
+    , PARROT_ASSERT_ARG(sourcefile) \
+    , PARROT_ASSERT_ARG(pbcpmc))
+#define ASSERT_ARGS_imcc_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s) \
+    , PARROT_ASSERT_ARG(error_message))
+#define ASSERT_ARGS_imcc_compile_pasm_ex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_IMCC_compile_pasm_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s) \
+    , PARROT_ASSERT_ARG(error_message))
+#define ASSERT_ARGS_imcc_compile_pir_ex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_IMCC_compile_pir_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s) \
+    , PARROT_ASSERT_ARG(error_message))
+#define ASSERT_ARGS_imcc_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_imcc_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: compilers/imcc/main.c */
+
 /* HEADERIZER BEGIN: compilers/imcc/imcc.y */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -183,16 +291,6 @@ Instruction * INS_LABEL(PARROT_INTERP,
 /* HEADERIZER BEGIN: compilers/imcc/parser_util.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-void * imcc_compile_file(PARROT_INTERP,
-    ARGIN(STRING *fullname),
-    ARGOUT(STRING **error_message))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*error_message);
-
 void check_op(PARROT_INTERP,
     ARGOUT(op_info_t **op_info),
     ARGOUT(char *fullname),
@@ -207,67 +305,6 @@ void check_op(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*op_info)
         FUNC_MODIFIES(*fullname);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * imcc_compile(PARROT_INTERP,
-    ARGIN(const char *s),
-    int pasm_file,
-    ARGOUT(STRING **error_message))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*error_message);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * imcc_compile_pasm(PARROT_INTERP, ARGIN(const char *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * imcc_compile_pasm_ex(PARROT_INTERP, ARGIN(const char *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * IMCC_compile_pasm_s(PARROT_INTERP,
-    ARGIN(const char *s),
-    ARGOUT(STRING **error_message))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*error_message);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * imcc_compile_pir(PARROT_INTERP, ARGIN(const char *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * imcc_compile_pir_ex(PARROT_INTERP, ARGIN(const char *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * IMCC_compile_pir_s(PARROT_INTERP,
-    ARGIN(const char *s),
-    ARGOUT(STRING **error_message))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*error_message);
-
-void imcc_destroy(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-void imcc_init(PARROT_INTERP)
-        __attribute__nonnull__(1);
 
 int imcc_string_ends_with(PARROT_INTERP,
     ARGIN(const STRING *str),
@@ -319,47 +356,12 @@ void op_fullname(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
-void register_compilers(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-#define ASSERT_ARGS_imcc_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(fullname) \
-    , PARROT_ASSERT_ARG(error_message))
 #define ASSERT_ARGS_check_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(op_info) \
     , PARROT_ASSERT_ARG(fullname) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(r))
-#define ASSERT_ARGS_imcc_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s) \
-    , PARROT_ASSERT_ARG(error_message))
-#define ASSERT_ARGS_imcc_compile_pasm __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_imcc_compile_pasm_ex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_IMCC_compile_pasm_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s) \
-    , PARROT_ASSERT_ARG(error_message))
-#define ASSERT_ARGS_imcc_compile_pir __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_imcc_compile_pir_ex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_IMCC_compile_pir_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s) \
-    , PARROT_ASSERT_ARG(error_message))
-#define ASSERT_ARGS_imcc_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_imcc_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_imcc_string_ends_with __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str) \
@@ -380,8 +382,6 @@ void register_compilers(PARROT_INTERP)
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(args))
-#define ASSERT_ARGS_register_compilers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/parser_util.c */
 
@@ -559,7 +559,6 @@ typedef struct _imc_info_t {
     int                   emitter;
     int                   error_code;      /* The Error code. */
     int                   expect_pasm;
-    int                   gc_off;
     int                   imcc_warn;
     int                   in_pod;
     int                   ins_line;
