@@ -71,6 +71,7 @@ our @EXPORT_OK = qw(
 # this list and the list above are run in response to --core-tests
 @core_tests = qw(
     t/src/*.t
+    t/src/embed/*.t
     t/run/*.t
     t/perl/*.t
 );

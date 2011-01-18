@@ -37,6 +37,7 @@
 /blib
 /config_lib.pir
 /cover_db
+/generated_hello.pbc
 /install_config.fpmc
 /installable*
 /libparrot.def

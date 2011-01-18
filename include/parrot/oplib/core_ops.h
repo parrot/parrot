@@ -19,7 +19,7 @@
 #include "parrot/runcore_api.h"
 
 PARROT_EXPORT
-op_lib_t *Parrot_DynOp_core_2_11_0(PARROT_INTERP, long init);
+op_lib_t *Parrot_DynOp_core_3_0_0(PARROT_INTERP, long init);
 
  opcode_t * Parrot_end(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_noop(opcode_t *, PARROT_INTERP);
@@ -83,6 +83,8 @@ op_lib_t *Parrot_DynOp_core_2_11_0(PARROT_INTERP, long init);
  opcode_t * Parrot_die_ic_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_exit_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_exit_ic(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_finalize_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_finalize_pc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_debug_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_debug_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_bounds_i(opcode_t *, PARROT_INTERP);
@@ -1090,8 +1092,6 @@ op_lib_t *Parrot_DynOp_core_2_11_0(PARROT_INTERP, long init);
  opcode_t * Parrot_root_new_p_pc_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_root_new_p_p_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_root_new_p_pc_ic(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_finalize_p(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_finalize_pc(opcode_t *, PARROT_INTERP);
 
 
 #endif /* PARROT_OPLIB_CORE_OPS_H_GUARD */
