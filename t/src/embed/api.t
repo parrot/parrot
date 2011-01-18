@@ -132,7 +132,7 @@ print PIR_FILE <<'PIR_CODE';
 .end
 PIR_CODE
 
-c_output_is( <<"CODE", << 'OUTPUT', "Parrot_api_serialize_bytecode_pmc" );
+c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_serialize_bytecode_pmc" );
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -141,7 +141,7 @@ c_output_is( <<"CODE", << 'OUTPUT', "Parrot_api_serialize_bytecode_pmc" );
 int main(void) {
     Parrot_PMC interp;
     Parrot_PMC bytecode;
-    Parrot_Int run_pbc;
+    int run_pbc;
     Parrot_String pbc_s;
     Parrot_Int length;
     char * pbc_c;
@@ -161,6 +161,7 @@ int main(void) {
     /* Step 2: Now load in the PIR and execute it */
     Parrot_api_load_bytecode_file(interp, "$temp_pbc", &bytecode);
     Parrot_api_run_bytecode(interp, bytecode, NULL);
+    return 0;
 }
 CODE
 executed

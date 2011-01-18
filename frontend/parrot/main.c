@@ -28,7 +28,7 @@ struct init_args_t {
     const char *run_core_name;
     const char *sourcefile;
     Parrot_Int trace;
-    Parrot_Int execute_packfile;
+    int        execute_packfile;
     Parrot_Int have_pbc_file;
     Parrot_Int turn_gc_off;
 };
@@ -64,8 +64,7 @@ static void Parrot_confess(
         __attribute__nonnull__(2);
 
 static void Parrot_version(void);
-PARROT_CAN_RETURN_NULL
-static const char * parseflags(
+static void parseflags(
     Parrot_PMC interp,
     int argc,
     ARGIN(const char *argv[]),
@@ -621,8 +620,8 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
 
 /*
 
-=item C<static const char * parseflags(Parrot_PMC interp, int argc, const char
-*argv[], int *pgm_argc, const char ***pgm_argv, struct init_args_t * args)>
+=item C<static void parseflags(Parrot_PMC interp, int argc, const char *argv[],
+int *pgm_argc, const char ***pgm_argv, struct init_args_t * args)>
 
 Parse Parrot's command line for options and set appropriate flags.
 
@@ -630,8 +629,7 @@ Parse Parrot's command line for options and set appropriate flags.
 
 */
 
-PARROT_CAN_RETURN_NULL
-static const char *
+static void
 parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
         ARGOUT(int *pgm_argc), ARGOUT(const char ***pgm_argv),
         ARGMOD(struct init_args_t * args))
