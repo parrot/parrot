@@ -141,6 +141,23 @@ to work on this type.
 
 L<http://trac.parrot.org/parrot/ticket/1904>
 
+=item The Eval PMC [eligible in 3.1]
+
+The Eval PMC will be removed. Uses of it returned from compilers will be
+replaced with PackFile PMCs instead.
+
+L<http://trac.parrot.org/parrot/ticket/1969>
+
+=item The PIR and PASM compreg PMCs [eligible in 3.1]
+
+The PMC returned by C<compreg "PIR"> is not going to be an NCI PMC any longer,
+it will be a new type of PMC which conforms to PDD31 and will be similar to
+HLLCompiler.
+
+There will not be a PASM compreg anymore.
+
+L<http://trac.parrot.org/parrot/ticket/1967>
+
 =back
 
 =head1 Opcodes
@@ -251,6 +268,13 @@ L<https://trac.parrot.org/parrot/ticket/451>
 =item PMC numbering [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/451>
+
+=item X-to-Y native PBC reading [eligible in 3.1]
+
+Support for PBC files optimized for alternate platforms will be dropped in
+favour of a universal network PBC format.
+
+L<https://trac.parrot.org/parrot/ticket/1961>
 
 =back
 
@@ -374,9 +398,31 @@ The old string_* functions will be removed.
 
 L<http://trac.parrot.org/parrot/ticket/1809>
 
+=item Old embedding API in src/embed.c
+
+Functions in src/embed.c are deprecated. Functions in that file will
+either be deleted outright if they are superfluous, or will be moved and
+renamed in a way that is more appropriate. The file src/embed.c and
+include/parrot/embed.h will both be deleted eventually.
+
+L<http://trac.parrot.org/parrot/ticket/1910>
+
 =back
 
 =head1 Compiler tools
+
+=head2 IMCC
+
+=over 4
+
+=item PIR compiler availability [eligible in 3.1]
+
+The PIR compiler (currently IMCC) will be extracted to a separately loadable
+component.
+
+L<http://trac.parrot.org/parrot/ticket/1868>
+
+=back
 
 =head2 Parrot Grammar Engine (PGE)
 

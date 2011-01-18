@@ -719,7 +719,6 @@ describe them as well.\n\n");
     fprintf(stderr, "Version     : %s\n", PARROT_VERSION);
     fprintf(stderr, "Configured  : %s\n", PARROT_CONFIG_DATE);
     fprintf(stderr, "Architecture: %s\n", PARROT_ARCHNAME);
-    fprintf(stderr, "JIT Capable : %s\n", JIT_CAPABLE ? "Yes" : "No");
     if (interp)
         fprintf(stderr, "Interp Flags: %#x\n", (unsigned int)interp->flags);
     else
