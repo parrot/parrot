@@ -59,6 +59,7 @@ static PackFile * compile_to_bytecode(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
+PARROT_CAN_RETURN_NULL
 static FILE* determine_input_file_type(PARROT_INTERP,
     ARGIN(const char * const sourcefile))
         __attribute__nonnull__(1)
@@ -83,7 +84,8 @@ static void imcc_get_optimization_description(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*opt_desc);
 
-static char * imcc_parseflags(PARROT_INTERP,
+PARROT_CAN_RETURN_NULL
+static const char * imcc_parseflags(PARROT_INTERP,
     int argc,
     ARGIN_NULLOK(const char **argv))
         __attribute__nonnull__(1);
@@ -230,7 +232,7 @@ Parrot_cmd_options(void)
 
 /*
 
-=item C<static char * imcc_parseflags(PARROT_INTERP, int argc, const char
+=item C<static const char * imcc_parseflags(PARROT_INTERP, int argc, const char
 **argv)>
 
 Parse flags ans set approptiate state(s)
@@ -239,12 +241,13 @@ Parse flags ans set approptiate state(s)
 
 */
 
-static char *
+PARROT_CAN_RETURN_NULL
+static const char *
 imcc_parseflags(PARROT_INTERP, int argc, ARGIN_NULLOK(const char **argv))
 {
     ASSERT_ARGS(imcc_parseflags)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
-    char * output_file = NULL;
+    const char * output_file = NULL;
 
     /* default state: run pbc */
     SET_STATE_RUN_PBC(interp);
@@ -509,6 +512,7 @@ flags and returns a C<FILE*> to the opened file.
 
 */
 
+PARROT_CAN_RETURN_NULL
 static FILE*
 determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile))
 {
