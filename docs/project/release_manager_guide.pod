@@ -435,6 +435,11 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
  - May 17, 2011 - 3.4   - ??
  - Jun 21, 2011 - 3.5   - ??
  - Jul 19, 2011 - 3.6*  - kid51
+ - Aug 16, 2011 - 3.7   - ??
+ - Sep 20, 2011 - 3.8   - ??
+ - Oct 18, 2011 - 3.9   - ??
+ - Nov 15, 2011 - 3.10  - ??
+ - Dec 20, 2011 - 3.11  - ??
 
 =cut
 
