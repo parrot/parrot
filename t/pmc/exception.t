@@ -19,7 +19,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(47)
+    plan(51)
     test_bool()
     test_int()
     test_new_int()
@@ -40,6 +40,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     test_throw_serialized()
     test_backtrace()
     test_annotations()
+    test_subclass_throw()
 .end
 
 .sub test_bool
@@ -469,6 +470,42 @@ _handler:
     is($I0, 0, 'got annotations from unthrow Exception')
     $I0 = ann
     is($I0, 0, 'annotations from unthrow Exception are empty')
+.end
+
+.sub test_subclass_throw
+    $P1 = get_class ["Exception"]
+    $P2 = subclass $P1, "MyException"
+    $P3 = new $P2
+    $S0 = typeof $P3
+    is ($S0, "MyException", "can create a subclass")
+    $S0 = $P3
+    is ($S0, "MyException", "really is a subclass, with :vtable override")
+
+    push_eh my_handler
+    throw $P3
+    fail("Could not throw MyException")
+    .return()
+  my_handler:
+    .get_results($P4)
+    pop_eh
+    $S0 = typeof $P4
+    is ($S0, "MyException", "received a MyException object")
+    $S0 = $P4
+    is ($S0, "MyException", "really is a subclass, with :vtable override")
+    .return()
+.end
+
+.namespace ["MyException"]
+
+.sub get_string :vtable("get_string") :method
+    .return("MyException")
+.end
+
+.namespace ["MyBuggyObject"]
+
+.sub get_string
+    $P0 = new ["MyException"]
+    throw $P0
 .end
 
 # Local Variables:
