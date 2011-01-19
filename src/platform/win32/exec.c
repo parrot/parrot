@@ -168,6 +168,32 @@ Parrot_getpid(void)
 
 /*
 
+=item C<INTVAL Parrot_proc_waitpid(PARROT_INTERP, INTVAL procid)>
+
+Calls C<CloseHandle()> to close C<*io>'s file descriptor.
+
+=cut
+
+*/
+
+INTVAL
+Parrot_proc_waitpid(PARROT_INTERP, INTVAL procid)
+{
+    HANDLE process = (HANDLE)procid;
+    DWORD  status  = WaitForSingleObject(process, INFINITE);
+    DWORD  exit_code;
+
+    if (status == WAIT_FAILED || !GetExitCodeProcess(process, &exit_code))
+        exit_code = 1;
+
+    CloseHandle(process);
+
+    return exit_code;
+}
+
+
+/*
+
 =back
 
 =cut

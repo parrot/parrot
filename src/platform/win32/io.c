@@ -257,32 +257,6 @@ Parrot_io_close(PARROT_INTERP, PIOHANDLE os_handle)
 
 /*
 
-=item C<INTVAL Parrot_io_waitpid(PARROT_INTERP, INTVAL procid)>
-
-Calls C<CloseHandle()> to close C<*io>'s file descriptor.
-
-=cut
-
-*/
-
-INTVAL
-Parrot_io_waitpid(PARROT_INTERP, INTVAL procid)
-{
-    HANDLE process = (HANDLE)procid;
-    DWORD  status  = WaitForSingleObject(process, INFINITE);
-    DWORD  exit_code;
-
-    if (status == WAIT_FAILED || !GetExitCodeProcess(process, &exit_code))
-        exit_code = 1;
-
-    CloseHandle(process);
-
-    return exit_code;
-}
-
-
-/*
-
 =item C<INTVAL Parrot_io_is_tty(PARROT_INTERP, PIOHANDLE fd)>
 
 Returns whether C<fd> is a console/tty.
