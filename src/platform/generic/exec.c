@@ -149,8 +149,8 @@ Parrot_getpid(void)
 
 /*
 
-=item C<PIOHANDLE Parrot_proc_exec(PARROT_INTERP, STRING *command, INTVAL
-flags, INTVAL *pid_out)>
+=item C<INTVAL Parrot_proc_exec(PARROT_INTERP, STRING *command, INTVAL flags,
+PIOHANDLE *handles)>
 
 Execute an external process.
 

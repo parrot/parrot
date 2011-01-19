@@ -125,7 +125,7 @@ typedef enum Parrot_proc_exec_enum {
      */
     PARROT_EXEC_STDIN   = 0x01,
     PARROT_EXEC_STDOUT  = 0x02,
-    PARROT_EXEC_STDERR  = 0x04,
+    PARROT_EXEC_STDERR  = 0x04
 } Parrot_proc_exec_flags;
 
 PARROT_EXPORT
