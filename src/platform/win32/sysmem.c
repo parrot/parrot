@@ -24,24 +24,6 @@ Get system memory information.
 
 #include <windows.h>
 
-
-/* Solution copied from http://www.perlmonks.org/?node_id=749964 */
-#if defined __MINGW32__ && __GNUC__ < 4
-typedef struct _MEMORYSTATUSEX {
-    DWORD dwLength;
-    DWORD dwMemoryLoad;
-    DWORDLONG ullTotalPhys;
-    DWORDLONG ullAvailPhys;
-    DWORDLONG ullTotalPageFile;
-    DWORDLONG ullAvailPageFile;
-    DWORDLONG ullTotalVirtual;
-    DWORDLONG ullAvailVirtual;
-    DWORDLONG ullAvailExtendedVirtual;
-} MEMORYSTATUSEX, *LPMEMORYSTATUSEX;
-
-WINBASEAPI BOOL WINAPI GlobalMemoryStatusEx(LPMEMORYSTATUSEX);
-#endif
-
 /* HEADERIZER HFILE: none */
 
 /*

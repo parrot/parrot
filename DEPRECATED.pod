@@ -141,6 +141,23 @@ to work on this type.
 
 L<http://trac.parrot.org/parrot/ticket/1904>
 
+=item The Eval PMC [eligible in 3.1]
+
+The Eval PMC will be removed. Uses of it returned from compilers will be
+replaced with PackFile PMCs instead.
+
+L<http://trac.parrot.org/parrot/ticket/1969>
+
+=item The PIR and PASM compreg PMCs [eligible in 3.1]
+
+The PMC returned by C<compreg "PIR"> is not going to be an NCI PMC any longer,
+it will be a new type of PMC which conforms to PDD31 and will be similar to
+HLLCompiler.
+
+There will not be a PASM compreg anymore.
+
+L<http://trac.parrot.org/parrot/ticket/1967>
+
 =back
 
 =head1 Opcodes

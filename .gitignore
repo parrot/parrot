@@ -37,6 +37,7 @@
 /blib
 /config_lib.pir
 /cover_db
+/generated_hello.pbc
 /install_config.fpmc
 /installable*
 /libparrot.def
@@ -439,6 +440,7 @@
 /t/src/*_*
 /t/src/*.gcov
 /t/src/*.gcdada
+/t/src/embed/*.c
 /t/stress/*.out
 /t/stress/*.pasm
 /t/stress/*.pbc

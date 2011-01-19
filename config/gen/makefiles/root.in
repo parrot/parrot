@@ -3022,13 +3022,13 @@ HEADERIZER_O_FILES = \
 headerizer : src/core_pmcs.c src/extend_vtable.c
 	$(HEADERIZER) $(HEADERIZER_O_FILES) compilers/imcc/imcc.y
 
-apilist: src/core_pmcs.c
+apilist: src/core_pmcs.c src/extend_vtable.c
 	$(HEADERIZER) --macro=PARROT_API $(HEADERIZER_O_FILES)
 
-exportlist: src/core_pmcs.c
+exportlist: src/core_pmcs.c src/extend_vtable.c
 	$(HEADERIZER) --macro=PARROT_EXPORT $(HEADERIZER_O_FILES)
 
-malloclist: src/core_pmcs.c
+malloclist: src/core_pmcs.c src/extend_vtable.c
 	$(HEADERIZER) --macro=PARROT_MALLOC $(HEADERIZER_O_FILES)
 
 include src/dynpmc/Rules.mak

@@ -350,6 +350,8 @@
 ^/frontend/pbc_merge/.*\.gcov/
 ^/frontend/pbc_merge/main\.o$
 ^/frontend/pbc_merge/main\.o/
+^/generated_hello\.pbc$
+^/generated_hello\.pbc/
 ^/include/parrot/.*\.tmp$
 ^/include/parrot/.*\.tmp/
 ^/include/parrot/config\.h$
@@ -970,6 +972,8 @@
 ^/t/src/.*\.gcov/
 ^/t/src/.*_.*$
 ^/t/src/.*_.*/
+^/t/src/embed/.*\.c$
+^/t/src/embed/.*\.c/
 ^/t/stress/.*\.out$
 ^/t/stress/.*\.out/
 ^/t/stress/.*\.pasm$
