@@ -25,7 +25,7 @@ Tests the Rational PMC.
     $S0 = config_hash['gmp']
 
     unless $S0 goto no_gmp
-    plan(78)
+    plan(79)
     loadlib $P1, 'rational'
     test_init()
     test_destroy()
@@ -559,7 +559,7 @@ CODE
 
 .sub test_init
     new $P1, 'Rational'
-    ok($P1,'initialization')
+    is($P1, 0, 'initialization')
 .end
 
 .sub test_destroy
@@ -669,8 +669,10 @@ CODE
     new $P0, 'Rational'
     $P0 = "0"
     $I0 = isfalse $P0
-
-    todo($I0, "0 value of rational does not evaluate correctly")
+    ok($I0, '0 should be false')
+    $P0 = "3/4"
+    $I0 = istrue $P0
+    ok($I0, '3/4 should be true')
 .end
 
 # Local Variables:
