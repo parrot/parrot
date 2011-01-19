@@ -85,9 +85,7 @@ static void clone_constant(PARROT_INTERP, ARGIN(PMC **c))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void compile_or_load_file(PARROT_INTERP,
-    ARGIN(STRING *path),
-    enum_runtime_ft file_type)
+static void compile_file(PARROT_INTERP, ARGIN(STRING *path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -216,6 +214,10 @@ static PackFile_ConstTable * find_constants(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void load_file(PARROT_INTERP, ARGIN(STRING *path))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_CANNOT_RETURN_NULL
 static PMC * make_annotation_value_pmc(PARROT_INTERP,
     ARGIN(PackFile_Annotations *self),
@@ -310,6 +312,9 @@ static void pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pf);
 
+static void push_context(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC* run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
@@ -352,7 +357,7 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_clone_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(c))
-#define ASSERT_ARGS_compile_or_load_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
 #define ASSERT_ARGS_const_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -408,6 +413,9 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_find_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
+#define ASSERT_ARGS_load_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(path))
 #define ASSERT_ARGS_make_annotation_value_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -451,6 +459,8 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_pf_register_standard_funcs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf))
+#define ASSERT_ARGS_push_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_run_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_pmc))
@@ -4270,60 +4280,86 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
 
 /*
 
-=item C<static void compile_or_load_file(PARROT_INTERP, STRING *path,
-enum_runtime_ft file_type)>
+=item C<static void push_context(PARROT_INTERP)>
 
-Either load a bytecode file and append it to the current packfile directory, or
-compile a PIR or PASM file from source.
+Create a new context to isolate the effects of compiling code or loading pbc.
 
 =cut
 
 */
 
 static void
-compile_or_load_file(PARROT_INTERP, ARGIN(STRING *path),
-        enum_runtime_ft file_type)
+push_context(PARROT_INTERP)
 {
-    ASSERT_ARGS(compile_or_load_file)
-    char * const filename = Parrot_str_to_cstring(interp, path);
-
+    ASSERT_ARGS(push_context)
     UINTVAL regs_used[]     = { 2, 2, 2, 2 }; /* Arbitrary values */
     const int parrot_hll_id = 0;
     PMC * context = Parrot_push_context(interp, regs_used);
     Parrot_pcc_set_HLL(interp, context, parrot_hll_id);
     Parrot_pcc_set_namespace(interp, context,
             Parrot_hll_get_HLL_namespace(interp, parrot_hll_id));
+}
 
-    if (file_type == PARROT_RUNTIME_FT_PBC) {
-        PackFile * pf = Parrot_pbc_read(interp, filename, 0);
-        pf = PackFile_append(interp, pf);
-        Parrot_str_free_cstring(filename);
 
-        if (!pf)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+/*
+
+=item C<static void compile_file(PARROT_INTERP, STRING *path)>
+
+Compile a PIR or PASM file from source.
+
+=cut
+
+*/
+
+static void
+compile_file(PARROT_INTERP, ARGIN(STRING *path))
+{
+    ASSERT_ARGS(compile_file)
+    char * const filename = Parrot_str_to_cstring(interp, path);
+
+    STRING *err;
+    PackFile_ByteCode * const cs =
+        (PackFile_ByteCode *)Parrot_compile_file(interp, filename, &err);
+    Parrot_str_free_cstring(filename);
+
+    if (cs)
+        do_sub_pragmas(interp, cs, PBC_LOADED, NULL);
+    else
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+                "compiler returned NULL ByteCode '%Ss' - %Ss", path, err);
+
+}
+
+
+/*
+
+=item C<static void load_file(PARROT_INTERP, STRING *path)>
+
+Load a bytecode file and append it to the current packfile directory.
+
+=cut
+
+*/
+
+static void
+load_file(PARROT_INTERP, ARGIN(STRING *path))
+{
+    ASSERT_ARGS(load_file)
+    char * const filename = Parrot_str_to_cstring(interp, path);
+
+    PackFile * pf = Parrot_pbc_read(interp, filename, 0);
+    pf = PackFile_append(interp, pf);
+    Parrot_str_free_cstring(filename);
+
+    if (!pf)
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "Unable to append PBC to the current directory");
 
-        mem_gc_free(interp, pf->header);
-        pf->header = NULL;
-        mem_gc_free(interp, pf->dirp);
-        pf->dirp   = NULL;
-        /* no need to free pf here, as directory_destroy will get it */
-    }
-    else {
-        STRING *err;
-        PackFile_ByteCode * const cs =
-            (PackFile_ByteCode *)Parrot_compile_file(interp,
-                filename, &err);
-        Parrot_str_free_cstring(filename);
-
-        if (cs)
-            do_sub_pragmas(interp, cs, PBC_LOADED, NULL);
-        else
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-                "compiler returned NULL ByteCode '%Ss' - %Ss", path, err);
-    }
-
-    Parrot_pop_context(interp);
+    mem_gc_free(interp, pf->header);
+    pf->header = NULL;
+    mem_gc_free(interp, pf->dirp);
+    pf->dirp   = NULL;
+    /* no need to free pf here, as directory_destroy will get it */
 }
 
 /*
@@ -4395,12 +4431,14 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
     /* Check if the file found was actually a bytecode file (.pbc extension) or
      * a source file (.pir or .pasm extension. */
 
-    if (STRING_equal(interp, found_ext, pbc))
-        file_type = PARROT_RUNTIME_FT_PBC;
-    else
-        file_type = PARROT_RUNTIME_FT_SOURCE;
+    push_context(interp);
 
-    compile_or_load_file(interp, path, file_type);
+    if (STRING_equal(interp, found_ext, pbc))
+        load_file(interp, path);
+    else
+        compile_file(interp, path);
+
+    Parrot_pop_context(interp);
 }
 
 /*
@@ -4493,12 +4531,14 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
     /* Check if the file found was actually a bytecode file (.pbc
      * extension) or a source file (.pir or .pasm extension). */
 
-    if (STRING_equal(interp, found_ext, pbc))
-        file_type = PARROT_RUNTIME_FT_PBC;
-    else
-        file_type = PARROT_RUNTIME_FT_SOURCE;
+    push_context(interp);
 
-    compile_or_load_file(interp, path, file_type);
+    if (STRING_equal(interp, found_ext, pbc))
+        load_file(interp, path);
+    else
+        compile_file(interp, path);
+
+    Parrot_pop_context(interp);
 }
 
 
