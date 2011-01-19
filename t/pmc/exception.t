@@ -19,7 +19,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(51)
+    plan(53)
     test_bool()
     test_int()
     test_new_int()
@@ -41,6 +41,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     test_backtrace()
     test_annotations()
     test_subclass_throw()
+    test_subclass_finalize()
 .end
 
 .sub test_bool
@@ -483,7 +484,8 @@ _handler:
 
     push_eh my_handler
     throw $P3
-    fail("Could not throw MyException")
+    pop_eh
+    ok(0, "Could not throw MyException")
     .return()
   my_handler:
     .get_results($P4)
@@ -495,6 +497,24 @@ _handler:
     .return()
 .end
 
+.sub test_subclass_finalize
+    $P0 = newclass "MyBuggyObject"
+    $P3 = new $P0
+    push_eh my_handler
+    $S0 = $P3
+    pop_eh
+    ok(0, "MyBuggyObject not as buggy as advertised")
+    .return()
+  my_handler:
+    .get_results($P4)
+    $S0 = typeof $P4
+    is ($S0, "MyException", "received a MyException object")
+    $S0 = $P4
+    is ($S0, "MyException", "really is a subclass, with :vtable override")
+    finalize $P4
+    .return()
+.end
+
 .namespace ["MyException"]
 
 .sub get_string :vtable("get_string") :method
@@ -503,9 +523,13 @@ _handler:
 
 .namespace ["MyBuggyObject"]
 
-.sub get_string
+.sub get_string :vtable("get_string") :method
     $P0 = new ["MyException"]
+    say "throwing"
     throw $P0
+    say "this didn't work!"
+    ok(0, "Oops! We shouldn't ever end up here unless finalize fails")
+    exit 1
 .end
 
 # Local Variables:
