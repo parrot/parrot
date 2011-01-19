@@ -83,7 +83,7 @@ static AttrEnum getAttrEnum(PARROT_INTERP, ARGIN(const STRING *name))
 /* HEADERIZER END: static */
 
 
-pmclass Exception auto_attrs {
+pmclass Exception provides Exception auto_attrs {
 
     ATTR INTVAL          id;           /* The task ID in the scheduler. */
     ATTR FLOATVAL        birthtime;    /* The creation time stamp of the exception. */
