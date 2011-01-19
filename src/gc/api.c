@@ -213,6 +213,7 @@ stack scanning during a garbage collection run.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
 {
@@ -285,6 +286,7 @@ routine.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_finalize(PARROT_INTERP)
 {
@@ -309,6 +311,7 @@ flags for the objects and initializes the PMC data pointer to C<NULL>.
 
 */
 
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
@@ -339,6 +342,7 @@ Adds the given PMC to the free list for later reuse.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
@@ -359,6 +363,7 @@ C<NULL>.
 
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
@@ -388,6 +393,7 @@ Adds the given STRING to the free list for later reuse.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
 {
@@ -408,6 +414,7 @@ to create ListChunk objects in src/list.c.
 
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Buffer *
@@ -429,6 +436,7 @@ it and use it again.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_free_bufferlike_header(PARROT_INTERP, ARGMOD(Buffer *obj),
     size_t size)
@@ -450,6 +458,7 @@ so the size may be rounded up or down to guarantee that this alignment holds.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP,
     ARGOUT(Buffer *buffer), size_t size)
@@ -473,6 +482,7 @@ memory is not cleared.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer),
     size_t newsize)
@@ -495,6 +505,7 @@ is B<not> changed.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_allocate_string_storage(PARROT_INTERP, ARGOUT(STRING *str),
     size_t size)
@@ -516,6 +527,7 @@ new buffer location, C<str-E<gt>bufused> is B<not> changed.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
     size_t newsize)
@@ -535,6 +547,7 @@ set.
 
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void *
 Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
@@ -552,6 +565,7 @@ flag set.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
@@ -569,6 +583,7 @@ managed and needs to be freed with C<Parrot_gc_free_fixed_size_storage>
 
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void *
 Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
@@ -587,6 +602,7 @@ C<Parrot_gc_allocate_fixed_size_storage>
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
 {
@@ -675,6 +691,7 @@ headers. Performs a complete mark & sweep run of the GC.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
@@ -692,6 +709,7 @@ Compact string pool if supported by GC.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_compact_memory_pool(PARROT_INTERP)
 {
@@ -711,6 +729,7 @@ Merges the header pools of C<source_interp> into those of C<dest_interp>.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_destroy_child_interp(ARGMOD(Interp *dest_interp),
     ARGIN(Interp *source_interp))
@@ -730,6 +749,7 @@ Returns the number of actively used sized buffers.
 
 */
 
+PARROT_EXPORT
 int
 Parrot_gc_active_sized_buffers(PARROT_INTERP)
 {
@@ -747,6 +767,7 @@ Returns the total number of sized buffers that we are managing.
 
 */
 
+PARROT_EXPORT
 int
 Parrot_gc_total_sized_buffers(PARROT_INTERP)
 {
@@ -764,6 +785,7 @@ Return the number of actively used PMCs.
 
 */
 
+PARROT_EXPORT
 int
 Parrot_gc_active_pmcs(PARROT_INTERP)
 {
@@ -781,6 +803,7 @@ Return the total number of PMCs that we are managing.
 
 */
 
+PARROT_EXPORT
 int
 Parrot_gc_total_pmcs(PARROT_INTERP)
 {
@@ -822,6 +845,7 @@ Returns the number of PMCs that are marked as needing timely destruction.
 
 */
 
+PARROT_EXPORT
 size_t
 Parrot_gc_count_mark_runs(PARROT_INTERP)
 {
@@ -829,6 +853,7 @@ Parrot_gc_count_mark_runs(PARROT_INTERP)
     return interp->gc_sys->get_gc_info(interp, GC_MARK_RUNS);
 }
 
+PARROT_EXPORT
 size_t
 Parrot_gc_count_collect_runs(PARROT_INTERP)
 {
@@ -836,6 +861,7 @@ Parrot_gc_count_collect_runs(PARROT_INTERP)
     return interp->gc_sys->get_gc_info(interp, GC_COLLECT_RUNS);
 }
 
+PARROT_EXPORT
 size_t
 Parrot_gc_count_lazy_mark_runs(PARROT_INTERP)
 {
@@ -843,6 +869,7 @@ Parrot_gc_count_lazy_mark_runs(PARROT_INTERP)
     return interp->gc_sys->get_gc_info(interp, GC_LAZY_MARK_RUNS);
 }
 
+PARROT_EXPORT
 size_t
 Parrot_gc_total_memory_allocated(PARROT_INTERP)
 {
@@ -850,6 +877,7 @@ Parrot_gc_total_memory_allocated(PARROT_INTERP)
     return interp->gc_sys->get_gc_info(interp, TOTAL_MEM_ALLOC);
 }
 
+PARROT_EXPORT
 size_t
 Parrot_gc_headers_alloc_since_last_collect(PARROT_INTERP)
 {
@@ -857,6 +885,7 @@ Parrot_gc_headers_alloc_since_last_collect(PARROT_INTERP)
     return interp->gc_sys->get_gc_info(interp, HEADER_ALLOCS_SINCE_COLLECT);
 }
 
+PARROT_EXPORT
 size_t
 Parrot_gc_mem_alloc_since_last_collect(PARROT_INTERP)
 {
@@ -864,6 +893,7 @@ Parrot_gc_mem_alloc_since_last_collect(PARROT_INTERP)
     return interp->gc_sys->get_gc_info(interp, MEM_ALLOCS_SINCE_COLLECT);
 }
 
+PARROT_EXPORT
 UINTVAL
 Parrot_gc_total_copied(PARROT_INTERP)
 {
@@ -871,6 +901,7 @@ Parrot_gc_total_copied(PARROT_INTERP)
     return interp->gc_sys->get_gc_info(interp, TOTAL_COPIED);
 }
 
+PARROT_EXPORT
 UINTVAL
 Parrot_gc_impatient_pmcs(PARROT_INTERP)
 {
@@ -971,6 +1002,7 @@ Parrot_is_blocked_GC_sweep(PARROT_INTERP)
         return 0;
 }
 
+PARROT_EXPORT
 void
 Parrot_gc_completely_unblock(PARROT_INTERP)
 {
@@ -991,6 +1023,7 @@ Mark a PMC as needing timely destruction
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
@@ -1009,6 +1042,7 @@ Retrieve the name of the currently active GC system.
 
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_gc_sys_name(PARROT_INTERP)
