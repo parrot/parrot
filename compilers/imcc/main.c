@@ -605,13 +605,9 @@ compile_to_bytecode(PARROT_INTERP,
 
     imcc_run_compilation(interp, yyscanner);
     if (IMCC_INFO(interp)->error_code) {
-        char * const error_str = Parrot_str_to_cstring(interp,
-                                                   IMCC_INFO(interp)->error_message);
-
         IMCC_INFO(interp)->error_code=IMCC_FATAL_EXCEPTION;
-        IMCC_warning(interp, "error:imcc:%s", error_str);
+        IMCC_warning(interp, "error:imcc:%Ss", IMCC_INFO(interp)->error_message);
         IMCC_print_inc(interp);
-        Parrot_str_free_cstring(error_str);
 
         imc_cleanup(interp, yyscanner);
         Parrot_x_jump_out_error(interp, IMCC_FATAL_EXCEPTION);
@@ -686,7 +682,7 @@ imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile),
         PIOHANDLE in_file = determine_input_file_type(interp, sourcefile);
         if (in_file == PIO_INVALID_HANDLE)
             IMCC_fatal_standalone(interp, EXCEPTION_EXTERNAL_ERROR,
-                                  "Error reading source file %s.\n",
+                                  "Error reading source file %Ss.\n",
                                   sourcefile);
         imc_yyin_set(in_file, yyscanner);
     }
