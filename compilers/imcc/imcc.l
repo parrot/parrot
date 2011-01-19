@@ -105,7 +105,7 @@ static int handle_identifier(PARROT_INTERP, YYSTYPE *valp, ARGIN(const char *id)
   } while (0)
 
 #define YY_INPUT(buf, result, max_size) \
-    result = PIO_READ((Interp *)yyextra, (PIOHANDLE)yyin, buf, max_size)
+    (result) = PIO_READ((Interp *)yyextra, (PIOHANDLE)yyin, (buf), (max_size))
 
 %}
 
