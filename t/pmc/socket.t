@@ -170,11 +170,6 @@ Tests the Socket PMC.
     interp = getinterp
     conf = interp[.IGLOBALS_CONFIG_HASH]
 
-    str = conf['osname']
-    if str != 'MSWin32' goto run_tests
-    skip(6, 'Sockets are currently broken on Windows')
-    .return ()
-
   run_tests:
     command = '"'
     str = conf['build_dir']
