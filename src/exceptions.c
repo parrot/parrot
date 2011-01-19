@@ -67,7 +67,8 @@ Parrot_ex_build_exception(PARROT_INTERP, INTVAL severity,
         long error, ARGIN_NULLOK(STRING *msg))
 {
     ASSERT_ARGS(Parrot_ex_build_exception)
-    PMC * const exception = Parrot_pmc_new(interp, enum_class_Exception);
+    const int exception_type_id = Parrot_hll_get_ctx_HLL_type(interp, enum_class_Exception);
+    PMC * const exception = Parrot_pmc_new(interp, exception_type_id);
 
     VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"), severity);
     VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"), error);
