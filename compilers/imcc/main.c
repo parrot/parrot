@@ -3,7 +3,7 @@
  * Intermediate Code Compiler for Parrot.
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
- * Copyright (C) 2003-2010, Parrot Foundation.
+ * Copyright (C) 2003-2011, Parrot Foundation.
  */
 
 /*
@@ -84,6 +84,7 @@ static void imcc_get_optimization_description(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*opt_desc);
 
+PARROT_CAN_RETURN_NULL
 static STRING * imcc_parseflags(PARROT_INTERP,
     int argc,
     ARGIN_NULLOK(const char **argv))
@@ -243,6 +244,7 @@ Parse flags ans set approptiate state(s)
 
 */
 
+PARROT_CAN_RETURN_NULL
 static STRING *
 imcc_parseflags(PARROT_INTERP, int argc, ARGIN_NULLOK(const char **argv))
 {
@@ -642,6 +644,8 @@ int
 imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile), int argc,
         ARGIN_NULLOK(const char **argv), ARGOUT(PMC **pbcpmc))
 {
+    ASSERT_ARGS(imcc_run_api)
+
     Interp * interp = (Interp *)VTABLE_get_pointer(NULL, interp_pmc);
     STRING *output_file = imcc_parseflags(interp, argc, argv);
     return imcc_run(interp, sourcefile, output_file, pbcpmc);
@@ -664,6 +668,8 @@ static int
 imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile),
         ARGIN(STRING *output_file), ARGOUT(PMC **pbcpmc))
 {
+    ASSERT_ARGS(imcc_run)
+
     yyscan_t           yyscanner;
     PackFile * pf_raw = NULL;
     int       is_stdin;

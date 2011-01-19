@@ -124,15 +124,15 @@ OUTPUT
 
 my (undef, $temp_pir)  = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 my (undef, $temp_pbc)  = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
-open PIR_FILE, ">", $temp_pir;
-print PIR_FILE <<'PIR_CODE';
+open my $PIR_FILE, ">", $temp_pir;
+print $PIR_FILE <<'PIR_CODE';
 .sub main :main
     .param pmc args
     say "executed"
 .end
 PIR_CODE
 
-c_output_is( <<"CODE", << 'OUTPUT', "Parrot_api_serialize_bytecode_pmc" );
+c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_serialize_bytecode_pmc" );
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -141,7 +141,7 @@ c_output_is( <<"CODE", << 'OUTPUT', "Parrot_api_serialize_bytecode_pmc" );
 int main(void) {
     Parrot_PMC interp;
     Parrot_PMC bytecode;
-    Parrot_Int run_pbc;
+    int run_pbc;
     Parrot_String pbc_s;
     Parrot_String filename;
     Parrot_Int length;
@@ -164,7 +164,6 @@ int main(void) {
     Parrot_api_string_import(interp, "$temp_pbc", &filename);
     Parrot_api_load_bytecode_file(interp, filename, &bytecode);
     Parrot_api_run_bytecode(interp, bytecode, NULL);
-
     return 0;
 }
 CODE
