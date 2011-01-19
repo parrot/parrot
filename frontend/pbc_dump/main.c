@@ -308,11 +308,12 @@ static struct longopt_opt_decl opt_options[] = {
     { 't', 't', OPTION_optional_FLAG, { "--terse"       } },
     { 'n', 'n', OPTION_optional_FLAG, { "--line-nums"   } },
     { 'd', 'd', OPTION_optional_FLAG, { "--disassemble" } },
-    { 'o', 'o', OPTION_required_FLAG, { "--output"      } }
+    { 'o', 'o', OPTION_required_FLAG, { "--output"      } },
 
 #if TRACE_PACKFILE
     { 'D', 'D', OPTION_required_FLAG, { "--debug"       } },
 #endif
+    { 0,    0,  OPTION_optional_FLAG, { NULL            } }
 };
 
 

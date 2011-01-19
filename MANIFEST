@@ -399,7 +399,6 @@ docs/pdds/draft/pdd01_overview.pod                          [doc]
 docs/pdds/draft/pdd05_opfunc.pod                            [doc]
 docs/pdds/draft/pdd06_pasm.pod                              [doc]
 docs/pdds/draft/pdd08_keys.pod                              [doc]
-docs/pdds/draft/pdd10_embedding.pod                         [doc]
 docs/pdds/draft/pdd11_extending.pod                         [doc]
 docs/pdds/draft/pdd14_numbers.pod                           [doc]
 docs/pdds/draft/pdd16_native_call.pod                       [doc]
@@ -409,6 +408,7 @@ docs/pdds/pdd00_pdd.pod                                     [doc]
 docs/pdds/pdd03_calling_conventions.pod                     [doc]
 docs/pdds/pdd07_codingstd.pod                               [doc]
 docs/pdds/pdd09_gc.pod                                      [doc]
+docs/pdds/pdd10_embedding.pod                               [doc]
 docs/pdds/pdd13_bytecode.pod                                [doc]
 docs/pdds/pdd15_object_metamodel.png                        [doc]
 docs/pdds/pdd15_object_metamodel.svg                        [doc]
@@ -952,7 +952,6 @@ include/parrot/global_setup.h                               [main]include
 include/parrot/hash.h                                       [main]include
 include/parrot/hll.h                                        [main]include
 include/parrot/imageio.h                                    [main]include
-include/parrot/imcc.h                                       [main]include
 include/parrot/interpreter.h                                [main]include
 include/parrot/io.h                                         [main]include
 include/parrot/io_portable.h                                [main]include
