@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 48;
+plan tests => 56;
 
 =head1 NAME
 
@@ -78,15 +78,16 @@ int main(void)
 {
     Parrot_Interp interp;
     Parrot_PMC pmc, pmc2, pmc3, pmc_string;
-    Parrot_PMC rpa;
-    Parrot_Int type, value, integer;
-    Parrot_Float number;
-    Parrot_String string;
+    Parrot_PMC rpa, rpa2;
+    Parrot_Int type, value, integer, integer2;
+    Parrot_Float number, number2;
+    Parrot_String string, string2;
 
     interp = new_interp();
 
     type   = Parrot_PMC_typenum(interp, "Integer");
     rpa    = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
+    rpa2   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
     pmc    = Parrot_PMC_new(interp, type);
     pmc2   = Parrot_PMC_new(interp, type);
     pmc3   = Parrot_PMC_new(interp, type);
@@ -116,6 +117,110 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_add_float" );
     Parrot_printf(interp,"%.2f\n", number);
 CODE
 1.00
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(push|pop)_integer" );
+    integer  = 42;
+    integer2 = 99;
+
+    Parrot_PMC_push_integer(interp, rpa, integer);
+    integer2 = Parrot_PMC_pop_integer(interp, rpa);
+
+    Parrot_printf(interp,"%d\n", integer2);
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(shift|unshift)_integer" );
+    integer  = 42;
+    integer2 = 99;
+
+    Parrot_PMC_unshift_integer(interp, rpa, integer);
+    integer2 = Parrot_PMC_shift_integer(interp, rpa);
+
+    Parrot_printf(interp,"%d\n", integer2);
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(push|pop)_pmc" );
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 99);
+
+    Parrot_PMC_push_pmc(interp, rpa, pmc);
+    pmc2 = Parrot_PMC_pop_pmc(interp, rpa);
+
+    Parrot_printf(interp,"%P\n", pmc2);
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(unshift|pop)_pmc" );
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 99);
+
+    Parrot_PMC_unshift_pmc(interp, rpa, pmc);
+    pmc2 = Parrot_PMC_pop_pmc(interp, rpa);
+
+    Parrot_printf(interp,"%P\n", pmc2);
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(push|pop)_string" );
+    string = createstring(interp, "FOO");
+    string2 = createstring(interp, "BAR");
+
+    Parrot_PMC_push_string(interp, rpa, string);
+    string2 = Parrot_PMC_pop_string(interp, rpa);
+
+    Parrot_printf(interp,"%S\n", string2);
+CODE
+FOO
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(unshift|shift)_string" );
+    string = createstring(interp, "FOO");
+    string2 = createstring(interp, "BAR");
+
+    Parrot_PMC_unshift_string(interp, rpa, string);
+    string2 = Parrot_PMC_shift_string(interp, rpa);
+
+    Parrot_printf(interp,"%S\n", string2);
+CODE
+FOO
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(push|pop)_float" );
+    number  = 42.0;
+    number2 = 99.0;
+
+    Parrot_PMC_push_float(interp, rpa, number);
+    number2 = Parrot_PMC_pop_float(interp, rpa);
+
+    Parrot_printf(interp,"%.2f\n", number2);
+CODE
+42.00
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(unshift|shift)_float" );
+    number  = 42.0;
+    number2 = 99.0;
+
+    Parrot_PMC_unshift_float(interp, rpa, number);
+    number2 = Parrot_PMC_shift_float(interp, rpa);
+
+    Parrot_printf(interp,"%.2f\n", number2);
+CODE
+42.00
 Done!
 OUTPUT
 
