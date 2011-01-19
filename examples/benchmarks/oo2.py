@@ -1,3 +1,4 @@
+# Copyright (C) 2004-2011, Parrot Foundation.
 class Foo:
     def __init__(self):
 	self.i = 10
