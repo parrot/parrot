@@ -197,13 +197,12 @@ PIOHANDLE
 Parrot_io_accept(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(void *addr))
 {
     Parrot_Socklen_t addrlen = sizeof (struct sockaddr_in);
-    int newsock;
+    PIOSOCKET newsock;
 
     newsock = accept((PIOSOCKET)os_handle, (struct sockaddr *)addr, &addrlen);
 
-    if (newsock == -1) {
-        return -1;
-    }
+    if (newsock == PIO_INVALID_SOCKET)
+        return PIO_INVALID_HANDLE;
 
     /* XXX FIXME: Need to do a getsockname and getpeername here to
      * fill in the sockaddr_in structs for local and peer */
@@ -211,7 +210,7 @@ Parrot_io_accept(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(void *addr))
     /* Optionally do a gethostyaddr() to resolve remote IP address.
      * This should be based on an option set in the master socket */
 
-    return newsock;
+    return (PIOHANDLE)newsock;
 }
 
 /*
@@ -226,7 +225,7 @@ Send the message C<*s> to C<*io>'s connected socket.
 */
 
 INTVAL
-Parrot_io_send(SHIM_INTERP, PIOHANDLE os_handle, ARGIN(const char *buf),
+Parrot_io_send(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(const char *buf),
         size_t len)
 {
     int error, byteswrote;
@@ -246,12 +245,9 @@ AGAIN:
           case PIO_SOCK_EINTR:
           case PIO_SOCK_EWOULDBLOCK:
             goto AGAIN;
-          case EPIPE:
-            /* XXX why close it here and not below */
-            close((PIOSOCKET)os_handle);
-            return -1;
           default:
-            return -1;
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                    "Write error: %s", strerror(errno));
         }
     }
 }
@@ -283,13 +279,9 @@ AGAIN:
           case PIO_SOCK_EINTR:
           case PIO_SOCK_EWOULDBLOCK:
             goto AGAIN;
-          case PIO_SOCK_ECONNRESET:
-            /* XXX why close it on err return result is -1 anyway */
-            close((PIOSOCKET)os_handle);
-            return -1;
           default:
-            close((PIOSOCKET)os_handle);
-            return -1;
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                    "Read error: %s", strerror(errno));
         }
     }
 }
@@ -413,7 +405,11 @@ Closes the given file descriptor.  Returns 0 on success, -1 on error.
 INTVAL
 Parrot_io_close_socket(SHIM_INTERP, PIOHANDLE handle)
 {
+#ifdef _WIN32
+    return closesocket((PIOSOCKET)handle);
+#else
     return close((PIOSOCKET)handle);
+#endif
 }
 
 
