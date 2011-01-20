@@ -737,10 +737,11 @@ inline op throw(invar PMC) :flow {
     opcode_t *dest;
     opcode_t * const ret    = expr NEXT();
     PMC      * const resume = pmc_new(interp, enum_class_Continuation);
+    STRING * const exception_str = CONST_STRING(interp, "Exception");
 
     VTABLE_set_pointer(interp, resume, ret);
 
-    if (PMC_IS_NULL(except) || except->vtable->base_type != enum_class_Exception)
+    if (PMC_IS_NULL(except) || !VTABLE_does(interp, except, exception_str))
         except = Parrot_ex_build_exception(interp, EXCEPT_fatal,
                 EXCEPTION_UNIMPLEMENTED,
                 Parrot_str_new_constant(interp, "Not a throwable object"));
@@ -753,7 +754,9 @@ inline op throw(invar PMC) :flow {
 inline op throw(invar PMC, invar PMC) :flow {
     opcode_t * dest;
     PMC * except = $1;
-    if (PMC_IS_NULL(except) || except->vtable->base_type != enum_class_Exception)
+    STRING * const exception_str = CONST_STRING(interp, "Exception");
+
+    if (PMC_IS_NULL(except) || !VTABLE_does(interp, except, exception_str))
         except = Parrot_ex_build_exception(interp, EXCEPT_fatal,
                 EXCEPTION_UNIMPLEMENTED,
                 Parrot_str_new_constant(interp, "Not a throwable object"));
@@ -764,15 +767,18 @@ inline op throw(invar PMC, invar PMC) :flow {
 
 inline op rethrow(invar PMC) :flow {
     opcode_t * dest;
-    if (PMC_IS_NULL($1) || $1->vtable->base_type != enum_class_Exception) {
+    PMC * except = $1;
+    STRING * const exception_str = CONST_STRING(interp, "Exception");
+
+    if (PMC_IS_NULL(except) || !VTABLE_does(interp, except, exception_str)) {
         opcode_t * const ret    = expr NEXT();
-        PMC      * const except = Parrot_ex_build_exception(interp, EXCEPT_fatal,
+        except = Parrot_ex_build_exception(interp, EXCEPT_fatal,
                 EXCEPTION_UNIMPLEMENTED,
                 Parrot_str_new_constant(interp, "Not a throwable object"));
         dest = Parrot_ex_throw_from_op(interp, except, ret);
         goto ADDRESS(dest);
     }
-    dest = Parrot_ex_rethrow_from_op(interp, $1);
+    dest = Parrot_ex_rethrow_from_op(interp, except);
     goto ADDRESS(dest);
 }
 

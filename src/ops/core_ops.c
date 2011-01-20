@@ -15552,10 +15552,11 @@ Parrot_throw_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     opcode_t *dest;
     opcode_t * const ret    = cur_opcode + 2;
     PMC      * const resume = pmc_new(interp, enum_class_Continuation);
+    STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
 
     VTABLE_set_pointer(interp, resume, ret);
 
-    if (PMC_IS_NULL(except) || except->vtable->base_type != enum_class_Exception)
+    if (PMC_IS_NULL(except) || !VTABLE_does(interp, except, exception_str))
         except = Parrot_ex_build_exception(interp, EXCEPT_fatal,
                 EXCEPTION_UNIMPLEMENTED,
                 Parrot_str_new_constant(interp, "Not a throwable object"));
@@ -15569,7 +15570,9 @@ Parrot_throw_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t * dest;
     PMC * except = PREG(1);
-    if (PMC_IS_NULL(except) || except->vtable->base_type != enum_class_Exception)
+    STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
+
+    if (PMC_IS_NULL(except) || !VTABLE_does(interp, except, exception_str))
         except = Parrot_ex_build_exception(interp, EXCEPT_fatal,
                 EXCEPTION_UNIMPLEMENTED,
                 Parrot_str_new_constant(interp, "Not a throwable object"));
@@ -15581,14 +15584,17 @@ opcode_t *
 Parrot_rethrow_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t * dest;
-    if (PMC_IS_NULL(PREG(1)) || PREG(1)->vtable->base_type != enum_class_Exception) {
+    PMC * except = PREG(1);
+    STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
+
+    if (PMC_IS_NULL(except) || !VTABLE_does(interp, except, exception_str)) {
         opcode_t * const ret    = cur_opcode + 2;
-        PMC      * const except = Parrot_ex_build_exception(interp, EXCEPT_fatal,
+        except = Parrot_ex_build_exception(interp, EXCEPT_fatal,
                 EXCEPTION_UNIMPLEMENTED,
                 Parrot_str_new_constant(interp, "Not a throwable object"));
         dest = Parrot_ex_throw_from_op(interp, except, ret);return (opcode_t *)dest;
     }
-    dest = Parrot_ex_rethrow_from_op(interp, PREG(1));return (opcode_t *)dest;
+    dest = Parrot_ex_rethrow_from_op(interp, except);return (opcode_t *)dest;
 }
 
 opcode_t *
@@ -25832,7 +25838,7 @@ op_lib_t core_op_lib = {
   1071,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
-  get_op          /* op_code() */ 
+  get_op          /* op_code() */
 };
 
 /*

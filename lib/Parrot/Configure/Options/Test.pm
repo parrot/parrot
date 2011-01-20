@@ -12,7 +12,6 @@ sub new {
     my ( $class, $argsref ) = @_;
     my $self = {};
     bless $self, $class;
-    my ( $run_configure_tests, $run_build_tests );
     if ( defined $argsref->{test} ) {
         if ( $argsref->{test} eq '1' ) {
             $self->set_run('run_configure_tests', 1);
