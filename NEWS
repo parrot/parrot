@@ -1,11 +1,42 @@
 New in 3.0.0
 - Core
- + Added a new embedding API in "parrot/api.h"
- + Removed autovivification behavior from ResizablePMCArray
- + Packfile manipulation functions now throw exceptions on error instead of printing error details directly to stderr
- + Improved Unicode support for file IO, environment variables, program names, and command-line parameters
- + Test coverage for several PMC types has been significantly increased
- + Test coverage for several internal subsystems has been increased
+  + A new embedding API is available in "parrot/api.h" and documented in
+    docs/pdd/pdd10_embedding.pod .
+  + Packfile PMCs were refactored and can now be used to produce runnable bytecode.
+  + Packfile manipulation code now throws embedder-friendly exceptions rather
+    than printing error details directly to stderr.
+  + Unicode support for file IO, environment variables, program names, and
+    command-line parameters was improved.
+  + An experimental gdb pretty-printers in tools/dev for Parrot STRINGs and
+    PMCs is now available.  (gdb 7.2 or later and Python are required)
+  + c2str.pl and pmc2c.pl improvements result in a noticably faster build.
+  + Bugs in our Digest::sha256 library and bit-related dynamic ops were fixed
+    by GCI student Nolan Lum. Both now work correctly on 32 and 64 bit systems.
+- Languages
+  + Ωη;)XD - OMeta for Winxed https://github.com/plobsing/ohm-eta-wink-kzd
+- Community
+  + tree-optimization by GSoC student Tyler L. Curtis joined the nest and now
+    lives at http://github.com/parrot/tree-optimization .
+  + Plumage now lives at http://github.com/parrot/plumage and is installable.
+  + Christmas proceeded as scheduled.  The Parrot team does not take credit for
+    this event.
+- Documentation
+  + HTML documentation generation has been rewritten and greatly simplified.
+  + We have improved documentation in docs/project/git_workflow.pod about
+    keeping a fork of parrot.git in sync.
+  + Translations of our README in various languages are now in the
+    docs/translation directory, thanks to Google Code-In students.
+- Tests
+  + A better way to write "todo" tests with Parrot's Test::More was implemented
+    by GCI student Fernando Brito.
+  + Major increases in test coverage of many core PMCs, dynamic PMCs and
+    dynamic opcodes resulted from GCI and the interpid students it attracted.
+  + Jonathan "Duke" Leto set up Debian Linux x86_64 and sparc32 smokers
+    in the GCC Compile Farm, which continually submit smoke reports with
+    a variety of configuration options and compilers.  Thanks, GCC!
+  + Makefile dependency checking is now automatically tested, resulting in a
+    more reliable parallel build.
+  + Coverage tests were improved for platforms with and without Devel::Cover.
 
 New in 2.11.0
 - Core
