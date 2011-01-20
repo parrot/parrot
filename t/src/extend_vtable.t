@@ -109,21 +109,18 @@ CODE
 }
 
 # This blows up
-=head
+#extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(freeze|thaw|thawfinish)");
+#    Parrot_PMC_set_integer_native(interp, pmc, 42);
+#    Parrot_PMC_set_integer_native(interp, pmc2, 99);
+#
+#    Parrot_PMC_freeze(interp, pmc, pmc2);
+#    Parrot_PMC_thaw(interp, pmc, pmc2);
+#    Parrot_printf(interp,"42\n");
+#CODE
+#42
+#Done!
+#OUTPUT
 
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(freeze|thaw|thawfinish)");
-    Parrot_PMC_set_integer_native(interp, pmc, 42);
-    Parrot_PMC_set_integer_native(interp, pmc2, 99);
-
-    Parrot_PMC_freeze(interp, pmc, pmc2);
-    Parrot_PMC_thaw(interp, pmc, pmc2);
-    Parrot_printf(interp,"42\n");
-CODE
-42
-Done!
-OUTPUT
-
-=cut
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_add_float" );
     Parrot_PMC_set_integer_native(interp, pmc, -42);
