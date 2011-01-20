@@ -54,8 +54,8 @@ pmclass Continuation auto_attrs provides invokable {
     ATTR PMC               *to_call_object;  /* pointer to CallSignature */
     /* a Continuation keeps the from_ctx alive */
     ATTR PMC               *from_ctx;        /* sub, this cont is returning from */
-    ATTR int                runloop_id;      /* id of the creating runloop. */
-    ATTR int                invoked;         /* flag when a handler has been invoked. */
+    ATTR INTVAL             runloop_id;      /* id of the creating runloop. */
+    ATTR INTVAL             invoked;         /* flag when a handler has been invoked. */
 
 /*
 
