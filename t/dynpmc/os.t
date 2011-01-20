@@ -293,7 +293,7 @@ finally2:
 .end
 CODE
 /Directory not empty
-No such file or directory/
+stat failed/
 OUT
 
 unlink "test-bad-rm/bad";

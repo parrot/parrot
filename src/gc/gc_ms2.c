@@ -14,7 +14,6 @@ src/gc/gc_ms2.c - Non-recursive M&S
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
 #include "parrot/pointer_array.h"
-#include "parrot/sysmem.h"
 #include "gc_private.h"
 #include "fixed_allocator.h"
 

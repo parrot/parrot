@@ -250,7 +250,6 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 
 #include "parrot/settings.h"
 #include "parrot/enums.h"
-#include "parrot/platform.h"
 #include "parrot/platform_interface.h"
 #include "parrot/global_setup.h"
 #include "parrot/caches.h"

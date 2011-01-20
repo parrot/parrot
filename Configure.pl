@@ -639,11 +639,11 @@ configuration file.
     auto::ctags
     auto::revision
     auto::icu
+    auto::platform
     gen::config_h
     gen::core_pmcs
     gen::opengl
     gen::makefiles
-    gen::platform
     gen::config_pm
 
     =cut

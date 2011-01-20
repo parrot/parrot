@@ -368,12 +368,6 @@
 ^/include/parrot/opsenum\.h/
 ^/include/parrot/pbcversion\.h$
 ^/include/parrot/pbcversion\.h/
-^/include/parrot/platform\.h$
-^/include/parrot/platform\.h/
-^/include/parrot/platform_interface\.h$
-^/include/parrot/platform_interface\.h/
-^/include/parrot/platform_limits\.h$
-^/include/parrot/platform_limits\.h/
 ^/include/parrot/vtable\.h$
 ^/include/parrot/vtable\.h/
 ^/include/pmc/.*\.h$
@@ -780,10 +774,6 @@
 ^/src/parrot_config\.c/
 ^/src/parrot_config\.h$
 ^/src/parrot_config\.h/
-^/src/platform\.c$
-^/src/platform\.c/
-^/src/platform_asm\.s$
-^/src/platform_asm\.s/
 ^/src/pmc/.*\.c$
 ^/src/pmc/.*\.c/
 ^/src/pmc/.*\.dump$

@@ -47,8 +47,6 @@ Some ideas from AT&T SFIO.
 #define PIO_BF_MMAP     00000010        /* Buffer mmap()ed              */
 
 
-#define PIO_ACCMODE     0000003
-#define PIO_DEFAULTMODE DEFAULT_OPEN_MODE
 #define PIO_UNBOUND     (size_t)-1
 
 typedef PMC **ParrotIOTable;

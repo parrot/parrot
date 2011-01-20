@@ -294,7 +294,7 @@ filehandle, rather than modifying the invocant).
         if (!got_filename || STRING_IS_NULL(filename))
             GET_ATTR_filename(INTERP, SELF, filename);
 
-        filehandle = Parrot_io_open(INTERP, SELF, filename, mode);
+        filehandle = Parrot_io_open_handle(INTERP, SELF, filename, mode);
 
         RETURN(PMC *filehandle);
     }
@@ -347,7 +347,7 @@ Returns a boolean value indicating whether C<SELF> is a console/tty.
 */
 
     METHOD isatty() {
-        const INTVAL isatty = Parrot_io_is_tty(INTERP, SELF);
+        const INTVAL isatty = Parrot_io_is_tty_handle(INTERP, SELF);
         RETURN(INTVAL isatty);
     }
 
@@ -478,7 +478,7 @@ filehandle when finished.
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot readall on a new file from an already open filehandle");
 
-            filehandle  = Parrot_io_open(INTERP, PMCNULL, name, NULL);
+            filehandle  = Parrot_io_open_handle(INTERP, PMCNULL, name, NULL);
 
             PARROT_ASSERT(filehandle->vtable->base_type == enum_class_FileHandle);
 
@@ -486,7 +486,7 @@ filehandle when finished.
             size = (size_t)(Parrot_stat_info_intval(INTERP, name, STAT_FILESIZE));
 
             result = Parrot_io_reads(INTERP, filehandle, size);
-            Parrot_io_close(INTERP, filehandle);
+            Parrot_io_close_handle(INTERP, filehandle);
         }
         else {
             PMC *sb;
@@ -522,7 +522,7 @@ Flushes the filehandle.
 */
 
     METHOD flush() {
-        Parrot_io_flush(INTERP, SELF);
+        Parrot_io_flush_filehandle(INTERP, SELF);
     }
 
 /*
@@ -747,7 +747,7 @@ C<offs_overflow> is optional and is used to handle offsets higher than 2Gb on
         const PIOOFF_T pio_offs = has_overflow ?
                                     Parrot_io_make_offset32(offs_overflow, offs) :
                                     offs;
-        if (0 > Parrot_io_seek(INTERP, SELF, pio_offs, whence))
+        if (0 > Parrot_io_seek_handle(INTERP, SELF, pio_offs, whence))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR, "seek failed");
     }
 

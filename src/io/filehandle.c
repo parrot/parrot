@@ -549,7 +549,7 @@ Parrot_io_close_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
         INTVAL status;
 
         GETATTR_FileHandle_process_id(interp, pmc, pid);
-        status = PIO_PIPE_WAIT(interp, pid);
+        status = Parrot_proc_waitpid(interp, pid);
         SETATTR_FileHandle_exit_status(interp, pmc, status);
     }
 

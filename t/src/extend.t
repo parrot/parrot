@@ -381,7 +381,7 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
     Parrot_eprintf(interp, "back\\n");
 
     /* win32 seems to buffer stderr ? */
-    Parrot_io_flush(interp, Parrot_io_STDERR(interp));
+    Parrot_io_flush_handle(interp, Parrot_io_STDERR(interp));
 
     name = Parrot_str_new_constant(interp, "_sub2");
     sub  = Parrot_ns_find_current_namespace_global(interp, name);
@@ -438,7 +438,7 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
     Parrot_eprintf(interp, "back\\n");
 
     /* win32 seems to buffer stderr ? */
-    Parrot_io_flush(interp, Parrot_io_STDERR(interp));
+    Parrot_io_flush_handle(interp, Parrot_io_STDERR(interp));
 
     name = Parrot_str_new_constant(interp, "_sub2");
     sub  = Parrot_ns_find_current_namespace_global(interp, name);

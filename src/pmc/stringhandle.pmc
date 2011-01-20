@@ -272,7 +272,7 @@ Clear the StringHandle by resetting it to a null value.
 */
 
     METHOD flush() {
-        Parrot_io_flush(INTERP, SELF);
+        Parrot_io_flush_handle(INTERP, SELF);
     }
 
 /*

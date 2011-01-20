@@ -12,8 +12,10 @@
 #define PARROT_THR_WINDOWS_H_GUARD
 
 #  undef FASTCALL
+#  include <windows.h>
 #  include <process.h>
 #  include <limits.h>
+#  undef CONST
 
 typedef CRITICAL_SECTION Parrot_mutex;
 typedef struct Windows_cond

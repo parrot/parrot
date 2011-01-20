@@ -540,7 +540,8 @@ sub is_perl {
     open my $file_handle, '<', $filename
         or $self->_croak("Could not open $filename for reading");
     my $line = <$file_handle>;
-    close $file_handle;
+    close $file_handle
+        or $self->_croak("Could not close $filename after reading");
 
     return 1 if $line && $line =~ /^#!.*perl/;
 
@@ -608,7 +609,8 @@ sub is_pir {
     open my $file_handle, '<', $filename
         or $self->_croak("Could not open $filename for reading");
     my $line = <$file_handle>;
-    close $file_handle;
+    close $file_handle
+        or $self->_croak("Could not close $filename for reading");
 
     if ( $line && $line =~ /^#!.*parrot(?:\s|$)/ ) {
         # something that specifies a pir or pbc is probably a HLL, skip it
@@ -797,7 +799,7 @@ sub generated_files {
 
     return {
         map { File::Spec->catfile( $path, $_ ) => $generated->{$_} }
-            keys %$generated
+            keys %{$generated}
     };
 }
 
@@ -819,7 +821,7 @@ sub slurp {
         local $/;
         $buf = <$fh>;
     }
-    close $fh;
+    close $fh or die "Cannot close $path after reading: $!\n";
 
     return $buf;
 }
