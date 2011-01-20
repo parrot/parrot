@@ -179,9 +179,7 @@ init_world(PARROT_INTERP)
     ASSERT_ARGS(init_world)
     PMC *iglobals, *self, *pmc;
 
-#ifdef PARROT_HAS_PLATFORM_INIT_CODE
     Parrot_platform_init_code();
-#endif
 
     /* Call base vtable class constructor methods */
     Parrot_gbl_setup_2(interp);

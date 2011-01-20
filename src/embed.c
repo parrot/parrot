@@ -977,7 +977,7 @@ Parrot_disassemble(PARROT_INTERP,
     PMC *output;
 
     if (outfile != NULL) {
-        output = Parrot_io_open(interp, PMCNULL,
+        output = Parrot_io_open_handle(interp, PMCNULL,
                 Parrot_str_new(interp, outfile, 0),
                 Parrot_str_new_constant(interp, "tw"));
     }
@@ -1049,7 +1049,7 @@ Parrot_disassemble(PARROT_INTERP,
         ++op_code_seq_num;
     }
     if (outfile != NULL)
-        Parrot_io_close(interp, output);
+        Parrot_io_close_handle(interp, output);
 
     return;
 }

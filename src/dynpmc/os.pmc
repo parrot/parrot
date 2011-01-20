@@ -181,16 +181,9 @@ C<path>.
     METHOD rm(STRING *path) {
         struct stat info;
         char * const cpath = Parrot_str_to_cstring(INTERP, path);
-        int          error = stat(cpath, &info);
+        int          error;
 
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_str_free_cstring(cpath);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-
-        if (S_ISDIR(info.st_mode)) {
+        if (Parrot_stat_info_intval(interp, path, STAT_ISDIR)) {
 #ifdef _MSC_VER
             error = _rmdir(cpath);
 #else

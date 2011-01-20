@@ -92,11 +92,6 @@ F: foreach my $file (@_) {
 
             if ( $line =~ m{ifndef (PARROT_.+_GUARD)$} ) {
 
-                # allow include/parrot/platform.h to have redundant guards;
-                # it contains verbatim copies of other header files (which
-                # have their own guards).
-                next L if ( defined($ifndef) && $ifndef eq 'PARROT_PLATFORM_H_GUARD' );
-
                 # check for multiple guards in the same file
                 $redundants{$file} = $1 if defined $ifndef;
 
