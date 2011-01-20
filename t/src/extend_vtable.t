@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 57;
+plan tests => 58;
 
 =head1 NAME
 
@@ -71,13 +71,14 @@ CODE
 
 sub extend_vtable_output_is
 {
-    my ($code, $expected_output, $msg) = @_;
+    my ($code, $expected_output, $msg, @opts) = @_;
     c_output_is(
         $common . linedirective(__LINE__) . <<CODE,
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_PMC pmc, pmc2, pmc3, pmc_string;
+    Parrot_PMC pmc, pmc2, pmc3, pmc_string, pmc_string2;
+    Parrot_PMC pmc_float, pmc_float2;
     Parrot_PMC rpa, rpa2;
     Parrot_Int type, value, integer, integer2;
     Parrot_Float number, number2;
@@ -91,7 +92,12 @@ int main(void)
     pmc    = Parrot_PMC_new(interp, type);
     pmc2   = Parrot_PMC_new(interp, type);
     pmc3   = Parrot_PMC_new(interp, type);
+
     pmc_string = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
+    pmc_string2 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
+
+    pmc_float  = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"Float"));
+    pmc_float2 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"Float"));
 
 $code
 
@@ -103,23 +109,23 @@ $code
     return 0;
 }
 CODE
-        $expected_output, $msg
+        $expected_output, $msg, @opts
     );
 
 }
 
 # This blows up
-#extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(freeze|thaw|thawfinish)");
-#    Parrot_PMC_set_integer_native(interp, pmc, 42);
-#    Parrot_PMC_set_integer_native(interp, pmc2, 99);
-#
-#    Parrot_PMC_freeze(interp, pmc, pmc2);
-#    Parrot_PMC_thaw(interp, pmc, pmc2);
-#    Parrot_printf(interp,"42\n");
-#CODE
-#42
-#Done!
-#OUTPUT
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(freeze|thaw|thawfinish)", todo => 'freeze + thaw are borked');
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 99);
+
+    Parrot_PMC_freeze(interp, pmc, pmc2);
+    Parrot_PMC_thaw(interp, pmc, pmc2);
+    Parrot_printf(interp,"42\n");
+CODE
+42
+Done!
+OUTPUT
 
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_add_float" );
@@ -675,17 +681,17 @@ CODE
 Done!
 OUTPUT
 
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal_num" );
-    Parrot_PMC_set_integer_native(interp, pmc, -42);
-    Parrot_PMC_set_integer_native(interp, pmc2, 42);
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal_num", todo => 'seems borked' );
+    Parrot_PMC_set_number_native(interp, pmc, -42);
+    Parrot_PMC_set_number_native(interp, pmc2, 42);
 
-    pmc3 = Parrot_PMC_is_equal_num(interp, pmc, pmc2);
-    printf("%d\n", (int) pmc3);
+    integer = Parrot_PMC_is_equal_num(interp, pmc, pmc2);
+    printf("%d\n", (int) integer);
 
-    Parrot_PMC_set_integer_native(interp, pmc2, -42);
+    Parrot_PMC_set_number_native(interp, pmc2, -42);
 
-    pmc3 = Parrot_PMC_is_equal_num(interp, pmc, pmc2);
-    printf("%d\n", (int) pmc3);
+    integer = Parrot_PMC_is_equal_num(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", integer);
 CODE
 0
 1
@@ -693,16 +699,19 @@ Done!
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal_string" );
-    Parrot_PMC_set_integer_native(interp, pmc, -42);
-    Parrot_PMC_set_integer_native(interp, pmc2, 42);
+     string  = createstring(interp, "FOO");
+     string2 = createstring(interp, "BAR");
 
-    pmc3 = Parrot_PMC_is_equal_string(interp, pmc, pmc2);
-    printf("%d\n", (int) pmc3);
+     Parrot_PMC_set_string_native(interp, pmc_string, string);
+     Parrot_PMC_set_string_native(interp, pmc_string2,string2);
 
-    Parrot_PMC_set_integer_native(interp, pmc2, -42);
+     integer = Parrot_PMC_is_equal(interp, pmc_string, pmc_string2);
+     Parrot_printf(interp, "%d\n", (int)integer);
 
-    pmc3 = Parrot_PMC_is_equal_string(interp, pmc, pmc2);
-    printf("%d\n", (int) pmc3);
+     Parrot_PMC_set_string_native(interp, pmc_string2, string);
+
+     integer = Parrot_PMC_is_equal(interp, pmc_string, pmc_string2);
+     Parrot_printf(interp, "%d\n", (int)integer);
 CODE
 0
 1
@@ -819,19 +828,19 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_cmp_string" );
     Parrot_PMC_set_integer_native(interp, pmc, 42);
     Parrot_PMC_set_integer_native(interp, pmc2, 17);
 
-    pmc3 = Parrot_PMC_cmp_string(interp, pmc, pmc2);
-    Parrot_io_printf(interp,"%d\n", pmc3 );
+    integer = Parrot_PMC_cmp_string(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", integer );
 
     Parrot_PMC_set_integer_native(interp, pmc, 17);
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
 
-    pmc3 = Parrot_PMC_cmp_string(interp, pmc, pmc2);
-    Parrot_io_printf(interp,"%d\n", pmc3 );
+    integer = Parrot_PMC_cmp_string(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", integer );
 
     Parrot_PMC_set_integer_native(interp, pmc, 42);
 
-    pmc3 = Parrot_PMC_cmp_string(interp, pmc, pmc2);
-    Parrot_io_printf(interp,"%d\n", pmc3 );
+    integer = Parrot_PMC_cmp_string(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", integer );
 CODE
 1
 -1
@@ -843,19 +852,19 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_cmp_num" );
     Parrot_PMC_set_integer_native(interp, pmc, 42);
     Parrot_PMC_set_integer_native(interp, pmc2, 17);
 
-    pmc3 = Parrot_PMC_cmp_num(interp, pmc, pmc2);
-    Parrot_io_printf(interp,"%d\n", pmc3 );
+    integer = Parrot_PMC_cmp_num(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", integer );
 
     Parrot_PMC_set_integer_native(interp, pmc, 17);
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
 
-    pmc3 = Parrot_PMC_cmp_num(interp, pmc, pmc2);
-    Parrot_io_printf(interp,"%d\n", pmc3 );
+    integer = Parrot_PMC_cmp_num(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", integer );
 
     Parrot_PMC_set_integer_native(interp, pmc, 42);
 
-    pmc3 = Parrot_PMC_cmp_num(interp, pmc, pmc2);
-    Parrot_io_printf(interp,"%d\n", pmc3 );
+    integer = Parrot_PMC_cmp_num(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", integer );
 CODE
 1
 -1
@@ -930,7 +939,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_type" );
     integer = Parrot_PMC_type(interp, pmc);
 
     if (integer > 0)
-        Parrot_io_printf(interp,"42\n", integer);
+        Parrot_printf(interp,"42\n", integer);
 CODE
 42
 Done!
@@ -942,7 +951,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_class" );
 
     pmc_string = Parrot_PMC_get_class(interp, pmc);
 
-    Parrot_io_printf(interp,"%P\n", pmc_string);
+    Parrot_printf(interp,"%P\n", pmc_string);
 CODE
 Integer
 Done!
