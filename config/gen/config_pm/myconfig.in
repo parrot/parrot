@@ -2,9 +2,6 @@ Summary of my parrot @VERSION@ (r@revision@) configuration:
   configdate='@configdate@'
   Platform:
     osname=@osname@, archname=@archname@
-    jitcapable=@jitcapable@, jitarchname=@jitarchname@,
-    jitosname=@jitosname@, jitcpuarch=@jitcpuarch@
-    execcapable=@execcapable@
     perl=@perl@
   Compiler:
     cc='@cc@', ccflags='@ccflags@',

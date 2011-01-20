@@ -60,13 +60,13 @@ is_env_var_set(PARROT_INTERP, ARGIN(STRING* var))
 {
     ASSERT_ARGS(is_env_var_set)
     int retval;
-    char* const value = Parrot_getenv(interp, var);
-    if (value == NULL)
+    STRING * const value = Parrot_getenv(interp, var);
+    if (STRING_IS_NULL(value))
         retval = 0;
-    else if (*value == '\0')
+    else if (STRING_IS_EMPTY(value))
         retval = 0;
     else
-        retval = !STREQ(value, "0");
+        retval = !STRING_equal(interp, value, CONST_STRING(interp, "0"));
     return retval;
 }
 
@@ -256,6 +256,7 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     interp->all_op_libs         = NULL;
     interp->evc_func_table      = NULL;
     interp->evc_func_table_size = 0;
+    interp->initial_pf          = PackFile_new(interp, 0);
     interp->code                = NULL;
 
     /* And a dynamic environment stack */

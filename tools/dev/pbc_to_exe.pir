@@ -95,8 +95,6 @@ HEADER
                 show_last_error_and_exit(interp);
             }
 
-            //Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
-
             if (!Parrot_api_load_bytecode_bytes(interp, program_code_addr, bytecode_size, &pbc)) {
                 fprintf(stderr, "PARROT VM: Could not load bytecode");
                 show_last_error_and_exit(interp);

@@ -153,6 +153,8 @@ Check the type of checkout.
 
 =item C<pmc_source_file_directories()>
 
+=item C<python_source_file_directories()>
+
 =item C<yacc_source_file_directories()>
 
 Returns the directories which contain source files of the appropriate filetype.
@@ -171,6 +173,8 @@ Returns the directories which contain source files of the appropriate filetype.
 
 =item C<pmc_source_file_with_name()>
 
+=item C<python_source_file_with_name()>
+
 =item C<yacc_source_file_with_name()>
 
 Returns the source file with the specified name and of the appropriate filetype.
@@ -188,6 +192,8 @@ Returns the source file with the specified name and of the appropriate filetype.
 =item C<pir_source_files()>
 
 =item C<pmc_source_files()>
+
+=item C<python_source_files()>
 
 =item C<yacc_source_files()>
 
@@ -213,6 +219,7 @@ BEGIN {
                 shebang     => qr/^#!\s*perl/,
                 shebang_ext => qr/.t$/,
             },
+            python => { file_exts => ['py'] },
         },
         header => { c => { file_exts => ['h'] }, },
     );
@@ -721,6 +728,36 @@ sub perl_module_file_with_name {
     return;
 }
 
+=item C<get_python_language_files()>
+
+Returns the Python language source files within Parrot.
+
+At the current time, these files are limited to examples and tools that are
+useful to Parrot developers.
+
+Returns a list of Parrot::Docs::File objects.
+
+=cut
+
+sub get_python_language_files {
+    my $self = shift;
+
+    my @files = ( $self->python_source_files,);
+
+    my @python_language_files = ();
+    foreach my $file (@files) {
+        next if $self->is_python_exemption($file);
+        push @python_language_files, $file;
+    }
+
+    return @python_language_files;
+}
+
+sub is_python_exemption {
+    my ($self, $file) = @_;
+    return;
+}
+
 =item C<docs_directory()>
 
 Returns the documentation directory.
@@ -743,18 +780,6 @@ sub html_docs_directory {
     my $self = shift;
 
     return $self->docs_directory->directory_with_name('html');
-}
-
-=item C<delete_html_docs()>
-
-Deletes the HTML documentation directory.
-
-=cut
-
-sub delete_html_docs {
-    my $self = shift;
-
-    return $self->html_docs_directory->delete();
 }
 
 =item C<generated_files>

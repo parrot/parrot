@@ -1,6 +1,6 @@
-# Copyright (c) 2001-2010, Parrot Foundation.
+# Copyright (c) 2001-2011, Parrot Foundation.
 
-=head1 PDD10: Embedding
+=head1 PDD 10: Embedding
 
 =head2 Abstract
 

@@ -150,13 +150,10 @@ parrot_init_library_paths(PARROT_INTERP)
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_INCLUDE, paths);
     { /* EXPERIMENTAL: add include path from environment */
-        const char *envvar = Parrot_getenv(interp,
-                                           Parrot_str_new_constant(interp, "PARROT_INCLUDE"));
+        STRING *envvar = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_INCLUDE"));
         Parrot_warn_experimental(interp, "PARROT_INCLUDE environment variable is experimental");
-        if (envvar != NULL  && envvar[0]) {
-            entry = Parrot_str_new(interp, envvar, 0);
-            VTABLE_push_string(interp, paths, entry);
-        }
+        if (!STRING_IS_NULL(envvar) && !STRING_IS_EMPTY(envvar))
+            VTABLE_push_string(interp, paths, envvar);
     }
     entry = CONST_STRING(interp, "./");
     VTABLE_push_string(interp, paths, entry);
@@ -166,13 +163,10 @@ parrot_init_library_paths(PARROT_INTERP)
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_LIBRARY, paths);
     { /* EXPERIMENTAL: add library path from environment */
-        const char *envvar = Parrot_getenv(interp,
-                                           Parrot_str_new_constant(interp, "PARROT_LIBRARY"));
+        STRING *envvar = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_LIBRARY"));
         Parrot_warn_experimental(interp, "PARROT_LIBRARY environment variable is experimental");
-        if (envvar != NULL && envvar[0]) {
-            entry = Parrot_str_new(interp, envvar, 0);
-            VTABLE_push_string(interp, paths, entry);
-        }
+        if (!STRING_IS_NULL(envvar) && !STRING_IS_EMPTY(envvar))
+            VTABLE_push_string(interp, paths, envvar);
     }
     entry = CONST_STRING(interp, "./");
     VTABLE_push_string(interp, paths, entry);
@@ -772,12 +766,11 @@ STRING *
 Parrot_get_runtime_path(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_get_runtime_path)
-    char * const env = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_RUNTIME"));
+    STRING * const env = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_RUNTIME"));
     STRING *result;
 
-    if (env)
-    {
-        result = Parrot_str_new(interp, env, 0);
+    if (!STRING_IS_NULL(env)) {
+        result = env;
     }
     else {
         PMC    * const config_hash =

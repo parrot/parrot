@@ -2147,11 +2147,20 @@ the server. The default is "parrot-autobot:qa_rocks"
   L6:
     archive = get_value('prove_archive', "report.tar.gz" :named('default'), kv :flat :named)
     harness.'archive'(archive)
+    .local pmc extra_props
     $I0 = exists kv['smolder_extra_properties']
     unless $I0 goto L7
-    $P0 = kv['smolder_extra_properties']
-    harness.'extra_props'($P0)
+    extra_props = kv['smolder_extra_properties']
+    goto L8
   L7:
+    extra_props = new 'Hash'
+  L8:
+    $I0 = exists extra_props['Submitter']
+    if $I0 goto L9
+    $S0 = get_submitter()
+    extra_props['Submitter'] = $S0
+  L9:
+    harness.'extra_props'(extra_props)
     aggregate = harness.'runtests'(files)
     print "creat "
     say archive
@@ -4216,8 +4225,6 @@ Return the whole config
     $S0 = $P0['ccwarn']
     flags .= $S0
     flags .= " "
-    $S0 = $P0['cc_hasjit']
-    flags .= $S0
     .return (flags)
 .end
 

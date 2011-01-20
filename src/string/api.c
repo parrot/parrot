@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -692,6 +692,76 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
         s->strlen = s->bufused = 0;
 
     return s;
+}
+
+
+/*
+
+=item C<STRING * Parrot_str_from_platform_cstring(PARROT_INTERP, const char *c)>
+
+Convert a C string, encoded in the platform's assumed encoding, to a Parrot
+string.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_str_from_platform_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *c))
+{
+    ASSERT_ARGS(Parrot_str_from_platform_cstring)
+    if (!c)
+        return STRINGNULL;
+    else {
+        STRING *retv;
+        Parrot_runloop jmp;
+
+        if (setjmp(jmp.resume)) {
+            /* catch */
+            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+            retv =  Parrot_str_new_init(interp, c, strlen(c),
+                                        Parrot_binary_encoding_ptr, 0);
+        }
+        else {
+            /* try */
+            Parrot_ex_add_c_handler(interp, &jmp);
+            retv = Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(interp, c),
+                                        Parrot_platform_encoding_ptr, 0);
+            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+        }
+
+        return retv;
+    }
+}
+
+
+/*
+
+=item C<char * Parrot_str_to_platform_cstring(PARROT_INTERP, STRING *s)>
+
+Obtain a C string, encoded in the platform's assumed encoding, from a Parrot
+string.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+char *
+Parrot_str_to_platform_cstring(PARROT_INTERP, ARGIN(STRING *s))
+{
+    ASSERT_ARGS(Parrot_str_to_platform_cstring)
+    if (STRING_IS_NULL(s)) {
+        return NULL;
+    }
+    else {
+        STRING * const s_plat = Parrot_str_change_encoding(interp,
+                                                           s, Parrot_platform_encoding_ptr->num);
+        return Parrot_str_to_cstring(interp, s_plat);
+    }
 }
 
 

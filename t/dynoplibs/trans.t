@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -493,13 +493,14 @@ Tests various transcendental operations
     config = interp[.IGLOBALS_CONFIG_HASH]
     .local int intvalsize
     intvalsize = config['intvalsize']
-    .local int gmp
+    .local string gmp
     gmp = config['gmp']
 
-    if intvalsize != 4 goto can_test
-    if gmp goto can_test
-        skip(40,'No integer overflow for 32-bit INTVALs without GMP installed')
-        goto end
+    if intvalsize == 4 goto skipthem
+
+    if gmp == 'define' goto can_test
+
+    goto skipthem
 
   can_test:
 
@@ -523,7 +524,10 @@ Tests various transcendental operations
 # In the meantime, make sure it overflows nicely
 # on 32 bit.
     unless i2 > 40 goto next
+    goto end
 
+  skipthem:
+    skip(40,'No integer overflow tests for 32-bit INTVALs')
   end:
 .end
 

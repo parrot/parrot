@@ -25,6 +25,18 @@ This file implements various functions for creating and writing packfiles.
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_INLINE
+static void update_backref_hash(PARROT_INTERP,
+    PackFile_ConstTable *ct,
+    Hash *seen,
+    INTVAL constno)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_update_backref_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
@@ -145,6 +157,34 @@ PackFile_pack(PARROT_INTERP, ARGMOD(PackFile *self), ARGOUT(opcode_t *cursor))
 
 /*
 
+=item C<static void update_backref_hash(PARROT_INTERP, PackFile_ConstTable *ct,
+Hash *seen, INTVAL constno)>
+
+Update C<ct>'s backref hash with new entries from C<seen>.
+
+=cut
+
+*/
+
+PARROT_INLINE
+static void
+update_backref_hash(PARROT_INTERP, PackFile_ConstTable *ct, Hash *seen, INTVAL constno)
+{
+    ASSERT_ARGS(update_backref_hash)
+    parrot_hash_iterate(seen, {
+        PMC *k = (PMC *)_bucket->key;
+        if (!Parrot_hash_get(interp, ct->pmc_hash, k)) {
+            UINTVAL idx = (UINTVAL)_bucket->value;
+            PMC *rec = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, 2);
+            VTABLE_set_integer_keyed_int(interp, rec, 0, constno);
+            VTABLE_set_integer_keyed_int(interp, rec, 1, idx);
+            Parrot_hash_put(interp, ct->pmc_hash, k, rec);
+        }
+    });
+}
+
+/*
+
 =item C<size_t PackFile_ConstTable_pack_size(PARROT_INTERP, PackFile_Segment
 *seg)>
 
@@ -169,10 +209,15 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
     for (i = 0; i < self->str.const_count; i++)
         size += PF_size_string(self->str.constants[i]);
 
+    self->pmc_hash = Parrot_hash_create(interp, enum_type_PMC, Hash_key_type_PMC_ptr);
     for (i = 0; i < self->pmc.const_count; i++) {
+        Hash *seen;
         PMC *c = self->pmc.constants[i];
-        size += PF_size_strlen(Parrot_freeze_pbc_size(interp, c, self)) - 1;
+        size += PF_size_strlen(Parrot_freeze_pbc_size(interp, c, self, &seen)) - 1;
+        update_backref_hash(interp, self, seen, i);
     }
+    Parrot_hash_destroy(interp, self->pmc_hash);
+    self->pmc_hash = NULL;
 
     return size;
 }
@@ -215,10 +260,15 @@ PackFile_ConstTable_pack(PARROT_INTERP,
     for (i = 0; i < self->str.const_count; i++)
         cursor = PF_store_string(cursor, self->str.constants[i]);
 
+    self->pmc_hash = Parrot_hash_create(interp, enum_type_PMC, Hash_key_type_PMC_ptr);
     for (i = 0; i < self->pmc.const_count; i++) {
-        PMC *c = self->pmc.constants[i];
-        cursor   = Parrot_freeze_pbc(interp, c, self, cursor);
+        Hash *seen;
+        PMC  *c = self->pmc.constants[i];
+        cursor  = Parrot_freeze_pbc(interp, c, self, cursor, &seen);
+        update_backref_hash(interp, self, seen, i);
     }
+    Parrot_hash_destroy(interp, self->pmc_hash);
+    self->pmc_hash = NULL;
 
     return cursor;
 }
@@ -230,6 +280,9 @@ PackFile_ConstTable *ct, FLOATVAL n)>
 
 =item C<int PackFile_ConstTable_rlookup_str(PARROT_INTERP, const
 PackFile_ConstTable *ct, STRING *s)>
+
+=item C<int PackFile_ConstTable_rlookup_pmc(PARROT_INTERP, PackFile_ConstTable
+*ct, PMC *v, INTVAL *constno, INTVAL *idx)>
 
 Reverse lookup a constant in the constant table.
 
@@ -260,7 +313,7 @@ PackFile_ConstTable_rlookup_str(PARROT_INTERP,
     ARGIN(const PackFile_ConstTable *ct), ARGIN(STRING *s))
 {
     ASSERT_ARGS(PackFile_ConstTable_rlookup_str)
-    int      i;
+    int i;
 
     if (ct->string_hash) {
         HashBucket *bucket = Parrot_hash_get_bucket(interp, ct->string_hash, s);
@@ -282,6 +335,28 @@ PackFile_ConstTable_rlookup_str(PARROT_INTERP,
     /* not found */
     return -1;
 }
+
+PARROT_EXPORT
+int
+PackFile_ConstTable_rlookup_pmc(PARROT_INTERP,
+        ARGIN(PackFile_ConstTable *ct), ARGIN(PMC *v),
+        ARGOUT(INTVAL *constno), ARGOUT(INTVAL *idx))
+{
+    ASSERT_ARGS(PackFile_ConstTable_rlookup_pmc)
+    PMC *rec;
+
+    PARROT_ASSERT(ct->pmc_hash);
+
+    rec = (PMC *)Parrot_hash_get(interp, ct->pmc_hash, v);
+    if (rec) {
+        *constno = VTABLE_get_integer_keyed_int(interp, rec, 0);
+        *idx     = VTABLE_get_integer_keyed_int(interp, rec, 1);
+        return 1;
+    }
+
+    return 0;
+}
+
 
 /*
 

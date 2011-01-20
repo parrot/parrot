@@ -34,6 +34,8 @@ This file implements a native call frame (thunk) factory using libffi.
 #  define ffi_type_parrot_numval ffi_type_float
 #elif(NUMVAL_SIZE == 8)
 #  define ffi_type_parrot_numval ffi_type_double
+#elif(NUMVAL_SIZE == 12)
+#  define ffi_type_parrot_numval ffi_type_longdouble
 #else
 #  error "unhandled NUMVAL_SIZE value"
 #endif
@@ -68,36 +70,61 @@ typedef struct  parrot_var_t {
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static PMC * build_ffi_thunk(PARROT_INTERP, PMC *user_data, STRING *sig_str)
-        __attribute__nonnull__(1);
+PARROT_CANNOT_RETURN_NULL
+static PMC * build_ffi_thunk(PARROT_INTERP,
+    SHIM(PMC *user_data),
+    ARGIN(STRING *sig_str))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
-static void call_ffi_thunk(PARROT_INTERP, PMC *nci_pmc, PMC *self)
-        __attribute__nonnull__(1);
+static void call_ffi_thunk(PARROT_INTERP,
+    ARGMOD(PMC *nci_pmc),
+    ARGMOD(PMC *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*nci_pmc)
+        FUNC_MODIFIES(*self);
 
-static PMC * clone_ffi_thunk(PARROT_INTERP, PMC *thunk, void *_thunk_data)
-        __attribute__nonnull__(1);
+PARROT_CANNOT_RETURN_NULL
+static PMC * clone_ffi_thunk(PARROT_INTERP,
+    ARGIN(PMC *thunk),
+    ARGIN(void *_thunk_data))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void free_ffi_thunk(PARROT_INTERP,
-    void *thunk_func,
-    void *thunk_data)
+    SHIM(void *thunk_func),
+    ARGFREE(void *thunk_data))
         __attribute__nonnull__(1);
 
-static PMC * init_thunk_pmc(PARROT_INTERP, ffi_thunk_t *thunk_data)
-        __attribute__nonnull__(1);
+PARROT_CANNOT_RETURN_NULL
+static PMC * init_thunk_pmc(PARROT_INTERP, ARGMOD(ffi_thunk_t *thunk_data))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*thunk_data);
 
+PARROT_CAN_RETURN_NULL
 static ffi_type * nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_build_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sig_str))
 #define ASSERT_ARGS_call_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(nci_pmc) \
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_clone_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(thunk) \
+    , PARROT_ASSERT_ARG(_thunk_data))
 #define ASSERT_ARGS_free_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_init_thunk_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(thunk_data))
 #define ASSERT_ARGS_nci_to_ffi_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -143,8 +170,9 @@ Properly encapsulate C<thunk_data> in a C<ManagedStruct>.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static PMC *
-init_thunk_pmc(PARROT_INTERP, ffi_thunk_t *thunk_data)
+init_thunk_pmc(PARROT_INTERP, ARGMOD(ffi_thunk_t *thunk_data))
 {
     ASSERT_ARGS(init_thunk_pmc)
     PMC *thunk = Parrot_pmc_new(interp, enum_class_ManagedStruct);
@@ -169,8 +197,9 @@ Suitable for use as C<IGLOBALS_NCI_FB_CB>.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static PMC *
-build_ffi_thunk(PARROT_INTERP, PMC *user_data, STRING *sig_str)
+build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(STRING *sig_str))
 {
     ASSERT_ARGS(build_ffi_thunk)
     ffi_thunk_t *thunk_data = mem_gc_allocate_zeroed_typed(interp, ffi_thunk_t);
@@ -232,6 +261,7 @@ Convert an NCI type specification into the corresponding LibFFI type.
 
 */
 
+PARROT_CAN_RETURN_NULL
 static ffi_type *
 nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
 {
@@ -266,6 +296,9 @@ nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
       case enum_nci_sig_intref:
       case enum_nci_sig_longref:
                                 return &ffi_type_pointer;
+
+      default:
+                                return NULL;
     }
 }
 
@@ -282,7 +315,7 @@ thunk contained in C<self>.
 */
 
 static void
-call_ffi_thunk(PARROT_INTERP, PMC *nci_pmc, PMC *self)
+call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
 {
     ASSERT_ARGS(call_ffi_thunk)
     Parrot_NCI_attributes *nci = PARROT_NCI(nci_pmc);
@@ -613,8 +646,9 @@ C<ManagedStruct> as a C<custom_clone_func> callback.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static PMC *
-clone_ffi_thunk(PARROT_INTERP, PMC *thunk, void *_thunk_data)
+clone_ffi_thunk(PARROT_INTERP, ARGIN(PMC *thunk), ARGIN(void *_thunk_data))
 {
     ASSERT_ARGS(clone_ffi_thunk)
     ffi_thunk_t *thunk_data = (ffi_thunk_t *)_thunk_data;
@@ -650,7 +684,7 @@ C<custom_free_func> callback.
 */
 
 static void
-free_ffi_thunk(PARROT_INTERP, void *thunk_func, void *thunk_data)
+free_ffi_thunk(PARROT_INTERP, SHIM(void *thunk_func), ARGFREE(void *thunk_data))
 {
     ASSERT_ARGS(free_ffi_thunk)
     ffi_thunk_t *thunk = (ffi_thunk_t *)thunk_data;

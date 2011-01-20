@@ -166,7 +166,7 @@ If GMP is not available, at present these functions will throw a NYI exception.
 
 
 #ifdef PARROT_HAS_GMP
-#  include "pmc_bigint.h"
+#  include "pmc/pmc_bigint.h"
 #  include <gmp.h>
 typedef struct BIGNUM {
     mpf_t b;

@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 ###############################################################################
 #
@@ -377,6 +377,9 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/memory.h \
 	$(INC_DIR)/packfile.h \
 	$(INC_DIR)/io.h \
+	$(INC_DIR)/io_portable.h \
+	$(INC_DIR)/io_unix.h \
+	$(INC_DIR)/io_win32.h \
 	$(INC_DIR)/op.h \
 	$(INC_DIR)/pmc.h \
 	$(INC_DIR)/gc_api.h \
@@ -388,6 +391,11 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/exit.h \
 	$(INC_DIR)/nci.h \
 	$(INC_DIR)/thread.h \
+	$(INC_DIR)/atomic.h \
+	$(INC_DIR)/atomic/fallback.h \
+	$(INC_DIR)/atomic/gcc_pcc.h \
+	$(INC_DIR)/atomic/gcc_x86.h \
+	$(INC_DIR)/atomic/sparc.h \
 	$(INC_DIR)/scheduler.h \
 	$(INC_DIR)/oo.h \
 	$(INC_DIR)/vtables.h \
@@ -1462,7 +1470,6 @@ src/exceptions$(O) : $(PARROT_H_HEADERS) \
 
 src/thread$(O) : \
     $(PARROT_H_HEADERS) \
-    $(INC_DIR)/atomic.h \
     $(INC_DIR)/extend.h \
     $(INC_DIR)/extend_vtable.h \
     src/thread.c \
@@ -1489,7 +1496,10 @@ src/runcore/profiling$(O) : src/runcore/profiling.str src/runcore/profiling.c \
 	include/pmc/pmc_namespace.h \
 	$(INC_DIR)/oplib/core_ops.h $(INC_DIR)/runcore_api.h \
 	$(INC_DIR)/runcore_profiling.h $(INC_DIR)/embed.h \
-	$(PARROT_H_HEADERS)
+	$(PARROT_H_HEADERS) \
+	$(INC_DIR)/extend.h \
+	$(INC_DIR)/extend_vtable.h
+
 
 src/call/args$(O) : \
 	$(PARROT_H_HEADERS) $(INC_DIR)/oplib/ops.h \
@@ -1684,7 +1694,8 @@ src/nci/api$(O) : src/nci/api.str \
 	src/nci/api.c \
 	$(PARROT_H_HEADERS)
 
-src/nci/core_thunks$(O) : src/nci/core_thunks.c \
+src/nci/core_thunks$(O) : src/nci/core_thunks.str \
+	src/nci/core_thunks.c \
 	$(PARROT_H_HEADERS) \
 	include/pmc/pmc_nci.h
 
@@ -1698,6 +1709,7 @@ src/nci/libffi$(O) : src/nci/libffi.c \
 src/nci/extra_thunks$(O) : \
     $(PARROT_H_HEADERS) \
     include/pmc/pmc_nci.h \
+    src/nci/extra_thunks.str \
     src/nci/extra_thunks.c
 	$(CC) $(CFLAGS) @optimize::src/nci/extra_thunks.c@ @ccwarn::src/nci/extra_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/nci/extra_thunks.c
 
@@ -1823,8 +1835,7 @@ src/gc/malloc_trace$(O) : src/gc/malloc.c src/gc/malloc_trace.c
 
 src/packfile/pf_items$(O) : $(PARROT_H_HEADERS) src/packfile/pf_items.c
 
-src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic/gcc_x86.h \
-    src/atomic/gcc_x86.c
+src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) src/atomic/gcc_x86.c
 
 # core_ops depends upon config.h so that it gets updated along with
 # updates to config.h's version numbers
@@ -2982,13 +2993,13 @@ HEADERIZER_O_FILES = \
 headerizer : src/core_pmcs.c src/extend_vtable.c
 	$(HEADERIZER) $(HEADERIZER_O_FILES) compilers/imcc/imcc.y
 
-apilist: src/core_pmcs.c
+apilist: src/core_pmcs.c src/extend_vtable.c
 	$(HEADERIZER) --macro=PARROT_API $(HEADERIZER_O_FILES)
 
-exportlist: src/core_pmcs.c
+exportlist: src/core_pmcs.c src/extend_vtable.c
 	$(HEADERIZER) --macro=PARROT_EXPORT $(HEADERIZER_O_FILES)
 
-malloclist: src/core_pmcs.c
+malloclist: src/core_pmcs.c src/extend_vtable.c
 	$(HEADERIZER) --macro=PARROT_MALLOC $(HEADERIZER_O_FILES)
 
 include src/dynpmc/Rules.mak

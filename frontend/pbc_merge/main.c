@@ -44,6 +44,9 @@ segments from the input PBC files.
 #include "pmc/pmc_sub.h"
 #include "parrot/embed.h"
 
+extern const unsigned char * Parrot_get_config_hash_bytes(void);
+extern int Parrot_get_config_hash_length(void);
+
 /* This struct describes an input file. */
 typedef struct pbc_merge_input {
     const char *filename;       /* name of the input file */
@@ -893,7 +896,8 @@ merge process and finally writes out the produced packfile.
 */
 
 static struct longopt_opt_decl options[] = {
-    { 'o', 'o', OPTION_required_FLAG, { "--output" } }
+    { 'o', 'o', OPTION_required_FLAG, { "--output" } },
+    {  0 ,  0 , OPTION_optional_FLAG, { NULL       } }
 };
 
 int
@@ -906,6 +910,13 @@ main(int argc, const char **argv)
     const char *output_file     = NULL;
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     Interp * const interp = Parrot_new(NULL);
+
+    {
+        const int config_length = Parrot_get_config_hash_length();
+        const unsigned char * const config_bytes =
+            Parrot_get_config_hash_bytes();
+        Parrot_set_configuration_hash_legacy(interp, config_length, config_bytes);
+    }
 
     Parrot_block_GC_mark(interp);
 

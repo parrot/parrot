@@ -2,8 +2,6 @@
  * Copyright (C) 2004-2010, Parrot Foundation.
  */
 
-#include <windows.h>
-
 #ifdef __MINGW32__
 #  include <w32api.h>
 #  if WINVER < Windows2000

@@ -472,7 +472,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         Parrot_String_Bounds bounds;
 
         const size_t buffer_size = buffer_end - buffer_next;
-        size_t       chunk_size, new_size, alloc_size, decoded_bytes;
+        size_t       alloc_size;
         INTVAL       got;
 
         /* Partial scan of buffer */
@@ -485,34 +485,38 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
         /* Append buffer to result */
 
-        if (bounds.delim == rs)
+        if (bounds.delim == rs) {
             /* End of line, use only part of buffer */
-            chunk_size = bounds.bytes;
-        else
-            /* Copy whole buffer, might copy partial characters */
-            chunk_size = buffer_size;
+            alloc_size = s->bufused + bounds.bytes;
 
-        decoded_bytes = s->bufused + bounds.bytes;
-        new_size      = s->bufused + chunk_size;
-        /* Additional space for multi-byte char split across buffers */
-        alloc_size    = new_size + max_split_bytes;
+            if (s->strstart)
+                Parrot_gc_reallocate_string_storage(interp, s, alloc_size);
+            else
+                Parrot_gc_allocate_string_storage(interp, s, alloc_size);
+
+            memcpy(s->strstart + s->bufused, buffer_next, bounds.bytes);
+
+            s->bufused += bounds.bytes;
+            s->strlen  += bounds.chars;
+
+            buffer_next += bounds.bytes;
+            Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
+            break;
+        }
+
+        /* Use additional space for multi-byte char split across buffers */
+        alloc_size = s->bufused + buffer_size + max_split_bytes;
 
         if (s->strstart)
             Parrot_gc_reallocate_string_storage(interp, s, alloc_size);
         else
             Parrot_gc_allocate_string_storage(interp, s, alloc_size);
 
-        memcpy(s->strstart + s->bufused, buffer_next, chunk_size);
+        /* Copy whole buffer, might copy partial characters */
+        memcpy(s->strstart + s->bufused, buffer_next, buffer_size);
 
-        s->bufused  = new_size;
+        s->bufused += bounds.bytes;
         s->strlen  += bounds.chars;
-
-        if (bounds.delim == rs) {
-            /* End of line */
-            buffer_next += chunk_size;
-            Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-            break;
-        }
 
         /* Refill buffer */
 
@@ -526,6 +530,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
                 break;
             }
             else {
+                /* TODO: set file position */
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_CHARACTER,
                     "Unaligned end in %s string\n", encoding->name);
@@ -538,12 +543,14 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         if (bounds.bytes < buffer_size) {
             /* Handle character split across buffers */
 
-            size_t bytes_l = s->bufused - decoded_bytes;
+            size_t bytes_l = buffer_size - bounds.bytes;
             size_t bytes_r = (size_t)got < max_split_bytes
                            ? (size_t)got : max_split_bytes;
 
+            size_t decoded_size = s->bufused;
+
             /* First, copy enough bytes to complete character */
-            memcpy(s->strstart + s->bufused, buffer_next, bytes_r);
+            memcpy(s->strstart + decoded_size + bytes_l, buffer_next, bytes_r);
 
             /* Partial scan of single character */
 
@@ -551,21 +558,40 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
             bounds.chars = 1;
             bounds.delim = rs;
 
-            encoding->partial_scan(interp, s->strstart + decoded_bytes,
-                                      &bounds);
+            encoding->partial_scan(interp, s->strstart + decoded_size,
+                                   &bounds);
 
-            if (bounds.bytes == 0)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_CHARACTER,
-                    "Unaligned end in %s string\n", encoding->name);
+            if (bounds.bytes == 0) {
+                INTVAL flags = Parrot_io_get_flags(interp, filehandle);
+
+                PARROT_ASSERT((size_t)got == bytes_r);
+
+                if (flags & PIO_F_FILE) {
+                    /* TODO: set file position */
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_CHARACTER,
+                        "Unaligned end in %s string\n", encoding->name);
+                }
+
+                /* Tricky case: We didn't receive enough bytes to complete
+                 * the character. So we have to prepend the rest of the old
+                 * buffer.
+                 */
+
+                memmove(buffer_next + bytes_l, buffer_next, got);
+                memcpy(buffer_next, s->strstart + decoded_size, bytes_l);
+
+                buffer_end += bytes_l;
+                Parrot_io_set_buffer_end(interp, filehandle, buffer_end);
+                break;
+            }
 
             PARROT_ASSERT(bounds.chars == 1);
 
-            bytes_r = bounds.bytes - bytes_l;
-
-            s->bufused  += bytes_r;
+            s->bufused  += bounds.bytes;
             s->strlen   += 1;
 
+            bytes_r      = bounds.bytes - bytes_l;
             buffer_next += bytes_r;
 
             if (bounds.delim == rs || (size_t)got == bytes_r) {
@@ -614,24 +640,23 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRIN
     int                   need_flush;
     size_t                avail;
     PIOHANDLE             os_handle;
+    PIOOFF_T              file_pos;
 
     if (len <= 0)
         return 0;
 
     GETATTR_Handle_os_handle(interp, filehandle, os_handle);
 
-#ifdef PIO_OS_WIN32
-    /* Win32 doesn't support append */
-    if (flags & PIO_F_APPEND) {
-        PIO_SEEK(interp, os_handle, 0, SEEK_END);
-    }
-#endif
-
     if (buffer_flags & PIO_BF_WRITEBUF)
         avail = buffer_size - (buffer_next - buffer_start);
 
     else if (buffer_flags & PIO_BF_READBUF) {
-        /* Urgent TODO: Seek back to correct position */
+        if (!(flags & PIO_F_APPEND)) {
+            /* Seek back to file position */
+            file_pos = Parrot_io_get_file_position(interp, filehandle);
+            PIO_SEEK(interp, os_handle, file_pos, SEEK_SET);
+        }
+
         buffer_flags &= ~PIO_BF_READBUF;
         Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
         buffer_next = buffer_start;
@@ -645,7 +670,16 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRIN
      * If any, we should flush */
     need_flush = 0;
 
-    if (Parrot_io_get_flags(interp, filehandle) & PIO_F_LINEBUF) {
+    if (flags & PIO_F_APPEND) {
+        /* Buffering would break append semantics */
+        need_flush = 1;
+
+#ifdef PIO_OS_WIN32
+        /* Win32 doesn't support append */
+        PIO_SEEK(interp, os_handle, 0, SEEK_END);
+#endif
+    }
+    else if (Parrot_io_get_flags(interp, filehandle) & PIO_F_LINEBUF) {
         /* scan from end, it's likely that EOL is at end of string */
         const char *p = (char*)(s->strstart) + len - 1;
         size_t      i;
@@ -662,7 +696,6 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRIN
      * Large writes (multiples of blocksize) should write
      * through generally for best performance, else you are
      * just doing extra memcpys.
-     * FIXME: This is badly optimized, will fixup later.
      */
     if (need_flush || len >= buffer_size) {
         size_t    wrote;
@@ -672,53 +705,47 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRIN
 
         wrote = PIO_WRITE(interp, os_handle, s->strstart, len);
 
-        if (wrote == len) {
-            /* TODO: Set correct position for PIO_F_APPEND */
-            Parrot_io_set_file_position(interp, filehandle, (wrote +
-                        Parrot_io_get_file_position(interp, filehandle)));
-            return wrote;
-        }
-        /* Write error */
-        else
+        if (wrote != len)
             return (size_t)-1;
     }
-    else if (avail > len) {
+    else if (len < avail) {
         buffer_flags |= PIO_BF_WRITEBUF;
         Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
 
-        memmove(buffer_next, s->strstart, len);
+        memcpy(buffer_next, s->strstart, len);
         buffer_next += len;
         Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-        Parrot_io_set_file_position(interp, filehandle, (len +
-                    Parrot_io_get_file_position(interp, filehandle)));
-        return len;
     }
     else {
+        /* Now we have avail <= len < buffer_size, so there is a non-empty
+         * write buffer */
         const unsigned int diff = (int)(len - avail);
 
-        buffer_flags |= PIO_BF_WRITEBUF;
-        Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
-
         /* Fill remainder, flush, then try to buffer more */
-        memmove(buffer_next, s->strstart, avail);
+        memcpy(buffer_next, s->strstart, avail);
         buffer_next += avail;
         Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-        Parrot_io_set_file_position(interp, filehandle, (avail +
-                    Parrot_io_get_file_position(interp, filehandle)));
         Parrot_io_flush_buffer(interp, filehandle);
 
-        buffer_flags |= PIO_BF_WRITEBUF;
-        Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
+        if (diff > 0) {
+            buffer_flags |= PIO_BF_WRITEBUF;
+            Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
 
-        buffer_next = Parrot_io_get_buffer_next(interp, filehandle);
-        memmove(buffer_start, (s->strstart + avail), diff);
+            memcpy(buffer_start, s->strstart + avail, diff);
 
-        buffer_next += diff;
-        Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-        Parrot_io_set_file_position(interp, filehandle, (diff +
-                    Parrot_io_get_file_position(interp, filehandle)));
-        return len;
+            buffer_next = buffer_start + diff;
+            Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
+        }
     }
+
+    if (flags & PIO_F_APPEND)
+        file_pos = PIO_TELL(interp, os_handle);
+    else
+        file_pos = Parrot_io_get_file_position(interp, filehandle) + len;
+
+    Parrot_io_set_file_position(interp, filehandle, file_pos);
+
+    return len;
 }
 
 
@@ -738,41 +765,45 @@ Parrot_io_seek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(Parrot_io_seek_buffer)
-    PIOOFF_T newpos   = offset;
-    PIOOFF_T file_pos = Parrot_io_get_file_position(interp, filehandle);
+    INTVAL    buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
+    PIOOFF_T  file_pos     = Parrot_io_get_file_position(interp, filehandle);
+    PIOHANDLE os_handle;
 
-    unsigned char *buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
-    unsigned char *buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-    unsigned char *buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
+    if (whence == SEEK_CUR) {
+        /* Don't use SEEK_CUR, filehandle may be ahead of file_pos */
+        offset += file_pos;
+        whence  = SEEK_SET;
+    }
 
-    if (whence == SEEK_CUR)
-        newpos = file_pos + offset;
+    if (buffer_flags & PIO_BF_READBUF
+    &&  whence != SEEK_END) {
+        /* Try to seek inside the read buffer */
+        unsigned char *buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
+        unsigned char *buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
+        unsigned char *buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
 
-    if (whence == SEEK_END
-    ||  newpos <  file_pos - (buffer_next - buffer_start)
-    ||  newpos >= file_pos + (buffer_end - buffer_next)) {
-        PIOHANDLE os_handle;
+        if (offset >= file_pos - (buffer_next - buffer_start)
+        &&  offset <  file_pos + (buffer_end  - buffer_next)) {
+            buffer_next += offset - file_pos;
+            Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
+            Parrot_io_set_file_position(interp, filehandle, offset);
 
-        Parrot_io_flush_buffer(interp, filehandle);
-        GETATTR_Handle_os_handle(interp, filehandle, os_handle);
-        newpos = PIO_SEEK(interp, os_handle, offset, whence);
-
-        if (newpos > Parrot_io_get_file_size(interp, filehandle)) {
-            Parrot_io_set_file_size(interp, filehandle, newpos);
+            return offset;
         }
-
-        /* Seek clears EOF */
-        Parrot_io_set_flags(interp, filehandle,
-                (Parrot_io_get_flags(interp, filehandle) & ~PIO_F_EOF));
-    }
-    else {
-        buffer_next += newpos - file_pos;
-        Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
     }
 
-    Parrot_io_set_file_position(interp, filehandle, newpos);
+    Parrot_io_flush_buffer(interp, filehandle);
 
-    return newpos;
+    GETATTR_Handle_os_handle(interp, filehandle, os_handle);
+    offset = PIO_SEEK(interp, os_handle, offset, whence);
+
+    /* Seek clears EOF */
+    Parrot_io_set_flags(interp, filehandle,
+            (Parrot_io_get_flags(interp, filehandle) & ~PIO_F_EOF));
+
+    Parrot_io_set_file_position(interp, filehandle, offset);
+
+    return offset;
 }
 
 /*

@@ -14,7 +14,7 @@ use lib (qw| lib |);
 SKIP: {
     skip
         q{Relevant only when working in checkout from repository},
-        12
+        11
         unless (-e 'DEVELOPING');
 
     use_ok('Parrot::Manifest');
