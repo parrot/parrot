@@ -702,8 +702,8 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal_string" );
      string  = createstring(interp, "FOO");
      string2 = createstring(interp, "BAR");
 
-     Parrot_PMC_set_string_native(interp, pmc_string, string);
-     Parrot_PMC_set_string_native(interp, pmc_string2,string2);
+     Parrot_PMC_assign_string_native(interp, pmc_string, string);
+     Parrot_PMC_assign_string_native(interp, pmc_string2,string2);
 
      integer = Parrot_PMC_is_equal(interp, pmc_string, pmc_string2);
      Parrot_printf(interp, "%d\n", (int)integer);
@@ -1007,7 +1007,6 @@ CODE
 -42
 Done!
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl
