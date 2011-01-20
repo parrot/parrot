@@ -181,6 +181,8 @@ Report whether the exception handler can handle a particular type of exception.
 
         INTVAL severity = VTABLE_get_integer_keyed_str(INTERP, exception, sev);
 
+        /* We handle Exception and anything that claims to implement that role
+           here. Include the base_type check as a sort of optimization */
         if (exception->vtable->base_type == enum_class_Exception
         ||  VTABLE_isa(INTERP, exception, ex_str)) {
             PMC *handled_types;
