@@ -287,7 +287,7 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN_NULLOK(const char **argv))
           case OPT_PBC_OUTPUT:
             UNSET_STATE_RUN_PBC(interp);
             SET_STATE_WRITE_PBC(interp);
-            if (!STRING_IS_NULL(output_file))
+            if (STRING_IS_NULL(output_file))
                 output_file = Parrot_str_new(interp, "-", 1);
             break;
 
