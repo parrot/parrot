@@ -50,8 +50,9 @@ static int e_file_emit(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-static int e_file_open(PARROT_INTERP, SHIM(const char *param))
-        __attribute__nonnull__(1);
+static int e_file_open(PARROT_INTERP, ARGIN(void *param))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_e_file_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -59,7 +60,8 @@ static int e_file_open(PARROT_INTERP, SHIM(const char *param))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ins))
 #define ASSERT_ARGS_e_file_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(param))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -584,7 +586,7 @@ free_ins(ARGMOD(Instruction *ins))
 
 /*
 
-=item C<int ins_print(PARROT_INTERP, PMC *io, const Instruction *ins)>
+=item C<int ins_print(PARROT_INTERP, PIOHANDLE io, const Instruction *ins)>
 
 Print details of instruction ins in file fd.
 
@@ -595,7 +597,7 @@ Print details of instruction ins in file fd.
 #define REGB_SIZE 256
 PARROT_IGNORABLE_RESULT
 int
-ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
+ins_print(PARROT_INTERP, PIOHANDLE io, ARGIN(const Instruction *ins))
 {
     ASSERT_ARGS(ins_print)
     char regb[IMCC_MAX_FIX_REGS][REGB_SIZE];
@@ -606,7 +608,7 @@ ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
 
     /* comments, labels and such */
     if (!ins->symregs[0] || !strchr(ins->format, '%'))
-        return Parrot_io_fprintf(interp, io, "%s", ins->format);
+        return Parrot_io_pprintf(interp, io, "%s", ins->format);
 
     for (i = 0; i < ins->symreg_count; i++) {
         const SymReg *p = ins->symregs[i];
@@ -655,29 +657,28 @@ ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
     switch (ins->opsize-1) {
       case -1:        /* labels */
       case 1:
-        len = Parrot_io_fprintf(interp, io, ins->format, regstr[0]);
+        len = Parrot_io_pprintf(interp, io, ins->format, regstr[0]);
         break;
       case 2:
-        len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1]);
+        len = Parrot_io_pprintf(interp, io, ins->format, regstr[0], regstr[1]);
         break;
       case 3:
-        len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2]);
+        len = Parrot_io_pprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2]);
         break;
       case 4:
-        len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
+        len = Parrot_io_pprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
                     regstr[3]);
         break;
       case 5:
-        len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
+        len = Parrot_io_pprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
                     regstr[3], regstr[4]);
         break;
       case 6:
-        len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
+        len = Parrot_io_pprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
                     regstr[3], regstr[4], regstr[5]);
         break;
       default:
-        Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
-                "unhandled: opsize (%d), op %s, fmt %s\n",
+        Parrot_io_eprintf(interp, "unhandled: opsize (%d), op %s, fmt %s\n",
                 ins->opsize, ins->opname, ins->format);
         exit(EXIT_FAILURE);
         break;
@@ -686,9 +687,12 @@ ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
     return len;
 }
 
+/* for debug */
+static PIOHANDLE output;
+
 /*
 
-=item C<static int e_file_open(PARROT_INTERP, const char *param)>
+=item C<static int e_file_open(PARROT_INTERP, void *param)>
 
 Prints a message to STDOUT.
 
@@ -697,13 +701,24 @@ Prints a message to STDOUT.
 */
 
 static int
-e_file_open(PARROT_INTERP, SHIM(const char *param))
+e_file_open(PARROT_INTERP, ARGIN(void *param))
 {
     ASSERT_ARGS(e_file_open)
-    DECL_CONST_CAST;
+    STRING *output_file = (STRING *)param;
 
-    Parrot_io_printf(interp, "# IMCC does produce b0rken PASM files\n");
-    Parrot_io_printf(interp, "# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392\n");
+    if (STRING_length(output_file) == 1
+    &&  STRING_ord(interp, output_file, 0) == '-') {
+        output = PIO_STDHANDLE(interp, PIO_STDOUT_FILENO);
+    }
+    else {
+        output = PIO_OPEN(interp, output_file, PIO_F_WRITE);
+        if (output == PIO_INVALID_HANDLE)
+            IMCC_fatal_standalone(interp, EXCEPTION_EXTERNAL_ERROR,
+                "Couldn't open %Ss\n", output_file);
+    }
+
+    Parrot_io_pprintf(interp, output, "# IMCC does produce b0rken PASM files\n");
+    Parrot_io_pprintf(interp, output, "# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392\n");
     return 1;
 }
 
@@ -721,8 +736,8 @@ static int
 e_file_close(PARROT_INTERP, SHIM(void *param))
 {
     ASSERT_ARGS(e_file_close)
-    printf("\n\n");
-    fclose(stdout);
+    Parrot_io_pprintf(interp, output, "\n\n");
+    PIO_CLOSE(interp, output);
     IMCC_info(interp, 1, "assembly module written.\n");
     return 0;
 }
@@ -747,19 +762,19 @@ e_file_emit(PARROT_INTERP,
     ASSERT_ARGS(e_file_emit)
 
     if ((ins->type & ITLABEL) || ! *ins->opname)
-        ins_print(interp, Parrot_io_STDOUT(interp), ins);
+        ins_print(interp, output, ins);
     else {
-        Parrot_io_fprintf(interp, Parrot_io_STDOUT(interp), "\t%s ", ins->opname);
-        ins_print(interp, Parrot_io_STDOUT(interp), ins);
+        Parrot_io_pprintf(interp, output, "\t%s ", ins->opname);
+        ins_print(interp, output, ins);
     }
 
-    Parrot_io_printf(interp, "\n");
+    Parrot_io_pprintf(interp, output, "\n");
     return 0;
 }
 
 /*
 
-=item C<int emit_open(PARROT_INTERP, int type, const char *param)>
+=item C<int emit_open(PARROT_INTERP, int type, void *param)>
 
 Opens the emitter function C<open> of the given C<type>. Passes
 the C<param> to the open function.
@@ -769,7 +784,7 @@ the C<param> to the open function.
 */
 
 int
-emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(const char *param))
+emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
 {
     ASSERT_ARGS(emit_open)
     IMCC_INFO(interp)->emitter       = type;

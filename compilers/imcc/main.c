@@ -597,7 +597,7 @@ compile_to_bytecode(PARROT_INTERP,
     IMCC_push_parser_state(interp);
     IMCC_INFO(interp)->state->file = sourcefile;
 
-    emit_open(interp, per_pbc, NULL);
+    emit_open(interp, per_pbc, per_pbc ? STRINGNULL : output_file);
 
     IMCC_info(interp, 1, "Starting parse...\n");
 
