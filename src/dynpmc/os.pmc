@@ -117,28 +117,8 @@ Returns the current working directory.
 */
 
     METHOD cwd() {
-        char *cwd;
-#ifdef _MSC_VER
-        cwd = _getcwd(NULL, 0);
-        /* capitalize the drive letter */
-        cwd[0] = (char)toupper((unsigned char)cwd[0]);
-#else
-#  ifdef PATH_MAX
-        cwd = getcwd(NULL, PATH_MAX+1);
-#  else
-        cwd = getcwd(NULL, 0);
-#  endif
-#endif
-        if (cwd) {
-            STRING * const scwd = Parrot_str_new(INTERP, cwd, strlen(cwd));
-            free(cwd);
-            RETURN(STRING *scwd);
-        }
-        else {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
+        STRING *cwd = Parrot_file_getcwd(INTERP);
+        RETURN(STRING *cwd);
     }
 
 /*
@@ -152,19 +132,7 @@ Changes the current working directory to the one specified by C<path>.
 */
 
     METHOD chdir(STRING *path) {
-        int error;
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-#ifdef _MSC_VER
-        error = _chdir(cpath);
-#else
-        error = chdir(cpath);
-#endif
-        Parrot_str_free_cstring(cpath);
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
+        Parrot_file_chdir(INTERP, path);
     }
 
 /*
@@ -183,27 +151,11 @@ C<path>.
         char * const cpath = Parrot_str_to_cstring(INTERP, path);
         int          error;
 
-        if (Parrot_stat_info_intval(interp, path, STAT_ISDIR)) {
-#ifdef _MSC_VER
-            error = _rmdir(cpath);
-#else
-            error = rmdir(cpath);
-#endif
-            Parrot_str_free_cstring(cpath);
-            if (error) {
-                const char * const errmsg = strerror(errno);
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                    errmsg);
-            }
+        if (Parrot_stat_info_intval(INTERP, path, STAT_ISDIR)) {
+            Parrot_file_rmdir(INTERP, path);
         }
         else {
-            error = remove(cpath);
-            Parrot_str_free_cstring(cpath);
-            if (error) {
-                const char * const errmsg = strerror(errno);
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                    errmsg);
-            }
+            Parrot_file_unlink(INTERP, path);
         }
     }
 
@@ -218,19 +170,7 @@ Creates a directory specified by C<path> with mode C<mode>.
 */
 
     METHOD mkdir(STRING *path, INTVAL mode) {
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-        /* should we validate mode? */
-#ifdef WIN32
-        const int error = _mkdir(cpath);
-#else
-        const int error = mkdir(cpath, (mode_t)mode);
-#endif
-        Parrot_str_free_cstring(cpath);
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
+        Parrot_file_mkdir(INTERP, path, mode);
     }
 
 /*

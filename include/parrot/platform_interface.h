@@ -91,6 +91,25 @@ INTVAL Parrot_io_poll(PARROT_INTERP, PIOHANDLE handle, int which, int sec, int u
 INTVAL Parrot_io_close_socket(PARROT_INTERP, PIOHANDLE handle);
 
 /*
+ * Files and directories
+ */
+
+PARROT_EXPORT
+STRING *Parrot_file_getcwd(Interp *);
+
+PARROT_EXPORT
+void Parrot_file_mkdir(Interp *, ARGIN(STRING *path), INTVAL mode);
+
+PARROT_EXPORT
+void Parrot_file_chdir(Interp *, ARGIN(STRING *path));
+
+PARROT_EXPORT
+void Parrot_file_rmdir(Interp *, ARGIN(STRING *path));
+
+PARROT_EXPORT
+void Parrot_file_unlink(Interp *, ARGIN(STRING *path));
+
+/*
 ** Math:
 */
 

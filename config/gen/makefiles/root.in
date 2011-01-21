@@ -1609,6 +1609,8 @@ src/platform/generic/env$(O) : src/platform/generic/env.c $(PARROT_H_HEADERS)
 
 src/platform/generic/exec$(O) : src/platform/generic/exec.c $(PARROT_H_HEADERS)
 
+src/platform/generic/file$(O) : src/platform/generic/file.c $(PARROT_H_HEADERS)
+
 src/platform/generic/hires_timer$(O) : src/platform/generic/hires_timer.c $(PARROT_H_HEADERS)
 
 src/platform/generic/itimer$(O) : src/platform/generic/itimer.c $(PARROT_H_HEADERS)
@@ -1646,6 +1648,8 @@ src/platform/win32/dl$(O) : src/platform/win32/dl.c $(PARROT_H_HEADERS)
 src/platform/win32/env$(O) : src/platform/win32/env.c $(PARROT_H_HEADERS)
 
 src/platform/win32/exec$(O) : src/platform/win32/exec.c $(PARROT_H_HEADERS)
+
+src/platform/win32/file$(O) : src/platform/win32/file.c $(PARROT_H_HEADERS)
 
 src/platform/win32/hires_timer$(O) : src/platform/win32/hires_timer.c $(PARROT_H_HEADERS)
 
