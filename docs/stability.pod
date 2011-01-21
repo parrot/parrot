@@ -48,7 +48,7 @@ interface.
 This component or interface is no longer supported; it will be removed after
 the completion of its deprecation cycle (usually one release.) Items that
 have been deprecated but not yet removed are documented in the top level
-F<DEPRECATED.pod>.
+F<DEPRECATED.json>.
 
 =back
 
