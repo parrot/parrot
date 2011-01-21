@@ -91,7 +91,7 @@ Returns a true value (1) if the supplied path is a directory.
 */
 
     METHOD is_dir(STRING *path) {
-        INTVAL res = Parrot_lstat_info_intval(interp, path, STAT_ISDIR);
+        INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISDIR);
 
         RETURN(INTVAL res);
     }
@@ -107,7 +107,7 @@ Returns a true value (1) if the supplied path is a plain file.
 */
 
     METHOD is_file(STRING *path) {
-        INTVAL res = Parrot_lstat_info_intval(interp, path, STAT_ISREG);
+        INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISREG);
 
         RETURN(INTVAL res);
     }
@@ -123,7 +123,7 @@ Returns a true value (1) if the supplied path is a link.
 */
 
     METHOD is_link(STRING *path) {
-        INTVAL res = Parrot_lstat_info_intval(interp, path, STAT_ISLNK);
+        INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISLNK);
 
         RETURN(INTVAL res);
     }

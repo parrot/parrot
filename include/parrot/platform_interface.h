@@ -94,6 +94,31 @@ INTVAL Parrot_io_close_socket(PARROT_INTERP, PIOHANDLE handle);
  * Files and directories
  */
 
+/* &gen_from_def(stat.pasm) */
+
+#define STAT_EXISTS               0
+#define STAT_FILESIZE             1
+#define STAT_ISDIR                2
+#define STAT_ISREG                3
+#define STAT_ISDEV                4
+#define STAT_CREATETIME           5
+#define STAT_ACCESSTIME           6
+#define STAT_MODIFYTIME           7
+#define STAT_CHANGETIME           8
+#define STAT_BACKUPTIME           9
+#define STAT_UID                 10
+#define STAT_GID                 11
+#define STAT_ISLNK               12
+#define STAT_PLATFORM_DEV        -1
+#define STAT_PLATFORM_INODE      -2
+#define STAT_PLATFORM_MODE       -3
+#define STAT_PLATFORM_NLINKS     -4
+#define STAT_PLATFORM_DEVTYPE    -5
+#define STAT_PLATFORM_BLOCKSIZE  -6
+#define STAT_PLATFORM_BLOCKS     -7
+
+/* &end_gen */
+
 PARROT_EXPORT
 STRING *Parrot_file_getcwd(Interp *);
 
@@ -108,6 +133,15 @@ void Parrot_file_rmdir(Interp *, ARGIN(STRING *path));
 
 PARROT_EXPORT
 void Parrot_file_unlink(Interp *, ARGIN(STRING *path));
+
+PARROT_EXPORT
+INTVAL Parrot_file_stat_intval(Interp * , ARGIN(STRING *path), INTVAL thing);
+
+PARROT_EXPORT
+INTVAL Parrot_file_lstat_intval(Interp * , ARGIN(STRING * path), INTVAL thing);
+
+PARROT_EXPORT
+INTVAL Parrot_file_fstat_intval(Interp * , PIOHANDLE os_handle, INTVAL thing);
 
 /*
 ** Math:

@@ -45,6 +45,9 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
         $P0 = loadlib 'os'
         $P1 = new ['OS']
         $S1 = $P1."cwd"()
+        # Unicode downcase needs ICU
+        $I0 = find_encoding "iso-8859-1"
+        $S1 = trans_encoding $S1, $I0
         $S2 = downcase $S1
         print $S2
         print "\n"
@@ -86,7 +89,7 @@ SKIP:
             $S0 = $P1.'cwd'()
     .end
 CODE
-/No such file or directory/
+/getcwd failed/
 OUT
 }
 
@@ -108,6 +111,9 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
         $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
+        # Unicode downcase needs ICU
+        $I0 = find_encoding "iso-8859-1"
+        $S1 = trans_encoding $S1, $I0
         $S2 = downcase $S1
         say $S2
 
@@ -115,6 +121,9 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
         $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
+        # Unicode downcase needs ICU
+        $I0 = find_encoding "iso-8859-1"
+        $S1 = trans_encoding $S1, $I0
         $S2 = downcase $S1
         say $S2
 
@@ -162,7 +171,7 @@ pir_error_output_like( <<'CODE', <<"OUT", 'Test bad chdir' );
         $P1."chdir"($S1)
 .end
 CODE
-/No such file or directory/
+/chdir failed/
 OUT
 
 # Test mkdir
@@ -183,6 +192,9 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
         $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
+        # Unicode downcase needs ICU
+        $I0 = find_encoding "iso-8859-1"
+        $S1 = trans_encoding $S1, $I0
         $S2 = downcase $S1
         say $S2
 
@@ -190,6 +202,9 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
         $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
+        # Unicode downcase needs ICU
+        $I0 = find_encoding "iso-8859-1"
+        $S1 = trans_encoding $S1, $I0
         $S2 = downcase $S1
         say $S2
 
@@ -236,7 +251,7 @@ pir_error_output_like( <<'CODE', <<"OUT", 'Test bad mkdir' );
         $P1."mkdir"(".", 0)
 .end
 CODE
-/File exists/i
+/mkdir failed/i
 OUT
 
 # Test remove on a directory
@@ -292,7 +307,7 @@ finally2:
         pop_eh
 .end
 CODE
-/Directory not empty
+/rmdir failed.*
 stat failed/
 OUT
 

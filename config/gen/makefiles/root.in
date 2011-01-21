@@ -396,7 +396,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/multidispatch.h \
 	$(INC_DIR)/library.h \
 	$(INC_DIR)/namespace.h \
-	$(INC_DIR)/stat.h \
 	$(INC_DIR)/hll.h \
 	$(INC_DIR)/pbcversion.h \
 	$(INC_DIR)/pobj.h \
@@ -1219,8 +1218,8 @@ runtime/parrot/include/dlopenflags.pasm : $(INC_DIR)/platform_interface.h $(H2IN
 runtime/parrot/include/datatypes.pasm : $(INC_DIR)/datatypes.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/datatypes.h $@
 
-runtime/parrot/include/stat.pasm : $(INC_DIR)/stat.h $(H2INC)
-	$(PERL) $(H2INC) $(INC_DIR)/stat.h $@
+runtime/parrot/include/stat.pasm : $(INC_DIR)/platform_interface.h $(H2INC)
+	$(PERL) $(H2INC) $(INC_DIR)/platform_interface.h $@
 
 runtime/parrot/include/stringinfo.pasm : $(INC_DIR)/string.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/string.h $@
@@ -1624,8 +1623,6 @@ src/platform/generic/misc$(O) : src/platform/generic/misc.c $(PARROT_H_HEADERS)
 
 src/platform/generic/socket$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_socket.h \
     src/io/io_private.h src/platform/generic/socket.c
-
-src/platform/generic/stat$(O) : src/platform/generic/stat.c $(PARROT_H_HEADERS)
 
 src/platform/generic/sysmem$(O) : src/platform/generic/sysmem.c $(PARROT_H_HEADERS)
 

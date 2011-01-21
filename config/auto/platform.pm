@@ -47,7 +47,6 @@ sub _set_implementations {
         encoding.c
         env.c
         dl.c
-        stat.c
         math.c
         itimer.c
         exec.c

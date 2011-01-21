@@ -923,7 +923,6 @@ include/parrot/runcore_trace.h                              [main]include
 include/parrot/scheduler.h                                  [main]include
 include/parrot/scheduler_private.h                          [main]include
 include/parrot/settings.h                                   [main]include
-include/parrot/stat.h                                       [main]include
 include/parrot/string.h                                     [main]include
 include/parrot/string_funcs.h                               [main]include
 include/parrot/sub.h                                        [main]include
@@ -1298,7 +1297,6 @@ src/platform/generic/itimer.c                               []
 src/platform/generic/math.c                                 []
 src/platform/generic/misc.c                                 []
 src/platform/generic/socket.c                               []
-src/platform/generic/stat.c                                 []
 src/platform/generic/sysmem.c                               []
 src/platform/generic/time.c                                 []
 src/platform/generic/uid.c                                  []
