@@ -11,6 +11,9 @@
 *.diff
 
 # ports/ should not go into release tarballs
+*.obj
+*.rc
+*.res
 /ports
 /*.core
 /*.def
