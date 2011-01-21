@@ -683,6 +683,35 @@ imcc_vfprintf(PARROT_INTERP, ARGMOD(PMC *io), ARGIN(const char *format), va_list
 
 /*
 
+=item C<int imcc_string_ends_with(PARROT_INTERP, const STRING *str, const char
+*ext)>
+
+Checks whether string C<str> has extension C<ext>.
+
+=cut
+
+*/
+
+int
+imcc_string_ends_with(PARROT_INTERP, ARGIN(const STRING *str),
+        ARGIN(const char *ext))
+{
+    ASSERT_ARGS(imcc_string_ends_with)
+    STRING *ext_str = Parrot_str_new(interp, ext, 0);
+    STRING *substr;
+    INTVAL  ext_len = STRING_length(ext_str);
+    INTVAL  len     = STRING_length(str);
+
+    if (ext_len >= len)
+        return 0;
+
+    substr = STRING_substr(interp, str, len - ext_len, ext_len);
+
+    return STRING_equal(interp, substr, ext_str);
+}
+
+/*
+
 =back
 
 =cut

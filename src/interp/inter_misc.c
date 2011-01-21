@@ -210,7 +210,7 @@ Parrot_set_compiler(PARROT_INTERP, ARGIN(STRING *type), ARGIN(PMC *compiler))
 
 /*
 
-=item C<void * Parrot_compile_file(PARROT_INTERP, const char *fullname, STRING
+=item C<void * Parrot_compile_file(PARROT_INTERP, STRING *fullname, STRING
 **error)>
 
 Compile code file.
@@ -222,7 +222,7 @@ Compile code file.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void *
-Parrot_compile_file(PARROT_INTERP, ARGIN(const char *fullname), ARGOUT(STRING **error))
+Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), ARGOUT(STRING **error))
 {
     ASSERT_ARGS(Parrot_compile_file)
     return imcc_compile_file(interp, fullname, error);

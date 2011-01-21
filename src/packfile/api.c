@@ -2162,7 +2162,6 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
 
     for (i = 0; i < dir->num_segments; ++i) {
         PackFile_Segment *seg;
-        char             *buf;
         STRING           *name;
         size_t            opcode;
 
@@ -2174,13 +2173,10 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         TRACE_PRINTF_VAL(("Segment type %d.\n", type));
 
         /* get name */
-        buf = PF_fetch_cstring(interp, pf, &cursor);
-        TRACE_PRINTF_VAL(("Segment name \"%s\".\n", name));
+        name = PF_fetch_string(interp, pf, &cursor);
 
         /* create it */
-        name = Parrot_str_new(interp, buf, strlen(buf));
         seg  = PackFile_Segment_new_seg(interp, dir, type, name, 0);
-        mem_gc_free(interp, buf);
 
         seg->file_offset = PF_fetch_opcode(pf, &cursor);
         TRACE_PRINTF_VAL(("Segment file_offset %ld.\n", seg->file_offset));
@@ -2404,11 +2400,9 @@ directory_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     size = 1 + default_packed_size(self);
 
     for (i = 0; i < dir->num_segments; ++i) {
-        char * const name = Parrot_str_to_cstring(interp, dir->segments[i]->name);
         /* type, offset, size */
         size += 3;
-        size += PF_size_cstring(name);
-        Parrot_str_free_cstring(name);
+        size += PF_size_string(dir->segments[i]->name);
     }
 
     /* pad/align it */
@@ -2460,13 +2454,11 @@ directory_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cu
 
     for (i = 0; i < num_segs; i++) {
         const PackFile_Segment * const seg = dir->segments[i];
-        char * const name = Parrot_str_to_cstring(interp, seg->name);
 
         *cursor++ = seg->type;
-        cursor = PF_store_cstring(cursor, name);
+        cursor = PF_store_string(cursor, seg->name);
         *cursor++ = seg->file_offset;
         *cursor++ = seg->op_count;
-        Parrot_str_free_cstring(name);
     }
 
     TRACE_PRINTF_ALIGN(("-ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
@@ -3199,7 +3191,7 @@ Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
 /*
 
 =item C<void Parrot_debug_add_mapping(PARROT_INTERP, PackFile_Debug *debug,
-opcode_t offset, const char *filename)>
+opcode_t offset, STRING *filename)>
 
 Adds a bytecode offset to a filename mapping for a PackFile_Debug.
 
@@ -3210,20 +3202,18 @@ Adds a bytecode offset to a filename mapping for a PackFile_Debug.
 PARROT_EXPORT
 void
 Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
-                         opcode_t offset, ARGIN(const char *filename))
+                         opcode_t offset, ARGIN(STRING *filename))
 {
     ASSERT_ARGS(Parrot_debug_add_mapping)
     PackFile_ConstTable * const    ct         = debug->code->const_table;
     int                            insert_pos = 0;
     opcode_t                       prev_filename_n;
-    STRING                        *filename_pstr;
 
     /* If the previous mapping has the same filename, don't record it. */
     if (debug->num_mappings) {
         prev_filename_n = debug->mappings[debug->num_mappings-1].filename;
-        filename_pstr = Parrot_str_new(interp, filename, 0);
         if (ct->str.constants[prev_filename_n] &&
-                STRING_equal(interp, filename_pstr,
+                STRING_equal(interp, filename,
                     ct->str.constants[prev_filename_n])) {
             return;
         }
@@ -3256,8 +3246,6 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
     {
         /* Set up new entry and insert it. */
         PackFile_DebugFilenameMapping *mapping = debug->mappings + insert_pos;
-        STRING *namestr = Parrot_str_new_init(interp, filename, strlen(filename),
-                Parrot_default_encoding_ptr, 0);
         size_t count = ct->str.const_count;
         size_t i;
 
@@ -3265,7 +3253,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
 
         /* Check if there is already a constant with this filename */
         for (i= 0; i < count; ++i) {
-            if (STRING_equal(interp, namestr, ct->str.constants[i]))
+            if (STRING_equal(interp, filename, ct->str.constants[i]))
                 break;
         }
         if (i < count) {
@@ -3277,10 +3265,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
             ct->str.const_count++;
             ct->str.constants = mem_gc_realloc_n_typed_zeroed(interp, ct->str.constants,
                     ct->str.const_count, ct->str.const_count - 1, STRING *);
-            ct->str.constants[ct->str.const_count - 1] =
-                Parrot_str_new_init(interp, filename, strlen(filename),
-                    Parrot_default_encoding_ptr,
-                    PObj_constant_FLAG);
+            ct->str.constants[ct->str.const_count - 1] = filename;
         }
 
         /* Set the mapped value */
@@ -4300,7 +4285,6 @@ push_context(PARROT_INTERP)
             Parrot_hll_get_HLL_namespace(interp, parrot_hll_id));
 }
 
-
 /*
 
 =item C<static void compile_file(PARROT_INTERP, STRING *path)>
@@ -4315,12 +4299,10 @@ static void
 compile_file(PARROT_INTERP, ARGIN(STRING *path))
 {
     ASSERT_ARGS(compile_file)
-    char * const filename = Parrot_str_to_cstring(interp, path);
 
     STRING *err;
     PackFile_ByteCode * const cs =
-        (PackFile_ByteCode *)Parrot_compile_file(interp, filename, &err);
-    Parrot_str_free_cstring(filename);
+        (PackFile_ByteCode *)Parrot_compile_file(interp, path, &err);
 
     if (cs)
         do_sub_pragmas(interp, cs, PBC_LOADED, NULL);
@@ -4563,6 +4545,186 @@ PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, ARGIN_NULLOK(PMC *eva
     PARROT_CALLIN_START(interp);
     do_sub_pragmas(interp, interp->code, what, eval);
     PARROT_CALLIN_END(interp);
+}
+
+
+/*
+
+=item C<Parrot_PackFile PackFile_read_pbc(PARROT_INTERP, STRING *fullname, const
+int debug)>
+
+Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+Parrot_PackFile
+PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
+{
+    ASSERT_ARGS(PackFile_read_pbc)
+    PackFile  *pf;
+    char      *program_code;
+    STRING    *stdin_filename = CONST_STRING(interp, "-");
+    PIOHANDLE  io             = PIO_INVALID_HANDLE;
+    INTVAL     is_mapped      = 0;
+    INTVAL     program_size;
+
+    if (STRING_length(fullname) == 0
+    ||  STRING_equal(interp, fullname, stdin_filename)) {
+        /* read from STDIN */
+        io = PIO_STDHANDLE(interp, PIO_STDIN_FILENO);
+
+        /* read 1k at a time */
+        program_size = 0;
+    }
+    else {
+        /* can't read a file that doesn't exist */
+        if (!Parrot_stat_info_intval(interp, fullname, STAT_EXISTS)) {
+            Parrot_io_eprintf(interp, "Parrot VM: Can't stat %s, code %i.\n",
+                    fullname, errno);
+            return NULL;
+        }
+
+        /* we may need to relax this if we want to read bytecode from pipes */
+        if (!Parrot_stat_info_intval(interp, fullname, STAT_ISREG)) {
+            Parrot_io_eprintf(interp,
+                "Parrot VM: '%s', is not a regular file %i.\n",
+                fullname, errno);
+            return NULL;
+        }
+
+        program_size = Parrot_stat_info_intval(interp, fullname, STAT_FILESIZE);
+
+#ifndef PARROT_HAS_HEADER_SYSMMAN
+        io = PIO_OPEN(interp, fullname, PIO_F_READ);
+
+        if (io == PIO_INVALID_HANDLE) {
+            Parrot_io_eprintf(interp, "Parrot VM: Can't open %s, code %i.\n",
+                    fullname, errno);
+            return NULL;
+        }
+#endif  /* PARROT_HAS_HEADER_SYSMMAN */
+
+    }
+#ifdef PARROT_HAS_HEADER_SYSMMAN
+again:
+#endif
+    /* if we've opened a file (or stdin) with PIO, read it in */
+    if (io != PIO_INVALID_HANDLE) {
+        char  *cursor;
+        size_t chunk_size = program_size > 0 ? program_size : 1024;
+        INTVAL wanted     = program_size;
+        size_t read_result;
+
+        program_code = mem_gc_allocate_n_typed(interp, chunk_size, char);
+        cursor       = program_code;
+        program_size = 0;
+
+        while ((read_result = PIO_READ(interp, io, cursor, chunk_size)) > 0) {
+            program_size += read_result;
+
+            if (program_size == wanted)
+                break;
+
+            chunk_size   = 1024;
+            program_code = mem_gc_realloc_n_typed(interp, program_code,
+                    program_size + chunk_size, char);
+
+            if (!program_code) {
+                Parrot_io_eprintf(interp,
+                            "Parrot VM: Could not reallocate buffer "
+                            "while reading packfile from PIO.\n");
+                PIO_CLOSE(interp, io);
+                return NULL;
+            }
+
+            cursor = (char *)(program_code + program_size);
+        }
+
+        /*if (ferror(io)) {
+            Parrot_io_eprintf(interp,
+             "Parrot VM: Problem reading packfile from PIO:  code %d.\n",
+                        ferror(io));
+            fclose(io);
+            mem_gc_free(interp, program_code);
+            return NULL;
+        }*/
+
+        PIO_CLOSE(interp, io);
+    }
+    else {
+        /* if we've gotten here, we opted not to use PIO to read the file.
+         * use mmap */
+
+#ifdef PARROT_HAS_HEADER_SYSMMAN
+
+        /* check that fullname isn't NULL, just in case */
+        if (!fullname)
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                "Trying to open a NULL filename");
+
+        io = PIO_OPEN(interp, fullname, PIO_F_READ);
+
+        if (io == PIO_INVALID_HANDLE) {
+            Parrot_io_eprintf(interp, "Parrot VM: Can't open %s, code %i.\n",
+                    fullname, errno);
+            return NULL;
+        }
+
+        program_code = (char *)mmap(0, (size_t)program_size,
+                        PROT_READ, MAP_SHARED, io, (off_t)0);
+
+        if (program_code == (void *)MAP_FAILED) {
+            Parrot_warn(interp, PARROT_WARNINGS_IO_FLAG,
+                    "Parrot VM: Can't mmap file %s, code %i.\n",
+                    fullname, errno);
+
+            goto again;
+        }
+
+        is_mapped = 1;
+
+#else   /* PARROT_HAS_HEADER_SYSMMAN */
+
+        Parrot_io_eprintf(interp, "Parrot VM: uncaught error occurred reading "
+                    "file or mmap not available.\n");
+        return NULL;
+
+#endif  /* PARROT_HAS_HEADER_SYSMMAN */
+
+    }
+
+    /* Now that we have the bytecode, let's unpack it. */
+
+    pf = PackFile_new(interp, is_mapped);
+
+    /* Make the cmdline option available to the unpackers */
+    pf->options = debug;
+
+    if (!PackFile_unpack(interp, pf, (opcode_t *)program_code,
+            (size_t)program_size)) {
+        Parrot_io_eprintf(interp, "Parrot VM: Can't unpack packfile %s.\n",
+                fullname);
+        return NULL;
+    }
+
+    /* Set :main routine */
+    if (!(pf->options & PFOPT_HEADERONLY))
+        do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
+
+    /* Prederefing the sub/the bytecode is done in switch_to_cs before
+     * actual usage of the segment */
+
+#ifdef PARROT_HAS_HEADER_SYSMMAN
+    /* the man page states that it's ok to close a mmaped file */
+    if (is_mapped)
+        PIO_CLOSE(interp, io);
+#endif
+
+    return pf;
 }
 
 

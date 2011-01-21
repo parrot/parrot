@@ -95,6 +95,7 @@ main(int argc, const char *argv[])
 {
     Parrot_PMC interp;
     Parrot_PMC pbc;
+    Parrot_String filename;
     const char *outfile = NULL;
     int option = 0;
     int debug = PFOPT_UTILS;
@@ -140,7 +141,8 @@ main(int argc, const char *argv[])
     /* What to do about this debug flag? */
     /* pf = Parrot_pbc_read(interp, argc ? *argv : "-", debug); */
 
-    if (!(Parrot_api_load_bytecode_file(interp, argc ? *argv : "-", &pbc) &&
+    Parrot_api_string_import(interp, argc ? *argv : "-", &filename);
+    if (!(Parrot_api_load_bytecode_file(interp, filename, &pbc) &&
           Parrot_api_disassemble_bytecode(interp, pbc, outfile, option) &&
           Parrot_api_destroy_interpreter(interp))) {
         fprintf(stderr, "Error during disassembly\n");

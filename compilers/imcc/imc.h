@@ -67,7 +67,7 @@ enum {
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void * imcc_compile_file(PARROT_INTERP,
-    ARGIN(const char *fullname),
+    ARGIN(STRING *fullname),
     ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -77,7 +77,7 @@ void * imcc_compile_file(PARROT_INTERP,
 PARROT_EXPORT
 int imcc_run_api(
     ARGMOD(PMC * interp_pmc),
-    ARGIN(const char *sourcefile),
+    ARGIN(STRING *sourcefile),
     int argc,
     ARGIN_NULLOK(const char **argv),
     ARGOUT(PMC **pbcpmc))
@@ -306,6 +306,13 @@ void check_op(PARROT_INTERP,
         FUNC_MODIFIES(*op_info)
         FUNC_MODIFIES(*fullname);
 
+int imcc_string_ends_with(PARROT_INTERP,
+    ARGIN(const STRING *str),
+    ARGIN(const char *ext))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 PARROT_IGNORABLE_RESULT
 int /*@alt void@*/
 imcc_vfprintf(PARROT_INTERP,
@@ -355,6 +362,10 @@ void op_fullname(
     , PARROT_ASSERT_ARG(fullname) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(r))
+#define ASSERT_ARGS_imcc_string_ends_with __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str) \
+    , PARROT_ASSERT_ARG(ext))
 #define ASSERT_ARGS_imcc_vfprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(io) \
@@ -458,8 +469,8 @@ struct nodeType_t;
 struct parser_state_t {
     struct parser_state_t *next;
     Interp                *interp;
-    char                  *file;
-    FILE                  *handle;
+    STRING                *file;
+    PIOHANDLE              handle;
     int                    line;
     int                    pasm_file;       /* pasm_file mode of this frame */
 };
@@ -612,8 +623,8 @@ typedef struct macro_t {
 #define UNSET_STATE_RUN_FROM_FILE(i) (COMPILER_STATE(i) &= ~PBC_RUN_FILE)
 
 /* imclexer.c */
-FILE * imc_yyin_set(FILE *new_yyin, void *yyscanner);
-FILE * imc_yyin_get(void *yyscanner);
+void      imc_yyin_set(PIOHANDLE new_yyin, void *yyscanner);
+PIOHANDLE imc_yyin_get(void *yyscanner);
 
 #endif /* PARROT_IMCC_IMC_H_GUARD */
 

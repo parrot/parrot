@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
 
     printf("ok 2\n");
 
-    Parrot_api_string_import_binary(pmc, bytes, 5, &str);
+    Parrot_api_string_import_binary(pmc, bytes, 5, "ascii", &str);
 
     if (strcmp(Parrot_str_to_cstring(interp, str), "hello") != 0) {
         printf("Failed to import a binary string into a Parrot_string");
