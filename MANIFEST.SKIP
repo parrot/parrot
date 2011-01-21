@@ -774,6 +774,8 @@
 ^/src/parrot_config\.c/
 ^/src/parrot_config\.h$
 ^/src/parrot_config\.h/
+^/src/platform/.*/.*\.o$
+^/src/platform/.*/.*\.o/
 ^/src/pmc/.*\.c$
 ^/src/pmc/.*\.c/
 ^/src/pmc/.*\.dump$
