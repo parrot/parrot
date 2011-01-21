@@ -1,6 +1,6 @@
 New in 3.1.0
 - Core
-  + Exception PMCs are not subclassable from PIR
+  + Exception PMCs are now subclassable from PIR
 
 New in 3.0.0
 - Core
