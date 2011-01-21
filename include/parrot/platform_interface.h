@@ -99,6 +99,16 @@ extern int Parrot_signbit(double x);
 int Parrot_signbit_l(long double x);
 #endif
 
+#ifndef signbit
+#  if NUMVAL_SIZE == 8
+#    define signbit(x) Parrot_signbit(x)
+#  else
+#    define signbit(x) Parrot_signbit_l(x)
+#  endif
+#endif
+
+#define Parrot_is_nzero(x) ((x) == 0.0 && signbit(x))
+
 /*
 ** Memory:
 */
