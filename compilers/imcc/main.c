@@ -746,16 +746,6 @@ imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile),
                     "main: NULL output_file when trying to write .pbc\n");
         }
         imcc_write_pbc(interp, output_file);
-
-        /* If necessary, load the file written above */
-        if (STATE_RUN_FROM_FILE(interp) && !is_stdout) {
-            IMCC_info(interp, 1, "Loading %Ss\n", output_file);
-            pf_raw = PackFile_read_pbc(interp, output_file, 0);
-            if (!pf_raw)
-                IMCC_fatal_standalone(interp, 1, "Packfile loading failed\n");
-            Parrot_pf_set_current_packfile(interp, pf_raw);
-            SET_STATE_LOAD_PBC(interp);
-        }
     }
 
     yylex_destroy(yyscanner);
