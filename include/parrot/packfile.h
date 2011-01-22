@@ -112,15 +112,6 @@ typedef enum {
 
 #define PF_DIR_FORMAT 1
 
-/* Fixup types */
-
-typedef enum {
-    enum_fixup_none = 0,
-    enum_fixup_sub  = 1,
-    enum_fixup_MAXUSEDVALUE = enum_fixup_sub
-} enum_fixup_t;
-
-
 /*
 ** Structure Definitions:
 */
