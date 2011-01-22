@@ -934,9 +934,6 @@ PackFile_ByteCode * Parrot_pf_get_current_code_segment(PARROT_INTERP)
 PackFile * Parrot_pf_get_current_packfile(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_trace_eprintf(ARGIN(const char *s), ...)
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_do_sub_pragmas __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -1078,8 +1075,6 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
 #define ASSERT_ARGS_Parrot_pf_get_current_packfile \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_trace_eprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(s))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/packfile/api.c */
 
