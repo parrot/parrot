@@ -512,7 +512,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .local int chunk_length
     $S0 = sock.'readline'()
     $I1 = length $S0
-    $I0 = find_not_cclass .CCLASS_NUMERIC, $S0, 0, $I1
+    $I0 = find_not_cclass .CCLASS_HEXADECIMAL, $S0, 0, $I1
     $S0 = substr $S0, 0, $I0
     $P0 = box $S0
     chunk_length = $P0.'to_int'(16)
