@@ -527,7 +527,18 @@ determine_input_file_type(PARROT_INTERP, ARGIN(STRING *sourcefile))
 
     if (STRING_length(sourcefile) == 1
     &&  STRING_ord(interp, sourcefile, 0) ==  '-') {
-        return PIO_STDHANDLE(interp, PIO_STDIN_FILENO);
+        PIOHANDLE handle = PIO_STDHANDLE(interp, PIO_STDIN_FILENO);
+
+        if ((FILE *)handle == NULL) {
+            /*
+             * We have to dup the handle because the stdin fd is 0 on UNIX and
+             * lex would think it's a NULL FILE pointer and reset it to the
+             * stdin FILE pointer.
+             */
+            handle = Parrot_io_dup(interp, handle);
+        }
+
+        return handle;
     }
     else {
         if (imcc_string_ends_with(interp, sourcefile, ".pasm"))
