@@ -40,51 +40,15 @@
 #define FLOATTYPE_4_NAME      "4-byte float"
 
 /*
-** Debug printf packfile reading:
-**   0 to disable
-**   1 to print basic info
-**   2 to print also values
-** Use also ./pbc_dump -D<1-7> to finetune. See F<src/pbc_dump.c>
-*/
-#define TRACE_PACKFILE 0
-
-/*
 ** Parrot_pbc_read() options:
 **   parrot, pbc_merge, parrot_debugger use 0
 **   pbc_dump, pbc_disassemble use 1 to skip the version check
 **   pbc_dump -h requires 2
-**   The rest is for TRACE_PACKFILE debugging with switch -D in pbc_dump
 */
-#define PFOPT_NONE  0
-#define PFOPT_UTILS 1
-#define PFOPT_HEADERONLY 2
-#if TRACE_PACKFILE
-#  define PFOPT_DEBUG 4
-#  define PFOPT_ALIGN 8
-#  define PFOPT_VALUE 16
-#endif
-#define PFOPT_PMC_FREEZE_ONLY 32
-
-#if TRACE_PACKFILE
-/* Here we pass multipe args to a macro so the args may not be bracketed here! */
-#  define TRACE_PRINTF(args)       if (pf->options & PFOPT_DEBUG) \
-        Parrot_trace_eprintf args
-#  define TRACE_PRINTF_ALIGN(args) if (pf->options & PFOPT_ALIGN) \
-        Parrot_trace_eprintf args
-#  if TRACE_PACKFILE == 2
-#    define TRACE_PRINTF_VAL(args) if (pf->options & PFOPT_VALUE) \
-        Parrot_trace_eprintf args
-#    define TRACE_PRINTF_2(args)   Parrot_trace_eprintf args
-#  else
-#    define TRACE_PRINTF_VAL(args)
-#    define TRACE_PRINTF_2(args)
-#  endif
-#else
-#  define TRACE_PRINTF(args)
-#  define TRACE_PRINTF_VAL(args)
-#  define TRACE_PRINTF_ALIGN(args)
-#  define TRACE_PRINTF_2(args)
-#endif
+#define PFOPT_NONE            0
+#define PFOPT_UTILS           1
+#define PFOPT_HEADERONLY      2
+#define PFOPT_PMC_FREEZE_ONLY 4
 
 /*
 ** Enumerated constants

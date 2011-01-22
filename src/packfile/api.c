@@ -502,30 +502,6 @@ static int sub_pragma(PARROT_INTERP,
 /* pad to 16 in bytes */
 #define PAD_16_B(size) ((size) % 16 ? 16 - (size) % 16 : 0)
 
-#if TRACE_PACKFILE
-
-/*
-
-=item C<void Parrot_trace_eprintf(const char *s, ...)>
-
-Print out an error message. Passes arguments directly to C<vfprintf>.
-
-=cut
-
-*/
-
-void
-Parrot_trace_eprintf(ARGIN(const char *s), ...)
-{
-    ASSERT_ARGS(Parrot_trace_eprintf)
-    va_list args;
-    va_start(args, s);
-    vfprintf(stderr, s, args);
-    va_end(args);
-}
-#endif
-
-
 /*
 
 =item C<void PackFile_destroy(PARROT_INTERP, PackFile *pf)>
@@ -938,8 +914,6 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
     PackFile_ConstTable * const ct = self->const_table;
     opcode_t i;
 
-    TRACE_PRINTF(("PackFile: do_sub_pragmas (action=%d)\n", action));
-
     for (i = 0; i < ct->pmc.const_count; ++i) {
         STRING * const SUB = CONST_STRING(interp, "Sub");
         PMC *sub_pmc = ct->pmc.constants[i];
@@ -1123,19 +1097,7 @@ PackFile_Header_unpack(PARROT_INTERP, ARGMOD(PackFile_Header *self),
     PackFile_Header_validate(interp, self, pf_options);
 
     /* Extract the header's UUID. */
-    PackFile_Header_read_uuid(interp, self, packed, packed_size)
-
-    /* Describe what was read for debugging. */
-    TRACE_PRINTF(("PackFile_Header_unpack: Wordsize %d.\n", self->wordsize));
-    TRACE_PRINTF(("PackFile_Header_unpack: Floattype %d (%s).\n",
-                  self->floattype,
-                  self->floattype == FLOATTYPE_8
-                      ? FLOATTYPE_8_NAME
-                      : self->floattype == FLOATTYPE_16
-                          ? FLOATTYPE_16_NAME
-                          : FLOATTYPE_12_NAME));
-    TRACE_PRINTF(("PackFile_Header_unpack: Byteorder %d (%sendian).\n",
-                  self->byteorder, self->byteorder ? "big " : "little-"));
+    PackFile_Header_read_uuid(interp, self, packed, packed_size);
 
     /* Return the number of bytes in the header */
     return PACKFILE_HEADER_BYTES + self->uuid_size;
@@ -1168,9 +1130,6 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     const opcode_t         *cursor;
     int                     header_read_length;
     opcode_t                padding;
-#if TRACE_PACKFILE
-    PackFile        * const pf  = self;
-#endif
 
     self->src  = packed;
     self->size = packed_size;
@@ -1183,8 +1142,6 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
      * 16 byte boundary. */
     header_read_length += PAD_16_B(header_read_length);
     cursor              = packed + (header_read_length / sizeof (opcode_t));
-    TRACE_PRINTF(("PackFile_unpack: pad=%d\n",
-                  (char *)cursor - (char *)packed));
 
     /* Set what transforms we need to do when reading the rest of the file. */
     PackFile_assign_transforms(self);
@@ -1202,14 +1159,11 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     }
 
     /* Padding. */
-    TRACE_PRINTF(("PackFile_unpack: 3 words padding.\n"));
     padding = PF_fetch_opcode(self, &cursor);
     padding = PF_fetch_opcode(self, &cursor);
     padding = PF_fetch_opcode(self, &cursor);
     UNUSED(padding);
 
-    TRACE_PRINTF(("PackFile_unpack: Directory read, offset %d.\n",
-                  (INTVAL)cursor - (INTVAL)packed));
     self->directory.base.file_offset = (INTVAL)cursor - (INTVAL)self->src;
     if (self->options & PFOPT_HEADERONLY)
         return cursor - packed;
@@ -1231,8 +1185,6 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
         self->is_mmap_ped = 0;
     }
 #endif
-
-    TRACE_PRINTF(("PackFile_unpack: Unpack done.\n"));
 
     return cursor - packed;
 }
@@ -1511,16 +1463,11 @@ default_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode
 {
     ASSERT_ARGS(default_unpack)
     DECL_CONST_CAST_OF(opcode_t);
-#if TRACE_PACKFILE
-    PackFile * const pf  = self->pf;
-#endif
 
     self->op_count = PF_fetch_opcode(self->pf, &cursor);
     self->itype    = PF_fetch_opcode(self->pf, &cursor);
     self->id       = PF_fetch_opcode(self->pf, &cursor);
     self->size     = PF_fetch_opcode(self->pf, &cursor);
-    TRACE_PRINTF_VAL(("default_unpack: op_count=%d, itype=%d, id=%d, size=%d.\n",
-        self->op_count, self->itype, self->id, self->size));
 
     if (self->size == 0)
         return cursor;
@@ -1549,13 +1496,8 @@ default_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode
     }
     else {
         int i;
-        TRACE_PRINTF(("default_unpack: pre-fetch %d ops into data\n",
-                      self->size));
-        for (i = 0; i < (int)self->size; ++i) {
+        for (i = 0; i < (int)self->size; i++)
             self->data[i] = PF_fetch_opcode(self->pf, &cursor);
-            TRACE_PRINTF(("default_unpack: transformed op[#%d]/%d %u\n",
-                          i, self->size, self->data[i]));
-        }
     }
 
     return cursor;
@@ -1963,17 +1905,12 @@ PackFile_Segment_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self),
     PackFile_Segment_pack_func_t f =
         self->pf->PackFuncs[self->type].pack;
     opcode_t * old_cursor;          /* Used for filling padding with 0 */
-#if TRACE_PACKFILE
-    PackFile * const pf  = self->pf;
-#endif
 
     cursor = default_pack(self, cursor);
 
     if (f)
         cursor = (f)(interp, self, cursor);
 
-    TRACE_PRINTF_ALIGN(("-ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                        OFFS(pf, cursor), pf->src, cursor));
     old_cursor = cursor;
     ALIGN_16(self->pf, cursor);
     /* fill padding with zeros */
@@ -1982,8 +1919,6 @@ PackFile_Segment_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self),
 
     /*if (align && (cursor - self->pf->src) % align)
       cursor += align - (cursor - self->pf->src) % align;*/
-    TRACE_PRINTF_ALIGN(("+ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                      OFFS(pf, cursor), pf->src, cursor));
 
     return cursor;
 }
@@ -2015,30 +1950,20 @@ PackFile_Segment_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self),
     ASSERT_ARGS(PackFile_Segment_unpack)
     PackFile_Segment_unpack_func_t f = self->pf->PackFuncs[self->type].unpack;
     int offs;
-#if TRACE_PACKFILE
-    PackFile * const pf  = self->pf;
-#endif
-
     cursor = default_unpack(interp, self, cursor);
 
     if (!cursor)
         return NULL;
 
     if (f) {
-        TRACE_PRINTF(("PackFile_Segment_unpack: special\n"));
-
         cursor = (f)(interp, self, cursor);
         if (!cursor)
             return NULL;
     }
 
     offs = OFFS(self->pf, cursor);
-    TRACE_PRINTF_ALIGN(("-S ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                        offs, self->pf->src, cursor));
     offs += PAD_16_B(offs);
     cursor = self->pf->src + offs/(sizeof (opcode_t));
-    TRACE_PRINTF_ALIGN(("+S ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                        offs, self->pf->src, cursor));
     return cursor;
 }
 
@@ -2156,7 +2081,6 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
 
     PARROT_ASSERT(pf);
     dir->num_segments = PF_fetch_opcode(pf, &cursor);
-    TRACE_PRINTF(("directory_unpack: %ld num_segments\n", dir->num_segments));
     dir->segments = mem_gc_allocate_n_zeroed_typed(interp,
             dir->num_segments, PackFile_Segment *);
 
@@ -2170,19 +2094,13 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         if (type >= PF_MAX_SEG)
             type = PF_UNKNOWN_SEG;
 
-        TRACE_PRINTF_VAL(("Segment type %d.\n", type));
-
         /* get name */
         name = PF_fetch_string(interp, pf, &cursor);
 
         /* create it */
         seg  = PackFile_Segment_new_seg(interp, dir, type, name, 0);
-
         seg->file_offset = PF_fetch_opcode(pf, &cursor);
-        TRACE_PRINTF_VAL(("Segment file_offset %ld.\n", seg->file_offset));
-
         seg->op_count    = PF_fetch_opcode(pf, &cursor);
-        TRACE_PRINTF_VAL(("Segment op_count %ld.\n", seg->op_count));
 
         if (pf->need_wordsize) {
 #if OPCODE_T_SIZE == 8
@@ -2197,9 +2115,6 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
                         (int)pf->header->wordsize);
                 return NULL;
             }
-            TRACE_PRINTF_VAL(("Segment offset: new pos 0x%x "
-                              "(src=0x%x cursor=0x%x).\n",
-                              OFFS(pf, pos), pf->src, cursor));
         }
         else
             pos = pf->src + seg->file_offset;
@@ -2227,12 +2142,8 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
     }
 
     offs = OFFS(pf, cursor);
-    TRACE_PRINTF_ALIGN(("-ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                      offs, pf->src, cursor));
     offs += PAD_16_B(offs);
     cursor = pf->src + offs/(sizeof (opcode_t));
-    TRACE_PRINTF_ALIGN(("+ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                      offs, pf->src, cursor));
 
     /* and now unpack contents of dir */
     for (i = 0; cursor && i < dir->num_segments; ++i) {
@@ -2245,15 +2156,11 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         size_t delta = 0;
 
         cursor = csave;
-        TRACE_PRINTF_VAL(("PackFile_Segment_unpack [%d] tmp len=%d.\n", i, tmp));
         pos    = PackFile_Segment_unpack(interp, dir->segments[i], cursor);
 
         if (!pos) {
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
                 "PackFile_unpack segment '%Ss' failed\n", dir->segments[i]->name);
-        }
-        else {
-            TRACE_PRINTF_VAL(("PackFile_Segment_unpack ok. pos=0x%x\n", pos));
         }
 
         /* FIXME bug on 64bit reading 32bit lurking here! TT #254 */
@@ -2268,9 +2175,6 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         }
         else
             delta = pos - cursor;
-
-        TRACE_PRINTF_VAL(("  delta=%d, pos=0x%x, cursor=0x%x\n",
-                          delta, pos, cursor));
 
         if ((size_t)delta != tmp || dir->segments[i]->op_count != tmp)
             Parrot_io_eprintf(interp, "PackFile_unpack segment '%Ss' directory length %d "
@@ -2461,15 +2365,12 @@ directory_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cu
         *cursor++ = seg->op_count;
     }
 
-    TRACE_PRINTF_ALIGN(("-ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                      OFFS(pf, cursor), pf->src, cursor));
     old_cursor = cursor;
     ALIGN_16(pf, cursor);
     /* fill padding with zeros */
     while (old_cursor != cursor)
         *old_cursor++ = 0;
-    TRACE_PRINTF_ALIGN(("+ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                      OFFS(pf, cursor), pf->src, cursor));
+
     /*if (align && (cursor - self->pf->src) % align)
       cursor += align - (cursor - self->pf->src) % align;*/
 
@@ -3866,16 +3767,10 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     PackFile_Annotations * const self = (PackFile_Annotations *)seg;
     PackFile_ByteCode    *code;
     STRING               *code_name;
-#if TRACE_PACKFILE
-    PackFile * const pf  = seg->pf;
-#endif
     INTVAL               i, str_len;
 
     /* Unpack keys. */
     self->num_keys = PF_fetch_opcode(seg->pf, &cursor);
-
-    TRACE_PRINTF(("PackFile_Annotations_unpack: Unpacking %ld keys\n",
-                  self->num_keys));
 
     self->keys     = mem_gc_allocate_n_zeroed_typed(interp,
             self->num_keys, PackFile_Annotations_Key);
@@ -3884,8 +3779,6 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
         PackFile_Annotations_Key * const key = self->keys + i;
         key->name = PF_fetch_opcode(seg->pf, &cursor);
         key->type = PF_fetch_opcode(seg->pf, &cursor);
-        TRACE_PRINTF_VAL(("PackFile_Annotations_unpack: key[%d]/%d name=%s type=%d\n",
-              i, self->num_keys, key->name, key->type));
     }
 
     /* Unpack groups. */
@@ -3897,10 +3790,6 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
         PackFile_Annotations_Group * const group = self->groups + i;
         group->bytecode_offset = PF_fetch_opcode(seg->pf, &cursor);
         group->entries_offset  = PF_fetch_opcode(seg->pf, &cursor);
-        TRACE_PRINTF_VAL((
-           "PackFile_Annotations_unpack: group[%d]/%d bytecode_offset=%d entries_offset=%d\n",
-           i, self->num_groups, group->bytecode_offset,
-           group->entries_offset));
     }
 
     /* Unpack entries. */
