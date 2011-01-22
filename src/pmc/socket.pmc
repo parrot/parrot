@@ -356,10 +356,10 @@ Read the given number of bytes from the socket and return them in a string.
             RETURN(STRING * STRINGNULL);
 
         if (buf == STRINGNULL)
-            buf = Parrot_io_reads(INTERP, SELF, 0);
+            buf = Parrot_io_reads(INTERP, SELF, 2048);
 
         while (Parrot_str_length(INTERP, buf) < nb) {
-            STRING *more = Parrot_io_reads(INTERP, SELF, 0);
+            STRING *more = Parrot_io_reads(INTERP, SELF, 2048);
             if (Parrot_str_length(INTERP, more) == 0) {
                 SET_ATTR_buf(INTERP, SELF, STRINGNULL);
                 RETURN(STRING *buf);
@@ -394,10 +394,10 @@ Read a line from the socket and return it in a string.
             RETURN(STRING * STRINGNULL);
 
         if (buf == STRINGNULL)
-            buf = Parrot_io_reads(INTERP, SELF, 0);
+            buf = Parrot_io_reads(INTERP, SELF, 2048);
 
         while ((idx = Parrot_str_find_index(INTERP, buf, CONST_STRING(INTERP, "\n"), 0)) < 0) {
-            STRING *more = Parrot_io_reads(INTERP, SELF, 0);
+            STRING *more = Parrot_io_reads(INTERP, SELF, 2048);
             if (Parrot_str_length(INTERP, more) == 0) {
                 SET_ATTR_buf(INTERP, SELF, STRINGNULL);
                 RETURN(STRING *buf);
