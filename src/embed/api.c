@@ -308,8 +308,8 @@ Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
 
 /*
 
-=item C<Parrot_Int Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc, const
-char *filename, Parrot_PMC * pbc)>
+=item C<Parrot_Int Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
+Parrot_String filename, Parrot_PMC * pbc)>
 
 Load a bytecode file and stores the resulting bytecode in C<pbc>. This function
 returns a true value if this call is successful and false value otherwise.
@@ -324,11 +324,11 @@ returns a true value if this call is successful and false value otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
-        ARGIN(const char *filename), ARGOUT(Parrot_PMC * pbc))
+        ARGIN(Parrot_String filename), ARGOUT(Parrot_PMC * pbc))
 {
     ASSERT_ARGS(Parrot_api_load_bytecode_file)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
+    PackFile * const pf = PackFile_read_pbc(interp, filename, 0);
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
             "Could not load packfile");
@@ -716,9 +716,9 @@ Parrot_api_set_configuration_hash(Parrot_PMC interp_pmc, Parrot_PMC confighash)
 
 /*
 
-=item C<Parrot_Int Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, const char *
-sourcefile, int argc, const char **argv, Parrot_PMC* bytecodepmc, int *result,
-imcc_hack_func_t func)>
+=item C<Parrot_Int Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc,
+Parrot_String sourcefile, int argc, const char **argv, Parrot_PMC* bytecodepmc,
+int *result, imcc_hack_func_t func)>
 
 WARNING: This is an evil hack to provide a wrapper around IMCC to catch unhandled
 exceptions without having to assume IMCC is linked in with libparrot. Delete this
@@ -733,7 +733,7 @@ otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, ARGIN(const char * sourcefile),
+Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, ARGIN(Parrot_String sourcefile),
     int argc, ARGIN_NULLOK(const char **argv), ARGMOD(Parrot_PMC* bytecodepmc),
     ARGOUT(int *result), imcc_hack_func_t func)
 {

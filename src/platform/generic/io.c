@@ -149,12 +149,8 @@ Parrot_io_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
     PIOHANDLE    fd;
     char        *spath;
 
-    if (path->encoding != Parrot_ascii_encoding_ptr
-    &&  path->encoding != Parrot_utf8_encoding_ptr)
-        path = Parrot_utf8_encoding_ptr->to_encoding(interp, path);
-
     oflags = convert_flags_to_unix(flags);
-    spath  = Parrot_str_to_cstring(interp, path);
+    spath  = Parrot_str_to_platform_cstring(interp, path);
 
     while ((fd = open(spath, oflags, DEFAULT_OPEN_MODE)) < 0
     &&      errno == EINTR)

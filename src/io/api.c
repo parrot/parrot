@@ -904,6 +904,36 @@ Parrot_io_fprintf(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s), ...)
 
 /*
 
+=item C<INTVAL Parrot_io_pprintf(PARROT_INTERP, PIOHANDLE os_handle, const char
+*s, ...)>
+
+Writes a C string format with varargs to PIOHANDLE C<os_handle>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+INTVAL
+Parrot_io_pprintf(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(const char *s), ...)
+{
+    ASSERT_ARGS(Parrot_io_pprintf)
+    va_list  args;
+    STRING  *str;
+    INTVAL   ret;
+
+    va_start(args, s);
+    str = Parrot_vsprintf_c(interp, s, args);
+    va_end(args);
+
+    ret = Parrot_io_write(interp, os_handle, str->strstart, str->bufused);
+
+    return ret;
+}
+
+/*
+
 =item C<INTVAL Parrot_io_printf(PARROT_INTERP, const char *s, ...)>
 
 Writes a C string format with varargs to C<stdout>.

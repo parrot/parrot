@@ -151,6 +151,7 @@ main(int argc, const char *argv[])
     const char **pir_argv;
     Parrot_Init_Args *initargs;
     struct init_args_t parsed_flags;
+    Parrot_String source_str;
 
     GET_INIT_STRUCT(initargs);
     /* internationalization setup */
@@ -173,16 +174,18 @@ main(int argc, const char *argv[])
     if (!Parrot_api_set_runcore(interp, parsed_flags.run_core_name, parsed_flags.trace))
         show_last_error_and_exit(interp);
 
+    if (!Parrot_api_string_import(interp, parsed_flags.sourcefile, &source_str))
+        show_last_error_and_exit(interp);
+
     if (parsed_flags.have_pbc_file) {
-        if (!Parrot_api_load_bytecode_file(interp, parsed_flags.sourcefile,
-                                           &bytecodepmc))
+        if (!Parrot_api_load_bytecode_file(interp, source_str, &bytecodepmc))
             show_last_error_and_exit(interp);
         if (parsed_flags.turn_gc_off)
             Parrot_api_toggle_gc(interp, 0);
     }
     else {
         Parrot_api_toggle_gc(interp, 0);
-        if (!Parrot_api_wrap_imcc_hack(interp, parsed_flags.sourcefile, argc, argv,
+        if (!Parrot_api_wrap_imcc_hack(interp, source_str, argc, argv,
                                        &bytecodepmc, &parsed_flags.execute_packfile,
                                        imcc_run_api))
             show_last_error_and_exit(interp);
@@ -650,6 +653,8 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     }
 
     while ((status = longopt_get(argc, argv, Parrot_cmd_options(), &opt)) > 0) {
+        Parrot_String str;
+
         switch (opt.opt_id) {
           case 'R':
             args->run_core_name = opt.opt_arg;

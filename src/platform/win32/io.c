@@ -184,16 +184,14 @@ Parrot_io_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
     convert_flags_to_win32(flags, &fAcc, &fShare, &fCreat);
 
     if (path->encoding == Parrot_ascii_encoding_ptr) {
-        spath = Parrot_str_to_cstring(interp, path);
+        spath = Parrot_str_to_encoded_cstring(interp, path,
+                    Parrot_ascii_encoding_ptr);
         fd = CreateFile(spath, fAcc, fShare, NULL, fCreat,
                     FILE_ATTRIBUTE_NORMAL, NULL);
     }
     else {
-        if (path->encoding != Parrot_ucs2_encoding_ptr
-        &&  path->encoding != Parrot_utf16_encoding_ptr)
-            path = Parrot_utf16_encoding_ptr->to_encoding(interp, path);
-
-        spath = Parrot_str_to_cstring(interp, path);
+        spath = Parrot_str_to_encoded_cstring(interp, path,
+                    Parrot_utf16_encoding_ptr);
         fd = CreateFileW((LPCWSTR)spath, fAcc, fShare, NULL, fCreat,
                     FILE_ATTRIBUTE_NORMAL, NULL);
     }

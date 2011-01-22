@@ -38,6 +38,23 @@
 
 #define PIO_NR_OPEN 256         /* Size of an "IO handle table" */
 
+/* IO object flags */
+#define PIO_F_READ      00000001
+#define PIO_F_WRITE     00000002
+#define PIO_F_APPEND    00000004
+#define PIO_F_TRUNC     00000010
+#define PIO_F_EOF       00000020
+#define PIO_F_FILE      00000100
+#define PIO_F_PIPE      00000200
+#define PIO_F_SOCKET    00000400
+#define PIO_F_CONSOLE   00001000        /* A terminal                   */
+#define PIO_F_READLINE  00002000        /* user interactive readline    */
+#define PIO_F_LINEBUF   00010000        /* Flushes on newline           */
+#define PIO_F_BLKBUF    00020000
+#define PIO_F_SOFT_SP   00040000        /* Python softspace */
+#define PIO_F_SHARED    00100000        /* Stream shares a file handle  */
+#define PIO_F_ASYNC     01000000        /* In Parrot async is default   */
+
 /* These macros will be removed */
 #define PIO_STDHANDLE(interp, fileno) Parrot_io_std_os_handle((interp), (fileno))
 #define PIO_OPEN(interp, file, flags) \
@@ -205,6 +222,16 @@ STRING * Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *pmc))
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL /*@alt void@*/
+Parrot_io_pprintf(PARROT_INTERP,
+    PIOHANDLE os_handle,
+    ARGIN(const char *s),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+INTVAL /*@alt void@*/
 Parrot_io_printf(PARROT_INTERP,
     ARGIN(const char *s),
     ...)
@@ -339,6 +366,9 @@ PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
 #define ASSERT_ARGS_Parrot_io_peek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_Parrot_io_pprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_io_printf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
