@@ -2112,29 +2112,29 @@ testexec: test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --run-exec $(RUNCORE_TEST_FILES)
 
 # Test that need to be compiled by the C-compiler
-src_tests :
+src_tests : test_prep
 	$(PERL) t/harness $(SRC_TEST_FILES)
 
-dynoplibs_tests :
+dynoplibs_tests : test_prep
 	$(PERL) t/harness $(DYNOPLIBS_TEST_FILES)
 
-dynpmc_tests :
+dynpmc_tests : test_prep
 	$(PERL) t/harness $(DYNPMC_TEST_FILES)
 
-oo_tests :
+oo_tests : test_prep
 	$(PERL) t/harness $(OO_TEST_FILES)
 
-op_tests :
+op_tests : test_prep
 	$(PERL) t/harness $(OP_TEST_FILES)
 
-pir_tests :
+pir_tests : test_prep
 	$(PERL) t/harness $(PIR_TEST_FILES)
 
-pmc_tests :
+pmc_tests : test_prep
 	$(PERL) t/harness $(PMC_TEST_FILES)
 
 # Command line and various environments
-run_tests :
+run_tests : test_prep
 	$(PERL) t/harness $(RUN_TEST_FILES)
 
 # Test the Perl5 Modules in the Parrot distribution
