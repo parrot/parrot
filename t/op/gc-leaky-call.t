@@ -59,8 +59,8 @@ function calls.
 
     $S1 = $I3
     $S0 = "allocated " . $S1
-    $S0 .= " (which should be <= 2_500_000) bytes of memory"
-    $I4 = isle $I3, 2500000
+    $S0 .= " (which should be <= 6_000_000) bytes of memory"
+    $I4 = isle $I3, 6000000
     ok($I4,$S0)
 .end
 
