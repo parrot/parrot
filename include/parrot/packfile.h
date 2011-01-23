@@ -845,13 +845,12 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * Parrot_pf_create_default_segments(PARROT_INTERP,
-    ARGMOD(PackFile * const pf),
+    ARGIN(PackFile * const pf),
     ARGIN(STRING * file_name),
     int add)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(* const pf);
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 void Parrot_pf_set_current_packfile(PARROT_INTERP,
@@ -928,9 +927,11 @@ const opcode_t * PackFile_Annotations_unpack(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*seg);
 
+PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * Parrot_pf_get_current_code_segment(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
 PackFile * Parrot_pf_get_current_packfile(PARROT_INTERP)
         __attribute__nonnull__(1);
 

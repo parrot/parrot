@@ -1712,6 +1712,7 @@ Get the interpreter's currently active PackFile
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 PackFile *
 Parrot_pf_get_current_packfile(PARROT_INTERP)
 {
@@ -1729,6 +1730,7 @@ Get's the interpreter's currently active bytecode segment
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode *
 Parrot_pf_get_current_code_segment(PARROT_INTERP)
 {
@@ -1802,7 +1804,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode *
-Parrot_pf_create_default_segments(PARROT_INTERP, ARGMOD(PackFile * const pf),
+Parrot_pf_create_default_segments(PARROT_INTERP, ARGIN(PackFile * const pf),
         ARGIN(STRING * file_name), int add)
 {
     ASSERT_ARGS(Parrot_pf_create_default_segments)

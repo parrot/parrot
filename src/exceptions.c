@@ -769,6 +769,7 @@ from all previous rethrow points.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_ex_build_complete_backtrace_string(PARROT_INTERP, ARGIN(PMC * ex))
 {
