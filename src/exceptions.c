@@ -34,6 +34,11 @@ static PMC * build_exception_from_args(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+static void Parrot_ex_update_for_rethrow(PARROT_INTERP, ARGMOD(PMC * ex))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* ex);
+
 PARROT_CAN_RETURN_NULL
 static void setup_exception_args(PARROT_INTERP, ARGIN(const char *sig), ...)
         __attribute__nonnull__(1)
@@ -42,6 +47,9 @@ static void setup_exception_args(PARROT_INTERP, ARGIN(const char *sig), ...)
 #define ASSERT_ARGS_build_exception_from_args __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(format))
+#define ASSERT_ARGS_Parrot_ex_update_for_rethrow __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ex))
 #define ASSERT_ARGS_setup_exception_args __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sig))
@@ -67,7 +75,8 @@ Parrot_ex_build_exception(PARROT_INTERP, INTVAL severity,
         long error, ARGIN_NULLOK(STRING *msg))
 {
     ASSERT_ARGS(Parrot_ex_build_exception)
-    PMC * const exception = Parrot_pmc_new(interp, enum_class_Exception);
+    const int exception_type_id = Parrot_hll_get_ctx_HLL_type(interp, enum_class_Exception);
+    PMC * const exception = Parrot_pmc_new(interp, exception_type_id);
 
     VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"), severity);
     VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"), error);
@@ -115,15 +124,15 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 
         /* flush interpreter output to get things printed in order */
         if (!PMC_IS_NULL(Parrot_io_STDOUT(interp)))
-            Parrot_io_flush(interp, Parrot_io_STDOUT(interp));
+            Parrot_io_flush_handle(interp, Parrot_io_STDOUT(interp));
         if (use_perr)
-            Parrot_io_flush(interp, Parrot_io_STDERR(interp));
+            Parrot_io_flush_handle(interp, Parrot_io_STDERR(interp));
 
         if (interp->pdb) {
             Interp * const interpdeb = interp->pdb->debugger;
             if (interpdeb) {
-                Parrot_io_flush(interpdeb, Parrot_io_STDOUT(interpdeb));
-                Parrot_io_flush(interpdeb, Parrot_io_STDERR(interpdeb));
+                Parrot_io_flush_handle(interpdeb, Parrot_io_STDOUT(interpdeb));
+                Parrot_io_flush_handle(interpdeb, Parrot_io_STDERR(interpdeb));
             }
         }
 
@@ -461,9 +470,7 @@ opcode_t *
 Parrot_ex_rethrow_from_op(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(Parrot_ex_rethrow_from_op)
-
-    Parrot_ex_mark_unhandled(interp, exception);
-
+    Parrot_ex_update_for_rethrow(interp, exception);
     return Parrot_ex_throw_from_op(interp, exception, NULL);
 }
 
@@ -485,8 +492,7 @@ void
 Parrot_ex_rethrow_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(Parrot_ex_rethrow_from_c)
-    Parrot_ex_mark_unhandled(interp, exception);
-
+    Parrot_ex_update_for_rethrow(interp, exception);
     Parrot_ex_throw_from_c(interp, exception);
 }
 
@@ -714,7 +720,6 @@ describe them as well.\n\n");
     fprintf(stderr, "Version     : %s\n", PARROT_VERSION);
     fprintf(stderr, "Configured  : %s\n", PARROT_CONFIG_DATE);
     fprintf(stderr, "Architecture: %s\n", PARROT_ARCHNAME);
-    fprintf(stderr, "JIT Capable : %s\n", JIT_CAPABLE ? "Yes" : "No");
     if (interp)
         fprintf(stderr, "Interp Flags: %#x\n", (unsigned int)interp->flags);
     else
@@ -723,6 +728,69 @@ describe them as well.\n\n");
     fprintf(stderr, "\nDumping Core...\n");
 
     DUMPCORE();
+}
+
+/*
+
+=item C<static void Parrot_ex_update_for_rethrow(PARROT_INTERP, PMC * ex)>
+
+Update an exception PMC so that it can be rethrown.
+
+=cut
+
+*/
+
+static void
+Parrot_ex_update_for_rethrow(PARROT_INTERP, ARGMOD(PMC * ex))
+{
+    ASSERT_ARGS(Parrot_ex_update_for_rethrow)
+    STRING * const bt_strings_str = CONST_STRING(interp, "bt_strings");
+    PMC * bt_strings = VTABLE_get_attr_str(interp, ex, bt_strings_str);
+    STRING * const prev_backtrace = Parrot_dbg_get_exception_backtrace(interp, ex);
+
+    if (PMC_IS_NULL(bt_strings)) {
+        bt_strings = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+        VTABLE_set_attr_str(interp, ex, bt_strings_str, bt_strings);
+    }
+    VTABLE_push_string(interp, bt_strings, prev_backtrace);
+
+    Parrot_ex_mark_unhandled(interp, ex);
+}
+
+/*
+
+=item C<STRING * Parrot_ex_build_complete_backtrace_string(PARROT_INTERP, PMC *
+ex)>
+
+Get a complete backtrace string for an exception PMC, including backtraces
+from all previous rethrow points.
+
+=cut
+
+*/
+
+STRING *
+Parrot_ex_build_complete_backtrace_string(PARROT_INTERP, ARGIN(PMC * ex))
+{
+    ASSERT_ARGS(Parrot_ex_build_complete_backtrace_string)
+    STRING * const cur_bt = Parrot_dbg_get_exception_backtrace(interp, ex);
+    PMC * const all_bt = VTABLE_get_attr_str(interp, ex, CONST_STRING(interp, "bt_strings"));
+    INTVAL elems, i;
+    PMC * builder;
+    if (PMC_IS_NULL(all_bt))
+        return cur_bt;
+
+    elems = VTABLE_elements(interp, all_bt);
+    builder = Parrot_pmc_new(interp, enum_class_StringBuilder);
+    VTABLE_push_string(interp, builder, cur_bt);
+    for (i = elems - 1; i >= 0; i--) {
+        STRING * const i_bt = VTABLE_get_string_keyed_int(interp, all_bt, i);
+        if (STRING_IS_NULL(i_bt))
+            continue;
+        VTABLE_push_string(interp, builder, CONST_STRING(interp, "\nthrown from:\n"));
+        VTABLE_push_string(interp, builder, i_bt);
+    }
+    return VTABLE_get_string(interp, builder);
 }
 
 

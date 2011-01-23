@@ -255,7 +255,6 @@ sub is_generated {
     # include/parrot/config.h
     # include/parrot/core_pmcs.h
     # include/parrot/feature.h
-    # include/parrot/platform.h
 
     # runtime/parrot/include/* (all?)
 

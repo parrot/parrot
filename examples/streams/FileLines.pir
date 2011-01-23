@@ -22,7 +22,7 @@ stream for it. Then it combines the stream with a stream providing line numbers.
 
 =cut
 
-.sub _main
+.sub _main :main
     .param pmc argv
     .local int argc
     .local pmc file

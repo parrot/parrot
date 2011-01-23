@@ -4,6 +4,12 @@
 
 embed.pod - Parrot embedding system
 
+=head1 NOTE
+
+Parrot's embedding API is being replaced with a newer version. This document
+is for the old embedding API and will be phased out over time. Documentation
+for the newer API is located at F<docs/embed_new.pod>.
+
 =head1 SYNOPSIS
 
     #include <parrot/embed.h>
@@ -823,8 +829,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_io_get_flags>
 
-=item C<Parrot_io_get_last_file_position>
-
 =item C<Parrot_io_get_os_handle>
 
 =item C<Parrot_io_init>
@@ -1430,8 +1434,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_run_callback>
 
 =item C<Parrot_runcode>
-
-=item C<Parrot_run_native>
 
 =item C<Parrot_schedule_event>
 

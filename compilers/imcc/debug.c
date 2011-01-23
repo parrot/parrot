@@ -115,9 +115,6 @@ IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
 {
     ASSERT_ARGS(IMCC_warning)
     va_list ap;
-    if (IMCC_INFO(interp)->imcc_warn)
-        return;
-
     va_start(ap, fmt);
     imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
     va_end(ap);
@@ -188,32 +185,32 @@ dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
     const Instruction *ins;
     int                pc;
 
-    Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
+    Parrot_io_eprintf(interp,
             "\nDumping the instructions status:"
             "\n-------------------------------\n");
-    Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
+    Parrot_io_eprintf(interp,
             "nins line blck deep flags\t    type opnr size   pc  X ins\n");
 
     for (pc = 0, ins = unit->instructions; ins; ins = ins->next) {
         const Basic_block * const bb = unit->bb_list[ins->bbindex];
 
         if (bb) {
-            Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
+            Parrot_io_eprintf(interp,
                     "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  ",
                      ins->index, ins->line, bb->index, bb->loop_depth,
                      ins->flags, ins->type, OP_INFO_OPNUM(ins->op),
                      ins->opsize, pc);
         }
         else {
-             fprintf(stderr, "\t");
+            Parrot_io_eprintf(interp, "\t");
         }
 
-        Parrot_io_fprintf(interp, Parrot_io_STDERR(interp), "%s\n", ins->opname);
-        ins_print(interp, Parrot_io_STDERR(interp), ins);
+        Parrot_io_eprintf(interp, "%s\n", ins->opname);
+        ins_print(interp, PIO_STDHANDLE(interp, PIO_STDERR_FILENO), ins);
         pc += ins->opsize;
     }
 
-    Parrot_io_fprintf(interp, Parrot_io_STDERR(interp), "\n");
+    Parrot_io_eprintf(interp, "\n");
 }
 
 /*

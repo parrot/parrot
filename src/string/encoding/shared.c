@@ -1244,7 +1244,8 @@ fixed8_iter_set_and_advance(PARROT_INTERP,
     ptr[iter->charpos++] = c;
     iter->bytepos++;
 
-    PARROT_ASSERT(iter->bytepos <= str->bufused);
+    if (str->bufused < iter->bytepos)
+        str->bufused = iter->bytepos;
 }
 
 
@@ -1433,7 +1434,7 @@ unicode_convert_case(PARROT_INTERP, ARGIN(const STRING *src), int mode)
 
     dest->bufused = convert_case_buf(interp, dest->strstart, dest_len,
                                      src->strstart, src->bufused, mode);
-    dest->strlen  = STRING_scan(interp, dest);
+    STRING_scan(interp, dest);
 
     /* downgrade if possible */
     if (dest->bufused == dest->strlen * 2)

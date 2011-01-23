@@ -104,12 +104,6 @@ will not auto-vivify nested hashes and return PMCNULL early.
 
 L<https://trac.parrot.org/parrot/ticket/1561>
 
-=item Method unescape on String [experimental]
-
-This is a helper method for testing of Parrot_str_unescape_string.
-
-L<https://trac.parrot.org/parrot/ticket/1628>
-
 =item logical_* vtables [eligiblie in 2.7]
 
 These can be replaced by C<get_bool> and intval ops unless you're using them for
@@ -125,6 +119,44 @@ L<https://trac.parrot.org/parrot/ticket/1655>
 This perennially broken PMC will be removed.
 
 L<http://trac.parrot.org/parrot/ticket/1892>
+
+=item Scalar PMC [eligible in 3.1]
+
+The Scalar PMC can be removed, so long as the behaviors of PMCs which inherit
+from it do not change.
+
+L<https://trac.parrot.org/parrot/ticket/1754>
+
+=item "Advanced" NCI parameter types [eligible in 3.1]
+
+Many NCI parameter types that implement complex functionalities will be removed.
+See ticket for list and replacement suggestions.
+
+L<http://trac.parrot.org/parrot/ticket/1931>
+
+=item FixedPMCArray set_pmc vtable [eligible in 3.1]
+
+set_pmc on FPA will be removed. The assign op, which uses this vtable will cease
+to work on this type.
+
+L<http://trac.parrot.org/parrot/ticket/1904>
+
+=item The Eval PMC [eligible in 3.1]
+
+The Eval PMC will be removed. Uses of it returned from compilers will be
+replaced with PackFile PMCs instead.
+
+L<http://trac.parrot.org/parrot/ticket/1969>
+
+=item The PIR and PASM compreg PMCs [eligible in 3.1]
+
+The PMC returned by C<compreg "PIR"> is not going to be an NCI PMC any longer,
+it will be a new type of PMC which conforms to PDD31 and will be similar to
+HLLCompiler.
+
+There will not be a PASM compreg anymore.
+
+L<http://trac.parrot.org/parrot/ticket/1967>
 
 =back
 
@@ -200,24 +232,24 @@ These will be changed to allow more flexibility in types.
 
 L<https://trac.parrot.org/parrot/ticket/1565>
 
-=item inplace string updates. [eligible in 2.4]
-
-All "inplace" string update ops are deprecated. E.g. "chopn_s", etc.
-Part of COW removal.
-
-L<https://trac.parrot.org/parrot/ticket/1540>
-
-=item finalize [experimental]
-
-Finalize exception handler, unrolling inner runloops if needed.
-
-L<https://trac.parrot.org/parrot/ticket/1635>
-
 =item logical PMC ops [eligible in 2.7]
 
 These fall out from the logical vtables deprecation.
 
 L<https://trac.parrot.org/parrot/ticket/1655>
+
+=item "constant" PObj [eligible in 3.1]
+
+"constant" PObj (which is never collected) are deprecated. All PMCs and STRINGs
+should be properly marked during GC.
+
+Functions C<Parrot_pmc_new_constant>, C<Parrot_pmc_new_constant_noinit>,
+C<Parrot_pmc_new_constant_init> and C<Parrot_pmc_new_constant_init_int>
+will be removed.
+
+PObj flag C<PObj_constant_FLAG> and related macros will be removed.
+
+L<https://trac.parrot.org/parrot/ticket/1875>
 
 =back
 
@@ -236,6 +268,13 @@ L<https://trac.parrot.org/parrot/ticket/451>
 =item PMC numbering [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/451>
+
+=item X-to-Y native PBC reading [eligible in 3.1]
+
+Support for PBC files optimized for alternate platforms will be dropped in
+favour of a universal network PBC format.
+
+L<https://trac.parrot.org/parrot/ticket/1961>
 
 =back
 
@@ -291,6 +330,12 @@ At this point, C<:init> is a no-op, and will therefore be removed.
 
 L<https://trac.parrot.org/parrot/ticket/1896>
 
+=item encoding:charset:"" string literals [eligible in 3.1]
+
+This form of string literals will be removed.
+
+L<https://trac.parrot.org/parrot/ticket/1808>
+
 =back
 
 =head1 Functions
@@ -324,20 +369,6 @@ this rather than relying on in-place modification of an existing pointer.
 
 L<https://trac.parrot.org/parrot/ticket/1584>
 
-=item STRING COW [eligible in 2.4]
-
-COW strings are to be removed. All "inplace" string modification
-functions and all "inplace" string ops are deprecated.
-
-L<https://trac.parrot.org/parrot/ticket/1540>
-
-=item Parrot_str_unescape_string [experimental]
-
-This function is an experimental addition to enhance and maybe replace
-Parrot_str_unescape
-
-L<https://trac.parrot.org/parrot/ticket/1628>
-
 =item Parrot_load_bytecode_file [experimental]
 
 Load a .pbc file into the interpreter. Experimental.
@@ -349,9 +380,49 @@ is deprecated.
 
 L<http://trac.parrot.org/parrot/ticket/1800>
 
+=item Non-const STRING* arguments [eligible in 3.1]
+
+Due immutable nature of STRINGs we are changing internal handling to use only
+const STRING pointers. It will improve optimizations possibilities by compiler,
+make parrot const-correct, etc.
+
+Passing of non-const STRING* arguments is deprecated and will be changed to
+const STRING*. This includes (but not limited to) all string API functions,
+VTABLEs, PCC, etc.
+
+L<http://trac.parrot.org/parrot/ticket/1906>
+
+=item Old string_* functions [eligible in 3.0]
+
+The old string_* functions will be removed.
+
+L<http://trac.parrot.org/parrot/ticket/1809>
+
+=item Old embedding API in src/embed.c
+
+Functions in src/embed.c are deprecated. Functions in that file will
+either be deleted outright if they are superfluous, or will be moved and
+renamed in a way that is more appropriate. The file src/embed.c and
+include/parrot/embed.h will both be deleted eventually.
+
+L<http://trac.parrot.org/parrot/ticket/1910>
+
 =back
 
 =head1 Compiler tools
+
+=head2 IMCC
+
+=over 4
+
+=item PIR compiler availability [eligible in 3.1]
+
+The PIR compiler (currently IMCC) will be extracted to a separately loadable
+component.
+
+L<http://trac.parrot.org/parrot/ticket/1868>
+
+=back
 
 =head2 Parrot Grammar Engine (PGE)
 

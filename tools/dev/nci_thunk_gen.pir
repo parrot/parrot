@@ -404,7 +404,8 @@ DECL
 
     $S0 = 'get_dynext_loader_decl'(sigs)
     $S1 = 'get_loader_body'(sigs)
-    $S2 = 'sprintf'(<<'LOADER', $S0, $S1)
+    $S2 = 'sprintf'(<<'LOADER', $S0, $S0, $S1)
+%s;
 %s {
 %s
 }
@@ -477,7 +478,7 @@ TEMPLATE
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
 CODA
 .end

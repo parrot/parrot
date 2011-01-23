@@ -1,11 +1,11 @@
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
-blib/lib/libparrot.2.11.0.dylib                  [main]lib
+blib/lib/libparrot.3.0.0.dylib                   [main]lib
 blib/lib/libparrot.a                             [main]lib
 blib/lib/libparrot.dylib                         [main]lib
 blib/lib/libparrot.so                            [main]lib
-blib/lib/libparrot.so.2.11.0                     [main]lib
+blib/lib/libparrot.so.3.0.0                      [main]lib
 compilers/data_json/data_json.pbc                [data_json]
 config/gen/call_list/opengl.in                   []
 docs/ops/bit.pod                                 [doc]
@@ -33,8 +33,6 @@ include/parrot/extend_vtable.h                   [main]include
 include/parrot/feature.h                         [main]include
 include/parrot/has_header.h                      [main]include
 include/parrot/pbcversion.h                      [devel]include
-include/parrot/platform.h                        [main]include
-include/parrot/platform_limits.h                 [devel]include
 include/parrot/vtable.h                          [main]include
 include/pmc/pmc_addrregistry.h                   [devel]include
 include/pmc/pmc_arrayiterator.h                  [devel]include
@@ -92,11 +90,13 @@ include/pmc/pmc_orderedhashiterator.h            [devel]include
 include/pmc/pmc_packfile.h                       [devel]include
 include/pmc/pmc_packfileannotation.h             [devel]include
 include/pmc/pmc_packfileannotations.h            [devel]include
+include/pmc/pmc_packfilebytecodesegment.h        [devel]include
 include/pmc/pmc_packfileconstanttable.h          [devel]include
 include/pmc/pmc_packfiledebug.h                  [devel]include
 include/pmc/pmc_packfiledirectory.h              [devel]include
 include/pmc/pmc_packfilefixupentry.h             [devel]include
 include/pmc/pmc_packfilefixuptable.h             [devel]include
+include/pmc/pmc_packfileopmap.h                  [devel]include
 include/pmc/pmc_packfilerawsegment.h             [devel]include
 include/pmc/pmc_packfilesegment.h                [devel]include
 include/pmc/pmc_parrotinterpreter.h              [devel]include
@@ -390,11 +390,13 @@ src/pmc/orderedhashiterator.dump                 [devel]src
 src/pmc/packfile.dump                            [devel]src
 src/pmc/packfileannotation.dump                  [devel]src
 src/pmc/packfileannotations.dump                 [devel]src
+src/pmc/packfilebytecodesegment.dump             [devel]src
 src/pmc/packfileconstanttable.dump               [devel]src
 src/pmc/packfiledebug.dump                       [devel]src
 src/pmc/packfiledirectory.dump                   [devel]src
 src/pmc/packfilefixupentry.dump                  [devel]src
 src/pmc/packfilefixuptable.dump                  [devel]src
+src/pmc/packfileopmap.dump                       [devel]src
 src/pmc/packfilerawsegment.dump                  [devel]src
 src/pmc/packfilesegment.dump                     [devel]src
 src/pmc/parrotinterpreter.dump                   [devel]src

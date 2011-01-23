@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -411,7 +411,7 @@ sub vtable_decl {
         NULL,       /* attribute_defs */
         NULL,       /* ro_variant_vtable */
         $methlist,
-	0           /* attr size */
+        0           /* attr size */
     };
 ENDOFCODE
     return $cout;
@@ -879,12 +879,12 @@ EOC
     else {
         $cout .= <<"EOC";
     if (isa == NULL) {
-        isa = parrot_new_hash(interp);
+        isa = Parrot_hash_new(interp);
     }
 EOC
     }
     $cout .= <<"EOC";
-    parrot_hash_put(interp, isa, (void *)(CONST_STRING_GEN(interp, "$classname")), PMCNULL);
+    Parrot_hash_put(interp, isa, (void *)(CONST_STRING_GEN(interp, "$classname")), PMCNULL);
     return isa;
 }
 
@@ -1013,7 +1013,7 @@ sub gen_switch_vtable {
 
         # Gather "case :"
         my @cases = map { $self->generate_single_case($vt_method_name, $_, @parameters) } @$multis;
-        my $cases = join "\n", @cases;
+        my $cases = join "", @cases;
 
         my $body = <<"BODY";
     INTVAL type = VTABLE_type(INTERP, $parameters[0]);
@@ -1052,16 +1052,29 @@ sub generate_single_case {
         # For default case we have to handle return manually.
         my ($pcc_signature, $retval, $call_tail, $pcc_return)
                 = $self->gen_defaul_case_wrapping($ssig, @parameters);
+        my $dispatch = "Parrot_mmd_multi_dispatch_from_c_args(INTERP, \"$vt_method_name\", \"$pcc_signature\", SELF, $parameters$call_tail);";
 
         $case = <<"CASE";
-        default:
-            if (type < enum_class_core_max)
-                $return$func(INTERP, SELF, $parameters);
-            else {
+        case enum_class_core_max:
+CASE
+        if ($retval eq '') {
+        $case .= <<"CASE";
+            $dispatch
+CASE
+        }
+        else {
+        $case .= <<"CASE";
+            {
                 $retval
-                Parrot_mmd_multi_dispatch_from_c_args(INTERP, "$vt_method_name", "$pcc_signature", SELF, $parameters$call_tail);
+                $dispatch
                 $pcc_return
             }
+CASE
+        }
+        $case .= <<"CASE";
+            break;
+        default:
+            $return$func(INTERP, SELF, $parameters);
             break;
 CASE
     }

@@ -14,7 +14,6 @@ src/gc/gc_ms2.c - Non-recursive M&S
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
 #include "parrot/pointer_array.h"
-#include "parrot/sysmem.h"
 #include "gc_private.h"
 #include "fixed_allocator.h"
 
@@ -691,8 +690,8 @@ static PMC*
 gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms2_allocate_pmc_header)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    Pool_Allocator   *pool = self->pmc_allocator;
+    MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    Pool_Allocator   * const pool = self->pmc_allocator;
     pmc_alloc_struct *ptr;
 
     if (!(flags & PObj_constant_FLAG))

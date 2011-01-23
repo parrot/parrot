@@ -179,9 +179,7 @@ init_world(PARROT_INTERP)
     ASSERT_ARGS(init_world)
     PMC *iglobals, *self, *pmc;
 
-#ifdef PARROT_HAS_PLATFORM_INIT_CODE
     Parrot_platform_init_code();
-#endif
 
     /* Call base vtable class constructor methods */
     Parrot_gbl_setup_2(interp);
@@ -247,7 +245,7 @@ Parrot_gbl_setup_2(PARROT_INTERP)
     }
     else {
         op_lib_t  *core_ops = PARROT_CORE_OPLIB_INIT(interp, 1);
-        interp->op_hash     = parrot_create_hash_sized(interp, enum_type_ptr,
+        interp->op_hash     = Parrot_hash_create_sized(interp, enum_type_ptr,
                                     Hash_key_type_cstring, core_ops->op_count);
         parrot_hash_oplib(interp, core_ops);
     }

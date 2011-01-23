@@ -279,6 +279,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .namespace ['LWP';'Protocol';'http']
 
 .include 'socket.pasm'
+.include 'cclass.pasm'
 
 .sub '' :init :load :anon
     $P0 = subclass ['LWP';'Protocol'], ['LWP';'Protocol';'http']
@@ -454,8 +455,11 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
     .local pmc response
     response = new ['HTTP';'Response']
+    .local pmc pcontent
     .local string content
-    content = request.'content'()
+    pcontent = request.'content'()
+    if null pcontent goto L11
+    content = pcontent
     unless content goto L11
     $I1 = sock.'puts'(content)
     if $I1 >= 0 goto L11
@@ -507,7 +511,9 @@ see http://search.cpan.org/~gaas/libwww-perl/
   L51:
     .local int chunk_length
     $S0 = sock.'readline'()
-    $S0 = chomp($S0)
+    $I1 = length $S0
+    $I0 = find_not_cclass .CCLASS_HEXADECIMAL, $S0, 0, $I1
+    $S0 = substr $S0, 0, $I0
     $P0 = box $S0
     chunk_length = $P0.'to_int'(16)
     if chunk_length == 0 goto L52

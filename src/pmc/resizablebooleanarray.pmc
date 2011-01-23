@@ -453,15 +453,21 @@ Used to unarchive the string.
 
 */
     VTABLE void thaw(PMC *info) {
+        const UINTVAL   head_pos      = VTABLE_shift_integer(INTERP, info);
+        const UINTVAL   tail_pos      = VTABLE_shift_integer(INTERP, info);
+        STRING * const  s             = VTABLE_shift_string(INTERP, info);
+        const size_t    size_in_bytes = ROUND_BYTES(tail_pos);
+        unsigned char  *bit_array;
 
-        const UINTVAL    head_pos = VTABLE_shift_integer(INTERP, info);
-        const UINTVAL    tail_pos = VTABLE_shift_integer(INTERP, info);
-        STRING * const   s        = VTABLE_shift_string(INTERP, info);
-
-        unsigned char * const bit_array = (unsigned char*)Parrot_str_to_cstring(INTERP, s);
-        SET_ATTR_size(INTERP, SELF, tail_pos);
+        SELF.set_integer_native(tail_pos);
         SET_ATTR_resize_threshold(INTERP, SELF, head_pos);
-        SET_ATTR_bit_array(INTERP, SELF, bit_array);
+
+        if (s->bufused < size_in_bytes)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_BAD_BUFFER_SIZE,
+                "ResizableBooleanArray: invalid buffer size during thaw");
+
+        GET_ATTR_bit_array(INTERP, SELF, bit_array);
+        memcpy(bit_array, s->strstart, size_in_bytes);
     }
 
 }  /* pmclass */

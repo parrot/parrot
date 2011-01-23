@@ -224,23 +224,6 @@ Unknown. (TODO)
 
 /*
 
-=item C<PMC *share_ro()>
-
-Unknown. (TODO)
-
-=cut
-
-*/
-
-    VTABLE PMC *share_ro() {
-        if (PObj_is_PMC_shared_TEST(SELF))
-            return SELF;
-        else
-            return pt_shared_fixup(INTERP, SELF);
-    }
-
-/*
-
 =item C<PMC *clone()>
 
 Clones the current Undef PMC.

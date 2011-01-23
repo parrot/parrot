@@ -160,6 +160,8 @@ Get a compiler PMC.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
 {
@@ -170,7 +172,7 @@ Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
 
     if (PMC_IS_NULL(hash)) {
         /* No compiler has been registered yet */
-        return NULL;
+        return PMCNULL;
     }
 
     /* Fetch the compiler */
@@ -208,7 +210,7 @@ Parrot_set_compiler(PARROT_INTERP, ARGIN(STRING *type), ARGIN(PMC *compiler))
 
 /*
 
-=item C<void * Parrot_compile_file(PARROT_INTERP, const char *fullname, STRING
+=item C<void * Parrot_compile_file(PARROT_INTERP, STRING *fullname, STRING
 **error)>
 
 Compile code file.
@@ -220,7 +222,7 @@ Compile code file.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void *
-Parrot_compile_file(PARROT_INTERP, ARGIN(const char *fullname), ARGOUT(STRING **error))
+Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), ARGOUT(STRING **error))
 {
     ASSERT_ARGS(Parrot_compile_file)
     return imcc_compile_file(interp, fullname, error);
@@ -373,23 +375,20 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
 
             else {
                 /* Need to strip back to what follows the final / or \. */
-                STRING * const fullname   = VTABLE_get_string(interp, exe_name);
-                char   * const fullname_c = Parrot_str_to_cstring(interp, fullname);
-                int            pos        = strlen(fullname_c) - 1;
-                STRING *basename;
+                STRING * const fullname = VTABLE_get_string(interp, exe_name);
+                const int      len      = STRING_length(fullname);
+                int            pos;
 
-                while (pos              >  0
-                &&     fullname_c[pos] != '/'
-                &&     fullname_c[pos] != '\\')
-                    --pos;
+                for (pos = len - 1; pos > 0; --pos) {
+                    const INTVAL c = STRING_ord(interp, fullname, pos);
 
-                if (pos > 0)
-                    ++pos;
+                    if (c == '/' || c == '\\') {
+                        ++pos;
+                        break;
+                    }
+                }
 
-                basename = Parrot_str_new(interp, fullname_c + pos, 0);
-                Parrot_str_free_cstring(fullname_c);
-
-                return basename;
+                return Parrot_str_substr(interp, fullname, pos, len - pos);
             }
         }
         case RUNTIME_PREFIX:

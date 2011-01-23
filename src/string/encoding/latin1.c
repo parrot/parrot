@@ -39,9 +39,18 @@ static STRING* latin1_downcase_first(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL latin1_scan(PARROT_INTERP, ARGIN(const STRING *src))
+static INTVAL latin1_partial_scan(PARROT_INTERP,
+    ARGIN(const char *buf),
+    ARGMOD(Parrot_String_Bounds *bounds))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*bounds);
+
+static void latin1_scan(PARROT_INTERP, ARGMOD(STRING *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*src);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* latin1_titlecase(PARROT_INTERP, ARGIN(const STRING *src))
@@ -78,6 +87,10 @@ static STRING* latin1_upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_latin1_downcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_latin1_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(buf) \
+    , PARROT_ASSERT_ARG(bounds))
 #define ASSERT_ARGS_latin1_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -145,7 +158,7 @@ latin1_chr(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<static UINTVAL latin1_scan(PARROT_INTERP, const STRING *src)>
+=item C<static void latin1_scan(PARROT_INTERP, STRING *src)>
 
 Returns the number of codepoints in string C<src>. No scanning needed
 for fixed encodings.
@@ -154,12 +167,60 @@ for fixed encodings.
 
 */
 
-static UINTVAL
-latin1_scan(PARROT_INTERP, ARGIN(const STRING *src))
+static void
+latin1_scan(PARROT_INTERP, ARGMOD(STRING *src))
 {
     ASSERT_ARGS(latin1_scan)
 
-    return src->bufused;
+    src->strlen = src->bufused;
+}
+
+
+/*
+
+=item C<static INTVAL latin1_partial_scan(PARROT_INTERP, const char *buf,
+Parrot_String_Bounds *bounds)>
+
+Partial scan of latin1 string. Stops after C<count> bytes or if character
+C<delim> is found. Setting C<count> or C<delim> to -1 disables these tests.
+
+=cut
+
+*/
+
+static INTVAL
+latin1_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
+        ARGMOD(Parrot_String_Bounds *bounds))
+{
+    ASSERT_ARGS(latin1_partial_scan)
+    UINTVAL       i;
+    UINTVAL       len   = bounds->bytes;
+    const INTVAL  chars = bounds->chars;
+    const INTVAL  delim = bounds->delim;
+    INTVAL        c     = -1;
+
+    if (chars >= 0 && (UINTVAL)chars < len)
+        len = chars;
+
+    if (delim >= 0) {
+        for (i = 0; i < len; ++i) {
+            c = (unsigned char)buf[i];
+
+            if (c == delim) {
+                len = i + 1;
+                break;
+            }
+        }
+    }
+    else {
+        c = buf[len-1];
+    }
+
+    bounds->bytes = len;
+    bounds->chars = len;
+    bounds->delim = c;
+
+    return 0;
 }
 
 
@@ -373,9 +434,10 @@ latin1_titlecase_first(PARROT_INTERP, ARGIN(const STRING *src))
 
 
 static STR_VTABLE Parrot_latin1_encoding = {
-    0,
+    -1,
     "iso-8859-1",
     NULL,
+    1, /* Bytes per unit */
     1, /* Max bytes per codepoint */
 
     latin1_to_encoding,
@@ -388,6 +450,7 @@ static STR_VTABLE Parrot_latin1_encoding = {
     fixed8_hash,
 
     latin1_scan,
+    latin1_partial_scan,
     fixed8_ord,
     fixed_substr,
 

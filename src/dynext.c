@@ -43,24 +43,23 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static void * dlopen_string(PARROT_INTERP,
     Parrot_dlopen_flags flags,
-    ARGIN(STRING *path))
+    ARGIN(const STRING *path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING * get_path(PARROT_INTERP,
-    ARGMOD(STRING *lib),
+    ARGIN(STRING *lib),
     Parrot_dlopen_flags flags,
     ARGOUT(void **handle),
-    ARGIN(STRING *wo_ext),
-    ARGIN(STRING *ext))
+    ARGIN(const STRING *wo_ext),
+    ARGIN(const STRING *ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
         __attribute__nonnull__(6)
-        FUNC_MODIFIES(*lib)
         FUNC_MODIFIES(*handle);
 
 PARROT_WARN_UNUSED_RESULT
@@ -220,7 +219,7 @@ is_loaded(PARROT_INTERP, ARGIN(STRING *path))
 /*
 
 =item C<static void * dlopen_string(PARROT_INTERP, Parrot_dlopen_flags flags,
-STRING *path)>
+const STRING *path)>
 
 Calls C<Parrot_dlopen> with the path argument converted to a C string.  The
 flags argument will be converted into native form and used if applicable.
@@ -232,7 +231,7 @@ flags argument will be converted into native form and used if applicable.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static void *
-dlopen_string(PARROT_INTERP, Parrot_dlopen_flags flags, ARGIN(STRING *path))
+dlopen_string(PARROT_INTERP, Parrot_dlopen_flags flags, ARGIN(const STRING *path))
 {
     ASSERT_ARGS(dlopen_string)
 
@@ -246,7 +245,7 @@ dlopen_string(PARROT_INTERP, Parrot_dlopen_flags flags, ARGIN(STRING *path))
 /*
 
 =item C<static STRING * get_path(PARROT_INTERP, STRING *lib, Parrot_dlopen_flags
-flags, void **handle, STRING *wo_ext, STRING *ext)>
+flags, void **handle, const STRING *wo_ext, const STRING *ext)>
 
 Returns path and handle of a dynamic lib, setting lib_name to just the filestem
 (i.e. without path or extension) as a freshly-allocated C string.
@@ -258,8 +257,8 @@ Returns path and handle of a dynamic lib, setting lib_name to just the filestem
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING *
-get_path(PARROT_INTERP, ARGMOD(STRING *lib), Parrot_dlopen_flags flags,
-        ARGOUT(void **handle), ARGIN(STRING *wo_ext), ARGIN(STRING *ext))
+get_path(PARROT_INTERP, ARGIN(STRING *lib), Parrot_dlopen_flags flags,
+        ARGOUT(void **handle), ARGIN(const STRING *wo_ext), ARGIN(const STRING *ext))
 {
     ASSERT_ARGS(get_path)
     PMC * const iglobals  = interp->iglobals;
@@ -421,7 +420,7 @@ Parrot_dyn_init_lib(PARROT_INTERP,
 
 /*
 
-=item C<void * Parrot_dyn_dlsym_str(PARROT_INTERP, void *handle, STRING
+=item C<void * Parrot_dyn_dlsym_str(PARROT_INTERP, void *handle, const STRING
 *symbol)>
 
 Loads a symbol named C<symbol> from the shared library represented by
@@ -435,7 +434,7 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 void *
 Parrot_dyn_dlsym_str(PARROT_INTERP,
-        ARGIN_NULLOK(void *handle), ARGIN_NULLOK(STRING *symbol))
+        ARGIN_NULLOK(void *handle), ARGIN_NULLOK(const STRING *symbol))
 {
     ASSERT_ARGS(Parrot_dyn_dlsym_str)
 
@@ -539,14 +538,9 @@ static STRING *
 clone_string_into(ARGMOD(Interp *d), ARGIN(Interp *s), ARGIN(PMC *value))
 {
     ASSERT_ARGS(clone_string_into)
-    STRING * const  orig    = VTABLE_get_string(s, value);
-    char   * const  raw_str = Parrot_str_to_cstring(s, orig);
-    STRING * const  ret     =
-        Parrot_str_new_init(d, raw_str, strlen(raw_str),
-            Parrot_default_encoding_ptr,
-            PObj_constant_FLAG);
-    Parrot_str_free_cstring(raw_str);
-    return ret;
+    STRING * const  str = VTABLE_get_string(s, value);
+    return Parrot_str_new_init(d, str->strstart, str->bufused,
+            str->encoding, PObj_constant_FLAG);
 }
 
 
@@ -650,7 +644,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_dyn_load_lib(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), ARGIN_NULLOK(PMC *parameters))
+Parrot_dyn_load_lib(PARROT_INTERP,
+        ARGIN_NULLOK(STRING *lib),
+        ARGIN_NULLOK(PMC *parameters))
 {
     ASSERT_ARGS(Parrot_dyn_load_lib)
     /* NULL intializa handle to protect against pitfalls in called functions.

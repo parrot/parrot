@@ -57,7 +57,7 @@ U: heimdall
 E: Nattfodd@gmail.com
 
 N: Allison Randal
-D: Architect (0.4.6...) & Lead Developer
+D: Architect (0.4.6 - 2.8.0) & Lead Developer
 E: allison@parrot.org
 U: allison
 
@@ -224,8 +224,8 @@ U: creiss
 E: creiss@cc.gatech.edu
 
 N: Chip Salzenberg
-D: Release manager emeritus (0.4.6-0.4.7)
-D: Architect emeritus (0.1.2-0.4.5)
+D: Release manager emeritus (0.4.6 - 0.4.7)
+D: Architect emeritus (0.1.2 - 0.4.5)
 U: chip
 E: chip@pobox.com
 
@@ -243,12 +243,11 @@ D: Rakudo patches
 
 N: Christoph Otto
 U: cotto
-D: Patch for key flags in pdd08
+D: Architect (2.9.0 - current)
 D: Range check in Env PMC
 A: christoph_googleacct@mksig.org
 A: christop...@mksig.org
 A: Christoph Otto
-D: Pipp, Lorito taskmaster
 E: christoph@mksig.org
 
 N: chromatic
@@ -299,9 +298,13 @@ N: Damian Miles Knopp
 U: dmknopp
 E: dmknopp@loyola.edu
 
+N: Daniel Kang
+U: jumpyshoes
+D: improve pbc_disassemble's test coverage
+
 N: Dan Sugalski
 U: dan
-D: Architect emeritus (0.0.1-0.1.1)
+D: Architect emeritus (0.0.1 - 0.1.1)
 E: dan@sidhe.org
 W: http://www.sidhe.org/~dan/blog/
 
@@ -322,6 +325,11 @@ E: arbelo@gmail.com
 N: Dave Woldrich
 D: Win32 build fixes
 E: dave@woldrich.com
+
+N: David Czech
+U: kapace
+E: davidczech510@gmail.com
+D: increasing EventHandler test coverage
 
 N: David M. Lloyd
 U: dmlloyd
@@ -674,6 +682,10 @@ U: LylePerl
 D: Win32 and CGI testing
 W: http://perl.bristolbath.org/blog/lyle/
 
+N: Mariano Wahlmann
+E: dichoso@gmail.com
+A: bluescreen
+
 N: Marcelo Serra Castilhos
 E: mhelix@terra.com.br
 D: Bug fix
@@ -712,7 +724,9 @@ N: Matt Kennedy
 D: Some Env PMC method implementations and tests
 
 N: Matt Rajca
-D: Code refactoring
+E: mattmatt.rajca@me.com
+A: mattrajca
+D: Code refactoring, increasing test coverage
 
 N: Mattia Barbon
 D: Win32 fixes, dynamic PMC creation and loading
@@ -1046,6 +1060,11 @@ D: Nicer command line handling in ops2c.pl
 
 N: Tony Payne
 D: Example hanoi.pasm
+
+N: Tony Young
+E: rofflwaffls@gmail.com
+U: rfw
+D: increasing PMC test coverage
 
 N: Tyler Curtis
 U: tcurtis

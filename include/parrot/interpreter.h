@@ -206,8 +206,6 @@ struct parrot_interp_t {
     struct _imc_info_t *imc_info;             /* imcc data */
     Hash               *op_hash;              /* mapping from op names to op_info_t */
 
-    const char         *output_file;          /* where to write output */
-
     PDB_t *pdb;                               /* debug /trace system */
 
     PMC   *dynamic_env;                       /* Dynamic environment stack */
@@ -277,7 +275,6 @@ struct parrot_interp_t {
 typedef enum {
     RESUME_NONE         = 0x00,
     RESUME_RESTART      = 0x01,
-    RESUME_ISJ          = 0x02,
     RESUME_INITIAL      = 0x04
 } resume_flag_enum;
 
@@ -342,8 +339,6 @@ PARROT_DATA STRING *STRINGNULL; /* a single Null STRING */
 typedef opcode_t *(*native_func_t)(PARROT_INTERP,
                                    opcode_t * cur_opcode,
                                    opcode_t * start_code);
-
-VAR_SCOPE native_func_t run_native;
 
 typedef PMC *(*Parrot_compiler_func_t)(PARROT_INTERP,
                                        const char * program);
@@ -470,7 +465,7 @@ STRING* interpinfo_s(PARROT_INTERP, INTVAL what)
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void * Parrot_compile_file(PARROT_INTERP,
-    ARGIN(const char *fullname),
+    ARGIN(STRING *fullname),
     ARGOUT(STRING **error))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -486,6 +481,8 @@ void Parrot_compreg(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

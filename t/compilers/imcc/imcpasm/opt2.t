@@ -11,7 +11,7 @@ use Parrot::Test tests => 6;
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "used once lhs" );
-.sub _main
+.sub _main :main
     $I1 = 1
     $I2 = 2
     print $I2
@@ -27,7 +27,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant propagation and resulting dead code" );
-.sub _main
+.sub _main :main
        set $I0, 5
 loop:
        set $I1, 2
@@ -50,7 +50,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "don't move constant past a label" );
-.sub _main
+.sub _main :main
   set $I1, 10
   set $I0, 5
   lt $I1, 20, nxt
@@ -97,7 +97,7 @@ SKIP: {
     skip( "loop opt disabled for now", 1 );
 
     pir_2_pasm_is( <<'CODE', <<'OUT', "remove invariant from loop" );
-.sub _main
+.sub _main :main
        set $I0, 5
 loop:
        set $I1, 2
@@ -130,7 +130,7 @@ OUT
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "constant prop repeated" );
-.sub _main
+.sub _main :main
   .local int a
   .local int b
   .local int sum

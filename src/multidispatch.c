@@ -1100,7 +1100,7 @@ Parrot_mmd_cache_create(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_mmd_cache_create)
     /* String hash. */
-    Hash *cache = parrot_new_hash(interp);
+    Hash *cache = Parrot_hash_new(interp);
     return cache;
 }
 
@@ -1175,7 +1175,7 @@ Parrot_mmd_cache_lookup_by_values(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     STRING * const key = mmd_cache_key_from_values(interp, name, values);
 
     if (key)
-        return (PMC *)parrot_hash_get(interp, cache, key);
+        return (PMC *)Parrot_hash_get(interp, cache, key);
 
     return PMCNULL;
 }
@@ -1202,7 +1202,7 @@ Parrot_mmd_cache_store_by_values(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     STRING * const key = mmd_cache_key_from_values(interp, name, values);
 
     if (key)
-        parrot_hash_put(interp, cache, key, chosen);
+        Parrot_hash_put(interp, cache, key, chosen);
 }
 
 
@@ -1278,7 +1278,7 @@ Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     const STRING * const key = mmd_cache_key_from_types(interp, name, types);
 
     if (key)
-        return (PMC *)parrot_hash_get(interp, cache, key);
+        return (PMC *)Parrot_hash_get(interp, cache, key);
 
     return PMCNULL;
 }
@@ -1306,7 +1306,7 @@ Parrot_mmd_cache_store_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     STRING * const key = mmd_cache_key_from_types(interp, name, types);
 
     if (key)
-        parrot_hash_put(interp, cache, key, chosen);
+        Parrot_hash_put(interp, cache, key, chosen);
 }
 
 
@@ -1328,7 +1328,7 @@ Parrot_mmd_cache_mark(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
     /* As a small future optimization, note that we only *really* need to mark
     * keys - the candidates will be referenced outside the cache, provided it's
     * invalidated properly. */
-    parrot_mark_hash(interp, cache);
+    Parrot_hash_mark(interp, cache);
 }
 
 
@@ -1347,7 +1347,7 @@ void
 Parrot_mmd_cache_destroy(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
 {
     ASSERT_ARGS(Parrot_mmd_cache_destroy)
-    parrot_hash_destroy(interp, cache);
+    Parrot_hash_destroy(interp, cache);
 }
 
 

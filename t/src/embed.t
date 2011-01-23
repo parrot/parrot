@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -34,11 +34,45 @@ sub linedirective
     return "#line " . $linenum . ' "' . __FILE__ . '"' . "\n";
 }
 
+
+my $common = linedirective(__LINE__) . <<'CODE';
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+#include "parrot/extend_vtable.h"
+
+static void fail(const char *msg);
+static Parrot_String createstring(Parrot_Interp interp, const char * value);
+static Parrot_Interp new_interp();
+
+static void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+static Parrot_String createstring(Parrot_Interp interp, const char * value)
+{
+    return Parrot_new_string(interp, value, strlen(value), (const char*)NULL, 0);
+}
+
+static Parrot_Interp new_interp()
+{
+    Parrot_Interp interp = Parrot_new(NULL);
+    if (!interp)
+        fail("Cannot create parrot interpreter");
+    return interp;
+
+}
+
+CODE
+
 c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, using just the embed.h header" );
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "parrot/embed.h"
 
 void fail(const char *msg);
@@ -68,7 +102,6 @@ c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, crea
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "parrot/embed.h"
 
 void fail(const char *msg);
@@ -139,29 +172,6 @@ CODE
 Done
 Really done
 OUTPUT
-
-my $common = linedirective(__LINE__) . <<'CODE';
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "parrot/embed.h"
-#include "parrot/extend.h"
-
-static void fail(const char *msg);
-static Parrot_String createstring(Parrot_Interp interp, const char * value);
-
-static void fail(const char *msg)
-{
-    fprintf(stderr, "failed: %s\n", msg);
-    exit(EXIT_FAILURE);
-}
-
-static Parrot_String createstring(Parrot_Interp interp, const char * value)
-{
-    return Parrot_new_string(interp, value, strlen(value), (const char*)NULL, 0);
-}
-
-CODE
 
 c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when an opcode is given improper arguments');
 
@@ -241,8 +251,7 @@ c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello wor
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler;
-    Parrot_String errstr;
+    Parrot_String compiler, errstr;
     Parrot_PMC code;
 
     /* Create the interpreter and show a message using parrot io */
@@ -270,6 +279,7 @@ CODE
 Hello, parrot
 Hello, pir
 OUTPUT
+
 
 c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from a sub" );
 
@@ -387,16 +397,8 @@ c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "returning
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler;
-    Parrot_String errstr;
-    Parrot_PMC code;
-    Parrot_PMC rootns;
-    Parrot_String parrotname;
-    Parrot_PMC parrotns;
-    Parrot_String subname;
-    Parrot_PMC sub;
-    Parrot_String msg;
-    Parrot_PMC ret;
+    Parrot_PMC code, rootns, parrotns, sub, ret;
+    Parrot_String compiler, errstr, parrotname, subname, msg;
 
     /* Create the interpreter */
     interp = Parrot_new(NULL);
@@ -425,12 +427,13 @@ int main(void)
     );
 
     /* Get parrot namespace */
-    rootns = Parrot_get_root_namespace(interp);
+    rootns     = Parrot_get_root_namespace(interp);
     parrotname = createstring(interp, "parrot");
-    parrotns = Parrot_PMC_get_pmc_keyed_str(interp, rootns,  parrotname);
+    parrotns   = Parrot_PMC_get_pmc_keyed_str(interp, rootns,  parrotname);
+
     /* Get the sub */
     subname = createstring(interp, "hello");
-    sub = Parrot_PMC_get_pmc_keyed_str(interp, parrotns,  subname);
+    sub     = Parrot_PMC_get_pmc_keyed_str(interp, parrotns,  subname);
 
     /* Execute it */
     msg = createstring(interp, "Hello, ");
@@ -587,7 +590,7 @@ int main(void)
     /* Compile pir */
     compiler = createstring(interp, "PIR");
     code = Parrot_compile_string(interp, compiler,
-".sub externcall\n"
+".sub externcall :main\n"
 "  .param pmc ec\n"
 "  ec()\n"
 "\n"
@@ -635,7 +638,7 @@ int main(void)
     /* Compile pir */
     compiler = createstring(interp, "PIR");
     code = Parrot_compile_string(interp, compiler,
-".sub externcall\n"
+".sub externcall :main\n"
 "  hello()\n"
 "\n"
 ".end\n"

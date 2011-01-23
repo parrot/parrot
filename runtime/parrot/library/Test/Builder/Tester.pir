@@ -260,15 +260,15 @@ description of the test.
 
     .local pmc line_string
     line_string = new 'String'
-    concat line_string, test_type
-    concat line_string, ' '
-    concat line_string, next_result
+    line_string = concat line_string, test_type
+    line_string = concat line_string, ' '
+    line_string = concat line_string, next_result
 
     .local int string_defined
     string_defined = length description
     unless string_defined goto SET_EXPECT_OUTPUT
-    concat line_string, ' - '
-    concat line_string, description
+    line_string = concat line_string, ' - '
+    line_string = concat line_string, description
 
   SET_EXPECT_OUTPUT:
     .local pmc expect_out
@@ -423,20 +423,20 @@ output or diagnostic output.
   REPORT_OUTPUT_MISMATCH:
     .local string diagnostic
     diagnostic = "output mismatch\nhave: "
-    concat diagnostic, received_out_string
-    concat diagnostic, "\nwant: "
-    concat diagnostic, expected_out_string
-    concat diagnostic, "\n"
+    diagnostic = concat diagnostic, received_out_string
+    diagnostic = concat diagnostic, "\nwant: "
+    diagnostic = concat diagnostic, expected_out_string
+    diagnostic = concat diagnostic, "\n"
     test.'diag'( diagnostic )
 
     eq diag_matches, 1, RETURN
 
   REPORT_DIAG_MISMATCH:
     diagnostic = "diagnostic mismatch\nhave: '"
-    concat diagnostic, received_diag_string
-    concat diagnostic, "'\nwant: '"
-    concat diagnostic, expected_diag_string
-    concat diagnostic, "'\n"
+    diagnostic = concat diagnostic, received_diag_string
+    diagnostic = concat diagnostic, "'\nwant: '"
+    diagnostic = concat diagnostic, expected_diag_string
+    diagnostic = concat diagnostic, "'\n"
     test.'diag'( diagnostic )
 
   RETURN:

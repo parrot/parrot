@@ -21,7 +21,7 @@ Getopt::Long::GetOptions(
     "c|gen-c" => \$action{gen_c},
 
     #command line options
-    "no-lines"  => \$options{nolines},
+    "no-lines"  => \$options{nolines}, # Configure.pl --no-line-directives
     "library=s" => \$options{library},
     "testing"   => \$options{testing},
 ) or exit 1;
