@@ -75,11 +75,6 @@ use it explicitly.
 Check the event queue and run event handlers if there are unhandled events.
 Note: Do B<not> use this opcode. It is for internal use only.
 
-=item B<wrapper__>()
-
-Internal opcode to wrap unknown ops from loaded opcode libs.
-Don't use.
-
 =item B<load_bytecode>(in STR)
 
 Load Parrot bytecode from file $1, and search the library path to locate the
@@ -102,12 +97,6 @@ inline op check_events__() :internal :flow {
     disable_event_checking(interp);
     Parrot_cx_handle_tasks(interp, interp->scheduler);
     goto ADDRESS(_this);   /* force this being a branch op */
-}
-
-inline op wrapper__() :internal :flow {
-    opcode_t *pc = CUR_OPCODE;
-    DO_OP(pc, interp);
-    goto ADDRESS(pc);
 }
 
 inline op load_bytecode(in STR) :load_file {

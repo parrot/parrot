@@ -25,7 +25,6 @@ op_lib_t *Parrot_DynOp_core_3_0_0(PARROT_INTERP, long init);
  opcode_t * Parrot_noop(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_check_events(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_check_events__(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_wrapper__(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_load_bytecode_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_load_bytecode_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_load_language_s(opcode_t *, PARROT_INTERP);
