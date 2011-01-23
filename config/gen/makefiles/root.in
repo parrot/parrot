@@ -2138,7 +2138,7 @@ run_tests : test_prep
 	$(PERL) t/harness $(RUN_TEST_FILES)
 
 # Test the Perl5 Modules in the Parrot distribution
-perl_tests :
+perl_tests : test_prep
 	$(PERL) t/harness $(PERL_TEST_FILES)
 
 nocritic_codetest :
