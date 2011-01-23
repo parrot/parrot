@@ -15552,7 +15552,7 @@ Parrot_throw_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     opcode_t *dest;
     opcode_t * const ret    = cur_opcode + 2;
     PMC      * const resume = pmc_new(interp, enum_class_Continuation);
-    STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
+    STRING * const exception_str = CONST_STRING(interp, "Exception");
 
     VTABLE_set_pointer(interp, resume, ret);
 
@@ -15570,7 +15570,7 @@ Parrot_throw_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t * dest;
     PMC * except = PREG(1);
-    STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
+    STRING * const exception_str = CONST_STRING(interp, "Exception");
 
     if (PMC_IS_NULL(except) || !VTABLE_does(interp, except, exception_str))
         except = Parrot_ex_build_exception(interp, EXCEPT_fatal,
@@ -15585,7 +15585,7 @@ Parrot_rethrow_p(opcode_t *cur_opcode, PARROT_INTERP)  {
     const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
     opcode_t * dest;
     PMC * except = PREG(1);
-    STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
+    STRING * const exception_str = CONST_STRING(interp, "Exception");
 
     if (PMC_IS_NULL(except) || !VTABLE_does(interp, except, exception_str)) {
         opcode_t * const ret    = cur_opcode + 2;
@@ -25838,7 +25838,7 @@ op_lib_t core_op_lib = {
   1071,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
-  get_op          /* op_code() */
+  get_op          /* op_code() */ 
 };
 
 /*
