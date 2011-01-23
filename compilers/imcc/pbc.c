@@ -1541,20 +1541,6 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
     Parrot_ns_store_sub(interp, sub_pmc);
 
-    /*
-     * store the sub's strings
-     * XXX these need to occur before the sub to support thawing properly
-     */
-    {
-        PMC *strings = Parrot_freeze_strings(interp, sub_pmc);
-        int        n = VTABLE_elements(interp, strings);
-
-        for (i = 0; i < n; i++) {
-            int unused = add_const_str(interp,
-                VTABLE_get_string_keyed_int(interp, strings, i), interp_code);
-        }
-    }
-
     /* store the sub */
     {
         const int k = add_const_table_pmc(interp, sub_pmc);
@@ -1583,6 +1569,19 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         }
         else if (interp_code->main_sub < 0) {
             interp_code->main_sub = k;
+        }
+
+        /*
+         * store the sub's strings
+         */
+        {
+            PMC *strings = Parrot_freeze_strings(interp, sub_pmc);
+            int        n = VTABLE_elements(interp, strings);
+
+            for (i = 0; i < n; i++) {
+                int unused = add_const_str(interp,
+                    VTABLE_get_string_keyed_int(interp, strings, i), interp_code);
+            }
         }
 
         return k;
