@@ -215,7 +215,17 @@ main(int argc, const char *argv[])
     exit(EXIT_SUCCESS);
 }
 
-PMC *
+/*
+
+=item C<PMC * load_bytecode_file(Parrot_PMC interp, Parrot_String filename)>
+
+Load in a .pbc file to a PackFile PMC
+
+=cut
+
+*/
+
+static PMC *
 load_bytecode_file(Parrot_PMC interp, Parrot_String filename)
 {
     PMC * bytecode = NULL;
