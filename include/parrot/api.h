@@ -15,7 +15,7 @@
 #include "parrot/config.h"
 #include "parrot/core_types.h"
 
-typedef void (*imcc_hack_func_t)(Parrot_PMC, Parrot_String, int, const char **, Parrot_PMC*);
+typedef Parrot_PMC (*imcc_hack_func_t)(Parrot_PMC, Parrot_String, int, const char **);
 
 #define PARROT_API PARROT_EXPORT
 
@@ -753,14 +753,14 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
 /* Forward declaration because IMCC is still part of libparrot */
 
 PARROT_API
-void
+Parrot_PMC
 imcc_run_api(ARGMOD(Parrot_PMC interp_pmc), ARGIN(Parrot_String sourcefile),
-        int argc, ARGIN(const char **argv), ARGOUT(PMC **pbcpmc));
+        int argc, ARGIN(const char **argv));
 
 PARROT_API
-void
+Parrot_PMC
 imcc_do_preprocess_api(ARGMOD(Parrot_PMC interp_pmc), ARGIN(Parrot_String sourcefile),
-        int argc, ARGIN(const char **argv), ARGOUT(PMC **pbcpmc));
+        int argc, ARGIN(const char **argv));
 
 #endif /* PARROT_API_H_GUARD */
 

@@ -75,29 +75,24 @@ void * imcc_compile_file(PARROT_INTERP,
         FUNC_MODIFIES(*error_message);
 
 PARROT_EXPORT
-void imcc_do_preprocess_api(
+PMC * imcc_do_preprocess_api(
     ARGMOD(PMC * interp_pmc),
     ARGIN(STRING *sourcefile),
     int argc,
-    SHIM(const char **argv),
-    ARGOUT_NULLOK(PMC **pbcpmc))
+    SHIM(const char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(* interp_pmc)
-        FUNC_MODIFIES(*pbcpmc);
+        FUNC_MODIFIES(* interp_pmc);
 
 PARROT_EXPORT
-void imcc_run_api(
+PMC * imcc_run_api(
     ARGMOD(PMC * interp_pmc),
     ARGIN(STRING *sourcefile),
     int argc,
-    ARGIN_NULLOK(const char **argv),
-    ARGOUT(PMC **pbcpmc))
+    ARGIN_NULLOK(const char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(* interp_pmc)
-        FUNC_MODIFIES(*pbcpmc);
+        FUNC_MODIFIES(* interp_pmc);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -157,8 +152,7 @@ void imcc_init(PARROT_INTERP)
     , PARROT_ASSERT_ARG(sourcefile))
 #define ASSERT_ARGS_imcc_run_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
-    , PARROT_ASSERT_ARG(sourcefile) \
-    , PARROT_ASSERT_ARG(pbcpmc))
+    , PARROT_ASSERT_ARG(sourcefile))
 #define ASSERT_ARGS_imcc_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s) \

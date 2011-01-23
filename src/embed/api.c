@@ -779,7 +779,7 @@ Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, ARGIN(Parrot_String sourcefile)
 {
     ASSERT_ARGS(Parrot_api_wrap_imcc_hack)
     EMBED_API_CALLIN(interp_pmc, interp)
-    func(interp_pmc, sourcefile, argc, argv, bytecodepmc);
+    *bytecodepmc = func(interp_pmc, sourcefile, argc, argv);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 

@@ -83,13 +83,9 @@ static void imcc_parseflags(PARROT_INTERP,
     ARGIN_NULLOK(const char **argv))
         __attribute__nonnull__(1);
 
-static void imcc_run(PARROT_INTERP,
-    ARGIN(STRING *sourcefile),
-    ARGOUT(PMC **pbcpmc))
+static PMC * imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pbcpmc);
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -118,8 +114,7 @@ static const struct longopt_opt_decl * Parrot_cmd_options(void);
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_imcc_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(sourcefile) \
-    , PARROT_ASSERT_ARG(pbcpmc))
+    , PARROT_ASSERT_ARG(sourcefile))
 #define ASSERT_ARGS_is_all_hex_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_cmd_options __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -530,8 +525,8 @@ compile_to_bytecode(PARROT_INTERP,
 
 /*
 
-=item C<void imcc_run_api(PMC * interp_pmc, STRING *sourcefile, int argc, const
-char **argv, PMC **pbcpmc)>
+=item C<PMC * imcc_run_api(PMC * interp_pmc, STRING *sourcefile, int argc, const
+char **argv)>
 
 This is a wrapper around C<imcc_run> function in which the input parameter is a
 PMC interpreter.
@@ -541,21 +536,21 @@ PMC interpreter.
 */
 
 PARROT_EXPORT
-void
+PMC *
 imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile), int argc,
-        ARGIN_NULLOK(const char **argv), ARGOUT(PMC **pbcpmc))
+        ARGIN_NULLOK(const char **argv))
 {
     ASSERT_ARGS(imcc_run_api)
 
     Interp * const interp = (Interp *)VTABLE_get_pointer(NULL, interp_pmc);
     imcc_parseflags(interp, argc, argv);
-    imcc_run(interp, sourcefile, pbcpmc);
+    return imcc_run(interp, sourcefile);
 }
 
 PARROT_EXPORT
-void
+PMC *
 imcc_do_preprocess_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile),
-        int argc, SHIM(const char **argv), ARGOUT_NULLOK(PMC **pbcpmc))
+        int argc, SHIM(const char **argv))
 {
     ASSERT_ARGS(imcc_do_preprocess_api)
     Interp * const interp = (Interp *)VTABLE_get_pointer(NULL, interp_pmc);
@@ -576,11 +571,12 @@ imcc_do_preprocess_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile),
 
     do_pre_process(interp, yyscanner);
     yylex_destroy(yyscanner);
+    return PMCNULL;
 }
 
 /*
 
-=item C<static void imcc_run(PARROT_INTERP, STRING *sourcefile, PMC **pbcpmc)>
+=item C<static PMC * imcc_run(PARROT_INTERP, STRING *sourcefile)>
 
 Entry point of IMCC, as invoked by Parrot's main function.
 Compile source code (if required), write bytecode file (if required)
@@ -590,17 +586,15 @@ and run. This function always returns 0.
 
 */
 
-static void
-imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile), ARGOUT(PMC **pbcpmc))
+static PMC *
+imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile))
 {
     ASSERT_ARGS(imcc_run)
 
-    yyscan_t           yyscanner;
-    PackFile * pf_raw = NULL;
+    yyscan_t  yyscanner;
+    PackFile *pf_raw = NULL;
     int       is_stdin;
     int       is_stdout;
-
-    *pbcpmc = PMCNULL;
 
     yylex_init_extra(interp, &yyscanner);
 
@@ -638,10 +632,11 @@ imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile), ARGOUT(PMC **pbcpmc))
     yylex_destroy(yyscanner);
 
     if (pf_raw) {
-        PMC * const _pbcpmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
-        VTABLE_set_pointer(interp, _pbcpmc, pf_raw);
-        *pbcpmc = _pbcpmc;
+        PMC * const pbcpmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, pbcpmc, pf_raw);
+        return pbcpmc;
     }
+    return PMCNULL;
 }
 
 /*
