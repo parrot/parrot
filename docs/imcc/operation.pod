@@ -207,11 +207,11 @@ with many interferences) get allocated last.
 
 =head1 Optimization
 
-Optimizations are only done when enabled with the B<-O> switch. Please
-consult F<t/imcpasm/*.t> for examples. They occur between various
-stages and may be repeatedly done: e.g. after converting a conditional
-branch to an absolute one, unreachable code will be removed then,
-which might cause unused labels ...
+Optimizations are only done when enabled with the B<-O> switch.
+
+They occur between various stages and may be repeatedly done: e.g. after
+converting a conditional branch to an absolute one, unreachable code will
+be removed then, which might cause unused labels ...
 
 =head1 OPTIMIZATIONS WITH -O1
 
@@ -240,7 +240,7 @@ A sequence of code:
 will be converted to
 
 =begin PIR_FRAGMENT
-    
+
     .local pmc cond
     # ...
     unless cond, L2

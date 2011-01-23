@@ -67,20 +67,6 @@ static int e_file_open(PARROT_INTERP, ARGIN(void *param))
 
 static const char types[] = "INPS";
 
-static const Emitter emitters[] = {
-    {e_file_open,
-     e_file_emit,
-     NULL,
-     NULL,
-     e_file_close},
-
-    {e_pbc_open,
-     e_pbc_emit,
-     e_pbc_new_sub,
-     e_pbc_end_sub,
-     e_pbc_close},
-};
-
 /*
 
 =item C<Instruction * _mk_instruction(const char *op, const char *fmt, int n,
@@ -692,89 +678,7 @@ static PIOHANDLE output;
 
 /*
 
-=item C<static int e_file_open(PARROT_INTERP, void *param)>
-
-Prints a message to STDOUT.
-
-=cut
-
-*/
-
-static int
-e_file_open(PARROT_INTERP, ARGIN(void *param))
-{
-    ASSERT_ARGS(e_file_open)
-    STRING *output_file = (STRING *)param;
-
-    if (STRING_length(output_file) == 1
-    &&  STRING_ord(interp, output_file, 0) == '-') {
-        output = PIO_STDHANDLE(interp, PIO_STDOUT_FILENO);
-    }
-    else {
-        output = PIO_OPEN(interp, output_file, PIO_F_WRITE);
-        if (output == PIO_INVALID_HANDLE)
-            IMCC_fatal_standalone(interp, EXCEPTION_EXTERNAL_ERROR,
-                "Couldn't open %Ss\n", output_file);
-    }
-
-    Parrot_io_pprintf(interp, output, "# IMCC does produce b0rken PASM files\n");
-    Parrot_io_pprintf(interp, output, "# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392\n");
-    return 1;
-}
-
-/*
-
-=item C<static int e_file_close(PARROT_INTERP, void *param)>
-
-Close STDOUT
-
-=cut
-
-*/
-
-static int
-e_file_close(PARROT_INTERP, SHIM(void *param))
-{
-    ASSERT_ARGS(e_file_close)
-    Parrot_io_pprintf(interp, output, "\n\n");
-    PIO_CLOSE(interp, output);
-    IMCC_info(interp, 1, "assembly module written.\n");
-    return 0;
-}
-
-/*
-
-=item C<static int e_file_emit(PARROT_INTERP, void *param, const IMC_Unit *unit,
-const Instruction *ins)>
-
-emit the Instruction C<ins> to the given IMC_Unit C<unit>, passing C<param>
-
-=cut
-
-*/
-
-static int
-e_file_emit(PARROT_INTERP,
-        SHIM(void *param),
-        SHIM(const IMC_Unit *unit),
-        ARGIN(const Instruction *ins))
-{
-    ASSERT_ARGS(e_file_emit)
-
-    if ((ins->type & ITLABEL) || ! *ins->opname)
-        ins_print(interp, output, ins);
-    else {
-        Parrot_io_pprintf(interp, output, "\t%s ", ins->opname);
-        ins_print(interp, output, ins);
-    }
-
-    Parrot_io_pprintf(interp, output, "\n");
-    return 0;
-}
-
-/*
-
-=item C<int emit_open(PARROT_INTERP, int type, void *param)>
+=item C<int emit_open(PARROT_INTERP)>
 
 Opens the emitter function C<open> of the given C<type>. Passes
 the C<param> to the open function.
@@ -784,13 +688,11 @@ the C<param> to the open function.
 */
 
 int
-emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
+emit_open(PARROT_INTERP)
 {
     ASSERT_ARGS(emit_open)
-    IMCC_INFO(interp)->emitter       = type;
     IMCC_INFO(interp)->dont_optimize = 0;
-
-    return (emitters[IMCC_INFO(interp)->emitter]).open(interp, param);
+    return e_pbc_open(interp);
 }
 
 /*
@@ -809,18 +711,15 @@ emit_flush(PARROT_INTERP, ARGIN_NULLOK(void *param), ARGIN(IMC_Unit *unit))
 {
     ASSERT_ARGS(emit_flush)
     Instruction *ins;
-    int          emitter = IMCC_INFO(interp)->emitter;
 
-    if (emitters[emitter].new_sub)
-        (emitters[emitter]).new_sub(interp, param, unit);
+    e_pbc_new_sub(interp, param, unit);
 
     for (ins = unit->instructions; ins; ins = ins->next) {
         IMCC_debug(interp, DEBUG_IMC, "emit %d\n", ins);
-        (emitters[emitter]).emit(interp, param, unit, ins);
+        e_pbc_emit(interp, param, unit, ins);
     }
 
-    if (emitters[emitter].end_sub)
-        (emitters[emitter]).end_sub(interp, param, unit);
+    e_pbc_end_sub(interp, param, unit);
 
     return 0;
 }
@@ -839,7 +738,7 @@ int
 emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
 {
     ASSERT_ARGS(emit_close)
-    return (emitters[IMCC_INFO(interp)->emitter]).close(interp, param);
+    return e_pbc_close(interp, param);
 }
 
 /*

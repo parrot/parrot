@@ -521,8 +521,8 @@ value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_pmc_wrap_string_array(ARGIN(Parrot_PMC interp_pmc), ARGIN_NULLOK(Parrot_Int argc),
-        ARGIN(const char ** argv), ARGOUT(Parrot_PMC * args))
+Parrot_api_pmc_wrap_string_array(ARGIN(Parrot_PMC interp_pmc), Parrot_Int argc,
+        ARGIN_NULLOK(const char ** argv), ARGOUT(Parrot_PMC * args))
 {
     ASSERT_ARGS(Parrot_api_pmc_wrap_string_array)
     EMBED_API_CALLIN(interp_pmc, interp)

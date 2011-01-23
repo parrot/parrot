@@ -73,19 +73,6 @@ typedef enum {
 } Instruction_Flags;
 #undef INSTRUCTION_BIT
 
-/* Functions */
-/* Globals */
-
-typedef struct _emittert {
-    int (*open)(PARROT_INTERP, void *param);
-    int (*emit)(PARROT_INTERP, void *param, const IMC_Unit *, const Instruction *ins);
-    int (*new_sub)(PARROT_INTERP, void *param, IMC_Unit *);
-    int (*end_sub)(PARROT_INTERP, void *param, IMC_Unit *);
-    int (*close)(PARROT_INTERP, void *param);
-} Emitter;
-
-enum Emitter_type { EMIT_FILE, EMIT_PBC };
-
 /* HEADERIZER BEGIN: compilers/imcc/instructions.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -125,7 +112,7 @@ int emit_flush(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-int emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
+int emit_open(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL

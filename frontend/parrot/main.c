@@ -705,6 +705,8 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     args->have_pbc_file = 0;
     args->trace = 0;
     args->turn_gc_off = 0;
+    args->outfile = NULL;
+    args->sourcefile = NULL;
 
     if (argc == 1) {
         usage(stderr);
@@ -774,6 +776,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
           case 'V':
             Parrot_version();
             break;
+          case OPT_PBC_OUTPUT:
           case 'o':
             args->write_packfile = 1;
             args->execute_packfile = 0;

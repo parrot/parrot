@@ -387,7 +387,7 @@ add_const_table_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
-=item C<int e_pbc_open(PARROT_INTERP, void *param)>
+=item C<int e_pbc_open(PARROT_INTERP)>
 
 Opens a compilation unit to emit PBC.
 
@@ -396,7 +396,7 @@ Opens a compilation unit to emit PBC.
 */
 
 int
-e_pbc_open(PARROT_INTERP, SHIM(void *param))
+e_pbc_open(PARROT_INTERP)
 {
     ASSERT_ARGS(e_pbc_open)
     PackFile_ByteCode * const current_bc = Parrot_pf_get_current_code_segment(interp);

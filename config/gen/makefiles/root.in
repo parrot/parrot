@@ -2325,7 +2325,6 @@ dynext-clean :
 # or is there an automatic xargs?
 test-clean :
 	$(RM_F) t/compilers/data_json/*.pir
-	$(RM_F) t/compilers/imcc/imcpasm/*.pir
 	$(RM_F) t/compilers/imcc/syn/*.pir t/compilers/imcc/syn/*.pasm
 	$(RM_F) t/compilers/imcc/reg/*.pir t/compilers/imcc/reg/*.pasm
 	$(RM_F) t/compilers/pct/*.pir

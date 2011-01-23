@@ -230,8 +230,6 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN_NULLOK(const char **argv))
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     STRING *output_file = STRINGNULL;
 
-    /* default state: run pbc */
-    SET_STATE_RUN_PBC(interp);
     if (!argv)
         return;
 
@@ -256,12 +254,6 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN_NULLOK(const char **argv))
             break;
           case 'E':
             SET_STATE_PRE_PROCESS(interp);
-            break;
-          case OPT_PBC_OUTPUT:
-            UNSET_STATE_RUN_PBC(interp);
-            SET_STATE_WRITE_PBC(interp);
-            if (STRING_IS_NULL(output_file))
-                output_file = Parrot_str_new(interp, "-", 1);
             break;
 
           case 'O':
@@ -494,7 +486,6 @@ compile_to_bytecode(PARROT_INTERP,
 {
     ASSERT_ARGS(compile_to_bytecode)
     PackFile *pf;
-    const int per_pbc   = STATE_WRITE_PBC(interp) || STATE_RUN_PBC(interp);
     const int opt_level = IMCC_INFO(interp)->optimizer_level;
 
     /* Shouldn't be more than five, but five extra is cheap */
@@ -514,8 +505,7 @@ compile_to_bytecode(PARROT_INTERP,
     IMCC_push_parser_state(interp);
     IMCC_INFO(interp)->state->file = sourcefile;
 
-    //emit_open(interp, per_pbc, per_pbc ? STRINGNULL : output_file);
-    emit_open(interp, per_pbc, STRINGNULL);
+    emit_open(interp);
 
     IMCC_info(interp, 1, "Starting parse...\n");
 
@@ -536,8 +526,8 @@ compile_to_bytecode(PARROT_INTERP,
     PIO_CLOSE(interp, imc_yyin_get(yyscanner));
 
     IMCC_info(interp, 1, "%ld lines compiled.\n", IMCC_INFO(interp)->line);
-    if (per_pbc && !IMCC_INFO(interp)->write_pbc)
-        PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
+    PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
+    PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     return pf;
 }
 
@@ -610,7 +600,8 @@ imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile), ARGOUT(PMC **pbcpmc))
         return 0;
     }
 
-    IMCC_INFO(interp)->write_pbc = STATE_WRITE_PBC(interp) ? 1 : 0;
+    //IMCC_INFO(interp)->write_pbc = STATE_WRITE_PBC(interp) ? 1 : 0;
+    IMCC_INFO(interp)->write_pbc = 1;
 
     if (IMCC_INFO(interp)->verbose) {
         IMCC_info(interp, 1, "debug = 0x%x\n", IMCC_INFO(interp)->debug);
@@ -639,8 +630,7 @@ imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile), ARGOUT(PMC **pbcpmc))
         *pbcpmc = _pbcpmc;
     }
 
-    /* should the bytecode be run */
-    return STATE_RUN_PBC(interp) ? 1 : 0;
+    return 1;
 }
 
 /*

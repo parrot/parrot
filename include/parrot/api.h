@@ -662,11 +662,10 @@ Parrot_Int Parrot_api_pmc_set_string(
 PARROT_API
 Parrot_Int Parrot_api_pmc_wrap_string_array(
     ARGIN(Parrot_PMC interp_pmc),
-    ARGIN_NULLOK(Parrot_Int argc),
-    ARGIN(const char ** argv),
+    Parrot_Int argc,
+    ARGIN_NULLOK(const char ** argv),
     ARGOUT(Parrot_PMC * args))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         FUNC_MODIFIES(* args);
 
@@ -753,7 +752,6 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
 #define ASSERT_ARGS_Parrot_api_pmc_wrap_string_array \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
-    , PARROT_ASSERT_ARG(argv) \
     , PARROT_ASSERT_ARG(args))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/pmc.c */

@@ -1301,7 +1301,7 @@ compile_file(PARROT_INTERP, PIOHANDLE file, void *yyscanner)
     yy_switch_to_buffer(yy_create_buffer((FILE *)file, YY_BUF_SIZE, yyscanner),
         yyscanner);
 
-    emit_open(interp, 1, NULL);
+    emit_open(interp);
 
     imcc_run_compilation(interp, yyscanner);
 
@@ -1320,7 +1320,7 @@ compile_string(PARROT_INTERP, const char *s, void *yyscanner)
 
     yy_scan_string(s, yyscanner);
 
-    emit_open(interp, 1, NULL);
+    emit_open(interp);
 
     imcc_run_compilation(interp, yyscanner);
 
