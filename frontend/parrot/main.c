@@ -174,10 +174,6 @@ main(int argc, const char *argv[])
     Parrot_String output_str;
 
     GET_INIT_STRUCT(initargs);
-    /* internationalization setup */
-    /* setlocale(LC_ALL, ""); */
-    /* PARROT_BINDTEXTDOMAIN(PACKAGE, LOCALEDIR); */
-    /* PARROT_TEXTDOMAIN(PACKAGE); */
 
     /* Parse minimal subset of flags */
     parseflags_minimal(initargs, argc, argv);
