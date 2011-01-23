@@ -224,20 +224,6 @@ inline op jump(in LABEL) :base_loop :flow {
     goto ADDRESS(loc);
 }
 
-########################################
-
-=item B<enternative>()
-
-Internal opcode used to jump from normal bytecode into a JITted version.
-
-=cut
-
-op enternative() :flow {
-    opcode_t * const addr = run_native(interp, CUR_OPCODE,
-            interp->code->base.data);
-    goto ADDRESS(addr);
-}
-
 =back
 
 =cut

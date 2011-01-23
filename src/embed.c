@@ -887,56 +887,6 @@ Parrot_disassemble(PARROT_INTERP,
 
 /*
 
-=item C<void Parrot_run_native(PARROT_INTERP, native_func_t func)>
-
-Runs the C function C<func> through the program C<[enternative, end]>.  This
-ensures that the function runs with the same setup as in other run loops.
-
-This function is used in some of the source tests in F<t/src> which use
-the interpreter outside a runloop.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_run_native(PARROT_INTERP, native_func_t func)
-{
-    ASSERT_ARGS(Parrot_run_native)
-    op_lib_t *core_ops  = PARROT_GET_CORE_OPLIB(interp);
-    PackFile * const pf = PackFile_new(interp, 0);
-    static opcode_t program_code[2] = {
-        0, /* enternative */
-        1  /* end */
-    };
-
-    static op_func_t op_func_table[2];
-    op_func_table[0] = core_ops->op_func_table[PARROT_OP_enternative];
-    op_func_table[1] = core_ops->op_func_table[PARROT_OP_end];
-
-
-    pf->cur_cs = (PackFile_ByteCode *)
-        (pf->PackFuncs[PF_BYTEC_SEG].new_seg)(interp, pf,
-                Parrot_str_new_constant(interp, "code"), 1);
-    pf->cur_cs->base.data     = program_code;
-    pf->cur_cs->base.size     = 2;
-    pf->cur_cs->op_func_table = op_func_table;
-    /* TODO fill out cur_cs with op_mapping */
-
-    Parrot_pf_set_current_packfile(interp, pf);
-
-    run_native = func;
-
-    if (interp->code && interp->code->const_table)
-        Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
-
-    runops(interp, interp->resume_offset);
-}
-
-
-/*
-
 =item C<Parrot_PMC Parrot_compile_string(PARROT_INTERP, Parrot_String type,
 const char *code, Parrot_String *error)>
 

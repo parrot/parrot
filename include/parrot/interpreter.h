@@ -341,8 +341,6 @@ typedef opcode_t *(*native_func_t)(PARROT_INTERP,
                                    opcode_t * cur_opcode,
                                    opcode_t * start_code);
 
-VAR_SCOPE native_func_t run_native;
-
 typedef PMC *(*Parrot_compiler_func_t)(PARROT_INTERP,
                                        const char * program);
 

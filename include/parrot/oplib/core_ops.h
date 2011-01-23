@@ -37,7 +37,6 @@ op_lib_t *Parrot_DynOp_core_3_0_0(PARROT_INTERP, long init);
  opcode_t * Parrot_local_return_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_jump_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_jump_ic(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_enternative(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_if_i_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_if_n_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_if_s_ic(opcode_t *, PARROT_INTERP);
