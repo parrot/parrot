@@ -1,11 +1,11 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 
 =head1 NAME
 
-src/packout.c - Functions for writing out packfiles
+src/packfile/output.c - Functions for writing out packfiles
 
 =head1 DESCRIPTION
 
@@ -172,7 +172,8 @@ Update C<ct>'s backref hash with new entries from C<seen>.
 
 PARROT_INLINE
 static void
-update_backref_hash(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct), ARGIN(Hash *seen), INTVAL constno)
+update_backref_hash(PARROT_INTERP,
+                    ARGIN(PackFile_ConstTable *ct), ARGIN(Hash *seen), INTVAL constno)
 {
     ASSERT_ARGS(update_backref_hash)
     parrot_hash_iterate(seen, {
