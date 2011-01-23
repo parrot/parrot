@@ -570,7 +570,6 @@ typedef struct _imc_info_t {
     int                   nkeys;
     int                   compiler_state;         /* see PBC_* flags */
     int                   verbose;
-    int                   write_pbc;
     int                   seen_main;
     opcode_t              npc;
 } imc_info_t;

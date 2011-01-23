@@ -600,9 +600,6 @@ imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile), ARGOUT(PMC **pbcpmc))
         return 0;
     }
 
-    //IMCC_INFO(interp)->write_pbc = STATE_WRITE_PBC(interp) ? 1 : 0;
-    IMCC_INFO(interp)->write_pbc = 1;
-
     if (IMCC_INFO(interp)->verbose) {
         IMCC_info(interp, 1, "debug = 0x%x\n", IMCC_INFO(interp)->debug);
         if (is_stdin)
