@@ -416,7 +416,8 @@ imcc_get_optimization_description(const PARROT_INTERP, int opt_level, ARGMOD(cha
         opt_desc[i++] = 'c';
 
     opt_desc[i] = '\0';
-    return;
+    IMCC_info(interp, 1, "using optimization '-O%s' (%x) \n",
+              opt_desc, opt_level);
 }
 
 /*
@@ -469,71 +470,6 @@ determine_input_file_type(PARROT_INTERP, ARGIN(STRING *sourcefile))
     }
 
     return handle;
-}
-
-/*
-
-=item C<static PackFile * compile_to_bytecode(PARROT_INTERP, STRING *sourcefile,
-yyscan_t yyscanner)>
-
-Compile source code into bytecode (or die trying).
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PackFile *
-compile_to_bytecode(PARROT_INTERP,
-                    ARGIN(STRING *sourcefile),
-                    ARGIN(yyscan_t yyscanner))
-{
-    ASSERT_ARGS(compile_to_bytecode)
-    PackFile *pf;
-    const int opt_level = IMCC_INFO(interp)->optimizer_level;
-
-    /* Shouldn't be more than five, but five extra is cheap */
-    char opt_desc[10];
-
-    imcc_get_optimization_description(interp, opt_level, opt_desc);
-
-    IMCC_info(interp, 1, "using optimization '-O%s' (%x) \n",
-              opt_desc, opt_level);
-
-    pf = PackFile_new(interp, 0);
-    Parrot_pf_set_current_packfile(interp, pf);
-    /* If I comment out the above two lines and replace with this one below,
-       Parrot builds and all tests pass. */
-    /*pf = Parrot_pf_get_current_packfile(interp);*/
-
-    IMCC_push_parser_state(interp);
-    IMCC_INFO(interp)->state->file = sourcefile;
-
-    emit_open(interp);
-
-    IMCC_info(interp, 1, "Starting parse...\n");
-
-    IMCC_INFO(interp)->state->pasm_file = STATE_PASM_FILE(interp) ? 1 : 0;
-
-    imcc_run_compilation(interp, yyscanner);
-    if (IMCC_INFO(interp)->error_code) {
-        IMCC_INFO(interp)->error_code=IMCC_FATAL_EXCEPTION;
-        IMCC_warning(interp, "error:imcc:%Ss", IMCC_INFO(interp)->error_message);
-        IMCC_print_inc(interp);
-
-        imc_cleanup(interp, yyscanner);
-        Parrot_x_jump_out_error(interp, IMCC_FATAL_EXCEPTION);
-    }
-
-    imc_cleanup(interp, yyscanner);
-
-    PIO_CLOSE(interp, imc_yyin_get(yyscanner));
-
-    IMCC_info(interp, 1, "%ld lines compiled.\n", IMCC_INFO(interp)->line);
-    PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
-    PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
-    return pf;
 }
 
 /*
@@ -603,9 +539,10 @@ static PMC *
 imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile))
 {
     ASSERT_ARGS(imcc_run)
-
     yyscan_t  yyscanner;
     PackFile *pf_raw = NULL;
+    const int opt_level = IMCC_INFO(interp)->optimizer_level;
+    char opt_desc[10];
 
     yylex_init_extra(interp, &yyscanner);
     {
@@ -613,9 +550,38 @@ imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile))
         imc_yyin_set(in_file, yyscanner);
     }
 
-    pf_raw = compile_to_bytecode(interp, sourcefile, yyscanner);
+    imcc_get_optimization_description(interp, opt_level, opt_desc);
 
+    pf_raw = PackFile_new(interp, 0);
+    /* TODO: Don't set current packfile in the interpreter. Leave the
+             interpreter alone */
+    Parrot_pf_set_current_packfile(interp, pf_raw);
+
+    IMCC_push_parser_state(interp);
+    IMCC_INFO(interp)->state->file = sourcefile;
+    IMCC_INFO(interp)->state->pasm_file = STATE_PASM_FILE(interp) ? 1 : 0;
+    emit_open(interp);
+
+    IMCC_info(interp, 1, "Starting parse...\n");
+    imcc_run_compilation(interp, yyscanner);
+    if (IMCC_INFO(interp)->error_code) {
+        IMCC_INFO(interp)->error_code = IMCC_FATAL_EXCEPTION;
+        IMCC_warning(interp, "error:imcc:%Ss", IMCC_INFO(interp)->error_message);
+        IMCC_print_inc(interp);
+
+        PIO_CLOSE(interp, imc_yyin_get(yyscanner));
+        imc_cleanup(interp, yyscanner);
+        yylex_destroy(yyscanner);
+        Parrot_x_jump_out_error(interp, IMCC_FATAL_EXCEPTION);
+    }
+
+    imc_cleanup(interp, yyscanner);
     yylex_destroy(yyscanner);
+    PIO_CLOSE(interp, imc_yyin_get(yyscanner));
+
+    IMCC_info(interp, 1, "%ld lines compiled.\n", IMCC_INFO(interp)->line);
+    PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
+    PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
 
     if (pf_raw) {
         PMC * const pbcpmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
