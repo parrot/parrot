@@ -491,7 +491,7 @@ typedef enum _AsmState {
     AsmInYield
 } AsmState;
 
-void IMCC_push_parser_state(PARROT_INTERP);
+void IMCC_push_parser_state(PARROT_INTERP, STRING *filename, int is_pasm);
 void IMCC_pop_parser_state(PARROT_INTERP, void *yyscanner);
 
 /* globals store the state between individual e_pbc_emit calls */

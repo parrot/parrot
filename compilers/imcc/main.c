@@ -54,8 +54,11 @@ static PIOHANDLE determine_input_file_type(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void do_pre_process(PARROT_INTERP, yyscan_t yyscanner)
-        __attribute__nonnull__(1);
+static void do_pre_process(PARROT_INTERP,
+    ARGIN(STRING * sourcefile),
+    yyscan_t yyscanner)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void imcc_destroy_macro_values(ARGMOD(void *value))
         __attribute__nonnull__(1)
@@ -88,7 +91,8 @@ static const struct longopt_opt_decl * Parrot_cmd_options(void);
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sourcefile))
 #define ASSERT_ARGS_do_pre_process __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sourcefile))
 #define ASSERT_ARGS_imcc_destroy_macro_values __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_imcc_get_optimization_description \
@@ -259,7 +263,8 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN_NULLOK(const char **argv))
 
 /*
 
-=item C<static void do_pre_process(PARROT_INTERP, yyscan_t yyscanner)>
+=item C<static void do_pre_process(PARROT_INTERP, STRING * sourcefile, yyscan_t
+yyscanner)>
 
 Pre-processor step.  Turn parser's output codes into Parrot instructions.
 
@@ -268,13 +273,13 @@ Pre-processor step.  Turn parser's output codes into Parrot instructions.
 */
 
 static void
-do_pre_process(PARROT_INTERP, yyscan_t yyscanner)
+do_pre_process(PARROT_INTERP, ARGIN(STRING * sourcefile), yyscan_t yyscanner)
 {
     ASSERT_ARGS(do_pre_process)
     int       c;
     YYSTYPE   val;
 
-    IMCC_push_parser_state(interp);
+    IMCC_push_parser_state(interp, sourcefile, 0);
     c = yylex(&val, yyscanner, interp); /* is reset at end of while loop */
     while (c) {
         switch (c) {
@@ -502,7 +507,7 @@ imcc_do_preprocess_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile),
         imc_yyin_set(in_file, yyscanner);
     }
 
-    do_pre_process(interp, yyscanner);
+    do_pre_process(interp, sourcefile, yyscanner);
     yylex_destroy(yyscanner);
     return PMCNULL;
 }
@@ -540,9 +545,7 @@ imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile))
              interpreter alone */
     Parrot_pf_set_current_packfile(interp, pf_raw);
 
-    IMCC_push_parser_state(interp);
-    IMCC_INFO(interp)->state->file = sourcefile;
-    IMCC_INFO(interp)->state->pasm_file = STATE_PASM_FILE(interp) ? 1 : 0;
+    IMCC_push_parser_state(interp, sourcefile, STATE_PASM_FILE(interp) ? 1 : 0);
     emit_open(interp);
 
     IMCC_info(interp, 1, "Starting parse...\n");
@@ -648,15 +651,13 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
         }
     }
 
-    IMCC_push_parser_state(interp);
+    IMCC_push_parser_state(interp, name, 0);
     next = IMCC_INFO(interp)->state->next;
 
     if (imc_info)
         IMCC_INFO(interp)->state->next = NULL;
 
     IMCC_INFO(interp)->state->pasm_file = pasm_file;
-    IMCC_INFO(interp)->state->file      = name;
-    IMCC_INFO(interp)->expect_pasm      = 0;
 
     compile_string(interp, s, yyscanner);
 
@@ -854,6 +855,8 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
     const char               *ext;
     PIOHANDLE                 fp;
     PMC                      *newcontext;
+    const int is_pasm = imcc_string_ends_with(interp, fullname, ".pasm");
+    void *yyscanner;
 
     /* need at least 3 regs for compilation of constant math e.g.
      * add_i_ic_ic - see also IMCC_subst_constants() */
@@ -876,8 +879,8 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
         IMCC_fatal(interp, EXCEPTION_EXTERNAL_ERROR,
                 "imcc_compile_file: couldn't open '%Ss'\n", fullname);
 
-    IMCC_push_parser_state(interp);
-    IMCC_INFO(interp)->state->file = fullname;
+    IMCC_push_parser_state(interp, fullname, is_pasm);
+    yylex_init_extra(interp, &yyscanner);
 
     /* start over; let the start of line rule increment this to 1 */
     IMCC_INFO(interp)->line = 0;
@@ -895,25 +898,9 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
     IMCC_INFO(interp)->cur_namespace = NULL;
     interp->code                     = NULL;
 
-    if (imcc_string_ends_with(interp, fullname, ".pasm")) {
-        void *yyscanner;
-        yylex_init_extra(interp, &yyscanner);
+    compile_file(interp, fp, yyscanner);
 
-        IMCC_INFO(interp)->state->pasm_file = 1;
-        /* see imcc.l */
-        compile_file(interp, fp, yyscanner);
-
-        yylex_destroy(yyscanner);
-    }
-    else {
-        void *yyscanner;
-        yylex_init_extra(interp, &yyscanner);
-
-        IMCC_INFO(interp)->state->pasm_file = 0;
-        compile_file(interp, fp, yyscanner);
-
-        yylex_destroy(yyscanner);
-    }
+    yylex_destroy(yyscanner);
 
     Parrot_unblock_GC_mark(interp);
     Parrot_pop_context(interp);

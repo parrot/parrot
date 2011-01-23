@@ -1252,7 +1252,7 @@ scan_file(PARROT_INTERP, macro_frame_t *frame, PIOHANDLE file, void *yyscanner)
 }
 
 void
-IMCC_push_parser_state(PARROT_INTERP)
+IMCC_push_parser_state(PARROT_INTERP, STRING *filename, int is_pasm)
 {
     macro_frame_t * const frame = new_frame(interp);
     frame->s.next             = (parser_state_t *)IMCC_INFO(interp)->frames;
@@ -1260,6 +1260,8 @@ IMCC_push_parser_state(PARROT_INTERP)
     frame->s.line             = IMCC_INFO(interp)->line
                               = 1;
     IMCC_INFO(interp)->state  = (parser_state_t *)IMCC_INFO(interp)->frames;
+    IMCC_INFO(interp)->state->file = filename;
+    IMCC_INFO(interp)->state->pasm_file = is_pasm;
 }
 
 static void
