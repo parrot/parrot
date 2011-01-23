@@ -27,6 +27,7 @@ Start Parrot
 struct init_args_t {
     const char *run_core_name;
     Parrot_String sourcefile;
+    Parrot_String outfile;
     Parrot_Int trace;
     Parrot_Int execute_packfile;
     Parrot_Int write_packfile;
@@ -53,6 +54,7 @@ PARROT_PURE_FUNCTION
 static int is_all_hex_digits(ARGIN(const char *s))
         __attribute__nonnull__(1);
 
+static PMC * load_bytecode_file(Parrot_PMC interp, Parrot_String filename);
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const struct longopt_opt_decl * Parrot_cmd_options(void);
@@ -101,12 +103,19 @@ static void usage(ARGMOD(FILE *fp))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*fp);
 
+static void verify_file_names(const char * input, const char * output);
+static void write_bytecode_file(
+    Parrot_PMC interp,
+    Parrot_String filename,
+    Parrot_PMC pbc);
+
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_help_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_is_all_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_is_all_hex_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_load_bytecode_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_cmd_options __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_confess __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(condition) \
@@ -125,11 +134,10 @@ static void usage(ARGMOD(FILE *fp))
 #define ASSERT_ARGS_show_last_error_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(fp))
+#define ASSERT_ARGS_verify_file_names __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_write_bytecode_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-PMC * load_bytecode_file(Parrot_PMC interp, Parrot_String filename);
-
 
 /*
 
@@ -175,6 +183,7 @@ main(int argc, const char *argv[])
     /* Parse flags */
     parseflags(interp, argc, argv, &pir_argc, &pir_argv, &parsed_flags);
     source_str = parsed_flags.sourcefile;
+    output_str = parsed_flags.outfile;
 
     if (!Parrot_api_set_runcore(interp, parsed_flags.run_core_name, parsed_flags.trace))
         show_last_error_and_exit(interp);
@@ -194,13 +203,12 @@ main(int argc, const char *argv[])
             Parrot_api_toggle_gc(interp, 1);
     }
 
+    /* -o outputs the file. -r outputs it and reads it in again from .pbc */
     if (parsed_flags.write_packfile) {
-        /* TODO: Write the packfile in bytecodepmc to disk with the given
-                 output file name. */
-        if (parsed_flags.execute_packfile) {
-            /* This is the -r option. Read it back in again */
-            //if (!Parrot_api_load_bytecode_file(interp,
-        }
+        if (!Parrot_api_write_bytecode_to_file(interp, bytecodepmc, output_str));
+            show_last_error_and_exit(interp);
+        if (parsed_flags.execute_packfile)
+            bytecodepmc = load_bytecode_file(interp, output_str);
     }
 
     if (parsed_flags.execute_packfile) {
@@ -217,7 +225,8 @@ main(int argc, const char *argv[])
 
 /*
 
-=item C<PMC * load_bytecode_file(Parrot_PMC interp, Parrot_String filename)>
+=item C<static PMC * load_bytecode_file(Parrot_PMC interp, Parrot_String
+filename)>
 
 Load in a .pbc file to a PackFile PMC
 
@@ -232,6 +241,24 @@ load_bytecode_file(Parrot_PMC interp, Parrot_String filename)
     if (!Parrot_api_load_bytecode_file(interp, filename, &bytecode))
         show_last_error_and_exit(interp);
     return bytecode;
+}
+
+/*
+
+=item C<static void write_bytecode_file(Parrot_PMC interp, Parrot_String
+filename, Parrot_PMC pbc)>
+
+Write a packfile PMC to a .pbc file.
+
+=cut
+
+*/
+
+static void
+write_bytecode_file(Parrot_PMC interp, Parrot_String filename, Parrot_PMC pbc)
+{
+    if (!Parrot_api_write_bytecode_to_file(interp, pbc, filename))
+        show_last_error_and_exit(interp);
 }
 
 /*
@@ -668,6 +695,8 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
 {
     ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
+    const char * infile = NULL;
+    const char * outfile = NULL;
     int status;
     int result = 1;
     args->run_core_name = "slow";
@@ -748,9 +777,9 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
           case 'o':
             args->write_packfile = 1;
             args->execute_packfile = 0;
-            /* IMCC is going to read this option too, and handle it. */
-            /* TODO: Move this logic out of IMCC. IMCC should return a
-                     packfile and we can write it out to a file ourselves. */
+            outfile = opt.opt_arg;
+            if (!Parrot_api_string_import(interp, opt.opt_arg, &args->outfile))
+                show_last_error_and_exit(interp);
             break;
           case 'r':
             args->write_packfile = 1;
@@ -821,12 +850,25 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     {
         const char * sourcefile = (*pgm_argv)[0];
         const char * ext = strrchr(sourcefile, '.');
-        if (ext && !strcmp(ext, ".pbc"))
+        if (sourcefile && ext && !strcmp(ext, ".pbc"))
             args->have_pbc_file = 1;
+        verify_file_names(sourcefile, outfile);
         if (!Parrot_api_string_import(interp, sourcefile, &args->sourcefile))
             show_last_error_and_exit(interp);
     }
 }
+
+static void
+verify_file_names(const char * input, const char * output)
+{
+    const char is_stdin = (input == NULL);
+    const char is_stdout = (output == NULL);
+    if (!is_stdin && !is_stdout && !strcmp(input, output)) {
+        fprintf(stderr, "Input and output files are the same");
+        exit(EXIT_FAILURE);
+    }
+}
+
 /*
 
 =back

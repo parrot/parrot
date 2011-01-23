@@ -53,20 +53,13 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile * compile_to_bytecode(PARROT_INTERP,
     ARGIN(STRING *sourcefile),
-    ARGIN(STRING *output_file),
     ARGIN(yyscan_t yyscanner))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(3);
 
 static PIOHANDLE determine_input_file_type(PARROT_INTERP,
     ARGIN(STRING *sourcefile))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void determine_output_file_type(PARROT_INTERP,
-    ARGIN(STRING *output_file))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -85,24 +78,18 @@ static void imcc_get_optimization_description(
         FUNC_MODIFIES(*opt_desc);
 
 PARROT_CAN_RETURN_NULL
-static STRING * imcc_parseflags(PARROT_INTERP,
+static void imcc_parseflags(PARROT_INTERP,
     int argc,
     ARGIN_NULLOK(const char **argv))
         __attribute__nonnull__(1);
 
 static int imcc_run(PARROT_INTERP,
     ARGIN(STRING *sourcefile),
-    ARGIN(STRING *output_file),
     ARGOUT(PMC **pbcpmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
         FUNC_MODIFIES(*pbcpmc);
-
-static void imcc_write_pbc(PARROT_INTERP, ARGIN(STRING *output_file))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -116,14 +103,10 @@ static const struct longopt_opt_decl * Parrot_cmd_options(void);
 #define ASSERT_ARGS_compile_to_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sourcefile) \
-    , PARROT_ASSERT_ARG(output_file) \
     , PARROT_ASSERT_ARG(yyscanner))
 #define ASSERT_ARGS_determine_input_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sourcefile))
-#define ASSERT_ARGS_determine_output_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(output_file))
 #define ASSERT_ARGS_do_pre_process __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_imcc_destroy_macro_values __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -136,11 +119,7 @@ static const struct longopt_opt_decl * Parrot_cmd_options(void);
 #define ASSERT_ARGS_imcc_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sourcefile) \
-    , PARROT_ASSERT_ARG(output_file) \
     , PARROT_ASSERT_ARG(pbcpmc))
-#define ASSERT_ARGS_imcc_write_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(output_file))
 #define ASSERT_ARGS_is_all_hex_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_cmd_options __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -235,8 +214,7 @@ Parrot_cmd_options(void)
 
 /*
 
-=item C<static STRING * imcc_parseflags(PARROT_INTERP, int argc, const char
-**argv)>
+=item C<static void imcc_parseflags(PARROT_INTERP, int argc, const char **argv)>
 
 Parse flags ans set approptiate state(s)
 
@@ -245,7 +223,7 @@ Parse flags ans set approptiate state(s)
 */
 
 PARROT_CAN_RETURN_NULL
-static STRING *
+static void
 imcc_parseflags(PARROT_INTERP, int argc, ARGIN_NULLOK(const char **argv))
 {
     ASSERT_ARGS(imcc_parseflags)
@@ -255,7 +233,7 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN_NULLOK(const char **argv))
     /* default state: run pbc */
     SET_STATE_RUN_PBC(interp);
     if (!argv)
-        return STRINGNULL;
+        return;
 
     while (longopt_get(argc, argv, Parrot_cmd_options(), &opt) > 0) {
         switch (opt.opt_id) {
@@ -279,11 +257,6 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN_NULLOK(const char **argv))
           case 'E':
             SET_STATE_PRE_PROCESS(interp);
             break;
-          case 'o':
-            UNSET_STATE_RUN_PBC(interp);
-            output_file = Parrot_str_from_platform_cstring(interp, opt.opt_arg);
-            break;
-
           case OPT_PBC_OUTPUT:
             UNSET_STATE_RUN_PBC(interp);
             SET_STATE_WRITE_PBC(interp);
@@ -315,7 +288,6 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN_NULLOK(const char **argv))
             break;
         }
     }
-    return output_file;
 }
 
 /*
@@ -465,51 +437,6 @@ imcc_get_optimization_description(const PARROT_INTERP, int opt_level, ARGMOD(cha
 
 /*
 
-=item C<static void imcc_write_pbc(PARROT_INTERP, STRING *output_file)>
-
-Output packed bytecode file.
-
-=cut
-
-*/
-
-static void
-imcc_write_pbc(PARROT_INTERP, ARGIN(STRING *output_file))
-{
-    ASSERT_ARGS(imcc_write_pbc)
-    size_t     size;
-    opcode_t  *packed;
-    PIOHANDLE  fp;
-    PackFile_ByteCode * const interp_code = Parrot_pf_get_current_code_segment(interp);
-
-    IMCC_info(interp, 1, "Writing %Ss\n", output_file);
-
-    size = PackFile_pack_size(interp, interp_code->base.pf) *
-        sizeof (opcode_t);
-    IMCC_info(interp, 1, "packed code %d bytes\n", size);
-    packed = (opcode_t*) mem_sys_allocate(size);
-    PackFile_pack(interp, interp->code->base.pf, packed);
-    if (STRING_length(output_file) == 1
-    &&  STRING_ord(interp, output_file, 0) == '-') {
-        fp = PIO_STDHANDLE(interp, PIO_STDOUT_FILENO);
-    }
-    else {
-        fp = PIO_OPEN(interp, output_file, PIO_F_WRITE);
-        if (fp == PIO_INVALID_HANDLE)
-            IMCC_fatal_standalone(interp, EXCEPTION_EXTERNAL_ERROR,
-                "Couldn't open %Ss\n", output_file);
-    }
-
-    if ((size != PIO_WRITE(interp, fp, (char *)packed, size)))
-        IMCC_fatal_standalone(interp, EXCEPTION_EXTERNAL_ERROR,
-            "Couldn't write %Ss\n", output_file);
-    PIO_CLOSE(interp, fp);
-    IMCC_info(interp, 1, "%Ss written.\n", output_file);
-    mem_sys_free(packed);
-}
-
-/*
-
 =item C<static PIOHANDLE determine_input_file_type(PARROT_INTERP, STRING
 *sourcefile)>
 
@@ -549,28 +476,8 @@ determine_input_file_type(PARROT_INTERP, ARGIN(STRING *sourcefile))
 
 /*
 
-=item C<static void determine_output_file_type(PARROT_INTERP, STRING
-*output_file)>
-
-Decide what kind of file we are to output.
-
-=cut
-
-*/
-
-static void
-determine_output_file_type(PARROT_INTERP, ARGIN(STRING *output_file))
-{
-    ASSERT_ARGS(determine_output_file_type)
-
-    if (imcc_string_ends_with(interp, output_file, ".pbc"))
-        SET_STATE_WRITE_PBC(interp);
-}
-
-/*
-
 =item C<static PackFile * compile_to_bytecode(PARROT_INTERP, STRING *sourcefile,
-STRING *output_file, yyscan_t yyscanner)>
+yyscan_t yyscanner)>
 
 Compile source code into bytecode (or die trying).
 
@@ -583,7 +490,6 @@ PARROT_CANNOT_RETURN_NULL
 static PackFile *
 compile_to_bytecode(PARROT_INTERP,
                     ARGIN(STRING *sourcefile),
-                    ARGIN(STRING *output_file),
                     ARGIN(yyscan_t yyscanner))
 {
     ASSERT_ARGS(compile_to_bytecode)
@@ -608,7 +514,8 @@ compile_to_bytecode(PARROT_INTERP,
     IMCC_push_parser_state(interp);
     IMCC_INFO(interp)->state->file = sourcefile;
 
-    emit_open(interp, per_pbc, per_pbc ? STRINGNULL : output_file);
+    //emit_open(interp, per_pbc, per_pbc ? STRINGNULL : output_file);
+    emit_open(interp, per_pbc, STRINGNULL);
 
     IMCC_info(interp, 1, "Starting parse...\n");
 
@@ -653,15 +560,14 @@ imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile), int argc,
 {
     ASSERT_ARGS(imcc_run_api)
 
-    Interp * interp = (Interp *)VTABLE_get_pointer(NULL, interp_pmc);
-    STRING *output_file = imcc_parseflags(interp, argc, argv);
-    return imcc_run(interp, sourcefile, output_file, pbcpmc);
+    Interp * const interp = (Interp *)VTABLE_get_pointer(NULL, interp_pmc);
+    imcc_parseflags(interp, argc, argv);
+    return imcc_run(interp, sourcefile, pbcpmc);
 }
 
 /*
 
-=item C<static int imcc_run(PARROT_INTERP, STRING *sourcefile, STRING
-*output_file, PMC **pbcpmc)>
+=item C<static int imcc_run(PARROT_INTERP, STRING *sourcefile, PMC **pbcpmc)>
 
 Entry point of IMCC, as invoked by Parrot's main function.
 Compile source code (if required), write bytecode file (if required)
@@ -672,8 +578,7 @@ and run. This function always returns 0.
 */
 
 static int
-imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile),
-        ARGIN(STRING *output_file), ARGOUT(PMC **pbcpmc))
+imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile), ARGOUT(PMC **pbcpmc))
 {
     ASSERT_ARGS(imcc_run)
 
@@ -705,19 +610,6 @@ imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile),
         return 0;
     }
 
-    is_stdin  = STRING_length(sourcefile) == 1
-             && STRING_ord(interp, sourcefile, 0) == '-';
-    is_stdout = STRING_length(output_file) == 1
-             && STRING_ord(interp, output_file, 0) == '-';
-
-    /* Do we need to produce an output file? If so, what type? */
-    if (STRING_length(output_file) != 0) {
-        determine_output_file_type(interp, output_file);
-
-        if (STRING_equal(interp, sourcefile, output_file) && !is_stdin)
-            IMCC_fatal_standalone(interp, 1, "main: outputfile is sourcefile\n");
-    }
-
     IMCC_INFO(interp)->write_pbc = STATE_WRITE_PBC(interp) ? 1 : 0;
 
     if (IMCC_INFO(interp)->verbose) {
@@ -737,16 +629,7 @@ imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile),
         Parrot_pf_set_current_packfile(interp, pf_raw);
     }
     else
-        pf_raw = compile_to_bytecode(interp, sourcefile, output_file, yyscanner);
-
-    /* Produce a PBC output file, if one was requested */
-    if (STATE_WRITE_PBC(interp)) {
-        if (STRING_length(output_file) == 0) {
-            IMCC_fatal_standalone(interp, 1,
-                    "main: NULL output_file when trying to write .pbc\n");
-        }
-        imcc_write_pbc(interp, output_file);
-    }
+        pf_raw = compile_to_bytecode(interp, sourcefile, yyscanner);
 
     yylex_destroy(yyscanner);
 

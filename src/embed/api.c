@@ -562,7 +562,7 @@ Parrot_api_write_bytecode_to_file(Parrot_PMC interp_pmc, Parrot_PMC pbc,
             PackFile_pack(interp, pf, packed);
             PIO_WRITE(interp, fp, (char *)packed, size);
         }
-        PIOCLOSE(interp, fp);
+        PIO_CLOSE(interp, fp);
     }
 
     EMBED_API_CALLOUT(interp_pmc, interp)
