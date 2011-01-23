@@ -29,13 +29,17 @@ This file implements various functions for creating and writing packfiles.
 
 PARROT_INLINE
 static void update_backref_hash(PARROT_INTERP,
-    PackFile_ConstTable *ct,
-    Hash *seen,
+    ARGIN(PackFile_ConstTable *ct),
+    ARGIN(Hash *seen),
     INTVAL constno)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_update_backref_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ct) \
+    , PARROT_ASSERT_ARG(seen))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -168,7 +172,7 @@ Update C<ct>'s backref hash with new entries from C<seen>.
 
 PARROT_INLINE
 static void
-update_backref_hash(PARROT_INTERP, PackFile_ConstTable *ct, Hash *seen, INTVAL constno)
+update_backref_hash(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct), ARGIN(Hash *seen), INTVAL constno)
 {
     ASSERT_ARGS(update_backref_hash)
     parrot_hash_iterate(seen, {

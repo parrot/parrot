@@ -24,8 +24,10 @@ Freezes other PMCs.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_INLINE
-static UINTVAL check_seen(PARROT_INTERP, PMC *self, PMC *v)
-        __attribute__nonnull__(1);
+static UINTVAL check_seen(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *v))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void create_buffer(PARROT_INTERP,
     ARGIN_NULLOK(PMC *pmc),
@@ -57,7 +59,9 @@ static void SET_VISIT_CURSOR(ARGMOD(PMC *pmc), ARGIN(const char *cursor))
         FUNC_MODIFIES(*pmc);
 
 #define ASSERT_ARGS_check_seen __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(v))
 #define ASSERT_ARGS_create_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))
@@ -227,7 +231,7 @@ Check the seen hash to prevent duplicate serialization.
 
 PARROT_INLINE
 static UINTVAL
-check_seen(PARROT_INTERP, PMC *self, PMC *v)
+check_seen(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *v))
 {
     ASSERT_ARGS(check_seen)
     Hash       *seen = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOFREEZE(self)->seen);
