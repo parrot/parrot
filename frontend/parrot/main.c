@@ -177,6 +177,11 @@ main(int argc, const char *argv[])
     if (!Parrot_api_string_import(interp, parsed_flags.sourcefile, &source_str))
         show_last_error_and_exit(interp);
 
+    if (parsed_flags.execute_packfile) {
+        if (!Parrot_api_pmc_wrap_string_array(interp, pir_argc, pir_argv, &argsarray))
+            show_last_error_and_exit(interp);
+    }
+
     if (parsed_flags.have_pbc_file) {
         if (!Parrot_api_load_bytecode_file(interp, source_str, &bytecodepmc))
             show_last_error_and_exit(interp);
@@ -194,8 +199,6 @@ main(int argc, const char *argv[])
     }
 
     if (parsed_flags.execute_packfile) {
-        if (!Parrot_api_pmc_wrap_string_array(interp, pir_argc, pir_argv, &argsarray))
-            show_last_error_and_exit(interp);
         if (!Parrot_api_run_bytecode(interp, bytecodepmc, argsarray))
             show_last_error_and_exit(interp);
     }

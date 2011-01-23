@@ -152,8 +152,10 @@ int main(void) {
 
     /* Step 1: Take the PIR, and compile it to PBC. Write to file */
     Parrot_api_string_import(interp, "$temp_pir", &filename);
+    Parrot_api_toggle_gc(interp, 0);
     Parrot_api_wrap_imcc_hack(interp, filename, 0, NULL, &bytecode, &run_pbc, imcc_run_api);
     Parrot_api_serialize_bytecode_pmc(interp, bytecode, &pbc_s);
+    Parrot_api_toggle_gc(interp, 1);
     Parrot_api_string_export_ascii(interp, pbc_s, &pbc_c);
     Parrot_api_string_byte_length(interp, pbc_s, &length);
     file = fopen("$temp_pbc", "w");
