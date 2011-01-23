@@ -49,15 +49,6 @@ static INTVAL       eval_nr  = 0;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PackFile * compile_to_bytecode(PARROT_INTERP,
-    ARGIN(STRING *sourcefile),
-    ARGIN(yyscan_t yyscanner))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 static PIOHANDLE determine_input_file_type(PARROT_INTERP,
     ARGIN(STRING *sourcefile))
         __attribute__nonnull__(1)
@@ -72,10 +63,7 @@ static void imcc_destroy_macro_values(ARGMOD(void *value))
 
 static void imcc_get_optimization_description(
     const PARROT_INTERP,
-    int opt_level,
-    ARGMOD(char *opt_desc))
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*opt_desc);
+    int opt_level);
 
 PARROT_CAN_RETURN_NULL
 static void imcc_parseflags(PARROT_INTERP,
@@ -96,10 +84,6 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const struct longopt_opt_decl * Parrot_cmd_options(void);
 
-#define ASSERT_ARGS_compile_to_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(sourcefile) \
-    , PARROT_ASSERT_ARG(yyscanner))
 #define ASSERT_ARGS_determine_input_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sourcefile))
@@ -108,8 +92,7 @@ static const struct longopt_opt_decl * Parrot_cmd_options(void);
 #define ASSERT_ARGS_imcc_destroy_macro_values __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_imcc_get_optimization_description \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(opt_desc))
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_imcc_parseflags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_imcc_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -390,7 +373,7 @@ do_pre_process(PARROT_INTERP, yyscan_t yyscanner)
 /*
 
 =item C<static void imcc_get_optimization_description(const PARROT_INTERP, int
-opt_level, char *opt_desc)>
+opt_level)>
 
 Create list (opt_desc[]) describing optimisation flags.
 
@@ -399,10 +382,11 @@ Create list (opt_desc[]) describing optimisation flags.
 */
 
 static void
-imcc_get_optimization_description(const PARROT_INTERP, int opt_level, ARGMOD(char *opt_desc))
+imcc_get_optimization_description(const PARROT_INTERP, int opt_level)
 {
     ASSERT_ARGS(imcc_get_optimization_description)
     int i = 0;
+    char opt_desc[10];
 
     if (opt_level & (OPT_PRE | OPT_CFG))
             opt_desc[i++] = '2';
@@ -535,14 +519,14 @@ and run. This function always returns 0.
 
 */
 
+
 static PMC *
 imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile))
 {
     ASSERT_ARGS(imcc_run)
-    yyscan_t  yyscanner;
-    PackFile *pf_raw = NULL;
+    yyscan_t yyscanner;
+    PackFile * const pf_raw = PackFile_new(interp, 0);
     const int opt_level = IMCC_INFO(interp)->optimizer_level;
-    char opt_desc[10];
 
     yylex_init_extra(interp, &yyscanner);
     {
@@ -550,9 +534,8 @@ imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile))
         imc_yyin_set(in_file, yyscanner);
     }
 
-    imcc_get_optimization_description(interp, opt_level, opt_desc);
+    imcc_get_optimization_description(interp, opt_level);
 
-    pf_raw = PackFile_new(interp, 0);
     /* TODO: Don't set current packfile in the interpreter. Leave the
              interpreter alone */
     Parrot_pf_set_current_packfile(interp, pf_raw);
