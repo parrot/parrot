@@ -242,6 +242,12 @@ Parrot_Int Parrot_api_wrap_imcc_hack(
         FUNC_MODIFIES(* bytecodepmc)
         FUNC_MODIFIES(*result);
 
+PARROT_API
+Parrot_Int Parrot_api_write_bytecode_to_file(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pbc,
+    Parrot_String filename);
+
 #define ASSERT_ARGS_Parrot_api_add_dynext_search_path \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(path))
@@ -299,6 +305,8 @@ Parrot_Int Parrot_api_wrap_imcc_hack(
        PARROT_ASSERT_ARG(sourcefile) \
     , PARROT_ASSERT_ARG(bytecodepmc) \
     , PARROT_ASSERT_ARG(result))
+#define ASSERT_ARGS_Parrot_api_write_bytecode_to_file \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/api.c */
 
