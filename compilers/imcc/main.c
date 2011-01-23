@@ -435,10 +435,14 @@ static PIOHANDLE
 determine_input_file_type(PARROT_INTERP, ARGIN(STRING *sourcefile))
 {
     ASSERT_ARGS(determine_input_file_type)
+    PIOHANDLE handle;
+
+    if (!STRING_length(sourcefile))
+        IMCC_fatal_standalone(interp, 1, "main: No source file specified.\n");
 
     if (STRING_length(sourcefile) == 1
-    &&  STRING_ord(interp, sourcefile, 0) ==  '-') {
-        PIOHANDLE handle = PIO_STDHANDLE(interp, PIO_STDIN_FILENO);
+            &&  STRING_ord(interp, sourcefile, 0) ==  '-') {
+        handle = PIO_STDHANDLE(interp, PIO_STDIN_FILENO);
 
         if ((FILE *)handle == NULL) {
             /*
@@ -448,14 +452,23 @@ determine_input_file_type(PARROT_INTERP, ARGIN(STRING *sourcefile))
              */
             handle = Parrot_io_dup(interp, handle);
         }
-
-        return handle;
     }
     else {
+        handle = PIO_OPEN(interp, sourcefile, PIO_F_READ);
+        if (handle == PIO_INVALID_HANDLE)
+            IMCC_fatal_standalone(interp, EXCEPTION_EXTERNAL_ERROR,
+                                  "Error reading source file %Ss.\n",
+                                  sourcefile);
         if (imcc_string_ends_with(interp, sourcefile, ".pasm"))
             SET_STATE_PASM_FILE(interp);
-        return PIO_OPEN(interp, sourcefile, PIO_F_READ);
     }
+
+    if (IMCC_INFO(interp)->verbose) {
+        IMCC_info(interp, 1, "debug = 0x%x\n", IMCC_INFO(interp)->debug);
+        IMCC_info(interp, 1, "Reading %Ss\n", sourcefile);
+    }
+
+    return handle;
 }
 
 /*
@@ -593,41 +606,14 @@ imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile))
 
     yyscan_t  yyscanner;
     PackFile *pf_raw = NULL;
-    int       is_stdin;
-    int       is_stdout;
 
     yylex_init_extra(interp, &yyscanner);
-
-    /* Figure out what kind of source file we have -- if we have one */
-    if (!STRING_length(sourcefile))
-        IMCC_fatal_standalone(interp, 1, "main: No source file specified.\n");
-    else {
+    {
         PIOHANDLE in_file = determine_input_file_type(interp, sourcefile);
-        if (in_file == PIO_INVALID_HANDLE)
-            IMCC_fatal_standalone(interp, EXCEPTION_EXTERNAL_ERROR,
-                                  "Error reading source file %Ss.\n",
-                                  sourcefile);
         imc_yyin_set(in_file, yyscanner);
     }
 
-    if (IMCC_INFO(interp)->verbose) {
-        IMCC_info(interp, 1, "debug = 0x%x\n", IMCC_INFO(interp)->debug);
-        if (is_stdin)
-            IMCC_info(interp, 1, "Reading stdin\n");
-        else
-            IMCC_info(interp, 1, "Reading %Ss\n", sourcefile);
-    }
-
-    /* If the input file is Parrot bytecode, then we simply read it
-       into a packfile, which Parrot then loads */
-    if (STATE_LOAD_PBC(interp)) {
-        pf_raw = PackFile_read_pbc(interp, sourcefile, 0);
-        if (!pf_raw)
-            IMCC_fatal_standalone(interp, 1, "main: Packfile loading failed\n");
-        Parrot_pf_set_current_packfile(interp, pf_raw);
-    }
-    else
-        pf_raw = compile_to_bytecode(interp, sourcefile, yyscanner);
+    pf_raw = compile_to_bytecode(interp, sourcefile, yyscanner);
 
     yylex_destroy(yyscanner);
 
