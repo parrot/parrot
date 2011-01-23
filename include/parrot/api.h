@@ -15,7 +15,7 @@
 #include "parrot/config.h"
 #include "parrot/core_types.h"
 
-typedef int (*imcc_hack_func_t)(Parrot_PMC, Parrot_String, int, const char **, Parrot_PMC*);
+typedef void (*imcc_hack_func_t)(Parrot_PMC, Parrot_String, int, const char **, Parrot_PMC*);
 
 #define PARROT_API PARROT_EXPORT
 
@@ -233,14 +233,10 @@ Parrot_Int Parrot_api_wrap_imcc_hack(
     ARGIN(Parrot_String sourcefile),
     int argc,
     ARGIN_NULLOK(const char **argv),
-    ARGMOD(Parrot_PMC* bytecodepmc),
-    ARGOUT(int *result),
+    ARGMOD_NULLOK(Parrot_PMC* bytecodepmc),
     imcc_hack_func_t func)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(5)
-        __attribute__nonnull__(6)
-        FUNC_MODIFIES(* bytecodepmc)
-        FUNC_MODIFIES(*result);
+        FUNC_MODIFIES(* bytecodepmc);
 
 PARROT_API
 Parrot_Int Parrot_api_write_bytecode_to_file(
@@ -302,9 +298,7 @@ Parrot_Int Parrot_api_write_bytecode_to_file(
 #define ASSERT_ARGS_Parrot_api_set_warnings __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_toggle_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_wrap_imcc_hack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(sourcefile) \
-    , PARROT_ASSERT_ARG(bytecodepmc) \
-    , PARROT_ASSERT_ARG(result))
+       PARROT_ASSERT_ARG(sourcefile))
 #define ASSERT_ARGS_Parrot_api_write_bytecode_to_file \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -759,8 +753,13 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
 /* Forward declaration because IMCC is still part of libparrot */
 
 PARROT_API
-int
+void
 imcc_run_api(ARGMOD(Parrot_PMC interp_pmc), ARGIN(Parrot_String sourcefile),
+        int argc, ARGIN(const char **argv), ARGOUT(PMC **pbcpmc));
+
+PARROT_API
+void
+imcc_do_preprocess_api(ARGMOD(Parrot_PMC interp_pmc), ARGIN(Parrot_String sourcefile),
         int argc, ARGIN(const char **argv), ARGOUT(PMC **pbcpmc));
 
 #endif /* PARROT_API_H_GUARD */

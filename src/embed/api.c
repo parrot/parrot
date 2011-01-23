@@ -758,7 +758,7 @@ Parrot_api_set_configuration_hash(Parrot_PMC interp_pmc, Parrot_PMC confighash)
 
 =item C<Parrot_Int Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc,
 Parrot_String sourcefile, int argc, const char **argv, Parrot_PMC* bytecodepmc,
-int *result, imcc_hack_func_t func)>
+imcc_hack_func_t func)>
 
 WARNING: This is an evil hack to provide a wrapper around IMCC to catch unhandled
 exceptions without having to assume IMCC is linked in with libparrot. Delete this
@@ -774,12 +774,12 @@ otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, ARGIN(Parrot_String sourcefile),
-    int argc, ARGIN_NULLOK(const char **argv), ARGMOD(Parrot_PMC* bytecodepmc),
-    ARGOUT(int *result), imcc_hack_func_t func)
+    int argc, ARGIN_NULLOK(const char **argv), ARGMOD_NULLOK(Parrot_PMC* bytecodepmc),
+    imcc_hack_func_t func)
 {
     ASSERT_ARGS(Parrot_api_wrap_imcc_hack)
     EMBED_API_CALLIN(interp_pmc, interp)
-    *result = func(interp_pmc, sourcefile, argc, argv, bytecodepmc);
+    func(interp_pmc, sourcefile, argc, argv, bytecodepmc);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 

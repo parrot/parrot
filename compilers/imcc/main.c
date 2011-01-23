@@ -83,7 +83,7 @@ static void imcc_parseflags(PARROT_INTERP,
     ARGIN_NULLOK(const char **argv))
         __attribute__nonnull__(1);
 
-static int imcc_run(PARROT_INTERP,
+static void imcc_run(PARROT_INTERP,
     ARGIN(STRING *sourcefile),
     ARGOUT(PMC **pbcpmc))
         __attribute__nonnull__(1)
@@ -251,9 +251,6 @@ imcc_parseflags(PARROT_INTERP, int argc, ARGIN_NULLOK(const char **argv))
             break;
           case 'y':
             yydebug = 1;
-            break;
-          case 'E':
-            SET_STATE_PRE_PROCESS(interp);
             break;
 
           case 'O':
@@ -533,7 +530,7 @@ compile_to_bytecode(PARROT_INTERP,
 
 /*
 
-=item C<int imcc_run_api(PMC * interp_pmc, STRING *sourcefile, int argc, const
+=item C<void imcc_run_api(PMC * interp_pmc, STRING *sourcefile, int argc, const
 char **argv, PMC **pbcpmc)>
 
 This is a wrapper around C<imcc_run> function in which the input parameter is a
@@ -544,7 +541,7 @@ PMC interpreter.
 */
 
 PARROT_EXPORT
-int
+void
 imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile), int argc,
         ARGIN_NULLOK(const char **argv), ARGOUT(PMC **pbcpmc))
 {
@@ -552,12 +549,38 @@ imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile), int argc,
 
     Interp * const interp = (Interp *)VTABLE_get_pointer(NULL, interp_pmc);
     imcc_parseflags(interp, argc, argv);
-    return imcc_run(interp, sourcefile, pbcpmc);
+    imcc_run(interp, sourcefile, pbcpmc);
+}
+
+PARROT_EXPORT
+void
+imcc_do_preprocess_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile),
+        int argc, SHIM(const char **argv), ARGOUT_NULLOK(PMC **pbcpmc))
+{
+    ASSERT_ARGS(imcc_do_preprocess_api)
+    Interp * const interp = (Interp *)VTABLE_get_pointer(NULL, interp_pmc);
+    yyscan_t yyscanner;
+    yylex_init_extra(interp, &yyscanner);
+
+    /* Figure out what kind of source file we have -- if we have one */
+    if (!STRING_length(sourcefile))
+        IMCC_fatal_standalone(interp, 1, "main: No source file specified.\n");
+    else {
+        PIOHANDLE in_file = determine_input_file_type(interp, sourcefile);
+        if (in_file == PIO_INVALID_HANDLE)
+            IMCC_fatal_standalone(interp, EXCEPTION_EXTERNAL_ERROR,
+                                  "Error reading source file %Ss.\n",
+                                  sourcefile);
+        imc_yyin_set(in_file, yyscanner);
+    }
+
+    do_pre_process(interp, yyscanner);
+    yylex_destroy(yyscanner);
 }
 
 /*
 
-=item C<static int imcc_run(PARROT_INTERP, STRING *sourcefile, PMC **pbcpmc)>
+=item C<static void imcc_run(PARROT_INTERP, STRING *sourcefile, PMC **pbcpmc)>
 
 Entry point of IMCC, as invoked by Parrot's main function.
 Compile source code (if required), write bytecode file (if required)
@@ -567,7 +590,7 @@ and run. This function always returns 0.
 
 */
 
-static int
+static void
 imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile), ARGOUT(PMC **pbcpmc))
 {
     ASSERT_ARGS(imcc_run)
@@ -591,13 +614,6 @@ imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile), ARGOUT(PMC **pbcpmc))
                                   "Error reading source file %Ss.\n",
                                   sourcefile);
         imc_yyin_set(in_file, yyscanner);
-    }
-
-    if (STATE_PRE_PROCESS(interp)) {
-        do_pre_process(interp, yyscanner);
-        yylex_destroy(yyscanner);
-
-        return 0;
     }
 
     if (IMCC_INFO(interp)->verbose) {
@@ -626,8 +642,6 @@ imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile), ARGOUT(PMC **pbcpmc))
         VTABLE_set_pointer(interp, _pbcpmc, pf_raw);
         *pbcpmc = _pbcpmc;
     }
-
-    return 1;
 }
 
 /*

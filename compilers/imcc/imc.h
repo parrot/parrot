@@ -75,7 +75,19 @@ void * imcc_compile_file(PARROT_INTERP,
         FUNC_MODIFIES(*error_message);
 
 PARROT_EXPORT
-int imcc_run_api(
+void imcc_do_preprocess_api(
+    ARGMOD(PMC * interp_pmc),
+    ARGIN(STRING *sourcefile),
+    int argc,
+    SHIM(const char **argv),
+    ARGOUT_NULLOK(PMC **pbcpmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* interp_pmc)
+        FUNC_MODIFIES(*pbcpmc);
+
+PARROT_EXPORT
+void imcc_run_api(
     ARGMOD(PMC * interp_pmc),
     ARGIN(STRING *sourcefile),
     int argc,
@@ -140,6 +152,9 @@ void imcc_init(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(fullname) \
     , PARROT_ASSERT_ARG(error_message))
+#define ASSERT_ARGS_imcc_do_preprocess_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp_pmc) \
+    , PARROT_ASSERT_ARG(sourcefile))
 #define ASSERT_ARGS_imcc_run_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(sourcefile) \
@@ -593,8 +608,6 @@ typedef struct macro_t {
 /* main.c */
 #define PBC_LOAD        (1 << 0)
 #define PBC_RUN         (1 << 1)
-#define PBC_WRITE       (1 << 2)
-#define PBC_PRE_PROCESS (1 << 3)
 #define PBC_PASM_FILE   (1 << 4)
 #define PBC_RUN_FILE    (1 << 5)
 
@@ -602,19 +615,16 @@ typedef struct macro_t {
 
 #define STATE_LOAD_PBC(i)      (COMPILER_STATE(i) & PBC_LOAD)
 #define STATE_RUN_PBC(i)       (COMPILER_STATE(i) & PBC_RUN)
-#define STATE_PRE_PROCESS(i)   (COMPILER_STATE(i) & PBC_PRE_PROCESS)
 #define STATE_PASM_FILE(i)     (COMPILER_STATE(i) & PBC_PASM_FILE)
 #define STATE_RUN_FROM_FILE(i) (COMPILER_STATE(i) & (PBC_RUN_FILE | PBC_RUN))
 
 #define SET_STATE_LOAD_PBC(i)      (COMPILER_STATE(i) |= PBC_LOAD)
 #define SET_STATE_RUN_PBC(i)       (COMPILER_STATE(i) |= PBC_RUN)
-#define SET_STATE_PRE_PROCESS(i)   (COMPILER_STATE(i) |= PBC_PRE_PROCESS)
 #define SET_STATE_PASM_FILE(i)     (COMPILER_STATE(i) |= PBC_PASM_FILE)
 #define SET_STATE_RUN_FROM_FILE(i) (COMPILER_STATE(i) |= PBC_RUN_FILE)
 
 #define UNSET_STATE_LOAD_PBC(i)      (COMPILER_STATE(i) &= ~PBC_LOAD)
 #define UNSET_STATE_RUN_PBC(i)       (COMPILER_STATE(i) &= ~PBC_RUN)
-#define UNSET_STATE_PRE_PROCESS(i)   (COMPILER_STATE(i) &= ~PBC_PRE_PROCESS)
 #define UNSET_STATE_PASM_FILE(i)     (COMPILER_STATE(i) &= ~PBC_PASM_FILE)
 #define UNSET_STATE_RUN_FROM_FILE(i) (COMPILER_STATE(i) &= ~PBC_RUN_FILE)
 

@@ -33,6 +33,7 @@ struct init_args_t {
     Parrot_Int write_packfile;
     Parrot_Int have_pbc_file;
     Parrot_Int turn_gc_off;
+    Parrot_Int preprocess_only;
 };
 
 extern int Parrot_set_config_hash(Parrot_PMC interp_pmc);
@@ -98,6 +99,13 @@ static void print_parrot_string(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*vector);
 
+static PMC * run_imcc(
+    Parrot_PMC interp,
+    Parrot_String sourcefile,
+    struct init_args_t *flags,
+    int argc,
+    char** argv);
+
 static void show_last_error_and_exit(Parrot_PMC interp);
 static void usage(ARGMOD(FILE *fp))
         __attribute__nonnull__(1)
@@ -131,6 +139,7 @@ static void write_bytecode_file(
     , PARROT_ASSERT_ARG(argv))
 #define ASSERT_ARGS_print_parrot_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(vector))
+#define ASSERT_ARGS_run_imcc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_show_last_error_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(fp))
@@ -195,10 +204,7 @@ main(int argc, const char *argv[])
     }
     else {
         Parrot_api_toggle_gc(interp, 0);
-        if (!Parrot_api_wrap_imcc_hack(interp, source_str, argc, argv,
-                                       &bytecodepmc, &parsed_flags.execute_packfile,
-                                       imcc_run_api))
-            show_last_error_and_exit(interp);
+        bytecodepmc = run_imcc(interp, source_str, &parsed_flags, argc, argv);
         if (!parsed_flags.turn_gc_off)
             Parrot_api_toggle_gc(interp, 1);
     }
@@ -221,6 +227,25 @@ main(int argc, const char *argv[])
     /* Clean-up after ourselves */
     Parrot_api_destroy_interpreter(interp);
     exit(EXIT_SUCCESS);
+}
+
+static PMC *
+run_imcc(Parrot_PMC interp, Parrot_String sourcefile,
+        struct init_args_t *flags, int argc, char** argv)
+{
+    if (flags->preprocess_only) {
+        if (!Parrot_api_wrap_imcc_hack(interp, sourcefile, argc, argv, NULL,
+                                       imcc_do_preprocess_api))
+            show_last_error_and_exit(interp);
+        exit(EXIT_SUCCESS);
+    }
+    else {
+        Parrot_PMC bytecodepmc = NULL;
+        if (!Parrot_api_wrap_imcc_hack(interp, sourcefile, argc, argv,
+                                       &bytecodepmc, imcc_run_api))
+            show_last_error_and_exit(interp);
+        return bytecodepmc;
+    }
 }
 
 /*
@@ -707,6 +732,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     args->turn_gc_off = 0;
     args->outfile = NULL;
     args->sourcefile = NULL;
+    args->preprocess_only = 0;
 
     if (argc == 1) {
         usage(stderr);
@@ -822,6 +848,8 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             /* result = Parrot_api_set_warnings(interp, PARROT_WARNINGS_ALL_FLAG); */
             result = Parrot_api_set_warnings(interp, 0xFFFF);
             break;
+          case 'E':
+            args->preprocess_only = 1;
           default:
             /* languages handle their arguments later (after being initialized) */
             break;
