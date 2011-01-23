@@ -723,7 +723,7 @@ inline op throw(invar PMC) :flow {
     opcode_t *dest;
     opcode_t * const ret    = expr NEXT();
     PMC      * const resume = pmc_new(interp, enum_class_Continuation);
-    STRING * const exception_str = CONST_STRING(interp, "Exception");
+    STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
 
     VTABLE_set_pointer(interp, resume, ret);
 
@@ -740,7 +740,7 @@ inline op throw(invar PMC) :flow {
 inline op throw(invar PMC, invar PMC) :flow {
     opcode_t * dest;
     PMC * except = $1;
-    STRING * const exception_str = CONST_STRING(interp, "Exception");
+    STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
 
     if (PMC_IS_NULL(except) || !VTABLE_does(interp, except, exception_str))
         except = Parrot_ex_build_exception(interp, EXCEPT_fatal,
@@ -754,7 +754,7 @@ inline op throw(invar PMC, invar PMC) :flow {
 inline op rethrow(invar PMC) :flow {
     opcode_t * dest;
     PMC * except = $1;
-    STRING * const exception_str = CONST_STRING(interp, "Exception");
+    STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
 
     if (PMC_IS_NULL(except) || !VTABLE_does(interp, except, exception_str)) {
         opcode_t * const ret    = expr NEXT();
