@@ -26,9 +26,10 @@ Start Parrot
 
 struct init_args_t {
     const char *run_core_name;
-    const char *sourcefile;
+    Parrot_String sourcefile;
     Parrot_Int trace;
-    int        execute_packfile;
+    Parrot_Int execute_packfile;
+    Parrot_Int write_packfile;
     Parrot_Int have_pbc_file;
     Parrot_Int turn_gc_off;
 };
@@ -127,6 +128,7 @@ static void usage(ARGMOD(FILE *fp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+PMC * load_bytecode_file(Parrot_PMC interp, Parrot_String filename);
 
 
 /*
@@ -152,6 +154,7 @@ main(int argc, const char *argv[])
     Parrot_Init_Args *initargs;
     struct init_args_t parsed_flags;
     Parrot_String source_str;
+    Parrot_String output_str;
 
     GET_INIT_STRUCT(initargs);
     /* internationalization setup */
@@ -171,15 +174,13 @@ main(int argc, const char *argv[])
 
     /* Parse flags */
     parseflags(interp, argc, argv, &pir_argc, &pir_argv, &parsed_flags);
+    source_str = parsed_flags.sourcefile;
+
     if (!Parrot_api_set_runcore(interp, parsed_flags.run_core_name, parsed_flags.trace))
         show_last_error_and_exit(interp);
 
-    if (!Parrot_api_string_import(interp, parsed_flags.sourcefile, &source_str))
-        show_last_error_and_exit(interp);
-
     if (parsed_flags.have_pbc_file) {
-        if (!Parrot_api_load_bytecode_file(interp, source_str, &bytecodepmc))
-            show_last_error_and_exit(interp);
+        bytecodepmc = load_bytecode_file(interp, source_str);
         if (parsed_flags.turn_gc_off)
             Parrot_api_toggle_gc(interp, 0);
     }
@@ -193,6 +194,15 @@ main(int argc, const char *argv[])
             Parrot_api_toggle_gc(interp, 1);
     }
 
+    if (parsed_flags.write_packfile) {
+        /* TODO: Write the packfile in bytecodepmc to disk with the given
+                 output file name. */
+        if (parsed_flags.execute_packfile) {
+            /* This is the -r option. Read it back in again */
+            //if (!Parrot_api_load_bytecode_file(interp,
+        }
+    }
+
     if (parsed_flags.execute_packfile) {
         if (!Parrot_api_pmc_wrap_string_array(interp, pir_argc, pir_argv, &argsarray))
             show_last_error_and_exit(interp);
@@ -203,6 +213,15 @@ main(int argc, const char *argv[])
     /* Clean-up after ourselves */
     Parrot_api_destroy_interpreter(interp);
     exit(EXIT_SUCCESS);
+}
+
+PMC *
+load_bytecode_file(Parrot_PMC interp, Parrot_String filename)
+{
+    PMC * bytecode = NULL;
+    if (!Parrot_api_load_bytecode_file(interp, filename, &bytecode))
+        show_last_error_and_exit(interp);
+    return bytecode;
 }
 
 /*
@@ -642,6 +661,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     int status;
     int result = 1;
     args->run_core_name = "slow";
+    args->write_packfile = 0;
     args->execute_packfile = 1;
     args->have_pbc_file = 0;
     args->trace = 0;
@@ -716,12 +736,14 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             Parrot_version();
             break;
           case 'o':
+            args->write_packfile = 1;
             args->execute_packfile = 0;
             /* IMCC is going to read this option too, and handle it. */
             /* TODO: Move this logic out of IMCC. IMCC should return a
                      packfile and we can write it out to a file ourselves. */
             break;
           case 'r':
+            args->write_packfile = 1;
             args->execute_packfile = 1;
             /* TODO: What else do we need to do for -r? We need to write the
                      packfile out to a file first, then open and execute it? */
@@ -786,11 +808,13 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     *pgm_argc = argc - opt.opt_index;
     *pgm_argv = argv + opt.opt_index;
 
-    args->sourcefile = (*pgm_argv)[0];
     {
-        const char * ext = strrchr(args->sourcefile, '.');
+        const char * sourcefile = (*pgm_argv)[0];
+        const char * ext = strrchr(sourcefile, '.');
         if (ext && !strcmp(ext, ".pbc"))
             args->have_pbc_file = 1;
+        if (!Parrot_api_string_import(interp, sourcefile, &args->sourcefile))
+            show_last_error_and_exit(interp);
     }
 }
 /*
