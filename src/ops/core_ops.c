@@ -73,13 +73,13 @@ extern op_lib_t core_op_lib;
 
 
 
-INTVAL core_numops = 1072;
+INTVAL core_numops = 1073;
 
 /*
 ** Op Function Table:
 */
 
-static op_func_t core_op_func_table[1072] = {
+static op_func_t core_op_func_table[1073] = {
   Parrot_end,                                        /*      0 */
   Parrot_noop,                                       /*      1 */
   Parrot_check_events,                               /*      2 */
@@ -1151,6 +1151,7 @@ static op_func_t core_op_func_table[1072] = {
   Parrot_root_new_p_pc_ic,                           /*   1068 */
   Parrot_push_cached_eh_i_ic,                        /*   1069 */
   Parrot_push_cached_eh_ic_ic,                       /*   1070 */
+  Parrot_push_cached_eh_ic,                          /*   1071 */
 
   NULL /* NULL function pointer */
 };
@@ -1161,7 +1162,7 @@ static op_func_t core_op_func_table[1072] = {
 ** Op Info Table:
 */
 
-static op_info_t core_op_info_table[1072] = {
+static op_info_t core_op_info_table[1073] = {
   { /* 0 */
     /* type PARROT_INLINE_OP, */
     "end",
@@ -15085,6 +15086,19 @@ static op_info_t core_op_info_table[1072] = {
     { 0, 1 },
     &core_op_lib
   },
+  { /* 1071 */
+    /* type PARROT_FUNCTION_OP, */
+    "push_cached_eh",
+    "push_cached_eh_ic",
+    "Parrot_push_cached_eh_ic",
+    /* "",  body */
+    0,
+    2,
+    { PARROT_ARG_IC },
+    { PARROT_ARGDIR_IN },
+    { 1 },
+    &core_op_lib
+  },
 
 };
 
@@ -25831,8 +25845,8 @@ Parrot_push_cached_eh_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
 
     /* Create new ExceptionHandler if there is none */
     if (PMC_IS_NULL(eh)) {
-        eh = Parrot_pmc_new(interp, enum_class_ExceptionHandler);
-        VTABLE_set_pointer(interp, eh, CUR_OPCODE + IREG(2));
+        eh = Parrot_pmc_new_init_int(interp, enum_class_ExceptionHandler, IREG(1));
+        VTABLE_set_pointer(interp, eh, CUR_OPCODE + ICONST(2));
         VTABLE_set_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE), eh);
     }
 
@@ -25860,7 +25874,7 @@ Parrot_push_cached_eh_ic_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
 
     /* Create new ExceptionHandler if there is none */
     if (PMC_IS_NULL(eh)) {
-        eh = Parrot_pmc_new(interp, enum_class_ExceptionHandler);
+        eh = Parrot_pmc_new_init_int(interp, enum_class_ExceptionHandler, ICONST(1));
         VTABLE_set_pointer(interp, eh, CUR_OPCODE + ICONST(2));
         VTABLE_set_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE), eh);
     }
@@ -25869,6 +25883,35 @@ Parrot_push_cached_eh_ic_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     Parrot_cx_add_handler_local(interp, eh);
 
 return (opcode_t *)cur_opcode + 3;}
+
+opcode_t *
+Parrot_push_cached_eh_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
+    const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
+    PMC                     *current_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+    Parrot_Sub_attributes   *sub;
+    PMC                     *eh;
+
+    PMC_get_sub(interp, current_sub, sub);
+
+    /* Vivify eh_cache to Hash. Keys will be C<op> */
+    if (PMC_IS_NULL(sub->eh_cache)) {
+        sub->eh_cache = Parrot_pmc_new(interp, enum_class_Hash);
+        VTABLE_set_integer_native(interp, sub->eh_cache, Hash_key_type_int);
+    }
+
+    eh = VTABLE_get_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE));
+
+    /* Create new ExceptionHandler if there is none */
+    if (PMC_IS_NULL(eh)) {
+        eh = Parrot_pmc_new(interp, enum_class_ExceptionHandler);
+        VTABLE_set_pointer(interp, eh, CUR_OPCODE + ICONST(1));
+        VTABLE_set_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE), eh);
+    }
+
+    /* Actually push ExceptionHandler */
+    Parrot_cx_add_handler_local(interp, eh);
+
+return (opcode_t *)cur_opcode + 2;}
 
 
 /*
@@ -25884,7 +25927,7 @@ op_lib_t core_op_lib = {
   3,    /* major_version */
   0,    /* minor_version */
   0,    /* patch_version */
-  1071,             /* op_count */
+  1072,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
   get_op          /* op_code() */ 

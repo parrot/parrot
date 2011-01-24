@@ -1085,6 +1085,7 @@ enum OPS_ENUM {
     enum_ops_root_new_p_pc_ic              = 1068,
     enum_ops_push_cached_eh_i_ic           = 1069,
     enum_ops_push_cached_eh_ic_ic          = 1070,
+    enum_ops_push_cached_eh_ic             = 1071,
 };
 
 
