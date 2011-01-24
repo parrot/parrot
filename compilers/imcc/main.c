@@ -60,6 +60,10 @@ static void do_pre_process(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void exit_reentrant_compile(PARROT_INTERP,
+    struct _imc_info_t *imc_info)
+        __attribute__nonnull__(1);
+
 static void imcc_destroy_macro_values(ARGMOD(void *value))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*value);
@@ -87,12 +91,18 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const struct longopt_opt_decl * Parrot_cmd_options(void);
 
+static struct _imc_info_t* prepare_reentrant_compile(PARROT_INTERP,
+    imcc_info_t * info)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_determine_input_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sourcefile))
 #define ASSERT_ARGS_do_pre_process __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sourcefile))
+#define ASSERT_ARGS_exit_reentrant_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_imcc_destroy_macro_values __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_imcc_get_optimization_description \
@@ -105,6 +115,8 @@ static const struct longopt_opt_decl * Parrot_cmd_options(void);
 #define ASSERT_ARGS_is_all_hex_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_cmd_options __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_prepare_reentrant_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -848,6 +860,22 @@ Called only from src/interp/inter_misc.c:Parrot_compile_file
 
 */
 
+static struct _imc_info_t*
+prepare_reentrant_compile(PARROT_INTERP, imcc_info_t * info)
+{
+    ASSERT_ARGS(imcc_prepare_reentrant_compile)
+    struct _imc_info_t * imc_info = NULL;
+    if (info->last_unit) {
+        /* a reentrant compile */
+        imc_info          = mem_gc_allocate_zeroed_typed(interp, imc_info_t);
+        imc_info->prev    = info;
+        imc_info->ghash   = info->ghash;
+        IMCC_INFO(interp) = imc_info;
+    }
+    return imc_info;
+}
+
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void *
@@ -857,18 +885,10 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
     ASSERT_ARGS(imcc_compile_file)
     PackFile_ByteCode * const cs_save = Parrot_pf_get_current_code_segment(interp);
     PackFile_ByteCode        *cs       = NULL;
-    struct _imc_info_t       *imc_info = NULL;
+    struct _imc_info_t * const imc_info = prepare_reentrant_compile(interp, IMCC_INFO(interp));
     PIOHANDLE fp = determine_input_file_type(interp, fullname);
     const int is_pasm = imcc_string_ends_with(interp, fullname, ".pasm");
     yyscan_t yyscanner;
-
-    if (IMCC_INFO(interp)->last_unit) {
-        /* a reentrant compile */
-        imc_info          = mem_gc_allocate_zeroed_typed(interp, imc_info_t);
-        imc_info->prev    = IMCC_INFO(interp);
-        imc_info->ghash   = IMCC_INFO(interp)->ghash;
-        IMCC_INFO(interp) = imc_info;
-    }
 
     IMCC_push_parser_state(interp, fullname, is_pasm);
     yylex_init_extra(interp, &yyscanner);
@@ -893,6 +913,15 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
     if (cs_save)
         (void)Parrot_switch_to_cs(interp, cs_save, 0);
 
+    exit_reentrant_compile(interp, imc_info);
+
+    return cs;
+}
+
+static void
+exit_reentrant_compile(PARROT_INTERP, struct _imc_info_t *imc_info)
+{
+    ASSERT_ARGS(exit_reentrant_compile)
     if (imc_info) {
         IMCC_INFO(interp) = imc_info->prev;
         if (imc_info->globals)
@@ -900,8 +929,6 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
 
         mem_sys_free(imc_info);
     }
-
-    return cs;
 }
 
 /*
