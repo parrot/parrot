@@ -21,6 +21,7 @@ Test various use cases of the push_cached_eh opcode.
     .include 'test_more.pir'
 
     'test_handle'()
+    'test_handle'() # Call second time
     'test_handle_twice'()
 
     'done_testing'()
@@ -31,13 +32,13 @@ Test various use cases of the push_cached_eh opcode.
 
     $P0 = new ["Exception"]
     throw $P0
-    nok("Not caught")
+    nok(1, "Not caught")
 
     .return()
 
   catch:
     pop_eh
-    ok("Caught in simple case")
+    ok(1, "Caught in simple case")
     .return()
 .end
 
@@ -64,12 +65,12 @@ Test various use cases of the push_cached_eh opcode.
 
     push_cached_eh catch
     "_throw"(payload)
-    nok("Exception not caught")
+    nok(1, "Exception not caught")
     .return()
 
   catch:
     pop_eh
-    ok(desc)
+    ok(1, desc)
     .return()
 .end
 
