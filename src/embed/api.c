@@ -530,7 +530,7 @@ Parrot_api_serialize_bytecode_pmc(Parrot_PMC interp_pmc, Parrot_PMC pbc,
 
 /*
 
-=item <Parrot_Int Parrot_api_write_bytecode_to_file(Parrot_PMC interp_pmc,
+=item C<Parrot_Int Parrot_api_write_bytecode_to_file(Parrot_PMC interp_pmc,
 Parrot_PMC pbc, Parrot_String filename)>
 
 Write out a PackFile PMC to a .pbc file
