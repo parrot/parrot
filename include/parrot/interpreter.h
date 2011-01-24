@@ -134,11 +134,6 @@ typedef struct warnings_t {
     Warnings_classes classes;
 } *Warnings;
 
-/* Forward declaration for imc_info_t -- the actual struct is
- * defined in imcc/imc.h */
-struct _imc_info_t;
-
-
 struct _Thread_data;    /* in thread.h */
 struct _Caches;         /* caches .h */
 
@@ -204,7 +199,6 @@ struct parrot_interp_t {
     PackFile_ByteCode  *code;                 /* The code we are executing */
     struct PackFile    *initial_pf;           /* first created PF  */
 
-    struct _imc_info_t *imc_info;             /* imcc data */
     Hash               *op_hash;              /* mapping from op names to op_info_t */
 
     PDB_t *pdb;                               /* debug /trace system */

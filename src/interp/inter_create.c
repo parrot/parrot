@@ -21,7 +21,6 @@ Create or destroy a Parrot interpreter
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
-#include "../compilers/imcc/imc.h"
 #include "pmc/pmc_callcontext.h"
 #include "../gc/gc_private.h"
 #include "inter_create.str"
@@ -157,9 +156,6 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     interp->current_runloop_id    = 0;
     interp->current_runloop_level = 0;
 
-    /* Allocate IMCC info */
-    IMCC_INFO(interp) = mem_internal_allocate_zeroed_typed(imc_info_t);
-
     interp->gc_sys           = mem_internal_allocate_zeroed_typed(GC_Subsystem);
     interp->gc_sys->sys_type = parent
                                     ? parent->gc_sys->sys_type
@@ -269,9 +265,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
 
     /* setup stdio PMCs */
     Parrot_io_init(interp);
-
-    /* init IMCC compiler */
-    imcc_init(interp);
 
     /* Done. Return and be done with it */
 
@@ -390,9 +383,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
      * TODO sweep constants too or special treatment - depends on how
      *      many constant PMCs we'll create
      */
-
-    /* destroy IMCC compiler */
-    imcc_destroy(interp);
 
     /* Now the PIOData gets also cleared */
     Parrot_io_finish(interp);
