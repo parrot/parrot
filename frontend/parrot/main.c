@@ -225,6 +225,17 @@ main(int argc, const char *argv[])
     exit(EXIT_SUCCESS);
 }
 
+/*
+
+=item C<static PMC * run_imcc(Parrot_PMC interp, Parrot_String sourcefile,
+struct init_args_t *flags, int argc, char** argv)>
+
+Call into IMCC to either compile or preprocess the input.
+
+=cut
+
+*/
+
 static PMC *
 run_imcc(Parrot_PMC interp, Parrot_String sourcefile,
         struct init_args_t *flags, int argc, char** argv)
@@ -884,6 +895,16 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             show_last_error_and_exit(interp);
     }
 }
+
+/*
+
+=item C<static void verify_file_names(const char * input, const char * output)>
+
+Verify that the input and output filenames are sane and are not the same.
+
+=cut
+
+*/
 
 static void
 verify_file_names(const char * input, const char * output)

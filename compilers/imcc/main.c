@@ -501,6 +501,10 @@ imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile), int argc,
     return imcc_run(interp, sourcefile);
 }
 
+/*
+
+=item C<
+
 PARROT_EXPORT
 PMC *
 imcc_do_preprocess_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile),
@@ -860,22 +864,6 @@ Called only from src/interp/inter_misc.c:Parrot_compile_file
 
 */
 
-static struct _imc_info_t*
-prepare_reentrant_compile(PARROT_INTERP, imc_info_t * info)
-{
-    ASSERT_ARGS(prepare_reentrant_compile)
-    struct _imc_info_t * imc_info = NULL;
-    if (info->last_unit) {
-        /* a reentrant compile */
-        imc_info          = mem_gc_allocate_zeroed_typed(interp, imc_info_t);
-        imc_info->prev    = info;
-        imc_info->ghash   = info->ghash;
-        IMCC_INFO(interp) = imc_info;
-    }
-    return imc_info;
-}
-
-
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void *
@@ -916,6 +904,39 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
     exit_reentrant_compile(interp, imc_info);
 
     return cs;
+}
+
+/*
+
+=item C<static struct _imc_info_t* prepare_reentrant_compile(PARROT_INTERP,
+imc_info_t * info)>
+
+Prepare IMCC for a reentrant compile. Push a new imc_info_t structure onto the
+list and set the new one as the current one. Return the new info structure.
+returns NULL if not in a reentrant situation. The return value of this I<MUST>
+be passed to C<exit_reentrant_compile>.
+
+=item C<static void exit_reentrant_compile(PARROT_INTERP, struct _imc_info_t
+*imc_info)>
+
+Exit reentrant compile. Restore compiler state back to what it was for the
+previous compile, if any.
+
+*/
+
+static struct _imc_info_t*
+prepare_reentrant_compile(PARROT_INTERP, imc_info_t * info)
+{
+    ASSERT_ARGS(prepare_reentrant_compile)
+    struct _imc_info_t * imc_info = NULL;
+    if (info->last_unit) {
+        /* a reentrant compile */
+        imc_info          = mem_gc_allocate_zeroed_typed(interp, imc_info_t);
+        imc_info->prev    = info;
+        imc_info->ghash   = info->ghash;
+        IMCC_INFO(interp) = imc_info;
+    }
+    return imc_info;
 }
 
 static void
