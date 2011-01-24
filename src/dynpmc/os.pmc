@@ -31,6 +31,66 @@ files and directories.
 #  include <unistd.h>
 #endif
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_CANNOT_RETURN_NULL
+static PMC * stat_buf_to_array(PARROT_INTERP,
+    ARGIN(const Parrot_Stat_Buf *buf))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static int win32_can_execute(PARROT_INTERP, ARGIN(STRING *filename))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_stat_buf_to_array __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(buf))
+#define ASSERT_ARGS_win32_can_execute __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(filename))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+/*
+
+=item C<static PMC * stat_buf_to_array(PARROT_INTERP, const Parrot_Stat_Buf
+*buf)>
+
+Converts a stat buffer to a Perl-like array.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static PMC *
+stat_buf_to_array(PARROT_INTERP, ARGIN(const Parrot_Stat_Buf *buf))
+{
+    ASSERT_ARGS(stat_buf_to_array)
+    PMC * const array = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
+
+    VTABLE_set_integer_native(interp, array, 13);
+
+    VTABLE_set_integer_keyed_int(interp, array,  0, buf->dev);
+    VTABLE_set_integer_keyed_int(interp, array,  1, buf->inode);
+    VTABLE_set_integer_keyed_int(interp, array,  2, buf->mode);
+    VTABLE_set_integer_keyed_int(interp, array,  3, buf->n_links);
+    VTABLE_set_integer_keyed_int(interp, array,  4, buf->uid);
+    VTABLE_set_integer_keyed_int(interp, array,  5, buf->gid);
+    VTABLE_set_integer_keyed_int(interp, array,  6, 0);
+    VTABLE_set_integer_keyed_int(interp, array,  7, buf->size);
+    VTABLE_set_integer_keyed_int(interp, array,  8, buf->access_time.tv_sec);
+    VTABLE_set_integer_keyed_int(interp, array,  9, buf->modify_time.tv_sec);
+    VTABLE_set_integer_keyed_int(interp, array, 10, buf->change_time.tv_sec);
+    VTABLE_set_integer_keyed_int(interp, array, 11, buf->block_size);
+    VTABLE_set_integer_keyed_int(interp, array, 12, buf->blocks);
+
+    return array;
+}
+
 #ifdef WIN32
 /*
 
@@ -43,7 +103,7 @@ tests if a win32 file is executable
 */
 
 static int
-win32_can_execute(PARROT_INTERP, STRING *filename)
+win32_can_execute(PARROT_INTERP, ARGIN(STRING *filename))
 {
     PMC * env = Parrot_pmc_new(interp, enum_class_Env);
     STRING * const pathext_str = Parrot_str_new(interp, "PATHEXT", 7);
@@ -69,13 +129,6 @@ win32_can_execute(PARROT_INTERP, STRING *filename)
     return 0;
 }
 #endif
-
-/* XXX Check if we need to deallocate strerror strings */
-/* XXX apparently, strerror_r is thread-safe and should be used instead.*/
-
-/* HEADERIZER HFILE: none */
-/* HEADERIZER BEGIN: static */
-/* HEADERIZER END: static */
 
 static PMC *OS_PMC;
 pmclass OS dynpmc singleton {
@@ -203,129 +256,33 @@ https://trac.parrot.org/parrot/ticket/849
 */
 
     METHOD stat(STRING *path) {
-        struct stat   info;
-        char  * const cpath = Parrot_str_to_cstring(INTERP, path);
-        const int     error = stat(cpath, &info);
+        Parrot_Stat_Buf  buf;
+        PMC             *array;
 
-        Parrot_str_free_cstring(cpath);
+        Parrot_file_stat(interp, path, &buf);
+        array = stat_buf_to_array(interp, &buf);
 
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-        else {
-            PMC * const array = Parrot_pmc_new(INTERP, enum_class_FixedPMCArray);
-            VTABLE_set_integer_native(INTERP, array, 13);
-
-            VTABLE_set_integer_keyed_int(INTERP, array,  0,
-                    (INTVAL)info.st_dev);
-            VTABLE_set_integer_keyed_int(INTERP, array,  1,
-                    (INTVAL)info.st_ino);
-            VTABLE_set_integer_keyed_int(INTERP, array,  2,
-                    (INTVAL)info.st_mode);
-            VTABLE_set_integer_keyed_int(INTERP, array,  3,
-                    (INTVAL)info.st_nlink);
-            VTABLE_set_integer_keyed_int(INTERP, array,  4,
-                    (INTVAL)info.st_uid);
-            VTABLE_set_integer_keyed_int(INTERP, array,  5,
-                    (INTVAL)info.st_gid);
-            VTABLE_set_integer_keyed_int(INTERP, array,  6,
-                    (INTVAL)info.st_rdev);
-            VTABLE_set_integer_keyed_int(INTERP, array,  7,
-                    (INTVAL)info.st_size);
-            VTABLE_set_integer_keyed_int(INTERP, array,  8,
-                    (INTVAL)info.st_atime);
-            VTABLE_set_integer_keyed_int(INTERP, array,  9,
-                    (INTVAL)info.st_mtime);
-            VTABLE_set_integer_keyed_int(INTERP, array, 10,
-                    (INTVAL)info.st_ctime);
-#ifndef WIN32
-            VTABLE_set_integer_keyed_int(INTERP, array, 11,
-                    (INTVAL)info.st_blksize);
-            VTABLE_set_integer_keyed_int(INTERP, array, 12,
-                    (INTVAL)info.st_blocks);
-#endif
-            RETURN(PMC *array);
-        }
+        RETURN(PMC *array);
     }
 
 /*
 
 =item C<fixedpmcarray *lstat(STRING *path)>
 
-Stats a file, and returns a 13 position array as in Perl:
-
-     0 dev      device number of filesystem
-     1 ino      inode number
-     2 mode     file mode  (type and permissions)
-     3 nlink    number of (hard) links to the file
-     4 uid      numeric user ID of file's owner
-     5 gid      numeric group ID of file's owner
-     6 rdev     the device identifier (special files only)
-     7 size     total size of file, in bytes
-     8 atime    last access time in seconds since the epoch
-     9 mtime    last modify time in seconds since the epoch
-    10 ctime    inode change time in seconds since the epoch (*)
-    11 blksize  preferred block size for file system I/O
-    12 blocks   actual number of blocks allocated
-
-11 and 12 are not available under Windows.
+Lstats a file, and returns a 13 position array as in Perl. See C<stat>.
 
 =cut
 
 */
 
     METHOD lstat(STRING *path) {
-        struct stat info;
+        Parrot_Stat_Buf  buf;
+        PMC             *array;
 
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-#ifdef WIN32
-        const int error = stat(cpath, &info);
-#else
-        const int error = lstat(cpath, &info);
-#endif
-        Parrot_str_free_cstring(cpath);
+        Parrot_file_stat(interp, path, &buf);
+        array = stat_buf_to_array(interp, &buf);
 
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-        else {
-            PMC * const array = Parrot_pmc_new(INTERP, enum_class_FixedPMCArray);
-            VTABLE_set_integer_native(INTERP, array, 13);
-
-            VTABLE_set_integer_keyed_int(INTERP, array,  0,
-                    (INTVAL)info.st_dev);
-            VTABLE_set_integer_keyed_int(INTERP, array,  1,
-                    (INTVAL)info.st_ino);
-            VTABLE_set_integer_keyed_int(INTERP, array,  2,
-                    (INTVAL)info.st_mode);
-            VTABLE_set_integer_keyed_int(INTERP, array,  3,
-                    (INTVAL)info.st_nlink);
-            VTABLE_set_integer_keyed_int(INTERP, array,  4,
-                    (INTVAL)info.st_uid);
-            VTABLE_set_integer_keyed_int(INTERP, array,  5,
-                    (INTVAL)info.st_gid);
-            VTABLE_set_integer_keyed_int(INTERP, array,  6,
-                    (INTVAL)info.st_rdev);
-            VTABLE_set_integer_keyed_int(INTERP, array,  7,
-                    (INTVAL)info.st_size);
-            VTABLE_set_integer_keyed_int(INTERP, array,  8,
-                    (INTVAL)info.st_atime);
-            VTABLE_set_integer_keyed_int(INTERP, array,  9,
-                    (INTVAL)info.st_mtime);
-            VTABLE_set_integer_keyed_int(INTERP, array, 10,
-                    (INTVAL)info.st_ctime);
-#ifndef WIN32
-            VTABLE_set_integer_keyed_int(INTERP, array, 11,
-                    (INTVAL)info.st_blksize);
-            VTABLE_set_integer_keyed_int(INTERP, array, 12,
-                    (INTVAL)info.st_blocks);
-#endif
-            RETURN(PMC *array);
-        }
+        RETURN(PMC *array);
     }
 
 /*

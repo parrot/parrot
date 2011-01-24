@@ -44,7 +44,14 @@ static INTVAL file_attribute_intval(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL filetime_to_unix(ARGIN(FILETIME *file_time))
+static void filetime_to_timespec(
+    ARGIN(FILETIME *ft),
+    ARGOUT(struct timespec *ts))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*ts);
+
+static INTVAL filetime_to_unix(ARGIN(FILETIME *ft))
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_by_handle_file_info_intval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -53,8 +60,11 @@ static INTVAL filetime_to_unix(ARGIN(FILETIME *file_time))
 #define ASSERT_ARGS_file_attribute_intval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(attr_data))
+#define ASSERT_ARGS_filetime_to_timespec __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(ft) \
+    , PARROT_ASSERT_ARG(ts))
 #define ASSERT_ARGS_filetime_to_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(file_time))
+       PARROT_ASSERT_ARG(ft))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -68,6 +78,7 @@ Returns the current working directory.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_file_getcwd(PARROT_INTERP)
 {
@@ -188,7 +199,44 @@ Parrot_file_unlink(PARROT_INTERP, ARGIN(STRING *path))
 
 /*
 
-=item C<static INTVAL filetime_to_unix(FILETIME *file_time)>
+=item C<static void filetime_to_timespec(FILETIME *ft, struct timespec *ts)>
+
+Converts a Win32 FILETIME to a struct timespec.
+
+=cut
+
+*/
+
+static void
+filetime_to_timespec(ARGIN(FILETIME *ft), ARGOUT(struct timespec *ts))
+{
+    ASSERT_ARGS(filetime_to_timespec)
+    LARGE_INTEGER large_int;
+
+    large_int.HighPart = ft->dwHighDateTime;
+    large_int.LowPart  = ft->dwLowDateTime;
+
+    /*
+     * A Windows FILETIME is the number of 100 nanosecond ticks since
+     * January 1st, 1601. So the offset to the Unix epoch is
+     * ((1970 - 1601) * 365 + 89) * (24 * 60 * 60) * (10 * 1000 * 1000)
+     */
+    large_int.QuadPart -= 116444736000000000LL;
+
+    if (large_int.QuadPart <= 0) {
+        /* A file time before the Unix epoch */
+        ts->tv_sec  = 0;
+        ts->tv_nsec = 0;
+    }
+    else {
+        ts->tv_sec  = (time_t)(large_int.QuadPart / 10000000);
+        ts->tv_nsec = 100 * (long)(large_int.QuadPart % 10000000);
+    }
+}
+
+/*
+
+=item C<static INTVAL filetime_to_unix(FILETIME *ft)>
 
 Converts a Win32 FILETIME to UNIX timestamp.
 
@@ -197,23 +245,142 @@ Converts a Win32 FILETIME to UNIX timestamp.
 */
 
 static INTVAL
-filetime_to_unix(ARGIN(FILETIME *file_time))
+filetime_to_unix(ARGIN(FILETIME *ft))
 {
     ASSERT_ARGS(filetime_to_unix)
-    LARGE_INTEGER large_int;
+    struct timespec ts;
 
-    large_int.HighPart = file_time->dwHighDateTime;
-    large_int.LowPart  = file_time->dwLowDateTime;
+    filetime_to_timespec(ft, &ts);
 
-    /* ((1970 - 1601) * 365 + 89) * (24 * 60 * 60) * (10 * 1000 * 1000) */
-    large_int.QuadPart -= 116444736000000000LL;
-
-    if (large_int.QuadPart <= 0)
-        return 0;
-
-    return (INTVAL)(large_int.QuadPart / 10000000);
+    return (INTVAL)ts.tv_sec;
 }
 
+/*
+
+=item C<void Parrot_file_stat(PARROT_INTERP, STRING *file, Parrot_Stat_Buf
+*buf)>
+
+Stats file C<file>.
+
+=cut
+
+*/
+
+void
+Parrot_file_stat(PARROT_INTERP, ARGIN(STRING *file),
+        ARGOUT(Parrot_Stat_Buf *buf))
+{
+    WIN32_FILE_ATTRIBUTE_DATA attr_data;
+    char   *c_str = Parrot_str_to_encoded_cstring(interp, file,
+                        Parrot_utf16_encoding_ptr);
+    BOOL    success;
+    INTVAL  type;
+
+    success = GetFileAttributesExW((LPWSTR)c_str,
+                    GetFileExInfoStandard, &attr_data);
+
+    Parrot_str_free_cstring(c_str);
+
+    if (!success)
+        THROW("stat");
+
+    if (attr_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+        type = STAT_TYPE_DIRECTORY;
+    }
+    else if (attr_data.dwFileAttributes & FILE_ATTRIBUTE_DEVICE) {
+        type = STAT_TYPE_DEVICE;
+    }
+    else {
+        type = STAT_TYPE_FILE;
+    }
+
+    buf->type        = type;
+    buf->size        = ((HUGEINTVAL)attr_data.nFileSizeHigh << 32)
+                     | attr_data.nFileSizeLow;
+    buf->uid         = 0;
+    buf->gid         = 0;
+    buf->dev         = 0;
+    buf->inode       = 0;
+    buf->mode        = 0777;
+    buf->n_links     = 0;
+    buf->block_size  = 0;
+    buf->blocks      = (INTVAL)(buf->size / 512);
+
+    filetime_to_timespec(&attr_data.ftCreationTime,   &buf->create_time);
+    filetime_to_timespec(&attr_data.ftLastAccessTime, &buf->access_time);
+    filetime_to_timespec(&attr_data.ftLastWriteTime,  &buf->modify_time);
+
+    buf->change_time = buf->modify_time;
+}
+
+/*
+
+=item C<void Parrot_file_lstat(PARROT_INTERP, STRING *file, Parrot_Stat_Buf
+*buf)>
+
+lstats file C<file>.
+
+=cut
+
+*/
+
+void
+Parrot_file_lstat(PARROT_INTERP, ARGIN(STRING *file),
+        ARGOUT(Parrot_Stat_Buf *buf))
+{
+    Parrot_file_stat(interp, file, buf);
+}
+
+/*
+
+=item C<void Parrot_file_fstat(PARROT_INTERP, PIOHANDLE os_handle,
+Parrot_Stat_Buf *buf)>
+
+fstats file C<file>.
+
+=cut
+
+*/
+
+void
+Parrot_file_fstat(PARROT_INTERP, PIOHANDLE os_handle,
+        ARGOUT(Parrot_Stat_Buf *buf))
+{
+    BY_HANDLE_FILE_INFORMATION file_info;
+    INTVAL type;
+
+    if (!GetFileInformationByHandle(os_handle, &file_info))
+        THROW("fstat");
+
+    if (file_info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+        type = STAT_TYPE_DIRECTORY;
+    }
+    else if (file_info.dwFileAttributes & FILE_ATTRIBUTE_DEVICE) {
+        type = STAT_TYPE_DEVICE;
+    }
+    else {
+        type = STAT_TYPE_FILE;
+    }
+
+    buf->type        = type;
+    buf->size        = ((HUGEINTVAL)file_info.nFileSizeHigh << 32)
+                     | file_info.nFileSizeLow;
+    buf->uid         = 0;
+    buf->gid         = 0;
+    buf->dev         = file_info.dwVolumeSerialNumber;
+    buf->inode       = ((HUGEINTVAL)file_info.nFileIndexHigh << 32)
+                     | file_info.nFileIndexLow;
+    buf->mode        = 0777;
+    buf->n_links     = file_info.nNumberOfLinks;
+    buf->block_size  = 0;
+    buf->blocks      = (INTVAL)(buf->size / 512);
+
+    filetime_to_timespec(&file_info.ftCreationTime,   &buf->create_time);
+    filetime_to_timespec(&file_info.ftLastAccessTime, &buf->access_time);
+    filetime_to_timespec(&file_info.ftLastWriteTime,  &buf->modify_time);
+
+    buf->change_time = buf->modify_time;
+}
 
 /*
 

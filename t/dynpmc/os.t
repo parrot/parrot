@@ -330,6 +330,10 @@ if ( $cygwin ) {
 }
 
 if ( $MSWin32 ) {
+    $s[0] = 0;      # dev: we use dwVolumeSerialNumber instead of drive letter 
+    $s[2] = 0777;   # mode: always 0777 on Windows
+    $s[3] = 0;      # nlink: only implemented in fstat for now
+    $s[6] = 0;      # rdev: we use zero instead of drive letter
     $stat = sprintf("0x%08x\n" x 11, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
@@ -337,6 +341,7 @@ if ( $MSWin32 ) {
         $P1 = new ['OS']
         $S1 = "xpto"
         $P2 = $P1."stat"($S1)
+        $P2[0] = 0
 
         $S1 = repeat "0x%08x\n", 11
         $S2 = sprintf $S1, $P2
@@ -375,7 +380,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', 'test bad stat');
         $P2 = $P1."stat"("non-existent something")
 .end
 CODE
-/No such file or directory/
+/stat failed/
 OUTPUT
 
 # test readdir
@@ -497,7 +502,7 @@ SKIP: {
         end
 .end
 CODE
-/${lstat}No such file or directory/
+/${lstat}stat failed/
 OUTPUT
 }
 

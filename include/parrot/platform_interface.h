@@ -16,6 +16,13 @@
 #  include <limits.h>
 #endif
 
+#ifndef PARROT_HAS_TIMESPEC
+struct timespec {
+    time_t tv_sec;
+    long   tv_nsec;
+};
+#endif /* PARROT_HAS_TIMESPEC */
+
 #ifdef _MSC_VER
 
 #  ifndef LLONG_MAX
@@ -117,7 +124,32 @@ INTVAL Parrot_io_close_socket(PARROT_INTERP, PIOHANDLE handle);
 #define STAT_PLATFORM_BLOCKSIZE  -6
 #define STAT_PLATFORM_BLOCKS     -7
 
+#define STAT_TYPE_UNKNOWN         0
+#define STAT_TYPE_FILE            1
+#define STAT_TYPE_DIRECTORY       2
+#define STAT_TYPE_PIPE            3
+#define STAT_TYPE_LINK            4
+#define STAT_TYPE_DEVICE          5
+
 /* &end_gen */
+
+typedef struct _Parrot_Stat_Buf {
+    INTVAL     type;
+    HUGEINTVAL size;
+    INTVAL     uid;
+    INTVAL     gid;
+    INTVAL     dev;
+    HUGEINTVAL inode;
+    INTVAL     mode;
+    INTVAL     n_links;
+    INTVAL     block_size;
+    INTVAL     blocks;
+
+    struct timespec create_time;
+    struct timespec access_time;
+    struct timespec modify_time;
+    struct timespec change_time;
+} Parrot_Stat_Buf;
 
 PARROT_EXPORT
 STRING *Parrot_file_getcwd(Interp *);
@@ -133,6 +165,15 @@ void Parrot_file_rmdir(Interp *, ARGIN(STRING *path));
 
 PARROT_EXPORT
 void Parrot_file_unlink(Interp *, ARGIN(STRING *path));
+
+PARROT_EXPORT
+void Parrot_file_stat(Interp * , ARGIN(STRING *path), ARGOUT(Parrot_Stat_Buf *buf));
+
+PARROT_EXPORT
+void Parrot_file_lstat(Interp * , ARGIN(STRING *path), ARGOUT(Parrot_Stat_Buf *buf));
+
+PARROT_EXPORT
+void Parrot_file_fstat(Interp * , PIOHANDLE handle, ARGOUT(Parrot_Stat_Buf *buf));
 
 PARROT_EXPORT
 INTVAL Parrot_file_stat_intval(Interp * , ARGIN(STRING *path), INTVAL thing);

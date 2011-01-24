@@ -32,14 +32,26 @@ This file implements OS-specific file functions for generic UNIX platforms.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static INTVAL stat_common(PARROT_INTERP,
+static void convert_stat_buf(PARROT_INTERP,
+    ARGIN(struct stat *stat_buf),
+    ARGOUT(Parrot_Stat_Buf *buf))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*buf);
+
+static INTVAL stat_intval(PARROT_INTERP,
     ARGIN(struct stat *statbuf),
     INTVAL thing,
     int status)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_stat_common __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_convert_stat_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(stat_buf) \
+    , PARROT_ASSERT_ARG(buf))
+#define ASSERT_ARGS_stat_intval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(statbuf))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -55,6 +67,7 @@ Returns the current working directory.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_file_getcwd(PARROT_INTERP)
 {
@@ -167,7 +180,149 @@ Parrot_file_unlink(PARROT_INTERP, ARGIN(STRING *path))
 
 /*
 
-=item C<static INTVAL stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL
+=item C<static void convert_stat_buf(PARROT_INTERP, struct stat *stat_buf,
+Parrot_Stat_Buf *buf)>
+
+Converts a UNIX stat buffer to a Parrot stat buffer.
+
+=cut
+
+*/
+
+static void
+convert_stat_buf(PARROT_INTERP, ARGIN(struct stat *stat_buf),
+        ARGOUT(Parrot_Stat_Buf *buf))
+{
+    ASSERT_ARGS(convert_stat_buf)
+    static const struct timespec zero = { 0, 0 };
+
+    INTVAL type;
+
+    switch (stat_buf->st_mode & S_IFMT) {
+      case S_IFREG:
+        type = STAT_TYPE_FILE;
+        break;
+      case S_IFDIR:
+        type = STAT_TYPE_DIRECTORY;
+        break;
+      case S_IFIFO:
+        type = STAT_TYPE_PIPE;
+        break;
+      case S_IFLNK:
+        type = STAT_TYPE_LINK;
+        break;
+      case S_IFCHR:
+      case S_IFBLK:
+        type = STAT_TYPE_DEVICE;
+        break;
+      default:
+        type = STAT_TYPE_UNKNOWN;
+        break;
+    }
+
+    buf->type        = type;
+    buf->size        = stat_buf->st_size;
+    buf->uid         = stat_buf->st_uid;
+    buf->gid         = stat_buf->st_gid;
+    buf->dev         = stat_buf->st_dev;
+    buf->inode       = stat_buf->st_ino;
+    buf->mode        = stat_buf->st_mode & 0xffff;
+    buf->n_links     = stat_buf->st_nlink;
+#ifdef PARROT_HAS_BSD_STAT_EXTN
+    buf->block_size  = stat_buf->st_blksize;
+    buf->blocks      = stat_buf->st_blocks;
+#else
+    buf->block_size  = 0;
+    buf->blocks      = stat_buf->st_size / 512;
+#endif
+
+    buf->create_time = zero;
+    buf->access_time = stat_buf->st_atim;
+    buf->modify_time = stat_buf->st_mtim;
+    buf->change_time = stat_buf->st_ctim;
+}
+
+/*
+
+=item C<void Parrot_file_stat(PARROT_INTERP, STRING *file, Parrot_Stat_Buf
+*buf)>
+
+Stats file C<file>.
+
+=cut
+
+*/
+
+void
+Parrot_file_stat(PARROT_INTERP, ARGIN(STRING *file),
+        ARGOUT(Parrot_Stat_Buf *buf))
+{
+    struct stat  stat_buf;
+    char * const filename = Parrot_str_to_cstring(interp, file);
+    const int    status = stat(filename, &stat_buf);
+
+    Parrot_str_free_cstring(filename);
+
+    if (status)
+        THROW("stat");
+
+    convert_stat_buf(interp, &stat_buf, buf);
+}
+
+/*
+
+=item C<void Parrot_file_lstat(PARROT_INTERP, STRING *file, Parrot_Stat_Buf
+*buf)>
+
+lstats file C<file>.
+
+=cut
+
+*/
+
+void
+Parrot_file_lstat(PARROT_INTERP, ARGIN(STRING *file),
+        ARGOUT(Parrot_Stat_Buf *buf))
+{
+    struct stat  stat_buf;
+    char * const filename = Parrot_str_to_cstring(interp, file);
+    const int    status = lstat(filename, &stat_buf);
+
+    Parrot_str_free_cstring(filename);
+
+    if (status)
+        THROW("stat");
+
+    convert_stat_buf(interp, &stat_buf, buf);
+}
+
+/*
+
+=item C<void Parrot_file_fstat(PARROT_INTERP, PIOHANDLE os_handle,
+Parrot_Stat_Buf *buf)>
+
+fstats file C<file>.
+
+=cut
+
+*/
+
+void
+Parrot_file_fstat(PARROT_INTERP, PIOHANDLE os_handle,
+        ARGOUT(Parrot_Stat_Buf *buf))
+{
+    struct stat stat_buf;
+    const int   status = fstat(os_handle, &stat_buf);
+
+    if (status)
+        THROW("stat");
+
+    convert_stat_buf(interp, &stat_buf, buf);
+}
+
+/*
+
+=item C<static INTVAL stat_intval(PARROT_INTERP, struct stat *statbuf, INTVAL
 thing, int status)>
 
 Stats the file, and returns the information specified by C<thing>. C<thing> can
@@ -224,9 +379,9 @@ C<STAT_CREATETIME> and C<STAT_BACKUPTIME> are not supported and will return C<-1
 */
 
 static INTVAL
-stat_common(PARROT_INTERP, ARGIN(struct stat *statbuf), INTVAL thing, int status)
+stat_intval(PARROT_INTERP, ARGIN(struct stat *statbuf), INTVAL thing, int status)
 {
-    ASSERT_ARGS(stat_common)
+    ASSERT_ARGS(stat_intval)
     INTVAL result = -1;
 
     if (thing == STAT_EXISTS)
@@ -336,7 +491,7 @@ Parrot_file_stat_intval(PARROT_INTERP, STRING *file, INTVAL thing)
     /* Everything needs the result of stat, so just go do it */
     const int status = stat(filename, &statbuf);
     Parrot_str_free_cstring(filename);
-    return stat_common(interp, &statbuf, thing, status);
+    return stat_intval(interp, &statbuf, thing, status);
 }
 
 /*
@@ -361,7 +516,7 @@ Parrot_file_lstat_intval(PARROT_INTERP, STRING *file, INTVAL thing)
     /* Everything needs the result of stat, so just go do it */
     const int status = lstat(filename, &statbuf);
     Parrot_str_free_cstring(filename);
-    return stat_common(interp, &statbuf, thing, status);
+    return stat_intval(interp, &statbuf, thing, status);
 }
 
 /*
@@ -383,7 +538,7 @@ Parrot_file_fstat_intval(PARROT_INTERP, PIOHANDLE file, INTVAL thing)
 
     /* Everything needs the result of stat, so just go do it */
     status = fstat(file, &statbuf);
-    return stat_common(interp, &statbuf, thing, status);
+    return stat_intval(interp, &statbuf, thing, status);
 }
 
 /*
