@@ -25849,6 +25849,11 @@ Parrot_push_cached_eh_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
         VTABLE_set_pointer(interp, eh, CUR_OPCODE + ICONST(2));
         VTABLE_set_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE), eh);
     }
+    else {
+        /* Reinit handler */
+        VTABLE_init(interp, eh);
+        VTABLE_set_pointer(interp, eh, CUR_OPCODE + ICONST(2));
+    }
 
     /* Actually push ExceptionHandler */
     Parrot_cx_add_handler_local(interp, eh);
@@ -25878,6 +25883,11 @@ Parrot_push_cached_eh_ic_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
         VTABLE_set_pointer(interp, eh, CUR_OPCODE + ICONST(2));
         VTABLE_set_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE), eh);
     }
+    else {
+        /* Reinit handler */
+        VTABLE_init(interp, eh);
+        VTABLE_set_pointer(interp, eh, CUR_OPCODE + ICONST(2));
+    }
 
     /* Actually push ExceptionHandler */
     Parrot_cx_add_handler_local(interp, eh);
@@ -25906,6 +25916,11 @@ Parrot_push_cached_eh_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
         eh = Parrot_pmc_new(interp, enum_class_ExceptionHandler);
         VTABLE_set_pointer(interp, eh, CUR_OPCODE + ICONST(1));
         VTABLE_set_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE), eh);
+    }
+    else {
+        /* Reinit handler */
+        VTABLE_init(interp, eh);
+        VTABLE_set_pointer(interp, eh, CUR_OPCODE + ICONST(1));
     }
 
     /* Actually push ExceptionHandler */
