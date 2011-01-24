@@ -858,15 +858,9 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
     PackFile_ByteCode * const cs_save = Parrot_pf_get_current_code_segment(interp);
     PackFile_ByteCode        *cs       = NULL;
     struct _imc_info_t       *imc_info = NULL;
-    const char               *ext;
     PIOHANDLE fp = determine_input_file_type(interp, fullname);
-    PMC                      *newcontext;
     const int is_pasm = imcc_string_ends_with(interp, fullname, ".pasm");
-    void *yyscanner;
-
-    /* need at least 3 regs for compilation of constant math e.g.
-     * add_i_ic_ic - see also IMCC_subst_constants() */
-    UINTVAL regs_used[4] = {3, 3, 3, 3};
+    yyscan_t yyscanner;
 
     if (IMCC_INFO(interp)->last_unit) {
         /* a reentrant compile */
@@ -882,19 +876,12 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
     /* start over; let the start of line rule increment this to 1 */
     IMCC_INFO(interp)->line = 0;
 
-    /* Activate a new context and reset it to initial values */
-    newcontext = Parrot_push_context(interp, regs_used);
-    Parrot_pcc_set_HLL(interp, newcontext, 0);
-    Parrot_pcc_set_sub(interp, newcontext, 0);
     IMCC_INFO(interp)->cur_namespace = NULL;
     interp->code                     = NULL;
 
     compile_file(interp, fp, yyscanner);
 
     yylex_destroy(yyscanner);
-
-    Parrot_pop_context(interp);
-
     imc_cleanup(interp, NULL);
     PIO_CLOSE(interp, fp);
 

@@ -226,9 +226,16 @@ Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), ARGOUT(STRING **erro
 {
     ASSERT_ARGS(Parrot_compile_file)
     PackFile_ByteCode *result = NULL;
+    UINTVAL regs_used[4] = {3, 3, 3, 3};
+    PMC * const newcontext = Parrot_push_context(interp, regs_used);
 
     Parrot_block_GC_mark(interp);
+    Parrot_pcc_set_HLL(interp, newcontext, 0);
+    Parrot_pcc_set_sub(interp, newcontext, 0);
+
     result = imcc_compile_file(interp, fullname, error);
+
+    Parrot_pop_context(interp);
     Parrot_unblock_GC_mark(interp);
 
     return result;
