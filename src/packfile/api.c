@@ -3656,16 +3656,11 @@ PackFile_Annotations_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
     if (self->keys)
         mem_gc_free(interp, self->keys);
 
-    /* Free any groups. */
-    if (self->groups)
-        mem_gc_free(interp, self->groups);
-
     /* Free any entries. */
     if (self->entries)
         mem_gc_free(interp, self->entries);
 
     self->keys    = NULL;
-    self->groups  = NULL;
     self->entries = NULL;
 }
 
@@ -3689,9 +3684,8 @@ PackFile_Annotations_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *seg))
 {
     ASSERT_ARGS(PackFile_Annotations_packed_size)
     const PackFile_Annotations * const self = (PackFile_Annotations *)seg;
-    return 3                      /* Counts. */
+    return 2                      /* Counts. */
          + self->num_keys    * 2  /* Keys. */
-         + self->num_groups  * 2  /* Groups. */
          + self->num_entries * 3; /* Entries. */
 }
 
@@ -3724,15 +3718,6 @@ PackFile_Annotations_pack(SHIM_INTERP, ARGIN(PackFile_Segment *seg),
         const PackFile_Annotations_Key * const key = self->keys + i;
         *cursor++ = key->name;
         *cursor++ = key->type;
-    }
-
-    /* Write group count and any groups. */
-    *cursor++ = self->num_groups;
-
-    for (i = 0; i < self->num_groups; ++i) {
-        const PackFile_Annotations_Group * const group = self->groups + i;
-        *cursor++ = group->bytecode_offset;
-        *cursor++ = group->entries_offset;
     }
 
     /* Write entry count and any entries. */
@@ -3781,17 +3766,6 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
         PackFile_Annotations_Key * const key = self->keys + i;
         key->name = PF_fetch_opcode(seg->pf, &cursor);
         key->type = PF_fetch_opcode(seg->pf, &cursor);
-    }
-
-    /* Unpack groups. */
-    self->num_groups = PF_fetch_opcode(seg->pf, &cursor);
-    self->groups     = mem_gc_allocate_n_zeroed_typed(interp,
-            self->num_groups, PackFile_Annotations_Group);
-
-    for (i = 0; i < self->num_groups; ++i) {
-        PackFile_Annotations_Group * const group = self->groups + i;
-        group->bytecode_offset = PF_fetch_opcode(seg->pf, &cursor);
-        group->entries_offset  = PF_fetch_opcode(seg->pf, &cursor);
     }
 
     /* Unpack entries. */
@@ -3862,20 +3836,6 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
 
     Parrot_io_printf(interp, "  ],\n");
 
-    /* Dump groups. */
-    Parrot_io_printf(interp, "\n  groups => [\n");
-    for (i = 0; i < self->num_groups; ++i) {
-        const PackFile_Annotations_Group * const group = self->groups + i;
-        Parrot_io_printf(interp, "    #%d\n    [\n", i);
-        Parrot_io_printf(interp, "        BYTECODE_OFFSET => %d\n",
-                group->bytecode_offset);
-        Parrot_io_printf(interp, "        ENTRIES_OFFSET => %d\n",
-                group->entries_offset);
-        Parrot_io_printf(interp, "    ],\n");
-    }
-
-    Parrot_io_printf(interp, "  ],\n");
-
     /* Dump entries. */
     Parrot_io_printf(interp, "\n  entries => [\n");
 
@@ -3893,43 +3853,6 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
 
     Parrot_io_printf(interp, "  ],\n");
     Parrot_io_printf(interp, "],\n");
-}
-
-
-/*
-
-=item C<void PackFile_Annotations_add_group(PARROT_INTERP, PackFile_Annotations
-*self, opcode_t offset)>
-
-Starts a new bytecode annotation group. Takes the offset in the bytecode where
-the new annotations group starts.
-
-=cut
-
-*/
-PARROT_EXPORT
-void
-PackFile_Annotations_add_group(PARROT_INTERP, ARGMOD(PackFile_Annotations *self),
-        opcode_t offset)
-{
-    ASSERT_ARGS(PackFile_Annotations_add_group)
-    PackFile_Annotations_Group *group;
-
-    /* Allocate extra space for the group in the groups array. */
-    if (self->groups)
-        self->groups = mem_gc_realloc_n_typed_zeroed(interp, self->groups,
-            1 + self->num_groups, self->num_groups, PackFile_Annotations_Group);
-    else
-        self->groups = mem_gc_allocate_n_typed(interp,
-                1 + self->num_groups, PackFile_Annotations_Group);
-
-    /* Store details. */
-    group = self->groups + self->num_groups;
-    group->bytecode_offset = offset;
-    group->entries_offset  = self->num_entries;
-
-    /* Increment group count. */
-    ++self->num_groups;
 }
 
 
@@ -4088,13 +4011,6 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
         if (key_id == -1)
             return PMCNULL;
     }
-
-    /* Use groups to find search start point. */
-    for (i = 0; i < self->num_groups; ++i)
-        if (offset < self->groups[i].bytecode_offset)
-            break;
-        else
-            start_entry = self->groups[i].entries_offset;
 
     if (key_id == -1) {
         /* Look through entries, storing what we find by key and tracking those

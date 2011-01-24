@@ -241,11 +241,6 @@ typedef struct PackFile_Annotations_Key {
     opcode_t type;
 } PackFile_Annotations_Key;
 
-typedef struct PackFile_Annotations_Group {
-    opcode_t bytecode_offset;
-    opcode_t entries_offset;
-} PackFile_Annotations_Group;
-
 typedef struct PackFile_Annotations_Entry {
     opcode_t bytecode_offset;
     opcode_t key;
@@ -256,8 +251,6 @@ typedef struct PackFile_Annotations {
     PackFile_Segment            base;
     opcode_t                    num_keys;
     PackFile_Annotations_Key    *keys;
-    opcode_t                    num_groups;
-    PackFile_Annotations_Group  *groups;
     opcode_t                    num_entries;
     PackFile_Annotations_Entry  *entries;
     PackFile_ByteCode           *code;
@@ -615,14 +608,6 @@ void PackFile_Annotations_add_entry(PARROT_INTERP,
         FUNC_MODIFIES(*self);
 
 PARROT_EXPORT
-void PackFile_Annotations_add_group(PARROT_INTERP,
-    ARGMOD(PackFile_Annotations *self),
-    opcode_t offset)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*self);
-
-PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment * PackFile_Annotations_new(PARROT_INTERP,
     SHIM(struct PackFile *pf),
@@ -943,10 +928,6 @@ PackFile * Parrot_pf_get_current_packfile(PARROT_INTERP)
     , PARROT_ASSERT_ARG(dir) \
     , PARROT_ASSERT_ARG(seg))
 #define ASSERT_ARGS_PackFile_Annotations_add_entry \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_PackFile_Annotations_add_group \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
