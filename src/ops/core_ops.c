@@ -68,13 +68,18 @@ extern op_lib_t core_op_lib;
 
 
 
-INTVAL core_numops = 1070;
+#include "pmc/pmc_sub.h"
+#include "parrot/sub.h"
+
+
+
+INTVAL core_numops = 1072;
 
 /*
 ** Op Function Table:
 */
 
-static op_func_t core_op_func_table[1070] = {
+static op_func_t core_op_func_table[1072] = {
   Parrot_end,                                        /*      0 */
   Parrot_noop,                                       /*      1 */
   Parrot_check_events,                               /*      2 */
@@ -1144,6 +1149,8 @@ static op_func_t core_op_func_table[1070] = {
   Parrot_root_new_p_pc_i,                            /*   1066 */
   Parrot_root_new_p_p_ic,                            /*   1067 */
   Parrot_root_new_p_pc_ic,                           /*   1068 */
+  Parrot_push_cached_eh_i_ic,                        /*   1069 */
+  Parrot_push_cached_eh_ic_ic,                       /*   1070 */
 
   NULL /* NULL function pointer */
 };
@@ -1154,7 +1161,7 @@ static op_func_t core_op_func_table[1070] = {
 ** Op Info Table:
 */
 
-static op_info_t core_op_info_table[1070] = {
+static op_info_t core_op_info_table[1072] = {
   { /* 0 */
     /* type PARROT_INLINE_OP, */
     "end",
@@ -15052,6 +15059,32 @@ static op_info_t core_op_info_table[1070] = {
     { 0, 0, 0 },
     &core_op_lib
   },
+  { /* 1069 */
+    /* type PARROT_FUNCTION_OP, */
+    "push_cached_eh",
+    "push_cached_eh_i_ic",
+    "Parrot_push_cached_eh_i_ic",
+    /* "",  body */
+    0,
+    3,
+    { PARROT_ARG_I, PARROT_ARG_IC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 1 },
+    &core_op_lib
+  },
+  { /* 1070 */
+    /* type PARROT_FUNCTION_OP, */
+    "push_cached_eh",
+    "push_cached_eh_ic_ic",
+    "Parrot_push_cached_eh_ic_ic",
+    /* "",  body */
+    0,
+    3,
+    { PARROT_ARG_IC, PARROT_ARG_IC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 1 },
+    &core_op_lib
+  },
 
 };
 
@@ -25779,6 +25812,64 @@ Parrot_root_new_p_pc_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
 
 return (opcode_t *)cur_opcode + 4;}
 
+opcode_t *
+Parrot_push_cached_eh_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
+    const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
+    PMC                     *current_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+    Parrot_Sub_attributes   *sub;
+    PMC                     *eh;
+
+    PMC_get_sub(interp, current_sub, sub);
+
+    /* Vivify eh_cache to Hash. Keys will be C<op> */
+    if (PMC_IS_NULL(sub->eh_cache)) {
+        sub->eh_cache = Parrot_pmc_new(interp, enum_class_Hash);
+        VTABLE_set_integer_native(interp, sub->eh_cache, Hash_key_type_int);
+    }
+
+    eh = VTABLE_get_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE));
+
+    /* Create new ExceptionHandler if there is none */
+    if (PMC_IS_NULL(eh)) {
+        eh = Parrot_pmc_new(interp, enum_class_ExceptionHandler);
+        VTABLE_set_pointer(interp, eh, CUR_OPCODE + IREG(1));
+        VTABLE_set_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE), eh);
+    }
+
+    /* Actually push ExceptionHandler */
+    Parrot_cx_add_handler_local(interp, eh);
+
+return (opcode_t *)cur_opcode + 3;}
+
+opcode_t *
+Parrot_push_cached_eh_ic_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
+    const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);
+    PMC                     *current_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+    Parrot_Sub_attributes   *sub;
+    PMC                     *eh;
+
+    PMC_get_sub(interp, current_sub, sub);
+
+    /* Vivify eh_cache to Hash. Keys will be C<op> */
+    if (PMC_IS_NULL(sub->eh_cache)) {
+        sub->eh_cache = Parrot_pmc_new(interp, enum_class_Hash);
+        VTABLE_set_integer_native(interp, sub->eh_cache, Hash_key_type_int);
+    }
+
+    eh = VTABLE_get_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE));
+
+    /* Create new ExceptionHandler if there is none */
+    if (PMC_IS_NULL(eh)) {
+        eh = Parrot_pmc_new(interp, enum_class_ExceptionHandler);
+        VTABLE_set_pointer(interp, eh, CUR_OPCODE + ICONST(1));
+        VTABLE_set_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE), eh);
+    }
+
+    /* Actually push ExceptionHandler */
+    Parrot_cx_add_handler_local(interp, eh);
+
+return (opcode_t *)cur_opcode + 3;}
+
 
 /*
 ** op lib descriptor:
@@ -25793,7 +25884,7 @@ op_lib_t core_op_lib = {
   3,    /* major_version */
   0,    /* minor_version */
   0,    /* patch_version */
-  1069,             /* op_count */
+  1071,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
   get_op          /* op_code() */ 

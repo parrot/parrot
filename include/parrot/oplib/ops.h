@@ -1083,7 +1083,9 @@ typedef enum {
     PARROT_OP_root_new_p_p_i,                  /* 1065 */
     PARROT_OP_root_new_p_pc_i,                 /* 1066 */
     PARROT_OP_root_new_p_p_ic,                 /* 1067 */
-    PARROT_OP_root_new_p_pc_ic                 /* 1068 */
+    PARROT_OP_root_new_p_pc_ic,                /* 1068 */
+    PARROT_OP_push_cached_eh_i_ic,             /* 1069 */
+    PARROT_OP_push_cached_eh_ic_ic             /* 1070 */
 
 } parrot_opcode_enums;
 

@@ -1090,6 +1090,8 @@ op_lib_t *Parrot_DynOp_core_3_0_0(PARROT_INTERP, long init);
  opcode_t * Parrot_root_new_p_pc_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_root_new_p_p_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_root_new_p_pc_ic(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_push_cached_eh_i_ic(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_push_cached_eh_ic_ic(opcode_t *, PARROT_INTERP);
 
 
 #endif /* PARROT_OPLIB_CORE_OPS_H_GUARD */
