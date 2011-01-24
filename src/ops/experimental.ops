@@ -355,6 +355,11 @@ op push_cached_eh(in INT, inconst LABEL) {
         VTABLE_set_pointer(interp, eh, CUR_OPCODE + $2);
         VTABLE_set_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE), eh);
     }
+    else {
+        /* Reinit handler */
+        VTABLE_init(interp, eh);
+        VTABLE_set_pointer(interp, eh, CUR_OPCODE + $2);
+    }
 
     /* Actually push ExceptionHandler */
     Parrot_cx_add_handler_local(interp, eh);
@@ -380,6 +385,11 @@ op push_cached_eh(inconst LABEL) {
         eh = Parrot_pmc_new(interp, enum_class_ExceptionHandler);
         VTABLE_set_pointer(interp, eh, CUR_OPCODE + $1);
         VTABLE_set_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE), eh);
+    }
+    else {
+        /* Reinit handler */
+        VTABLE_init(interp, eh);
+        VTABLE_set_pointer(interp, eh, CUR_OPCODE + $1);
     }
 
     /* Actually push ExceptionHandler */
