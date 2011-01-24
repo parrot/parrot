@@ -169,7 +169,7 @@ sub collect_test_environment_data {
             $devel .= (" ".@mods." mods");
         }
         my $out = `git branch`;
-        ($branch) = $out =~ m{\* (\w+)$}m;
+        ($branch) = $out =~ m{\* ([/\w+])$}m;
     }
     my $me = $^O eq 'MSWin32' ? $ENV{'USERNAME'}
            : $ENV{'LOGNAME'} || eval { getpwuid($<) };
