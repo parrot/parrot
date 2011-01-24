@@ -83,6 +83,7 @@ pmclass Sub auto_attrs provides invokable {
     ATTR Parrot_sub_arginfo *arg_info;       /* Argument counts and flags. */
 
     ATTR PMC               *outer_ctx;       /* outer context, if a closure */
+    ATTR PMC               *eh_cache;        /* cache for ExceptionHandlers */
 
 /*
 
@@ -612,6 +613,8 @@ Marks the sub as live.
         Parrot_gc_mark_PMC_alive(INTERP, sub->namespace_name);
         Parrot_gc_mark_PMC_alive(INTERP, sub->multi_signature);
         Parrot_gc_mark_PMC_alive(INTERP, sub->namespace_stash);
+
+        Parrot_gc_mark_PMC_alive(INTERP, sub->eh_cache);
     }
 
 /*
