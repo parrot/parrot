@@ -92,7 +92,7 @@ PARROT_CANNOT_RETURN_NULL
 static const struct longopt_opt_decl * Parrot_cmd_options(void);
 
 static struct _imc_info_t* prepare_reentrant_compile(PARROT_INTERP,
-    imcc_info_t * info)
+    imc_info_t * info)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_determine_input_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -861,9 +861,9 @@ Called only from src/interp/inter_misc.c:Parrot_compile_file
 */
 
 static struct _imc_info_t*
-prepare_reentrant_compile(PARROT_INTERP, imcc_info_t * info)
+prepare_reentrant_compile(PARROT_INTERP, imc_info_t * info)
 {
-    ASSERT_ARGS(imcc_prepare_reentrant_compile)
+    ASSERT_ARGS(prepare_reentrant_compile)
     struct _imc_info_t * imc_info = NULL;
     if (info->last_unit) {
         /* a reentrant compile */

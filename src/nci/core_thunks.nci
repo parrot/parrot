@@ -9,7 +9,7 @@
 d    JOd      # Parrot builtins
 I    JOS
 P    JOl
-P    Jt
+P    JS       # IMCC compregs
 S    JOS      # ParrotIO.readline
 I    JI       # Parrot_is_char_*
 v    JOSP     # String.trans
