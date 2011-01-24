@@ -326,7 +326,38 @@ Cached version of push_eh. Creates and cache ExceptionHandler inside current Sub
 
 =cut
 
+
+BEGIN_OPS_PREAMBLE
+
+#include "pmc/pmc_sub.h"
+#include "parrot/sub.h"
+
+END_OPS_PREAMBLE
+
 op push_cached_eh(in INT, inconst LABEL) {
+    PMC                     *current_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+    Parrot_Sub_attributes   *sub;
+    PMC                     *eh;
+
+    PMC_get_sub(interp, current_sub, sub);
+
+    /* Vivify eh_cache to Hash. Keys will be C<op> */
+    if (PMC_IS_NULL(sub->eh_cache)) {
+        sub->eh_cache = Parrot_pmc_new(interp, enum_class_Hash);
+        VTABLE_set_integer_native(interp, sub->eh_cache, Hash_key_type_int);
+    }
+
+    eh = VTABLE_get_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE));
+
+    /* Create new ExceptionHandler if there is none */
+    if (PMC_IS_NULL(eh)) {
+        eh = Parrot_pmc_new(interp, enum_class_ExceptionHandler);
+        VTABLE_set_pointer(interp, eh, CUR_OPCODE + $1);
+        VTABLE_set_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE), eh);
+    }
+
+    /* Actually push ExceptionHandler */
+    Parrot_cx_add_handler_local(interp, eh);
 }
 
 =back
