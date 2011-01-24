@@ -503,7 +503,14 @@ imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile), int argc,
 
 /*
 
-=item C<
+=item C<PMC * imcc_do_preprocess_api(PMC * interp_pmc, STRING *sourcefile, int
+argc, const char **argv)>
+
+Preprocess the input source file and dump the preprocessed text to stdout.
+
+=cut
+
+*/
 
 PARROT_EXPORT
 PMC *

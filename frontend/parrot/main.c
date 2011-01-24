@@ -240,6 +240,7 @@ static PMC *
 run_imcc(Parrot_PMC interp, Parrot_String sourcefile,
         struct init_args_t *flags, int argc, char** argv)
 {
+    ASSERT_ARGS(run_imcc)
     if (flags->preprocess_only) {
         if (!Parrot_api_wrap_imcc_hack(interp, sourcefile, argc, argv, NULL,
                                        imcc_do_preprocess_api))
@@ -269,6 +270,7 @@ Load in a .pbc file to a PackFile PMC
 static PMC *
 load_bytecode_file(Parrot_PMC interp, Parrot_String filename)
 {
+    ASSERT_ARGS(load_bytecode_file)
     PMC * bytecode = NULL;
     if (!Parrot_api_load_bytecode_file(interp, filename, &bytecode))
         show_last_error_and_exit(interp);
@@ -289,6 +291,7 @@ Write a packfile PMC to a .pbc file.
 static void
 write_bytecode_file(Parrot_PMC interp, Parrot_String filename, Parrot_PMC pbc)
 {
+    ASSERT_ARGS(write_bytecode_file)
     if (!Parrot_api_write_bytecode_to_file(interp, pbc, filename))
         show_last_error_and_exit(interp);
 }
@@ -411,6 +414,7 @@ static void
 Parrot_confess(ARGIN(const char * condition), ARGIN(const char * file),
         unsigned int line)
 {
+    ASSERT_ARGS(Parrot_confess)
     fprintf(stderr, "Parrot Error: %s (%s:%d)\n", condition, file, line);
 }
 
@@ -907,8 +911,9 @@ Verify that the input and output filenames are sane and are not the same.
 */
 
 static void
-verify_file_names(const char * input, const char * output)
+verify_file_names(ARGIN_NULLOK(const char * input), ARGIN_NULLOK(const char * output))
 {
+    ASSERT_ARGS(verify_file_names)
     const char is_stdin = (input == NULL);
     const char is_stdout = (output == NULL);
     if (!is_stdin && !is_stdout && !strcmp(input, output)) {
