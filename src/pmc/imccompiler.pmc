@@ -1,0 +1,87 @@
+pmclass IMCCompiler provides HLLCompiler {
+    ATTR imc_info_t *imcc_info;
+    ATTR INTVAL type; /* 0 = PIR, 1 = PASM */
+
+    VTABLE void init() {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            "IMCCompiler: Must initialize with an integer argument 0 (PIR) or 1 (PASM)");
+    }
+
+    VTABLE void init_pmc(PMC *init) {
+        const INTVAL type = VTABLE_get_integer(INTERP, init);
+        VTABLE_init_int(INTERP, SELF, type);
+    }
+
+    VTABLE void init_int(INTVAL type) {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        if (type != 0 && type != 1)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "IMCCompiler: Must have type 0 (PIR) or 1 (PASM)");
+        attrs->type = type;
+    }
+
+    /* provided to emulate the current NCI compreg */
+    VTABLE void* invoke(void* next) {
+        /* TODO: This */
+        return next;
+    }
+
+    METHOD compile(STRING *source,
+            STRING *target :named("target") :optional, INTVAL has_target :opt_flag,
+            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag
+    ) {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        PMC * pf = PMCNULL;
+        if (has_target)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "IMCCompiler: compiler does not support the target option");
+        /* TODO: Handle outer_ctx */
+        pf = imcc_compile_string(INTERP, source);
+        RETURN(PMC *pf);
+    }
+
+    METHOD compile_file(STRING *filename,
+            STRING *target :named("target") :optional, INTVAL has_target :opt_flag,
+            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag
+    ) {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        PMC * pf = PMCNULL;
+        if (has_target)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "IMCCompiler: compiler does not support the target option");
+        /* TODO: Handle outer_ctx */
+        pf = imcc_compile_file(INTERP, filename);
+        RETURN(PMC *pf);
+    }
+
+    METHOD eval(STRING *source,
+            STRING *target :named("target") :optional, INTVAL has_target :opt_flag,
+            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag
+    ) {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        PMC * pf = PMCNULL;
+        if (has_target)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "IMCCompiler: compiler does not support the target option");
+        /* TODO: Handle outer_ctx */
+        pf = imcc_compile_string(INTERP, source);
+        /* TODO: Execute it */
+    }
+
+    METHOD parse_name(STRING *name) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+                "IMCCompiler: parse_name is not supported");
+    }
+
+    METHOD load_module(STRING *name) {
+        /* TODO: This */
+    }
+
+    METHOD get_module(STRING *name) {
+        /* TODO: This */
+    }
+
+    METHOD get_exports(PMC *module) {
+        /* TODO: This */
+    }
+}
