@@ -489,11 +489,12 @@ void
 Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
 {
     ASSERT_ARGS(Parrot_cx_add_handler_local)
-    if (PMC_IS_NULL(Parrot_pcc_get_handlers(interp, interp->ctx)))
-        Parrot_pcc_set_handlers(interp, interp->ctx, Parrot_pmc_new(interp,
-                                                                    enum_class_ResizablePMCArray));
-
-    VTABLE_unshift_pmc(interp, Parrot_pcc_get_handlers(interp, interp->ctx), handler);
+    PMC *handlers = Parrot_pcc_get_handlers(interp, interp->ctx);
+    if (PMC_IS_NULL(handlers)) {
+        handlers = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        Parrot_pcc_set_handlers(interp, interp->ctx, handlers);
+    }
+    VTABLE_unshift_pmc(interp, handlers, handler);
 
 }
 
