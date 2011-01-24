@@ -320,6 +320,15 @@ op root_new(out PMC, in PMC, in INT) {
     }
 }
 
+=item B<push_cached_eh>(in INT, inconst LABEL)
+
+Cached version of push_eh. Creates and cache ExceptionHandler inside current Sub.
+
+=cut
+
+op push_cached_eh(in INT, inconst LABEL) {
+}
+
 =back
 
 =head1 COPYRIGHT
