@@ -444,6 +444,10 @@ determine_input_file_type(PARROT_INTERP, ARGIN(STRING *sourcefile))
         }
     }
     else {
+        if (Parrot_stat_info_intval(interp, sourcefile, STAT_ISDIR))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                "imcc_compile_file: '%Ss' is a directory\n", sourcefile);
+
         handle = PIO_OPEN(interp, sourcefile, PIO_F_READ);
         if (handle == PIO_INVALID_HANDLE)
             IMCC_fatal_standalone(interp, EXCEPTION_EXTERNAL_ERROR,
@@ -855,7 +859,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
     PackFile_ByteCode        *cs       = NULL;
     struct _imc_info_t       *imc_info = NULL;
     const char               *ext;
-    PIOHANDLE                 fp;
+    PIOHANDLE fp = determine_input_file_type(interp, fullname);
     PMC                      *newcontext;
     const int is_pasm = imcc_string_ends_with(interp, fullname, ".pasm");
     void *yyscanner;
@@ -872,26 +876,11 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
         IMCC_INFO(interp) = imc_info;
     }
 
-    if (Parrot_stat_info_intval(interp, fullname, STAT_ISDIR))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
-            "imcc_compile_file: '%Ss' is a directory\n", fullname);
-
-    fp = PIO_OPEN(interp, fullname, PIO_F_READ);
-    if (fp == PIO_INVALID_HANDLE)
-        IMCC_fatal(interp, EXCEPTION_EXTERNAL_ERROR,
-                "imcc_compile_file: couldn't open '%Ss'\n", fullname);
-
     IMCC_push_parser_state(interp, fullname, is_pasm);
     yylex_init_extra(interp, &yyscanner);
 
     /* start over; let the start of line rule increment this to 1 */
     IMCC_INFO(interp)->line = 0;
-
-    /*
-     * the Parrot_str_compare() called from pmc_type() triggers GC
-     * which can destroy packfiles under construction
-     */
-    Parrot_block_GC_mark(interp);
 
     /* Activate a new context and reset it to initial values */
     newcontext = Parrot_push_context(interp, regs_used);
@@ -904,7 +893,6 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
 
     yylex_destroy(yyscanner);
 
-    Parrot_unblock_GC_mark(interp);
     Parrot_pop_context(interp);
 
     imc_cleanup(interp, NULL);
