@@ -97,7 +97,7 @@ PMC * imcc_run_api(
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * imcc_compile(PARROT_INTERP,
-    ARGIN(const char *s),
+    ARGIN(STRING *s),
     int pasm_file,
     ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
@@ -107,14 +107,14 @@ PMC * imcc_compile(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC * imcc_compile_pasm_ex(PARROT_INTERP, ARGIN(const char *s))
+PMC * imcc_compile_pasm_ex(PARROT_INTERP, ARGIN(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * IMCC_compile_pasm_s(PARROT_INTERP,
-    ARGIN(const char *s),
+    ARGIN(STRING *s),
     ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -123,14 +123,14 @@ PMC * IMCC_compile_pasm_s(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC * imcc_compile_pir_ex(PARROT_INTERP, ARGIN(const char *s))
+PMC * imcc_compile_pir_ex(PARROT_INTERP, ARGIN(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * IMCC_compile_pir_s(PARROT_INTERP,
-    ARGIN(const char *s),
+    ARGIN(STRING *s),
     ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

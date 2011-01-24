@@ -579,7 +579,7 @@ imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile))
 
 /*
 
-=item C<PMC * imcc_compile(PARROT_INTERP, const char *s, int pasm_file, STRING
+=item C<PMC * imcc_compile(PARROT_INTERP, STRING *s, int pasm_file, STRING
 **error_message)>
 
 Compile a pasm or imcc string
@@ -593,7 +593,7 @@ FIXME as we have separate constants, the old constants in ghash must be deleted.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
+imcc_compile(PARROT_INTERP, ARGIN(STRING *s), int pasm_file,
         ARGOUT(STRING **error_message))
 {
     ASSERT_ARGS(imcc_compile)
@@ -606,15 +606,12 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     PMC                   *eval_pmc = NULL;
     struct _imc_info_t    *imc_info = NULL;
     struct parser_state_t *next;
-    void                  *yyscanner;
+    yyscan_t               yyscanner;
     PMC                   *ignored;
     UINTVAL regs_used[4] = {3, 3, 3, 3};
     INTVAL eval_number;
 
     yylex_init_extra(interp, &yyscanner);
-
-    /* we create not yet anchored PMCs - e.g. Subs: turn off GC */
-    Parrot_block_GC_mark(interp);
 
     if (IMCC_INFO(interp)->last_unit) {
         /* a reentrant compile */
@@ -641,6 +638,10 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     IMCC_INFO(interp)->cur_namespace = NULL;
 
     /* spit out the sourcefile */
+    /* TODO: Update this to PIO. variable "s" is now a STRING, not const
+             char *.
+     */
+    /*
     if (Interp_debug_TEST(interp, PARROT_EVAL_DEBUG_FLAG)) {
         char *buf = Parrot_str_to_cstring(interp, name);
         FILE * const fp = fopen(buf, "w");
@@ -650,16 +651,19 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
             fclose(fp);
         }
     }
+    */
 
-    IMCC_push_parser_state(interp, name, 0);
+    IMCC_push_parser_state(interp, name, pasm_file);
     next = IMCC_INFO(interp)->state->next;
 
     if (imc_info)
         IMCC_INFO(interp)->state->next = NULL;
 
-    IMCC_INFO(interp)->state->pasm_file = pasm_file;
-
-    compile_string(interp, s, yyscanner);
+    {
+        const char * code_c = Parrot_str_to_cstring(interp, s);
+        compile_string(interp, code_c, yyscanner);
+        Parrot_str_free_cstring(code_c);
+    }
 
     Parrot_pop_context(interp);
 
@@ -677,9 +681,9 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
         Parrot_Sub_attributes *sub_data;
 
         /*
-         * create sub PMC
-         *
-         * TODO if a sub was denoted :main return that instead
+         * create Eval PMC
+         * TODO: Don't return the sub or an Eval. Return the PackFile* or a
+         *       PackFile PMC instead. TT #1969
          */
         eval_pmc             = Parrot_pmc_new(interp, enum_class_Eval);
         PMC_get_sub(interp, eval_pmc, sub_data);
@@ -710,8 +714,6 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     else
         imc_cleanup(interp, yyscanner);
 
-    Parrot_unblock_GC_mark(interp);
-
     yylex_destroy(yyscanner);
 
     /* Now run any :load/:init subs. */
@@ -727,7 +729,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
 
 /*
 
-=item C<PMC * IMCC_compile_pir_s(PARROT_INTERP, const char *s, STRING
+=item C<PMC * IMCC_compile_pir_s(PARROT_INTERP, STRING *s, STRING
 **error_message)>
 
 Compile PIR code from a C string. Returns errors in the <STRING> provided.
@@ -741,7 +743,7 @@ Called only from src/embed.c:Parrot_compile_string().
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-IMCC_compile_pir_s(PARROT_INTERP, ARGIN(const char *s),
+IMCC_compile_pir_s(PARROT_INTERP, ARGIN(STRING *s),
         ARGOUT(STRING **error_message))
 {
     ASSERT_ARGS(IMCC_compile_pir_s)
@@ -750,7 +752,7 @@ IMCC_compile_pir_s(PARROT_INTERP, ARGIN(const char *s),
 
 /*
 
-=item C<PMC * IMCC_compile_pasm_s(PARROT_INTERP, const char *s, STRING
+=item C<PMC * IMCC_compile_pasm_s(PARROT_INTERP, STRING *s, STRING
 **error_message)>
 
 Compile PASM code from a C string. Returns errors in the <STRING> provided.
@@ -764,7 +766,7 @@ Called only from src/embed.c:Parrot_compile_string().
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-IMCC_compile_pasm_s(PARROT_INTERP, ARGIN(const char *s),
+IMCC_compile_pasm_s(PARROT_INTERP, ARGIN(STRING *s),
         ARGOUT(STRING **error_message))
 {
     ASSERT_ARGS(IMCC_compile_pasm_s)
@@ -773,7 +775,7 @@ IMCC_compile_pasm_s(PARROT_INTERP, ARGIN(const char *s),
 
 /*
 
-=item C<PMC * imcc_compile_pasm_ex(PARROT_INTERP, const char *s)>
+=item C<PMC * imcc_compile_pasm_ex(PARROT_INTERP, STRING *s)>
 
 Compile PASM code from a C string. Throws an exception upon errors.
 
@@ -786,7 +788,7 @@ Called only from the PASM compreg
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-imcc_compile_pasm_ex(PARROT_INTERP, ARGIN(const char *s))
+imcc_compile_pasm_ex(PARROT_INTERP, ARGIN(STRING *s))
 {
     ASSERT_ARGS(imcc_compile_pasm_ex)
     STRING *error_message;
@@ -802,7 +804,7 @@ imcc_compile_pasm_ex(PARROT_INTERP, ARGIN(const char *s))
 
 /*
 
-=item C<PMC * imcc_compile_pir_ex(PARROT_INTERP, const char *s)>
+=item C<PMC * imcc_compile_pir_ex(PARROT_INTERP, STRING *s)>
 
 Compile PIR code from a C string. Throws an exception upon errors.
 
@@ -815,7 +817,7 @@ Called only from the PIR compreg
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-imcc_compile_pir_ex(PARROT_INTERP, ARGIN(const char *s))
+imcc_compile_pir_ex(PARROT_INTERP, ARGIN(STRING *s))
 {
     ASSERT_ARGS(imcc_compile_pir_ex)
     STRING *error_message;

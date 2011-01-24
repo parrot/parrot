@@ -952,17 +952,22 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code)
         ARGOUT(Parrot_String *error))
 {
     ASSERT_ARGS(Parrot_compile_string)
-    /* For the benefit of embedders that do not load any pbc
-     * before compiling a string */
+    STRING * const code_s = Parrot_str_new(interp, code, 0);
+    PMC * result = PMCNULL;
+
+    Parrot_block_GC_mark(interp);
 
     if (STRING_equal(interp, CONST_STRING(interp, "PIR"), type))
-        return IMCC_compile_pir_s(interp, code, error);
+        result = IMCC_compile_pir_s(interp, code_s, error);
 
-    if (STRING_equal(interp, CONST_STRING(interp, "PASM"), type))
-        return IMCC_compile_pasm_s(interp, code, error);
+    else if (STRING_equal(interp, CONST_STRING(interp, "PASM"), type))
+        result = IMCC_compile_pasm_s(interp, code_s, error);
+    else
+        *error = Parrot_str_new(interp, "Invalid interpreter type", 0);
 
-    *error = Parrot_str_new(interp, "Invalid interpreter type", 0);
-    return NULL;
+    Parrot_unblock_GC_mark(interp);
+
+    return result;
 }
 
 /*

@@ -130,7 +130,7 @@ Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type), ARGIN(Parrot_compiler_func_t 
     ASSERT_ARGS(Parrot_compreg)
     PMC    * const iglobals = interp->iglobals;
     PMC    * const nci      = Parrot_pmc_new(interp, enum_class_NCI);
-    STRING * const sc       = CONST_STRING(interp, "PJt");
+    STRING * const sc       = CONST_STRING(interp, "PJS");
     PMC    * hash           = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                               IGLOBALS_COMPREG_HASH);
 
@@ -210,8 +210,8 @@ Parrot_set_compiler(PARROT_INTERP, ARGIN(STRING *type), ARGIN(PMC *compiler))
 
 /*
 
-=item C<void * Parrot_compile_file(PARROT_INTERP, STRING *fullname, STRING
-**error)>
+=item C<PackFile_ByteCode * Parrot_compile_file(PARROT_INTERP, STRING *fullname,
+STRING **error)>
 
 Compile code file.
 
@@ -221,11 +221,17 @@ Compile code file.
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-void *
+PackFile_ByteCode *
 Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), ARGOUT(STRING **error))
 {
     ASSERT_ARGS(Parrot_compile_file)
-    return imcc_compile_file(interp, fullname, error);
+    PackFile_ByteCode *result = NULL;
+
+    Parrot_block_GC_mark(interp);
+    result = imcc_compile_file(interp, fullname, error);
+    Parrot_unblock_GC_mark(interp);
+
+    return result;
 }
 
 /*
