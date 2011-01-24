@@ -1871,6 +1871,7 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
     include/parrot/runcore_api.h \
     include/pmc/pmc_continuation.h \
     include/pmc/pmc_parrotlibrary.h \
+    include/pmc/pmc_sub.h \
     src/io/io_private.h
 
 @TEMP_gc_c@
