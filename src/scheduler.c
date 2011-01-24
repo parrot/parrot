@@ -496,7 +496,7 @@ Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
         Parrot_pcc_set_handlers(interp, ctx, handlers);
     }
 
-    VTABLE_unshift_pmc(interp, Parrot_pcc_get_handlers(interp, interp->ctx), handler);
+    VTABLE_unshift_pmc(interp, handlers, handler);
 
 }
 
