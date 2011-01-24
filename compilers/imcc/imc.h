@@ -75,6 +75,7 @@ void * imcc_compile_file(PARROT_INTERP,
         FUNC_MODIFIES(*error_message);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC * imcc_do_preprocess_api(
     ARGMOD(PMC * interp_pmc),
     ARGIN(STRING *sourcefile),
@@ -85,6 +86,7 @@ PMC * imcc_do_preprocess_api(
         FUNC_MODIFIES(* interp_pmc);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC * imcc_run_api(
     ARGMOD(PMC * interp_pmc),
     ARGIN(STRING *sourcefile),

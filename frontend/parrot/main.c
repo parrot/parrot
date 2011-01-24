@@ -55,7 +55,9 @@ PARROT_PURE_FUNCTION
 static int is_all_hex_digits(ARGIN(const char *s))
         __attribute__nonnull__(1);
 
+PARROT_CAN_RETURN_NULL
 static PMC * load_bytecode_file(Parrot_PMC interp, Parrot_String filename);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const struct longopt_opt_decl * Parrot_cmd_options(void);
@@ -99,19 +101,25 @@ static void print_parrot_string(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*vector);
 
+PARROT_CANNOT_RETURN_NULL
 static PMC * run_imcc(
     Parrot_PMC interp,
     Parrot_String sourcefile,
-    struct init_args_t *flags,
+    ARGIN(struct init_args_t *flags),
     int argc,
-    char** argv);
+    ARGIN(char** argv))
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(5);
 
 static void show_last_error_and_exit(Parrot_PMC interp);
 static void usage(ARGMOD(FILE *fp))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*fp);
 
-static void verify_file_names(const char * input, const char * output);
+static void verify_file_names(
+    ARGIN_NULLOK(const char * input),
+    ARGIN_NULLOK(const char * output));
+
 static void write_bytecode_file(
     Parrot_PMC interp,
     Parrot_String filename,
@@ -139,7 +147,9 @@ static void write_bytecode_file(
     , PARROT_ASSERT_ARG(argv))
 #define ASSERT_ARGS_print_parrot_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(vector))
-#define ASSERT_ARGS_run_imcc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_run_imcc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(flags) \
+    , PARROT_ASSERT_ARG(argv))
 #define ASSERT_ARGS_show_last_error_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(fp))
@@ -236,9 +246,10 @@ Call into IMCC to either compile or preprocess the input.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static PMC *
 run_imcc(Parrot_PMC interp, Parrot_String sourcefile,
-        struct init_args_t *flags, int argc, char** argv)
+        ARGIN(struct init_args_t *flags), int argc, ARGIN(char** argv))
 {
     ASSERT_ARGS(run_imcc)
     if (flags->preprocess_only) {
@@ -267,6 +278,7 @@ Load in a .pbc file to a PackFile PMC
 
 */
 
+PARROT_CAN_RETURN_NULL
 static PMC *
 load_bytecode_file(Parrot_PMC interp, Parrot_String filename)
 {

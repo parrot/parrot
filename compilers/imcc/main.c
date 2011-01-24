@@ -61,8 +61,9 @@ static void do_pre_process(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static void exit_reentrant_compile(PARROT_INTERP,
-    struct _imc_info_t *imc_info)
-        __attribute__nonnull__(1);
+    ARGMOD_NULLOK(struct _imc_info_t *imc_info))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*imc_info);
 
 static void imcc_destroy_macro_values(ARGMOD(void *value))
         __attribute__nonnull__(1)
@@ -72,12 +73,12 @@ static void imcc_get_optimization_description(
     const PARROT_INTERP,
     int opt_level);
 
-PARROT_CAN_RETURN_NULL
 static void imcc_parseflags(PARROT_INTERP,
     int argc,
     ARGIN_NULLOK(const char **argv))
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
 static PMC * imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -91,9 +92,12 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const struct longopt_opt_decl * Parrot_cmd_options(void);
 
+PARROT_CAN_RETURN_NULL
 static struct _imc_info_t* prepare_reentrant_compile(PARROT_INTERP,
-    imc_info_t * info)
-        __attribute__nonnull__(1);
+    ARGMOD(imc_info_t * info))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* info);
 
 #define ASSERT_ARGS_determine_input_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -116,7 +120,8 @@ static struct _imc_info_t* prepare_reentrant_compile(PARROT_INTERP,
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_cmd_options __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_prepare_reentrant_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(info))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -216,7 +221,6 @@ Parse flags ans set approptiate state(s)
 
 */
 
-PARROT_CAN_RETURN_NULL
 static void
 imcc_parseflags(PARROT_INTERP, int argc, ARGIN_NULLOK(const char **argv))
 {
@@ -490,6 +494,7 @@ PMC interpreter.
 */
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile), int argc,
         ARGIN_NULLOK(const char **argv))
@@ -513,6 +518,7 @@ Preprocess the input source file and dump the preprocessed text to stdout.
 */
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 imcc_do_preprocess_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile),
         int argc, SHIM(const char **argv))
@@ -551,7 +557,7 @@ and run. This function always returns 0.
 
 */
 
-
+PARROT_CANNOT_RETURN_NULL
 static PMC *
 imcc_run(PARROT_INTERP, ARGIN(STRING *sourcefile))
 {
@@ -931,8 +937,9 @@ previous compile, if any.
 
 */
 
+PARROT_CAN_RETURN_NULL
 static struct _imc_info_t*
-prepare_reentrant_compile(PARROT_INTERP, imc_info_t * info)
+prepare_reentrant_compile(PARROT_INTERP, ARGMOD(imc_info_t * info))
 {
     ASSERT_ARGS(prepare_reentrant_compile)
     struct _imc_info_t * imc_info = NULL;
@@ -947,7 +954,7 @@ prepare_reentrant_compile(PARROT_INTERP, imc_info_t * info)
 }
 
 static void
-exit_reentrant_compile(PARROT_INTERP, struct _imc_info_t *imc_info)
+exit_reentrant_compile(PARROT_INTERP, ARGMOD_NULLOK(struct _imc_info_t *imc_info))
 {
     ASSERT_ARGS(exit_reentrant_compile)
     if (imc_info) {
