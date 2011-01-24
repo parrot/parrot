@@ -40,15 +40,15 @@ IMCC_FATAL_EXCEPTION.
 
 PARROT_DOES_NOT_RETURN
 void
-IMCC_fatal(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
+IMCC_fatal(ARGMOD(imc_info_t * imcc), SHIM(int code), ARGIN(const char *fmt), ...)
 {
     ASSERT_ARGS(IMCC_fatal)
     va_list ap;
 
     va_start(ap, fmt);
-    IMCC_INFO(interp)->error_message = Parrot_vsprintf_c(interp, fmt, ap);
+    imcc->error_message = Parrot_vsprintf_c(imcc->interp, fmt, ap);
     va_end(ap);
-    IMCC_THROW(IMCC_INFO(interp)->jump_buf, IMCC_FATAL_EXCEPTION);
+    IMCC_THROW(imcc->jump_buf, IMCC_FATAL_EXCEPTION);
 }
 
 /*
@@ -63,15 +63,15 @@ Throws an IMCC_FATALY_EXCEPTION.
 
 PARROT_DOES_NOT_RETURN
 void
-IMCC_fataly(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
+IMCC_fataly(ARGMOD(imc_info_t * imcc), SHIM(int code), ARGIN(const char *fmt), ...)
 {
     ASSERT_ARGS(IMCC_fataly)
     va_list ap;
 
     va_start(ap, fmt);
-    IMCC_INFO(interp)->error_message = Parrot_vsprintf_c(interp, fmt, ap);
+    imcc->error_message = Parrot_vsprintf_c(imcc->interp, fmt, ap);
     va_end(ap);
-    IMCC_THROW(IMCC_INFO(interp)->jump_buf, IMCC_FATALY_EXCEPTION);
+    IMCC_THROW(imcc->jump_buf, IMCC_FATALY_EXCEPTION);
 }
 
 /*
@@ -88,15 +88,15 @@ recoverable exception but a forced exit.
 
 PARROT_DOES_NOT_RETURN
 void
-IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
+IMCC_fatal_standalone(ARGMOD(imc_info_t * imcc), int code, ARGIN(const char *fmt), ...)
 {
     ASSERT_ARGS(IMCC_fatal_standalone)
     va_list ap;
 
     va_start(ap, fmt);
-    imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
+    imcc_vfprintf(imcc, Parrot_io_STDERR(imcc->interp), fmt, ap);
     va_end(ap);
-    Parrot_x_jump_out_error(interp, code);
+    Parrot_x_jump_out_error(imcc->interp, code);
 }
 
 /*
@@ -111,12 +111,12 @@ cause Parrot to exit.
 */
 
 void
-IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
+IMCC_warning(ARGMOD(imc_info_t * imcc), ARGIN(const char *fmt), ...)
 {
     ASSERT_ARGS(IMCC_warning)
     va_list ap;
     va_start(ap, fmt);
-    imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
+    imcc_vfprintf(imcc, Parrot_io_STDERR(imcc->interp), fmt, ap);
     va_end(ap);
 }
 
@@ -132,16 +132,16 @@ then IMCC's verbose mode.
 */
 
 void
-IMCC_info(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
+IMCC_info(ARGMOD(imc_info_t * imcc), int level, ARGIN(const char *fmt), ...)
 {
     ASSERT_ARGS(IMCC_info)
     va_list ap;
 
-    if (level > IMCC_INFO(interp)->verbose)
+    if (level > imcc->verbose)
         return;
 
     va_start(ap, fmt);
-    imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
+    imcc_vfprintf(imcc, Parrot_io_STDERR(imcc->interp), fmt, ap);
     va_end(ap);
 }
 
@@ -156,15 +156,15 @@ Prints a debug message, if IMCC's debug mode is turned on.
 */
 
 void
-IMCC_debug(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
+IMCC_debug(ARGMOD(imc_info_t * imcc), int level, ARGIN(const char *fmt), ...)
 {
     ASSERT_ARGS(IMCC_debug)
     va_list ap;
 
-    if (!(level & IMCC_INFO(interp)->debug))
+    if (!(level & imcc->debug))
         return;
     va_start(ap, fmt);
-    imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
+    imcc_vfprintf(imcc, Parrot_io_STDERR(imcc->interp), fmt, ap);
     va_end(ap);
 }
 
@@ -179,38 +179,38 @@ Dumps the current instruction status of IMCC
 */
 
 void
-dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
+dump_instructions(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit))
 {
     ASSERT_ARGS(dump_instructions)
     const Instruction *ins;
     int                pc;
 
-    Parrot_io_eprintf(interp,
+    Parrot_io_eprintf(imcc->interp,
             "\nDumping the instructions status:"
             "\n-------------------------------\n");
-    Parrot_io_eprintf(interp,
+    Parrot_io_eprintf(imcc->interp,
             "nins line blck deep flags\t    type opnr size   pc  X ins\n");
 
     for (pc = 0, ins = unit->instructions; ins; ins = ins->next) {
         const Basic_block * const bb = unit->bb_list[ins->bbindex];
 
         if (bb) {
-            Parrot_io_eprintf(interp,
+            Parrot_io_eprintf(imcc->interp,
                     "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  ",
                      ins->index, ins->line, bb->index, bb->loop_depth,
                      ins->flags, ins->type, OP_INFO_OPNUM(ins->op),
                      ins->opsize, pc);
         }
         else {
-            Parrot_io_eprintf(interp, "\t");
+            Parrot_io_eprintf(imcc->interp, "\t");
         }
 
-        Parrot_io_eprintf(interp, "%s\n", ins->opname);
-        ins_print(interp, PIO_STDHANDLE(interp, PIO_STDERR_FILENO), ins);
+        Parrot_io_eprintf(imcc->interp, "%s\n", ins->opname);
+        ins_print(imcc, PIO_STDHANDLE(imcc->interp, PIO_STDERR_FILENO), ins);
         pc += ins->opsize;
     }
 
-    Parrot_io_eprintf(interp, "\n");
+    Parrot_io_eprintf(imcc->interp, "\n");
 }
 
 /*

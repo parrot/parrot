@@ -526,6 +526,7 @@ typedef struct _imcc_globals_t {
 } imcc_globals;
 
 typedef struct _imc_info_t {
+    Parrot_Interp          interp;
     struct _imc_info_t    *prev;
     IMC_Unit              *imc_units;
     IMC_Unit              *last_unit;
@@ -605,7 +606,7 @@ typedef struct macro_t {
 #define PBC_PASM_FILE   (1 << 4)
 #define PBC_RUN_FILE    (1 << 5)
 
-#define COMPILER_STATE(i) IMCC_INFO(i)->compiler_state
+#define COMPILER_STATE(i) (i)->compiler_state
 
 #define STATE_LOAD_PBC(i)      (COMPILER_STATE(i) & PBC_LOAD)
 #define STATE_RUN_PBC(i)       (COMPILER_STATE(i) & PBC_RUN)

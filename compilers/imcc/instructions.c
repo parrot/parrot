@@ -506,7 +506,8 @@ Emit a single instruction into the current unit buffer.
 
 PARROT_CAN_RETURN_NULL
 Instruction *
-emitb(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGIN_NULLOK(Instruction *i))
+emitb(ARGMOD(imc_info_t * imcc), ARGMOD_NULLOK(IMC_Unit *unit),
+        ARGIN_NULLOK(Instruction *i))
 {
     ASSERT_ARGS(emitb)
     if (!unit || !i)
@@ -521,7 +522,7 @@ emitb(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGIN_NULLOK(Instruction *i)
     }
 
     /* lexer is in next line already */
-    i->line = IMCC_INFO(interp)->line;
+    i->line = imcc->line;
 
     return i;
 }
@@ -558,7 +559,7 @@ Print details of instruction ins in file fd.
 #define REGB_SIZE 256
 PARROT_IGNORABLE_RESULT
 int
-ins_print(PARROT_INTERP, PIOHANDLE io, ARGIN(const Instruction *ins))
+ins_print(ARGMOD(imc_info_t * imcc), PIOHANDLE io, ARGIN(const Instruction *ins))
 {
     ASSERT_ARGS(ins_print)
     char regb[IMCC_MAX_FIX_REGS][REGB_SIZE];
@@ -569,7 +570,7 @@ ins_print(PARROT_INTERP, PIOHANDLE io, ARGIN(const Instruction *ins))
 
     /* comments, labels and such */
     if (!ins->symregs[0] || !strchr(ins->format, '%'))
-        return Parrot_io_pprintf(interp, io, "%s", ins->format);
+        return Parrot_io_pprintf(imcc->interp, io, "%s", ins->format);
 
     for (i = 0; i < ins->symreg_count; i++) {
         const SymReg *p = ins->symregs[i];
@@ -618,28 +619,28 @@ ins_print(PARROT_INTERP, PIOHANDLE io, ARGIN(const Instruction *ins))
     switch (ins->opsize-1) {
       case -1:        /* labels */
       case 1:
-        len = Parrot_io_pprintf(interp, io, ins->format, regstr[0]);
+        len = Parrot_io_pprintf(imcc->interp, io, ins->format, regstr[0]);
         break;
       case 2:
-        len = Parrot_io_pprintf(interp, io, ins->format, regstr[0], regstr[1]);
+        len = Parrot_io_pprintf(imcc->interp, io, ins->format, regstr[0], regstr[1]);
         break;
       case 3:
-        len = Parrot_io_pprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2]);
+        len = Parrot_io_pprintf(imcc->interp, io, ins->format, regstr[0], regstr[1], regstr[2]);
         break;
       case 4:
-        len = Parrot_io_pprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
+        len = Parrot_io_pprintf(imcc->interp, io, ins->format, regstr[0], regstr[1], regstr[2],
                     regstr[3]);
         break;
       case 5:
-        len = Parrot_io_pprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
+        len = Parrot_io_pprintf(imcc->interp, io, ins->format, regstr[0], regstr[1], regstr[2],
                     regstr[3], regstr[4]);
         break;
       case 6:
-        len = Parrot_io_pprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
+        len = Parrot_io_pprintf(imcc->interp, io, ins->format, regstr[0], regstr[1], regstr[2],
                     regstr[3], regstr[4], regstr[5]);
         break;
       default:
-        Parrot_io_eprintf(interp, "unhandled: opsize (%d), op %s, fmt %s\n",
+        Parrot_io_eprintf(imcc->interp, "unhandled: opsize (%d), op %s, fmt %s\n",
                 ins->opsize, ins->opname, ins->format);
         exit(EXIT_FAILURE);
         break;
@@ -662,12 +663,12 @@ the C<param> to the open function.
 
 */
 
-int
-emit_open(PARROT_INTERP)
+void
+emit_open(ARGMOD(imc_info_t * imcc))
 {
     ASSERT_ARGS(emit_open)
-    IMCC_INFO(interp)->dont_optimize = 0;
-    return e_pbc_open(interp);
+    imcc->dont_optimize = 0;
+    e_pbc_open(imcc);
 }
 
 /*
@@ -681,22 +682,21 @@ IMC_Unit C<unit>.
 
 */
 
-int
-emit_flush(PARROT_INTERP, ARGIN_NULLOK(void *param), ARGIN(IMC_Unit *unit))
+void
+emit_flush(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(void *param),
+        ARGIN(IMC_Unit *unit))
 {
     ASSERT_ARGS(emit_flush)
     Instruction *ins;
 
-    e_pbc_new_sub(interp, param, unit);
+    e_pbc_new_sub(imcc, param, unit);
 
     for (ins = unit->instructions; ins; ins = ins->next) {
-        IMCC_debug(interp, DEBUG_IMC, "emit %d\n", ins);
-        e_pbc_emit(interp, param, unit, ins);
+        IMCC_debug(imcc, DEBUG_IMC, "emit %d\n", ins);
+        e_pbc_emit(imcc, param, unit, ins);
     }
 
-    e_pbc_end_sub(interp, param, unit);
-
-    return 0;
+    e_pbc_end_sub(imcc, param, unit);
 }
 
 /*
@@ -709,11 +709,10 @@ Closes the given emitter.
 
 */
 
-int
-emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
+emit_close(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(void *param))
 {
     ASSERT_ARGS(emit_close)
-    return e_pbc_close(interp, param);
+    e_pbc_close(imcc, param);
 }
 
 /*

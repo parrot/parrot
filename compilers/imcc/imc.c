@@ -63,25 +63,25 @@ afterwards.
 */
 
 void
-imc_compile_all_units(PARROT_INTERP)
+imc_compile_all_units(ARGMOD(imc_info_t * imcc))
 {
     ASSERT_ARGS(imc_compile_all_units)
     /* compile all units created during the parse */
     IMC_Unit *unit;
 
 #if ! COMPILE_IMMEDIATE
-    for (unit = IMCC_INFO(interp)->imc_units; unit;) {
+    for (unit = imcc->imc_units; unit;) {
         IMC_Unit * const unit_next = unit->next;
-        imc_compile_unit(interp, unit);
+        imc_compile_unit(imcc, unit);
         unit = unit_next;
     }
 #endif
 
-    emit_close(interp, NULL);
+    emit_close(imcc, NULL);
 
     /* All done with compilation, now free all memory allocated
      * for instructions and other structures.  */
-    for (unit = IMCC_INFO(interp)->imc_units; unit;) {
+    for (unit = imcc->imc_units; unit;) {
         IMC_Unit    * const unit_next = unit->next;
         Instruction *ins;
 
@@ -91,13 +91,13 @@ imc_compile_all_units(PARROT_INTERP)
             ins = ins_next;
         }
 
-        imc_free_unit(interp, unit);
+        imc_free_unit(imcc, unit);
         unit = unit_next;
     }
 
-    IMCC_INFO(interp)->imc_units = NULL;
-    IMCC_INFO(interp)->cur_unit  = NULL;
-    IMCC_INFO(interp)->last_unit = NULL;
+    imcc->imc_units = NULL;
+    imcc->cur_unit  = NULL;
+    imcc->last_unit = NULL;
 }
 
 
@@ -113,14 +113,14 @@ on a single compilation unit at a time.
 */
 
 void
-imc_compile_unit(PARROT_INTERP, ARGIN(IMC_Unit *unit))
+imc_compile_unit(ARGMOD(imc_info_t * imcc), ARGIN(IMC_Unit *unit))
 {
     ASSERT_ARGS(imc_compile_unit)
     /* Not much here for now except the allocator */
-    IMCC_INFO(interp)->cur_unit = unit;
+    imcc->cur_unit = unit;
 
-    imc_reg_alloc(interp, unit);
-    emit_flush(interp, NULL, unit);
+    imc_reg_alloc(imcc, unit);
+    emit_flush(imcc, NULL, unit);
 }
 
 
@@ -135,16 +135,16 @@ Cleans up the compiler state in preparation for another compiler invocation.
 */
 
 void
-imc_cleanup(PARROT_INTERP, ARGIN_NULLOK(void *yyscanner))
+imc_cleanup(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(void *yyscanner))
 {
     ASSERT_ARGS(imc_cleanup)
-    IMCC_pop_parser_state(interp, yyscanner);
-    clear_globals(interp);
-    mem_sys_free(IMCC_INFO(interp)->ghash.data);
-    IMCC_INFO(interp)->ghash.data = NULL;
+    IMCC_pop_parser_state(imcc, yyscanner);
+    clear_globals(imcc);
+    mem_sys_free(imcc->ghash.data);
+    imcc->ghash.data = NULL;
 
-    if (IMCC_INFO(interp)->state)
-        IMCC_INFO(interp)->state->file = STRINGNULL;
+    if (imcc->state)
+        imcc->state->file = STRINGNULL;
 }
 
 
@@ -161,11 +161,11 @@ Creates a new IMC_Unit of the given IMC_Unit_Type C<t>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
 static IMC_Unit *
-imc_new_unit(PARROT_INTERP, IMC_Unit_Type t)
+imc_new_unit(ARGMOD(imc_info_t * imcc), IMC_Unit_Type t)
 {
     ASSERT_ARGS(imc_new_unit)
-    IMC_Unit * const unit = mem_gc_allocate_zeroed_typed(interp, IMC_Unit);
-    create_symhash(interp, &unit->hash);
+    IMC_Unit * const unit = mem_gc_allocate_zeroed_typed(imcc->interp, IMC_Unit);
+    create_symhash(imcc, &unit->hash);
     unit->type = t;
     return unit;
 }
@@ -185,17 +185,16 @@ current state.
 
 PARROT_CANNOT_RETURN_NULL
 IMC_Unit *
-imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)
+imc_open_unit(ARGMOD(imc_info_t * imc_info), IMC_Unit_Type t)
 {
     ASSERT_ARGS(imc_open_unit)
-    IMC_Unit   * const unit     = imc_new_unit(interp, t);
-    imc_info_t * const imc_info = IMCC_INFO(interp);
+    IMC_Unit * const unit = imc_new_unit(imc_info, t);
 
     if (!imc_info->imc_units)
         imc_info->imc_units = unit;
 
     if (!imc_info->ghash.data)
-        create_symhash(interp, &imc_info->ghash);
+        create_symhash(imc_info->interp, &imc_info->ghash);
 
     unit->prev = imc_info->last_unit;
 
@@ -224,15 +223,15 @@ on the list of units.
 */
 
 void
-imc_close_unit(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
+imc_close_unit(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(IMC_Unit *unit))
 {
     ASSERT_ARGS(imc_close_unit)
 #if COMPILE_IMMEDIATE
     if (unit)
-        imc_compile_unit(interp, unit);
+        imc_compile_unit(imcc, unit);
 #endif
 
-    IMCC_INFO(interp)->cur_unit = NULL;
+    imcc->cur_unit = NULL;
 }
 
 
@@ -247,10 +246,9 @@ Frees an IMC_Unit and all of its associated memory.
 */
 
 static void
-imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+imc_free_unit(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
 {
     ASSERT_ARGS(imc_free_unit)
-    imc_info_t * const imc = IMCC_INFO(interp);
 
     free_reglist(unit);
 
@@ -258,9 +256,9 @@ imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     clear_basic_blocks(unit);
 
     if (!imc->n_comp_units)
-        IMCC_fatal(interp, 1, "imc_free_unit: non existent unit\n");
+        IMCC_fatal(imcc, 1, "imc_free_unit: non existent unit\n");
 
-    imc->n_comp_units--;
+    imcc->n_comp_units--;
 
     clear_locals(unit);
 

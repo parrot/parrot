@@ -150,7 +150,7 @@ on a single compilation unit at a time.
 */
 
 void
-imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
+imc_reg_alloc(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(IMC_Unit *unit))
 {
     ASSERT_ARGS(imc_reg_alloc)
     const char *function;
@@ -162,8 +162,7 @@ imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
         return;
 
     imc_stat_init(unit);
-    if (!(IMCC_INFO(interp)->optimizer_level &
-                (OPT_PRE|OPT_CFG|OPT_PASM)) && unit->pasm_file)
+    if (!imcc->optimizer_level & (OPT_PRE|OPT_CFG|OPT_PASM)) && unit->pasm_file)
         goto done;
 
     if (unit->instructions->symreg_count)
@@ -171,53 +170,53 @@ imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
     else
       function = "(not a sub)";
 
-    IMCC_debug(interp, DEBUG_IMC, "\n------------------------\n");
-    IMCC_debug(interp, DEBUG_IMC, "processing sub %s\n", function);
-    IMCC_debug(interp, DEBUG_IMC, "------------------------\n\n");
+    IMCC_debug(imcc, DEBUG_IMC, "\n------------------------\n");
+    IMCC_debug(imcc, DEBUG_IMC, "processing sub %s\n", function);
+    IMCC_debug(imcc, DEBUG_IMC, "------------------------\n\n");
 
-    if (IMCC_INFO(interp)->optimizer_level == OPT_PRE && unit->pasm_file) {
-        while (pre_optimize(interp, unit))
+    if (imcc->optimizer_level == OPT_PRE && unit->pasm_file) {
+        while (pre_optimize(imcc, unit))
             ;
         goto done;
     }
 
     /* all lexicals get a unique register */
-    allocate_lexicals(interp, unit);
+    allocate_lexicals(imcc, unit);
 
     /* build CFG and life info, and optimize iteratively */
     do {
         int first = 1;
         do {
-            while (pre_optimize(interp, unit)) { };
+            while (pre_optimize(imcc, unit)) { };
 
-            find_basic_blocks(interp, unit, first);
-            build_cfg(interp, unit);
+            find_basic_blocks(imcc, unit, first);
+            build_cfg(imcc, unit);
             first = 0;
-        } while (cfg_optimize(interp, unit));
+        } while (cfg_optimize(imcc, unit));
 
-        compute_dominators(interp, unit);
-        find_loops(interp, unit);
+        compute_dominators(imcc, unit);
+        find_loops(imcc, unit);
 
-        if (IMCC_INFO(interp)->optimizer_level)
-            compute_dominance_frontiers(interp, unit);
+        if (imcc->optimizer_level)
+            compute_dominance_frontiers(imcc, unit);
 
-        build_reglist(interp, unit);
+        build_reglist(imcc, unit);
 
-        allocate_uniq(interp, unit, 0);
-    } while (!IMCC_INFO(interp)->dont_optimize && optimize(interp, unit));
+        allocate_uniq(imcc, unit, 0);
+    } while (!imcc->dont_optimize && optimize(imcc, unit));
 
-    if (IMCC_INFO(interp)->debug & DEBUG_IMC)
+    if (imcc->debug & DEBUG_IMC)
         dump_symreg(unit);
 
     /* TODO add option for a better allocator */
-    vanilla_reg_alloc(interp, unit);
+    vanilla_reg_alloc(imcc, unit);
 
-    if (IMCC_INFO(interp)->debug & DEBUG_IMC)
+    if (imcc->debug & DEBUG_IMC)
         dump_instructions(interp, unit);
 
   done:
-    if (IMCC_INFO(interp)->verbose  || (IMCC_INFO(interp)->debug & DEBUG_IMC))
-        print_stat(interp, unit);
+    if (imcc->verbose  || (imcc->debug & DEBUG_IMC))
+        print_stat(imcc, unit);
     else
         make_stat(unit, NULL, unit->n_regs_used);
 }
@@ -336,7 +335,7 @@ and final
 */
 
 static void
-print_stat(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+print_stat(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
 {
     ASSERT_ARGS(print_stat)
     int sets[4] = {0, 0, 0, 0};
@@ -346,30 +345,30 @@ print_stat(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             ? unit->instructions->symregs[0]->name
             : "(not a function)";
 
-    make_stat(unit, sets, unit->n_regs_used);
-    IMCC_info(interp, 1,
+    make_stat(imcc, sets, unit->n_regs_used);
+    IMCC_info(imcc, 1,
             "sub %s:\n\tregisters in .pir:\t I%d, N%d, S%d, P%d\n",
             function,
             unit->n_vars_used[0], unit->n_vars_used[1],
             unit->n_vars_used[2], unit->n_vars_used[3]);
-    IMCC_info(interp, 1,
+    IMCC_info(imcc, 1,
               "\t%d labels, %d lines deleted, "
               "%d if_branch, %d branch_branch\n",
               unit->ostat.deleted_labels, unit->ostat.deleted_ins,
               unit->ostat.if_branch, unit->ostat.branch_branch);
-    IMCC_info(interp, 1, "\t%d branch_cond_loop\n",
+    IMCC_info(imcc, 1, "\t%d branch_cond_loop\n",
               unit->ostat.branch_cond_loop);
-    IMCC_info(interp, 1, "\t%d used once deleted\n",
+    IMCC_info(imcc, 1, "\t%d used once deleted\n",
               unit->ostat.used_once);
-    IMCC_info(interp, 1, "\t%d invariants_moved\n",
+    IMCC_info(imcc, 1, "\t%d invariants_moved\n",
               unit->ostat.invariants_moved);
-    IMCC_info(interp, 1, "\tregisters needed:\t I%d, N%d, S%d, P%d\n",
+    IMCC_info(imcc, 1, "\tregisters needed:\t I%d, N%d, S%d, P%d\n",
             sets[0], sets[1], sets[2], sets[3]);
-    IMCC_info(interp, 1,
+    IMCC_info(imcc, 1,
             "\tregisters in .pasm:\t I%d, N%d, S%d, P%d - %d\n",
             unit->n_regs_used[0], unit->n_regs_used[1],
             unit->n_regs_used[2], unit->n_regs_used[3]);
-    IMCC_info(interp, 1, "\t%d basic_blocks, %d edges\n",
+    IMCC_info(imcc, 1, "\t%d basic_blocks, %d edges\n",
             unit->n_basic_blocks, edge_count(unit));
 }
 
@@ -437,13 +436,13 @@ Run through them and allocate all that don't overlap in one bunch.
 */
 
 static void
-build_reglist(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+build_reglist(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
 {
     ASSERT_ARGS(build_reglist)
     SymHash  const *hsh = &unit->hash;
     unsigned int    i, count, unused, n_symbols;
 
-    IMCC_info(interp, 2, "build_reglist\n");
+    IMCC_info(imcc, 2, "build_reglist\n");
 
     /* count symbols */
     if (unit->reglist)
@@ -453,7 +452,7 @@ build_reglist(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     if (count == 0)
         return;
 
-    unit->reglist = mem_gc_allocate_n_typed(interp, count, SymReg *);
+    unit->reglist = mem_gc_allocate_n_typed(imcc->interp, count, SymReg *);
 
     for (i = count = 0; i < hsh->size; i++) {
         SymReg *r;
@@ -466,7 +465,7 @@ build_reglist(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
     unit->n_symbols = n_symbols = count;
 
-    if (IMCC_INFO(interp)->debug & DEBUG_IMC)
+    if (imcc->debug & DEBUG_IMC)
         dump_symreg(unit);
 
     compute_du_chain(unit);
@@ -586,15 +585,14 @@ find first available register of the given reg_set
 
 PARROT_WARN_UNUSED_RESULT
 static unsigned int
-first_avail(PARROT_INTERP,
-        ARGIN(const IMC_Unit *unit), int reg_set,
+first_avail(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit), int reg_set,
         ARGOUT_NULLOK(Set **avail))
 {
     ASSERT_ARGS(first_avail)
-    int n                     = (int)unit->n_symbols > unit->max_color
-                              ? (int)unit->n_symbols
-                              : unit->max_color;
-    Set         *allocated    = set_make(interp, (unsigned int)n + 1);
+    int n = (int)unit->n_symbols > unit->max_color
+                ? (int)unit->n_symbols
+                : unit->max_color;
+    Set *allocated = set_make(imcc, (unsigned int)n + 1);
 
     const SymHash * const hsh = &unit->hash;
 
@@ -633,7 +631,7 @@ allocate lexicals or non-volatile in ascending order
 */
 
 static void
-allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
+allocate_uniq(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), int usage)
 {
     ASSERT_ARGS(allocate_uniq)
     SymHash     *hsh     = &unit->hash;
@@ -654,17 +652,17 @@ allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
             }
 
             if (REG_NEEDS_ALLOC(r)
-            &&  r->color == -1
-            && (r->usage & usage)
-            && r->use_count) {
+                    &&  r->color == -1
+                    && (r->usage & usage)
+                    && r->use_count) {
                 Set         *avail     = sets[j];
                 unsigned int first_reg = avail
                                        ? set_first_zero(avail)
-                                       : first_avail(interp, unit, (int)r->set, &avail);
+                                       : first_avail(imcc, unit, (int)r->set, &avail);
                 set_add(avail, first_reg);
                 r->color = first_reg++;
 
-                IMCC_debug(interp, DEBUG_IMC,
+                IMCC_debug(imcc, DEBUG_IMC,
                         "allocate %s sym %c '%s'  color %d\n",
                         usage & U_LEXICAL ? "Lexical" : "Non-vol",
                         (int)r->set, r->name, r->color);
@@ -702,7 +700,7 @@ register.
 */
 
 static void
-vanilla_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+vanilla_reg_alloc(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
 {
     ASSERT_ARGS(vanilla_reg_alloc)
     const char   type[] = "INSP";
@@ -724,7 +722,7 @@ vanilla_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     /* Assign new colors. */
     for (j = 0; j < 4; j++) {
         reg_set   = type[j];
-        first_reg = first_avail(interp, unit, reg_set, &avail);
+        first_reg = first_avail(imcc, unit, reg_set, &avail);
 
         /* XXX Use a different loop variable that doesn't shadow outer i */
         for (i = 0; i < hsh->size; i++) {
@@ -734,7 +732,7 @@ vanilla_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                     continue;
                 if (REG_NEEDS_ALLOC(r) && (r->color == -1) && r->use_count) {
                     if (set_contains(avail, first_reg))
-                        first_reg = first_avail(interp, unit, reg_set, NULL);
+                        first_reg = first_avail(imcc, unit, reg_set, NULL);
 
                     set_add(avail, first_reg);
                     r->color = first_reg++;
@@ -759,11 +757,11 @@ because they are accessible through the LexPad.
 */
 
 static void
-allocate_lexicals(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+allocate_lexicals(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
 {
     ASSERT_ARGS(allocate_lexicals)
-    IMCC_debug(interp, DEBUG_IMC, "allocate lexicals\n");
-    allocate_uniq(interp, unit, U_LEXICAL);
+    IMCC_debug(imcc, DEBUG_IMC, "allocate lexicals\n");
+    allocate_uniq(imcc, unit, U_LEXICAL);
 }
 
 /*

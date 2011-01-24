@@ -42,12 +42,12 @@ Creates a new Set object.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Set*
-set_make(PARROT_INTERP, unsigned int length)
+set_make(ARGMOD(imc_info_t * imcc), unsigned int length)
 {
     ASSERT_ARGS(set_make)
-    Set * const s = mem_gc_allocate_zeroed_typed(interp, Set);
+    Set * const s = mem_gc_allocate_zeroed_typed(imcc->interp, Set);
     s->length     = length;
-    s->bmp        = mem_gc_allocate_n_zeroed_typed(interp,
+    s->bmp        = mem_gc_allocate_n_zeroed_typed(imcc->interp,
                             NUM_BYTES(length), unsigned char);
 
     return s;
@@ -67,10 +67,10 @@ Creates a new Set object of C<length> items, setting them all to full.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Set*
-set_make_full(PARROT_INTERP, unsigned int length)
+set_make_full(ARGMOD(imc_info_t * imcc), unsigned int length)
 {
     ASSERT_ARGS(set_make_full)
-    Set * const s      = set_make(interp, length);
+    Set * const s      = set_make(imcc, length);
     const size_t bytes = NUM_BYTES(length);
 
     if (bytes)
@@ -132,10 +132,10 @@ Copies the set C<s>, returning a new set pointer.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Set*
-set_copy(PARROT_INTERP, ARGIN(const Set *s))
+set_copy(ARGMOD(imc_info_t * imcc), ARGIN(const Set *s))
 {
     ASSERT_ARGS(set_copy)
-    Set * const d = set_make(interp, s->length);
+    Set * const d = set_make(imcc, s->length);
 
     memcpy(d->bmp, s->bmp, NUM_BYTES(d->length));
     return d;
@@ -288,11 +288,11 @@ Computes the union of the two Set arguments, returning it as a new Set.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Set *
-set_union(PARROT_INTERP, ARGIN(const Set *s1), ARGIN(const Set *s2))
+set_union(ARGMOD(imc_info_t * imcc), ARGIN(const Set *s1), ARGIN(const Set *s2))
 {
     ASSERT_ARGS(set_union)
     unsigned int i;
-    Set * const s = set_make(interp, s1->length);
+    Set * const s = set_make(imcc, s1->length);
 
     PARROT_ASSERT(s1->length == s2->length);
 
@@ -318,11 +318,12 @@ through the binary C<and> operator.)
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Set *
-set_intersec(PARROT_INTERP, ARGIN(const Set *s1), ARGIN(const Set *s2))
+set_intersec(ARGMOD(imc_info_t * imcc), ARGIN(const Set *s1),
+        ARGIN(const Set *s2))
 {
     ASSERT_ARGS(set_intersec)
     unsigned int i;
-    Set * const  s = set_make(interp, s1->length);
+    Set * const  s = set_make(imcc, s1->length);
 
     PARROT_ASSERT(s1->length == s2->length);
 
