@@ -301,7 +301,7 @@ Parrot_io_connect_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 
     /* Connect to an IPv6 addrinfo if an UnManagedStruct was provided as address */
     if (!PMC_IS_NULL(address) && address->vtable->base_type == enum_class_UnManagedStruct) {
-        res = VTABLE_get_pointer(interp, address);
+        res = (struct addrinfo *)VTABLE_get_pointer(interp, address);
 
         for (walk = res; walk != NULL; walk = walk->ai_next) {
             fd = socket(walk->ai_family, walk->ai_socktype, walk->ai_protocol);
@@ -382,7 +382,7 @@ Parrot_io_bind_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 
     /* Bind to an IPv6 address (UnManagedStruct with an struct addrinfo inside */
     if (!PMC_IS_NULL(address) && address->vtable->base_type == enum_class_UnManagedStruct) {
-        res = VTABLE_get_pointer(interp, address);
+        res = (struct addrinfo *)VTABLE_get_pointer(interp, address);
 
         for (walk = res; walk != NULL; walk = walk->ai_next) {
             fd = socket(walk->ai_family, walk->ai_socktype, walk->ai_protocol);

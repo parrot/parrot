@@ -137,7 +137,6 @@ Returns the string representation of this sockaddr by calling C<getnameinfo(3)>.
 */
     VTABLE STRING *get_string() {
         Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
-        struct sockaddr_storage *addr           = data->pointer;
         /* TODO: get hostname, not only numeric */
         char buf[INET6_ADDRSTRLEN+1];
         /* numeric port maximum is 65535, so 5 chars */
@@ -146,7 +145,7 @@ Returns the string representation of this sockaddr by calling C<getnameinfo(3)>.
         if (!data->pointer)
             return Parrot_sprintf_c(interp, "(?)");
 
-        getnameinfo((struct sockaddr_storage*)data->pointer, data->len, buf,
+        getnameinfo((struct sockaddr *)data->pointer, data->len, buf,
                 sizeof(buf), portbuf, sizeof(portbuf), NI_NUMERICHOST | NI_NUMERICSERV);
         return Parrot_str_format_data(interp, "%s:%s", buf, portbuf);
     }
@@ -166,7 +165,7 @@ Copies a C<sockaddr_in> or C<sockaddr_in6> from the given C<addrinfo> pointer
     VTABLE void set_pointer(void *value) {
         Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
 
-        struct addrinfo *walk = value;
+        struct addrinfo *walk = (struct addrinfo *)value;
         memcpy(data->pointer, walk->ai_addr, walk->ai_addrlen);
         data->len = walk->ai_addrlen;
     }
