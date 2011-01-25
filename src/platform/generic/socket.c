@@ -259,8 +259,8 @@ Parrot_io_listen(SHIM_INTERP, PIOHANDLE os_handle, INTVAL sec)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_accept(PARROT_INTERP, PIOHANDLE os_handle, void
-*addr)>
+=item C<PIOHANDLE Parrot_io_accept(PARROT_INTERP, PIOHANDLE os_handle, PMC *
+remote_addr)>
 
 Accept a new connection and return a newly created C<ParrotIO> socket.
 
