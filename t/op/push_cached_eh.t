@@ -24,6 +24,9 @@ Test various use cases of the push_cached_eh opcode.
     'test_handle'() # Call second time
     'test_handle_twice'()
 
+    'test_handle_typed'()
+    'test_handle_typed'() # Call second time
+
     'done_testing'()
 .end
 
@@ -39,6 +42,46 @@ Test various use cases of the push_cached_eh opcode.
   catch:
     pop_eh
     ok(1, "Caught in simple case")
+    .return()
+.end
+
+.sub "test_handle_typed"
+    push_cached_eh .CONTROL_RETURN, catch
+
+    $P0 = new ["Exception"]
+    $P0["type"] = .CONTROL_RETURN
+    throw $P0
+    nok(1, "Not caught")
+
+    goto try_again
+
+  catch:
+    pop_eh
+    ok(1, "Caught typed")
+
+
+  try_again:
+    push_cached_eh .CONTROL_RETURN, catch_typed
+    push_cached_eh .CONTROL_ERROR, catch_untyped
+
+    $P0 = new ["Exception"]
+    $P0["type"] = .CONTROL_RETURN
+    throw $P0
+    nok(1, "Not caught")
+    .return()
+
+  catch_untyped:
+    pop_eh
+    nok(1, "Caught wrong exception")
+    .return()
+
+  catch_typed:
+    pop_eh
+    ok(1, "Caught correct exception")
+    .return()
+
+
+
     .return()
 .end
 
