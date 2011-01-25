@@ -241,9 +241,7 @@ imcc_preprocess(ARGMOD(imc_info_t *imcc))
         imc_yyin_set(in_file, yyscanner);
     }
 
-    /* TODO: This */
-    //do_pre_process(interp, sourcefile, yyscanner);
-
+    do_pre_process(imcc, sourcefile, yyscanner);
 }
 
 
@@ -456,34 +454,37 @@ imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
 {
     ASSERT_ARGS(imcc_compile_file)
     PackFile * const pf_raw = PackFile_new(imcc->interp, 0);
-    struct _imc_info_t * const imc_info = prepare_reentrant_compile(imcc);
-    yyscan_t yyscanner = imcc_get_scanner(imcc);
+    struct _imc_info_t * const imc_save = prepare_reentrant_compile(imcc);
+    struct _imc_info_t * imcc_use = imc_save ? imc_save : imcc;
+
+    yyscan_t yyscanner = imcc_get_scanner(imcc_use);
 
     /* TODO: Don't set current packfile in the interpreter. Leave the
              interpreter alone */
     Parrot_pf_set_current_packfile(imcc->interp, pf_raw);
 
-    IMCC_push_parser_state(imcc, fullname, is_pasm);
+    IMCC_push_parser_state(imcc_use, fullname, is_pasm);
 
-    imcc_compile_buffer_safe(imcc, yyscanner, source, 1, is_pasm);
+    imcc_compile_buffer_safe(imcc_use, yyscanner, source, 1, is_pasm);
 
     yylex_destroy(yyscanner);
-    imc_cleanup(imcc, NULL);
+    imc_cleanup(imcc_use, NULL);
 
     if (imcc->error_code) {
         imcc->error_code = IMCC_FATAL_EXCEPTION;
-        IMCC_warning(imcc, "error:imcc:%Ss", imcc->error_message);
-        IMCC_print_inc(imcc);
+        IMCC_warning(imcc_use, "error:imcc:%Ss", imcc->error_message);
+        IMCC_print_inc(imcc_use);
 
         return PMCNULL;
     }
 
-    imcc = exit_reentrant_compile(imcc, imc_info);
+    exit_reentrant_compile(imcc, imc_save);
 
     IMCC_info(imcc, 1, "%ld lines compiled.\n", imcc->line);
     PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, NULL);
     PackFile_fixup_subs(imcc->interp, PBC_POSTCOMP, NULL);
 
+    /* TODO: Return a real PackFile PMC */
     if (pf_raw) {
         PMC * const pbcpmc = Parrot_pmc_new(imcc->interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(imcc->interp, pbcpmc, pf_raw);
@@ -491,258 +492,6 @@ imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
     }
     return PMCNULL;
 }
-
-/*
-
-=item C<PMC * imcc_compile(imc_info_t *imcc, STRING *s, int pasm_file, STRING
-**error_message)>
-
-Compile a pasm or imcc string
-
-FIXME as we have separate constants, the old constants in ghash must be deleted.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-imcc_compile(ARGMOD(imc_info_t *imcc))
-{
-    ASSERT_ARGS(imcc_compile)
-    /* imcc always compiles to interp->code
-     * XXX: This is EXTREMELY bad. IMCC should not write to interp->code
-     * save old cs, make new
-     */
-    STRING                *name;
-    PackFile_ByteCode     *old_cs, *new_cs;
-    PMC                   *eval_pmc = NULL;
-    struct _imc_info_t    *imc_info = NULL;
-    struct parser_state_t *next;
-    yyscan_t               yyscanner;
-    PMC                   *ignored;
-    UINTVAL regs_used[4] = {3, 3, 3, 3};
-    INTVAL eval_number;
-
-    yylex_init_extra(imcc, &yyscanner);
-
-    if (imcc->last_unit) {
-        /* a reentrant compile */
-        imc_info = imcc_new(imcc->interp);
-        imc_info->ghash   = imcc->ghash;
-        imc_info->prev    = imcc;
-        imcc = imc_info;
-    }
-
-    ignored = Parrot_push_context(imcc->interp, regs_used);
-    UNUSED(ignored);
-
-    if (eval_nr == 0)
-        MUTEX_INIT(eval_nr_lock);
-
-    LOCK(eval_nr_lock);
-    eval_number = ++eval_nr;
-    UNLOCK(eval_nr_lock);
-
-    name   = Parrot_sprintf_c(imcc->interp, "EVAL_" INTVAL_FMT, eval_number);
-    new_cs = PF_create_default_segs(imcc->interp, name, 0, 0);
-    old_cs = Parrot_switch_to_cs(imcc->interp, new_cs, 0);
-
-    imcc->cur_namespace = NULL;
-
-    /* spit out the sourcefile */
-    /* TODO: Update this to PIO. variable "s" is now a STRING, not const
-             char *.
-     */
-    /*
-    if (Interp_debug_TEST(interp, PARROT_EVAL_DEBUG_FLAG)) {
-        char *buf = Parrot_str_to_cstring(interp, name);
-        FILE * const fp = fopen(buf, "w");
-        Parrot_str_free_cstring(buf);
-        if (fp) {
-            fputs(s, fp);
-            fclose(fp);
-        }
-    }
-    */
-
-    IMCC_push_parser_state(imcc, name, pasm_file);
-    next = imcc->state->next;
-
-    if (imc_info)
-        imcc->state->next = NULL;
-
-
-    imcc_compile_buffer_safe(imcc, code_c, yyscanner);
-
-    Parrot_pop_context(imcc->interp);
-
-    /*
-     * compile_string NULLifies frames->next, so that yywrap
-     * doesn't try to continue compiling the previous buffer
-     * This OTOH prevents pop_parser-state ->
-     *
-     * set next here and pop
-     */
-    imcc->state->next = next;
-    IMCC_pop_parser_state(imcc, yyscanner);
-
-    if (!imcc->error_code) {
-        Parrot_Sub_attributes *sub_data;
-
-        /*
-         * create Eval PMC
-         * TODO: Don't return the sub or an Eval. Return the PackFile* or a
-         *       PackFile PMC instead. TT #1969
-         */
-        eval_pmc             = Parrot_pmc_new(imcc->interp, enum_class_Eval);
-        PMC_get_sub(imcc->interp, eval_pmc, sub_data);
-        sub_data->seg        = new_cs;
-        sub_data->start_offs = 0;
-        sub_data->end_offs   = new_cs->base.size;
-        sub_data->name       = name;
-
-        *error_message = NULL;
-    }
-    else {
-        PackFile_Segment_destroy(imcc->interp, (PackFile_Segment *)new_cs);
-        *error_message = imcc->error_message;
-    }
-
-    if (imc_info) {
-        SymReg *ns     = imcc->cur_namespace;
-        imcc           = imc_info->prev;
-        mem_sys_free(imc_info);
-        imc_info       = imcc;
-        imcc->cur_unit = imc_info->last_unit;
-
-        if (ns && ns != imc_info->cur_namespace)
-            free_sym(ns);
-
-        imcc->cur_namespace = imc_info->cur_namespace;
-    }
-    else
-        imc_cleanup(imcc, yyscanner);
-
-    yylex_destroy(yyscanner);
-
-    /* Now run any :load/:init subs. */
-    if (!*error_message)
-        PackFile_fixup_subs(imcc->interp, PBC_MAIN, eval_pmc);
-
-    /* restore old byte_code, */
-    if (old_cs)
-        (void)Parrot_switch_to_cs(imcc->interp, old_cs, 0);
-
-    return eval_pmc;
-}
-
-/*
-
-=item C<PMC * IMCC_compile_pir_s(imc_info_t *imcc, STRING *s, STRING
-**error_message)>
-
-Compile PIR code from a C string. Returns errors in the <STRING> provided.
-
-Called only from src/embed.c:Parrot_compile_string().
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-IMCC_compile_pir_s(ARGMOD(imc_info_t *imcc), ARGIN(STRING *s),
-        ARGOUT(STRING **error_message))
-{
-    ASSERT_ARGS(IMCC_compile_pir_s)
-    return imcc_compile(imcc, s, 0, error_message);
-}
-
-/*
-
-=item C<PMC * IMCC_compile_pasm_s(imc_info_t *imcc, STRING *s, STRING
-**error_message)>
-
-Compile PASM code from a C string. Returns errors in the <STRING> provided.
-
-Called only from src/embed.c:Parrot_compile_string().
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-IMCC_compile_pasm_s(ARGMOD(imc_info_t *imcc), ARGIN(STRING *s),
-        ARGOUT(STRING **error_message))
-{
-    ASSERT_ARGS(IMCC_compile_pasm_s)
-    return imcc_compile(imcc, s, 1, error_message);
-}
-
-/*
-
-=item C<PMC * imcc_compile_pasm_ex(imc_info_t *imcc, STRING *s)>
-
-Compile PASM code from a C string. Throws an exception upon errors.
-
-Called only from the PASM compreg
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-imcc_compile_pasm_ex(ARGMOD(imc_info_t *imcc), ARGIN(STRING *s))
-{
-    ASSERT_ARGS(imcc_compile_pasm_ex)
-    STRING *error_message;
-
-    PMC * const sub = imcc_compile(imcc, s, 1, &error_message);
-
-    if (sub)
-        return sub;
-
-    Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_SYNTAX_ERROR,
-            "%Ss", error_message);
-}
-
-/*
-
-=item C<PMC * imcc_compile_pir_ex(imc_info_t *imcc, STRING *s)>
-
-Compile PIR code from a C string. Throws an exception upon errors.
-
-Called only from the PIR compreg
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-imcc_compile_pir_ex(ARGMOD(imc_info_t *imcc), ARGIN(STRING *s))
-{
-    ASSERT_ARGS(imcc_compile_pir_ex)
-    STRING *error_message;
-    PMC *sub;
-
-    sub = imcc_compile(imcc, s, 0, &error_message);
-    if (sub)
-        return sub;
-
-    Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_SYNTAX_ERROR,
-            "%Ss", error_message);
-}
-
-
 
 /*
 
@@ -772,16 +521,16 @@ prepare_reentrant_compile(ARGMOD(imc_info_t * imcc))
         imc_info        = mem_gc_allocate_zeroed_typed(imcc->interp, imc_info_t);
         imc_info->prev  = imcc;
         imc_info->ghash = imcc->ghash;
-        imcc            = imc_info;
         /* start over; let the start of line rule increment this to 1 */
-        imcc->line = 0;
-        imcc->cur_namespace = NULL;
-        imcc->interp->code = NULL;
+        imc_info->line = 0;
+        imc_info->cur_namespace = NULL;
+        imc_info->interp->code = NULL;
+        return imc_info;
     }
-    return imc_info;
+    return NULL;
 }
 
-static imc_info_t *
+void
 exit_reentrant_compile(ARGMOD(imc_info_t * imcc),
         ARGMOD_NULLOK(struct _imc_info_t *imc_info))
 {
