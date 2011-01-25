@@ -37,7 +37,7 @@ Some ideas from AT&T SFIO.
 #endif
 
 #ifdef WIN32
-#  include <winsock.h>
+#  include <ws2tcpip.h>
 #endif
 
 /* Buffer flags */
