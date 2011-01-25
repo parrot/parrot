@@ -3813,6 +3813,18 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
     Parrot_io_printf(interp, "],\n");
 }
 
+/*
+
+=item C<static INTVAL find_pf_ann_idx(PARROT_INTERP, PackFile_Annotations *pfa,
+PackFile_Annotations_Key *key, UINTVAL offs)>
+
+Find the index of the active annotation at the given offset.
+
+=cut
+
+*/
+
+
 static
 INTVAL
 find_pf_ann_idx(PARROT_INTERP, PackFile_Annotations *pfa,
@@ -3840,7 +3852,7 @@ find_pf_ann_idx(PARROT_INTERP, PackFile_Annotations *pfa,
             hi = mid;
         }
         else {
-            /* exact match: retrun prior */
+            /* exact match: retrun prior annotation */
             return mid - 1;
         }
     }
