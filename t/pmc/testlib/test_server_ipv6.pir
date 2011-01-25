@@ -23,18 +23,12 @@ in case of test failures.
 
 .sub main :main
     .local pmc sock, address, conn
-    .local string str
+    .local string str, null_string
     .local int len, status
 
     sock = new 'Socket'
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    push_eh try_ip6_localhost
-    address = sock.'getaddrinfo'('localhost', 1234, .PIO_PROTO_TCP, .PIO_PF_INET6, 1)
-    goto ok
-  try_ip6_localhost:
-    pop_eh
-    address = sock.'getaddrinfo'('ip6-localhost', 1234, .PIO_PROTO_TCP, .PIO_PF_INET6, 1)
-  ok:
+    address = sock.'getaddrinfo'(null_string, 1234, .PIO_PROTO_TCP, .PIO_PF_INET6, 0)
     status = sock.'bind'(address)
     sock.'listen'(5)
 
