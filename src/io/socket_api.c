@@ -294,7 +294,60 @@ INTVAL
 Parrot_io_connect_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 {
     ASSERT_ARGS(Parrot_io_connect_handle)
+    struct addrinfo *res, *walk;
+    int fd = -1;
+    int i = 1;
     Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
+
+    /* Connect to an IPv6 addrinfo if an UnManagedStruct was provided as address */
+    if (!PMC_IS_NULL(address) && address->vtable->base_type == enum_class_UnManagedStruct) {
+        fprintf(stderr, "Connecting to IPv6 addr\n");
+        res = VTABLE_get_pointer(interp, address);
+
+        for (walk = res; walk != NULL; walk = walk->ai_next) {
+            fd = socket(walk->ai_family, walk->ai_socktype, walk->ai_protocol);
+            if (fd < 0) {
+                /* Cannot create socket. Not necessarily an error, for example not
+                 * on FreeBSD, where getaddrinfo() returns IPv6 addresses even
+                 * when the libc does not offer IPv6 support and thus fails in
+                 * socket(). */
+                continue;
+            }
+
+            if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i)) == -1) {
+                perror("Error setting SO_REUSEADDR:");
+                continue;
+            }
+
+            /* XXX: this effectively overwrites any previously set sockets. is that alright? */
+            SETATTR_Socket_os_handle(interp, pmc, fd);
+
+AGAIN:
+            if (connect(fd, walk->ai_addr, walk->ai_addrlen) != 0) {
+                switch (errno) {
+                  case EINTR:
+                    goto AGAIN;
+                  case EINPROGRESS:
+                    goto AGAIN;
+                  case EISCONN:
+                    break;
+                  default:
+                    close(fd);
+                    fd = -1;
+                    continue;
+                }
+            }
+
+            PARROT_SOCKET(pmc)->remote = Parrot_pmc_new(interp, enum_class_Sockaddr);
+
+            VTABLE_set_pointer(interp, PARROT_SOCKET(pmc)->remote, walk);
+            return 0;
+        }
+
+        if (fd == -1)
+            return -1;
+        fprintf(stderr, "huh?!\n");
+    }
 
     if (Parrot_io_socket_is_closed(interp, pmc))
         return -1;
@@ -323,7 +376,51 @@ INTVAL
 Parrot_io_bind_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 {
     ASSERT_ARGS(Parrot_io_bind_handle)
+    struct addrinfo *res, *walk;
+    int fd = -1;
+    int i = 1;
     Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
+
+    /* Bind to an IPv6 address (UnManagedStruct with an struct addrinfo inside */
+    if (!PMC_IS_NULL(address) && address->vtable->base_type == enum_class_UnManagedStruct) {
+        res = VTABLE_get_pointer(interp, address);
+
+        for (walk = res; walk != NULL; walk = walk->ai_next) {
+            fd = socket(walk->ai_family, walk->ai_socktype, walk->ai_protocol);
+            if (fd < 0) {
+                /* Cannot create socket. Not necessarily an error, for example not
+                 * on FreeBSD, where getaddrinfo() returns IPv6 addresses even
+                 * when the libc does not offer IPv6 support and thus fails in
+                 * socket(). */
+                continue;
+            }
+
+            if (walk->ai_family == AF_INET6) {
+                if (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &i, sizeof(i)) == -1) {
+                    perror("Error setting IPV6_V6ONLY:");
+                    continue;
+                }
+            }
+
+            /* XXX: this effectively overwrites any previously set sockets. is that alright? */
+            SETATTR_Socket_os_handle(interp, pmc, fd);
+
+            if (bind(fd, walk->ai_addr, walk->ai_addrlen) != 0) {
+                close(fd);
+                fd = -1;
+                continue;
+            }
+
+            PARROT_SOCKET(pmc)->local = Parrot_pmc_new(interp, enum_class_Sockaddr);
+
+            VTABLE_set_pointer(interp, PARROT_SOCKET(pmc)->local, walk);
+            return 0;
+        }
+
+        if (fd == -1)
+            return -1;
+
+    }
 
     if (Parrot_io_socket_is_closed(interp, pmc))
         return -1;
@@ -393,8 +490,7 @@ Parrot_io_accept_handle(PARROT_INTERP, ARGMOD(PMC *pmc))
     new_io->local  = io->local;
     new_io->remote = Parrot_pmc_new(interp, enum_class_Sockaddr);
 
-    os_handle = Parrot_io_accept(interp, io->os_handle,
-                    VTABLE_get_pointer(interp, new_io->remote));
+    os_handle = Parrot_io_accept(interp, io->os_handle, new_io->remote);
     /* TODO: error check */
     new_io->os_handle = os_handle;
 

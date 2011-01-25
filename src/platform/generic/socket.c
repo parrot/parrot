@@ -18,6 +18,7 @@ src/platform/generic/socket.c - UNIX socket functions
 #include "parrot/parrot.h"
 #include "../../io/io_private.h"
 #include "pmc/pmc_socket.h"
+#include "pmc/pmc_sockaddr.h"
 
 /* Windows defines file handles as void * and sockets as unsigned int.
  * We use void * for Windows PIOHANDLEs, so we have to cast them for the
@@ -61,6 +62,27 @@ typedef int PIOSOCKET;
 
 /* HEADERIZER HFILE: none */
 
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void get_addrinfo(PARROT_INTERP,
+    ARGIN(PMC * addrinfo),
+    ARGIN(const char *host),
+    int port,
+    int protocol,
+    int family,
+    int passive)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+#define ASSERT_ARGS_get_addrinfo __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(addrinfo) \
+    , PARROT_ASSERT_ARG(host))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /*
 
 =back
@@ -77,6 +99,61 @@ Very minimal stubs for now, maybe someone will run with these.
 =cut
 
 */
+
+
+/*
+
+=item C<PMC * Parrot_io_getaddrinfo(PARROT_INTERP, STRING *addr, INTVAL port,
+INTVAL protocol, INTVAL family, INTVAL passive)>
+
+C<Parrot_io_getaddrinfo()> calls get_addrinfo() to convert hostnames or IP
+addresses to sockaddrs (and more) and returns an Addrinfo PMC which can be
+passed to C<Parrot_io_connect_unix()> or C<Parrot_io_bind_unix()>.
+
+=cut
+
+*/
+
+/* TODO: where to move this to? originally from src/io/socket_api.c */
+static int pio_pf[PIO_PF_MAX+1] = {
+#ifdef PF_LOCAL
+    PF_LOCAL,   /* PIO_PF_LOCAL */
+#else
+    -1,         /* PIO_PF_LOCAL */
+#endif
+#ifdef PF_UNIX
+    PF_UNIX,    /* PIO_PF_UNIX */
+#else
+    -1,         /* PIO_PF_UNIX */
+#endif
+#ifdef PF_INET
+    PF_INET,    /* PIO_PF_INET */
+#else
+    -1,         /* PIO_PF_INET */
+#endif
+#ifdef PF_INET6
+    PF_INET6,   /* PIO_PF_INET6 */
+#else
+    -1,         /* PIO_PF_INET6 */
+#endif
+};
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive)
+{
+    char * const s        = Parrot_str_to_cstring(interp, addr);
+    PMC  * const addrinfo = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+
+    /* set family: 0 means any (AF_INET or AF_INET6) for getaddrinfo, so treat
+     * it specially */
+    int fam = (family != 0 ? pio_pf[family] : 0);
+
+    get_addrinfo(interp, addrinfo, s, port, protocol, fam, passive);
+    Parrot_str_free_cstring(s);
+    return addrinfo;
+}
 
 /*
 
@@ -194,15 +271,20 @@ Accept a new connection and return a newly created C<ParrotIO> socket.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PIOHANDLE
-Parrot_io_accept(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(void *addr))
+Parrot_io_accept(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(PMC * remote_addr))
 {
+    struct sockaddr * addr = (struct sockaddr *)VTABLE_get_pointer(interp, remote_addr);
     Parrot_Socklen_t addrlen = sizeof (struct sockaddr_in);
     PIOSOCKET newsock;
 
-    newsock = accept((PIOSOCKET)os_handle, (struct sockaddr *)addr, &addrlen);
+    newsock = accept((PIOSOCKET)os_handle, addr, &addrlen);
 
     if (newsock == PIO_INVALID_SOCKET)
         return PIO_INVALID_HANDLE;
+
+    /* Set the length for the remote sockaddr PMC so that it can distinguish
+     * between sockaddr_in and sockaddr_in6 */
+    PARROT_SOCKADDR(remote_addr)->len = addrlen;
 
     /* XXX FIXME: Need to do a getsockname and getpeername here to
      * fill in the sockaddr_in structs for local and peer */
@@ -341,7 +423,7 @@ AGAIN:
 /*
 
 =item C<void Parrot_io_sockaddr_in(PARROT_INTERP, void *addr, STRING *host_str,
-int port)>
+int port, int family)>
 
 Fill in a C<sockaddr_in> structure to connect to the specified host and port.
 
@@ -351,14 +433,15 @@ Fill in a C<sockaddr_in> structure to connect to the specified host and port.
 
 void
 Parrot_io_sockaddr_in(PARROT_INTERP, ARGOUT(void *addr),
-        ARGIN(STRING *host_str), int port)
+        ARGIN(STRING *host_str), int port, int family)
 {
     char * const host   = Parrot_str_to_cstring(interp, host_str);
-    /* Hard coded to IPv4 for now */
-    const int    family = AF_INET;
     int          success;
 
     struct sockaddr_in * const sa = (struct sockaddr_in*)addr;
+
+    /* Hard coded to IPv4 for now */
+    family = AF_INET;
 
 #ifdef _WIN32
     sa->sin_addr.S_un.S_addr = inet_addr(host);
@@ -412,6 +495,89 @@ Parrot_io_close_socket(SHIM_INTERP, PIOHANDLE handle)
 #endif
 }
 
+/*
+
+=item C<PMC * Parrot_io_remote_address(PARROT_INTERP, PMC *sock)>
+
+C<Parrot_io_remote_address()> returns the remote address of the given sock
+PMC. It can be used to find out to which address the connection was actually
+established (in case of the remote server having multiple IPv4 and/or IPv6
+addresses.
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_io_remote_address(PARROT_INTERP, ARGIN(PMC *sock))
+{
+    PMC * const addrinfo = VTABLE_clone(interp, PARROT_SOCKET(sock)->remote);
+
+    return addrinfo;
+}
+
+/*
+
+=item C<PMC * Parrot_io_local_address(PARROT_INTERP, PMC *sock)>
+
+C<Parrot_io_local_address()> returns the local address of the given sock
+PMC. It can be used to find out to which address the socket was actually
+bound (when binding to "localhost" without explicitly specifying an address
+family, for example).
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_io_local_address(PARROT_INTERP, ARGIN(PMC *sock))
+{
+    PMC * const addrinfo = VTABLE_clone(interp, PARROT_SOCKET(sock)->local);
+
+    return addrinfo;
+}
+
+/*
+
+=item C<static void get_addrinfo(PARROT_INTERP, PMC * addrinfo, const char
+*host, int port, int protocol, int family, int passive)>
+
+Internal helper function to call getaddrinfo and store the result pointer in
+the given PMC (of type UnManagedStruct).
+
+=cut
+
+*/
+
+static void
+get_addrinfo(PARROT_INTERP, ARGIN(PMC * addrinfo), ARGIN(const char *host), int port, int protocol, int family, int passive)
+{
+    ASSERT_ARGS(get_addrinfo)
+
+    struct addrinfo hints;
+    struct addrinfo *res;
+    /* We need to pass the port as a string (because you could also use a
+     * service specification from /etc/services). The highest port is 65535,
+     * so we need 5 characters + trailing null-byte. */
+    char portstr[6];
+    int ret;
+
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_protocol = protocol;
+    if (passive)
+        hints.ai_flags = AI_PASSIVE;
+    hints.ai_family = family;
+    snprintf(portstr, sizeof(portstr), "%u", port);
+
+    if ((ret = getaddrinfo(host, portstr, &hints, &res)) != 0) {
+        fprintf(stderr, "getaddrinfo failure: %s\n", gai_strerror(ret));
+        return;
+    }
+
+    VTABLE_set_pointer(interp, addrinfo, res);
+}
 
 
 /*

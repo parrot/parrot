@@ -18,6 +18,7 @@ The Socket PMC performs network I/O operations.
 */
 
 #include "../src/io/io_private.h"
+#include "pmc/pmc_sockaddr.h"
 
 #define CHUNK_SIZE      2048
 
@@ -169,20 +170,71 @@ for readable, two for writeable, and four for exceptions.
 
 /*
 
-=item C<sockaddr(STRING * address, INTVAL port)>
+=item C<sockaddr(STRING * address, INTVAL port, INTVAL family :optional)>
 
 C<sockaddr> returns an object representing a socket address, generated
-from a port number (integer) and an address (string).
+from a port number (integer) , address (string) and an optional address
+family (integer). If no address family is given, it defaults to IPv4.
 
 =cut
 
 */
 
-    METHOD sockaddr(STRING * address, INTVAL port) {
-        PMC * const sockaddr = Parrot_pmc_new(interp, enum_class_Sockaddr);
+    METHOD sockaddr(STRING * address, INTVAL port, INTVAL family :optional) {
+        PMC * sockaddr;
+
+        if (!family)
+            family = AF_INET;
+
+        sockaddr = Parrot_pmc_new(interp, enum_class_Sockaddr);
         Parrot_io_sockaddr_in(INTERP,
-                VTABLE_get_pointer(INTERP, sockaddr), address, port);
+                VTABLE_get_pointer(INTERP, sockaddr), address, port, family);
+        PARROT_SOCKADDR(sockaddr)->len = sizeof(struct sockaddr_in);
         RETURN(PMC * sockaddr);
+    }
+
+/*
+
+=item C<getaddrinfo(STRING * address, INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive)>
+
+C<getaddrinfo> returns an object representing the result of the
+C<getaddrinfo(3)> function which consists of multiple socket addresses,
+including family and protocol. It can be passed to C<bind()> or C<connect()>.
+
+=cut
+
+*/
+    METHOD getaddrinfo(STRING * address, INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive) {
+        PMC * res = Parrot_io_getaddrinfo(INTERP, address, port, protocol, family, passive);
+        RETURN(PMC * res);
+    }
+
+/*
+
+=item C<remote_address()>
+
+C<remote_address> returns the remote address of this socket PMC.
+
+=cut
+
+*/
+    METHOD remote_address() {
+        PMC * res = Parrot_io_remote_address(INTERP, SELF);
+        RETURN(PMC * res);
+    }
+
+/*
+
+=item C<local_address()>
+
+C<local_address> returns the local address of this socket PMC.
+
+=cut
+
+*/
+    METHOD local_address() {
+        PMC * res = Parrot_io_local_address(INTERP, SELF);
+        RETURN(PMC * res);
     }
 
 
@@ -277,7 +329,7 @@ complete, it invokes the callback, passing it a status object.
 =item C<bind(PMC *host)>
 
 C<bind> binds a socket object to the port and address specified by an
-address object (the packed result of C<sockaddr>).
+address object (the result of C<getaddrinfo>).
 
 The asynchronous version takes an additional final PMC callback
 argument, and only returns a status object. When the bind operation is

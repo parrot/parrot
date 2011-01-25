@@ -13,6 +13,9 @@ t/pmc/socket.t - test the Socket PMC
 
 Tests the Socket PMC.
 
+The IPv6-related tests in this file do not actually require an IPv6 networking
+stack, so we don't need to check if this parrot is IPv6-aware.
+
 =cut
 
 .include 'socket.pasm'
