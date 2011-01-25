@@ -627,6 +627,8 @@ struct _imc_info_t {
     int                   compiler_state;         /* see PBC_* flags */
     int                   verbose;
     int                   seen_main;
+    STRING               *source;
+    int                   source_is_file;
     opcode_t              npc;
 };
 

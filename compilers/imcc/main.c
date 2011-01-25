@@ -160,151 +160,67 @@ imcc_new(PARROT_INTERP)
     return imcc;
 }
 
-
-/*
-
-=item C<static int is_all_hex_digits(const char *s)>
-
-Tests all characters in a string are hexadecimal digits.
-Returns 1 if true, 0 as soon as a non-hex found
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-static int
-is_all_hex_digits(ARGIN(const char *s))
+PARROT_EXPORT
+void
+imcc_set_input_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *filename), INTVAL is_pasm)
 {
-    ASSERT_ARGS(is_all_hex_digits)
-    for (; *s; s++)
-        if (!isxdigit(*s))
-            return 0;
-    return 1;
+    ASSERT_ARGS(imcc_set_input_file)
+    imcc->source = filename;
+    imcc->source_is_file = 1;
+    if (is_pasm)
+        SET_STATE_PASM_FILE(imcc);
 }
 
-/*
-
-=item C<static const struct longopt_opt_decl * Parrot_cmd_options(void)>
-
-Set up the const struct declaration for cmd_options
-
-=cut
-
-*/
-
-/* TODO: Weed out the options that IMCC doesn't use, and rename this function
-         to something more imcc-ish
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static const struct longopt_opt_decl *
-Parrot_cmd_options(void)
+PARROT_EXPORT
+void
+imcc_set_input_string(ARGMOD(imc_info_t *imcc), ARGIN(STRING *code), INTVAL is_pasm)
 {
-    ASSERT_ARGS(Parrot_cmd_options)
-    static const struct longopt_opt_decl cmd_options[] = {
-        { '.', '.', (OPTION_flags)0, { "--wait" } },
-        { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
-        { 'E', 'E', (OPTION_flags)0, { "--pre-process-only" } },
-        { 'G', 'G', (OPTION_flags)0, { "--no-gc" } },
-        { '\0', OPT_HASH_SEED, OPTION_required_FLAG, { "--hash-seed" } },
-        { 'I', 'I', OPTION_required_FLAG, { "--include" } },
-        { 'L', 'L', OPTION_required_FLAG, { "--library" } },
-        { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
-        { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
-        { 'g', 'g', OPTION_required_FLAG, { "--gc" } },
-        { '\0', OPT_GC_THRESHOLD, OPTION_required_FLAG, { "--gc-threshold" } },
-        { 'V', 'V', (OPTION_flags)0, { "--version" } },
-        { 'X', 'X', OPTION_required_FLAG, { "--dynext" } },
-        { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,
-                                     { "--leak-test", "--destroy-at-end" } },
-        { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
-        { 'a', 'a', (OPTION_flags)0, { "--pasm" } },
-        { 'c', 'c', (OPTION_flags)0, { "--pbc" } },
-        { 'd', 'd', OPTION_optional_FLAG, { "--imcc-debug" } },
-        { '\0', OPT_HELP_DEBUG, (OPTION_flags)0, { "--help-debug" } },
-        { 'h', 'h', (OPTION_flags)0, { "--help" } },
-        { 'o', 'o', OPTION_required_FLAG, { "--output" } },
-        { '\0', OPT_PBC_OUTPUT, (OPTION_flags)0, { "--output-pbc" } },
-        { 'r', 'r', (OPTION_flags)0, { "--run-pbc" } },
-        { '\0', OPT_RUNTIME_PREFIX, (OPTION_flags)0, { "--runtime-prefix" } },
-        { 't', 't', OPTION_optional_FLAG, { "--trace" } },
-        { 'v', 'v', (OPTION_flags)0, { "--verbose" } },
-        { 'w', 'w', (OPTION_flags)0, { "--warnings" } },
-        { 'y', 'y', (OPTION_flags)0, { "--yydebug" } },
-        { 0, 0, (OPTION_flags)0, { NULL } }
-    };
-    return cmd_options;
+    ASSERT_ARGS(imcc_set_input_string)
+    imcc->source = code;
+    imcc->source_is_file = 0;
+    if (is_pasm)
+        SET_STATE_PASM_FILE(imcc);
+}
+PARROT_EXPORT
+void
+imcc_set_debug_mode(ARGMOD(imc_info_t *imcc), INTVAL dflags, INTVAL yflags)
+{
+    imcc->debug = dflags;
+    yydebug = yflags ? 1 : 0;
 }
 
-
-/*
-
-=item C<static void imcc_parseflags(imc_info_t *imcc, int argc, const char
-**argv)>
-
-Parse flags ans set approptiate state(s)
-
-=cut
-
-*/
-
-static void
-imcc_parseflags(ARGMOD(imc_info_t *imcc), int argc,
-        ARGIN_NULLOK(const char **argv))
+PARROT_EXPORT
+void
+imcc_set_warning_mode(ARGMOD(imc_info_t *imcc), INTVAL warnings)
 {
-    ASSERT_ARGS(imcc_parseflags)
-    struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
-    STRING *output_file = STRINGNULL;
+}
 
-    if (!argv)
+PARROT_EXPORT
+void
+imcc_set_verbosity(ARGMOD(imc_info_t *imcc), INTVAL verbose)
+{
+    imcc->verbose = verbose;
+}
+
+PARROT_EXPORT
+void
+imcc_set_optimization_level(ARGMOD(imc_info_t *imcc), ARGIN(const char *opts))
+{
+    if (!opts || !*opts || opts[0] = '0')
         return;
+    if (strchr(opt.opt_arg, 'p'))
+        imcc->optimizer_level |= OPT_PASM;
+    if (strchr(opt.opt_arg, 'c'))
+        imcc->optimizer_level |= OPT_SUB;
 
-    while (longopt_get(argc, argv, Parrot_cmd_options(), &opt) > 0) {
-        switch (opt.opt_id) {
-          case 'd':
-            if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
-                imcc->debug = strtoul(opt.opt_arg, NULL, 16);
-            }
-            else {
-                imcc->debug++;
-            }
-            break;
-          case 'a':
-            SET_STATE_PASM_FILE(imcc);
-            break;
-          case 'v':
-            imcc->verbose++;
-            break;
-          case 'y':
-            yydebug = 1;
-            break;
+    /* OLD DEFAULT: 1 */
 
-          case 'O':
-            if (!opt.opt_arg) {
-                imcc->optimizer_level |= OPT_PRE;
-                break;
-            }
-            if (strchr(opt.opt_arg, 'p'))
-                imcc->optimizer_level |= OPT_PASM;
-            if (strchr(opt.opt_arg, 'c'))
-                imcc->optimizer_level |= OPT_SUB;
-
-            /* currently not ok due to different register allocation */
-            if (strchr(opt.opt_arg, '1')) {
-                imcc->optimizer_level |= OPT_PRE;
-            }
-            if (strchr(opt.opt_arg, '2')) {
-                imcc->optimizer_level |= (OPT_PRE | OPT_CFG);
-            }
-            break;
-
-          default:
-            /* skip already processed arguments */
-            break;
-        }
+    /* currently not ok due to different register allocation */
+    if (strchr(opt.opt_arg, '1')) {
+        imcc->optimizer_level |= OPT_PRE;
+    }
+    if (strchr(opt.opt_arg, '2')) {
+        imcc->optimizer_level |= (OPT_PRE | OPT_CFG);
     }
 }
 
