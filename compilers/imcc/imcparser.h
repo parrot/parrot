@@ -290,7 +290,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 1026 "compilers/imcc/imcc.y"
+#line 1023 "compilers/imcc/imcc.y"
 
     IdList * idlist;
     int t;

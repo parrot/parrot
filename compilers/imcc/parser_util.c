@@ -526,7 +526,7 @@ change_op_arg_to_num(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
         if (c->type & VT_CONSTP)
             c = c->reg;
 
-        r[num]  = mk_const(imcc->interp, c->name, 'N');
+        r[num]  = mk_const(imcc, c->name, 'N');
         changed = 1;
     }
     else if (emit) {
@@ -538,7 +538,7 @@ change_op_arg_to_num(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
         */
         SymReg *rr[2];
 
-        rr[0]   = mk_temp_reg(imcc->interp, 'N');
+        rr[0]   = mk_temp_reg(imcc, 'N');
         rr[1]   = r[num];
 
         INS(imcc, unit, "set", NULL, rr, 2, 0, 1);

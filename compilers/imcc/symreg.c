@@ -428,7 +428,7 @@ add_namespace(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
     ASSERT_ARGS(add_namespace)
     SymReg * const ns = imcc->cur_namespace;
 
-    unit->hll_id = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp));
+    unit->hll_id = Parrot_pcc_get_HLL(imcc->interp, CURRENT_CONTEXT(imcc->interp));
 
     if (!ns)
         return;
@@ -659,7 +659,7 @@ mk_ident(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t, INTVAL type)
 {
     ASSERT_ARGS(mk_ident)
     char   * const fullname = _mk_fullname(imcc, imcc->namespace_stack, name);
-    SymReg *r = get_sym_by_name(&imcc->cur_unit->hash), name);
+    SymReg *r = get_sym_by_name(&imcc->cur_unit->hash, name);
     if (r && (r->set != t || r->type != type))
         IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                 "syntax error, duplicated IDENTIFIER '%s'\n", fullname);
@@ -726,14 +726,14 @@ mk_pmc_const_2(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
       case enum_class_Coroutine:
         r[1]        = rhs;
         rhs->usage |= U_FIXUP;
-        INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
+        INS(imcc, unit, "set_p_pc", "", r, 2, 0, 1);
         return NULL;
       default:
         break;
     }
 
     r[1] = rhs;
-    INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
+    INS(imcc, unit, "set_p_pc", "", r, 2, 0, 1);
 
     return NULL;
 }
@@ -776,7 +776,7 @@ mk_const_ident(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t,
             IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                     "global PMC constant not allowed");
 
-        r = _mk_symreg(imcc, &IMCC_INFO(interp)->ghash, name, t);
+        r = _mk_symreg(imcc, &imcc->ghash, name, t);
 
         r->type = VT_CONSTP;
     }

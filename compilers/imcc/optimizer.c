@@ -823,7 +823,7 @@ eval_ins(ARGMOD(imc_info_t *imcc), ARGIN(const char *op), size_t ops,
     ASSERT_ARGS(eval_ins)
     opcode_t eval[4], *pc;
     int i;
-    op_info_t *op_info = (op_info_t *)Parrot_hash_get(imcc->interp, interp->op_hash, op);
+    op_info_t *op_info = (op_info_t *)Parrot_hash_get(imcc->interp, imcc->interp->op_hash, op);
     if (!op_info || !STREQ(op_info->full_name, op))
         IMCC_fatal(imcc, 1, "eval_ins: op '%s' not found\n", op);
     /* now fill registers */
@@ -1307,7 +1307,7 @@ branch_cond_loop_swap(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit), ARGMOD(I
                 Parrot_ex_throw_from_c_args(imcc->interp, NULL, 1,
                     "Negative branch register address detected");
 
-            regs[reg_index] = mk_label_address(interp, label);
+            regs[reg_index] = mk_label_address(imcc, label);
             tmp = INS(imcc, unit, (const char*)neg_op, "", regs, args, 0, 0);
 
             IMCC_debug(imcc, DEBUG_OPT1,

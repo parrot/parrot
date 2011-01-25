@@ -199,12 +199,12 @@ static int get_old_size(
         FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*ins_line);
 
-static void imcc_globals_destroy(
-    ARGMOD(imc_info_t * imcc),
+static void imcc_globals_destroy(PARROT_INTERP,
     SHIM(int ex),
-    SHIM(void *param))
+    ARGMOD(void *param))
         __attribute__nonnull__(1)
-        FUNC_MODIFIES(* imcc);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*param);
 
 static void init_fixedintegerarray_from_string(
     ARGMOD(imc_info_t * imcc),
@@ -328,7 +328,8 @@ static void verify_signature(
     , PARROT_ASSERT_ARG(bc) \
     , PARROT_ASSERT_ARG(ins_line))
 #define ASSERT_ARGS_imcc_globals_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(param))
 #define ASSERT_ARGS_init_fixedintegerarray_from_string \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
@@ -362,8 +363,7 @@ static void verify_signature(
 
 /*
 
-=item C<static void imcc_globals_destroy(imc_info_t * imcc, int ex, void
-*param)>
+=item C<static void imcc_globals_destroy(PARROT_INTERP, int ex, void *param)>
 
 Frees memory allocated for IMCC globals for one particular compilation unit.
 
@@ -372,9 +372,10 @@ Frees memory allocated for IMCC globals for one particular compilation unit.
 */
 
 static void
-imcc_globals_destroy(ARGMOD(imc_info_t * imcc), SHIM(int ex), SHIM(void *param))
+imcc_globals_destroy(PARROT_INTERP, SHIM(int ex), ARGMOD(void *param))
 {
     ASSERT_ARGS(imcc_globals_destroy)
+    imc_info_t * const imcc = (imc_info_t*)param;
 
     /* This is an allowed condition? See TT #629 */
     if (imcc->globals) {
@@ -415,7 +416,7 @@ static int
 add_const_table_pmc(ARGMOD(imc_info_t * imcc), ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(add_const_table_pmc)
-    PackFile_ByteCode * const bc = Parrot_pf_get_current_code_segment(interp);
+    PackFile_ByteCode * const bc = Parrot_pf_get_current_code_segment(imcc->interp);
     PackFile_ConstTable * const ct = bc->const_table;
 
     if (!ct->pmc.constants)
@@ -460,7 +461,7 @@ e_pbc_open(ARGMOD(imc_info_t * imcc))
         clear_sym_hash(&imcc->globals->cs->key_consts);
     else {
         /* register cleanup code */
-        Parrot_x_on_exit(imcc->interp, imcc_globals_destroy, NULL);
+        Parrot_x_on_exit(imcc->interp, imcc_globals_destroy, imcc);
     }
 
     /* free previous cached key constants if any */
@@ -958,15 +959,15 @@ fixup_globals(ARGMOD(imc_info_t * imcc))
                     op_info_t *op = &core_ops->op_info_table[PARROT_OP_find_sub_not_null_p_sc];
                     PARROT_ASSERT(op);
 
-                    bc->base.data[addr] = bytecode_map_op(interp, op);
+                    bc->base.data[addr] = bytecode_map_op(imcc, op);
 
                     if (nam->color < 0)
-                        nam->color = add_const_str(interp,
-                            IMCC_string_from_reg(interp, nam), bc);
+                        nam->color = add_const_str(imcc,
+                            IMCC_string_from_reg(imcc, nam), bc);
 
                     bc->base.data[addr+2] = nam->color;
 
-                    IMCC_debug(interp, DEBUG_PBC_FIXUP,
+                    IMCC_debug(imcc, DEBUG_PBC_FIXUP,
                             "fixup const PMC"
                             " find_name sub '%s' const nr: %d\n",
                             fixup->name, nam->color);
@@ -1367,7 +1368,7 @@ find_outer(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit))
     }
 
     /* could be eval too; check if :outer is the current sub */
-    current = Parrot_pcc_get_sub(imcc->interp, CURRENT_CONTEXT(interp));
+    current = Parrot_pcc_get_sub(imcc->interp, CURRENT_CONTEXT(imcc->interp));
 
     if (PMC_IS_NULL(current))
         IMCC_fatal(imcc, 1, "Undefined :outer sub '%s'.\n",
@@ -1558,7 +1559,7 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
         vtable_index = Parrot_get_vtable_index(imcc->interp, vtable_name);
 
         if (vtable_index == -1)
-            IMCC_fatal(interp, 1,
+            IMCC_fatal(imcc, 1,
                 "'%S' is not a vtable, but was used with :vtable.\n",
                 vtable_name);
 
@@ -1674,9 +1675,9 @@ build_key(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *key_reg),
         SymReg *r = reg;
 
         if (tail) {
-            PMC * temp = Parrot_pmc_new_constant(imcc->interp, enum_class_Key)
-            SETATTR_Key_next_key(interp, tail, temp);
-            GETATTR_Key_next_key(interp, tail, tail);
+            PMC * temp = Parrot_pmc_new_constant(imcc->interp, enum_class_Key);
+            SETATTR_Key_next_key(imcc->interp, tail, temp);
+            GETATTR_Key_next_key(imcc->interp, tail, tail);
         }
         else {
             head = tail = Parrot_pmc_new_constant(imcc->interp, enum_class_Key);
@@ -1940,10 +1941,10 @@ make_pmc_const(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r))
         VTABLE_set_number_native(imcc->interp, p, Parrot_str_to_num(imcc->interp, s));
         break;
       case enum_class_String:
-        VTABLE_set_string_native(imccinterp, p, s);
+        VTABLE_set_string_native(imcc->interp, p, s);
         break;
       case enum_class_FixedIntegerArray:
-        init_fixedintegerarray_from_string(imcc->interp, p, s);
+        init_fixedintegerarray_from_string(imcc, p, s);
         break;
       default:
         Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -2227,7 +2228,7 @@ verify_signature(ARGMOD(imc_info_t * imcc), ARGIN(const Instruction *ins),
 
     /* append PMC constant */
     if (changed_sig)
-        pc[-1] = add_const_table_pmc(imcc->interp, changed_sig);
+        pc[-1] = add_const_table_pmc(imcc, changed_sig);
 }
 
 
@@ -2417,7 +2418,7 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
                     *(imcc->pc)++ = r->color;
                 }
                 else
-                    *(imcc->pc)++ = build_key(interp, r, interp_code);
+                    *(imcc->pc)++ = build_key(imcc, r, interp_code);
                 IMCC_debug(imcc, DEBUG_PBC, " %d", imcc->pc[-1]);
                 break;
               default:

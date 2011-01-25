@@ -750,18 +750,6 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/pmc.c */
 
-/* Forward declaration because IMCC is still part of libparrot */
-
-PARROT_API
-Parrot_PMC
-imcc_run_api(ARGMOD(Parrot_PMC interp_pmc), ARGIN(Parrot_String sourcefile),
-        int argc, ARGIN(const char **argv));
-
-PARROT_API
-Parrot_PMC
-imcc_do_preprocess_api(ARGMOD(Parrot_PMC interp_pmc), ARGIN(Parrot_String sourcefile),
-        int argc, ARGIN(const char **argv));
-
 #endif /* PARROT_API_H_GUARD */
 
 /*

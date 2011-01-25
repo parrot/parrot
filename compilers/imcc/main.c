@@ -64,7 +64,7 @@ static void do_pre_process(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*imcc);
 
-static void exit_reentrant_compile(
+static imc_info_t * exit_reentrant_compile(
     ARGMOD(imc_info_t * imcc),
     ARGMOD_NULLOK(struct _imc_info_t *imc_info))
         __attribute__nonnull__(1)
@@ -155,7 +155,7 @@ PARROT_CANNOT_RETURN_NULL
 imc_info_t *
 imcc_new(PARROT_INTERP)
 {
-    imc_info_t * const imcc = (imc_info_t *)mem_sys_allocate_zeroed(imc_info_t);
+    imc_info_t * const imcc = (imc_info_t *)mem_sys_allocate_zeroed(sizeof(imc_info_t));
     imcc->interp = interp;
     return imcc;
 }
@@ -327,8 +327,8 @@ do_pre_process(ARGMOD(imc_info_t *imcc), ARGIN(STRING * sourcefile),
     int       c;
     YYSTYPE   val;
 
-    IMCC_push_parser_state(interp, sourcefile, 0);
-    c = yylex(&val, yyscanner, interp); /* is reset at end of while loop */
+    IMCC_push_parser_state(imcc, sourcefile, 0);
+    c = yylex(&val, yyscanner, imcc); /* is reset at end of while loop */
     while (c) {
         switch (c) {
             case EMIT:          printf(".emit\n"); break;
@@ -415,7 +415,7 @@ do_pre_process(ARGMOD(imc_info_t *imcc), ARGIN(STRING * sourcefile),
                     printf("%s ", val.s);
                 break;
         }
-        c = yylex(&val, yyscanner, interp);
+        c = yylex(&val, yyscanner, imcc);
     }
     printf("\n");
     fflush(stdout);
@@ -498,10 +498,10 @@ determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sourcefile))
 
         handle = PIO_OPEN(imcc->interp, sourcefile, PIO_F_READ);
         if (handle == PIO_INVALID_HANDLE)
-            IMCC_fatal_standalone(imcc->interp, EXCEPTION_EXTERNAL_ERROR,
+            IMCC_fatal_standalone(imcc, EXCEPTION_EXTERNAL_ERROR,
                                   "Error reading source file %Ss.\n",
                                   sourcefile);
-        if (imcc_string_ends_with(imcc->interp, sourcefile, ".pasm"))
+        if (imcc_string_ends_with(imcc, sourcefile, ".pasm"))
             SET_STATE_PASM_FILE(imcc);
     }
 
@@ -515,7 +515,7 @@ determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sourcefile))
 
 /*
 
-=item C<PMC * imcc_run_api(PMC * interp_pmc, STRING *sourcefile, int argc, const
+=item C<PMC * imcc_run_api(imc_info_t *imcc, STRING *sourcefile, int argc, const
 char **argv)>
 
 This is a wrapper around C<imcc_run> function in which the input parameter is a
@@ -528,20 +528,18 @@ PMC interpreter.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-imcc_run_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile), int argc,
+imcc_run_api(ARGMOD(imc_info_t *imcc), ARGIN(STRING *sourcefile), int argc,
         ARGIN_NULLOK(const char **argv))
 {
     ASSERT_ARGS(imcc_run_api)
 
-    /* TODO: This! */
-    //Interp * const interp = (Interp *)VTABLE_get_pointer(NULL, interp_pmc);
-    //imcc_parseflags(interp, argc, argv);
-    //return imcc_run(interp, sourcefile);
+    imcc_parseflags(imcc, argc, argv);
+    return imcc_run(imcc, sourcefile);
 }
 
 /*
 
-=item C<PMC * imcc_do_preprocess_api(PMC * interp_pmc, STRING *sourcefile, int
+=item C<PMC * imcc_do_preprocess_api(imc_info_t *imcc, STRING *sourcefile, int
 argc, const char **argv)>
 
 Preprocess the input source file and dump the preprocessed text to stdout.
@@ -553,21 +551,21 @@ Preprocess the input source file and dump the preprocessed text to stdout.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-imcc_do_preprocess_api(ARGMOD(PMC * interp_pmc), ARGIN(STRING *sourcefile),
+imcc_do_preprocess_api(ARGMOD(imc_info_t *imcc), ARGIN(STRING *sourcefile),
         int argc, SHIM(const char **argv))
 {
     ASSERT_ARGS(imcc_do_preprocess_api)
-    Interp * const interp = (Interp *)VTABLE_get_pointer(NULL, interp_pmc);
     yyscan_t yyscanner;
-    yylex_init_extra(interp, &yyscanner);
+    yylex_init_extra(imcc, &yyscanner);
+    UNUSED(argc);
 
     /* Figure out what kind of source file we have -- if we have one */
     if (!STRING_length(sourcefile))
-        IMCC_fatal_standalone(interp, 1, "main: No source file specified.\n");
+        IMCC_fatal_standalone(imcc, 1, "main: No source file specified.\n");
     else {
-        PIOHANDLE in_file = determine_input_file_type(interp, sourcefile);
+        PIOHANDLE in_file = determine_input_file_type(imcc, sourcefile);
         if (in_file == PIO_INVALID_HANDLE)
-            IMCC_fatal_standalone(interp, EXCEPTION_EXTERNAL_ERROR,
+            IMCC_fatal_standalone(imcc, EXCEPTION_EXTERNAL_ERROR,
                                   "Error reading source file %Ss.\n",
                                   sourcefile);
         imc_yyin_set(in_file, yyscanner);
@@ -612,7 +610,7 @@ imcc_run(ARGMOD(imc_info_t *imcc), ARGIN(STRING *sourcefile))
              interpreter alone */
     Parrot_pf_set_current_packfile(imcc->interp, pf_raw);
 
-    IMCC_push_parser_state(imcc, sourcefile, STATE_PASM_FILE(interp) ? 1 : 0);
+    IMCC_push_parser_state(imcc, sourcefile, STATE_PASM_FILE(imcc) ? 1 : 0);
     emit_open(imcc);
 
     IMCC_info(imcc, 1, "Starting parse...\n");
@@ -682,7 +680,7 @@ imcc_compile(ARGMOD(imc_info_t *imcc), ARGIN(STRING *s), int pasm_file,
 
     if (imcc->last_unit) {
         /* a reentrant compile */
-        imc_info          = mem_gc_allocate_zeroed_typed(interp, imc_info_t);
+        imc_info = imcc_new(imcc->interp);
         imc_info->ghash   = imcc->ghash;
         imc_info->prev    = imcc;
         imcc = imc_info;
@@ -931,7 +929,7 @@ imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
     /* start over; let the start of line rule increment this to 1 */
     imcc->line = 0;
     imcc->cur_namespace = NULL;
-    interp->code = NULL;
+    imcc->interp->code = NULL;
 
     compile_file(imcc, fp, yyscanner);
 
@@ -947,7 +945,7 @@ imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
     if (cs_save)
         (void)Parrot_switch_to_cs(imcc->interp, cs_save, 0);
 
-    imcc = exit_reentrant_compile(imc_info);
+    imcc = exit_reentrant_compile(imcc, imc_info);
 
     return cs;
 }
@@ -961,8 +959,8 @@ list and set the new one as the current one. Return the new info structure.
 returns NULL if not in a reentrant situation. The return value of this I<MUST>
 be passed to C<exit_reentrant_compile>.
 
-=item C<static void exit_reentrant_compile(imc_info_t * imcc, struct _imc_info_t
-*imc_info)>
+=item C<static imc_info_t * exit_reentrant_compile(imc_info_t * imcc, struct
+_imc_info_t *imc_info)>
 
 Exit reentrant compile. Restore compiler state back to what it was for the
 previous compile, if any.
@@ -985,7 +983,7 @@ prepare_reentrant_compile(ARGMOD(imc_info_t * imcc))
     return imc_info;
 }
 
-static void
+static imc_info_t *
 exit_reentrant_compile(ARGMOD(imc_info_t * imcc),
         ARGMOD_NULLOK(struct _imc_info_t *imc_info))
 {

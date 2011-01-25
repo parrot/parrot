@@ -176,7 +176,7 @@ imc_reg_alloc(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(IMC_Unit *unit))
         return;
 
     imc_stat_init(unit);
-    if (!imcc->optimizer_level & (OPT_PRE|OPT_CFG|OPT_PASM)) && unit->pasm_file)
+    if (!imcc->optimizer_level & (OPT_PRE|OPT_CFG|OPT_PASM) && unit->pasm_file)
         goto done;
 
     if (unit->instructions->symreg_count)
@@ -226,7 +226,7 @@ imc_reg_alloc(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(IMC_Unit *unit))
     vanilla_reg_alloc(imcc, unit);
 
     if (imcc->debug & DEBUG_IMC)
-        dump_instructions(interp, unit);
+        dump_instructions(imcc, unit);
 
   done:
     if (imcc->verbose  || (imcc->debug & DEBUG_IMC))
@@ -359,7 +359,7 @@ print_stat(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
             ? unit->instructions->symregs[0]->name
             : "(not a function)";
 
-    make_stat(imcc, sets, unit->n_regs_used);
+    make_stat(unit, sets, unit->n_regs_used);
     IMCC_info(imcc, 1,
             "sub %s:\n\tregisters in .pir:\t I%d, N%d, S%d, P%d\n",
             function,

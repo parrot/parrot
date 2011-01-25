@@ -369,10 +369,7 @@ static void set_lexical(
 #define YYDEBUG 1
 #define YYERROR_VERBOSE 1
 
-/*
- * We use a pure parser with the interpreter as a parameter. However this still
- * doesn't make the parser reentrant, as there are too many globals around.
- */
+/* Warning: parser is probably not reentrant */
 
 /*
  * Choosing instructions for Parrot is pretty easy since many are
@@ -822,10 +819,10 @@ begin_return_or_yield(ARGMOD(imc_info_t *imcc), int yield)
     ins->symregs[0]->pcc_sub->yield = yield;
     snprintf(name, sizeof (name), yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d",
             IMCC_INTERNAL_CHAR, imcc->cnr++);
-    interp->imc_info->sr_return = mk_pcc_sub(imcc, name, 0);
-    i = iLABEL(imcc, imcc->cur_unit, interp->imc_info->sr_return);
+    imcc->sr_return = mk_pcc_sub(imcc, name, 0);
+    i = iLABEL(imcc, imcc->cur_unit, imcc->sr_return);
     i->type = yield ? ITPCCSUB | ITLABEL | ITPCCYIELD : ITPCCSUB | ITLABEL ;
-    interp->imc_info->asm_state = yield ? AsmInYield : AsmInReturn;
+    imcc->asm_state = yield ? AsmInYield : AsmInReturn;
 }
 
 /*
@@ -1004,7 +1001,7 @@ do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
     ASSERT_ARGS(do_loadlib)
     STRING * const s = Parrot_str_unescape(imcc->interp, lib + 1, '"', NULL);
     PMC    * const lib_pmc = Parrot_dyn_load_lib(imcc->interp, s, NULL);
-    if (PMC_IS_NULL(lib_pmc) || !VTABLE_get_bool(interp, lib_pmc)) {
+    if (PMC_IS_NULL(lib_pmc) || !VTABLE_get_bool(imcc->interp, lib_pmc)) {
         IMCC_fataly(imcc, EXCEPTION_LIBRARY_ERROR,
             "loadlib directive could not find library `%S'", s);
     }
@@ -1095,13 +1092,9 @@ do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
 
 %nonassoc CONCAT DOT
 
-
  /* %locations */
 %pure_parser
 
-/* Note that we pass interp last, because Bison only passes
-   the last param to yyerror().  (Tested on bison <= 2.3)
-*/
 %parse-param {void *yyscanner}
 %lex-param   {void *yyscanner}
 %parse-param {imc_info_t *imcc}
@@ -1233,7 +1226,7 @@ pasmline:
    | pragma
    ;
 
-pasm_inst:                     { clear_state(interp); }
+pasm_inst:                     { clear_state(imcc); }
      PARROT_OP pasm_args
          {
            $$ = INS(imcc, imcc->cur_unit, $2, 0, imcc->regs,
@@ -1794,7 +1787,7 @@ statements:
  * split out the action just so that we can assign it a precedence. */
 
 helper_clear_state:
-        { clear_state(interp); } %prec LOW_PREC
+        { clear_state(imcc); } %prec LOW_PREC
    ;
 
 statement:
@@ -2319,18 +2312,18 @@ _var_or_i:
    ;
 sub_label_op_c:
      sub_label_op
-   | STRINGC  { $$ = mk_sub_address_fromc(interp, $1); mem_sys_free($1); }
-   | USTRINGC { $$ = mk_sub_address_u(interp, $1);  mem_sys_free($1); }
+   | STRINGC  { $$ = mk_sub_address_fromc(imcc, $1); mem_sys_free($1); }
+   | USTRINGC { $$ = mk_sub_address_u(imcc, $1);     mem_sys_free($1); }
    ;
 
 sub_label_op:
-     IDENTIFIER { $$ = mk_sub_address(interp, $1); mem_sys_free($1); }
-   | PARROT_OP  { $$ = mk_sub_address(interp, $1); mem_sys_free($1); }
+     IDENTIFIER { $$ = mk_sub_address(imcc, $1); mem_sys_free($1); }
+   | PARROT_OP  { $$ = mk_sub_address(imcc, $1); mem_sys_free($1); }
    ;
 
 label_op:
-     IDENTIFIER { $$ = mk_label_address(interp, $1); mem_sys_free($1); }
-   | PARROT_OP  { $$ = mk_label_address(interp, $1); mem_sys_free($1); }
+     IDENTIFIER { $$ = mk_label_address(imcc, $1); mem_sys_free($1); }
+   | PARROT_OP  { $$ = mk_label_address(imcc, $1); mem_sys_free($1); }
    ;
 
 var_or_i:
