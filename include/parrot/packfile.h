@@ -883,7 +883,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC * PackFile_Annotations_lookup(PARROT_INTERP,
     ARGIN(PackFile_Annotations *self),
     opcode_t offset,
-    ARGIN_NULLOK(STRING *key))
+    ARGIN_NULLOK(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

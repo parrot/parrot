@@ -214,6 +214,14 @@ static PackFile_ConstTable * find_constants(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static INTVAL find_pf_ann_idx(PARROT_INTERP,
+    ARGIN(PackFile_Annotations *pfa),
+    ARGIN(PackFile_Annotations_Key *key),
+    UINTVAL offs)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 static void load_file(PARROT_INTERP, ARGIN(STRING *path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -405,12 +413,13 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_find_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
+#define ASSERT_ARGS_find_pf_ann_idx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pfa) \
+    , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_load_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
-#define ASSERT_ARGS_make_annotation_value_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_make_code_pointers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(seg))
 #define ASSERT_ARGS_mark_1_bc_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -3825,12 +3834,11 @@ Find the index of the active annotation at the given offset.
 */
 
 
-static
-INTVAL
-find_pf_ann_idx(PARROT_INTERP, PackFile_Annotations *pfa,
-    PackFile_Annotations_Key *key, UINTVAL offs)
+static INTVAL
+find_pf_ann_idx(PARROT_INTERP, ARGIN(PackFile_Annotations *pfa),
+    ARGIN(PackFile_Annotations_Key *key), UINTVAL offs)
 {
-    // ASSERT_ARGS(find_pf_ann_idx)
+    ASSERT_ARGS(find_pf_ann_idx)
     UINTVAL hi, mid, lo;
     UINTVAL mid_val;
 
