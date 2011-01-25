@@ -91,6 +91,8 @@ INTVAL Parrot_io_send(PARROT_INTERP, PIOHANDLE handle, ARGIN(const char *buf), s
 INTVAL Parrot_io_recv(PARROT_INTERP, PIOHANDLE handle, ARGOUT(char *buf), size_t len);
 INTVAL Parrot_io_poll(PARROT_INTERP, PIOHANDLE handle, int which, int sec, int usec);
 INTVAL Parrot_io_close_socket(PARROT_INTERP, PIOHANDLE handle);
+PMC *Parrot_io_remote_address(PARROT_INTERP, ARGIN(PMC *sock));
+PMC *Parrot_io_local_address(PARROT_INTERP, ARGIN(PMC *sock));
 
 /*
 ** Math:
