@@ -184,23 +184,27 @@ family (integer). If no address family is given, it defaults to IPv4.
 */
 
     METHOD sockaddr(STRING * address, INTVAL port, INTVAL family :optional) {
-        PMC * sockaddr;
+        PMC *array;
+        PMC *res;
 
         if (!family)
-            family = AF_INET;
+            family = PF_INET;
 
-        sockaddr = Parrot_pmc_new(interp, enum_class_Sockaddr);
-        Parrot_io_sockaddr_in(INTERP,
-                VTABLE_get_pointer(INTERP, sockaddr), address, port, family);
-        PARROT_SOCKADDR(sockaddr)->len = sizeof(struct sockaddr_in);
-        RETURN(PMC * sockaddr);
+        array = Parrot_io_getaddrinfo(INTERP, address, port, IPPROTO_TCP, family, 0);
+
+        if (VTABLE_elements(interp, array))
+            res = VTABLE_get_pmc_keyed_int(interp, array, 0);
+        else
+            res = PMCNULL;
+
+        RETURN(PMC * res);
     }
 
 /*
 
 =item C<getaddrinfo(STRING * address, INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive)>
 
-C<getaddrinfo> returns an object representing the result of the
+C<getaddrinfo> returns an array of Sockaddr PMCs representing the result of the
 C<getaddrinfo(3)> function which consists of multiple socket addresses,
 including family and protocol. It can be passed to C<bind()> or C<connect()>.
 
@@ -222,7 +226,7 @@ C<remote_address> returns the remote address of this socket PMC.
 
 */
     METHOD remote_address() {
-        PMC * res = Parrot_io_remote_address(INTERP, SELF);
+        PMC * res = PARROT_SOCKET(SELF)->remote;
         RETURN(PMC * res);
     }
 
@@ -236,7 +240,7 @@ C<local_address> returns the local address of this socket PMC.
 
 */
     METHOD local_address() {
-        PMC * res = Parrot_io_local_address(INTERP, SELF);
+        PMC * res = PARROT_SOCKET(SELF)->local;
         RETURN(PMC * res);
     }
 
