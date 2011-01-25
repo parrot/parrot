@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -141,7 +141,9 @@ static int pio_pf[PIO_PF_MAX+1] = {
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive)
+Parrot_io_getaddrinfo(PARROT_INTERP,
+                      ARGIN(STRING *addr),
+                      INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive)
 {
     char * const s        = Parrot_str_to_cstring(interp, addr);
     PMC  * const addrinfo = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
@@ -552,7 +554,9 @@ the given PMC (of type UnManagedStruct).
 */
 
 static void
-get_addrinfo(PARROT_INTERP, ARGIN(PMC * addrinfo), ARGIN(const char *host), int port, int protocol, int family, int passive)
+get_addrinfo(PARROT_INTERP,
+             ARGIN(PMC * addrinfo),
+             ARGIN(const char *host), int port, int protocol, int family, int passive)
 {
     ASSERT_ARGS(get_addrinfo)
 
@@ -564,12 +568,12 @@ get_addrinfo(PARROT_INTERP, ARGIN(PMC * addrinfo), ARGIN(const char *host), int 
     char portstr[6];
     int ret;
 
-    memset(&hints, 0, sizeof(struct addrinfo));
+    memset(&hints, 0, sizeof (struct addrinfo));
     hints.ai_protocol = protocol;
     if (passive)
         hints.ai_flags = AI_PASSIVE;
     hints.ai_family = family;
-    snprintf(portstr, sizeof(portstr), "%u", port);
+    snprintf(portstr, sizeof (portstr), "%u", port);
 
     if ((ret = getaddrinfo(host, portstr, &hints, &res)) != 0) {
         fprintf(stderr, "getaddrinfo failure: %s\n", gai_strerror(ret));

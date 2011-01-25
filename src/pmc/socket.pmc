@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008, Parrot Foundation.
+Copyright (C) 2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -189,7 +189,7 @@ family (integer). If no address family is given, it defaults to IPv4.
         sockaddr = Parrot_pmc_new(interp, enum_class_Sockaddr);
         Parrot_io_sockaddr_in(INTERP,
                 VTABLE_get_pointer(INTERP, sockaddr), address, port, family);
-        PARROT_SOCKADDR(sockaddr)->len = sizeof(struct sockaddr_in);
+        PARROT_SOCKADDR(sockaddr)->len = sizeof (struct sockaddr_in);
         RETURN(PMC * sockaddr);
     }
 
@@ -204,7 +204,8 @@ including family and protocol. It can be passed to C<bind()> or C<connect()>.
 =cut
 
 */
-    METHOD getaddrinfo(STRING * address, INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive) {
+    METHOD getaddrinfo(STRING * address,
+                       INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive) {
         PMC * res = Parrot_io_getaddrinfo(INTERP, address, port, protocol, family, passive);
         RETURN(PMC * res);
     }
