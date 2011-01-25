@@ -313,7 +313,7 @@ Parrot_io_connect_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
                 continue;
             }
 
-            if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i)) == -1) {
+            if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &i, sizeof (i)) == -1) {
                 perror("Error setting SO_REUSEADDR:");
                 continue;
             }
@@ -395,7 +395,7 @@ Parrot_io_bind_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
             }
 
             if (walk->ai_family == AF_INET6) {
-                if (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &i, sizeof(i)) == -1) {
+                if (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &i, sizeof (i)) == -1) {
                     perror("Error setting IPV6_V6ONLY:");
                     continue;
                 }
