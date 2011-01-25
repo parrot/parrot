@@ -36,6 +36,22 @@
     .return ($P0)
 .end
 
+.sub 'test_push_cached_eh_deeply'
+    .param int depth    :optional
+    .param int has_depth :opt_flag
+
+    unless has_depth goto check
+    depth = 10000
+
+  check:
+    if depth !=0 goto recure
+    .tailcall "test_push_cached_eh"()
+
+  recure:
+    dec depth
+    "test_push_cached_eh_deeply"(depth)
+.end
+
 .sub 'benchmark'
     .param pmc      sub
     .param string   desc
@@ -66,6 +82,9 @@
 
     .const "Sub" test_push_cached_eh = "test_push_cached_eh"
     "benchmark"(test_push_cached_eh, "push_cached_eh")
+
+    .const "Sub" test_push_cached_eh_deeply = "test_push_cached_eh_deeply"
+    "benchmark"(test_push_cached_eh_deeply, "push_cached_eh_deeply")
 
     .const "Sub" test_push_eh = "test_push_eh"
     "benchmark"(test_push_eh, "push_eh")
