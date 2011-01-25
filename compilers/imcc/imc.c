@@ -196,7 +196,7 @@ imc_open_unit(ARGMOD(imc_info_t * imc_info), IMC_Unit_Type t)
         imc_info->imc_units = unit;
 
     if (!imc_info->ghash.data)
-        create_symhash(imc_info->interp, &imc_info->ghash);
+        create_symhash(imc_info, &imc_info->ghash);
 
     unit->prev = imc_info->last_unit;
 
@@ -257,7 +257,7 @@ imc_free_unit(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
     /* and cfg ... */
     clear_basic_blocks(unit);
 
-    if (!imc->n_comp_units)
+    if (!imcc->n_comp_units)
         IMCC_fatal(imcc, 1, "imc_free_unit: non existent unit\n");
 
     imcc->n_comp_units--;

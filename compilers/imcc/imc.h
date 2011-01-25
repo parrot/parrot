@@ -39,6 +39,7 @@
 #define IMCC_INTERNAL_CHAR '@'
 
 typedef struct IMC_Unit IMC_Unit;
+typedef struct _imc_info_t imc_info_t;
 
 #include "symreg.h"
 #include "instructions.h"
@@ -304,16 +305,16 @@ typedef void* yyscan_t;
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-Instruction * IMCC_create_itcall_label(PARROT_INTERP)
+Instruction * IMCC_create_itcall_label(imc_info_t *info)
         __attribute__nonnull__(1);
 
-void IMCC_itcall_sub(PARROT_INTERP, ARGIN(SymReg *sub))
+void IMCC_itcall_sub(imc_info_t *info, ARGIN(SymReg *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-Instruction * INS_LABEL(PARROT_INTERP,
+Instruction * INS_LABEL(imc_info_t *info,
     ARGMOD_NULLOK(IMC_Unit *unit),
     ARGIN(SymReg *r0),
     int emit)
@@ -429,7 +430,7 @@ void op_fullname(
 /* HEADERIZER END: compilers/imcc/parser_util.c */
 
 /* imclexer.c */
-void IMCC_print_inc(PARROT_INTERP);
+void IMCC_print_inc(imc_info_t * imcc);
 
 /* Call convention independent API */
 
@@ -536,8 +537,8 @@ typedef enum _AsmState {
     AsmInYield
 } AsmState;
 
-void IMCC_push_parser_state(PARROT_INTERP, STRING *filename, int is_pasm);
-void IMCC_pop_parser_state(PARROT_INTERP, void *yyscanner);
+void IMCC_push_parser_state(imc_info_t *info, STRING *filename, int is_pasm);
+void IMCC_pop_parser_state(imc_info_t *info, void *yyscanner);
 
 /* globals store the state between individual e_pbc_emit calls */
 typedef struct subs_t {
@@ -568,7 +569,7 @@ typedef struct _imcc_globals_t {
     int             inter_seg_n;
 } imcc_globals;
 
-typedef struct _imc_info_t {
+struct _imc_info_t {
     Parrot_Interp          interp;
     struct _imc_info_t    *prev;
     IMC_Unit              *imc_units;
@@ -627,7 +628,7 @@ typedef struct _imc_info_t {
     int                   verbose;
     int                   seen_main;
     opcode_t              npc;
-} imc_info_t;
+};
 
 /* macro structs */
 #define MAX_PARAM 16

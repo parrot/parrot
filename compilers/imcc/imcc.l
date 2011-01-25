@@ -230,7 +230,7 @@ SP              [ ]
         yy_pop_state(yyscanner);
         yy_push_state(cmt3, yyscanner);
 
-        str = Parrot_str_new(interp, yytext,0);
+        str = Parrot_str_new(imcc->interp, yytext,0);
         imcc->frames->s.file = str;
         imcc->cur_unit->file = str;
 
@@ -733,10 +733,10 @@ SP              [ ]
 int yywrap(void* yyscanner) {
     /* Add code here to open next source file and start scanning
      * yywrap returns 0 if scanning is to continue */
-    imc_into_t * imcc = yyget_extra(yyscanner);
+    imc_info_t * imcc = yyget_extra(yyscanner);
     yyguts_t * const yyg = (yyguts_t *)yyscanner;
 
-    if (!interp) {
+    if (!imcc->interp) {
         fprintf(stderr, "Argh, interp not found\n");
         exit(1);
     }
@@ -745,7 +745,8 @@ int yywrap(void* yyscanner) {
 
     /* pop old frame */
     if (imcc->frames->s.next) {
-        pop_parser_state(imcc->frames->s.interp, yyscanner);
+        /* TODO: Double-check this */
+        pop_parser_state(imcc, yyscanner);
         if (YYSTATE == INITIAL || YYSTATE == emit)
             BEGIN(imcc->frames->s.pasm_file ? emit : INITIAL);
         return 0;
@@ -770,7 +771,7 @@ new_frame(ARGMOD(imc_info_t *imcc)) {
             tmp->s.file = imcc->frames->s.file;
     }
 
-    tmp->s.interp = interp;
+    tmp->s.interp = imcc->interp;
 
     return tmp;
 }
@@ -778,11 +779,11 @@ new_frame(ARGMOD(imc_info_t *imcc)) {
 static void
 scan_string(macro_frame_t *frame, ARGIN(const char *expansion), void *yyscanner)
 {
-    yyguts_t * const yyg      = (yyguts_t *)yyscanner;
-    Interp   * const interp   = yyget_extra(yyscanner);
+    yyguts_t * const yyg = (yyguts_t *)yyscanner;
+    imc_info_t * imcc = yyget_extra(yyscanner);
 
-    frame->buffer             = YY_CURRENT_BUFFER;
-    frame->s.next             = (parser_state_t *)imcc->frames;
+    frame->buffer = YY_CURRENT_BUFFER;
+    frame->s.next = (parser_state_t *)imcc->frames;
     imcc->frames = frame;
 
     /* start at the effective *starting line* of the macro */
@@ -825,7 +826,7 @@ yylex_skip(YYSTYPE *valp, ARGMOD(imc_info_t *imcc), const char *skip, void *yysc
     yyguts_t   * const yyg = (yyguts_t *)yyscanner;
 
     do {
-        c = yylex(valp, yyscanner, interp);
+        c = yylex(valp, yyscanner, imcc);
         p = skip;
 
         while (*p && c != *p)
@@ -895,7 +896,7 @@ read_params(YYSTYPE *valp, ARGMOD(imc_info_t *imcc), params_t *params,
     size_t   len      = 0;
     char    *current  = mem_sys_strdup("");
     yyguts_t *yyg     = (yyguts_t *)yyscanner;
-    int      c        = yylex_skip(&val, interp, " \n", yyscanner);
+    int      c        = yylex_skip(&val, imcc, " \n", yyscanner);
 
     params->num_param = 0;
 
@@ -920,7 +921,7 @@ read_params(YYSTYPE *valp, ARGMOD(imc_info_t *imcc), params_t *params,
 
             if (val.s)
                 mem_sys_free(val.s);
-            c = yylex_skip(&val, interp, " \n", yyscanner);
+            c = yylex_skip(&val, imcc, " \n", yyscanner);
         }
         else if (need_id && (*current || c != IDENTIFIER) && c != ' ') {
             IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
@@ -968,7 +969,7 @@ read_macro(YYSTYPE *valp, ARGMOD(imc_info_t *imcc), void *yyscanner)
 
     BEGIN(macro);
 
-    c = yylex_skip(valp, interp, " ", yyscanner);
+    c = yylex_skip(valp, imcc, " ", yyscanner);
 
     if (c != IDENTIFIER)
         IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR, "Macro names must be identifiers");
@@ -1276,7 +1277,7 @@ pop_parser_state(ARGMOD(imc_info_t *imcc), void *yyscanner)
     if (tmp) {
         int l;
         if (tmp->s.handle != PIO_INVALID_HANDLE)
-            PIO_CLOSE(interp, tmp->s.handle);
+            PIO_CLOSE(imcc->interp, tmp->s.handle);
 
         imcc->frames =
             (macro_frame_t *)imcc->frames->s.next;
@@ -1342,7 +1343,8 @@ imcc_run_compilation(ARGMOD(imc_info_t *imcc), void *yyscanner) {
         if (yyparse(yyscanner, imcc)) {
             imcc->error_code    = IMCC_PARSEFAIL_EXCEPTION;
             /* TODO: Be slightly less unhelpful */
-            imcc->error_message = string_from_literal(imcc, "syntax error ... somewhere");
+            imcc->error_message = string_from_literal(imcc->interp,
+                    "syntax error ... somewhere");
             return;
         }
 
@@ -1438,7 +1440,7 @@ static int
 handle_identifier(ARGMOD(imc_info_t *imcc), YYSTYPE *valp, const char *text)
 {
     if (!imcc->is_def) {
-        SymReg *r = find_sym(interp, text);
+        SymReg *r = find_sym(imcc, text);
 
         if (r && (r->type & (VTIDENTIFIER|VT_CONSTP))) {
             valp->sr = r;
