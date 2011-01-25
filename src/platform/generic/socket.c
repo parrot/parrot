@@ -194,11 +194,11 @@ Connects C<*io>'s socket to address C<*r>.
 */
 
 INTVAL
-Parrot_io_connect(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(void *addr))
+Parrot_io_connect(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(void *addr),
+        INTVAL addr_len)
 {
 AGAIN:
-    if ((connect((PIOSOCKET)os_handle, (struct sockaddr *)addr,
-            sizeof (struct sockaddr_in))) != 0) {
+    if (connect((PIOSOCKET)os_handle, (struct sockaddr *)addr, addr_len) != 0) {
         switch (PIO_SOCK_ERRNO) {
           case PIO_SOCK_EINTR:
             goto AGAIN;
@@ -225,12 +225,10 @@ Binds C<*io>'s socket to the local address and port specified by C<*l>.
 */
 
 INTVAL
-Parrot_io_bind(PARROT_INTERP, PIOHANDLE os_handle, ARGMOD(void *addr))
+Parrot_io_bind(PARROT_INTERP, PIOHANDLE os_handle, ARGMOD(void *addr),
+        INTVAL addr_len)
 {
-    struct sockaddr_in * saddr;
-
-    if ((bind((PIOSOCKET)os_handle, (struct sockaddr *)addr,
-            sizeof (struct sockaddr_in))) == -1) {
+    if (bind((PIOSOCKET)os_handle, (struct sockaddr *)addr, addr_len) != 0) {
         return -1;
     }
 
@@ -440,9 +438,6 @@ Parrot_io_sockaddr_in(PARROT_INTERP, ARGOUT(void *addr),
 
     struct sockaddr_in * const sa = (struct sockaddr_in*)addr;
 
-    /* Hard coded to IPv4 for now */
-    family = AF_INET;
-
 #ifdef _WIN32
     sa->sin_addr.S_un.S_addr = inet_addr(host);
     success = sa->sin_addr.S_un.S_addr != -1;
@@ -461,11 +456,9 @@ Parrot_io_sockaddr_in(PARROT_INTERP, ARGOUT(void *addr),
          * it may have been toggled off.
          */
         struct hostent *he = gethostbyname(host);
-        /* XXX FIXME - Handle error condition better */
-        if (!he) {
-            fprintf(stderr, "gethostbyname failure [%s]\n", host);
-            return;
-        }
+        if (!he)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                    "gethostbyname failed: %s", host);
         memcpy((char*)&sa->sin_addr, he->h_addr, sizeof (sa->sin_addr));
     }
 
@@ -571,10 +564,9 @@ get_addrinfo(PARROT_INTERP, ARGIN(PMC * addrinfo), ARGIN(const char *host), int 
     hints.ai_family = family;
     snprintf(portstr, sizeof(portstr), "%u", port);
 
-    if ((ret = getaddrinfo(host, portstr, &hints, &res)) != 0) {
-        fprintf(stderr, "getaddrinfo failure: %s\n", gai_strerror(ret));
-        return;
-    }
+    if ((ret = getaddrinfo(host, portstr, &hints, &res)) != 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "getaddrinfo failed: %s", host);
 
     VTABLE_set_pointer(interp, addrinfo, res);
 }

@@ -27,7 +27,14 @@ in case of test failures.
     .local int len, status
 
     sock = new 'Socket'
+    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
+    push_eh try_ip6_localhost
     address = sock.'getaddrinfo'('localhost', 1234, .PIO_PROTO_TCP, .PIO_PF_INET6, 1)
+    goto ok
+  try_ip6_localhost:
+    pop_eh
+    address = sock.'getaddrinfo'('ip6-localhost', 1234, .PIO_PROTO_TCP, .PIO_PF_INET6, 1)
+  ok:
     status = sock.'bind'(address)
     sock.'listen'(5)
 

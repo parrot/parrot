@@ -48,11 +48,12 @@ Initializes the PMC by allocating a C<sockaddr_storage>.
 */
 
     VTABLE void init() {
-        Parrot_Sockaddr_attributes * const pdata_struct =
+        Parrot_Sockaddr_attributes * const attrs =
             (Parrot_Sockaddr_attributes *) PMC_data(SELF);
 
-        pdata_struct->pointer = mem_gc_allocate_zeroed_typed(INTERP,
+        attrs->pointer = mem_gc_allocate_zeroed_typed(INTERP,
                 struct sockaddr_storage);
+        attrs->len     = sizeof (struct sockaddr_storage);
         PObj_custom_destroy_SET(SELF);
     }
 
@@ -109,6 +110,24 @@ Returns true if the Sockaddr is defined.
         Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
 
         return data->pointer ? 1 : 0 ;
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the length of the sockaddr struct.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        INTVAL len;
+
+        GET_ATTR_len(INTERP, SELF, len);
+
+        return len;
     }
 
 /*

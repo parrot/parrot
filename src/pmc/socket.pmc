@@ -29,6 +29,9 @@ The Socket PMC performs network I/O operations.
 pmclass Socket extends Handle provides socket auto_attrs {
     ATTR PMC *local;           /* Local addr                   */
     ATTR PMC *remote;          /* Remote addr                  */
+    ATTR INTVAL  family;
+    ATTR INTVAL  type;
+    ATTR INTVAL  protocol;
     ATTR STRING *buf;
 
 /*
