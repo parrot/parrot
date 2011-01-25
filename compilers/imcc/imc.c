@@ -31,21 +31,23 @@ Moved all register allocation and spill code to reg_alloc.c
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+static void imc_free_unit(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-static IMC_Unit * imc_new_unit(PARROT_INTERP, IMC_Unit_Type t)
-        __attribute__nonnull__(1);
+static IMC_Unit * imc_new_unit(ARGMOD(imc_info_t * imcc), IMC_Unit_Type t)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(* imcc);
 
 #define ASSERT_ARGS_imc_free_unit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_imc_new_unit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(imcc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -53,7 +55,7 @@ static IMC_Unit * imc_new_unit(PARROT_INTERP, IMC_Unit_Type t)
 
 /*
 
-=item C<void imc_compile_all_units(PARROT_INTERP)>
+=item C<void imc_compile_all_units(imc_info_t * imcc)>
 
 Compiles all imc_units, and free all memory of instructions and structures
 afterwards.
@@ -103,7 +105,7 @@ imc_compile_all_units(ARGMOD(imc_info_t * imcc))
 
 /*
 
-=item C<void imc_compile_unit(PARROT_INTERP, IMC_Unit *unit)>
+=item C<void imc_compile_unit(imc_info_t * imcc, IMC_Unit *unit)>
 
 Compiles each unit in IMCC.  This is the main loop of the compiler; it operates
 on a single compilation unit at a time.
@@ -126,7 +128,7 @@ imc_compile_unit(ARGMOD(imc_info_t * imcc), ARGIN(IMC_Unit *unit))
 
 /*
 
-=item C<void imc_cleanup(PARROT_INTERP, void *yyscanner)>
+=item C<void imc_cleanup(imc_info_t * imcc, void *yyscanner)>
 
 Cleans up the compiler state in preparation for another compiler invocation.
 
@@ -150,7 +152,7 @@ imc_cleanup(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(void *yyscanner))
 
 /*
 
-=item C<static IMC_Unit * imc_new_unit(PARROT_INTERP, IMC_Unit_Type t)>
+=item C<static IMC_Unit * imc_new_unit(imc_info_t * imcc, IMC_Unit_Type t)>
 
 Creates a new IMC_Unit of the given IMC_Unit_Type C<t>.
 
@@ -173,7 +175,7 @@ imc_new_unit(ARGMOD(imc_info_t * imcc), IMC_Unit_Type t)
 
 /*
 
-=item C<IMC_Unit * imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)>
+=item C<IMC_Unit * imc_open_unit(imc_info_t * imc_info, IMC_Unit_Type t)>
 
 Creates a new IMC_Unit and "open" it for construction.  This sets the current
 state of the parser.  You can close the unit later while retaining all the
@@ -213,7 +215,7 @@ imc_open_unit(ARGMOD(imc_info_t * imc_info), IMC_Unit_Type t)
 
 /*
 
-=item C<void imc_close_unit(PARROT_INTERP, IMC_Unit *unit)>
+=item C<void imc_close_unit(imc_info_t * imcc, IMC_Unit *unit)>
 
 Closes a unit from compilation.  This does not destroy the unit, but leaves it
 on the list of units.
@@ -237,7 +239,7 @@ imc_close_unit(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(IMC_Unit *unit))
 
 /*
 
-=item C<static void imc_free_unit(PARROT_INTERP, IMC_Unit *unit)>
+=item C<static void imc_free_unit(imc_info_t * imcc, IMC_Unit *unit)>
 
 Frees an IMC_Unit and all of its associated memory.
 

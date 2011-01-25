@@ -31,7 +31,7 @@ An implementation of sets -- used for tracking register usage.
 
 /*
 
-=item C<Set* set_make(PARROT_INTERP, unsigned int length)>
+=item C<Set* set_make(imc_info_t * imcc, unsigned int length)>
 
 Creates a new Set object.
 
@@ -56,7 +56,7 @@ set_make(ARGMOD(imc_info_t * imcc), unsigned int length)
 
 /*
 
-=item C<Set* set_make_full(PARROT_INTERP, unsigned int length)>
+=item C<Set* set_make_full(imc_info_t * imcc, unsigned int length)>
 
 Creates a new Set object of C<length> items, setting them all to full.
 
@@ -121,7 +121,7 @@ set_clear(ARGMOD(Set *s))
 
 /*
 
-=item C<Set* set_copy(PARROT_INTERP, const Set *s)>
+=item C<Set* set_copy(imc_info_t * imcc, const Set *s)>
 
 Copies the set C<s>, returning a new set pointer.
 
@@ -277,7 +277,7 @@ set_contains(ARGIN(const Set *s), unsigned int element)
 
 /*
 
-=item C<Set * set_union(PARROT_INTERP, const Set *s1, const Set *s2)>
+=item C<Set * set_union(imc_info_t * imcc, const Set *s1, const Set *s2)>
 
 Computes the union of the two Set arguments, returning it as a new Set.
 
@@ -306,7 +306,7 @@ set_union(ARGMOD(imc_info_t * imcc), ARGIN(const Set *s1), ARGIN(const Set *s2))
 
 /*
 
-=item C<Set * set_intersec(PARROT_INTERP, const Set *s1, const Set *s2)>
+=item C<Set * set_intersec(imc_info_t * imcc, const Set *s1, const Set *s2)>
 
 Creates a new Set object that is the intersection of the Set arguments (defined
 through the binary C<and> operator.)

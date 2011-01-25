@@ -496,7 +496,7 @@ move_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins), ARGMOD(Instruction *t
 
 /*
 
-=item C<Instruction * emitb(PARROT_INTERP, IMC_Unit *unit, Instruction *i)>
+=item C<Instruction * emitb(imc_info_t * imcc, IMC_Unit *unit, Instruction *i)>
 
 Emit a single instruction into the current unit buffer.
 
@@ -548,7 +548,7 @@ free_ins(ARGMOD(Instruction *ins))
 
 /*
 
-=item C<int ins_print(PARROT_INTERP, PIOHANDLE io, const Instruction *ins)>
+=item C<int ins_print(imc_info_t * imcc, PIOHANDLE io, const Instruction *ins)>
 
 Print details of instruction ins in file fd.
 
@@ -654,7 +654,7 @@ static PIOHANDLE output;
 
 /*
 
-=item C<int emit_open(PARROT_INTERP)>
+=item C<void emit_open(imc_info_t * imcc)>
 
 Opens the emitter function C<open> of the given C<type>. Passes
 the C<param> to the open function.
@@ -673,7 +673,7 @@ emit_open(ARGMOD(imc_info_t * imcc))
 
 /*
 
-=item C<int emit_flush(PARROT_INTERP, void *param, IMC_Unit *unit)>
+=item C<void emit_flush(imc_info_t * imcc, void *param, IMC_Unit *unit)>
 
 Flushes the emitter by emitting all the instructions in the current
 IMC_Unit C<unit>.
@@ -701,7 +701,7 @@ emit_flush(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(void *param),
 
 /*
 
-=item C<int emit_close(PARROT_INTERP, void *param)>
+=item C<void emit_close(imc_info_t *imcc, void *param)>
 
 Closes the given emitter.
 
@@ -709,7 +709,8 @@ Closes the given emitter.
 
 */
 
-emit_close(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(void *param))
+void
+emit_close(ARGMOD(imc_info_t *imcc), ARGIN_NULLOK(void *param))
 {
     ASSERT_ARGS(emit_close)
     e_pbc_close(imcc, param);

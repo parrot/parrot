@@ -43,7 +43,83 @@ ParserUtil - Parser support functions.
 /* HEADERIZER HFILE: compilers/imcc/imc.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_WARN_UNUSED_RESULT
+static int change_op_arg_to_num(
+    ARGMOD(imc_info_t * imcc),
+    ARGMOD(IMC_Unit *unit),
+    ARGMOD(SymReg **r),
+    int num,
+    int emit)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*r);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static op_info_t * try_find_op(
+    ARGMOD(imc_info_t * imcc),
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(const char *name),
+    ARGMOD(SymReg **r),
+    int n,
+    int keyvec,
+    int emit)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* imcc)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*r);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static const char * try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*r);
+
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static Instruction * var_arg_ins(
+    ARGMOD(imc_info_t * imcc),
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(const char *name),
+    ARGMOD(SymReg **r),
+    int n,
+    int emit)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* imcc)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*r);
+
+#define ASSERT_ARGS_change_op_arg_to_num __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(r))
+#define ASSERT_ARGS_try_find_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(r))
+#define ASSERT_ARGS_try_rev_cmp __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(r))
+#define ASSERT_ARGS_var_arg_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(r))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
@@ -116,8 +192,8 @@ op_fullname(ARGOUT(char *dest), ARGIN(const char *name),
 
 /*
 
-=item C<void check_op(ARGMOD(imc_info_t * imcc), op_info_t **op_info, char *fullname, const
-char *name, SymReg * const * r, int narg, int keyvec)>
+=item C<void check_op(imc_info_t * imcc, op_info_t **op_info, char *fullname,
+const char *name, SymReg * const * r, int narg, int keyvec)>
 
 Return opcode value for op name
 
@@ -138,7 +214,7 @@ check_op(ARGMOD(imc_info_t * imcc), ARGOUT(op_info_t **op_info), ARGOUT(char *fu
 
 /*
 
-=item C<int is_op(ARGMOD(imc_info_t * imcc), const char *name)>
+=item C<int is_op(imc_info_t * imcc, const char *name)>
 
 Is instruction a parrot opcode?
 
@@ -156,8 +232,8 @@ is_op(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
 
 /*
 
-=item C<static Instruction * var_arg_ins(ARGMOD(imc_info_t * imcc), IMC_Unit *unit, const
-char *name, SymReg **r, int n, int emit)>
+=item C<static Instruction * var_arg_ins(imc_info_t * imcc, IMC_Unit *unit,
+const char *name, SymReg **r, int n, int emit)>
 
 Create an C<Instruction> object for an instruction that takes a variable
 number of arguments.
@@ -209,8 +285,8 @@ var_arg_ins(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(const char 
 
 /*
 
-=item C<Instruction * INS(ARGMOD(imc_info_t * imcc), IMC_Unit *unit, const char *name, const
-char *fmt, SymReg **r, int n, int keyvec, int emit)>
+=item C<Instruction * INS(imc_info_t * imcc, IMC_Unit *unit, const char *name,
+const char *fmt, SymReg **r, int n, int keyvec, int emit)>
 
 Makes an instruction.
 
@@ -425,8 +501,8 @@ INS(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
 
 /*
 
-=item C<static int change_op_arg_to_num(ARGMOD(imc_info_t * imcc), IMC_Unit *unit, SymReg
-**r, int num, int emit)>
+=item C<static int change_op_arg_to_num(imc_info_t * imcc, IMC_Unit *unit,
+SymReg **r, int num, int emit)>
 
 Change one argument of an op to be numeric in stead of integral. Used when
 integer argument op variants don't exist.
@@ -479,8 +555,8 @@ change_op_arg_to_num(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
 
 /*
 
-=item C<static op_info_t * try_find_op(ARGMOD(imc_info_t * imcc), IMC_Unit *unit, const char
-*name, SymReg **r, int n, int keyvec, int emit)>
+=item C<static op_info_t * try_find_op(imc_info_t * imcc, IMC_Unit *unit, const
+char *name, SymReg **r, int n, int keyvec, int emit)>
 
 Try to find valid op doing the same operation e.g.
 
@@ -594,8 +670,8 @@ try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
 
 /*
 
-=item C<int imcc_vfprintf(ARGMOD(imc_info_t * imcc), PMC *io, const char *format, va_list
-ap)>
+=item C<int imcc_vfprintf(imc_info_t * imcc, PMC *io, const char *format,
+va_list ap)>
 
 Formats a given series of arguments per a given format string and prints it to
 the given Parrot IO PMC.
@@ -615,8 +691,8 @@ imcc_vfprintf(ARGMOD(imc_info_t * imcc), ARGMOD(PMC *io),
 
 /*
 
-=item C<int imcc_string_ends_with(ARGMOD(imc_info_t * imcc), const STRING *str, const char
-*ext)>
+=item C<int imcc_string_ends_with(imc_info_t * imcc, const STRING *str, const
+char *ext)>
 
 Checks whether string C<str> has extension C<ext>.
 

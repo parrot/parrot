@@ -38,19 +38,27 @@ The following parts are just missing:
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void allocate_lexicals(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+static void allocate_lexicals(
+    ARGMOD(imc_info_t * imcc),
+    ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit);
 
-static void allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
+static void allocate_uniq(
+    ARGMOD(imc_info_t * imcc),
+    ARGMOD(IMC_Unit *unit),
+    int usage)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit);
 
-static void build_reglist(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+static void build_reglist(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit);
 
 static void compute_du_chain(ARGMOD(IMC_Unit *unit))
@@ -63,12 +71,14 @@ static void compute_one_du_chain(ARGMOD(SymReg *r), ARGIN(IMC_Unit *unit))
         FUNC_MODIFIES(*r);
 
 PARROT_WARN_UNUSED_RESULT
-static unsigned int first_avail(PARROT_INTERP,
+static unsigned int first_avail(
+    ARGMOD(imc_info_t * imcc),
     ARGIN(const IMC_Unit *unit),
     int reg_set,
     ARGOUT_NULLOK(Set **avail))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*avail);
 
 static void imc_stat_init(ARGMOD(IMC_Unit *unit))
@@ -84,9 +94,10 @@ static void make_stat(
         FUNC_MODIFIES(*sets)
         FUNC_MODIFIES(*cols);
 
-static void print_stat(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+static void print_stat(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit);
 
 PARROT_WARN_UNUSED_RESULT
@@ -98,19 +109,22 @@ static void sort_reglist(ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*unit);
 
-static void vanilla_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+static void vanilla_reg_alloc(
+    ARGMOD(imc_info_t * imcc),
+    ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit);
 
 #define ASSERT_ARGS_allocate_lexicals __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_allocate_uniq __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_build_reglist __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_compute_du_chain __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit))
@@ -118,14 +132,14 @@ static void vanilla_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
        PARROT_ASSERT_ARG(r) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_first_avail __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_imc_stat_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_make_stat __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_print_stat __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_reg_sort_f __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(a) \
@@ -133,14 +147,14 @@ static void vanilla_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 #define ASSERT_ARGS_sort_reglist __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_vanilla_reg_alloc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
 
-=item C<void imc_reg_alloc(PARROT_INTERP, IMC_Unit *unit)>
+=item C<void imc_reg_alloc(imc_info_t * imcc, IMC_Unit *unit)>
 
 imc_reg_alloc is the main loop of the allocation algorithm. It operates
 on a single compilation unit at a time.
@@ -326,7 +340,7 @@ imc_stat_init(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void print_stat(PARROT_INTERP, IMC_Unit *unit)>
+=item C<static void print_stat(imc_info_t * imcc, IMC_Unit *unit)>
 
 and final
 
@@ -418,7 +432,7 @@ sort_reglist(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void build_reglist(PARROT_INTERP, IMC_Unit *unit)>
+=item C<static void build_reglist(imc_info_t * imcc, IMC_Unit *unit)>
 
 make a linear list of IDENTs and VARs, set n_symbols
 TODO
@@ -574,8 +588,8 @@ compute_one_du_chain(ARGMOD(SymReg *r), ARGIN(IMC_Unit *unit))
 
 /*
 
-=item C<static unsigned int first_avail(PARROT_INTERP, const IMC_Unit *unit, int
-reg_set, Set **avail)>
+=item C<static unsigned int first_avail(imc_info_t * imcc, const IMC_Unit *unit,
+int reg_set, Set **avail)>
 
 find first available register of the given reg_set
 
@@ -622,7 +636,7 @@ first_avail(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit), int reg_set,
 
 /*
 
-=item C<static void allocate_uniq(PARROT_INTERP, IMC_Unit *unit, int usage)>
+=item C<static void allocate_uniq(imc_info_t * imcc, IMC_Unit *unit, int usage)>
 
 allocate lexicals or non-volatile in ascending order
 
@@ -690,7 +704,7 @@ allocate_uniq(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), int usage)
 
 /*
 
-=item C<static void vanilla_reg_alloc(PARROT_INTERP, IMC_Unit *unit)>
+=item C<static void vanilla_reg_alloc(imc_info_t * imcc, IMC_Unit *unit)>
 
 Vanilla register allocator - assign every virtual register to an actual
 register.
@@ -747,7 +761,7 @@ vanilla_reg_alloc(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void allocate_lexicals(PARROT_INTERP, IMC_Unit *unit)>
+=item C<static void allocate_lexicals(imc_info_t * imcc, IMC_Unit *unit)>
 
 Allocate registers for lexical variables. These must have unique registers
 because they are accessible through the LexPad.

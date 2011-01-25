@@ -35,7 +35,8 @@ PCC Implementation by Leopold Toetsch
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void insert_tail_call(PARROT_INTERP,
+static void insert_tail_call(
+    ARGMOD(imc_info_t * imcc),
     ARGIN(IMC_Unit *unit),
     ARGMOD(Instruction *ins),
     ARGMOD(SymReg *sub),
@@ -44,12 +45,14 @@ static void insert_tail_call(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*ins)
         FUNC_MODIFIES(*sub);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static Instruction * insINS(PARROT_INTERP,
+static Instruction * insINS(
+    ARGMOD(imc_info_t * imcc),
     ARGMOD(IMC_Unit *unit),
     ARGIN(Instruction *ins),
     ARGIN(const char *name),
@@ -60,11 +63,13 @@ static Instruction * insINS(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static Instruction * move_regs(PARROT_INTERP,
+static Instruction * move_regs(
+    ARGMOD(imc_info_t * imcc),
     ARGIN(IMC_Unit *unit),
     ARGIN(Instruction *ins),
     size_t n,
@@ -74,11 +79,13 @@ static Instruction * move_regs(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(5)
-        __attribute__nonnull__(6);
+        __attribute__nonnull__(6)
+        FUNC_MODIFIES(* imcc);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static Instruction* pcc_get_args(PARROT_INTERP,
+static Instruction* pcc_get_args(
+    ARGMOD(imc_info_t * imcc),
     ARGMOD(IMC_Unit *unit),
     ARGIN(Instruction *ins),
     ARGIN(const char *op_name),
@@ -89,64 +96,71 @@ static Instruction* pcc_get_args(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit);
 
-static int pcc_reg_mov(PARROT_INTERP,
+static int pcc_reg_mov(
+    ARGMOD(imc_info_t * imcc),
     unsigned char d,
     unsigned char s,
     ARGMOD(void *vinfo))
         __attribute__nonnull__(1)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*vinfo);
 
-static int recursive_tail_call(PARROT_INTERP,
+static int recursive_tail_call(
+    ARGMOD(imc_info_t * imcc),
     ARGIN(IMC_Unit *unit),
     ARGIN(Instruction *ins),
     ARGIN(SymReg *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* imcc);
 
-static void unshift_self(PARROT_INTERP,
+static void unshift_self(
+    ARGMOD(imc_info_t * imcc),
     ARGIN(SymReg *sub),
     ARGIN(SymReg *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc);
 
 #define ASSERT_ARGS_insert_tail_call __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(ins) \
     , PARROT_ASSERT_ARG(sub))
 #define ASSERT_ARGS_insINS __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(ins) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(regs))
 #define ASSERT_ARGS_move_regs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(ins) \
     , PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_pcc_get_args __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(ins) \
     , PARROT_ASSERT_ARG(op_name))
 #define ASSERT_ARGS_pcc_reg_mov __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(vinfo))
 #define ASSERT_ARGS_recursive_tail_call __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(ins) \
     , PARROT_ASSERT_ARG(sub))
 #define ASSERT_ARGS_unshift_self __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(sub) \
     , PARROT_ASSERT_ARG(obj))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -154,8 +168,8 @@ static void unshift_self(PARROT_INTERP,
 
 /*
 
-=item C<static Instruction * insINS(PARROT_INTERP, IMC_Unit *unit, Instruction
-*ins, const char *name, SymReg **regs, int n)>
+=item C<static Instruction * insINS(imc_info_t * imcc, IMC_Unit *unit,
+Instruction *ins, const char *name, SymReg **regs, int n)>
 
 Utility instruction routine. Creates and inserts an instruction
 into the current block in one call.
@@ -180,7 +194,7 @@ insINS(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins
 
 /*
 
-=item C<SymReg* get_pasm_reg(PARROT_INTERP, const char *name)>
+=item C<SymReg* get_pasm_reg(imc_info_t * imcc, const char *name)>
 
 get or create the SymReg
 
@@ -204,7 +218,7 @@ get_pasm_reg(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
 
 /*
 
-=item C<SymReg* get_const(PARROT_INTERP, const char *name, int type)>
+=item C<SymReg* get_const(imc_info_t * imcc, const char *name, int type)>
 
 get or create a constant
 
@@ -228,7 +242,7 @@ get_const(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int type)
 
 /*
 
-=item C<static Instruction* pcc_get_args(PARROT_INTERP, IMC_Unit *unit,
+=item C<static Instruction* pcc_get_args(imc_info_t * imcc, IMC_Unit *unit,
 Instruction *ins, const char *op_name, int n, SymReg * const *args, const int
 *arg_flags)>
 
@@ -367,7 +381,7 @@ pcc_get_args(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
 
 /*
 
-=item C<static void unshift_self(PARROT_INTERP, SymReg *sub, SymReg *obj)>
+=item C<static void unshift_self(imc_info_t * imcc, SymReg *sub, SymReg *obj)>
 
 prepend the object to args or self to params
 
@@ -400,7 +414,8 @@ unshift_self(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *sub), ARGIN(SymReg *obj))
 
 /*
 
-=item C<void expand_pcc_sub(PARROT_INTERP, IMC_Unit *unit, Instruction *ins)>
+=item C<void expand_pcc_sub(imc_info_t * imcc, IMC_Unit *unit, Instruction
+*ins)>
 
 Expand a PCC (Parrot Calling Convention) subroutine
 by generating the appropriate prologue and epilogue
@@ -484,7 +499,7 @@ expand_pcc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(Instruct
 
 /*
 
-=item C<void expand_pcc_sub_ret(PARROT_INTERP, IMC_Unit *unit, Instruction
+=item C<void expand_pcc_sub_ret(imc_info_t * imcc, IMC_Unit *unit, Instruction
 *ins)>
 
 Expand a PCC sub return directive into its PASM instructions
@@ -530,8 +545,8 @@ typedef struct move_info_t {
 
 /*
 
-=item C<static int pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s,
-void *vinfo)>
+=item C<static int pcc_reg_mov(imc_info_t * imcc, unsigned char d, unsigned char
+s, void *vinfo)>
 
 Callback for C<Parrot_util_register_move>. Inserts move instructions in stead of
 actually moving the registers.
@@ -606,7 +621,7 @@ pcc_reg_mov(ARGMOD(imc_info_t * imcc), unsigned char d, unsigned char s,
 
 /*
 
-=item C<static Instruction * move_regs(PARROT_INTERP, IMC_Unit *unit,
+=item C<static Instruction * move_regs(imc_info_t * imcc, IMC_Unit *unit,
 Instruction *ins, size_t n, SymReg **dest, SymReg **src)>
 
 Insert instructions for moving C<n> registers from C<src> to C<dest>.
@@ -666,7 +681,7 @@ move_regs(ARGMOD(imc_info_t * imcc), ARGIN(IMC_Unit *unit),
 
 /*
 
-=item C<static int recursive_tail_call(PARROT_INTERP, IMC_Unit *unit,
+=item C<static int recursive_tail_call(imc_info_t * imcc, IMC_Unit *unit,
 Instruction *ins, SymReg *sub)>
 
 convert a recursive tailcall into a loop
@@ -732,8 +747,8 @@ recursive_tail_call(ARGMOD(imc_info_t * imcc), ARGIN(IMC_Unit *unit),
 
 /*
 
-=item C<static void insert_tail_call(PARROT_INTERP, IMC_Unit *unit, Instruction
-*ins, SymReg *sub, SymReg *meth)>
+=item C<static void insert_tail_call(imc_info_t * imcc, IMC_Unit *unit,
+Instruction *ins, SymReg *sub, SymReg *meth)>
 
 Creates and inserts an appropriate tailcall instruction for either a sub call
 or a method call.
@@ -772,7 +787,7 @@ insert_tail_call(ARGMOD(imc_info_t * imcc), ARGIN(IMC_Unit *unit),
 
 /*
 
-=item C<void expand_pcc_sub_call(PARROT_INTERP, IMC_Unit *unit, Instruction
+=item C<void expand_pcc_sub_call(imc_info_t * imcc, IMC_Unit *unit, Instruction
 *ins)>
 
 Expand a PCC subroutine call (IMC) into its PASM instructions

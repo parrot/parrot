@@ -33,7 +33,159 @@ between blocks.
 /* HEADERIZER HFILE: compilers/imcc/cfg.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void bb_add_edge(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(Basic_block *from),
+    ARGMOD(Basic_block *to))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*to);
+
+static void bb_check_set_addr(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(IMC_Unit *unit),
+    ARGMOD(Basic_block *bb),
+    ARGIN(const SymReg *label))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*bb);
+
+static void bb_findadd_edge(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(Basic_block *from),
+    ARGIN(const SymReg *label))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit);
+
+static void bb_remove_edge(ARGMOD(IMC_Unit *unit), ARGMOD(Edge *edge))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*edge);
+
+PARROT_WARN_UNUSED_RESULT
+static int check_invoke_type(
+    ARGMOD(imc_info_t *imcc),
+    ARGIN(const IMC_Unit *unit),
+    ARGIN(const Instruction *ins))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*imcc);
+
+static void free_dominance_frontiers(ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*unit);
+
+static void free_dominators(ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*unit);
+
+static void free_edge(ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*unit);
+
+static void free_loops(ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*unit);
+
+static void init_basic_blocks(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit);
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static Basic_block* make_basic_block(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(IMC_Unit *unit),
+    ARGMOD(Instruction *ins))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*ins);
+
+static void mark_loop(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(const Edge *e))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit);
+
+static void sort_loops(ARGMOD(imc_info_t *imcc), ARGIN(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc);
+
+#define ASSERT_ARGS_bb_add_edge __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(from) \
+    , PARROT_ASSERT_ARG(to))
+#define ASSERT_ARGS_bb_check_set_addr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(bb) \
+    , PARROT_ASSERT_ARG(label))
+#define ASSERT_ARGS_bb_findadd_edge __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(from) \
+    , PARROT_ASSERT_ARG(label))
+#define ASSERT_ARGS_bb_remove_edge __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(edge))
+#define ASSERT_ARGS_check_invoke_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(ins))
+#define ASSERT_ARGS_free_dominance_frontiers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_free_dominators __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_free_edge __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_free_loops __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_init_basic_blocks __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_make_basic_block __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(ins))
+#define ASSERT_ARGS_mark_loop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(e))
+#define ASSERT_ARGS_sort_loops __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /* Code: */
@@ -45,8 +197,8 @@ between blocks.
 
 /*
 
-=item C<static int check_invoke_type(ARGMOD(imc_info_t *imcc), const IMC_Unit *unit, const
-Instruction *ins)>
+=item C<static int check_invoke_type(imc_info_t *imcc, const IMC_Unit *unit,
+const Instruction *ins)>
 
 Given an invoke-type instruction, returns the type of the invocation.
 
@@ -86,7 +238,7 @@ check_invoke_type(ARGMOD(imc_info_t *imcc), ARGIN(const IMC_Unit    *unit),
 
 /*
 
-=item C<void find_basic_blocks(ARGMOD(imc_info_t *imcc), IMC_Unit *unit, int first)>
+=item C<void find_basic_blocks(imc_info_t *imcc, IMC_Unit *unit, int first)>
 
 Finds all basic blocks in the given IMC_Unit, expanding PCC calls if first is
 true.
@@ -196,8 +348,8 @@ find_basic_blocks(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit), int first)
 
 /*
 
-=item C<static void bb_check_set_addr(ARGMOD(imc_info_t *imcc), IMC_Unit *unit, Basic_block
-*bb, const SymReg *label)>
+=item C<static void bb_check_set_addr(imc_info_t *imcc, IMC_Unit *unit,
+Basic_block *bb, const SymReg *label)>
 
 Looks for a C<set_addr> op in the current unit referring to the given label.
 
@@ -234,7 +386,7 @@ bb_check_set_addr(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
 
 /*
 
-=item C<void build_cfg(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<void build_cfg(imc_info_t *imcc, IMC_Unit *unit)>
 
 Once the basic blocks have been computed, build_cfg computes the dependencies
 between them.
@@ -307,8 +459,8 @@ build_cfg(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void bb_findadd_edge(ARGMOD(imc_info_t *imcc), IMC_Unit *unit, Basic_block
-*from, const SymReg *label)>
+=item C<static void bb_findadd_edge(imc_info_t *imcc, IMC_Unit *unit,
+Basic_block *from, const SymReg *label)>
 
 Finds the placement of the given label and links its containing block to the
 given basic block.
@@ -379,7 +531,7 @@ blocks_are_connected(ARGIN(const Basic_block *from),
 
 /*
 
-=item C<static void bb_add_edge(ARGMOD(imc_info_t *imcc), IMC_Unit *unit, Basic_block
+=item C<static void bb_add_edge(imc_info_t *imcc, IMC_Unit *unit, Basic_block
 *from, Basic_block *to)>
 
 Adds an edge between the two given blocks.
@@ -533,7 +685,7 @@ edge_count(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void compute_dominators(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<void compute_dominators(imc_info_t *imcc, IMC_Unit *unit)>
 
 Computes the dominators tree of the CFG.  Basic block A dominates B if each
 path to B passes through A
@@ -674,7 +826,7 @@ compute_dominators(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<void compute_dominance_frontiers(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<void compute_dominance_frontiers(imc_info_t *imcc, IMC_Unit *unit)>
 
 Algorithm to find dominance frontiers described in paper "A Simple, Fast
 Dominance Algorithm", Cooper et al. (2001)
@@ -792,7 +944,7 @@ free_dominance_frontiers(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void sort_loops(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<static void sort_loops(imc_info_t *imcc, IMC_Unit *unit)>
 
 Sorts the loops found in the CFG of the current unit.
 
@@ -872,7 +1024,7 @@ sort_loops(ARGMOD(imc_info_t *imcc), ARGIN(IMC_Unit *unit))
 
 /*
 
-=item C<void find_loops(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<void find_loops(imc_info_t *imcc, IMC_Unit *unit)>
 
 Searches for loops in the CFG. We search for edges that go from a node to one
 of its dominators.
@@ -951,7 +1103,7 @@ natural_preheader(ARGIN(const IMC_Unit *unit), ARGIN(const Loop_info *loop_info)
 
 /*
 
-=item C<static void mark_loop(ARGMOD(imc_info_t *imcc), IMC_Unit *unit, const Edge *e)>
+=item C<static void mark_loop(imc_info_t *imcc, IMC_Unit *unit, const Edge *e)>
 
 Increases the loop_depth of all the nodes in a loop.
 
@@ -1099,7 +1251,7 @@ search_predecessors_not_in(ARGIN(const Basic_block *node), ARGMOD(Set *s))
 
 /*
 
-=item C<static void init_basic_blocks(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<static void init_basic_blocks(imc_info_t *imcc, IMC_Unit *unit)>
 
 Initializes the basic blocks memory for this unit.
 
@@ -1157,7 +1309,7 @@ clear_basic_blocks(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static Basic_block* make_basic_block(ARGMOD(imc_info_t *imcc), IMC_Unit *unit,
+=item C<static Basic_block* make_basic_block(imc_info_t *imcc, IMC_Unit *unit,
 Instruction *ins)>
 
 Creates, initializes, and returns a new Basic_block.

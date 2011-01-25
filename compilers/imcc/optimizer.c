@@ -78,11 +78,142 @@ e.g. eliminate new Px .PerlUndef because Px where different before
 /* HEADERIZER HFILE: compilers/imcc/optimizer.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static int branch_branch(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit);
+
+static int branch_cond_loop(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit);
+
+PARROT_WARN_UNUSED_RESULT
+static int branch_cond_loop_swap(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(IMC_Unit *unit),
+    ARGMOD(Instruction *branch),
+    ARGMOD(Instruction *start),
+    ARGMOD(Instruction *cond))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*branch)
+        FUNC_MODIFIES(*start)
+        FUNC_MODIFIES(*cond);
+
+PARROT_WARN_UNUSED_RESULT
+static int branch_reorg(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit);
+
+static int constant_propagation(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit);
+
+static int dead_code_remove(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit);
+
+PARROT_WARN_UNUSED_RESULT
+static int eval_ins(
+    ARGMOD(imc_info_t *imcc),
+    ARGIN(const char *op),
+    size_t ops,
+    ARGIN(SymReg **r))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*imcc);
+
+static int if_branch(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit);
+
+static int strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit);
+
+PARROT_WARN_UNUSED_RESULT
+static int unused_label(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit);
+
+static int used_once(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit);
+
+#define ASSERT_ARGS_branch_branch __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_branch_cond_loop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_branch_cond_loop_swap __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(branch) \
+    , PARROT_ASSERT_ARG(start) \
+    , PARROT_ASSERT_ARG(cond))
+#define ASSERT_ARGS_branch_reorg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_constant_propagation __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_dead_code_remove __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_eval_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(op) \
+    , PARROT_ASSERT_ARG(r))
+#define ASSERT_ARGS_if_branch __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_strength_reduce __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_unused_label __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit))
+#define ASSERT_ARGS_used_once __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
 
-=item C<int pre_optimize(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<int pre_optimize(imc_info_t *imcc, IMC_Unit *unit)>
 
 Handles optimizations occuring before the construction of the CFG.
 
@@ -107,7 +238,7 @@ pre_optimize(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<int cfg_optimize(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<int cfg_optimize(imc_info_t *imcc, IMC_Unit *unit)>
 
 Handles optimizations occuring during the construction of the CFG.
 Returns TRUE if any optimization was performed. Otherwise, returns
@@ -142,7 +273,7 @@ cfg_optimize(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<int optimize(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<int optimize(imc_info_t *imcc, IMC_Unit *unit)>
 
 Runs after the CFG is built and handles constant propagation.
 
@@ -208,7 +339,7 @@ get_neg_op(ARGIN(const char *op), ARGOUT(int *n))
  */
 /*
 
-=item C<static int if_branch(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<static int if_branch(imc_info_t *imcc, IMC_Unit *unit)>
 
 Convert if/branch/label constructs of the form:
 
@@ -278,7 +409,7 @@ if_branch(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int strength_reduce(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<static int strength_reduce(imc_info_t *imcc, IMC_Unit *unit)>
 
 strength_reduce ... rewrites e.g add Ix, Ix, y => add Ix, y
 
@@ -525,7 +656,7 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int constant_propagation(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<static int constant_propagation(imc_info_t *imcc, IMC_Unit *unit)>
 
 Does conservative constant propagation.
 This code will not propagate constants past labels or saves,
@@ -631,8 +762,8 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<Instruction * IMCC_subst_constants_umix(ARGMOD(imc_info_t *imcc), IMC_Unit *unit,
-const char *name, SymReg **r, int n)>
+=item C<Instruction * IMCC_subst_constants_umix(imc_info_t *imcc, IMC_Unit
+*unit, const char *name, SymReg **r, int n)>
 
 rewrite e.g. add_n_ic => add_n_nc
 
@@ -673,7 +804,7 @@ IMCC_subst_constants_umix(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
 
 /*
 
-=item C<static int eval_ins(ARGMOD(imc_info_t *imcc), const char *op, size_t ops, SymReg
+=item C<static int eval_ins(imc_info_t *imcc, const char *op, size_t ops, SymReg
 **r)>
 
 Run one parrot instruction, registers are filled with the
@@ -751,8 +882,8 @@ eval_ins(ARGMOD(imc_info_t *imcc), ARGIN(const char *op), size_t ops,
 
 /*
 
-=item C<Instruction * IMCC_subst_constants(ARGMOD(imc_info_t *imcc), IMC_Unit *unit, const
-char *name, SymReg **r, int n, int *ok)>
+=item C<Instruction * IMCC_subst_constants(imc_info_t *imcc, IMC_Unit *unit,
+const char *name, SymReg **r, int n, int *ok)>
 
 rewrite e.g. add_n_nc_nc => set_n_nc
              abs_i_ic    => set_i_ic
@@ -963,7 +1094,7 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
 
 /*
 
-=item C<static int branch_branch(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<static int branch_branch(imc_info_t *imcc, IMC_Unit *unit)>
 
 if I0 goto L1  => if IO goto L2
 ...
@@ -1019,7 +1150,7 @@ branch_branch(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int branch_reorg(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<static int branch_reorg(imc_info_t *imcc, IMC_Unit *unit)>
 
 branch L2  => ...
 L1:           branch L4
@@ -1112,7 +1243,7 @@ branch_reorg(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int branch_cond_loop_swap(ARGMOD(imc_info_t *imcc), IMC_Unit *unit,
+=item C<static int branch_cond_loop_swap(imc_info_t *imcc, IMC_Unit *unit,
 Instruction *branch, Instruction *start, Instruction *cond)>
 
 Converts conditional loops to post-test
@@ -1196,7 +1327,7 @@ branch_cond_loop_swap(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit), ARGMOD(I
 
 /*
 
-=item C<static int branch_cond_loop(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<static int branch_cond_loop(imc_info_t *imcc, IMC_Unit *unit)>
 
 start:           => start:
 if cond goto end    if cond goto end
@@ -1277,7 +1408,7 @@ branch_cond_loop(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int unused_label(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<static int unused_label(imc_info_t *imcc, IMC_Unit *unit)>
 
 Removes unused labels.
 
@@ -1354,7 +1485,7 @@ unused_label(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int dead_code_remove(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<static int dead_code_remove(imc_info_t *imcc, IMC_Unit *unit)>
 
 dead code elimination
 ... unreachable blocks
@@ -1438,7 +1569,7 @@ dead_code_remove(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 /* optimizations with CFG & life info built */
 /*
 
-=item C<static int used_once(ARGMOD(imc_info_t *imcc), IMC_Unit *unit)>
+=item C<static int used_once(imc_info_t *imcc, IMC_Unit *unit)>
 
 used_once ... deletes assignments, when LHS is unused
 

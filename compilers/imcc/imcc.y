@@ -40,7 +40,329 @@
 /* HEADERIZER HFILE: compilers/imcc/imc.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void add_pcc_named_arg(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(SymReg *cur_call),
+    ARGMOD(SymReg *name),
+    ARGMOD(SymReg *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*cur_call)
+        FUNC_MODIFIES(*name)
+        FUNC_MODIFIES(*value);
+
+static void add_pcc_named_arg_var(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(SymReg *cur_call),
+    ARGMOD(SymReg *name),
+    ARGMOD(SymReg *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*cur_call)
+        FUNC_MODIFIES(*name)
+        FUNC_MODIFIES(*value);
+
+static void add_pcc_named_param(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(SymReg *cur_call),
+    ARGMOD(SymReg *name),
+    ARGMOD(SymReg *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*cur_call)
+        FUNC_MODIFIES(*name)
+        FUNC_MODIFIES(*value);
+
+static void add_pcc_named_result(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(SymReg *cur_call),
+    ARGMOD(SymReg *name),
+    ARGMOD(SymReg *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*cur_call)
+        FUNC_MODIFIES(*name)
+        FUNC_MODIFIES(*value);
+
+static void add_pcc_named_return(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(SymReg *cur_call),
+    ARGMOD(SymReg *name),
+    ARGMOD(SymReg *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*cur_call)
+        FUNC_MODIFIES(*name)
+        FUNC_MODIFIES(*value);
+
+static void adv_named_set(ARGMOD(imc_info_t *imcc), ARGIN(const char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc);
+
+static void adv_named_set_u(
+    ARGMOD(imc_info_t *imcc),
+    ARGIN(const char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc);
+
+static void begin_return_or_yield(ARGMOD(imc_info_t *imcc), int yield)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*imcc);
+
+static void clear_state(ARGMOD(imc_info_t *imcc))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*imcc);
+
+static void do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static Instruction* func_ins(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(SymReg *lhs),
+    ARGIN(const char *op),
+    ARGMOD(SymReg **r),
+    int n,
+    int keyv,
+    int emit)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*r);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static Instruction * iINDEXFETCH(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(SymReg *r0),
+    ARGIN(SymReg *r1),
+    ARGIN(SymReg *r2))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static Instruction * iINDEXSET(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(SymReg *r0),
+    ARGIN(SymReg *r1),
+    ARGIN(SymReg *r2))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static Instruction * iLABEL(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD_NULLOK(IMC_Unit *unit),
+    ARGMOD(SymReg *r0))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*r0);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static const char * inv_op(ARGIN(const char *op))
+        __attribute__nonnull__(1);
+
+PARROT_IGNORABLE_RESULT
+PARROT_CANNOT_RETURN_NULL
+static Instruction * iSUBROUTINE(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD_NULLOK(IMC_Unit *unit),
+    ARGMOD(SymReg *r))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*r);
+
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+static Instruction * MK_I(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(const char *fmt),
+    int n,
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static Instruction* mk_pmc_const_named(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(IMC_Unit *unit),
+    ARGIN(const char *name),
+    ARGMOD(SymReg *left),
+    ARGIN(const char *constant))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*left);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static SymReg * mk_sub_address_fromc(
+    ARGMOD(imc_info_t *imcc),
+    ARGIN(const char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static SymReg * mk_sub_address_u(
+    ARGMOD(imc_info_t *imcc),
+    ARGIN(const char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc);
+
+static void set_lexical(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(SymReg *r),
+    ARGMOD(SymReg *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(*r)
+        FUNC_MODIFIES(*name);
+
+#define ASSERT_ARGS_add_pcc_named_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(cur_call) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_add_pcc_named_arg_var __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(cur_call) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_add_pcc_named_param __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(cur_call) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_add_pcc_named_result __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(cur_call) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_add_pcc_named_return __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(cur_call) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_adv_named_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_adv_named_set_u __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_begin_return_or_yield __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_clear_state __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_do_loadlib __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(lib))
+#define ASSERT_ARGS_func_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(lhs) \
+    , PARROT_ASSERT_ARG(op) \
+    , PARROT_ASSERT_ARG(r))
+#define ASSERT_ARGS_iINDEXFETCH __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(r0) \
+    , PARROT_ASSERT_ARG(r1) \
+    , PARROT_ASSERT_ARG(r2))
+#define ASSERT_ARGS_iINDEXSET __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(r0) \
+    , PARROT_ASSERT_ARG(r1) \
+    , PARROT_ASSERT_ARG(r2))
+#define ASSERT_ARGS_iLABEL __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(r0))
+#define ASSERT_ARGS_inv_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(op))
+#define ASSERT_ARGS_iSUBROUTINE __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(r))
+#define ASSERT_ARGS_MK_I __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(fmt))
+#define ASSERT_ARGS_mk_pmc_const_named __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(left) \
+    , PARROT_ASSERT_ARG(constant))
+#define ASSERT_ARGS_mk_sub_address_fromc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_mk_sub_address_u __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_set_lexical __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(r) \
+    , PARROT_ASSERT_ARG(name))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 
@@ -62,7 +384,7 @@
 
 =over 4
 
-=item C<static Instruction * MK_I(ARGMOD(imc_info_t *imcc), IMC_Unit *unit, const char
+=item C<static Instruction * MK_I(imc_info_t *imcc, IMC_Unit *unit, const char
 *fmt, int n, ...)>
 
 build and emitb instruction by INS. fmt may contain:
@@ -116,7 +438,7 @@ MK_I(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit), ARGIN(const char *fmt), i
 
 /*
 
-=item C<static Instruction* mk_pmc_const_named(ARGMOD(imc_info_t *imcc), IMC_Unit *unit,
+=item C<static Instruction* mk_pmc_const_named(imc_info_t *imcc, IMC_Unit *unit,
 const char *name, SymReg *left, const char *constant)>
 
 =cut
@@ -183,8 +505,8 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
 
 /*
 
-=item C<static Instruction* func_ins(ARGMOD(imc_info_t *imcc), IMC_Unit *unit, SymReg *lhs,
-const char *op, SymReg **r, int n, int keyv, int emit)>
+=item C<static Instruction* func_ins(imc_info_t *imcc, IMC_Unit *unit, SymReg
+*lhs, const char *op, SymReg **r, int n, int keyv, int emit)>
 
 =cut
 
@@ -209,7 +531,7 @@ func_ins(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit), ARGIN(SymReg *lhs),
 
 /*
 
-=item C<static void clear_state(ARGMOD(imc_info_t *imcc))>
+=item C<static void clear_state(imc_info_t *imcc)>
 
 =cut
 
@@ -225,8 +547,8 @@ clear_state(ARGMOD(imc_info_t *imcc))
 
 /*
 
-=item C<Instruction * INS_LABEL(ARGMOD(imc_info_t *imcc), IMC_Unit *unit, SymReg *r0, int
-emit)>
+=item C<Instruction * INS_LABEL(imc_info_t *imcc, IMC_Unit *unit, SymReg *r0,
+int emit)>
 
 =cut
 
@@ -252,7 +574,8 @@ INS_LABEL(ARGMOD(imc_info_t *imcc), ARGMOD_NULLOK(IMC_Unit *unit),
 
 /*
 
-=item C<static Instruction * iLABEL(ARGMOD(imc_info_t *imcc), IMC_Unit *unit, SymReg *r0)>
+=item C<static Instruction * iLABEL(imc_info_t *imcc, IMC_Unit *unit, SymReg
+*r0)>
 
 =cut
 
@@ -274,8 +597,8 @@ iLABEL(ARGMOD(imc_info_t *imcc), ARGMOD_NULLOK(IMC_Unit *unit),
 
 /*
 
-=item C<static Instruction * iSUBROUTINE(ARGMOD(imc_info_t *imcc), IMC_Unit *unit, SymReg
-*r)>
+=item C<static Instruction * iSUBROUTINE(imc_info_t *imcc, IMC_Unit *unit,
+SymReg *r)>
 
 =cut
 
@@ -301,8 +624,8 @@ iSUBROUTINE(ARGMOD(imc_info_t *imcc), ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymR
 
 /*
 
-=item C<static Instruction * iINDEXFETCH(ARGMOD(imc_info_t *imcc), IMC_Unit *unit, SymReg
-*r0, SymReg *r1, SymReg *r2)>
+=item C<static Instruction * iINDEXFETCH(imc_info_t *imcc, IMC_Unit *unit,
+SymReg *r0, SymReg *r1, SymReg *r2)>
 
 substr or X = P[key]
 
@@ -323,7 +646,7 @@ iINDEXFETCH(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit), ARGIN(SymReg *r0),
 
 /*
 
-=item C<static Instruction * iINDEXSET(ARGMOD(imc_info_t *imcc), IMC_Unit *unit, SymReg
+=item C<static Instruction * iINDEXSET(imc_info_t *imcc, IMC_Unit *unit, SymReg
 *r0, SymReg *r1, SymReg *r2)>
 
 substr or P[key] = X
@@ -370,7 +693,7 @@ inv_op(ARGIN(const char *op))
 
 /*
 
-=item C<Instruction * IMCC_create_itcall_label(ARGMOD(imc_info_t *imcc))>
+=item C<Instruction * IMCC_create_itcall_label(imc_info_t *imcc)>
 
 =cut
 
@@ -400,7 +723,8 @@ IMCC_create_itcall_label(ARGMOD(imc_info_t *imcc))
 
 /*
 
-=item C<static SymReg * mk_sub_address_fromc(ARGMOD(imc_info_t *imcc), const char *name)>
+=item C<static SymReg * mk_sub_address_fromc(imc_info_t *imcc, const char
+*name)>
 
 =cut
 
@@ -434,7 +758,7 @@ mk_sub_address_fromc(ARGMOD(imc_info_t *imcc), ARGIN(const char *name))
 
 /*
 
-=item C<static SymReg * mk_sub_address_u(ARGMOD(imc_info_t *imcc), const char *name)>
+=item C<static SymReg * mk_sub_address_u(imc_info_t *imcc, const char *name)>
 
 =cut
 
@@ -454,7 +778,7 @@ mk_sub_address_u(ARGMOD(imc_info_t *imcc), ARGIN(const char *name))
 
 /*
 
-=item C<void IMCC_itcall_sub(ARGMOD(imc_info_t *imcc), SymReg *sub)>
+=item C<void IMCC_itcall_sub(imc_info_t *imcc, SymReg *sub)>
 
 =cut
 
@@ -478,7 +802,7 @@ IMCC_itcall_sub(ARGMOD(imc_info_t *imcc), ARGIN(SymReg *sub))
 
 /*
 
-=item C<static void begin_return_or_yield(ARGMOD(imc_info_t *imcc), int yield)>
+=item C<static void begin_return_or_yield(imc_info_t *imcc, int yield)>
 
 =cut
 
@@ -506,7 +830,7 @@ begin_return_or_yield(ARGMOD(imc_info_t *imcc), int yield)
 
 /*
 
-=item C<static void set_lexical(ARGMOD(imc_info_t *imcc), SymReg *r, SymReg *name)>
+=item C<static void set_lexical(imc_info_t *imcc, SymReg *r, SymReg *name)>
 
 =cut
 
@@ -533,7 +857,7 @@ set_lexical(ARGMOD(imc_info_t *imcc), ARGMOD(SymReg *r), ARGMOD(SymReg *name))
 
 /*
 
-=item C<static void add_pcc_named_arg(ARGMOD(imc_info_t *imcc), SymReg *cur_call, SymReg
+=item C<static void add_pcc_named_arg(imc_info_t *imcc, SymReg *cur_call, SymReg
 *name, SymReg *value)>
 
 =cut
@@ -553,7 +877,7 @@ add_pcc_named_arg(ARGMOD(imc_info_t *imcc), ARGMOD(SymReg *cur_call),
 
 /*
 
-=item C<static void add_pcc_named_arg_var(ARGMOD(imc_info_t *imcc), SymReg *cur_call,
+=item C<static void add_pcc_named_arg_var(imc_info_t *imcc, SymReg *cur_call,
 SymReg *name, SymReg *value)>
 
 =cut
@@ -572,8 +896,8 @@ add_pcc_named_arg_var(ARGMOD(imc_info_t *imcc), ARGMOD(SymReg *cur_call),
 
 /*
 
-=item C<static void add_pcc_named_result(ARGMOD(imc_info_t *imcc), SymReg *cur_call, SymReg
-*name, SymReg *value)>
+=item C<static void add_pcc_named_result(imc_info_t *imcc, SymReg *cur_call,
+SymReg *name, SymReg *value)>
 
 =cut
 
@@ -592,8 +916,8 @@ add_pcc_named_result(ARGMOD(imc_info_t *imcc), ARGMOD(SymReg *cur_call),
 
 /*
 
-=item C<static void add_pcc_named_param(ARGMOD(imc_info_t *imcc), SymReg *cur_call, SymReg
-*name, SymReg *value)>
+=item C<static void add_pcc_named_param(imc_info_t *imcc, SymReg *cur_call,
+SymReg *name, SymReg *value)>
 
 =cut
 
@@ -612,8 +936,8 @@ add_pcc_named_param(ARGMOD(imc_info_t *imcc), ARGMOD(SymReg *cur_call),
 
 /*
 
-=item C<static void add_pcc_named_return(ARGMOD(imc_info_t *imcc), SymReg *cur_call, SymReg
-*name, SymReg *value)>
+=item C<static void add_pcc_named_return(imc_info_t *imcc, SymReg *cur_call,
+SymReg *name, SymReg *value)>
 
 =cut
 
@@ -632,9 +956,9 @@ add_pcc_named_return(ARGMOD(imc_info_t *imcc), ARGMOD(SymReg *cur_call),
 
 /*
 
-=item C<static void adv_named_set(ARGMOD(imc_info_t *imcc), const char *name)>
+=item C<static void adv_named_set(imc_info_t *imcc, const char *name)>
 
-=item C<static void adv_named_set_u(ARGMOD(imc_info_t *imcc), const char *name)>
+=item C<static void adv_named_set_u(imc_info_t *imcc, const char *name)>
 
 Sets the name of the current named argument.
 
@@ -668,7 +992,7 @@ adv_named_set_u(ARGMOD(imc_info_t *imcc), ARGIN(const char *name))
 
 /*
 
-=item C<static void do_loadlib(ARGMOD(imc_info_t *imcc), const char *lib)>
+=item C<static void do_loadlib(imc_info_t *imcc, const char *lib)>
 
 =cut
 

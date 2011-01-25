@@ -29,7 +29,7 @@ handle info/error/warning messages from imcc
 
 /*
 
-=item C<void IMCC_fatal(PARROT_INTERP, int code, const char *fmt, ...)>
+=item C<void IMCC_fatal(imc_info_t * imcc, int code, const char *fmt, ...)>
 
 Prints out a fatal error message from IMCC and throws an
 IMCC_FATAL_EXCEPTION.
@@ -53,7 +53,7 @@ IMCC_fatal(ARGMOD(imc_info_t * imcc), SHIM(int code), ARGIN(const char *fmt), ..
 
 /*
 
-=item C<void IMCC_fataly(PARROT_INTERP, int code, const char *fmt, ...)>
+=item C<void IMCC_fataly(imc_info_t * imcc, int code, const char *fmt, ...)>
 
 Throws an IMCC_FATALY_EXCEPTION.
 
@@ -76,7 +76,7 @@ IMCC_fataly(ARGMOD(imc_info_t * imcc), SHIM(int code), ARGIN(const char *fmt), .
 
 /*
 
-=item C<void IMCC_fatal_standalone(PARROT_INTERP, int code, const char *fmt,
+=item C<void IMCC_fatal_standalone(imc_info_t * imcc, int code, const char *fmt,
 ...)>
 
 Prints an error message from IMCC and exits Parrot. This is not a
@@ -101,7 +101,7 @@ IMCC_fatal_standalone(ARGMOD(imc_info_t * imcc), int code, ARGIN(const char *fmt
 
 /*
 
-=item C<void IMCC_warning(PARROT_INTERP, const char *fmt, ...)>
+=item C<void IMCC_warning(imc_info_t * imcc, const char *fmt, ...)>
 
 Prints a warning message, but does not throw an exception and does not
 cause Parrot to exit.
@@ -122,7 +122,7 @@ IMCC_warning(ARGMOD(imc_info_t * imcc), ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void IMCC_info(PARROT_INTERP, int level, const char *fmt, ...)>
+=item C<void IMCC_info(imc_info_t * imcc, int level, const char *fmt, ...)>
 
 Prints some information, if the level of the information is higher
 then IMCC's verbose mode.
@@ -147,7 +147,7 @@ IMCC_info(ARGMOD(imc_info_t * imcc), int level, ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void IMCC_debug(PARROT_INTERP, int level, const char *fmt, ...)>
+=item C<void IMCC_debug(imc_info_t * imcc, int level, const char *fmt, ...)>
 
 Prints a debug message, if IMCC's debug mode is turned on.
 
@@ -170,7 +170,7 @@ IMCC_debug(ARGMOD(imc_info_t * imcc), int level, ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void dump_instructions(PARROT_INTERP, const IMC_Unit *unit)>
+=item C<void dump_instructions(imc_info_t * imcc, const IMC_Unit *unit)>
 
 Dumps the current instruction status of IMCC
 
