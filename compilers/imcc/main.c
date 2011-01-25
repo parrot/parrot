@@ -351,40 +351,6 @@ do_pre_process(ARGMOD(imc_info_t *imcc), ARGIN(STRING * sourcefile),
 
 /*
 
-=item C<static void imcc_get_optimization_description(imc_info_t * imcc, int
-opt_level)>
-
-Create list (opt_desc[]) describing optimisation flags.
-
-=cut
-
-*/
-
-static void
-imcc_get_optimization_description(ARGMOD(imc_info_t * imcc), int opt_level)
-{
-    ASSERT_ARGS(imcc_get_optimization_description)
-    int i = 0;
-    char opt_desc[10];
-
-    if (opt_level & (OPT_PRE | OPT_CFG))
-            opt_desc[i++] = '2';
-    else
-        if (opt_level & OPT_PRE)
-            opt_desc[i++] = '1';
-
-    if (opt_level & OPT_PASM)
-        opt_desc[i++] = 'p';
-    if (opt_level & OPT_SUB)
-        opt_desc[i++] = 'c';
-
-    opt_desc[i] = '\0';
-    IMCC_info(imcc, 1, "using optimization '-O%s' (%x) \n",
-              opt_desc, opt_level);
-}
-
-/*
-
 =item C<static PMC * imcc_compile_file(imc_info_t *imcc, STRING *sourcefile)>
 
 Entry point of IMCC, as invoked by Parrot's main function.
@@ -399,38 +365,8 @@ PARROT_CANNOT_RETURN_NULL
 static PMC *
 imcc_compile_string(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source), int is_pasm)
 {
-    ASSERT_ARGS(imcc_run)
-    yyscan_t yyscanner = imcc_get_scanner(imcc);
-    PackFile * const pf_raw = PackFile_new(imcc->interp, 0);
-
-    /* TODO: Don't set current packfile in the interpreter. Leave the
-             interpreter alone */
-    Parrot_pf_set_current_packfile(imcc->interp, pf_raw);
-
-    //IMCC_push_parser_state(imcc, sourcefile, is_pasm ? 1 : 0);
-    imcc_compile_buffer_safe(imcc, yyscanner, source, 0, is_pasm);
-
-    imc_cleanup(imcc, yyscanner);
-    yylex_destroy(yyscanner);
-
-    if (imcc->error_code) {
-        imcc->error_code = IMCC_FATAL_EXCEPTION;
-        IMCC_warning(imcc, "error:imcc:%Ss", imcc->error_message);
-        IMCC_print_inc(imcc);
-
-        return PMCNULL;
-    }
-
-    IMCC_info(imcc, 1, "%ld lines compiled.\n", imcc->line);
-    PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, NULL);
-    PackFile_fixup_subs(imcc->interp, PBC_POSTCOMP, NULL);
-
-    if (pf_raw) {
-        PMC * const pbcpmc = Parrot_pmc_new(imcc->interp, enum_class_UnManagedStruct);
-        VTABLE_set_pointer(imcc->interp, pbcpmc, pf_raw);
-        return pbcpmc;
-    }
-    return PMCNULL;
+    ASSERT_ARGS(imcc_compile_file)
+    return imcc_run_compilation_reentrant(imcc, fullname, 0, is_pasm);
 }
 
 /*
@@ -449,14 +385,28 @@ Called only from src/interp/inter_misc.c:Parrot_compile_file
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
-        int is_pasm)
+imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname), int is_pasm)
 {
     ASSERT_ARGS(imcc_compile_file)
+    return imcc_run_compilation_reentrant(imcc, fullname, 1, is_pasm);
+}
+
+static PMC *
+imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
+        int is_file, int is_pasm)
+{
     PackFile * const pf_raw = PackFile_new(imcc->interp, 0);
     struct _imc_info_t * const imc_save = prepare_reentrant_compile(imcc);
     struct _imc_info_t * imcc_use = imc_save ? imc_save : imcc;
+    PMC * const result = imcc_run_compilation_internal(imcc, fullname, is_file, is_pasm);
+    exit_reentrant_compile(imcc, imc_save);
+    return result;
+}
 
+static PMC *
+imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
+        int is_file, int is_pasm)
+}
     yyscan_t yyscanner = imcc_get_scanner(imcc_use);
 
     /* TODO: Don't set current packfile in the interpreter. Leave the
@@ -477,8 +427,6 @@ imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
 
         return PMCNULL;
     }
-
-    exit_reentrant_compile(imcc, imc_save);
 
     IMCC_info(imcc, 1, "%ld lines compiled.\n", imcc->line);
     PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, NULL);
