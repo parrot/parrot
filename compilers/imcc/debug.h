@@ -35,9 +35,12 @@ void dump_dominance_frontiers(ARGIN(const IMC_Unit *unit))
 void dump_dominators(ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-void dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
+void dump_instructions(
+    ARGMOD(imc_info_t * imcc),
+    ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
 
 void dump_labels(ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1);
@@ -48,41 +51,58 @@ void dump_loops(ARGIN(const IMC_Unit *unit))
 void dump_symreg(ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-void IMCC_debug(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
+void IMCC_debug(
+    ARGMOD(imc_info_t * imcc),
+    int level,
+    ARGIN(const char *fmt),
+    ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc);
 
 PARROT_DOES_NOT_RETURN
-void IMCC_fatal(PARROT_INTERP,
+void IMCC_fatal(
+    ARGMOD(imc_info_t * imcc),
     NULLOK(int code),
     ARGIN(const char *fmt),
     ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc);
 
 PARROT_DOES_NOT_RETURN
-void IMCC_fatal_standalone(PARROT_INTERP,
+void IMCC_fatal_standalone(
+    ARGMOD(imc_info_t * imcc),
     int code,
     ARGIN(const char *fmt),
     ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc);
 
 PARROT_DOES_NOT_RETURN
-void IMCC_fataly(PARROT_INTERP,
+void IMCC_fataly(
+    ARGMOD(imc_info_t * imcc),
     NULLOK(int code),
     ARGIN(const char *fmt),
     ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc);
 
-void IMCC_info(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
+void IMCC_info(
+    ARGMOD(imc_info_t * imcc),
+    int level,
+    ARGIN(const char *fmt),
+    ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc);
 
-void IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
+void IMCC_warning(ARGMOD(imc_info_t * imcc), ARGIN(const char *fmt), ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
 
 #define ASSERT_ARGS_dump_cfg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit))
@@ -91,7 +111,7 @@ void IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
 #define ASSERT_ARGS_dump_dominators __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_dump_instructions __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_dump_labels __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit))
@@ -100,22 +120,22 @@ void IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
 #define ASSERT_ARGS_dump_symreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_IMCC_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(fmt))
 #define ASSERT_ARGS_IMCC_fatal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(fmt))
 #define ASSERT_ARGS_IMCC_fatal_standalone __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(fmt))
 #define ASSERT_ARGS_IMCC_fataly __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(fmt))
 #define ASSERT_ARGS_IMCC_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(fmt))
 #define ASSERT_ARGS_IMCC_warning __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(fmt))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/debug.c */
