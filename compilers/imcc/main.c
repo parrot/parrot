@@ -162,27 +162,6 @@ imcc_new(PARROT_INTERP)
 
 PARROT_EXPORT
 void
-imcc_set_input_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *filename), INTVAL is_pasm)
-{
-    ASSERT_ARGS(imcc_set_input_file)
-    imcc->source = filename;
-    imcc->source_is_file = 1;
-    if (is_pasm)
-        SET_STATE_PASM_FILE(imcc);
-}
-
-PARROT_EXPORT
-void
-imcc_set_input_string(ARGMOD(imc_info_t *imcc), ARGIN(STRING *code), INTVAL is_pasm)
-{
-    ASSERT_ARGS(imcc_set_input_string)
-    imcc->source = code;
-    imcc->source_is_file = 0;
-    if (is_pasm)
-        SET_STATE_PASM_FILE(imcc);
-}
-PARROT_EXPORT
-void
 imcc_set_debug_mode(ARGMOD(imc_info_t *imcc), INTVAL dflags, INTVAL yflags)
 {
     imcc->debug = dflags;
@@ -224,16 +203,49 @@ imcc_set_optimization_level(ARGMOD(imc_info_t *imcc), ARGIN(const char *opts))
     }
 }
 
-/*
+PARROT_EXPORT
+PMC *
+imcc_compile(ARGMOD(imc_info_t *imcc))
+{
+}
 
-=item C<static void do_pre_process(imc_info_t *imcc, STRING * sourcefile,
-yyscan_t yyscanner)>
+yyscan_t
+imcc_get_scanner(ARGMOD(imc_info_t *imcc))
+{
+    yyscan_t yyscanner;
+    yylex_init_extra(imcc, &yyscanner);
+    return yyscanner;
+}
 
-Pre-processor step.  Turn parser's output codes into Parrot instructions.
+void
+imcc_destroy_scanner(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner)
+{
+    yylex_destroy(yyscanner);
+}
 
-=cut
+PARROT_EXPORT
+void
+imcc_preprocess(ARGMOD(imc_info_t *imcc))
+{
+    yyscan_t yyscanner = imcc_get_scanner(imcc);
 
-*/
+    /* Figure out what kind of source file we have -- if we have one */
+    if (!STRING_length(sourcefile))
+        IMCC_fatal_standalone(imcc, 1, "main: No source file specified.\n");
+    else {
+        PIOHANDLE in_file = determine_input_file_type(imcc, sourcefile);
+        if (in_file == PIO_INVALID_HANDLE)
+            IMCC_fatal_standalone(imcc, EXCEPTION_EXTERNAL_ERROR,
+                                  "Error reading source file %Ss.\n",
+                                  sourcefile);
+        imc_yyin_set(in_file, yyscanner);
+    }
+
+    /* TODO: This */
+    //do_pre_process(interp, sourcefile, yyscanner);
+
+}
+
 
 static void
 do_pre_process(ARGMOD(imc_info_t *imcc), ARGIN(STRING * sourcefile),
@@ -375,127 +387,7 @@ imcc_get_optimization_description(ARGMOD(imc_info_t * imcc), int opt_level)
 
 /*
 
-=item C<static PIOHANDLE determine_input_file_type(imc_info_t * imcc, STRING
-*sourcefile)>
-
-Determine whether the sourcefile is a .pir or .pasm file. Sets the appropriate
-flags and returns a C<FILE*> to the opened file.
-
-=cut
-
-*/
-
-static PIOHANDLE
-determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sourcefile))
-{
-    ASSERT_ARGS(determine_input_file_type)
-    PIOHANDLE handle;
-
-    if (!STRING_length(sourcefile))
-        IMCC_fatal_standalone(imcc, 1, "main: No source file specified.\n");
-
-    if (STRING_length(sourcefile) == 1
-            && STRING_ord(imcc->interp, sourcefile, 0) ==  '-') {
-        handle = PIO_STDHANDLE(imcc->interp, PIO_STDIN_FILENO);
-
-        if ((FILE *)handle == NULL) {
-            /*
-             * We have to dup the handle because the stdin fd is 0 on UNIX and
-             * lex would think it's a NULL FILE pointer and reset it to the
-             * stdin FILE pointer.
-             */
-            handle = Parrot_io_dup(imcc->interp, handle);
-        }
-    }
-    else {
-        if (Parrot_stat_info_intval(imcc->interp, sourcefile, STAT_ISDIR))
-            Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_EXTERNAL_ERROR,
-                "imcc_compile_file: '%Ss' is a directory\n", sourcefile);
-
-        handle = PIO_OPEN(imcc->interp, sourcefile, PIO_F_READ);
-        if (handle == PIO_INVALID_HANDLE)
-            IMCC_fatal_standalone(imcc, EXCEPTION_EXTERNAL_ERROR,
-                                  "Error reading source file %Ss.\n",
-                                  sourcefile);
-        if (imcc_string_ends_with(imcc, sourcefile, ".pasm"))
-            SET_STATE_PASM_FILE(imcc);
-    }
-
-    if (imcc->verbose) {
-        IMCC_info(imcc, 1, "debug = 0x%x\n", imcc->debug);
-        IMCC_info(imcc, 1, "Reading %Ss\n", sourcefile);
-    }
-
-    return handle;
-}
-
-/*
-
-=item C<PMC * imcc_run_api(imc_info_t *imcc, STRING *sourcefile, int argc, const
-char **argv)>
-
-This is a wrapper around C<imcc_run> function in which the input parameter is a
-PMC interpreter.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-imcc_run_api(ARGMOD(imc_info_t *imcc), ARGIN(STRING *sourcefile), int argc,
-        ARGIN_NULLOK(const char **argv))
-{
-    ASSERT_ARGS(imcc_run_api)
-
-    imcc_parseflags(imcc, argc, argv);
-    return imcc_run(imcc, sourcefile);
-}
-
-/*
-
-=item C<PMC * imcc_do_preprocess_api(imc_info_t *imcc, STRING *sourcefile, int
-argc, const char **argv)>
-
-Preprocess the input source file and dump the preprocessed text to stdout.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-imcc_do_preprocess_api(ARGMOD(imc_info_t *imcc), ARGIN(STRING *sourcefile),
-        int argc, SHIM(const char **argv))
-{
-    ASSERT_ARGS(imcc_do_preprocess_api)
-    yyscan_t yyscanner;
-    yylex_init_extra(imcc, &yyscanner);
-    UNUSED(argc);
-
-    /* Figure out what kind of source file we have -- if we have one */
-    if (!STRING_length(sourcefile))
-        IMCC_fatal_standalone(imcc, 1, "main: No source file specified.\n");
-    else {
-        PIOHANDLE in_file = determine_input_file_type(imcc, sourcefile);
-        if (in_file == PIO_INVALID_HANDLE)
-            IMCC_fatal_standalone(imcc, EXCEPTION_EXTERNAL_ERROR,
-                                  "Error reading source file %Ss.\n",
-                                  sourcefile);
-        imc_yyin_set(in_file, yyscanner);
-    }
-
-    /* TODO: This */
-    //do_pre_process(interp, sourcefile, yyscanner);
-    yylex_destroy(yyscanner);
-    return PMCNULL;
-}
-
-/*
-
-=item C<static PMC * imcc_run(imc_info_t *imcc, STRING *sourcefile)>
+=item C<static PMC * imcc_compile_file(imc_info_t *imcc, STRING *sourcefile)>
 
 Entry point of IMCC, as invoked by Parrot's main function.
 Compile source code (if required), write bytecode file (if required)
@@ -507,44 +399,86 @@ and run. This function always returns 0.
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-imcc_run(ARGMOD(imc_info_t *imcc), ARGIN(STRING *sourcefile))
+imcc_compile_string(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source), int is_pasm)
 {
     ASSERT_ARGS(imcc_run)
-    yyscan_t yyscanner;
+    yyscan_t yyscanner = imcc_get_scanner(imcc);
     PackFile * const pf_raw = PackFile_new(imcc->interp, 0);
-    const int opt_level = imcc->optimizer_level;
-
-    yylex_init_extra(imcc, &yyscanner);
-    {
-        PIOHANDLE in_file = determine_input_file_type(imcc, sourcefile);
-        imc_yyin_set(in_file, yyscanner);
-    }
-
-    imcc_get_optimization_description(imcc, opt_level);
 
     /* TODO: Don't set current packfile in the interpreter. Leave the
              interpreter alone */
     Parrot_pf_set_current_packfile(imcc->interp, pf_raw);
 
-    IMCC_push_parser_state(imcc, sourcefile, STATE_PASM_FILE(imcc) ? 1 : 0);
-    emit_open(imcc);
+    //IMCC_push_parser_state(imcc, sourcefile, is_pasm ? 1 : 0);
+    imcc_compile_buffer_safe(imcc, yyscanner, source, 0, is_pasm);
 
-    IMCC_info(imcc, 1, "Starting parse...\n");
-    imcc_run_compilation(imcc, yyscanner);
+    imc_cleanup(imcc, yyscanner);
+    yylex_destroy(yyscanner);
+
     if (imcc->error_code) {
         imcc->error_code = IMCC_FATAL_EXCEPTION;
         IMCC_warning(imcc, "error:imcc:%Ss", imcc->error_message);
         IMCC_print_inc(imcc);
 
-        PIO_CLOSE(imcc->interp, imc_yyin_get(yyscanner));
-        imc_cleanup(imcc, yyscanner);
-        yylex_destroy(yyscanner);
-        Parrot_x_jump_out_error(imcc->interp, IMCC_FATAL_EXCEPTION);
+        return PMCNULL;
     }
 
-    imc_cleanup(imcc, yyscanner);
+    IMCC_info(imcc, 1, "%ld lines compiled.\n", imcc->line);
+    PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, NULL);
+    PackFile_fixup_subs(imcc->interp, PBC_POSTCOMP, NULL);
+
+    if (pf_raw) {
+        PMC * const pbcpmc = Parrot_pmc_new(imcc->interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(imcc->interp, pbcpmc, pf_raw);
+        return pbcpmc;
+    }
+    return PMCNULL;
+}
+
+/*
+
+=item C<void * imcc_compile_file(imc_info_t *imcc, STRING *fullname, STRING
+**error_message)>
+
+Compile a file by filename (can be either PASM or IMCC code)
+
+Called only from src/interp/inter_misc.c:Parrot_compile_file
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
+        int is_pasm)
+{
+    ASSERT_ARGS(imcc_compile_file)
+    PackFile * const pf_raw = PackFile_new(imcc->interp, 0);
+    struct _imc_info_t * const imc_info = prepare_reentrant_compile(imcc);
+    yyscan_t yyscanner = imcc_get_scanner(imcc);
+
+    /* TODO: Don't set current packfile in the interpreter. Leave the
+             interpreter alone */
+    Parrot_pf_set_current_packfile(imcc->interp, pf_raw);
+
+    IMCC_push_parser_state(imcc, fullname, is_pasm);
+
+    imcc_compile_buffer_safe(imcc, yyscanner, source, 1, is_pasm);
+
     yylex_destroy(yyscanner);
-    PIO_CLOSE(imcc->interp, imc_yyin_get(yyscanner));
+    imc_cleanup(imcc, NULL);
+
+    if (imcc->error_code) {
+        imcc->error_code = IMCC_FATAL_EXCEPTION;
+        IMCC_warning(imcc, "error:imcc:%Ss", imcc->error_message);
+        IMCC_print_inc(imcc);
+
+        return PMCNULL;
+    }
+
+    imcc = exit_reentrant_compile(imcc, imc_info);
 
     IMCC_info(imcc, 1, "%ld lines compiled.\n", imcc->line);
     PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, NULL);
@@ -574,8 +508,7 @@ FIXME as we have separate constants, the old constants in ghash must be deleted.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-imcc_compile(ARGMOD(imc_info_t *imcc), ARGIN(STRING *s), int pasm_file,
-        ARGOUT(STRING **error_message))
+imcc_compile(ARGMOD(imc_info_t *imcc))
 {
     ASSERT_ARGS(imcc_compile)
     /* imcc always compiles to interp->code
@@ -640,11 +573,8 @@ imcc_compile(ARGMOD(imc_info_t *imcc), ARGIN(STRING *s), int pasm_file,
     if (imc_info)
         imcc->state->next = NULL;
 
-    {
-        const char * code_c = Parrot_str_to_cstring(imcc->interp, s);
-        compile_string(imcc, code_c, yyscanner);
-        Parrot_str_free_cstring(code_c);
-    }
+
+    imcc_compile_buffer_safe(imcc, code_c, yyscanner);
 
     Parrot_pop_context(imcc->interp);
 
@@ -812,59 +742,7 @@ imcc_compile_pir_ex(ARGMOD(imc_info_t *imcc), ARGIN(STRING *s))
             "%Ss", error_message);
 }
 
-/*
 
-=item C<void * imcc_compile_file(imc_info_t *imcc, STRING *fullname, STRING
-**error_message)>
-
-Compile a file by filename (can be either PASM or IMCC code)
-
-Called only from src/interp/inter_misc.c:Parrot_compile_file
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-void *
-imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
-        ARGOUT(STRING **error_message))
-{
-    ASSERT_ARGS(imcc_compile_file)
-    PackFile_ByteCode * const cs_save = Parrot_pf_get_current_code_segment(imcc->interp);
-    PackFile_ByteCode        *cs       = NULL;
-    struct _imc_info_t * const imc_info = prepare_reentrant_compile(imcc);
-    PIOHANDLE fp = determine_input_file_type(imcc, fullname);
-    const int is_pasm = imcc_string_ends_with(imcc, fullname, ".pasm");
-    yyscan_t yyscanner;
-
-    IMCC_push_parser_state(imcc, fullname, is_pasm);
-    yylex_init_extra(imcc, &yyscanner);
-
-    /* start over; let the start of line rule increment this to 1 */
-    imcc->line = 0;
-    imcc->cur_namespace = NULL;
-    imcc->interp->code = NULL;
-
-    compile_file(imcc, fp, yyscanner);
-
-    yylex_destroy(yyscanner);
-    imc_cleanup(imcc, NULL);
-    PIO_CLOSE(imcc->interp, fp);
-
-    if (!imcc->error_code)
-        cs = Parrot_pf_get_current_code_segment(imcc->interp);
-    else
-        *error_message = imcc->error_message;
-
-    if (cs_save)
-        (void)Parrot_switch_to_cs(imcc->interp, cs_save, 0);
-
-    imcc = exit_reentrant_compile(imcc, imc_info);
-
-    return cs;
-}
 
 /*
 
@@ -895,6 +773,10 @@ prepare_reentrant_compile(ARGMOD(imc_info_t * imcc))
         imc_info->prev  = imcc;
         imc_info->ghash = imcc->ghash;
         imcc            = imc_info;
+        /* start over; let the start of line rule increment this to 1 */
+        imcc->line = 0;
+        imcc->cur_namespace = NULL;
+        imcc->interp->code = NULL;
     }
     return imc_info;
 }
