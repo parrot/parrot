@@ -71,6 +71,30 @@ extern op_lib_t core_op_lib;
 #include "pmc/pmc_sub.h"
 #include "parrot/sub.h"
 
+static int
+handler_is_used(PARROT_INTERP, ARGIN(PMC *handler)) {
+    PMC *ctx, *handlers;
+    ctx = CURRENT_CONTEXT(interp);
+
+    while (!PMC_IS_NULL(ctx)) {
+        handlers = Parrot_pcc_get_handlers(interp, ctx);
+
+        if (!PMC_IS_NULL(handlers)) {
+            PMC *iter = VTABLE_get_iter(interp, handlers);
+            while (!PMC_IS_NULL(iter) && VTABLE_get_bool(interp, iter)) {
+                PMC * const test = VTABLE_shift_pmc(interp, iter);
+                if (test == handler)
+                    return 1;
+            }
+        }
+
+        /* Continue the search in the next context up the chain. */
+        ctx = Parrot_pcc_get_caller_ctx(interp, ctx);
+    }
+
+    return 0;
+}
+
 
 
 INTVAL core_numops = 1073;
@@ -25844,7 +25868,7 @@ Parrot_push_cached_eh_i_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     eh = VTABLE_get_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE));
 
     /* Create new ExceptionHandler if there is none */
-    if (PMC_IS_NULL(eh)) {
+    if (PMC_IS_NULL(eh) || handler_is_used(interp, eh)) {
         eh = Parrot_pmc_new_init_int(interp, enum_class_ExceptionHandler, IREG(1));
         VTABLE_set_pointer(interp, eh, CUR_OPCODE + ICONST(2));
         VTABLE_set_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE), eh);
@@ -25878,7 +25902,7 @@ Parrot_push_cached_eh_ic_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     eh = VTABLE_get_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE));
 
     /* Create new ExceptionHandler if there is none */
-    if (PMC_IS_NULL(eh)) {
+    if (PMC_IS_NULL(eh) || handler_is_used(interp, eh)) {
         eh = Parrot_pmc_new_init_int(interp, enum_class_ExceptionHandler, ICONST(1));
         VTABLE_set_pointer(interp, eh, CUR_OPCODE + ICONST(2));
         VTABLE_set_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE), eh);
@@ -25912,7 +25936,7 @@ Parrot_push_cached_eh_ic(opcode_t *cur_opcode, PARROT_INTERP)  {
     eh = VTABLE_get_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE));
 
     /* Create new ExceptionHandler if there is none */
-    if (PMC_IS_NULL(eh)) {
+    if (PMC_IS_NULL(eh) || handler_is_used(interp, eh)) {
         eh = Parrot_pmc_new(interp, enum_class_ExceptionHandler);
         VTABLE_set_pointer(interp, eh, CUR_OPCODE + ICONST(1));
         VTABLE_set_pmc_keyed_int(interp, sub->eh_cache, PTR2INTVAL(CUR_OPCODE), eh);
