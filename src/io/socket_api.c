@@ -301,7 +301,6 @@ Parrot_io_connect_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 
     /* Connect to an IPv6 addrinfo if an UnManagedStruct was provided as address */
     if (!PMC_IS_NULL(address) && address->vtable->base_type == enum_class_UnManagedStruct) {
-        fprintf(stderr, "Connecting to IPv6 addr\n");
         res = VTABLE_get_pointer(interp, address);
 
         for (walk = res; walk != NULL; walk = walk->ai_next) {
