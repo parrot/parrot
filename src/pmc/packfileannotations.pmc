@@ -158,12 +158,6 @@ thrown unless all of the following criteria are met:
                     entity_attrs->str_value, &dummy);
                 break;
 
-            case PF_ANNOTATION_KEY_TYPE_NUM:
-                Parrot_mmd_multi_dispatch_from_c_args(INTERP,
-                    "get_or_create_constant", "PN->I", attrs->const_table,
-                    entity_attrs->num_value, &dummy);
-                break;
-
             default:
                 /* Do nothing. If value_type if INT it will be stored directly */
                 break;
@@ -218,6 +212,8 @@ Initialize PackfileAnnotations from PackFile_Annotations*.
         PMC      *annotation;
         Parrot_PackfileAnnotation_attributes *annotation_attrs;
 
+        Parrot_ex_throw_from_c_args(interp, NULL, 0, "TODO");
+#if 0
         /* Copy annotations to own array */
         VTABLE_set_integer_native(INTERP, attrs->annotations, a->num_entries);
         for (i = 0; i < a->num_entries; ++i) {
@@ -253,6 +249,7 @@ Initialize PackfileAnnotations from PackFile_Annotations*.
 
             VTABLE_set_pmc_keyed_int(INTERP, attrs->annotations, i, annotation);
         }
+#endif
     }
 
 /*
@@ -301,6 +298,8 @@ Create PackFile_Annotations* from self.
         types       = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
         last_key_id = -1;
 
+        Parrot_ex_throw_from_c_args(interp, NULL, 0, "TODO");
+#if 0
         /* Iterate over stored annotations and create Key if required. */
         num = VTABLE_elements(INTERP, attrs->annotations);
         res->num_entries = num;
@@ -379,6 +378,7 @@ Create PackFile_Annotations* from self.
         }
 
         return res;
+#endif
     }
 
 /*

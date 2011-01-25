@@ -227,33 +227,32 @@ typedef struct PackFile_Debug {
     PackFile_ByteCode      *code;   /* where this segment belongs to */
 } PackFile_Debug;
 
+#define ANN_ENTRY_OFF 0
+#define ANN_ENTRY_VAL 1
+
 /* &gen_from_def(packfile_annotation_key_type.pasm) */
 
 /* Key types for annotation segment. */
-#define PF_ANNOTATION_KEY_TYPE_INT 0
-#define PF_ANNOTATION_KEY_TYPE_STR 1
-#define PF_ANNOTATION_KEY_TYPE_NUM 2
+typedef enum {
+    PF_ANNOTATION_KEY_TYPE_INT = 1,
+    PF_ANNOTATION_KEY_TYPE_STR = 2,
+    PF_ANNOTATION_KEY_TYPE_PMC = 3
+} pf_ann_key_type_t;
 
 /* &end_gen */
 
 typedef struct PackFile_Annotations_Key {
-    opcode_t name;
-    opcode_t type;
+    UINTVAL           name;
+    pf_ann_key_type_t type;
+    UINTVAL           start;
+    UINTVAL           len;
 } PackFile_Annotations_Key;
 
-typedef struct PackFile_Annotations_Entry {
-    opcode_t bytecode_offset;
-    opcode_t key;
-    opcode_t value;
-} PackFile_Annotations_Entry;
-
 typedef struct PackFile_Annotations {
-    PackFile_Segment            base;
-    opcode_t                    num_keys;
-    PackFile_Annotations_Key    *keys;
-    opcode_t                    num_entries;
-    PackFile_Annotations_Entry  *entries;
+    PackFile_Segment             base;
     PackFile_ByteCode           *code;
+    opcode_t                     num_keys;
+    PackFile_Annotations_Key    *keys;
 } PackFile_Annotations;
 
 typedef struct PackFile_Directory {

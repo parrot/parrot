@@ -191,41 +191,8 @@ Set the string value of the annotation.
         attrs->value_type = PF_ANNOTATION_KEY_TYPE_STR;
         attrs->str_value  = value;
     }
-
-/*
-
-=item C<INTVAL get_number()>
-
-Fetch the float value of the annotation.
-
-=cut
-
-*/
-    VTABLE FLOATVAL get_number() {
-        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
-        if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_NUM)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "Trying to fetch wrong type of value from annotation");
-        return attrs->num_value;
-    }
-
-
-/*
-
-=item C<void set_number_native(INTVAL value)>
-
-Set the float value of the annotation.
-
-=cut
-
-*/
-    VTABLE void set_number_native(FLOATVAL value) {
-        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
-        attrs->value_type = PF_ANNOTATION_KEY_TYPE_NUM;
-        attrs->num_value  = value;
-    }
-
 }
+
 /*
 
 =back

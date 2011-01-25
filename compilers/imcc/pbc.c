@@ -2279,9 +2279,6 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
           case 'I':
             annotation_type = PF_ANNOTATION_KEY_TYPE_INT;
             break;
-          case 'N':
-            annotation_type = PF_ANNOTATION_KEY_TYPE_NUM;
-            break;
           case 'S':
             annotation_type = PF_ANNOTATION_KEY_TYPE_STR;
             break;
