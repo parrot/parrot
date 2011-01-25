@@ -28,8 +28,8 @@ pmclass PackfileAnnotation auto_attrs {
     ATTR INTVAL     value_type;
     /* This 3 attributes should be in single union. But Pmc2c isn't smart enough to handle it */
     ATTR INTVAL     int_value;
-    ATTR FLOATVAL   num_value;
     ATTR STRING    *str_value;
+    ATTR PMC       *pmc_value;
 
 /*
 

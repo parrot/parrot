@@ -3868,14 +3868,13 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
         opcode_t offset, opcode_t key, opcode_t type, opcode_t value)
 {
     ASSERT_ARGS(PackFile_Annotations_add_entry)
-    /* See if we already have this key. */
-    STRING  * const key_name = self->code->const_table->str.constants[key];
     opcode_t key_id   = -1;
     INTVAL   i, idx;
 
+    /* See if we already have this key. */
     for (i = 0; i < self->num_keys; ++i) {
-        STRING * const test_key = self->code->const_table->str.constants[self->keys[i].name];
-        if (STRING_equal(interp, test_key, key_name)) {
+        opcode_t test_key = self->keys[i].name;
+        if (key == test_key) {
             key_id = i;
             break;
         }
@@ -3906,7 +3905,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION,
                 "Annotations with different types of value used for key '%S'\n",
-                key_name);
+                self->code->const_table->str.constants[self->keys[key_id].name]);
     }
 
     /* Lookup position where value will be inserted. */
