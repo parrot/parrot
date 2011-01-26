@@ -310,10 +310,7 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
     sa_attrs->len      = addr_len;
     sa_attrs->pointer  = sa;
 
-    if (STRING_IS_NULL(addr))
-        host = "localhost";
-    else
-        host = Parrot_str_to_cstring(interp, addr);
+    host = Parrot_str_to_cstring(interp, addr);
 
 #  ifdef _WIN32
     sa->sin_addr.S_un.S_addr = inet_addr(host);
@@ -323,7 +320,7 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
     success = inet_aton(host, &sa->sin_addr) != 0;
 #    else
     /* positive retval is success */
-    success = inet_pton(family, host, &sa->sin_addr) > 0;
+    success = inet_pton(PF_INET, host, &sa->sin_addr) > 0;
 #    endif
 #  endif
 
@@ -345,7 +342,7 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
 
     Parrot_str_free_cstring(host);
 
-    sa->sin_family = family;
+    sa->sin_family = PF_INET;
     sa->sin_port = htons(port);
 
     array = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
