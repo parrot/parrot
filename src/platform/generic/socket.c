@@ -132,6 +132,7 @@ PMC *
 Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
         INTVAL protocol, INTVAL family, INTVAL passive)
 {
+#ifdef PARROT_HAS_IPV6
     char *s;
     PMC *array;
 
@@ -169,14 +170,88 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
 
     for (walk = ai; walk; walk = ai->ai_next) {
         PMC *sockaddr = Parrot_pmc_new(interp, enum_class_Sockaddr);
+        Parrot_Sockaddr_attributes *sa_attrs = PARROT_SOCKADDR(sockaddr);
 
-        VTABLE_set_pointer(interp, sockaddr, walk);
+        sa_attrs->type     = walk->ai_socktype;
+        sa_attrs->protocol = walk->ai_protocol;
+        sa_attrs->len      = walk->ai_addrlen;
+        sa_attrs->pointer  = Parrot_gc_allocate_memory_chunk(interp,
+                                    walk->ai_addrlen);
+
+        memcpy(sa_attrs->pointer, walk->ai_addr, walk->ai_addrlen);
+
         VTABLE_push_pmc(interp, array, sockaddr);
     }
 
     freeaddrinfo(ai);
 
     return array;
+
+#else /* PARROT_HAS_IPV6 */
+
+    char *host;
+    int   success;
+    PMC  *sockaddr;
+    PMC  *array;
+
+    const size_t addr_len = sizeof (struct sockaddr_in);
+    struct sockaddr_in *sa;
+
+    Parrot_Sockaddr_attributes *sa_attrs;
+
+    sa       = (struct sockaddr_in *)Parrot_gc_allocate_memory_chunk(interp,
+                                            addr_len);
+    sockaddr = Parrot_pmc_new(interp, enum_class_Sockaddr);
+    sa_attrs = PARROT_SOCKADDR(sockaddr);
+
+    sa_attrs->type     = 0;
+    sa_attrs->protocol = 0;
+    sa_attrs->len      = addr_len;
+    sa_attrs->pointer  = sa;
+
+    if (STRING_IS_NULL(addr))
+        host = "localhost";
+    else
+        host = Parrot_str_to_cstring(interp, addr);
+
+#  ifdef _WIN32
+    sa->sin_addr.S_un.S_addr = inet_addr(host);
+    success = sa->sin_addr.S_un.S_addr != -1;
+#  else
+#    ifdef PARROT_DEF_INET_ATON
+    success = inet_aton(host, &sa->sin_addr) != 0;
+#    else
+    /* positive retval is success */
+    success = inet_pton(family, host, &sa->sin_addr) > 0;
+#    endif
+#  endif
+
+    if (!success) {
+        /* Maybe it is a hostname, try to lookup */
+        /* XXX Check PIO option before doing a name lookup,
+         * it may have been toggled off.
+         */
+        struct hostent *he = gethostbyname(host);
+
+        if (!he) {
+            Parrot_str_free_cstring(host);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                    "getaddrinfo failed: %s", host);
+        }
+
+        memcpy((char*)&sa->sin_addr, he->h_addr, sizeof (sa->sin_addr));
+    }
+
+    Parrot_str_free_cstring(host);
+
+    sa->sin_family = family;
+    sa->sin_port = htons(port);
+
+    array = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+    VTABLE_push_pmc(interp, array, sockaddr);
+
+    return array;
+#endif /* PARROT_HAS_IPV6 */
 }
 
 /*
@@ -194,9 +269,11 @@ socket type and protocol number.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_io_getnameinfo(PARROT_INTERP, ARGIN(const void *sa), INTVAL len)
+Parrot_io_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL len)
 {
     /* TODO: get hostname, not only numeric */
+
+#ifdef PARROT_HAS_IPV6
     char buf[INET6_ADDRSTRLEN+1];
     /* numeric port maximum is 65535, so 5 chars */
     char portbuf[6];
@@ -205,6 +282,14 @@ Parrot_io_getnameinfo(PARROT_INTERP, ARGIN(const void *sa), INTVAL len)
             portbuf, sizeof (portbuf), NI_NUMERICHOST | NI_NUMERICSERV);
 
     return Parrot_str_format_data(interp, "%s:%s", buf, portbuf);
+
+#else /* PARROT_HAS_IPV6 */
+
+    const struct sockaddr_in *sa = (const struct sockaddr_in *)addr;
+    char *buf = inet_ntoa(sa->sin_addr);
+
+    return Parrot_str_format_data(interp, "%s:%u", buf, ntohs(sa->sin_port));
+#endif /* PARROT_HAS_IPV6 */
 }
 
 /*
