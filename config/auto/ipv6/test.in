@@ -14,6 +14,7 @@ Copyright (C) 2010, Parrot Foundation.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int main(int argc, char *argv[]) {
 #ifdef _WIN32
