@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008, Parrot Foundation.
+Copyright (C) 2008-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -211,7 +211,8 @@ including family and protocol. It can be passed to C<bind()> or C<connect()>.
 =cut
 
 */
-    METHOD getaddrinfo(STRING * address, INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive) {
+    METHOD getaddrinfo(STRING * address,
+                       INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive) {
         PMC * res = Parrot_io_getaddrinfo(INTERP, address, port, protocol, family, passive);
         RETURN(PMC * res);
     }
