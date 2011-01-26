@@ -29,7 +29,7 @@ in case of test failures.
     sock = new 'Socket'
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
     address = sock.'getaddrinfo'(null_string, 1234, .PIO_PROTO_TCP, .PIO_PF_INET6, 0)
-    status = sock.'bind'(address)
+    sock.'bind'(address)
     sock.'listen'(5)
 
     say 'Server started'

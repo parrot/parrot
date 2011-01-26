@@ -85,9 +85,9 @@ INTVAL Parrot_io_addr_match(PARROT_INTERP, ARGIN(PMC *sa), INTVAL family, INTVAL
             INTVAL protocol);
 STRING *Parrot_io_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL addr_len);
 PIOHANDLE Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto);
-INTVAL Parrot_io_connect(PARROT_INTERP, PIOHANDLE handle, ARGIN(void *addr), INTVAL addr_len);
-INTVAL Parrot_io_bind(PARROT_INTERP, PIOHANDLE handle, ARGIN(void *addr), INTVAL addr_len);
-INTVAL Parrot_io_listen(PARROT_INTERP, PIOHANDLE handle, INTVAL sec);
+void Parrot_io_connect(PARROT_INTERP, PIOHANDLE handle, ARGIN(void *addr), INTVAL addr_len);
+void Parrot_io_bind(PARROT_INTERP, PIOHANDLE handle, ARGIN(void *addr), INTVAL addr_len);
+void Parrot_io_listen(PARROT_INTERP, PIOHANDLE handle, INTVAL sec);
 PIOHANDLE Parrot_io_accept(PARROT_INTERP, PIOHANDLE handle, ARGOUT(PMC * remote_addr));
 INTVAL Parrot_io_send(PARROT_INTERP, PIOHANDLE handle, ARGIN(const char *buf), size_t len);
 INTVAL Parrot_io_recv(PARROT_INTERP, PIOHANDLE handle, ARGOUT(char *buf), size_t len);

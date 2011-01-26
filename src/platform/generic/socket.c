@@ -207,7 +207,7 @@ Very minimal stubs for now, maybe someone will run with these.
 /*
 
 =item C<PMC * Parrot_io_getaddrinfo(PARROT_INTERP, STRING *addr, INTVAL port,
-INTVAL protocol, INTVAL family, INTVAL passive)>
+INTVAL protocol, INTVAL fam, INTVAL passive)>
 
 C<Parrot_io_getaddrinfo()> calls get_addrinfo() to convert hostnames or IP
 addresses to sockaddrs (and more) and returns an Addrinfo PMC which can be
@@ -221,15 +221,11 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
-        INTVAL protocol, INTVAL family, INTVAL passive)
+        INTVAL protocol, INTVAL fam, INTVAL passive)
 {
 #ifdef PARROT_HAS_IPV6
     char *s;
     PMC *array;
-
-    /* set family: 0 means any (AF_INET or AF_INET6) for getaddrinfo, so treat
-     * it specially */
-    int fam = (family != 0 ? pio_pf[family] : 0);
 
     struct addrinfo hints;
     struct addrinfo *ai, *walk;
@@ -243,6 +239,13 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
         s = NULL;
     else
         s = Parrot_str_to_cstring(interp, addr);
+
+    /* convert Parrot's family to system family */
+    if (fam < 0
+    ||  fam >= PIO_PF_MAX
+    || (fam = pio_pf[fam]) < 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "unsupported protocol family: %ld", fam);
 
     memset(&hints, 0, sizeof (struct addrinfo));
     if (passive)
@@ -259,7 +262,7 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
 
     array = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
-    for (walk = ai; walk; walk = ai->ai_next) {
+    for (walk = ai; walk; walk = walk->ai_next) {
         PMC *sockaddr = Parrot_pmc_new(interp, enum_class_Sockaddr);
         Parrot_Sockaddr_attributes *sa_attrs = PARROT_SOCKADDR(sockaddr);
 
@@ -349,8 +352,8 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
 
 /*
 
-=item C<INTVAL Parrot_io_addr_match(PARROT_INTERP, PMC *sa, INTVAL family,
-INTVAL type, INTVAL protocol)>
+=item C<INTVAL Parrot_io_addr_match(PARROT_INTERP, PMC *sa, INTVAL fam, INTVAL
+type, INTVAL protocol)>
 
 Returns true if the address C<sa> matches C<family>, C<type> and C<protocol>.
 
@@ -359,15 +362,24 @@ Returns true if the address C<sa> matches C<family>, C<type> and C<protocol>.
 */
 
 INTVAL
-Parrot_io_addr_match(PARROT_INTERP, ARGIN(PMC *sa), INTVAL family,
+Parrot_io_addr_match(PARROT_INTERP, ARGIN(PMC *sa), INTVAL fam,
         INTVAL type, INTVAL protocol)
 {
     Parrot_Sockaddr_attributes * const sa_data = PARROT_SOCKADDR(sa);
 
-    family = pio_pf[family];
-    type   = pio_sock[type];
+    /* convert Parrot's family to system family */
+    if (fam < 0
+    ||  fam >= PIO_PF_MAX
+    || (fam = pio_pf[fam]) < 0)
+        return 0;
 
-    return sa_data->family   == family
+    /* convert Parrot's socket type to system type */
+    if (type < 0
+    ||  type >= PIO_SOCK_MAX
+    || (type = pio_sock[type]) < 0)
+        return 0;
+
+    return sa_data->family   == fam
     &&    (sa_data->type     == 0
     ||     sa_data->type     == type)
     &&    (sa_data->protocol == 0
@@ -431,23 +443,24 @@ Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto)
     const int value = 1;
 
     /* convert Parrot's family to system family */
-    if (fam < 0 || fam >= PIO_PF_MAX)
-        return PIO_INVALID_HANDLE;
-    fam = pio_pf[fam];
-    if (fam < 0)
-        return PIO_INVALID_HANDLE;
+    if (fam < 0
+    ||  fam >= PIO_PF_MAX
+    || (fam = pio_pf[fam]) < 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "unsupported protocol family: %ld", fam);
 
     /* convert Parrot's socket type to system type */
-    if (type < 0 || type >= PIO_SOCK_MAX)
-        return PIO_INVALID_HANDLE;
-    type = pio_sock[type];
-    if (type < 0)
-        return PIO_INVALID_HANDLE;
+    if (type < 0
+    ||  type >= PIO_SOCK_MAX
+    || (type = pio_sock[type]) < 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "unsupported socket type: %ld", type);
 
     sock = socket(fam, type, proto);
 
     if (sock == PIO_INVALID_SOCKET)
-        return PIO_INVALID_HANDLE;
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "creating socket failed: %d", PIO_SOCK_ERRNO);
 
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &value, sizeof (value));
 
@@ -461,7 +474,7 @@ Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto)
 
 /*
 
-=item C<INTVAL Parrot_io_connect(PARROT_INTERP, PIOHANDLE os_handle, void *addr,
+=item C<void Parrot_io_connect(PARROT_INTERP, PIOHANDLE os_handle, void *addr,
 INTVAL addr_len)>
 
 Connects C<*io>'s socket to address C<*r>.
@@ -470,7 +483,7 @@ Connects C<*io>'s socket to address C<*r>.
 
 */
 
-INTVAL
+void
 Parrot_io_connect(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(void *addr),
         INTVAL addr_len)
 {
@@ -482,18 +495,17 @@ AGAIN:
           case PIO_SOCK_EINPROGRESS:
             goto AGAIN;
           case PIO_SOCK_EISCONN:
-            return 0;
+            return;
           default:
-            return -1;
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                    "connect failed: %d", PIO_SOCK_ERRNO);
         }
     }
-
-    return 0;
 }
 
 /*
 
-=item C<INTVAL Parrot_io_bind(PARROT_INTERP, PIOHANDLE os_handle, void *addr,
+=item C<void Parrot_io_bind(PARROT_INTERP, PIOHANDLE os_handle, void *addr,
 INTVAL addr_len)>
 
 Binds C<*io>'s socket to the local address and port specified by C<*l>.
@@ -502,20 +514,18 @@ Binds C<*io>'s socket to the local address and port specified by C<*l>.
 
 */
 
-INTVAL
+void
 Parrot_io_bind(PARROT_INTERP, PIOHANDLE os_handle, ARGMOD(void *addr),
         INTVAL addr_len)
 {
-    if (bind((PIOSOCKET)os_handle, (struct sockaddr *)addr, addr_len) != 0) {
-        return -1;
-    }
-
-    return 0;
+    if (bind((PIOSOCKET)os_handle, (struct sockaddr *)addr, addr_len) != 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "connect failed: %d", PIO_SOCK_ERRNO);
 }
 
 /*
 
-=item C<INTVAL Parrot_io_listen(PARROT_INTERP, PIOHANDLE os_handle, INTVAL sec)>
+=item C<void Parrot_io_listen(PARROT_INTERP, PIOHANDLE os_handle, INTVAL sec)>
 
 Listen for new connections. This is only applicable to C<STREAM> or
 C<SEQ> sockets.
@@ -524,13 +534,12 @@ C<SEQ> sockets.
 
 */
 
-INTVAL
-Parrot_io_listen(SHIM_INTERP, PIOHANDLE os_handle, INTVAL sec)
+void
+Parrot_io_listen(PARROT_INTERP, PIOHANDLE os_handle, INTVAL sec)
 {
-    if ((listen((PIOSOCKET)os_handle, sec)) == -1) {
-        return -1;
-    }
-    return 0;
+    if (listen((PIOSOCKET)os_handle, sec) != 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "listen failed: %d", PIO_SOCK_ERRNO);
 }
 
 /*
@@ -550,7 +559,8 @@ PIOHANDLE
 Parrot_io_accept(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(PMC * remote_addr))
 {
     Parrot_Socklen_t addr_len = sizeof (struct sockaddr_storage);
-    struct sockaddr_storage *addr = Parrot_gc_allocate_memory_chunk(interp,
+    struct sockaddr_storage *addr =
+        (struct sockaddr_storage *)Parrot_gc_allocate_memory_chunk(interp,
                                         addr_len);
     Parrot_Sockaddr_attributes *sa_attrs = PARROT_SOCKADDR(remote_addr);
     PIOSOCKET newsock;
@@ -607,7 +617,7 @@ AGAIN:
             goto AGAIN;
           default:
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                    "Write error: %d", PIO_SOCK_ERRNO);
+                    "send failed: %d", PIO_SOCK_ERRNO);
         }
     }
 }
@@ -641,7 +651,7 @@ AGAIN:
             goto AGAIN;
           default:
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                    "Read error: %d", PIO_SOCK_ERRNO);
+                    "recv failed: %d", PIO_SOCK_ERRNO);
         }
     }
 }
@@ -668,11 +678,12 @@ the read buffer.
 */
 
 INTVAL
-Parrot_io_poll(SHIM_INTERP, PIOHANDLE os_handle, int which, int sec,
+Parrot_io_poll(PARROT_INTERP, PIOHANDLE os_handle, int which, int sec,
     int usec)
 {
     fd_set r, w, e;
     struct timeval t;
+    int n;
     PIOSOCKET sock = (PIOSOCKET)os_handle;
 
     t.tv_sec = sec;
@@ -683,19 +694,21 @@ Parrot_io_poll(SHIM_INTERP, PIOHANDLE os_handle, int which, int sec,
     if (which & 2) FD_SET(sock, &w);
     if (which & 4) FD_SET(sock, &e);
 AGAIN:
-    if ((select(sock + 1, &r, &w, &e, &t)) >= 0) {
-        int n;
-        n = (FD_ISSET(sock, &r) ? 1 : 0);
-        n |= (FD_ISSET(sock, &w) ? 2 : 0);
-        n |= (FD_ISSET(sock, &e) ? 4 : 0);
-        return n;
-    }
-    else {
+    if (select(sock + 1, &r, &w, &e, &t) < 0) {
         switch (PIO_SOCK_ERRNO) {
-            case PIO_SOCK_EINTR:  goto AGAIN;
-            default:              return -1;
+            case PIO_SOCK_EINTR:
+                goto AGAIN;
+            default:
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                        "select failed: %d", PIO_SOCK_ERRNO);
         }
     }
+
+    n  = (FD_ISSET(sock, &r) ? 1 : 0);
+    n |= (FD_ISSET(sock, &w) ? 2 : 0);
+    n |= (FD_ISSET(sock, &e) ? 4 : 0);
+
+    return n;
 }
 
 /*
