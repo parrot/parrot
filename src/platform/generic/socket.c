@@ -15,6 +15,13 @@ src/platform/generic/socket.c - UNIX socket functions
 
 */
 
+#ifdef _WIN32
+#  include <ws2tcpip.h>
+#  undef CONST
+#else
+#  include <sys/socket.h>
+#endif
+
 #include "parrot/parrot.h"
 #include "../../io/io_private.h"
 #include "pmc/pmc_socket.h"
@@ -58,6 +65,12 @@ typedef SOCKET PIOSOCKET;
 
 typedef int PIOSOCKET;
 
+#endif
+
+#if PARROT_HAS_SOCKLEN_T
+typedef socklen_t Parrot_Socklen_t;
+#else
+typedef int Parrot_Socklen_t;
 #endif
 
 /* HEADERIZER HFILE: none */
@@ -165,10 +178,10 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
         s = Parrot_str_to_cstring(interp, addr);
 
     memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_protocol = protocol;
     if (passive)
         hints.ai_flags = AI_PASSIVE;
     hints.ai_family = fam;
+    hints.ai_protocol = protocol;
     snprintf(portstr, sizeof(portstr), "%ld", port);
 
     if ((ret = getaddrinfo(s, portstr, &hints, &ai)) != 0)
@@ -193,6 +206,33 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
 
 /*
 
+=item C<PIOHANDLE Parrot_io_getnameinfo(PARROT_INTERP, int fam, int type, int proto)>
+
+Uses C<socket()> to create a socket with the specified address family,
+socket type and protocol number.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_io_getnameinfo(PARROT_INTERP, ARGIN(const void *sa), INTVAL len)
+{
+    /* TODO: get hostname, not only numeric */
+    char buf[INET6_ADDRSTRLEN+1];
+    /* numeric port maximum is 65535, so 5 chars */
+    char portbuf[6];
+
+    getnameinfo((const struct sockaddr *)sa, len, buf, sizeof(buf),
+            portbuf, sizeof(portbuf), NI_NUMERICHOST | NI_NUMERICSERV);
+
+    return Parrot_str_format_data(interp, "%s:%s", buf, portbuf);
+}
+
+/*
+
 =item C<PIOHANDLE Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto)>
 
 Uses C<socket()> to create a socket with the specified address family,
@@ -203,17 +243,21 @@ socket type and protocol number.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
 PIOHANDLE
 Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto)
 {
     const PIOSOCKET sock = socket(fam, type, proto);
-    int i = 1;
+    const int value = 1;
 
     if (sock == PIO_INVALID_SOCKET)
         return PIO_INVALID_HANDLE;
 
-    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &i, sizeof (i));
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &value, sizeof (value));
+
+#ifdef IPV6_V6ONLY
+    if (fam == AF_INET6)
+        setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, &value, sizeof (value));
+#endif
 
     return (PIOHANDLE)sock;
 }

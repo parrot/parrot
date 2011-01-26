@@ -80,6 +80,7 @@ INTVAL Parrot_io_pipe(PARROT_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE
  */
 
 PMC *Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive);
+STRING *Parrot_io_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL addr_len);
 PIOHANDLE Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto);
 INTVAL Parrot_io_connect(PARROT_INTERP, PIOHANDLE handle, ARGIN(void *addr), INTVAL addr_len);
 INTVAL Parrot_io_bind(PARROT_INTERP, PIOHANDLE handle, ARGIN(void *addr), INTVAL addr_len);

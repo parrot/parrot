@@ -317,7 +317,8 @@ Parrot_io_connect_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
                 (struct sockaddr_storage *)sa_data->pointer;
 
             if (ss->ss_family     != io->family
-            ||  sa_data->type     != io->type
+            || (sa_data->type     != io->type
+            &&  sa_data->type     != 0)
             ||  sa_data->protocol != io->protocol)
                 continue;
 
@@ -375,19 +376,10 @@ Parrot_io_bind_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
                 (struct sockaddr_storage *)sa_data->pointer;
 
             if (ss->ss_family     != io->family
-            ||  sa_data->type     != io->type
+            || (sa_data->type     != io->type
+            &&  sa_data->type     != 0)
             ||  sa_data->protocol != io->protocol)
                 continue;
-
-            /* TODO: move this to platform specific code */
-            if (io->family == AF_INET6) {
-                const int value = 1;
-
-                if (setsockopt(io->os_handle, IPPROTO_IPV6, IPV6_V6ONLY,
-                            &value, sizeof (value)) == -1) {
-                    perror("Error setting IPV6_V6ONLY:");
-                }
-            }
 
             io->local = sa;
 

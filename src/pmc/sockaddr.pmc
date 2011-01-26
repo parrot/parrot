@@ -170,17 +170,11 @@ Returns the string representation of this sockaddr by calling C<getnameinfo(3)>.
 */
     VTABLE STRING *get_string() {
         Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
-        /* TODO: get hostname, not only numeric */
-        char buf[INET6_ADDRSTRLEN+1];
-        /* numeric port maximum is 65535, so 5 chars */
-        char portbuf[6];
 
         if (!data->pointer)
             return Parrot_sprintf_c(interp, "(?)");
 
-        getnameinfo((struct sockaddr *)data->pointer, data->len, buf,
-                sizeof(buf), portbuf, sizeof(portbuf), NI_NUMERICHOST | NI_NUMERICSERV);
-        return Parrot_str_format_data(interp, "%s:%s", buf, portbuf);
+        return Parrot_io_getnameinfo(INTERP, data->pointer, data->len);
     }
 
 
