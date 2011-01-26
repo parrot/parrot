@@ -26,10 +26,6 @@
 #  endif
 #  include <ws2tcpip.h>
 #  undef CONST
-#else
-#  include <sys/types.h>
-#  include <sys/socket.h>
-#  include <netdb.h>
 #endif
 
 
