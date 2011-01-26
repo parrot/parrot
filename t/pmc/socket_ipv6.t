@@ -24,7 +24,7 @@ IPv6-related tests for the Socket PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(16)
+    plan(11)
 
     check_for_ipv6()
 
