@@ -135,13 +135,6 @@ static struct _imc_info_t* prepare_reentrant_compile(
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-
-#define OPT_GC_DEBUG       128
-#define OPT_DESTROY_FLAG   129
-#define OPT_HELP_DEBUG     130
-#define OPT_PBC_OUTPUT     131
-#define OPT_RUNTIME_PREFIX 132
-
 /*
 
 =item C<>
@@ -229,6 +222,7 @@ imcc_preprocess(ARGMOD(imc_info_t *imcc))
 {
     yyscan_t yyscanner = imcc_get_scanner(imcc);
 
+    /* TODO: THIS! */
     /* Figure out what kind of source file we have -- if we have one */
     if (!STRING_length(sourcefile))
         IMCC_fatal_standalone(imcc, 1, "main: No source file specified.\n");
@@ -252,6 +246,8 @@ do_pre_process(ARGMOD(imc_info_t *imcc), ARGIN(STRING * sourcefile),
     ASSERT_ARGS(do_pre_process)
     int       c;
     YYSTYPE   val;
+
+    /* TODO: THIS! */
 
     IMCC_push_parser_state(imcc, sourcefile, 0);
     c = yylex(&val, yyscanner, imcc); /* is reset at end of while loop */
