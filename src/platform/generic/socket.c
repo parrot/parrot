@@ -15,13 +15,6 @@ src/platform/generic/socket.c - UNIX socket functions
 
 */
 
-#ifdef _WIN32
-#  include <ws2tcpip.h>
-#  undef CONST
-#else
-#  include <sys/socket.h>
-#endif
-
 #include "parrot/parrot.h"
 #include "../../io/io_private.h"
 #include "pmc/pmc_socket.h"

@@ -29,15 +29,6 @@ extern "C" {
 }
 #endif
 
-/* TODO: move all platform specific code to src/platform */
-#ifdef _WIN32
-#  undef CONST
-#  include <ws2tcpip.h>
-#  undef CONST
-#else
-#  include <sys/socket.h>
-#endif
-
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */

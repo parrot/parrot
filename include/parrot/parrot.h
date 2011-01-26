@@ -16,6 +16,13 @@
 #ifndef PARROT_PARROT_H_GUARD
 #define PARROT_PARROT_H_GUARD
 
+/* TODO: move all platform specific code to src/platform */
+#ifdef _WIN32
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
+#  undef CONST
+#endif
+
 #include "parrot/core_types.h"
 
 #if defined(INSIDE_GLOBAL_SETUP)

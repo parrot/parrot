@@ -17,14 +17,6 @@ These are the primary interface functions for working with socket objects.
 
 */
 
-/* TODO: move all platform specific code to src/platform */
-#ifdef _WIN32
-#  include <ws2tcpip.h>
-#  undef CONST
-#else
-#  include <sys/socket.h>
-#endif
-
 #include "parrot/parrot.h"
 #include "io_private.h"
 #include "api.str"
