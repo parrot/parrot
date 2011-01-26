@@ -115,7 +115,7 @@ IPv6-related tests for the Socket PMC.
 
   no_ipv6:
     diag( 'No IPv6' )
-    skip(4)
+    skip(11)
     exit 0
   done:
 .end
