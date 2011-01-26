@@ -206,7 +206,8 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
 
 /*
 
-=item C<PIOHANDLE Parrot_io_getnameinfo(PARROT_INTERP, int fam, int type, int proto)>
+=item C<STRING * Parrot_io_getnameinfo(PARROT_INTERP, const void *sa, INTVAL
+len)>
 
 Uses C<socket()> to create a socket with the specified address family,
 socket type and protocol number.
