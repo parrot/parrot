@@ -15,6 +15,53 @@ src/platform/generic/socket.c - UNIX socket functions
 
 */
 
+#ifdef _WIN32
+
+#  ifdef __MINGW32__
+#    include <w32api.h>
+#    if WINVER < WindowsXP
+#      error Minimum requirement for Parrot on Windows is Windows XP - might want to check windef.h
+#    endif
+#  endif
+#  include <ws2tcpip.h>
+#  undef CONST
+
+#else /* _WIN32 */
+
+#include "parrot/has_header.h"
+
+/* FreeBSD wants this order:
+
+     #include <sys/types.h>
+     #include <sys/socket.h>
+     #include <netinet/in.h>
+     #include <arpa/inet.h>
+
+   as netinet/in.h relies on things defined earlier
+*/
+
+#  ifdef PARROT_HAS_HEADER_SYSTYPES
+#    include <sys/types.h>
+#  endif /* PARROT_HAS_HEADER_SYSTYPES */
+
+#  ifdef PARROT_HAS_HEADER_SYSSOCKET
+#    include <sys/socket.h>
+#  endif /* PARROT_HAS_HEADER_SYSSOCKET */
+
+#  ifdef PARROT_HAS_HEADER_NETINETIN
+#    include <netinet/in.h>
+#  endif /* PARROT_HAS_HEADER_NETINETIN */
+
+#  ifdef PARROT_HAS_HEADER_ARPAINET
+#    include <arpa/inet.h>
+#  endif /* PARROT_HAS_HEADER_ARPAINET */
+
+#  ifdef PARROT_HAS_HEADER_NETDB
+#    include <netdb.h>
+#  endif /* PARROT_HAS_HEADER_NETDB */
+
+#endif /* _WIN32 */
+
 #include "parrot/parrot.h"
 #include "../../io/io_private.h"
 #include "pmc/pmc_socket.h"
@@ -66,6 +113,74 @@ typedef socklen_t Parrot_Socklen_t;
 typedef int Parrot_Socklen_t;
 #endif
 
+/*
+ * Mapping between PIO_PF_* constants and system-specific PF_* constants.
+ *
+ * Uses -1 for unsupported protocols.
+ */
+
+static int pio_pf[PIO_PF_MAX+1] = {
+#ifdef PF_LOCAL
+    PF_LOCAL,   /* PIO_PF_LOCAL */
+#else
+    -1,         /* PIO_PF_LOCAL */
+#endif
+#ifdef PF_UNIX
+    PF_UNIX,    /* PIO_PF_UNIX */
+#else
+    -1,         /* PIO_PF_UNIX */
+#endif
+#ifdef PF_INET
+    PF_INET,    /* PIO_PF_INET */
+#else
+    -1,         /* PIO_PF_INET */
+#endif
+#ifdef PF_INET6
+    PF_INET6,   /* PIO_PF_INET6 */
+#else
+    -1,         /* PIO_PF_INET6 */
+#endif
+};
+
+/*
+ * Mapping between PIO_SOCK_* constants and system-specific SOCK_* constants.
+ * Uses -1 for unsupported socket types.
+ */
+
+static int pio_sock[PIO_SOCK_MAX+1] = {
+#ifdef SOCK_PACKET
+    SOCK_PACKET,    /* PIO_SOCK_PACKET */
+#else
+    -1,             /* PIO_SOCK_PACKET */
+#endif
+#ifdef SOCK_STREAM
+    SOCK_STREAM,    /* PIO_SOCK_STREAM */
+#else
+    -1,             /* PIO_SOCK_STREAM */
+#endif
+#ifdef SOCK_DGRAM
+    SOCK_DGRAM,     /* PIO_SOCK_DGRAM */
+#else
+    -1,             /* PIO_SOCK_DGRAM */
+#endif
+#ifdef SOCK_RAW
+    SOCK_RAW,       /* PIO_SOCK_RAW */
+#else
+    -1,             /* PIO_SOCK_RAW */
+#endif
+#ifdef SOCK_RDM
+    SOCK_RDM,      /* PIO_SOCK_RDM */
+#else
+    -1,            /* PIO_SOCK_RDM */
+#endif
+#ifdef SOCK_SEQPACKET
+    SOCK_SEQPACKET, /* PIO_SOCK_SEQPACKET */
+#else
+    -1,             /* PIO_SOCK_SEQPACKET */
+#endif
+};
+
+
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
@@ -101,30 +216,6 @@ passed to C<Parrot_io_connect_unix()> or C<Parrot_io_bind_unix()>.
 =cut
 
 */
-
-/* TODO: where to move this to? originally from src/io/socket_api.c */
-static int pio_pf[PIO_PF_MAX+1] = {
-#ifdef PF_LOCAL
-    PF_LOCAL,   /* PIO_PF_LOCAL */
-#else
-    -1,         /* PIO_PF_LOCAL */
-#endif
-#ifdef PF_UNIX
-    PF_UNIX,    /* PIO_PF_UNIX */
-#else
-    -1,         /* PIO_PF_UNIX */
-#endif
-#ifdef PF_INET
-    PF_INET,    /* PIO_PF_INET */
-#else
-    -1,         /* PIO_PF_INET */
-#endif
-#ifdef PF_INET6
-    PF_INET6,   /* PIO_PF_INET6 */
-#else
-    -1,         /* PIO_PF_INET6 */
-#endif
-};
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -172,6 +263,7 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
         PMC *sockaddr = Parrot_pmc_new(interp, enum_class_Sockaddr);
         Parrot_Sockaddr_attributes *sa_attrs = PARROT_SOCKADDR(sockaddr);
 
+        sa_attrs->family   = walk->ai_family;
         sa_attrs->type     = walk->ai_socktype;
         sa_attrs->protocol = walk->ai_protocol;
         sa_attrs->len      = walk->ai_addrlen;
@@ -204,6 +296,7 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
     sockaddr = Parrot_pmc_new(interp, enum_class_Sockaddr);
     sa_attrs = PARROT_SOCKADDR(sockaddr);
 
+    sa_attrs->family   = PF_INET;
     sa_attrs->type     = 0;
     sa_attrs->protocol = 0;
     sa_attrs->len      = addr_len;
@@ -256,7 +349,34 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
 
 /*
 
-=item C<STRING * Parrot_io_getnameinfo(PARROT_INTERP, const void *sa, INTVAL
+=item C<INTVAL Parrot_io_addr_match(PARROT_INTERP, PMC *sa, INTVAL family,
+INTVAL type, INTVAL protocol)>
+
+Returns true if the address C<sa> matches C<family>, C<type> and C<protocol>.
+
+=cut
+
+*/
+
+INTVAL
+Parrot_io_addr_match(PARROT_INTERP, ARGIN(PMC *sa), INTVAL family,
+        INTVAL type, INTVAL protocol)
+{
+    Parrot_Sockaddr_attributes * const sa_data = PARROT_SOCKADDR(sa);
+
+    family = pio_pf[family];
+    type   = pio_sock[type];
+
+    return sa_data->family   == family
+    &&    (sa_data->type     == 0
+    ||     sa_data->type     == type)
+    &&    (sa_data->protocol == 0
+    ||     sa_data->protocol == protocol);
+}
+
+/*
+
+=item C<STRING * Parrot_io_getnameinfo(PARROT_INTERP, const void *addr, INTVAL
 len)>
 
 Uses C<socket()> to create a socket with the specified address family,
@@ -278,7 +398,7 @@ Parrot_io_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL len)
     /* numeric port maximum is 65535, so 5 chars */
     char portbuf[6];
 
-    getnameinfo((const struct sockaddr *)sa, len, buf, sizeof (buf),
+    getnameinfo((const struct sockaddr *)addr, len, buf, sizeof (buf),
             portbuf, sizeof (portbuf), NI_NUMERICHOST | NI_NUMERICSERV);
 
     return Parrot_str_format_data(interp, "%s:%s", buf, portbuf);
@@ -307,8 +427,24 @@ PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
 Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto)
 {
-    const PIOSOCKET sock = socket(fam, type, proto);
+    PIOSOCKET sock;
     const int value = 1;
+
+    /* convert Parrot's family to system family */
+    if (fam < 0 || fam >= PIO_PF_MAX)
+        return -1;
+    fam = pio_pf[fam];
+    if (fam < 0)
+        return -1;
+
+    /* convert Parrot's socket type to system type */
+    if (type < 0 || type >= PIO_SOCK_MAX)
+        return -1;
+    type = pio_sock[type];
+    if (type < 0)
+        return -1;
+
+    sock = socket(fam, type, proto);
 
     if (sock == PIO_INVALID_SOCKET)
         return PIO_INVALID_HANDLE;

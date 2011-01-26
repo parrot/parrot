@@ -188,9 +188,10 @@ family (integer). If no address family is given, it defaults to IPv4.
         PMC *res;
 
         if (!family)
-            family = PF_INET;
+            family = PIO_PF_INET;
 
-        array = Parrot_io_getaddrinfo(INTERP, address, port, IPPROTO_TCP, family, 0);
+        array = Parrot_io_getaddrinfo(INTERP, address, port, PIO_PROTO_TCP,
+                    family, 0);
 
         if (VTABLE_elements(interp, array))
             res = VTABLE_get_pmc_keyed_int(interp, array, 0);

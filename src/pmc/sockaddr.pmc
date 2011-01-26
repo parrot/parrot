@@ -25,6 +25,7 @@ These are the vtable functions for the Sockaddr class.
 /* HEADERIZER END: static */
 
 pmclass Sockaddr auto_attrs {
+    ATTR INTVAL  family;
     ATTR INTVAL  type;
     ATTR INTVAL  protocol;
     ATTR INTVAL  len;     /* Length of the sockaddr struct */

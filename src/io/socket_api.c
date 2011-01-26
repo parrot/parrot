@@ -37,79 +37,9 @@ Returns 1 if the socket is closed, 0 if it is open.
 
 */
 
-
-/*
- * Mapping between PIO_PF_* constants and system-specific PF_* constants.
- *
- * Uses -1 for unsupported protocols.
- */
-
-static int pio_pf[PIO_PF_MAX+1] = {
-#ifdef PF_LOCAL
-    PF_LOCAL,   /* PIO_PF_LOCAL */
-#else
-    -1,         /* PIO_PF_LOCAL */
-#endif
-#ifdef PF_UNIX
-    PF_UNIX,    /* PIO_PF_UNIX */
-#else
-    -1,         /* PIO_PF_UNIX */
-#endif
-#ifdef PF_INET
-    PF_INET,    /* PIO_PF_INET */
-#else
-    -1,         /* PIO_PF_INET */
-#endif
-#ifdef PF_INET6
-    PF_INET6,   /* PIO_PF_INET6 */
-#else
-    -1,         /* PIO_PF_INET6 */
-#endif
-};
-
-/*
- * Mapping between PIO_SOCK_* constants and system-specific SOCK_* constants.
- * Uses -1 for unsupported socket types.
- */
-
-static int pio_sock[PIO_SOCK_MAX+1] = {
-#ifdef SOCK_PACKET
-    SOCK_PACKET,    /* PIO_SOCK_PACKET */
-#else
-    -1,             /* PIO_SOCK_PACKET */
-#endif
-#ifdef SOCK_STREAM
-    SOCK_STREAM,    /* PIO_SOCK_STREAM */
-#else
-    -1,             /* PIO_SOCK_STREAM */
-#endif
-#ifdef SOCK_DGRAM
-    SOCK_DGRAM,     /* PIO_SOCK_DGRAM */
-#else
-    -1,             /* PIO_SOCK_DGRAM */
-#endif
-#ifdef SOCK_RAW
-    SOCK_RAW,       /* PIO_SOCK_RAW */
-#else
-    -1,             /* PIO_SOCK_RAW */
-#endif
-#ifdef SOCK_RDM
-    SOCK_RDM,      /* PIO_SOCK_RDM */
-#else
-    -1,            /* PIO_SOCK_RDM */
-#endif
-#ifdef SOCK_SEQPACKET
-    SOCK_SEQPACKET, /* PIO_SOCK_SEQPACKET */
-#else
-    -1,             /* PIO_SOCK_SEQPACKET */
-#endif
-};
-
-
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
 INTVAL
 Parrot_io_socket_is_closed(PARROT_INTERP, ARGMOD(PMC *socket))
 {
@@ -185,20 +115,6 @@ Parrot_io_socket_handle(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
     ASSERT_ARGS(Parrot_io_socket_handle)
     PMC       *new_socket;
     PIOHANDLE  os_handle;
-
-    /* convert Parrot's family to system family */
-    if (fam < 0 || fam >= PIO_PF_MAX)
-        return -1;
-    fam = pio_pf[fam];
-    if (fam < 0)
-        return -1;
-
-    /* convert Parrot's socket type to system type */
-    if (type < 0 || type >= PIO_SOCK_MAX)
-        return -1;
-    type = pio_sock[type];
-    if (type < 0)
-        return -1;
 
     if (PMC_IS_NULL(socket))
         new_socket = Parrot_io_new_socket_pmc(interp,
@@ -313,18 +229,15 @@ Parrot_io_connect_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
         for (i = 0; i < len; ++i) {
             PMC *sa = VTABLE_get_pmc_keyed_int(interp, address, i);
             Parrot_Sockaddr_attributes * const sa_data = PARROT_SOCKADDR(sa);
-            struct sockaddr_storage *ss =
-                (struct sockaddr_storage *)sa_data->pointer;
 
-            if (ss->ss_family     != io->family
-            || (sa_data->type     != io->type
-            &&  sa_data->type     != 0)
-            ||  sa_data->protocol != io->protocol)
+            if (!Parrot_io_addr_match(interp, sa, io->family, io->type,
+                    io->protocol))
                 continue;
 
             io->remote = sa;
 
-            Parrot_io_connect(interp, io->os_handle, ss, sa_data->len);
+            Parrot_io_connect(interp, io->os_handle, sa_data->pointer,
+                    sa_data->len);
 
             return 0;
         }
@@ -372,18 +285,15 @@ Parrot_io_bind_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
         for (i = 0; i < len; ++i) {
             PMC *sa = VTABLE_get_pmc_keyed_int(interp, address, i);
             Parrot_Sockaddr_attributes * const sa_data = PARROT_SOCKADDR(sa);
-            struct sockaddr_storage *ss =
-                (struct sockaddr_storage *)sa_data->pointer;
 
-            if (ss->ss_family     != io->family
-            || (sa_data->type     != io->type
-            &&  sa_data->type     != 0)
-            ||  sa_data->protocol != io->protocol)
+            if (!Parrot_io_addr_match(interp, sa, io->family, io->type,
+                    io->protocol))
                 continue;
 
             io->local = sa;
 
-            Parrot_io_bind(interp, io->os_handle, ss, sa_data->len);
+            Parrot_io_bind(interp, io->os_handle, sa_data->pointer,
+                    sa_data->len);
 
             return 0;
         }
