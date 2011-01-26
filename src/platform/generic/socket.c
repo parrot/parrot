@@ -145,7 +145,7 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
      * service specification from /etc/services). The highest port is 65535,
      * so we need 5 characters + trailing null-byte. */
     char portstr[6];
-    int ret;
+    int  ret;
 
     if (STRING_IS_NULL(addr))
         s = NULL;
@@ -155,19 +155,24 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
     memset(&hints, 0, sizeof (struct addrinfo));
     if (passive)
         hints.ai_flags = AI_PASSIVE;
-    hints.ai_family = fam;
+
+    hints.ai_family   = fam;
     hints.ai_protocol = protocol;
+
     snprintf(portstr, sizeof (portstr), "%ld", port);
 
-    if ((ret = getaddrinfo(s, portstr, &hints, &ai)) != 0)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "getaddrinfo failed: %s", s ? s : "(null)");
+    /* check return value *after* freeing cstring */
+    ret = getaddrinfo(s, portstr, &hints, &ai);
 
     Parrot_str_free_cstring(s);
 
+    if (ret != 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "getaddrinfo failed: %s", s ? s : "(null)");
+
     array = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
-    for (walk = ai; walk; walk = ai->ai_next) {
+    for (walk = ai; walk; walk = walk->ai_next) {
         PMC *sockaddr = Parrot_pmc_new(interp, enum_class_Sockaddr);
 
         VTABLE_set_pointer(interp, sockaddr, walk);
