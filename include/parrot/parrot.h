@@ -18,7 +18,7 @@
 
 /* TODO: move all platform specific code to src/platform */
 #ifdef _WIN32
-#  include <winsock2.h>
+#  include <w32api.h>
 #  include <ws2tcpip.h>
 #  undef CONST
 #endif
