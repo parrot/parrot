@@ -24,14 +24,12 @@ IPv6-related tests for the Socket PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(18)
+    plan(11)
 
     check_for_ipv6()
 
     test_tcp_socket6()
-    test_raw_tcp_socket6()
     test_udp_socket6()
-    test_raw_udp_socket6()
 
     test_bind()
 
@@ -46,8 +44,7 @@ IPv6-related tests for the Socket PMC.
     sock = new 'Socket'
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
     addrinfo = sock.'getaddrinfo'(null_string, 1234, .PIO_PROTO_TCP, .PIO_PF_INET6, 0)
-    result = sock.'bind'(addrinfo)
-    is(result, 0, 'bind ok (IPv6 localhost)')
+    sock.'bind'(addrinfo)
 
     str = sock.'local_address'()
     is(str, "::1:1234", "local address of bound socket is ::1")
@@ -56,8 +53,7 @@ IPv6-related tests for the Socket PMC.
 
     sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
     addrinfo = sock.'getaddrinfo'(null_string, 1234, .PIO_PROTO_TCP, .PIO_PF_INET, 0)
-    result = sock.'bind'(addrinfo)
-    is(result, 0, 'bind ok (IPv4 localhost)')
+    sock.'bind'(addrinfo)
 
     str = sock.'local_address'()
     is(str, "127.0.0.1:1234", "local address of bound socket is 127.0.0.1")
@@ -91,8 +87,7 @@ IPv6-related tests for the Socket PMC.
     sock = new 'Socket'
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
     address = sock.'getaddrinfo'(null_string, 1234, .PIO_PROTO_TCP, .PIO_PF_INET6, 0)
-    status = sock.'connect'(address)
-    nok(status, 'connect')
+    sock.'connect'(address)
 
     str = server.'readline'()
     is(str, "Connection from ::1:1234\n", 'Server got a connection from ::1:1234')
@@ -120,7 +115,7 @@ IPv6-related tests for the Socket PMC.
 
   no_ipv6:
     diag( 'No IPv6' )
-    skip(4)
+    skip(11)
     exit 0
   done:
 .end
@@ -139,26 +134,12 @@ IPv6-related tests for the Socket PMC.
     isa_ok(sockaddr,'Sockaddr',"A TCP ipv6 sockaddr to ::1 was set")
 .end
 
-.sub test_raw_tcp_socket6
-    .local pmc sock, sockaddr
-    .local string null_string
-
-    sock = new 'Socket'
-    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_RAW, .PIO_PROTO_TCP)
-
-    sockaddr = sock."sockaddr"(null_string, 80, .PIO_PF_INET6)
-    isa_ok(sockaddr,'Sockaddr',"A raw TCP ipv6 sockaddr to localhost was set:")
-
-    sockaddr = sock."sockaddr"("::1", 80, .PIO_PF_INET6)
-    isa_ok(sockaddr,'Sockaddr',"A raw TCP ipv6 sockaddr to ::1 was set:")
-.end
-
 .sub test_udp_socket6
     .local pmc sock, sockaddr
     .local string null_string
 
     sock = new 'Socket'
-    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_UDP)
+    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_DGRAM, .PIO_PROTO_UDP)
 
     sockaddr = sock."sockaddr"(null_string, 80, .PIO_PF_INET6)
     isa_ok(sockaddr,'Sockaddr', "A UDP ipv6 sockaddr to localhost was set:")
@@ -166,21 +147,6 @@ IPv6-related tests for the Socket PMC.
     sockaddr = sock."sockaddr"("::1", 80, .PIO_PF_INET6)
     isa_ok(sockaddr,'Sockaddr', "A UDP ipv6 sockaddr to ::1 was set:")
 .end
-
-.sub test_raw_udp_socket6
-    .local pmc sock, sockaddr
-    .local string null_string
-
-    sock = new 'Socket'
-    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_RAW, .PIO_PROTO_UDP)
-
-    sockaddr = sock."sockaddr"(null_string, 80, .PIO_PF_INET6)
-    isa_ok(sockaddr,'Sockaddr', "A raw UDP ipv6 sockaddr to localhost was set: ")
-
-    sockaddr = sock."sockaddr"("::1", 80, .PIO_PF_INET6)
-    isa_ok(sockaddr,'Sockaddr', "A raw UDP ipv6 sockaddr to ::1 was set: ")
-.end
-
 
 # Local Variables:
 #   mode: pir

@@ -7,9 +7,8 @@ src/pmc/sockaddr.pmc - sockaddr_in/sockaddr_in6 holder
 
 =head1 DESCRIPTION
 
-The Sockaddr PMC holds a C<sockaddr_in> (IPv4) or C<sockaddr_in6> (IPv6) and
-saves its length (to distinguish C<sockaddr_in> and C<sockaddr_in6>).
-
+The Sockaddr PMC holds a C<sockaddr> struct and saves its length (to
+distinguish C<sockaddr_in> and C<sockaddr_in6>).
 
 =head2 Vtable Functions
 
@@ -21,19 +20,12 @@ These are the vtable functions for the Sockaddr class.
 
 */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-    struct sockaddr_storage;
-#ifdef __cplusplus
-}
-#endif
-
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
 pmclass Sockaddr auto_attrs {
+    ATTR INTVAL  family;
     ATTR INTVAL  type;
     ATTR INTVAL  protocol;
     ATTR INTVAL  len;     /* Length of the sockaddr struct */
@@ -43,7 +35,7 @@ pmclass Sockaddr auto_attrs {
 
 =item C<void init()>
 
-Initializes the PMC by allocating a C<sockaddr_storage>.
+Initializes the PMC.
 
 =cut
 
@@ -175,31 +167,6 @@ Returns the string representation of this sockaddr by calling C<getnameinfo(3)>.
             return Parrot_sprintf_c(interp, "(?)");
 
         return Parrot_io_getnameinfo(INTERP, data->pointer, data->len);
-    }
-
-
-/*
-
-=item C<void set_pointer(void *)>
-
-Copies a C<sockaddr_in> or C<sockaddr_in6> from the given C<addrinfo> pointer
-(by accessing its C<ai_addr> and C<ai_addrlen> members).
-
-=cut
-
-*/
-
-    VTABLE void set_pointer(void *value) {
-        Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
-        struct addrinfo *ai = (struct addrinfo *)value;
-
-        data->type     = ai->ai_socktype;
-        data->protocol = ai->ai_protocol;
-        data->len      = ai->ai_addrlen;
-        data->pointer  = Parrot_gc_allocate_memory_chunk(INTERP,
-                            ai->ai_addrlen);
-
-        memcpy(data->pointer, ai->ai_addr, ai->ai_addrlen);
     }
 
 }
