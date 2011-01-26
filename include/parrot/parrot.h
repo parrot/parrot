@@ -18,7 +18,12 @@
 
 /* TODO: move all platform specific code to src/platform */
 #ifdef _WIN32
-#  include <w32api.h>
+#  ifdef __MINGW32__
+#    include <w32api.h>
+#    if WINVER < WindowsXP
+#      error Minimum requirement for Parrot on Windows is Windows XP - might want to check windef.h
+#    endif
+#  endif
 #  include <ws2tcpip.h>
 #  undef CONST
 #endif
