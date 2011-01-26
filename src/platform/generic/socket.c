@@ -76,24 +76,6 @@ typedef int Parrot_Socklen_t;
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-static void get_addrinfo(PARROT_INTERP,
-    ARGIN(PMC * addrinfo),
-    ARGIN(const char *host),
-    int port,
-    int protocol,
-    int family,
-    int passive)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-#define ASSERT_ARGS_get_addrinfo __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(addrinfo) \
-    , PARROT_ASSERT_ARG(host))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
@@ -177,12 +159,12 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
     else
         s = Parrot_str_to_cstring(interp, addr);
 
-    memset(&hints, 0, sizeof(struct addrinfo));
+    memset(&hints, 0, sizeof (struct addrinfo));
     if (passive)
         hints.ai_flags = AI_PASSIVE;
     hints.ai_family = fam;
     hints.ai_protocol = protocol;
-    snprintf(portstr, sizeof(portstr), "%ld", port);
+    snprintf(portstr, sizeof (portstr), "%ld", port);
 
     if ((ret = getaddrinfo(s, portstr, &hints, &ai)) != 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
@@ -226,8 +208,8 @@ Parrot_io_getnameinfo(PARROT_INTERP, ARGIN(const void *sa), INTVAL len)
     /* numeric port maximum is 65535, so 5 chars */
     char portbuf[6];
 
-    getnameinfo((const struct sockaddr *)sa, len, buf, sizeof(buf),
-            portbuf, sizeof(portbuf), NI_NUMERICHOST | NI_NUMERICSERV);
+    getnameinfo((const struct sockaddr *)sa, len, buf, sizeof (buf),
+            portbuf, sizeof (portbuf), NI_NUMERICHOST | NI_NUMERICSERV);
 
     return Parrot_str_format_data(interp, "%s:%s", buf, portbuf);
 }
