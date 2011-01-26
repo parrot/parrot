@@ -21,6 +21,7 @@ These are the primary interface functions for working with socket objects.
 #include "io_private.h"
 #include "api.str"
 #include "pmc/pmc_socket.h"
+#include "pmc/pmc_sockaddr.h"
 
 #include <stdarg.h>
 
@@ -211,6 +212,9 @@ Parrot_io_socket_handle(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
         return -1;
 
     SETATTR_Socket_os_handle(interp, new_socket, os_handle);
+    SETATTR_Socket_family(interp, new_socket, fam);
+    SETATTR_Socket_type(interp, new_socket, type);
+    SETATTR_Socket_protocol(interp, new_socket, proto);
 
     return 0;
 }
@@ -294,69 +298,47 @@ INTVAL
 Parrot_io_connect_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 {
     ASSERT_ARGS(Parrot_io_connect_handle)
-    struct addrinfo *res, *walk;
-    int fd = -1;
-    int i = 1;
     Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
-
-    /* Connect to an IPv6 addrinfo if an UnManagedStruct was provided as address */
-    if (!PMC_IS_NULL(address) && address->vtable->base_type == enum_class_UnManagedStruct) {
-        res = (struct addrinfo *)VTABLE_get_pointer(interp, address);
-
-        for (walk = res; walk != NULL; walk = walk->ai_next) {
-            fd = socket(walk->ai_family, walk->ai_socktype, walk->ai_protocol);
-            if (fd < 0) {
-                /* Cannot create socket. Not necessarily an error, for example not
-                 * on FreeBSD, where getaddrinfo() returns IPv6 addresses even
-                 * when the libc does not offer IPv6 support and thus fails in
-                 * socket(). */
-                continue;
-            }
-
-            if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &i, sizeof (i)) == -1) {
-                perror("Error setting SO_REUSEADDR:");
-                continue;
-            }
-
-            /* XXX: this effectively overwrites any previously set sockets. is that alright? */
-            SETATTR_Socket_os_handle(interp, pmc, fd);
-
-AGAIN:
-            if (connect(fd, walk->ai_addr, walk->ai_addrlen) != 0) {
-                switch (errno) {
-                  case EINTR:
-                    goto AGAIN;
-                  case EINPROGRESS:
-                    goto AGAIN;
-                  case EISCONN:
-                    break;
-                  default:
-                    close(fd);
-                    fd = -1;
-                    continue;
-                }
-            }
-
-            PARROT_SOCKET(pmc)->remote = Parrot_pmc_new(interp, enum_class_Sockaddr);
-
-            VTABLE_set_pointer(interp, PARROT_SOCKET(pmc)->remote, walk);
-            return 0;
-        }
-
-        if (fd == -1)
-            return -1;
-        fprintf(stderr, "huh?!\n");
-    }
+    int i;
 
     if (Parrot_io_socket_is_closed(interp, pmc))
         return -1;
     if (PMC_IS_NULL(address))
         return -1;
 
+    /* Iterate over all addresses if an array is passed */
+    if (address->vtable->base_type != enum_class_Sockaddr) {
+        INTVAL len = VTABLE_elements(interp, address);
+
+        for (i = 0; i < len; ++i) {
+            PMC *sa = VTABLE_get_pmc_keyed_int(interp, address, i);
+            Parrot_Sockaddr_attributes * const sa_data = PARROT_SOCKADDR(sa);
+            struct sockaddr_storage *ss =
+                (struct sockaddr_storage *)sa_data->pointer;
+
+            if (ss->ss_family     != io->family
+            || (sa_data->type     != io->type
+            &&  sa_data->type     != 0)
+            ||  sa_data->protocol != io->protocol)
+                continue;
+
+            io->remote = sa;
+
+            Parrot_io_connect(interp, io->os_handle, ss, sa_data->len);
+
+            return 0;
+        }
+
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "No address found for family %d, type %d, proto %d",
+                io->family, io->type, io->protocol);
+    }
+
     io->remote = address;
 
     return Parrot_io_connect(interp, io->os_handle,
-                VTABLE_get_pointer(interp, address));
+                VTABLE_get_pointer(interp, address),
+                VTABLE_get_integer(interp, address));
 }
 
 /*
@@ -375,61 +357,47 @@ INTVAL
 Parrot_io_bind_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 {
     ASSERT_ARGS(Parrot_io_bind_handle)
-    struct addrinfo *res, *walk;
-    int fd = -1;
-    int i = 1;
     Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
-
-    /* Bind to an IPv6 address (UnManagedStruct with an struct addrinfo inside */
-    if (!PMC_IS_NULL(address) && address->vtable->base_type == enum_class_UnManagedStruct) {
-        res = (struct addrinfo *)VTABLE_get_pointer(interp, address);
-
-        for (walk = res; walk != NULL; walk = walk->ai_next) {
-            fd = socket(walk->ai_family, walk->ai_socktype, walk->ai_protocol);
-            if (fd < 0) {
-                /* Cannot create socket. Not necessarily an error, for example not
-                 * on FreeBSD, where getaddrinfo() returns IPv6 addresses even
-                 * when the libc does not offer IPv6 support and thus fails in
-                 * socket(). */
-                continue;
-            }
-
-            if (walk->ai_family == AF_INET6) {
-                if (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &i, sizeof (i)) == -1) {
-                    perror("Error setting IPV6_V6ONLY:");
-                    continue;
-                }
-            }
-
-            /* XXX: this effectively overwrites any previously set sockets. is that alright? */
-            SETATTR_Socket_os_handle(interp, pmc, fd);
-
-            if (bind(fd, walk->ai_addr, walk->ai_addrlen) != 0) {
-                close(fd);
-                fd = -1;
-                continue;
-            }
-
-            PARROT_SOCKET(pmc)->local = Parrot_pmc_new(interp, enum_class_Sockaddr);
-
-            VTABLE_set_pointer(interp, PARROT_SOCKET(pmc)->local, walk);
-            return 0;
-        }
-
-        if (fd == -1)
-            return -1;
-
-    }
+    int i;
 
     if (Parrot_io_socket_is_closed(interp, pmc))
         return -1;
     if (PMC_IS_NULL(address))
         return -1;
 
+    /* Iterate over all addresses if an array is passed */
+    if (address->vtable->base_type != enum_class_Sockaddr) {
+        INTVAL len = VTABLE_elements(interp, address);
+
+        for (i = 0; i < len; ++i) {
+            PMC *sa = VTABLE_get_pmc_keyed_int(interp, address, i);
+            Parrot_Sockaddr_attributes * const sa_data = PARROT_SOCKADDR(sa);
+            struct sockaddr_storage *ss =
+                (struct sockaddr_storage *)sa_data->pointer;
+
+            if (ss->ss_family     != io->family
+            || (sa_data->type     != io->type
+            &&  sa_data->type     != 0)
+            ||  sa_data->protocol != io->protocol)
+                continue;
+
+            io->local = sa;
+
+            Parrot_io_bind(interp, io->os_handle, ss, sa_data->len);
+
+            return 0;
+        }
+
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "No address found for family %d, type %d, proto %d",
+                io->family, io->type, io->protocol);
+    }
+
     io->local = address;
 
     return Parrot_io_bind(interp, io->os_handle,
-                VTABLE_get_pointer(interp, address));
+                VTABLE_get_pointer(interp, address),
+                VTABLE_get_integer(interp, address));
 }
 
 /*

@@ -34,8 +34,10 @@ extern "C" {
 /* HEADERIZER END: static */
 
 pmclass Sockaddr auto_attrs {
-    ATTR void   *pointer; /* The stored pointer. */
-    ATTR INTVAL len; /* Length of the contents of the sockaddr_storage */
+    ATTR INTVAL  type;
+    ATTR INTVAL  protocol;
+    ATTR INTVAL  len;     /* Length of the sockaddr struct */
+    ATTR void   *pointer; /* Pointer to a sockaddr struct */
 
 /*
 
@@ -48,11 +50,14 @@ Initializes the PMC by allocating a C<sockaddr_storage>.
 */
 
     VTABLE void init() {
-        Parrot_Sockaddr_attributes * const pdata_struct =
+        Parrot_Sockaddr_attributes * const attrs =
             (Parrot_Sockaddr_attributes *) PMC_data(SELF);
 
-        pdata_struct->pointer = mem_gc_allocate_zeroed_typed(INTERP,
-                struct sockaddr_storage);
+        attrs->type     = 0;
+        attrs->protocol = 0;
+        attrs->pointer  = NULL;
+        attrs->len      = 0;
+
         PObj_custom_destroy_SET(SELF);
     }
 
@@ -70,7 +75,8 @@ Destroys the PMC and frees all allocated memory.
         Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
 
         if (data) {
-            mem_gc_free(INTERP, data->pointer);
+            if (data->pointer)
+                mem_gc_free(INTERP, data->pointer);
             data->pointer = NULL;
         }
     }
@@ -88,10 +94,19 @@ one.
 
     VTABLE PMC *clone() {
         PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        Parrot_Sockaddr_attributes * const old_attrs = PARROT_SOCKADDR(SELF);
+        Parrot_Sockaddr_attributes * const new_attrs = PARROT_SOCKADDR(dest);
 
-        memcpy(PARROT_SOCKADDR(dest)->pointer, PARROT_SOCKADDR(SELF)->pointer,
-                sizeof (struct sockaddr_storage));
-        PARROT_SOCKADDR(dest)->len = PARROT_SOCKADDR(SELF)->len;
+        new_attrs->type     = old_attrs->type;
+        new_attrs->protocol = old_attrs->protocol;
+        new_attrs->len      = old_attrs->len;
+
+        if (old_attrs->len) {
+            new_attrs->pointer = Parrot_gc_allocate_memory_chunk(INTERP,
+                                    old_attrs->len);
+            memcpy(new_attrs->pointer, old_attrs->pointer, old_attrs->len);
+        }
+
         return dest;
     }
 
@@ -108,7 +123,25 @@ Returns true if the Sockaddr is defined.
     VTABLE INTVAL get_bool() {
         Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
 
-        return data->pointer ? 1 : 0 ;
+        return data->pointer ? 1 : 0;
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the length of the sockaddr struct.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        INTVAL len;
+
+        GET_ATTR_len(INTERP, SELF, len);
+
+        return len;
     }
 
 /*
@@ -137,17 +170,11 @@ Returns the string representation of this sockaddr by calling C<getnameinfo(3)>.
 */
     VTABLE STRING *get_string() {
         Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
-        /* TODO: get hostname, not only numeric */
-        char buf[INET6_ADDRSTRLEN+1];
-        /* numeric port maximum is 65535, so 5 chars */
-        char portbuf[6];
 
         if (!data->pointer)
             return Parrot_sprintf_c(interp, "(?)");
 
-        getnameinfo((struct sockaddr *)data->pointer, data->len, buf,
-                sizeof (buf), portbuf, sizeof (portbuf), NI_NUMERICHOST | NI_NUMERICSERV);
-        return Parrot_str_format_data(interp, "%s:%s", buf, portbuf);
+        return Parrot_io_getnameinfo(INTERP, data->pointer, data->len);
     }
 
 
@@ -164,10 +191,15 @@ Copies a C<sockaddr_in> or C<sockaddr_in6> from the given C<addrinfo> pointer
 
     VTABLE void set_pointer(void *value) {
         Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+        struct addrinfo *ai = (struct addrinfo *)value;
 
-        struct addrinfo *walk = (struct addrinfo *)value;
-        memcpy(data->pointer, walk->ai_addr, walk->ai_addrlen);
-        data->len = walk->ai_addrlen;
+        data->type     = ai->ai_socktype;
+        data->protocol = ai->ai_protocol;
+        data->len      = ai->ai_addrlen;
+        data->pointer  = Parrot_gc_allocate_memory_chunk(INTERP,
+                            ai->ai_addrlen);
+
+        memcpy(data->pointer, ai->ai_addr, ai->ai_addrlen);
     }
 
 }
