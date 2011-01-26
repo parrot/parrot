@@ -432,17 +432,17 @@ Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto)
 
     /* convert Parrot's family to system family */
     if (fam < 0 || fam >= PIO_PF_MAX)
-        return -1;
+        return PIO_INVALID_HANDLE;
     fam = pio_pf[fam];
     if (fam < 0)
-        return -1;
+        return PIO_INVALID_HANDLE;
 
     /* convert Parrot's socket type to system type */
     if (type < 0 || type >= PIO_SOCK_MAX)
-        return -1;
+        return PIO_INVALID_HANDLE;
     type = pio_sock[type];
     if (type < 0)
-        return -1;
+        return PIO_INVALID_HANDLE;
 
     sock = socket(fam, type, proto);
 
@@ -549,18 +549,20 @@ PARROT_CAN_RETURN_NULL
 PIOHANDLE
 Parrot_io_accept(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(PMC * remote_addr))
 {
-    struct sockaddr * addr = (struct sockaddr *)VTABLE_get_pointer(interp, remote_addr);
-    Parrot_Socklen_t addrlen = sizeof (struct sockaddr_in);
+    Parrot_Socklen_t addr_len = sizeof (struct sockaddr_storage);
+    struct sockaddr_storage *addr = Parrot_gc_allocate_memory_chunk(interp,
+                                        addr_len);
+    Parrot_Sockaddr_attributes *sa_attrs = PARROT_SOCKADDR(remote_addr);
     PIOSOCKET newsock;
 
-    newsock = accept((PIOSOCKET)os_handle, addr, &addrlen);
+    newsock = accept((PIOSOCKET)os_handle, (struct sockaddr *)addr, &addr_len);
 
     if (newsock == PIO_INVALID_SOCKET)
-        return PIO_INVALID_HANDLE;
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "accept failed: %d", PIO_SOCK_ERRNO);
 
-    /* Set the length for the remote sockaddr PMC so that it can distinguish
-     * between sockaddr_in and sockaddr_in6 */
-    PARROT_SOCKADDR(remote_addr)->len = addrlen;
+    sa_attrs->len     = addr_len;
+    sa_attrs->pointer = addr;
 
     /* XXX FIXME: Need to do a getsockname and getpeername here to
      * fill in the sockaddr_in structs for local and peer */
@@ -605,7 +607,7 @@ AGAIN:
             goto AGAIN;
           default:
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                    "Write error: %s", strerror(errno));
+                    "Write error: %d", PIO_SOCK_ERRNO);
         }
     }
 }
@@ -639,7 +641,7 @@ AGAIN:
             goto AGAIN;
           default:
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                    "Read error: %s", strerror(errno));
+                    "Read error: %d", PIO_SOCK_ERRNO);
         }
     }
 }
