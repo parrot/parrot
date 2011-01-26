@@ -7,9 +7,8 @@ src/pmc/sockaddr.pmc - sockaddr_in/sockaddr_in6 holder
 
 =head1 DESCRIPTION
 
-The Sockaddr PMC holds a C<sockaddr_in> (IPv4) or C<sockaddr_in6> (IPv6) and
-saves its length (to distinguish C<sockaddr_in> and C<sockaddr_in6>).
-
+The Sockaddr PMC holds a C<sockaddr> struct and saves its length (to
+distinguish C<sockaddr_in> and C<sockaddr_in6>).
 
 =head2 Vtable Functions
 
@@ -20,14 +19,6 @@ These are the vtable functions for the Sockaddr class.
 =cut
 
 */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-    struct sockaddr_storage;
-#ifdef __cplusplus
-}
-#endif
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
@@ -43,7 +34,7 @@ pmclass Sockaddr auto_attrs {
 
 =item C<void init()>
 
-Initializes the PMC by allocating a C<sockaddr_storage>.
+Initializes the PMC.
 
 =cut
 
