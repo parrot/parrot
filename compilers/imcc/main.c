@@ -368,10 +368,10 @@ static PMC *
 imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
         int is_file, int is_pasm)
 {
-    struct _imc_info_t * const imc_save = prepare_reentrant_compile(imcc);
+    struct _imc_info_t * const imc_save = imcc; //prepare_reentrant_compile(imcc);
     struct _imc_info_t * imcc_use = imc_save ? imc_save : imcc;
     PMC * const result = imcc_run_compilation_internal(imcc, fullname, is_file, is_pasm);
-    exit_reentrant_compile(imcc, imc_save);
+    //exit_reentrant_compile(imcc, imc_save);
     return result;
 }
 
@@ -384,6 +384,10 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 
     /* TODO: Don't set current packfile in the interpreter. Leave the
              interpreter alone */
+
+    //if (is_file)
+    pf_raw->cur_cs = Parrot_pf_create_default_segments(imcc->interp, pf_raw, source, 0);
+    //Parrot_pf_create_default_segments(imcc->interp, pf_raw, source, 0);
     Parrot_pf_set_current_packfile(imcc->interp, pf_raw);
 
     IMCC_push_parser_state(imcc, source, is_pasm);
@@ -439,7 +443,7 @@ prepare_reentrant_compile(ARGMOD(imc_info_t * imcc))
     struct _imc_info_t * imc_info = NULL;
     if (imcc->last_unit) {
         /* a reentrant compile */
-        imc_info        = mem_gc_allocate_zeroed_typed(imcc->interp, imc_info_t);
+        imc_info        = calloc(1, sizeof(imc_info_t));
         imc_info->prev  = imcc;
         imc_info->ghash = imcc->ghash;
         /* start over; let the start of line rule increment this to 1 */

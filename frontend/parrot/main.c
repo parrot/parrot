@@ -375,6 +375,12 @@ load_bytecode_file(Parrot_PMC interp, Parrot_String filename)
 {
     ASSERT_ARGS(load_bytecode_file)
     PMC * bytecode = NULL;
+
+    /* set up all the compregs */
+    Parrot_PMC class_pmc = get_class_pmc(interp, "IMCCompiler");
+    Parrot_PMC pir_compiler = get_imcc_compiler_pmc(interp, class_pmc, 0);
+    Parrot_PMC pasm_compiler = get_imcc_compiler_pmc(interp, class_pmc, 1);
+
     if (!Parrot_api_load_bytecode_file(interp, filename, &bytecode))
         show_last_error_and_exit(interp);
     return bytecode;

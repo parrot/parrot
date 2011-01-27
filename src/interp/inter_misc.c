@@ -225,20 +225,26 @@ PackFile_ByteCode *
 Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), ARGOUT(STRING **error))
 {
     ASSERT_ARGS(Parrot_compile_file)
-    PackFile_ByteCode *result = NULL;
+    PMC *result = NULL;
     UINTVAL regs_used[4] = {3, 3, 3, 3};
     PMC * const newcontext = Parrot_push_context(interp, regs_used);
+    PMC * pir_compiler = Parrot_get_compiler(interp, CONST_STRING(interp, "PIR"));
+    imc_info_t *imcc = (imc_info_t *) VTABLE_get_pointer(interp, pir_compiler);
+    PackFile * pf = NULL;
 
     Parrot_block_GC_mark(interp);
     Parrot_pcc_set_HLL(interp, newcontext, 0);
     Parrot_pcc_set_sub(interp, newcontext, 0);
 
-    result = imcc_compile_file(interp, fullname, error);
+    result = imcc_compile_file(imcc, fullname, 0);
+    pf = (PackFile *) VTABLE_get_pointer(interp, result);
+
+    // TODO: Get error message
 
     Parrot_pop_context(interp);
     Parrot_unblock_GC_mark(interp);
 
-    return result;
+    return pf->cur_cs;
 }
 
 /*
