@@ -57,22 +57,13 @@ static void do_pre_process(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*imcc);
 
-PARROT_CANNOT_RETURN_NULL
-static PMC * imcc_compile_string(
-    ARGMOD(imc_info_t *imcc),
-    ARGIN(STRING *source),
-    int is_pasm)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*imcc);
-
 static void imcc_destroy_macro_values(ARGMOD(void *value))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*value);
 
 static PMC * imcc_run_compilation_internal(
     ARGMOD(imc_info_t *imcc),
-    ARGIN(STRING *fullname),
+    ARGIN(STRING *source),
     int is_file,
     int is_pasm)
         __attribute__nonnull__(1)
@@ -97,14 +88,11 @@ static struct _imc_info_t* prepare_reentrant_compile(
 #define ASSERT_ARGS_do_pre_process __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(sourcefile))
-#define ASSERT_ARGS_imcc_compile_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(source))
 #define ASSERT_ARGS_imcc_destroy_macro_values __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_imcc_run_compilation_internal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(fullname))
+    , PARROT_ASSERT_ARG(source))
 #define ASSERT_ARGS_imcc_run_compilation_reentrant \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
@@ -326,7 +314,7 @@ do_pre_process(ARGMOD(imc_info_t *imcc), ARGIN(STRING * sourcefile),
 
 /*
 
-=item C<static PMC * imcc_compile_string(imc_info_t *imcc, STRING *source, int
+=item C<PMC * imcc_compile_string(imc_info_t *imcc, STRING *source, int
 is_pasm)>
 
 Entry point of IMCC, as invoked by Parrot's main function.
@@ -338,7 +326,7 @@ and run. This function always returns 0.
 */
 
 PARROT_CANNOT_RETURN_NULL
-static PMC *
+PMC *
 imcc_compile_string(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source), int is_pasm)
 {
     ASSERT_ARGS(imcc_compile_string)

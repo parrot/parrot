@@ -127,6 +127,15 @@ void exit_reentrant_compile(
         FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*imc_info);
 
+PARROT_CANNOT_RETURN_NULL
+PMC * imcc_compile_string(
+    ARGMOD(imc_info_t *imcc),
+    ARGIN(STRING *source),
+    int is_pasm)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc);
+
 void imcc_destroy(ARGMOD(imc_info_t * imcc))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(* imcc);
@@ -160,6 +169,9 @@ yyscan_t imcc_get_scanner(ARGMOD(imc_info_t *imcc))
        PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_exit_reentrant_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_imcc_compile_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(source))
 #define ASSERT_ARGS_imcc_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_destroy_scanner __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
