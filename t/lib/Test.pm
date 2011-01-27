@@ -4,7 +4,7 @@
 our sub yaml_ok($yaml, $expected, $description, *%adverbs) {
     my $parser := YAML::Tiny.new;
     my $result := $parser.read_string($yaml);
-    is_deeply($expected, $result, $description);
+    is_deeply($expected, $result, $description, todo => %adverbs<todo>);
 }
 
 Q:PIR {
