@@ -139,7 +139,6 @@ my $annotated_pir = <<'PIR';
   .annotate 'line', 441
   dec i
   .annotate 'goodbye', 'cactus'
-  .annotate 'num', 12.9
 .end
 PIR
 
