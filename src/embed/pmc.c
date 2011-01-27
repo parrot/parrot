@@ -459,7 +459,7 @@ Parrot_api_pmc_box_integer(Parrot_PMC interp_pmc, Parrot_Int value,
 
 PARROT_API
 Parrot_Int
-Parrot_api_pmc_push(Parrot_PMC interp_pmc, Parrot_PMC pmc Parrot_PMC item)
+Parrot_api_pmc_push(Parrot_PMC interp_pmc, Parrot_PMC pmc, Parrot_PMC item)
 {
     ASSERT_ARGS(Parrot_api_pmc_push)
     EMBED_API_CALLIN(interp_pmc, interp)

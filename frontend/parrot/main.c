@@ -43,6 +43,26 @@ extern int Parrot_set_config_hash(Parrot_PMC interp_pmc);
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_CANNOT_RETURN_NULL
+static PMC * compile_file(
+    Parrot_PMC interp,
+    Parrot_PMC compiler,
+    Parrot_String file);
+
+PARROT_CANNOT_RETURN_NULL
+static PMC * get_class_pmc(Parrot_PMC interp, ARGIN(char *name))
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+static PMC * get_imcc_compiler_pmc(
+    Parrot_PMC interp,
+    Parrot_PMC class_pmc,
+    Parrot_Int is_pasm);
+
+PARROT_CANNOT_RETURN_NULL
+static PMC * get_signature_pmc(Parrot_PMC interp, ARGIN(const char *sig))
+        __attribute__nonnull__(2);
+
 static void help(void);
 static void help_debug(void);
 PARROT_WARN_UNUSED_RESULT
@@ -105,11 +125,8 @@ PARROT_CANNOT_RETURN_NULL
 static PMC * run_imcc(
     Parrot_PMC interp,
     Parrot_String sourcefile,
-    ARGIN(struct init_args_t *flags),
-    int argc,
-    ARGIN(char** argv))
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(5);
+    ARGIN(struct init_args_t *flags))
+        __attribute__nonnull__(3);
 
 static void show_last_error_and_exit(Parrot_PMC interp);
 static void usage(ARGMOD(FILE *fp))
@@ -125,6 +142,12 @@ static void write_bytecode_file(
     Parrot_String filename,
     Parrot_PMC pbc);
 
+#define ASSERT_ARGS_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_get_class_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_get_imcc_compiler_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_get_signature_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(sig))
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_help_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_is_all_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -148,8 +171,7 @@ static void write_bytecode_file(
 #define ASSERT_ARGS_print_parrot_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(vector))
 #define ASSERT_ARGS_run_imcc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(flags) \
-    , PARROT_ASSERT_ARG(argv))
+       PARROT_ASSERT_ARG(flags))
 #define ASSERT_ARGS_show_last_error_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(fp))
@@ -238,7 +260,7 @@ main(int argc, const char *argv[])
 /*
 
 =item C<static PMC * run_imcc(Parrot_PMC interp, Parrot_String sourcefile,
-struct init_args_t *flags, int argc, char** argv)>
+struct init_args_t *flags)>
 
 Call into IMCC to either compile or preprocess the input.
 
