@@ -19,8 +19,8 @@ src/platform/generic/socket.c - UNIX socket functions
 
 #  ifdef __MINGW32__
 #    include <w32api.h>
-#    if WINVER < WindowsXP
-#      error Minimum requirement for Parrot on Windows is Windows XP - might want to check windef.h
+#    if WINVER < Windows2000
+#      error Minimum requirement for Parrot on Windows is Windows 2000 - might want to check windef.h
 #    endif
 #  endif
 #  include <ws2tcpip.h>

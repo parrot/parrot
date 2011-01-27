@@ -20,6 +20,13 @@ Get system memory information.
 
 */
 
+#ifdef __MINGW32__
+#  include <w32api.h>
+#  if WINVER < Windows2000
+#    error Minimum requirement for Parrot on Windows is Windows 2000 - might want to check windef.h
+#  endif
+#endif
+
 #include "parrot/parrot.h"
 #include <windows.h>
 
