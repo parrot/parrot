@@ -12,7 +12,7 @@
 CREDITS                                                     [main]doc
 ChangeLog                                                   []
 Configure.pl                                                []
-DEPRECATED.pod                                              [devel]doc
+DEPRECATED.yaml                                             [devel]doc
 DEVELOPING                                                  []
 DONORS.pod                                                  [main]doc
 LICENSE                                                     [main]doc

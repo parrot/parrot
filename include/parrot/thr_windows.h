@@ -12,8 +12,7 @@
 #define PARROT_THR_WINDOWS_H_GUARD
 
 #  undef FASTCALL
-/* include winsock2.h to override winsock.h included by windows.h */
-#  include <winsock2.h>
+#  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 #  include <process.h>
 #  include <limits.h>
