@@ -121,6 +121,15 @@ imcc_new(PARROT_INTERP)
 }
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+imc_info_t *
+imcc_new_pmc(PMC * interp_pmc)
+{
+    /* TODO: This is ugly. Fix it */
+    return imcc_new((Interp *)VTABLE_get_pointer(NULL, interp_pmc));
+}
+
+PARROT_EXPORT
 void
 imcc_set_debug_mode(ARGMOD(imc_info_t *imcc), INTVAL dflags, INTVAL yflags)
 {

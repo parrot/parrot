@@ -248,21 +248,19 @@ Call into IMCC to either compile or preprocess the input.
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-run_imcc(Parrot_PMC interp, Parrot_String sourcefile,
-        ARGIN(struct init_args_t *flags), int argc, ARGIN(char** argv))
+run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *flags))
 {
     ASSERT_ARGS(run_imcc)
+    imcc_info_t *imcc = imcc_new_pmc(interp);
     if (flags->preprocess_only) {
-        //if (!Parrot_api_wrap_imcc_hack(interp, sourcefile, argc, argv, NULL,
-        //                               imcc_do_preprocess_api))
-        //    show_last_error_and_exit(interp);
+        imcc_preprocess(imcc, sourcefile);
+        imcc_destroy(imcc);
         exit(EXIT_SUCCESS);
     }
     else {
-        Parrot_PMC bytecodepmc = NULL;
-        //if (!Parrot_api_wrap_imcc_hack(interp, sourcefile, argc, argv,
-        //                               &bytecodepmc, imcc_run_api))
-        //    show_last_error_and_exit(interp);
+        /* TODO: determine if it's a .pasm or .pir file */
+        Parrot_PMC bytecode = imcc_compile_file(imcc, sourcefile, 0);
+        imcc_destroy(imcc);
         return bytecodepmc;
     }
 }
