@@ -50,7 +50,7 @@ static PMC * compile_file(
     Parrot_String file);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC * get_class_pmc(Parrot_PMC interp, ARGIN(char *name))
+static PMC * get_class_pmc(Parrot_PMC interp, ARGIN(const char *name))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
@@ -232,7 +232,7 @@ main(int argc, const char *argv[])
     }
     else {
         Parrot_api_toggle_gc(interp, 0);
-        bytecodepmc = run_imcc(interp, source_str, &parsed_flags, argc, argv);
+        bytecodepmc = run_imcc(interp, source_str, &parsed_flags);
         if (!parsed_flags.turn_gc_off)
             Parrot_api_toggle_gc(interp, 1);
     }
@@ -290,14 +290,14 @@ run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-get_class_pmc(Parrot_PMC interp, ARGIN(char *name))
+get_class_pmc(Parrot_PMC interp, ARGIN(const char *name))
 {
     Parrot_String name_s = NULL;
-    Parrot_PMC name_pmc = NULL
+    Parrot_PMC name_pmc = NULL;
     Parrot_PMC class_pmc = NULL;
     if (!(Parrot_api_string_import_ascii(interp, name, &name_s) &&
           Parrot_api_pmc_box_string(interp, name_s, &name_pmc) &&
-          Parrot_api_pmc_get_class(interp, key, &class_pmc))
+          Parrot_api_pmc_get_class(interp, name_pmc, &class_pmc)))
         show_last_error_and_exit(interp);
     return class_pmc;
 }
@@ -308,15 +308,15 @@ get_imcc_compiler_pmc(Parrot_PMC interp, Parrot_PMC class_pmc, Parrot_Int is_pas
 {
     Parrot_PMC is_pasm_pmc = NULL;
     Parrot_PMC compiler_pmc = NULL;
-    char *name = is_pasm ? "PASM" : "PIR";
+    const char *name = is_pasm ? "PASM" : "PIR";
     Parrot_String name_s = NULL;
 
     if (!Parrot_api_pmc_box_integer(interp, is_pasm, &is_pasm_pmc))
         show_last_error_and_exit(interp);
     if (!Parrot_api_pmc_new_from_class(interp, class_pmc, is_pasm_pmc, &compiler_pmc))
         show_last_error_and_exit(interp);
-    if (!(Parrot_api_pmc_box_string(interp, name, &name_s) &&
-          Parrot_api_pmc_set_compiler(interp, name_s, compiler_pmc)))
+    if (!(Parrot_api_string_import_ascii(interp, name, &name_s) &&
+          Parrot_api_set_compiler(interp, name_s, compiler_pmc)))
         show_last_error_and_exit(interp);
     return compiler_pmc;
 }
@@ -331,7 +331,7 @@ get_signature_pmc(Parrot_PMC interp, ARGIN(const char *sig))
     if (!Parrot_api_pmc_new_from_class(interp, class_pmc, NULL, &sig_pmc))
         show_last_error_and_exit(interp);
     if (!(Parrot_api_string_import_ascii(interp, sig, &sig_s) &&
-          Parrot_api_pmc_set_string(interp, sig_pmc, sig_s))
+          Parrot_api_pmc_set_string(interp, sig_pmc, sig_s)))
         show_last_error_and_exit(interp);
     return sig_pmc;
 }
