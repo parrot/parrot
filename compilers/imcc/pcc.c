@@ -582,7 +582,7 @@ pcc_reg_mov(ARGMOD(imc_info_t * imcc), unsigned char d, unsigned char s,
                 if (temps[t])
                     dest = temps[t];
                 else {
-                    dest = temps[t] = mk_temp_reg(interp, src->set);
+                    dest = temps[t] = mk_temp_reg(imcc, src->set);
                 }
                 break;
             }
@@ -599,7 +599,7 @@ pcc_reg_mov(ARGMOD(imc_info_t * imcc), unsigned char d, unsigned char s,
         for (t = 0; t < 4; ++t) {
             if (types[t] == dest->set) {
                 if (!temps[t])
-                    temps[t] = mk_temp_reg(interp, dest->set);
+                    temps[t] = mk_temp_reg(imcc, dest->set);
                 src = temps[t];
                 break;
             }
@@ -699,7 +699,7 @@ recursive_tail_call(ARGMOD(imc_info_t * imcc), ARGIN(IMC_Unit *unit),
     SymReg *regs[2];
     Instruction *get_params, *tmp_ins, *unused_ins;
     char *buf;
-    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(interp);
+    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(imcc->interp);
 
     if (!(unit->instructions->type & ITLABEL))
         return 0;
@@ -846,7 +846,7 @@ expand_pcc_sub_call(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
 
         if (!meth_call && (the_sub->type & VTADDRESS)) {
             /* sub->pcc_sub->sub is an actual subroutine name, not a variable */
-            reg = mk_temp_reg(interp, 'P');
+            reg = mk_temp_reg(imcc, 'P');
             add_pcc_sub(sub, reg);
 
             /* insert set_p_pc with the sub as constant */
