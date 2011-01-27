@@ -224,7 +224,6 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
         INTVAL protocol, INTVAL fam, INTVAL passive)
 {
 #ifdef PARROT_HAS_IPV6
-    char *s;
     PMC *array;
 
     struct addrinfo hints;
@@ -234,11 +233,6 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
      * so we need 5 characters + trailing null-byte. */
     char portstr[6];
     int  ret;
-
-    if (STRING_IS_NULL(addr))
-        s = NULL;
-    else
-        s = Parrot_str_to_cstring(interp, addr);
 
     /* convert Parrot's family to system family */
     if (fam < 0
@@ -256,14 +250,19 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
 
     snprintf(portstr, sizeof (portstr), "%ld", port);
 
-    /* check return value *after* freeing cstring */
-    ret = getaddrinfo(s, portstr, &hints, &ai);
+    {
+        /* Limited scope for the C string to prevent mistakes */
+        char *s = STRING_IS_NULL(addr)
+                ? (char *) NULL
+                : Parrot_str_to_cstring(interp, addr);
+        ret = getaddrinfo(s, portstr, &hints, &ai);
 
-    Parrot_str_free_cstring(s);
+        Parrot_str_free_cstring(s);
+    }
 
     if (ret != 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "getaddrinfo failed: %s", s ? s : "(null)");
+                "getaddrinfo failed: %Ss", addr);
 
     array = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
@@ -298,6 +297,12 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
     struct sockaddr_in *sa;
 
     Parrot_Sockaddr_attributes *sa_attrs;
+
+    /* FIXME: don't know what is supposed to do, this check is just to
+     * prevent segfaults */
+    if (STRING_IS_NULL(addr))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "getaddrinfo failed: null address");
 
     sa       = (struct sockaddr_in *)Parrot_gc_allocate_memory_chunk(interp,
                                             addr_len);
