@@ -70,6 +70,15 @@ static void imcc_destroy_macro_values(ARGMOD(void *value))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*value);
 
+static PMC * imcc_run_compilation_internal(
+    ARGMOD(imc_info_t *imcc),
+    ARGIN(STRING *fullname),
+    int is_file,
+    int is_pasm)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc);
+
 static PMC * imcc_run_compilation_reentrant(
     ARGMOD(imc_info_t *imcc),
     ARGIN(STRING *fullname),
@@ -93,6 +102,9 @@ static struct _imc_info_t* prepare_reentrant_compile(
     , PARROT_ASSERT_ARG(source))
 #define ASSERT_ARGS_imcc_destroy_macro_values __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_imcc_run_compilation_internal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(fullname))
 #define ASSERT_ARGS_imcc_run_compilation_reentrant \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
@@ -314,7 +326,7 @@ do_pre_process(ARGMOD(imc_info_t *imcc), ARGIN(STRING * sourcefile),
 
 /*
 
-=item C<PMC * imcc_compile_file(imc_info_t *imcc, STRING *fullname, int
+=item C<static PMC * imcc_compile_string(imc_info_t *imcc, STRING *source, int
 is_pasm)>
 
 Entry point of IMCC, as invoked by Parrot's main function.
@@ -329,14 +341,14 @@ PARROT_CANNOT_RETURN_NULL
 static PMC *
 imcc_compile_string(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source), int is_pasm)
 {
-    ASSERT_ARGS(imcc_compile_file)
+    ASSERT_ARGS(imcc_compile_string)
     return imcc_run_compilation_reentrant(imcc, source, 0, is_pasm);
 }
 
 /*
 
-=item C<void * imcc_compile_file(imc_info_t *imcc, STRING *fullname, STRING
-**error_message)>
+=item C<PMC * imcc_compile_file(imc_info_t *imcc, STRING *fullname, int
+is_pasm)>
 
 Compile a file by filename (can be either PASM or IMCC code)
 
@@ -359,7 +371,6 @@ static PMC *
 imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
         int is_file, int is_pasm)
 {
-    PackFile * const pf_raw = PackFile_new(imcc->interp, 0);
     struct _imc_info_t * const imc_save = prepare_reentrant_compile(imcc);
     struct _imc_info_t * imcc_use = imc_save ? imc_save : imcc;
     PMC * const result = imcc_run_compilation_internal(imcc, fullname, is_file, is_pasm);
@@ -368,26 +379,27 @@ imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname)
 }
 
 static PMC *
-imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
+imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
         int is_file, int is_pasm)
-}
-    yyscan_t yyscanner = imcc_get_scanner(imcc_use);
+{
+    yyscan_t yyscanner = imcc_get_scanner(imcc);
+    PackFile * const pf_raw = PackFile_new(imcc->interp, 0);
 
     /* TODO: Don't set current packfile in the interpreter. Leave the
              interpreter alone */
     Parrot_pf_set_current_packfile(imcc->interp, pf_raw);
 
-    IMCC_push_parser_state(imcc_use, fullname, is_pasm);
+    IMCC_push_parser_state(imcc, source, is_pasm);
 
-    imcc_compile_buffer_safe(imcc_use, yyscanner, source, 1, is_pasm);
+    imcc_compile_buffer_safe(imcc, yyscanner, source, 1, is_pasm);
 
     yylex_destroy(yyscanner);
-    imc_cleanup(imcc_use, NULL);
+    imc_cleanup(imcc, NULL);
 
     if (imcc->error_code) {
         imcc->error_code = IMCC_FATAL_EXCEPTION;
-        IMCC_warning(imcc_use, "error:imcc:%Ss", imcc->error_message);
-        IMCC_print_inc(imcc_use);
+        IMCC_warning(imcc, "error:imcc:%Ss", imcc->error_message);
+        IMCC_print_inc(imcc);
 
         return PMCNULL;
     }
