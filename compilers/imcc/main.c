@@ -49,13 +49,6 @@ static INTVAL       eval_nr  = 0;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static PIOHANDLE determine_input_file_type(
-    ARGMOD(imc_info_t * imcc),
-    ARGIN(STRING *sourcefile))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(* imcc);
-
 static void do_pre_process(
     ARGMOD(imc_info_t *imcc),
     ARGIN(STRING * sourcefile),
@@ -64,44 +57,27 @@ static void do_pre_process(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*imcc);
 
-static imc_info_t * exit_reentrant_compile(
-    ARGMOD(imc_info_t * imcc),
-    ARGMOD_NULLOK(struct _imc_info_t *imc_info))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(* imcc)
-        FUNC_MODIFIES(*imc_info);
-
 static void imcc_destroy_macro_values(ARGMOD(void *value))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*value);
 
-static void imcc_get_optimization_description(
-    ARGMOD(imc_info_t * imcc),
-    int opt_level)
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(* imcc);
-
-static void imcc_parseflags(
+static PMC * imcc_run_compilation_internal(
     ARGMOD(imc_info_t *imcc),
-    int argc,
-    ARGIN_NULLOK(const char **argv))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*imcc);
-
-PARROT_CANNOT_RETURN_NULL
-static PMC * imcc_run(ARGMOD(imc_info_t *imcc), ARGIN(STRING *sourcefile))
+    ARGIN(STRING *source),
+    int is_file,
+    int is_pasm)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*imcc);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-static int is_all_hex_digits(ARGIN(const char *s))
-        __attribute__nonnull__(1);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static const struct longopt_opt_decl * Parrot_cmd_options(void);
+static PMC * imcc_run_compilation_reentrant(
+    ARGMOD(imc_info_t *imcc),
+    ARGIN(STRING *fullname),
+    int is_file,
+    int is_pasm)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc);
 
 PARROT_CAN_RETURN_NULL
 static struct _imc_info_t* prepare_reentrant_compile(
@@ -109,27 +85,18 @@ static struct _imc_info_t* prepare_reentrant_compile(
         __attribute__nonnull__(1)
         FUNC_MODIFIES(* imcc);
 
-#define ASSERT_ARGS_determine_input_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(sourcefile))
 #define ASSERT_ARGS_do_pre_process __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(sourcefile))
-#define ASSERT_ARGS_exit_reentrant_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_destroy_macro_values __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
-#define ASSERT_ARGS_imcc_get_optimization_description \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc))
-#define ASSERT_ARGS_imcc_parseflags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc))
-#define ASSERT_ARGS_imcc_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_imcc_run_compilation_internal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(sourcefile))
-#define ASSERT_ARGS_is_all_hex_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_Parrot_cmd_options __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+    , PARROT_ASSERT_ARG(source))
+#define ASSERT_ARGS_imcc_run_compilation_reentrant \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(fullname))
 #define ASSERT_ARGS_prepare_reentrant_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -178,20 +145,20 @@ PARROT_EXPORT
 void
 imcc_set_optimization_level(ARGMOD(imc_info_t *imcc), ARGIN(const char *opts))
 {
-    if (!opts || !*opts || opts[0] = '0')
+    if (!opts || !*opts || opts[0] == '0')
         return;
-    if (strchr(opt.opt_arg, 'p'))
+    if (strchr(opts, 'p'))
         imcc->optimizer_level |= OPT_PASM;
-    if (strchr(opt.opt_arg, 'c'))
+    if (strchr(opts, 'c'))
         imcc->optimizer_level |= OPT_SUB;
 
     /* OLD DEFAULT: 1 */
 
     /* currently not ok due to different register allocation */
-    if (strchr(opt.opt_arg, '1')) {
+    if (strchr(opts, '1')) {
         imcc->optimizer_level |= OPT_PRE;
     }
-    if (strchr(opt.opt_arg, '2')) {
+    if (strchr(opts, '2')) {
         imcc->optimizer_level |= (OPT_PRE | OPT_CFG);
     }
 }
@@ -218,7 +185,7 @@ imcc_destroy_scanner(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner)
 
 PARROT_EXPORT
 void
-imcc_preprocess(ARGMOD(imc_info_t *imcc))
+imcc_preprocess(ARGMOD(imc_info_t *imcc), ARGIN(STRING * const sourcefile))
 {
     yyscan_t yyscanner = imcc_get_scanner(imcc);
 
@@ -347,7 +314,8 @@ do_pre_process(ARGMOD(imc_info_t *imcc), ARGIN(STRING * sourcefile),
 
 /*
 
-=item C<static PMC * imcc_compile_file(imc_info_t *imcc, STRING *sourcefile)>
+=item C<PMC * imcc_compile_string(imc_info_t *imcc, STRING *source, int
+is_pasm)>
 
 Entry point of IMCC, as invoked by Parrot's main function.
 Compile source code (if required), write bytecode file (if required)
@@ -358,17 +326,17 @@ and run. This function always returns 0.
 */
 
 PARROT_CANNOT_RETURN_NULL
-static PMC *
+PMC *
 imcc_compile_string(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source), int is_pasm)
 {
-    ASSERT_ARGS(imcc_compile_file)
-    return imcc_run_compilation_reentrant(imcc, fullname, 0, is_pasm);
+    ASSERT_ARGS(imcc_compile_string)
+    return imcc_run_compilation_reentrant(imcc, source, 0, is_pasm);
 }
 
 /*
 
-=item C<void * imcc_compile_file(imc_info_t *imcc, STRING *fullname, STRING
-**error_message)>
+=item C<PMC * imcc_compile_file(imc_info_t *imcc, STRING *fullname, int
+is_pasm)>
 
 Compile a file by filename (can be either PASM or IMCC code)
 
@@ -391,7 +359,6 @@ static PMC *
 imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
         int is_file, int is_pasm)
 {
-    PackFile * const pf_raw = PackFile_new(imcc->interp, 0);
     struct _imc_info_t * const imc_save = prepare_reentrant_compile(imcc);
     struct _imc_info_t * imcc_use = imc_save ? imc_save : imcc;
     PMC * const result = imcc_run_compilation_internal(imcc, fullname, is_file, is_pasm);
@@ -400,26 +367,27 @@ imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname)
 }
 
 static PMC *
-imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
+imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
         int is_file, int is_pasm)
-}
-    yyscan_t yyscanner = imcc_get_scanner(imcc_use);
+{
+    yyscan_t yyscanner = imcc_get_scanner(imcc);
+    PackFile * const pf_raw = PackFile_new(imcc->interp, 0);
 
     /* TODO: Don't set current packfile in the interpreter. Leave the
              interpreter alone */
     Parrot_pf_set_current_packfile(imcc->interp, pf_raw);
 
-    IMCC_push_parser_state(imcc_use, fullname, is_pasm);
+    IMCC_push_parser_state(imcc, source, is_pasm);
 
-    imcc_compile_buffer_safe(imcc_use, yyscanner, source, 1, is_pasm);
+    imcc_compile_buffer_safe(imcc, yyscanner, source, 1, is_pasm);
 
     yylex_destroy(yyscanner);
-    imc_cleanup(imcc_use, NULL);
+    imc_cleanup(imcc, NULL);
 
     if (imcc->error_code) {
         imcc->error_code = IMCC_FATAL_EXCEPTION;
-        IMCC_warning(imcc_use, "error:imcc:%Ss", imcc->error_message);
-        IMCC_print_inc(imcc_use);
+        IMCC_warning(imcc, "error:imcc:%Ss", imcc->error_message);
+        IMCC_print_inc(imcc);
 
         return PMCNULL;
     }
@@ -446,8 +414,8 @@ list and set the new one as the current one. Return the new info structure.
 returns NULL if not in a reentrant situation. The return value of this I<MUST>
 be passed to C<exit_reentrant_compile>.
 
-=item C<static imc_info_t * exit_reentrant_compile(imc_info_t * imcc, struct
-_imc_info_t *imc_info)>
+=item C<void exit_reentrant_compile(imc_info_t * imcc, struct _imc_info_t
+*imc_info)>
 
 Exit reentrant compile. Restore compiler state back to what it was for the
 previous compile, if any.

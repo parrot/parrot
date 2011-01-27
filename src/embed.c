@@ -27,8 +27,6 @@ numbered.  You probably want src/embed/api.c
 #include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
 
-#include "../compilers/imcc/imc.h"
-
 #include "embed.str"
 
 /* HEADERIZER HFILE: include/parrot/embed.h */
@@ -958,12 +956,13 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code)
     Parrot_block_GC_mark(interp);
 
     if (STRING_equal(interp, CONST_STRING(interp, "PIR"), type))
-        result = IMCC_compile_pir_s(interp, code_s, error);
+        result = imcc_compile_string(interp, code_s, 0);
 
     else if (STRING_equal(interp, CONST_STRING(interp, "PASM"), type))
-        result = IMCC_compile_pasm_s(interp, code_s, error);
-    else
-        *error = Parrot_str_new(interp, "Invalid interpreter type", 0);
+        result = imcc_compile_string(interp, code_s, 1);
+    // TODO: Where to get the error info now?
+    //else
+        //*error = Parrot_str_new(interp, "Invalid interpreter type", 0);
 
     Parrot_unblock_GC_mark(interp);
 

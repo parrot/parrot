@@ -41,6 +41,7 @@
 typedef struct IMC_Unit IMC_Unit;
 typedef struct _imc_info_t imc_info_t;
 
+#include "yyscanner.h"
 #include "symreg.h"
 #include "instructions.h"
 #include "sets.h"
@@ -66,24 +67,16 @@ enum {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-void * imcc_compile_file(
-    ARGMOD(imc_info_t *imcc),
-    ARGIN(STRING *fullname),
-    ARGOUT(STRING **error_message))
+PMC * imcc_compile(ARGMOD(imc_info_t *imcc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*imcc)
-        FUNC_MODIFIES(*error_message);
+        FUNC_MODIFIES(*imcc);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC * imcc_do_preprocess_api(
+PMC * imcc_compile_file(
     ARGMOD(imc_info_t *imcc),
-    ARGIN(STRING *sourcefile),
-    int argc,
-    SHIM(const char **argv))
+    ARGIN(STRING *fullname),
+    int is_pasm)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*imcc);
@@ -94,102 +87,96 @@ imc_info_t * imcc_new(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PMC * imcc_run_api(
+void imcc_preprocess(
     ARGMOD(imc_info_t *imcc),
-    ARGIN(STRING *sourcefile),
-    int argc,
-    ARGIN_NULLOK(const char **argv))
+    ARGIN(STRING * const sourcefile))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*imcc);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * imcc_compile(
+PARROT_EXPORT
+void imcc_set_debug_mode(
     ARGMOD(imc_info_t *imcc),
-    ARGIN(STRING *s),
-    int pasm_file,
-    ARGOUT(STRING **error_message))
+    INTVAL dflags,
+    INTVAL yflags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*imcc)
-        FUNC_MODIFIES(*error_message);
+        FUNC_MODIFIES(*imcc);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * imcc_compile_pasm_ex(ARGMOD(imc_info_t *imcc), ARGIN(STRING *s))
+PARROT_EXPORT
+void imcc_set_optimization_level(
+    ARGMOD(imc_info_t *imcc),
+    ARGIN(const char *opts))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*imcc);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * IMCC_compile_pasm_s(
-    ARGMOD(imc_info_t *imcc),
-    ARGIN(STRING *s),
-    ARGOUT(STRING **error_message))
+PARROT_EXPORT
+void imcc_set_verbosity(ARGMOD(imc_info_t *imcc), INTVAL verbose)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*imcc)
-        FUNC_MODIFIES(*error_message);
+        FUNC_MODIFIES(*imcc);
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_EXPORT
+void imcc_set_warning_mode(ARGMOD(imc_info_t *imcc), INTVAL warnings)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*imcc);
+
+void exit_reentrant_compile(
+    ARGMOD(imc_info_t * imcc),
+    ARGMOD_NULLOK(struct _imc_info_t *imc_info))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(* imcc)
+        FUNC_MODIFIES(*imc_info);
+
 PARROT_CANNOT_RETURN_NULL
-PMC * imcc_compile_pir_ex(ARGMOD(imc_info_t *imcc), ARGIN(STRING *s))
+PMC * imcc_compile_string(
+    ARGMOD(imc_info_t *imcc),
+    ARGIN(STRING *source),
+    int is_pasm)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*imcc);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * IMCC_compile_pir_s(
-    ARGMOD(imc_info_t *imcc),
-    ARGIN(STRING *s),
-    ARGOUT(STRING **error_message))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*imcc)
-        FUNC_MODIFIES(*error_message);
 
 void imcc_destroy(ARGMOD(imc_info_t * imcc))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(* imcc);
 
+void imcc_destroy_scanner(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*imcc);
+
+yyscan_t imcc_get_scanner(ARGMOD(imc_info_t *imcc))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*imcc);
+
+#define ASSERT_ARGS_imcc_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(fullname) \
-    , PARROT_ASSERT_ARG(error_message))
-#define ASSERT_ARGS_imcc_do_preprocess_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(sourcefile))
+    , PARROT_ASSERT_ARG(fullname))
 #define ASSERT_ARGS_imcc_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_imcc_run_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_imcc_preprocess __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(sourcefile))
-#define ASSERT_ARGS_imcc_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_imcc_set_debug_mode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_imcc_set_optimization_level __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(s) \
-    , PARROT_ASSERT_ARG(error_message))
-#define ASSERT_ARGS_imcc_compile_pasm_ex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+    , PARROT_ASSERT_ARG(opts))
+#define ASSERT_ARGS_imcc_set_verbosity __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_imcc_set_warning_mode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_exit_reentrant_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_imcc_compile_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_IMCC_compile_pasm_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(s) \
-    , PARROT_ASSERT_ARG(error_message))
-#define ASSERT_ARGS_imcc_compile_pir_ex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_IMCC_compile_pir_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(s) \
-    , PARROT_ASSERT_ARG(error_message))
+    , PARROT_ASSERT_ARG(source))
 #define ASSERT_ARGS_imcc_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_imcc_destroy_scanner __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_imcc_get_scanner __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/main.c */

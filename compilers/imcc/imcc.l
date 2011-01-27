@@ -1297,10 +1297,9 @@ IMCC_pop_parser_state(ARGMOD(imc_info_t *imcc), void *yyscanner)
     pop_parser_state(imcc, yyscanner);
 }
 
-static PIOHANDLE
+PIOHANDLE
 determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sourcefile))
 {
-    ASSERT_ARGS(determine_input_file_type)
     PIOHANDLE handle;
 
     if (!STRING_length(sourcefile))
