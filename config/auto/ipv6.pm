@@ -50,7 +50,7 @@ sub runstep {
 
 sub _handle_ipv6_status {
     my ($self, $conf, $ipv6_status) = @_;
-    $conf->data->set( HAS_IPV6 => $ipv6_status );
+    $conf->data->set( HAS_IPV6 => 1) if $ipv6_status;
     $ipv6_status
         ? $self->set_result('yes')
         : $self->set_result('no');
