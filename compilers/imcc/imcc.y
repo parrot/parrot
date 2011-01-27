@@ -24,6 +24,8 @@
 #include "pbc.h"
 #include "parser.h"
 #include "optimizer.h"
+#include "instructions.h"
+#include "symreg.h"
 
 /* prevent declarations of malloc() and free() in the generated parser. */
 #define YYMALLOC

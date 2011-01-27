@@ -27,8 +27,6 @@ numbered.  You probably want src/embed/api.c
 #include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
 
-#include "../compilers/imcc/imc.h"
-
 #include "embed.str"
 
 /* HEADERIZER HFILE: include/parrot/embed.h */
