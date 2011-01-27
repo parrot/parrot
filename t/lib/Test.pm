@@ -2,7 +2,9 @@
 #module Test;
 
 our sub yaml_ok($yaml, $expected, $description) {
-    ok(1, $description);
+    my $parser := YAML::Tiny.new;
+    my $result := $parser.read_string($yaml);
+    is_deeply($result, $expected, $description);
 }
 
 Q:PIR {
