@@ -21,8 +21,6 @@ Win32 System Programming, 2nd Edition.
 
 */
 
-#include <windows.h>
-
 #include "parrot/parrot.h"
 #include "../../io/io_private.h"
 

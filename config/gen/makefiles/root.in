@@ -962,8 +962,13 @@ src/scheduler$(O) : \
 
 src/io/core$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/core.c
 
-src/io/socket_api$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
-    src/io/api.str include/pmc/pmc_socket.h src/io/socket_api.c
+src/io/socket_api$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/io/io_private.h \
+    src/io/api.str \
+    include/pmc/pmc_socket.h \
+    include/pmc/pmc_sockaddr.h \
+    src/io/socket_api.c
 
 O_FILES = \
     $(INTERP_O_FILES) \
@@ -1621,7 +1626,7 @@ src/platform/generic/math$(O) : src/platform/generic/math.c $(PARROT_H_HEADERS)
 src/platform/generic/misc$(O) : src/platform/generic/misc.c $(PARROT_H_HEADERS)
 
 src/platform/generic/socket$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_socket.h \
-    src/io/io_private.h src/platform/generic/socket.c
+    src/io/io_private.h include/pmc/pmc_sockaddr.h src/platform/generic/socket.c
 
 src/platform/generic/stat$(O) : src/platform/generic/stat.c $(PARROT_H_HEADERS)
 
