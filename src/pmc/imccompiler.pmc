@@ -33,6 +33,22 @@ pmclass IMCCompiler provides HLLCompiler {
         return next;
     }
 
+    VTABLE void *get_pointer() {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        return attrs->imcc_info;
+    }
+
+    VTABLE INTVAL get_integer() {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        return attrs->is_pasm;
+    }
+
+    VTABLE void destroy() {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        imcc_destroy(attrs->imcc_info);
+        attrs->imcc_info = NULL;
+    }
+
     METHOD compile(STRING *source,
             STRING *target :named("target") :optional, INTVAL has_target :opt_flag,
             PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag
