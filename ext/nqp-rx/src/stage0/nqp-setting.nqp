@@ -54,6 +54,16 @@ module ResizablePMCArray {
         @mapped;
     }
 
+    =begin item grep
+    Return an array with elements matching code.
+    =end item
+
+    method grep (&code) {
+        my @grepped;
+        for self { @grepped.push($_) if &code($_) };
+        @grepped;
+    }
+
     =begin item reverse
     Return a reversed copy of the invocant.
     =end item
@@ -68,6 +78,7 @@ module ResizablePMCArray {
 
 our sub join ($separator, *@values) { @values.join($separator); }
 our sub map (&code, *@values) { @values.map(&code); }
+our sub grep (&code, *@values) { @values.grep(&code); }
 our sub list (*@values) { @values; }
 
 # vim: ft=perl6
