@@ -1,5 +1,8 @@
-pmclass IMCCompiler provides HLLCompiler {
-    ATTR imc_info_t *imcc_info;
+
+#include "../compilers/imcc/imc.h"
+
+pmclass IMCCompiler auto_attrs provides HLLCompiler {
+    ATTR void *imcc_info;
     ATTR INTVAL is_pasm; /* 0 = PIR, 1 = PASM */
 
     VTABLE void init() {
@@ -17,13 +20,14 @@ pmclass IMCCompiler provides HLLCompiler {
         if (is_pasm != 0 && is_pasm != 1)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "IMCCompiler: Must have type 0 (PIR) or 1 (PASM)");
-        attrs->is_pasm = type;
+        attrs->is_pasm = is_pasm;
         attrs->imcc_info = imcc_new(INTERP);
     }
 
     /* provided to emulate the current NCI compreg */
     VTABLE void* invoke(void* next) {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        PMC * const ctx = CURRENT_CONTEXT(INTERP);
         PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
         STRING * code = STRINGNULL;
         PMC * result = PMCNULL;
