@@ -253,16 +253,16 @@ run_imcc(Parrot_PMC interp, Parrot_String sourcefile,
 {
     ASSERT_ARGS(run_imcc)
     if (flags->preprocess_only) {
-        if (!Parrot_api_wrap_imcc_hack(interp, sourcefile, argc, argv, NULL,
-                                       imcc_do_preprocess_api))
-            show_last_error_and_exit(interp);
+        //if (!Parrot_api_wrap_imcc_hack(interp, sourcefile, argc, argv, NULL,
+        //                               imcc_do_preprocess_api))
+        //    show_last_error_and_exit(interp);
         exit(EXIT_SUCCESS);
     }
     else {
         Parrot_PMC bytecodepmc = NULL;
-        if (!Parrot_api_wrap_imcc_hack(interp, sourcefile, argc, argv,
-                                       &bytecodepmc, imcc_run_api))
-            show_last_error_and_exit(interp);
+        //if (!Parrot_api_wrap_imcc_hack(interp, sourcefile, argc, argv,
+        //                               &bytecodepmc, imcc_run_api))
+        //    show_last_error_and_exit(interp);
         return bytecodepmc;
     }
 }
