@@ -61,6 +61,7 @@ compilers/imcc/sets.c                                       [imcc]
 compilers/imcc/sets.h                                       [imcc]
 compilers/imcc/symreg.c                                     [imcc]
 compilers/imcc/symreg.h                                     [imcc]
+compilers/imcc/yyscanner.h                                  [imcc]
 compilers/imcc/unit.h                                       [imcc]
 compilers/opsc/Defines.mak                                  [opsc]
 compilers/opsc/README.pod                                   []doc
