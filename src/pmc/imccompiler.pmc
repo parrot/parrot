@@ -75,6 +75,11 @@ pmclass IMCCompiler provides HLLCompiler {
         /* TODO: Execute it */
     }
 
+    METHOD preprocess(STRING *code) {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        imcc_preprocess(attrs->imcc_info, code);
+    }
+
     METHOD parse_name(STRING *name) {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "IMCCompiler: parse_name is not supported");
