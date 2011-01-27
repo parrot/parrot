@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 
@@ -3751,7 +3751,7 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     for (i = 0; i < self->num_keys; ++i) {
         PackFile_Annotations_Key * const key = self->keys + i;
         key->name  = PF_fetch_opcode(seg->pf, &cursor);
-        key->type  = PF_fetch_opcode(seg->pf, &cursor);
+        key->type  = (pf_ann_key_type_t)PF_fetch_opcode(seg->pf, &cursor);
         key->start = PF_fetch_opcode(seg->pf, &cursor);
         key->len   = PF_fetch_opcode(seg->pf, &cursor);
     }
@@ -3913,7 +3913,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
 
         /* Populate it. */
         self->keys[key_id].name  = key;
-        self->keys[key_id].type  = type;
+        self->keys[key_id].type  = (pf_ann_key_type_t)type;
         self->keys[key_id].start = key_id == 0 ?
                                     0 :
                                     self->keys[key_id - 1].start + self->keys[key_id -1].len;
@@ -3934,7 +3934,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
           (find_pf_ann_idx(interp, self, &self->keys[key_id], offset) + 1) * 2;
 
     /* Extend segment data and shift subsequent data by 2. */
-    self->base.data = mem_sys_realloc(self->base.data,
+    self->base.data = (opcode_t *)mem_sys_realloc(self->base.data,
                             (self->base.size + 2) * sizeof (opcode_t));
     mem_sys_memmove(&self->base.data[idx + 2], &self->base.data[idx],
             (self->base.size - idx) * sizeof (opcode_t));
@@ -4015,6 +4015,9 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
             return Parrot_pmc_box_string(interp, self->code->const_table->str.constants[val]);
           case PF_ANNOTATION_KEY_TYPE_PMC:
             return self->code->const_table->pmc.constants[val];
+          default:
+            Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG, "unexpected annotation type found");
+            return PMCNULL;
         }
     }
 }
