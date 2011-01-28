@@ -25,7 +25,8 @@ This file implements OS-specific file functions for Win32 platforms.
 #include "parrot/parrot.h"
 
 #define THROW(msg) Parrot_ex_throw_from_c_args(interp, NULL, \
-    EXCEPTION_EXTERNAL_ERROR, "%s failed: Error %d", (msg), GetLastError())
+    EXCEPTION_EXTERNAL_ERROR, "%s failed: %Ss", (msg), \
+    Parrot_platform_strerror(GetLastError()))
 
 /* HEADERIZER HFILE: none */
 
