@@ -322,7 +322,8 @@ Parrot_io_read(PARROT_INTERP, PIOHANDLE os_handle,
 
         if (err != ERROR_BROKEN_PIPE)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                    "Read error: %d", err);
+                    "Read error: %Ss",
+                    Parrot_platform_strerror(interp, err));
     }
 
     return countread;
@@ -351,10 +352,13 @@ Parrot_io_write(PARROT_INTERP, PIOHANDLE os_handle,
     if (WriteFile(os_handle, (LPCSTR)buf, len, &countwrote, NULL))
         return countwrote;
 
+    err = GetLastError();
+
     /* Write may have failed because of small buffers,
      * see TT #710 for example.
      * Let's try writing in small chunks */
-    if ((err = GetLastError()) == ERROR_NOT_ENOUGH_MEMORY || err == ERROR_INVALID_USER_BUFFER) {
+    if (err == ERROR_NOT_ENOUGH_MEMORY
+    ||  err == ERROR_INVALID_USER_BUFFER) {
         DWORD chunk   = 4096; /* Arbitrarily choosen value */
         DWORD written = 0;
 
@@ -379,7 +383,7 @@ Parrot_io_write(PARROT_INTERP, PIOHANDLE os_handle,
     }
 fail:
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Write error: %d", GetLastError());
+            "Write error: %Ss", Parrot_platform_strerror(interp, err));
 }
 
 /*
@@ -407,11 +411,16 @@ Parrot_io_seek(PARROT_INTERP, PIOHANDLE os_handle,
     /* offset.HighPart gets overwritten */
     offset.LowPart = SetFilePointer(os_handle, offset.LowPart,
                         &offset.HighPart, whence);
-    if (offset.LowPart == INVALID_SET_FILE_POINTER
-    &&  GetLastError() != NO_ERROR) {
-        /* Error - exception */
-        return -1;
+
+    if (offset.LowPart == INVALID_SET_FILE_POINTER) {
+        DWORD err = GetLastError();
+
+        if (err != NO_ERROR)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                    "seek failed: %Ss",
+                    Parrot_platform_strerror(interp, err));
     }
+
     return offset.QuadPart;
 }
 
@@ -432,9 +441,16 @@ Parrot_io_tell(PARROT_INTERP, PIOHANDLE os_handle)
 
     p.QuadPart = piooffsetzero;
     p.LowPart = SetFilePointer(os_handle, 0, &p.HighPart, FILE_CURRENT);
-    if (p.LowPart == 0xFFFFFFFF && GetLastError() != NO_ERROR) {
-        /* FIXME: Error - exception */
+
+    if (p.LowPart == 0xFFFFFFFF) {
+        DWORD err = GetLastError();
+
+        if (err != NO_ERROR)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                    "tell failed: %Ss",
+                    Parrot_platform_strerror(interp, err));
     }
+
     return p.QuadPart;
 }
 
