@@ -961,8 +961,13 @@ src/scheduler$(O) : \
 
 src/io/core$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/core.c
 
-src/io/socket_api$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
-    src/io/api.str include/pmc/pmc_socket.h src/io/socket_api.c
+src/io/socket_api$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/io/io_private.h \
+    src/io/api.str \
+    include/pmc/pmc_socket.h \
+    include/pmc/pmc_sockaddr.h \
+    src/io/socket_api.c
 
 O_FILES = \
     $(INTERP_O_FILES) \
@@ -1606,6 +1611,8 @@ src/platform/generic/encoding$(O) : src/platform/generic/encoding.c $(PARROT_H_H
 
 src/platform/generic/env$(O) : src/platform/generic/env.c $(PARROT_H_HEADERS)
 
+src/platform/generic/error$(O) : src/platform/generic/error.c $(PARROT_H_HEADERS)
+
 src/platform/generic/exec$(O) : src/platform/generic/exec.c $(PARROT_H_HEADERS)
 
 src/platform/generic/file$(O) : src/platform/generic/file.c $(PARROT_H_HEADERS)
@@ -1622,7 +1629,7 @@ src/platform/generic/math$(O) : src/platform/generic/math.c $(PARROT_H_HEADERS)
 src/platform/generic/misc$(O) : src/platform/generic/misc.c $(PARROT_H_HEADERS)
 
 src/platform/generic/socket$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_socket.h \
-    src/io/io_private.h src/platform/generic/socket.c
+    src/io/io_private.h include/pmc/pmc_sockaddr.h src/platform/generic/socket.c
 
 src/platform/generic/sysmem$(O) : src/platform/generic/sysmem.c $(PARROT_H_HEADERS)
 
@@ -1643,6 +1650,8 @@ src/platform/solaris/time$(O) : src/platform/solaris/time.c $(PARROT_H_HEADERS)
 src/platform/win32/dl$(O) : src/platform/win32/dl.c $(PARROT_H_HEADERS)
 
 src/platform/win32/env$(O) : src/platform/win32/env.c $(PARROT_H_HEADERS)
+
+src/platform/win32/error$(O) : src/platform/win32/error.c $(PARROT_H_HEADERS)
 
 src/platform/win32/exec$(O) : src/platform/win32/exec.c $(PARROT_H_HEADERS)
 
@@ -2113,33 +2122,33 @@ testexec: test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --run-exec $(RUNCORE_TEST_FILES)
 
 # Test that need to be compiled by the C-compiler
-src_tests :
+src_tests : test_prep
 	$(PERL) t/harness $(SRC_TEST_FILES)
 
-dynoplibs_tests :
+dynoplibs_tests : test_prep
 	$(PERL) t/harness $(DYNOPLIBS_TEST_FILES)
 
-dynpmc_tests :
+dynpmc_tests : test_prep
 	$(PERL) t/harness $(DYNPMC_TEST_FILES)
 
-oo_tests :
+oo_tests : test_prep
 	$(PERL) t/harness $(OO_TEST_FILES)
 
-op_tests :
+op_tests : test_prep
 	$(PERL) t/harness $(OP_TEST_FILES)
 
-pir_tests :
+pir_tests : test_prep
 	$(PERL) t/harness $(PIR_TEST_FILES)
 
-pmc_tests :
+pmc_tests : test_prep
 	$(PERL) t/harness $(PMC_TEST_FILES)
 
 # Command line and various environments
-run_tests :
+run_tests : test_prep
 	$(PERL) t/harness $(RUN_TEST_FILES)
 
 # Test the Perl5 Modules in the Parrot distribution
-perl_tests :
+perl_tests : test_prep
 	$(PERL) t/harness $(PERL_TEST_FILES)
 
 nocritic_codetest :

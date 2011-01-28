@@ -1435,8 +1435,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_runcode>
 
-=item C<Parrot_run_native>
-
 =item C<Parrot_schedule_event>
 
 =item C<Parrot_schedule_interp_qentry>

@@ -106,10 +106,6 @@ Parrot_PackFile Parrot_pbc_read(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_run_native(PARROT_INTERP, native_func_t func)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 void Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -193,8 +189,6 @@ PMC* set_current_sub(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_Parrot_pbc_read __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_run_native __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_runcode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

@@ -61,7 +61,7 @@ Parrot_sysmem_amount(PARROT_INTERP)
      * This should really check for #ifdef HAS_SYSCONF, but Configure
      * doesn't probe for that yet.
      */
-    memsize = sysconf(_SC_AVPHYS_PAGES) * sysconf(_SC_PAGESIZE);
+    memsize = sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE);
 
 #elif defined(PARROT_HAS_HEADER_SYSSYSCTL) && defined(CTL_HW) && defined(HW_PHYSMEM)
 

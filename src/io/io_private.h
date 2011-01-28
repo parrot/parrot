@@ -29,17 +29,6 @@ Some ideas from AT&T SFIO.
 
 #include <parrot/io.h>
 
-/* XXX: Parrot config is currently not probing for all headers so
- * I'm sticking here rather than parrot.h
- */
-#ifdef UNIX
-#  include <sys/socket.h>
-#endif
-
-#ifdef WIN32
-#  include <winsock.h>
-#endif
-
 /* Buffer flags */
 #define PIO_BF_MALLOC   00000001        /* Buffer malloced              */
 #define PIO_BF_READBUF  00000002        /* Buffer is read-buffer        */
@@ -59,13 +48,6 @@ struct _ParrotIOData {
 #define _PIO_STDIN(i)   (((ParrotIOData*)(i)->piodata)->table[PIO_STDIN_FILENO])
 #define _PIO_STDOUT(i)  (((ParrotIOData*)(i)->piodata)->table[PIO_STDOUT_FILENO])
 #define _PIO_STDERR(i)  (((ParrotIOData*)(i)->piodata)->table[PIO_STDERR_FILENO])
-
-/* Parrot_Socklen_t is used in POSIX accept call */
-#if PARROT_HAS_SOCKLEN_T
-typedef socklen_t Parrot_Socklen_t;
-#else
-typedef int Parrot_Socklen_t;
-#endif
 
 #endif /* PARROT_IO_PRIVATE_H_GUARD */
 

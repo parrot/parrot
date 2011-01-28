@@ -12,6 +12,7 @@
 #define PARROT_THR_WINDOWS_H_GUARD
 
 #  undef FASTCALL
+#  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 #  include <process.h>
 #  include <limits.h>

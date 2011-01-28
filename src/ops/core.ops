@@ -75,11 +75,6 @@ use it explicitly.
 Check the event queue and run event handlers if there are unhandled events.
 Note: Do B<not> use this opcode. It is for internal use only.
 
-=item B<wrapper__>()
-
-Internal opcode to wrap unknown ops from loaded opcode libs.
-Don't use.
-
 =item B<load_bytecode>(in STR)
 
 Load Parrot bytecode from file $1, and search the library path to locate the
@@ -102,12 +97,6 @@ inline op check_events__() :internal :flow {
     disable_event_checking(interp);
     Parrot_cx_handle_tasks(interp, interp->scheduler);
     goto ADDRESS(_this);   /* force this being a branch op */
-}
-
-inline op wrapper__() :internal :flow {
-    opcode_t *pc = CUR_OPCODE;
-    DO_OP(pc, interp);
-    goto ADDRESS(pc);
 }
 
 inline op load_bytecode(in STR) :load_file {
@@ -222,20 +211,6 @@ Jump to the address held in register $1.
 inline op jump(in LABEL) :base_loop :flow {
     opcode_t * const loc = INTVAL2PTR(opcode_t *, $1);
     goto ADDRESS(loc);
-}
-
-########################################
-
-=item B<enternative>()
-
-Internal opcode used to jump from normal bytecode into a JITted version.
-
-=cut
-
-op enternative() :flow {
-    opcode_t * const addr = run_native(interp, CUR_OPCODE,
-            interp->code->base.data);
-    goto ADDRESS(addr);
 }
 
 =back
@@ -737,7 +712,7 @@ inline op throw(invar PMC) :flow {
     opcode_t *dest;
     opcode_t * const ret    = expr NEXT();
     PMC      * const resume = pmc_new(interp, enum_class_Continuation);
-    STRING * const exception_str = CONST_STRING(interp, "Exception");
+    STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
 
     VTABLE_set_pointer(interp, resume, ret);
 
@@ -754,7 +729,7 @@ inline op throw(invar PMC) :flow {
 inline op throw(invar PMC, invar PMC) :flow {
     opcode_t * dest;
     PMC * except = $1;
-    STRING * const exception_str = CONST_STRING(interp, "Exception");
+    STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
 
     if (PMC_IS_NULL(except) || !VTABLE_does(interp, except, exception_str))
         except = Parrot_ex_build_exception(interp, EXCEPT_fatal,
@@ -768,7 +743,7 @@ inline op throw(invar PMC, invar PMC) :flow {
 inline op rethrow(invar PMC) :flow {
     opcode_t * dest;
     PMC * except = $1;
-    STRING * const exception_str = CONST_STRING(interp, "Exception");
+    STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
 
     if (PMC_IS_NULL(except) || !VTABLE_does(interp, except, exception_str)) {
         opcode_t * const ret    = expr NEXT();

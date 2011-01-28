@@ -700,14 +700,14 @@ void Parrot_io_set_buffer_start(SHIM_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_io_accept_handle(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
 PARROT_EXPORT
-INTVAL Parrot_io_bind_handle(PARROT_INTERP,
+void Parrot_io_bind_handle(PARROT_INTERP,
     ARGMOD(PMC *pmc),
     ARGMOD(PMC *address))
         __attribute__nonnull__(1)
@@ -717,7 +717,7 @@ INTVAL Parrot_io_bind_handle(PARROT_INTERP,
         FUNC_MODIFIES(*address);
 
 PARROT_EXPORT
-INTVAL Parrot_io_connect_handle(PARROT_INTERP,
+void Parrot_io_connect_handle(PARROT_INTERP,
     ARGMOD(PMC *pmc),
     ARGMOD(PMC *address))
         __attribute__nonnull__(1)
@@ -727,8 +727,7 @@ INTVAL Parrot_io_connect_handle(PARROT_INTERP,
         FUNC_MODIFIES(*address);
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_io_listen_handle(PARROT_INTERP,
+void Parrot_io_listen_handle(PARROT_INTERP,
     ARGMOD(PMC *pmc),
     INTVAL backlog)
         __attribute__nonnull__(1)
@@ -788,7 +787,6 @@ void Parrot_io_socket_initialize_handle(SHIM_INTERP, ARGMOD(PMC *socket))
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
 INTVAL Parrot_io_socket_is_closed(PARROT_INTERP, ARGMOD(PMC *socket))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
