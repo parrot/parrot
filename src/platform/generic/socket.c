@@ -289,7 +289,8 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
 
 #else /* PARROT_HAS_IPV6 */
 
-    char *host;
+    const char *host;
+    char *cstring;
     int   success;
     PMC  *sockaddr;
     PMC  *array;
@@ -298,12 +299,6 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
     struct sockaddr_in *sa;
 
     Parrot_Sockaddr_attributes *sa_attrs;
-
-    /* FIXME: don't know what is supposed to do, this check is just to
-     * prevent segfaults */
-    if (STRING_IS_NULL(addr))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "getaddrinfo failed: null address");
 
     sa       = (struct sockaddr_in *)Parrot_gc_allocate_memory_chunk(interp,
                                             addr_len);
@@ -316,7 +311,14 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
     sa_attrs->len      = addr_len;
     sa_attrs->pointer  = sa;
 
-    host = Parrot_str_to_cstring(interp, addr);
+    if (STRING_IS_NULL(addr)) {
+        cstring = NULL;
+        host    = "127.0.0.1";
+    }
+    else {
+        cstring = Parrot_str_to_cstring(interp, addr);
+        host    = cstring;
+    }
 
 #  ifdef _WIN32
     sa->sin_addr.S_un.S_addr = inet_addr(host);
@@ -346,7 +348,8 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
         memcpy((char*)&sa->sin_addr, he->h_addr, sizeof (sa->sin_addr));
     }
 
-    Parrot_str_free_cstring(host);
+    if (cstring)
+        Parrot_str_free_cstring(cstring);
 
     sa->sin_family = PF_INET;
     sa->sin_port = htons(port);
