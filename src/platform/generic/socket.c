@@ -263,7 +263,8 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
 
     if (ret != 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "getaddrinfo failed: %Ss", addr);
+                "getaddrinfo failed: %Ss: %Ss", addr,
+                Parrot_platform_strerror(interp, PIO_SOCK_ERRNO));
 
     array = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
@@ -471,7 +472,8 @@ Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto)
 
     if (sock == PIO_INVALID_SOCKET)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "creating socket failed: %d", PIO_SOCK_ERRNO);
+                "creating socket failed: %Ss",
+                Parrot_platform_strerror(interp, PIO_SOCK_ERRNO));
 
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &value, sizeof (value));
 
@@ -509,7 +511,8 @@ AGAIN:
             return;
           default:
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                    "connect failed: %d", PIO_SOCK_ERRNO);
+                    "connect failed: %Ss",
+                    Parrot_platform_strerror(interp, PIO_SOCK_ERRNO));
         }
     }
 }
@@ -531,7 +534,8 @@ Parrot_io_bind(PARROT_INTERP, PIOHANDLE os_handle, ARGMOD(void *addr),
 {
     if (bind((PIOSOCKET)os_handle, (struct sockaddr *)addr, addr_len) != 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "connect failed: %d", PIO_SOCK_ERRNO);
+                "bind failed: %Ss",
+                Parrot_platform_strerror(interp, PIO_SOCK_ERRNO));
 }
 
 /*
@@ -550,7 +554,8 @@ Parrot_io_listen(PARROT_INTERP, PIOHANDLE os_handle, INTVAL sec)
 {
     if (listen((PIOSOCKET)os_handle, sec) != 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "listen failed: %d", PIO_SOCK_ERRNO);
+                "listen failed: %Ss",
+                Parrot_platform_strerror(interp, PIO_SOCK_ERRNO));
 }
 
 /*
@@ -580,7 +585,8 @@ Parrot_io_accept(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(PMC * remote_addr))
 
     if (newsock == PIO_INVALID_SOCKET)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "accept failed: %d", PIO_SOCK_ERRNO);
+                "accept failed: %Ss",
+                Parrot_platform_strerror(interp, PIO_SOCK_ERRNO));
 
     sa_attrs->len     = addr_len;
     sa_attrs->pointer = addr;
@@ -628,7 +634,8 @@ AGAIN:
             goto AGAIN;
           default:
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                    "send failed: %d", PIO_SOCK_ERRNO);
+                    "send failed: %Ss",
+                    Parrot_platform_strerror(interp, PIO_SOCK_ERRNO));
         }
     }
 }
@@ -662,7 +669,8 @@ AGAIN:
             goto AGAIN;
           default:
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                    "recv failed: %d", PIO_SOCK_ERRNO);
+                    "recv failed: %Ss",
+                    Parrot_platform_strerror(interp, PIO_SOCK_ERRNO));
         }
     }
 }
@@ -711,7 +719,8 @@ AGAIN:
                 goto AGAIN;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                        "select failed: %d", PIO_SOCK_ERRNO);
+                        "select failed: %Ss",
+                        Parrot_platform_strerror(interp, PIO_SOCK_ERRNO));
         }
     }
 
