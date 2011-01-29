@@ -12,7 +12,6 @@
 CREDITS                                                     [main]doc
 ChangeLog                                                   []
 Configure.pl                                                []
-DEPRECATED.pod                                              [devel]doc
 DEVELOPING                                                  []
 DONORS.pod                                                  [main]doc
 LICENSE                                                     [main]doc
@@ -289,6 +288,7 @@ docs/book/pir/ch06_subroutines.pod                          [doc]
 docs/book/pir/ch07_objects.pod                              [doc]
 docs/book/pir/ch08_io.pod                                   [doc]
 docs/book/pir/ch09_exceptions.pod                           [doc]
+docs/changes/api.yaml                                       [doc]
 docs/compiler_faq.pod                                       [doc]
 docs/configuration.pod                                      [doc]
 docs/debug.pod                                              [doc]
