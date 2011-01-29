@@ -123,7 +123,7 @@ method read_string($string) {
 
 # Deparse a scalar string to the actual scalar
 method _read_scalar($string, $indent, @lines) {
-    pir::die("!!!");
+    pir::die("_read_scalar not implemented");
 ###    # Trim trailing whitespace
 ###    $string =~ s/\s*\z//;
 ###
@@ -197,7 +197,7 @@ method _read_scalar($string, $indent, @lines) {
 
 # Parse an array
 method _read_array($array, $indent, @lines) {
-    pir::die("!!!");
+    pir::die("_read_array not implemented");
 ###    while ( @$lines ) {
 ###        # Check for a new document
 ###        if ( $lines->[0] =~ /^(?:---|\.\.\.)/ ) {
@@ -272,7 +272,7 @@ method _read_array($array, $indent, @lines) {
 
 # Parse an array
 method _read_hash($hash, $indent, @lines) {
-    pir::die("!!!");
+    pir::die("_read_hash not implemented");
 ###
 ###    while ( @$lines ) {
 ###        # Check for a new document
