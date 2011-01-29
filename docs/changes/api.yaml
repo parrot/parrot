@@ -69,6 +69,11 @@ Action methods in rules:
     - Opcodes
     - experimental
   ticket: https://trac.parrot.org/parrot/ticket/1581
+'IPv6 Support':
+  tags:
+    - experimental
+  ticket:
+  note: "IPv6 support is still being perfected and being made portable"
 'JSON and Config;JSON':
   eligible: 1.5
   tags:
@@ -85,7 +90,7 @@ Action methods in rules:
   tags:
     - PMC
   ticket: https://trac.parrot.org/parrot/ticket/1554
-'MappedByteArray':
+'MappedByteArray PMC':
   tags:
     - PMC
     - experimental
