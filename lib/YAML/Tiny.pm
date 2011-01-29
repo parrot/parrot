@@ -77,11 +77,13 @@ method read_string($string) {
     while ( @lines ) {
         # Do we have a document header?
         if my $match := @lines[0] ~~ /^^\-\-\-\s*[(.+)\s*]?$/ {
+            #_dumper($match);
             # Handle scalar documents
             @lines.shift;
             # if ( defined $1 and $1 !~ /^(?:\#.+|\%YAML[: ][\d\.]+)\z/ ) {
-            if pir::defined($match) {
-                @result.push(self._read_scalar( $match, [ undef ], @lines ));
+            # match[0] is RPA. Get first element.
+            if +$match[0] {
+                @result.push(self._read_scalar( ~$match[0][0], [ undef ], @lines ));
                 next;
             }
         }
@@ -103,7 +105,7 @@ method read_string($string) {
             # A hash at the root
             my $document := { };
             @result.push($document);
-            self._read_hash( $document, [ length($m) ], @lines );
+            self._read_hash( $document, [ length($m[0][0]) ], @lines );
 
         } else {
             pir::die("YAML::Tiny failed to classify the line '{ @lines[0] }'");
@@ -123,21 +125,21 @@ method read_string($string) {
 
 # Deparse a scalar string to the actual scalar
 method _read_scalar($string, $indent, @lines) {
-    pir::die("_read_scalar not implemented");
-###    # Trim trailing whitespace
-###    $string =~ s/\s*\z//;
-###
-###    # Explitic null/undef
-###    return undef if $string eq '~';
-###
-###    # Single quote
-###    if ( $string =~ /^\'(.*?)\'(?:\s+\#.*)?\z/ ) {
-###        return '' unless defined $1;
-###        $string = $1;
-###        $string =~ s/\'\'/\'/g;
-###        return $string;
-###    }
-###
+   # Trim trailing whitespace
+   $string := subst($string, /\s*$/, '');
+
+   # Explitic null/undef
+   return undef if $string eq '~';
+
+   # Single quote
+   my $match := $string ~~ /^'(.*?)'[\s+\#.*]?$/;
+   if $match {
+       return '' unless pir::defined($match[0]);
+       $string := ~$match[0][0];
+       $string := subst($string, /\'\'/, "'", :global<1>);
+       return $string;
+   }
+
 ###    # Double quote.
 ###    # The commented out form is simpler, but overloaded the Perl regex
 ###    # engine due to recursion and backtracking problems on strings
@@ -152,25 +154,26 @@ method _read_scalar($string, $indent, @lines) {
 ###        return $string;
 ###    }
 ###
-###    # Special cases
+    # Special cases
 ###    if ( $string =~ /^[\'\"!&]/ ) {
 ###        pir::die \"YAML::Tiny does not support a feature in line '$string'";
 ###    }
-###    return {} if $string =~ /^{}(?:\s+\#.*)?\z/;
-###    return [] if $string =~ /^\[\](?:\s+\#.*)?\z/;
-###
-###    # Regular unquoted string
-###    if ( $string !~ /^[>|]/ ) {
-###        if (
-###            $string =~ /^(?:-(?:\s|$)|[\@\%\`])/
-###            or
-###            $string =~ /:(?:\s|$)/
-###        ) {
-###            pir::die \"YAML::Tiny found illegal characters in plain scalar: '$string'";
-###        }
-###        $string =~ s/\s+#.*\z//;
-###        return $string;
-###    }
+    return {} if $string ~~ /^{}[\s+\#.*]?$/;
+    return [] if $string ~~ /^\[\][\s+\#.*]?$/;
+
+    # Regular unquoted string
+    if !($string ~~ /^[ '>' | '|' ]/) {
+        #if (
+        #    $string =~ /^(?:-(?:\s|$)|[\@\%\`])/
+        #   or
+        #   $string =~ /:(?:\s|$)/
+        #) {
+        #    pir::die("YAML::Tiny found illegal characters in plain scalar: '{ $string }'");
+        #}
+        $string := subst($string, /\s+\#.*$/, '');
+        return $string;
+    }
+
 ###
 ###    # Error
 ###    pir::die \"YAML::Tiny failed to find multi-line scalar content" unless @$lines;
@@ -193,6 +196,7 @@ method _read_scalar($string, $indent, @lines) {
 ###    my $j = (substr($string, 0, 1) eq '>') ? ' ' : "\n";
 ###    my $t = (substr($string, 1, 1) eq '-') ? ''  : "\n";
 ###    return join( $j, @multiline ) . $t;
+    pir::die("_read_scalar not implemented for '{ $string }' string");
 }
 
 # Parse an array
@@ -333,6 +337,7 @@ method _read_hash($hash, $indent, @lines) {
 
 INIT {
     pir::load_bytecode("nqp-setting.pbc");
+    pir::load_bytecode("dumper.pbc");
 }
 
 # vim: ft=perl6

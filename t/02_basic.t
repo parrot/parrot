@@ -37,7 +37,6 @@ yaml_ok(
 	[ undef ],
 	'only_header',
 	noyamlperl => 1,
-    todo => 1,
 );
 yaml_ok(
 	"---\n---\n",
@@ -51,21 +50,18 @@ yaml_ok(
 	[ undef ],
 	'one_undef',
 	noyamlperl => 1,
-    todo => 1,
 );
 yaml_ok(
 	"---  ~\n",
 	[ undef ],
 	'one_undef2',
 	noyamlperl => 1,
-    todo => 1,
 );
 yaml_ok(
 	"--- ~\n---\n",
 	[ undef, undef ],
 	'two_undef',
 	noyamlperl => 1,
-    todo => 1,
 );
 
 # Just a scalar
@@ -73,20 +69,17 @@ yaml_ok(
 	"--- foo\n",
 	[ 'foo' ],
 	'one_scalar',
-    todo => 1,
 );
 yaml_ok(
 	"---  foo\n",
 	[ 'foo' ],
 	'one_scalar2',
-    todo => 1,
 );
 yaml_ok(
 	"--- foo\n--- bar\n",
 	[ 'foo', 'bar' ],
 	'two_scalar',
 	noyamlperl => 1,
-    todo => 1,
 );
 
 # Simple lists
