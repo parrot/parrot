@@ -3,8 +3,14 @@
 
 our sub yaml_ok($yaml, $expected, $description, *%adverbs) {
     my $parser := YAML::Tiny.new;
-    my $result := $parser.read_string($yaml);
-    is_deeply($expected, $result, $description, todo => %adverbs<todo>);
+    try {
+        my $result := $parser.read_string($yaml);
+        is_deeply($expected, $result, $description, todo => %adverbs<todo>);
+
+        CATCH {
+            nok(1, "Parse failed '{ $! }'");
+        }
+    }
 }
 
 Q:PIR {
