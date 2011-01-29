@@ -133,11 +133,6 @@ Action methods in rules:
   tags:
     - compiler tools
   ticket: https://trac.parrot.org/parrot/ticket/462
-'PMC Attributes Allocation Functions [experimental]':
-  note: 'These items and related helper functions are added as experimental support for <https://trac.parrot.org/parrot/ticket/1506>'
-  tags:
-    - functions
-    - experimental
 'PMC numbering [experimental]':
   tags:
     - bytecode
