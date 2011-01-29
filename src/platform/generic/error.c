@@ -26,7 +26,7 @@ Functions for handling system errors.
 
 /*
 
-=item C<void Parrot_platform_strerror(void)>
+=item C<STRING * Parrot_platform_strerror(PARROT_INTERP, INTVAL error)>
 
 Returns a error message for a system error code.
 
