@@ -201,16 +201,17 @@ method _read_scalar($string, $indent, @lines) {
 
 # Parse an array
 method _read_array($array, $indent, @lines) {
+
+    while ( @lines ) {
+        # Check for a new document
+        if @lines[0] ~~ /^[\-\-\- | \.\.\. ]/ {
+            while @lines && !(@lines[0] ~~ /^\-\-\-/ ) {
+                @lines.shift;
+            }
+            return 1;
+        }
+
     pir::die("_read_array not implemented");
-###    while ( @$lines ) {
-###        # Check for a new document
-###        if ( $lines->[0] =~ /^(?:---|\.\.\.)/ ) {
-###            while ( @$lines and $lines->[0] !~ /^---/ ) {
-###                shift @$lines;
-###            }
-###            return 1;
-###        }
-###
 ###        # Check the indent level
 ###        $lines->[0] =~ /^(\s*)/;
 ###        if ( length($1) < $indent->[-1] ) {
@@ -269,9 +270,9 @@ method _read_array($array, $indent, @lines) {
 ###        } else {
 ###            pir::die \"YAML::Tiny failed to classify line '$lines->[0]'";
 ###        }
-###    }
-###
-###    return 1;
+    }
+
+    1;
 }
 
 # Parse an array
