@@ -386,7 +386,7 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
              interpreter alone */
 
     //if (is_file)
-    pf_raw->cur_cs = Parrot_pf_create_default_segments(imcc->interp, pf_raw, source, 0);
+    pf_raw->cur_cs = Parrot_pf_create_default_segments(imcc->interp, pf_raw, source, 1);
     //Parrot_pf_create_default_segments(imcc->interp, pf_raw, source, 0);
     Parrot_pf_set_current_packfile(imcc->interp, pf_raw);
 
