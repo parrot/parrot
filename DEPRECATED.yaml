@@ -31,12 +31,6 @@ Action methods in rules:
   tags:
     - debugger
     - experimental
-'Auto-vivification of nested aggregates [eligible in 2.4]':
-  eligible: 2.4
-  note: E.g. will not auto-vivify nested hashes and return PMCNULL early.
-  tags:
-    - pmcs
-  ticket: https://trac.parrot.org/parrot/ticket/1561
 'C API coding standards cleanup [eligible in 1.1]':
   eligible: 1.1
   note: "All C API functions that aren't currently named according to the 'Parrot_<system>_*' scheme will be renamed. A list of renamed functions will be kept in the ticket at:"
