@@ -51,9 +51,9 @@ pir_output_is( <<'CODE', <<'OUT', 'one complete start-to-end compiler' );
 .namespace [ 'NoneBuilder' ]
 
 .sub 'init' :anon :load :init
-    load_bytecode 'Protoobject.pbc'
-    $P0 = get_hll_global 'Protomaker'
-    $P1 = $P0.'new_subclass'('Protoobject', 'NoneBuilder', 'text')
+    load_bytecode 'P6object.pbc'
+    $P0 = get_hll_global 'P6metaclass'
+    $P1 = $P0.'new_class'('NoneBuilder', 'attr' => 'text')
 .end
 
 .sub 'get' :method
@@ -81,8 +81,8 @@ pir_output_is( <<'CODE', <<'OUT', 'one complete start-to-end compiler' );
 
 .sub 'init' :anon :load :init
     load_bytecode 'Protoobject.pbc'
-    $P0 = get_hll_global 'Protomaker'
-    $P1 = $P0.'new_subclass'('Protoobject', 'NoneGrammar')
+    $P0 = get_hll_global 'P6metaclass'
+    $P1 = $P0.'new_class'('NoneGrammar')
 .end
 
 .sub 'apply' :method
