@@ -154,12 +154,6 @@ Action methods in rules:
     - functions
     - experimental
   ticket: https://trac.parrot.org/parrot/ticket/1628
-'Protoobject [eligible in 2.7]':
-  eligible: 2.7
-  note: Use P6Object instead.
-  tags:
-    - Parrot library
-  ticket: http://trac.parrot.org/parrot/ticket/1337
 'Threads and Parallelism [experimental]':
   tags:
     - experimental

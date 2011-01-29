@@ -296,7 +296,6 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/PGE/Perl6Grammar.pbc \
     $(LIBRARY_DIR)/PGE/Text.pbc \
     $(LIBRARY_DIR)/PGE/Util.pbc \
-    $(LIBRARY_DIR)/Protoobject.pbc \
     $(LIBRARY_DIR)/Range.pbc \
     $(LIBRARY_DIR)/Stream/Base.pbc \
     $(LIBRARY_DIR)/Stream/Combiner.pbc \
