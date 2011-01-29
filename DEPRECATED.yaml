@@ -188,11 +188,6 @@ Action methods in rules:
   tags:
     - opcodes
   ticket: https://trac.parrot.org/parrot/ticket/218
-'implicit optional named parameters [eligible in 2.1]':
-  eligible: 2.1
-  tags:
-    - PIR syntax
-  ticket: https://trac.parrot.org/parrot/ticket/1103
 'loadlib_p_s_p [experimental]':
   note: Ability to use non-default dynamic loading behaviour.
   tags:
