@@ -296,7 +296,6 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/PGE/Perl6Grammar.pbc \
     $(LIBRARY_DIR)/PGE/Text.pbc \
     $(LIBRARY_DIR)/PGE/Util.pbc \
-    $(LIBRARY_DIR)/Protoobject.pbc \
     $(LIBRARY_DIR)/Range.pbc \
     $(LIBRARY_DIR)/Stream/Base.pbc \
     $(LIBRARY_DIR)/Stream/Combiner.pbc \
@@ -1612,6 +1611,8 @@ src/platform/generic/encoding$(O) : src/platform/generic/encoding.c $(PARROT_H_H
 
 src/platform/generic/env$(O) : src/platform/generic/env.c $(PARROT_H_HEADERS)
 
+src/platform/generic/error$(O) : src/platform/generic/error.c $(PARROT_H_HEADERS)
+
 src/platform/generic/exec$(O) : src/platform/generic/exec.c $(PARROT_H_HEADERS)
 
 src/platform/generic/hires_timer$(O) : src/platform/generic/hires_timer.c $(PARROT_H_HEADERS)
@@ -1649,6 +1650,8 @@ src/platform/solaris/time$(O) : src/platform/solaris/time.c $(PARROT_H_HEADERS)
 src/platform/win32/dl$(O) : src/platform/win32/dl.c $(PARROT_H_HEADERS)
 
 src/platform/win32/env$(O) : src/platform/win32/env.c $(PARROT_H_HEADERS)
+
+src/platform/win32/error$(O) : src/platform/win32/error.c $(PARROT_H_HEADERS)
 
 src/platform/win32/exec$(O) : src/platform/win32/exec.c $(PARROT_H_HEADERS)
 

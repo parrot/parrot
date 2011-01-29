@@ -54,6 +54,7 @@ sub _set_implementations {
         hires_timer.c
         sysmem.c
         uid.c
+        error.c
         asm.s
         /;
     my @impl_files;

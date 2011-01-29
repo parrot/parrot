@@ -47,6 +47,12 @@
 void Parrot_platform_init_code(void);
 
 /*
+ * Errors
+ */
+
+STRING *Parrot_platform_strerror(PARROT_INTERP, INTVAL error);
+
+/*
 ** I/O:
 */
 

@@ -18,7 +18,7 @@ Test the Sockaddr PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(7)
+    plan(8)
 
     test_basic()
     test_bool()
@@ -52,8 +52,13 @@ Test the Sockaddr PMC.
 
 .sub test_string
     $P0 = new 'Socket'
+
     $P1 = $P0."sockaddr"("localhost", 1234)
     is($P1,"127.0.0.1:1234","sockaddr stringification")
+
+    null $S0
+    $P1 = $P0."sockaddr"($S0, 56789)
+    is($P1,"127.0.0.1:56789","sockaddr stringification")
 .end
 
 # Local Variables:
