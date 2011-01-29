@@ -171,18 +171,6 @@ Action methods in rules:
   tags:
     - Parrot library
   ticket: http://trac.parrot.org/parrot/ticket/1337
-'STRING COW [eligible in 2.4]':
-  eligible: 2.4
-  note: COW strings are to be removed. All "inplace" string modification functions and all "inplace" string ops are deprecated.
-  tags:
-    - functions
-  ticket: https://trac.parrot.org/parrot/ticket/1540
-'STRING Out parameters in Parrot_str_* functions [eligible in 2.1]':
-  eligible: 2.1
-  note: All STRING modification functions will return a STRING pointer; capture and use this rather than relying on in-place modification of an existing pointer.
-  tags:
-    - functions
-  ticket: https://trac.parrot.org/parrot/ticket/1584
 'Threads and Parallelism [experimental]':
   tags:
     - experimental
@@ -205,58 +193,23 @@ Action methods in rules:
   tags:
     - pmcs
   ticket: https://trac.parrot.org/parrot/ticket/1552
-'charset, charsetname, find_charset, trans_charset [eligible in 2.10]':
-  eligible: 2.10
-  note: These opcodes will be removed. The corresponding encoding opcodes should be used instead.
-  tags:
-    - opcodes
-  ticket: https://trac.parrot.org/parrot/ticket/1778
-'continuation-based ExceptionHandlers [eligible in 2.1]':
-  eligible: 2.1
-  tags:
-    - PIR syntax
-  ticket: https://trac.parrot.org/parrot/ticket/1091
 'dlfunc and new_callback signature string format [eligible in 2.4]':
   eligible: 2.4
   note: These will be changed to allow more flexibility in types.
   tags:
     - opcodes
   ticket: https://trac.parrot.org/parrot/ticket/1565
-'finalize [experimental]':
-  note: 'Finalize exception handler, unrolling inner runloops if needed.'
-  tags:
-    - opcodes
-    - experimental
-  ticket: https://trac.parrot.org/parrot/ticket/1635
-'fixed_8 encoding [eligible in 2.10]':
-  eligible: 2.10
-  note: "The 'fixed_8' encoding is going away. Use 'ascii' instead. If you want to test for a fixed_8 encoding, you have to compare the encoding to 'ascii', 'iso-8859-1' and 'binary' separately."
-  tags:
-    - opcodes
-  ticket: https://trac.parrot.org/parrot/ticket/1778
 'get_addr and set_addr [eligible in 1.5]':
   eligible: 1.5
   note: 'These opcodes are being repurposed. They will always return a unique memory address of the PMC. Uses of get_addr and set_addr that would set label values for Sub, Exception, and related PMC types will instead be handled by get_label and set_label.'
   tags:
     - opcodes
   ticket: https://trac.parrot.org/parrot/ticket/218
-'get_results opcode order and features [eligible in 2.1]':
-  eligible: 2.1
-  note: get_results no longer used to fetch exception object.
-  tags:
-    - opcodes
-  ticket: https://trac.parrot.org/parrot/ticket/1406
 'implicit optional named parameters [eligible in 2.1]':
   eligible: 2.1
   tags:
     - PIR syntax
   ticket: https://trac.parrot.org/parrot/ticket/1103
-'inplace string updates. [eligible in 2.4]':
-  eligible: 2.4
-  note: 'All "inplace" string update ops are deprecated. E.g. "chopn_s", etc. Part of COW removal.'
-  tags:
-    - opcodes
-  ticket: https://trac.parrot.org/parrot/ticket/1540
 'loadlib_p_s_p [experimental]':
   note: Ability to use non-default dynamic loading behaviour.
   tags:
