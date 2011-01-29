@@ -4190,9 +4190,11 @@ compile_file(PARROT_INTERP, ARGIN(STRING *path))
     ASSERT_ARGS(compile_file)
 
     STRING *err;
+    PackFile_ByteCode * const cur_code = interp->code;
     PackFile_ByteCode * const cs =
         (PackFile_ByteCode *)Parrot_compile_file(interp, path, &err);
 
+    interp->code = cur_code;
     if (cs)
         do_sub_pragmas(interp, cs, PBC_LOADED, NULL);
     else
