@@ -7,7 +7,7 @@ t/tools/show_deprecated.pl.t - test show_deprecated.pl
 
 =head1 SYNOPSIS
 
-    % prove t/tools/show_deprecated.pl.t - test show_deprecated.pl
+    % prove t/tools/show_deprecated.t - test show_deprecated.pl
 
 =head1 DESCRIPTION
 

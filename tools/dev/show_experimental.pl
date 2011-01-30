@@ -28,9 +28,11 @@ YAML
 
 my $api  = catfile(qw/docs changes api.yaml/);
 my $yaml = LoadFile($api);
-while ( my($title,$data) = each %$yaml) {
-    my $tags = $data->{tags};
-    my $note = $data->{note} || '';
+
+for my $e (@$yaml) {
+    my $tags = $e->{tags};
+    my $note = $e->{note} || '';
+    my $title = $e->{name};
     # This format is ugly, but is functional for now
     print "$title\t$note\n" if any { $_ eq 'experimental' } @$tags;
 }
