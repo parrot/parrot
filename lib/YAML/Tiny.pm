@@ -74,7 +74,9 @@ method read_string($string) {
     @lines.shift() if +@lines && @lines[0] ~~ /^^ \%YAML <[: ]> .* $/;
 
     # A nibbling parser
-    while ( @lines ) {
+    while +@lines {
+        debug("Handling", @lines[0]);
+
         # Do we have a document header?
         if my $match := @lines[0] ~~ /^^\-\-\-\s*[(.+)\s*]?$/ {
             debug("Scalar", $match);
@@ -106,14 +108,16 @@ method read_string($string) {
             @result.push($document);
             self._read_array( $document, [ 0 ], @lines );
 
-        } elsif my $m := @lines[0] ~~ /^(\s*)\S/ {
+        }
+        elsif my $m := @lines[0] ~~ /^(\s*)\S/ {
             debug("Hash", $match);
             # A hash at the root
-            my $document := { };
-            @result.push($document);
-            self._read_hash( $document, [ length($m[0][0]) ], @lines );
-
-        } else {
+            my %document;
+            @result.push(%document);
+            self._read_hash( %document, [ length($m[0][0]) ], @lines );
+            debug("Got hash", %document);
+        }
+        else {
             pir::die("YAML::Tiny failed to classify the line '{ @lines[0] }'");
         }
     }
@@ -126,11 +130,14 @@ method read_string($string) {
 ### }
 ###
 ### return $self;
+    debug("RESULT", @result);
+
     @result;
 }
 
 # Deparse a scalar string to the actual scalar
 method _read_scalar($string, $indent, @lines) {
+    debug("Scalar", $string);
    # Trim trailing whitespace
    $string := subst($string, /\s*$/, '');
 
@@ -229,6 +236,7 @@ method _read_array(@array, @indent, @lines) {
 
         if $m := @lines[0] ~~ /^ (\s*\-\s+) <-[\'\"]> \S*\s* ':' [\s+|$]/ {
             # Inline nested hash
+            debug("Inline nested hash", $m);
             my $indent2 := length($m[0]);
             subst(@lines[0], /'-'/, ' ');
             @array.push(hash());
@@ -284,63 +292,74 @@ method _read_array(@array, @indent, @lines) {
 }
 
 # Parse an array
-method _read_hash($hash, $indent, @lines) {
-    pir::die("_read_hash not implemented");
-###
-###    while ( @$lines ) {
-###        # Check for a new document
-###        if ( $lines->[0] =~ /^(?:---|\.\.\.)/ ) {
-###            while ( @$lines and $lines->[0] !~ /^---/ ) {
-###                shift @$lines;
-###            }
-###            return 1;
-###        }
-###
-###        # Check the indent level
-###        $lines->[0] =~ /^(\s*)/;
-###        if ( length($1) < $indent->[-1] ) {
-###            return 1;
-###        } elsif ( length($1) > $indent->[-1] ) {
-###            pir::die \"YAML::Tiny found bad indenting in line '$lines->[0]'";
-###        }
-###
-###        # Get the key
-###        unless ( $lines->[0] =~ s/^\s*([^\'\" ][^\n]*?)\s*:(\s+(?:\#.*)?|$)// ) {
-###            if ( $lines->[0] =~ /^\s*[?\'\"]/ ) {
-###                pir::die \"YAML::Tiny does not support a feature in line '$lines->[0]'";
-###            }
-###            pir::die \"YAML::Tiny failed to classify line '$lines->[0]'";
-###        }
-###        my $key = $1;
-###
-###        # Do we have a value?
-###        if ( length $lines->[0] ) {
-###            # Yes
-###            $hash->{$key} = $self->_read_scalar( shift(@$lines), [ @$indent, undef ], $lines );
-###        } else {
-###            # An indent
-###            shift @$lines;
-###            unless ( @$lines ) {
-###                $hash->{$key} = undef;
-###                return 1;
-###            }
-###            if ( $lines->[0] =~ /^(\s*)-/ ) {
-###                $hash->{$key} = [];
-###                $self->_read_array( $hash->{$key}, [ @$indent, length($1) ], $lines );
-###            } elsif ( $lines->[0] =~ /^(\s*)./ ) {
-###                my $indent2 = length("$1");
-###                if ( $indent->[-1] >= $indent2 ) {
-###                    # Null hash entry
-###                    $hash->{$key} = undef;
-###                } else {
-###                    $hash->{$key} = {};
-###                    $self->_read_hash( $hash->{$key}, [ @$indent, length($1) ], $lines );
-###                }
-###            }
-###        }
-###    }
-###
-###    return 1;
+method _read_hash(%hash, @indent, @lines) {
+
+    while +@lines {
+        # Check for a new document
+        if @lines[0] ~~ /^['---'| '...' ]/ {
+            while @lines && !(@lines[0] ~~ /^'---'/ ) {
+                @lines.shift;
+            }
+            return 1;
+        }
+
+        # Check the indent level
+        my $m := @lines[0] ~~ /^(\s*)/;
+        if length($m[0]) < @indent[-1] {
+            return 1;
+        }
+        elsif length($m[0]) > @indent[-1] {
+            pir::die("YAML::Tiny found bad indenting in line '{ @lines[0] }'");
+        }
+
+        # Get the key
+        $m := @lines[0] ~~ /^\s* (<-[\'\"\ ]>\N*?) \s* ':' [\s+[\#.*]?|$]/;
+        #unless ( $lines->[0] =~ s/^\s*([^\'\" ][^\n]*?)\s*:(\s+(?:\#.*)?|$)// ) {
+        #    if ( $lines->[0] =~ /^\s*[?\'\"]/ ) {
+        #        pir::die \"YAML::Tiny does not support a feature in line '$lines->[0]'";
+        #    }
+        #    pir::die \"YAML::Tiny failed to classify line '$lines->[0]'";
+        #}
+        debug("Match", @lines[0], $m);
+        @lines[0] := subst(@lines[0], /^\s* (<-[\'\"]>\N*?) \s* ':' (\s+[\#.*]?|$)/, '');
+        debug("Line", @lines[0]);
+
+        my $key := ~$m[0];
+
+        # Do we have a value?
+        if length(@lines[0]) {
+            # Yes
+            debug("Reading scalar", @lines[0]);
+            %hash{$key} := self._read_scalar( @lines.shift, [ @indent, undef ], @lines );
+            debug("Done", %hash);
+        }
+        else {
+            # An indent
+            @lines.shift;
+            unless @lines {
+                %hash{$key} := undef;
+                return 1;
+            }
+
+            if $m := @lines[0] ~~ /^(\s*)\-/ {
+                %hash{$key} := list();
+                self._read_array( %hash{$key}, [ @indent, length($m[0]) ], @lines );
+            }
+            elsif @lines[0] ~~ /^(\s*)./ {
+                my $indent2 := length($m[0]);
+                if ( @indent[-1] >= $indent2 ) {
+                    # Null hash entry
+                    %hash{$key} := undef;
+                }
+                else {
+                    %hash{$key} := {};
+                    self._read_hash( %hash{$key}, [ @indent, length($m[0]) ], @lines );
+                }
+            }
+        }
+    }
+
+    1;
 }
 
 sub debug($message, *@params) {
