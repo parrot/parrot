@@ -12,7 +12,7 @@ t/tools/show_deprecated.pl.t - test show_deprecated.pl
 =head1 DESCRIPTION
 
 Tests the C<show_deprecated.pl> tool. This also serves as a basic
-test that docs/changes/api.yaml is valid YAML.
+test that api.yaml is valid YAML.
 
 These tests could be greatly improved.
 

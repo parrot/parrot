@@ -12,7 +12,7 @@ t/tools/show_experimental.pl.t - test show_experimental.pl
 =head1 DESCRIPTION
 
 Tests the C<show_experimental.pl> tool. This also serves as a basic
-test that docs/changes/api.yaml is valid YAML.
+test that api.yaml is valid YAML.
 
 These tests could be greatly improved.
 

@@ -9,7 +9,7 @@ use List::MoreUtils qw/any/;
 
 =head1 NAME
 
-show_deprecated.pl - Show deprecated features listed in docs/changes/api.yaml
+show_deprecated.pl - Show deprecated features listed in api.yaml
 
 =head1 SYNOPSIS
 

@@ -9,7 +9,7 @@ use List::MoreUtils qw/any/;
 
 =head1 NAME
 
-show_experimental.pl - Show experimental features listed in docs/changes/api.yaml
+show_experimental.pl - Show experimental features listed in api.yaml
 
 =head1 SYNOPSIS
 
