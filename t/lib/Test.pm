@@ -6,10 +6,10 @@ our sub yaml_ok($yaml, $expected, $description, *%adverbs) {
     try {
         my $result := $parser.read_string($yaml);
         #_dumper($result);
-        is_deeply($expected, $result, $description, todo => %adverbs<todo>);
+        is_deeply($expected, $result, $description, todo => %adverbs<todo> ?? $description !! 0);
 
         CATCH {
-            nok(1, "Parse failed '{ $! }'", %adverbs<todo>);
+            nok(1, "Parse failed '{ $! }'", %adverbs<todo> ?? $description !! 0);
         }
     }
 }
