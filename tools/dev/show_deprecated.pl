@@ -28,14 +28,13 @@ YAML
 
 my $api  = catfile(qw/api.yaml/);
 my $yaml = LoadFile($api);
-use Data::Dumper;
-warn Dumper [ $yaml ];
 
 for my $e (@$yaml) {
     my $tags     = $e->{tags};
     my $ticket   = $e->{ticket};
     my $eligible = $e->{eligible};
     my $title    = $e->{name};
+    next if any { $_ eq 'old' } @$tags;
     # This format is ugly, but is functional for now
     print "$ticket\t$eligible\t$title\n" if any { $_ eq 'deprecated' } @$tags;
 }

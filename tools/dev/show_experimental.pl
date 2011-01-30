@@ -33,6 +33,7 @@ for my $e (@$yaml) {
     my $tags = $e->{tags};
     my $note = $e->{note} || '';
     my $title = $e->{name};
+    next if any { $_ eq 'old' } @$tags;
     # This format is ugly, but is functional for now
     print "$title\t$note\n" if any { $_ eq 'experimental' } @$tags;
 }
