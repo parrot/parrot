@@ -155,24 +155,25 @@ method _read_scalar($string, $indent, @lines) {
        return $string;
    }
 
-###    # Double quote.
-###    # The commented out form is simpler, but overloaded the Perl regex
-###    # engine due to recursion and backtracking problems on strings
-###    # larger than 32,000ish characters. Keep it for reference purposes.
-###    # if ( $string =~ /^\"((?:\\.|[^\"])*)\"\z/ ) {
+    # Double quote.
+    # The commented out form is simpler, but overloaded the Perl regex
+    # engine due to recursion and backtracking problems on strings
+    # larger than 32,000ish characters. Keep it for reference purposes.
+    if my $m := $string ~~ /^\" ([\\.|<-[\"]>]*) \" [\s+\#.*]?$/ {
 ###    if ( $string =~ /^\"([^\\"]*(?:\\.[^\\"]*)*)\"(?:\s+\#.*)?\z/ ) {
-###        # Reusing the variable is a little ugly,
-###        # but avoids a new variable and a string copy.
-###        $string = $1;
-###        $string =~ s/\\"/"/g;
-###        $string =~ s/\\([never\\fartz]|x([0-9a-fA-F]{2}))/(length($1)>1)?pack("H2",$2):$UNESCAPES{$1}/gex;
-###        return $string;
-###    }
-###
+        # Reusing the variable is a little ugly,
+        # but avoids a new variable and a string copy.
+        debug("Double match", $m);
+        $string := ~$m[0];
+        $string := subst($string, /\\\"/, '"', :global<1>);
+        #$string =~ s/\\([never\\fartz]|x([0-9a-fA-F]{2}))/(length($1)>1)?pack("H2",$2):$UNESCAPES{$1}/gex;
+        return $string;
+    }
+
     # Special cases
-###    if ( $string =~ /^[\'\"!&]/ ) {
-###        pir::die \"YAML::Tiny does not support a feature in line '$string'";
-###    }
+    if $string ~~ /^<[\'\"!&]>/ {
+        pir::die("YAML::Tiny does not support a feature in line '$string'");
+    }
     return {} if $string ~~ /^{}[\s+\#.*]?$/;
     return [] if $string ~~ /^\[\][\s+\#.*]?$/;
 

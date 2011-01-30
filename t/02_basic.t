@@ -195,7 +195,6 @@ yaml_ok(
 	"only_spaces",
 	noyamlpm   => 1,
 	noyamlperl => 1,
-    todo => 1,
 );
 
 yaml_ok(
@@ -204,7 +203,6 @@ yaml_ok(
 	"leading_trailing_spaces",
 	noyamlpm   => 1,
 	noyamlperl => 1,
-    todo => 1,
 );
 
 # Implicit document start
