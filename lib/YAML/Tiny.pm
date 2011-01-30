@@ -280,7 +280,7 @@ method _read_array(@array, @indent, @lines) {
                 pir::die("YAML::Tiny failed to classify line '{ @lines[0] }'");
             }
         }
-        elsif pir::defined(@indent[-2]) && @indent[-1] == @indent[-2] {
+        elsif (@indent > 1) && (@indent[-1] == @indent[-2]) {
             # This is probably a structure like the following...
             # ---
             # foo:
