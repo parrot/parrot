@@ -28,6 +28,7 @@ README_win32.pod                                            [devel]doc
 RESPONSIBLE_PARTIES                                         [main]doc
 TODO                                                        [devel]doc
 VERSION                                                     [devel]
+api.yaml                                                    []
 compilers/data_json/Defines.mak                             [data_json]
 compilers/data_json/Rules.mak                               [data_json]
 compilers/data_json/data_json.pir                           [data_json]
@@ -2080,6 +2081,8 @@ t/tools/pmc2cutils/04-dump_pmc.t                            [test]
 t/tools/pmc2cutils/05-gen_c.t                               [test]
 t/tools/pmc2cutils/08-pmc-pm.t                              [test]
 t/tools/pmc2cutils/README                                   []doc
+t/tools/show_deprecated.t                                   [test]
+t/tools/show_experimental.t                                 [test]
 t/tools/testdata                                            [test]
 tools/build/README                                          []doc
 tools/build/c2str.pl                                        []
@@ -2147,6 +2150,8 @@ tools/dev/pmctree.pl                                        []
 tools/dev/pprof2cg.pl                                       [devel]
 tools/dev/reconfigure.pl                                    [devel]
 tools/dev/search-ops.pl                                     []
+tools/dev/show_deprecated.pl                                []
+tools/dev/show_experimental.pl                              []
 tools/dev/symlink.pl                                        []
 tools/dev/update_copyright.pl                               []
 tools/dev/vgp                                               []
