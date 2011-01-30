@@ -43,7 +43,6 @@ yaml_ok(
 	[ undef, undef ],
 	'two_header',
 	noyamlperl => 1,
-    todo => 1,
 );
 yaml_ok(
 	"--- ~\n",
@@ -87,20 +86,17 @@ yaml_ok(
 	"---\n- foo\n",
 	[ [ 'foo' ] ],
 	'one_list1',
-    todo => 1,
 );
 yaml_ok(
 	"---\n- foo\n- bar\n",
 	[ [ 'foo', 'bar' ] ],
 	'one_list2',
-    todo => 1,
 );
 yaml_ok(
 	"---\n- ~\n- bar\n",
 	[ [ undef, 'bar' ] ],
 	'one_listundef',
 	noyamlperl => 1,
-    todo => 1,
 );
 
 # Simple hashs
@@ -219,7 +215,6 @@ yaml_ok(
 	"- foo\n",
 	[ [ 'foo' ] ],
 	'implicit_array',
-    todo => 1,
 );
 
 # Inline nested hash
@@ -242,7 +237,6 @@ yaml_ok(
 	"---\n- foo\n#\n- bar\n",
 	[ [ 'foo', 'bar' ] ],
 	'empty_comment_in_list',
-    todo => 1,
 );
 
 yaml_ok(
