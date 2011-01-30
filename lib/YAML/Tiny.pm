@@ -77,7 +77,7 @@ method read_string($string) {
     while ( @lines ) {
         # Do we have a document header?
         if my $match := @lines[0] ~~ /^^\-\-\-\s*[(.+)\s*]?$/ {
-            #_dumper($match);
+            debug("Scalar", $match);
             # Handle scalar documents
             @lines.shift;
             # if ( defined $1 and $1 !~ /^(?:\#.+|\%YAML[: ][\d\.]+)\z/ ) {
@@ -88,20 +88,26 @@ method read_string($string) {
             }
         }
 
-        if !@lines || !(@lines[0] ~~ /^[\-\-\-|\.\.\.]/) {
+        debug("Lines", @lines);
+
+        if !@lines || (@lines[0] ~~ /^['---'|'...']/) {
+            debug("Naked", @lines);
             # A naked document
             @result.push(undef);
-            while @lines && !(@lines[0] ~~ /^\-\-\-/) {
+            while @lines && !(@lines[0] ~~ /^'---'/) {
                 @lines.shift;
             }
 
-        } elsif @lines[0] ~~ /^\s*\-/ {
+        }
+        elsif @lines[0] ~~ /^\s*\-/ {
+            debug("Array", $match);
             # An array at the root
             my $document := [ ];
             @result.push($document);
             self._read_array( $document, [ 0 ], @lines );
 
         } elsif my $m := @lines[0] ~~ /^(\s*)\S/ {
+            debug("Hash", $match);
             # A hash at the root
             my $document := { };
             @result.push($document);
@@ -200,38 +206,39 @@ method _read_scalar($string, $indent, @lines) {
 }
 
 # Parse an array
-method _read_array($array, $indent, @lines) {
+method _read_array(@array, @indent, @lines) {
 
     while ( @lines ) {
+        debug("_read_array", @lines[0]);
+
         # Check for a new document
-        if @lines[0] ~~ /^[\-\-\- | \.\.\. ]/ {
-            while @lines && !(@lines[0] ~~ /^\-\-\-/ ) {
+        if @lines[0] ~~ /^['---'| '...' ]/ {
+            while @lines && !(@lines[0] ~~ /^'---'/ ) {
                 @lines.shift;
             }
             return 1;
         }
 
-    pir::die("_read_array not implemented");
-###        # Check the indent level
-###        $lines->[0] =~ /^(\s*)/;
-###        if ( length($1) < $indent->[-1] ) {
-###            return 1;
-###        } elsif ( length($1) > $indent->[-1] ) {
-###            pir::die \"YAML::Tiny found bad indenting in line '$lines->[0]'";
-###        }
-###
-###        if ( $lines->[0] =~ /^(\s*\-\s+)[^\'\"]\S*\s*:(?:\s+|$)/ ) {
-###            # Inline nested hash
-###            my $indent2 = length("$1");
-###            $lines->[0] =~ s/-/ /;
-###            push @$array, { };
-###            $self->_read_hash( $array->[-1], [ @$indent, $indent2 ], $lines );
-###
-###        } elsif ( $lines->[0] =~ /^\s*\-(\s*)(.+?)\s*\z/ ) {
-###            # Array entry with a value
-###            shift @$lines;
-###            push @$array, $self->_read_scalar( "$2", [ @$indent, undef ], $lines );
-###
+        # Check the indent level
+        my $m := @lines[0] ~~ /^(\s*)/;
+        if ( length($m[0]) < @indent[-1] ) {
+            return 1;
+        } elsif ( length($m[0]) > @indent[-1] ) {
+            pir::die("YAML::Tiny found bad indenting in line '{ @lines[0] }'");
+        }
+
+        if $m := @lines[0] ~~ /^ (\s*\-\s+) <-[\'\"]> \S*\s* ':' [\s+|$]/ {
+            # Inline nested hash
+            my $indent2 := length($m[0]);
+            subst(@lines[0], /'-'/, ' ');
+            @array.push(hash());
+            self._read_hash( @array[-1], [ @indent, $indent2 ], @lines );
+        }
+        elsif $m := @lines[0] ~~ /^\s* \- (\s*) (.+?) \s* $/ {
+            # Array entry with a value
+            @lines.shift;
+            @array.push(self._read_scalar( ~$m[1], [ @indent, undef ], @lines ));
+        }
 ###        } elsif ( $lines->[0] =~ /^\s*\-\s*\z/ ) {
 ###            shift @$lines;
 ###            unless ( @$lines ) {
@@ -257,7 +264,8 @@ method _read_array($array, $indent, @lines) {
 ###                pir::die \"YAML::Tiny failed to classify line '$lines->[0]'";
 ###            }
 ###
-###        } elsif ( defined $indent->[-2] and $indent->[-1] == $indent->[-2] ) {
+###        }
+###        elsif ( defined $indent->[-2] and $indent->[-1] == $indent->[-2] ) {
 ###            # This is probably a structure like the following...
 ###            # ---
 ###            # foo:
@@ -267,9 +275,9 @@ method _read_array($array, $indent, @lines) {
 ###            # ... so lets return and let the hash parser handle it
 ###            return 1;
 ###
-###        } else {
-###            pir::die \"YAML::Tiny failed to classify line '$lines->[0]'";
-###        }
+        else {
+            pir::die("YAML::Tiny failed to classify line '{ @lines[0] }'");
+        }
     }
 
     1;
@@ -335,6 +343,14 @@ method _read_hash($hash, $indent, @lines) {
 ###    return 1;
 }
 
+sub debug($message, *@params) {
+    if 0 {
+        print("$message: ");
+        _dumper(@params);
+    }
+}
+
+sub length($s) { pir::length($s) }
 
 INIT {
     pir::load_bytecode("nqp-setting.pbc");
