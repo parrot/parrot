@@ -127,12 +127,6 @@ Action methods in rules:
   tags:
     - compiler tools
   ticket: https://trac.parrot.org/parrot/ticket/463
-'PCT::HLLCompiler stages [eligible in 1.1]':
-  eligible: 1.1
-  note: 'The interface of various methods for adding, removing, and modifying the list stages in a PCT::HLLCompiler object is subject to change. The existing actual stages will remain; only the mechanism for specifying the order of individual stages is likely to change.'
-  tags:
-    - compiler tools
-  ticket: https://trac.parrot.org/parrot/ticket/462
 'PMC numbering [experimental]':
   tags:
     - bytecode
