@@ -168,19 +168,24 @@ yaml_ok(
 	"---\n- 'foo'\n",
 	[ [ 'foo' ] ],
 	'single_quote1',
-    todo => 1,
 );
 yaml_ok(
 	"---\n- '  '\n",
 	[ [ '  ' ] ],
 	'single_spaces',
-    todo => 1,
 );
 yaml_ok(
 	"---\n- ''\n",
 	[ [ '' ] ],
 	'single_null',
-    todo => 1,
+);
+
+yaml_ok(
+	"--- '  foo'\n--- 'bar  '\n",
+	[ "  foo", "bar  " ],
+	"leading_trailing_spaces_single",
+	noyamlpm   => 1,
+	noyamlperl => 1,
 );
 
 # Double quotes

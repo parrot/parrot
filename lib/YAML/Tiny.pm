@@ -75,11 +75,12 @@ method read_string($string) {
 
     # A nibbling parser
     while +@lines {
+        debug("Current result", |@result);
         debug("Handling", @lines[0]);
 
         # Do we have a document header?
         if my $match := @lines[0] ~~ /^^\-\-\-\s*[(.+)\s*]?$/ {
-            debug("Scalar", $match);
+            debug("Header", $match);
             # Handle scalar documents
             @lines.shift;
             # if ( defined $1 and $1 !~ /^(?:\#.+|\%YAML[: ][\d\.]+)\z/ ) {
@@ -130,14 +131,14 @@ method read_string($string) {
 ### }
 ###
 ### return $self;
-    debug("RESULT", @result);
+    debug("RESULT", |@result);
 
     @result;
 }
 
 # Deparse a scalar string to the actual scalar
 method _read_scalar($string, $indent, @lines) {
-    debug("Scalar", $string);
+    debug("_read_scalar", $string);
    # Trim trailing whitespace
    $string := subst($string, /\s*$/, '');
 
@@ -145,10 +146,11 @@ method _read_scalar($string, $indent, @lines) {
    return undef if $string eq '~';
 
    # Single quote
-   my $match := $string ~~ /^'(.*?)'[\s+\#.*]?$/;
+   my $match := $string ~~ /^\'(.*?)\'[\s+\#.*]?$/;
    if $match {
+       debug("Match", $match);
        return '' unless pir::defined($match[0]);
-       $string := ~$match[0][0];
+       $string := ~$match[0];
        $string := subst($string, /\'\'/, "'", :global<1>);
        return $string;
    }

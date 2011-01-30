@@ -5,7 +5,8 @@ our sub yaml_ok($yaml, $expected, $description, *%adverbs) {
     my $parser := YAML::Tiny.new;
     try {
         my $result := $parser.read_string($yaml);
-        #_dumper($result);
+        #print("result: "); _dumper($result);
+        #print("expected: "); _dumper($expected);
         is_deeply($expected, $result, $description, todo => %adverbs<todo> ?? $description !! 0);
 
         CATCH {
