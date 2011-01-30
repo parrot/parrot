@@ -26,7 +26,7 @@ YAML
 
 =cut
 
-my $api  = catfile(qw/docs changes api.yaml/);
+my $api  = catfile(qw/api.yaml/);
 my $yaml = LoadFile($api);
 use Data::Dumper;
 warn Dumper [ $yaml ];

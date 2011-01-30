@@ -28,7 +28,6 @@ use YAML qw/LoadFile/;
 
 plan tests => 1;
 
-my $api    = LoadFile( catfile(qw/docs changes api.yaml/) );
 my $script = catfile(qw/tools dev show_experimental.pl/);
 
 my $exit_code = system("$^X $script");
