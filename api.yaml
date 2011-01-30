@@ -51,6 +51,7 @@
   tags:
     - deprecated
     - PMC
+    - old
   ticket: https://trac.parrot.org/parrot/ticket/1561
 -
   name: 'C API coding standards cleanup'
@@ -187,6 +188,7 @@
   tags:
     - deprecated
     - compiler
+    - old
   ticket: https://trac.parrot.org/parrot/ticket/462
 -
   name: 'PMC Attributes Allocation Functions'
@@ -194,6 +196,7 @@
   tags:
     - functions
     - experimental
+    - old
 -
   name: 'PMC numbering'
   tags:
@@ -226,6 +229,7 @@
   tags:
     - deprecated
     - library
+    - old
   ticket: https://trac.parrot.org/parrot/ticket/1337
 -
   name: 'STRING COW'
@@ -234,6 +238,7 @@
   tags:
     - deprecated
     - functions
+    - old
   ticket: https://trac.parrot.org/parrot/ticket/1540
 -
   name: 'STRING Out parameters in Parrot_str_* functions'
@@ -242,6 +247,7 @@
   tags:
     - deprecated
     - functions
+    - old
   ticket: https://trac.parrot.org/parrot/ticket/1584
 -
   name: 'Threads and Parallelism'
@@ -279,6 +285,7 @@
   tags:
     - deprecated
     - opcodes
+    - old
   ticket: https://trac.parrot.org/parrot/ticket/1778
 -
   name: 'continuation-based ExceptionHandlers'
@@ -287,6 +294,7 @@
     - deprecated
     - PIR
     - syntax
+    - old
   ticket: https://trac.parrot.org/parrot/ticket/1091
 -
   name: 'dlfunc and new_callback signature string format'
@@ -310,6 +318,7 @@
   tags:
     - deprecated
     - opcodes
+    - old
   ticket: https://trac.parrot.org/parrot/ticket/1778
 -
   name: 'get_addr and set_addr'
@@ -326,11 +335,13 @@
   tags:
     - deprecated
     - opcodes
+    - old
   ticket: https://trac.parrot.org/parrot/ticket/1406
 -
   name: 'implicit optional named parameters'
   eligible: 2.1
   tags:
+    - old
     - deprecated
     - PIR
     - syntax
@@ -342,6 +353,7 @@
   tags:
     - deprecated
     - opcodes
+    - old
   ticket: https://trac.parrot.org/parrot/ticket/1540
 -
   name: 'loadlib_p_s_p'
