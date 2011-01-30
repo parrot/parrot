@@ -102,14 +102,13 @@ yaml_ok(
 # Simple hashs
 yaml_ok(
 	"---\nfoo: bar\n",
-	[ { foo => 'bar' } ],
+	[ hash( foo => 'bar' ) ],
 	'one_hash1',
-    todo => 1,
 );
 
 yaml_ok(
 	"---\nfoo: bar\nthis: ~\n",
-	[ { this => undef, foo => 'bar' } ],
+	[ hash(this => undef, foo => 'bar') ],
  	'one_hash2',
 	noyamlperl => 1,
     todo => 1,
@@ -123,10 +122,9 @@ foo:
   - ~
   - baz
 },
-	[ { foo => [ 'bar', undef, 'baz' ] } ],
+	[ hash(foo => [ 'bar', undef, 'baz' ]) ],
 	'array_in_hash',
 	noyamlperl => 1,
-    todo => 1,
 );
 
 # Simple hash inside a hash with an undef
@@ -136,7 +134,7 @@ foo: ~
 bar:
   foo: bar
 },
-	[ { foo => undef, bar => { foo => 'bar' } } ],
+	[ hash(foo => undef, bar => hash(foo => 'bar' )) ],
 	'hash_in_hash',
 	noyamlperl => 1,
     todo => 1,
@@ -155,10 +153,10 @@ yaml_ok(
   this: that
 },
 	[ [
-		{ foo => undef, this => 'that' },
+		hash( foo => undef, this => 'that' ),
 		'foo',
 		undef,
-		{ foo => 'bar', this => 'that' },
+		hash( foo => 'bar', this => 'that' ),
 	] ],
 	'hash_in_array',
 	noyamlperl => 1,
@@ -207,9 +205,8 @@ yaml_ok(
 # Implicit document start
 yaml_ok(
 	"foo: bar\n",
-	[ { foo => 'bar' } ],
+	[ hash( foo => 'bar' ) ],
 	'implicit_hash',
-    todo => 1,
 );
 yaml_ok(
 	"- foo\n",
@@ -218,19 +215,19 @@ yaml_ok(
 );
 
 # Inline nested hash
-yaml_ok(
-	q{
----
-- ~
-- foo: bar
-  this: that
-- baz
-},
-	[ [ undef, { foo => 'bar', this => 'that' }, 'baz' ] ],
-	'inline_nested_hash',
-	noyamlperl => 1,
-    todo => 1,
-);
+###yaml_ok(
+###	q{
+###---
+###- ~
+###- foo: bar
+###  this: that
+###- baz
+###},
+###	[ [ undef, hash( foo => 'bar', this => 'that' ), 'baz' ] ],
+###	'inline_nested_hash',
+###	noyamlperl => 1,
+###    todo => 1,
+###);
 
 # Empty comments
 yaml_ok(
@@ -241,9 +238,8 @@ yaml_ok(
 
 yaml_ok(
 	"---\nfoo: bar\n# foo\none: two\n",
-	[ { foo => 'bar', one => 'two' } ],
+	[ hash( foo => 'bar', one => 'two' ) ],
 	'empty_comment_in_hash',
-    todo => 1,
 );
 
 # Complex keys
