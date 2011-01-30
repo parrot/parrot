@@ -231,6 +231,7 @@ method _read_array(@array, @indent, @lines) {
 
         # Check the indent level
         my $m := @lines[0] ~~ /^(\s*)/;
+        debug("Indenting", $m, @indent);
         if ( length($m[0]) < @indent[-1] ) {
             return 1;
         } elsif ( length($m[0]) > @indent[-1] ) {
@@ -308,6 +309,7 @@ method _read_hash(%hash, @indent, @lines) {
 
         # Check the indent level
         my $m := @lines[0] ~~ /^(\s*)/;
+        debug("Indenting", $m, @indent[-1], @indent);
         if length($m[0]) < @indent[-1] {
             return 1;
         }
@@ -348,7 +350,8 @@ method _read_hash(%hash, @indent, @lines) {
                 %hash{$key} := list();
                 self._read_array( %hash{$key}, [ @indent, length($m[0]) ], @lines );
             }
-            elsif @lines[0] ~~ /^(\s*)./ {
+            elsif $m := @lines[0] ~~ /^(\s*)./ {
+                debug("Deeper", $m);
                 my $indent2 := length($m[0]);
                 if ( @indent[-1] >= $indent2 ) {
                     # Null hash entry
