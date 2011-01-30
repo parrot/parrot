@@ -251,42 +251,45 @@ method _read_array(@array, @indent, @lines) {
             @lines.shift;
             @array.push(self._read_scalar( ~$m[1], [ @indent, undef ], @lines ));
         }
-###        } elsif ( $lines->[0] =~ /^\s*\-\s*\z/ ) {
-###            shift @$lines;
-###            unless ( @$lines ) {
-###                push @$array, undef;
-###                return 1;
-###            }
-###            if ( $lines->[0] =~ /^(\s*)\-/ ) {
-###                my $indent2 = length("$1");
-###                if ( $indent->[-1] == $indent2 ) {
-###                    # Null array entry
-###                    push @$array, undef;
-###                } else {
-###                    # Naked indenter
-###                    push @$array, [ ];
-###                    $self->_read_array( $array->[-1], [ @$indent, $indent2 ], $lines );
-###                }
-###
-###            } elsif ( $lines->[0] =~ /^(\s*)\S/ ) {
-###                push @$array, { };
-###                $self->_read_hash( $array->[-1], [ @$indent, length("$1") ], $lines );
-###
-###            } else {
-###                pir::die \"YAML::Tiny failed to classify line '$lines->[0]'";
-###            }
-###
-###        }
-###        elsif ( defined $indent->[-2] and $indent->[-1] == $indent->[-2] ) {
-###            # This is probably a structure like the following...
-###            # ---
-###            # foo:
-###            # - list
-###            # bar: value
-###            #
-###            # ... so lets return and let the hash parser handle it
-###            return 1;
-###
+        elsif $m := @lines[0] ~~ /^\s*\-\s*$/ {
+            @lines.shift;
+            unless @lines {
+                @array.push(undef);
+                return 1;
+            }
+
+            if $m := @lines[0] ~~ /^(\s*)\-/ {
+                my $indent2 := length($m[0]);
+                if @indent[-1] == $indent2 {
+                    # Null array entry
+                    @array.push(undef);
+                }
+                else {
+                    # Naked indenter
+                    @array.push([ ]);
+                    self._read_array( @array[-1], [ @indent, $indent2 ], @lines );
+                }
+
+            }
+            elsif $m := @lines[0] ~~ /^(\s*)\S/ {
+                @array.push(hash());
+                self._read_hash( @array[-1], [ @indent, length($m[0]) ], @lines );
+
+            }
+            else {
+                pir::die("YAML::Tiny failed to classify line '{ @lines[0] }'");
+            }
+        }
+        elsif pir::defined(@indent[-2]) && @indent[-1] == @indent[-2] {
+            # This is probably a structure like the following...
+            # ---
+            # foo:
+            # - list
+            # bar: value
+            #
+            # ... so lets return and let the hash parser handle it
+            return 1;
+        }
         else {
             pir::die("YAML::Tiny failed to classify line '{ @lines[0] }'");
         }
