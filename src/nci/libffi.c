@@ -372,6 +372,9 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 case 'P':
                     pcc_arg_ptr[i] = &pcc_arg[i].p;
                     break;
+                default:
+                    PARROT_ASSERT(!"Impossible PCC signature");
+                    break;
             }
 
             call_arg[i + 3] = &pcc_arg_ptr[i];
@@ -507,6 +510,9 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 translation_pointers[i] = mem_internal_allocate_zeroed_typed(FLOATVAL);
                 *(FLOATVAL *)translation_pointers[i] = pcc_arg[j++].n;
                 values[i]                            = translation_pointers[i];
+                break;
+              default:
+                PARROT_ASSERT("!Unhandled NCI signature");
                 break;
             }
         }
