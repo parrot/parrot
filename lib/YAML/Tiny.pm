@@ -362,8 +362,9 @@ method _read_hash(%hash, @indent, @lines) {
     1;
 }
 
+our $DEBUG;
 sub debug($message, *@params) {
-    if 0 {
+    if $DEBUG {
         print("$message: ");
         _dumper(@params);
     }
