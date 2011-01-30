@@ -5,10 +5,11 @@ our sub yaml_ok($yaml, $expected, $description, *%adverbs) {
     my $parser := YAML::Tiny.new;
     try {
         my $result := $parser.read_string($yaml);
+        #_dumper($result);
         is_deeply($expected, $result, $description, todo => %adverbs<todo>);
 
         CATCH {
-            nok(1, "Parse failed '{ $! }'");
+            nok(1, "Parse failed '{ $! }'", %adverbs<todo>);
         }
     }
 }
@@ -16,6 +17,7 @@ our sub yaml_ok($yaml, $expected, $description, *%adverbs) {
 Q:PIR {
     # We want Test::More features for testing. Not NQP's builtin.
     .include "test_more.pir"
+    load_bytecode "dumper.pbc"
 }
 
 # vim: ft=perl6
