@@ -43,6 +43,14 @@ Functions controlling Parrot's profiling runcore.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void destroy_basic_output(ARGIN(Parrot_profiling_runcore_t *runcore))
+        __attribute__nonnull__(1);
+
+static void destroy_profiling_core(PARROT_INTERP,
+    ARGIN(Parrot_profiling_runcore_t *runcore))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static char* get_filename_cstr(PARROT_INTERP,
@@ -148,6 +156,11 @@ static void store_postop_time(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_destroy_basic_output __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(runcore))
+#define ASSERT_ARGS_destroy_profiling_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(runcore))
 #define ASSERT_ARGS_get_filename_cstr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore) \
@@ -260,6 +273,9 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     runcore->runops  = (Parrot_runcore_runops_fn_t)  runops_profiling_core;
     runcore->destroy = (Parrot_runcore_destroy_fn_t) destroy_profiling_core;
 
+    runcore->output.init     = NULL;
+    runcore->output.store    = NULL;
+    runcore->output.destroy  = NULL;
     runcore->prev_ctx        = NULL;
     runcore->profiling_flags = 0;
     runcore->runloop_count   = 0;
@@ -275,10 +291,14 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
 
         STRING *profile_format_str = output_str;
         if (STRING_equal(interp, profile_format_str, CONST_STRING(interp, "pprof"))) {
-            runcore->output_fn = record_values_ascii_pprof;
+            runcore->output.init    = NULL;
+            runcore->output.store   = record_values_ascii_pprof;
+            runcore->output.destroy = destroy_basic_output;
         }
         else if (STRING_equal(interp, profile_format_str, CONST_STRING(interp, "none"))) {
-            runcore->output_fn = record_values_none;
+            runcore->output.init    = NULL;
+            runcore->output.store   = record_values_none;
+            runcore->output.destroy = NULL;
         }
         else {
             Parrot_eprintf(interp, "'%Ss' is not a valid profiling output format.\n", output_str);
@@ -287,13 +307,15 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
         }
     }
     else {
-        runcore->output_fn = record_values_ascii_pprof;
+        runcore->output.init    = NULL;
+        runcore->output.store   = record_values_ascii_pprof;
+        runcore->output.destroy = destroy_basic_output;
     }
 
     /* figure out where to write the output */
     env_filename_str = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_FILENAME"));
 
-    if (runcore->output_fn != record_values_none) {
+    if (runcore->output.store != record_values_none) {
         if (!STRING_IS_NULL(env_filename_str)) {
             STRING  *lc_filename;
             runcore->profile_filename = env_filename_str;
@@ -342,6 +364,8 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
 
     /* put profile_filename in the gc root set so it won't get collected */
     Parrot_str_gc_register(interp, runcore->profile_filename);
+
+    RUNCORE_init(runcore);
 
     Profiling_first_loop_SET(runcore);
 
@@ -448,7 +472,7 @@ ARGIN(opcode_t *pc))
 
     /* make it easy to tell separate runloops apart */
     if (interp->current_runloop_level == 1) {
-        runcore->output_fn(runcore, pprof_data, PPROF_LINE_END_OF_RUNLOOP);
+        RUNCORE_store(runcore, pprof_data, PPROF_LINE_END_OF_RUNLOOP);
         record_bogus_parent_runloop(runcore);
     }
 
@@ -494,7 +518,7 @@ ARGIN(PPROF_DATA *pprof_data), ARGIN(PMC* ctx_pmc), ARGIN(opcode_t *pc))
             pprof_data[PPROF_DATA_CTX_ADDR]  = (PPROF_DATA) ctx;
         }
 
-        runcore->output_fn(runcore, pprof_data, PPROF_LINE_CONTEXT_SWITCH);
+        RUNCORE_store(runcore, pprof_data, PPROF_LINE_CONTEXT_SWITCH);
 
         Parrot_str_free_cstring(ns_cstr);
         Parrot_str_free_cstring(filename_cstr);
@@ -572,7 +596,7 @@ ARGIN(PPROF_DATA *pprof_data), ARGIN(opcode_t *pc))
 
             pprof_data[PPROF_DATA_ANNOTATION_NAME]  = (PPROF_DATA) key_cstr;
             pprof_data[PPROF_DATA_ANNOTATION_VALUE] = (PPROF_DATA) val_cstr;
-            runcore->output_fn(runcore, pprof_data, PPROF_LINE_ANNOTATION);
+            RUNCORE_store(runcore, pprof_data, PPROF_LINE_ANNOTATION);
 
             Parrot_str_free_cstring(key_cstr);
             Parrot_str_free_cstring(val_cstr);
@@ -607,7 +631,7 @@ INTVAL line_num)
 
     pprof_data[PPROF_DATA_LINE]   = line_num;
     pprof_data[PPROF_DATA_OPNAME] = (PPROF_DATA) op_name;
-    runcore->output_fn(runcore, pprof_data, PPROF_LINE_OP);
+    RUNCORE_store(runcore, pprof_data, PPROF_LINE_OP);
 }
 
 
@@ -681,7 +705,7 @@ record_version_and_cli(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore)
 
         /* CLI line won't reflect any options passed to the parrot binary. */
         pprof_data[PPROF_DATA_CLI] = (PPROF_DATA) cli_cstr;
-        runcore->output_fn(runcore, pprof_data, PPROF_LINE_CLI);
+        RUNCORE_store(runcore, pprof_data, PPROF_LINE_CLI);
 
         Parrot_str_free_cstring(cli_cstr);
     }
@@ -689,7 +713,7 @@ record_version_and_cli(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore)
     if (Profiling_first_loop_TEST(runcore)) {
         Profiling_first_loop_CLEAR(runcore);
         pprof_data[PPROF_DATA_VERSION] = (PPROF_DATA) PPROF_VERSION;
-        runcore->output_fn(runcore, pprof_data, PPROF_LINE_VERSION);
+        RUNCORE_store(runcore, pprof_data, PPROF_LINE_VERSION);
         record_bogus_parent_runloop(runcore);
     }
 
@@ -800,12 +824,12 @@ record_bogus_parent_runloop(ARGIN(Parrot_profiling_runcore_t * runcore))
     pprof_data[PPROF_DATA_FILENAME]  = (PPROF_DATA) "no_file";
     pprof_data[PPROF_DATA_SUB_ADDR]  = 1;
     pprof_data[PPROF_DATA_CTX_ADDR]  = 1;
-    runcore->output_fn(runcore, pprof_data, PPROF_LINE_CONTEXT_SWITCH);
+    RUNCORE_store(runcore, pprof_data, PPROF_LINE_CONTEXT_SWITCH);
 
     pprof_data[PPROF_DATA_LINE]   = runcore->runloop_count;
     pprof_data[PPROF_DATA_TIME]   = 0;
     pprof_data[PPROF_DATA_OPNAME] = (PPROF_DATA) "noop";
-    runcore->output_fn(runcore, pprof_data, PPROF_LINE_OP);
+    RUNCORE_store(runcore, pprof_data, PPROF_LINE_OP);
 
     ++runcore->runloop_count;
 }
@@ -898,8 +922,27 @@ ARGIN(PPROF_DATA *pprof_data), ARGIN_NULLOK(Parrot_profiling_line type))
 
 /*
 
-=item C<void * destroy_profiling_core(PARROT_INTERP, Parrot_profiling_runcore_t
-*runcore)>
+=item C<static void destroy_basic_output(Parrot_profiling_runcore_t *runcore)>
+
+Perform finalization needed by the basic output methods.
+
+=cut
+
+*/
+
+static void
+destroy_basic_output(ARGIN(Parrot_profiling_runcore_t *runcore))
+{
+    ASSERT_ARGS(destroy_basic_output)
+
+    fclose(runcore->profile_fd);
+}
+
+
+/*
+
+=item C<static void destroy_profiling_core(PARROT_INTERP,
+Parrot_profiling_runcore_t *runcore)>
 
 Perform any finalization needed by the profiling runcore.
 
@@ -907,8 +950,7 @@ Perform any finalization needed by the profiling runcore.
 
 */
 
-PARROT_CAN_RETURN_NULL
-void *
+static void
 destroy_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
 {
     ASSERT_ARGS(destroy_profiling_core)
@@ -922,11 +964,8 @@ destroy_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore)
     Parrot_str_free_cstring(filename_cstr);
     Parrot_hash_destroy(interp, runcore->line_cache);
 
-    if (runcore->output_fn != record_values_none)
-        fclose(runcore->profile_fd);
+    RUNCORE_destroy(runcore);
     mem_gc_free(interp, runcore->time);
-
-    return NULL;
 }
 
 /*
