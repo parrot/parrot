@@ -234,7 +234,8 @@ Retrieve an integer as the next item from the image.
         const PackFile      *pf        = PARROT_IMAGEIOTHAW(SELF)->pf;
         const unsigned char *stream    = (const unsigned char *)PARROT_IMAGEIOTHAW(SELF)->curs;
         const INTVAL         i         = pf->fetch_iv(stream);
-        PARROT_IMAGEIOTHAW(SELF)->curs = (opcode_t *)(stream + pf->header->wordsize);
+        DECL_CONST_CAST;
+        PARROT_IMAGEIOTHAW(SELF)->curs = PARROT_const_cast(opcode_t *, stream + pf->header->wordsize);
         BYTECODE_SHIFT_OK(INTERP, SELF);
         return i;
     }
