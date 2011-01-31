@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -235,7 +235,8 @@ Retrieve an integer as the next item from the image.
         const unsigned char *stream    = (const unsigned char *)PARROT_IMAGEIOTHAW(SELF)->curs;
         const INTVAL         i         = pf->fetch_iv(stream);
         DECL_CONST_CAST;
-        PARROT_IMAGEIOTHAW(SELF)->curs = PARROT_const_cast(opcode_t *, stream + pf->header->wordsize);
+        PARROT_IMAGEIOTHAW(SELF)->curs = (opcode_t *)PARROT_const_cast(unsigned char *,
+                                                                    stream + pf->header->wordsize);
         BYTECODE_SHIFT_OK(INTERP, SELF);
         return i;
     }
