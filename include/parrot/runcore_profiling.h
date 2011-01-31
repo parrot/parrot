@@ -42,7 +42,7 @@ typedef void (*profiling_store_fn)  (PARROT_INTERP, ARGIN(Parrot_profiling_runco
 typedef void (*profiling_init_fn)   (PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t*));
 typedef void (*profiling_destroy_fn)(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t*));
 
-#define RUNCORE_init(i, r)        ((r)->output.init    ? (r)->output.init((i), (r))            : fprintf(stderr, "init not found\n"))
+#define RUNCORE_init(i, r)        ((r)->output.init    ? (r)->output.init((i), (r))            : NULL)
 #define RUNCORE_store(i, r, d, l) ((r)->output.store   ? (r)->output.store((i), (r), (d), (l)) : NULL)
 #define RUNCORE_destroy(i, r)     ((r)->output.destroy ? (r)->output.destroy((i), (r))         : NULL)
 
