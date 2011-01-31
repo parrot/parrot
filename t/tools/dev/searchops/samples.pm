@@ -39,7 +39,7 @@ pseudo-core.ops - Parrot Core Ops
 
 =item B<end>()
 
-Halts the interpreter. (Must be op #0, CORE_OPS_end). See also B<exit>.
+Halts the interpreter. See also B<exit>.
 
 =cut
 
@@ -80,12 +80,6 @@ inline op check_events__() :internal :flow {
     disable_event_checking(interp);
     Parrot_cx_handle_tasks(interp, interp->scheduler);
     goto ADDRESS(_this);   /* force this being a branch op */
-}
-
-inline op wrapper__() :internal :flow {
-    opcode_t *pc = CUR_OPCODE;
-    DO_OP(pc, interp);
-    goto ADDRESS(pc);
 }
 
 inline op prederef__() :internal :flow {

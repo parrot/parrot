@@ -249,18 +249,15 @@ destination to continue execution.
 
     VTABLE opcode_t *invoke(void *next) {
         PMC * const        from_obj = Parrot_pcc_get_signature(INTERP, CURRENT_CONTEXT(INTERP));
-        PMC               *to_ctx, *call_obj;
         opcode_t          *pc;
         PackFile_ByteCode *seg;
         UNUSED(next)
 
         GET_ATTR_seg(INTERP, SELF, seg);
         GET_ATTR_address(INTERP, SELF, pc);
-        GET_ATTR_to_ctx(INTERP, SELF, to_ctx);
-        GET_ATTR_to_call_object(INTERP, SELF, call_obj);
 
-        Parrot_continuation_check(INTERP, SELF);
-        Parrot_continuation_rewind_environment(INTERP, SELF);
+        Parrot_sub_continuation_check(INTERP, SELF);
+        Parrot_sub_continuation_rewind_environment(INTERP, SELF);
 
         if (!PMC_IS_NULL(from_obj))
             Parrot_pcc_set_signature(INTERP, CURRENT_CONTEXT(INTERP), from_obj);
@@ -287,7 +284,7 @@ Experimental: returns caller info as a STRING.
         PMC *to_ctx;
 
         GET_ATTR_to_ctx(INTERP, SELF, to_ctx);
-        return Parrot_Context_infostr(INTERP, to_ctx);
+        return Parrot_sub_Context_infostr(INTERP, to_ctx);
     }
 
 

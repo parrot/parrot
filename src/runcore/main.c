@@ -338,15 +338,17 @@ parrot_hash_oplib(PARROT_INTERP, ARGIN(op_lib_t *lib))
 {
     ASSERT_ARGS(parrot_hash_oplib)
 
-    size_t i;
+    int i;
+
+    DECL_CONST_CAST;
 
     for (i = 0; i < lib->op_count; i++) {
         op_info_t *op = &lib->op_info_table[i];
-        parrot_hash_put(interp, interp->op_hash, (void *)op->full_name,
+        Parrot_hash_put(interp, interp->op_hash, PARROT_const_cast(char *, op->full_name),
                                                  (void *)op);
 
-        if (!parrot_hash_exists(interp, interp->op_hash, (void *)op->name))
-            parrot_hash_put(interp, interp->op_hash, (void *)op->name,
+        if (!Parrot_hash_exists(interp, interp->op_hash, PARROT_const_cast(char *, op->name)))
+            Parrot_hash_put(interp, interp->op_hash, PARROT_const_cast(char *, op->name),
                                                      (void *)op);
     }
 }
@@ -416,8 +418,8 @@ enable_event_checking(PARROT_INTERP)
                                         cs->op_count, op_func_t);
 
         for (i = interp->evc_func_table_size; i < cs->op_count; i++)
-            interp->evc_func_table[i] = (op_func_t)
-                D2FPTR(((void**)core_lib->op_func_table)[CORE_OPS_check_events__]);
+            interp->evc_func_table[i] =
+                core_lib->op_func_table[PARROT_OP_check_events__];
 
         interp->evc_func_table_size = cs->op_count;
     }

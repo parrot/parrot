@@ -294,7 +294,7 @@ LOOP:
     if $I0 >= requested goto DONE
     $S0 = self."read"()
     if_null $S0, DONE
-    concat ret, $S0
+    ret = concat ret, $S0
     goto LOOP
 DONE:
 

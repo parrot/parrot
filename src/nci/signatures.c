@@ -228,6 +228,8 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
             sig_buf[j++] = 'P';
             sig_buf[j++] = 's';
             break;
+          default:
+            break;
         }
     }
 

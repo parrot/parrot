@@ -30,6 +30,8 @@ at the moment:
 
 =cut
 
+.pcc_sub :main main:
+
 # How can I get to the command line args?
 
 	#set I10, P5

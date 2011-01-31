@@ -1,11 +1,16 @@
 #! perl
-# Copyright (C) 2001-2006, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 3;
+use Parrot::Test;
+use File::Spec::Functions;
+
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
+
+plan tests => 2;
 
 =head1 NAME
 
@@ -48,52 +53,7 @@ CODE
 Blow'd Up(tm)
 OUTPUT
 
-# vor $EDITOR '
-
-c_output_is( <<'CODE', <<'OUTPUT', "Parrot_run_native" );
-
-#include <parrot/parrot.h>
-#include <parrot/embed.h>
-
-static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
-
-int
-main(int argc, const char* argv[])
-{
-    Interp *interp;
-
-    interp = Parrot_new(NULL);
-    if (!interp) {
-        return 1;
-    }
-
-    Parrot_io_eprintf(interp, "main\n");
-
-    Parrot_run_native(interp, the_test);
-
-    Parrot_io_eprintf(interp, "back\n");
-    Parrot_x_exit(interp, 0);
-    return 0;
-}
-
-static opcode_t*
-the_test(Interp *interp,
-         opcode_t *cur_op, opcode_t *start)
-{
-    UNUSED(cur_op);
-    UNUSED(start);
-
-    /* tests go here */
-    Parrot_io_eprintf(interp, "ok\n");
-
-    return NULL; /* always return 0 or bad things may happen */
-}
-
-CODE
-main
-ok
-back
-OUTPUT
+# for $EDITOR '
 
 # Local Variables:
 #   mode: cperl

@@ -56,7 +56,7 @@ struct IMC_Unit {
     SymReg           *_namespace;
     int               owns_namespace;   /* should this unit free *_namespace */
     int               pasm_file;
-    const char       *file;
+    STRING           *file;
     int               n_vars_used[4];   /* INSP in PIR */
     int               n_regs_used[4];   /* INSP in PBC */
     int               first_avail[4];   /* INSP */

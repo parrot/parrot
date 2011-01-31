@@ -38,7 +38,7 @@ sub runstep {
 
     my $describe = $Parrot::Git::Describe::current;
 
-    if ( defined($describe) and $describe !~ /^REL(EASE)?_\d+_\d+_\d+(-\d+-g[0-9A-Fa-f]{7})?$/ ) {
+    if ( defined($describe) and $describe !~ /^REL(EASE)?_\d+_\d+_\d+(-\d+-g[0-9A-Fa-f]{7,40})?$/ ) {
         die "Invalid git describe string (Git::Describe): $describe";
     }
 

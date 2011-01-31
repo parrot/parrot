@@ -36,11 +36,34 @@ Functions starting with unicode_ work with unicode strings.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static size_t convert_case_buf(PARROT_INTERP,
+    ARGMOD_NULLOK(char *dest_buf),
+    size_t dest_len,
+    ARGIN(const char *src_buf),
+    size_t src_len,
+    int mode)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*dest_buf);
+
 static int u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
+static STRING* unicode_convert_case(PARROT_INTERP,
+    ARGIN(const STRING *src),
+    int mode)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_convert_case_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src_buf))
 #define ASSERT_ARGS_u_iscclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_unicode_convert_case __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -1221,7 +1244,8 @@ fixed8_iter_set_and_advance(PARROT_INTERP,
     ptr[iter->charpos++] = c;
     iter->bytepos++;
 
-    PARROT_ASSERT(iter->bytepos <= str->bufused);
+    if (str->bufused < iter->bytepos)
+        str->bufused = iter->bytepos;
 }
 
 
@@ -1318,14 +1342,116 @@ unicode_compose(PARROT_INTERP, ARGIN(const STRING *src))
 }
 
 
+#define ENCODING_UPCASE     1
+#define ENCODING_DOWNCASE   2
+#define ENCODING_TITLECASE  3
+
+/*
+
+=item C<static size_t convert_case_buf(PARROT_INTERP, char *dest_buf, size_t
+dest_len, const char *src_buf, size_t src_len, int mode)>
+
+Converts a UTF-16 buffer to upper, lower or title case using the ICU library.
+
+Throws an exception if ICU is not installed.
+
+=cut
+
+*/
+
+static size_t
+convert_case_buf(PARROT_INTERP, ARGMOD_NULLOK(char *dest_buf), size_t dest_len,
+    ARGIN(const char *src_buf), size_t src_len, int mode)
+{
+    ASSERT_ARGS(convert_case_buf)
+#if PARROT_HAS_ICU
+    UErrorCode err = U_ZERO_ERROR;
+    int        res;
+
+    switch (mode) {
+      case ENCODING_UPCASE:
+        res = u_strToUpper((UChar *)dest_buf, dest_len / 2,
+                           (const UChar *)src_buf, src_len / 2, NULL, &err);
+        break;
+      case ENCODING_DOWNCASE:
+        res = u_strToLower((UChar *)dest_buf, dest_len / 2,
+                           (const UChar *)src_buf, src_len / 2, NULL, &err);
+        break;
+      case ENCODING_TITLECASE:
+        res = u_strToTitle((UChar *)dest_buf, dest_len / 2,
+                           (const UChar *)src_buf, src_len / 2,
+                           NULL, NULL, &err);
+        break;
+      default:
+        res = 0; /* Should never happen, just to avoid a warning */
+        break;
+    }
+
+    if (dest_buf != NULL)
+        PARROT_ASSERT(U_SUCCESS(err));
+
+    return res * 2;
+#else
+    UNUSED(dest_buf);
+    UNUSED(dest_len);
+    UNUSED(src_buf);
+    UNUSED(src_len);
+    UNUSED(mode);
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+        "no ICU lib loaded");
+#endif
+}
+
+
+/*
+
+=item C<static STRING* unicode_convert_case(PARROT_INTERP, const STRING *src,
+int mode)>
+
+Converts the string to upper, lower or title case.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static STRING*
+unicode_convert_case(PARROT_INTERP, ARGIN(const STRING *src), int mode)
+{
+    ASSERT_ARGS(unicode_convert_case)
+    STRING *dest;
+    size_t  dest_len;
+
+    if (src->encoding != Parrot_utf16_encoding_ptr
+    &&  src->encoding != Parrot_ucs2_encoding_ptr)
+        src = Parrot_utf16_encoding_ptr->to_encoding(interp, src);
+
+    /* In-place operation is not safe for old ICU versions */
+    dest_len = convert_case_buf(interp, NULL, 0, src->strstart, src->bufused,
+                                mode);
+
+    dest = Parrot_str_new_init(interp, NULL, dest_len, src->encoding, 0);
+
+    dest->bufused = convert_case_buf(interp, dest->strstart, dest_len,
+                                     src->strstart, src->bufused, mode);
+    STRING_scan(interp, dest);
+
+    /* downgrade if possible */
+    if (dest->bufused == dest->strlen * 2)
+        dest->encoding = Parrot_ucs2_encoding_ptr;
+    else
+        dest->encoding = Parrot_utf16_encoding_ptr;
+
+    return dest;
+}
+
+
 /*
 
 =item C<STRING* unicode_upcase(PARROT_INTERP, const STRING *src)>
 
 Converts the STRING C<src> to all upper-case graphemes, for those characters
 which support upper-case versions.
-
-Throws an exception if ICU is not installed.
 
 =cut
 
@@ -1336,85 +1462,12 @@ STRING*
 unicode_upcase(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(unicode_upcase)
-#if PARROT_HAS_ICU
-    UErrorCode err;
-    int dest_len, src_len, needed;
-    STRING *res;
-#endif
 
     if (src->bufused  == src->strlen
-            && src->encoding == Parrot_utf8_encoding_ptr) {
+    &&  src->encoding == Parrot_utf8_encoding_ptr)
         return Parrot_ascii_encoding_ptr->upcase(interp, src);
-    }
 
-#if PARROT_HAS_ICU
-    /* to_encoding will allocate new string */
-    res = Parrot_utf16_encoding_ptr->to_encoding(interp, src);
-    /*
-       U_CAPI int32_t U_EXPORT2
-       u_strToUpper(UChar *dest, int32_t destCapacity,
-       const UChar *src, int32_t srcLength,
-       const char *locale,
-       UErrorCode *pErrorCode);
-       */
-    err = U_ZERO_ERROR;
-
-    /* use all available space - see below XXX */
-    /* TODO downcase, titlecase too */
-    dest_len = Buffer_buflen(res) / sizeof (UChar);
-    src_len  = res->bufused       / sizeof (UChar);
-
-    /*
-     * XXX troubles:
-     *   t/op/string_cs_45  upcase utf8:"\u01f0"
-     *   this creates \u004a \u030c J+NON-SPACING HACEK
-     *   the string needs resizing, *if* the src buffer is
-     *   too short. *But* with icu 3.2/3.4 the src string is
-     *   overwritten with partial result, despite the icu docs sayeth:
-     *
-     *      The source string and the destination buffer
-     *      are allowed to overlap.
-     *
-     *  Workaround:  'preflighting' returns needed length
-     *  Alternative: forget about inplace operation - create new result
-     *
-     *  TODO downcase, titlecase
-     */
-    needed = u_strToUpper(NULL, 0,
-            (UChar *)res->strstart, src_len,
-            NULL,       /* locale = default */
-            &err);
-
-    if (needed > dest_len) {
-        Parrot_gc_reallocate_string_storage(interp, res, needed * sizeof (UChar));
-        dest_len = needed;
-    }
-
-    err      = U_ZERO_ERROR;
-    dest_len = u_strToUpper((UChar *)res->strstart, dest_len,
-            (UChar *)res->strstart, src_len,
-            NULL,       /* locale = default */
-            &err);
-    PARROT_ASSERT(U_SUCCESS(err));
-    res->bufused = dest_len * sizeof (UChar);
-
-    /* downgrade if possible */
-    if (dest_len == (int)src->strlen)
-        res->encoding = Parrot_ucs2_encoding_ptr;
-    else {
-        /* string is likely still ucs2 if it was earlier
-         * but strlen changed due to combining char
-         */
-        res->strlen = dest_len;
-    }
-
-    return res;
-
-#else
-    UNUSED(src);
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
-#endif
+    return unicode_convert_case(interp, src, ENCODING_UPCASE);
 }
 
 
@@ -1423,8 +1476,6 @@ unicode_upcase(PARROT_INTERP, ARGIN(const STRING *src))
 =item C<STRING* unicode_downcase(PARROT_INTERP, const STRING *src)>
 
 Converts all graphemes to lower-case, for those graphemes which have cases.
-
-Throws an exception if ICU is not installed.
 
 =cut
 
@@ -1435,55 +1486,12 @@ STRING*
 unicode_downcase(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(unicode_downcase)
-#if PARROT_HAS_ICU
-    UErrorCode err;
-    int dest_len, src_len;
-    STRING *res;
-#endif
 
     if (src->bufused  == src->strlen
-            && src->encoding == Parrot_utf8_encoding_ptr) {
+    &&  src->encoding == Parrot_utf8_encoding_ptr)
         return Parrot_ascii_encoding_ptr->downcase(interp, src);
-    }
 
-#if PARROT_HAS_ICU
-    /* to_encoding will allocate new string */
-    res = Parrot_utf16_encoding_ptr->to_encoding(interp, src);
-    /*
-U_CAPI int32_t U_EXPORT2
-u_strToLower(UChar *dest, int32_t destCapacity,
-             const UChar *src, int32_t srcLength,
-             const char *locale,
-             UErrorCode *pErrorCode);
-     */
-    err      = U_ZERO_ERROR;
-    src_len  = res->bufused / sizeof (UChar);
-    dest_len = u_strToLower((UChar *)res->strstart, src_len,
-            (UChar *)res->strstart, src_len,
-            NULL,       /* locale = default */
-            &err);
-    res->bufused = dest_len * sizeof (UChar);
-
-    if (!U_SUCCESS(err)) {
-        err = U_ZERO_ERROR;
-        Parrot_gc_reallocate_string_storage(interp, res, res->bufused);
-        dest_len = u_strToLower((UChar *)res->strstart, dest_len,
-                (UChar *)res->strstart, src_len,
-                NULL,       /* locale = default */
-                &err);
-        PARROT_ASSERT(U_SUCCESS(err));
-    }
-
-    /* downgrade if possible */
-    if (dest_len == (int)res->strlen)
-        res->encoding = Parrot_ucs2_encoding_ptr;
-
-    return res;
-
-#else
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
-#endif
+    return unicode_convert_case(interp, src, ENCODING_DOWNCASE);
 }
 
 
@@ -1492,8 +1500,6 @@ u_strToLower(UChar *dest, int32_t destCapacity,
 =item C<STRING* unicode_titlecase(PARROT_INTERP, const STRING *src)>
 
 Converts the string to title case, for those characters which support cases.
-
-Throws an exception if ICU is not installed.
 
 =cut
 
@@ -1504,59 +1510,12 @@ STRING*
 unicode_titlecase(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(unicode_titlecase)
-#if PARROT_HAS_ICU
-
-    UErrorCode err;
-    int dest_len, src_len;
-    STRING *res;
 
     if (src->bufused  == src->strlen
-    &&  src->encoding == Parrot_utf8_encoding_ptr) {
+    &&  src->encoding == Parrot_utf8_encoding_ptr)
         return Parrot_ascii_encoding_ptr->titlecase(interp, src);
-    }
 
-    /* to_encoding will allocate new string */
-    res = Parrot_utf16_encoding_ptr->to_encoding(interp, src);
-
-    /*
-U_CAPI int32_t U_EXPORT2
-u_strToTitle(UChar *dest, int32_t destCapacity,
-             const UChar *src, int32_t srcLength,
-             UBreakIterator *titleIter,
-             const char *locale,
-             UErrorCode *pErrorCode);
-     */
-
-    err      = U_ZERO_ERROR;
-    src_len  = res->bufused / sizeof (UChar);
-    dest_len = u_strToTitle((UChar *)res->strstart, src_len,
-            (UChar *)res->strstart, src_len,
-            NULL,       /* default titleiter */
-            NULL,       /* locale = default */
-            &err);
-    res->bufused = dest_len * sizeof (UChar);
-
-    if (!U_SUCCESS(err)) {
-        err = U_ZERO_ERROR;
-        Parrot_gc_reallocate_string_storage(interp, res, res->bufused);
-        dest_len = u_strToTitle((UChar *)res->strstart, dest_len,
-                (UChar *)res->strstart, src_len,
-                NULL, NULL,
-                &err);
-        PARROT_ASSERT(U_SUCCESS(err));
-    }
-
-    /* downgrade if possible */
-    if (dest_len == (int)res->strlen)
-        res->encoding = Parrot_ucs2_encoding_ptr;
-
-    return res;
-
-#else
-    UNUSED(src);
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
-#endif
+    return unicode_convert_case(interp, src, ENCODING_TITLECASE);
 }
 
 

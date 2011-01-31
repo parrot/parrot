@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -28,6 +28,46 @@ files and directories.
 #  include <dirent.h>
 #else
 #  include <dirent.h>
+#  include <unistd.h>
+#endif
+
+#ifdef WIN32
+/*
+
+=item C<static int win32_can_execute(PARROT_INTERP, STRING *filename)>
+
+tests if a win32 file is executable
+
+=cut
+
+*/
+
+static int
+win32_can_execute(PARROT_INTERP, STRING *filename)
+{
+    PMC * env = Parrot_pmc_new(interp, enum_class_Env);
+    STRING * const pathext_str = Parrot_str_new(interp, "PATHEXT", 7);
+    STRING * const pathext_sep = Parrot_str_new(interp, ";", 1);
+    STRING * const dot = Parrot_str_new(interp, ".", 1);
+    STRING * const pathext = VTABLE_get_string_keyed_str(interp, env, pathext_str);
+    PMC * const pathext_pmc = Parrot_str_split(interp, pathext_sep, pathext);
+    const INTVAL elems = VTABLE_elements(interp, pathext_pmc);
+    INTVAL i;
+    STRING * wo_stem = NULL;
+    STRING * ext = NULL;
+    parrot_split_path_ext(interp, filename, &wo_stem, &ext);
+    if (STRING_IS_NULL(ext) || Parrot_str_length(interp, ext) == 0)
+        return 0;
+    ext = Parrot_str_upcase(interp, ext);
+    ext = Parrot_str_concat(interp, dot, ext);
+
+    for (i = 0; i < elems; i++) {
+        STRING * const test_ext = VTABLE_get_string_keyed_int(interp, pathext_pmc, i);
+        if (Parrot_str_equal(interp, ext, test_ext))
+            return 1;
+    }
+    return 0;
+}
 #endif
 
 /* XXX Check if we need to deallocate strerror strings */
@@ -141,16 +181,9 @@ C<path>.
     METHOD rm(STRING *path) {
         struct stat info;
         char * const cpath = Parrot_str_to_cstring(INTERP, path);
-        int          error = stat(cpath, &info);
+        int          error;
 
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_str_free_cstring(cpath);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-
-        if (S_ISDIR(info.st_mode)) {
+        if (Parrot_stat_info_intval(interp, path, STAT_ISDIR)) {
 #ifdef _MSC_VER
             error = _rmdir(cpath);
 #else
@@ -495,7 +528,8 @@ reads entries from a directory.
         }
 
         while ((dirent = readdir(dir)) != NULL) {
-            VTABLE_push_string(INTERP, array, Parrot_str_new(INTERP, dirent->d_name, 0));
+            const char *const name = dirent->d_name;
+            VTABLE_push_string(INTERP, array, Parrot_str_from_platform_cstring(INTERP, name));
         }
 
         closedir(dir);
@@ -581,6 +615,65 @@ thrown.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
+    }
+
+/*
+
+=item C<get_user_id()>
+
+Returns the ID number of the current user. This is platform-dependent.
+
+=cut
+
+*/
+
+    METHOD get_user_id() {
+        const UINTVAL uid = Parrot_get_user_id();
+        RETURN(INTVAL uid);
+    }
+
+/*
+
+=item C<can_execute(STRING *filename)>
+
+=cut
+
+*/
+
+    METHOD can_execute(STRING *filename) {
+        INTVAL can = 0;
+#ifndef WIN32
+        char * const file = Parrot_str_to_cstring(INTERP, filename);
+        can = access(file, X_OK) + 1;
+        Parrot_str_free_cstring(file);
+#else
+        can = win32_can_execute(interp, filename);
+#endif
+        RETURN(INTVAL can);
+    }
+
+    METHOD can_read(STRING *filename) {
+        char * const file = Parrot_str_to_cstring(INTERP, filename);
+        INTVAL can = 0;
+#ifndef WIN32
+        can = access(file, R_OK) + 1;
+#else
+        can = 1;
+#endif
+        Parrot_str_free_cstring(file);
+        RETURN(INTVAL can);
+    }
+
+    METHOD can_write(STRING *filename) {
+        char * const file = Parrot_str_to_cstring(INTERP, filename);
+        INTVAL can = 0;
+#ifndef WIN32
+        can = access(file, W_OK) + 1;
+#else
+        /* TODO: Win32 */
+#endif
+        Parrot_str_free_cstring(file);
+        RETURN(INTVAL can);
     }
 
 }

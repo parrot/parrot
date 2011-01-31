@@ -25,13 +25,20 @@ Without non-option arguments it reads the pbc from STDIN.
 
 */
 
-#include <parrot/parrot.h>
-#include "parrot/embed.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include "parrot/parrot.h"
+#include "parrot/longopt.h"
 
-static void do_dis(Parrot_Interp, const char *, int);
+#define PFOPT_UTILS 1
+
+typedef enum {
+    enum_DIS_BARE      = 1,
+    enum_DIS_HEADER    = 2
+} Parrot_disassemble_options;
+
+static void show_last_error_and_exit(Parrot_PMC interp);
 
 /*
 
@@ -51,12 +58,6 @@ static void help(void)
     printf("pbc_disassemble -o converted.pasm file.pbc\n\n");
     printf("  -b\t\t ... bare .pasm without header and left column\n");
     printf("  -h\t\t ... dump Constant-table header only\n");
-#if TRACE_PACKFILE
-    printf("\t-D<1-7> --debug debug output\n");
-    printf("\t   1 general info\n");
-    printf("\t   2 alignment\n");
-    printf("\t   4 values\n");
-#endif
     printf("  -o filename\t ... output to filename\n");
     exit(EXIT_SUCCESS);
 }
@@ -65,10 +66,8 @@ static struct longopt_opt_decl options[] = {
     { 'h', 'h', OPTION_optional_FLAG, { "--header-only" } },
     { '?', '?', OPTION_optional_FLAG, { "--help" } },
     { 'b', 'b', OPTION_optional_FLAG, { "--bare" } },
-#if TRACE_PACKFILE
-    { 'D', 'D', OPTION_required_FLAG, { "--debug" } },
-#endif
-    { 'o', 'o', OPTION_required_FLAG, { "--output" } }
+    { 'o', 'o', OPTION_required_FLAG, { "--output" } },
+    {  0 ,  0,  OPTION_optional_FLAG, { NULL } }
 };
 
 /*
@@ -85,22 +84,24 @@ command-line and disassembles it.
 int
 main(int argc, const char *argv[])
 {
-    Parrot_PackFile pf;
-    Parrot_Interp interp;
+    Parrot_PMC interp;
+    Parrot_PMC pbc;
+    Parrot_String filename;
     const char *outfile = NULL;
     int option = 0;
     int debug = PFOPT_UTILS;
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int status;
+    Parrot_Init_Args *initargs;
+    GET_INIT_STRUCT(initargs);
 
-    interp = Parrot_new(NULL);
-    if (!interp) {
-        return 1;
+    if (!(Parrot_api_make_interpreter(NULL, 0, initargs, &interp) &&
+          Parrot_api_set_executable_name(interp, argv[0]))) {
+        fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
+        show_last_error_and_exit(interp);
     }
-    /* init and set top of stack */
-    Parrot_init_stacktop(interp, &status);
-    while ((status = longopt_get(interp,
-                    argc, argv, options, &opt)) > 0) {
+
+    while ((status = longopt_get(argc, argv, options, &opt)) > 0) {
         switch (opt.opt_id) {
           case 'h':
             option += enum_DIS_HEADER;
@@ -111,11 +112,6 @@ main(int argc, const char *argv[])
           case 'o':
             outfile = opt.opt_arg;
             break;
-#if TRACE_PACKFILE
-          case 'D':
-            debug += atoi(opt.opt_arg) << 2;
-            break;
-#endif
           case '?':
           default:
             help();
@@ -128,36 +124,53 @@ main(int argc, const char *argv[])
     argc -= opt.opt_index;
     argv += opt.opt_index;
 
-    pf = Parrot_pbc_read(interp, argc ? *argv : "-", debug);
+    /* What to do about this debug flag? */
+    /* pf = Parrot_pbc_read(interp, argc ? *argv : "-", debug); */
 
-    if (!pf) {
-        printf("Can't read PBC\n");
-        return 1;
+    Parrot_api_string_import(interp, argc ? *argv : "-", &filename);
+    if (!(Parrot_api_load_bytecode_file(interp, filename, &pbc) &&
+          Parrot_api_disassemble_bytecode(interp, pbc, outfile, option) &&
+          Parrot_api_destroy_interpreter(interp))) {
+        fprintf(stderr, "Error during disassembly\n");
+        show_last_error_and_exit(interp);
     }
-
-    Parrot_pbc_load(interp, pf);
-
-    do_dis(interp, outfile, option);
-
-    Parrot_x_exit(interp, 0);
+    exit(EXIT_SUCCESS);
 }
 
 /*
 
-=item C<static void do_dis(PARROT_INTERP, const char *outfile, int options)>
+=item C<static void show_last_error_and_exit(Parrot_PMC interp)>
 
-Do the disassembling.
-
-C<option> is currently used to pass debugging flags to the packfile reader.
+Prints out the C<interp>'s last error and exits.
 
 =cut
 
 */
 
 static void
-do_dis(PARROT_INTERP, const char *outfile, int options)
+show_last_error_and_exit(Parrot_PMC interp)
 {
-    Parrot_disassemble(interp, outfile, (Parrot_disassemble_options) options);
+    Parrot_String errmsg, backtrace;
+    Parrot_Int exit_code, is_error;
+    Parrot_PMC exception;
+
+    if (!(Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg) &&
+          Parrot_api_get_exception_backtrace(interp, exception, &backtrace))) {
+        fprintf(stderr, "PARROT VM: Cannot recover\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (errmsg) {
+        char * errmsg_raw;
+        Parrot_api_string_export_ascii(interp, errmsg, &errmsg_raw);
+        fprintf(stderr, "%s\n", errmsg_raw);
+        Parrot_api_string_free_exported_ascii(interp, errmsg_raw);
+
+        Parrot_api_string_export_ascii(interp, backtrace, &errmsg_raw);
+        fprintf(stderr, "%s\n", errmsg_raw);
+        Parrot_api_string_free_exported_ascii(interp, errmsg_raw);
+    }
+    exit(exit_code);
 }
 
 /*

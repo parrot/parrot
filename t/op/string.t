@@ -580,9 +580,9 @@ handler:
 .end
 
 .sub concat_s_s_sc_null_onto_null
-    concat $S0, $S0
+    $S0 = concat $S0, $S0
     is( $S0, "", '' )
-    concat $S1, ""
+    $S1 = concat $S1, ""
     is( $S1, "", '' )
 .end
 
@@ -590,16 +590,16 @@ handler:
     set $S12, ""
     set $I0, 0
 WHILE:
-    concat $S12, "hi"
+    $S12 = concat $S12, "hi"
     add $I0, 1
     lt $I0, 10, WHILE
     is( $S12, "hihihihihihihihihihi", '' )
 .end
 
 .sub concat_s_s_sc_foo_one_onto_null
-    concat $S0, "foo1"
+    $S0 = concat $S0, "foo1"
     set $S1, "foo2"
-    concat $S2, $S1
+    $S2 = concat $S2, $S1
     is( $S0, "foo1", '' )
     is( $S2, "foo2", '' )
 .end
@@ -607,7 +607,7 @@ WHILE:
 .sub test_concat_s_s_sc
     set $S1, "fish"
     set $S2, "bone"
-    concat $S1, $S2
+    $S1 = concat $S1, $S2
     is( $S1, "fishbone", '' )
 .end
 
@@ -640,7 +640,7 @@ WHILE:
    set     $S0, ""
    set     $S1, ""
    set     $S2, "foo"
-   concat  $S1,$S1,$S2
+   concat  $S1, $S1, $S2
    is( $S1, "foo", 'same constant twice bug' )
    is( $S0, "", 'same constant twice bug' )
 .end
@@ -1160,9 +1160,9 @@ WHILE:
     set $S1,  "bar     "
     set $S2,  "quux    "
     set $S15, ""
-    concat $S15, $S0
-    concat $S15, $S1
-    concat $S15, $S2
+    $S15 = concat $S15, $S0
+    $S15 = concat $S15, $S1
+    $S15 = concat $S15, $S2
     is( $S15, "foo     bar     quux    ", 'Check that bug #16874 was fixed' )
 .end
 
@@ -1393,11 +1393,11 @@ WHILE:
     $I0 = 1
     $I1 = intvalsize * 2
   loop:
-    concat $S0, 'f'
+    $S0 = concat $S0, 'f'
     inc $I0
     le $I0, $I1, loop
   padding_loop:
-    concat $S0, ' '
+    $S0 = concat $S0, ' '
     inc $I0
     le $I0, 20, padding_loop
 
@@ -1611,6 +1611,19 @@ catch2:
     pop_eh
 null2:
     is ($S9, "Can't upcase NULL string", 'upcase inplace null')
+
+    push_eh catch3
+    null $S9
+    set $S0, binary:"abCD012yz"
+    upcase $S1, $S0
+    pop_eh
+    goto null3
+catch3:
+    .get_results($P9)
+    $S9 = $P9['message']
+    pop_eh
+null3:
+    is ($S9, "Invalid operation on binary string", 'upcase binary')
 .end
 
 .sub test_downcase

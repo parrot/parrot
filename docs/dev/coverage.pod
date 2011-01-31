@@ -1,0 +1,61 @@
+# Copyright (C) 2001-2010, Parrot Foundation.
+
+=head1 Make Cover
+
+docs/dev/coverage.pod - Make Cover Documentation.
+
+=head1 Overview
+
+"make cover" is a very useful tool which generates reports on how well tested
+parrot code is. The coverage reports are outputted in various formats in
+cover_db/ after C<make cover> has run. The final result of make cover is a
+listing of parrot's source files and a matching percentage of how well covered
+that file is by the tests.
+
+=head1 Dependencies
+
+Obviously, the first step would be to get parrot and build it. See
+F<docs/intro.pod> for more information. To run "make cover" you must first
+install some Perl tools to aid in the creation of these reports. Make Cover
+requires the "Devel::Cover" perl module. If you are running Debian/Ubuntu type
+systems you can run
+
+  sudo apt-get install libdevel-cover-perl
+
+or using CPAN:
+
+  perl -MCPAN -e 'install Devel::Cover'
+
+and that will install the required module. Other OSes may have this packaged
+as well, so try to find it. If you do not have a packaged version of this
+module, head over to http://search.cpan.org/dist/Devel-Cover/ and install it.
+
+=head1 Process
+
+Next, make sure your working parrot directory is as clean as can be. Any left
+over files can cause problems when generating the coverage reports.
+
+  make realclean
+
+or
+
+  git clean -dfx
+
+Next, run C<make test> to see if there are any failing tests. Finally you can
+type in C<make cover> and leave to make a sandwich and something to drink
+because it's probably going to take a I<long> time to run. If you run into
+trouble, C<make fulltest> may be of some assistance.
+
+=head1 Cover
+
+If you have run C<make fullcover> before, you know how long it takes to execute
+that command. Recently a new tool C<make cover> has been added that is
+much faster, but does not run tests in all runcores.
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
+vim: expandtab shiftwidth=4:

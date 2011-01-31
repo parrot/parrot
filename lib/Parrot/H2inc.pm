@@ -137,8 +137,8 @@ sub parse_file {
             }
         }
     }
-    $cur and die "Missing '&end_gen' in $in_file\n";
     close $fh or die "Could not close handle to $in_file after reading: $!";
+    $cur and die "Missing '&end_gen' in $in_file\n";
 
     return;
 }

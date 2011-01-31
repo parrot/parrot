@@ -574,7 +574,7 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
         pio = Parrot_io_STDERR(debugger);
 
-        if (Parrot_io_is_tty(debugger, pio))
+        if (Parrot_io_is_tty_handle(debugger, pio))
             Parrot_io_setlinebuf(debugger, pio);
         else {
             /* this is essential (100 x faster!)  and should probably
@@ -608,7 +608,7 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         }
     }
 
-    Parrot_io_flush(debugger, Parrot_io_STDERR(debugger));
+    Parrot_io_flush_handle(debugger, Parrot_io_STDERR(debugger));
 
     return pc;
 }

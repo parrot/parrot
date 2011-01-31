@@ -695,7 +695,7 @@ pt_transfer_sub(ARGOUT(Parrot_Interp d), ARGIN(Parrot_Interp s), ARGIN(PMC *sub)
     ASSERT_ARGS(pt_transfer_sub)
 #if defined THREAD_DEBUG && THREAD_DEBUG
     Parrot_io_eprintf(s, "copying over subroutine [%Ss]\n",
-        Parrot_full_sub_name(s, sub));
+        Parrot_sub_full_sub_name(s, sub));
 #endif
     return make_local_copy(d, s, sub);
 }
@@ -1394,8 +1394,10 @@ pt_add_to_interpreters(PARROT_INTERP, ARGIN_NULLOK(Parrot_Interp new_interp))
          * Create an entry for the very first interpreter, event
          * handling needs it
          */
-        PARROT_ASSERT(!interpreter_array);
-        PARROT_ASSERT(n_interpreters == 0);
+
+        if (interpreter_array || n_interpreters != 0)
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                "pt_add_to_interpreters: must pass new_interp when creating additional interps");
 
         interpreter_array    = mem_internal_allocate_typed(Interp *);
         interpreter_array[0] = interp;

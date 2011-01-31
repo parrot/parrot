@@ -77,15 +77,6 @@ typedef struct GC_MS_PObj_Wrapper {
     struct GC_MS_PObj_Wrapper * next_ptr;
 } GC_MS_PObj_Wrapper;
 
-
-typedef enum _gc_sys_type_enum {
-    MS,  /* mark and sweep */
-    INF, /* infinite memory core */
-    TMS, /* tricolor mark and sweep */
-    MS2,
-    GMS  /* Generational M&S */
-} gc_sys_type_enum;
-
 /* how often to skip a full GC when this pool has nothing free */
 typedef enum _gc_skip_type_enum {
     GC_NO_SKIP = 0,
@@ -583,10 +574,9 @@ void gc_ms_reallocate_string_storage(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-size_t Parrot_gc_get_info(PARROT_INTERP,
+size_t Parrot_gc_get_info(SHIM_INTERP,
     Interpinfo_enum which,
     ARGIN(GC_Statistics *stats))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 void Parrot_gc_ms_init(PARROT_INTERP)
@@ -629,8 +619,7 @@ int Parrot_gc_ms_needed(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_Parrot_gc_get_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(stats))
+       PARROT_ASSERT_ARG(stats))
 #define ASSERT_ARGS_Parrot_gc_ms_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_ms_needed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

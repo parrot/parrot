@@ -15,10 +15,10 @@ consider when deciding whether this is a good idea.
 
 =head1 Introduction
 
-when considering whether to add code to Parrot, we'll ask ourselves and the
+When considering whether to add code to Parrot, we'll ask ourselves and the
 developer(s) the following questions, in approximate order of importance.  This
 is not an exhaustive list as much as a guide to help us make sure we think
-through the implications of adopting and supporting a new core component.  
+through the implications of adopting and supporting a new core component.
 
 =over 4
 
@@ -28,7 +28,8 @@ How will it help Parrot and its users to further their goals?  Examples include
 better debugging, increased execution speed, better code generation and
 improved modularity.
 
-=item * How does its benefit outweigh its maintenance (testing, updating, support, deprecation, etc.) burden?
+=item * How does its benefit outweigh its maintenance (testing, updating,
+support, deprecation, etc.) burden?
 
 This is somewhat subjective, but the main question concerns how high the
 maintenance burden will be relative to the benefits the code will provide.
@@ -36,18 +37,19 @@ maintenance burden will be relative to the benefits the code will provide.
 =item * Is the code something that most of Parrot's users will be happy to find?
 
 More specifically, will the addition make development more fun for the majority
-of Parrot's users.  A generic optimization framework is would help most
+of Parrot's users.  A generic optimization framework would help most
 projects and have a good chance of inclusion.  A specialized math library or an
 HLL-specific datatype won't be of use to most projects and should live as a
 separate project.
 
-=item * How well-documented and tested is it? 
+=item * How well-documented and tested is it?
 
 If we can't figure out how it works or if it does what it claims, it'll have a
 hard getting accepted.  We have enough undertested and underdocumented code
 already.
 
-=item * Which committers have expressed willingness to maintain it?  How familiar are they with it?
+=item * Which committers have expressed willingness to maintain it?
+How familiar are they with it?
 
 Core code needs to be maintained.  If an experienced core committer expresses
 willingness to maintain an addition, that's good.  If that committer has worked
@@ -62,7 +64,15 @@ other systems?
 =item * What impact does it have on Parrot's install footprint?
 
 
-=item * How will having the code in core help Parrot more than having it in an external project would?
+=item * How will having the code in core help Parrot more than having it in an
+external project would?
+
+
+=item * How will the addition impact Parrot's runtime characteristics,
+e.g. its memory usage, speed, startup time, etc?
+
+
+=item * What drawbacks will result from including the addition in core?
 
 
 =back

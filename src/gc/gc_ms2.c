@@ -14,7 +14,6 @@ src/gc/gc_ms2.c - Non-recursive M&S
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
 #include "parrot/pointer_array.h"
-#include "parrot/sysmem.h"
 #include "gc_private.h"
 #include "fixed_allocator.h"
 
@@ -114,7 +113,7 @@ static void* gc_ms2_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static PMC* gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
+static PMC* gc_ms2_allocate_pmc_header(PARROT_INTERP, SHIM(UINTVAL flags))
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
@@ -641,10 +640,11 @@ Parrot_gc_ms2_init(PARROT_INTERP)
         self->fixed_size_allocator = Parrot_gc_fixed_allocator_new(interp);
 
         self->gc_threshold = Parrot_sysmem_amount(interp) / 8;
+
+        Parrot_gc_str_initialize(interp, &self->string_gc);
     }
 
     interp->gc_sys->gc_private = self;
-    Parrot_gc_str_initialize(interp, &self->string_gc);
 }
 
 
@@ -684,11 +684,11 @@ gc_ms2_finalize(PARROT_INTERP)
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static PMC*
-gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
+gc_ms2_allocate_pmc_header(PARROT_INTERP, SHIM(UINTVAL flags))
 {
     ASSERT_ARGS(gc_ms2_allocate_pmc_header)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    Pool_Allocator   *pool = self->pmc_allocator;
+    MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    Pool_Allocator   * const pool = self->pmc_allocator;
     pmc_alloc_struct *ptr;
 
     MAYBE_MARK_AND_SWEEP(interp, self);
@@ -1014,8 +1014,6 @@ gc_ms2_mark_live_objects(PARROT_INTERP, ARGIN(MarkSweep_GC *self),
 {
     ASSERT_ARGS(gc_ms2_mark_live_objects)
 
-    pmc_alloc_struct *tmp;
-
     /* Allocate list for gray objects */
     self->new_objects = Parrot_pa_new(interp);
 
@@ -1054,8 +1052,7 @@ static void
 gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms2_mark_and_sweep)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    size_t            counter;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     /* GC is blocked */
     if (self->gc_mark_block_level)
@@ -1088,7 +1085,7 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     /* Replace objects with new_objects. Ignoring "constant" one */
     do {
-        Parrot_Pointer_Array *tmp = self->objects;
+        Parrot_Pointer_Array * const tmp = self->objects;
         self->objects = self->new_objects;
         Parrot_pa_destroy(interp, tmp);
     } while (0);
@@ -1235,7 +1232,6 @@ gc_ms2_is_ptr_owned(PARROT_INTERP,
         ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_ms2_is_ptr_owned)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     PObj             *obj  = (PObj *)ptr;
     pmc_alloc_struct *item = PMC2PAC(ptr);
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 55;
+use Parrot::Test tests => 58;
 use Parrot::Config;
 
 =head1 NAME
@@ -23,6 +23,7 @@ Tests encoding support.
 =cut
 
 pasm_output_is( <<'CODE', <<OUTPUT, "basic syntax" );
+.pcc_sub :main main:
     set S0, ascii:"ok 1\n"
     print S0
     set S0, binary:"ok 2\n"
@@ -37,6 +38,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "encoding name" );
+.pcc_sub :main main:
     set S0, "ok 1\n"
     encoding I0, S0
     encodingname S1, I0
@@ -48,6 +50,7 @@ ascii
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "find_encoding" );
+.pcc_sub :main main:
     find_encoding I0, "iso-8859-1"
     print "ok 1\n"
     find_encoding I0, "ascii"
@@ -62,6 +65,7 @@ ok 3
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "find_encoding - not existing" );
+.pcc_sub :main main:
     find_encoding I0, "no_such"
     end
 CODE
@@ -69,6 +73,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "downcase" );
+.pcc_sub :main main:
     set S0, iso-8859-1:"AEIOU_ÄÖÜ\n"
     downcase S1, S0
     print S1
@@ -78,6 +83,7 @@ aeiou_äöü
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "upcase" );
+.pcc_sub :main main:
     set S0, iso-8859-1:"aeiou_äöüß\n"
     upcase S1, S0
     print S1
@@ -87,6 +93,7 @@ AEIOU_ÄÖÜß
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "titlecase" );
+.pcc_sub :main main:
     set S0, iso-8859-1:"zAEIOU_ÄÖÜ\n"
     titlecase S1, S0
     print S1
@@ -100,6 +107,7 @@ Zaeiou_äöü
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "is_whitespace" );
+.pcc_sub :main main:
     set S0, iso-8859-1:"a\t\n \xa0" # is 0xa0 a whitespace in iso-8859-1??
     .include "cclass.pasm"
     is_cclass I0, .CCLASS_WHITESPACE, S0, 0
@@ -133,6 +141,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "is_wordchar" );
+.pcc_sub :main main:
     .include "cclass.pasm"
     set S0, "az019-,._"
     length I1, S0
@@ -149,6 +158,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "is_digit" );
+.pcc_sub :main main:
     .include "cclass.pasm"
     set S0, "az019-,._"
     length I1, S0
@@ -165,6 +175,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "is_punctuation" );
+.pcc_sub :main main:
     .include "cclass.pasm"
     set S0, "az019-,._"
     length I1, S0
@@ -181,6 +192,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "is_newline" );
+.pcc_sub :main main:
     .include "cclass.pasm"
     set S0, "a\n"
     is_cclass I0, .CCLASS_NEWLINE, S0, 0
@@ -194,6 +206,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "find_wordchar" );
+.pcc_sub :main main:
     .include "cclass.pasm"
     set S0, "_ ab 09"
     set I0, 0
@@ -213,6 +226,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "find_digit" );
+.pcc_sub :main main:
     .include "cclass.pasm"
     set S0, "_ ab 09"
     set I0, 0
@@ -232,6 +246,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "find_punctuation" );
+.pcc_sub :main main:
     .include "cclass.pasm"
     set S0, "_ .b ,9"
     set I0, 0
@@ -251,6 +266,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i ascii to iso-8859-1" );
+.pcc_sub :main main:
     set S0, "abc"
     find_encoding I0, "iso-8859-1"
     trans_encoding S1, S0, I0
@@ -267,6 +283,7 @@ iso-8859-1
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i iso-8859-1 to ascii" );
+.pcc_sub :main main:
     set S0, iso-8859-1:"abc"
     find_encoding I0, "ascii"
     trans_encoding S1, S0, I0
@@ -283,6 +300,7 @@ ascii
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i iso-8859-1 to ascii - lossy" );
+.pcc_sub :main main:
     set S1, iso-8859-1:"abcä"
     find_encoding I0, "ascii"
     trans_encoding S2, S1, I0
@@ -293,6 +311,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i iso-8859-1 to binary" );
+.pcc_sub :main main:
     set S0, iso-8859-1:"abc"
     find_encoding I0, "binary"
     trans_encoding S1, S0, I0
@@ -309,6 +328,7 @@ binary
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i ascii to binary" );
+.pcc_sub :main main:
     set S0, ascii:"abc"
     find_encoding I0, "binary"
     trans_encoding S1, S0, I0
@@ -325,6 +345,7 @@ binary
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i iso-8859-1 to utf8" );
+.pcc_sub :main main:
     set S0, iso-8859-1:"abc_ä_"
     find_encoding I0, "utf8"
     trans_encoding S1, S0, I0
@@ -345,6 +366,7 @@ utf8
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i utf8 to iso-8859-1" );
+.pcc_sub :main main:
     set S0, utf8:"abc_\xe4_"
     bytelength I2, S0   # XXX its 7 for utf8 only
     print I2
@@ -369,6 +391,7 @@ iso-8859-1
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i utf-8 to iso-8859-1 - lossy" );
+.pcc_sub :main main:
     set S1, utf8:"abc\uBABE"
     find_encoding I0, "iso-8859-1"
     trans_encoding S2, S1, I0
@@ -379,6 +402,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i utf-8 to ascii - lossy" );
+.pcc_sub :main main:
     set S1, utf8:"abc\xFC"
     find_encoding I0, "ascii"
     trans_encoding S2, S1, I0
@@ -388,7 +412,19 @@ CODE
 /Lossy conversion/
 OUTPUT
 
+pasm_error_output_like( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i utf-16 to ucs-2 - lossy" );
+.pcc_sub :main main:
+    set S1, utf16:"abc\x{10101}def"
+    find_encoding I0, "ucs2"
+    trans_encoding S2, S1, I0
+    print "never\n"
+    end
+CODE
+/Lossy conversion/
+OUTPUT
+
 pasm_output_is( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i iso-8859-1 to ucs4" );
+.pcc_sub :main main:
     set S0, iso-8859-1:"abc_ä_"
     find_encoding I0, "ucs4"
     trans_encoding S1, S0, I0
@@ -410,6 +446,7 @@ ucs4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "trans_encoding_s_s_i utf8 to ucs4" );
+.pcc_sub :main main:
     set S0, utf8:"\x{fc}_\x{20202}"
     find_encoding I0, "ucs4"
     trans_encoding S1, S0, I0
@@ -457,7 +494,7 @@ ok 2
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "concat ascii, utf8" );
-.sub main
+.sub main :main
     .local string s, t, u
     s = "abcd"
     t = utf8:"efg\n"
@@ -474,7 +511,7 @@ abcdefg
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "concat ascii, utf8 preallocated" );
-.sub main
+.sub main :main
     .local string s, t
     s = repeat "abcd", 100
     t = "efg"
@@ -502,7 +539,7 @@ abcdefgefgefgefghi\xc2\xa9jk
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "literal encoding persistence - TT #468" );
-.sub main
+.sub main :main
     # set output encoding to normalize printed strings
     $P0 = getinterp
     $P1 = $P0.'stdout_handle'()
@@ -539,7 +576,7 @@ hello(10): ucs2
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "empty literal encoding persistence - TT #1791");
-.sub main
+.sub main :main
     load_bytecode 't/op/testlib/test_strings.pbc'
     $P0 = 'get_empties'()
     $P1 = iter $P0
@@ -571,6 +608,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<"OUTPUT", "negative encoding number" );
+.pcc_sub :main main:
     trans_encoding S2, 'foo', -1
     end
 CODE
@@ -578,6 +616,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 ord, length" );
+.pcc_sub :main main:
     set S1, iso-8859-1:"TÖTSCH"
     find_encoding I0, "utf16"
     trans_encoding S1, S1, I0
@@ -599,6 +638,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<"OUTPUT", "chopn utf8" );
+.pcc_sub :main main:
     set S0, iso-8859-1:"TTÖÖ"
     find_encoding I0, "utf8"
     trans_encoding S1, S0, I0
@@ -618,10 +658,11 @@ TT 2 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 append" );
+.pcc_sub :main main:
     set S1, iso-8859-1:"Tötsch"
     find_encoding I0, "utf16"
     trans_encoding S1, S1, I0
-    concat S1, " Leo"
+    concat S1, S1, " Leo"
     length I0, S1
     print I0
     print ' '
@@ -640,6 +681,7 @@ T\xc3\xb6tsch Leo
 OUTPUT
 
 pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 concat" );
+.pcc_sub :main main:
     set S1, iso-8859-1:"Tötsch"
     find_encoding I0, "utf16"
     trans_encoding S1, S1, I0
@@ -662,6 +704,7 @@ T\xc3\xb6tsch Leo
 OUTPUT
 
 pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 substr" );
+.pcc_sub :main main:
     set S1, iso-8859-1:"Tötsch"
     find_encoding I0, "utf16"
     trans_encoding S1, S1, I0
@@ -676,6 +719,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 replace" );
+.pcc_sub :main main:
     set S1, iso-8859-1:"Tötsch"
     find_encoding I0, "utf16"
     trans_encoding S1, S1, I0
@@ -695,6 +739,7 @@ Toetsch
 OUTPUT
 
 pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 index, latin1 search" );
+.pcc_sub :main main:
     set S0, iso-8859-1:"tötsch"
     find_encoding I0, "utf16"
     trans_encoding S1, S0, I0
@@ -708,6 +753,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 index, latin1 search" );
+.pcc_sub :main main:
     set S0, iso-8859-1:"tötsch"
     find_encoding I0, "utf16"
     trans_encoding S1, S0, I0
@@ -715,7 +761,7 @@ pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 index, latin1 search" );
     index I0, S1, S2
     print I0
     print "\n"
-    concat S1, S2
+    concat S1, S1, S2
     index I0, S1, S2, 2
     print I0
     print "\n"
@@ -726,7 +772,7 @@ CODE
 OUTPUT
 
 SKIP: {
-    skip( 'no ICU lib', 8 ) unless $PConfig{has_icu};
+    skip( 'no ICU lib', 10 ) unless $PConfig{has_icu};
 
     pir_output_is( <<'CODE', <<"OUTPUT", "unicode downcase" );
 .sub main :main
@@ -745,6 +791,7 @@ t\xc3\xb6tsch
 OUTPUT
 
     pasm_output_is( <<'CODE', <<"OUTPUT", "unicode downcase, trans_encoding_s_s_i" );
+    .pcc_sub :main main:
     set S0, iso-8859-1:"TÖTSCH"
     find_encoding I0, "utf8"
     trans_encoding S1, S0, I0
@@ -759,6 +806,7 @@ t\xf6tsch
 OUTPUT
 
     pasm_output_is( <<'CODE', <<"OUTPUT", "unicode downcase - transencoding" );
+    .pcc_sub :main main:
     set S0, iso-8859-1:"TÖTSCH"
     find_encoding I0, "utf8"
     trans_encoding S1, S0, I0
@@ -796,10 +844,50 @@ OUTPUT
     $P0.'encoding'("utf8") # set utf8 output
     print $S1
     print "\n"
+    length $I0, $S1
+    print $I0
+    print "\n"
     end
 .end
 CODE
 HACEK J J\xcc\x8c
+10
+OUTPUT
+
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode titlecase to combined char" );
+.sub main :main
+    set $S1, utf8:"hacek j \u01f0"
+    titlecase $S1, $S1
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
+    print "\n"
+    length $I0, $S1
+    print $I0
+    print "\n"
+    end
+.end
+CODE
+Hacek J J\xcc\x8c
+10
+OUTPUT
+
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode downcase to combined char" );
+.sub main :main
+    set $S1, utf8:"I WITH DOT ABOVE \u0130"
+    downcase $S1, $S1
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
+    print "\n"
+    length $I0, $S1
+    print $I0
+    print "\n"
+    end
+.end
+CODE
+i with dot above i\xcc\x87
+19
 OUTPUT
 
     # charset/unicode.c
@@ -880,6 +968,7 @@ OUTPUT
 }    # SKIP
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "escape ascii" );
+.pcc_sub :main main:
     set S0, "abcdefghi\n"
     escape S1, S0
     print S1
@@ -890,6 +979,7 @@ abcdefghi\n
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "escape ctrl" );
+.pcc_sub :main main:
     set S0, "\x00\x01\x1f\x7f"
     escape S1, S0
     print S1
@@ -900,6 +990,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "escape latin1" );
+.pcc_sub :main main:
     set S0, iso-8859-1:"tötsch leo"
     escape S1, S0
     print S1
@@ -910,6 +1001,7 @@ t\x{f6}tsch leo
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "escape unicode" );
+.pcc_sub :main main:
     set S0, utf8:"\u2001\u2002\u2003\u2004\x{e01ef}\u0114"
     escape S1, S0
     print S1
@@ -920,7 +1012,7 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'escape unicode w/ literal 0' );
-.sub 'main'
+.sub 'main' :main
     $S0 = utf8:"x/\u0445\u0440\u0435\u043d\u044c_09-10.txt"
     $S1 = escape $S0
     say $S1
@@ -930,7 +1022,7 @@ x/\u0445\u0440\u0435\u043d\u044c_09-10.txt
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'compare mixed encodings' );
-.sub 'main'
+.sub 'main' :main
     $S0 = iso-8859-1:"a\xFCb 1"
     $S1 = utf8:"a\xFCb 2"
     $I0 = islt $S0, $S1

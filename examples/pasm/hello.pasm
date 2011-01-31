@@ -11,6 +11,8 @@ for showing how to create an executable from PASM.
 
 =cut
 
+.pcc_sub :main main:
+
     # Get @ARGV as a ResizableStringArray
     get_params "0", P0
 

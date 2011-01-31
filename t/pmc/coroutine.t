@@ -23,7 +23,7 @@ Tests the C<Coroutine> PMC.
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine 1" );
 .include "interpinfo.pasm"
-.pcc_sub _main:
+.pcc_sub :main _main:
     .const 'Sub' P0 = "_coro"
     new P10, ['Integer']
     set P10, 2
@@ -50,7 +50,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example" );
 
-.sub __main__
+.sub __main__ :main
     .local pmc return
     .local pmc counter
     .const 'Sub' itr = "_iterator"
@@ -107,7 +107,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in main" );
 .include "interpinfo.pasm"
-_main:
+.pcc_sub :main _main:
     .const 'Sub' P0 = "_coro"
     push_eh _catchm
     new P16, ['Integer']
@@ -146,7 +146,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro" );
 .include "interpinfo.pasm"
-_main:
+.pcc_sub :main _main:
     .const 'Sub' P0 = "_coro"
     push_eh _catchm
     new P16, ['Integer']
@@ -185,7 +185,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro no handler" );
 .include "interpinfo.pasm"
-_main:
+.pcc_sub :main _main:
     .const 'Sub' P0 = "_coro"
     push_eh _catchm
     new P16, ['Integer']
@@ -221,7 +221,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro rethrow" );
 .include "interpinfo.pasm"
-_main:
+.pcc_sub :main _main:
     .const 'Sub' P0 = "_coro"
     push_eh _catchm
     new P16, ['Integer']
@@ -331,7 +331,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
-.sub _main
+.sub _main :main
     .local pmc pmc1
     pmc1 = new ['Coroutine']
     .local int bool1

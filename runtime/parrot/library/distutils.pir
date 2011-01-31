@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2010, Parrot Foundation.
+# Copyright (C) 2009-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -201,6 +201,7 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
 =cut
 
 .loadlib 'sys_ops'
+.include 'errors.pasm'
 
 .sub '__onload' :load :init :anon
     load_bytecode 'osutils.pbc'
@@ -344,6 +345,9 @@ Entry point.
     .param pmc args :slurpy
     .param pmc kv :slurpy :named
     .local pmc steps
+
+    errorsoff .PARROT_ERRORS_PARAM_COUNT_FLAG
+
     steps = new 'ResizableStringArray'
     $P0 = iter args
   L1:
@@ -2143,11 +2147,20 @@ the server. The default is "parrot-autobot:qa_rocks"
   L6:
     archive = get_value('prove_archive', "report.tar.gz" :named('default'), kv :flat :named)
     harness.'archive'(archive)
+    .local pmc extra_props
     $I0 = exists kv['smolder_extra_properties']
     unless $I0 goto L7
-    $P0 = kv['smolder_extra_properties']
-    harness.'extra_props'($P0)
+    extra_props = kv['smolder_extra_properties']
+    goto L8
   L7:
+    extra_props = new 'Hash'
+  L8:
+    $I0 = exists extra_props['Submitter']
+    if $I0 goto L9
+    $S0 = get_submitter()
+    extra_props['Submitter'] = $S0
+  L9:
+    harness.'extra_props'(extra_props)
     aggregate = harness.'runtests'(files)
     print "creat "
     say archive
@@ -4212,8 +4225,6 @@ Return the whole config
     $S0 = $P0['ccwarn']
     flags .= $S0
     flags .= " "
-    $S0 = $P0['cc_hasjit']
-    flags .= $S0
     .return (flags)
 .end
 
@@ -4265,18 +4276,21 @@ Return the whole config
 
 .sub 'get_executable'
     .param string name
+    $S0 = '"'
     $P0 = get_config()
     $I0 = $P0['installed']
     unless $I0 goto L1
-    $S0 = $P0['bindir']
+    $S1 = $P0['bindir']
     goto L2
   L1:
-    $S0 = $P0['prefix']
+    $S1 = $P0['prefix']
   L2:
+    $S0 .= $S1
     $S0 .= '/'
     $S0 .= name
     $S1 = $P0['exe']
     $S0 .= $S1
+    $S0 .= '"'
     .return ($S0)
 .end
 
@@ -4523,6 +4537,31 @@ Return the whole config
     .return (default)
   L2:
     $S0 = upcase key
+    .return ($S0)
+.end
+
+=item get_submitter
+
+=cut
+
+.sub 'get_submitter'
+    .local pmc env
+    env = new 'Env'
+    $I0 = exists env['SMOLDER_SUBMITTER']
+    unless $I0 goto L1
+    $S0 = env['SMOLDER_SUBMITTER']
+    .return ($S0)
+  L1:
+    .local string me
+    $P0 = get_config()
+    $I0 = exists $P0['win32']
+    unless $I0 goto L2
+    me = env['USERNAME']
+    goto L3
+  L2:
+    me = env['LOGNAME']
+  L3:
+    $S0 = me . '@unknown'
     .return ($S0)
 .end
 

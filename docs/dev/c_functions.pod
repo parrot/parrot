@@ -14,7 +14,7 @@ macros and our existing configuration system, we can instruct the
 compiler to search for and prevent certain types of errors.
 
 The net result is that errors (or potential errors) can be detected early
-at compile-rime instead of later an runtime or during "make test".
+at compile-time instead of later an runtime or during "make test".
 
 Headerizer creates function declarations based on function
 definitions. It scans the source files passed to it and extracts the
@@ -212,7 +212,7 @@ without wanting to know its value.
     PARROT_EXPORT
     PARROT_PURE_FUNCTION
     INTVAL
-    parrot_hash_size(SHIM_INTERP, NOTNULL(const Hash *hash))
+    Parrot_hash_size(SHIM_INTERP, NOTNULL(const Hash *hash))
     {
         return hash->entries;
     }

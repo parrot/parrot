@@ -22,6 +22,7 @@ Tests PMC object methods.
 =cut
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc - unknown method" );
+.pcc_sub :main main:
     newclass P2, "Foo"
     set S0, "nada"
     callmethodcc P2, S0
@@ -32,6 +33,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethod (STR) - unknown method" );
+.pcc_sub :main main:
     newclass P2, "Foo"
     set S1, "nada"
     callmethod P2, S1, P1
@@ -42,6 +44,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc - unknown method" );
+.pcc_sub :main main:
     newclass P2, "Foo"
     set S0, "nada"
     callmethodcc P2, S0
@@ -52,6 +55,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc (STR) - unknown method" );
+.pcc_sub :main main:
     newclass P2, "Foo"
     set S1, "nada"
     callmethodcc P2, S1
@@ -222,7 +226,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "methods: self" );
 
-.sub _main
+.sub _main :main
     .local pmc A
     .local pmc B
 
@@ -277,7 +281,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "methods: self w arg" );
 
-.sub _main
+.sub _main :main
     .local pmc A
     .local pmc B
 
@@ -329,7 +333,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "methods: self w arg and ret" );
 
-.sub _main
+.sub _main :main
     .local pmc A
     .local pmc B
 
@@ -386,6 +390,7 @@ OUTPUT
 SKIP: {
     skip( "currently broken", 1 );
     pasm_output_is( <<'CODE', <<'OUTPUT', "exceptions and different runloops" );
+.pcc_sub :main main:
 _main:
     push_eh eh
 
@@ -455,6 +460,7 @@ CbA
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "find_method - unknown method" );
+.pcc_sub :main main:
     newclass P2, "Foo"
     set S0, "nada"
     find_method P0, P2, S0
@@ -644,7 +650,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "self - CURRENT_OBJECT" );
 
-.sub _main
+.sub _main :main
     .local pmc A
 
     newclass A, "A"
@@ -668,7 +674,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys" );
 
-.sub _main
+.sub _main :main
     newclass $P0, "Foo"
 
     new $P1, ['Foo']
@@ -697,7 +703,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys - clobber" );
 
-.sub _main
+.sub _main :main
     newclass $P0, "Foo"
 
     new $P1, ['Foo']

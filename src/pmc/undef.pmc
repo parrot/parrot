@@ -48,7 +48,6 @@ appropriate type.
             VTABLE_set_pmc(INTERP, SELF, other);
         }
         else {
-            PMC * const class_  = PARROT_OBJECT(other)->_class;
             PMC        *clone   = VTABLE_clone(INTERP, other);
             void       *attrs   = PMC_data(clone);
             PMC        *meta    = PMC_metadata(clone);
@@ -221,23 +220,6 @@ Unknown. (TODO)
 
     VTABLE void share() {
         /* see src/pmc/integer.pmc */
-    }
-
-/*
-
-=item C<PMC *share_ro()>
-
-Unknown. (TODO)
-
-=cut
-
-*/
-
-    VTABLE PMC *share_ro() {
-        if (PObj_is_PMC_shared_TEST(SELF))
-            return SELF;
-        else
-            return pt_shared_fixup(INTERP, SELF);
     }
 
 /*

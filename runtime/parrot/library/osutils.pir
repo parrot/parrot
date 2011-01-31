@@ -197,6 +197,10 @@ osutils - Parrot OS Utilities
   L2:
     $I0 = newer(dst, src)
     if $I0 goto L3
+    $I0 = stat dst, .STAT_EXISTS
+    unless $I0 goto L4
+    unlink(dst, verbose :named('verbose'))
+  L4:
     cp(src, dst, verbose :named('verbose'))
     unless has_exe goto L3
     unless exe goto L3

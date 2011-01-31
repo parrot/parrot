@@ -51,7 +51,7 @@ print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
 
     /* sub was located via globals */
     Parrot_io_eprintf(tracer, "# Calling sub '%Ss'\n# ",
-        Parrot_full_sub_name(interp, sub));
+        Parrot_sub_full_sub_name(interp, sub));
 
     print_pbc_location(interp);
 }
@@ -484,7 +484,7 @@ Invokes the subroutine.
 
                 if (PMC_IS_NULL(outer_sub->ctx)) {
                     PMC * const dummy = Parrot_alloc_context(INTERP,
-                                                outer_sub->n_regs_used, NULL);
+                                                outer_sub->n_regs_used, PMCNULL);
                     Parrot_pcc_set_sub(INTERP, dummy, outer_pmc);
 
                     if (!PMC_IS_NULL(outer_sub->lex_info)) {

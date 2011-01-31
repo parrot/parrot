@@ -328,7 +328,8 @@ store_sub_in_multi(PARROT_INTERP, ARGIN(PMC *sub_pmc), ARGIN(PMC *ns))
 
     /* is there an existing MultiSub PMC? or do we need to create one? */
     if (PMC_IS_NULL(multisub)) {
-        multisub = Parrot_pmc_new(interp,  Parrot_hll_get_ctx_HLL_type(interp, enum_class_MultiSub));
+        multisub = Parrot_pmc_new(interp,
+                                  Parrot_hll_get_ctx_HLL_type(interp, enum_class_MultiSub));
         /* we have to push the sub onto the MultiSub before we try to store
         it because storing requires information from the sub */
         VTABLE_push_pmc(interp, multisub, sub_pmc);
@@ -687,7 +688,7 @@ Parrot_ns_find_named_item(PARROT_INTERP, ARGIN(STRING *name), SHIM(void *next))
 {
     ASSERT_ARGS(Parrot_ns_find_named_item)
     PMC * const ctx     = CURRENT_CONTEXT(interp);
-    PMC * const lex_pad = Parrot_find_pad(interp, name, ctx);
+    PMC * const lex_pad = Parrot_sub_find_pad(interp, name, ctx);
     PMC * g = PMCNULL;
 
     if (!PMC_IS_NULL(lex_pad)) {

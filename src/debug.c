@@ -105,6 +105,13 @@ PARROT_CAN_RETURN_NULL
 static const DebuggerCmd * get_cmd(ARGIN_NULLOK(const char **cmd));
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PMC * get_exception_context(PARROT_INTERP, ARGMOD(PMC * exception))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* exception);
+
+PARROT_WARN_UNUSED_RESULT
 static unsigned long get_uint(ARGMOD(const char **cmd), unsigned int def)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*cmd);
@@ -121,6 +128,16 @@ static void no_such_register(PARROT_INTERP,
     char register_type,
     UINTVAL register_num)
         __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static STRING * PDB_get_continuation_backtrace(PARROT_INTERP,
+    ARGMOD_NULLOK(PMC * sub),
+    ARGMOD(PMC * ctx))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* sub)
+        FUNC_MODIFIES(* ctx);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -147,6 +164,9 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 #define ASSERT_ARGS_GDB_print_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_cmd __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_get_exception_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(exception))
 #define ASSERT_ARGS_get_uint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_get_ulong __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -155,6 +175,10 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
        PARROT_ASSERT_ARG(pdb))
 #define ASSERT_ARGS_no_such_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_PDB_get_continuation_backtrace \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_skip_whitespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cmd))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -838,7 +862,7 @@ Parrot_debugger_destroy(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_debugger_load(PARROT_INTERP, STRING *filename)>
+=item C<void Parrot_debugger_load(PARROT_INTERP, const STRING *filename)>
 
 Loads a Parrot source file for the current program.
 
@@ -848,7 +872,7 @@ Loads a Parrot source file for the current program.
 
 PARROT_EXPORT
 void
-Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
+Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(const STRING *filename))
 {
     ASSERT_ARGS(Parrot_debugger_load)
     char *file;
@@ -2400,12 +2424,6 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
                         strcpy(&dest[size], buf);
                         size += strlen(buf);
                         break;
-                      case KEY_number_FLAG:
-                        Parrot_snprintf(interp, buf, sizeof (buf),
-                                    FLOATVAL_FMT, VTABLE_get_number(interp, k));
-                        strcpy(&dest[size], buf);
-                        size += strlen(buf);
-                        break;
                       case KEY_string_FLAG:
                         dest[size++] = '"';
                         {
@@ -2421,12 +2439,6 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
                       case KEY_integer_FLAG|KEY_register_FLAG:
                         Parrot_snprintf(interp, buf, sizeof (buf),
                                     "I" INTVAL_FMT, VTABLE_get_integer(interp, k));
-                        strcpy(&dest[size], buf);
-                        size += strlen(buf);
-                        break;
-                      case KEY_number_FLAG|KEY_register_FLAG:
-                        Parrot_snprintf(interp, buf, sizeof (buf),
-                                    "N" INTVAL_FMT, VTABLE_get_integer(interp, k));
                         strcpy(&dest[size], buf);
                         size += strlen(buf);
                         break;
@@ -3244,6 +3256,67 @@ PDB_help(PARROT_INTERP, ARGIN(const char *command))
 
 /*
 
+=item C<STRING * Parrot_dbg_get_exception_backtrace(PARROT_INTERP, PMC *
+exception)>
+
+Returns an string containing the backtrace of the interpreter's call chain for a given exception.
+
+=cut
+
+*/
+
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_dbg_get_exception_backtrace(PARROT_INTERP, ARGMOD(PMC * exception))
+{
+    ASSERT_ARGS(Parrot_dbg_get_exception_backtrace)
+
+    PMC * const ctx = get_exception_context(interp, exception);
+
+    if (PMC_IS_NULL(ctx))
+        return STRINGNULL;
+    else {
+        const Parrot_CallContext_attributes * const cattrs = PARROT_CALLCONTEXT(ctx);
+        PMC * const sub = cattrs->current_sub;
+        STRING * const bt = PDB_get_continuation_backtrace(interp, sub, ctx);
+        return bt;
+    }
+}
+
+/*
+
+=item C<static PMC * get_exception_context(PARROT_INTERP, PMC * exception)>
+
+Returns the context in which the exception was generated.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PMC *
+get_exception_context(PARROT_INTERP, ARGMOD(PMC * exception))
+{
+    ASSERT_ARGS(get_exception_context)
+    PMC * const thrower = VTABLE_get_attr_str(interp, exception, CONST_STRING(interp, "thrower"));
+    if (!PMC_IS_NULL(thrower))
+        return thrower;
+    else {
+        PMC * const resume = VTABLE_get_attr_str(interp, exception, CONST_STRING(interp, "resume"));
+        if (PMC_IS_NULL(resume))
+            return PMCNULL;
+        else {
+            const Parrot_Continuation_attributes * const cont = PARROT_CONTINUATION(resume);
+            return cont->to_ctx;
+        }
+    }
+}
+
+/*
+
 =item C<void PDB_backtrace(PARROT_INTERP)>
 
 Prints a backtrace of the interp's call chain.
@@ -3257,19 +3330,41 @@ void
 PDB_backtrace(PARROT_INTERP)
 {
     ASSERT_ARGS(PDB_backtrace)
-    STRING           *str;
-    PMC              *old       = PMCNULL;
-    int               rec_level = 0;
-    int               limit_count = 0;
-
     /* information about the current sub */
     PMC *sub = interpinfo_p(interp, CURRENT_SUB);
     PMC *ctx = CURRENT_CONTEXT(interp);
+    STRING * const bt = PDB_get_continuation_backtrace(interp, sub, ctx);
+    Parrot_io_eprintf(interp, "%Ss", bt);
+}
+
+/*
+
+=item C<static STRING * PDB_get_continuation_backtrace(PARROT_INTERP, PMC * sub,
+PMC * ctx)>
+
+Returns an string with the backtrace of interpreter's call chain for the given sub including
+context information.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static STRING *
+PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD_NULLOK(PMC * sub), ARGMOD(PMC * ctx))
+{
+    ASSERT_ARGS(PDB_get_continuation_backtrace)
+    STRING *str;
+    PMC    *old         = PMCNULL;
+    PMC    *output      = Parrot_pmc_new(interp, enum_class_StringBuilder);
+    int     rec_level   = 0;
+    int     limit_count = 0;
 
     if (!PMC_IS_NULL(sub)) {
-        str = Parrot_Context_infostr(interp, ctx);
+        str = Parrot_sub_Context_infostr(interp, ctx);
         if (str) {
-            Parrot_io_eprintf(interp, "%Ss", str);
+            VTABLE_push_string(interp, output, str);
             if (interp->code->annotations) {
                 PMC *annot = PackFile_Annotations_lookup(interp, interp->code->annotations,
                         Parrot_pcc_get_pc(interp, ctx) - interp->code->base.data + 1, NULL);
@@ -3279,13 +3374,15 @@ PDB_backtrace(PARROT_INTERP)
                     PMC *pline = VTABLE_get_pmc_keyed_str(interp, annot,
                             Parrot_str_new_constant(interp, "line"));
                     if ((!PMC_IS_NULL(pfile)) && (!PMC_IS_NULL(pline))) {
-                        STRING *file = VTABLE_get_string(interp, pfile);
+                        STRING * const file = VTABLE_get_string(interp, pfile);
                         INTVAL line = VTABLE_get_integer(interp, pline);
-                        Parrot_io_eprintf(interp, " (%Ss:%li)", file, (long)line);
+                        STRING * const fmt =
+                            Parrot_sprintf_c(interp, " (%Ss:%li)", file, (long)line);
+                        VTABLE_push_string(interp, output, fmt);
                     }
                 }
             }
-            Parrot_io_eprintf(interp, "\n");
+            VTABLE_push_string(interp, output, CONST_STRING(interp, "\n"));
         }
     }
 
@@ -3309,7 +3406,7 @@ PDB_backtrace(PARROT_INTERP)
             break;
 
 
-        str = Parrot_Context_infostr(interp, Parrot_pcc_get_caller_ctx(interp, ctx));
+        str = Parrot_sub_Context_infostr(interp, Parrot_pcc_get_caller_ctx(interp, ctx));
 
 
         if (!str)
@@ -3328,14 +3425,16 @@ PDB_backtrace(PARROT_INTERP)
                 ++rec_level;
         }
         else if (rec_level != 0) {
-            Parrot_io_eprintf(interp, "... call repeated %d times\n", rec_level);
+            STRING * const fmt =
+                Parrot_sprintf_c(interp, "... call repeated %d times\n", rec_level);
+            VTABLE_push_string(interp, output, fmt);
             rec_level = 0;
         }
 
         /* print the context description */
         if (rec_level == 0) {
             PackFile_ByteCode *seg = sub_cont->seg;
-            Parrot_io_eprintf(interp, "%Ss", str);
+            VTABLE_push_string(interp, output, str);
             if (seg->annotations) {
                 PMC *annot = PackFile_Annotations_lookup(interp, seg->annotations,
                         Parrot_pcc_get_pc(interp, sub_cont->to_ctx) - seg->base.data,
@@ -3349,11 +3448,13 @@ PDB_backtrace(PARROT_INTERP)
                     if ((!PMC_IS_NULL(pfile)) && (!PMC_IS_NULL(pline))) {
                         STRING *file = VTABLE_get_string(interp, pfile);
                         INTVAL line = VTABLE_get_integer(interp, pline);
-                        Parrot_io_eprintf(interp, " (%Ss:%li)", file, (long)line);
+                        STRING * const fmt =
+                            Parrot_sprintf_c(interp, " (%Ss:%li)", file, (long)line);
+                        VTABLE_push_string(interp, output, fmt);
                     }
                 }
             }
-            Parrot_io_eprintf(interp, "\n");
+            VTABLE_push_string(interp, output, CONST_STRING(interp, "\n"));
         }
 
         /* get the next Continuation */
@@ -3364,9 +3465,14 @@ PDB_backtrace(PARROT_INTERP)
             break;
     }
 
-    if (rec_level != 0)
-        Parrot_io_eprintf(interp, "... call repeated %d times\n", rec_level);
+    if (rec_level != 0) {
+        STRING * const fmt = Parrot_sprintf_c(interp, "... call repeated %d times\n", rec_level);
+        VTABLE_push_string(interp, output, fmt);
+    }
+    return VTABLE_get_string(interp, output);
 }
+
+
 
 /*
  * GDB functions

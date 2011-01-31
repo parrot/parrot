@@ -44,7 +44,7 @@ sub runstep {
 
     $conf->data->set(
         TEMP_gc_c => <<"EOF",
-src/gc/alloc_resources\$(O):	\$(GENERAL_H_FILES) src/gc/alloc_resources.c
+src/gc/alloc_resources\$(O):	\$(GEN_HEADERS) src/gc/alloc_resources.c
 EOF
         TEMP_gc_o => "src/gc/alloc_resources\$(O)",
         gc_flag   => '',

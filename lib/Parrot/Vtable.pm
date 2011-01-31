@@ -11,8 +11,8 @@ Parrot::Vtable - Functions for manipulating vtables
 =head1 DESCRIPTION
 
 C<Parrot::Vtable> provides a collection of functions for manipulating PMC
-vtables. It is used by F<tools/build/pmc2c.pl>, F<tools/build/vtable_h.pl>, and
-F<tools/dev/gen_class.pl>.
+vtables. It is used by F<tools/build/pmc2c.pl>, F<tools/build/vtable_h.pl>,
+F<tools/build/vtable_extend.pl> and F<tools/dev/gen_class.pl>.
 
 =head2 Functions
 
@@ -244,8 +244,6 @@ EOM
     # finally the name mapping
     $macros .= <<'EOM';
 
-#ifdef PARROT_IN_OBJECTS_C
-
 #define PARROT_VTABLE_LOW 9
 
 static PARROT_OBSERVER const char * const Parrot_vtable_slot_names[] = {
@@ -276,7 +274,6 @@ EOM
 
 #define NUM_VTABLE_FUNCTIONS $num_vtable_funcs
 
-#endif /* PARROT_IN_OBJECTS_C */
 EOM
 
     $macros;
@@ -390,7 +387,7 @@ sub parse_params {
 
 =over 4
 
-=item F<tools/build/jit2c.pl>
+=item F<tools/build/vtable_extend.pl>
 
 =item F<tools/build/pmc2c.pl>
 
