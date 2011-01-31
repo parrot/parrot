@@ -38,13 +38,13 @@ typedef enum Parrot_profiling_line {
     PPROF_LINE_END_OF_RUNLOOP
 } Parrot_profiling_line;
 
-typedef void (*profiling_store_fn)  (ARGIN(Parrot_profiling_runcore_t*), ARGIN(PPROF_DATA*), ARGIN_NULLOK(Parrot_profiling_line));
-typedef void (*profiling_init_fn)   (ARGIN(Parrot_profiling_runcore_t*));
-typedef void (*profiling_destroy_fn)(ARGIN(Parrot_profiling_runcore_t*));
+typedef void (*profiling_store_fn)  (PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t*), ARGIN(PPROF_DATA*), ARGIN_NULLOK(Parrot_profiling_line));
+typedef void (*profiling_init_fn)   (PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t*));
+typedef void (*profiling_destroy_fn)(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t*));
 
-#define RUNCORE_init(r)        ((r)->output.init    ? (r)->output.init((r))            : NULL)
-#define RUNCORE_store(r, d, l) ((r)->output.store   ? (r)->output.store((r), (d), (l)) : NULL)
-#define RUNCORE_destroy(r)     ((r)->output.destroy ? (r)->output.destroy((r))         : NULL)
+#define RUNCORE_init(i, r)        ((r)->output.init    ? (r)->output.init((i), (r))            : fprintf(stderr, "init not found\n"))
+#define RUNCORE_store(i, r, d, l) ((r)->output.store   ? (r)->output.store((i), (r), (d), (l)) : NULL)
+#define RUNCORE_destroy(i, r)     ((r)->output.destroy ? (r)->output.destroy((i), (r))         : NULL)
 
 typedef enum Parrot_profiling_datatype {
 
