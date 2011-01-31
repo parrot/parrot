@@ -34,6 +34,7 @@ Returns a error message for a system error code.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_platform_strerror(PARROT_INTERP, INTVAL error)
 {
