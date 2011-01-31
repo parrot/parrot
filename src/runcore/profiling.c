@@ -795,6 +795,35 @@ record_bogus_parent_runloop(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t * ru
 
 /*
 
+=item C<static void destroy_profiling_core(PARROT_INTERP,
+Parrot_profiling_runcore_t *runcore)>
+
+Perform any finalization needed by the profiling runcore.
+
+=cut
+
+*/
+
+static void
+destroy_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
+{
+    ASSERT_ARGS(destroy_profiling_core)
+
+    char *filename_cstr = Parrot_str_to_cstring(interp, runcore->profile_filename);
+
+    fprintf(stderr, "\nPROFILING RUNCORE: wrote profile to %s\n"
+        "Use tools/dev/pprof2cg.pl to generate Callgrind-compatible "
+        "output from this file.\n", filename_cstr);
+
+    Parrot_str_free_cstring(filename_cstr);
+    Parrot_hash_destroy(interp, runcore->line_cache);
+
+    RUNCORE_destroy(interp, runcore);
+    mem_gc_free(interp, runcore->time);
+}
+
+/*
+
 =item C<static void record_values_ascii_pprof(PARROT_INTERP,
 Parrot_profiling_runcore_t * runcore, PPROF_DATA *pprof_data,
 Parrot_profiling_line type)>
@@ -960,35 +989,6 @@ init_null_output(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
 {
     ASSERT_ARGS(init_null_output)
     runcore->profile_filename = CONST_STRING(interp, "none");
-}
-
-/*
-
-=item C<static void destroy_profiling_core(PARROT_INTERP,
-Parrot_profiling_runcore_t *runcore)>
-
-Perform any finalization needed by the profiling runcore.
-
-=cut
-
-*/
-
-static void
-destroy_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
-{
-    ASSERT_ARGS(destroy_profiling_core)
-
-    char *filename_cstr = Parrot_str_to_cstring(interp, runcore->profile_filename);
-
-    fprintf(stderr, "\nPROFILING RUNCORE: wrote profile to %s\n"
-        "Use tools/dev/pprof2cg.pl to generate Callgrind-compatible "
-        "output from this file.\n", filename_cstr);
-
-    Parrot_str_free_cstring(filename_cstr);
-    Parrot_hash_destroy(interp, runcore->line_cache);
-
-    RUNCORE_destroy(interp, runcore);
-    mem_gc_free(interp, runcore->time);
 }
 
 /*
