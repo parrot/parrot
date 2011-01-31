@@ -3791,7 +3791,8 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
 {
     ASSERT_ARGS(PackFile_Annotations_dump)
     const PackFile_Annotations * const self = (const PackFile_Annotations *)seg;
-    INTVAL                      i, j;
+    INTVAL                      i;
+    size_t                      j;
 
     default_dump_header(interp, (const PackFile_Segment *)self);
 
