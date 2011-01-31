@@ -1878,6 +1878,7 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
     include/parrot/oplib/core_ops.h \
     include/parrot/runcore_api.h \
     include/pmc/pmc_continuation.h \
+    include/pmc/pmc_fixedintegerarray.h \
     include/pmc/pmc_parrotlibrary.h \
     src/io/io_private.h
 

@@ -8,6 +8,7 @@ BEGIN_OPS_PREAMBLE
 #include "parrot/embed.h"
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_continuation.h"
+#include "pmc/pmc_fixedintegerarray.h"
 #include "pmc/pmc_parrotlibrary.h"
 
 END_OPS_PREAMBLE
@@ -457,7 +458,8 @@ op set_args(inconst PMC) :flow {
     PMC * const signature = $1;
     PMC * const call_sig = Parrot_pcc_build_sig_object_from_op(interp,
             PMCNULL, signature, raw_args);
-    const INTVAL argc = VTABLE_elements(interp, signature);
+    INTVAL argc;
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);
     goto OFFSET(argc + 2);
 }
@@ -480,7 +482,7 @@ op get_params(inconst PMC) :flow {
         Parrot_pcc_dec_recursion_depth(interp, ctx);
         Parrot_pcc_set_caller_ctx(interp, ctx, Parrot_pcc_get_caller_ctx(interp, caller_ctx));
     }
-    argc = VTABLE_elements(interp, signature);
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);
     goto OFFSET(argc + 2);
 }
 
@@ -495,7 +497,7 @@ op set_returns(inconst PMC) :flow {
 
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);
 
-    argc = VTABLE_elements(interp, signature);
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);
     goto OFFSET(argc + 2);
 }
 
@@ -511,7 +513,7 @@ op get_results(inconst PMC) :flow {
     Parrot_pcc_fill_params_from_op(interp, call_object, signature, raw_params,
             PARROT_ERRORS_RESULT_COUNT_FLAG);
 
-    argc = VTABLE_elements(interp, signature);
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), PMCNULL);
     goto OFFSET(argc + 2);
 }
