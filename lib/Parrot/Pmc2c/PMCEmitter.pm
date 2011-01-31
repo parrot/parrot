@@ -972,12 +972,6 @@ sub is_vtable_method {
     return 0;
 }
 
-sub vtable {
-    my ( $self, $value ) = @_;
-    $self->{vtable} = $value if $value;
-    return $self->{vtable};
-}
-
 =item C<gen_switch_vtable>
 
 Generate switch-bases VTABLE for MULTI

@@ -443,6 +443,12 @@ sub dump_is_current {
     return ( stat $dumpfile )[9] >= ( stat $pmcfile )[9];
 }
 
+sub vtable {
+    my ( $self, $value ) = @_;
+    $self->{vtable} = $value if $value;
+    return $self->{vtable};
+}
+
 1;
 
 # Local Variables:
