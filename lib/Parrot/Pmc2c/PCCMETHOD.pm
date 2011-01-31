@@ -259,6 +259,7 @@ END
         $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     _ret_object = Parrot_pcc_build_call_from_c_args(interp, _call_object,
         "$returns_signature", $returns_varargs);
+    UNUSED(_ret_object);
     return;
     /*END RETURN $returns */
     }
