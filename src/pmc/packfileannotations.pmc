@@ -221,7 +221,7 @@ Initialize PackfileAnnotations from PackFile_Annotations*.
         for (i = 0; i < a->num_keys; ++i) {
             PackFile_Annotations_Key   *key   = &a->keys[i];
 
-            for (j = 0; j < key->len; j++) {
+            for (j = 0; j < (opcode_t)key->len; j++) {
                 PMC *annotation = Parrot_pmc_new(INTERP, enum_class_PackfileAnnotation);
                 opcode_t offs = a->base.data[(key->start + j) * 2 + ANN_ENTRY_OFF];
                 opcode_t val  = a->base.data[(key->start + j) * 2 + ANN_ENTRY_VAL];
