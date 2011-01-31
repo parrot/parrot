@@ -110,6 +110,8 @@ Parrot_gc_set_system_type(PARROT_INTERP, ARGIN(const char *name))
         interp->gc_sys->sys_type = MS2;
     if (STREQ(name, "INF"))
         interp->gc_sys->sys_type = INF;
+    if (STREQ(name, "GMS"))
+        interp->gc_sys->sys_type = GMS;
 }
 
 /*
