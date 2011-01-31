@@ -254,7 +254,8 @@ Retrieve a float as the next item from the image.
         PackFile       *pf             = PARROT_IMAGEIOTHAW(SELF)->pf;
         const opcode_t *curs           = PARROT_IMAGEIOTHAW(SELF)->curs;
         FLOATVAL        f              = PF_fetch_number(pf, &curs);
-        PARROT_IMAGEIOTHAW(SELF)->curs = (opcode_t *)curs;
+        DECL_CONST_CAST;
+        PARROT_IMAGEIOTHAW(SELF)->curs = PARROT_const_cast(opcode_t *, curs);
         BYTECODE_SHIFT_OK(INTERP, SELF);
         return f;
     }
@@ -290,7 +291,8 @@ Retrieve a string as the next item from the image.
             PackFile *pf                   = PARROT_IMAGEIOTHAW(SELF)->pf;
             const opcode_t *curs           = PARROT_IMAGEIOTHAW(SELF)->curs;
             STRING   *s                    = PF_fetch_string(INTERP, pf, &curs);
-            PARROT_IMAGEIOTHAW(SELF)->curs = (opcode_t *)curs;
+            DECL_CONST_CAST;
+            PARROT_IMAGEIOTHAW(SELF)->curs = PARROT_const_cast(opcode_t *, curs);
             BYTECODE_SHIFT_OK(INTERP, SELF);
             return s;
         }
