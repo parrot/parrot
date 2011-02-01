@@ -1878,7 +1878,7 @@ pobj2gen(ARGIN(PObj *pmc))
 {
     ASSERT_ARGS(pobj2gen)
 
-    return PObj_to_generation(pmc);
+    return POBJ2GEN(pmc);
 }
 
 static int
@@ -1886,7 +1886,7 @@ gen2flags(int gen)
 {
     ASSERT_ARGS(gen2flags)
 
-    return generation_to_flags(gen);
+    return GEN2FLAGS(gen);
 }
 
 /*
