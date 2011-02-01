@@ -1983,24 +1983,25 @@ static void
 gc_gms_check_sanity(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_check_sanity)
-#if 0
-#ifndef NDEBUG
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    List_Item_Header *tmp;
-    int gen;
+    size_t            i;
 
-    for (gen=0; gen < 2; gen++) {
-        tmp = self->objects[gen]->first;
-        while (tmp) {
-            PMC * pmc = LLH2Obj_typed(tmp, PMC);
+    POINTER_ARRAY_ITER(self->dirty_list,
+        PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
+        PARROT_ASSERT(pmc->flags & PObj_GC_on_dirty_list_FLAG
+            || !"Object in dirty_list without dirty_flag"););
 
-            PARROT_ASSERT(pobj2gen((PObj *)pmc) == gen);
+    POINTER_ARRAY_ITER(self->work_list,
+        PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
+        PARROT_ASSERT(!(pmc->flags & PObj_GC_on_dirty_list_FLAG)
+            || !"Dirty object in work_list"););
 
-            tmp = tmp->next;
-        }
+    for (i = 0; i < MAX_GENERATIONS; i++) {
+        POINTER_ARRAY_ITER(self->objects[i],
+            PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
+            PARROT_ASSERT((POBJ2GEN(pmc) == i)
+                || !"Object from wrong generation"););
     }
-#endif
-#endif
 }
 
 /*
