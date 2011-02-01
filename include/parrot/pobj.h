@@ -166,10 +166,12 @@ typedef enum PObj_enum {
     PObj_report_FLAG            = POBJ_FLAG(20),
 
     /* Flags used by generation GC to determine generation object belong */
-
     PObj_GC_generation_0_FLAG   = POBJ_FLAG(22),
     PObj_GC_generation_1_FLAG   = POBJ_FLAG(23),
     PObj_GC_generation_2_FLAG   = POBJ_FLAG(24),
+
+    /* Object was marked dirty by write barrier */
+    PObj_GC_on_dirty_list_FLAG  = POBJ_FLAG(25),
 
     /* Mark that object is referenced from older generation */
     PObj_GC_ref_generation_0_FLAG   = POBJ_FLAG(25),
