@@ -1667,20 +1667,20 @@ gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_write_barrier)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    List_Item_Header *item = Obj2LLH(pmc);
-    size_t            gen  = PObj_to_generation(pmc);
+    size_t            gen  = POBJ2GEN(pmc);
+    pmc_alloc_struct *item = PMC2PAC(pmc);
 
-    /* If we are already marked this one - skip it */
-    if (pmc->flags & PObj_GC_wb_triggered_FLAG)
-        return;
+    PARROT_ASSERT(!(pmc->flags & PObj_GC_wb_triggered_FLAG)
+        || !"Second write barrier");
+    PARROT_ASSERT(gen || !"Write barrier on nursery object");
 
-    if (!gen)
-        return;
+    Parrot_pa_remove(interp, self->objects[gen], item);
+    item->ptr = Parrot_pa_insert(interp, self->dirty_list, item);
 
-    LIST_REMOVE(self->objects[gen], item);
-    LIST_APPEND(self->root_objects, item);
-    pmc->flags |= PObj_GC_wb_triggered_FLAG;
-    PObj_live_SET(pmc);
+    pmc->flags |= PObj_GC_on_dirty_list_FLAG;
+
+    /* We don't need it anymore */
+    gc_gms_unseal_object(interp, pmc);
 }
 
 /*
