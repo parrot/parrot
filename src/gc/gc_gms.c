@@ -327,13 +327,6 @@ static void gc_gms_iterate_live_strings(PARROT_INTERP,
     ARGIN_NULLOK(void *data))
         __attribute__nonnull__(1);
 
-static void gc_gms_iterate_string_list(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array *list),
-    string_iterator_callback callback,
-    ARGIN_NULLOK(void *data))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
@@ -1405,34 +1398,7 @@ gc_gms_iterate_live_strings(PARROT_INTERP,
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t             i;
     for (i = 0; i < MAX_COLLECTIONS; i++) {
-        gc_gms_iterate_string_list(interp, self->strings[i], callback, data);
-    }
-}
-
-/*
-
-=item C<static void gc_gms_iterate_string_list(PARROT_INTERP,
-Parrot_Pointer_Array *list, string_iterator_callback callback, void *data)>
-
-Iterate over string list
-
-=cut
-
-*/
-
-static void
-gc_gms_iterate_string_list(PARROT_INTERP,
-        ARGIN(Parrot_Pointer_Array *list),
-        string_iterator_callback callback,
-        ARGIN_NULLOK(void *data))
-{
-    ASSERT_ARGS(gc_gms_iterate_string_list)
-    List_Item_Header *tmp = list->first;
-
-    while (tmp) {
-        Buffer *b = LLH2Obj_typed(tmp, Buffer);
-        callback(interp, b, data);
-        tmp = tmp->next;
+        // FIXME
     }
 }
 
