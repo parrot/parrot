@@ -903,6 +903,16 @@ gc_gms_process_work_list(PARROT_INTERP,
 
         if (PMC_metadata(pmc))
             Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc)););
+
+    /* Move processed objects back to own generation */
+    POINTER_ARRAY_ITER(work_list,
+        pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
+        PMC              *pmc  = &(item->pmc);
+        size_t            gen  = POBJ2GEN(pmc);
+
+        Parrot_pa_remove(interp, work_list, item);
+        item->ptr = Parrot_pa_insert(interp, self->objects[gen], item););
+
 }
 
 /*
