@@ -99,6 +99,11 @@ void imcc_preprocess(
         FUNC_MODIFIES(*imcc);
 
 PARROT_EXPORT
+void imcc_reset(ARGMOD(imc_info_t *imcc))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*imcc);
+
+PARROT_EXPORT
 void imcc_set_debug_mode(
     ARGMOD(imc_info_t *imcc),
     INTVAL dflags,
@@ -163,6 +168,8 @@ yyscan_t imcc_get_scanner(ARGMOD(imc_info_t *imcc))
 #define ASSERT_ARGS_imcc_preprocess __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(sourcefile))
+#define ASSERT_ARGS_imcc_reset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_set_debug_mode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_set_optimization_level __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
