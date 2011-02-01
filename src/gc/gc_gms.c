@@ -950,6 +950,8 @@ gc_gms_sweep_pools(PARROT_INTERP,
                 if (move_to_old) {
                     Parrot_pa_remove(interp, self->objects[i], item);
                     item->ptr = Parrot_pa_insert(interp, self->objects[i + 1], item);
+                    gc_gms_set_gen_flags(interp, pmc, i + 1);
+                    gc_gms_seal_object(interp, pmc);
                 }
             }
             else if (!PObj_constant_TEST(pmc)) {
