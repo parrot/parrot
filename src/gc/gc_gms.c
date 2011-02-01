@@ -100,7 +100,7 @@ TBD
 #define PANIC_OUT_OF_MEM(size) failed_allocation(__LINE__, (size))
 
 /* Maximum number of collections */
-#define MAX_COLLECTIONS     8
+#define MAX_GENERATIONS     8
 
 /* We allocate additional space in front of PObj* to store additional pointer */
 typedef struct pmc_alloc_struct {
@@ -145,13 +145,13 @@ typedef struct MarkSweep_GC {
     struct Parrot_Pointer_Array     *dirty_list;
 
     /* Currently allocate objects. */
-    struct Parrot_Pointer_Array     *objects[MAX_COLLECTIONS];
+    struct Parrot_Pointer_Array     *objects[MAX_GENERATIONS];
 
     /* Allocator for strings */
     struct Pool_Allocator           *string_allocator;
 
-    /* MAX_COLLECTIONS generations of strings */
-    struct Parrot_Pointer_Array     *strings[MAX_COLLECTIONS];
+    /* MAX_GENERATIONS generations of strings */
+    struct Parrot_Pointer_Array     *strings[MAX_GENERATIONS];
 
     /* Fixed-size allocator */
     struct Fixed_Allocator *fixed_size_allocator;
@@ -696,7 +696,7 @@ Parrot_gc_gms_init(PARROT_INTERP)
         self->work_list  = Parrot_pa_new(interp);
         self->dirty_list = Parrot_pa_new(interp);
 
-        for (i = 0; i < MAX_COLLECTIONS; i++) {
+        for (i = 0; i < MAX_GENERATIONS; i++) {
             self->objects[i] = Parrot_pa_new(interp);
             self->strings[i] = Parrot_pa_new(interp);
         }
@@ -827,7 +827,7 @@ gc_gms_select_generation_to_collect(PARROT_INTERP)
     /* TODO Use less naive approach. E.g. count amount of allocated memory in
      * older generations */
     size_t ret  = (size_t)log10(interp->gc_sys->stats.gc_mark_runs);
-    return ret < MAX_COLLECTIONS ? ret : MAX_COLLECTIONS;
+    return ret < MAX_GENERATIONS ? ret : MAX_GENERATIONS;
 }
 
 static void
@@ -1069,7 +1069,7 @@ gc_gms_finalize(PARROT_INTERP)
 
     Parrot_gc_str_finalize(interp, &self->string_gc);
 
-    for (i = 0; i < MAX_COLLECTIONS; i++) {
+    for (i = 0; i < MAX_GENERATIONS; i++) {
         Parrot_pa_destroy(interp, self->objects[0]);
         Parrot_pa_destroy(interp, self->strings[0]);
     }
@@ -1147,7 +1147,7 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     ASSERT_ARGS(gc_gms_is_pmc_ptr)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t             i;
-    for (i = 0; i < MAX_COLLECTIONS; i++) {
+    for (i = 0; i < MAX_GENERATIONS; i++) {
         if (gc_gms_is_ptr_owned(interp, ptr, self->pmc_allocator, self->objects[i]))
             return 1;
     }
@@ -1273,7 +1273,7 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     ASSERT_ARGS(gc_gms_is_string_ptr)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t             i;
-    for (i = 0; i < MAX_COLLECTIONS; i++) {
+    for (i = 0; i < MAX_GENERATIONS; i++) {
         if (gc_gms_is_ptr_owned(interp, ptr, self->string_allocator, self->objects[i]))
             return 1;
     }
@@ -1376,7 +1376,7 @@ gc_gms_iterate_live_strings(PARROT_INTERP,
 
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t             i;
-    for (i = 0; i < MAX_COLLECTIONS; i++) {
+    for (i = 0; i < MAX_GENERATIONS; i++) {
         // FIXME
     }
 }
@@ -1867,7 +1867,7 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
 #if 0
     Pointer_Array doens't keep count.
 
-    for (i = 0; i < MAX_COLLECTIONS; i++)
+    for (i = 0; i < MAX_GENERATIONS; i++)
         fprintf(stderr, "%d: %d %d\n",
                 self->objects[i]->count, self->strings[i]->count);
 #endif
