@@ -334,8 +334,7 @@ static void gc_gms_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_mark_string_header(PARROT_INTERP,
-    ARGIN_NULLOK(STRING *str))
+static void gc_gms_mark_str_header(PARROT_INTERP, ARGIN_NULLOK(STRING *str))
         __attribute__nonnull__(1);
 
 static void gc_gms_maybe_mark_and_sweep(PARROT_INTERP)
@@ -510,15 +509,12 @@ static int pobj2gen(ARGIN(PObj *pmc))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_iterate_live_strings __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_gms_iterate_string_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(list))
 #define ASSERT_ARGS_gc_gms_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_mark_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_gc_gms_mark_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_gc_gms_mark_str_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_maybe_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -643,7 +639,7 @@ Parrot_gc_gms_init(PARROT_INTERP)
     interp->gc_sys->is_pmc_ptr                  = gc_gms_is_pmc_ptr;
     interp->gc_sys->is_string_ptr               = gc_gms_is_string_ptr;
     interp->gc_sys->mark_pmc_header             = gc_gms_mark_pmc_header;
-    interp->gc_sys->mark_str_header             = gc_gms_mark_string_header;
+    interp->gc_sys->mark_str_header             = gc_gms_mark_str_header;
 
     interp->gc_sys->block_mark                  = gc_gms_block_GC_mark;
     interp->gc_sys->unblock_mark                = gc_gms_unblock_GC_mark;
@@ -897,7 +893,7 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
-=item C<static void gc_gms_mark_string_header(PARROT_INTERP, STRING *str)>
+=item C<static void gc_gms_mark_str_header(PARROT_INTERP, STRING *str)>
 
 Mark String
 
@@ -906,22 +902,12 @@ Mark String
 */
 
 static void
-gc_gms_mark_string_header(PARROT_INTERP, ARGIN_NULLOK(STRING *str))
+gc_gms_mark_str_header(PARROT_INTERP, ARGIN_NULLOK(STRING *str))
 {
-    ASSERT_ARGS(gc_gms_mark_string_header)
+    ASSERT_ARGS(gc_gms_mark_str_header)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    size_t             gen  = POBJ2GEN(str);
-
-    /* If object too old - skip it */
-    if (gen > self->gen_to_collect)
-        return;
-
-    /* Object was already marked as grey. Or live. Or dead. Skip it */
-    if (PObj_is_live_or_free_TESTALL(str))
-        return;
-
-    /* mark it live */
-    PObj_live_SET(str);
+    if (str)
+        PObj_live_SET(str);
 }
 
 
