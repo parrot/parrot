@@ -169,6 +169,28 @@ Returns the string representation of this sockaddr by calling C<getnameinfo(3)>.
         return Parrot_io_getnameinfo(INTERP, data->pointer, data->len);
     }
 
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL what)>
+
+Returns family, type or protocol. Used for debugging.
+
+=cut
+
+*/
+    VTABLE INTVAL get_integer_keyed_int(INTVAL what) {
+        Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+
+        switch (what) {
+          case 0:
+            return data->family;
+          case 1:
+            return data->type;
+          case 2:
+            return data->protocol;
+        }
+    }
+
 }
 
 /*
