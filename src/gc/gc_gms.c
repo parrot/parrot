@@ -1276,6 +1276,7 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         if (gc_gms_is_ptr_owned(interp, ptr, self->string_allocator, self->objects[i]))
             return 1;
     }
+    return 0;
 }
 
 /*
