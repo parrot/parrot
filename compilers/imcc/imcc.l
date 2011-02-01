@@ -130,7 +130,7 @@ DQ_STRING       \"(\\.|[^"\\\n])*\"
 ENCCHAR         {LETTER}|{DIGIT}|"-"
 ENCCHARS        {ENCCHAR}*
 ENC             {LETTER}{ENCCHARS}":"
-UNICODE         {ENC}{ENC}?{DQ_STRING}
+UNICODE         {ENC}{DQ_STRING}
 STRINGCONSTANT  {SQ_STRING}|{DQ_STRING}
 SQ_STRING       \'[^'\n]*\'
 EOL             \r?\n
