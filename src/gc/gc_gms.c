@@ -1693,7 +1693,7 @@ gc_gms_count_used_string_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list)
     ASSERT_ARGS(gc_gms_count_used_string_memory)
 
     size_t total_amount = 0;
-
+#if 0
     List_Item_Header *tmp = list->first;
     while (tmp) {
         List_Item_Header *next = tmp->next;
@@ -1707,7 +1707,7 @@ gc_gms_count_used_string_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list)
 
         tmp = next;
     }
-
+#endif
     return total_amount;
 }
 
@@ -1728,7 +1728,7 @@ gc_gms_count_used_pmc_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
     ASSERT_ARGS(gc_gms_count_used_pmc_memory)
 
     size_t total_amount = 0;
-
+#if 0
     List_Item_Header *tmp = list->first;
     while (tmp) {
         List_Item_Header *next = tmp->next;
@@ -1741,7 +1741,7 @@ gc_gms_count_used_pmc_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
 
         tmp = next;
     }
-
+#endif
     return total_amount;
 }
 
