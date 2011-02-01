@@ -33,6 +33,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler {
         STRING * code = STRINGNULL;
         PMC * result = PMCNULL;
         Parrot_pcc_fill_params_from_c_args(interp, call_object, "S", &code);
+        imcc_reset(attrs->imcc_info);
         result = imcc_compile_string(attrs->imcc_info, code, attrs->is_pasm);
         Parrot_pcc_build_call_from_c_args(interp, call_object, "P", result);
         interp->code = cur_code;
