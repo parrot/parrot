@@ -826,7 +826,8 @@ gc_gms_select_generation_to_collect(PARROT_INTERP)
 {
     /* TODO Use less naive approach. E.g. count amount of allocated memory in
      * older generations */
-    return (size_t)log10(interp->gc_sys->stats.gc_mark_runs);
+    size_t ret  = (size_t)log10(interp->gc_sys->stats.gc_mark_runs);
+    return ret < MAX_COLLECTIONS ? ret : MAX_COLLECTIONS;
 }
 
 static void
