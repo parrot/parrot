@@ -394,9 +394,14 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     /* TODO: Don't set current packfile in the interpreter. Leave the
              interpreter alone */
 
-    //if (is_file)
-    pf_raw->cur_cs = Parrot_pf_create_default_segments(imcc->interp, pf_raw, source, 1);
-    //Parrot_pf_create_default_segments(imcc->interp, pf_raw, source, 0);
+    if (is_file)
+        pf_raw->cur_cs = Parrot_pf_create_default_segments(imcc->interp, pf_raw, source, 1);
+    else {
+        const INTVAL eval_number = eval_nr++;
+        STRING * const evalname = Parrot_sprintf_c(imcc->interp, "EVAL_" INTVAL_FMT, eval_number);
+        pf_raw->cur_cs = Parrot_pf_create_default_segments(imcc->interp, pf_raw, evalname, 1);
+    }
+
     Parrot_pf_set_current_packfile(imcc->interp, pf_raw);
 
     IMCC_push_parser_state(imcc, source, is_pasm);

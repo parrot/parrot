@@ -4194,12 +4194,15 @@ compile_file(PARROT_INTERP, ARGIN(STRING *path))
     PackFile_ByteCode * const cs =
         (PackFile_ByteCode *)Parrot_compile_file(interp, path, &err);
 
-    interp->code = cur_code;
-    if (cs)
+    if (cs) {
+        interp->code = cur_code;
         do_sub_pragmas(interp, cs, PBC_LOADED, NULL);
-    else
+    }
+    else {
+        interp->code = cur_code;
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
                 "compiler returned NULL ByteCode '%Ss' - %Ss", path, err);
+    }
 
 }
 
