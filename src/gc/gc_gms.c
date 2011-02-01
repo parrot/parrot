@@ -103,14 +103,15 @@ TBD
 #define MAX_COLLECTIONS     8
 
 /* Get generation from PObj->flags */
-#define PObj_to_generation(pobj)                                \
+#define POBJ2GEN(pobj)                                          \
     (                                                           \
         (((pobj)->flags & PObj_GC_generation_0_FLAG) ? 1 : 0)   \
         + (((pobj)->flags) & PObj_GC_generation_1_FLAG ? 2 : 0) \
         + (((pobj)->flags) & PObj_GC_generation_2_FLAG ? 4 : 0) \
     )
 
-#define generation_to_flags(gen)                        \
+/* Get flags for generation number */
+#define GEN2FLAGS(gen)                                  \
     (                                                   \
         ((gen) & 1 ? PObj_GC_generation_0_FLAG : 0)     \
         | ((gen) & 2 ? PObj_GC_generation_1_FLAG : 0)   \
@@ -123,16 +124,19 @@ typedef struct MarkSweep_GC {
     struct Pool_Allocator  *pmc_allocator;
 
     /* During M&S gather new live objects in this list */
-    struct Linked_List     *root_objects;
+    struct Parrot_Pointer_Array     *work_set;
 
-    /* Currently allocate objects. 3 generations of them */
-    struct Linked_List     *objects[3];
+    /* During M&S gather new live objects in this list */
+    struct Parrot_Pointer_Array     *dirty_list;
+
+    /* Currently allocate objects. */
+    struct Parrot_Pointer_Array     *objects[MAX_COLLECTIONS];
 
     /* Allocator for strings */
-    struct Pool_Allocator  *string_allocator;
+    struct Parrot_Pointer_Array  *string_allocator;
 
-    /* 3 generations of strings */
-    struct Linked_List     *strings[3];
+    /* MAX_COLLECTIONS generations of strings */
+    struct Parrot_Pointer_Array     *strings[MAX_COLLECTIONS];
 
     /* Fixed-size allocator */
     struct Fixed_Allocator *fixed_size_allocator;
@@ -144,7 +148,7 @@ typedef struct MarkSweep_GC {
     size_t                  gc_threshold;
 
     /* During GC phase - which generation we are collecting */
-    size_t                  current_generation;
+    size_t                  gen_to_collect;
 
     /* GC blocking */
     UINTVAL gc_mark_block_level;  /* How many outstanding GC block
@@ -221,13 +225,16 @@ static void gc_gms_block_GC_mark(PARROT_INTERP)
 static void gc_gms_block_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void gc_gms_bring_them_together(PARROT_INTERP,
-    ARGIN(List_Item_Header *old_object_tails[]))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void gc_gms_check_sanity(PARROT_INTERP)
         __attribute__nonnull__(1);
+
+static void gc_gms_cleanup_dirty_list(PARROT_INTERP,
+    ARGIN(MarkSweep_GC *self),
+    ARGIN(Parrot_Pointer_Array *dirty_list),
+    size_t gen)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void gc_gms_compact_memory_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -332,15 +339,25 @@ static void gc_gms_pmc_needs_early_collection(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
-static void gc_gms_pmc_validate(PARROT_INTERP, ARGIN(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void gc_gms_print_stats(PARROT_INTERP,
     ARGIN(const char* header),
     int gen)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+static void gc_gms_process_dirty_list(PARROT_INTERP,
+    ARGIN(MarkSweep_GC *self),
+    ARGIN(Parrot_Pointer_Array *dirty_list))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static void gc_gms_process_work_list(PARROT_INTERP,
+    ARGIN(MarkSweep_GC *self),
+    ARGIN(Parrot_Pointer_Array *work_list))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void gc_gms_reallocate_buffer_storage(PARROT_INTERP,
     ARGIN(Buffer *str),
@@ -371,15 +388,10 @@ static void gc_gms_seal_object(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static size_t gc_gms_select_generation_to_collect(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static void gc_gms_set_gen_flags(PARROT_INTERP, ARGIN(PMC *pmc), int gen)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void gc_gms_string_mark_propagate(PARROT_INTERP, ARGIN(STRING *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void gc_gms_string_validate(PARROT_INTERP, ARGIN(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -396,6 +408,13 @@ static void gc_gms_sweep_pool(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
+static void gc_gms_sweep_pools(PARROT_INTERP,
+    ARGIN(MarkSweep_GC *self),
+    ARGIN(Parrot_Pointer_Array *work_list))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 static void gc_gms_sweep_string_cb(PARROT_INTERP, ARGIN(PObj *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -405,10 +424,6 @@ static void gc_gms_unblock_GC_mark(PARROT_INTERP)
 
 static void gc_gms_unblock_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
-
-static void gc_gms_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 static void gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
@@ -447,11 +462,12 @@ static int pobj2gen(ARGIN(PObj *pmc))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_block_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_gms_bring_them_together __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(old_object_tails))
 #define ASSERT_ARGS_gc_gms_check_sanity __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_gms_cleanup_dirty_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(dirty_list))
 #define ASSERT_ARGS_gc_gms_compact_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_count_used_pmc_memory __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -514,12 +530,17 @@ static int pobj2gen(ARGIN(PObj *pmc))
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_gc_gms_pmc_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_print_stats __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(header))
+#define ASSERT_ARGS_gc_gms_process_dirty_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(dirty_list))
+#define ASSERT_ARGS_gc_gms_process_work_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(work_list))
 #define ASSERT_ARGS_gc_gms_reallocate_buffer_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -535,15 +556,12 @@ static int pobj2gen(ARGIN(PObj *pmc))
 #define ASSERT_ARGS_gc_gms_seal_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_gc_gms_select_generation_to_collect \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_set_gen_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_gc_gms_string_mark_propagate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_gc_gms_string_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_gc_gms_sweep_pmc_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj))
@@ -552,6 +570,10 @@ static int pobj2gen(ARGIN(PObj *pmc))
     , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(list) \
     , PARROT_ASSERT_ARG(callback))
+#define ASSERT_ARGS_gc_gms_sweep_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(work_list))
 #define ASSERT_ARGS_gc_gms_sweep_string_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj))
@@ -559,9 +581,6 @@ static int pobj2gen(ARGIN(PObj *pmc))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_unblock_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_gms_vtable_mark_propagate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_write_barrier __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -672,34 +691,36 @@ Parrot_gc_gms_init(PARROT_INTERP)
         self = (MarkSweep_GC*)interp->parent_interpreter->gc_sys->gc_private;
     }
     else {
+        size_t i;
+
         self = mem_allocate_zeroed_typed(MarkSweep_GC);
 
         self->pmc_allocator = Parrot_gc_pool_new(interp,
             sizeof (List_Item_Header) + sizeof (PMC));
 
-        self->objects[0] = Parrot_list_new(interp);
-        self->objects[1] = Parrot_list_new(interp);
-        self->objects[2] = Parrot_list_new(interp);
-
-        /* Allocate list for gray objects */
-        self->root_objects = Parrot_list_new(interp);
-
-
         self->string_allocator = Parrot_gc_pool_new(interp,
             sizeof (List_Item_Header) + sizeof (STRING));
-        self->strings[0] = Parrot_list_new(interp);
-        self->strings[1] = Parrot_list_new(interp);
-        self->strings[2] = Parrot_list_new(interp);
+
+        /* Allocate list for gray objects */
+        self->work_list  = Parrot_pa_new(interp);
+        self->dirty_list = Parrot_pa_new(interp);
+
+        for (i = 0; i < MAX_COLLECTIONS; i++) {
+            self->objects[i] = Parrot_pa_new(interp);
+            self->strings[i] = Parrot_pa_new(interp);
+        }
 
         self->fixed_size_allocator = Parrot_gc_fixed_allocator_new(interp);
 
-        /* Collect every 256M allocated. */
+        /* Collect every nM allocated. */
         /* Hardcode for now. Will be configured via CLI */
         self->gc_threshold = 1 * 1024 * 1024;
+
+        Parrot_gc_str_initialize(interp, &self->string_gc);
     }
+
     interp->gc_sys->gc_private = self;
 
-    Parrot_gc_str_initialize(interp, &self->string_gc);
 }
 
 static void
@@ -711,227 +732,76 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     Linked_List      *list;
     int               i, gen = -1;
 
-    /*
-     * Remember current postions of objects.
-     * We will use later for properly moving objects between generations.
-     */
-    List_Item_Header *old_object_tails[] = {
-                          self->objects[0]->last,
-                          self->objects[1]->last,
-                          self->objects[2]->last
-                      };
     UNUSED(flags);
 
     /* GC is blocked */
     if (self->gc_mark_block_level)
         return;
 
-    if (flags & GC_finish_FLAG) {
-        /* Ignore it. Will cleanup in gc_gms_finalize */
+    /* Ignore it. Will cleanup in gc_gms_finalize */
+    if (flags & GC_finish_FLAG)
         return;
-    }
 
     /* Ignore calls from String GC. We know better when to trigger GC */
-    if (flags & GC_strings_cb_FLAG) {
+    if (flags & GC_strings_cb_FLAG)
         return;
-    }
 
+    /* Block further GC calls */
     ++self->gc_mark_block_level;
 
     interp->gc_sys->stats.gc_mark_runs++;
-    /* Which generation we are going to collect? */
-    /* TODO Use less naive approach. E.g. count amount of allocated memory in
-     * older generations */
-    if (interp->gc_sys->stats.gc_mark_runs % 100 == 0)
-        gen = self->current_generation = 2;
-    else if (interp->gc_sys->stats.gc_mark_runs % 10 == 0)
-        gen = self->current_generation = 1;
-    else
-        gen = self->current_generation = 0;
 
 #ifdef DETAIL_MEMORY_DEBUG
     gc_gms_print_stats(interp, "Before", gen);
 #endif
 
     gc_gms_check_sanity(interp);
+    /*
+    2. Choose K - how many collections we want to collect. Collections [0..K] will
+    be collected. Remember K in C<self->gen_to_collect>.
+    */
+    self->gen_to_collect = gen = gc_gms_select_generation_to_collect(interp);
 
-    /* Trace roots */
+    /*
+    3. Move all objects from collections younger K from dirty_list
+    back to original lists. Reason for this is "corollary of invariant". We can
+    either collect such objects or they will be marked by referents from
+    "dirty_list".
+    */
+    gc_gms_cleanup_dirty_list(interp, self, self->dirty_list, gen);
+
+    /*
+    4. Trace root objects. According to "0. Pre-requirements" we will ignore all
+    "old" objects. All relevant objects are moved into "work_list".
+    */
     gc_gms_mark_pmc_header(interp, PMCNULL);
     Parrot_gc_trace_root(interp, NULL, GC_TRACE_FULL);
     if (interp->pdb && interp->pdb->debugger) {
         Parrot_gc_trace_root(interp->pdb->debugger, NULL, (Parrot_gc_trace_type)0);
     }
-
     gc_gms_check_sanity(interp);
-    /* root_objects are "gray" until fully marked */
-    /* Additional gray objects will appended to root_objects list */
-    /* Iterate over them in one go */
-    tmp = self->root_objects->first;
-    while (tmp) {
-        PMC *pmc = LLH2Obj_typed(tmp, PMC);
 
-        /* write_barrier can set this flag */
-        pmc->flags &= ~PObj_GC_wb_triggered_FLAG;
-
-        /* if object is a PMC and contains buffers or PMCs, then attach the PMC
-         * to the chained mark list. */
-        if (PObj_custom_mark_TEST(pmc))
-            VTABLE_mark(interp, pmc);
-
-        if (PMC_metadata(pmc))
-            Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc));
-
-        PObj_live_SET(pmc);
-
-        tmp = tmp->next;
-    }
-
-    gc_gms_check_sanity(interp);
     /*
-     * At this point root_objects contains live objects from different
-     * generations.
-     *
-     * Iterate over them and move into proper list. Do not repaint them white
-     * yet.
-     *
-     * Remember postions of last item in lists. We will need it to pull more
-     * objects into those generations.
-     */
-    old_object_tails[0] = self->objects[0]->last;
-    old_object_tails[1] = self->objects[1]->last;
-    old_object_tails[2] = self->objects[2]->last;
-
-    tmp = self->root_objects->first;
-    while (tmp) {
-        List_Item_Header *next = tmp->next;
-        PMC              *pmc = LLH2Obj_typed(tmp, PMC);
-        size_t            gen = PObj_to_generation(pmc);
-
-        LIST_REMOVE(self->root_objects, tmp);
-        LIST_APPEND(self->objects[gen], tmp);
-
-        /* Seal old objects back */
-        if (gen)
-            gc_gms_seal_object(interp, pmc);
-
-        tmp = next;
-    }
-
+    5. Iterate over "dirty_set" calling VTABLE_mark on it. It will move all
+    children into "work_list".
+    */
+    gc_gms_process_dirty_list(interp, self, self->dirty_list);
     gc_gms_check_sanity(interp);
+
     /*
-     * Now. self->objects[N] contains properly marked objects.
-     * (For current or younger generations).
-     * 1. Propagate survived objects into older generation.
-     * 2. Paint them white.
-     * 3. Destroy everything else.
-     */
-
-    /* There is no generation beyond 2. We have to handle it differentely */
-    for (i = gen == 2 ? 1 : gen; i >= 0; i--) {
-        tmp = self->objects[i]->first;
-        while (tmp) {
-            PMC                 *pmc = LLH2Obj_typed(tmp, PMC);
-            List_Item_Header    *next = tmp->next;
-
-            /* We are moving previously remembered tail. Update it */
-            if (!next) {
-                old_object_tails[i] = tmp->prev;
-            }
-
-            if (!PObj_constant_TEST(pmc)) {
-                if (PObj_live_TEST(pmc)) {
-                    gc_gms_seal_object(interp, pmc);
-
-                    /* Move to older generation */
-                    LIST_REMOVE(self->objects[i], tmp);
-                    LIST_APPEND(self->objects[i+1], tmp);
-
-                    gc_gms_set_gen_flags(interp, pmc, i+1);
-                }
-            }
-
-            tmp = next;
-        }
-    }
-
-    gc_gms_check_sanity(interp);
-    /* Handling oldest generation. Don't move it further */
-    if (1 || gen >= 1) {
-        tmp = self->objects[2]->first;
-        while (tmp) {
-            PMC                 *pmc = LLH2Obj_typed(tmp, PMC);
-            List_Item_Header    *next = tmp->next;
-
-            if (PObj_live_TEST(pmc)) {
-                gc_gms_seal_object(interp, pmc);
-                gc_gms_set_gen_flags(interp, pmc, 2);
-            }
-
-            tmp = next;
-        }
-    }
-
+    6. Iterate over "work_list" calling VTABLE_mark on it.
+    */
+    gc_gms_process_work_list(interp, self, self->work_list);
     gc_gms_check_sanity(interp);
 
-#ifdef DETAIL_MEMORY_DEBUG
-    gc_gms_print_stats(interp, "Bringing", gen);
-#endif
-
-    gc_gms_bring_them_together(interp, old_object_tails);
-
-#ifdef DETAIL_MEMORY_DEBUG
-    gc_gms_print_stats(interp, "Here", gen);
-#endif
-
-
-    /* Now. Sweep all dead objects */
-    gc_gms_sweep_pool(interp, self->pmc_allocator, self->objects[0], gc_gms_sweep_pmc_cb);
-    gc_gms_sweep_pool(interp, self->string_allocator, self->strings[0], gc_gms_sweep_string_cb);
-
-    if (gen >= 1) {
-        gc_gms_sweep_pool(interp, self->pmc_allocator, self->objects[1], gc_gms_sweep_pmc_cb);
-        gc_gms_sweep_pool(interp, self->string_allocator, self->strings[1], gc_gms_sweep_string_cb);
-    }
-    else {
-        tmp = 0 && old_object_tails[1]
-             ? old_object_tails[1]
-             : self->objects[1]->first;
-        while (tmp) {
-            PMC *pmc = LLH2Obj_typed(tmp, PMC);
-            PObj_live_CLEAR(pmc);
-            tmp = tmp->next;
-        }
-
-        tmp = self->strings[1]->first;
-        while (tmp) {
-            PMC *pmc = LLH2Obj_typed(tmp, PMC);
-            PObj_live_CLEAR(pmc);
-            tmp = tmp->next;
-        }
-    }
-
-    if (gen == 2) {
-        gc_gms_sweep_pool(interp, self->pmc_allocator, self->objects[2], gc_gms_sweep_pmc_cb);
-        gc_gms_sweep_pool(interp, self->string_allocator, self->strings[2], gc_gms_sweep_string_cb);
-    }
-    else {
-        tmp = 0 && old_object_tails[2]
-              ? old_object_tails[2]
-              : self->objects[2]->first;
-        while (tmp) {
-            PMC *pmc = LLH2Obj_typed(tmp, PMC);
-            PObj_live_CLEAR(pmc);
-            tmp = tmp->next;
-        }
-
-        tmp = self->strings[2]->first;
-        while (tmp) {
-            PMC *pmc = LLH2Obj_typed(tmp, PMC);
-            PObj_live_CLEAR(pmc);
-            tmp = tmp->next;
-        }
-    }
-
+    /*
+    7. Sweep generations starting from K:
+        - Destroy all dead objects
+        - Move live objects into generation max(K+1, N)
+        - Paint them white.
+    */
+    gc_gms_sweep_pools(interp, self);
+    gc_gms_check_sanity(interp);
 
 
     /* Update some stats */
@@ -943,7 +813,6 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     self->num_early_gc_PMCs                      = 0;
 
     gc_gms_compact_memory_pool(interp);
-
     gc_gms_check_sanity(interp);
 
     gc_gms_ensure_flags(interp);
@@ -954,152 +823,116 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 }
 
 /*
-=item C<static void gc_gms_bring_them_together(PARROT_INTERP, List_Item_Header
-*old_object_tails[])>
 
-Bring all cross-referenced objects into same generation.
+=item C<static size_t gc_gms_select_generation_to_collect(PARROT_INTERP)>
 
-TODO Give better name to this function.
+Select how many generations we do want to collect.
 
 =cut
+
 */
-static void
-gc_gms_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tails[]))
+static size_t
+gc_gms_select_generation_to_collect(PARROT_INTERP)
 {
-    ASSERT_ARGS(gc_gms_bring_them_together)
-    MarkSweep_GC  *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    int i;
+    /* TODO Use less naive approach. E.g. count amount of allocated memory in
+     * older generations */
+    return (size_t)log10(interp->gc_sys->stats.gc_mark_runs);
+}
 
-    /*
-     * Last step. old_object_tails contains pointer to previous end of generation.
-     * We have to move old-to-young referenced objects into same generation.
-     *
-     * Use special version of VTABLE_mark for it.
-     */
-    interp->gc_sys->mark_pmc_header = gc_gms_vtable_mark_propagate;
-    interp->gc_sys->mark_str_header = gc_gms_string_mark_propagate;
+static void
+gc_gms_cleanup_dirty_list(PARROT_INTERP,
+        ARGIN(MarkSweep_GC *self),
+        ARGIN(Parrot_Pointer_Array *dirty_list),
+        size_t gen)
+{
+}
 
-    for (i = 2; i > 0; i--) {
-        /* It can be our first move to this generation */
-        List_Item_Header *tmp = old_object_tails[i]
-                              ? old_object_tails[i]
-                              : self->objects[i]->first;
+static void
+gc_gms_process_dirty_list(PARROT_INTERP,
+        ARGIN(MarkSweep_GC *self),
+        ARGIN(Parrot_Pointer_Array *dirty_list))
+{
+}
 
-        // FIXME. Something wrong with updating tails.
-        tmp = self->objects[i]->first;
+static void
+gc_gms_process_work_list(PARROT_INTERP,
+        ARGIN(MarkSweep_GC *self),
+        ARGIN(Parrot_Pointer_Array *work_list))
+{
+}
 
-        /* We are "marking" this generation */
-        self->current_generation = i;
-
-        /* mark can append more objects to this list */
-        while (tmp) {
-            PMC *pmc = LLH2Obj_typed(tmp, PMC);
-
-            /*
-             * Invariant: Objects in older generation painted black:
-             * 1. By write_barrier.
-             * 2. By trace_roots.
-             * 3. By reference from young objects.
-             */
-            if (PObj_live_TEST(pmc)) {
-                if (PObj_custom_mark_TEST(pmc))
-                    VTABLE_mark(interp, pmc);
-
-                if (PMC_metadata(pmc))
-                    Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc));
-            }
-
-            tmp = tmp->next;
-        }
-    }
+static void
+gc_gms_sweep_pools(PARROT_INTERP,
+        ARGIN(MarkSweep_GC *self),
+        ARGIN(Parrot_Pointer_Array *work_list))
+{
+}
 
 
-    interp->gc_sys->mark_str_header = gc_gms_mark_string_header;
-    interp->gc_sys->mark_pmc_header = gc_gms_mark_pmc_header;
+/*
 
-    gc_gms_check_sanity(interp);
+=item C<static void gc_gms_mark_pmc_header(PARROT_INTERP, PMC *pmc)>
 
-#ifndef NDEBUG
-    // DEBUG ONLY. Simple recursive check
-    interp->gc_sys->mark_pmc_header = gc_gms_pmc_validate;
-    interp->gc_sys->mark_str_header = gc_gms_string_validate;
+mark as grey
 
-    for (i = 2; i > 0; i--) {
-        /* It can be our first move to this generation */
-        List_Item_Header *tmp = self->objects[i]->first;
+=cut
 
-        while (tmp) {
-            PMC *pmc = LLH2Obj_typed(tmp, PMC);
-            tmp = tmp->next;
-        }
+*/
 
-        tmp = self->objects[i]->first;
+static void
+gc_gms_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
+{
+    ASSERT_ARGS(gc_gms_mark_pmc_header)
+    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    List_Item_Header  *item = Obj2LLH(pmc);
+    size_t             gen  = PObj_to_generation(pmc);
 
-        /* We are "marking" this generation */
-        self->current_generation = i;
+    /* Object was already marked as grey. Or live. Or dead. Skip it */
+    if (PObj_is_live_or_free_TESTALL(pmc) || PObj_constant_TEST(pmc))
+        return;
 
-        while (tmp) {
-            PMC *pmc = LLH2Obj_typed(tmp, PMC);
+    /* mark it live. Even if it's from older generation we can have link
+     * _from_ young object which should keep it alive */
+    PObj_live_SET(pmc);
 
-            if (PObj_live_TEST(pmc)) {
+    /* If object too old - skip it */
+    if (gen > self->current_generation)
+        return;
 
-                if (PObj_custom_mark_TEST(pmc))
-                    VTABLE_mark(interp, pmc);
-
-                if (PMC_metadata(pmc))
-                    Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc));
-            }
-
-            tmp = tmp->next;
-        }
-    }
-
-    interp->gc_sys->mark_str_header = gc_gms_mark_string_header;
-    interp->gc_sys->mark_pmc_header = gc_gms_mark_pmc_header;
-#endif
+    LIST_REMOVE(self->objects[gen], item);
+    LIST_APPEND(self->root_objects, item);
 }
 
 /*
 
-=item C<static void gc_gms_pmc_validate(PARROT_INTERP, PMC *pmc)>
+=item C<static void gc_gms_mark_string_header(PARROT_INTERP, STRING *str)>
 
-=item C<static void gc_gms_string_validate(PARROT_INTERP, STRING *s)>
-
-Validate pmc/string objects re current generation
+Mark String
 
 =cut
 
 */
 
 static void
-gc_gms_pmc_validate(PARROT_INTERP, ARGIN(PMC *pmc))
+gc_gms_mark_string_header(PARROT_INTERP, ARGIN_NULLOK(STRING *str))
 {
-    ASSERT_ARGS(gc_gms_pmc_validate)
+    ASSERT_ARGS(gc_gms_mark_string_header)
+    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    List_Item_Header  *item = Obj2LLH(str);
+    size_t             gen  = PObj_to_generation(str);
 
-    MarkSweep_GC  *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-
-    if (PObj_constant_TEST(pmc))
+    /* If object too old - skip it */
+    if (gen > self->current_generation)
         return;
 
-    PARROT_ASSERT(pobj2gen((PObj *)pmc) >= self->current_generation
-                  || !"Got object from wrong generation");
-
-    if (PObj_custom_mark_TEST(pmc))
-        VTABLE_mark(interp, pmc);
-}
-
-static void
-gc_gms_string_validate(PARROT_INTERP, ARGIN(STRING *s))
-{
-    ASSERT_ARGS(gc_gms_string_validate)
-
-    MarkSweep_GC  *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-
-    if (PObj_constant_TEST(s))
+    /* Object was already marked as grey. Or live. Or dead. Skip it */
+    if (PObj_is_live_or_free_TESTALL(str))
         return;
 
-    PARROT_ASSERT(pobj2gen((PObj *)s) >= self->current_generation);
+    /* mark it live */
+    PObj_live_SET(str);
 }
+
 
 /*
 
@@ -1249,15 +1082,15 @@ gc_gms_finalize(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_finalize)
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    size_t        i;
 
     Parrot_gc_str_finalize(interp, &self->string_gc);
 
-    Parrot_list_destroy(interp, self->objects[0]);
-    Parrot_list_destroy(interp, self->objects[1]);
-    Parrot_list_destroy(interp, self->objects[2]);
-    Parrot_list_destroy(interp, self->strings[0]);
-    Parrot_list_destroy(interp, self->strings[1]);
-    Parrot_list_destroy(interp, self->strings[2]);
+    for (i = 0; i < MAX_COLLECTIONS; i++) {
+        Parrot_pa_destroy(interp, self->objects[0]);
+        Parrot_pa_destroy(interp, self->strings[0]);
+    }
+
     Parrot_gc_pool_destroy(interp, self->pmc_allocator);
     Parrot_gc_pool_destroy(interp, self->string_allocator);
     Parrot_gc_fixed_allocator_destroy(interp, self->fixed_size_allocator);
@@ -1315,40 +1148,6 @@ gc_gms_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
 
 /*
 
-=item C<static void gc_gms_mark_pmc_header(PARROT_INTERP, PMC *pmc)>
-
-mark as grey
-
-=cut
-
-*/
-
-static void
-gc_gms_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
-{
-    ASSERT_ARGS(gc_gms_mark_pmc_header)
-    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    List_Item_Header  *item = Obj2LLH(pmc);
-    size_t             gen  = PObj_to_generation(pmc);
-
-    /* Object was already marked as grey. Or live. Or dead. Skip it */
-    if (PObj_is_live_or_free_TESTALL(pmc) || PObj_constant_TEST(pmc))
-        return;
-
-    /* mark it live. Even if it's from older generation we can have link
-     * _from_ young object which should keep it alive */
-    PObj_live_SET(pmc);
-
-    /* If object too old - skip it */
-    if (gen > self->current_generation)
-        return;
-
-    LIST_REMOVE(self->objects[gen], item);
-    LIST_APPEND(self->root_objects, item);
-}
-
-/*
-
 =item C<static int gc_gms_is_pmc_ptr(PARROT_INTERP, void *ptr)>
 
 establish if *ptr is.owned
@@ -1362,9 +1161,12 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_gms_is_pmc_ptr)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    return gc_gms_is_ptr_owned(interp, ptr, self->pmc_allocator, self->objects[0])
-           || gc_gms_is_ptr_owned(interp, ptr, self->pmc_allocator, self->objects[1])
-           || gc_gms_is_ptr_owned(interp, ptr, self->pmc_allocator, self->objects[2]);
+    size_t             i;
+    for (i = 0; i < MAX_COLLECTIONS; i++) {
+        if (gc_gms_is_ptr_owned(interp, ptr, self->pmc_allocator, self->objects[i]))
+            return 1;
+    }
+    return 0;
 }
 
 /*
@@ -1480,9 +1282,11 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_gms_is_string_ptr)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    return gc_gms_is_ptr_owned(interp, ptr, self->string_allocator, self->strings[0])
-           || gc_gms_is_ptr_owned(interp, ptr, self->string_allocator, self->strings[1])
-           || gc_gms_is_ptr_owned(interp, ptr, self->string_allocator, self->strings[2]);
+    size_t             i;
+    for (i = 0; i < MAX_COLLECTIONS; i++) {
+        if (gc_gms_is_ptr_owned(interp, ptr, self->string_allocator, self->objects[i]))
+            return 1;
+    }
 }
 
 /*
@@ -1542,36 +1346,6 @@ gc_gms_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
 
 /*
 
-=item C<static void gc_gms_mark_string_header(PARROT_INTERP, STRING *str)>
-
-Mark String
-
-=cut
-
-*/
-
-static void
-gc_gms_mark_string_header(PARROT_INTERP, ARGIN_NULLOK(STRING *str))
-{
-    ASSERT_ARGS(gc_gms_mark_string_header)
-    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    List_Item_Header  *item = Obj2LLH(str);
-    size_t             gen  = PObj_to_generation(str);
-
-    /* If object too old - skip it */
-    if (gen > self->current_generation)
-        return;
-
-    /* Object was already marked as grey. Or live. Or dead. Skip it */
-    if (PObj_is_live_or_free_TESTALL(str))
-        return;
-
-    /* mark it live */
-    PObj_live_SET(str);
-}
-
-/*
-
 =item C<static void gc_gms_sweep_string_cb(PARROT_INTERP, PObj *obj)>
 
 destroy string *obj
@@ -1610,9 +1384,10 @@ gc_gms_iterate_live_strings(PARROT_INTERP,
     ASSERT_ARGS(gc_gms_iterate_live_strings)
 
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    gc_gms_iterate_string_list(interp, self->strings[0], callback, data);
-    gc_gms_iterate_string_list(interp, self->strings[1], callback, data);
-    gc_gms_iterate_string_list(interp, self->strings[2], callback, data);
+    size_t             i;
+    for (i = 0; i < MAX_COLLECTIONS; i++) {
+        gc_gms_iterate_string_list(interp, self->strings[i], callback, data);
+    }
 }
 
 /*
@@ -1642,77 +1417,6 @@ gc_gms_iterate_string_list(PARROT_INTERP,
     }
 }
 
-
-/*
-
-=item C<static void gc_gms_vtable_mark_propagate(PARROT_INTERP, PMC *pmc)>
-
-propogate to next generation if req
-
-=cut
-
-*/
-
-static void
-gc_gms_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
-{
-    ASSERT_ARGS(gc_gms_vtable_mark_propagate)
-
-    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    List_Item_Header  *item = Obj2LLH(pmc);
-    size_t             gen  = PObj_to_generation(pmc);
-
-    PARROT_ASSERT(!PObj_on_free_list_TEST(pmc)
-            || !"Attempt to mark dead object");
-
-    /* Objects from older generation will stay */
-    if (gen > self->current_generation)
-        return;
-
-    /* "Constant"... */
-    if (pmc->flags & PObj_constant_FLAG)
-        return;
-
-    LIST_REMOVE(self->objects[gen], item);
-    LIST_APPEND(self->objects[self->current_generation], item);
-    gc_gms_set_gen_flags(interp, pmc, self->current_generation);
-
-    PObj_live_SET(pmc);
-}
-
-/*
-
-=item C<static void gc_gms_string_mark_propagate(PARROT_INTERP, STRING *s)>
-
-propogate to next generation if req
-
-=cut
-
-*/
-
-static void
-gc_gms_string_mark_propagate(PARROT_INTERP, ARGIN(STRING *s))
-{
-    ASSERT_ARGS(gc_gms_string_mark_propagate)
-
-    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    List_Item_Header  *item = Obj2LLH(s);
-    size_t             gen  = PObj_to_generation(s);
-
-    PARROT_ASSERT(item->owner == self->strings[gen]);
-
-    /* Objects from older generation will stay */
-    if (gen >= self->current_generation)
-        return;
-
-    /* "Constant"... */
-    if (s->flags & PObj_constant_FLAG)
-        return;
-
-    LIST_REMOVE(self->strings[gen], item);
-    LIST_APPEND(self->strings[self->current_generation], item);
-    gc_gms_set_gen_flags(interp, (PMC *)s, self->current_generation);
-}
 
 /*
 =item C<static void gc_gms_sweep_pool(PARROT_INTERP, Pool_Allocator *pool,
@@ -2194,8 +1898,9 @@ gc_gms_set_gen_flags(PARROT_INTERP, ARGIN(PMC *pmc), int gen)
 {
     ASSERT_ARGS(gc_gms_set_gen_flags)
     pmc->flags &= ~(PObj_GC_generation_0_FLAG
-        | PObj_GC_generation_1_FLAG);
-    pmc->flags |= gen2flags(gen);
+        | PObj_GC_generation_1_FLAG
+        | PObj_GC_generation_2_FLAG);
+    pmc->flags |= GEN2FLAGS(gen);
 }
 
 /*
@@ -2246,14 +1951,13 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
 {
     ASSERT_ARGS(gc_gms_print_stats)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    size_t            i;
 
-    fprintf(stderr, "%s\ngen: %d\n0: %d %d\n1: %d %d\n2: %d %d\n",
-            header,
-            gen,
-            self->objects[0]->count, self->strings[0]->count,
-            self->objects[1]->count, self->strings[1]->count,
-            self->objects[2]->count, self->strings[2]->count);
+    fprintf(stderr, "%s\ngen: %d\n", header, gen);
 
+    for (i = 0; i < MAX_COLLECTIONS; i++)
+        fprintf(stderr, "%d: %d %d\n",
+                self->objects[i]->count, self->strings[i]->count);
 
     fprintf(stderr, "PMC: %d\n", Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
     fprintf(stderr, "STRING: %d\n", Parrot_gc_pool_allocated_size(interp, self->string_allocator));
