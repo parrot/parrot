@@ -918,7 +918,7 @@ gc_gms_process_work_list(PARROT_INTERP,
 
         PARROT_ASSERT(!(pmc->flags & PObj_GC_on_dirty_list_FLAG));
 
-        Parrot_pa_remove(interp, work_list, item);
+        Parrot_pa_remove(interp, work_list, item->ptr);
         item->ptr = Parrot_pa_insert(interp, self->objects[gen], item););
 
 }
@@ -958,14 +958,14 @@ gc_gms_sweep_pools(PARROT_INTERP,
                 PObj_live_CLEAR(pmc);
 
                 if (move_to_old) {
-                    Parrot_pa_remove(interp, self->objects[i], item);
+                    Parrot_pa_remove(interp, self->objects[i], ptr);
                     item->ptr = Parrot_pa_insert(interp, self->objects[i + 1], item);
                     gc_gms_set_gen_flags(interp, pmc, i + 1);
                     gc_gms_seal_object(interp, pmc);
                 }
             }
             else if (!PObj_constant_TEST(pmc)) {
-                Parrot_pa_remove(interp, self->objects[i], item);
+                Parrot_pa_remove(interp, self->objects[i], ptr);
 
                 /* this is manual inlining of Parrot_pmc_destroy() */
                 if (PObj_custom_destroy_TEST(pmc))
@@ -1018,7 +1018,7 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
     if (pmc->flags & PObj_GC_on_dirty_list_FLAG)
         return;
 
-    Parrot_pa_remove(interp, self->objects[gen], item);
+    Parrot_pa_remove(interp, self->objects[gen], item->ptr);
     item->ptr = Parrot_pa_insert(interp, self->work_list, item);
 }
 
@@ -1799,7 +1799,7 @@ gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
     if (!gen)
         return;
 
-    Parrot_pa_remove(interp, self->objects[gen], item);
+    Parrot_pa_remove(interp, self->objects[gen], item->ptr);
     item->ptr = Parrot_pa_insert(interp, self->dirty_list, item);
 
     pmc->flags |= PObj_GC_on_dirty_list_FLAG;
