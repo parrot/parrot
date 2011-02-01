@@ -931,11 +931,10 @@ gc_gms_mark_string_header(PARROT_INTERP, ARGIN_NULLOK(STRING *str))
 {
     ASSERT_ARGS(gc_gms_mark_string_header)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    List_Item_Header  *item = Obj2LLH(str);
-    size_t             gen  = PObj_to_generation(str);
+    size_t             gen  = POBJ2GEN(str);
 
     /* If object too old - skip it */
-    if (gen > self->current_generation)
+    if (gen > self->gen_to_collect)
         return;
 
     /* Object was already marked as grey. Or live. Or dead. Skip it */
@@ -1115,25 +1114,22 @@ static PMC*
 gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_gms_allocate_pmc_header)
-    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    List_Item_Header *ptr;
-    PMC              *ret;
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    Pool_Allocator   * const pool = self->pmc_allocator;
+    pmc_alloc_struct *ptr;
 
     gc_gms_maybe_mark_and_sweep(interp);
 
     /* Increase used memory. Not precisely accurate due Pool_Allocator paging */
     ++interp->gc_sys->stats.header_allocs_since_last_collect;
+
     interp->gc_sys->stats.memory_allocated      += sizeof (PMC);
     interp->gc_sys->stats.mem_used_last_collect += sizeof (PMC);
 
-    ptr = (List_Item_Header *)Parrot_gc_pool_allocate(interp,
-            self->pmc_allocator);
-    LIST_APPEND(self->objects[0], ptr);
+    ptr         = (pmc_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
+    ptr->ptr    = Parrot_pa_insert(interp, self->objects[0], ptr);
 
-    ret = LLH2Obj_typed(ptr, PMC);
-    ret->flags = 0;
-
-    return ret;
+    return &ptr->pmc;
 }
 
 static void
@@ -1141,17 +1137,22 @@ gc_gms_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_free_pmc_header)
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+
     if (pmc) {
+        size_t gen = POBJ2GEN(pmc);
+
+        /* We should never free objects from dirty list directly! */
+        PARROT_ASSERT(!(pmc->flags & PObj_GC_on_dirty_list_FLAG));
+
         if (PObj_on_free_list_TEST(pmc))
             return;
 
-        Parrot_list_remove(interp, self->objects[PObj_to_generation(pmc)], Obj2LLH(pmc));
-
+        Parrot_pa_remove(interp, self->objects[gen], PMC2PAC(pmc)->ptr);
         PObj_on_free_list_SET(pmc);
 
         Parrot_pmc_destroy(interp, pmc);
 
-        Parrot_gc_pool_free(interp, self->pmc_allocator, Obj2LLH(pmc));
+        Parrot_gc_pool_free(interp, self->pmc_allocator, PMC2PAC(pmc));
 
         --interp->gc_sys->stats.header_allocs_since_last_collect;
         interp->gc_sys->stats.memory_allocated      -= sizeof (PMC);
