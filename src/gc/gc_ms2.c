@@ -641,7 +641,7 @@ Parrot_gc_ms2_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
                                 : GC_DEFAULT_DYNAMIC_THRESHOLD;
         self->min_threshold     = args->min_threshold
                                 ? args->min_threshold
-                                : Parrot_sysmem_amount(interp) / 8;
+                                : 4 * 1024 * 1024;
         self->gc_threshold      = self->min_threshold;
 
         Parrot_gc_str_initialize(interp, &self->string_gc);
