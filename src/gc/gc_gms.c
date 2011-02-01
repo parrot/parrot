@@ -1404,27 +1404,21 @@ gc_gms_is_ptr_owned(PARROT_INTERP, ARGIN_NULLOK(void *ptr),
 {
     ASSERT_ARGS(gc_gms_is_ptr_owned)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    List_Item_Header *item = Obj2LLH(ptr);
     PObj             *obj  = (PObj *)ptr;
+    pmc_alloc_struct *item = PMC2PAC(ptr);
 
     if (!obj || !item)
         return 0;
 
-    if (!Parrot_gc_pool_is_maybe_owned(interp, pool, item))
+    if (!Parrot_gc_pool_is_owned(interp, pool, item))
         return 0;
 
     /* black or white objects marked already. */
     if (PObj_is_live_or_free_TESTALL(obj))
         return 0;
 
-    if (!Parrot_gc_pool_is_owned(interp, pool, item))
-        return 0;
-
     /* Pool.is_owned isn't precise enough (yet) */
-    if (Parrot_list_contains(interp, list, item))
-        return 1;
-
-    return 0;
+    return Parrot_pa_is_owned(interp, list, item, item->ptr);
 }
 
 
