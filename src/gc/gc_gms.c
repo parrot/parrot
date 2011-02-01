@@ -402,6 +402,9 @@ static void gc_gms_set_gen_flags(PARROT_INTERP, ARGIN(PMC *pmc), int gen)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void gc_gms_swap_vtables(ARGIN(PMC *pmc))
+        __attribute__nonnull__(1);
+
 static void gc_gms_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -419,6 +422,10 @@ static void gc_gms_unblock_GC_mark(PARROT_INTERP)
 
 static void gc_gms_unblock_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
+
+static void gc_gms_unseal_object(PARROT_INTERP, ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
@@ -554,6 +561,8 @@ static int pobj2gen(ARGIN(PObj *pmc))
 #define ASSERT_ARGS_gc_gms_set_gen_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_gc_gms_swap_vtables __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_sweep_pmc_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj))
@@ -567,6 +576,9 @@ static int pobj2gen(ARGIN(PObj *pmc))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_unblock_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_gms_unseal_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_write_barrier __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -1788,17 +1800,36 @@ gc_gms_seal_object(PARROT_INTERP, ARGIN(PMC *pmc))
     /* "Seal" object with write barrier */
     VTABLE  *t   = pmc->vtable;
 
-    if (!(t->flags & VTABLE_IS_WRITE_BARRIER_FLAG)) {
-        PARROT_ASSERT(pmc->vtable);
-        PARROT_ASSERT(pmc->vtable->wb_variant_vtable);
+    PARROT_ASSERT(!(t->flags & VTABLE_IS_WRITE_BARRIER_FLAG));
+    gc_gms_swap_vtables(pmc);
+}
 
-        pmc->vtable = pmc->vtable->wb_variant_vtable;
-        pmc->vtable->wb_variant_vtable = t;
+static void
+gc_gms_unseal_object(PARROT_INTERP, ARGIN(PMC *pmc))
+{
+    ASSERT_ARGS(gc_gms_seal_object)
+    /* "Seal" object with write barrier */
+    VTABLE  *t   = pmc->vtable;
 
-        PARROT_ASSERT(pmc->vtable != pmc->vtable->wb_variant_vtable);
-        PARROT_ASSERT(pmc->vtable != pmc->vtable->ro_variant_vtable);
-    }
+    PARROT_ASSERT(t->flags & VTABLE_IS_WRITE_BARRIER_FLAG);
+    gc_gms_swap_vtables(pmc);
+}
 
+static void
+gc_gms_swap_vtables(ARGIN(PMC *pmc))
+{
+    ASSERT_ARGS(gc_gms_swap_vtables)
+
+    VTABLE  *t   = pmc->vtable;
+
+    PARROT_ASSERT(pmc->vtable);
+    PARROT_ASSERT(pmc->vtable->wb_variant_vtable);
+
+    pmc->vtable = pmc->vtable->wb_variant_vtable;
+    pmc->vtable->wb_variant_vtable = t;
+
+    PARROT_ASSERT(pmc->vtable != pmc->vtable->wb_variant_vtable);
+    PARROT_ASSERT(pmc->vtable != pmc->vtable->ro_variant_vtable);
 }
 
 /*
