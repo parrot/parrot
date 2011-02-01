@@ -935,13 +935,15 @@ gc_gms_sweep_pools(PARROT_INTERP,
 
     size_t i;
 
-    for (i = 0; i < self->gen_to_collect; i++) {
+    for (i = 0; i <= self->gen_to_collect; i++) {
         /* Don't move to generation beyond last */
         int move_to_old = (i + 1) != MAX_GENERATIONS;
 
         POINTER_ARRAY_ITER(self->objects[i],
             pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
             PMC              *pmc  = &(item->pmc);
+
+            PARROT_ASSERT(POBJ2GEN(pmc) == i);
 
             /* Paint live objects white */
             if (PObj_live_TEST(pmc)) {
@@ -955,7 +957,7 @@ gc_gms_sweep_pools(PARROT_INTERP,
                 }
             }
             else if (!PObj_constant_TEST(pmc)) {
-                Parrot_pa_remove(interp, self->objects[i], PMC2PAC(pmc)->ptr);
+                Parrot_pa_remove(interp, self->objects[i], item);
 
                 /* this is manual inlining of Parrot_pmc_destroy() */
                 if (PObj_custom_destroy_TEST(pmc))
