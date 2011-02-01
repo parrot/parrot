@@ -76,6 +76,7 @@ typedef void (*gc_object_fn_type)(PARROT_INTERP, struct Memory_Pools *, struct F
 
 typedef enum {
     TOTAL_MEM_ALLOC = 1,
+    TOTAL_MEM_USED,
     GC_MARK_RUNS,
     GC_COLLECT_RUNS,
     ACTIVE_PMCS,
@@ -348,6 +349,10 @@ size_t Parrot_gc_total_memory_allocated(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+size_t Parrot_gc_total_memory_used(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 int Parrot_gc_total_pmcs(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -489,6 +494,8 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_total_memory_allocated \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_gc_total_memory_used __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_total_pmcs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

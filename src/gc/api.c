@@ -805,7 +805,13 @@ Return the number of lazy mark runs the GC has performed.
 
 =item C<size_t Parrot_gc_total_memory_allocated(PARROT_INTERP)>
 
-Return the total number of memory allocations made by the GC.
+Return the total number of bytes allocated by the GC.
+
+=item C<size_t Parrot_gc_total_memory_used(PARROT_INTERP)>
+
+Return the total number of bytes used. This is lower than the allocated
+memory because of fragmentation and freed memory that is not returned
+to the OS.
 
 =item C<size_t Parrot_gc_headers_alloc_since_last_collect(PARROT_INTERP)>
 
@@ -853,6 +859,14 @@ Parrot_gc_total_memory_allocated(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_gc_total_memory_allocated)
     return interp->gc_sys->get_gc_info(interp, TOTAL_MEM_ALLOC);
+}
+
+PARROT_EXPORT
+size_t
+Parrot_gc_total_memory_used(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_gc_total_memory_used)
+    return interp->gc_sys->get_gc_info(interp, TOTAL_MEM_USED);
 }
 
 PARROT_EXPORT

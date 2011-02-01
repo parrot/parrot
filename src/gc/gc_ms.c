@@ -1800,6 +1800,8 @@ Parrot_gc_get_info(SHIM_INTERP, Interpinfo_enum which, ARGIN(GC_Statistics *stat
     switch (which) {
         case TOTAL_MEM_ALLOC:
             return stats->memory_allocated;
+        case TOTAL_MEM_USED:
+            return stats->memory_used;
         case GC_MARK_RUNS:
             return stats->gc_mark_runs;
         case GC_COLLECT_RUNS:
