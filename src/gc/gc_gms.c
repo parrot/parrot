@@ -1822,6 +1822,7 @@ static void
 gc_gms_check_sanity(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_check_sanity)
+#if 0
 #ifndef NDEBUG
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     List_Item_Header *tmp;
@@ -1837,6 +1838,7 @@ gc_gms_check_sanity(PARROT_INTERP)
             tmp = tmp->next;
         }
     }
+#endif
 #endif
 }
 
@@ -1860,9 +1862,13 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
 
     fprintf(stderr, "%s\ngen: %d\n", header, gen);
 
+#if 0
+    Pointer_Array doens't keep count.
+
     for (i = 0; i < MAX_COLLECTIONS; i++)
         fprintf(stderr, "%d: %d %d\n",
                 self->objects[i]->count, self->strings[i]->count);
+#endif
 
     fprintf(stderr, "PMC: %d\n", Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
     fprintf(stderr, "STRING: %d\n", Parrot_gc_pool_allocated_size(interp, self->string_allocator));
@@ -1892,13 +1898,14 @@ static void
 gc_gms_ensure_flags_in_list(PARROT_INTERP, ARGIN(Parrot_Pointer_Array* list))
 {
     ASSERT_ARGS(gc_gms_ensure_flags_in_list)
-
+#if 0
     List_Item_Header *tmp = list->first;
     while (tmp) {
         PObj *obj = LLH2Obj_typed(tmp, PObj);
         PARROT_ASSERT(!(obj->flags & b_PObj_live_FLAG));
         tmp = tmp->next;
     }
+#endif
 }
 
 /*
