@@ -1224,7 +1224,8 @@ gc_gms_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
 {
     ASSERT_ARGS(gc_gms_allocate_string_header)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    List_Item_Header *ptr;
+    Pool_Allocator   *pool = self->string_allocator;
+    string_alloc_struct *ptr;
     STRING           *ret;
 
     gc_gms_maybe_mark_and_sweep(interp);
@@ -1234,11 +1235,10 @@ gc_gms_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
     interp->gc_sys->stats.memory_allocated      += sizeof (STRING);
     interp->gc_sys->stats.mem_used_last_collect += sizeof (STRING);
 
-    ptr = (List_Item_Header *)Parrot_gc_pool_allocate(interp,
-            self->string_allocator);
-    LIST_APPEND(self->strings[0], ptr);
+    ptr = (string_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
+    ptr->ptr = Parrot_pa_insert(interp, self->strings[0], ptr);
 
-    ret = LLH2Obj_typed(ptr, STRING);
+    ret = &ptr->str;
     memset(ret, 0, sizeof (STRING));
     return ret;
 }
@@ -1248,16 +1248,21 @@ gc_gms_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
 {
     ASSERT_ARGS(gc_gms_free_string_header)
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    if (s) {
-        if (PObj_on_free_list_TEST(s))
-            return;
-        Parrot_list_remove(interp, self->strings[PObj_to_generation(s)], Obj2LLH(s));
-        PObj_on_free_list_SET(s);
+
+    if (s
+    && !PObj_on_free_list_TEST(s)) {
+        MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+        size_t        gen  = POBJ2GEN(s);
+
+        Parrot_pa_remove(interp, self->strings[gen], STR2PAC(s)->ptr);
 
         if (Buffer_bufstart(s) && !PObj_external_TEST(s))
-            Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, (Buffer *)s);
+            Parrot_gc_str_free_buffer_storage(interp,
+                &self->string_gc, (Buffer *)s);
 
-        Parrot_gc_pool_free(interp, self->string_allocator, Obj2LLH(s));
+        PObj_on_free_list_SET(s);
+
+        Parrot_gc_pool_free(interp, self->string_allocator, STR2PAC(s));
 
         --interp->gc_sys->stats.header_allocs_since_last_collect;
         interp->gc_sys->stats.memory_allocated      -= sizeof (STRING);
