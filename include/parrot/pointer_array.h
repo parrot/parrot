@@ -38,6 +38,10 @@ typedef struct Parrot_Pointer_Array {
     /* Total number of allocated chunks */
     size_t                       total_chunks;
 
+#ifndef NDEBUG
+    size_t                       count;
+#endif
+
     Parrot_Pointer_Array_Chunk **chunks;
 } Parrot_Pointer_Array;
 
