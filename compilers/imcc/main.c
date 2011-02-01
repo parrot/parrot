@@ -121,6 +121,15 @@ imcc_new(PARROT_INTERP)
 }
 
 PARROT_EXPORT
+void
+imcc_reset(ARGMOD(imc_info_t *imcc))
+{
+    Interp * interp = imcc->interp;
+    memset(imcc, 0, sizeof(imc_info_t));
+    imcc->interp = interp;
+}
+
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 imc_info_t *
 imcc_new_pmc(PMC * interp_pmc)
@@ -368,10 +377,10 @@ static PMC *
 imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
         int is_file, int is_pasm)
 {
-    struct _imc_info_t * const imc_save = imcc; //prepare_reentrant_compile(imcc);
+    struct _imc_info_t * const imc_save = prepare_reentrant_compile(imcc);
     struct _imc_info_t * imcc_use = imc_save ? imc_save : imcc;
     PMC * const result = imcc_run_compilation_internal(imcc, fullname, is_file, is_pasm);
-    //exit_reentrant_compile(imcc, imc_save);
+    exit_reentrant_compile(imcc, imc_save);
     return result;
 }
 
@@ -392,7 +401,7 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 
     IMCC_push_parser_state(imcc, source, is_pasm);
 
-    imcc_compile_buffer_safe(imcc, yyscanner, source, 1, is_pasm);
+    imcc_compile_buffer_safe(imcc, yyscanner, source, is_file, is_pasm);
 
     yylex_destroy(yyscanner);
     imc_cleanup(imcc, NULL);
@@ -461,7 +470,7 @@ exit_reentrant_compile(ARGMOD(imc_info_t * imcc),
 {
     ASSERT_ARGS(exit_reentrant_compile)
     if (imc_info) {
-        imcc = imc_info->prev;
+        PARROT_ASSERT(imcc == imc_info->prev);
         if (imc_info->globals)
             mem_sys_free(imc_info->globals);
 

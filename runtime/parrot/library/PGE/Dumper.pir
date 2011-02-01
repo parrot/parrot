@@ -6,8 +6,6 @@ PGE::Dumper - various methods for displaying PGE structures
 
 =cut
 
-.sub __onload
-.end
 
 .namespace [ "PGE";"Match" ]
 

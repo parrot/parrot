@@ -64,6 +64,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler {
                 "IMCCompiler: compiler does not support the target option");
         /* TODO: Handle outer_ctx */
         pf = imcc_compile_string(attrs->imcc_info, source, attrs->is_pasm);
+        imcc_reset(attrs->imcc_info);
         RETURN(PMC *pf);
     }
 
