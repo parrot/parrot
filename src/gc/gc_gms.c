@@ -99,20 +99,23 @@ TBD
 
 #define PANIC_OUT_OF_MEM(size) failed_allocation(__LINE__, (size))
 
-/* Get generation from PObj->flags */
-#define PObj_to_generation(pobj)                      \
-    ((pobj)->flags & PObj_GC_generation_0_FLAG        \
-        ? 1                                           \
-        : ((pobj)->flags) & PObj_GC_generation_1_FLAG \
-            ? 2                                       \
-            : 0)
+/* Maximum number of collections */
+#define MAX_COLLECTIONS     8
 
-#define generation_to_flags(gen)                      \
-    (gen) == 1                                        \
-        ? PObj_GC_generation_0_FLAG                   \
-        : (gen) == 2                                  \
-            ? PObj_GC_generation_1_FLAG               \
-            : 0
+/* Get generation from PObj->flags */
+#define PObj_to_generation(pobj)                                \
+    (                                                           \
+        (((pobj)->flags & PObj_GC_generation_0_FLAG) ? 1 : 0)   \
+        + (((pobj)->flags) & PObj_GC_generation_1_FLAG ? 2 : 0) \
+        + (((pobj)->flags) & PObj_GC_generation_2_FLAG ? 4 : 0) \
+    )
+
+#define generation_to_flags(gen)                        \
+    (                                                   \
+        ((gen) & 1 ? PObj_GC_generation_0_FLAG : 0)     \
+        | ((gen) & 2 ? PObj_GC_generation_1_FLAG : 0)   \
+        | ((gen) & 4 ? PObj_GC_generation_2_FLAG : 0)   \
+    )
 
 /* Private information */
 typedef struct MarkSweep_GC {
@@ -692,7 +695,7 @@ Parrot_gc_gms_init(PARROT_INTERP)
 
         /* Collect every 256M allocated. */
         /* Hardcode for now. Will be configured via CLI */
-        self->gc_threshold = 256 * 1024 * 1024;
+        self->gc_threshold = 1 * 1024 * 1024;
     }
     interp->gc_sys->gc_private = self;
 
@@ -896,7 +899,6 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         while (tmp) {
             PMC *pmc = LLH2Obj_typed(tmp, PMC);
             PObj_live_CLEAR(pmc);
-            pmc->flags &= ~PObj_GC_generation_2_FLAG;
             tmp = tmp->next;
         }
 
@@ -919,7 +921,6 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         while (tmp) {
             PMC *pmc = LLH2Obj_typed(tmp, PMC);
             PObj_live_CLEAR(pmc);
-            pmc->flags &= ~PObj_GC_generation_2_FLAG;
             tmp = tmp->next;
         }
 
@@ -1001,8 +1002,6 @@ gc_gms_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
              * 3. By reference from young objects.
              */
             if (PObj_live_TEST(pmc)) {
-                pmc->flags |= PObj_GC_generation_2_FLAG;
-
                 if (PObj_custom_mark_TEST(pmc))
                     VTABLE_mark(interp, pmc);
 
@@ -1031,7 +1030,6 @@ gc_gms_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
 
         while (tmp) {
             PMC *pmc = LLH2Obj_typed(tmp, PMC);
-            pmc->flags &= ~PObj_GC_generation_2_FLAG;
             tmp = tmp->next;
         }
 
@@ -1044,7 +1042,6 @@ gc_gms_bring_them_together(PARROT_INTERP, ARGIN(List_Item_Header *old_object_tai
             PMC *pmc = LLH2Obj_typed(tmp, PMC);
 
             if (PObj_live_TEST(pmc)) {
-                pmc->flags |= PObj_GC_generation_2_FLAG;
 
                 if (PObj_custom_mark_TEST(pmc))
                     VTABLE_mark(interp, pmc);
@@ -1084,13 +1081,8 @@ gc_gms_pmc_validate(PARROT_INTERP, ARGIN(PMC *pmc))
     if (PObj_constant_TEST(pmc))
         return;
 
-    if (pmc->flags & PObj_GC_generation_2_FLAG)
-        return;
-
     PARROT_ASSERT(pobj2gen((PObj *)pmc) >= self->current_generation
                   || !"Got object from wrong generation");
-
-    pmc->flags |= PObj_GC_generation_2_FLAG;
 
     if (PObj_custom_mark_TEST(pmc))
         VTABLE_mark(interp, pmc);
@@ -1681,10 +1673,6 @@ gc_gms_vtable_mark_propagate(PARROT_INTERP, ARGIN(PMC *pmc))
     if (pmc->flags & PObj_constant_FLAG)
         return;
 
-    /* PMC was already processed */
-    if (pmc->flags & PObj_GC_generation_2_FLAG)
-        return;
-
     LIST_REMOVE(self->objects[gen], item);
     LIST_APPEND(self->objects[self->current_generation], item);
     gc_gms_set_gen_flags(interp, pmc, self->current_generation);
@@ -1749,7 +1737,7 @@ gc_gms_sweep_pool(PARROT_INTERP,
         if (PObj_live_TEST(obj)) {
             /* Paint live objects white */
             PObj_live_CLEAR(obj);
-            obj->flags &= ~(PObj_GC_wb_triggered_FLAG | PObj_GC_generation_2_FLAG);
+            obj->flags &= ~PObj_GC_wb_triggered_FLAG;
         }
         else if (!PObj_constant_TEST(obj)) {
             callback(interp, obj);
@@ -2300,7 +2288,6 @@ gc_gms_ensure_flags_in_list(PARROT_INTERP, ARGIN(Linked_List* list))
     while (tmp) {
         PObj *obj = LLH2Obj_typed(tmp, PObj);
         PARROT_ASSERT(!(obj->flags & b_PObj_live_FLAG));
-        PARROT_ASSERT(!(obj->flags & PObj_GC_generation_2_FLAG));
         tmp = tmp->next;
     }
 }
