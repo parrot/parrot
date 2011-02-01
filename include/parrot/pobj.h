@@ -145,27 +145,25 @@ typedef enum PObj_enum {
     PObj_constant_FLAG          = POBJ_FLAG(12),
     /* Marks the contents as coming from a non-Parrot source */
     PObj_external_FLAG          = POBJ_FLAG(13),
-    /* the Buffer is aligned to BUFFER_ALIGNMENT boundaries */
-    PObj_aligned_FLAG           = POBJ_FLAG(14),
     /* Mark the buffer as pointing to system memory */
-    PObj_sysmem_FLAG            = POBJ_FLAG(15),
+    PObj_sysmem_FLAG            = POBJ_FLAG(14),
 
 /* PObj usage FLAGs, COW & GC */
     /* The Buffer allows COW copies, and may have some. */
-    PObj_is_COWable_FLAG        = POBJ_FLAG(16),
+    PObj_is_COWable_FLAG        = POBJ_FLAG(15),
     /* Private flag for the GC system. Set if the PObj's in use as
      * far as the GC's concerned */
-    b_PObj_live_FLAG            = POBJ_FLAG(17),
+    b_PObj_live_FLAG            = POBJ_FLAG(16),
     /* Mark the object as on the free list */
-    b_PObj_on_free_list_FLAG    = POBJ_FLAG(18),
+    b_PObj_on_free_list_FLAG    = POBJ_FLAG(17),
 
 /* GC FLAGS */
     /* Set to true if the PObj has a custom mark routine */
-    PObj_custom_mark_FLAG       = POBJ_FLAG(19),
+    PObj_custom_mark_FLAG       = POBJ_FLAG(18),
     /* Set if the PObj has a destroy method that must be called */
-    PObj_custom_destroy_FLAG    = POBJ_FLAG(20),
+    PObj_custom_destroy_FLAG    = POBJ_FLAG(19),
     /* For debugging, report when this buffer gets moved around */
-    PObj_report_FLAG            = POBJ_FLAG(21),
+    PObj_report_FLAG            = POBJ_FLAG(20),
 
     /* Flags used by generation GC to determine generation object belong */
 
@@ -221,9 +219,6 @@ typedef enum PObj_enum {
 
 #define PObj_is_COWable_TEST(o) PObj_flag_TEST(is_COWable, o)
 #define PObj_is_COWable_SET(o) PObj_flag_SET(is_COWable, o)
-
-#define PObj_aligned_TEST(o) PObj_flag_TEST(aligned, o)
-#define PObj_aligned_SET(o) PObj_flag_SET(aligned, o)
 
 #define PObj_constant_TEST(o) PObj_flag_TEST(constant, o)
 #define PObj_constant_SET(o) PObj_flag_SET(constant, o)
