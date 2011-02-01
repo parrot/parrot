@@ -1685,9 +1685,10 @@ gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
     size_t            gen  = POBJ2GEN(pmc);
     pmc_alloc_struct *item = PMC2PAC(pmc);
 
-    PARROT_ASSERT(!(pmc->flags & PObj_GC_wb_triggered_FLAG)
-        || !"Second write barrier");
-    PARROT_ASSERT(gen || !"Write barrier on nursery object");
+    if (pmc->flags & PObj_GC_wb_triggered_FLAG)
+        return;
+    if (!gen)
+        return;
 
     Parrot_pa_remove(interp, self->objects[gen], item);
     item->ptr = Parrot_pa_insert(interp, self->dirty_list, item);
