@@ -766,6 +766,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     "dirty_list".
     */
     gc_gms_cleanup_dirty_list(interp, self, self->dirty_list, gen);
+    gc_gms_print_stats(interp, "After cleanup", gen);
 
     /*
     4. Trace root objects. According to "0. Pre-requirements" we will ignore all
@@ -777,6 +778,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         Parrot_gc_trace_root(interp->pdb->debugger, NULL, (Parrot_gc_trace_type)0);
     }
     gc_gms_check_sanity(interp);
+    gc_gms_print_stats(interp, "After trace_roots", gen);
 
     /*
     5. Iterate over "dirty_set" calling VTABLE_mark on it. It will move all
@@ -784,12 +786,14 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     */
     gc_gms_process_dirty_list(interp, self, self->dirty_list);
     gc_gms_check_sanity(interp);
+    gc_gms_print_stats(interp, "After dirty_list", gen);
 
     /*
     6. Iterate over "work_list" calling VTABLE_mark on it.
     */
     gc_gms_process_work_list(interp, self, self->work_list);
     gc_gms_check_sanity(interp);
+    gc_gms_print_stats(interp, "After work_list", gen);
 
     /*
     7. Sweep generations starting from K:
@@ -904,11 +908,15 @@ gc_gms_process_work_list(PARROT_INTERP,
         if (PMC_metadata(pmc))
             Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc)););
 
+    gc_gms_print_stats(interp, "Before cleaning work_list", self->gen_to_collect);
+
     /* Move processed objects back to own generation */
     POINTER_ARRAY_ITER(work_list,
         pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
         PMC              *pmc  = &(item->pmc);
         size_t            gen  = POBJ2GEN(pmc);
+
+        PARROT_ASSERT(!(pmc->flags & PObj_GC_on_dirty_list_FLAG));
 
         Parrot_pa_remove(interp, work_list, item);
         item->ptr = Parrot_pa_insert(interp, self->objects[gen], item););
@@ -943,7 +951,7 @@ gc_gms_sweep_pools(PARROT_INTERP,
             pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
             PMC              *pmc  = &(item->pmc);
 
-            PARROT_ASSERT(POBJ2GEN(pmc) == i);
+            PARROT_ASSERT(PObj_constant_TEST(pmc) || POBJ2GEN(pmc) == i);
 
             /* Paint live objects white */
             if (PObj_live_TEST(pmc)) {
@@ -1797,7 +1805,8 @@ gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
     pmc->flags |= PObj_GC_on_dirty_list_FLAG;
 
     /* We don't need it anymore */
-    gc_gms_unseal_object(interp, pmc);
+    if (pmc->vtable->flags & VTABLE_IS_WRITE_BARRIER_FLAG)
+        gc_gms_unseal_object(interp, pmc);
 }
 
 /*
@@ -2015,6 +2024,9 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
     fprintf(stderr, "%s\ngen: %d\n", header, gen);
 
 #ifndef NDEBUG
+    fprintf(stderr, "dirty: %d\nwork: %d\n",
+            self->dirty_list->count, self->work_list->count);
+
     for (i = 0; i < MAX_GENERATIONS; i++)
         fprintf(stderr, "%d: %d %d\n",
                 i, self->objects[i]->count, self->strings[i]->count);
