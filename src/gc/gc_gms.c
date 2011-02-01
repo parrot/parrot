@@ -930,8 +930,10 @@ gc_gms_sweep_pools(PARROT_INTERP,
             if (PObj_live_TEST(pmc)) {
                 PObj_live_CLEAR(pmc);
 
-                if (move_to_old)
+                if (move_to_old) {
+                    Parrot_pa_remove(interp, self->objects[i], item);
                     item->ptr = Parrot_pa_insert(interp, self->objects[i + 1], item);
+                }
             }
             else if (!PObj_constant_TEST(pmc)) {
                 Parrot_pa_remove(interp, self->objects[i], PMC2PAC(pmc)->ptr);
