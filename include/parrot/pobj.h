@@ -173,11 +173,6 @@ typedef enum PObj_enum {
     /* Object was marked dirty by write barrier */
     PObj_GC_on_dirty_list_FLAG  = POBJ_FLAG(25),
 
-    /* Mark that object is referenced from older generation */
-    PObj_GC_ref_generation_0_FLAG   = POBJ_FLAG(25),
-    PObj_GC_ref_generation_1_FLAG   = POBJ_FLAG(26),
-
-
 /* PMC specific FLAGs */
     /* call object finalizer */
     PObj_need_finalize_FLAG     = POBJ_FLAG(27),
