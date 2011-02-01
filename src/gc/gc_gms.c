@@ -407,15 +407,6 @@ static void gc_gms_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_sweep_pool(PARROT_INTERP,
-    ARGIN(Pool_Allocator *pool),
-    ARGIN(Parrot_Pointer_Array *list),
-    ARGIN(sweep_cb callback))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
-
 static void gc_gms_sweep_pools(PARROT_INTERP, ARGIN(MarkSweep_GC *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -570,11 +561,6 @@ static int pobj2gen(ARGIN(PObj *pmc))
 #define ASSERT_ARGS_gc_gms_sweep_pmc_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj))
-#define ASSERT_ARGS_gc_gms_sweep_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pool) \
-    , PARROT_ASSERT_ARG(list) \
-    , PARROT_ASSERT_ARG(callback))
 #define ASSERT_ARGS_gc_gms_sweep_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -1402,48 +1388,6 @@ gc_gms_iterate_live_strings(PARROT_INTERP,
     }
 }
 
-
-/*
-=item C<static void gc_gms_sweep_pool(PARROT_INTERP, Pool_Allocator *pool,
-Parrot_Pointer_Array *list, sweep_cb callback)>
-
-Helper function to sweep pool.
-
-=cut
-*/
-
-static void
-gc_gms_sweep_pool(PARROT_INTERP,
-        ARGIN(Pool_Allocator *pool),
-        ARGIN(Parrot_Pointer_Array *list),
-        ARGIN(sweep_cb callback))
-{
-    ASSERT_ARGS(gc_gms_sweep_pool)
-    List_Item_Header *tmp = list->first;
-    while (tmp) {
-        List_Item_Header *next = tmp->next;
-        PObj             *obj  = LLH2Obj_typed(tmp, PObj);
-        if (PObj_live_TEST(obj)) {
-            /* Paint live objects white */
-            PObj_live_CLEAR(obj);
-            obj->flags &= ~PObj_GC_wb_triggered_FLAG;
-        }
-        else if (!PObj_constant_TEST(obj)) {
-            callback(interp, obj);
-
-            LIST_REMOVE(list, tmp);
-            memset(tmp, 0, sizeof (List_Item_Header));
-
-            PObj_on_free_list_SET(obj);
-            Parrot_gc_pool_free(interp, pool, tmp);
-        }
-        else {
-            /* Remove "constant" objects from pool. We don't handle them */
-            LIST_REMOVE(list, tmp);
-        }
-        tmp = next;
-    }
-}
 
 
 
