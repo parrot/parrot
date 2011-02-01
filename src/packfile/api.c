@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 
@@ -214,15 +214,15 @@ static PackFile_ConstTable * find_constants(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void load_file(PARROT_INTERP, ARGIN(STRING *path))
+static INTVAL find_pf_ann_idx(PARROT_INTERP,
+    ARGIN(PackFile_Annotations *pfa),
+    ARGIN(PackFile_Annotations_Key *key),
+    UINTVAL offs)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-PARROT_CANNOT_RETURN_NULL
-static PMC * make_annotation_value_pmc(PARROT_INTERP,
-    ARGIN(PackFile_Annotations *self),
-    INTVAL type,
-    opcode_t value)
+static void load_file(PARROT_INTERP, ARGIN(STRING *path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -413,12 +413,13 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_find_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
+#define ASSERT_ARGS_find_pf_ann_idx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pfa) \
+    , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_load_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
-#define ASSERT_ARGS_make_annotation_value_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_make_code_pointers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(seg))
 #define ASSERT_ARGS_mark_1_bc_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -1712,6 +1713,7 @@ Get the interpreter's currently active PackFile
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 PackFile *
 Parrot_pf_get_current_packfile(PARROT_INTERP)
 {
@@ -1729,6 +1731,7 @@ Get's the interpreter's currently active bytecode segment
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode *
 Parrot_pf_get_current_code_segment(PARROT_INTERP)
 {
@@ -1802,7 +1805,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode *
-Parrot_pf_create_default_segments(PARROT_INTERP, ARGMOD(PackFile * const pf),
+Parrot_pf_create_default_segments(PARROT_INTERP, ARGIN(PackFile * const pf),
         ARGIN(STRING * file_name), int add)
 {
     ASSERT_ARGS(Parrot_pf_create_default_segments)
@@ -3654,17 +3657,7 @@ PackFile_Annotations_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
     if (self->keys)
         mem_gc_free(interp, self->keys);
 
-    /* Free any groups. */
-    if (self->groups)
-        mem_gc_free(interp, self->groups);
-
-    /* Free any entries. */
-    if (self->entries)
-        mem_gc_free(interp, self->entries);
-
     self->keys    = NULL;
-    self->groups  = NULL;
-    self->entries = NULL;
 }
 
 
@@ -3687,10 +3680,7 @@ PackFile_Annotations_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *seg))
 {
     ASSERT_ARGS(PackFile_Annotations_packed_size)
     const PackFile_Annotations * const self = (PackFile_Annotations *)seg;
-    return 3                      /* Counts. */
-         + self->num_keys    * 2  /* Keys. */
-         + self->num_groups  * 2  /* Groups. */
-         + self->num_entries * 3; /* Entries. */
+    return 1 + self->num_keys * 4;  /* keys and key count */
 }
 
 
@@ -3722,25 +3712,8 @@ PackFile_Annotations_pack(SHIM_INTERP, ARGIN(PackFile_Segment *seg),
         const PackFile_Annotations_Key * const key = self->keys + i;
         *cursor++ = key->name;
         *cursor++ = key->type;
-    }
-
-    /* Write group count and any groups. */
-    *cursor++ = self->num_groups;
-
-    for (i = 0; i < self->num_groups; ++i) {
-        const PackFile_Annotations_Group * const group = self->groups + i;
-        *cursor++ = group->bytecode_offset;
-        *cursor++ = group->entries_offset;
-    }
-
-    /* Write entry count and any entries. */
-    *cursor++ = self->num_entries;
-
-    for (i = 0; i < self->num_entries; ++i) {
-        const PackFile_Annotations_Entry * const entry = self->entries + i;
-        *cursor++ = entry->bytecode_offset;
-        *cursor++ = entry->key;
-        *cursor++ = entry->value;
+        *cursor++ = key->start;
+        *cursor++ = key->len;
     }
 
     return cursor;
@@ -3777,31 +3750,10 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
 
     for (i = 0; i < self->num_keys; ++i) {
         PackFile_Annotations_Key * const key = self->keys + i;
-        key->name = PF_fetch_opcode(seg->pf, &cursor);
-        key->type = PF_fetch_opcode(seg->pf, &cursor);
-    }
-
-    /* Unpack groups. */
-    self->num_groups = PF_fetch_opcode(seg->pf, &cursor);
-    self->groups     = mem_gc_allocate_n_zeroed_typed(interp,
-            self->num_groups, PackFile_Annotations_Group);
-
-    for (i = 0; i < self->num_groups; ++i) {
-        PackFile_Annotations_Group * const group = self->groups + i;
-        group->bytecode_offset = PF_fetch_opcode(seg->pf, &cursor);
-        group->entries_offset  = PF_fetch_opcode(seg->pf, &cursor);
-    }
-
-    /* Unpack entries. */
-    self->num_entries = PF_fetch_opcode(seg->pf, &cursor);
-    self->entries     = mem_gc_allocate_n_zeroed_typed(interp,
-            self->num_entries, PackFile_Annotations_Entry);
-
-    for (i = 0; i < self->num_entries; ++i) {
-        PackFile_Annotations_Entry * const entry = self->entries + i;
-        entry->bytecode_offset = PF_fetch_opcode(seg->pf, &cursor);
-        entry->key             = PF_fetch_opcode(seg->pf, &cursor);
-        entry->value           = PF_fetch_opcode(seg->pf, &cursor);
+        key->name  = PF_fetch_opcode(seg->pf, &cursor);
+        key->type  = (pf_ann_key_type_t)PF_fetch_opcode(seg->pf, &cursor);
+        key->start = PF_fetch_opcode(seg->pf, &cursor);
+        key->len   = PF_fetch_opcode(seg->pf, &cursor);
     }
 
     /* Need to associate this segment with the applicable code segment. */
@@ -3840,52 +3792,30 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
     ASSERT_ARGS(PackFile_Annotations_dump)
     const PackFile_Annotations * const self = (const PackFile_Annotations *)seg;
     INTVAL                      i;
+    size_t                      j;
 
     default_dump_header(interp, (const PackFile_Segment *)self);
 
     /* Dump keys. */
-    Parrot_io_printf(interp, "\n  keys => [\n");
+    Parrot_io_printf(interp, "\n  [\n");
     for (i = 0; i < self->num_keys; ++i) {
-        const PackFile_Annotations_Key * const key = self->keys + i;
+        const PackFile_Annotations_Key * const key = &self->keys[i];
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        NAME => %Ss\n",
                 self->code->const_table->str.constants[key->name]);
         Parrot_io_printf(interp, "        TYPE => %s\n",
                 key->type == PF_ANNOTATION_KEY_TYPE_INT ? "integer" :
                 key->type == PF_ANNOTATION_KEY_TYPE_STR ? "string" :
-                key->type == PF_ANNOTATION_KEY_TYPE_NUM ? "number" :
-                "PMC");
-        Parrot_io_printf(interp, "    ],\n");
-    }
-
-    Parrot_io_printf(interp, "  ],\n");
-
-    /* Dump groups. */
-    Parrot_io_printf(interp, "\n  groups => [\n");
-    for (i = 0; i < self->num_groups; ++i) {
-        const PackFile_Annotations_Group * const group = self->groups + i;
-        Parrot_io_printf(interp, "    #%d\n    [\n", i);
-        Parrot_io_printf(interp, "        BYTECODE_OFFSET => %d\n",
-                group->bytecode_offset);
-        Parrot_io_printf(interp, "        ENTRIES_OFFSET => %d\n",
-                group->entries_offset);
-        Parrot_io_printf(interp, "    ],\n");
-    }
-
-    Parrot_io_printf(interp, "  ],\n");
-
-    /* Dump entries. */
-    Parrot_io_printf(interp, "\n  entries => [\n");
-
-    for (i = 0; i < self->num_entries; ++i) {
-        const PackFile_Annotations_Entry * const entry = self->entries + i;
-        Parrot_io_printf(interp, "    #%d\n    [\n", i);
-        Parrot_io_printf(interp, "        BYTECODE_OFFSET => %d\n",
-                entry->bytecode_offset);
-        Parrot_io_printf(interp, "        KEY => %d\n",
-                entry->key);
-        Parrot_io_printf(interp, "        VALUE => %d\n",
-                entry->value);
+                key->type == PF_ANNOTATION_KEY_TYPE_PMC ? "pmc" :
+                "<ERROR>");
+        for (j = key->start; j < key->len; j++) {
+            Parrot_io_printf(interp, "      [\n", i);
+            Parrot_io_printf(interp, "          BYTECODE_OFFSET => %d\n",
+                    self->base.data[j * 2 + ANN_ENTRY_OFF]);
+            Parrot_io_printf(interp, "          VALUE => %d\n",
+                    self->base.data[j * 2 + ANN_ENTRY_VAL]);
+            Parrot_io_printf(interp, "      ],\n");
+        }
         Parrot_io_printf(interp, "    ],\n");
     }
 
@@ -3893,43 +3823,49 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
     Parrot_io_printf(interp, "],\n");
 }
 
-
 /*
 
-=item C<void PackFile_Annotations_add_group(PARROT_INTERP, PackFile_Annotations
-*self, opcode_t offset)>
+=item C<static INTVAL find_pf_ann_idx(PARROT_INTERP, PackFile_Annotations *pfa,
+PackFile_Annotations_Key *key, UINTVAL offs)>
 
-Starts a new bytecode annotation group. Takes the offset in the bytecode where
-the new annotations group starts.
+Find the index of the active annotation at the given offset.
 
 =cut
 
 */
-PARROT_EXPORT
-void
-PackFile_Annotations_add_group(PARROT_INTERP, ARGMOD(PackFile_Annotations *self),
-        opcode_t offset)
+
+
+static INTVAL
+find_pf_ann_idx(PARROT_INTERP, ARGIN(PackFile_Annotations *pfa),
+    ARGIN(PackFile_Annotations_Key *key), UINTVAL offs)
 {
-    ASSERT_ARGS(PackFile_Annotations_add_group)
-    PackFile_Annotations_Group *group;
+    ASSERT_ARGS(find_pf_ann_idx)
+    UINTVAL hi, mid, lo;
+    UINTVAL mid_val;
 
-    /* Allocate extra space for the group in the groups array. */
-    if (self->groups)
-        self->groups = mem_gc_realloc_n_typed_zeroed(interp, self->groups,
-            1 + self->num_groups, self->num_groups, PackFile_Annotations_Group);
-    else
-        self->groups = mem_gc_allocate_n_typed(interp,
-                1 + self->num_groups, PackFile_Annotations_Group);
+    lo = key->start;
+    hi = key->start + key->len;
 
-    /* Store details. */
-    group = self->groups + self->num_groups;
-    group->bytecode_offset = offset;
-    group->entries_offset  = self->num_entries;
+    while (1) {
+        mid     = (lo + hi) / 2;
+        mid_val = pfa->base.data[mid * 2 + ANN_ENTRY_OFF];
 
-    /* Increment group count. */
-    ++self->num_groups;
+        if (mid_val < offs) {
+            if (lo == mid)
+                return mid; /* end of range search */
+            lo = mid;
+        }
+        else if (mid_val > offs) {
+            if (hi == key->start)
+                return -1; /* bottomed out */
+            hi = mid;
+        }
+        else {
+            /* exact match: retrun prior annotation */
+            return mid - 1;
+        }
+    }
 }
-
 
 /*
 
@@ -3953,14 +3889,13 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
         opcode_t offset, opcode_t key, opcode_t type, opcode_t value)
 {
     ASSERT_ARGS(PackFile_Annotations_add_entry)
-    /* See if we already have this key. */
-    STRING  * const key_name = self->code->const_table->str.constants[key];
     opcode_t key_id   = -1;
-    INTVAL   i;
+    INTVAL   i, idx;
 
+    /* See if we already have this key. */
     for (i = 0; i < self->num_keys; ++i) {
-        STRING * const test_key = self->code->const_table->str.constants[self->keys[i].name];
-        if (STRING_equal(interp, test_key, key_name)) {
+        opcode_t test_key = self->keys[i].name;
+        if (key == test_key) {
             key_id = i;
             break;
         }
@@ -3975,85 +3910,54 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
             self->keys = mem_gc_allocate_n_typed(interp,
                     1 + self->num_keys, PackFile_Annotations_Key);
 
-        key_id             = self->num_keys;
-        ++self->num_keys;
+        key_id = self->num_keys++;
 
         /* Populate it. */
-        self->keys[key_id].name = key;
-        self->keys[key_id].type = type;
+        self->keys[key_id].name  = key;
+        self->keys[key_id].type  = (pf_ann_key_type_t)type;
+        self->keys[key_id].start = key_id == 0 ?
+                                    0 :
+                                    self->keys[key_id - 1].start + self->keys[key_id -1].len;
+        self->keys[key_id].len   = 0;
     }
     else {
         /* Ensure key types are compatible. */
-        if (self->keys[key_id].type != type)
+        if (self->keys[key_id].type != (pf_ann_key_type_t)type)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION,
                 "Annotations with different types of value used for key '%S'\n",
-                key_name);
+                self->code->const_table->str.constants[self->keys[key_id].name]);
     }
 
-    /* Add annotations entry. */
-    if (self->entries)
-        self->entries = mem_gc_realloc_n_typed(interp, self->entries,
-                1 + self->num_entries, PackFile_Annotations_Entry);
-    else
-        self->entries = mem_gc_allocate_n_typed(interp,
-                1 + self->num_entries, PackFile_Annotations_Entry);
+    /* Lookup position where value will be inserted. */
+    idx = self->keys[key_id].len == 0  ?
+          self->keys[key_id].start * 2 :
+          (UINTVAL)(find_pf_ann_idx(interp, self, &self->keys[key_id], offset) + 1) * 2;
 
-    self->entries[self->num_entries].bytecode_offset = offset;
-    self->entries[self->num_entries].key             = key_id;
-    self->entries[self->num_entries].value           = value;
+    /* Extend segment data and shift subsequent data by 2. */
+    self->base.data = (opcode_t *)mem_sys_realloc(self->base.data,
+                            (self->base.size + 2) * sizeof (opcode_t));
+    mem_sys_memmove(&self->base.data[idx + 2], &self->base.data[idx],
+            (self->base.size - idx) * sizeof (opcode_t));
+    self->base.size += 2;
+    for (i = key_id + 1; i < self->num_keys; i++)
+        self->keys[i].start++;
 
-    ++self->num_entries;
-}
-
-
-/*
-
-=item C<static PMC * make_annotation_value_pmc(PARROT_INTERP,
-PackFile_Annotations *self, INTVAL type, opcode_t value)>
-
-Makes a PMC of the right type holding the value.  Helper for
-C<PackFile_Annotations_lookup()>.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-static PMC *
-make_annotation_value_pmc(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
-        INTVAL type, opcode_t value)
-{
-    ASSERT_ARGS(make_annotation_value_pmc)
-    PMC *result;
-
-    switch (type) {
-      case PF_ANNOTATION_KEY_TYPE_INT:
-        result = Parrot_pmc_new_init_int(interp, enum_class_Integer, value);
-        break;
-      case PF_ANNOTATION_KEY_TYPE_NUM:
-        result = Parrot_pmc_new(interp, enum_class_Float);
-        VTABLE_set_number_native(interp, result,
-                    self->code->const_table->num.constants[value]);
-        break;
-      default:
-        result = Parrot_pmc_new(interp, enum_class_String);
-        VTABLE_set_string_native(interp, result,
-                    self->code->const_table->str.constants[value]);
-    }
-
-    return result;
+    /* Add entry. */
+    self->base.data[idx + ANN_ENTRY_OFF] = offset;
+    self->base.data[idx + ANN_ENTRY_VAL] = value;
+    self->keys[key_id].len++;
 }
 
 
 /*
 
 =item C<PMC * PackFile_Annotations_lookup(PARROT_INTERP, PackFile_Annotations
-*self, opcode_t offset, STRING *key)>
+*self, opcode_t offset, STRING *name)>
 
 Looks up the annotation(s) in force at the given bytecode offset. If just one
-particular annotation is required, it can be passed as key, and the value will
-be returned (or a NULL PMC if no annotation of that name is in force).
+particular annotation is required, it can be passed as C<name>, and the value
+will be returned (or a NULL PMC if no annotation of that name is in force).
 Otherwise, a Hash will be returned of the all annotations. If there are none in
 force, an empty hash will be returned.
 
@@ -4064,92 +3968,59 @@ force, an empty hash will be returned.
 PARROT_CANNOT_RETURN_NULL
 PMC *
 PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
-        opcode_t offset, ARGIN_NULLOK(STRING *key))
+        opcode_t offset, ARGIN_NULLOK(STRING *name))
 {
     ASSERT_ARGS(PackFile_Annotations_lookup)
-    PMC   *result;
-    INTVAL start_entry = 0;
-    INTVAL i;
 
-    /* If we have a key, look up its ID; if we don't find one. */
-    opcode_t key_id = -1;
-
-    if (!STRING_IS_NULL(key)) {
-        for (i = 0; i < self->num_keys; ++i) {
-            STRING * const test_key = self->code->const_table->str.constants[self->keys[i].name];
-            if (STRING_equal(interp, test_key, key)) {
-                key_id = i;
-                break;
-            }
+    if (STRING_IS_NULL(name)) {
+        /* find all annotations for this offset */
+        PMC *result = Parrot_pmc_new(interp, enum_class_Hash);
+        INTVAL i;
+        for (i = 0; i < self->num_keys; i++) {
+            STRING *k = self->code->const_table->str.constants[self->keys[i].name];
+            PMC    *v = PackFile_Annotations_lookup(interp, self, offset, k);
+            if (!PMC_IS_NULL(v))
+                VTABLE_set_pmc_keyed_str(interp, result, k, v);
         }
 
-        if (key_id == -1)
-            return PMCNULL;
+        return result;
     }
 
-    /* Use groups to find search start point. */
-    for (i = 0; i < self->num_groups; ++i)
-        if (offset < self->groups[i].bytecode_offset)
-            break;
-        else
-            start_entry = self->groups[i].entries_offset;
-
-    if (key_id == -1) {
-        /* Look through entries, storing what we find by key and tracking those
-         * that we have values for. */
-        opcode_t *latest_values = mem_gc_allocate_n_zeroed_typed(interp,
-                self->num_keys, opcode_t);
-        opcode_t *have_values   = mem_gc_allocate_n_zeroed_typed(interp,
-                self->num_keys, opcode_t);
-
-        for (i = start_entry; i < self->num_entries; ++i) {
-            if (self->entries[i].bytecode_offset >= offset)
-                break;
-
-            latest_values[self->entries[i].key] = self->entries[i].value;
-            have_values[self->entries[i].key]   = 1;
-        }
-
-        /* Create hash of values we have. */
-        result = Parrot_pmc_new(interp, enum_class_Hash);
-
-        for (i = 0; i < self->num_keys; ++i) {
-            if (have_values[i]) {
-                STRING * const key_name =
-                    self->code->const_table->str.constants[self->keys[i].name];
-                VTABLE_set_pmc_keyed_str(interp, result, key_name,
-                        make_annotation_value_pmc(interp, self, self->keys[i].type,
-                                latest_values[i]));
-            }
-        }
-
-        mem_gc_free(interp, latest_values);
-        mem_gc_free(interp, have_values);
-    }
     else {
-        /* Look for latest applicable value of the key. */
-        opcode_t latest_value = 0;
-        opcode_t found_value  = 0;
+        PackFile_Annotations_Key *key = NULL;
+        INTVAL i;
+        opcode_t val;
 
-        for (i = start_entry; i < self->num_entries; ++i) {
-            if (self->entries[i].bytecode_offset >= offset)
+        for (i = 0; i < self->num_keys; i++) {
+            STRING *test_key = self->code->const_table->str.constants[self->keys[i].name];
+            if (STRING_equal(interp, test_key, name)) {
+                key = &self->keys[i];
                 break;
-
-            if (self->entries[i].key == key_id) {
-                latest_value = self->entries[i].value;
-                found_value  = 1;
             }
         }
 
-        /* Did we find anything? */
-        if (!found_value)
-            result = PMCNULL;
-        else
-            result = make_annotation_value_pmc(interp, self,
-                    self->keys[key_id].type, latest_value);
-    }
+        if (!key)
+            return PMCNULL; /* no such key */
 
-    return result;
+        i = find_pf_ann_idx(interp, self, key, offset);
+
+        if (i < 0)
+            return PMCNULL; /* no active entry */
+
+        val = self->base.data[i * 2 + ANN_ENTRY_VAL];
+
+        switch (key->type) {
+          case PF_ANNOTATION_KEY_TYPE_INT:
+            return Parrot_pmc_box_integer(interp, val);
+          case PF_ANNOTATION_KEY_TYPE_STR:
+            return Parrot_pmc_box_string(interp, self->code->const_table->str.constants[val]);
+          case PF_ANNOTATION_KEY_TYPE_PMC:
+            return self->code->const_table->pmc.constants[val];
+          default:
+            Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG, "unexpected annotation type found");
+            return PMCNULL;
+        }
+    }
 }
 
 /*

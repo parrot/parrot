@@ -227,7 +227,7 @@ sub _get_manifest_entry {
 sub _get_special {
     my %special = qw(
         CREDITS                                         [main]doc
-        DEPRECATED.pod                                  [devel]doc
+        DEPRECATED.yaml                                  [devel]doc
         DONORS.pod                                      [main]doc
         LICENSE                                         [main]doc
         NEWS                                            [main]doc

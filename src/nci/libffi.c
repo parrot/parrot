@@ -372,6 +372,9 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 case 'P':
                     pcc_arg_ptr[i] = &pcc_arg[i].p;
                     break;
+                default:
+                    PARROT_ASSERT(!"Impossible PCC signature");
+                    break;
             }
 
             call_arg[i + 3] = &pcc_arg_ptr[i];
@@ -397,7 +400,7 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
          *   object into a ManagedStruct
          */
         translation_pointers = mem_internal_allocate_n_zeroed_typed(nci->arity, void*);
-        for (i = 0, j = 0; i < (size_t)nci->arity; i++) {
+        for (i = 0, j = 0; i < nci->arity; i++) {
             pmc_holder_t *pmc_holder;
             switch (VTABLE_get_integer_keyed_int(interp, nci->signature, i + 1)) {
               case enum_nci_sig_interp:
@@ -508,6 +511,9 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 *(FLOATVAL *)translation_pointers[i] = pcc_arg[j++].n;
                 values[i]                            = translation_pointers[i];
                 break;
+              default:
+                PARROT_ASSERT("!Unhandled NCI signature");
+                break;
             }
         }
 
@@ -578,7 +584,7 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
      * Free memory used for cstrings,
      * and any other translations that use temporary memory
      */
-    for (i = 0; i < (size_t)nci->arity; i++) {
+    for (i = 0; i < nci->arity; i++) {
         switch (VTABLE_get_integer_keyed_int(interp, nci->signature, i + 1)) {
             case enum_nci_sig_bufref:
                 if (translation_pointers[i]) {

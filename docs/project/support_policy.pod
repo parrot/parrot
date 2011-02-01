@@ -1,4 +1,4 @@
-# Copyright (C) 2009, The Parrot Foundation.
+# Copyright (C) 2009-2011, The Parrot Foundation.
 
 =pod
 
@@ -58,7 +58,7 @@ features we will also regularly deprecate features and remove them. To
 ease the burden of these changes on the users, our policy is to notify
 users of these deprecations in at least one supported release before
 removal and to provide users with a reasonable upgrade path. Deprecation
-notices are listed in the file L<DEPRECATED.pod>, together with a version
+notices are listed in the file L<api.yaml>, together with a version
 number to help us track when the feature is safe to remove.  The suggested
 upgrade paths for deprecated features can be found on the ParrotDeprecations
 wiki page. Note that deprecation removals that are committed without an
@@ -108,7 +108,11 @@ very rare.
 =head2 Experimental Features
 
 From time to time, we may add features to get feedback on their utility and
-design.  Marking them as "Experimental" in F<DEPRECATED.pod> indicates that we
+<<<<<<< HEAD
+design.  Marking them as "Experimental" in F<DEPRECATED.yaml> indicates that we
+=======
+design.  Marking them as "Experimental" in F<DEPRECATED.json> indicates that we
+>>>>>>> leto/deprecations_as_data
 may modify or remove them without official deprecation notices.  Use them at
 your own risk--and please provide feedback through official channels if you use
 them successfully or otherwise.
@@ -215,7 +219,11 @@ of the public API (listed in docs/embed.pod)
 
 =item * Parrot internals hidden behind a public API
 
-=item * Items otherwise eligible but marked as "experimental" in F<DEPRECATED.pod>
+<<<<<<< HEAD
+=item * Items otherwise eligible but marked as "experimental" in F<DEPRECATED.yaml>
+=======
+=item * Items otherwise eligible but marked as "experimental" in F<DEPRECATED.json>
+>>>>>>> leto/deprecations_as_data
 
 =back
 

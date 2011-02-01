@@ -52,7 +52,7 @@ Parrot_sysmem_amount(PARROT_INTERP)
     statex.dwLength = sizeof (MEMORYSTATUSEX);
     GlobalMemoryStatusEx(&statex);
     /* TODO Check status and bail out */
-    return statex.ullAvailPhys;
+    return statex.ullTotalPhys;
 }
 
 /*

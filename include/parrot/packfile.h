@@ -227,40 +227,32 @@ typedef struct PackFile_Debug {
     PackFile_ByteCode      *code;   /* where this segment belongs to */
 } PackFile_Debug;
 
+#define ANN_ENTRY_OFF 0
+#define ANN_ENTRY_VAL 1
+
 /* &gen_from_def(packfile_annotation_key_type.pasm) */
 
 /* Key types for annotation segment. */
-#define PF_ANNOTATION_KEY_TYPE_INT 0
-#define PF_ANNOTATION_KEY_TYPE_STR 1
-#define PF_ANNOTATION_KEY_TYPE_NUM 2
+typedef enum {
+    PF_ANNOTATION_KEY_TYPE_INT = 1,
+    PF_ANNOTATION_KEY_TYPE_STR = 2,
+    PF_ANNOTATION_KEY_TYPE_PMC = 3
+} pf_ann_key_type_t;
 
 /* &end_gen */
 
 typedef struct PackFile_Annotations_Key {
-    opcode_t name;
-    opcode_t type;
+    UINTVAL           name;
+    pf_ann_key_type_t type;
+    UINTVAL           start;
+    UINTVAL           len;
 } PackFile_Annotations_Key;
 
-typedef struct PackFile_Annotations_Group {
-    opcode_t bytecode_offset;
-    opcode_t entries_offset;
-} PackFile_Annotations_Group;
-
-typedef struct PackFile_Annotations_Entry {
-    opcode_t bytecode_offset;
-    opcode_t key;
-    opcode_t value;
-} PackFile_Annotations_Entry;
-
 typedef struct PackFile_Annotations {
-    PackFile_Segment            base;
-    opcode_t                    num_keys;
-    PackFile_Annotations_Key    *keys;
-    opcode_t                    num_groups;
-    PackFile_Annotations_Group  *groups;
-    opcode_t                    num_entries;
-    PackFile_Annotations_Entry  *entries;
+    PackFile_Segment             base;
     PackFile_ByteCode           *code;
+    opcode_t                     num_keys;
+    PackFile_Annotations_Key    *keys;
 } PackFile_Annotations;
 
 typedef struct PackFile_Directory {
@@ -615,14 +607,6 @@ void PackFile_Annotations_add_entry(PARROT_INTERP,
         FUNC_MODIFIES(*self);
 
 PARROT_EXPORT
-void PackFile_Annotations_add_group(PARROT_INTERP,
-    ARGMOD(PackFile_Annotations *self),
-    opcode_t offset)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*self);
-
-PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment * PackFile_Annotations_new(PARROT_INTERP,
     SHIM(struct PackFile *pf),
@@ -845,13 +829,12 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * Parrot_pf_create_default_segments(PARROT_INTERP,
-    ARGMOD(PackFile * const pf),
+    ARGIN(PackFile * const pf),
     ARGIN(STRING * file_name),
     int add)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(* const pf);
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 void Parrot_pf_set_current_packfile(PARROT_INTERP,
@@ -900,7 +883,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC * PackFile_Annotations_lookup(PARROT_INTERP,
     ARGIN(PackFile_Annotations *self),
     opcode_t offset,
-    ARGIN_NULLOK(STRING *key))
+    ARGIN_NULLOK(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -928,9 +911,11 @@ const opcode_t * PackFile_Annotations_unpack(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*seg);
 
+PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * Parrot_pf_get_current_code_segment(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
 PackFile * Parrot_pf_get_current_packfile(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -942,10 +927,6 @@ PackFile * Parrot_pf_get_current_packfile(PARROT_INTERP)
     , PARROT_ASSERT_ARG(dir) \
     , PARROT_ASSERT_ARG(seg))
 #define ASSERT_ARGS_PackFile_Annotations_add_entry \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_PackFile_Annotations_add_group \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))

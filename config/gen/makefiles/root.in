@@ -296,7 +296,6 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/PGE/Perl6Grammar.pbc \
     $(LIBRARY_DIR)/PGE/Text.pbc \
     $(LIBRARY_DIR)/PGE/Util.pbc \
-    $(LIBRARY_DIR)/Protoobject.pbc \
     $(LIBRARY_DIR)/Range.pbc \
     $(LIBRARY_DIR)/Stream/Base.pbc \
     $(LIBRARY_DIR)/Stream/Combiner.pbc \
@@ -962,8 +961,13 @@ src/scheduler$(O) : \
 
 src/io/core$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/core.c
 
-src/io/socket_api$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
-    src/io/api.str include/pmc/pmc_socket.h src/io/socket_api.c
+src/io/socket_api$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/io/io_private.h \
+    src/io/api.str \
+    include/pmc/pmc_socket.h \
+    include/pmc/pmc_sockaddr.h \
+    src/io/socket_api.c
 
 O_FILES = \
     $(INTERP_O_FILES) \
@@ -1611,6 +1615,8 @@ src/platform/generic/encoding$(O) : src/platform/generic/encoding.c $(PARROT_H_H
 
 src/platform/generic/env$(O) : src/platform/generic/env.c $(PARROT_H_HEADERS)
 
+src/platform/generic/error$(O) : src/platform/generic/error.c $(PARROT_H_HEADERS)
+
 src/platform/generic/exec$(O) : src/platform/generic/exec.c $(PARROT_H_HEADERS)
 
 src/platform/generic/hires_timer$(O) : src/platform/generic/hires_timer.c $(PARROT_H_HEADERS)
@@ -1625,7 +1631,7 @@ src/platform/generic/math$(O) : src/platform/generic/math.c $(PARROT_H_HEADERS)
 src/platform/generic/misc$(O) : src/platform/generic/misc.c $(PARROT_H_HEADERS)
 
 src/platform/generic/socket$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_socket.h \
-    src/io/io_private.h src/platform/generic/socket.c
+    src/io/io_private.h include/pmc/pmc_sockaddr.h src/platform/generic/socket.c
 
 src/platform/generic/stat$(O) : src/platform/generic/stat.c $(PARROT_H_HEADERS)
 
@@ -1648,6 +1654,8 @@ src/platform/solaris/time$(O) : src/platform/solaris/time.c $(PARROT_H_HEADERS)
 src/platform/win32/dl$(O) : src/platform/win32/dl.c $(PARROT_H_HEADERS)
 
 src/platform/win32/env$(O) : src/platform/win32/env.c $(PARROT_H_HEADERS)
+
+src/platform/win32/error$(O) : src/platform/win32/error.c $(PARROT_H_HEADERS)
 
 src/platform/win32/exec$(O) : src/platform/win32/exec.c $(PARROT_H_HEADERS)
 
@@ -1874,6 +1882,7 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
     include/parrot/oplib/core_ops.h \
     include/parrot/runcore_api.h \
     include/pmc/pmc_continuation.h \
+    include/pmc/pmc_fixedintegerarray.h \
     include/pmc/pmc_parrotlibrary.h \
     src/io/io_private.h
 

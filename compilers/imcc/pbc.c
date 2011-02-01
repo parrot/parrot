@@ -2272,19 +2272,12 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
                     PackFile_Segment_new_seg(interp, dir,
                         PF_ANNOTATIONS_SEG, name, 1);
             interp_code->annotations->code = interp_code;
-
-            /* Create initial group. */
-            PackFile_Annotations_add_group(interp, interp_code->annotations,
-                    IMCC_INFO(interp)->pc - interp_code->base.data);
         }
 
         /* Add annotation. */
         switch (ins->symregs[1]->set) {
           case 'I':
             annotation_type = PF_ANNOTATION_KEY_TYPE_INT;
-            break;
-          case 'N':
-            annotation_type = PF_ANNOTATION_KEY_TYPE_NUM;
             break;
           case 'S':
             annotation_type = PF_ANNOTATION_KEY_TYPE_STR;

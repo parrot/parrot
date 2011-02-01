@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -291,19 +291,18 @@ Parrot_Int
 Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
 {
     ASSERT_ARGS(Parrot_api_destroy_interpreter)
-    void * _oldtop;
     Parrot_jump_buff env;
-    Interp * const interp = GET_INTERP(interp_pmc);
-    _oldtop = interp->lo_var_ptr;
-    if (_oldtop == NULL)
-        interp->lo_var_ptr = &_oldtop;
-    interp->api_jmp_buf = &env;
     if (setjmp(env)) {
         /* We can't check for potential errors because the interpreter
          * might have been destroyed. */
         return 1;
     }
     else {
+        Interp * const interp = GET_INTERP(interp_pmc);
+        void * _oldtop = interp->lo_var_ptr;
+        if (_oldtop == NULL)
+            interp->lo_var_ptr = &_oldtop;
+        interp->api_jmp_buf = &env;
         Parrot_destroy(interp);
         Parrot_x_exit(interp, 0);
         /* Never reached, x_exit calls longjmp */
