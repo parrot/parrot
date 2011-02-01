@@ -802,7 +802,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     /* We swept all dead objects */
     self->num_early_gc_PMCs                      = 0;
 
-    gc_gms_compact_memory_pool(interp);
+    //gc_gms_compact_memory_pool(interp);
     gc_gms_check_sanity(interp);
 
     gc_gms_ensure_flags(interp);
@@ -848,7 +848,7 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
         ARGIN(Parrot_Pointer_Array *dirty_list),
         size_t gen)
 {
-    POINTER_ARRAY_ITER(self->dirty_list,
+    POINTER_ARRAY_ITER(dirty_list,
         pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
         PMC              *pmc  = &(item->pmc);
         size_t            gen  = POBJ2GEN(pmc);
@@ -858,11 +858,29 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
         });
 }
 
+/*
+
+=item C<gc_gms_process_dirty_list()>
+
+Iterate over "dirty_set" calling VTABLE_mark on it. It will move all
+children into "work_list".
+
+=cut
+
+*/
 static void
 gc_gms_process_dirty_list(PARROT_INTERP,
         ARGIN(MarkSweep_GC *self),
         ARGIN(Parrot_Pointer_Array *dirty_list))
 {
+    POINTER_ARRAY_ITER(dirty_list,
+        PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
+
+        if (PObj_custom_mark_TEST(pmc))
+            VTABLE_mark(interp, pmc);
+
+        if (PMC_metadata(pmc))
+            Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc)););
 }
 
 static void
@@ -870,12 +888,68 @@ gc_gms_process_work_list(PARROT_INTERP,
         ARGIN(MarkSweep_GC *self),
         ARGIN(Parrot_Pointer_Array *work_list))
 {
+    POINTER_ARRAY_ITER(work_list,
+        PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
+
+        if (PObj_custom_mark_TEST(pmc))
+            VTABLE_mark(interp, pmc);
+
+        if (PMC_metadata(pmc))
+            Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc)););
 }
 
+/*
+
+=item C<gc_gms_sweep_pools()>
+
+Sweep generations starting from K:
+    - Destroy all dead objects
+    - Move live objects into generation max(K+1, N)
+    - Paint them white.
+
+=cut
+
+*/
 static void
 gc_gms_sweep_pools(PARROT_INTERP,
         ARGIN(MarkSweep_GC *self))
 {
+    ASSERT_ARGS(gc_gms_sweep_pools)
+
+    size_t i;
+
+    for (i = 0; i < self->gen_to_collect; i++) {
+        /* Don't move to generation beyond last */
+        int move_to_old = (i + 1) != MAX_GENERATIONS;
+
+        POINTER_ARRAY_ITER(self->objects[i],
+            pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
+            PMC              *pmc  = &(item->pmc);
+
+            /* Paint live objects white */
+            if (PObj_live_TEST(pmc)) {
+                PObj_live_CLEAR(pmc);
+
+                if (move_to_old)
+                    item->ptr = Parrot_pa_insert(interp, self->objects[i + 1], item);
+            }
+            else if (!PObj_constant_TEST(pmc)) {
+                Parrot_pa_remove(interp, self->objects[i], PMC2PAC(pmc)->ptr);
+
+                /* this is manual inlining of Parrot_pmc_destroy() */
+                if (PObj_custom_destroy_TEST(pmc))
+                    VTABLE_destroy(interp, pmc);
+
+                if (pmc->vtable->attr_size && PMC_data(pmc))
+                    Parrot_gc_free_pmc_attributes(interp, pmc);
+                PMC_data(pmc) = NULL;
+
+                PObj_on_free_list_SET(pmc);
+                PObj_gc_CLEAR(pmc);
+
+                Parrot_gc_pool_free(interp, self->pmc_allocator, ptr);
+            });
+    }
 }
 
 
