@@ -35,6 +35,12 @@ for my $e (@$yaml) {
     my $eligible = $e->{eligible};
     my $title    = $e->{name};
     next if any { $_ eq 'old' } @$tags;
+
+    $eligible = "no"
+        unless defined $eligible && $eligible ne '';
+    $ticket = "**************** no ticket ****************"
+        unless defined $ticket && $ticket ne '';
+
     # This format is ugly, but is functional for now
     print "$ticket\t$eligible\t$title\n" if any { $_ eq 'deprecated' } @$tags;
 }
