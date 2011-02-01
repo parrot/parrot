@@ -830,12 +830,32 @@ gc_gms_select_generation_to_collect(PARROT_INTERP)
     return ret < MAX_GENERATIONS ? ret : MAX_GENERATIONS;
 }
 
+/*
+
+=item C<gc_gms_cleanup_dirty_list()>
+
+Move all objects from collections younger K from dirty_list
+back to original lists. Reason for this is "corollary of invariant". We can
+either collect such objects or they will be marked by referents from
+"dirty_list".
+
+=cut
+
+*/
 static void
 gc_gms_cleanup_dirty_list(PARROT_INTERP,
         ARGIN(MarkSweep_GC *self),
         ARGIN(Parrot_Pointer_Array *dirty_list),
         size_t gen)
 {
+    POINTER_ARRAY_ITER(self->dirty_list,
+        pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
+        PMC              *pmc  = &(item->pmc);
+        size_t            gen  = POBJ2GEN(pmc);
+        if (gen <= self->gen_to_collect) {
+            Parrot_pa_remove(interp, dirty_list, ptr);
+            item->ptr = Parrot_pa_insert(interp, self->objects[gen], item);
+        });
 }
 
 static void
@@ -1865,7 +1885,7 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
     fprintf(stderr, "%s\ngen: %d\n", header, gen);
 
 #if 0
-    Pointer_Array doens't keep count.
+    Pointer_Array does not keep count.
 
     for (i = 0; i < MAX_GENERATIONS; i++)
         fprintf(stderr, "%d: %d %d\n",
