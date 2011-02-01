@@ -431,10 +431,6 @@ static void gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int gen2flags(int gen);
-static int pobj2gen(ARGIN(PObj *pmc))
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_failed_allocation __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_gms_allocate_buffer_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -582,9 +578,6 @@ static int pobj2gen(ARGIN(PObj *pmc))
 #define ASSERT_ARGS_gc_gms_write_barrier __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_gen2flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_pobj2gen __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -1750,34 +1743,6 @@ gc_gms_count_used_pmc_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
     }
 
     return total_amount;
-}
-
-/*
-
-=item C<static int pobj2gen(PObj *pmc)>
-
-=item C<static int gen2flags(int gen)>
-
-helper functions to check and use macro
-
-=cut
-
-*/
-
-static int
-pobj2gen(ARGIN(PObj *pmc))
-{
-    ASSERT_ARGS(pobj2gen)
-
-    return PObj_to_generation(pmc);
-}
-
-static int
-gen2flags(int gen)
-{
-    ASSERT_ARGS(gen2flags)
-
-    return generation_to_flags(gen);
 }
 
 /*
