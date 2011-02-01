@@ -93,7 +93,7 @@ TBD
 
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
-#include "parrot/list.h"
+#include "parrot/pointer_array.h"
 #include "gc_private.h"
 #include "fixed_allocator.h"
 
@@ -101,6 +101,21 @@ TBD
 
 /* Maximum number of collections */
 #define MAX_COLLECTIONS     8
+
+/* We allocate additional space in front of PObj* to store additional pointer */
+typedef struct pmc_alloc_struct {
+    void *ptr;
+    PMC   pmc;   /* NB: Value! */
+} pmc_alloc_struct;
+
+typedef struct string_alloc_struct {
+    void    *ptr;
+    STRING   str;   /* NB: Value! */
+} string_alloc_struct;
+
+#define PMC2PAC(p) ((pmc_alloc_struct *)((char*)(p) - sizeof (void *)))
+#define STR2PAC(p) ((string_alloc_struct *)((char*)(p) - sizeof (void *)))
+
 
 /* Get generation from PObj->flags */
 #define POBJ2GEN(pobj)                                          \
@@ -124,7 +139,7 @@ typedef struct MarkSweep_GC {
     struct Pool_Allocator  *pmc_allocator;
 
     /* During M&S gather new live objects in this list */
-    struct Parrot_Pointer_Array     *work_set;
+    struct Parrot_Pointer_Array     *work_list;
 
     /* During M&S gather new live objects in this list */
     struct Parrot_Pointer_Array     *dirty_list;
@@ -133,7 +148,7 @@ typedef struct MarkSweep_GC {
     struct Parrot_Pointer_Array     *objects[MAX_COLLECTIONS];
 
     /* Allocator for strings */
-    struct Parrot_Pointer_Array  *string_allocator;
+    struct Pool_Allocator           *string_allocator;
 
     /* MAX_COLLECTIONS generations of strings */
     struct Parrot_Pointer_Array     *strings[MAX_COLLECTIONS];
@@ -240,12 +255,12 @@ static void gc_gms_compact_memory_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static size_t gc_gms_count_used_pmc_memory(PARROT_INTERP,
-    ARGIN(Linked_List *list))
+    ARGIN(Parrot_Pointer_Array *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static size_t gc_gms_count_used_string_memory(PARROT_INTERP,
-    ARGIN(Linked_List *list))
+    ARGIN(Parrot_Pointer_Array *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -253,7 +268,7 @@ static void gc_gms_ensure_flags(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static void gc_gms_ensure_flags_in_list(PARROT_INTERP,
-    ARGIN(Linked_List* list))
+    ARGIN(Parrot_Pointer_Array* list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -299,7 +314,7 @@ static int gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 static int gc_gms_is_ptr_owned(PARROT_INTERP,
     ARGIN_NULLOK(void *ptr),
     ARGIN(Pool_Allocator *pool),
-    ARGIN(Linked_List *list))
+    ARGIN(Parrot_Pointer_Array *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
@@ -313,7 +328,7 @@ static void gc_gms_iterate_live_strings(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 static void gc_gms_iterate_string_list(PARROT_INTERP,
-    ARGIN(Linked_List *list),
+    ARGIN(Parrot_Pointer_Array *list),
     string_iterator_callback callback,
     ARGIN_NULLOK(void *data))
         __attribute__nonnull__(1)
@@ -401,19 +416,16 @@ static void gc_gms_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
 
 static void gc_gms_sweep_pool(PARROT_INTERP,
     ARGIN(Pool_Allocator *pool),
-    ARGIN(Linked_List *list),
+    ARGIN(Parrot_Pointer_Array *list),
     ARGIN(sweep_cb callback))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void gc_gms_sweep_pools(PARROT_INTERP,
-    ARGIN(MarkSweep_GC *self),
-    ARGIN(Parrot_Pointer_Array *work_list))
+static void gc_gms_sweep_pools(PARROT_INTERP, ARGIN(MarkSweep_GC *self))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 static void gc_gms_sweep_string_cb(PARROT_INTERP, ARGIN(PObj *obj))
         __attribute__nonnull__(1)
@@ -572,8 +584,7 @@ static int pobj2gen(ARGIN(PObj *pmc))
     , PARROT_ASSERT_ARG(callback))
 #define ASSERT_ARGS_gc_gms_sweep_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(work_list))
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_gc_gms_sweep_string_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj))
@@ -696,10 +707,10 @@ Parrot_gc_gms_init(PARROT_INTERP)
         self = mem_allocate_zeroed_typed(MarkSweep_GC);
 
         self->pmc_allocator = Parrot_gc_pool_new(interp,
-            sizeof (List_Item_Header) + sizeof (PMC));
+            sizeof (pmc_alloc_struct));
 
         self->string_allocator = Parrot_gc_pool_new(interp,
-            sizeof (List_Item_Header) + sizeof (STRING));
+            sizeof (string_alloc_struct));
 
         /* Allocate list for gray objects */
         self->work_list  = Parrot_pa_new(interp);
@@ -728,8 +739,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_gms_mark_and_sweep)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    List_Item_Header *tmp;
-    Linked_List      *list;
+    Parrot_Pointer_Array      *list;
     int               i, gen = -1;
 
     UNUSED(flags);
@@ -863,8 +873,7 @@ gc_gms_process_work_list(PARROT_INTERP,
 
 static void
 gc_gms_sweep_pools(PARROT_INTERP,
-        ARGIN(MarkSweep_GC *self),
-        ARGIN(Parrot_Pointer_Array *work_list))
+        ARGIN(MarkSweep_GC *self))
 {
 }
 
@@ -884,8 +893,8 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_mark_pmc_header)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    List_Item_Header  *item = Obj2LLH(pmc);
-    size_t             gen  = PObj_to_generation(pmc);
+    pmc_alloc_struct  *item = PMC2PAC(pmc);
+    size_t             gen  = POBJ2GEN(pmc);
 
     /* Object was already marked as grey. Or live. Or dead. Skip it */
     if (PObj_is_live_or_free_TESTALL(pmc) || PObj_constant_TEST(pmc))
@@ -896,11 +905,15 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
     PObj_live_SET(pmc);
 
     /* If object too old - skip it */
-    if (gen > self->current_generation)
+    if (gen > self->gen_to_collect)
         return;
 
-    LIST_REMOVE(self->objects[gen], item);
-    LIST_APPEND(self->root_objects, item);
+    /* Object is on dirty_list. */
+    if (pmc->flags & PObj_GC_on_dirty_list_FLAG)
+        return;
+
+    Parrot_pa_remove(interp, self->objects[gen], item);
+    item->ptr = Parrot_pa_insert(interp, self->work_list, item);
 }
 
 /*
@@ -1392,8 +1405,8 @@ gc_gms_iterate_live_strings(PARROT_INTERP,
 
 /*
 
-=item C<static void gc_gms_iterate_string_list(PARROT_INTERP, Linked_List *list,
-string_iterator_callback callback, void *data)>
+=item C<static void gc_gms_iterate_string_list(PARROT_INTERP,
+Parrot_Pointer_Array *list, string_iterator_callback callback, void *data)>
 
 Iterate over string list
 
@@ -1403,7 +1416,7 @@ Iterate over string list
 
 static void
 gc_gms_iterate_string_list(PARROT_INTERP,
-        ARGIN(Linked_List *list),
+        ARGIN(Parrot_Pointer_Array *list),
         string_iterator_callback callback,
         ARGIN_NULLOK(void *data))
 {
@@ -1420,7 +1433,7 @@ gc_gms_iterate_string_list(PARROT_INTERP,
 
 /*
 =item C<static void gc_gms_sweep_pool(PARROT_INTERP, Pool_Allocator *pool,
-Linked_List *list, sweep_cb callback)>
+Parrot_Pointer_Array *list, sweep_cb callback)>
 
 Helper function to sweep pool.
 
@@ -1430,7 +1443,7 @@ Helper function to sweep pool.
 static void
 gc_gms_sweep_pool(PARROT_INTERP,
         ARGIN(Pool_Allocator *pool),
-        ARGIN(Linked_List *list),
+        ARGIN(Parrot_Pointer_Array *list),
         ARGIN(sweep_cb callback))
 {
     ASSERT_ARGS(gc_gms_sweep_pool)
@@ -1464,7 +1477,7 @@ gc_gms_sweep_pool(PARROT_INTERP,
 
 /*
 =item C<static int gc_gms_is_ptr_owned(PARROT_INTERP, void *ptr, Pool_Allocator
-*pool, Linked_List *list)>
+*pool, Parrot_Pointer_Array *list)>
 
 Helper function to check that we own PObj
 
@@ -1473,7 +1486,7 @@ Helper function to check that we own PObj
 
 static int
 gc_gms_is_ptr_owned(PARROT_INTERP, ARGIN_NULLOK(void *ptr),
-    ARGIN(Pool_Allocator *pool), ARGIN(Linked_List *list))
+    ARGIN(Pool_Allocator *pool), ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_gms_is_ptr_owned)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
@@ -1764,8 +1777,8 @@ gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
-=item C<static size_t gc_gms_count_used_string_memory(PARROT_INTERP, Linked_List
-*list)>
+=item C<static size_t gc_gms_count_used_string_memory(PARROT_INTERP,
+Parrot_Pointer_Array *list)>
 
 find amount of used string memory
 
@@ -1774,7 +1787,7 @@ find amount of used string memory
 */
 
 static size_t
-gc_gms_count_used_string_memory(PARROT_INTERP, ARGIN(Linked_List *list))
+gc_gms_count_used_string_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_gms_count_used_string_memory)
 
@@ -1799,8 +1812,8 @@ gc_gms_count_used_string_memory(PARROT_INTERP, ARGIN(Linked_List *list))
 
 /*
 
-=item C<static size_t gc_gms_count_used_pmc_memory(PARROT_INTERP, Linked_List
-*list)>
+=item C<static size_t gc_gms_count_used_pmc_memory(PARROT_INTERP,
+Parrot_Pointer_Array *list)>
 
 find amount of used pmc memory
 
@@ -1809,7 +1822,7 @@ find amount of used pmc memory
 */
 
 static size_t
-gc_gms_count_used_pmc_memory(PARROT_INTERP, ARGIN(Linked_List *list))
+gc_gms_count_used_pmc_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_gms_count_used_pmc_memory)
 
@@ -1974,8 +1987,8 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
 
 /*
 
-=item C<static void gc_gms_ensure_flags_in_list(PARROT_INTERP, Linked_List*
-list)>
+=item C<static void gc_gms_ensure_flags_in_list(PARROT_INTERP,
+Parrot_Pointer_Array* list)>
 
 Make sure the flags are in the list
 
@@ -1984,7 +1997,7 @@ Make sure the flags are in the list
 */
 
 static void
-gc_gms_ensure_flags_in_list(PARROT_INTERP, ARGIN(Linked_List* list))
+gc_gms_ensure_flags_in_list(PARROT_INTERP, ARGIN(Parrot_Pointer_Array* list))
 {
     ASSERT_ARGS(gc_gms_ensure_flags_in_list)
 
