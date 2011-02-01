@@ -1782,8 +1782,12 @@ gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
     size_t            gen  = POBJ2GEN(pmc);
     pmc_alloc_struct *item = PMC2PAC(pmc);
 
+    if (pmc->flags & PObj_GC_on_dirty_list_FLAG)
+        return;
+
     if (pmc->flags & PObj_GC_wb_triggered_FLAG)
         return;
+
     if (!gen)
         return;
 
