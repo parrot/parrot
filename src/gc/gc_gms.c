@@ -11,20 +11,16 @@ src/gc/gc_gms.c - Generational M&S
 Generational, non-compacting, mark and sweep GC.
 
 Objects are stored in N (up to 8) different lists; one for each generation.
-PObj_GC_generation_0_FLAG, PObj_GC_generation_1_FLAG, PObj_GC_generation_2_FLAG
-determine which generation an object is in.
-PObj_GC_on_dirty_list_FLAG is set by Write Barrier.
+Collection with lower number is younger.  PObj_GC_generation_0_FLAG,
+PObj_GC_generation_1_FLAG, PObj_GC_generation_2_FLAG determine which
+generation an object is in.  PObj_GC_on_dirty_list_FLAG is set by Write
+Barrier.
 
 "Dirty" objects are moved into "dirty_list" out of C<generation> list.
 
 Invariant: new reference from old-to-new generation can be introduced either:
     - from objects already in "dirty_list"
     - or with moving referent object into "dirty_list"
-We keep this invariant by "sealing" all objects in old generations with Write
-Barriers. Write Barrier will:
-    - Unseal object
-    - Set "dirty" flag
-    - Move object into "dirty_list"
 
 Corollary: objects in "dirty_list" either:
     - not referenced at all
@@ -33,19 +29,63 @@ Corollary: objects in "dirty_list" either:
 
 (Proof is very simple and left as exercise for reader)
 
-GC algorithm WILL be:
-1. Collect roots.
-2. ...
-3. Profit!
-
-Pictures of GC steps.
-
 Notation 
 1. "*A1:B2" is a live object A in generation 1 referenced by an object B in generation 2.
 2. "B0" is a non-live object B in generation 0 not referenced by anything.
-2. gn: generation n.
-3. R: root set.
+3. gn: generation n.
+4. R: root set.
+5. D: dirty list.
 
+GC algorithm WILL be:
+
+0. Pre-requirements:
+    a) Invariant described above to maintain dirty_list.
+    b) Maintain invariant by
+        i) "sealing" all objects in old generations with Write Barriers.
+        ii) Write Barrier will:
+            - Unseal object
+            - Set "on_dirty_list" flag
+            - Move object into "dirty_list"
+    c) gc_gms_mark_pmc_header ignores:
+        i) objects from generation older than C<self->gen_to_collect>.
+        ii) objects with on_dirty_list flag set.
+        iii) move objects to "work_list" for fully mark objects without recursion.
+
+1. Trigger GC (based on phase of the Moon for simplicity. We can tune Moon later).
+
+2. Choose K - how many collections we want to collect. Collections [0..K] will
+be collected. Remember K in C<self->gen_to_collect>.
+
+3. Move all objects from collections younger K from dirty_list
+back to original lists. Reason for this is "corollary of invariant". We can
+either collect such objects or they will be marked by referents from
+"dirty_list".
+
+4. Trace root objects. According to "0. Pre-requirements" we will ignore all
+"old" objects. All relevant objects are moved into "work_list".
+
+5. Iterate over "dirty_set" calling VTABLE_mark on it. It will move all
+children into "work_list".
+
+6. Iterate over "work_list" calling VTABLE_mark on it.
+
+7. Sweep generations starting from K:
+    - Destroy all dead objects
+    - Move live objects into generation max(K+1, N)
+    - Paint them white.
+
+8. ...
+
+9. Profit!
+
+We are not cleaning "dirty_list" after this process to rescan it again on next
+iteration. It allows us to keep track of old-to-new inter-generations
+references between iterations. Objects from "dirty_list" which is ready to be
+collected handled by "Step 3".
+
+
+Pictures of GC steps.
+TBD
 
 =cut
 
