@@ -1959,12 +1959,10 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
 
     fprintf(stderr, "%s\ngen: %d\n", header, gen);
 
-#if 0
-    Pointer_Array does not keep count.
-
+#ifndef NDEBUG
     for (i = 0; i < MAX_GENERATIONS; i++)
         fprintf(stderr, "%d: %d %d\n",
-                self->objects[i]->count, self->strings[i]->count);
+                i, self->objects[i]->count, self->strings[i]->count);
 #endif
 
     fprintf(stderr, "PMC: %d\n", Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
