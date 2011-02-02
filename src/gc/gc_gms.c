@@ -2027,7 +2027,7 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            i;
 
-    fprintf(stderr, "%s\ngen: %d\n", header, gen);
+    fprintf(stderr, "%s\ntotal: %d\ngen: %d\n", header, interp->gc_sys->stats.gc_mark_runs, gen);
 
 #ifndef NDEBUG
     fprintf(stderr, "dirty: %d\nwork: %d\n",
