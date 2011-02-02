@@ -95,6 +95,10 @@ static size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void set_context(PARROT_INTERP, ARGIN(PMC *ctx))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_allocate_registers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmcctx) \
@@ -111,6 +115,9 @@ static size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(number_regs_used))
+#define ASSERT_ARGS_set_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -804,6 +811,38 @@ Parrot_pcc_set_regs_ps(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(Regs_ps *bp_ps))
     CONTEXT_STRUCT(ctx)->bp_ps = *bp_ps;
 }
 
+/*
+
+=item C<void Parrot_pcc_set_context_func(PARROT_INTERP, PMC *ctx)>
+
+Set new Context to interpreter.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pcc_set_context_func(PARROT_INTERP, ARGIN(PMC *ctx))
+{
+    set_context(interp, ctx);
+}
+
+/*
+
+=item C<static void set_context(PARROT_INTERP, PMC *ctx)>
+
+Helper function to set breakpoint to.
+
+=cut
+
+*/
+
+static void
+set_context(PARROT_INTERP, ARGIN(PMC *ctx))
+{
+    CURRENT_CONTEXT(interp) = ctx;
+}
 
 /*
 
