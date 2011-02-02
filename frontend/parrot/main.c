@@ -32,6 +32,7 @@ struct init_args_t {
     Parrot_Int execute_packfile;
     Parrot_Int write_packfile;
     Parrot_Int have_pbc_file;
+    Parrot_Int have_pasm_file;
     Parrot_Int turn_gc_off;
     Parrot_Int preprocess_only;
 };
@@ -113,6 +114,12 @@ static void parseflags_minimal(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(* initargs);
 
+PARROT_CANNOT_RETURN_NULL
+static void preprocess_file(
+    Parrot_PMC interp,
+    Parrot_PMC compiler,
+    Parrot_String file);
+
 static void print_parrot_string(
     Parrot_PMC interp,
     ARGMOD(FILE *vector),
@@ -168,6 +175,7 @@ static void write_bytecode_file(
 #define ASSERT_ARGS_parseflags_minimal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(initargs) \
     , PARROT_ASSERT_ARG(argv))
+#define ASSERT_ARGS_preprocess_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_print_parrot_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(vector))
 #define ASSERT_ARGS_run_imcc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -278,14 +286,13 @@ run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *
     Parrot_PMC pasm_compiler = get_imcc_compiler_pmc(interp, class_pmc, 1);
 
     if (flags->preprocess_only) {
-        //imcc_preprocess(imcc, sourcefile);
-        //imcc_destroy(imcc);
+        preprocess_file(interp, pir_compiler, sourcefile);
         exit(EXIT_SUCCESS);
     }
-    else {
-        /* TODO: determine if it's a .pasm or .pir file */
+    else if (flags->have_pasm_file)
+        return compile_file(interp, pasm_compiler, sourcefile);
+    else
         return compile_file(interp, pir_compiler, sourcefile);
-    }
 }
 
 PARROT_CANNOT_RETURN_NULL
@@ -356,6 +363,26 @@ compile_file(Parrot_PMC interp, Parrot_PMC compiler, Parrot_String file)
     Parrot_api_pmc_invoke(interp, method, signature_pmc);
     Parrot_api_pmc_get_keyed_int(interp, signature_pmc, 0, &result_pmc);
     return result_pmc;
+}
+
+PARROT_CANNOT_RETURN_NULL
+static void
+preprocess_file(Parrot_PMC interp, Parrot_PMC compiler, Parrot_String file)
+{
+    Parrot_PMC signature_pmc = get_signature_pmc(interp, "PiS->");
+    Parrot_String method_name = NULL;
+    Parrot_PMC method = NULL;
+    Parrot_PMC file_pmc = NULL;
+    Parrot_PMC result_pmc = NULL;
+
+    if (!Parrot_api_string_import_ascii(interp, "preprocess", &method_name))
+        show_last_error_and_exit(interp);
+    if (!Parrot_api_pmc_find_method(interp, compiler, method_name, &method))
+        show_last_error_and_exit(interp);
+    Parrot_api_pmc_box_string(interp, file, &file_pmc);
+    Parrot_api_pmc_push(interp, signature_pmc, compiler);
+    Parrot_api_pmc_push(interp, signature_pmc, file_pmc);
+    Parrot_api_pmc_invoke(interp, method, signature_pmc);
 }
 
 /*
@@ -848,6 +875,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     args->write_packfile = 0;
     args->execute_packfile = 1;
     args->have_pbc_file = 0;
+    args->have_pasm_file = 0;
     args->trace = 0;
     args->turn_gc_off = 0;
     args->outfile = NULL;
@@ -1003,6 +1031,8 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
         const char * ext = strrchr(sourcefile, '.');
         if (sourcefile && ext && !strcmp(ext, ".pbc"))
             args->have_pbc_file = 1;
+        else if (sourcefile && !strcmp(ext, ".pasm"))
+            args->have_pasm_file = 1;
         verify_file_names(sourcefile, outfile);
         if (!Parrot_api_string_import(interp, sourcefile, &args->sourcefile))
             show_last_error_and_exit(interp);
