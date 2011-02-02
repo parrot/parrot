@@ -371,7 +371,8 @@
     - opcodes
   ticket: https://trac.parrot.org/parrot/ticket/1655
 -
-  name: 'logical_* vtables [eligiblie in 2.7]'
+  name: 'logical_* vtables'
+  eligible: 2.7
   note: "These can be replaced by 'get_bool' and intval ops unless you're using them for things that aren't really logical ops (don't do that!). Logical vtables are removed in r49012, and logical ops on PMCs are converted to use 'get_bool' internally. Rakudo seems to depend on logical ops on PMC."
   tags:
     - deprecated
