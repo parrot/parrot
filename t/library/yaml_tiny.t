@@ -250,12 +250,23 @@ yaml_ok(
 	'empty_comment_in_hash',
 );
 
+
 # Complex keys
 #yaml_ok(
 #	"---\na b: c d\n",
 #	[ { 'a b' => 'c d' } ],
 #	'key_with_whitespace',
 #);
+
+# try parsing api.yaml
+try {
+    my $parser := YAML::Tiny.new;
+    my $result := $parser.read_string(slurp('api.yaml'));
+    ok(1, "parsed api.yaml");
+    CATCH {
+        nok(1, "failed to parse api.yaml");
+    }
+}
 
 done_testing();
 
