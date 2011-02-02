@@ -377,7 +377,6 @@ method write_string($document) {
 
 multi method _dump($indent, ResizablePMCArray @list) {
     my @items := map(-> $_ {
-        _dumper($_);
         $indent ~ '- ' ~ self._dump('  ' ~ $indent, $_);
     }, |@list);
 
