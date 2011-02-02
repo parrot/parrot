@@ -239,6 +239,7 @@ Parrot_pcc_set_outer_ctx_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(PMC *outer_c
     ASSERT_ARGS(Parrot_pcc_set_outer_ctx_func)
     Parrot_Context * const c = CONTEXT_STRUCT(ctx);
     PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(outer_ctx->vtable->base_type == enum_class_CallContext);
     Parrot_gc_write_barrier(interp, ctx);
     c->outer_ctx = outer_ctx;
 }
