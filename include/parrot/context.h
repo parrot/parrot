@@ -566,7 +566,7 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 #  define Parrot_pcc_trace_flags_off(i, c, flags) Parrot_pcc_trace_flags_off_func((i), (c), (flags))
 #  define Parrot_pcc_trace_flags_test(i, c, flags) Parrot_pcc_trace_flags_test_func((i), (c), (flags))
 
-#  define Parrot_pcc_set_context(i, c)   Parrot_pcc_set_context((i), (c))
+#  define Parrot_pcc_set_context(i, c)   Parrot_pcc_set_context_func((i), (c))
 
 #endif /* ifndef NDEBUG */
 
