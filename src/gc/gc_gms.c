@@ -867,7 +867,7 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
         PMC              *pmc  = &(item->pmc);
         size_t            gen  = POBJ2GEN(pmc);
         if (gen <= self->gen_to_collect) {
-            Parrot_pa_remove(interp, dirty_list, ptr);
+            Parrot_pa_remove(interp, dirty_list, item->ptr);
             item->ptr = Parrot_pa_insert(interp, self->objects[gen], item);
         });
 }
@@ -961,14 +961,14 @@ gc_gms_sweep_pools(PARROT_INTERP,
                 PObj_live_CLEAR(pmc);
 
                 if (move_to_old) {
-                    Parrot_pa_remove(interp, self->objects[i], ptr);
+                    Parrot_pa_remove(interp, self->objects[i], item->ptr);
                     item->ptr = Parrot_pa_insert(interp, self->objects[i + 1], item);
                     gc_gms_set_gen_flags(interp, pmc, i + 1);
                     gc_gms_seal_object(interp, pmc);
                 }
             }
             else if (!PObj_constant_TEST(pmc)) {
-                Parrot_pa_remove(interp, self->objects[i], ptr);
+                Parrot_pa_remove(interp, self->objects[i], item->ptr);
 
                 /* this is manual inlining of Parrot_pmc_destroy() */
                 if (PObj_custom_destroy_TEST(pmc))
