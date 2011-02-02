@@ -344,6 +344,9 @@ typedef opcode_t *(*native_func_t)(PARROT_INTERP,
 typedef PMC *(*Parrot_compiler_func_t)(PARROT_INTERP,
                                        const char * program);
 
+void
+Parrot_clear_emergency_interp(void);
+
 /* HEADERIZER BEGIN: src/interp/inter_create.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -370,7 +373,7 @@ void Parrot_destroy(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
-const Interp* Parrot_get_emergency_interp(void);
+Interp* Parrot_get_emergency_interp(void);
 
 void Parrot_really_destroy(PARROT_INTERP,
     NULLOK(int exit_code),

@@ -503,7 +503,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
 /*
 
-=item C<const Interp* Parrot_get_emergency_interp(void)>
+=item C<Interp* Parrot_get_emergency_interp(void)>
 
 Provide access to a (possibly) valid interp pointer.  This is intended B<only>
 for use cases when an interp is not available otherwise, which shouldn't be
@@ -516,7 +516,7 @@ other than error handling.
 */
 
 PARROT_CAN_RETURN_NULL
-const Interp*
+Interp*
 Parrot_get_emergency_interp(void) {
     ASSERT_ARGS(Parrot_get_emergency_interp)
 
@@ -526,7 +526,7 @@ Parrot_get_emergency_interp(void) {
 
 /*
 
-=item C<Interp* Parrot_clear_emergency_interp(void)>
+=item C<void Parrot_clear_emergency_interp(void)>
 
 Null the C<emergency_interp> static variable.  This is only useful when
 purposefully invalidating C<emergency_interp>.  This is not a general-purpose
@@ -535,6 +535,7 @@ function.  Don't use it for anything other than error handling.
 =cut
 
 */
+
 void
 Parrot_clear_emergency_interp(void) {
     emergency_interp = NULL;
