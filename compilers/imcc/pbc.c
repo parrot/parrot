@@ -1633,7 +1633,7 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
             int        n = VTABLE_elements(imcc->interp, strings);
 
             for (i = 0; i < n; i++) {
-                int unused = add_const_str(imcc->interp,
+                int unused = add_const_str(imcc,
                     VTABLE_get_string_keyed_int(imcc->interp, strings, i), interp_code);
             }
         }
