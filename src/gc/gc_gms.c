@@ -1215,7 +1215,7 @@ gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
     ASSERT_ARGS(gc_gms_allocate_pmc_header)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Pool_Allocator   * const pool = self->pmc_allocator;
-    pmc_alloc_struct *ptr;
+    pmc_alloc_struct *item;
 
     gc_gms_maybe_mark_and_sweep(interp);
 
@@ -1225,10 +1225,10 @@ gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
     interp->gc_sys->stats.memory_allocated      += sizeof (PMC);
     interp->gc_sys->stats.mem_used_last_collect += sizeof (PMC);
 
-    ptr         = (pmc_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
-    ptr->ptr    = Parrot_pa_insert(interp, self->objects[0], ptr);
+    item         = (pmc_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
+    item->ptr    = Parrot_pa_insert(interp, self->objects[0], item);
 
-    return &ptr->pmc;
+    return &(item->pmc);
 }
 
 static void
@@ -1324,7 +1324,7 @@ gc_gms_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
     ASSERT_ARGS(gc_gms_allocate_string_header)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Pool_Allocator   *pool = self->string_allocator;
-    string_alloc_struct *ptr;
+    string_alloc_struct *item;
     STRING           *ret;
 
     gc_gms_maybe_mark_and_sweep(interp);
@@ -1334,10 +1334,10 @@ gc_gms_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
     interp->gc_sys->stats.memory_allocated      += sizeof (STRING);
     interp->gc_sys->stats.mem_used_last_collect += sizeof (STRING);
 
-    ptr = (string_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
-    ptr->ptr = Parrot_pa_insert(interp, self->strings[0], ptr);
+    item = (string_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
+    item->ptr = Parrot_pa_insert(interp, self->strings[0], item);
 
-    ret = &ptr->str;
+    ret = &(item->str);
     memset(ret, 0, sizeof (STRING));
     return ret;
 }
