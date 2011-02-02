@@ -1629,12 +1629,12 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
          * store the sub's strings
          */
         {
-            PMC *strings = Parrot_freeze_strings(interp, sub_pmc);
-            int        n = VTABLE_elements(interp, strings);
+            PMC *strings = Parrot_freeze_strings(imcc->interp, sub_pmc);
+            int        n = VTABLE_elements(imcc->interp, strings);
 
             for (i = 0; i < n; i++) {
-                int unused = add_const_str(interp,
-                    VTABLE_get_string_keyed_int(interp, strings, i), interp_code);
+                int unused = add_const_str(imcc->interp,
+                    VTABLE_get_string_keyed_int(imcc->interp, strings, i), interp_code);
             }
         }
 
