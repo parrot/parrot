@@ -372,12 +372,12 @@ method _read_hash(%hash, @indent, @lines) {
 }
 
 method write_string($document) {
-    "---\n" ~ self._dump("", $document);
+    "---" ~ self._dump("", $document);
 }
 
 multi method _dump($indent, ResizablePMCArray @list) {
     my @items := map(-> $_ {
-        $indent ~ '- ' ~ self._dump('  ' ~ $indent, $_);
+        $indent ~ '-' ~ self._dump('  ' ~ $indent, $_);
     }, |@list);
 
     "\n" ~ join("\n", |@items);
@@ -388,11 +388,11 @@ multi method _dump($indent, Hash %hash) {
 }
 
 multi method _dump($indent, String $value) {
-    "'" ~ subst($value, /\'/, "''") ~ "'";
+    " '" ~ subst($value, /\'/, "''") ~ "'";
 }
 
 multi method _dump($indent, $value) {
-    $value;
+    ' ' ~ $value;
 }
 
 
