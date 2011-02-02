@@ -521,7 +521,7 @@ Parrot_sub_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
     }
 
     /* set context */
-    CURRENT_CONTEXT(interp) = to_ctx;
+    Parrot_pcc_set_context(interp, to_ctx);
     Parrot_pcc_set_signature(interp, to_ctx, sig);
 }
 

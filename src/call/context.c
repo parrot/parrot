@@ -362,7 +362,7 @@ Parrot_pop_context(PARROT_INTERP)
     PMC * const old = Parrot_pcc_get_caller_ctx(interp, ctx);
 
     /* restore old, set cached interpreter base pointers */
-    CURRENT_CONTEXT(interp) = old;
+    set_context(interp, old);
 }
 
 /*
@@ -597,7 +597,7 @@ Parrot_set_new_context(PARROT_INTERP, ARGIN(const UINTVAL *number_regs_used))
     PMC *old = CURRENT_CONTEXT(interp);
     PMC *ctx = Parrot_alloc_context(interp, number_regs_used, old);
 
-    CURRENT_CONTEXT(interp) = ctx;
+    set_context(interp, ctx);
 
     return ctx;
 }
