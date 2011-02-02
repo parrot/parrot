@@ -944,9 +944,9 @@ gc_gms_sweep_pools(PARROT_INTERP,
 {
     ASSERT_ARGS(gc_gms_sweep_pools)
 
-    size_t i;
+    INTVAL i;
 
-    for (i = 0; i <= self->gen_to_collect; i++) {
+    for (i = self->gen_to_collect; i >= 0; i--) {
         /* Don't move to generation beyond last */
         int move_to_old = (i + 1) != MAX_GENERATIONS;
 
