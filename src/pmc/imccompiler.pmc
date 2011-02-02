@@ -37,6 +37,12 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler {
         STRING * code = STRINGNULL;
         PMC * result = PMCNULL;
         PMC * eval_pmc = PMCNULL;
+        UINTVAL regs_used[4] = {3, 3, 3, 3};
+        PMC * const newcontext = Parrot_push_context(interp, regs_used);
+
+        Parrot_block_GC_mark(interp);
+        Parrot_pcc_set_HLL(interp, newcontext, 0);
+        Parrot_pcc_set_sub(interp, newcontext, 0);
 
         Parrot_pcc_fill_params_from_c_args(INTERP, call_object, "S", &code);
         imcc_reset(attrs->imcc_info);
@@ -53,6 +59,10 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler {
             //sub_data->name = name;
             PackFile_fixup_subs(INTERP, PBC_MAIN, eval_pmc);
         }
+
+        Parrot_pop_context(interp);
+        Parrot_unblock_GC_mark(interp);
+
         Parrot_pcc_build_call_from_c_args(INTERP, call_object, "P", eval_pmc);
         interp->code = cur_code;
         return next;
