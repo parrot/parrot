@@ -371,6 +371,28 @@ method _read_hash(%hash, @indent, @lines) {
     1;
 }
 
+method write_string($document) {
+    "---\n" ~ self._dump("", $document);
+}
+
+multi method _dump($indent, ResizablePMCArray @list) {
+    my @items := map(-> $_ {
+        _dumper($_);
+        $indent ~ '- ' ~ self._dump('  ' ~ $indent, $_);
+    }, |@list);
+
+    "\n" ~ join("\n", |@items);
+}
+
+multi method _dump($indent, Hash %hash) {
+    "\n" ~ join("\n", |map(-> $k { $indent ~ $k ~ ': ' ~ self._dump('  ' ~ $indent, %hash{$k}) }, |%hash.keys));
+}
+
+multi method _dump($indent, $value) {
+    $value;
+}
+
+
 our $DEBUG;
 sub debug($message, *@params) {
     if $DEBUG {
