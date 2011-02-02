@@ -869,6 +869,7 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
 
         if (gen <= self->gen_to_collect) {
             PObj_live_CLEAR(pmc);
+            pmc->flags &= ~PObj_GC_on_dirty_list_FLAG;
             Parrot_pa_remove(interp, dirty_list, item->ptr);
             item->ptr = Parrot_pa_insert(interp, self->objects[gen], item);
         });
