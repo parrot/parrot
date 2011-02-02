@@ -105,11 +105,25 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler {
     ) {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         PMC * pf = PMCNULL;
+        UINTVAL regs_used[4] = {3, 3, 3, 3};
+        PMC * const newcontext = Parrot_push_context(interp, regs_used);
+
+
+
         if (has_target)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "IMCCompiler: compiler does not support the target option");
+
+        Parrot_block_GC_mark(interp);
+        Parrot_pcc_set_HLL(interp, newcontext, 0);
+        Parrot_pcc_set_sub(interp, newcontext, 0);
+
         /* TODO: Handle outer_ctx */
         pf = imcc_compile_file(attrs->imcc_info, filename, attrs->is_pasm);
+
+        Parrot_pop_context(interp);
+        Parrot_unblock_GC_mark(interp);
+
         RETURN(PMC *pf);
     }
 
