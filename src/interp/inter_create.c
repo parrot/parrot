@@ -26,6 +26,8 @@ Create or destroy a Parrot interpreter
 #include "../gc/gc_private.h"
 #include "inter_create.str"
 
+static Interp* emergency_interp;
+
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 
 /* HEADERIZER BEGIN: static */
@@ -130,6 +132,7 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
         interp->parent_interpreter = parent;
     else {
         interp->parent_interpreter = NULL;
+        emergency_interp           = interp;
 
 #if PARROT_CATCH_NULL
         PMCNULL                    = NULL;
@@ -350,6 +353,10 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     if (!interp->parent_interpreter) {
         Parrot_cx_runloop_end(interp);
         pt_join_threads(interp);
+
+        /* Don't bother trying to provide a pir backtrace on assertion failures
+         * during global destruction.  It only works in movies. */
+        emergency_interp = NULL;
     }
 
     /* if something needs destruction (e.g. closing PIOs)
@@ -491,6 +498,17 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
             mem_internal_free(interp);
         }
     }
+}
+
+PARROT_CAN_RETURN_NULL
+Interp*
+Parrot_get_emergency_interp(void) {
+    return emergency_interp;
+}
+
+void
+Parrot_clear_emergency_interp(void) {
+    emergency_interp = NULL;
 }
 
 
