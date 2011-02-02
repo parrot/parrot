@@ -129,6 +129,7 @@ EOH
     my $export = 'PARROT_EXPORT ';
     if ($self->is_dynamic) {
         $export = 'PARROT_DYNEXT_EXPORT ';
+        $h->emit("${export}VTABLE* Parrot_${name}_get_vtable_pointer(PARROT_INTERP);\n");
         $h->emit("${export}void    Parrot_${name}_class_init(PARROT_INTERP, int, int);\n");
     }
 
@@ -191,6 +192,9 @@ sub hdecls {
         unless $name eq 'default';
 
     $hout .= "${export}VTABLE* Parrot_${lc_name}_get_vtable(PARROT_INTERP);\n";
+
+    $hout .= "${export}VTABLE* Parrot_${lc_name}_get_vtable_pointer(PARROT_INTERP);\n"
+        if ($self->is_dynamic);
 
     $self->{hdecls} .= $hout;
 
@@ -947,6 +951,22 @@ EOC
 
     foreach my $parent_name ( @other_parents ) {
         $get_extra_vtable .= "    Parrot_${parent_name}_ro_update_vtable(vt);\n";
+    }
+
+    if ($self->is_dynamic) {
+        # The C could be optimized, but the case when Parrot_x_get_vtable_pointer
+        # is needed is very rare.  See TT #898 for more info.
+        $cout .= <<"EOC";
+$export
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+VTABLE* Parrot_${classname}_get_vtable_pointer(PARROT_INTERP) {
+    STRING *type_name = Parrot_str_new_constant(interp, "${classname}");
+    INTVAL  type_num  = Parrot_pmc_get_type_str(interp, type_name);
+    return interp->vtables[type_num];
+}
+
+EOC
     }
 
     $get_extra_vtable .= "    Parrot_${classname}_ro_update_vtable(vt);\n";
