@@ -1,4 +1,6 @@
 #!nqp
+# Copyright (C) 2011, Parrot Foundation.
+
 class YAML::Tiny;
 
 # The character class of all characters we need to escape
@@ -51,7 +53,8 @@ method read_string($string) {
 ###     # );
 ###     if ( $string =~ /^(?:\376\377|\377\376|\377\376\0\0|\0\0\376\377)/ ) {
 ###         pir::die \"Stream has a non UTF-8 BOM";
-###     } else {
+###     }
+###     else {
 ###         # Strip UTF-8 bom if found, we'll just ignore it
 ###         $string =~ s/^\357\273\277//;
 ###     }
