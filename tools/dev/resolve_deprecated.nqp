@@ -28,11 +28,11 @@ produce simplified version.
 
 =end COMPLICATIONS
 
+say("Parsing");
 my @yaml   := YAML::Tiny.new.read_string(slurp('api.yaml'))[0];
 my $ua     := pir::new(LWP::UserAgent);
 
-# Example of YAML::Dumper usage
-#say(YAML::Tiny.new.write_string(@yaml));
+say("Processing");
 
 for @yaml -> %e {
     # Skip items without ticket
@@ -41,6 +41,8 @@ for @yaml -> %e {
 
     # Skip already marked items
     next if any(-> $_ { $_ eq 'old' }, %e<tags>);
+
+    say("Checking $ticket");
 
     # Request non-https version due limitation of LWP.
     my $response := $ua.get(subst($ticket ~ '?format=tab', /^https/, 'http')).content;
@@ -53,6 +55,8 @@ for @yaml -> %e {
     say("Ticket $ticket is closed and can be marked as 'old'");
     %e<tags>.push('old');
 }
+
+say("Done");
 
 spew("api.yaml", YAML::Tiny.new.write_string(@yaml));
 
