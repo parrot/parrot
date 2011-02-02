@@ -13,6 +13,9 @@ t/pmc/socket.t - test the Socket PMC
 
 Tests the Socket PMC.
 
+The IPv6-related tests in this file do not actually require an IPv6 networking
+stack, so we don't need to check if this parrot is IPv6-aware.
+
 =cut
 
 .include 'socket.pasm'
@@ -21,7 +24,7 @@ Tests the Socket PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(25)
+    plan(20)
 
     test_init()
     test_get_fd()
@@ -33,12 +36,8 @@ Tests the Socket PMC.
     test_is_closed()
     test_tcp_socket()
     test_tcp_socket6()
-    test_raw_tcp_socket()
-    test_raw_tcp_socket6()
     test_udp_socket()
     test_udp_socket6()
-    test_raw_udp_socket()
-    test_raw_udp_socket6()
     test_server()
 
 .end
@@ -116,50 +115,20 @@ Tests the Socket PMC.
     ok(1, 'Created a IPv6 TCP Socket')
 .end
 
-.sub test_raw_tcp_socket6
-    .local pmc sock
-    sock = new 'Socket'
-    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_RAW, .PIO_PROTO_TCP)
-    ok(1, 'Created a raw IPv6 TCP Socket')
-.end
-
 .sub test_udp_socket6
     .local pmc sock
     sock = new 'Socket'
 
-    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_UDP)
+    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_DGRAM, .PIO_PROTO_UDP)
     ok(1, 'Created a IPv6 UDP Socket')
-.end
-
-.sub test_raw_udp_socket6
-    .local pmc sock
-    sock = new 'Socket'
-
-    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_RAW, .PIO_PROTO_UDP)
-    ok(1, 'Created a raw IPv6 UDP Socket')
-.end
-
-.sub test_raw_tcp_socket
-    .local pmc sock
-    sock = new 'Socket'
-    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_RAW, .PIO_PROTO_TCP)
-    ok(1, 'Created a raw TCP Socket')
 .end
 
 .sub test_udp_socket
     .local pmc sock
     sock = new 'Socket'
 
-    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_UDP)
+    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_DGRAM, .PIO_PROTO_UDP)
     ok(1, 'Created a UDP Socket')
-.end
-
-.sub test_raw_udp_socket
-    .local pmc sock
-    sock = new 'Socket'
-
-    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_RAW, .PIO_PROTO_UDP)
-    ok(1, 'Created a raw UDP Socket')
 .end
 
 .sub test_server
@@ -190,8 +159,7 @@ Tests the Socket PMC.
     result = sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
     ok(result, 'socket')
     address = sock.'sockaddr'('localhost', 1234)
-    status = sock.'connect'(address)
-    nok(status, 'connect')
+    sock.'connect'(address)
     status = sock.'send'('test message')
     is(status, '12', 'send')
     str = sock.'recv'()

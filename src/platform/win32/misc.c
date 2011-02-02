@@ -20,9 +20,10 @@ Miscellaneous helper functions that are specific to Win32.
 
 */
 
-#include "parrot/parrot.h"
+#include <ws2tcpip.h>
+#undef CONST
 
-#include <windows.h>
+#include "parrot/parrot.h"
 
 /* HEADERIZER HFILE: none */
 

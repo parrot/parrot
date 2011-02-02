@@ -1,4 +1,4 @@
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 Cage Cleaner Guide
 
@@ -313,9 +313,10 @@ L<http://www.oreillynet.com/onlamp/blog/2006/07/calling_for_parrot_janitors.html
 
 =head2 Remove usage of deprecated features
 
-F<DEPRECATED.pod> lists features that are deprecated but not yet removed;
-A Trac ticket will document how this deprecated feature is to be replaced.
-Help prepare for the actual removal of the feature by replacing its usage.
+The F<api.yaml> file lists features that are deprecated but not yet
+removed, as well as experimental features.  A Trac ticket will document how
+this deprecated feature is to be replaced.  Help prepare for the actual removal
+of the feature by replacing its usage.
 
 =head2 Clean up skipped tests
 

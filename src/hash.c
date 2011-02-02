@@ -685,7 +685,7 @@ Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
 
     /* special case for great speed */
     if (key_type   == Hash_key_type_STRING
-    &&  entry_type == enum_hash_int) {
+    &&  entry_type == (PARROT_DATA_TYPE)enum_hash_int) {
         for (entry_index = 0; entry_index < num_entries; ++entry_index) {
             STRING * const key     = VTABLE_shift_string(interp, info);
             const INTVAL   i       = VTABLE_shift_integer(interp, info);
@@ -936,7 +936,7 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     /* copy buckets and index */
     mem_sys_memcopy(new_buckets, hash->buckets,
             N_BUCKETS(old_size) * sizeof (HashBucket));
-    mem_sys_memcopy(new_index, hash->index, old_size * sizeof (HashBucket **));
+    mem_sys_memcopy(new_index, hash->index, old_size * sizeof (HashBucket *));
 
     /* free */
     if (old_size > SPLIT_POINT)
@@ -947,10 +947,10 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
 
     /* clear second half of the buckets, freed by old the index */
     memset(new_buckets + N_BUCKETS(old_size), 0,
-            sizeof (HashBucket *) * old_size);
+            sizeof (HashBucket) * old_size);
 
     /* clear second half of the index */
-    memset(new_index + (old_size), 0, sizeof (HashBucket **) * old_size);
+    memset(new_index + (old_size), 0, sizeof (HashBucket *) * old_size);
 
 
 

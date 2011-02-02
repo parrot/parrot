@@ -1595,20 +1595,6 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
 
     Parrot_ns_store_sub(imcc->interp, sub_pmc);
 
-    /*
-     * store the sub's strings
-     * XXX these need to occur before the sub to support thawing properly
-     */
-    {
-        PMC *strings = Parrot_freeze_strings(imcc->interp, sub_pmc);
-        int        n = VTABLE_elements(imcc->interp, strings);
-
-        for (i = 0; i < n; i++) {
-            int unused = add_const_str(imcc,
-                VTABLE_get_string_keyed_int(imcc->interp, strings, i), interp_code);
-        }
-    }
-
     /* store the sub */
     {
         const int k = add_const_table_pmc(imcc, sub_pmc);
@@ -1637,6 +1623,19 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
         }
         else if (interp_code->main_sub < 0) {
             interp_code->main_sub = k;
+        }
+
+        /*
+         * store the sub's strings
+         */
+        {
+            PMC *strings = Parrot_freeze_strings(interp, sub_pmc);
+            int        n = VTABLE_elements(interp, strings);
+
+            for (i = 0; i < n; i++) {
+                int unused = add_const_str(interp,
+                    VTABLE_get_string_keyed_int(interp, strings, i), interp_code);
+            }
         }
 
         return k;
@@ -2323,19 +2322,12 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
                     PackFile_Segment_new_seg(imcc->interp, dir,
                         PF_ANNOTATIONS_SEG, name, 1);
             interp_code->annotations->code = interp_code;
-
-            /* Create initial group. */
-            PackFile_Annotations_add_group(imcc->interp, interp_code->annotations,
-                    imcc->pc - interp_code->base.data);
         }
 
         /* Add annotation. */
         switch (ins->symregs[1]->set) {
           case 'I':
             annotation_type = PF_ANNOTATION_KEY_TYPE_INT;
-            break;
-          case 'N':
-            annotation_type = PF_ANNOTATION_KEY_TYPE_NUM;
             break;
           case 'S':
             annotation_type = PF_ANNOTATION_KEY_TYPE_STR;
