@@ -46,8 +46,11 @@ for @yaml -> %e {
     my $/ := $response ~~ /\t ( "closed" ) \t/;
     next unless $/[0] eq 'closed';
 
-    say("Ticket $ticket is closed and can be marked ad 'old'");
+    say("Ticket $ticket is closed and can be marked as 'old'");
 }
+
+# Example of YAML::Dumper usage
+# say(pir::new(YAML::Dumper).yaml(@yaml));
 
 sub any(&code, @list) {
     return 1 if &code($_) for @list;
