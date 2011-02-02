@@ -866,7 +866,9 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
         pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
         PMC              *pmc  = &(item->pmc);
         size_t            gen  = POBJ2GEN(pmc);
+
         if (gen <= self->gen_to_collect) {
+            PObj_live_CLEAR(pmc);
             Parrot_pa_remove(interp, dirty_list, item->ptr);
             item->ptr = Parrot_pa_insert(interp, self->objects[gen], item);
         });
