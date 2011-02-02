@@ -199,20 +199,22 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 
     /*Call appropriate initialization function for GC subsystem*/
     if (args->system == NULL
-    ||  STREQ(args->system, "MS2")) {
+    ||  STREQ(args->system, "ms2")) {
         interp->gc_sys->sys_type = MS2;
         Parrot_gc_ms2_init(interp, args);
     }
-    else if (STREQ(args->system, "MS")) {
+    else if (STREQ(args->system, "ms")) {
         interp->gc_sys->sys_type = MS;
         Parrot_gc_ms_init(interp, args);
     }
-    else if (STREQ(args->system, "INF")) {
+    else if (STREQ(args->system, "inf")) {
         interp->gc_sys->sys_type = INF;
         Parrot_gc_inf_init(interp, args);
     }
     else {
-        /*die horribly because of invalid GC core specified*/
+        /* Can't throw exception before GC is initialized */
+        fprintf(stderr, "Unknown GC type '%s'\n", args->system);
+        exit(EXIT_FAILURE);
     }
 
     /* Assertions that GC subsystem has complete API */
