@@ -427,7 +427,8 @@ help(void)
     printf(
     "    -w --warnings\n"
     "    -G --no-gc\n"
-    "       --gc-threshold=percentage    maximum memory wasted by GC\n"
+    "       --gc-dynamic-threshold=percentage    maximum memory wasted by GC\n"
+    "       --gc-min-threshold=KB\n"
     "       --gc-debug\n"
     "       --leak-test|--destroy-at-end\n"
     "    -g --gc ms|inf set GC type\n"
@@ -479,14 +480,15 @@ Parrot_cmd_options(void)
         { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
         { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
         { 'g', 'g', OPTION_required_FLAG, { "--gc" } },
-        { '\0', OPT_GC_THRESHOLD, OPTION_required_FLAG, { "--gc-threshold" } },
+        { '\0', OPT_GC_DYNAMIC_THRESHOLD, OPTION_required_FLAG, { "--gc-dynamic-threshold" } },
+        { '\0', OPT_GC_MIN_THRESHOLD, OPTION_required_FLAG, { "--gc-min-threshold" } },
+        { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
         { 'V', 'V', (OPTION_flags)0, { "--version" } },
         { 'X', 'X', OPTION_required_FLAG, { "--dynext" } },
         { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,
                                      { "--leak-test", "--destroy-at-end" } },
         { 'o', 'o', OPTION_required_FLAG, { "--output" } },
         { '\0', OPT_PBC_OUTPUT, (OPTION_flags)0, { "--output-pbc" } },
-        { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
         { 'a', 'a', (OPTION_flags)0, { "--pasm" } },
         { 'c', 'c', (OPTION_flags)0, { "--pbc" } },
         { 'd', 'd', OPTION_optional_FLAG, { "--imcc-debug" } },
@@ -545,82 +547,53 @@ static void
 parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const char *argv[]))
 {
     ASSERT_ARGS(parseflags_minimal)
+    struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
+    int status;
 
-    int pos = 0;
-
-    while (pos < argc) {
-        const char *arg = argv[pos];
-
-        if (!strcmp(arg, "--gc")) {
-            ++pos;
-            if (pos == argc) {
-                fprintf(stderr,
-                        "main: No GC specified."
-                        "\n\nhelp: parrot -h\n");
-                exit(EXIT_FAILURE);
-            }
-            arg = argv[pos];
-            initargs->gc_system = arg;
+    while ((status = longopt_get(argc, argv, Parrot_cmd_options(), &opt)) > 0) {
+        switch (opt.opt_id) {
+          case 'g':
+            initargs->gc_system = opt.opt_arg;
             break;
-        }
+          case OPT_GC_DYNAMIC_THRESHOLD:
+            if (opt.opt_arg && is_all_digits(opt.opt_arg)) {
+                initargs->gc_dynamic_threshold = strtoul(opt.opt_arg, NULL, 10);
 
-        /* arg should start with --gc-threshold *and* contain more chars */
-        else if (!strncmp(arg, "--gc-threshold", 14)) {
-
-            /* the next character could be '=' */
-            if (arg[14] == '=') {
-                arg++;
-            }
-
-            /* or the end of the string... */
-            else if (arg[14] == '\0'
-
-            /* and there's another argument */
-                 && pos < argc - 1) {
-                 arg = argv[++pos];
-            }
-
-            /* ANYTHING ELSE IS WRONG */
-            else {
-                fprintf(stderr, "--gc-threshold needs an argument");
-                exit(EXIT_FAILURE);
-            }
-
-            if (is_all_digits(arg)) {
-                initargs->gc_threshold = strtoul(arg, NULL, 10);
-
-                if (initargs->gc_threshold > 1000) {
+                if (initargs->gc_dynamic_threshold > 1000) {
                     fprintf(stderr, "error: maximum GC threshold is 1000\n");
                     exit(EXIT_FAILURE);
                 }
             }
             else {
-                fprintf(stderr, "error: invalid GC threshold specified:"
-                        "'%s'\n", arg);
+                fprintf(stderr, "error: invalid GC dynamic threshold specified:"
+                        "'%s'\n", opt.opt_arg);
                 exit(EXIT_FAILURE);
             }
-            ++pos;
-            arg = argv[pos];
-        }
-        else if (!strncmp(arg, "--hash-seed", 11)) {
-
-            if ((arg = strrchr(arg, '=')))
-                ++arg;
-            else
-                arg = argv[++pos];
-
-            if (is_all_hex_digits(arg)) {
-                initargs->hash_seed = strtoul(arg, NULL, 16);
+            break;
+          case OPT_GC_MIN_THRESHOLD:
+            if (opt.opt_arg && is_all_digits(opt.opt_arg)) {
+                initargs->gc_min_threshold = strtoul(opt.opt_arg, NULL, 10)
+                                           * 1024;
+            }
+            else {
+                fprintf(stderr, "error: invalid GC min threshold specified:"
+                        "'%s'\n", opt.opt_arg);
+                exit(EXIT_FAILURE);
+            }
+            break;
+          case OPT_HASH_SEED:
+            if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
+                initargs->hash_seed = strtoul(opt.opt_arg, NULL, 16);
             }
             else {
                 fprintf(stderr, "error: invalid hash seed specified:"
-                        "'%s'\n", arg);
+                        "'%s'\n", opt.opt_arg);
                 exit(EXIT_FAILURE);
             }
-            ++pos;
-            arg = argv[pos];
+            break;
+          default:
+            break;
         }
-        ++pos;
     }
 }
 
@@ -663,13 +636,12 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             args->run_core_name = opt.opt_arg;
             break;
           case 'g':
+          case OPT_GC_DYNAMIC_THRESHOLD:
+          case OPT_GC_MIN_THRESHOLD:
             /* Handled in parseflags_minimal */
             break;
           case 'G':
             args->turn_gc_off = 1;
-            break;
-          case OPT_GC_THRESHOLD:
-            /* handled in parseflags_minimal */
             break;
           case 't':
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {

@@ -1376,8 +1376,12 @@ src/gc/alloc_resources$(O) : \
     src/gc/gc_private.h \
     src/gc/alloc_resources.c
 
-src/gc/fixed_allocator$(O) : $(PARROT_H_HEADERS) \
-	src/gc/fixed_allocator.h src/gc/fixed_allocator.c
+src/gc/fixed_allocator$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/gc/gc_private.h \
+    src/gc/variable_size_pool.h \
+    src/gc/fixed_allocator.h \
+    src/gc/fixed_allocator.c
 
 src/gc/variable_size_pool$(O) : $(PARROT_H_HEADERS) \
 	src/gc/variable_size_pool.h src/gc/variable_size_pool.c

@@ -49,8 +49,9 @@ typedef int (*imcc_hack_func_t)(Parrot_PMC, Parrot_String, int, const char **, P
 
 typedef struct _Parrot_Init_Args {
     void *stacktop;
-    const char * gc_system;
-    Parrot_Int gc_threshold;
+    const char *gc_system;
+    Parrot_Int gc_dynamic_threshold;
+    Parrot_Int gc_min_threshold;
     Parrot_UInt hash_seed;
 } Parrot_Init_Args;
 
