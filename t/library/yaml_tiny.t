@@ -2,8 +2,8 @@
 
 # Testing of basic document structures
 
-pir::load_bytecode("lib/YAML/Tiny.pbc");
-pir::load_bytecode("t/lib/Test.pbc");
+pir::load_bytecode("YAML/Tiny.pbc");
+pir::load_bytecode("YAML/Test.pbc");
 
 
 #####################################################################
@@ -253,4 +253,18 @@ yaml_ok(
 #);
 
 done_testing();
+
+our sub yaml_ok($yaml, $expected, $description, *%adverbs) {
+    my $parser := YAML::Tiny.new;
+    try {
+        my $result := $parser.read_string($yaml);
+        #print("result: "); _dumper($result);
+        #print("expected: "); _dumper($expected);
+        is_deeply($expected, $result, $description, todo => %adverbs<todo> ?? $description !! 0);
+
+        CATCH {
+            nok(1, "Parse failed '{ $! }'", %adverbs<todo> ?? $description !! 0);
+        }
+    }
+}
 
