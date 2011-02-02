@@ -40,7 +40,7 @@ for @yaml -> %e {
     next unless $ticket;
 
     # Skip already marked items
-    next if any(-> $_ { $_ eq 'old' }, %e<tags>);
+    next if any(-> $_ { $_ eq 'completed' }, %e<tags>);
 
     say("Checking $ticket");
 
@@ -52,8 +52,8 @@ for @yaml -> %e {
     my $/ := $response ~~ /\t ( "closed" ) \t/;
     next unless $/[0] eq 'closed';
 
-    say("Ticket $ticket is closed and can be marked as 'old'");
-    %e<tags>.push('old');
+    say("Ticket $ticket is closed and can be marked as 'completed'");
+    %e<tags>.push('completed');
 }
 
 say("Done");

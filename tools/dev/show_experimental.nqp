@@ -25,7 +25,7 @@ for @yaml -> %e {
     my @tags  := %e<tags>;
     my $note  := %e<note> // '';
     my $title := %e<name>;
-    next if any(-> $_ { $_ eq 'old' }, @tags);
+    next if any(-> $_ { $_ eq 'completed' }, @tags);
     # This format is ugly, but is functional for now
     say("$title\t$note") if any(-> $_ { $_ eq 'experimental' }, @tags);
 }

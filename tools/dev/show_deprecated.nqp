@@ -27,7 +27,7 @@ for @yaml -> %e {
     my $eligible := %e<eligible> // 'NONE';
     my $ticket   := %e<ticket> //
       '*************** no ticket ****************';
-    next if any(-> $_ { $_ eq 'old' }, @tags);
+    next if any(-> $_ { $_ eq 'completed' }, @tags);
     # This format is ugly, but is functional for now
     say( "$ticket\t$eligible\t$title" ) if any( -> $_ { $_ eq 'deprecated' }, @tags);
 
