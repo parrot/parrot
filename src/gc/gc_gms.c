@@ -745,6 +745,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     /* Block further GC calls */
     ++self->gc_mark_block_level;
+    self->work_list = Parrot_pa_new(interp);
 
     interp->gc_sys->stats.gc_mark_runs++;
 
@@ -821,6 +822,8 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 #if 1 //def DETAIL_MEMORY_DEBUG
     gc_gms_print_stats(interp, "After", gen);
 #endif
+
+    Parrot_pa_destroy(interp, self->work_list);
 }
 
 /*
