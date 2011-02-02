@@ -370,7 +370,7 @@ void Parrot_destroy(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
-Interp* Parrot_get_emergency_interp(void);
+const Interp* Parrot_get_emergency_interp(void);
 
 void Parrot_really_destroy(PARROT_INTERP,
     NULLOK(int exit_code),

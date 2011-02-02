@@ -356,7 +356,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
         /* Don't bother trying to provide a pir backtrace on assertion failures
          * during global destruction.  It only works in movies. */
-        emergency_interp = NULL;
+        Parrot_clear_emergency_interp();
     }
 
     /* if something needs destruction (e.g. closing PIOs)
@@ -500,12 +500,39 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     }
 }
 
+
+/*
+
+=item C<const Interp* Parrot_get_emergency_interp(void)>
+
+Provide access to a (possibly) valid interp pointer.  This is intended B<only>
+for use cases when an interp is not available otherwise, which shouldn't be
+often.  There are no guarantees about what what this function returns.  If you
+have access to a valid interp, use that instead.  Don't use this for anything
+other than error handling.
+
+=cut
+
+*/
+
 PARROT_CAN_RETURN_NULL
-Interp*
+const Interp*
 Parrot_get_emergency_interp(void) {
     return emergency_interp;
 }
 
+
+/*
+
+=item C<Interp* Parrot_clear_emergency_interp(void)>
+
+Null the C<emergency_interp> static variable.  This is only useful when
+purposefully invalidating C<emergency_interp>.  This is not a general-purpose
+function.  Don't use it for anything other than error handling.
+
+=cut
+
+*/
 void
 Parrot_clear_emergency_interp(void) {
     emergency_interp = NULL;
