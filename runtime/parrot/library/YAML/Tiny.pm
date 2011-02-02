@@ -387,6 +387,10 @@ multi method _dump($indent, Hash %hash) {
     "\n" ~ join("\n", |map(-> $k { $indent ~ $k ~ ': ' ~ self._dump('  ' ~ $indent, %hash{$k}) }, |%hash.keys));
 }
 
+multi method _dump($indent, String $value) {
+    "'" ~ subst($value, /\'/, "''") ~ "'";
+}
+
 multi method _dump($indent, $value) {
     $value;
 }
