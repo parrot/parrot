@@ -3,7 +3,12 @@
 # Testing of basic document structures
 
 pir::load_bytecode("YAML/Tiny.pbc");
-pir::load_bytecode("YAML/Test.pbc");
+
+Q:PIR {
+        # We want Test::More features for testing. Not NQP's builtin.
+        .include "test_more.pir"
+        load_bytecode "dumper.pbc"
+};
 
 
 #####################################################################
@@ -267,4 +272,6 @@ our sub yaml_ok($yaml, $expected, $description, *%adverbs) {
         }
     }
 }
+
+
 

@@ -287,6 +287,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/ProfTest/NQPProfile.pir \
     $(LIBRARY_DIR)/ProfTest/Matcher.pir \
     $(LIBRARY_DIR)/ProfTest/Want.pir \
+    $(LIBRARY_DIR)/YAML/Tiny.pir \
     $(LIBRARY_DIR)/parrotlib.pbc \
     $(LIBRARY_DIR)/pcore.pbc \
     $(LIBRARY_DIR)/pcre.pbc \
@@ -341,6 +342,7 @@ FLUID_FILES_2 = \
     $(LIBRARY_DIR)/ProfTest/NQPProfile.pbc \
     $(LIBRARY_DIR)/ProfTest/Matcher.pbc \
     $(LIBRARY_DIR)/ProfTest/Want.pbc \
+    $(LIBRARY_DIR)/YAML/Tiny.pbc \
     runtime/parrot/include/parrotlib.pbc
 
 
