@@ -188,6 +188,8 @@ Returns family, type or protocol. Used for debugging.
             return data->type;
           case 2:
             return data->protocol;
+          default:
+            return -1;
         }
     }
 
