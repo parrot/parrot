@@ -1,4 +1,4 @@
-#!/usr/bin/env parrot-nqp
+#! parrot-nqp
 
 # Testing of basic document structures
 
