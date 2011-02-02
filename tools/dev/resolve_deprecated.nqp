@@ -2,6 +2,7 @@
 # Copyright (C) 2011, Parrot Foundation.
 
 pir::load_bytecode("YAML/Tiny.pbc");
+pir::load_bytecode("YAML/Dumper.pbc");
 pir::load_bytecode("LWP/UserAgent.pbc");
 pir::load_bytecode("nqp-setting.pbc");
 pir::load_bytecode("dumper.pbc");
@@ -30,6 +31,9 @@ produce simplified version.
 my @yaml   := YAML::Tiny.new.read_string(slurp('api.yaml'))[0];
 my $ua     := pir::new(LWP::UserAgent);
 
+# Example of YAML::Dumper usage
+#say(YAML::Tiny.new.write_string(@yaml));
+
 for @yaml -> %e {
     # Skip items without ticket
     my $ticket := %e<ticket>;
@@ -47,10 +51,10 @@ for @yaml -> %e {
     next unless $/[0] eq 'closed';
 
     say("Ticket $ticket is closed and can be marked as 'old'");
+    %e<tags>.push('old');
 }
 
-# Example of YAML::Dumper usage
-# say(pir::new(YAML::Dumper).yaml(@yaml));
+spew("api.yaml", YAML::Tiny.new.write_string(@yaml));
 
 sub any(&code, @list) {
     return 1 if &code($_) for @list;
