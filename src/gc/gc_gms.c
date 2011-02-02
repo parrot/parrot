@@ -700,7 +700,7 @@ Parrot_gc_gms_init(PARROT_INTERP)
             sizeof (string_alloc_struct));
 
         /* Allocate list for gray objects */
-        self->work_list  = Parrot_pa_new(interp);
+        self->work_list  = NULL;
         self->dirty_list = Parrot_pa_new(interp);
 
         for (i = 0; i < MAX_GENERATIONS; i++) {
