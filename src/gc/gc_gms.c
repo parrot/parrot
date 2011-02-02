@@ -778,23 +778,23 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     if (interp->pdb && interp->pdb->debugger) {
         Parrot_gc_trace_root(interp->pdb->debugger, NULL, (Parrot_gc_trace_type)0);
     }
-    gc_gms_check_sanity(interp);
     gc_gms_print_stats(interp, "After trace_roots", gen);
+    gc_gms_check_sanity(interp);
 
     /*
     5. Iterate over "dirty_set" calling VTABLE_mark on it. It will move all
     children into "work_list".
     */
     gc_gms_process_dirty_list(interp, self, self->dirty_list);
-    gc_gms_check_sanity(interp);
     gc_gms_print_stats(interp, "After dirty_list", gen);
+    gc_gms_check_sanity(interp);
 
     /*
     6. Iterate over "work_list" calling VTABLE_mark on it.
     */
     gc_gms_process_work_list(interp, self, self->work_list);
-    gc_gms_check_sanity(interp);
     gc_gms_print_stats(interp, "After work_list", gen);
+    gc_gms_check_sanity(interp);
 
     /*
     7. Sweep generations starting from K:
