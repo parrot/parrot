@@ -23,7 +23,7 @@ my @yaml := YAML::Tiny.new.read_string(slurp('api.yaml'))[0];
 
 for @yaml -> %e {
     my @tags  := %e<tags>;
-    my $note  := %e<note> || '';
+    my $note  := %e<note> // '';
     my $title := %e<name>;
     next if any(-> $_ { $_ eq 'old' }, @tags);
     # This format is ugly, but is functional for now
