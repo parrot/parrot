@@ -265,6 +265,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/distutils.pbc \
     $(LIBRARY_DIR)/dumper.pbc \
     $(LIBRARY_DIR)/yaml_dumper.pbc \
+    $(LIBRARY_DIR)/YAML/Tiny.pbc \
     $(LIBRARY_DIR)/Getopt/Obj.pbc \
     $(LIBRARY_DIR)/HTTP/Message.pbc \
     $(LIBRARY_DIR)/Iter.pbc \
@@ -286,6 +287,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/ProfTest/NQPProfile.pir \
     $(LIBRARY_DIR)/ProfTest/Matcher.pir \
     $(LIBRARY_DIR)/ProfTest/Want.pir \
+    $(LIBRARY_DIR)/YAML/Tiny.pir \
     $(LIBRARY_DIR)/parrotlib.pbc \
     $(LIBRARY_DIR)/pcore.pbc \
     $(LIBRARY_DIR)/pcre.pbc \
@@ -340,6 +342,7 @@ FLUID_FILES_2 = \
     $(LIBRARY_DIR)/ProfTest/NQPProfile.pbc \
     $(LIBRARY_DIR)/ProfTest/Matcher.pbc \
     $(LIBRARY_DIR)/ProfTest/Want.pbc \
+    $(LIBRARY_DIR)/YAML/Tiny.pbc \
     runtime/parrot/include/parrotlib.pbc
 
 
@@ -1166,7 +1169,15 @@ $(LIBRARY_DIR)/ProfTest/Matcher.pbc: $(LIBRARY_DIR)/ProfTest/Matcher.pir
 $(LIBRARY_DIR)/ProfTest/Matcher.pir: $(LIBRARY_DIR)/ProfTest/Matcher.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Matcher.nqp > $@
 
+#
+# YAML::Tiny
+#
 
+$(LIBRARY_DIR)/YAML/Tiny.pir: $(LIBRARY_DIR)/YAML/Tiny.pm $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/YAML/Tiny.pm > $@
+
+$(LIBRARY_DIR)/YAML/Tiny.pbc: $(LIBRARY_DIR)/YAML/Tiny.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/YAML/Tiny.pir
 
 ###############################################################################
 #

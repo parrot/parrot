@@ -37,13 +37,34 @@ IPv6-related tests for the Socket PMC.
 .end
 
 .sub test_bind
-    .local pmc sock, addrinfo
+    .local pmc sock, addrinfo, addr, it
     .local string str, null_string
-    .local int result
+    .local int result, count
 
     sock = new 'Socket'
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
     addrinfo = sock.'getaddrinfo'(null_string, 1234, .PIO_PROTO_TCP, .PIO_PF_INET6, 0)
+
+    # output addresses for debugging
+    it = iter addrinfo
+    count = 1
+  loop:
+    addr = shift it
+    print '# address '
+    print count
+    print ': family '
+    $I0 = addr[0]
+    print $I0
+    print ', type '
+    $I0 = addr[1]
+    print $I0
+    print ', protocol '
+    $I0 = addr[2]
+    print $I0
+    print "\n"
+    inc count
+    if it goto loop
+
     sock.'bind'(addrinfo)
 
     str = sock.'local_address'()
