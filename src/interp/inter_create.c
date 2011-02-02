@@ -518,6 +518,8 @@ other than error handling.
 PARROT_CAN_RETURN_NULL
 const Interp*
 Parrot_get_emergency_interp(void) {
+    ASSERT_ARGS(Parrot_get_emergency_interp)
+
     return emergency_interp;
 }
 
