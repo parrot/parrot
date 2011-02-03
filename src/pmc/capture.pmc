@@ -25,6 +25,7 @@ These are the vtable functions for the Capture PMC.
     do { \
         GETATTR_Capture_array((i), (obj), (arr)); \
         if (!(arr)) { \
+            Parrot_gc_write_barrier((i), (obj));  \
             PObj_custom_mark_SET(obj); \
             (arr) = Parrot_pmc_new((i), enum_class_ResizablePMCArray); \
             SETATTR_Capture_array((i), (obj), (arr)); \
@@ -34,6 +35,7 @@ These are the vtable functions for the Capture PMC.
     do { \
         GETATTR_Capture_hash((i), (obj), (hsh)); \
         if (!(hsh)) { \
+            Parrot_gc_write_barrier((i), (obj)); \
             PObj_custom_mark_SET(obj); \
             (hsh) = Parrot_pmc_new((i), enum_class_Hash); \
             SETATTR_Capture_hash((i), (obj), (hsh)); \
