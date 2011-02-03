@@ -101,7 +101,12 @@ TBD
 
 #define PANIC_OUT_OF_MEM(size) failed_allocation(__LINE__, (size))
 
-/* Maximum number of collections */
+/*
+ * Maximum number of collections
+ * NB:
+ *  1. Maximum number is 8 due limit number of bits in PMC.flags.
+ *  2. Don't forget to update gc_gms_select_generation_to_collect after changing it!
+ */
 #define MAX_GENERATIONS     3
 
 /* We allocate additional space in front of PObj* to store additional pointer */
@@ -856,6 +861,7 @@ gc_gms_select_generation_to_collect(PARROT_INTERP)
     /* TODO Use less naive approach. E.g. count amount of allocated memory in
      * older generations */
     size_t runs = interp->gc_sys->stats.gc_mark_runs;
+#if 0
     if (runs % 100000000 == 0)
         return 8;
     if (runs % 10000000 == 0)
@@ -868,6 +874,7 @@ gc_gms_select_generation_to_collect(PARROT_INTERP)
         return 4;
     if (runs % 1000 == 0)
         return 3;
+#endif
     if (runs % 100 == 0)
         return 2;
     if (runs % 10 == 0)
