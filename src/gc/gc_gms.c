@@ -1951,37 +1951,11 @@ gc_gms_count_used_pmc_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
 }
 
 /*
-
-=item C<static int pobj2gen(PObj *pmc)>
-
-=item C<static int gen2flags(int gen)>
-
-helper functions to check and use macro
-
-=cut
-
-*/
-
-static int
-pobj2gen(ARGIN(PObj *pmc))
-{
-    ASSERT_ARGS(pobj2gen)
-
-    return POBJ2GEN(pmc);
-}
-
-static int
-gen2flags(int gen)
-{
-    ASSERT_ARGS(gen2flags)
-
-    return GEN2FLAGS(gen);
-}
-
-/*
 =item C<static void gc_gms_seal_object(PARROT_INTERP, PMC *pmc)>
 
-Seal object with write barrier.
+=item C<static void gc_gms_unseal_object(PARROT_INTERP, PMC *pmc)>
+
+Seal/unseal object with write barrier.
 
 =cut
 */
@@ -2097,19 +2071,19 @@ static void
 gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
 {
     ASSERT_ARGS(gc_gms_print_stats)
+
+#ifdef DETAIL_MEMORY_DEBUG
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            i;
 
     fprintf(stderr, "%s\ntotal: %d\ngen: %d\n", header, interp->gc_sys->stats.gc_mark_runs, gen);
 
-#ifndef NDEBUG
     fprintf(stderr, "dirty: %d\nwork: %d\n",
             self->dirty_list->count, self->work_list->count);
 
     for (i = 0; i < MAX_GENERATIONS; i++)
         fprintf(stderr, "%d: %d %d\n",
                 i, self->objects[i]->count, self->strings[i]->count);
-#endif
 
 #if 0
     fprintf(stderr, "PMC: %d\n", Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
@@ -2123,6 +2097,7 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
 
 #endif
     fprintf(stderr, "\n");
+#endif
 
 }
 
@@ -2145,6 +2120,7 @@ static void
 gc_gms_validate_objects(PARROT_INTERP)
 {
     INTVAL i;
+#ifdef DETAIL_MEMORY_DEBUG
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     interp->gc_sys->mark_pmc_header = gc_gms_validate_pmc;
@@ -2157,7 +2133,7 @@ gc_gms_validate_objects(PARROT_INTERP)
             PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
             PObj_live_CLEAR(pmc););
     }
-
+#endif
 }
 
 /*
@@ -2178,6 +2154,34 @@ gc_gms_get_youngest_generation(PARROT_INTERP, ARGIN(PMC *pmc))
 
     if (gen < self->youngest_child)
         self->youngest_child = gen;
+}
+
+/*
+
+=item C<static int pobj2gen(PObj *pmc)>
+
+=item C<static int gen2flags(int gen)>
+
+helper functions to check and use macro
+
+=cut
+
+*/
+
+static int
+pobj2gen(ARGIN(PObj *pmc))
+{
+    ASSERT_ARGS(pobj2gen)
+
+    return POBJ2GEN(pmc);
+}
+
+static int
+gen2flags(int gen)
+{
+    ASSERT_ARGS(gen2flags)
+
+    return GEN2FLAGS(gen);
 }
 
 /*
