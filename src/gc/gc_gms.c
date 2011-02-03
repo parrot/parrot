@@ -2133,56 +2133,6 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
 
 }
 
-/*
-
-=item C<static void gc_gms_ensure_flags_in_list(PARROT_INTERP,
-Parrot_Pointer_Array* list)>
-
-Make sure the flags are in the list
-
-=cut
-
-*/
-
-static void
-gc_gms_ensure_flags_in_list(PARROT_INTERP, ARGIN(Parrot_Pointer_Array* list))
-{
-    ASSERT_ARGS(gc_gms_ensure_flags_in_list)
-#if 0
-    List_Item_Header *tmp = list->first;
-    while (tmp) {
-        PObj *obj = LLH2Obj_typed(tmp, PObj);
-        PARROT_ASSERT(!(obj->flags & b_PObj_live_FLAG));
-        tmp = tmp->next;
-    }
-#endif
-}
-
-/*
-
-=item C<static void gc_gms_ensure_flags(PARROT_INTERP)>
-
-debug function to check for flags
-
-=cut
-
-*/
-
-static void
-gc_gms_ensure_flags(PARROT_INTERP)
-{
-    ASSERT_ARGS(gc_gms_ensure_flags)
-#ifndef NDEBUG
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    gc_gms_ensure_flags_in_list(interp, self->objects[0]);
-    gc_gms_ensure_flags_in_list(interp, self->objects[1]);
-    gc_gms_ensure_flags_in_list(interp, self->objects[2]);
-    gc_gms_ensure_flags_in_list(interp, self->strings[0]);
-    gc_gms_ensure_flags_in_list(interp, self->strings[1]);
-    gc_gms_ensure_flags_in_list(interp, self->strings[2]);
-#endif
-}
-
 static void
 gc_gms_validate_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
