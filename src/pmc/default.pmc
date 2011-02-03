@@ -470,6 +470,7 @@ Sets the property for C<*key> to C<*value>.
         if (PMC_IS_NULL(PMC_metadata(SELF)))
             PMC_metadata(SELF) = make_prop_hash(INTERP, SELF);
 
+        Parrot_gc_write_barrier(INTERP, PMC_metadata(SELF));
         VTABLE_set_pmc_keyed_str(INTERP, PMC_metadata(SELF), key, value);
     }
 
