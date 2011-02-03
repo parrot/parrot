@@ -710,7 +710,7 @@ Parrot_file_symlink(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
                             Parrot_utf16_encoding_ptr);
     char    *c_to   = Parrot_str_to_encoded_cstring(interp, to,
                             Parrot_utf16_encoding_ptr);
-    DWORD    attrs  = GetFileAttributesW(c_from);
+    DWORD    attrs  = GetFileAttributesW((LPWSTR)c_from);
     BOOLEAN  result = 0; /* BOOLEAN, not BOOL */
 
     if (attrs != INVALID_FILE_ATTRIBUTES) {
@@ -752,6 +752,59 @@ Parrot_file_link(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
 
     if (!result)
         THROW("link");
+}
+
+/*
+
+=item C<PMC * Parrot_file_readdir(PARROT_INTERP, STRING *path)>
+
+Reads entries from a directory.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_file_readdir(PARROT_INTERP, ARGIN(STRING *path))
+{
+    PMC    *array = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+    char   *c_str;
+    char   *suffix;
+    INTVAL  last_char;
+    HANDLE  handle;
+
+    WIN32_FIND_DATAW find_data;
+
+    /* Add \* to the directory name and start search. */
+    last_char = STRING_ord(interp, path, -1);
+    suffix    = last_char == '\\' || last_char == '/' ? "*" : "\\*";
+    path      = Parrot_str_concat(interp, path,
+                        string_from_literal(interp, suffix));
+    c_str     = Parrot_str_to_encoded_cstring(interp, path,
+                        Parrot_utf16_encoding_ptr);
+    handle    = FindFirstFileW((LPWSTR)c_str, &find_data);
+
+    Parrot_str_free_cstring(c_str);
+
+    if (handle == INVALID_HANDLE_VALUE)
+        THROW("readdir");
+
+    /* Loop over all directories and add to result array. */
+    do {
+        STRING *entry = Parrot_str_new_init(interp, (char *)find_data.cFileName,
+                            wcslen(find_data.cFileName) * 2,
+                            Parrot_utf16_encoding_ptr, 0);
+
+        VTABLE_push_string(interp, array, entry);
+    } while (FindNextFileW(handle, &find_data) != 0);
+
+    if (GetLastError() != ERROR_NO_MORE_FILES)
+        THROW("readdir");
+
+    FindClose(handle);
+
+    return array;
 }
 
 /*

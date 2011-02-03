@@ -592,6 +592,42 @@ Parrot_file_link(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
 
 /*
 
+=item C<PMC * Parrot_file_readdir(PARROT_INTERP, STRING *path)>
+
+Reads entries from a directory.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_file_readdir(PARROT_INTERP, ARGIN(STRING *path))
+{
+    char *c_str = Parrot_str_to_platform_cstring(interp, path);
+    PMC  *array = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+    DIR  *dir   = opendir(c_str);
+
+    struct dirent *dirent;
+
+    Parrot_str_free_cstring(c_str);
+
+    if (!dir)
+        THROW("readdir");
+
+    while ((dirent = readdir(dir)) != NULL) {
+        const char *const name = dirent->d_name;
+        VTABLE_push_string(interp, array,
+                Parrot_str_from_platform_cstring(interp, name));
+    }
+
+    closedir(dir);
+
+    return array;
+}
+
+/*
+
 =back
 
 =cut

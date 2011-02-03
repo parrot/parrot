@@ -334,6 +334,7 @@ if ( $MSWin32 ) {
     $s[2] = 0777;   # mode: always 0777 on Windows
     $s[3] = 0;      # nlink: only implemented in fstat for now
     $s[6] = 0;      # rdev: we use zero instead of drive letter
+    $s[10] = $s[9]; # ctime: equals mtime
     $stat = sprintf("0x%08x\n" x 11, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
@@ -394,13 +395,15 @@ pir_output_is( <<'CODE', $entries, 'Test OS.readdir' );
     $P2 = $P1.'readdir'('docs')
 
     $S0 = join ' ', $P2
+    $I0 = find_encoding 'ascii'
+    $S0 = trans_encoding $S0, $I0
     print $S0
     print "\n"
 .end
 CODE
 
 SKIP: {
-    skip 'not implemented on windows yet', 2 if ( $MSWin32 && $MSVC );
+    skip 'not implemented on windows yet', 1 if ( $MSWin32 && $MSVC );
 
     mkdir 'silly-dir-with-silly-names';
     open my $fileh, '>', "silly-dir-with-silly-names/sillyname\x{263A}";
@@ -425,17 +428,17 @@ CODE
 
     unlink "silly-dir-with-silly-names/sillyname\x{263A}";
     rmdir "silly-dir-with-silly-names";
+}
 
-    pir_error_output_like( <<'CODE', <<'OUTPUT', 'Test bad OS.readdir' );
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'Test bad OS.readdir' );
 .sub main :main
     $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P2 = $P1.'readdir'('non-existent directory')
 .end
 CODE
-/No such file or directory/
+/readdir failed/
 OUTPUT
-}
 
 # test rename
 
