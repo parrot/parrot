@@ -82,12 +82,12 @@ PMC * imcc_compile_file(
         FUNC_MODIFIES(*imcc);
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-STRING* imcc_last_error_message(ARGIN(imc_info_t *imcc))
+INTVAL imcc_last_error_code(ARGIN(imc_info_t *imcc))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-INTVAL imcc_last_error_message(ARGIN(imc_info_t *imcc))
+PARROT_CAN_RETURN_NULL
+STRING* imcc_last_error_message(ARGIN(imc_info_t *imcc))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -171,7 +171,7 @@ yyscan_t imcc_get_scanner(ARGMOD(imc_info_t *imcc))
 #define ASSERT_ARGS_imcc_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(fullname))
-#define ASSERT_ARGS_imcc_last_error_message __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_imcc_last_error_code __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_last_error_message __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))

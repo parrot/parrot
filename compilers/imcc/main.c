@@ -148,7 +148,7 @@ imcc_last_error_message(ARGIN(imc_info_t *imcc))
 
 PARROT_EXPORT
 INTVAL
-imcc_last_error_message(ARGIN(imc_info_t *imcc))
+imcc_last_error_code(ARGIN(imc_info_t *imcc))
 {
     return imcc->error_code;
 }
