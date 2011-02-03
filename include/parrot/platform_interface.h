@@ -162,37 +162,43 @@ typedef struct _Parrot_Stat_Buf {
 } Parrot_Stat_Buf;
 
 PARROT_EXPORT
-STRING *Parrot_file_getcwd(Interp *);
+STRING *Parrot_file_getcwd(PARROT_INTERP);
 
 PARROT_EXPORT
-void Parrot_file_mkdir(Interp *, ARGIN(STRING *path), INTVAL mode);
+void Parrot_file_mkdir(PARROT_INTERP, ARGIN(STRING *path), INTVAL mode);
 
 PARROT_EXPORT
-void Parrot_file_chdir(Interp *, ARGIN(STRING *path));
+void Parrot_file_chdir(PARROT_INTERP, ARGIN(STRING *path));
 
 PARROT_EXPORT
-void Parrot_file_rmdir(Interp *, ARGIN(STRING *path));
+void Parrot_file_rmdir(PARROT_INTERP, ARGIN(STRING *path));
 
 PARROT_EXPORT
-void Parrot_file_unlink(Interp *, ARGIN(STRING *path));
+void Parrot_file_unlink(PARROT_INTERP, ARGIN(STRING *path));
 
 PARROT_EXPORT
-void Parrot_file_stat(Interp * , ARGIN(STRING *path), ARGOUT(Parrot_Stat_Buf *buf));
+void Parrot_file_stat(PARROT_INTERP, ARGIN(STRING *path), ARGOUT(Parrot_Stat_Buf *buf));
 
 PARROT_EXPORT
-void Parrot_file_lstat(Interp * , ARGIN(STRING *path), ARGOUT(Parrot_Stat_Buf *buf));
+void Parrot_file_lstat(PARROT_INTERP, ARGIN(STRING *path), ARGOUT(Parrot_Stat_Buf *buf));
 
 PARROT_EXPORT
-void Parrot_file_fstat(Interp * , PIOHANDLE handle, ARGOUT(Parrot_Stat_Buf *buf));
+void Parrot_file_fstat(PARROT_INTERP, PIOHANDLE handle, ARGOUT(Parrot_Stat_Buf *buf));
 
 PARROT_EXPORT
-INTVAL Parrot_file_stat_intval(Interp * , ARGIN(STRING *path), INTVAL thing);
+INTVAL Parrot_file_stat_intval(PARROT_INTERP, ARGIN(STRING *path), INTVAL thing);
 
 PARROT_EXPORT
-INTVAL Parrot_file_lstat_intval(Interp * , ARGIN(STRING * path), INTVAL thing);
+INTVAL Parrot_file_lstat_intval(PARROT_INTERP, ARGIN(STRING * path), INTVAL thing);
 
 PARROT_EXPORT
-INTVAL Parrot_file_fstat_intval(Interp * , PIOHANDLE os_handle, INTVAL thing);
+INTVAL Parrot_file_fstat_intval(PARROT_INTERP, PIOHANDLE os_handle, INTVAL thing);
+
+PARROT_EXPORT
+void Parrot_file_symlink(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to));
+
+PARROT_EXPORT
+void Parrot_file_link(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to));
 
 /*
 ** Math:

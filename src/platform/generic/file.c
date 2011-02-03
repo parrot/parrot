@@ -544,6 +544,54 @@ Parrot_file_fstat_intval(PARROT_INTERP, PIOHANDLE file, INTVAL thing)
 
 /*
 
+=item C<void Parrot_file_symlink(PARROT_INTERP, STRING *from, STRING *to)>
+
+Creates a symlink
+
+=cut
+
+*/
+
+void
+Parrot_file_symlink(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
+{
+    char * const c_from = Parrot_str_to_platform_cstring(interp, from);
+    char * const c_to   = Parrot_str_to_platform_cstring(interp, to);
+    const int    result = symlink(c_from, c_to);
+
+    Parrot_str_free_cstring(c_from);
+    Parrot_str_free_cstring(c_to);
+
+    if (result)
+        THROW("symlink");
+}
+
+/*
+
+=item C<void Parrot_file_link(PARROT_INTERP, STRING *from, STRING *to)>
+
+Creates a hard link
+
+=cut
+
+*/
+
+void
+Parrot_file_link(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
+{
+    char * const c_from = Parrot_str_to_platform_cstring(interp, from);
+    char * const c_to   = Parrot_str_to_platform_cstring(interp, to);
+    const int    result = link(c_from, c_to);
+
+    Parrot_str_free_cstring(c_from);
+    Parrot_str_free_cstring(c_to);
+
+    if (result)
+        THROW("link");
+}
+
+/*
+
 =back
 
 =cut

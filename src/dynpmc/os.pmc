@@ -289,60 +289,28 @@ Lstats a file, and returns a 13 position array as in Perl. See C<stat>.
 
 =item C<void symlink(STRING *from, STRING *to)>
 
-Creates a symlink, where available
+Creates a symlink
 
 =cut
 
 */
 
     METHOD symlink(STRING *from, STRING *to) {
-#ifndef WIN32
-        char * const cfrom = Parrot_str_to_cstring(INTERP, from);
-        char * const cto   = Parrot_str_to_cstring(INTERP, to);
-        const int error    = symlink(cfrom, cto);
-
-        Parrot_str_free_cstring(cfrom);
-        Parrot_str_free_cstring(cto);
-
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-#else
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
-                "Win32 does not support symlinks!");
-#endif
+        Parrot_file_symlink(INTERP, from, to);
     }
 
 /*
 
 =item C<void link(STRING *from, STRING *to)>
 
-Creates a hard link, where available(?)
+Creates a hard link
 
 =cut
 
 */
 
     METHOD link(STRING *from, STRING *to) {
-#ifndef WIN32
-        char * const cfrom = Parrot_str_to_cstring(INTERP, from);
-        char * const cto   = Parrot_str_to_cstring(INTERP, to);
-        const int    error = link(cfrom, cto);
-
-        Parrot_str_free_cstring(cfrom);
-        Parrot_str_free_cstring(cto);
-
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                "link() failed for OS PMC: %s\n", errmsg);
-        }
-#else
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-                "Win32 is not POSIX. Need win32 developer!");
-#endif
+        Parrot_file_link(INTERP, from, to);
     }
 
 /*

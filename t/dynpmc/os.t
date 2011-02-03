@@ -383,15 +383,11 @@ CODE
 /stat failed/
 OUTPUT
 
-# test readdir
-SKIP: {
-    skip 'not implemented on windows yet', 3 if ( $MSWin32 && $MSVC );
-
-    opendir my $IN, 'docs';
-    my @entries = readdir $IN;
-    closedir $IN;
-    my $entries = join( ' ', @entries ) . "\n";
-    pir_output_is( <<'CODE', $entries, 'Test OS.readdir' );
+opendir my $IN, 'docs';
+my @entries = readdir $IN;
+closedir $IN;
+my $entries = join( ' ', @entries ) . "\n";
+pir_output_is( <<'CODE', $entries, 'Test OS.readdir' );
 .sub main :main
     $P0 = loadlib 'os'
     $P1 = new ['OS']
@@ -402,6 +398,9 @@ SKIP: {
     print "\n"
 .end
 CODE
+
+SKIP: {
+    skip 'not implemented on windows yet', 2 if ( $MSWin32 && $MSVC );
 
     mkdir 'silly-dir-with-silly-names';
     open my $fileh, '>', "silly-dir-with-silly-names/sillyname\x{263A}";
@@ -528,7 +527,7 @@ rmdir $xpto if -f $xpto;    # this way next test doesn't fail if this one does
 
 # Test symlink
 SKIP: {
-    skip "Symlinks not available under Windows", 2 if $MSWin32;
+    skip "Admin rights needed for symlinks on Windows", 2 if $MSWin32;
 
     pir_error_output_like( <<'CODE', <<"OUT", "Test symlink" );
 .sub main :main
@@ -547,8 +546,7 @@ SKIP: {
 .end
 CODE
 /ok
-File exists
-/
+symlink failed/
 OUT
 
     ok( -l "xpto", "symlink was really created" );
@@ -556,10 +554,7 @@ OUT
 }
 
 # Test link to file. May require root permissions
-SKIP: {
-    skip "Hardlinks to files not possible on Windows", 2 if $MSWin32 or $cygwin;
-
-    pir_output_is( <<'CODE', <<"OUT", "Test link" );
+pir_output_is( <<'CODE', <<"OUT", "Test link" );
 .sub main :main
         $P0 = loadlib 'os'
         $P1 = new ['OS']
@@ -576,16 +571,12 @@ CODE
 ok
 OUT
 
-    my $nl = [ stat("myconfig") ]->[3];
-    ok( $nl > 1, "hard link to file was really created" );
-    unlink "xpto" if -f "xpto";
-}
+my $nl = [ stat("myconfig") ]->[3];
+ok( $nl > 1, "hard link to file was really created" );
+unlink "xpto" if -f "xpto";
 
-SKIP: {
-    skip "Hardlinks to files not possible on Windows", 1 if $MSWin32 or $cygwin;
-
-    my $prevnl = [ stat("tools") ]->[3];
-    pir_output_like( <<"CODE", <<"OUT", "Test dirlink" );
+my $prevnl = [ stat("tools") ]->[3];
+pir_output_like( <<"CODE", <<"OUT", "Test dirlink" );
 .sub main :main
     .local pmc os
     .local string xpto, tools
@@ -622,9 +613,8 @@ SKIP: {
     end
 .end
 CODE
-/link.* failed for OS PMC:/
+/link failed/
 OUT
-}
 
 # Test umask
 SKIP: {

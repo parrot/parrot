@@ -26,7 +26,7 @@ This file implements OS-specific file functions for Win32 platforms.
 
 #define THROW(msg) Parrot_ex_throw_from_c_args(interp, NULL, \
     EXCEPTION_EXTERNAL_ERROR, "%s failed: %Ss", (msg), \
-    Parrot_platform_strerror(GetLastError()))
+    Parrot_platform_strerror(interp, GetLastError()))
 
 /* HEADERIZER HFILE: none */
 
@@ -691,6 +691,67 @@ Parrot_file_fstat_intval(PARROT_INTERP, PIOHANDLE os_handle, INTVAL thing)
     }
 
     return result;
+}
+
+/*
+
+=item C<void Parrot_file_symlink(PARROT_INTERP, STRING *from, STRING *to)>
+
+Creates a symlink
+
+=cut
+
+*/
+
+void
+Parrot_file_symlink(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
+{
+    char    *c_from = Parrot_str_to_encoded_cstring(interp, from,
+                            Parrot_utf16_encoding_ptr);
+    char    *c_to   = Parrot_str_to_encoded_cstring(interp, to,
+                            Parrot_utf16_encoding_ptr);
+    DWORD    attrs  = GetFileAttributesW(c_from);
+    BOOLEAN  result = 0; /* BOOLEAN, not BOOL */
+
+    if (attrs != INVALID_FILE_ATTRIBUTES) {
+        DWORD flags = attrs & FILE_ATTRIBUTE_DIRECTORY
+                    ? SYMBOLIC_LINK_FLAG_DIRECTORY
+                    : 0;
+
+        result = CreateSymbolicLinkW((LPWSTR)c_to, (LPWSTR)c_from, flags);
+    }
+
+    Parrot_str_free_cstring(c_from);
+    Parrot_str_free_cstring(c_to);
+
+    if (!result)
+        THROW("symlink");
+}
+
+/*
+
+=item C<void Parrot_file_link(PARROT_INTERP, STRING *from, STRING *to)>
+
+Creates a symlink
+
+=cut
+
+*/
+
+void
+Parrot_file_link(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
+{
+    char    *c_from = Parrot_str_to_encoded_cstring(interp, from,
+                            Parrot_utf16_encoding_ptr);
+    char    *c_to   = Parrot_str_to_encoded_cstring(interp, to,
+                            Parrot_utf16_encoding_ptr);
+    BOOL     result = CreateHardLinkW((LPWSTR)c_to, (LPWSTR)c_from, NULL);
+
+    Parrot_str_free_cstring(c_from);
+    Parrot_str_free_cstring(c_to);
+
+    if (!result)
+        THROW("link");
 }
 
 /*
