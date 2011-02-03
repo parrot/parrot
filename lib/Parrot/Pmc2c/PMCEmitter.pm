@@ -998,10 +998,12 @@ $get_extra_vtable
 
 EOC
 
-    $get_extra_vtable .= "    vt = Parrot_${classname}_get_vtable(interp);\n";
-    #$get_extra_vtable .= "    Parrot_${first_parent}_wb_update_vtable(interp);\n";
+    $get_extra_vtable = "    vt = Parrot_${classname}_get_vtable(interp);\n";
+    if ($first_parent ne 'default') {
+        $get_extra_vtable .= "    Parrot_default_wb_update_vtable(vt);\n";
+    }
 
-    foreach my $parent_name ( @other_parents ) {
+    foreach my $parent_name ( $first_parent, @other_parents ) {
         $get_extra_vtable .= "    Parrot_${parent_name}_wb_update_vtable(vt);\n";
     }
 
