@@ -141,8 +141,9 @@ EOH
     if ($name ne 'default') {
         $h->emit("${export}VTABLE* Parrot_${name}_update_vtable(ARGMOD(VTABLE*));\n");
         $h->emit("${export}VTABLE* Parrot_${name}_ro_update_vtable(ARGMOD(VTABLE*));\n");
-        $h->emit("${export}VTABLE* Parrot_${name}_wb_update_vtable(ARGMOD(VTABLE*));\n");
     }
+
+    $h->emit("${export}VTABLE* Parrot_${name}_wb_update_vtable(ARGMOD(VTABLE*));\n");
     $h->emit("${export}VTABLE* Parrot_${name}_get_vtable(PARROT_INTERP);\n");
     $h->emit("${export}VTABLE* Parrot_${name}_ro_get_vtable(PARROT_INTERP);\n");
     $h->emit("${export}VTABLE* Parrot_${name}_wb_get_vtable(PARROT_INTERP);\n");
