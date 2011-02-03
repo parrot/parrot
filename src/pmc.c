@@ -269,13 +269,8 @@ Parrot_pmc_reuse_noinit(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type)
                             | PObj_GC_generation_1_FLAG
                             | PObj_GC_generation_2_FLAG
                             | PObj_GC_on_dirty_list_FLAG
-                            | PObj_GC_wb_triggered_FLAG
                             | b_PObj_live_FLAG)
         );
-
-        // HACK!!!
-        if (pmc->flags & PObj_GC_wb_triggered_FLAG)
-            PObj_live_SET(pmc);
 
         /* Set the right vtable */
         pmc->vtable = new_vtable;
