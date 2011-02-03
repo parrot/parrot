@@ -829,7 +829,8 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     /* We swept all dead objects */
     self->num_early_gc_PMCs                      = 0;
 
-    //gc_gms_compact_memory_pool(interp);
+    gc_gms_compact_memory_pool(interp);
+
     gc_gms_check_sanity(interp);
 
     gc_gms_print_stats(interp, "After", gen);
@@ -1116,6 +1117,10 @@ gc_gms_compact_memory_pool(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_compact_memory_pool)
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+
+    // FIXME String part isn't implemented yet.
+    return;
+
     Parrot_gc_str_compact_pool(interp, &self->string_gc);
 }
 
