@@ -90,32 +90,6 @@ implementation, and malloc wrappers for various purposes. These are unused.
 
 /*
 
-=item C<void Parrot_gc_set_system_type(PARROT_INTERP, const char *name)>
-
-Sets the type specified by C<name> of garbage collector.
-
-=cut
-
-*/
-
-
-PARROT_EXPORT
-void
-Parrot_gc_set_system_type(PARROT_INTERP, ARGIN(const char *name))
-{
-    ASSERT_ARGS(Parrot_gc_set_system_type)
-    if (STREQ(name, "MS"))
-        interp->gc_sys->sys_type = MS;
-    if (STREQ(name, "MS2"))
-        interp->gc_sys->sys_type = MS2;
-    if (STREQ(name, "INF"))
-        interp->gc_sys->sys_type = INF;
-    if (STREQ(name, "GMS"))
-        interp->gc_sys->sys_type = GMS;
-}
-
-/*
-
 =item C<void Parrot_gc_mark_PObj_alive(PARROT_INTERP, PObj *obj)>
 
 Marks the PObj as "alive" for the Garbage Collector. Takes a pointer to a PObj,
@@ -188,7 +162,7 @@ Parrot_gc_mark_STRING_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(STRING *obj))
 
 /*
 
-=item C<void Parrot_gc_initialize(PARROT_INTERP, void *stacktop)>
+=item C<void Parrot_gc_initialize(PARROT_INTERP, Parrot_GC_Init_Args *args)>
 
 Initializes the memory allocator and the garbage collection subsystem.
 Calls the initialization function associated with each collector, which
@@ -203,30 +177,30 @@ stack scanning during a garbage collection run.
 
 PARROT_EXPORT
 void
-Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
+Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_gc_initialize)
 
-    interp->lo_var_ptr                    = stacktop;
+    interp->lo_var_ptr = args->stacktop;
 
-    /*Call appropriate initialization function for GC subsystem*/
-    switch (interp->gc_sys->sys_type) {
-      case MS:
-        Parrot_gc_ms_init(interp);
-        break;
-      case INF:
-        Parrot_gc_inf_init(interp);
-        break;
-      case MS2:
-        Parrot_gc_ms2_init(interp);
-        break;
-      case GMS:
-        Parrot_gc_gms_init(interp);
-        break;
-      default:
-        /*die horribly because of invalid GC core specified*/
-        break;
-    };
+    if (args->system == NULL
+    ||  STREQ(args->system, "ms2")) {
+        interp->gc_sys->sys_type = MS2;
+        Parrot_gc_ms2_init(interp, args);
+    }
+    else if (STREQ(args->system, "ms")) {
+        interp->gc_sys->sys_type = MS;
+        Parrot_gc_ms_init(interp, args);
+    }
+    else if (STREQ(args->system, "inf")) {
+        interp->gc_sys->sys_type = INF;
+        Parrot_gc_inf_init(interp, args);
+    }
+    else {
+        /* Can't throw exception before GC is initialized */
+        fprintf(stderr, "Unknown GC type '%s'\n", args->system);
+        exit(EXIT_FAILURE);
+    }
 
     /* Assertions that GC subsystem has complete API */
     PARROT_ASSERT(interp->gc_sys->do_gc_mark);
@@ -818,7 +792,13 @@ Return the number of lazy mark runs the GC has performed.
 
 =item C<size_t Parrot_gc_total_memory_allocated(PARROT_INTERP)>
 
-Return the total number of memory allocations made by the GC.
+Return the total number of bytes allocated by the GC.
+
+=item C<size_t Parrot_gc_total_memory_used(PARROT_INTERP)>
+
+Return the total number of bytes used. This is lower than the allocated
+memory because of fragmentation and freed memory that is not returned
+to the OS.
 
 =item C<size_t Parrot_gc_headers_alloc_since_last_collect(PARROT_INTERP)>
 
@@ -866,6 +846,14 @@ Parrot_gc_total_memory_allocated(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_gc_total_memory_allocated)
     return interp->gc_sys->get_gc_info(interp, TOTAL_MEM_ALLOC);
+}
+
+PARROT_EXPORT
+size_t
+Parrot_gc_total_memory_used(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_gc_total_memory_used)
+    return interp->gc_sys->get_gc_info(interp, TOTAL_MEM_USED);
 }
 
 PARROT_EXPORT

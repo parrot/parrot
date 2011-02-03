@@ -87,7 +87,7 @@ if ( !@ARGV ) {
     @files = grep {! m/$filter_languages/}
              map  { $_->path }
              grep { $_->read !~ m/use v6;/ }
-             grep { $_->read !~ m/#! nqp/ }
+             grep { $_->read !~ m/#!\s*nqp/ }
              $dist->get_perl_language_files();
 }
 else {

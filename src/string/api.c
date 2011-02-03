@@ -2719,10 +2719,7 @@ Parrot_str_unescape(PARROT_INTERP,
 
     STRING           *src;
     const STR_VTABLE *encoding, *src_encoding;
-
-    /* does the encoding have a character set? */
-    const char     *p        = enc_char ? strchr(enc_char, ':') : NULL;
-    size_t          clength  = strlen(cstring);
+    size_t            clength = strlen(cstring);
 
     if (delimiter && clength)
         --clength;
@@ -2730,35 +2727,12 @@ Parrot_str_unescape(PARROT_INTERP,
     if (enc_char == NULL) {
         encoding = Parrot_default_encoding_ptr;
     }
-    else if (p == NULL) {
+    else {
         encoding = Parrot_find_encoding(interp, enc_char);
 
         if (!encoding)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Can't make '%s' encoding strings", enc_char);
-    }
-    else {
-        #define MAX_ENCODING_NAME_ALLOWED 63
-        char   buffer[MAX_ENCODING_NAME_ALLOWED + 1];
-        size_t l = p - enc_char;
-
-        if (l < MAX_ENCODING_NAME_ALLOWED) {
-            memcpy(buffer, enc_char, l);
-            buffer[l] = '\0';
-        }
-        else {
-            buffer[0] = '\0';
-        }
-
-        encoding = Parrot_find_encoding(interp, buffer);
-
-        if (!encoding) {
-            encoding = Parrot_find_encoding(interp, p + 1);
-
-            if (!encoding)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                    "Can't make '%s' encoding strings", enc_char);
-        }
     }
 
     if (encoding->max_bytes_per_codepoint == 1)

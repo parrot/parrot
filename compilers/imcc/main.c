@@ -148,12 +148,6 @@ static const struct longopt_opt_decl * Parrot_cmd_options(void);
 /* HEADERIZER END: static */
 
 
-#define OPT_GC_DEBUG       128
-#define OPT_DESTROY_FLAG   129
-#define OPT_HELP_DEBUG     130
-#define OPT_PBC_OUTPUT     131
-#define OPT_RUNTIME_PREFIX 132
-
 /*
 
 =item C<static int is_all_hex_digits(const char *s)>
@@ -208,12 +202,13 @@ Parrot_cmd_options(void)
         { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
         { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
         { 'g', 'g', OPTION_required_FLAG, { "--gc" } },
-        { '\0', OPT_GC_THRESHOLD, OPTION_required_FLAG, { "--gc-threshold" } },
+        { '\0', OPT_GC_DYNAMIC_THRESHOLD, OPTION_required_FLAG, { "--gc-dynamic-threshold" } },
+        { '\0', OPT_GC_MIN_THRESHOLD, OPTION_required_FLAG, { "--gc-min-threshold" } },
+        { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
         { 'V', 'V', (OPTION_flags)0, { "--version" } },
         { 'X', 'X', OPTION_required_FLAG, { "--dynext" } },
         { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,
                                      { "--leak-test", "--destroy-at-end" } },
-        { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
         { 'a', 'a', (OPTION_flags)0, { "--pasm" } },
         { 'c', 'c', (OPTION_flags)0, { "--pbc" } },
         { 'd', 'd', OPTION_optional_FLAG, { "--imcc-debug" } },

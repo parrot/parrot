@@ -747,7 +747,7 @@ Return the POST representation of a C<PAST::Control>.
 
     ehreg = self.'uniquereg'('P')
     ops.'push_pirop'('new', ehreg, "'ExceptionHandler'")
-    ops.'push_pirop'('set_addr', ehreg, label)
+    ops.'push_pirop'('set_label', ehreg, label)
     controltypes = get_global '%!controltypes'
     type = node.'handle_types'()
     unless type, handle_types_done
@@ -932,7 +932,7 @@ Return the POST representation of a C<PAST::Block>.
     ctrllabel = $P0.'new'('result'=>$S0)
     $S0 = self.'uniquereg'('P')
     bpost.'push_pirop'('new', $S0, "['ExceptionHandler']", '.CONTROL_RETURN')
-    bpost.'push_pirop'('set_addr', $S0, ctrllabel)
+    bpost.'push_pirop'('set_label', $S0, ctrllabel)
     bpost.'push_pirop'('push_eh', $S0)
     bpost.'add_directive'('.include "except_types.pasm"')
 
@@ -1398,7 +1398,7 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
     .local string handreg
     handreg = self.'uniquereg'('P')
     ops.'push_pirop'('new', handreg, "'ExceptionHandler'")
-    ops.'push_pirop'('set_addr', handreg, handlabel)
+    ops.'push_pirop'('set_label', handreg, handlabel)
     ops.'push_pirop'('callmethod', '"handle_types"', handreg, '.CONTROL_LOOP_NEXT', '.CONTROL_LOOP_REDO', '.CONTROL_LOOP_LAST')
     ops.'push_pirop'('push_eh', handreg)
 
