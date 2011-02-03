@@ -427,6 +427,13 @@ static void gc_gms_unseal_object(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void gc_gms_validate_objects(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+static void gc_gms_validate_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -577,6 +584,11 @@ static int pobj2gen(ARGIN(PObj *pmc))
 #define ASSERT_ARGS_gc_gms_unblock_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_unseal_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_gc_gms_validate_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_gms_validate_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_write_barrier __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -824,6 +836,9 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 #endif
 
     Parrot_pa_destroy(interp, self->work_list);
+
+
+    gc_gms_validate_objects(interp);
 }
 
 /*
@@ -846,7 +861,8 @@ gc_gms_select_generation_to_collect(PARROT_INTERP)
 
 /*
 
-=item C<gc_gms_cleanup_dirty_list()>
+=item C<static void gc_gms_cleanup_dirty_list(PARROT_INTERP, MarkSweep_GC *self,
+Parrot_Pointer_Array *dirty_list, size_t gen)>
 
 Move all objects from collections younger K from dirty_list
 back to original lists. Reason for this is "corollary of invariant". We can
@@ -877,7 +893,8 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
 
 /*
 
-=item C<gc_gms_process_dirty_list()>
+=item C<static void gc_gms_process_dirty_list(PARROT_INTERP, MarkSweep_GC *self,
+Parrot_Pointer_Array *dirty_list)>
 
 Iterate over "dirty_set" calling VTABLE_mark on it. It will move all
 children into "work_list".
@@ -931,7 +948,7 @@ gc_gms_process_work_list(PARROT_INTERP,
 
 /*
 
-=item C<gc_gms_sweep_pools()>
+=item C<static void gc_gms_sweep_pools(PARROT_INTERP, MarkSweep_GC *self)>
 
 Sweep generations starting from K:
     - Destroy all dead objects
@@ -2107,6 +2124,40 @@ gc_gms_ensure_flags(PARROT_INTERP)
     gc_gms_ensure_flags_in_list(interp, self->strings[1]);
     gc_gms_ensure_flags_in_list(interp, self->strings[2]);
 #endif
+}
+
+static void
+gc_gms_validate_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
+{
+    PARROT_ASSERT(!PObj_on_free_list_TEST(pmc));
+
+    if (PObj_live_TEST(pmc))
+        return;
+
+    PObj_live_SET(pmc);
+
+    if (PObj_custom_mark_TEST(pmc))
+        VTABLE_mark(interp, pmc);
+
+}
+
+static void
+gc_gms_validate_objects(PARROT_INTERP)
+{
+    INTVAL i;
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+
+    interp->gc_sys->mark_pmc_header = gc_gms_validate_pmc;
+    Parrot_gc_trace_root(interp, NULL, GC_TRACE_FULL);
+    interp->gc_sys->mark_pmc_header = gc_gms_mark_pmc_header;
+
+    // UGLY HACK TO PAINT ALL OTHER OBJECTS WHITE
+    for (i = 0; i < MAX_GENERATIONS; i++) {
+        POINTER_ARRAY_ITER(self->objects[i],
+            PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
+            PObj_live_CLEAR(pmc););
+    }
+
 }
 
 /*
