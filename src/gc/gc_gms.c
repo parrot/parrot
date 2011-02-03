@@ -60,6 +60,10 @@ be collected. Remember K in C<self->gen_to_collect>.
 back to original lists. Reason for this is "corollary of invariant". We can
 either collect such objects or they will be marked by referents from
 "dirty_list".
+XXX: This is wrong! We can't do it. If we have object A1 in dirty_list pointing to B0 than after full cycle on Gen1:
+  * A1 will became A2 out of dirty_list
+  * B0 will became B1.
+Than on next Gen1 collection we will sweep B1 because A2 will not be processed.
 
 4. Trace root objects. According to "0. Pre-requirements" we will ignore all
 "old" objects. All relevant objects are moved into "work_list".
