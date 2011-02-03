@@ -582,6 +582,8 @@
 ^/runtime/parrot/library/YAML/Dumper/.*\.pbc/
 ^/runtime/parrot/library/YAML/Parser/.*\.pbc$
 ^/runtime/parrot/library/YAML/Parser/.*\.pbc/
+^/runtime/parrot/library/YAML/Tiny\.pir$
+^/runtime/parrot/library/YAML/Tiny\.pir/
 ^/runtime/parrot/library/config\.pir$
 ^/runtime/parrot/library/config\.pir/
 ^/src/.*\.gcda$
