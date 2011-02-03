@@ -272,14 +272,6 @@ static size_t gc_gms_count_used_string_memory(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_ensure_flags(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-static void gc_gms_ensure_flags_in_list(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array* list))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void gc_gms_finalize(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -496,11 +488,6 @@ static int pobj2gen(ARGIN(PObj *pmc))
     , PARROT_ASSERT_ARG(list))
 #define ASSERT_ARGS_gc_gms_count_used_string_memory \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(list))
-#define ASSERT_ARGS_gc_gms_ensure_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_gms_ensure_flags_in_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(list))
 #define ASSERT_ARGS_gc_gms_finalize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -845,11 +832,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     //gc_gms_compact_memory_pool(interp);
     gc_gms_check_sanity(interp);
 
-    gc_gms_ensure_flags(interp);
-
-#if 1 //def DETAIL_MEMORY_DEBUG
     gc_gms_print_stats(interp, "After", gen);
-#endif
 
     Parrot_pa_destroy(interp, self->work_list);
 
@@ -2167,7 +2150,7 @@ gc_gms_validate_objects(PARROT_INTERP)
 
 /*
 
-=item C<gc_gms_get_youngest_generation()>
+=item C<static void gc_gms_get_youngest_generation(PARROT_INTERP, PMC *pmc)>
 
 Calculate youngest genereation of PMC children. Used to remove items from
 dirty_list.
