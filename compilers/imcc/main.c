@@ -139,6 +139,21 @@ imcc_new_pmc(PMC * interp_pmc)
 }
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+STRING*
+imcc_last_error_message(ARGIN(imc_info_t *imcc))
+{
+    return imcc->error_message;
+}
+
+PARROT_EXPORT
+INTVAL
+imcc_last_error_message(ARGIN(imc_info_t *imcc))
+{
+    return imcc->error_code;
+}
+
+PARROT_EXPORT
 void
 imcc_set_debug_mode(ARGMOD(imc_info_t *imcc), INTVAL dflags, INTVAL yflags)
 {
