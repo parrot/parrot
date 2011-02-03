@@ -104,7 +104,7 @@ TBD
 #define PANIC_OUT_OF_MEM(size) failed_allocation(__LINE__, (size))
 
 /* Maximum number of collections */
-#define MAX_GENERATIONS     8
+#define MAX_GENERATIONS     3
 
 /* We allocate additional space in front of PObj* to store additional pointer */
 typedef struct pmc_alloc_struct {
