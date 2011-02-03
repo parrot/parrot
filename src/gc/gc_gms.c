@@ -925,6 +925,9 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
         if (PObj_custom_mark_TEST(pmc))
             VTABLE_mark(interp, pmc);
 
+        if (PMC_metadata(pmc) && self->youngest_child > POBJ2GEN(PMC_metadata(pmc)))
+            self->youngest_child = POBJ2GEN(PMC_metadata(pmc));
+
         /* All children aren't younger than us - get rid of it */
         if (self->youngest_child >= gen) {
             PObj_live_CLEAR(pmc);
