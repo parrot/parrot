@@ -56,14 +56,12 @@ GC algorithm WILL be:
 2. Choose K - how many collections we want to collect. Collections [0..K] will
 be collected. Remember K in C<self->gen_to_collect>.
 
-3. Move all objects from collections younger K from dirty_list
-back to original lists. Reason for this is "corollary of invariant". We can
-either collect such objects or they will be marked by referents from
-"dirty_list".
-XXX: This is wrong! We can't do it. If we have object A1 in dirty_list pointing to B0 than after full cycle on Gen1:
-  * A1 will became A2 out of dirty_list
-  * B0 will became B1.
-Than on next Gen1 collection we will sweep B1 because A2 will not be processed.
+3. Move all objects from dirty_list which has all direct children in
+generations not younger than object back to original lists. Reason for this is
+"corollary of invariant". We can either collect such objects or they will be
+marked by referents from "dirty_list". To perform calculation of youngest
+child's generation we temporary override .mark_pmc_header with
+C<gc_gms_get_youngest_generation> which iterate over direct children only.
 
 4. Trace root objects. According to "0. Pre-requirements" we will ignore all
 "old" objects. All relevant objects are moved into "work_list".
