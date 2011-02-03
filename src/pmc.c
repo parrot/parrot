@@ -252,6 +252,7 @@ Parrot_pmc_reuse_noinit(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type)
     ASSERT_ARGS(Parrot_pmc_reuse_noinit)
 
     if (pmc->vtable->base_type != new_type) {
+        Parrot_UInt    old_flags  = pmc->flags;
         VTABLE * const new_vtable = interp->vtables[new_type];
 
         /* Singleton/const PMCs/types are not eligible */
@@ -264,8 +265,10 @@ Parrot_pmc_reuse_noinit(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type)
         // FIXME It's abstraction leak. And it's really strange idea
         // of reusing PMCs...
         PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG
-            | pmc->flags & (PObj_GC_generation_0_FLAG
+            | old_flags & (PObj_GC_generation_0_FLAG
                             | PObj_GC_generation_1_FLAG
+                            | PObj_GC_generation_2_FLAG
+                            | PObj_GC_on_dirty_list_FLAG
                             | PObj_GC_wb_triggered_FLAG
                             | b_PObj_live_FLAG)
         );
