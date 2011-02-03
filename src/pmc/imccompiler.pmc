@@ -47,6 +47,11 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler {
         Parrot_pcc_fill_params_from_c_args(INTERP, call_object, "S", &code);
         imcc_reset(attrs->imcc_info);
         result = imcc_compile_string(attrs->imcc_info, code, attrs->is_pasm);
+        if (PMC_IS_NULL(result)) {
+            STRING * const msg = imcc_last_error_message(attrs->imcc_info);
+            INTVAL code = imcc_last_error_code(attrs->imcc_info);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, code, msg);
+        }
         pf = (PackFile*)VTABLE_get_pointer(INTERP, result);
         {
             Parrot_Sub_attributes *sub_data;
