@@ -2152,6 +2152,10 @@ gc_gms_get_youngest_generation(PARROT_INTERP, ARGIN(PMC *pmc))
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            gen  = POBJ2GEN(pmc);
 
+    /* If child is on dirty_list ignore it. It will be kept alive anyway */
+    if (pmc->flags & PObj_GC_on_dirty_list_FLAG)
+        return;
+
     if (gen < self->youngest_child)
         self->youngest_child = gen;
 }
