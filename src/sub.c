@@ -443,7 +443,7 @@ Parrot_sub_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
         return;
 
     /* set the sub's outer context to the current context */
-    Parrot_gc_write_barrier(interp, Parrot_pcc_get_sub(interp, ctx));
+    Parrot_gc_write_barrier(interp, sub_pmc);
     sub->outer_ctx = ctx;
 }
 
