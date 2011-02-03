@@ -148,6 +148,12 @@ typedef struct MarkSweep_GC {
     /* During M&S gather new live objects in this list */
     struct Parrot_Pointer_Array     *dirty_list;
 
+    /*
+     * During checking of dirty_list it will be set to generation of youngest
+     * child
+     */
+    size_t    youngest_child;
+
     /* Currently allocate objects. */
     struct Parrot_Pointer_Array     *objects[MAX_GENERATIONS];
 
@@ -305,6 +311,10 @@ static void gc_gms_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
 
 static size_t gc_gms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
         __attribute__nonnull__(1);
+
+static void gc_gms_get_youngest_generation(PARROT_INTERP, ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static unsigned int gc_gms_is_blocked_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -513,6 +523,10 @@ static int pobj2gen(ARGIN(PObj *pmc))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_get_gc_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_gms_get_youngest_generation \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_is_blocked_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_is_blocked_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -882,18 +896,29 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
         ARGIN(Parrot_Pointer_Array *dirty_list),
         size_t gen)
 {
+    /* Override with special version of mark */
+    interp->gc_sys->mark_pmc_header = gc_gms_get_youngest_generation;
+
     POINTER_ARRAY_ITER(dirty_list,
         pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
         PMC              *pmc  = &(item->pmc);
         size_t            gen  = POBJ2GEN(pmc);
 
-        if (gen <= self->gen_to_collect) {
+        self->youngest_child = gen;
+
+        if (PObj_custom_mark_TEST(pmc))
+            VTABLE_mark(interp, pmc);
+
+        /* All children aren't younger than us - get rid of it */
+        if (self->youngest_child >= gen) {
             PObj_live_CLEAR(pmc);
             pmc->flags &= ~PObj_GC_on_dirty_list_FLAG;
             Parrot_pa_remove(interp, dirty_list, item->ptr);
             item->ptr = Parrot_pa_insert(interp, self->objects[gen], item);
             gc_gms_seal_object(interp, pmc);
         });
+
+    interp->gc_sys->mark_pmc_header = gc_gms_mark_pmc_header;
 }
 
 /*
@@ -2163,6 +2188,26 @@ gc_gms_validate_objects(PARROT_INTERP)
             PObj_live_CLEAR(pmc););
     }
 
+}
+
+/*
+
+=item C<gc_gms_get_youngest_generation()>
+
+Calculate youngest genereation of PMC children. Used to remove items from
+dirty_list.
+
+=cut
+
+*/
+static void
+gc_gms_get_youngest_generation(PARROT_INTERP, ARGIN(PMC *pmc))
+{
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    size_t            gen  = POBJ2GEN(pmc);
+
+    if (gen < self->youngest_child)
+        self->youngest_child = gen;
 }
 
 /*
