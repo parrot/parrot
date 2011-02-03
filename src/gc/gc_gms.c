@@ -2062,8 +2062,20 @@ static void
 gc_gms_check_sanity(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_check_sanity)
+#ifndef NDEBUG
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            i;
+
+    for (i = 0; i < MAX_GENERATIONS; i++) {
+        POINTER_ARRAY_ITER(self->objects[i],
+            PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
+            PARROT_ASSERT((POBJ2GEN(pmc) == i)
+                || !"Object from wrong generation");
+
+            if (i)
+                PARROT_ASSERT((pmc->vtable->flags & VTABLE_IS_WRITE_BARRIER_FLAG)
+                    || !"Unsealed object in old generation"););
+    }
 
     POINTER_ARRAY_ITER(self->dirty_list,
         PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
@@ -2074,13 +2086,7 @@ gc_gms_check_sanity(PARROT_INTERP)
         PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
         PARROT_ASSERT(!(pmc->flags & PObj_GC_on_dirty_list_FLAG)
             || !"Dirty object in work_list"););
-
-    for (i = 0; i < MAX_GENERATIONS; i++) {
-        POINTER_ARRAY_ITER(self->objects[i],
-            PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
-            PARROT_ASSERT((POBJ2GEN(pmc) == i)
-                || !"Object from wrong generation"););
-    }
+#endif
 }
 
 /*
