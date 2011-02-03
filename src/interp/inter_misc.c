@@ -237,6 +237,11 @@ Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), ARGOUT(STRING **erro
     Parrot_pcc_set_sub(interp, newcontext, 0);
 
     result = imcc_compile_file(imcc, fullname, 0);
+    if (PMC_IS_NULL(result)) {
+        STRING * const msg = imcc_last_error_message(imcc);
+        INTVAL code = imcc_last_error_code(imcc);
+        Parrot_ex_throw_from_c_args(interp, NULL, code, msg);
+    }
     pf = (PackFile *) VTABLE_get_pointer(interp, result);
 
     // TODO: Get error message
