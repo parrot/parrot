@@ -987,6 +987,13 @@ gc_gms_sweep_pools(PARROT_INTERP,
                 Parrot_gc_pool_free(interp, self->pmc_allocator, ptr);
             });
     }
+
+    // UGLY HACK TO PAINT ALL OTHER OBJECTS WHITE
+    for (i = self->gen_to_collect + 1; i < MAX_GENERATIONS; i++) {
+        POINTER_ARRAY_ITER(self->objects[i],
+            PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
+            PObj_live_CLEAR(pmc););
+    }
 }
 
 
