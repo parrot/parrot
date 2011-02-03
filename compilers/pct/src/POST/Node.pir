@@ -27,9 +27,11 @@ for compiling programs in Parrot.
     $P0[0] = "    .param pmc %0\n"
     $P0[1] = "    .param pmc %0 :optional\n    .param int has_%0 :opt_flag\n"
     $P0[2] = "    .param pmc %0 :slurpy\n"
+    $P0[3] = "    .param pmc %0 :slurpy\n"
     $P0[4] = "    .param pmc %0 :named(%1)\n"
     $P0[5] = "    .param pmc %0 :optional :named(%1)\n    .param int has_%0 :opt_flag\n"
     $P0[6] = "    .param pmc %0 :slurpy :named\n"
+    $P0[7] = "    .param pmc %0 :slurpy :named\n"
     $P0[8] = "    .param pmc %0 :call_sig\n"
     set_hll_global ['POST';'Sub'], '%!paramfmt', $P0
     .return ()

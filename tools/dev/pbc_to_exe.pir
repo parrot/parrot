@@ -95,12 +95,12 @@ HEADER
                 show_last_error_and_exit(interp);
             }
 
-            if (!Parrot_api_load_bytecode_bytes(interp, program_code_addr, bytecode_size, &pbc)) {
-                fprintf(stderr, "PARROT VM: Could not load bytecode");
-                show_last_error_and_exit(interp);
-            }
             if (!Parrot_api_pmc_wrap_string_array(interp, argc, argv, &argsarray)) {
                 fprintf(stderr, "PARROT VM: Could not build args array");
+                show_last_error_and_exit(interp);
+            }
+            if (!Parrot_api_load_bytecode_bytes(interp, program_code_addr, bytecode_size, &pbc)) {
+                fprintf(stderr, "PARROT VM: Could not load bytecode");
                 show_last_error_and_exit(interp);
             }
             if (!Parrot_api_run_bytecode(interp, pbc, argsarray)) {

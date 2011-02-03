@@ -685,7 +685,7 @@ Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
 
     /* special case for great speed */
     if (key_type   == Hash_key_type_STRING
-    &&  entry_type == enum_hash_int) {
+    &&  entry_type == (PARROT_DATA_TYPE)enum_hash_int) {
         for (entry_index = 0; entry_index < num_entries; ++entry_index) {
             STRING * const key     = VTABLE_shift_string(interp, info);
             const INTVAL   i       = VTABLE_shift_integer(interp, info);

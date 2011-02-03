@@ -96,10 +96,10 @@ is( `"$PARROT" --trace "$first_pir_file" "$second_pir_file" $redir`,
 like( qx{$PARROT --runtime-prefix}, qr/^.+$/, "--runtime-prefix" );
 
 # TT #1797: check for warning error and mask off "did it crash?" bits
-my $output = qx{$PARROT --gc-threshold 2>&1 };
+my $output = qx{$PARROT --gc-dynamic-threshold 2>&1 };
 my $exit   = $? & 127;
-like( $output, qr/--gc-threshold needs an argument/,
-                 '--gc-threshold needs argument warning' );
+like( $output, qr/--gc-dynamic-threshold needs an argument/,
+                 '--gc-dynamic-threshold needs argument warning' );
 is( $exit, 0, '... and should not crash' );
 
 # Test --leak-test

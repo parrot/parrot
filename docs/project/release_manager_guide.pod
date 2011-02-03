@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2010, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 Release Instructions
 
@@ -35,7 +35,7 @@ A couple of days in advance: announce the new release to
 parrot-dev@lists.parrot.org and to the IRC channel #parrot. Ask whether
 there are any showstopping bugs. Check in again with the language
 project leads. It's also good to ask for updates to F<NEWS>, F<CREDITS>,
-F<PLATFORMS>, F<RESPONSIBLE_PARTIES>, F<DEPRECATED.yaml> and
+F<PLATFORMS>, F<RESPONSIBLE_PARTIES>, F<api.yaml> and
 L<https://trac.parrot.org/parrot/wiki/Languages>.
 
 On the Saturday before a release you should notify other developers to stop
@@ -66,7 +66,8 @@ and the master on origin are in sync.
 
 =item 2.
 
-Update files with version-specific information:
+Update files with version-specific information, but before doing this you
+should have parrot configured and have run C<make> with the old version:
 
 =over 4
 

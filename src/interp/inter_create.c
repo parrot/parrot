@@ -26,6 +26,8 @@ Create or destroy a Parrot interpreter
 #include "../gc/gc_private.h"
 #include "inter_create.str"
 
+static Interp* emergency_interp;
+
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 
 /* HEADERIZER BEGIN: static */
@@ -88,8 +90,11 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 {
     ASSERT_ARGS(make_interpreter)
     int stacktop;
+    Parrot_GC_Init_Args args;
     Interp * const interp = allocate_interpreter(parent, flags);
-    initialize_interpreter(interp, (void*)&stacktop);
+    memset(&args, 0, sizeof (args));
+    args.stacktop = &stacktop;
+    initialize_interpreter(interp, &args);
     return interp;
 }
 
@@ -130,6 +135,7 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
         interp->parent_interpreter = parent;
     else {
         interp->parent_interpreter = NULL;
+        emergency_interp           = interp;
 
 #if PARROT_CATCH_NULL
         PMCNULL                    = NULL;
@@ -161,10 +167,6 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     IMCC_INFO(interp) = mem_internal_allocate_zeroed_typed(imc_info_t);
 
     interp->gc_sys           = mem_internal_allocate_zeroed_typed(GC_Subsystem);
-    interp->gc_sys->sys_type = parent
-                                    ? parent->gc_sys->sys_type
-                                    : PARROT_GC_DEFAULT_TYPE;
-    interp->gc_threshold     = GC_DYNAMIC_THRESHOLD_DEFAULT;
 
     /* Done. Return and be done with it */
     return interp;
@@ -172,7 +174,8 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 
 /*
 
-=item C<Parrot_Interp initialize_interpreter(PARROT_INTERP, void *stacktop)>
+=item C<Parrot_Interp initialize_interpreter(PARROT_INTERP, Parrot_GC_Init_Args
+*args)>
 
 Initialize previously allocated interpreter.
 
@@ -183,12 +186,12 @@ Initialize previously allocated interpreter.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Interp
-initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
+initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(initialize_interpreter)
 
     /* Set up the memory allocation system */
-    Parrot_gc_initialize(interp, stacktop);
+    Parrot_gc_initialize(interp, args);
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
 
@@ -350,6 +353,10 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     if (!interp->parent_interpreter) {
         Parrot_cx_runloop_end(interp);
         pt_join_threads(interp);
+
+        /* Don't bother trying to provide a pir backtrace on assertion failures
+         * during global destruction.  It only works in movies. */
+        Parrot_clear_emergency_interp();
     }
 
     /* if something needs destruction (e.g. closing PIOs)
@@ -491,6 +498,47 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
             mem_internal_free(interp);
         }
     }
+}
+
+
+/*
+
+=item C<Interp* Parrot_get_emergency_interp(void)>
+
+Provide access to a (possibly) valid interp pointer.  This is intended B<only>
+for use cases when an interp is not available otherwise, which shouldn't be
+often.  There are no guarantees about what what this function returns.  If you
+have access to a valid interp, use that instead.  Don't use this for anything
+other than error handling.
+
+=cut
+
+*/
+
+PARROT_CAN_RETURN_NULL
+Interp*
+Parrot_get_emergency_interp(void) {
+    ASSERT_ARGS(Parrot_get_emergency_interp)
+
+    return emergency_interp;
+}
+
+
+/*
+
+=item C<void Parrot_clear_emergency_interp(void)>
+
+Null the C<emergency_interp> static variable.  This is only useful when
+purposefully invalidating C<emergency_interp>.  This is not a general-purpose
+function.  Don't use it for anything other than error handling.
+
+=cut
+
+*/
+
+void
+Parrot_clear_emergency_interp(void) {
+    emergency_interp = NULL;
 }
 
 

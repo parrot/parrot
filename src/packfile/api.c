@@ -3791,7 +3791,8 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
 {
     ASSERT_ARGS(PackFile_Annotations_dump)
     const PackFile_Annotations * const self = (const PackFile_Annotations *)seg;
-    INTVAL                      i, j;
+    INTVAL                      i;
+    size_t                      j;
 
     default_dump_header(interp, (const PackFile_Segment *)self);
 
@@ -3921,7 +3922,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
     }
     else {
         /* Ensure key types are compatible. */
-        if (self->keys[key_id].type != type)
+        if (self->keys[key_id].type != (pf_ann_key_type_t)type)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION,
                 "Annotations with different types of value used for key '%S'\n",
@@ -3931,7 +3932,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
     /* Lookup position where value will be inserted. */
     idx = self->keys[key_id].len == 0  ?
           self->keys[key_id].start * 2 :
-          (find_pf_ann_idx(interp, self, &self->keys[key_id], offset) + 1) * 2;
+          (UINTVAL)(find_pf_ann_idx(interp, self, &self->keys[key_id], offset) + 1) * 2;
 
     /* Extend segment data and shift subsequent data by 2. */
     self->base.data = (opcode_t *)mem_sys_realloc(self->base.data,

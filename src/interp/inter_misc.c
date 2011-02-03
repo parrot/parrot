@@ -250,6 +250,9 @@ interpinfo(PARROT_INTERP, INTVAL what)
       case TOTAL_MEM_ALLOC:
         ret = Parrot_gc_total_memory_allocated(interp);
         break;
+      case TOTAL_MEM_USED:
+        ret = Parrot_gc_total_memory_used(interp);
+        break;
       case GC_MARK_RUNS:
         ret = Parrot_gc_count_mark_runs(interp);
         break;
