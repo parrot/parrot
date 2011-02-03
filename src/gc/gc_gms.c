@@ -2112,6 +2112,7 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
                 i, self->objects[i]->count, self->strings[i]->count);
 #endif
 
+#if 0
     fprintf(stderr, "PMC: %d\n", Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
     fprintf(stderr, "STRING: %d\n", Parrot_gc_pool_allocated_size(interp, self->string_allocator));
 
@@ -2121,6 +2122,7 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
     fprintf(stderr, "attrs: %d\n", Parrot_gc_fixed_allocator_allocated_memory(interp,
                                                                       self->fixed_size_allocator));
 
+#endif
     fprintf(stderr, "\n");
 
 }
