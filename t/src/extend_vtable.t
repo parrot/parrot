@@ -714,12 +714,12 @@ CODE
 Done!
 OUTPUT
 
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal_num", todo => 'seems borked' );
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal_num");
     Parrot_PMC_set_number_native(interp, pmc, -42);
     Parrot_PMC_set_number_native(interp, pmc2, 42);
 
     integer = Parrot_PMC_is_equal_num(interp, pmc, pmc2);
-    printf("%d\n", (int) integer);
+    Parrot_printf(interp, "%d\n", integer);
 
     Parrot_PMC_set_number_native(interp, pmc2, -42);
 
