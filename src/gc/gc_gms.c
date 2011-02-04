@@ -631,7 +631,7 @@ Flags can be a combination of these values:
 
 /*
 
-=item C<void Parrot_gc_gms_init(PARROT_INTERP)>
+=item C<void Parrot_gc_gms_init(PARROT_INTERP, Parrot_GC_Init_Args *args)>
 
 Initializes the generational collector
 
@@ -640,7 +640,7 @@ Initializes the generational collector
 */
 
 void
-Parrot_gc_gms_init(PARROT_INTERP)
+Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_gc_gms_init)
     struct MarkSweep_GC *self;
@@ -732,7 +732,7 @@ Parrot_gc_gms_init(PARROT_INTERP)
 
         /* Collect every nM allocated. */
         /* Hardcode for now. Will be configured via CLI */
-        self->gc_threshold = 1 * 1024 * 1024;
+        self->gc_threshold = 10 * 1024 * 1024;
 
         Parrot_gc_str_initialize(interp, &self->string_gc);
     }

@@ -184,7 +184,11 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->lo_var_ptr = args->stacktop;
 
     if (args->system == NULL
-    ||  STREQ(args->system, "ms2")) {
+    ||  STREQ(args->system, "gms")) {
+        interp->gc_sys->sys_type = GMS;
+        Parrot_gc_gms_init(interp, args);
+    }
+    else if (STREQ(args->system, "ms2")) {
         interp->gc_sys->sys_type = MS2;
         Parrot_gc_ms2_init(interp, args);
     }
