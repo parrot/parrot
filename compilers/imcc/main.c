@@ -139,6 +139,21 @@ imcc_new_pmc(PMC * interp_pmc)
 }
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+STRING*
+imcc_last_error_message(ARGIN(imc_info_t *imcc))
+{
+    return imcc->error_message;
+}
+
+PARROT_EXPORT
+INTVAL
+imcc_last_error_code(ARGIN(imc_info_t *imcc))
+{
+    return imcc->error_code;
+}
+
+PARROT_EXPORT
 void
 imcc_set_debug_mode(ARGMOD(imc_info_t *imcc), INTVAL dflags, INTVAL yflags)
 {
@@ -408,16 +423,19 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 
     imcc_compile_buffer_safe(imcc, yyscanner, source, is_file, is_pasm);
 
-    yylex_destroy(yyscanner);
-    imc_cleanup(imcc, NULL);
-
     if (imcc->error_code) {
         imcc->error_code = IMCC_FATAL_EXCEPTION;
         IMCC_warning(imcc, "error:imcc:%Ss", imcc->error_message);
         IMCC_print_inc(imcc);
 
+        yylex_destroy(yyscanner);
+        imc_cleanup(imcc, NULL);
+
         return PMCNULL;
     }
+
+    yylex_destroy(yyscanner);
+    imc_cleanup(imcc, NULL);
 
     IMCC_info(imcc, 1, "%ld lines compiled.\n", imcc->line);
     PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, NULL);
