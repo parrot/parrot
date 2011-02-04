@@ -165,7 +165,7 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
     ASSERT_ARGS(Parrot_api_set_runcore)
     EMBED_API_CALLIN(interp_pmc, interp)
     if (trace) {
-        Parrot_pcc_trace_flags_on(interp, interp->ctx, trace);
+        Interp_trace_SET(interp, PARROT_TRACE_OPS_FLAG);
         Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
     }
     else {
@@ -176,8 +176,10 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "fast"));
         else if (!strcmp(corename, "exec"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "exec"));
-        else if (!strcmp(corename, "trace"))
+        else if (!strcmp(corename, "trace")) {
+            Interp_trace_SET(interp, PARROT_TRACE_OPS_FLAG);
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
+        }
         else if (!strcmp(corename, "profiling"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "profiling"));
         else if (!strcmp(corename, "gcdebug"))
