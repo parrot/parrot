@@ -137,15 +137,23 @@ CODE
 
 }
 
-# This blows up
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(freeze|thaw|thawfinish)", todo => 'freeze + thaw are borked');
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(freeze|thaw)");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
     Parrot_PMC_set_integer_native(interp, pmc2, 99);
+    Parrot_printf(interp,"%P\n", pmc);
+    Parrot_printf(interp,"%P\n", pmc2);
 
-    Parrot_PMC_freeze(interp, pmc, pmc2);
-    Parrot_PMC_thaw(interp, pmc, pmc2);
-    Parrot_printf(interp,"42\n");
+    /* freeze pmc, thaw tp pmc 2 */
+    Parrot_PMC_freeze(interp, pmc, rpa);
+    Parrot_PMC_thaw(interp, pmc2, rpa);
+    /* Modify pmc to ensure they are not pointing to the same location */
+    Parrot_PMC_set_integer_native(interp, pmc, 1000);
+    Parrot_printf(interp,"%P\n", pmc);
+    Parrot_printf(interp,"%P\n", pmc2);
 CODE
+42
+99
+1000
 42
 Done!
 OUTPUT
