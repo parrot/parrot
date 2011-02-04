@@ -990,8 +990,8 @@
 ^/t/src/.*\.gcdada/
 ^/t/src/.*\.gcov$
 ^/t/src/.*\.gcov/
-^/t/src/.*_.*$
-^/t/src/.*_.*/
+^/t/src/.*_.*\.c$
+^/t/src/.*_.*\.c/
 ^/t/src/embed/.*\.c$
 ^/t/src/embed/.*\.c/
 ^/t/stress/.*\.out$
