@@ -93,7 +93,7 @@ sub extend_vtable_output_is
     my ($code, $expected_output, $msg, @opts) = @_;
     c_output_is(
         $common . linedirective(__LINE__) . <<CODE,
-int dotest(Parrot_Interp interp, void *unused)
+void dotest(Parrot_Interp interp, void *unused)
 {
     Parrot_PMC pmc, pmc2, pmc3, pmc_string, pmc_string2;
     Parrot_PMC pmc_float, pmc_float2;
