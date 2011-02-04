@@ -24,7 +24,12 @@ use warnings;
 use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::MethodEmitter ();
-use Parrot::Pmc2c::UtilFunctions qw( dont_edit dynext_load_code c_code_coda );
+use Parrot::Pmc2c::UtilFunctions qw(
+    dont_edit
+    dynext_load_code
+    c_code_coda
+    gen_multi_name
+);
 use Text::Balanced 'extract_bracketed';
 use Parrot::Pmc2c::PCCMETHOD ();
 use Parrot::Pmc2c::MULTI ();
@@ -415,15 +420,6 @@ sub vtable_decl {
     };
 ENDOFCODE
     return $cout;
-}
-
-sub gen_multi_name
-{
-    my ($name, $cache) = @_;
-
-    return $cache->{$name} if exists $cache->{$name};
-    my $count              = keys %$cache;
-    return $cache->{$name} = "mfl_$count";
 }
 
 =item C<pmc_class_init_func()>
