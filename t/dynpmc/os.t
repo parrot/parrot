@@ -668,7 +668,7 @@ SKIP: {
 .end
 CODE
 /\/
-Too many levels of symbolic links
+chroot failed
 /
 OUT
     rmtree("my-super-chroot", 0, 1);
@@ -733,7 +733,7 @@ OUT
             end
     .end
 CODE
-/No such file or directory/
+/chmod failed/
 OUT
 
 }
