@@ -809,6 +809,32 @@ Parrot_file_readdir(PARROT_INTERP, ARGIN(STRING *path))
 
 /*
 
+=item C<void Parrot_file_rename(PARROT_INTERP, STRING *from, STRING *to)>
+
+Renames a file
+
+=cut
+
+*/
+
+void
+Parrot_file_rename(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
+{
+    char    *c_from = Parrot_str_to_encoded_cstring(interp, from,
+                            Parrot_utf16_encoding_ptr);
+    char    *c_to   = Parrot_str_to_encoded_cstring(interp, to,
+                            Parrot_utf16_encoding_ptr);
+    BOOL     result = MoveFileW((LPWSTR)c_from, (LPWSTR)c_to);
+
+    Parrot_str_free_cstring(c_from);
+    Parrot_str_free_cstring(c_to);
+
+    if (!result)
+        THROW("rename");
+}
+
+/*
+
 =item C<INTVAL Parrot_file_can_read(PARROT_INTERP, STRING *path)>
 
 Tests whether a file can be read. TODO: We only check if the file exists

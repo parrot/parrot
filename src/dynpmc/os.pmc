@@ -355,18 +355,7 @@ thrown.
 */
 
     METHOD rename(STRING *oldpath, STRING *newpath) {
-        char * const coldpath = Parrot_str_to_cstring(INTERP, oldpath);
-        char * const cnewpath = Parrot_str_to_cstring(INTERP, newpath);
-        const int    ret      = rename(coldpath, cnewpath);
-
-        Parrot_str_free_cstring(coldpath);
-        Parrot_str_free_cstring(cnewpath);
-
-        if (ret < 0) {
-            const char * const errmsg = strerror(errno) ;
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                "%s", errmsg);
-        }
+        Parrot_file_rename(INTERP, oldpath, newpath);
     }
 
 /*

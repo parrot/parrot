@@ -628,6 +628,30 @@ Parrot_file_readdir(PARROT_INTERP, ARGIN(STRING *path))
 
 /*
 
+=item C<void Parrot_file_rename(PARROT_INTERP, STRING *from, STRING *to)>
+
+Renames a file
+
+=cut
+
+*/
+
+void
+Parrot_file_rename(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
+{
+    char * const c_from = Parrot_str_to_platform_cstring(interp, from);
+    char * const c_to   = Parrot_str_to_platform_cstring(interp, to);
+    const int    result = rename(c_from, c_to);
+
+    Parrot_str_free_cstring(c_from);
+    Parrot_str_free_cstring(c_to);
+
+    if (result)
+        THROW("rename");
+}
+
+/*
+
 =item C<INTVAL Parrot_file_can_read(PARROT_INTERP, STRING *path)>
 
 Tests whether a file can be read
