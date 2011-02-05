@@ -1,12 +1,8 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
-
 package Parrot::Pmc2c::Parser;
-
+# Copyright (C) 2004-2011, Parrot Foundation.
 use strict;
 use warnings;
-
 use base qw( Exporter );
-
 our @EXPORT_OK = qw( parse_pmc extract_balanced );
 use Parrot::Pmc2c::PMC ();
 use Parrot::Pmc2c::Attribute ();
@@ -22,12 +18,18 @@ Parrot::Pmc2c::Parser - PMC Parser
 
 =head1 SYNOPSIS
 
-    use Parrot::Pmc2c::Parser;
+    use Parrot::Pmc2c::Parser qw(
+        parse_pmc
+        extract_balanced
+    );
 
 =head1 DESCRIPTION
 
-Parrot::Pmc2c::Parser parses a sudo C syntax into a perl hash that is then dumped.
+Parrot::Pmc2c::Parser parses a pseudo-C syntax into a perl hash that is then dumped.
 
+=head1 SUBROUTINES
+
+This package exports two subroutines on request only.
 
 =head2 C<parse_pmc()>
 
@@ -51,7 +53,7 @@ Filename of the pmc to parse.
 
 B<Return Values:>  Reference to a Parrot::Pmc2c::PMC object
 
-B<Comments:>  Called by C<dump_pmc()>.
+B<Comments:>  Called by C<Parrot::Pmc2c::Dumper::dump_pmc()>.
 
 =cut
 
