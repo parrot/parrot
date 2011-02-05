@@ -809,6 +809,93 @@ Parrot_file_readdir(PARROT_INTERP, ARGIN(STRING *path))
 
 /*
 
+=item C<INTVAL Parrot_file_can_read(PARROT_INTERP, STRING *path)>
+
+Tests whether a file can be read. TODO: We only check if the file exists
+and don't look at the ACLs.
+
+=cut
+
+*/
+
+INTVAL
+Parrot_file_can_read(PARROT_INTERP, ARGIN(STRING *path))
+{
+    char    *c_str  = Parrot_str_to_encoded_cstring(interp, from,
+                            Parrot_utf16_encoding_ptr);
+    DWORD    attrs  = GetFileAttributesW((LPWSTR)c_str);
+
+    Parrot_str_free_cstring(c_str);
+
+    return attrs != INVALID_FILE_ATTRIBUTES;
+}
+
+/*
+
+=item C<INTVAL Parrot_file_can_write(PARROT_INTERP, STRING *path)>
+
+Tests whether a file can be read. TODO: We only check if the file exists
+and is not read-only. We should look at the ACLs.
+
+
+=cut
+
+*/
+
+INTVAL
+Parrot_file_can_write(PARROT_INTERP, ARGIN(STRING *path))
+{
+    char    *c_str  = Parrot_str_to_encoded_cstring(interp, from,
+                            Parrot_utf16_encoding_ptr);
+    DWORD    attrs  = GetFileAttributesW((LPWSTR)c_str);
+
+    Parrot_str_free_cstring(c_str);
+
+    return attrs != INVALID_FILE_ATTRIBUTES
+    &&    (attrs & FILE_ATTRIBUTE_READONLY) == 0;
+}
+
+/*
+
+=item C<INTVAL Parrot_file_can_execute(PARROT_INTERP, STRING *path)>
+
+Tests whether a file can be executed
+
+=cut
+
+*/
+
+INTVAL
+Parrot_file_can_execute(PARROT_INTERP, ARGIN(STRING *path))
+{
+    PMC * const    env         = Parrot_pmc_new(interp, enum_class_Env);
+    STRING * const pathext_str = Parrot_str_new(interp, "PATHEXT", 7);
+    STRING * const pathext_sep = Parrot_str_new(interp, ";", 1);
+    STRING * const dot         = Parrot_str_new(interp, ".", 1);
+    STRING * const pathext     = VTABLE_get_string_keyed_str(interp, env, pathext_str);
+    PMC * const    pathext_pmc = Parrot_str_split(interp, pathext_sep, pathext);
+    const INTVAL   elems       = VTABLE_elements(interp, pathext_pmc);
+    INTVAL i;
+    STRING *wo_stem = NULL;
+    STRING *ext     = NULL;
+
+    parrot_split_path_ext(interp, filename, &wo_stem, &ext);
+    if (STRING_IS_NULL(ext) || Parrot_str_length(interp, ext) == 0)
+        return 0;
+    ext = Parrot_str_upcase(interp, ext);
+    ext = Parrot_str_concat(interp, dot, ext);
+
+    for (i = 0; i < elems; i++) {
+        STRING * const test_ext = VTABLE_get_string_keyed_int(interp, pathext_pmc, i);
+        if (Parrot_str_equal(interp, ext, test_ext))
+            return 1;
+    }
+
+    return 0;
+}
+
+/*
+
 =back
 
 =cut

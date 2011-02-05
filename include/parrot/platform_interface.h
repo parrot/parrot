@@ -203,6 +203,15 @@ void Parrot_file_link(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to));
 PARROT_EXPORT
 PMC *Parrot_file_readdir(PARROT_INTERP, ARGIN(STRING *path));
 
+PARROT_EXPORT
+INTVAL Parrot_file_can_read(PARROT_INTERP, ARGIN(STRING *path));
+
+PARROT_EXPORT
+INTVAL Parrot_file_can_write(PARROT_INTERP, ARGIN(STRING *path));
+
+PARROT_EXPORT
+INTVAL Parrot_file_can_execute(PARROT_INTERP, ARGIN(STRING *path));
+
 /*
 ** Math:
 */

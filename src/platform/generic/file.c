@@ -628,6 +628,69 @@ Parrot_file_readdir(PARROT_INTERP, ARGIN(STRING *path))
 
 /*
 
+=item C<INTVAL Parrot_file_can_read(PARROT_INTERP, STRING *path)>
+
+Tests whether a file can be read
+
+=cut
+
+*/
+
+INTVAL
+Parrot_file_can_read(PARROT_INTERP, ARGIN(STRING *path))
+{
+    char *c_str  = Parrot_str_to_platform_cstring(interp, path);
+    int   result = access(c_str, R_OK);
+
+    Parrot_str_free_cstring(c_str);
+
+    return result == 0;
+}
+
+/*
+
+=item C<INTVAL Parrot_file_can_write(PARROT_INTERP, STRING *path)>
+
+Tests whether a file can be written
+
+=cut
+
+*/
+
+INTVAL
+Parrot_file_can_write(PARROT_INTERP, ARGIN(STRING *path))
+{
+    char *c_str  = Parrot_str_to_platform_cstring(interp, path);
+    int   result = access(c_str, W_OK);
+
+    Parrot_str_free_cstring(c_str);
+
+    return result == 0;
+}
+
+/*
+
+=item C<INTVAL Parrot_file_can_execute(PARROT_INTERP, STRING *path)>
+
+Tests whether a file can be executed
+
+=cut
+
+*/
+
+INTVAL
+Parrot_file_can_execute(PARROT_INTERP, ARGIN(STRING *path))
+{
+    char *c_str  = Parrot_str_to_platform_cstring(interp, path);
+    int   result = access(c_str, X_OK);
+
+    Parrot_str_free_cstring(c_str);
+
+    return result == 0;
+}
+
+/*
+
 =back
 
 =cut
