@@ -471,7 +471,7 @@ pir_error_output_like( <<'CODE', <<"OUT", 'Test bad OS.rename' );
     $P1.'rename'('some silly non-existent file name', 'arglblargl')
 .end
 CODE
-/No such file or directory/
+/rename failed/
 OUT
 
 # test lstat

@@ -770,8 +770,6 @@ Parrot_file_umask(PARROT_INTERP, INTVAL mask)
     Parrot_ex_throw_from_c_args(interp, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "umask not implemented on Win32");
-
-    return 0;
 }
 
 /*
@@ -903,7 +901,7 @@ and don't look at the ACLs.
 INTVAL
 Parrot_file_can_read(PARROT_INTERP, ARGIN(STRING *path))
 {
-    char    *c_str  = Parrot_str_to_encoded_cstring(interp, from,
+    char    *c_str  = Parrot_str_to_encoded_cstring(interp, path,
                             Parrot_utf16_encoding_ptr);
     DWORD    attrs  = GetFileAttributesW((LPWSTR)c_str);
 
@@ -927,7 +925,7 @@ and is not read-only. We should look at the ACLs.
 INTVAL
 Parrot_file_can_write(PARROT_INTERP, ARGIN(STRING *path))
 {
-    char    *c_str  = Parrot_str_to_encoded_cstring(interp, from,
+    char    *c_str  = Parrot_str_to_encoded_cstring(interp, path,
                             Parrot_utf16_encoding_ptr);
     DWORD    attrs  = GetFileAttributesW((LPWSTR)c_str);
 
@@ -961,7 +959,7 @@ Parrot_file_can_execute(PARROT_INTERP, ARGIN(STRING *path))
     STRING *wo_stem = NULL;
     STRING *ext     = NULL;
 
-    parrot_split_path_ext(interp, filename, &wo_stem, &ext);
+    parrot_split_path_ext(interp, path, &wo_stem, &ext);
     if (STRING_IS_NULL(ext) || Parrot_str_length(interp, ext) == 0)
         return 0;
     ext = Parrot_str_upcase(interp, ext);
