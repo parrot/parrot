@@ -4489,7 +4489,8 @@ again:
 
 /*
 
-=item C<void Parrot_pf_execute_bytecode_program(PARROT_INTERP, PackFile *pf, PMC *args)
+=item C<void Parrot_pf_execute_bytecode_program(PARROT_INTERP, PackFile *pf, PMC
+*args)>
 
 Execute a PackFile* as if it were a main program.
 
