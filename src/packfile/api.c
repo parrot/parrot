@@ -4487,6 +4487,16 @@ again:
     return pf;
 }
 
+/*
+
+=item C<void Parrot_pf_execute_bytecode_program(PARROT_INTERP, PackFile *pf, PMC *args)
+
+Execute a PackFile* as if it were a main program.
+
+=cut
+
+*/
+
 void
 Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PackFile *pf), ARGMOD(PMC *args))
 {
@@ -4494,6 +4504,9 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PackFile *pf), ARGMOD(P
     if (pf->cur_cs)
         Parrot_pf_set_current_packfile(interp, pf);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+
+    /* TODO: Ask the PackFile for the main sub directly, instead of relying on
+             it being stored in the current context */
     main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
 
     /* if no sub was marked being :main, we create a dummy sub with offset 0 */
