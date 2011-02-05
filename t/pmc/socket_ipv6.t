@@ -37,13 +37,34 @@ IPv6-related tests for the Socket PMC.
 .end
 
 .sub test_bind
-    .local pmc sock, addrinfo
-    .local string str, null_string
-    .local int result
+    .local pmc sock, addrinfo, addr, it
+    .local string str
+    .local int result, count
 
     sock = new 'Socket'
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    addrinfo = sock.'getaddrinfo'(null_string, 1234, .PIO_PROTO_TCP, .PIO_PF_INET6, 0)
+    addrinfo = sock.'getaddrinfo'('::1', 1234, .PIO_PROTO_TCP, .PIO_PF_INET6, 0)
+
+    # output addresses for debugging
+    it = iter addrinfo
+    count = 1
+  loop:
+    addr = shift it
+    print '# address '
+    print count
+    print ': family '
+    $I0 = addr[0]
+    print $I0
+    print ', type '
+    $I0 = addr[1]
+    print $I0
+    print ', protocol '
+    $I0 = addr[2]
+    print $I0
+    print "\n"
+    inc count
+    if it goto loop
+
     sock.'bind'(addrinfo)
 
     str = sock.'local_address'()
@@ -52,7 +73,7 @@ IPv6-related tests for the Socket PMC.
     sock.'close'()
 
     sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    addrinfo = sock.'getaddrinfo'(null_string, 1234, .PIO_PROTO_TCP, .PIO_PF_INET, 0)
+    addrinfo = sock.'getaddrinfo'('127.0.0.1', 1234, .PIO_PROTO_TCP, .PIO_PF_INET, 0)
     sock.'bind'(addrinfo)
 
     str = sock.'local_address'()
@@ -62,8 +83,8 @@ IPv6-related tests for the Socket PMC.
 
 .sub test_server
     .local pmc interp, conf, server, sock, address, result
-    .local string command, str, null_string
-    .local int status
+    .local string command, str, null_string, part
+    .local int status, port
 
     interp = getinterp
     conf = interp[.IGLOBALS_CONFIG_HASH]
@@ -82,11 +103,14 @@ IPv6-related tests for the Socket PMC.
     server = new 'FileHandle'
     server.'open'(command, 'rp')
     str = server.'readline'()
-    is(str, "Server started\n", 'Server process started')
+    part = substr str, 0, 34
+    is(part, 'Server started, listening on port ', 'Server process started')
+    part = substr str, 34, 4
+    port = part
 
     sock = new 'Socket'
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    address = sock.'getaddrinfo'(null_string, 1234, .PIO_PROTO_TCP, .PIO_PF_INET6, 0)
+    address = sock.'getaddrinfo'(null_string, port, .PIO_PROTO_TCP, .PIO_PF_INET6, 0)
     sock.'connect'(address)
 
     str = server.'readline'()
@@ -122,12 +146,11 @@ IPv6-related tests for the Socket PMC.
 
 .sub test_tcp_socket6
     .local pmc sock, sockaddr
-    .local string null_string
 
     sock = new 'Socket'
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
 
-    sockaddr = sock."sockaddr"(null_string, 80, .PIO_PF_INET6)
+    sockaddr = sock."sockaddr"('::1', 80, .PIO_PF_INET6)
     isa_ok(sockaddr,'Sockaddr',"A TCP ipv6 sockaddr to localhost was set")
 
     sockaddr = sock."sockaddr"("::1", 80, .PIO_PF_INET6)
@@ -136,12 +159,11 @@ IPv6-related tests for the Socket PMC.
 
 .sub test_udp_socket6
     .local pmc sock, sockaddr
-    .local string null_string
 
     sock = new 'Socket'
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_DGRAM, .PIO_PROTO_UDP)
 
-    sockaddr = sock."sockaddr"(null_string, 80, .PIO_PF_INET6)
+    sockaddr = sock."sockaddr"('::1', 80, .PIO_PF_INET6)
     isa_ok(sockaddr,'Sockaddr', "A UDP ipv6 sockaddr to localhost was set:")
 
     sockaddr = sock."sockaddr"("::1", 80, .PIO_PF_INET6)

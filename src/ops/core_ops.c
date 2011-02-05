@@ -40,6 +40,7 @@ extern op_lib_t core_op_lib;
 #include "parrot/embed.h"
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_continuation.h"
+#include "pmc/pmc_fixedintegerarray.h"
 #include "pmc/pmc_parrotlibrary.h"
 
 
@@ -15338,7 +15339,8 @@ Parrot_set_args_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     PMC * const signature = PCONST(1);
     PMC * const call_sig = Parrot_pcc_build_sig_object_from_op(interp,
             PMCNULL, signature, raw_args);
-    const INTVAL argc = VTABLE_elements(interp, signature);
+    INTVAL argc;
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);return (opcode_t *)cur_opcode + argc + 2;
 }
 
@@ -15362,7 +15364,7 @@ Parrot_get_params_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
         Parrot_pcc_dec_recursion_depth(interp, ctx);
         Parrot_pcc_set_caller_ctx(interp, ctx, Parrot_pcc_get_caller_ctx(interp, caller_ctx));
     }
-    argc = VTABLE_elements(interp, signature);return (opcode_t *)cur_opcode + argc + 2;
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);return (opcode_t *)cur_opcode + argc + 2;
 }
 
 opcode_t *
@@ -15378,7 +15380,7 @@ Parrot_set_returns_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
 
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);
 
-    argc = VTABLE_elements(interp, signature);return (opcode_t *)cur_opcode + argc + 2;
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);return (opcode_t *)cur_opcode + argc + 2;
 }
 
 opcode_t *
@@ -15395,7 +15397,7 @@ Parrot_get_results_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     Parrot_pcc_fill_params_from_op(interp, call_object, signature, raw_params,
             PARROT_ERRORS_RESULT_COUNT_FLAG);
 
-    argc = VTABLE_elements(interp, signature);
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), PMCNULL);return (opcode_t *)cur_opcode + argc + 2;
 }
 

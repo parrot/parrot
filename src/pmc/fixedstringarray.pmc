@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -614,18 +614,16 @@ Used to unarchive the string.
 
 */
     VTABLE void thaw(PMC *info) {
-        UINTVAL  i, size;
-        STRING **str_array;
+        UINTVAL size = VTABLE_shift_integer(INTERP, info);
+        SELF.init_int(size);
+        if (size > 0) {
+            UINTVAL i;
+            STRING **str_array;
+            GET_ATTR_str_array(INTERP, SELF, str_array);
 
-        SELF.init();
-        SUPER(info);
-
-        size   = VTABLE_shift_integer(INTERP, info);
-        SELF.set_integer_native((INTVAL)size);
-        GET_ATTR_str_array(INTERP, SELF, str_array);
-
-        for (i = 0; i < size; ++i)
-            str_array[i] = VTABLE_shift_string(INTERP, info);
+            for (i = 0; i < size; ++i)
+                str_array[i] = VTABLE_shift_string(INTERP, info);
+        }
     }
 }
 

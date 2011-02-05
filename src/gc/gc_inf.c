@@ -423,7 +423,7 @@ gc_inf_get_gc_info(SHIM_INTERP, SHIM(Interpinfo_enum what))
 
 /*
 
-=item C<void Parrot_gc_inf_init(PARROT_INTERP)>
+=item C<void Parrot_gc_inf_init(PARROT_INTERP, Parrot_GC_Init_Args *args)>
 
 Initializes the infinite memory collector. Installs the necessary function
 pointers into the Memory_Pools structure. The two most important are the
@@ -437,7 +437,7 @@ finalization is necessary.
 */
 
 void
-Parrot_gc_inf_init(PARROT_INTERP)
+Parrot_gc_inf_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_gc_inf_init)
 

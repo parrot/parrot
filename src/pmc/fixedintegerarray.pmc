@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -66,8 +66,10 @@ Initializes the array.
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 _("FixedIntegerArray: Cannot set array size to a negative number (%d)"), size);
-        SET_ATTR_size(INTERP, SELF, size);
-        SET_ATTR_int_array(INTERP, SELF, mem_gc_allocate_n_typed(INTERP, size, INTVAL));
+        if (size > 0) {
+            SET_ATTR_size(INTERP, SELF, size);
+            SET_ATTR_int_array(INTERP, SELF, mem_gc_allocate_n_typed(INTERP, size, INTVAL));
+        }
         PObj_custom_destroy_SET(SELF);
     }
 
@@ -545,12 +547,6 @@ Return a new Iterator for this PMC.
 
 /*
 
-=item C<void visit(PMC *info)>
-
-This is used by freeze/thaw to visit the contents of the array.
-
-C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
-
 =item C<void freeze(PMC *info)>
 
 Used to archive the array.
@@ -559,13 +555,11 @@ Used to archive the array.
 
 Used to unarchive the array.
 
+C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
+
 =cut
 
 */
-
-    /*VTABLE void visit(PMC *info) {
-        SUPER(info);
-    }*/
 
     VTABLE void freeze(PMC *info) {
         INTVAL   *int_array;
@@ -582,20 +576,12 @@ Used to unarchive the array.
     }
 
     VTABLE void thaw(PMC *info) {
-        INTVAL n;
-
-        SUPER(info);
-
-        SET_ATTR_size(INTERP, SELF, 0);
-        SET_ATTR_int_array(INTERP, SELF, NULL);
-
-        if ((n = VTABLE_shift_integer(INTERP, info))) {
+        INTVAL n = VTABLE_shift_integer(INTERP, info);
+        SELF.init_int(n);
+        if (n > 0) {
             INTVAL  i;
             INTVAL *int_array;
-
-            SELF.set_integer_native(n);
             GET_ATTR_int_array(INTERP, SELF, int_array);
-
             for (i = 0; i < n; ++i)
                 int_array[i] = VTABLE_shift_integer(INTERP, info);
         }

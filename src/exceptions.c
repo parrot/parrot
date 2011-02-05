@@ -108,7 +108,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 
     STRING * const message     = already_dying ? STRINGNULL :
             VTABLE_get_string(interp, exception);
-    const INTVAL   severity    = already_dying ? EXCEPT_fatal :
+    const INTVAL   severity    = already_dying ? (INTVAL)EXCEPT_fatal :
             VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
 
     if (already_dying)
@@ -583,6 +583,7 @@ Parrot_print_backtrace(void)
 #  ifndef PARROT_HAS_DLINFO
 #    define BACKTRACE_VERBOSE
 #  endif
+    Interp *emergency_interp = Parrot_get_emergency_interp();
     /* stolen from http://www.delorie.com/gnu/docs/glibc/libc_665.html */
     void *array[BACKTRACE_DEPTH];
     int i;
@@ -621,7 +622,11 @@ Parrot_print_backtrace(void)
             fputs("Not enough memory for backtrace_symbols\n", stderr);
     }
 #  endif
-
+    fprintf(stderr, "Attempting to get PIR backtrace.  No guarantees.  Here goes...\n");
+    if (emergency_interp) {
+        Parrot_clear_emergency_interp();
+        PDB_backtrace(emergency_interp);
+    }
 #  undef BACKTRACE_DEPTH
 #endif /* ifdef PARROT_HAS_BACKTRACE */
 }

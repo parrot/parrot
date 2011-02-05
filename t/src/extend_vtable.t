@@ -46,6 +46,7 @@ my $common = linedirective(__LINE__) . <<'CODE';
 static void fail(const char *msg);
 static Parrot_String createstring(Parrot_Interp interp, const char * value);
 static Parrot_Interp new_interp();
+static void handler(Parrot_Interp interp, Parrot_PMC exception, void *unused);
 
 static void fail(const char *msg)
 {
@@ -66,6 +67,24 @@ static Parrot_Interp new_interp()
     return interp;
 
 }
+static void handler(Parrot_Interp interp, Parrot_PMC exception, void *unused)
+{
+    Parrot_printf(interp, "Failed!\n");
+    if (exception) {
+        Parrot_String key;
+        Parrot_Int type;
+        Parrot_Int severity;
+        Parrot_String message;
+
+        key = createstring(interp, "type");
+        type = Parrot_PMC_get_integer_keyed_str(interp, exception, key);
+        key = createstring(interp, "severity");
+        severity = Parrot_PMC_get_integer_keyed_str(interp, exception, key);
+        message = Parrot_PMC_get_string(interp, exception);
+        Parrot_printf(interp, "Exception is: type %d severity %d message '%Ss'\n",
+                type, severity, message);
+    }
+}
 
 CODE
 
@@ -74,17 +93,14 @@ sub extend_vtable_output_is
     my ($code, $expected_output, $msg, @opts) = @_;
     c_output_is(
         $common . linedirective(__LINE__) . <<CODE,
-int main(void)
+void dotest(Parrot_Interp interp, void *unused)
 {
-    Parrot_Interp interp;
     Parrot_PMC pmc, pmc2, pmc3, pmc_string, pmc_string2;
     Parrot_PMC pmc_float, pmc_float2;
     Parrot_PMC rpa, rpa2;
     Parrot_Int type, value, integer, integer2;
     Parrot_Float number, number2;
     Parrot_String string, string2;
-
-    interp = new_interp();
 
     type   = Parrot_PMC_typenum(interp, "Integer");
     rpa    = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
@@ -106,6 +122,13 @@ $code
 
     Parrot_destroy(interp);
     printf("Done!\\n");
+}
+
+int main(void)
+{
+    Parrot_Interp interp;
+    interp = new_interp();
+    Parrot_ext_try(interp, &dotest, &handler, NULL);
     return 0;
 }
 CODE
@@ -114,15 +137,23 @@ CODE
 
 }
 
-# This blows up
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(freeze|thaw|thawfinish)", todo => 'freeze + thaw are borked');
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(freeze|thaw)");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
     Parrot_PMC_set_integer_native(interp, pmc2, 99);
+    Parrot_printf(interp,"%P\n", pmc);
+    Parrot_printf(interp,"%P\n", pmc2);
 
-    Parrot_PMC_freeze(interp, pmc, pmc2);
-    Parrot_PMC_thaw(interp, pmc, pmc2);
-    Parrot_printf(interp,"42\n");
+    /* freeze pmc, thaw tp pmc 2 */
+    Parrot_PMC_freeze(interp, pmc, rpa);
+    Parrot_PMC_thaw(interp, pmc2, rpa);
+    /* Modify pmc to ensure they are not pointing to the same location */
+    Parrot_PMC_set_integer_native(interp, pmc, 1000);
+    Parrot_printf(interp,"%P\n", pmc);
+    Parrot_printf(interp,"%P\n", pmc2);
 CODE
+42
+99
+1000
 42
 Done!
 OUTPUT
@@ -691,12 +722,12 @@ CODE
 Done!
 OUTPUT
 
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal_num", todo => 'seems borked' );
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal_num");
     Parrot_PMC_set_number_native(interp, pmc, -42);
     Parrot_PMC_set_number_native(interp, pmc2, 42);
 
     integer = Parrot_PMC_is_equal_num(interp, pmc, pmc2);
-    printf("%d\n", (int) integer);
+    Parrot_printf(interp, "%d\n", integer);
 
     Parrot_PMC_set_number_native(interp, pmc2, -42);
 

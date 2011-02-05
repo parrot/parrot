@@ -200,8 +200,11 @@ sub rewrite_vtable_method {
           }x,
             sub {
               if ($pmc->is_dynamic($super)) {
+                #*_get_vtable_pointer is a minor hack invented only to handle
+                #the use case when a dynpmc calls a parent dynpmc's vtable
+                #function.  See TT #898 for more info.
                 return "Parrot_" . $super .
-                  "_get_vtable(interp)->$name(" . full_arguments($1) .
+                  "_get_vtable_pointer(interp)->$name(" . full_arguments($1) .
                   ')';
               }
               else {
