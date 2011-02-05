@@ -203,7 +203,6 @@ sub pcc_signature {
 =head1 SEE ALSO
 
     lib/Parrot/Pmc2c/PMC/RO.pm
-    lib/Parrot/Pmc2c/PMCEmitter.pm
     lib/Parrot/Pmc2c/VTable.pm
     lib/Parrot/Pmc2c/PMC.pm
     lib/Parrot/Pmc2c/Parser.pm

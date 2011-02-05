@@ -1011,7 +1011,6 @@ lib/Parrot/Pmc2c/PMC/ParrotClass.pm                         [devel]lib
 lib/Parrot/Pmc2c/PMC/PrintTree.pm                           [devel]lib
 lib/Parrot/Pmc2c/PMC/RO.pm                                  [devel]lib
 lib/Parrot/Pmc2c/PMC/default.pm                             [devel]lib
-lib/Parrot/Pmc2c/PMCEmitter.pm                              [devel]lib
 lib/Parrot/Pmc2c/Parser.pm                                  [devel]lib
 lib/Parrot/Pmc2c/Pmc2cMain.pm                               [devel]lib
 lib/Parrot/Pmc2c/UtilFunctions.pm                           [devel]lib
