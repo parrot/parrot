@@ -201,10 +201,19 @@ PARROT_EXPORT
 void Parrot_file_link(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to));
 
 PARROT_EXPORT
+INTVAL Parrot_file_umask(PARROT_INTERP, INTVAL mask);
+
+PARROT_EXPORT
+void Parrot_file_chroot(PARROT_INTERP, ARGIN(STRING *path));
+
+PARROT_EXPORT
 PMC *Parrot_file_readdir(PARROT_INTERP, ARGIN(STRING *path));
 
 PARROT_EXPORT
 void Parrot_file_rename(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to));
+
+PARROT_EXPORT
+void Parrot_file_chmod(PARROT_INTERP, ARGIN(STRING *path), INTVAL mode);
 
 PARROT_EXPORT
 INTVAL Parrot_file_can_read(PARROT_INTERP, ARGIN(STRING *path));

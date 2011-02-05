@@ -592,6 +592,44 @@ Parrot_file_link(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
 
 /*
 
+=item C<INTVAL Parrot_file_umask(PARROT_INTERP, INTVAL mask)>
+
+Changes umask and return previous one
+
+=cut
+
+*/
+
+INTVAL
+Parrot_file_umask(PARROT_INTERP, INTVAL mask)
+{
+    return umask((mode_t)mask);
+}
+
+/*
+
+=item C<void Parrot_file_chroot(PARROT_INTERP, STRING *path)>
+
+Change root directory
+
+=cut
+
+*/
+
+void
+Parrot_file_chroot(PARROT_INTERP, ARGIN(STRING *path))
+{
+    char *c_str  = Parrot_str_to_platform_cstring(interp, path);
+    int   result = chroot(c_str);
+
+    Parrot_str_free_cstring(c_str);
+
+    if (result)
+        THROW("chroot");
+}
+
+/*
+
 =item C<PMC * Parrot_file_readdir(PARROT_INTERP, STRING *path)>
 
 Reads entries from a directory.
@@ -648,6 +686,28 @@ Parrot_file_rename(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
 
     if (result)
         THROW("rename");
+}
+
+/*
+
+=item C<void Parrot_file_chmod(PARROT_INTERP, STRING *path, INTVAL mode)>
+
+Changes permissions of file C<path>
+
+=cut
+
+*/
+
+void
+Parrot_file_chmod(PARROT_INTERP, ARGIN(STRING *path), INTVAL mode)
+{
+    char *c_str  = Parrot_str_to_platform_cstring(interp, path);
+    int   result = chmod(c_str, mode);
+
+    Parrot_str_free_cstring(c_str);
+
+    if (result)
+        THROW("chmod");
 }
 
 /*

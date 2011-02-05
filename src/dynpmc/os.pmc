@@ -18,19 +18,6 @@ files and directories.
 
 */
 
-#if defined(_MSC_VER)
-#  include <direct.h>
-#  include <io.h>
-#  include <tchar.h>
-#  include <windows.h>
-#elif defined(__BORLANDC__)
-#  include <dir.h>
-#  include <dirent.h>
-#else
-#  include <dirent.h>
-#  include <unistd.h>
-#endif
-
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -286,14 +273,8 @@ previous one).
 */
 
     METHOD umask(INTVAL mask) {
-#ifndef _MSC_VER
-        const INTVAL old = umask((mode_t)mask);
+        const INTVAL old = Parrot_file_umask(INTERP, mask);
         RETURN(INTVAL old);
-#else
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_UNIMPLEMENTED,
-            "Win32 is not POSIX. Need Win32 developer!");
-#endif
     }
 
 /*
@@ -311,21 +292,7 @@ idea to do the same with parrot.
 */
 
     METHOD chroot(STRING *path) {
-#ifndef WIN32
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-        const int    error = chroot(cpath);
-
-        Parrot_str_free_cstring(cpath);
-
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-#else
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-                "Win32 is not POSIX. Need Win32 developer!");
-#endif
+        Parrot_file_chroot(INTERP, path);
     }
 
 
@@ -367,21 +334,7 @@ thrown.
 */
 
     METHOD chmod(STRING *path, INTVAL mode) {
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-
-#ifndef WIN32
-        const int    error = chmod(cpath, mode);
-#else
-        const int    error = _chmod(cpath, mode);
-#endif
-
-        Parrot_str_free_cstring(cpath);
-
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
+        Parrot_file_chmod(INTERP, path, mode);
     }
 
 /*

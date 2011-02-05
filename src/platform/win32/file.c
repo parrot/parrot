@@ -756,6 +756,44 @@ Parrot_file_link(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
 
 /*
 
+=item C<INTVAL Parrot_file_umask(PARROT_INTERP, INTVAL mask)>
+
+Changes umask and return previous one
+
+=cut
+
+*/
+
+INTVAL
+Parrot_file_umask(PARROT_INTERP, INTVAL mask)
+{
+    Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+            "umask not implemented on Win32");
+
+    return 0;
+}
+
+/*
+
+=item C<void Parrot_file_chroot(PARROT_INTERP, STRING *path)>
+
+Change root directory
+
+=cut
+
+*/
+
+void
+Parrot_file_chroot(PARROT_INTERP, ARGIN(STRING *path))
+{
+    Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+            "chroot not implemented on Win32");
+}
+
+/*
+
 =item C<PMC * Parrot_file_readdir(PARROT_INTERP, STRING *path)>
 
 Reads entries from a directory.
@@ -831,6 +869,24 @@ Parrot_file_rename(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
 
     if (!result)
         THROW("rename");
+}
+
+/*
+
+=item C<void Parrot_file_chmod(PARROT_INTERP, STRING *path, INTVAL mode)>
+
+Changes permissions of file C<path>
+
+=cut
+
+*/
+
+void
+Parrot_file_chmod(PARROT_INTERP, ARGIN(STRING *path), INTVAL mode)
+{
+    Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+            "chmod not implemented on Win32");
 }
 
 /*
