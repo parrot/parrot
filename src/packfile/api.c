@@ -4487,6 +4487,27 @@ again:
     return pf;
 }
 
+void
+Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PackFile *pf), ARGMOD(PMC *args))
+{
+    ASSERT_ARGS(Parrot_pf_execute_bytecode_program)
+    if (pf->cur_cs)
+        Parrot_pf_set_current_packfile(interp, pf);
+    PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+    main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+
+    /* if no sub was marked being :main, we create a dummy sub with offset 0 */
+
+    if (!main_sub)
+        main_sub = set_current_sub(interp);
+
+    Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), NULL);
+    Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
+
+    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, args);
+    Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", args);
+}
+
 
 /*
 
