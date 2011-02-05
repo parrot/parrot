@@ -26,8 +26,6 @@ use base qw( Exporter );
 our @EXPORT_OK = qw();
 use Storable ();
 use Parrot::PMC;
-#use Parrot::Pmc2c::Method;
-###
 use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::MethodEmitter ();
