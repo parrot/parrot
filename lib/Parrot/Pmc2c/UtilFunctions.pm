@@ -12,6 +12,7 @@ our @EXPORT_OK = qw( count_newlines return_statement dont_edit dynext_load_code
     args_from_parameter_list
     passable_args_from_parameter_list
     gen_multi_name
+    trim ltrim rtrim
 );
 
 =head1 NAME
@@ -306,6 +307,28 @@ sub gen_multi_name {
     return $cache->{$name} if exists $cache->{$name};
     my $count              = keys %$cache;
     return $cache->{$name} = "mfl_$count";
+}
+
+# Perl trim function to remove whitespace from the start and end of the string
+sub trim {
+    my $string = shift;
+    $string    =~ s/^\s+//;
+    $string    =~ s/\s+$//;
+    return $string;
+}
+
+# Left trim function to remove leading whitespace
+sub ltrim {
+    my $string = shift;
+    $string    =~ s/^\s+//;
+    return $string;
+}
+
+# Right trim function to remove trailing whitespace
+sub rtrim {
+    my $string = shift;
+    $string    =~ s/\s+$//;
+    return $string;
 }
 
 1;
