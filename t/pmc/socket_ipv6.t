@@ -43,7 +43,7 @@ IPv6-related tests for the Socket PMC.
 
     sock = new 'Socket'
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    addrinfo = sock.'getaddrinfo'('::1', 1234, .PIO_PROTO_TCP, .PIO_PF_INET6, 0)
+    addrinfo = sock.'getaddrinfo'('::1', 1234, .PIO_PROTO_TCP, .PIO_PF_INET6, 1)
 
     # output addresses for debugging
     it = iter addrinfo
@@ -73,7 +73,7 @@ IPv6-related tests for the Socket PMC.
     sock.'close'()
 
     sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    addrinfo = sock.'getaddrinfo'('127.0.0.1', 1234, .PIO_PROTO_TCP, .PIO_PF_INET, 0)
+    addrinfo = sock.'getaddrinfo'('127.0.0.1', 1234, .PIO_PROTO_TCP, .PIO_PF_INET, 1)
     sock.'bind'(addrinfo)
 
     str = sock.'local_address'()

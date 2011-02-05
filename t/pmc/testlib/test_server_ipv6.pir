@@ -31,7 +31,7 @@ in case of test failures.
     port = 1234
     push_eh error
   retry:
-    address = sock.'getaddrinfo'('::1', port, .PIO_PROTO_TCP, .PIO_PF_INET6, 0)
+    address = sock.'getaddrinfo'('::1', port, .PIO_PROTO_TCP, .PIO_PF_INET6, 1)
     sock.'bind'(address)
     goto started
   error:
