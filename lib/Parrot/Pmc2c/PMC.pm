@@ -489,6 +489,8 @@ sub generate {
     $emitter->write_to_file;
 }
 
+=over 4
+
 =item C<generate_c_file()>
 
 Generates the C implementation file code for the PMC.
@@ -1420,6 +1422,8 @@ sub is_vtable_method {
 =item C<gen_switch_vtable>
 
 Generate switch-bases VTABLE for MULTI
+
+=back
 
 =cut
 
