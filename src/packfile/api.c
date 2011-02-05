@@ -4502,6 +4502,8 @@ void
 Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PackFile *pf), ARGMOD(PMC *args))
 {
     ASSERT_ARGS(Parrot_pf_execute_bytecode_program)
+    PMC * main_sub;
+
     if (pf->cur_cs)
         Parrot_pf_set_current_packfile(interp, pf);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
