@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -874,7 +874,8 @@ Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)
 
 /*
 
-=item C<PMC * Parrot_pmc_box_c_string_array(PARROT_INTERP, int count, const char **s)
+=item C<PMC * Parrot_pmc_box_c_string_array(PARROT_INTERP, int count, const char
+**s)>
 
 Take a C string array and a count, and box it into a string array PMC
 
