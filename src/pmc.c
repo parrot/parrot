@@ -889,7 +889,7 @@ Parrot_pmc_box_c_string_array(PARROT_INTERP, int count, ARGIN(const char **s))
     ASSERT_ARGS(Parrot_pmc_box_c_string_array)
     PMC * const s_pmc = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
 
-    if (argv != NULL && argc > 0) {
+    if (s != NULL && count > 0) {
         Parrot_Int i = 0;
         for (; i < count; ++i) {
             /* Run through argv, adding everything to the array */
@@ -897,7 +897,7 @@ Parrot_pmc_box_c_string_array(PARROT_INTERP, int count, ARGIN(const char **s))
             VTABLE_push_string(interp, s_pmc, item);
         }
     }
-    return userargv;
+    return s_pmc;
 }
 
 
