@@ -4497,6 +4497,7 @@ Execute a PackFile* as if it were a main program.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PackFile *pf), ARGMOD(PMC *args))
 {

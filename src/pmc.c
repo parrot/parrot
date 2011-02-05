@@ -872,6 +872,34 @@ Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)
     return ret;
 }
 
+/*
+
+=item C<PMC * Parrot_pmc_box_c_string_array(PARROT_INTERP, int count, const char **s)
+
+Take a C string array and a count, and box it into a string array PMC
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PMC *
+Parrot_pmc_box_c_string_array(PARROT_INTERP, int count, ARGIN(const char **s))
+{
+    ASSERT_ARGS(Parrot_pmc_box_c_string_array)
+    PMC * const s_pmc = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+
+    if (argv != NULL && argc > 0) {
+        Parrot_Int i = 0;
+        for (; i < count; ++i) {
+            /* Run through argv, adding everything to the array */
+            STRING * const item = Parrot_str_from_platform_cstring(interp, s[i]);
+            VTABLE_push_string(interp, s_pmc, item);
+        }
+    }
+    return userargv;
+}
+
 
 /*
 
