@@ -39,7 +39,6 @@ use Text::Balanced 'extract_bracketed';
 use Parrot::Pmc2c::PCCMETHOD ();
 use Parrot::Pmc2c::MULTI ();
 use Parrot::Pmc2c::PMC::RO ();
-use Parrot::Pmc2c::PMC::ParrotClass ();
 
 sub create {
     my ( $this, $pmc_classname ) = @_;
