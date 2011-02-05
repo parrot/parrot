@@ -96,10 +96,6 @@ Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
     Parrot_Pointer_Array_Chunk   *chunk;
     void                         *ret;
 
-#ifndef NDEBUG
-    self->count++;
-#endif
-
     /* If there is no free chunks */
     if (self->current_chunk >= self->total_chunks)
          allocate_more_chunks(interp, self);
@@ -184,11 +180,6 @@ Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
     /* Mark sell to avoid iterating over */
     *(UINTVAL*)ptr = ((UINTVAL)self->next_free) | 1;
     self->next_free = (void**)ptr;
-
-#ifndef NDEBUG
-    self->count--;
-#endif
-
 }
 
 /*

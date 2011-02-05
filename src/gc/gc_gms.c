@@ -769,7 +769,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     interp->gc_sys->stats.gc_mark_runs++;
 
-#if 1
+#ifdef DETAIL_MEMORY_DEBUG
     gc_gms_print_stats(interp, "Before", gen);
 #endif
 
