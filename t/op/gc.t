@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -143,7 +143,7 @@ GC related bugs.
 
     $I0 = interpinfo .INTERPINFO_ACTIVE_PMCS
     ok($I0, "Got non-zero number of active PMCs")
-    
+
     $I1 = interpinfo .INTERPINFO_TOTAL_PMCS
     ok($I0, "Got non-zero number of total PMCs")
 
