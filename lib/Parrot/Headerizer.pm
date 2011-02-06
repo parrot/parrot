@@ -90,7 +90,7 @@ Parrot::Headerizer object.
 sub new {
     my ($class, $args) = @_;
     if (defined $args) {
-        die "Argument to Parrot::Headerizer must be hashref"
+        die 'Argument to Parrot::Headerizer must be hashref'
             unless reftype($args) eq 'HASH';
     }
     else {

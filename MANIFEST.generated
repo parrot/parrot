@@ -33,8 +33,6 @@ include/parrot/extend_vtable.h                   [main]include
 include/parrot/feature.h                         [main]include
 include/parrot/has_header.h                      [main]include
 include/parrot/pbcversion.h                      [devel]include
-include/parrot/platform.h                        [main]include
-include/parrot/platform_limits.h                 [devel]include
 include/parrot/vtable.h                          [main]include
 include/pmc/pmc_addrregistry.h                   [devel]include
 include/pmc/pmc_arrayiterator.h                  [devel]include
@@ -315,6 +313,7 @@ runtime/parrot/library/URI.pbc                   [main]
 runtime/parrot/library/YAML/Dumper.pbc           [main]
 runtime/parrot/library/YAML/Dumper/Base.pmc      [main]
 runtime/parrot/library/YAML/Dumper/Default.pmc   [main]
+runtime/parrot/library/YAML/Tiny.pbc             [main]
 runtime/parrot/library/config.pbc                [main]
 runtime/parrot/library/config.pir                [main]
 runtime/parrot/library/distutils.pbc             [main]

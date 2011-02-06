@@ -77,7 +77,7 @@ typedef enum {
 /* Globals */
 
 typedef struct _emittert {
-    int (*open)(PARROT_INTERP, const char *param);
+    int (*open)(PARROT_INTERP, void *param);
     int (*emit)(PARROT_INTERP, void *param, const IMC_Unit *, const Instruction *ins);
     int (*new_sub)(PARROT_INTERP, void *param, IMC_Unit *);
     int (*end_sub)(PARROT_INTERP, void *param, IMC_Unit *);
@@ -125,7 +125,7 @@ int emit_flush(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-int emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(const char *param))
+int emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
@@ -150,10 +150,9 @@ int get_branch_regno(ARGIN(const Instruction *ins))
 PARROT_IGNORABLE_RESULT
 int /*@alt void@*/
 ins_print(PARROT_INTERP,
-    ARGIN(PMC *io),
+    PIOHANDLE io,
     ARGIN(const Instruction *ins))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 void insert_ins(
@@ -237,7 +236,6 @@ void subst_ins(
        PARROT_ASSERT_ARG(ins))
 #define ASSERT_ARGS_ins_print __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(io) \
     , PARROT_ASSERT_ARG(ins))
 #define ASSERT_ARGS_insert_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit) \

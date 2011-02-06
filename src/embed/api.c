@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -125,20 +125,25 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
     ASSERT_ARGS(Parrot_api_make_interpreter)
     int alt_stacktop;
     Parrot_Interp interp_raw;
+    Parrot_GC_Init_Args gc_args;
     void *stacktop_ptr = &alt_stacktop;
     const Parrot_Interp parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
     interp_raw = allocate_interpreter(parent_raw, flags);
     if (args) {
-        if (args->stacktop)
-            stacktop_ptr = args->stacktop;
-        if (args->gc_system)
-            Parrot_gc_set_system_type(interp_raw, args->gc_system);
-        if (args->gc_threshold)
-            interp_raw->gc_threshold = args->gc_threshold;
+        gc_args.stacktop          = args->stacktop
+                                  ? args->stacktop : &alt_stacktop;
+        gc_args.system            = args->gc_system;
+        gc_args.dynamic_threshold = args->gc_dynamic_threshold;
+        gc_args.min_threshold     = args->gc_min_threshold;
+
         if (args->hash_seed)
             interp_raw->hash_seed = args->hash_seed;
     }
-    initialize_interpreter(interp_raw, stacktop_ptr);
+    else {
+        memset(&gc_args, 0, sizeof (Parrot_GC_Init_Args));
+        gc_args.stacktop = &alt_stacktop;
+    }
+    initialize_interpreter(interp_raw, &gc_args);
     *interp = VTABLE_get_pmc_keyed_int(
             interp_raw, interp_raw->iglobals, (Parrot_Int)IGLOBALS_INTERPRETER);
     return !PMC_IS_NULL(*interp);
@@ -286,19 +291,18 @@ Parrot_Int
 Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
 {
     ASSERT_ARGS(Parrot_api_destroy_interpreter)
-    void * _oldtop;
     Parrot_jump_buff env;
-    Interp * const interp = GET_INTERP(interp_pmc);
-    _oldtop = interp->lo_var_ptr;
-    if (_oldtop == NULL)
-        interp->lo_var_ptr = &_oldtop;
-    interp->api_jmp_buf = &env;
     if (setjmp(env)) {
         /* We can't check for potential errors because the interpreter
          * might have been destroyed. */
         return 1;
     }
     else {
+        Interp * const interp = GET_INTERP(interp_pmc);
+        void * _oldtop = interp->lo_var_ptr;
+        if (_oldtop == NULL)
+            interp->lo_var_ptr = &_oldtop;
+        interp->api_jmp_buf = &env;
         Parrot_destroy(interp);
         Parrot_x_exit(interp, 0);
         /* Never reached, x_exit calls longjmp */
@@ -308,8 +312,8 @@ Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
 
 /*
 
-=item C<Parrot_Int Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc, const
-char *filename, Parrot_PMC * pbc)>
+=item C<Parrot_Int Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
+Parrot_String filename, Parrot_PMC * pbc)>
 
 Load a bytecode file and stores the resulting bytecode in C<pbc>. This function
 returns a true value if this call is successful and false value otherwise.
@@ -324,11 +328,11 @@ returns a true value if this call is successful and false value otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
-        ARGIN(const char *filename), ARGOUT(Parrot_PMC * pbc))
+        ARGIN(Parrot_String filename), ARGOUT(Parrot_PMC * pbc))
 {
     ASSERT_ARGS(Parrot_api_load_bytecode_file)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
+    PackFile * const pf = PackFile_read_pbc(interp, filename, 0);
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
             "Could not load packfile");
@@ -434,8 +438,6 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
 {
     ASSERT_ARGS(Parrot_api_run_bytecode)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PMC * main_sub = NULL;
-
     PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
 
     /* Debugging mode nonsense. */
@@ -447,21 +449,9 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile.");
-    if (pf->cur_cs)
-        Parrot_pf_set_current_packfile(interp, pf);
-    PackFile_fixup_subs(interp, PBC_MAIN, NULL);
-    main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
-
-    /* if no sub was marked being :main, we create a dummy sub with offset 0 */
-
-    if (!main_sub)
-        main_sub = set_current_sub(interp);
-
-    Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), NULL);
-    Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
-
-    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, mainargs);
-    Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", mainargs);
+    if (!mainargs)
+        mainargs = PMCNULL;
+    Parrot_pf_execute_bytecode_program(interp, pf, mainargs);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -716,9 +706,9 @@ Parrot_api_set_configuration_hash(Parrot_PMC interp_pmc, Parrot_PMC confighash)
 
 /*
 
-=item C<Parrot_Int Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, const char *
-sourcefile, int argc, const char **argv, Parrot_PMC* bytecodepmc, int *result,
-imcc_hack_func_t func)>
+=item C<Parrot_Int Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc,
+Parrot_String sourcefile, int argc, const char **argv, Parrot_PMC* bytecodepmc,
+int *result, imcc_hack_func_t func)>
 
 WARNING: This is an evil hack to provide a wrapper around IMCC to catch unhandled
 exceptions without having to assume IMCC is linked in with libparrot. Delete this
@@ -733,7 +723,7 @@ otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, ARGIN(const char * sourcefile),
+Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, ARGIN(Parrot_String sourcefile),
     int argc, ARGIN_NULLOK(const char **argv), ARGMOD(Parrot_PMC* bytecodepmc),
     ARGOUT(int *result), imcc_hack_func_t func)
 {

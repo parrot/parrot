@@ -30,7 +30,7 @@ running compilers from a command line.
     $P0 = split ' ', 'parse past post pir evalpmc'
     setattribute self, '@stages', $P0
 
-    $P0 = split ' ', 'e=s help|h target=s dumper=s trace|t=s encoding=s output|o=s combine version|v stagestats'
+    $P0 = split ' ', 'e=s help|h target=s dumper=s trace|t=s encoding=s output|o=s combine version|v stagestats ll-backtrace'
     setattribute self, '@cmdoptions', $P0
 
     $P1 = box <<'    USAGE'
@@ -855,9 +855,11 @@ Generic method for compilers invoked from a shell command line.
     $I0 = adverbs['version']
     if $I0 goto version
 
-    .local int can_backtrace
+    .local int can_backtrace, ll_backtrace
     can_backtrace = can self, 'backtrace'
     unless can_backtrace goto no_push_eh
+    ll_backtrace = adverbs['ll-backtrace']
+    if ll_backtrace goto no_push_eh
     push_eh uncaught_exception
   no_push_eh:
 

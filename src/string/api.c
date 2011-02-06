@@ -61,11 +61,6 @@ static const STR_VTABLE * string_rep_compatible(SHIM_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
-static char * string_to_cstring_nullable(SHIM_INTERP,
-    ARGIN_NULLOK(const STRING *s));
-
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 static void throw_illegal_escape(PARROT_INTERP)
@@ -76,7 +71,6 @@ static void throw_illegal_escape(PARROT_INTERP)
 #define ASSERT_ARGS_string_rep_compatible __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(a) \
     , PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_string_to_cstring_nullable __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_throw_illegal_escape __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -739,7 +733,7 @@ Parrot_str_from_platform_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *c))
 
 /*
 
-=item C<char * Parrot_str_to_platform_cstring(PARROT_INTERP, STRING *s)>
+=item C<char * Parrot_str_to_platform_cstring(PARROT_INTERP, const STRING *s)>
 
 Obtain a C string, encoded in the platform's assumed encoding, from a Parrot
 string.
@@ -751,16 +745,14 @@ string.
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 char *
-Parrot_str_to_platform_cstring(PARROT_INTERP, ARGIN(STRING *s))
+Parrot_str_to_platform_cstring(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_platform_cstring)
     if (STRING_IS_NULL(s)) {
         return NULL;
     }
     else {
-        STRING * const s_plat = Parrot_str_change_encoding(interp,
-                                                           s, Parrot_platform_encoding_ptr->num);
-        return Parrot_str_to_cstring(interp, s_plat);
+        return Parrot_str_to_encoded_cstring(interp, s, Parrot_platform_encoding_ptr);
     }
 }
 
@@ -2119,9 +2111,11 @@ Parrot_str_from_num(PARROT_INTERP, FLOATVAL f)
 
 =item C<char * Parrot_str_to_cstring(PARROT_INTERP, const STRING *s)>
 
-Returns a C string for the specified Parrot string. Use
-C<Parrot_str_free_cstring()> to free the string. Failure to do this will result
-in a memory leak.
+Returns a C string for the specified Parrot string in the current
+representation of the string. Use C<Parrot_str_free_cstring()> to free
+the string. Failure to do this will result in a memory leak.
+
+You usually should use Parrot_str_to_encoded_cstring instead.
 
 =cut
 
@@ -2135,45 +2129,65 @@ Parrot_str_to_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_cstring)
 
-    if (STRING_IS_NULL(s)) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
-            "Can't convert NULL string");
-    }
-
-    return string_to_cstring_nullable(interp, s);
+    return Parrot_str_to_encoded_cstring(interp, s, s->encoding);
 }
 
 
 /*
 
-=item C<static char * string_to_cstring_nullable(PARROT_INTERP, const STRING
-*s)>
+=item C<char * Parrot_str_to_encoded_cstring(PARROT_INTERP, const STRING *s,
+const STR_VTABLE *enc)>
 
-Returns a C string for the specified Parrot string. Use
-C<Parrot_str_free_cstring()> to free the string, if it's not NULL. Failure to
-do this will result in a memory leak.  Failure to check if the return value is
-NULL will result in embarrassment for you.
+Returns a C string in the encoding C<enc> for the Parrot string C<s>. Use
+C<Parrot_str_free_cstring()> to free the string. Failure to do this will result
+in a memory leak.
 
 =cut
 
 */
 
+PARROT_EXPORT
 PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
-static char *
-string_to_cstring_nullable(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
+PARROT_CANNOT_RETURN_NULL
+char *
+Parrot_str_to_encoded_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s),
+        ARGIN(const STR_VTABLE *enc))
 {
-    ASSERT_ARGS(string_to_cstring_nullable)
+    ASSERT_ARGS(Parrot_str_to_encoded_cstring)
+    size_t  len;
+    size_t  trail;
+    char   *p;
+
     if (STRING_IS_NULL(s))
-        return NULL;
-    else {
-        char * const p = (char*)mem_internal_allocate(s->bufused + 2);
-        memcpy(p, s->strstart, s->bufused);
-        /* Two trailing NULs for wide char strings */
-        p[s->bufused]   = '\0';
-        p[s->bufused+1] = '\0';
-        return p;
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Can't convert NULL string");
+
+    if (s->encoding != enc) {
+        /* Check for compatible encodings */
+        if (s->encoding == Parrot_ascii_encoding_ptr) {
+            if (enc == Parrot_latin1_encoding_ptr
+            ||  enc == Parrot_utf8_encoding_ptr)
+                    goto skip;
+        }
+        else if (s->encoding == Parrot_ucs2_encoding_ptr) {
+            if (enc == Parrot_utf16_encoding_ptr)
+                goto skip;
+        }
+
+        /* Convert */
+        s = enc->to_encoding(interp, s);
     }
+skip:
+
+    len   = s->bufused;
+    trail = enc->bytes_per_unit;
+
+    p = (char*)mem_internal_allocate(len + trail);
+
+    memcpy(p, s->strstart, len);
+    memset(p + len, 0, trail);
+
+    return p;
 }
 
 
@@ -2698,10 +2712,7 @@ Parrot_str_unescape(PARROT_INTERP,
 
     STRING           *src;
     const STR_VTABLE *encoding, *src_encoding;
-
-    /* does the encoding have a character set? */
-    const char     *p        = enc_char ? strchr(enc_char, ':') : NULL;
-    size_t          clength  = strlen(cstring);
+    size_t            clength = strlen(cstring);
 
     if (delimiter && clength)
         --clength;
@@ -2709,35 +2720,12 @@ Parrot_str_unescape(PARROT_INTERP,
     if (enc_char == NULL) {
         encoding = Parrot_default_encoding_ptr;
     }
-    else if (p == NULL) {
+    else {
         encoding = Parrot_find_encoding(interp, enc_char);
 
         if (!encoding)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Can't make '%s' encoding strings", enc_char);
-    }
-    else {
-        #define MAX_ENCODING_NAME_ALLOWED 63
-        char   buffer[MAX_ENCODING_NAME_ALLOWED + 1];
-        size_t l = p - enc_char;
-
-        if (l < MAX_ENCODING_NAME_ALLOWED) {
-            memcpy(buffer, enc_char, l);
-            buffer[l] = '\0';
-        }
-        else {
-            buffer[0] = '\0';
-        }
-
-        encoding = Parrot_find_encoding(interp, buffer);
-
-        if (!encoding) {
-            encoding = Parrot_find_encoding(interp, p + 1);
-
-            if (!encoding)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                    "Can't make '%s' encoding strings", enc_char);
-        }
     }
 
     if (encoding->max_bytes_per_codepoint == 1)

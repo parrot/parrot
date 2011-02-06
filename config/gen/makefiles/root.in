@@ -156,8 +156,6 @@ GEN_MAKEFILES = \
 
 GEN_CONFIGS = \
     $(INC_DIR)/config.h \
-    $(INC_DIR)/platform.h \
-    $(INC_DIR)/platform_limits.h \
     $(INC_DIR)/has_header.h \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/core_pmcs.h \
@@ -167,8 +165,6 @@ GEN_CONFIGS = \
     lib/Parrot/PMC.pm \
     runtime/parrot/include/config.fpmc \
     $(LIBRARY_DIR)/config.pir \
-    src/platform.c \
-#IF(platform_asm):    src/platform_asm.s \
 #IF(has_opengl):    src/glut_nci_thunks.nci \
 #IF(has_glut):    src/glut_callbacks.c \
     src/core_pmcs.c \
@@ -269,6 +265,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/distutils.pbc \
     $(LIBRARY_DIR)/dumper.pbc \
     $(LIBRARY_DIR)/yaml_dumper.pbc \
+    $(LIBRARY_DIR)/YAML/Tiny.pbc \
     $(LIBRARY_DIR)/Getopt/Obj.pbc \
     $(LIBRARY_DIR)/HTTP/Message.pbc \
     $(LIBRARY_DIR)/Iter.pbc \
@@ -290,6 +287,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/ProfTest/NQPProfile.pir \
     $(LIBRARY_DIR)/ProfTest/Matcher.pir \
     $(LIBRARY_DIR)/ProfTest/Want.pir \
+    $(LIBRARY_DIR)/YAML/Tiny.pir \
     $(LIBRARY_DIR)/parrotlib.pbc \
     $(LIBRARY_DIR)/pcore.pbc \
     $(LIBRARY_DIR)/pcre.pbc \
@@ -300,7 +298,6 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/PGE/Perl6Grammar.pbc \
     $(LIBRARY_DIR)/PGE/Text.pbc \
     $(LIBRARY_DIR)/PGE/Util.pbc \
-    $(LIBRARY_DIR)/Protoobject.pbc \
     $(LIBRARY_DIR)/Range.pbc \
     $(LIBRARY_DIR)/Stream/Base.pbc \
     $(LIBRARY_DIR)/Stream/Combiner.pbc \
@@ -345,6 +342,7 @@ FLUID_FILES_2 = \
     $(LIBRARY_DIR)/ProfTest/NQPProfile.pbc \
     $(LIBRARY_DIR)/ProfTest/Matcher.pbc \
     $(LIBRARY_DIR)/ProfTest/Want.pbc \
+    $(LIBRARY_DIR)/YAML/Tiny.pbc \
     runtime/parrot/include/parrotlib.pbc
 
 
@@ -360,7 +358,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/config.h \
 	$(INC_DIR)/settings.h \
 	$(INC_DIR)/enums.h \
-	$(INC_DIR)/platform.h \
 	$(INC_DIR)/platform_interface.h \
 	$(INC_DIR)/global_setup.h \
 	$(INC_DIR)/caches.h \
@@ -377,9 +374,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/memory.h \
 	$(INC_DIR)/packfile.h \
 	$(INC_DIR)/io.h \
-	$(INC_DIR)/io_portable.h \
-	$(INC_DIR)/io_unix.h \
-	$(INC_DIR)/io_win32.h \
 	$(INC_DIR)/op.h \
 	$(INC_DIR)/pmc.h \
 	$(INC_DIR)/gc_api.h \
@@ -391,6 +385,8 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/exit.h \
 	$(INC_DIR)/nci.h \
 	$(INC_DIR)/thread.h \
+	$(INC_DIR)/thr_pthread.h \
+	$(INC_DIR)/thr_windows.h \
 	$(INC_DIR)/atomic.h \
 	$(INC_DIR)/atomic/fallback.h \
 	$(INC_DIR)/atomic/gcc_pcc.h \
@@ -406,7 +402,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/hll.h \
 	$(INC_DIR)/pbcversion.h \
 	$(INC_DIR)/pobj.h \
-	$(INC_DIR)/platform_limits.h \
 	$(INC_DIR)/has_header.h \
 	$(INC_DIR)/oplib.h \
 	$(INC_DIR)/feature.h \
@@ -437,13 +432,8 @@ IO_O_FILES = \
     src/io/core$(O) \
     src/io/api$(O) \
     src/io/buffer$(O) \
-    src/io/unix$(O) \
-    src/io/win32$(O) \
-    src/io/portable$(O) \
     src/io/filehandle$(O) \
-    src/io/socket_api$(O) \
-    src/io/socket_unix$(O) \
-    src/io/socket_win32$(O)
+    src/io/socket_api$(O)
 
 INTERP_O_FILES = \
     src/string/api$(O) \
@@ -496,7 +486,6 @@ INTERP_O_FILES = \
 #IF(has_core_nci_thunks):  src/nci/core_thunks$(O) \
 #IF(has_extra_nci_thunks): src/nci/extra_thunks$(O) \
     src/oo$(O) \
-    src/platform$(O) \
     src/packfile/object_serialization$(O) \
     src/pmc$(O) \
     src/runcore/main$(O)  \
@@ -515,10 +504,9 @@ INTERP_O_FILES = \
     src/packfile/output$(O) \
     src/packfile/pf_items$(O) \
     src/longopt$(O) \
+    @TEMP_platform_o@ \
     @TEMP_atomic_o@ \
     @TEMP_gc_o@ \
-#IF(platform_asm):    src/platform_asm$(O) \
-
 
 OPS_FILES = @ops@
 
@@ -748,22 +736,16 @@ help :
 	@echo "  all:               'parrot' and the documentation."
 	@echo "                     This is the default."
 	@echo ""
+	@echo "  parrot_utils:      ./pbc_dump, ./pbc_disassemble,"
+	@echo "                       ./parrot_debugger, ./pbc_merge,"
+	@echo "                       ./pbc_to_exe ./parrot_config"
+	@echo " ./pbc_dump:           Parrot Dumper"
+	@echo " ./pbc_disassemble:    Parrot Disassembler"
+	@echo " ./parrot_debugger:    Parrot Debugger"
+	@echo " ./pbc_merge:          Parrot configuration information"
+	@echo ""
 	@echo "  world:             'all' and 'parrot_utils'."
 	@echo "  installable:       same as 'world', but targets for installation"
-	@echo ""
-	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PDB), $(PBC_MERGE) and $(PBC_TO_EXE) $(PARROT_CONFIG)"
-	@echo " $(PDUMP):"
-	@echo "                     Parrot Dumper"
-	@echo " $(DIS):"
-	@echo "                     Parrot Disassembler"
-	@echo " $(PDB):"
-	@echo "                     Parrot Debugger"
-	@echo " $(PBC_MERGE):"
-	@echo "                     Merge bytecode files"
-	@echo " $(PBC_TO_EXE):"
-	@echo "                     Generate C, compile, and link bytecode files"
-	@echo " $(PARROT_CONFIG):"
-	@echo "                     Provide Parrot configuration information"
 	@echo ""
 	@echo "Installation:"
 	@echo "  install:           Install under '$(PREFIX)' on Unix systems."
@@ -834,6 +816,7 @@ help :
 	@echo "  tags-vi:           Create tags for the vi editor."
 	@echo "  tags-emacs:        Create tags for the Emacs editor."
 	@echo "  perlcritic:        Check Perl code with Perl::Critic."
+	@echo "  cagecritic:        Extra strict checking with Perl::Critic."
 	@echo "  bootstrap-ops:     Generate C code from .ops files. Requires already built parrot."
 	@echo "  bootstrap-nci      Generate C code for NCI. Requires already built parrot."
 	@echo ""
@@ -934,7 +917,6 @@ src/parrot_config$(O) : \
     $(INC_DIR)/core_types.h \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/has_header.h \
-    $(INC_DIR)/platform_limits.h \
     src/parrot_config.c
 
 src/install_config$(O) : \
@@ -944,7 +926,6 @@ src/install_config$(O) : \
     $(INC_DIR)/core_types.h \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/has_header.h \
-    $(INC_DIR)/platform_limits.h \
     src/install_config.c
 
 src/null_config$(O) : \
@@ -954,7 +935,6 @@ src/null_config$(O) : \
     $(INC_DIR)/core_types.h \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/has_header.h \
-    $(INC_DIR)/platform_limits.h \
     src/null_config.c
 
 src/list$(O) : \
@@ -984,16 +964,13 @@ src/scheduler$(O) : \
 
 src/io/core$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/core.c
 
-src/io/socket_api$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
-    src/io/api.str include/pmc/pmc_socket.h src/io/socket_api.c
-
-src/io/socket_unix$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_socket.h \
-    src/io/io_private.h src/io/socket_unix.c
-
-src/io/socket_win32$(O) : $(PARROT_H_HEADERS) \
-	src/io/io_private.h \
-	include/pmc/pmc_socket.h \
-	src/io/socket_win32.c
+src/io/socket_api$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/io/io_private.h \
+    src/io/api.str \
+    include/pmc/pmc_socket.h \
+    include/pmc/pmc_sockaddr.h \
+    src/io/socket_api.c
 
 O_FILES = \
     $(INTERP_O_FILES) \
@@ -1192,7 +1169,15 @@ $(LIBRARY_DIR)/ProfTest/Matcher.pbc: $(LIBRARY_DIR)/ProfTest/Matcher.pir
 $(LIBRARY_DIR)/ProfTest/Matcher.pir: $(LIBRARY_DIR)/ProfTest/Matcher.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Matcher.nqp > $@
 
+#
+# YAML::Tiny
+#
 
+$(LIBRARY_DIR)/YAML/Tiny.pir: $(LIBRARY_DIR)/YAML/Tiny.pm $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/YAML/Tiny.pm > $@
+
+$(LIBRARY_DIR)/YAML/Tiny.pbc: $(LIBRARY_DIR)/YAML/Tiny.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/YAML/Tiny.pir
 
 ###############################################################################
 #
@@ -1377,8 +1362,7 @@ src/gc/gc_ms2$(O) : \
     src/gc/fixed_allocator.h \
     src/gc/gc_ms2.c \
     $(INC_DIR)/pointer_array.h \
-    src/gc/variable_size_pool.h \
-    $(INC_DIR)/sysmem.h
+    src/gc/variable_size_pool.h
 
 src/gc/api$(O) : \
     $(PARROT_H_HEADERS) \
@@ -1392,8 +1376,12 @@ src/gc/alloc_resources$(O) : \
     src/gc/gc_private.h \
     src/gc/alloc_resources.c
 
-src/gc/fixed_allocator$(O) : $(PARROT_H_HEADERS) \
-	src/gc/fixed_allocator.h src/gc/fixed_allocator.c
+src/gc/fixed_allocator$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/gc/gc_private.h \
+    src/gc/variable_size_pool.h \
+    src/gc/fixed_allocator.h \
+    src/gc/fixed_allocator.c
 
 src/gc/variable_size_pool$(O) : $(PARROT_H_HEADERS) \
 	src/gc/variable_size_pool.h src/gc/variable_size_pool.c
@@ -1415,13 +1403,6 @@ src/gc/string_gc$(O) : $(PARROT_H_HEADERS) \
 
 src/hll$(O) : $(PARROT_H_HEADERS) src/hll.str $(INC_DIR)/dynext.h src/hll.c
 
-src/platform$(O) : \
-    $(PARROT_H_HEADERS) \
-    $(INC_DIR)/sysmem.h \
-    src/platform.c
-
-#IF(platform_asm):src/platform_asm$(O) : $(PARROT_H_HEADERS)
-#IF(platform_asm):
 src/core_pmcs$(O) : $(PARROT_H_HEADERS) src/core_pmcs.c
 
 src/runcore/trace$(O) : \
@@ -1574,18 +1555,9 @@ src/io/api$(O) : \
 src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c \
     include/pmc/pmc_handle.h
 
-src/io/portable$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/portable.c
-
-src/io/unix$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
-    include/pmc/pmc_filehandle.h src/io/unix.c
-
-src/io/win32$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
-    include/pmc/pmc_filehandle.h src/io/win32.c
-
 src/gc/alloc_memory$(O) : $(PARROT_H_HEADERS) src/gc/alloc_memory.c
 
 frontend/parrot/main$(O) : \
-    $(INC_DIR)/platform_limits.h \
     $(INC_DIR)/api.h \
     $(INC_DIR)/compiler.h \
     $(INC_DIR)/config.h \
@@ -1635,6 +1607,81 @@ src/packfile/pf_items$(O) : \
     src/packfile/pf_items.c
 
 src/parrot$(O) : $(GEN_HEADERS)
+
+src/platform/ansi/dl$(O) : src/platform/ansi/dl.c $(PARROT_H_HEADERS)
+
+src/platform/ansi/exec$(O) : src/platform/ansi/exec.c $(PARROT_H_HEADERS)
+
+src/platform/ansi/time$(O) : src/platform/ansi/time.c $(PARROT_H_HEADERS)
+
+src/platform/cygwin/math$(O) : src/platform/cygwin/math.c $(PARROT_H_HEADERS)
+
+src/platform/darwin/hires_timer$(O) : src/platform/darwin/hires_timer.c $(PARROT_H_HEADERS)
+
+src/platform/darwin/sysmem$(O) : src/platform/darwin/sysmem.c $(PARROT_H_HEADERS)
+
+src/platform/generic/dl$(O) : src/platform/generic/dl.c $(PARROT_H_HEADERS)
+
+src/platform/generic/encoding$(O) : src/platform/generic/encoding.c $(PARROT_H_HEADERS)
+
+src/platform/generic/env$(O) : src/platform/generic/env.c $(PARROT_H_HEADERS)
+
+src/platform/generic/error$(O) : src/platform/generic/error.c $(PARROT_H_HEADERS)
+
+src/platform/generic/exec$(O) : src/platform/generic/exec.c $(PARROT_H_HEADERS)
+
+src/platform/generic/hires_timer$(O) : src/platform/generic/hires_timer.c $(PARROT_H_HEADERS)
+
+src/platform/generic/itimer$(O) : src/platform/generic/itimer.c $(PARROT_H_HEADERS)
+
+src/platform/generic/io$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
+    src/platform/generic/io.c
+
+src/platform/generic/math$(O) : src/platform/generic/math.c $(PARROT_H_HEADERS)
+
+src/platform/generic/misc$(O) : src/platform/generic/misc.c $(PARROT_H_HEADERS)
+
+src/platform/generic/socket$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_socket.h \
+    src/io/io_private.h include/pmc/pmc_sockaddr.h src/platform/generic/socket.c
+
+src/platform/generic/stat$(O) : src/platform/generic/stat.c $(PARROT_H_HEADERS)
+
+src/platform/generic/sysmem$(O) : src/platform/generic/sysmem.c $(PARROT_H_HEADERS)
+
+src/platform/generic/time$(O) : src/platform/generic/time.c $(PARROT_H_HEADERS)
+
+src/platform/generic/uid$(O) : src/platform/generic/uid.c $(PARROT_H_HEADERS)
+
+src/platform/linux/encoding$(O) : src/platform/linux/encoding.c $(PARROT_H_HEADERS)
+
+src/platform/netbsd/misc$(O) : src/platform/netbsd/misc.c $(PARROT_H_HEADERS)
+
+src/platform/openbsd/math$(O) : src/platform/openbsd/math.c $(PARROT_H_HEADERS)
+
+src/platform/solaris/math$(O) : src/platform/solaris/math.c $(PARROT_H_HEADERS)
+
+src/platform/solaris/time$(O) : src/platform/solaris/time.c $(PARROT_H_HEADERS)
+
+src/platform/win32/dl$(O) : src/platform/win32/dl.c $(PARROT_H_HEADERS)
+
+src/platform/win32/env$(O) : src/platform/win32/env.c $(PARROT_H_HEADERS)
+
+src/platform/win32/error$(O) : src/platform/win32/error.c $(PARROT_H_HEADERS)
+
+src/platform/win32/exec$(O) : src/platform/win32/exec.c $(PARROT_H_HEADERS)
+
+src/platform/win32/hires_timer$(O) : src/platform/win32/hires_timer.c $(PARROT_H_HEADERS)
+
+src/platform/win32/io$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
+    src/platform/win32/io.c
+
+src/platform/win32/misc$(O) : src/platform/win32/misc.c $(PARROT_H_HEADERS)
+
+src/platform/win32/sysmem$(O) : src/platform/win32/sysmem.c $(PARROT_H_HEADERS)
+
+src/platform/win32/time$(O) : src/platform/win32/time.c $(PARROT_H_HEADERS)
+
+src/platform/win32/uid$(O) : src/platform/win32/uid.c $(PARROT_H_HEADERS)
 
 src/runcore/cores$(O) : src/runcore/cores.str \
 	src/runcore/cores.c \
@@ -1846,6 +1893,7 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
     include/parrot/oplib/core_ops.h \
     include/parrot/runcore_api.h \
     include/pmc/pmc_continuation.h \
+    include/pmc/pmc_fixedintegerarray.h \
     include/pmc/pmc_parrotlibrary.h \
     src/io/io_private.h
 
@@ -2088,33 +2136,33 @@ testexec: test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --run-exec $(RUNCORE_TEST_FILES)
 
 # Test that need to be compiled by the C-compiler
-src_tests :
+src_tests : test_prep
 	$(PERL) t/harness $(SRC_TEST_FILES)
 
-dynoplibs_tests :
+dynoplibs_tests : test_prep
 	$(PERL) t/harness $(DYNOPLIBS_TEST_FILES)
 
-dynpmc_tests :
+dynpmc_tests : test_prep
 	$(PERL) t/harness $(DYNPMC_TEST_FILES)
 
-oo_tests :
+oo_tests : test_prep
 	$(PERL) t/harness $(OO_TEST_FILES)
 
-op_tests :
+op_tests : test_prep
 	$(PERL) t/harness $(OP_TEST_FILES)
 
-pir_tests :
+pir_tests : test_prep
 	$(PERL) t/harness $(PIR_TEST_FILES)
 
-pmc_tests :
+pmc_tests : test_prep
 	$(PERL) t/harness $(PMC_TEST_FILES)
 
 # Command line and various environments
-run_tests :
+run_tests : test_prep
 	$(PERL) t/harness $(RUN_TEST_FILES)
 
 # Test the Perl5 Modules in the Parrot distribution
-perl_tests :
+perl_tests : test_prep
 	$(PERL) t/harness $(PERL_TEST_FILES)
 
 nocritic_codetest :

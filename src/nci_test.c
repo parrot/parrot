@@ -135,14 +135,23 @@ PARROT_DYNEXT_EXPORT void nci_cb_D4(cb_D4_func, void*);
 
 /* Variable definitions */
 
-PARROT_DYNEXT_EXPORT int    int_cb_D4           = -55555;
-PARROT_DYNEXT_EXPORT int    nci_dlvar_char      = 22;
-PARROT_DYNEXT_EXPORT int    nci_dlvar_short     = 333;
-PARROT_DYNEXT_EXPORT int    nci_dlvar_int       = -4444;
-PARROT_DYNEXT_EXPORT long   nci_dlvar_long      = -7777777;
-PARROT_DYNEXT_EXPORT float  nci_dlvar_float     = -333.0;
-PARROT_DYNEXT_EXPORT double nci_dlvar_double    = -55555.55555;
-PARROT_DYNEXT_EXPORT char   nci_dlvar_cstring[] = "This is a C-string.\n";
+PARROT_DYNEXT_EXPORT int    int_cb_D4;
+PARROT_DYNEXT_EXPORT int    nci_dlvar_char;
+PARROT_DYNEXT_EXPORT int    nci_dlvar_short;
+PARROT_DYNEXT_EXPORT int    nci_dlvar_int;
+PARROT_DYNEXT_EXPORT long   nci_dlvar_long;
+PARROT_DYNEXT_EXPORT float  nci_dlvar_float;
+PARROT_DYNEXT_EXPORT double nci_dlvar_double;
+PARROT_DYNEXT_EXPORT char   nci_dlvar_cstring[];
+
+int    int_cb_D4           = -55555;
+int    nci_dlvar_char      = 22;
+int    nci_dlvar_short     = 333;
+int    nci_dlvar_int       = -4444;
+long   nci_dlvar_long      = -7777777;
+float  nci_dlvar_float     = -333.0;
+double nci_dlvar_double    = -55555.55555;
+char   nci_dlvar_cstring[] = "This is a C-string.\n";
 
 
 /* Function definitions */

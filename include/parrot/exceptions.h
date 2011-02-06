@@ -223,6 +223,7 @@ void die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_ex_build_complete_backtrace_string(PARROT_INTERP,
     ARGIN(PMC * ex))
         __attribute__nonnull__(1)

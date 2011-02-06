@@ -91,25 +91,9 @@ Returns a true value (1) if the supplied path is a directory.
 */
 
     METHOD is_dir(STRING *path) {
-        struct stat info;
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-#ifdef WIN32
-        const int error = stat(cpath, &info);
-#else
-        const int error = lstat(cpath, &info);
-#endif
-        Parrot_str_free_cstring(cpath);
+        INTVAL res = Parrot_lstat_info_intval(interp, path, STAT_ISDIR);
 
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-
-        if (S_ISDIR(info.st_mode))
-            RETURN(INTVAL 1);
-        else
-            RETURN(INTVAL 0);
+        RETURN(INTVAL res);
     }
 
 /*
@@ -123,25 +107,9 @@ Returns a true value (1) if the supplied path is a plain file.
 */
 
     METHOD is_file(STRING *path) {
-        struct stat info;
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-#ifdef WIN32
-        int error   = stat(cpath, &info);
-#else
-        int error   = lstat(cpath, &info);
-#endif
-        Parrot_str_free_cstring(cpath);
+        INTVAL res = Parrot_lstat_info_intval(interp, path, STAT_ISREG);
 
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-
-        if (S_ISREG(info.st_mode))
-            RETURN(INTVAL 1);
-        else
-            RETURN(INTVAL 0);
+        RETURN(INTVAL res);
     }
 
 /*
@@ -155,28 +123,9 @@ Returns a true value (1) if the supplied path is a link.
 */
 
     METHOD is_link(STRING *path) {
-#ifdef WIN32
-        /* I love win32 implementations */
-        RETURN(INTVAL 0);
-#else
-        struct stat info;
+        INTVAL res = Parrot_lstat_info_intval(interp, path, STAT_ISLNK);
 
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-        const int    error = lstat(cpath, &info);
-
-        Parrot_str_free_cstring(cpath);
-
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-
-        if (S_ISLNK(info.st_mode))
-            RETURN(INTVAL 1);
-        else
-            RETURN(INTVAL 0);
-#endif
+        RETURN(INTVAL res);
     }
 
 /*

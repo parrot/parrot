@@ -129,6 +129,7 @@ typedef Parrot_Run_core_t Run_Cores;
 #include "parrot/debugger.h"
 #include "parrot/multidispatch.h"
 #include "parrot/call.h"
+#include "parrot/gc_api.h"
 
 typedef struct warnings_t {
     Warnings_classes classes;
@@ -170,8 +171,6 @@ struct parrot_interp_t {
 
     struct GC_Subsystem *gc_sys;              /* functions and data specific
                                                  to current GC subsystem*/
-    UINTVAL  gc_threshold;                    /* maximum percentage of memory
-                                                 wasted by GC */
 
     PMC     *gc_registry;                     /* root set of registered PMCs */
 
@@ -341,10 +340,11 @@ typedef opcode_t *(*native_func_t)(PARROT_INTERP,
                                    opcode_t * cur_opcode,
                                    opcode_t * start_code);
 
-VAR_SCOPE native_func_t run_native;
-
 typedef PMC *(*Parrot_compiler_func_t)(PARROT_INTERP,
                                        const char * program);
+
+void
+Parrot_clear_emergency_interp(void);
 
 /* HEADERIZER BEGIN: src/interp/inter_create.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -358,7 +358,8 @@ Parrot_Interp allocate_interpreter(
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-Parrot_Interp initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
+Parrot_Interp initialize_interpreter(PARROT_INTERP,
+    ARGIN(Parrot_GC_Init_Args *args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -371,6 +372,9 @@ PARROT_EXPORT
 void Parrot_destroy(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_CAN_RETURN_NULL
+Interp* Parrot_get_emergency_interp(void);
+
 void Parrot_really_destroy(PARROT_INTERP,
     NULLOK(int exit_code),
     SHIM(void *arg))
@@ -379,10 +383,11 @@ void Parrot_really_destroy(PARROT_INTERP,
 #define ASSERT_ARGS_allocate_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_initialize_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(stacktop))
+    , PARROT_ASSERT_ARG(args))
 #define ASSERT_ARGS_make_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_get_emergency_interp __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_really_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -467,7 +472,7 @@ STRING* interpinfo_s(PARROT_INTERP, INTVAL what)
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void * Parrot_compile_file(PARROT_INTERP,
-    ARGIN(const char *fullname),
+    ARGIN(STRING *fullname),
     ARGOUT(STRING **error))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

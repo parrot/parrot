@@ -357,23 +357,30 @@ static void
 check_var_size_obj_pool(ARGIN(const Variable_Size_Pool *pool))
 {
     ASSERT_ARGS(check_var_size_obj_pool)
-    size_t count;
-    Memory_Block * block_walker;
-    count = 10000000; /*detect unendless loop just use big enough number*/
+    Memory_Block *block_walker = (Memory_Block *)pool->top_block;
 
-    block_walker = (Memory_Block *)pool->top_block;
-    while (block_walker != NULL) {
-        PARROT_ASSERT(block_walker->start == (char *)block_walker +
-            sizeof (Memory_Block));
-        PARROT_ASSERT((size_t)(block_walker->top -
-            block_walker->start) == block_walker->size - block_walker->free);
+#ifdef NDEBUG
+    while (block_walker) {
+        block_walker = block_walker->prev;
+    }
+#else
+    /* detect unendless loop with a big enough number */
+    size_t count = 10000000;
+
+    while (block_walker) {
+        PARROT_ASSERT(block_walker->start
+            == (char *)block_walker + sizeof (Memory_Block));
+        PARROT_ASSERT((size_t)(block_walker->top - block_walker->start)
+            == block_walker->size - block_walker->free);
 
         /*check the list*/
-        if (block_walker->prev != NULL)
+        if (block_walker->prev)
             PARROT_ASSERT(block_walker->prev->next == block_walker);
         block_walker = block_walker->prev;
-        PARROT_ASSERT(--count);
+        --count;
+        PARROT_ASSERT(count > 0);
     }
+#endif
 }
 
 /*

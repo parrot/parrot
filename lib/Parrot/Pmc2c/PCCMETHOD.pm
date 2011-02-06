@@ -259,6 +259,7 @@ END
         $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     _ret_object = Parrot_pcc_build_call_from_c_args(interp, _call_object,
         "$returns_signature", $returns_varargs);
+    UNUSED(_ret_object);
     return;
     /*END RETURN $returns */
     }
@@ -354,7 +355,7 @@ sub process_pccmethod_args {
         $signature .= gen_arg_pcc_sig($arg);
         if ( $arg_type eq 'arg' ) {
             my $tis  = $reg_type_info->{$type}{"s"};     #reg_type_info string
-            $declarations .= "$tis $name;\n";
+            $declarations .= "$tis $name;\n" unless $arg->{already_declared};
             push @vararg_list, "&$name"
         }
         elsif ( $arg_type eq 'return' ) {
@@ -397,9 +398,10 @@ sub rewrite_pccmethod {
     my $linear_args = parse_p_args_string( $self->parameters );
     unshift @$linear_args,
         {
-        type  => convert_type_string_to_reg_type('PMC'),
-        name  => '_self',
-        attrs => parse_adverb_attributes(':invocant')
+            type             => convert_type_string_to_reg_type('PMC'),
+            name             => '_self',
+            attrs            => parse_adverb_attributes(':invocant'),
+            already_declared => 1,
         };
 
  # The invocant is already passed in the C signature, why pass it again?

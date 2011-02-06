@@ -58,12 +58,6 @@ static void help(void)
     printf("pbc_disassemble -o converted.pasm file.pbc\n\n");
     printf("  -b\t\t ... bare .pasm without header and left column\n");
     printf("  -h\t\t ... dump Constant-table header only\n");
-#if TRACE_PACKFILE
-    printf("\t-D<1-7> --debug debug output\n");
-    printf("\t   1 general info\n");
-    printf("\t   2 alignment\n");
-    printf("\t   4 values\n");
-#endif
     printf("  -o filename\t ... output to filename\n");
     exit(EXIT_SUCCESS);
 }
@@ -72,9 +66,6 @@ static struct longopt_opt_decl options[] = {
     { 'h', 'h', OPTION_optional_FLAG, { "--header-only" } },
     { '?', '?', OPTION_optional_FLAG, { "--help" } },
     { 'b', 'b', OPTION_optional_FLAG, { "--bare" } },
-#if TRACE_PACKFILE
-    { 'D', 'D', OPTION_required_FLAG, { "--debug" } },
-#endif
     { 'o', 'o', OPTION_required_FLAG, { "--output" } },
     {  0 ,  0,  OPTION_optional_FLAG, { NULL } }
 };
@@ -95,6 +86,7 @@ main(int argc, const char *argv[])
 {
     Parrot_PMC interp;
     Parrot_PMC pbc;
+    Parrot_String filename;
     const char *outfile = NULL;
     int option = 0;
     int debug = PFOPT_UTILS;
@@ -120,11 +112,6 @@ main(int argc, const char *argv[])
           case 'o':
             outfile = opt.opt_arg;
             break;
-#if TRACE_PACKFILE
-          case 'D':
-            debug += atoi(opt.opt_arg) << 2;
-            break;
-#endif
           case '?':
           default:
             help();
@@ -140,7 +127,8 @@ main(int argc, const char *argv[])
     /* What to do about this debug flag? */
     /* pf = Parrot_pbc_read(interp, argc ? *argv : "-", debug); */
 
-    if (!(Parrot_api_load_bytecode_file(interp, argc ? *argv : "-", &pbc) &&
+    Parrot_api_string_import(interp, argc ? *argv : "-", &filename);
+    if (!(Parrot_api_load_bytecode_file(interp, filename, &pbc) &&
           Parrot_api_disassemble_bytecode(interp, pbc, outfile, option) &&
           Parrot_api_destroy_interpreter(interp))) {
         fprintf(stderr, "Error during disassembly\n");

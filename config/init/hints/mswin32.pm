@@ -201,9 +201,8 @@ sub runstep {
         );
     }
     elsif ($is_mingw) {
-
         # when using mingw gcc, parrot needs at least Windows2000, but WindowsME.
-        my @os_version =  Win32::GetOSVersion();
+        my @os_version = Win32::GetOSVersion();
         my $winver = (($os_version[4] >=2 && $os_version[1]>=5)
             || ($os_version[4] = 1 && $os_version[1] = 4))? 'Windows2000' : 'WindowsNT4';
 

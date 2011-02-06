@@ -126,6 +126,42 @@ Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
 
 /*
 
+=item C<size_t Parrot_pa_count_allocated(PARROT_INTERP, Parrot_Pointer_Array
+*self)>
+
+Get count of allocated objects.
+
+=cut
+
+*/
+size_t
+Parrot_pa_count_allocated(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
+{
+    ASSERT_ARGS(Parrot_pa_count_allocated)
+    return self->total_chunks * CELL_PER_CHUNK;
+}
+
+/*
+
+=item C<size_t Parrot_pa_count_allocated()>
+
+Get count of allocated objects.
+
+=cut
+
+*/
+size_t
+Parrot_pa_count_used(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
+{
+    ASSERT_ARGS(Parrot_pa_count_allocated)
+    size_t count = 0;
+    POINTER_ARRAY_ITER(self, count++;);
+    return count;
+}
+
+
+/*
+
 =item C<void Parrot_pa_remove(PARROT_INTERP, Parrot_Pointer_Array *self, void
 *ptr)>
 

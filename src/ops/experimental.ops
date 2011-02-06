@@ -39,8 +39,6 @@ Break into debugger. Implementation notes:
 
 For other architectures, this is a C<noop>.
 
-=back
-
 =cut
 
 op trap() :deprecated {
@@ -52,8 +50,6 @@ op trap() :deprecated {
 #endif
 }
 
-=over 4
-
 =item B<set_label>(invar PMC, inconst LABEL)
 
 Sets the opcode_t* label value for the given PMC. This is basically only
@@ -63,8 +59,6 @@ useful for PMCs such as Sub, Continuation, ExceptionHandler and derivatives
 
 Gets the opcode_t* label value from the given PMC. This is basically only
 useful for PMCs such as Sub, Continuation, ExceptionHandler and derivatives
-
-=back
 
 =cut
 
@@ -77,8 +71,6 @@ inline op get_label(out INT, invar PMC) {
     $1 =  PTR2INTVAL(ptr);
 }
 
-=over 4
-
 =item B<fetch>(out PMC, in PMC, in PMC, in PMC)
 
 Fetches a value from $2, keyed by $3 into $1.  If the resulting PMC is PMCNULL,
@@ -87,8 +79,6 @@ uses the type in $4 to create and return a new PMC.
 =item B<fetch>(out PMC, in PMC, in INT, in PMC)
 
 =item B<fetch>(out PMC, in PMC, in STR, in PMC)
-
-=back
 
 =cut
 
@@ -152,8 +142,6 @@ inline op fetch(out PMC, in PMC, in STR, in PMC) :base_core {
     }
 }
 
-=over 4
-
 =item B<vivify>(out PMC, in PMC, in PMC, in PMC)
 
 Fetches a value from $2, keyed by $3 into $1.  If the resulting PMC is PMCNULL,
@@ -162,8 +150,6 @@ uses the type in $4 to create and return a new PMC.
 =item B<vivify>(out PMC, in PMC, in INT, in PMC)
 
 =item B<vivify>(out PMC, in PMC, in STR, in PMC)
-
-=back
 
 =cut
 
@@ -236,13 +222,9 @@ inline op vivify(out PMC, in PMC, in STR, in PMC) :base_core {
     }
 }
 
-=over 4
-
 =item B<new>(out PMC, in STR, in INT)
 
 =item B<new>(out PMC, in PMC, in INT)
-
-=back
 
 =cut
 
@@ -301,8 +283,6 @@ op new(out PMC, in PMC, in INT) {
         goto ADDRESS(dest);
     }
 }
-
-=over 4
 
 =item B<root_new>(out PMC, in PMC, in INT)
 

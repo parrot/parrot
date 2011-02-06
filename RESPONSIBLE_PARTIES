@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2010, Parrot Foundation.
+# Copyright (C) 2002-2011, Parrot Foundation.
 
 This is a list of project roles, with a partial list of the folks who have
 taken responsibility for them.  This does not list all the people with
@@ -18,7 +18,7 @@ Product Manager                 Andrew Whitworth
 
 Project Manager                 Jim Keenan
 
-Community Manager               Jonathan Leto
+Community Manager               Jonathan "Duke" Leto
 
 Release Manager                 Bob Rogers
                                 Patrick Michaud
@@ -31,7 +31,7 @@ Release Manager                 Bob Rogers
                                 Francois Perrad
                                 Mark Glines
                                 Christoph Otto
-                                Jonathan Leto
+                                Jonathan "Duke" Leto
                                 Gerd Pokorra
                                 Michael Hind
                                 Tyler Curtis
@@ -43,7 +43,7 @@ Metacommitter                   Allison Randal
                                 Jeff Horwitz
                                 Andrew Whitworth
                                 Jim Keenan
-                                Jonathan Leto
+                                Jonathan "Duke" Leto
                                 Julian Albo
 
 
@@ -62,7 +62,7 @@ Core Developer                  Jonathan Worthington
                                 Julian Albo
                                 Mark Glines
                                 Vasily Chekalkin
-                                Jonathan Leto
+                                Jonathan "Duke" Leto
 
 Compiler Developer              Patrick Michaud (PGE, PCT)
                                 Allison Randal (TGE)
@@ -84,7 +84,7 @@ Patch Monster                   chromatic
                                 Christoph Otto
                                 Julian Albo
                                 Mark Glines
-                                Jonthan Leto
+                                Jonthan "Duke" Leto
 
 
 Contributors

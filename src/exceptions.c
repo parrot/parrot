@@ -108,7 +108,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 
     STRING * const message     = already_dying ? STRINGNULL :
             VTABLE_get_string(interp, exception);
-    const INTVAL   severity    = already_dying ? EXCEPT_fatal :
+    const INTVAL   severity    = already_dying ? (INTVAL)EXCEPT_fatal :
             VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
 
     if (already_dying)
@@ -124,15 +124,15 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 
         /* flush interpreter output to get things printed in order */
         if (!PMC_IS_NULL(Parrot_io_STDOUT(interp)))
-            Parrot_io_flush(interp, Parrot_io_STDOUT(interp));
+            Parrot_io_flush_handle(interp, Parrot_io_STDOUT(interp));
         if (use_perr)
-            Parrot_io_flush(interp, Parrot_io_STDERR(interp));
+            Parrot_io_flush_handle(interp, Parrot_io_STDERR(interp));
 
         if (interp->pdb) {
             Interp * const interpdeb = interp->pdb->debugger;
             if (interpdeb) {
-                Parrot_io_flush(interpdeb, Parrot_io_STDOUT(interpdeb));
-                Parrot_io_flush(interpdeb, Parrot_io_STDERR(interpdeb));
+                Parrot_io_flush_handle(interpdeb, Parrot_io_STDOUT(interpdeb));
+                Parrot_io_flush_handle(interpdeb, Parrot_io_STDERR(interpdeb));
             }
         }
 
@@ -343,15 +343,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(Parrot_ex_throw_from_c)
 
-    Parrot_runloop * const return_point = interp->current_runloop;
-    opcode_t *address;
-    PMC        * const handler      =
-                             Parrot_cx_find_handler_local(interp, exception);
-
-    if (PMC_IS_NULL(handler)) {
-        VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), CURRENT_CONTEXT(interp));
-        die_from_exception(interp, exception);
-    }
+    PMC * const handler = Parrot_cx_find_handler_local(interp, exception);
 
     if (Interp_debug_TEST(interp, PARROT_BACKTRACE_DEBUG_FLAG)) {
         STRING * const exit_code = CONST_STRING(interp, "exit_code");
@@ -368,6 +360,9 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
      * Don't split line. It will break CONST_STRING handling. */
     VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), CURRENT_CONTEXT(interp));
 
+    if (PMC_IS_NULL(handler))
+        die_from_exception(interp, exception);
+
     /* it's a C exception handler */
     if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {
         Parrot_runloop * const jump_point =
@@ -375,13 +370,15 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
         jump_point->exception = exception;
         longjmp(jump_point->resume, 1);
     }
-
-    /* Run the handler. */
-    address = VTABLE_invoke(interp, handler, NULL);
-    setup_exception_args(interp, "P", exception);
-    PARROT_ASSERT(return_point->handler_start == NULL);
-    return_point->handler_start = address;
-    longjmp(return_point->resume, 2);
+    else {
+        /* Run the handler. */
+        Parrot_runloop * const return_point = interp->current_runloop;
+        opcode_t              *address = VTABLE_invoke(interp, handler, NULL);
+        setup_exception_args(interp, "P", exception);
+        PARROT_ASSERT(return_point->handler_start == NULL);
+        return_point->handler_start = address;
+        longjmp(return_point->resume, 2);
+    }
 }
 
 /*
@@ -586,6 +583,7 @@ Parrot_print_backtrace(void)
 #  ifndef PARROT_HAS_DLINFO
 #    define BACKTRACE_VERBOSE
 #  endif
+    Interp *emergency_interp = Parrot_get_emergency_interp();
     /* stolen from http://www.delorie.com/gnu/docs/glibc/libc_665.html */
     void *array[BACKTRACE_DEPTH];
     int i;
@@ -624,7 +622,11 @@ Parrot_print_backtrace(void)
             fputs("Not enough memory for backtrace_symbols\n", stderr);
     }
 #  endif
-
+    fprintf(stderr, "Attempting to get PIR backtrace.  No guarantees.  Here goes...\n");
+    if (emergency_interp) {
+        Parrot_clear_emergency_interp();
+        PDB_backtrace(emergency_interp);
+    }
 #  undef BACKTRACE_DEPTH
 #endif /* ifdef PARROT_HAS_BACKTRACE */
 }
@@ -769,6 +771,7 @@ from all previous rethrow points.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_ex_build_complete_backtrace_string(PARROT_INTERP, ARGIN(PMC * ex))
 {

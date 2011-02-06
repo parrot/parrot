@@ -23,7 +23,6 @@ use File::Spec;
 use lib qw( lib );
 use Parrot::Config;
 use IO::CaptureOutput qw| capture |;
-use Parrot::Config '%PConfig';
 
 BEGIN {
     eval "use Test::Builder::Tester;";

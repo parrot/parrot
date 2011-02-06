@@ -1,3 +1,13 @@
+New in 3.1.0
+- Core
+  + Exception PMCs are now subclassable from PIR
+  + IPv6 is now supported
+- Languages
+- Community
+- Documentation
+- Tests
+
+
 New in 3.0.0
 - Core
   + A new embedding API is available in "parrot/api.h" and documented in

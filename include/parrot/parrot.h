@@ -38,31 +38,9 @@
 
 /* Other headers, where available */
 
-/* FreeBSD wants this order:
-
-     #include <sys/types.h>
-     #include <sys/socket.h>
-     #include <netinet/in.h>
-     #include <arpa/inet.h>
-
-   as netinet/in.h relies on things defined earlier
-*/
-
 #ifdef PARROT_HAS_HEADER_SYSTYPES
 #  include <sys/types.h>
 #endif /* PARROT_HAS_HEADER_SYSTYPES */
-
-#ifdef PARROT_HAS_HEADER_SYSSOCKET
-#  include <sys/socket.h>
-#endif /* PARROT_HAS_HEADER_SYSSOCKET */
-
-#ifdef PARROT_HAS_HEADER_NETINETIN
-#  include <netinet/in.h>
-#endif /* PARROT_HAS_HEADER_NETINETIN */
-
-#ifdef PARROT_HAS_HEADER_ARPAINET
-#  include <arpa/inet.h>
-#endif /* PARROT_HAS_HEADER_ARPAINET */
 
 #ifdef PARROT_HAS_HEADER_UNISTD
 #  include <unistd.h>
@@ -86,10 +64,6 @@
 #ifdef PARROT_HAS_HEADER_FCNTL
 #  include <fcntl.h>
 #endif /* PARROT_HAS_HEADER_FCNTL */
-
-#ifdef PARROT_HAS_HEADER_NETDB
-#  include <netdb.h>
-#endif /* PARROT_HAS_HEADER_NETDB */
 
 #ifdef PARROT_HAS_HEADER_SYSSTAT
 #  include <sys/stat.h>
@@ -250,7 +224,6 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 
 #include "parrot/settings.h"
 #include "parrot/enums.h"
-#include "parrot/platform.h"
 #include "parrot/platform_interface.h"
 #include "parrot/global_setup.h"
 #include "parrot/caches.h"

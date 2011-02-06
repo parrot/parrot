@@ -1,4 +1,4 @@
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -30,11 +30,11 @@ exposed or used externally.  It may be modified or removed at any time.
 
 Externally visible, but under active development. Use at your own risk.
 
-=item Evolving
+=item Experimental
 
 Externally visible, but under development. Changes must include documentation
 (and tests where appropriate,) and must be reviewed by the Project Team before
-committing to trunk. Backward compatibility is maintained when possible.
+committing to master. Backward compatibility is maintained when possible.
 
 =item Stable
 
@@ -48,7 +48,7 @@ interface.
 This component or interface is no longer supported; it will be removed after
 the completion of its deprecation cycle (usually one release.) Items that
 have been deprecated but not yet removed are documented in the top level
-F<DEPRECATED.pod>.
+F<api.yaml>.
 
 =back
 
@@ -63,7 +63,7 @@ component/interface
 
 =head1 STABILITY
 
-Evolving. This proposal has been reviewed and accepted by the Project Team,
+Experimental. This proposal has been reviewed and accepted by the Project Team,
 but some details remain to be filled in.
 
 =head1 AUTHOR

@@ -64,11 +64,11 @@ my @steps = qw(
     auto::icu
     auto::libffi
     auto::ipv6
+    auto::platform
     gen::config_h
     gen::core_pmcs
     gen::opengl
     gen::makefiles
-    gen::platform
     gen::config_pm
 );
 

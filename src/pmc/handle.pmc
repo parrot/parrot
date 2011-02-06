@@ -81,15 +81,11 @@ platforms that use integer file descriptors).
 */
 
     METHOD get_fd() {
-#ifndef PIO_OS_STDIO
         PIOHANDLE os_handle;
         INTVAL    fd;
         GET_ATTR_os_handle(INTERP, SELF, os_handle);
         fd = (INTVAL)os_handle;
         RETURN(INTVAL fd);
-#endif /*PIO_OS_STDIO*/
-
-        RETURN(INTVAL -1);
     }
 
 
@@ -166,7 +162,7 @@ Close the handle.
 */
 
     METHOD close() {
-        const INTVAL status = Parrot_io_close(INTERP, SELF);
+        const INTVAL status = Parrot_io_close_handle(INTERP, SELF);
         RETURN(INTVAL status);
     }
 

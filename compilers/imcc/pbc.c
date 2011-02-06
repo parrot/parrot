@@ -387,7 +387,7 @@ add_const_table_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
-=item C<int e_pbc_open(PARROT_INTERP, const char *param)>
+=item C<int e_pbc_open(PARROT_INTERP, void *param)>
 
 Opens a compilation unit to emit PBC.
 
@@ -396,7 +396,7 @@ Opens a compilation unit to emit PBC.
 */
 
 int
-e_pbc_open(PARROT_INTERP, SHIM(const char *param))
+e_pbc_open(PARROT_INTERP, SHIM(void *param))
 {
     ASSERT_ARGS(e_pbc_open)
     PackFile_ByteCode * const current_bc = Parrot_pf_get_current_code_segment(interp);
@@ -428,9 +428,8 @@ e_pbc_open(PARROT_INTERP, SHIM(const char *param))
 
     /* we need some segments */
     if (!current_bc) {
-        const char *n    = IMCC_INFO(interp)->state->file;
-        STRING     *name = Parrot_str_new(interp, n, strlen(n));
-        PMC        *self;
+        STRING *name = IMCC_INFO(interp)->state->file;
+        PMC    *self;
 
         cs->seg = PF_create_default_segs(interp, name, 1, 1);
     }
@@ -1542,20 +1541,6 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
     Parrot_ns_store_sub(interp, sub_pmc);
 
-    /*
-     * store the sub's strings
-     * XXX these need to occur before the sub to support thawing properly
-     */
-    {
-        PMC *strings = Parrot_freeze_strings(interp, sub_pmc);
-        int        n = VTABLE_elements(interp, strings);
-
-        for (i = 0; i < n; i++) {
-            int unused = add_const_str(interp,
-                VTABLE_get_string_keyed_int(interp, strings, i), interp_code);
-        }
-    }
-
     /* store the sub */
     {
         const int k = add_const_table_pmc(interp, sub_pmc);
@@ -1584,6 +1569,19 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         }
         else if (interp_code->main_sub < 0) {
             interp_code->main_sub = k;
+        }
+
+        /*
+         * store the sub's strings
+         */
+        {
+            PMC *strings = Parrot_freeze_strings(interp, sub_pmc);
+            int        n = VTABLE_elements(interp, strings);
+
+            for (i = 0; i < n; i++) {
+                int unused = add_const_str(interp,
+                    VTABLE_get_string_keyed_int(interp, strings, i), interp_code);
+            }
         }
 
         return k;
@@ -2274,19 +2272,12 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
                     PackFile_Segment_new_seg(interp, dir,
                         PF_ANNOTATIONS_SEG, name, 1);
             interp_code->annotations->code = interp_code;
-
-            /* Create initial group. */
-            PackFile_Annotations_add_group(interp, interp_code->annotations,
-                    IMCC_INFO(interp)->pc - interp_code->base.data);
         }
 
         /* Add annotation. */
         switch (ins->symregs[1]->set) {
           case 'I':
             annotation_type = PF_ANNOTATION_KEY_TYPE_INT;
-            break;
-          case 'N':
-            annotation_type = PF_ANNOTATION_KEY_TYPE_NUM;
             break;
           case 'S':
             annotation_type = PF_ANNOTATION_KEY_TYPE_STR;
