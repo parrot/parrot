@@ -894,19 +894,19 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_cmp_pmc" );
     Parrot_PMC_set_integer_native(interp, pmc, 42);
     Parrot_PMC_set_integer_native(interp, pmc2, 17);
 
-    pmc = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
-    Parrot_printf(interp,"%d\n", integer );
+    pmc3 = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
+    Parrot_printf(interp,"%P\n", pmc3 );
 
     Parrot_PMC_set_integer_native(interp, pmc, 17);
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
 
-    pmc = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
-    Parrot_printf(interp,"%d\n", integer );
+    pmc3 = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
+    Parrot_printf(interp,"%P\n", pmc3 );
 
     Parrot_PMC_set_integer_native(interp, pmc, 42);
 
-    pmc = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
-    Parrot_printf(interp,"%d\n", integer );
+    pmc3 = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
+    Parrot_printf(interp,"%P\n", pmc3 );
 CODE
 1
 -1
