@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 62;
+plan tests => 63;
 
 =head1 NAME
 
@@ -145,9 +145,10 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(freeze|thaw)");
     Parrot_printf(interp,"%P\n", pmc);
     Parrot_printf(interp,"%P\n", pmc2);
 
-    /* freeze pmc, thaw tp pmc 2 */
+    /* freeze pmc, thaw to pmc 2 */
     Parrot_PMC_freeze(interp, pmc, rpa);
     Parrot_PMC_thaw(interp, pmc2, rpa);
+
     /* Modify pmc to ensure they are not pointing to the same location */
     Parrot_PMC_set_integer_native(interp, pmc, 1000);
     Parrot_printf(interp,"%P\n", pmc);
@@ -157,6 +158,20 @@ CODE
 99
 1000
 42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_iter");
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 99);
+
+    Parrot_PMC_push_pmc(interp, rpa, pmc);
+    Parrot_PMC_push_pmc(interp, rpa, pmc2);
+    pmc3 = Parrot_PMC_get_iter(interp, rpa);
+    Parrot_printf(interp,"Great Scott!\n", pmc2);
+    /* TODO: Improve this test */
+CODE
+Great Scott!
 Done!
 OUTPUT
 
