@@ -408,10 +408,6 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_floor_divide_float" );
     Parrot_PMC_set_integer_native(interp, pmc3, 0);
     number = 3.0;
 
-    /*
-       We must pass in the destination, but the return
-       value of the function must be used. This is broken.
-    */
     pmc3 = Parrot_PMC_floor_divide_float(interp, pmc, number, pmc3);
     number = Parrot_PMC_get_number(interp, pmc3);
     printf("%.2f\n", number);
@@ -425,11 +421,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_floor_divide_int" );
     Parrot_PMC_set_integer_native(interp, pmc3, 0);
     integer = 3;
 
-    /*
-       We must pass in the destination, but the return
-       value of the function must be used. This is broken.
-    */
-    pmc3 = Parrot_PMC_floor_divide_float(interp, pmc, integer, pmc3);
+    pmc3 = Parrot_PMC_floor_divide_int(interp, pmc, integer, pmc3);
     integer = Parrot_PMC_get_integer(interp, pmc3);
     printf("%d\n", integer);
 CODE
