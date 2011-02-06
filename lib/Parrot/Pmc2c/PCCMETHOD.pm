@@ -312,20 +312,6 @@ sub process_pccmethod_args {
     return ( $signature, $varargs, $declarations );
 }
 
-sub find_max_regs {
-    my ($n_regs)    = @_;
-    my $n_regs_used = [ 0, 0, 0, 0 ];
-
-    for my $x (@$n_regs) {
-        for my $i ( 0 .. 3 ) {
-            $n_regs_used->[$i] = $n_regs_used->[$i] > $x->[$i]
-                ? $n_regs_used->[$i] : $x->[$i];
-        }
-    }
-
-    return join( ", ", @$n_regs_used );
-}
-
 =head3 C<rewrite_pccmethod()>
 
     rewrite_pccmethod($method, $pmc);
@@ -541,22 +527,6 @@ sub process_parameter {
     }
 
     return ($type, @arg_names);
-}
-
-sub make_arg_pmc {
-    my ($args, $name) = @_;
-
-    return '' unless @$args;
-
-    my $code = "    VTABLE_set_integer_native(interp, $name, " . @$args
-             . ");\n";
-
-    for my $i ( 0 .. $#{$args} ) {
-        $code .= "    VTABLE_set_integer_keyed_int(interp, $name, "
-              .  "$i, $args->[$i]);\n";
-    }
-
-    return $code;
 }
 
 1;

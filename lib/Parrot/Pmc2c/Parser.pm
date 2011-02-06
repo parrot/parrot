@@ -318,12 +318,6 @@ sub strip_outer_brackets {
     return substr $method_body, 1, -1;
 }
 
-sub extract_bracketed_body_text {
-    my ( $body_text, $bracketed ) = @_;
-    my ( $extracted, $remaining ) = extract_bracketed( $body_text, $bracketed );
-    return ( strip_outer_brackets($extracted), $remaining );
-}
-
 =head2 C<parse_top_level()>
 
     my ($preamble, $pmcname, $flags, $parents, $pmcbody, $post, $chewed_lines)
