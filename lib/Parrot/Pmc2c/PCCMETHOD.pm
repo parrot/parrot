@@ -147,41 +147,6 @@ sub gen_arg_pcc_sig {
     return $sig;
 }
 
-sub gen_arg_flags {
-    my ($param) = @_;
-
-    return PARROT_ARG_INTVAL | PARROT_ARG_OPT_FLAG
-        if exists $param->{attrs}{opt_flag};
-
-    my $flag = $reg_type_info->{ $param->{type} }->{at};
-    $flag   |= PARROT_ARG_CONSTANT     if exists $param->{attrs}{constant};
-    $flag   |= PARROT_ARG_OPTIONAL     if exists $param->{attrs}{optional};
-    $flag   |= PARROT_ARG_FLATTEN      if exists $param->{attrs}{flatten};
-    $flag   |= PARROT_ARG_SLURPY_ARRAY if exists $param->{attrs}{slurpy};
-    $flag   |= PARROT_ARG_NAME         if exists $param->{attrs}{name};
-    $flag   |= PARROT_ARG_NAME         if exists $param->{attrs}{named};
-
-    return $flag;
-}
-
-sub gen_arg_accessor {
-    my ( $arg, $arg_type ) = @_;
-    my ( $name, $reg_type, $index ) = @{$arg}{qw( name type index )};
-
-    my $tis  = $reg_type_info->{$reg_type}{s};     #reg_type_info string
-    my $tiss = $reg_type_info->{$reg_type}{ss};    #reg_type_info short string
-
-    if ( 'arg' eq $arg_type ) {
-        return "$tis $name = CTX_REG_$tiss(_ctx, $index);\n";
-    }
-    elsif ( 'result' eq $arg_type ) {
-        return "    $name = CTX_REG_$tiss(_ctx, $index);\n";
-    }
-    else {  #$arg_type eq 'param' or $arg_type eq 'return'
-        return "    CTX_REG_$tiss(_ctx, $index) = $name;\n";
-    }
-}
-
 =head3 C<rewrite_RETURNs($method, $pmc)>
 
 Rewrites the method body performing the various macro substitutions for RETURNs.
