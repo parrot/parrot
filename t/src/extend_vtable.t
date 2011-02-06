@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 59;
+plan tests => 60;
 
 =head1 NAME
 
@@ -91,6 +91,7 @@ CODE
 sub extend_vtable_output_is
 {
     my ($code, $expected_output, $msg, @opts) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     c_output_is(
         $common . linedirective(__LINE__) . <<CODE,
 void dotest(Parrot_Interp interp, void *unused)
@@ -881,6 +882,30 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_cmp_string" );
     Parrot_PMC_set_integer_native(interp, pmc, 42);
 
     integer = Parrot_PMC_cmp_string(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", integer );
+CODE
+1
+-1
+0
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_cmp_pmc" );
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 17);
+
+    pmc = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", integer );
+
+    Parrot_PMC_set_integer_native(interp, pmc, 17);
+    Parrot_PMC_set_integer_native(interp, pmc2, 42);
+
+    pmc = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
+    Parrot_printf(interp,"%d\n", integer );
+
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+
+    pmc = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
     Parrot_printf(interp,"%d\n", integer );
 CODE
 1
