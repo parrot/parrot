@@ -57,14 +57,14 @@ sub new {
 
     $self ||= {};
     $self   = {
-        (
-            attributes => [],
-            methods    => [],
-            super      => {},
-            variant    => '',
-            mixins     => [],
-            %{$self}
-        )
+        attributes  => [],
+        methods     => [],
+        super       => {},
+        variant     => '',
+        mixins      => [],
+        %{$self},
+        dynpmc_list => { map { $_ => 1 }
+            ( 'default', 'delegate', 'deleg_pmc', 'scalar' ) },
     };
 
     bless $self, $class;
@@ -174,12 +174,10 @@ sub is_ro {
     return $self->flag('ro');
 }
 
-our $dynpmc_list = { map { $_ => 1 } ( 'default', 'delegate', 'deleg_pmc', 'scalar' ) };
-
 sub is_dynamic {
     my ( $self, $pmcname ) = @_;
     return $self->flag('dynpmc') unless $pmcname;
-    return 0 if exists $dynpmc_list->{$pmcname};
+    return 0 if exists $self->{dynpmc_list}->{$pmcname};
     return 0 if exists $Parrot::PMC::pmc_types{$pmcname};
     return 1;
 }
