@@ -293,10 +293,6 @@ sub find_methods {
                 }
             }
 
-            # To be deprecated
-            parse_mmds( $method, $filename, $lineno )
-                if $methodblock =~ /\bMMD_(\w+):/;
-
             $pmc->add_method($method);
         }
 
@@ -309,56 +305,6 @@ sub find_methods {
     $lineno += count_newlines($pmcbody);
 
     return ($lineno, $class_init);
-}
-
-sub parse_mmds {
-    my ( $method, $filename, $lineno ) = @_;
-    my $mmd_methods         = [];
-    my $body_text           = $method->body;
-    my $default_body        = $body_text;
-    my $default_body_lineno = $lineno;
-
-    # now split into MMD if necessary:
-    while ( $body_text =~ s/(\bMMD_(\w+):\s*)// ) {
-
-        $lineno       += count_newlines($1);
-        my $right_type = $2;
-
-        $method->add_mmd_rights($right_type);
-
-        ( my $mmd_part, $body_text ) = extract_bracketed_body_text( $body_text, '{' );
-
-        die "Empty MMD body near '$body_text'" unless $mmd_part;
-        my $mmd_part_lines = count_newlines($mmd_part);
-
-        # remove whitespace at end of last line
-        $mmd_part =~ s/\n\s*$/\n/s;
-
-        if ( $right_type eq 'DEFAULT' ) {
-            $default_body        = $mmd_part;
-            $default_body_lineno = $lineno;
-        }
-        else {
-            my $mmd_method = Parrot::Pmc2c::Method->new(
-                {
-                    name        => $method->name . "_$right_type",
-                    parent_name => $method->parent_name,
-                    body        => Parrot::Pmc2c::Emitter->text( $mmd_part, $filename, $lineno ),
-                    return_type => $method->return_type,
-                    parameters  => $method->parameters,
-                    type        => Parrot::Pmc2c::Method::VTABLE,
-                    attrs       => $method->attrs,
-                    right       => $right_type,
-                }
-            );
-
-            push @{$mmd_methods}, $mmd_method;
-        }
-
-        $lineno += $mmd_part_lines;
-    }
-    $method->mmds($mmd_methods);
-    $method->body( Parrot::Pmc2c::Emitter->text( $default_body, $filename, $default_body_lineno ) );
 }
 
 sub strip_outer_brackets {

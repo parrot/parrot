@@ -51,13 +51,6 @@ sub clone {
     return $self->new( { ( %{$self}, %{ $self_hash || {} } ) } );
 }
 
-sub add_mmd_rights {
-    my ( $self, $value ) = @_;
-    push @{ $self->{mmd_rights} }, $value;
-
-    return;
-}
-
 sub mmd_rights {
     my ($self) = @_;
     return $self->{mmd_rights};
