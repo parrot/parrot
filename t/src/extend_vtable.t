@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 60;
+plan tests => 61;
 
 =head1 NAME
 
@@ -96,7 +96,7 @@ sub extend_vtable_output_is
         $common . linedirective(__LINE__) . <<CODE,
 void dotest(Parrot_Interp interp, void *unused)
 {
-    Parrot_PMC pmc, pmc2, pmc3, pmc_string, pmc_string2;
+    Parrot_PMC pmc, pmc2, pmc3, pmc_string, pmc_string2, pmc_string3;
     Parrot_PMC pmc_float, pmc_float2;
     Parrot_PMC rpa, rpa2;
     Parrot_Int type, value, integer, integer2;
@@ -112,6 +112,7 @@ void dotest(Parrot_Interp interp, void *unused)
 
     pmc_string = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
     pmc_string2 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
+    pmc_string3 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
 
     pmc_float  = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"Float"));
     pmc_float2 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"Float"));
@@ -757,6 +758,20 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal_string" );
 CODE
 0
 1
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_concatenate" );
+     string  = createstring(interp, "FOO");
+     string2 = createstring(interp, "BAR");
+
+     Parrot_PMC_assign_string_native(interp, pmc_string, string);
+     Parrot_PMC_assign_string_native(interp, pmc_string2,string2);
+
+     pmc_string3 = Parrot_PMC_concatenate(interp, pmc_string, pmc_string2, pmc_string3);
+     Parrot_printf(interp, "%P\n", pmc_string3);
+CODE
+FOOBAR
 Done!
 OUTPUT
 
