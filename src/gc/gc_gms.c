@@ -764,9 +764,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     interp->gc_sys->stats.gc_mark_runs++;
 
-#ifdef DETAIL_MEMORY_DEBUG
     gc_gms_print_stats(interp, "Before", gen);
-#endif
 
     gc_gms_check_sanity(interp);
     /*
@@ -2144,7 +2142,7 @@ static void
 gc_gms_validate_objects(PARROT_INTERP)
 {
     INTVAL i;
-#ifdef DETAIL_MEMORY_DEBUG
+#ifndef NDEBUG
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     interp->gc_sys->mark_pmc_header = gc_gms_validate_pmc;
