@@ -920,7 +920,7 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
         /* All children aren't younger than us - get rid of it */
         if (self->youngest_child >= gen) {
             PObj_live_CLEAR(pmc);
-            pmc->flags &= ~PObj_GC_on_dirty_list_FLAG;
+            PObj_GC_on_dirty_list_CLEAR(pmc);
             Parrot_pa_remove(interp, dirty_list, item->ptr);
             item->ptr = Parrot_pa_insert(interp, self->objects[gen], item);
             gc_gms_seal_object(interp, pmc);
@@ -977,7 +977,7 @@ gc_gms_process_work_list(PARROT_INTERP,
         PMC              *pmc  = &(item->pmc);
         size_t            gen  = POBJ2GEN(pmc);
 
-        PARROT_ASSERT(!(pmc->flags & PObj_GC_on_dirty_list_FLAG));
+        PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc));
 
         Parrot_pa_remove(interp, work_list, item->ptr);
         item->ptr = Parrot_pa_insert(interp, self->objects[gen], item););
@@ -1073,7 +1073,7 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
         return;
 
     /* Object is on dirty_list. */
-    if (pmc->flags & PObj_GC_on_dirty_list_FLAG)
+    if (PObj_GC_on_dirty_list_TEST(pmc))
         return;
 
     /* mark it live. */
@@ -1303,7 +1303,7 @@ gc_gms_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
         size_t gen = POBJ2GEN(pmc);
 
         /* We should never free objects from dirty list directly! */
-        PARROT_ASSERT(!(pmc->flags & PObj_GC_on_dirty_list_FLAG));
+        PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc));
 
         if (PObj_on_free_list_TEST(pmc))
             return;
@@ -2036,12 +2036,12 @@ gc_gms_check_sanity(PARROT_INTERP)
 
     POINTER_ARRAY_ITER(self->dirty_list,
         PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
-        PARROT_ASSERT(pmc->flags & PObj_GC_on_dirty_list_FLAG
+        PARROT_ASSERT(PObj_GC_on_dirty_list_TEST(pmc)
             || !"Object in dirty_list without dirty_flag"););
 
     POINTER_ARRAY_ITER(self->work_list,
         PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
-        PARROT_ASSERT(!(pmc->flags & PObj_GC_on_dirty_list_FLAG)
+        PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc)
             || !"Dirty object in work_list"););
 #endif
 }
@@ -2142,7 +2142,7 @@ gc_gms_get_youngest_generation(PARROT_INTERP, ARGIN(PMC *pmc))
     size_t            gen  = POBJ2GEN(pmc);
 
     /* If child is on dirty_list ignore it. It will be kept alive anyway */
-    if (pmc->flags & PObj_GC_on_dirty_list_FLAG)
+    if (PObj_GC_on_dirty_list_TEST(pmc))
         return;
 
     if (gen < self->youngest_child)
