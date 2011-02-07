@@ -172,6 +172,9 @@ typedef enum PObj_enum {
     /* For debugging, report when this buffer gets moved around */
     PObj_report_FLAG            = POBJ_FLAG(23),
 
+    /* Object requires write barrier */
+    PObj_GC_need_write_barrier_FLAG = POBJ_FLAG(26),
+
 /* PMC specific FLAGs */
     /* call object finalizer */
     PObj_need_finalize_FLAG     = POBJ_FLAG(25),
@@ -287,6 +290,11 @@ typedef enum PObj_enum {
 #define PObj_is_shared_TEST(o) PObj_flag_TEST(is_shared, o)
 #define PObj_is_shared_SET(o)  PObj_flag_SET(is_shared, o)
 #define PObj_is_shared_CLEAR(o) PObj_flag_CLEAR(is_shared, o)
+
+#define PObj_GC_need_write_barrier_TEST(o)  PObj_flag_TEST(GC_need_write_barrier, o)
+#define PObj_GC_need_write_barrier_SET(o)   PObj_flag_SET(GC_need_write_barrier, o)
+#define PObj_GC_need_write_barrier_CLEAR(o) PObj_flag_CLEAR(GC_need_write_barrier, o)
+
 
 /* some combinations */
 #define PObj_is_external_or_free_TESTALL(o) (PObj_get_FLAGS(o) & \
