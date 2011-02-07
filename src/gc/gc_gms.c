@@ -1504,7 +1504,7 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t             i;
     for (i = 0; i < MAX_GENERATIONS; i++) {
-        if (gc_gms_is_ptr_owned(interp, ptr, self->string_allocator, self->objects[i]))
+        if (gc_gms_is_ptr_owned(interp, ptr, self->string_allocator, self->strings[i]))
             return 1;
     }
     return 0;
