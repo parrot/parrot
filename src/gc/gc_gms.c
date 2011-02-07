@@ -829,7 +829,9 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     /* We swept all dead objects */
     self->num_early_gc_PMCs                      = 0;
 
-    gc_gms_compact_memory_pool(interp);
+    /* Don't compact after nursery collection */
+    if (gen)
+        gc_gms_compact_memory_pool(interp);
 
     gc_gms_check_sanity(interp);
 
@@ -1142,9 +1144,6 @@ gc_gms_compact_memory_pool(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_compact_memory_pool)
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-
-    // FIXME String part isn't implemented yet.
-    return;
 
     Parrot_gc_str_compact_pool(interp, &self->string_gc);
 }
@@ -1592,7 +1591,9 @@ gc_gms_iterate_live_strings(PARROT_INTERP,
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t             i;
     for (i = 0; i < MAX_GENERATIONS; i++) {
-        // FIXME
+        POINTER_ARRAY_ITER(self->strings[i],
+            STRING *s = &((string_alloc_struct *)ptr)->str;
+            callback(interp, (Buffer *)s, data););
     }
 }
 
@@ -2078,6 +2079,8 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
                 i,
                 Parrot_pa_count_used(interp, self->objects[i]),
                 Parrot_pa_count_used(interp, self->strings[i]));
+
+    fprintf(stderr, "STRING: %d\n", self->string_gc.memory_pool->total_allocated);
 
 #if 0
     fprintf(stderr, "PMC: %d\n", Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
