@@ -322,6 +322,7 @@ make_prop_hash(PARROT_INTERP, ARGMOD(PMC *self))
                        : Parrot_pmc_new(interp, enum_class_Hash);
 
     propagate_std_props(interp, self, prop);
+    Parrot_gc_write_barrier(interp, self);
     return prop;
 }
 

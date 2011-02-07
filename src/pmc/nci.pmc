@@ -55,7 +55,7 @@ build_func(PARROT_INTERP, ARGIN(PMC *obj), ARGMOD(Parrot_NCI_attributes *nci))
 {
     ASSERT_ARGS(build_func)
 
-    Parrot_gc_write_barrier(interp, obj);
+    PARROT_GC_WRITE_BARRIER(interp, obj);
     nci->signature = Parrot_nci_parse_signature(interp, nci->sig_str);
 
     Parrot_nci_sig_to_pcc(interp, nci->signature,

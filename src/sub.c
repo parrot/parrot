@@ -429,7 +429,7 @@ Parrot_sub_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
                 PMC_get_sub(interp, child_sub->outer_sub, child_outer_sub);
                 if (STRING_equal(interp, current_sub->subid,
                                       child_outer_sub->subid)) {
-                    Parrot_gc_write_barrier(interp, child_pmc);
+                    PARROT_GC_WRITE_BARRIER(interp, child_pmc);
                     child_sub->outer_ctx = ctx;
                 }
             }
