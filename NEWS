@@ -2,6 +2,8 @@ New in 3.1.0
 - Core
   + Exception PMCs are now subclassable from PIR
   + IPv6 is now supported
+  + Added Parrot_ext_try function to extend API (experimental), to allow
+    implementation of try .. catch construcs in C extensions.
 - Languages
 - Community
 - Documentation
