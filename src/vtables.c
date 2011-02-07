@@ -97,9 +97,6 @@ Parrot_vtbl_destroy_vtable(PARROT_INTERP, ARGFREE_NOTNULL(VTABLE *vtable))
     /* We sometimes get a type number allocated without any corresponding
      * vtable. E.g. if you load perl_group, perlscalar is this way.  */
 
-    // FIXME! 
-    return;
-
     if (vtable->ro_variant_vtable) {
         VTABLE * const ro_vtable = vtable->ro_variant_vtable;
 
