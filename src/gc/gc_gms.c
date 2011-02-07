@@ -2050,6 +2050,11 @@ gc_gms_check_sanity(PARROT_INTERP)
             if (i)
                 PARROT_ASSERT(PObj_GC_need_write_barrier_TEST(pmc)
                     || !"Unsealed object in old generation"););
+
+        POINTER_ARRAY_ITER(self->strings[i],
+            STRING *str = &(((string_alloc_struct*)ptr)->str);
+            PARROT_ASSERT((POBJ2GEN(str) == i)
+                || !"String from wrong generation"););
     }
 
     POINTER_ARRAY_ITER(self->dirty_list,
@@ -2130,6 +2135,12 @@ gc_gms_validate_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 }
 
 static void
+gc_gms_validate_str(PARROT_INTERP, ARGIN(STRING *str))
+{
+    PARROT_ASSERT(!PObj_on_free_list_TEST(str));
+}
+
+static void
 gc_gms_validate_objects(PARROT_INTERP)
 {
     INTVAL i;
@@ -2137,8 +2148,10 @@ gc_gms_validate_objects(PARROT_INTERP)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     interp->gc_sys->mark_pmc_header = gc_gms_validate_pmc;
+    interp->gc_sys->mark_str_header = gc_gms_validate_str;
     Parrot_gc_trace_root(interp, NULL, GC_TRACE_FULL);
     interp->gc_sys->mark_pmc_header = gc_gms_mark_pmc_header;
+    interp->gc_sys->mark_str_header = gc_gms_mark_str_header;
 
     for (i = 0; i < MAX_GENERATIONS; i++) {
         POINTER_ARRAY_ITER(self->objects[i],
