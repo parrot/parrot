@@ -1261,6 +1261,22 @@ gc_gms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
 
     if (which == IMPATIENT_PMCS)
         return self->num_early_gc_PMCs;
+    if (which == TOTAL_PMCS) {
+        /* It's higher than actual number of allocated PMCs */
+        size_t ret = 0, i;
+        for (i = 0; i < MAX_GENERATIONS; i++) {
+            ret += Parrot_pa_count_allocated(interp, self->objects[i]);
+        }
+        return ret;
+    }
+    if (which == ACTIVE_PMCS) {
+        /* It's higher than actual number of allocated PMCs */
+        size_t ret = 0, i;
+        for (i = 0; i < MAX_GENERATIONS; i++) {
+            ret += Parrot_pa_count_used(interp, self->objects[i]);
+        }
+        return ret;
+    }
 
     return Parrot_gc_get_info(interp, which, &interp->gc_sys->stats);
 }
