@@ -1023,6 +1023,8 @@ gc_gms_sweep_pools(PARROT_INTERP,
             else if (!PObj_constant_TEST(pmc)) {
                 Parrot_pa_remove(interp, self->objects[i], item->ptr);
 
+                interp->gc_sys->stats.memory_used -= sizeof (PMC);
+
                 /* this is manual inlining of Parrot_pmc_destroy() */
                 if (PObj_custom_destroy_TEST(pmc))
                     VTABLE_destroy(interp, pmc);
