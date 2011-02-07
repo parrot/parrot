@@ -411,9 +411,6 @@ static void gc_gms_set_gen_flags(PARROT_INTERP, ARGIN(PMC *pmc), int gen)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_swap_vtables(ARGIN(PMC *pmc))
-        __attribute__nonnull__(1);
-
 static void gc_gms_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -576,8 +573,6 @@ static int pobj2gen(ARGIN(PObj *pmc))
 #define ASSERT_ARGS_gc_gms_set_gen_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_gc_gms_swap_vtables __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_sweep_pmc_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj))
@@ -1962,23 +1957,6 @@ gc_gms_unseal_object(PARROT_INTERP, ARGIN(PMC *pmc))
     ASSERT_ARGS(gc_gms_unseal_object)
     /* "Unseal" object with write barrier */
     PObj_GC_need_write_barrier_CLEAR(pmc);
-}
-
-static void
-gc_gms_swap_vtables(ARGIN(PMC *pmc))
-{
-    ASSERT_ARGS(gc_gms_swap_vtables)
-
-    VTABLE  *t   = pmc->vtable;
-
-    PARROT_ASSERT(pmc->vtable);
-    PARROT_ASSERT(pmc->vtable->wb_variant_vtable);
-
-    pmc->vtable = pmc->vtable->wb_variant_vtable;
-    pmc->vtable->wb_variant_vtable = t;
-
-    PARROT_ASSERT(pmc->vtable != pmc->vtable->wb_variant_vtable);
-    PARROT_ASSERT(pmc->vtable != pmc->vtable->ro_variant_vtable);
 }
 
 /*
