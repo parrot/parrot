@@ -1867,8 +1867,7 @@ gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
     pmc->flags |= PObj_GC_on_dirty_list_FLAG;
 
     /* We don't need it anymore */
-    if (pmc->vtable->flags & VTABLE_IS_WRITE_BARRIER_FLAG)
-        gc_gms_unseal_object(interp, pmc);
+    gc_gms_unseal_object(interp, pmc);
 }
 
 /*
@@ -1954,24 +1953,15 @@ gc_gms_seal_object(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_seal_object)
     /* "Seal" object with write barrier */
-    VTABLE  *t   = pmc->vtable;
-
-    if(!(t->flags & VTABLE_IS_WRITE_BARRIER_FLAG)) {
-        PObj_GC_need_write_barrier_SET(pmc);
-        gc_gms_swap_vtables(pmc);
-    }
+    PObj_GC_need_write_barrier_SET(pmc);
 }
 
 static void
 gc_gms_unseal_object(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_unseal_object)
-    /* "Seal" object with write barrier */
-    VTABLE  *t   = pmc->vtable;
-
-    PARROT_ASSERT(t->flags & VTABLE_IS_WRITE_BARRIER_FLAG);
+    /* "Unseal" object with write barrier */
     PObj_GC_need_write_barrier_CLEAR(pmc);
-    gc_gms_swap_vtables(pmc);
 }
 
 static void
@@ -2033,7 +2023,7 @@ gc_gms_check_sanity(PARROT_INTERP)
                 || !"Object from wrong generation");
 
             if (i)
-                PARROT_ASSERT((pmc->vtable->flags & VTABLE_IS_WRITE_BARRIER_FLAG)
+                PARROT_ASSERT(PObj_GC_need_write_barrier_TEST(pmc)
                     || !"Unsealed object in old generation"););
     }
 
