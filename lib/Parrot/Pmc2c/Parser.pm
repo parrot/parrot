@@ -89,6 +89,7 @@ sub parse_pmc {
     $pmc->add_method($class_init) if $class_init;
     $pmc->vtable( $pmc2cMain->read_dump("vtable.pmc") );
     $pmc->pre_method_gen();
+    $pmc->post_method_gen();
 
     return $pmc;
 }
