@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
+# Copyright (C) 2004-2011, Parrot Foundation.
 package Parrot::Pmc2c::Method;
 use strict;
 use warnings;
