@@ -153,16 +153,15 @@ sub vtbl_struct {
 
     $struct = <<'EOF';
 typedef enum {
-    VTABLE_IS_CONST_FLAG            = 0x001,
-    VTABLE_HAS_CONST_TOO            = 0x002,
-    VTABLE_PMC_NEEDS_EXT            = 0x004,
-    VTABLE_DATA_IS_PMC              = 0x008,
-    VTABLE_PMC_IS_SINGLETON         = 0x010,
-    VTABLE_IS_SHARED_FLAG           = 0x020,
-    VTABLE_IS_CONST_PMC_FLAG        = 0x040,
-    VTABLE_HAS_READONLY_FLAG        = 0x080,
-    VTABLE_IS_READONLY_FLAG         = 0x100,
-    VTABLE_IS_WRITE_BARRIER_FLAG    = 0x200
+    VTABLE_IS_CONST_FLAG     = 0x001,
+    VTABLE_HAS_CONST_TOO     = 0x002,
+    VTABLE_PMC_NEEDS_EXT     = 0x004,
+    VTABLE_DATA_IS_PMC       = 0x008,
+    VTABLE_PMC_IS_SINGLETON  = 0x010,
+    VTABLE_IS_SHARED_FLAG    = 0x020,
+    VTABLE_IS_CONST_PMC_FLAG = 0x040,
+    VTABLE_HAS_READONLY_FLAG = 0x080,
+    VTABLE_IS_READONLY_FLAG  = 0x100
 } vtable_flags_t;
 
 typedef struct _vtable {
@@ -178,8 +177,6 @@ typedef struct _vtable {
     const char *attribute_defs; /* list of PMC attributes */
     struct _vtable *ro_variant_vtable; /* A variant of this vtable with the
                                    opposite IS_READONLY flag */
-    struct _vtable *wb_variant_vtable; /* A variant of this vtable with the
-                                   write barrier trampoline */
     /* Vtable Functions */
 
 EOF
@@ -232,7 +229,7 @@ EOM
  * vtable slot names
  */
 EOM
-    my $vtable_slot_num = 10;
+    my $vtable_slot_num = 9;
     for my $entry ( @{$vtable} ) {
         my $uc_meth = uc $entry->[1];
         $macros .= <<"EOM";
@@ -256,7 +253,6 @@ static PARROT_OBSERVER const char * const Parrot_vtable_slot_names[] = {
     "",   /* class */
     "",   /* mro */
     "",   /* ro_variant_vtable */
-    "",   /* wb_variant_vtable */
 
     /* Vtable Functions */
 EOM

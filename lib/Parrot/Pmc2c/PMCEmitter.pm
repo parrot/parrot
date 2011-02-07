@@ -29,7 +29,6 @@ use Text::Balanced 'extract_bracketed';
 use Parrot::Pmc2c::PCCMETHOD ();
 use Parrot::Pmc2c::MULTI ();
 use Parrot::Pmc2c::PMC::RO ();
-use Parrot::Pmc2c::PMC::WB ();
 use Parrot::Pmc2c::PMC::ParrotClass ();
 
 sub prep_for_emit {
@@ -91,10 +90,6 @@ sub generate_c_file {
         $ro->gen_methods;
     }
 
-    my $wb = $self->wb;
-    $wb->{emitter} = $self->{emitter};
-    $wb->gen_methods;
-
     $c->emit("#include \"pmc_default.h\"\n");
 
     $c->emit( $self->update_vtable_func );
@@ -143,10 +138,8 @@ EOH
         $h->emit("${export}VTABLE* Parrot_${name}_ro_update_vtable(ARGMOD(VTABLE*));\n");
     }
 
-    $h->emit("${export}VTABLE* Parrot_${name}_wb_update_vtable(ARGMOD(VTABLE*));\n");
     $h->emit("${export}VTABLE* Parrot_${name}_get_vtable(PARROT_INTERP);\n");
     $h->emit("${export}VTABLE* Parrot_${name}_ro_get_vtable(PARROT_INTERP);\n");
-    $h->emit("${export}VTABLE* Parrot_${name}_wb_get_vtable(PARROT_INTERP);\n");
     $h->emit("${export}PMC*    Parrot_${name}_get_mro(PARROT_INTERP, ARGIN_NULLOK(PMC* mro));\n");
     $h->emit("${export}Hash*   Parrot_${name}_get_isa(PARROT_INTERP, ARGIN_NULLOK(Hash* isa));\n");
 
@@ -229,8 +222,6 @@ sub init {
 
     $self->ro( Parrot::Pmc2c::PMC::RO->new($self) )
         unless $self->abstract or $self->singleton;
-
-    $self->wb( Parrot::Pmc2c::PMC::WB->new($self) )
 }
 
 =item C<gen_includes()>
@@ -466,7 +457,6 @@ sub vtable_decl {
         NULL,       /* mro */
         NULL,       /* attribute_defs */
         NULL,       /* ro_variant_vtable */
-        NULL,       /* wb_variant_vtable */
         $methlist,
         0           /* attr size */
     };
@@ -571,7 +561,6 @@ END_MULTI_LIST
 
     my %extra_vt;
     $extra_vt{ro} = $self->{ro} if $self->{ro};
-    $extra_vt{wb} = $self->{wb};
 
     $cout .= <<"EOC";
 void
@@ -647,8 +636,6 @@ EOC
 
     for my $k ( keys %extra_vt ) {
         my $k_flags = $self->$k->vtable_flags;
-        # HACK
-        $k_flags .= '|VTABLE_IS_WRITE_BARRIER_FLAG' if $k eq 'wb';
 
         $cout .= <<"EOC";
         {
@@ -860,27 +847,6 @@ $vtable_updates
 
 EOC
 
-    # Generate WB vtable for implemented non-updating methods
-    $vtable_updates = '';
-    foreach my $name ( @{ $self->vtable->names} ) {
-        next unless exists $self->{has_method}{$name}
-                    && $self->vtable_method_does_write($name);
-        next if $name =~ m{ ^init }xo;
-        $vtable_updates .= "    vt->$name = Parrot_${classname}_wb_${name};\n";
-    }
-
-    $vtable_updates .= $set_attr_size;
-
-    $cout .= <<"EOC";
-
-$export
-VTABLE *Parrot_${classname}_wb_update_vtable(ARGMOD(VTABLE *vt)) {
-$vtable_updates
-    return vt;
-}
-
-EOC
-
     $cout;
 }
 
@@ -1054,29 +1020,6 @@ $export
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 VTABLE* Parrot_${classname}_ro_get_vtable(PARROT_INTERP) {
-    VTABLE *vt;
-$get_extra_vtable
-    return vt;
-}
-
-EOC
-
-    $get_extra_vtable = "    vt = Parrot_${classname}_get_vtable(interp);\n";
-    if ($first_parent ne 'default') {
-        $get_extra_vtable .= "    Parrot_default_wb_update_vtable(vt);\n";
-    }
-
-    foreach my $parent_name ( $first_parent, @other_parents ) {
-        $get_extra_vtable .= "    Parrot_${parent_name}_wb_update_vtable(vt);\n";
-    }
-
-    $get_extra_vtable .= "    Parrot_${classname}_wb_update_vtable(vt);\n";
-
-    $cout .= <<"EOC";
-$export
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-VTABLE* Parrot_${classname}_wb_get_vtable(PARROT_INTERP) {
     VTABLE *vt;
 $get_extra_vtable
     return vt;
