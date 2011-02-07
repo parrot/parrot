@@ -1038,6 +1038,34 @@ gc_gms_sweep_pools(PARROT_INTERP,
 
                 Parrot_gc_pool_free(interp, self->pmc_allocator, ptr);
             });
+
+        POINTER_ARRAY_ITER(self->strings[i],
+            string_alloc_struct *item = (string_alloc_struct *)ptr;
+            STRING *str = &(item->str);
+
+            PARROT_ASSERT(!PObj_on_free_list_TEST(obj));
+
+            /* Paint live objects white */
+            if (PObj_live_TEST(str)) {
+                PObj_live_CLEAR(str);
+                if (move_to_old) {
+                    Parrot_pa_remove(interp, self->strings[i], item->ptr);
+                    item->ptr = Parrot_pa_insert(interp, self->strings[i + 1], item);
+                    gc_gms_set_gen_flags(interp, str, i + 1);
+                }
+            }
+
+            else if (!PObj_constant_TEST(str)) {
+                Parrot_pa_remove(interp, self->strings[i], item->ptr);
+                if (Buffer_bufstart(str) && !PObj_external_TEST(str))
+                    Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, (Buffer*)str);
+
+                interp->gc_sys->stats.memory_used -= sizeof (STRING);
+
+                PObj_on_free_list_SET(str);
+
+                Parrot_gc_pool_free(interp, self->string_allocator, ptr);
+            });
     }
 
 }
