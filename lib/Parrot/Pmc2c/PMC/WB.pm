@@ -99,7 +99,7 @@ sub new {
         _self->vtable = _self->vtable->wb_variant_vtable;
         _self->vtable->wb_variant_vtable = t;
         PARROT_ASSERT(_self->vtable != _self->vtable->wb_variant_vtable);
-        Parrot_gc_write_barrier(interp, _self);
+        PARROT_GC_WRITE_BARRIER(interp, _self);
         return _self->vtable->$name(interp, _self $parameters);
 EOC
 

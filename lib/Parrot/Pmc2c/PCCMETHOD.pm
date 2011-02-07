@@ -430,7 +430,7 @@ END
     }
     $e->emit( <<'END', __FILE__, __LINE__ + 1 );
 
-    Parrot_gc_write_barrier(interp, _self);
+    PARROT_GC_WRITE_BARRIER(interp, _self);
 
     { /* BEGIN PMETHOD BODY */
 
@@ -441,7 +441,7 @@ END
 
     } /* END PMETHOD BODY */
 
-    Parrot_gc_write_barrier(interp, _self);
+    PARROT_GC_WRITE_BARRIER(interp, _self);
 
     } /* END PARAMS SCOPE */
     return;

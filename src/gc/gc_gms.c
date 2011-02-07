@@ -1956,8 +1956,10 @@ gc_gms_seal_object(PARROT_INTERP, ARGIN(PMC *pmc))
     /* "Seal" object with write barrier */
     VTABLE  *t   = pmc->vtable;
 
-    if(!(t->flags & VTABLE_IS_WRITE_BARRIER_FLAG))
+    if(!(t->flags & VTABLE_IS_WRITE_BARRIER_FLAG)) {
+        PObj_GC_need_write_barrier_SET(pmc);
         gc_gms_swap_vtables(pmc);
+    }
 }
 
 static void
@@ -1968,6 +1970,7 @@ gc_gms_unseal_object(PARROT_INTERP, ARGIN(PMC *pmc))
     VTABLE  *t   = pmc->vtable;
 
     PARROT_ASSERT(t->flags & VTABLE_IS_WRITE_BARRIER_FLAG);
+    PObj_GC_need_write_barrier_CLEAR(pmc);
     gc_gms_swap_vtables(pmc);
 }
 
