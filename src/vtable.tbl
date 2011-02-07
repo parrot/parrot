@@ -5,9 +5,9 @@
 
 # INPLACE MMD variant must always be normal op + 1
 
-void init()
+void init() :write
 # init must be first for JITed vtable meths
-void init_pmc(PMC* initializer)
+void init_pmc(PMC* initializer) :write
 PMC* instantiate(PMC* sig)
 void morph(PMC* type) :write
 void mark()
@@ -271,4 +271,4 @@ void share()
 
 PMC* share_ro()
 
-void init_int(INTVAL initializer)
+void init_int(INTVAL initializer) :write
