@@ -1001,8 +1001,6 @@ Parrot_pmc_create_mro(PARROT_INTERP, INTVAL type)
 
     if (vtable->ro_variant_vtable)
         vtable->ro_variant_vtable->mro = mro;
-    if (vtable->wb_variant_vtable)
-        vtable->wb_variant_vtable->mro = mro;
 
     count = VTABLE_elements(interp, mro_list);
 
