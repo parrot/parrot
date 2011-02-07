@@ -523,7 +523,7 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/api.c */
 
-#if 0 && defined(NDEBUG) && defined(PARROT_IN_CORE)
+#if defined(NDEBUG) && defined(PARROT_IN_CORE)
 #  define Parrot_gc_mark_STRING_alive(interp, obj) \
           do if (! STRING_IS_NULL(obj)) PObj_live_SET(obj); while (0)
 #else
@@ -532,7 +532,7 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
 
 #if defined(PARROT_IN_CORE)
 #  define Parrot_gc_mark_PMC_alive(interp, obj) \
-      do if (!PMC_IS_NULL(obj)) Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
+      do if (!PMC_IS_NULL(obj) && !PObj_live_TEST(obj)) Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
       while (0)
 #else
 #  define Parrot_gc_mark_PMC_alive(interp, obj) Parrot_gc_mark_PMC_alive_fun((interp), (obj))
