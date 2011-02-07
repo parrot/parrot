@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -62,7 +62,6 @@ PMC2C_FILES = \\
     lib/Parrot/Pmc2c/Method.pm \\
     lib/Parrot/Pmc2c/PCCMETHOD.pm \\
     lib/Parrot/Pmc2c/MULTI.pm \\
-    lib/Parrot/Pmc2c/PMCEmitter.pm \\
     lib/Parrot/Pmc2c/MethodEmitter.pm \\
     lib/Parrot/Pmc2c/Library.pm \\
     lib/Parrot/Pmc2c/UtilFunctions.pm \\

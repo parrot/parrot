@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
+# Copyright (C) 2004-2011, Parrot Foundation.
 package Parrot::Pmc2c::Method;
 use strict;
 use warnings;
@@ -49,13 +49,6 @@ sub new {
 sub clone {
     my ( $self, $self_hash ) = @_;
     return $self->new( { ( %{$self}, %{ $self_hash || {} } ) } );
-}
-
-sub add_mmd_rights {
-    my ( $self, $value ) = @_;
-    push @{ $self->{mmd_rights} }, $value;
-
-    return;
 }
 
 sub mmd_rights {
@@ -203,7 +196,6 @@ sub pcc_signature {
 =head1 SEE ALSO
 
     lib/Parrot/Pmc2c/PMC/RO.pm
-    lib/Parrot/Pmc2c/PMCEmitter.pm
     lib/Parrot/Pmc2c/VTable.pm
     lib/Parrot/Pmc2c/PMC.pm
     lib/Parrot/Pmc2c/Parser.pm
