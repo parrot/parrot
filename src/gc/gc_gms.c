@@ -2042,11 +2042,14 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
     fprintf(stderr, "%s\ntotal: %d\ngen: %d\n", header, interp->gc_sys->stats.gc_mark_runs, gen);
 
     fprintf(stderr, "dirty: %d\nwork: %d\n",
-            self->dirty_list->count, self->work_list->count);
+            Parrot_pa_count_used(interp, self->dirty_list),
+            Parrot_pa_count_used(interp, self->work_list));
 
     for (i = 0; i < MAX_GENERATIONS; i++)
         fprintf(stderr, "%d: %d %d\n",
-                i, self->objects[i]->count, self->strings[i]->count);
+                i,
+                Parrot_pa_count_used(interp, self->objects[i]),
+                Parrot_pa_count_used(interp, self->strings[i]));
 
 #if 0
     fprintf(stderr, "PMC: %d\n", Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
