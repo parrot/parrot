@@ -1045,7 +1045,7 @@ gc_gms_sweep_pools(PARROT_INTERP,
             string_alloc_struct *item = (string_alloc_struct *)ptr;
             STRING *str = &(item->str);
 
-            PARROT_ASSERT(!PObj_on_free_list_TEST(obj));
+            PARROT_ASSERT(!PObj_on_free_list_TEST(str));
 
             /* Paint live objects white */
             if (PObj_live_TEST(str)) {
