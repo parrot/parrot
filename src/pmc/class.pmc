@@ -260,7 +260,7 @@ build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
     _class->attrib_index = attrib_index;
     _class->attrib_cache = cache;
 
-    Parrot_gc_write_barrier(interp, self);
+    PARROT_GC_WRITE_BARRIER(interp, self);
 }
 
 /*

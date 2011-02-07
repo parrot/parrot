@@ -233,7 +233,7 @@ ARGIN(PMC *method))
 
     if (PMC_IS_NULL(cache)) {
         cache = Parrot_pmc_new(interp, enum_class_Hash);
-        Parrot_gc_write_barrier(interp, _class);
+        PARROT_GC_WRITE_BARRIER(interp, _class);
         SETATTR_Class_meth_cache(interp, _class, cache);
     }
 

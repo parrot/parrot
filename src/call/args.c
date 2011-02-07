@@ -1517,7 +1517,7 @@ Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP,
 
         /* Store raw signature */
         GETATTR_CallContext_current_cont(interp, parent, temp);
-        Parrot_gc_write_barrier(interp, tailcall);
+        PARROT_GC_WRITE_BARRIER(interp, tailcall);
         SETATTR_CallContext_current_cont(interp, tailcall, temp);
     }
 }

@@ -442,13 +442,13 @@ Invokes the subroutine.
                     "maximum recursion depth exceeded");
 
         /* and copy set context variables */
-        Parrot_gc_write_barrier(interp, ccont);
+        PARROT_GC_WRITE_BARRIER(interp, ccont);
         PARROT_CONTINUATION(ccont)->from_ctx = context;
 
         /* if this is an outer sub, then we need to set sub->ctx
          * to the new context (refcounted) */
         if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER) {
-            Parrot_gc_write_barrier(interp, _self);
+            PARROT_GC_WRITE_BARRIER(interp, _self);
             sub->ctx = context;
         }
 
@@ -503,7 +503,7 @@ Invokes the subroutine.
                         Parrot_pcc_set_outer_ctx(INTERP, dummy,
                             outer_sub->outer_ctx);
 
-                    Parrot_gc_write_barrier(interp, outer_pmc);
+                    PARROT_GC_WRITE_BARRIER(interp, outer_pmc);
                     outer_sub->ctx = dummy;
                 }
 
