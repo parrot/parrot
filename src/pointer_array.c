@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -143,7 +143,7 @@ Parrot_pa_count_allocated(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 
 /*
 
-=item C<size_t Parrot_pa_count_allocated()>
+=item C<size_t Parrot_pa_count_used(PARROT_INTERP, Parrot_Pointer_Array *self)>
 
 Get count of allocated objects.
 
