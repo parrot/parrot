@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -347,7 +347,7 @@ PARROT_EXPORT
 int
 Parrot_gc_pool_is_maybe_owned(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGMOD(void *ptr))
 {
-    ASSERT_ARGS(Parrot_gc_pool_is_owned)
+    ASSERT_ARGS(Parrot_gc_pool_is_maybe_owned)
     return pool_is_maybe_owned(pool, ptr);
 }
 
@@ -455,7 +455,7 @@ pool_free(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGFREE(void *data))
 static int
 pool_is_maybe_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
 {
-    ASSERT_ARGS(pool_is_owned)
+    ASSERT_ARGS(pool_is_maybe_owned)
     Pool_Allocator_Arena *arena = pool->top_arena;
     size_t                a_size;
 
