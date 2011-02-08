@@ -254,6 +254,10 @@ typedef enum PObj_enum {
 #define PObj_needs_early_gc_SET(o) PObj_flag_SET(needs_early_gc, o)
 #define PObj_needs_early_gc_CLEAR(o) PObj_flag_CLEAR(needs_early_gc, o)
 
+#define PObj_high_priority_gc_TEST(o)   PObj_flag_TEST(high_priority_gc, o)
+#define PObj_high_priority_gc_SET(o)     PObj_flag_SET(high_priority_gc, o)
+#define PObj_high_priority_gc_CLEAR(o) PObj_flag_CLEAR(high_priority_gc, o)
+
 #define PObj_custom_mark_SET(o)   PObj_flag_SET(custom_mark, o)
 #define PObj_custom_mark_CLEAR(o)   PObj_flag_CLEAR(custom_mark, o)
 #define PObj_custom_mark_TEST(o)   PObj_flag_TEST(custom_mark, o)

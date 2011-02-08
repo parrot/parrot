@@ -2,6 +2,14 @@ New in 3.1.0
 - Core
   + Exception PMCs are now subclassable from PIR
   + IPv6 is now supported
+  + Added Parrot_ext_try function to extend API (experimental), to allow
+    implementation of try .. catch construcs in C extensions.
+  + We now have a YAML library called YAML::Tiny, a port of YAML::Tiny from Perl 5
+  + Deprecated/experimental features are now stored in api.yaml in an easy-to-parse
+    format, which will allow automated tools easy access to this data. This replaces
+    DEPRECATED.pod, which no longer exists.
+  + Improved GC latency
+  + Improved GC performance on low-memory systems
 - Languages
 - Community
 - Documentation

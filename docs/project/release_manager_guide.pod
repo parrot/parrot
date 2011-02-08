@@ -352,8 +352,9 @@ following channels (and any others you can think of):
 =item a
 
 Send a text email to parrot-dev, parrot-users, perl6-language, perl6-announce,
-perl5-porters, etc.  You should also include LWN.net in this mailing; email to
-C<lwn> at that domain.
+perl5-porters, etc.  (Note: perl6-internals is no longer in use, so you don't
+need to mail that list.)  You should also include LWN.net in this mailing;
+email to C<lwn> at that domain.
 
 =item b
 

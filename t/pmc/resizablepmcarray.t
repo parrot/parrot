@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -16,12 +16,15 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(142)
+    plan(143)
 
+    init_tests()
     resize_tests()
     negative_array_size()
     set_tests()
@@ -57,6 +60,15 @@ out-of-bounds test. Checks INT and PMC keys.
     push_to_subclasses_array()
 .end
 
+.sub init_negative
+    .local pmc p
+    p = new ['ResizablePMCArray'], -1
+.end
+
+.sub init_tests
+    .const 'Sub' negative = 'init_negative'
+    throws_type(negative, .EXCEPTION_OUT_OF_BOUNDS, 'new with negative size fails')
+.end
 
 .sub resize_tests
     .local pmc p
