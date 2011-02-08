@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -861,6 +861,35 @@ Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)
     return ret;
 }
 
+/*
+
+=item C<PMC * Parrot_pmc_box_c_string_array(PARROT_INTERP, int count, const char
+**s)>
+
+Take a C string array and a count, and box it into a string array PMC
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PMC *
+Parrot_pmc_box_c_string_array(PARROT_INTERP, int count, ARGIN(const char **s))
+{
+    ASSERT_ARGS(Parrot_pmc_box_c_string_array)
+    PMC * const s_pmc = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+
+    if (s != NULL && count > 0) {
+        Parrot_Int i = 0;
+        for (; i < count; ++i) {
+            /* Run through argv, adding everything to the array */
+            STRING * const item = Parrot_str_from_platform_cstring(interp, s[i]);
+            VTABLE_push_string(interp, s_pmc, item);
+        }
+    }
+    return s_pmc;
+}
+
 
 /*
 
@@ -920,7 +949,6 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
     &&  (_class == _class->vtable->pmc_class))
         interp->vtables[type]->pmc_class = _class;
     else {
-        gc_flag_CLEAR(is_special_PMC, _class);
         PObj_is_PMC_shared_CLEAR(_class);
         interp->vtables[type]->pmc_class = _class;
     }

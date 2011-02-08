@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2010, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 Release Instructions
 
@@ -66,7 +66,8 @@ and the master on origin are in sync.
 
 =item 2.
 
-Update files with version-specific information:
+Update files with version-specific information, but before doing this you
+should have parrot configured and have run C<make> with the old version:
 
 =over 4
 
@@ -351,8 +352,9 @@ following channels (and any others you can think of):
 =item a
 
 Send a text email to parrot-dev, parrot-users, perl6-language, perl6-announce,
-perl5-porters, etc.  You should also include LWN.net in this mailing; email to
-C<lwn> at that domain.
+perl5-porters, etc.  (Note: perl6-internals is no longer in use, so you don't
+need to mail that list.)  You should also include LWN.net in this mailing;
+email to C<lwn> at that domain.
 
 =item b
 

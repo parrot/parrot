@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -29,6 +29,23 @@ pmclass ResizableStringArray extends FixedStringArray auto_attrs provides array 
 =head2 Functions
 
 =over 4
+
+=item C<void init_int(INTVAL size)>
+
+Initializes the array.
+
+=cut
+
+*/
+
+    VTABLE void init_int(INTVAL size) {
+        SUPER(size);
+        if (size)
+            SET_ATTR_resize_threshold(INTERP, SELF, size);
+    }
+
+
+/*
 
 =item C<STRING *get_string_keyed_int(INTVAL key)>
 

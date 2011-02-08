@@ -31,7 +31,14 @@
 
 #define ALIGNED_STRING_SIZE(len) (((len) + sizeof (void*) + WORD_ALIGN_1) & WORD_ALIGN_MASK)
 
-#define GC_DYNAMIC_THRESHOLD_DEFAULT 25
+#define PARROT_GC_WRITE_BARRIER(i, p) do { if (PObj_GC_need_write_barrier_TEST((p))) Parrot_gc_write_barrier((i), (p)); } while(0)
+
+typedef struct _Parrot_GC_Init_Args {
+    void *stacktop;
+    const char *system;
+    Parrot_Int dynamic_threshold;
+    Parrot_Int min_threshold;
+} Parrot_GC_Init_Args;
 
 typedef enum _gc_sys_type_enum {
     MS,  /* mark and sweep */
@@ -71,6 +78,7 @@ typedef void (*gc_object_fn_type)(PARROT_INTERP, struct Memory_Pools *, struct F
 
 typedef enum {
     TOTAL_MEM_ALLOC = 1,
+    TOTAL_MEM_USED,
     GC_MARK_RUNS,
     GC_COLLECT_RUNS,
     ACTIVE_PMCS,
@@ -245,7 +253,7 @@ UINTVAL Parrot_gc_impatient_pmcs(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
+void Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -330,11 +338,6 @@ void Parrot_gc_reallocate_string_storage(PARROT_INTERP,
         FUNC_MODIFIES(*str);
 
 PARROT_EXPORT
-void Parrot_gc_set_system_type(PARROT_INTERP, ARGIN(const char *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_gc_sys_name(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -345,6 +348,10 @@ UINTVAL Parrot_gc_total_copied(PARROT_INTERP)
 
 PARROT_EXPORT
 size_t Parrot_gc_total_memory_allocated(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+size_t Parrot_gc_total_memory_used(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -444,7 +451,7 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_initialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(stacktop))
+    , PARROT_ASSERT_ARG(args))
 #define ASSERT_ARGS_Parrot_gc_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_mark_PMC_alive_fun __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -483,15 +490,14 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
-#define ASSERT_ARGS_Parrot_gc_set_system_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_Parrot_gc_sys_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_total_copied __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_total_memory_allocated \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_gc_total_memory_used __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_total_pmcs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

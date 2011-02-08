@@ -48,6 +48,9 @@ sub runstep {
     if ($ENV{'MACOSX_DEPLOYMENT_TARGET'} eq '10.6') {
         $flagsref->{ccflags} .= ' -pipe -fno-common ';
     }
+    elsif ($ENV{'MACOSX_DEPLOYMENT_TARGET'} eq '10.5') {
+        $flagsref->{ccflags} .= ' -pipe -fno-common ';
+    }
     else {
         $flagsref->{ccflags} .= ' -pipe -fno-common -Wno-long-double ';
     }

@@ -282,9 +282,9 @@
 /runtime/parrot/library/Tcl/*.pbc
 /runtime/parrot/library/Test/*.pbc
 /runtime/parrot/library/Test/Builder/*.pbc
-
 /runtime/parrot/library/URI/*.pbc
 /runtime/parrot/library/YAML/*.pbc
+/runtime/parrot/library/YAML/Tiny.pir
 /runtime/parrot/library/YAML/Dumper/*.pbc
 /runtime/parrot/library/YAML/Parser/*.pbc
 /src/*.o
@@ -441,7 +441,7 @@
 /t/pmc/*.pir
 /t/pmc/*_pbcexe*
 /t/pmc/testlib/*.pbc
-/t/src/*_*
+/t/src/*_*.c
 /t/src/*.gcov
 /t/src/*.gcdada
 /t/src/embed/*.c

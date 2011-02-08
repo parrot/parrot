@@ -125,20 +125,25 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
     ASSERT_ARGS(Parrot_api_make_interpreter)
     int alt_stacktop;
     Parrot_Interp interp_raw;
+    Parrot_GC_Init_Args gc_args;
     void *stacktop_ptr = &alt_stacktop;
     const Parrot_Interp parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
     interp_raw = allocate_interpreter(parent_raw, flags);
     if (args) {
-        if (args->stacktop)
-            stacktop_ptr = args->stacktop;
-        if (args->gc_system)
-            Parrot_gc_set_system_type(interp_raw, args->gc_system);
-        if (args->gc_threshold)
-            interp_raw->gc_threshold = args->gc_threshold;
+        gc_args.stacktop          = args->stacktop
+                                  ? args->stacktop : &alt_stacktop;
+        gc_args.system            = args->gc_system;
+        gc_args.dynamic_threshold = args->gc_dynamic_threshold;
+        gc_args.min_threshold     = args->gc_min_threshold;
+
         if (args->hash_seed)
             interp_raw->hash_seed = args->hash_seed;
     }
-    initialize_interpreter(interp_raw, stacktop_ptr);
+    else {
+        memset(&gc_args, 0, sizeof (Parrot_GC_Init_Args));
+        gc_args.stacktop = &alt_stacktop;
+    }
+    initialize_interpreter(interp_raw, &gc_args);
     *interp = VTABLE_get_pmc_keyed_int(
             interp_raw, interp_raw->iglobals, (Parrot_Int)IGLOBALS_INTERPRETER);
     return !PMC_IS_NULL(*interp);
@@ -365,7 +370,7 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
 
     if (!PackFile_unpack(interp, pf, (const opcode_t *)pbc, bytecode_size))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "could not unpack packfile");
+            "Could not unpack packfile");
     do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
     *pbcpmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, *pbcpmc, pf);
@@ -435,8 +440,6 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
 {
     ASSERT_ARGS(Parrot_api_run_bytecode)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PMC * main_sub = NULL;
-
     PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
 
     /* Debugging mode nonsense. */
@@ -448,21 +451,9 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile.");
-    if (pf->cur_cs)
-        Parrot_pf_set_current_packfile(interp, pf);
-    PackFile_fixup_subs(interp, PBC_MAIN, NULL);
-    main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
-
-    /* if no sub was marked being :main, we create a dummy sub with offset 0 */
-
-    if (!main_sub)
-        main_sub = set_current_sub(interp);
-
-    Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), NULL);
-    Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
-
-    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, mainargs);
-    Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", mainargs);
+    if (!mainargs)
+        mainargs = PMCNULL;
+    Parrot_pf_execute_bytecode_program(interp, pf, mainargs);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -877,6 +868,19 @@ Parrot_api_toggle_gc(Parrot_PMC interp_pmc, Parrot_Int on)
         Parrot_block_GC_mark(interp);
         Parrot_block_GC_sweep(interp);
     }
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+PARROT_API
+Parrot_Int
+Parrot_api_reset_call_signature(Parrot_PMC interp_pmc, Parrot_PMC ctx)
+{
+    EMBED_API_CALLIN(interp_pmc, interp)
+    STRING * const callcontext = Parrot_str_new(interp, "CallContext", 0);
+    if (!VTABLE_isa(interp, ctx, callcontext))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Not a valid CallContext");
+    VTABLE_morph(interp, ctx, PMCNULL);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 

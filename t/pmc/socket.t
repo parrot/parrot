@@ -133,8 +133,8 @@ stack, so we don't need to check if this parrot is IPv6-aware.
 
 .sub test_server
     .local pmc interp, conf, server, sock, address, result
-    .local string command, str
-    .local int status
+    .local string command, str, part
+    .local int status, port
 
     interp = getinterp
     conf = interp[.IGLOBALS_CONFIG_HASH]
@@ -153,12 +153,15 @@ stack, so we don't need to check if this parrot is IPv6-aware.
     server = new 'FileHandle'
     server.'open'(command, 'rp')
     str = server.'readline'()
-    is(str, "Server started\n", 'Server process started')
+    part = substr str, 0, 34
+    is(part, 'Server started, listening on port ', 'Server process started')
+    part = substr str, 34, 4
+    port = part
 
     sock = new 'Socket'
     result = sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
     ok(result, 'socket')
-    address = sock.'sockaddr'('localhost', 1234)
+    address = sock.'sockaddr'('localhost', port)
     sock.'connect'(address)
     status = sock.'send'('test message')
     is(status, '12', 'send')

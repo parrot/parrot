@@ -536,17 +536,7 @@ Parrot_api_pmc_wrap_string_array(ARGIN(Parrot_PMC interp_pmc), Parrot_Int argc,
 {
     ASSERT_ARGS(Parrot_api_pmc_wrap_string_array)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PMC * const userargv = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
-
-    if (argv != NULL && argc > 0) {
-        Parrot_Int i = 0;
-        for (; i < argc; ++i) {
-            /* Run through argv, adding everything to the array */
-            STRING * const arg = Parrot_str_from_platform_cstring(interp, argv[i]);
-            VTABLE_push_string(interp, userargv, arg);
-        }
-    }
-    *args = userargv;
+    *args = Parrot_pmc_box_c_string_array(interp, argc, argv);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
