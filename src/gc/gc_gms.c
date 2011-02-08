@@ -124,20 +124,16 @@ typedef struct string_alloc_struct {
 
 
 /* Get generation from PObj->flags */
-#define POBJ2GEN(pobj)                                          \
-    (                                                           \
-        (((pobj)->flags & PObj_GC_generation_0_FLAG) ? 1 : 0)   \
-        + (((pobj)->flags) & PObj_GC_generation_1_FLAG ? 2 : 0) \
-        + (((pobj)->flags) & PObj_GC_generation_2_FLAG ? 4 : 0) \
-    )
+#define POBJ2GEN(pobj)                                            \
+        ((((pobj)->flags & PObj_GC_generation_0_FLAG) ? 1 : 0)    \
+         + (((pobj)->flags) & PObj_GC_generation_1_FLAG ? 2 : 0)  \
+         + (((pobj)->flags) & PObj_GC_generation_2_FLAG ? 4 : 0))
 
 /* Get flags for generation number */
 #define GEN2FLAGS(gen)                                  \
-    (                                                   \
-        ((gen) & 1 ? PObj_GC_generation_0_FLAG : 0)     \
-        | ((gen) & 2 ? PObj_GC_generation_1_FLAG : 0)   \
-        | ((gen) & 4 ? PObj_GC_generation_2_FLAG : 0)   \
-    )
+        (((gen) & 1 ? PObj_GC_generation_0_FLAG : 0)    \
+         | ((gen) & 2 ? PObj_GC_generation_1_FLAG : 0)  \
+         | ((gen) & 4 ? PObj_GC_generation_2_FLAG : 0))
 
 /* Private information */
 typedef struct MarkSweep_GC {
