@@ -4249,7 +4249,7 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
             "\"load_bytecode\" no file name");
 
-    /* Block GC, see TT #1190 */
+    /* Block GC, see TT #1990 */
     Parrot_block_GC_mark(interp);
 
     parrot_split_path_ext(interp, file_str, &wo_ext, &ext);
