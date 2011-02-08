@@ -137,7 +137,7 @@ Get count of allocated objects.
 size_t
 Parrot_pa_count_allocated(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 {
-    ASSERT_ARGS(Parrot_pa_count_allocated)
+    ASSERT_ARGS(Parrot_pa_count_used)
     return self->total_chunks * CELL_PER_CHUNK;
 }
 
