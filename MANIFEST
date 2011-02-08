@@ -1000,7 +1000,6 @@ lib/Parrot/Pmc2c/Emitter.pm                                 [devel]lib
 lib/Parrot/Pmc2c/Library.pm                                 [devel]lib
 lib/Parrot/Pmc2c/MULTI.pm                                   [devel]lib
 lib/Parrot/Pmc2c/Method.pm                                  [devel]lib
-lib/Parrot/Pmc2c/MethodEmitter.pm                           [devel]lib
 lib/Parrot/Pmc2c/Object.pm                                  [devel]lib
 lib/Parrot/Pmc2c/PCCMETHOD.pm                               [devel]lib
 lib/Parrot/Pmc2c/PMC.pm                                     [devel]lib
