@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2010, Parrot Foundation.
+Copyright (C) 2009-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -825,6 +825,8 @@ PARROT_EXPORT
 void
 Parrot_pcc_set_context_func(PARROT_INTERP, ARGIN(PMC *ctx))
 {
+    ASSERT_ARGS(Parrot_pcc_set_context_func)
+
     set_context(interp, ctx);
 }
 
@@ -841,6 +843,8 @@ Helper function to set breakpoint to.
 static void
 set_context(PARROT_INTERP, ARGIN(PMC *ctx))
 {
+    ASSERT_ARGS(set_context)
+
     CURRENT_CONTEXT(interp) = ctx;
 }
 
