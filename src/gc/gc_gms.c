@@ -848,6 +848,7 @@ Select how many generations we do want to collect.
 static size_t
 gc_gms_select_generation_to_collect(PARROT_INTERP)
 {
+    ASSERT_ARGS(gc_gms_select_generation_to_collect)
     /* TODO Use less naive approach. E.g. count amount of allocated memory in
      * older generations */
     size_t runs = interp->gc_sys->stats.gc_mark_runs;
@@ -891,6 +892,8 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
         ARGIN(Parrot_Pointer_Array *dirty_list),
         size_t gen)
 {
+    ASSERT_ARGS(gc_gms_cleanup_dirty_list)
+
     /* Override with special version of mark */
     interp->gc_sys->mark_pmc_header = gc_gms_get_youngest_generation;
 
@@ -935,6 +938,8 @@ gc_gms_process_dirty_list(PARROT_INTERP,
         ARGIN(MarkSweep_GC *self),
         ARGIN(Parrot_Pointer_Array *dirty_list))
 {
+    ASSERT_ARGS(gc_gms_process_dirty_list)
+
     POINTER_ARRAY_ITER(dirty_list,
         PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
 
@@ -960,6 +965,8 @@ gc_gms_process_work_list(PARROT_INTERP,
         ARGIN(MarkSweep_GC *self),
         ARGIN(Parrot_Pointer_Array *work_list))
 {
+    ASSERT_ARGS(gc_gms_process_work_list)
+
     POINTER_ARRAY_ITER(work_list,
         PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
 
@@ -2138,6 +2145,8 @@ Validation routines
 static void
 gc_gms_validate_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
+    ASSERT_ARGS(gc_gms_validate_pmc)
+
     PARROT_ASSERT(!PObj_on_free_list_TEST(pmc));
 
     if (PObj_live_TEST(pmc))
@@ -2153,12 +2162,16 @@ gc_gms_validate_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 static void
 gc_gms_validate_str(PARROT_INTERP, ARGIN(STRING *str))
 {
+    ASSERT_ARGS(gc_gms_validate_str)
+
     PARROT_ASSERT(!PObj_on_free_list_TEST(str));
 }
 
 static void
 gc_gms_validate_objects(PARROT_INTERP)
 {
+    ASSERT_ARGS(gc_gms_validate_objects)
+
     INTVAL i;
 #ifndef NDEBUG
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
@@ -2190,6 +2203,8 @@ dirty_list.
 static void
 gc_gms_get_youngest_generation(PARROT_INTERP, ARGIN(PMC *pmc))
 {
+    ASSERT_ARGS(gc_gms_get_youngest_generation)
+
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            gen  = POBJ2GEN(pmc);
 
