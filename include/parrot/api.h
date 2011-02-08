@@ -185,6 +185,11 @@ Parrot_Int Parrot_api_ready_bytecode(
         FUNC_MODIFIES(*main_sub);
 
 PARROT_API
+Parrot_Int Parrot_api_reset_call_signature(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC ctx);
+
+PARROT_API
 Parrot_Int Parrot_api_run_bytecode(
     Parrot_PMC interp_pmc,
     Parrot_PMC pbc,
@@ -282,6 +287,8 @@ Parrot_Int Parrot_api_wrap_imcc_hack(
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_api_ready_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(main_sub))
+#define ASSERT_ARGS_Parrot_api_reset_call_signature \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_run_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_serialize_bytecode_pmc \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
