@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -29,7 +28,7 @@ Corollary: objects in "dirty_list" either:
 
 (Proof is very simple and left as exercise for reader)
 
-Notation 
+Notation
 1. "*A1:B2" is a live object A in generation 1 referenced by an object B in generation 2.
 2. "B0" is a non-live object B in generation 0 not referenced by anything.
 3. gn: generation n.
@@ -2223,5 +2222,5 @@ gen2flags(int gen)
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
