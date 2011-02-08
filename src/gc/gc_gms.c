@@ -435,6 +435,10 @@ static void gc_gms_validate_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void gc_gms_validate_str(PARROT_INTERP, ARGIN(STRING *str))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -589,6 +593,9 @@ static int pobj2gen(ARGIN(PObj *pmc))
 #define ASSERT_ARGS_gc_gms_validate_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_gc_gms_validate_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_gc_gms_write_barrier __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))

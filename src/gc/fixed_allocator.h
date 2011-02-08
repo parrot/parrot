@@ -167,6 +167,9 @@ Pool_Allocator * Parrot_gc_pool_new(SHIM_INTERP, size_t object_size);
 #define ASSERT_ARGS_Parrot_gc_pool_free __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pool))
+#define ASSERT_ARGS_Parrot_gc_pool_is_maybe_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pool) \
+    , PARROT_ASSERT_ARG(ptr))
 #define ASSERT_ARGS_Parrot_gc_pool_is_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(ptr))
