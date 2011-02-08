@@ -945,6 +945,16 @@ gc_gms_process_dirty_list(PARROT_INTERP,
             Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc)););
 }
 
+/*
+
+=item C<static void gc_gms_process_work_list(PARROT_INTERP, MarkSweep_GC *self,
+Parrot_Pointer_Array *work_list)>
+
+Process work list moving objects back to own generation
+
+=cut
+
+*/
 static void
 gc_gms_process_work_list(PARROT_INTERP,
         ARGIN(MarkSweep_GC *self),
@@ -2112,6 +2122,19 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
 
 }
 
+/*
+
+=item C<static void gc_gms_validate_pmc(PARROT_INTERP, PMC *pmc)>
+
+=item C<static void gc_gms_validate_str(PARROT_INTERP, STRING *str)>
+
+=item C<static void gc_gms_validate_objects(PARROT_INTERP)>
+
+Validation routines
+
+=cut
+
+*/
 static void
 gc_gms_validate_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
