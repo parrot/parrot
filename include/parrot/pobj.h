@@ -1,5 +1,5 @@
 /* pobj.h
- *  Copyright (C) 2001-2005, Parrot Foundation.
+ *  Copyright (C) 2001-2011, Parrot Foundation.
  *  Overview:
  *     Parrot Object data members and flags enum
  *  Data Structure and Algorithms:
@@ -186,7 +186,7 @@ typedef enum PObj_enum {
     /* True if the PMC is a class */
     PObj_is_class_FLAG          = POBJ_FLAG(29),
     /* True if the PMC is a parrot object */
-    PObj_is_object_FLAG         = POBJ_FLAG(30),
+    PObj_is_object_FLAG         = POBJ_FLAG(30)
 
 } PObj_flags;
 #undef POBJ_FLAG
