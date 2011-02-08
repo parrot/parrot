@@ -28,7 +28,6 @@ use Storable ();
 use Parrot::PMC;
 use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::Method ();
-use Parrot::Pmc2c::MethodEmitter ();
 use Parrot::Pmc2c::UtilFunctions qw(
     dont_edit
     dynext_load_code
