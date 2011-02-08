@@ -822,8 +822,9 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
 
     /* Update some stats */
-    interp->gc_sys->stats.header_allocs_since_last_collect = 0;
-    interp->gc_sys->stats.mem_used_last_collect            = 0;
+    interp->gc_sys->stats.header_allocs_since_last_collect  = 0;
+    interp->gc_sys->stats.mem_used_last_collect             = 0;
+
     self->gc_mark_block_level--;
 
     /* We swept all dead objects */
@@ -1215,6 +1216,7 @@ gc_gms_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
                         self->fixed_size_allocator, attr_size);
     memset(PMC_data(pmc), 0, attr_size);
 
+    interp->gc_sys->stats.memory_used           += attr_size;
     interp->gc_sys->stats.mem_used_last_collect += attr_size;
 
     return PMC_data(pmc);
@@ -1229,6 +1231,7 @@ gc_gms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
         Parrot_gc_fixed_allocator_free(interp, self->fixed_size_allocator,
                 PMC_data(pmc), pmc->vtable->attr_size);
 
+        interp->gc_sys->stats.memory_used           -= pmc->vtable->attr_size;
         interp->gc_sys->stats.mem_used_last_collect -= pmc->vtable->attr_size;
     }
 }
@@ -1240,7 +1243,7 @@ gc_gms_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
     ASSERT_ARGS(gc_gms_allocate_fixed_size_storage)
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
-    interp->gc_sys->stats.memory_allocated      += size;
+    interp->gc_sys->stats.memory_used           += size;
     interp->gc_sys->stats.mem_used_last_collect += size;
 
     return Parrot_gc_fixed_allocator_allocate(interp, self->fixed_size_allocator, size);
@@ -1253,7 +1256,7 @@ gc_gms_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
     if (data) {
         MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
-        interp->gc_sys->stats.memory_allocated      -= size;
+        interp->gc_sys->stats.memory_used           -= size;
         interp->gc_sys->stats.mem_used_last_collect -= size;
 
         Parrot_gc_fixed_allocator_free(interp, self->fixed_size_allocator, data, size);
@@ -1341,7 +1344,7 @@ gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
     /* Increase used memory. Not precisely accurate due Pool_Allocator paging */
     ++interp->gc_sys->stats.header_allocs_since_last_collect;
 
-    interp->gc_sys->stats.memory_allocated      += sizeof (PMC);
+    interp->gc_sys->stats.memory_used           += sizeof (PMC);
     interp->gc_sys->stats.mem_used_last_collect += sizeof (PMC);
 
     item         = (pmc_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
@@ -1373,7 +1376,7 @@ gc_gms_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
         Parrot_gc_pool_free(interp, self->pmc_allocator, PMC2PAC(pmc));
 
         --interp->gc_sys->stats.header_allocs_since_last_collect;
-        interp->gc_sys->stats.memory_allocated      -= sizeof (PMC);
+        interp->gc_sys->stats.memory_used           -= sizeof (PMC);
         interp->gc_sys->stats.mem_used_last_collect -= sizeof (PMC);
     }
 }
@@ -1450,7 +1453,7 @@ gc_gms_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
 
     /* Increase used memory. Not precisely accurate due Pool_Allocator paging */
     ++interp->gc_sys->stats.header_allocs_since_last_collect;
-    interp->gc_sys->stats.memory_allocated      += sizeof (STRING);
+    interp->gc_sys->stats.memory_used           += sizeof (STRING);
     interp->gc_sys->stats.mem_used_last_collect += sizeof (STRING);
 
     item = (string_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
@@ -1483,7 +1486,7 @@ gc_gms_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
         Parrot_gc_pool_free(interp, self->string_allocator, STR2PAC(s));
 
         --interp->gc_sys->stats.header_allocs_since_last_collect;
-        interp->gc_sys->stats.memory_allocated      -= sizeof (STRING);
+        interp->gc_sys->stats.memory_used           -= sizeof (STRING);
         interp->gc_sys->stats.mem_used_last_collect -= sizeof (STRING);
     }
 }
@@ -1552,6 +1555,7 @@ gc_gms_allocate_string_storage(PARROT_INTERP, ARGIN(STRING *str), size_t size)
     ASSERT_ARGS(gc_gms_allocate_string_storage)
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Parrot_gc_str_allocate_string_storage(interp, &self->string_gc, str, size);
+    interp->gc_sys->stats.memory_used           += size;
     interp->gc_sys->stats.mem_used_last_collect += size;
 }
 
@@ -1561,6 +1565,7 @@ gc_gms_reallocate_string_storage(PARROT_INTERP, ARGIN(STRING *str), size_t size)
     ASSERT_ARGS(gc_gms_reallocate_string_storage)
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Parrot_gc_str_reallocate_string_storage(interp, &self->string_gc, str, size);
+    interp->gc_sys->stats.memory_used           += size;
     interp->gc_sys->stats.mem_used_last_collect += size;
 }
 
@@ -1570,6 +1575,7 @@ gc_gms_allocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
     ASSERT_ARGS(gc_gms_allocate_buffer_storage)
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Parrot_gc_str_allocate_buffer_storage(interp, &self->string_gc, str, size);
+    interp->gc_sys->stats.memory_used           += size;
     interp->gc_sys->stats.mem_used_last_collect += size;
 }
 
@@ -1579,6 +1585,7 @@ gc_gms_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
     ASSERT_ARGS(gc_gms_reallocate_buffer_storage)
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Parrot_gc_str_reallocate_buffer_storage(interp, &self->string_gc, str, size);
+    interp->gc_sys->stats.memory_used           += size;
     interp->gc_sys->stats.mem_used_last_collect += size;
 }
 
@@ -1893,7 +1900,7 @@ gc_gms_maybe_mark_and_sweep(PARROT_INTERP)
 
     MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
-    /* Collect every 256M. Hardcode for now. Will be configured via CLI */
+    /* Collect every gc_threshold. */
     if (interp->gc_sys->stats.mem_used_last_collect > self->gc_threshold) {
         gc_gms_mark_and_sweep(interp, 0);
     }
