@@ -1059,6 +1059,9 @@ Parrot_gc_sys_name(PARROT_INTERP)
         case MS2:
             name = Parrot_str_new(interp, "ms2", 3);
             break;
+        case GMS:
+            name = Parrot_str_new(interp, "gms", 3);
+            break;
         default:
             name = Parrot_str_new(interp, "unknown", 7);
             break;
