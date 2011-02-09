@@ -48,7 +48,16 @@ TT1465 - http://trac.parrot.org/parrot/ticket/1465 .
 
     $I1 = interpinfo.INTERPINFO_GC_COLLECT_RUNS
     $I2 = interpinfo.INTERPINFO_GC_MARK_RUNS
+    $S0 = interpinfo .INTERPINFO_GC_SYS_NAME
+    if $S0 == "gms" goto last_alloc
+
     $I3 = interpinfo.INTERPINFO_TOTAL_MEM_ALLOC
+    goto test
+
+  last_alloc:
+    $I3 = interpinfo.INTERPINFO_MEM_ALLOCS_SINCE_COLLECT
+
+  test:
 
     $S1 = $I1
     $S0 = "performed " . $S1

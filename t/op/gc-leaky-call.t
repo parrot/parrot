@@ -25,6 +25,8 @@ function calls.
     $S0 = interpinfo .INTERPINFO_GC_SYS_NAME
     if $S0 == "inf" goto dont_run_hanging_tests
 
+    diag($S0)
+
     plan(3)
     test_gc_mark_sweep()
 
@@ -45,8 +47,17 @@ function calls.
 
     $I1 = interpinfo.INTERPINFO_GC_COLLECT_RUNS
     $I2 = interpinfo.INTERPINFO_GC_MARK_RUNS
-    $I3 = interpinfo.INTERPINFO_TOTAL_MEM_ALLOC
 
+    $S0 = interpinfo .INTERPINFO_GC_SYS_NAME
+    if $S0 == "gms" goto last_alloc
+
+    $I3 = interpinfo.INTERPINFO_TOTAL_MEM_ALLOC
+    goto test
+
+  last_alloc:
+    $I3 = interpinfo.INTERPINFO_MEM_ALLOCS_SINCE_COLLECT
+
+  test:
     $S1 = $I1
     $S0 = "performed " . $S1
     $S0 .= " (which should be >=1) GC collect runs"
