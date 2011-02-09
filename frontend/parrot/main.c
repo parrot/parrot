@@ -23,6 +23,7 @@ Start Parrot
 #include <ctype.h>
 #include "parrot/longopt.h"
 #include "parrot/api.h"
+#include "imcc/api.h"
 
 struct init_args_t {
     const char *run_core_name;
@@ -43,26 +44,6 @@ extern int Parrot_set_config_hash(Parrot_PMC interp_pmc);
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_CANNOT_RETURN_NULL
-static PMC * compile_file(
-    Parrot_PMC interp,
-    Parrot_PMC compiler,
-    Parrot_String file);
-
-PARROT_CANNOT_RETURN_NULL
-static PMC * get_class_pmc(Parrot_PMC interp, ARGIN(const char *name))
-        __attribute__nonnull__(2);
-
-PARROT_CANNOT_RETURN_NULL
-static PMC * get_imcc_compiler_pmc(
-    Parrot_PMC interp,
-    Parrot_PMC class_pmc,
-    Parrot_Int is_pasm);
-
-PARROT_CANNOT_RETURN_NULL
-static PMC * get_signature_pmc(Parrot_PMC interp, ARGIN(const char *sig))
-        __attribute__nonnull__(2);
 
 static void help(void);
 static void help_debug(void);
@@ -114,12 +95,6 @@ static void parseflags_minimal(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(* initargs);
 
-PARROT_CANNOT_RETURN_NULL
-static void preprocess_file(
-    Parrot_PMC interp,
-    Parrot_PMC compiler,
-    Parrot_String file);
-
 static void print_parrot_string(
     Parrot_PMC interp,
     ARGMOD(FILE *vector),
@@ -149,12 +124,6 @@ static void write_bytecode_file(
     Parrot_String filename,
     Parrot_PMC pbc);
 
-#define ASSERT_ARGS_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_get_class_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_get_imcc_compiler_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_get_signature_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(sig))
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_help_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_is_all_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -175,7 +144,6 @@ static void write_bytecode_file(
 #define ASSERT_ARGS_parseflags_minimal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(initargs) \
     , PARROT_ASSERT_ARG(argv))
-#define ASSERT_ARGS_preprocess_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_print_parrot_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(vector))
 #define ASSERT_ARGS_run_imcc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -252,7 +220,7 @@ main(int argc, const char *argv[])
 
     /* -o outputs the file. -r outputs it and reads it in again from .pbc */
     if (parsed_flags.write_packfile) {
-        if (!Parrot_api_write_bytecode_to_file(interp, bytecodepmc, output_str));
+        if (!Parrot_api_write_bytecode_to_file(interp, bytecodepmc, output_str))
             show_last_error_and_exit(interp);
         if (parsed_flags.execute_packfile)
             bytecodepmc = load_bytecode_file(interp, output_str);
@@ -284,8 +252,10 @@ static PMC *
 run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *flags))
 {
     ASSERT_ARGS(run_imcc)
-    Parrot_PMC pir_compiler = imcc_get_pir_compreg_api(interp, 1);
-    Parrot_PMC pasm_compiler = imcc_get_pasm_compreg_api(interp, 1);
+    /* TODO: Handle the error condition */
+    Parrot_PMC error = NULL;
+    Parrot_PMC pir_compiler = imcc_get_pir_compreg_api(interp, 1, &error);
+    Parrot_PMC pasm_compiler = imcc_get_pasm_compreg_api(interp, 1, &error);
 
     if (flags->preprocess_only) {
         imcc_preprocess_file_api(interp, pir_compiler, sourcefile);
@@ -294,7 +264,7 @@ run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *
     else {
         const Parrot_Int pasm_mode = flags->have_pasm_file;
         Parrot_PMC compiler = pasm_mode ? pasm_compiler : pir_compiler;
-        return imcc_compile_file_api(interp, compiler, sourcefile);
+        return imcc_compile_file_api(interp, compiler, sourcefile, &error);
     }
 }
 
@@ -314,11 +284,12 @@ static PMC *
 load_bytecode_file(Parrot_PMC interp, Parrot_String filename)
 {
     ASSERT_ARGS(load_bytecode_file)
-    PMC * bytecode = NULL;
+    Parrot_PMC bytecode = NULL;
+    Parrot_PMC error = NULL;
 
     /* set up all the compregs */
-    Parrot_PMC pir_compiler = imcc_get_pir_compreg_api(interp, 1);
-    Parrot_PMC pasm_compiler = imcc_get_pasm_compreg_api(interp, 1);
+    Parrot_PMC pir_compiler = imcc_get_pir_compreg_api(interp, 1, &error);
+    Parrot_PMC pasm_compiler = imcc_get_pasm_compreg_api(interp, 1, &error);
 
     if (!Parrot_api_load_bytecode_file(interp, filename, &bytecode))
         show_last_error_and_exit(interp);

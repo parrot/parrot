@@ -96,10 +96,6 @@ imc_info_t * imcc_new(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-imc_info_t * imcc_new_pmc(PMC * interp_pmc);
-
-PARROT_EXPORT
 void imcc_preprocess(
     ARGMOD(imc_info_t *imcc),
     ARGIN(STRING * const sourcefile))
@@ -177,7 +173,6 @@ yyscan_t imcc_get_scanner(ARGMOD(imc_info_t *imcc))
        PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_imcc_new_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_imcc_preprocess __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(sourcefile))

@@ -1,0 +1,46 @@
+
+#ifndef PARROT_IMCC_API_H_GUARD
+#define PARROT_IMCC_API_H_GUARD
+
+#include "parrot/api.h"
+
+/* HEADERIZER BEGIN: compilers/imcc/api.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC * imcc_compile_file_api(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC compiler,
+    Parrot_String file,
+    Parrot_PMC *error);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC * imcc_get_pasm_compreg_api(
+    Parrot_PMC interp_pmc,
+    int add_compreg,
+    Parrot_PMC *err);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC * imcc_get_pir_compreg_api(
+    Parrot_PMC interp_pmc,
+    int add_compreg,
+    Parrot_PMC *err);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+void imcc_preprocess_file_api(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC compiler,
+    Parrot_String file);
+
+#define ASSERT_ARGS_imcc_compile_file_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_imcc_get_pasm_compreg_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_imcc_get_pir_compreg_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_imcc_preprocess_file_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: compilers/imcc/api.c */
+
+#endif /* PARROT_IMCC_API_H_GUARD */

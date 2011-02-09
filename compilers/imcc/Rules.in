@@ -1,3 +1,8 @@
+compilers/imcc/api$(O) : \
+    compilers/imcc/api.c \
+    include/imcc/api.h \
+    $(PARROT_H_HEADERS)
+
 compilers/imcc/pcc$(O) : \
     compilers/imcc/pcc.c \
     compilers/imcc/cfg.h \
