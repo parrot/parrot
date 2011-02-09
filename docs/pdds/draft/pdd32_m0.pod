@@ -1,0 +1,76 @@
+# Copyright (C) 2001-2010, Parrot Foundation.
+
+=head1 PDD 32: M0 Design Spec
+
+=head2 Abstract
+
+This document specifies M0, the set of microcode-like ops on which Parrot will
+be based, and their requisite runtime environment.
+
+=head2 Introduction
+
+Insert introduction here.
+
+=head2 Definitions
+
+define things here (M0, mop/6model)
+
+=head2 Design Goals
+
+Insert design goals here.
+
+=head2 Scope of this PDD
+
+list things that will/won't be covered
+
+=head2 List of Ops
+
+Insert list of ops here.
+
+=head2 metadata
+
+describe metadata here
+
+=head2 Op Composition
+
+if m0 needs to support this, describe it here
+
+=head2 structs
+
+describe structs here, if they're relevant to m0
+
+=head2 Binary instruction format
+
+describe this here
+
+=head2 Types
+
+Describe the types here (INPS, S being an alias for P)
+
+=head2 Backends
+
+Describe what kind of backends are supported and what's needed from them.
+
+=head2 MOP interaction
+
+describe this here
+
+=head2 FFI
+
+describe this here
+
+
+=head2 Interp Structure
+
+Describe interp structure here.  mostly relevant to Lorito.
+
+
+
+
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
