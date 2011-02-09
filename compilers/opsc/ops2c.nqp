@@ -131,6 +131,13 @@ sub MAIN() {
         $emitter.print_c_header_files();
         $emitter.print_c_source_file();
     }
+
+    Q:PIR {
+        .include 'interpinfo.pasm'
+        $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS
+        print "GC runs: "
+        say $I2
+    }
 }
 
 # vim: expandtab shiftwidth=4 ft=perl6:

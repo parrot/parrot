@@ -135,6 +135,8 @@ typedef struct string_alloc_struct {
          | ((gen) & 2 ? PObj_GC_generation_1_FLAG : 0)  \
          | ((gen) & 4 ? PObj_GC_generation_2_FLAG : 0))
 
+#define SET_GEN_FLAGS(pmc, gen) PObj_flags_SETTO((pmc), ((pmc)->flags & ~PObj_GC_all_generation_FLAGS) | GEN2FLAGS(gen))
+
 /* Private information */
 typedef struct MarkSweep_GC {
     /* Allocator for PMC headers */
@@ -1035,7 +1037,7 @@ gc_gms_sweep_pools(PARROT_INTERP,
                 if (move_to_old) {
                     Parrot_pa_remove(interp, self->objects[i], item->ptr);
                     item->ptr = Parrot_pa_insert(interp, self->objects[i + 1], item);
-                    gc_gms_set_gen_flags(interp, pmc, i + 1);
+                    SET_GEN_FLAGS(pmc, i + 1);
                     gc_gms_seal_object(interp, pmc);
                 }
             }
@@ -1070,7 +1072,7 @@ gc_gms_sweep_pools(PARROT_INTERP,
                 if (move_to_old) {
                     Parrot_pa_remove(interp, self->strings[i], item->ptr);
                     item->ptr = Parrot_pa_insert(interp, self->strings[i + 1], item);
-                    gc_gms_set_gen_flags(interp, str, i + 1);
+                    SET_GEN_FLAGS(str, i + 1);
                 }
             }
 
