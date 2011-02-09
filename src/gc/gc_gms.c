@@ -234,7 +234,8 @@ static PMC* gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static STRING* gc_gms_allocate_string_header(PARROT_INTERP, UINTVAL flags)
+static STRING* gc_gms_allocate_string_header(PARROT_INTERP,
+    SHIM(UINTVAL flags))
         __attribute__nonnull__(1);
 
 static void gc_gms_allocate_string_storage(PARROT_INTERP,
@@ -403,10 +404,6 @@ static void gc_gms_seal_object(PARROT_INTERP, ARGIN(PMC *pmc))
 static size_t gc_gms_select_generation_to_collect(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void gc_gms_set_gen_flags(PARROT_INTERP, ARGIN(PMC *pmc), int gen)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void gc_gms_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -570,9 +567,6 @@ static int pobj2gen(ARGIN(PObj *pmc))
 #define ASSERT_ARGS_gc_gms_select_generation_to_collect \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_gms_set_gen_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_sweep_pmc_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj))
@@ -2029,20 +2023,6 @@ gc_gms_unseal_object(PARROT_INTERP, ARGIN(PMC *pmc))
     ASSERT_ARGS(gc_gms_unseal_object)
     /* "Unseal" object with write barrier */
     PObj_GC_need_write_barrier_CLEAR(pmc);
-}
-
-/*
-=item C<static void gc_gms_set_gen_flags(PARROT_INTERP, PMC *pmc, int gen)>
-
-Set flags for generation.
-
-=cut
-*/
-static void
-gc_gms_set_gen_flags(PARROT_INTERP, ARGIN(PMC *pmc), int gen)
-{
-    ASSERT_ARGS(gc_gms_set_gen_flags)
-    PObj_flags_SETTO(pmc, (pmc->flags & ~PObj_GC_all_generation_FLAGS) | GEN2FLAGS(gen));
 }
 
 /*
