@@ -1038,7 +1038,7 @@ gc_gms_sweep_pools(PARROT_INTERP,
             PARROT_ASSERT(PObj_constant_TEST(pmc) || POBJ2GEN(pmc) == i);
 
             /* Paint live objects white */
-            if (PObj_live_TEST(pmc)) {
+            if (PObj_live_TEST(pmc) || PObj_constant_TEST(pmc)) {
                 PObj_live_CLEAR(pmc);
 
                 if (move_to_old) {
@@ -1074,7 +1074,7 @@ gc_gms_sweep_pools(PARROT_INTERP,
             PARROT_ASSERT(!PObj_on_free_list_TEST(str));
 
             /* Paint live objects white */
-            if (PObj_live_TEST(str)) {
+            if (PObj_live_TEST(str) || PObj_constant_TEST(str)) {
                 PObj_live_CLEAR(str);
                 if (move_to_old) {
                     Parrot_pa_remove(interp, self->strings[i], item->ptr);
