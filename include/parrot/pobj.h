@@ -176,6 +176,15 @@ typedef enum PObj_enum {
     /* Object requires write barrier */
     PObj_GC_need_write_barrier_FLAG = POBJ_FLAG(26),
 
+    /* For simplify some cleanup/setup */
+    PObj_GC_all_generation_FLAGS = PObj_GC_generation_0_FLAG
+                                 | PObj_GC_generation_1_FLAG
+                                 | PObj_GC_generation_2_FLAG,
+
+    PObj_GC_all_FLAGS            = PObj_GC_all_generation_FLAGS
+                                 | PObj_GC_on_dirty_list_FLAG
+                                 | PObj_GC_need_write_barrier_FLAG,
+
 /* PMC specific FLAGs */
     /* call object finalizer */
     PObj_need_finalize_FLAG     = POBJ_FLAG(27),

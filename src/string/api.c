@@ -406,9 +406,7 @@ Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
     // HACK. FIXME. It's abstraction leak here from GC.
     // Basically if we are copying string from older generation
     // we have to clear flags about it.
-    d->flags &= ~PObj_GC_generation_0_FLAG
-                & ~PObj_GC_generation_1_FLAG
-                & ~PObj_GC_generation_2_FLAG;
+    d->flags &= ~PObj_GC_all_generation_FLAGS;
 
     /* Clear live flag. It might be set on constant strings */
     PObj_live_CLEAR(d);

@@ -2040,10 +2040,7 @@ static void
 gc_gms_set_gen_flags(PARROT_INTERP, ARGIN(PMC *pmc), int gen)
 {
     ASSERT_ARGS(gc_gms_set_gen_flags)
-    pmc->flags &= ~(PObj_GC_generation_0_FLAG
-        | PObj_GC_generation_1_FLAG
-        | PObj_GC_generation_2_FLAG);
-    pmc->flags |= GEN2FLAGS(gen);
+    PObj_flags_SETTO(pmc, (pmc->flags & ~PObj_GC_all_generation_FLAGS) | GEN2FLAGS(gen));
 }
 
 /*
