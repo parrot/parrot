@@ -737,7 +737,8 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 
         /* Collect every nM allocated. */
         /* Hardcode for now. Will be configured via CLI */
-        self->gc_threshold = 1024 * 1024;
+        //self->gc_threshold = 10 * 1024 * 1024;
+        self->gc_threshold = Parrot_sysmem_amount(interp) / 100;
 
         Parrot_gc_str_initialize(interp, &self->string_gc);
     }
