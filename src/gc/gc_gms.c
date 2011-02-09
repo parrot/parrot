@@ -2185,8 +2185,8 @@ gc_gms_validate_objects(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_validate_objects)
 
-    INTVAL i;
 #ifndef NDEBUG
+    INTVAL i;
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     interp->gc_sys->mark_pmc_header = gc_gms_validate_pmc;
