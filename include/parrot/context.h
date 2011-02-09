@@ -32,7 +32,7 @@ typedef struct Parrot_CallContext_attributes Parrot_Context;
  * Macros to make accessing registers more convenient/readable.
  */
 
-#ifndef NDEBUG
+#if 1
 
 #  define CTX_REG_NUM(p, x) (*Parrot_pcc_get_FLOATVAL_reg(interp, (p), (x)))
 #  define CTX_REG_INT(p, x) (*Parrot_pcc_get_INTVAL_reg(interp, (p), (x)))
