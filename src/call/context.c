@@ -699,7 +699,7 @@ Parrot_pcc_get_PMC_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_PMC) > idx);
     PARROT_GC_WRITE_BARRIER(interp, ctx);
     res = &(CONTEXT_STRUCT(ctx)->bp_ps.regs_p[-1L - idx]);
-    PARROT_ASSERT(!PObj_on_free_list_TEST(*res));
+    PARROT_ASSERT(!*res || !PObj_on_free_list_TEST(*res));
     return res;
 }
 
