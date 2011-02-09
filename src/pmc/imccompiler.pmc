@@ -83,6 +83,14 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler {
         return attrs->is_pasm;
     }
 
+    VTABLE STRING *get_string() {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        if (attrs->is_pasm)
+            return CONST_STRING(INTERP, "PASM");
+        else
+            return CONST_STRING(INTERP, "PIR");
+    }
+
     VTABLE void destroy() {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         imcc_destroy(attrs->imcc_info);

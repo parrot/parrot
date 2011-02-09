@@ -284,108 +284,18 @@ static PMC *
 run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *flags))
 {
     ASSERT_ARGS(run_imcc)
-    Parrot_PMC class_pmc = get_class_pmc(interp, "IMCCompiler");
-    Parrot_PMC pir_compiler = get_imcc_compiler_pmc(interp, class_pmc, 0);
-    Parrot_PMC pasm_compiler = get_imcc_compiler_pmc(interp, class_pmc, 1);
+    Parrot_PMC pir_compiler = imcc_get_pir_compreg_api(interp, 1);
+    Parrot_PMC pasm_compiler = imcc_get_pasm_compreg_api(interp, 1);
 
     if (flags->preprocess_only) {
-        preprocess_file(interp, pir_compiler, sourcefile);
+        imcc_preprocess_file_api(interp, pir_compiler, sourcefile);
         exit(EXIT_SUCCESS);
     }
-    else if (flags->have_pasm_file)
-        return compile_file(interp, pasm_compiler, sourcefile);
-    else
-        return compile_file(interp, pir_compiler, sourcefile);
-}
-
-PARROT_CANNOT_RETURN_NULL
-static PMC *
-get_class_pmc(Parrot_PMC interp, ARGIN(const char *name))
-{
-    Parrot_String name_s = NULL;
-    Parrot_PMC name_pmc = NULL;
-    Parrot_PMC class_pmc = NULL;
-    if (!(Parrot_api_string_import_ascii(interp, name, &name_s) &&
-          Parrot_api_pmc_box_string(interp, name_s, &name_pmc) &&
-          Parrot_api_pmc_get_class(interp, name_pmc, &class_pmc)))
-        show_last_error_and_exit(interp);
-    return class_pmc;
-}
-
-PARROT_CANNOT_RETURN_NULL
-static PMC *
-get_imcc_compiler_pmc(Parrot_PMC interp, Parrot_PMC class_pmc, Parrot_Int is_pasm)
-{
-    Parrot_PMC is_pasm_pmc = NULL;
-    Parrot_PMC compiler_pmc = NULL;
-    const char *name = is_pasm ? "PASM" : "PIR";
-    Parrot_String name_s = NULL;
-
-    if (!Parrot_api_pmc_box_integer(interp, is_pasm, &is_pasm_pmc))
-        show_last_error_and_exit(interp);
-    if (!Parrot_api_pmc_new_from_class(interp, class_pmc, is_pasm_pmc, &compiler_pmc))
-        show_last_error_and_exit(interp);
-    if (!(Parrot_api_string_import_ascii(interp, name, &name_s) &&
-          Parrot_api_set_compiler(interp, name_s, compiler_pmc)))
-        show_last_error_and_exit(interp);
-    return compiler_pmc;
-}
-
-PARROT_CANNOT_RETURN_NULL
-static PMC *
-get_signature_pmc(Parrot_PMC interp, ARGIN(const char *sig))
-{
-    Parrot_PMC class_pmc = get_class_pmc(interp, "CallContext");
-    Parrot_PMC sig_pmc = NULL;
-    Parrot_String sig_s = NULL;
-    if (!Parrot_api_pmc_new_from_class(interp, class_pmc, NULL, &sig_pmc))
-        show_last_error_and_exit(interp);
-    if (!(Parrot_api_string_import_ascii(interp, sig, &sig_s) &&
-          Parrot_api_pmc_set_string(interp, sig_pmc, sig_s)))
-        show_last_error_and_exit(interp);
-    return sig_pmc;
-}
-
-PARROT_CANNOT_RETURN_NULL
-static PMC *
-compile_file(Parrot_PMC interp, Parrot_PMC compiler, Parrot_String file)
-{
-    Parrot_PMC signature_pmc = get_signature_pmc(interp, "PiS->P");
-    Parrot_String method_name = NULL;
-    Parrot_PMC method = NULL;
-    Parrot_PMC file_pmc = NULL;
-    Parrot_PMC result_pmc = NULL;
-
-    if (!Parrot_api_string_import_ascii(interp, "compile_file", &method_name))
-        show_last_error_and_exit(interp);
-    if (!Parrot_api_pmc_find_method(interp, compiler, method_name, &method))
-        show_last_error_and_exit(interp);
-    Parrot_api_pmc_box_string(interp, file, &file_pmc);
-    Parrot_api_pmc_push(interp, signature_pmc, compiler);
-    Parrot_api_pmc_push(interp, signature_pmc, file_pmc);
-    Parrot_api_pmc_invoke(interp, method, signature_pmc);
-    Parrot_api_pmc_get_keyed_int(interp, signature_pmc, 0, &result_pmc);
-    return result_pmc;
-}
-
-PARROT_CANNOT_RETURN_NULL
-static void
-preprocess_file(Parrot_PMC interp, Parrot_PMC compiler, Parrot_String file)
-{
-    Parrot_PMC signature_pmc = get_signature_pmc(interp, "PiS->");
-    Parrot_String method_name = NULL;
-    Parrot_PMC method = NULL;
-    Parrot_PMC file_pmc = NULL;
-    Parrot_PMC result_pmc = NULL;
-
-    if (!Parrot_api_string_import_ascii(interp, "preprocess", &method_name))
-        show_last_error_and_exit(interp);
-    if (!Parrot_api_pmc_find_method(interp, compiler, method_name, &method))
-        show_last_error_and_exit(interp);
-    Parrot_api_pmc_box_string(interp, file, &file_pmc);
-    Parrot_api_pmc_push(interp, signature_pmc, compiler);
-    Parrot_api_pmc_push(interp, signature_pmc, file_pmc);
-    Parrot_api_pmc_invoke(interp, method, signature_pmc);
+    else {
+        const Parrot_Int pasm_mode = flags->have_pasm_file;
+        Parrot_PMC compiler = pasm_mode ? pasm_compiler : pir_compiler;
+        return imcc_compile_file_api(interp, compiler, sourcefile);
+    }
 }
 
 /*
@@ -407,9 +317,8 @@ load_bytecode_file(Parrot_PMC interp, Parrot_String filename)
     PMC * bytecode = NULL;
 
     /* set up all the compregs */
-    Parrot_PMC class_pmc = get_class_pmc(interp, "IMCCompiler");
-    Parrot_PMC pir_compiler = get_imcc_compiler_pmc(interp, class_pmc, 0);
-    Parrot_PMC pasm_compiler = get_imcc_compiler_pmc(interp, class_pmc, 1);
+    Parrot_PMC pir_compiler = imcc_get_pir_compreg_api(interp, 1);
+    Parrot_PMC pasm_compiler = imcc_get_pasm_compreg_api(interp, 1);
 
     if (!Parrot_api_load_bytecode_file(interp, filename, &bytecode))
         show_last_error_and_exit(interp);

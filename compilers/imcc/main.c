@@ -130,15 +130,6 @@ imcc_reset(ARGMOD(imc_info_t *imcc))
 }
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-imc_info_t *
-imcc_new_pmc(PMC * interp_pmc)
-{
-    /* TODO: This is ugly. Fix it */
-    return imcc_new((Interp *)VTABLE_get_pointer(NULL, interp_pmc));
-}
-
-PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 STRING*
 imcc_last_error_message(ARGIN(imc_info_t *imcc))
