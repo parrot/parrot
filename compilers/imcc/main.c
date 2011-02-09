@@ -392,10 +392,10 @@ static PMC *
 imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
         int is_file, int is_pasm)
 {
-    struct _imc_info_t * const imc_save = prepare_reentrant_compile(imcc);
+    struct _imc_info_t * const imc_save = imcc; //prepare_reentrant_compile(imcc);
     struct _imc_info_t * imcc_use = imc_save ? imc_save : imcc;
     PMC * const result = imcc_run_compilation_internal(imcc, fullname, is_file, is_pasm);
-    exit_reentrant_compile(imcc, imc_save);
+    //exit_reentrant_compile(imcc, imc_save);
     return result;
 }
 
@@ -405,6 +405,7 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 {
     yyscan_t yyscanner = imcc_get_scanner(imcc);
     PackFile * const pf_raw = PackFile_new(imcc->interp, 0);
+    INTVAL success = 0;
 
     /* TODO: Don't set current packfile in the interpreter. Leave the
              interpreter alone */
@@ -421,7 +422,7 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 
     IMCC_push_parser_state(imcc, source, is_pasm);
 
-    imcc_compile_buffer_safe(imcc, yyscanner, source, is_file, is_pasm);
+    success = imcc_compile_buffer_safe(imcc, yyscanner, source, is_file, is_pasm);
 
     if (imcc->error_code) {
         imcc->error_code = IMCC_FATAL_EXCEPTION;
@@ -442,7 +443,7 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     PackFile_fixup_subs(imcc->interp, PBC_POSTCOMP, NULL);
 
     /* TODO: Return a real PackFile PMC */
-    if (pf_raw) {
+    if (success && pf_raw) {
         PMC * const pbcpmc = Parrot_pmc_new(imcc->interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(imcc->interp, pbcpmc, pf_raw);
         return pbcpmc;

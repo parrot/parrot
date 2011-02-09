@@ -50,7 +50,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler {
         if (PMC_IS_NULL(result)) {
             STRING * const msg = imcc_last_error_message(attrs->imcc_info);
             INTVAL code = imcc_last_error_code(attrs->imcc_info);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, code, msg);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
         pf = (PackFile*)VTABLE_get_pointer(INTERP, result);
         {

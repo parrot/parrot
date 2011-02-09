@@ -1369,7 +1369,7 @@ imcc_cleanup_input(ARGMOD(imc_info_t * imcc), PIOHANDLE file,
         Parrot_str_free_cstring(source_c);
 }
 
-void
+INTVAL
 imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
         ARGIN(STRING *source), int is_file, int is_pasm)
 {
@@ -1377,20 +1377,22 @@ imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
     YY_BUFFER_STATE  volatile buffer;
     const char * source_c = Parrot_str_to_cstring(imcc->interp, source);
     PIOHANDLE file;
+    INTVAL success = 0;
 
     imcc->frames->s.next = NULL;
     buffer = YY_CURRENT_BUFFER;
 
     file = imcc_setup_input(imcc, yyscanner, source, source_c, is_file);
     emit_open(imcc);
-    imcc_run_compilation(imcc, yyscanner);
+    success = imcc_run_compilation(imcc, yyscanner);
     imcc_cleanup_input(imcc, file, source_c, is_file);
 
     if (buffer)
         yy_switch_to_buffer(buffer, yyscanner);
+    return success;
 }
 
-void
+INTVAL
 imcc_run_compilation(ARGMOD(imc_info_t *imcc), void *yyscanner) {
     /* TODO: Kill this stuff and use Parrot exceptions exclusively */
     IMCC_TRY(imcc->jump_buf, imcc->error_code) {
@@ -1399,10 +1401,11 @@ imcc_run_compilation(ARGMOD(imc_info_t *imcc), void *yyscanner) {
             /* TODO: Be slightly less unhelpful */
             imcc->error_message = string_from_literal(imcc->interp,
                     "syntax error ... somewhere");
-            return;
+            return 0;
         }
 
         imc_compile_all_units(imcc);
+        return 1;
     }
 
     IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
@@ -1414,6 +1417,7 @@ imcc_run_compilation(ARGMOD(imc_info_t *imcc), void *yyscanner) {
     }
 
     IMCC_END_TRY;
+    return 0;
 }
 
 void
