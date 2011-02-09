@@ -121,7 +121,7 @@ TBD
  *  1. Maximum number is 8 due limit number of bits in PMC.flags.
  *  2. Don't forget to update gc_gms_select_generation_to_collect after changing it!
  */
-#define MAX_GENERATIONS     3
+#define MAX_GENERATIONS     2
 
 /* We allocate additional space in front of PObj* to store additional pointer */
 typedef struct pmc_alloc_struct {
@@ -881,9 +881,9 @@ gc_gms_select_generation_to_collect(PARROT_INTERP)
         return 4;
     if (runs % 1000 == 0)
         return 3;
-#endif
     if (runs % 100 == 0)
         return 2;
+#endif
     if (runs % 10 == 0)
         return 1;
     return 0;
