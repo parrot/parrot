@@ -352,9 +352,7 @@ static void gc_gms_pmc_needs_early_collection(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
-static void gc_gms_print_stats(PARROT_INTERP,
-    ARGIN(const char* header),
-    int gen)
+static void gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -724,7 +722,7 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 
         /* Collect every nM allocated. */
         /* Hardcode for now. Will be configured via CLI */
-        self->gc_threshold = 10 * 1024 * 1024;
+        self->gc_threshold = 1024 * 1024;
 
         Parrot_gc_str_initialize(interp, &self->string_gc);
     }
@@ -761,7 +759,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     interp->gc_sys->stats.gc_mark_runs++;
 
-    gc_gms_print_stats(interp, "Before", gen);
+    gc_gms_print_stats(interp, "Before");
 
     gc_gms_check_sanity(interp);
     /*
@@ -777,7 +775,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     "dirty_list".
     */
     gc_gms_cleanup_dirty_list(interp, self, self->dirty_list, gen);
-    gc_gms_print_stats(interp, "After cleanup", gen);
+    gc_gms_print_stats(interp, "After cleanup");
 
     /*
     4. Trace root objects. According to "0. Pre-requirements" we will ignore all
@@ -788,7 +786,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     if (interp->pdb && interp->pdb->debugger) {
         Parrot_gc_trace_root(interp->pdb->debugger, NULL, (Parrot_gc_trace_type)0);
     }
-    gc_gms_print_stats(interp, "After trace_roots", gen);
+    gc_gms_print_stats(interp, "After trace_roots");
     gc_gms_check_sanity(interp);
 
     /*
@@ -796,14 +794,14 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     children into "work_list".
     */
     gc_gms_process_dirty_list(interp, self, self->dirty_list);
-    gc_gms_print_stats(interp, "After dirty_list", gen);
+    gc_gms_print_stats(interp, "After dirty_list");
     gc_gms_check_sanity(interp);
 
     /*
     6. Iterate over "work_list" calling VTABLE_mark on it.
     */
     gc_gms_process_work_list(interp, self, self->work_list);
-    gc_gms_print_stats(interp, "After work_list", gen);
+    gc_gms_print_stats(interp, "After work_list");
     gc_gms_check_sanity(interp);
 
     /*
@@ -831,10 +829,10 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     gc_gms_check_sanity(interp);
 
-    gc_gms_print_stats(interp, "After", gen);
+    gc_gms_print_stats(interp, "After");
 
     Parrot_pa_destroy(interp, self->work_list);
-
+    self->work_list = NULL;
 
     gc_gms_validate_objects(interp);
 }
@@ -979,7 +977,7 @@ gc_gms_process_work_list(PARROT_INTERP,
         if (PMC_metadata(pmc))
             Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc)););
 
-    gc_gms_print_stats(interp, "Before cleaning work_list", self->gen_to_collect);
+    gc_gms_print_stats(interp, "Before cleaning work_list");
 
     /* Move processed objects back to own generation */
     POINTER_ARRAY_ITER(work_list,
@@ -1104,8 +1102,11 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
     pmc_alloc_struct  *item = PMC2PAC(pmc);
     size_t             gen  = POBJ2GEN(pmc);
 
+    PARROT_ASSERT(!PObj_on_free_list_TEST(pmc)
+        || !"Resurrecting of dead objects is not supported");
+
     /* Object was already marked as grey. Or live. Or dead. Skip it */
-    if (PObj_is_live_or_free_TESTALL(pmc) || PObj_constant_TEST(pmc))
+    if (PObj_live_TEST(pmc) || PObj_constant_TEST(pmc))
         return;
 
     /* If object too old - skip it */
@@ -2073,8 +2074,7 @@ gc_gms_check_sanity(PARROT_INTERP)
 
 /*
 
-=item C<static void gc_gms_print_stats(PARROT_INTERP, const char* header, int
-gen)>
+=item C<static void gc_gms_print_stats(PARROT_INTERP, const char* header)>
 
 debug function
 
@@ -2082,20 +2082,22 @@ debug function
 
 */
 
-static void
-gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
+
+void
+gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
 {
     ASSERT_ARGS(gc_gms_print_stats)
 
-#ifdef DETAIL_MEMORY_DEBUG
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            i;
 
-    fprintf(stderr, "%s\ntotal: %d\ngen: %d\n", header, interp->gc_sys->stats.gc_mark_runs, gen);
+    fprintf(stderr, "%s\ntotal: %d\ngen: %d\n", header,
+            interp->gc_sys->stats.gc_mark_runs,
+            self->gen_to_collect);
 
     fprintf(stderr, "dirty: %d\nwork: %d\n",
             Parrot_pa_count_used(interp, self->dirty_list),
-            Parrot_pa_count_used(interp, self->work_list));
+            self->work_list ? Parrot_pa_count_used(interp, self->work_list) : 0);
 
     for (i = 0; i < MAX_GENERATIONS; i++)
         fprintf(stderr, "%d: %d %d\n",
@@ -2117,6 +2119,16 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header), int gen)
 
 #  endif
     fprintf(stderr, "\n");
+
+}
+
+static void
+gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header))
+{
+    ASSERT_ARGS(gc_gms_print_stats)
+
+#ifdef DETAIL_MEMORY_DEBUG
+    gc_gms_print_stats_always(interp, header, gen);
 #endif
 
 }
