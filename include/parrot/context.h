@@ -443,7 +443,7 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 /* HEADERIZER END: src/call/context_accessors.c */
 
 /* Map Context manipulating functions to functions or macros */
-#ifdef NDEBUG
+#if 0
 #  define Parrot_pcc_get_context_struct(i, c) CONTEXT_STRUCT(c)
 
 #  define Parrot_pcc_get_num_constants(i, c) (CONTEXT_STRUCT(c)->num_constants)
