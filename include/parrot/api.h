@@ -234,17 +234,6 @@ PARROT_API
 Parrot_Int Parrot_api_toggle_gc(Parrot_PMC interp_pmc, Parrot_Int on);
 
 PARROT_API
-Parrot_Int Parrot_api_wrap_imcc_hack(
-    Parrot_PMC interp_pmc,
-    ARGIN(Parrot_String sourcefile),
-    int argc,
-    ARGIN_NULLOK(const char **argv),
-    ARGMOD_NULLOK(Parrot_PMC* bytecodepmc),
-    imcc_hack_func_t func)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(* bytecodepmc);
-
-PARROT_API
 Parrot_Int Parrot_api_write_bytecode_to_file(
     Parrot_PMC interp_pmc,
     Parrot_PMC pbc,
@@ -305,8 +294,6 @@ Parrot_Int Parrot_api_write_bytecode_to_file(
        PARROT_ASSERT_ARG(corename))
 #define ASSERT_ARGS_Parrot_api_set_warnings __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_toggle_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_api_wrap_imcc_hack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(sourcefile))
 #define ASSERT_ARGS_Parrot_api_write_bytecode_to_file \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
