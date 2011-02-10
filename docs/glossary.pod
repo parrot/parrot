@@ -254,6 +254,12 @@ that hides messy details like register allocation so language compiler writers
 who target Parrot don't have to roll their own. Files have the
 extension C<.pir>.
 
+=item PIRC
+
+Parrot Intermediate Represenation Compiler.  It is an experimental attempt
+to replace IMCC, but could the PIR for IMCC.  Work on PIRC is imcomplete,
+and the next generation compiler is PIRATE.
+
 =item PMC
 
 Polymorphic Container:  these classes are the primitives that
