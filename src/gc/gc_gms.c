@@ -139,9 +139,9 @@ typedef struct string_alloc_struct {
 
 
 /* Get generation from PObj->flags */
-#define POBJ2GEN(pobj)                                            \
-        ((((pobj)->flags & PObj_GC_generation_0_FLAG) ? 1 : 0)    \
-         + (((pobj)->flags) & PObj_GC_generation_1_FLAG ? 2 : 0)  \
+#define POBJ2GEN(pobj)                                                  \
+        ((size_t)(((pobj)->flags & PObj_GC_generation_0_FLAG) ? 1 : 0)  \
+         + (((pobj)->flags) & PObj_GC_generation_1_FLAG ? 2 : 0)        \
          + (((pobj)->flags) & PObj_GC_generation_2_FLAG ? 4 : 0))
 
 /* Get flags for generation number */
@@ -2113,21 +2113,21 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            i;
 
-    fprintf(stderr, "%s\ntotal: %d\ngen: %d\n", header,
+    fprintf(stderr, "%s\ntotal: %lu\ngen: %lu\n", header,
             interp->gc_sys->stats.gc_mark_runs,
             self->gen_to_collect);
 
-    fprintf(stderr, "dirty: %d\nwork: %d\n",
+    fprintf(stderr, "dirty: %lu\nwork: %lu\n",
             Parrot_pa_count_used(interp, self->dirty_list),
             self->work_list ? Parrot_pa_count_used(interp, self->work_list) : 0);
 
     for (i = 0; i < MAX_GENERATIONS; i++)
-        fprintf(stderr, "%d: %d %d\n",
+        fprintf(stderr, "%lu: %lu %lu\n",
                 i,
                 Parrot_pa_count_used(interp, self->objects[i]),
                 Parrot_pa_count_used(interp, self->strings[i]));
 
-    fprintf(stderr, "STRING: %d\n", self->string_gc.memory_pool->total_allocated);
+    fprintf(stderr, "STRING: %lu\n", self->string_gc.memory_pool->total_allocated);
 
 #if 0
     fprintf(stderr, "PMC: %d\n", Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
