@@ -99,7 +99,14 @@ they'll be the same thing under Lorito).
 
 =head2 FFI
 
-describe this here
+describe FFI here.  This will become especially important when we start
+integrating Lorito with the rest of Parrot and want to be able to call into C
+code from M0 and vice versa.
+
+=head2 Concurrency
+
+describe what primitives will be needed to allow data sharing and
+synchronization between contexts.
 
 =cut
 
