@@ -56,11 +56,19 @@ Insert list of ops here.
 
 =head2 Textual Representation
 
-Describe what the textual form of M0 will look like.
+Describe what the textual form of M0 will look like.  The emphasis should be on
+ease of consumption.  We won't be writing a large amount of M0 code by hand;
+it's just fine if it's painful to do so for non-trivial use cases.
 
 =head2 Binary Representation
 
-Describe what the binary form of M0 will look like
+Describe what the binary form of M0 will look like, including ops, constants
+tables, debug segments, etc.  M0 being minimal, we should expect the binary
+representation to remain stable once it's been finalized.
+
+=head2 Binary instruction format
+
+describe the binary encoding of a single M0 instruction and how it should be interpreteted.
 
 =head2 metadata
 
@@ -68,7 +76,7 @@ describe metadata here, e.g. debugging information, aggregate op tracking info, 
 
 =head2 Op Composition
 
-if m0 needs to support this, describe it here
+if m0 needs to support op composition, describe it here
 
 =head2 memory model
 
@@ -76,23 +84,18 @@ describe what kind of memory m0 ops will have access to and how they'll get at i
 
 =head2 structs
 
-describe structs here, if they're relevant to m0
-
-=head2 Binary instruction format
-
-describe this here
+describe structs here, as far as they're relevant to m0
 
 =head2 Types
 
 Describe the types here (INPS, S being an alias for P)
 
-=head2 Backends
-
-Describe what kind of backends are supported and what's needed from them.
-
 =head2 MOP interaction
 
-describe this here
+describe this here - the mop is mostly a higher-level concern than M0 cares
+about, but M0 will need to describe how PMCs and strings behave.  To make that
+happen, M0 needs to have some minimal concept of a pmc (and an object, since
+they'll be the same thing under Lorito).
 
 =head2 FFI
 
