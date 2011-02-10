@@ -211,7 +211,7 @@ See also L<"PCT">.
 =item PASM
 
 Parrot Assembly Language is the lowest level language before being translated
-in to bytecode.  Generally PIR is used.
+in to byte code.  Generally PIR is used.
 
 =item PBC
 
@@ -261,13 +261,13 @@ extension C<.pir>.
 
 =item PIRATE
 
-PIRATE is Parrot's the next generation compiler, and is currently under development.  
+PIRATE is Parrot's next generation compiler, and is currently under development.  
 IMCC is still the current compiler.
 
 =item PIRC
 
-Parrot Intermediate Represenation Compiler.  It is an experimental attempt
-to replace IMCC, but could the PIR for IMCC.  Work on PIRC is imcomplete,
+Parrot Intermediate Representation Compiler.  It is an experimental attempt
+to replace IMCC, but could the PIR for IMCC.  Work on PIRC is incomplete,
 and the next generation compiler is PIRATE.
 
 =item PMC
