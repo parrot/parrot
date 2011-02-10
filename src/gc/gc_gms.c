@@ -150,7 +150,8 @@ typedef struct string_alloc_struct {
          | ((gen) & 2 ? PObj_GC_generation_1_FLAG : 0)  \
          | ((gen) & 4 ? PObj_GC_generation_2_FLAG : 0))
 
-#define SET_GEN_FLAGS(pmc, gen) PObj_flags_SETTO((pmc), ((pmc)->flags & ~PObj_GC_all_generation_FLAGS) | GEN2FLAGS(gen))
+#define SET_GEN_FLAGS(pmc, gen) PObj_flags_SETTO((pmc), \
+        ((pmc)->flags & ~PObj_GC_all_generation_FLAGS) | GEN2FLAGS(gen))
 
 /* Private information */
 typedef struct MarkSweep_GC {
