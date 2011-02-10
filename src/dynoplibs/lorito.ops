@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010, Parrot Foundation.
+ * Copyright (C) 2010-2011, Parrot Foundation.
  */
 
 /*
@@ -12,7 +12,7 @@ END_OPS_PREAMBLE
 
 =head1 NAME
 
-lorito.ops - Prototype Lortio M0 opcodes
+lorito.ops - Prototype Lorito M0 opcodes
 
 =cut
 
