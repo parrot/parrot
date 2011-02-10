@@ -42,7 +42,7 @@ int yyerror(yyscan_t, Interp*, const char *);
 YY_EXTRA_TYPE yyget_extra(yyscan_t yyscanner);
 void yyset_extra(YY_EXTRA_TYPE user_defined, yyscan_t yyscanner);
 
-extern void compile_file(PARROT_INTERP, FILE *file, void *);
+extern void compile_file(PARROT_INTERP, PIOHANDLE file, void *);
 extern void compile_string(PARROT_INTERP, const char *, void *);
 extern void imcc_run_compilation(PARROT_INTERP, void *);
 

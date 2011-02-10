@@ -3,7 +3,7 @@
 # Copyright (C) 2001-2009, Parrot Foundation.
 ################################################################################
 
-=head1 TITLE
+=head1 NAME
 
 tools/dev/install_files.pl - Copy files to their correct locations
 

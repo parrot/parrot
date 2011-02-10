@@ -120,7 +120,7 @@ sub _get_platform {
         $platform = 'ia64';
     }
 
-    $platform = 'generic' unless -d "config/gen/platform/$platform";
+    $platform = 'generic' unless -d "src/platform/$platform";
 
     return $platform;
 }

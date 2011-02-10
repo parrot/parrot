@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -153,7 +153,7 @@ MORE:
 
     ret = length buf
     if ret <= 0 goto SERVE_REQ
-    concat req, buf
+    req = concat req, buf
     index pos, req, CRLFCRLF
     # print "\npos1:"
     # print pos
@@ -349,7 +349,7 @@ START:
     inc pos_in
 
 INC_IN:
-    concat out, char_out
+    out = concat out, char_out
     inc pos_in
     goto START
 END:

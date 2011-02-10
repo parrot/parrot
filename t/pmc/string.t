@@ -15,10 +15,12 @@ Tests the C<String> PMC.
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'test_more.pir'
 
-    plan(153)
+    plan(154)
 
     set_or_get_strings()
     setting_integers()
@@ -58,6 +60,7 @@ Tests the C<String> PMC.
     out_of_bounds_substr_negative_offset()
     exception_to_int_2()
     exception_to_int_3()
+    exception_to_int_noalphanum()
     assign_null_string()
     access_keyed()
     exists_keyed()
@@ -664,7 +667,6 @@ loop:
     $P0 = box unicode:"科ムウオ"
     $P0.'reverse'()
     is( $P0, unicode:"オウム科", 'reverse unicode string')
-
 .end
 
 .sub is_integer__check_integer
@@ -813,6 +815,18 @@ handler:
         $I0 = s.'to_int'(37)
 handler:
     .exception_is( 'invalid conversion to int - bad base 37' )
+.end
+
+.sub to_int_noalnum
+    .local pmc s
+    s = new ['String']
+    s = "?"
+    $I0 = s.'to_int'(10)
+.end
+
+.sub exception_to_int_noalphanum
+    .const 'Sub' noalnum = 'to_int_noalnum'
+    throws_type(noalnum, .EXCEPTION_INVALID_OPERATION, 'to_int - no aplhanumeric')
 .end
 
 .sub assign_null_string

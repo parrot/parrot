@@ -21,6 +21,40 @@ in the distribution's root directory, and follow the prompts.
 However, if you do know how to fix the problem you encountered, then think
 about submitting a patch, or (see below) getting commit privileges.
 
+=head1 A Note on Random Failures
+
+If you encounter errors that appear intermittently, it may be difficult or
+impossible for Parrot developers to diagnose and solve the problem. It is
+therefore recommended to control the sources of randomness in Parrot in an
+attempt to eliminate the intermittency of the bug. There are three common
+sources of randomness that should be considered.
+
+=over
+
+=item Pseudo-Random Number Generator
+
+Direct use of a PRNG from within Parrot programs will lead to inconsistent
+results. If possible, isolate the bug from PRNG use, for example, by logging
+the random values which trigger the error and then hard coding them.
+
+=item Address Space Layout Randomization
+
+Several operating systems provide a security measure known as address space
+layout randomization. In bugs involving stray pointers, this can cause
+corruption in random Parrot subsystems. Temporarily disabling this feature may
+make this problem consistent and therefore debugable.
+
+=item Hash Seed
+
+Parrot's hash implementation uses randomization of its seed as a precaution
+against attacks based on hash collisions. The seed used can be directly
+controlled using C<parrot>'s C<--hash-seed> parameter. To determine what seeds
+are causing the error, Parrot can be rebuilt with C<DEBUG_HASH_SEED> set to
+C<1>, which will cause C<parrot> to output the hash seed being used on every
+invocation.
+
+=back
+
 =head1 How To Create A Patch
 
 Try to keep your patches specific to a single change, and ensure that your

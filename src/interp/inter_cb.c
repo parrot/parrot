@@ -79,7 +79,6 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
     PMC *cb, *cb_sig;
     int type = 0;
     STRING *sc;
-    char * const signature = Parrot_str_to_cstring(interp, cb_signature);
     /*
      * we stuff all the information into the user_data PMC and pass that
      * on to the external sub
@@ -93,19 +92,18 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
     sc = CONST_STRING(interp, "_sub");
     VTABLE_setprop(interp, user_data, sc, sub);
     /* only ASCII signatures are supported */
-    if (strlen(signature) == 3) {
+    if (STRING_length(cb_signature) == 3) {
         /* Callback return type ignored */
 
-        if (signature[1] == 'U') {
+        if (STRING_ord(interp, cb_signature, 1) == 'U') {
             type = 'D';
         }
         else {
-            if (signature[2] == 'U') {
+            if (STRING_ord(interp, cb_signature, 2) == 'U') {
                 type = 'C';
             }
         }
     }
-    Parrot_str_free_cstring(signature);
     if (type != 'C' && type != 'D')
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
             "unhandled signature '%Ss' in make_cb", cb_signature);
@@ -288,9 +286,7 @@ Parrot_run_callback(PARROT_INTERP,
     PMC     *signature;
     PMC     *sub;
     STRING  *sig_str;
-    char    *p;
-    char     ch;
-    char    *sig_cstr;
+    INTVAL   ch;
     char     pasm_sig[5];
     INTVAL   i_param;
     PMC     *p_param;
@@ -301,16 +297,13 @@ Parrot_run_callback(PARROT_INTERP,
     sub       = VTABLE_getprop(interp, user_data, sc);
     sc        = CONST_STRING(interp, "_signature");
     signature = VTABLE_getprop(interp, user_data, sc);
-
     sig_str   = VTABLE_get_string(interp, signature);
-    sig_cstr  = Parrot_str_to_cstring(interp, sig_str);
-    p         = sig_cstr;
-    ++p;     /* Skip return type */
 
     pasm_sig[0] = 'P';
-    if (*p == 'U') /* user_data Z in pdd16 */
-        ++p;       /* p is now type of external data */
-    switch (*p) {
+    ch = STRING_ord(interp, sig_str, 1);
+    if (ch == 'U') /* user_data Z in pdd16 */
+        ch = STRING_ord(interp, sig_str, 2); /* ch is now type of external data */
+    switch (ch) {
       case 'v':
         pasm_sig[1] = 'v';
         break;
@@ -341,12 +334,9 @@ case_I:
         param = Parrot_str_new(interp, external_data, 0);
         break;
       default:
-        ch = *p;
-        Parrot_str_free_cstring(sig_cstr);
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "unhandled signature char '%c' in run_cb", ch);
     }
-    Parrot_str_free_cstring(sig_cstr);
     pasm_sig[2] = '-';
     pasm_sig[3] = '>';  /* no return value supported yet */
     pasm_sig[4] = '\0';

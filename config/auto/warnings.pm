@@ -155,7 +155,6 @@ sub _init {
 
     # Add some gcc-only warnings that would break g++
     push @{$gcc->{'basic'}}, qw(
-        -Wbad-function-cast
         -Wc++-compat
         -Wdeclaration-after-statement
         -Werror=declaration-after-statement

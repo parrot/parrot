@@ -461,12 +461,12 @@ third and subsequent children can be any value they wish.
     npost = self.'as_post'(npast, 'rtype'=>'~')
     $S1 = npost
     ops.'push'(npost)
-    concat $S0, ' :named('
-    concat $S0, $S1
-    concat $S0, ')'
+    $S0 = concat $S0, ' :named('
+    $S0 = concat $S0, $S1
+    $S0 = concat $S0, ')'
     goto named_done
   flat_named:
-    concat $S0, ' :named :flat'
+    $S0 = concat $S0, ' :named :flat'
   named_done:
     push namedargs, $S0
     goto iter_rtype
@@ -477,7 +477,7 @@ third and subsequent children can be any value they wish.
     goto iter_rtype
   flat_pos:
     $S0 = cpost
-    concat $S0, ' :flat'
+    $S0 = concat $S0, ' :flat'
     push posargs, $S0
   iter_rtype:
     unless sigidx < sigmax goto iter_loop
@@ -503,10 +503,10 @@ third and subsequent children can be any value they wish.
     ops.'push'(cpost)
     # now construct the keyed PMC
     $S0 = cpost
-    concat $S0, '['
+    $S0 = concat $S0, '['
     $S1 = kpost
-    concat $S0, $S1
-    concat $S0, ']'
+    $S0 = concat $S0, $S1
+    $S0 = concat $S0, ']'
     push posargs, $S0
     goto iter_rtype
   iter_end:
@@ -656,7 +656,7 @@ nodes of type C<PAST::Stmts>.
     $P0 = node.'list'()
     $I0 = elements $P0
     $S0 = repeat 'v', $I0
-    concat $S0, rtype
+    $S0 = concat $S0, rtype
     ops = self.'post_children'(node, 'signature'=>$S0)
     $P0 = ops[-1]
     ops.'result'($P0)
@@ -698,7 +698,7 @@ Return the POST representation of a C<PAST::Control>.
     $P0 = node.'list'()
     $I0 = elements $P0
     $S0 = repeat 'v', $I0
-    concat $S0, rtype
+    $S0 = concat $S0, rtype
     ops.'push_pirop'('.local pmc exception')
     ops.'push_pirop'('.get_results (exception)')
     children = self.'post_children'(node, 'signature'=>$S0)
@@ -747,7 +747,7 @@ Return the POST representation of a C<PAST::Control>.
 
     ehreg = self.'uniquereg'('P')
     ops.'push_pirop'('new', ehreg, "'ExceptionHandler'")
-    ops.'push_pirop'('set_addr', ehreg, label)
+    ops.'push_pirop'('set_label', ehreg, label)
     controltypes = get_global '%!controltypes'
     type = node.'handle_types'()
     unless type, handle_types_done
@@ -856,20 +856,20 @@ Return the POST representation of a C<PAST::Block>.
     blockreg = self.'uniquereg'('P')
     if ns goto block_ns
     blockref = concat ".const 'Sub' ", blockreg
-    concat blockref, ' = '
+    blockref = concat blockref, ' = '
     $P0 = bpost.'subid'()
     $S0 = self.'escape'($P0)
-    concat blockref, $S0
+    blockref = concat blockref, $S0
     goto have_blockref
   block_ns:
     $P0 = get_hll_global ['POST'], 'Compiler'
     blockref = concat 'get_hll_global ', blockreg
     $S0 = $P0.'key_pir'(ns)
-    concat blockref, ', '
-    concat blockref, $S0
+    blockref = concat blockref, ', '
+    blockref = concat blockref, $S0
     $S0 = self.'escape'(name)
-    concat blockref, ', '
-    concat blockref, $S0
+    blockref = concat blockref, ', '
+    blockref = concat blockref, $S0
   have_blockref:
 
     ##  determine the outer POST::Sub for the new one
@@ -932,7 +932,7 @@ Return the POST representation of a C<PAST::Block>.
     ctrllabel = $P0.'new'('result'=>$S0)
     $S0 = self.'uniquereg'('P')
     bpost.'push_pirop'('new', $S0, "['ExceptionHandler']", '.CONTROL_RETURN')
-    bpost.'push_pirop'('set_addr', $S0, ctrllabel)
+    bpost.'push_pirop'('set_label', $S0, ctrllabel)
     bpost.'push_pirop'('push_eh', $S0)
     bpost.'add_directive'('.include "except_types.pasm"')
 
@@ -941,7 +941,7 @@ Return the POST representation of a C<PAST::Block>.
     $P0 = node.'list'()
     $I0 = elements $P0
     $S0 = repeat 'v', $I0
-    concat $S0, '*'
+    $S0 = concat $S0, '*'
     ##  convert children to post
     .local pmc ops, retval
     ops = self.'post_children'(node, 'signature'=>$S0)
@@ -1398,7 +1398,7 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
     .local string handreg
     handreg = self.'uniquereg'('P')
     ops.'push_pirop'('new', handreg, "'ExceptionHandler'")
-    ops.'push_pirop'('set_addr', handreg, handlabel)
+    ops.'push_pirop'('set_label', handreg, handlabel)
     ops.'push_pirop'('callmethod', '"handle_types"', handreg, '.CONTROL_LOOP_NEXT', '.CONTROL_LOOP_REDO', '.CONTROL_LOOP_LAST')
     ops.'push_pirop'('push_eh', handreg)
 
@@ -2085,12 +2085,12 @@ attribute.
     if null files goto scope_error_3
     $S0 = files
     sourceline = concat ' (', $S0
-    concat sourceline, ':'
+    sourceline = concat sourceline, ':'
     $I0 = self.'lineof'(source, pos)
     inc $I0
     $S0 = $I0
-    concat sourceline, $S0
-    concat sourceline, ')'
+    sourceline = concat sourceline, $S0
+    sourceline = concat sourceline, ')'
   scope_error_3:
     .tailcall self.'panic'("Symbol '", name, "' not predeclared", scope, " in ", blockname, sourceline)
 .end
@@ -2357,8 +2357,8 @@ attribute.
     $S0 = basepost.'result'()
     name = concat $S0, '['
     $S0 = keypost.'result'()
-    concat name, $S0
-    concat name, ']'
+    name = concat name, $S0
+    name = concat name, ']'
     .local pmc fetchop, storeop
     $P0 = get_hll_global ['POST'], 'Op'
     if bindpost goto keyed_bind
@@ -2570,10 +2570,10 @@ to have a PMC generated containing the constant value.
     .local string blockreg, blockref
     blockreg = self.'uniquereg'('P')
     blockref = concat ".const 'Sub' ", blockreg
-    concat blockref, ' = '
+    blockref = concat blockref, ' = '
     $P0 = value.'subid'()
     $S0 = self.'escape'($P0)
-    concat blockref, $S0
+    blockref = concat blockref, $S0
     ops.'push_pirop'(blockref)
     ops.'result'(blockreg)
     .return (ops)

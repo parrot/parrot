@@ -52,9 +52,9 @@ sub runstep {
 
 E_NOTE
 
-    opendir OPS, 'src/ops' or die "opendir ops: $!";
-    my @ops = sort grep { !/^\./ && /\.ops$/ } readdir OPS;
-    closedir OPS;
+    opendir my $OPS, 'src/ops' or die "opendir ops: $!";
+    my @ops = sort grep { !/^\./ && /\.ops$/ } readdir $OPS;
+    closedir $OPS;
 
     my $TEMP_pod = join q{ } =>
         map { my $t = $_; $t =~ s/\.ops$/.pod/; "ops/$t" } @ops;

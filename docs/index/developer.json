@@ -1,0 +1,29 @@
+{
+   "page" : "developer",
+   "content" : [
+      {
+         "source" : [
+            "docs/parrotbyte.pod",
+            "docs/memory_internals.pod",
+            "docs/vtables.pod",
+            "docs/embed.pod",
+            "docs/porting_intro.pod"
+         ],
+         "title" : "Internals"
+      },
+      {
+         "source" : "docs/dev/*",
+         "title" : "Development Notes"
+      },
+      {
+         "source" : [
+            "docs/user/pir/*",
+            "docs/pmc/array.pod",
+            "docs/pmc/struct.pod",
+            "docs/pmc/subs.pod"
+         ],
+         "title" : "Articles"
+      }
+   ],
+   "title" : "Developer Documentation"
+}

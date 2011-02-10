@@ -25,7 +25,7 @@ of the now missing C<clonei>.
 
 =cut
 
-main:
+.pcc_sub :main main:
     new P10, 'ResizableIntegerArray'
 	set 	I1,0
 	## P9 is used as a stack for temporaries.

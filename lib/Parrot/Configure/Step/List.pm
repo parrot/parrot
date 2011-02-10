@@ -11,7 +11,6 @@ my @steps = qw(
     init::defaults
     init::install
     init::hints
-    init::headers
     inter::progs
     inter::make
     inter::lex
@@ -36,7 +35,6 @@ my @steps = qw(
     auto::va_ptr
     auto::format
     auto::isreg
-    auto::jit
     auto::frames
     auto::llvm
     auto::inline
@@ -57,6 +55,7 @@ my @steps = qw(
     auto::gettext
     auto::snprintf
     auto::perldoc
+    auto::coverage
     auto::pod2man
     auto::ctags
     auto::revision
@@ -65,11 +64,11 @@ my @steps = qw(
     auto::icu
     auto::libffi
     auto::ipv6
+    auto::platform
     gen::config_h
     gen::core_pmcs
     gen::opengl
     gen::makefiles
-    gen::platform
     gen::config_pm
 );
 

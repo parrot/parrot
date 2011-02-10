@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -72,6 +72,7 @@ Parrot_pa_destroy(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
     for (i = 0; i < self->total_chunks; i++)
         mem_sys_free(self->chunks[i]);
     mem_sys_free(self->chunks);
+    mem_sys_free(self);
 }
 
 /*
@@ -122,6 +123,42 @@ Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
     chunk->data[chunk->next_free++] = ptr;
     return ret;
 }
+
+/*
+
+=item C<size_t Parrot_pa_count_allocated(PARROT_INTERP, Parrot_Pointer_Array
+*self)>
+
+Get count of allocated objects.
+
+=cut
+
+*/
+size_t
+Parrot_pa_count_allocated(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
+{
+    ASSERT_ARGS(Parrot_pa_count_allocated)
+    return self->total_chunks * CELL_PER_CHUNK;
+}
+
+/*
+
+=item C<size_t Parrot_pa_count_used(PARROT_INTERP, Parrot_Pointer_Array *self)>
+
+Get count of allocated objects.
+
+=cut
+
+*/
+size_t
+Parrot_pa_count_used(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
+{
+    ASSERT_ARGS(Parrot_pa_count_used)
+    size_t count = 0;
+    POINTER_ARRAY_ITER(self, count++;);
+    return count;
+}
+
 
 /*
 

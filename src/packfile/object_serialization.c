@@ -62,7 +62,7 @@ Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 /*
 
 =item C<opcode_t * Parrot_freeze_pbc(PARROT_INTERP, PMC *pmc, const
-PackFile_ConstTable *pf, opcode_t *cursor)>
+PackFile_ConstTable *pf, opcode_t *cursor, Hash **seen)>
 
 Freezes a PMC to a PackFile.
 
@@ -75,7 +75,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 opcode_t *
 Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf),
-    ARGIN(opcode_t *cursor))
+    ARGIN(opcode_t *cursor), ARGOUT(Hash **seen))
 {
     ASSERT_ARGS(Parrot_freeze_pbc)
     PMC    *visitor;
@@ -88,6 +88,7 @@ Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTabl
     VTABLE_set_pmc(interp, visitor, pmc);
 
     image  = VTABLE_get_string(interp, visitor);
+    *seen  = (Hash *)VTABLE_get_pointer(interp, visitor);
     cursor = PF_store_buf(cursor, image);
 
     return cursor;
@@ -96,33 +97,8 @@ Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTabl
 
 /*
 
-=item C<UINTVAL Parrot_freeze_size(PARROT_INTERP, PMC *pmc)>
-
-Gets the size of an image to be frozen without allocating a large buffer.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-UINTVAL
-Parrot_freeze_size(PARROT_INTERP, ARGIN(PMC *pmc))
-{
-    ASSERT_ARGS(Parrot_freeze_size)
-    PMC    *pmc_result;
-    PMC    * const visitor = Parrot_pmc_new(interp, enum_class_ImageIOSize);
-    VTABLE_set_pmc(interp, visitor, pmc);
-    pmc_result = VTABLE_get_pmc(interp, visitor);
-
-    return VTABLE_get_integer(interp, pmc_result);
-}
-
-
-/*
-
 =item C<UINTVAL Parrot_freeze_pbc_size(PARROT_INTERP, PMC *pmc, const
-PackFile_ConstTable *pf)>
+PackFile_ConstTable *pf, Hash **seen)>
 
 Gets the size of an image if it were created using C<Parrot_freeze_pbc>.
 
@@ -133,7 +109,8 @@ Gets the size of an image if it were created using C<Parrot_freeze_pbc>.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 UINTVAL
-Parrot_freeze_pbc_size(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf))
+Parrot_freeze_pbc_size(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf),
+        ARGOUT(Hash **seen))
 {
     ASSERT_ARGS(Parrot_freeze_pbc_size)
     PMC *pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
@@ -147,6 +124,7 @@ Parrot_freeze_pbc_size(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_Cons
     VTABLE_set_pmc(interp, visitor, pmc);
 
     pmc_result = VTABLE_get_pmc(interp, visitor);
+    *seen      = (Hash *)VTABLE_get_pointer(interp, visitor);
     return VTABLE_get_integer(interp, pmc_result);
 }
 
@@ -171,6 +149,40 @@ Parrot_freeze_strings(PARROT_INTERP, ARGIN(PMC *pmc))
     PMC * const visitor = Parrot_pmc_new(interp, enum_class_ImageIOStrings);
     VTABLE_set_pmc(interp, visitor, pmc);
     return VTABLE_get_pmc(interp, visitor);
+}
+
+/*
+
+=item C<void Parrot_pf_verify_image_string(PARROT_INTERP, STRING *image)>
+
+Perform some quick sanity checks on a packfile image string to verify that it
+is valid. Throws exceptions if not.
+
+=cut
+
+*/
+
+void
+Parrot_pf_verify_image_string(PARROT_INTERP, ARGIN(STRING *image))
+{
+    ASSERT_ARGS(Parrot_pf_verify_image_string)
+    if (STRING_length(image) < 16)
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INVALID_STRING_REPRESENTATION,
+            "Cannot deserialize PMC. Incorrect Length.");
+    else {
+        const char major = image->strstart[14];
+        const char minor = image->strstart[15];
+
+        if (major == PARROT_PBC_MAJOR && minor == PARROT_PBC_MINOR)
+            return;
+
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INVALID_STRING_REPRESENTATION,
+            "Version %d.%d of serialized PMC is invalid. Expected %d.%d. "
+            "You're probably linking against an incompatible libparrot.",
+            major, minor, PARROT_PBC_MAJOR, PARROT_PBC_MINOR);
+    }
 }
 
 
@@ -297,86 +309,6 @@ Parrot_clone(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_clone)
     return VTABLE_clone(interp, pmc);
-}
-
-
-/*
-
-=item C<void Parrot_visit_loop_visit(PARROT_INTERP, PMC *info)>
-
-Iterate a visitor PMC visiting each encountered target PMC.
-
-=cut
-
-*/
-
-void
-Parrot_visit_loop_visit(PARROT_INTERP, ARGIN(PMC *info))
-{
-    ASSERT_ARGS(Parrot_visit_loop_visit)
-
-    PMC * const  todo   = VTABLE_get_iter(interp, info);
-    const INTVAL action = VTABLE_get_integer(interp, info);
-    INTVAL       i;
-
-    /* can't cache upper limit, visit may append items */
-    for (i = 0; i < VTABLE_elements(interp, todo); ++i) {
-        PMC * const current = VTABLE_get_pmc_keyed_int(interp, todo, i);
-        if (PMC_IS_NULL(current))
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_MALFORMED_PACKFILE,
-                    "NULL current PMC at %d in visit_loop_todo_list - %s",
-                    (int) i,
-                    action == VISIT_FREEZE_NORMAL ? "feeze" : "thaw");
-
-        PARROT_ASSERT(current->vtable);
-
-        if (action == VISIT_FREEZE_NORMAL)
-            VTABLE_freeze(interp, current, info);
-        else
-            VTABLE_thaw(interp, current, info);
-
-        VTABLE_visit(interp, current, info);
-
-        VISIT_PMC(interp, info, PMC_metadata(current));
-    }
-}
-
-
-/*
-
-=item C<void Parrot_visit_loop_thawfinish(PARROT_INTERP, PMC *info)>
-
-Iterates a visitor PMC, thawfinishing each encountered target PMC.
-
-=cut
-
-*/
-
-void
-Parrot_visit_loop_thawfinish(PARROT_INTERP, ARGIN(PMC *info))
-{
-    ASSERT_ARGS(Parrot_visit_loop_thawfinish)
-
-    /* call thawfinish for each processed PMC */
-    /*
-     * Thaw in reverse order. We have to fully thaw younger PMCs
-     * before use them in older.
-     *
-     * XXX There are no younger or older pmcs in a directed graph
-     *     that allows cycles. Any code that requires a specific
-     *      order here is likely broken.
-     */
-
-    PMC * const  todo = VTABLE_get_iter(interp, info);
-    const INTVAL n    = VTABLE_elements(interp, todo);
-    int          i;
-
-    for (i = n - 1; i >= 0; --i) {
-        PMC *current = VTABLE_get_pmc_keyed_int(interp, todo, i);
-        if (!PMC_IS_NULL(current))
-            VTABLE_thawfinish(interp, current, info);
-    }
 }
 
 

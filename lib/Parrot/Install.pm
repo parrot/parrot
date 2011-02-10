@@ -225,23 +225,22 @@ sub install_files {
         else {
             next unless -e $src;
             next if $^O eq 'cygwin' and -e "$src.exe"; # stat works, copy not
-            eval {
-                if (-l $src) {   # a link should be created
-                    # check if the system supports symbolic linking
-                    use Config;
-                    if ($Config{d_symlink} && $Config{d_readlink}) {
-                        # copy as symbolic link
-                        symlink(readlink($src), $dest);
-                        # by success take next file, else the file will be
-                        # copied with the command after the eval block of
-                        # this loop
-                        if (-e $dest) {
-                            print "$dest\n";
-                            next;
-                        }
+            if (-l $src) {   # a link should be created
+                # check if the system supports symbolic linking
+                use Config;
+                if ($Config{d_symlink} && $Config{d_readlink}) {
+                    # copy as symbolic link
+                    unlink($dest);
+                    symlink(readlink($src), $dest);
+                    # by success take next file, else the file will be
+                    # copied with the command after the eval block of
+                    # this loop
+                    if (-e $dest) {
+                        print "$dest\n";
+                        next;
                     }
                 }
-            };
+            }
             copy( $src, $dest ) or die "Error: couldn't copy $src to $dest: $!\n";
             print "$dest\n";
         }

@@ -15,7 +15,7 @@
 
 #include <stdarg.h>
 #include "parrot/core_types.h"
-#include "parrot/config.h"      /* PARROT_VERSION, PARROT_JIT_CAPABLE... */
+#include "parrot/config.h"      /* PARROT_VERSION... */
 #include "parrot/interpreter.h" /* give us the interpreter flags */
 #include "parrot/warnings.h"    /* give us the warnings flags    */
 
@@ -69,6 +69,16 @@ void Parrot_ext_call(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
+
+PARROT_EXPORT
+void Parrot_ext_try(PARROT_INTERP,
+    ARGIN_NULLOK(void (*cfunction)(Parrot_Interp,
+    void *)),
+    ARGIN_NULLOK(void (*chandler)(Parrot_Interp,
+    PMC *,
+    void *)),
+    ARGIN_NULLOK(void *data))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
@@ -201,6 +211,8 @@ int Parrot_vfprintf(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_pmc) \
     , PARROT_ASSERT_ARG(signature))
+#define ASSERT_ARGS_Parrot_ext_try __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_find_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_fprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

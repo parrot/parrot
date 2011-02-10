@@ -23,7 +23,6 @@ use File::Spec;
 use lib qw( lib );
 use Parrot::Config;
 use IO::CaptureOutput qw| capture |;
-use Parrot::Config '%PConfig';
 
 BEGIN {
     eval "use Test::Builder::Tester;";
@@ -95,6 +94,7 @@ my ( $desc, $err, $line );
 $desc = 'pasm_output_is: success';
 test_out("ok 1 - $desc");
 pasm_output_is( <<'CODE', <<'OUTPUT', $desc );
+.pcc_sub :main main:
     print "foo\n"
     end
 CODE
@@ -114,6 +114,7 @@ ERR
 chomp $err;
 test_err($err);
 pasm_output_is( <<'CODE', <<"OUTPUT", $desc );
+.pcc_sub :main main:
     print "foo\n"
     end
 CODE
@@ -125,6 +126,7 @@ test_test($desc);
 $desc = 'pasm_output_isnt: success';
 test_out("ok 1 - $desc");
 pasm_output_isnt( <<'CODE', <<"OUTPUT", $desc );
+.pcc_sub :main main:
     print "foo\n"
     end
 CODE
@@ -150,6 +152,7 @@ ERR
 chomp $err;
 test_err( $err );
 pasm_output_isnt( <<'CODE', <<'OUTPUT', $desc );
+.pcc_sub :main main:
     print "foo\n"
     end
 CODE
@@ -160,6 +163,7 @@ test_test(title => $desc, skip_err => 1);
 $desc = 'pasm_output_like: success';
 test_out("ok 1 - $desc");
 pasm_output_like( <<'CODE', <<'OUTPUT', $desc );
+.pcc_sub :main main:
     print "foo\n"
     end
 CODE
@@ -179,6 +183,7 @@ ERR
 chomp $err;
 test_err($err);
 pasm_output_like( <<'CODE', <<"OUTPUT", $desc );
+.pcc_sub :main main:
     print "foo\n"
     end
 CODE
@@ -356,7 +361,7 @@ OUTPUT
 ##### PIR-to-PASM output test functions #####
 
 my $pir_2_pasm_code = <<'ENDOFCODE';
-.sub _test
+.sub _test :main
    noop
    end
 .end

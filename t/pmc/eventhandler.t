@@ -18,9 +18,10 @@ Tests the EventHandler PMC used by the event system.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(4)
+    plan(6)
 
     create_an_event_and_set_attributes()
+    invoke_eventhandler()
 .end
 
 .sub create_an_event_and_set_attributes
@@ -46,6 +47,8 @@ Tests the EventHandler PMC used by the event system.
     code         = get_global 'my_handler'
     init['code'] = code
 
+    sweep 1
+
     eh  = new ['EventHandler'], init
     $S0 = typeof eh
     is( $S0, 'EventHandler', 'Created EventHandler with args' )
@@ -53,21 +56,43 @@ Tests the EventHandler PMC used by the event system.
     $S1 = eh
     is( $S1, 'cool event', 'Event type confirmed' )
 
+    # Test set_integer_native, but no way to confirm.
+    eh = 5
+
     push_eh bad_args
         eh = new ['EventHandler'], code
     pop_eh
 
     ok( 1, 'No exception from initializer' )
+
+    push_eh bad_args
+        eh = new ['EventHandler'], type
+    pop_eh
+
     .return()
 
   bad_args:
-    ok( 0, 'Exception with bad initializer' )
+    ok( 1, 'Exception with bad initializer' )
 
+.end
+
+.sub invoke_eventhandler
+    .local pmc eh
+    .local pmc code
+
+    code = get_global 'test_handler'
+    eh   = new ['EventHandler'], code
+
+    # See ticket http://trac.parrot.org/parrot/ticket/1894
+    eh()
 .end
 
 .sub my_handler
 .end
 
+.sub test_handler
+    ok ( 1, 'Invoked Exception handler.' )
+.end
 
 # Local Variables:
 #   mode: pir

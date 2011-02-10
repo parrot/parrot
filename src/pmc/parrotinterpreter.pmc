@@ -795,15 +795,12 @@ If no PMC object is provided, the current standard error handle is returned.
 Returns the pid of the current process, 0 in platforms that doesn't
 support it.
 
-This method is experimental. See TT #1564.
-
 =cut
 
 */
 
     METHOD getpid() {
         INTVAL id = Parrot_getpid();
-        Parrot_warn_experimental(INTERP, "Method getpid on ParrotInterpreter is experimental");
         RETURN(INTVAL id);
     }
 

@@ -397,7 +397,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE INTVAL get_bool() {
       #ifdef PARROT_HAS_GMP
-        if (mpq_cmp_si(RT(SELF), 0, 0))
+        if (mpq_cmp_si(RT(SELF), 0, 1) == 0)
             return 0;
         else
             return 1;

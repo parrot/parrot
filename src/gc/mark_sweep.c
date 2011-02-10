@@ -222,6 +222,9 @@ Parrot_gc_trace_root(PARROT_INTERP,
     /* Walk the iodata */
     Parrot_IOData_mark(interp, interp->piodata);
 
+    if (!PMC_IS_NULL(interp->final_exception))
+        Parrot_gc_mark_PMC_alive(interp, interp->final_exception);
+
     if (trace == GC_TRACE_FULL)
         trace_system_areas(interp, mem_pools);
 
@@ -480,7 +483,6 @@ Parrot_append_arena_in_pool(PARROT_INTERP,
         new_arena->prev->next = new_arena;
 
     pool->last_Arena = new_arena;
-    interp->gc_sys->stats.header_allocs_since_last_collect += size;
     interp->gc_sys->stats.memory_allocated += size;
 }
 

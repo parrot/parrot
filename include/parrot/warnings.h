@@ -26,7 +26,6 @@ typedef enum {
 /* &gen_from_enum(errors.pasm)  */
 typedef enum {
     PARROT_ERRORS_NONE_FLAG         = 0x00,
-    PARROT_ERRORS_GLOBALS_FLAG      = 0x01,
     PARROT_ERRORS_OVERFLOW_FLAG     = 0x02,
     PARROT_ERRORS_PARAM_COUNT_FLAG  = 0x04,
     PARROT_ERRORS_RESULT_COUNT_FLAG = 0x08,

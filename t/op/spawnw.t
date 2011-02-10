@@ -49,6 +49,7 @@ Nigel Sandever - L<nigelsandever@btconnect.com>
 # test string version of spawnw
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 0" );
+.pcc_sub :main main:
         set     S1, 'perl -e "exit(0)"'
         set     I1, 99
         spawnw  I1, S1
@@ -62,6 +63,7 @@ return code: 0
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 123" );
+.pcc_sub :main main:
         set     S1, 'perl -e "exit(123)"'
         set     I1, 99
         spawnw  I1, S1
@@ -75,6 +77,7 @@ return code: 123
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 3" );
+.pcc_sub :main main:
         set     S1, 'perl -e "exit(3)"'
         set     I1, 99
         spawnw  I1, S1
@@ -90,6 +93,7 @@ OUTPUT
 # test array version of spawnw
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 0" );
+.pcc_sub :main main:
         new     P0, 'ResizablePMCArray'
         set     P0, 3
         set     P0[0], "perl"
@@ -107,6 +111,7 @@ return code: 0
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 123" );
+.pcc_sub :main main:
         new     P0, 'ResizablePMCArray'
         set     P0, 3
         set     P0[0], "perl"
@@ -124,6 +129,7 @@ return code: 123
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 3" );
+.pcc_sub :main main:
         new     P0, 'ResizablePMCArray'
         set     P0, 3
         set     P0[0], "perl"

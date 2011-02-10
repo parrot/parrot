@@ -35,7 +35,6 @@ sub runstep {
                     "HAS_PPC_$suffix" => '1',
                 );
                 $conf->debug(" (\U$suffix) ");
-                $conf->data->add( ' ', TEMP_generated => $f );
             }
         }
         $conf->cc_clean();

@@ -22,6 +22,13 @@ or
   $P0 = _md5sum("bar")
   $S0 = _md5_hex($P0)
 
+or using the Object interface:
+
+  load_bytecode "Digest/MD5.pbc"
+  $P0 = new ["Digest";"MD5"]
+  $P1 = $P0."md5sum"("baz")
+  $P0."md5_print"()
+
 =head1 DESCRIPTION
 
 This is a pure Parrot MD5 hash routine. You should run it with the JIT
@@ -41,10 +48,9 @@ Pass it the Integer array from _md5sum to get the checksum as string.
 
 Pass it the Integer array to print the checksum.
 
-=head1 BUGS
+=head1 METHODS
 
-Still has some limitations on input buffer size, largely due to memory
-consumption which should be resolved soon.
+The MD5 class defines the following subroutines, which are very similar to the subroutine alternatives:
 
 =cut
 
@@ -53,10 +59,10 @@ consumption which should be resolved soon.
 .loadlib 'bit_ops'
 
 ###########################################################################
-# Export function entries to globals
+# Interface definition
 
+# Export subroutines to globals
 .sub onload :load
-
     .local pmc f
     f = get_hll_global ['Digest'], '_md5sum'
     set_global "_md5sum", f
@@ -64,6 +70,52 @@ consumption which should be resolved soon.
     set_global "_md5_hex", f
     f = get_hll_global ['Digest'], '_md5_print'
     set_global "_md5_print", f
+.end
+
+.namespace ['Digest';'MD5']
+
+# Create Object Oriented interface
+.sub '' :init :load :anon
+    $P0 = newclass ['Digest';'MD5']
+    $P0.'add_attribute'('context')
+.end
+
+=head2 C<md5sum( str )>
+
+Pass in a string, returns an Integer array with the result, and stores the result in an attribute.
+
+=cut
+
+.sub 'md5sum' :method
+    .param string str
+    $P0 = _md5sum (str)
+    setattribute self, 'context', $P0
+    .return ($P0)
+.end
+
+=head2 C<md5_hex( )>
+
+Uses the Integer array from _md5sum to return the checksum as string.
+
+=cut
+
+.sub 'md5_hex' :method
+    $P0 = getattribute self, 'context'
+    $S0 = _md5_hex($P0)
+    .return ($S0)
+.end
+
+=head2 C<md5_print( )>
+
+Uses the Integer array from _md5sum to print the checksum. Returns the checksum as a string.
+
+=cut
+
+.sub 'md5_print' :method
+    $P0 = getattribute self, 'context'
+    $S0 = _md5_hex($P0)
+    say $S0
+    .return ($S0)
 .end
 
 ###########################################################################
@@ -444,6 +496,15 @@ loop:
 
     .return ($S0)
 .end
+
+
+=head1 BUGS
+
+Still has some limitations on input buffer size, largely due to memory
+consumption which should be resolved soon.
+
+=cut
+
 
 # Local Variables:
 #   mode: pir

@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -15,12 +15,16 @@ Tests the Integer PMC.
 
 =cut
 
-.loadlib 'sys_ops'
+.const string MAXINT = 'MAXINT'
+.const string MININT = 'MININT'
+.const string NO_SYSINFO = 'This test requires sysinfo'
 
 .sub 'test' :main
     .include 'test_more.pir'
 
-    plan(137)
+    get_max_min()
+
+    plan(142)
     test_init()
     test_basic_math()
     test_truthiness_and_definedness()
@@ -50,6 +54,7 @@ Tests the Integer PMC.
     $I0 = has_bigint()
     unless $I0 goto no_bigint
     test_autopromotion_to_BigInt()
+    test_add_BigInt()
     test_sub_BigInt()
     test_mul_BigInt()
     test_div_BigInt()
@@ -57,8 +62,52 @@ Tests the Integer PMC.
     test_neg_BigInt()
     goto done_bigint_tests
   no_bigint:
-    skip_n_bigint_tests(20)
+    skip_n_bigint_tests(30)
   done_bigint_tests:
+.end
+
+# Get INTVAL max and min values from sysinfo only if the sys_ops lib is
+# available and leaving them as zero otherwise (that happens during corestes,
+# for example).
+# The test that needs the values are skipped based on this.
+.sub get_max_min
+    .local string code
+
+    code = <<'CODE'
+.loadlib 'sys_ops'
+.include 'sysinfo.pasm'
+.sub aux_get_max
+    .local int m
+    .local pmc pm
+    m = sysinfo .SYSINFO_PARROT_INTMAX
+    pm = box m
+    set_hll_global 'MAXINT', pm
+    m = sysinfo .SYSINFO_PARROT_INTMIN
+    pm = box m
+    set_hll_global 'MININT', pm
+.end
+CODE
+
+    .local pmc m
+    m = box 0
+    set_hll_global MAXINT, m
+    m = box 0
+    set_hll_global MININT, m
+    .local pmc pircomp
+    push_eh catch
+    pircomp = compreg 'PIR'
+    if null pircomp goto done
+    .local pmc getit
+    getit = pircomp(code)
+    getit()
+    goto done
+  catch:
+    .local pmc ex
+    .get_results(ex)
+    finalize ex
+
+  done:
+    pop_eh
 .end
 
 .sub has_bigint
@@ -92,7 +141,7 @@ Tests the Integer PMC.
 
 .sub test_get_as_base_bounds_check
     throws_substring(<<'CODE', 'get_as_base: base out of bounds', 'get_as_base lower bound check')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 42
         $S0 = $P0.'get_as_base'(1)
@@ -100,7 +149,7 @@ Tests the Integer PMC.
     .end
 CODE
     throws_substring(<<'CODE', 'get_as_base: base out of bounds', 'get_as_base upper bound check')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 42
         $S0 = $P0.'get_as_base'(37)
@@ -130,18 +179,29 @@ CODE
     neg int_1
     is(int_1, 5, '... neg')
 
+    $P9 = get_hll_global MININT
+    $I0 = $P9
+    unless $I0 goto skip
+
     throws_substring(<<'CODE', 'Integer overflow', 'mul integer overflow')
-    .sub main
-        .include "errors.pasm"
+
+    .sub main :main
+        .include 'errors.pasm'
         errorson .PARROT_ERRORS_OVERFLOW_FLAG
+        .include 'sysinfo.pasm'
+        $I0 = sysinfo .SYSINFO_PARROT_INTMAX
 
         $P0 = new ['Integer']
-        $P0 = 2048
-        $P0 *= 2048
-        $P0 *= 2048
+        $P0 = $I0
+        $P0 *= 2
     .end
 CODE
+    goto more
 
+  skip:
+    skip(1, NO_SYSINFO)
+
+  more:
     int_1 = new ['Integer']
     int_1 = -57494
     int_1 = abs int_1
@@ -155,17 +215,18 @@ CODE
 
 .sub test_autopromotion_to_BigInt
     push_eh _dont_have_bigint_library
-    .include 'sysinfo.pasm'
     .local pmc bigint_1
     .local pmc int_1
 
     int_1 = new ['Integer']
     bigint_1 = new ['BigInt']
 
-    $I0 = sysinfo .SYSINFO_PARROT_INTMIN
+    $P9 = get_hll_global MININT
+    $I0 = $P9
+    unless $I0 goto skip
+
     int_1 = $I0
     bigint_1 = int_1 - 1
-    pop_eh
 
     dec int_1
     $P0 = typeof int_1
@@ -180,6 +241,10 @@ CODE
     ok(1, "no bigint library")
     ok(1, "no bigint library")
   _have_bigint_library:
+    goto end
+  skip:
+    skip(2, NO_SYSINFO)
+  end:
 .end
 
 .sub test_truthiness_and_definedness
@@ -377,6 +442,32 @@ OK4:
 fin:
 .end
 
+.sub test_add_BigInt
+    $P9 = get_hll_global MAXINT
+    $I0 = $P9
+    unless $I0 goto skip
+    new $P0, ['Integer']
+    new $P1, ['BigInt']
+    set $P0, $I0
+    set $P1, $I0
+    add $P0, $P0, 1
+    add $P1, $P1, 1
+    typeof $P2, $P0
+    is($P0, $P1, 'add integer overflow promotion')
+    is($P2, 'BigInt', 'add integer overflow type check')
+
+    new $P0, ['Integer']
+    set $P0, $I0
+    add $P0, 1
+    typeof $P2, $P0
+    is($P0, $P1, 'i_add integer overflow promotion')
+    is($P2, 'BigInt', 'i_add integer overflow type check')
+    goto end
+  skip:
+    skip(4, NO_SYSINFO)
+  end:
+.end
+
 .sub test_add
    new $P0, ['Integer']
    set $P0, 5
@@ -391,11 +482,6 @@ fin:
    add $P2, $P1, $P0
    set $S0, $P2
    is($S0,50)
-
-   new $P0, ['Integer']
-   set $P0, 1073741824
-   add $P0, $P0, 1073741824
-   is($P0, 2147483648, 'add integer overflow')
 
    new $P0, ['Integer']
    new $P1, ['Complex']
@@ -425,6 +511,39 @@ fin:
     $P1 = 424125
     sub $P1, $P1, $P0
     is($P1, 1, 'BigInt sub (no exception)')
+
+    $P0 = new ['Integer']
+    $P1 = new ['BigInt']
+    $P9 = get_hll_global MININT
+    $I0 = $P9
+    unless $I0 goto skip
+    $P0 = $I0
+    $P1 = $I0
+    sub $P0, $P0, 1
+    sub $P1, $P1, 1
+    typeof $P2, $P0
+    is($P0, $P1, 'subtract overflow promotion')
+    is($P2, 'BigInt', 'subtract overflow type check')
+
+    $P0 = new ['Integer']
+    $P0 = $I0
+    sub $P0, 1
+    typeof $P2, $P0
+    is($P0, $P1, 'i_subtract_int overflow promotion')
+    is($P2, 'BigInt', 'i_subtract_int overflow type check')
+
+    $P0 = new ['Integer']
+    $P2 = new ['Integer']
+    $P0 = $I0
+    $P2 = 1
+    sub $P0, $P2
+    typeof $P3, $P0
+    is($P0, $P1, 'i_subtract overflow promotion')
+    is($P3, 'BigInt', 'i_subtract overflow type check')
+    goto end
+  skip:
+    skip(6, NO_SYSINFO)
+  end:
 .end
 
 .sub test_sub
@@ -434,23 +553,6 @@ fin:
     $P1 = 10
     sub $P1, $P1, $P0
     is($P1, 6.9, 'DEFAULT sub')
-
-    $P0 = new ['Integer']
-    $P0 = -1073741824
-    sub $P0, $P0, 1073741825
-    is($P0, -2147483649, 'BigInt sub overflow')
-
-    $P0 = new ['Integer']
-    $P0 = -1073741824
-    sub $P0, 1073741825
-    is($P0, -2147483649, 'i_subtract_int overflow')
-
-    $P0 = new ['Integer']
-    $P1 = new ['Integer']
-    $P0 = -1073741824
-    $P1 = 1073741825
-    sub $P0, $P1
-    is($P0, -2147483649, 'i_subtract overflow')
 
     $P0 = new ['Integer']
     $P0 = 5
@@ -492,23 +594,11 @@ fin:
     is($P0, 24, 'i_multiply Integer PMC by Integer PMC')
 
     $P0 = new ['Integer']
-    $P1 = new ['Complex']
-    $P2 = new ['Complex']
-    $P0 = 2
-    $P1 = "2+4i"
-    $P2 = "4+8i"
-    mul $P0, $P1
-    $I0 = iseq $P0, $P2
-    todo($I0, 'i_multiply Integer PMC by Complex PMC', 'unresolved bug, see TT #1887')
-
-    $P0 = new ['Integer']
     $P1 = new ['Float']
     $P0 = 2
     $P1 = 3.5
     mul $P0, $P1
     is($P0, 7, 'i_multiply Integer PMC by DEFAULT')
-
-
 
     $P0 = new ['Integer']
     $P0 = 2
@@ -525,14 +615,23 @@ fin:
     $P2 = 48
     mul $P0, $P1
     $I0 = iseq $P0, $P2
-    todo($I0, 'i_multiply Integer PMC by BigInt PMC', 'unresolved bug, see TT #1887')
+    ok($I0, 'i_multiply Integer PMC by BigInt PMC')
 
     $P0 = new ['Integer']
-    $P0 = 1073741824
+    $P9 = get_hll_global MAXINT
+    $I0 = $P9
+    unless $I0 goto skip
+    $P0 = $I0
+    $P1 = $I0
     mul $P0, 2
-    $P1 = typeof $P0
-    is($P0, 2147483648, 'i_multiply_int overflow promotion')
-    is($P1, 'BigInt', 'i_multiple_int overflow type check')
+    mul $P1, 2
+    $P2 = typeof $P0
+    is($P0, $P1, 'i_multiply_int overflow promotion')
+    is($P2, 'BigInt', 'i_multiple_int overflow type check')
+    goto end
+  skip:
+    skip(2, NO_SYSINFO)
+  end:
 .end
 
 .sub test_div_BigInt
@@ -575,7 +674,7 @@ fin:
 
 .sub test_div
     throws_substring(<<'CODE', 'float division by zero', 'divide by 0 (Float PMC)')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P1 = new ['Float']
         $P0 = 50
@@ -593,7 +692,7 @@ CODE
     is($P0, 100, 'i_divide DEFAULT multi')
 
     throws_substring(<<'CODE', 'float division by zero', 'i_divide by 0 (Float PMC)')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P1 = new ['Float']
         $P0 = 50
@@ -604,7 +703,7 @@ CODE
 CODE
 
     throws_substring(<<'CODE', 'float division by zero', 'floor_divide by 0 (Float PMC)')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P1 = new ['Float']
         $P0 = 50
@@ -615,7 +714,7 @@ CODE
 CODE
 
     throws_substring(<<'CODE', 'float division by zero', 'floor_divide by 0 (FLOATVAL)')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 50
         $P0 = fdiv $P0, 0.0
@@ -629,7 +728,7 @@ CODE
     is($P0, 3, 'floor_divide INTVAL')
 
     throws_substring(<<'CODE', 'float division by zero', 'floor_divide by 0 (INTVAL)')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 50
         $P0 = fdiv $P0, 0
@@ -645,7 +744,7 @@ CODE
     is($P0, 8, 'i_floor_divide DEFAULT multi')
 
     throws_substring(<<'CODE', 'float division by zero', 'i_floor_divide by 0 (DEFAULT)')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P1 = new ['Float']
         $P0 = 50
@@ -660,7 +759,7 @@ CODE
     is($P0, 2, 'i_floor_divide INTVAL multi')
 
     throws_substring(<<'CODE', 'float division by zero', 'i_floor_divide by 0 INTVAL multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 50
         fdiv $P0, 0
@@ -673,7 +772,7 @@ CODE
     is($P0, 8, 'i_floor_divide FLOATVAL multi')
 
     throws_substring(<<'CODE', 'float division by zero', 'i_floor_divide by 0 FLOATVAL multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 50
         fdiv $P0, 0.0
@@ -725,7 +824,7 @@ CODE
 
 .sub test_mod
     throws_substring(<<'CODE', 'int modulus by zero', 'modulus by 0 DEFAULT multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P1 = new ['Float']
         $P0 = 7
@@ -741,7 +840,7 @@ CODE
     is($P0, 3, 'modulus INTVAL multi')
 
     throws_substring(<<'CODE', 'int modulus by zero', 'modulus by 0 INTVAL multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 7
         $P0 = mod $P0, 0
@@ -749,7 +848,7 @@ CODE
     .end
 CODE
     throws_substring(<<'CODE', 'int modulus by zero', 'modulus by 0 FLOATVAL multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 7
         $P0 = mod $P0, 0.0
@@ -765,7 +864,7 @@ CODE
     is($P0, 2, 'i_modulus DEFAULT multi')
 
     throws_substring(<<'CODE', 'int modulus by zero', 'i_modulus by 0 DEFAULT multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P1 = new ['Float']
         $P0 = 7
@@ -784,7 +883,7 @@ CODE
     is($P0, 1, 'i_modulus FLOATVAL multi')
 
     throws_substring(<<'CODE', 'int modulus by zero', 'i_modulus by 0 INTVAL multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 7
         mod $P0, 0
@@ -792,7 +891,7 @@ CODE
     .end
 CODE
     throws_substring(<<'CODE', 'int modulus by zero', 'i_modulus by 0 FLOATVAL multi')
-    .sub main
+    .sub main :main
         $P0 = new ['Integer']
         $P0 = 7
         mod $P0, 0.0
@@ -802,12 +901,12 @@ CODE
 .end
 
 .sub test_neg_BigInt
-    .include 'sysinfo.pasm'
-
     $P0 = new ['Integer']
     $P1 = new ['BigInt']
 
-    $I0 = sysinfo .SYSINFO_PARROT_INTMIN
+    $P9 = get_hll_global MININT
+    $I0 = $P9
+    unless $I0 goto skip
 
     $P0 = $I0
     $P1 = $I0
@@ -817,6 +916,10 @@ CODE
     $P2 = typeof $P0
     is($P0, $P1, 'neg integer overflow promotion')
     is($P2, 'BigInt', 'neg integer overflow type check')
+    goto end
+  skip:
+    skip(2, NO_SYSINFO)
+  end:
 .end
 
 .sub test_neg

@@ -43,9 +43,12 @@ sub runstep {
     _set_deployment_environment();
 
     my $lib_dir = $conf->data->get('build_dir') . "/blib/lib";
-    $flagsref->{ldflags} .= " -L$lib_dir";
+    $flagsref->{ldflags} .= ' -L"' . $lib_dir . '"';
 
     if ($ENV{'MACOSX_DEPLOYMENT_TARGET'} eq '10.6') {
+        $flagsref->{ccflags} .= ' -pipe -fno-common ';
+    }
+    elsif ($ENV{'MACOSX_DEPLOYMENT_TARGET'} eq '10.5') {
         $flagsref->{ccflags} .= ' -pipe -fno-common ';
     }
     else {
@@ -91,9 +94,11 @@ sub runstep {
         libparrot_shared_alias => "libparrot$share_ext",
         rpath                  => "-L",
         libparrot_soname       => "-install_name "
-            . $lib_dir
+            . '"'
+            . $conf->data->get('libdir')
             . '/libparrot'
             . $conf->data->get('share_ext')
+            . '"'
     );
 }
 

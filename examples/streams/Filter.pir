@@ -18,7 +18,7 @@ Creates a counter stream that generates numbers from 0 to 9.
 
 =cut
 
-.sub _main
+.sub _main :main
     .local pmc stream
     .local pmc filter
 
@@ -88,8 +88,8 @@ It also filters the value 4 out, which will be missing in the output.
 
     mul i, 2
     set tmp, i
-    concat str, " * 2 = "
-    concat str, tmp
+    str = concat str, " * 2 = "
+    str = concat str, tmp
 
     .return(str)
 
@@ -108,7 +108,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2009, Parrot Foundation.
+Copyright (C) 2004-2010, Parrot Foundation.
 
 =cut
 

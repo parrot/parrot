@@ -34,6 +34,8 @@ EXCEPTION_INVALID_OPERATION.
 pmclass Handle provides Handle manual_attrs {
     /* TODO: Consider encapsulating PIOHANDLE as a PMC type, for subclassing */
     ATTR PIOHANDLE os_handle;         /* Low level OS descriptor      */
+    ATTR INTVAL    record_separator;  /* Record separator (only single char
+                                       * supported) */
 
     VTABLE void init() {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -79,15 +81,11 @@ platforms that use integer file descriptors).
 */
 
     METHOD get_fd() {
-#ifndef PIO_OS_STDIO
         PIOHANDLE os_handle;
         INTVAL    fd;
         GET_ATTR_os_handle(INTERP, SELF, os_handle);
         fd = (INTVAL)os_handle;
         RETURN(INTVAL fd);
-#endif /*PIO_OS_STDIO*/
-
-        RETURN(INTVAL -1);
     }
 
 
@@ -125,6 +123,36 @@ Read a line from the handle and return it in a string.
 
 /*
 
+=item C<METHOD record_separator()>
+
+Set the record separator for readline.
+
+=cut
+
+*/
+
+    METHOD record_separator(STRING *str :optional, int has_str :opt_flag) {
+        INTVAL c;
+
+        if (has_str) {
+            if (STRING_length(str) != 1)
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                    "Record separator must be a single character");
+
+            c = STRING_ord(interp, str, 0);
+            SET_ATTR_record_separator(INTERP, SELF, c);
+        }
+        else {
+            GET_ATTR_record_separator(INTERP, SELF, c);
+            str = Parrot_str_chr(interp, c);
+        }
+
+        RETURN(STRING *str);
+    }
+
+
+/*
+
 =item C<METHOD close()>
 
 Close the handle.
@@ -134,7 +162,7 @@ Close the handle.
 */
 
     METHOD close() {
-        const INTVAL status = Parrot_io_close(INTERP, SELF);
+        const INTVAL status = Parrot_io_close_handle(INTERP, SELF);
         RETURN(INTVAL status);
     }
 

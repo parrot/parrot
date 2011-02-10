@@ -51,17 +51,21 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 =cut
 
+.include 'except_types.pasm'
+
 .namespace []
 
 .sub main :main
     .include 'test_more.pir'
-    plan(74)
+    plan(92)
 
     create_namespace_pmc()
     verify_namespace_type()
     get_namespace_class()
     keyed_namespace_lookup()
+    keyed_int_namespace_lookup()
     get_global_opcode()
+    inspect_opcode()
     get_sub_from_namespace_hash()
     access_sub_in_namespace()
     get_namespace_from_sub()
@@ -151,6 +155,14 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     $I0 = isnull $P1
     is($I0, 0, "get_class on a NameSpace returns something")
 
+    $P9 = $P0.'get_class'()
+    $I0 = issame $P9, $P1
+    ok($I0, "Namespace get_class method gives same result as get_class op")
+
+    $P8 = get_namespace
+    $P9 = $P8.'get_class'()
+    is_null($P9, "Namespace get_class gives NULL for non class namespace")
+
     # Create object from class from NameSpace
     push_eh eh
     $P2 = new $P1
@@ -167,6 +179,12 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .end
 
+.sub namespace_lookup_invalidkeytype
+    $P0 = get_root_namespace
+    $P2 = new ['Boolean']
+    $P0[$P2] = $P2
+.end
+
 .sub keyed_namespace_lookup
     # Tests to verify behavior of TT #1449
     $P0 = get_root_namespace
@@ -177,6 +195,9 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     is($I0, 0, "can lookup nested namespace by Key")
     # TODO: Get the function from this namespace and call it to verify we have
     #       the correct one.
+    $P1 = $P0["parrot";"Fool";"Baz"]
+    $I0 = isnull $P1
+    is($I0, 1, "can lookup nested namespace by Key - not found")
 
     # Array lookup
     $P1 = new ['ResizableStringArray']
@@ -185,10 +206,18 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     $P1[2] = "Bar"
     $P1[3] = "Baz"
     $P2 = $P0[$P1]
-    $I0 = isnull $P1
+    $I0 = isnull $P2
     is($I0, 0, "can lookup nested namespace by RSA")
+    say $P2
+    $I0 = isa $P2, "NameSpace"
+    is($I0, 1, "can lookup nested namespace by RSA - isa NameSpace")
     # TODO: Get the function from this namespace and call it to verify we have
     #       the correct one.
+    null $S0
+    $P1[3] = $S0
+    $P2 = $P0[$P1]
+    $I0 = isnull $P2
+    is($I0, 1, "lookup nested namespace by RSA with a null element")
 
     # String lookup
     $P1 = $P0["parrot"]
@@ -199,6 +228,35 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     is($I0, 0, "can lookup namespace by string")
     # TODO: Get the function from this namespace and call it to verify we have
     #       the correct one.
+
+    # String PMC lookup
+    $P3 = new ["String"]
+    $P3 = "Foo"
+    $P2 = $P1[$P3]
+    $I0 = isnull $P2
+    is($I0, 0, "can lookup namespace by String PMC")
+    $P3 = "NotFoo"
+    $P2 = $P1[$P3]
+    $I0 = isnull $P2
+    is($I0, 1, "can lookup namespace by String PMC - not found")
+
+    .const 'Sub' invalidkey = 'namespace_lookup_invalidkeytype'
+    throws_type(invalidkey, .EXCEPTION_GLOBAL_NOT_FOUND, 'namespace lookup with invalid key')
+.end
+
+.sub keyed_int_namespace_lookup
+    $P0 = get_root_namespace
+    $P1 = $P0[0]
+    $I0 = isnull $P1
+    is($I0, 1, "root namespace keyed_int returns NULL")
+
+    # This value must be hardcoded here, update the test if the
+    # vtable numbers change
+    .const int I_VTABLE_GET_STRING = 76
+    $P0 = get_namespace ["WithVtable"]
+    $P1 = $P0[I_VTABLE_GET_STRING]
+    $I0 = isnull $P1
+    is($I0, 0, "namespace keyed_int returns a :vtable sub")
 .end
 
 # L<PDD21//>
@@ -238,7 +296,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
   test4:
     throws_substring( <<'CODE', 'Null PMC access in invoke', 'Invoking a non-existent sub')
-        .sub main
+        .sub main :main
             $P0 = get_global ["Foo"], "SUB_THAT_DOES_NOT_EXIST"
             $P0()
         .end
@@ -247,7 +305,7 @@ CODE
   test5:
     # this used to behave differently from the previous case.
     throws_substring( <<'CODE', 'Null PMC access in invoke', 'Invoking a non-existent sub')
-        .sub main
+        .sub main :main
             $P0 = get_global ["Foo";"Bar"], "SUB_THAT_DOES_NOT_EXIST"
             $P0()
         .end
@@ -310,6 +368,23 @@ CODE
   end_test10:
     pop_eh
 
+.end
+
+.sub inspect_opcode_unknown_value
+    .local pmc ns
+    ns = get_namespace
+    $P0 = inspect ns, 'introspectionvaluethatshouldnotexist'
+.end
+
+.sub 'inspect_opcode'
+    .local pmc ns, value
+    ns = get_namespace ['WithVtable']
+    value = inspect ns, 'vtable_overrides'
+    $I0 = elements value
+    is($I0, 1, 'inspect vtable overrides from namespace')
+
+    .const 'Sub' unknown_value = 'inspect_opcode_unknown_value'
+    throws_type(unknown_value, .EXCEPTION_INVALID_OPERATION, 'inspect with invalid introspection value')
 .end
 
 .sub 'get_sub_from_namespace_hash'
@@ -573,6 +648,17 @@ CODE
     $S0 = $P1()
     is($S0, "", "find_var finds the correct sub")
 
+    $P0 = get_namespace ["FooSub"]
+    $P1 = $P0.'get_sym'("Bar")
+    $P2 = get_namespace ["FooSub";"Bar"]
+    $I0 = isnull $P1
+    $I1 = $I0
+    $I0 = isnull $P2
+    $I1 += $I0
+    $I0 = issame $P1, $P2
+    $I1 += $I0
+    is ($I0, 0, "get_sym gets a .sub and not a namespace with same name")
+
     # Test del_namespace. Test that it deletes an existing namespace, and that
     # it won't delete something that isn't a namespace
 
@@ -580,6 +666,42 @@ CODE
     # won't delete something that isn't a sub
 
     # Test del_var. It will delete any type of thing
+.end
+
+.sub export_empty_name_in_hash
+    .local pmc nsa, nsb, h
+    nsa = get_namespace
+    nsb = get_namespace ['Foo']
+    h = new ['Hash']
+    h[''] = 'foo'
+    nsb.'export_to'(nsa, h)
+.end
+
+.sub export_not_found_in_hash
+    .local pmc nsa, nsb, h
+    nsa = get_namespace
+    nsb = get_namespace ['Foo']
+    h = new ['Hash']
+    h["somethingthatshouldn'tbeinthenamespace"] = 'foo'
+    nsb.'export_to'(nsa, h)
+.end
+
+.sub export_empty_name_in_array
+    .local pmc nsa, nsb, h
+    nsa = get_namespace
+    nsb = get_namespace ['Foo']
+    h = new ['FixedStringArray'], 1
+    h[0] = ''
+    nsb.'export_to'(nsa, h)
+.end
+
+.sub export_not_found_in_array
+    .local pmc nsa, nsb, h
+    nsa = get_namespace
+    nsb = get_namespace ['Foo']
+    h = new ['FixedStringArray'], 1
+    h[0] = "somethingthatshouldn'tbeinthenamespace"
+    nsb.'export_to'(nsa, h)
 .end
 
 .sub 'export_to_method'
@@ -594,6 +716,22 @@ CODE
             ar = new ['ResizableStringArray']
             push ar, 'baz'
             nsa = new ['Null']
+            nsb = get_namespace ['Foo']
+            nsb.'export_to'(nsa, ar)
+        .end
+CODE
+
+    errormsg = "can't handle argument of type"
+    description = "export_to() invalid 'what' type"
+    throws_substring(<<"CODE", errormsg, description)
+        .sub 'test' :main
+            .local pmc nsa, nsb, ar
+
+            # To trigger the condition we need something of an unexpected
+            # type which elements vtable function does not return 0
+            ar = new ['String']
+            ar = 'boo'
+            nsa = get_namespace
             nsb = get_namespace ['Foo']
             nsb.'export_to'(nsa, ar)
         .end
@@ -637,7 +775,20 @@ CODE
             nsb = get_namespace ['Foo']
             nsb.'export_to'(nsa, ar)
         .end
+
 CODE
+
+    .const 'Sub' empty_name_hash = 'export_empty_name_in_hash'
+    throws_type(empty_name_hash, .EXCEPTION_INVALID_OPERATION, 'export from hash with empty key')
+
+    .const 'Sub' not_found_hash = 'export_not_found_in_hash'
+    throws_type(not_found_hash, .EXCEPTION_GLOBAL_NOT_FOUND, 'export from hash with key not found')
+
+    .const 'Sub' empty_name_array = 'export_empty_name_in_array'
+    throws_type(empty_name_array, .EXCEPTION_INVALID_OPERATION, 'export from array with empty value')
+
+    .const 'Sub' not_found_array = 'export_not_found_in_array'
+    throws_type(not_found_array, .EXCEPTION_GLOBAL_NOT_FOUND, 'export from array with value not found')
 
 # Things to add: successful export_to with non-empty array, successful
 # export_to with non-empty hash. both of these things across HLL boundaries
@@ -669,6 +820,20 @@ CODE
 .namespace ["Foo";"Bar";"Baz"]
 .sub 'widget'
     .return("Foo::Bar::Baz")
+.end
+
+# Nested namespace and a sub with same name
+.namespace ["FooSub"]
+.sub 'Bar'
+.end
+.namespace ["FooSub";"Bar"]
+.sub 'boo'
+.end
+
+# Namespace with :vtable
+.namespace ["WithVtable"]
+.sub 'get_string' :anon :vtable
+    .return('something')
 .end
 
 # Namespace specified in ISO-8859-1

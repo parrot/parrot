@@ -90,8 +90,6 @@ Parrot Options:
    --opcode=(type)      Use the given type for opcodes
    --ops=(files)        Use the given ops files
 
-   --jitcapable         Use JIT
-   --execcapable        Use JIT to emit a native executable
    --without-threads    Build parrot without thread support
    --buildframes        Dynamically build NCI call frames
    --without-core-nci-thunks

@@ -46,6 +46,8 @@ extern void *flush_reg_store(void);
 
 #define POOL_MAX_BYTES                         65536 * 128
 #define GC_SIZE_THRESHOLD                      1024  * 1024
+#define GC_DEFAULT_DYNAMIC_THRESHOLD           75
+#define GC_DEFAULT_MIN_THRESHOLD               4 * 1024 * 1024
 
 #define PMC_HEADERS_PER_ALLOC     4096 * 10 / sizeof (PMC)
 #define BUFFER_HEADERS_PER_ALLOC  4096      / sizeof (Buffer)
@@ -77,14 +79,6 @@ typedef struct GC_MS_PObj_Wrapper {
     struct GC_MS_PObj_Wrapper * next_ptr;
 } GC_MS_PObj_Wrapper;
 
-
-typedef enum _gc_sys_type_enum {
-    MS,  /* mark and sweep */
-    INF, /* infinite memory core */
-    TMS, /* tricolor mark and sweep */
-    MS2
-} gc_sys_type_enum;
-
 /* how often to skip a full GC when this pool has nothing free */
 typedef enum _gc_skip_type_enum {
     GC_NO_SKIP = 0,
@@ -102,11 +96,13 @@ typedef struct GC_Statistics {
     size_t  mem_allocs_since_last_collect;      /* The number of memory
                                                  * allocations from the
                                                  * system since the last
-                                                 * compaction run */
+                                                 * compaction run.
+                                                 * UNUSED, ALWAYS 0 */
     size_t  header_allocs_since_last_collect;   /* The size of header
                                                  * blocks allocated from
                                                  * the system since the last
-                                                 * GC run */
+                                                 * GC run.
+                                                 * UNUSED, ALWAYS 0 */
     size_t  memory_allocated;     /* The total amount of memory allocated
                                    * in fixed and variable size pools.
                                    * Doesn't count memory for internal
@@ -193,12 +189,11 @@ typedef struct GC_Subsystem {
     /* Iterate over _live_ strings. Used for string pool compacting */
     void (*iterate_live_strings)(PARROT_INTERP, string_iterator_callback callback, void *data);
 
+    /* Write barrier */
+    void (*write_barrier)(PARROT_INTERP, PMC *);
+
     /* Statistic for GC */
     struct GC_Statistics stats;
-
-    /*Function hooks that GC systems can CHOOSE to provide if they need them
-     *These will be called via the GC API functions Parrot_gc_func_name
-     *e.g. read barrier && write barrier hooks can go here later ...*/
 
     /* Holds system-specific data structures */
     void * gc_private;
@@ -583,13 +578,12 @@ void gc_ms_reallocate_string_storage(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-size_t Parrot_gc_get_info(PARROT_INTERP,
+size_t Parrot_gc_get_info(SHIM_INTERP,
     Interpinfo_enum which,
     ARGIN(GC_Statistics *stats))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-void Parrot_gc_ms_init(PARROT_INTERP)
+void Parrot_gc_ms_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -629,8 +623,7 @@ int Parrot_gc_ms_needed(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_Parrot_gc_get_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(stats))
+       PARROT_ASSERT_ARG(stats))
 #define ASSERT_ARGS_Parrot_gc_ms_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_ms_needed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -641,7 +634,7 @@ int Parrot_gc_ms_needed(PARROT_INTERP)
 /* HEADERIZER BEGIN: src/gc/gc_inf.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void Parrot_gc_inf_init(PARROT_INTERP)
+void Parrot_gc_inf_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_gc_inf_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -652,11 +645,19 @@ void Parrot_gc_inf_init(PARROT_INTERP)
 /* HEADERIZER BEGIN: src/gc/gc_ms2.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void Parrot_gc_ms2_init(PARROT_INTERP)
+void Parrot_gc_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_gc_ms2_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+void Parrot_gc_ms2_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_Parrot_gc_maybe_mark_and_sweep \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_gc_ms2_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(args))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/gc_ms2.c */
 

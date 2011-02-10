@@ -349,7 +349,6 @@ key receives the value of the hash element.
         STRING * const percent     = CONST_STRING(INTERP, "%");
         STRING * const comma       = CONST_STRING(INTERP, ",");
         STRING * const comma_space = CONST_STRING(INTERP, ", ");
-        STRING * const newline     = CONST_STRING(INTERP, "\n");
         STRING *key;
         PMC    *stringbuilder = SELF;
         INTVAL percentPos;

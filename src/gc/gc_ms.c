@@ -171,8 +171,7 @@ static void gc_ms_iterate_live_strings(PARROT_INTERP,
 static void gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
-static void gc_ms_mark_pobj_header(PARROT_INTERP, ARGMOD_NULLOK(PObj *obj))
-        __attribute__nonnull__(1)
+static void gc_ms_mark_pobj_header(SHIM_INTERP, ARGMOD_NULLOK(PObj *obj))
         FUNC_MODIFIES(*obj);
 
 static void gc_ms_mark_special(PARROT_INTERP, ARGIN(PMC *pmc))
@@ -327,8 +326,7 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_ms_mark_pobj_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms_mark_pobj_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_ms_mark_special __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -375,7 +373,7 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
 
 =over 4
 
-=item C<void Parrot_gc_ms_init(PARROT_INTERP)>
+=item C<void Parrot_gc_ms_init(PARROT_INTERP, Parrot_GC_Init_Args *args)>
 
 Initialize the state structures of the gc system. Called immediately before
 creation of memory pools. This function must set the function pointers
@@ -387,7 +385,7 @@ C<more_object_fn>.
 */
 
 void
-Parrot_gc_ms_init(PARROT_INTERP)
+Parrot_gc_ms_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_gc_ms_init)
 
@@ -549,7 +547,7 @@ Parrot_gc_ms_needed(PARROT_INTERP)
     /* The dynamic threshold is a configurable percentage of the amount of
        memory used after the last GC */
     dynamic_threshold = (size_t)(interp->gc_sys->stats.mem_used_last_collect *
-                                 (0.01 * interp->gc_threshold));
+                                 0.25);
 
     return new_mem > dynamic_threshold;
 }
@@ -619,10 +617,8 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     /* Note it */
     ++interp->gc_sys->stats.gc_mark_runs;
-    interp->gc_sys->stats.header_allocs_since_last_collect = 0;
 
     --mem_pools->gc_mark_block_level;
-    interp->gc_sys->stats.header_allocs_since_last_collect = 0;
     interp->gc_sys->stats.mem_used_last_collect = interp->gc_sys->stats.memory_used;
 
     return;
@@ -828,10 +824,8 @@ gc_ms_mark_pmc_header(PARROT_INTERP, ARGMOD_NULLOK(PMC *obj))
 
         /* if object is a PMC and contains buffers or PMCs, then attach the PMC
          * to the chained mark list. */
-        if (PObj_is_special_PMC_TEST(obj)) {
-            if (PObj_custom_mark_TEST(obj))
-                VTABLE_mark(interp, obj);
-        }
+        if (PObj_custom_mark_TEST(obj))
+            VTABLE_mark(interp, obj);
 
         if (PMC_metadata(obj))
             Parrot_gc_mark_PMC_alive(interp, PMC_metadata(obj));
@@ -942,7 +936,7 @@ mark *obj as live
 */
 
 static void
-gc_ms_mark_pobj_header(PARROT_INTERP, ARGMOD_NULLOK(PObj *obj))
+gc_ms_mark_pobj_header(SHIM_INTERP, ARGMOD_NULLOK(PObj *obj))
 {
     ASSERT_ARGS(gc_ms_mark_pobj_header)
     if (obj) {
@@ -1797,13 +1791,15 @@ returns stats as required by enum which
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 size_t
-Parrot_gc_get_info(PARROT_INTERP, Interpinfo_enum which, ARGIN(GC_Statistics *stats))
+Parrot_gc_get_info(SHIM_INTERP, Interpinfo_enum which, ARGIN(GC_Statistics *stats))
 {
     ASSERT_ARGS(Parrot_gc_get_info)
 
     switch (which) {
         case TOTAL_MEM_ALLOC:
             return stats->memory_allocated;
+        case TOTAL_MEM_USED:
+            return stats->memory_used;
         case GC_MARK_RUNS:
             return stats->gc_mark_runs;
         case GC_COLLECT_RUNS:

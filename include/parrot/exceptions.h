@@ -223,6 +223,12 @@ void die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_ex_build_complete_backtrace_string(PARROT_INTERP,
+    ARGIN(PMC * ex))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 void Parrot_print_backtrace(void);
 #define ASSERT_ARGS_do_panic __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_exit_fatal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -262,6 +268,10 @@ void Parrot_print_backtrace(void);
 #define ASSERT_ARGS_die_from_exception __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(exception))
+#define ASSERT_ARGS_Parrot_ex_build_complete_backtrace_string \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ex))
 #define ASSERT_ARGS_Parrot_print_backtrace __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exceptions.c */

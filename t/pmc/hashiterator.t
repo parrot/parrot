@@ -17,18 +17,21 @@ well.
 
 =cut
 
+.include 'hash_key_type.pasm'
 .include 'except_types.pasm'
 
 .sub main :main
     .include 'test_more.pir'
 
-    plan(10)
+    plan(14)
 
     iter_over_empty_hash()
     iter_over_single_element()
     iter_over_single_element_with_checks()
     iter_invalid_type()
+    iter_hash_keyed_int()
     iter_clone()
+    iter_and_delete()
 .end
 
 .sub 'iter_over_empty_hash'
@@ -37,6 +40,9 @@ well.
     it   = new 'HashIterator', hash
     $I0  = isfalse it
     ok($I0, "Iterator for empty Hash is empty")
+
+    $I0  = elements it
+    is($I0, 0, "Iterator for empty Hash has 0 elements")
 
     # shift_pmc throws on empty Hash but shift_string doesn't.
 
@@ -110,6 +116,24 @@ well.
     ok(i, 'setting invalid type throws')
 .end
 
+.sub iter_hash_keyed_int
+    .local pmc hash, it, value
+    .local int check
+    hash = new ['Hash']
+    hash = .Hash_key_type_int
+    hash[0] = 'a'
+    hash[1] = 'b'
+    hash['0'] = 'x'
+    it = iter hash
+    value = shift it
+    value = shift it
+    check = 0
+    if it goto report
+    check = 1
+  report:
+    is(check, 1, 'iterate over hash with int key type')
+.end
+
 .sub iter_clone
     .local pmc oh, it, cl
     .local int result
@@ -120,6 +144,52 @@ well.
     cl = clone it
     result = isnull cl
     ok(result, 'clone of HashIterator gives null')
+.end
+
+.sub iter_and_delete
+    .local pmc hash, it, value
+    .local int check
+
+    # Make sure we get used memory with garbage content and not fresh
+    # zeroed pages
+    sweep 1
+
+    hash = new ['Hash']
+    hash = .Hash_key_type_int
+    hash[1] = 'a'
+    hash[2] = 'b'
+    hash[3] = 'c'
+    it = iter hash
+    delete hash[1]
+    delete hash[2]
+    delete hash[3]
+    check = 0
+    push_eh catch_int
+    value = shift it
+    goto report_int
+  catch_int:
+    check = 1
+  report_int:
+    ok(check, 'iterate over int hash with deleted keys')
+    pop_eh
+
+    hash = new ['Hash']
+    hash['x'] = 'a'
+    hash['y'] = 'b'
+    hash['z'] = 'c'
+    it = iter hash
+    delete hash['x']
+    delete hash['y']
+    delete hash['z']
+    check = 0
+    push_eh catch
+    value = shift it
+    goto report
+  catch:
+    check = 1
+  report:
+    ok(check, 'iterate over string hash with deleted keys')
+    pop_eh
 .end
 
 # Local Variables:

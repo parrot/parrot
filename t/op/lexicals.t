@@ -30,7 +30,7 @@ Tests various lexical scratchpad operations, as described in PDD20.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', '.lex parsing - PASM (\'$a\') succeeds' );
-.pcc_sub main:
+.pcc_sub :main main:
     .lex "$a", P0
     print "ok\n"
     end
@@ -39,7 +39,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', '.lex parsing - PIR' );
-.sub main
+.sub main :main
     .lex "$a", $P0
     print "ok\n"
 .end
@@ -68,7 +68,7 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', '.lex - same PMC twice (PASM)' );
-.pcc_sub main:
+.pcc_sub :main main:
     .lex '$a', P0
     .lex '$b', P0
     new P0, 'String'
@@ -167,7 +167,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexpad - no pad inherited in coro' );
-.sub main
+.sub main :main
      coro()
 .end
 .sub coro
@@ -186,7 +186,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexpad - set var via pad' );
-.sub main
+.sub main :main
     .local pmc pad, interp
     interp = getinterp
     pad = interp["lexpad"]
@@ -209,7 +209,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexpad - set two vars via pad (2 lex -> 2 pmc)' );
-.sub main
+.sub main :main
     .lex '$a', $P0
     .lex '$b', $P2
     .local pmc pad, interp
@@ -238,7 +238,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'synopsis example' );
-.sub main
+.sub main :main
     .lex '$a', $P0
     $P1 = new 'Integer'
     $P1 = 13013
@@ -252,7 +252,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', ':lex parsing - PASM' );
-.pcc_sub main:
+.pcc_sub :main main:
     print "ok\n"
     end
 .pcc_sub :lex foo:
@@ -262,7 +262,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ':lex parsing - PIR' );
-.sub main
+.sub main :main
     print "ok\n"
 .end
 .sub foo :lex
@@ -272,7 +272,7 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', ':outer parsing - PASM' );
-.pcc_sub main:
+.pcc_sub :main main:
     print "ok\n"
     end
 .pcc_sub :outer('main') foo:
@@ -282,7 +282,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ':outer parsing - PIR' );
-.sub main
+.sub main :main
     print "ok\n"
 .end
 .sub foo :outer('main')
@@ -292,7 +292,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ':outer parsing - ident' );
-.sub main
+.sub main :main
     .local pmc a
     .lex "$a", a
     print "ok\n"
@@ -315,7 +315,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexinfo from pad' );
-.sub main
+.sub main :main
     .lex '$a', $P0
     .local pmc pad, interp, info
     interp = getinterp
@@ -337,7 +337,7 @@ LexInfo
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ':lex parsing - verify info and pad' );
-.sub main
+.sub main :main
     foo()
     print "ok\n"
 .end
@@ -366,7 +366,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer' );
-.sub "main"
+.sub 'main' :main
     foo()
 .end
 .sub foo :outer('main')
@@ -381,7 +381,7 @@ main
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer 2' );
-.sub "main"
+.sub 'main' :main
     foo()
 .end
 .sub foo  :outer('main')
@@ -403,7 +403,7 @@ main
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer via interp' );
-.sub "main"
+.sub 'main' :main
     .const 'Sub' foo = "foo"
     .local pmc foo_cl
     .lex "a", $P0
@@ -1460,7 +1460,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'TT #536: lexical sub lookup' );
-.sub 'main'
+.sub 'main' :main
     .const 'Sub' $P0 = 'lexfoo'
     .lex 'foo1', $P0
     .lex 'foo2', $P0
@@ -1488,7 +1488,7 @@ ok 2 - looking up lexical sub
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'find_dynamic_lex basic' );
-.sub 'main'
+.sub 'main' :main
     $P0 = box 'main'
     .lex '$*VAR', $P0
     'foo'()
@@ -1509,7 +1509,7 @@ null
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "find_dynamic_lex doesn't search outer" );
-.sub 'main'
+.sub 'main' :main
     $P0 = box 'main'
     .lex '$*VAR', $P0
     'bar'()
@@ -1534,7 +1534,7 @@ OUTPUT
 
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'find_dynamic_lex two levels deep' );
-.sub 'main'
+.sub 'main' :main
     $P0 = box 'main'
     .lex '$*VAR', $P0
     'bar'()
@@ -1553,7 +1553,7 @@ main
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', '.lex should not accept $S#');
-.sub 'main'
+.sub 'main' :main
     $S0 = 'hello world'
     .lex '$var', $S0
 .end
@@ -1562,7 +1562,7 @@ CODE
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', '.lex should not accept $I#');
-.sub 'main'
+.sub 'main' :main
     $I0 = 5
     .lex '$var', $I0
 .end
@@ -1571,7 +1571,7 @@ CODE
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', '.lex should not accept $N#');
-.sub 'main'
+.sub 'main' :main
     $N0 = 3.14
     .lex '$pi', $N0
 .end
@@ -1580,7 +1580,7 @@ CODE
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'store_lex should not accept $S#');
-.sub 'main'
+.sub 'main' :main
     $S0 = 'hello world'
     store_lex '$var', $S0
 .end
@@ -1589,7 +1589,7 @@ CODE
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'store_lex should not accept $I#');
-.sub 'main'
+.sub 'main' :main
     $I0 = 5
     store_lex '$var', $I0
 .end
@@ -1598,7 +1598,7 @@ CODE
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'store_lex should not accept $N#');
-.sub 'main'
+.sub 'main' :main
     $N0 = 3.14
     store_lex '$pi', $N0
 .end

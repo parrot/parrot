@@ -1,12 +1,8 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
-
 package Parrot::Pmc2c::Parser;
-
+# Copyright (C) 2004-2011, Parrot Foundation.
 use strict;
 use warnings;
-
 use base qw( Exporter );
-
 our @EXPORT_OK = qw( parse_pmc extract_balanced );
 use Parrot::Pmc2c::PMC ();
 use Parrot::Pmc2c::Attribute ();
@@ -22,12 +18,18 @@ Parrot::Pmc2c::Parser - PMC Parser
 
 =head1 SYNOPSIS
 
-    use Parrot::Pmc2c::Parser;
+    use Parrot::Pmc2c::Parser qw(
+        parse_pmc
+        extract_balanced
+    );
 
 =head1 DESCRIPTION
 
-Parrot::Pmc2c::Parser parses a sudo C syntax into a perl hash that is then dumped.
+Parrot::Pmc2c::Parser parses a pseudo-C syntax into a perl hash that is then dumped.
 
+=head1 SUBROUTINES
+
+This package exports two subroutines on request only.
 
 =head2 C<parse_pmc()>
 
@@ -51,7 +53,7 @@ Filename of the pmc to parse.
 
 B<Return Values:>  Reference to a Parrot::Pmc2c::PMC object
 
-B<Comments:>  Called by C<dump_pmc()>.
+B<Comments:>  Called by C<Parrot::Pmc2c::Dumper::dump_pmc()>.
 
 =cut
 
@@ -291,10 +293,6 @@ sub find_methods {
                 }
             }
 
-            # To be deprecated
-            parse_mmds( $method, $filename, $lineno )
-                if $methodblock =~ /\bMMD_(\w+):/;
-
             $pmc->add_method($method);
         }
 
@@ -309,56 +307,6 @@ sub find_methods {
     return ($lineno, $class_init);
 }
 
-sub parse_mmds {
-    my ( $method, $filename, $lineno ) = @_;
-    my $mmd_methods         = [];
-    my $body_text           = $method->body;
-    my $default_body        = $body_text;
-    my $default_body_lineno = $lineno;
-
-    # now split into MMD if necessary:
-    while ( $body_text =~ s/(\bMMD_(\w+):\s*)// ) {
-
-        $lineno       += count_newlines($1);
-        my $right_type = $2;
-
-        $method->add_mmd_rights($right_type);
-
-        ( my $mmd_part, $body_text ) = extract_bracketed_body_text( $body_text, '{' );
-
-        die "Empty MMD body near '$body_text'" unless $mmd_part;
-        my $mmd_part_lines = count_newlines($mmd_part);
-
-        # remove whitespace at end of last line
-        $mmd_part =~ s/\n\s*$/\n/s;
-
-        if ( $right_type eq 'DEFAULT' ) {
-            $default_body        = $mmd_part;
-            $default_body_lineno = $lineno;
-        }
-        else {
-            my $mmd_method = Parrot::Pmc2c::Method->new(
-                {
-                    name        => $method->name . "_$right_type",
-                    parent_name => $method->parent_name,
-                    body        => Parrot::Pmc2c::Emitter->text( $mmd_part, $filename, $lineno ),
-                    return_type => $method->return_type,
-                    parameters  => $method->parameters,
-                    type        => Parrot::Pmc2c::Method::VTABLE,
-                    attrs       => $method->attrs,
-                    right       => $right_type,
-                }
-            );
-
-            push @{$mmd_methods}, $mmd_method;
-        }
-
-        $lineno += $mmd_part_lines;
-    }
-    $method->mmds($mmd_methods);
-    $method->body( Parrot::Pmc2c::Emitter->text( $default_body, $filename, $default_body_lineno ) );
-}
-
 sub strip_outer_brackets {
     my ($method_body) = @_;
     die "First character in $method_body is not a {"
@@ -368,12 +316,6 @@ sub strip_outer_brackets {
         unless substr( $method_body, -1, 1 ) eq '}';
 
     return substr $method_body, 1, -1;
-}
-
-sub extract_bracketed_body_text {
-    my ( $body_text, $bracketed ) = @_;
-    my ( $extracted, $remaining ) = extract_bracketed( $body_text, $bracketed );
-    return ( strip_outer_brackets($extracted), $remaining );
 }
 
 =head2 C<parse_top_level()>

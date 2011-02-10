@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -16,12 +16,15 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(142)
+    plan(143)
 
+    init_tests()
     resize_tests()
     negative_array_size()
     set_tests()
@@ -57,6 +60,15 @@ out-of-bounds test. Checks INT and PMC keys.
     push_to_subclasses_array()
 .end
 
+.sub init_negative
+    .local pmc p
+    p = new ['ResizablePMCArray'], -1
+.end
+
+.sub init_tests
+    .const 'Sub' negative = 'init_negative'
+    throws_type(negative, .EXCEPTION_OUT_OF_BOUNDS, 'new with negative size fails')
+.end
 
 .sub resize_tests
     .local pmc p
@@ -327,8 +339,8 @@ lp:
     unless it goto done
     $P0 = shift it
     $S0 = $P0
-    concat sorted, $S0
-    concat sorted, " "
+    sorted = concat sorted, $S0
+    sorted = concat sorted, " "
     goto lp
 done:
     is(sorted, "1 2 5 9 10 ", "inherited sort method works")
@@ -350,9 +362,9 @@ done:
     arr.'sort'(comparator)
     .local string s, aux
     s = typeof arr
-    concat s, ':'
+    s = concat s, ':'
     aux = join '-', arr
-    concat s, aux
+    s = concat s, aux
     is(s, 'ssRPA:z-p-a', "sort works in a pir subclass, TT #218")
 .end
 
@@ -491,8 +503,8 @@ done:
 loop:
     set $P2, $P1[$I0]
     typeof $S0, $P2
-    concat $S1, $S0
-    concat $S1, ","
+    $S1 = concat $S1, $S0
+    $S1 = concat $S1, ","
     inc $I0
     lt $I0, $I1, loop
 
@@ -835,7 +847,7 @@ loop:
     unless $P3 goto loop_end
     $P4 = shift $P3
     $S1 = $P4
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
     goto loop
 loop_end:
     .return($S0)
@@ -993,8 +1005,8 @@ loop:
     unless it goto end
     $P2 = shift it
     $S0 = $P2
-    concat $S1, $S0
-    concat $S1, ","
+    $S1 = concat $S1, $S0
+    $S1 = concat $S1, ","
     goto loop
 end:
     is($S1, "11,13,15,", "iterator works on RPA subclass")

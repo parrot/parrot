@@ -21,10 +21,20 @@
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 117 )
+    plan( 149 )
 
     test_skip()
     test_todo()
+    test_todo_ok()
+    test_todo_nok()
+    test_todo_is()
+    test_todo_isnt()
+    test_todo_like()
+    test_todo_is_deeply()
+    test_todo_isa_ok()
+    test_todo_throws_like()
+    test_todo_lives_ok()
+    test_todo_dies_ok()
     test_ok()
     test_nok()
     test_is()
@@ -817,6 +827,282 @@ CODE
     test_test( 'todo test with no description or reason' )
 
 .end
+
+.sub test_todo_ok
+
+    test_out( 'ok 13 # TODO todo reason' )
+    ok( 1, 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "ok" param) test should pass, marked as TODO' )
+
+    test_out( "not ok 14 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    ok( 0, 'failing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "ok" param) test should fail, marked as TODO' )
+
+.end
+
+.sub test_todo_nok
+
+    test_out( 'ok 15 # TODO todo reason' )
+    nok( 0, 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "nok" param) test should pass, marked as TODO' )
+
+    test_out( "not ok 16 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    nok( 1, 'failing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "nok" param) test should fail, marked as TODO' )
+
+.end
+
+.sub test_todo_is
+
+    # is pass (PMC, Integer)
+    test_out( 'ok 17 # TODO todo reason' )
+    $P0 = new ['Integer'], 1
+    $I0 = 1
+    is( $P0, $I0, 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "is(PMC, Int)" param) test should pass, marked as TODO' )
+
+    # is fail (PMC, Integer)
+    test_out( "not ok 18 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    $P0 = new ['Integer'], 2
+    $I0 = 1
+    is( $P0, $I0, 'failing test', 'todo' => 'todo reason' )
+    test_diag( 'Have: 2' )
+    test_diag( 'Want: 1' )
+    test_test( 'todo (as "is(PMC, Int)" param) test should fail, marked as TODO' )
+
+    # is pass (PMC, Float)
+    test_out( 'ok 19 # TODO todo reason' )
+    $P0 = new ['Float']
+    $P0 = 1.1
+    is( $P0, 1.1, 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "is(PMC, Float)" param) test should pass, marked as TODO' )
+
+    # is fail (PMC, Float)
+    test_out( "not ok 20 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    $P0 = new ['Float']
+    $P0 = 1.1
+    is( $P0, 2.2, 'failing test', 'todo' => 'todo reason' )
+    test_diag( 'Have: 1.1' )
+    test_diag( 'Want: 2.2' )
+    test_test( 'todo (as "is(PMC, Float)" param) test should fail, marked as TODO' )
+
+    # is pass (PMC, String)
+    test_out( 'ok 21 # TODO todo reason' )
+    $P0 = new ['String']
+    $P0 = "foobar"
+    is( $P0, "foobar", 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "is(PMC, String)" param) test should pass, marked as TODO' )
+
+    # is fail (PMC, String)
+    test_out( "not ok 22 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    $P0 = new ['String']
+    $P0 = "foobar"
+    is( $P0, "zzz", 'failing test', 'todo' => 'todo reason' )
+    test_diag( 'Have: foobar' )
+    test_diag( 'Want: zzz' )
+    test_test( 'todo (as "is(PMC, String)" param) test should fail, marked as TODO' )
+
+    .local pmc left
+    .local pmc right
+
+    # is pass (PMC, PMC)
+    test_out( 'ok 23 # TODO todo reason' )
+    null left
+    null right
+    is( left, right, 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "is(PMC, PMC)" param) test should pass, marked as TODO' )
+
+    # is fail (PMC, PMC)
+    test_out( "not ok 24 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    left  = new 'String'
+    left = 'left'
+    is( left, right, 'failing test', 'todo' => 'todo reason' )
+    test_diag( 'Have: left' )
+    test_diag( 'Want: null' )
+    test_test( 'todo (as "is(PMC, PMC)" param) test should fail, marked as TODO' )
+
+.end
+
+.sub test_todo_isnt
+
+    # isnt pass (Integer, Integer)
+    test_out( 'ok 25 # TODO todo reason' )
+    isnt( 1, 2, 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "isnt(Int, Int)" param) test should pass, marked as TODO' )
+
+    # isnt fail (Integer, Integer)
+    test_out( "not ok 26 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    isnt( 1, 1, 'failing test', 'todo' => 'todo reason' )
+    test_diag( 'Have: 1' )
+    test_diag( 'Want: not 1' )
+    test_test( 'todo (as "isnt(Int, Int)" param) test should fail, marked as TODO' )
+
+    # isnt pass (Float, Float)
+    test_out( 'ok 27 # TODO todo reason' )
+    isnt( 1.1, 2.2, 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "isnt(Float, Float)" param) test should pass, marked as TODO' )
+
+    # isnt fail (Float, Float)
+    test_out( "not ok 28 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    isnt( 1.1, 1.1, 'failing test', 'todo' => 'todo reason' )
+    test_diag( 'Have: 1.1' )
+    test_diag( 'Want: not 1.1' )
+    test_test( 'todo (as "isnt(Float, Float)" param) test should fail, marked as TODO' )
+
+    # isnt pass (String, String)
+    test_out( 'ok 29 # TODO todo reason' )
+    isnt( "foobar", "zzz", 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "isnt(String, String)" param) test should pass, marked as TODO' )
+
+    # isnt fail (String, String)
+    test_out( "not ok 30 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    isnt( "foobar", "foobar", 'failing test', 'todo' => 'todo reason' )
+    test_diag( 'Have: foobar' )
+    test_diag( 'Want: not foobar' )
+    test_test( 'todo (as "isnt(String, String)" param) test should fail, marked as TODO' )
+
+    # isnt pass (PMC, PMC)
+    test_out( 'ok 31 # TODO todo reason' )
+    $P0 = new ['String']
+    $P0 = "123"
+    $P1 = new ['String']
+    $P1 = "999"
+    isnt( $P0, $P1, 'passing test', 'todo' => 'todo reason' )
+    test_test( 'todo (as "isnt(PMC, PMC)" param) test should pass, marked as TODO' )
+
+    # isnt fail (PMC, PMC)
+    test_out( "not ok 32 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
+    $P0 = new ['String']
+    $P0 = "123"
+    $P1 = new ['String']
+    $P1 = "123"
+    isnt( $P0, $P1, 'failing test', 'todo' => 'todo reason' )
+    test_diag( 'Have: 123' )
+    test_diag( 'Want: not 123' )
+    test_test( 'todo (as "isnt(PMC, PMC)" param) test should fail, marked as TODO' )
+
+.end
+
+.sub test_todo_like
+
+    test_out( 'ok 33 # TODO todo reason' )
+    like( 'abcdef', '<[c]>', 'testing like()', 'todo' => 'todo reason' )
+    test_test( 'todo (as "like()" param) test should pass, marked as TODO' )
+
+    test_out( "not ok 34 # TODO todo reason\n\tFailed (TODO) test 'testing like()'" )
+    like( 'abcdef', '<[z]>', 'testing like()', 'todo' => 'todo reason' )
+    test_diag( "match failed: target 'abcdef' does not match pattern '<[z]>'" )
+    test_test( 'todo (as "like()" param) test should fail, marked as TODO' )
+
+.end
+
+.sub test_todo_is_deeply
+
+    .local pmc left
+    .local pmc right
+    left  = new 'ResizablePMCArray'
+    right = new 'ResizablePMCArray'
+
+    push left,  7
+    push right, 7
+    push left,  'seven'
+    push right, 'seven'
+
+    test_out( 'ok 35 # TODO todo reason' )
+    is_deeply( left, right, 'comparing two pmc arrays', 'todo' => 'todo reason' )
+    test_test( 'todo (as "is_deeply()" param) test should pass, marked as TODO' )
+
+    push left, '9 - 2'
+
+    test_out( "not ok 36 # TODO todo reason\n\tFailed (TODO) test 'comparing two pmc arrays'" )
+    test_diag( 'Mismatch: expected 3 elements, received 2' )
+    is_deeply( left, right, 'comparing two pmc arrays', 'todo' => 'todo reason' )
+    test_test( 'todo (as "is_deeply()" param) test should fail, marked as TODO' )
+
+.end
+
+.sub test_todo_isa_ok
+
+    .local pmc dog, terrier, daschund, Spot, Sossy
+
+    dog = newclass "dog_class"
+    terrier = subclass dog, "terrier_sub"
+    daschund = subclass dog, "daschund_sub"
+
+    Spot = new "terrier_sub"
+    Sossy = new "daschund_sub"
+
+    test_out( 'ok 37 # TODO todo reason' )
+    isa_ok(Spot, "terrier_sub", "Spot", 'todo' => 'todo reason')
+    test_test( 'todo (as "isa_ok()" param) test should pass, marked as TODO' )
+
+    test_out( "not ok 38 # TODO todo reason\n\tFailed (TODO) test 'Spot isa daschund_sub'" )
+    test_diag( "Spot isn't a daschund_sub it's a terrier_sub" )
+    isa_ok(Spot, 'daschund_sub', "Spot", 'todo' => 'todo reason')
+    test_test( 'todo (as "isa_ok()" param) test should fail, marked as TODO' )
+
+.end
+
+
+.sub test_todo_throws_like
+    test_out( "not ok 39 # TODO todo reason\n\tFailed (TODO) test 'throws_like fails when there is no error'" )
+    throws_like( <<'CODE', 'somejunk', 'throws_like fails when there is no error', 'todo' => 'todo reason')
+  .sub main
+    $I0 = 42
+  .end
+CODE
+    test_diag( 'no error thrown' )
+    test_test( 'todo (as "throws_like()" param) test should fail, marked as TODO' )
+
+    test_out( 'ok 40 # TODO todo reason' )
+    throws_like( <<'CODE', 'for\ the\ lulz','throws_like passes when error matches pattern', 'todo' => 'todo reason')
+  .sub main
+    die 'I did it for the lulz'
+  .end
+CODE
+    test_test( 'todo (as "throws_like()" param) test should pass, marked as TODO' )
+.end
+
+
+.sub test_todo_lives_ok
+    test_out( 'ok 41 # TODO todo reason' )
+    lives_ok( <<'CODE', 'lives_ok passes when there is no error', 'todo' => 'todo reason' )
+  .sub main
+    $I0 = 42
+  .end
+CODE
+    test_test( 'todo (as "lives_ok()" param) test should pass, marked as TODO' )
+
+    test_out( "not ok 42 # TODO todo reason\n\tFailed (TODO) test 'lives_ok fails when there is an error'" )
+    lives_ok( <<'CODE', 'lives_ok fails when there is an error', 'todo' => 'todo reason' )
+  .sub main
+    die 'I did it for the lulz'
+  .end
+CODE
+    test_diag( 'I did it for the lulz' )
+    test_test( 'todo (as "lives_ok()" param) test should fail, marked as TODO' )
+.end
+
+
+.sub test_todo_dies_ok
+    test_out( 'ok 43 # TODO todo reason' )
+    dies_ok( <<'CODE', 'dies_ok passes when there is an error', 'todo' => 'todo reason' )
+  .sub main
+    die 'I did it for the lulz'
+  .end
+CODE
+    test_test( 'todo (as "dies_ok()" param) test should fail, marked as TODO' )
+
+    test_out( "not ok 44 # TODO todo reason\n\tFailed (TODO) test 'dies_ok fails when there is no error'" )
+    dies_ok( <<'CODE', 'dies_ok fails when there is no error', 'todo' => 'todo reason' )
+  .sub main
+    $I0 = 42
+  .end
+CODE
+    test_diag( 'no error thrown' )
+    test_test( 'todo (as "dies_ok()" param) test should fail, marked as TODO' )
+.end
+
 
 .sub test_isa_ok
     .local pmc dog, terrier, daschund, Spot, Sossy
