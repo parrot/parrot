@@ -459,6 +459,10 @@ pool_is_maybe_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
     Pool_Allocator_Arena *arena = pool->top_arena;
     size_t                a_size;
 
+    /* Poiners are aligned */
+    if (PTR2UINTVAL(ptr) & 3)
+        return 0;
+
     return (ptr >= pool->lo_arena_ptr && ptr < pool->hi_arena_ptr);
 }
 
