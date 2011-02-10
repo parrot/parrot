@@ -28,6 +28,12 @@ are a subset of the C<M0> specification.
 Lorito refers to the combination of C<M0>, a meta-object model and the way that
 they're used as a foundation for Parrot.
 
+=item * Lorito Context
+
+This refers to a Lorito Context PMC, which is the most important datastructure
+at the M0 level. You could say that it is the "secret sauce" of M0. The exact
+details of the Lorito Context PMC are still in flux.
+
 =back
 
 =head2 Design Goals
@@ -63,11 +69,11 @@ spec is more stable.
 
 =item * noop - Do Nothing
 
-=item * get_cc - Get the current context
+=item * get_cc - Get the current Lorito context
 
-=item * invoke_cc - Invoke the current context
+=item * invoke_cc - Invoke the current Lorito context
 
-=item * new_ctx - Create a new context
+=item * new_ctx - Create a new Lorito context
 
 
 =head2 Textual Representation
