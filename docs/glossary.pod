@@ -208,6 +208,11 @@ abstract syntax tree.
 
 See also L<"PCT">.
 
+=item PASM
+
+Parrot Assembly Language is the lowest level language before being translated
+in to bytecode.  Generally PIR is used.
+
 =item PBC
 
 Parrot Byte Code. The name for the "executable" files that can be passed to the
