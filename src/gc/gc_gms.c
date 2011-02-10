@@ -1422,6 +1422,14 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     if (PObj_is_live_or_free_TESTALL(obj))
         return 0;
 
+    /* If object too old - skip it */
+    if (POBJ2GEN(&item->pmc) > self->gen_to_collect)
+        return 0;
+
+    /* Object is on dirty_list. */
+    if (PObj_GC_on_dirty_list_TEST(&item->pmc))
+        return 0;
+
     for (i = 0; i < MAX_GENERATIONS; i++) {
         /* Pool.is_owned isn't precise enough (yet) */
         if (Parrot_pa_is_owned(interp, self->objects[i], item, item->ptr))
@@ -1550,7 +1558,7 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     ASSERT_ARGS(gc_gms_is_string_ptr)
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     PObj             *obj  = (PObj *)ptr;
-    pmc_alloc_struct *item = PMC2PAC(ptr);
+    string_alloc_struct *item = STR2PAC(ptr);
     size_t            i;
 
     if (!obj || !item)
@@ -1561,6 +1569,10 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 
     /* black or white objects marked already. */
     if (PObj_is_live_or_free_TESTALL(obj))
+        return 0;
+
+    /* If object too old - skip it */
+    if (POBJ2GEN(&item->str) > self->gen_to_collect)
         return 0;
 
     /* Pool.is_owned isn't precise enough (yet) */
