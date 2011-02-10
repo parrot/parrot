@@ -320,10 +320,6 @@ static void gc_gms_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
 static size_t gc_gms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
         __attribute__nonnull__(1);
 
-static void gc_gms_get_youngest_generation(PARROT_INTERP, ARGIN(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static unsigned int gc_gms_is_blocked_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -353,6 +349,11 @@ static void gc_gms_mark_str_header(PARROT_INTERP, ARGIN_NULLOK(STRING *str))
 
 static void gc_gms_maybe_mark_and_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
+
+static void gc_gms_pmc_get_youngest_generation(PARROT_INTERP,
+    ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void gc_gms_pmc_needs_early_collection(PARROT_INTERP,
     ARGMOD(PMC *pmc))
@@ -409,6 +410,11 @@ static void gc_gms_seal_object(PARROT_INTERP, ARGIN(PMC *pmc))
 
 static size_t gc_gms_select_generation_to_collect(PARROT_INTERP)
         __attribute__nonnull__(1);
+
+static void gc_gms_str_get_youngest_generation(PARROT_INTERP,
+    ARGIN(STRING *str))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void gc_gms_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
         __attribute__nonnull__(1)
@@ -513,10 +519,6 @@ static int pobj2gen(ARGIN(PObj *pmc))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_get_gc_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_gms_get_youngest_generation \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_is_blocked_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_is_blocked_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -536,6 +538,10 @@ static int pobj2gen(ARGIN(PObj *pmc))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_maybe_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_gms_pmc_get_youngest_generation \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_pmc_needs_early_collection \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -569,6 +575,10 @@ static int pobj2gen(ARGIN(PObj *pmc))
 #define ASSERT_ARGS_gc_gms_select_generation_to_collect \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_gms_str_get_youngest_generation \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_gc_gms_sweep_pmc_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj))
@@ -901,7 +911,8 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
     ASSERT_ARGS(gc_gms_cleanup_dirty_list)
 
     /* Override with special version of mark */
-    interp->gc_sys->mark_pmc_header = gc_gms_get_youngest_generation;
+    interp->gc_sys->mark_pmc_header = gc_gms_pmc_get_youngest_generation;
+    interp->gc_sys->mark_str_header = gc_gms_str_get_youngest_generation;
 
     POINTER_ARRAY_ITER(dirty_list,
         pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
@@ -926,6 +937,7 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
         });
 
     interp->gc_sys->mark_pmc_header = gc_gms_mark_pmc_header;
+    interp->gc_sys->mark_str_header = gc_gms_mark_str_header;
 }
 
 /*
@@ -2218,7 +2230,10 @@ gc_gms_validate_objects(PARROT_INTERP)
 
 /*
 
-=item C<static void gc_gms_get_youngest_generation(PARROT_INTERP, PMC *pmc)>
+=item C<static void gc_gms_pmc_get_youngest_generation(PARROT_INTERP, PMC *pmc)>
+
+=item C<static void gc_gms_str_get_youngest_generation(PARROT_INTERP, STRING
+*str)>
 
 Calculate youngest genereation of PMC children. Used to remove items from
 dirty_list.
@@ -2227,16 +2242,24 @@ dirty_list.
 
 */
 static void
-gc_gms_get_youngest_generation(PARROT_INTERP, ARGIN(PMC *pmc))
+gc_gms_pmc_get_youngest_generation(PARROT_INTERP, ARGIN(PMC *pmc))
 {
-    ASSERT_ARGS(gc_gms_get_youngest_generation)
+    ASSERT_ARGS(gc_gms_pmc_get_youngest_generation)
 
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            gen  = POBJ2GEN(pmc);
 
-    /* If child is on dirty_list ignore it. It will be kept alive anyway */
-    if (PObj_GC_on_dirty_list_TEST(pmc))
-        return;
+    if (gen < self->youngest_child)
+        self->youngest_child = gen;
+}
+
+static void
+gc_gms_str_get_youngest_generation(PARROT_INTERP, ARGIN(STRING *str))
+{
+    ASSERT_ARGS(gc_gms_str_get_youngest_generation)
+
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    size_t            gen  = POBJ2GEN(str);
 
     if (gen < self->youngest_child)
         self->youngest_child = gen;
