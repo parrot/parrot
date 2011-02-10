@@ -22036,10 +22036,21 @@ Parrot_copy_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
                 EXCEPTION_NULL_REG_ACCESS, "Null PMC in copy");return (opcode_t *)handler;
     }
     else {
+        PMC   * const clone = VTABLE_clone(interp, PREG(2));
         /* Preserve the metadata on the destination. */
         PMC   * const meta  = VTABLE_getprops(interp, PREG(1));
 
-        PREG(1) = VTABLE_clone(interp, PREG(2));
+        /* avoid leaks and unreachable memory by destroying the destination PMC */
+        Parrot_pmc_destroy(interp, PREG(1));
+
+        /* the source PMC knows how to clone itself, but we must reuse the
+         * destination header */
+        memmove(PREG(1), clone, sizeof (PMC));
+
+        /* don't let the clone's destruction destroy the destination's data */
+        PObj_custom_destroy_CLEAR(clone);
+        PMC_data(clone)        = NULL;
+        PMC_metadata(clone)    = NULL;
 
         /* Restore metadata. */
         if (!PMC_IS_NULL(meta)) {
