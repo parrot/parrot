@@ -7,33 +7,72 @@
 This document specifies M0, the set of microcode-like ops on which Parrot will
 be based, and their requisite runtime environment.
 
-=head2 Introduction
-
-Insert introduction here.
-
 =head2 Definitions
 
 define things here (M0, mop/6model)
 
+=over 4
+
+=item * M0 
+
+C<M0> refers to the specification for a minimal virtual machine capable of
+executing the ops described in this document.
+
+=item * M0 ops
+
+This is the lowest-level set of ops supported by an M0-compliant VM.  These ops
+are a subset of the C<M0> specification.
+
+=item * Lorito
+
+Lorito refers to the combination of C<M0>, a meta-object model and the way that
+they're used as a foundation for Parrot.
+
+=back
+
 =head2 Design Goals
 
-Insert design goals here.
+There are three goals that M0 needs to meet.  The first is that we have
+executable code with equivalent power to C.  The second objective is to have a
+form of code with can be easily analyzed.  The third goal is that we have a
+single form of code used to implement the majority of Parrot, rather than
+having having a mix of C and PIR.
 
-=head2 Scope of this PDD
+We are also designing M0 to be minimally simple.  As much as possible, all the
+complexity of Parrot will be built on top of M0.  This is to facilitate
+multiple implementations, e.g. a quick and dirty prototype implementation in
+JavaScript, a space-optimized implemention targeted for mobile devices, a
+tracing jit targeted for server use, etc.
 
-list things that will/won't be covered
+=head2 Scope
+
+This document only covers M0 and the minimum VM necessary to support it.
+Anything beyond that, e.g. the meta-object model or layout of contexts, is
+beyond its scope.
 
 =head2 List of Ops
 
 Insert list of ops here.
 
+=head2 Textual Representation
+
+Describe what the textual form of M0 will look like.
+
+=head2 Binary Representation
+
+Describe what the binary form of M0 will look like
+
 =head2 metadata
 
-describe metadata here
+describe metadata here, e.g. debugging information, aggregate op tracking info, whatever
 
 =head2 Op Composition
 
 if m0 needs to support this, describe it here
+
+=head2 memory model
+
+describe what kind of memory m0 ops will have access to and how they'll get at it
 
 =head2 structs
 
@@ -58,15 +97,6 @@ describe this here
 =head2 FFI
 
 describe this here
-
-
-=head2 Interp Structure
-
-Describe interp structure here.  mostly relevant to Lorito.
-
-
-
-
 
 =cut
 
