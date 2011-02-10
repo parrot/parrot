@@ -1407,12 +1407,27 @@ static int
 gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_gms_is_pmc_ptr)
-    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    size_t             i;
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    PObj             *obj  = (PObj *)ptr;
+    pmc_alloc_struct *item = PMC2PAC(ptr);
+    size_t            i;
+
+    if (!obj || !item)
+        return 0;
+
+    if (!Parrot_gc_pool_is_owned(interp, self->pmc_allocator, item))
+        return 0;
+
+    /* black or white objects marked already. */
+    if (PObj_is_live_or_free_TESTALL(obj))
+        return 0;
+
     for (i = 0; i < MAX_GENERATIONS; i++) {
-        if (gc_gms_is_ptr_owned(interp, ptr, self->pmc_allocator, self->objects[i]))
+        /* Pool.is_owned isn't precise enough (yet) */
+        if (Parrot_pa_is_owned(interp, self->objects[i], item, item->ptr))
             return 1;
     }
+
     return 0;
 }
 
@@ -1533,10 +1548,24 @@ static int
 gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_gms_is_string_ptr)
-    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    size_t             i;
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    PObj             *obj  = (PObj *)ptr;
+    pmc_alloc_struct *item = PMC2PAC(ptr);
+    size_t            i;
+
+    if (!obj || !item)
+        return 0;
+
+    if (!Parrot_gc_pool_is_owned(interp, self->string_allocator, item))
+        return 0;
+
+    /* black or white objects marked already. */
+    if (PObj_is_live_or_free_TESTALL(obj))
+        return 0;
+
+    /* Pool.is_owned isn't precise enough (yet) */
     for (i = 0; i < MAX_GENERATIONS; i++) {
-        if (gc_gms_is_ptr_owned(interp, ptr, self->string_allocator, self->strings[i]))
+        if (Parrot_pa_is_owned(interp, self->strings[i], item, item->ptr))
             return 1;
     }
     return 0;
