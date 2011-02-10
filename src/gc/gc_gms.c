@@ -35,7 +35,7 @@ Notation
 4. R: root set.
 5. D: dirty list.
 
-GC algorithm WILL be:
+GC algorithm is:
 
 0. Pre-requirements:
     a) Invariant described above to maintain dirty_list.
