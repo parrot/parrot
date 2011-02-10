@@ -13,7 +13,7 @@ define things here (M0, mop/6model)
 
 =over 4
 
-=item * M0 
+=item * M0
 
 C<M0> refers to the specification for a minimal virtual machine capable of
 executing the ops described in this document.
@@ -44,6 +44,9 @@ multiple implementations, e.g. a quick and dirty prototype implementation in
 JavaScript, a space-optimized implemention targeted for mobile devices, a
 tracing jit targeted for server use, etc.
 
+There will be no stacks in M0, not even for argument passing. Everything must
+be in Continuation-Passing-Style.
+
 =head2 Scope
 
 This document only covers M0 and the minimum VM necessary to support it.
@@ -52,7 +55,20 @@ beyond its scope.
 
 =head2 List of Ops
 
-Insert list of ops here.
+M0 ops are very low-level and provide the smallest necessary amount of
+"syntax sugar" on top of the most basic operations of the VM.
+
+The names and number of the ops below may change at any time, until the
+spec is more stable.
+
+=item * noop - Do Nothing
+
+=item * get_cc - Get the current context
+
+=item * invoke_cc - Invoke the current context
+
+=item * new_ctx - Create a new context
+
 
 =head2 Textual Representation
 
