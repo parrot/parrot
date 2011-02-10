@@ -22039,6 +22039,8 @@ Parrot_copy_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
         PMC   * const clone = VTABLE_clone(interp, PREG(2));
         /* Preserve the metadata on the destination. */
         PMC   * const meta  = VTABLE_getprops(interp, PREG(1));
+        /* We have to preserve GC flags of original PMC */
+        Parrot_UInt   gc_flags = PREG(1)->flags & PObj_GC_all_FLAGS;
 
         /* avoid leaks and unreachable memory by destroying the destination PMC */
         Parrot_pmc_destroy(interp, PREG(1));
@@ -22046,6 +22048,7 @@ Parrot_copy_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
         /* the source PMC knows how to clone itself, but we must reuse the
          * destination header */
         memmove(PREG(1), clone, sizeof (PMC));
+        PREG(1)->flags |= gc_flags;
 
         /* don't let the clone's destruction destroy the destination's data */
         PObj_custom_destroy_CLEAR(clone);
