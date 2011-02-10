@@ -259,6 +259,11 @@ that hides messy details like register allocation so language compiler writers
 who target Parrot don't have to roll their own. Files have the
 extension C<.pir>.
 
+=item PIRATE
+
+PIRATE is Parrot's the next generation compiler, and is currently under development.  
+IMCC is still the current compiler.
+
 =item PIRC
 
 Parrot Intermediate Represenation Compiler.  It is an experimental attempt
