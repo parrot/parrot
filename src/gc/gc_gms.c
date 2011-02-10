@@ -332,14 +332,6 @@ static unsigned int gc_gms_is_blocked_GC_sweep(PARROT_INTERP)
 static int gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         __attribute__nonnull__(1);
 
-static int gc_gms_is_ptr_owned(PARROT_INTERP,
-    ARGIN_NULLOK(void *ptr),
-    ARGIN(Pool_Allocator *pool),
-    ARGIN(Parrot_Pointer_Array *list))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
-
 static int gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         __attribute__nonnull__(1);
 
@@ -530,10 +522,6 @@ static int pobj2gen(ARGIN(PObj *pmc))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_is_pmc_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_gms_is_ptr_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pool) \
-    , PARROT_ASSERT_ARG(list))
 #define ASSERT_ARGS_gc_gms_is_string_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_iterate_live_strings __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -1691,39 +1679,6 @@ gc_gms_iterate_live_strings(PARROT_INTERP,
 }
 
 
-
-
-/*
-=item C<static int gc_gms_is_ptr_owned(PARROT_INTERP, void *ptr, Pool_Allocator
-*pool, Parrot_Pointer_Array *list)>
-
-Helper function to check that we own PObj
-
-=cut
-*/
-
-static int
-gc_gms_is_ptr_owned(PARROT_INTERP, ARGIN_NULLOK(void *ptr),
-    ARGIN(Pool_Allocator *pool), ARGIN(Parrot_Pointer_Array *list))
-{
-    ASSERT_ARGS(gc_gms_is_ptr_owned)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    PObj             *obj  = (PObj *)ptr;
-    pmc_alloc_struct *item = PMC2PAC(ptr);
-
-    if (!obj || !item)
-        return 0;
-
-    if (!Parrot_gc_pool_is_owned(interp, pool, item))
-        return 0;
-
-    /* black or white objects marked already. */
-    if (PObj_is_live_or_free_TESTALL(obj))
-        return 0;
-
-    /* Pool.is_owned isn't precise enough (yet) */
-    return Parrot_pa_is_owned(interp, list, item, item->ptr);
-}
 
 
 /*
