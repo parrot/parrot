@@ -62,21 +62,6 @@ marked by referents from "dirty_list". To perform calculation of youngest
 child's generation we temporary override .mark_pmc_header with
 C<gc_gms_get_youngest_generation> which iterate over direct children only.
 
-XXX Step3 is wrong. Let's take next picture:
-  1) Object A(1) reference B(1).
-  2) We put C(0) to B(1).
-  3) B(1) moved to dirty_list.
-  4) We collect Gen1.
-  5) A(1) become A(2).
-  6) B(1*) stays in dirty_list
-  7) C(0) become C(1).
-  8) We collect Gen1 again.
-    i) B(1*) moved back to Gen1.
-    ii) B(1) is referenced only by A(2).
-    iii) A(2) isn't processed during GC.
-    iv) We collect B(1).
-
-
 4. Trace root objects. According to "0. Pre-requirements" we will ignore all
 "old" objects. All relevant objects are moved into "work_list".
 
@@ -934,7 +919,13 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
             Parrot_pa_remove(interp, dirty_list, item->ptr);
             item->ptr = Parrot_pa_insert(interp, self->objects[gen], item);
             gc_gms_seal_object(interp, pmc);
-        });
+        }
+        else {
+            /* Survival */
+            if ((gen <= self->gen_to_collect) && (gen < MAX_GENERATIONS - 1)) {
+                SET_GEN_FLAGS(pmc, gen + 1);
+            }
+        };);
 
     interp->gc_sys->mark_pmc_header = gc_gms_mark_pmc_header;
     interp->gc_sys->mark_str_header = gc_gms_mark_str_header;
