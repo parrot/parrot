@@ -2095,19 +2095,20 @@ gc_gms_check_sanity(PARROT_INTERP)
 
 /*
 
+=item C<void gc_gms_print_stats_always(PARROT_INTERP, const char* header)>
+
 =item C<static void gc_gms_print_stats(PARROT_INTERP, const char* header)>
 
-debug function
+debug functions
 
 =cut
 
 */
 
-
 void
 gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
 {
-    ASSERT_ARGS(gc_gms_print_stats)
+    ASSERT_ARGS(gc_gms_print_stats_always)
 
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            i;
@@ -2128,7 +2129,7 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
 
     fprintf(stderr, "STRING: %d\n", self->string_gc.memory_pool->total_allocated);
 
-#  if 0
+#if 0
     fprintf(stderr, "PMC: %d\n", Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
     fprintf(stderr, "STRING: %d\n", Parrot_gc_pool_allocated_size(interp, self->string_allocator));
 
@@ -2138,7 +2139,7 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
     fprintf(stderr, "attrs: %d\n", Parrot_gc_fixed_allocator_allocated_memory(interp,
                                                                       self->fixed_size_allocator));
 
-#  endif
+#endif
     fprintf(stderr, "\n");
 
 }
