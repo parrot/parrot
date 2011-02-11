@@ -4,6 +4,8 @@
 # see src/multidispatch.c
 
 # INPLACE MMD variant must always be normal op + 1
+# NOTE: VTABLE functions that modify their PMC must be marked with :write to
+# work properly with the generational GC.
 
 void init() :write
 # init must be first for JITed vtable meths

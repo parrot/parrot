@@ -1928,6 +1928,8 @@ gc_gms_maybe_mark_and_sweep(PARROT_INTERP)
 =item C<static void gc_gms_write_barrier(PARROT_INTERP, PMC *pmc)>
 
 WriteBarrier for PMC. Add to root_objects list for mandatory next collecting.
+This is automatically added by pmc2c to all VTABLE function which are marked
+with C<:write> in src/vtable.tbl.
 
 =cut
 */
