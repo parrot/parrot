@@ -240,7 +240,7 @@ be added, or overridden (for instance, the PAST to PIR transformation).
 Parrot Design Document: documents that describe the features parrot must
 implement.
 
-See also L<< http://github.com/parrot/parrot/docs/pdds/pdd00_pdd.pod >>.
+See also L<< <a href="http://github.com/parrot/parrot/docs/pdds/pdd00_pdd.pod">pdd00_pdd.pod</a> >>.
 
 =item PGE
 
