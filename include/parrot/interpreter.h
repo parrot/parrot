@@ -489,6 +489,10 @@ PMC * Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+Interp * Parrot_int_get_interp_from_pmc(ARGIN(PMC * interp_pmc))
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 void Parrot_mark_method_writes(PARROT_INTERP,
     int type,
     ARGIN(const char *name))
@@ -542,6 +546,9 @@ void register_nci_method(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_get_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(type))
+#define ASSERT_ARGS_Parrot_int_get_interp_from_pmc \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp_pmc))
 #define ASSERT_ARGS_Parrot_mark_method_writes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))

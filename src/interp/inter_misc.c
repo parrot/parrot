@@ -23,6 +23,7 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 #include "../compilers/imcc/imc.h"
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_callcontext.h"
+#include "pmc/pmc_parrotinterpreter.h"
 
 #include "parrot/has_header.h"
 
@@ -240,11 +241,9 @@ Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), ARGOUT(STRING **erro
     if (PMC_IS_NULL(result)) {
         STRING * const msg = imcc_last_error_message(imcc);
         INTVAL code = imcc_last_error_code(imcc);
-        Parrot_ex_throw_from_c_args(interp, NULL, code, msg);
+        Parrot_ex_throw_from_c_args(interp, NULL, code, "%Ss", msg);
     }
     pf = (PackFile *) VTABLE_get_pointer(interp, result);
-
-    // TODO: Get error message
 
     Parrot_pop_context(interp);
     Parrot_unblock_GC_mark(interp);
@@ -430,6 +429,16 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
                 "illegal argument in interpinfo");
     }
 }
+
+PARROT_EXPORT
+Interp *
+Parrot_int_get_interp_from_pmc(ARGIN(PMC * interp_pmc))
+{
+    ASSERT_ARGS(Parrot_int_get_interp_from_pmc)
+    PARROT_ASSERT(interp_pmc->vtable->base_type == enum_class_ParrotInterpreter);
+    return ((Parrot_ParrotInterpreter_attributes*)interp_pmc->data)->interp;
+}
+
 
 /*
  * Local variables:
