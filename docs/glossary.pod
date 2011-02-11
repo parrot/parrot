@@ -333,8 +333,10 @@ L<http://www.perl.com/pub/a/2003/02/p6pdigest/20030216.html>
 =item run core
 
 aka run loop, aka runcore. The way Parrot executes PBCs.
-See L<running.pod> for a list of available runcores, and how to tell
+See running.pod for a list of available runcores, and how to tell
 parrot which one to use.
+
+running.pod: L<< https://github.com/hackbinary/parrot/parrot/docs/running.pod >>
 
 =item SMOP
 
