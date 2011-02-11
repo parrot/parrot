@@ -146,6 +146,20 @@ code from M0 and vice versa.
 describe what primitives will be needed to allow data sharing and
 synchronization between contexts.
 
+
+
+=head1 Lorito
+
+=head2 Description
+
+This section covers the parts of Lorito that are not directly relevant to
+someone implementing an M0-compatible VM.  These topics are important to a
+complete implementation of Lorito but do not need to be directly addressed by
+M0 VM implementations.
+
+<this space intentionally left blank, for now>
+
+
 =cut
 
 __END__
