@@ -7,7 +7,6 @@ CX=/usr/bin/g++
 =general
 
 cc=$CC
-cxx=$CX
 link=$CX
 ld=/usr/bin/g++
 

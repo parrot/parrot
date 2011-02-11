@@ -57,7 +57,6 @@ foreach my $p (
         arflags
         ldflags
         libs
-        cxx
     |
     )
 {

@@ -276,10 +276,6 @@ Use the given compiler flags.
 
 Use the given compiler warning flags.
 
-=item C<--cxx=(compiler)>
-
-Specify which C++ compiler to use (for ICU).
-
 =item C<--libs=(libs)>
 
 Use the given libraries.
@@ -452,7 +448,6 @@ for the purpose of setting environmental variables used in options, like this:
     CX="/usr/bin/g++"
     /usr/local/bin/perl Configure.pl \
         --cc="$CC" \
-        --cxx="$CX" \
         --link="$CX" \
         --ld="$CX"
 
@@ -479,7 +474,6 @@ Parrot configuration options.  Entries in this section must be either
 I<option=value> pairs or be options which will be assigned a true value.
 
     cc=$CC
-    cxx=$CX
     link=$CX
     ld=/usr/bin/g++
     verbose
@@ -585,7 +579,6 @@ configuration file.
     =general
 
     cc=$CC
-    cxx=$CX
     link=$CX
     ld=/usr/bin/g++
 
