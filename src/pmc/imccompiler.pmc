@@ -7,6 +7,7 @@
 pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     ATTR void *imcc_info;
     ATTR INTVAL is_pasm; /* 0 = PIR, 1 = PASM */
+    ATTR INTVAL current_eval;
 
     VTABLE void init() {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -25,6 +26,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
                 "IMCCompiler: Must have type 0 (PIR) or 1 (PASM)");
         attrs->is_pasm = is_pasm;
         attrs->imcc_info = imcc_new(INTERP);
+        attrs->current_eval = 0;
     }
 
     /* provided to emulate the current NCI compreg */
@@ -62,7 +64,8 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             sub_data->seg = pf->cur_cs;
             sub_data->start_offs = 0;
             sub_data->end_offs = pf->cur_cs->base.size;
-            //sub_data->name = name;
+            sub_data->name = Parrot_sprintf_c(INTERP, "EVAL_%d", attrs->current_eval);
+            attrs->current_eval++;
             PackFile_fixup_subs(INTERP, PBC_MAIN, eval_pmc);
         }
 

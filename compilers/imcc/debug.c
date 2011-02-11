@@ -48,7 +48,9 @@ IMCC_fatal(ARGMOD(imc_info_t * imcc), SHIM(int code), ARGIN(const char *fmt), ..
     va_start(ap, fmt);
     imcc->error_message = Parrot_vsprintf_c(imcc->interp, fmt, ap);
     va_end(ap);
-    IMCC_THROW(imcc->jump_buf, IMCC_FATAL_EXCEPTION);
+    //IMCC_THROW(imcc->jump_buf, IMCC_FATAL_EXCEPTION);
+    Parrot_ex_throw_from_c_args(imcc->interp, NULL, IMCC_FATAL_EXCEPTION,
+        "error:imcc:%Ss", imcc->error_message);
 }
 
 /*
@@ -71,7 +73,9 @@ IMCC_fataly(ARGMOD(imc_info_t * imcc), SHIM(int code), ARGIN(const char *fmt), .
     va_start(ap, fmt);
     imcc->error_message = Parrot_vsprintf_c(imcc->interp, fmt, ap);
     va_end(ap);
-    IMCC_THROW(imcc->jump_buf, IMCC_FATALY_EXCEPTION);
+    //IMCC_THROW(imcc->jump_buf, IMCC_FATALY_EXCEPTION);
+    Parrot_ex_throw_from_c_args(imcc->interp, NULL, IMCC_FATALY_EXCEPTION,
+        "error:imcc:%Ss", imcc->error_message);
 }
 
 /*
