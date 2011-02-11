@@ -344,7 +344,7 @@ aka run loop, aka runcore. The way Parrot executes PBCs.
 See running.pod for a list of available runcores, and how to tell
 parrot which one to use.
 
-running.pod: L<< https://github.com/hackbinary/parrot/parrot/docs/running.pod >>
+running.pod: L<< https://github.com/parrot/parrot/parrot/docs/running.pod >>
 
 =item SMOP
 
