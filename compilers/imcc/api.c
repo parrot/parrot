@@ -41,6 +41,9 @@ static PMC * get_compreg_pmc(PARROT_INTERP, int is_pasm, int add_compreg)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+#define GET_RAW_INTERP(p) ((Interp*)VTABLE_get_pointer(NULL, p))
+#define GET_INTERP(p) (PMC_IS_NULL(p) ? NULL : GET_RAW_INTERP(p))
+
 #define IMCC_API_CALLIN(p, i)                    \
     Parrot_jump_buff env;                        \
     if (setjmp(env)) {                           \

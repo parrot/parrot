@@ -95,7 +95,7 @@ IMCC_fatal_standalone(ARGMOD(imc_info_t * imcc), int code, ARGIN(const char *fmt
     STRING * s = STRINGNULL;
 
     va_start(ap, fmt);
-    s = Parrot_vsprintf_c(imcc->interp, fmt, ap)
+    s = Parrot_vsprintf_c(imcc->interp, fmt, ap);
     va_end(ap);
     Parrot_ex_throw_from_c_args(imcc->interp, NULL, code, "%Ss", s);
 }
