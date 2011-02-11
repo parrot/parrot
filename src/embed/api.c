@@ -833,10 +833,22 @@ Parrot_api_toggle_gc(Parrot_PMC interp_pmc, Parrot_Int on)
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
+/*
+
+=item C<Parrot_Int Parrot_api_reset_call_signature(Parrot_PMC interp_pmc,
+Parrot_PMC ctx)>
+
+Reset the call signature
+
+=cut
+
+*/
+
 PARROT_API
 Parrot_Int
 Parrot_api_reset_call_signature(Parrot_PMC interp_pmc, Parrot_PMC ctx)
 {
+    ASSERT_ARGS(Parrot_api_reset_call_signature)
     EMBED_API_CALLIN(interp_pmc, interp)
     STRING * const callcontext = Parrot_str_new(interp, "CallContext", 0);
     if (!VTABLE_isa(interp, ctx, callcontext))

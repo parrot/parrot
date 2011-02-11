@@ -542,7 +542,7 @@ reads entries from a directory.
         INTVAL last_char = STRING_ord(INTERP, path, -1);
         int trailing_slash = last_char == '\\' || last_char == '/';
         cpath = Parrot_str_to_cstring(INTERP, Parrot_str_concat(INTERP,
-                path, string_from_literal(INTERP, trailing_slash ? "*" : "\\*"), 0));
+                path, string_from_literal(INTERP, trailing_slash ? "*" : "\\*")));
         hFind = FindFirstFile(cpath, &file_find_data);
         Parrot_str_free_cstring(cpath);
         if (hFind == INVALID_HANDLE_VALUE)
