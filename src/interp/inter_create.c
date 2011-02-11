@@ -150,7 +150,7 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
      * so the GC_DEBUG stuff is available. */
     interp->flags = flags;
 
-    interp->ctx         = PMCNULL;
+    interp->ctx         = NULL;
     interp->resume_flag = RESUME_INITIAL;
 
     interp->recursion_limit = RECURSION_LIMIT;

@@ -74,8 +74,6 @@ static void get_compreg_pmc(PARROT_INTERP, struct _get_compreg_data * data)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-
-
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *

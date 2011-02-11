@@ -346,6 +346,7 @@ Parrot_ext_try(PARROT_INTERP,
                 ARGIN_NULLOK(void *data))
 {
     ASSERT_ARGS(Parrot_ext_try)
+    PMC * const start_ctx = interp->ctx;
     if (cfunction) {
         Parrot_runloop jmp;
         PARROT_CALLIN_START(interp);
@@ -353,11 +354,13 @@ Parrot_ext_try(PARROT_INTERP,
           case 0: /* try */
             Parrot_ex_add_c_handler(interp, &jmp);
             (*cfunction)(interp, data);
+            interp->ctx = start_ctx;
             Parrot_cx_delete_handler_local(interp, STRINGNULL);
             break;
           default: /* catch */
             {
                 PMC *exception = jmp.exception;
+                interp->ctx = start_ctx;
                 Parrot_cx_delete_handler_local(interp, STRINGNULL);
                 if (chandler)
                     (*chandler)(interp, exception, data);
