@@ -12,7 +12,7 @@ Short descriptions of words and acronyms found in Parrot development.
 
 LAST UPDATED: 14 FEB 2011
 
-glossary.pod is updated and maintained from Parrot's Github repository.
+glossary.pod is updated and maintained from Parrot's GitHub repository.
 You may get the most up-to-date version at:
 L<< https://github.com/parrot/parrot/docs/glossary.pod >>
 
@@ -179,7 +179,7 @@ L<http://oss.software.ibm.com/icu/index.html>
 =item IMCC
 
 Intermediate Code Compiler: the component of parrot that compiles PASM
-and PIR into bytecode.
+and PIR into byte code.
 
 See also L<"PIR">.
 
@@ -305,7 +305,7 @@ See also L<"PCT">.
 =for comment
 XXX This section needs to be edited down.
 
-A bytecode transformation technique which reduces the amount of pointer
+A byte code transformation technique which reduces the amount of pointer
 dereferencing done in the inner loop of the interpreter by pre-converting
 opcode numbers into pointers to their opfuncs, and also converting the register
 numbers and constant numbers in the arguments to the ops into pointers.
@@ -319,7 +319,7 @@ L<http://archive.develooper.com/perl6-internals@perl.org/msg06941.html>
 On 2001-12-18, predereferencing got a speed boost (to about 47% faster than the
 regular DO_OP inner loop -- without compiler optimizations turned on). This was
 due to an off-list (actually over lunch) suggestion by John Kennedy that
-instead of pre-initializing the new copy of the bytecode with NULL pointers, we
+instead of pre-initializing the new copy of the byte code with NULL pointers, we
 pre-initialize it with pointers to a pseudo-opfunc that does the
 predereferencing whenever it is encountered.
 
@@ -364,8 +364,8 @@ are pre-selected, and there is no direct way to invoke them from PIR.
 =item Warnock's Dilemma
 
 The dilemma you face when posting a message to a public forum about something
-and not even getting an acknowledgment of its existence. This leaves you
-wondering if your problem is unimportant or previously addressed, if everyone's
+and not even getting an acknowledgement of its existence. This leaves you
+wondering if your problem is unimportant or previously addressed, if everyone is
 waiting on someone else to answer you,  or if maybe your mail never actually
 made it to anyone else in the forum.
 
