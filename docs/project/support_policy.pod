@@ -108,7 +108,7 @@ very rare.
 =head2 Experimental Features
 
 From time to time, we may add features to get feedback on their utility and
-design.  Marking them as "Experimental" in F<DEPRECATED.yaml> indicates that we
+design.  Marking them as "Experimental" in F<api.yaml> indicates that we
 may modify or remove them without official deprecation notices.  Use them at
 your own risk--and please provide feedback through official channels if you use
 them successfully or otherwise.
@@ -215,7 +215,7 @@ of the public API (listed in docs/embed.pod)
 
 =item * Parrot internals hidden behind a public API
 
-=item * Items otherwise eligible but marked as "experimental" in F<DEPRECATED.yaml>
+=item * Items otherwise eligible but marked as "experimental" in F<api.yaml>
 
 =back
 
