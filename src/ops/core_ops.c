@@ -15389,7 +15389,6 @@ Parrot_get_results_pc(opcode_t *cur_opcode, PARROT_INTERP)  {
     opcode_t * const raw_params  = CUR_OPCODE;
     PMC      * const signature   = PCONST(1);
     PMC             *ctx         = CURRENT_CONTEXT(interp);
-    PMC             *ccont       = Parrot_pcc_get_continuation(interp, ctx);
     PMC             *call_object = Parrot_pcc_get_signature(interp, ctx);
 
     INTVAL argc;
