@@ -28,20 +28,6 @@ IMCC call-in routines for use with the Parrot embedding API
 #include "imcc/api.h"
 #include "imc.h"
 
-struct _get_compreg_data {
-    int is_pasm;
-    int add_compreg;
-    PMC * compiler;
-    PMC * error;
-};
-
-struct _compile_file_data {
-    PMC * compiler;
-    STRING * file;
-    PMC * pbc;
-    PMC * error;
-};
-
 /* HEADERIZER HFILE: include/imcc/api.h */
 
 /* HEADERIZER BEGIN: static */
@@ -74,23 +60,43 @@ static void get_compreg_pmc(PARROT_INTERP, struct _get_compreg_data * data)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+#define IMCC_API_CALLIN(p, i)                    \
+    Parrot_jump_buff env;                        \
+    if (setjmp(env)) {                           \
+        Interp * const __interp = GET_INTERP(p); \
+        __interp->api_jmp_buf = NULL;            \
+        return !__interp->exit_code;             \
+    }                                            \
+    else {                                       \
+        Interp * const (i) = GET_INTERP(p);      \
+        void * _oldtop = (i)->lo_var_ptr;        \
+        if (_oldtop == NULL)                     \
+            (i)->lo_var_ptr = &_oldtop;          \
+        (i)->api_jmp_buf = &env;                 \
+        {
+
+#define IMCC_API_CALLOUT(p, i)                                     \
+        }                                                          \
+        (i)->api_jmp_buf = NULL;                                   \
+        if (!_oldtop) {                                            \
+            PARROT_ASSERT((i)->lo_var_ptr == &_oldtop);            \
+            (i)->lo_var_ptr = NULL;                                \
+        }                                                          \
+        return 1;                                                  \
+    }
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC *
-imcc_get_pir_compreg_api(Parrot_PMC interp_pmc, int add_compreg, Parrot_PMC *err)
+Parrot_Int
+imcc_get_pir_compreg_api(Parrot_PMC interp_pmc, int add_compreg,
+        Parrot_PMC *compiler, Parrot_PMC *err)
 {
-    Interp * const interp = (Interp *) VTABLE_get_pointer(NULL, interp_pmc);
-    PMC * compiler = PMCNULL;
-    struct _get_compreg_data * const data = (struct _get_compreg_data *)
-            Parrot_gc_allocate_fixed_size_storage(interp, sizeof(struct _get_compreg_data));
-    data->is_pasm = 0;
-    data->add_compreg = add_compreg;
-    Parrot_ext_try(interp, get_compreg_pmc, get_compreg_handler, data);
-    compiler = data->compiler;
-    if (PMC_IS_NULL(compiler))
-        *err = data->error;
-    Parrot_gc_free_fixed_size_storage(interp, sizeof(struct _get_compreg_data), data);
-    return compiler;
+    IMCC_API_CALLIN(interp_pmc, interp)
+    *compiler = get_compreg_pmc(interp, 0, add_compreg);
+    if (PMC_IS_NULL(*compiler))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not create PIR compiler PMC");
+    IMCC_API_CALLOUT(interp_pmc, interp)
 }
 
 PARROT_EXPORT
@@ -99,74 +105,40 @@ PMC *
 imcc_get_pasm_compreg_api(Parrot_PMC interp_pmc, int add_compreg,
         Parrot_PMC *err)
 {
-    Interp * const interp = (Interp *) VTABLE_get_pointer(NULL, interp_pmc);
-    PMC * compiler = PMCNULL;
-    struct _get_compreg_data * const data = (struct _get_compreg_data *)
-            Parrot_gc_allocate_fixed_size_storage(interp, sizeof(struct _get_compreg_data));
-    data->is_pasm = 1;
-    data->add_compreg = add_compreg;
-    Parrot_ext_try(interp, get_compreg_pmc, get_compreg_handler, data);
-    compiler = data->compiler;
-    if (PMC_IS_NULL(compiler))
-        *err = data->error;
-    Parrot_gc_free_fixed_size_storage(interp, sizeof(struct _get_compreg_data), data);
-    return compiler;
+    IMCC_API_CALLIN(interp_pmc, interp)
+    *compiler = get_compreg_pmc(interp, 1, add_compreg);
+    if (PMC_IS_NULL(*compiler))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not create PASM compiler PMC");
+    IMCC_API_CALLOUT(interp_pmc, interp)
 }
 
-static void
-get_compreg_pmc(PARROT_INTERP, struct _get_compreg_data * data)
+static PMC *
+get_compreg_pmc(PARROT_INTERP, int is_pasm, int add_compreg)
 {
-    data->compiler = Parrot_pmc_new_init_int(interp, enum_class_IMCCompiler, data->is_pasm);
-    if (data->add_compreg) {
-        STRING * const name = VTABLE_get_string(interp, data->compiler);
-        Parrot_set_compiler(interp, name, data->compiler);
+    PMC * const comp = Parrot_pmc_new_init_int(interp, enum_class_IMCCompiler, is_pasm);
+    if (add_compreg) {
+        STRING * const name = VTABLE_get_string(interp, comp);
+        Parrot_set_compiler(interp, name, comp);
     }
+    return comp;
 }
-
-static void
-get_compreg_handler(PARROT_INTERP, PMC * ex, struct _get_compreg_data * data)
-{
-    data->error = ex;
-    data->compiler = PMCNULL;
-}
-
-
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC *
+Parrot_Int
 imcc_compile_file_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
-        Parrot_String file, Parrot_PMC *error)
+        Parrot_String file, Parrot_PMC *pbc, Parrot_PMC *error)
 {
-    Interp * const interp = (Interp *) VTABLE_get_pointer(NULL, interp_pmc);
-    PMC * pbc = PMCNULL;
-    struct _compile_file_data * const data = (struct _compile_file_data *)
-            Parrot_gc_allocate_fixed_size_storage(interp, sizeof(struct _compile_file_data));
-    data->compiler = compiler;
-    data->file = file;
-    Parrot_ext_try(interp, compile_file, compile_file_handler, data);
-    pbc = data->pbc;
-    if (PMC_IS_NULL(pbc))
-        *error = data->error;
-    Parrot_gc_free_fixed_size_storage(interp, sizeof(struct _compile_file_data), data);
-    return pbc;
-}
-
-static void
-compile_file(PARROT_INTERP, struct _compile_file_data * data)
-{
-    PMC * result = PMCNULL;
+    IMCC_API_CALLIN(interp_pmc, interp)
     STRING * const meth_name = Parrot_str_new(interp, "compile_file", 0);
-    Parrot_pcc_invoke_method_from_c_args(interp, data->compiler, meth_name,
-            "S->P", data->file, &result);
-    data->pbc = result;
-}
+    PMC * result = PMCNULL;
 
-static void
-compile_file_handler(PARROT_INTERP, PMC * ex, struct _compile_file_data * data)
-{
-    data->error = ex;
-    data->pbc = PMCNULL;
+    Parrot_pcc_invoke_method_from_c_args(interp, compiler, meth_name,
+            "S->P", file, &result);
+
+    *pbc = result;
+    IMCC_API_CALLOUT(interp_pmc, interp)
 }
 
 PARROT_EXPORT
@@ -175,10 +147,10 @@ void
 imcc_preprocess_file_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
         Parrot_String file)
 {
-    /* TODO: Error handling with Parrot_ext_try */
-    Interp * const interp = (Interp *) VTABLE_get_pointer(NULL, interp_pmc);
+    IMCC_API_CALLIN(interp_pmc, interp)
     STRING * const meth_name = Parrot_str_new(interp, "preprocess", 0);
     Parrot_pcc_invoke_method_from_c_args(interp, compiler, meth_name,
             "S->", file);
+    IMCC_API_CALLOUT(interp_pmc, interp)
 }
 
