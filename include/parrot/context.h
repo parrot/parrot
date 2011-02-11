@@ -34,10 +34,10 @@ typedef struct Parrot_CallContext_attributes Parrot_Context;
 
 #if 1
 
-#  define CTX_REG_NUM(p, x) (*Parrot_pcc_get_FLOATVAL_reg(interp, (p), (x)))
-#  define CTX_REG_INT(p, x) (*Parrot_pcc_get_INTVAL_reg(interp, (p), (x)))
-#  define CTX_REG_PMC(p, x) (*Parrot_pcc_get_PMC_reg(interp, (p), (x)))
-#  define CTX_REG_STR(p, x) (*Parrot_pcc_get_STRING_reg(interp, (p), (x)))
+#  define CTX_REG_NUM(i, p, x) (*Parrot_pcc_get_FLOATVAL_reg((i), (p), (x)))
+#  define CTX_REG_INT(i, p, x) (*Parrot_pcc_get_INTVAL_reg((i), (p), (x)))
+#  define CTX_REG_PMC(i, p, x) (*Parrot_pcc_get_PMC_reg((i), (p), (x)))
+#  define CTX_REG_STR(i, p, x) (*Parrot_pcc_get_STRING_reg((i), (p), (x)))
 
 #  define REG_NUM(interp, x) (*Parrot_pcc_get_FLOATVAL_reg((interp), (interp)->ctx, (x)))
 #  define REG_INT(interp, x) (*Parrot_pcc_get_INTVAL_reg((interp), (interp)->ctx, (x)))
@@ -48,15 +48,15 @@ typedef struct Parrot_CallContext_attributes Parrot_Context;
 
 /* Manually inlined macros. Used in optimized builds */
 
-#  define CTX_REG_NUM(p, x) (CONTEXT_STRUCT(p)->bp.regs_n[-1L - (x)])
-#  define CTX_REG_INT(p, x) (CONTEXT_STRUCT(p)->bp.regs_i[(x)])
-#  define CTX_REG_PMC(p, x) (CONTEXT_STRUCT(p)->bp_ps.regs_p[-1L - (x)])
-#  define CTX_REG_STR(p, x) (CONTEXT_STRUCT(p)->bp_ps.regs_s[(x)])
+#  define CTX_REG_NUM(i, p, x) (CONTEXT_STRUCT(p)->bp.regs_n[-1L - (x)])
+#  define CTX_REG_INT(i, p, x) (CONTEXT_STRUCT(p)->bp.regs_i[(x)])
+#  define CTX_REG_PMC(i, p, x) (CONTEXT_STRUCT(p)->bp_ps.regs_p[-1L - (x)])
+#  define CTX_REG_STR(i, p, x) (CONTEXT_STRUCT(p)->bp_ps.regs_s[(x)])
 
-#  define REG_NUM(interp, x) CTX_REG_NUM((interp)->ctx, (x))
-#  define REG_INT(interp, x) CTX_REG_INT((interp)->ctx, (x))
-#  define REG_PMC(interp, x) CTX_REG_PMC((interp)->ctx, (x))
-#  define REG_STR(interp, x) CTX_REG_STR((interp)->ctx, (x))
+#  define REG_NUM(interp, x) CTX_REG_NUM((interp), (interp)->ctx, (x))
+#  define REG_INT(interp, x) CTX_REG_INT((interp), (interp)->ctx, (x))
+#  define REG_PMC(interp, x) CTX_REG_PMC((interp), (interp)->ctx, (x))
+#  define REG_STR(interp, x) CTX_REG_STR((interp), (interp)->ctx, (x))
 
 #endif
 

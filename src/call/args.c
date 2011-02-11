@@ -353,18 +353,18 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
           case PARROT_ARG_INTVAL:
             VTABLE_push_integer(interp, call_object, constant
                     ? raw_index
-                    : CTX_REG_INT(ctx, raw_index));
+                    : CTX_REG_INT(interp, ctx, raw_index));
             break;
           case PARROT_ARG_FLOATVAL:
             VTABLE_push_float(interp, call_object, constant
                     ? Parrot_pcc_get_num_constant(interp, ctx, raw_index)
-                    : CTX_REG_NUM(ctx, raw_index));
+                    : CTX_REG_NUM(interp, ctx, raw_index));
             break;
           case PARROT_ARG_STRING:
             {
                 STRING * const string_value = constant
                         ? Parrot_pcc_get_string_constant(interp, ctx, raw_index)
-                        : CTX_REG_STR(ctx, raw_index);
+                        : CTX_REG_STR(interp, ctx, raw_index);
 
                 if (arg_flags & PARROT_ARG_NAME) {
                     ++arg_index;
@@ -387,7 +387,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
             {
                 PMC * const pmc_value = constant
                         ? Parrot_pcc_get_pmc_constant(interp, ctx, raw_index)
-                        : CTX_REG_PMC(ctx, raw_index);
+                        : CTX_REG_PMC(interp, ctx, raw_index);
 
                 if (arg_flags & PARROT_ARG_FLATTEN) {
                     dissect_aggregate_arg(interp, call_object, pmc_value);
@@ -437,22 +437,22 @@ extract_named_arg_from_op(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(STRING 
       case PARROT_ARG_INTVAL:
         VTABLE_set_integer_keyed_str(interp, call_object, name, constant
                 ? raw_index
-                : CTX_REG_INT(ctx, raw_index));
+                : CTX_REG_INT(interp, ctx, raw_index));
         break;
       case PARROT_ARG_FLOATVAL:
         VTABLE_set_number_keyed_str(interp, call_object, name, constant
                 ? Parrot_pcc_get_num_constant(interp, ctx, raw_index)
-                : CTX_REG_NUM(ctx, raw_index));
+                : CTX_REG_NUM(interp, ctx, raw_index));
         break;
       case PARROT_ARG_STRING:
         VTABLE_set_string_keyed_str(interp, call_object, name, constant
                 ? Parrot_pcc_get_string_constant(interp, ctx, raw_index)
-                : CTX_REG_STR(ctx, raw_index));
+                : CTX_REG_STR(interp, ctx, raw_index));
         break;
       case PARROT_ARG_PMC:
         VTABLE_set_pmc_keyed_str(interp, call_object, name, constant
                 ? Parrot_pcc_get_pmc_constant(interp, ctx, raw_index)
-                : CTX_REG_PMC(ctx, raw_index));
+                : CTX_REG_PMC(interp, ctx, raw_index));
         break;
       default:
         break;
