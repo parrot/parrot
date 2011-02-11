@@ -53,11 +53,9 @@ more information.
 
 pmclass LoritoContext auto_attrs provides invokable {
     ATTR PMC      *caller_ctx;         /* caller context */
+    ATTR PMC      *current_ctx;         /* caller context */
     ATTR PMC      *exception_payload;  /* Exception Payload */
-    ATTR PMC      *REPR;               /* in-memory REPResentation */
-    ATTR PMC      *HOW;                /* Higher Order Workings of an object */
-    ATTR opcode_t          *address;         /* start of bytecode, addr to continue */
-    ATTR
+    ATTR opcode_t *address;            /* start of bytecode, addr to continue */
     ATTR opcode_t *current_pc;         /* program counter of Sub invocation */
     ATTR opcode_t *out_pc;             /* program counter to jump to */
     ATTR opcode_t *eh_pc;              /* program counter of error handler */
@@ -86,6 +84,10 @@ Initializes the continuation.
         PMC * caller_ctx = Parrot_pcc_get_caller_ctx(INTERP, cur_ctx);
 
         SET_ATTR_caller_ctx(INTERP, SELF, caller_ctx);
+        SET_ATTR_current_ctx(INTERP, SELF, cur_ctx);
+        SET_ATTR_runloop_id(INTERP, SELF, 0);
+        SET_ATTR_seg(INTERP, SELF, INTERP->code);
+        SET_ATTR_address(INTERP, SELF, NULL);
 
         PObj_custom_mark_SET(SELF);
     }
@@ -345,6 +347,13 @@ Experimental: return callers PMC or PMCNULL if none.
 
         RETURN(PMC *caller);
 
+    }
+
+    METHOD current_ctx {
+        PMC *current_ctx;
+
+        GET_ATTR_current_ctx(INTERP, SELF, current_ctx);
+        RETURN(current_ctx);
     }
 
 

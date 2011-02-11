@@ -18,12 +18,14 @@ Tests the LoritoContext PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(1)
+    plan(2)
 
     test_new()
 .end
 
 .sub 'test_new'
     $P0 = new 'LoritoContext'
-    ok(1, 'Instantiated LoritoContext')
+    isa_ok($P0, 'LoritoContext')
+    $P1 = $P0.'current_ctx'()
+    isa_ok($P1,'Context')
 .end
