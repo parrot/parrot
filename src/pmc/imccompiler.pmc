@@ -4,7 +4,7 @@
 
 /* HEADERIZER HFILE: none */
 
-pmclass IMCCompiler auto_attrs provides HLLCompiler {
+pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     ATTR void *imcc_info;
     ATTR INTVAL is_pasm; /* 0 = PIR, 1 = PASM */
 

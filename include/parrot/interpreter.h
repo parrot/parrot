@@ -467,10 +467,11 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * Parrot_compile_file(PARROT_INTERP,
     ARGIN(STRING *fullname),
+    INTVAL is_pasm,
     ARGOUT(STRING **error))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         FUNC_MODIFIES(*error);
 
 PARROT_EXPORT

@@ -1346,6 +1346,7 @@ find_outer(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit))
     Parrot_Sub_attributes *sub;
     size_t      len;
 
+
     if (!unit->outer)
         return NULL;
 
@@ -1367,12 +1368,22 @@ find_outer(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit))
         }
     }
 
-    /* could be eval too; check if :outer is the current sub */
+    /* could be eval too; check if :outer is the current sub. If not, look
+       in the current namespace */
     current = Parrot_pcc_get_sub(imcc->interp, CURRENT_CONTEXT(imcc->interp));
+    if (PMC_IS_NULL(current))
+    {
+        PMC * const ns = Parrot_pcc_get_namespace(imcc->interp, CURRENT_CONTEXT(imcc->interp));
+        STRING * const invokable_s = Parrot_str_new(imcc->interp, "invokable", 0);
+        STRING * const unit_name_s = Parrot_str_new(imcc->interp, unit->outer->name, 0);
+        current = VTABLE_get_pmc_keyed_str(imcc->interp, ns, unit_name_s);
+        if (current->vtable->base_type != enum_class_Sub &&
+            !VTABLE_does(imcc->interp, current, invokable_s))
+            current = PMCNULL;
+    }
 
     if (PMC_IS_NULL(current))
-        IMCC_fatal(imcc, 1, "Undefined :outer sub '%s'.\n",
-                   unit->outer->name);
+        IMCC_fatal(imcc, 1, "Undefined :outer sub '%s'.\n", unit->outer->name);
 
     PMC_get_sub(imcc->interp, current, sub);
 

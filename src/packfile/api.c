@@ -85,7 +85,7 @@ static void clone_constant(PARROT_INTERP, ARGIN(PMC **c))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void compile_file(PARROT_INTERP, ARGIN(STRING *path))
+static void compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -4047,7 +4047,7 @@ push_context(PARROT_INTERP)
 
 /*
 
-=item C<static void compile_file(PARROT_INTERP, STRING *path)>
+=item C<static void compile_file(PARROT_INTERP, STRING *path, INTVAL is_pasm)>
 
 Compile a PIR or PASM file from source.
 
@@ -4056,14 +4056,14 @@ Compile a PIR or PASM file from source.
 */
 
 static void
-compile_file(PARROT_INTERP, ARGIN(STRING *path))
+compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
 {
     ASSERT_ARGS(compile_file)
 
     STRING *err;
     PackFile_ByteCode * const cur_code = interp->code;
     PackFile_ByteCode * const cs =
-        (PackFile_ByteCode *)Parrot_compile_file(interp, path, &err);
+        (PackFile_ByteCode *)Parrot_compile_file(interp, path, is_pasm, &err);
 
     if (cs) {
         interp->code = cur_code;
@@ -4182,8 +4182,11 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 
     if (STRING_equal(interp, found_ext, pbc))
         load_file(interp, path);
-    else
-        compile_file(interp, path);
+    else {
+        const STRING * pasm_s = CONST_STRING(interp, "pasm");
+        const INTVAL is_pasm = STRING_equal(interp, found_ext, pasm_s);
+        compile_file(interp, path, is_pasm);
+    }
 
     Parrot_pop_context(interp);
 }
@@ -4287,8 +4290,11 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
 
     if (STRING_equal(interp, found_ext, pbc))
         load_file(interp, path);
-    else
-        compile_file(interp, path);
+    else {
+        const STRING * pasm_s = CONST_STRING(interp, "pasm");
+        const INTVAL is_pasm = STRING_equal(interp, ext, pasm_s);
+        compile_file(interp, path, is_pasm);
+    }
 
     Parrot_pop_context(interp);
 

@@ -212,7 +212,7 @@ Parrot_set_compiler(PARROT_INTERP, ARGIN(STRING *type), ARGIN(PMC *compiler))
 /*
 
 =item C<PackFile_ByteCode * Parrot_compile_file(PARROT_INTERP, STRING *fullname,
-STRING **error)>
+INTVAL is_pasm, STRING **error)>
 
 Compile code file.
 
@@ -223,21 +223,23 @@ Compile code file.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode *
-Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), ARGOUT(STRING **error))
+Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), INTVAL is_pasm,
+        ARGOUT(STRING **error))
 {
     ASSERT_ARGS(Parrot_compile_file)
     PMC *result = NULL;
     UINTVAL regs_used[4] = {3, 3, 3, 3};
     PMC * const newcontext = Parrot_push_context(interp, regs_used);
-    PMC * pir_compiler = Parrot_get_compiler(interp, CONST_STRING(interp, "PIR"));
-    imc_info_t *imcc = (imc_info_t *) VTABLE_get_pointer(interp, pir_compiler);
+    STRING * compiler_s = is_pasm ? CONST_STRING(interp, "PASM") : CONST_STRING(interp, "PIR");
+    PMC * compiler = Parrot_get_compiler(interp, compiler_s);
+    imc_info_t *imcc = (imc_info_t *) VTABLE_get_pointer(interp, compiler);
     PackFile * pf = NULL;
 
     Parrot_block_GC_mark(interp);
     Parrot_pcc_set_HLL(interp, newcontext, 0);
     Parrot_pcc_set_sub(interp, newcontext, 0);
 
-    result = imcc_compile_file(imcc, fullname, 0);
+    result = imcc_compile_file(imcc, fullname, is_pasm);
     if (PMC_IS_NULL(result)) {
         STRING * const msg = imcc_last_error_message(imcc);
         INTVAL code = imcc_last_error_code(imcc);
