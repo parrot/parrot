@@ -1405,8 +1405,7 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     if (!obj || !item)
         return 0;
 
-    /* Quick check for valid address before dereferencing it */
-    if (!Parrot_gc_pool_is_maybe_owned(interp, self->pmc_allocator, item))
+    if (!Parrot_gc_pool_is_owned(interp, self->pmc_allocator, item))
         return 0;
 
     /* black or white objects marked already. */
@@ -1419,9 +1418,6 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 
     /* Object is on dirty_list. */
     if (PObj_GC_on_dirty_list_TEST(&item->pmc))
-        return 0;
-
-    if (!Parrot_gc_pool_is_owned(interp, self->pmc_allocator, item))
         return 0;
 
     for (i = 0; i < MAX_GENERATIONS; i++) {
@@ -1558,8 +1554,7 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     if (!obj || !item)
         return 0;
 
-    /* Quick check for valid address before dereferencing it */
-    if (!Parrot_gc_pool_is_maybe_owned(interp, self->string_allocator, item))
+    if (!Parrot_gc_pool_is_owned(interp, self->string_allocator, item))
         return 0;
 
     /* black or white objects marked already. */
@@ -1568,9 +1563,6 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 
     /* If object too old - skip it */
     if (POBJ2GEN(&item->str) > self->gen_to_collect)
-        return 0;
-
-    if (!Parrot_gc_pool_is_owned(interp, self->string_allocator, item))
         return 0;
 
     /* Pool.is_owned isn't precise enough (yet) */
