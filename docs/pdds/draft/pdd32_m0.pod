@@ -96,6 +96,18 @@ representation to remain stable once it's been finalized.
 
 describe the binary encoding of a single M0 instruction and how it should be interpreteted.
 
+=head2 M0 Runloop
+
+The runloop is the part of the interpreter that executes ops directly.  It
+doesn't much matter how those ops are executed, but the runloop does need to
+accomplish the following:
+
+=item * fetch the instruction at the current PC
+
+=item * execute the instruction
+
+=item * increment the pc, if needed
+
 =head2 metadata
 
 describe metadata here, e.g. debugging information, aggregate op tracking info, whatever
