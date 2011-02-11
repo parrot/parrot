@@ -9,25 +9,25 @@
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC * imcc_compile_file_api(
+Parrot_Int imcc_compile_file_api(
     Parrot_PMC interp_pmc,
     Parrot_PMC compiler,
     Parrot_String file,
-    Parrot_PMC *error);
+    Parrot_PMC *pbc);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC * imcc_get_pasm_compreg_api(
     Parrot_PMC interp_pmc,
     int add_compreg,
-    Parrot_PMC *err);
+    Parrot_PMC *compiler);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC * imcc_get_pir_compreg_api(
+Parrot_Int imcc_get_pir_compreg_api(
     Parrot_PMC interp_pmc,
     int add_compreg,
-    Parrot_PMC *err);
+    Parrot_PMC *compiler);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL

@@ -33,28 +33,9 @@ IMCC call-in routines for use with the Parrot embedding API
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void compile_file(PARROT_INTERP, struct _compile_file_data * data)
+static PMC * get_compreg_pmc(PARROT_INTERP, int is_pasm, int add_compreg)
         __attribute__nonnull__(1);
 
-static void compile_file_handler(PARROT_INTERP,
-    PMC * ex,
-    struct _compile_file_data * data)
-        __attribute__nonnull__(1);
-
-static void get_compreg_handler(PARROT_INTERP,
-    PMC * ex,
-    struct _get_compreg_data * data)
-        __attribute__nonnull__(1);
-
-static void get_compreg_pmc(PARROT_INTERP, struct _get_compreg_data * data)
-        __attribute__nonnull__(1);
-
-#define ASSERT_ARGS_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_compile_file_handler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_get_compreg_handler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_compreg_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -89,7 +70,7 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Int
 imcc_get_pir_compreg_api(Parrot_PMC interp_pmc, int add_compreg,
-        Parrot_PMC *compiler, Parrot_PMC *err)
+        Parrot_PMC *compiler)
 {
     IMCC_API_CALLIN(interp_pmc, interp)
     *compiler = get_compreg_pmc(interp, 0, add_compreg);
@@ -103,7 +84,7 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 imcc_get_pasm_compreg_api(Parrot_PMC interp_pmc, int add_compreg,
-        Parrot_PMC *err)
+        Parrot_PMC *compiler)
 {
     IMCC_API_CALLIN(interp_pmc, interp)
     *compiler = get_compreg_pmc(interp, 1, add_compreg);
@@ -128,7 +109,7 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Int
 imcc_compile_file_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
-        Parrot_String file, Parrot_PMC *pbc, Parrot_PMC *error)
+        Parrot_String file, Parrot_PMC *pbc)
 {
     IMCC_API_CALLIN(interp_pmc, interp)
     STRING * const meth_name = Parrot_str_new(interp, "compile_file", 0);

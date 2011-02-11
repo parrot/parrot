@@ -252,11 +252,12 @@ static PMC *
 run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *flags))
 {
     ASSERT_ARGS(run_imcc)
-    /* TODO: Handle the error condition */
-    Parrot_PMC error = NULL;
-    Parrot_PMC pir_compiler = imcc_get_pir_compreg_api(interp, 1, &error);
-    Parrot_PMC pasm_compiler = imcc_get_pasm_compreg_api(interp, 1, &error);
+    Parrot_PMC pir_compiler = NULL;
+    Parrot_PMC pasm_compiler = NULL;;
 
+    if (!(imcc_get_pir_compreg_api(interp, 1, &pir_compiler) &&
+          imcc_get_pasm_compreg_api(interp, 1, &pasm_compiler)))
+        show_last_error_and_exit(interp);
     if (flags->preprocess_only) {
         imcc_preprocess_file_api(interp, pir_compiler, sourcefile);
         exit(EXIT_SUCCESS);
@@ -264,7 +265,11 @@ run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *
     else {
         const Parrot_Int pasm_mode = flags->have_pasm_file;
         Parrot_PMC compiler = pasm_mode ? pasm_compiler : pir_compiler;
-        return imcc_compile_file_api(interp, compiler, sourcefile, &error);
+        Parrot_PMC pbc = NULL;
+
+        if (!imcc_compile_file_api(interp, compiler, sourcefile, &pbc))
+            show_last_error_and_exit(interp);
+        return pbc;
     }
 }
 
