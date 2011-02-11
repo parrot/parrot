@@ -39,14 +39,24 @@ TT1465 - http://trac.parrot.org/parrot/ticket/1465 .
 
 .sub test_gc_mark_sweep
     .local int counter
+    .local int cycles
+
+    cycles  = 10
+  cycle:
 
     counter = 0
   loop:
     $P0 = box 0
     inc counter
-    if counter < 2e7 goto loop
+    if counter < 1e7 goto loop
 
     $I1 = interpinfo.INTERPINFO_GC_COLLECT_RUNS
+    if $I1 goto done
+
+    dec cycles
+    if cycles > 0 goto cycle
+
+  done:
     $I2 = interpinfo.INTERPINFO_GC_MARK_RUNS
     $S0 = interpinfo .INTERPINFO_GC_SYS_NAME
     if $S0 == "gms" goto last_alloc

@@ -38,14 +38,25 @@ function calls.
 
 .sub test_gc_mark_sweep
     .local int counter
+    .local int cycles
+
+    cycles  = 10
+  cycle:
 
     counter = 0
   loop:
-    consume()
+    "consume"()
     inc counter
-    if counter < 1e7 goto loop
+    if counter < 1e6 goto loop
 
     $I1 = interpinfo.INTERPINFO_GC_COLLECT_RUNS
+    if $I1 goto done
+
+    dec cycles
+    if cycles > 0 goto cycle
+
+  done:
+
     $I2 = interpinfo.INTERPINFO_GC_MARK_RUNS
 
     $S0 = interpinfo .INTERPINFO_GC_SYS_NAME
