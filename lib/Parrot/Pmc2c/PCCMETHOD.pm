@@ -365,9 +365,6 @@ END
     $e_post->emit( <<'END', __FILE__, __LINE__ + 1 );
 
     } /* END PMETHOD BODY */
-
-    PARROT_GC_WRITE_BARRIER(interp, _self);
-
     } /* END PARAMS SCOPE */
     return;
 END

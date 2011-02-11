@@ -281,6 +281,7 @@ Parrot_gc_sweep_pool(PARROT_INTERP,
             if (PObj_live_TEST(b)) {
                 ++total_used;
                 PObj_live_CLEAR(b);
+                PObj_get_FLAGS(b) &= ~PObj_custom_GC_FLAG;
             }
             else if (!PObj_on_free_list_TEST(b)) {
                 /* it must be dead */
@@ -360,9 +361,11 @@ mark_special(PARROT_INTERP, SHIM(Memory_Pools *mem_pools), ARGIN(PMC *obj))
 {
     ASSERT_ARGS(mark_special)
 
+    PObj_get_FLAGS(obj) |= PObj_custom_GC_FLAG;
+
     /* clearing the flag is much more expensive then testing */
     if (!PObj_needs_early_gc_TEST(obj))
-        PObj_needs_early_gc_CLEAR(obj);
+        PObj_high_priority_gc_CLEAR(obj);
 
     /* mark properties */
     Parrot_gc_mark_PMC_alive(interp, PMC_metadata(obj));

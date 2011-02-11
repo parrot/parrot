@@ -212,14 +212,8 @@ sub generate_body {
 
     my $body = $self->body;
 
-    if ( $self->is_vtable || $self->name =~ '_orig') {
-        # UGLY HACK to rewrite original body of write-barriered vtable
-        my $orig_name = $self->name;
-        my $n = $self->name;
-        $n =~ s/_orig$//;
-        $self->name($n);
+    if ( $self->is_vtable ) {
         $self->rewrite_vtable_method($pmc);
-        $self->name($orig_name);
     }
     else {
         $self->rewrite_nci_method($pmc);

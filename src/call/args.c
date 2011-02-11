@@ -334,7 +334,6 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
     }
 
     /* this macro is much, much faster than the VTABLE STRING comparisons */
-    PARROT_GC_WRITE_BARRIER(interp, call_object);
     SETATTR_CallContext_arg_flags(interp, call_object, raw_sig);
     GETATTR_FixedIntegerArray_size(interp, raw_sig, arg_count);
     GETATTR_FixedIntegerArray_int_array(interp, raw_sig, int_array);
@@ -1521,7 +1520,6 @@ Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP,
 
         GETATTR_CallContext_current_cont(interp, parent, temp);
         SETATTR_CallContext_current_cont(interp, tailcall, temp);
-        PARROT_GC_WRITE_BARRIER(interp, tailcall);
     }
 }
 

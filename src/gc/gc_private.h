@@ -152,7 +152,7 @@ typedef struct GC_Subsystem {
 
     int  (*is_pmc_ptr)(PARROT_INTERP, void*);
     int  (*is_string_ptr)(PARROT_INTERP, void*);
-    void (*mark_str_header)(PARROT_INTERP, STRING *);
+    void (*mark_pobj_header)(PARROT_INTERP, PObj*);
     void (*mark_pmc_header)(PARROT_INTERP, PMC *);
 
     void* (*allocate_pmc_attributes)(PARROT_INTERP, PMC *);
@@ -660,26 +660,6 @@ void Parrot_gc_ms2_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     , PARROT_ASSERT_ARG(args))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/gc_ms2.c */
-
-/* HEADERIZER BEGIN: src/gc/gc_gms.c */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-void gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-void Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-#define ASSERT_ARGS_gc_gms_print_stats_always __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(header))
-#define ASSERT_ARGS_Parrot_gc_gms_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(args))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/gc/gc_gms.c */
 
 /* HEADERIZER BEGIN: src/gc/string_gc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

@@ -398,17 +398,9 @@ Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
 
     d = Parrot_gc_new_string_header(interp,
         PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
-
     /* This might set the constant flag again but it is the right thing
      * to do */
     STRUCT_COPY(d, s);
-
-    /*
-     * FIXME. It's abstraction leak here from GC.
-     * Basically if we are copying string from older generation
-     * we have to clear flags about it.
-     */
-    d->flags &= ~PObj_GC_all_generation_FLAGS;
 
     /* Clear live flag. It might be set on constant strings */
     PObj_live_CLEAR(d);

@@ -4,12 +4,10 @@
 # see src/multidispatch.c
 
 # INPLACE MMD variant must always be normal op + 1
-# NOTE: VTABLE functions that modify their PMC must be marked with :write to
-# work properly with the generational GC.
 
-void init() :write
+void init()
 # init must be first for JITed vtable meths
-void init_pmc(PMC* initializer) :write
+void init_pmc(PMC* initializer)
 PMC* instantiate(PMC* sig)
 void morph(PMC* type) :write
 void mark()
@@ -18,8 +16,8 @@ PMC* get_namespace()
 
 # XXX FIXME should this be marked as writing?
 PMC* getprop(STRING* key)
-void setprop(STRING* key, PMC* value) :write
-void delprop(STRING* key) :write
+void setprop(STRING* key, PMC* value)
+void delprop(STRING* key)
 PMC* getprops()
 
 INTVAL type()
@@ -273,4 +271,4 @@ void share()
 
 PMC* share_ro()
 
-void init_int(INTVAL initializer) :write
+void init_int(INTVAL initializer)

@@ -347,8 +347,6 @@ Parrot_sub_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(PMC *ctx))
         if (PMC_IS_NULL(outer))
             return lex_pad;
 
-        PARROT_ASSERT(outer->vtable->base_type == enum_class_CallContext);
-
         if (!PMC_IS_NULL(lex_pad))
             if (VTABLE_exists_keyed_str(interp, lex_pad, lex_name))
                 return lex_pad;
@@ -429,7 +427,6 @@ Parrot_sub_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
                 PMC_get_sub(interp, child_sub->outer_sub, child_outer_sub);
                 if (STRING_equal(interp, current_sub->subid,
                                       child_outer_sub->subid)) {
-                    PARROT_GC_WRITE_BARRIER(interp, child_pmc);
                     child_sub->outer_ctx = ctx;
                 }
             }
@@ -443,7 +440,6 @@ Parrot_sub_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
         return;
 
     /* set the sub's outer context to the current context */
-    PARROT_GC_WRITE_BARRIER(interp, sub_pmc);
     sub->outer_ctx = ctx;
 }
 
@@ -525,7 +521,7 @@ Parrot_sub_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
     }
 
     /* set context */
-    Parrot_pcc_set_context(interp, to_ctx);
+    CURRENT_CONTEXT(interp) = to_ctx;
     Parrot_pcc_set_signature(interp, to_ctx, sig);
 }
 
