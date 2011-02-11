@@ -74,7 +74,7 @@ Initializes the continuation.
 */
 
     VTABLE void init() {
-        PMC * const to_ctx = CURRENT_CONTEXT(INTERP);
+        PMC * const cur_ctx = CURRENT_CONTEXT(INTERP);
         PMC * caller_ctx = Parrot_pcc_get_caller_ctx(INTERP, cur_ctx);
 
         SET_ATTR_caller_ctx(INTERP, SELF, caller_ctx);
