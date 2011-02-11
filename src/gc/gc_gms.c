@@ -719,9 +719,12 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 
         self->fixed_size_allocator = Parrot_gc_fixed_allocator_new(interp);
 
-        /* Collect every nM allocated. */
-        /* Hardcode for now. Will be configured via CLI */
-        //self->gc_threshold = 10 * 1024 * 1024;
+        /*
+         * Collect every 1/100 of avaliable memory.
+         *
+         * Will be configured/dynamically adjusted in future. For now it gives
+         * good performance overrall.
+         */
         self->gc_threshold = Parrot_sysmem_amount(interp) / 100;
 
         Parrot_gc_str_initialize(interp, &self->string_gc);
