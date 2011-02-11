@@ -392,6 +392,7 @@ Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
     ASSERT_ARGS(Parrot_str_copy)
     STRING *d;
     int     is_movable;
+    UINTVAL gc_flags;
 
     if (STRING_IS_NULL(s))
         return STRINGNULL;
@@ -399,14 +400,19 @@ Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
     d = Parrot_gc_new_string_header(interp,
         PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
 
+    /* Preserve GC flags */
+    gc_flags = d->flags & PObj_GC_all_FLAGS;
+
     /* This might set the constant flag again but it is the right thing
      * to do */
     STRUCT_COPY(d, s);
 
-    // HACK. FIXME. It's abstraction leak here from GC.
-    // Basically if we are copying string from older generation
-    // we have to clear flags about it.
-    d->flags &= ~PObj_GC_all_generation_FLAGS;
+    /*
+     * FIXME. It's abstraction leak here from GC.
+     * Basically if we are copying string from older generation
+     * we have to clear flags about it.
+     */
+    d->flags &= ~gc_flags;
 
     /* Clear live flag. It might be set on constant strings */
     PObj_live_CLEAR(d);
