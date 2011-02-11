@@ -8,6 +8,14 @@ docs/glossary.pod - Parrot Glossary
 
 Short descriptions of words and acronyms found in Parrot development.
 
+=head1 VERSION
+
+LAST UPDATED: 14 FEB 2011
+
+glossary.pod is updated and maintained from Parrot's Github repository.
+You may get the most up-to-date version at:
+L<< https://github.com/parrot/parrot/docs/glossary.pod >>
+
 =head1 GLOSSARY
 
 =for comment
