@@ -370,6 +370,7 @@ Parrot_ext_try(PARROT_INTERP,
           default: /* catch */
             {
                 PMC *exception = jmp.exception;
+                curctx = CONTEXT(interp);
                 if (curctx != initialctx) {
                     Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG,
                             "popping context in Parrot_ext_try");
