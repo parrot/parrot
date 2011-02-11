@@ -75,6 +75,10 @@ spec is more stable.
 
 =item * new_ctx - Create a new Lorito context
 
+=item * print  - prints a string
+
+=item * set  - sets a register to a value
+
 
 =head2 Textual Representation
 
