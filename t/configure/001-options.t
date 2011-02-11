@@ -102,7 +102,7 @@ my $CX = "/usr/bin/g++-3.3";
 ($args, $step_list_ref) = process_options(
     {
         argv => [
-            q{--cc=$CC},      q{--cxx=$CX}, q{--link=$CX}, q{--ld=$CX},
+            q{--cc=$CC},      q{--link=$CX}, q{--ld=$CX},
             q{--without-icu}, q{--without-gmp},
         ],
         mode => q{configure},
