@@ -32,7 +32,7 @@ typedef struct Parrot_CallContext_attributes Parrot_Context;
  * Macros to make accessing registers more convenient/readable.
  */
 
-#ifndef NDEBUG
+#if 1
 
 #  define CTX_REG_NUM(p, x) (*Parrot_pcc_get_FLOATVAL_reg(interp, (p), (x)))
 #  define CTX_REG_INT(p, x) (*Parrot_pcc_get_INTVAL_reg(interp, (p), (x)))
@@ -211,30 +211,34 @@ UINTVAL Parrot_pcc_inc_recursion_depth_func(SHIM_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_caller_ctx_func(SHIM_INTERP,
+void Parrot_pcc_set_caller_ctx_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(PMC *caller_ctx))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-void Parrot_pcc_set_constants_func(SHIM_INTERP,
+void Parrot_pcc_set_constants_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(struct PackFile_ConstTable *ct))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_pcc_set_continuation_func(SHIM_INTERP,
+void Parrot_pcc_set_continuation_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(PMC *_continuation))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_handlers_func(SHIM_INTERP,
+void Parrot_pcc_set_handlers_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(PMC *handlers))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
@@ -243,41 +247,47 @@ void Parrot_pcc_set_HLL_func(SHIM_INTERP, ARGIN(PMC *ctx), INTVAL hll)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_lex_pad_func(SHIM_INTERP,
+void Parrot_pcc_set_lex_pad_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(PMC *lex_pad))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_pcc_set_namespace_func(SHIM_INTERP,
+void Parrot_pcc_set_namespace_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(PMC *_namespace))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_object_func(SHIM_INTERP,
+void Parrot_pcc_set_object_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(PMC *object))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_outer_ctx_func(SHIM_INTERP,
+void Parrot_pcc_set_outer_ctx_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(PMC *outer_ctx))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_pcc_set_pc_func(SHIM_INTERP,
+void Parrot_pcc_set_pc_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(opcode_t *pc))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_signature_func(SHIM_INTERP,
+void Parrot_pcc_set_signature_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(PMC *sig_object))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -377,33 +387,43 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
        PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_caller_ctx_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ctx) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx) \
     , PARROT_ASSERT_ARG(caller_ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_constants_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ctx) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx) \
     , PARROT_ASSERT_ARG(ct))
 #define ASSERT_ARGS_Parrot_pcc_set_continuation_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ctx))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_handlers_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ctx) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx) \
     , PARROT_ASSERT_ARG(handlers))
 #define ASSERT_ARGS_Parrot_pcc_set_HLL_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_lex_pad_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ctx) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx) \
     , PARROT_ASSERT_ARG(lex_pad))
 #define ASSERT_ARGS_Parrot_pcc_set_namespace_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ctx))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_object_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ctx))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_outer_ctx_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ctx) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx) \
     , PARROT_ASSERT_ARG(outer_ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_pc_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ctx))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_signature_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ctx))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_trace_flags_off_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx))
@@ -423,7 +443,7 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 /* HEADERIZER END: src/call/context_accessors.c */
 
 /* Map Context manipulating functions to functions or macros */
-#ifdef NDEBUG
+#if 0
 #  define Parrot_pcc_get_context_struct(i, c) CONTEXT_STRUCT(c)
 
 #  define Parrot_pcc_get_num_constants(i, c) (CONTEXT_STRUCT(c)->num_constants)
@@ -485,6 +505,8 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 #  define Parrot_pcc_trace_flags_off(i, c, flags)    (CONTEXT_STRUCT(c)->trace_flags &= ~(flags))
 #  define Parrot_pcc_trace_flags_test(i, c, flags)   (CONTEXT_STRUCT(c)->trace_flags & (flags))
 
+#  define Parrot_pcc_set_context(i, c)   (CURRENT_CONTEXT(i) = (c))
+
 #else
 
 #  define Parrot_pcc_get_context_struct(i, c) Parrot_pcc_get_context_struct_func((i), (c))
@@ -543,6 +565,8 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 #  define Parrot_pcc_trace_flags_on(i, c, flags) Parrot_pcc_trace_flags_on_func((i), (c), (flags))
 #  define Parrot_pcc_trace_flags_off(i, c, flags) Parrot_pcc_trace_flags_off_func((i), (c), (flags))
 #  define Parrot_pcc_trace_flags_test(i, c, flags) Parrot_pcc_trace_flags_test_func((i), (c), (flags))
+
+#  define Parrot_pcc_set_context(i, c)   Parrot_pcc_set_context_func((i), (c))
 
 #endif /* ifndef NDEBUG */
 

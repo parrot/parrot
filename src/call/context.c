@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2010, Parrot Foundation.
+Copyright (C) 2009-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -95,6 +95,10 @@ static size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void set_context(PARROT_INTERP, ARGIN(PMC *ctx))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_allocate_registers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmcctx) \
@@ -111,6 +115,9 @@ static size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(number_regs_used))
+#define ASSERT_ARGS_set_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -355,7 +362,7 @@ Parrot_pop_context(PARROT_INTERP)
     PMC * const old = Parrot_pcc_get_caller_ctx(interp, ctx);
 
     /* restore old, set cached interpreter base pointers */
-    CURRENT_CONTEXT(interp) = old;
+    set_context(interp, old);
 }
 
 /*
@@ -590,7 +597,7 @@ Parrot_set_new_context(PARROT_INTERP, ARGIN(const UINTVAL *number_regs_used))
     PMC *old = CURRENT_CONTEXT(interp);
     PMC *ctx = Parrot_alloc_context(interp, number_regs_used, old);
 
-    CURRENT_CONTEXT(interp) = ctx;
+    set_context(interp, ctx);
 
     return ctx;
 }
@@ -667,6 +674,7 @@ Parrot_pcc_get_STRING_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_STRING_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_STR) > idx);
+    PARROT_GC_WRITE_BARRIER(interp, ctx);
     return &(CONTEXT_STRUCT(ctx)->bp_ps.regs_s[idx]);
 }
 
@@ -687,8 +695,12 @@ PMC **
 Parrot_pcc_get_PMC_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_PMC_reg)
+    PMC **res;
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_PMC) > idx);
-    return &(CONTEXT_STRUCT(ctx)->bp_ps.regs_p[-1L - idx]);
+    PARROT_GC_WRITE_BARRIER(interp, ctx);
+    res = &(CONTEXT_STRUCT(ctx)->bp_ps.regs_p[-1L - idx]);
+    PARROT_ASSERT(!*res || !PObj_on_free_list_TEST(*res));
+    return res;
 }
 
 /*
@@ -802,6 +814,42 @@ Parrot_pcc_set_regs_ps(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(Regs_ps *bp_ps))
     CONTEXT_STRUCT(ctx)->bp_ps = *bp_ps;
 }
 
+/*
+
+=item C<void Parrot_pcc_set_context_func(PARROT_INTERP, PMC *ctx)>
+
+Set new Context to interpreter.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pcc_set_context_func(PARROT_INTERP, ARGIN(PMC *ctx))
+{
+    ASSERT_ARGS(Parrot_pcc_set_context_func)
+
+    set_context(interp, ctx);
+}
+
+/*
+
+=item C<static void set_context(PARROT_INTERP, PMC *ctx)>
+
+Helper function to set breakpoint to.
+
+=cut
+
+*/
+
+static void
+set_context(PARROT_INTERP, ARGIN(PMC *ctx))
+{
+    ASSERT_ARGS(set_context)
+
+    CURRENT_CONTEXT(interp) = ctx;
+}
 
 /*
 

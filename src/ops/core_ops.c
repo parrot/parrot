@@ -20,8 +20,8 @@
 #define CUR_OPCODE cur_opcode
 #define IREG(i) (CUR_CTX->bp.regs_i[cur_opcode[i]])
 #define NREG(i) (CUR_CTX->bp.regs_n[-1L - cur_opcode[i]])
-#define PREG(i) (CUR_CTX->bp_ps.regs_p[-1L - cur_opcode[i]])
-#define SREG(i) (CUR_CTX->bp_ps.regs_s[cur_opcode[i]])
+#define PREG(i) REG_PMC(interp, cur_opcode[i])
+#define SREG(i) REG_STR(interp, cur_opcode[i])
 #define ICONST(i) cur_opcode[i]
 #define NCONST(i) Parrot_pcc_get_num_constants(interp, interp->ctx)[cur_opcode[i]]
 #define SCONST(i) Parrot_pcc_get_str_constants(interp, interp->ctx)[cur_opcode[i]]
@@ -22038,6 +22038,8 @@ Parrot_copy_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
         PMC   * const clone = VTABLE_clone(interp, PREG(2));
         /* Preserve the metadata on the destination. */
         PMC   * const meta  = VTABLE_getprops(interp, PREG(1));
+        /* We have to preserve GC flags of original PMC */
+        Parrot_UInt   gc_flags = PREG(1)->flags & PObj_GC_all_FLAGS;
 
         /* avoid leaks and unreachable memory by destroying the destination PMC */
         Parrot_pmc_destroy(interp, PREG(1));
@@ -22045,6 +22047,7 @@ Parrot_copy_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
         /* the source PMC knows how to clone itself, but we must reuse the
          * destination header */
         memmove(PREG(1), clone, sizeof (PMC));
+        PREG(1)->flags |= gc_flags;
 
         /* don't let the clone's destruction destroy the destination's data */
         PObj_custom_destroy_CLEAR(clone);
