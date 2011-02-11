@@ -10,6 +10,8 @@ New in 3.1.0
     DEPRECATED.pod, which no longer exists.
   + Improved GC latency
   + Improved GC performance on low-memory systems
+- NQP
+  + A repository for a new NQP version which has a new object model is created at http://github.com/perl6/nqp
 - Languages
 - Community
 - Documentation
