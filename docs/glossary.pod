@@ -248,46 +248,20 @@ be added, or overridden (for instance, the PAST to PIR transformation).
 Parrot Design Document: documents that describe the features parrot must
 implement.
 
-See also L< pddsE<47>pdd00_pdd.pod >
-
-See also L<< S<pdds/pdd00_pdd.pod> >>
-
-See also L<< http://github.com/parrot/parrot/docs/pdds/pdd00_pdd.pod.html >>.
-
 
 =begin man
 
-
-hello man.
-
-
-=end man
-
 =begin nroff
-
-
-hello nroff
-
-
-=end nroff
-
 
 =begin text
 
-
-hello text
-
+See also pddsE<47>pdd00_pdd.pod
 
 =end text
 
+=end nroff
 
-=begin pod
-
-See also L<< "pdds/pdd00_pdd.pod.html" >>
-
-See also L<< http://github.com/parrot/parrot/docs/pdds/pdd00_pdd.pod.html >>.
-
-=end pod
+=end man
 
 =begin html
 
@@ -295,6 +269,7 @@ See also L<< http://github.com/parrot/parrot/docs/pdds/pdd00_pdd.pod.html >>.
 <br />
 See also <a href="pdds/pdd00_pdd.pod">pdd00_pdd.pod</a><br />
 See also <a href="pdds/pdd00_pdd.pod.html">pdd00_pdd.pod.html</a><br />
+See also <a href="https://github.com/parrot/parrot/docs/pdds/pdd00_pdd.pod">pdd00_pdd.pod on GitHub</a><br />
 
 =end html
 
@@ -386,7 +361,29 @@ aka run loop, aka runcore. The way Parrot executes PBCs.
 See running.pod for a list of available runcores, and how to tell
 parrot which one to use.
 
-running.pod: L<< https://github.com/hackbinary/parrot/parrot/docs/running.pod >>
+=begin man
+
+=begin nroff
+
+=begin text
+
+See also running.pod
+
+=end text
+
+=end nroff
+
+=end man
+
+=begin html
+
+<br />
+<br />
+
+See also <a href="pdds/pdd00_pdd.pod.html">running.pod.html</a><br />
+See also <a href="https://github.com/parrot/parrot/docs/running.pod">running.pod on GitHub</a><br />
+
+=end html
 
 =item SMOP
 
