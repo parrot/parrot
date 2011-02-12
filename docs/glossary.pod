@@ -14,7 +14,7 @@ LAST UPDATED: 14 FEB 2011
 
 glossary.pod is updated and maintained from Parrot's GitHub repository.
 You may get the most up-to-date version at:
-L<< https://github.com/parrot/parrot/docs/glossary.pod >>
+L<< https://github.com/parrot/parrot/blob/master/docs/glossary.pod >>
 
 =head1 GLOSSARY
 
@@ -265,11 +265,8 @@ See also pddsE<47>pdd00_pdd.pod
 
 =begin html
 
-<br />
-<br />
-See also <a href="pdds/pdd00_pdd.pod">pdd00_pdd.pod</a><br />
 See also <a href="pdds/pdd00_pdd.pod.html">pdd00_pdd.pod.html</a><br />
-See also <a href="https://github.com/parrot/parrot/docs/pdds/pdd00_pdd.pod">pdd00_pdd.pod on GitHub</a><br />
+See also <a href="https://github.com/parrot/parrot/blob/master/docs/pdds/pdd00_pdd.pod">pdd00_pdd.pod on GitHub</a><br />
 
 =end html
 
@@ -381,7 +378,7 @@ See also running.pod
 <br />
 
 See also <a href="pdds/pdd00_pdd.pod.html">running.pod.html</a><br />
-See also <a href="https://github.com/parrot/parrot/docs/running.pod">running.pod on GitHub</a><br />
+See also <a href="https://github.com/parrot/parrot/blob/master/docs/running.pod">running.pod on GitHub</a><br />
 
 =end html
 
