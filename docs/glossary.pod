@@ -13,6 +13,7 @@ Short descriptions of words and acronyms found in Parrot development.
 LAST UPDATED: 14 FEB 2011
 
 glossary.pod is updated and maintained from Parrot's GitHub repository.
+
 You may get the most up-to-date version at:
 L<< https://github.com/parrot/parrot/blob/master/docs/glossary.pod >>
 
@@ -265,8 +266,8 @@ See also pddsE<47>pdd00_pdd.pod
 
 =begin html
 
-See also <a href="pdds/pdd00_pdd.pod.html">pdd00_pdd.pod.html</a><br />
-See also <a href="https://github.com/parrot/parrot/blob/master/docs/pdds/pdd00_pdd.pod">pdd00_pdd.pod on GitHub</a><br />
+See also <a href="pdds/pdd00_pdd.pod.html">pdd00_pdd.pod.html</a>
+(Just <a href="https://github.com/parrot/parrot/blob/master/docs/pdds/pdd00_pdd.pod">pdd00_pdd.pod</a> on GitHub)<br />
 
 =end html
 
@@ -374,8 +375,8 @@ See also running.pod
 
 =begin html
 
-See also <a href="pdds/pdd00_pdd.pod.html">running.pod.html</a><br />
-See also <a href="https://github.com/parrot/parrot/blob/master/docs/running.pod">running.pod on GitHub</a><br />
+See also <a href="pdds/pdd00_pdd.pod.html">running.pod.html</a>
+(Just <a href="https://github.com/parrot/parrot/blob/master/docs/running.pod">running.pod</a> on Github.<br />
 
 =end html
 
