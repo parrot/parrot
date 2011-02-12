@@ -267,7 +267,7 @@ See also pddsE<47>pdd00_pdd.pod
 =begin html
 
 See also <a href="pdds/pdd00_pdd.pod.html">pdd00_pdd.pod.html</a>
-(Just <a href="https://github.com/parrot/parrot/blob/master/docs/pdds/pdd00_pdd.pod">pdd00_pdd.pod</a> on GitHub)<br />
+ (just <a href="https://github.com/parrot/parrot/blob/master/docs/pdds/pdd00_pdd.pod">pdd00_pdd.pod</a> on GitHub).<br />
 
 =end html
 
@@ -376,7 +376,7 @@ See also running.pod
 =begin html
 
 See also <a href="pdds/pdd00_pdd.pod.html">running.pod.html</a>
-(Just <a href="https://github.com/parrot/parrot/blob/master/docs/running.pod">running.pod</a> on Github.<br />
+(Just <a href="https://github.com/parrot/parrot/blob/master/docs/running.pod">running.pod</a> on Github).<br />
 
 =end html
 
