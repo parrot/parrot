@@ -54,7 +54,8 @@ sub stash_if_necessary {
             return 0;
         }
         return 1;
-    } else {
+    }
+    else {
         print  "Nothing to stash in $repo\n";
         return 0;
     }
