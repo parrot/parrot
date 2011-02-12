@@ -293,7 +293,8 @@ See also L<< http://github.com/parrot/parrot/docs/pdds/pdd00_pdd.pod.html >>.
 
 <br />
 <br />
-See also <a href="pdds/pdd00_pdd.pod.html">pdd00_pdd.pod</a>
+See also <a href="pdds/pdd00_pdd.pod">pdd00_pdd.pod</a><br />
+See also <a href="pdds/pdd00_pdd.pod.html">pdd00_pdd.pod.html</a><br />
 
 =end html
 
