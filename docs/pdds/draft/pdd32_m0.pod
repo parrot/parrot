@@ -7,6 +7,34 @@
 This document specifies M0, the set of microcode-like ops on which Parrot will
 be based, and their requisite runtime environment.
 
+=head2 Status
+
+This document is a draft under active development.  Nothing is set in stone
+yet.  If you would like to suggest improvements, please talk with cotto, bacek,
+atrodo, chromatic or dukeleto.
+
+=head2 M0 Milestones
+
+This is a list of things that we expect the M0 VM to be able to do as this spec
+progresses.  They're pretty basic, but that's the idea behind M0.
+
+=item * print 42 (hard-coded instructions are fine at this point)
+
+=item * assemble an M0 assembly listing into M0 bytecode
+
+=item * disassemble binary M0 bytecode into an M0 assembly listing
+
+=item * print "hello, world\n"
+
+=item * add two integer registers, store the result
+
+=item * calculate the sum of a 10-element array of ints
+
+=item * calculate the hash of a hard-coded string (any non-trivial algorithm)
+
+=item * call a function with an argument, return a value
+
+
 =head2 Definitions
 
 define things here (M0, mop/6model)
