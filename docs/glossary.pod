@@ -248,11 +248,52 @@ be added, or overridden (for instance, the PAST to PIR transformation).
 Parrot Design Document: documents that describe the features parrot must
 implement.
 
+See also L< pddsE<47>pdd00_pdd.pod >
+
+See also L<< S<pdds/pdd00_pdd.pod> >>
+
 See also L<< http://github.com/parrot/parrot/docs/pdds/pdd00_pdd.pod.html >>.
+
+
+=begin man
+
+
+hello man.
+
+
+=end man
+
+=begin nroff
+
+
+hello nroff
+
+
+=end nroff
+
+
+=begin text
+
+
+hello text
+
+
+=end text
+
+
+=begin pod
+
+See also L<< "pdds/pdd00_pdd.pod.html" >>
+
+See also L<< http://github.com/parrot/parrot/docs/pdds/pdd00_pdd.pod.html >>.
+
+=end pod
 
 =begin html
 
-<a href="http://github.com/parrot/parrot/docs/pdds/pdd00_pdd.pod">pdd00_pdd.pod</a>
+<br />
+<br />
+See also <a href="pdds/pdd00_pdd.pod.html">pdd00_pdd.pod</a>
 
 =end html
 
