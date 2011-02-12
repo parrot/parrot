@@ -2,9 +2,11 @@
 
 =pod
 
-=head1 Name
+=head1 NAME
 
-docs/project/core_inclusion.pod - Questions we'll consider when deciding if a
+docs/project/core_inclusion.pod - Core Inclusion
+
+Questions we'll consider when deciding if a
 piece of code should be moved into core.
 
 =head1 Abstract
