@@ -374,9 +374,6 @@ See also running.pod
 
 =begin html
 
-<br />
-<br />
-
 See also <a href="pdds/pdd00_pdd.pod.html">running.pod.html</a><br />
 See also <a href="https://github.com/parrot/parrot/blob/master/docs/running.pod">running.pod on GitHub</a><br />
 
