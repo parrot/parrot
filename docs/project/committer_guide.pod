@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 Committer Guide
 
@@ -12,7 +12,7 @@ From F<docs/project/roles_responsibilities.pod>:
 
 =head1 Adding new files
 
-To add a new file to Parrot, in your svn working copy use the command:
+To add a new file to Parrot, in your git working copy use the command:
 
   % git add <filename>
 
@@ -54,7 +54,7 @@ depending upon the current language's comment character):
 
 =head1 Removing files
 
-To remove a file from the Parrot source, you need to use the C<svn rm>
+To remove a file from the Parrot source, you need to use the C<git rm>
 command:
 
   % git rm <filename>
