@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#! perl
 # Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
