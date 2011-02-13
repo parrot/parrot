@@ -7,7 +7,6 @@ use base qw( Exporter );
 our @EXPORT_OK = qw(
     $script
     $parrot_version
-    $svnid
     print_help
     print_version
 );
@@ -17,11 +16,9 @@ use FindBin qw($Bin);
 
 our $script         = q{Configure.pl};
 our $parrot_version = Parrot::BuildUtil::parrot_version("$Bin/../../");
-our $svnid          = '$Id$';
 
 sub print_version {
     print "Parrot Version $parrot_version Configure 2.0\n";
-    print "$svnid\n";
     return 1;
 }
 
@@ -181,7 +178,6 @@ configuration options processing modes
     use Parrot::Configure::Options::Conf qw(
         $script
         $parrot_version
-        $svnid
         print_help
         print_version
      );
@@ -215,11 +211,6 @@ Defaults to string 'Configure.pl', but may be overridden for testing purposes.
 =head2 C<$parrot_version>
 
 String which is return value of C<Parrot::BuildUtil::parrot_version()>; may be
-overridden for testing purposes.
-
-=head2 C<$svnid>
-
-String holding a standard Subversion 'Id' tag; may be
 overridden for testing purposes.
 
 =head1 EXPORTED SUBROUTINES

@@ -1,5 +1,5 @@
 #! ../../../parrot
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -31,7 +31,7 @@ See F<runtime/library/distutils.pir>.
     $P0['license_type'] = 'Artistic License 2.0'
     $P0['license_uri'] = 'http://www.perlfoundation.org/artistic_license_2_0'
     $P0['copyright_holder'] = 'Parrot Foundation'
-    $P0['checkout_uri'] = 'https://svn.parrot.org/parrot/trunk/examples/languages/abc'
+    $P0['checkout_uri'] = 'https://github.com/parrot/parrot/tree/master/examples/languages/abc'
     $P0['browser_uri'] = 'http://trac.parrot.org/parrot/browser/trunk/examples/languages/abc'
     $P0['project_uri'] = 'http://trac.parrot.org/parrot/browser/trunk/examples/languages/abc'
 

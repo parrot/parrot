@@ -82,7 +82,7 @@ sub new {
             'People',
             '',
             $self->new_item(
-                'A list of some of the Parrot developers with SVN commit access.',
+                'A list of some of the Parrot developers with Git commit access.',
                 'RESPONSIBLE_PARTIES'
             ),
             $self->new_item(
