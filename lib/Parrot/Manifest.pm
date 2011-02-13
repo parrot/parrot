@@ -56,7 +56,6 @@ sub new {
     my $argsref = shift;
 
     my %data = (
-        id         => '$' . 'Id$',
         time       => scalar gmtime,
         cmd        => 'git',
         script     => $argsref->{script},
