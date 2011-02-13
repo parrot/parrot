@@ -87,10 +87,9 @@ Set-up for C<test_step_thru_runstep()>:
 
     $parrot_version = Parrot::BuildUtil::parrot_version();
     $args = process_options( {
-    argv            => [ ],
-    script          => $0,
-    parrot_version  => $parrot_version,
-    svnid           => '$Id$',
+        argv            => [ ],
+        script          => $0,
+        parrot_version  => $parrot_version,
 } );
 
     $conf = Parrot::Configure->new;
