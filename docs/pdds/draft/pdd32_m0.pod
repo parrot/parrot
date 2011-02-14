@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2011, Parrot Foundation.
 
 =head1 PDD 32: M0 Design Spec
 
@@ -103,10 +103,21 @@ spec is more stable.
 
 =item * new_ctx - Create a new Lorito context
 
-=item * print  - prints a string
+=item * print  - prints a string to a file handle
+
+=item * new  - create a new PMC
+
+=item * store - store a register in a PMC, or vice versa
 
 =item * set  - sets a register to a value
 
+=item * get  - gets the value of a register
+
+=item * add - add two registers
+
+=item * multiply - multiply two registers
+
+=item * load_bytecode - load bytecode into the current Lorito context
 
 =head2 Textual Representation
 
@@ -142,7 +153,7 @@ describe metadata here, e.g. debugging information, aggregate op tracking info, 
 
 =head2 Op Composition
 
-if m0 needs to support op composition, describe it here
+If M0 needs to support op composition, describe it here.
 
 =head2 Objects
 
@@ -162,7 +173,8 @@ describe structs here, as far as they're relevant to m0
 
 =head2 Types
 
-Describe the types here (INPS, S being an alias for P)
+There are four register types, Integer, Numeric, PMC and String. It remains to
+be seen whether S and P will merely be syntax sugar for the same datastructure.
 
 =head2 MOP interaction
 
@@ -181,8 +193,6 @@ code from M0 and vice versa.
 
 describe what primitives will be needed to allow data sharing and
 synchronization between contexts.
-
-
 
 =head1 Lorito
 
