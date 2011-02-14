@@ -46,7 +46,7 @@ are passed to opcodes. "Context is the new interp."
 
 =cut
 
-op context(out PMC) {
+op get_cc(out PMC) {
     PMC * ctx = CURRENT_CONTEXT(interp);
     $1 = ctx;
 }
@@ -54,7 +54,7 @@ op context(out PMC) {
 op noop() {
 }
 
-op call(invar PMC, invar PMC) :flo{
+op invoke(invar PMC, invar PMC) :flo{
     PMC * ctx             = CURRENT_CONTEXT(interp);
     opcode_t   *dest      = expr NEXT();
     PMC * const p         = Parrot_pcc_get_continuation(interp,$1);
