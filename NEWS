@@ -11,11 +11,14 @@ New in 3.1.0
   + Improved GC latency
   + Improved GC performance on low-memory systems
 - NQP
-  + A repository for a new NQP version which has a new object model is created at http://github.com/perl6/nqp
+  + A repository for a new NQP version which has a new object model is
+    created at http://github.com/perl6/nqp
 - Languages
 - Community
 - Documentation
+  + Many new Parrot-related terms were added to docs/glossary.pod
 - Tests
+  + Test suite now passes on NetBSD 5.1
 
 
 New in 3.0.0
