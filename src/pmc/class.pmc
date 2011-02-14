@@ -1458,9 +1458,11 @@ Returns whether the class is or inherits from C<*class>.
         }
 
     cache_and_return:
-        if (_class->instantiated)
+        if (_class->instantiated) {
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             Parrot_hash_put(INTERP, _class->isa_cache, (void *)classobj,
                  (void *)retval);
+        }
         return retval;
 
     found:
