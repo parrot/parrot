@@ -148,10 +148,6 @@ C<path>.
 */
 
     METHOD rm(STRING *path) {
-        struct stat info;
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-        int          error;
-
         if (Parrot_file_stat_intval(INTERP, path, STAT_ISDIR)) {
             Parrot_file_rmdir(INTERP, path);
         }

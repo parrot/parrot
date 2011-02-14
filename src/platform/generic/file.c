@@ -259,7 +259,7 @@ Parrot_file_stat(PARROT_INTERP, ARGIN(STRING *file),
         ARGOUT(Parrot_Stat_Buf *buf))
 {
     struct stat  stat_buf;
-    char * const filename = Parrot_str_to_cstring(interp, file);
+    char * const filename = Parrot_str_to_platform_cstring(interp, file);
     const int    status = stat(filename, &stat_buf);
 
     Parrot_str_free_cstring(filename);
@@ -286,7 +286,7 @@ Parrot_file_lstat(PARROT_INTERP, ARGIN(STRING *file),
         ARGOUT(Parrot_Stat_Buf *buf))
 {
     struct stat  stat_buf;
-    char * const filename = Parrot_str_to_cstring(interp, file);
+    char * const filename = Parrot_str_to_platform_cstring(interp, file);
     const int    status = lstat(filename, &stat_buf);
 
     Parrot_str_free_cstring(filename);
@@ -484,14 +484,12 @@ Returns the stat field given by C<thing> of file C<file>.
 INTVAL
 Parrot_file_stat_intval(PARROT_INTERP, STRING *file, INTVAL thing)
 {
-    struct stat statbuf;
+    struct stat  statbuf;
+    char * const filename = Parrot_str_to_platform_cstring(interp, file);
+    const int    status = stat(filename, &statbuf);
 
-    /* Get the name of the file as something we can use */
-    char * const filename = Parrot_str_to_cstring(interp, file);
-
-    /* Everything needs the result of stat, so just go do it */
-    const int status = stat(filename, &statbuf);
     Parrot_str_free_cstring(filename);
+
     return stat_intval(interp, &statbuf, thing, status);
 }
 
@@ -510,13 +508,11 @@ INTVAL
 Parrot_file_lstat_intval(PARROT_INTERP, STRING *file, INTVAL thing)
 {
     struct stat statbuf;
-
-    /* Get the name of the file as something we can use */
-    char * const filename = Parrot_str_to_cstring(interp, file);
-
-    /* Everything needs the result of stat, so just go do it */
+    char * const filename = Parrot_str_to_platform_cstring(interp, file);
     const int status = lstat(filename, &statbuf);
+
     Parrot_str_free_cstring(filename);
+
     return stat_intval(interp, &statbuf, thing, status);
 }
 
