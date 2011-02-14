@@ -39,7 +39,7 @@ typedef struct Parrot_CallContext_attributes Parrot_Context;
 #define CTX_REG_PMC(i, p, x) (*Parrot_pcc_get_PMC_reg((i), (p), (x)))
 #define CTX_REG_STR(i, p, x) (*Parrot_pcc_get_STRING_reg((i), (p), (x)))
 
-#if NDEBUG
+#ifndef NDEBUG
 
 #  define CTX_REG_NUM(i, p, x) (*Parrot_pcc_get_FLOATVAL_reg((i), (p), (x)))
 #  define CTX_REG_INT(i, p, x) (*Parrot_pcc_get_INTVAL_reg((i), (p), (x)))
