@@ -713,8 +713,7 @@ sub post_method_gen {
         next if $name eq 'class_init';
         next unless $self->implements_vtable($name);
         # Skip non-updating methods
-        next unless $self->{has_method}{$name}
-                    && $self->vtable_method_does_write($name);
+        next unless $self->vtable_method_does_write($name);
 
         $method  = $self->get_method($name);
 
