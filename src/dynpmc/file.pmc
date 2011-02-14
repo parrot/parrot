@@ -196,7 +196,7 @@ Rename a file C<from> to the path C<to>.
 
 =back
 
-=head1 SEE ALS0
+=head1 SEE ALSO
 
    stat(2), rename(2)
 
