@@ -292,6 +292,7 @@ add_multi_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
                 add_to_class(interp, nsinfo, classobj, method_name, value);
 
                 GETATTR_NameSpace_hash(interp, SELF, hash);
+                PARROT_GC_WRITE_BARRIER(interp, SELF);
 
                 Parrot_hash_put(interp, hash,
                     Parrot_hash_key_from_string(interp, hash, key),
