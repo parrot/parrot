@@ -2059,7 +2059,7 @@ static void
 gc_gms_check_sanity(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_check_sanity)
-#ifndef NDEBUG
+#ifdef DETAIL_MEMORY_DEBUG
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            i;
 
