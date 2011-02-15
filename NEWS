@@ -15,12 +15,27 @@ New in 3.1.0
   + A repository for a new NQP version which has a new object model is
     created at http://github.com/perl6/nqp
 - Languages
+  + Cardinal (Ruby on Parrot) now compiles and passes it's test suite on master
+    and is looking for developers : https://github.com/parrot/cardinal
+  + Cardinal can send smoke reports with "rake smoke" or "parrot setup.pir smoke"
+  + Jaspers, an implementation of Javascript on Parrot, now has a Github repo
+    and is looking for developers: https://github.com/leto/jaspers
 - Community
+  + The following Parrot Google Code-In students were grand prize winners:
+    Fernando Brito, Brazil       David Czech, Canada
+    Nolan Lum, United States     Matt Rajca, United States
+    Tony Young, New Zealand
+    We are very proud of them for their fine work and congratulate
+    them for achieving top finalist status! For more info, see:
+    http://google-opensource.blogspot.com/2011/02/google-code-in-grand-prize-winners.html
 - Documentation
   + Many new Parrot-related terms were added to docs/glossary.pod
   + Internal project documentation is included in html output
 - Tests
   + Test suite now passes on NetBSD 5.1
+  + Test coverage increased greatly for the Embed/Extend subsystem,
+    thanks to a TPF grant:
+    http://leto.net/dukeleto.pl/2011/01/parrot-embed-grant-update-2.html
 
 
 New in 3.0.0
