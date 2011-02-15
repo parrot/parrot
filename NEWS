@@ -11,6 +11,7 @@ New in 3.1.0
   + Improved GC latency
   + Improved GC performance on low-memory systems
   + Improved packfile annotation lookup complexity
+  + Removal of unused code and SVN based code
 - NQP
   + A repository for a new NQP version which has a new object model is
     created at http://github.com/perl6/nqp
@@ -30,13 +31,13 @@ New in 3.1.0
     http://google-opensource.blogspot.com/2011/02/google-code-in-grand-prize-winners.html
 - Documentation
   + Many new Parrot-related terms were added to docs/glossary.pod
+  + Removal of most remaining references to SVN
   + Internal project documentation is included in html output
 - Tests
   + Test suite now passes on NetBSD 5.1
   + Test coverage increased greatly for the Embed/Extend subsystem,
     thanks to a TPF grant:
     http://leto.net/dukeleto.pl/2011/01/parrot-embed-grant-update-2.html
-
 
 New in 3.0.0
 - Core

@@ -749,6 +749,7 @@ D: testing parrot and some HLL's
 D: fixing codetest failures
 D: adding function documentation
 D: tracwiki additions
+D: Release manager for 2.7.0, 3.1.0
 E: mike.hind@gmail.com
 
 N: Michael G. Schwern
