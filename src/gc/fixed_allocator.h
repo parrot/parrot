@@ -134,6 +134,14 @@ int Parrot_gc_pool_is_owned(SHIM_INTERP,
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*ptr);
 
+PARROT_CAN_RETURN_NULL
+void* Parrot_gc_pool_high_ptr(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
+        __attribute__nonnull__(2);
+
+PARROT_CAN_RETURN_NULL
+void* Parrot_gc_pool_low_ptr(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
+        __attribute__nonnull__(2);
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
 Pool_Allocator * Parrot_gc_pool_new(SHIM_INTERP, size_t object_size);
@@ -173,6 +181,10 @@ Pool_Allocator * Parrot_gc_pool_new(SHIM_INTERP, size_t object_size);
 #define ASSERT_ARGS_Parrot_gc_pool_is_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(ptr))
+#define ASSERT_ARGS_Parrot_gc_pool_high_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pool))
+#define ASSERT_ARGS_Parrot_gc_pool_low_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_Parrot_gc_pool_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/fixed_allocator.c */
