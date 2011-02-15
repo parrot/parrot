@@ -115,6 +115,8 @@ ok( $op.need_write_barrier, "'out PMC' Write Barrier");
 $op := @ops[4];
 ok( $op.need_write_barrier, "'inout STR' Write Barrier");
 
+ok( $op.body ~~ /PARROT_GC_WRITE_BARRIER/, "We have Write Barrier inserted into op");
+
 done_testing();
 
 # Don't forget to update plan!
