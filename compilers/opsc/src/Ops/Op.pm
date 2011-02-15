@@ -126,6 +126,8 @@ method name($name?) { self.attr('name', $name, defined($name)) }
 
 method args($args?) { self.attr('args', $args, defined($args)) }
 
+method need_write_barrier($args?) { self.attr('need_write_barrier', $args, defined($args)) }
+
 method arg_types($args?)  {
     my $res := self.attr('arg_types', $args, defined($args));
 
