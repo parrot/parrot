@@ -44,6 +44,9 @@ sub runstep {
     if ($gc) {
         $conf->data->set(gc_flag => '-DPARROT_GC_DEFAULT_TYPE=' . uc($gc));
     }
+    else {
+        $conf->data->set(gc_flag => '');
+    }
 
     return 1;
 }
