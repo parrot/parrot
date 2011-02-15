@@ -186,6 +186,12 @@ typedef struct GC_Subsystem {
     /* Return by value to simplify memory management */
     size_t (*get_gc_info)(PARROT_INTERP, Interpinfo_enum);
 
+    /* Get boundaries of allocated memory. Used during scanning of C stack */
+    void* (*get_low_str_ptr)(PARROT_INTERP);
+    void* (*get_high_str_ptr)(PARROT_INTERP);
+    void* (*get_low_pmc_ptr)(PARROT_INTERP);
+    void* (*get_high_pmc_ptr)(PARROT_INTERP);
+
     /* Iterate over _live_ strings. Used for string pool compacting */
     void (*iterate_live_strings)(PARROT_INTERP, string_iterator_callback callback, void *data);
 

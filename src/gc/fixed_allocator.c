@@ -269,6 +269,12 @@ check that pointer is probably owned by pool.
 
 Calculate size of memory allocated by pool.
 
+=item C<void* Parrot_gc_pool_low_ptr(PARROT_INTERP, Pool_Allocator *pool)>
+
+=item C<void* Parrot_gc_pool_high_ptr(PARROT_INTERP, Pool_Allocator *pool)>
+
+Get low/high boundaries of allocated memory.
+
 =back
 
 =cut
@@ -367,6 +373,21 @@ Parrot_gc_pool_allocated_size(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
     return count * arena_size(pool);
 }
 
+PARROT_CAN_RETURN_NULL
+void*
+Parrot_gc_pool_low_ptr(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
+{
+    ASSERT_ARGS(Parrot_gc_pool_low_ptr)
+    return pool->lo_arena_ptr;
+}
+
+PARROT_CAN_RETURN_NULL
+void*
+Parrot_gc_pool_high_ptr(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
+{
+    ASSERT_ARGS(Parrot_gc_pool_high_ptr)
+    return pool->hi_arena_ptr;
+}
 
 /*
 

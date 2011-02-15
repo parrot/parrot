@@ -305,6 +305,22 @@ static void gc_gms_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
 static size_t gc_gms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
         __attribute__nonnull__(1);
 
+PARROT_CAN_RETURN_NULL
+static void * gc_gms_get_high_pmc_ptr(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_CAN_RETURN_NULL
+static void * gc_gms_get_high_str_ptr(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_CAN_RETURN_NULL
+static void * gc_gms_get_low_pmc_ptr(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_CAN_RETURN_NULL
+static void * gc_gms_get_low_str_ptr(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static unsigned int gc_gms_is_blocked_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -504,6 +520,14 @@ static int pobj2gen(ARGIN(PObj *pmc))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_get_gc_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_gms_get_high_pmc_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_gms_get_high_str_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_gms_get_low_pmc_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_gms_get_low_str_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_is_blocked_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_is_blocked_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -687,6 +711,11 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->gc_sys->reallocate_memory_chunk_with_interior_pointers
                 = gc_gms_reallocate_memory_chunk_zeroed;
     interp->gc_sys->free_memory_chunk           = gc_gms_free_memory_chunk;
+
+    interp->gc_sys->get_low_str_ptr             = gc_gms_get_low_str_ptr;
+    interp->gc_sys->get_high_str_ptr            = gc_gms_get_high_str_ptr;
+    interp->gc_sys->get_low_pmc_ptr             = gc_gms_get_low_pmc_ptr;
+    interp->gc_sys->get_high_pmc_ptr            = gc_gms_get_high_pmc_ptr;
 
     interp->gc_sys->iterate_live_strings        = gc_gms_iterate_live_strings;
     interp->gc_sys->write_barrier               = gc_gms_write_barrier;
@@ -1950,6 +1979,57 @@ gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
     /* We don't need it anymore */
     gc_gms_unseal_object(interp, pmc);
 }
+
+/*
+
+=item C<static void * gc_gms_get_low_str_ptr(PARROT_INTERP)>
+
+=item C<static void * gc_gms_get_high_str_ptr(PARROT_INTERP)>
+
+=item C<static void * gc_gms_get_low_pmc_ptr(PARROT_INTERP)>
+
+=item C<static void * gc_gms_get_high_pmc_ptr(PARROT_INTERP)>
+
+Get memory boudaries.
+
+*/
+
+PARROT_CAN_RETURN_NULL
+static void *
+gc_gms_get_low_str_ptr(PARROT_INTERP)
+{
+    ASSERT_ARGS(gc_gms_get_low_str_ptr)
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    return Parrot_gc_pool_low_ptr(interp, self->string_allocator);
+}
+
+PARROT_CAN_RETURN_NULL
+static void *
+gc_gms_get_high_str_ptr(PARROT_INTERP)
+{
+    ASSERT_ARGS(gc_gms_get_high_str_ptr)
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    return Parrot_gc_pool_high_ptr(interp, self->string_allocator);
+}
+
+PARROT_CAN_RETURN_NULL
+static void *
+gc_gms_get_low_pmc_ptr(PARROT_INTERP)
+{
+    ASSERT_ARGS(gc_gms_get_low_pmc_ptr)
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    return Parrot_gc_pool_low_ptr(interp, self->pmc_allocator);
+}
+
+PARROT_CAN_RETURN_NULL
+static void *
+gc_gms_get_high_pmc_ptr(PARROT_INTERP)
+{
+    ASSERT_ARGS(gc_gms_get_high_pmc_ptr)
+    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    return Parrot_gc_pool_high_ptr(interp, self->pmc_allocator);
+}
+
 
 /*
 
