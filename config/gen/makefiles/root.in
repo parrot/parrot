@@ -453,6 +453,7 @@ INTERP_O_FILES = \
     src/extend$(O) \
     src/extend_vtable$(O) \
     src/gc/alloc_memory$(O) \
+    src/gc/alloc_resources$(O) \
     src/gc/api$(O) \
     src/gc/gc_ms$(O) \
     src/gc/gc_inf$(O) \
@@ -507,7 +508,6 @@ INTERP_O_FILES = \
     src/longopt$(O) \
     @TEMP_platform_o@ \
     @TEMP_atomic_o@ \
-    @TEMP_gc_o@ \
 
 OPS_FILES = @ops@
 
@@ -1908,7 +1908,6 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
     include/pmc/pmc_parrotlibrary.h \
     src/io/io_private.h
 
-@TEMP_gc_c@
 
 @TEMP_pmc_build@
 
