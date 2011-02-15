@@ -523,7 +523,6 @@ Parrot_pcc_set_pc_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(opcode_t *pc
     ASSERT_ARGS(Parrot_pcc_set_pc_func)
     Parrot_Context * const c = CONTEXT_STRUCT(ctx);
     PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
-    PARROT_GC_WRITE_BARRIER(interp, ctx);
     c->current_pc = pc;
 }
 
