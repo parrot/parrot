@@ -182,27 +182,37 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 
     interp->lo_var_ptr = args->stacktop;
 
-    if (args->system == NULL
-    ||  STREQ(args->system, "gms")) {
-        interp->gc_sys->sys_type = GMS;
-        Parrot_gc_gms_init(interp, args);
+    interp->gc_sys->sys_type = PARROT_GC_DEFAULT_TYPE;
+
+    if (args->system != NULL) {
+        if (STREQ(args->system, "gms"))
+            interp->gc_sys->sys_type = GMS;
+        else if (STREQ(args->system, "ms2"))
+            interp->gc_sys->sys_type = MS2;
+        else if (STREQ(args->system, "ms"))
+            interp->gc_sys->sys_type = MS;
+        else if (STREQ(args->system, "inf"))
+            interp->gc_sys->sys_type = INF;
+        else {
+            /* Can't throw exception before GC is initialized */
+            fprintf(stderr, "Unknown GC type '%s'\n", args->system);
+            exit(EXIT_FAILURE);
+        }
     }
-    else if (STREQ(args->system, "ms2")) {
-        interp->gc_sys->sys_type = MS2;
-        Parrot_gc_ms2_init(interp, args);
-    }
-    else if (STREQ(args->system, "ms")) {
-        interp->gc_sys->sys_type = MS;
+
+    switch (interp->gc_sys->sys_type) {
+      case MS:
         Parrot_gc_ms_init(interp, args);
-    }
-    else if (STREQ(args->system, "inf")) {
-        interp->gc_sys->sys_type = INF;
+        break;
+      case INF:
         Parrot_gc_inf_init(interp, args);
-    }
-    else {
-        /* Can't throw exception before GC is initialized */
-        fprintf(stderr, "Unknown GC type '%s'\n", args->system);
-        exit(EXIT_FAILURE);
+        break;
+      case MS2:
+        Parrot_gc_ms2_init(interp, args);
+        break;
+      case GMS:
+        Parrot_gc_gms_init(interp, args);
+        break;
     }
 
     /* Assertions that GC subsystem has complete API */
