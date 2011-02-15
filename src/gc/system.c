@@ -278,9 +278,13 @@ get_max_buffer_address(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools
     size_t         max        = 0;
     UINTVAL        i;
 
+    if (interp->gc_sys->get_high_str_ptr)
+        return interp->gc_sys->get_high_str_ptr(interp);
+
     if (!mem_pools)
         return -1;
 
+    /* FIXME Remove this code. And Memory_Pools. And old GC MS. */
     for (i = 0; i < mem_pools->num_sized; ++i) {
         if (mem_pools->sized_header_pools[i]) {
             if (mem_pools->sized_header_pools[i]->end_arena_memory > max)
@@ -316,6 +320,9 @@ get_min_buffer_address(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools
     size_t         min        = (size_t) 0;
     UINTVAL        i;
 
+    if (interp->gc_sys->get_low_str_ptr)
+        return interp->gc_sys->get_low_str_ptr(interp);
+
     if (!mem_pools)
         return 0;
 
@@ -347,6 +354,10 @@ static size_t
 get_max_pmc_address(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(get_max_pmc_address)
+
+    if (interp->gc_sys->get_high_pmc_ptr)
+        return interp->gc_sys->get_high_pmc_ptr(interp);
+
     return mem_pools
             ? mem_pools->pmc_pool->end_arena_memory
             : (size_t)-1;
@@ -371,6 +382,10 @@ static size_t
 get_min_pmc_address(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(get_min_pmc_address)
+
+    if (interp->gc_sys->get_low_pmc_ptr)
+        return interp->gc_sys->get_low_pmc_ptr(interp);
+
     return mem_pools
            ? mem_pools->pmc_pool->start_arena_memory
            : 0;
