@@ -107,8 +107,13 @@ for @($op) {
 }
 ok( $goto_offset, "goto NEXT appended for non :flow ops");
 
+# Check write barriers.
 ok( !$op.need_write_barrier, "Write Barrier is not required");
 
+$op := @ops[3];
+ok( $op.need_write_barrier, "'out PMC' Write Barrier");
+$op := @ops[4];
+ok( $op.need_write_barrier, "'inout STR' Write Barrier");
 
 done_testing();
 
