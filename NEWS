@@ -1,7 +1,7 @@
 New in 3.1.0
 - Core
   + Exception PMCs are now subclassable from PIR
-  + IPv6 is now supported
+  + IPv6 is now supported and tested
   + Added Parrot_ext_try function to extend API (experimental), to allow
     implementation of try .. catch construcs in C extensions.
   + We now have a YAML library called YAML::Tiny, a port of YAML::Tiny from Perl 5
@@ -10,6 +10,7 @@ New in 3.1.0
     DEPRECATED.pod, which no longer exists.
   + Improved GC latency
   + Improved GC performance on low-memory systems
+  + Improved packfile annotation lookup complexity
 - NQP
   + A repository for a new NQP version which has a new object model is
     created at http://github.com/perl6/nqp
@@ -17,6 +18,7 @@ New in 3.1.0
 - Community
 - Documentation
   + Many new Parrot-related terms were added to docs/glossary.pod
+  + Internal project documentation is included in html output
 - Tests
   + Test suite now passes on NetBSD 5.1
 
