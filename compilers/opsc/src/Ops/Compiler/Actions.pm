@@ -91,7 +91,7 @@ method op($/) {
     if $op.need_write_barrier {
         $op.push(PAST::Op.new(
                 :pasttype<inline>,
-                :inline("    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp))\n")
+                :inline("    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));\n")
             ));
     }
 
