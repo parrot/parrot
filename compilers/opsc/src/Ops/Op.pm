@@ -126,7 +126,15 @@ method name($name?) { self.attr('name', $name, defined($name)) }
 
 method args($args?) { self.attr('args', $args, defined($args)) }
 
-method need_write_barrier($args?) { self.attr('need_write_barrier', $args, defined($args)) }
+method need_write_barrier() {
+    my $need := 0;
+    # We need write barriers only for (in)out PMC|STR
+    for self.args -> $a {
+        $need := ($a<type> eq 'STR' || $a<type> eq 'PMC')
+                 && ($a<direction> eq 'out' || $a<direction> eq 'inout');
+    }
+    $need;
+}
 
 method arg_types($args?)  {
     my $res := self.attr('arg_types', $args, defined($args));
