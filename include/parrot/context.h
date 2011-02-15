@@ -434,7 +434,7 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 /* HEADERIZER END: src/call/context_accessors.c */
 
 /* Map Context manipulating functions to functions or macros */
-#if 0
+#ifdef NDEBUG
 #  define Parrot_pcc_get_context_struct(i, c) CONTEXT_STRUCT(c)
 
 #  define Parrot_pcc_get_num_constants(i, c) (CONTEXT_STRUCT(c)->num_constants)
@@ -447,13 +447,11 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 } while (0)
 
 #  define Parrot_pcc_get_continuation(i, c) (CONTEXT_STRUCT(c)->current_cont)
-#  define Parrot_pcc_set_continuation(i, c, value) (CONTEXT_STRUCT(c)->current_cont = (value))
-
 #  define Parrot_pcc_get_caller_ctx(i, c) (CONTEXT_STRUCT(c)->caller_ctx)
-#  define Parrot_pcc_set_caller_ctx(i, c, value) (CONTEXT_STRUCT(c)->caller_ctx = (value))
-
 #  define Parrot_pcc_get_namespace(i, c) (CONTEXT_STRUCT(c)->current_namespace)
-#  define Parrot_pcc_set_namespace(i, c, value) (CONTEXT_STRUCT(c)->current_namespace = (value))
+#  define Parrot_pcc_get_object(i, c) (CONTEXT_STRUCT(c)->current_object)
+#  define Parrot_pcc_get_lex_pad(i, c) (CONTEXT_STRUCT(c)->lex_pad)
+#  define Parrot_pcc_get_handlers(i, c) (CONTEXT_STRUCT(c)->handlers)
 
 #  define Parrot_pcc_get_pc(i, c) (CONTEXT_STRUCT(c)->current_pc)
 #  define Parrot_pcc_set_pc(i, c, value) (CONTEXT_STRUCT(c)->current_pc = (value))
@@ -461,20 +459,9 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 #  define Parrot_pcc_get_HLL(i, c) (CONTEXT_STRUCT(c)->current_HLL)
 #  define Parrot_pcc_set_HLL(i, c, value) (CONTEXT_STRUCT(c)->current_HLL = (value))
 
-#  define Parrot_pcc_get_object(i, c) (CONTEXT_STRUCT(c)->current_object)
-#  define Parrot_pcc_set_object(i, c, value) (CONTEXT_STRUCT(c)->current_object = (value))
-
-#  define Parrot_pcc_get_lex_pad(i, c) (CONTEXT_STRUCT(c)->lex_pad)
-#  define Parrot_pcc_set_lex_pad(i, c, value) (CONTEXT_STRUCT(c)->lex_pad = (value))
-
-#  define Parrot_pcc_get_handlers(i, c) (CONTEXT_STRUCT(c)->handlers)
-#  define Parrot_pcc_set_handlers(i, c, value) (CONTEXT_STRUCT(c)->handlers = (value))
-
 #  define Parrot_pcc_get_outer_ctx(i, c) (CONTEXT_STRUCT(c)->outer_ctx)
-#  define Parrot_pcc_set_outer_ctx(i, c, value) (CONTEXT_STRUCT(c)->outer_ctx = (value))
 
 #  define Parrot_pcc_get_signature(i, c) (CONTEXT_STRUCT(c)->current_sig)
-#  define Parrot_pcc_set_signature(i, c, value) (CONTEXT_STRUCT(c)->current_sig = (value))
 
 #  define Parrot_pcc_get_num_constant(i, c, idx) (CONTEXT_STRUCT(c)->num_constants[(idx)])
 #  define Parrot_pcc_get_string_constant(i, c, idx) (CONTEXT_STRUCT(c)->str_constants[(idx)])
@@ -496,8 +483,6 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 #  define Parrot_pcc_trace_flags_off(i, c, flags)    (CONTEXT_STRUCT(c)->trace_flags &= ~(flags))
 #  define Parrot_pcc_trace_flags_test(i, c, flags)   (CONTEXT_STRUCT(c)->trace_flags & (flags))
 
-#  define Parrot_pcc_set_context(i, c)   (CURRENT_CONTEXT(i) = (c))
-
 #else
 
 #  define Parrot_pcc_get_context_struct(i, c) Parrot_pcc_get_context_struct_func((i), (c))
@@ -508,13 +493,10 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 #  define Parrot_pcc_set_constants(i, c, value) Parrot_pcc_set_constants_func((i), (c), (value))
 
 #  define Parrot_pcc_get_continuation(i, c) Parrot_pcc_get_continuation_func((i), (c))
-#  define Parrot_pcc_set_continuation(i, c, value) Parrot_pcc_set_continuation_func((i), (c), (value))
 
 #  define Parrot_pcc_get_caller_ctx(i, c) Parrot_pcc_get_caller_ctx_func((i), (c))
-#  define Parrot_pcc_set_caller_ctx(i, c, value) Parrot_pcc_set_caller_ctx_func((i), (c), (value))
 
 #  define Parrot_pcc_get_namespace(i, c) Parrot_pcc_get_namespace_func((i), (c))
-#  define Parrot_pcc_set_namespace(i, c, value) Parrot_pcc_set_namespace_func((i), (c), (value))
 
 #  define Parrot_pcc_get_pc(i, c) Parrot_pcc_get_pc_func((i), (c))
 #  define Parrot_pcc_set_pc(i, c, value) Parrot_pcc_set_pc_func((i), (c), (value))
@@ -523,19 +505,14 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 #  define Parrot_pcc_set_HLL(i, c, value) Parrot_pcc_set_HLL_func((i), (c), (value))
 
 #  define Parrot_pcc_get_object(i, c) Parrot_pcc_get_object_func((i), (c))
-#  define Parrot_pcc_set_object(i, c, value) Parrot_pcc_set_object_func((i), (c), (value))
 
 #  define Parrot_pcc_get_lex_pad(i, c) Parrot_pcc_get_lex_pad_func((i), (c))
-#  define Parrot_pcc_set_lex_pad(i, c, value) Parrot_pcc_set_lex_pad_func((i), (c), (value))
 
 #  define Parrot_pcc_get_handlers(i, c) Parrot_pcc_get_handlers_func((i), (c))
-#  define Parrot_pcc_set_handlers(i, c, value) Parrot_pcc_set_handlers_func((i), (c), (value))
 
 #  define Parrot_pcc_get_outer_ctx(i, c) Parrot_pcc_get_outer_ctx_func((i), (c))
-#  define Parrot_pcc_set_outer_ctx(i, c, value) Parrot_pcc_set_outer_ctx_func((i), (c), (value))
 
 #  define Parrot_pcc_get_signature(i, c) Parrot_pcc_get_signature_func((i), (c))
-#  define Parrot_pcc_set_signature(i, c, value) Parrot_pcc_set_signature_func((i), (c), (value))
 
 #  define Parrot_pcc_get_num_constant(i, c, idx) Parrot_pcc_get_num_constant_func((i), (c), (idx))
 #  define Parrot_pcc_get_string_constant(i, c, idx) Parrot_pcc_get_string_constant_func((i), (c), (idx))
@@ -557,9 +534,20 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 #  define Parrot_pcc_trace_flags_off(i, c, flags) Parrot_pcc_trace_flags_off_func((i), (c), (flags))
 #  define Parrot_pcc_trace_flags_test(i, c, flags) Parrot_pcc_trace_flags_test_func((i), (c), (flags))
 
+#endif /* ifndef NDEBUG */
+
+
+/* TODO Drop defines if set_foo_func in favour set_foo functions */
+#  define Parrot_pcc_set_continuation(i, c, value) Parrot_pcc_set_continuation_func((i), (c), (value))
+#  define Parrot_pcc_set_caller_ctx(i, c, value) Parrot_pcc_set_caller_ctx_func((i), (c), (value))
+#  define Parrot_pcc_set_namespace(i, c, value) Parrot_pcc_set_namespace_func((i), (c), (value))
+#  define Parrot_pcc_set_object(i, c, value) Parrot_pcc_set_object_func((i), (c), (value))
+#  define Parrot_pcc_set_lex_pad(i, c, value) Parrot_pcc_set_lex_pad_func((i), (c), (value))
+#  define Parrot_pcc_set_handlers(i, c, value) Parrot_pcc_set_handlers_func((i), (c), (value))
+#  define Parrot_pcc_set_outer_ctx(i, c, value) Parrot_pcc_set_outer_ctx_func((i), (c), (value))
+#  define Parrot_pcc_set_signature(i, c, value) Parrot_pcc_set_signature_func((i), (c), (value))
 #  define Parrot_pcc_set_context(i, c)   Parrot_pcc_set_context_func((i), (c))
 
-#endif /* ifndef NDEBUG */
 
 #endif /* PARROT_CONTEXT_H_GUARD */
 
