@@ -132,6 +132,7 @@ method need_write_barrier() {
     for self.args -> $a {
         $need := ($a<type> eq 'STR' || $a<type> eq 'PMC')
                  && ($a<direction> eq 'out' || $a<direction> eq 'inout');
+        return $need if $need;
     }
     $need;
 }
