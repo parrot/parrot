@@ -27,8 +27,6 @@ use warnings;
 
 use base qw(Parrot::Configure::Step);
 
-use Parrot::Configure::Utils ':auto';
-
 sub _init {
     my $self = shift;
     my %data;
@@ -40,16 +38,12 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $gc = 'gc';
-
-    $conf->data->set(
-        TEMP_gc_c => <<"EOF",
-src/gc/alloc_resources\$(O):	\$(GEN_HEADERS) src/gc/alloc_resources.c
-EOF
-        TEMP_gc_o => "src/gc/alloc_resources\$(O)",
-        gc_flag   => '',
-    );
+    my $gc = $conf->options->get('gc') || '';
     $conf->debug(" ($gc) ");
+
+    if ($gc) {
+        $conf->data->set(gc_flag => '-DPARROT_GC_DEFAULT_TYPE=' . uc($gc));
+    }
 
     return 1;
 }

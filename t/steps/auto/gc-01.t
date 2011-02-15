@@ -18,7 +18,7 @@ use IO::CaptureOutput qw| capture |;
 
 my ($args, $step_list_ref) = process_options(
     {
-        argv => [ q{--verbose} ],
+        argv => [ q{--verbose --gc=ms2} ],
         mode => q{configure},
     }
 );
@@ -41,8 +41,9 @@ my $step = test_step_constructor_and_description($conf);
         \$stdout,
     );
     ok( $ret, "runstep() returned true value" );
-    like( $stdout, qr/\(gc\)/, "Got expected verbose output");
-    is($conf->data->get('gc_flag'), q{},
+    note $stdout;
+    like( $stdout, qr/\(ms2\)/, "Got expected verbose output");
+    is($conf->data->get('gc_flag'), q{-DPARROT_GC_DEFAULT_TYPE=MS2},
         "Got expected value for 'gc_flag'");
 }
 
