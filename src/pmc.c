@@ -262,12 +262,13 @@ Parrot_pmc_reuse_noinit(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type)
         Parrot_pmc_destroy(interp, pmc);
 
         /*
-         * We can reuse PMC from older generation. Preserve it.
+         * We can reuse PMC from older generation. Preserve and soil it.
          *
          * FIXME It's abstraction leak. And it's really strange idea of reusing
          * PMCs...
          */
         PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG | gc_flags);
+        PARROT_GC_WRITE_BARRIER(interp, pmc);
 
         /* Set the right vtable */
         pmc->vtable = new_vtable;
