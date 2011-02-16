@@ -2351,7 +2351,7 @@ gc_gms_validate_objects(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_validate_objects)
 
-#ifndef NDEBUG
+//#ifndef NDEBUG
     INTVAL i;
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
@@ -2366,7 +2366,7 @@ gc_gms_validate_objects(PARROT_INTERP)
             PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
             PObj_live_CLEAR(pmc););
     }
-#endif
+//#endif
 }
 
 /*
