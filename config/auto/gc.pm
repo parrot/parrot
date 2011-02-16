@@ -40,12 +40,19 @@ sub runstep {
 
     my $gc = $conf->options->get('gc') || '';
     $conf->debug(" ($gc) ");
+    
+    my @known_gcs = qw<gms ms ms2 inf>;
 
     if ($gc) {
+        if (!grep /$gc/, @known_gcs) {
+            die "unknown gc '$gc': valid gc cores are ".join(', ', @known_gcs);
+        }
         $conf->data->set(gc_flag => '-DPARROT_GC_DEFAULT_TYPE=' . uc($gc));
+        $self->set_result($gc);
     }
     else {
         $conf->data->set(gc_flag => '');
+        $self->set_result('gms');
     }
 
     return 1;
