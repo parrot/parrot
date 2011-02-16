@@ -777,7 +777,6 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
          * good performance overrall.
          */
         self->gc_threshold = Parrot_sysmem_amount(interp) / 100;
-        self->gc_threshold = 1 * 1024 * 1024;
 
         Parrot_gc_str_initialize(interp, &self->string_gc);
     }
