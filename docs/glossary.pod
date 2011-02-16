@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -7,6 +7,14 @@ docs/glossary.pod - Parrot Glossary
 =head1 SUMMARY
 
 Short descriptions of words and acronyms found in Parrot development.
+
+=head1 VERSION
+
+LAST UPDATED: 14 FEB 2011
+
+glossary.pod is updated and maintained from Parrot's GitHub repository.
+You may get the most up-to-date version at:
+L<< https://github.com/parrot/parrot/docs/glossary.pod >>
 
 =head1 GLOSSARY
 
@@ -22,8 +30,8 @@ parser.
 
 =item bcg
 
-Byte Code Generation: bcg will be part of the Parrot Compiler
-tools. It will aid in converting POST to byte code.
+Bytecode Generation: bcg will be part of the Parrot Compiler
+tools. It will aid in converting POST to bytecode.
 
 =item Continuations
 
@@ -208,9 +216,14 @@ abstract syntax tree.
 
 See also L<"PCT">.
 
+=item PASM
+
+Parrot Assembly Language is the lowest level language before being translated
+in to bytecode.  Generally PIR is used.
+
 =item PBC
 
-Parrot Byte Code. The name for the "executable" files that can be passed to the
+Parrot bytecode. The name for the "executable" files that can be passed to the
 Parrot interpreter for immediate execution (although PASM and IMC files can be
 executed directly, too).
 
@@ -235,7 +248,13 @@ be added, or overridden (for instance, the PAST to PIR transformation).
 Parrot Design Document: documents that describe the features parrot must
 implement.
 
-See also L<pdds/pdd00_pdd>.
+See also L<< http://github.com/parrot/parrot/docs/pdds/pdd00_pdd.pod.html >>.
+
+=begin html
+
+<a href="http://github.com/parrot/parrot/docs/pdds/pdd00_pdd.pod">pdd00_pdd.pod</a>
+
+=end html
 
 =item PGE
 
@@ -253,6 +272,17 @@ Parrot Intermediate Representation: A medium-level assembly language for Parrot
 that hides messy details like register allocation so language compiler writers
 who target Parrot don't have to roll their own. Files have the
 extension C<.pir>.
+
+=item PIRATE
+
+PIRATE is Parrot's next generation compiler, and is currently under development.  
+IMCC is still the current compiler.
+
+=item PIRC
+
+Parrot Intermediate Representation Compiler.  It is an experimental attempt
+to replace IMCC, but could the PIR for IMCC.  Work on PIRC is incomplete,
+and the next generation compiler is PIRATE.
 
 =item PMC
 
@@ -311,8 +341,10 @@ L<http://www.perl.com/pub/a/2003/02/p6pdigest/20030216.html>
 =item run core
 
 aka run loop, aka runcore. The way Parrot executes PBCs.
-See L<running.pod> for a list of available runcores, and how to tell
+See running.pod for a list of available runcores, and how to tell
 parrot which one to use.
+
+running.pod: L<< https://github.com/parrot/parrot/parrot/docs/running.pod >>
 
 =item SMOP
 
@@ -332,8 +364,8 @@ are pre-selected, and there is no direct way to invoke them from PIR.
 =item Warnock's Dilemma
 
 The dilemma you face when posting a message to a public forum about something
-and not even getting an acknowledgment of its existence. This leaves you
-wondering if your problem is unimportant or previously addressed, if everyone's
+and not even getting an acknowledgement of its existence. This leaves you
+wondering if your problem is unimportant or previously addressed, if everyone is
 waiting on someone else to answer you,  or if maybe your mail never actually
 made it to anyone else in the forum.
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -87,6 +87,25 @@ do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
 
 pmclass ResizablePMCArray extends FixedPMCArray auto_attrs provides array {
     ATTR INTVAL resize_threshold; /* max size before array needs resizing */
+
+/*
+
+=item C<void init_int(INTVAL size)>
+
+Initializes the array.
+
+=cut
+
+*/
+
+    VTABLE void init_int(INTVAL size) {
+        if (size < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    _("ResizeblePMCArray: Cannot set array size to a negative number (%d)"), size);
+        SUPER(size);
+        if (size > 0)
+            PMC_threshold(SELF) = size;
+    }
 
 /*
 

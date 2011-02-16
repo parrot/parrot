@@ -8,7 +8,6 @@ CX=/usr/bin/g++
 
 foobar
 cc=$CC
-cxx=$CX
 link=$CX
 ld=/usr/bin/g++
 

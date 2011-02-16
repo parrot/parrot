@@ -32,6 +32,14 @@ D: Building on various platforms.
 N: Ahmed Zawawi
 D: Rakudo builtins
 
+N: Akash Manohar
+U: akashmanohar
+A: SingAlong
+E: akash@akash.im
+D: Fixed PCT tutorial Episode-3
+S: Bangalore, India
+W: http://akash.im
+
 N: Alberto Manuel Brandao Simoes
 U: ambs
 E: ambs@cpan.org
@@ -749,6 +757,7 @@ D: testing parrot and some HLL's
 D: fixing codetest failures
 D: adding function documentation
 D: tracwiki additions
+D: Release manager for 2.7.0, 3.1.0
 E: mike.hind@gmail.com
 
 N: Michael G. Schwern

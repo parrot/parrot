@@ -533,6 +533,12 @@ gc_ms2_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
 
     if (which == IMPATIENT_PMCS)
         return self->num_early_gc_PMCs;
+    if (which == TOTAL_PMCS)
+        /* It's higher than actual number of allocated PMCs */
+        return Parrot_pa_count_allocated(interp, self->objects);
+    if (which == ACTIVE_PMCS)
+        /* It's higher than actual number of allocated PMCs */
+        return Parrot_pa_count_used(interp, self->objects);
 
     return Parrot_gc_get_info(interp, which, &interp->gc_sys->stats);
 }

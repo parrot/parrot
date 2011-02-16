@@ -31,6 +31,8 @@
 
 #define ALIGNED_STRING_SIZE(len) (((len) + sizeof (void*) + WORD_ALIGN_1) & WORD_ALIGN_MASK)
 
+#define PARROT_GC_WRITE_BARRIER(i, p) do { if (PObj_GC_need_write_barrier_TEST((p))) Parrot_gc_write_barrier((i), (p)); } while(0)
+
 typedef struct _Parrot_GC_Init_Args {
     void *stacktop;
     const char *system;
@@ -361,6 +363,11 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+void Parrot_gc_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 unsigned int Parrot_is_blocked_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -501,6 +508,9 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_total_sized_buffers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_gc_write_barrier __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_is_blocked_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_is_blocked_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -521,7 +531,7 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
 
 #if defined(PARROT_IN_CORE)
 #  define Parrot_gc_mark_PMC_alive(interp, obj) \
-      do if (!PMC_IS_NULL(obj) && !PObj_live_TEST(obj)) Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
+      do if (!PMC_IS_NULL(obj)) Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
       while (0)
 #else
 #  define Parrot_gc_mark_PMC_alive(interp, obj) Parrot_gc_mark_PMC_alive_fun((interp), (obj))

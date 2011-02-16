@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
+# Copyright (C) 2004-2011, Parrot Foundation.
 
 
 =head1 NAME
@@ -25,7 +25,6 @@ use warnings;
 use base qw( Parrot::Pmc2c::PMC );
 
 use Parrot::Pmc2c::Emitter ();
-use Parrot::Pmc2c::PMCEmitter ();
 use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::UtilFunctions qw( return_statement );
 use Text::Balanced 'extract_bracketed';

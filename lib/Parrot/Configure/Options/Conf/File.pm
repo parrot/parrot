@@ -9,7 +9,6 @@ our @EXPORT_OK = qw(
     $script
     %options_components
     $parrot_version
-    $svnid
 );
 use File::Spec;
 use lib qw( lib );
@@ -17,7 +16,6 @@ use Parrot::BuildUtil;
 use Parrot::Configure::Options::Conf qw(
     $script
     $parrot_version
-    $svnid
     print_help
     print_version
 );
@@ -165,18 +163,16 @@ Parrot's configuration-file interface
         $script
         %options_components
         $parrot_version
-        $svnid
     );
 
 =head1 DESCRIPTION
 
-This package exports five variables on demand.
+This package exports four variables on demand.
 
     %options_components
     @valid_options
     $script
     $parrot_version
-    $svnid
 
 Typically, only one of these -- C<%options_components> -- is directly imported
 by Parrot::Configure::Options for use in the case where options are supplied

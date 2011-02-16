@@ -146,12 +146,12 @@ t/compilers/imcc/*/*.t
 t/op/*.t
 t/pmc/*.t
 t/oo/*.t
+t/pir/*.t
 t/native_pbc/*.t
-t/dynpmc/*.t
-t/dynoplibs/*.t
 TEST
     .const string core_tests = <<'TEST'
 t/src/*.t
+t/src/embed/*.t
 t/run/*.t
 t/perl/*.t
 TEST
@@ -161,6 +161,10 @@ t/compilers/pge/*.t
 t/compilers/pge/p5regex/*.t
 t/compilers/pge/perl6regex/*.t
 t/compilers/tge/*.t
+t/compilers/opsc/*.t
+t/compilers/data_json/*.t
+t/dynoplibs/*.t
+t/dynpmc/*.t
 t/library/*.t
 t/tools/*.t
 t/profiling/*.t

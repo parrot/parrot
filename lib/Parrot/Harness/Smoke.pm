@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Parrot::Harness::Smoke - Subroutines used by harness-scripts to generate smoke reports
+Parrot::Harness::Smoke - Generate smoke reports
 
 =head1 DESCRIPTION
 
@@ -17,7 +17,7 @@ The module currently exports three subroutines on demand.
 
     %env_data = collect_test_environment_data();
 
-Subroutine collects environmental data via:
+It collects environmental data via:
 
 =over 4
 
@@ -25,7 +25,7 @@ Subroutine collects environmental data via:
 
 =item * Environmental variables
 
-=item * Analysis of C<.svn> metadata
+=item * Analysis of C<git> metadata
 
 =item * Application of CPAN modules.  F<Mail::Util> and F<Sys::Hostname> are
 used, if available.

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -741,9 +741,7 @@ Used to unarchive the array.
     }
 
     VTABLE void thaw(PMC *info) {
-        SELF.set_integer_native(VTABLE_shift_integer(INTERP, info));
-        /* Thawed array was created from pmc_new_noinit */
-        PObj_custom_mark_destroy_SETALL(SELF);
+        SELF.init_int(VTABLE_shift_integer(INTERP, info));
     }
 
 /*

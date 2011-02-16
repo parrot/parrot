@@ -21,6 +21,13 @@
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PMC * Parrot_pmc_box_c_string_array(PARROT_INTERP,
+    int count,
+    ARGIN(const char **s))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
 void Parrot_pmc_create_mro(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
 
@@ -181,6 +188,9 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_Parrot_pmc_box_c_string_array __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_pmc_create_mro __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pmc_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

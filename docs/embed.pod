@@ -160,7 +160,7 @@ The default. No flags.
 
 =item PARROT_BOUNDS_FLAG
 
-True if byte code bounds should be tracked.
+True if bytecode bounds should be tracked.
 
 =item PARROT_GC_DEBUG_FLAG
 

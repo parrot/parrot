@@ -1,8 +1,14 @@
-# Copyright (C) 2005-2008, Parrot Foundation.
+# Copyright (C) 2005-2011, Parrot Foundation.
 
 =head1 NAME
 
-Parrot::Revision - SVN Revision of Parrot
+Parrot::Revision - Revision number of Parrot
+
+B<Note:> This package is largely obsolete, as the Git version control system
+does not use a continually incrementing integer to designate a particular
+revision, as our previous CVS and Subversion VCSes did.  We retain it for
+backwards compatibility for certain high-level languages built on top of
+Parrot.
 
 =head1 SYNOPSIS
 

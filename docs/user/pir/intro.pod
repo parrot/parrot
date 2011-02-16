@@ -24,7 +24,7 @@ topics will appear in later articles.
 In order to test the PIR and PASM code in this article, a parrot virtual
 machine is needed (henceforth just "parrot"). Parrot is available from
 L<http://parrot.org>. Just download the latest release, or checkout
-the current development version from the SVN tree. The programs in this
+the current development version from the Git repository. The programs in this
 article were tested with Parrot 0.8.1.
 
 Parrot is very easy to compile on unix-like and Microsoft Windows

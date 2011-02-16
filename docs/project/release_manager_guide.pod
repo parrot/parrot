@@ -1,6 +1,6 @@
 # Copyright (C) 2007-2011, Parrot Foundation.
 
-=head1 Release Instructions
+=head1 Release Manager Guide
 
 To prepare a release:
 
@@ -352,8 +352,9 @@ following channels (and any others you can think of):
 =item a
 
 Send a text email to parrot-dev, parrot-users, perl6-language, perl6-announce,
-perl5-porters, etc.  You should also include LWN.net in this mailing; email to
-C<lwn> at that domain.
+perl5-porters, etc.  (Note: perl6-internals is no longer in use, so you don't
+need to mail that list.)  You should also include LWN.net in this mailing;
+email to C<lwn> at that domain.
 
 =item b
 
@@ -432,7 +433,6 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
 Versions with a asterisk (*) are supported releases.
 
- - Feb 15, 2011 - 3.1   - mikehh
  - Mar 15, 2011 - 3.2   - gerd
  - Apr 19, 2011 - 3.3*  - whiteknight
  - May 17, 2011 - 3.4   - gerd

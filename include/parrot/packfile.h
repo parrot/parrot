@@ -837,6 +837,16 @@ PackFile_ByteCode * Parrot_pf_create_default_segments(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+void Parrot_pf_execute_bytecode_program(PARROT_INTERP,
+    ARGMOD(PackFile *pf),
+    ARGMOD(PMC *args))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pf)
+        FUNC_MODIFIES(*args);
+
+PARROT_EXPORT
 void Parrot_pf_set_current_packfile(PARROT_INTERP,
     ARGIN(PackFile * const pf))
         __attribute__nonnull__(1)
@@ -1016,6 +1026,11 @@ PackFile * Parrot_pf_get_current_packfile(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf) \
     , PARROT_ASSERT_ARG(file_name))
+#define ASSERT_ARGS_Parrot_pf_execute_bytecode_program \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pf) \
+    , PARROT_ASSERT_ARG(args))
 #define ASSERT_ARGS_Parrot_pf_set_current_packfile \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
