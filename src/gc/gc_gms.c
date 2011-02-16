@@ -2325,7 +2325,8 @@ gc_gms_validate_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_validate_pmc)
 
-    PARROT_ASSERT(!PObj_on_free_list_TEST(pmc));
+    if (PObj_on_free_list_TEST(pmc))
+        Parrot_confess("Dead object found!", __FILE__, __LINE__);
 
     if (PObj_live_TEST(pmc))
         return;
