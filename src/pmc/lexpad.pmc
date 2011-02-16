@@ -153,6 +153,7 @@ Return the LexInfo PMC, if any or a Null PMC.
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
         CTX_REG_PMC(INTERP, ctx, (INTVAL)b->value) = value;
+        PARROT_GC_WRITE_BARRIER(INTERP, ctx);
     }
 
     VTABLE void set_pmc_keyed(PMC *name, PMC *value) {
