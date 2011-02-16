@@ -777,6 +777,7 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
          * good performance overrall.
          */
         self->gc_threshold = Parrot_sysmem_amount(interp) / 100;
+        self->gc_threshold = 1 * 1024 * 1024;
 
         Parrot_gc_str_initialize(interp, &self->string_gc);
     }
@@ -2346,7 +2347,7 @@ gc_gms_validate_objects(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_validate_objects)
 
-//#ifndef NDEBUG
+#if defined(PARROT_GC_VALIDATE) || !defined(NDEBUG)
     INTVAL i;
     MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
@@ -2361,7 +2362,7 @@ gc_gms_validate_objects(PARROT_INTERP)
             PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
             PObj_live_CLEAR(pmc););
     }
-//#endif
+#endif
 }
 
 /*
