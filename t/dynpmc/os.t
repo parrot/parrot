@@ -330,7 +330,7 @@ if ( $cygwin ) {
 }
 
 if ( $MSWin32 ) {
-    $s[0] = 0;      # dev: we use dwVolumeSerialNumber instead of drive letter 
+    $s[0] = 0;      # dev: we use dwVolumeSerialNumber instead of drive letter
     $s[2] = 0777;   # mode: always 0777 on Windows
     $s[3] = 0;      # nlink: only implemented in fstat for now
     $s[6] = 0;      # rdev: we use zero instead of drive letter
