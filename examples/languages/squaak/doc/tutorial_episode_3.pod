@@ -196,8 +196,8 @@ Rename the token C<< term:sym<integer> >> to C<< term:sym<integer_constant> >> a
 C<< term:sym<quote> >> to C<< term:sym<string_constant> >> (to better match our
 language specification).
 
-Add action methods for term:sym<integer_constant> and term:sym<string_constant>
-to F<src/Squaak/Actions.pm>:
+In F<src/Squaak/Actions.pm> remove action methods for term:sym<integer> and term:sym<quote>
+in and add action methods for term:sym<integer_constant> and term:sym<string_constant>:
 
     method term:sym<integer_constant>($/) {
         make PAST::Val.new(:value($<integer>.ast), :returns<Integer>);
