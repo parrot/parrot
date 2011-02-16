@@ -184,6 +184,7 @@ sub rewrite_RETURNs {
         if ($returns eq 'void') {
             $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     /*BEGIN RETURN $returns */
+    PARROT_GC_WRITE_BARRIER(interp, _self);
     return;
     /*END RETURN $returns */
 END
@@ -204,6 +205,7 @@ END
     _ret_object = Parrot_pcc_build_call_from_c_args(interp, _call_object,
         "$returns_signature", $returns_varargs);
     UNUSED(_ret_object);
+    PARROT_GC_WRITE_BARRIER(interp, _self);
     return;
     /*END RETURN $returns */
     }
@@ -212,6 +214,7 @@ END
         else { # if ($returns_signature)
             $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     /*BEGIN RETURN $returns */
+    PARROT_GC_WRITE_BARRIER(interp, _self);
     return;
     /*END RETURN $returns */
 END
