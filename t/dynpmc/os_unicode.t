@@ -21,12 +21,16 @@ Tests the C<OS> PMC with Unicode filenames.
     .include 'test_more.pir'
     .include 'iglobals.pasm'
     .local pmc config_hash, interp
+    .local int enc1, enc2
 
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]
     $S0 = config_hash['osname']
-    if $S0 == 'linux' goto has_unicode
-    if $S0 != 'MSWin32' goto no_unicode
+    if $S0 == 'MSWin32' goto has_unicode
+    if $S0 != 'linux' goto no_unicode
+    enc1 = find_encoding 'platform'
+    enc2 = find_encoding 'utf8'
+    if enc1 != enc2 goto no_unicode
 
   has_unicode:
     plan(17)
