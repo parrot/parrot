@@ -279,7 +279,7 @@ get_max_buffer_address(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools
     UINTVAL        i;
 
     if (interp->gc_sys->get_high_str_ptr)
-        return interp->gc_sys->get_high_str_ptr(interp);
+        return (size_t)interp->gc_sys->get_high_str_ptr(interp);
 
     if (!mem_pools)
         return -1;
@@ -321,7 +321,7 @@ get_min_buffer_address(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools
     UINTVAL        i;
 
     if (interp->gc_sys->get_low_str_ptr)
-        return interp->gc_sys->get_low_str_ptr(interp);
+        return (size_t)interp->gc_sys->get_low_str_ptr(interp);
 
     if (!mem_pools)
         return 0;
@@ -356,7 +356,7 @@ get_max_pmc_address(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools))
     ASSERT_ARGS(get_max_pmc_address)
 
     if (interp->gc_sys->get_high_pmc_ptr)
-        return interp->gc_sys->get_high_pmc_ptr(interp);
+        return (size_t)interp->gc_sys->get_high_pmc_ptr(interp);
 
     return mem_pools
             ? mem_pools->pmc_pool->end_arena_memory
@@ -384,7 +384,7 @@ get_min_pmc_address(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools))
     ASSERT_ARGS(get_min_pmc_address)
 
     if (interp->gc_sys->get_low_pmc_ptr)
-        return interp->gc_sys->get_low_pmc_ptr(interp);
+        return (size_t)interp->gc_sys->get_low_pmc_ptr(interp);
 
     return mem_pools
            ? mem_pools->pmc_pool->start_arena_memory
