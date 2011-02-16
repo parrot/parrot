@@ -22890,7 +22890,10 @@ Parrot_copy_p_p(opcode_t *cur_opcode, PARROT_INTERP)  {
         /* the source PMC knows how to clone itself, but we must reuse the
          * destination header */
         memmove(PREG(1), clone, sizeof (PMC));
+
+        /* Restore old flags and soil destination. We've changed it */
         PREG(1)->flags |= gc_flags;
+        PARROT_GC_WRITE_BARRIER(interp, PREG(1));
 
         /* don't let the clone's destruction destroy the destination's data */
         PObj_custom_destroy_CLEAR(clone);
