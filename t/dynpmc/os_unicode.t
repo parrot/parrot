@@ -29,10 +29,11 @@ Tests the C<OS> PMC with Unicode filenames.
     if $S0 != 'MSWin32' goto no_unicode
 
   has_unicode:
-    plan(6)
+    plan(17)
     $P0 = loadlib 'os'
     $P0 = loadlib 'file'
-    test_unicode()
+    test_unicode_dirs()
+    test_unicode_files()
     .return()
 
   no_unicode:
@@ -40,22 +41,38 @@ Tests the C<OS> PMC with Unicode filenames.
     .return()
 .end
 
-.sub 'test_unicode'
-    .local pmc os, file, array, it
-    .local int rnd, found
+.sub 'unicode_filename'
+    .param string prefix
     .local string filename, unicode
+    .local pmc array
+    .local int rnd, enc
+
+    array = new ['ResizablePMCArray']
+    push array, prefix
+    rnd = rand 1000000
+    push array, rnd
+    unicode = ucs4:"\x{2022}\x{20000}"
+    push array, unicode
+    filename = sprintf "%s_%06d_%s", array
+
+    # make sure it is not utf-8
+    enc = find_encoding 'ucs4'
+    filename = trans_encoding filename, enc
+
+    .return (filename)
+.end
+
+.sub 'test_unicode_dirs'
+    .local pmc os, file, array, it
+    .local int found
+    .local string filename, cwd
 
     os = new ['OS']
     isa_ok(os, 'OS', 'new OS')
     file = new ['File']
     isa_ok(file, 'File', 'new File')
 
-    array = new ['ResizablePMCArray']
-    rnd = rand 1000000
-    push array, rnd
-    unicode = ucs4:"\x{2022}\x{20000}"
-    push array, unicode
-    filename = sprintf "test_%06d_%s", array
+    filename = unicode_filename('test')
 
     os.'mkdir'(filename, 0o777)
     $I0 = file.'is_dir'(filename)
@@ -78,10 +95,60 @@ Tests the C<OS> PMC with Unicode filenames.
     $I0 = file.'is_dir'($S0)
     ok($I0, 'chdir')
 
+    cwd = os.'cwd'()
+    $I0 = length filename
+    neg $I0
+    cwd = substr cwd, $I0
+    is(cwd, filename, 'cwd')
+
     os.'chdir'('..')
     os.'rm'(filename)
     $I0 = file.'exists'(filename)
     nok($I0, 'rmdir')
+.end
+
+.sub 'test_unicode_files'
+    .local pmc os, file, fh, stat
+    .local string filename, dest_filename
+    .local int size
+
+    os = new ['OS']
+    isa_ok(os, 'OS', 'new OS')
+    file = new ['File']
+    isa_ok(file, 'File', 'new File')
+
+    filename = unicode_filename('test1')
+
+    fh = new['FileHandle']
+    fh.'open'(filename, 'w')
+    isa_ok(fh, 'FileHandle', 'open')
+    fh.'print'('1234')
+    fh.'close'()
+
+    $I0 = file.'is_file'(filename)
+    ok($I0, 'is_file')
+
+    $I0 = os.'can_read'(filename)
+    ok($I0, 'can_read')
+
+    stat = os.'stat'(filename)
+    size = stat[7]
+    is(size, 4, 'stat')
+
+    stat = os.'lstat'(filename)
+    size = stat[7]
+    is(size, 4, 'lstat')
+
+    dest_filename = unicode_filename('test2')
+    os.'rename'(filename, dest_filename)
+    $I0 = file.'exists'(filename)
+    nok($I0, 'rename old')
+    $I0 = file.'exists'(dest_filename)
+    ok($I0, 'rename new')
+
+    os.'rm'(dest_filename)
+    $I0 = file.'exists'(dest_filename)
+    nok($I0, 'rm')
 .end
 
 # Local Variables:
