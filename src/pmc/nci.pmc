@@ -55,7 +55,6 @@ build_func(PARROT_INTERP, ARGIN(PMC *obj), ARGMOD(Parrot_NCI_attributes *nci))
 {
     ASSERT_ARGS(build_func)
 
-    PARROT_GC_WRITE_BARRIER(interp, obj);
     nci->signature = Parrot_nci_parse_signature(interp, nci->sig_str);
 
     Parrot_nci_sig_to_pcc(interp, nci->signature,
@@ -68,6 +67,7 @@ build_func(PARROT_INTERP, ARGIN(PMC *obj), ARGMOD(Parrot_NCI_attributes *nci))
     /* Build call function. */
     nci->fb_info     = build_call_func(interp, nci->sig_str);
     nci->func        = F2DPTR(VTABLE_get_pointer(interp, nci->fb_info));
+    PARROT_GC_WRITE_BARRIER(interp, obj);
 
     return (nci_thunk_t)nci->func;
 }
