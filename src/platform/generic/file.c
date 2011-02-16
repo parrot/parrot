@@ -238,9 +238,24 @@ convert_stat_buf(PARROT_INTERP, ARGIN(struct stat *stat_buf),
 #endif
 
     buf->create_time = zero;
+#ifdef PARROT_HAS_STAT_ATIM
     buf->access_time = stat_buf->st_atim;
     buf->modify_time = stat_buf->st_mtim;
     buf->change_time = stat_buf->st_ctim;
+#else
+#  ifdef PARROT_HAS_STAT_ATIMESPEC
+    buf->access_time = stat_buf->st_atimespec;
+    buf->modify_time = stat_buf->st_mtimespec;
+    buf->change_time = stat_buf->st_ctimespec;
+#  else
+    buf->access_time.tv_sec  = stat_buf->st_atime;
+    buf->access_time.tv_nsec = 0;
+    buf->modify_time.tv_sec  = stat_buf->st_mtime;
+    buf->modify_time.tv_nsec = 0;
+    buf->change_time.tv_sec  = stat_buf->st_ctime;
+    buf->change_time.tv_nsec = 0;
+#  endif
+#endif
 }
 
 /*

@@ -1,0 +1,31 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+
+check if struct stat has st_atimespec, st_mtimespec and st_ctimespec
+
+*/
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/stat.h>
+
+int
+main()
+{
+    struct stat st;
+    st.st_atimespec.tv_sec  = 22;
+    st.st_atimespec.tv_nsec = 500;
+    st.st_mtimespec.tv_sec  = 22;
+    st.st_mtimespec.tv_nsec = 500;
+    st.st_ctimespec.tv_sec  = 22;
+    st.st_ctimespec.tv_nsec = 500;
+    printf("OK\n");
+    return EXIT_SUCCESS;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
