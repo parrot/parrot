@@ -156,7 +156,7 @@ C<statement> rule with this rule:
         <assignment>
     }
 
-Replace the statementlist rule with this:
+Replace the statement_list rule with this:
 
     rule statement_list {
         <stat_or_def>*
@@ -212,6 +212,14 @@ in and add action methods for term:sym<integer_constant> and term:sym<string_con
     }
 
 PAST::Val nodes are used the represent constant values.
+
+Replace the statement_list method in F<src/Squaak/Actions.pm> with this:
+
+    method statement_list($/) {
+		    my $past := PAST::Stmts.new( :node($/) );
+		    for $<stat_or_def> { $past.push( $_.ast ); }
+		    make $past;
+    }
 
 Finally, remove the rules C<proto token statement_control>,
 C<< rule statement_control:sym<say> >>, and C<< rule statement_control:sym<print> >>.
