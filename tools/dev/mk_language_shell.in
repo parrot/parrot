@@ -446,7 +446,7 @@ This is the grammar for @lang@ in Perl 6 rules.
 grammar @lang@::Grammar is HLL::Grammar;
 
 token TOP {
-    <statementlist>
+    <statement_list>
     [ $ || <.panic: "Syntax error"> ]
 }
 
@@ -460,7 +460,7 @@ token ws {
 
 ## Statements
 
-rule statementlist { [ <statement> | <?> ] ** ';' }
+rule statement_list { [ <statement> | <?> ] ** ';' }
 
 rule statement {
     | <statement_control>
@@ -498,10 +498,10 @@ __src/@lang@/Actions.pm__
 class @lang@::Actions is HLL::Actions;
 
 method TOP($/) {
-    make PAST::Block.new( $<statementlist>.ast , :hll<@lclang@>, :node($/) );
+    make PAST::Block.new( $<statement_list>.ast , :hll<@lclang@>, :node($/) );
 }
 
-method statementlist($/) {
+method statement_list($/) {
     my $past := PAST::Stmts.new( :node($/) );
     for $<statement> { $past.push( $_.ast ); }
     make $past;
