@@ -622,6 +622,7 @@ all : \
     $(PGE_LIB_PBCS) \
     $(PCT_LIB_PBCS) \
     $(DATA_JSON_LIB_PBCS) \
+    $(JSON_LANG) \
     $(NQP_LIB_PBCS) \
 #IF(has_dynamic_linking): $(DYNOPLIBS_TARGETS) \
 #IF(has_dynamic_linking): $(LIBNCI_TEST_SO) \
