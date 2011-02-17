@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  7;
+use Test::More tests =>  8;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::gc');
 use Parrot::Configure::Options qw( process_options );
@@ -18,7 +18,7 @@ use IO::CaptureOutput qw| capture |;
 
 my ($args, $step_list_ref) = process_options(
     {
-        argv => [ q{--verbose --gc=ms2} ],
+        argv => [ '--verbose', '--gc=ms2' ],
         mode => q{configure},
     }
 );
@@ -40,13 +40,10 @@ my $step = test_step_constructor_and_description($conf);
         sub { $ret = $step->runstep($conf); },
         \$stdout,
     );
-    ok( $ret, "runstep() returned true value" );
-    like($stdout, qr/\(gms\)/, "Got expected verbose output");
-    # Although it looks like this test intends to set --gc=ms2, it
-    # actually doesn't.  It's unclear why.  The config step
-    # does work; this test just doesn't seem to exercise it.
-    # is($conf->data->get('gc_type'), 'MS2',
-    #       "Got expected value for 'gc_type'");
+    ok($ret, "runstep() returned true value");
+    like($stdout, qr/\(ms2\)/, "Got expected verbose output");
+    is($conf->data->get('gc_type'), 'MS2',
+          "Got expected value for 'gc_type'");
 }
 
 pass("Completed all tests in $0");
