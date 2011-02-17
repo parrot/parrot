@@ -346,6 +346,13 @@ sub vtable_method_does_write {
     return $self->vtable->attrs($methodname)->{write};
 }
 
+sub vtable_method_has_manual_wb {
+    my ( $self, $methodname ) = @_;
+
+    my $attrs = $self->method_attrs($methodname);
+    return $self->vtable->attrs($methodname)->{manual_wb};
+}
+
 sub vtable_method_does_multi {
     my ( $self, $methodname ) = @_;
 
