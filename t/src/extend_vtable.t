@@ -292,15 +292,19 @@ CODE
 Done!
 OUTPUT
 
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(push|pop)_pmc" );
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(push|pop|shift)_pmc" );
     Parrot_PMC_set_integer_native(interp, pmc, 42);
     Parrot_PMC_set_integer_native(interp, pmc2, 99);
 
+    Parrot_PMC_push_pmc(interp, rpa, pmc2);
     Parrot_PMC_push_pmc(interp, rpa, pmc);
     pmc2 = Parrot_PMC_pop_pmc(interp, rpa);
+    pmc = Parrot_PMC_shift_pmc(interp,rpa);
 
+    Parrot_printf(interp,"%P\n", pmc);
     Parrot_printf(interp,"%P\n", pmc2);
 CODE
+99
 42
 Done!
 OUTPUT
