@@ -32,17 +32,6 @@
 #endif /* DISABLE_GC_DEBUG */
 
 /*
- * GC_DEFAULT_TYPE selection
- * MS  -- stop-the-world mark & sweep
- * INF -- infinite memory "collector"
- * MS2 -- new style mark & sweep
- * GMS -- Generational M&S based on MS2
- */
-#ifndef PARROT_GC_DEFAULT_TYPE
-#  define PARROT_GC_DEFAULT_TYPE GMS
-#endif
-
-/*
  * JIT/i386 can use the CGP run core for external functions instead
  * of calling the function version of the opcode
  *

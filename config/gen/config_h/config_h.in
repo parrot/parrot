@@ -82,6 +82,17 @@ struct PackFile;      typedef struct PackFile * Parrot_PackFile;
 
 #define PARROT_NOINLINE @noinline@
 
+/*
+ * GC_DEFAULT_TYPE selection
+ * MS  -- stop-the-world mark & sweep
+ * INF -- infinite memory "collector"
+ * MS2 -- new style mark & sweep
+ * GMS -- Generational M&S based on MS2
+ */
+#ifndef PARROT_GC_DEFAULT_TYPE
+#  define PARROT_GC_DEFAULT_TYPE @gc_type@
+#endif
+
 #if defined(PARROT_IN_CORE)
 
 /* Put any other symbols here. */
