@@ -452,7 +452,6 @@ Returns the stat field given by C<thing> of file C<file>.
 INTVAL
 Parrot_file_stat_intval(PARROT_INTERP, STRING *file, INTVAL thing)
 {
-    ASSERT_ARGS(stat_common)
     INTVAL result = -1;
 
     switch (thing) {
@@ -639,7 +638,6 @@ Returns the fstat field given by C<thing> from file handle C<os_handle>.
 INTVAL
 Parrot_file_fstat_intval(PARROT_INTERP, PIOHANDLE os_handle, INTVAL thing)
 {
-    ASSERT_ARGS(stat_common)
     INTVAL result = -1;
 
     if (thing == STAT_EXISTS)
