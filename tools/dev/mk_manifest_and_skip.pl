@@ -36,6 +36,7 @@ Recreates MANIFEST and MANIFEST.SKIP from the output of C<git status>.
     git add file1 file2
     git commit -m "commit msg"
     perl tools/dev/mk_manifest_and_skip.pl
+    git add MANIFEST
     git commit -m "update manifest"
     git push
 
