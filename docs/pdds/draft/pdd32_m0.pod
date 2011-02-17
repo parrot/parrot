@@ -34,10 +34,7 @@ progresses.  They're pretty basic, but that's the idea behind M0.
 
 =item * call a function with an argument, return a value
 
-
 =head2 Definitions
-
-define things here (M0, mop/6model)
 
 =over 4
 
@@ -61,6 +58,14 @@ they're used as a foundation for Parrot.
 This refers to a Lorito Context PMC, which is the most important datastructure
 at the M0 level. You could say that it is the "secret sauce" of M0. The exact
 details of the Lorito Context PMC are still in flux.
+
+A Context will contain:
+INSP registers (fixed number of each)
+PC    - currently executing instruction (bytecode segment and offset)
+EH    - exception handler address (bytecode segment and offset)
+EX    - exception payload
+caller - calling context
+
 
 =back
 
@@ -127,9 +132,52 @@ it's just fine if it's painful to do so for non-trivial use cases.
 
 =head2 Binary Representation
 
-Describe what the binary form of M0 will look like, including ops, constants
-tables, debug segments, etc.  M0 being minimal, we should expect the binary
-representation to remain stable once it's been finalized.
+proposal: M0's binary representation will be composed of a fixed header, a
+single directory segment and a bunch of sets of 3 segments describing a chunk
+of bytecode: a bytecode segment containing the ops, a variables table segment
+containing the objects that the segment needs, and a metadata segment that
+carries any extra data like HLL line numbers, function names, annotations,
+custom data).  
+
+The header will look like:
+'asdfasdf' : 8-byte magic number (copy from pbc)
+0x?        : 1 byte number of bytes in an I registers
+0x?        : 1 byte number of bytes in an N register
+0x?        : 1 byte number of bytes in a opcode_t
+0x?        : 1 byte number of bytes in a pointer
+0x?        : 1 byte for endianness
+xxxxx      : padding
+
+directory:
+opcode_t, number of opcode_t-sized units in this segment
+opcode_t, type of m0 directory segment
+[
+  opcode_t : offset of bytecode segment
+  opcode_t : offset of vartable segment
+  opcode_t : offset of metadata segment
+]
+
+m0-bytecode - ops (many per file)
+opcode_t : number of opcode_t-sized units in this segment
+opcode_t : type of m0 bytecode segment
+[
+  opcode_t : ops
+]
+
+m0-vartable - constants table, but they're not necessarily constants: first context has these, other contexts get COW'd copies (one per bytecode segment)
+opcode_t : number of opcode_t-sized units in this segment
+opcode_t : type of m0 variables table segment
+[
+  opcode_t: offset within segment to name
+  opcode_t: pointer to object data
+]
+
+m0-metadata - anything else (line numbers, function names, annotations, etc) (one per bytecode segment)
+opcode_t : number of opcode_t-sized units in this segment
+opcode_t : type of m0 metadata segment
+[
+  opcode_t : data (idk)
+]
 
 =head2 Binary instruction format
 
