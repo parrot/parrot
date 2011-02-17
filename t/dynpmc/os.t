@@ -530,7 +530,7 @@ rmdir $xpto if -f $xpto;    # this way next test doesn't fail if this one does
 
 # Test symlink
 SKIP: {
-    skip "Admin rights needed for symlinks on Windows", 2 if $MSWin32;
+    skip "Admin rights and Vista needed for symlinks on Windows", 2 if $MSWin32;
 
     pir_error_output_like( <<'CODE', <<"OUT", "Test symlink" );
 .sub main :main

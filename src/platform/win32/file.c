@@ -487,46 +487,55 @@ Parrot_file_stat_intval(PARROT_INTERP, STRING *file, INTVAL thing)
         }
         break;
       case STAT_ISLNK:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "STAT_ISLNK not supported");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "STAT_ISLNK not supported");
         break;
       case STAT_BACKUPTIME:
         result = -1;
         break;
       case STAT_UID:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "STAT_UID not supported");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "STAT_UID not supported");
         break;
       case STAT_GID:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "STAT_GID not supported");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "STAT_GID not supported");
         break;
       case STAT_PLATFORM_DEV:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "STAT_PLATFORM_DEV not supported");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "STAT_PLATFORM_DEV not supported");
         break;
       case STAT_PLATFORM_INODE:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "STAT_PLATFORM_INODE not supported");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "STAT_PLATFORM_INODE not supported");
         break;
       case STAT_PLATFORM_MODE:
         result = 0777;
         break;
       case STAT_PLATFORM_NLINKS:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "STAT_PLATFORM_NLINKS not supported");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "STAT_PLATFORM_NLINKS not supported");
         break;
       case STAT_PLATFORM_DEVTYPE:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "STAT_PLATFORM_DEVTYPE not supported");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "STAT_PLATFORM_DEVTYPE not supported");
         break;
       case STAT_PLATFORM_BLOCKSIZE:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "STAT_PLATFORM_BLOCKSIZE not supported");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "STAT_PLATFORM_BLOCKSIZE not supported");
         break;
       case STAT_PLATFORM_BLOCKS:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "STAT_PLATFORM_BLOCKS not supported");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "STAT_PLATFORM_BLOCKS not supported");
         break;
       default:
         break;
@@ -657,34 +666,40 @@ Parrot_file_fstat_intval(PARROT_INTERP, PIOHANDLE os_handle, INTVAL thing)
         }
         break;
       case STAT_ISLNK:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "STAT_ISLNK not supported");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "STAT_ISLNK not supported");
         break;
       case STAT_BACKUPTIME:
         result = -1;
         break;
       case STAT_UID:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "STAT_UID not supported");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "STAT_UID not supported");
         break;
       case STAT_GID:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "STAT_GID not supported");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "STAT_GID not supported");
         break;
       case STAT_PLATFORM_MODE:
         result = 0777;
         break;
       case STAT_PLATFORM_DEVTYPE:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "STAT_PLATFORM_DEVTYPE not supported");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "STAT_PLATFORM_DEVTYPE not supported");
         break;
       case STAT_PLATFORM_BLOCKSIZE:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "STAT_PLATFORM_BLOCKSIZE not supported");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "STAT_PLATFORM_BLOCKSIZE not supported");
         break;
       case STAT_PLATFORM_BLOCKS:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "STAT_PLATFORM_BLOCKS not supported");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "STAT_PLATFORM_BLOCKS not supported");
         break;
       default:
         break;
@@ -703,22 +718,42 @@ Creates a symlink
 
 */
 
+typedef BOOLEAN (WINAPI *csl_func_t)(LPWSTR, LPWSTR, DWORD);
+
 void
 Parrot_file_symlink(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
 {
-    char    *c_from = Parrot_str_to_encoded_cstring(interp, from,
-                            Parrot_utf16_encoding_ptr);
-    char    *c_to   = Parrot_str_to_encoded_cstring(interp, to,
-                            Parrot_utf16_encoding_ptr);
-    DWORD    attrs  = GetFileAttributesW((LPWSTR)c_from);
+    static csl_func_t csl;
+    static int        initialized = 0;
+
+    char    *c_from;
+    char    *c_to;
+    DWORD    attrs;
     BOOLEAN  result = 0; /* BOOLEAN, not BOOL */
+
+    if (!initialized) {
+        csl = (csl_func_t)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+                                "CreateSymbolicLinkW");
+        initialized = 1;
+    }
+
+    if (csl == NULL)
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "CreateSymbolicLink not supported");
+
+    c_from = Parrot_str_to_encoded_cstring(interp, from,
+                            Parrot_utf16_encoding_ptr);
+    c_to   = Parrot_str_to_encoded_cstring(interp, to,
+                            Parrot_utf16_encoding_ptr);
+    attrs  = GetFileAttributesW((LPWSTR)c_from);
 
     if (attrs != INVALID_FILE_ATTRIBUTES) {
         DWORD flags = attrs & FILE_ATTRIBUTE_DIRECTORY
                     ? SYMBOLIC_LINK_FLAG_DIRECTORY
                     : 0;
 
-        result = CreateSymbolicLinkW((LPWSTR)c_to, (LPWSTR)c_from, flags);
+        result = csl((LPWSTR)c_to, (LPWSTR)c_from, flags);
     }
 
     Parrot_str_free_cstring(c_from);
