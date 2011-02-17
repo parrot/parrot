@@ -139,7 +139,7 @@ CODE
 
 }
 
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(freeze|thaw)");
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(freeze|thaw|thawfinish)");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
     Parrot_PMC_set_integer_native(interp, pmc2, 99);
     Parrot_printf(interp,"%P\n", pmc);
@@ -148,6 +148,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(freeze|thaw)");
     /* freeze pmc, thaw to pmc 2 */
     Parrot_PMC_freeze(interp, pmc, rpa);
     Parrot_PMC_thaw(interp, pmc2, rpa);
+    Parrot_PMC_thawfinish(interp, pmc2, rpa);
 
     /* Modify pmc to ensure they are not pointing to the same location */
     Parrot_PMC_set_integer_native(interp, pmc, 1000);
