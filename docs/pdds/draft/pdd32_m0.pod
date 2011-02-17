@@ -145,7 +145,8 @@ single directory segment and a bunch of sets of 3 segments describing a chunk
 of bytecode: a bytecode segment containing the ops, a variables table segment
 containing the objects that the segment needs, and a metadata segment that
 carries any extra data like HLL line numbers, function names, annotations,
-custom data).  
+custom data).  We should design the binary format of M0 in a way that allows
+it to be mmapped by an interpreter. 
 
 The header will look like:
 
