@@ -214,6 +214,7 @@
   tags: 
     - 'bytecode'
     - 'experimental'
+    - 'completed'
   ticket:  'https://trac.parrot.org/parrot/ticket/451'
 -
   name:  'PackfileDebug'
@@ -419,6 +420,7 @@
   tags: 
     - 'bytecode'
     - 'experimental'
+    - 'completed'
   ticket:  'https://trac.parrot.org/parrot/ticket/451'
 -
   name:  'open and close opcodes will be removed'
@@ -433,6 +435,7 @@
   tags: 
     - 'bytecode'
     - 'experimental'
+    - 'completed'
   ticket:  'https://trac.parrot.org/parrot/ticket/451'
 -
   name:  'pkg-config support'
