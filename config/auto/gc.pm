@@ -38,7 +38,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $gc = $conf->options->get('gc') || '';
+    my $gc = $conf->options->get('gc') || 'gms';
     $conf->debug(" ($gc) ");
     
     my @known_gcs = qw<gms ms ms2 inf>;
@@ -51,7 +51,7 @@ sub runstep {
         $self->set_result($gc);
     }
     else {
-        $conf->data->set(gc_flag => '');
+        $conf->data->set(gc_flag => '-DPARROT_GC_DEFAULT_TYPE=GMS');
         $self->set_result('gms');
     }
 

@@ -41,9 +41,8 @@ my $step = test_step_constructor_and_description($conf);
         \$stdout,
     );
     ok( $ret, "runstep() returned true value" );
-    note $stdout;
-    like( $stdout, qr/\(ms2\)/, "Got expected verbose output");
-    is($conf->data->get('gc_flag'), q{-DPARROT_GC_DEFAULT_TYPE=MS2},
+    like($stdout, qr/\(gms\)/, "Got expected verbose output");
+    like($conf->data->get('gc_flag'), qr{-DPARROT_GC_DEFAULT_TYPE=},
         "Got expected value for 'gc_flag'");
 }
 
