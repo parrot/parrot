@@ -722,7 +722,10 @@ sub post_method_gen {
         # Skip non-updating methods
         next unless $self->vtable_method_does_write($name);
 
-        $method  = $self->get_method($name);
+        # Skip methods with manual WBs.
+        next if $self->vtable_method_has_manual_wb($name);
+
+        $method = $self->get_method($name);
 
         #warn "Rewriting " . $self->name . "." . $name;
         $self->add_method(
