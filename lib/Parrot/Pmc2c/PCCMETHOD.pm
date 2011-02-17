@@ -183,10 +183,12 @@ sub rewrite_RETURNs {
 
         if ($returns eq 'void') {
             $e->emit( <<"END", __FILE__, __LINE__ + 1 );
+    {
     /*BEGIN RETURN $returns */
     PARROT_GC_WRITE_BARRIER(interp, _self);
     return;
     /*END RETURN $returns */
+    }
 END
             $matched->replace( $match, $e );
             next;
@@ -213,9 +215,11 @@ END
         }
         else { # if ($returns_signature)
             $e->emit( <<"END", __FILE__, __LINE__ + 1 );
+    {
     /*BEGIN RETURN $returns */
     PARROT_GC_WRITE_BARRIER(interp, _self);
     return;
+    }
     /*END RETURN $returns */
 END
         }
