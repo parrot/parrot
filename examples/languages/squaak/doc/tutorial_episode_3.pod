@@ -290,7 +290,8 @@ object should be set using the make function).
 If you're following this tutorial, I highly advise you to get your feet wet, and
 do the exercises. Remember, learning and not doing is not learning (or something
 like that :-). This week's exercises are not that difficult, and after doing
-them, you'll have implemented the first part of our little Squaak language.
+them, you'll have implemented the first part of our little Squaak language. Also
+note that your Squaak will not be running properly without completing them.
 
 =head2 What's next?
 
