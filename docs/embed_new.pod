@@ -281,6 +281,8 @@ like normal if it is found to be unreachable.
 
 =over 4
 
+=item *
+
 TODO
 
 =back
@@ -325,7 +327,7 @@ performing both compiling and linking in one step.
 =head2 Load bytecode as a library and run a single subroutine
 
     TODO
-   
+
 =head1 SEE ALSO
 
 F<frontend/parrot/main.c> and F<t/src/embed/*.t> for Parrot's use of the
