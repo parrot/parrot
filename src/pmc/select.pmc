@@ -1,0 +1,448 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+
+=head1 NAME
+
+src/pmc/select.pmc - IO Select PMC
+
+=head1 DESCRIPTION
+
+This is the base-class for non-blocking IO using select
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "../src/io/io_private.h"
+#include <sys/select.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#define max(a, b) (((a) > (b)) ? (a) : (b))
+
+#define SELECT_READ  1
+#define SELECT_WRITE 2
+#define SELECT_ERROR 4
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+/*
+
+=item C<INTVAL get_fd(INTEPR, PMC* filehandle)>
+
+Returns the c89 standard integer file descriptor for the filehandle
+
+=cut
+
+*/
+
+    static INTVAL get_fd(PARROT_INTERP, PMC* handle) {
+        INTVAL fd = -1;
+        switch (handle->vtable->base_type) {
+            case enum_class_FileHandle:
+                {
+                    PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, handle);
+                    fd = os_handle;
+                }
+                break;
+            default:
+                abort();
+        }
+        return fd;
+    }
+
+/*
+
+=item C<INTVAL find_max_fd(INTERP, PMC *data_hash)>
+
+Returns the maximum of all the c89 standard integer file descriptors held by
+the Hash PMC
+
+=back
+
+=head2 Vtable Functions 
+
+=over 4
+
+=cut
+
+*/
+    static INTVAL find_max_fd(PARROT_INTERP, ARGIN(PMC *data_hash)) {
+        PMC * const  iter = VTABLE_get_iter(interp, data_hash);
+        const INTVAL n    = VTABLE_elements(interp, data_hash);
+        INTVAL       j;
+        INTVAL maxid = -1;
+
+        for (j = 0; j < n; ++j) {
+            INTVAL id = VTABLE_shift_integer(interp, iter);
+            maxid = max(maxid, id);
+        }
+        return maxid;
+    }
+
+
+pmclass Select no_ro auto_attrs {
+
+    /* TODO: Consider encapsulating PIOHANDLE as a PMC type, for subclassing */
+    ATTR PMC *data_hash;         /* fd -> data */
+    ATTR fd_set rb_array;          /* read bit array */
+    ATTR fd_set wb_array;          /* write bit array */
+    ATTR fd_set eb_array;          /* error bit array */
+    ATTR fd_set *rb;          /* read bit array */
+    ATTR fd_set *wb;          /* write bit array */
+    ATTR fd_set *eb;          /* error bit array */
+    ATTR INTVAL maxfd;
+
+
+/*
+
+=item C<void init()>
+
+Initializes the PMC.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        PMC *data_hash = pmc_new(interp, enum_class_Hash);
+        Parrot_Select_attributes * const attrs =
+            mem_gc_allocate_zeroed_typed(INTERP, Parrot_Select_attributes);
+        PMC_data(SELF) = attrs;
+        SET_ATTR_data_hash(INTERP, SELF, data_hash);
+        SET_ATTR_maxfd(INTERP, SELF, -1);
+        PARROT_SELECT(SELF)->rb = &(PARROT_SELECT(SELF)->rb_array);
+        PARROT_SELECT(SELF)->wb = &(PARROT_SELECT(SELF)->wb_array);
+        PARROT_SELECT(SELF)->eb = &(PARROT_SELECT(SELF)->eb_array);
+
+        FD_ZERO((PARROT_SELECT(SELF)->rb));
+        FD_ZERO((PARROT_SELECT(SELF)->wb));
+        FD_ZERO((PARROT_SELECT(SELF)->eb));
+        PObj_custom_destroy_SET(SELF);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Destroys the PMC.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        if (PMC_data(SELF)) {
+            mem_gc_free(INTERP, PMC_data(SELF));
+            PMC_data(SELF) = NULL;
+        }
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+
+=item C<METHOD INTVAL getfd(PMC* filehandle)>
+
+Returns the c89 standard integer file descriptor for the filehandle
+
+=cut
+
+*/
+
+    METHOD getfd(PMC* handle) {
+      INTVAL i = get_fd(interp, handle);
+      RETURN(INTVAL i)
+    }
+
+/*
+
+=item C<METHOD INTVAL getmaxfd()>
+
+Returns the maximum of all the c89 standard integer file descriptors held by
+the Select PMC
+
+=cut
+
+*/
+
+    METHOD getmaxfd() {
+      INTVAL v;
+      GET_ATTR_maxfd(INTERP, SELF, v);
+      RETURN(INTVAL v);
+    }
+
+/*
+
+=item C<METHOD PMC* get_data_hash()>
+
+Returns the Hash PMC that holds the mapping from file descriptor to the opaque
+PMC associated with the file descriptor when it was added to the Select PMC.
+
+Used mainly for testing purposes.
+
+=cut
+
+*/
+
+    METHOD get_data_hash() {
+      PMC *data_hash;
+      GET_ATTR_data_hash(INTERP, SELF, data_hash);
+      RETURN(PMC *data_hash);
+    }
+
+
+/*
+
+=item C<METHOD update(PMC* filehandle, PMC* data, INTVAL read_write_error_flag)>
+
+Adds filehandle PMC to the Select PMC for monitoring based on the
+read_write_error_flags
+
+read_write_error_flag = READ (0x1) | WRITE (0x2) | ERROR (0x4)
+
+An array of data PMCs are returned by the can_read, can_read, has_exception,
+and select methods when the filehandles meet one of read_write_error_flag
+conditions.
+
+=cut
+
+*/
+    METHOD update(PMC *handle, PMC* data, INTVAL rwe) {
+      PMC *data_hash;
+      INTVAL fdkey = get_fd(interp, handle);
+      INTVAL maxid;
+      GET_ATTR_data_hash(INTERP, SELF, data_hash);
+      GET_ATTR_maxfd(INTERP, SELF, maxid);
+      VTABLE_set_pmc_keyed_int(interp, data_hash, fdkey, data);
+      PARROT_GC_WRITE_BARRIER(interp, data_hash);
+      if (rwe & SELECT_READ) { FD_SET(fdkey, PARROT_SELECT(SELF)->rb) ; }
+      if (rwe & SELECT_WRITE) { FD_SET(fdkey, PARROT_SELECT(SELF)->wb) ; }
+      if (rwe & SELECT_ERROR) { FD_SET(fdkey, PARROT_SELECT(SELF)->eb) ; }
+      maxid = max(maxid, fdkey);
+      SET_ATTR_maxfd(INTERP, SELF, maxid);
+    }
+
+/*
+
+=item C<METHOD remove(PMC* filehandle)>
+
+Removes filehandle from the Select PMC.
+
+=cut
+
+*/
+    METHOD remove(PMC *handle) {
+      PMC *data_hash;
+      INTVAL fd = get_fd(interp, handle);
+      PMC *fdkey;
+      INTVAL maxid;
+      GET_ATTR_data_hash(INTERP, SELF, data_hash);
+      GET_ATTR_maxfd(INTERP, SELF, maxid);
+      VTABLE_delete_keyed_int(interp, data_hash, fd);
+      PARROT_GC_WRITE_BARRIER(interp, data_hash);
+      FD_CLR(fd, PARROT_SELECT(SELF)->rb);
+      FD_CLR(fd, PARROT_SELECT(SELF)->wb);
+      FD_CLR(fd, PARROT_SELECT(SELF)->eb);
+      if (fd == maxid) {
+        maxid = find_max_fd(interp, data_hash);
+        SET_ATTR_maxfd(INTERP, SELF, maxid);
+      }
+    }
+
+/*
+
+=item C<METHOD can_read()>
+
+Returns the associated data for the file descriptors in the Select PMC, which
+are ready to be read from.
+
+Waits for a maximum of timeout seconds for a file descriptor to be ready to
+read before returning.
+
+=cut
+
+*/
+
+    METHOD can_read(INTVAL timeout) {
+      int i;
+      fd_set rdset;
+      struct timeval timeouts;
+      PMC *results;
+      PMC *data_hash;
+      INTVAL maxid;
+      GET_ATTR_data_hash(INTERP, SELF, data_hash);
+      GET_ATTR_maxfd(INTERP, SELF, maxid);
+      timeouts.tv_sec = timeout;
+      timeouts.tv_usec = 0;
+      memcpy(&rdset, PARROT_SELECT(SELF)->rb, sizeof (fd_set));
+      results = pmc_new(interp, enum_class_ResizablePMCArray);
+
+      select(maxid + 1, &rdset, NULL, NULL, &timeouts);
+      for (i=0; i<=maxid; i++) {
+        if (FD_ISSET(i, &rdset)) {
+          VTABLE_push_pmc(interp, results, VTABLE_get_pmc_keyed_int(interp, data_hash, i));
+          PARROT_GC_WRITE_BARRIER(interp, results);
+        }
+      }
+      RETURN(PMC *results);
+    }
+
+/*
+
+=item C<METHOD can_write()>
+
+Returns the associated data for the file descriptors in the Select PMC, which
+are ready to be written to.
+
+Waits for a maximum of timeout seconds for a file descriptor to be ready to
+write to before returning.
+
+=cut
+
+*/
+
+    METHOD can_write(INTVAL timeout) {
+      int i;
+      fd_set wbset;
+      struct timeval timeouts;
+      PMC *results;
+      PMC *data_hash;
+      INTVAL maxid;
+      GET_ATTR_data_hash(INTERP, SELF, data_hash);
+      GET_ATTR_maxfd(INTERP, SELF, maxid);
+      timeouts.tv_sec = timeout;
+      timeouts.tv_usec = 0;
+      memcpy(&wbset, PARROT_SELECT(SELF)->wb, sizeof (fd_set));
+      results = pmc_new(interp, enum_class_ResizablePMCArray);
+
+      select(maxid + 1, NULL, &wbset, NULL, &timeouts);
+      for (i=0; i<=maxid; i++) {
+        if (FD_ISSET(i, &wbset)) {
+          VTABLE_push_pmc(interp, results, VTABLE_get_pmc_keyed_int(interp, data_hash, i));
+          PARROT_GC_WRITE_BARRIER(interp, results);
+        }
+      }
+      RETURN(PMC *results);
+    }
+
+/*
+
+=item C<METHOD has_exception()>
+
+Returns the associated data for the file descriptors in the Select PMC, which
+are in an exception state.
+
+Waits for a maximum of timeout seconds for a file descriptor to be in an
+exception state before returning.
+
+=cut
+
+*/
+
+    METHOD has_exception(INTVAL timeout) {
+      int i;
+      fd_set ebset;
+      struct timeval timeouts;
+      PMC *results;
+      PMC *data_hash;
+      INTVAL maxid;
+      GET_ATTR_data_hash(INTERP, SELF, data_hash);
+      GET_ATTR_maxfd(INTERP, SELF, maxid);
+      timeouts.tv_sec = timeout;
+      timeouts.tv_usec = 0;
+      memcpy(&ebset, PARROT_SELECT(SELF)->eb, sizeof (fd_set));
+      results = pmc_new(interp, enum_class_ResizablePMCArray);
+
+      select(maxid + 1, NULL, NULL, &ebset, &timeouts);
+      for (i=0; i<=maxid; i++) {
+        if (FD_ISSET(i, &ebset)) {
+          VTABLE_push_pmc(interp, results, VTABLE_get_pmc_keyed_int(interp, data_hash, i));
+          PARROT_GC_WRITE_BARRIER(interp, results);
+        }
+      }
+      RETURN(PMC *results);
+    }
+
+/*
+
+=item C<METHOD can_read()>
+
+Returns the associated data for the file descriptors in the Select PMC, which
+are ready to be read, written, or have and exception to be handled.
+
+Waits for a maximum of timeout seconds for a file descriptor to be ready to be
+handled.
+
+=back
+
+=cut
+
+*/
+
+    METHOD select(INTVAL timeout) {
+      int i;
+      fd_set rdset;
+      fd_set wrset;
+      fd_set erset;
+      struct timeval timeouts;
+      PMC *results;
+      PMC *rresults;
+      PMC *wresults;
+      PMC *eresults;
+      PMC *data_hash;
+      INTVAL maxid;
+      GET_ATTR_data_hash(INTERP, SELF, data_hash);
+      GET_ATTR_maxfd(INTERP, SELF, maxid);
+      timeouts.tv_sec = timeout;
+      timeouts.tv_usec = 0;
+      memcpy(&rdset, PARROT_SELECT(SELF)->rb, sizeof (fd_set));
+      memcpy(&wrset, PARROT_SELECT(SELF)->wb, sizeof (fd_set));
+      memcpy(&erset, PARROT_SELECT(SELF)->eb, sizeof (fd_set));
+      results = pmc_new(interp, enum_class_ResizablePMCArray);
+      rresults = pmc_new(interp, enum_class_ResizablePMCArray);
+      wresults = pmc_new(interp, enum_class_ResizablePMCArray);
+      eresults = pmc_new(interp, enum_class_ResizablePMCArray);
+
+      select(maxid + 1, &rdset, &wrset, &erset, &timeouts);
+      for (i=0; i<=maxid; i++) {
+        if (FD_ISSET(i, &rdset)) {
+          VTABLE_push_pmc(interp, rresults, VTABLE_get_pmc_keyed_int(interp, data_hash, i));
+          PARROT_GC_WRITE_BARRIER(interp, rresults);
+        }
+        if (FD_ISSET(i, &wrset)) {
+          VTABLE_push_pmc(interp, wresults, VTABLE_get_pmc_keyed_int(interp, data_hash, i));
+          PARROT_GC_WRITE_BARRIER(interp, wresults);
+        }
+        if (FD_ISSET(i, &erset)) {
+          VTABLE_push_pmc(interp, eresults, VTABLE_get_pmc_keyed_int(interp, data_hash, i));
+          PARROT_GC_WRITE_BARRIER(interp, eresults);
+        }
+      }
+      VTABLE_push_pmc(interp, results, rresults);
+      VTABLE_push_pmc(interp, results, wresults);
+      VTABLE_push_pmc(interp, results, eresults);
+      PARROT_GC_WRITE_BARRIER(interp, results);
+      RETURN(PMC *results);
+    }
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
