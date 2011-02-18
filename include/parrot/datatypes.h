@@ -57,7 +57,8 @@ typedef enum {
     enum_type_ptr,              /* native pointer */
     enum_type_cstr,             /* c string */
     enum_type_struct_ptr,       /* pointer to another struct */
-    enum_type_struct,           /* a nested struct */
+    enum_type_struct,           /* a struct */
+    enum_type_union,            /* a union */
     enum_type_func_ptr,         /* a function pointer */
 
     enum_type_sized,            /* arbitrary size type for list_new */
@@ -113,6 +114,7 @@ const struct _data_types data_types[] = {
     { "cstr", sizeof (char *) },
     { "struct_ptr", sizeof (void*) },
     { "struct", 0 },
+    { "union",  0 },
     { "func_ptr", sizeof (void (*)(void)) },
 
     { "sized", 0 },
