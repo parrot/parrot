@@ -7,16 +7,20 @@
 This document specifies M0, the set of microcode-like ops on which Parrot will
 be based, and their requisite runtime environment.
 
+=head2 Version
+
+$Revision$
+
 =head2 Status
 
 This document is a draft under active development.  Nothing is set in stone
-yet.  If you would like to suggest improvements, please talk with cotto, bacek,
-atrodo, chromatic or dukeleto.
+yet.  If you would like to suggest improvements, please talk with cotto,
+bacek, atrodo, chromatic or dukeleto.
 
 =head2 M0 Milestones
 
-This is a list of things that we expect the M0 VM to be able to do as this spec
-progresses.  They're pretty basic, but that's the idea behind M0.
+This is a list of things that we expect the M0 VM to be able to do as this
+spec progresses.  They're pretty basic, but that's the idea behind M0.
 
 =over
 
@@ -49,13 +53,13 @@ executing the ops described in this document.
 
 =item * M0 ops
 
-This is the lowest-level set of ops supported by an M0-compliant VM.  These ops
-are a subset of the C<M0> specification.
+This is the lowest-level set of ops supported by an M0-compliant VM.  These
+ops are a subset of the C<M0> specification.
 
 =item * Lorito
 
-Lorito refers to the combination of C<M0>, a meta-object model and the way that
-they're used as a foundation for Parrot.
+Lorito refers to the combination of C<M0>, a meta-object model and the way
+that they're used as a foundation for Parrot.
 
 =item * Lorito Context
 
@@ -70,7 +74,6 @@ EH    - exception handler address (bytecode segment and offset)
 EX    - exception payload
 caller - calling context
 
-
 =back
 
 =head2 Design Goals
@@ -81,13 +84,13 @@ form of code with can be easily analyzed.  The third goal is that we have a
 single form of code used to implement the majority of Parrot, rather than
 having having a mix of C and PIR.
 
-We are also designing M0 to be as simple as possible.  As much as possible, all
-the complexity of Parrot will be built on top of M0.  This is to facilitate
-multiple implementations, e.g. a quick and dirty prototype implementation in
-JavaScript, a space-optimized implemention targeted for mobile devices, a
-tracing jit targeted for server use, etc.  M0's simplicity should be extreme;
-the moment M0 gets ops for the sake of efficiency or ease of use, it has failed
-its design goals.
+We are also designing M0 to be as simple as possible.  As much as possible,
+all the complexity of Parrot will be built on top of M0.  This is to
+facilitate multiple implementations, e.g. a quick and dirty prototype
+implementation in JavaScript, a space-optimized implemention targeted for
+mobile devices, a tracing jit targeted for server use, etc.  M0's simplicity
+should be extreme; the moment M0 gets ops for the sake of efficiency or ease
+of use, it has failed its design goals.
 
 There will be no stacks in M0, not even for argument passing. Everything must
 be in Continuation-Passing-Style.
@@ -136,9 +139,9 @@ spec is more stable.
 
 =head2 Textual Representation
 
-Describe what the textual form of M0 will look like.  The emphasis should be on
-ease of consumption.  We won't be writing a large amount of M0 code by hand;
-it's just fine if it's painful to do so for non-trivial use cases.
+Describe what the textual form of M0 will look like.  The emphasis should be
+on ease of consumption.  We won't be writing a large amount of M0 code by
+hand; it's just fine if it's painful to do so for non-trivial use cases.
 
 =head2 Binary Representation
 
@@ -178,7 +181,8 @@ m0-bytecode - ops (many per file)
     opcode_t : ops
   ]
 
-m0-vartable - constants table, but they're not necessarily constants: first context has these, other contexts get COW'd copies (one per bytecode segment)
+m0-vartable - constants table, but they're not necessarily constants: first
+context has these, other contexts get COW'd copies (one per bytecode segment)
 
   opcode_t : number of opcode_t-sized units in this segment
   opcode_t : type of m0 variables table segment
@@ -187,7 +191,8 @@ m0-vartable - constants table, but they're not necessarily constants: first cont
     opcode_t: pointer to object data
   ]
 
-m0-metadata - anything else (line numbers, function names, annotations, etc) (one per bytecode segment)
+m0-metadata - anything else (line numbers, function names, annotations, etc)
+(one per bytecode segment)
 
   opcode_t : number of opcode_t-sized units in this segment
   opcode_t : type of m0 metadata segment
@@ -197,7 +202,8 @@ m0-metadata - anything else (line numbers, function names, annotations, etc) (on
 
 =head2 Binary instruction format
 
-describe the binary encoding of a single M0 instruction and how it should be interpreteted.
+describe the binary encoding of a single M0 instruction and how it should be
+interpreteted.
 
 =head2 M0 Runloop
 
@@ -205,15 +211,20 @@ The runloop is the part of the interpreter that executes ops directly.  It
 doesn't much matter how those ops are executed, but the runloop does need to
 accomplish the following:
 
+=over
+
 =item * fetch the instruction at the current PC
 
 =item * execute the instruction
 
 =item * increment the pc, if needed
 
+=back
+
 =head2 metadata
 
-describe metadata here, e.g. debugging information, aggregate op tracking info, whatever
+describe metadata here, e.g. debugging information, aggregate op tracking
+info, whatever
 
 =head2 Op Composition
 
@@ -229,7 +240,8 @@ intelligent way of interacting with PMCs.  Figure this out.
 
 =head2 memory model
 
-describe what kind of memory m0 ops will have access to and how they'll get at it
+describe what kind of memory m0 ops will have access to and how they'll get at
+it
 
 =head2 structs
 
@@ -238,7 +250,8 @@ describe structs here, as far as they're relevant to m0
 =head2 Types
 
 There are four register types, Integer, Numeric, PMC and String. It remains to
-be seen whether S and P will merely be syntax sugar for the same datastructure.
+be seen whether S and P will merely be syntax sugar for the same
+datastructure.
 
 =head2 MOP interaction
 
@@ -269,6 +282,13 @@ M0 VM implementations.
 
 <this space intentionally left blank, for now>
 
+=head2 Implementation
+
+<this space intentionally left blank, for now>
+
+=head2 References
+
+<this space intentionally left blank, for now>
 
 =cut
 
