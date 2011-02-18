@@ -22,8 +22,6 @@ typedef enum {
     enum_type_FLOATVAL,
     enum_type_STRING,
     enum_type_PMC,              /* actual PMCs have positive class numbers */
-    enum_type_BIGINT,
-    enum_type_DPOINTER,
 
     enum_type_char,             /* native integer types */
     enum_type_short,
@@ -79,8 +77,6 @@ const struct _data_types data_types[] = {
     { "FLOATVAL", NUMVAL_SIZE },
     { "STRING", sizeof (void *) },
     { "PMC",    sizeof (void *) },           /* actual PMCs have positive class numbers */
-    { "BIGINT", sizeof (void *) },
-    { "DPOINTER", sizeof (void *) },
 
     { "char",   sizeof (char) },          /* native integer types */
     { "short",  sizeof (short) },
