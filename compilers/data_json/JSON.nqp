@@ -1,7 +1,41 @@
 #! parrot-nqp
 
+# Copyright (C) 2011, Parrot Foundation.
+
 # This is the start to rewrite JSON. It starts with rewriting data_json only.
 # data_json depends on the PGE. The rewrite use NQP.
+
+
+=begin Pod
+
+=for NAME
+JSON, a lightweight data-interchange format.
+
+=head1 SYNOPSIS
+
+The C<from_json> method return a PMC that containing the data structure
+for a given valid JSON (JavaScript Object Notation) string.
+For example:
+
+=begin code
+
+.sub 'main' :main
+    .local pmc result
+
+    load_language 'JSON'
+    result = from_json( '[1,2,3]' )
+
+    load_bytecode 'dumper.pbc'
+    _dumper( result, 'JSON' )
+.end
+
+=end code
+
+For more information about the structure of the JSON representation, see
+the documentation at L<http://www.json.org/>.
+
+=end Pod
+
 
 INIT {
     pir::load_bytecode('P6Regex.pbc');
@@ -92,3 +126,6 @@ sub from_json($value) {
      my $result := JSON::Compiler.eval($value, :actions(JSON::Actions.new));
      return $result;
 }
+
+
+# vim: expandtab shiftwidth=4 ft=perl6:
