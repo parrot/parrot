@@ -116,35 +116,44 @@ beyond its scope.
 
 =head2 List of Ops
 
-M0 ops are very low-level and provide the smallest necessary amount of
-"syntax sugar" on top of the most basic operations of the VM.
+M0 ops are very low-level and provide the simplest possible way of interacting
+with the VM.  Apart from print/gripe/say (which are intended only for the early
+stages of an M0 VM's development), M0 ops should painfully minimal.  It's
+expected that common operations will be painful.  That's what compilers are
+for.
 
-The names and number of the ops below may change at any time, until the
-spec is more stable.
+The names and number of the ops below may change at any time, possibly without
+any rational reason, until the spec is more stable.
 
 =over
 
-=item * noop - Do Nothing
+=item * print  - prints a string to a file handle
+
+=item * add - add two registers
+
+=item * multiply - multiply two registers
+
+=item * set  - sets a register to a value
+
+=item * get  - gets the value of a register
+
+=item * cmp - numeric comparison
+
+=back
+
+These are too magical and can be written in terms of simpler ops:
+
+=over
+
+=item * new  - create a new PMC
+
+=item * store - store a register in a PMC, or vice versa
 
 =item * get_cc - Get the current Lorito context
 
 =item * invoke_cc - Invoke the current Lorito context
 
 =item * new_ctx - Create a new Lorito context
-
-=item * print  - prints a string to a file handle
-
-=item * new  - create a new PMC
-
-=item * store - store a register in a PMC, or vice versa
-
-=item * set  - sets a register to a value
-
-=item * get  - gets the value of a register
-
-=item * add - add two registers
-
-=item * multiply - multiply two registers
 
 =item * load_bytecode - load bytecode into the current Lorito context
 
@@ -265,6 +274,26 @@ describe structs here, as far as they're relevant to m0
 There are four register types, Integer, Numeric, PMC and String. It remains to
 be seen whether S and P will merely be syntax sugar for the same
 datastructure.
+
+question: how will ops deal with types?
+options:
+1 - ops are hard-coded per-type, registers contain no type info
+2 - ops deal with whatever type they get, registers have type flags built-in (or built in to the op)
+    e.g. op looks like this:
+    byte : op
+    byte : ctx
+    byte : arg0
+    byte : arg1
+    byte : arg2
+    3b   : arg0 flags (001 -> I, 010 -> N, ...)
+    3b   : arg1 flags
+    3b   : arg2 flags
+3 - ops don't know about types, registers numbers are typed by convention
+    0-19 -> I, 20 -> 39 -> N, ...
+4 - register numbers mean different things depending on the op
+    add 2, 3, 5 -> add $I2, $I3, $I5
+    say 2, 3, 5 -> say $P2, $S3, $S5
+5 - ???
 
 =head2 MOP interaction
 
