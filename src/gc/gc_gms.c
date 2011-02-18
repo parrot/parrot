@@ -1080,6 +1080,7 @@ To come.
 static void
 gc_gms_soil_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
+    ASSERT_ARGS(gc_gms_soil_pmc)
     MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     pmc_alloc_struct  *item = PMC2PAC(pmc);
     size_t             gen  = POBJ2GEN(pmc);
@@ -1112,6 +1113,7 @@ To come.
 static void
 gc_gms_soil_roots(PARROT_INTERP, ARGIN(MarkSweep_GC *self))
 {
+    ASSERT_ARGS(gc_gms_soil_roots)
     interp->gc_sys->mark_pmc_header = gc_gms_soil_pmc;
     Parrot_gc_trace_root(interp, NULL, GC_TRACE_SYSTEM_ONLY);
     interp->gc_sys->mark_pmc_header = gc_gms_mark_pmc_header;
