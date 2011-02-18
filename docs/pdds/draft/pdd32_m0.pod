@@ -80,7 +80,7 @@ caller - calling context
 
 There are three goals that M0 needs to meet.  The first is that we have
 executable code with equivalent power to C.  The second objective is to have a
-form of code with can be easily analyzed.  The third goal is that we have a
+form of code that can be easily analyzed.  The third goal is that we have a
 single form of code used to implement the majority of Parrot, rather than
 having having a mix of C and PIR.
 
