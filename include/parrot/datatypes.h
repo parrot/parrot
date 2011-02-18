@@ -63,7 +63,7 @@ typedef enum {
     enum_type_union,            /* a union */
     enum_type_func_ptr,         /* a function pointer */
 
-    enum_type_sized,            /* arbitrary size type for list_new */
+    enum_type_sized,
     enum_last_type              /* + one */
 
 } PARROT_DATA_TYPE;
