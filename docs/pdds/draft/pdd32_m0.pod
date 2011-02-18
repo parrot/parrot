@@ -78,11 +78,24 @@ caller - calling context
 
 =head2 Design Goals
 
-There are three goals that M0 needs to meet.  The first is that we have
-executable code with equivalent power to C.  The second objective is to have a
-form of code that can be easily analyzed.  The third goal is that we have a
-single form of code used to implement the majority of Parrot, rather than
-having having a mix of C and PIR.
+There are three goals that M0 needs to meet:
+
+=over
+
+=item 1
+
+Have executable code with equivalent power to C.
+
+=item 2
+
+Have a form of code that can be easily analyzed.
+
+=item 3
+
+Have a single form of code used to implement the majority of Parrot, rather
+than having a mix of C and PIR.
+
+=back
 
 We are also designing M0 to be as simple as possible.  As much as possible,
 all the complexity of Parrot will be built on top of M0.  This is to
