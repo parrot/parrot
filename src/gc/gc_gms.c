@@ -1067,6 +1067,16 @@ gc_gms_process_work_list(PARROT_INTERP,
 
 }
 
+/*
+
+=item C<static void gc_gms_soil_pmc(PARROT_INTERP, PMC *pmc)>
+
+To come.
+
+=cut
+
+*/
+
 static void
 gc_gms_soil_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
@@ -1090,6 +1100,14 @@ gc_gms_soil_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
     PObj_GC_on_dirty_list_SET(pmc);
     PObj_live_CLEAR(pmc);
 }
+
+/*
+
+=item C<static void gc_gms_soil_roots(PARROT_INTERP, MarkSweep_GC *self)>
+
+To come.
+
+*/
 
 static void
 gc_gms_soil_roots(PARROT_INTERP, ARGIN(MarkSweep_GC *self))
