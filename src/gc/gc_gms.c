@@ -77,10 +77,10 @@ Main reason for it:
      PMC *res = Parrot_pmc_new(interp);
      <do something to fill a lot of guts. E.g. Hash.clone>
      return *res;
-     
+
 C<Hash.clone> can trigger GC. C<res> _will_ not be sealed by any automatic
 methods (e.g. pmc2c vtable overrides).
-    
+
 We will soil objects only from C stack.
 
 8. Sweep generations starting from K:

@@ -189,7 +189,7 @@ Creates and returns a clone of the hash.
         Parrot_hash_clone(INTERP, (Hash *)SELF.get_pointer(),
                    (Hash *)VTABLE_get_pointer(INTERP, dest));
         /*
-         * Trigger write barrier. 
+         * Trigger write barrier.
          *
          * If GC was triggered during deep clone of hash than C<dest>
          * will be moved into Gen1 without making it dirty. So, half
