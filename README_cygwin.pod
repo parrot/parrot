@@ -70,12 +70,12 @@ Building is tricky:
 
 If the freeglut package for the X Server is installed, this
 is used, otherwise the w32api and opengl packages for native
-Windows opengl support are tried.  
+Windows opengl support are tried.
 
 In order to use the w32api native GLUT there must be no
 F</usr/include/GL> directory.
- 
-The problem is that the L<NCI|pdds/draft/pdd16_native_call.pod> 
+
+The problem is that the L<NCI|pdds/draft/pdd16_native_call.pod>
 tries the header files to create the imports and not the
 libraries, and if the /usr/include/GL headers are found
 these are used, despite the w32api GLUT libraries are
@@ -87,7 +87,7 @@ defined.
 
 Required packages:
 
-  libglut-devel libGL-devel libGLU-devel libglut3 ... 
+  libglut-devel libGL-devel libGLU-devel libglut3 ...
 
 or if C<libglut-devel> and C<libGL-devel> is not installed:
 
