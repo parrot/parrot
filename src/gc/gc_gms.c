@@ -70,7 +70,7 @@ children into "work_list".
 
 6. Iterate over "work_list" calling VTABLE_mark on it.
 
-7. Soil nursery root objects.
+7. Soil nursery root PMCs from C-stack.
 
 Main reason for it:
 
@@ -80,8 +80,6 @@ Main reason for it:
 
 C<Hash.clone> can trigger GC. C<res> _will_ not be sealed by any automatic
 methods (e.g. pmc2c vtable overrides).
-
-We will soil objects only from C stack.
 
 8. Sweep generations starting from K:
     - Destroy all dead objects
@@ -1071,7 +1069,7 @@ gc_gms_process_work_list(PARROT_INTERP,
 
 =item C<static void gc_gms_soil_pmc(PARROT_INTERP, PMC *pmc)>
 
-To come.
+Mark single nursery PMC as dirty. Part of Step 7.
 
 =cut
 
@@ -1106,7 +1104,7 @@ gc_gms_soil_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 
 =item C<static void gc_gms_soil_roots(PARROT_INTERP, MarkSweep_GC *self)>
 
-To come.
+Mark all nursery PMCs on C-stack as durty. Part of Step 7.
 
 */
 
