@@ -41,14 +41,14 @@ typedef enum {
     enum_type_double,
     enum_type_longdouble,
 
-    enum_type_bit,              /* fixed size types */
-    enum_type_int1 = enum_type_bit,
-    enum_type_int4,
-    enum_type_int8,
+    enum_type_int8,             /* fixed size types */
     enum_type_int16,
     enum_type_int32,
     enum_type_int64,
 
+    enum_type_bit,              
+    enum_type_uint1 = enum_type_bit,
+    enum_type_uint4,
     enum_type_uint8,            /* unsigned variants */
     enum_type_uint16,
     enum_type_uint32,
@@ -97,14 +97,14 @@ const struct _data_types data_types[] = {
     { "double", sizeof (double) },
     { "longdouble", 0 },        /* TODO */
 
-    { "int1",   0 },            /*  = bit */
-    { "int4",   0 },
     { "int8",   1 },
     { "int16",  2 },
     { "int32",  4 },
     { "int64",  8 },
 
-    { "uint8",  1 },          /* unsigned variants */
+    { "uint1",  0 },            /*  = bit */
+    { "uint4",  0 },
+    { "uint8",  1 },            /* unsigned variants */
     { "uint16", 2 },
     { "uint32", 4 },
     { "uint64", 8 },
