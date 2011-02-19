@@ -523,6 +523,7 @@ Parrot_set_strreg(PARROT_INTERP, Parrot_Int regnum,
 {
     ASSERT_ARGS(Parrot_set_strreg)
     REG_STR(interp, regnum) = value;
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
 }
 
 /*
@@ -543,6 +544,7 @@ Parrot_set_pmcreg(PARROT_INTERP, Parrot_Int regnum,
 {
     ASSERT_ARGS(Parrot_set_pmcreg)
     REG_PMC(interp, regnum) = value;
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
 }
 
 /*=for api extend Parrot_new_string

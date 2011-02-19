@@ -259,6 +259,8 @@ build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
     /* Store built attribute index and invalidate cache. */
     _class->attrib_index = attrib_index;
     _class->attrib_cache = cache;
+
+    PARROT_GC_WRITE_BARRIER(interp, self);
 }
 
 /*
@@ -541,6 +543,7 @@ make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
             if (!PMC_IS_NULL(names))
                 /* remove the HLL namespace name */
                 VTABLE_shift_string(interp, names);
+                PARROT_GC_WRITE_BARRIER(interp, SELF);
                 _class->fullname = Parrot_str_join(interp, CONST_STRING(interp, ";"), names);
                 return _class->fullname;
         }
@@ -580,10 +583,13 @@ calculate_mro(PARROT_INTERP, ARGIN(PMC *SELF), INTVAL num_parents)
         PMC    * const parent_mro = VTABLE_inspect_str(interp, parent, ap);
         PMC    * const mro        = VTABLE_clone(interp, parent_mro);
         VTABLE_unshift_pmc(interp, mro, SELF);
+        PARROT_GC_WRITE_BARRIER(interp, SELF);
         _class->all_parents = mro;
     }
-    else
+    else {
+        PARROT_GC_WRITE_BARRIER(interp, SELF);
         _class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
+    }
 
     if (!CLASS_is_anon_TEST(SELF))
         interp->vtables[VTABLE_type(interp, SELF)]->mro = _class->all_parents;
@@ -1360,6 +1366,7 @@ Creates a new PMC object of the type of the class and calls init().
                 PMC_data_typed(object, Parrot_Object_attributes *);
             objattr->_class       = SELF;
             objattr->attrib_store = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+            PARROT_GC_WRITE_BARRIER(INTERP, object);
         }
 
         if (!PMC_IS_NULL(init)) {
@@ -1452,9 +1459,11 @@ Returns whether the class is or inherits from C<*class>.
         }
 
     cache_and_return:
-        if (_class->instantiated)
+        if (_class->instantiated) {
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             Parrot_hash_put(INTERP, _class->isa_cache, (void *)classobj,
                  (void *)retval);
+        }
         return retval;
 
     found:

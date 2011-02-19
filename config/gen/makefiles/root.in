@@ -91,7 +91,7 @@ C_LIBS           = @libs@
 CC_SHARED        = @cc_shared@
 CC_O_OUT         = @cc_o_out@
 CC_WARN          = @ccwarn@
-CFLAGS           = $(CC_INC) @ccflags@ @cc_build_call_frames@ @cc_debug@ @gc_flag@ @clock_best@ $(CC_SHARED)
+CFLAGS           = $(CC_INC) @ccflags@ @cc_build_call_frames@ @cc_debug@ @clock_best@ $(CC_SHARED)
 LINK_DYNAMIC     = @link_dynamic@
 LINK             = @link@
 LINKFLAGS        = @linkflags@ @link_debug@ @ld_debug@
@@ -452,10 +452,12 @@ INTERP_O_FILES = \
     src/extend$(O) \
     src/extend_vtable$(O) \
     src/gc/alloc_memory$(O) \
+    src/gc/alloc_resources$(O) \
     src/gc/api$(O) \
     src/gc/gc_ms$(O) \
     src/gc/gc_inf$(O) \
     src/gc/gc_ms2$(O) \
+    src/gc/gc_gms$(O) \
     src/gc/mark_sweep$(O) \
     src/gc/system$(O) \
     src/gc/fixed_allocator$(O) \
@@ -505,7 +507,6 @@ INTERP_O_FILES = \
     src/longopt$(O) \
     @TEMP_platform_o@ \
     @TEMP_atomic_o@ \
-    @TEMP_gc_o@ \
 
 OPS_FILES = @ops@
 
@@ -1382,6 +1383,16 @@ src/gc/fixed_allocator$(O) : \
     src/gc/fixed_allocator.h \
     src/gc/fixed_allocator.c
 
+src/gc/gc_gms$(O) : \
+	$(PARROT_H_HEADERS) \
+	src/gc/gc_gms.c \
+    $(INC_DIR)/pointer_array.h \
+	src/gc/gc_private.h \
+	src/gc/fixed_allocator.h \
+	src/gc/variable_size_pool.h
+
+src/gc/api$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/api.c
+
 src/gc/variable_size_pool$(O) : $(PARROT_H_HEADERS) \
 	src/gc/variable_size_pool.h src/gc/variable_size_pool.c
 
@@ -1898,7 +1909,6 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
     include/pmc/pmc_parrotlibrary.h \
     src/io/io_private.h
 
-@TEMP_gc_c@
 
 @TEMP_pmc_build@
 

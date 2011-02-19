@@ -88,6 +88,13 @@ method op($/) {
     $op<type>  := ~$<op_type>;
     $op<normalized_args> := @norm_args;
 
+    if $op.need_write_barrier {
+        $op.push(PAST::Op.new(
+                :pasttype<inline>,
+                :inline("    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));\n")
+            ));
+    }
+
     if !%flags<flow> {
         my $goto_next := PAST::Op.new(
             :pasttype('call'),
@@ -106,7 +113,7 @@ method op($/) {
         $op.push($goto_next);
         $op.push(PAST::Op.new(
                 :pasttype<inline>,
-                :inline<;>
+                :inline(";\n"),
             ));
     }
 

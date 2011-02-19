@@ -8,7 +8,7 @@
 pir::load_bytecode('opsc.pbc');
 pir::load_bytecode('dumper.pbc');
 
-plan(26);
+Q:PIR{ .include "test_more.pir" };
 
 my $buf := q|
 BEGIN_OPS_PREAMBLE
@@ -25,6 +25,15 @@ inline op foo(out INT, in PMC, inconst NUM) :flow :deprecated {
     foo # We don't handle anything in C<body> during parse/past.
 }
 
+inline op bar(out PMC) {
+    foo # We don't handle anything in C<body> during parse/past.
+}
+
+inline op bar(out PMC, in INT) {
+    foo # We don't handle anything in C<body> during parse/past.
+}
+
+
 |;
 my $compiler := pir::compreg__Ps('Ops');
 
@@ -38,7 +47,7 @@ ok(~$preambles[0] ~~ /HEADER/, 'Header parsed');
 
 my @ops := @($past<ops>);
 # One "bar" and two "foo"
-ok(+@ops ==  3, 'We have 3 ops');
+is(+@ops, 6, 'We have 6 ops');
 
 my $op := @ops[1];
 ok($op.name == 'foo', "Name parsed");
@@ -98,6 +107,19 @@ for @($op) {
 }
 ok( $goto_offset, "goto NEXT appended for non :flow ops");
 
+# Check write barriers.
+ok( !$op.need_write_barrier, "Write Barrier is not required");
+
+$op := @ops[3];
+ok( $op.need_write_barrier, "'out PMC' Write Barrier");
+$op := @ops[4];
+ok( $op.need_write_barrier, "'inout STR' Write Barrier");
+$op := @ops[5];
+ok( $op.need_write_barrier, "Write Barrier calculated properly");
+
+ok( $op.body ~~ /PARROT_GC_WRITE_BARRIER/, "We have Write Barrier inserted into op");
+
+done_testing();
 
 # Don't forget to update plan!
 

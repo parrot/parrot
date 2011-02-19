@@ -24,21 +24,24 @@ The vtable functions for the native C call functions.
 PARROT_IGNORABLE_RESULT
 static nci_thunk_t /*@alt void@*/
 build_func(PARROT_INTERP,
+    ARGIN(PMC *obj),
     ARGMOD(Parrot_NCI_attributes *nci))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*nci);
 
 #define ASSERT_ARGS_build_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj) \
     , PARROT_ASSERT_ARG(nci))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
 
-=item C<static nci_thunk_t build_func(PARROT_INTERP, Parrot_NCI_attributes
-*nci)>
+=item C<static nci_thunk_t build_func(PARROT_INTERP, PMC *obj,
+Parrot_NCI_attributes *nci)>
 
 Actually build the NCI thunk.
 
@@ -48,7 +51,7 @@ Actually build the NCI thunk.
 
 PARROT_IGNORABLE_RESULT
 static nci_thunk_t
-build_func(PARROT_INTERP, ARGMOD(Parrot_NCI_attributes *nci))
+build_func(PARROT_INTERP, ARGIN(PMC *obj), ARGMOD(Parrot_NCI_attributes *nci))
 {
     ASSERT_ARGS(build_func)
 
@@ -64,6 +67,7 @@ build_func(PARROT_INTERP, ARGMOD(Parrot_NCI_attributes *nci))
     /* Build call function. */
     nci->fb_info     = build_call_func(interp, nci->sig_str);
     nci->func        = F2DPTR(VTABLE_get_pointer(interp, nci->fb_info));
+    PARROT_GC_WRITE_BARRIER(interp, obj);
 
     return (nci_thunk_t)nci->func;
 }
@@ -242,7 +246,7 @@ class, the PMC arguments are shifted down.
 
         if (!func) {
             /* build the thunk only when necessary */
-            func = build_func(interp, nci_info);
+            func = build_func(interp, SELF, nci_info);
 
             if (!func)
                 Parrot_ex_throw_from_c_args(INTERP, NULL,
@@ -284,7 +288,7 @@ Returns the function pointer as an integer.
     VTABLE INTVAL get_integer() {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         if (!nci_info->func)
-            build_func(INTERP, nci_info);
+            build_func(INTERP, SELF, nci_info);
         return (INTVAL)nci_info->func;
     }
 
@@ -318,7 +322,7 @@ Return the arity of the NCI (the number of arguments).
 
         if (nci_info) {
             if (!nci_info->func)
-                build_func(INTERP, nci_info);
+                build_func(INTERP, SELF, nci_info);
             if (nci_info->func) {
                 arity = nci_info->arity;
                 RETURN(INTVAL arity);
