@@ -573,7 +573,6 @@ Mark any referenced strings and PMCs.
         Hash     *hash;
         PMC      *tmp;
         STRING   *short_sig;
-        Pcc_cell *positionals;
         UINTVAL  *n_regs_used;
 
         if (!PMC_data(SELF))
