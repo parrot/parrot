@@ -1230,7 +1230,6 @@ void
 Parrot_hash_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash), NOTNULL(value_free func))
 {
     ASSERT_ARGS(Parrot_hash_chash_destroy_values)
-    UINTVAL i;
 
     parrot_hash_iterate(hash,
         mem_gc_free(interp, _bucket->key);
