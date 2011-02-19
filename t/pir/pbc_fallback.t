@@ -10,7 +10,7 @@ use Parrot::Test tests =>   1;
 
 =head1 NAME
 
-t/pir/pbc_fallback.t - Parrot Calling Conventions
+t/pir/pbc_fallback.t - PBC Fallback
 
 =head1 SYNOPSIS
 
