@@ -2216,7 +2216,6 @@ clean : \
     test-clean \
     prog-clean \
     dynext-clean \
-#IF(has_perldoc):    docs-clean \
 #IF(has_perldoc):    html-clean \
     examples-clean \
     ext-clean \
