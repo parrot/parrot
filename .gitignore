@@ -440,6 +440,7 @@
 /t/perl/Parrot_Test_1.pir
 /t/perl/*.gcda
 /t/perl/*.gcno
+/t/pir/pbc_fallback_1.pir
 /t/pmc/*.out
 /t/pmc/*.pasm
 /t/pmc/*.pbc
