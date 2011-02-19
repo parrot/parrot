@@ -16,6 +16,13 @@
 #  include <limits.h>
 #endif
 
+#ifndef PARROT_HAS_TIMESPEC
+struct timespec {
+    time_t tv_sec;
+    long   tv_nsec;
+};
+#endif /* PARROT_HAS_TIMESPEC */
+
 #ifdef _MSC_VER
 
 #  ifndef LLONG_MAX
@@ -99,6 +106,123 @@ INTVAL Parrot_io_send(PARROT_INTERP, PIOHANDLE handle, ARGIN(const char *buf), s
 INTVAL Parrot_io_recv(PARROT_INTERP, PIOHANDLE handle, ARGOUT(char *buf), size_t len);
 INTVAL Parrot_io_poll(PARROT_INTERP, PIOHANDLE handle, int which, int sec, int usec);
 INTVAL Parrot_io_close_socket(PARROT_INTERP, PIOHANDLE handle);
+
+/*
+ * Files and directories
+ */
+
+/* &gen_from_def(stat.pasm) */
+
+#define STAT_EXISTS               0
+#define STAT_FILESIZE             1
+#define STAT_ISDIR                2
+#define STAT_ISREG                3
+#define STAT_ISDEV                4
+#define STAT_CREATETIME           5
+#define STAT_ACCESSTIME           6
+#define STAT_MODIFYTIME           7
+#define STAT_CHANGETIME           8
+#define STAT_BACKUPTIME           9
+#define STAT_UID                 10
+#define STAT_GID                 11
+#define STAT_ISLNK               12
+#define STAT_PLATFORM_DEV        -1
+#define STAT_PLATFORM_INODE      -2
+#define STAT_PLATFORM_MODE       -3
+#define STAT_PLATFORM_NLINKS     -4
+#define STAT_PLATFORM_DEVTYPE    -5
+#define STAT_PLATFORM_BLOCKSIZE  -6
+#define STAT_PLATFORM_BLOCKS     -7
+
+#define STAT_TYPE_UNKNOWN         0
+#define STAT_TYPE_FILE            1
+#define STAT_TYPE_DIRECTORY       2
+#define STAT_TYPE_PIPE            3
+#define STAT_TYPE_LINK            4
+#define STAT_TYPE_DEVICE          5
+
+/* &end_gen */
+
+typedef struct _Parrot_Stat_Buf {
+    INTVAL     type;
+    HUGEINTVAL size;
+    INTVAL     uid;
+    INTVAL     gid;
+    INTVAL     dev;
+    HUGEINTVAL inode;
+    INTVAL     mode;
+    INTVAL     n_links;
+    INTVAL     block_size;
+    INTVAL     blocks;
+
+    struct timespec create_time;
+    struct timespec access_time;
+    struct timespec modify_time;
+    struct timespec change_time;
+} Parrot_Stat_Buf;
+
+PARROT_EXPORT
+STRING *Parrot_file_getcwd(PARROT_INTERP);
+
+PARROT_EXPORT
+void Parrot_file_mkdir(PARROT_INTERP, ARGIN(STRING *path), INTVAL mode);
+
+PARROT_EXPORT
+void Parrot_file_chdir(PARROT_INTERP, ARGIN(STRING *path));
+
+PARROT_EXPORT
+void Parrot_file_rmdir(PARROT_INTERP, ARGIN(STRING *path));
+
+PARROT_EXPORT
+void Parrot_file_unlink(PARROT_INTERP, ARGIN(STRING *path));
+
+PARROT_EXPORT
+void Parrot_file_stat(PARROT_INTERP, ARGIN(STRING *path), ARGOUT(Parrot_Stat_Buf *buf));
+
+PARROT_EXPORT
+void Parrot_file_lstat(PARROT_INTERP, ARGIN(STRING *path), ARGOUT(Parrot_Stat_Buf *buf));
+
+PARROT_EXPORT
+void Parrot_file_fstat(PARROT_INTERP, PIOHANDLE handle, ARGOUT(Parrot_Stat_Buf *buf));
+
+PARROT_EXPORT
+INTVAL Parrot_file_stat_intval(PARROT_INTERP, ARGIN(STRING *path), INTVAL thing);
+
+PARROT_EXPORT
+INTVAL Parrot_file_lstat_intval(PARROT_INTERP, ARGIN(STRING * path), INTVAL thing);
+
+PARROT_EXPORT
+INTVAL Parrot_file_fstat_intval(PARROT_INTERP, PIOHANDLE os_handle, INTVAL thing);
+
+PARROT_EXPORT
+void Parrot_file_symlink(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to));
+
+PARROT_EXPORT
+void Parrot_file_link(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to));
+
+PARROT_EXPORT
+INTVAL Parrot_file_umask(PARROT_INTERP, INTVAL mask);
+
+PARROT_EXPORT
+void Parrot_file_chroot(PARROT_INTERP, ARGIN(STRING *path));
+
+PARROT_EXPORT
+PMC *Parrot_file_readdir(PARROT_INTERP, ARGIN(STRING *path));
+
+PARROT_EXPORT
+void Parrot_file_rename(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to));
+
+PARROT_EXPORT
+void Parrot_file_chmod(PARROT_INTERP, ARGIN(STRING *path), INTVAL mode);
+
+PARROT_EXPORT
+INTVAL Parrot_file_can_read(PARROT_INTERP, ARGIN(STRING *path));
+
+PARROT_EXPORT
+INTVAL Parrot_file_can_write(PARROT_INTERP, ARGIN(STRING *path));
+
+PARROT_EXPORT
+INTVAL Parrot_file_can_execute(PARROT_INTERP, ARGIN(STRING *path));
 
 /*
 ** Math:

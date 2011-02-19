@@ -42,11 +42,11 @@ sub _set_implementations {
     my @impls = qw/
         io.c
         socket.c
+        file.c
         time.c
         encoding.c
         env.c
         dl.c
-        stat.c
         math.c
         itimer.c
         exec.c

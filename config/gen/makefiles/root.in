@@ -398,7 +398,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/multidispatch.h \
 	$(INC_DIR)/library.h \
 	$(INC_DIR)/namespace.h \
-	$(INC_DIR)/stat.h \
 	$(INC_DIR)/hll.h \
 	$(INC_DIR)/pbcversion.h \
 	$(INC_DIR)/pobj.h \
@@ -1234,8 +1233,8 @@ runtime/parrot/include/dlopenflags.pasm : $(INC_DIR)/platform_interface.h $(H2IN
 runtime/parrot/include/datatypes.pasm : $(INC_DIR)/datatypes.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/datatypes.h $@
 
-runtime/parrot/include/stat.pasm : $(INC_DIR)/stat.h $(H2INC)
-	$(PERL) $(H2INC) $(INC_DIR)/stat.h $@
+runtime/parrot/include/stat.pasm : $(INC_DIR)/platform_interface.h $(H2INC)
+	$(PERL) $(H2INC) $(INC_DIR)/platform_interface.h $@
 
 runtime/parrot/include/stringinfo.pasm : $(INC_DIR)/string.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/string.h $@
@@ -1630,6 +1629,8 @@ src/platform/generic/error$(O) : src/platform/generic/error.c $(PARROT_H_HEADERS
 
 src/platform/generic/exec$(O) : src/platform/generic/exec.c $(PARROT_H_HEADERS)
 
+src/platform/generic/file$(O) : src/platform/generic/file.c $(PARROT_H_HEADERS)
+
 src/platform/generic/hires_timer$(O) : src/platform/generic/hires_timer.c $(PARROT_H_HEADERS)
 
 src/platform/generic/itimer$(O) : src/platform/generic/itimer.c $(PARROT_H_HEADERS)
@@ -1643,8 +1644,6 @@ src/platform/generic/misc$(O) : src/platform/generic/misc.c $(PARROT_H_HEADERS)
 
 src/platform/generic/socket$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_socket.h \
     src/io/io_private.h include/pmc/pmc_sockaddr.h src/platform/generic/socket.c
-
-src/platform/generic/stat$(O) : src/platform/generic/stat.c $(PARROT_H_HEADERS)
 
 src/platform/generic/sysmem$(O) : src/platform/generic/sysmem.c $(PARROT_H_HEADERS)
 
@@ -1669,6 +1668,8 @@ src/platform/win32/env$(O) : src/platform/win32/env.c $(PARROT_H_HEADERS)
 src/platform/win32/error$(O) : src/platform/win32/error.c $(PARROT_H_HEADERS)
 
 src/platform/win32/exec$(O) : src/platform/win32/exec.c $(PARROT_H_HEADERS)
+
+src/platform/win32/file$(O) : src/platform/win32/file.c $(PARROT_H_HEADERS)
 
 src/platform/win32/hires_timer$(O) : src/platform/win32/hires_timer.c $(PARROT_H_HEADERS)
 

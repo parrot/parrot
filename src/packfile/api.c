@@ -4342,21 +4342,21 @@ PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
     }
     else {
         /* can't read a file that doesn't exist */
-        if (!Parrot_stat_info_intval(interp, fullname, STAT_EXISTS)) {
+        if (!Parrot_file_stat_intval(interp, fullname, STAT_EXISTS)) {
             Parrot_io_eprintf(interp, "Parrot VM: Can't stat %s, code %i.\n",
                     fullname, errno);
             return NULL;
         }
 
         /* we may need to relax this if we want to read bytecode from pipes */
-        if (!Parrot_stat_info_intval(interp, fullname, STAT_ISREG)) {
+        if (!Parrot_file_stat_intval(interp, fullname, STAT_ISREG)) {
             Parrot_io_eprintf(interp,
                 "Parrot VM: '%s', is not a regular file %i.\n",
                 fullname, errno);
             return NULL;
         }
 
-        program_size = Parrot_stat_info_intval(interp, fullname, STAT_FILESIZE);
+        program_size = Parrot_file_stat_intval(interp, fullname, STAT_FILESIZE);
 
 #ifndef PARROT_HAS_HEADER_SYSMMAN
         io = PIO_OPEN(interp, fullname, PIO_F_READ);

@@ -363,13 +363,11 @@ STRING * Parrot_str_titlecase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 char * Parrot_str_to_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 char * Parrot_str_to_encoded_cstring(PARROT_INTERP,
     ARGIN_NULLOK(const STRING *s),
