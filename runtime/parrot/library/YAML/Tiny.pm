@@ -391,7 +391,7 @@ multi method _dump($indent, Hash %hash) {
 }
 
 multi method _dump($indent, String $value) {
-    " '" ~ subst($value, /\'/, "''") ~ "'";
+    " '" ~ subst($value, /\'/, "''", :global) ~ "'";
 }
 
 multi method _dump($indent, $value) {

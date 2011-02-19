@@ -100,12 +100,11 @@ static int hash_compare_string(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static int hash_compare_string_enc(PARROT_INTERP,
+static int hash_compare_string_enc(
     ARGIN(const void *search_key),
     ARGIN(const void *bucket_key))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -187,8 +186,7 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(search_key))
 #define ASSERT_ARGS_hash_compare_string_enc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(search_key) \
+       PARROT_ASSERT_ARG(search_key) \
     , PARROT_ASSERT_ARG(bucket_key))
 #define ASSERT_ARGS_key_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -273,8 +271,8 @@ hash_compare_string(PARROT_INTERP, ARGIN(const void *search_key),
 
 /*
 
-=item C<static int hash_compare_string_enc(PARROT_INTERP, const void
-*search_key, const void *bucket_key)>
+=item C<static int hash_compare_string_enc(const void *search_key, const void
+*bucket_key)>
 
 Compare two strings. Returns 0 if they are identical. Considers differing
 encodings to be distinct.
@@ -283,8 +281,7 @@ encodings to be distinct.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-hash_compare_string_enc(PARROT_INTERP, ARGIN(const void *search_key),
-                                       ARGIN(const void *bucket_key))
+hash_compare_string_enc(ARGIN(const void *search_key), ARGIN(const void *bucket_key))
 {
     ASSERT_ARGS(hash_compare_string_enc)
     STRING const *s1 = (STRING const *)search_key;
@@ -493,7 +490,7 @@ hash_compare(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(void *a),
         return hash_compare_string(interp, (STRING *)a, (STRING *)b);
 
     if (hash->key_type == Hash_key_type_STRING_enc)
-        return hash_compare_string_enc(interp, (STRING *)a, (STRING *)b);
+        return hash_compare_string_enc((STRING *)a, (STRING *)b);
 
     if (hash->key_type == Hash_key_type_cstring)
         return strcmp((char *)a, (char *)b);
@@ -1233,7 +1230,6 @@ void
 Parrot_hash_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash), NOTNULL(value_free func))
 {
     ASSERT_ARGS(Parrot_hash_chash_destroy_values)
-    UINTVAL i;
 
     parrot_hash_iterate(hash,
         mem_gc_free(interp, _bucket->key);
@@ -1513,17 +1509,15 @@ Parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN_NULLOK(void *key))
     const UINTVAL hashval = key_hash(interp, hash, key) & hash->mask;
     if (hash->buckets){
         HashBucket   **prev   = &hash->index[hashval];
-        if (*prev) {
-            for (; *prev; prev = &(*prev)->next) {
-                HashBucket *current = *prev;
-                if (hash_compare(interp, hash, key, current->key) == 0) {
-                    *prev = current->next;
-                    --hash->entries;
-                    current->next    = hash->free_list;
-                    current->key     = NULL;
-                    hash->free_list = current;
-                    return;
-                }
+        for (; *prev; prev = &(*prev)->next) {
+            HashBucket *current = *prev;
+            if (hash_compare(interp, hash, key, current->key) == 0) {
+                *prev = current->next;
+                --hash->entries;
+                current->next    = hash->free_list;
+                current->key     = NULL;
+                hash->free_list = current;
+                return;
             }
         }
     }

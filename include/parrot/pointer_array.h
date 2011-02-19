@@ -98,11 +98,14 @@ void Parrot_pa_remove(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 size_t Parrot_pa_count_allocated(PARROT_INTERP,
     ARGIN(Parrot_Pointer_Array *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 size_t Parrot_pa_count_used(PARROT_INTERP,
     ARGIN(Parrot_Pointer_Array *self))
         __attribute__nonnull__(1)
