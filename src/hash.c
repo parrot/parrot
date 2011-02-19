@@ -1509,17 +1509,15 @@ Parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN_NULLOK(void *key))
     const UINTVAL hashval = key_hash(interp, hash, key) & hash->mask;
     if (hash->buckets){
         HashBucket   **prev   = &hash->index[hashval];
-        if (*prev) {
-            for (; *prev; prev = &(*prev)->next) {
-                HashBucket *current = *prev;
-                if (hash_compare(interp, hash, key, current->key) == 0) {
-                    *prev = current->next;
-                    --hash->entries;
-                    current->next    = hash->free_list;
-                    current->key     = NULL;
-                    hash->free_list = current;
-                    return;
-                }
+        for (; *prev; prev = &(*prev)->next) {
+            HashBucket *current = *prev;
+            if (hash_compare(interp, hash, key, current->key) == 0) {
+                *prev = current->next;
+                --hash->entries;
+                current->next    = hash->free_list;
+                current->key     = NULL;
+                hash->free_list = current;
+                return;
             }
         }
     }
