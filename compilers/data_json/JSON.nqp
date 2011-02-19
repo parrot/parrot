@@ -39,7 +39,6 @@ the documentation at L<http://www.json.org/>.
 
 INIT {
     pir::load_bytecode('P6Regex.pbc');
-    pir::load_bytecode('dumper.pbc');
 }
 
 grammar JSON::Grammar is HLL::Grammar {
