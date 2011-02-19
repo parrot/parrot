@@ -757,7 +757,6 @@ help :
 	@echo ""
 	@echo "Documentation:"
 	@echo "  help:              Print this help message."
-	@echo "  docs:              Generate documentation from POD in the sources."
 	@echo "  html:              Generate HTML documentation from POD in the sources."
 	@echo "  html-clean:        Remove the HTML documentation."
 	@echo "  htmlhelp:          Compile HTML documentation (CHM format)."
@@ -1913,18 +1912,6 @@ $(INC_DIR)/vtable.h : src/vtable.tbl $(BUILD_TOOLS_DIR)/vtable_h.pl lib/Parrot/V
 # Documentation targets:
 #
 ###############################################################################
-
-#IF(has_perldoc):docs : docs.dummy
-#ELSE:docs : docs.stub
-
-docs.stub:
-	@echo "Perldoc is required, but not detected."
-
-docs.dummy :
-	$(MAKE) docs
-
-docs-clean :
-	$(MAKE) docs clean
 
 #IF(has_perldoc):html : html.dummy
 #ELSE:html : html.stub
