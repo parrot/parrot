@@ -3,6 +3,8 @@ New in 3.2.0
 - Languages
 - Community
 - Documentation
+  + 'make docs' target, which was serving only to generate superfluous POD
+    files, has been removed.
 - Tests
 
 New in 3.1.0
