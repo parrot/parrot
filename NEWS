@@ -1,5 +1,6 @@
 New in 3.2.0
 - Core
+  + Full support for Unicode filenames on Linux and Win32
 - Languages
 - Community
 - Documentation
