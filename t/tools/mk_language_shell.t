@@ -27,16 +27,8 @@ use Parrot::Test;
 use File::Spec::Functions;
 use File::Path qw/rmtree/;
 
-my $exefile;
 
-BEGIN {
-    $exefile = catfile( ".", qw/tools dev mk_language_shell.pl/ );
-    unless ( -f $exefile ) {
-        plan skip_all => "$exefile hasn't been built yet.";
-        exit(0);
-    }
-    plan tests => 7;
-}
+plan tests => 7;
 
 output_like(
     "test_parrot_language_$$",
@@ -90,6 +82,7 @@ Runs mk_language_shell with $keys as the argument and verifies the output.
 
 sub output_like {
     my ($options, $snippet, $desc)  = @_;
+    my $exefile = catfile( ".", qw/tools dev mk_language_shell.pl/ );
 
     my $out = `$^X $exefile $options`;
 
