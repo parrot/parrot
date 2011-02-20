@@ -149,6 +149,10 @@ any rational reason, until the spec is more stable.
 
 =item * free - free memory
 
+=item * memset - set a region of memory to a value stored in a register
+
+=item * memget - get a region from memory and copy it into a register
+
 =item * shr - right circular bitshift
 
 =item * shl - leftward circular bitshift
@@ -275,20 +279,21 @@ info, whatever
 
 =head2 Op Composition
 
-If M0 needs to support op composition, describe it here.
+M0 will not support op composition unless necessary.
 
 =head2 Objects
 
 In Lorito, we'll still have INSP registers like PIR, but the S registers will
 be PMCs that happen to be strings.  Additionally, PMCs and objects are being
-unified.  For the most part this is above the level of what M0 needs to care
-about, but it will be important for M0 to print out strings and have some
-intelligent way of interacting with PMCs.  Figure this out.
+unified. M0's idea of an object/PMC is a blob of memory which obeys a primitive
+vtable interface, which is really just looking up an integer index in memory.
 
-=head2 memory model
+=head2 Memory Model
 
-describe what kind of memory m0 ops will have access to and how they'll get at
-it
+Memory can be allocated with alloc() and freed with free(). One can retrieve
+values from memory with memget() and changed with memset().
+
+Will some memory be protected in M0?
 
 =head2 structs
 
@@ -296,9 +301,8 @@ describe structs here, as far as they're relevant to m0
 
 =head2 Types
 
-There are four register types, Integer, Numeric, PMC and String. It remains to
-be seen whether S and P will merely be syntax sugar for the same
-datastructure.
+There are four register types, Integer, Numeric, PMC and String. The string
+type will merely be syntax sugar for accessing a PMC.
 
 question: how will ops deal with types?
 options:
@@ -332,6 +336,10 @@ they'll be the same thing under Lorito).
 describe FFI here.  This will become especially important when we start
 integrating Lorito with the rest of Parrot and want to be able to call into C
 code from M0 and vice versa.
+
+M0 will need to implement similar functionality to dlfunc and dlvar, but most
+likely the atoms to build up that functionality, since they contain too much
+magic to be M0 ops.
 
 =head2 Concurrency
 
