@@ -651,6 +651,28 @@ typedef struct macro_t {
     params_t params;
 } macro_t;
 
+typedef struct parser_state_t parser_state_t;
+
+struct yy_buffer_state;
+
+/* parser state structure
+ * the first few items are common to struct parser_state, but
+ * we AFAIK need this hack as flex doesn't export YY_BUFFER_STATE */
+typedef struct macro_frame_t {
+    struct parser_state_t s;
+
+    /* macro stuff */
+    params_t *params;
+    char     *heredoc_rest;
+
+    params_t  expansion;
+    int       label;
+    int       is_macro;
+    //YY_BUFFER_STATE buffer;
+    struct yy_buffer_state * buffer;
+} macro_frame_t;
+
+
 /* main.c */
 #define PBC_LOAD        (1 << 0)
 #define PBC_RUN         (1 << 1)

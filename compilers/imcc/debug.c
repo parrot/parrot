@@ -26,6 +26,18 @@ handle info/error/warning messages from imcc
 #include "parrot/io.h"
 
 /* HEADERIZER HFILE: compilers/imcc/debug.h */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_CANNOT_RETURN_NULL
+static STRING * IMCC_get_err_location(ARGMOD(imc_info_t *imcc))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*imcc);
+
+#define ASSERT_ARGS_IMCC_get_err_location __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 /*
 
@@ -43,14 +55,16 @@ void
 IMCC_fatal(ARGMOD(imc_info_t * imcc), SHIM(int code), ARGIN(const char *fmt), ...)
 {
     ASSERT_ARGS(IMCC_fatal)
+    STRING * location = STRINGNULL;
     va_list ap;
 
     va_start(ap, fmt);
     imcc->error_message = Parrot_vsprintf_c(imcc->interp, fmt, ap);
     va_end(ap);
     //IMCC_THROW(imcc->jump_buf, IMCC_FATAL_EXCEPTION);
+    location = IMCC_get_err_location(imcc);
     Parrot_ex_throw_from_c_args(imcc->interp, NULL, IMCC_FATAL_EXCEPTION,
-        "error:imcc:%Ss", imcc->error_message);
+        "error:imcc:%Ss\n\t%Ss", imcc->error_message, location);
 }
 
 /*
@@ -68,14 +82,43 @@ void
 IMCC_fataly(ARGMOD(imc_info_t * imcc), SHIM(int code), ARGIN(const char *fmt), ...)
 {
     ASSERT_ARGS(IMCC_fataly)
+    STRING * location;
     va_list ap;
 
     va_start(ap, fmt);
     imcc->error_message = Parrot_vsprintf_c(imcc->interp, fmt, ap);
     va_end(ap);
     //IMCC_THROW(imcc->jump_buf, IMCC_FATALY_EXCEPTION);
+    location = IMCC_get_err_location(imcc);
     Parrot_ex_throw_from_c_args(imcc->interp, NULL, IMCC_FATALY_EXCEPTION,
-        "error:imcc:%Ss", imcc->error_message);
+        "error:imcc:%Ss\n\t%Ss", imcc->error_message, location);
+}
+
+PARROT_CANNOT_RETURN_NULL
+static STRING *
+IMCC_get_err_location(ARGMOD(imc_info_t *imcc))
+{
+    macro_frame_t *f;
+    STRING        *old = imcc->frames->s.file;
+    STRING * msg = STRINGNULL;
+
+    if (imcc->frames && imcc->frames->is_macro)
+        msg = Parrot_sprintf_c(imcc->interp, "in macro '.%Ss' line %d",
+                imcc->frames->s.file, imcc->line);
+    else
+        msg = Parrot_sprintf_c(imcc->interp, "in file '%Ss' line %d\n",
+                imcc->frames->s.file, imcc->line);
+
+
+    for (f = imcc->frames; f; f = (macro_frame_t *)f->s.next) {
+        if (!STRING_equal(imcc->interp, f->s.file, old)) {
+            msg = Parrot_sprintf_c(imcc->interp,
+                "%Ss\tincluded from '%Ss' line %d\n", msg, f->s.file, f->s.line);
+        }
+
+        old = f->s.file;
+    }
+    return msg;
 }
 
 /*

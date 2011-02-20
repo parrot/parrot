@@ -418,7 +418,7 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     if (imcc->error_code) {
         imcc->error_code = IMCC_FATAL_EXCEPTION;
         IMCC_warning(imcc, "error:imcc:%Ss", imcc->error_message);
-        if (is_file)
+        //if (is_file)
             IMCC_print_inc(imcc);
 
         yylex_destroy(yyscanner);

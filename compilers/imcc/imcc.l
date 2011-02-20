@@ -35,25 +35,6 @@
  *
  *
  */
-
-typedef struct parser_state_t parser_state_t;
-
-/* parser state structure
- * the first few items are common to struct parser_state, but
- * we AFAIK need this hack as flex doesn't export YY_BUFFER_STATE */
-typedef struct macro_frame_t {
-    struct parser_state_t s;
-
-    /* macro stuff */
-    params_t *params;
-    char     *heredoc_rest;
-
-    params_t  expansion;
-    int       label;
-    int       is_macro;
-    YY_BUFFER_STATE buffer;
-} macro_frame_t;
-
 /* static function declarations */
 static void pop_parser_state(ARGMOD(imc_info_t *imcc), ARGMOD(void *yyscanner));
 
