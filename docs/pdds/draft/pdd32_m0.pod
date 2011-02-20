@@ -129,9 +129,13 @@ any rational reason, until the spec is more stable.
 
 =item * print  - prints a string to a file handle
 
-=item * add - add two registers
+=item * add_i - add two integer registers
 
-=item * multiply - multiply two registers
+=item * add_n - add two numeric registers
+
+=item * mult_i - multiply two integer registers
+
+=item * mult_n - multiply two numeric registers
 
 =item * set  - sets a register to a value
 
@@ -141,8 +145,11 @@ any rational reason, until the spec is more stable.
 
 =item * alloc - allocate memory
 
-=item * mark_unused - tell the GC that this previously allocated memory is now unused
+=item * free - free memory
 
+=item * shr - right circular bitshift
+
+=item * shl - leftward circular bitshift
 
 =back
 
@@ -161,6 +168,8 @@ These are too magical and can be written in terms of simpler ops:
 =item * new_ctx - Create a new Lorito context
 
 =item * load_bytecode - load bytecode into the current Lorito context
+
+=item * mark_unused - tell the GC that this previously allocated memory is now unused
 
 =back
 
