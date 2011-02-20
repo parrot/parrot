@@ -188,12 +188,17 @@ hand; it's just fine if it's painful to do so for non-trivial use cases.
 =head2 Binary Representation
 
 proposal: M0's binary representation will be composed of a fixed header, a
-single directory segment and a bunch of sets of 3 segments describing a chunk
-of bytecode: a bytecode segment containing the ops, a variables table segment
-containing the objects that the segment needs, and a metadata segment that
-carries any extra data like HLL line numbers, function names, annotations,
-custom data).  We should design the binary format of M0 in a way that allows
-it to be mmapped by an interpreter. 
+single directory segment and a bunch of segment triplets describing a chunk
+of bytecode:
+
+=item * a bytecode segment containing the ops
+
+=item * a variables table segment containing the objects that the segment needs
+
+=item * a metadata segment that carries any extra data like HLL line numbers, function names, annotations and custom data.
+
+We should design the binary format of M0 in a way that allows it to be mmapped
+by an interpreter.
 
 The header will look like:
 
