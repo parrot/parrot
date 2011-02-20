@@ -141,7 +141,9 @@ any rational reason, until the spec is more stable.
 
 =item * get  - gets the value of a register
 
-=item * cmp - numeric comparison
+=item * cmp_i - integer comparison
+
+=item * cmp_n - numeric comparison
 
 =item * alloc - allocate memory
 
@@ -150,6 +152,10 @@ any rational reason, until the spec is more stable.
 =item * shr - right circular bitshift
 
 =item * shl - leftward circular bitshift
+
+=item * int2num - coerce integer to numeric
+
+=item * num2int - coerce numeric to integer
 
 =back
 
