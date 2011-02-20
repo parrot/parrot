@@ -17,11 +17,9 @@ This file implements OS-specific file functions for Win32 platforms.
 
 */
 
-#include <direct.h>
-#include <io.h>
+#include <w32api.h>
 #include <tchar.h>
-#include <windows.h>
-
+#include <direct.h>
 #include "parrot/parrot.h"
 
 #define THROW(msg) Parrot_ex_throw_from_c_args(interp, NULL, \
@@ -748,8 +746,8 @@ Parrot_file_symlink(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
 
     if (attrs != INVALID_FILE_ATTRIBUTES) {
         DWORD flags = attrs & FILE_ATTRIBUTE_DIRECTORY
-                    ? SYMBOLIC_LINK_FLAG_DIRECTORY
-                    : 0;
+                    ? 0x1    /* SYMBOLIC_LINK_FLAG_DIRECTORY */
+                    : 0x0;
 
         result = csl((LPWSTR)c_to, (LPWSTR)c_from, flags);
     }
