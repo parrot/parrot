@@ -16,9 +16,11 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'test_more.pir'
-    plan(84)
+    plan(86)
     test_setting_array_size()
     test_assign_from_another()
     test_assign_self()
@@ -49,6 +51,13 @@ out-of-bounds test. Checks INT and PMC keys.
     test_invalid_init_tt1509()
 .end
 
+.sub exists_out_of_bounds
+    .local pmc fpa
+    fpa = new ['FixedPMCArray']
+    fpa = 5
+    $I0 = exists fpa[5]
+.end
+
 .sub test_exists
     .local pmc fpa
     fpa = new ['FixedPMCArray']
@@ -64,6 +73,9 @@ out-of-bounds test. Checks INT and PMC keys.
     fpa[$P1] = 99
     $I0 = exists fpa[$P1]
     ok($I0,'FixedPMCArray element existence')
+
+    .const 'Sub' out_of_bounds = 'exists_out_of_bounds'
+    throws_type(out_of_bounds, .EXCEPTION_OUT_OF_BOUNDS, 'exists ouf of bounds')
 .end
 
 .sub test_sort
@@ -281,6 +293,9 @@ CODE
 
     is(fpa1,fpa2)
 
+    .local pmc nofpa
+    nofpa = new ['FixedStringArray']
+    isnt(fpa1, nofpa, 'Not equal to a different type')
 .end
 
 .sub test_elements
