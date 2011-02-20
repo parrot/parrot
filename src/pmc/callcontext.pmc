@@ -573,7 +573,6 @@ Mark any referenced strings and PMCs.
         Hash     *hash;
         PMC      *tmp;
         STRING   *short_sig;
-        Pcc_cell *positionals;
         UINTVAL  *n_regs_used;
 
         if (!PMC_data(SELF))
@@ -1052,6 +1051,9 @@ return current Namespace
     VTABLE void push_pmc(PMC *value) {
         Pcc_cell *cells;
         INTVAL    num_pos, allocated_positionals;
+
+        PARROT_ASSERT(!PObj_on_free_list_TEST(value)
+                || !"Push dead object into CallContext!");
 
         GET_ATTR_num_positionals(INTERP, SELF, num_pos);
         GET_ATTR_allocated_positionals(INTERP, SELF, allocated_positionals);

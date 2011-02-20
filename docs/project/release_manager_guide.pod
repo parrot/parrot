@@ -1,6 +1,6 @@
 # Copyright (C) 2007-2011, Parrot Foundation.
 
-=head1 Release Instructions
+=head1 Release Manager Guide
 
 To prepare a release:
 
@@ -433,7 +433,6 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
 Versions with a asterisk (*) are supported releases.
 
- - Feb 15, 2011 - 3.1   - mikehh
  - Mar 15, 2011 - 3.2   - gerd
  - Apr 19, 2011 - 3.3*  - whiteknight
  - May 17, 2011 - 3.4   - gerd

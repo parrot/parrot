@@ -339,7 +339,9 @@ Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
             "Could not load packfile");
     do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
+    Parrot_block_GC_mark(interp);
     *pbc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+    Parrot_unblock_GC_mark(interp);
     VTABLE_set_pointer(interp, *pbc, pf);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
@@ -368,12 +370,14 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
     PackFile * const pf = PackFile_new(interp, 0);
     PARROT_ASSERT(pf);
 
+    Parrot_block_GC_mark(interp);
     if (!PackFile_unpack(interp, pf, (const opcode_t *)pbc, bytecode_size))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
             "Could not unpack packfile");
     do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
     *pbcpmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, *pbcpmc, pf);
+    Parrot_unblock_GC_mark(interp);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
@@ -842,10 +846,22 @@ Parrot_api_toggle_gc(Parrot_PMC interp_pmc, Parrot_Int on)
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
+/*
+
+=item C<Parrot_Int Parrot_api_reset_call_signature(Parrot_PMC interp_pmc,
+Parrot_PMC ctx)>
+
+Reset the call signature
+
+=cut
+
+*/
+
 PARROT_API
 Parrot_Int
 Parrot_api_reset_call_signature(Parrot_PMC interp_pmc, Parrot_PMC ctx)
 {
+    ASSERT_ARGS(Parrot_api_reset_call_signature)
     EMBED_API_CALLIN(interp_pmc, interp)
     STRING * const callcontext = Parrot_str_new(interp, "CallContext", 0);
     if (!VTABLE_isa(interp, ctx, callcontext))

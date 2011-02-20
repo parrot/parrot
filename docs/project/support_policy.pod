@@ -108,14 +108,17 @@ very rare.
 =head2 Experimental Features
 
 From time to time, we may add features to get feedback on their utility and
-<<<<<<< HEAD
-design.  Marking them as "Experimental" in F<DEPRECATED.yaml> indicates that we
-=======
-design.  Marking them as "Experimental" in F<DEPRECATED.json> indicates that we
->>>>>>> leto/deprecations_as_data
+design.  Marking them as "Experimental" in F<api.yaml> indicates that we
 may modify or remove them without official deprecation notices.  Use them at
 your own risk--and please provide feedback through official channels if you use
 them successfully or otherwise.
+
+=head2 Changes Requiring Users to Add Code
+
+Internal changes to Parrot which require users to add code in order to continue
+functioning normally also fall under our support policy.  An example of this
+kind of change is the addition of the generational gc, which required a write
+barrier on VTABLE functions which modified the contents of a PMC.
 
 =head2 Supported Older Versions
 
@@ -206,6 +209,8 @@ backwards-incompatible change requires deprecation:
 
 =item * API changes in the compiler tools
 
+=item * changes to Parrot that require HLLs or libraries to add code
+
 =back
 
 Please note that these features I<do not> require deprecation notices:
@@ -219,11 +224,7 @@ of the public API (listed in docs/embed.pod)
 
 =item * Parrot internals hidden behind a public API
 
-<<<<<<< HEAD
-=item * Items otherwise eligible but marked as "experimental" in F<DEPRECATED.yaml>
-=======
-=item * Items otherwise eligible but marked as "experimental" in F<DEPRECATED.json>
->>>>>>> leto/deprecations_as_data
+=item * Items otherwise eligible but marked as "experimental" in F<api.yaml>
 
 =back
 

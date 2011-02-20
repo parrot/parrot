@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -55,6 +55,13 @@ static void pool_free(SHIM_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
+static int pool_is_maybe_owned(
+    ARGMOD(Pool_Allocator *pool),
+    ARGIN(void *ptr))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
+
 static int pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -74,6 +81,9 @@ static int pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
     , PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_pool_free __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool))
+#define ASSERT_ARGS_pool_is_maybe_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pool) \
+    , PARROT_ASSERT_ARG(ptr))
 #define ASSERT_ARGS_pool_is_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(ptr))
@@ -104,6 +114,11 @@ Allocate fixed size memory from Fixed_Allocator.
 *allocator, void *data, size_t size)>
 
 Free fixed size memory from Fixed_Allocator.
+
+=item C<size_t Parrot_gc_fixed_allocator_allocated_memory(PARROT_INTERP,
+Fixed_Allocator *allocator)>
+
+Calculate amount of memory allocated in Fixed_Allocator.
 
 =cut
 
@@ -197,6 +212,23 @@ Parrot_gc_fixed_allocator_free(PARROT_INTERP,
     pool_free(interp, allocator->pools[index], data);
 }
 
+PARROT_EXPORT
+size_t
+Parrot_gc_fixed_allocator_allocated_memory(PARROT_INTERP,
+        ARGIN(Fixed_Allocator *allocator))
+{
+    ASSERT_ARGS(Parrot_gc_fixed_allocator_allocated_memory)
+    size_t total = 0;
+    size_t i     = 0;
+
+    for (i = 0; i < allocator->num_pools; i++) {
+        if (allocator->pools[i])
+            total += Parrot_gc_pool_allocated_size(interp, allocator->pools[i]);
+    }
+
+    return total;
+}
+
 /*
 
 =back
@@ -225,7 +257,23 @@ Frees a fixed-size data item back to the Pool for later reallocation
 =item C<int Parrot_gc_pool_is_owned(PARROT_INTERP, Pool_Allocator *pool, void
 *ptr)>
 
-check for pool validity
+check that pointer is owned by pool.
+
+=item C<int Parrot_gc_pool_is_maybe_owned(PARROT_INTERP, Pool_Allocator *pool,
+void *ptr)>
+
+check that pointer is probably owned by pool.
+
+=item C<size_t Parrot_gc_pool_allocated_size(PARROT_INTERP, Pool_Allocator
+*pool)>
+
+Calculate size of memory allocated by pool.
+
+=item C<void* Parrot_gc_pool_low_ptr(PARROT_INTERP, Pool_Allocator *pool)>
+
+=item C<void* Parrot_gc_pool_high_ptr(PARROT_INTERP, Pool_Allocator *pool)>
+
+Get low/high boundaries of allocated memory.
 
 =back
 
@@ -301,6 +349,45 @@ Parrot_gc_pool_is_owned(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGMOD(void *
     return pool_is_owned(pool, ptr);
 }
 
+PARROT_EXPORT
+int
+Parrot_gc_pool_is_maybe_owned(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGMOD(void *ptr))
+{
+    ASSERT_ARGS(Parrot_gc_pool_is_maybe_owned)
+    return pool_is_maybe_owned(pool, ptr);
+}
+
+
+PARROT_EXPORT
+size_t
+Parrot_gc_pool_allocated_size(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
+{
+    ASSERT_ARGS(Parrot_gc_pool_allocated_size)
+    Pool_Allocator_Arena *arena = pool->top_arena;
+    int                   count = 0;
+    while (arena) {
+        count++;
+        arena = arena->next;
+    }
+
+    return count * arena_size(pool);
+}
+
+PARROT_CAN_RETURN_NULL
+void*
+Parrot_gc_pool_low_ptr(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
+{
+    ASSERT_ARGS(Parrot_gc_pool_low_ptr)
+    return pool->lo_arena_ptr;
+}
+
+PARROT_CAN_RETURN_NULL
+void*
+Parrot_gc_pool_high_ptr(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
+{
+    ASSERT_ARGS(Parrot_gc_pool_high_ptr)
+    return pool->hi_arena_ptr;
+}
 
 /*
 
@@ -317,6 +404,8 @@ Parrot_gc_pool_is_owned(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGMOD(void *
 =item C<static void pool_free(PARROT_INTERP, Pool_Allocator *pool, void *data)>
 
 =item C<static int pool_is_owned(Pool_Allocator *pool, void *ptr)>
+
+=item C<static int pool_is_maybe_owned(Pool_Allocator *pool, void *ptr)>
 
 Static implementation of public methods.
 
@@ -384,6 +473,19 @@ pool_free(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGFREE(void *data))
     ++pool->num_free_objects;
 }
 
+static int
+pool_is_maybe_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
+{
+    ASSERT_ARGS(pool_is_maybe_owned)
+    Pool_Allocator_Arena *arena = pool->top_arena;
+    size_t                a_size;
+
+    /* Poiners are aligned */
+    if (PTR2UINTVAL(ptr) & 3)
+        return 0;
+
+    return (ptr >= pool->lo_arena_ptr && ptr < pool->hi_arena_ptr);
+}
 
 static int
 pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))

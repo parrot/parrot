@@ -28,6 +28,7 @@ These are the vtable functions for the Capture PMC.
             PObj_custom_mark_SET(obj); \
             (arr) = Parrot_pmc_new((i), enum_class_ResizablePMCArray); \
             SETATTR_Capture_array((i), (obj), (arr)); \
+            PARROT_GC_WRITE_BARRIER((i), (obj));  \
         } \
     } while (0)
 #define CAPTURE_hash_CREATE(i, obj, hsh) \
@@ -37,6 +38,7 @@ These are the vtable functions for the Capture PMC.
             PObj_custom_mark_SET(obj); \
             (hsh) = Parrot_pmc_new((i), enum_class_Hash); \
             SETATTR_Capture_hash((i), (obj), (hsh)); \
+            PARROT_GC_WRITE_BARRIER((i), (obj)); \
         } \
     } while (0)
 
@@ -765,14 +767,12 @@ Mark the array.
 */
 
     VTABLE void mark() {
-        if (PMC_data(SELF)) {
-            PMC *array, *hash;
-            GET_ATTR_array(INTERP, SELF, array);
-            GET_ATTR_hash(INTERP, SELF, hash);
+        PMC *array, *hash;
+        GET_ATTR_array(INTERP, SELF, array);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
-            Parrot_gc_mark_PMC_alive(INTERP, array);
-            Parrot_gc_mark_PMC_alive(INTERP, hash);
-        }
+        Parrot_gc_mark_PMC_alive(INTERP, array);
+        Parrot_gc_mark_PMC_alive(INTERP, hash);
     }
 
 /*

@@ -18,7 +18,6 @@ our @shared_valid_options = qw{
     ccwarn
     configure_trace
     coveragedir
-    cxx
     darwin_no_fink
     darwin_no_macports
     datadir
@@ -29,6 +28,7 @@ our @shared_valid_options = qw{
     fatal
     fatal-step
     floatval
+    gc
     help
     hintsfile
     icu-config

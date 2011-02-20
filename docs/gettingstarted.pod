@@ -158,7 +158,7 @@ L<http://lists.parrot.org/pipermail/parrot-dev/>
 
 =back
 
-In addition, there is a mailing list which logs all commits to the Parrot SVN
+In addition, there is a mailing list which logs all commits to the Parrot Git
 repository. If you're interested in Parrot development, you might find it very
 helpful to subscribe and keep up on changes that people are making.
 

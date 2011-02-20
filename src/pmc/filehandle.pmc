@@ -483,7 +483,7 @@ filehandle when finished.
             PARROT_ASSERT(filehandle->vtable->base_type == enum_class_FileHandle);
 
             SET_ATTR_encoding(INTERP, filehandle, encoding);
-            size = (size_t)(Parrot_stat_info_intval(INTERP, name, STAT_FILESIZE));
+            size = (size_t)(Parrot_file_stat_intval(INTERP, name, STAT_FILESIZE));
 
             result = Parrot_io_reads(INTERP, filehandle, size);
             Parrot_io_close_handle(INTERP, filehandle);

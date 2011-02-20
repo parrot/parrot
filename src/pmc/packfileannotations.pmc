@@ -269,8 +269,6 @@ Create PackFile_Annotations* from self.
                 PackFile_Annotations);
         INTVAL                i, num;
         PMC                  *keys;             /* Temporary representation of Keys */
-        PMC                  *names;            /* Constants for Key's names */
-        PMC                  *types;            /* Types of Keys */
         INTVAL                last_key_id;
         INTVAL                name_id;
         INTVAL                value_id;
@@ -295,8 +293,6 @@ Create PackFile_Annotations* from self.
             ]
         */
         keys        = Parrot_pmc_new(INTERP, enum_class_Hash);
-        names       = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
-        types       = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
         last_key_id = -1;
 
         /* Iterate over stored annotations and create Key if required. */

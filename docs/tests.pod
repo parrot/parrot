@@ -183,7 +183,7 @@ tests are intended to be run after someone has made changes in modules such as
 F<lib/Parrot/Pmc2cUtils/>.  They're set up to be run after F<Configure.pl> has
 completed but before make has been invoked.  (In fact, they will generate
 errors if make has completed.)  You can run them with any of the following:
- 
+
      perl Configure.pl --test
      perl Configure.pl --test=build
      make buildtools_tests  (following Configure.pl)

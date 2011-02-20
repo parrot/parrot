@@ -91,7 +91,7 @@ C_LIBS           = @libs@
 CC_SHARED        = @cc_shared@
 CC_O_OUT         = @cc_o_out@
 CC_WARN          = @ccwarn@
-CFLAGS           = $(CC_INC) @ccflags@ @cc_build_call_frames@ @cc_debug@ @gc_flag@ @clock_best@ $(CC_SHARED)
+CFLAGS           = $(CC_INC) @ccflags@ @cc_build_call_frames@ @cc_debug@ @clock_best@ $(CC_SHARED)
 LINK_DYNAMIC     = @link_dynamic@
 LINK             = @link@
 LINKFLAGS        = @linkflags@ @link_debug@ @ld_debug@
@@ -398,7 +398,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/multidispatch.h \
 	$(INC_DIR)/library.h \
 	$(INC_DIR)/namespace.h \
-	$(INC_DIR)/stat.h \
 	$(INC_DIR)/hll.h \
 	$(INC_DIR)/pbcversion.h \
 	$(INC_DIR)/pobj.h \
@@ -453,10 +452,12 @@ INTERP_O_FILES = \
     src/extend$(O) \
     src/extend_vtable$(O) \
     src/gc/alloc_memory$(O) \
+    src/gc/alloc_resources$(O) \
     src/gc/api$(O) \
     src/gc/gc_ms$(O) \
     src/gc/gc_inf$(O) \
     src/gc/gc_ms2$(O) \
+    src/gc/gc_gms$(O) \
     src/gc/mark_sweep$(O) \
     src/gc/system$(O) \
     src/gc/fixed_allocator$(O) \
@@ -506,7 +507,6 @@ INTERP_O_FILES = \
     src/longopt$(O) \
     @TEMP_platform_o@ \
     @TEMP_atomic_o@ \
-    @TEMP_gc_o@ \
 
 OPS_FILES = @ops@
 
@@ -622,6 +622,7 @@ all : \
     $(PGE_LIB_PBCS) \
     $(PCT_LIB_PBCS) \
     $(DATA_JSON_LIB_PBCS) \
+    $(JSON_LANG) \
     $(NQP_LIB_PBCS) \
 #IF(has_dynamic_linking): $(DYNOPLIBS_TARGETS) \
 #IF(has_dynamic_linking): $(LIBNCI_TEST_SO) \
@@ -756,7 +757,6 @@ help :
 	@echo ""
 	@echo "Documentation:"
 	@echo "  help:              Print this help message."
-	@echo "  docs:              Generate documentation from POD in the sources."
 	@echo "  html:              Generate HTML documentation from POD in the sources."
 	@echo "  html-clean:        Remove the HTML documentation."
 	@echo "  htmlhelp:          Compile HTML documentation (CHM format)."
@@ -1234,8 +1234,8 @@ runtime/parrot/include/dlopenflags.pasm : $(INC_DIR)/platform_interface.h $(H2IN
 runtime/parrot/include/datatypes.pasm : $(INC_DIR)/datatypes.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/datatypes.h $@
 
-runtime/parrot/include/stat.pasm : $(INC_DIR)/stat.h $(H2INC)
-	$(PERL) $(H2INC) $(INC_DIR)/stat.h $@
+runtime/parrot/include/stat.pasm : $(INC_DIR)/platform_interface.h $(H2INC)
+	$(PERL) $(H2INC) $(INC_DIR)/platform_interface.h $@
 
 runtime/parrot/include/stringinfo.pasm : $(INC_DIR)/string.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/string.h $@
@@ -1382,6 +1382,16 @@ src/gc/fixed_allocator$(O) : \
     src/gc/variable_size_pool.h \
     src/gc/fixed_allocator.h \
     src/gc/fixed_allocator.c
+
+src/gc/gc_gms$(O) : \
+	$(PARROT_H_HEADERS) \
+	src/gc/gc_gms.c \
+    $(INC_DIR)/pointer_array.h \
+	src/gc/gc_private.h \
+	src/gc/fixed_allocator.h \
+	src/gc/variable_size_pool.h
+
+src/gc/api$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/api.c
 
 src/gc/variable_size_pool$(O) : $(PARROT_H_HEADERS) \
 	src/gc/variable_size_pool.h src/gc/variable_size_pool.c
@@ -1630,6 +1640,8 @@ src/platform/generic/error$(O) : src/platform/generic/error.c $(PARROT_H_HEADERS
 
 src/platform/generic/exec$(O) : src/platform/generic/exec.c $(PARROT_H_HEADERS)
 
+src/platform/generic/file$(O) : src/platform/generic/file.c $(PARROT_H_HEADERS)
+
 src/platform/generic/hires_timer$(O) : src/platform/generic/hires_timer.c $(PARROT_H_HEADERS)
 
 src/platform/generic/itimer$(O) : src/platform/generic/itimer.c $(PARROT_H_HEADERS)
@@ -1643,8 +1655,6 @@ src/platform/generic/misc$(O) : src/platform/generic/misc.c $(PARROT_H_HEADERS)
 
 src/platform/generic/socket$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_socket.h \
     src/io/io_private.h include/pmc/pmc_sockaddr.h src/platform/generic/socket.c
-
-src/platform/generic/stat$(O) : src/platform/generic/stat.c $(PARROT_H_HEADERS)
 
 src/platform/generic/sysmem$(O) : src/platform/generic/sysmem.c $(PARROT_H_HEADERS)
 
@@ -1669,6 +1679,8 @@ src/platform/win32/env$(O) : src/platform/win32/env.c $(PARROT_H_HEADERS)
 src/platform/win32/error$(O) : src/platform/win32/error.c $(PARROT_H_HEADERS)
 
 src/platform/win32/exec$(O) : src/platform/win32/exec.c $(PARROT_H_HEADERS)
+
+src/platform/win32/file$(O) : src/platform/win32/file.c $(PARROT_H_HEADERS)
 
 src/platform/win32/hires_timer$(O) : src/platform/win32/hires_timer.c $(PARROT_H_HEADERS)
 
@@ -1897,7 +1909,6 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
     include/pmc/pmc_parrotlibrary.h \
     src/io/io_private.h
 
-@TEMP_gc_c@
 
 @TEMP_pmc_build@
 
@@ -1912,18 +1923,6 @@ $(INC_DIR)/vtable.h : src/vtable.tbl $(BUILD_TOOLS_DIR)/vtable_h.pl lib/Parrot/V
 # Documentation targets:
 #
 ###############################################################################
-
-#IF(has_perldoc):docs : docs.dummy
-#ELSE:docs : docs.stub
-
-docs.stub:
-	@echo "Perldoc is required, but not detected."
-
-docs.dummy :
-	$(MAKE) docs
-
-docs-clean :
-	$(MAKE) docs clean
 
 #IF(has_perldoc):html : html.dummy
 #ELSE:html : html.stub
@@ -2228,7 +2227,6 @@ clean : \
     test-clean \
     prog-clean \
     dynext-clean \
-#IF(has_perldoc):    docs-clean \
 #IF(has_perldoc):    html-clean \
     examples-clean \
     ext-clean \

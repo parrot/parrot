@@ -1,5 +1,5 @@
 /* pobj.h
- *  Copyright (C) 2001-2005, Parrot Foundation.
+ *  Copyright (C) 2001-2011, Parrot Foundation.
  *  Overview:
  *     Parrot Object data members and flags enum
  *  Data Structure and Algorithms:
@@ -145,43 +145,52 @@ typedef enum PObj_enum {
     PObj_constant_FLAG          = POBJ_FLAG(12),
     /* Marks the contents as coming from a non-Parrot source */
     PObj_external_FLAG          = POBJ_FLAG(13),
-    /* the Buffer is aligned to BUFFER_ALIGNMENT boundaries */
-    PObj_aligned_FLAG           = POBJ_FLAG(14),
     /* Mark the buffer as pointing to system memory */
-    PObj_sysmem_FLAG            = POBJ_FLAG(15),
+    PObj_sysmem_FLAG            = POBJ_FLAG(14),
 
 /* PObj usage FLAGs, COW & GC */
-    /* Used during tri-color mark&sweep */
-    PObj_grey_FLAG              = POBJ_FLAG(16),
-
     /* The Buffer allows COW copies, and may have some. */
-    PObj_is_COWable_FLAG        = POBJ_FLAG(17),
+    PObj_is_COWable_FLAG        = POBJ_FLAG(15),
     /* Private flag for the GC system. Set if the PObj's in use as
      * far as the GC's concerned */
-    b_PObj_live_FLAG            = POBJ_FLAG(18),
+    b_PObj_live_FLAG            = POBJ_FLAG(16),
     /* Mark the object as on the free list */
-    b_PObj_on_free_list_FLAG    = POBJ_FLAG(19),
+    b_PObj_on_free_list_FLAG    = POBJ_FLAG(17),
 
 /* GC FLAGS */
     /* Set to true if the PObj has a custom mark routine */
-    PObj_custom_mark_FLAG       = POBJ_FLAG(20),
-    /* Mark the buffer as needing GC */
-    PObj_custom_GC_FLAG         = POBJ_FLAG(21),
+    PObj_custom_mark_FLAG       = POBJ_FLAG(18),
     /* Set if the PObj has a destroy method that must be called */
-    PObj_custom_destroy_FLAG    = POBJ_FLAG(22),
+    PObj_custom_destroy_FLAG    = POBJ_FLAG(19),
     /* For debugging, report when this buffer gets moved around */
-    PObj_report_FLAG            = POBJ_FLAG(23),
+    PObj_report_FLAG            = POBJ_FLAG(20),
+
+    /* Flags used by generation GC to determine generation object belong */
+    PObj_GC_generation_0_FLAG   = POBJ_FLAG(22),
+    PObj_GC_generation_1_FLAG   = POBJ_FLAG(23),
+    PObj_GC_generation_2_FLAG   = POBJ_FLAG(24),
+
+    /* Object was marked dirty by write barrier */
+    PObj_GC_on_dirty_list_FLAG  = POBJ_FLAG(25),
 
     /* Object requires write barrier */
     PObj_GC_need_write_barrier_FLAG = POBJ_FLAG(26),
 
+    /* For simplify some cleanup/setup */
+    PObj_GC_all_generation_FLAGS = PObj_GC_generation_0_FLAG
+                                 | PObj_GC_generation_1_FLAG
+                                 | PObj_GC_generation_2_FLAG,
+
+    PObj_GC_all_FLAGS            = PObj_GC_all_generation_FLAGS
+                                 | PObj_GC_on_dirty_list_FLAG
+                                 | PObj_GC_need_write_barrier_FLAG,
+
 /* PMC specific FLAGs */
     /* call object finalizer */
-    PObj_need_finalize_FLAG     = POBJ_FLAG(25),
+    PObj_need_finalize_FLAG     = POBJ_FLAG(27),
 
     /* true if this is connected by some route to a needs_early_gc object */
-    PObj_high_priority_gc_FLAG  = POBJ_FLAG(27),
-    PObj_needs_early_gc_FLAG    = (POBJ_FLAG(27) | POBJ_FLAG(28)),
+    PObj_needs_early_gc_FLAG    = POBJ_FLAG(28),
 
     /* True if the PMC is a class */
     PObj_is_class_FLAG          = POBJ_FLAG(29),
@@ -217,9 +226,6 @@ typedef enum PObj_enum {
 #define PObj_is_COWable_TEST(o) PObj_flag_TEST(is_COWable, o)
 #define PObj_is_COWable_SET(o) PObj_flag_SET(is_COWable, o)
 
-#define PObj_aligned_TEST(o) PObj_flag_TEST(aligned, o)
-#define PObj_aligned_SET(o) PObj_flag_SET(aligned, o)
-
 #define PObj_constant_TEST(o) PObj_flag_TEST(constant, o)
 #define PObj_constant_SET(o) PObj_flag_SET(constant, o)
 #define PObj_constant_CLEAR(o) PObj_flag_CLEAR(constant, o)
@@ -231,10 +237,6 @@ typedef enum PObj_enum {
 #define PObj_report_TEST(o) PObj_flag_TEST(report, o)
 #define PObj_report_SET(o) PObj_flag_SET(report, o)
 #define PObj_report_CLEAR(o) PObj_flag_CLEAR(report, o)
-
-#define PObj_grey_TEST(o) gc_flag_TEST(grey, o)
-#define PObj_grey_SET(o) gc_flag_SET(grey, o)
-#define PObj_grey_CLEAR(o) gc_flag_CLEAR(grey, o)
 
 #define PObj_on_free_list_TEST(o) gc_flag_TEST(on_free_list, o)
 #define PObj_on_free_list_SET(o) gc_flag_SET(on_free_list, o)
@@ -290,6 +292,10 @@ typedef enum PObj_enum {
 #define PObj_is_shared_TEST(o) PObj_flag_TEST(is_shared, o)
 #define PObj_is_shared_SET(o)  PObj_flag_SET(is_shared, o)
 #define PObj_is_shared_CLEAR(o) PObj_flag_CLEAR(is_shared, o)
+
+#define PObj_GC_on_dirty_list_TEST(o)  PObj_flag_TEST(GC_on_dirty_list, o)
+#define PObj_GC_on_dirty_list_SET(o)   PObj_flag_SET(GC_on_dirty_list, o)
+#define PObj_GC_on_dirty_list_CLEAR(o) PObj_flag_CLEAR(GC_on_dirty_list, o)
 
 #define PObj_GC_need_write_barrier_TEST(o)  PObj_flag_TEST(GC_need_write_barrier, o)
 #define PObj_GC_need_write_barrier_SET(o)   PObj_flag_SET(GC_need_write_barrier, o)

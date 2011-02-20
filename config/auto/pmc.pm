@@ -426,7 +426,6 @@ include/parrot/vtables.h
 include/parrot/has_header.h
 include/parrot/warnings.h
 include/parrot/op.h
-include/parrot/stat.h
 include/parrot/debugger.h
 include/parrot/caches.h
 include/parrot/config.h

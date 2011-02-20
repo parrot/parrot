@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 3;
+plan tests => 4;
 
 =head1 NAME
 
@@ -128,6 +128,26 @@ int main(int argc, const char **argv)
     else fail("snprintf len mismatch");
     */
     printf("THE FAILZ");
+    return 0;
+}
+CODE
+Done
+OUTPUT
+
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "PARROT_GC_WRITE_BARRIER macro" );
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/parrot.h"
+
+int main(int argc, const char **argv)
+{
+    PMC pmc;
+    pmc.flags = 0;
+    /* It should compile */
+    PARROT_GC_WRITE_BARRIER(NULL, &pmc);
+    printf("Done\n");
     return 0;
 }
 CODE
