@@ -139,6 +139,11 @@ any rational reason, until the spec is more stable.
 
 =item * cmp - numeric comparison
 
+=item * alloc - allocate memory
+
+=item * mark_unused - tell the GC that this previously allocated memory is now unused
+
+
 =back
 
 These are too magical and can be written in terms of simpler ops:
