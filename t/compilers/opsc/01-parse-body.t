@@ -145,6 +145,13 @@ inline op noop(out PMC, in INT) {
 }», "Space between function call");
 
 
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    $1 = foo() ? bar() : baz ();
+}», "Ternary op");
+
+
+
 # Final big test?
 parse_ok($c, q«
 inline op copy(inout PMC, invar PMC) :base_mem {

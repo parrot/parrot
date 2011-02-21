@@ -194,6 +194,14 @@ token infix:sym<&>    { <sym>  <O('%tight_and')> }
 token infix:sym<^>    { <sym>  <O('%tight_and')> }   # XXX Check precedence
 token infix:sym<|>    { <sym>  <O('%tight_or')> }
 
+token infix:sym<?:> {
+    '?'
+    <.ws>
+    <EXPR('i=')>
+    ':'
+    <O('%conditional, :reducecheck<ternary>')>
+}
+
 token postcircumfix:sym<( )> {
     '(' <.ws> <arglist> ')'
     <O('%methodop')>
