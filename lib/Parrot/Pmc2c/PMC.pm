@@ -352,6 +352,13 @@ sub vtable_method_does_write {
     return $self->vtable->attrs($methodname)->{write};
 }
 
+sub vtable_method_has_manual_wb {
+    my ( $self, $methodname ) = @_;
+
+    my $attrs = $self->method_attrs($methodname);
+    return $self->vtable->attrs($methodname)->{manual_wb};
+}
+
 sub vtable_method_does_multi {
     my ( $self, $methodname ) = @_;
 
@@ -707,6 +714,55 @@ sub pre_method_gen {
     1;
 }
 
+=item C<post_method_gen>
+
+Generate write barriers.
+
+=cut
+
+sub post_method_gen {
+    my ($self) = @_;
+
+    # vtables
+    foreach my $method ( @{ $self->vtable->methods } ) {
+        my $name = $method->name;
+        next if $name eq 'class_init';
+        next unless $self->implements_vtable($name);
+        # Skip non-updating methods
+        next unless $self->vtable_method_does_write($name);
+
+        # Skip methods with manual WBs.
+        next if $self->vtable_method_has_manual_wb($name);
+
+        $method = $self->get_method($name);
+
+        #warn "Rewriting " . $self->name . "." . $name;
+        $self->add_method(
+            $method->clone({
+                name => $name.'_orig',
+                type => "ORIG",
+            })
+        );
+
+        # Rewrite body with write barrier.
+        my $body;
+        my $need_result = $method->return_type && $method->return_type !~ 'void';
+
+        $body .= $method->return_type . " result;\nresult = " if $need_result;
+
+        # Get parameters.      strip type from param
+        my $parameters = join ', ',
+                         'INTERP', 'SELF', map { /\s*\*?(\S+)$/; $1 }
+                         split (/,/, $method->parameters);
+        $body .= $method->full_method_name($self->name) . "_orig($parameters);\n";
+
+        $body .= "PARROT_GC_WRITE_BARRIER(interp, _self);\n";
+        $body .= "return result;" if $need_result;
+
+        $method->body(Parrot::Pmc2c::Emitter->text($body) );
+    }
+
+}
 =item C<gen_methods()>
 
 Returns the C code for the pmc methods.
@@ -1577,6 +1633,8 @@ sub gen_defaul_case_wrapping {
         die "Can't handle signature $ssig!";
     }
 }
+
+
 1;
 
 # Local Variables:

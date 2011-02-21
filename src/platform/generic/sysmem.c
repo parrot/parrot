@@ -25,6 +25,9 @@ Get system memory information.
 #include <stdio.h>
 #include <unistd.h>
 
+#if defined(PARROT_HAS_HEADER_SYSPARAM)
+#  include <sys/param.h>
+#endif
 #if defined(PARROT_HAS_HEADER_SYSSYSCTL)
 #  include <sys/sysctl.h>
 #endif

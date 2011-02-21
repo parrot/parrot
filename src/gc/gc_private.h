@@ -152,7 +152,7 @@ typedef struct GC_Subsystem {
 
     int  (*is_pmc_ptr)(PARROT_INTERP, void*);
     int  (*is_string_ptr)(PARROT_INTERP, void*);
-    void (*mark_pobj_header)(PARROT_INTERP, PObj*);
+    void (*mark_str_header)(PARROT_INTERP, STRING *);
     void (*mark_pmc_header)(PARROT_INTERP, PMC *);
 
     void* (*allocate_pmc_attributes)(PARROT_INTERP, PMC *);
@@ -185,6 +185,12 @@ typedef struct GC_Subsystem {
     /* Introspection. Each GC must provide this function. Even with fake data */
     /* Return by value to simplify memory management */
     size_t (*get_gc_info)(PARROT_INTERP, Interpinfo_enum);
+
+    /* Get boundaries of allocated memory. Used during scanning of C stack */
+    void* (*get_low_str_ptr)(PARROT_INTERP);
+    void* (*get_high_str_ptr)(PARROT_INTERP);
+    void* (*get_low_pmc_ptr)(PARROT_INTERP);
+    void* (*get_high_pmc_ptr)(PARROT_INTERP);
 
     /* Iterate over _live_ strings. Used for string pool compacting */
     void (*iterate_live_strings)(PARROT_INTERP, string_iterator_callback callback, void *data);
@@ -660,6 +666,31 @@ void Parrot_gc_ms2_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     , PARROT_ASSERT_ARG(args))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/gc_ms2.c */
+
+/* HEADERIZER BEGIN: src/gc/gc_gms.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+void gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+int pobj2gen(ARGIN(PObj *pmc))
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_gc_gms_print_stats_always __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(header))
+#define ASSERT_ARGS_Parrot_gc_gms_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(args))
+#define ASSERT_ARGS_pobj2gen __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pmc))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/gc/gc_gms.c */
 
 /* HEADERIZER BEGIN: src/gc/string_gc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

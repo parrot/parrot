@@ -134,6 +134,8 @@ Get count of allocated objects.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 size_t
 Parrot_pa_count_allocated(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 {
@@ -150,6 +152,7 @@ Get count of allocated objects.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
 size_t
 Parrot_pa_count_used(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 {

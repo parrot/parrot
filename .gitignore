@@ -252,6 +252,7 @@
 /runtime/parrot/include/*.fpmc
 /runtime/parrot/include/*.pasm
 /runtime/parrot/include/*.pbc
+/runtime/parrot/languages/JSON/JSON.pir
 /runtime/parrot/languages/data_json
 /runtime/parrot/library/*.pbc
 /runtime/parrot/library/OpenGL_funcs.pir
@@ -439,6 +440,7 @@
 /t/perl/Parrot_Test_1.pir
 /t/perl/*.gcda
 /t/perl/*.gcno
+/t/pir/pbc_fallback_1.pir
 /t/pmc/*.out
 /t/pmc/*.pasm
 /t/pmc/*.pbc

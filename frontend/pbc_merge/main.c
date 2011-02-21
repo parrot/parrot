@@ -234,14 +234,14 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
     /* Check the file exists. */
     STRING * const fs = Parrot_str_new_init(interp, fullname,
             strlen(fullname), Parrot_default_encoding_ptr, 0);
-    if (!Parrot_stat_info_intval(interp, fs, STAT_EXISTS)) {
+    if (!Parrot_file_stat_intval(interp, fs, STAT_EXISTS)) {
         Parrot_io_eprintf(interp, "PBC Merge: Can't stat %s, code %i.\n",
                 fullname, errno);
         Parrot_x_exit(interp, 1);
     }
 
     /* Get program size. */
-    program_size = Parrot_stat_info_intval(interp, fs, STAT_FILESIZE);
+    program_size = Parrot_file_stat_intval(interp, fs, STAT_FILESIZE);
 
     /* Attempt to open file and handle any errors. */
     io = fopen(fullname, "rb");

@@ -44,11 +44,7 @@ items currently are:
 =cut
 
 op stat(out INT, in STR, in INT) {
-    $1 = Parrot_stat_info_intval(interp, $2, $3);
-}
-
-op stat(out INT, in INT, in INT) {
-    $1 = Parrot_fstat_info_intval(interp, $2, $3);
+    $1 = Parrot_file_stat_intval(interp, $2, $3);
 }
 
 ##########################################
