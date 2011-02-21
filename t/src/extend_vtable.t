@@ -166,7 +166,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_hashvalue");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
 
     integer = Parrot_PMC_hashvalue(interp, pmc);
-    if (integer > 0)
+    if (integer != 0)
         Parrot_printf(interp,"Got hash!\n", integer);
 CODE
 Got hash!
