@@ -148,17 +148,21 @@ rule statement_list {
     [ <statement> <.eat_terminator> ]*
 }
 
-
-proto rule statement { <...> }
-
-rule statement:sym<call> {
-    <identifier> <arguments>?
+token statement {
+    <EXPR> <.ws>
 }
 
+token term:sym<name> { <identifier> }
 
-rule arguments {
-    '(' [ <EXPR> ** ',' ]? ')'
+token postcircumfix:sym<( )> {
+    '(' <.ws> <EXPR>? ')'
+    <O('%methodop')>
 }
+token postcircumfix:sym<[ ]> {
+    '[' <.ws> <EXPR>? ']'
+    <O('%methodop')>
+}
+
 
 rule blockoid {
     '{'
@@ -197,6 +201,12 @@ token ws {
   | ^^ '=' .*? \n '=cut'
   | '/*' .*? '*/'
   ]*
+}
+
+INIT {
+    Ops::Compiler::Grammar.O(':prec<y=>, :assoc<unary>', '%methodop');
+    Ops::Compiler::Grammar.O(':prec<p=>, :assoc<left>',  '%multiplicative');
+    Ops::Compiler::Grammar.O(':prec<o=>, :assoc<left>',  '%additive');
 }
 
 
