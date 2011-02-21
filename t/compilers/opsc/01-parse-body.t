@@ -62,6 +62,8 @@ inline op noop(in PMC) {
     foo = bar;
 }|, "Simple assignment");
 
+# "Macro"
+
 parse_ok($c, q|
 inline op noop(in PMC) {
     foo($1);
@@ -71,6 +73,19 @@ parse_ok($c, q|
 inline op noop(out PMC, in INT) {
     $1 = foo($2);
 }|, "Simple register assignment");
+
+parse_ok($c, q|
+inline op noop(out PMC, in INT) {
+    opcode_t * next = expr NEXT();
+}|, "expr NEXT");
+
+parse_ok($c, q|
+inline op noop(out PMC, in INT) {
+    opcode_t * dest;
+    goto ADDRESS(dest);
+}|, "goto ADDRESS");
+
+
 
 # Casting
 
@@ -109,6 +124,7 @@ inline op noop(out PMC, in INT) {
         $1 = baz();
     }
 }|, "Simple 'if-else'");
+
 
 parse_ok($c, q«
 inline op noop(out PMC, in INT) {
