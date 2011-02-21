@@ -106,6 +106,10 @@ inline op noop(out PMC, in INT) {
     }
 }|, "Simple 'if-else'");
 
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    $1 = $2 & 1 | 2 ^ 3;
+}», "Binary ops");
 
 
 done_testing();
