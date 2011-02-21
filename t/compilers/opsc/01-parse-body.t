@@ -24,7 +24,14 @@ inline op noop() {
     foo();
 }
 |);
-    ok(1, "Single call op parsed");
+    ok(1, "Simple call op parsed");
+
+    _parse($c, q|
+inline op noop() {
+    foo(42);
+}
+|);
+    ok(1, "Complex call op parsed");
 
     _parse($c, q|
 inline op noop() {
