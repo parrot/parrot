@@ -194,6 +194,10 @@ token infix:sym<&>    { <sym>  <O('%tight_and')> }
 token infix:sym<^>    { <sym>  <O('%tight_and')> }   # XXX Check precedence
 token infix:sym<|>    { <sym>  <O('%tight_or')> }
 
+token infix:sym<&&>   { <sym>  <O('%tight_and')> }
+token infix:sym<||>   { <sym>  <O('%tight_or')> }
+
+
 token infix:sym<?:> {
     '?'
     <.ws>
