@@ -69,22 +69,22 @@ C<init> with a value from an existing pointer-ish PMC.
 */
 
     VTABLE void init() {
-	if (PTR_FAT_TEST(INTERP, SELF) && !PMC_data(SELF)) {
-	    PMC_data(SELF) = (void *)mem_gc_allocate_zeroed_typed(INTERP, Parrot_Ptr_attributes);
-	    PObj_custom_destroy_SET(SELF);
-	}
+        if (PTR_FAT_TEST(INTERP, SELF) && !PMC_data(SELF)) {
+            PMC_data(SELF) = (void *)mem_gc_allocate_zeroed_typed(INTERP, Parrot_Ptr_attributes);
+            PObj_custom_destroy_SET(SELF);
+        }
     }
 
     VTABLE void init_int(INTVAL i) {
-	void *ptr = (void *)i;
-	SELF.init();
-	STATICSELF.set_pointer(ptr);
+        void *ptr = (void *)i;
+        SELF.init();
+        STATICSELF.set_pointer(ptr);
     }
 
     VTABLE void init_pmc(PMC *p) {
-	void *ptr = VTABLE_get_pointer(INTERP, p);
-	SELF.init();
-	STATICSELF.set_pointer(ptr);
+        void *ptr = VTABLE_get_pointer(INTERP, p);
+        SELF.init();
+        STATICSELF.set_pointer(ptr);
     }
 
 /*
@@ -100,19 +100,19 @@ Get and set the pointer value.
 */
 
     VTABLE void *get_pointer() {
-	void *ptr;
-	if (PTR_FAT_TEST(INTERP, SELF))
-	    GET_ATTR_ptr(INTERP, SELF, ptr);
-	else
-	    ptr = PMC_data(SELF);
-	return ptr;
+        void *ptr;
+        if (PTR_FAT_TEST(INTERP, SELF))
+            GET_ATTR_ptr(INTERP, SELF, ptr);
+        else
+            ptr = PMC_data(SELF);
+        return ptr;
     }
 
     VTABLE void set_pointer(void *ptr) {
-	if (PTR_FAT_TEST(INTERP, SELF))
-	    SET_ATTR_ptr(INTERP, SELF, ptr);
-	else
-	    PMC_data(SELF) = ptr;
+        if (PTR_FAT_TEST(INTERP, SELF))
+            SET_ATTR_ptr(INTERP, SELF, ptr);
+        else
+            PMC_data(SELF) = ptr;
     }
 
 /*
@@ -126,7 +126,7 @@ Boolean value of the pointer. Non-C<NULL> is true, following in the C tradition.
 */
 
     VTABLE INTVAL get_bool() {
-	return STATICSELF.get_pointer() != NULL;
+        return STATICSELF.get_pointer() != NULL;
     }
 
 /*
@@ -140,8 +140,8 @@ Manage attribute deallocation for C<fat> representation.
 */
 
     VTABLE void destroy() {
-	if (PTR_FAT_TEST(INTERP, SELF) && PMC_data(SELF))
-	    mem_gc_free(INTERP, PMC_data(SELF));
+        if (PTR_FAT_TEST(INTERP, SELF) && PMC_data(SELF))
+            mem_gc_free(INTERP, PMC_data(SELF));
     }
 }
 

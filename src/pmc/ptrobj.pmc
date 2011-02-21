@@ -29,17 +29,17 @@ typedef void (*ptrobj_destroy_func_t)(PARROT_INTERP, PMC *, void *);
 #define PTROBJ_SET_MARK(i, p, m) do { \
     SETATTR_PtrObj_mark((i), (p), (m)); \
     if (m) \
-	PObj_custom_mark_SET(p); \
+        PObj_custom_mark_SET(p); \
     else \
-	PObj_custom_mark_CLEAR(p); \
+        PObj_custom_mark_CLEAR(p); \
 } while (0)
 
 #define PTROBJ_SET_DESTROY(i, p, d) do { \
     SETATTR_PtrObj_destroy((i), (p), (d)); \
     if (d) \
-	PObj_custom_destroy_SET(p); \
+        PObj_custom_destroy_SET(p); \
     else \
-	PObj_custom_destroy_CLEAR(p); \
+        PObj_custom_destroy_CLEAR(p); \
 } while (0)
 END_PMC_HEADER_PREAMBLE
 
@@ -64,14 +64,14 @@ Get or set the custom C<clone> function.
 
 
     VTABLE PMC *clone() {
-	void                *ptr;
-	ptrobj_clone_func_t  clone;
-	GET_ATTR_ptr(INTERP, SELF, ptr);
-	GET_ATTR_clone(INTERP, SELF, clone);
-	if (clone)
-	    return clone(INTERP, SELF, ptr);
-	else
-	    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+        void                *ptr;
+        ptrobj_clone_func_t  clone;
+        GET_ATTR_ptr(INTERP, SELF, ptr);
+        GET_ATTR_clone(INTERP, SELF, clone);
+        if (clone)
+            return clone(INTERP, SELF, ptr);
+        else
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                     "clone not implemented for PtrObj %x", ptr);
     }
 
@@ -104,13 +104,13 @@ Get or set the custom C<mark> function.
 */
 
     VTABLE void mark() {
-	void               *ptr;
-	ptrobj_mark_func_t  mark;
-	GET_ATTR_ptr(INTERP, SELF, ptr);
-	GET_ATTR_mark(INTERP, SELF, mark);
+        void               *ptr;
+        ptrobj_mark_func_t  mark;
+        GET_ATTR_ptr(INTERP, SELF, ptr);
+        GET_ATTR_mark(INTERP, SELF, mark);
         /* invariant: custom mark flag only set when a custom mark function has been provided */
-	PARROT_ASSERT(mark);
-	mark(INTERP, SELF, ptr);
+        PARROT_ASSERT(mark);
+        mark(INTERP, SELF, ptr);
     }
 
     METHOD mark_func(PMC *func :optional, INTVAL has_func :opt_flag) {
@@ -142,13 +142,13 @@ Get or set the custom C<destroy> function.
 */
 
     VTABLE void destroy() {
-	void                  *ptr;
-	ptrobj_destroy_func_t  destroy;
-	GET_ATTR_ptr(INTERP, SELF, ptr);
-	GET_ATTR_destroy(INTERP, SELF, destroy);
+        void                  *ptr;
+        ptrobj_destroy_func_t  destroy;
+        GET_ATTR_ptr(INTERP, SELF, ptr);
+        GET_ATTR_destroy(INTERP, SELF, destroy);
         /* invariant: custom destroy flag only set when a destroy function has been provided */
-	PARROT_ASSERT(destroy);
-	destroy(INTERP, SELF, ptr);
+        PARROT_ASSERT(destroy);
+        destroy(INTERP, SELF, ptr);
     }
 
     METHOD destroy_func(PMC *func :optional, INTVAL has_func :opt_flag) {
