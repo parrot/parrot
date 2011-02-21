@@ -214,7 +214,7 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
             elt->type = elt_type;
             elt_size  = data_types[elt_type - enum_first_type].size;
             elt_align = data_types[elt_type - enum_first_type].align;
-            
+
             switch (elt_type) {
               /* aligned integer types */
               case enum_type_INTVAL:
