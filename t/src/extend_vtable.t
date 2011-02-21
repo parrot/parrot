@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 69;
+plan tests => 71;
 
 =head1 NAME
 
@@ -179,6 +179,7 @@ CODE
 Done!
 OUTPUT
 
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_method");
     type   = Parrot_PMC_typenum(interp, "Class");
     pmc    = Parrot_PMC_new(interp, type);
@@ -189,6 +190,21 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_method");
     Parrot_PMC_add_method(interp, pmc, string, pmc2);
     Parrot_printf(interp,"42\n");
     Parrot_PMC_remove_method(interp, pmc, string);
+    Parrot_printf(interp,"42\n");
+CODE
+42
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_parent");
+    type   = Parrot_PMC_typenum(interp, "Class");
+    pmc    = Parrot_PMC_new(interp, type);
+    pmc2    = Parrot_PMC_new(interp, type);
+
+    Parrot_PMC_add_parent(interp, pmc, pmc2);
+    Parrot_printf(interp,"42\n");
+    Parrot_PMC_remove_parent(interp, pmc, pmc2);
     Parrot_printf(interp,"42\n");
 CODE
 42
