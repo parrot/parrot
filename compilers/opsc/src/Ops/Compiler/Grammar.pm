@@ -218,6 +218,7 @@ token postcircumfix:sym<[ ]> {
 }
 
 token postfix:sym«->» { <sym> <identifier> <O('%methodop')> }
+token postfix:sym«.»  { <sym> <identifier> <O('%methodop')> }
 
 token arglist {
     <.ws>
@@ -242,8 +243,7 @@ token prefix:sym<->   { <sym>  <![>]> <O('%symbolic_unary')> }
 token prefix:sym<?>   { <sym>  <O('%symbolic_unary')> }
 token prefix:sym<!>   { <sym>  <O('%symbolic_unary')> }
 token prefix:sym<|>   { <sym>  <O('%symbolic_unary')> }
-
-
+token prefix:sym<&>   { <sym>  <O('%symbolic_unary')> }
 
 
 rule blockoid {
