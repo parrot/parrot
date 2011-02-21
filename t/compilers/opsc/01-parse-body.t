@@ -120,6 +120,13 @@ inline op noop(out PMC, in INT) {
 }», "Pointer access in declarator");
 
 
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    $1 |= $2;
+    $1 &= $2;
+    $1 ^= $2;
+}», "Binary assignment");
+
 
 # Final big test?
 ### parse_ok($c, q«
