@@ -70,6 +70,30 @@ inline op noop(out PMC, in INT) {
     $1 = foo($2);
 }|, "Simple register assignment");
 
+parse_ok($c, q|
+inline op noop(out PMC, in INT) {
+    if (foo())
+        $1 = bar();
+}|, "Simple 'if'");
+
+parse_ok($c, q|
+inline op noop(out PMC, in INT) {
+    if (foo()) {
+        baz($2);
+        $1 = bar();
+    }
+}|, "Complex 'if'");
+
+parse_ok($c, q|
+inline op noop(out PMC, in INT) {
+    if (foo()) {
+        $1 = bar();
+    }
+    else {
+        $1 = baz();
+    }
+}|, "Simple 'if-else'");
+
 
 
 done_testing();
