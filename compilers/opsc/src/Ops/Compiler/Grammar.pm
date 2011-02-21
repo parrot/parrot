@@ -79,10 +79,9 @@ rule op_flag {
 }
 
 # OpBody starts with '{' and ends with single '}' on line.
-regex op_body {
-    '{'
-    <body_word>*?
-    ^^ '}'
+token op_body {
+    <?DEBUG>
+    <blockoid>
 }
 
 #Process op body by breaking it into "words" consisting entirely of whitespace,
@@ -133,8 +132,52 @@ token macro_destination {
 }
 
 token identifier {
-    <.ident>
+    <!keyword> <ident>
 }
+
+token keyword {
+    [
+    |'for' |'if' |'while'
+    ]>>
+}
+
+
+# Part of C grammar.
+
+rule statement_list {
+    [ <statement> <.eat_terminator> ]*
+}
+
+
+proto rule statement { <...> }
+
+rule statement:sym<call> {
+    <identifier> <arguments>?
+}
+
+
+rule arguments {
+    '(' [ <EXPR> ** ',' ]? ')'
+}
+
+rule blockoid {
+    '{'
+    <statement_list>
+    '}'
+}
+
+
+token eat_terminator {
+    | ';'
+    | <?terminator>
+    | $
+}
+
+proto token terminator { <...> }
+
+token terminator:sym<;> { <?[;]> }
+token terminator:sym<}> { <?[}]> }
+
 
 # ws handles whitespace, pod and perl and C comments
 token ws {
