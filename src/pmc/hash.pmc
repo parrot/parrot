@@ -940,6 +940,30 @@ Sets C<*value> as the value for C<*key>.
 
 /*
 
+=item C<void set_pmc_keyed_int(INTVAL key, PMC *value)>
+
+Sets C<*value> as the value for C<*key>.
+
+=cut
+
+*/
+
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
+        Hash * const hash = (Hash *)SELF.get_pointer();
+
+        if (PObj_constant_TEST(SELF)
+        && (!PObj_constant_TEST((PObj *)value)))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Used non-constant PMC value in constant hash.");
+
+        Parrot_hash_put(INTERP, hash,
+                Parrot_hash_key_from_int(INTERP, hash, key),
+                Parrot_hash_value_from_pmc(INTERP, hash, value));
+    }
+
+/*
+
 =item C<INTVAL exists_keyed_str(STRING *key)>
 
 =cut
@@ -1045,6 +1069,19 @@ Returns whether the value for C<*key> is defined.
     VTABLE void delete_keyed_str(STRING *key) {
         Hash * const hash = (Hash *)SELF.get_pointer();
         Parrot_hash_delete(INTERP, hash, Parrot_hash_key_from_string(INTERP, hash, key));
+    }
+
+/*
+
+=item C<void delete_keyed_int(INTVAL key)>
+
+=cut
+
+*/
+
+    VTABLE void delete_keyed_int(INTVAL. key) {
+        Hash * const hash = (Hash *)SELF.get_pointer();
+        Parrot_hash_delete(INTERP, hash, Parrot_hash_key_from_int(INTERP, hash, key));
     }
 
 /*
