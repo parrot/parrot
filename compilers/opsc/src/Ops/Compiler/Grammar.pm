@@ -226,6 +226,10 @@ token prefix:sym<( )> {
     '(' <type_declarator> ')'
     <O('%casting')>
 }
+token circumfix:sym<( )> {
+    '(' <.ws> <EXPR> ')'
+    <O('%methodop')>        # XXX Check precedence
+}
 
 token prefix:sym<+>   { <sym>  <O('%symbolic_unary')> }
 token prefix:sym<->   { <sym>  <![>]> <O('%symbolic_unary')> }

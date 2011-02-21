@@ -79,6 +79,10 @@ inline op noop(out PMC, in INT) {
     $1 = (PMC*)foo($2);
 }|, "Casting works");
 
+parse_ok($c, q|
+inline op set(out INT, in NUM) :base_core {
+    $1 = (INTVAL)($2);
+}|, "Casting works 2");
 
 # Control statements
 
