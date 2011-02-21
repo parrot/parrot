@@ -80,7 +80,7 @@ rule op_flag {
 
 # OpBody starts with '{' and ends with single '}' on line.
 token op_body {
-    <?DEBUG>
+    #<?DEBUG>
     <blockoid>
 }
 
