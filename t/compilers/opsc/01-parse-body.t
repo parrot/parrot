@@ -127,8 +127,18 @@ inline op noop(out PMC, in INT) {
     $1 ^= $2;
 }», "Binary assignment");
 
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    PMC_data(clone)        = NULL;
+}», "LHS expr assignment");
 
-# Final big test?
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    $1 = sizeof (PMC);
+}», "Space between function call");
+
+
+### # Final big test?
 ### parse_ok($c, q«
 ### inline op copy(inout PMC, invar PMC) :base_mem {
 ###     if (PMC_IS_NULL($1)) {
