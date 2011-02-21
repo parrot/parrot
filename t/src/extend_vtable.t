@@ -179,6 +179,23 @@ CODE
 Done!
 OUTPUT
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_method");
+    type   = Parrot_PMC_typenum(interp, "Class");
+    pmc    = Parrot_PMC_new(interp, type);
+
+    string = createstring(interp,"foo");
+    Parrot_PMC_set_integer_native(interp, pmc2, 42);
+
+    Parrot_PMC_add_method(interp, pmc, string, pmc2);
+    Parrot_printf(interp,"42\n");
+    Parrot_PMC_remove_method(interp, pmc, string);
+    Parrot_printf(interp,"42\n");
+CODE
+42
+42
+Done!
+OUTPUT
+
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_hashvalue");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
