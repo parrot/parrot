@@ -9,7 +9,12 @@ src/pmc/structview.pmc - C struct view for pointers.
 
 PMC class to view pointers as C C<struct>s. This includes read, write, allocate,
 and deallocate operations. Bounds checking is implemented where the pointer
-class supports a bound.
+class supports a bound. Recursive definition through nesting is not supported
+but can be emulated by interpreting pointer or buffer elements as structs once
+dereferenced.
+
+Elements are get/set using keyed access of the form C<[Ptr; Idx]>, which will
+interpret the C<Ptr> PMC and lookup the C<Idx>'th element.
 
 =head2 Vtables and Methods
 
@@ -74,11 +79,85 @@ pmclass StructView auto_attrs {
     ATTR size_t      align;
     ATTR size_t      size;
 
+/*
+
+=item C<void init()>
+
+Creating an instance without an initializer is dissallowed and will throw an
+exception.
+
+=cut
+
+*/
+
     VTABLE void init() {
         Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                 "Meaningless creation of %Ss without initializer",
                 SELF->vtable->whoami);
     }
+
+/*
+
+=item C<void init_pmc(PMC *p)>
+
+Create a new StructView for viewing buffers as described by the initializer.
+
+An initializer is an array-aggregate of integers. For example,
+C<FixedIntegerArray> will work for this purpose.
+
+The first elemnt of the initializer is interpreted as the type of the
+C<StructView>. There are three supported types of view: struct, indicated with
+the C<DATATYPE_STRUCT> flag; union, indicated with the C<DATATYPE_UNION> flag;
+and custom, indicated with the C<DATATYPE_SIZED> flag.
+
+The second element of the initializer is interpreted as the number of elements
+contained within the view.
+
+If using a custom view, the third and fourth elements are interpreted as the
+size and alignment in bytes respectively.
+
+The remainder of the initializer is interpreted as a description of the
+elements of the view. For struct and union views, elements are described
+by a single integer flag from C<datatypes.pasm>, with layout being determined
+automatically identical to what your C compiler would have done. For custom
+views, elements are represented by a 3-tuple of
+C<{type, byte-offset, bit-offset}>, which can be used for arbitrary layouts.
+Note, however, that unaligned access is only supported on unsigned integers,
+and even then, it is inefficient. You have been warned.
+
+Supported element types are include:
+
+=over 4
+
+=item Parrot Types
+
+C<INTVAL>, C<FLOATVAL>, C<STRING>, and C<PMC>
+
+=item C-Native Types
+
+Integer: C<char>, C<uchar>, C<short>, C<ushort>, C<int>, C<uint>, C<long>,
+C<ulong>, C<longlong> (*), and C<ulonglong> (*)
+Float:   C<float>, C<double>, C<longdouble> (**)
+PMC:     data pointer (C<ptr>), function pointer (C<func_ptr>), buffer (C<sized>) (***)
+
+(*)   Only available if your C system sports a C<long long> type.
+
+(**)  Only available if your C system sports a C<long double> type.
+
+(***) Requires 2 additional following parameters - buffer size and alignment.
+
+=item Explicitly Sized Types
+
+C<uint1> (also known as C<bit>), C<uint4>, C<int8>, C<uint8>, C<int16>,
+C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
+
+(*) Only available if your C system sports a 64 bit integer type.
+
+=back
+
+=cut
+
+*/
 
     VTABLE void init_pmc(PMC *p) {
         INTVAL            init_len    = VTABLE_elements(INTERP, p);
@@ -315,11 +394,33 @@ pmclass StructView auto_attrs {
         SET_ATTR_size(INTERP, SELF, size);
     }
 
+/*
+
+=item C<void destroy()>
+
+Free internal offsets array.
+
+=cut
+
+*/
+
     VTABLE void destroy() {
         elt_desc_t *elts;
         GET_ATTR_elts(INTERP, SELF, elts);
         mem_gc_free(INTERP, elts);
     }
+
+/*
+
+=item C<INTVAL get_integer_keyed(PMC *k)>
+
+=item C<void set_integer_keyed(PMC *k, INTVAL x)>
+
+Get/Set an integer-type element from a struct-pointer PMC.
+
+=cut
+
+*/
 
     VTABLE INTVAL get_integer_keyed(PMC *k) {
         BEGIN_KEYED(INTERP, SELF, k)
@@ -485,6 +586,21 @@ pmclass StructView auto_attrs {
         }
     }
 
+/*
+
+=item C<FLOATVAL get_number_keyed(PMC *k)>
+
+=item C<void set_number_keyed(PMC *k, FLOATVAL n)>
+
+Get/Set a float-like element from a struct-pointer PMC.
+
+=cut
+
+*/
+
+
+*/
+
     VTABLE FLOATVAL get_number_keyed(PMC *k) {
         BEGIN_KEYED(INTERP, SELF, k)
         switch (elts[i].access) {
@@ -535,6 +651,18 @@ pmclass StructView auto_attrs {
         }
     }
 
+/*
+
+=item C<STRING *get_string keyed(PMC *k)>
+
+=item C<void set_string_keyed(PMC *k, STRING *)>
+
+Get/Set a string element from a struct-pointer PMC.
+
+=cut
+
+*/
+
     VTABLE STRING *get_string_keyed(PMC *k) {
         BEGIN_KEYED(INTERP, SELF, k)
         switch (elts[i].access) {
@@ -565,6 +693,19 @@ pmclass StructView auto_attrs {
                     Parrot_dt_get_datatype_name(INTERP, elts[i].type));
         }
     }
+
+/*
+
+=item C<PMC *get_pmc_keyed(PMC *k)>
+
+=item C<void set_pmc_keyed(PMC *k, PMC *p)>
+
+Get/Set a PMC-like element from a struct-pointer PMC or box/unbox values from
+any other type of element.
+
+=cut
+
+*/
 
     VTABLE PMC *get_pmc_keyed(PMC *k) {
         BEGIN_KEYED(INTERP, SELF, k)
@@ -639,6 +780,18 @@ pmclass StructView auto_attrs {
         }
     }
 
+/*
+
+=item C<INTVAL get_integer()>
+
+=item C<METHOD size()>
+
+Get the size (in bytes) required for one instance.
+
+=cut
+
+*/
+
     VTABLE INTVAL get_integer() {
         size_t size;
         GET_ATTR_size(INTERP, SELF, size);
@@ -651,11 +804,32 @@ pmclass StructView auto_attrs {
         RETURN (INTVAL size);
     }
 
+/*
+
+=item C<METHOD align()>
+
+Get the alignment (in bytes) required for an instance.
+
+=cut
+
+*/
+
     METHOD align() {
         size_t align;
         GET_ATTR_align(INTERP, SELF, align);
         RETURN (INTVAL align);
     }
+
+/*
+
+=item C<METHOD aligned_size()>
+
+Get the size of one instance plus the pad bytes to align a subsequent
+instance.
+
+=cut
+
+*/
 
     METHOD aligned_size() {
         size_t size, align;
@@ -665,6 +839,16 @@ pmclass StructView auto_attrs {
         ret = ALIGN_UP(size, align);
         RETURN (INTVAL ret);
     }
+
+/*
+
+=item C<METHOD alloc(INTVAL n :optional)>
+
+Allocate an instance, or an array of instances when C<n> has been provided.
+
+=cut
+
+*/
 
     METHOD alloc(INTVAL n :optional, int has_n :opt_flag) {
         size_t size, align;
