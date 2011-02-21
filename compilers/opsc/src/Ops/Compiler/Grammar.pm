@@ -245,6 +245,7 @@ rule blockoid {
     <declarator>*
     <statement_list>
     '}'
+    <?MARKER('endstmt')>
 }
 
 # Simplified parsing of declarator
@@ -259,6 +260,7 @@ rule type_declarator {
 
 token eat_terminator {
     | ';'
+    | <?MARKED('endstmt')>
     | <?terminator>
     | $
 }

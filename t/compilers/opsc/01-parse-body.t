@@ -155,6 +155,15 @@ inline op noop(out PMC, in INT) {
 }», "Ternary op");
 
 
+# Check blockoid
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    if (foo()) {
+    }
+    bar();
+}», "Blockoid finish statement");
+
+
 
 # Final big test?
 parse_ok($c, q«
