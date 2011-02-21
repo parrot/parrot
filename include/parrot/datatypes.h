@@ -48,7 +48,7 @@ typedef enum {
     enum_type_int32,
     enum_type_int64,
 
-    enum_type_bit,              
+    enum_type_bit,
     enum_type_uint1 = enum_type_bit,
     enum_type_uint4,
     enum_type_uint8,            /* unsigned variants */
