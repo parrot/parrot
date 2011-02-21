@@ -131,7 +131,6 @@ rule statement_list {
 
 token statement {
     | <statement_control>
-    | <op_macro>
     | <blockoid>
     | <EXPR> <.ws>
 }
@@ -167,7 +166,8 @@ token term:sym<float_constant_long> { # longer to work-around lack of LTM
     ]
 }
 
-token term:sym<reg> { <macro_param> }
+token term:sym<reg>   { <macro_param> }
+token term:sym<macro> { <op_macro>    }
 
 # Assignment
 token infix:sym<=>  { <sym>  <O('%assignment')> }

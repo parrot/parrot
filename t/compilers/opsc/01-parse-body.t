@@ -79,6 +79,14 @@ inline op noop(out PMC, in INT) {
     opcode_t * next = expr NEXT();
 }|, "expr NEXT");
 
+
+parse_ok($c, q|
+inline op noop(out PMC, in INT) {
+        opcode_t *dest = Parrot_ex_throw_from_op_args(
+            interp, expr NEXT(), EXCEPTION_NO_CLASS,
+            "Class '%Ss' not found", VTABLE_get_repr(interp, $4));
+}|, "expr NEXT 2");
+
 parse_ok($c, q|
 inline op noop(out PMC, in INT) {
     opcode_t * dest;
