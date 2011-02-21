@@ -79,13 +79,13 @@ Get or set the custom C<clone> function.
         if (has_func) {
             void *f = VTABLE_get_pointer(INTERP, func);
             PTROBJ_SET_CLONE(INTERP, SELF, (ptrobj_clone_func_t)f);
-            RETURN ();
+            RETURN();
         }
         else {
             ptrobj_clone_func_t f;
             GET_ATTR_clone(INTERP, SELF, f);
             func = Parrot_pmc_new_init_int(INTERP, enum_class_Ptr, (INTVAL)f);
-            RETURN (PMC func);
+            RETURN(PMC func);
         }
     }
 
@@ -117,13 +117,13 @@ Get or set the custom C<mark> function.
         if (has_func) {
             void *f = VTABLE_get_pointer(INTERP, func);
             PTROBJ_SET_MARK(INTERP, SELF, (ptrobj_clone_func_t)f);
-            RETURN ();
+            RETURN();
         }
         else {
             ptrobj_mark_func_t f;
             GET_ATTR_mark(INTERP, SELF, f);
             func = Parrot_pmc_new_init_int(INTERP, enum_class_Ptr, (INTVAL)f);
-            RETURN (PMC func);
+            RETURN(PMC func);
         }
     }
 
@@ -155,13 +155,13 @@ Get or set the custom C<destroy> function.
         if (has_func) {
             void *f = VTABLE_get_pointer(INTERP, func);
             PTROBJ_SET_DESTROY(INTERP, SELF, (ptrobj_clone_func_t)f);
-            RETURN ();
+            RETURN();
         }
         else {
             ptrobj_destroy_func_t f;
             GET_ATTR_destroy(INTERP, SELF, f);
             func = Parrot_pmc_new_init_int(INTERP, enum_class_Ptr, (INTVAL)f);
-            RETURN (PMC func);
+            RETURN(PMC func);
         }
     }
 }

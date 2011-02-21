@@ -801,7 +801,7 @@ Get the size (in bytes) required for one instance.
     METHOD size() {
         size_t size;
         GET_ATTR_size(INTERP, SELF, size);
-        RETURN (INTVAL size);
+        RETURN(INTVAL size);
     }
 
 /*
@@ -817,7 +817,7 @@ Get the alignment (in bytes) required for an instance.
     METHOD align() {
         size_t align;
         GET_ATTR_align(INTERP, SELF, align);
-        RETURN (INTVAL align);
+        RETURN(INTVAL align);
     }
 
 /*
@@ -837,7 +837,7 @@ instance.
         GET_ATTR_size(INTERP, SELF, size);
         GET_ATTR_align(INTERP, SELF, align);
         ret = ALIGN_UP(size, align);
-        RETURN (INTVAL ret);
+        RETURN(INTVAL ret);
     }
 
 /*
@@ -866,7 +866,7 @@ Allocate an instance, or an array of instances when C<n> has been provided.
         ret = Parrot_pmc_new_init_int(INTERP, enum_class_PtrObj, (INTVAL)buf);
         SETATTR_PtrObj_destroy(INTERP, ret, deallocate_ptrobj);
 
-        RETURN (PMC ret);
+        RETURN(PMC ret);
     }
 }
 
