@@ -112,6 +112,53 @@ inline op noop(out PMC, in INT) {
 }», "Binary ops");
 
 
+
+# Final big test?
+### parse_ok($c, q«
+### inline op copy(inout PMC, invar PMC) :base_mem {
+###     if (PMC_IS_NULL($1)) {
+###         opcode_t * const dest = expr NEXT();
+###         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, dest,
+###                 EXCEPTION_NULL_REG_ACCESS, "Null PMC in copy");
+###         goto ADDRESS(handler);
+###     }
+###     else {
+###         PMC   * const clone = VTABLE_clone(interp, $2);
+###         /* Preserve the metadata on the destination. */
+###         PMC   * const meta  = VTABLE_getprops(interp, $1);
+###         /* We have to preserve GC flags of original PMC */
+###         Parrot_UInt   gc_flags = $1->flags & PObj_GC_all_FLAGS;
+### 
+###         /* avoid leaks and unreachable memory by destroying the destination PMC */
+###         Parrot_pmc_destroy(interp, $1);
+### 
+###         /* the source PMC knows how to clone itself, but we must reuse the
+###          * destination header */
+###         memmove($1, clone, sizeof (PMC));
+### 
+###         /* Restore old flags and soil destination. We've changed it */
+###         $1->flags |= gc_flags;
+###         PARROT_GC_WRITE_BARRIER(interp, $1);
+### 
+###         /* don't let the clone's destruction destroy the destination's data */
+###         PObj_custom_destroy_CLEAR(clone);
+###         PMC_data(clone)        = NULL;
+###         PMC_metadata(clone)    = NULL;
+### 
+###         /* Restore metadata. */
+###         if (!PMC_IS_NULL(meta)) {
+###             PMC * const iter = VTABLE_get_iter(interp, meta);
+###             while (VTABLE_get_bool(interp, iter)) {
+###                 STRING * const key = VTABLE_shift_string(interp, iter);
+###                 PMC * const value  = VTABLE_get_pmc_keyed_str(interp, meta, key);
+###                 VTABLE_setprop(interp, $1, key, value);
+###             }
+###         }
+###     }
+### }
+### », "Big test passed");
+
+
 done_testing();
 
 
