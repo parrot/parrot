@@ -35,6 +35,13 @@ inline op noop() {
 
     _parse($c, q|
 inline op noop() {
+    foo("Answer", 42);
+}
+|);
+    ok(1, "More complex call op parsed");
+
+    _parse($c, q|
+inline op noop() {
     char bar;
 }
 |);
@@ -54,6 +61,12 @@ inline op noop() {
 |);
     ok(1, "More complex declaration parsed");
 
+    _parse($c, q|
+inline op noop() {
+    Interp * const new_interp = foo("Answer", 42);
+}
+|);
+    ok(1, "Really complex declaration parsed");
 
 };
 

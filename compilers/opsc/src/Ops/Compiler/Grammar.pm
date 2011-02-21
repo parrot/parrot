@@ -175,7 +175,9 @@ token term:sym<float_constant_long> { # longer to work-around lack of LTM
 }
 
 # Assignment
-token infix:sym<=>   { <sym>  <O('%assignment')> }
+token infix:sym<=>  { <sym>  <O('%assignment')> }
+
+token infix:sym<,>  { <sym>  <O('%comma')> }
 
 token postcircumfix:sym<( )> {
     '(' <.ws> <arglist> ')'
