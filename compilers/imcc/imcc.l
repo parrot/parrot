@@ -1199,7 +1199,7 @@ include_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *file_name), void *yyscanner
 
     if (STRING_IS_NULL(s)
     ||  (file = PIO_OPEN(imcc->interp, s, PIO_F_READ)) == PIO_INVALID_HANDLE) {
-        IMCC_fataly(imcc->interp, EXCEPTION_EXTERNAL_ERROR,
+        IMCC_fataly(imcc, EXCEPTION_EXTERNAL_ERROR,
             "No such file or directory");
     }
 
