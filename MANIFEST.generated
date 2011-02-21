@@ -104,6 +104,9 @@ include/pmc/pmc_parrotlibrary.h                  [devel]include
 include/pmc/pmc_parrotthread.h                   [devel]include
 include/pmc/pmc_pmcproxy.h                       [devel]include
 include/pmc/pmc_pointer.h                        [devel]include
+include/pmc/pmc_ptr.h                            [devel]include
+include/pmc/pmc_ptrbuf.h                         [devel]include
+include/pmc/pmc_ptrobj.h                         [devel]include
 include/pmc/pmc_resizablebooleanarray.h          [devel]include
 include/pmc/pmc_resizablefloatarray.h            [devel]include
 include/pmc/pmc_resizableintegerarray.h          [devel]include
@@ -119,6 +122,7 @@ include/pmc/pmc_string.h                         [devel]include
 include/pmc/pmc_stringbuilder.h                  [devel]include
 include/pmc/pmc_stringhandle.h                   [devel]include
 include/pmc/pmc_stringiterator.h                 [devel]include
+include/pmc/pmc_structview.h                     [devel]include
 include/pmc/pmc_sub.h                            [devel]include
 include/pmc/pmc_task.h                           [devel]include
 include/pmc/pmc_threadinterpreter.h              [devel]include
@@ -406,6 +410,9 @@ src/pmc/parrotlibrary.dump                       [devel]src
 src/pmc/parrotthread.dump                        [devel]src
 src/pmc/pmcproxy.dump                            [devel]src
 src/pmc/pointer.dump                             [devel]src
+src/pmc/ptr.dump                                 [devel]src
+src/pmc/ptrbuf.dump                              [devel]src
+src/pmc/ptrobj.dump                              [devel]src
 src/pmc/resizablebooleanarray.dump               [devel]src
 src/pmc/resizablefloatarray.dump                 [devel]src
 src/pmc/resizableintegerarray.dump               [devel]src
@@ -421,6 +428,7 @@ src/pmc/string.dump                              [devel]src
 src/pmc/stringbuilder.dump                       [devel]src
 src/pmc/stringhandle.dump                        [devel]src
 src/pmc/stringiterator.dump                      [devel]src
+src/pmc/structview.dump                          [devel]src
 src/pmc/sub.dump                                 [devel]src
 src/pmc/task.dump                                [devel]src
 src/pmc/threadinterpreter.dump                   [devel]src
