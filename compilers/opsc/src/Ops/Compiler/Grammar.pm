@@ -160,8 +160,28 @@ token term:sym<reg> { <macro_param> }
 
 # Assignment
 token infix:sym<=>  { <sym>  <O('%assignment')> }
-
+token infix:sym<|=> { <sym>  <O('%assignment')> }
+token infix:sym<&=> { <sym>  <O('%assignment')> }
+token infix:sym<^=> { <sym>  <O('%assignment')> }
 token infix:sym<,>  { <sym>  <O('%comma')> }
+
+token infix:sym<*>    { <sym>  <O('%multiplicative')> }
+token infix:sym</>    { <sym>  <O('%multiplicative')> }
+token infix:sym<%>    { <sym>  <O('%multiplicative')> }
+
+token infix:sym<+>    { <sym>  <O('%additive')> }
+token infix:sym<->    { <sym>  <O('%additive')> }
+
+token infix:sym«==»   { <sym>  <O('%relational')> }
+token infix:sym«!=»   { <sym>  <O('%relational')> }
+token infix:sym«<=»   { <sym>  <O('%relational')> }
+token infix:sym«>=»   { <sym>  <O('%relational')> }
+token infix:sym«<»    { <sym>  <O('%relational')> }
+token infix:sym«>»    { <sym>  <O('%relational')> }
+
+token infix:sym<&>    { <sym>  <O('%tight_and')> }
+token infix:sym<^>    { <sym>  <O('%tight_and')> }   # XXX Check precedence
+token infix:sym<|>    { <sym>  <O('%tight_or')> }
 
 token postcircumfix:sym<( )> {
     '(' <.ws> <arglist> ')'
@@ -171,6 +191,8 @@ token postcircumfix:sym<[ ]> {
     '[' <.ws> <EXPR>? ']'
     <O('%methodop')>
 }
+
+token postfix:sym«->» { <sym> <O('%methodop')> }
 
 token arglist {
     <.ws>
@@ -185,6 +207,14 @@ token prefix:sym<( )> {
     '(' <type_declarator> ')'
     <O('%casting')>
 }
+
+token prefix:sym<+>   { <sym>  <O('%symbolic_unary')> }
+token prefix:sym<->   { <sym>  <![>]> <O('%symbolic_unary')> }
+token prefix:sym<?>   { <sym>  <O('%symbolic_unary')> }
+token prefix:sym<!>   { <sym>  <O('%symbolic_unary')> }
+token prefix:sym<|>   { <sym>  <O('%symbolic_unary')> }
+
+
 
 
 rule blockoid {
