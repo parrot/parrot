@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 71;
+plan tests => 72;
 
 =head1 NAME
 
@@ -193,6 +193,25 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_method");
     Parrot_printf(interp,"42\n");
 CODE
 42
+42
+Done!
+OUTPUT
+
+# TODO remove_role
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_role");
+    type   = Parrot_PMC_typenum(interp, "Class");
+    pmc    = Parrot_PMC_new(interp, type);
+
+    type   = Parrot_PMC_typenum(interp, "Role");
+    pmc2   = Parrot_PMC_new(interp, type);
+
+    Parrot_PMC_add_role(interp, pmc, pmc2);
+    Parrot_printf(interp,"42\n");
+    /*
+    Parrot_PMC_remove_role(interp, pmc, pmc2);
+    Parrot_printf(interp,"42\n");
+    */
+CODE
 42
 Done!
 OUTPUT
