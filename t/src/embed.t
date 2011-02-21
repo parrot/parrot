@@ -173,7 +173,7 @@ Done
 Really done
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when an opcode is given improper arguments');
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when an opcode is given improper arguments', todo => "Must explicitly set a PIR compreg");
 
 int main(int argc, const char **argv)
 {
@@ -196,7 +196,7 @@ CODE
 The opcode 'copy' (copy<0>) was not found. Check the type and number of the arguments
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when given invalid language string');
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when given invalid language string', todo => "Must explicitly set a PIR compreg" );
 
 int main(int argc, const char **argv)
 {
@@ -246,7 +246,7 @@ error:imcc:syntax error, unexpected IDENTIFIER ('The')
 OUTPUT
 
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from main" );
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from main", todo => "Must explicitly set a PIR compreg" );
 
 int main(void)
 {
@@ -281,7 +281,7 @@ Hello, pir
 OUTPUT
 
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from a sub" );
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from a sub", todo => "Must explicitly set a PIR compreg" );
 
 int main(void)
 {
@@ -333,7 +333,7 @@ CODE
 Hello, sub
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "calling a sub with string argument and return a string" );
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "calling a sub with string argument and return a string", todo => "Must explicitly set a PIR compreg" );
 
 int main(void)
 {
@@ -392,7 +392,7 @@ CODE
 Hello, world!
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "returning a Float PMC" );
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "returning a Float PMC", todo => "Must explicitly set a PIR compreg" );
 
 int main(void)
 {
@@ -447,7 +447,7 @@ CODE
 42.0 is the answer. What is the question?
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "returning two Float PMCs in a ResizablePMCArray" );
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "returning two Float PMCs in a ResizablePMCArray", todo => "Must explicitly set a PIR compreg" );
 
 int main(void)
 {
@@ -507,7 +507,7 @@ CODE
 42.0 is the answer and pi*100 = 314.0
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "calling a sub with string argument and return a numeric" );
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "calling a sub with string argument and return a numeric", todo => "Must explicitly set a PIR compreg" );
 
 int main(void)
 {
@@ -565,7 +565,7 @@ CODE
 42.0 is the answer. What is the question?
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "External sub" );
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "External sub", todo => "Must explicitly set a PIR compreg" );
 
 void hello(Parrot_Interp interp);
 
@@ -608,7 +608,7 @@ CODE
 Hello from C
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Insert external sub in namespace" );
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Insert external sub in namespace", todo => "Must explicitly set a PIR compreg" );
 
 void hello(Parrot_Interp interp);
 
