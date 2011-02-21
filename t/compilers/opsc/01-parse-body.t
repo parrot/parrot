@@ -245,6 +245,57 @@ inline op copy(inout PMC, invar PMC) :base_mem {
 », "Big test passed");
 
 
+
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    if (PMC_IS_NULL($1) || $1->vtable->base_type != enum_class_ResizableIntegerArray) {
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, dest,
+            EXCEPTION_INVALID_OPERATION,
+            "Must pass a valid integer array to 'local_return'");
+        goto ADDRESS(handler);
+    }
+}», "Complex if");
+
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    /* The return address must be within the current code segment. */
+    if (! (next >= interp->code->base.data
+           && next < (interp->code->base.data + interp->code->base.size))) {
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, dest,
+            EXCEPTION_INVALID_OPERATION,
+            "Address for 'local_return' must be within the current code segment");
+        goto ADDRESS(handler);
+    }
+}», "Complex if 2");
+
+parse_ok($c, q«
+inline op local_return(invar PMC) :flow {
+    INTVAL return_addr;
+    opcode_t *next;
+    opcode_t * const dest = expr NEXT();
+
+    if (PMC_IS_NULL($1) || $1->vtable->base_type != enum_class_ResizableIntegerArray) {
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, dest,
+            EXCEPTION_INVALID_OPERATION,
+            "Must pass a valid integer array to 'local_return'");
+        goto ADDRESS(handler);
+    }
+
+    return_addr = VTABLE_pop_integer(interp, $1);
+    next = INTVAL2PTR(opcode_t *, return_addr);
+
+    /* The return address must be within the current code segment. */
+    if (! (next >= interp->code->base.data
+           && next < (interp->code->base.data + interp->code->base.size))) {
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, dest,
+            EXCEPTION_INVALID_OPERATION,
+            "Address for 'local_return' must be within the current code segment");
+        goto ADDRESS(handler);
+    }
+
+    goto ADDRESS(next);
+}», "core.ops local_return");
+
 done_testing();
 
 
