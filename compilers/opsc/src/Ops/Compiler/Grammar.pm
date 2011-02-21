@@ -162,10 +162,20 @@ rule arguments {
 
 rule blockoid {
     '{'
+    <declarator>*
     <statement_list>
     '}'
 }
 
+# Simplified parsing of declarator
+rule declarator {
+    <type_declarator> <variable=.ident> [ '=' <statement> ]? ';'
+}
+
+# No double poiners (for now?)
+rule type_declarator {
+    'const'? <.identifier> '*'? 'const'?
+}
 
 token eat_terminator {
     | ';'
