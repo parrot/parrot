@@ -6,12 +6,14 @@
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(11)
+    plan(16)
 
     test_bit_struct()
     test_unaligned_struct()
     test_union()
     test_fp()
+    test_explicit_sized_types()
+    test_struct_pad()
 .end
 
 .sub test_bit_struct
@@ -148,6 +150,62 @@
     $N0 = abs $N0
     $I0 = eps > $N0
     .return ($I0)
+.end
+
+.sub 'test_explicit_sized_types'
+    $P0 = new ['FixedPMCArray'], 3
+    $P0[0] = .DATATYPE_STRUCT
+    $P0[1] = 1
+    $P0[2] = .DATATYPE_INT8
+
+    .local pmc sv
+    sv = new ['StructView'], $P0
+    $I0 = sv.'size'()
+    is($I0, 1, 'sizeof (struct { int8 c; })')
+
+    $P0[2] = .DATATYPE_UINT16
+    sv = new ['StructView'], $P0
+    $I0 = sv.'size'()
+    is($I0, 2, 'sizeof (struct { uint16 s; })')
+
+    $P0[2] = .DATATYPE_UINT32
+    sv = new ['StructView'], $P0
+    $I0 = sv.'size'()
+    is($I0, 4, 'sizeof (struct { int32 i; })')
+.end
+
+.sub 'test_struct_pad'
+    $P0 = new ['FixedIntegerArray'], 5
+    $P0[0] = .DATATYPE_STRUCT
+    $P0[1] = 3
+    $P0[2] = .DATATYPE_INT8
+    $P0[3] = .DATATYPE_INT32
+    $P0[4] = .DATATYPE_INT8
+
+    .local pmc sv, sv2
+    sv = new ['StructView'], $P0
+
+    $P0[1] = 1
+    $P0[2] = .DATATYPE_INT8
+    sv2 = new ['StructView'], $P0
+    $I0 = sv2.'size'()
+
+    $P0[1] = 1
+    $P0[2] = .DATATYPE_INT32
+    sv2 = new ['StructView'], $P0
+    $I1 = sv2.'size'()
+
+    $I0 *= 2
+    $I0 += $I1
+
+    $I1 = sv.'size'()
+
+    $I2 = $I1 > $I0
+    ok($I2, 'sizeof poorly aligned struct greater than the sum of the sizes')
+
+    $I0 = sv.'aligned_size'()
+    $I2 = $I0 > $I1
+    ok($I2, 'aligned size of poorly aligned struct greater than size')
 .end
 
 # Local Variables:

@@ -146,6 +146,12 @@ pmclass StructView auto_attrs {
 #if HAS_LONGLONG
               case enum_type_longlong:
 #endif
+              case enum_type_int8:
+              case enum_type_int16:
+              case enum_type_int32:
+#if HAS_64BIT
+              case enum_type_int64:
+#endif
               case enum_type_uchar:
               case enum_type_ushort:
               case enum_type_uint:
@@ -153,6 +159,13 @@ pmclass StructView auto_attrs {
 #if HAS_LONGLONG
               case enum_type_ulonglong:
 #endif
+              case enum_type_uint8:
+              case enum_type_uint16:
+              case enum_type_uint32:
+#if HAS_64BIT
+              case enum_type_uint64:
+#endif
+
                 elt_access = int_access;
                 break;
 
@@ -186,20 +199,6 @@ pmclass StructView auto_attrs {
               case enum_type_func_ptr:
                 elt_access = pmc_access;
                 break;
-
-              /* TODO: explicitly sized type support */
-              case enum_type_int8:
-              case enum_type_int16:
-              case enum_type_int32:
-#if HAS_64BIT
-              case enum_type_int64:
-#endif
-              case enum_type_uint8:
-              case enum_type_uint16:
-              case enum_type_uint32:
-#if HAS_64BIT
-              case enum_type_uint64:
-#endif
 
               /* locally unsupported types */
 #if !HAS_LONGLONG
@@ -282,6 +281,12 @@ pmclass StructView auto_attrs {
 #if HAS_LONGLONG
                           case enum_type_ulonglong:
 #endif
+                          case enum_type_uint8:
+                          case enum_type_uint16:
+                          case enum_type_uint32:
+#if HAS_64BIT
+                          case enum_type_uint64:
+#endif
                             elt->access = unaligned_access;
                             break;
                           default:
@@ -321,22 +326,32 @@ pmclass StructView auto_attrs {
         switch (elts[i].access) {
           case int_access:
             switch (elts[i].type) {
-#define _CASE_RET(type, name) \
+#define CASE_RET2(type, name) \
               case enum_type_  ## name: return *(type *)ptr;
-#define CASE_RET(type) \
-                _CASE_RET(type, type) \
-                _CASE_RET(unsigned type, u ## type)
-                _CASE_RET(INTVAL, INTVAL)
-                CASE_RET(char);
-                CASE_RET(short);
-                CASE_RET(int);
-                CASE_RET(long);
+#define CASE_RET1(type) \
+                CASE_RET2(type, type) \
+                CASE_RET2(unsigned type, u ## type)
+                CASE_RET2(INTVAL, INTVAL)
+                CASE_RET1(char);
+                CASE_RET1(short);
+                CASE_RET1(int);
+                CASE_RET1(long);
 #if HAS_LONGLONG
-                _CASE_RET(long long,          longlong);
-                _CASE_RET(unsigned long long, ulonglong);
+                CASE_RET2(long long,          longlong);
+                CASE_RET2(unsigned long long, ulonglong);
 #endif
-#undef  CASE_RET
-#undef _CASE_RET
+                CASE_RET2(Parrot_Int1,  int8);
+                CASE_RET2(Parrot_UInt1, uint8);
+                CASE_RET2(Parrot_Int2,  int16);
+                CASE_RET2(Parrot_UInt2, uint16);
+                CASE_RET2(Parrot_Int4,  int32);
+                CASE_RET2(Parrot_UInt4, uint32);
+#if HAS_64BIT
+                CASE_RET2(Parrot_Int8,  int64);
+                CASE_RET2(Parrot_UInt8, uint64);
+#endif
+#undef CASE_RET1
+#undef CASE_RET2
             }
             break;
           case unaligned_access:
@@ -390,22 +405,32 @@ pmclass StructView auto_attrs {
         switch (elts[i].access) {
           case int_access:
             switch (elts[i].type) {
-#define _CASE_SET(type, name) \
+#define CASE_SET2(type, name) \
               case enum_type_  ## name: *(type *)ptr = x; return;
-#define CASE_SET(type) \
-                _CASE_SET(type, type) \
-                _CASE_SET(unsigned type, u ## type)
-                _CASE_SET(INTVAL, INTVAL)
-                CASE_SET(char);
-                CASE_SET(short);
-                CASE_SET(int);
-                CASE_SET(long);
+#define CASE_SET1(type) \
+                CASE_SET2(type, type) \
+                CASE_SET2(unsigned type, u ## type)
+                CASE_SET2(INTVAL, INTVAL)
+                CASE_SET1(char);
+                CASE_SET1(short);
+                CASE_SET1(int);
+                CASE_SET1(long);
 #if HAS_LONGLONG
-                _CASE_SET(long long,          longlong);
-                _CASE_SET(unsigned long long, ulonglong);
+                CASE_SET2(long long,          longlong);
+                CASE_SET2(unsigned long long, ulonglong);
 #endif
-#undef  CASE_SET
-#undef _CASE_SET
+                CASE_SET2(Parrot_Int1,  int8);
+                CASE_SET2(Parrot_UInt1, uint8);
+                CASE_SET2(Parrot_Int2,  int16);
+                CASE_SET2(Parrot_UInt2, uint16);
+                CASE_SET2(Parrot_Int4,  int32);
+                CASE_SET2(Parrot_UInt4, uint32);
+#if HAS_64BIT
+                CASE_SET2(Parrot_Int8,  int64);
+                CASE_SET2(Parrot_UInt8, uint64);
+#endif
+#undef CASE_SET1
+#undef CASE_SET2
             }
             break;
           case unaligned_access:
