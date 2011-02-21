@@ -111,6 +111,9 @@ inline op noop(out PMC, in INT) {
     $1 = $2 & 1 | 2 ^ 3;
 }», "Binary ops");
 
+parse_ok($c, q«
+inline op noop(out PMC, in INT) { gc_flags = $1->flags; }», "Pointer access");
+
 
 
 # Final big test?

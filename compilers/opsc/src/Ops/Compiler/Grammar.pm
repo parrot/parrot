@@ -192,7 +192,7 @@ token postcircumfix:sym<[ ]> {
     <O('%methodop')>
 }
 
-token postfix:sym«->» { <sym> <O('%methodop')> }
+token postfix:sym«->» { <sym> <identifier> <O('%methodop')> }
 
 token arglist {
     <.ws>
