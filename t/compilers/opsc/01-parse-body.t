@@ -112,7 +112,14 @@ inline op noop(out PMC, in INT) {
 }», "Binary ops");
 
 parse_ok($c, q«
-inline op noop(out PMC, in INT) { gc_flags = $1->flags; }», "Pointer access");
+inline op noop(out PMC, in INT) {
+    gc_flags = $1->flags;
+}», "Pointer access");
+
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    gc_flags = $1->foo->bar->baz;
+}», "Nested pointer access");
 
 parse_ok($c, q«
 inline op noop(out PMC, in INT) {
