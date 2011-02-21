@@ -91,31 +91,31 @@ const struct _data_types data_types[] = {
     { "short",      sizeof (short),              ALIGNOF(short) },
     { "int",        sizeof (int),                ALIGNOF(int) },
     { "long",       sizeof (long),               ALIGNOF(long)  },
-#if HAS_LONGLONG
+#  if HAS_LONGLONG
     { "longlong",   sizeof (long long),          ALIGNOF(long long) },
-#else
+#  else
     { "longlong",   0,                           0 },
-#endif
+#  endif
 
     /* native unsigned types */
     { "uchar",      sizeof (unsigned char),      ALIGNOF(unsigned char) },
     { "ushort",     sizeof (unsigned short),     ALIGNOF(unsigned short) },
     { "uint",       sizeof (unsigned int),       ALIGNOF(unsigned int) },
     { "ulong",      sizeof (unsigned long),      ALIGNOF(unsigned long) },
-#if HAS_LONGLONG
+#  if HAS_LONGLONG
     { "ulonglong",  sizeof (unsigned long long), ALIGNOF(unsigned long long) },
-#else
+#  else
     { "ulonglong",  0,                           0 },
-#endif
+#  endif
 
     /* native float types */
     { "float",      sizeof (float),              ALIGNOF(float) },
     { "double",     sizeof (double),             ALIGNOF(double) },
-#if HAS_LONGDOUBLE
+#  if HAS_LONGDOUBLE
     { "longdouble", sizeof (long double),        ALIGNOF(long double)},
-#else
+#  else
     { "longdouble", 0,                           0 },
-#endif
+#  endif
 
     /* explicitly sized integer types */
     { "int8",       1,                           ALIGNOF(int /* TODO */) },
