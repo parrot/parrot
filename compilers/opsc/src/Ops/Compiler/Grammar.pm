@@ -197,6 +197,8 @@ token infix:sym<|>    { <sym>  <O('%tight_or')> }
 token infix:sym<&&>   { <sym>  <O('%tight_and')> }
 token infix:sym<||>   { <sym>  <O('%tight_or')> }
 
+token infix:sym«<<»   { <sym>  <O('%multiplicative')> }
+token infix:sym«>>»   { <sym>  <O('%multiplicative')> }
 
 token infix:sym<?:> {
     '?'
