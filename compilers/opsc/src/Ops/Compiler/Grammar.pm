@@ -180,6 +180,12 @@ token arglist {
     ]
 }
 
+# Casting. TODO Figure out precedence.
+token prefix:sym<( )> {
+    '(' <type_declarator> ')'
+    <O('%casting')>
+}
+
 
 rule blockoid {
     '{'
@@ -223,7 +229,7 @@ token ws {
 INIT {
     Ops::Compiler::Grammar.O(':prec<y=>, :assoc<unary>', '%methodop');
     Ops::Compiler::Grammar.O(':prec<x=>, :assoc<unary>', '%autoincrement');
-    Ops::Compiler::Grammar.O(':prec<w=>, :assoc<left>',  '%exponentiation');
+    Ops::Compiler::Grammar.O(':prec<w=>, :assoc<unary>', '%casting');
     Ops::Compiler::Grammar.O(':prec<v=>, :assoc<unary>', '%symbolic_unary');
     Ops::Compiler::Grammar.O(':prec<u=>, :assoc<left>',  '%multiplicative');
     Ops::Compiler::Grammar.O(':prec<t=>, :assoc<left>',  '%additive');

@@ -31,6 +31,8 @@ inline op noop() {
 }
 |, "More complex call op parsed");
 
+# Declarations
+
 parse_ok($c, q|
 inline op noop() {
     char bar;
@@ -69,6 +71,16 @@ parse_ok($c, q|
 inline op noop(out PMC, in INT) {
     $1 = foo($2);
 }|, "Simple register assignment");
+
+# Casting
+
+parse_ok($c, q|
+inline op noop(out PMC, in INT) {
+    $1 = (PMC*)foo($2);
+}|, "Casting works");
+
+
+# Control statements
 
 parse_ok($c, q|
 inline op noop(out PMC, in INT) {
