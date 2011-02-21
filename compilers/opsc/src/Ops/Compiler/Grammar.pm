@@ -149,18 +149,49 @@ rule statement_list {
 }
 
 token statement {
-    <EXPR> <.ws>
+    | <statement_control>
+    | <blockoid>
+    | <EXPR> <.ws>
 }
 
+
+proto rule statement_control { <...> }
+
+rule statement_control:sym<if> {
+    <sym> '(' <EXPR> ')'
+    <then=.statement>
+    [ 'else' <else=.statement> ]?
+}
+
+
 token term:sym<name> { <identifier> }
+token term:sym<int>  { <integer> }
+token term:sym<str>  { <quote> }
+token term:sym<float_constant_long> { # longer to work-around lack of LTM
+    [
+    | \d+ '.' \d*
+    | \d* '.' \d+
+    ]
+}
+
+# Assignment
+token infix:sym<=>   { <sym>  <O('%assignment')> }
 
 token postcircumfix:sym<( )> {
-    '(' <.ws> <EXPR>? ')'
+    '(' <.ws> <arglist> ')'
     <O('%methodop')>
 }
 token postcircumfix:sym<[ ]> {
     '[' <.ws> <EXPR>? ']'
     <O('%methodop')>
+}
+
+token arglist {
+    <.ws>
+    [
+    | <EXPR('f=')>
+    | <?>
+    ]
 }
 
 
@@ -205,8 +236,20 @@ token ws {
 
 INIT {
     Ops::Compiler::Grammar.O(':prec<y=>, :assoc<unary>', '%methodop');
-    Ops::Compiler::Grammar.O(':prec<p=>, :assoc<left>',  '%multiplicative');
-    Ops::Compiler::Grammar.O(':prec<o=>, :assoc<left>',  '%additive');
+    Ops::Compiler::Grammar.O(':prec<x=>, :assoc<unary>', '%autoincrement');
+    Ops::Compiler::Grammar.O(':prec<w=>, :assoc<left>',  '%exponentiation');
+    Ops::Compiler::Grammar.O(':prec<v=>, :assoc<unary>', '%symbolic_unary');
+    Ops::Compiler::Grammar.O(':prec<u=>, :assoc<left>',  '%multiplicative');
+    Ops::Compiler::Grammar.O(':prec<t=>, :assoc<left>',  '%additive');
+    Ops::Compiler::Grammar.O(':prec<r=>, :assoc<left>',  '%concatenation');
+    Ops::Compiler::Grammar.O(':prec<m=>, :assoc<left>',  '%relational');
+    Ops::Compiler::Grammar.O(':prec<l=>, :assoc<left>',  '%tight_and');
+    Ops::Compiler::Grammar.O(':prec<k=>, :assoc<left>',  '%tight_or');
+    Ops::Compiler::Grammar.O(':prec<j=>, :assoc<right>', '%conditional');
+    Ops::Compiler::Grammar.O(':prec<i=>, :assoc<right>', '%assignment');
+    Ops::Compiler::Grammar.O(':prec<g=>, :assoc<list>, :nextterm<nulltermish>',  '%comma');
+    Ops::Compiler::Grammar.O(':prec<f=>, :assoc<list>',  '%list_infix');
+    Ops::Compiler::Grammar.O(':prec<e=>, :assoc<unary>', '%list_prefix');
 }
 
 

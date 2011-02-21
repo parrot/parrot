@@ -26,6 +26,27 @@ inline op noop() {
 |);
     ok(1, "Single call op parsed");
 
+    _parse($c, q|
+inline op noop() {
+    char bar;
+}
+|);
+    ok(1, "Simple declaration parsed");
+
+    _parse($c, q|
+inline op noop() {
+    Interp * const new_interp;
+}
+|);
+    ok(1, "Complex declaration parsed");
+
+    _parse($c, q|
+inline op noop() {
+    Interp * const new_interp = foo();
+}
+|);
+    ok(1, "More complex declaration parsed");
+
 
 };
 
