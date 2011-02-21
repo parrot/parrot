@@ -145,6 +145,15 @@ rule statement_control:sym<if> {
     [ 'else' <else=.statement> ]?
 }
 
+rule statement_control:sym<while> {
+    <sym> '(' <condition=.EXPR> ')'
+    <statement>
+}
+
+rule statement_control:sym<for> {
+    <sym> '(' <init=.EXPR> ';' <test=.EXPR> ';' <step=.EXPR> ')'
+    <statement>
+}
 
 token term:sym<name> { <identifier> }
 token term:sym<int>  { <integer> }
