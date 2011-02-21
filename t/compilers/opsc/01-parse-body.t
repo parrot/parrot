@@ -114,6 +114,11 @@ inline op noop(out PMC, in INT) {
 parse_ok($c, q«
 inline op noop(out PMC, in INT) { gc_flags = $1->flags; }», "Pointer access");
 
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    Parrot_Int gc_flags = $1->flags & PObj_GC_all_FLAGS;
+}», "Pointer access in declarator");
+
 
 
 # Final big test?
