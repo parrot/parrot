@@ -55,6 +55,23 @@ inline op noop() {
 }
 |, "Really complex declaration parsed");
 
+parse_ok($c, q|
+inline op noop(in PMC) {
+    foo = bar;
+}|, "Simple assignment");
+
+parse_ok($c, q|
+inline op noop(in PMC) {
+    foo($1);
+}|, "Simple register");
+
+parse_ok($c, q|
+inline op noop(out PMC, in INT) {
+    $1 = foo($2);
+}|, "Simple register assignment");
+
+
+
 done_testing();
 
 

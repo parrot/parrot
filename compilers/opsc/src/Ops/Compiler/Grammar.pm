@@ -84,25 +84,6 @@ token op_body {
     <blockoid>
 }
 
-#Process op body by breaking it into "words" consisting entirely of whitespace,
-#alnums or a single punctuation, then checking for interesting macros (e.g $1
-#or goto NEXT() ) in the midst of the words.
-token body_word {
-    [
-    || <macro_param>
-    || <op_macro>
-    || <word>
-    ]
-}
-
-token word {
-    || <quote>
-    || <ident>
-    || <alnum>
-    || <punct>
-    || <ws>
-}
-
 proto token quote { <...> }
 token quote:sym<apos> { <?[']> <quote_EXPR: ':q'>  }
 token quote:sym<dblq> { <?["]> <quote_EXPR: ':q'> }
@@ -112,7 +93,7 @@ token macro_param {
 }
 
 rule op_macro {
-    <macro_type> <macro_destination> '(' <body_word>*? ')'
+    <macro_type> <macro_destination> '(' <arg=.EXPR>? ')'
 }
 
 token macro_type {
@@ -150,6 +131,7 @@ rule statement_list {
 
 token statement {
     | <statement_control>
+    | <op_macro>
     | <blockoid>
     | <EXPR> <.ws>
 }
@@ -173,6 +155,8 @@ token term:sym<float_constant_long> { # longer to work-around lack of LTM
     | \d* '.' \d+
     ]
 }
+
+token term:sym<reg> { <macro_param> }
 
 # Assignment
 token infix:sym<=>  { <sym>  <O('%assignment')> }
