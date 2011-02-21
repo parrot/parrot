@@ -177,6 +177,12 @@ token infix:sym<=>  { <sym>  <O('%assignment')> }
 token infix:sym<|=> { <sym>  <O('%assignment')> }
 token infix:sym<&=> { <sym>  <O('%assignment')> }
 token infix:sym<^=> { <sym>  <O('%assignment')> }
+
+token infix:sym<+=> { <sym>  <O('%assignment')> }
+token infix:sym<-=> { <sym>  <O('%assignment')> }
+token infix:sym<*=> { <sym>  <O('%assignment')> }
+token infix:sym</=> { <sym>  <O('%assignment')> }
+
 token infix:sym<,>  { <sym>  <O('%comma')> }
 
 token infix:sym<*>    { <sym>  <O('%multiplicative')> }
@@ -222,6 +228,10 @@ token postcircumfix:sym<[ ]> {
 
 token postfix:sym«->» { <sym> <identifier> <O('%methodop')> }
 token postfix:sym«.»  { <sym> <identifier> <O('%methodop')> }
+
+# XXX Check precedence
+token postfix:sym<--> { <sym> <O('%methodop')> }
+token postfix:sym<++> { <sym> <O('%methodop')> }
 
 token arglist {
     <.ws>
