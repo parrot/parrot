@@ -35,7 +35,7 @@ typedef enum {
     pmc_access
 } elt_access_t;
 
-typedef struct {
+typedef struct elt_desc_t {
     elt_access_t     access;
     PARROT_DATA_TYPE type;
     size_t           byte_offset;
