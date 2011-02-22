@@ -69,7 +69,18 @@ END_PMC_HEADER_PREAMBLE
     base_ptr = VTABLE_get_pointer((interp), ptr_pmc); \
     ptr      = ((char *)base_ptr) + elts[i].byte_offset;
 
-static void deallocate_ptrobj(PARROT_INTERP, PMC *obj, void *ptr)  {
+/*
+
+=item C<static void deallocate_ptrobj(PARROT_INTERP, PMC *obj, void *ptr)>
+
+Deallocation function to be attached to allocated instances.
+
+=cut
+
+*/
+
+static void
+deallocate_ptrobj(PARROT_INTERP, PMC *obj, void *ptr)  {
     mem_sys_free(ptr);
 }
 
@@ -598,9 +609,6 @@ Get/Set a float-like element from a struct-pointer PMC.
 
 */
 
-
-*/
-
     VTABLE FLOATVAL get_number_keyed(PMC *k) {
         BEGIN_KEYED(INTERP, SELF, k)
         switch (elts[i].access) {
@@ -873,10 +881,6 @@ Allocate an instance, or an array of instances when C<n> has been provided.
 /*
 
 =back
-
-=head1 SEE ALSO
-
-F<docs/pmc/struct.pod>
 
 =cut
 
