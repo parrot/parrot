@@ -290,11 +290,14 @@ load_bytecode_file(Parrot_PMC interp, Parrot_String filename)
 {
     ASSERT_ARGS(load_bytecode_file)
     Parrot_PMC bytecode = NULL;
-    Parrot_PMC error = NULL;
 
     /* set up all the compregs */
-    Parrot_PMC pir_compiler = imcc_get_pir_compreg_api(interp, 1, &error);
-    Parrot_PMC pasm_compiler = imcc_get_pasm_compreg_api(interp, 1, &error);
+    Parrot_PMC pir_compiler;
+    Parrot_PMC pasm_compiler;
+
+    if (!(imcc_get_pir_compreg_api(interp, 1, &pir_compiler) &&
+          imcc_get_pasm_compreg_api(interp, 1, &pasm_compiler)))
+        show_last_error_and_exit(interp);
 
     if (!Parrot_api_load_bytecode_file(interp, filename, &bytecode))
         show_last_error_and_exit(interp);

@@ -137,10 +137,12 @@ c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_serial
 #include <stdlib.h>
 
 #include "parrot/api.h"
+#include "imcc/api.h"
 
 int main(void) {
     Parrot_PMC interp;
     Parrot_PMC bytecode;
+    Parrot_PMC pir_compiler;
     Parrot_String pbc_s;
     Parrot_String filename;
     Parrot_Int length;
@@ -150,9 +152,10 @@ int main(void) {
     Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
 
     /* Step 1: Take the PIR, and compile it to PBC. Write to file */
+    imcc_get_pir_compreg_api(interp, 1, &pir_compiler);
     Parrot_api_string_import(interp, "$temp_pir", &filename);
     Parrot_api_toggle_gc(interp, 0);
-    Parrot_api_wrap_imcc_hack(interp, filename, 0, NULL, &bytecode, imcc_run_api);
+    imcc_compile_file_api(interp, pir_compiler, filename, &bytecode);
 
     Parrot_api_serialize_bytecode_pmc(interp, bytecode, &pbc_s);
     Parrot_api_toggle_gc(interp, 1);
@@ -196,7 +199,7 @@ c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_reset_
 int main(void) {
     Parrot_PMC interp;
     Parrot_PMC bytecode;
-    int run_pbc;
+    Parrot_PMC pir_compiler;
     Parrot_String filename;
     int i;
     Parrot_String signature_s;
@@ -208,7 +211,8 @@ int main(void) {
     Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
     Parrot_api_string_import(interp, "$temp_pir", &filename);
     Parrot_api_toggle_gc(interp, 0);
-    Parrot_api_wrap_imcc_hack(interp, filename, 0, NULL, &bytecode, &run_pbc, imcc_run_api);
+    imcc_get_pir_compreg_api(interp, 1, &pir_compiler);
+    imcc_compile_file_api(interp, pir_compiler, filename, &bytecode);
     Parrot_api_run_bytecode(interp, bytecode, NULL);
 
     Parrot_api_string_import_ascii(interp, "Pi->", &signature_s);

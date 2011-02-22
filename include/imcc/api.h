@@ -17,7 +17,7 @@ Parrot_Int imcc_compile_file_api(
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC * imcc_get_pasm_compreg_api(
+Parrot_Int imcc_get_pasm_compreg_api(
     Parrot_PMC interp_pmc,
     int add_compreg,
     Parrot_PMC *compiler);
