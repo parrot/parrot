@@ -145,6 +145,11 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
 
         /* TODO: Handle outer_ctx */
         pf = imcc_compile_file(attrs->imcc_info, filename, attrs->is_pasm);
+        if (PMC_IS_NULL(pf)) {
+            STRING * const msg = imcc_last_error_message(attrs->imcc_info);
+            INTVAL code = imcc_last_error_code(attrs->imcc_info);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
+        }
 
         Parrot_pop_context(interp);
         Parrot_unblock_GC_mark(interp);
