@@ -22,7 +22,7 @@ t/pmc/os.t - Files and Dirs
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/os.t
+    % prove t/dynpmc/os.t
 
 =head1 DESCRIPTION
 
