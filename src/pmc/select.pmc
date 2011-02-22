@@ -91,11 +91,11 @@ the Hash PMC
 
 pmclass Select auto_attrs {
 
-    ATTR PMC *data_hash;  /* fd -> data */
-    ATTR fd_set rb_array; /* read bit array */
-    ATTR fd_set wb_array; /* write bit array */
-    ATTR fd_set eb_array; /* error bit array */
-    ATTR INTVAL maxfd;
+    ATTR PMC    *data_hash; /* fd -> data */
+    ATTR fd_set  rb_array;  /* read bit array */
+    ATTR fd_set  wb_array;  /* write bit array */
+    ATTR fd_set  eb_array;  /* error bit array */
+    ATTR INTVAL  maxfd;
 
 /*
 
@@ -280,8 +280,8 @@ read before returning.
       GET_ATTR_maxfd(INTERP, SELF, maxid);
       timeouts.tv_sec  = timeout;
       timeouts.tv_usec = 0;
+      results          = pmc_new(interp, enum_class_ResizablePMCArray);
       memcpy(&rdset, &PARROT_SELECT(SELF)->rb_array, sizeof (fd_set));
-      results = pmc_new(interp, enum_class_ResizablePMCArray);
 
       select(maxid + 1, &rdset, NULL, NULL, &timeouts);
       for (i=0; i <= maxid; i++) {
@@ -317,8 +317,8 @@ write to before returning.
       GET_ATTR_maxfd(INTERP, SELF, maxid);
       timeouts.tv_sec  = timeout;
       timeouts.tv_usec = 0;
+      results          = pmc_new(interp, enum_class_ResizablePMCArray);
       memcpy(&wbset, &PARROT_SELECT(SELF)->wb_array, sizeof (fd_set));
-      results = pmc_new(interp, enum_class_ResizablePMCArray);
 
       select(maxid + 1, NULL, &wbset, NULL, &timeouts);
       for (i=0; i<=maxid; i++) {
@@ -346,8 +346,7 @@ exception state before returning.
 
     METHOD has_exception(INTVAL timeout) {
       struct timeval  timeouts;
-      PMC            *results;
-      PMC            *data_hash;
+      PMC            *results, *data_hash;
       INTVAL          maxid, i;
       fd_set          ebset;
 
@@ -355,8 +354,8 @@ exception state before returning.
       GET_ATTR_maxfd(INTERP, SELF, maxid);
       timeouts.tv_sec  = timeout;
       timeouts.tv_usec = 0;
+      results          = pmc_new(interp, enum_class_ResizablePMCArray);
       memcpy(&ebset, &PARROT_SELECT(SELF)->eb_array, sizeof (fd_set));
-      results = pmc_new(interp, enum_class_ResizablePMCArray);
 
       select(maxid + 1, NULL, NULL, &ebset, &timeouts);
       for (i=0; i<=maxid; i++) {
@@ -373,7 +372,7 @@ exception state before returning.
 =item C<METHOD can_read()>
 
 Returns the associated data for the file descriptors in the Select PMC, which
-are ready to be read, written, or have and exception to be handled.
+are ready to be read, written, or have an exception to be handled.
 
 Waits for a maximum of timeout seconds for a file descriptor to be ready to be
 handled.
@@ -394,13 +393,13 @@ handled.
       GET_ATTR_maxfd(INTERP, SELF, maxid);
       timeouts.tv_sec  = timeout;
       timeouts.tv_usec = 0;
+      results          = pmc_new(interp, enum_class_ResizablePMCArray);
+      rresults         = pmc_new(interp, enum_class_ResizablePMCArray);
+      wresults         = pmc_new(interp, enum_class_ResizablePMCArray);
+      eresults         = pmc_new(interp, enum_class_ResizablePMCArray);
       memcpy(&rdset, &PARROT_SELECT(SELF)->rb_array, sizeof (fd_set));
       memcpy(&wrset, &PARROT_SELECT(SELF)->wb_array, sizeof (fd_set));
       memcpy(&erset, &PARROT_SELECT(SELF)->eb_array, sizeof (fd_set));
-      results  = pmc_new(interp, enum_class_ResizablePMCArray);
-      rresults = pmc_new(interp, enum_class_ResizablePMCArray);
-      wresults = pmc_new(interp, enum_class_ResizablePMCArray);
-      eresults = pmc_new(interp, enum_class_ResizablePMCArray);
 
       select(maxid + 1, &rdset, &wrset, &erset, &timeouts);
       for (i=0; i<=maxid; i++) {
