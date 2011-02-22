@@ -97,13 +97,14 @@ than having a mix of C and PIR.
 
 =back
 
-We are also designing M0 to be as simple as possible.  As much as possible,
-all the complexity of Parrot will be built on top of M0.  This is to
-facilitate multiple implementations, e.g. a quick and dirty prototype
-implementation in JavaScript, a space-optimized implemention targeted for
-mobile devices, a tracing jit targeted for server use, etc.  M0's simplicity
-should be extreme; the moment M0 gets ops for the sake of efficiency or ease
-of use, it has failed its design goals.
+We are also designing M0 to be as simple as possible, i.e. M0 should contain as
+few ops as possible.  The complexity of Parrot will be built on top of M0, in
+M1 (which will be written in M0) and beyond.  This is to facilitate multiple
+implementations, e.g. a quick and dirty prototype implementation in JavaScript,
+a space-optimized implemention targeted for mobile devices, a tracing jit
+targeted for server use, etc.  M0's simplicity should be extreme; the moment M0
+gets ops for the sake of efficiency or ease of use, it has failed its design
+goals.
 
 There will be no stacks in M0, not even for argument passing. Everything must
 be in Continuation-Passing-Style.
