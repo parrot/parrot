@@ -261,7 +261,7 @@ method op_body($/) {
 
 method macro_param($/) {
     make PAST::Var.new(
-        :name(~$<num>),
+        :name(~$/),
         :node($/),
     );
 }
@@ -411,6 +411,31 @@ method term:sym<call> ($/) {
     make $past;
 }
 
+method term:sym<reg> ($/) {
+    make $<macro_param>.ast;
+}
+
+method term:sym<int> ($/) {
+    # TODO Handle type
+    make PAST::Val.new(
+        :value(~$/),
+        :returns<int>
+    );
+}
+
+method term:sym<str> ($/) {
+    make PAST::Val.new(
+        :value(~$<quote>),
+        :returns<string>
+    );
+}
+
+method term:sym<float_constant_long> ($/) { # longer to work-around lack of LTM
+    make PAST::Val.new(
+        :value(~$/),
+        :returns<float>
+    );
+}
 # Local Variables:
 #   mode: perl6
 #   fill-column: 100
