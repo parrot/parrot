@@ -923,9 +923,13 @@ ERROR
 JSON
 
     # decode table
+    .local pmc compiler
+    load_language 'data_json'
+    compiler = compreg 'data_json'
+
     .local pmc table
-    load_language 'JSON'
-    table = from_json(json_table)
+    $P0 = compiler.'compile'(json_table)
+    table = $P0()
 
     # fixup table
     .local pmc table_iter
