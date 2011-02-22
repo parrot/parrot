@@ -2,11 +2,19 @@ New in 3.2.0
 - Core
   + Full support for Unicode filenames on Linux and Win32
   + The configuration option --cxx is gone
+  + The make target "docs" is not needed any more
+  + Improved code coverage
+  + The branch "gen_gc2" is merged
+  + "opsc_full_parse" branch for semantically parse of ops is started
 - Languages
+  + A few tests in Cardinal are fixed
+  + Minor fixes, refactors and cleaning on Winxed
+  + New predefs replace and push on Winxed
 - Community
 - Documentation
   + 'make docs' target, which was serving only to generate superfluous POD
     files, has been removed.
+  + Svn remnants from PDDs are removed
 - Tests
 
 New in 3.1.0
