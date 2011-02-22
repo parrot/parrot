@@ -175,6 +175,10 @@ rule switch_default {
 }
 
 
+# HACK to support for INT_FMT "\n"
+token term:sym<concat> {
+    <identifier> \s <quote>
+}
 
 token term:sym<name> {
     <identifier> [ <.ws> '(' <arglist> ')' ]?
