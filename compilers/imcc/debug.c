@@ -106,14 +106,14 @@ IMCC_get_err_location(ARGMOD(imc_info_t *imcc))
         msg = Parrot_sprintf_c(imcc->interp, "in macro '.%Ss' line %d",
                 imcc->frames->s.file, imcc->line);
     else
-        msg = Parrot_sprintf_c(imcc->interp, "in file '%Ss' line %d\n",
+        msg = Parrot_sprintf_c(imcc->interp, "in file '%Ss' line %d",
                 imcc->frames->s.file, imcc->line);
 
 
     for (f = imcc->frames; f; f = (macro_frame_t *)f->s.next) {
         if (!STRING_equal(imcc->interp, f->s.file, old)) {
             msg = Parrot_sprintf_c(imcc->interp,
-                "%Ss\tincluded from '%Ss' line %d\n", msg, f->s.file, f->s.line);
+                "%Ss\n\tincluded from '%Ss' line %d", msg, f->s.file, f->s.line);
         }
 
         old = f->s.file;
