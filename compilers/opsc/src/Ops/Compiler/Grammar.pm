@@ -130,9 +130,12 @@ rule statement_list {
 }
 
 token statement {
+    [
     | <statement_control>
     | <blockoid>
     | <EXPR> <.ws>
+    ]
+    <?MARKER('endstmt')>
 }
 
 
@@ -264,7 +267,6 @@ rule blockoid {
     <declarator>*
     <statement_list>
     '}'
-    <?MARKER('endstmt')>
 }
 
 # Simplified parsing of declarator
