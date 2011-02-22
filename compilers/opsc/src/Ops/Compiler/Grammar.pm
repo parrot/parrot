@@ -209,6 +209,9 @@ token infix:sym<-=> { <sym>  <O('%assignment')> }
 token infix:sym<*=> { <sym>  <O('%assignment')> }
 token infix:sym</=> { <sym>  <O('%assignment')> }
 
+token infix:sym«>>=» { <sym>  <O('%assignment')> }
+token infix:sym«<<=» { <sym>  <O('%assignment')> }
+
 token infix:sym<,>  { <sym>  <O('%comma')> }
 
 token infix:sym<*>    { <sym>  <O('%multiplicative')> }
@@ -282,6 +285,7 @@ token prefix:sym<->   { <sym>  <![>]> <O('%symbolic_unary')> }
 token prefix:sym<!>   { <sym>  <O('%symbolic_unary')> }
 token prefix:sym<|>   { <sym>  <O('%symbolic_unary')> }
 token prefix:sym<&>   { <sym>  <O('%symbolic_unary')> }
+token prefix:sym<*>   { <sym>  <O('%symbolic_unary')> }
 token prefix:sym<~>   { <sym>  <O('%symbolic_unary')> }
 
 
