@@ -143,6 +143,15 @@ inline op noop(out PMC, in INT) {
     }
 }|, "Simple 'if-else'");
 
+parse_ok($c, q|
+inline op noop(out PMC, in INT) {
+    if (foo())
+        $1 = bar();
+    else
+        $1 = baz();
+}|, "Parenthises less 'if-else'");
+
+
 
 parse_ok($c, q«
 inline op noop(out PMC, in INT) {
