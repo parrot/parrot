@@ -22,15 +22,15 @@ op bar() {
 }
 
 inline op foo(out INT, in PMC, inconst NUM) :flow :deprecated {
-    foo # We don't handle anything in C<body> during parse/past.
+    foo(); # We don't handle anything in C<body> during parse/past.
 }
 
 inline op bar(out PMC) {
-    foo # We don't handle anything in C<body> during parse/past.
+    foo(); # We don't handle anything in C<body> during parse/past.
 }
 
 inline op bar(out PMC, in INT) {
-    foo # We don't handle anything in C<body> during parse/past.
+    foo(); # We don't handle anything in C<body> during parse/past.
 }
 
 
