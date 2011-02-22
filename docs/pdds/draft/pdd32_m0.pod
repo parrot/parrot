@@ -168,16 +168,24 @@ These are too magical and can be written in terms of simpler ops:
 =over
 
 =item * new  - create a new PMC
-
+       * allocate memory
+       * set default values
 =item * store - store a register in a PMC, or vice versa
 
 =item * get_cc - Get the current Lorito context
 
 =item * invoke_cc - Invoke the current Lorito context
+       * set return PC in context
+       * switch code segment, if necessary
+       * get (new) current PC from context
 
 =item * new_ctx - Create a new Lorito context
+       * allocate memory
+       * set default values
 
 =item * load_bytecode - load bytecode into the current Lorito context
+       * allocate memory
+       * make a couple of system calls (hand-waving here)
 
 =item * mark_unused - tell the GC that this previously allocated memory is now unused
 
