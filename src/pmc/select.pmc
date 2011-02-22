@@ -109,33 +109,12 @@ Initializes the PMC.
 
     VTABLE void init() {
         PMC *fd_map = pmc_new(interp, enum_class_Hash);
-        Parrot_Select_attributes * const attrs =
-            mem_gc_allocate_zeroed_typed(INTERP, Parrot_Select_attributes);
-        PMC_data(SELF) = attrs;
         SET_ATTR_fd_map(INTERP, SELF, fd_map);
         SET_ATTR_maxfd(INTERP, SELF, -1);
 
         FD_ZERO(&(PARROT_SELECT(SELF)->rb_array));
         FD_ZERO(&(PARROT_SELECT(SELF)->wb_array));
         FD_ZERO(&(PARROT_SELECT(SELF)->eb_array));
-        PObj_custom_destroy_SET(SELF);
-    }
-
-/*
-
-=item C<void destroy()>
-
-Destroys the PMC.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        if (PMC_data(SELF)) {
-            mem_gc_free(INTERP, PMC_data(SELF));
-            PMC_data(SELF) = NULL;
-        }
     }
 
 /*
