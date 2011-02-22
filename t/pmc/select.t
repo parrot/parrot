@@ -52,8 +52,16 @@ Tests the Select PMC.
     $P9 = "FH2"
     $P1."update"($P3, $P9, 5)
 
+    $I1 = $P1.'getfd'($P0)
+    $I2 = $P1.'getfd'($P3)
+
+    if $I1 > $I2 goto a
+    $I1 = $I2
+a:
+
     $I0 = $P1.'getmaxfd'()
-    is($I0, 6, 'maxid = 6')
+    
+    is($I0, $I1, 'maxid = max(fd1 fd2)')
 
     $P2 = $P1.'get_fd_map'()
     $I3 = $P2

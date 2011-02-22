@@ -68,7 +68,7 @@ the Hash PMC
 
 =back
 
-=head2 Vtable Functions 
+=head2 Vtable Functions
 
 =over 4
 
