@@ -253,42 +253,9 @@ method op_param($/) {
 }
 
 method op_body($/) {
-    my $past := PAST::Stmts.new(
-        :node($/),
-    );
+    my $past := $<blockoid>.ast;
     $past<jump> := list();
-    my $prev_words := '';
-    for $<body_word> {
-        if $prev_words && $_<word> {
-            $prev_words := $prev_words ~ ~$_<word>;
-        }
-        elsif $_<word> {
-            $prev_words := ~$_<word>;
-        }
-        else {
-            $past.push(PAST::Op.new(
-                :pasttype('inline'),
-                :inline($prev_words),
-            ));
-            $prev_words := '';
 
-            if $_<macro_param> {
-                $past.push($_<macro_param>.ast);
-            }
-            elsif $_<op_macro> {
-                $past.push($_<op_macro>.ast);
-                for $_<op_macro>.ast<jump> {
-                    $past<jump>.push($_);
-                }
-            }
-        }
-    }
-    if $prev_words {
-        $past.push(PAST::Op.new(
-            :pasttype('inline'),
-            :inline($prev_words)
-        ));
-    }
     make $past;
 }
 
@@ -299,27 +266,6 @@ method macro_param($/) {
     );
 }
 
-method body_word($/) {
-    #say('# body_word: '~ ~$<word>);
-    my $past;
-    if $<word> {
-        $past := PAST::Op.new(
-            :pasttype('inline'),
-            :inline(~$<word>)
-        );
-    }
-    elsif $<macro_param> {
-        $past := $<macro_param>.ast;
-    }
-    elsif $<op_macro> {
-        $past := $<op_macro>.ast;
-    }
-    else {
-        die('horribly');
-    }
-    #_dumper($past);
-    make $past;
-}
 
 method op_macro($/) {
     #say('# op_macro');
@@ -408,6 +354,32 @@ sub process_op_macro_body_word($/, $macro) {
         }
     }
 }
+
+method blockoid ($/) {
+    my $past := PAST::Block.new(:node($/));
+
+    $past.push($_.ast) for $<declarator>;
+    $past.push($_.ast) for @($<statement_list>.ast);
+
+    make $past;
+}
+
+method declarator ($/) {
+    my $past := PAST::Var.new(
+        :node($/),
+        :isdecl(1),
+        :name(~$<variable>),
+        :vivibase(~$<type_declarator>),
+    );
+    make $past;
+}
+
+method statement_list ($/) {
+    my $past := PAST::Stmts.new(:node($/));
+
+    make $past;
+}
+
 
 # Local Variables:
 #   mode: perl6
