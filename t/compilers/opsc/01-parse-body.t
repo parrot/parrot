@@ -153,6 +153,67 @@ inline op noop(out PMC, in INT) {
 
 
 parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    switch ($2) {
+    }
+}
+», "Simple switch");
+
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    switch ($2) {
+        case 42:
+            break;
+    }
+}
+», "Simple switch 2");
+
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    switch ($2) {
+        case 42:
+            goto NEXT();
+            break;
+    }
+}
+», "Simple switch 3");
+
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    switch ($2) {
+        case 24:
+            goto NEXT();
+            break;
+        case 42:
+            goto NEXT();
+            break;
+    }
+}
+», "Comples switch with two cases");
+
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    switch ($2) {
+        default:
+            goto NEXT();
+            break;
+    }
+}
+», "Simple switch with default");
+
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    switch ($2) {
+        case 42:
+            break;
+        default:
+            goto NEXT();
+            break;
+    }
+}
+», "Complex switch with case and default");
+
+parse_ok($c, q«
 inline op if (invar INT, inconst LABEL) {
     if ($1 != 0)
         goto OFFSET($2);

@@ -157,6 +157,24 @@ rule statement_control:sym<for> {
     <statement>
 }
 
+# Not real "C" switch. Just close enough
+rule statement_control:sym<switch> {
+    <sym> '(' <test=.EXPR> ')' '{'
+    <switch_case>*
+    <switch_default>?
+    '}'
+}
+
+rule switch_case {
+    'case' [ <identifier> | <integer>] ':' <statement_list>
+}
+
+rule switch_default {
+    'default' ':' <statement_list>
+}
+
+
+
 token term:sym<name> {
     <identifier> [ <.ws> '(' <arglist> ')' ]?
 }
@@ -281,8 +299,8 @@ rule type_declarator {
 
 token eat_terminator {
     | ';'
-    | <?MARKED('endstmt')>
     | <?terminator>
+    | <?MARKED('endstmt')>
     | $
 }
 
