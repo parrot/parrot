@@ -359,7 +359,7 @@ method blockoid ($/) {
     my $past := PAST::Block.new(:node($/));
 
     $past.push($_.ast) for $<declarator>;
-    $past.push($_.ast) for @($<statement_list>.ast);
+    $past.push($_) for @($<statement_list>.ast);
 
     make $past;
 }
@@ -377,9 +377,29 @@ method declarator ($/) {
 method statement_list ($/) {
     my $past := PAST::Stmts.new(:node($/));
 
+    $past.push($_.ast) for $<statement>;
+
     make $past;
 }
 
+method statement ($/) {
+    my $past;
+
+    if $<statement_control> {
+        $past := $<statement_control>.ast;
+    }
+    elsif $<blockoid> {
+        $past := $<blockoid>.ast;
+    }
+    elsif $<EXPR> {
+        $past := $<EXPR>.ast;
+    }
+    else {
+        $/.CURSOR.panic("Unknown content in statement");
+    }
+
+    make $past;
+}
 
 # Local Variables:
 #   mode: perl6
