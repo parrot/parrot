@@ -256,10 +256,10 @@ token circumfix:sym<( )> {
 
 token prefix:sym<+>   { <sym>  <O('%symbolic_unary')> }
 token prefix:sym<->   { <sym>  <![>]> <O('%symbolic_unary')> }
-token prefix:sym<?>   { <sym>  <O('%symbolic_unary')> }
 token prefix:sym<!>   { <sym>  <O('%symbolic_unary')> }
 token prefix:sym<|>   { <sym>  <O('%symbolic_unary')> }
 token prefix:sym<&>   { <sym>  <O('%symbolic_unary')> }
+token prefix:sym<~>   { <sym>  <O('%symbolic_unary')> }
 
 
 rule blockoid {
