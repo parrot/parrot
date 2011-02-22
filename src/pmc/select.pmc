@@ -89,18 +89,16 @@ the Hash PMC
     }
 
 
-pmclass Select no_ro auto_attrs {
+pmclass Select auto_attrs {
 
-    /* TODO: Consider encapsulating PIOHANDLE as a PMC type, for subclassing */
-    ATTR PMC *data_hash;         /* fd -> data */
-    ATTR fd_set rb_array;          /* read bit array */
-    ATTR fd_set wb_array;          /* write bit array */
-    ATTR fd_set eb_array;          /* error bit array */
+    ATTR PMC *data_hash;      /* fd -> data */
+    ATTR fd_set rb_array;     /* read bit array */
+    ATTR fd_set wb_array;     /* write bit array */
+    ATTR fd_set eb_array;     /* error bit array */
     ATTR fd_set *rb;          /* read bit array */
     ATTR fd_set *wb;          /* write bit array */
     ATTR fd_set *eb;          /* error bit array */
     ATTR INTVAL maxfd;
-
 
 /*
 
