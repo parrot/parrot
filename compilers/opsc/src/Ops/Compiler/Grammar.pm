@@ -33,7 +33,7 @@ token end_preamble {
 }
 
 rule op {
-    <op_type>? 'op' <op_name=identifier>
+    <op_type>? 'op' <op_name=ident>
     [ '(' <signature> ')' || <.panic: "Fail to parse signature"> ]
     <op_flag>*
     [ <op_body> || <.panic: "Fail to parse op body"> ]

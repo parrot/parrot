@@ -152,6 +152,13 @@ inline op noop(out PMC, in INT) {
 }|, "Parenthises less 'if-else'");
 
 
+parse_ok($c, q«
+inline op if (invar INT, inconst LABEL) {
+    if ($1 != 0)
+        goto OFFSET($2);
+}
+», "core.ops 'if'");
+
 
 parse_ok($c, q«
 inline op noop(out PMC, in INT) {
