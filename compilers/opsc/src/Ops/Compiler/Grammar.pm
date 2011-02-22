@@ -246,10 +246,13 @@ token infix:sym<?:> {
     <O('%conditional, :reducecheck<ternary>')>
 }
 
+token infix:sym<,>    { <sym>  <O('%list_infix')> }
+
 token postcircumfix:sym<( )> {
     '(' <.ws> <arglist> ')'
     <O('%methodop')>
 }
+
 token postcircumfix:sym<[ ]> {
     '[' <.ws> <EXPR>? ']'
     <O('%methodop')>
