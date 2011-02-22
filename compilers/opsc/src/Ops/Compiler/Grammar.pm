@@ -118,7 +118,8 @@ token identifier {
 
 token keyword {
     [
-    |'for' |'if' |'while'
+    | 'for' |'if' |'while'
+    | 'case' | 'default'
     ]>>
 }
 
