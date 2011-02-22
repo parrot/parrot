@@ -303,7 +303,7 @@ rule declarator {
 
 # No double poiners (for now?)
 rule type_declarator {
-    'const'? <.identifier> '*'? 'const'?
+    'const'? <.identifier> '*'* 'const'?
 }
 
 token eat_terminator {
