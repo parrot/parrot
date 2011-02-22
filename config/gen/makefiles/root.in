@@ -610,7 +610,7 @@ all : \
     corevm \
     docs \
 #IF(has_glut):    $(LIBGLUTCB_SO) \
-#IF(has_dynamic_linking): $(DIS) \
+    $(DIS) \
     $(PARROT_CONFIG) \
     $(PBC_TO_EXE) \
     $(PBC_MERGE) \
@@ -622,26 +622,12 @@ all : \
     $(PCT_LIB_PBCS) \
     $(DATA_JSON_LIB_PBCS) \
     $(JSON_LANG) \
-    $(EXTRANCITHUNKS_SO) \
+#IF(has_dynamic_linking): $(EXTRANCITHUNKS_SO) \
     $(NQP_LIB_PBCS) \
 #IF(has_dynamic_linking): $(DYNOPLIBS_TARGETS) \
 #IF(has_dynamic_linking): $(LIBNCI_TEST_SO) \
     $(GEN_LIBRARY) \
     src/install_config$(O)
-
-$(EXTRANCITHUNKS_SO): \
-#IF(has_dynamic_linking): $(DIS) \
-    $(PARROT_CONFIG) \
-    $(PBC_TO_EXE) \
-    $(PBC_MERGE) \
-    $(PDB) \
-    $(PDUMP) \
-    $(NQP_RX) \
-    $(TGE_LIB_PBCS) \
-    $(PGE_LIB_PBCS) \
-    $(PCT_LIB_PBCS) \
-    $(DATA_JSON_LIB_PBCS) \
-    $(JSON_LANG)
 
 # We build DYNPMC_TARGET in corevm. It's kinda hack to test t/pmc/threads.t CLONE_LIBRARIES
 corevm : \
