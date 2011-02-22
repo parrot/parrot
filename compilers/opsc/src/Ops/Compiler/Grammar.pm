@@ -180,7 +180,7 @@ token term:sym<concat> {
     <identifier> \s <quote>
 }
 
-token term:sym<name> {
+token term:sym<call> {
     <identifier> [ <.ws> '(' <arglist> ')' ]?
 }
 token term:sym<int>  { <integer> ('u'|'U'|'l'|'L')* }

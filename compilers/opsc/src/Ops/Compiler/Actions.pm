@@ -401,6 +401,16 @@ method statement ($/) {
     make $past;
 }
 
+method term:sym<call> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype('call'),
+        :name(~$<identifier>),
+    );
+
+    # TODO Handle arglist
+    make $past;
+}
+
 # Local Variables:
 #   mode: perl6
 #   fill-column: 100
