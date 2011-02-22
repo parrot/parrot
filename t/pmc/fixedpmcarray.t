@@ -20,7 +20,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(87)
+    plan(88)
     test_setting_array_size()
     test_assign_from_another()
     test_assign_self()
@@ -269,6 +269,10 @@ out-of-bounds test. Checks INT and PMC keys.
     .const 'Sub' cannot_auto_pmc = 'cannot_auto_pmc'
     throws_type(cannot_auto_pmc, .EXCEPTION_INVALID_OPERATION, 'Autovivification of nested arrays fails - pmc')
 
+    null $P1
+    matrix[0] = $P1
+    elem_out_pmc = matrix[0; 0]
+    is_null(elem_out_pmc, 'Attempt to recurse null element gives null')
 .end
 
 .sub test_equality
