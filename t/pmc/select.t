@@ -55,17 +55,17 @@ Tests the Select PMC.
     $I0 = $P1.'getmaxfd'()
     is($I0, 6, 'maxid = 6')
 
-    $P2 = $P1.'get_data_hash'()
+    $P2 = $P1.'get_fd_map'()
     $I3 = $P2
     is($I3, 2, 'two items in select PMC')
 
     $I0 = $P1.'getfd'($P0)
     $S0 = $P2[$I0]
-    is($S0, "FH1", 'data_hash[x] = FH1')
+    is($S0, "FH1", 'fd_map[x] = FH1')
 
     $I0 = $P1.'getfd'($P3)
     $S0 = $P2[$I0]
-    is($S0, "FH2", 'data_hash[x] = FH2')
+    is($S0, "FH2", 'fd_map[x] = FH2')
 
     $P1.'remove'($P0)
     $I3 = $P2
