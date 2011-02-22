@@ -196,7 +196,7 @@ token term:sym<reg>   { <macro_param> }
 token term:sym<macro> { <op_macro>    }
 
 # Used for macro-casting. E.g. PTR2INTVAL.
-token term:sym<type>  { <type_declarator>    }
+token term:sym<type>  { <type_declarator> <!before '('> }
 
 # Assignment
 token infix:sym<=>  { <sym>  <O('%assignment')> }
