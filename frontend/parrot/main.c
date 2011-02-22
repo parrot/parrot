@@ -894,7 +894,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
         const char * ext = strrchr(sourcefile, '.');
         if (sourcefile && ext && !strcmp(ext, ".pbc"))
             args->have_pbc_file = 1;
-        else if (sourcefile && !strcmp(ext, ".pasm"))
+        else if (sourcefile && ext && !strcmp(ext, ".pasm"))
             args->have_pasm_file = 1;
         verify_file_names(sourcefile, outfile);
         if (!Parrot_api_string_import(interp, sourcefile, &args->sourcefile))
