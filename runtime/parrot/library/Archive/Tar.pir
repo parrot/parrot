@@ -68,6 +68,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     .param string path
     .local string data
     $P0 = new 'FileHandle'
+    $P0.'encoding'('binary')
     push_eh _handler
     .local string data
     data = $P0.'readall'(path)
