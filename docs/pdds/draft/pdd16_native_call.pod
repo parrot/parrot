@@ -7,9 +7,9 @@
 This PDD describes the native call interface, and the function signatures used
 to describe those functions.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 

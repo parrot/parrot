@@ -7,9 +7,9 @@
 This PDD aims to clear up the confusion regarding the implementation of keyed
 access to PMCs in Parrot.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 

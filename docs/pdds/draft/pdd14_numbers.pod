@@ -6,9 +6,9 @@
 
 This PDD describes Parrot's numeric data types.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 

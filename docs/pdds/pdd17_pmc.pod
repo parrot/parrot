@@ -7,9 +7,9 @@
 This PDD describes the internal structure and behavior of the Polymorphic
 Container (PMC) data type.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 
