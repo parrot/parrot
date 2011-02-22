@@ -1528,22 +1528,16 @@ src/interp/inter_misc$(O) : $(PARROT_H_HEADERS) \
 	compilers/imcc/sets.h \
 	compilers/imcc/symreg.h \
 	compilers/imcc/unit.h \
+	compilers/imcc/yyscanner.h \
 	$(INC_DIR)/oplib/ops.h \
-	$(INC_DIR)/runcore_api.h
+	$(INC_DIR)/runcore_api.h \
+        include/pmc/pmc_parrotinterpreter.h
 
 src/interp/inter_create$(O) : $(PARROT_H_HEADERS) \
 	$(INC_DIR)/oplib/core_ops.h \
 	src/gc/gc_private.h \
 	src/interp/inter_create.c \
 	src/interp/inter_create.str \
-	compilers/imcc/imc.h \
-	compilers/imcc/cfg.h \
-	compilers/imcc/debug.h \
-	compilers/imcc/instructions.h \
-	compilers/imcc/sets.h \
-	compilers/imcc/symreg.h \
-	compilers/imcc/unit.h \
-	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/runcore_api.h \
         src/gc/variable_size_pool.h
 
@@ -1575,6 +1569,7 @@ frontend/parrot/main$(O) : \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/has_header.h \
     $(INC_DIR)/longopt.h \
+    include/imcc/api.h \
     frontend/parrot/main.c
 
 src/multidispatch$(O) : \
@@ -1599,6 +1594,7 @@ src/packfile/api$(O) : \
     compilers/imcc/sets.h \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
+    compilers/imcc/yyscanner.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/dynext.h \
@@ -1713,13 +1709,6 @@ src/embed$(O) : \
     $(INC_DIR)/runcore_api.h \
     $(INC_DIR)/extend_vtable.h \
     $(INC_DIR)/oplib/core_ops.h \
-    compilers/imcc/imc.h \
-    compilers/imcc/cfg.h \
-    compilers/imcc/debug.h \
-    compilers/imcc/instructions.h \
-    compilers/imcc/sets.h \
-    compilers/imcc/symreg.h \
-    compilers/imcc/unit.h \
     include/pmc/pmc_sub.h
 
 src/embed/api$(O) : \
