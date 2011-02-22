@@ -183,7 +183,7 @@ token term:sym<concat> {
 token term:sym<name> {
     <identifier> [ <.ws> '(' <arglist> ')' ]?
 }
-token term:sym<int>  { <integer> }
+token term:sym<int>  { <integer> ('u'|'U'|'l'|'L')* }
 token term:sym<str>  { <quote> }
 token term:sym<float_constant_long> { # longer to work-around lack of LTM
     [
