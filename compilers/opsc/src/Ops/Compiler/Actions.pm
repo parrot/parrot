@@ -401,6 +401,13 @@ method statement ($/) {
     make $past;
 }
 
+method term:sym<identifier> ($/) {
+    # XXX Type vs Variable
+    make PAST::Var.new(
+        :name(~$/),
+    );
+}
+
 method term:sym<call> ($/) {
     my $past := PAST::Op.new(
         :pasttype('call'),

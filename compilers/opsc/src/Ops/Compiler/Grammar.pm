@@ -195,8 +195,8 @@ token term:sym<float_constant_long> { # longer to work-around lack of LTM
 token term:sym<reg>   { <macro_param> }
 token term:sym<macro> { <op_macro>    }
 
-# Used for macro-casting. E.g. PTR2INTVAL.
-token term:sym<type>  { <type_declarator> <!before '('> }
+# Used for macro-casting. E.g. PTR2INTVAL. Or variable name.
+token term:sym<identifier>  { <type_declarator> <!before '('> }
 
 # Assignment
 token infix:sym<=>  { <sym>  <O('%assignment')> }
