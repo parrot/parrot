@@ -14,13 +14,19 @@ sub MAIN() {
     pir::load_bytecode("opsc.pbc");
     pir::load_bytecode("Getopt/Obj.pbc");
 
-    my $core := 0;
-    my @files;
-    my $emit_lines := 1;
-
     my $opts := get_options();
 
-    if $opts<core> {
+    return usage() if $opts<help>;
+
+    #TODO: figure out how to generate line numbers
+    # $emit_lines is currently ignored
+    my $emit_lines  := !?$opts<no-lines>;
+    my $core        := ?$opts<core>;
+    my $debug       := ?$opts<debug>;
+    my $quiet       := ?$opts<quiet>;
+
+    my @files;
+    if $core {
         @files := <
             src/ops/core.ops
             src/ops/bit.ops
@@ -35,26 +41,16 @@ sub MAIN() {
             src/ops/var.ops
             src/ops/experimental.ops
         >;
-        $core := 1;
     }
     elsif $opts<dynamic> {
-        $core := 0;
         @files.push( $opts<dynamic>);
     }
-    elsif (+$opts == 0 || $opts<help>) {
+    else {
         return usage();
-    }
-
-    if ($opts<no-lines>) {
-        #TODO: figure out how to generate line numbers
-        # $emit_lines is currently ignored
-        $emit_lines := 0;
     }
 
     my $trans := Ops::Trans::C.new();
     my $start_time := pir::time__N();
-    my $debug := ?$opts<debug>;
-    my $quiet := ?$opts<quiet>;
     my $lib   := $core
                  ?? Ops::OpLib.new(
                         :skip_file('src/ops/ops.skip'),
