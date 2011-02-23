@@ -4,7 +4,7 @@ New in 3.2.0
   + The configuration option --cxx is gone
   + The make target "docs" is not needed any more
   + Improved code coverage
-  + The branch "gen_gc2" is merged
+  + New Generational GC implemented. To enable it run Configure.pl --gc=gms 
   + "opsc_full_parse" branch for semantically parse of ops is started
 - Languages
   + A few tests in Cardinal are fixed
