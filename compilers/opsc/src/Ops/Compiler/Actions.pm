@@ -413,8 +413,15 @@ method term:sym<call> ($/) {
         :name(~$<identifier>),
     );
 
-    if $<arglist>[0]<EXPR> {
-        $past.push($_.ast) for @($<arglist>[0]<EXPR>);
+    my $args := $<arglist>[0]<EXPR>;
+
+    if $args {
+        if +@($args) > 1 {
+            $past.push($_.ast) for @($args);
+        }
+        else {
+            $past.push($args.ast);
+        }
     }
 
     make $past;
