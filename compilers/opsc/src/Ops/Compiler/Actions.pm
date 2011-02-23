@@ -89,9 +89,17 @@ method op($/) {
     $op<normalized_args> := @norm_args;
 
     if $op.need_write_barrier {
-        $op.push(PAST::Op.new(
-                :pasttype<inline>,
-                :inline("    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));\n")
+        $op.push(
+            PAST::Op.new(
+                :pasttype<call>,
+                :name<PARROT_GC_WRITE_BARRIER>,
+                PAST::Op.new(
+                    :pasttype<call>,
+                    :name<CURRENT_CONTEXT>,
+                    PAST::Var.new(
+                        :name<interp>
+                    )
+                )
             ));
     }
 
