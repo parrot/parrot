@@ -407,7 +407,7 @@ method term:sym<call> ($/) {
         :name(~$<identifier>),
     );
 
-    if $<arglist> {
+    if $<arglist>[0]<EXPR> {
         $past.push($_.ast) for @($<arglist>[0]<EXPR>);
     }
 
