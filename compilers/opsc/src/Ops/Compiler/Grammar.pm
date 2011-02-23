@@ -120,6 +120,8 @@ token keyword {
     [
     | 'for' |'if' |'while'
     | 'case' | 'default'
+    | 'goto' | 'expr' | 'restart'
+    | 'OFFSET' | 'ADDRESS' | 'NEXT'
     ]>>
 }
 
