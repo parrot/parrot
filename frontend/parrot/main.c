@@ -703,7 +703,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             break;
           case 'c':
             args->have_pbc_file = 1;
-
+            break;
           case OPT_GC_DEBUG:
           /*
 #if DISABLE_GC_DEBUG

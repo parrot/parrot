@@ -1652,6 +1652,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg), ARGMOD(PackFile_ByteCode * bc))
 
           case VT_CONSTP:
             r = r->reg;
+            /* Fall through. */
           case VTCONST:
           case VTCONST|VT_ENCODED:
             switch (r->set) {

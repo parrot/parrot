@@ -869,6 +869,7 @@ ARGIN(PPROF_DATA *pprof_data), ARGIN_NULLOK(Parrot_profiling_line type))
                 char *value = (char *) pprof_data[PPROF_DATA_ANNOTATION_VALUE];
                 fprintf(runcore->profile_fd, "AN:{x{name:%s}x}{x{value:%s}x}\n", name, value);
             }
+            break;
 
         case PPROF_LINE_CLI:
             fprintf(runcore->profile_fd, "CLI: %s\n", (char *) pprof_data[PPROF_DATA_CLI]);
