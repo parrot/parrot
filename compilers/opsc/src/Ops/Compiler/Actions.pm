@@ -259,93 +259,91 @@ method op_body($/) {
     make $past;
 }
 
-
-method op_macro($/) {
-    #say('# op_macro');
-    # Generate set of calls to Trans:
-    # goto NEXT()         -> goto_offset(opsize())
-    # goto OFFSET($addr)  -> goto_offset($addr)
-    # goto ADDRESS($addr) -> goto_address($addr)
-    # expr NEXT()         -> expr_offset(opsize())
-    # expr OFFSET($addr)  -> expr_offset($addr)
-    # expr ADDRERR($addr) -> expr_address($addr)
-    # restart NEXT()      -> restart_offset(opsize()); goto_address(0)
-    # restart OFFSET()    -> restart_offset($addr); goto_offset($addr)
-    # XXX In trunk "restart ADDRESS" equivalent of "goto ADDRESS".
-    # restart ADDRESS()   -> restart_address($addr); goto_address($addr)
-
-    my $macro_type := ~$<macro_type>;
-    my $macro_dest := ~$<macro_destination>;
-    my $is_next    := $macro_dest eq 'NEXT';
-    my $macro_name := $macro_type ~ '_' ~ lc($is_next ?? 'offset' !! $macro_dest);
-
-    my $past  := PAST::Stmts.new;
-
-    my $macro := PAST::Op.new(
-        :pasttype('call'),
-        :name($macro_name),
+method op_macro:sym<expr offset>($/) {
+    make PAST::Op.new(
+        :pasttype<call>,
+        :name<expr_offset>,
+        $<arg>.ast,
     );
-    $past.push($macro);
+}
 
-    $past<jump> := list();
+method op_macro:sym<goto offset>($/) {
+    make PAST::Op.new(
+        :pasttype<call>,
+        :name<goto_offset>,
+        $<arg>.ast,
+    );
+}
 
-    if $macro_type ne 'expr' && $macro_dest eq 'OFFSET' {
-        $past<jump>.push('PARROT_JUMP_RELATIVE');
-    }
+method op_macro:sym<expr address>($/) {
+    make PAST::Op.new(
+        :pasttype<call>,
+        :name<expr_address>,
+        $<arg>.ast,
+    );
+}
 
-    if $macro_type eq 'expr' || $macro_type eq 'goto' {
-        if $is_next {
-            $macro.push(PAST::Op.new(
-                :pasttype<call>,
-                :name<OPSIZE>,
-            ));
-        }
-        else {
-            process_op_macro_body_word($/, $macro);
-        }
-    }
-    elsif $macro_type eq 'restart' {
-        if $is_next {
-            $macro.push(PAST::Op.new(
-                :pasttype<call>,
-                :name<OPSIZE>,
-            ));
-        }
-        else {
-            process_op_macro_body_word($/, $macro);
-        }
+method op_macro:sym<goto address>($/) {
+    make PAST::Op.new(
+        :pasttype<call>,
+        :name<goto_address>,
+        $<arg>.ast,
+    );
+}
 
-        $macro := PAST::Op.new(
+method op_macro:sym<expr next>($/) {
+    my $past := PAST::Op.new(
+        :pasttype<call>,
+        :name<expr_offset>,
+        PAST::Op.new(
             :pasttype<call>,
-            :name<goto_address>,
-        );
-        if $is_next {
-            $macro.push(PAST::Op.new(
-                :pasttype<inline>,
-                :inline<0>,
-            ));
-        }
-        else {
-            process_op_macro_body_word($/, $macro);
-        }
-        $past.push($macro);
-    }
-    else {
-        pir::die("Horribly");
-    }
+            :name<OPSIZE>,
+        )
+    );
+    $past<jump> := <PARROT_JUMP_RELATIVE>;
 
     make $past;
 }
 
-sub process_op_macro_body_word($/, $macro) {
-    #_dumper($<body_word>);
-    if $<body_word> {
-        for $<body_word> {
-            #say(' word ' ~ $_);
-            my $bit := $_.ast;
-            $macro.push($_.ast) if defined($bit);
-        }
-    }
+method op_macro:sym<goto next>($/) {
+    my $past := PAST::Op.new(
+        :pasttype<call>,
+        :name<goto_offset>,
+        PAST::Op.new(
+            :pasttype<call>,
+            :name<OPSIZE>,
+        )
+    );
+    $past<jump> := <PARROT_JUMP_RELATIVE>;
+
+    make $past;
+}
+
+
+method op_macro:sym<restart next> ($/) {
+    #say('# op_macro');
+    # restart NEXT()      -> restart_offset(opsize()); goto_address(0)
+    my $past := PAST::Stmts.new(
+        PAST::Op.new(
+            :pasttype<call>,
+            :name<restart_offset>,
+            PAST::Op.new(
+                :pasttype<call>,
+                :name<OPSIZE>,
+            )
+        ),
+        PAST::Op.new(
+            :pasttype<call>,
+            :name<goto_address>,
+            PAST::Val.new(
+                :value<0>
+            )
+        ),
+    );
+
+    $past<jump> := <PARROT_JUMP_RELATIVE>;
+
+    make $past;
 }
 
 method blockoid ($/) {

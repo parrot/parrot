@@ -92,25 +92,16 @@ token macro_param {
     '$' $<num>=<integer> # Up to nine params.
 }
 
-rule op_macro {
-    <macro_type> <macro_destination> '(' <arg=.EXPR>? ')'
-}
 
-token macro_type {
-    [
-    | 'goto'
-    | 'expr'
-    | 'restart'
-    ]
-}
+proto rule op_macro { <...> }
+rule op_macro:sym<goto offset>  { 'goto' 'OFFSET' '(' <arg=.EXPR> ')' }
+rule op_macro:sym<expr offset>  { 'expr' 'OFFSET' '(' <arg=.EXPR> ')' }
+rule op_macro:sym<goto address> { 'goto' 'ADDRESS' '(' <arg=.EXPR> ')' }
+rule op_macro:sym<expr address> { 'expr' 'ADDRESS' '(' <arg=.EXPR> ')' }
+rule op_macro:sym<goto next>    { 'goto' 'NEXT' '(' ')' }
+rule op_macro:sym<expr next>    { 'expr' 'NEXT' '(' ')' }
+rule op_macro:sym<restart next> { 'restart' 'NEXT' '(' ')' }
 
-token macro_destination {
-    [
-    | 'OFFSET'
-    | 'ADDRESS'
-    | 'NEXT'
-    ]
-}
 
 token identifier {
     <!keyword> <ident>
