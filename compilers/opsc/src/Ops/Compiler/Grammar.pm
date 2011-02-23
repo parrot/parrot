@@ -194,7 +194,10 @@ token term:sym<float_constant_long> { # longer to work-around lack of LTM
     ]
 }
 
-token term:sym<reg>   { <macro_param> }
+token term:sym<reg>   {
+    '$' $<num>=<integer> # Up to nine params.
+}
+
 token term:sym<macro> { <op_macro>    }
 
 # Used for macro-casting. E.g. PTR2INTVAL. Or variable name.

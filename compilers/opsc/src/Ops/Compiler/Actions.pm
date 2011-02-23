@@ -259,13 +259,6 @@ method op_body($/) {
     make $past;
 }
 
-method macro_param($/) {
-    make PAST::Var.new(
-        :name(~$/),
-        :node($/),
-    );
-}
-
 
 method op_macro($/) {
     #say('# op_macro');
@@ -422,7 +415,14 @@ method term:sym<call> ($/) {
 }
 
 method term:sym<reg> ($/) {
-    make $<macro_param>.ast;
+    make PAST::Var.new(
+        :name(~$/),
+        :node($/),
+    );
+}
+
+method term:sym<macro> ($/) {
+    make $<op_macro>.ast;
 }
 
 method term:sym<int> ($/) {
