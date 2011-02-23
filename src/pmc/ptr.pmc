@@ -143,6 +143,22 @@ Manage attribute deallocation for C<fat> representation.
         if (PTR_FAT_TEST(INTERP, SELF) && PMC_data(SELF))
             mem_gc_free(INTERP, PMC_data(SELF));
     }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Implement C<PtrBuf> interface. Specifies length of the buffer.
+
+In this case, always returns C<0>, indicating undetermined length.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        return 0;
+    }
 }
 
 /*

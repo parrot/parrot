@@ -9,9 +9,9 @@ src/pmc/structview.pmc - C struct view for pointers.
 
 PMC class to view pointers as C C<struct>s. This includes read, write, allocate,
 and deallocate operations. Bounds checking is implemented where the pointer
-class supports a bound. Recursive definition through nesting is not supported
-but can be emulated by interpreting pointer or buffer elements as structs once
-dereferenced.
+class reports a non-zero bound. Recursive definition through nesting is not
+supported but can be emulated by interpreting pointer or buffer elements as
+structs once dereferenced.
 
 Elements are get/set using keyed access of the form C<[Ptr; Idx]>, which will
 interpret the C<Ptr> PMC and lookup the C<Idx>'th element.
@@ -51,23 +51,48 @@ END_PMC_HEADER_PREAMBLE
 
 #define MAX(x, y) ((y) > (x) ? (y) : (x))
 
-#define BEGIN_KEYED(interp, s, k) \
-    size_t      n_elts; \
-    elt_desc_t *elts; \
-    PMC        *ptr_pmc; \
-    void       *ptr, *base_ptr; \
-    INTVAL      i; \
-    GETATTR_StructView_n_elts((interp), (s), n_elts); \
-    GETATTR_StructView_elts((interp), (s), elts); \
-    ptr_pmc = Parrot_key_pmc((interp), (k)); \
-    (k)     = Parrot_key_next((interp), (k)); \
-    i       = Parrot_key_integer((interp), (k)); \
-    if (i < 0 || n_elts <= i) \
-        Parrot_ex_throw_from_c_args((interp), NULL, 0, \
-                "Struct index out of bounds (%d)", \
-                i); \
-    base_ptr = VTABLE_get_pointer((interp), ptr_pmc); \
-    ptr      = ((char *)base_ptr) + elts[i].byte_offset;
+#define BEGIN_KEYED(interp, s, k)                                \
+    size_t      n_elts;                                          \
+    elt_desc_t *elts;                                            \
+    PMC        *ptr_pmc;                                         \
+    void       *ptr, *base_ptr;                                  \
+    INTVAL      i;                                               \
+    GETATTR_StructView_n_elts((interp), (s), n_elts);            \
+    GETATTR_StructView_elts((interp), (s), elts);                \
+    ptr_pmc = Parrot_key_pmc((interp), (k));                     \
+    (k)     = Parrot_key_next((interp), (k));                    \
+    i       = Parrot_key_integer((interp), (k));                 \
+    if (i < 0 || n_elts <= i)                                    \
+        Parrot_ex_throw_from_c_args((interp), NULL, 0,           \
+                "Struct index out of bounds (%d)",               \
+                i);                                              \
+    base_ptr = VTABLE_get_pointer((interp), ptr_pmc);            \
+    ptr      = ((char *)base_ptr) + elts[i].byte_offset;         \
+    /* guard against null pointer dereference */                 \
+    if (!base_ptr)                                               \
+        Parrot_ex_throw_from_c_args((interp), NULL, 0,           \
+                "Attempt to derefrence null pointer");           \
+    /* guard against out of bounds access */                     \
+    {                                                            \
+        size_t buf_size = VTABLE_get_integer((interp), ptr_pmc); \
+        size_t self_size;                                        \
+        GETATTR_StructView_size((interp), (s), self_size);       \
+        if (buf_size && buf_size < self_size)                    \
+            Parrot_ex_throw_from_c_args((interp), NULL, 0,       \
+                    "Buffer length too small for struct "        \
+                        "(at least %d required, got %d)",        \
+                    self_size, buf_size);                        \
+    }                                                            \
+    /* guard against unaligned access */                         \
+    {                                                            \
+        size_t align;                                            \
+        GETATTR_StructView_align((interp), (s), align);          \
+        if (base_ptr != ALIGN_UP(base_ptr - NULL, align))        \
+            Parrot_ex_throw_from_c_args((interp), NULL, 0,       \
+                    "Attempt to dereference unaligned pointer "  \
+                        "(%x, required alignment: %d)",          \
+                    base_ptr, align);                            \
+    }
 
 /*
 
