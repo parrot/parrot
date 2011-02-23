@@ -13,7 +13,9 @@ Q:PIR{ .include "test_more.pir" };
 my $buf := q|
 inline op foo(inconst NUM) {
     PMC *foo;
-    foo("answer", 42);
+    foo();
+    foo(bar);
+    foo(bar, baz);
     if (answer != 42) {
         answer = 42;
     }
@@ -40,10 +42,14 @@ my $call := $op[1];
 ok( $call ~~ PAST::Op, "PAST::op for call created" );
 is( $call.pasttype, "call", ".. with pasttype call" );
 is( $call.name,     "foo",  ".. with name 'foo'" );
+is( +@($call),          0,  ".. with 0 args" );
+
+$call := $op[2];
+is( +@($call),          1,  ".. with 1 arg" );
+$call := $op[3];
 is( +@($call),          2,  ".. with 2 args" );
 
-
-my $if := $op[2];
+my $if := $op[4];
 ok( $if ~~ PAST::Op,      "PAST::op for if created" );
 is( $if.pasttype,   "if", ".. with pasttype call" );
 is( +@($if),            3, ".. with 3 children" );
