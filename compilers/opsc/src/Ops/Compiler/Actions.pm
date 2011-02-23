@@ -446,6 +446,31 @@ method term:sym<float_constant_long> ($/) { # longer to work-around lack of LTM
         :returns<float>
     );
 }
+
+
+method statement_control:sym<if> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<if>,
+
+        $<EXPR>.ast,
+        $<then>.ast,
+    );
+
+    $past.push($<else>.ast) if $<else>;
+
+    make $past;
+}
+
+method statement_control:sym<while> ($/) {
+}
+
+method statement_control:sym<for> ($/) {
+}
+
+# Not real "C" switch. Just close enough
+method statement_control:sym<switch> ($/) {
+}
+
 # Local Variables:
 #   mode: perl6
 #   fill-column: 100
