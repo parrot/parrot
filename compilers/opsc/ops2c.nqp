@@ -64,8 +64,7 @@ sub MAIN() {
 
     my $f := Ops::File.new(|@files, :oplib($lib), :core($core), :quiet($quiet));
 
-    pir::sprintf(my $time, "%.3f", [pir::time__N() - $start_time] );
-    $quiet || say("# Ops parsed in $time seconds.");
+    $quiet || say("# Ops parsed in { pir::sprintf__ssp("%.3f", [pir::time__N() - $start_time] ) } seconds.");
 
     my $emitter := Ops::Emitter.new(
         :ops_file($f), :trans($trans),
