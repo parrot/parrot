@@ -74,9 +74,7 @@ sub MAIN() {
     );
 
     unless $debug {
-        if $core {
-            $emitter.print_ops_num_files();
-        }
+        $emitter.print_ops_num_files() if $core;
         $emitter.print_c_header_files();
         $emitter.print_c_source_file();
     }
@@ -88,35 +86,22 @@ sub get_options() {
     $getopts.notOptStop();
 
     # build core ops
-    my $arg := $getopts.add();
-    $arg.long('core');
-    $arg.short('c');
+    $getopts.add_option('core', 'c');
 
     # build the dynops in one .ops file
-    $arg := $getopts.add();
-    $arg.long('dynamic');
-    $arg.short('d');
-    $arg.type('String');
+    $getopts.add_option('dynamic', 'd', 'String');
 
     # don't write to any files
-    $arg := $getopts.add();
-    $arg.long('debug');
-    $arg.short('g');
+    $getopts.add_option('debug', 'g');
 
     # don't add line numbers to generated files (not implemented)
-    $arg := $getopts.add();
-    $arg.long('no-lines');
-    $arg.short('n');
+    $getopts.add_option('no-lines', 'n');
 
     # print anemic usage information and exit
-    $arg := $getopts.add();
-    $arg.long('help');
-    $arg.short('h');
+    $getopts.add_option('help', 'h');
 
     # suppress timing and debug output on stdout
-    $arg := $getopts.add();
-    $arg.long('quiet');
-    $arg.short('q');
+    $getopts.add_option('quite', 'q');
 
     $getopts.get_options(pir::getinterp__p()[2]);
 }
@@ -135,4 +120,15 @@ sub usage() {
     ");
     pir::exit(0);
 }
+
+# Monkey patching
+module Getopt::Obj {
+    multi method add_option($long, $short, $type?) {
+        my $opt := self.add();
+        $opt.long($long);
+        $opt.short($short);
+        $opt.type($type) if $type;
+    }
+}
+
 # vim: expandtab shiftwidth=4 ft=perl6:
