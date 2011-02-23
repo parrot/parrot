@@ -49,7 +49,10 @@ spec progresses.  They're pretty basic, but that's the idea behind M0.
 =item * M0
 
 C<M0> refers to the specification for a minimal virtual machine capable of
-executing the ops described in this document.
+executing the ops described in this document.  The M0 VM should have the same
+expressive power as C and will live at the same level that C currently does.
+This means that M0 explicitly does not need to know about higher-level concepts
+such as garbage collection and Parrot's calling conventions.
 
 =item * M0 ops
 
@@ -124,7 +127,10 @@ expected that common operations will be painful.  That's what compilers are
 for.
 
 The names and number of the ops below may change at any time, possibly without
-any rational reason, until the spec is more stable.
+any rational reason, until the spec is more stable.  As a way to verify that
+the op set is complete, we will look at how a representative selection of PIR's
+existing core ops and the dynops used by HLLs could be reimplemented in terms
+of M0 ops.
 
 =over
 
@@ -264,6 +270,12 @@ m0-metadata - anything else (line numbers, function names, annotations, etc)
 
 describe the binary encoding of a single M0 instruction and how it should be
 interpreteted.
+
+Initially, M0 ops will be packed without any padding.  Once we have a
+representative sample of running M0 code, we will benchmark various padding
+strategies to find which have the best performance characteristics for a
+typical expected workload.  A viable M0 interpreter implemented in a low-level
+langauge like C will be needed to properly test this. 
 
 =head2 M0 Runloop
 
