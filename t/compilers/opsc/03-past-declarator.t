@@ -13,6 +13,7 @@ Q:PIR{ .include "test_more.pir" };
 my $buf := q|
 inline op foo(inconst NUM) {
     PMC *foo;
+    foo("answer", 42);
 }
 |;
 my $compiler := pir::compreg__Ps('Ops');
@@ -28,6 +29,12 @@ ok( $var ~~ PAST::Var, "PAST::Var created" );
 ok( $var.isdecl, ".. as declaration" );
 is( $var.name, "foo", ".. with proper name" );
 is( $var.vivibase, "PMC *", ".. with proper type" );
+
+my $call := $op[1];
+ok( $call ~~ PAST::Op, "PAST::op for call created" );
+is( $call.pasttype, "call", ".. with pasttype call" );
+is( $call.name,     "foo",  ".. with name 'foo'" );
+is( +@($call),          2,  ".. with 2 args" );
 
 done_testing();
 

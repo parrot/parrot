@@ -407,7 +407,10 @@ method term:sym<call> ($/) {
         :name(~$<identifier>),
     );
 
-    # TODO Handle arglist
+    if $<arglist> {
+        $past.push($_.ast) for @($<arglist>[0]<EXPR>);
+    }
+
     make $past;
 }
 
