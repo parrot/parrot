@@ -269,7 +269,7 @@ method op_body($/) {
 
 method op_macro:sym<expr offset>($/) {
     make PAST::Op.new(
-        :pasttype<call>,
+        :pasttype<macro>,
         :name<expr_offset>,
         $<arg>.ast,
     );
@@ -277,7 +277,7 @@ method op_macro:sym<expr offset>($/) {
 
 method op_macro:sym<goto offset>($/) {
     make PAST::Op.new(
-        :pasttype<call>,
+        :pasttype<macro>,
         :name<goto_offset>,
         $<arg>.ast,
     );
@@ -285,7 +285,7 @@ method op_macro:sym<goto offset>($/) {
 
 method op_macro:sym<expr address>($/) {
     make PAST::Op.new(
-        :pasttype<call>,
+        :pasttype<macro>,
         :name<expr_address>,
         $<arg>.ast,
     );
@@ -293,7 +293,7 @@ method op_macro:sym<expr address>($/) {
 
 method op_macro:sym<goto address>($/) {
     make PAST::Op.new(
-        :pasttype<call>,
+        :pasttype<macro>,
         :name<goto_address>,
         $<arg>.ast,
     );
@@ -301,7 +301,7 @@ method op_macro:sym<goto address>($/) {
 
 method op_macro:sym<expr next>($/) {
     my $past := PAST::Op.new(
-        :pasttype<call>,
+        :pasttype<macro>,
         :name<expr_offset>,
         PAST::Op.new(
             :pasttype<call>,
@@ -315,7 +315,7 @@ method op_macro:sym<expr next>($/) {
 
 method op_macro:sym<goto next>($/) {
     my $past := PAST::Op.new(
-        :pasttype<call>,
+        :pasttype<macro>,
         :name<goto_offset>,
         PAST::Op.new(
             :pasttype<call>,
@@ -333,15 +333,15 @@ method op_macro:sym<restart next> ($/) {
     # restart NEXT()      -> restart_offset(opsize()); goto_address(0)
     my $past := PAST::Stmts.new(
         PAST::Op.new(
-            :pasttype<call>,
+            :pasttype<macro>,
             :name<restart_offset>,
             PAST::Op.new(
-                :pasttype<call>,
+                :pasttype<macro>,
                 :name<OPSIZE>,
             )
         ),
         PAST::Op.new(
-            :pasttype<call>,
+            :pasttype<macro>,
             :name<goto_address>,
             PAST::Val.new(
                 :value<0>
