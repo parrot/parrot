@@ -116,7 +116,7 @@ Get or set the custom C<mark> function.
     METHOD mark_func(PMC *func :optional, INTVAL has_func :opt_flag) {
         if (has_func) {
             void *f = VTABLE_get_pointer(INTERP, func);
-            PTROBJ_SET_MARK(INTERP, SELF, (ptrobj_clone_func_t)f);
+            PTROBJ_SET_MARK(INTERP, SELF, (ptrobj_mark_func_t)f);
             RETURN();
         }
         else {
@@ -154,7 +154,7 @@ Get or set the custom C<destroy> function.
     METHOD destroy_func(PMC *func :optional, INTVAL has_func :opt_flag) {
         if (has_func) {
             void *f = VTABLE_get_pointer(INTERP, func);
-            PTROBJ_SET_DESTROY(INTERP, SELF, (ptrobj_clone_func_t)f);
+            PTROBJ_SET_DESTROY(INTERP, SELF, (ptrobj_destroy_func_t)f);
             RETURN();
         }
         else {

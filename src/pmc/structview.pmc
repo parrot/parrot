@@ -51,47 +51,47 @@ END_PMC_HEADER_PREAMBLE
 
 #define MAX(x, y) ((y) > (x) ? (y) : (x))
 
-#define BEGIN_KEYED(interp, s, k)                                \
-    size_t      n_elts;                                          \
-    elt_desc_t *elts;                                            \
-    PMC        *ptr_pmc;                                         \
-    void       *ptr, *base_ptr;                                  \
-    INTVAL      i;                                               \
-    GETATTR_StructView_n_elts((interp), (s), n_elts);            \
-    GETATTR_StructView_elts((interp), (s), elts);                \
-    ptr_pmc = Parrot_key_pmc((interp), (k));                     \
-    (k)     = Parrot_key_next((interp), (k));                    \
-    i       = Parrot_key_integer((interp), (k));                 \
-    if (i < 0 || n_elts <= i)                                    \
-        Parrot_ex_throw_from_c_args((interp), NULL, 0,           \
-                "Struct index out of bounds (%d)",               \
-                i);                                              \
-    base_ptr = VTABLE_get_pointer((interp), ptr_pmc);            \
-    ptr      = ((char *)base_ptr) + elts[i].byte_offset;         \
-    /* guard against null pointer dereference */                 \
-    if (!base_ptr)                                               \
-        Parrot_ex_throw_from_c_args((interp), NULL, 0,           \
-                "Attempt to derefrence null pointer");           \
-    /* guard against out of bounds access */                     \
-    {                                                            \
-        size_t buf_size = VTABLE_get_integer((interp), ptr_pmc); \
-        size_t self_size;                                        \
-        GETATTR_StructView_size((interp), (s), self_size);       \
-        if (buf_size && buf_size < self_size)                    \
-            Parrot_ex_throw_from_c_args((interp), NULL, 0,       \
-                    "Buffer length too small for struct "        \
-                        "(at least %d required, got %d)",        \
-                    self_size, buf_size);                        \
-    }                                                            \
-    /* guard against unaligned access */                         \
-    {                                                            \
-        size_t align;                                            \
-        GETATTR_StructView_align((interp), (s), align);          \
-        if (base_ptr != ALIGN_UP(base_ptr - NULL, align))        \
-            Parrot_ex_throw_from_c_args((interp), NULL, 0,       \
-                    "Attempt to dereference unaligned pointer "  \
-                        "(%x, required alignment: %d)",          \
-                    base_ptr, align);                            \
+#define BEGIN_KEYED(interp, s, k)                                         \
+    size_t      n_elts;                                                   \
+    elt_desc_t *elts;                                                     \
+    PMC        *ptr_pmc;                                                  \
+    void       *ptr, *base_ptr;                                           \
+    INTVAL      i;                                                        \
+    GETATTR_StructView_n_elts((interp), (s), n_elts);                     \
+    GETATTR_StructView_elts((interp), (s), elts);                         \
+    ptr_pmc = Parrot_key_pmc((interp), (k));                              \
+    (k)     = Parrot_key_next((interp), (k));                             \
+    i       = Parrot_key_integer((interp), (k));                          \
+    if (i < 0 || n_elts <= i)                                             \
+        Parrot_ex_throw_from_c_args((interp), NULL, 0,                    \
+                "Struct index out of bounds (%d)",                        \
+                i);                                                       \
+    base_ptr = VTABLE_get_pointer((interp), ptr_pmc);                     \
+    ptr      = ((char *)base_ptr) + elts[i].byte_offset;                  \
+    /* guard against null pointer dereference */                          \
+    if (!base_ptr)                                                        \
+        Parrot_ex_throw_from_c_args((interp), NULL, 0,                    \
+                "Attempt to derefrence null pointer");                    \
+    /* guard against out of bounds access */                              \
+    {                                                                     \
+        size_t buf_size = VTABLE_get_integer((interp), ptr_pmc);          \
+        size_t self_size;                                                 \
+        GETATTR_StructView_size((interp), (s), self_size);                \
+        if (buf_size && buf_size < self_size)                             \
+            Parrot_ex_throw_from_c_args((interp), NULL, 0,                \
+                    "Buffer length too small for struct "                 \
+                        "(at least %d required, got %d)",                 \
+                    self_size, buf_size);                                 \
+    }                                                                     \
+    /* guard against unaligned access */                                  \
+    {                                                                     \
+        size_t align;                                                     \
+        GETATTR_StructView_align((interp), (s), align);                   \
+        if ((size_t)base_ptr != ALIGN_UP((size_t)base_ptr - NULL, align)) \
+            Parrot_ex_throw_from_c_args((interp), NULL, 0,                \
+                    "Attempt to dereference unaligned pointer "           \
+                        "(%x, required alignment: %d)",                   \
+                    base_ptr, align);                                     \
     }
 
 /*
@@ -197,7 +197,8 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
 
     VTABLE void init_pmc(PMC *p) {
         INTVAL            init_len    = VTABLE_elements(INTERP, p);
-        PARROT_DATA_TYPE  pack_type   = VTABLE_get_integer_keyed_int(INTERP, p, 0);
+        PARROT_DATA_TYPE  pack_type   = (PARROT_DATA_TYPE)
+                                            VTABLE_get_integer_keyed_int(INTERP, p, 0);
         INTVAL            n_elts      = VTABLE_get_integer_keyed_int(INTERP, p, 1);
         elt_desc_t       *elt_ary;
         size_t            bit_cursor  = 0;
@@ -239,7 +240,8 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
 
         for (/* i already initialized */ j = 0; i < init_len && j < n_elts; i += incr, j++) {
             elt_desc_t       *elt       = &elt_ary[j];
-            PARROT_DATA_TYPE  elt_type  = VTABLE_get_integer_keyed_int(INTERP, p, i);
+            PARROT_DATA_TYPE  elt_type  = (PARROT_DATA_TYPE)
+                                            VTABLE_get_integer_keyed_int(INTERP, p, i);
             size_t            elt_size, elt_align;
             elt_access_t      elt_access;
 
@@ -575,7 +577,7 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 UINTVAL        ux = x;
                 size_t         bits, n;
                 unsigned char  tempc;
-                unsigned char *cptr = ptr;
+                unsigned char *cptr = (unsigned char *)ptr;
 
                 switch (elts[i].type) {
                   case enum_type_uint1:
@@ -770,7 +772,7 @@ any other type of element.
         }
     }
 
-    VTABLE void *set_pmc_keyed(PMC *k, PMC *p) {
+    VTABLE void set_pmc_keyed(PMC *k, PMC *p) {
         BEGIN_KEYED(INTERP, SELF, k)
         switch (elts[i].access) {
           case int_access:
