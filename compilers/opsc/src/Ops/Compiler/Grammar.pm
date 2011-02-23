@@ -88,11 +88,6 @@ proto token quote { <...> }
 token quote:sym<apos> { <?[']> <quote_EXPR: ':q'>  }
 token quote:sym<dblq> { <?["]> <quote_EXPR: ':q'> }
 
-token macro_param {
-    '$' $<num>=<integer> # Up to nine params.
-}
-
-
 proto rule op_macro { <...> }
 rule op_macro:sym<goto offset>  { 'goto' 'OFFSET' '(' <arg=.EXPR> ')' }
 rule op_macro:sym<expr offset>  { 'expr' 'OFFSET' '(' <arg=.EXPR> ')' }
