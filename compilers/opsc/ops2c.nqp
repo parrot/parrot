@@ -18,42 +18,7 @@ sub MAIN() {
     my @files;
     my $emit_lines := 1;
 
-    my $getopts := Q:PIR{ %r = new ['Getopt';'Obj'] };
-
-    $getopts.notOptStop();
-
-    # build core ops
-    my $arg := $getopts.add();
-    $arg.long('core');
-    $arg.short('c');
-
-    # build the dynops in one .ops file
-    $arg := $getopts.add();
-    $arg.long('dynamic');
-    $arg.short('d');
-    $arg.type('String');
-
-    # don't write to any files
-    $arg := $getopts.add();
-    $arg.long('debug');
-    $arg.short('g');
-
-    # don't add line numbers to generated files (not implemented)
-    $arg := $getopts.add();
-    $arg.long('no-lines');
-    $arg.short('n');
-
-    # print anemic usage information and exit
-    $arg := $getopts.add();
-    $arg.long('help');
-    $arg.short('h');
-
-    # suppress timing and debug output on stdout
-    $arg := $getopts.add();
-    $arg.long('quiet');
-    $arg.short('q');
-
-    my $opts := $getopts.get_options(pir::getinterp__p()[2]);
+    my $opts := get_options();
 
     if $opts<core> {
         @files := <
@@ -77,18 +42,7 @@ sub MAIN() {
         @files.push( $opts<dynamic>);
     }
     elsif (+$opts == 0 || $opts<help>) {
-        say("This is ops2c, part of the Parrot VM's build infrastructure.
-    normal options:
-    -c --core                generate the C code for core ops (must be run from within Parrot's build directory)
-    -d --dynamic <file.ops>  generate the C code for the dynamic ops in a single .ops file
-    -q --quiet               don't report any non-error messages
-    -h --help                print this usage information
-    -n --no-lines            do not print #line directives in generated C code (line numbers are not currently supported)
-
-    debugging options:
-    -g --debug               perform all processing but do not write to any files
-    ");
-        pir::exit(0);
+        return usage();
     }
 
     if ($opts<no-lines>) {
@@ -128,4 +82,57 @@ sub MAIN() {
     }
 }
 
+sub get_options() {
+    my $getopts := pir::new(Getopt::Obj);
+
+    $getopts.notOptStop();
+
+    # build core ops
+    my $arg := $getopts.add();
+    $arg.long('core');
+    $arg.short('c');
+
+    # build the dynops in one .ops file
+    $arg := $getopts.add();
+    $arg.long('dynamic');
+    $arg.short('d');
+    $arg.type('String');
+
+    # don't write to any files
+    $arg := $getopts.add();
+    $arg.long('debug');
+    $arg.short('g');
+
+    # don't add line numbers to generated files (not implemented)
+    $arg := $getopts.add();
+    $arg.long('no-lines');
+    $arg.short('n');
+
+    # print anemic usage information and exit
+    $arg := $getopts.add();
+    $arg.long('help');
+    $arg.short('h');
+
+    # suppress timing and debug output on stdout
+    $arg := $getopts.add();
+    $arg.long('quiet');
+    $arg.short('q');
+
+    $getopts.get_options(pir::getinterp__p()[2]);
+}
+
+sub usage() {
+    say("This is ops2c, part of the Parrot VM's build infrastructure.
+    normal options:
+    -c --core                generate the C code for core ops (must be run from within Parrot's build directory)
+    -d --dynamic <file.ops>  generate the C code for the dynamic ops in a single .ops file
+    -q --quiet               don't report any non-error messages
+    -h --help                print this usage information
+    -n --no-lines            do not print #line directives in generated C code (line numbers are not currently supported)
+
+    debugging options:
+    -g --debug               perform all processing but do not write to any files
+    ");
+    pir::exit(0);
+}
 # vim: expandtab shiftwidth=4 ft=perl6:
