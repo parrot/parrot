@@ -101,19 +101,14 @@ sub MAIN() {
     my $start_time := pir::time__N();
     my $debug := ?$opts<debug>;
     my $quiet := ?$opts<quiet>;
-    my $f;
-    my $renum;
+    my $lib   := $core
+                 ?? Ops::OpLib.new(
+                        :skip_file('src/ops/ops.skip'),
+                        :quiet($quiet)
+                    )
+                 !! undef;
 
-    if $core {
-        my $lib := Ops::OpLib.new(
-            :skip_file('src/ops/ops.skip'),
-            :quiet($quiet)
-        );
-        $f := Ops::File.new(|@files, :oplib($lib), :core(1), :quiet($quiet));
-    }
-    else {
-        $f := Ops::File.new(|@files, :core(0), :quiet($quiet));
-    }
+    my $f := Ops::File.new(|@files, :oplib($lib), :core($core), :quiet($quiet));
 
     pir::sprintf(my $time, "%.3f", [pir::time__N() - $start_time] );
     $quiet || say("# Ops parsed in $time seconds.");
