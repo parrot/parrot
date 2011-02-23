@@ -62,19 +62,31 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
 
 =cut
 
+.include 'iglobals.pasm'
+
 .sub 'new_from_file'
     .param string path
     .local string data
     $P0 = new 'FileHandle'
+    $P0.'encoding'('binary')
     push_eh _handler
     .local string data
     data = $P0.'readall'(path)
     pop_eh
+    $P0 = getinterp
+    $P0 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I0 = $P0['win32']
     .local int mode, uid, gid, mtime
     mode = stat path, .STAT_PLATFORM_MODE
     mode &= 0o777
+    unless $I0 goto L1
+    uid = 0
+    gid = 0
+    goto L2
+  L1:
     uid = stat path, .STAT_UID
     gid = stat path, .STAT_GID
+  L2:
     mtime = stat path, .STAT_MODIFYTIME
     .tailcall new_from_data(path, data, mode :named('mode'), uid :named('uid'), gid :named('gid'), mtime :named('mtime'))
   _handler:

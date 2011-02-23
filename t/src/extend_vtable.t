@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 59;
+plan tests => 68;
 
 =head1 NAME
 
@@ -91,11 +91,12 @@ CODE
 sub extend_vtable_output_is
 {
     my ($code, $expected_output, $msg, @opts) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     c_output_is(
         $common . linedirective(__LINE__) . <<CODE,
 void dotest(Parrot_Interp interp, void *unused)
 {
-    Parrot_PMC pmc, pmc2, pmc3, pmc_string, pmc_string2;
+    Parrot_PMC pmc, pmc2, pmc3, pmc_string, pmc_string2, pmc_string3;
     Parrot_PMC pmc_float, pmc_float2;
     Parrot_PMC rpa, rpa2;
     Parrot_Int type, value, integer, integer2;
@@ -111,6 +112,7 @@ void dotest(Parrot_Interp interp, void *unused)
 
     pmc_string = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
     pmc_string2 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
+    pmc_string3 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
 
     pmc_float  = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"Float"));
     pmc_float2 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"Float"));
@@ -137,15 +139,17 @@ CODE
 
 }
 
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(freeze|thaw)");
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(freeze|thaw|thawfinish)");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
     Parrot_PMC_set_integer_native(interp, pmc2, 99);
     Parrot_printf(interp,"%P\n", pmc);
     Parrot_printf(interp,"%P\n", pmc2);
 
-    /* freeze pmc, thaw tp pmc 2 */
+    /* freeze pmc, thaw to pmc 2 */
     Parrot_PMC_freeze(interp, pmc, rpa);
     Parrot_PMC_thaw(interp, pmc2, rpa);
+    Parrot_PMC_thawfinish(interp, pmc2, rpa);
+
     /* Modify pmc to ensure they are not pointing to the same location */
     Parrot_PMC_set_integer_native(interp, pmc, 1000);
     Parrot_printf(interp,"%P\n", pmc);
@@ -155,6 +159,71 @@ CODE
 99
 1000
 42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_hashvalue");
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+
+    integer = Parrot_PMC_hashvalue(interp, pmc);
+    if (integer != 0)
+        Parrot_printf(interp,"Got hash!\n", integer);
+CODE
+Got hash!
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer");
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+
+    integer = (Parrot_Int)Parrot_PMC_get_pointer(interp, pmc);
+    if (integer > 0)
+        Parrot_printf(interp,"Got pointer!\n", integer);
+CODE
+Got pointer!
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_iter");
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 99);
+
+    Parrot_PMC_push_pmc(interp, rpa, pmc);
+    Parrot_PMC_push_pmc(interp, rpa, pmc2);
+    pmc3 = Parrot_PMC_get_iter(interp, rpa);
+    Parrot_printf(interp,"Great Scott!\n", pmc2);
+    /* TODO: Improve this test */
+CODE
+Great Scott!
+Done!
+OUTPUT
+
+# TODO: Is this test correct?
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pmc");
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+    Parrot_PMC_push_pmc(interp, rpa, pmc);
+    Parrot_PMC_push_pmc(interp, rpa, pmc);
+    Parrot_PMC_push_pmc(interp, rpa, pmc);
+
+    pmc3 = Parrot_PMC_get_iter(interp, rpa);
+    pmc2 = Parrot_PMC_get_pmc(interp, pmc3);
+    Parrot_printf(interp,"%P\n", pmc2);
+CODE
+3
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_namespace");
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 99);
+
+    Parrot_PMC_push_pmc(interp, rpa, pmc);
+    Parrot_PMC_push_pmc(interp, rpa, pmc2);
+    pmc3 = Parrot_PMC_get_namespace(interp, rpa);
+    Parrot_printf(interp,"Great Scott!\n", pmc2);
+    /* TODO: Improve this test */
+CODE
+Great Scott!
 Done!
 OUTPUT
 
@@ -223,15 +292,19 @@ CODE
 Done!
 OUTPUT
 
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(push|pop)_pmc" );
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(push|pop|shift)_pmc" );
     Parrot_PMC_set_integer_native(interp, pmc, 42);
     Parrot_PMC_set_integer_native(interp, pmc2, 99);
 
+    Parrot_PMC_push_pmc(interp, rpa, pmc2);
     Parrot_PMC_push_pmc(interp, rpa, pmc);
     pmc2 = Parrot_PMC_pop_pmc(interp, rpa);
+    pmc = Parrot_PMC_shift_pmc(interp,rpa);
 
+    Parrot_printf(interp,"%P\n", pmc);
     Parrot_printf(interp,"%P\n", pmc2);
 CODE
+99
 42
 Done!
 OUTPUT
@@ -406,10 +479,6 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_floor_divide_float" );
     Parrot_PMC_set_integer_native(interp, pmc3, 0);
     number = 3.0;
 
-    /*
-       We must pass in the destination, but the return
-       value of the function must be used. This is broken.
-    */
     pmc3 = Parrot_PMC_floor_divide_float(interp, pmc, number, pmc3);
     number = Parrot_PMC_get_number(interp, pmc3);
     printf("%.2f\n", number);
@@ -423,11 +492,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_floor_divide_int" );
     Parrot_PMC_set_integer_native(interp, pmc3, 0);
     integer = 3;
 
-    /*
-       We must pass in the destination, but the return
-       value of the function must be used. This is broken.
-    */
-    pmc3 = Parrot_PMC_floor_divide_float(interp, pmc, integer, pmc3);
+    pmc3 = Parrot_PMC_floor_divide_int(interp, pmc, integer, pmc3);
     integer = Parrot_PMC_get_integer(interp, pmc3);
     printf("%d\n", integer);
 CODE
@@ -759,6 +824,58 @@ CODE
 Done!
 OUTPUT
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_concatenate_str" );
+     string  = createstring(interp, "FOO");
+     string2 = createstring(interp, "BAR");
+
+     Parrot_PMC_assign_string_native(interp, pmc_string, string);
+
+     pmc_string3 = Parrot_PMC_concatenate_str(interp, pmc_string, string2, pmc_string3);
+     Parrot_printf(interp, "%P\n", pmc_string3);
+CODE
+FOOBAR
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_concatenate" );
+     string  = createstring(interp, "FOO");
+
+     Parrot_PMC_assign_string_native(interp, pmc_string, string);
+
+     Parrot_PMC_i_concatenate(interp, pmc_string, pmc_string);
+     Parrot_printf(interp, "%P\n", pmc_string);
+CODE
+FOOFOO
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_concatenate_str" );
+     string  = createstring(interp, "FOO");
+     string2 = createstring(interp, "BAR");
+
+     Parrot_PMC_assign_string_native(interp, pmc_string, string);
+
+     Parrot_PMC_i_concatenate_str(interp, pmc_string, string2);
+     Parrot_printf(interp, "%P\n", pmc_string);
+CODE
+FOOBAR
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_concatenate" );
+     string  = createstring(interp, "FOO");
+     string2 = createstring(interp, "BAR");
+
+     Parrot_PMC_assign_string_native(interp, pmc_string, string);
+     Parrot_PMC_assign_string_native(interp, pmc_string2,string2);
+
+     pmc_string3 = Parrot_PMC_concatenate(interp, pmc_string, pmc_string2, pmc_string3);
+     Parrot_printf(interp, "%P\n", pmc_string3);
+CODE
+FOOBAR
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_subtract" );
 
     Parrot_PMC_set_integer_native(interp, pmc,  52);
@@ -888,6 +1005,31 @@ CODE
 0
 Done!
 OUTPUT
+
+
+#extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_cmp_pmc" );
+#    Parrot_PMC_set_integer_native(interp, pmc, 42);
+#    Parrot_PMC_set_integer_native(interp, pmc2, 17);
+#
+#    pmc3 = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
+#    Parrot_printf(interp,"%P\n", pmc3 );
+#
+#    Parrot_PMC_set_integer_native(interp, pmc, 17);
+#    Parrot_PMC_set_integer_native(interp, pmc2, 42);
+#
+#    pmc3 = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
+#    Parrot_printf(interp,"%P\n", pmc3 );
+#
+#    Parrot_PMC_set_integer_native(interp, pmc, 42);
+#
+#    pmc3 = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
+#    Parrot_printf(interp,"%P\n", pmc3 );
+#CODE
+#1
+#-1
+#0
+#Done!
+#OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_cmp_num" );
     Parrot_PMC_set_integer_native(interp, pmc, 42);

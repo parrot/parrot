@@ -775,13 +775,11 @@ Mark the array.
 
     VTABLE void mark() {
         PMC ** const data = PMC_array(SELF);
-        INTVAL i;
-
-        if (!data)
-            return;
-
-        for (i = PMC_size(SELF) - 1; i >= 0; --i)
-            Parrot_gc_mark_PMC_alive(INTERP, data[i]);
+        if (data) {
+            INTVAL i;
+            for (i = PMC_size(SELF) - 1; i >= 0; --i)
+                Parrot_gc_mark_PMC_alive(INTERP, data[i]);
+        }
     }
 
 

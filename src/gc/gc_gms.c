@@ -2279,20 +2279,20 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
     size_t            i;
 
     fprintf(stderr, "%s\ntotal: %lu\ngen: %lu\n", header,
-            interp->gc_sys->stats.gc_mark_runs,
-            self->gen_to_collect);
+            (unsigned long)interp->gc_sys->stats.gc_mark_runs,
+            (unsigned long)self->gen_to_collect);
 
     fprintf(stderr, "dirty: %lu\nwork: %lu\n",
-            Parrot_pa_count_used(interp, self->dirty_list),
-            self->work_list ? Parrot_pa_count_used(interp, self->work_list) : 0);
+            (unsigned long)Parrot_pa_count_used(interp, self->dirty_list),
+            self->work_list ? (unsigned long)Parrot_pa_count_used(interp, self->work_list) : 0);
 
     for (i = 0; i < MAX_GENERATIONS; i++)
         fprintf(stderr, "%lu: %lu %lu\n",
-                i,
-                Parrot_pa_count_used(interp, self->objects[i]),
-                Parrot_pa_count_used(interp, self->strings[i]));
+                (unsigned long)i,
+                (unsigned long)Parrot_pa_count_used(interp, self->objects[i]),
+                (unsigned long)Parrot_pa_count_used(interp, self->strings[i]));
 
-    fprintf(stderr, "STRING: %lu\n", self->string_gc.memory_pool->total_allocated);
+    fprintf(stderr, "STRING: %lu\n", (unsigned long)self->string_gc.memory_pool->total_allocated);
 
 #if 0
     fprintf(stderr, "PMC: %d\n", Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));

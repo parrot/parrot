@@ -6,9 +6,9 @@
 
 A high-level overview of the Parrot virtual machine.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 

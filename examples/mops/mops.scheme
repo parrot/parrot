@@ -15,7 +15,7 @@
 ; This program is free software. It is subject to the same
 ; license as Parrot.
 ;
-; $Id$
+; 
 ;
 
 (let ((I1 0) (I2 0) (I3 1)   ; set    I2, 0

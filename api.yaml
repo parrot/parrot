@@ -451,3 +451,11 @@
     - 'experimental'
     - 'functions'
   ticket:  'https://trac.parrot.org/parrot/ticket/1996'
+-
+  name:  'hashvalue vtable'
+  eligible:  '3.6'
+  note:  'Unused vtable in parrot core'
+  tags:
+    - 'deprecated'
+    - 'vtable'
+  ticket:  'https://trac.parrot.org/parrot/ticket/2027'

@@ -1,6 +1,6 @@
 /* nci/signatures.c
 Copyright (C) 2010, Parrot Foundation.
-$Id$
+
 
 =head1 NAME
 

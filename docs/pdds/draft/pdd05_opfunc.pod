@@ -12,9 +12,9 @@ Parrot. }}
 
 {{ NOTE: standardize on underscores or no underscores? }}
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 
