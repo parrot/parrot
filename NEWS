@@ -5,6 +5,7 @@ New in 3.2.0
   + Improved code coverage
   + New Generational GC implemented. To enable it run Configure.pl --gc=gms 
   + "opsc_full_parse" branch for semantically parse of ops is started
+  + Parallel building is supported ( make -j<number> )
 - Languages
   + A few tests in Cardinal are fixed
   + Minor fixes, refactors and cleaning on Winxed
