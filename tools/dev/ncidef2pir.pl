@@ -1,18 +1,19 @@
 #! perl
 
-# Copyright (C) 2003-2007, Parrot Foundation.
+# Copyright (C) 2003-2011, Parrot Foundation.
 
 =head1 NAME
 
-tools/dev/ncidef2asm.pl - Turn an NCI library definition file into PASM
+tools/dev/ncidef2pir.pl - Turn an NCI library definition file into PIR
 
 =head1 SYNOPSIS
 
-    perl tools/dev/ncidef2asm.pl path/to/from_file [ path/to/to_file ]
+    perl tools/dev/ncidef2pir.pl path/to/from_file [ path/to/to_file ]
 
 =head1 DESCRIPTION
 
-This program takes an NCI library definition file and turns it into PASM.
+This program takes an NCI library definition file and creates a PIR file
+which loads the described library.
 
 An NCI library definition file provides the information needed to
 generate a parrot wrapper for the named library (or libraries). Its
@@ -40,8 +41,7 @@ correct order.
 =head2 package
 
 Declares the package that all subsequent sub PMCs will be put
-into. The name is a simple concatenation of the package name, double
-colon, and the routine name, with no preceding punctuation.
+into. Double colon is used to to delimit namespaces.
 
 =head2 lib
 
@@ -157,15 +157,18 @@ my ( $from_file, $to_file ) = @ARGV;
 # source file and add a .pasm to it
 if ( !defined $to_file ) {
     $to_file = $from_file;
-    $to_file =~ s/\..*$//;
-    $to_file .= ".pasm";
+    $to_file =~ s/\.[^.]*$//;
+    $to_file .= ".pir";
 }
 
 open my $INPUT,  '<', "$from_file" or die "Can't open up $from_file, error $!";
 open my $OUTPUT, '>', "$to_file"   or die "Can't open up $to_file, error $!";
 
-# To start, save all the registers, just in case
-print $OUTPUT "saveall\n";
+# Have the library initialized on load
+print $OUTPUT <<EOR;
+.sub '' :anon :load
+  .local pmc lib, nci
+EOR
 
 my @libs;
 my ( $cur_package, $line, $cur_section );
@@ -198,8 +201,7 @@ while ( $line = <$INPUT> ) {
 }
 
 # Put the registers back and end
-print $OUTPUT "restoreall\n";
-print $OUTPUT "end\n";
+print $OUTPUT ".end\n";
 close $OUTPUT;
 
 sub package_line {
@@ -210,13 +212,12 @@ sub package_line {
     $line =~ s/\s*$//;
 
     # Set the global current package
-    $cur_package = $line;
-
+    $cur_package = [ split '::', $line ];
 }
 
 sub lib_line {
     my $line = shift;
-    print $OUTPUT "loadlib P1, '$line'\n";
+    print $OUTPUT "  loadlib lib, '$line'\n";
 }
 
 sub def_line {
@@ -224,8 +225,10 @@ sub def_line {
     my ( $return_type, $name, @params ) = split ' ', $line;
     unshift @params, $return_type;
     my $signature = join( "", @params );
-    print $OUTPUT "dlfunc P2, P1, '$name', '$signature'\n";
-    print $OUTPUT "store_global '${cur_package}::${name}', P2\n";
+    print $OUTPUT "  dlfunc nci, lib, '$name', '$signature'\n";
+    print $OUTPUT "  set_global " .
+                    "[" . (join ";", (map {"'$_'"} @$cur_package)) . "]" .
+                    ", '${name}', nci\n";
 }
 
 # Local Variables:
