@@ -169,8 +169,8 @@ rule switch_default {
 
 
 # HACK to support for INT_FMT "\n"
-token term:sym<concat> {
-    <identifier> \s <quote>
+token term:sym<concatenate_strings> { # Long-long name as LTM workaround
+    <identifier> \s+ <quote>
 }
 
 token term:sym<call> {
