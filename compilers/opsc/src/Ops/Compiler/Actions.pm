@@ -456,7 +456,7 @@ method statement_control:sym<if> ($/) {
         $<then>.ast,
     );
 
-    $past.push($<else>.ast) if $<else>;
+    $past.push($<else>[0].ast) if $<else>;
 
     make $past;
 }

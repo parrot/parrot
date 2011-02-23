@@ -14,6 +14,12 @@ my $buf := q|
 inline op foo(inconst NUM) {
     PMC *foo;
     foo("answer", 42);
+    if (answer != 42) {
+        answer = 42;
+    }
+    else {
+        question = "what?";
+    }
 }
 |;
 my $compiler := pir::compreg__Ps('Ops');
@@ -35,6 +41,13 @@ ok( $call ~~ PAST::Op, "PAST::op for call created" );
 is( $call.pasttype, "call", ".. with pasttype call" );
 is( $call.name,     "foo",  ".. with name 'foo'" );
 is( +@($call),          2,  ".. with 2 args" );
+
+
+my $if := $op[2];
+ok( $if ~~ PAST::Op,      "PAST::op for if created" );
+is( $if.pasttype,   "if", ".. with pasttype call" );
+is( +@($if),            3, ".. with 3 children" );
+
 
 done_testing();
 
