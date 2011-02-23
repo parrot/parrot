@@ -100,7 +100,7 @@ sub get_options() {
     $getopts.add_option('help', 'h');
 
     # suppress timing and debug output on stdout
-    $getopts.add_option('quite', 'q');
+    $getopts.add_option('quiet', 'q');
 
     $getopts.get_options(pir::getinterp__p()[2]);
 }
