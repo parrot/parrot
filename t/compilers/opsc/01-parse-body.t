@@ -117,6 +117,11 @@ inline op set(out INT, in NUM) :base_core {
     $1 = PTR2INTVAL(optcode_t *, dest);
 }|, "Casting works 3");
 
+parse_ok($c, q|
+inline op set(out INT, in NUM) :base_core {
+    $1 = (INTVAL)dest;
+}|, "Casting works 4");
+
 # Control statements
 
 parse_ok($c, q|
@@ -230,6 +235,16 @@ parse_ok($c, q«
 inline op noop(out PMC, in INT) {
     gc_flags = $1->flags;
 }», "Pointer access");
+
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    gc_flags = foo->flags;
+}», "Pointer access 2");
+
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    gc_flags = foo(foo->flags);
+}», "Pointer access 3");
 
 parse_ok($c, q«
 inline op noop(out PMC, in INT) {

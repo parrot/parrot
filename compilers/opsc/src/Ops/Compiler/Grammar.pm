@@ -169,7 +169,7 @@ token term:sym<concatenate_strings> { # Long-long name as LTM workaround
 }
 
 token term:sym<call> {
-    <identifier> [ <.ws> '(' <arglist> ')' ]?
+    <identifier> <.ws> '(' <arglist> ')'
 }
 token term:sym<int>  { <integer> ('u'|'U'|'l'|'L')* }
 token term:sym<str>  { <quote> }
@@ -186,8 +186,10 @@ token term:sym<reg>   {
 
 token term:sym<macro> { <op_macro>    }
 
-# Used for macro-casting. E.g. PTR2INTVAL. Or variable name.
-token term:sym<identifier>  { <type_declarator> <!before '('> }
+# Variable name.
+token term:sym<identifier>  { # Short name for sym<call> to win LTM
+    <identifier> <!before <ws> '('>
+}
 
 # Assignment
 token infix:sym<=>  { <sym>  <O('%assignment')> }
@@ -210,7 +212,7 @@ token infix:sym</>    { <sym>  <O('%multiplicative')> }
 token infix:sym<%>    { <sym>  <O('%multiplicative')> }
 
 token infix:sym<+>    { <sym>  <O('%additive')> }
-token infix:sym<->    { <sym>  <O('%additive')> }
+token infix:sym<->    { <sym>  <!before '>' > <O('%additive')> }
 
 token infix:sym«==»   { <sym>  <O('%relational')> }
 token infix:sym«!=»   { <sym>  <O('%relational')> }
@@ -258,6 +260,8 @@ token arglist {
     <.ws>
     [
     | <EXPR('f=')>
+    | <type_declarator> <.ws> ',' <.ws> <EXPR('f=')>
+    | <type_declarator>
     | <?>
     ]
 }
@@ -295,7 +299,7 @@ rule declarator {
 
 # No double poiners (for now?)
 rule type_declarator {
-    'const'? <.identifier> '*'* 'const'?
+    'const'? <identifier> '*'* 'const'? <!before <[(.\-]> >
 }
 
 token eat_terminator {
