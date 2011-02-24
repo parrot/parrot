@@ -311,7 +311,7 @@ rule declarator {
 
 # No double poiners (for now?)
 rule type_declarator {
-    'const'? <identifier> '*'* 'const'? <!before <[(.\-]> >
+    'const'? <identifier> '*'* 'const'? <?before [ <identifier> | ',' | ')' ] >
 }
 
 token eat_terminator {
