@@ -2919,6 +2919,9 @@ win32-inno-installer : world installable
 	$(PERL) $(DEV_TOOLS_DIR)/mk_inno.pl
 	$(INNO_SETUP) parrot.iss
 
+distcheck : release
+	$(PERL) tools/release/distcheck.pl
+
 ###############################################################################
 #
 # exec:
