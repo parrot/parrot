@@ -55,6 +55,7 @@ BUILD_TOOLS_DIR = tools/build
 # directory for developers' tools
 # programs, templates, configuration files NOT invoked by 'make all'
 DEV_TOOLS_DIR = tools/dev
+RELEASE_TOOLS_DIR = tools/release
 
 # directory for header files
 INC_DIR         = include/parrot
@@ -2920,7 +2921,7 @@ win32-inno-installer : world installable
 	$(INNO_SETUP) parrot.iss
 
 distcheck : release
-	$(PERL) tools/release/distcheck.pl
+	$(PERL) $(RELEASE_TOOLS_DIR)/distcheck.pl
 
 ###############################################################################
 #
