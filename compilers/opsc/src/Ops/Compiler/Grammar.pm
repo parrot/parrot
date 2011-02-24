@@ -199,7 +199,7 @@ token term:sym<reg>   {
 token term:sym<macro> { <op_macro>    }
 
 # Variable name.
-token term:sym<identifier>  { # Short name for sym<call> to win LTM
+token term:sym<identifier>  {
     <identifier> <!before <ws> '('>
 }
 
