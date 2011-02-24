@@ -416,7 +416,7 @@ method term:sym<call> ($/) {
         :name(~$<identifier>),
     );
 
-    my $args := $<arglist>[0]<EXPR>;
+    my $args := $<arglist><EXPR>;
 
     if $args {
         if +@($args) > 1 {
