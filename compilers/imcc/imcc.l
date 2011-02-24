@@ -1343,7 +1343,7 @@ imcc_setup_input(ARGMOD(imc_info_t * imcc), yyscan_t yyscanner,
 
 static void
 imcc_cleanup_input(ARGMOD(imc_info_t * imcc), PIOHANDLE file,
-        ARGIN(const char *source_c), int is_file)
+        ARGIN(char *source_c), int is_file)
 {
     if (is_file)
         PIO_CLOSE(imcc->interp, file);
@@ -1357,7 +1357,7 @@ imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
 {
     yyguts_t * const yyg = (yyguts_t *)yyscanner;
     YY_BUFFER_STATE  volatile buffer;
-    const char * source_c = Parrot_str_to_cstring(imcc->interp, source);
+    char * source_c = Parrot_str_to_cstring(imcc->interp, source);
     PIOHANDLE file;
     INTVAL success = 0;
 

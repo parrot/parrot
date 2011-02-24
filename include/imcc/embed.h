@@ -5,19 +5,16 @@
 /* Forward Declarations. IMCC will define these things internally.
    libparrot and other embedders and extenders should treat these
    as being opaque */
+#ifndef PARROT_IMCC_IMC_H_GUARD
 typedef struct IMC_Unit IMC_Unit;
 struct _imc_info_t;
 typedef struct _imc_info_t imc_info_t;
+#endif
 
 #include "imcc/yyscanner.h"
 
 /* HEADERIZER BEGIN: compilers/imcc/main.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_EXPORT
-PMC * imcc_compile(ARGMOD(imc_info_t *imcc))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*imcc);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -82,7 +79,7 @@ void imcc_set_warning_mode(ARGMOD(imc_info_t *imcc), INTVAL warnings)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*imcc);
 
-void exit_reentrant_compile(
+imc_info_t * exit_reentrant_compile(
     ARGMOD(imc_info_t * imcc),
     ARGMOD_NULLOK(struct _imc_info_t *imc_info))
         __attribute__nonnull__(1)
@@ -110,8 +107,6 @@ yyscan_t imcc_get_scanner(ARGMOD(imc_info_t *imcc))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*imcc);
 
-#define ASSERT_ARGS_imcc_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(fullname))

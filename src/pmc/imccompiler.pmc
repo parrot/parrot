@@ -5,7 +5,7 @@
 /* HEADERIZER HFILE: none */
 
 pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
-    ATTR imc_info_t *imcc_info;
+    ATTR void *imcc_info;
     ATTR INTVAL is_pasm; /* 0 = PIR, 1 = PASM */
     ATTR INTVAL current_eval;
 
@@ -25,13 +25,14 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "IMCCompiler: Must have type 0 (PIR) or 1 (PASM)");
         attrs->is_pasm = is_pasm;
-        attrs->imcc_info = imcc_new(INTERP);
+        attrs->imcc_info = (void*) imcc_new(INTERP);
         attrs->current_eval = 0;
     }
 
     /* provided to emulate the current NCI compreg */
-    VTABLE void* invoke(void* next) {
+    VTABLE opcode_t* invoke(void* next) {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        imc_info_t * const imcc = (imc_info_t*) attrs->imcc_info;
         PMC * const ctx = CURRENT_CONTEXT(INTERP);
         PMC * cont = INTERP->current_cont;
         PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
@@ -48,11 +49,11 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         Parrot_pcc_set_sub(interp, newcontext, 0);
 
         Parrot_pcc_fill_params_from_c_args(INTERP, call_object, "S", &code);
-        imcc_reset(attrs->imcc_info);
-        result = imcc_compile_string(attrs->imcc_info, code, attrs->is_pasm);
+        imcc_reset(imcc);
+        result = imcc_compile_string(imcc, code, attrs->is_pasm);
         if (PMC_IS_NULL(result)) {
-            STRING * const msg = imcc_last_error_message(attrs->imcc_info);
-            INTVAL code = imcc_last_error_code(attrs->imcc_info);
+            STRING * const msg = imcc_last_error_message(imcc);
+            INTVAL code = imcc_last_error_code(imcc);
             Parrot_unblock_GC_mark(interp);
             Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
@@ -81,9 +82,10 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             next = VTABLE_invoke(INTERP, cont, next);
         }
 
+        /* TODO: What do we do with this return value? Can we ignore it? */
         Parrot_pcc_build_call_from_c_args(INTERP, call_object, "P", eval_pmc);
         interp->code = cur_code;
-        return next;
+        return (opcode_t*)next;
     }
 
     VTABLE void *get_pointer() {
@@ -106,7 +108,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
 
     VTABLE void destroy() {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
-        imcc_destroy(attrs->imcc_info);
+        imcc_destroy((imc_info_t*)(attrs->imcc_info));
         attrs->imcc_info = NULL;
     }
 
@@ -116,12 +118,13 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     ) {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         PMC * pf = PMCNULL;
+        imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
         if (has_target)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "IMCCompiler: compiler does not support the target option");
         /* TODO: Handle outer_ctx */
-        pf = imcc_compile_string(attrs->imcc_info, source, attrs->is_pasm);
-        imcc_reset(attrs->imcc_info);
+        pf = imcc_compile_string(imcc, source, attrs->is_pasm);
+        imcc_reset(imcc);
         RETURN(PMC *pf);
     }
 
@@ -131,10 +134,9 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     ) {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         PMC * pf = PMCNULL;
+        imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
         UINTVAL regs_used[4] = {3, 3, 3, 3};
         PMC * const newcontext = Parrot_push_context(interp, regs_used);
-
-
 
         if (has_target)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -145,10 +147,10 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         Parrot_pcc_set_sub(interp, newcontext, 0);
 
         /* TODO: Handle outer_ctx */
-        pf = imcc_compile_file(attrs->imcc_info, filename, attrs->is_pasm);
+        pf = imcc_compile_file(imcc, filename, attrs->is_pasm);
         if (PMC_IS_NULL(pf)) {
-            STRING * const msg = imcc_last_error_message(attrs->imcc_info);
-            INTVAL code = imcc_last_error_code(attrs->imcc_info);
+            STRING * const msg = imcc_last_error_message(imcc);
+            INTVAL code = imcc_last_error_code(imcc);
             Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
 
@@ -164,17 +166,19 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     ) {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         PMC * pf = PMCNULL;
+        imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
         if (has_target)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "IMCCompiler: compiler does not support the target option");
         /* TODO: Handle outer_ctx */
-        pf = imcc_compile_string(attrs->imcc_info, source, attrs->is_pasm);
+        pf = imcc_compile_string(imcc, source, attrs->is_pasm);
         /* TODO: Execute it */
     }
 
     METHOD preprocess(STRING *code) {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
-        imcc_preprocess(attrs->imcc_info, code);
+        imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
+        imcc_preprocess(imcc, code);
     }
 
     METHOD parse_name(STRING *name) {

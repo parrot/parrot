@@ -40,11 +40,14 @@ IMCC helpers.
 
 extern int yydebug;
 
+/* defined in imcc.l */
+PIOHANDLE determine_input_file_type(imc_info_t * imcc, STRING *sourcefile);
+
 /* XXX non-reentrant */
 static Parrot_mutex eval_nr_lock;
 static INTVAL       eval_nr  = 0;
 
-/* HEADERIZER HFILE: include/imcc/imc.h */
+/* HEADERIZER HFILE: include/imcc/embed.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -185,12 +188,6 @@ imcc_set_optimization_level(ARGMOD(imc_info_t *imcc), ARGIN(const char *opts))
     if (strchr(opts, '2')) {
         imcc->optimizer_level |= (OPT_PRE | OPT_CFG);
     }
-}
-
-PARROT_EXPORT
-PMC *
-imcc_compile(ARGMOD(imc_info_t *imcc))
-{
 }
 
 yyscan_t
@@ -452,8 +449,8 @@ list and set the new one as the current one. Return the new info structure.
 returns NULL if not in a reentrant situation. The return value of this I<MUST>
 be passed to C<exit_reentrant_compile>.
 
-=item C<void exit_reentrant_compile(imc_info_t * imcc, struct _imc_info_t
-*imc_info)>
+=item C<imc_info_t * exit_reentrant_compile(imc_info_t * imcc, struct
+_imc_info_t *imc_info)>
 
 Exit reentrant compile. Restore compiler state back to what it was for the
 previous compile, if any.
@@ -468,7 +465,7 @@ prepare_reentrant_compile(ARGMOD(imc_info_t * imcc))
     struct _imc_info_t * imc_info = NULL;
     if (imcc->last_unit) {
         /* a reentrant compile */
-        imc_info        = calloc(1, sizeof(imc_info_t));
+        imc_info        = (imc_info_t*) calloc(1, sizeof(imc_info_t));
         imc_info->prev  = imcc;
         imc_info->ghash = imcc->ghash;
         /* start over; let the start of line rule increment this to 1 */
@@ -480,7 +477,7 @@ prepare_reentrant_compile(ARGMOD(imc_info_t * imcc))
     return NULL;
 }
 
-void
+imc_info_t *
 exit_reentrant_compile(ARGMOD(imc_info_t * imcc),
         ARGMOD_NULLOK(struct _imc_info_t *imc_info))
 {
