@@ -393,6 +393,9 @@ method statement ($/) {
     elsif $<EXPR> {
         $past := $<EXPR>.ast;
     }
+    elsif $<c_macro> {
+        # TODO
+    }
     else {
         $/.CURSOR.panic("Unknown content in statement");
     }

@@ -7,11 +7,18 @@ grammar Ops::Compiler::Grammar is HLL::Grammar;
 
 rule TOP {
     <body>
+    <.pod_ws>
     [ $ || <.panic: 'Syntax error'> ]
 }
 
 rule body {
-    [ <preamble> | <op> ]*
+    [
+        <.pod_ws>
+        [
+        | <preamble>
+        | <op>
+        ]
+    ]*
 }
 
 token preamble {
@@ -97,6 +104,10 @@ rule op_macro:sym<goto next>    { 'goto' 'NEXT' '(' ')' }
 rule op_macro:sym<expr next>    { 'expr' 'NEXT' '(' ')' }
 rule op_macro:sym<restart next> { 'restart' 'NEXT' '(' ')' }
 
+# Eat c_macro till next non-whitespace char.
+token c_macro {
+    ^^ '#' \N+ <.ws>
+}
 
 token identifier {
     <!keyword> <ident>
@@ -120,6 +131,7 @@ rule statement_list {
 
 token statement {
     [
+    | <c_macro>
     | <statement_control>
     | <blockoid>
     | <EXPR> <.ws>
@@ -314,13 +326,18 @@ proto token terminator { <...> }
 token terminator:sym<;> { <?[;]> }
 token terminator:sym<}> { <?[}]> }
 
-
-# ws handles whitespace, pod and perl and C comments
-token ws {
+token pod_ws {
   [
   | \s+
   | '#' \N*
   | ^^ '=' .*? \n '=cut'
+  ]*
+}
+
+# ws handles whitespace and C comments
+token ws {
+  [
+  | \s+
   | '/*' .*? '*/'
   ]*
 }
