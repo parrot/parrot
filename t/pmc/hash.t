@@ -24,8 +24,6 @@ well.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(176)
-
     initial_hash_tests()
     more_than_one_hash()
     hash_key_type()
@@ -77,6 +75,8 @@ well.
     equality_tests()
 
     pmc_keys()
+
+    'done_testing'()
 .end
 
 .sub initial_hash_tests
@@ -1501,6 +1501,23 @@ postit_end:
     is($I0, 3, "Got 3 different types of PMC keys")
     $I0 = types['ResizableStringArray']
     ok($I0, "Including ResizableStringArray")
+
+
+    # Check custom hashvalue vtable.
+    $P0 = newclass ['Foo']
+    addattribute $P0, "invoked"
+
+    $P0 = new ['Foo']
+    hash[$P0] = "answer"
+    $P1 = getattribute $P0, "invoked"
+    is ($P1, 42, "hashvalue was invoked")
+.end
+
+.namespace ['Foo']
+.sub '' :method :vtable('hashvalue')
+    $P0 = box 42
+    setattribute self, "invoked", $P0
+    .return (42)
 .end
 
 # Local Variables:
