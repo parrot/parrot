@@ -2171,6 +2171,7 @@ tools/install/smoke.pl                                      []
 tools/install/smoke_languages.pl                            []
 tools/release/README                                        []doc
 tools/release/crow.pir                                      []
+tools/release/distcheck.pl                                  []
 tools/release/gen_release_info.pl                           []
 tools/release/inc_ver.pir                                   []
 tools/release/release.json                                  []
