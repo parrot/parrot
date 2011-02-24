@@ -267,8 +267,7 @@ static void gc_gms_check_sanity(PARROT_INTERP)
 
 static void gc_gms_cleanup_dirty_list(PARROT_INTERP,
     ARGIN(MarkSweep_GC *self),
-    ARGIN(Parrot_Pointer_Array *dirty_list),
-    size_t gen)
+    ARGIN(Parrot_Pointer_Array *dirty_list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -826,7 +825,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     either collect such objects or they will be marked by referents from
     "dirty_list".
     */
-    gc_gms_cleanup_dirty_list(interp, self, self->dirty_list, gen);
+    gc_gms_cleanup_dirty_list(interp, self, self->dirty_list);
     gc_gms_print_stats(interp, "After cleanup");
 
     /*
@@ -942,7 +941,7 @@ gc_gms_select_generation_to_collect(PARROT_INTERP)
 /*
 
 =item C<static void gc_gms_cleanup_dirty_list(PARROT_INTERP, MarkSweep_GC *self,
-Parrot_Pointer_Array *dirty_list, size_t gen)>
+Parrot_Pointer_Array *dirty_list)>
 
 Move all objects from collections younger K from dirty_list
 back to original lists. Reason for this is "corollary of invariant". We can
@@ -955,8 +954,7 @@ either collect such objects or they will be marked by referents from
 static void
 gc_gms_cleanup_dirty_list(PARROT_INTERP,
         ARGIN(MarkSweep_GC *self),
-        ARGIN(Parrot_Pointer_Array *dirty_list),
-        size_t gen)
+        ARGIN(Parrot_Pointer_Array *dirty_list))
 {
     ASSERT_ARGS(gc_gms_cleanup_dirty_list)
 
