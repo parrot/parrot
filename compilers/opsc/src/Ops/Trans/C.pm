@@ -288,7 +288,7 @@ static HOP **hop;
 
 static void hop_init(PARROT_INTERP);
 static size_t hash_str(const char *str);
-static void store_op(PARROT_INTERP, op_info_t *info, HOP *p, const char *name);
+static void store_op(op_info_t *info, HOP *p, const char *name);
 
 /* XXX on changing interpreters, this should be called,
    through a hook */
@@ -321,7 +321,7 @@ size_t hash_str(ARGIN(const char *str))
 }
 
 
-static void store_op(PARROT_INTERP, op_info_t *info, HOP *p, const char *name)
+static void store_op(op_info_t *info, HOP *p, const char *name)
 {
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
 
@@ -362,11 +362,11 @@ static void hop_init(PARROT_INTERP)
 
     /* store full names */
     for (i = 0; i < [[BS]]op_lib.op_count; i++) {
-        store_op(interp, info + i, hops++, info[i].full_name);
+        store_op(info + i, hops++, info[i].full_name);
 
         /* plus one short name */
         if (i && info[i - 1].name != info[i].name)
-            store_op(interp, info + i, hops++, info[i].name);
+            store_op(info + i, hops++, info[i].name);
     }
 }
 
