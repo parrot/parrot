@@ -26,6 +26,7 @@ numbered.  You probably want src/embed/api.c
 #include "pmc/pmc_callcontext.h"
 #include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
+#include "imcc/embed.h"
 
 #include "embed.str"
 
@@ -900,23 +901,28 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code)
         ARGOUT(Parrot_String *error))
 {
     ASSERT_ARGS(Parrot_compile_string)
-    STRING * const code_s = Parrot_str_new(interp, code, 0);
-    PMC * result = PMCNULL;
+    PMC * compiler = Parrot_get_compiler(interp, type);
 
-    Parrot_block_GC_mark(interp);
-
-    if (STRING_equal(interp, CONST_STRING(interp, "PIR"), type))
-        result = imcc_compile_string(interp, code_s, 0);
-
-    else if (STRING_equal(interp, CONST_STRING(interp, "PASM"), type))
-        result = imcc_compile_string(interp, code_s, 1);
-    // TODO: Where to get the error info now?
-    //else
-        //*error = Parrot_str_new(interp, "Invalid interpreter type", 0);
-
-    Parrot_unblock_GC_mark(interp);
-
-    return result;
+    if (PMC_IS_NULL(compiler)) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not find compiler %Ss", type);
+    }
+    else {
+        STRING * const code_s = Parrot_str_new(interp, code, 0);
+        PMC * result = PMCNULL;
+        imc_info_t * imcc = (imc_info_t*) VTABLE_get_pointer(interp, compiler);
+        INTVAL is_pasm = VTABLE_get_integer(interp, compiler);
+        Parrot_block_GC_mark(interp);
+        result = imcc_compile_string(imcc, code_s, is_pasm);
+        if (PMC_IS_NULL(result)) {
+            STRING * const msg = imcc_last_error_message(imcc);
+            INTVAL code = imcc_last_error_code(imcc);
+            Parrot_unblock_GC_mark(interp);
+            Parrot_ex_throw_from_c_args(interp, NULL, code, "%Ss", msg);
+        }
+        Parrot_unblock_GC_mark(interp);
+        return result;
+    }
 }
 
 /*

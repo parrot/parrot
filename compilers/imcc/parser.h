@@ -11,7 +11,7 @@ typedef struct _IdList {
 } IdList;
 
 #include "imcparser.h"
-#include "yyscanner.h"
+#include "imcc/yyscanner.h"
 
 #define KEY_BIT(argnum) (1 << (argnum))
 

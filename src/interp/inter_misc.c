@@ -20,12 +20,11 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 
 #include "parrot/parrot.h"
 #include "inter_misc.str"
-#include "../compilers/imcc/imc.h"
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_callcontext.h"
 #include "pmc/pmc_parrotinterpreter.h"
-
 #include "parrot/has_header.h"
+#include "imcc/embed.h"
 
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 

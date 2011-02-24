@@ -63,7 +63,6 @@ compilers/imcc/sets.h                                       [imcc]
 compilers/imcc/symreg.c                                     [imcc]
 compilers/imcc/symreg.h                                     [imcc]
 compilers/imcc/unit.h                                       [imcc]
-compilers/imcc/yyscanner.h                                  [imcc]
 compilers/opsc/Defines.mak                                  [opsc]
 compilers/opsc/README.pod                                   []doc
 compilers/opsc/Rules.mak                                    [opsc]
@@ -871,6 +870,8 @@ frontend/pbc_dump/main.c                                    []
 frontend/pbc_dump/packdump.c                                []
 frontend/pbc_merge/main.c                                   []
 include/imcc/api.h                                          [main]include
+include/imcc/embed.h                                        [main]include
+include/imcc/yyscanner.h                                    [main]include
 include/parrot/api.h                                        [main]include
 include/parrot/atomic.h                                     [main]include
 include/parrot/atomic/fallback.h                            [main]include

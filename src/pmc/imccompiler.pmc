@@ -1,11 +1,11 @@
 
-#include "../compilers/imcc/imc.h"
+#include "imcc/embed.h"
 #include "pmc/pmc_sub.h"
 
 /* HEADERIZER HFILE: none */
 
 pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
-    ATTR void *imcc_info;
+    ATTR imc_info_t *imcc_info;
     ATTR INTVAL is_pasm; /* 0 = PIR, 1 = PASM */
     ATTR INTVAL current_eval;
 
@@ -53,6 +53,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         if (PMC_IS_NULL(result)) {
             STRING * const msg = imcc_last_error_message(attrs->imcc_info);
             INTVAL code = imcc_last_error_code(attrs->imcc_info);
+            Parrot_unblock_GC_mark(interp);
             Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
         pf = (PackFile*)VTABLE_get_pointer(INTERP, result);

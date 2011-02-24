@@ -44,7 +44,7 @@ extern int yydebug;
 static Parrot_mutex eval_nr_lock;
 static INTVAL       eval_nr  = 0;
 
-/* HEADERIZER HFILE: compilers/imcc/imc.h */
+/* HEADERIZER HFILE: include/imcc/imc.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

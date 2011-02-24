@@ -1521,14 +1521,7 @@ src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
 src/interp/inter_misc$(O) : $(PARROT_H_HEADERS) \
 	src/interp/inter_misc.c \
 	src/interp/inter_misc.str \
-	compilers/imcc/imc.h \
-	compilers/imcc/cfg.h \
-	compilers/imcc/debug.h \
-	compilers/imcc/instructions.h \
-	compilers/imcc/sets.h \
-	compilers/imcc/symreg.h \
-	compilers/imcc/unit.h \
-	compilers/imcc/yyscanner.h \
+	include/imcc/embed.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/runcore_api.h \
         include/pmc/pmc_parrotinterpreter.h
@@ -1587,14 +1580,6 @@ src/packfile/api$(O) : \
     include/pmc/pmc_sub.h \
     include/pmc/pmc_key.h \
     include/pmc/pmc_parrotlibrary.h \
-    compilers/imcc/imc.h \
-    compilers/imcc/cfg.h \
-    compilers/imcc/debug.h \
-    compilers/imcc/instructions.h \
-    compilers/imcc/sets.h \
-    compilers/imcc/symreg.h \
-    compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/dynext.h \
@@ -1709,7 +1694,8 @@ src/embed$(O) : \
     $(INC_DIR)/runcore_api.h \
     $(INC_DIR)/extend_vtable.h \
     $(INC_DIR)/oplib/core_ops.h \
-    include/pmc/pmc_sub.h
+    include/pmc/pmc_sub.h \
+    include/imcc/embed.h \
 
 src/embed/api$(O) : \
     $(PARROT_H_HEADERS) \

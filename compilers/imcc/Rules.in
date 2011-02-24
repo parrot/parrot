@@ -1,6 +1,7 @@
 compilers/imcc/api$(O) : \
     compilers/imcc/api.c \
     include/imcc/api.h \
+    include/imcc/embed.h \
     include/parrot/extend_vtable.h \
     compilers/imcc/imc.h \
     compilers/imcc/cfg.h \
@@ -9,7 +10,7 @@ compilers/imcc/api$(O) : \
     compilers/imcc/symreg.h \
     compilers/imcc/sets.h \
     compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
+    include/imcc/yyscanner.h \
     compilers/imcc/debug.h \
     include/parrot/api.h \
     compilers/imcc/instructions.h \
@@ -26,7 +27,7 @@ compilers/imcc/pcc$(O) : \
     compilers/imcc/sets.h \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
+    include/imcc/yyscanner.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/runcore_api.h \
@@ -43,7 +44,7 @@ compilers/imcc/instructions$(O) : \
     compilers/imcc/sets.h \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
+    include/imcc/yyscanner.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/runcore_api.h \
@@ -59,7 +60,7 @@ compilers/imcc/pbc$(O) : \
     compilers/imcc/sets.h \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
+    include/imcc/yyscanner.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/runcore_api.h \
@@ -80,7 +81,7 @@ compilers/imcc/parser_util$(O) : \
     compilers/imcc/sets.h \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
+    include/imcc/yyscanner.h \
     $(INC_DIR)/dynext.h \
     $(INC_DIR)/embed.h \
     $(INC_DIR)/oplib/ops.h \
@@ -97,7 +98,7 @@ compilers/imcc/imc$(O) : \
     compilers/imcc/sets.h \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
+    include/imcc/yyscanner.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
@@ -111,7 +112,7 @@ compilers/imcc/cfg$(O) : \
     compilers/imcc/sets.h \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
+    include/imcc/yyscanner.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/runcore_api.h \
@@ -126,7 +127,7 @@ compilers/imcc/debug$(O) : \
     compilers/imcc/sets.h \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
+    include/imcc/yyscanner.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
@@ -142,7 +143,7 @@ compilers/imcc/imclexer$(O) : \
     compilers/imcc/sets.h \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
+    include/imcc/yyscanner.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 	$(CC) $(CFLAGS) @optimize::compilers/imcc/imclexer.c@ @ccwarn::compilers/imcc/imclexer.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c compilers/imcc/imclexer.c
@@ -161,13 +162,14 @@ compilers/imcc/imcparser$(O) : \
     compilers/imcc/sets.h \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
+    include/imcc/yyscanner.h \
     $(INC_DIR)/dynext.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 	$(CC) $(CFLAGS) @optimize::compilers/imcc/imcparser.c@ @ccwarn::compilers/imcc/imcparser.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c compilers/imcc/imcparser.c
 
 compilers/imcc/main$(O) : \
+    include/imcc/embed.h \
     compilers/imcc/main.c \
     compilers/imcc/cfg.h \
     compilers/imcc/debug.h \
@@ -180,7 +182,7 @@ compilers/imcc/main$(O) : \
     compilers/imcc/sets.h \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
+    include/imcc/yyscanner.h \
     $(INC_DIR)/embed.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/runcore_api.h \
@@ -201,7 +203,7 @@ compilers/imcc/optimizer$(O) : \
     compilers/imcc/sets.h \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
+    include/imcc/yyscanner.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/runcore_api.h \
@@ -218,7 +220,7 @@ compilers/imcc/reg_alloc$(O) : \
     compilers/imcc/sets.h \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
+    include/imcc/yyscanner.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
@@ -231,7 +233,7 @@ compilers/imcc/sets$(O) : \
     compilers/imcc/sets.h \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
+    include/imcc/yyscanner.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
@@ -244,7 +246,7 @@ compilers/imcc/symreg$(O) : \
     compilers/imcc/sets.h \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
-    compilers/imcc/yyscanner.h \
+    include/imcc/yyscanner.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
