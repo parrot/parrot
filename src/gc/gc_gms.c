@@ -137,8 +137,8 @@ typedef struct string_alloc_struct {
 /* Get generation from PObj->flags */
 #define POBJ2GEN(pobj)                                                  \
         ((size_t)(((pobj)->flags & PObj_GC_generation_0_FLAG) ? 1 : 0)  \
-         + (((pobj)->flags) & PObj_GC_generation_1_FLAG ? 2 : 0)        \
-         + (((pobj)->flags) & PObj_GC_generation_2_FLAG ? 4 : 0))
+         + (((pobj)->flags & PObj_GC_generation_1_FLAG) ? 2 : 0)        \
+         + (((pobj)->flags & PObj_GC_generation_2_FLAG) ? 4 : 0))
 
 /* Get flags for generation number */
 #define GEN2FLAGS(gen)                                  \
