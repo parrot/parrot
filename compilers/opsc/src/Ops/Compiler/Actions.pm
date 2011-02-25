@@ -73,9 +73,10 @@ method op($/) {
     );
 
     # Flatten PAST::Stmts into Op.
-    for @($<op_body>.ast) {
-        $op.push($_);
-    }
+    #for @($<op_body>.ast) {
+    #    $op.push($_);
+    #}
+    $op.push($<op_body>.ast);
 
     for $<op_body>.ast<jump> {
         $op.add_jump($_);
@@ -108,21 +109,12 @@ method op($/) {
             :pasttype('call'),
             :name('goto_offset'),
             PAST::Op.new(
-                :pasttype<call>,
+                :pasttype<macro>,
                 :name<OPSIZE>,
             )
         );
 
-        my $nl := "\n";
-        $op.push(PAST::Op.new(
-                :pasttype<inline>,
-                :inline($nl)
-            ));
-        $op.push($goto_next);
-        $op.push(PAST::Op.new(
-                :pasttype<inline>,
-                :inline(";\n"),
-            ));
+        $op[0].push($goto_next);
     }
 
     my $past := PAST::Stmts.new(
@@ -304,7 +296,7 @@ method op_macro:sym<expr next>($/) {
         :pasttype<macro>,
         :name<expr_offset>,
         PAST::Op.new(
-            :pasttype<call>,
+            :pasttype<macro>,
             :name<OPSIZE>,
         )
     );
@@ -318,7 +310,7 @@ method op_macro:sym<goto next>($/) {
         :pasttype<macro>,
         :name<goto_offset>,
         PAST::Op.new(
-            :pasttype<call>,
+            :pasttype<macro>,
             :name<OPSIZE>,
         )
     );

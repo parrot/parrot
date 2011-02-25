@@ -314,12 +314,15 @@ our multi method process_body_chunk($trans, PAST::Var $var) {
         if my $expr := $var.viviself {
             $res := $res ~ ' = ' ~ self.process_body_chunk($trans, $expr);
         }
-        $res := $res ~ ";\n";
         $res;
     }
-    else {
+    elsif $var.scope eq 'register' {
         my $n := +$var.name;
         $trans.access_arg( self.arg_type($n - 1), $n);
+    }
+    else {
+        # Just ordinary variable
+        $var.name;
     }
 }
 
@@ -356,13 +359,62 @@ our multi method process_body_chunk($trans, PAST::Op $chunk) {
         #pir::say('RET ' ~ $ret);
         return $ret;
     }
+    elsif $type eq 'call' {
+        my @res;
+        @res.push($chunk.name);
+        @res.push('(');
+
+        my @args;
+        @args.push(self.process_body_chunk($trans, $_)) for @($chunk);
+        @res.push(join(', ', |@args));
+
+        @res.push(')');
+        join('', |@res);
+    }
+    elsif $type eq 'if' {
+        my @res;
+        @res.push('if (');
+        @res.push(self.process_body_chunk($trans, $chunk[0]));
+        @res.push(") ");
+
+        # 'then'
+        @res.push(self.process_body_chunk($trans, $chunk[1]));
+
+        # 'else'
+        @res.push("\nelse " ~ self.process_body_chunk($trans, $chunk[2])) if $chunk[2];
+
+        join('', |@res);
+    }
+    elsif $type eq '' && $chunk.pirop {
+        # Some infix stuff
+        my $res :=
+            self.process_body_chunk($trans, $chunk[0])
+            ~ ' ' ~ $chunk.pirop ~ ' '
+            ~ self.process_body_chunk($trans, $chunk[1]);
+        $res;
+    }
+    else {
+        #pir::die("Unhandled $type");
+    }
 }
 
 our multi method process_body_chunk($trans, PAST::Stmts $chunk) {
     my @children := list();
     for @($chunk) {
         @children.push(self.process_body_chunk($trans, $_));
+        @children.push(";\n");
     }
+    join('', |@children);
+}
+
+our multi method process_body_chunk($trans, PAST::Block $chunk) {
+    my @children := list();
+    @children.push('{' ~ "\n");
+    for @($chunk) {
+        @children.push(self.process_body_chunk($trans, $_));
+        @children.push(";\n");
+    }
+    @children.push('}');
     join('', |@children);
 }
 
