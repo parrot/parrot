@@ -215,8 +215,8 @@ token infix:sym<-=> { <sym>  <O('%assignment :pirop<-=>')> }
 token infix:sym<*=> { <sym>  <O('%assignment :pirop<*=>')> }
 token infix:sym</=> { <sym>  <O('%assignment :pirop</=>')> }
 
-token infix:sym«>>=» { <sym>  <O('%assignment :pirop<>>=>')> }
-token infix:sym«<<=» { <sym>  <O('%assignment :pirop<<<=>')> }
+token infix:sym«>>=» { <sym>  <O('%assignment :pirop<shr_assign>')> }
+token infix:sym«<<=» { <sym>  <O('%assignment :pirop<shl_assign>')> }
 
 token infix:sym<,>  { <sym>  <O('%comma')> }
 
@@ -229,10 +229,10 @@ token infix:sym<->    { <sym>  <!before '>' > <O('%additive :pirop<->')> }
 
 token infix:sym«==»   { <sym>  <O('%relational :pirop<==>')> }
 token infix:sym«!=»   { <sym>  <O('%relational :pirop<!=>')> }
-token infix:sym«<=»   { <sym>  <O('%relational :pirop<<=>')> }
-token infix:sym«>=»   { <sym>  <O('%relational :pirop<>=>')> }
-token infix:sym«<»    { <sym>  <O('%relational :pirop<<>')> }
-token infix:sym«>»    { <sym>  <O('%relational :pirop<>>')> }
+token infix:sym«<=»   { <sym>  <O('%relational :pirop<le>')> }
+token infix:sym«>=»   { <sym>  <O('%relational :pirop<ge>')> }
+token infix:sym«<»    { <sym>  <O('%relational :pirop<lt>')> }
+token infix:sym«>»    { <sym>  <O('%relational :pirop<gt>')> }
 
 token infix:sym<&>    { <sym>  <O('%tight_and :pirop<&>')> }
 token infix:sym<^>    { <sym>  <O('%tight_and :pirop<^>')> }   # XXX Check precedence

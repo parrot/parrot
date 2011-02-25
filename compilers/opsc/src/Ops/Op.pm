@@ -302,11 +302,6 @@ our multi method process_body_chunk($trans, PAST::Val $val) {
     $val.value;
 }
 
-our %PIROP_MAPPING := hash(
-    :shr('>>'),
-    :shl('<<'),
-);
-
 our multi method process_body_chunk($trans, PAST::Var $var) {
     if ($var.isdecl) {
         my $res := $var.vivibase ~ ' ' ~ $var.name;
@@ -329,6 +324,19 @@ our multi method process_body_chunk($trans, PAST::Var $var) {
         $var.name;
     }
 }
+
+our %PIROP_MAPPING := hash(
+    :shr('>>'),
+    :shl('<<'),
+
+    :shr_assign('>>='),
+    :shl_assign('<<='),
+
+    :le('<='),
+    :ge('>='),
+    :lt('<'),
+    :gt('>'),
+);
 
 our multi method process_body_chunk($trans, PAST::Op $chunk) {
     my $type := $chunk.pasttype;
