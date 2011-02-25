@@ -370,6 +370,11 @@ method declarator ($/) {
         :name(~$<variable>),
         :vivibase(~$<type_declarator>),
     );
+
+    $past.viviself($<statement>[0].ast) if $<statement>[0];
+
+    $past<array_size> := ~$<array_size><VALUE> if $<array_size>;
+
     make $past;
 }
 
