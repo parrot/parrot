@@ -215,34 +215,34 @@ token infix:sym<-=> { <sym>  <O('%assignment :pirop<-=>')> }
 token infix:sym<*=> { <sym>  <O('%assignment :pirop<*=>')> }
 token infix:sym</=> { <sym>  <O('%assignment :pirop</=>')> }
 
-token infix:sym«>>=» { <sym>  <O('%assignment :pirop«>>=»')> }
-token infix:sym«<<=» { <sym>  <O('%assignment :pirop«<<=»')> }
+token infix:sym«>>=» { <sym>  <O('%assignment :pirop<>>=>')> }
+token infix:sym«<<=» { <sym>  <O('%assignment :pirop<<<=>')> }
 
 token infix:sym<,>  { <sym>  <O('%comma')> }
 
-token infix:sym<*>    { <sym>  <O('%multiplicative :pirop«*»')> }
-token infix:sym</>    { <sym>  <O('%multiplicative :pirop«/»')> }
-token infix:sym<%>    { <sym>  <O('%multiplicative :pirop«%»')> }
+token infix:sym<*>    { <sym>  <O('%multiplicative :pirop<*>')> }
+token infix:sym</>    { <sym>  <O('%multiplicative :pirop</>')> }
+token infix:sym<%>    { <sym>  <O('%multiplicative :pirop<%>')> }
 
-token infix:sym<+>    { <sym>  <O('%additive :pirop«+»')> }
-token infix:sym<->    { <sym>  <!before '>' > <O('%additive :pirop«-»')> }
+token infix:sym<+>    { <sym>  <O('%additive :pirop<+>')> }
+token infix:sym<->    { <sym>  <!before '>' > <O('%additive :pirop<->')> }
 
-token infix:sym«==»   { <sym>  <O('%relational :pirop«==»')> }
-token infix:sym«!=»   { <sym>  <O('%relational :pirop«!=» ')> }
-token infix:sym«<=»   { <sym>  <O('%relational :pirop«<=»')> }
-token infix:sym«>=»   { <sym>  <O('%relational :pirop«>=»')> }
-token infix:sym«<»    { <sym>  <O('%relational :pirop«<»')> }
-token infix:sym«>»    { <sym>  <O('%relational :pirop«>»')> }
+token infix:sym«==»   { <sym>  <O('%relational :pirop<==>')> }
+token infix:sym«!=»   { <sym>  <O('%relational :pirop<!=>')> }
+token infix:sym«<=»   { <sym>  <O('%relational :pirop<<=>')> }
+token infix:sym«>=»   { <sym>  <O('%relational :pirop<>=>')> }
+token infix:sym«<»    { <sym>  <O('%relational :pirop<<>')> }
+token infix:sym«>»    { <sym>  <O('%relational :pirop<>>')> }
 
-token infix:sym<&>    { <sym>  <O('%tight_and :pirop«&»')> }
-token infix:sym<^>    { <sym>  <O('%tight_and :pirop«^»')> }   # XXX Check precedence
-token infix:sym<|>    { <sym>  <O('%tight_or :pirop«|»')> }
+token infix:sym<&>    { <sym>  <O('%tight_and :pirop<&>')> }
+token infix:sym<^>    { <sym>  <O('%tight_and :pirop<^>')> }   # XXX Check precedence
+token infix:sym<|>    { <sym>  <O('%tight_or :pirop<|>')> }
 
-token infix:sym<&&>   { <sym>  <O('%tight_and :pirop«&&»')> }
-token infix:sym<||>   { <sym>  <O('%tight_or :pirop«||»')> }
+token infix:sym<&&>   { <sym>  <O('%tight_and :pirop<&&>')> }
+token infix:sym<||>   { <sym>  <O('%tight_or :pirop<||>')> }
 
-token infix:sym«<<»   { <sym>  <O('%multiplicative :pirop«<<»')> }
-token infix:sym«>>»   { <sym>  <O('%multiplicative :pirop«>>»')> }
+token infix:sym«<<»   { <sym>  <O('%multiplicative :pirop<<<>')> }
+token infix:sym«>>»   { <sym>  <O('%multiplicative :pirop<>>>')> }
 
 token infix:sym<?:> {
     '?'
