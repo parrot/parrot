@@ -117,6 +117,16 @@ inline op noop(in PMC) :flow {
             / '-foo' /
         ],
 
+        [
+            'Infix *',
+            q«
+inline op noop(in PMC) :flow {
+    $1 = foo * bar;
+}
+            »,
+            / 'foo * bar' /
+        ],
+
 
     );
 }
