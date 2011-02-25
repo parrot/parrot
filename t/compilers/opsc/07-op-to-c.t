@@ -8,10 +8,16 @@ my $compiler := pir::compreg__Ps('Ops');
 my $trans    := Ops::Trans::C.new;
 
 for get_test_data() -> $test {
-    my $past := $compiler.compile($test[1], target => 'past');
-    my $body := $past<ops>[0].get_body($trans);
-    diag( $body );
-    ok( $body ~~ $test[2], $test[0]);
+    try {
+        my $past := $compiler.compile($test[1], target => 'past');
+        my $body := $past<ops>[0].get_body($trans);
+        diag( $body );
+        ok( $body ~~ $test[2], $test[0]);
+
+        CATCH {
+            ok( 0, $test[0] ~ ': ' ~ $! );
+        }
+    }
 }
 
 
@@ -30,6 +36,25 @@ inline op noop(in PMC) :flow {
         / 'foo(bar, baz)' /
         ],
 
+        [
+            'if (foo)',
+            q«
+inline op noop(in PMC) :flow {
+    if (foo) bar();
+}
+        »,
+        / 'if (foo)' /
+        ],
+
+        [
+            'while (foo)',
+            q«
+inline op noop(in PMC) :flow {
+    while (foo) bar();
+}
+        »,
+        / 'while (foo)' /
+        ],
     );
 }
 
