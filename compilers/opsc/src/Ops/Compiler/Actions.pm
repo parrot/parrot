@@ -490,9 +490,9 @@ method statement_control:sym<for> ($/) {
     my $past := PAST::Op.new(
         :pasttype<for>,
 
-        $<init>.ast,
-        $<test>.ast,
-        $<step>.ast,
+        $<init> ?? $<init>[0].ast !! undef,
+        $<test> ?? $<test>[0].ast !! undef,
+        $<step> ?? $<step>[0].ast !! undef,
         $<statement>.ast,
     );
 
