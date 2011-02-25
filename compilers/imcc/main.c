@@ -380,10 +380,9 @@ static PMC *
 imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
         int is_file, int is_pasm)
 {
-    struct _imc_info_t * const imc_save = imcc; //prepare_reentrant_compile(imcc);
-    struct _imc_info_t * imcc_use = imc_save ? imc_save : imcc;
-    PMC * const result = imcc_run_compilation_internal(imcc, fullname, is_file, is_pasm);
-    //exit_reentrant_compile(imcc, imc_save);
+    struct _imc_info_t * const imcc_use = prepare_reentrant_compile(imcc);
+    PMC * const result = imcc_run_compilation_internal(imcc_use, fullname, is_file, is_pasm);
+    exit_reentrant_compile(imcc, imcc_use);
     return result;
 }
 
@@ -419,7 +418,6 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
             IMCC_print_inc(imcc);
 
         yylex_destroy(yyscanner);
-        imc_cleanup(imcc, NULL);
 
         return PMCNULL;
     }
@@ -462,32 +460,32 @@ static struct _imc_info_t*
 prepare_reentrant_compile(ARGMOD(imc_info_t * imcc))
 {
     ASSERT_ARGS(prepare_reentrant_compile)
-    struct _imc_info_t * imc_info = NULL;
+    struct _imc_info_t * new_info = imcc;
     if (imcc->last_unit) {
         /* a reentrant compile */
-        imc_info        = (imc_info_t*) calloc(1, sizeof(imc_info_t));
-        imc_info->prev  = imcc;
-        imc_info->ghash = imcc->ghash;
+        new_info        = (imc_info_t*) calloc(1, sizeof(imc_info_t));
+        new_info->prev  = imcc;
+        new_info->ghash = imcc->ghash;
         /* start over; let the start of line rule increment this to 1 */
-        imc_info->line = 0;
-        imc_info->cur_namespace = NULL;
-        imc_info->interp->code = NULL;
-        return imc_info;
+        new_info->line = 0;
+        new_info->cur_namespace = NULL;
+        new_info->interp->code = NULL;
     }
-    return NULL;
+    return new_info;
 }
 
 imc_info_t *
 exit_reentrant_compile(ARGMOD(imc_info_t * imcc),
-        ARGMOD_NULLOK(struct _imc_info_t *imc_info))
+        ARGMOD_NULLOK(struct _imc_info_t *new_info))
 {
     ASSERT_ARGS(exit_reentrant_compile)
-    if (imc_info) {
-        PARROT_ASSERT(imcc == imc_info->prev);
-        if (imc_info->globals)
-            mem_sys_free(imc_info->globals);
+    if (new_info && new_info->prev == imcc) {
+        PARROT_ASSERT(imcc == new_info->prev);
+        imc_cleanup(new_info, NULL);
+        if (new_info->globals)
+            mem_sys_free(new_info->globals);
 
-        mem_sys_free(imc_info);
+        mem_sys_free(new_info);
     }
     return imcc;
 }
