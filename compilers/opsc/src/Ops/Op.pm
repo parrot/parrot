@@ -370,15 +370,13 @@ our method process_body_chunk:pasttype<macro> ($trans, PAST::Op $chunk) {
 
 our method process_body_chunk:pasttype<call> ($trans, PAST::Op $chunk) {
     my @res;
-    @res.push($chunk.name);
-    @res.push('(');
-
-    my @args;
-    @args.push(self.process_body_chunk($trans, $_)) for @($chunk);
-    @res.push(join(', ', |@args));
-
-    @res.push(')');
-    join('', |@res);
+    join('',
+        $chunk.name,
+        '(',
+        # Handle args.
+        @($chunk).map(-> $_ { self.process_body_chunk($trans, $_) } ).join(', '),
+        ')',
+    );
 }
 
 our method process_body_chunk:pasttype<if> ($trans, PAST::Op $chunk) {
