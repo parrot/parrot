@@ -485,6 +485,10 @@ method statement_control:sym<for> ($/) {
 method statement_control:sym<switch> ($/) {
 }
 
+method circumfix:sym<( )> ($/) {
+    make $<EXPR>.ast;
+}
+
 # Local Variables:
 #   mode: perl6
 #   fill-column: 100
