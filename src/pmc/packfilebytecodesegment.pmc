@@ -89,11 +89,9 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
 */
 
     VTABLE void *get_pointer() {
-        INTVAL op_count, lib_count;
+        INTVAL op_count;
         size_t i;
 
-        STRING *oplib_name = CONST_STRING(INTERP, "oplib_name");
-        STRING *lib_ops    = CONST_STRING(INTERP, "lib_ops");
         PMC    *ops, *op_map;
 
         PackFile_ByteCode_OpMapping * mapping;
@@ -152,7 +150,6 @@ an op and the remaining PMCs being Integers.
         Parrot_PackfileBytecodeSegment_attributes *attrs =
             PMC_data_typed(SELF, Parrot_PackfileBytecodeSegment_attributes*);
 
-        STRING *op_name;
         INTVAL  i, op_num, arr_size;
 
         if (!VTABLE_does(INTERP, p, CONST_STRING(INTERP, "array"))) {
