@@ -359,9 +359,6 @@ bb_check_set_addr(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
             bb_add_edge(interp, unit, unit->bb_list[0], bb);
             bb_add_edge(interp, unit, unit->bb_list[unit->n_basic_blocks - 1], bb);
 
-            /* and mark the instruction as being kind of a branch */
-            bb->start->type |= ITADDR;
-
             break;
         }
     }
