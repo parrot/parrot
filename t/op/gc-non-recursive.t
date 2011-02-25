@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -21,6 +21,15 @@ See http://trac.parrot.org/parrot/ticket/1723
 
     .local pmc iterclass, intclass
 
+    .local pmc config
+    .local string optimize
+
+    load_bytecode 'config.pbc'
+    config = '_config'()
+    optimize = config['optimize']
+    # with a non-optimized build do not this test
+    if optimize == '' goto non_optimized
+
     iterclass = newclass ['RangeIter']
     addattribute iterclass, '$!value'
     addattribute iterclass, '$!nextIter'
@@ -36,6 +45,7 @@ See http://trac.parrot.org/parrot/ticket/1723
     ($I0, next) = next.'reify'()
     if $I0 < 500000 goto loop
     sweep 1
+  non_optimized:
     ok(1, "Marking of large list doesn't exhaust C stack")
     done_testing()
 .end

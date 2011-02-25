@@ -8,9 +8,9 @@ The extension API for Parrot is a simple, somewhat abstract, interface to
 Parrot for code written in C or other compiled languages. It provides about
 the same level of access to Parrot  that bytecode programs have.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 

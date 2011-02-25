@@ -113,6 +113,7 @@ include/pmc/pmc_role.h                           [devel]include
 include/pmc/pmc_scalar.h                         [devel]include
 include/pmc/pmc_scheduler.h                      [devel]include
 include/pmc/pmc_schedulermessage.h               [devel]include
+include/pmc/pmc_select.h                         [devel]include
 include/pmc/pmc_sockaddr.h                       [devel]include
 include/pmc/pmc_socket.h                         [devel]include
 include/pmc/pmc_string.h                         [devel]include
@@ -415,6 +416,7 @@ src/pmc/role.dump                                [devel]src
 src/pmc/scalar.dump                              [devel]src
 src/pmc/scheduler.dump                           [devel]src
 src/pmc/schedulermessage.dump                    [devel]src
+src/pmc/select.dump                              [devel]src
 src/pmc/sockaddr.dump                            [devel]src
 src/pmc/socket.dump                              [devel]src
 src/pmc/string.dump                              [devel]src

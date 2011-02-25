@@ -1718,6 +1718,7 @@ build_key(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *key_reg),
 
           case VT_CONSTP:
             r = r->reg;
+            /* Fall through. */
           case VTCONST:
           case VTCONST|VT_ENCODED:
             switch (r->set) {

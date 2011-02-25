@@ -22,7 +22,7 @@ t/pmc/os.t - Files and Dirs
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/os.t
+    % prove t/dynpmc/os.t
 
 =head1 DESCRIPTION
 
@@ -76,7 +76,7 @@ OUT
 
 SKIP:
 {
-    skip 'windows doesn\'t like having the rug pulled from underneath it', 1 if ($MSWin32 || $cygwin);
+    skip 'Some OSes don\'t allow to remove the current directory', 1 if $^O !~ /linux/i;
     mkdir "test-bad-cwd";
 
     pir_error_output_like( <<'CODE', <<"OUT", 'Test bad cwd' );

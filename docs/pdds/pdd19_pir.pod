@@ -7,9 +7,9 @@
 This document outlines the architecture and core syntax of Parrot
 Intermediate Representation (PIR).
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 

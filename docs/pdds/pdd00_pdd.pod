@@ -7,9 +7,9 @@
 This document defines the content and format of Parrot Design Documents
 (PDDs).
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Synopsis
 

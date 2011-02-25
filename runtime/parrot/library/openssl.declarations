@@ -1,0 +1,247 @@
+[package]
+OpenSSL
+
+[lib]
+libssl
+
+[defs]
+
+p SSLv2_client_method
+p SSLv2_server_method
+p SSLv2_method
+p SSLv3_client_method
+p SSLv3_server_method
+p SSLv3_method
+p TLSv1_client_method
+p TLSv1_server_method
+p TLSv1_method
+
+
+#DEALING WITH CIPHERS
+
+t SSL_CIPHER_description p t i
+i SSL_CIPHER_get_bits p 4
+t SSL_CIPHER_get_name p
+t SSL_CIPHER_get_version p
+
+
+#DEALING WITH PROTOCOL CONTEXTS
+
+l SSL_CTX_add_extra_chain_cert p p
+i SSL_CTX_add_session p p
+i SSL_CTX_check_private_key p
+l SSL_CTX_ctrl p i l t
+v SSL_CTX_flush_sessions p l
+v SSL_CTX_free p
+t SSL_CTX_get_app_data p
+p SSL_CTX_get_cert_store p
+p SSL_CTX_get_client_CA_list p
+#i (*SSL_CTX_get_client_cert_cb(SSL_CTX *ctx))(SSL *ssl, X509 **x509, EVP_PKEY **pkey);
+t SSL_CTX_get_ex_data p i
+i SSL_CTX_get_ex_new_indexi l t p p p #(long argl, char *argp, int (*new_func);(void), int (*dup_func)(void), void (*free_func)(void))
+#v (*SSL_CTX_get_info_callback(SSL_CTX *ctx))(SSL *ssl, int cb, int ret);
+i SSL_CTX_get_quiet_shutdown p
+i SSL_CTX_get_session_cache_mode p
+l SSL_CTX_get_timeout p
+#i (*SSL_CTX_get_verify_callback(const SSL_CTX *ctx))(int ok, X509_STORE_CTX *ctx);
+i SSL_CTX_get_verify_mode p
+i SSL_CTX_load_verify_locations p t t
+l SSL_CTX_need_tmp_RSA p
+p SSL_CTX_new p
+i SSL_CTX_remove_session p p
+i SSL_CTX_sess_accept p
+i SSL_CTX_sess_accept_good p
+i SSL_CTX_sess_accept_renegotiate p
+i SSL_CTX_sess_cache_full p
+i SSL_CTX_sess_cb_hits p
+i SSL_CTX_sess_connect p
+i SSL_CTX_sess_connect_good p
+i SSL_CTX_sess_connect_renegotiate p
+i SSL_CTX_sess_get_cache_size p
+#p (*SSL_CTX_sess_get_get_cb(SSL_CTX *ctx))(SSL *ssl, unsigned char *data, int len, int *copy);
+#i (*SSL_CTX_sess_get_new_cb(SSL_CTX *ctx)(SSL *ssl, SSL_SESSION *sess);
+#v (*SSL_CTX_sess_get_remove_cb(SSL_CTX *ctx)(SSL_CTX *ctx, SSL_SESSION *sess);
+i SSL_CTX_sess_hits p
+i SSL_CTX_sess_misses p
+i SSL_CTX_sess_number p
+v SSL_CTX_sess_set_cache_size p t #(SSL_CTX *ctx,t);
+v SSL_CTX_sess_set_get_cb p p t i 4 #(SSL_CTX *ctx, SSL_SESSION *(*cb)(SSL *ssl, unsigned char *data, int len, int *copy));
+v SSL_CTX_sess_set_new_cb p p p #(SSL_CTX *ctx, int (*cb)(SSL *ssl, SSL_SESSION *sess));
+v SSL_CTX_sess_set_remove_cb p p p #(SSL_CTX *ctx, void (*cb)(SSL_CTX *ctx, SSL_SESSION *sess));
+i SSL_CTX_sess_timeouts p
+p SSL_CTX_sessions p
+v SSL_CTX_set_app_data p p
+v SSL_CTX_set_cert_store p p
+v SSL_CTX_set_cert_verify_cb p p #(SSL_CTX *ctx, int (*cb)(), char *arg)
+i SSL_CTX_set_cipher_list p t
+v SSL_CTX_set_client_CA_list p p
+v SSL_CTX_set_client_cert_cb p p p p #(SSL_CTX *ctx, int (*cb)(SSL *ssl, X509 **x509, EVP_PKEY **pkey));
+v SSL_CTX_set_default_passwd_cb p p #(SSL_CTX *ctx, int (*cb);(void))
+v SSL_CTX_set_default_read_ahead p i
+i SSL_CTX_set_default_verify_paths p
+i SSL_CTX_set_ex_data p i t
+v SSL_CTX_set_info_callback p p i i #(SSL_CTX *ctx, void (*cb)(SSL *ssl, int cb, int ret));
+v SSL_CTX_set_msg_callback p p i i p l p p #(SSL_CTX *ctx, void (*cb)(int write_p, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg));
+v SSL_CTX_set_msg_callback_arg p p
+v SSL_CTX_set_options p l
+v SSL_CTX_set_quiet_shutdown p i
+v SSL_CTX_set_session_cache_mode p i
+i SSL_CTX_set_ssl_version p p
+v SSL_CTX_set_timeout p l
+l SSL_CTX_set_tmp_dh p p
+l SSL_CTX_set_tmp_dh_callback p p #(SSL_CTX *ctx, DH *(*cb)(void));
+l SSL_CTX_set_tmp_rsa p p
+l SSL_CTX_set_tmp_rsa_callback p p i i
+l SSL_set_tmp_rsa_callback p p #(SSL *ssl, RSA *(*cb)(SSL *ssl, int export, int keylength));
+v SSL_CTX_set_verify p i p #(SSL_CTX *ctx, int mode, int (*cb);(void))
+i SSL_CTX_use_PrivateKey p p
+i SSL_CTX_use_PrivateKey_ASN1 i p t l
+i SSL_CTX_use_PrivateKey_file p t i
+i SSL_CTX_use_RSAPrivateKey p p
+i SSL_CTX_use_RSAPrivateKey_ASN1 p t l
+i SSL_CTX_use_RSAPrivateKey_file p t i
+i SSL_CTX_use_certificate p p
+i SSL_CTX_use_certificate_ASN1 p i t
+i SSL_CTX_use_certificate_file p t i
+v SSL_CTX_set_psk_client_callback p p #(SSL_CTX *ctx, unsigned int (*callback)(SSL *ssl, const char *hint, char *identity, unsigned int max_identity_len, unsigned char *psk, unsigned int max_psk_len));
+i SSL_CTX_use_psk_identity_hint p t
+v SSL_CTX_set_psk_server_callback p p #(SSL_CTX *ctx, unsigned int (*callback)(SSL *ssl, const char *identity, unsigned char *psk, int max_psk_len));
+
+
+#DEALING WITH SESSIONS
+i SSL_SESSION_cmp p p
+v SSL_SESSION_free p
+t SSL_SESSION_get_app_data p
+t SSL_SESSION_get_ex_data p i
+i SSL_SESSION_get_ex_new_index l t p p p #(long argl, char *argp, int (*new_func);(void), int (*dup_func)(void), void (*free_func)(void))
+l SSL_SESSION_get_time p
+l SSL_SESSION_get_timeout p
+l SSL_SESSION_hash p
+p SSL_SESSION_new
+i SSL_SESSION_print p p
+i SSL_SESSION_print_fp p p
+v SSL_SESSION_set_app_data p t
+i SSL_SESSION_set_ex_data p i t
+l SSL_SESSION_set_time p l
+l SSL_SESSION_set_timeout p l
+
+#DEALING WITH CONNECTIONS
+i SSL_accept p
+i SSL_add_dir_cert_subjects_to_stack p t
+i SSL_add_file_cert_subjects_to_stack p t
+i SSL_add_client_CA p p
+t SSL_alert_desc_string i
+t SSL_alert_desc_string_long i
+t SSL_alert_type_string i
+t SSL_alert_type_string_long i
+i SSL_check_private_key p
+v SSL_clear p
+l SSL_clear_num_renegotiations p
+i SSL_connect p
+v SSL_copy_session_id p p
+l SSL_ctrl p i l t
+i SSL_do_handshake p
+p SL_dup p
+p SSL_dup_CA_list p
+v SSL_free p
+p SSL_get_SSL_CTX p
+t SSL_get_app_data p
+p SSL_get_certificate p
+t SSL_get_cipher p
+i SSL_get_cipher_bits p i
+t SSL_get_cipher_list p i
+t SSL_get_cipher_name p
+t SSL_get_cipher_version p
+p SSL_get_ciphers p
+p SSL_get_client_CA_list p
+p SSL_get_current_cipher p
+l SSL_get_default_timeout p
+i SSL_get_error p i
+t SSL_get_ex_data p i
+i SSL_get_ex_data_X509_STORE_CTX_idx
+i SSL_get_ex_new_index l t p p p #(long argl, char *argp, int (*new_func);(void), int (*dup_func)(void), void (*free_func)(void))
+i SSL_get_fd p
+#v (*SSL_get_info_callback p)()
+p SSL_get_peer_cert_chain p
+p SSL_get_peer_certificate p
+p SSL_get_privatekey p
+i SSL_get_quiet_shutdown p
+p SSL_get_rbio p
+i SSL_get_read_ahead p
+p SSL_get_session p
+t SSL_get_shared_ciphers p t i
+i SSL_get_shutdown p
+p SSL_get_ssl_method p
+i SSL_get_state p
+l SSL_get_time p
+l SSL_get_timeout p
+#i (*SSL_get_verify_callback(const SSL *ssl))(int,X509_STORE_CTX *)
+i SSL_get_verify_mode p
+l SSL_get_verify_result p
+t SSL_get_version p
+p SSL_get_wbio p
+i SSL_in_accept_init p
+i SSL_in_before p
+i SSL_in_connect_init p
+i SSL_in_init p
+i SSL_is_init_finished p
+p SSL_load_client_CA_file t
+v SSL_load_error_strings
+p SSL_new p
+l SSL_num_renegotiations p
+i SSL_peek p t i
+i SSL_pending p
+i SSL_read p t i
+i SSL_renegotiate p
+t SSL_rstate_string p
+t SSL_rstate_string_long p
+l SSL_session_reused p
+v SSL_set_accept_state p
+v SSL_set_app_data p t
+v SSL_set_bio p p p
+i SSL_set_cipher_list p t
+v SSL_set_client_CA_list p p
+v SSL_set_connect_state p
+i SSL_set_ex_data p i t
+i SSL_set_fd p i
+v SSL_set_info_callback p p #(SSL *ssl, void (*cb);(void))
+v SSL_set_msg_callbacki p p #(SSL *ctx, void (*cb)(int write_p, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg));
+v SSL_set_msg_callback_arg p p
+v SSL_set_options p l
+v SSL_set_quiet_shutdown p i
+v SSL_set_read_ahead p i
+i SSL_set_rfd p i
+i SSL_set_session p p
+v SSL_set_shutdown p i
+i SSL_set_ssl_method p p
+v SSL_set_time p l
+v SSL_set_timeout p l
+v SSL_set_verify p i p #(SSL *ssl, int mode, int (*callback);(void))
+v SSL_set_verify_result p l
+i SSL_set_wfd p i
+i SSL_shutdown p
+i SSL_state p
+t SSL_state_string p
+t SSL_state_string_long p
+l SSL_total_renegotiations p
+i SSL_use_PrivateKey p p
+i SSL_use_PrivateKey_ASN1 i p t l #(int type, SSL *ssl, unsigned char *d, long len);
+i SSL_use_PrivateKey_file p t i #(SSL *ssl, char *file, int type);
+i SSL_use_RSAPrivateKey p p #(SSL *ssl, RSA *rsa);
+i SSL_use_RSAPrivateKey_ASN1 p t l #(SSL *ssl, unsigned char *d, long len);
+i SSL_use_RSAPrivateKey_file p t i #(SSL *ssl, char *file, int type);
+i SSL_use_certificate p p #(SSL *ssl, X509 *x);
+i SSL_use_certificate_ASN1 p i t #(SSL *ssl, int len, unsigned char *d);
+i SSL_use_certificate_file p t i #(SSL *ssl, char *file, int type);
+i SSL_version p
+i SSL_want p
+i SSL_want_nothing p
+i SSL_want_read p
+i SSL_want_write p
+i SSL_want_x509_lookup p
+i SSL_write p t i #(SSL *ssl, const void *buf, int num);
+v SSL_set_psk_client_callback p p #(SSL *ssl, unsigned int (*callback)(SSL *ssl, const char *hint, char *identity, unsigned int max_identity_len, unsigned char *psk, unsigned int max_psk_len));
+i SSL_use_psk_identity_hint p t #(SSL *ssl, const char *hint);
+v SSL_set_psk_server_callback p p #(SSL *ssl, unsigned int (*callback)(SSL *ssl, const char *identity, unsigned char *psk, int max_psk_len));
+t SSL_get_psk_identity_hint p
+t SSL_get_psk_identity p

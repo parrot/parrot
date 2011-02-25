@@ -8,7 +8,7 @@ Parrot, more precisely libparrot, can be embedded into applications to provide
 a dynamic language runtime. A perfect example of this embedding is in the
 Parrot executable, which is a thin wrapper around libparrot.
 
-=head2 Version
+
 
 Version 1
 
