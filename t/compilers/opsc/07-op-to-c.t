@@ -55,6 +55,56 @@ inline op noop(in PMC) :flow {
         »,
         / 'while (foo)' /
         ],
+
+        [
+            'for (;;)',
+            q«
+inline op noop(in PMC) :flow {
+    for (;;) bar();
+}
+        »,
+        / 'for (; ; )' /
+        ],
+
+        [
+            'for (foo;;)',
+            q«
+inline op noop(in PMC) :flow {
+    for (foo;;) bar();
+}
+        »,
+        / 'for (foo; ; )' /
+        ],
+
+        [
+            'for (;foo;)',
+            q«
+inline op noop(in PMC) :flow {
+    for (;foo;) bar();
+}
+        »,
+        / 'for (; foo; )' /
+        ],
+
+        [
+            'for (;;foo)',
+            q«
+inline op noop(in PMC) :flow {
+    for (;;foo) bar();
+}
+        »,
+        / 'for (; ; foo)' /
+        ],
+
+        [
+            'for (foo;bar;baz)',
+            q«
+inline op noop(in PMC) :flow {
+    for (foo;bar;baz) bar();
+}
+        »,
+        / 'for (foo; bar; baz)' /
+        ],
     );
 }
 

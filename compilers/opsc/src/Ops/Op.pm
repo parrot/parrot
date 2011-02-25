@@ -402,6 +402,19 @@ our method to_c:pasttype<while> ($trans, PAST::Op $chunk) {
     );
 }
 
+our method to_c:pasttype<for> ($trans, PAST::Op $chunk) {
+    join('',
+        'for (',
+        $chunk[0] ?? self.to_c($trans, $chunk[0]) !! '',
+        '; ',
+        $chunk[1] ?? self.to_c($trans, $chunk[1]) !! '',
+        '; ',
+        $chunk[2] ?? self.to_c($trans, $chunk[2]) !! '',
+        ') ',
+        self.to_c($trans, $chunk[3]),
+    );
+}
+
 our method to_c:pasttype<undef> ($trans, PAST::Op $chunk) {
     if $chunk.pirop {
         # Some infix stuff
