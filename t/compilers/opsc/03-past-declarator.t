@@ -29,7 +29,7 @@ my $compiler := pir::compreg__Ps('Ops');
 my $past := $compiler.compile($buf, target => 'past');
 
 ok(1, "PAST::Node created");
-my $op := @($past<ops>)[0];
+my $op := @($past<ops>)[0][0];
 
 my $var := $op[0];
 
