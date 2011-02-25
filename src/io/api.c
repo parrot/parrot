@@ -764,8 +764,9 @@ Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 =item C<INTVAL Parrot_io_eof(PARROT_INTERP, PMC *pmc)>
 
-Returns a boolean value indication whether C<*pmc>'s current read/write
-position is C<EOF>.
+Returns a boolean value indication whether C<*pmc>'s C<EOF> flag is set,
+indicating that an attempt was made to read past the end of the underlying
+filehandle.
 
 =cut
 

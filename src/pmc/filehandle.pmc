@@ -250,7 +250,11 @@ For internal usage only, subject to change without notice.
 
 =item C<INTVAL get_bool()>
 
-Returns whether the FileHandle has reached the end of the file.
+Return false if a previous read attempted to read past the end of the underlying
+filehandle.  Note that this method may return true even if there are no bytes
+remaining if the most recent read requested the exact number of bytes remaining
+in the file.
+
 
 =cut
 
@@ -677,7 +681,10 @@ scheme) for the filehandle.
 
 =item C<METHOD eof()>
 
-Returns true if the filehandle is at end-of-file, returns false otherwise.
+Return true if a previous read attempted to read past the end of the underlying
+filehandle.  Note that this method may return false even if there are no bytes
+remaining if the most recent read requested the exact number of bytes remaining
+in the file.
 
 =cut
 
