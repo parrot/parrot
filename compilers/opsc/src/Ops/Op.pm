@@ -289,7 +289,7 @@ method get_body( $trans ) {
     for @(self) {
         #pir::say('# chunk ' ~ $chunk.WHAT);
         if pir::defined($_) {
-            my $chunk := self.process_body_chunk($trans, $_);
+            my $chunk := self.to_c($trans, $_);
             @body.push($chunk);
         }
     }
@@ -298,11 +298,11 @@ method get_body( $trans ) {
 }
 
 # Recursively process body chunks returning string.
-our multi method process_body_chunk($trans, PAST::Val $val) {
+our multi method to_c($trans, PAST::Val $val) {
     $val.value;
 }
 
-our multi method process_body_chunk($trans, PAST::Var $var) {
+our multi method to_c($trans, PAST::Var $var) {
     if ($var.isdecl) {
         my $res := $var.vivibase ~ ' ' ~ $var.name;
 
@@ -311,7 +311,7 @@ our multi method process_body_chunk($trans, PAST::Var $var) {
         }
 
         if my $expr := $var.viviself {
-            $res := $res ~ ' = ' ~ self.process_body_chunk($trans, $expr);
+            $res := $res ~ ' = ' ~ self.to_c($trans, $expr);
         }
         $res;
     }
@@ -338,11 +338,11 @@ our %PIROP_MAPPING := hash(
     :gt('>'),
 );
 
-our method process_body_chunk:pasttype<inline> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<inline> ($trans, PAST::Op $chunk) {
     return $chunk.inline;
 }
 
-our method process_body_chunk:pasttype<macro> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<macro> ($trans, PAST::Op $chunk) {
     my $name     := $chunk.name;
     #say('NAME '~$name ~ ' ' ~ $is_next);
     if $name eq 'OPSIZE' {
@@ -352,7 +352,7 @@ our method process_body_chunk:pasttype<macro> ($trans, PAST::Op $chunk) {
 
     my @children := list();
     for @($chunk) {
-        @children.push(self.process_body_chunk($trans, $_));
+        @children.push(self.to_c($trans, $_));
     }
     my $children := join('', |@children);
 
@@ -368,40 +368,40 @@ our method process_body_chunk:pasttype<macro> ($trans, PAST::Op $chunk) {
     return $ret;
 }
 
-our method process_body_chunk:pasttype<call> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<call> ($trans, PAST::Op $chunk) {
     my @res;
     join('',
         $chunk.name,
         '(',
         # Handle args.
-        @($chunk).map(-> $_ { self.process_body_chunk($trans, $_) } ).join(', '),
+        @($chunk).map(-> $_ { self.to_c($trans, $_) } ).join(', '),
         ')',
     );
 }
 
-our method process_body_chunk:pasttype<if> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<if> ($trans, PAST::Op $chunk) {
     my @res;
     @res.push('if (');
-    @res.push(self.process_body_chunk($trans, $chunk[0]));
+    @res.push(self.to_c($trans, $chunk[0]));
     @res.push(") ");
 
     # 'then'
-    @res.push(self.process_body_chunk($trans, $chunk[1]));
+    @res.push(self.to_c($trans, $chunk[1]));
 
     # 'else'
-    @res.push("\nelse " ~ self.process_body_chunk($trans, $chunk[2])) if $chunk[2];
+    @res.push("\nelse " ~ self.to_c($trans, $chunk[2])) if $chunk[2];
 
     join('', |@res);
 }
 
-our method process_body_chunk:pasttype<undef> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<undef> ($trans, PAST::Op $chunk) {
     if $chunk.pirop {
         # Some infix stuff
         my $res :=
               '('
-            ~ self.process_body_chunk($trans, $chunk[0])
+            ~ self.to_c($trans, $chunk[0])
             ~ ' ' ~ (%PIROP_MAPPING{$chunk.pirop} // $chunk.pirop) ~ ' '
-            ~ self.process_body_chunk($trans, $chunk[1])
+            ~ self.to_c($trans, $chunk[1])
             ~ ')';
         $res;
     }
@@ -410,27 +410,27 @@ our method process_body_chunk:pasttype<undef> ($trans, PAST::Op $chunk) {
     }
 }
 
-our multi method process_body_chunk($trans, PAST::Op $chunk) {
+our multi method to_c($trans, PAST::Op $chunk) {
     my $type := $chunk.pasttype // 'undef';
 
-    my $sub  := pir::find_sub_not_null__ps('process_body_chunk:pasttype<' ~ $type ~ '>');
+    my $sub  := pir::find_sub_not_null__ps('to_c:pasttype<' ~ $type ~ '>');
     $sub(self, $trans, $chunk);
 }
 
-our multi method process_body_chunk($trans, PAST::Stmts $chunk) {
+our multi method to_c($trans, PAST::Stmts $chunk) {
     my @children := list();
     for @($chunk) {
-        @children.push(self.process_body_chunk($trans, $_));
+        @children.push(self.to_c($trans, $_));
         @children.push(";\n");
     }
     join('', |@children);
 }
 
-our multi method process_body_chunk($trans, PAST::Block $chunk) {
+our multi method to_c($trans, PAST::Block $chunk) {
     my @children := list();
     @children.push('{' ~ "\n");
     for @($chunk) {
-        @children.push(self.process_body_chunk($trans, $_));
+        @children.push(self.to_c($trans, $_));
         @children.push(";\n");
     }
     @children.push('}');
