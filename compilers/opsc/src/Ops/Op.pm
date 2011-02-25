@@ -308,7 +308,7 @@ our multi method process_body_chunk($trans, PAST::Op $chunk) {
         #pir::say('RET ' ~ $chunk<inline>);
         return $chunk.inline;
     }
-    elsif $type eq 'call' {
+    elsif $type eq 'macro' {
         my $name     := $chunk.name;
         #say('NAME '~$name ~ ' ' ~ $is_next);
         if $name eq 'OPSIZE' {
