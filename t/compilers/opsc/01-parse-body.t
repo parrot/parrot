@@ -289,6 +289,15 @@ inline op noop(out PMC, in INT) {
     bar();
 }», "Blockoid finish statement");
 
+# Statement controls
+
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    for (;;) {
+        foo()
+    }
+}», "Empty 'for' parsed");
+
 
 
 # Final big test?

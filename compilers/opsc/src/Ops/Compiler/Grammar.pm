@@ -154,7 +154,7 @@ rule statement_control:sym<while> {
 }
 
 rule statement_control:sym<for> {
-    <sym> '(' <init=.EXPR> ';' <test=.EXPR> ';' <step=.EXPR> ')'
+    <sym> '(' <init=.EXPR>? ';' <test=.EXPR>? ';' <step=.EXPR>? ')'
     <statement>
 }
 
