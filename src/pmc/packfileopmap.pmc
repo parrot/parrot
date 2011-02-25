@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 
 =head1 NAME
@@ -44,7 +44,7 @@ Create empty PackfileOpMap for a given op library.
 
     VTABLE void init() {
         PMC *core_ops_info, *core_ops_pmc;
-        STRING *oplib_name, *oplib_str, *lib_ops, *table_ops, *core_ops_str;
+        STRING *oplib_name, *oplib_str, *lib_ops, *table_ops;
         Parrot_PackfileOpMap_attributes *attrs = PARROT_PACKFILEOPMAP(SELF);
 
         PObj_custom_mark_SET(SELF);
@@ -59,7 +59,6 @@ Create empty PackfileOpMap for a given op library.
         table_ops    = CONST_STRING(INTERP, "table_ops");
         oplib_name   = CONST_STRING(INTERP, "oplib_name");
         oplib_str    = CONST_STRING(INTERP, "oplib");
-        core_ops_str = CONST_STRING(INTERP, "core_ops");
 
         core_ops_info = Parrot_pmc_new(INTERP, enum_class_Hash);
         VTABLE_set_pmc_keyed_str(INTERP, core_ops_info, oplib_name, core_ops_pmc);
@@ -104,9 +103,9 @@ already in the map, a new map will be created.
             STRING *table_ops_str, *lib_ops_str;
             INTVAL op_count;
 
-            PMC *op_map = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
-            PMC *oplib  = VTABLE_get_pmc_keyed_str(INTERP, op_map, oplib_str);
-            INTVAL op_num = VTABLE_get_integer_keyed(INTERP, oplib, key);
+            PMC * const op_map  = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
+            PMC * const oplib   = VTABLE_get_pmc_keyed_str(INTERP, op_map, oplib_str);
+            const INTVAL op_num = VTABLE_get_integer_keyed(INTERP, oplib, key);
 
             /* Not in this oplib */
             if (op_num == -1) {
@@ -157,9 +156,9 @@ Get Op PMC by name.
         GET_ATTR_op_maps(INTERP, SELF, op_maps);
         op_map_count = VTABLE_elements(INTERP, op_maps);
         for (i = 0; i < op_map_count; i++) {
-            PMC *op_map = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
-            PMC *oplib  = VTABLE_get_pmc_keyed_str(INTERP, op_map, oplib_str);
-            PMC *op     = VTABLE_get_pmc_keyed_str(INTERP, oplib, name);
+            PMC * const op_map = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
+            PMC * const oplib  = VTABLE_get_pmc_keyed_str(INTERP, op_map, oplib_str);
+            PMC * const op     = VTABLE_get_pmc_keyed_str(INTERP, oplib, name);
 
             if (!PMC_IS_NULL(op))
                 return op;
@@ -233,7 +232,7 @@ Ensure that an op library is loaded and accessible to this OpMap.
         op_map_count = VTABLE_elements(INTERP, op_maps);
 
         for (i = 0; i < op_map_count; i++) {
-            PMC *map = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
+            PMC * const map = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
             if (Parrot_str_equal(INTERP, lib_name,
                         VTABLE_get_string_keyed_str(INTERP, map, oplib_name))) {
                 RETURN(INTVAL 1);
@@ -289,7 +288,7 @@ Construct PackFile_ByteCode_OpMapping.
         for (i = 0; i < m->n_libs; i++) {
             INTVAL j;
             PackFile_ByteCode_OpMappingEntry *om = &m->libs[i];
-            PMC *mapping = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
+            PMC * const mapping = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
 
             STRING *tmp;
             PMC    *oplib, *table_ops, *lib_ops;
