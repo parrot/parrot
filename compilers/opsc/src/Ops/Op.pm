@@ -188,7 +188,9 @@ Sets/gets the op's code body.
 method body() {
     my $res := '';
     for @(self) -> $part {
-        $res := $res ~ $part<inline>;
+        if pir::defined($part) {
+            $res := $res ~ $part<inline>;
+        }
     }
     $res;
 }
@@ -285,19 +287,40 @@ method get_body( $trans ) {
 
     #work through the op_body tree
     for @(self) {
-        my $chunk := self.process_body_chunk($trans, $_);
-        #pir::say('# chunk ' ~ $chunk);
-        @body.push($chunk);
+        #pir::say('# chunk ' ~ $chunk.WHAT);
+        if pir::defined($_) {
+            my $chunk := self.process_body_chunk($trans, $_);
+            @body.push($chunk);
+        }
     }
 
     join('', |@body);
 }
 
 # Recursively process body chunks returning string.
+our multi method process_body_chunk($trans, PAST::Val $val) {
+    $val.value;
+}
 
-our multi method process_body_chunk($trans, PAST::Var $chunk) {
-    my $n := +$chunk.name;
-    $trans.access_arg( self.arg_type($n - 1), $n);
+
+our multi method process_body_chunk($trans, PAST::Var $var) {
+    if ($var.isdecl) {
+        my $res := $var.vivibase ~ ' ' ~ $var.name;
+
+        if my $arr  := $var<array_size> {
+            $res := $res ~ '[' ~ $arr ~ ']';
+        }
+
+        if my $expr := $var.viviself {
+            $res := $res ~ ' = ' ~ self.process_body_chunk($trans, $expr);
+        }
+        $res := $res ~ ";\n";
+        $res;
+    }
+    else {
+        my $n := +$var.name;
+        $trans.access_arg( self.arg_type($n - 1), $n);
+    }
 }
 
 our multi method process_body_chunk($trans, PAST::Op $chunk) {
