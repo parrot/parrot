@@ -31,7 +31,7 @@ Parrot_Int imcc_get_pir_compreg_api(
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-void imcc_preprocess_file_api(
+Parrot_Int imcc_preprocess_file_api(
     Parrot_PMC interp_pmc,
     Parrot_PMC compiler,
     Parrot_String file);
