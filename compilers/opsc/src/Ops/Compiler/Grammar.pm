@@ -241,8 +241,8 @@ token infix:sym<|>    { <sym>  <O('%tight_or :pirop<|>')> }
 token infix:sym<&&>   { <sym>  <O('%tight_and :pirop<&&>')> }
 token infix:sym<||>   { <sym>  <O('%tight_or :pirop<||>')> }
 
-token infix:sym«<<»   { <sym>  <O('%multiplicative :pirop<<<>')> }
-token infix:sym«>>»   { <sym>  <O('%multiplicative :pirop<>>>')> }
+token infix:sym«<<»   { <sym>  <O('%multiplicative :pirop<shl>')> }
+token infix:sym«>>»   { <sym>  <O('%multiplicative :pirop<shr>')> }
 
 token infix:sym<?:> {
     '?'

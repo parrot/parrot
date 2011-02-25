@@ -302,6 +302,10 @@ our multi method process_body_chunk($trans, PAST::Val $val) {
     $val.value;
 }
 
+our %PIROP_MAPPING := hash(
+    :shr('>>'),
+    :shl('<<'),
+);
 
 our multi method process_body_chunk($trans, PAST::Var $var) {
     if ($var.isdecl) {
@@ -388,9 +392,11 @@ our multi method process_body_chunk($trans, PAST::Op $chunk) {
     elsif $type eq '' && $chunk.pirop {
         # Some infix stuff
         my $res :=
-            self.process_body_chunk($trans, $chunk[0])
-            ~ ' ' ~ $chunk.pirop ~ ' '
-            ~ self.process_body_chunk($trans, $chunk[1]);
+              '('
+            ~ self.process_body_chunk($trans, $chunk[0])
+            ~ ' ' ~ (%PIROP_MAPPING{$chunk.pirop} // $chunk.pirop) ~ ' '
+            ~ self.process_body_chunk($trans, $chunk[1])
+            ~ ')';
         $res;
     }
     else {
