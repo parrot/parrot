@@ -67,22 +67,6 @@ static Instruction * insINS(
         FUNC_MODIFIES(*unit);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static Instruction * move_regs(
-    ARGMOD(imc_info_t * imcc),
-    ARGIN(IMC_Unit *unit),
-    ARGIN(Instruction *ins),
-    size_t n,
-    ARGIN(SymReg **dest),
-    ARGIN(SymReg **src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(5)
-        __attribute__nonnull__(6)
-        FUNC_MODIFIES(* imcc);
-
-PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction* pcc_get_args(
     ARGMOD(imc_info_t * imcc),
@@ -109,17 +93,6 @@ static int pcc_reg_mov(
         FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*vinfo);
 
-static int recursive_tail_call(
-    ARGMOD(imc_info_t * imcc),
-    ARGIN(IMC_Unit *unit),
-    ARGIN(Instruction *ins),
-    ARGIN(SymReg *sub))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(* imcc);
-
 static void unshift_self(
     ARGMOD(imc_info_t * imcc),
     ARGIN(SymReg *sub),
@@ -140,12 +113,6 @@ static void unshift_self(
     , PARROT_ASSERT_ARG(ins) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(regs))
-#define ASSERT_ARGS_move_regs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(unit) \
-    , PARROT_ASSERT_ARG(ins) \
-    , PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_pcc_get_args __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit) \
@@ -154,11 +121,6 @@ static void unshift_self(
 #define ASSERT_ARGS_pcc_reg_mov __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(vinfo))
-#define ASSERT_ARGS_recursive_tail_call __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(unit) \
-    , PARROT_ASSERT_ARG(ins) \
-    , PARROT_ASSERT_ARG(sub))
 #define ASSERT_ARGS_unshift_self __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(sub) \
@@ -621,132 +583,6 @@ pcc_reg_mov(ARGMOD(imc_info_t * imcc), unsigned char d, unsigned char s,
 
 /*
 
-=item C<static Instruction * move_regs(imc_info_t * imcc, IMC_Unit *unit,
-Instruction *ins, size_t n, SymReg **dest, SymReg **src)>
-
-Insert instructions for moving C<n> registers from C<src> to C<dest>.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static Instruction *
-move_regs(ARGMOD(imc_info_t * imcc), ARGIN(IMC_Unit *unit),
-        ARGIN(Instruction *ins), size_t n, ARGIN(SymReg **dest),
-        ARGIN(SymReg **src))
-{
-    ASSERT_ARGS(move_regs)
-    unsigned char *move_list;
-    move_info_t    move_info;
-    unsigned int   i;
-
-    if (!n)
-        return ins;
-
-    move_list      = (unsigned char *)mem_sys_allocate(2 * n);
-    move_info.unit = unit;
-    move_info.ins  = ins;
-    move_info.n    = n;
-    move_info.dest = dest;
-    move_info.src  = src;
-
-    memset(move_list, -1, 2 * n);
-
-    for (i = 0; i < 2 * n; ++i) {
-        const SymReg * const ri = i < n ? dest[i] : src[i - n];
-        unsigned int         j;
-
-        for (j = 0; j < i; ++j) {
-            const SymReg * const rj = j < n ? dest[j] : src[j - n];
-            if (ri == rj) {
-                PARROT_ASSERT(j < 255);
-                move_list[i] = (unsigned char)j;
-                goto done;
-            }
-        }
-        PARROT_ASSERT(i < 255);
-        move_list[i] = (unsigned char)i;
-      done:
-        ;
-    }
-
-    Parrot_util_register_move(imcc->interp, n, move_list, move_list + n, 255,
-        pcc_reg_mov, NULL, &move_info);
-
-    mem_sys_free(move_list);
-    return move_info.ins;
-}
-
-/*
-
-=item C<static int recursive_tail_call(imc_info_t * imcc, IMC_Unit *unit,
-Instruction *ins, SymReg *sub)>
-
-convert a recursive tailcall into a loop
-
-=cut
-
-*/
-
-static int
-recursive_tail_call(ARGMOD(imc_info_t * imcc), ARGIN(IMC_Unit *unit),
-        ARGIN(Instruction *ins), ARGIN(SymReg *sub))
-{
-    ASSERT_ARGS(recursive_tail_call)
-    SymReg *called_sub, *this_sub, *label;
-    SymReg *regs[2];
-    Instruction *get_params, *tmp_ins, *unused_ins;
-    char *buf;
-    op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(imcc->interp);
-
-    if (!(unit->instructions->type & ITLABEL))
-        return 0;
-
-    this_sub = unit->instructions->symregs[0];
-
-    if (!this_sub)
-        return 0;
-
-    called_sub = sub->pcc_sub->sub;
-
-    if (STRNEQ(this_sub->name, called_sub->name))
-        return 0;
-
-    if (sub->pcc_sub->nargs != this_sub->pcc_sub->nargs)
-        return 0;
-
-    /* TODO check if we have only positional args */
-
-    get_params = unit->instructions->next;
-
-    if (get_params->op != &core_ops->op_info_table[PARROT_OP_get_params_pc])
-        return 0;
-
-    buf = (char *)malloc(strlen(this_sub->name) + 3);
-    sprintf(buf, "%s@0", this_sub->name);
-
-    if (!(label = find_sym(imcc, buf))) {
-        label   = mk_local_label(imcc, buf);
-        tmp_ins = INS_LABEL(imcc, unit, label, 0);
-        insert_ins(unit, get_params, tmp_ins);
-    }
-
-    free(buf);
-
-    ins = move_regs(imcc, unit, ins, sub->pcc_sub->nargs,
-            this_sub->pcc_sub->args, sub->pcc_sub->args);
-
-    regs[0]    = label;
-    unused_ins = insINS(imcc, unit, ins, "branch", regs, 1);
-    UNUSED(unused_ins);
-
-    return 1;
-}
-
-/*
-
 =item C<static void insert_tail_call(imc_info_t * imcc, IMC_Unit *unit,
 Instruction *ins, SymReg *sub, SymReg *meth)>
 
@@ -822,10 +658,6 @@ expand_pcc_sub_call(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
     }
 
     tail_call = sub->pcc_sub->tailcall;
-
-    if (tail_call && imcc->optimizer_level & OPT_SUB)
-        if (recursive_tail_call(imcc, unit, ins, sub))
-            return;
 
     if (sub->pcc_sub->object)
         meth_call = 1;

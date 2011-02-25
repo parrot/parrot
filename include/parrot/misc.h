@@ -62,21 +62,6 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_util_range_rand(INTVAL from, INTVAL to, INTVAL how_random);
 
 PARROT_EXPORT
-void Parrot_util_register_move(PARROT_INTERP,
-    int n_regs,
-    ARGOUT(unsigned char *dest_regs),
-    ARGIN(unsigned char *src_regs),
-    unsigned char temp_reg,
-    reg_move_func mov,
-    reg_move_func mov_alt,
-    ARGIN(void *info))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(8)
-        FUNC_MODIFIES(*dest_regs);
-
-PARROT_EXPORT
 void Parrot_util_srand(INTVAL seed);
 
 PARROT_EXPORT
@@ -118,11 +103,6 @@ void Parrot_util_quicksort(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_util_float_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_util_int_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_util_range_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_util_register_move __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(dest_regs) \
-    , PARROT_ASSERT_ARG(src_regs) \
-    , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_Parrot_util_srand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_util_tm_to_array __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
