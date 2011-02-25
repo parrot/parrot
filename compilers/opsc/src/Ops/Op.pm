@@ -369,7 +369,6 @@ our method to_c:pasttype<macro> ($trans, PAST::Op $chunk) {
 }
 
 our method to_c:pasttype<call> ($trans, PAST::Op $chunk) {
-    my @res;
     join('',
         $chunk.name,
         '(',
