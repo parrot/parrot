@@ -298,6 +298,12 @@ inline op noop(out PMC, in INT) {
     }
 }», "Empty 'for' parsed");
 
+inline op noop(out PMC, in INT) {
+    do {
+        foo()
+    } while(1);
+}», "Simple 'do-while' parsed");
+
 
 
 # Final big test?

@@ -158,6 +158,10 @@ rule statement_control:sym<for> {
     <statement>
 }
 
+rule statement_control:sym<do> {
+    <sym> <blockoid> 'while' '(' <condition=.EXPR> ')'
+}
+
 # Not real "C" switch. Just close enough
 rule statement_control:sym<switch> {
     <sym> '(' <test=.EXPR> ')' '{'
