@@ -12,6 +12,7 @@ enum INSTYPE {    /*instruction type can be   */
     ITPCCRET   =   0x20000, /*  PCC sub return */
     ITCALL     =   0x40000, /*  function call */
     ITLABEL    =   0x80000, /*  label         */
+    ITPCCPARAM =  0x100000, /*  .get_params */
     ITRESULT   =  0x400000, /*  .get_results */
     ITPCCSUB   = 0x1000000, /*  PCC sub call */
     ITPCCYIELD = 0x2000000  /*  yield from PCC call instead of return */

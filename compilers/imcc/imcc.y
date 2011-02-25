@@ -570,6 +570,7 @@ iSUBROUTINE(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r))
 {
     ASSERT_ARGS(iSUBROUTINE)
     Instruction * const i = iLABEL(interp, unit, r);
+    i->type              |= ITPCCPARAM;
 
     r->type    = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
     r->pcc_sub = mem_gc_allocate_zeroed_typed(interp, pcc_sub_t);
@@ -1336,6 +1337,20 @@ sub_param:
    { IMCC_INFO(interp)->is_def = 1; }
    sub_param_type_def
          {
+           if (/* IMCC_INFO(interp)->cur_unit->last_ins->op
+           ||  */ !(IMCC_INFO(interp)->cur_unit->last_ins->type & ITPCCPARAM)) {
+               SymReg *r;
+               Instruction *i;
+               char name[128];
+               snprintf(name, sizeof (name), "%cpcc_params_%d",
+                        IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
+               r = mk_symreg(interp, name, 0);
+               r->type    = VT_PCC_SUB;
+               r->pcc_sub = mem_gc_allocate_zeroed_typed(interp, pcc_sub_t);
+               i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, r);
+               IMCC_INFO(interp)->cur_call = r;
+               i->type = ITPCCPARAM;
+           }
            if (IMCC_INFO(interp)->adv_named_id) {
                  add_pcc_named_param(interp, IMCC_INFO(interp)->cur_call,
                                      IMCC_INFO(interp)->adv_named_id, $3);
