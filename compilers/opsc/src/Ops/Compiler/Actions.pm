@@ -476,9 +476,27 @@ method statement_control:sym<if> ($/) {
 }
 
 method statement_control:sym<while> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<while>,
+
+        $<condition>.ast,
+        $<statement>.ast,
+    );
+
+    make $past;
 }
 
 method statement_control:sym<for> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<for>,
+
+        $<init>.ast,
+        $<test>.ast,
+        $<step>.ast,
+        $<statement>.ast,
+    );
+
+    make $past;
 }
 
 # Not real "C" switch. Just close enough
