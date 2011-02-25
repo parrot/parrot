@@ -45,9 +45,14 @@ See http://trac.parrot.org/parrot/ticket/1723
     ($I0, next) = next.'reify'()
     if $I0 < 500000 goto loop
     sweep 1
-  non_optimized:
     ok(1, "Marking of large list doesn't exhaust C stack")
     done_testing()
+    .return ()
+
+  non_optimized:
+    skip("Disabled in non-optimized builds")
+    done_testing()
+    .return ()
 .end
 
 
