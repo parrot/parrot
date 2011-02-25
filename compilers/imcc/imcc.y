@@ -1037,7 +1037,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %type <s> relop any_string assign_op  bin_op  un_op
 %type <i> labels _labels label  statement sub_call
 %type <i> pcc_sub_call
-%type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results sub_param_type_def
+%type <sr> sub_param pcc_arg pcc_result pcc_args pcc_results sub_param_type_def
 %type <sr> pcc_returns pcc_yields pcc_return pcc_call arg arglist the_sub multi_type
 %type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
@@ -1322,20 +1322,13 @@ sub:
                 IMCC_INFO(interp)->cur_unit->instructions->symregs[0];
           }
         }
-     sub_params
      sub_body  ESUB            { $$ = 0; IMCC_INFO(interp)->cur_call = NULL; }
-   ;
-
-sub_params:
-     /* empty */               { $$ = 0; } %prec LOW_PREC
-   | sub_params '\n'                               { $$ = 0; }
-   | sub_params sub_param '\n'
    ;
 
 sub_param:
    PARAM
    { IMCC_INFO(interp)->is_def = 1; }
-   sub_param_type_def
+   sub_param_type_def '\n'
          {
            if (/* IMCC_INFO(interp)->cur_unit->last_ins->op
            ||  */ !(IMCC_INFO(interp)->cur_unit->last_ins->type & ITPCCPARAM)) {
@@ -1787,7 +1780,8 @@ helper_clear_state:
    ;
 
 statement:
-     helper_clear_state
+     sub_param                 { $$ = 0; }
+   | helper_clear_state
      instruction               { $$ = $2; }
    | MACRO '\n'                { $$ = 0; }
    | FILECOMMENT               { $$ = 0; }
