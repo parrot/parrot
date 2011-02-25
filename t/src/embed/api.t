@@ -195,6 +195,7 @@ c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_reset_
 #include <stdlib.h>
 
 #include "parrot/api.h"
+#include "imcc/api.h"
 
 int main(void) {
     Parrot_PMC interp;
