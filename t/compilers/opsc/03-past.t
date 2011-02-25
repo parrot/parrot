@@ -36,8 +36,8 @@ inline op bar(out PMC, in INT) {
 
 |;
 my $compiler := pir::compreg__Ps('Ops');
-
-my $past := $compiler.compile($buf, target => 'past');
+my $past     := $compiler.compile($buf, target => 'past');
+my $trans    := Ops::Trans::C.new;
 
 ok(1, "PAST::Node created");
 
@@ -101,11 +101,7 @@ ok( $op.arg_types.join('_') eq 'i_pc_nc', "Second variant correct");
 
 # Check body munching.
 $op := @ops[0];
-my $goto_offset := 0;
-for @($op) {
-    $goto_offset := $goto_offset || $_<name> eq 'goto_offset';
-}
-ok( $goto_offset, "goto NEXT appended for non :flow ops");
+ok( $op.get_body($trans) ~~ /goto_offset/ , "goto NEXT appended for non :flow ops");
 
 # Check write barriers.
 ok( !$op.need_write_barrier, "Write Barrier is not required");
@@ -117,7 +113,7 @@ ok( $op.need_write_barrier, "'inout STR' Write Barrier");
 $op := @ops[5];
 ok( $op.need_write_barrier, "Write Barrier calculated properly");
 
-ok( $op.body ~~ /PARROT_GC_WRITE_BARRIER/, "We have Write Barrier inserted into op");
+ok( $op.get_body($trans) ~~ /PARROT_GC_WRITE_BARRIER/, "We have Write Barrier inserted into op");
 
 done_testing();
 
