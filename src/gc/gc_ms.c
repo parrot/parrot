@@ -175,8 +175,7 @@ static void gc_ms_mark_special(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_ms_mark_str_header(PARROT_INTERP, ARGMOD_NULLOK(STRING *obj))
-        __attribute__nonnull__(1)
+static void gc_ms_mark_str_header(SHIM_INTERP, ARGMOD_NULLOK(STRING *obj))
         FUNC_MODIFIES(*obj);
 
 static void gc_ms_more_traceable_objects(PARROT_INTERP,
@@ -330,8 +329,7 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
 #define ASSERT_ARGS_gc_ms_mark_special __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_gc_ms_mark_str_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms_mark_str_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_ms_more_traceable_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pool))
@@ -502,8 +500,7 @@ Merges the header pools of C<source_interp> into those of C<dest_interp>.
 */
 
 static void
-gc_ms_destroy_child_interp(ARGMOD(Interp *dest_interp),
-    ARGIN(Interp *source_interp))
+gc_ms_destroy_child_interp(ARGMOD(Interp *dest_interp), ARGIN(Interp *source_interp))
 {
     ASSERT_ARGS(gc_ms_destroy_child_interp)
 
@@ -539,7 +536,7 @@ Parrot_gc_ms_needed(PARROT_INTERP)
     size_t dynamic_threshold;
 
     /* new_mem is the additional amount of memory used since the last GC */
-    size_t new_mem = interp->gc_sys->stats.memory_used
+    const size_t new_mem = interp->gc_sys->stats.memory_used
                    - interp->gc_sys->stats.mem_used_last_collect;
 
     /* Never run a GC if new_mem is below static GC_SIZE_THRESHOLD */
@@ -938,7 +935,7 @@ mark *obj as live
 */
 
 static void
-gc_ms_mark_str_header(PARROT_INTERP, ARGMOD_NULLOK(STRING *obj))
+gc_ms_mark_str_header(SHIM_INTERP, ARGMOD_NULLOK(STRING *obj))
 {
     ASSERT_ARGS(gc_ms_mark_str_header)
     if (obj) {
