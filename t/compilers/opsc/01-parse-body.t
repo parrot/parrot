@@ -298,6 +298,7 @@ inline op noop(out PMC, in INT) {
     }
 }», "Empty 'for' parsed");
 
+parse_ok($c, q«
 inline op noop(out PMC, in INT) {
     do {
         foo()
