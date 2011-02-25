@@ -338,66 +338,66 @@ our %PIROP_MAPPING := hash(
     :gt('>'),
 );
 
-our multi method process_body_chunk($trans, PAST::Op $chunk) {
-    my $type := $chunk.pasttype;
-    #say('OP ' ~ $type);
-    if $type eq 'inline' {
-        #_dumper($chunk);
-        #pir::say('RET ' ~ $chunk<inline>);
-        return $chunk.inline;
+our method process_body_chunk:pasttype<inline> ($trans, PAST::Op $chunk) {
+    return $chunk.inline;
+}
+
+our method process_body_chunk:pasttype<macro> ($trans, PAST::Op $chunk) {
+    my $name     := $chunk.name;
+    #say('NAME '~$name ~ ' ' ~ $is_next);
+    if $name eq 'OPSIZE' {
+        #say('is_next');
+        return ~self.size;
     }
-    elsif $type eq 'macro' {
-        my $name     := $chunk.name;
-        #say('NAME '~$name ~ ' ' ~ $is_next);
-        if $name eq 'OPSIZE' {
-            #say('is_next');
-            return ~self.size;
-        }
 
-        my @children := list();
-        for @($chunk) {
-            @children.push(self.process_body_chunk($trans, $_));
-        }
-        my $children := join('', |@children);
-
-        #pir::say('children ' ~ $children);
-        my $ret := Q:PIR<
-            $P0 = find_lex '$trans'
-            $P1 = find_lex '$name'
-            $S0 = $P1
-            $P1 = find_lex '$children'
-            %r  = $P0.$S0($P1)
-        >;
-        #pir::say('RET ' ~ $ret);
-        return $ret;
+    my @children := list();
+    for @($chunk) {
+        @children.push(self.process_body_chunk($trans, $_));
     }
-    elsif $type eq 'call' {
-        my @res;
-        @res.push($chunk.name);
-        @res.push('(');
+    my $children := join('', |@children);
 
-        my @args;
-        @args.push(self.process_body_chunk($trans, $_)) for @($chunk);
-        @res.push(join(', ', |@args));
+    #pir::say('children ' ~ $children);
+    my $ret := Q:PIR<
+        $P0 = find_lex '$trans'
+        $P1 = find_lex '$name'
+        $S0 = $P1
+        $P1 = find_lex '$children'
+        %r  = $P0.$S0($P1)
+    >;
+    #pir::say('RET ' ~ $ret);
+    return $ret;
+}
 
-        @res.push(')');
-        join('', |@res);
-    }
-    elsif $type eq 'if' {
-        my @res;
-        @res.push('if (');
-        @res.push(self.process_body_chunk($trans, $chunk[0]));
-        @res.push(") ");
+our method process_body_chunk:pasttype<call> ($trans, PAST::Op $chunk) {
+    my @res;
+    @res.push($chunk.name);
+    @res.push('(');
 
-        # 'then'
-        @res.push(self.process_body_chunk($trans, $chunk[1]));
+    my @args;
+    @args.push(self.process_body_chunk($trans, $_)) for @($chunk);
+    @res.push(join(', ', |@args));
 
-        # 'else'
-        @res.push("\nelse " ~ self.process_body_chunk($trans, $chunk[2])) if $chunk[2];
+    @res.push(')');
+    join('', |@res);
+}
 
-        join('', |@res);
-    }
-    elsif $type eq '' && $chunk.pirop {
+our method process_body_chunk:pasttype<if> ($trans, PAST::Op $chunk) {
+    my @res;
+    @res.push('if (');
+    @res.push(self.process_body_chunk($trans, $chunk[0]));
+    @res.push(") ");
+
+    # 'then'
+    @res.push(self.process_body_chunk($trans, $chunk[1]));
+
+    # 'else'
+    @res.push("\nelse " ~ self.process_body_chunk($trans, $chunk[2])) if $chunk[2];
+
+    join('', |@res);
+}
+
+our method process_body_chunk:pasttype<undef> ($trans, PAST::Op $chunk) {
+    if $chunk.pirop {
         # Some infix stuff
         my $res :=
               '('
@@ -408,8 +408,15 @@ our multi method process_body_chunk($trans, PAST::Op $chunk) {
         $res;
     }
     else {
-        #pir::die("Unhandled $type");
+        pir::die("Unhandled chunk");
     }
+}
+
+our multi method process_body_chunk($trans, PAST::Op $chunk) {
+    my $type := $chunk.pasttype // 'undef';
+
+    my $sub  := pir::find_sub_not_null__ps('process_body_chunk:pasttype<' ~ $type ~ '>');
+    $sub(self, $trans, $chunk);
 }
 
 our multi method process_body_chunk($trans, PAST::Stmts $chunk) {
