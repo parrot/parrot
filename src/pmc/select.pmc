@@ -249,16 +249,18 @@ read before returning.
 
 */
 
-    METHOD can_read(INTVAL timeout) {
-      fd_set  rdset;
+    METHOD can_read(FLOATVAL timeout) {
+      fd_set          rdset;
       struct  timeval timeouts;
-      PMC    *results, *fd_map;
-      INTVAL  maxid, i;
+      PMC            *results, *fd_map;
+      INTVAL          maxid, i;
+      INTVAL          sec;
+      INTVAL          usec = modf(timeout, &sec) * 1000000;
 
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
       GET_ATTR_maxfd(INTERP, SELF, maxid);
-      timeouts.tv_sec  = timeout;
-      timeouts.tv_usec = 0;
+      timeouts.tv_sec  = sec;
+      timeouts.tv_usec = usec;
       results          = pmc_new(interp, enum_class_ResizablePMCArray);
       memcpy(&rdset, &PARROT_SELECT(SELF)->rb_array, sizeof (fd_set));
 
@@ -286,16 +288,18 @@ write to before returning.
 
 */
 
-    METHOD can_write(INTVAL timeout) {
+    METHOD can_write(FLOATVAL timeout) {
       fd_set         wbset;
       struct timeval timeouts;
       PMC           *results, *fd_map;
       INTVAL         maxid, i;
+      INTVAL         sec;
+      INTVAL         usec = modf(timeout, &sec) * 1000000;
 
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
       GET_ATTR_maxfd(INTERP, SELF, maxid);
-      timeouts.tv_sec  = timeout;
-      timeouts.tv_usec = 0;
+      timeouts.tv_sec  = sec;
+      timeouts.tv_usec = usec;
       results          = pmc_new(interp, enum_class_ResizablePMCArray);
       memcpy(&wbset, &PARROT_SELECT(SELF)->wb_array, sizeof (fd_set));
 
@@ -323,16 +327,18 @@ exception state before returning.
 
 */
 
-    METHOD has_exception(INTVAL timeout) {
-      struct timeval  timeouts;
-      PMC            *results, *fd_map;
-      INTVAL          maxid, i;
-      fd_set          ebset;
+    METHOD has_exception(FLOATVAL timeout) {
+      fd_set         ebset;
+      struct timeval timeouts;
+      PMC           *results, *fd_map;
+      INTVAL         maxid, i;
+      INTVAL         sec;
+      INTVAL         usec = modf(timeout, &sec) * 1000000;
 
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
       GET_ATTR_maxfd(INTERP, SELF, maxid);
-      timeouts.tv_sec  = timeout;
-      timeouts.tv_usec = 0;
+      timeouts.tv_sec  = sec;
+      timeouts.tv_usec = usec;
       results          = pmc_new(interp, enum_class_ResizablePMCArray);
       memcpy(&ebset, &PARROT_SELECT(SELF)->eb_array, sizeof (fd_set));
 
@@ -362,16 +368,18 @@ handled.
 
 */
 
-    METHOD select(INTVAL timeout) {
+    METHOD select(FLOATVAL timeout) {
       fd_set          rdset, wrset, erset;
       struct timeval  timeouts;
       PMC            *results, *rresults, *wresults, *eresults, *fd_map;
       INTVAL          maxid, i;
+      INTVAL          sec;
+      INTVAL          usec = modf(timeout, &sec) * 1000000;
 
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
       GET_ATTR_maxfd(INTERP, SELF, maxid);
-      timeouts.tv_sec  = timeout;
-      timeouts.tv_usec = 0;
+      timeouts.tv_sec  = sec;
+      timeouts.tv_usec = usec;
       results          = pmc_new(interp, enum_class_ResizablePMCArray);
       rresults         = pmc_new(interp, enum_class_ResizablePMCArray);
       wresults         = pmc_new(interp, enum_class_ResizablePMCArray);

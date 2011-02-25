@@ -60,7 +60,7 @@ Tests the Select PMC.
 a:
 
     $I0 = $P1.'getmaxfd'()
-    
+
     is($I0, $I1, 'maxid = max(fd1 fd2)')
 
     $P2 = $P1.'get_fd_map'()
