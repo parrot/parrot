@@ -639,6 +639,7 @@ TEMPLATE
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC *       ret_object  = PMCNULL;
+    UNUSED(ret_object);
     %s
     %s;
     UNUSED(return_data); /* Potentially unused, at least */
