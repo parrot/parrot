@@ -1524,7 +1524,7 @@ pcc_sub_call:
      PCC_BEGIN '\n'
          {
            char name[128];
-           SymReg *r, *r1;
+           SymReg *r;
            Instruction *i;
 
            snprintf(name, sizeof (name), "%cpcc_sub_call_%d",
@@ -1537,11 +1537,6 @@ pcc_sub_call:
            i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, r);
            IMCC_INFO(interp)->cur_call = r;
            i->type = ITPCCSUB;
-           /*
-            * if we are inside a pcc_sub mark the sub as doing a
-            * sub call; the sub is in r[0] of the first ins
-            */
-           r1 = IMCC_INFO(interp)->cur_unit->instructions->symregs[0];
          }
      pcc_args
      opt_invocant
