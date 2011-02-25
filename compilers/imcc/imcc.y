@@ -1329,19 +1329,22 @@ sub_params:
      /* empty */               { $$ = 0; } %prec LOW_PREC
    | sub_params '\n'                               { $$ = 0; }
    | sub_params sub_param '\n'
-         {
-           if (IMCC_INFO(interp)->adv_named_id) {
-                 add_pcc_named_param(interp, IMCC_INFO(interp)->cur_call,
-                                     IMCC_INFO(interp)->adv_named_id, $2);
-                 IMCC_INFO(interp)->adv_named_id = NULL;
-           }
-           else
-               add_pcc_arg(interp, IMCC_INFO(interp)->cur_call, $2);
-         }
    ;
 
 sub_param:
-   PARAM { IMCC_INFO(interp)->is_def = 1; } sub_param_type_def { $$ = $3; IMCC_INFO(interp)->is_def = 0; }
+   PARAM
+   { IMCC_INFO(interp)->is_def = 1; }
+   sub_param_type_def
+         {
+           if (IMCC_INFO(interp)->adv_named_id) {
+                 add_pcc_named_param(interp, IMCC_INFO(interp)->cur_call,
+                                     IMCC_INFO(interp)->adv_named_id, $3);
+                 IMCC_INFO(interp)->adv_named_id = NULL;
+           }
+           else
+               add_pcc_arg(interp, IMCC_INFO(interp)->cur_call, $3);
+         }
+   { IMCC_INFO(interp)->is_def = 0; }
    ;
 
 sub_param_type_def:
