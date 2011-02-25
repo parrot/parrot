@@ -55,6 +55,30 @@ is( $if.pasttype,   "if", ".. with pasttype call" );
 is( +@($if),            3, ".. with 3 children" );
 
 
+# test while pasttype
+$buf := q|
+inline op bar(out PMC, in INT) {
+    while (1) {
+        foo();
+    }
+}|;
+$past := $compiler.compile($buf, target => 'past');
+$op := $past<ops>[0];
+is( $op[0][0]<pasttype>, 'while', "while loop generates right pasttype");
+
+# test for pasttype
+$buf := q|
+inline op bar(out PMC, in INT) {
+    for (i = 0; i < 111; quux($2)) {
+        foo($1);
+    }
+}|;
+$past := $compiler.compile($buf, target => 'past');
+$op := $past<ops>[0];
+is( $op[0][0]<pasttype>, 'for', "for loop generates right pasttype");
+
+
+
 done_testing();
 
 # Don't forget to update plan!
