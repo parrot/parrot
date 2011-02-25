@@ -32,8 +32,8 @@ sub get_test_data() {
 inline op noop(in PMC) :flow {
             foo(bar, baz);
 }
-        »,
-        / 'foo(bar, baz)' /
+            »,
+            / 'foo(bar, baz)' /
         ],
 
         [
@@ -42,8 +42,8 @@ inline op noop(in PMC) :flow {
 inline op noop(in PMC) :flow {
     if (foo) bar();
 }
-        »,
-        / 'if (foo)' /
+            »,
+            / 'if (foo)' /
         ],
 
         [
@@ -52,8 +52,8 @@ inline op noop(in PMC) :flow {
 inline op noop(in PMC) :flow {
     while (foo) bar();
 }
-        »,
-        / 'while (foo)' /
+            »,
+            / 'while (foo)' /
         ],
 
         [
@@ -62,8 +62,8 @@ inline op noop(in PMC) :flow {
 inline op noop(in PMC) :flow {
     for (;;) bar();
 }
-        »,
-        / 'for (; ; )' /
+            »,
+            / 'for (; ; )' /
         ],
 
         [
@@ -72,8 +72,8 @@ inline op noop(in PMC) :flow {
 inline op noop(in PMC) :flow {
     for (foo;;) bar();
 }
-        »,
-        / 'for (foo; ; )' /
+            »,
+            / 'for (foo; ; )' /
         ],
 
         [
@@ -82,8 +82,8 @@ inline op noop(in PMC) :flow {
 inline op noop(in PMC) :flow {
     for (;foo;) bar();
 }
-        »,
-        / 'for (; foo; )' /
+            »,
+            / 'for (; foo; )' /
         ],
 
         [
@@ -92,8 +92,8 @@ inline op noop(in PMC) :flow {
 inline op noop(in PMC) :flow {
     for (;;foo) bar();
 }
-        »,
-        / 'for (; ; foo)' /
+            »,
+            / 'for (; ; foo)' /
         ],
 
         [
@@ -102,8 +102,8 @@ inline op noop(in PMC) :flow {
 inline op noop(in PMC) :flow {
     for (foo;bar;baz) bar();
 }
-        »,
-        / 'for (foo; bar; baz)' /
+            »,
+            / 'for (foo; bar; baz)' /
         ],
     );
 }
