@@ -293,13 +293,13 @@ token circumfix:sym<( )> {
     <O('%methodop')>        # XXX Check precedence
 }
 
-token prefix:sym<+>   { <sym>  <O('%symbolic_unary')> }
-token prefix:sym<->   { <sym>  <![>]> <O('%symbolic_unary')> }
-token prefix:sym<!>   { <sym>  <O('%symbolic_unary')> }
-token prefix:sym<|>   { <sym>  <O('%symbolic_unary')> }
-token prefix:sym<&>   { <sym>  <O('%symbolic_unary')> }
-token prefix:sym<*>   { <sym>  <O('%symbolic_unary')> }
-token prefix:sym<~>   { <sym>  <O('%symbolic_unary')> }
+token prefix:sym<+>   { <sym>  <O('%symbolic_unary :pirop<+>')> }
+token prefix:sym<->   { <sym>  <![>]> <O('%symbolic_unary :pirop<->')> }
+token prefix:sym<!>   { <sym>  <O('%symbolic_unary :pirop<!>')> }
+token prefix:sym<|>   { <sym>  <O('%symbolic_unary :pirop<|>')> }
+token prefix:sym<&>   { <sym>  <O('%symbolic_unary :pirop<&>')> }
+token prefix:sym<*>   { <sym>  <O('%symbolic_unary :pirop<*>')> }
+token prefix:sym<~>   { <sym>  <O('%symbolic_unary :pirop<~>')> }
 
 
 rule blockoid {

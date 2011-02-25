@@ -105,6 +105,19 @@ inline op noop(in PMC) :flow {
             »,
             / 'for (foo; bar; baz)' /
         ],
+
+
+        [
+            'Prefix -',
+            q«
+inline op noop(in PMC) :flow {
+    $1 = -foo;
+}
+            »,
+            / '-foo' /
+        ],
+
+
     );
 }
 

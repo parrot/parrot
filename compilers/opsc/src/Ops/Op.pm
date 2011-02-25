@@ -418,13 +418,29 @@ our method to_c:pasttype<for> ($trans, PAST::Op $chunk) {
 our method to_c:pasttype<undef> ($trans, PAST::Op $chunk) {
     if $chunk.pirop {
         # Some infix stuff
-        my $res :=
+        if $chunk.name ~~ / infix / {
               '('
             ~ self.to_c($trans, $chunk[0])
             ~ ' ' ~ (%PIROP_MAPPING{$chunk.pirop} // $chunk.pirop) ~ ' '
             ~ self.to_c($trans, $chunk[1])
             ~ ')';
-        $res;
+        }
+        elsif $chunk.name ~~ / prefix / {
+              '('
+            ~ (%PIROP_MAPPING{$chunk.pirop} // $chunk.pirop)
+            ~ self.to_c($trans, $chunk[0])
+            ~ ')';
+        }
+        elsif $chunk.name ~~ / postfix / {
+              '('
+            ~ self.to_c($trans, $chunk[0])
+            ~ (%PIROP_MAPPING{$chunk.pirop} // $chunk.pirop)
+            ~ ')';
+        }
+        else {
+            _dumper($chunk);
+            pir::die("Unhandled chunk");
+        }
     }
     else {
         _dumper($chunk);
