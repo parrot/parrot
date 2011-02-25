@@ -393,6 +393,15 @@ our method to_c:pasttype<if> ($trans, PAST::Op $chunk) {
     join('', |@res);
 }
 
+our method to_c:pasttype<while> ($trans, PAST::Op $chunk) {
+    join('',
+        'while (',
+        self.to_c($trans, $chunk[0]),
+        ') ',
+        self.to_c($trans, $chunk[1]),
+    );
+}
+
 our method to_c:pasttype<undef> ($trans, PAST::Op $chunk) {
     if $chunk.pirop {
         # Some infix stuff
@@ -405,6 +414,7 @@ our method to_c:pasttype<undef> ($trans, PAST::Op $chunk) {
         $res;
     }
     else {
+        _dumper($chunk);
         pir::die("Unhandled chunk");
     }
 }
