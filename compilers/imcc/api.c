@@ -125,7 +125,8 @@ imcc_get_pasm_compreg_api(Parrot_PMC interp_pmc, int add_compreg,
 
 /*
 
-=item C<static PMC * get_compreg_pmc(PARROT_INTERP, int is_pasm, int add_compreg)>
+=item C<static PMC * get_compreg_pmc(PARROT_INTERP, int is_pasm, int
+add_compreg)>
 
 Get an IMCC compiler PMC. Register it under its preferred name if
 C<add_compreg> is 1.

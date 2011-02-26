@@ -419,7 +419,7 @@ PARROT_PURE_FUNCTION
 static int
 is_all_hex_digits(ARGIN(const char *s))
 {
-    ASSERT_ARGS(is_all_hex_digits);
+    ASSERT_ARGS(is_all_hex_digits)
     for (; *s; ++s)
         if (!isxdigit(*s))
             return 0;

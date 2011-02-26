@@ -64,6 +64,16 @@ static void imcc_destroy_macro_values(ARGMOD(void *value))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*value);
 
+static void imcc_destroy_scanner(
+    ARGMOD(imc_info_t *imcc),
+    yyscan_t yyscanner)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*imcc);
+
+static yyscan_t imcc_get_scanner(ARGMOD(imc_info_t *imcc))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*imcc);
+
 static PMC * imcc_run_compilation_internal(
     ARGMOD(imc_info_t *imcc),
     ARGIN(STRING *source),
@@ -93,6 +103,10 @@ static struct _imc_info_t* prepare_reentrant_compile(
     , PARROT_ASSERT_ARG(sourcefile))
 #define ASSERT_ARGS_imcc_destroy_macro_values __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_imcc_destroy_scanner __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_imcc_get_scanner __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_run_compilation_internal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(source))
@@ -129,7 +143,7 @@ imcc_new(PARROT_INTERP)
 
 /*
 
-=item C<void imcc_reset(imc_info_t * imcc)>
+=item C<void imcc_reset(imc_info_t *imcc)>
 
 Reset IMCC between runs. This *MUST* be called between subsequent invocations
 from libparrot. It should not be called when IMCC calls itself recursively.
@@ -152,7 +166,7 @@ imcc_reset(ARGMOD(imc_info_t *imcc))
 
 /*
 
-=item C<STRING * imcc_last_error_message(imc_info_t * imcc)>
+=item C<STRING* imcc_last_error_message(imc_info_t *imcc)>
 
 Return the last error message generated as a string.
 
@@ -171,7 +185,7 @@ imcc_last_error_message(ARGIN(imc_info_t *imcc))
 
 /*
 
-=item C<INTVAL imcc_last_error_code(imc_info_t * imcc)>
+=item C<INTVAL imcc_last_error_code(imc_info_t *imcc)>
 
 Return the numerical code for the last error.
 
@@ -189,7 +203,7 @@ imcc_last_error_code(ARGIN(imc_info_t *imcc))
 
 /*
 
-=item C<void imcc_set_debug_mode(imc_info_t * imcc, INTVAL dflags, INTVAL
+=item C<void imcc_set_debug_mode(imc_info_t *imcc, INTVAL dflags, INTVAL
 yflags)>
 
 Set the debug flags on IMCC. There are two sets of flags: debug flags for the
@@ -203,14 +217,14 @@ PARROT_EXPORT
 void
 imcc_set_debug_mode(ARGMOD(imc_info_t *imcc), INTVAL dflags, INTVAL yflags)
 {
-    ASSERT_ARGS(imc_set_debug_mode)
+    ASSERT_ARGS(imcc_set_debug_mode)
     imcc->debug = dflags;
     yydebug = yflags ? 1 : 0;
 }
 
 /*
 
-=item C<void imcc_set_verbosity(imc_info_t * imcc, INTVAL verbose>
+=item C<void imcc_set_verbosity(imc_info_t *imcc, INTVAL verbose)>
 
 If C<verbose> is 1, turn on verbose output for IMCC. Most of the extra
 information will be dumped directly to stderr or stdout.
@@ -229,7 +243,7 @@ imcc_set_verbosity(ARGMOD(imc_info_t *imcc), INTVAL verbose)
 
 /*
 
-=item C<void imcc_set_optimization_level(imc_info_t * imcc, cons char * opts)>
+=item C<void imcc_set_optimization_level(imc_info_t *imcc, const char *opts)>
 
 Set the optimization level. C<opts> is a string with character code flags.
 
@@ -262,7 +276,7 @@ imcc_set_optimization_level(ARGMOD(imc_info_t *imcc), ARGIN(const char *opts))
 
 /*
 
-=item C<yyscan_t imcc_get_scanner(imc_info_t * imcc)>
+=item C<static yyscan_t imcc_get_scanner(imc_info_t *imcc)>
 
 Get a bison scanner object to use for parsing.
 
@@ -281,7 +295,7 @@ imcc_get_scanner(ARGMOD(imc_info_t *imcc))
 
 /*
 
-=item C<void imcc_destroy_scanner(imc_info_t * imcc, yyscan_t yyscanner)>
+=item C<static void imcc_destroy_scanner(imc_info_t *imcc, yyscan_t yyscanner)>
 
 Cleanup and destroy a bison scanner object
 
@@ -298,7 +312,7 @@ imcc_destroy_scanner(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner)
 
 /*
 
-=item C<void imcc_preprocess(imc_info_t * imcc, STRING * const sourcefile)>
+=item C<void imcc_preprocess(imc_info_t *imcc, STRING * const sourcefile)>
 
 Preprocess the given file. Dump the output to stdout.
 
@@ -331,7 +345,8 @@ imcc_preprocess(ARGMOD(imc_info_t *imcc), ARGIN(STRING * const sourcefile))
 
 /*
 
-=item C<void do_pre_process(imc_info_t * imcc, STRING * sourcefile)>
+=item C<static void do_pre_process(imc_info_t *imcc, STRING * sourcefile,
+yyscan_t yyscanner)>
 
 Do the actual preprocessing. C<sourcefile> is the validated name of an
 existing file. C<yyscanner> is a bison parser object which has already been
@@ -488,7 +503,8 @@ imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname), int is_pasm
 
 /*
 
-=item C<PMC * imcc_run_compilation_reentrant(imc_info_t * imcc>
+=item C<static PMC * imcc_run_compilation_reentrant(imc_info_t *imcc, STRING
+*fullname, int is_file, int is_pasm)>
 
 run a compilation over an input sequence, allowing for some reentrancy. This
 may be a recursive compilation inside an existing compilation sequence.
@@ -510,8 +526,8 @@ imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname)
 
 /*
 
-=item C<PMC * imcc_run_compilation_internal(imc_info_t * imcc, STRING * source,
-int is_file, int is_pasm)>
+=item C<static PMC * imcc_run_compilation_internal(imc_info_t *imcc, STRING
+*source, int is_file, int is_pasm)>
 
 Perform an actual compilation. The input is either a string or a file
 (determined by C<is_file>), and is in either PIR or PASM format (determined by
@@ -586,7 +602,7 @@ returns NULL if not in a reentrant situation. The return value of this I<MUST>
 be passed to C<exit_reentrant_compile>.
 
 =item C<imc_info_t * exit_reentrant_compile(imc_info_t * imcc, struct
-_imc_info_t *imc_info)>
+_imc_info_t *new_info)>
 
 Exit reentrant compile. Restore compiler state back to what it was for the
 previous compile, if any.

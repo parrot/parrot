@@ -94,7 +94,7 @@ IMCC_fataly(ARGMOD(imc_info_t * imcc), SHIM(int code), ARGIN(const char *fmt), .
 
 /*
 
-=item C<STRING * IMCC_get_err_location(imc_info_t *imcc)>
+=item C<static STRING * IMCC_get_err_location(imc_info_t *imcc)>
 
 Return a string containing the location of an error, with file name and
 line number.

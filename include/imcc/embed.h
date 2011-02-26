@@ -74,17 +74,12 @@ void imcc_set_verbosity(ARGMOD(imc_info_t *imcc), INTVAL verbose)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*imcc);
 
-PARROT_EXPORT
-void imcc_set_warning_mode(ARGMOD(imc_info_t *imcc), INTVAL warnings)
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*imcc);
-
 imc_info_t * exit_reentrant_compile(
     ARGMOD(imc_info_t * imcc),
-    ARGMOD_NULLOK(struct _imc_info_t *imc_info))
+    ARGMOD_NULLOK(struct _imc_info_t *new_info))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(* imcc)
-        FUNC_MODIFIES(*imc_info);
+        FUNC_MODIFIES(*new_info);
 
 PARROT_CANNOT_RETURN_NULL
 PMC * imcc_compile_string(
@@ -98,14 +93,6 @@ PMC * imcc_compile_string(
 void imcc_destroy(ARGMOD(imc_info_t * imcc))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(* imcc);
-
-void imcc_destroy_scanner(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner)
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*imcc);
-
-yyscan_t imcc_get_scanner(ARGMOD(imc_info_t *imcc))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*imcc);
 
 #define ASSERT_ARGS_imcc_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
@@ -128,18 +115,12 @@ yyscan_t imcc_get_scanner(ARGMOD(imc_info_t *imcc))
     , PARROT_ASSERT_ARG(opts))
 #define ASSERT_ARGS_imcc_set_verbosity __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
-#define ASSERT_ARGS_imcc_set_warning_mode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_exit_reentrant_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_compile_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(source))
 #define ASSERT_ARGS_imcc_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc))
-#define ASSERT_ARGS_imcc_destroy_scanner __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc))
-#define ASSERT_ARGS_imcc_get_scanner __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/main.c */
