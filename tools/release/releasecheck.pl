@@ -22,7 +22,7 @@ if ($tb =~ m/(parrot-\d+\.\d+\.\d+(?:-devel)?)\.tar\.gz$/ ) {
 else {
     croak "Unable to extract distro from $tb";
 }
-print "Performing distcheck on $tb\n";
+print "Performing releasecheck on $tb\n";
 {
     my $tdir = tempdir( CLEANUP => 1 );
     chdir $tdir or croak "Unable to change to temporary directory";
@@ -38,7 +38,7 @@ print "Performing distcheck on $tb\n";
     print "Rebuilding\n";
     system(qq{make --silent}) and croak "Unable to build";
     print "Retesting\n";
-    system(qq{make test --silent}) and croak "'make test' did not complete successfully";
+    system(qq{make test}) and croak "'make test' did not complete successfully";
     print "Rereleasing\n";
     system(qq{make release --silent}) and croak "Unable to release";
     print "Recleaning\n";
@@ -46,4 +46,4 @@ print "Performing distcheck on $tb\n";
     chdir $cwd or croak "Unable to change dir back";
     print "Leaving temporary directory\n";
 }
-print "Completed distcheck on $tb\n";
+print "Completed releasecheck on $tb\n";
