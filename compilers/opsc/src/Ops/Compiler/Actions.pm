@@ -380,7 +380,14 @@ method statement_list ($/) {
 
 method labeled_statement ($/) {
     # FIXME!!!
-    make $<statement>.ast;
+    my $past := $<statement>
+                ?? $<statement>.ast
+                !! PAST::Op.new();
+
+    # FIXME!!! We need some semantics here.
+    $past<label> := ~$<label> if $<label>;
+
+    make $past;
 }
 
 method statement ($/) {
