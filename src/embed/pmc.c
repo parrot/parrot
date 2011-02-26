@@ -457,6 +457,17 @@ Parrot_api_pmc_box_integer(Parrot_PMC interp_pmc, Parrot_Int value,
 
 /* TODO: Box float */
 
+/*
+
+=item C<Parrot_Int Parrot_api_pmc_push(Parrot_PMC interp_pmc, Parrot_PMC pmc,
+Parrot_PMC item)>
+
+Push a PMC C<item> onto aggregate PMC C<pmc>.
+
+=cut
+
+*/
+
 PARROT_API
 Parrot_Int
 Parrot_api_pmc_push(Parrot_PMC interp_pmc, Parrot_PMC pmc, Parrot_PMC item)
