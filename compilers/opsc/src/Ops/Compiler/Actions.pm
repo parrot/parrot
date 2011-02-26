@@ -506,6 +506,12 @@ method statement_control:sym<for> ($/) {
 
 # Not real "C" switch. Just close enough
 method statement_control:sym<switch> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<switch>,
+        $<test>.ast,
+    );
+    $past.push($_) for @($<statement_list>.ast);
+    make $past;
 }
 
 method circumfix:sym<( )> ($/) {
