@@ -107,27 +107,25 @@ rule op_macro:sym<restart next> { 'restart' 'NEXT' '(' ')' }
 proto rule c_macro { <...> }
 
 token c_macro:sym<define> {
-    ^^ '#' \h* <sym> \h+ <name=.identifier> <c_macro_args>? <body=.nonl>? \n <.ws>
+    ^^ '#' \h* <sym> \h+ <name=.identifier> <c_macro_args>? <body=.nonl>?
 }
 
 token c_macro:sym<ifdef> {
-    ^^ '#' \h* <sym> \h+ <name=.identifier> \n <.ws>
+    ^^ '#' \h* <sym> \h+ <name=.identifier> <.ws>
     <then=.statement_list>
     [
     ^^ '#' 'else' <else=.statement_list>
     ]?
     ^^ '#' 'endif'
-    <.ws>
 }
 
 token c_macro:sym<if> {
-    ^^ '#' \h* <sym> \h+ <condition=.nonl> \n <.ws>
+    ^^ '#' \h* <sym> \h+ <condition=.nonl> <.ws>
     <then=.statement_list>
     [
     ^^ '#' 'else' <else=.statement_list>
     ]?
     ^^ '#' 'endif'
-    <.ws>
 }
 
 
@@ -161,6 +159,7 @@ rule statement_list {
 }
 
 token statement {
+    <label>*
     [
     | <c_macro>
     | <statement_control>
@@ -171,6 +170,14 @@ token statement {
     <?MARKER('endstmt')>
 }
 
+rule label {
+    [
+    | 'case' [ <integer> | <identifier> ] ':'
+    | 'default' ':'
+    | <identifier> ':'
+    ]
+    <.ws>
+}
 
 proto rule statement_control { <...> }
 
@@ -197,19 +204,9 @@ rule statement_control:sym<do> {
 # Not real "C" switch. Just close enough
 rule statement_control:sym<switch> {
     <sym> '(' <test=.EXPR> ')' '{'
-    <switch_case>*
-    <switch_default>?
+    <statement_list>
     '}'
 }
-
-rule switch_case {
-    'case' [ <identifier> | <integer>] ':' <statement_list>
-}
-
-rule switch_default {
-    'default' ':' <statement_list>
-}
-
 
 # HACK to support for INT_FMT "\n"
 token term:sym<concatenate_strings> { # Long-long name as LTM workaround
