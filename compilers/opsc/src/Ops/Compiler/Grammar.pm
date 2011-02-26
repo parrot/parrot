@@ -104,10 +104,41 @@ rule op_macro:sym<goto next>    { 'goto' 'NEXT' '(' ')' }
 rule op_macro:sym<expr next>    { 'expr' 'NEXT' '(' ')' }
 rule op_macro:sym<restart next> { 'restart' 'NEXT' '(' ')' }
 
-# Eat c_macro till next non-whitespace char.
-token c_macro {
-    ^^ '#' \N+ <.ws>
+proto rule c_macro { <...> }
+
+token c_macro:sym<define> {
+    ^^ '#' \h* <sym> \h+ <name=.identifier> <c_macro_args>? <body=.nonl>? \n <.ws>
 }
+
+token c_macro:sym<ifdef> {
+    ^^ '#' \h* <sym> \h+ <name=.identifier> \n <.ws>
+    <then=.statement_list>
+    [
+    ^^ '#' 'else' <else=.statement_list>
+    ]?
+    ^^ '#' 'endif'
+    <.ws>
+}
+
+token c_macro:sym<if> {
+    ^^ '#' \h* <sym> \h+ <condition=.nonl> \n <.ws>
+    <then=.statement_list>
+    [
+    ^^ '#' 'else' <else=.statement_list>
+    ]?
+    ^^ '#' 'endif'
+    <.ws>
+}
+
+
+token c_macro_args {
+    '(' \h* <arg=.identifier>? [ \h* ',' \h* <arg=.identifier> ]* \h* ')'
+}
+
+token nonl {
+    \N+
+}
+
 
 token identifier {
     <!keyword> <ident>
@@ -134,8 +165,9 @@ token statement {
     | <c_macro>
     | <statement_control>
     | <blockoid>
-    | <EXPR> <.ws>
+    | <EXPR>
     ]
+    <.ws>
     <?MARKER('endstmt')>
 }
 
