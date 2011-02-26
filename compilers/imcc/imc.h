@@ -40,6 +40,9 @@
 
 typedef struct IMC_Unit IMC_Unit;
 typedef struct _imc_info_t imc_info_t;
+/* This macro helps to prevent duplicate typedefs if some IMCC header files
+   are used in an embedding situation. */
+#define IMCC_IMC_H_HAVE_TYPEDEFS
 
 #include "imcc/yyscanner.h"
 #include "symreg.h"

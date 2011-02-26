@@ -8,11 +8,11 @@
 /* Forward Declarations. IMCC will define these things internally.
    libparrot and other embedders and extenders should treat these
    as being opaque */
-#  ifndef PARROT_IMCC_IMC_H_GUARD
+#ifndef IMCC_IMC_H_HAVE_TYPEDEFS
 typedef struct IMC_Unit IMC_Unit;
 struct _imc_info_t;
 typedef struct _imc_info_t imc_info_t;
-#  endif
+#endif
 
 #include "imcc/yyscanner.h"
 
