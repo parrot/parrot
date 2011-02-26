@@ -198,3 +198,10 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         /* TODO: This */
     }
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

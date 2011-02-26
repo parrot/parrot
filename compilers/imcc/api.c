@@ -200,3 +200,9 @@ imcc_preprocess_file_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
     IMCC_API_CALLOUT(interp_pmc, interp)
 }
 
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

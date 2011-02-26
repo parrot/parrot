@@ -145,3 +145,10 @@ yyscan_t imcc_get_scanner(ARGMOD(imc_info_t *imcc))
 /* HEADERIZER END: compilers/imcc/main.c */
 
 #endif /* PARROT_IMCC_EMBED_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

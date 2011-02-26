@@ -44,3 +44,10 @@ Parrot_Int imcc_preprocess_file_api(
 /* HEADERIZER END: compilers/imcc/api.c */
 
 #endif /* PARROT_IMCC_API_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
