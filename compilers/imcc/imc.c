@@ -147,6 +147,7 @@ imc_cleanup(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(void *yyscanner))
 
     if (imcc->state)
         imcc->state->file = STRINGNULL;
+    imcc->last_unit = NULL;
 }
 
 

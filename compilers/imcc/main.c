@@ -127,9 +127,14 @@ PARROT_EXPORT
 void
 imcc_reset(ARGMOD(imc_info_t *imcc))
 {
+    // TODO: Figure out all the values from the imcc structure that we need
+    //       to save. If we clear out too much, we will have weird behavior.
+    //       However, if we don't clear out enough, we get segfaults.
     Interp * interp = imcc->interp;
+    Hash * macros = imcc->macros;
     memset(imcc, 0, sizeof(imc_info_t));
     imcc->interp = interp;
+    imcc->macros = macros;
 }
 
 PARROT_EXPORT
