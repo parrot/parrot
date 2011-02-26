@@ -113,8 +113,8 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
 
     METHOD compile(STRING *source,
             STRING *target :named("target") :optional, INTVAL has_target :opt_flag,
-            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag
-    ) {
+            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag)
+    {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         PMC * pf = PMCNULL;
         imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
@@ -129,8 +129,8 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
 
     METHOD compile_file(STRING *filename,
             STRING *target :named("target") :optional, INTVAL has_target :opt_flag,
-            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag
-    ) {
+            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag)
+    {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         PMC * pf = PMCNULL;
         imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
@@ -161,8 +161,8 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
 
     METHOD eval(STRING *source,
             STRING *target :named("target") :optional, INTVAL has_target :opt_flag,
-            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag
-    ) {
+            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag)
+    {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         PMC * pf = PMCNULL;
         imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
