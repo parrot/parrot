@@ -159,7 +159,7 @@ rule statement_list {
 }
 
 token statement {
-    <label>*
+    <label>*      # Multiple labels for handling pass-throught in switch.
     [
     | <c_macro>
     | <statement_control>
