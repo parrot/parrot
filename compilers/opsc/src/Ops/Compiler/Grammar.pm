@@ -321,15 +321,9 @@ rule type_declarator {
 
 token eat_terminator {
     | ';'
-    | <?terminator>
     | <?MARKED('endstmt')>
     | $
 }
-
-proto token terminator { <...> }
-
-token terminator:sym<;> { <?[;]> }
-token terminator:sym<}> { <?[}]> }
 
 token pod_ws {
   [
