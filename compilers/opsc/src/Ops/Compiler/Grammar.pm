@@ -155,11 +155,20 @@ token keyword {
 # Part of C grammar.
 
 rule statement_list {
-    [ <statement> <.eat_terminator> ]*
+    [ <labeled_statement> <.eat_terminator> ]*
+}
+
+token labeled_statement {
+    [
+    | <label> <.ws> <statement>
+    | <label>
+    | <statement>
+    ]
+    <.ws>
+    <?MARKER('endstmt')>
 }
 
 token statement {
-    <label>*      # Multiple labels for handling pass-throught in switch.
     [
     | <c_macro>
     | <statement_control>
