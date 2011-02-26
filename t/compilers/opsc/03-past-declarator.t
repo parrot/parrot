@@ -81,8 +81,6 @@ is( $op[0][0]<pasttype>, 'for', "for loop generates right pasttype");
 
 done_testing();
 
-# Don't forget to update plan!
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
