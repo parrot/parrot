@@ -94,10 +94,22 @@ IMCC_fataly(ARGMOD(imc_info_t * imcc), SHIM(int code), ARGIN(const char *fmt), .
         "error:imcc:%Ss\n\t%Ss", imcc->error_message, location);
 }
 
+/*
+
+=item C<STRING * IMCC_get_err_location(imc_info_t *imcc)>
+
+Return a string containing the location of an error, with file name and
+line number.
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 static STRING *
 IMCC_get_err_location(ARGMOD(imc_info_t *imcc))
 {
+    ASSERT_ARGS(IMCC_get_err_location)
     macro_frame_t *f;
     STRING        *old = imcc->frames->s.file;
     STRING * msg = STRINGNULL;
