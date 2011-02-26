@@ -121,7 +121,8 @@ imc_info_t *
 imcc_new(PARROT_INTERP)
 {
     ASSERT_ARGS(imcc_new)
-    imc_info_t * const imcc = (imc_info_t *)mem_sys_allocate_zeroed(sizeof(imc_info_t));
+    const size_t info_size = sizeof (imc_info_t);
+    imc_info_t * const imcc = (imc_info_t *)mem_sys_allocate_zeroed(info_size);
     imcc->interp = interp;
     return imcc;
 }
