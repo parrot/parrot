@@ -69,12 +69,25 @@ static PMC * get_compreg_pmc(PARROT_INTERP, int is_pasm, int add_compreg)
         return 1;                                                  \
     }
 
+/*
+
+=item C<Parrot_Int imcc_get_pir_compreg_api(Parrot_PMC interp_pmc, int
+add_compreg, Parrot_PMC *compiler)>
+
+Get a registerable compiler object for the "PIR" language. If C<add_compreg>
+is 1, register that compiler with Parrot under the name "PIR".
+
+=cut
+
+*/
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Int
 imcc_get_pir_compreg_api(Parrot_PMC interp_pmc, int add_compreg,
         Parrot_PMC *compiler)
 {
+    ASSERT_ARGS(imcc_get_pir_compreg_api)
     IMCC_API_CALLIN(interp_pmc, interp)
     *compiler = get_compreg_pmc(interp, 0, add_compreg);
     if (PMC_IS_NULL(*compiler))
@@ -83,12 +96,25 @@ imcc_get_pir_compreg_api(Parrot_PMC interp_pmc, int add_compreg,
     IMCC_API_CALLOUT(interp_pmc, interp)
 }
 
+/*
+
+=item C<Parrot_Int imcc_get_pasm_compreg_api(Parrot_PMC interp_pmc, int
+add_compreg, Parrot_PMC *compiler)>
+
+Get a registerable compiler object for the "PASM" language. If C<add_compreg>
+is 1, register that compiler with Parrot under the name "PASM".
+
+=cut
+
+*/
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Int
 imcc_get_pasm_compreg_api(Parrot_PMC interp_pmc, int add_compreg,
         Parrot_PMC *compiler)
 {
+    ASSERT_ARGS(imcc_get_pasm_compreg_api)
     IMCC_API_CALLIN(interp_pmc, interp)
     *compiler = get_compreg_pmc(interp, 1, add_compreg);
     if (PMC_IS_NULL(*compiler))
@@ -97,9 +123,20 @@ imcc_get_pasm_compreg_api(Parrot_PMC interp_pmc, int add_compreg,
     IMCC_API_CALLOUT(interp_pmc, interp)
 }
 
+/*
+
+=item C<static PMC * get_compreg_pmc(PARROT_INTERP, int is_pasm, int add_compreg)>
+
+Get an IMCC compiler PMC. Register it under its preferred name if
+C<add_compreg> is 1.
+
+=cut
+*/
+
 static PMC *
 get_compreg_pmc(PARROT_INTERP, int is_pasm, int add_compreg)
 {
+    ASSERT_ARGS(get_compreg_pmc)
     PMC * const comp = Parrot_pmc_new_init_int(interp, enum_class_IMCCompiler, is_pasm);
     if (add_compreg) {
         STRING * const name = VTABLE_get_string(interp, comp);
@@ -108,12 +145,24 @@ get_compreg_pmc(PARROT_INTERP, int is_pasm, int add_compreg)
     return comp;
 }
 
+/*
+
+=item C<Parrot_Int imcc_compile_file_api(Parrot_PMC interp_pmc, Parrot_PMC
+compiler, Parrot_String file, Parrot_PMC *pbc)>
+
+Compile a file using the given IMCCompiler PMC.
+
+=cut
+
+*/
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Int
 imcc_compile_file_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
         Parrot_String file, Parrot_PMC *pbc)
 {
+    ASSERT_ARGS(imcc_compile_file_api)
     IMCC_API_CALLIN(interp_pmc, interp)
     STRING * const meth_name = Parrot_str_new(interp, "compile_file", 0);
     PMC * result = PMCNULL;
@@ -125,12 +174,25 @@ imcc_compile_file_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
     IMCC_API_CALLOUT(interp_pmc, interp)
 }
 
+/*
+
+=item C<Parrot_Int imcc_preprocess_file_api(Parrot_PMC interp_pmc, Parrot_PMC
+compiler, Parrot_String file)>
+
+Preprocess the specified file only, using the given IMCCompiler PMC. Currently
+the preprocessed text is dumped directly to stdout.
+
+=cut
+
+*/
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Int
 imcc_preprocess_file_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
         Parrot_String file)
 {
+    ASSERT_ARGS(imcc_preprocess_file_api)
     IMCC_API_CALLIN(interp_pmc, interp)
     STRING * const meth_name = Parrot_str_new(interp, "preprocess", 0);
     Parrot_pcc_invoke_method_from_c_args(interp, compiler, meth_name,
