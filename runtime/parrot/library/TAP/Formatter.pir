@@ -677,7 +677,7 @@ Harness output delegate for default console output
     name = getattribute self, 'name'
     .local string pretty
     pretty = formatter.'_format_name'(name)
-    formatter.'_output'(pretty)
+    formatter.'_output'(pretty, '')
   L1:
 .end
 
