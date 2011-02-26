@@ -373,9 +373,14 @@ method declarator ($/) {
 method statement_list ($/) {
     my $past := PAST::Stmts.new(:node($/));
 
-    $past.push($_.ast) for $<statement>;
+    $past.push($_.ast) for $<labeled_statement>;
 
     make $past;
+}
+
+method labeled_statement ($/) {
+    # FIXME!!!
+    make $<statement>.ast;
 }
 
 method statement ($/) {
