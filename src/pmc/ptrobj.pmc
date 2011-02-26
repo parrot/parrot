@@ -1,0 +1,182 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+
+=head1 NAME
+
+src/pmc/ptrobj.pmc - PtrObj
+
+=head1 DESCRIPTION
+
+C<PtrObj> is for object-ish pointers. These augment C<PtrBuf> to afford memory management.
+
+=head2 VTABLEs
+
+=over 4
+
+=cut
+
+*/
+
+BEGIN_PMC_HEADER_PREAMBLE
+typedef PMC *(*ptrobj_clone_func_t)(PARROT_INTERP, PMC *, void *);
+typedef void (*ptrobj_mark_func_t)(PARROT_INTERP, PMC *, void *);
+typedef void (*ptrobj_destroy_func_t)(PARROT_INTERP, PMC *, void *);
+
+#define PTROBJ_SET_CLONE(i, p, c) do { \
+    SETATTR_PtrObj_clone((i), (p), (c)); \
+} while (0)
+
+#define PTROBJ_SET_MARK(i, p, m) do { \
+    SETATTR_PtrObj_mark((i), (p), (m)); \
+    if (m) \
+        PObj_custom_mark_SET(p); \
+    else \
+        PObj_custom_mark_CLEAR(p); \
+} while (0)
+
+#define PTROBJ_SET_DESTROY(i, p, d) do { \
+    SETATTR_PtrObj_destroy((i), (p), (d)); \
+    if (d) \
+        PObj_custom_destroy_SET(p); \
+    else \
+        PObj_custom_destroy_CLEAR(p); \
+} while (0)
+END_PMC_HEADER_PREAMBLE
+
+pmclass PtrObj extends PtrBuf auto_attrs {
+    ATTR ptrobj_clone_func_t   clone;
+    ATTR ptrobj_mark_func_t    mark;
+    ATTR ptrobj_destroy_func_t destroy;
+
+/*
+
+=item C<PMC *clone()>
+
+Invoke the custom C<clone> function, if one has been provided. Otherwise, cloning is an error.
+
+=item C<METHOD clone_func(func :optional)>
+
+Get or set the custom C<clone> function.
+
+=cut
+
+*/
+
+
+    VTABLE PMC *clone() {
+        void                *ptr;
+        ptrobj_clone_func_t  clone;
+        GET_ATTR_ptr(INTERP, SELF, ptr);
+        GET_ATTR_clone(INTERP, SELF, clone);
+        if (clone)
+            return clone(INTERP, SELF, ptr);
+        else
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    "clone not implemented for PtrObj %x", ptr);
+    }
+
+    METHOD clone_func(PMC *func :optional, INTVAL has_func :opt_flag) {
+        if (has_func) {
+            void *f = VTABLE_get_pointer(INTERP, func);
+            PTROBJ_SET_CLONE(INTERP, SELF, (ptrobj_clone_func_t)f);
+            RETURN();
+        }
+        else {
+            ptrobj_clone_func_t f;
+            GET_ATTR_clone(INTERP, SELF, f);
+            func = Parrot_pmc_new_init_int(INTERP, enum_class_Ptr, (INTVAL)f);
+            RETURN(PMC func);
+        }
+    }
+
+/*
+
+=item C<void mark()>
+
+Invoke the custom C<mark> function, if one has been provided.
+
+=item C<METHOD mark_func(func :optional)>
+
+Get or set the custom C<mark> function.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        void               *ptr;
+        ptrobj_mark_func_t  mark;
+        GET_ATTR_ptr(INTERP, SELF, ptr);
+        GET_ATTR_mark(INTERP, SELF, mark);
+        /* invariant: custom mark flag only set when a custom mark function has been provided */
+        PARROT_ASSERT(mark);
+        mark(INTERP, SELF, ptr);
+    }
+
+    METHOD mark_func(PMC *func :optional, INTVAL has_func :opt_flag) {
+        if (has_func) {
+            void *f = VTABLE_get_pointer(INTERP, func);
+            PTROBJ_SET_MARK(INTERP, SELF, (ptrobj_mark_func_t)f);
+            RETURN();
+        }
+        else {
+            ptrobj_mark_func_t f;
+            GET_ATTR_mark(INTERP, SELF, f);
+            func = Parrot_pmc_new_init_int(INTERP, enum_class_Ptr, (INTVAL)f);
+            RETURN(PMC func);
+        }
+    }
+
+/*
+
+=item C<void destroy()>
+
+Invoke the custom C<destroy> function if one has been provided.
+
+=item C<METHOD destroy_func(func :optional)>
+
+Get or set the custom C<destroy> function.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        void                  *ptr;
+        ptrobj_destroy_func_t  destroy;
+        GET_ATTR_ptr(INTERP, SELF, ptr);
+        GET_ATTR_destroy(INTERP, SELF, destroy);
+        /* invariant: custom destroy flag only set when a destroy function has been provided */
+        PARROT_ASSERT(destroy);
+        destroy(INTERP, SELF, ptr);
+    }
+
+    METHOD destroy_func(PMC *func :optional, INTVAL has_func :opt_flag) {
+        if (has_func) {
+            void *f = VTABLE_get_pointer(INTERP, func);
+            PTROBJ_SET_DESTROY(INTERP, SELF, (ptrobj_destroy_func_t)f);
+            RETURN();
+        }
+        else {
+            ptrobj_destroy_func_t f;
+            GET_ATTR_destroy(INTERP, SELF, f);
+            func = Parrot_pmc_new_init_int(INTERP, enum_class_Ptr, (INTVAL)f);
+            RETURN(PMC func);
+        }
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
