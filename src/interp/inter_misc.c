@@ -432,6 +432,19 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
     }
 }
 
+/*
+
+=item C<Interp * Parrot_int_get_interp_from_pmc(PMC * interp_pmc)>
+
+C<interp_pmc> is a ParrotInterpreter PMC. Extract the raw C<Interp*> from it
+without needing an existing C<Interp *> reference.
+
+Do not use with any other type of PMC.
+
+=cut
+
+*/
+
 PARROT_EXPORT
 Interp *
 Parrot_int_get_interp_from_pmc(ARGIN(PMC * interp_pmc))
