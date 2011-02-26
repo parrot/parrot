@@ -396,11 +396,30 @@ method statement ($/) {
         $past := $<EXPR>.ast;
     }
     elsif $<c_macro> {
-        # TODO
+        $past := $<c_macro>.ast;
     }
     else {
         $/.CURSOR.panic("Unknown content in statement");
     }
+
+    make $past;
+}
+
+method c_macro:sym<define> ($/) {
+}
+
+method c_macro:sym<ifdef> ($/) {
+}
+
+method c_macro:sym<if> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<macro_if>,
+
+        ~$<condition>,  # FIXME! We have to parse condition somehow.
+        $<then>.ast,
+    );
+
+    $past.push($<else>[0].ast) if $<else>;
 
     make $past;
 }
