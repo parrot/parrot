@@ -415,6 +415,19 @@ our method to_c:pasttype<for> ($trans, PAST::Op $chunk) {
     );
 }
 
+our method to_c:pasttype<switch> ($trans, PAST::Op $chunk) {
+    my @parts := pir::clone(@($chunk));
+    my $cond  := @parts.shift;
+    join('',
+        'switch (',
+        self.to_c($trans, $cond),
+        ') {',
+        "\n",
+        @parts.map(-> $_ { self.to_c($trans, $_) } ).join(";\n"),
+        '}',
+    );
+}
+
 our method to_c:pasttype<undef> ($trans, PAST::Op $chunk) {
     if $chunk.pirop {
         # Some infix stuff
