@@ -107,7 +107,9 @@ static struct _imc_info_t* prepare_reentrant_compile(
 
 /*
 
-=item C<>
+=item C<imc_info_t * imcc_new(PARROT_INTERP)>
+
+Return a new instance of IMCC for the given interpreter.
 
 =cut
 
@@ -118,15 +120,28 @@ PARROT_CANNOT_RETURN_NULL
 imc_info_t *
 imcc_new(PARROT_INTERP)
 {
+    ASSERT_ARGS(imcc_new)
     imc_info_t * const imcc = (imc_info_t *)mem_sys_allocate_zeroed(sizeof(imc_info_t));
     imcc->interp = interp;
     return imcc;
 }
 
+/*
+
+=item C<void imcc_reset(imc_info_t * imcc)>
+
+Reset IMCC between runs. This *MUST* be called between subsequent invocations
+from libparrot. It should not be called when IMCC calls itself recursively.
+
+=cut
+
+*/
+
 PARROT_EXPORT
 void
 imcc_reset(ARGMOD(imc_info_t *imcc))
 {
+    ASSERT_ARGS(imcc_reset)
     // TODO: Figure out all the values from the imcc structure that we need
     //       to save. If we clear out too much, we will have weird behavior.
     //       However, if we don't clear out enough, we get segfaults.
@@ -137,46 +152,98 @@ imcc_reset(ARGMOD(imc_info_t *imcc))
     imcc->macros = macros;
 }
 
+/*
+
+=item C<STRING * imcc_last_error_message(imc_info_t * imcc)>
+
+Return the last error message generated as a string.
+
+=cut
+
+*/
+
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 STRING*
 imcc_last_error_message(ARGIN(imc_info_t *imcc))
 {
+    ASSERT_ARGS(imcc_last_error_message)
     return imcc->error_message;
 }
+
+/*
+
+=item C<INTVAL imcc_last_error_code(imc_info_t * imcc)>
+
+Return the numerical code for the last error.
+
+=cut
+
+*/
 
 PARROT_EXPORT
 INTVAL
 imcc_last_error_code(ARGIN(imc_info_t *imcc))
 {
+    ASSERT_ARGS(imcc_last_error_code)
     return imcc->error_code;
 }
+
+/*
+
+=item C<void imcc_set_debug_mode(imc_info_t * imcc, INTVAL dflags, INTVAL
+yflags)>
+
+Set the debug flags on IMCC. There are two sets of flags: debug flags for the
+compiler (C<dflags>) and debug flags for the flex/bison parser (C<yflags>).
+
+=cut
+
+*/
 
 PARROT_EXPORT
 void
 imcc_set_debug_mode(ARGMOD(imc_info_t *imcc), INTVAL dflags, INTVAL yflags)
 {
+    ASSERT_ARGS(imc_set_debug_mode)
     imcc->debug = dflags;
     yydebug = yflags ? 1 : 0;
 }
 
-PARROT_EXPORT
-void
-imcc_set_warning_mode(ARGMOD(imc_info_t *imcc), INTVAL warnings)
-{
-}
+/*
+
+=item C<void imcc_set_verbosity(imc_info_t * imcc, INTVAL verbose>
+
+If C<verbose> is 1, turn on verbose output for IMCC. Most of the extra
+information will be dumped directly to stderr or stdout.
+
+=cut
+
+*/
 
 PARROT_EXPORT
 void
 imcc_set_verbosity(ARGMOD(imc_info_t *imcc), INTVAL verbose)
 {
+    ASSERT_ARGS(imcc_set_verbosity)
     imcc->verbose = verbose;
 }
+
+/*
+
+=item C<void imcc_set_optimization_level(imc_info_t * imcc, cons char * opts)>
+
+Set the optimization level. C<opts> is a string with character code flags.
+
+=cut
+
+*/
 
 PARROT_EXPORT
 void
 imcc_set_optimization_level(ARGMOD(imc_info_t *imcc), ARGIN(const char *opts))
 {
+    ASSERT_ARGS(imcc_set_optimization_level)
     if (!opts || !*opts || opts[0] == '0')
         return;
     if (strchr(opts, 'p'))
@@ -195,24 +262,57 @@ imcc_set_optimization_level(ARGMOD(imc_info_t *imcc), ARGIN(const char *opts))
     }
 }
 
-yyscan_t
+/*
+
+=item C<yyscan_t imcc_get_scanner(imc_info_t * imcc)>
+
+Get a bison scanner object to use for parsing.
+
+=cut
+
+*/
+
+static yyscan_t
 imcc_get_scanner(ARGMOD(imc_info_t *imcc))
 {
+    ASSERT_ARGS(imcc_get_scanner)
     yyscan_t yyscanner;
     yylex_init_extra(imcc, &yyscanner);
     return yyscanner;
 }
 
-void
+/*
+
+=item C<void imcc_destroy_scanner(imc_info_t * imcc, yyscan_t yyscanner)>
+
+Cleanup and destroy a bison scanner object
+
+=cut
+
+*/
+
+static void
 imcc_destroy_scanner(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner)
 {
+    ASSERT_ARGS(imcc_destroy_scanner)
     yylex_destroy(yyscanner);
 }
+
+/*
+
+=item C<void imcc_preprocess(imc_info_t * imcc, STRING * const sourcefile)>
+
+Preprocess the given file. Dump the output to stdout.
+
+=cut
+
+*/
 
 PARROT_EXPORT
 void
 imcc_preprocess(ARGMOD(imc_info_t *imcc), ARGIN(STRING * const sourcefile))
 {
+    ASSERT_ARGS(imcc_preprocess)
     yyscan_t yyscanner = imcc_get_scanner(imcc);
 
     /* TODO: THIS! */
@@ -231,6 +331,17 @@ imcc_preprocess(ARGMOD(imc_info_t *imcc), ARGIN(STRING * const sourcefile))
     do_pre_process(imcc, sourcefile, yyscanner);
 }
 
+/*
+
+=item C<void do_pre_process(imc_info_t * imcc, STRING * sourcefile)>
+
+Do the actual preprocessing. C<sourcefile> is the validated name of an
+existing file. C<yyscanner> is a bison parser object which has already been
+set up to read from that file.
+
+=cut
+
+*/
 
 static void
 do_pre_process(ARGMOD(imc_info_t *imcc), ARGIN(STRING * sourcefile),
@@ -343,9 +454,7 @@ do_pre_process(ARGMOD(imc_info_t *imcc), ARGIN(STRING * sourcefile),
 =item C<PMC * imcc_compile_string(imc_info_t *imcc, STRING *source, int
 is_pasm)>
 
-Entry point of IMCC, as invoked by Parrot's main function.
-Compile source code (if required), write bytecode file (if required)
-and run. This function always returns 0.
+Compile a string of PIR or PASM (set by C<is_pasm>).
 
 =cut
 
@@ -364,9 +473,7 @@ imcc_compile_string(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source), int is_pasm
 =item C<PMC * imcc_compile_file(imc_info_t *imcc, STRING *fullname, int
 is_pasm)>
 
-Compile a file by filename (can be either PASM or IMCC code)
-
-Called only from src/interp/inter_misc.c:Parrot_compile_file
+Compile a file containing PIR or PASM (set by C<is_pasm>).
 
 =cut
 
@@ -381,20 +488,48 @@ imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname), int is_pasm
     return imcc_run_compilation_reentrant(imcc, fullname, 1, is_pasm);
 }
 
+/*
+
+=item C<PMC * imcc_run_compilation_reentrant(imc_info_t * imcc>
+
+run a compilation over an input sequence, allowing for some reentrancy. This
+may be a recursive compilation inside an existing compilation sequence.
+
+=cut
+
+*/
+
 static PMC *
 imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
         int is_file, int is_pasm)
 {
+    ASSERT_ARGS(imcc_run_compilation_reentrant)
     struct _imc_info_t * const imcc_use = prepare_reentrant_compile(imcc);
     PMC * const result = imcc_run_compilation_internal(imcc_use, fullname, is_file, is_pasm);
     exit_reentrant_compile(imcc, imcc_use);
     return result;
 }
 
+/*
+
+=item C<PMC * imcc_run_compilation_internal(imc_info_t * imcc, STRING * source,
+int is_file, int is_pasm)>
+
+Perform an actual compilation. The input is either a string or a file
+(determined by C<is_file>), and is in either PIR or PASM format (determined by
+C<is_pasm>).
+
+All compilations go through this function.
+
+=cut
+
+*/
+
 static PMC *
 imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
         int is_file, int is_pasm)
 {
+    ASSERT_ARGS(imcc_run_compilation_internal)
     yyscan_t yyscanner = imcc_get_scanner(imcc);
     PackFile * const pf_raw = PackFile_new(imcc->interp, 0);
     INTVAL success = 0;
