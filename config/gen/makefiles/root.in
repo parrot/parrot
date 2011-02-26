@@ -2370,6 +2370,7 @@ test-clean :
     "t/dynoplibs/*.pbc" \
     "t/op/*.pbc" \
     "t/oo/*.pbc" \
+    "t/pir/*.pbc" \
     "t/pmc/*.pbc" \
     "t/dynpmc/*.pbc" \
     "t/stress/*.pbc" \
