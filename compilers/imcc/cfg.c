@@ -276,19 +276,25 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int first)
         ins->index   = ++i;
         ins->bbindex = unit->n_basic_blocks - 1;
 
-        if (!ins->op && (ins->type & ITPCCSUB)) {
-            if (first) {
-                if (ins->type & ITLABEL) {
-                    expand_pcc_sub_ret(interp, unit, ins);
-                    ins->type &= ~ITLABEL;
-                }
-                else {
-                    /* if this is a sub call expand it */
-                    expand_pcc_sub_call(interp, unit, ins);
-                }
-
-                ins->type &= ~ITPCCSUB;
+        if (!ins->op
+        &&  (ins->type & ITPCCPARAM)
+        &&   first) {
+            expand_pcc_sub(interp, unit, ins);
+            ins->type &= ~ITPCCPARAM;
+        }
+        else if (!ins->op
+        &&       (ins->type & ITPCCSUB)
+        &&        first) {
+            if (ins->type & ITLABEL) {
+                expand_pcc_sub_ret(interp, unit, ins);
+                ins->type &= ~ITLABEL;
             }
+            else {
+                /* if this is a sub call expand it */
+                expand_pcc_sub_call(interp, unit, ins);
+            }
+
+            ins->type &= ~ITPCCSUB;
         }
         else if (ins->type & ITLABEL) {
             /* set the labels address (ins) */
@@ -358,9 +364,6 @@ bb_check_set_addr(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
             /* connect this block with first and last block */
             bb_add_edge(interp, unit, unit->bb_list[0], bb);
             bb_add_edge(interp, unit, unit->bb_list[unit->n_basic_blocks - 1], bb);
-
-            /* and mark the instruction as being kind of a branch */
-            bb->start->type |= ITADDR;
 
             break;
         }
