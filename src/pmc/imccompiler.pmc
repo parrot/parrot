@@ -18,6 +18,7 @@ A compiler object to wrap IMCC
 */
 
 #include "imcc/embed.h"
+#include "imcc/yyscanner.h"
 #include "pmc/pmc_sub.h"
 
 /* HEADERIZER HFILE: none */
