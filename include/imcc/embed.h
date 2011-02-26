@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2011, Parrot Foundation.
+ */
 
 #ifndef PARROT_IMCC_EMBED_H_GUARD
 #define PARROT_IMCC_EMBED_H_GUARD
@@ -5,11 +8,11 @@
 /* Forward Declarations. IMCC will define these things internally.
    libparrot and other embedders and extenders should treat these
    as being opaque */
-#ifndef PARROT_IMCC_IMC_H_GUARD
+#  ifndef PARROT_IMCC_IMC_H_GUARD
 typedef struct IMC_Unit IMC_Unit;
 struct _imc_info_t;
 typedef struct _imc_info_t imc_info_t;
-#endif
+#  endif
 
 #include "imcc/yyscanner.h"
 

@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2011, Parrot Foundation.
+ */
 
 #ifndef PARROT_IMCC_YYSCANNER_H_GUARD
 #define PARROT_IMCC_YYSCANNER_H_GUARD

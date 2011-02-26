@@ -159,7 +159,7 @@ imcc_reset(ARGMOD(imc_info_t *imcc))
     ASSERT_ARGS(imcc_reset)
     Interp * interp = imcc->interp;
     Hash * macros = imcc->macros;
-    memset(imcc, 0, sizeof(imc_info_t));
+    memset(imcc, 0, sizeof (imc_info_t));
     imcc->interp = interp;
     imcc->macros = macros;
 }
@@ -617,7 +617,7 @@ prepare_reentrant_compile(ARGMOD(imc_info_t * imcc))
     struct _imc_info_t * new_info = imcc;
     if (imcc->last_unit) {
         /* a reentrant compile */
-        new_info        = (imc_info_t*) calloc(1, sizeof(imc_info_t));
+        new_info        = (imc_info_t*) calloc(1, sizeof (imc_info_t));
         new_info->prev  = imcc;
         new_info->ghash = imcc->ghash;
         /* start over; let the start of line rule increment this to 1 */

@@ -1,3 +1,21 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+
+=head1 NAME
+
+src/pmc/imccompiler.pmc - A compiler object to wrap IMCC
+
+=head1 DESCRIPTION
+
+A compiler object to wrap IMCC
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "imcc/embed.h"
 #include "pmc/pmc_sub.h"
