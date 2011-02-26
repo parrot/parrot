@@ -26,17 +26,24 @@ print "Performing distcheck on $tb\n";
 {
     my $tdir = tempdir( CLEANUP => 1 );
     chdir $tdir or croak "Unable to change to temporary directory";
+    print "Changing to temporary directory\n";
     my $ctarball = "$tdir/$tb";
     copy "$cwd/$tb" => $ctarball
         or croak "Unable to copy $tb";
     system(qq{tar xzf $ctarball})
         and croak "Unable to untar $ctarball";
     chdir $distro or croak "Unable to chdir to $distro";
+    print "Reconfiguring\n";
     system(qq{$^X Configure.pl --silent}) and croak "Unable to configure";
+    print "Rebuilding\n";
     system(qq{make --silent}) and croak "Unable to build";
-    system(qq{make test}) and croak "'make test' did not complete successfully";
-    system(qq{make release}) and croak "Unable to release";
-    system(qq{make realclean}) and croak "Unable to realclean";
+    print "Retesting\n";
+    system(qq{make test --silent}) and croak "'make test' did not complete successfully";
+    print "Rereleasing\n";
+    system(qq{make release --silent}) and croak "Unable to release";
+    print "Recleaning\n";
+    system(qq{make realclean --silent}) and croak "Unable to realclean";
     chdir $cwd or croak "Unable to change dir back";
+    print "Leaving temporary directory\n";
 }
 print "Completed distcheck on $tb\n";

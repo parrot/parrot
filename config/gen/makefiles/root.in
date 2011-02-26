@@ -2919,7 +2919,7 @@ release : MANIFEST MANIFEST.generated
 
 release_check:
 	make release VERSION=$(SOVERSION)
-	$(PERL) $(RELEASE_TOOLS_DIR)/distcheck.pl
+	$(PERL) $(RELEASE_TOOLS_DIR)/releasecheck.pl
 
 relcheck : release_check
 
