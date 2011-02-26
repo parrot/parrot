@@ -142,9 +142,6 @@ void
 imcc_reset(ARGMOD(imc_info_t *imcc))
 {
     ASSERT_ARGS(imcc_reset)
-    // TODO: Figure out all the values from the imcc structure that we need
-    //       to save. If we clear out too much, we will have weird behavior.
-    //       However, if we don't clear out enough, we get segfaults.
     Interp * interp = imcc->interp;
     Hash * macros = imcc->macros;
     memset(imcc, 0, sizeof(imc_info_t));
@@ -554,8 +551,8 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     if (imcc->error_code) {
         imcc->error_code = IMCC_FATAL_EXCEPTION;
         IMCC_warning(imcc, "error:imcc:%Ss", imcc->error_message);
-        //if (is_file)
-            IMCC_print_inc(imcc);
+        /* Don't use this function. use IMCC_get_error_location instead */
+        IMCC_print_inc(imcc);
 
         yylex_destroy(yyscanner);
 

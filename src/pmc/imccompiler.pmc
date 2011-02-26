@@ -45,7 +45,6 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         PMC * const newcontext = Parrot_push_context(interp, regs_used);
 
         Parrot_block_GC_mark(interp);
-        //Parrot_pcc_set_HLL(interp, newcontext, 0);
         Parrot_pcc_set_sub(interp, newcontext, 0);
 
         Parrot_pcc_fill_params_from_c_args(INTERP, call_object, "S", &code);

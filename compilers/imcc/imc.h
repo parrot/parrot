@@ -532,7 +532,6 @@ typedef struct macro_frame_t {
     params_t  expansion;
     int       label;
     int       is_macro;
-    //YY_BUFFER_STATE buffer;
     struct yy_buffer_state * buffer;
 } macro_frame_t;
 
