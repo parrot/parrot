@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -128,7 +128,7 @@ equal to three quarters of the old size).
             if (cur < 8192)
                 cur = size < 2 * cur ? 2 * cur : size;
             else {
-                INTVAL needed = size - cur;
+                const INTVAL needed = size - cur;
                 cur          += needed + 4096;
                 cur          &= ~0xfff;
             }
@@ -151,7 +151,7 @@ Creates and returns a copy of the array.
 
     VTABLE PMC *clone() {
         INTVAL size;
-        PMC   *copy          = SUPER();
+        PMC * const copy = SUPER();
 
         /* copy trimmed extra space */
         GET_ATTR_size(INTERP, SELF, size);
@@ -171,7 +171,7 @@ Adds C<value> to the end of the array.
 */
 
     VTABLE void push_float(FLOATVAL value) {
-        INTVAL nextix = SELF.elements();
+        const INTVAL nextix = SELF.elements();
         SELF.set_number_keyed_int(nextix, value);
     }
 
@@ -256,12 +256,6 @@ Add and integer to the start of the array.
 =head1 SEE ALSO
 
 F<docs/pdds/pdd17_basic_types.pod>.
-
-=head1 HISTORY
-
-Initial version                  - Matt Fowles 2004-06-11
-Changed allocator to double size - Matt Fowles 2004-06-15
-moved available size to int_val2 - Matt Fowles 2005-07-22
 
 =cut
 
