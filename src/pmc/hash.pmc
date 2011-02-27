@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -299,7 +299,7 @@ NB: this method will destroy all old data!
 =cut
 */
     METHOD set_value_type(INTVAL type) {
-        Hash *old_hash = (Hash *)SELF.get_pointer();
+        Hash * const old_hash = (Hash *)SELF.get_pointer();
         Hash *new_hash;
 
         /*
@@ -330,7 +330,7 @@ NB: this method will destroy all old data!
     }
 
     METHOD get_value_type() {
-        INTVAL ret = ((Hash *)SELF.get_pointer())->entry_type;
+        const INTVAL ret = ((Hash *)SELF.get_pointer())->entry_type;
         RETURN(INTVAL ret);
     }
 
@@ -388,7 +388,7 @@ Return a representation of the hash contents.
 
     VTABLE STRING *get_repr() {
         PMC * const iter = VTABLE_get_iter(INTERP, SELF);
-        PMC          *sb = Parrot_pmc_new(INTERP, enum_class_StringBuilder);
+        PMC * const sb   = Parrot_pmc_new(INTERP, enum_class_StringBuilder);
         const INTVAL n   = VTABLE_elements(INTERP, SELF);
         INTVAL       j;
 
