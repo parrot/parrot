@@ -789,11 +789,13 @@ Mark the array.
 
 =back
 
-=head1 Auxiliar functions
+=head1 Auxiliary functions
 
 =over 4
 
 =item C<static void cannot_autovivify_nested(PARROT_INTERP)>
+
+Throw exception when trying to autovivify nested arrays
 
 =cut
 
