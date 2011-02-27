@@ -43,7 +43,6 @@ Initializes the exception handler.
 */
 
     VTABLE void init() {
-        Parrot_ExceptionHandler_attributes * const attrs = PARROT_EXCEPTIONHANDLER(SELF);
         SUPER();
 
         /* an exception handler has no separate context; it's only a snapshot
