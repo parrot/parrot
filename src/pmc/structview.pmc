@@ -98,13 +98,11 @@ END_PMC_HEADER_PREAMBLE
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void deallocate_ptrobj(PARROT_INTERP,
+static void deallocate_ptrobj(SHIM_INTERP,
     SHIM(PMC *obj),
-    ARGFREE(void *ptr))
-        __attribute__nonnull__(1);
+    ARGFREE(void *ptr));
 
-#define ASSERT_ARGS_deallocate_ptrobj __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_deallocate_ptrobj __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -119,7 +117,7 @@ Deallocation function to be attached to allocated instances.
 */
 
 static void
-deallocate_ptrobj(PARROT_INTERP, SHIM(PMC *obj), ARGFREE(void *ptr))
+deallocate_ptrobj(SHIM_INTERP, SHIM(PMC *obj), ARGFREE(void *ptr))
 {
     ASSERT_ARGS(deallocate_ptrobj)
     mem_sys_free(ptr);
@@ -803,7 +801,6 @@ any other type of element.
             break;
           case pmc_access:
             {
-                PMC *ret;
                 switch (elts[i].type) {
                   case enum_type_PMC:
                     *(PMC **)ptr = p;
