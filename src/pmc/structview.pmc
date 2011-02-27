@@ -525,10 +525,6 @@ Get/Set an integer-type element from a struct-pointer PMC.
                     break;
                 }
 
-#if PARROT_BIGENDIAN
-                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
-                        "Unaligned access not yet implemented for big-endian systems");
-#else
                 /* fetch hi bits of first byte */
                 acc = *cptr++ >> elts[i].bit_offset;
                 n   = 8       -  elts[i].bit_offset;
@@ -541,7 +537,6 @@ Get/Set an integer-type element from a struct-pointer PMC.
 
                 /* mask off hi bits of last byte */
                 acc &= (~(UINTVAL)0) >> (sizeof (UINTVAL) * 8 - bits);
-#endif
 
                 return acc;
             }
@@ -605,10 +600,6 @@ Get/Set an integer-type element from a struct-pointer PMC.
                     break;
                 }
 
-#if PARROT_BIGENDIAN
-                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
-                        "Unaligned write not yet implemented for big-endian systems");
-#else
                 /* cache last byte (for restoring hi bits) */
                 tempc    = cptr[(bits + elts[i].bit_offset)/8];
 
@@ -628,7 +619,6 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 n = 8 - (n - bits); /* how many bits of last byte we should have written */
                 *cptr &=           (1 << n) - 1;
                 *cptr |= tempc & ~((1 << n) - 1);
-#endif
             }
             break;
           default:
