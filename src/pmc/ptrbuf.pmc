@@ -18,6 +18,10 @@ been made. It has two things - a pointer and a size.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass PtrBuf extends Ptr auto_attrs {
     ATTR UINTVAL size;
 

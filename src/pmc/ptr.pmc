@@ -33,6 +33,10 @@ BEGIN_PMC_HEADER_PREAMBLE
 #define PTR_FAT_CLEAR(i, s) PObj_flag_CLEAR(private1, (s))
 END_PMC_HEADER_PREAMBLE
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 /*
 
 =head2 VTABLEs

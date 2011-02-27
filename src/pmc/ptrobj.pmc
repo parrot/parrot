@@ -17,6 +17,10 @@ C<PtrObj> is for object-ish pointers. These augment C<PtrBuf> to afford memory m
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 BEGIN_PMC_HEADER_PREAMBLE
 typedef PMC *(*ptrobj_clone_func_t)(PARROT_INTERP, PMC *, void *);
 typedef void (*ptrobj_mark_func_t)(PARROT_INTERP, PMC *, void *);

@@ -94,6 +94,20 @@ END_PMC_HEADER_PREAMBLE
                     base_ptr, align);                              \
     }
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void deallocate_ptrobj(PARROT_INTERP,
+    SHIM(PMC *obj),
+    ARGFREE(void *ptr))
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_deallocate_ptrobj __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /*
 
 =item C<static void deallocate_ptrobj(PARROT_INTERP, PMC *obj, void *ptr)>
@@ -105,7 +119,8 @@ Deallocation function to be attached to allocated instances.
 */
 
 static void
-deallocate_ptrobj(PARROT_INTERP, PMC *obj, void *ptr)  {
+deallocate_ptrobj(PARROT_INTERP, SHIM(PMC *obj), ARGFREE(void *ptr))
+{
     mem_sys_free(ptr);
 }
 
