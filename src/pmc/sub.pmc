@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -36,6 +36,8 @@ static void print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
 /*
 
 =item C<static void print_sub_name(PARROT_INTERP, PMC *sub)>
+
+static function to print the name of the sub (for tracing/debugging)
 
 =cut
 
