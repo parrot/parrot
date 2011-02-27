@@ -384,7 +384,6 @@ Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_peek_buffer)
     unsigned char *buffer_next;
-    UINTVAL        len          = 1;
     INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
 
     /* write buffer flush */
