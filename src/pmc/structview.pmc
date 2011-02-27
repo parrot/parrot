@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -121,6 +121,7 @@ Deallocation function to be attached to allocated instances.
 static void
 deallocate_ptrobj(PARROT_INTERP, SHIM(PMC *obj), ARGFREE(void *ptr))
 {
+    ASSERT_ARGS(deallocate_ptrobj)
     mem_sys_free(ptr);
 }
 
