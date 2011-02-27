@@ -134,13 +134,13 @@ Thaws the PMC contained in C<image>.
         STATICSELF.shift_pmc();
 
         {
-            PMC *seen = PARROT_IMAGEIOTHAW(SELF)->seen;
-            PMC *todo = PARROT_IMAGEIOTHAW(SELF)->todo;
+            PMC * const seen = PARROT_IMAGEIOTHAW(SELF)->seen;
+            PMC * const todo = PARROT_IMAGEIOTHAW(SELF)->todo;
             INTVAL i, n;
 
             for (i = 0; i < VTABLE_elements(INTERP, todo); i++) {
-                INTVAL idx = VTABLE_get_integer_keyed_int(INTERP, todo, i);
-                PMC *current = VTABLE_get_pmc_keyed_int(INTERP, seen, idx);
+                const INTVAL idx = VTABLE_get_integer_keyed_int(INTERP, todo, i);
+                PMC * const current = VTABLE_get_pmc_keyed_int(INTERP, seen, idx);
                 if (PMC_IS_NULL(current))
                     Parrot_ex_throw_from_c_args(interp, NULL,
                             EXCEPTION_MALFORMED_PACKFILE,
@@ -159,8 +159,8 @@ Thaws the PMC contained in C<image>.
                         (char *)PARROT_IMAGEIOTHAW(SELF)->curs);
 
             for (i = 0; i < n; i++) {
-                INTVAL idx = VTABLE_get_integer_keyed_int(INTERP, todo, i);
-                PMC *current = VTABLE_get_pmc_keyed_int(INTERP, seen, idx);
+                const INTVAL idx = VTABLE_get_integer_keyed_int(INTERP, todo, i);
+                PMC * const current = VTABLE_get_pmc_keyed_int(INTERP, seen, idx);
                 VTABLE_thawfinish(INTERP, current, SELF);
             }
         }
@@ -231,7 +231,7 @@ Retrieve an integer as the next item from the image.
 
     VTABLE INTVAL shift_integer() {
         /* inlining PF_fetch_integer speeds up PBC thawing measurably */
-        const PackFile      *pf        = PARROT_IMAGEIOTHAW(SELF)->pf;
+        PackFile * const pf = PARROT_IMAGEIOTHAW(SELF)->pf;
         const unsigned char *stream    = (const unsigned char *)PARROT_IMAGEIOTHAW(SELF)->curs;
         const INTVAL         i         = pf->fetch_iv(stream);
         DECL_CONST_CAST;
@@ -253,9 +253,9 @@ Retrieve a float as the next item from the image.
 */
 
     VTABLE FLOATVAL shift_float() {
-        PackFile       *pf             = PARROT_IMAGEIOTHAW(SELF)->pf;
+        PackFile * const pf = PARROT_IMAGEIOTHAW(SELF)->pf;
         const opcode_t *curs           = PARROT_IMAGEIOTHAW(SELF)->curs;
-        FLOATVAL        f              = PF_fetch_number(pf, &curs);
+        const FLOATVAL f = PF_fetch_number(pf, &curs);
         DECL_CONST_CAST;
         PARROT_IMAGEIOTHAW(SELF)->curs = PARROT_const_cast(opcode_t *, curs);
         BYTECODE_SHIFT_OK(INTERP, SELF);
@@ -290,7 +290,7 @@ Retrieve a string as the next item from the image.
         }
 
         {
-            PackFile *pf                   = PARROT_IMAGEIOTHAW(SELF)->pf;
+            PackFile * const pf = PARROT_IMAGEIOTHAW(SELF)->pf;
             const opcode_t *curs           = PARROT_IMAGEIOTHAW(SELF)->curs;
             STRING   *s                    = PF_fetch_string(INTERP, pf, &curs);
             DECL_CONST_CAST;

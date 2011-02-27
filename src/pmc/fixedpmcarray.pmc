@@ -59,7 +59,7 @@ Sort this array, optionally using the provided cmp_func
         if (n > 1) {
             /* XXX Workaround for TT #218 */
             if (PObj_is_object_TEST(SELF)) {
-                PMC *parent = SELF.get_attr_str(CONST_STRING(INTERP, "proxy"));
+                PMC * const parent = SELF.get_attr_str(CONST_STRING(INTERP, "proxy"));
                 Parrot_pcc_invoke_method_from_c_args(INTERP, parent, CONST_STRING(INTERP, "sort"), "P->", cmp_func);
             }
             else
@@ -501,7 +501,7 @@ C<value>.
             SELF.set_number_keyed_int(k, value);
         }
         else {
-            PMC *box = SELF.get_pmc_keyed_int(k);
+            PMC * const box = SELF.get_pmc_keyed_int(k);
 
             if (PMC_IS_NULL(box))
                 cannot_autovivify_nested(INTERP);
@@ -582,13 +582,13 @@ Sets the PMC at index C<key> to C<value>.
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
-        PMC   *nextkey = Parrot_key_next(INTERP, key);
+        PMC * const nextkey = Parrot_key_next(INTERP, key);
 
         if (!nextkey) {
             SELF.set_pmc_keyed_int(k, value);
         }
         else {
-            PMC *box = SELF.get_pmc_keyed_int(k);
+            PMC * const box = SELF.get_pmc_keyed_int(k);
 
             if (PMC_IS_NULL(box))
                 cannot_autovivify_nested(INTERP);
@@ -789,11 +789,15 @@ Mark the array.
 
 =back
 
-=head1 Auxiliar functions
+=head1 Auxiliary functions
 
 =over 4
 
 =item C<static void cannot_autovivify_nested(PARROT_INTERP)>
+
+Throw exception when trying to autovivify nested arrays
+
+=cut
 
 */
 

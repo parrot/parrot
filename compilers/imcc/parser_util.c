@@ -484,11 +484,6 @@ INS(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
                      ||  STREQ(fullname, "branch_i"))
                 imcc->dont_optimize = 1;
         }
-        else if (STREQ(name, "set") && n == 2) {
-            /* set Px, Py: both PMCs have the same address */
-            if (r[0]->set == r[1]->set && REG_NEEDS_ALLOC(r[1]))
-                ins->type |= ITALIAS;
-        }
 
       found_ins:
         if (emit)

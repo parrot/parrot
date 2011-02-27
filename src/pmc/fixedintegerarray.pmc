@@ -576,7 +576,7 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
     }
 
     VTABLE void thaw(PMC *info) {
-        INTVAL n = VTABLE_shift_integer(INTERP, info);
+        const INTVAL n = VTABLE_shift_integer(INTERP, info);
         SELF.init_int(n);
         if (n > 0) {
             INTVAL  i;

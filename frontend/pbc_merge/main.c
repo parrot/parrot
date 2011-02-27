@@ -124,14 +124,11 @@ static PackFile_ConstTable* pbc_merge_constants(PARROT_INTERP,
 static void pbc_merge_debugs(PARROT_INTERP,
     ARGMOD(pbc_merge_input **inputs),
     int num_inputs,
-    ARGMOD(PackFile *pf),
     ARGMOD(PackFile_ByteCode *bc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
         FUNC_MODIFIES(*inputs)
-        FUNC_MODIFIES(*pf)
         FUNC_MODIFIES(*bc);
 
 PARROT_WARN_UNUSED_RESULT
@@ -172,7 +169,6 @@ static void pbc_merge_write(PARROT_INTERP,
 #define ASSERT_ARGS_pbc_merge_debugs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs) \
-    , PARROT_ASSERT_ARG(pf) \
     , PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_pbc_merge_loadpbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -474,7 +470,7 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         }
 
         for (j = 0; j < in_seg->pmc.const_count; j++) {
-            PMC *v = pmc_constants[pmc_cursor] = in_seg->pmc.constants[j];
+            pmc_constants[pmc_cursor] = in_seg->pmc.constants[j];
             inputs[i]->pmc.const_map[j] = pmc_cursor;
             pmc_cursor++;
         }
@@ -494,7 +490,7 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 /*
 
 =item C<static void pbc_merge_debugs(PARROT_INTERP, pbc_merge_input **inputs,
-int num_inputs, PackFile *pf, PackFile_ByteCode *bc)>
+int num_inputs, PackFile_ByteCode *bc)>
 
 This function merges the debug segments from the input PBC files.
 
@@ -504,7 +500,7 @@ This function merges the debug segments from the input PBC files.
 
 static void
 pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
-                 int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
+                 int num_inputs, ARGMOD(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(pbc_merge_debugs)
     PackFile_Debug                 *debug_seg;
@@ -754,7 +750,7 @@ pbc_fixup_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         PackFile_ConstTable * const in_seg = inputs[i]->pf->cur_cs->const_table;
 
         for (j = 0; j < in_seg->pmc.const_count; j++) {
-            PMC *v = in_seg->pmc.constants[j];
+            PMC * const v = in_seg->pmc.constants[j];
 
             /* If it's a sub PMC, need to deal with offsets. */
             switch (v->vtable->base_type) {
@@ -826,7 +822,7 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     ct->code        = bc;
     interp->code    = bc;
 
-    pbc_merge_debugs(interp, inputs, num_inputs, merged, bc);
+    pbc_merge_debugs(interp, inputs, num_inputs, bc);
 
     /* Walk bytecode and fix ops that reference the constants table. */
     pbc_fixup_bytecode(interp, inputs, num_inputs, bc);

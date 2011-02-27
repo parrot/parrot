@@ -1857,6 +1857,7 @@ Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         switch (c) {
           case '-':
             sign = -1;
+            /* Fall through. */
           case '+':
             c = count-- > 0 ? STRING_iter_get_and_advance(interp, s, &iter) : 0;
             break;

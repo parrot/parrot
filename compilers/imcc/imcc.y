@@ -610,6 +610,7 @@ iSUBROUTINE(ARGMOD(imc_info_t *imcc), ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymR
 {
     ASSERT_ARGS(iSUBROUTINE)
     Instruction * const i = iLABEL(imcc, unit, r);
+    i->type              |= ITPCCPARAM;
 
     r->type    = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
     r->pcc_sub = mem_gc_allocate_zeroed_typed(imcc->interp, pcc_sub_t);
@@ -1068,7 +1069,7 @@ do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
 %type <s> relop any_string assign_op  bin_op  un_op
 %type <i> labels _labels label  statement sub_call
 %type <i> pcc_sub_call
-%type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results sub_param_type_def
+%type <sr> sub_param pcc_arg pcc_result pcc_args pcc_results sub_param_type_def
 %type <sr> pcc_returns pcc_yields pcc_return pcc_call arg arglist the_sub multi_type
 %type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
@@ -1344,27 +1345,37 @@ sub:
                 imcc->cur_unit->instructions->symregs[0];
           }
         }
-     sub_params
-     sub_body  ESUB  { $$ = 0; imcc->cur_call = NULL; }
-   ;
-
-sub_params:
-     /* empty */     { $$ = 0; } %prec LOW_PREC
-   | sub_params '\n' { $$ = 0; }
-   | sub_params sub_param '\n'
-         {
-           if (imcc->adv_named_id) {
-                 add_pcc_named_param(imcc, imcc->cur_call,
-                                     imcc->adv_named_id, $2);
-                 imcc->adv_named_id = NULL;
-           }
-           else
-               add_pcc_arg(imcc, imcc->cur_call, $2);
-         }
+     sub_body  ESUB            { $$ = 0; imcc->cur_call = NULL; }
    ;
 
 sub_param:
-   PARAM { imcc->is_def = 1; } sub_param_type_def { $$ = $3; imcc->is_def = 0; }
+   PARAM
+   { imcc->is_def = 1; }
+   sub_param_type_def '\n'
+         {
+           if (/* IMCC_INFO(interp)->cur_unit->last_ins->op
+           ||  */ !(imcc->cur_unit->last_ins->type & ITPCCPARAM)) {
+               SymReg *r;
+               Instruction *i;
+               char name[128];
+               snprintf(name, sizeof (name), "%cpcc_params_%d",
+                        IMCC_INTERNAL_CHAR, imcc->cnr++);
+               r = mk_symreg(imcc, name, 0);
+               r->type    = VT_PCC_SUB;
+               r->pcc_sub = mem_gc_allocate_zeroed_typed(imcc->interp, pcc_sub_t);
+               i = iLABEL(imcc, imcc->cur_unit, r);
+               imcc->cur_call = r;
+               i->type = ITPCCPARAM;
+           }
+           if (imcc->adv_named_id) {
+                 add_pcc_named_param(imcc, imcc->cur_call,
+                                     imcc->adv_named_id, $3);
+                 imcc->adv_named_id = NULL;
+           }
+           else
+               add_pcc_arg(imcc, imcc->cur_call, $3);
+         }
+   { imcc->is_def = 0; }
    ;
 
 sub_param_type_def:
@@ -1536,7 +1547,7 @@ pcc_sub_call:
      PCC_BEGIN '\n'
          {
            char name[128];
-           SymReg *r, *r1;
+           SymReg *r;
            Instruction *i;
 
            snprintf(name, sizeof (name), "%cpcc_sub_call_%d",
@@ -1549,11 +1560,6 @@ pcc_sub_call:
            i = iLABEL(imcc, imcc->cur_unit, r);
            imcc->cur_call = r;
            i->type = ITPCCSUB;
-           /*
-            * if we are inside a pcc_sub mark the sub as doing a
-            * sub call; the sub is in r[0] of the first ins
-            */
-           r1 = imcc->cur_unit->instructions->symregs[0];
          }
      pcc_args
      opt_invocant
@@ -1793,13 +1799,14 @@ helper_clear_state:
    ;
 
 statement:
-     helper_clear_state
-     instruction        { $$ = $2; }
-   | MACRO '\n'         { $$ = 0; }
-   | FILECOMMENT        { $$ = 0; }
-   | LINECOMMENT        { $$ = 0; }
-   | location_directive { $$ = 0; }
-   | annotate_directive { $$ = $1; }
+     sub_param                 { $$ = 0; }
+   | helper_clear_state
+     instruction               { $$ = $2; }
+   | MACRO '\n'                { $$ = 0; }
+   | FILECOMMENT               { $$ = 0; }
+   | LINECOMMENT               { $$ = 0; }
+   | location_directive        { $$ = 0; }
+   | annotate_directive        { $$ = $1; }
    ;
 
 labels:

@@ -593,8 +593,8 @@ inline op set_addr(invar PMC, invar LABEL) {
 }
 
 inline op get_addr(out INT, invar PMC) {
-    void *ptr = VTABLE_get_pointer(interp, $2);
-    $1        = (INTVAL)ptr;
+    void * const ptr = VTABLE_get_pointer(interp, $2);
+    $1 = (INTVAL)ptr;
 }
 
 =back
@@ -832,7 +832,7 @@ op finalize(in PMC) {
         if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "ExceptionHandler")))
             eh = $1;
         else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "Exception"))) {
-            PMC *iter = VTABLE_get_attr_str(interp,
+            PMC * const iter = VTABLE_get_attr_str(interp,
                                             $1, Parrot_str_new_constant(interp, "handler_iter"));
             if (!PMC_IS_NULL(iter))
                 eh = VTABLE_get_pmc_keyed_int(interp, iter, -1);
@@ -1399,7 +1399,7 @@ inline op annotations(out PMC, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 LICENSE
 

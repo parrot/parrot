@@ -188,7 +188,6 @@ Creates and returns a clone of the NCI.
     VTABLE PMC *clone() {
         Parrot_NCI_attributes * const nci_info_self = PARROT_NCI(SELF);
         Parrot_NCI_attributes *nci_info_ret;
-        void                  *orig_func;
 
         PMC * const ret     = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         nci_info_ret        = PARROT_NCI(ret);

@@ -966,6 +966,8 @@
 ^/t/perl/Parrot_Test_1\.pasm/
 ^/t/perl/Parrot_Test_1\.pir$
 ^/t/perl/Parrot_Test_1\.pir/
+^/t/pir/pbc_fallback_1\.pbc$
+^/t/pir/pbc_fallback_1\.pbc/
 ^/t/pir/pbc_fallback_1\.pir$
 ^/t/pir/pbc_fallback_1\.pir/
 ^/t/pmc/.*\.out$

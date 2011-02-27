@@ -786,9 +786,8 @@ static void
 gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_gms_mark_and_sweep)
-    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    Parrot_Pointer_Array      *list;
-    int               i, gen = -1;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    int gen = -1;
 
     UNUSED(flags);
 
@@ -1221,8 +1220,8 @@ static void
 gc_gms_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_mark_pmc_header)
-    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    pmc_alloc_struct  *item = PMC2PAC(pmc);
+    MarkSweep_GC      * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    pmc_alloc_struct  * const item = PMC2PAC(pmc);
     size_t             gen  = POBJ2GEN(pmc);
 
     PARROT_ASSERT(!PObj_on_free_list_TEST(pmc)
@@ -1261,7 +1260,6 @@ static void
 gc_gms_mark_str_header(PARROT_INTERP, ARGIN_NULLOK(STRING *str))
 {
     ASSERT_ARGS(gc_gms_mark_str_header)
-    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     if (str)
         PObj_live_SET(str);
 }
@@ -1280,7 +1278,7 @@ static void
 gc_gms_compact_memory_pool(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_compact_memory_pool)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     Parrot_gc_str_compact_pool(interp, &self->string_gc);
 }
@@ -1329,7 +1327,7 @@ static void*
 gc_gms_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_allocate_pmc_attributes)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     const size_t  attr_size = pmc->vtable->attr_size;
     PMC_data(pmc) = Parrot_gc_fixed_allocator_allocate(interp,
                         self->fixed_size_allocator, attr_size);
@@ -1346,7 +1344,7 @@ gc_gms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_free_pmc_attributes)
     if (PMC_data(pmc)) {
-        MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+        MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
         Parrot_gc_fixed_allocator_free(interp, self->fixed_size_allocator,
                 PMC_data(pmc), pmc->vtable->attr_size);
 
@@ -1360,7 +1358,7 @@ static void*
 gc_gms_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_gms_allocate_fixed_size_storage)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     interp->gc_sys->stats.memory_used           += size;
     interp->gc_sys->stats.mem_used_last_collect += size;
@@ -1373,7 +1371,7 @@ gc_gms_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
 {
     ASSERT_ARGS(gc_gms_free_fixed_size_storage)
     if (data) {
-        MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+        MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
         interp->gc_sys->stats.memory_used           -= size;
         interp->gc_sys->stats.mem_used_last_collect -= size;
@@ -1396,7 +1394,7 @@ static size_t
 gc_gms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
 {
     ASSERT_ARGS(gc_gms_get_gc_info)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     if (which == IMPATIENT_PMCS)
         return self->num_early_gc_PMCs;
@@ -1433,7 +1431,7 @@ static void
 gc_gms_finalize(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_finalize)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t        i;
 
     Parrot_gc_str_finalize(interp, &self->string_gc);
@@ -1454,7 +1452,7 @@ static PMC*
 gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_gms_allocate_pmc_header)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Pool_Allocator   * const pool = self->pmc_allocator;
     pmc_alloc_struct *item;
 
@@ -1476,7 +1474,7 @@ static void
 gc_gms_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_free_pmc_header)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     if (pmc) {
         size_t gen = POBJ2GEN(pmc);
@@ -1514,9 +1512,9 @@ static int
 gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_gms_is_pmc_ptr)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    PObj             *obj  = (PObj *)ptr;
-    pmc_alloc_struct *item = PMC2PAC(ptr);
+    MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    PObj             * const obj  = (PObj *)ptr;
+    pmc_alloc_struct * const item = PMC2PAC(ptr);
     size_t            i;
 
     if (!obj || !item)
@@ -1586,8 +1584,8 @@ static STRING*
 gc_gms_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
 {
     ASSERT_ARGS(gc_gms_allocate_string_header)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    Pool_Allocator   *pool = self->string_allocator;
+    MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    Pool_Allocator   * const pool = self->string_allocator;
     string_alloc_struct *item;
     STRING           *ret;
 
@@ -1610,12 +1608,10 @@ static void
 gc_gms_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
 {
     ASSERT_ARGS(gc_gms_free_string_header)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
-    if (s
-    && !PObj_on_free_list_TEST(s)) {
-        MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-        size_t        gen  = POBJ2GEN(s);
+    if (s && !PObj_on_free_list_TEST(s)) {
+        MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+        const size_t         gen = POBJ2GEN(s);
 
         Parrot_pa_remove(interp, self->strings[gen], STR2PAC(s)->ptr);
 
@@ -1663,9 +1659,9 @@ static int
 gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_gms_is_string_ptr)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    PObj             *obj  = (PObj *)ptr;
-    string_alloc_struct *item = STR2PAC(ptr);
+    MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    PObj             * const obj  = (PObj *)ptr;
+    string_alloc_struct * const item = STR2PAC(ptr);
     size_t            i;
 
     if (!obj || !item)
@@ -1713,7 +1709,7 @@ static void
 gc_gms_allocate_string_storage(PARROT_INTERP, ARGIN(STRING *str), size_t size)
 {
     ASSERT_ARGS(gc_gms_allocate_string_storage)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Parrot_gc_str_allocate_string_storage(interp, &self->string_gc, str, size);
     interp->gc_sys->stats.memory_used           += size;
     interp->gc_sys->stats.mem_used_last_collect += size;
@@ -1723,7 +1719,7 @@ static void
 gc_gms_reallocate_string_storage(PARROT_INTERP, ARGIN(STRING *str), size_t size)
 {
     ASSERT_ARGS(gc_gms_reallocate_string_storage)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Parrot_gc_str_reallocate_string_storage(interp, &self->string_gc, str, size);
     interp->gc_sys->stats.memory_used           += size;
     interp->gc_sys->stats.mem_used_last_collect += size;
@@ -1733,7 +1729,7 @@ static void
 gc_gms_allocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
 {
     ASSERT_ARGS(gc_gms_allocate_buffer_storage)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Parrot_gc_str_allocate_buffer_storage(interp, &self->string_gc, str, size);
     interp->gc_sys->stats.memory_used           += size;
     interp->gc_sys->stats.mem_used_last_collect += size;
@@ -1743,7 +1739,7 @@ static void
 gc_gms_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
 {
     ASSERT_ARGS(gc_gms_reallocate_buffer_storage)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Parrot_gc_str_reallocate_buffer_storage(interp, &self->string_gc, str, size);
     interp->gc_sys->stats.memory_used           += size;
     interp->gc_sys->stats.mem_used_last_collect += size;
@@ -1763,8 +1759,8 @@ static void
 gc_gms_sweep_string_cb(PARROT_INTERP, ARGIN(PObj *obj))
 {
     ASSERT_ARGS(gc_gms_sweep_string_cb)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    Buffer       *str  = (Buffer *)obj;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    Buffer       * const str  = (Buffer *)obj;
     /* Compact string pool here. Or get rid of "shared buffers" and just free storage */
     if (Buffer_bufstart(str) && !PObj_external_TEST(str))
         Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, str);
@@ -1788,7 +1784,7 @@ gc_gms_iterate_live_strings(PARROT_INTERP,
 {
     ASSERT_ARGS(gc_gms_iterate_live_strings)
 
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t             i;
     for (i = 0; i < MAX_GENERATIONS; i++) {
         POINTER_ARRAY_ITER(self->strings[i],
@@ -1834,7 +1830,7 @@ static void
 gc_gms_block_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_block_GC_mark)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     ++self->gc_mark_block_level;
     Parrot_shared_gc_block(interp);
 }
@@ -1843,7 +1839,7 @@ static void
 gc_gms_unblock_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_unblock_GC_mark)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     if (self->gc_mark_block_level) {
         --self->gc_mark_block_level;
         Parrot_shared_gc_unblock(interp);
@@ -1854,7 +1850,7 @@ static void
 gc_gms_block_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_block_GC_sweep)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     ++self->gc_sweep_block_level;
 }
 
@@ -1862,7 +1858,7 @@ static void
 gc_gms_unblock_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_unblock_GC_sweep)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     if (self->gc_sweep_block_level)
         --self->gc_sweep_block_level;
 }
@@ -1871,7 +1867,7 @@ static unsigned int
 gc_gms_is_blocked_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_is_blocked_GC_mark)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     return self->gc_mark_block_level;
 }
 
@@ -1879,7 +1875,7 @@ static unsigned int
 gc_gms_is_blocked_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_is_blocked_GC_sweep)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     return self->gc_sweep_block_level;
 }
 
@@ -2006,7 +2002,7 @@ static void
 gc_gms_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_pmc_needs_early_collection)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     ++self->num_early_gc_PMCs;
 }
 
@@ -2025,7 +2021,7 @@ gc_gms_maybe_mark_and_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_maybe_mark_and_sweep)
 
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     /* Collect every gc_threshold. */
     if (interp->gc_sys->stats.mem_used_last_collect > self->gc_threshold) {
@@ -2046,9 +2042,9 @@ static void
 gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_write_barrier)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    size_t            gen  = POBJ2GEN(pmc);
-    pmc_alloc_struct *item = PMC2PAC(pmc);
+    MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    const size_t             gen  = POBJ2GEN(pmc);
+    pmc_alloc_struct * const item = PMC2PAC(pmc);
 
     if (pmc->flags & PObj_GC_on_dirty_list_FLAG)
         return;
@@ -2084,7 +2080,7 @@ static void *
 gc_gms_get_low_str_ptr(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_get_low_str_ptr)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     return Parrot_gc_pool_low_ptr(interp, self->string_allocator);
 }
 
@@ -2093,7 +2089,7 @@ static void *
 gc_gms_get_high_str_ptr(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_get_high_str_ptr)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     return Parrot_gc_pool_high_ptr(interp, self->string_allocator);
 }
 
@@ -2102,7 +2098,7 @@ static void *
 gc_gms_get_low_pmc_ptr(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_get_low_pmc_ptr)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     return Parrot_gc_pool_low_ptr(interp, self->pmc_allocator);
 }
 
@@ -2111,7 +2107,7 @@ static void *
 gc_gms_get_high_pmc_ptr(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_get_high_pmc_ptr)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     return Parrot_gc_pool_high_ptr(interp, self->pmc_allocator);
 }
 
@@ -2225,7 +2221,7 @@ gc_gms_check_sanity(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_check_sanity)
 #ifdef DETAIL_MEMORY_DEBUG
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            i;
 
     for (i = 0; i < MAX_GENERATIONS; i++) {
@@ -2273,7 +2269,7 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
 {
     ASSERT_ARGS(gc_gms_print_stats_always)
 
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            i;
 
     fprintf(stderr, "%s\ntotal: %lu\ngen: %lu\n", header,
@@ -2364,7 +2360,7 @@ gc_gms_validate_objects(PARROT_INTERP)
 
 #if defined(PARROT_GC_VALIDATE) || !defined(NDEBUG)
     INTVAL i;
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     interp->gc_sys->mark_pmc_header = gc_gms_validate_pmc;
     interp->gc_sys->mark_str_header = gc_gms_validate_str;
@@ -2374,7 +2370,7 @@ gc_gms_validate_objects(PARROT_INTERP)
 
     for (i = 0; i < MAX_GENERATIONS; i++) {
         POINTER_ARRAY_ITER(self->objects[i],
-            PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
+            PMC * const pmc = &((pmc_alloc_struct *)ptr)->pmc;
             PObj_live_CLEAR(pmc););
     }
 #endif
@@ -2398,8 +2394,8 @@ gc_gms_pmc_get_youngest_generation(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_pmc_get_youngest_generation)
 
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    size_t            gen  = POBJ2GEN(pmc);
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    const size_t         gen  = POBJ2GEN(pmc);
 
     if (gen < self->youngest_child)
         self->youngest_child = gen;
@@ -2410,8 +2406,8 @@ gc_gms_str_get_youngest_generation(PARROT_INTERP, ARGIN(STRING *str))
 {
     ASSERT_ARGS(gc_gms_str_get_youngest_generation)
 
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    size_t            gen  = POBJ2GEN(str);
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    const size_t         gen  = POBJ2GEN(str);
 
     if (gen < self->youngest_child)
         self->youngest_child = gen;

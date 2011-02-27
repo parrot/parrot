@@ -300,7 +300,7 @@ Wait for process with C<pid> to exit.
 */
 
 INTVAL
-Parrot_proc_waitpid(PARROT_INTERP, INTVAL pid)
+Parrot_proc_waitpid(SHIM_INTERP, INTVAL pid)
 {
     int status;
 

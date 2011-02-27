@@ -213,13 +213,14 @@ static PackFile_ConstTable * find_constants(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL find_pf_ann_idx(PARROT_INTERP,
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+static INTVAL find_pf_ann_idx(
     ARGIN(PackFile_Annotations *pfa),
     ARGIN(PackFile_Annotations_Key *key),
     UINTVAL offs)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 static void load_file(PARROT_INTERP, ARGIN(STRING *path))
         __attribute__nonnull__(1)
@@ -255,9 +256,8 @@ static PMC * PackFile_Constant_unpack_pmc(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC * packfile_main(PARROT_INTERP, ARGIN(PackFile_ByteCode *bc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static PMC * packfile_main(ARGIN(PackFile_ByteCode *bc))
+        __attribute__nonnull__(1);
 
 static void PackFile_set_header(ARGOUT(PackFile_Header *header))
         __attribute__nonnull__(1)
@@ -413,8 +413,7 @@ static int sub_pragma(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
 #define ASSERT_ARGS_find_pf_ann_idx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pfa) \
+       PARROT_ASSERT_ARG(pfa) \
     , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_load_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -434,8 +433,7 @@ static int sub_pragma(PARROT_INTERP,
     , PARROT_ASSERT_ARG(constt) \
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_packfile_main __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(bc))
+       PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_PackFile_set_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_pf_debug_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -655,7 +653,7 @@ static PMC*
 run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
     ASSERT_ARGS(run_sub)
-    Parrot_runcore_t *old_core = interp->run_core;
+    Parrot_runcore_t * const old_core = interp->run_core;
     PMC              *retval   = PMCNULL;
 
     Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
@@ -692,7 +690,7 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
       case PBC_IMMEDIATE:
         /* run IMMEDIATE sub */
         if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_IMMEDIATE) {
-            void *lo_var_ptr = interp->lo_var_ptr;
+            void * const lo_var_ptr = interp->lo_var_ptr;
             PMC  *result;
 
             PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_IMMEDIATE;
@@ -867,7 +865,7 @@ mark_const_subs(PARROT_INTERP)
 
 /*
 
-=item C<static PMC * packfile_main(PARROT_INTERP, PackFile_ByteCode *bc)>
+=item C<static PMC * packfile_main(PackFile_ByteCode *bc)>
 
 Access the main function of a bytecode segment.
 
@@ -877,10 +875,10 @@ Access the main function of a bytecode segment.
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-packfile_main(PARROT_INTERP, ARGIN(PackFile_ByteCode *bc))
+packfile_main(ARGIN(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(packfile_main)
-    PackFile_ConstTable *ct = bc->const_table;
+    const PackFile_ConstTable * const ct = bc->const_table;
     return ct->pmc.constants[bc->main_sub];
 }
 
@@ -916,7 +914,7 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
 
     for (i = 0; i < ct->pmc.const_count; ++i) {
         STRING * const SUB = CONST_STRING(interp, "Sub");
-        PMC *sub_pmc = ct->pmc.constants[i];
+        PMC * const sub_pmc = ct->pmc.constants[i];
 
         if (VTABLE_isa(interp, sub_pmc, SUB)) {
             Parrot_Sub_attributes *sub;
@@ -943,9 +941,9 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
                     "No main sub found");
             {
-                PMC  *mainsub         = packfile_main(interp, self);
+                PMC *      const mainsub = packfile_main(self);
+                opcode_t * const ptr     = (opcode_t *)VTABLE_get_pointer(interp, mainsub);
                 Parrot_Sub_attributes *main_attrs;
-                opcode_t *ptr         = (opcode_t *)VTABLE_get_pointer(interp, mainsub);
                 PMC_get_sub(interp, mainsub, main_attrs);
                 interp->resume_offset = (ptr - main_attrs->seg->base.data);
                 Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), mainsub);
@@ -1694,11 +1692,8 @@ create_seg(PARROT_INTERP, ARGMOD(PackFile_Directory *dir), pack_file_types t,
            ARGIN(STRING *name), ARGIN(STRING *file_name), int add)
 {
     ASSERT_ARGS(create_seg)
-    PackFile_Segment *seg;
-    STRING           *seg_name;
-
-    seg_name = Parrot_sprintf_c(interp, "%Ss_%Ss", name, file_name);
-    seg = PackFile_Segment_new_seg(interp, dir, t, seg_name, add);
+    STRING *           const seg_name = Parrot_sprintf_c(interp, "%Ss_%Ss", name, file_name);
+    PackFile_Segment * const seg      = PackFile_Segment_new_seg(interp, dir, t, seg_name, add);
     return seg;
 }
 
@@ -1712,6 +1707,7 @@ Get the interpreter's currently active PackFile
 
 */
 
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 PackFile *
 Parrot_pf_get_current_packfile(PARROT_INTERP)
@@ -1730,6 +1726,7 @@ Get's the interpreter's currently active bytecode segment
 
 */
 
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode *
 Parrot_pf_get_current_code_segment(PARROT_INTERP)
@@ -2152,7 +2149,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         const opcode_t * const csave = cursor;
 
         /* check len again */
-        size_t tmp   = PF_fetch_opcode(pf, &cursor);
+        const size_t tmp = PF_fetch_opcode(pf, &cursor);
 
         /* keep gcc -O silent */
         size_t delta = 0;
@@ -2209,7 +2206,7 @@ directory_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     size_t i;
 
     for (i = 0; i < dir->num_segments; ++i) {
-        PackFile_Segment *segment = dir->segments[i];
+        PackFile_Segment * const segment = dir->segments[i];
         /* Prevent repeated destruction */
         dir->segments[i] = NULL;
 
@@ -2551,7 +2548,7 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     if (byte_code->op_info_table)
         mem_gc_free(interp, byte_code->op_info_table);
     if (byte_code->op_mapping.libs) {
-        opcode_t n_libs = byte_code->op_mapping.n_libs;
+        const opcode_t n_libs = byte_code->op_mapping.n_libs;
         opcode_t i;
 
         for (i = 0; i < n_libs; i++) {
@@ -2595,7 +2592,7 @@ static PackFile_Segment *
 byte_code_new(PARROT_INTERP, SHIM(PackFile *pf), SHIM(STRING *name), SHIM(int add))
 {
     ASSERT_ARGS(byte_code_new)
-    PackFile_ByteCode *byte_code = mem_gc_allocate_zeroed_typed(interp, PackFile_ByteCode);
+    PackFile_ByteCode * const byte_code = mem_gc_allocate_zeroed_typed(interp, PackFile_ByteCode);
     byte_code->main_sub          = -1;
 
     return (PackFile_Segment *) byte_code;
@@ -2737,9 +2734,10 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
                                     PackFile_ByteCode_OpMappingEntry);
 
     for (u = 0; u < byte_code->n_libdeps; u++) {
-        STRING *libname = PF_fetch_string(interp, self->pf, &cursor);
-        PMC    *lib_pmc = Parrot_dyn_load_lib(interp, libname, NULL);
+        STRING * const libname = PF_fetch_string(interp, self->pf, &cursor);
+        PMC    * const lib_pmc = Parrot_dyn_load_lib(interp, libname, NULL);
         byte_code->libdeps[u] = libname;
+        UNUSED(lib_pmc);
     }
 
     for (i = 0; i < byte_code->op_mapping.n_libs; i++) {
@@ -2759,7 +2757,7 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
                 entry->lib = PARROT_CORE_OPLIB_INIT(interp, 1);
             }
             else {
-                PMC *lib_pmc = Parrot_dyn_load_lib(interp,
+                PMC * const lib_pmc = Parrot_dyn_load_lib(interp,
                                                 Parrot_str_new(interp, lib_name, 0),
                                                 NULL);
                 typedef op_lib_t *(*oplib_init_t)(PARROT_INTERP, long init);
@@ -2971,7 +2969,7 @@ pf_debug_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(const opcod
        name. So we can't find the bytecode seg without knowing the filename.
        But with the new scheme we can have many file names. For now, just
        base this on the name of the debug segment. */
-    STRING *code_name = NULL;
+    STRING *code_name;
     size_t str_len;
 
     /* Number of mappings. */
@@ -3110,11 +3108,10 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
     ASSERT_ARGS(Parrot_debug_add_mapping)
     PackFile_ConstTable * const    ct         = debug->code->const_table;
     int                            insert_pos = 0;
-    opcode_t                       prev_filename_n;
 
     /* If the previous mapping has the same filename, don't record it. */
     if (debug->num_mappings) {
-        prev_filename_n = debug->mappings[debug->num_mappings-1].filename;
+        const opcode_t prev_filename_n = debug->mappings[debug->num_mappings-1].filename;
         if (ct->str.constants[prev_filename_n] &&
                 STRING_equal(interp, filename,
                     ct->str.constants[prev_filename_n])) {
@@ -3129,8 +3126,9 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
 
     /* Can it just go on the end? */
     if (debug->num_mappings == 0
-    ||  offset              >= debug->mappings[debug->num_mappings - 1].offset)
+    ||  offset              >= debug->mappings[debug->num_mappings - 1].offset) {
         insert_pos = debug->num_mappings;
+    }
     else {
         /* Find the right place and shift stuff that's after it. */
         int i;
@@ -3278,11 +3276,10 @@ clone_constant(PARROT_INTERP, ARGIN(PMC **c))
     STRING * const _sub = CONST_STRING(interp, "Sub");
 
     if (VTABLE_isa(interp, *c, _sub)) {
-        PMC                   *old_sub_pmc, *new_sub_pmc;
         Parrot_Sub_attributes *old_sub,     *new_sub;
 
-        old_sub_pmc   = *c;
-        new_sub_pmc   = Parrot_thaw_constants(interp, Parrot_freeze(interp, old_sub_pmc));
+        PMC * const old_sub_pmc = *c;
+        PMC * const new_sub_pmc = Parrot_thaw_constants(interp, Parrot_freeze(interp, old_sub_pmc));
 
         PMC_get_sub(interp, new_sub_pmc, new_sub);
         PMC_get_sub(interp, old_sub_pmc, old_sub);
@@ -3824,7 +3821,7 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
 
 /*
 
-=item C<static INTVAL find_pf_ann_idx(PARROT_INTERP, PackFile_Annotations *pfa,
+=item C<static INTVAL find_pf_ann_idx(PackFile_Annotations *pfa,
 PackFile_Annotations_Key *key, UINTVAL offs)>
 
 Find the index of the active annotation at the given offset.
@@ -3834,20 +3831,21 @@ Find the index of the active annotation at the given offset.
 */
 
 
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 static INTVAL
-find_pf_ann_idx(PARROT_INTERP, ARGIN(PackFile_Annotations *pfa),
-    ARGIN(PackFile_Annotations_Key *key), UINTVAL offs)
+find_pf_ann_idx(ARGIN(PackFile_Annotations *pfa),
+                ARGIN(PackFile_Annotations_Key *key), UINTVAL offs)
 {
     ASSERT_ARGS(find_pf_ann_idx)
-    UINTVAL hi, mid, lo;
-    UINTVAL mid_val;
+    UINTVAL hi, lo;
 
     lo = key->start;
     hi = key->start + key->len;
 
     while (1) {
-        mid     = (lo + hi) / 2;
-        mid_val = pfa->base.data[mid * 2 + ANN_ENTRY_OFF];
+        const UINTVAL mid = (lo + hi) / 2;
+        const UINTVAL mid_val = pfa->base.data[mid * 2 + ANN_ENTRY_OFF];
 
         if (mid_val < offs) {
             if (lo == mid)
@@ -3893,7 +3891,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
 
     /* See if we already have this key. */
     for (i = 0; i < self->num_keys; ++i) {
-        opcode_t test_key = self->keys[i].name;
+        const opcode_t test_key = self->keys[i].name;
         if (key == test_key) {
             key_id = i;
             break;
@@ -3931,7 +3929,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
     /* Lookup position where value will be inserted. */
     idx = self->keys[key_id].len == 0  ?
           self->keys[key_id].start * 2 :
-          (UINTVAL)(find_pf_ann_idx(interp, self, &self->keys[key_id], offset) + 1) * 2;
+          (UINTVAL)(find_pf_ann_idx(self, &self->keys[key_id], offset) + 1) * 2;
 
     /* Extend segment data and shift subsequent data by 2. */
     self->base.data = (opcode_t *)mem_sys_realloc(self->base.data,
@@ -3973,11 +3971,11 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
 
     if (STRING_IS_NULL(name)) {
         /* find all annotations for this offset */
-        PMC *result = Parrot_pmc_new(interp, enum_class_Hash);
+        PMC * const result = Parrot_pmc_new(interp, enum_class_Hash);
         INTVAL i;
         for (i = 0; i < self->num_keys; i++) {
-            STRING *k = self->code->const_table->str.constants[self->keys[i].name];
-            PMC    *v = PackFile_Annotations_lookup(interp, self, offset, k);
+            STRING * const k = self->code->const_table->str.constants[self->keys[i].name];
+            PMC    * const v = PackFile_Annotations_lookup(interp, self, offset, k);
             if (!PMC_IS_NULL(v))
                 VTABLE_set_pmc_keyed_str(interp, result, k, v);
         }
@@ -3991,7 +3989,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
         opcode_t val;
 
         for (i = 0; i < self->num_keys; i++) {
-            STRING *test_key = self->code->const_table->str.constants[self->keys[i].name];
+            STRING * const test_key = self->code->const_table->str.constants[self->keys[i].name];
             if (STRING_equal(interp, test_key, name)) {
                 key = &self->keys[i];
                 break;
@@ -4001,7 +3999,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
         if (!key)
             return PMCNULL; /* no such key */
 
-        i = find_pf_ann_idx(interp, self, key, offset);
+        i = find_pf_ann_idx(self, key, offset);
 
         if (i < 0)
             return PMCNULL; /* no active entry */
@@ -4036,9 +4034,9 @@ static void
 push_context(PARROT_INTERP)
 {
     ASSERT_ARGS(push_context)
-    UINTVAL regs_used[]     = { 2, 2, 2, 2 }; /* Arbitrary values */
+    const UINTVAL regs_used[] = { 2, 2, 2, 2 }; /* Arbitrary values */
     const int parrot_hll_id = 0;
-    PMC * context = Parrot_push_context(interp, regs_used);
+    PMC * const context = Parrot_push_context(interp, regs_used);
     Parrot_pcc_set_HLL(interp, context, parrot_hll_id);
     Parrot_pcc_set_namespace(interp, context,
             Parrot_hll_get_HLL_namespace(interp, parrot_hll_id));
@@ -4344,7 +4342,7 @@ PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
     ASSERT_ARGS(PackFile_read_pbc)
     PackFile  *pf;
     char      *program_code;
-    STRING    *stdin_filename = CONST_STRING(interp, "-");
+    STRING    * const stdin_filename = CONST_STRING(interp, "-");
     PIOHANDLE  io             = PIO_INVALID_HANDLE;
     INTVAL     is_mapped      = 0;
     INTVAL     program_size;

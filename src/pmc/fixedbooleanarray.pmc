@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -279,14 +279,12 @@ Returns the Parrot string representation of the array.
         UINTVAL i;
         const UINTVAL elems = SELF.elements();
 
-        STRING * const zero = CONST_STRING(INTERP, "0");
-        STRING * const one  = CONST_STRING(INTERP, "1");
+        const STRING * const zero = CONST_STRING(INTERP, "0");
+        const STRING * const one  = CONST_STRING(INTERP, "1");
 
         for (i = 0; i < elems; ++i) {
-            if (SELF.get_integer_keyed_int((INTVAL)i))
-                str = Parrot_str_concat(INTERP, str, one);
-            else
-                str = Parrot_str_concat(INTERP, str, zero);
+            str = Parrot_str_concat(INTERP, str,
+                SELF.get_integer_keyed_int((INTVAL)i) ? one : zero);
         }
 
         return str;

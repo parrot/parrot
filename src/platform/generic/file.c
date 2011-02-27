@@ -33,12 +33,11 @@ This file implements OS-specific file functions for generic UNIX platforms.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void convert_stat_buf(PARROT_INTERP,
+static void convert_stat_buf(
     ARGIN(struct stat *stat_buf),
     ARGOUT(Parrot_Stat_Buf *buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         FUNC_MODIFIES(*buf);
 
 static INTVAL stat_intval(PARROT_INTERP,
@@ -49,8 +48,7 @@ static INTVAL stat_intval(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_convert_stat_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(stat_buf) \
+       PARROT_ASSERT_ARG(stat_buf) \
     , PARROT_ASSERT_ARG(buf))
 #define ASSERT_ARGS_stat_intval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -181,8 +179,8 @@ Parrot_file_unlink(PARROT_INTERP, ARGIN(STRING *path))
 
 /*
 
-=item C<static void convert_stat_buf(PARROT_INTERP, struct stat *stat_buf,
-Parrot_Stat_Buf *buf)>
+=item C<static void convert_stat_buf(struct stat *stat_buf, Parrot_Stat_Buf
+*buf)>
 
 Converts a UNIX stat buffer to a Parrot stat buffer.
 
@@ -191,8 +189,7 @@ Converts a UNIX stat buffer to a Parrot stat buffer.
 */
 
 static void
-convert_stat_buf(PARROT_INTERP, ARGIN(struct stat *stat_buf),
-        ARGOUT(Parrot_Stat_Buf *buf))
+convert_stat_buf(ARGIN(struct stat *stat_buf), ARGOUT(Parrot_Stat_Buf *buf))
 {
     ASSERT_ARGS(convert_stat_buf)
     static const struct timespec zero = { 0, 0 };
@@ -282,7 +279,7 @@ Parrot_file_stat(PARROT_INTERP, ARGIN(STRING *file),
     if (status)
         THROW("stat");
 
-    convert_stat_buf(interp, &stat_buf, buf);
+    convert_stat_buf(&stat_buf, buf);
 }
 
 /*
@@ -309,7 +306,7 @@ Parrot_file_lstat(PARROT_INTERP, ARGIN(STRING *file),
     if (status)
         THROW("stat");
 
-    convert_stat_buf(interp, &stat_buf, buf);
+    convert_stat_buf(&stat_buf, buf);
 }
 
 /*
@@ -333,7 +330,7 @@ Parrot_file_fstat(PARROT_INTERP, PIOHANDLE os_handle,
     if (status)
         THROW("stat");
 
-    convert_stat_buf(interp, &stat_buf, buf);
+    convert_stat_buf(&stat_buf, buf);
 }
 
 /*

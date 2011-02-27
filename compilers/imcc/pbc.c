@@ -1705,12 +1705,19 @@ build_key(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *key_reg),
             /* don't emit mapped regs in key parts */
             regno = r->color >= 0 ? r->color : -1 - r->color;
 
-            if (r->set == 'I')
+            switch (r->set) {
+              case 'I':
                 Parrot_key_set_register(imcc->interp, tail, regno, KEY_integer_FLAG);
-            else if (r->set == 'S')
+                break;
+              case 'S':
                 Parrot_key_set_register(imcc->interp, tail, regno, KEY_string_FLAG);
-            else
+                break;
+              case 'P':
+                Parrot_key_set_register(imcc->interp, tail, regno, KEY_pmc_FLAG);
+                break;
+              default:
                 IMCC_fatal(imcc, 1, "build_key: wrong register set\n");
+            }
 
             IMCC_debug(imcc, DEBUG_PBC_CONST, " keypart reg %s %c%d\n",
                     r->name, r->set, (int)r->color);
