@@ -72,7 +72,7 @@ Get the length of a platform-encoded C string.
 */
 
 size_t
-Parrot_str_platform_strlen(PARROT_INTERP, const char *s)
+Parrot_str_platform_strlen(SHIM_INTERP, const char *s)
 {
     return strlen(s);
 }
