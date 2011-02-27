@@ -155,7 +155,7 @@ Create a new StructView for viewing buffers as described by the initializer.
 An initializer is an array-aggregate of integers. For example,
 C<FixedIntegerArray> will work for this purpose.
 
-The first elemnt of the initializer is interpreted as the type of the
+The first element of the initializer is interpreted as the type of the
 C<StructView>. There are three supported types of view: struct, indicated with
 the C<DATATYPE_STRUCT> flag; union, indicated with the C<DATATYPE_UNION> flag;
 and custom, indicated with the C<DATATYPE_SIZED> flag.
