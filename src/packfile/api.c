@@ -3835,7 +3835,8 @@ Find the index of the active annotation at the given offset.
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 static INTVAL
-find_pf_ann_idx(ARGIN(PackFile_Annotations *pfa), ARGIN(PackFile_Annotations_Key *key), UINTVAL offs)
+find_pf_ann_idx(ARGIN(PackFile_Annotations *pfa),
+                ARGIN(PackFile_Annotations_Key *key), UINTVAL offs)
 {
     ASSERT_ARGS(find_pf_ann_idx)
     UINTVAL hi, lo;
