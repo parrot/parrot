@@ -130,7 +130,6 @@ src/pmc/imageio.pmc
 src/pmc/namespace.pmc
 src/pmc/object.pmc
 src/pmc/sub.pmc
-src/pmc/threadinterpreter.pmc
 
 # Local Variables:
 #   mode: cperl
