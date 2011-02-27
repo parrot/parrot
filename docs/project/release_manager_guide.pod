@@ -164,8 +164,8 @@ Make sure everything works:
 
     make realclean
     perl Configure.pl --test ...
-    make world docs html 2>&1 | tee make_world_docs_html.log
-    make fulltest        2>&1 | tee make_fulltest.log
+    make world html 2>&1 | tee make_world_html.log
+    make fulltest   2>&1 | tee make_fulltest.log
 
 Note that running "make fulltest" takes a while and that separate
 harnesses are being run.
@@ -218,8 +218,8 @@ Untar F<parrot-a.b.c.tar.gz> into another area.
 Make sure everything works:
 
     perl Configure.pl
-    make world docs html 2>&1 | tee make_world_docs_html.log
-    make fulltest        2>&1 | tee make_fulltest.log
+    make world html 2>&1 | tee make_world_html.log
+    make fulltest   2>&1 | tee make_fulltest.log
 
 Verify that the version is correct and doesn't contain the suffix C<devel>:
 
