@@ -271,7 +271,7 @@ Parrot_gc_str_reallocate_buffer_storage(PARROT_INTERP,
     ASSERT_ARGS(Parrot_gc_str_reallocate_buffer_storage)
     Variable_Size_Pool * const pool = gc->memory_pool;
     char   *mem;
-    size_t  new_size, old_size, copysize;
+    size_t  new_size, copysize;
 
     /* we don't shrink buffers */
     if (newsize <= Buffer_buflen(buffer))
@@ -286,7 +286,6 @@ Parrot_gc_str_reallocate_buffer_storage(PARROT_INTERP,
      * The normal case is therefore always to allocate a new block
      */
     new_size = ALIGNED_STRING_SIZE(newsize);
-    old_size = ALIGNED_STRING_SIZE(Buffer_buflen(buffer));
 
     interp->gc_sys->stats.memory_used += new_size;
 
@@ -753,7 +752,6 @@ compact_pool(PARROT_INTERP,
         ARGMOD(Variable_Size_Pool *pool))
 {
     ASSERT_ARGS(compact_pool)
-    INTVAL        j;
     UINTVAL       total_size, new_size;
     Memory_Block *new_block;
 
