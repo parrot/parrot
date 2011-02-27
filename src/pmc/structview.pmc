@@ -223,6 +223,7 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
         switch (pack_type) {
           case enum_type_struct:
           case enum_type_union:
+            size  = 0;
             align = 1; /* sorry, no sub-byte alignment */
             incr  = 1;
             i     = 2;
