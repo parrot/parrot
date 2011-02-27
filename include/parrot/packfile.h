@@ -921,10 +921,12 @@ const opcode_t * PackFile_Annotations_unpack(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*seg);
 
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * Parrot_pf_get_current_code_segment(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 PackFile * Parrot_pf_get_current_packfile(PARROT_INTERP)
         __attribute__nonnull__(1);

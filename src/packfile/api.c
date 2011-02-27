@@ -214,13 +214,14 @@ static PackFile_ConstTable * find_constants(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL find_pf_ann_idx(PARROT_INTERP,
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+static INTVAL find_pf_ann_idx(
     ARGIN(PackFile_Annotations *pfa),
     ARGIN(PackFile_Annotations_Key *key),
     UINTVAL offs)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 static void load_file(PARROT_INTERP, ARGIN(STRING *path))
         __attribute__nonnull__(1)
@@ -256,9 +257,8 @@ static PMC * PackFile_Constant_unpack_pmc(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC * packfile_main(PARROT_INTERP, ARGIN(PackFile_ByteCode *bc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static PMC * packfile_main(ARGIN(PackFile_ByteCode *bc))
+        __attribute__nonnull__(1);
 
 static void PackFile_set_header(ARGOUT(PackFile_Header *header))
         __attribute__nonnull__(1)
@@ -414,8 +414,7 @@ static int sub_pragma(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
 #define ASSERT_ARGS_find_pf_ann_idx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pfa) \
+       PARROT_ASSERT_ARG(pfa) \
     , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_load_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -435,8 +434,7 @@ static int sub_pragma(PARROT_INTERP,
     , PARROT_ASSERT_ARG(constt) \
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_packfile_main __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(bc))
+       PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_PackFile_set_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_pf_debug_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -868,7 +866,7 @@ mark_const_subs(PARROT_INTERP)
 
 /*
 
-=item C<static PMC * packfile_main(PARROT_INTERP, PackFile_ByteCode *bc)>
+=item C<static PMC * packfile_main(PackFile_ByteCode *bc)>
 
 Access the main function of a bytecode segment.
 
@@ -878,10 +876,10 @@ Access the main function of a bytecode segment.
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-packfile_main(PARROT_INTERP, ARGIN(PackFile_ByteCode *bc))
+packfile_main(ARGIN(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(packfile_main)
-    PackFile_ConstTable * const ct = bc->const_table;
+    const PackFile_ConstTable * const ct = bc->const_table;
     return ct->pmc.constants[bc->main_sub];
 }
 
@@ -944,7 +942,7 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
                     "No main sub found");
             {
-                PMC *      const mainsub = packfile_main(interp, self);
+                PMC *      const mainsub = packfile_main(self);
                 opcode_t * const ptr     = (opcode_t *)VTABLE_get_pointer(interp, mainsub);
                 Parrot_Sub_attributes *main_attrs;
                 PMC_get_sub(interp, mainsub, main_attrs);
@@ -1710,6 +1708,7 @@ Get the interpreter's currently active PackFile
 
 */
 
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 PackFile *
 Parrot_pf_get_current_packfile(PARROT_INTERP)
@@ -1728,6 +1727,7 @@ Get's the interpreter's currently active bytecode segment
 
 */
 
+PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode *
 Parrot_pf_get_current_code_segment(PARROT_INTERP)
@@ -3822,7 +3822,7 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
 
 /*
 
-=item C<static INTVAL find_pf_ann_idx(PARROT_INTERP, PackFile_Annotations *pfa,
+=item C<static INTVAL find_pf_ann_idx(PackFile_Annotations *pfa,
 PackFile_Annotations_Key *key, UINTVAL offs)>
 
 Find the index of the active annotation at the given offset.
@@ -3832,9 +3832,10 @@ Find the index of the active annotation at the given offset.
 */
 
 
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 static INTVAL
-find_pf_ann_idx(PARROT_INTERP, ARGIN(PackFile_Annotations *pfa),
-    ARGIN(PackFile_Annotations_Key *key), UINTVAL offs)
+find_pf_ann_idx(ARGIN(PackFile_Annotations *pfa), ARGIN(PackFile_Annotations_Key *key), UINTVAL offs)
 {
     ASSERT_ARGS(find_pf_ann_idx)
     UINTVAL hi, lo;
@@ -3928,7 +3929,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
     /* Lookup position where value will be inserted. */
     idx = self->keys[key_id].len == 0  ?
           self->keys[key_id].start * 2 :
-          (UINTVAL)(find_pf_ann_idx(interp, self, &self->keys[key_id], offset) + 1) * 2;
+          (UINTVAL)(find_pf_ann_idx(self, &self->keys[key_id], offset) + 1) * 2;
 
     /* Extend segment data and shift subsequent data by 2. */
     self->base.data = (opcode_t *)mem_sys_realloc(self->base.data,
@@ -3998,7 +3999,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
         if (!key)
             return PMCNULL; /* no such key */
 
-        i = find_pf_ann_idx(interp, self, key, offset);
+        i = find_pf_ann_idx(self, key, offset);
 
         if (i < 0)
             return PMCNULL; /* no active entry */
