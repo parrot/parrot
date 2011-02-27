@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 68;
+plan tests => 72;
 
 =head1 NAME
 
@@ -162,6 +162,76 @@ CODE
 Done!
 OUTPUT
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_attribute");
+    type   = Parrot_PMC_typenum(interp, "Class");
+    pmc    = Parrot_PMC_new(interp, type);
+
+    string = createstring(interp,"foo");
+    Parrot_PMC_set_integer_native(interp, pmc2, 42);
+
+    Parrot_PMC_add_attribute(interp, pmc, string, pmc2);
+    Parrot_printf(interp,"42\n");
+    Parrot_PMC_remove_attribute(interp, pmc, string);
+    Parrot_printf(interp,"42\n");
+CODE
+42
+42
+Done!
+OUTPUT
+
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_method");
+    type   = Parrot_PMC_typenum(interp, "Class");
+    pmc    = Parrot_PMC_new(interp, type);
+
+    string = createstring(interp,"foo");
+    Parrot_PMC_set_integer_native(interp, pmc2, 42);
+
+    Parrot_PMC_add_method(interp, pmc, string, pmc2);
+    Parrot_printf(interp,"42\n");
+    Parrot_PMC_remove_method(interp, pmc, string);
+    Parrot_printf(interp,"42\n");
+CODE
+42
+42
+Done!
+OUTPUT
+
+# TODO remove_role
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_role");
+    type   = Parrot_PMC_typenum(interp, "Class");
+    pmc    = Parrot_PMC_new(interp, type);
+
+    type   = Parrot_PMC_typenum(interp, "Role");
+    pmc2   = Parrot_PMC_new(interp, type);
+
+    Parrot_PMC_add_role(interp, pmc, pmc2);
+    Parrot_printf(interp,"42\n");
+    /*
+    Parrot_PMC_remove_role(interp, pmc, pmc2);
+    Parrot_printf(interp,"42\n");
+    */
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_parent");
+    type   = Parrot_PMC_typenum(interp, "Class");
+    pmc    = Parrot_PMC_new(interp, type);
+    pmc2    = Parrot_PMC_new(interp, type);
+
+    Parrot_PMC_add_parent(interp, pmc, pmc2);
+    Parrot_printf(interp,"42\n");
+    Parrot_PMC_remove_parent(interp, pmc, pmc2);
+    Parrot_printf(interp,"42\n");
+CODE
+42
+42
+Done!
+OUTPUT
+
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_hashvalue");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
 
@@ -176,7 +246,7 @@ OUTPUT
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
 
-    integer = (Parrot_Int)Parrot_PMC_get_pointer(interp, pmc);
+    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, pmc);
     if (integer > 0)
         Parrot_printf(interp,"Got pointer!\n", integer);
 CODE
