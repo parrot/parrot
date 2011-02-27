@@ -99,7 +99,7 @@
     $P0    = new ['FixedIntegerArray'], 4
     $P0[0] = .DATATYPE_UNION
     $P0[1] = 2
-    $P0[2] = .DATATYPE_UINT
+    $P0[2] = .DATATYPE_USHORT
     $P0[3] = .DATATYPE_UCHAR
 
     .local pmc sv, buf
