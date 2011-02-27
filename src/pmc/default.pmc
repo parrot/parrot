@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -61,6 +61,7 @@ static INTVAL check_set_std_props(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*pmc);
 
+PARROT_WARN_UNUSED_RESULT
 static INTVAL has_pending_std_props(ARGIN(const PMC *self))
         __attribute__nonnull__(1);
 
@@ -254,6 +255,7 @@ Returns true if propagate_std_props() would create a non-empty prophash.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static INTVAL
 has_pending_std_props(ARGIN(const PMC *self))
 {
@@ -799,7 +801,7 @@ Calculate hashvalue for PMC. Default behaviour stringify and use string.
 */
 
     VTABLE INTVAL hashvalue() {
-        STRING *s = SELF.get_string();
+        STRING * const s = SELF.get_string();
         return STRING_hash(INTERP, s, INTERP->hash_seed);
     }
 
@@ -1024,7 +1026,7 @@ Provides introspection of a specific piece of information about the PMC.
 
     VTABLE PMC *inspect_str(STRING *name) {
         if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "flags"))) {
-            PMC *found = Parrot_pmc_new_init_int(INTERP, enum_class_Integer,
+            PMC * const found = Parrot_pmc_new_init_int(INTERP, enum_class_Integer,
                     (INTVAL)PObj_get_FLAGS(SELF));
             return found;
         }
