@@ -87,12 +87,13 @@ Creates and returns a copy of the array.
 
     VTABLE PMC *clone() {
 
+        STRING **my_str_array;
         PMC        *const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         GET_ATTR_str_array(INTERP, SELF, my_str_array);
 
         if (my_str_array) {
-            STRING **my_str_array, **dest_str_array;
+            STRING **dest_str_array;
             INTVAL size;
             size_t mem_size;
 
