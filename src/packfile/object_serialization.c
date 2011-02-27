@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -113,7 +113,7 @@ Parrot_freeze_pbc_size(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_Cons
         ARGOUT(Hash **seen))
 {
     ASSERT_ARGS(Parrot_freeze_pbc_size)
-    PMC *pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+    PMC * const pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     PMC *visitor, *pmc_result;
     DECL_CONST_CAST;
 
@@ -260,9 +260,9 @@ PMC*
 Parrot_thaw_pbc(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct), ARGMOD(const opcode_t **cursor))
 {
     ASSERT_ARGS(Parrot_thaw_pbc)
-    PackFile * const pf = ct->base.pf;
-    STRING *image       = PF_fetch_buf(interp, pf, cursor);
-    PMC *info           = Parrot_pmc_new(interp, enum_class_ImageIOThaw);
+    PackFile * const pf    = ct->base.pf;
+    STRING *   const image = PF_fetch_buf(interp, pf, cursor);
+    PMC *      const info  = Parrot_pmc_new(interp, enum_class_ImageIOThaw);
     VTABLE_set_pointer(interp, info, ct);
     VTABLE_set_string_native(interp, info, image);
     return VTABLE_get_pmc(interp, info);
