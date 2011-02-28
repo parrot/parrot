@@ -236,7 +236,7 @@ op new(out PMC, in STR, in INT) {
                           : PMCNULL;
 
     if (!PMC_IS_NULL(_class)) {
-        PMC *initial = Parrot_pmc_new(interp,
+        PMC * const initial = Parrot_pmc_new(interp,
                                       Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
         VTABLE_set_integer_native(interp, initial, $3);
         $1 = VTABLE_instantiate(interp, _class, initial);
@@ -264,7 +264,7 @@ op new(out PMC, in PMC, in INT) {
     if (type > enum_class_core_max) {
         PMC * const _class = Parrot_oo_get_class(interp, name_key);
         if (!PMC_IS_NULL(_class)) {
-            PMC *initial = Parrot_pmc_new(interp,
+            PMC * const initial = Parrot_pmc_new(interp,
                 Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
             VTABLE_set_integer_native(interp, initial, $3);
             $1 = VTABLE_instantiate(interp, _class, initial);
@@ -277,7 +277,7 @@ op new(out PMC, in PMC, in INT) {
 
     /* it's a typo */
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
         goto ADDRESS(dest);
@@ -300,7 +300,7 @@ op root_new(out PMC, in PMC, in INT) {
         PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, name_key);
         PMC * const _class   = Parrot_oo_get_class(interp, ns);
         if (!PMC_IS_NULL(_class)) {
-            PMC *initial = Parrot_pmc_new(interp,
+            PMC * const initial = Parrot_pmc_new(interp,
                 Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
             VTABLE_set_integer_native(interp, initial, $3);
             $1 = VTABLE_instantiate(interp, _class, initial);
@@ -313,7 +313,7 @@ op root_new(out PMC, in PMC, in INT) {
 
     /* it's a typo */
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
         goto ADDRESS(dest);
@@ -324,7 +324,7 @@ op root_new(out PMC, in PMC, in INT) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 LICENSE
 

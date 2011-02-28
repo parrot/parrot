@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -85,10 +85,10 @@ Set pointer to underlying PackFile_ConstTable
 
     VTABLE void set_pointer(void * pointer) {
         PackFile_Debug *p = (PackFile_Debug *) pointer;
-        INTVAL num_mappings = p->num_mappings;
-        PMC *mapping_offset = Parrot_pmc_new_init_int(INTERP,
+        const INTVAL num_mappings = p->num_mappings;
+        PMC * const mapping_offset = Parrot_pmc_new_init_int(INTERP,
                                                       enum_class_FixedIntegerArray, num_mappings);
-        PMC *mapping_filename = Parrot_pmc_new_init_int(INTERP,
+        PMC * const mapping_filename = Parrot_pmc_new_init_int(INTERP,
                                                       enum_class_FixedIntegerArray, num_mappings);
         INTVAL i;
 
@@ -110,7 +110,7 @@ Set pointer to underlying PackFile_ConstTable
 */
 
     VTABLE void *get_pointer() {
-        PackFile_Debug *p = (PackFile_Debug *) mem_gc_realloc_n_typed(INTERP,
+        PackFile_Debug * const p = (PackFile_Debug *) mem_gc_realloc_n_typed(INTERP,
                                                            SUPER(), sizeof (PackFile_Debug), char);
         INTVAL num_mappings;
         PMC *mapping_offset;

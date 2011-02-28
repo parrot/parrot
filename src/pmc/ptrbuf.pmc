@@ -1,0 +1,78 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+
+=head1 NAME
+
+src/pmc/ptrbuf.pmc - PtrBuf
+
+=head1 DESCRIPTION
+
+C<PtrBuf> is a pointer to a buffer. No affordances for memory management have
+been made. It has two things - a pointer and a size.
+
+=head2 VTABLEs
+
+=over 4
+
+=cut
+
+*/
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass PtrBuf extends Ptr auto_attrs {
+    ATTR UINTVAL size;
+
+/*
+
+=item C<void init()>
+
+C<PtrBuf> is always C<fat> and manages its own attributes. Let C<Ptr> know about this.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        PTR_FAT_SET(INTERP, SELF);
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+=item C<void set_integer_native(INTVAL i)>
+
+Get and set the buffer size.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        INTVAL i;
+        GET_ATTR_size(INTERP, SELF, i);
+        return i;
+    }
+
+    VTABLE void set_integer_native(INTVAL i) {
+        SET_ATTR_size(INTERP, SELF, i);
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

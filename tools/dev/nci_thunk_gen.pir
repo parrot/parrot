@@ -641,6 +641,7 @@ TEMPLATE
     PMC *       ret_object  = PMCNULL;
     %s
     %s;
+    UNUSED(ret_object);
     UNUSED(return_data); /* Potentially unused, at least */
 TEMPLATE
 

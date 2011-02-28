@@ -177,10 +177,11 @@ update_backref_hash(PARROT_INTERP,
 {
     ASSERT_ARGS(update_backref_hash)
     parrot_hash_iterate(seen, {
-        PMC *k = (PMC *)_bucket->key;
+        PMC * const k = (PMC *)_bucket->key;
         if (!Parrot_hash_get(interp, ct->pmc_hash, k)) {
-            UINTVAL idx = (UINTVAL)_bucket->value;
-            PMC *rec = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, 2);
+            const UINTVAL idx = (UINTVAL)_bucket->value;
+            PMC * const rec = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, 2);
+
             VTABLE_set_integer_keyed_int(interp, rec, 0, constno);
             VTABLE_set_integer_keyed_int(interp, rec, 1, idx);
             Parrot_hash_put(interp, ct->pmc_hash, k, rec);
@@ -217,7 +218,7 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
     self->pmc_hash = Parrot_hash_create(interp, enum_type_PMC, Hash_key_type_PMC_ptr);
     for (i = 0; i < self->pmc.const_count; i++) {
         Hash *seen;
-        PMC *c = self->pmc.constants[i];
+        PMC * const c = self->pmc.constants[i];
         size += PF_size_strlen(Parrot_freeze_pbc_size(interp, c, self, &seen)) - 1;
         update_backref_hash(interp, self, seen, i);
     }
@@ -268,7 +269,7 @@ PackFile_ConstTable_pack(PARROT_INTERP,
     self->pmc_hash = Parrot_hash_create(interp, enum_type_PMC, Hash_key_type_PMC_ptr);
     for (i = 0; i < self->pmc.const_count; i++) {
         Hash *seen;
-        PMC  *c = self->pmc.constants[i];
+        PMC * const c = self->pmc.constants[i];
         cursor  = Parrot_freeze_pbc(interp, c, self, cursor, &seen);
         update_backref_hash(interp, self, seen, i);
     }
@@ -330,7 +331,7 @@ PackFile_ConstTable_rlookup_str(PARROT_INTERP,
     }
 
     for (i = 0; i < ct->str.const_count; i++) {
-        STRING *sc = ct->str.constants[i];
+        STRING * const sc = ct->str.constants[i];
         if (STRING_equal(interp, s, sc)
         &&  s->encoding == sc->encoding) {
             return i;

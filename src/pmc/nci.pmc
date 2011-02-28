@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -187,11 +187,9 @@ Creates and returns a clone of the NCI.
 
     VTABLE PMC *clone() {
         Parrot_NCI_attributes * const nci_info_self = PARROT_NCI(SELF);
-        Parrot_NCI_attributes *nci_info_ret;
-        void                  *orig_func;
 
         PMC * const ret     = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
-        nci_info_ret        = PARROT_NCI(ret);
+        Parrot_NCI_attributes * const nci_info_ret = PARROT_NCI(ret);
 
         /* FIXME if data is malloced (JIT/i386!) then we need
          * the length of data here, to memcpy it
@@ -318,13 +316,12 @@ Return the arity of the NCI (the number of arguments).
 */
     METHOD arity() {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
-        INTVAL arity = 0;
 
         if (nci_info) {
             if (!nci_info->func)
                 build_func(INTERP, SELF, nci_info);
             if (nci_info->func) {
-                arity = nci_info->arity;
+                const INTVAL arity = nci_info->arity;
                 RETURN(INTVAL arity);
             }
         }

@@ -55,6 +55,9 @@ find( { wanted => \&wanted, no_chdir => 1 },
 our %deps;
 
 foreach my $file (sort grep /\.[hc]$/, @incfiles) {
+    # skip pmcs - we don't handle inheritance correctly
+    next if $file =~ m{^src/(?:dyn)?pmc/};
+
     open my $fh, '<', $file;
     my $guts;
     {

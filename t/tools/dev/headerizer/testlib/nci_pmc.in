@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 
 =head1 NAME
@@ -53,6 +53,8 @@ static void pcc_params(PARROT_INTERP,
 
 =item C<static void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes
 *nci_info, size_t sig_length)>
+
+Check and validate parameter signatures
 
 =cut
 

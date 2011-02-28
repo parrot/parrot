@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 
 =head1 NAME
@@ -45,7 +45,7 @@ Initialize PackfileBytecodeSegment.
 
 */
     VTABLE void init() {
-        Parrot_PackfileBytecodeSegment_attributes * attrs =
+        Parrot_PackfileBytecodeSegment_attributes * const attrs =
                 PARROT_PACKFILEBYTECODESEGMENT(SELF);
 
         PObj_custom_mark_SET(SELF);
@@ -89,11 +89,9 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
 */
 
     VTABLE void *get_pointer() {
-        INTVAL op_count, lib_count;
+        INTVAL op_count;
         size_t i;
 
-        STRING *oplib_name = CONST_STRING(INTERP, "oplib_name");
-        STRING *lib_ops    = CONST_STRING(INTERP, "lib_ops");
         PMC    *ops, *op_map;
 
         PackFile_ByteCode_OpMapping * mapping;
@@ -149,10 +147,9 @@ an op and the remaining PMCs being Integers.
 
     VTABLE void push_pmc(PMC *p) {
 
-        Parrot_PackfileBytecodeSegment_attributes *attrs =
+        const Parrot_PackfileBytecodeSegment_attributes * const attrs =
             PMC_data_typed(SELF, Parrot_PackfileBytecodeSegment_attributes*);
 
-        STRING *op_name;
         INTVAL  i, op_num, arr_size;
 
         if (!VTABLE_does(INTERP, p, CONST_STRING(INTERP, "array"))) {
