@@ -15,7 +15,6 @@
 
 /* TODO: detect these with configure */
 #define HAS_LONGLONG   0
-#define HAS_LONGDOUBLE 0
 
 /* &gen_from_enum(datatypes.pasm) subst(s/enum_type_(\w+)/uc("DATATYPE_$1")/e) */
 typedef enum {
@@ -111,11 +110,7 @@ const struct _data_types data_types[] = {
     /* native float types */
     { "float",      sizeof (float),              ALIGNOF(float) },
     { "double",     sizeof (double),             ALIGNOF(double) },
-#  if HAS_LONGDOUBLE
     { "longdouble", sizeof (long double),        ALIGNOF(long double)},
-#  else
-    { "longdouble", 0,                           0 },
-#  endif
 
     /* explicitly sized integer types */
     { "int8",       1,                           ALIGNOF(int /* TODO */) },

@@ -187,14 +187,12 @@ C<INTVAL>, C<FLOATVAL>, C<STRING>, and C<PMC>
 
 Integer: C<char>, C<uchar>, C<short>, C<ushort>, C<int>, C<uint>, C<long>,
 C<ulong>, C<longlong> (*), and C<ulonglong> (*)
-Float:   C<float>, C<double>, C<longdouble> (**)
-PMC:     data pointer (C<ptr>), function pointer (C<func_ptr>), buffer (C<sized>) (***)
+Float:   C<float>, C<double>, C<longdouble>
+PMC:     data pointer (C<ptr>), function pointer (C<func_ptr>), buffer (C<sized>) (**)
 
-(*)   Only available if your C system sports a C<long long> type.
+(*)  Only available if your C system sports a C<long long> type.
 
-(**)  Only available if your C system sports a C<long double> type.
-
-(***) Requires 2 additional following parameters - buffer size and alignment.
+(**) Requires 2 additional following parameters - buffer size and alignment.
 
 =item Explicitly Sized Types
 
@@ -311,9 +309,7 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
               case enum_type_FLOATVAL:
               case enum_type_float:
               case enum_type_double:
-#if HAS_LONGDOUBLE
               case enum_type_longdouble:
-#endif
                 elt_access = num_access;
                 break;
 
@@ -340,9 +336,6 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
 #if !HAS_64BIT
               case enum_type_int64:
               case enum_type_uint64:
-#endif
-#if !HAS_LONGDOUBLE
-              case enum_type_longdouble:
 #endif
                 Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                         "Unsupported struct element type `%Ss' (index %d)",
@@ -652,10 +645,8 @@ Get/Set a float-like element from a struct-pointer PMC.
                 return *(float *)ptr;
               case enum_type_double:
                 return *(double *)ptr;
-#if HAS_LONGDOUBLE
               case enum_type_longdouble:
                 return *(long double *)ptr;
-#endif
             }
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
@@ -678,11 +669,9 @@ Get/Set a float-like element from a struct-pointer PMC.
               case enum_type_double:
                 *(double *)ptr      = n;
                 return;
-#if HAS_LONGDOUBLE
               case enum_type_longdouble:
                 *(long double *)ptr = n;
                 return;
-#endif
             }
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
