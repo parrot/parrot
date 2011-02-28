@@ -371,6 +371,26 @@ our method to_c:pasttype<macro> ($trans, PAST::Op $chunk) {
     return $ret;
 }
 
+our method to_c:pasttype<macro_if> ($trans, PAST::Op $chunk) {
+    my @res;
+
+    @res.push('#if ');
+    # #if isn't parsed semantically yet.
+    @res.push($chunk[0]);
+    #@res.push(self.to_c($trans, $chunk[0]));
+    @res.push("\n");
+
+    # 'then'
+    @res.push(self.to_c($trans, $chunk[1]));
+
+    # 'else'
+    @res.push("\n#else\n" ~ self.to_c($trans, $chunk[2])) if $chunk[2];
+
+    @res.push("\n#endif\n");
+
+
+    join('', |@res);
+}
 our method to_c:pasttype<call> ($trans, PAST::Op $chunk) {
     join('',
         $chunk.name,
