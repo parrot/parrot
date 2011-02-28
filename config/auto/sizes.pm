@@ -31,10 +31,20 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    $conf->cc_gen('config/auto/sizes/test_c.in');
-    $conf->cc_build();
-    my %results = eval $conf->cc_run();
-    $conf->cc_clean();
+    my %results = map {
+        $_->[0] . 'size', test_size($conf, $_->[1])
+    } ( [ intval     => $conf->data->get('iv') ],
+        [ numval     => $conf->data->get('nv') ],
+        [ opcode     => $conf->data->get('opcode_t') ],
+        [ short      => 'short' ],
+        [ int        => 'int' ],
+        [ long       => 'long' ],
+        [ longlong   => 'long long' ],
+        [ ptr        => 'void *' ],
+        [ float      => 'float' ],
+        [ double     => 'double' ],
+        [ longdouble => 'long double' ],
+    );
 
     for ( keys %results ) {
         $conf->data->set( $_ => $results{$_} );
@@ -104,6 +114,18 @@ sub runstep {
 }
 
 #################### INTERNAL SUBROUTINES ####################
+
+sub test_size {
+    my ($conf, $type) = @_;
+
+    $conf->data->set(TEMP_type => $type);
+    $conf->cc_gen('config/auto/sizes/test_c.in');
+    $conf->cc_build();
+    my $ret = eval $conf->cc_run();
+    $conf->cc_clean();
+
+    return $ret;
+}
 
 sub _handle_intval_ptrsize_discrepancy {
     my $resultsref = shift;
