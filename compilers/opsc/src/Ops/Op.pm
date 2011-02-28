@@ -383,15 +383,27 @@ our method to_c:pasttype<call> ($trans, PAST::Op $chunk) {
 
 our method to_c:pasttype<if> ($trans, PAST::Op $chunk) {
     my @res;
-    @res.push('if (');
-    @res.push(self.to_c($trans, $chunk[0]));
-    @res.push(") ");
 
-    # 'then'
-    @res.push(self.to_c($trans, $chunk[1]));
+    if ($chunk<ternary>) {
+        @res.push(self.to_c($trans, $chunk[0]));
+        @res.push(" ? ");
+        # 'then'
+        @res.push(self.to_c($trans, $chunk[1]));
+        # 'else'
+        @res.push(" : ");
+        @res.push(self.to_c($trans, $chunk[2]));
+    }
+    else {
+        @res.push('if (');
+        @res.push(self.to_c($trans, $chunk[0]));
+        @res.push(") ");
 
-    # 'else'
-    @res.push("\nelse " ~ self.to_c($trans, $chunk[2])) if $chunk[2];
+        # 'then'
+        @res.push(self.to_c($trans, $chunk[1]));
+
+        # 'else'
+        @res.push("\nelse " ~ self.to_c($trans, $chunk[2])) if $chunk[2];
+    }
 
     join('', |@res);
 }

@@ -494,6 +494,14 @@ method term:sym<float_constant_long> ($/) { # longer to work-around lack of LTM
     );
 }
 
+method infix:sym<?:> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<if>,
+    );
+    # Override to emit ternary ops in .to_c
+    $past<ternary> := 1;
+    make $past;
+}
 
 method statement_control:sym<if> ($/) {
     my $past := PAST::Op.new(
