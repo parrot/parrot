@@ -404,6 +404,11 @@ inline op local_return(invar PMC) :flow {
     goto ADDRESS(next);
 }», "core.ops local_return");
 
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    foo = bar[42];
+}», "Array access");
+
 done_testing();
 
 
