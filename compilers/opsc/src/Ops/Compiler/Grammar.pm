@@ -351,7 +351,11 @@ rule blockoid {
 
 # Simplified parsing of declarator
 rule declarator {
-    <type_declarator> <variable=.ident> [ '[' <array_size=.integer> ']' ]? [ '=' <statement> ]? ';'
+    <type_declarator>  [ <declarator_name> ** ',' ] ';'
+}
+
+rule declarator_name {
+     <variable=.ident> [ '[' <array_size=.integer> ']' ]? [ '=' <statement> ]?
 }
 
 # No double poiners (for now?)

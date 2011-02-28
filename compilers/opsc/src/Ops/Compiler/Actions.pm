@@ -362,16 +362,20 @@ method blockoid ($/) {
 }
 
 method declarator ($/) {
-    my $past := PAST::Var.new(
-        :node($/),
-        :isdecl(1),
-        :name(~$<variable>),
-        :vivibase(~$<type_declarator>),
-    );
+    my $past := PAST::Block.new(:node($/));
+    for $<declarator_name> {
+        my $decl := PAST::Var.new(
+            :node($_),
+            :isdecl(1),
+            :name(~$_<variable>),
+            :vivibase(~$<type_declarator>),
+        );
 
-    $past.viviself($<statement>[0].ast) if $<statement>[0];
+        $decl.viviself($_<statement>[0].ast) if $_<statement>[0];
 
-    $past<array_size> := ~$<array_size><VALUE> if $<array_size>;
+        $decl<array_size> := ~$_<array_size><VALUE> if $_<array_size>;
+        $past.push($decl);
+    }
 
     make $past;
 }
