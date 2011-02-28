@@ -158,7 +158,7 @@ sub collect_test_environment_data {
     my $arch = $PConfig{cpuarch} eq 'sun4' ? 'sparc' : $PConfig{cpuarch};
     # add the 32/64 bit suffix to the cpuarch
     if ($arch !~ /\d$/) {
-      $arch .= 8 * $PConfig{opcode_t_size};
+      $arch .= 8 * $PConfig{opcodesize};
     }
     my $devel = $PConfig{DEVEL};
     # check for local-modifications if -d .git and query to continue

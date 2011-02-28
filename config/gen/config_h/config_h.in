@@ -115,7 +115,7 @@ typedef @hugefloatval@ HUGEFLOATVAL;
 
 #define INTVAL_SIZE @intvalsize@
 #define NUMVAL_SIZE @nvsize@
-#define OPCODE_T_SIZE @opcode_t_size@
+#define OPCODE_T_SIZE @opcodesize@
 #define PTR_SIZE @ptrsize@
 #define SHORT_SIZE @shortsize@
 #define INT_SIZE @intsize@
