@@ -77,11 +77,11 @@ ok($source ~~ /'0,' \s '0,' \s '1'/, "Labels handled correctly");
 my $op_body := '
 inline op do_stuff(invar PMC)
 {
-    restart ADDRESS(234);
+    goto ADDRESS(234);
 }';
 my $new_body := translate_op_body($trans, $op_body);
 my $restart_addr_ok := $new_body ~~ /'return' \s '(' 'opcode_t' \s '*' ')' \s? '234'/;
-ok($restart_addr_ok, "restart ADDRESS() translated ok");
+ok($restart_addr_ok, "goto ADDRESS() translated ok");
 
 $op_body := '
 inline op branch(in LABEL) :base_loop :flow {
