@@ -353,11 +353,7 @@ our method to_c:pasttype<macro> ($trans, PAST::Op $chunk) {
         return ~self.size;
     }
 
-    my @children := list();
-    for @($chunk) {
-        @children.push(self.to_c($trans, $_));
-    }
-    my $children := join('', |@children);
+    my $children := @($chunk).map(-> $_ { self.to_c($trans, $_) }).join('');
 
     #pir::say('children ' ~ $children);
     my $ret := Q:PIR<
