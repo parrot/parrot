@@ -109,10 +109,7 @@ method op ($/, $key?) {
             my $goto_next := PAST::Op.new(
                 :pasttype('macro'),
                 :name('goto_offset'),
-                PAST::Val.new(
-                    :value($OP.size),
-                    :returns('int'),
-                )
+                self.opsize,
             );
 
             $OP[0].push($goto_next);
@@ -296,10 +293,7 @@ method op_macro:sym<expr next>($/) {
     my $past := PAST::Op.new(
         :pasttype<macro>,
         :name<expr_offset>,
-        PAST::Op.new(
-            :pasttype<macro>,
-            :name<OPSIZE>,
-        )
+        self.opsize,
     );
 
     $OP.add_jump('PARROT_JUMP_RELATIVE');
@@ -311,10 +305,7 @@ method op_macro:sym<goto next>($/) {
     my $past := PAST::Op.new(
         :pasttype<macro>,
         :name<goto_offset>,
-        PAST::Op.new(
-            :pasttype<macro>,
-            :name<OPSIZE>,
-        )
+        self.opsize,
     );
 
     $OP.add_jump('PARROT_JUMP_RELATIVE');
@@ -330,10 +321,7 @@ method op_macro:sym<restart next> ($/) {
         PAST::Op.new(
             :pasttype<macro>,
             :name<restart_offset>,
-            PAST::Op.new(
-                :pasttype<macro>,
-                :name<OPSIZE>,
-            )
+            self.opsize,
         ),
         PAST::Op.new(
             :pasttype<macro>,
@@ -607,6 +595,14 @@ method circumfix:sym<( )> ($/) {
 method prefix:sym<( )> ($/) {
     make PAST::Op.new(
         :returns(~$<type_declarator>),
+    );
+}
+
+# Helper method for generating PAST::Val with opsize
+method opsize () {
+    make PAST::Val.new(
+        :value($OP.size),
+        :returns('int'),
     );
 }
 
