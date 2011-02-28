@@ -308,8 +308,8 @@ token postfix:sym«->» { <sym> <identifier> <O('%methodop')> }
 token postfix:sym«.»  { <sym> <identifier> <O('%methodop')> }
 
 # XXX Check precedence
-token postfix:sym<--> { <sym> <O('%methodop')> }
-token postfix:sym<++> { <sym> <O('%methodop')> }
+token postfix:sym<--> { <sym> <O('%autoincrement :pirop<-->')> }
+token postfix:sym<++> { <sym> <O('%autoincrement :pirop<++>')> }
 
 token arglist {
     <.ws>
@@ -331,8 +331,8 @@ token circumfix:sym<( )> {
     <O('%methodop')>        # XXX Check precedence
 }
 
-token prefix:sym<+>   { <sym>  <O('%symbolic_unary :pirop<+>')> }
-token prefix:sym<->   { <sym>  <![>]> <O('%symbolic_unary :pirop<->')> }
+token prefix:sym<+>   { <sym>  <![+]> <O('%symbolic_unary :pirop<+>')> }
+token prefix:sym<->   { <sym>  <![>\-]> <O('%symbolic_unary :pirop<->')> }
 token prefix:sym<!>   { <sym>  <O('%symbolic_unary :pirop<!>')> }
 token prefix:sym<|>   { <sym>  <O('%symbolic_unary :pirop<|>')> }
 token prefix:sym<&>   { <sym>  <O('%symbolic_unary :pirop<&>')> }
