@@ -434,7 +434,12 @@ our method to_c:pasttype<switch> ($trans, PAST::Op $chunk) {
 our method to_c:pasttype<undef> ($trans, PAST::Op $chunk) {
     if $chunk.pirop {
         # Some infix stuff
-        if $chunk.name ~~ / infix / {
+        if $chunk.pirop eq ',' {
+            join(', ',
+                |@($chunk).map(-> $_ { self.to_c($trans, $_)})
+            );
+        }
+        elsif $chunk.name ~~ / infix / {
               '('
             ~ self.to_c($trans, $chunk[0])
             ~ ' ' ~ (%PIROP_MAPPING{$chunk.pirop} // $chunk.pirop) ~ ' '
