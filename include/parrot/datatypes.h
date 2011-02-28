@@ -110,18 +110,26 @@ const struct _data_types data_types[] = {
     { "longdouble", sizeof (long double),        ALIGNOF(long double)},
 
     /* explicitly sized integer types */
-    { "int8",       1,                           ALIGNOF(int /* TODO */) },
-    { "int16",      2,                           ALIGNOF(int /* TODO */) },
-    { "int32",      4,                           ALIGNOF(int /* TODO */) },
-    { "int64",      8,                           ALIGNOF(int /* TODO */) },
+    { "int8",       1,                           ALIGNOF(Parrot_Int1) },
+    { "int16",      2,                           ALIGNOF(Parrot_Int2) },
+    { "int32",      4,                           ALIGNOF(Parrot_Int4) },
+#  if HAS_INT64
+    { "int64",      8,                           ALIGNOF(Parrot_Int8) },
+#  else
+    { "int64",      0,                           0 },
+#  endif
 
     /* unsigned variants */
     { "uint1",      0,                           0 }, /* = bit */
     { "uint4",      0,                           0 },
-    { "uint8",      1,                           ALIGNOF(int /* TODO */) },
-    { "uint16",     2,                           ALIGNOF(int /* TODO */) },
-    { "uint32",     4,                           ALIGNOF(int /* TODO */) },
-    { "uint64",     8,                           ALIGNOF(int /* TODO */) },
+    { "uint8",      1,                           ALIGNOF(Parrot_Int1) },
+    { "uint16",     2,                           ALIGNOF(Parrot_Int2) },
+    { "uint32",     4,                           ALIGNOF(Parrot_Int4) },
+#  if HAS_INT64
+    { "uint64",     8,                           ALIGNOF(Parrot_Int8) },
+#  else
+    { "uint64",     0,                           0 },
+#  endif
 
     { "ptr",        sizeof (void *),             ALIGNOF(void *) },
     { "cstr",       sizeof (char *),             ALIGNOF(char *) },
