@@ -440,6 +440,16 @@ our method to_c:pasttype<while> ($trans, PAST::Op $chunk) {
     );
 }
 
+our method to_c:pasttype<do-while> ($trans, PAST::Op $chunk) {
+    join('',
+        'do ',
+        self.to_c($trans, $chunk[0]),
+        'while (',
+        self.to_c($trans, $chunk[1]),
+        ')',
+    );
+}
+
 our method to_c:pasttype<for> ($trans, PAST::Op $chunk) {
     join('',
         'for (',

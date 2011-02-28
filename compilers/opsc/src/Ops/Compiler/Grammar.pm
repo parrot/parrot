@@ -207,7 +207,7 @@ rule statement_control:sym<for> {
     <statement_list>
 }
 
-rule statement_control:sym<do> {
+rule statement_control:sym<do-while> {
     <sym> <blockoid> 'while' '(' <condition=.EXPR> ')'
 }
 

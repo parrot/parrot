@@ -548,6 +548,17 @@ method statement_control:sym<while> ($/) {
     make $past;
 }
 
+method statement_control:sym<do-while> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<do-while>,
+
+        $<blockoid>.ast,
+        $<condition>.ast,
+    );
+
+    make $past;
+}
+
 method statement_control:sym<for> ($/) {
     my $past := PAST::Op.new(
         :pasttype<for>,
