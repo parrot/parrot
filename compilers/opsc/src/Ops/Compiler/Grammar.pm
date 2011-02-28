@@ -260,7 +260,7 @@ token infix:sym</=> { <sym>  <O('%assignment :pirop</=>')> }
 token infix:sym«>>=» { <sym>  <O('%assignment :pirop<shr_assign>')> }
 token infix:sym«<<=» { <sym>  <O('%assignment :pirop<shl_assign>')> }
 
-token infix:sym<,>  { <sym>  <O('%comma')> }
+token infix:sym<,>   { <sym>  <O('%comma')> }
 
 token infix:sym<*>    { <sym>  <O('%multiplicative :pirop<*>')> }
 token infix:sym</>    { <sym>  <O('%multiplicative :pirop</>')> }
@@ -304,8 +304,10 @@ token postcircumfix:sym<[ ]> {
     <O('%methodop')>
 }
 
-token postfix:sym«->» { <sym> <identifier> <O('%methodop')> }
-token postfix:sym«.»  { <sym> <identifier> <O('%methodop')> }
+#token postfix:sym«->» { <sym> <identifier> <O('%methodop :pirop<arrow>')> }
+#token postfix:sym«.»  { <sym> <identifier> <O('%methodop :pirop<dotty>')> }
+token infix:sym«->» { <sym> <O('%methodop :pirop<arrow>')> }
+token infix:sym«.»  { <sym> <O('%methodop :pirop<dotty>')> }
 
 # XXX Check precedence
 token postfix:sym<--> { <sym> <O('%autoincrement :pirop<-->')> }
@@ -380,7 +382,7 @@ token ws {
 }
 
 INIT {
-    Ops::Compiler::Grammar.O(':prec<y=>, :assoc<unary>', '%methodop');
+    Ops::Compiler::Grammar.O(':prec<y=>, :assoc<left>', '%methodop');
     Ops::Compiler::Grammar.O(':prec<x=>, :assoc<unary>', '%autoincrement');
     Ops::Compiler::Grammar.O(':prec<w=>, :assoc<unary>', '%casting');
     Ops::Compiler::Grammar.O(':prec<v=>, :assoc<unary>', '%symbolic_unary');

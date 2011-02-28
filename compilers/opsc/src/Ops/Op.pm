@@ -336,6 +336,9 @@ our %PIROP_MAPPING := hash(
     :ge('>='),
     :lt('<'),
     :gt('>'),
+
+    :arrow('->'),
+    :dotty('.'),
 );
 
 our method to_c:pasttype<inline> ($trans, PAST::Op $chunk) {
@@ -452,7 +455,7 @@ our method to_c:pasttype<undef> ($trans, PAST::Op $chunk) {
         }
         else {
             _dumper($chunk);
-            pir::die("Unhandled chunk");
+            pir::die("Unhandled chunk for pirop");
         }
     }
     elsif $chunk.returns {
