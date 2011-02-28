@@ -271,6 +271,8 @@ method op_macro:sym<goto offset>($/) {
         :name<goto_offset>,
         $<arg>.ast,
     );
+
+    $OP.add_jump('PARROT_JUMP_RELATIVE');
 }
 
 method op_macro:sym<expr address>($/) {
@@ -295,8 +297,6 @@ method op_macro:sym<expr next>($/) {
         :name<expr_offset>,
         self.opsize,
     );
-
-    $OP.add_jump('PARROT_JUMP_RELATIVE');
 
     make $past;
 }
@@ -331,8 +331,6 @@ method op_macro:sym<restart next> ($/) {
             )
         ),
     );
-
-    $OP.add_jump('PARROT_JUMP_RELATIVE');
 
     make $past;
 }
