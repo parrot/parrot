@@ -466,7 +466,7 @@ method term:sym<call> ($/) {
 
 method term:sym<reg> ($/) {
     make PAST::Var.new(
-        :name(~$/),
+        :name(+$<num>),
         :node($/),
         :scope('register'), # Special scope
     );
