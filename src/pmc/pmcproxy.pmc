@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -102,7 +102,7 @@ Initializes a PMCProxy PMC.
         if (type_num > INTERP->n_vtable_max || type_num <= 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                     EXCEPTION_INVALID_OPERATION,
-                    "Attempt to create PMC Proxy for invalid type number!");
+                    "Attempt to create PMC Proxy for invalid type number = %d!", type_num);
 
         /* Set up the object. */
         SELF.init();
@@ -116,11 +116,12 @@ Initializes a PMCProxy PMC.
         /* Build MRO (skip ourself). */
         mro_length = VTABLE_elements(INTERP, INTERP->vtables[type_num]->mro);
         for (i = 1; i < mro_length; ++i) {
-            PMC    *pclass = VTABLE_get_pmc_keyed_int(INTERP, INTERP->vtables[type_num]->mro, i);
-            PMC    *cns    = pclass->vtable->_namespace;
-            STRING *cname  = pclass->vtable->whoami;
+            PMC    * const pclass = VTABLE_get_pmc_keyed_int(INTERP,
+                                                             INTERP->vtables[type_num]->mro, i);
+            PMC    * const cns    = pclass->vtable->_namespace;
+            STRING * const cname  = pclass->vtable->whoami;
             if (!STRING_equal(INTERP, cname, CONST_STRING(INTERP, "scalar"))) {
-                PMC *pproxy = Parrot_oo_get_class(INTERP, cns);
+                PMC * const pproxy = Parrot_oo_get_class(INTERP, cns);
                 VTABLE_push_pmc(INTERP, proxy_info->all_parents, pproxy);
             }
         }
@@ -136,7 +137,7 @@ Initializes a PMCProxy PMC.
 
             /* Link the proxy and the namespace, caching the proxy object for
              * later retrieval on class lookup. */
-             Parrot_pcc_invoke_method_from_c_args(INTERP, proxy_info->_namespace, CONST_STRING(INTERP, "set_class"), "P->", SELF);
+            Parrot_pcc_invoke_method_from_c_args(INTERP, proxy_info->_namespace, CONST_STRING(INTERP, "set_class"), "P->", SELF);
 
             /* Extract any methods from the namespace */
             Parrot_oo_extract_methods_from_namespace(INTERP, SELF,
@@ -148,15 +149,16 @@ Initializes a PMCProxy PMC.
              * and terminated by an space,
              * the list is '\0' terminated
              */
-            const char * attr = INTERP->vtables[type_num]->attribute_defs;
-            while (* attr) {
+            const char *attr = INTERP->vtables[type_num]->attribute_defs;
+            while (*attr) {
                 const char * const current = attr + 1;
-                size_t l;
-                char attrtype = * attr;
-                while (* attr != ' ') ++attr;
-                l= attr - current;
+                const char attrtype = *attr;
+
+                while (*attr != ' ')
+                    ++attr;
                 if (attrtype != ':') {
-                    STRING *sattr = Parrot_str_new(INTERP, current, l);
+                    const size_t n = attr - current;
+                    STRING * const sattr = Parrot_str_new(INTERP, current, n);
                     SELF.add_attribute(sattr, NULL);
                 }
                 ++attr;
@@ -179,7 +181,7 @@ Creates an instance of the PMC.
 
 */
     VTABLE PMC *instantiate(PMC *init) {
-        Parrot_Class_attributes * const _pmc = PARROT_CLASS(SELF);
+        const Parrot_Class_attributes * const _pmc = PARROT_CLASS(SELF);
 
         if (!PMC_IS_NULL(init))
             return Parrot_pmc_new_init(INTERP, _pmc->id, init);
@@ -200,7 +202,7 @@ Returns whether the class is or inherits from C<*classname>.
     VTABLE INTVAL isa_pmc(PMC *lookup) {
         Parrot_Class_attributes * const _proxy = PARROT_CLASS(SELF);
         INTVAL        i, num_classes;
-        STRING       *classname;
+        const STRING *classname;
         PMC          *classobj;
 
         if (PMC_IS_NULL(lookup))
@@ -230,7 +232,7 @@ Returns whether the class is or inherits from C<*classname>.
 
         /* Look in the isa hash. */
         if (INTERP->vtables[_proxy->id]) {
-            Hash *isa_hash = INTERP->vtables[_proxy->id]->isa_hash;
+            const Hash * const isa_hash = INTERP->vtables[_proxy->id]->isa_hash;
             PARROT_ASSERT(isa_hash);
             if (Parrot_hash_exists(INTERP, isa_hash, classname))
                 return 1;
@@ -262,10 +264,9 @@ Returns whether the class is or inherits from C<*classname>.
 */
 
     VTABLE INTVAL isa(STRING *classname) {
-        Parrot_Class_attributes * const _proxy = PARROT_CLASS(SELF);
-        const STRING * const pmc_proxy = CONST_STRING(INTERP, "PMCProxy");
+        const Parrot_Class_attributes * const _proxy = PARROT_CLASS(SELF);
 
-        if (STRING_equal(INTERP, classname, pmc_proxy))
+        if (STRING_equal(INTERP, classname, CONST_STRING(INTERP, "PMCProxy")))
             return 1;
 
         if (SUPER(classname))
@@ -273,7 +274,7 @@ Returns whether the class is or inherits from C<*classname>.
 
         /* Look in the isa hash. */
         if (INTERP->vtables[_proxy->id]) {
-            Hash *isa_hash = INTERP->vtables[_proxy->id]->isa_hash;
+            const Hash * const isa_hash = INTERP->vtables[_proxy->id]->isa_hash;
 
             if (!isa_hash && STRING_equal(INTERP,
                      INTERP->vtables[_proxy->id]->whoami, classname)) {
@@ -298,9 +299,9 @@ Returns whether the class does the role with the given C<*rolename>.
 */
 
     VTABLE INTVAL does(STRING *role_name) {
-        Parrot_Class_attributes * const attrs = PARROT_CLASS(SELF);
-        const INTVAL id = attrs->id;
+        const INTVAL id = PARROT_CLASS(SELF)->id;
         const INTVAL type_does = Parrot_pmc_type_does(INTERP, role_name, id);
+
         if (type_does)
             return 1;
         return VTABLE_isa(INTERP, SELF, role_name);
@@ -465,7 +466,7 @@ Return the name of the low-level class (without the HLL namespace).
 */
 
     VTABLE STRING *get_string() {
-        Parrot_Class_attributes * const proxy_info = PARROT_CLASS(SELF);
+        const Parrot_Class_attributes * const proxy_info = PARROT_CLASS(SELF);
         return proxy_info->name;
     }
 

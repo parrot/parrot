@@ -300,6 +300,12 @@ sub preamble {
     return $self->{preamble};
 }
 
+sub hdr_preamble {
+    my ( $self, $value ) = @_;
+    $self->{hdr_preamble} = $value if $value;
+    return $self->{hdr_preamble};
+}
+
 sub postamble {
     my ( $self, $value ) = @_;
     $self->{postamble} = $value if $value;
@@ -561,6 +567,9 @@ sub generate_h_file {
 EOH
 
     $h->emit("#define PARROT_IN_EXTENSION\n") if ( $self->is_dynamic );
+
+    # Emit header preamble
+    $h->emit($self->hdr_preamble) if $self->hdr_preamble;
 
     # Emit available functions for work with vtables.
     my $export = 'PARROT_EXPORT ';

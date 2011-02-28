@@ -111,7 +111,7 @@ Returns the current working directory.
 */
 
     METHOD cwd() {
-        STRING *cwd = Parrot_file_getcwd(INTERP);
+        STRING * const cwd = Parrot_file_getcwd(INTERP);
         RETURN(STRING *cwd);
     }
 
@@ -296,7 +296,7 @@ Reads entries from a directory.
 */
 
     METHOD readdir(STRING *path) {
-        PMC *array = Parrot_file_readdir(INTERP, path);
+        PMC * const array = Parrot_file_readdir(INTERP, path);
         RETURN(PMC *array);
     }
 
@@ -354,17 +354,17 @@ Returns the ID number of the current user. This is platform-dependent.
 */
 
     METHOD can_execute(STRING *filename) {
-        INTVAL can = Parrot_file_can_execute(INTERP, filename);
+        const INTVAL can = Parrot_file_can_execute(INTERP, filename);
         RETURN(INTVAL can);
     }
 
     METHOD can_read(STRING *filename) {
-        INTVAL can = Parrot_file_can_read(INTERP, filename);
+        const INTVAL can = Parrot_file_can_read(INTERP, filename);
         RETURN(INTVAL can);
     }
 
     METHOD can_write(STRING *filename) {
-        INTVAL can = Parrot_file_can_write(INTERP, filename);
+        const INTVAL can = Parrot_file_can_write(INTERP, filename);
         RETURN(INTVAL can);
     }
 

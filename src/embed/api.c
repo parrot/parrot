@@ -126,7 +126,6 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
     int alt_stacktop;
     Parrot_Interp interp_raw;
     Parrot_GC_Init_Args gc_args;
-    void *stacktop_ptr = &alt_stacktop;
     const Parrot_Interp parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
     interp_raw = allocate_interpreter(parent_raw, flags);
     if (args) {

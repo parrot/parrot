@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -101,7 +101,7 @@ advance_to_next(PARROT_INTERP, ARGMOD(PMC *self))
     }
     else {
         /* linear scan */
-        int n_buckets = N_BUCKETS(attrs->total_buckets);
+        const int n_buckets = N_BUCKETS(attrs->total_buckets);
 
         if (!attrs->bucket)
             attrs->bucket = attrs->parrot_hash->buckets;

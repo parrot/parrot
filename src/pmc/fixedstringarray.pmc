@@ -87,12 +87,13 @@ Creates and returns a copy of the array.
 
     VTABLE PMC *clone() {
 
-        STRING    **my_str_array, **dest_str_array;
+        STRING **my_str_array;
         PMC        *const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         GET_ATTR_str_array(INTERP, SELF, my_str_array);
 
         if (my_str_array) {
+            STRING **dest_str_array;
             INTVAL size;
             size_t mem_size;
 
@@ -414,7 +415,7 @@ C<value>.
 */
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        STRING *val = Parrot_str_from_num(INTERP, value);
+        STRING * const val = Parrot_str_from_num(INTERP, value);
         SELF.set_string_keyed_int(key, val);
     }
 
@@ -614,7 +615,7 @@ Used to unarchive the string.
 
 */
     VTABLE void thaw(PMC *info) {
-        UINTVAL size = VTABLE_shift_integer(INTERP, info);
+        const UINTVAL size = VTABLE_shift_integer(INTERP, info);
         SELF.init_int(size);
         if (size > 0) {
             UINTVAL i;

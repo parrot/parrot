@@ -366,7 +366,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     /* it's a C exception handler */
     if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {
         Parrot_runloop * const jump_point =
-            (Parrot_runloop * const)VTABLE_get_pointer(interp, handler);
+            (Parrot_runloop *)VTABLE_get_pointer(interp, handler);
         jump_point->exception = exception;
         longjmp(jump_point->resume, 1);
     }

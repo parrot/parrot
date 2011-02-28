@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2010, Parrot Foundation.
+Copyright (C) 2008-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -483,7 +483,8 @@ get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
     /* yes, this *looks* risky, but it's a Parrot STRING hash internally */
     if (hash && hash->entries) {
         UINTVAL j = 0;
-        PMC *result = Parrot_pmc_new_init_int(interp, enum_class_FixedStringArray, hash->entries);
+        PMC * const result =
+            Parrot_pmc_new_init_int(interp, enum_class_FixedStringArray, hash->entries);
         parrot_hash_iterate(hash,
             VTABLE_set_string_keyed_int(interp, result, j++, (STRING *)_bucket->key););
         return result;
@@ -1393,7 +1394,7 @@ return current Namespace
             Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
 
             if (cell) {
-                INTVAL type = CELL_TYPE_MASK(cell);
+                const INTVAL type = CELL_TYPE_MASK(cell);
                 if (type == PMCCELL)
                     return CELL_PMC(cell);
                 return autobox_pmc(INTERP, cell, type);
@@ -1457,7 +1458,7 @@ return current Namespace
             Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
 
             if (cell) {
-                INTVAL type = CELL_TYPE_MASK(cell);
+                const INTVAL type = CELL_TYPE_MASK(cell);
                 if (type == PMCCELL)
                     return CELL_PMC(cell);
                 return autobox_pmc(INTERP, cell, type);
@@ -1591,8 +1592,8 @@ sub, or for the point of the call a level deeper for the rest.
                 PMC_get_sub(INTERP, sub_pmc, sub);
 
                 if (sub->seg->annotations) {
-                    PackFile_ByteCode *seg = sub->seg;
-                    opcode_t          *pc  = cont && cur_ctx == cont->to_ctx
+                    PackFile_ByteCode * const seg = sub->seg;
+                    opcode_t          * const pc  = cont && cur_ctx == cont->to_ctx
                                              ? cont->address
                                              : Parrot_pcc_get_pc(INTERP, cur_ctx);
 

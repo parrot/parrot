@@ -141,7 +141,7 @@ INTVALS.
 op seek(invar PMC, in INT, in INT) :base_io {
     if ($1) {
         if (Parrot_io_seek_handle(interp, $1, Parrot_io_make_offset($2), $3) < 0) {
-            opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_PIO_ERROR,
                 "seek failed (32bit)");
             goto ADDRESS(handler);
@@ -152,7 +152,7 @@ op seek(invar PMC, in INT, in INT) :base_io {
 op seek(invar PMC, in INT, in INT, in INT) :base_io {
     if ($1) {
         if (Parrot_io_seek_handle(interp, $1, Parrot_io_make_offset32($2, $3), $4) < 0) {
-            opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_PIO_ERROR,
                 "seek failed (64bit)");
             goto ADDRESS(handler);
@@ -238,7 +238,7 @@ read mode and create an IO object in $1.
 
 inline op open(out PMC, in STR, in STR) :filesys_open {
     if (STRING_IS_NULL($2) || STRING_IS_NULL($3)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_UNEXPECTED_NULL, "Invalid open");
         goto ADDRESS(handler);
     }
@@ -250,7 +250,7 @@ inline op open(out PMC, in STR, in STR) :filesys_open {
 
 inline op open(out PMC, in STR) :filesys_open {
     if (STRING_IS_NULL($2)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_UNEXPECTED_NULL, "Invalid open");
         goto ADDRESS(handler);
     }

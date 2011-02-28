@@ -2370,6 +2370,7 @@ test-clean :
     "t/dynoplibs/*.pbc" \
     "t/op/*.pbc" \
     "t/oo/*.pbc" \
+    "t/pir/*.pbc" \
     "t/pmc/*.pbc" \
     "t/dynpmc/*.pbc" \
     "t/stress/*.pbc" \
@@ -2971,7 +2972,8 @@ src/extra_nci_thunks$(O) : $(PARROT_H_HEADERS) src/extra_nci_thunks.c \
     include/pmc/pmc_nci.h
 	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/extra_nci_thunks.c
 
-$(EXTRANCITHUNKS_SO) : $(LIBPARROT) src/extra_nci_thunks$(O)
+$(EXTRANCITHUNKS_SO) : $(LIBPARROT) $(NQP_RX) $(JSON_LANG) \
+    src/extra_nci_thunks$(O)
 	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \
     @ld_out@$@ src/extra_nci_thunks$(O) \
     $(ALL_PARROT_LIBS)

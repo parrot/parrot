@@ -127,7 +127,7 @@ Calculate amount of memory allocated in Fixed_Allocator.
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 struct Fixed_Allocator*
-Parrot_gc_fixed_allocator_new(PARROT_INTERP)
+Parrot_gc_fixed_allocator_new(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_gc_fixed_allocator_new)
 
@@ -477,8 +477,6 @@ static int
 pool_is_maybe_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
 {
     ASSERT_ARGS(pool_is_maybe_owned)
-    Pool_Allocator_Arena *arena = pool->top_arena;
-    size_t                a_size;
 
     /* Poiners are aligned */
     if (PTR2UINTVAL(ptr) & 3)

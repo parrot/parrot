@@ -921,8 +921,8 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
     INTVAL         i;
 
     for (i = 0; i < n; ++i) {
-        PMC * const _class    = VTABLE_get_pmc_keyed_int(interp, mro, i);
-        PMC * const ns        = VTABLE_get_namespace(interp, _class);
+        PMC * const _class_i  = VTABLE_get_pmc_keyed_int(interp, mro, i);
+        PMC * const ns        = VTABLE_get_namespace(interp, _class_i);
         PMC * const class_obj = VTABLE_inspect_str(interp, ns, class_str);
         PMC        *method    = PMCNULL;
         PMC        *method_hash;
@@ -938,7 +938,7 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
         if (PMC_IS_NULL(method))
             method = VTABLE_get_pmc_keyed_str(interp, ns, method_name);
 
-        TRACE_FM(interp, _class, method_name, method);
+        TRACE_FM(interp, _class_i, method_name, method);
 
         if (!PMC_IS_NULL(method))
             return method;

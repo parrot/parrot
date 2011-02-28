@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -63,7 +63,7 @@ Returns a true value (1) if the supplied file or directory exists.
 */
 
     METHOD exists(STRING *path) {
-        INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_EXISTS);
+        const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_EXISTS);
 
         RETURN(INTVAL res);
     }
@@ -79,7 +79,7 @@ Returns a true value (1) if the supplied path is a directory.
 */
 
     METHOD is_dir(STRING *path) {
-        INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISDIR);
+        const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISDIR);
 
         RETURN(INTVAL res);
     }
@@ -95,7 +95,7 @@ Returns a true value (1) if the supplied path is a plain file.
 */
 
     METHOD is_file(STRING *path) {
-        INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISREG);
+        const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISREG);
 
         RETURN(INTVAL res);
     }
@@ -111,7 +111,7 @@ Returns a true value (1) if the supplied path is a link.
 */
 
     METHOD is_link(STRING *path) {
-        INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISLNK);
+        const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISLNK);
 
         RETURN(INTVAL res);
     }

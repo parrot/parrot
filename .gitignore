@@ -441,6 +441,7 @@
 /t/perl/*.gcda
 /t/perl/*.gcno
 /t/pir/pbc_fallback_1.pir
+/t/pir/pbc_fallback_1.pbc
 /t/pmc/*.out
 /t/pmc/*.pasm
 /t/pmc/*.pbc

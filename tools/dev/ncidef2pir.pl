@@ -212,7 +212,7 @@ sub package_line {
     $line =~ s/\s*$//;
 
     # Set the global current package
-    $cur_package = [ split '::', $line ];
+    $cur_package = [ split /::/, $line ];
 }
 
 sub lib_line {

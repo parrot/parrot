@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2008, Parrot Foundation.
+ * Copyright (C) 2002-2011, Parrot Foundation.
  */
 
 /*
@@ -83,7 +83,7 @@ Print all the Parrot registers at once.
 
 op debug_print() :base_debug {
     if (!interp->pdb) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_INVALID_OPERATION,
             "Initialize debugger with debug_init before using debug_print");
         goto ADDRESS(handler);

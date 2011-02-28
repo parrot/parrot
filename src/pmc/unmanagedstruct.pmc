@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -561,6 +561,8 @@ ret_pmc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(char *p), int type, INTVAL idx)
 /*
 
 =item C<static void set_int(PARROT_INTERP, char *p, int type, INTVAL value)>
+
+Set int value based on int type
 
 =cut
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2009, Parrot Foundation.
+Copyright (C) 2005-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -46,11 +46,11 @@ Initializes the instance.
 */
 
     VTABLE void init() {
-        Hash  *pmc_registry = Parrot_hash_create(INTERP,
+        Hash * const pmc_registry = Parrot_hash_create(INTERP,
                 enum_type_int,
                 Hash_key_type_PMC_ptr);
 
-        Hash  *str_registry = Parrot_hash_create(INTERP,
+        Hash * const str_registry = Parrot_hash_create(INTERP,
                 enum_type_int,
                 Hash_key_type_STRING);
 

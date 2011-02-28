@@ -1,5 +1,5 @@
 /* nci/signatures.c
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 
 =head1 NAME
@@ -43,10 +43,9 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
 
     const size_t sig_length = Parrot_str_byte_length(interp, sig_str);
 
-    size_t j = 0;
     size_t i;
 
-    PMC *sig_pmc = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
+    PMC * const sig_pmc = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
 
     for (i = 0; i < sig_length; ++i) {
         const INTVAL c = Parrot_str_indexed(interp, sig_str, i);

@@ -88,8 +88,7 @@ void Parrot_gc_fixed_allocator_free(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-struct Fixed_Allocator* Parrot_gc_fixed_allocator_new(PARROT_INTERP)
-        __attribute__nonnull__(1);
+struct Fixed_Allocator* Parrot_gc_fixed_allocator_new(SHIM_INTERP);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
@@ -163,8 +162,7 @@ Pool_Allocator * Parrot_gc_pool_new(SHIM_INTERP, size_t object_size);
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(allocator) \
     , PARROT_ASSERT_ARG(data))
-#define ASSERT_ARGS_Parrot_gc_fixed_allocator_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_gc_fixed_allocator_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_gc_pool_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pool))

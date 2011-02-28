@@ -21,6 +21,7 @@
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_pmc_box_c_string_array(PARROT_INTERP,
     int count,
     ARGIN(const char **s))
