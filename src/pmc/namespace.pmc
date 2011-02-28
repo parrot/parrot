@@ -1142,7 +1142,8 @@ Return the parent NameSpace or PMCNULL, if none.
 */
 
     METHOD get_parent() {
-        PMC * const parent = PARROT_NAMESPACE(SELF)->parent ? PARROT_NAMESPACE(SELF)->parent : PMCNULL;
+        PMC * const parent = PARROT_NAMESPACE(SELF)->parent ?
+                                 PARROT_NAMESPACE(SELF)->parent : PMCNULL;
         RETURN(PMC *parent);
     }
 

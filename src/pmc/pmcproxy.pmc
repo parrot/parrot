@@ -116,7 +116,8 @@ Initializes a PMCProxy PMC.
         /* Build MRO (skip ourself). */
         mro_length = VTABLE_elements(INTERP, INTERP->vtables[type_num]->mro);
         for (i = 1; i < mro_length; ++i) {
-            PMC    * const pclass = VTABLE_get_pmc_keyed_int(INTERP, INTERP->vtables[type_num]->mro, i);
+            PMC    * const pclass = VTABLE_get_pmc_keyed_int(INTERP,
+                                                             INTERP->vtables[type_num]->mro, i);
             PMC    * const cns    = pclass->vtable->_namespace;
             STRING * const cname  = pclass->vtable->whoami;
             if (!STRING_equal(INTERP, cname, CONST_STRING(INTERP, "scalar"))) {
