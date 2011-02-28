@@ -371,6 +371,19 @@ our method to_c:pasttype<macro> ($trans, PAST::Op $chunk) {
     return $ret;
 }
 
+our method to_c:pasttype<macro_define> ($trans, PAST::Op $chunk) {
+    my @res;
+    @res.push('#define ');
+    #name of macro
+    @res.push($chunk[0]);
+    
+    @res.push(self.to_c($trans, $chunk<macro_args>)) if $chunk<macro_args>;
+    @res.push(self.to_c($trans, $chunk<body>))       if $chunk<body>;
+
+    join('', |@res);
+}
+
+
 our method to_c:pasttype<macro_if> ($trans, PAST::Op $chunk) {
     my @res;
 

@@ -423,6 +423,15 @@ method statement ($/) {
 }
 
 method c_macro:sym<define> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<macro_define>,
+        $<name>,
+    );
+
+    $past<macro_args> := $<c_macro_args>[0].ast if $<c_macro_args>;
+    $past<body>       := $<body>[0].ast         if $<body>;
+
+    make $past;
 }
 
 method c_macro:sym<if> ($/) {
@@ -450,7 +459,6 @@ method c_macro:sym<ifdef> ($/) {
 
     make $past;
 }
-
 
 method term:sym<identifier> ($/) {
     # XXX Type vs Variable
