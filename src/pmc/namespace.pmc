@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2010, Parrot Foundation.
+Copyright (C) 2005-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -465,7 +465,7 @@ really a public API.
 
         if (val_is_NS) {
             /* TODO - this hack needs to go */
-            Parrot_NameSpace_attributes *nsinfo = PARROT_NAMESPACE(value);
+            Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(value);
             nsinfo->parent = SELF;  /* set parent */
             nsinfo->name   = key;   /* and name */
 
@@ -1142,7 +1142,7 @@ Return the parent NameSpace or PMCNULL, if none.
 */
 
     METHOD get_parent() {
-        PMC *parent = PARROT_NAMESPACE(SELF)->parent ? PARROT_NAMESPACE(SELF)->parent : PMCNULL;
+        PMC * const parent = PARROT_NAMESPACE(SELF)->parent ? PARROT_NAMESPACE(SELF)->parent : PMCNULL;
         RETURN(PMC *parent);
     }
 
