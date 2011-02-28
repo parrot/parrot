@@ -579,7 +579,7 @@ the op itself as one argument.
 =end
 
 method size() {
-    return pir::does__IPs(self.arg_types, 'array') ?? +self.arg_types + 1 !! 2;
+    return pir::does__IPs(self.args, 'array') ?? +self.args + 1 !! 2;
 }
 
 =begin
