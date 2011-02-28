@@ -425,9 +425,6 @@ method statement ($/) {
 method c_macro:sym<define> ($/) {
 }
 
-method c_macro:sym<ifdef> ($/) {
-}
-
 method c_macro:sym<if> ($/) {
     my $past := PAST::Op.new(
         :pasttype<macro_if>,
@@ -445,7 +442,7 @@ method c_macro:sym<ifdef> ($/) {
     my $past := PAST::Op.new(
         :pasttype<macro_if>,
 
-        'defined(' ~ ~$<condition> ~ ')',  # FIXME! We have to parse condition somehow.
+        'defined(' ~ ~$<name> ~ ')',  # FIXME! We have to parse condition somehow.
         $<then>.ast,
     );
 
