@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -49,7 +49,7 @@ Initialize PackfileAnnotations.
 
 */
     VTABLE void init() {
-        Parrot_PackfileAnnotations_attributes * attrs =
+        Parrot_PackfileAnnotations_attributes * const attrs =
                 PMC_data_typed(SELF, Parrot_PackfileAnnotations_attributes*);
 
         attrs->annotations = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
@@ -72,7 +72,7 @@ Marks the object as live.
 */
 
     VTABLE void mark() {
-        Parrot_PackfileAnnotations_attributes * attrs =
+        Parrot_PackfileAnnotations_attributes * const attrs =
                 PARROT_PACKFILEANNOTATIONS(SELF);
 
         Parrot_gc_mark_PMC_alive(INTERP, attrs->const_table);
@@ -137,9 +137,9 @@ thrown unless all of the following criteria are met:
 
 */
     VTABLE void set_pmc_keyed_int(INTVAL index, PMC *annotation)  {
-        Parrot_PackfileAnnotations_attributes * attrs =
+        const Parrot_PackfileAnnotations_attributes * const attrs =
                 PARROT_PACKFILEANNOTATIONS(SELF);
-        Parrot_PackfileAnnotation_attributes  * entity_attrs =
+        const Parrot_PackfileAnnotation_attributes  * const entity_attrs =
                 PARROT_PACKFILEANNOTATION(annotation);
         INTVAL dummy;
 
@@ -178,15 +178,13 @@ PackfileAnnotationKeys.
 */
 
     METHOD set_directory(PMC *directory) {
-        Parrot_PackfileAnnotations_attributes *attrs =
+        Parrot_PackfileAnnotations_attributes * const attrs =
                 PARROT_PACKFILEANNOTATIONS(SELF);
-        STRING *name;
-        PMC    *segment;
 
-        PMC *iter = VTABLE_get_iter(INTERP, directory);
+        PMC * const iter = VTABLE_get_iter(INTERP, directory);
         while (VTABLE_get_bool(INTERP, iter)) {
-            name = VTABLE_shift_string(INTERP, iter);
-            segment = VTABLE_get_pmc_keyed_str(INTERP, directory, name);
+            STRING * const name = VTABLE_shift_string(INTERP, iter);
+            PMC * const segment = VTABLE_get_pmc_keyed_str(INTERP, directory, name);
             if (VTABLE_isa(INTERP, segment,
                     Parrot_str_new_constant(INTERP, "PackfileConstantTable"))) {
                 attrs->const_table = segment;
@@ -205,11 +203,11 @@ Initialize PackfileAnnotations from PackFile_Annotations*.
 
 */
     VTABLE void set_pointer(void *pointer) {
-        PackFile_Annotations * a = (PackFile_Annotations*)pointer;
-        Parrot_PackfileAnnotations_attributes *attrs =
+        PackFile_Annotations * const a = (PackFile_Annotations*)pointer;
+        Parrot_PackfileAnnotations_attributes * const attrs =
                 PARROT_PACKFILEANNOTATIONS(SELF);
         Parrot_PackfileAnnotation_attributes *annotation_attrs;
-        opcode_t  i, j;
+        opcode_t i;
 
         if (!attrs->const_table)
             Parrot_ex_throw_from_c_args(INTERP, NULL,
@@ -219,12 +217,13 @@ Initialize PackfileAnnotations from PackFile_Annotations*.
         /* Copy annotations to own array */
         VTABLE_set_integer_native(INTERP, attrs->annotations, 0); /* truncate */
         for (i = 0; i < a->num_keys; ++i) {
-            PackFile_Annotations_Key   *key   = &a->keys[i];
+            PackFile_Annotations_Key * const key = &a->keys[i];
+            opcode_t j;
 
             for (j = 0; j < (opcode_t)key->len; j++) {
-                PMC *annotation = Parrot_pmc_new(INTERP, enum_class_PackfileAnnotation);
-                opcode_t offs = a->base.data[(key->start + j) * 2 + ANN_ENTRY_OFF];
-                opcode_t val  = a->base.data[(key->start + j) * 2 + ANN_ENTRY_VAL];
+                PMC * const annotation = Parrot_pmc_new(INTERP, enum_class_PackfileAnnotation);
+                const opcode_t offs = a->base.data[(key->start + j) * 2 + ANN_ENTRY_OFF];
+                const opcode_t val  = a->base.data[(key->start + j) * 2 + ANN_ENTRY_VAL];
 
                 /* Poke directly to annotation attributes. */
                 annotation_attrs         = PARROT_PACKFILEANNOTATION(annotation);
@@ -263,10 +262,10 @@ Create PackFile_Annotations* from self.
 
 */
     VTABLE void *get_pointer() {
-        Parrot_PackfileAnnotations_attributes *attrs =
+        Parrot_PackfileAnnotations_attributes * const attrs =
                 PARROT_PACKFILEANNOTATIONS(SELF);
-        PackFile_Annotations *res = mem_gc_allocate_zeroed_typed(INTERP,
-                PackFile_Annotations);
+        PackFile_Annotations * const res =
+            mem_gc_allocate_zeroed_typed(INTERP, PackFile_Annotations);
         INTVAL                i, num;
         PMC                  *keys;             /* Temporary representation of Keys */
         INTVAL                last_key_id;
