@@ -205,10 +205,10 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
 */
 
     VTABLE void init_pmc(PMC *p) {
-        INTVAL            init_len    = VTABLE_elements(INTERP, p);
-        PARROT_DATA_TYPE  pack_type   = (PARROT_DATA_TYPE)
+        const INTVAL      init_len    = VTABLE_elements(INTERP, p);
+        const PARROT_DATA_TYPE pack_type = (PARROT_DATA_TYPE)
                                             VTABLE_get_integer_keyed_int(INTERP, p, 0);
-        INTVAL            n_elts      = VTABLE_get_integer_keyed_int(INTERP, p, 1);
+        const INTVAL      n_elts      = VTABLE_get_integer_keyed_int(INTERP, p, 1);
         elt_desc_t       *elt_ary;
         size_t            bit_cursor  = 0;
         size_t            byte_cursor = 0;
@@ -249,8 +249,8 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
         SET_ATTR_n_elts(INTERP, SELF, n_elts);
 
         for (/* i already initialized */ j = 0; i < init_len && j < n_elts; i += incr, j++) {
-            elt_desc_t       *elt       = &elt_ary[j];
-            PARROT_DATA_TYPE  elt_type  = (PARROT_DATA_TYPE)
+            elt_desc_t * const elt = &elt_ary[j];
+            const PARROT_DATA_TYPE elt_type = (PARROT_DATA_TYPE)
                                             VTABLE_get_integer_keyed_int(INTERP, p, i);
             size_t            elt_size, elt_align;
             elt_access_t      elt_access;
