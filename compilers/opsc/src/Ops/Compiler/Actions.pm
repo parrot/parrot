@@ -91,17 +91,23 @@ method op($/) {
 
     if $op.need_write_barrier {
         $op.push(
-            PAST::Op.new(
-                :pasttype<call>,
-                :name<PARROT_GC_WRITE_BARRIER>,
+            PAST::Stmts.new(
                 PAST::Op.new(
                     :pasttype<call>,
-                    :name<CURRENT_CONTEXT>,
+                    :name<PARROT_GC_WRITE_BARRIER>,
                     PAST::Var.new(
                         :name<interp>
+                    ),
+                    PAST::Op.new(
+                        :pasttype<call>,
+                        :name<CURRENT_CONTEXT>,
+                        PAST::Var.new(
+                            :name<interp>
+                        )
                     )
                 )
-            ));
+            )
+        );
     }
 
     if !%flags<flow> {
