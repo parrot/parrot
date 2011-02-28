@@ -468,13 +468,17 @@ method term:sym<call> ($/) {
         :name(~$<identifier>),
     );
 
-    my $type := $<arglist><type_declarator>;
-    $past.push(~$type) if $type;
-
-    my $args := $<arglist><EXPR>;
-    $past.push($args.ast) if $args;
+    if ($<arglist><arg>) {
+        $past.push($_.ast) for $<arglist><arg>;
+    }
 
     make $past;
+}
+
+method arg ($/) {
+    make $<type_declarator>
+        ?? ~$<type_declarator>
+        !! $<EXPR>.ast;
 }
 
 method term:sym<reg> ($/) {

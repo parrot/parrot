@@ -317,14 +317,14 @@ token infix:sym«.»  { <sym> <O('%methodop :pirop<dotty>')> }
 token postfix:sym<--> { <sym> <O('%autoincrement :pirop<-->')> }
 token postfix:sym<++> { <sym> <O('%autoincrement :pirop<++>')> }
 
-token arglist {
-    <.ws>
-    [
-    | <EXPR('f=')>
-    | <type_declarator> <.ws> ',' <.ws> <EXPR('f=')>
-    | <type_declarator>
+rule arglist {
+    | <arg> ** ','
     | <?>
-    ]
+}
+
+token arg {
+    | <EXPR('i=')>
+    | <type_declarator>
 }
 
 # Casting. TODO Figure out precedence.
