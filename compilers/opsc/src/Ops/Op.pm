@@ -344,7 +344,7 @@ our method to_c:pasttype<inline> ($trans, PAST::Op $chunk) {
 
 our method to_c:pasttype<macro> ($trans, PAST::Op $chunk) {
     my $name     := $chunk.name;
-    #say('NAME '~$name ~ ' ' ~ $is_next);
+
     if $name eq 'OPSIZE' {
         #say('is_next');
         return ~self.size;
@@ -477,7 +477,7 @@ our multi method to_c($trans, PAST::Op $chunk) {
 
     my $type := $chunk.pasttype // 'undef';
     my $sub  := pir::find_sub_not_null__ps('to_c:pasttype<' ~ $type ~ '>');
-    $res ~ $sub(self, $trans, $chunk) ~ ";\n";
+    $res ~ $sub(self, $trans, $chunk);
 }
 
 our multi method to_c($trans, PAST::Stmts $chunk) {
