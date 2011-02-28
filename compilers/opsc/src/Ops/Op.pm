@@ -347,12 +347,6 @@ our method to_c:pasttype<inline> ($trans, PAST::Op $chunk) {
 
 our method to_c:pasttype<macro> ($trans, PAST::Op $chunk) {
     my $name     := $chunk.name;
-
-    if $name eq 'OPSIZE' {
-        #say('is_next');
-        return ~self.size;
-    }
-
     my $children := @($chunk).map(-> $_ { self.to_c($trans, $_) }).join('');
 
     #pir::say('children ' ~ $children);
