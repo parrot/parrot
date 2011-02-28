@@ -112,7 +112,7 @@ method op($/) {
 
     if !%flags<flow> {
         my $goto_next := PAST::Op.new(
-            :pasttype('call'),
+            :pasttype('macro'),
             :name('goto_offset'),
             PAST::Op.new(
                 :pasttype<macro>,
