@@ -146,6 +146,7 @@ token keyword {
     [
     | 'for' |'if' |'while' | 'else'
     | 'case' | 'default'
+    | 'break' | 'return' | 'continue'
     | 'goto' | 'expr' | 'restart'
     | 'OFFSET' | 'ADDRESS' | 'NEXT'
     ]>>
@@ -216,6 +217,9 @@ rule statement_control:sym<switch> {
     <statement_list>
     '}'
 }
+
+rule statement_control:sym<break> { <sym> }
+rule statement_control:sym<continue> { <sym> }
 
 # HACK to support for INT_FMT "\n"
 token term:sym<concatenate_strings> { # Long-long name as LTM workaround
@@ -341,6 +345,7 @@ token prefix:sym<&>   { <sym>  <O('%symbolic_unary :pirop<&>')> }
 token prefix:sym<*>   { <sym>  <O('%symbolic_unary :pirop<*>')> }
 token prefix:sym<~>   { <sym>  <O('%symbolic_unary :pirop<~>')> }
 
+token prefix:sym<return> { <sym>  <O('%symbolic_unary :pirop<return>')> }
 
 rule blockoid {
     '{'

@@ -484,6 +484,9 @@ our method to_c:pasttype<undef> ($trans, PAST::Op $chunk) {
             self.to_c($trans, $chunk[0]),
         );
     }
+    elsif $chunk<control> {
+        $chunk<control>;
+    }
     else {
         _dumper($chunk);
         pir::die("Unhandled chunk");

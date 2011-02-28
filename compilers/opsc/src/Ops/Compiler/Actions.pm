@@ -441,6 +441,20 @@ method c_macro:sym<if> ($/) {
     make $past;
 }
 
+method c_macro:sym<ifdef> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<macro_if>,
+
+        'defined(' ~ ~$<condition> ~ ')',  # FIXME! We have to parse condition somehow.
+        $<then>.ast,
+    );
+
+    $past.push($<else>[0].ast) if $<else>;
+
+    make $past;
+}
+
+
 method term:sym<identifier> ($/) {
     # XXX Type vs Variable
     make PAST::Var.new(
@@ -549,6 +563,19 @@ method statement_control:sym<switch> ($/) {
     $past.push($_) for @($<statement_list>.ast);
     make $past;
 }
+
+method statement_control:sym<break> ($/) {
+    my $past := PAST::Op.new();
+    $past<control> := 'break';
+    make $past;
+}
+
+method statement_control:sym<continue> ($/) {
+    my $past := PAST::Op.new();
+    $past<control> := 'continue';
+    make $past;
+}
+
 
 method circumfix:sym<( )> ($/) {
     make $<EXPR>.ast;
