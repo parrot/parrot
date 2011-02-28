@@ -518,13 +518,18 @@ our method to_c:pasttype<undef> ($trans, PAST::Op $chunk) {
 }
 
 our multi method to_c($trans, PAST::Op $chunk) {
-    my $res := '';
+    my @res;
 
-    $res := $chunk<label> if $chunk<label>;
+    @res.push($chunk<label>) if $chunk<label>;
 
     my $type := $chunk.pasttype // 'undef';
     my $sub  := pir::find_sub_not_null__ps('to_c:pasttype<' ~ $type ~ '>');
-    $res ~ $sub(self, $trans, $chunk);
+
+    @res.push('(') if $chunk<wrap>;
+    @res.push($sub(self, $trans, $chunk));
+    @res.push(')') if $chunk<wrap>;
+
+    @res.join('');
 }
 
 our multi method to_c($trans, PAST::Stmts $chunk) {

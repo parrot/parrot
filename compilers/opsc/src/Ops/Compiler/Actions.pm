@@ -578,7 +578,12 @@ method statement_control:sym<continue> ($/) {
 
 
 method circumfix:sym<( )> ($/) {
-    make $<EXPR>.ast;
+    my $past := $<EXPR>.ast;
+
+    # Indicate that we need wrapping.
+    $past<wrap> := 1;
+
+    make $past;
 }
 
 # For casting we just set "returns" of EXPR.
