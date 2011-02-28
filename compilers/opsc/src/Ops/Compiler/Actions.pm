@@ -468,6 +468,10 @@ method c_macro:sym<ifdef> ($/) {
     make $past;
 }
 
+method term:sym<concatenate_strings> ($/) {
+    make ~$<identifier> ~ ' ' ~ ~$<quote>;
+}
+
 method term:sym<identifier> ($/) {
     # XXX Type vs Variable
     make PAST::Var.new(
