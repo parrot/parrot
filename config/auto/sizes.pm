@@ -115,8 +115,8 @@ sub test_size {
 
     $conf->data->set( TEMP_type => $type );
     $conf->cc_gen('config/auto/sizes/test_c.in');
-    $conf->cc_build();
-    my $ret = eval $conf->cc_run();
+    eval { $conf->cc_build() };
+    my $ret = $@ ? 0 : eval $conf->cc_run();
     $conf->cc_clean();
 
     return $ret;
