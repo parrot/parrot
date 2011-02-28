@@ -371,7 +371,7 @@ method declarator ($/) {
             :vivibase(~$<type_declarator>),
         );
 
-        $decl.viviself($_<statement>[0].ast) if $_<statement>[0];
+        $decl.viviself($_<EXPR>[0].ast) if $_<EXPR>[0];
 
         $decl<array_size> := ~$_<array_size><VALUE> if $_<array_size>;
         $past.push($decl);
