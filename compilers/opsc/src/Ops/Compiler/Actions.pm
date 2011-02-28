@@ -362,7 +362,7 @@ method blockoid ($/) {
 }
 
 method declarator ($/) {
-    my $past := PAST::Block.new(:node($/));
+    my $past := PAST::Stmts.new(:node($/));
     for $<declarator_name> {
         my $decl := PAST::Var.new(
             :node($_),
