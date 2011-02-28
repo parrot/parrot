@@ -112,18 +112,18 @@ token c_macro:sym<define> {
 
 token c_macro:sym<ifdef> {
     ^^ '#' \h* <sym> \h+ <name=.identifier> <.ws>
-    <then=.statement_list>
+    <then=.mixed_content>
     [
-    ^^ '#' 'else' <else=.statement_list>
+    ^^ '#' 'else' <else=.mixed_content>
     ]?
     ^^ '#' 'endif'
 }
 
 token c_macro:sym<if> {
     ^^ '#' \h* <sym> \h+ <condition=.nonl> <.ws>
-    <then=.statement_list>
+    <then=.mixed_content>
     [
-    ^^ '#' 'else' <else=.statement_list>
+    ^^ '#' 'else' <else=.mixed_content>
     ]?
     ^^ '#' 'endif'
 }
