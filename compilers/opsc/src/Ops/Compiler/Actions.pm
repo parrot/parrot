@@ -355,6 +355,14 @@ method op_macro:sym<restart next> ($/) {
 method blockoid ($/) {
     my $past := PAST::Block.new(:node($/));
 
+    $past.push($_) for @($<mixed_content>.ast);
+
+    make $past;
+}
+
+method mixed_content ($/) {
+    my $past := PAST::Stmts.new(:node($/));
+
     @($_.ast).map(-> $_ { $past.push($_) }) for $<declarator>;
     $past.push($_) for @($<statement_list>.ast);
 

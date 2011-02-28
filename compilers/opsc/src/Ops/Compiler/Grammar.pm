@@ -348,10 +348,12 @@ token prefix:sym<~>   { <sym>  <O('%symbolic_unary :pirop<~>')> }
 token prefix:sym<return> { <sym>  <O('%symbolic_unary :pirop<return>')> }
 
 rule blockoid {
-    '{'
+    '{' <mixed_content> '}'
+}
+
+rule mixed_content {
     <declarator>*
     <statement_list>
-    '}'
 }
 
 # Simplified parsing of declarator
