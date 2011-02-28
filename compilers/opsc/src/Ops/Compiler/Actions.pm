@@ -465,6 +465,9 @@ method term:sym<call> ($/) {
         :name(~$<identifier>),
     );
 
+    my $type := $<arglist><type_declarator>;
+    $past.push(~$type) if $type;
+
     my $args := $<arglist><EXPR>;
     $past.push($args.ast) if $args;
 

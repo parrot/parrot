@@ -550,6 +550,11 @@ our multi method to_c($trans, PAST::Block $chunk) {
     join('', |@children);
 }
 
+# Stub!
+our multi method to_c($trans, String $str) {
+    $str;
+}
+
 =begin
 
 =item C<size()>
