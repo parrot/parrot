@@ -182,13 +182,13 @@ sub _set_int8 {
         if ( $sizesref->{$type} == 8 ) {
             $conf->data->set(
                 int8_t       => $typesref->{$type},
-                HAS_INTVAL64 => 1,
+                HAS_INT64 => 1,
             );
             return;
         }
     }
 
-    $conf->data->set( HAS_INTVAL64 => 0 );
+    $conf->data->set( HAS_INT64 => 0 );
     print <<'END';
 
 Can't find an int type with size 8, 64-bit support dissabled.

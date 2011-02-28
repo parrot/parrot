@@ -44,9 +44,6 @@ typedef struct elt_desc_t {
 } elt_desc_t;
 END_PMC_HEADER_PREAMBLE
 
-/* TODO: detect with configure */
-#define HAS_64BIT      0
-
 #define ALIGN_UP(addr, align) (((addr) + ((align) - 1)) & ~((align) - 1))
 
 #define MAX(x, y) ((y) > (x) ? (y) : (x))
@@ -279,7 +276,7 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
               case enum_type_int8:
               case enum_type_int16:
               case enum_type_int32:
-#if HAS_64BIT
+#if HAS_INT64
               case enum_type_int64:
 #endif
               case enum_type_uchar:
@@ -292,7 +289,7 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
               case enum_type_uint8:
               case enum_type_uint16:
               case enum_type_uint32:
-#if HAS_64BIT
+#if HAS_INT64
               case enum_type_uint64:
 #endif
 
@@ -333,7 +330,7 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
               case enum_type_longlong:
               case enum_type_ulonglong:
 #endif
-#if !HAS_64BIT
+#if !HAS_INT64
               case enum_type_int64:
               case enum_type_uint64:
 #endif
@@ -409,7 +406,7 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
                           case enum_type_uint8:
                           case enum_type_uint16:
                           case enum_type_uint32:
-#if HAS_64BIT
+#if HAS_INT64
                           case enum_type_uint64:
 #endif
                             elt->access = unaligned_access;
@@ -493,7 +490,7 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 CASE_RET2(Parrot_UInt2, uint16);
                 CASE_RET2(Parrot_Int4,  int32);
                 CASE_RET2(Parrot_UInt4, uint32);
-#if HAS_64BIT
+#if HAS_INT64
                 CASE_RET2(Parrot_Int8,  int64);
                 CASE_RET2(Parrot_UInt8, uint64);
 #endif
@@ -567,7 +564,7 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 CASE_SET2(Parrot_UInt2, uint16);
                 CASE_SET2(Parrot_Int4,  int32);
                 CASE_SET2(Parrot_UInt4, uint32);
-#if HAS_64BIT
+#if HAS_INT64
                 CASE_SET2(Parrot_Int8,  int64);
                 CASE_SET2(Parrot_UInt8, uint64);
 #endif

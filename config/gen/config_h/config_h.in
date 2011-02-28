@@ -37,6 +37,10 @@ typedef @int2_t@                Parrot_Int2;
 typedef unsigned @int2_t@       Parrot_UInt2;
 typedef @int4_t@                Parrot_Int4;
 typedef unsigned @int4_t@       Parrot_UInt4;
+#if @HAS_INT64@
+typedef @int8_t@                Parrot_Int8;
+typedef unsigned @int8_t@       Parrot_UInt8;
+#endif
 
 typedef @float4_t@              Parrot_Float4;
 typedef @float8_t@              Parrot_Float8;
@@ -122,25 +126,6 @@ typedef @hugefloatval@ HUGEFLOATVAL;
 #define LONG_SIZE @longsize@
 #define HUGEINTVAL_SIZE @hugeintvalsize@
 #define DOUBLE_SIZE @doublesize@
-
-/* We don't have a portable config for 64-bit
- * registers yet. */
-#if 0
-#  if INTVAL_SIZE >= 8
-typedef Parrot_Int   INTVAL64;
-typedef Parrot_Int   Parrot_Int64;
-#  else
-#    if HUGEINTVAL_SIZE >= 8
-typedef HUGEINTVAL   INTVAL64;
-typedef HUGEINTVAL   Parrot_Int64;
-#    else
-/* No 64-bit type available? */
-typedef union { unsigned char b[8]; } INTVAL64;
-typedef INTVAL64   Parrot_Int64;
-#    endif
-#  endif
-#endif
-
 
 typedef Parrot_Opcode opcode_t;
 typedef size_t ptrcast_t;
