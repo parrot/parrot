@@ -13,9 +13,6 @@
 #ifndef PARROT_DATATYPES_H_GUARD
 #define PARROT_DATATYPES_H_GUARD
 
-/* TODO: detect these with configure */
-#define HAS_LONGLONG   0
-
 /* &gen_from_enum(datatypes.pasm) subst(s/enum_type_(\w+)/uc("DATATYPE_$1")/e) */
 typedef enum {
     enum_type_undef,            /* illegal */
