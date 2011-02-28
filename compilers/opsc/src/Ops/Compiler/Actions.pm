@@ -451,15 +451,7 @@ method term:sym<call> ($/) {
     );
 
     my $args := $<arglist><EXPR>;
-
-    if $args {
-        if +@($args) > 1 {
-            $past.push($_.ast) for @($args);
-        }
-        else {
-            $past.push($args.ast);
-        }
-    }
+    $past.push($args.ast) if $args;
 
     make $past;
 }
