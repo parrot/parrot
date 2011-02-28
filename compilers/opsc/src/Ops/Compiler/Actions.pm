@@ -85,7 +85,7 @@ method op ($/, $key?) {
         $OP.push($<op_body>.ast);
 
         if $OP.need_write_barrier {
-            $OP.push(
+            $OP[0].push(
                 PAST::Stmts.new(
                     PAST::Op.new(
                         :pasttype<call>,
