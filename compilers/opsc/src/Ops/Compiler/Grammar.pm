@@ -144,7 +144,7 @@ token identifier {
 
 token keyword {
     [
-    | 'for' |'if' |'while'
+    | 'for' |'if' |'while' | 'else'
     | 'case' | 'default'
     | 'goto' | 'expr' | 'restart'
     | 'OFFSET' | 'ADDRESS' | 'NEXT'
@@ -192,18 +192,18 @@ proto rule statement_control { <...> }
 
 rule statement_control:sym<if> {
     <sym> '(' <EXPR> ')'
-    <then=.statement>
-    [ 'else' <else=.statement> ]?
+    <then=.statement_list>
+    [ 'else' <else=.statement_list> ]?
 }
 
 rule statement_control:sym<while> {
     <sym> '(' <condition=.EXPR> ')'
-    <statement>
+    <statement_list>
 }
 
 rule statement_control:sym<for> {
     <sym> '(' <init=.EXPR>? ';' <test=.EXPR>? ';' <step=.EXPR>? ')'
-    <statement>
+    <statement_list>
 }
 
 rule statement_control:sym<do> {
@@ -260,7 +260,7 @@ token infix:sym</=> { <sym>  <O('%assignment :pirop</=>')> }
 token infix:sym«>>=» { <sym>  <O('%assignment :pirop<shr_assign>')> }
 token infix:sym«<<=» { <sym>  <O('%assignment :pirop<shl_assign>')> }
 
-token infix:sym<,>   { <sym>  <O('%comma')> }
+token infix:sym<,>   { <sym>  <O('%comma :pirop<,>')> }
 
 token infix:sym<*>    { <sym>  <O('%multiplicative :pirop<*>')> }
 token infix:sym</>    { <sym>  <O('%multiplicative :pirop</>')> }
