@@ -360,7 +360,7 @@ rule declarator {
 }
 
 rule declarator_name {
-     <variable=.ident> [ '[' <array_size=.integer> ']' ]? [ '=' <statement> ]?
+     <variable=.ident> [ '[' <array_size=.integer> ']' ]? [ '=' <EXPR('i=')> ]?
 }
 
 # No double poiners (for now?)
