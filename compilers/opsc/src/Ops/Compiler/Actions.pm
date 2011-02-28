@@ -257,10 +257,7 @@ method op_param($/) {
 }
 
 method op_body($/) {
-    my $past := $<blockoid>.ast;
-    $past<jump> := list();
-
-    make $past;
+    make $<blockoid>.ast;
 }
 
 method op_macro:sym<expr offset>($/) {
@@ -304,7 +301,8 @@ method op_macro:sym<expr next>($/) {
             :name<OPSIZE>,
         )
     );
-    $past<jump> := <PARROT_JUMP_RELATIVE>;
+
+    $OP.add_jump('PARROT_JUMP_RELATIVE');
 
     make $past;
 }
@@ -318,7 +316,8 @@ method op_macro:sym<goto next>($/) {
             :name<OPSIZE>,
         )
     );
-    $past<jump> := <PARROT_JUMP_RELATIVE>;
+
+    $OP.add_jump('PARROT_JUMP_RELATIVE');
 
     make $past;
 }
@@ -345,7 +344,7 @@ method op_macro:sym<restart next> ($/) {
         ),
     );
 
-    $past<jump> := <PARROT_JUMP_RELATIVE>;
+    $OP.add_jump('PARROT_JUMP_RELATIVE');
 
     make $past;
 }
