@@ -51,10 +51,8 @@ static void free_pmc_in_pool(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Fixed_Size_Pool * new_bufferlike_pool(PARROT_INTERP,
-    ARGIN(const Memory_Pools *mem_pools),
     size_t actual_buffer_size)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -85,8 +83,7 @@ static Fixed_Size_Pool * new_string_pool(PARROT_INTERP,
     , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(p))
 #define ASSERT_ARGS_new_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_new_fixed_size_obj_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_new_pmc_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -547,8 +544,8 @@ free_pmc_in_pool(PARROT_INTERP,
 
 /*
 
-=item C<static Fixed_Size_Pool * new_bufferlike_pool(PARROT_INTERP, const
-Memory_Pools *mem_pools, size_t actual_buffer_size)>
+=item C<static Fixed_Size_Pool * new_bufferlike_pool(PARROT_INTERP, size_t
+actual_buffer_size)>
 
 Creates a new pool for buffer-like structures. This is called from
 C<get_bufferlike_pool()>, and should probably not be called directly.
@@ -560,9 +557,7 @@ C<get_bufferlike_pool()>, and should probably not be called directly.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Fixed_Size_Pool *
-new_bufferlike_pool(PARROT_INTERP,
-        ARGIN(const Memory_Pools *mem_pools),
-        size_t actual_buffer_size)
+new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
 {
     ASSERT_ARGS(new_bufferlike_pool)
     const int num_headers          = BUFFER_HEADERS_PER_ALLOC;
@@ -629,7 +624,7 @@ new_string_pool(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools), INTVAL constant)
     ASSERT_ARGS(new_string_pool)
     Fixed_Size_Pool *pool;
     if (constant) {
-        pool           = new_bufferlike_pool(interp, mem_pools, sizeof (STRING));
+        pool = new_bufferlike_pool(interp, sizeof (STRING));
         pool->gc_object = NULL;
     }
     else
@@ -709,7 +704,7 @@ get_bufferlike_pool(PARROT_INTERP,
     }
 
     if (sized_pools[idx] == NULL)
-        sized_pools[idx] = new_bufferlike_pool(interp, mem_pools, buffer_size);
+        sized_pools[idx] = new_bufferlike_pool(interp, buffer_size);
 
     return sized_pools[idx];
 }
