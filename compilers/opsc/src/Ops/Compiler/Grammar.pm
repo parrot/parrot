@@ -43,8 +43,8 @@ rule op {
     <op_type>? 'op' <op_name=ident>
     [ '(' <signature> ')' || <.panic: "Fail to parse signature"> ]
     <op_flag>*
+    {*} #= start    
     [ <op_body> || <.panic: "Fail to parse op body"> ]
-    {*}
 }
 
 token op_type {

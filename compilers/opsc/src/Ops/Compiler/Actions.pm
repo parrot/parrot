@@ -3,6 +3,7 @@
 
 class Ops::Compiler::Actions is HLL::Actions;
 
+our $OP;
 our $OPLIB;
 
 INIT {
@@ -54,91 +55,88 @@ method preamble($/) {
     );
 }
 
-method op($/) {
+method op ($/, $key?) {
 
-    # Handling flags.
-    my %flags := hash();
-    for $<op_flag> {
-        %flags{~$_<identifier>} := 1;
+    if $key eq 'start' {
+        # Handling flags.
+        my %flags := hash();
+        for $<op_flag> {
+            %flags{~$_<identifier>} := 1;
+        }
+
+        my @args      := @($<signature>.ast);
+        my @norm_args := normalize_args(@args);
+
+        $OP := Ops::Op.new(
+            :name(~$<op_name>),
+        );
+
+        if ~$<op_name> eq 'runinterp' {
+            $OP.add_jump('PARROT_JUMP_RELATIVE');
+        }
+
+        $OP<flags> := %flags;
+        $OP<args>  := @args;
+        $OP<type>  := ~$<op_type>;
+        $OP<normalized_args> := @norm_args;
     }
+    else {
+        # Handle op body
+        $OP.push($<op_body>.ast);
 
-    my @args := @($<signature>.ast);
-
-    my @norm_args := normalize_args(@args);
-    # We have to clone @norm_args. Otherwise it will be destroyed...
-    my @variants  := expand_args(pir::clone__PP(@norm_args));
-
-    my $op := Ops::Op.new(
-        :name(~$<op_name>),
-    );
-
-    # Flatten PAST::Stmts into Op.
-    #for @($<op_body>.ast) {
-    #    $op.push($_);
-    #}
-    $op.push($<op_body>.ast);
-
-    for $<op_body>.ast<jump> {
-        $op.add_jump($_);
-    }
-    if ~$<op_name> eq 'runinterp' {
-        $op.add_jump('PARROT_JUMP_RELATIVE');
-    }
-    $op<flags> := %flags;
-    $op<args>  := @args;
-    $op<type>  := ~$<op_type>;
-    $op<normalized_args> := @norm_args;
-
-    if $op.need_write_barrier {
-        $op.push(
-            PAST::Stmts.new(
-                PAST::Op.new(
-                    :pasttype<call>,
-                    :name<PARROT_GC_WRITE_BARRIER>,
-                    PAST::Var.new(
-                        :name<interp>
-                    ),
+        if $OP.need_write_barrier {
+            $OP.push(
+                PAST::Stmts.new(
                     PAST::Op.new(
                         :pasttype<call>,
-                        :name<CURRENT_CONTEXT>,
+                        :name<PARROT_GC_WRITE_BARRIER>,
                         PAST::Var.new(
                             :name<interp>
+                        ),
+                        PAST::Op.new(
+                            :pasttype<call>,
+                            :name<CURRENT_CONTEXT>,
+                            PAST::Var.new(
+                                :name<interp>
+                            )
                         )
                     )
                 )
-            )
-        );
-    }
-
-    if !%flags<flow> {
-        my $goto_next := PAST::Op.new(
-            :pasttype('macro'),
-            :name('goto_offset'),
-            PAST::Op.new(
-                :pasttype<macro>,
-                :name<OPSIZE>,
-            )
-        );
-
-        $op[0].push($goto_next);
-    }
-
-    my $past := PAST::Stmts.new(
-        :node($/)
-    );
-
-    if @variants {
-        for @variants {
-            my $new_op := pir::clone__PP($op);
-            $new_op<arg_types> := $_;
-            $past.push($new_op);
+            );
         }
-    }
-    else {
-        $past.push($op);
-    }
 
-    make $past;
+        if !$OP<flags><flow> {
+            my $goto_next := PAST::Op.new(
+                :pasttype('macro'),
+                :name('goto_offset'),
+                PAST::Val.new(
+                    :value($OP.size),
+                    :returns('int'),
+                )
+            );
+
+            $OP[0].push($goto_next);
+        }
+
+        my $past := PAST::Stmts.new(
+            :node($/)
+        );
+
+        # We have to clone @norm_args. Otherwise it will be destroyed...
+        my @variants  := expand_args(pir::clone__PP($OP<normalized_args>));
+        if @variants {
+            for @variants {
+                my $new_op := pir::clone__PP($OP);
+                $new_op<arg_types> := $_;
+                $past.push($new_op);
+            }
+        }
+        else {
+            $past.push($OP);
+        }
+
+        make $past;
+    }
 }
 
 # Normalize args
