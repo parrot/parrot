@@ -492,7 +492,7 @@ our multi method to_c($trans, PAST::Stmts $chunk) {
     my @children := list();
     for @($chunk) {
         @children.push(self.to_c($trans, $_));
-        @children.push(";\n");
+        @children.push(";\n") unless $_ ~~ PAST::Block;
     }
     join('', |@children);
 }
