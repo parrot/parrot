@@ -310,8 +310,8 @@ token postcircumfix:sym<[ ]> {
 
 #token postfix:sym«->» { <sym> <identifier> <O('%methodop :pirop<arrow>')> }
 #token postfix:sym«.»  { <sym> <identifier> <O('%methodop :pirop<dotty>')> }
-token infix:sym«->» { <sym> <O('%methodop :pirop<arrow>')> }
-token infix:sym«.»  { <sym> <O('%methodop :pirop<dotty>')> }
+token infix:sym«->» { <sym> <O('%dotty :pirop<arrow>')> }
+token infix:sym«.»  { <sym> <O('%dotty :pirop<dotty>')> }
 
 # XXX Check precedence
 token postfix:sym<--> { <sym> <O('%autoincrement :pirop<-->')> }
@@ -393,7 +393,8 @@ token ws {
 }
 
 INIT {
-    Ops::Compiler::Grammar.O(':prec<y=>, :assoc<left>', '%methodop');
+    Ops::Compiler::Grammar.O(':prec<z=>, :assoc<unary>', '%methodop');
+    Ops::Compiler::Grammar.O(':prec<y=>, :assoc<left>',  '%dotty');
     Ops::Compiler::Grammar.O(':prec<x=>, :assoc<unary>', '%autoincrement');
     Ops::Compiler::Grammar.O(':prec<w=>, :assoc<unary>', '%casting');
     Ops::Compiler::Grammar.O(':prec<v=>, :assoc<unary>', '%symbolic_unary');
