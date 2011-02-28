@@ -513,7 +513,7 @@ method statement_control:sym<while> ($/) {
         :pasttype<while>,
 
         $<condition>.ast,
-        $<statement>.ast,
+        $<statement_list>.ast,
     );
 
     make $past;
@@ -526,7 +526,7 @@ method statement_control:sym<for> ($/) {
         $<init> ?? $<init>[0].ast !! undef,
         $<test> ?? $<test>[0].ast !! undef,
         $<step> ?? $<step>[0].ast !! undef,
-        $<statement>.ast,
+        $<statement_list>.ast,
     );
 
     make $past;
