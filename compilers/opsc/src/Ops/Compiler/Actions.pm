@@ -550,6 +550,13 @@ method circumfix:sym<( )> ($/) {
     make $<EXPR>.ast;
 }
 
+# For casting we just set "returns" of EXPR.
+method prefix:sym<( )> ($/) {
+    make PAST::Op.new(
+        :returns(~$<type_declarator>),
+    );
+}
+
 # Local Variables:
 #   mode: perl6
 #   fill-column: 100

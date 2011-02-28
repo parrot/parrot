@@ -455,6 +455,15 @@ our method to_c:pasttype<undef> ($trans, PAST::Op $chunk) {
             pir::die("Unhandled chunk");
         }
     }
+    elsif $chunk.returns {
+        # Handle "cast"
+        join('',
+            '(',
+            $chunk.returns,
+            ')',
+            self.to_c($trans, $chunk[0]),
+        );
+    }
     else {
         _dumper($chunk);
         pir::die("Unhandled chunk");
