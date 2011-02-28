@@ -507,6 +507,10 @@ our method to_c:pasttype<undef> ($trans, PAST::Op $chunk) {
     elsif $chunk<control> {
         $chunk<control>;
     }
+    elsif $chunk<label> {
+        # Do nothing. Empty label for statement.
+        "";
+    }
     else {
         _dumper($chunk);
         pir::die("Unhandled chunk");
