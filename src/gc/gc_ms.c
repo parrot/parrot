@@ -1182,6 +1182,7 @@ gc_ms_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
     return attrs;
 }
 
+#if DEBUG_FREE_LIST
 /*
 
 =item C<static INTVAL contained_in_attr_pool(const PMC_Attribute_Pool *pool,
@@ -1212,6 +1213,7 @@ contained_in_attr_pool(ARGIN(const PMC_Attribute_Pool *pool), ARGIN(const void *
 
     return 0;
 }
+#endif
 
 /*
 
