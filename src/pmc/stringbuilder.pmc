@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -23,7 +23,10 @@ TODO: Add description here.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
 static size_t calculate_capacity(SHIM_INTERP, size_t needed);
+
 #define ASSERT_ARGS_calculate_capacity __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -262,7 +265,7 @@ Set content of buffer to passed string or PMC
         STRING * buffer;
 
         /* Calculate (possibly new) total size */
-        size_t total_size = calculate_capacity(INTERP, s->bufused);
+        const size_t total_size = calculate_capacity(INTERP, s->bufused);
 
         GET_ATTR_buffer(INTERP, SELF, buffer);
 
@@ -349,16 +352,15 @@ key receives the value of the hash element.
         STRING * const percent     = CONST_STRING(INTERP, "%");
         STRING * const comma       = CONST_STRING(INTERP, ",");
         STRING * const comma_space = CONST_STRING(INTERP, ", ");
-        STRING *key;
         PMC    *stringbuilder = SELF;
-        INTVAL percentPos;
         INTVAL pos = 0;
 
         /* Loop over the format string, splitting it into chunks
          * for the string builder. */
         while (pos >= 0) {
             /* Find the next % */
-            percentPos = STRING_index(INTERP, fmt, percent, pos);
+            const INTVAL percentPos = STRING_index(INTERP, fmt, percent, pos);
+            STRING *key;
 
             if (percentPos < 0) {
                 if (pos == 0) {
@@ -466,6 +468,8 @@ Calculate capacity for string. We allocate double the amount needed.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
 static size_t
 calculate_capacity(SHIM_INTERP, size_t needed)
 {
