@@ -355,18 +355,22 @@ rule mixed_content {
 
 # Simplified parsing of declarator
 rule declarator {
-    <type_declarator>  [ <declarator_name> ** ',' ] ';'
+    <type_declarator=.pointerless_type> [ <declarator_name> ** ',' ] ';'
 }
 
 rule declarator_name {
-     <pointer=.star>* <variable=.ident> [ '[' <array_size=.integer> ']' ]? [ '=' <EXPR('i=')> ]?
+     <pointer>* <variable=.ident> [ '[' <array_size=.integer> ']' ]? [ '=' <EXPR('i=')> ]?
 }
 
+rule pointer { <star> 'const'? }
 token star { '*' }
 
-# No double poiners (for now?)
+rule pointerless_type {
+    'struct'? 'const'? <identifier>
+}
+
 rule type_declarator {
-    'struct'? 'const'? <identifier> <pointer=.star>* 'const'? <?before [ <identifier> | ',' | ')' ] >
+    'struct'? 'const'? <identifier> <pointer>*
 }
 
 token eat_terminator {

@@ -12,7 +12,7 @@ Q:PIR{ .include "test_more.pir" };
 
 my $buf := q|
 inline op foo(inconst NUM) {
-    PMC *foo;
+    PMC * const foo;
     foo();
     foo(bar);
     foo(bar, baz);
@@ -36,7 +36,8 @@ my $var := $op[0];
 ok( $var ~~ PAST::Var, "PAST::Var created" );
 ok( $var.isdecl, ".. as declaration" );
 is( $var.name, "foo", ".. with proper name" );
-is( $var.vivibase, "PMC *", ".. with proper type" );
+is( $var.vivibase, "PMC ", ".. with proper type" );
+is( $var<pointer>, "* const ", ".. with proper pointer" );
 
 my $call := $op[1];
 ok( $call ~~ PAST::Op, "PAST::op for call created" );

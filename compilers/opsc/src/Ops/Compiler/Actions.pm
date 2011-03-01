@@ -365,6 +365,7 @@ method declarator ($/) {
         $decl.viviself($_<EXPR>[0].ast) if $_<EXPR>[0];
 
         $decl<array_size> := ~$_<array_size><VALUE> if $_<array_size>;
+        $decl<pointer>    := $_<pointer>.join('');
         $past.push($decl);
     }
 

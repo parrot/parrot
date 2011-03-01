@@ -304,7 +304,7 @@ our multi method to_c($trans, PAST::Val $val) {
 
 our multi method to_c($trans, PAST::Var $var) {
     if ($var.isdecl) {
-        my $res := $var.vivibase ~ ' ' ~ $var.name;
+        my $res := $var.vivibase ~ ' ' ~ $var<pointer> ~ ' ' ~ $var.name;
 
         if my $arr  := $var<array_size> {
             $res := $res ~ '[' ~ $arr ~ ']';
