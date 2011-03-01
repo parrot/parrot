@@ -227,14 +227,14 @@ Verify that the version is correct and doesn't contain the suffix C<devel>:
 
 =over 4
 
-=item * C<make release_test>
+=item * C<make release_check>
 
 As an alternative to steps 4, 5 and 6 above, you may wish to call:
 
     perl Configure.pl
-    make release_test
+    make release_check
 
-This target (or, for short, C<make reltest>), will prepare the tarballs, copy
+This target (or, for short, C<make relcheck>), will prepare the tarballs, copy
 the F<.gz> tarball to a temporary directory, and then reconfigure, rebuild,
 retest (through C<make test>) and rerelease.
 
