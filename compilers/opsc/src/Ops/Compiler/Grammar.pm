@@ -359,12 +359,14 @@ rule declarator {
 }
 
 rule declarator_name {
-     <variable=.ident> [ '[' <array_size=.integer> ']' ]? [ '=' <EXPR('i=')> ]?
+     <pointer=.star>* <variable=.ident> [ '[' <array_size=.integer> ']' ]? [ '=' <EXPR('i=')> ]?
 }
+
+token star { '*' }
 
 # No double poiners (for now?)
 rule type_declarator {
-    'struct'? 'const'? <identifier> '*'* 'const'? <?before [ <identifier> | ',' | ')' ] >
+    'struct'? 'const'? <identifier> <pointer=.star>* 'const'? <?before [ <identifier> | ',' | ')' ] >
 }
 
 token eat_terminator {
