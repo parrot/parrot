@@ -2175,6 +2175,7 @@ tools/release/crow.pir                                      []
 tools/release/gen_release_info.pl                           []
 tools/release/inc_ver.pir                                   []
 tools/release/release.json                                  []
+tools/release/releasecheck.pl                               []
 tools/release/templates.json                                []
 # Local variables:
 #   mode: text
