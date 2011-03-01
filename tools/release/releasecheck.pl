@@ -1,4 +1,6 @@
-# !perl
+#! perl
+# Copyright (C) 2011, Parrot Foundation.
+
 use strict;
 use warnings;
 use Data::Dumper;$Data::Dumper::Indent=1;
