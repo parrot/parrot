@@ -16,6 +16,8 @@ New in 3.2.0
     files, has been removed.
   + Svn remnants from PDDs are removed
 - Tests
+  + Added 'make release_check' target so that Release Manager can double-check
+    tarball
 
 New in 3.1.0
 - Core
