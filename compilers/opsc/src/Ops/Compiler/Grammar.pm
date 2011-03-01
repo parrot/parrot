@@ -229,6 +229,7 @@ token term:sym<concatenate_strings> { # Long-long name as LTM workaround
 token term:sym<call> {
     <identifier> <.ws> '(' <arglist> ')'
 }
+
 token term:sym<int>  { <integer> ('u'|'U'|'l'|'L')* }
 token term:sym<str>  { <quote> }
 token term:sym<float_constant_long> { # longer to work-around lack of LTM
@@ -298,13 +299,8 @@ token infix:sym<?:> {
     <O('%conditional, :reducecheck<ternary>')>
 }
 
-token postcircumfix:sym<( )> {
-    '(' <.ws> <arglist> ')'
-    <O('%methodop')>
-}
-
 token postcircumfix:sym<[ ]> {
-    '[' <.ws> <EXPR>? ']'
+    '[' <.ws> <EXPR> ']'
     <O('%methodop')>
 }
 
@@ -332,6 +328,7 @@ token prefix:sym<( )> {
     '(' <type_declarator> ')'
     <O('%casting')>
 }
+
 token circumfix:sym<( )> {
     '(' <.ws> <EXPR> ')'
     <O('%methodop')>        # XXX Check precedence

@@ -604,6 +604,14 @@ method circumfix:sym<( )> ($/) {
     make $past;
 }
 
+method postcircumfix:sym<[ ]> ($/) {
+    make PAST::Var.new(
+        $<EXPR>.ast,
+        :scope('keyed'),
+    );
+}
+
+
 # For casting we just set "returns" of EXPR.
 method prefix:sym<( )> ($/) {
     make PAST::Op.new(

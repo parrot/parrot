@@ -315,6 +315,9 @@ our multi method to_c($trans, PAST::Var $var) {
         }
         $res;
     }
+    elsif $var.scope eq 'keyed' {
+        self.to_c($trans, $var[0]) ~ '[' ~ self.to_c($trans, $var[1]) ~ ']';
+    }
     elsif $var.scope eq 'register' {
         my $n := +$var.name;
         $trans.access_arg( self.arg_type($n - 1), $n);

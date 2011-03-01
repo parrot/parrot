@@ -127,6 +127,16 @@ inline op noop(in PMC) :flow {
             / 'foo * bar' /
         ],
 
+        [
+            'Array access',
+            q«
+inline op noop(in PMC) :flow {
+    $1 = foo[bar];
+}
+            »,
+            / 'foo[bar]' /
+        ],
+
 
     );
 }
