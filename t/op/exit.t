@@ -56,6 +56,7 @@ TODO: {
     local $TODO = 'pasm exits with 1 by default';
     pasm_exit_code_is( <<'CODE', 0, 'exit with success by default' );
         set I0, 0
+        end
 CODE
 
 }
