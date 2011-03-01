@@ -225,6 +225,21 @@ Verify that the version is correct and doesn't contain the suffix C<devel>:
 
     ./parrot -V
 
+=over 4
+
+=item * C<make release_test>
+
+As an alternative to steps 4, 5 and 6 above, you may wish to call:
+
+    perl Configure.pl
+    make release_test
+
+This target (or, for short, C<make reltest>), will prepare the tarballs, copy
+the F<.gz> tarball to a temporary directory, and then reconfigure, rebuild,
+retest (through C<make test>) and rerelease.
+
+=back
+
 =item 7.
 
 Tag the release as "RELEASE_a_b_c", where a.b.c is the version number.
