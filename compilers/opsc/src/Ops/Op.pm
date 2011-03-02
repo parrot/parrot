@@ -560,7 +560,7 @@ our method to_c:pasttype<undef> (PAST::Op $chunk, %c) {
 our multi method to_c(PAST::Op $chunk, %c) {
     my @res;
 
-    @res.push($chunk<label>) if $chunk<label>;
+    @res.push($chunk<label> ~ "\n" ~ indent(%c)) if $chunk<label>;
 
     my $type := $chunk.pasttype // 'undef';
     my $sub  := pir::find_sub_not_null__ps('to_c:pasttype<' ~ $type ~ '>');
@@ -578,7 +578,7 @@ our multi method to_c(PAST::Stmts $chunk, %c) {
 
     my @children := list();
     for @($chunk) {
-        @children.push(indent(%c)) unless $_ ~~ PAST::Block;
+        @children.push(indent($_, %c)) unless $_ ~~ PAST::Block;
 
         @children.push(self.to_c($_, %c));
         @children.push(";") if need_semicolon($_);
@@ -607,7 +607,7 @@ our multi method to_c(PAST::Block $chunk, %c) {
             $need_space := 0;
         }
 
-        @children.push(indent(%c));
+        @children.push(indent($_, %c));
         @children.push(self.to_c($_, %c));
         @children.push(need_semicolon($_) ?? ";" !! "\n");
         @children.push("\n");
@@ -658,9 +658,14 @@ method size() {
     return pir::does__IPs(self.args, 'array') ?? +self.args + 1 !! 2;
 }
 
-sub indent(%c) {
+our multi sub indent($chunk, %c) {
+    pir::repeat(' ', %c<level> * 4 - ($chunk<label> ?? 2 !! 0));
+}
+
+our multi sub indent(%c) {
     pir::repeat(' ', %c<level> * 4);
 }
+
 
 =begin
 
