@@ -19,6 +19,9 @@
     - 'PIR'
     - 'syntax'
     - 'deprecated'
+  detection:
+    regex:
+      pir: '^ ".sub" .+ ":init"'
   ticket:  'https://trac.parrot.org/parrot/ticket/1896'
 -
   name:  '":load" and ":init" Sub flags doing different things'
@@ -81,6 +84,9 @@
   tags: 
     - 'deprecated'
     - 'PMC'
+  detection:
+    regex:
+      pir: 'new\s\[?\''Complex\''\]?'
   ticket:  'https://trac.parrot.org/parrot/ticket/1892'
 -
   name:  'Cross-HLL library loading'
