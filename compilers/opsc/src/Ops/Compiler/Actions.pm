@@ -598,7 +598,9 @@ method statement_control:sym<continue> ($/) {
 
 method statement_or_block ($/) {
     $<labeled_statement>
-        ?? make $<labeled_statement>.ast
+        ?? make PAST::Block.new(
+               $<labeled_statement>.ast
+           )
         !! make $<blockoid>.ast
 }
 
