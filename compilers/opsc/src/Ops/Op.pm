@@ -434,7 +434,6 @@ our method to_c:pasttype<if> (PAST::Op $chunk, %c) {
 
         # 'else'
         if $chunk[2] {
-            @res.push("\n");
             @res.push(indent(%c));
             @res.push("else " ~ self.to_c($chunk[2], %c));
         }
@@ -491,12 +490,19 @@ our method to_c:pasttype<switch> (PAST::Op $chunk, %c) {
 }
 
 our method to_c:pasttype<undef> (PAST::Op $chunk, %c) {
-    if $chunk.pirop {
+    my $pirop := $chunk.pirop;
+
+    if $pirop {
         # Some infix stuff
-        if $chunk.pirop eq ',' {
+        if $pirop eq ',' {
             join(', ',
                 |@($chunk).map(-> $_ { self.to_c($_, %c)})
             );
+        }
+        elsif $pirop eq '=' {
+              self.to_c($chunk[0], %c)
+            ~ ' = '
+            ~ self.to_c($chunk[1], %c)
         }
         elsif $chunk.name ~~ / infix / {
               '('
