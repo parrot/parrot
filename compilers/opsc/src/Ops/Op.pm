@@ -425,8 +425,6 @@ our method to_c:pasttype<if> (PAST::Op $chunk, %c) {
         @res.push(self.to_c($chunk[2], %c));
     }
     else {
-        @res.push("\n");
-        @res.push(indent(%c));
         @res.push('if (');
         @res.push(self.to_c($chunk[0], %c));
         @res.push(") ");
@@ -450,8 +448,6 @@ our method to_c:pasttype<if> (PAST::Op $chunk, %c) {
 
 our method to_c:pasttype<while> (PAST::Op $chunk, %c) {
     join('',
-        "\n",
-        indent(%c),
         'while (',
         self.to_c($chunk[0], %c),
         ') ',
@@ -461,8 +457,6 @@ our method to_c:pasttype<while> (PAST::Op $chunk, %c) {
 
 our method to_c:pasttype<do-while> (PAST::Op $chunk, %c) {
     join('',
-        "\n",
-        indent(%c),
         'do ',
         self.to_c($chunk[0], %c),
         'while (',
@@ -473,8 +467,6 @@ our method to_c:pasttype<do-while> (PAST::Op $chunk, %c) {
 
 our method to_c:pasttype<for> (PAST::Op $chunk, %c) {
     join('',
-        "\n",
-        indent(%c),
         'for (',
         $chunk[0] ?? self.to_c($chunk[0], %c) !! '',
         '; ',
@@ -490,8 +482,6 @@ our method to_c:pasttype<switch> (PAST::Op $chunk, %c) {
     my @parts := pir::clone(@($chunk));
     my $cond  := @parts.shift;
     join('',
-        "\n",
-        indent(%c),
         'switch (',
         self.to_c($cond, %c),
         ') {',
@@ -603,18 +593,18 @@ our multi method to_c(PAST::Block $chunk, %c) {
     my @children := list();
     @children.push($chunk<label>) if $chunk<label>;
 
-    @children.push('{' ~ "\n");
+    @children.push("\{\n");
 
     for @($chunk) {
         if $need_space && !need_space($_) {
             # Hack. If this $chunk doesn't need semicolon it will put newline before
-            @children.push("\n") if need_semicolon($_);
+            @children.push("\n");
             $need_space := 0;
         }
 
         @children.push(indent(%c));
         @children.push(self.to_c($_, %c));
-        @children.push(";") if need_semicolon($_);
+        @children.push(need_semicolon($_) ?? ";" !! "\n");
         @children.push("\n");
     }
 
