@@ -459,9 +459,9 @@ our method to_c:pasttype<do-while> (PAST::Op $chunk, %c) {
     join('',
         'do ',
         self.to_c($chunk[0], %c),
-        'while (',
+        ' while (',
         self.to_c($chunk[1], %c),
-        ')',
+        ');',
     );
 }
 
@@ -487,7 +487,8 @@ our method to_c:pasttype<switch> (PAST::Op $chunk, %c) {
         ') {',
         "\n",
         @parts.map(-> $_ { self.to_c($_, %c) } ).join(";\n"),
-        "}\n",
+        indent(%c),
+        "}",
     );
 }
 
@@ -633,6 +634,8 @@ sub need_semicolon($past) {
     return 0 if $pasttype eq 'if';
     return 0 if $pasttype eq 'for';
     return 0 if $pasttype eq 'while';
+    return 0 if $pasttype eq 'do-while';
+    return 0 if $pasttype eq 'switch';
 
     return 1;
 }
