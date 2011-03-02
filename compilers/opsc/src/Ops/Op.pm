@@ -589,14 +589,14 @@ our multi method to_c(PAST::Stmts $chunk, %c) {
 }
 
 our multi method to_c(PAST::Block $chunk, %c) {
-    my $level    := %c<level>;
-    $level++;
-
     # Put newline after variable declarations.
     my $need_space := need_space($chunk[0]);
 
     my @children := list();
-    @children.push($chunk<label>) if $chunk<label>;
+    @children.push(indent($chunk, %c) ~ $chunk<label> ~ "\n" ~ indent(%c)) if $chunk<label>;
+
+    my $level    := %c<level>;
+    $level++;
 
     @children.push("\{\n");
 
