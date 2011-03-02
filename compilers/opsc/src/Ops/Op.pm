@@ -429,22 +429,18 @@ our method to_c:pasttype<if> (PAST::Op $chunk, %c) {
         @res.push(indent(%c));
         @res.push('if (');
         @res.push(self.to_c($chunk[0], %c));
-        @res.push(")");
+        @res.push(") ");
 
         # 'then'
         # single statement. Make it pretty.
 
-        @res.push($chunk[1] ~~ PAST::Block ?? " " !! "\n    " ~ indent(%c));
         @res.push(self.to_c($chunk[1], %c));
 
         # 'else'
         if $chunk[2] {
             @res.push("\n");
             @res.push(indent(%c));
-            @res.push("else");
-            # single statement. Make it pretty.
-            @res.push($chunk[2] ~~ PAST::Block ?? " " !! "\n    " ~ indent(%c));
-
+            @res.push("else ");
             @res.push(self.to_c($chunk[2], %c));
         }
     }
