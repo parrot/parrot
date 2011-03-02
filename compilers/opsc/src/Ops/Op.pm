@@ -586,7 +586,8 @@ our multi method to_c(PAST::Stmts $chunk, %c) {
         @children.push(indent(%c)) unless $_ ~~ PAST::Block;
 
         @children.push(self.to_c($_, %c));
-        @children.push(";\n") unless $_ ~~ PAST::Block;
+        @children.push(";") if need_semicolon($_);
+        @children.push("\n");
     }
     $level-- unless $chunk[0] ~~ PAST::Block;
     join('', |@children);
@@ -612,7 +613,8 @@ our multi method to_c(PAST::Block $chunk, %c) {
 
         @children.push(indent(%c));
         @children.push(self.to_c($_, %c));
-        @children.push(";\n");
+        @children.push(";") if need_semicolon($_);
+        @children.push("\n");
     }
 
     $level--;
@@ -624,6 +626,19 @@ our multi method to_c(PAST::Block $chunk, %c) {
 
 sub need_space($past) {
     ($past ~~ PAST::Var) && $past.isdecl;
+}
+
+sub need_semicolon($past) {
+    return 0 if $past ~~ PAST::Block;
+    return 1 unless $past ~~ PAST::Op;
+
+    my $pasttype := $past.pasttype;
+    return 1 unless $pasttype;
+    return 0 if $pasttype eq 'if';
+    return 0 if $pasttype eq 'for';
+    return 0 if $pasttype eq 'while';
+
+    return 1;
 }
 
 
