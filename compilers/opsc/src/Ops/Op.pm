@@ -506,23 +506,28 @@ our method to_c:pasttype<undef> (PAST::Op $chunk, %c) {
             ~ ' = '
             ~ self.to_c($chunk[1], %c)
         }
+        elsif ($pirop eq 'arrow') || ($pirop eq 'dotty') {
+              self.to_c($chunk[0], %c)
+            ~ %PIROP_MAPPING{$pirop}
+            ~ self.to_c($chunk[1], %c)
+        }
         elsif $chunk.name ~~ / infix / {
               '('
             ~ self.to_c($chunk[0], %c)
-            ~ ' ' ~ (%PIROP_MAPPING{$chunk.pirop} // $chunk.pirop) ~ ' '
+            ~ ' ' ~ (%PIROP_MAPPING{$pirop} // $pirop) ~ ' '
             ~ self.to_c($chunk[1], %c)
             ~ ')';
         }
         elsif $chunk.name ~~ / prefix / {
               '('
-            ~ (%PIROP_MAPPING{$chunk.pirop} // $chunk.pirop)
+            ~ (%PIROP_MAPPING{$pirop} // $pirop)
             ~ self.to_c($chunk[0], %c)
             ~ ')';
         }
         elsif $chunk.name ~~ / postfix / {
               '('
             ~ self.to_c($chunk[0], %c)
-            ~ (%PIROP_MAPPING{$chunk.pirop} // $chunk.pirop)
+            ~ (%PIROP_MAPPING{$pirop} // $pirop)
             ~ ')';
         }
         else {
