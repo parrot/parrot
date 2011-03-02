@@ -14,9 +14,9 @@ New in 3.2.0
   + A few tests in Cardinal are fixed
   + Minor fixes, refactors and cleaning on Winxed
   + New predefs replace and push on Winxed
-  + Operator exits, class and .* (indirect method call) added on Winxed
+  + Operators exits, class and .* (indirect method call) added on Winxed
   + $loadlib directive for Winxed
-  + -o option to installabel driver added on Winxed
+  + -o option to installable driver added on Winxed
 - Community
   + M0 roadmap is in progress
 - Documentation
