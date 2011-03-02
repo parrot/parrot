@@ -607,7 +607,8 @@ our multi method to_c(PAST::Block $chunk, %c) {
 
     for @($chunk) {
         if $need_space && !need_space($_) {
-            @children.push("\n");
+            # Hack. If this $chunk doesn't need semicolon it will put newline before
+            @children.push("\n") if need_semicolon($_);
             $need_space := 0;
         }
 
