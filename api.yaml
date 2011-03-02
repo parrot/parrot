@@ -1,5 +1,9 @@
 ---
 -
+  name:     'Pointer, UnManagedStruct, and ManagedStruct'
+  eligible: '3.4'
+  ticket:   'http://trac.parrot.org/parrot/ticket/2035'
+-
   name:  'add write barrier to all PMCs that write in unusual VTABLE functions'
   eligible:  '3.4'
   note:  'VTABLE functions not marked with :write that mutate the PMCs need to use the write barrier.  See ticket for more information.'
