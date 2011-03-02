@@ -425,6 +425,8 @@ our method to_c:pasttype<if> (PAST::Op $chunk, %c) {
         @res.push(self.to_c($chunk[2], %c));
     }
     else {
+        @res.push("\n");
+        @res.push(indent(%c));
         @res.push('if (');
         @res.push(self.to_c($chunk[0], %c));
         @res.push(") ");
@@ -446,6 +448,8 @@ our method to_c:pasttype<if> (PAST::Op $chunk, %c) {
 
 our method to_c:pasttype<while> (PAST::Op $chunk, %c) {
     join('',
+        "\n",
+        indent(%c),
         'while (',
         self.to_c($chunk[0], %c),
         ') ',
@@ -455,6 +459,8 @@ our method to_c:pasttype<while> (PAST::Op $chunk, %c) {
 
 our method to_c:pasttype<do-while> (PAST::Op $chunk, %c) {
     join('',
+        "\n",
+        indent(%c),
         'do ',
         self.to_c($chunk[0], %c),
         'while (',
@@ -465,6 +471,8 @@ our method to_c:pasttype<do-while> (PAST::Op $chunk, %c) {
 
 our method to_c:pasttype<for> (PAST::Op $chunk, %c) {
     join('',
+        "\n",
+        indent(%c),
         'for (',
         $chunk[0] ?? self.to_c($chunk[0], %c) !! '',
         '; ',
@@ -480,6 +488,8 @@ our method to_c:pasttype<switch> (PAST::Op $chunk, %c) {
     my @parts := pir::clone(@($chunk));
     my $cond  := @parts.shift;
     join('',
+        "\n",
+        indent(%c),
         'switch (',
         self.to_c($cond, %c),
         ') {',
