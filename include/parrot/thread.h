@@ -13,52 +13,17 @@
 
 #include "parrot/parrot.h"
 
-#ifdef _WIN32
-#  include "parrot/thr_windows.h"
+#ifdef PARROT_HAS_THREADS
+#  ifdef _WIN32
+#    include "parrot/thr_windows.h"
+#  else
+#    include "parrot/thr_pthread.h"
+#  endif
 #else
-#  include "parrot/thr_pthread.h"
-#endif
+#  include   "parrot/thr_none.h"
+#endif /* PARROT_HAS_THREADS */
 
 #include "parrot/atomic.h"
-
-#ifndef PARROT_HAS_THREADS
-
-#  define LOCK(m)
-#  define UNLOCK(m)
-#  define COND_WAIT(c, m)
-#  define COND_TIMED_WAIT(c, m, t)
-#  define COND_SIGNAL(c)
-#  define COND_BROADCAST(c)
-
-#  define MUTEX_INIT(m)
-#  define MUTEX_DESTROY(m)
-
-#  define COND_INIT(c)
-#  define COND_DESTROY(c)
-
-#  define THREAD_CREATE_DETACHED(t, func, arg)
-#  define THREAD_CREATE_JOINABLE(t, func, arg)
-
-#  define JOIN(t, ret)
-#  define DETACH(t)
-
-#  define CLEANUP_PUSH(f, a)
-#  define CLEANUP_POP(a)
-
-#  define Parrot_mutex int
-#  define Parrot_cond int
-#  define Parrot_thread int
-
-typedef void (*Cleanup_Handler)(void *);
-
-#  if ! PARROT_HAS_TIMESPEC
-struct timespec {
-    time_t tv_sec;
-    long tv_nsec;
-};
-#  endif /* PARROT_HAS_TIMESPEC */
-
-#endif /* PARROT_HAS_THREADS */
 
 #ifndef YIELD
 #  define YIELD
