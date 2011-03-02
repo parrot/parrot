@@ -222,8 +222,8 @@ rule statement_control:sym<break> { <sym> }
 rule statement_control:sym<continue> { <sym> }
 
 token statement_or_block {
-    | <labeled_statement> <.eat_terminator>
     | <blockoid>
+    | <labeled_statement> <.eat_terminator>
 }
 
 # HACK to support for INT_FMT "\n"
