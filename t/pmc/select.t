@@ -49,11 +49,11 @@ Tests the Select PMC.
     $I1 = $I2
 a:
 
-    $I0 = $P1.'getmaxfd'()
+    $I0 = $P1.'max_fd'()
 
     is($I0, $I1, 'maxid = max(fd1 fd2)')
 
-    $P2 = $P1.'get_fd_map'()
+    $P2 = $P1.'fd_map'()
     $I3 = $P2
     is($I3, 2, 'two items in select PMC')
 

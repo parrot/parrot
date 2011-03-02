@@ -100,7 +100,7 @@ Initializes the PMC.
 
 =over 4
 
-=item C<METHOD INTVAL getmaxfd()>
+=item C<METHOD INTVAL max_fd()>
 
 Returns the maximum of all the c89 standard integer file descriptors held by
 the Select PMC
@@ -109,7 +109,7 @@ the Select PMC
 
 */
 
-    METHOD getmaxfd() {
+    METHOD max_fd() {
       INTVAL v;
       GET_ATTR_maxfd(INTERP, SELF, v);
       RETURN(INTVAL v);
@@ -117,7 +117,7 @@ the Select PMC
 
 /*
 
-=item C<METHOD PMC* get_fd_map()>
+=item C<METHOD PMC* fd_map()>
 
 Returns the Hash PMC that holds the mapping from file descriptor to the opaque
 PMC associated with the file descriptor when it was added to the Select PMC.
@@ -128,7 +128,7 @@ Used mainly for testing purposes.
 
 */
 
-    METHOD get_fd_map() {
+    METHOD fd_map() {
       PMC *fd_map;
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
       RETURN(PMC *fd_map);
