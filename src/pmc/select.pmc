@@ -70,7 +70,7 @@ pmclass Select auto_attrs {
     ATTR fd_set  rb_array; /* read bit array */
     ATTR fd_set  wb_array; /* write bit array */
     ATTR fd_set  eb_array; /* error bit array */
-    ATTR INTVAL  maxfd;
+    ATTR INTVAL  max_fd;
 
 /*
 
@@ -85,7 +85,7 @@ Initializes the PMC.
     VTABLE void init() {
         PMC *fd_map = pmc_new(interp, enum_class_Hash);
         SET_ATTR_fd_map(INTERP, SELF, fd_map);
-        SET_ATTR_maxfd(INTERP, SELF, -1);
+        SET_ATTR_max_fd(INTERP, SELF, -1);
 
         FD_ZERO(&(PARROT_SELECT(SELF)->rb_array));
         FD_ZERO(&(PARROT_SELECT(SELF)->wb_array));
@@ -111,7 +111,7 @@ the Select PMC
 
     METHOD max_fd() {
       INTVAL v;
-      GET_ATTR_maxfd(INTERP, SELF, v);
+      GET_ATTR_max_fd(INTERP, SELF, v);
       RETURN(INTVAL v);
     }
 
@@ -157,7 +157,7 @@ conditions.
 
       GETATTR_FileHandle_os_handle(INTERP, handle, fdkey);
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
-      GET_ATTR_maxfd(INTERP, SELF, maxid);
+      GET_ATTR_max_fd(INTERP, SELF, maxid);
       VTABLE_set_pmc_keyed_int(interp, fd_map, fdkey, data);
       PARROT_GC_WRITE_BARRIER(interp, fd_map);
       if (rwe & SELECT_READ)  { FD_SET(fdkey, &PARROT_SELECT(SELF)->rb_array); }
@@ -165,7 +165,7 @@ conditions.
       if (rwe & SELECT_ERROR) { FD_SET(fdkey, &PARROT_SELECT(SELF)->eb_array); }
       if (maxid < fdkey)
           maxid = fdkey;
-      SET_ATTR_maxfd(INTERP, SELF, maxid);
+      SET_ATTR_max_fd(INTERP, SELF, maxid);
     }
 
 /*
@@ -183,7 +183,7 @@ Removes filehandle from the Select PMC.
 
       GETATTR_FileHandle_os_handle(INTERP, handle, fd);
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
-      GET_ATTR_maxfd(INTERP, SELF, maxid);
+      GET_ATTR_max_fd(INTERP, SELF, maxid);
       VTABLE_delete_keyed_int(interp, fd_map, fd);
       PARROT_GC_WRITE_BARRIER(interp, fd_map);
       FD_CLR(fd, &PARROT_SELECT(SELF)->rb_array);
@@ -191,7 +191,7 @@ Removes filehandle from the Select PMC.
       FD_CLR(fd, &PARROT_SELECT(SELF)->eb_array);
       if (fd == maxid) {
         maxid = find_max_fd(interp, fd_map);
-        SET_ATTR_maxfd(INTERP, SELF, maxid);
+        SET_ATTR_max_fd(INTERP, SELF, maxid);
       }
     }
 
@@ -218,7 +218,7 @@ read before returning.
       INTVAL          usec = modf(timeout, &sec) * 1000000;
 
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
-      GET_ATTR_maxfd(INTERP, SELF, maxid);
+      GET_ATTR_max_fd(INTERP, SELF, maxid);
       timeouts.tv_sec  = sec;
       timeouts.tv_usec = usec;
       results          = pmc_new(interp, enum_class_ResizablePMCArray);
@@ -257,7 +257,7 @@ write to before returning.
       INTVAL         usec = modf(timeout, &sec) * 1000000;
 
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
-      GET_ATTR_maxfd(INTERP, SELF, maxid);
+      GET_ATTR_max_fd(INTERP, SELF, maxid);
       timeouts.tv_sec  = sec;
       timeouts.tv_usec = usec;
       results          = pmc_new(interp, enum_class_ResizablePMCArray);
@@ -296,7 +296,7 @@ exception state before returning.
       INTVAL         usec = modf(timeout, &sec) * 1000000;
 
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
-      GET_ATTR_maxfd(INTERP, SELF, maxid);
+      GET_ATTR_max_fd(INTERP, SELF, maxid);
       timeouts.tv_sec  = sec;
       timeouts.tv_usec = usec;
       results          = pmc_new(interp, enum_class_ResizablePMCArray);
@@ -337,7 +337,7 @@ handled.
       INTVAL          usec = modf(timeout, &sec) * 1000000;
 
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
-      GET_ATTR_maxfd(INTERP, SELF, maxid);
+      GET_ATTR_max_fd(INTERP, SELF, maxid);
       timeouts.tv_sec  = sec;
       timeouts.tv_usec = usec;
       results          = pmc_new(interp, enum_class_ResizablePMCArray);
