@@ -86,19 +86,17 @@ method op ($/, $key?) {
 
         if $OP.need_write_barrier {
             $OP[0].push(
-                PAST::Stmts.new(
+                PAST::Op.new(
+                    :pasttype<call>,
+                    :name<PARROT_GC_WRITE_BARRIER>,
+                    PAST::Var.new(
+                        :name<interp>
+                    ),
                     PAST::Op.new(
                         :pasttype<call>,
-                        :name<PARROT_GC_WRITE_BARRIER>,
+                        :name<CURRENT_CONTEXT>,
                         PAST::Var.new(
                             :name<interp>
-                        ),
-                        PAST::Op.new(
-                            :pasttype<call>,
-                            :name<CURRENT_CONTEXT>,
-                            PAST::Var.new(
-                                :name<interp>
-                            )
                         )
                     )
                 )
