@@ -433,7 +433,11 @@ our method to_c:pasttype<if> (PAST::Op $chunk, %c) {
         @res.push(self.to_c($chunk[1], %c));
 
         # 'else'
-        @res.push("\nelse " ~ self.to_c($chunk[2], %c)) if $chunk[2];
+        if $chunk[2] {
+            @res.push("\n");
+            @res.push(indent(%c));
+            @res.push("else " ~ self.to_c($chunk[2], %c));
+        }
     }
 
     join('', |@res);
@@ -554,25 +558,38 @@ our multi method to_c(PAST::Op $chunk, %c) {
 }
 
 our multi method to_c(PAST::Stmts $chunk, %c) {
+    my $level    := %c<level>;
+    $level++ unless $chunk[0] ~~ PAST::Block;
+
     my @children := list();
     for @($chunk) {
+        @children.push(indent(%c)) unless $_ ~~ PAST::Block;
         @children.push(self.to_c($_, %c));
         @children.push(";\n") unless $_ ~~ PAST::Block;
     }
+    $level-- unless $chunk[0] ~~ PAST::Block;
     join('', |@children);
 }
 
 our multi method to_c(PAST::Block $chunk, %c) {
-    my @children := list();
+    my $level    := %c<level>;
+    $level++;
 
+    my @children := list();
     @children.push($chunk<label>) if $chunk<label>;
 
     @children.push('{' ~ "\n");
+
     for @($chunk) {
+        @children.push(indent(%c));
         @children.push(self.to_c($_, %c));
         @children.push(";\n");
     }
+
+    $level--;
+    @children.push(indent(%c));
     @children.push('}');
+
     join('', |@children);
 }
 
@@ -592,6 +609,10 @@ the op itself as one argument.
 
 method size() {
     return pir::does__IPs(self.args, 'array') ?? +self.args + 1 !! 2;
+}
+
+sub indent(%c) {
+    pir::repeat(' ', %c<level> * 4);
 }
 
 =begin
