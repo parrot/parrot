@@ -20,23 +20,13 @@ Tests the Select PMC.
 .sub main :main
 .include 'test_more.pir'
 
-    plan(13)
-    'test_getfd'()
+    plan(12)
     'test_update'()
     'test_read'()
     'test_write'()
     'test_select'()
 .end
 
-
-# Select constructor
-.sub 'test_getfd'
-    $P0 = new ['FileHandle']
-    $P0.'open'('README')
-    $P1 = new ['Select']
-    $I0 = $P1.'getfd'($P0)
-    ok($I0, 'new')
-.end
 
 .sub 'test_update'
     $P9 = new 'String'
@@ -52,8 +42,8 @@ Tests the Select PMC.
     $P9 = "FH2"
     $P1."update"($P3, $P9, 5)
 
-    $I1 = $P1.'getfd'($P0)
-    $I2 = $P1.'getfd'($P3)
+    $I1 = $P0.'handle'()
+    $I2 = $P3.'handle'()
 
     if $I1 > $I2 goto a
     $I1 = $I2
@@ -67,11 +57,11 @@ a:
     $I3 = $P2
     is($I3, 2, 'two items in select PMC')
 
-    $I0 = $P1.'getfd'($P0)
+    $I0 = $P0.'handle'()
     $S0 = $P2[$I0]
     is($S0, "FH1", 'fd_map[x] = FH1')
 
-    $I0 = $P1.'getfd'($P3)
+    $I0 = $P3.'handle'()
     $S0 = $P2[$I0]
     is($S0, "FH2", 'fd_map[x] = FH2')
 

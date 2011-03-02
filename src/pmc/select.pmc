@@ -19,6 +19,7 @@ This is the base-class for non-blocking IO using select
 
 #include "parrot/parrot.h"
 #include "../src/io/io_private.h"
+#include "pmc/pmc_filehandle.h"
 #include <sys/select.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -33,31 +34,6 @@ This is the base-class for non-blocking IO using select
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
-
-/*
-
-=item C<INTVAL get_fd(INTEPR, PMC* filehandle)>
-
-Returns the c89 standard integer file descriptor for the filehandle
-
-=cut
-
-*/
-
-    static INTVAL get_fd(PARROT_INTERP, PMC* handle) {
-        INTVAL fd = -1;
-        switch (handle->vtable->base_type) {
-            case enum_class_FileHandle:
-                {
-                    PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, handle);
-                    fd = os_handle;
-                }
-                break;
-            default:
-                abort();
-        }
-        return fd;
-    }
 
 /*
 
@@ -125,22 +101,6 @@ Initializes the PMC.
 
 =over 4
 
-
-=item C<METHOD INTVAL getfd(PMC* filehandle)>
-
-Returns the c89 standard integer file descriptor for the filehandle
-
-=cut
-
-*/
-
-    METHOD getfd(PMC* handle) {
-      INTVAL i = get_fd(interp, handle);
-      RETURN(INTVAL i)
-    }
-
-/*
-
 =item C<METHOD INTVAL getmaxfd()>
 
 Returns the maximum of all the c89 standard integer file descriptors held by
@@ -194,9 +154,9 @@ conditions.
 */
     METHOD update(PMC *handle, PMC* data, INTVAL rwe) {
       PMC    *fd_map;
-      INTVAL  maxid;
-      INTVAL  fdkey = get_fd(interp, handle);
+      INTVAL  maxid,  fdkey;
 
+      GETATTR_FileHandle_os_handle(INTERP, handle, fdkey);
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
       GET_ATTR_maxfd(INTERP, SELF, maxid);
       VTABLE_set_pmc_keyed_int(interp, fd_map, fdkey, data);
@@ -219,9 +179,9 @@ Removes filehandle from the Select PMC.
 */
     METHOD remove(PMC *handle) {
       PMC    *fdkey, *fd_map;
-      INTVAL  fd = get_fd(interp, handle);
-      INTVAL  maxid;
+      INTVAL  fd,  maxid;
 
+      GETATTR_FileHandle_os_handle(INTERP, handle, fd);
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
       GET_ATTR_maxfd(INTERP, SELF, maxid);
       VTABLE_delete_keyed_int(interp, fd_map, fd);
