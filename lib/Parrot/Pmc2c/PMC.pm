@@ -1112,16 +1112,14 @@ EOC
 
         {
             /* Register this PMC as a HLL mapping */
-            const INTVAL hll_id = Parrot_hll_get_HLL_id( interp, CONST_STRING_GEN(interp, "$hll"));
-            if (hll_id > 0) {
+            INTVAL hll_id = Parrot_hll_register_HLL( interp, CONST_STRING_GEN(interp, "$hll"));
 EOC
         foreach my $maps ( sort keys %{ $self->{flags}{maps} } ) {
             $cout .= <<"EOC";
-                Parrot_hll_register_HLL_type( interp, hll_id, enum_class_$maps, entry);
+            Parrot_hll_register_HLL_type( interp, hll_id, enum_class_$maps, entry);
 EOC
         }
         $cout .= <<"EOC";
-            }
         } /* Register */
 EOC
     }
