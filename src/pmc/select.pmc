@@ -25,8 +25,6 @@ This is the base-class for non-blocking IO using select
 #include <sys/types.h>
 #include <unistd.h>
 
-#define max(a, b) (((a) > (b)) ? (a) : (b))
-
 #define SELECT_READ  1
 #define SELECT_WRITE 2
 #define SELECT_ERROR 4
@@ -59,7 +57,8 @@ the Hash PMC
 
         for (j = 0; j < n; ++j) {
             INTVAL id = VTABLE_shift_integer(interp, iter);
-            maxid = max(maxid, id);
+            if (maxid < id)
+                maxid = id;
         }
         return maxid;
     }
@@ -164,7 +163,8 @@ conditions.
       if (rwe & SELECT_READ)  { FD_SET(fdkey, &PARROT_SELECT(SELF)->rb_array); }
       if (rwe & SELECT_WRITE) { FD_SET(fdkey, &PARROT_SELECT(SELF)->wb_array); }
       if (rwe & SELECT_ERROR) { FD_SET(fdkey, &PARROT_SELECT(SELF)->eb_array); }
-      maxid = max(maxid, fdkey);
+      if (maxid < fdkey)
+          maxid = fdkey;
       SET_ATTR_maxfd(INTERP, SELF, maxid);
     }
 
