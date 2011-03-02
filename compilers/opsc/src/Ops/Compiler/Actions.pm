@@ -587,13 +587,13 @@ method statement_control:sym<switch> ($/) {
 method statement_control:sym<break> ($/) {
     my $past := PAST::Op.new();
     $past<control> := 'break';
-    make PAST::Stmts.new($past);
+    make $past;
 }
 
 method statement_control:sym<continue> ($/) {
     my $past := PAST::Op.new();
     $past<control> := 'continue';
-    make PAST::Stmts.new($past);
+    make $past;
 }
 
 method statement_or_block ($/) {
