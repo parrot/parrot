@@ -579,8 +579,8 @@ method statement_control:sym<switch> ($/) {
     my $past := PAST::Op.new(
         :pasttype<switch>,
         $<test>.ast,
+        $<statement_list>.ast,
     );
-    $past.push($_) for @($<statement_list>.ast);
     make $past;
 }
 

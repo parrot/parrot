@@ -479,14 +479,13 @@ our method to_c:pasttype<for> (PAST::Op $chunk, %c) {
 }
 
 our method to_c:pasttype<switch> (PAST::Op $chunk, %c) {
-    my @parts := pir::clone(@($chunk));
-    my $cond  := @parts.shift;
     join('',
         'switch (',
-        self.to_c($cond, %c),
+        self.to_c($chunk[0], %c),
         ') {',
         "\n",
-        @parts.map(-> $_ { self.to_c($_, %c) } ).join(";\n"),
+        self.to_c($chunk[1], %c),
+        "\n",
         indent(%c),
         "}",
     );
