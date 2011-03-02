@@ -193,18 +193,18 @@ proto rule statement_control { <...> }
 
 rule statement_control:sym<if> {
     <sym> '(' <EXPR> ')'
-    <then=.statement_list>
-    [ 'else' <else=.statement_list> ]?
+    <then=.statement_or_block>
+    [ 'else' <else=.statement_or_block> ]?
 }
 
 rule statement_control:sym<while> {
     <sym> '(' <condition=.EXPR> ')'
-    <statement_list>
+    <statement_list=.statement_or_block>
 }
 
 rule statement_control:sym<for> {
     <sym> '(' <init=.EXPR>? ';' <test=.EXPR>? ';' <step=.EXPR>? ')'
-    <statement_list>
+    <statement_list=.statement_or_block>
 }
 
 rule statement_control:sym<do-while> {
@@ -220,6 +220,11 @@ rule statement_control:sym<switch> {
 
 rule statement_control:sym<break> { <sym> }
 rule statement_control:sym<continue> { <sym> }
+
+token statement_or_block {
+    | <labeled_statement> <.eat_terminator>
+    | <blockoid>
+}
 
 # HACK to support for INT_FMT "\n"
 token term:sym<concatenate_strings> { # Long-long name as LTM workaround

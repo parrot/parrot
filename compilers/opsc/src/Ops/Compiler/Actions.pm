@@ -596,6 +596,11 @@ method statement_control:sym<continue> ($/) {
     make PAST::Stmts.new($past);
 }
 
+method statement_or_block ($/) {
+    $<labeled_statement>
+        ?? make $<labeled_statement>.ast
+        !! make $<blockoid>.ast
+}
 
 method circumfix:sym<( )> ($/) {
     my $past := $<EXPR>.ast;

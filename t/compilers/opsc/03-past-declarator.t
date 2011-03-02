@@ -78,6 +78,14 @@ $past := $compiler.compile($buf, target => 'past');
 $op := $past<ops>[0];
 is( $op[0][0]<pasttype>, 'for', "for loop generates right pasttype");
 
+$buf := q|
+inline op bar(out PMC, in INT) {
+    if (foo) bar(); baz();
+}|;
+$past := $compiler.compile($buf, target => 'past');
+$op := $past<ops>[0];
+# if, baz, WB, goto
+is( +@($op[0]), 4, "Properly handle single statement in 'if'");
 
 
 done_testing();
