@@ -573,8 +573,7 @@ our multi method to_c(PAST::Op $chunk, %c) {
 }
 
 our multi method to_c(PAST::Stmts $chunk, %c) {
-    my $level    := %c<level>;
-    $level++ unless $chunk[0] ~~ PAST::Block;
+    %c<level>++ unless $chunk[0] ~~ PAST::Block;
 
     my @children := list();
     for @($chunk) {
@@ -584,7 +583,7 @@ our multi method to_c(PAST::Stmts $chunk, %c) {
         @children.push(";") if need_semicolon($_);
         @children.push("\n");
     }
-    $level-- unless $chunk[0] ~~ PAST::Block;
+    %c<level>-- unless $chunk[0] ~~ PAST::Block;
     join('', |@children);
 }
 
@@ -595,8 +594,7 @@ our multi method to_c(PAST::Block $chunk, %c) {
     my @children := list();
     @children.push(indent($chunk, %c) ~ $chunk<label> ~ "\n" ~ indent(%c)) if $chunk<label>;
 
-    my $level    := %c<level>;
-    $level++;
+    %c<level>++;
 
     @children.push("\{\n");
 
@@ -613,7 +611,7 @@ our multi method to_c(PAST::Block $chunk, %c) {
         @children.push("\n");
     }
 
-    $level--;
+    %c<level>--;
     @children.push(indent(%c));
     @children.push("}");
 
