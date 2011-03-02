@@ -181,13 +181,12 @@ token statement {
     <?MARKER('endstmt')>
 }
 
-rule label {
+token label {
     [
-    | 'case' [ <integer> | <identifier> ] ':'
-    | 'default' ':'
+    | 'case' <.ws> [ <integer> | <identifier> ] ':'
+    | 'default:'
     | <identifier> ':'
     ]
-    <.ws>
 }
 
 proto rule statement_control { <...> }
