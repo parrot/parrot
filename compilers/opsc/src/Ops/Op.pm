@@ -283,26 +283,29 @@ method >> >>> to C<VTABLE_I<method>>.
 
 method get_body( $trans ) {
 
+    my %context := hash(
+        trans => $trans,
+        level => 0,
+    );
+
     my @body := list();
 
     #work through the op_body tree
     for @(self) {
         #pir::say('# chunk ' ~ $chunk.WHAT);
-        if pir::defined($_) {
-            my $chunk := self.to_c($trans, $_);
-            @body.push($chunk);
-        }
+        my $chunk := self.to_c($_, %context);
+        @body.push($chunk);
     }
 
     join('', |@body);
 }
 
 # Recursively process body chunks returning string.
-our multi method to_c($trans, PAST::Val $val) {
+our multi method to_c(PAST::Val $val, %c) {
     $val.value;
 }
 
-our multi method to_c($trans, PAST::Var $var) {
+our multi method to_c(PAST::Var $var, %c) {
     if ($var.isdecl) {
         my $res := $var.vivibase ~ ' ' ~ $var<pointer> ~ ' ' ~ $var.name;
 
@@ -311,16 +314,16 @@ our multi method to_c($trans, PAST::Var $var) {
         }
 
         if my $expr := $var.viviself {
-            $res := $res ~ ' = ' ~ self.to_c($trans, $expr);
+            $res := $res ~ ' = ' ~ self.to_c($expr, %c);
         }
         $res;
     }
     elsif $var.scope eq 'keyed' {
-        self.to_c($trans, $var[0]) ~ '[' ~ self.to_c($trans, $var[1]) ~ ']';
+        self.to_c($var[0], %c) ~ '[' ~ self.to_c($var[1], %c) ~ ']';
     }
     elsif $var.scope eq 'register' {
         my $n := +$var.name;
-        $trans.access_arg( self.arg_type($n - 1), $n);
+        %c<trans>.access_arg( self.arg_type($n - 1), $n);
     }
     else {
         # Just ordinary variable
@@ -344,13 +347,15 @@ our %PIROP_MAPPING := hash(
     :dotty('.'),
 );
 
-our method to_c:pasttype<inline> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<inline> (PAST::Op $chunk, %c) {
     return $chunk.inline;
 }
 
-our method to_c:pasttype<macro> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<macro> (PAST::Op $chunk, %c) {
     my $name     := $chunk.name;
-    my $children := @($chunk).map(-> $_ { self.to_c($trans, $_) }).join('');
+    my $children := @($chunk).map(-> $_ { self.to_c($_, %c) }).join('');
+
+    my $trans    := %c<trans>;
 
     #pir::say('children ' ~ $children);
     my $ret := Q:PIR<
@@ -364,20 +369,20 @@ our method to_c:pasttype<macro> ($trans, PAST::Op $chunk) {
     return $ret;
 }
 
-our method to_c:pasttype<macro_define> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<macro_define> (PAST::Op $chunk, %c) {
     my @res;
     @res.push('#define ');
     #name of macro
     @res.push($chunk[0]);
     
-    @res.push(self.to_c($trans, $chunk<macro_args>)) if $chunk<macro_args>;
-    @res.push(self.to_c($trans, $chunk<body>))       if $chunk<body>;
+    @res.push(self.to_c($chunk<macro_args>, %c)) if $chunk<macro_args>;
+    @res.push(self.to_c($chunk<body>, %c))       if $chunk<body>;
 
     join('', |@res);
 }
 
 
-our method to_c:pasttype<macro_if> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<macro_if> (PAST::Op $chunk, %c) {
     my @res;
 
     @res.push('#if ');
@@ -387,122 +392,122 @@ our method to_c:pasttype<macro_if> ($trans, PAST::Op $chunk) {
     @res.push("\n");
 
     # 'then'
-    @res.push(self.to_c($trans, $chunk[1]));
+    @res.push(self.to_c($chunk[1], %c));
 
     # 'else'
-    @res.push("\n#else\n" ~ self.to_c($trans, $chunk[2])) if $chunk[2];
+    @res.push("\n#else\n" ~ self.to_c($chunk[2], %c)) if $chunk[2];
 
     @res.push("\n#endif\n");
 
 
     join('', |@res);
 }
-our method to_c:pasttype<call> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<call> (PAST::Op $chunk, %c) {
     join('',
         $chunk.name,
         '(',
         # Handle args.
-        @($chunk).map(-> $_ { self.to_c($trans, $_) } ).join(', '),
+        @($chunk).map(-> $_ { self.to_c($_, %c) } ).join(', '),
         ')',
     );
 }
 
-our method to_c:pasttype<if> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<if> (PAST::Op $chunk, %c) {
     my @res;
 
     if ($chunk<ternary>) {
-        @res.push(self.to_c($trans, $chunk[0]));
+        @res.push(self.to_c($chunk[0], %c));
         @res.push(" ? ");
         # 'then'
-        @res.push(self.to_c($trans, $chunk[1]));
+        @res.push(self.to_c($chunk[1], %c));
         # 'else'
         @res.push(" : ");
-        @res.push(self.to_c($trans, $chunk[2]));
+        @res.push(self.to_c($chunk[2], %c));
     }
     else {
         @res.push('if (');
-        @res.push(self.to_c($trans, $chunk[0]));
+        @res.push(self.to_c($chunk[0], %c));
         @res.push(") ");
 
         # 'then'
-        @res.push(self.to_c($trans, $chunk[1]));
+        @res.push(self.to_c($chunk[1], %c));
 
         # 'else'
-        @res.push("\nelse " ~ self.to_c($trans, $chunk[2])) if $chunk[2];
+        @res.push("\nelse " ~ self.to_c($chunk[2], %c)) if $chunk[2];
     }
 
     join('', |@res);
 }
 
-our method to_c:pasttype<while> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<while> (PAST::Op $chunk, %c) {
     join('',
         'while (',
-        self.to_c($trans, $chunk[0]),
+        self.to_c($chunk[0], %c),
         ') ',
-        self.to_c($trans, $chunk[1]),
+        self.to_c($chunk[1], %c),
     );
 }
 
-our method to_c:pasttype<do-while> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<do-while> (PAST::Op $chunk, %c) {
     join('',
         'do ',
-        self.to_c($trans, $chunk[0]),
+        self.to_c($chunk[0], %c),
         'while (',
-        self.to_c($trans, $chunk[1]),
+        self.to_c($chunk[1], %c),
         ')',
     );
 }
 
-our method to_c:pasttype<for> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<for> (PAST::Op $chunk, %c) {
     join('',
         'for (',
-        $chunk[0] ?? self.to_c($trans, $chunk[0]) !! '',
+        $chunk[0] ?? self.to_c($chunk[0], %c) !! '',
         '; ',
-        $chunk[1] ?? self.to_c($trans, $chunk[1]) !! '',
+        $chunk[1] ?? self.to_c($chunk[1], %c) !! '',
         '; ',
-        $chunk[2] ?? self.to_c($trans, $chunk[2]) !! '',
+        $chunk[2] ?? self.to_c($chunk[2], %c) !! '',
         ') ',
-        self.to_c($trans, $chunk[3]),
+        self.to_c($chunk[3], %c),
     );
 }
 
-our method to_c:pasttype<switch> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<switch> (PAST::Op $chunk, %c) {
     my @parts := pir::clone(@($chunk));
     my $cond  := @parts.shift;
     join('',
         'switch (',
-        self.to_c($trans, $cond),
+        self.to_c($cond, %c),
         ') {',
         "\n",
-        @parts.map(-> $_ { self.to_c($trans, $_) } ).join(";\n"),
+        @parts.map(-> $_ { self.to_c($_, %c) } ).join(";\n"),
         '}',
     );
 }
 
-our method to_c:pasttype<undef> ($trans, PAST::Op $chunk) {
+our method to_c:pasttype<undef> (PAST::Op $chunk, %c) {
     if $chunk.pirop {
         # Some infix stuff
         if $chunk.pirop eq ',' {
             join(', ',
-                |@($chunk).map(-> $_ { self.to_c($trans, $_)})
+                |@($chunk).map(-> $_ { self.to_c($_, %c)})
             );
         }
         elsif $chunk.name ~~ / infix / {
               '('
-            ~ self.to_c($trans, $chunk[0])
+            ~ self.to_c($chunk[0], %c)
             ~ ' ' ~ (%PIROP_MAPPING{$chunk.pirop} // $chunk.pirop) ~ ' '
-            ~ self.to_c($trans, $chunk[1])
+            ~ self.to_c($chunk[1], %c)
             ~ ')';
         }
         elsif $chunk.name ~~ / prefix / {
               '('
             ~ (%PIROP_MAPPING{$chunk.pirop} // $chunk.pirop)
-            ~ self.to_c($trans, $chunk[0])
+            ~ self.to_c($chunk[0], %c)
             ~ ')';
         }
         elsif $chunk.name ~~ / postfix / {
               '('
-            ~ self.to_c($trans, $chunk[0])
+            ~ self.to_c($chunk[0], %c)
             ~ (%PIROP_MAPPING{$chunk.pirop} // $chunk.pirop)
             ~ ')';
         }
@@ -517,7 +522,7 @@ our method to_c:pasttype<undef> ($trans, PAST::Op $chunk) {
             '(',
             $chunk.returns,
             ')',
-            self.to_c($trans, $chunk[0]),
+            self.to_c($chunk[0], %c),
         );
     }
     elsif $chunk<control> {
@@ -533,7 +538,7 @@ our method to_c:pasttype<undef> ($trans, PAST::Op $chunk) {
     }
 }
 
-our multi method to_c($trans, PAST::Op $chunk) {
+our multi method to_c(PAST::Op $chunk, %c) {
     my @res;
 
     @res.push($chunk<label>) if $chunk<label>;
@@ -542,29 +547,29 @@ our multi method to_c($trans, PAST::Op $chunk) {
     my $sub  := pir::find_sub_not_null__ps('to_c:pasttype<' ~ $type ~ '>');
 
     @res.push('(') if $chunk<wrap>;
-    @res.push($sub(self, $trans, $chunk));
+    @res.push($sub(self, $chunk, %c));
     @res.push(')') if $chunk<wrap>;
 
     @res.join('');
 }
 
-our multi method to_c($trans, PAST::Stmts $chunk) {
+our multi method to_c(PAST::Stmts $chunk, %c) {
     my @children := list();
     for @($chunk) {
-        @children.push(self.to_c($trans, $_));
+        @children.push(self.to_c($_, %c));
         @children.push(";\n") unless $_ ~~ PAST::Block;
     }
     join('', |@children);
 }
 
-our multi method to_c($trans, PAST::Block $chunk) {
+our multi method to_c(PAST::Block $chunk, %c) {
     my @children := list();
 
     @children.push($chunk<label>) if $chunk<label>;
 
     @children.push('{' ~ "\n");
     for @($chunk) {
-        @children.push(self.to_c($trans, $_));
+        @children.push(self.to_c($_, %c));
         @children.push(";\n");
     }
     @children.push('}');
@@ -572,7 +577,7 @@ our multi method to_c($trans, PAST::Block $chunk) {
 }
 
 # Stub!
-our multi method to_c($trans, String $str) {
+our multi method to_c(String $str, %c) {
     $str;
 }
 
