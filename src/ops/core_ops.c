@@ -15075,7 +15075,7 @@ opcode_t *
 Parrot_check_events(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  next =  cur_opcode + 1;
 
-    Parrot_cx_check_tasks(interp, (interp -> scheduler));
+    Parrot_cx_check_tasks(interp, interp->scheduler);
     return (opcode_t *)next;
 }
 
@@ -15084,7 +15084,7 @@ Parrot_check_events__(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  _this = CUR_OPCODE;
 
     disable_event_checking(interp);
-    Parrot_cx_handle_tasks(interp, (interp -> scheduler));
+    Parrot_cx_handle_tasks(interp, interp->scheduler);
     return (opcode_t *)_this;
 }
 
@@ -15127,7 +15127,7 @@ Parrot_local_branch_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
     INTVAL   return_addr;
     opcode_t  * const  dest =  cur_opcode + 3;
 
-    if ((PMC_IS_NULL(PREG(1)) || (((PREG(1) -> vtable) -> base_type) != enum_class_ResizableIntegerArray))) {
+    if ((PMC_IS_NULL(PREG(1)) || (PREG(1)->vtable->base_type != enum_class_ResizableIntegerArray))) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_INVALID_OPERATION, "Must pass a valid integer array to 'local_branch'");
 
         return (opcode_t *)handler;
@@ -15143,7 +15143,7 @@ Parrot_local_branch_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     INTVAL   return_addr;
     opcode_t  * const  dest =  cur_opcode + 3;
 
-    if ((PMC_IS_NULL(PREG(1)) || (((PREG(1) -> vtable) -> base_type) != enum_class_ResizableIntegerArray))) {
+    if ((PMC_IS_NULL(PREG(1)) || (PREG(1)->vtable->base_type != enum_class_ResizableIntegerArray))) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_INVALID_OPERATION, "Must pass a valid integer array to 'local_branch'");
 
         return (opcode_t *)handler;
@@ -15160,7 +15160,7 @@ Parrot_local_return_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * next;
     opcode_t  * const  dest =  cur_opcode + 2;
 
-    if ((PMC_IS_NULL(PREG(1)) || (((PREG(1) -> vtable) -> base_type) != enum_class_ResizableIntegerArray))) {
+    if ((PMC_IS_NULL(PREG(1)) || (PREG(1)->vtable->base_type != enum_class_ResizableIntegerArray))) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_INVALID_OPERATION, "Must pass a valid integer array to 'local_return'");
 
         return (opcode_t *)handler;
@@ -15168,7 +15168,7 @@ Parrot_local_return_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
     (return_addr) = VTABLE_pop_integer(interp, PREG(1));
     next = INTVAL2PTR(opcode_t *, (return_addr));
-    if ((!(((next >= (((interp -> code) -> base) . data)) && (next < (((((interp -> code) -> base) . data) + (((interp -> code) -> base) . size)))))))) {
+    if ((!(((next >= interp->code->base.data) && (next < ((interp->code->base.data + interp->code->base.size))))))) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_INVALID_OPERATION, "Address for 'local_return' must be within the current code segment");
 
         return (opcode_t *)handler;
@@ -15274,7 +15274,7 @@ Parrot_invokecc_p(opcode_t *cur_opcode, PARROT_INTERP) {
         Parrot_pcc_set_object(interp, signature, NULL);
     }
 
-    (interp -> current_cont) = NEED_CONTINUATION;
+    interp->current_cont = NEED_CONTINUATION;
     dest = VTABLE_invoke(interp, p, dest);
     return (opcode_t *)dest;
 }
@@ -15290,7 +15290,7 @@ Parrot_invoke_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
         Parrot_pcc_set_object(interp, signature, NULL);
     }
 
-    (interp -> current_cont) = PREG(2);
+    interp->current_cont = PREG(2);
     dest = VTABLE_invoke(interp, p, dest);
     return (opcode_t *)dest;
 }
@@ -15314,9 +15314,9 @@ Parrot_tailcall_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  this_call_sig = Parrot_pcc_get_signature(interp, ctx);
     PMC  * const  parent_call_sig = Parrot_pcc_get_signature(interp, parent_ctx);
 
-    (interp -> current_cont) = Parrot_pcc_get_continuation(interp, ctx);
+    interp->current_cont = Parrot_pcc_get_continuation(interp, ctx);
     Parrot_pcc_merge_signature_for_tailcall(interp, parent_call_sig, this_call_sig);
-    SUB_FLAG_TAILCALL_SET((interp -> current_cont));
+    SUB_FLAG_TAILCALL_SET(interp->current_cont);
     dest = VTABLE_invoke(interp, p, dest);
     return (opcode_t *)dest;
 }
@@ -15714,18 +15714,18 @@ Parrot_finalize_p(opcode_t *cur_opcode, PARROT_INTERP) {
     }
 
     if ((!PMC_IS_NULL(eh))) {
-        Parrot_runloop  * rl = (interp -> current_runloop);
+        Parrot_runloop  * rl = interp->current_runloop;
         INTVAL   rid;
 
         Parrot_pcc_invoke_method_from_c_args(interp, eh, Parrot_str_new_constant(interp, "rid"), "->I", (&rid));
-        while ((rl && ((rl -> id) != rid))) {
-            rl = (rl -> prev);
+        while ((rl && (rl->id != rid))) {
+            rl = rl->prev;
         }
 
         if (rl) {
-            if ((rl != (interp -> current_runloop))) {
-                (rl -> handler_start) = dest;
-                longjmp((rl -> resume), 3);
+            if ((rl != interp->current_runloop)) {
+                rl->handler_start = dest;
+                longjmp(rl->resume, 3);
             }
 
         }
@@ -15762,18 +15762,18 @@ Parrot_finalize_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     }
 
     if ((!PMC_IS_NULL(eh))) {
-        Parrot_runloop  * rl = (interp -> current_runloop);
+        Parrot_runloop  * rl = interp->current_runloop;
         INTVAL   rid;
 
         Parrot_pcc_invoke_method_from_c_args(interp, eh, Parrot_str_new_constant(interp, "rid"), "->I", (&rid));
-        while ((rl && ((rl -> id) != rid))) {
-            rl = (rl -> prev);
+        while ((rl && (rl->id != rid))) {
+            rl = rl->prev;
         }
 
         if (rl) {
-            if ((rl != (interp -> current_runloop))) {
-                (rl -> handler_start) = dest;
-                longjmp((rl -> resume), 3);
+            if ((rl != interp->current_runloop)) {
+                rl->handler_start = dest;
+                longjmp(rl->resume, 3);
             }
 
         }
@@ -16019,7 +16019,7 @@ Parrot_runinterp_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
     Interp  * const  new_interp = (Interp *)VTABLE_get_pointer(interp, PREG(1));
 
     Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
-    Parrot_switch_to_cs(new_interp, (interp -> code), 1);
+    Parrot_switch_to_cs(new_interp, interp->code, 1);
     runops(new_interp, (REL_PC + IREG(2)));
     return (opcode_t *)cur_opcode + 3;
 }
@@ -16029,14 +16029,14 @@ Parrot_runinterp_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     Interp  * const  new_interp = (Interp *)VTABLE_get_pointer(interp, PREG(1));
 
     Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
-    Parrot_switch_to_cs(new_interp, (interp -> code), 1);
+    Parrot_switch_to_cs(new_interp, interp->code, 1);
     runops(new_interp, (REL_PC + ICONST(2)));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_getinterp_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PREG(1) = VTABLE_get_pmc_keyed_int(interp, (interp -> iglobals), IGLOBALS_INTERPRETER);
+    PREG(1) = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_INTERPRETER);
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 2;
 }
@@ -16140,8 +16140,8 @@ Parrot_dlfunc_p_p_s_s(opcode_t *cur_opcode, PARROT_INTERP) {
     void          * ptr = NULL;
     funcptr_t       p;
 
-    if ((((!PMC_IS_NULL(PREG(2))) && (((PREG(2) -> vtable) -> base_type) == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
-        dl_handle = (((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2))) -> dl_handle);
+    if ((((!PMC_IS_NULL(PREG(2))) && (PREG(2)->vtable->base_type == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
+        dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
     ptr = Parrot_dyn_dlsym_str(interp, dl_handle, SREG(3));
@@ -16167,8 +16167,8 @@ Parrot_dlfunc_p_p_sc_s(opcode_t *cur_opcode, PARROT_INTERP) {
     void          * ptr = NULL;
     funcptr_t       p;
 
-    if ((((!PMC_IS_NULL(PREG(2))) && (((PREG(2) -> vtable) -> base_type) == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
-        dl_handle = (((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2))) -> dl_handle);
+    if ((((!PMC_IS_NULL(PREG(2))) && (PREG(2)->vtable->base_type == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
+        dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
     ptr = Parrot_dyn_dlsym_str(interp, dl_handle, SCONST(3));
@@ -16194,8 +16194,8 @@ Parrot_dlfunc_p_p_s_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     void          * ptr = NULL;
     funcptr_t       p;
 
-    if ((((!PMC_IS_NULL(PREG(2))) && (((PREG(2) -> vtable) -> base_type) == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
-        dl_handle = (((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2))) -> dl_handle);
+    if ((((!PMC_IS_NULL(PREG(2))) && (PREG(2)->vtable->base_type == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
+        dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
     ptr = Parrot_dyn_dlsym_str(interp, dl_handle, SREG(3));
@@ -16221,8 +16221,8 @@ Parrot_dlfunc_p_p_sc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     void          * ptr = NULL;
     funcptr_t       p;
 
-    if ((((!PMC_IS_NULL(PREG(2))) && (((PREG(2) -> vtable) -> base_type) == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
-        dl_handle = (((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2))) -> dl_handle);
+    if ((((!PMC_IS_NULL(PREG(2))) && (PREG(2)->vtable->base_type == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
+        dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
     ptr = Parrot_dyn_dlsym_str(interp, dl_handle, SCONST(3));
@@ -16247,8 +16247,8 @@ Parrot_dlvar_p_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     void  *         dl_handle = NULL;
     void  *         p = NULL;
 
-    if ((((!PMC_IS_NULL(PREG(2))) && (((PREG(2) -> vtable) -> base_type) == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
-        dl_handle = (((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2))) -> dl_handle);
+    if ((((!PMC_IS_NULL(PREG(2))) && (PREG(2)->vtable->base_type == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
+        dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
     p = Parrot_dyn_dlsym_str(interp, dl_handle, SREG(3));
@@ -16272,8 +16272,8 @@ Parrot_dlvar_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     void  *         dl_handle = NULL;
     void  *         p = NULL;
 
-    if ((((!PMC_IS_NULL(PREG(2))) && (((PREG(2) -> vtable) -> base_type) == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
-        dl_handle = (((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2))) -> dl_handle);
+    if ((((!PMC_IS_NULL(PREG(2))) && (PREG(2)->vtable->base_type == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
+        dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
     }
 
     p = Parrot_dyn_dlsym_str(interp, dl_handle, SCONST(3));
@@ -16294,7 +16294,7 @@ Parrot_dlvar_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_compreg_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  compreg_hash = VTABLE_get_pmc_keyed_int(interp, (interp -> iglobals), IGLOBALS_COMPREG_HASH);
+    PMC  * const  compreg_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_COMPREG_HASH);
 
     VTABLE_set_pmc_keyed_str(interp, compreg_hash, SREG(1), PREG(2));
     return (opcode_t *)cur_opcode + 3;
@@ -16302,7 +16302,7 @@ Parrot_compreg_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_compreg_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  compreg_hash = VTABLE_get_pmc_keyed_int(interp, (interp -> iglobals), IGLOBALS_COMPREG_HASH);
+    PMC  * const  compreg_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_COMPREG_HASH);
 
     VTABLE_set_pmc_keyed_str(interp, compreg_hash, SCONST(1), PREG(2));
     return (opcode_t *)cur_opcode + 3;
@@ -16310,7 +16310,7 @@ Parrot_compreg_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_compreg_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  compreg_hash = VTABLE_get_pmc_keyed_int(interp, (interp -> iglobals), IGLOBALS_COMPREG_HASH);
+    PMC  * const  compreg_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_COMPREG_HASH);
 
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, compreg_hash, SREG(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -16319,7 +16319,7 @@ Parrot_compreg_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_compreg_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  compreg_hash = VTABLE_get_pmc_keyed_int(interp, (interp -> iglobals), IGLOBALS_COMPREG_HASH);
+    PMC  * const  compreg_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_COMPREG_HASH);
 
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, compreg_hash, SCONST(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -16342,10 +16342,10 @@ Parrot_new_callback_p_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_annotations_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    if (((interp -> code) -> annotations)) {
-        const opcode_t   cur_pos = (( cur_opcode + 2) - (((interp -> code) -> base) . data));
+    if (interp->code->annotations) {
+        const opcode_t   cur_pos = (( cur_opcode + 2) - interp->code->base.data);
 
-        PREG(1) = PackFile_Annotations_lookup(interp, ((interp -> code) -> annotations), cur_pos, NULL);
+        PREG(1) = PackFile_Annotations_lookup(interp, interp->code->annotations, cur_pos, NULL);
     }
     else {
         PREG(1) = Parrot_pmc_new(interp, enum_class_Hash);
@@ -16357,10 +16357,10 @@ Parrot_annotations_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_annotations_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
-    if (((interp -> code) -> annotations)) {
-        const opcode_t   cur_pos = (( cur_opcode + 3) - (((interp -> code) -> base) . data));
+    if (interp->code->annotations) {
+        const opcode_t   cur_pos = (( cur_opcode + 3) - interp->code->base.data);
 
-        PREG(1) = PackFile_Annotations_lookup(interp, ((interp -> code) -> annotations), cur_pos, SREG(2));
+        PREG(1) = PackFile_Annotations_lookup(interp, interp->code->annotations, cur_pos, SREG(2));
     }
     else {
         PREG(1) = PMCNULL;
@@ -16372,10 +16372,10 @@ Parrot_annotations_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_annotations_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
-    if (((interp -> code) -> annotations)) {
-        const opcode_t   cur_pos = (( cur_opcode + 3) - (((interp -> code) -> base) . data));
+    if (interp->code->annotations) {
+        const opcode_t   cur_pos = (( cur_opcode + 3) - interp->code->base.data);
 
-        PREG(1) = PackFile_Annotations_lookup(interp, ((interp -> code) -> annotations), cur_pos, SCONST(2));
+        PREG(1) = PackFile_Annotations_lookup(interp, interp->code->annotations, cur_pos, SCONST(2));
     }
     else {
         PREG(1) = PMCNULL;
@@ -19555,7 +19555,7 @@ Parrot_callmethodcc_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
             Parrot_pcc_set_object(interp, signature, object);
         }
 
-        (interp -> current_cont) = NEED_CONTINUATION;
+        interp->current_cont = NEED_CONTINUATION;
         dest = VTABLE_invoke(interp, method_pmc, next);
     }
     else {
@@ -19589,7 +19589,7 @@ Parrot_callmethodcc_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
             Parrot_pcc_set_object(interp, signature, object);
         }
 
-        (interp -> current_cont) = NEED_CONTINUATION;
+        interp->current_cont = NEED_CONTINUATION;
         dest = VTABLE_invoke(interp, method_pmc, next);
     }
     else {
@@ -19618,7 +19618,7 @@ Parrot_callmethodcc_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
         Parrot_pcc_set_object(interp, signature, PREG(1));
     }
 
-    (interp -> current_cont) = NEED_CONTINUATION;
+    interp->current_cont = NEED_CONTINUATION;
     dest = VTABLE_invoke(interp, PREG(2), next);
     return (opcode_t *)dest;
 }
@@ -19641,7 +19641,7 @@ Parrot_callmethod_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
             Parrot_pcc_set_object(interp, signature, object);
         }
 
-        (interp -> current_cont) = PREG(3);
+        interp->current_cont = PREG(3);
         dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
     }
 
@@ -19666,7 +19666,7 @@ Parrot_callmethod_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
             Parrot_pcc_set_object(interp, signature, object);
         }
 
-        (interp -> current_cont) = PREG(3);
+        interp->current_cont = PREG(3);
         dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
     }
 
@@ -19686,7 +19686,7 @@ Parrot_callmethod_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
         Parrot_pcc_set_object(interp, signature, object);
     }
 
-    (interp -> current_cont) = PREG(3);
+    interp->current_cont = PREG(3);
     dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
     return (opcode_t *)dest;
 }
@@ -19704,8 +19704,8 @@ Parrot_tailcallmethod_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
         dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for invocant of class '%Ss'", meth, VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
     }
     else {
-        (interp -> current_cont) = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
-        (PObj_get_FLAGS((interp -> current_cont)) |= SUB_FLAG_TAILCALL);
+        interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
+        (PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL);
         if ((!PMC_IS_NULL(signature))) {
             Parrot_pcc_set_object(interp, signature, object);
         }
@@ -19729,8 +19729,8 @@ Parrot_tailcallmethod_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
         dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for invocant of class '%Ss'", meth, VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
     }
     else {
-        (interp -> current_cont) = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
-        (PObj_get_FLAGS((interp -> current_cont)) |= SUB_FLAG_TAILCALL);
+        interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
+        (PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL);
         if ((!PMC_IS_NULL(signature))) {
             Parrot_pcc_set_object(interp, signature, object);
         }
@@ -19749,8 +19749,8 @@ Parrot_tailcallmethod_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * dest;
     PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
-    (interp -> current_cont) = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
-    (PObj_get_FLAGS((interp -> current_cont)) |= SUB_FLAG_TAILCALL);
+    interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
+    (PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL);
     if ((!PMC_IS_NULL(signature))) {
         Parrot_pcc_set_object(interp, signature, object);
     }
@@ -20693,7 +20693,7 @@ Parrot_new_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_root_new_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  key = PREG(2);
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
     PMC  * const  ns = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC  *  classobj = PMCNULL;
 
@@ -20717,7 +20717,7 @@ Parrot_root_new_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_root_new_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  key = PCONST(2);
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
     PMC  * const  ns = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC  *  classobj = PMCNULL;
 
@@ -20741,7 +20741,7 @@ Parrot_root_new_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_root_new_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  key = PREG(2);
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
     PMC  * const  ns = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC  *  classobj = PMCNULL;
 
@@ -20765,7 +20765,7 @@ Parrot_root_new_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_root_new_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  key = PCONST(2);
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
     PMC  * const  ns = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC  *  classobj = PMCNULL;
 
@@ -20789,7 +20789,7 @@ Parrot_root_new_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_root_new_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  key = PREG(2);
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
     PMC  * const  ns = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC  *  classobj = PMCNULL;
 
@@ -20813,7 +20813,7 @@ Parrot_root_new_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_root_new_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  key = PCONST(2);
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
     PMC  * const  ns = Parrot_ns_get_namespace_keyed(interp, root_ns, key);
     PMC  *  classobj = PMCNULL;
 
@@ -21890,11 +21890,11 @@ Parrot_copy_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     else {
         PMC    * const  clone = VTABLE_clone(interp, PREG(2));
         PMC    * const  meta = VTABLE_getprops(interp, PREG(1));
-        Parrot_UInt     gc_flags = ((PREG(1) -> flags) & PObj_GC_all_FLAGS);
+        Parrot_UInt     gc_flags = (PREG(1)->flags & PObj_GC_all_FLAGS);
 
         Parrot_pmc_destroy(interp, PREG(1));
         memmove(PREG(1), clone, sizeof(PMC));
-        ((PREG(1) -> flags) |= gc_flags);
+        (PREG(1)->flags |= gc_flags);
         PARROT_GC_WRITE_BARRIER(interp, PREG(1));
         PObj_custom_destroy_CLEAR(clone);
         PMC_data(clone) = NULL;
@@ -22584,7 +22584,7 @@ case STRINGINFO_HEADER:
             break;
 ;
 case STRINGINFO_STRSTART:
-            IREG(1) = PTR2UINTVAL((SREG(2) -> strstart));
+            IREG(1) = PTR2UINTVAL(SREG(2)->strstart);
             break;
 ;
 case STRINGINFO_BUFLEN:
@@ -22596,11 +22596,11 @@ case STRINGINFO_FLAGS:
             break;
 ;
 case STRINGINFO_BUFUSED:
-            IREG(1) = (SREG(2) -> bufused);
+            IREG(1) = SREG(2)->bufused;
             break;
 ;
 case STRINGINFO_STRLEN:
-            IREG(1) = (SREG(2) -> strlen);
+            IREG(1) = SREG(2)->strlen;
             break;
 ;
 default:
@@ -22627,7 +22627,7 @@ case STRINGINFO_HEADER:
             break;
 ;
 case STRINGINFO_STRSTART:
-            IREG(1) = PTR2UINTVAL((SCONST(2) -> strstart));
+            IREG(1) = PTR2UINTVAL(SCONST(2)->strstart);
             break;
 ;
 case STRINGINFO_BUFLEN:
@@ -22639,11 +22639,11 @@ case STRINGINFO_FLAGS:
             break;
 ;
 case STRINGINFO_BUFUSED:
-            IREG(1) = (SCONST(2) -> bufused);
+            IREG(1) = SCONST(2)->bufused;
             break;
 ;
 case STRINGINFO_STRLEN:
-            IREG(1) = (SCONST(2) -> strlen);
+            IREG(1) = SCONST(2)->strlen;
             break;
 ;
 default:
@@ -22670,7 +22670,7 @@ case STRINGINFO_HEADER:
             break;
 ;
 case STRINGINFO_STRSTART:
-            IREG(1) = PTR2UINTVAL((SREG(2) -> strstart));
+            IREG(1) = PTR2UINTVAL(SREG(2)->strstart);
             break;
 ;
 case STRINGINFO_BUFLEN:
@@ -22682,11 +22682,11 @@ case STRINGINFO_FLAGS:
             break;
 ;
 case STRINGINFO_BUFUSED:
-            IREG(1) = (SREG(2) -> bufused);
+            IREG(1) = SREG(2)->bufused;
             break;
 ;
 case STRINGINFO_STRLEN:
-            IREG(1) = (SREG(2) -> strlen);
+            IREG(1) = SREG(2)->strlen;
             break;
 ;
 default:
@@ -22713,7 +22713,7 @@ case STRINGINFO_HEADER:
             break;
 ;
 case STRINGINFO_STRSTART:
-            IREG(1) = PTR2UINTVAL((SCONST(2) -> strstart));
+            IREG(1) = PTR2UINTVAL(SCONST(2)->strstart);
             break;
 ;
 case STRINGINFO_BUFLEN:
@@ -22725,11 +22725,11 @@ case STRINGINFO_FLAGS:
             break;
 ;
 case STRINGINFO_BUFUSED:
-            IREG(1) = (SCONST(2) -> bufused);
+            IREG(1) = SCONST(2)->bufused;
             break;
 ;
 case STRINGINFO_STRLEN:
-            IREG(1) = (SCONST(2) -> strlen);
+            IREG(1) = SCONST(2)->strlen;
             break;
 ;
 default:
@@ -23560,7 +23560,7 @@ Parrot_get_hll_namespace_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_get_root_namespace_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
 
     PREG(1) = root_ns;
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -23569,7 +23569,7 @@ Parrot_get_root_namespace_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_get_root_namespace_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
 
     if (PMC_IS_NULL(root_ns)) {
         PREG(1) = PMCNULL;
@@ -23586,7 +23586,7 @@ Parrot_get_root_namespace_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_get_root_namespace_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
 
     if (PMC_IS_NULL(root_ns)) {
         PREG(1) = PMCNULL;
@@ -23823,7 +23823,7 @@ Parrot_get_hll_global_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_get_root_global_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
 
     PREG(1) = Parrot_ns_find_global_from_op(interp, root_ns, SREG(2),  cur_opcode + 3);
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -23832,7 +23832,7 @@ Parrot_get_root_global_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_get_root_global_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
 
     PREG(1) = Parrot_ns_find_global_from_op(interp, root_ns, SCONST(2),  cur_opcode + 3);
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -23841,7 +23841,7 @@ Parrot_get_root_global_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_get_root_global_p_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
 
     if (PMC_IS_NULL(root_ns)) {
         PREG(1) = PMCNULL;
@@ -23864,7 +23864,7 @@ Parrot_get_root_global_p_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_get_root_global_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
 
     if (PMC_IS_NULL(root_ns)) {
         PREG(1) = PMCNULL;
@@ -23887,7 +23887,7 @@ Parrot_get_root_global_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_get_root_global_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
 
     if (PMC_IS_NULL(root_ns)) {
         PREG(1) = PMCNULL;
@@ -23910,7 +23910,7 @@ Parrot_get_root_global_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_get_root_global_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
 
     if (PMC_IS_NULL(root_ns)) {
         PREG(1) = PMCNULL;
@@ -24037,7 +24037,7 @@ Parrot_set_hll_global_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_set_root_global_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
 
     Parrot_ns_set_global(interp, root_ns, SREG(1), PREG(2));
     return (opcode_t *)cur_opcode + 3;
@@ -24045,7 +24045,7 @@ Parrot_set_root_global_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_set_root_global_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
 
     Parrot_ns_set_global(interp, root_ns, SCONST(1), PREG(2));
     return (opcode_t *)cur_opcode + 3;
@@ -24053,7 +24053,7 @@ Parrot_set_root_global_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_set_root_global_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
     PMC  * const  ns = Parrot_ns_make_namespace_keyed(interp, root_ns, PREG(1));
 
     Parrot_ns_set_global(interp, ns, SREG(2), PREG(3));
@@ -24062,7 +24062,7 @@ Parrot_set_root_global_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_set_root_global_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
     PMC  * const  ns = Parrot_ns_make_namespace_keyed(interp, root_ns, PCONST(1));
 
     Parrot_ns_set_global(interp, ns, SREG(2), PREG(3));
@@ -24071,7 +24071,7 @@ Parrot_set_root_global_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_set_root_global_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
     PMC  * const  ns = Parrot_ns_make_namespace_keyed(interp, root_ns, PREG(1));
 
     Parrot_ns_set_global(interp, ns, SCONST(2), PREG(3));
@@ -24080,7 +24080,7 @@ Parrot_set_root_global_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_set_root_global_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  root_ns = (interp -> root_namespace);
+    PMC  * const  root_ns = interp->root_namespace;
     PMC  * const  ns = Parrot_ns_make_namespace_keyed(interp, root_ns, PCONST(1));
 
     Parrot_ns_set_global(interp, ns, SCONST(2), PREG(3));
@@ -25740,7 +25740,7 @@ Parrot_root_new_p_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
     const INTVAL   type = Parrot_pmc_get_type(interp, name_key);
 
     if ((type > enum_class_core_max)) {
-        PMC  * const  root_ns = (interp -> root_namespace);
+        PMC  * const  root_ns = interp->root_namespace;
         PMC  * const  ns = Parrot_ns_get_namespace_keyed(interp, root_ns, name_key);
         PMC  * const  _class = Parrot_oo_get_class(interp, ns);
 
@@ -25774,7 +25774,7 @@ Parrot_root_new_p_pc_i(opcode_t *cur_opcode, PARROT_INTERP) {
     const INTVAL   type = Parrot_pmc_get_type(interp, name_key);
 
     if ((type > enum_class_core_max)) {
-        PMC  * const  root_ns = (interp -> root_namespace);
+        PMC  * const  root_ns = interp->root_namespace;
         PMC  * const  ns = Parrot_ns_get_namespace_keyed(interp, root_ns, name_key);
         PMC  * const  _class = Parrot_oo_get_class(interp, ns);
 
@@ -25808,7 +25808,7 @@ Parrot_root_new_p_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     const INTVAL   type = Parrot_pmc_get_type(interp, name_key);
 
     if ((type > enum_class_core_max)) {
-        PMC  * const  root_ns = (interp -> root_namespace);
+        PMC  * const  root_ns = interp->root_namespace;
         PMC  * const  ns = Parrot_ns_get_namespace_keyed(interp, root_ns, name_key);
         PMC  * const  _class = Parrot_oo_get_class(interp, ns);
 
@@ -25842,7 +25842,7 @@ Parrot_root_new_p_pc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     const INTVAL   type = Parrot_pmc_get_type(interp, name_key);
 
     if ((type > enum_class_core_max)) {
-        PMC  * const  root_ns = (interp -> root_namespace);
+        PMC  * const  root_ns = interp->root_namespace;
         PMC  * const  ns = Parrot_ns_get_namespace_keyed(interp, root_ns, name_key);
         PMC  * const  _class = Parrot_oo_get_class(interp, ns);
 
