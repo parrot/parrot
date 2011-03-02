@@ -924,6 +924,7 @@ include/parrot/settings.h                                   [main]include
 include/parrot/string.h                                     [main]include
 include/parrot/string_funcs.h                               [main]include
 include/parrot/sub.h                                        [main]include
+include/parrot/thr_none.h                                   [main]include
 include/parrot/thr_pthread.h                                [main]include
 include/parrot/thr_windows.h                                [main]include
 include/parrot/thread.h                                     [main]include
