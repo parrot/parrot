@@ -288,16 +288,8 @@ method get_body( $trans ) {
         level => 0,
     );
 
-    my @body := list();
-
     #work through the op_body tree
-    for @(self) {
-        #pir::say('# chunk ' ~ $chunk.WHAT);
-        my $chunk := self.to_c($_, %context);
-        @body.push($chunk);
-    }
-
-    join('', |@body);
+    self.join_children(self, %context);
 }
 
 # Recursively process body chunks returning string.
@@ -353,7 +345,7 @@ our method to_c:pasttype<inline> (PAST::Op $chunk, %c) {
 
 our method to_c:pasttype<macro> (PAST::Op $chunk, %c) {
     my $name     := $chunk.name;
-    my $children := @($chunk).map(-> $_ { self.to_c($_, %c) }).join('');
+    my $children := self.join_children($chunk, %c);
 
     my $trans    := %c<trans>;
 
@@ -407,7 +399,7 @@ our method to_c:pasttype<call> (PAST::Op $chunk, %c) {
         $chunk.name,
         '(',
         # Handle args.
-        @($chunk).map(-> $_ { self.to_c($_, %c) } ).join(', '),
+        self.join_children($chunk, %c, ', '),
         ')',
     );
 }
@@ -497,9 +489,7 @@ our method to_c:pasttype<undef> (PAST::Op $chunk, %c) {
     if $pirop {
         # Some infix stuff
         if $pirop eq ',' {
-            join(', ',
-                |@($chunk).map(-> $_ { self.to_c($_, %c)})
-            );
+            self.join_children($chunk, %c, ', ');
         }
         elsif $pirop eq '=' {
               self.to_c($chunk[0], %c)
@@ -654,6 +644,10 @@ the op itself as one argument.
 
 method size() {
     return pir::does__IPs(self.args, 'array') ?? +self.args + 1 !! 2;
+}
+
+method join_children (PAST::Node $node, %c, $joiner?) {
+    @($node).map(-> $_ { self.to_c($_, %c) }).join($joiner // '');
 }
 
 our multi sub indent($chunk, %c) {
