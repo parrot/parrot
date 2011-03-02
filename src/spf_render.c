@@ -829,13 +829,13 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                                 obj->getfloat(interp, info.type, obj);
 
                             /* check for Inf and NaN values */
-                            if (thefloat == PARROT_FLOATVAL_INF_POSITIVE) {
+                            if (PARROT_FLOATVAL_IS_POSINF(thefloat)) {
                                 ts = cstr2pstr(PARROT_CSTRING_INF_POSITIVE);
                             }
-                            else if (thefloat == PARROT_FLOATVAL_INF_NEGATIVE) {
+                            else if (PARROT_FLOATVAL_IS_NEGINF(thefloat)) {
                                 ts = cstr2pstr(PARROT_CSTRING_INF_NEGATIVE);
                             }
-                            else if (thefloat != thefloat) {
+                            else if (PARROT_FLOATVAL_IS_NAN(thefloat)) {
                                 ts = cstr2pstr(PARROT_CSTRING_NAN_QUIET);
                             }
                             else {

@@ -151,10 +151,16 @@ const struct _data_types data_types[] = {
 #  define PARROT_FLOATVAL_INF_POSITIVE	INFINITY
 #  define PARROT_FLOATVAL_INF_NEGATIVE	-INFINITY
 #  define PARROT_FLOATVAL_NAN_QUIET	NAN
+#  define PARROT_FLOATVAL_IS_POSINF(x)  (isinf(x) && (x) > 0)
+#  define PARROT_FLOATVAL_IS_NEGINF(x)  (isinf(x) && (x) < 0)
+#  define PARROT_FLOATVAL_IS_NAN(x)     isnan(x)
 #else
 #  define PARROT_FLOATVAL_INF_POSITIVE  Parrot_dt_divide_floatval_by_zero(interp, 1.0)
 #  define PARROT_FLOATVAL_INF_NEGATIVE  Parrot_dt_divide_floatval_by_zero(interp, -1.0)
 #  define PARROT_FLOATVAL_NAN_QUIET     Parrot_dt_divide_floatval_by_zero(interp, 0.0)
+#  define PARROT_FLOATVAL_IS_POSINF(x)  ((x) == PARROT_FLOATVAL_INF_POSITIVE)
+#  define PARROT_FLOATVAL_IS_NEGINF(x)  ((x) == PARROT_FLOATVAL_INF_NEGATIVE)
+#  define PARROT_FLOATVAL_IS_NAN(x)     ((x) != (x))
 #endif
 
 #define PARROT_CSTRING_INF_POSITIVE    "Inf"

@@ -7,7 +7,7 @@ config/auto/infnan.pm - detect INFINITY and NAN
 
 =head1 DESCRIPTION
 
-Determining if the system has INFINITY and NAN defined in headers.
+Determining if the system has INFINITY, NAN, isinf, and isnan defined in headers.
 
 =cut
 
@@ -23,7 +23,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Are INFINITY and NAN defined};
+    $data{description} = q{Is standard C Inf/NaN handling present};
     $data{result}      = q{};
     return \%data;
 }

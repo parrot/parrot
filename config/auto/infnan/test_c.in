@@ -14,7 +14,7 @@ int
 main(int argc, char **argv) {
     double inf = INFINITY;
     double nan = NAN;
-    printf("OK: %d %d\n", inf, nan);
+    printf("OK: %d %d\n", isinf(inf), isnan(nan));
     return EXIT_SUCCESS;
 }
 
