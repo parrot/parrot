@@ -438,6 +438,8 @@ our method to_c:pasttype<if> (PAST::Op $chunk, %c) {
             @res.push(indent(%c));
             @res.push("else " ~ self.to_c($chunk[2], %c));
         }
+
+        @res.push("\n");
     }
 
     join('', |@res);
@@ -484,7 +486,7 @@ our method to_c:pasttype<switch> (PAST::Op $chunk, %c) {
         ') {',
         "\n",
         @parts.map(-> $_ { self.to_c($_, %c) } ).join(";\n"),
-        '}',
+        "}\n",
     );
 }
 
@@ -588,7 +590,7 @@ our multi method to_c(PAST::Block $chunk, %c) {
 
     $level--;
     @children.push(indent(%c));
-    @children.push('}');
+    @children.push("}\n");
 
     join('', |@children);
 }
