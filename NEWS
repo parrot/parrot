@@ -2,10 +2,8 @@ New in 3.2.0
 - Core
   + Full support for Unicode filenames on Linux and Win32
   + The configuration option --cxx is gone
-  + Improved code coverage
   + New Generational GC implemented. To enable it run Configure.pl --gc=gms 
   + "opsc_full_parse" branch for semantically parse of ops is started
-  + Parallel building is supported ( make -j<number> )
   + A statement convert the '.param' PIR systax
   + A PMC is implemented for low-level buffer access which separate the
     representation from the pointers
