@@ -589,6 +589,7 @@ our multi method to_c(PAST::Stmts $chunk, %c) {
     my @children := list();
     for @($chunk) {
         @children.push(indent(%c)) unless $_ ~~ PAST::Block;
+
         @children.push(self.to_c($_, %c));
         @children.push(";\n") unless $_ ~~ PAST::Block;
     }
@@ -600,12 +601,20 @@ our multi method to_c(PAST::Block $chunk, %c) {
     my $level    := %c<level>;
     $level++;
 
+    # Put newline after variable declarations.
+    my $need_space := need_space($chunk[0]);
+
     my @children := list();
     @children.push($chunk<label>) if $chunk<label>;
 
     @children.push('{' ~ "\n");
 
     for @($chunk) {
+        if $need_space && !need_space($_) {
+            @children.push("\n");
+            $need_space := 0;
+        }
+
         @children.push(indent(%c));
         @children.push(self.to_c($_, %c));
         @children.push(";\n");
@@ -617,6 +626,11 @@ our multi method to_c(PAST::Block $chunk, %c) {
 
     join('', |@children);
 }
+
+sub need_space($past) {
+    ($past ~~ PAST::Var) && $past.isdecl;
+}
+
 
 # Stub!
 our multi method to_c(String $str, %c) {
