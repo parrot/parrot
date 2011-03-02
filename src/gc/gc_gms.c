@@ -834,7 +834,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     gc_gms_mark_pmc_header(interp, PMCNULL);
     Parrot_gc_trace_root(interp, NULL, GC_TRACE_FULL);
     if (interp->pdb && interp->pdb->debugger) {
-        Parrot_gc_trace_root(interp->pdb->debugger, NULL, (Parrot_gc_trace_type)0);
+        Parrot_gc_trace_root(interp->pdb->debugger, NULL, GC_TRACE_FULL);
     }
     gc_gms_print_stats(interp, "After trace_roots");
     gc_gms_check_sanity(interp);
