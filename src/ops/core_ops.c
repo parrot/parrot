@@ -22579,37 +22579,33 @@ Parrot_stringinfo_i_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
     }
     else {
         switch (IREG(3)) {
-case STRINGINFO_HEADER:
+          case STRINGINFO_HEADER:
             IREG(1) = PTR2UINTVAL(SREG(2));
             break;
-;
-case STRINGINFO_STRSTART:
+          case STRINGINFO_STRSTART:
             IREG(1) = PTR2UINTVAL(SREG(2)->strstart);
             break;
-;
-case STRINGINFO_BUFLEN:
+          case STRINGINFO_BUFLEN:
             IREG(1) = Buffer_buflen(SREG(2));
             break;
-;
-case STRINGINFO_FLAGS:
+          case STRINGINFO_FLAGS:
             IREG(1) = PObj_get_FLAGS(SREG(2));
             break;
-;
-case STRINGINFO_BUFUSED:
+          case STRINGINFO_BUFUSED:
             IREG(1) = SREG(2)->bufused;
             break;
-;
-case STRINGINFO_STRLEN:
+          case STRINGINFO_STRLEN:
             IREG(1) = SREG(2)->strlen;
             break;
-;
-default:
+          default:
             {
-            opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "stringinfo: unknown info type: %d", IREG(3));
+                opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "stringinfo: unknown info type: %d", IREG(3));
 
-            return (opcode_t *)handler;
-        }}
-;
+                return (opcode_t *)handler;
+            }
+
+        }
+
     }
 
     return (opcode_t *)cur_opcode + 4;
@@ -22622,37 +22618,33 @@ Parrot_stringinfo_i_sc_i(opcode_t *cur_opcode, PARROT_INTERP) {
     }
     else {
         switch (IREG(3)) {
-case STRINGINFO_HEADER:
+          case STRINGINFO_HEADER:
             IREG(1) = PTR2UINTVAL(SCONST(2));
             break;
-;
-case STRINGINFO_STRSTART:
+          case STRINGINFO_STRSTART:
             IREG(1) = PTR2UINTVAL(SCONST(2)->strstart);
             break;
-;
-case STRINGINFO_BUFLEN:
+          case STRINGINFO_BUFLEN:
             IREG(1) = Buffer_buflen(SCONST(2));
             break;
-;
-case STRINGINFO_FLAGS:
+          case STRINGINFO_FLAGS:
             IREG(1) = PObj_get_FLAGS(SCONST(2));
             break;
-;
-case STRINGINFO_BUFUSED:
+          case STRINGINFO_BUFUSED:
             IREG(1) = SCONST(2)->bufused;
             break;
-;
-case STRINGINFO_STRLEN:
+          case STRINGINFO_STRLEN:
             IREG(1) = SCONST(2)->strlen;
             break;
-;
-default:
+          default:
             {
-            opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "stringinfo: unknown info type: %d", IREG(3));
+                opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "stringinfo: unknown info type: %d", IREG(3));
 
-            return (opcode_t *)handler;
-        }}
-;
+                return (opcode_t *)handler;
+            }
+
+        }
+
     }
 
     return (opcode_t *)cur_opcode + 4;
@@ -22665,37 +22657,33 @@ Parrot_stringinfo_i_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     }
     else {
         switch (ICONST(3)) {
-case STRINGINFO_HEADER:
+          case STRINGINFO_HEADER:
             IREG(1) = PTR2UINTVAL(SREG(2));
             break;
-;
-case STRINGINFO_STRSTART:
+          case STRINGINFO_STRSTART:
             IREG(1) = PTR2UINTVAL(SREG(2)->strstart);
             break;
-;
-case STRINGINFO_BUFLEN:
+          case STRINGINFO_BUFLEN:
             IREG(1) = Buffer_buflen(SREG(2));
             break;
-;
-case STRINGINFO_FLAGS:
+          case STRINGINFO_FLAGS:
             IREG(1) = PObj_get_FLAGS(SREG(2));
             break;
-;
-case STRINGINFO_BUFUSED:
+          case STRINGINFO_BUFUSED:
             IREG(1) = SREG(2)->bufused;
             break;
-;
-case STRINGINFO_STRLEN:
+          case STRINGINFO_STRLEN:
             IREG(1) = SREG(2)->strlen;
             break;
-;
-default:
+          default:
             {
-            opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "stringinfo: unknown info type: %d", ICONST(3));
+                opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "stringinfo: unknown info type: %d", ICONST(3));
 
-            return (opcode_t *)handler;
-        }}
-;
+                return (opcode_t *)handler;
+            }
+
+        }
+
     }
 
     return (opcode_t *)cur_opcode + 4;
@@ -22708,37 +22696,33 @@ Parrot_stringinfo_i_sc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     }
     else {
         switch (ICONST(3)) {
-case STRINGINFO_HEADER:
+          case STRINGINFO_HEADER:
             IREG(1) = PTR2UINTVAL(SCONST(2));
             break;
-;
-case STRINGINFO_STRSTART:
+          case STRINGINFO_STRSTART:
             IREG(1) = PTR2UINTVAL(SCONST(2)->strstart);
             break;
-;
-case STRINGINFO_BUFLEN:
+          case STRINGINFO_BUFLEN:
             IREG(1) = Buffer_buflen(SCONST(2));
             break;
-;
-case STRINGINFO_FLAGS:
+          case STRINGINFO_FLAGS:
             IREG(1) = PObj_get_FLAGS(SCONST(2));
             break;
-;
-case STRINGINFO_BUFUSED:
+          case STRINGINFO_BUFUSED:
             IREG(1) = SCONST(2)->bufused;
             break;
-;
-case STRINGINFO_STRLEN:
+          case STRINGINFO_STRLEN:
             IREG(1) = SCONST(2)->strlen;
             break;
-;
-default:
+          default:
             {
-            opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "stringinfo: unknown info type: %d", ICONST(3));
+                opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "stringinfo: unknown info type: %d", ICONST(3));
 
-            return (opcode_t *)handler;
-        }}
-;
+                return (opcode_t *)handler;
+            }
+
+        }
+
     }
 
     return (opcode_t *)cur_opcode + 4;
