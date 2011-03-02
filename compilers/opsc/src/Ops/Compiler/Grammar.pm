@@ -1,5 +1,5 @@
 #! nqp
-# Copyright (C) 2009-2010, Parrot Foundation.
+# Copyright (C) 2009-2011, Parrot Foundation.
 
 INIT { pir::load_bytecode('HLL.pbc'); }
 
@@ -43,7 +43,7 @@ rule op {
     <op_type>? 'op' <op_name=ident>
     [ '(' <signature> ')' || <.panic: "Fail to parse signature"> ]
     <op_flag>*
-    {*} #= start    
+    {*} #= start
     [ <op_body> || <.panic: "Fail to parse op body"> ]
 }
 
