@@ -366,11 +366,11 @@ our method to_c:pasttype<macro_define> (PAST::Op $chunk, %c) {
     @res.push('#define ');
     #name of macro
     @res.push($chunk[0]);
-    
+
     @res.push(self.to_c($chunk<macro_args>, %c)) if $chunk<macro_args>;
     @res.push(self.to_c($chunk<body>, %c))       if $chunk<body>;
 
-    join('', |@res);
+    @res.join('');
 }
 
 
@@ -391,8 +391,7 @@ our method to_c:pasttype<macro_if> (PAST::Op $chunk, %c) {
 
     @res.push("\n#endif\n");
 
-
-    join('', |@res);
+    @res.join('');
 }
 our method to_c:pasttype<call> (PAST::Op $chunk, %c) {
     join('',
@@ -435,7 +434,7 @@ our method to_c:pasttype<if> (PAST::Op $chunk, %c) {
         }
     }
 
-    join('', |@res);
+    @res.join('');
 }
 
 our method to_c:pasttype<while> (PAST::Op $chunk, %c) {
@@ -565,47 +564,48 @@ our multi method to_c(PAST::Op $chunk, %c) {
 our multi method to_c(PAST::Stmts $chunk, %c) {
     %c<level>++ unless $chunk[0] ~~ PAST::Block;
 
-    my @children := list();
+    my @res;
     for @($chunk) {
-        @children.push(indent($_, %c)) unless $_ ~~ PAST::Block;
+        @res.push(indent($_, %c)) unless $_ ~~ PAST::Block;
 
-        @children.push(self.to_c($_, %c));
-        @children.push(";") if need_semicolon($_);
-        @children.push("\n");
+        @res.push(self.to_c($_, %c));
+        @res.push(";") if need_semicolon($_);
+        @res.push("\n");
     }
     %c<level>-- unless $chunk[0] ~~ PAST::Block;
-    join('', |@children);
+
+    @res.join('');
 }
 
 our multi method to_c(PAST::Block $chunk, %c) {
     # Put newline after variable declarations.
     my $need_space := need_space($chunk[0]);
 
-    my @children := list();
-    @children.push(indent($chunk, %c) ~ $chunk<label> ~ "\n" ~ indent(%c)) if $chunk<label>;
+    my @res;
+    @res.push(indent($chunk, %c) ~ $chunk<label> ~ "\n" ~ indent(%c)) if $chunk<label>;
 
     %c<level>++;
 
-    @children.push("\{\n");
+    @res.push("\{\n");
 
     for @($chunk) {
         if $need_space && !need_space($_) {
             # Hack. If this $chunk doesn't need semicolon it will put newline before
-            @children.push("\n");
+            @res.push("\n");
             $need_space := 0;
         }
 
-        @children.push(indent($_, %c));
-        @children.push(self.to_c($_, %c));
-        @children.push(need_semicolon($_) ?? ";" !! "\n");
-        @children.push("\n");
+        @res.push(indent($_, %c));
+        @res.push(self.to_c($_, %c));
+        @res.push(need_semicolon($_) ?? ";" !! "\n");
+        @res.push("\n");
     }
 
     %c<level>--;
-    @children.push(indent(%c));
-    @children.push("}");
+    @res.push(indent(%c));
+    @res.push("}");
 
-    join('', |@children);
+    @res.join('');
 }
 
 sub need_space($past) {
