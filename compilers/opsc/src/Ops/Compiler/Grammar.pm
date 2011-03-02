@@ -144,7 +144,8 @@ token identifier {
 
 token keyword {
     [
-    | 'for' |'if' |'while' | 'else'
+    | 'for' |'while' | 'do'
+    | 'if' | 'else'
     | 'case' | 'default'
     | 'break' | 'return' | 'continue'
     | 'goto' | 'expr' | 'restart'
@@ -208,7 +209,7 @@ rule statement_control:sym<for> {
 }
 
 rule statement_control:sym<do-while> {
-    <sym> <blockoid> 'while' '(' <condition=.EXPR> ')'
+    'do' <blockoid> 'while' '(' <condition=.EXPR> ')'
 }
 
 # Not real "C" switch. Just close enough
