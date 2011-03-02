@@ -375,7 +375,10 @@ method statement_list ($/) {
 
     $past.push($_.ast) for $<labeled_statement>;
 
-    make $past;
+    # Avoid wrapping single blockoid into Stmts.
+    make (+@($past) == 1) && ($past[0] ~~ PAST::Block)
+        ?? $past[0]
+        !! $past;
 }
 
 method labeled_statement ($/) {
