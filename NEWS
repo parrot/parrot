@@ -6,11 +6,19 @@ New in 3.2.0
   + New Generational GC implemented. To enable it run Configure.pl --gc=gms 
   + "opsc_full_parse" branch for semantically parse of ops is started
   + Parallel building is supported ( make -j<number> )
+  + A statement convert the '.param' PIR systax
+  + A PMC is implemented for low-level buffer access which separate the
+    representation from the pointers
+  + Support added for 'long double', 'long long', and 64-bit to StructView
 - Languages
   + A few tests in Cardinal are fixed
   + Minor fixes, refactors and cleaning on Winxed
   + New predefs replace and push on Winxed
+  + Operator exits, class and .* (indirect method call) added on Winxed
+  + $loadlib directive for Winxed
+  + -o option to installabel driver added on Winxed
 - Community
+  + M0 roadmap is in progress
 - Documentation
   + 'make docs' target, which was serving only to generate superfluous POD
     files, has been removed.
@@ -18,6 +26,7 @@ New in 3.2.0
 - Tests
   + Added 'make release_check' target so that Release Manager can double-check
     tarball
+  + Probes added for 'long long' and 64-bit C types
 
 New in 3.1.0
 - Core
