@@ -439,6 +439,7 @@ our method to_c:pasttype<if> (PAST::Op $chunk, %c) {
 
         # 'else'
         if $chunk[2] {
+            @res.push("\n");
             @res.push(indent(%c));
             @res.push("else");
             # single statement. Make it pretty.
@@ -446,8 +447,6 @@ our method to_c:pasttype<if> (PAST::Op $chunk, %c) {
 
             @res.push(self.to_c($chunk[2], %c));
         }
-
-        @res.push("\n");
     }
 
     join('', |@res);
@@ -622,7 +621,7 @@ our multi method to_c(PAST::Block $chunk, %c) {
 
     $level--;
     @children.push(indent(%c));
-    @children.push("}\n");
+    @children.push("}");
 
     join('', |@children);
 }
