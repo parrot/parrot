@@ -20,11 +20,19 @@ Tests the Select PMC.
 .sub main :main
 .include 'test_more.pir'
 
-    plan(12)
+    plan(13)
+    'test_load'()
     'test_update'()
     'test_read'()
     'test_write'()
     'test_select'()
+.end
+
+
+.sub 'test_load'
+    $P0 = loadlib 'select'
+    $I0 = defined $P0
+    ok($I0, 'select library loaded')
 .end
 
 

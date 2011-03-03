@@ -64,7 +64,7 @@ the Hash PMC
     }
 
 
-pmclass Select auto_attrs {
+pmclass Select auto_attrs dynpmc {
 
     ATTR PMC    *fd_map;   /* map a fd to its PMC */
     ATTR fd_set  rb_array; /* read bit array */
