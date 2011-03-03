@@ -16,6 +16,7 @@
 #include "parrot/parrot.h"
 
 #define PARROT_MMD_MAX_CLASS_DEPTH 1000
+#define Parrot_mmd_cache_destroy(x, y)
 
 /* function typedefs */
 typedef PMC*    (*mmd_f_p_ppp)(PARROT_INTERP, PMC *, PMC *, PMC *);
