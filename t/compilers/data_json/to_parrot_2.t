@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 61;
+use Parrot::Test tests => 60;
 
 =head1 NAME
 
@@ -19,8 +19,6 @@ t/compilers/data_json/to_parrot.t - test JSON to parrot conversions
 =head1 DESCRIPTION
 
 Tests JSON->Parrot conversions.
-
-Note: This uses the new data_json compiler.
 
 =cut
 
@@ -679,22 +677,7 @@ JSON
 ]
 OUT
 
-json_dump_is( <<'JSON', <<'OUT', 'unicode chars' );
-["\u0000","\u00e4","\u007f","\u0080","\u0100","\u203e","Pl\u00e4ne"]
-JSON
-"JSON" => ResizablePMCArray (size:7) [
-    "\x{0}",
-    "\x{e4}",
-    "\x{7f}",
-    "\x{80}",
-    "\u0100",
-    "\u203e",
-    "Pl\x{e4}ne"
-]
-OUT
-
-
-# GH #570 Need many more tests, exercising all aspects of http://www.json.org/
+# TT #1226 Need many more tests, exercising all aspects of http://www.json.org/
 
 sub json_dump_is {
     my ( $code, $dumped, $reason, %args ) = @_;
