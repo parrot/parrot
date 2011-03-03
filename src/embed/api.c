@@ -871,8 +871,8 @@ the size information will be included with the pointer for later use. If
 C<size> is less than or equal to zero, it will be ignored and will not be
 included in the PMC object.
 
-item C<Parrot_Int Parrot_api_unwrap_pointer(Parrot_PMC interp_pmc,
-Parrot_PMC pmc, ARGOUT(void ** ptr), ARGOUT(Parrot_Int * size))>
+=item C<Parrot_Int Parrot_api_unwrap_pointer(Parrot_PMC interp_pmc, Parrot_PMC
+pmc, void ** ptr, Parrot_Int * size)>
 
 Return a pointer from a PMC. This is typically used in conjunction with
 C<Parrot_api_wrap_pointer> to return the original wrapped pointer value from
