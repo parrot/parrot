@@ -188,7 +188,9 @@ Sets/gets the op's code body.
 method body() {
     my $res := '';
     for @(self) -> $part {
-        $res := $res ~ $part<inline>;
+        if pir::defined($part) {
+            $res := $res ~ $part<inline>;
+        }
     }
     $res;
 }
@@ -281,66 +283,354 @@ method >> >>> to C<VTABLE_I<method>>.
 
 method get_body( $trans ) {
 
-    my @body := list();
+    my %context := hash(
+        trans => $trans,
+        level => 0,
+    );
 
     #work through the op_body tree
-    for @(self) {
-        my $chunk := self.process_body_chunk($trans, $_);
-        #pir::say('# chunk ' ~ $chunk);
-        @body.push($chunk);
-    }
-
-    join('', |@body);
+    self.join_children(self, %context);
 }
 
 # Recursively process body chunks returning string.
-
-our multi method process_body_chunk($trans, PAST::Var $chunk) {
-    my $n := +$chunk.name;
-    $trans.access_arg( self.arg_type($n - 1), $n);
+our multi method to_c(PAST::Val $val, %c) {
+    $val.value;
 }
 
-our multi method process_body_chunk($trans, PAST::Op $chunk) {
-    my $type := $chunk.pasttype;
-    #say('OP ' ~ $type);
-    if $type eq 'inline' {
-        #_dumper($chunk);
-        #pir::say('RET ' ~ $chunk<inline>);
-        return $chunk.inline;
+our multi method to_c(PAST::Var $var, %c) {
+    if ($var.isdecl) {
+        my $res := $var.vivibase ~ ' ' ~ $var<pointer> ~ ' ' ~ $var.name;
+
+        if my $arr  := $var<array_size> {
+            $res := $res ~ '[' ~ $arr ~ ']';
+        }
+
+        if my $expr := $var.viviself {
+            $res := $res ~ ' = ' ~ self.to_c($expr, %c);
+        }
+        $res;
     }
-    elsif $type eq 'call' {
-        my $name     := $chunk.name;
-        #say('NAME '~$name ~ ' ' ~ $is_next);
-        if $name eq 'OPSIZE' {
-            #say('is_next');
-            return ~self.size;
-        }
-
-        my @children := list();
-        for @($chunk) {
-            @children.push(self.process_body_chunk($trans, $_));
-        }
-        my $children := join('', |@children);
-
-        #pir::say('children ' ~ $children);
-        my $ret := Q:PIR<
-            $P0 = find_lex '$trans'
-            $P1 = find_lex '$name'
-            $S0 = $P1
-            $P1 = find_lex '$children'
-            %r  = $P0.$S0($P1)
-        >;
-        #pir::say('RET ' ~ $ret);
-        return $ret;
+    elsif $var.scope eq 'keyed' {
+        self.to_c($var[0], %c) ~ '[' ~ self.to_c($var[1], %c) ~ ']';
+    }
+    elsif $var.scope eq 'register' {
+        my $n := +$var.name;
+        %c<trans>.access_arg( self.arg_type($n - 1), $n);
+    }
+    else {
+        # Just ordinary variable
+        $var.name;
     }
 }
 
-our multi method process_body_chunk($trans, PAST::Stmts $chunk) {
-    my @children := list();
+our %PIROP_MAPPING := hash(
+    :shr('>>'),
+    :shl('<<'),
+
+    :shr_assign('>>='),
+    :shl_assign('<<='),
+
+    :le('<='),
+    :ge('>='),
+    :lt('<'),
+    :gt('>'),
+
+    :arrow('->'),
+    :dotty('.'),
+);
+
+our method to_c:pasttype<inline> (PAST::Op $chunk, %c) {
+    return $chunk.inline;
+}
+
+our method to_c:pasttype<macro> (PAST::Op $chunk, %c) {
+    my $name     := $chunk.name;
+    my $children := self.join_children($chunk, %c);
+
+    my $trans    := %c<trans>;
+
+    #pir::say('children ' ~ $children);
+    my $ret := Q:PIR<
+        $P0 = find_lex '$trans'
+        $P1 = find_lex '$name'
+        $S0 = $P1
+        $P1 = find_lex '$children'
+        %r  = $P0.$S0($P1)
+    >;
+    #pir::say('RET ' ~ $ret);
+    return $ret;
+}
+
+our method to_c:pasttype<macro_define> (PAST::Op $chunk, %c) {
+    my @res;
+    @res.push('#define ');
+    #name of macro
+    @res.push($chunk[0]);
+
+    @res.push(self.to_c($chunk<macro_args>, %c)) if $chunk<macro_args>;
+    @res.push(self.to_c($chunk<body>, %c))       if $chunk<body>;
+
+    @res.join('');
+}
+
+
+our method to_c:pasttype<macro_if> (PAST::Op $chunk, %c) {
+    my @res;
+
+    @res.push('#if ');
+    # #if isn't parsed semantically yet.
+    @res.push($chunk[0]);
+    #@res.push(self.to_c($trans, $chunk[0]));
+    @res.push("\n");
+
+    # 'then'
+    @res.push(self.to_c($chunk[1], %c));
+
+    # 'else'
+    @res.push("\n#else\n" ~ self.to_c($chunk[2], %c)) if $chunk[2];
+
+    @res.push("\n#endif\n");
+
+    @res.join('');
+}
+our method to_c:pasttype<call> (PAST::Op $chunk, %c) {
+    join('',
+        $chunk.name,
+        '(',
+        # Handle args.
+        self.join_children($chunk, %c, ', '),
+        ')',
+    );
+}
+
+our method to_c:pasttype<if> (PAST::Op $chunk, %c) {
+    my @res;
+
+    if ($chunk<ternary>) {
+        @res.push(self.to_c($chunk[0], %c));
+        @res.push(" ? ");
+        # 'then'
+        @res.push(self.to_c($chunk[1], %c));
+        # 'else'
+        @res.push(" : ");
+        @res.push(self.to_c($chunk[2], %c));
+    }
+    else {
+        @res.push('if (');
+        @res.push(self.to_c($chunk[0], %c));
+        @res.push(") ");
+
+        # 'then'
+        # single statement. Make it pretty.
+
+        @res.push(self.to_c($chunk[1], %c));
+
+        # 'else'
+        if $chunk[2] {
+            @res.push("\n");
+            @res.push(indent(%c));
+            @res.push("else ");
+            @res.push(self.to_c($chunk[2], %c));
+        }
+    }
+
+    @res.join('');
+}
+
+our method to_c:pasttype<while> (PAST::Op $chunk, %c) {
+    join('',
+        'while (',
+        self.to_c($chunk[0], %c),
+        ') ',
+        self.to_c($chunk[1], %c),
+    );
+}
+
+our method to_c:pasttype<do-while> (PAST::Op $chunk, %c) {
+    join('',
+        'do ',
+        self.to_c($chunk[0], %c),
+        ' while (',
+        self.to_c($chunk[1], %c),
+        ');',
+    );
+}
+
+our method to_c:pasttype<for> (PAST::Op $chunk, %c) {
+    join('',
+        'for (',
+        $chunk[0] ?? self.to_c($chunk[0], %c) !! '',
+        '; ',
+        $chunk[1] ?? self.to_c($chunk[1], %c) !! '',
+        '; ',
+        $chunk[2] ?? self.to_c($chunk[2], %c) !! '',
+        ') ',
+        self.to_c($chunk[3], %c),
+    );
+}
+
+our method to_c:pasttype<switch> (PAST::Op $chunk, %c) {
+    join('',
+        'switch (',
+        self.to_c($chunk[0], %c),
+        ') {',
+        "\n",
+        self.to_c($chunk[1], %c),
+        "\n",
+        indent(%c),
+        "}",
+    );
+}
+
+our method to_c:pasttype<undef> (PAST::Op $chunk, %c) {
+    my $pirop := $chunk.pirop;
+
+    if $pirop {
+        # Some infix stuff
+        if $pirop eq ',' {
+            self.join_children($chunk, %c, ', ');
+        }
+        elsif $pirop eq '=' {
+              self.to_c($chunk[0], %c)
+            ~ ' = '
+            ~ self.to_c($chunk[1], %c)
+        }
+        elsif ($pirop eq 'arrow') || ($pirop eq 'dotty') {
+              self.to_c($chunk[0], %c)
+            ~ %PIROP_MAPPING{$pirop}
+            ~ self.to_c($chunk[1], %c)
+        }
+        elsif $chunk.name ~~ / infix / {
+              '('
+            ~ self.to_c($chunk[0], %c)
+            ~ ' ' ~ (%PIROP_MAPPING{$pirop} // $pirop) ~ ' '
+            ~ self.to_c($chunk[1], %c)
+            ~ ')';
+        }
+        elsif $chunk.name ~~ / prefix / {
+              '('
+            ~ (%PIROP_MAPPING{$pirop} // $pirop)
+            ~ self.to_c($chunk[0], %c)
+            ~ ')';
+        }
+        elsif $chunk.name ~~ / postfix / {
+              '('
+            ~ self.to_c($chunk[0], %c)
+            ~ (%PIROP_MAPPING{$pirop} // $pirop)
+            ~ ')';
+        }
+        else {
+            _dumper($chunk);
+            pir::die("Unhandled chunk for pirop");
+        }
+    }
+    elsif $chunk.returns {
+        # Handle "cast"
+        join('',
+            '(',
+            $chunk.returns,
+            ')',
+            self.to_c($chunk[0], %c),
+        );
+    }
+    elsif $chunk<control> {
+        $chunk<control>;
+    }
+    elsif $chunk<label> {
+        # Do nothing. Empty label for statement.
+        "";
+    }
+    else {
+        _dumper($chunk);
+        pir::die("Unhandled chunk");
+    }
+}
+
+our multi method to_c(PAST::Op $chunk, %c) {
+    my @res;
+
+    @res.push($chunk<label> ~ "\n" ~ indent(%c)) if $chunk<label>;
+
+    my $type := $chunk.pasttype // 'undef';
+    my $sub  := pir::find_sub_not_null__ps('to_c:pasttype<' ~ $type ~ '>');
+
+    @res.push('(') if $chunk<wrap>;
+    @res.push($sub(self, $chunk, %c));
+    @res.push(')') if $chunk<wrap>;
+
+    @res.join('');
+}
+
+our multi method to_c(PAST::Stmts $chunk, %c) {
+    %c<level>++ unless $chunk[0] ~~ PAST::Block;
+
+    my @res;
     for @($chunk) {
-        @children.push(self.process_body_chunk($trans, $_));
+        @res.push(indent($_, %c)) unless $_ ~~ PAST::Block;
+
+        @res.push(self.to_c($_, %c));
+        @res.push(";") if need_semicolon($_);
+        @res.push("\n");
     }
-    join('', |@children);
+    %c<level>-- unless $chunk[0] ~~ PAST::Block;
+
+    @res.join('');
+}
+
+our multi method to_c(PAST::Block $chunk, %c) {
+    # Put newline after variable declarations.
+    my $need_space := need_space($chunk[0]);
+
+    my @res;
+    @res.push(indent($chunk, %c) ~ $chunk<label> ~ "\n" ~ indent(%c)) if $chunk<label>;
+
+    %c<level>++;
+
+    @res.push("\{\n");
+
+    for @($chunk) {
+        if $need_space && !need_space($_) {
+            # Hack. If this $chunk doesn't need semicolon it will put newline before
+            @res.push("\n");
+            $need_space := 0;
+        }
+
+        @res.push(indent($_, %c));
+        @res.push(self.to_c($_, %c));
+        @res.push(need_semicolon($_) ?? ";" !! "\n");
+        @res.push("\n");
+    }
+
+    %c<level>--;
+    @res.push(indent(%c));
+    @res.push("}");
+
+    @res.join('');
+}
+
+sub need_space($past) {
+    ($past ~~ PAST::Var) && $past.isdecl;
+}
+
+sub need_semicolon($past) {
+    return 0 if $past ~~ PAST::Block;
+    return 1 unless $past ~~ PAST::Op;
+
+    my $pasttype := $past.pasttype;
+    return 1 unless $pasttype;
+    return 0 if $pasttype eq 'if';
+    return 0 if $pasttype eq 'for';
+    return 0 if $pasttype eq 'while';
+    return 0 if $pasttype eq 'do-while';
+    return 0 if $pasttype eq 'switch';
+
+    return 1;
+}
+
+
+# Stub!
+our multi method to_c(String $str, %c) {
+    $str;
 }
 
 =begin
@@ -353,8 +643,21 @@ the op itself as one argument.
 =end
 
 method size() {
-    return pir::does__IPs(self.arg_types, 'array') ?? +self.arg_types + 1 !! 2;
+    return pir::does__IPs(self.args, 'array') ?? +self.args + 1 !! 2;
 }
+
+method join_children (PAST::Node $node, %c, $joiner?) {
+    @($node).map(-> $_ { self.to_c($_, %c) }).join($joiner // '');
+}
+
+our multi sub indent($chunk, %c) {
+    pir::repeat(' ', %c<level> * 4 - ($chunk<label> ?? 2 !! 0));
+}
+
+our multi sub indent(%c) {
+    pir::repeat(' ', %c<level> * 4);
+}
+
 
 =begin
 

@@ -13,9 +13,7 @@
 #ifndef PARROT_DATATYPES_H_GUARD
 #define PARROT_DATATYPES_H_GUARD
 
-/* TODO: detect these with configure */
-#define HAS_LONGLONG   0
-#define HAS_LONGDOUBLE 0
+#include "parrot/has_header.h"
 
 /* &gen_from_enum(datatypes.pasm) subst(s/enum_type_(\w+)/uc("DATATYPE_$1")/e) */
 typedef enum {
@@ -111,25 +109,29 @@ const struct _data_types data_types[] = {
     /* native float types */
     { "float",      sizeof (float),              ALIGNOF(float) },
     { "double",     sizeof (double),             ALIGNOF(double) },
-#  if HAS_LONGDOUBLE
     { "longdouble", sizeof (long double),        ALIGNOF(long double)},
-#  else
-    { "longdouble", 0,                           0 },
-#  endif
 
     /* explicitly sized integer types */
-    { "int8",       1,                           ALIGNOF(int /* TODO */) },
-    { "int16",      2,                           ALIGNOF(int /* TODO */) },
-    { "int32",      4,                           ALIGNOF(int /* TODO */) },
-    { "int64",      8,                           ALIGNOF(int /* TODO */) },
+    { "int8",       1,                           ALIGNOF(Parrot_Int1) },
+    { "int16",      2,                           ALIGNOF(Parrot_Int2) },
+    { "int32",      4,                           ALIGNOF(Parrot_Int4) },
+#  if HAS_INT64
+    { "int64",      8,                           ALIGNOF(Parrot_Int8) },
+#  else
+    { "int64",      0,                           0 },
+#  endif
 
     /* unsigned variants */
     { "uint1",      0,                           0 }, /* = bit */
     { "uint4",      0,                           0 },
-    { "uint8",      1,                           ALIGNOF(int /* TODO */) },
-    { "uint16",     2,                           ALIGNOF(int /* TODO */) },
-    { "uint32",     4,                           ALIGNOF(int /* TODO */) },
-    { "uint64",     8,                           ALIGNOF(int /* TODO */) },
+    { "uint8",      1,                           ALIGNOF(Parrot_Int1) },
+    { "uint16",     2,                           ALIGNOF(Parrot_Int2) },
+    { "uint32",     4,                           ALIGNOF(Parrot_Int4) },
+#  if HAS_INT64
+    { "uint64",     8,                           ALIGNOF(Parrot_Int8) },
+#  else
+    { "uint64",     0,                           0 },
+#  endif
 
     { "ptr",        sizeof (void *),             ALIGNOF(void *) },
     { "cstr",       sizeof (char *),             ALIGNOF(char *) },
@@ -144,15 +146,21 @@ const struct _data_types data_types[] = {
 };
 #endif /* INSIDE_GLOBAL_SETUP */
 
-#if defined(__NetBSD__) && defined(__alpha__)
+#ifdef PARROT_HAS_INF_NAN
 #  include <math.h>
 #  define PARROT_FLOATVAL_INF_POSITIVE	INFINITY
 #  define PARROT_FLOATVAL_INF_NEGATIVE	-INFINITY
 #  define PARROT_FLOATVAL_NAN_QUIET	NAN
+#  define PARROT_FLOATVAL_IS_POSINF(x)  (isinf(x) && (x) > 0)
+#  define PARROT_FLOATVAL_IS_NEGINF(x)  (isinf(x) && (x) < 0)
+#  define PARROT_FLOATVAL_IS_NAN(x)     isnan(x)
 #else
 #  define PARROT_FLOATVAL_INF_POSITIVE  Parrot_dt_divide_floatval_by_zero(interp, 1.0)
 #  define PARROT_FLOATVAL_INF_NEGATIVE  Parrot_dt_divide_floatval_by_zero(interp, -1.0)
 #  define PARROT_FLOATVAL_NAN_QUIET     Parrot_dt_divide_floatval_by_zero(interp, 0.0)
+#  define PARROT_FLOATVAL_IS_POSINF(x)  ((x) == PARROT_FLOATVAL_INF_POSITIVE)
+#  define PARROT_FLOATVAL_IS_NEGINF(x)  ((x) == PARROT_FLOATVAL_INF_NEGATIVE)
+#  define PARROT_FLOATVAL_IS_NAN(x)     ((x) != (x))
 #endif
 
 #define PARROT_CSTRING_INF_POSITIVE    "Inf"

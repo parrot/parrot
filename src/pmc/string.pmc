@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2010, Parrot Foundation.
+Copyright (C) 2003-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -527,7 +527,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
                         enum_class_Integer));
 
         String_iter   iter;
-        const STRING *me  = VTABLE_get_string(INTERP, SELF);
+        const STRING * const me  = VTABLE_get_string(INTERP, SELF);
         UINTVAL       i   = 0;
         size_t        len = STRING_length(me);
 
@@ -538,7 +538,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
         STRING_ITER_INIT(interp, &iter);
 
         while (iter.charpos < len) {
-            int c = STRING_iter_get_and_advance(interp, me, &iter);
+            const int c = STRING_iter_get_and_advance(interp, me, &iter);
             int dig;
 
             if (isdigit((unsigned char)c))
@@ -687,11 +687,11 @@ if present.
 */
 
     METHOD reverse(STRING *src :optional, INTVAL got_src :opt_flag) {
-        STRING *s;
         if (got_src) {
             SET_ATTR_str_val(INTERP, SELF, Parrot_str_reverse(INTERP, src));
         }
         else {
+            STRING *s;
             GET_ATTR_str_val(INTERP, SELF, s);
             SET_ATTR_str_val(INTERP, SELF, Parrot_str_reverse(INTERP, s));
         }
@@ -708,9 +708,8 @@ Checks if the ascii STRING C<str> is just an integer.
 */
 
     METHOD is_integer(STRING *src) {
-        INTVAL         i;
-        char          *p;
         const INTVAL   len = Parrot_str_length(INTERP, src);
+        const char *p;
 
         if (!len)
             RETURN(INTVAL 0);
@@ -719,11 +718,9 @@ Checks if the ascii STRING C<str> is just an integer.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_ENCODING,
                 "Can't is_integer non fixed_8");
 
-        i = 0;
         p = src->strstart;
-
-        if (p[i] == '-' || p[i] == '+' ||
-            (p[i] >= '0' && p[i] <= '9')) {
+        if (p[0] == '-' || p[0] == '+' || (p[0] >= '0' && p[0] <= '9')) {
+            int i;
             for (i = 1; i < len; ++i)
                 if (p[i] < '0' || p[i] > '9')
                     RETURN(INTVAL 0);
@@ -761,7 +758,7 @@ Find last occurrence of C<substring>, but not after the C<start> position.
 */
 
     METHOD reverse_index(STRING *substring, INTVAL start) {
-        STRING * const src = VTABLE_get_string(INTERP, SELF);
+        const STRING * const src = VTABLE_get_string(INTERP, SELF);
         INTVAL         res = -1;
         UINTVAL        len;
 
@@ -795,7 +792,7 @@ EXPERIMENTAL, for testing only. See TT #1628
 
     METHOD unescape(STRING *encodingname)
     {
-        const STR_VTABLE *encoding = Parrot_find_encoding_by_string(INTERP, encodingname);
+        const STR_VTABLE * const encoding = Parrot_find_encoding_by_string(INTERP, encodingname);
         STRING * const src = VTABLE_get_string(INTERP, SELF);
         STRING * const dest = Parrot_str_unescape_string(INTERP, src,
                 encoding, 0);

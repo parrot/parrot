@@ -56,7 +56,7 @@ method prepare_ops($emitter, $ops_file) {
 
         @op_func_table.push(sprintf( "  %-50s /* %6ld */\n", "$func_name,", $index ));
 
-        my $body := join('', $definition, '  {', "\n", $src, '}', "\n\n");
+        my $body := join('', $definition, ' ', $src, "\n\n");
         @op_funcs.push($body);
         @op_protos.push($prototype);
         $index++;

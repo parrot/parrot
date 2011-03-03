@@ -45,7 +45,7 @@ Initializes a newly created Socket object.
 */
 
     VTABLE void init() {
-        Parrot_Socket_attributes *data_struct =
+        Parrot_Socket_attributes * const data_struct =
                 (Parrot_Socket_attributes *) PMC_data(SELF);
 
         data_struct->local  = PMCNULL;
@@ -68,8 +68,8 @@ Create a copy of the socket handle.
 */
 
     VTABLE PMC *clone() {
-        PMC * copy = SUPER();
-        Parrot_Socket_attributes * const old_struct = PARROT_SOCKET(SELF);
+        PMC * const copy = SUPER();
+        const Parrot_Socket_attributes * const old_struct = PARROT_SOCKET(SELF);
         Parrot_Socket_attributes * const data_struct = PARROT_SOCKET(copy);
 
         if (!PMC_IS_NULL(old_struct->local))
@@ -110,7 +110,7 @@ Free structures.
 */
     VTABLE void destroy() {
         if (PARROT_SOCKET(SELF)) {
-            Parrot_Socket_attributes *data_struct = PARROT_SOCKET(SELF);
+            Parrot_Socket_attributes * const data_struct = PARROT_SOCKET(SELF);
 
             if (data_struct->os_handle != PIO_INVALID_HANDLE)
                 Parrot_io_close_socket(INTERP, data_struct->os_handle);
@@ -167,7 +167,7 @@ for readable, two for writeable, and four for exceptions.
 
 
     METHOD poll(INTVAL which, INTVAL sec, INTVAL usec) {
-        INTVAL poll = Parrot_io_poll_handle(INTERP, SELF, which, sec, usec);
+        const INTVAL poll = Parrot_io_poll_handle(INTERP, SELF, which, sec, usec);
         RETURN(INTVAL poll);
     }
 
@@ -214,7 +214,7 @@ including family and protocol. It can be passed to C<bind()> or C<connect()>.
 */
     METHOD getaddrinfo(STRING * address,
                        INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive) {
-        PMC * res = Parrot_io_getaddrinfo(INTERP, address, port, protocol, family, passive);
+        PMC * const res = Parrot_io_getaddrinfo(INTERP, address, port, protocol, family, passive);
         RETURN(PMC * res);
     }
 
@@ -228,7 +228,7 @@ C<remote_address> returns the remote address of this socket PMC.
 
 */
     METHOD remote_address() {
-        PMC * res = PARROT_SOCKET(SELF)->remote;
+        PMC * const res = PARROT_SOCKET(SELF)->remote;
         RETURN(PMC * res);
     }
 
@@ -242,7 +242,7 @@ C<local_address> returns the local address of this socket PMC.
 
 */
     METHOD local_address() {
-        PMC * res = PARROT_SOCKET(SELF)->local;
+        PMC * const res = PARROT_SOCKET(SELF)->local;
         RETURN(PMC * res);
     }
 
@@ -328,7 +328,7 @@ complete, it invokes the callback, passing it a status object.
 */
 
     METHOD send(STRING *buf) {
-        INTVAL res = Parrot_io_send_handle(INTERP, SELF, buf);
+        const INTVAL res = Parrot_io_send_handle(INTERP, SELF, buf);
         RETURN(INTVAL res);
     }
 
@@ -393,7 +393,7 @@ but continues to send new connection events until the socket is closed.]
 */
 
     METHOD accept() {
-        PMC * res = Parrot_io_accept_handle(INTERP, SELF);
+        PMC * const res = Parrot_io_accept_handle(INTERP, SELF);
         RETURN(PMC * res);
     }
 
@@ -419,7 +419,7 @@ Read the given number of bytes from the socket and return them in a string.
             buf = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
 
         while (Parrot_str_length(INTERP, buf) < nb) {
-            STRING *more = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
+            STRING * const more = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
             if (Parrot_str_length(INTERP, more) == 0) {
                 SET_ATTR_buf(INTERP, SELF, STRINGNULL);
                 RETURN(STRING *buf);
@@ -457,7 +457,7 @@ Read a line from the socket and return it in a string.
             buf = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
 
         while ((idx = Parrot_str_find_index(INTERP, buf, CONST_STRING(INTERP, "\n"), 0)) < 0) {
-            STRING *more = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
+            STRING * const more = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
             if (Parrot_str_length(INTERP, more) == 0) {
                 SET_ATTR_buf(INTERP, SELF, STRINGNULL);
                 RETURN(STRING *buf);
@@ -483,7 +483,7 @@ Print the string to the socket.
 */
 
     METHOD puts(STRING *buf) {
-        INTVAL res = Parrot_io_send_handle(INTERP, SELF, buf);
+        const INTVAL res = Parrot_io_send_handle(INTERP, SELF, buf);
         RETURN(INTVAL res);
     }
 

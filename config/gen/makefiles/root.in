@@ -55,6 +55,7 @@ BUILD_TOOLS_DIR = tools/build
 # directory for developers' tools
 # programs, templates, configuration files NOT invoked by 'make all'
 DEV_TOOLS_DIR = tools/dev
+RELEASE_TOOLS_DIR = tools/release
 
 # directory for header files
 INC_DIR         = include/parrot
@@ -823,6 +824,7 @@ help :
 	@echo ""
 	@echo "Release:"
 	@echo "  release:           Create a tarball."
+	@echo "  release_check:     Check that the tarball will build on its own."
 	@echo "  win32-inno-installer:  Create MSWin32 setup."
 	@echo ""
 	@echo "Examples:"
@@ -2915,6 +2917,12 @@ release : MANIFEST MANIFEST.generated
 	sha256sum parrot-$(VERSION).tar.bz2 > parrot-$(VERSION).tar.bz2.sha256
 	mv MANIFEST.real MANIFEST
 	rm parrot-$(VERSION)
+
+release_check:
+	make release VERSION=$(SOVERSION)
+	$(PERL) $(RELEASE_TOOLS_DIR)/releasecheck.pl
+
+relcheck : release_check
 
 win32-inno-installer : world installable
 	$(PERL) $(DEV_TOOLS_DIR)/mk_inno.pl
