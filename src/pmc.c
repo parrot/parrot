@@ -882,6 +882,7 @@ Take a C string array and a count, and box it into a string array PMC
 */
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_pmc_box_c_string_array(PARROT_INTERP, int count, ARGIN(const char **s))
 {

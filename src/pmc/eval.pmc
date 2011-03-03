@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -70,7 +70,7 @@ get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
             INTVAL i, n;
             for (i = n = 0; i < ct->pmc.const_count; ++i) {
                 STRING * const SUB = CONST_STRING(interp, "Sub");
-                PMC *x = ct->pmc.constants[i];
+                PMC * const x = ct->pmc.constants[i];
                 if (VTABLE_isa(interp, x, SUB))
                     if (!idx--)
                         return x;
@@ -101,11 +101,11 @@ mark_ct(PARROT_INTERP, ARGIN(PMC *self))
     seg = sub->seg;
 
     if (seg) {
-        PackFile_ConstTable * const ct = seg->const_table;
+        const PackFile_ConstTable * const ct = seg->const_table;
         if (ct) {
             INTVAL i;
             for (i = 0; i < ct->pmc.const_count; ++i) {
-                PMC *sub = ct->pmc.constants[i];
+                PMC * const sub = ct->pmc.constants[i];
                 Parrot_gc_mark_PMC_alive(interp, sub);
             }
         }
@@ -133,7 +133,7 @@ Invokes the first subroutine in the eval code.
 */
 
     VTABLE opcode_t *invoke(void *next) {
-        PMC *sub = SELF.get_pmc_keyed_int(0);
+        PMC * const sub = SELF.get_pmc_keyed_int(0);
         return VTABLE_invoke(INTERP, sub, next);
     }
 
@@ -304,16 +304,15 @@ Unarchives the code.
 */
 
     VTABLE void freeze(PMC *info) {
-        STRING   *packed = SELF.get_string();
+        STRING * const packed = SELF.get_string();
         VTABLE_push_string(INTERP, info, packed);
 
         SUPER(info);
     }
 
     VTABLE void thaw(PMC *info) {
-        STRING           *packed = VTABLE_shift_string(INTERP, info);
+        STRING    * const packed = VTABLE_shift_string(INTERP, info);
         PackFile         *pf;
-        PackFile_Segment *seg;
         Parrot_Sub_attributes *sub;
         size_t            i;
 
@@ -328,7 +327,7 @@ Unarchives the code.
         do_sub_pragmas(INTERP, pf->cur_cs, PBC_PBC, SELF);
 
         for (i = 0; i < pf->directory.num_segments; ++i) {
-            seg = pf->directory.segments[i];
+            PackFile_Segment * const seg = pf->directory.segments[i];
 
             if (seg->type == PF_BYTEC_SEG) {
                 PMC_get_sub(INTERP, SELF, sub);
@@ -361,7 +360,7 @@ Unarchives the code.
                 INTVAL i;
                 STRING * const SUB = CONST_STRING(interp, "Sub");
                 for (i = n = 0; i < ct->pmc.const_count; ++i) {
-                    PMC *x = ct->pmc.constants[i];
+                    PMC * const x = ct->pmc.constants[i];
                     if (VTABLE_isa(interp, x, SUB))
                         ++n;
                 }
@@ -375,10 +374,6 @@ Unarchives the code.
 /*
 
 =back
-
-=head1 HISTORY
-
-Initial version by leo 2003/01/16.
 
 =cut
 

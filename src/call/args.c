@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -58,11 +58,10 @@ static void assign_default_param_value(PARROT_INTERP,
     INTVAL param_index,
     INTVAL param_flags,
     ARGIN(void *arg_info),
-    ARGMOD(struct pcc_funcs_ptr *accessor))
+    ARGIN(const struct pcc_funcs_ptr *accessor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*accessor);
+        __attribute__nonnull__(5);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -95,7 +94,7 @@ static void fill_params(PARROT_INTERP,
     ARGMOD_NULLOK(PMC *call_object),
     ARGIN(PMC *raw_sig),
     ARGIN(void *arg_info),
-    ARGIN(struct pcc_funcs_ptr *accessor),
+    ARGIN(const struct pcc_funcs_ptr *accessor),
     Errors_classes direction)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
@@ -486,7 +485,7 @@ dissect_aggregate_arg(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(PMC *aggreg
         }
     }
     else if (VTABLE_does(interp, aggregate, CONST_STRING(interp, "hash"))) {
-        Hash *hash = (Hash *)VTABLE_get_pointer(interp, aggregate);
+        const Hash * const hash = (Hash *)VTABLE_get_pointer(interp, aggregate);
 
         parrot_hash_iterate(hash,
             VTABLE_set_pmc_keyed_str(interp, call_object,
@@ -715,7 +714,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
 /*
 
 =item C<static void fill_params(PARROT_INTERP, PMC *call_object, PMC *raw_sig,
-void *arg_info, struct pcc_funcs_ptr *accessor, Errors_classes direction)>
+void *arg_info, const struct pcc_funcs_ptr *accessor, Errors_classes direction)>
 
 Gets args for the current function call and puts them into position.
 First it gets the positional non-slurpy parameters, then the positional
@@ -729,7 +728,7 @@ slurpy parameters.
 static void
 fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         ARGIN(PMC *raw_sig), ARGIN(void *arg_info),
-        ARGIN(struct pcc_funcs_ptr *accessor),
+        ARGIN(const struct pcc_funcs_ptr *accessor),
         Errors_classes direction)
 {
     ASSERT_ARGS(fill_params)
@@ -1178,7 +1177,7 @@ named_argument_arity_error(PARROT_INTERP, int named_arg_count,
 /*
 
 =item C<static void assign_default_param_value(PARROT_INTERP, INTVAL
-param_index, INTVAL param_flags, void *arg_info, struct pcc_funcs_ptr
+param_index, INTVAL param_flags, void *arg_info, const struct pcc_funcs_ptr
 *accessor)>
 
 Assign an appropriate default value to the parameter depending on its type
@@ -1189,7 +1188,7 @@ Assign an appropriate default value to the parameter depending on its type
 
 static void
 assign_default_param_value(PARROT_INTERP, INTVAL param_index, INTVAL param_flags,
-        ARGIN(void *arg_info), ARGMOD(struct pcc_funcs_ptr *accessor))
+        ARGIN(void *arg_info), ARGIN(const struct pcc_funcs_ptr *accessor))
 {
     ASSERT_ARGS(assign_default_param_value)
     switch (PARROT_ARG_TYPE_MASK_MASK(param_flags)) {
@@ -1236,7 +1235,7 @@ Parrot_pcc_fill_params_from_op(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 {
     ASSERT_ARGS(Parrot_pcc_fill_params_from_op)
 
-    static pcc_funcs_ptr function_pointers = {
+    const static pcc_funcs_ptr function_pointers = {
         (intval_ptr_func_t)intval_param_from_op,
         (numval_ptr_func_t)numval_param_from_op,
         (string_ptr_func_t)string_param_from_op,
@@ -1310,7 +1309,7 @@ Parrot_pcc_fill_params_from_varargs(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_objec
 {
     ASSERT_ARGS(Parrot_pcc_fill_params_from_varargs)
     PMC    *raw_sig  = PMCNULL;
-    static pcc_funcs_ptr function_pointers = {
+    const static pcc_funcs_ptr function_pointers = {
         (intval_ptr_func_t)intval_param_from_c_args,
         (numval_ptr_func_t)numval_param_from_c_args,
         (string_ptr_func_t)string_param_from_c_args,

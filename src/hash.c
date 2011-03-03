@@ -1468,7 +1468,7 @@ Parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
     }
     else {
         if (hash->key_type == Hash_key_type_STRING) {
-            STRING *s = (STRING *)key;
+            STRING * const s = (STRING *)key;
             hashval = key_hash_STRING(interp, s, hash->seed);
             bucket  = parrot_hash_get_bucket_string(interp, hash, s, hashval);
         }
@@ -1510,7 +1510,7 @@ Parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN_NULLOK(void *key))
     if (hash->buckets){
         HashBucket   **prev   = &hash->index[hashval];
         for (; *prev; prev = &(*prev)->next) {
-            HashBucket *current = *prev;
+            HashBucket * const current = *prev;
             if (hash_compare(interp, hash, key, current->key) == 0) {
                 *prev = current->next;
                 --hash->entries;

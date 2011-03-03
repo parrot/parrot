@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -185,7 +185,7 @@ Create a copy of the task, resetting status, ID, and birthtime.
          * have been subclassed). */
         PMC * const copy  = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         Parrot_Task_attributes * const new_struct = PARROT_TASK(copy);
-        Parrot_Task_attributes * const old_struct = PARROT_TASK(SELF);
+        const Parrot_Task_attributes * const old_struct = PARROT_TASK(SELF);
 
         new_struct->codeblock = VTABLE_clone(INTERP, old_struct->codeblock);
         new_struct->data      = old_struct->data;
@@ -287,7 +287,8 @@ Retrieves the task ID for this task.
 
 */
     VTABLE INTVAL get_integer() {
-        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
+        const Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
+        UNUSED(INTERP);
         return core_struct->id;
     }
 
@@ -303,6 +304,7 @@ Sets the task ID of the task.
 
     VTABLE void set_integer_native(INTVAL value) {
         Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
+        UNUSED(INTERP);
         core_struct->id = value;
     }
 
@@ -318,6 +320,7 @@ Sets the birthtime of the task.
 
     VTABLE void set_number_native(FLOATVAL value) {
         Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
+        UNUSED(INTERP);
         core_struct->birthtime = value;
     }
 
@@ -333,6 +336,7 @@ Sets the type of the task.
 
     VTABLE void set_string_native(STRING *value) {
         Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
+        UNUSED(INTERP);
         core_struct->type = value;
     }
 

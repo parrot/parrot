@@ -135,7 +135,7 @@ already in the map, a new map will be created.
     }
 
     VTABLE INTVAL get_integer_keyed_str(STRING *str_key) {
-        PMC *pmc_key = Parrot_key_new_string(INTERP, str_key);
+        PMC * const pmc_key = Parrot_key_new_string(INTERP, str_key);
         return SELF.get_integer_keyed(pmc_key);
     }
 
@@ -151,7 +151,7 @@ Get Op PMC by name.
     VTABLE PMC* get_pmc_keyed_str(STRING *name) {
         PMC    *op_maps;
         INTVAL  op_map_count, i;
-        STRING *oplib_str = CONST_STRING(INTERP, "oplib");
+        STRING * const oplib_str = CONST_STRING(INTERP, "oplib");
 
         GET_ATTR_op_maps(INTERP, SELF, op_maps);
         op_map_count = VTABLE_elements(INTERP, op_maps);
@@ -223,7 +223,7 @@ Ensure that an op library is loaded and accessible to this OpMap.
         PMC *op_maps, *ops_info, *oplib, *lib_name_pmc;
         INTVAL i, op_map_count;
         STRING *oplib_name, *lib_ops, *table_ops, *oplib_str;
-        Parrot_PackfileOpMap_attributes *attrs =
+        Parrot_PackfileOpMap_attributes * const attrs =
                 PARROT_PACKFILEOPMAP(SELF);
 
         oplib_name = CONST_STRING(INTERP, "oplib_name");

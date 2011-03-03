@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -1498,8 +1498,8 @@ Returns whether the class is or inherits from C<*classname>.
         else {
             Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
 
-            INTVAL num_classes = VTABLE_elements(INTERP, _class->all_parents);
-            int    i           = 0;
+            const INTVAL num_classes = VTABLE_elements(INTERP, _class->all_parents);
+            int i;
 
             for (i = 1; i < num_classes; ++i) {
                 PMC * const cur_class = VTABLE_get_pmc_keyed_int(INTERP,

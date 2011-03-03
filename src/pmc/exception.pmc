@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -679,7 +679,7 @@ Retrieve an attribute value for the exception object.
             break;
           case attr_message:
             {
-            STRING *message = SELF.get_string();
+            STRING * const message = SELF.get_string();
             value = Parrot_pmc_new(INTERP, enum_class_String);
             VTABLE_set_string_native(INTERP, value, message);
             }

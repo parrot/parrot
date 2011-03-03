@@ -209,11 +209,8 @@ static void gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(2);
 
 static void gc_ms2_mark_str_header(SHIM_INTERP, ARGIN_NULLOK(STRING *s));
-static void gc_ms2_pmc_needs_early_collection(PARROT_INTERP,
-    ARGMOD(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
+static void gc_ms2_pmc_needs_early_collection(PARROT_INTERP, SHIM(PMC *pmc))
+        __attribute__nonnull__(1);
 
 static void gc_ms2_reallocate_buffer_storage(PARROT_INTERP,
     ARGIN(Buffer *str),
@@ -338,8 +335,7 @@ static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
 #define ASSERT_ARGS_gc_ms2_mark_str_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_ms2_pmc_needs_early_collection \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_reallocate_buffer_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -1482,7 +1478,7 @@ Marks a PMC as needing timely destruction.
 */
 
 static void
-gc_ms2_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
+gc_ms2_pmc_needs_early_collection(PARROT_INTERP, SHIM(PMC *pmc))
 {
     ASSERT_ARGS(gc_ms2_pmc_needs_early_collection)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;

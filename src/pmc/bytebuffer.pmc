@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -19,15 +19,20 @@ individual bytes and conversions from and to parrot strings.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static STRING * build_string(PARROT_INTERP,
     ARGIN_NULLOK(const unsigned char *content),
     INTVAL size,
-    ARGIN_NULLOK(const STR_VTABLE *encoding))
-        __attribute__nonnull__(1);
+    ARGIN(const STR_VTABLE *encoding))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4);
 
+PARROT_WARN_UNUSED_RESULT
 static INTVAL grow_to(INTVAL position);
+
 #define ASSERT_ARGS_build_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_grow_to __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -146,7 +151,7 @@ Resize the buffer to the given value.
             GET_ATTR_size(INTERP, SELF, size);
             /* If reducing size, just change the size value */
             if (set_size > size) {
-                INTVAL copysize = set_size < size ? set_size : size;
+                const INTVAL copysize = set_size < size ? set_size : size;
                 if (allocated_size == 0) {
                     content = (unsigned char *)Parrot_gc_allocate_memory_chunk(INTERP, set_size);
                     if (size > 0) {
@@ -232,14 +237,14 @@ is out of current size.
 
         GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
         if (position >= allocated_size) {
-            INTVAL newsize = grow_to(position);
+            const INTVAL newsize = grow_to(position);
             if (allocated_size == 0) {
                 INTVAL copysize = newsize;
                 STRING * source;
                 content = (unsigned char *)Parrot_gc_allocate_memory_chunk(INTERP, newsize);
                 GET_ATTR_source(INTERP, SELF, source);
                 if (!STRING_IS_NULL(source)) {
-                    INTVAL srclen = Parrot_str_byte_length(INTERP, source);
+                    const INTVAL srclen = Parrot_str_byte_length(INTERP, source);
                     if (srclen < copysize)
                         copysize = srclen;
                     memcpy(content, source->strstart, copysize);
@@ -339,8 +344,8 @@ as the string argument.
         STRING *result;
         unsigned char *content;
         INTVAL size;
-        const STR_VTABLE *encoding = STRING_IS_NULL(as) ?
-                Parrot_default_encoding_ptr : as->encoding;
+        const STR_VTABLE * const encoding =
+            STRING_IS_NULL(as) ? Parrot_default_encoding_ptr : as->encoding;
         GET_ATTR_content(INTERP, SELF, content);
         GET_ATTR_size(INTERP, SELF, size);
         result = build_string(INTERP, content, size, encoding);
@@ -360,7 +365,7 @@ length in codepoints.
 
     METHOD get_chars(INTVAL pos, INTVAL length, STRING *encodingname)
     {
-        const STR_VTABLE *encoding = Parrot_find_encoding_by_string(INTERP, encodingname);
+        const STR_VTABLE * const encoding = Parrot_find_encoding_by_string(INTERP, encodingname);
         STRING           *result;
         unsigned char    *content;
         INTVAL            size;
@@ -402,13 +407,14 @@ Build a string from the buffer content with the encoding specified.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static INTVAL
 grow_to(INTVAL position)
 {
     ASSERT_ARGS(grow_to)
 
     const UINTVAL blocksize = 2048;
-    UINTVAL minsize = position + 1;
+    const UINTVAL minsize = position + 1;
     return (INTVAL) (minsize < 64 ? 64 :
            minsize < 256 ? 256 :
            minsize < 1024 ? 1024 :
@@ -416,10 +422,10 @@ grow_to(INTVAL position)
 }
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static STRING *
 build_string(PARROT_INTERP, ARGIN_NULLOK(const unsigned char *content),
-        INTVAL size,
-        ARGIN_NULLOK(const STR_VTABLE *encoding))
+        INTVAL size, ARGIN(const STR_VTABLE *encoding))
 {
     ASSERT_ARGS(build_string)
     if (encoding == NULL)
