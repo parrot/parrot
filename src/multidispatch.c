@@ -1337,7 +1337,7 @@ Parrot_mmd_cache_mark(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
     /* As a small future optimization, note that we only *really* need to mark
     * keys - the candidates will be referenced outside the cache, provided it's
     * invalidated properly. */
-    VTABLE_mark(interp, cache);
+    Parrot_gc_mark_PMC_alive(interp, cache);
 }
 
 
