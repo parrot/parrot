@@ -690,13 +690,11 @@ sub json_dump_is {
     return pir_output_is( <<"END_PIR", $dumped, $reason, %args );
 
 .sub test :main
-    load_language 'data_json'
+    load_language 'JSON'
     load_bytecode 'dumper.pbc'
 
-    .local pmc JSON, eval, result
-    JSON = compreg 'data_json'
-    eval = JSON.'compile'("$code")
-    result = eval()
+    .local pmc result
+    result = from_json("$code")
     _dumper(result, "JSON")
 .end
 END_PIR
@@ -712,13 +710,11 @@ sub json_isnt {
     return pir_error_output_like( <<"END_PIR", qr/not a valid JSON value/, $reason, %args );
 
 .sub test :main
-    load_language 'data_json'
+    load_language 'JSON'
 
-    .local pmc JSON, eval, result
+    .local pmc result
 
-    JSON = compreg 'data_json'
-    eval = JSON.'compile'("$code")
-    result = eval()
+    result = from_json("$code")
 .end
 END_PIR
 
