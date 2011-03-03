@@ -13,6 +13,8 @@
 #ifndef PARROT_DATATYPES_H_GUARD
 #define PARROT_DATATYPES_H_GUARD
 
+#include "parrot/has_header.h"
+
 /* &gen_from_enum(datatypes.pasm) subst(s/enum_type_(\w+)/uc("DATATYPE_$1")/e) */
 typedef enum {
     enum_type_undef,            /* illegal */
@@ -144,15 +146,21 @@ const struct _data_types data_types[] = {
 };
 #endif /* INSIDE_GLOBAL_SETUP */
 
-#if defined(__NetBSD__) && defined(__alpha__)
+#ifdef PARROT_HAS_INF_NAN
 #  include <math.h>
 #  define PARROT_FLOATVAL_INF_POSITIVE	INFINITY
 #  define PARROT_FLOATVAL_INF_NEGATIVE	-INFINITY
 #  define PARROT_FLOATVAL_NAN_QUIET	NAN
+#  define PARROT_FLOATVAL_IS_POSINF(x)  (isinf(x) && (x) > 0)
+#  define PARROT_FLOATVAL_IS_NEGINF(x)  (isinf(x) && (x) < 0)
+#  define PARROT_FLOATVAL_IS_NAN(x)     isnan(x)
 #else
 #  define PARROT_FLOATVAL_INF_POSITIVE  Parrot_dt_divide_floatval_by_zero(interp, 1.0)
 #  define PARROT_FLOATVAL_INF_NEGATIVE  Parrot_dt_divide_floatval_by_zero(interp, -1.0)
 #  define PARROT_FLOATVAL_NAN_QUIET     Parrot_dt_divide_floatval_by_zero(interp, 0.0)
+#  define PARROT_FLOATVAL_IS_POSINF(x)  ((x) == PARROT_FLOATVAL_INF_POSITIVE)
+#  define PARROT_FLOATVAL_IS_NEGINF(x)  ((x) == PARROT_FLOATVAL_INF_NEGATIVE)
+#  define PARROT_FLOATVAL_IS_NAN(x)     ((x) != (x))
 #endif
 
 #define PARROT_CSTRING_INF_POSITIVE    "Inf"
