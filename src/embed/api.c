@@ -899,7 +899,8 @@ Parrot_api_wrap_pointer(Parrot_PMC interp_pmc, ARGIN_NULLOK(void *ptr),
     if (size > 0) {
         ptr_pmc = Parrot_pmc_new(interp, enum_class_PtrBuf);
         VTABLE_set_integer_native(interp, ptr_pmc, size);
-    } else
+    }
+    else
         ptr_pmc = Parrot_pmc_new(interp, enum_class_Ptr);
     VTABLE_set_pointer(interp, ptr_pmc, ptr);
     *pmc = ptr_pmc;
