@@ -1287,7 +1287,7 @@ Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     const STRING * const key = mmd_cache_key_from_types(interp, name, types);
 
     if (key)
-        return VTABLE_get_pmc_keyed_str(interp, cache, key);
+        return VTABLE_get_pmc_keyed_str(interp, cache, (STRING *) key);
 
     return PMCNULL;
 }
