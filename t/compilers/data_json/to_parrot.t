@@ -707,7 +707,7 @@ sub json_isnt {
     $code =~ s{("|\\)}{\\$1}g;
     $code =~ s{\n}{\\n}g;
 
-    return pir_error_output_like( <<"END_PIR", qr/not a valid JSON value/, $reason, %args );
+    return pir_error_output_like( <<"END_PIR", qr/Unable to parse source/, $reason, %args );
 
 .sub test :main
     load_language 'JSON'
