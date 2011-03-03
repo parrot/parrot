@@ -66,6 +66,14 @@ grammar JSON::Grammar is HLL::Grammar {
         '}'
     }
 
+    rule value:sym<true> {
+        'true'
+    }
+
+    rule value:sym<false> {
+        'false'
+    }
+
     token string {
         <?["]> <quote_EXPR: ':qq'> 
     }
@@ -107,6 +115,10 @@ class JSON::Actions is HLL::Actions {
         $past.'push'($hashreg);
         make $past;
     }
+
+    method value:sym<true>($/) { make 1; }
+
+    method value:sym<false>($/) { make 0; }
 
     method string($/) { make $<quote_EXPR>.ast; }
 }
