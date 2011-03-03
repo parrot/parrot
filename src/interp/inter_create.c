@@ -210,9 +210,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
      */
     Parrot_str_init(interp);
 
-    /* Set up MMD; MMD cache for builtins. */
-    interp->op_mmd_cache = Parrot_mmd_cache_create(interp);
-
     /* create caches structure */
     init_object_cache(interp);
 
@@ -222,7 +219,11 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     Parrot_vtbl_initialize_core_vtables(interp);
 
     /* create the root set registry */
-    interp->gc_registry     = Parrot_pmc_new(interp, enum_class_AddrRegistry);
+    interp->gc_registry = Parrot_pmc_new(interp, enum_class_AddrRegistry);
+
+    /* Set up MMD; MMD cache for builtins. */
+    interp->op_mmd_cache = Parrot_mmd_cache_create(interp);
+    Parrot_pmc_gc_register(interp, interp->op_mmd_cache);
 
     Parrot_gbl_init_world_once(interp);
 
@@ -431,9 +432,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     }
 
     Parrot_gc_mark_and_sweep(interp, GC_finish_FLAG);
-
-    /* MMD cache */
-    Parrot_mmd_cache_destroy(interp, interp->op_mmd_cache);
 
     /* copies of constant tables */
     Parrot_destroy_constants(interp);
