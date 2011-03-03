@@ -898,10 +898,10 @@ Parrot_api_wrap_pointer(Parrot_PMC interp_pmc, ARGIN_NULLOK(void *ptr),
     PMC * ptr_pmc = NULL;
     if (size > 0) {
         ptr_pmc = Parrot_pmc_new(interp, enum_class_PtrBuf);
-        VTABLE_set_integer_native(interp, ptr_pmc, ptr);
+        VTABLE_set_integer_native(interp, ptr_pmc, size);
     } else
         ptr_pmc = Parrot_pmc_new(interp, enum_class_Ptr);
-    VTABLE_set_pointer(interp, ptr_pmc, size);
+    VTABLE_set_pointer(interp, ptr_pmc, ptr);
     *pmc = ptr_pmc;
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
