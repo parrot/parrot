@@ -859,6 +859,70 @@ Parrot_api_reset_call_signature(Parrot_PMC interp_pmc, Parrot_PMC ctx)
 
 /*
 
+=item C<Parrot_Int Parrot_api_wrap_pointer(Parrot_PMC interp_pmc, void *ptr,
+Parrot_Int size, Parrot_PMC *pmc)>
+
+Wrap a user data pointer into a Ptr PMC for passing into Parrot. This PMC
+is designed such that Parrot will treat the pointer as being opaque and will
+not attempt to dereference, examine, or manipulate it at all.
+
+Optionally a C<size> parameter can be passed. If C<size> is greater than zero,
+the size information will be included with the pointer for later use. If
+C<size> is less than or equal to zero, it will be ignored and will not be
+included in the PMC object.
+
+item C<Parrot_Int Parrot_api_unwrap_pointer(Parrot_PMC interp_pmc,
+Parrot_PMC pmc, ARGOUT(void ** ptr), ARGOUT(Parrot_Int * size))>
+
+Return a pointer from a PMC. This is typically used in conjunction with
+C<Parrot_api_wrap_pointer> to return the original wrapped pointer value from
+the PMC. Used with other PMC types besides C<Ptr> or C<PtrBuf> will have
+undefined results, and should not be used or relied upon.
+
+If the pointer was stored with size information, C<size> will contain that
+size value. Otherwise, C<size> will be -1.
+
+Notice that this function does not destroy or alter the data PMC.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_wrap_pointer(Parrot_PMC interp_pmc, ARGIN_NULLOK(void *ptr),
+        Parrot_Int size, ARGOUT(Parrot_PMC *pmc))
+{
+    ASSERT_ARGS(Parrot_api_wrap_pointer)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    PMC * ptr_pmc = NULL;
+    if (size > 0) {
+        ptr_pmc = Parrot_pmc_new(interp, enum_class_PtrBuf);
+        VTABLE_set_integer_native(interp, ptr_pmc, ptr);
+    } else
+        ptr_pmc = Parrot_pmc_new(interp, enum_class_Ptr);
+    VTABLE_set_pointer(interp, ptr_pmc, size);
+    *pmc = ptr_pmc;
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+PARROT_API
+Parrot_Int
+Parrot_api_unwrap_pointer(Parrot_PMC interp_pmc, Parrot_PMC pmc,
+        ARGOUT(void ** ptr), ARGOUT(Parrot_Int * size))
+{
+    ASSERT_ARGS(Parrot_api_unwrap_pointer)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    *ptr = VTABLE_get_pointer(interp, pmc);
+    if (pmc->vtable->base_type == enum_class_PtrBuf)
+        *size = VTABLE_get_integer(interp, pmc);
+    else
+        *size = -1;
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+/*
+
 =back
 
 =cut
