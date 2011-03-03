@@ -53,7 +53,7 @@ typedef struct _multi_func_list {
     funcptr_t func_ptr;
 } multi_func_list;
 
-#define MMD_Cache Hash
+#define MMD_Cache PMC
 
 /* HEADERIZER BEGIN: src/multidispatch.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -99,12 +99,6 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 MMD_Cache * Parrot_mmd_cache_create(PARROT_INTERP)
         __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_mmd_cache_destroy(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*cache);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -227,9 +221,6 @@ PMC * Parrot_mmd_sort_manhattan_by_sig_pmc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(sig_obj))
 #define ASSERT_ARGS_Parrot_mmd_cache_create __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_mmd_cache_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(cache))
 #define ASSERT_ARGS_Parrot_mmd_cache_lookup_by_types \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

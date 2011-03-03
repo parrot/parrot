@@ -1109,7 +1109,7 @@ Parrot_mmd_cache_create(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_mmd_cache_create)
     /* String hash. */
-    Hash *cache = Parrot_hash_new(interp);
+    PMC *cache = Parrot_pmc_new(interp, enum_class_Hash);
     return cache;
 }
 
@@ -1184,7 +1184,7 @@ Parrot_mmd_cache_lookup_by_values(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     STRING * const key = mmd_cache_key_from_values(interp, name, values);
 
     if (key)
-        return (PMC *)Parrot_hash_get(interp, cache, key);
+        return VTABLE_get_pmc_keyed_str(interp, cache, key);
 
     return PMCNULL;
 }
@@ -1211,7 +1211,7 @@ Parrot_mmd_cache_store_by_values(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     STRING * const key = mmd_cache_key_from_values(interp, name, values);
 
     if (key)
-        Parrot_hash_put(interp, cache, key, chosen);
+        VTABLE_set_pmc_keyed_str(interp, cache, key, chosen);
 }
 
 
@@ -1287,7 +1287,7 @@ Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     const STRING * const key = mmd_cache_key_from_types(interp, name, types);
 
     if (key)
-        return (PMC *)Parrot_hash_get(interp, cache, key);
+        return VTABLE_get_pmc_keyed_str(interp, cache, key);
 
     return PMCNULL;
 }
@@ -1315,7 +1315,7 @@ Parrot_mmd_cache_store_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     STRING * const key = mmd_cache_key_from_types(interp, name, types);
 
     if (key)
-        Parrot_hash_put(interp, cache, key, chosen);
+        VTABLE_set_pmc_keyed_str(interp, cache, key, chosen);
 }
 
 
@@ -1337,26 +1337,7 @@ Parrot_mmd_cache_mark(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
     /* As a small future optimization, note that we only *really* need to mark
     * keys - the candidates will be referenced outside the cache, provided it's
     * invalidated properly. */
-    Parrot_hash_mark(interp, cache);
-}
-
-
-/*
-
-=item C<void Parrot_mmd_cache_destroy(PARROT_INTERP, MMD_Cache *cache)>
-
-Destroys an MMD cache.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_mmd_cache_destroy(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
-{
-    ASSERT_ARGS(Parrot_mmd_cache_destroy)
-    Parrot_hash_destroy(interp, cache);
+    VTABLE_mark(interp, cache);
 }
 
 
