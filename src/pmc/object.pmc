@@ -645,7 +645,7 @@ non-zero value if it does.
 
         if (!PMC_IS_NULL(method)) {
             INTVAL result = 0;
-            Parrot_ext_call(INTERP, method, "PiS->I", SELF, &result);
+            Parrot_ext_call(INTERP, method, "PiS->I", SELF, method_name, &result);
             return result;
         }
         else {
@@ -681,7 +681,7 @@ Returns whether the object's class is or inherits from C<*classname>.
 
         if (!PMC_IS_NULL(method)) {
             INTVAL result = 0;
-            Parrot_ext_call(INTERP, method, "PiP->I", SELF, &result);
+            Parrot_ext_call(INTERP, method, "PiP->I", SELF, lookup, &result);
             return result;
         }
 
@@ -711,7 +711,7 @@ Returns whether the class is or inherits from C<*classname>.
 
         if (!PMC_IS_NULL(method)) {
             INTVAL result = 0;
-            Parrot_ext_call(INTERP, method, "PiS->I", SELF, &result);
+            Parrot_ext_call(INTERP, method, "PiS->I", SELF, classname, &result);
             return result;
         }
         else if (SELF->vtable->whoami == classname

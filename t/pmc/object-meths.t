@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 38;
 
 =head1 NAME
 
@@ -1119,6 +1119,26 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "method called on non-object" );
 .end
 CODE
 /Method 'new' not found for non-object/
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "overloading can vtable" );
+.namespace [ 'Foo' ]
+
+.sub 'can' :vtable("can") :method
+    .param string role
+    .return(1)
+.end
+
+.namespace []
+
+.sub main :main
+    $P0 = newclass "Foo"
+    $P1 = new $P0
+    $I0 = can $P1, "no_method_i_ever_heard_of"
+    say $I0
+.end
+CODE
+1
 OUTPUT
 
 # Local Variables:
