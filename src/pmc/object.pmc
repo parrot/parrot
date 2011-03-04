@@ -668,18 +668,22 @@ Returns whether the object's class is or inherits from C<*classname>.
 */
 
     VTABLE INTVAL isa_pmc(PMC *lookup) {
-        PMC * const classobj = VTABLE_get_class(INTERP, SELF);
-        STRING * const vtable_meth_name = CONST_STRING(INTERP, "isa_pmc");
-        PMC * const method = Parrot_oo_find_vtable_override(INTERP, classobj,
+        PMC * method;
+
+        if (PMC_IS_NULL(lookup))
+            return 0;
+        else {
+            PMC * const classobj = VTABLE_get_class(INTERP, SELF);
+            STRING * const vtable_meth_name = CONST_STRING(INTERP, "isa_pmc");
+            method = Parrot_oo_find_vtable_override(INTERP, classobj,
                 vtable_meth_name);
+        }
 
         if (!PMC_IS_NULL(method)) {
             INTVAL result = 0;
             Parrot_ext_call(INTERP, method, "PiP->I", SELF, &result);
             return result;
         }
-        if (PMC_IS_NULL(lookup))
-            return 0;
 
         if (SUPER(lookup))
             return 1;
@@ -713,10 +717,8 @@ Returns whether the class is or inherits from C<*classname>.
         else if (SELF->vtable->whoami == classname
                 || STRING_equal(INTERP, SELF->vtable->whoami, classname))
             return 1;
-        else {
-            PMC *_class = PARROT_OBJECT(SELF)->_class;
-            return VTABLE_isa(INTERP, _class, classname);
-        }
+        else
+            return VTABLE_isa(INTERP, classobj, classname);
     }
 
 
