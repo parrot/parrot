@@ -299,6 +299,29 @@ Returns the Parrot string representation C<key>.
 
 /*
 
+=item C<INTVAL hashvalue()>
+
+Get a hashvalue for this PMC.
+
+Providing a non-default C<hashvalue()> implementation avoids creating
+unecessary string temporaries.
+
+=cut
+
+*/
+
+    VTABLE INTVAL hashvalue() {
+        INTVAL *int_array;
+        INTVAL size;
+        GET_ATTR_int_array(INTERP, SELF, int_array);
+        GET_ATTR_size(INTERP, SELF, size);
+        return Parrot_hsh_hash_buffer((const unsigned char *)int_array,
+                                        size * sizeof (INTVAL), INTERP->hash_seed);
+    }
+
+
+/*
+
 =item C<STRING *get_string_keyed(PMC *key)>
 
 Returns the Parrot string value of the element at index C<*key>.
