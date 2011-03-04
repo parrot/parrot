@@ -636,11 +636,24 @@ non-zero value if it does.
 =cut
 
 */
+
     VTABLE INTVAL can(STRING *method_name) {
-        /* Just use find_method and see it if finds anything. */
-        const PMC * const method =
-            VTABLE_find_method(INTERP, SELF, method_name);
-        return !PMC_IS_NULL(method);
+        PMC * const classobj = VTABLE_get_class(INTERP, SELF);
+        STRING * const vtable_meth_name = CONST_STRING(INTERP, "can");
+        PMC * const method = Parrot_oo_find_vtable_override(INTERP, classobj,
+                vtable_meth_name);
+
+        if (!PMC_IS_NULL(method)) {
+            INTVAL result = 0;
+            Parrot_ext_call(INTERP, method, "PiS->I", SELF, &result);
+            return result;
+        }
+        else {
+            /* If we don't have an override just fall back to seeing if we
+               have a method of that name defined */
+            PMC * const m = VTABLE_find_method(INTERP, SELF, method_name);
+            return !PMC_IS_NULL(m);
+        }
     }
 
 
