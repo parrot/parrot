@@ -26,7 +26,7 @@ which builds parrot to C call frames.
 
 /*
 
-=item C<PMC * build_call_func(PARROT_INTERP, STRING *signature)>
+=item C<PMC * build_call_func(PARROT_INTERP, PMC *sig)>
 
 This function serves a single purpose. It takes the function signature for a
 C function we want to call and returns a PMC with a pointer to a function
@@ -38,17 +38,14 @@ that can call it.
 
 PARROT_CANNOT_RETURN_NULL
 PMC *
-build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
+build_call_func(PARROT_INTERP, ARGIN(PMC *sig))
 {
     ASSERT_ARGS(build_call_func)
 
-    PMC * const iglobals = interp->iglobals;
-    PMC *nci_funcs;
-    PMC *thunk;
-
-    /* fixup empty signatures */
-    if (STRING_IS_EMPTY(signature))
-        signature = CONST_STRING(interp, "v");
+    PMC    * const iglobals = interp->iglobals;
+    PMC    *nci_funcs;
+    PMC    *thunk;
+    INTVAL  hv;
 
     if (PMC_IS_NULL(iglobals))
         PANIC(interp, "iglobals isn't created yet");
@@ -57,7 +54,7 @@ build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
     if (PMC_IS_NULL(nci_funcs))
         PANIC(interp, "iglobals.nci_funcs isn't created_yet");
 
-    thunk = VTABLE_get_pmc_keyed_str(interp, nci_funcs, signature);
+    thunk = VTABLE_get_pmc_keyed(interp, nci_funcs, sig);
 
     if (PMC_IS_NULL(thunk)) {
         /* try to dynamically build a thunk */
@@ -67,7 +64,7 @@ build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
             nci_fb_func_t cb = (nci_fb_func_t)D2FPTR(cb_ptr);
             if (cb_ptr) {
                 PMC *nci_fb_ud = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FB_UD);
-                thunk = cb(interp, nci_fb_ud, signature);
+                thunk = cb(interp, nci_fb_ud, sig);
             }
         }
     }
@@ -79,7 +76,7 @@ build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
 
     Parrot_ex_throw_from_c_args(interp, NULL,
         EXCEPTION_UNIMPLEMENTED,
-        "No NCI thunk available for signature '%S'", signature);
+        "No NCI thunk available for signature '%Ss'", VTABLE_get_repr(interp, sig));
 }
 
 /*

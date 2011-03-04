@@ -45,7 +45,7 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
 
     size_t i;
 
-    PMC * const sig_pmc = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
+    PMC *sig_pmc = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
 
     for (i = 0; i < sig_length; ++i) {
         const INTVAL c = Parrot_str_indexed(interp, sig_str, i);

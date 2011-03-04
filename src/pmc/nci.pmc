@@ -65,7 +65,7 @@ build_func(PARROT_INTERP, ARGIN(PMC *obj), ARGMOD(Parrot_NCI_attributes *nci))
     nci->arity       = VTABLE_elements(interp, nci->signature) - 1;
 
     /* Build call function. */
-    nci->fb_info     = build_call_func(interp, nci->sig_str);
+    nci->fb_info     = build_call_func(interp, nci->signature);
     nci->func        = F2DPTR(VTABLE_get_pointer(interp, nci->fb_info));
     PARROT_GC_WRITE_BARRIER(interp, obj);
 
