@@ -234,7 +234,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
 =cut
 
 .sub '_format_tar_entry' :method
-    $P0 = new 'ResizableStringArray'
+    $P0 = new 'StringBuilder'
     $P1 = new 'FixedPMCArray'
     set $P1, 1
     .const string f1 = '%06o'
@@ -299,7 +299,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     $P2 = getattribute self, 'prefix'
     $S0 = pad_string_with_null($P2, 155)
     push $P0, $S0
-    $S0 = join '', $P0
+    $S0 = $P0
     $I0 = compute_checksum($S0)
     $P1[0] = $I0
     $S1 = sprintf "%6o\0\0", $P1
