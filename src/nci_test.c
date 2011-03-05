@@ -96,7 +96,6 @@ PARROT_DYNEXT_EXPORT void * nci_pp(void *);
 PARROT_DYNEXT_EXPORT short  nci_s(void);
 PARROT_DYNEXT_EXPORT short  nci_ssc(short, char);
 PARROT_DYNEXT_EXPORT char * nci_t(void);
-PARROT_DYNEXT_EXPORT char * nci_tb(void *);
 PARROT_DYNEXT_EXPORT char * nci_tB(void **);
 PARROT_DYNEXT_EXPORT char * nci_tt(char *);
 PARROT_DYNEXT_EXPORT void   nci_v(void);
@@ -404,29 +403,6 @@ char *
 nci_t(void)
 {
     return nci_dlvar_cstring;
-}
-
-/*
-
-=item C<PARROT_DYNEXT_EXPORT char * nci_tb(void *p)>
-
-Returns "xx worked", where "xx" is replaced with the first two character values
-of C<p>, in reverse order.
-
-=cut
-
-*/
-
-static char b[] = "xx worked\n";
-
-PARROT_DYNEXT_EXPORT
-char *
-nci_tb(void *p)
-{
-    b[0] = ((char*) p)[1];
-    b[1] = ((char*) p)[0];
-
-    return b;
 }
 
 /*

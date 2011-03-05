@@ -35,7 +35,7 @@ SKIP: {
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
         plan skip_all => "Please make libnci_test$PConfig{load_ext}";
     }
-    plan tests => 73;
+    plan tests => 72;
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'load library fails' );
 .sub test :main
@@ -871,20 +871,6 @@ OUTPUT
 CODE
 42
 4711
-OUTPUT
-
-    pasm_output_is( <<'CODE', <<'OUTPUT', "nci_tb" );
-.pcc_sub :main main:
-  loadlib P1, "libnci_test"
-  dlfunc P0, P1, "nci_tb", "tb"
-  set S5, "ko\n"
-  set_args "0", S5
-  invokecc P0
-  get_results "0", S5
-  print S5
-  end
-CODE
-ok worked
 OUTPUT
 
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_tB" );
