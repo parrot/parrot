@@ -36,6 +36,7 @@ Parse a signature string to a NCI signature PMC.
 */
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_EXPORT
 PMC *
 Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
 {
