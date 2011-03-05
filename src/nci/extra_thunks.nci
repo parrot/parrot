@@ -23,7 +23,6 @@
 # t - character string (0-terminated)
 # Buffers are not valid return parameters,
 # use 'p' when the native function returns a pointer value
-# b - void *
 # B - void **
 
 # PMC register stuff
@@ -81,7 +80,6 @@ v    ii
 v    illllllll
 v    l
 v    p
-v    pbip
 v    pi
 v    piiii
 v    pl
@@ -123,7 +121,6 @@ t    pttti
 # libpast
 p    Ji
 p    Jipp
-p    Jbip
 v    Jp
 v    JS
 
@@ -152,7 +149,6 @@ S    JOSP
 
 i          # void function returning int like fork()
 i    i3i   # POSIX's waitpid
-i    ibi   # POSIX's read
 
 # win32
 l     lttl
@@ -272,7 +268,6 @@ p    pttttitl
 p    tiB3P
 p    tip3P
 i    pPtiiipi
-i    tpiibi
 
 # Oddball ones for postgres
 p    ptippppi    PQexecParams
@@ -308,7 +303,6 @@ f    ff
 f    is
 
 i
-i    b
 i    d
 i    i
 i    ii
@@ -334,7 +328,6 @@ i    p333333
 i    p4
 i    p42p
 i    p4i
-i    pb
 i    pi
 i    pii
 i    pii4
@@ -385,7 +378,6 @@ l    33l
 
 p
 p    B
-p    b
 p    Jt
 p    i
 p    ii
@@ -419,7 +411,6 @@ s    sc
 c    sc
 i    iii
 i    i3
-t    b
 t    B
 v    P
 v    pP

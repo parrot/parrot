@@ -34,7 +34,6 @@ typedef enum {
 
     enum_nci_sig_string,
     enum_nci_sig_cstring,
-    enum_nci_sig_cstringref,
     enum_nci_sig_bufref,
 
     enum_nci_sig_ptr,

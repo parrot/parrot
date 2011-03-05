@@ -56,9 +56,6 @@ v    JOSS
 # Needed by integer.pmc
 S    JOI
 
-# src/pmc/nci.pmc
-v    JOb
-
 # ParrotThread creation
 i    JOP@
 I    JOP@

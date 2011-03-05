@@ -280,7 +280,6 @@ nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
 
       case enum_nci_sig_string:
       case enum_nci_sig_cstring:
-      case enum_nci_sig_cstringref:
       case enum_nci_sig_bufref:
                                 return &ffi_type_pointer;
 
@@ -421,9 +420,6 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 j++;
                 middle_man[i]           = &translation_pointers[i];
                 values[i]               = &middle_man[i];
-                break;
-              case enum_nci_sig_cstringref:
-                values[i] = &Buffer_bufstart(pcc_arg[j++].s);
                 break;
               case enum_nci_sig_char:
                 translation_pointers[i]            = mem_internal_allocate_zeroed_typed(char);
