@@ -19955,13 +19955,17 @@ Parrot_subclass_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", VTABLE_get_string(interp, PREG(2)));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_pmc_new(interp, enum_class_Class);
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -19972,13 +19976,17 @@ Parrot_subclass_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", VTABLE_get_string(interp, PCONST(2)));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_pmc_new(interp, enum_class_Class);
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -19989,13 +19997,17 @@ Parrot_subclass_p_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", VTABLE_get_string(interp, PREG(2)));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_oo_newclass_from_str(interp, SREG(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20006,13 +20018,17 @@ Parrot_subclass_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", VTABLE_get_string(interp, PCONST(2)));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_oo_newclass_from_str(interp, SREG(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20023,13 +20039,17 @@ Parrot_subclass_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", VTABLE_get_string(interp, PREG(2)));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_oo_newclass_from_str(interp, SCONST(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20040,13 +20060,17 @@ Parrot_subclass_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", VTABLE_get_string(interp, PCONST(2)));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_oo_newclass_from_str(interp, SCONST(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20057,13 +20081,17 @@ Parrot_subclass_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", VTABLE_get_string(interp, PREG(2)));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_pmc_new_init(interp, enum_class_Class, PREG(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20074,13 +20102,17 @@ Parrot_subclass_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", VTABLE_get_string(interp, PCONST(2)));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_pmc_new_init(interp, enum_class_Class, PREG(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20091,13 +20123,17 @@ Parrot_subclass_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", VTABLE_get_string(interp, PREG(2)));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_pmc_new_init(interp, enum_class_Class, PCONST(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20108,13 +20144,17 @@ Parrot_subclass_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", VTABLE_get_string(interp, PCONST(2)));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_pmc_new_init(interp, enum_class_Class, PCONST(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20125,13 +20165,17 @@ Parrot_subclass_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", SREG(2));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_pmc_new(interp, enum_class_Class);
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20142,13 +20186,17 @@ Parrot_subclass_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", SCONST(2));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_pmc_new(interp, enum_class_Class);
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20159,13 +20207,17 @@ Parrot_subclass_p_s_s(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", SREG(2));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_oo_newclass_from_str(interp, SREG(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20176,13 +20228,17 @@ Parrot_subclass_p_sc_s(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", SCONST(2));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_oo_newclass_from_str(interp, SREG(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20193,13 +20249,17 @@ Parrot_subclass_p_s_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", SREG(2));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_oo_newclass_from_str(interp, SCONST(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20210,13 +20270,17 @@ Parrot_subclass_p_sc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", SCONST(2));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_oo_newclass_from_str(interp, SCONST(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20227,13 +20291,17 @@ Parrot_subclass_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", SREG(2));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_pmc_new_init(interp, enum_class_Class, PREG(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20244,13 +20312,17 @@ Parrot_subclass_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", SCONST(2));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_pmc_new_init(interp, enum_class_Class, PREG(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20261,13 +20333,17 @@ Parrot_subclass_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", SREG(2));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_pmc_new_init(interp, enum_class_Class, PCONST(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20278,13 +20354,17 @@ Parrot_subclass_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(parent_class)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_NO_CLASS, "Class '%Ss' doesn't exist", SCONST(2));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
     PREG(1) = Parrot_pmc_new_init(interp, enum_class_Class, PCONST(3));
     VTABLE_add_parent(interp, PREG(1), parent_class);
-    return (opcode_t *)next;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)next;
+    }
+
 }
 
 opcode_t *
@@ -20498,6 +20578,7 @@ Parrot_new_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 3, EXCEPTION_NO_CLASS, "Class '%Ss' not found", name);
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -20522,6 +20603,7 @@ Parrot_new_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 3, EXCEPTION_NO_CLASS, "Class '%Ss' not found", name);
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -20546,6 +20628,7 @@ Parrot_new_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", name);
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -20570,6 +20653,7 @@ Parrot_new_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", name);
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -20594,6 +20678,7 @@ Parrot_new_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", name);
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -20618,6 +20703,7 @@ Parrot_new_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", name);
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -20642,6 +20728,7 @@ Parrot_new_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 3, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -20666,6 +20753,7 @@ Parrot_new_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 3, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -20690,6 +20778,7 @@ Parrot_new_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -20714,6 +20803,7 @@ Parrot_new_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -20738,6 +20828,7 @@ Parrot_new_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -20762,6 +20853,7 @@ Parrot_new_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -20789,6 +20881,7 @@ Parrot_root_new_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     else {
         opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 3, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, key));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)dest;
     }
 
@@ -20813,6 +20906,7 @@ Parrot_root_new_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     else {
         opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 3, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, key));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)dest;
     }
 
@@ -20837,6 +20931,7 @@ Parrot_root_new_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     else {
         opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, key));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)dest;
     }
 
@@ -20861,6 +20956,7 @@ Parrot_root_new_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     else {
         opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, key));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)dest;
     }
 
@@ -20885,6 +20981,7 @@ Parrot_root_new_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     else {
         opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, key));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)dest;
     }
 
@@ -20909,6 +21006,7 @@ Parrot_root_new_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     else {
         opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, key));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)dest;
     }
 
@@ -20945,11 +21043,15 @@ Parrot_find_method_p_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((PMC_IS_NULL(PREG(1)) || (!VTABLE_defined(interp, PREG(1))))) {
         opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp, resume, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for invocant of class '%Ss'", SREG(3), VTABLE_get_string(interp, VTABLE_get_class(interp, PREG(2))));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)dest;
     }
 
-    return (opcode_t *)resume;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)resume;
+    }
+
 }
 
 opcode_t *
@@ -20960,11 +21062,15 @@ Parrot_find_method_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((PMC_IS_NULL(PREG(1)) || (!VTABLE_defined(interp, PREG(1))))) {
         opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp, resume, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for invocant of class '%Ss'", SCONST(3), VTABLE_get_string(interp, VTABLE_get_class(interp, PREG(2))));
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)dest;
     }
 
-    return (opcode_t *)resume;
-    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    {
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+        return (opcode_t *)resume;
+    }
+
 }
 
 opcode_t *
@@ -21967,6 +22073,7 @@ Parrot_copy_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
         opcode_t  * const  dest =  cur_opcode + 3;
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_NULL_REG_ACCESS, "Null PMC in copy");
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
     else {
@@ -22169,6 +22276,7 @@ Parrot_repeat_s_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((IREG(3) < 0)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_NEG_REPEAT, "Cannot repeat with negative arg");
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
@@ -22182,6 +22290,7 @@ Parrot_repeat_s_sc_i(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((IREG(3) < 0)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_NEG_REPEAT, "Cannot repeat with negative arg");
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
@@ -22195,6 +22304,7 @@ Parrot_repeat_s_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((ICONST(3) < 0)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_NEG_REPEAT, "Cannot repeat with negative arg");
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
@@ -22208,6 +22318,7 @@ Parrot_repeat_s_sc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((ICONST(3) < 0)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_NEG_REPEAT, "Cannot repeat with negative arg");
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
@@ -24158,6 +24269,7 @@ Parrot_find_name_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((!SREG(2))) {
         opcode_t  * handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Tried to find null name");
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
@@ -24171,6 +24283,7 @@ Parrot_find_name_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((!SCONST(2))) {
         opcode_t  * handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Tried to find null name");
 
+        PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
     }
 
@@ -24189,7 +24302,11 @@ Parrot_find_sub_not_null_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
 
         Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
         handler = Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_GLOBAL_NOT_FOUND, "Could not find sub %Ss", SREG(2));
-        return (opcode_t *)handler;
+        {
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+            return (opcode_t *)handler;
+        }
+
     }
 
     PREG(1) = sub;
@@ -24207,7 +24324,11 @@ Parrot_find_sub_not_null_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 
         Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
         handler = Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_GLOBAL_NOT_FOUND, "Could not find sub %Ss", SCONST(2));
-        return (opcode_t *)handler;
+        {
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+            return (opcode_t *)handler;
+        }
+
     }
 
     PREG(1) = sub;
@@ -24259,6 +24380,7 @@ Parrot_fetch_p_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24286,6 +24408,7 @@ Parrot_fetch_p_pc_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24313,6 +24436,7 @@ Parrot_fetch_p_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24340,6 +24464,7 @@ Parrot_fetch_p_pc_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24367,6 +24492,7 @@ Parrot_fetch_p_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24394,6 +24520,7 @@ Parrot_fetch_p_pc_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24421,6 +24548,7 @@ Parrot_fetch_p_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24448,6 +24576,7 @@ Parrot_fetch_p_pc_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24475,6 +24604,7 @@ Parrot_fetch_p_p_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24502,6 +24632,7 @@ Parrot_fetch_p_pc_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24529,6 +24660,7 @@ Parrot_fetch_p_p_ic_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24556,6 +24688,7 @@ Parrot_fetch_p_pc_ic_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24583,6 +24716,7 @@ Parrot_fetch_p_p_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24610,6 +24744,7 @@ Parrot_fetch_p_pc_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24637,6 +24772,7 @@ Parrot_fetch_p_p_ic_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24664,6 +24800,7 @@ Parrot_fetch_p_pc_ic_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24691,6 +24828,7 @@ Parrot_fetch_p_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24718,6 +24856,7 @@ Parrot_fetch_p_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24745,6 +24884,7 @@ Parrot_fetch_p_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24772,6 +24912,7 @@ Parrot_fetch_p_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24799,6 +24940,7 @@ Parrot_fetch_p_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24826,6 +24968,7 @@ Parrot_fetch_p_pc_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24853,6 +24996,7 @@ Parrot_fetch_p_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24880,6 +25024,7 @@ Parrot_fetch_p_pc_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24907,6 +25052,7 @@ Parrot_vivify_p_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24935,6 +25081,7 @@ Parrot_vivify_p_pc_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24963,6 +25110,7 @@ Parrot_vivify_p_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -24991,6 +25139,7 @@ Parrot_vivify_p_pc_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25019,6 +25168,7 @@ Parrot_vivify_p_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25047,6 +25197,7 @@ Parrot_vivify_p_pc_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25075,6 +25226,7 @@ Parrot_vivify_p_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25103,6 +25255,7 @@ Parrot_vivify_p_pc_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25131,6 +25284,7 @@ Parrot_vivify_p_p_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25159,6 +25313,7 @@ Parrot_vivify_p_pc_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25187,6 +25342,7 @@ Parrot_vivify_p_p_ic_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25215,6 +25371,7 @@ Parrot_vivify_p_pc_ic_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25243,6 +25400,7 @@ Parrot_vivify_p_p_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25271,6 +25429,7 @@ Parrot_vivify_p_pc_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25299,6 +25458,7 @@ Parrot_vivify_p_p_ic_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25327,6 +25487,7 @@ Parrot_vivify_p_pc_ic_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25355,6 +25516,7 @@ Parrot_vivify_p_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25383,6 +25545,7 @@ Parrot_vivify_p_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25411,6 +25574,7 @@ Parrot_vivify_p_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25439,6 +25603,7 @@ Parrot_vivify_p_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PREG(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25467,6 +25632,7 @@ Parrot_vivify_p_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25495,6 +25661,7 @@ Parrot_vivify_p_pc_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25523,6 +25690,7 @@ Parrot_vivify_p_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25551,6 +25719,7 @@ Parrot_vivify_p_pc_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
             if ((type <= 0)) {
                 opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 5, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, PCONST(4)));
 
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
                 return (opcode_t *)dest;
             }
 
@@ -25581,6 +25750,7 @@ Parrot_new_p_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", name);
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -25608,6 +25778,7 @@ Parrot_new_p_sc_i(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", name);
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -25635,6 +25806,7 @@ Parrot_new_p_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", name);
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -25662,6 +25834,7 @@ Parrot_new_p_sc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
         if ((type <= 0)) {
             opcode_t  * dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", name);
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -25695,6 +25868,7 @@ Parrot_new_p_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
         else {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -25727,6 +25901,7 @@ Parrot_new_p_pc_i(opcode_t *cur_opcode, PARROT_INTERP) {
         else {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -25759,6 +25934,7 @@ Parrot_new_p_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
         else {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -25791,6 +25967,7 @@ Parrot_new_p_pc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
         else {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -25825,6 +26002,7 @@ Parrot_root_new_p_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
         else {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -25859,6 +26037,7 @@ Parrot_root_new_p_pc_i(opcode_t *cur_opcode, PARROT_INTERP) {
         else {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -25893,6 +26072,7 @@ Parrot_root_new_p_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
         else {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
@@ -25927,6 +26107,7 @@ Parrot_root_new_p_pc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
         else {
             opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_NO_CLASS, "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
 
+            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
             return (opcode_t *)dest;
         }
 
