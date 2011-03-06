@@ -15,6 +15,8 @@ class LLVM::Module {
     method dump() {
         %LLVM::F<LLVMDumpModule>($!ref);
     }
+
+    method _get_ptr() { $!ref };
 };
 
 # vim: ft=perl6
