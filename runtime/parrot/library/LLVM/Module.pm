@@ -16,13 +16,12 @@ class LLVM::Module {
         %LLVM::F<LLVMDumpModule>($!ref);
     }
 
-    method add_function ($name, $signature) {
-        # FIXME. Total hack for now.
+    method add_function ($name, *@args, :$va_args?) {
         my $type := %LLVM::F<LLVMFunctionType>(
-            LLVM::Type::void(), # return
-            undef,              # parameters
-            0,                  # number of parameters
-            0,                  # is var args
+            LLVM::Type::void(),             # return
+            LLVM::convert_to_struct(@args), # parameters
+            +@args,                         # number of parameters
+            +$va_args,                      # is var args
         );
 
         LLVM::Function.new.BUILD(%LLVM::F<LLVMAddFunction>($!ref, $name, $type));

@@ -124,6 +124,16 @@ class LLVM::Builder {
 #            # Miscellaneous instructions
 #            LLVMBuildPhi => "pppt",
 #            LLVMBuildCall => "pppp3t", #FIXME
+
+    method call($func, *@args, :$name?) {
+        %LLVM::F<LLVMBuildCall>(
+            $!ref,
+            $func._get_ptr,
+            LLVM::convert_to_struct(@args),
+            +@args,
+            $name // ""
+        );
+    }
 #            LLVMBuildSelect => "pppppt",
 #            LLVMBuildVAArg => "ppppt",
 #            LLVMBuildExtractElement => "ppppt",

@@ -1,6 +1,33 @@
 module LLVM {
     our %F;
 
+    sub convert_to_struct(@args) {
+        pir::say("# Got { +@args } args");
+        my @init;
+        for @args {
+            @init.push(-100); # INTVAL. BAD. WE NEED PTR
+            @init.push(0);
+            @init.push(0);
+        }
+        my $struct := pir::new__psp('ManagedStruct', @init);
+
+        my $count := 0;
+        for @args {
+            Q:PIR{
+                .local pmc args, count, arg
+                args  = find_lex '$struct'
+                count = find_lex '$count'
+                $I0   = count
+                arg   = find_lex '$_'
+                $I1   = get_addr arg
+                args[$I0] = $I1
+            };
+            $count++;
+        }
+
+        $struct;
+    }
+
     INIT {
         pir::load_bytecode("nqp-setting.pbc");
 
@@ -269,3 +296,4 @@ module LLVM {
     }
 }
 
+# vim: ft=perl6
