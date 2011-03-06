@@ -8,7 +8,7 @@ Q:PIR {
         load_bytecode "dumper.pbc"
 };
 
-my $module := LLVM::Module.new.createWithName("HELLO");
+my $module := LLVM::Module.new.BUILD("HELLO");
 $module.dump();
 
 # vim: ft=perl6
