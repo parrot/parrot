@@ -183,9 +183,6 @@ Parrot_gc_trace_root(PARROT_INTERP,
     /* mark the current context. */
     Parrot_gc_mark_PMC_alive(interp, CURRENT_CONTEXT(interp));
 
-    /* mark the dynamic environment. */
-    Parrot_gc_mark_PMC_alive(interp, interp->dynamic_env);
-
     /* mark the vtables: the data, Class PMCs, etc. */
     Parrot_vtbl_mark_vtables(interp);
 

@@ -208,8 +208,6 @@ struct parrot_interp_t {
 
     PDB_t *pdb;                               /* debug /trace system */
 
-    PMC   *dynamic_env;                       /* Dynamic environment stack */
-
     void  *lo_var_ptr;                        /* Pointer to memory on runops
                                                * system stack */
 
