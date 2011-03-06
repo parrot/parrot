@@ -9,6 +9,73 @@ module LLVM {
             LLVMModuleCreateWithName    => "pt",
             LLVMDumpModule              => "vp",
 
+            # See llvm::LLVMTypeKind::getTypeID.
+            LLVMGetTypeKind => "ip",
+
+            # See llvm::LLVMType::getContext.
+            LLVMGetTypeContext => "pp",
+
+            # Operations on integer types
+            LLVMInt1TypeInContext => "pp",
+            LLVMInt8TypeInContext => "pp",
+            LLVMInt16TypeInContext => "pp",
+            LLVMInt32TypeInContext => "pp",
+            LLVMInt64TypeInContext => "pp",
+            LLVMIntTypeInContext => "ppi",
+
+            LLVMInt1Type => "p",
+            LLVMInt8Type => "p",
+            LLVMInt16Type => "p",
+            LLVMInt32Type => "p",
+            LLVMInt64Type => "p",
+            LLVMIntType => "pi",
+            LLVMGetIntTypeWidth => "ip",
+
+            # Operations on real types
+            LLVMFloatTypeInContext => "pp",
+            LLVMDoubleTypeInContext => "pp",
+            LLVMX86FP80TypeInContext => "pp",
+            LLVMFP128TypeInContext => "pp",
+            LLVMPPCFP128TypeInContext => "pp",
+
+            LLVMFloatType => "p",
+            LLVMDoubleType => "p",
+            LLVMX86FP80Type => "p",
+            LLVMFP128Type => "p",
+            LLVMPPCFP128Type => "p",
+
+            # Operations on function types
+            LLVMFunctionType => "pppii", # FIXME
+            LLVMIsFunctionVarArg => "ip",
+            LLVMGetReturnType => "pp",
+            LLVMCountParamTypes => "pp",
+            LLVMGetParamTypes => "pp",
+
+# Operations on struct types
+            LLVMStructTypeInContext => "pppii", # FIXME
+            LLVMStructType => "ppii", # FIXME
+            LLVMCountStructElementTypes => "ip",
+            LLVMGetStructElementTypes => "vpp", # FIXME
+            LLVMIsPackedStruct => "ip",
+
+# Operations on array, pointer, and vector types
+            LLVMArrayType => "ppi",
+            LLVMPointerType => "ppi",
+            LLVMVectorType => "ppi",
+
+            LLVMGetElementType => "pp",
+            LLVMGetArrayLength => "ip",
+            LLVMGetPointerAddressSpace => "ip",
+            LLVMGetVectorSize => "ip",
+
+# Operations on other types
+            LLVMVoidTypeInContext => "pp",
+            LLVMLabelTypeInContext => "pp",
+            LLVMOpaqueTypeInContext => "pp",
+
+            LLVMVoidType => "p",
+            LLVMLabelType => "p",
+            LLVMOpaqueType => "p",
 
             # Operations on basic blocks
             LLVMBasicBlockAsValue => "pp",
