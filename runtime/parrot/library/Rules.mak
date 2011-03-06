@@ -31,6 +31,9 @@ $(LIBRARY_DIR)/LLVM.pbc : \
 $(LIBRARY_DIR)/LLVM.pir: $(NQP_RX) $(LIBRARY_DIR)/LLVM.pm
 	$(NQP_RX) --target=pir --output=$@ $(LIBRARY_DIR)/LLVM.pm
 
+$(LIBRARY_DIR)/LLVM/Builder.pir: $(NQP_RX) $(LIBRARY_DIR)/LLVM/Builder.pm
+	$(NQP_RX) --target=pir --output=$@ $(LIBRARY_DIR)/LLVM/Builder.pm
+
 $(LIBRARY_DIR)/LLVM/Module.pir: $(NQP_RX) $(LIBRARY_DIR)/LLVM/Module.pm
 	$(NQP_RX) --target=pir --output=$@ $(LIBRARY_DIR)/LLVM/Module.pm
 
