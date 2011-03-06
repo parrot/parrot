@@ -10,6 +10,10 @@ class LLVM::Function {
         );
     }
 
+    method set_linkage($linkage) {
+        %LLVM::F<LLVMSetLinkage>($!ptr, $linkage);
+    }
+
     method _get_ptr() { $!ptr };
 };
 
