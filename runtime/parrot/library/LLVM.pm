@@ -9,6 +9,37 @@ module LLVM {
             LLVMModuleCreateWithName    => "pt",
             LLVMDumpModule              => "vp",
 
+# Operations on constants of any type
+            LLVMConstNull => "pp",
+            LLVMConstAllOnes => "pp",
+            LLVMGetUndef   => "pp",
+            LLVMIsConstant => "ip",
+            LLVMIsNull => "ip",
+            LLVMIsUndef => "ip",
+            LLVMConstPointerNull => "pp",
+
+# Operations on scalar constants
+            LLVMConstInt => "ppii",
+            LLVMConstIntOfString => "ppti",
+            LLVMConstIntOfStringAndSize => "pptii",
+            LLVMConstReal => "ppd",
+            LLVMConstRealOfString => "ppt",
+            LLVMConstRealOfStringAndSize => "ppti",
+
+
+# Operations on composite constants
+            LLVMConstStringInContext => "pptii",
+            LLVMConstStructInContext => "pppii",
+
+            LLVMConstString => "ptii",
+            LLVMConstArray => "pppi", # FIXME
+            LLVMConstStruct => "ppii", # FIXME
+            LLVMConstVector => "ppi", #FIXME
+
+# Constant expressions
+            LLVMAlignOf => "pp",
+            LLVMSizeOf => "pp",
+
             # See llvm::LLVMTypeKind::getTypeID.
             LLVMGetTypeKind => "ip",
 

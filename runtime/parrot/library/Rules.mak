@@ -27,6 +27,7 @@ $(LIBRARY_DIR)/LLVM.pbc : \
 	$(LIBRARY_DIR)/LLVM.pir				\
 	$(LIBRARY_DIR)/LLVM/BasicBlock.pir 	\
 	$(LIBRARY_DIR)/LLVM/Builder.pir 	\
+	$(LIBRARY_DIR)/LLVM/Constant.pir 	\
 	$(LIBRARY_DIR)/LLVM/Function.pir 	\
 	$(LIBRARY_DIR)/LLVM/Module.pir		\
 	$(LIBRARY_DIR)/LLVM/Type.pir
@@ -40,6 +41,9 @@ $(LIBRARY_DIR)/LLVM/BasicBlock.pir: $(NQP_RX) $(LIBRARY_DIR)/LLVM/BasicBlock.pm
 
 $(LIBRARY_DIR)/LLVM/Builder.pir: $(NQP_RX) $(LIBRARY_DIR)/LLVM/Builder.pm
 	$(NQP_RX) --target=pir --output=$@ $(LIBRARY_DIR)/LLVM/Builder.pm
+
+$(LIBRARY_DIR)/LLVM/Constant.pir: $(NQP_RX) $(LIBRARY_DIR)/LLVM/Constant.pm
+	$(NQP_RX) --target=pir --output=$@ $(LIBRARY_DIR)/LLVM/Constant.pm
 
 $(LIBRARY_DIR)/LLVM/Function.pir: $(NQP_RX) $(LIBRARY_DIR)/LLVM/Function.pm
 	$(NQP_RX) --target=pir --output=$@ $(LIBRARY_DIR)/LLVM/Function.pm
