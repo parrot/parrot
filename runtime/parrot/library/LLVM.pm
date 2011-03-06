@@ -32,13 +32,25 @@ module LLVM {
             LLVMConstStructInContext => "pppii",
 
             LLVMConstString => "ptii",
-            LLVMConstArray => "pppi", # FIXME
-            LLVMConstStruct => "ppii", # FIXME
-            LLVMConstVector => "ppi", #FIXME
+            LLVMConstArray => "pppi",
+            LLVMConstStruct => "ppii",
+            LLVMConstVector => "ppi",
 
 # Constant expressions
             LLVMAlignOf => "pp",
             LLVMSizeOf => "pp",
+
+# Operations on global variables, functions, and aliases (globals)
+            LLVMGetGlobalParent => "pp",
+            LLVMIsDeclaration => "ip",
+            LLVMGetLinkage => "ip",
+            LLVMSetLinkage => "vpi",
+            LLVMGetSection => "tp",
+            LLVMSetSection => "vpt",
+            LLVMGetVisibility => "ip",
+            LLVMSetVisibility => "vpi",
+            LLVMGetAlignment => "ip",
+            LLVMSetAlignment => "vpi",
 
             # See llvm::LLVMTypeKind::getTypeID.
             LLVMGetTypeKind => "ip",
@@ -50,14 +62,14 @@ module LLVM {
             LLVMInt1TypeInContext => "pp",
             LLVMInt8TypeInContext => "pp",
             LLVMInt16TypeInContext => "pp",
-            LLVMInt32TypeInContext => "pp",
+            LLVMInti2TypeInContext => "pp",
             LLVMInt64TypeInContext => "pp",
             LLVMIntTypeInContext => "ppi",
 
             LLVMInt1Type => "p",
             LLVMInt8Type => "p",
             LLVMInt16Type => "p",
-            LLVMInt32Type => "p",
+            LLVMInti2Type => "p",
             LLVMInt64Type => "p",
             LLVMIntType => "pi",
             LLVMGetIntTypeWidth => "ip",
@@ -76,17 +88,17 @@ module LLVM {
             LLVMPPCFP128Type => "p",
 
             # Operations on function types
-            LLVMFunctionType => "pppii", # FIXME
+            LLVMFunctionType => "pppii",
             LLVMIsFunctionVarArg => "ip",
             LLVMGetReturnType => "pp",
             LLVMCountParamTypes => "pp",
             LLVMGetParamTypes => "pp",
 
 # Operations on struct types
-            LLVMStructTypeInContext => "pppii", # FIXME
-            LLVMStructType => "ppii", # FIXME
+            LLVMStructTypeInContext => "pppii",
+            LLVMStructType => "ppii",
             LLVMCountStructElementTypes => "ip",
-            LLVMGetStructElementTypes => "vpp", # FIXME
+            LLVMGetStructElementTypes => "vpp",
             LLVMIsPackedStruct => "ip",
 
 # Operations on array, pointer, and vector types
@@ -114,7 +126,7 @@ module LLVM {
             LLVMValueAsBasicBlock => "pp",
             LLVMGetBasicBlockParent => "pp",
             LLVMCountBasicBlocks => "ip",
-            LLVMGetBasicBlocks => "vpp", # FIXME
+            LLVMGetBasicBlocks => "vpp",
             LLVMGetFirstBasicBlock => "pp",
             LLVMGetLastBasicBlock => "pp",
             LLVMGetNextBasicBlock => "pp",
@@ -160,7 +172,7 @@ module LLVM {
             # Terminators
             LLVMBuildRetVoid                => "pp",
             LLVMBuildRet                    => "ppp",
-            LLVMBuildAggregateRet           => "ppp3",
+            LLVMBuildAggregateRet           => "pppi",
             LLVMBuildBr                     => "ppp",
             LLVMBuildCondBr                 => "ppppp",
             LLVMBuildSwitch                 => "ppppi",
@@ -204,9 +216,9 @@ module LLVM {
             LLVMBuildFree               => "ppp",
             LLVMBuildLoad               => "pppt",
             LLVMBuildStore              => "pppp",
-            LLVMBuildGEP                => "pppp3t", # FIXME It's array here.
-            LLVMBuildInBoundsGEP        => "pppp3t", # FIXME
-            LLVMBuildStructGEP          => "ppp3t",
+            LLVMBuildGEP                => "ppppit",
+            LLVMBuildInBoundsGEP        => "ppppit",
+            LLVMBuildStructGEP          => "pppit",
             LLVMBuildGlobalString       => "pptt",
             LLVMBuildGlobalStringPtr    => "pptt",
 
@@ -231,19 +243,19 @@ module LLVM {
             LLVMBuildFPCast => "ppppt",
 
             # Comparisons
-            LLVMBuildICmp => "pp3ppt",
-            LLVMBuildFCmp => "pp3ppt",
+            LLVMBuildICmp => "ppippt",
+            LLVMBuildFCmp => "ppippt",
 
             # Miscellaneous instructions
             LLVMBuildPhi => "pppt",
-            LLVMBuildCall => "pppp3t", #FIXME
+            LLVMBuildCall => "ppppit",
             LLVMBuildSelect => "pppppt",
             LLVMBuildVAArg => "ppppt",
             LLVMBuildExtractElement => "ppppt",
             LLVMBuildInsertElement => "pppppt",
             LLVMBuildShuffleVector => "pppppt",
-            LLVMBuildExtractValue => "ppp3t",
-            LLVMBuildInsertValue => "pppp3t",
+            LLVMBuildExtractValue => "pppit",
+            LLVMBuildInsertValue => "ppppit",
 
             LLVMBuildIsNull => "pppt",
             LLVMBuildIsNotNull => "pppt",
