@@ -10,8 +10,11 @@ Q:PIR {
 
 my $module := LLVM::Module.new.BUILD("HELLO");
 ok(pir::defined($module), "LLVM::Module created");
+ok( $module ~~ LLVM::Module, ".. with proper type");
 
 my $function := $module.add_function("hello", "");
+ok(pir::defined($function), "Function created");
+ok( $function ~~ LLVM::Function, ".. with proper type");
 
 # This will dump to stderr.
 $module.dump();
