@@ -16,9 +16,9 @@ class LLVM::Module {
         %LLVM::F<LLVMDumpModule>($!ref);
     }
 
-    method add_function ($name, *@args, :$va_args?) {
+    method add_function ($name, $return, *@args, :$va_args?) {
         my $type := %LLVM::F<LLVMFunctionType>(
-            LLVM::Type::void(),             # return
+            $return,                        # return
             LLVM::convert_to_struct(@args), # parameters
             +@args,                         # number of parameters
             +$va_args,                      # is var args
