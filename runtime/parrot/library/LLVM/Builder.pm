@@ -11,7 +11,7 @@ class LLVM::Builder {
 
     method DESTROY () {
         %LLVM::F<LLVMDisposeBuilder>($!ref);
-        $ref := undef;
+        $!ref := undef;
     }
 
 #            LLVMPositionBuilder             => "vppp",
@@ -37,7 +37,14 @@ class LLVM::Builder {
 
 #            # Terminators
 #            LLVMBuildRetVoid                => "pp",
+    multi method ret() {
+        %LLVM::F<LLVMBuildRetVoid>($!ref);
+    }
+
 #            LLVMBuildRet                    => "ppp",
+    multi method ret($value) {
+        %LLVM::F<LLVMBuildRet>($!ref, $value);
+    }
 #            LLVMBuildAggregateRet           => "ppp3",
 #            LLVMBuildBr                     => "ppp",
 #            LLVMBuildCondBr                 => "ppppp",
