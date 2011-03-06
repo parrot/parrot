@@ -7,15 +7,16 @@ Q:PIR {
         .include "test_more.pir"
         load_bytecode "dumper.pbc"
 };
+pir::loadlib("llvm_engine");
 
 my $module := LLVM::Module.new.BUILD("HELLO");
 ok(pir::defined($module), "LLVM::Module created");
 ok( $module ~~ LLVM::Module, ".. with proper type");
 
 my $printf := $module.add_function("printf", LLVM::Type::pointer(LLVM::Type::int8()), :va_args<1>);
-$printf.set_linkage(9);
+#$printf.set_linkage(9);
 
-my $function := $module.add_function("hello");
+my $function := $module.add_function("hello", LLVM::Type::int32());
 ok(pir::defined($function), "Function created");
 ok( $function ~~ LLVM::Function, ".. with proper type");
 
