@@ -408,10 +408,12 @@ STRING* Parrot_hash_value_to_string(PARROT_INTERP,
 
 PARROT_HOT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 size_t Parrot_hsh_hash_buffer(
-    const unsigned char *buf,
+    ARGIN(const unsigned char *buf),
     size_t len,
-    size_t hashval);
+    size_t hashval)
+        __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_hash_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -519,7 +521,8 @@ size_t Parrot_hsh_hash_buffer(
 #define ASSERT_ARGS_Parrot_hash_value_to_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
-#define ASSERT_ARGS_Parrot_hsh_hash_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_hsh_hash_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(buf))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/hash.c */
 

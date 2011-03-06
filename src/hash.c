@@ -229,8 +229,9 @@ Compute the hash of a buffer.
 
 PARROT_HOT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 size_t
-Parrot_hsh_hash_buffer(const unsigned char *buf, size_t len, size_t hashval)
+Parrot_hsh_hash_buffer(ARGIN(const unsigned char *buf), size_t len, size_t hashval)
 {
     ASSERT_ARGS(Parrot_hsh_hash_buffer)
     while (len--) {
