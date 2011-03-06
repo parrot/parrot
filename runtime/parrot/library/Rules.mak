@@ -21,3 +21,13 @@ $(LIBRARY_DIR)/Tcl/Glob.pbc : \
 
 $(LIBRARY_DIR)/P6Object.pbc : \
     $(LIBRARY_DIR)/dumper.pbc
+
+$(LIBRARY_DIR)/LLVM.pbc : \
+	$(LIBRARY_DIR)/LLVM.pir				\
+	$(LIBRARY_DIR)/LLVM/Module.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/LLVM.pir
+
+$(LIBRARY_DIR)/LLVM/Module.pir: $(NQP_RX) $(LIBRARY_DIR)/LLVM/Module.pm
+	$(NQP_RX) --target=pir --output=$@ $(LIBRARY_DIR)/LLVM/Module.pm
+
+
