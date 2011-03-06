@@ -16,6 +16,10 @@ my $function := $module.add_function("hello", "");
 ok(pir::defined($function), "Function created");
 ok( $function ~~ LLVM::Function, ".. with proper type");
 
+
+my $bb := $function.append_basic_block("the_block");
+ok( pir::defined($bb), "BasicBlock appended");
+
 # This will dump to stderr.
 $module.dump();
 ok(1, "LLVM::Module dumped");
