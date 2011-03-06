@@ -930,7 +930,7 @@ fixed8_hash(SHIM_INTERP, ARGIN(const STRING *src), size_t hashval)
     DECL_CONST_CAST;
     STRING * const s = PARROT_const_cast(STRING *, src);
     const unsigned char *pos = (const unsigned char *)s->strstart;
-    s->hashval = hashval = Parrot_hsh_hash_buffer(pos, s->strlen, hashval);
+    s->hashval = hashval = Parrot_hash_buffer(pos, s->strlen, hashval);
     return hashval;
 }
 
