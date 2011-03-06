@@ -12,7 +12,7 @@ my $module := LLVM::Module.new.BUILD("HELLO");
 ok(pir::defined($module), "LLVM::Module created");
 ok( $module ~~ LLVM::Module, ".. with proper type");
 
-my $printf := $module.add_function("printf", :va_args<1>);
+my $printf := $module.add_function("printf", LLVM::Type::pointer(LLVM::Type::int8()), :va_args<1>);
 $printf.set_linkage(9);
 
 my $function := $module.add_function("hello");
