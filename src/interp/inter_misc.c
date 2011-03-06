@@ -166,9 +166,7 @@ PMC *
 Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
 {
     ASSERT_ARGS(Parrot_get_compiler)
-    PMC    * const iglobals = interp->iglobals;
-    PMC    * hash           = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
-                              IGLOBALS_COMPREG_HASH);
+    PMC * const  hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_COMPREG_HASH);
 
     if (PMC_IS_NULL(hash)) {
         /* No compiler has been registered yet */
