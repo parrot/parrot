@@ -12,10 +12,12 @@ my $module := LLVM::Module.new.BUILD("HELLO");
 ok(pir::defined($module), "LLVM::Module created");
 ok( $module ~~ LLVM::Module, ".. with proper type");
 
-my $function := $module.add_function("hello", "");
+my $printf := $module.add_function("printf", :va_args<1>);
+$printf.set_linkage(9);
+
+my $function := $module.add_function("hello");
 ok(pir::defined($function), "Function created");
 ok( $function ~~ LLVM::Function, ".. with proper type");
-
 
 my $bb := $function.append_basic_block("the_block");
 ok( pir::defined($bb), "BasicBlock appended");
@@ -27,6 +29,13 @@ ok( $builder ~~ LLVM::Builder, ".. with proper type");
 
 $builder.set_position($bb);
 ok( 1, "Builder positioned");
+
+$builder.call($function, :name<foo>);
+ok( 1, "Call created");
+
+$builder.call($printf, LLVM::Constant::string("Hello World\n"));
+ok( 1, "Call created with args");
+
 
 $builder.ret();
 ok( 1, "return created");
