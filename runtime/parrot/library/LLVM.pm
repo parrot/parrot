@@ -9,7 +9,11 @@ module LLVM {
             LLVMModuleCreateWithName    => "pt",
             LLVMDumpModule              => "vp",
 
+
             # Instruction builders 
+            LLVMCreateBuilderInContext      => "pp",
+            LLVMCreateBuilder               => "pv",
+
             LLVMPositionBuilder             => "vppp",
             LLVMPositionBuilderBefore       => "vpp",
             LLVMPositionBuilderAtEnd        => "vpp",
@@ -30,10 +34,10 @@ module LLVM {
             LLVMBuildUnwind                 => "pp",
             LLVMBuildUnreachable            => "pp",
 
-# Add a case to the switch instruction */
+            # Add a case to the switch instruction */
             LLVMAddCase => "vppp",
 
-# Arithmetic
+            # Arithmetic
             LLVMBuildAdd        => "ppppt",
             LLVMBuildNSWAdd     => "ppppt",
             LLVMBuildFAdd       => "ppppt",
@@ -58,7 +62,7 @@ module LLVM {
             LLVMBuildNeg => "pppt",
             LLVMBuildNot => "pppt",
 
-# Memory
+            # Memory
             LLVMBuildMalloc             => "pppt",
             LLVMBuildArrayMalloc        => "ppppt",
             LLVMBuildAlloca             => "pppt",
