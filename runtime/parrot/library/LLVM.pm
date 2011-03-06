@@ -10,6 +10,38 @@ module LLVM {
             LLVMDumpModule              => "vp",
 
 
+            # Operations on basic blocks
+            LLVMBasicBlockAsValue => "pp",
+            LLVMValueIsBasicBlock => "ip",
+            LLVMValueAsBasicBlock => "pp",
+            LLVMGetBasicBlockParent => "pp",
+            LLVMCountBasicBlocks => "ip",
+            LLVMGetBasicBlocks => "vpp", # FIXME
+            LLVMGetFirstBasicBlock => "pp",
+            LLVMGetLastBasicBlock => "pp",
+            LLVMGetNextBasicBlock => "pp",
+            LLVMGetPreviousBasicBlock => "pp",
+            LLVMGetEntryBasicBlock => "pp",
+
+            LLVMAppendBasicBlockInContext => "pppt",
+            LLVMInsertBasicBlockInContext => "pppt",
+
+            # Operations on functions
+            LLVMAddFunction => "pptp",
+            LLVMGetNamedFunction => "ppt",
+            LLVMGetFirstFunction => "pp",
+            LLVMGetLastFunction => "pp",
+            LLVMGetNextFunction => "pp",
+            LLVMGetPreviousFunction => "pp",
+            LLVMDeleteFunction    => "vp",
+            LLVMGetIntrinsicID => "ip",
+            LLVMGetFunctionCallConv => "ip",
+            LLVMSetFunctionCallConv => "vpi",
+            LLVMGetGC => "tp",
+            LLVMSetGC => "vpt",
+            LLVMAddFunctionAttr => "vpi",
+            LLVMRemoveFunctionAttr => "vpi",
+
             # Instruction builders 
             LLVMCreateBuilderInContext      => "pp",
             LLVMCreateBuilder               => "pv",
