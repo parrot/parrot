@@ -23,9 +23,13 @@ $(LIBRARY_DIR)/P6Object.pbc : \
     $(LIBRARY_DIR)/dumper.pbc
 
 $(LIBRARY_DIR)/LLVM.pbc : \
+	$(LIBRARY_DIR)/llvm_lib.pir			\
 	$(LIBRARY_DIR)/LLVM.pir				\
 	$(LIBRARY_DIR)/LLVM/Module.pir
-	$(PARROT) -o $@ $(LIBRARY_DIR)/LLVM.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/llvm_lib.pir
+
+$(LIBRARY_DIR)/LLVM.pir: $(NQP_RX) $(LIBRARY_DIR)/LLVM.pm
+	$(NQP_RX) --target=pir --output=$@ $(LIBRARY_DIR)/LLVM.pm
 
 $(LIBRARY_DIR)/LLVM/Module.pir: $(NQP_RX) $(LIBRARY_DIR)/LLVM/Module.pm
 	$(NQP_RX) --target=pir --output=$@ $(LIBRARY_DIR)/LLVM/Module.pm
