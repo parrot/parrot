@@ -93,6 +93,10 @@ module LLVM {
             LLVMAppendBasicBlockInContext => "pppt",
             LLVMInsertBasicBlockInContext => "pppt",
 
+            LLVMAppendBasicBlock => "ppt",
+            LLVMInsertBasicBlock => "ppt",
+            LLVMDeleteBasicBlock => "vp",
+
             # Operations on functions
             LLVMAddFunction => "pptp",
             LLVMGetNamedFunction => "ppt",
