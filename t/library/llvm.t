@@ -9,6 +9,14 @@ Q:PIR {
 };
 
 my $module := LLVM::Module.new.BUILD("HELLO");
+ok(pir::defined($module), "LLVM::Module created");
+
+# This will dump to stderr.
 $module.dump();
+ok(1, "LLVM::Module dumped");
+
+
+
+done_testing();
 
 # vim: ft=perl6
