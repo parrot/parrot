@@ -6,7 +6,7 @@ module LLVM::Type {
     sub int1() { %LLVM::F<LLVMInt1Type>() }
     sub int8() { %LLVM::F<LLVMInt8Type>() }
     sub int16() { %LLVM::F<LLVMInt16Type>() }
-    sub inti2() { %LLVM::F<LLVMInti2Type>() }
+    sub int32() { %LLVM::F<LLVMInt32Type>() }
     sub int64() { %LLVM::F<LLVMInt64Type>() }
     sub int($radix) { %LLVM::F<LLVMIntType>($radix) }
 
