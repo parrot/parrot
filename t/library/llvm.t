@@ -31,22 +31,27 @@ ok( $builder ~~ LLVM::Builder, ".. with proper type");
 $builder.set_position($bb);
 ok( 1, "Builder positioned");
 
-$builder.call($function, :name<foo>);
-ok( 1, "Call created");
+#$builder.call($function, :name<foo>);
+#ok( 1, "Call created");
 
-$builder.call($printf, LLVM::Constant::string("Hello World\n"));
-ok( 1, "Call created with args");
+#$builder.call($printf, LLVM::Constant::string("Hello World\n"));
+#ok( 1, "Call created with args");
 
-
-$builder.ret();
+my $answer := LLVM::Constant::integer(42);
+ok( 1, "Constant created");
+$builder.ret($answer);
 ok( 1, "return created");
 
 # This will dump to stderr.
 $module.dump();
 ok(1, "LLVM::Module dumped");
 
-
-
+my $engine := pir::new__psp("LLVM_Engine", $module._get_ptr());
+my $call   := $engine.create($function._get_ptr(), "I");
+my $res    := -1;
+$res       := $call();
+ok(1, "Function called");
+is($res, 42, "Proper answer found");
 
 done_testing();
 
