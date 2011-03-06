@@ -19,6 +19,7 @@ ok( $function ~~ LLVM::Function, ".. with proper type");
 
 my $bb := $function.append_basic_block("the_block");
 ok( pir::defined($bb), "BasicBlock appended");
+ok( $bb ~~ LLVM::BasicBlock, ".. with proper type");
 
 # This will dump to stderr.
 $module.dump();
