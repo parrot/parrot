@@ -25,6 +25,12 @@ my $builder := LLVM::Builder.new.BUILD();
 ok( pir::defined($builder), "LLVM::Builder created");
 ok( $builder ~~ LLVM::Builder, ".. with proper type");
 
+$builder.set_position($bb);
+ok( 1, "Builder positioned");
+
+$builder.ret();
+ok( 1, "return created");
+
 # This will dump to stderr.
 $module.dump();
 ok(1, "LLVM::Module dumped");
