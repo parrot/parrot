@@ -1,12 +1,14 @@
 class LLVM::Builder {
     has $!ref;
 
-    method BUILD () {
+    multi method BUILD () {
         $!ref := %LLVM::F<LLVMCreateBuilder>();
+        self;
     }
 
-    method BUILD ($context) {
+    multi method BUILD ($context) {
         $!ref := %LLVM::F<LLVMCreateBuilderInContext>($context);
+        self;
     }
 
     method DESTROY () {
