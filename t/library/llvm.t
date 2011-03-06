@@ -21,6 +21,10 @@ my $bb := $function.append_basic_block("the_block");
 ok( pir::defined($bb), "BasicBlock appended");
 ok( $bb ~~ LLVM::BasicBlock, ".. with proper type");
 
+my $builder := LLVM::Builder.new.BUILD();
+ok( pir::defined($builder), "LLVM::Builder created");
+ok( $builder ~~ LLVM::Builder, ".. with proper type");
+
 # This will dump to stderr.
 $module.dump();
 ok(1, "LLVM::Module dumped");
