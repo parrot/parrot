@@ -25,7 +25,7 @@ class LLVM::Module {
             0,                  # is var args
         );
 
-        %LLVM::F<LLVMAddFunction>($!ref, $name, $type);
+        LLVM::Function.new.BUILD(%LLVM::F<LLVMAddFunction>($!ref, $name, $type));
     }
 
     method _get_ptr() { $!ref };

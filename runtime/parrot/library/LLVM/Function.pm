@@ -1,0 +1,14 @@
+class LLVM::Function {
+    our $counter;
+    has $!ptr;
+
+    method BUILD($ptr) { $!ptr := $ptr; self };
+
+    method append_basic_block($name?) {
+        %LLVM::F<LLVMAppendBasicBlock>($!ptr, $name ?? $name !! "block" ~~ $counter++);
+    }
+
+    method _get_ptr() { $!ptr };
+};
+
+# vim: ft=perl6
