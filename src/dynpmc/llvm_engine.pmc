@@ -1,0 +1,33 @@
+
+#include <stdint.h>
+#include <limits.h>
+#include <llvm-c/Core.h>
+#include <llvm-c/ExecutionEngine.h>
+
+pmclass LLVM_Engine dynpmc group llvm auto_attrs {
+    ATTR PMC *ptr;
+
+    VTABLE void init_pmc(PMC *module) {
+        PMC *ptr;
+        LLVMExecutionEngineRef engine; 
+
+        LLVMInitializeNativeTarget();
+        LLVMLinkInJIT();
+
+        LLVMCreateJITCompilerForModule(&engine, VTABLE_get_pointer(INTERP, module), 0, NULL);
+        ptr = Parrot_pmc_new(INTERP, enum_class_Ptr);
+        VTABLE_set_pointer(INTERP, ptr, engine);
+        SET_ATTR_ptr(INTERP, SELF, ptr);
+    }
+
+    METHOD create(PMC *function, STRING *signature) {
+        PMC  *ptr;
+        PMC  *ret = Parrot_pmc_new(INTERP, enum_class_NCI);
+        void *f;
+
+        GET_ATTR_ptr(INTERP, SELF, ptr);
+        f = LLVMGetPointerToGlobal(VTABLE_get_pointer(INTERP, ptr), VTABLE_get_pointer(INTERP, function));
+        VTABLE_set_pointer_keyed_str(interp, ret, signature, f);
+        RETURN(PMC* ret);
+    }
+};
