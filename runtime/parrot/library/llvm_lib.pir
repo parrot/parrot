@@ -1,5 +1,6 @@
 
 .include "runtime/parrot/library/LLVM.pir"
+.include "runtime/parrot/library/LLVM/Opaque.pir"
 .include "runtime/parrot/library/LLVM/BasicBlock.pir"
 .include "runtime/parrot/library/LLVM/Builder.pir"
 .include "runtime/parrot/library/LLVM/Constant.pir"
