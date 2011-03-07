@@ -869,7 +869,6 @@ fixed8_index(PARROT_INTERP, ARGIN(const STRING *src),
         ARGIN(const STRING *search), INTVAL offset)
 {
     ASSERT_ARGS(fixed8_index)
-    INTVAL retval;
 
     if (STRING_max_bytes_per_codepoint(search) != 1)
         return encoding_index(interp, src, search, offset);
@@ -900,15 +899,13 @@ fixed8_rindex(PARROT_INTERP, ARGIN(const STRING *src),
         ARGIN(const STRING *search_string), INTVAL offset)
 {
     ASSERT_ARGS(fixed8_rindex)
-    INTVAL retval;
 
     if (STRING_max_bytes_per_codepoint(search_string) != 1)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
             "Cross-charset rindex not supported");
 
     PARROT_ASSERT(STRING_max_bytes_per_codepoint(src) == 1);
-    retval = Parrot_util_byte_rindex(interp, src, search_string, offset);
-    return retval;
+    return Parrot_util_byte_rindex(interp, src, search_string, offset);
 }
 
 
@@ -1030,13 +1027,14 @@ Returns Boolean.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-fixed8_is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offset)
+fixed8_is_cclass(SHIM_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offset)
 {
     ASSERT_ARGS(fixed8_is_cclass)
     const unsigned char * const ptr = (unsigned char *)src->strstart;
     UINTVAL codepoint;
 
-    if (offset >= src->strlen) return 0;
+    if (offset >= src->strlen)
+        return 0;
     codepoint = ptr[offset];
 
     return Parrot_iso_8859_1_typetable[codepoint] & flags ? 1 : 0;
@@ -1056,7 +1054,7 @@ Find a character in the given character class.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-fixed8_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src),
+fixed8_find_cclass(SHIM_INTERP, INTVAL flags, ARGIN(const STRING *src),
         UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(fixed8_find_cclass)
@@ -1089,7 +1087,7 @@ Returns C<INTVAL>.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-fixed8_find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src),
+fixed8_find_not_cclass(SHIM_INTERP, INTVAL flags, ARGIN(const STRING *src),
         UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(fixed8_find_not_cclass)
@@ -1142,7 +1140,7 @@ Get the character at C<iter> plus C<offset>.
 */
 
 UINTVAL
-fixed8_iter_get(PARROT_INTERP,
+fixed8_iter_get(SHIM_INTERP,
     ARGIN(const STRING *str), ARGIN(const String_iter *iter), INTVAL offset)
 {
     ASSERT_ARGS(fixed8_iter_get)
@@ -1190,8 +1188,7 @@ Moves the string iterator C<i> to the next codepoint.
 */
 
 UINTVAL
-fixed8_iter_get_and_advance(PARROT_INTERP,
-    ARGIN(const STRING *str), ARGMOD(String_iter *iter))
+fixed8_iter_get_and_advance(SHIM_INTERP, ARGIN(const STRING *str), ARGMOD(String_iter *iter))
 {
     ASSERT_ARGS(fixed8_iter_get_and_advance)
     unsigned char * const ptr = (unsigned char *)str->strstart;

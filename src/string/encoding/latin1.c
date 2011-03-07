@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2010, Parrot Foundation.
+Copyright (C) 2004-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -39,10 +39,9 @@ static STRING* latin1_downcase_first(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL latin1_partial_scan(PARROT_INTERP,
+static INTVAL latin1_partial_scan(SHIM_INTERP,
     ARGIN(const char *buf),
     ARGMOD(Parrot_String_Bounds *bounds))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*bounds);
@@ -87,8 +86,7 @@ static STRING* latin1_upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_latin1_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buf) \
+       PARROT_ASSERT_ARG(buf) \
     , PARROT_ASSERT_ARG(bounds))
 #define ASSERT_ARGS_latin1_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(src))
@@ -187,11 +185,9 @@ C<delim> is found. Setting C<count> or C<delim> to -1 disables these tests.
 */
 
 static INTVAL
-latin1_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
-        ARGMOD(Parrot_String_Bounds *bounds))
+latin1_partial_scan(SHIM_INTERP, ARGIN(const char *buf), ARGMOD(Parrot_String_Bounds *bounds))
 {
     ASSERT_ARGS(latin1_partial_scan)
-    UINTVAL       i;
     UINTVAL       len   = bounds->bytes;
     const INTVAL  chars = bounds->chars;
     const INTVAL  delim = bounds->delim;
@@ -201,6 +197,7 @@ latin1_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
         len = chars;
 
     if (delim >= 0) {
+        UINTVAL i;
         for (i = 0; i < len; ++i) {
             c = (unsigned char)buf[i];
 
@@ -239,8 +236,8 @@ latin1_upcase(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(latin1_upcase)
     unsigned char *buffer;
-    UINTVAL        offset = 0;
-    STRING        *result = Parrot_str_clone(interp, src);
+    UINTVAL offset;
+    STRING * const result = Parrot_str_clone(interp, src);
 
     if (!result->strlen)
         return result;
@@ -276,8 +273,8 @@ latin1_downcase(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(latin1_downcase)
     unsigned char *buffer;
-    UINTVAL        offset = 0;
-    STRING        *result = Parrot_str_clone(interp, src);
+    UINTVAL offset;
+    STRING * const result = Parrot_str_clone(interp, src);
 
     if (!result->strlen)
         return result;
@@ -315,7 +312,7 @@ latin1_titlecase(PARROT_INTERP, ARGIN(const STRING *src))
     unsigned char *buffer;
     unsigned int   c;
     UINTVAL        offset;
-    STRING        *result = Parrot_str_clone(interp, src);
+    STRING * const result = Parrot_str_clone(interp, src);
 
     if (!result->strlen)
         return result;
@@ -394,7 +391,7 @@ latin1_downcase_first(PARROT_INTERP, ARGIN(const STRING *src))
     ASSERT_ARGS(latin1_downcase_first)
     unsigned char *buffer;
     unsigned int   c;
-    STRING        *result = Parrot_str_clone(interp, src);
+    STRING * const result = Parrot_str_clone(interp, src);
 
     if (!result->strlen)
         return result;
