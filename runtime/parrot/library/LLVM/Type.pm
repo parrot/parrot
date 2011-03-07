@@ -11,6 +11,10 @@ module LLVM::Type {
     sub int($radix) { %LLVM::F<LLVMIntType>($radix) }
 
     sub void() { %LLVM::F<LLVMVoidType>() };
+
+    sub struct(*@parts, :$packed?) {
+        %LLVM::F<LLVMStructType>(LLVM::convert_to_struct(@parts), +@parts, $packed);
+    }
 };
 
 # vim: ft=perl6
