@@ -47,7 +47,7 @@ return memory.
 
 PARROT_EXPORT
 PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 void *
 mem_sys_allocate(size_t size)
 {
