@@ -25,6 +25,7 @@ $(LIBRARY_DIR)/P6Object.pbc : \
 $(LIBRARY_DIR)/LLVM.pbc : \
 	$(LIBRARY_DIR)/llvm_lib.pir			\
 	$(LIBRARY_DIR)/LLVM.pir				\
+	$(LIBRARY_DIR)/LLVM/Opaque.pir 		\
 	$(LIBRARY_DIR)/LLVM/BasicBlock.pir 	\
 	$(LIBRARY_DIR)/LLVM/Builder.pir 	\
 	$(LIBRARY_DIR)/LLVM/Constant.pir 	\
@@ -35,6 +36,9 @@ $(LIBRARY_DIR)/LLVM.pbc : \
 
 $(LIBRARY_DIR)/LLVM.pir: $(NQP_RX) $(LIBRARY_DIR)/LLVM.pm
 	$(NQP_RX) --target=pir --output=$@ $(LIBRARY_DIR)/LLVM.pm
+
+$(LIBRARY_DIR)/LLVM/Opaque.pir: $(NQP_RX) $(LIBRARY_DIR)/LLVM/Opaque.pm
+	$(NQP_RX) --target=pir --output=$@ $(LIBRARY_DIR)/LLVM/Opaque.pm
 
 $(LIBRARY_DIR)/LLVM/BasicBlock.pir: $(NQP_RX) $(LIBRARY_DIR)/LLVM/BasicBlock.pm
 	$(NQP_RX) --target=pir --output=$@ $(LIBRARY_DIR)/LLVM/BasicBlock.pm
