@@ -99,24 +99,16 @@ class LLVM::Builder is LLVM::Opaque {
 
 #            LLVMBuildGEP                => "ppppit",
     method gep($type, *@indices, :$name?) {
-        pir::say("# { +@indices }");
-        pir::say("# $name");
-        my $args := LLVM::convert_to_struct(@indices);
-        pir::say("# FOO");
+        my $args := LLVM::to_array(@indices);
         my $r := %LLVM::F<BuildGEP>(self, $type, $args, +@indices, $name // "");
-        pir::say("# BANG");
         $r;
     }
 
 #            LLVMBuildStructGEP          => "ppp3t",
 #            LLVMBuildInBoundsGEP        => "ppppit",
     method inbounds_gep($type, *@indices, :$name?) {
-        pir::say("# { +@indices }");
-        pir::say("# $name");
-        my $args := LLVM::convert_to_struct(@indices);
-        pir::say("# FOO");
+        my $args := LLVM::to_array(@indices);
         my $r := %LLVM::F<BuildInBoundsGEP>(self, $type, $args, +@indices, $name // "");
-        pir::say("# BANG");
         $r;
     }
 
@@ -163,7 +155,7 @@ class LLVM::Builder is LLVM::Opaque {
         %LLVM::F<BuildCall>(
             self,
             $func,
-            LLVM::convert_to_struct(@args),
+            LLVM::to_array(@args),
             +@args,
             $name // ""
         );

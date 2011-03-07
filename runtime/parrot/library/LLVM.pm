@@ -1,7 +1,10 @@
 module LLVM {
     our %F;
 
-    sub convert_to_struct(@args) {
+=item convert_to_array
+    Convert @args to array used in LLVM API.
+
+    sub to_array(@args) {
         my @init;
         for @args {
             @init.push(-100); # INTVAL. BAD. WE NEED PTR

@@ -16,7 +16,7 @@ class LLVM::Module is LLVM::Opaque {
     method add_function ($name, $return, *@args, :$va_args?) {
         my $type := %LLVM::F<FunctionType>(
             $return,                        # return
-            LLVM::convert_to_struct(@args), # parameters
+            LLVM::to_array(@args),          # parameters
             +@args,                         # number of parameters
             +$va_args,                      # is var args
         );
