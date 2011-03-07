@@ -1,14 +1,15 @@
 class LLVM::Context is LLVM::Opaque {
-    method BUILD() {
+    multi method new() {
         self.wrap(%LLVM::F<ContextCreate>());
     }
+    multi method new($ptr) { self.wrap($ptr) };
 
     method DESTROY() {
         %LLVM::F<ContextDispose>(self);
     }
 
     sub global() {
-        LLVM::Context.new.wrap(%LLVM::F<GetGlobalContext>());
+        LLVM::Context.new(%LLVM::F<GetGlobalContext>());
     }
 
     method int1() { %LLVM::F<Int1TypeInContext>(self) }
