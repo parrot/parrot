@@ -10,7 +10,7 @@ class LLVM::Module is LLVM::Opaque {
     }
 
     method dump() {
-        %LLVM::F<LLVMDumpModule>(self.unwrap());
+        %LLVM::F<LLVMDumpModule>(self);
     }
 
     method add_function ($name, $return, *@args, :$va_args?) {
@@ -21,7 +21,7 @@ class LLVM::Module is LLVM::Opaque {
             +$va_args,                      # is var args
         );
 
-        LLVM::Function.new.BUILD(%LLVM::F<LLVMAddFunction>(self.unwrap(), $name, $type));
+        LLVM::Function.new.BUILD(%LLVM::F<LLVMAddFunction>(self, $name, $type));
     }
 };
 
