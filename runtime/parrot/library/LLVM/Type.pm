@@ -1,4 +1,5 @@
-module LLVM::Type {
+class LLVM::Type is LLVM::Opaque {
+
     multi sub int1() { %LLVM::F<Int1Type>() }
     multi sub int8() { %LLVM::F<Int8Type>() }
     multi sub int16() { %LLVM::F<Int16Type>() }
