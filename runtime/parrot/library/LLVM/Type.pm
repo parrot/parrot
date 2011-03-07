@@ -13,7 +13,7 @@ module LLVM::Type {
     sub void() { %LLVM::F<VoidType>() };
 
     sub struct(*@parts, :$packed?) {
-        %LLVM::F<StructType>(LLVM::convert_to_struct(@parts), +@parts, $packed);
+        %LLVM::F<StructType>(LLVM::to_array(@parts), +@parts, $packed);
     }
 };
 
