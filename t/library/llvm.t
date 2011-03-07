@@ -13,7 +13,7 @@ my $module := LLVM::Module.new.BUILD("HELLO");
 ok(pir::defined($module), "LLVM::Module created");
 ok( $module ~~ LLVM::Module, ".. with proper type");
 
-my $printf := $module.add_function("printf", LLVM::Type::pointer(LLVM::Type::int8()), :va_args<1>);
+my $printf := $module.add_function("printf", LLVM::Type::int32(), LLVM::Type::pointer(LLVM::Type::int8()), :va_args<1>);
 #$printf.set_linkage(9);
 
 my $function := $module.add_function("hello", LLVM::Type::int32());
@@ -34,8 +34,11 @@ ok( 1, "Builder positioned");
 #$builder.call($function, :name<foo>);
 #ok( 1, "Call created");
 
-#$builder.call($printf, LLVM::Constant::string("Hello World\n"));
-#ok( 1, "Call created with args");
+my $hello_str := $builder.global_string("****** Hello LLVM World ******\n", "");
+ok( 1, "Global string created");
+
+$builder.call($printf, $hello_str);
+ok( 1, "Call created with args");
 
 my $answer := LLVM::Constant::integer(42);
 ok( 1, "Constant created");
