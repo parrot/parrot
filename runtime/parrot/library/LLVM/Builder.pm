@@ -1,30 +1,30 @@
 class LLVM::Builder is LLVM::Opaque {
 
     multi method BUILD () {
-        self.wrap( %LLVM::F<LLVMCreateBuilder>() );
+        self.wrap( %LLVM::F<CreateBuilder>() );
     }
 
     multi method BUILD ($context) {
-        self.wrap( %LLVM::F<LLVMCreateBuilderInContext>($context) );
+        self.wrap( %LLVM::F<CreateBuilderInContext>($context) );
     }
 
     method DESTROY () {
-        %LLVM::F<LLVMDisposeBuilder>(self);
+        %LLVM::F<DisposeBuilder>(self);
     }
 
 #            LLVMPositionBuilder             => "vppp",
     multi method set_position(LLVM::BasicBlock $bb, $value) {
-        %LLVM::F<LLVMPositionBuilder>(self, $bb, $value);
+        %LLVM::F<PositionBuilder>(self, $bb, $value);
     }
 
 #            LLVMPositionBuilderBefore       => "vpp",
     multi method set_position($value) {
-        %LLVM::F<LLVMPositionBuilderBefore>(self, $value);
+        %LLVM::F<PositionBuilderBefore>(self, $value);
     }
 
 #            LLVMPositionBuilderAtEnd        => "vpp",
     multi method set_position(LLVM::BasicBlock $bb) {
-        %LLVM::F<LLVMPositionBuilderAtEnd>(self, $bb);
+        %LLVM::F<PositionBuilderAtEnd>(self, $bb);
     }
 
 #            LLVMGetInsertBlock              => "pp",
@@ -36,12 +36,12 @@ class LLVM::Builder is LLVM::Opaque {
 #            # Terminators
 #            LLVMBuildRetVoid                => "pp",
     multi method ret() {
-        %LLVM::F<LLVMBuildRetVoid>(self);
+        %LLVM::F<BuildRetVoid>(self);
     }
 
 #            LLVMBuildRet                    => "ppp",
     multi method ret($value) {
-        %LLVM::F<LLVMBuildRet>(self, $value);
+        %LLVM::F<BuildRet>(self, $value);
     }
 #            LLVMBuildAggregateRet           => "ppp3",
 #            LLVMBuildBr                     => "ppp",
@@ -84,17 +84,17 @@ class LLVM::Builder is LLVM::Opaque {
 #            LLVMBuildArrayMalloc        => "ppppt",
 #            LLVMBuildAlloca             => "pppt",
     method alloca($type, $name?) {
-        %LLVM::F<LLVMBuildAlloca>(self, $type, $name);
+        %LLVM::F<BuildAlloca>(self, $type, $name);
     }
 #            LLVMBuildArrayAlloca        => "ppppt",
 #            LLVMBuildFree               => "ppp",
 #            LLVMBuildLoad               => "pppt",
     method load($ptr, $name?) {
-        %LLVM::F<LLVMBuildLoad>(self, $ptr, $name);
+        %LLVM::F<BuildLoad>(self, $ptr, $name);
     }
 #            LLVMBuildStore              => "pppp",
     method store($value, $ptr) {
-        %LLVM::F<LLVMBuildStore>(self, $value, $ptr);
+        %LLVM::F<BuildStore>(self, $value, $ptr);
     }
 
 #            LLVMBuildGEP                => "ppppit",
@@ -103,7 +103,7 @@ class LLVM::Builder is LLVM::Opaque {
         pir::say("# $name");
         my $args := LLVM::convert_to_struct(@indices);
         pir::say("# FOO");
-        my $r := %LLVM::F<LLVMBuildGEP>(self, $type, $args, +@indices, $name // "");
+        my $r := %LLVM::F<BuildGEP>(self, $type, $args, +@indices, $name // "");
         pir::say("# BANG");
         $r;
     }
@@ -115,19 +115,19 @@ class LLVM::Builder is LLVM::Opaque {
         pir::say("# $name");
         my $args := LLVM::convert_to_struct(@indices);
         pir::say("# FOO");
-        my $r := %LLVM::F<LLVMBuildInBoundsGEP>(self, $type, $args, +@indices, $name // "");
+        my $r := %LLVM::F<BuildInBoundsGEP>(self, $type, $args, +@indices, $name // "");
         pir::say("# BANG");
         $r;
     }
 
 #            LLVMBuildStructGEP          => "ppp3t",
     method struct_gep($ptr, Int $idx, Str $name?) {
-        %LLVM::F<LLVMBuildStructGEP>(self, $ptr, $idx, $name);
+        %LLVM::F<BuildStructGEP>(self, $ptr, $idx, $name);
     }
 
 #            LLVMBuildGlobalString       => "pptt",
     method global_string($value, $name) {
-        %LLVM::F<LLVMBuildGlobalString>(self, $value, $name);
+        %LLVM::F<BuildGlobalString>(self, $value, $name);
     }
 #            LLVMBuildGlobalStringPtr    => "pptt",
 
@@ -160,7 +160,7 @@ class LLVM::Builder is LLVM::Opaque {
 #            LLVMBuildCall => "pppp3t", #FIXME
 
     method call($func, *@args, :$name?) {
-        %LLVM::F<LLVMBuildCall>(
+        %LLVM::F<BuildCall>(
             self,
             $func,
             LLVM::convert_to_struct(@args),

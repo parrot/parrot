@@ -34,507 +34,505 @@ module LLVM {
         my %funcs := hash(
 #/*===-- Error handling ----------------------------------------------------===*/
 
-            LLVMDisposeMessage => "vt",
+            DisposeMessage => "vt",
 
 
 #/*===-- Contexts ----------------------------------------------------------===*/
 
 #/* Create and destroy contexts. */
-            LLVMContextCreate => "p",
-            LLVMGetGlobalContext => "p",
-            LLVMContextDispose => "vp",
+            ContextCreate => "p",
+            GetGlobalContext => "p",
+            ContextDispose => "vp",
 
-            LLVMGetMDKindIDInContext => "IptI",
-            LLVMGetMDKindID => "ItI",
+            GetMDKindIDInContext => "IptI",
+            GetMDKindID => "ItI",
 
 #/*===-- Modules -----------------------------------------------------------===*/
 
 #/* Create and destroy modules. */ 
 #/** See llvm::Module::Module. */
-            LLVMModuleCreateWithName => "pt",
-            LLVMModuleCreateWithNameInContext => "ptp",
+            ModuleCreateWithName => "pt",
+            ModuleCreateWithNameInContext => "ptp",
 
 #/** See llvm::Module::~Module. */
-            LLVMDisposeModule => "vp",
+            DisposeModule => "vp",
 
 #/** Data layout. See Module::getDataLayout. */
-            LLVMGetDataLayout => "tp",
-            LLVMSetDataLayout => "vpt",
+            GetDataLayout => "tp",
+            SetDataLayout => "vpt",
 
 #/** Target triple. See Module::getTargetTriple. */
-            LLVMGetTarget => "tp",
-            LLVMSetTarget => "vpt",
+            GetTarget => "tp",
+            SetTarget => "vpt",
 
 #/** See Module::addTypeName. */
-            LLVMAddTypeName => "Iptp",
-            LLVMDeleteTypeName => "vpt",
-            LLVMGetTypeByName => "ppt",
+            AddTypeName => "Iptp",
+            DeleteTypeName => "vpt",
+            GetTypeByName => "ppt",
 
 #/** See Module::dump. */
-            LLVMDumpModule => "vp",
+            DumpModule => "vp",
 
 
 #/*===-- Types -------------------------------------------------------------===*/
 
 #/** See llvm::LLVMTypeKind::getTypeID. */
-            LLVMGetTypeKind => "pp",
+            GetTypeKind => "pp",
 
 #/** See llvm::LLVMType::getContext. */
-            LLVMGetTypeContext => "pp",
+            GetTypeContext => "pp",
 
 #/* Operations on integer types */
-            LLVMInt1TypeInContext => "pp",
-            LLVMInt8TypeInContext => "pp",
-            LLVMInt16TypeInContext => "pp",
-            LLVMInt32TypeInContext => "pp",
-            LLVMInt64TypeInContext => "pp",
-            LLVMIntTypeInContext => "ppi",
+            Int1TypeInContext => "pp",
+            Int8TypeInContext => "pp",
+            Int16TypeInContext => "pp",
+            Int32TypeInContext => "pp",
+            Int64TypeInContext => "pp",
+            IntTypeInContext => "ppi",
 
-            LLVMInt1Type => "p",
-            LLVMInt8Type => "p",
-            LLVMInt16Type => "p",
-            LLVMInt32Type => "p",
-            LLVMInt64Type => "p",
-            LLVMIntType => "pi",
-            LLVMGetIntTypeWidth => "Ip",
+            Int1Type => "p",
+            Int8Type => "p",
+            Int16Type => "p",
+            Int32Type => "p",
+            Int64Type => "p",
+            IntType => "pi",
+            GetIntTypeWidth => "Ip",
 
 #/* Operations on real types */
-            LLVMFloatTypeInContext => "pp",
-            LLVMDoubleTypeInContext => "pp",
-            LLVMX86FP80TypeInContext => "pp",
-            LLVMFP128TypeInContext => "pp",
-            LLVMPPCFP128TypeInContext => "pp",
+            FloatTypeInContext => "pp",
+            DoubleTypeInContext => "pp",
+            X86FP80TypeInContext => "pp",
+            FP128TypeInContext => "pp",
+            PPCFP128TypeInContext => "pp",
 
-            LLVMFloatType => "p",
-            LLVMDoubleType => "p",
-            LLVMX86FP80Type => "p",
-            LLVMFP128Type => "p",
-            LLVMPPCFP128Type => "p",
+            FloatType => "p",
+            DoubleType => "p",
+            X86FP80Type => "p",
+            FP128Type => "p",
+            PPCFP128Type => "p",
 
 #/* Operations on function types */
-            LLVMFunctionType => "pppii",
-            LLVMIsFunctionVarArg => "Ip",
-            LLVMGetReturnType => "pp",
-            LLVMCountParamTypes => "Ip",
-            LLVMGetParamTypes => "vpp",
+            FunctionType => "pppii",
+            IsFunctionVarArg => "Ip",
+            GetReturnType => "pp",
+            CountParamTypes => "Ip",
+            GetParamTypes => "vpp",
 
 #/* Operations on struct types */
-            LLVMStructTypeInContext => "pppii",
-            LLVMStructType => "ppii",
-            LLVMCountStructElementTypes => "Ip",
-            LLVMGetStructElementTypes => "vpp",
-            LLVMIsPackedStruct => "Ip",
+            StructTypeInContext => "pppii",
+            StructType => "ppii",
+            CountStructElementTypes => "Ip",
+            GetStructElementTypes => "vpp",
+            IsPackedStruct => "Ip",
 
 #/* Operations on union types */
-            LLVMUnionTypeInContext => "pppi",
-            LLVMUnionType => "ppi",
-            LLVMCountUnionElementTypes => "Ip",
-            LLVMGetUnionElementTypes => "vpp",
+            UnionTypeInContext => "pppi",
+            UnionType => "ppi",
+            CountUnionElementTypes => "Ip",
+            GetUnionElementTypes => "vpp",
 
 #/* Operations on array, pointer, and vector types (sequence types) */
-            LLVMArrayType => "ppi",
-            LLVMPointerType => "ppi",
-            LLVMVectorType => "ppi",
+            ArrayType => "ppi",
+            PointerType => "ppi",
+            VectorType => "ppi",
 
-            LLVMGetElementType => "pp",
-            LLVMGetArrayLength => "Ip",
-            LLVMGetPointerAddressSpace => "Ip",
-            LLVMGetVectorSize => "Ip",
+            GetElementType => "pp",
+            GetArrayLength => "Ip",
+            GetPointerAddressSpace => "Ip",
+            GetVectorSize => "Ip",
 
 #/* Operations on other types */
-            LLVMVoidTypeInContext => "pp",
-            LLVMLabelTypeInContext => "pp",
-            LLVMOpaqueTypeInContext => "pp",
+            VoidTypeInContext => "pp",
+            LabelTypeInContext => "pp",
+            OpaqueTypeInContext => "pp",
 
-            LLVMVoidType => "p",
-            LLVMLabelType => "p",
-            LLVMOpaqueType => "p",
+            VoidType => "p",
+            LabelType => "p",
+            OpaqueType => "p",
 
 #/* Operations on type handles */
-            LLVMCreateTypeHandle => "pp",
-            LLVMRefineType => "vpp",
-            LLVMResolveTypeHandle => "pp",
-            LLVMDisposeTypeHandle => "vp",
+            CreateTypeHandle => "pp",
+            RefineType => "vpp",
+            ResolveTypeHandle => "pp",
+            DisposeTypeHandle => "vp",
 
 
 #/*===-- Values ------------------------------------------------------------===*/
 
 #/* Operations on all values */
-            LLVMTypeOf => "pp",
-            LLVMGetValueName => "tp",
-            LLVMSetValueName => "vpt",
-            LLVMDumpValue => "vp",
-            LLVMReplaceAllUsesWith => "vpp",
-            LLVMHasMetadata => "Ip",
-            LLVMGetMetadata => "ppi",
-            LLVMSetMetadata => "vpip",
+            TypeOf => "pp",
+            GetValueName => "tp",
+            SetValueName => "vpt",
+            DumpValue => "vp",
+            ReplaceAllUsesWith => "vpp",
+            HasMetadata => "Ip",
+            GetMetadata => "ppi",
+            SetMetadata => "vpip",
 
-=begin
-/* Conversion functions. Return the input value if it is an instance of the
-   specified class, otherwise NULL. See llvm::dyn_cast_or_null<>. */
-#define LLVM_DECLARE_VALUE_CAST(name) \
-  LLVMValueRef LLVMIsA##name(LLVMValueRef Val);
-LLVM_FOR_EACH_VALUE_SUBCLASS(LLVM_DECLARE_VALUE_CAST)
-=end
+# Conversion functions. Return the input value if it is an instance of the
+# specified class, otherwise NULL. See llvm::dyn_cast_or_null<>.
+# #define LLVM_DECLARE_VALUE_CAST(name) \
+# LLVMValueRef LLVMIsA##name(LLVMValueRef Val);
+# LLVM_FOR_EACH_VALUE_SUBCLASS(LLVM_DECLARE_VALUE_CAST)
 
 #/* Operations on Uses */
-            LLVMGetFirstUse => "pp",
-            LLVMGetNextUse => "pp",
-            LLVMGetUser => "pp",
-            LLVMGetUsedValue => "pp",
+            GetFirstUse => "pp",
+            GetNextUse => "pp",
+            GetUser => "pp",
+            GetUsedValue => "pp",
 
 #/* Operations on Users */
-            LLVMGetOperand => "ppi",
+            GetOperand => "ppi",
 
 #/* Operations on constants of any type */
-            LLVMConstNull => "pp",
-            LLVMConstAllOnes => "pp",
-            LLVMGetUndef => "pp",
-            LLVMIsConstant => "Ip",
-            LLVMIsNull => "Ip",
-            LLVMIsUndef => "Ip",
-            LLVMConstPointerNull => "pp",
+            ConstNull => "pp",
+            ConstAllOnes => "pp",
+            GetUndef => "pp",
+            IsConstant => "Ip",
+            IsNull => "Ip",
+            IsUndef => "Ip",
+            ConstPointerNull => "pp",
 
 #/* Operations on metadata */
-            LLVMMDStringInContext => "ppti",
-            LLVMMDString => "pti",
-            LLVMMDNodeInContext => "pppi",
-            LLVMMDNode => "ppi",
+            MDStringInContext => "ppti",
+            MDString => "pti",
+            MDNodeInContext => "pppi",
+            MDNode => "ppi",
 
 #/* Operations on scalar constants */
-            LLVMConstInt => "ppii",
-            LLVMConstIntOfString => "ppti",
-            LLVMConstIntOfStringAndSize => "pptii",
-            LLVMConstReal => "ppd",
-            LLVMConstRealOfString => "ppt",
-            LLVMConstRealOfStringAndSize => "ppti",
-            LLVMConstIntGetZExtValue => "Ip",
-            LLVMConstIntGetSExtValue => "Ip",
+            ConstInt => "ppii",
+            ConstIntOfString => "ppti",
+            ConstIntOfStringAndSize => "pptii",
+            ConstReal => "ppd",
+            ConstRealOfString => "ppt",
+            ConstRealOfStringAndSize => "ppti",
+            ConstIntGetZExtValue => "Ip",
+            ConstIntGetSExtValue => "Ip",
 
 
 #/* Operations on composite constants */
-            LLVMConstStringInContext => "pptii",
-            LLVMConstStructInContext => "pppii",
+            ConstStringInContext => "pptii",
+            ConstStructInContext => "pppii",
 
-            LLVMConstString => "ptii",
-            LLVMConstArray => "pppi",
-            LLVMConstStruct => "ppii",
-            LLVMConstVector => "ppi",
-            LLVMConstUnion => "ppp",
+            ConstString => "ptii",
+            ConstArray => "pppi",
+            ConstStruct => "ppii",
+            ConstVector => "ppi",
+            ConstUnion => "ppp",
 
 #/* Constant expressions */
-            LLVMGetConstOpcode => "ip",
-            LLVMAlignOf => "pp",
-            LLVMSizeOf => "pp",
-            LLVMConstNeg => "pp",
-            LLVMConstNSWNeg => "pp",
-            LLVMConstNUWNeg => "pp",
-            LLVMConstFNeg => "pp",
-            LLVMConstNot => "pp",
-            LLVMConstAdd => "ppp",
-            LLVMConstNSWAdd => "ppp",
-            LLVMConstNUWAdd => "ppp",
-            LLVMConstFAdd => "ppp",
-            LLVMConstSub => "ppp",
-            LLVMConstNSWSub => "ppp",
-            LLVMConstNUWSub => "ppp",
-            LLVMConstFSub => "ppp",
-            LLVMConstMul => "ppp",
-            LLVMConstNSWMul => "ppp",
-            LLVMConstNUWMul => "ppp",
-            LLVMConstFMul => "ppp",
-            LLVMConstUDiv => "ppp",
-            LLVMConstSDiv => "ppp",
-            LLVMConstExactSDiv => "ppp",
-            LLVMConstFDiv => "ppp",
-            LLVMConstURem => "ppp",
-            LLVMConstSRem => "ppp",
-            LLVMConstFRem => "ppp",
-            LLVMConstAnd => "ppp",
-            LLVMConstOr => "ppp",
-            LLVMConstXor => "ppp",
-            LLVMConstICmp => "pppp",
-            LLVMConstFCmp => "pppp",
-            LLVMConstShl => "ppp",
-            LLVMConstLShr => "ppp",
-            LLVMConstAShr => "ppp",
-            LLVMConstGEP => "pppi",
-            LLVMConstInBoundsGEP => "pppi",
-            LLVMConstTrunc => "ppp",
-            LLVMConstSExt => "ppp",
-            LLVMConstZExt => "ppp",
-            LLVMConstFPTrunc => "ppp",
-            LLVMConstFPExt => "ppp",
-            LLVMConstUIToFP => "ppp",
-            LLVMConstSIToFP => "ppp",
-            LLVMConstFPToUI => "ppp",
-            LLVMConstFPToSI => "ppp",
-            LLVMConstPtrToInt => "ppp",
-            LLVMConstIntToPtr => "ppp",
-            LLVMConstBitCast => "ppp",
-            LLVMConstZExtOrBitCast => "ppp",
-            LLVMConstSExtOrBitCast => "ppp",
-            LLVMConstTruncOrBitCast => "ppp",
-            LLVMConstPointerCast => "ppp",
-            LLVMConstIntCast => "pppp",
-            LLVMConstFPCast => "ppp",
-            LLVMConstSelect => "pppp",
-            LLVMConstExtractElement => "ppp",
-            LLVMConstInsertElement => "pppp",
-            LLVMConstShuffleVector => "pppp",
-            LLVMConstExtractValue => "pppi",
-            LLVMConstInsertValue => "pppii", # FIXME
-            LLVMConstInlineAsm => "ppttii",
-            LLVMBlockAddress => "ppp",
+            GetConstOpcode => "ip",
+            AlignOf => "pp",
+            SizeOf => "pp",
+            ConstNeg => "pp",
+            ConstNSWNeg => "pp",
+            ConstNUWNeg => "pp",
+            ConstFNeg => "pp",
+            ConstNot => "pp",
+            ConstAdd => "ppp",
+            ConstNSWAdd => "ppp",
+            ConstNUWAdd => "ppp",
+            ConstFAdd => "ppp",
+            ConstSub => "ppp",
+            ConstNSWSub => "ppp",
+            ConstNUWSub => "ppp",
+            ConstFSub => "ppp",
+            ConstMul => "ppp",
+            ConstNSWMul => "ppp",
+            ConstNUWMul => "ppp",
+            ConstFMul => "ppp",
+            ConstUDiv => "ppp",
+            ConstSDiv => "ppp",
+            ConstExactSDiv => "ppp",
+            ConstFDiv => "ppp",
+            ConstURem => "ppp",
+            ConstSRem => "ppp",
+            ConstFRem => "ppp",
+            ConstAnd => "ppp",
+            ConstOr => "ppp",
+            ConstXor => "ppp",
+            ConstICmp => "pppp",
+            ConstFCmp => "pppp",
+            ConstShl => "ppp",
+            ConstLShr => "ppp",
+            ConstAShr => "ppp",
+            ConstGEP => "pppi",
+            ConstInBoundsGEP => "pppi",
+            ConstTrunc => "ppp",
+            ConstSExt => "ppp",
+            ConstZExt => "ppp",
+            ConstFPTrunc => "ppp",
+            ConstFPExt => "ppp",
+            ConstUIToFP => "ppp",
+            ConstSIToFP => "ppp",
+            ConstFPToUI => "ppp",
+            ConstFPToSI => "ppp",
+            ConstPtrToInt => "ppp",
+            ConstIntToPtr => "ppp",
+            ConstBitCast => "ppp",
+            ConstZExtOrBitCast => "ppp",
+            ConstSExtOrBitCast => "ppp",
+            ConstTruncOrBitCast => "ppp",
+            ConstPointerCast => "ppp",
+            ConstIntCast => "pppp",
+            ConstFPCast => "ppp",
+            ConstSelect => "pppp",
+            ConstExtractElement => "ppp",
+            ConstInsertElement => "pppp",
+            ConstShuffleVector => "pppp",
+            ConstExtractValue => "pppi",
+            ConstInsertValue => "pppii", # FIXME
+            ConstInlineAsm => "ppttii",
+            BlockAddress => "ppp",
 
 #/* Operations on global variables, functions, and aliases (globals) */
-            LLVMGetGlobalParent => "pp",
-            LLVMIsDeclaration => "Ip",
-            LLVMGetLinkage => "Ip",
-            LLVMSetLinkage => "vpi",
-            LLVMGetSection => "tp",
-            LLVMSetSection => "vpt",
-            LLVMGetVisibility => "Ip",
-            LLVMSetVisibility => "vpi",
-            LLVMGetAlignment => "Ip",
-            LLVMSetAlignment => "vpi",
+            GetGlobalParent => "pp",
+            IsDeclaration => "Ip",
+            GetLinkage => "Ip",
+            SetLinkage => "vpi",
+            GetSection => "tp",
+            SetSection => "vpt",
+            GetVisibility => "Ip",
+            SetVisibility => "vpi",
+            GetAlignment => "Ip",
+            SetAlignment => "vpi",
 
 #/* Operations on global variables */
-            LLVMAddGlobal => "pppt",
-            LLVMAddGlobalInAddressSpace => "pppti",
-            LLVMGetNamedGlobal => "ppt",
-            LLVMGetFirstGlobal => "pp",
-            LLVMGetLastGlobal => "pp",
-            LLVMGetNextGlobal => "pp",
-            LLVMGetPreviousGlobal => "pp",
-            LLVMDeleteGlobal => "vp",
-            LLVMGetInitializer => "vp",
-            LLVMSetInitializer => "vpp",
-            LLVMIsThreadLocal => "Ip",
-            LLVMSetThreadLocal => "vpi",
-            LLVMIsGlobalConstant => "Ip",
-            LLVMSetGlobalConstant => "vpi",
+            AddGlobal => "pppt",
+            AddGlobalInAddressSpace => "pppti",
+            GetNamedGlobal => "ppt",
+            GetFirstGlobal => "pp",
+            GetLastGlobal => "pp",
+            GetNextGlobal => "pp",
+            GetPreviousGlobal => "pp",
+            DeleteGlobal => "vp",
+            GetInitializer => "vp",
+            SetInitializer => "vpp",
+            IsThreadLocal => "Ip",
+            SetThreadLocal => "vpi",
+            IsGlobalConstant => "Ip",
+            SetGlobalConstant => "vpi",
 
 #/* Operations on aliases */
-            LLVMAddAlias => "ppppt",
+            AddAlias => "ppppt",
 
 #/* Operations on functions */
-            LLVMAddFunction => "pptp",
-            LLVMGetNamedFunction => "ppt",
-            LLVMGetFirstFunction => "pp",
-            LLVMGetLastFunction => "pp",
-            LLVMGetNextFunction => "pp",
-            LLVMGetPreviousFunction => "pp",
-            LLVMDeleteFunction => "vp",
-            LLVMGetIntrinsicID => "Ip",
-            LLVMGetFunctionCallConv => "Ip",
-            LLVMSetFunctionCallConv => "vpi",
-            LLVMGetGC => "tp",
-            LLVMSetGC => "vpt",
-            LLVMAddFunctionAttr => "vpi",
-            LLVMGetFunctionAttr => "Ip",
-            LLVMRemoveFunctionAttr => "vpi",
+            AddFunction => "pptp",
+            GetNamedFunction => "ppt",
+            GetFirstFunction => "pp",
+            GetLastFunction => "pp",
+            GetNextFunction => "pp",
+            GetPreviousFunction => "pp",
+            DeleteFunction => "vp",
+            GetIntrinsicID => "Ip",
+            GetFunctionCallConv => "Ip",
+            SetFunctionCallConv => "vpi",
+            GetGC => "tp",
+            SetGC => "vpt",
+            AddFunctionAttr => "vpi",
+            GetFunctionAttr => "Ip",
+            RemoveFunctionAttr => "vpi",
 
 #/* Operations on parameters */
-            LLVMCountParams => "Ip",
-            LLVMGetParams => "vpp",
-            LLVMGetParam => "ppi",
-            LLVMGetParamParent => "pp",
-            LLVMGetFirstParam => "pp",
-            LLVMGetLastParam => "pp",
-            LLVMGetNextParam => "pp",
-            LLVMGetPreviousParam => "pp",
-            LLVMAddAttribute => "vpi",
-            LLVMRemoveAttribute => "vpi",
-            LLVMGetAttribute => "Ip",
-            LLVMSetParamAlignment => "vpi",
+            CountParams => "Ip",
+            GetParams => "vpp",
+            GetParam => "ppi",
+            GetParamParent => "pp",
+            GetFirstParam => "pp",
+            GetLastParam => "pp",
+            GetNextParam => "pp",
+            GetPreviousParam => "pp",
+            AddAttribute => "vpi",
+            RemoveAttribute => "vpi",
+            GetAttribute => "Ip",
+            SetParamAlignment => "vpi",
 
 #/* Operations on basic blocks */
-            LLVMBasicBlockAsValue => "pp",
-            LLVMValueIsBasicBlock => "Ip",
-            LLVMValueAsBasicBlock => "pp",
-            LLVMGetBasicBlockParent => "pp",
-            LLVMCountBasicBlocks => "Ip",
-            LLVMGetBasicBlocks => "vpp",
-            LLVMGetFirstBasicBlock => "pp",
-            LLVMGetLastBasicBlock => "pp",
-            LLVMGetNextBasicBlock => "pp",
-            LLVMGetPreviousBasicBlock => "pp",
-            LLVMGetEntryBasicBlock => "pp",
+            BasicBlockAsValue => "pp",
+            ValueIsBasicBlock => "Ip",
+            ValueAsBasicBlock => "pp",
+            GetBasicBlockParent => "pp",
+            CountBasicBlocks => "Ip",
+            GetBasicBlocks => "vpp",
+            GetFirstBasicBlock => "pp",
+            GetLastBasicBlock => "pp",
+            GetNextBasicBlock => "pp",
+            GetPreviousBasicBlock => "pp",
+            GetEntryBasicBlock => "pp",
 
-            LLVMAppendBasicBlockInContext => "pppt",
-            LLVMInsertBasicBlockInContext => "pppt",
+            AppendBasicBlockInContext => "pppt",
+            InsertBasicBlockInContext => "pppt",
 
-            LLVMAppendBasicBlock => "ppt",
-            LLVMInsertBasicBlock => "ppt",
-            LLVMDeleteBasicBlock => "vp",
+            AppendBasicBlock => "ppt",
+            InsertBasicBlock => "ppt",
+            DeleteBasicBlock => "vp",
 
 #/* Operations on instructions */
-            LLVMGetInstructionParent => "pp",
-            LLVMGetFirstInstruction => "pp",
-            LLVMGetLastInstruction => "pp",
-            LLVMGetNextInstruction => "pp",
-            LLVMGetPreviousInstruction => "pp",
+            GetInstructionParent => "pp",
+            GetFirstInstruction => "pp",
+            GetLastInstruction => "pp",
+            GetNextInstruction => "pp",
+            GetPreviousInstruction => "pp",
 
 #/* Operations on call sites */
-            LLVMSetInstructionCallConv => "vpi",
-            LLVMGetInstructionCallConv => "Ip",
-            LLVMAddInstrAttribute => "vpii",
-            LLVMRemoveInstrAttribute => "vpii",
-            LLVMSetInstrParamAlignment => "vpii",
+            SetInstructionCallConv => "vpi",
+            GetInstructionCallConv => "Ip",
+            AddInstrAttribute => "vpii",
+            RemoveInstrAttribute => "vpii",
+            SetInstrParamAlignment => "vpii",
 
 #/* Operations on call instructions (only) */
-            LLVMIsTailCall => "Ip",
-            LLVMSetTailCall => "vpi",
+            IsTailCall => "Ip",
+            SetTailCall => "vpi",
 
 #/* Operations on phi nodes */
-            LLVMAddIncoming => "vpppi",
-            LLVMCountIncoming => "Ip",
-            LLVMGetIncomingValue => "ppi",
-            LLVMGetIncomingBlock => "ppi",
+            AddIncoming => "vpppi",
+            CountIncoming => "Ip",
+            GetIncomingValue => "ppi",
+            GetIncomingBlock => "ppi",
 
 #/*===-- Instruction builders ----------------------------------------------===*/
 
 # An instruction builder represents a point within a basic block, and is the
 # exclusive means of building instructions using the C interface.
 
-            LLVMCreateBuilderInContext => "pp",
-            LLVMCreateBuilder => "p",
-            LLVMPositionBuilder => "vppp",
-            LLVMPositionBuilderBefore => "vpp",
-            LLVMPositionBuilderAtEnd => "vpp",
-            LLVMGetInsertBlock => "pp",
-            LLVMClearInsertionPosition => "vp",
-            LLVMInsertIntoBuilder => "vpp",
-            LLVMInsertIntoBuilderWithName => "vppt",
-            LLVMDisposeBuilder => "vp",
+            CreateBuilderInContext => "pp",
+            CreateBuilder => "p",
+            PositionBuilder => "vppp",
+            PositionBuilderBefore => "vpp",
+            PositionBuilderAtEnd => "vpp",
+            GetInsertBlock => "pp",
+            ClearInsertionPosition => "vp",
+            InsertIntoBuilder => "vpp",
+            InsertIntoBuilderWithName => "vppt",
+            DisposeBuilder => "vp",
 
 #/* Metadata */
-            LLVMSetCurrentDebugLocation => "vpp",
-            LLVMGetCurrentDebugLocation => "pp",
-            LLVMSetInstDebugLocation => "vpp",
+            SetCurrentDebugLocation => "vpp",
+            GetCurrentDebugLocation => "pp",
+            SetInstDebugLocation => "vpp",
 
 #/* Terminators */
-            LLVMBuildRetVoid => "pp",
-            LLVMBuildRet => "ppp",
-            LLVMBuildAggregateRet => "pppi",
-            LLVMBuildBr => "ppp",
-            LLVMBuildCondBr => "ppppp",
-            LLVMBuildSwitch => "ppppi",
-            LLVMBuildIndirectBr => "pppi",
-            LLVMBuildInvoke => "ppppippt",
-            LLVMBuildUnwind => "pp",
-            LLVMBuildUnreachable => "pp",
+            BuildRetVoid => "pp",
+            BuildRet => "ppp",
+            BuildAggregateRet => "pppi",
+            BuildBr => "ppp",
+            BuildCondBr => "ppppp",
+            BuildSwitch => "ppppi",
+            BuildIndirectBr => "pppi",
+            BuildInvoke => "ppppippt",
+            BuildUnwind => "pp",
+            BuildUnreachable => "pp",
 
 #/* Add a case to the switch instruction */
-            LLVMAddCase => "vppp",
+            AddCase => "vppp",
 
 #/* Add a destination to the indirectbr instruction */
-            LLVMAddDestination => "vpp",
+            AddDestination => "vpp",
 
 #/* Arithmetic */
-            LLVMBuildAdd => "ppppt",
-            LLVMBuildNSWAdd => "ppppt",
-            LLVMBuildNUWAdd => "ppppt",
-            LLVMBuildFAdd => "ppppt",
-            LLVMBuildSub => "ppppt",
-            LLVMBuildNSWSub => "ppppt",
-            LLVMBuildNUWSub => "ppppt",
-            LLVMBuildFSub => "ppppt",
-            LLVMBuildMul => "ppppt",
-            LLVMBuildNSWMul => "ppppt",
-            LLVMBuildNUWMul => "ppppt",
-            LLVMBuildFMul => "ppppt",
-            LLVMBuildUDiv => "ppppt",
-            LLVMBuildSDiv => "ppppt",
-            LLVMBuildExactSDiv => "ppppt",
-            LLVMBuildFDiv => "ppppt",
-            LLVMBuildURem => "ppppt",
-            LLVMBuildSRem => "ppppt",
-            LLVMBuildFRem => "ppppt",
-            LLVMBuildShl => "ppppt",
-            LLVMBuildLShr => "ppppt",
-            LLVMBuildAShr => "ppppt",
-            LLVMBuildAnd => "ppppt",
-            LLVMBuildOr => "ppppt",
-            LLVMBuildXor => "ppppt",
-            LLVMBuildBinOp => "ppippt",
-            LLVMBuildNeg => "pppt",
-            LLVMBuildNSWNeg => "pppt",
-            LLVMBuildNUWNeg => "pppt",
-            LLVMBuildFNeg => "pppt",
-            LLVMBuildNot => "pppt",
+            BuildAdd => "ppppt",
+            BuildNSWAdd => "ppppt",
+            BuildNUWAdd => "ppppt",
+            BuildFAdd => "ppppt",
+            BuildSub => "ppppt",
+            BuildNSWSub => "ppppt",
+            BuildNUWSub => "ppppt",
+            BuildFSub => "ppppt",
+            BuildMul => "ppppt",
+            BuildNSWMul => "ppppt",
+            BuildNUWMul => "ppppt",
+            BuildFMul => "ppppt",
+            BuildUDiv => "ppppt",
+            BuildSDiv => "ppppt",
+            BuildExactSDiv => "ppppt",
+            BuildFDiv => "ppppt",
+            BuildURem => "ppppt",
+            BuildSRem => "ppppt",
+            BuildFRem => "ppppt",
+            BuildShl => "ppppt",
+            BuildLShr => "ppppt",
+            BuildAShr => "ppppt",
+            BuildAnd => "ppppt",
+            BuildOr => "ppppt",
+            BuildXor => "ppppt",
+            BuildBinOp => "ppippt",
+            BuildNeg => "pppt",
+            BuildNSWNeg => "pppt",
+            BuildNUWNeg => "pppt",
+            BuildFNeg => "pppt",
+            BuildNot => "pppt",
 
 #/* Memory */
-            LLVMBuildMalloc => "pppt",
-            LLVMBuildArrayMalloc => "ppppt",
-            LLVMBuildAlloca => "pppt",
-            LLVMBuildArrayAlloca => "ppppt",
-            LLVMBuildFree => "ppp",
-            LLVMBuildLoad => "pppt",
-            LLVMBuildStore => "pppp",
-            LLVMBuildGEP => "ppppit",
-            LLVMBuildInBoundsGEP => "ppppit",
-            LLVMBuildStructGEP => "pppit",
-            LLVMBuildGlobalString => "pptt",
-            LLVMBuildGlobalStringPtr => "pptt",
+            BuildMalloc => "pppt",
+            BuildArrayMalloc => "ppppt",
+            BuildAlloca => "pppt",
+            BuildArrayAlloca => "ppppt",
+            BuildFree => "ppp",
+            BuildLoad => "pppt",
+            BuildStore => "pppp",
+            BuildGEP => "ppppit",
+            BuildInBoundsGEP => "ppppit",
+            BuildStructGEP => "pppit",
+            BuildGlobalString => "pptt",
+            BuildGlobalStringPtr => "pptt",
 
 #/* Casts */
-            LLVMBuildTrunc => "ppppt",
-            LLVMBuildZExt => "ppppt",
-            LLVMBuildSExt => "ppppt",
-            LLVMBuildFPToUI => "ppppt",
-            LLVMBuildFPToSI => "ppppt",
-            LLVMBuildUIToFP => "ppppt",
-            LLVMBuildSIToFP => "ppppt",
-            LLVMBuildFPTrunc => "ppppt",
-            LLVMBuildFPExt => "ppppt",
-            LLVMBuildPtrToInt => "ppppt",
-            LLVMBuildIntToPtr => "ppppt",
-            LLVMBuildBitCast => "ppppt",
-            LLVMBuildZExtOrBitCast => "ppppt",
-            LLVMBuildSExtOrBitCast => "ppppt",
-            LLVMBuildTruncOrBitCast => "ppppt",
-            LLVMBuildCast => "ppppt",
-            LLVMBuildPointerCast => "ppppt",
-            LLVMBuildIntCast => "ppppt",
-            LLVMBuildFPCast => "ppppt",
+            BuildTrunc => "ppppt",
+            BuildZExt => "ppppt",
+            BuildSExt => "ppppt",
+            BuildFPToUI => "ppppt",
+            BuildFPToSI => "ppppt",
+            BuildUIToFP => "ppppt",
+            BuildSIToFP => "ppppt",
+            BuildFPTrunc => "ppppt",
+            BuildFPExt => "ppppt",
+            BuildPtrToInt => "ppppt",
+            BuildIntToPtr => "ppppt",
+            BuildBitCast => "ppppt",
+            BuildZExtOrBitCast => "ppppt",
+            BuildSExtOrBitCast => "ppppt",
+            BuildTruncOrBitCast => "ppppt",
+            BuildCast => "ppppt",
+            BuildPointerCast => "ppppt",
+            BuildIntCast => "ppppt",
+            BuildFPCast => "ppppt",
 
 #/* Comparisons */
-            LLVMBuildICmp => "ppippt",
-            LLVMBuildFCmp => "ppippt",
+            BuildICmp => "ppippt",
+            BuildFCmp => "ppippt",
 
 #/* Miscellaneous instructions */
-            LLVMBuildPhi => "pppt",
-            LLVMBuildCall => "ppppit",
-            LLVMBuildSelect => "pppppt",
-            LLVMBuildVAArg => "ppppt",
-            LLVMBuildExtractElement => "ppppt",
-            LLVMBuildInsertElement => "pppppt",
-            LLVMBuildShuffleVector => "pppppt",
-            LLVMBuildExtractValue => "ppppit",
-            LLVMBuildInsertValue => "ppppit",
+            BuildPhi => "pppt",
+            BuildCall => "ppppit",
+            BuildSelect => "pppppt",
+            BuildVAArg => "ppppt",
+            BuildExtractElement => "ppppt",
+            BuildInsertElement => "pppppt",
+            BuildShuffleVector => "pppppt",
+            BuildExtractValue => "ppppit",
+            BuildInsertValue => "ppppit",
 
-            LLVMBuildIsNull => "pppt",
-            LLVMBuildIsNotNull => "pppt",
-            LLVMBuildPtrDiff => "ppppt",
+            BuildIsNull => "pppt",
+            BuildIsNotNull => "pppt",
+            BuildPtrDiff => "ppppt",
 
 
 #/*===-- Module providers --------------------------------------------------===*/
 
 # Changes the type of M so it can be passed to FunctionPassManagers and the
 # JIT.  They take ModuleProviders for historical reasons.
-            LLVMCreateModuleProviderForExistingModule => "pp",
+            CreateModuleProviderForExistingModule => "pp",
 
 # Destroys the module M.
-            LLVMDisposeModuleProvider => "vp",
+            DisposeModuleProvider => "vp",
 
 
 #/*===-- Memory buffers ----------------------------------------------------===*/
 
-            LLVMCreateMemoryBufferWithContentsOfFile => "itpt", # FIXME
-            LLVMCreateMemoryBufferWithSTDIN => "ipt", # FIXME
-            LLVMDisposeMemoryBuffer => "vp",
+            CreateMemoryBufferWithContentsOfFile => "itpt", # FIXME
+            CreateMemoryBufferWithSTDIN => "ipt", # FIXME
+            DisposeMemoryBuffer => "vp",
 
 
 #/*===-- Pass Managers -----------------------------------------------------===*/
@@ -542,47 +540,47 @@ LLVM_FOR_EACH_VALUE_SUBCLASS(LLVM_DECLARE_VALUE_CAST)
 # Constructs a new whole-module pass pipeline. This type of pipeline is
 # suitable for link-time optimization and whole-module transformations.
 # See llvm::PassManager::PassManager.
-            LLVMCreatePassManager => "p",
+            CreatePassManager => "p",
 
 # Constructs a new function-by-function pass pipeline over the module
 # provider. It does not take ownership of the module provider. This type of
 # pipeline is suitable for code generation and JIT compilation tasks.
 # See llvm::FunctionPassManager::FunctionPassManager. */
-            LLVMCreateFunctionPassManagerForModule => "pp",
+            CreateFunctionPassManagerForModule => "pp",
 
-# Deprecated: Use LLVMCreateFunctionPassManagerForModule instead. */
-#LLVMPassManagerRef LLVMCreateFunctionPassManager(LLVMModuleProviderRef MP);
+# Deprecated: UseCreateFunctionPassManagerForModule instead. */
+#LLVMPassManagerRefCreateFunctionPassManager(LLVMModuleProviderRef MP);
 
 # Initializes, executes on the provided module, and finalizes all of the
 # passes scheduled in the pass manager. Returns 1 if any of the passes
 # modified the module, 0 otherwise. See llvm::PassManager::run(Module&). */
-            LLVMRunPassManager => "Ipp",
+            RunPassManager => "Ipp",
 
 # Initializes all of the function passes scheduled in the function pass
 # manager. Returns 1 if any of the passes modified the module, 0 otherwise.
 # See llvm::FunctionPassManager::doInitialization. */
-            LLVMInitializeFunctionPassManager => "Ip",
+            InitializeFunctionPassManager => "Ip",
 
 # Executes all of the function passes scheduled in the function pass manager
 # on the provided function. Returns 1 if any of the passes modified the
 # function, false otherwise.
 # See llvm::FunctionPassManager::run(Function&). */
-            LLVMRunFunctionPassManager => "Ipp",
+            RunFunctionPassManager => "Ipp",
 
 # Finalizes all of the function passes scheduled in in the function pass
 # manager. Returns 1 if any of the passes modified the module, 0 otherwise.
 # See llvm::FunctionPassManager::doFinalization. */
-            LLVMFinalizeFunctionPassManager => "Ip",
+            FinalizeFunctionPassManager => "Ip",
 
 # Frees the memory of a pass pipeline. For function pipelines, does not free
 # the module provider.
 # See llvm::PassManagerBase::~PassManagerBase. */
-            LLVMDisposePassManager => "vp",
+            DisposePassManager => "vp",
 
         );
 
         for %funcs.kv -> $name, $signature {
-            %F{$name} := pir::dlfunc__ppss($lib, $name, $signature);
+            %F{$name} := pir::dlfunc__ppss($lib, "LLVM" ~ $name, $signature);
         }
     }
 }
