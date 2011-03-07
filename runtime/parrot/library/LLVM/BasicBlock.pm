@@ -1,9 +1,5 @@
-class LLVM::BasicBlock {
-    has $!ref;
-
-    method BUILD($ref) { $!ref := $ref; self };
-
-    method _get_ptr() { $!ref };
+class LLVM::BasicBlock is LLVM::Opaque {
+    method BUILD($ref) { self.wrap($ptr) };
 };
 
 # vim: ft=perl6

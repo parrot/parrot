@@ -46,8 +46,8 @@ ok( 1, "return created");
 $module.dump();
 ok(1, "LLVM::Module dumped");
 
-my $engine := pir::new__psp("LLVM_Engine", $module._get_ptr());
-my $call   := $engine.create($function._get_ptr(), "I");
+my $engine := pir::new__psp("LLVM_Engine", $module.unwrap());
+my $call   := $engine.create($function.unwrap(), "I");
 my $res    := -1;
 $res       := $call();
 ok(1, "Function called");
