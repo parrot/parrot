@@ -41,14 +41,23 @@ information see F<src/pmc.c>.
 
 */
     void class_init() {
+        UNUSED(INTERP);
+        UNUSED(entry);
+
         File_PMC = NULL;
     }
 
     VTABLE void *get_pointer() {
+        UNUSED(INTERP);
+        UNUSED(SELF);
+
         return File_PMC;
     }
 
     VTABLE void set_pointer(void *ptr) {
+        UNUSED(INTERP);
+        UNUSED(SELF);
+
         File_PMC = (PMC *)ptr;
     }
 
