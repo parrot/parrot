@@ -7,3 +7,10 @@
 .include "runtime/parrot/library/LLVM/Function.pir"
 .include "runtime/parrot/library/LLVM/Type.pir"
 .include "runtime/parrot/library/LLVM/Module.pir"
+
+.namespace ['LLVM';'Opaque']
+.sub '' :vtable('get_pointer') :method
+    $P0 = self.'unwrap'()
+    $I0 = get_addr $P0
+    .return ($I0)
+.end
