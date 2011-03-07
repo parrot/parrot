@@ -83,10 +83,20 @@ class LLVM::Builder is LLVM::Opaque {
 #            LLVMBuildMalloc             => "pppt",
 #            LLVMBuildArrayMalloc        => "ppppt",
 #            LLVMBuildAlloca             => "pppt",
+    method alloca($type, $name?) {
+        %LLVM::F<LLVMBuildAlloca>(self, $type, $name // "");
+    }
 #            LLVMBuildArrayAlloca        => "ppppt",
 #            LLVMBuildFree               => "ppp",
 #            LLVMBuildLoad               => "pppt",
+    method load($ptr, $name?) {
+        %LLVM::F<LLVMBuildLoad>(self, $ptr, $name // "");
+    }
 #            LLVMBuildStore              => "pppp",
+    method store($value, $ptr) {
+        %LLVM::F<LLVMBuildStore>(self, $value, $ptr);
+    }
+
 #            LLVMBuildGEP                => "pppp3t", # FIXME It's array here.
 #            LLVMBuildInBoundsGEP        => "pppp3t", # FIXME
 #            LLVMBuildStructGEP          => "ppp3t",
