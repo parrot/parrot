@@ -1,34 +1,30 @@
-class LLVM::Builder {
-    has $!ref;
+class LLVM::Builder is LLVM::Opaque {
 
     multi method BUILD () {
-        $!ref := %LLVM::F<LLVMCreateBuilder>();
-        self;
+        self.wrap( %LLVM::F<LLVMCreateBuilder>() );
     }
 
     multi method BUILD ($context) {
-        $!ref := %LLVM::F<LLVMCreateBuilderInContext>($context);
-        self;
+        self.wrap( %LLVM::F<LLVMCreateBuilderInContext>($context) );
     }
 
     method DESTROY () {
-        %LLVM::F<LLVMDisposeBuilder>($!ref);
-        $!ref := undef;
+        %LLVM::F<LLVMDisposeBuilder>(self.unwrap());
     }
 
 #            LLVMPositionBuilder             => "vppp",
     multi method set_position(LLVM::BasicBlock $bb, $value) {
-        %LLVM::F<LLVMPositionBuilder>($!ref, $bb.unwrap(), $value);
+        %LLVM::F<LLVMPositionBuilder>(self.unwrap(), $bb.unwrap(), $value);
     }
 
 #            LLVMPositionBuilderBefore       => "vpp",
     multi method set_position($value) {
-        %LLVM::F<LLVMPositionBuilderBefore>($!ref, $value);
+        %LLVM::F<LLVMPositionBuilderBefore>(self.unwrap(), $value);
     }
 
 #            LLVMPositionBuilderAtEnd        => "vpp",
     multi method set_position(LLVM::BasicBlock $bb) {
-        %LLVM::F<LLVMPositionBuilderAtEnd>($!ref, $bb.unwrap());
+        %LLVM::F<LLVMPositionBuilderAtEnd>(self.unwrap(), $bb.unwrap());
     }
 
 #            LLVMGetInsertBlock              => "pp",
@@ -40,12 +36,12 @@ class LLVM::Builder {
 #            # Terminators
 #            LLVMBuildRetVoid                => "pp",
     multi method ret() {
-        %LLVM::F<LLVMBuildRetVoid>($!ref);
+        %LLVM::F<LLVMBuildRetVoid>(self.unwrap());
     }
 
 #            LLVMBuildRet                    => "ppp",
     multi method ret($value) {
-        %LLVM::F<LLVMBuildRet>($!ref, $value);
+        %LLVM::F<LLVMBuildRet>(self.unwrap(), $value);
     }
 #            LLVMBuildAggregateRet           => "ppp3",
 #            LLVMBuildBr                     => "ppp",
@@ -95,6 +91,9 @@ class LLVM::Builder {
 #            LLVMBuildInBoundsGEP        => "pppp3t", # FIXME
 #            LLVMBuildStructGEP          => "ppp3t",
 #            LLVMBuildGlobalString       => "pptt",
+    method global_string($value, $name) {
+        %LLVM::F<LLVMBuildGlobalString>(self.unwrap(), $value, $name);
+    }
 #            LLVMBuildGlobalStringPtr    => "pptt",
 
 #            # Casts
@@ -127,7 +126,7 @@ class LLVM::Builder {
 
     method call($func, *@args, :$name?) {
         %LLVM::F<LLVMBuildCall>(
-            $!ref,
+            self.unwrap(),
             $func.unwrap(),
             LLVM::convert_to_struct(@args),
             +@args,
