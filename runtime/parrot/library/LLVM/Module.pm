@@ -23,6 +23,16 @@ class LLVM::Module is LLVM::Opaque {
 
         LLVM::Function.new.BUILD(%LLVM::F<LLVMAddFunction>(self, $name, $type));
     }
+
+#/** See Module::addTypeName. */
+    # LLVMAddTypeName => "Iptp",
+    method add_type_name(Str $name, $type) {
+        %LLVM::F<LLVMAddTypeName>(self, $name, $type);
+    }
+
+    # LLVMDeleteTypeName => "vpt",
+    # LLVMGetTypeByName => "ppt",
+
 };
 
 # vim: ft=perl6
