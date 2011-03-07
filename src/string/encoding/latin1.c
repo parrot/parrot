@@ -47,8 +47,7 @@ static INTVAL latin1_partial_scan(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*bounds);
 
-static void latin1_scan(PARROT_INTERP, ARGMOD(STRING *src))
-        __attribute__nonnull__(1)
+static void latin1_scan(SHIM_INTERP, ARGMOD(STRING *src))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*src);
 
@@ -75,8 +74,7 @@ static STRING* latin1_upcase(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* latin1_upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
-        __attribute__nonnull__(1)
+static STRING* latin1_upcase_first(SHIM_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_latin1_chr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -92,8 +90,7 @@ static STRING* latin1_upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(buf) \
     , PARROT_ASSERT_ARG(bounds))
 #define ASSERT_ARGS_latin1_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
+       PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_latin1_titlecase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -107,8 +104,7 @@ static STRING* latin1_upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_latin1_upcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
+       PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -168,7 +164,7 @@ for fixed encodings.
 */
 
 static void
-latin1_scan(PARROT_INTERP, ARGMOD(STRING *src))
+latin1_scan(SHIM_INTERP, ARGMOD(STRING *src))
 {
     ASSERT_ARGS(latin1_scan)
 
@@ -356,12 +352,12 @@ supports cases.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-latin1_upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
+latin1_upcase_first(SHIM_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(latin1_upcase_first)
     unsigned char *buffer;
     unsigned int   c;
-    STRING        *result = Parrot_str_clone(interp, src);
+    STRING * const result = Parrot_str_clone(interp, src);
 
     if (!result->strlen)
         return result;
