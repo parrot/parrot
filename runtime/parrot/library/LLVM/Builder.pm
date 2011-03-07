@@ -18,7 +18,7 @@ class LLVM::Builder {
 
 #            LLVMPositionBuilder             => "vppp",
     multi method set_position(LLVM::BasicBlock $bb, $value) {
-        %LLVM::F<LLVMPositionBuilder>($!ref, $bb._get_ptr(), $value);
+        %LLVM::F<LLVMPositionBuilder>($!ref, $bb.unwrap(), $value);
     }
 
 #            LLVMPositionBuilderBefore       => "vpp",
@@ -28,7 +28,7 @@ class LLVM::Builder {
 
 #            LLVMPositionBuilderAtEnd        => "vpp",
     multi method set_position(LLVM::BasicBlock $bb) {
-        %LLVM::F<LLVMPositionBuilderAtEnd>($!ref, $bb._get_ptr());
+        %LLVM::F<LLVMPositionBuilderAtEnd>($!ref, $bb.unwrap());
     }
 
 #            LLVMGetInsertBlock              => "pp",
@@ -128,7 +128,7 @@ class LLVM::Builder {
     method call($func, *@args, :$name?) {
         %LLVM::F<LLVMBuildCall>(
             $!ref,
-            $func._get_ptr,
+            $func.unwrap(),
             LLVM::convert_to_struct(@args),
             +@args,
             $name // ""

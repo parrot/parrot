@@ -1,8 +1,6 @@
 class LLVM::Function is LLVM::Opaque {
     our $counter;
 
-    method BUILD($ptr) { self.wrap($ptr) };
-
     method append_basic_block($name?) {
         LLVM::BasicBlock.new.BUILD(
             %LLVM::F<LLVMAppendBasicBlock>($!ptr, $name ?? $name !! "block" ~~ $counter++)
