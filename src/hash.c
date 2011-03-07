@@ -218,8 +218,8 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 
 /*
 
-=item C<size_t Parrot_hash_buffer(const unsigned char *buf, size_t len,
-size_t hashval)>
+=item C<size_t Parrot_hash_buffer(const unsigned char *buf, size_t len, size_t
+hashval)>
 
 Compute the hash of a buffer.
 
