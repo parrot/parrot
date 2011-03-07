@@ -119,7 +119,7 @@ LIB_LOADED:
     #int pcre_copy_substring(const char *subject, int *ovector,
     #        int stringcount, int stringnumber, char *buffer,
     #        int buffersize);
-    dlfunc pcre_function, libpcre, 'pcre_copy_substring', 'itpiibi'
+    dlfunc pcre_function, libpcre, 'pcre_copy_substring', 'itpiipi'
     set_hll_global ['PCRE'; 'NCI'], 'PCRE_copy_substring', pcre_function
 
     # const char *pcre_version(void);
