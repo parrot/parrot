@@ -267,6 +267,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/dumper.pbc \
     $(LIBRARY_DIR)/yaml_dumper.pbc \
     $(LIBRARY_DIR)/YAML/Tiny.pbc \
+    $(LIBRARY_DIR)/LLVM.pbc \
     $(LIBRARY_DIR)/Getopt/Obj.pbc \
     $(LIBRARY_DIR)/HTTP/Message.pbc \
     $(LIBRARY_DIR)/Iter.pbc \
@@ -344,6 +345,7 @@ FLUID_FILES_2 = \
     $(LIBRARY_DIR)/ProfTest/Matcher.pbc \
     $(LIBRARY_DIR)/ProfTest/Want.pbc \
     $(LIBRARY_DIR)/YAML/Tiny.pbc \
+    $(LIBRARY_DIR)/LLVM.pbc \
     runtime/parrot/include/parrotlib.pbc
 
 
