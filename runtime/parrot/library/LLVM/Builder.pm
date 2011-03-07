@@ -84,22 +84,47 @@ class LLVM::Builder is LLVM::Opaque {
 #            LLVMBuildArrayMalloc        => "ppppt",
 #            LLVMBuildAlloca             => "pppt",
     method alloca($type, $name?) {
-        %LLVM::F<LLVMBuildAlloca>(self, $type, $name // "");
+        %LLVM::F<LLVMBuildAlloca>(self, $type, $name);
     }
 #            LLVMBuildArrayAlloca        => "ppppt",
 #            LLVMBuildFree               => "ppp",
 #            LLVMBuildLoad               => "pppt",
     method load($ptr, $name?) {
-        %LLVM::F<LLVMBuildLoad>(self, $ptr, $name // "");
+        %LLVM::F<LLVMBuildLoad>(self, $ptr, $name);
     }
 #            LLVMBuildStore              => "pppp",
     method store($value, $ptr) {
         %LLVM::F<LLVMBuildStore>(self, $value, $ptr);
     }
 
-#            LLVMBuildGEP                => "pppp3t", # FIXME It's array here.
-#            LLVMBuildInBoundsGEP        => "pppp3t", # FIXME
+#            LLVMBuildGEP                => "ppppit",
+    method gep($type, *@indices, :$name?) {
+        pir::say("# { +@indices }");
+        pir::say("# $name");
+        my $args := LLVM::convert_to_struct(@indices);
+        pir::say("# FOO");
+        my $r := %LLVM::F<LLVMBuildGEP>(self, $type, $args, +@indices, $name // "");
+        pir::say("# BANG");
+        $r;
+    }
+
 #            LLVMBuildStructGEP          => "ppp3t",
+#            LLVMBuildInBoundsGEP        => "ppppit",
+    method inbounds_gep($type, *@indices, :$name?) {
+        pir::say("# { +@indices }");
+        pir::say("# $name");
+        my $args := LLVM::convert_to_struct(@indices);
+        pir::say("# FOO");
+        my $r := %LLVM::F<LLVMBuildInBoundsGEP>(self, $type, $args, +@indices, $name // "");
+        pir::say("# BANG");
+        $r;
+    }
+
+#            LLVMBuildStructGEP          => "ppp3t",
+    method struct_gep($ptr, Int $idx, Str $name?) {
+        %LLVM::F<LLVMBuildStructGEP>(self, $ptr, $idx, $name);
+    }
+
 #            LLVMBuildGlobalString       => "pptt",
     method global_string($value, $name) {
         %LLVM::F<LLVMBuildGlobalString>(self, $value, $name);

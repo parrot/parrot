@@ -32,7 +32,6 @@ class LLVM::Module is LLVM::Opaque {
 
     # LLVMDeleteTypeName => "vpt",
     # LLVMGetTypeByName => "ppt",
-
 };
 
 # vim: ft=perl6
