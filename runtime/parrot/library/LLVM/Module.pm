@@ -4,16 +4,13 @@ LLVM Module.
 =end Description
 
 
-class LLVM::Module {
-    has $!ref;
-
+class LLVM::Module is LLVM::Opaque {
     method BUILD($name) {
-        $!ref := %LLVM::F<LLVMModuleCreateWithName>($name);
-        self;
+        self.wrap( %LLVM::F<LLVMModuleCreateWithName>($name) );
     }
 
     method dump() {
-        %LLVM::F<LLVMDumpModule>($!ref);
+        %LLVM::F<LLVMDumpModule>(self.unwrap());
     }
 
     method add_function ($name, $return, *@args, :$va_args?) {
@@ -24,10 +21,8 @@ class LLVM::Module {
             +$va_args,                      # is var args
         );
 
-        LLVM::Function.new.BUILD(%LLVM::F<LLVMAddFunction>($!ref, $name, $type));
+        LLVM::Function.new.BUILD(%LLVM::F<LLVMAddFunction>(self.unwrap(), $name, $type));
     }
-
-    method _get_ptr() { $!ref };
 };
 
 # vim: ft=perl6
