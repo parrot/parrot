@@ -3,12 +3,12 @@ class LLVM::Function is LLVM::Opaque {
 
     method append_basic_block($name?) {
         LLVM::BasicBlock.new.BUILD(
-            %LLVM::F<LLVMAppendBasicBlock>($!ptr, $name ?? $name !! "block" ~~ $counter++)
+            %LLVM::F<AppendBasicBlock>($!ptr, $name ?? $name !! "block" ~~ $counter++)
         );
     }
 
     method set_linkage($linkage) {
-        %LLVM::F<LLVMSetLinkage>($!ptr, $linkage);
+        %LLVM::F<SetLinkage>($!ptr, $linkage);
     }
 };
 

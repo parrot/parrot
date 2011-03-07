@@ -6,28 +6,28 @@ LLVM Module.
 
 class LLVM::Module is LLVM::Opaque {
     method BUILD($name) {
-        self.wrap( %LLVM::F<LLVMModuleCreateWithName>($name) );
+        self.wrap( %LLVM::F<ModuleCreateWithName>($name) );
     }
 
     method dump() {
-        %LLVM::F<LLVMDumpModule>(self);
+        %LLVM::F<DumpModule>(self);
     }
 
     method add_function ($name, $return, *@args, :$va_args?) {
-        my $type := %LLVM::F<LLVMFunctionType>(
+        my $type := %LLVM::F<FunctionType>(
             $return,                        # return
             LLVM::convert_to_struct(@args), # parameters
             +@args,                         # number of parameters
             +$va_args,                      # is var args
         );
 
-        LLVM::Function.new.BUILD(%LLVM::F<LLVMAddFunction>(self, $name, $type));
+        LLVM::Function.new.BUILD(%LLVM::F<AddFunction>(self, $name, $type));
     }
 
 #/** See Module::addTypeName. */
     # LLVMAddTypeName => "Iptp",
     method add_type_name(Str $name, $type) {
-        %LLVM::F<LLVMAddTypeName>(self, $name, $type);
+        %LLVM::F<AddTypeName>(self, $name, $type);
     }
 
     # LLVMDeleteTypeName => "vpt",
