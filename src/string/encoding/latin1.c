@@ -74,7 +74,8 @@ static STRING* latin1_upcase(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* latin1_upcase_first(SHIM_INTERP, ARGIN(const STRING *src))
+static STRING* latin1_upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_latin1_chr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -104,7 +105,8 @@ static STRING* latin1_upcase_first(SHIM_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_latin1_upcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(src))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -352,7 +354,7 @@ supports cases.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-latin1_upcase_first(SHIM_INTERP, ARGIN(const STRING *src))
+latin1_upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(latin1_upcase_first)
     unsigned char *buffer;
