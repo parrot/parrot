@@ -1428,6 +1428,8 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
                 case 'N': flags = PARROT_ARG_FLOATVAL; ++set; break;
                 case 'S': flags = PARROT_ARG_STRING;   ++set; break;
                 case 'P': flags = PARROT_ARG_PMC;      ++set; break;
+                /* Ugly hack to support Object.get_pointer */
+                case 'V': flags = PARROT_ARG_INTVAL;   ++set; break;
                 case ' ': break;
                 default:
                     Parrot_ex_throw_from_c_args(interp, NULL,
