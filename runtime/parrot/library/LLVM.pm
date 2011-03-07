@@ -44,8 +44,8 @@ module LLVM {
             GetGlobalContext => "p",
             ContextDispose => "vp",
 
-            GetMDKindIDInContext => "IptI",
-            GetMDKindID => "ItI",
+            GetMDKindIDInContext => "ipti",
+            GetMDKindID => "iti",
 
 #/*===-- Modules -----------------------------------------------------------===*/
 
@@ -66,7 +66,7 @@ module LLVM {
             SetTarget => "vpt",
 
 #/** See Module::addTypeName. */
-            AddTypeName => "Iptp",
+            AddTypeName => "iptp",
             DeleteTypeName => "vpt",
             GetTypeByName => "ppt",
 
@@ -96,7 +96,7 @@ module LLVM {
             Int32Type => "p",
             Int64Type => "p",
             IntType => "pi",
-            GetIntTypeWidth => "Ip",
+            GetIntTypeWidth => "ip",
 
 #/* Operations on real types */
             FloatTypeInContext => "pp",
@@ -113,22 +113,22 @@ module LLVM {
 
 #/* Operations on function types */
             FunctionType => "pppii",
-            IsFunctionVarArg => "Ip",
+            IsFunctionVarArg => "ip",
             GetReturnType => "pp",
-            CountParamTypes => "Ip",
+            CountParamTypes => "ip",
             GetParamTypes => "vpp",
 
 #/* Operations on struct types */
             StructTypeInContext => "pppii",
             StructType => "ppii",
-            CountStructElementTypes => "Ip",
+            CountStructElementTypes => "ip",
             GetStructElementTypes => "vpp",
-            IsPackedStruct => "Ip",
+            IsPackedStruct => "ip",
 
 #/* Operations on union types */
             UnionTypeInContext => "pppi",
             UnionType => "ppi",
-            CountUnionElementTypes => "Ip",
+            CountUnionElementTypes => "ip",
             GetUnionElementTypes => "vpp",
 
 #/* Operations on array, pointer, and vector types (sequence types) */
@@ -137,9 +137,9 @@ module LLVM {
             VectorType => "ppi",
 
             GetElementType => "pp",
-            GetArrayLength => "Ip",
-            GetPointerAddressSpace => "Ip",
-            GetVectorSize => "Ip",
+            GetArrayLength => "ip",
+            GetPointerAddressSpace => "ip",
+            GetVectorSize => "ip",
 
 #/* Operations on other types */
             VoidTypeInContext => "pp",
@@ -165,7 +165,7 @@ module LLVM {
             SetValueName => "vpt",
             DumpValue => "vp",
             ReplaceAllUsesWith => "vpp",
-            HasMetadata => "Ip",
+            HasMetadata => "ip",
             GetMetadata => "ppi",
             SetMetadata => "vpip",
 
@@ -188,9 +188,9 @@ module LLVM {
             ConstNull => "pp",
             ConstAllOnes => "pp",
             GetUndef => "pp",
-            IsConstant => "Ip",
-            IsNull => "Ip",
-            IsUndef => "Ip",
+            IsConstant => "ip",
+            IsNull => "ip",
+            IsUndef => "ip",
             ConstPointerNull => "pp",
 
 #/* Operations on metadata */
@@ -206,8 +206,8 @@ module LLVM {
             ConstReal => "ppd",
             ConstRealOfString => "ppt",
             ConstRealOfStringAndSize => "ppti",
-            ConstIntGetZExtValue => "Ip",
-            ConstIntGetSExtValue => "Ip",
+            ConstIntGetZExtValue => "ip",
+            ConstIntGetSExtValue => "ip",
 
 
 #/* Operations on composite constants */
@@ -287,14 +287,14 @@ module LLVM {
 
 #/* Operations on global variables, functions, and aliases (globals) */
             GetGlobalParent => "pp",
-            IsDeclaration => "Ip",
-            GetLinkage => "Ip",
+            IsDeclaration => "ip",
+            GetLinkage => "ip",
             SetLinkage => "vpi",
             GetSection => "tp",
             SetSection => "vpt",
-            GetVisibility => "Ip",
+            GetVisibility => "ip",
             SetVisibility => "vpi",
-            GetAlignment => "Ip",
+            GetAlignment => "ip",
             SetAlignment => "vpi",
 
 #/* Operations on global variables */
@@ -308,9 +308,9 @@ module LLVM {
             DeleteGlobal => "vp",
             GetInitializer => "vp",
             SetInitializer => "vpp",
-            IsThreadLocal => "Ip",
+            IsThreadLocal => "ip",
             SetThreadLocal => "vpi",
-            IsGlobalConstant => "Ip",
+            IsGlobalConstant => "ip",
             SetGlobalConstant => "vpi",
 
 #/* Operations on aliases */
@@ -324,17 +324,17 @@ module LLVM {
             GetNextFunction => "pp",
             GetPreviousFunction => "pp",
             DeleteFunction => "vp",
-            GetIntrinsicID => "Ip",
-            GetFunctionCallConv => "Ip",
+            GetIntrinsicID => "ip",
+            GetFunctionCallConv => "ip",
             SetFunctionCallConv => "vpi",
             GetGC => "tp",
             SetGC => "vpt",
             AddFunctionAttr => "vpi",
-            GetFunctionAttr => "Ip",
+            GetFunctionAttr => "ip",
             RemoveFunctionAttr => "vpi",
 
 #/* Operations on parameters */
-            CountParams => "Ip",
+            CountParams => "ip",
             GetParams => "vpp",
             GetParam => "ppi",
             GetParamParent => "pp",
@@ -344,15 +344,15 @@ module LLVM {
             GetPreviousParam => "pp",
             AddAttribute => "vpi",
             RemoveAttribute => "vpi",
-            GetAttribute => "Ip",
+            GetAttribute => "ip",
             SetParamAlignment => "vpi",
 
 #/* Operations on basic blocks */
             BasicBlockAsValue => "pp",
-            ValueIsBasicBlock => "Ip",
+            ValueIsBasicBlock => "ip",
             ValueAsBasicBlock => "pp",
             GetBasicBlockParent => "pp",
-            CountBasicBlocks => "Ip",
+            CountBasicBlocks => "ip",
             GetBasicBlocks => "vpp",
             GetFirstBasicBlock => "pp",
             GetLastBasicBlock => "pp",
@@ -376,18 +376,18 @@ module LLVM {
 
 #/* Operations on call sites */
             SetInstructionCallConv => "vpi",
-            GetInstructionCallConv => "Ip",
+            GetInstructionCallConv => "ip",
             AddInstrAttribute => "vpii",
             RemoveInstrAttribute => "vpii",
             SetInstrParamAlignment => "vpii",
 
 #/* Operations on call instructions (only) */
-            IsTailCall => "Ip",
+            IsTailCall => "ip",
             SetTailCall => "vpi",
 
 #/* Operations on phi nodes */
             AddIncoming => "vpppi",
-            CountIncoming => "Ip",
+            CountIncoming => "ip",
             GetIncomingValue => "ppi",
             GetIncomingBlock => "ppi",
 
@@ -554,23 +554,23 @@ module LLVM {
 # Initializes, executes on the provided module, and finalizes all of the
 # passes scheduled in the pass manager. Returns 1 if any of the passes
 # modified the module, 0 otherwise. See llvm::PassManager::run(Module&). */
-            RunPassManager => "Ipp",
+            RunPassManager => "ipp",
 
 # Initializes all of the function passes scheduled in the function pass
 # manager. Returns 1 if any of the passes modified the module, 0 otherwise.
 # See llvm::FunctionPassManager::doInitialization. */
-            InitializeFunctionPassManager => "Ip",
+            InitializeFunctionPassManager => "ip",
 
 # Executes all of the function passes scheduled in the function pass manager
 # on the provided function. Returns 1 if any of the passes modified the
 # function, false otherwise.
 # See llvm::FunctionPassManager::run(Function&). */
-            RunFunctionPassManager => "Ipp",
+            RunFunctionPassManager => "ipp",
 
 # Finalizes all of the function passes scheduled in in the function pass
 # manager. Returns 1 if any of the passes modified the module, 0 otherwise.
 # See llvm::FunctionPassManager::doFinalization. */
-            FinalizeFunctionPassManager => "Ip",
+            FinalizeFunctionPassManager => "ip",
 
 # Frees the memory of a pass pipeline. For function pipelines, does not free
 # the module provider.
