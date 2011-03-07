@@ -209,6 +209,7 @@ init_world(PARROT_INTERP)
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_DYN_LIBS, pmc);
 
     pmc = Parrot_pmc_new(interp, enum_class_Hash);
+    VTABLE_set_pointer(interp, pmc, Parrot_hash_create(interp, enum_type_PMC, Hash_key_type_PMC));
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS, pmc);
 #if PARROT_HAS_CORE_NCI_THUNKS
     Parrot_nci_load_core_thunks(interp);

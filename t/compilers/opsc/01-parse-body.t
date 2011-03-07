@@ -425,7 +425,7 @@ sub parse_ok($c, $buf, $descriptor) {
 
 sub _parse($c, $buf) {
     my $res := $c.parse($buf, :target<parse>);
-    _dumper($res);
+#    _dumper($res);
     $res;
 }
 

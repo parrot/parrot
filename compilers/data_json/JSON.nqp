@@ -74,6 +74,10 @@ grammar JSON::Grammar is HLL::Grammar {
         'false'
     }
 
+    rule value:sym<null> {
+        'null'
+    }
+
     token string {
         <?["]> <quote_EXPR: ':qq'> 
     }

@@ -218,6 +218,31 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 
 /*
 
+=item C<size_t Parrot_hash_buffer(const unsigned char *buf, size_t len, size_t
+hashval)>
+
+Compute the hash of a buffer.
+
+=cut
+
+*/
+
+PARROT_HOT
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+size_t
+Parrot_hash_buffer(ARGIN_NULLOK(const unsigned char *buf), size_t len, size_t hashval)
+{
+    ASSERT_ARGS(Parrot_hash_buffer)
+    while (len--) {
+        hashval += hashval << 5;
+        hashval += *buf++;
+    }
+    return hashval;
+}
+
+/*
+
 =item C<static size_t key_hash_STRING(PARROT_INTERP, const STRING *s, size_t
 seed)>
 

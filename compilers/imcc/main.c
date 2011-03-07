@@ -1042,7 +1042,6 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
     PackFile_ByteCode * const cs_save = Parrot_pf_get_current_code_segment(interp);
     PackFile_ByteCode        *cs       = NULL;
     struct _imc_info_t       *imc_info = NULL;
-    const char               *ext;
     PIOHANDLE                 fp;
     PMC                      *newcontext;
 

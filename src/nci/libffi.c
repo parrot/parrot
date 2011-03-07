@@ -73,7 +73,7 @@ typedef struct  parrot_var_t {
 PARROT_CANNOT_RETURN_NULL
 static PMC * build_ffi_thunk(PARROT_INTERP,
     SHIM(PMC *user_data),
-    ARGIN(STRING *sig_str))
+    ARGIN(PMC *sig))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -111,7 +111,7 @@ static ffi_type * nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
 
 #define ASSERT_ARGS_build_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(sig_str))
+    , PARROT_ASSERT_ARG(sig))
 #define ASSERT_ARGS_call_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(nci_pmc) \
@@ -187,8 +187,7 @@ init_thunk_pmc(PARROT_INTERP, ARGMOD(ffi_thunk_t *thunk_data))
 
 /*
 
-=item C<static PMC * build_ffi_thunk(PARROT_INTERP, PMC *user_data, STRING
-*sig_str)>
+=item C<static PMC * build_ffi_thunk(PARROT_INTERP, PMC *user_data, PMC *sig)>
 
 Build a C<ManagedStruct>-encapsulated C<ffi_thunk_t> from C<sig_str>.
 Suitable for use as C<IGLOBALS_NCI_FB_CB>.
@@ -199,14 +198,12 @@ Suitable for use as C<IGLOBALS_NCI_FB_CB>.
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(STRING *sig_str))
+build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
 {
     ASSERT_ARGS(build_ffi_thunk)
     ffi_thunk_t *thunk_data = mem_gc_allocate_zeroed_typed(interp, ffi_thunk_t);
     PMC         *thunk      = init_thunk_pmc(interp, thunk_data);
 
-    /* TODO: use sig PMC in fb callback */
-    PMC         *sig        = Parrot_nci_parse_signature(interp, sig_str);
     STRING *pcc_ret_sig, *pcc_params_sig;
     Parrot_nci_sig_to_pcc(interp, sig, &pcc_params_sig, &pcc_ret_sig);
 
