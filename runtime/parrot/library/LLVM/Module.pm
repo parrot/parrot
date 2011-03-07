@@ -31,7 +31,14 @@ class LLVM::Module is LLVM::Opaque {
     }
 
     # LLVMDeleteTypeName => "vpt",
+    method delete_type_name(Str $name) {
+        %LLVM::F<DeleteTypeName>(self, $name);
+    }
+
     # LLVMGetTypeByName => "ppt",
+    method get_type_name(Str $name) {
+        %LLVM::F<GetTypeByName>(self, $name);
+    }
 };
 
 # vim: ft=perl6
