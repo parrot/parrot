@@ -1,10 +1,10 @@
 class LLVM::Builder is LLVM::Opaque {
 
-    multi method BUILD () {
+    multi method new () {
         self.wrap( %LLVM::F<CreateBuilder>() );
     }
 
-    multi method BUILD ($context) {
+    multi method new ($context) {
         self.wrap( %LLVM::F<CreateBuilderInContext>($context) );
     }
 
