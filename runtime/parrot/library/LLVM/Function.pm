@@ -1,8 +1,7 @@
-class LLVM::Function {
+class LLVM::Function is LLVM::Opaque {
     our $counter;
-    has $!ptr;
 
-    method BUILD($ptr) { $!ptr := $ptr; self };
+    method BUILD($ptr) { self.wrap($ptr) };
 
     method append_basic_block($name?) {
         LLVM::BasicBlock.new.BUILD(
@@ -13,8 +12,6 @@ class LLVM::Function {
     method set_linkage($linkage) {
         %LLVM::F<LLVMSetLinkage>($!ptr, $linkage);
     }
-
-    method _get_ptr() { $!ptr };
 };
 
 # vim: ft=perl6
