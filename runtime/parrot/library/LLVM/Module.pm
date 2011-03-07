@@ -5,7 +5,7 @@ LLVM Module.
 
 
 class LLVM::Module is LLVM::Opaque {
-    method BUILD($name) {
+    method new($name) {
         self.wrap( %LLVM::F<ModuleCreateWithName>($name) );
     }
 

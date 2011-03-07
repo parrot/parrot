@@ -9,7 +9,7 @@ Q:PIR {
 };
 pir::loadlib("llvm_engine");
 
-my $module := LLVM::Module.new.BUILD("HELLO");
+my $module := LLVM::Module.new("HELLO");
 ok(pir::defined($module), "LLVM::Module created");
 ok( $module ~~ LLVM::Module, ".. with proper type");
 
