@@ -2,7 +2,6 @@ module LLVM {
     our %F;
 
     sub convert_to_struct(@args) {
-        pir::say("# Got { +@args } args");
         my @init;
         for @args {
             @init.push(-100); # INTVAL. BAD. WE NEED PTR
