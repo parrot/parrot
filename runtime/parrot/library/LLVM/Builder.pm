@@ -49,7 +49,19 @@ class LLVM::Builder is LLVM::Opaque {
     }
 #            LLVMBuildAggregateRet           => "ppp3",
 #            LLVMBuildBr                     => "ppp",
+    method br(LLVM::BasicBlock $to) {
+        LLVM::Value.create(
+            LLVM::call("BuildBr", self, $to);
+        );
+    }
+
 #            LLVMBuildCondBr                 => "ppppp",
+    method cond_br(LLVM::Value $if, LLVM::BasicBlock $then, LLVM::BasicBlock $else) {
+        LLVM::Value::create(
+            LLVM::call("BuildCondBr", self, $if, $then, $else)
+        )
+    }
+
 #            LLVMBuildSwitch                 => "ppppi",
 #            LLVMBuildInvoke                 => "ppppippt",
 #            LLVMBuildUnwind                 => "pp",
@@ -142,7 +154,7 @@ class LLVM::Builder is LLVM::Opaque {
 
 #            # Miscellaneous instructions
 #            LLVMBuildPhi => "pppt",
-#            LLVMBuildCall => "pppp3t", #FIXME
+#            LLVMBuildCall => "pppppt",
 
     method call($func, *@args, :$name?) {
         LLVM::call("BuildCall", 
