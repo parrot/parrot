@@ -58,27 +58,7 @@ class LLVM::Builder is LLVM::Opaque {
 #            # Add a case to the switch instruction */
 #            LLVMAddCase => "vppp",
 
-#            # Arithmetic
-#            LLVMBuildAdd        => "ppppt",
-#            LLVMBuildNSWAdd     => "ppppt",
-#            LLVMBuildFAdd       => "ppppt",
-#            LLVMBuildSub        => "ppppt",
-#            LLVMBuildFSub       => "ppppt",
-#            LLVMBuildMul        => "ppppt",
-#            LLVMBuildFMul       => "ppppt",
-#            LLVMBuildUDiv       => "ppppt",
-#            LLVMBuildSDiv       => "ppppt",
-#            LLVMBuildExactSDiv  => "ppppt",
-#            LLVMBuildFDiv       => "ppppt",
-#            LLVMBuildURem       => "ppppt",
-#            LLVMBuildSRem       => "ppppt",
-#            LLVMBuildFRem       => "ppppt",
-#            LLVMBuildShl        => "ppppt",
-#            LLVMBuildLShr       => "ppppt",
-#            LLVMBuildAShr       => "ppppt",
-#            LLVMBuildAnd        => "ppppt",
-#            LLVMBuildOr         => "ppppt",
-#            LLVMBuildXor        => "ppppt",
+#            # Arithmetic is generated in INIT block.
 
 #            LLVMBuildNeg => "pppt",
 #            LLVMBuildNot => "pppt",
@@ -115,19 +95,18 @@ class LLVM::Builder is LLVM::Opaque {
         );
     }
 
-#            LLVMBuildStructGEP          => "ppp3t",
+#            LLVMBuildStructGEP          => "ppppt",
+    method struct_gep($ptr, Int $idx, Str $name?) {
+        LLVM::Value.create(
+            LLVM::call("BuildStructGEP", self, $ptr, $idx, $name)
+        );
+    }
+
 #            LLVMBuildInBoundsGEP        => "ppppit",
     method inbounds_gep($type, *@indices, :$name?) {
         my $args := LLVM::to_array(@indices);
         LLVM::Value.create(
             LLVM::call("BuildInBoundsGEP", self, $type, $args, +@indices, $name // "")
-        );
-    }
-
-#            LLVMBuildStructGEP          => "ppp3t",
-    method struct_gep($ptr, Int $idx, Str $name?) {
-        LLVM::Value.create(
-            LLVM::call("BuildStructGEP", self, $ptr, $idx, $name)
         );
     }
 
