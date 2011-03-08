@@ -790,6 +790,47 @@ module LLVM {
 
             GetPointerToGlobal => "Vpp",
 
+
+# Transform/IPO.h
+# See llvm::createArgumentPromotionPass function. */
+            AddArgumentPromotionPass => "vp",
+
+# See llvm::createConstantMergePass function. */
+            AddConstantMergePass => "vp",
+
+# See llvm::createDeadArgEliminationPass function. */
+            AddDeadArgEliminationPass => "vp",
+
+# See llvm::createDeadTypeEliminationPass function. */
+            AddDeadTypeEliminationPass => "vp",
+
+# See llvm::createFunctionAttrsPass function. */
+            AddFunctionAttrsPass => "vp",
+
+# See llvm::createFunctionInliningPass function. */
+            AddFunctionInliningPass => "vp",
+
+# See llvm::createGlobalDCEPass function. */
+            AddGlobalDCEPass => "vp",
+
+# See llvm::createGlobalOptimizerPass function. */
+            AddGlobalOptimizerPass => "vp",
+
+# See llvm::createIPConstantPropagationPass function. */
+            AddIPConstantPropagationPass => "vp",
+
+# See llvm::createLowerSetJmpPass function. */
+            AddLowerSetJmpPass => "vp",
+
+# See llvm::createPruneEHPass function. */
+            AddPruneEHPass => "vp",
+
+# See llvm::createStripDeadPrototypesPass function. */
+            AddStripDeadPrototypesPass => "vp",
+
+# See llvm::createStripSymbolsPass function. */
+            AddStripSymbolsPass => "vp",
+
         );
 
         for %funcs.kv -> $name, $signature {
