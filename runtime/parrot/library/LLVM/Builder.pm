@@ -123,25 +123,7 @@ class LLVM::Builder is LLVM::Opaque {
         );
     }
 
-#            # Casts
-#            LLVMBuildTrunc => "ppppt",
-#            LLVMBuildZExt => "ppppt",
-#            LLVMBuildSExt => "ppppt",
-#            LLVMBuildFPToUI => "ppppt",
-#            LLVMBuildFPToSI => "ppppt",
-#            LLVMBuildUIToFP => "ppppt",
-#            LLVMBuildSIToFP => "ppppt",
-#            LLVMBuildFPTrunc => "ppppt",
-#            LLVMBuildFPExt => "ppppt",
-#            LLVMBuildPtrToInt => "ppppt",
-#            LLVMBuildIntToPtr => "ppppt",
-#            LLVMBuildBitCast => "ppppt",
-#            LLVMBuildZExtOrBitCast => "ppppt",
-#            LLVMBuildSExtOrBitCast => "ppppt",
-#            LLVMBuildTruncOrBitCast => "ppppt",
-#            LLVMBuildPointerCast => "ppppt",
-#            LLVMBuildIntCast => "ppppt",
-#            LLVMBuildFPCast => "ppppt",
+            # Casts are generated
 
 #            # Comparisons
 #            LLVMBuildICmp => "pp3ppt",
@@ -185,6 +167,38 @@ INIT {
             method (LLVM::Value $left, LLVM::Value $right, :$name?) {
                 LLVM::Value.create(
                     LLVM::call($call, self, $left, $right, $name)
+                )
+            },
+            to => $WHAT
+        );
+    }
+
+    # Generate casts
+    for hash(
+        Trunc => "trunk",
+        ZExt => "zext",
+        SExt => "sext",
+        FPToUI => "fp_to_ui",
+        FPToSI => "fp_to_si",
+        UIToFP => "ui_to_fp",
+        SIToFP => "si_to_fp",
+        FPTrunc => "fp_trunc",
+        FPExt => "fp_ext",
+        PtrToInt => "ptr_to_int",
+        IntToPtr => "int_to_ptr",
+        BitCast => "bit_cast",
+        ZExtOrBitCast => "zext_or_bit_cast",
+        SExtOrBitCast => "sext_or_bit_cast",
+        TruncOrBitCast => "trunk_or_bit_cast",
+        PointerCast => "pointer_cast",
+        IntCast => "int_cast",
+        FPCast => "fp_cast",
+    ).kv -> $call, $subname {
+        $HOW.add_method(
+            $subname,
+            method (LLVM::Value $left, LLVM::Value $right, :$name?) {
+                LLVM::Value.create(
+                    LLVM::call("LLVMBuild" ~ $call, self, $left, $right, $name)
                 )
             },
             to => $WHAT
