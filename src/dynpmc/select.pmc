@@ -159,7 +159,6 @@ conditions.
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
       GET_ATTR_max_fd(INTERP, SELF, maxid);
       VTABLE_set_pmc_keyed_int(interp, fd_map, fdkey, data);
-      PARROT_GC_WRITE_BARRIER(interp, fd_map);
       if (rwe & SELECT_READ)  { FD_SET(fdkey, &PARROT_SELECT(SELF)->rb_array); }
       if (rwe & SELECT_WRITE) { FD_SET(fdkey, &PARROT_SELECT(SELF)->wb_array); }
       if (rwe & SELECT_ERROR) { FD_SET(fdkey, &PARROT_SELECT(SELF)->eb_array); }
@@ -185,7 +184,6 @@ Removes filehandle from the Select PMC.
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
       GET_ATTR_max_fd(INTERP, SELF, maxid);
       VTABLE_delete_keyed_int(interp, fd_map, fd);
-      PARROT_GC_WRITE_BARRIER(interp, fd_map);
       FD_CLR(fd, &PARROT_SELECT(SELF)->rb_array);
       FD_CLR(fd, &PARROT_SELECT(SELF)->wb_array);
       FD_CLR(fd, &PARROT_SELECT(SELF)->eb_array);
@@ -228,7 +226,6 @@ read before returning.
       for (i=0; i <= maxid; i++) {
         if (FD_ISSET(i, &rdset)) {
           VTABLE_push_pmc(interp, results, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
-          PARROT_GC_WRITE_BARRIER(interp, results);
         }
       }
       RETURN(PMC *results);
@@ -267,7 +264,6 @@ write to before returning.
       for (i=0; i<=maxid; i++) {
         if (FD_ISSET(i, &wbset)) {
           VTABLE_push_pmc(interp, results, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
-          PARROT_GC_WRITE_BARRIER(interp, results);
         }
       }
       RETURN(PMC *results);
@@ -306,7 +302,6 @@ exception state before returning.
       for (i=0; i<=maxid; i++) {
         if (FD_ISSET(i, &ebset)) {
           VTABLE_push_pmc(interp, results, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
-          PARROT_GC_WRITE_BARRIER(interp, results);
         }
       }
       RETURN(PMC *results);
@@ -352,21 +347,17 @@ handled.
       for (i=0; i<=maxid; i++) {
         if (FD_ISSET(i, &rdset)) {
           VTABLE_push_pmc(interp, rresults, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
-          PARROT_GC_WRITE_BARRIER(interp, rresults);
         }
         if (FD_ISSET(i, &wrset)) {
           VTABLE_push_pmc(interp, wresults, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
-          PARROT_GC_WRITE_BARRIER(interp, wresults);
         }
         if (FD_ISSET(i, &erset)) {
           VTABLE_push_pmc(interp, eresults, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
-          PARROT_GC_WRITE_BARRIER(interp, eresults);
         }
       }
       VTABLE_push_pmc(interp, results, rresults);
       VTABLE_push_pmc(interp, results, wresults);
       VTABLE_push_pmc(interp, results, eresults);
-      PARROT_GC_WRITE_BARRIER(interp, results);
       RETURN(PMC *results);
     }
 }
