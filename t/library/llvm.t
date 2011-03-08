@@ -98,7 +98,7 @@ while $i < $last {
 
 # Call print
 my $s := $builder.global_string("*********************\n", "");
-$builder.call($printf, $s);
+$builder.call($function);
 
 # Load arg first
 my $val := $builder.load(@params[0]);
@@ -113,10 +113,36 @@ $builder.ret($val);
 # Dump and execute it
 $module.dump();
 
+
 $call   := $engine.create($f2, "tt");
 $res    := $call("Hello from Parrot!\n");
 is($res, "Hello from Parrot!\n", "Got same string back");
 
+# Let's optimize it.
+my $pass := %LLVM::F<CreatePassManager>();
+ok(1, "Pass Manager created");
+%LLVM::F<AddConstantPropagationPass>($pass);
+ok(1, "AddConstantPropagationPass");
+%LLVM::F<AddInstructionCombiningPass>($pass);
+ok(1, "AddInstructionCombiningPass");
+%LLVM::F<AddPromoteMemoryToRegisterPass>($pass);
+ok(1, "AddPromoteMemoryToRegisterPass");
+%LLVM::F<AddGVNPass>($pass);
+ok(1, "AddGVNPass");
+%LLVM::F<AddCFGSimplificationPass>($pass);
+ok(1, "AddCFGSimplificationPass");
+
+%LLVM::F<AddFunctionInliningPass>($pass);
+ok(1, "AddFunctionInliningPass");
+
+%LLVM::F<RunPassManager>($pass, $module);
+ok(1, "RunPassManager");
+
+$module.dump();
+
+$call   := $engine.create($f2, "tt");
+$res    := $call("Hello from Parrot!\n");
+is($res, "Hello from Parrot!\n", "Got same string back");
 
 
 done_testing();
