@@ -31,7 +31,6 @@ class LLVM::Builder is LLVM::Opaque {
 #            LLVMClearInsertionPosition      => "vp",
 #            LLVMInsertIntoBuilder           => "vpp",
 #            LLVMInsertIntoBuilderWithName   => "vppt",
-#            LLVMDisposeBuilder              => "vp",
 
 #            # Terminators
 #            LLVMBuildRetVoid                => "pp",
@@ -157,7 +156,7 @@ class LLVM::Builder is LLVM::Opaque {
 #            LLVMBuildCall => "pppppt",
 
     method call($func, *@args, :$name?) {
-        LLVM::call("BuildCall", 
+        LLVM::call("BuildCall",
             self,
             $func,
             LLVM::to_array(@args),
