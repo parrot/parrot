@@ -36,12 +36,16 @@ class LLVM::Builder is LLVM::Opaque {
 #            # Terminators
 #            LLVMBuildRetVoid                => "pp",
     multi method ret() {
-        LLVM::call("BuildRetVoid", self);
+        LLVM::Value.create(
+            LLVM::call("BuildRetVoid", self)
+        );
     }
 
 #            LLVMBuildRet                    => "ppp",
     multi method ret($value) {
-        LLVM::call("BuildRet", self, $value);
+        LLVM::Value.create(
+            LLVM::call("BuildRet", self, $value)
+        );
     }
 #            LLVMBuildAggregateRet           => "ppp3",
 #            LLVMBuildBr                     => "ppp",
@@ -84,46 +88,60 @@ class LLVM::Builder is LLVM::Opaque {
 #            LLVMBuildArrayMalloc        => "ppppt",
 #            LLVMBuildAlloca             => "pppt",
     method alloca($type, $name?) {
-        LLVM::call("BuildAlloca", self, $type, $name);
+        LLVM::Value.create(
+            LLVM::call("BuildAlloca", self, $type, $name)
+        );
     }
 #            LLVMBuildArrayAlloca        => "ppppt",
 #            LLVMBuildFree               => "ppp",
 #            LLVMBuildLoad               => "pppt",
     method load($ptr, $name?) {
-        LLVM::call("BuildLoad", self, $ptr, $name);
+        LLVM::Value.create(
+            LLVM::call("BuildLoad", self, $ptr, $name)
+        );
     }
 #            LLVMBuildStore              => "pppp",
     method store($value, $ptr) {
-        LLVM::call("BuildStore", self, $value, $ptr);
+        LLVM::Value.create(
+            LLVM::call("BuildStore", self, $value, $ptr)
+        );
     }
 
 #            LLVMBuildGEP                => "ppppit",
     method gep($type, *@indices, :$name?) {
         my $args := LLVM::to_array(@indices);
-        my $r := LLVM::call("BuildGEP", self, $type, $args, +@indices, $name // "");
-        $r;
+        LLVM::Value.create(
+            LLVM::call("BuildGEP", self, $type, $args, +@indices, $name // "")
+        );
     }
 
 #            LLVMBuildStructGEP          => "ppp3t",
 #            LLVMBuildInBoundsGEP        => "ppppit",
     method inbounds_gep($type, *@indices, :$name?) {
         my $args := LLVM::to_array(@indices);
-        my $r := LLVM::call("BuildInBoundsGEP", self, $type, $args, +@indices, $name // "");
-        $r;
+        LLVM::Value.create(
+            LLVM::call("BuildInBoundsGEP", self, $type, $args, +@indices, $name // "")
+        );
     }
 
 #            LLVMBuildStructGEP          => "ppp3t",
     method struct_gep($ptr, Int $idx, Str $name?) {
-        LLVM::call("BuildStructGEP", self, $ptr, $idx, $name);
+        LLVM::Value.create(
+            LLVM::call("BuildStructGEP", self, $ptr, $idx, $name)
+        );
     }
 
 #            LLVMBuildGlobalString       => "pptt",
     method global_string($value, $name) {
-        LLVM::call("BuildGlobalString", self, $value, $name);
+        LLVM::Value.create(
+            LLVM::call("BuildGlobalString", self, $value, $name)
+        );
     }
 #            LLVMBuildGlobalStringPtr    => "pptt",
     method global_string_ptr($value, $name) {
-        LLVM::call("BuildGlobalStringPtr", self, $value, $name);
+        LLVM::Value.create(
+            LLVM::call("BuildGlobalStringPtr", self, $value, $name)
+        );
     }
 
 #            # Casts
