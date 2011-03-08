@@ -77,6 +77,29 @@ typedef enum {
 
 =begin
 typedef enum {
+  LLVMRealPredicateFalse, /**< Always false (always folded) */
+  LLVMRealOEQ,            /**< True if ordered and equal */
+  LLVMRealOGT,            /**< True if ordered and greater than */
+  LLVMRealOGE,            /**< True if ordered and greater than or equal */
+  LLVMRealOLT,            /**< True if ordered and less than */
+  LLVMRealOLE,            /**< True if ordered and less than or equal */
+  LLVMRealONE,            /**< True if ordered and operands are unequal */
+  LLVMRealORD,            /**< True if ordered (no nans) */
+  LLVMRealUNO,            /**< True if unordered: isnan(X) | isnan(Y) */
+  LLVMRealUEQ,            /**< True if unordered or equal */
+  LLVMRealUGT,            /**< True if unordered or greater than */
+  LLVMRealUGE,            /**< True if unordered, greater than, or equal */
+  LLVMRealULT,            /**< True if unordered or less than */
+  LLVMRealULE,            /**< True if unordered, less than, or equal */
+  LLVMRealUNE,            /**< True if unordered or not equal */
+  LLVMRealPredicateTrue   /**< Always true (always folded) */
+} LLVMRealPredicate;
+=end
+        generate_enum_class("LLVM::REAL_PREDICATE", 0, <FALSE OEQ OGT OGE OLT OLE ONE ORD UNO UEQ UGT UGE ULT ULE UNE TRUE>);
+
+
+=begin
+typedef enum {
   LLVMAbortProcessAction, /* verifier will print to stderr and abort() */
   LLVMPrintMessageAction, /* verifier will print to stderr and return 1 */
   LLVMReturnStatusAction  /* verifier will just return 1 */
