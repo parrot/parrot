@@ -52,7 +52,7 @@ $module.dump();
 ok(1, "LLVM::Module dumped");
 
 my $engine := pir::new__psp("LLVM_Engine", $module);
-my $call   := $engine.create($function, "i");
+my $call   := $engine.create_call($function, "i");
 my $res    := -1;
 $res       := $call();
 ok(1, "Function called");
@@ -118,7 +118,7 @@ $module.verify(1) || pir::die("oops");
 $module.dump();
 
 
-$call   := $engine.create($f2, "tt");
+$call   := $engine.create_call($f2, "tt");
 $res    := $call("Hello from Parrot!\n");
 is($res, "Hello from Parrot!\n", "Got same string back");
 
@@ -131,9 +131,9 @@ ok(1, "RunPassManager");
 
 $module.dump();
 
-$call   := $engine.create($f2, "tt");
+$call   := $engine.create_call($f2, "tt");
 $res    := $call("Hello from Parrot!\n");
-is($res, "Hello from Parrot!\n", "Got same string back");
+is($res, "Hello from Parrot!\n", "Got same string back in optimized build");
 
 
 done_testing();
