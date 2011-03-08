@@ -267,7 +267,7 @@ encoding_index(PARROT_INTERP, ARGIN(const STRING *src),
 *search, INTVAL offset)>
 
 Finds the last index of substring C<search_string> in STRING C<src>,
-starting from C<offset>. Not implemented.
+starting from C<offset>.
 
 =cut
 
