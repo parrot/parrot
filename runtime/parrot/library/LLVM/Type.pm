@@ -24,6 +24,9 @@ class LLVM::Type is LLVM::Opaque {
     sub void() { LLVM::Type.create(LLVM::call("VoidType", )) };
     sub label() { LLVM::Type.create(LLVM::call("LabelType", )) };
     sub opaque() { LLVM::Type.create(LLVM::call("OpaqueType", )) };
+
+    # Shortcut for i8*
+    sub cstring() { pointer(int8()); }
 };
 
 # vim: ft=perl6
