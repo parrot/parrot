@@ -580,6 +580,216 @@ module LLVM {
 # See llvm::PassManagerBase::~PassManagerBase. */
             DisposePassManager => "vp",
 
+##### Transform/Scalar.h
+# See llvm::createAggressiveDCEPass function.
+            AddAggressiveDCEPass => "vp",
+
+# See llvm::createCFGSimplificationPass function. */
+            AddCFGSimplificationPass => "vp",
+
+# See llvm::createDeadStoreEliminationPass function. */
+            AddDeadStoreEliminationPass => "vp",
+
+# See llvm::createGVNPass function. */
+            AddGVNPass => "vp",
+
+# See llvm::createIndVarSimplifyPass function. */
+            AddIndVarSimplifyPass => "vp",
+
+# See llvm::createInstructionCombiningPass function. */
+            AddInstructionCombiningPass => "vp",
+
+# See llvm::createJumpThreadingPass function. */
+            AddJumpThreadingPass => "vp",
+
+# See llvm::createLICMPass function. */
+            AddLICMPass => "vp",
+
+# See llvm::createLoopDeletionPass function. */
+            AddLoopDeletionPass => "vp",
+
+# See llvm::createLoopIndexSplitPass function. */
+            AddLoopIndexSplitPass => "vp",
+
+# See llvm::createLoopRotatePass function. */
+            AddLoopRotatePass => "vp",
+
+# See llvm::createLoopUnrollPass function. */
+            AddLoopUnrollPass => "vp",
+
+# See llvm::createLoopUnswitchPass function. */
+            AddLoopUnswitchPass => "vp",
+
+# See llvm::createMemCpyOptPass function. */
+            AddMemCpyOptPass => "vp",
+
+# See llvm::createPromoteMemoryToRegisterPass function. */
+            AddPromoteMemoryToRegisterPass => "vp",
+
+# See llvm::createReassociatePass function. */
+            AddReassociatePass => "vp",
+
+# See llvm::createSCCPPass function. */
+            AddSCCPPass => "vp",
+
+# See llvm::createScalarReplAggregatesPass function. */
+            AddScalarReplAggregatesPass => "vp",
+
+# See llvm::createSimplifyLibCallsPass function. */
+            AddSimplifyLibCallsPass => "vp",
+
+# See llvm::createTailCallEliminationPass function. */
+            AddTailCallEliminationPass => "vp",
+
+# See llvm::createConstantPropagationPass function. */
+            AddConstantPropagationPass => "vp",
+
+# See llvm::demotePromoteMemoryToRegisterPass function. */
+            AddDemoteMemoryToRegisterPass => "vp",
+
+##### Target.h
+#/*===-- Target Data -------------------------------------------------------===*/
+
+# Creates target data from a target layout string.
+# See the constructor llvm::TargetData::TargetData. */
+            CreateTargetData => "pt",
+
+# Adds target data information to a pass manager. This does not take ownership
+# of the target data.
+# See the method llvm::PassManagerBase::add. */
+            AddTargetData => "vpp",
+
+# Converts target data to a target layout string. The string must be disposed
+# with LLVMDisposeMessage.
+# See the constructor llvm::TargetData::TargetData. */
+            CopyStringRepOfTargetData => "tp",
+
+# Returns the byte order of a target, either LLVMBigEndian or
+# LLVMLittleEndian.
+# See the method llvm::TargetData::isLittleEndian. */
+            ByteOrder => "ip",
+
+# Returns the pointer size in bytes for a target.
+# See the method llvm::TargetData::getPointerSize. */
+            PointerSize => "ip",
+
+# Returns the integer type that is the same size as a pointer on a target.
+# See the method llvm::TargetData::getIntPtrType. */
+            IntPtrType => "pp",
+
+# Computes the size of a type in bytes for a target.
+# See the method llvm::TargetData::getTypeSizeInBits. */
+            SizeOfTypeInBits => "lpp", # FIXME
+
+# Computes the storage size of a type in bytes for a target.
+# See the method llvm::TargetData::getTypeStoreSize. */
+            StoreSizeOfType => "lpp", # FIXME
+
+# Computes the ABI size of a type in bytes for a target.
+# See the method llvm::TargetData::getTypeAllocSize. */
+            ABISizeOfType => "lpp", # FIXME
+
+# Computes the ABI alignment of a type in bytes for a target.
+# See the method llvm::TargetData::getTypeABISize. */
+            ABIAlignmentOfType => "ipp",
+
+# Computes the call frame alignment of a type in bytes for a target.
+# See the method llvm::TargetData::getTypeABISize. */
+            CallFrameAlignmentOfType => "ipp",
+
+# Computes the preferred alignment of a type in bytes for a target.
+# See the method llvm::TargetData::getTypeABISize. */
+            PreferredAlignmentOfType => "ipp",
+
+# Computes the preferred alignment of a global variable in bytes for a target.
+# See the method llvm::TargetData::getPreferredAlignment. */
+            PreferredAlignmentOfGlobal => "ipp",
+
+# Computes the structure element that contains the byte offset for a target.
+# See the method llvm::StructLayout::getElementContainingOffset. */
+            ElementAtOffset => "ippl", # FIXME
+
+# Computes the byte offset of the indexed struct element for a target.
+# See the method llvm::StructLayout::getElementContainingOffset. */
+            OffsetOfElement => "lppi", # FIXME
+
+# Struct layouts are speculatively cached. If a TargetDataRef is alive when
+# types are being refined and removed, this method must be called whenever a
+# struct type is removed to avoid a dangling pointer in this cache.
+# See the method llvm::TargetData::InvalidateStructLayoutInfo. */
+            InvalidateStructLayout => "vpp",
+
+# Deallocates a TargetData.
+# See the destructor llvm::TargetData::~TargetData. */
+            DisposeTargetData => "vp",
+
+
+# ExecutionEngine.h
+            LinkInJIT => "v",
+            LinkInInterpreter => "v",
+
+            CreateGenericValueOfInt => "ppli", # FIXME
+
+            CreateGenericValueOfPointer => "pV",
+
+            CreateGenericValueOfFloat => "ppd",
+
+            GenericValueIntWidth => "ip",
+
+            GenericValueToInt => "lpi", # FIXME
+
+            GenericValueToPointer => "Vp",
+
+            GenericValueToFloat => "dpp",
+
+            DisposeGenericValue => "vp",
+
+#/*===-- Operations on execution engines -----------------------------------===*/
+
+#LLVMBool LLVMCreateExecutionEngineForModule(LLVMExecutionEngineRef *OutEE,
+#                                            LLVMModuleRef M,
+#                                            char **OutError);
+
+#LLVMBool LLVMCreateInterpreterForModule(LLVMExecutionEngineRef *OutInterp,
+#                                        LLVMModuleRef M,
+#                                        char **OutError);
+
+#LLVMBool LLVMCreateJITCompilerForModule(LLVMExecutionEngineRef *OutJIT,
+#                                        LLVMModuleRef M,
+#                                        unsigned OptLevel,
+#                                        char **OutError);
+
+
+            DisposeExecutionEngine => "vp",
+
+            RunStaticConstructors => "vp",
+
+            RunStaticDestructors => "vp",
+
+#int LLVMRunFunctionAsMain(LLVMExecutionEngineRef EE, LLVMValueRef F,
+#                          unsigned ArgC, const char * const *ArgV,
+#                          const char * const *EnvP);
+
+#LLVMGenericValueRef LLVMRunFunction(LLVMExecutionEngineRef EE, LLVMValueRef F,
+#                                    unsigned NumArgs,
+#                                    LLVMGenericValueRef *Args);
+
+            FreeMachineCodeForFunction => "vpp",
+
+            AddModule => "vpp",
+
+#LLVMBool LLVMRemoveModule(LLVMExecutionEngineRef EE, LLVMModuleRef M,
+#                          LLVMModuleRef *OutMod, char **OutError);
+
+#LLVMBool LLVMFindFunction(LLVMExecutionEngineRef EE, const char *Name,
+#                          LLVMValueRef *OutFn);
+
+            GetExecutionEngineTargetData => "pp",
+
+            AddGlobalMapping => "vppV",
+
+            GetPointerToGlobal => "Vpp",
+
         );
 
         for %funcs.kv -> $name, $signature {
