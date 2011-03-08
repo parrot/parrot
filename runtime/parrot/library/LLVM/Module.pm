@@ -5,8 +5,8 @@ LLVM Module.
 
 
 class LLVM::Module is LLVM::Opaque {
-    method new($name) {
-        self.wrap( %LLVM::F<ModuleCreateWithName>($name) );
+    multi method create($name) {
+        self.new.wrap( %LLVM::F<ModuleCreateWithName>($name) );
     }
 
     method dump() {
@@ -21,7 +21,7 @@ class LLVM::Module is LLVM::Opaque {
             +$va_args,                      # is var args
         );
 
-        LLVM::Function.new.BUILD(%LLVM::F<AddFunction>(self, $name, $type));
+        LLVM::Function.create(%LLVM::F<AddFunction>(self, $name, $type));
     }
 
 #/** See Module::addTypeName. */

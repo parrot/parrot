@@ -1,12 +1,12 @@
 class LLVM::Function is LLVM::Opaque {
     method entry_block() {
-        LLVM::BasicBlock.new.BUILD(
+        LLVM::BasicBlock.create(
             %LLVM::F<GetEntryBasicBlock>(self)
         );
     }
 
     method append_basic_block($name?) {
-        LLVM::BasicBlock.new.BUILD(
+        LLVM::BasicBlock.create(
             %LLVM::F<AppendBasicBlock>(self, $name // "")
         );
     }
