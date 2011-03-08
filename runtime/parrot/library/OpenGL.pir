@@ -199,14 +199,14 @@ Create NCI wrappers for all GL, GLU, and GLUT functions
     glut_funcs   = _glut_func_list()
     glutcb_funcs = _glutcb_func_list()
 
-    _wrap_nci_list(namespace, libgl,     gl_funcs)
-    _wrap_nci_list(namespace, libglu,    glu_funcs)
-    _wrap_nci_list(namespace, libglut,   glut_funcs)
-    _wrap_nci_list(namespace, libglutcb, glutcb_funcs)
+    _wrap_nci_list(namespace, libgl,     gl_funcs,     0)
+    _wrap_nci_list(namespace, libglu,    glu_funcs,    0)
+    _wrap_nci_list(namespace, libglut,   glut_funcs,   0)
+    _wrap_nci_list(namespace, libglutcb, glutcb_funcs, 1)
 .end
 
 
-=item _wrap_nci_list(pmc namespace, pmc library, pmc nci_list)
+=item _wrap_nci_list(pmc namespace, pmc library, pmc nci_list, int first_arg_interp)
 
 Create NCI wrappers for every C<library> entry point in C<nci_list>,
 and store the results in C<namespace> .  The list should consist of
@@ -218,6 +218,7 @@ alternating function names and Parrot NCI signatures.
     .param pmc namespace
     .param pmc library
     .param pmc nci_list
+    .param int first_arg_interp
 
     .local pmc namespace_key
     namespace_key = namespace.'get_name'()
@@ -232,10 +233,27 @@ alternating function names and Parrot NCI signatures.
     func_name = shift list_iter
     signature = shift list_iter
     function  = dlfunc library, func_name, signature
+    unless first_arg_interp goto done_interp_wrap
+        .const 'Sub' $P0 = '_call_with_interp'
+        $P0 = clone $P0
+        $P0(function)
+        function = $P0
+    done_interp_wrap:
     set_root_global namespace_key, func_name, function
     goto list_loop
 
   done:
+.end
+
+.sub _call_with_interp :anon
+    .param pmc func
+    $P0 = getinterp
+    .yield ()
+  call:
+    .param pmc args :slurpy
+    func($P0, args :flat)
+    .yield ()
+    goto call
 .end
 
 
