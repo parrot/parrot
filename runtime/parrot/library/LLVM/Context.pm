@@ -1,7 +1,8 @@
 class LLVM::Context is LLVM::Opaque {
     multi method create() {
-        self.wrap(LLVM::call("ContextCreate", ));
+        LLVM::Context.new.wrap(LLVM::call("ContextCreate"));
     }
+
     multi method create($ptr) { self.wrap($ptr) };
 
     method DESTROY() {
@@ -9,7 +10,7 @@ class LLVM::Context is LLVM::Opaque {
     }
 
     sub global() {
-        LLVM::Context.create(LLVM::call("GetGlobalContext", ));
+        LLVM::Context.new.wrap(LLVM::call("GetGlobalContext"));
     }
 
     method int1() { LLVM::call("Int1TypeInContext", self) }
