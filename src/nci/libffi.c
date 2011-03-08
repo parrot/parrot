@@ -265,7 +265,6 @@ nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
     ASSERT_ARGS(nci_to_ffi_type)
     switch (nci_t) {
       case enum_nci_sig_void:   return &ffi_type_void;
-      case enum_nci_sig_null:   return &ffi_type_pointer;
       case enum_nci_sig_interp: return &ffi_type_pointer;
 
       case enum_nci_sig_float:  return &ffi_type_float;

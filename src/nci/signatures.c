@@ -55,10 +55,6 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
         PARROT_ASSERT(c == (char)c);
 
         switch ((char)c) {
-          case '0':    /* null ptr or such - doesn't consume a reg */
-            e = enum_nci_sig_null;
-            break;
-
           case 'f':
             e = enum_nci_sig_float;
             break;
@@ -185,7 +181,6 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
             if (j == 0)
                 sig_buf[j++] = '\0';
             break;
-          case enum_nci_sig_null:
           case enum_nci_sig_interp:
             break;
           case enum_nci_sig_float:

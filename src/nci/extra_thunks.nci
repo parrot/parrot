@@ -37,7 +37,6 @@
 # v - void
 
 # special stuff
-# 0 - insert a NULL (pointer) - doesn't consume a register
 # J - Parrot_Interp param
 
 # callback stuff
