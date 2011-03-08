@@ -9,6 +9,10 @@ class LLVM::Module is LLVM::Opaque {
         self.new.wrap( %LLVM::F<ModuleCreateWithName>($name) );
     }
 
+    method verify($action?) {
+        %LLVM::F<VerifyModule>(self, $action // 2, "");
+    }
+
     method dump() {
         %LLVM::F<DumpModule>(self);
     }
