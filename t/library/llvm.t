@@ -42,6 +42,14 @@ ok( 1, "Call created with args");
 
 my $answer := LLVM::Constant::integer(42);
 ok( 1, "Constant created");
+
+# Simple math
+$answer := $builder.add(
+    LLVM::Constant::integer(40),
+    LLVM::Constant::integer(2)
+);
+ok( 1, "Simple add created");
+
 $builder.ret($answer);
 ok( 1, "return created");
 
