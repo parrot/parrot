@@ -99,7 +99,7 @@ while $i < $last {
 }
 
 # Call print
-my $s := $builder.global_string("*********************\n", "");
+my $s := $builder.global_string_ptr("*********************\n", "");
 $builder.call($function);
 
 # Load arg first
@@ -111,6 +111,8 @@ $builder.call($printf, $s);
 
 # Return same shit from function
 $builder.ret($val);
+
+$module.verify(1) || pir::die("oops");
 
 # Dump and execute it
 $module.dump();
