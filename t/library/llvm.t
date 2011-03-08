@@ -97,10 +97,15 @@ while $i < $last {
 }
 
 # Call print
+my $s := $builder.global_string("*********************\n", "");
+$builder.call($printf, $s);
+
 # Load arg first
 my $val := $builder.load(@params[0]);
 ok( pir::defined($val), "Value loaded");
 $builder.call($printf, $val);
+
+$builder.call($printf, $s);
 
 # Return same shit from function
 $builder.ret($val);
