@@ -196,9 +196,9 @@ INIT {
     ).kv -> $call, $subname {
         $HOW.add_method(
             $subname,
-            method (LLVM::Value $left, LLVM::Value $right, :$name?) {
+            method (LLVM::Value $value, LLVM::Type $type, :$name?) {
                 LLVM::Value.create(
-                    LLVM::call("LLVMBuild" ~ $call, self, $left, $right, $name)
+                    LLVM::call("LLVMBuild" ~ $call, self, $value, $type, $name)
                 )
             },
             to => $WHAT
