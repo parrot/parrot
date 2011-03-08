@@ -10,6 +10,7 @@ class LLVM::Builder is LLVM::Opaque {
 
     method DESTROY () {
         LLVM::call("DisposeBuilder", self);
+        self.wrap(undef);
     }
 
 #            LLVMPositionBuilder             => "vppp",
