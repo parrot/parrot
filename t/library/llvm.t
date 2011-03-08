@@ -53,7 +53,7 @@ ok( 1, "Simple add created");
 $builder.ret($answer);
 ok( 1, "return created");
 
-ok( $module.verify(1), "Module verified");
+ok( $module.verify, "Module verified");
 
 # This will dump to stderr.
 $module.dump();
@@ -120,7 +120,7 @@ $builder.call($printf, $s);
 # Return same shit from function
 $builder.ret($val);
 
-$module.verify(1) || pir::die("oops");
+$module.verify(LLVM::VERIFYER_FAILURE_ACTION.PRINT_MESSAGE) || pir::die("oops");
 
 # Dump and execute it
 $module.dump();
