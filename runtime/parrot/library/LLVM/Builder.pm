@@ -193,6 +193,26 @@ class LLVM::Builder is LLVM::Opaque {
 #            LLVMBuildIsNotNull => "pppt",
 #            LLVMBuildPtrDiff => "ppppt",
 
+INIT {
+    my $HOW  := LLVM::Builder.HOW;
+    my $WHAT := LLVM::Builder.WHAT;
+
+    # Generate binary ops
+    for <Add NSWAdd FAdd Sub FSub Mul FMul UDiv SDiv ExactSDiv FDiv URem SRem FRem Shl LShr AShr And Or Xor> -> $name {
+        my $call    := "Build" ~ $name;
+        my $subname := pir::downcase($name);
+        $HOW.add_method(
+            $subname,
+            method (LLVM::Value $left, LLVM::Value $right, :$name?) {
+                LLVM::Value.create(
+                    LLVM::call($call, self, $left, $right, $name)
+                )
+            },
+            to => $WHAT
+        );
+    }
+}
+
 };
 
 # vim: ft=perl6
