@@ -1,4 +1,4 @@
-class LLVM::Function is LLVM::Opaque {
+class LLVM::Function is LLVM::Value {
     method entry_block() {
         LLVM::BasicBlock.create(
             LLVM::call("GetEntryBasicBlock", self)
