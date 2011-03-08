@@ -21,7 +21,7 @@ class LLVM::PassManager is LLVM::Opaque {
     >;
 
     method create(:$optimize?) {
-        my $res := self.new.wrap(%LLVM::F<CreatePassManager>());
+        my $res := self.new.wrap(LLVM::call("CreatePassManager", ));
 
         if $optimize {
             $res.add($_) for @DEFAULT_OPTIMIZATIONS;
@@ -31,7 +31,7 @@ class LLVM::PassManager is LLVM::Opaque {
     }
 
     method DESTROY() {
-        %LLVM::F<DisposePassManager>(self);
+        LLVM::call("DisposePassManager", self);
     }
 
     method add(Str $name) {
@@ -41,7 +41,7 @@ class LLVM::PassManager is LLVM::Opaque {
     }
 
     method run(LLVM::Module $module) {
-        %LLVM::F<RunPassManager>(self, $module);
+        LLVM::call("RunPassManager", self, $module);
     }
 }
 

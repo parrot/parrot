@@ -1,23 +1,23 @@
 class LLVM::Type is LLVM::Opaque {
 
-    multi sub int1() { %LLVM::F<Int1Type>() }
-    multi sub int8() { %LLVM::F<Int8Type>() }
-    multi sub int16() { %LLVM::F<Int16Type>() }
-    multi sub int32() { %LLVM::F<Int32Type>() }
-    multi sub int64() { %LLVM::F<Int64Type>() }
-    multi sub int($radix) { %LLVM::F<IntType>($radix) }
+    multi sub int1() { LLVM::call("Int1Type", ) }
+    multi sub int8() { LLVM::call("Int8Type", ) }
+    multi sub int16() { LLVM::call("Int16Type", ) }
+    multi sub int32() { LLVM::call("Int32Type", ) }
+    multi sub int64() { LLVM::call("Int64Type", ) }
+    multi sub int($radix) { LLVM::call("IntType", $radix) }
 
     sub struct(*@parts, :$packed?) {
-        %LLVM::F<StructType>(LLVM::to_array(@parts), +@parts, $packed);
+        LLVM::call("StructType", LLVM::to_array(@parts), +@parts, $packed);
     }
 
     sub pointer($type, :$address_space?) {
-        %LLVM::F<PointerType>($type, $address_space);
+        LLVM::call("PointerType", $type, $address_space);
     }
 
-    sub void() { %LLVM::F<VoidType>() };
-    sub label() { %LLVM::F<LabelType>() };
-    sub opaque() { %LLVM::F<OpaqueType>() };
+    sub void() { LLVM::call("VoidType", ) };
+    sub label() { LLVM::call("LabelType", ) };
+    sub opaque() { LLVM::call("OpaqueType", ) };
 };
 
 # vim: ft=perl6
