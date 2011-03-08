@@ -43,10 +43,21 @@ module LLVM {
         pir::load_bytecode("nqp-setting.pbc");
 
         #### Bind enums
-        # For enums we generate new class and bunch of methods.
 
-        my $count := 0;
-        my $meta  := P6metaclass;
+        # For enums we generate new class and bunch of methods.
+        sub generate_enum_class($name, $from, @values, &inc?) {
+            my $enum  := P6metaclass.new_class($name);
+            my $how   := $enum.HOW;
+            for @values {
+                my $c := +$from; # Force clone of $count.
+                $how.add_method(
+                    $_,
+                    method () { $c },
+                    to => $enum,
+                );
+                $from := &inc ?? &inc($from) !! $from++;
+            }
+        };
 
 =begin
 typedef enum {
@@ -62,6 +73,7 @@ typedef enum {
   LLVMIntSLE      /**< signed less or equal */
 } LLVMIntPredicate;
 =end
+        generate_enum_class("LLVM::INT_PREDICATE", 32, <EQ NE UGT UGE ULT ULE SGT SGE SLT SLE>);
 
 =begin
 typedef enum {
@@ -70,19 +82,7 @@ typedef enum {
   LLVMReturnStatusAction  /* verifier will just return 1 */
 } LLVMVerifierFailureAction;
 =end
-
-        $count    := 0;
-        my $enum  := $meta.new_class("LLVM::VERIFYER_FAILURE_ACTION");
-        my $how   := $enum.HOW;
-        for <ABORT_PROCESSING PRINT_MESSAGE RETURN_STATUS> {
-            my $c := +$count; # Force clone of $count.
-            $how.add_method(
-                $_,
-                method () { $c },
-                to => $enum,
-            );
-            $count++;
-        }
+        generate_enum_class("LLVM::VERIFYER_FAILURE_ACTION", 0, <ABORT_PROCESSING PRINT_MESSAGE RETURN_STATUS>);
 
 
             #### Bind functions
