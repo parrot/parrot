@@ -126,8 +126,19 @@ class LLVM::Builder is LLVM::Opaque {
             # Casts are generated
 
 #            # Comparisons
-#            LLVMBuildICmp => "pp3ppt",
-#            LLVMBuildFCmp => "pp3ppt",
+#            LLVMBuildICmp => "ppippt",
+    method icmp($op, LLVM::Value $left, LLVM::Value $right, :$name?) {
+        LLVM::Value.create(
+            LLVM::call("BuildICmp", $op, $left, $right, $name)
+        )
+    }
+
+#            LLVMBuildFCmp => "ppippt",
+    method fcmp($op, LLVM::Value $left, LLVM::Value $right, :$name?) {
+        LLVM::Value.create(
+            LLVM::call("BuildFCmp", $op, $left, $right, $name)
+        )
+    }
 
 #            # Miscellaneous instructions
 #            LLVMBuildPhi => "pppt",
