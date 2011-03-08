@@ -34,7 +34,7 @@ ok( 1, "Builder positioned");
 #$builder.call($function, :name<foo>);
 #ok( 1, "Call created");
 
-my $hello_str := $builder.global_string("****** Hello LLVM World ******\n", "");
+my $hello_str := $builder.global_string_ptr("****** Hello LLVM World ******\n", "");
 ok( 1, "Global string created");
 
 $builder.call($printf, $hello_str);
@@ -44,6 +44,8 @@ my $answer := LLVM::Constant::integer(42);
 ok( 1, "Constant created");
 $builder.ret($answer);
 ok( 1, "return created");
+
+ok( $module.verify(1), "Module verified");
 
 # This will dump to stderr.
 $module.dump();

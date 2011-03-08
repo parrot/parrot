@@ -122,6 +122,9 @@ class LLVM::Builder is LLVM::Opaque {
         %LLVM::F<BuildGlobalString>(self, $value, $name);
     }
 #            LLVMBuildGlobalStringPtr    => "pptt",
+    method global_string_ptr($value, $name) {
+        %LLVM::F<BuildGlobalStringPtr>(self, $value, $name);
+    }
 
 #            # Casts
 #            LLVMBuildTrunc => "ppppt",
