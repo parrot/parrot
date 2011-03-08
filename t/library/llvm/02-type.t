@@ -30,6 +30,10 @@ $type := LLVM::Type::int(128);
 ok( $type, "int(128) created");
 ok( $type ~~ LLVM::Type, ".. with proper class");
 
+my $ptr := LLVM::Type::pointer(LLVM::Type::int8());
+ok( $ptr, "i8* created");
+ok( $type ~~ LLVM::Type, ".. with proper class");
+
 # TODO Add tests for floats
 
 done_testing();
