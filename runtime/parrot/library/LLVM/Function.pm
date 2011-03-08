@@ -1,18 +1,18 @@
 class LLVM::Function is LLVM::Opaque {
     method entry_block() {
         LLVM::BasicBlock.create(
-            %LLVM::F<GetEntryBasicBlock>(self)
+            LLVM::call("GetEntryBasicBlock", self)
         );
     }
 
     method append_basic_block($name?) {
         LLVM::BasicBlock.create(
-            %LLVM::F<AppendBasicBlock>(self, $name // "")
+            LLVM::call("AppendBasicBlock", self, $name // "")
         );
     }
 
     method set_linkage($linkage) {
-        %LLVM::F<SetLinkage>(self, $linkage);
+        LLVM::call("SetLinkage", self, $linkage);
     }
 
 
@@ -20,7 +20,7 @@ class LLVM::Function is LLVM::Opaque {
     CountParams => "ip",
 
     method params_count() {
-        %LLVM::F<CountParams>(self);
+        LLVM::call("CountParams", self);
     }
 
     =item *
@@ -30,7 +30,7 @@ class LLVM::Function is LLVM::Opaque {
     GetParam => "ppi",
 
     method param($idx) {
-        LLVM::Value.create(%LLVM::F<GetParam>(self, $idx));
+        LLVM::Value.create(LLVM::call("GetParam", self, $idx));
     }
 
     =item *

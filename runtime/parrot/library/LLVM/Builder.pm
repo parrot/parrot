@@ -1,30 +1,30 @@
 class LLVM::Builder is LLVM::Opaque {
 
     multi method create () {
-        self.new.wrap( %LLVM::F<CreateBuilder>() );
+        self.new.wrap( LLVM::call("CreateBuilder", ) );
     }
 
     multi method create ($context) {
-        self.new.wrap( %LLVM::F<CreateBuilderInContext>($context) );
+        self.new.wrap( LLVM::call("CreateBuilderInContext", $context) );
     }
 
     method DESTROY () {
-        %LLVM::F<DisposeBuilder>(self);
+        LLVM::call("DisposeBuilder", self);
     }
 
 #            LLVMPositionBuilder             => "vppp",
     multi method set_position(LLVM::BasicBlock $bb, $value) {
-        %LLVM::F<PositionBuilder>(self, $bb, $value);
+        LLVM::call("PositionBuilder", self, $bb, $value);
     }
 
 #            LLVMPositionBuilderBefore       => "vpp",
     multi method set_position($value) {
-        %LLVM::F<PositionBuilderBefore>(self, $value);
+        LLVM::call("PositionBuilderBefore", self, $value);
     }
 
 #            LLVMPositionBuilderAtEnd        => "vpp",
     multi method set_position(LLVM::BasicBlock $bb) {
-        %LLVM::F<PositionBuilderAtEnd>(self, $bb);
+        LLVM::call("PositionBuilderAtEnd", self, $bb);
     }
 
 #            LLVMGetInsertBlock              => "pp",
@@ -36,12 +36,12 @@ class LLVM::Builder is LLVM::Opaque {
 #            # Terminators
 #            LLVMBuildRetVoid                => "pp",
     multi method ret() {
-        %LLVM::F<BuildRetVoid>(self);
+        LLVM::call("BuildRetVoid", self);
     }
 
 #            LLVMBuildRet                    => "ppp",
     multi method ret($value) {
-        %LLVM::F<BuildRet>(self, $value);
+        LLVM::call("BuildRet", self, $value);
     }
 #            LLVMBuildAggregateRet           => "ppp3",
 #            LLVMBuildBr                     => "ppp",
@@ -84,23 +84,23 @@ class LLVM::Builder is LLVM::Opaque {
 #            LLVMBuildArrayMalloc        => "ppppt",
 #            LLVMBuildAlloca             => "pppt",
     method alloca($type, $name?) {
-        %LLVM::F<BuildAlloca>(self, $type, $name);
+        LLVM::call("BuildAlloca", self, $type, $name);
     }
 #            LLVMBuildArrayAlloca        => "ppppt",
 #            LLVMBuildFree               => "ppp",
 #            LLVMBuildLoad               => "pppt",
     method load($ptr, $name?) {
-        %LLVM::F<BuildLoad>(self, $ptr, $name);
+        LLVM::call("BuildLoad", self, $ptr, $name);
     }
 #            LLVMBuildStore              => "pppp",
     method store($value, $ptr) {
-        %LLVM::F<BuildStore>(self, $value, $ptr);
+        LLVM::call("BuildStore", self, $value, $ptr);
     }
 
 #            LLVMBuildGEP                => "ppppit",
     method gep($type, *@indices, :$name?) {
         my $args := LLVM::to_array(@indices);
-        my $r := %LLVM::F<BuildGEP>(self, $type, $args, +@indices, $name // "");
+        my $r := LLVM::call("BuildGEP", self, $type, $args, +@indices, $name // "");
         $r;
     }
 
@@ -108,22 +108,22 @@ class LLVM::Builder is LLVM::Opaque {
 #            LLVMBuildInBoundsGEP        => "ppppit",
     method inbounds_gep($type, *@indices, :$name?) {
         my $args := LLVM::to_array(@indices);
-        my $r := %LLVM::F<BuildInBoundsGEP>(self, $type, $args, +@indices, $name // "");
+        my $r := LLVM::call("BuildInBoundsGEP", self, $type, $args, +@indices, $name // "");
         $r;
     }
 
 #            LLVMBuildStructGEP          => "ppp3t",
     method struct_gep($ptr, Int $idx, Str $name?) {
-        %LLVM::F<BuildStructGEP>(self, $ptr, $idx, $name);
+        LLVM::call("BuildStructGEP", self, $ptr, $idx, $name);
     }
 
 #            LLVMBuildGlobalString       => "pptt",
     method global_string($value, $name) {
-        %LLVM::F<BuildGlobalString>(self, $value, $name);
+        LLVM::call("BuildGlobalString", self, $value, $name);
     }
 #            LLVMBuildGlobalStringPtr    => "pptt",
     method global_string_ptr($value, $name) {
-        %LLVM::F<BuildGlobalStringPtr>(self, $value, $name);
+        LLVM::call("BuildGlobalStringPtr", self, $value, $name);
     }
 
 #            # Casts
@@ -155,7 +155,7 @@ class LLVM::Builder is LLVM::Opaque {
 #            LLVMBuildCall => "pppp3t", #FIXME
 
     method call($func, *@args, :$name?) {
-        %LLVM::F<BuildCall>(
+        LLVM::call("BuildCall", 
             self,
             $func,
             LLVM::to_array(@args),

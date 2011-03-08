@@ -1,23 +1,23 @@
 class LLVM::Context is LLVM::Opaque {
     multi method create() {
-        self.wrap(%LLVM::F<ContextCreate>());
+        self.wrap(LLVM::call("ContextCreate", ));
     }
     multi method create($ptr) { self.wrap($ptr) };
 
     method DESTROY() {
-        %LLVM::F<ContextDispose>(self);
+        LLVM::call("ContextDispose", self);
     }
 
     sub global() {
-        LLVM::Context.create(%LLVM::F<GetGlobalContext>());
+        LLVM::Context.create(LLVM::call("GetGlobalContext", ));
     }
 
-    method int1() { %LLVM::F<Int1TypeInContext>(self) }
-    method int8() { %LLVM::F<Int8TypeInContext>(self) }
-    method int16() { %LLVM::F<Int16TypeInContext>(self) }
-    method int32() { %LLVM::F<Int32TypeInContext>(self) }
-    method int64() { %LLVM::F<Int64TypeInContext>(self) }
-    method int($radix) { %LLVM::F<IntTypeInContext>(self, $radix) }
+    method int1() { LLVM::call("Int1TypeInContext", self) }
+    method int8() { LLVM::call("Int8TypeInContext", self) }
+    method int16() { LLVM::call("Int16TypeInContext", self) }
+    method int32() { LLVM::call("Int32TypeInContext", self) }
+    method int64() { LLVM::call("Int64TypeInContext", self) }
+    method int($radix) { LLVM::call("IntTypeInContext", self, $radix) }
 
 }
 

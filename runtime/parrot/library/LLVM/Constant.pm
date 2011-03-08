@@ -1,15 +1,15 @@
 module LLVM::Constant {
 
     sub null($type) {
-        %LLVM::F<ConstNull>($type);
+        LLVM::call("ConstNull", $type);
     }
 
     sub string($str) {
-        %LLVM::F<ConstString>(~$str, pir::length($str), 0);
+        LLVM::call("ConstString", ~$str, pir::length($str), 0);
     }
 
     sub integer($int, $radix?) {
-        %LLVM::F<ConstInt>(LLVM::Type::int($radix // 32), +$int, 1);
+        LLVM::call("ConstInt", LLVM::Type::int($radix // 32), +$int, 1);
     }
 };
 

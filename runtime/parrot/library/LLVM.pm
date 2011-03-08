@@ -1,6 +1,15 @@
 module LLVM {
     our %F;
 
+=item call
+    Call LLVM with check that function is actually bound.
+
+    sub call($name, *@args) {
+        my $m := %F{$name};
+        pir::die("Function LLVM{ $name } isn't bound") unless pir::defined($m);
+        $m(|@args);
+    }
+
 =item convert_to_array
     Convert @args to array used in LLVM API.
 
