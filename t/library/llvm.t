@@ -9,7 +9,7 @@ Q:PIR {
 };
 pir::loadlib("llvm_engine");
 
-my $module := LLVM::Module.new("HELLO");
+my $module := LLVM::Module.create("HELLO");
 ok(pir::defined($module), "LLVM::Module created");
 ok( $module ~~ LLVM::Module, ".. with proper type");
 
@@ -24,7 +24,7 @@ my $bb := $function.append_basic_block("the_block");
 ok( pir::defined($bb), "BasicBlock appended");
 ok( $bb ~~ LLVM::BasicBlock, ".. with proper type");
 
-my $builder := LLVM::Builder.new();
+my $builder := LLVM::Builder.create();
 ok( pir::defined($builder), "LLVM::Builder created");
 ok( $builder ~~ LLVM::Builder, ".. with proper type");
 
