@@ -9,6 +9,10 @@ class LLVM::Opaque {
 
     method wrap($ptr) { $!ptr := $ptr; self };
     method unwrap()   { $!ptr };
+
+    method defined() is pirflags<:vtable('get_bool')> {
+        pir::defined($!ptr);
+    }
 };
 
 # vim: ft=perl6
