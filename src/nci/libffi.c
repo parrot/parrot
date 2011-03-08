@@ -286,7 +286,6 @@ nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
       case enum_nci_sig_ptr:
       case enum_nci_sig_pmc:
       case enum_nci_sig_pmcinv:
-      case enum_nci_sig_pmcslurp:
       case enum_nci_sig_ptrref:
       case enum_nci_sig_shortref:
       case enum_nci_sig_intref:

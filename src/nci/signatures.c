@@ -118,9 +118,6 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
           case 'O':   /* push PMC * invocant */
             e = enum_nci_sig_pmcinv;
             break;
-          case '@':   /* push PMC * slurpy */
-            e = enum_nci_sig_pmcslurp;
-            break;
 
           case 'B': /* buffer (void**) pass &Buffer_bufstart(SReg) */
             e = enum_nci_sig_bufref;
@@ -219,10 +216,6 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
           case enum_nci_sig_pmcinv:
             sig_buf[j++] = 'P';
             sig_buf[j++] = 'i';
-            break;
-          case enum_nci_sig_pmcslurp:
-            sig_buf[j++] = 'P';
-            sig_buf[j++] = 's';
             break;
           default:
             break;

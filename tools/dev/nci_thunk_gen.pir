@@ -914,8 +914,7 @@ ERROR
            "temp_tmpl": "PMC *t_%i; void *v_%i",
            "preamble_tmpl": "v_%i = VTABLE_get_pointer(interp, t_%i);",
            "call_param_tmpl": "&v_%i",
-           "postamble_tmpl": "VTABLE_set_pointer(interp, t_%i, v_%i);" },
-    "@": { "as_proto": "PMC *", "as_return": "", "cname": "xAT_", "sig_char": "Ps" }
+           "postamble_tmpl": "VTABLE_set_pointer(interp, t_%i, v_%i);" }
 }
 JSON
 

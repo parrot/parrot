@@ -39,7 +39,6 @@
 # special stuff
 # 0 - insert a NULL (pointer) - doesn't consume a register
 # J - Parrot_Interp param
-# @ - slurpy array
 
 # callback stuff
 # U - Single PMC parameter to pass into callback - user data
