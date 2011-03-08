@@ -265,7 +265,6 @@ nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
     ASSERT_ARGS(nci_to_ffi_type)
     switch (nci_t) {
       case enum_nci_sig_void:   return &ffi_type_void;
-      case enum_nci_sig_interp: return &ffi_type_pointer;
 
       case enum_nci_sig_float:  return &ffi_type_float;
       case enum_nci_sig_double: return &ffi_type_double;
@@ -397,9 +396,6 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
         for (i = 0, j = 0; i < nci->arity; i++) {
             pmc_holder_t *pmc_holder;
             switch (VTABLE_get_integer_keyed_int(interp, nci->signature, i + 1)) {
-              case enum_nci_sig_interp:
-                values[i] = &interp;
-                break;
               case enum_nci_sig_string:
                 translation_pointers[i] = pcc_arg[j++].s;
                 values[i]               = &translation_pointers[i];

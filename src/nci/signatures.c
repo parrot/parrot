@@ -88,10 +88,6 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
             e = enum_nci_sig_cstring;
             break;
 
-          case 'J':   /* interpreter */
-            e = enum_nci_sig_interp;
-            break;
-
           case 'p':   /* push pmc->data */
             e = enum_nci_sig_ptr;
             break;
@@ -180,8 +176,6 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
             /* null return */
             if (j == 0)
                 sig_buf[j++] = '\0';
-            break;
-          case enum_nci_sig_interp:
             break;
           case enum_nci_sig_float:
           case enum_nci_sig_double:

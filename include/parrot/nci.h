@@ -19,7 +19,6 @@ typedef void (*native_pcc_method_t)(PARROT_INTERP);
 
 typedef enum {
     enum_nci_sig_void,
-    enum_nci_sig_interp,
 
     enum_nci_sig_float,
     enum_nci_sig_double,

@@ -36,43 +36,24 @@
 # void stuff
 # v - void
 
-# special stuff
-# J - Parrot_Interp param
-
 # callback stuff
 # U - Single PMC parameter to pass into callback - user data
 
 # Signatures
 
-# t/src/embed.t
-v    J
-
 # mod_parrot
 i    ip
-i    JPip
-i    JpP
-i    Jpii
 i    p
 i    tp
-p    J
-p    Jp
-t    J
-t    Jpti
 t    p
 t    pt
 v    p
 v    pit
 v    ptt
-v    Jtiiipt
-p    JttPP
-P    Jtpi
 i    Vppp
-v    JpPP
 v    pt
-v    Jpt
 
 v
-v    Jiiip    # examples/japh/japh11.pasm
 v    i
 v    ii
 v    illllllll
@@ -83,27 +64,7 @@ v    piiii
 v    pl
 v    pp
 
-# For python
-i    JPP
-
-# Py_func signatures
-P    JP
-P    JPP
-P    JO
-S    JO
 i    P
-
-# PyBuiltins
-P    JOPP
-P    JOPPP
-v    JOPP
-v    JOPPP
-P    JOPPPP
-P    JOPPPPP
-
-# Added for Tcl
-I    JOSI
-P    JOSII
 
 # Added for TclLibrary
 t    p3
@@ -116,34 +77,8 @@ t    ptti
 t    pti
 t    pttti
 
-# libpast
-p    Ji
-p    Jipp
-v    Jp
-v    JS
-
 # crypt
 t    tt
-
-# Sub.__get_regs_used
-I    JOt
-
-# declare_lex_preg
-v    JOSI
-
-# Added for .NET => PIR translator dynamic PMCs.
-S    JOi
-v    JOi
-I    JO
-N    JO
-v    JON
-P    JOi
-v    JOI
-
-# Make lua stop panic'ing.
-P    JOI
-P    JOIS
-S    JOSP
 
 i          # void function returning int like fork()
 i    i3i   # POSIX's waitpid
@@ -376,7 +311,6 @@ l    33l
 
 p
 p    B
-p    Jt
 p    i
 p    ii
 p    iiii
@@ -415,12 +349,6 @@ v    pP
 p    ip
 i    33
 v    pii
-v    JO
-i    JO
-i    JOi
-i    JOt
-i    Jt
-i    Ji
 
 v    Vi
 v    p
