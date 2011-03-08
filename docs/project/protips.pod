@@ -1,0 +1,70 @@
+# Copyright (C) 2011, Parrot Foundation.
+
+=head1 Name
+
+docs/project/protips.pod - A Collection of Useful Tips for Parrot Hacking
+
+=head1 Description
+
+Parrot is a complex project that can fail in mysterious and spectacular ways
+and has a tendency to exhibit surprising performance bottlenecks.  When that
+happens, you have the exciting job of figuring out what's wrong and how to fix
+it.  This document exists to provide a repository of knowledge and techniques
+to make that job easier.
+
+=head2 Debugging Parrot (external tools)
+
+=head3 gdb
+
+gdb should be a familiar tool, but many developers only use a small subset of
+its capabilities.  This section covers some of its lesser known features that
+may come in handy while debugging Parrot.  Note that this is not intended to be
+an exhaustive resource.  If your favorite technique is missing, please add it.  
+
+=head4 Conditional Breakpoints
+
+gdb's breakpoints are great for inspecting the state of a running (or recently
+crashed) program, but sometimes the function or line you want to break on will
+be entered many times before it becomes interesting.  gdb allows breakpoints to be tied to conditions like so:
+  (gdb) br Parrot_FixedPMCArray_elements if _self == 0
+  Breakpoint 1 at 0xb7e69830: file ./src/pmc/fixedpmcarray.c, line 163.
+
+=head4 Pretty-Printing
+
+A very nice feature implemented by Nolan Lum as a Google Code-In project is gdb
+pretty-printing support for Parrot's STRING and PMC structs.  This makes those
+structs much more discoverable.  Instead of seeing this:
+  $1 = {flags = 512, vtable = 0x8096388, data = 0x80b64a4, _metadata = 0x0}
+when debugging a PMC or STRING, you'll see this:
+  <INSERT AWESOME GDB 7.1 OUTPUT HERE>
+Note that you'll need gdb 7.1 or later for this to work.
+
+=head2 Debugging Parrot (internal tools)
+
+When it crashes, Parrot make an effort to provide a PIR-level backtrace in
+addition the typical C-level backtrace.  This may not be entirely useful
+because libparrot gets its debugging information from imcc, but there's
+potential for it to help.
+
+TODO: parrot_debugger
+
+=head2 Profiling (external tools)
+
+TODO: valgrind (memgrind, callgrind)
+
+=head2 Profiling (internal tools)
+
+TODO: profiling runcore
+
+=head2 Misc
+
+When hacking on the Configure system, it's helpful to be able to run a single step instead of having to go through the whole process.  tools/dev/reconfigure.pl exists for that purpose:
+
+  perl tools/dev/reconfigure.pl --step=gen::makefile
+
+
+
+__END__
+Local Variables:
+  fill-column:78
+End:
