@@ -10,7 +10,7 @@ class LLVM::Module is LLVM::Opaque {
     }
 
     method verify($action?) {
-        %LLVM::F<VerifyModule>(self, $action // 2, "");
+        0 == %LLVM::F<VerifyModule>(self, $action // 2, "");
     }
 
     method dump() {
