@@ -6,8 +6,9 @@
 .include "runtime/parrot/library/LLVM/Constant.pir"
 .include "runtime/parrot/library/LLVM/Context.pir"
 .include "runtime/parrot/library/LLVM/Function.pir"
-.include "runtime/parrot/library/LLVM/Type.pir"
 .include "runtime/parrot/library/LLVM/Module.pir"
+.include "runtime/parrot/library/LLVM/Type.pir"
+.include "runtime/parrot/library/LLVM/Value.pir"
 
 .namespace ['LLVM';'Opaque']
 .sub '' :vtable('get_pointer') :method
