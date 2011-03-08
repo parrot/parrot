@@ -1,6 +1,7 @@
 
 .include "runtime/parrot/library/LLVM.pir"
 .include "runtime/parrot/library/LLVM/Opaque.pir"
+.include "runtime/parrot/library/LLVM/Value.pir"
 .include "runtime/parrot/library/LLVM/BasicBlock.pir"
 .include "runtime/parrot/library/LLVM/Builder.pir"
 .include "runtime/parrot/library/LLVM/Constant.pir"
@@ -9,7 +10,6 @@
 .include "runtime/parrot/library/LLVM/Module.pir"
 .include "runtime/parrot/library/LLVM/PassManager.pir"
 .include "runtime/parrot/library/LLVM/Type.pir"
-.include "runtime/parrot/library/LLVM/Value.pir"
 
 .namespace ['LLVM';'Opaque']
 .sub '' :vtable('get_pointer') :method
