@@ -50,7 +50,7 @@ class LLVM::Builder is LLVM::Opaque {
 #            LLVMBuildBr                     => "ppp",
     method br(LLVM::BasicBlock $to) {
         LLVM::Value.create(
-            LLVM::call("BuildBr", self, $to);
+            LLVM::call("BuildBr", self, $to)
         );
     }
 
