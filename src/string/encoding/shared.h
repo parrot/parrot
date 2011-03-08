@@ -93,10 +93,12 @@ void encoding_ord_error(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL encoding_rindex(PARROT_INTERP,
-    SHIM(const STRING *src),
-    SHIM(const STRING *search_string),
-    NULLOK(INTVAL offset))
-        __attribute__nonnull__(1);
+    ARGIN(const STRING *src),
+    ARGIN(const STRING *search),
+    INTVAL offset)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 STRING * encoding_substr(PARROT_INTERP,
@@ -305,7 +307,9 @@ STRING* unicode_upcase_first(PARROT_INTERP, SHIM(const STRING *src))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_encoding_rindex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(search))
 #define ASSERT_ARGS_encoding_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))

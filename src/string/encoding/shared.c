@@ -264,7 +264,7 @@ encoding_index(PARROT_INTERP, ARGIN(const STRING *src),
 /*
 
 =item C<INTVAL encoding_rindex(PARROT_INTERP, const STRING *src, const STRING
-*search_string, INTVAL offset)>
+*search, INTVAL offset)>
 
 Finds the last index of substring C<search_string> in STRING C<src>,
 starting from C<offset>. Not implemented.
@@ -275,13 +275,56 @@ starting from C<offset>. Not implemented.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-encoding_rindex(PARROT_INTERP, SHIM(const STRING *src),
-        SHIM(const STRING *search_string), SHIM(INTVAL offset))
+encoding_rindex(PARROT_INTERP, ARGIN(const STRING *src),
+        ARGIN(const STRING *search), INTVAL offset)
 {
     ASSERT_ARGS(encoding_rindex)
-    /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-        "Unicode rindex not implemented");
+    String_iter search_iter, search_start, start;
+    const UINTVAL len = search->strlen;
+    UINTVAL c0;
+    INTVAL  skip;
+
+    if (offset < 0
+    ||  len == 0
+    ||  src->strlen < len)
+        return -1;
+
+    skip = src->strlen - len;
+
+    if (offset < skip)
+        skip = offset;
+
+    STRING_ITER_INIT(interp, &start);
+    STRING_iter_skip(interp, src, &start, skip);
+
+    STRING_ITER_INIT(interp, &search_start);
+    c0 = STRING_iter_get_and_advance(interp, search, &search_start);
+
+    while (1) {
+        UINTVAL c1 = STRING_iter_get(interp, src, &start, 0);
+
+        if (c1 == c0) {
+            UINTVAL c2;
+            String_iter iter = start;
+
+            STRING_iter_skip(interp, src, &iter, 1);
+            search_iter = search_start;
+
+            do {
+                if (search_iter.charpos >= len)
+                    return start.charpos;
+                c1 = STRING_iter_get_and_advance(interp, src, &iter);
+                c2 = STRING_iter_get_and_advance(interp, search, &search_iter);
+            } while (c1 == c2);
+        }
+
+        if (start.charpos == 0)
+            break;
+
+        STRING_iter_skip(interp, src, &start, -1);
+    }
+
+    return -1;
 }
 
 
@@ -901,10 +944,12 @@ fixed8_rindex(PARROT_INTERP, ARGIN(const STRING *src),
     ASSERT_ARGS(fixed8_rindex)
 
     if (STRING_max_bytes_per_codepoint(search_string) != 1)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-            "Cross-charset rindex not supported");
+        return encoding_rindex(interp, src, search_string, offset);
 
-    PARROT_ASSERT(STRING_max_bytes_per_codepoint(src) == 1);
+    if (offset < 0
+    ||  !STRING_length(search_string))
+        return -1;
+
     return Parrot_util_byte_rindex(interp, src, search_string, offset);
 }
 
