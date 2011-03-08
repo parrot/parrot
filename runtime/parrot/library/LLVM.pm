@@ -50,11 +50,7 @@ module LLVM {
             my $how   := $enum.HOW;
             for @values {
                 my $c := +$from; # Force clone of $count.
-                $how.add_method(
-                    $_,
-                    method () { $c },
-                    to => $enum,
-                );
+                $how.add_method( $_, method () { $c }, to => $enum);
                 $from := &inc ?? &inc($from) !! $from++;
             }
         };
