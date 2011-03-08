@@ -42,6 +42,50 @@ module LLVM {
     INIT {
         pir::load_bytecode("nqp-setting.pbc");
 
+        #### Bind enums
+        # For enums we generate new class and bunch of methods.
+
+        my $count := 0;
+        my $meta  := P6metaclass;
+
+=begin
+typedef enum {
+  LLVMIntEQ = 32, /**< equal */
+  LLVMIntNE,      /**< not equal */
+  LLVMIntUGT,     /**< unsigned greater than */
+  LLVMIntUGE,     /**< unsigned greater or equal */
+  LLVMIntULT,     /**< unsigned less than */
+  LLVMIntULE,     /**< unsigned less or equal */
+  LLVMIntSGT,     /**< signed greater than */
+  LLVMIntSGE,     /**< signed greater or equal */
+  LLVMIntSLT,     /**< signed less than */
+  LLVMIntSLE      /**< signed less or equal */
+} LLVMIntPredicate;
+=end
+
+=begin
+typedef enum {
+  LLVMAbortProcessAction, /* verifier will print to stderr and abort() */
+  LLVMPrintMessageAction, /* verifier will print to stderr and return 1 */
+  LLVMReturnStatusAction  /* verifier will just return 1 */
+} LLVMVerifierFailureAction;
+=end
+
+        $count    := 0;
+        my $enum  := $meta.new_class("LLVM::VERIFYER_FAILURE_ACTION");
+        my $how   := $enum.HOW;
+        for <ABORT_PROCESSING PRINT_MESSAGE RETURN_STATUS> {
+            my $c := +$count; # Force clone of $count.
+            $how.add_method(
+                $_,
+                method () { $c },
+                to => $enum,
+            );
+            $count++;
+        }
+
+
+            #### Bind functions
         my $lib   := pir::loadlib("/usr/lib/libLLVM-2.7.so.1");
         my %funcs := hash(
 #/*===-- Error handling ----------------------------------------------------===*/
