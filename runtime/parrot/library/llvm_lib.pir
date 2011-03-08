@@ -7,6 +7,7 @@
 .include "runtime/parrot/library/LLVM/Context.pir"
 .include "runtime/parrot/library/LLVM/Function.pir"
 .include "runtime/parrot/library/LLVM/Module.pir"
+.include "runtime/parrot/library/LLVM/PassManager.pir"
 .include "runtime/parrot/library/LLVM/Type.pir"
 .include "runtime/parrot/library/LLVM/Value.pir"
 
