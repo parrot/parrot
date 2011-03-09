@@ -34,7 +34,7 @@ ok( 1, "Builder positioned");
 #$builder.call($function, :name<foo>);
 #ok( 1, "Call created");
 
-my $hello_str := $builder.global_string_ptr("****** Hello LLVM World ******\n", "");
+my $hello_str := $builder.global_string_ptr("****** Hello LLVM World ******\n");
 ok( 1, "Global string created");
 
 $builder.call($printf, $hello_str);
@@ -107,7 +107,7 @@ while $i < $last {
 }
 
 # Call print
-my $s := $builder.global_string_ptr("*********************\n", "");
+my $s := $builder.global_string_ptr("*********************\n", :name<stars>);
 $builder.call($function);
 
 # Load arg first
