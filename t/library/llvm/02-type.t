@@ -40,6 +40,25 @@ ok( $type ~~ LLVM::Type, ".. with proper class");
 
 # TODO Add tests for floats
 
+# Refine
+# Create struc: struct foo { foo *next}
+# "something"
+my $abstract := LLVM::Type::opaque();
+
+# Struct "foo{ something * }"
+my $concrete := LLVM::Type::struct(
+    LLVM::Type::pointer($abstract)
+);
+# "something" -> "foo"
+$abstract.refine_to($concrete);
+ok( 1, "Refine done");
+
+# I don't know how to check it. But dump should generate
+# %struct.foo = type { %struct.foo* }
+#my $m := LLVM::Module.create("foo");
+#$m.add_type_name("struct.foo", $concrete);
+#$m.dump();
+
 done_testing();
 
 # vim: ft=perl6
