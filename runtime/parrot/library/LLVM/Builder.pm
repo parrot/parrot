@@ -14,12 +14,12 @@ class LLVM::Builder is LLVM::Opaque {
     }
 
 #            LLVMPositionBuilder             => "vppp",
-    multi method set_position(LLVM::BasicBlock $bb, $value) {
+    multi method set_position(LLVM::BasicBlock $bb, LLVM::Value $value) {
         LLVM::call("PositionBuilder", self, $bb, $value);
     }
 
 #            LLVMPositionBuilderBefore       => "vpp",
-    multi method set_position($value) {
+    multi method set_position(LLVM::Value $value) {
         LLVM::call("PositionBuilderBefore", self, $value);
     }
 
@@ -42,7 +42,7 @@ class LLVM::Builder is LLVM::Opaque {
     }
 
 #            LLVMBuildRet                    => "ppp",
-    multi method ret($value) {
+    multi method ret(LLVM::Value $value) {
         LLVM::Value.create(
             LLVM::call("BuildRet", self, $value)
         );
@@ -79,7 +79,7 @@ class LLVM::Builder is LLVM::Opaque {
 #            LLVMBuildMalloc             => "pppt",
 #            LLVMBuildArrayMalloc        => "ppppt",
 #            LLVMBuildAlloca             => "pppt",
-    method alloca($type, $name?) {
+    method alloca(LLVM::Type $type, Str $name?) {
         LLVM::Value.create(
             LLVM::call("BuildAlloca", self, $type, $name)
         );
@@ -87,20 +87,20 @@ class LLVM::Builder is LLVM::Opaque {
 #            LLVMBuildArrayAlloca        => "ppppt",
 #            LLVMBuildFree               => "ppp",
 #            LLVMBuildLoad               => "pppt",
-    method load($ptr, $name?) {
+    method load(LLVM::Value $ptr, Str $name?) {
         LLVM::Value.create(
             LLVM::call("BuildLoad", self, $ptr, $name)
         );
     }
 #            LLVMBuildStore              => "pppp",
-    method store($value, $ptr) {
+    method store(LLVM::Value $value, LLVM::Value $ptr) {
         LLVM::Value.create(
             LLVM::call("BuildStore", self, $value, $ptr)
         );
     }
 
 #            LLVMBuildGEP                => "ppppit",
-    method gep($type, *@indices, :$name?) {
+    method gep(LLVM::Type $type, *@indices, Str :$name?) {
         my $args := LLVM::to_array(@indices);
         LLVM::Value.create(
             LLVM::call("BuildGEP", self, $type, $args, +@indices, $name // "")
@@ -108,14 +108,14 @@ class LLVM::Builder is LLVM::Opaque {
     }
 
 #            LLVMBuildStructGEP          => "ppppt",
-    method struct_gep($ptr, Int $idx, Str $name?) {
+    method struct_gep(LLVM::Type $ptr, Int $idx, Str $name?) {
         LLVM::Value.create(
             LLVM::call("BuildStructGEP", self, $ptr, $idx, $name)
         );
     }
 
 #            LLVMBuildInBoundsGEP        => "ppppit",
-    method inbounds_gep($type, *@indices, :$name?) {
+    method inbounds_gep(LLVM::Type $type, *@indices, :$name?) {
         my $args := LLVM::to_array(@indices);
         LLVM::Value.create(
             LLVM::call("BuildInBoundsGEP", self, $type, $args, +@indices, $name // "")
@@ -123,13 +123,13 @@ class LLVM::Builder is LLVM::Opaque {
     }
 
 #            LLVMBuildGlobalString       => "pptt",
-    method global_string($value, $name) {
+    method global_string(Str $value, Str :$name?) {
         LLVM::Value.create(
             LLVM::call("BuildGlobalString", self, $value, $name)
         );
     }
 #            LLVMBuildGlobalStringPtr    => "pptt",
-    method global_string_ptr($value, $name) {
+    method global_string_ptr(Str $value, Str :$name?) {
         LLVM::Value.create(
             LLVM::call("BuildGlobalStringPtr", self, $value, $name)
         );
@@ -139,14 +139,14 @@ class LLVM::Builder is LLVM::Opaque {
 
 #            # Comparisons
 #            LLVMBuildICmp => "ppippt",
-    method icmp($op, LLVM::Value $left, LLVM::Value $right, :$name?) {
+    method icmp(Int $op, LLVM::Value $left, LLVM::Value $right, Str :$name?) {
         LLVM::Value.create(
             LLVM::call("BuildICmp", $op, $left, $right, $name)
         )
     }
 
 #            LLVMBuildFCmp => "ppippt",
-    method fcmp($op, LLVM::Value $left, LLVM::Value $right, :$name?) {
+    method fcmp(Int $op, LLVM::Value $left, LLVM::Value $right, Str :$name?) {
         LLVM::Value.create(
             LLVM::call("BuildFCmp", $op, $left, $right, $name)
         )
@@ -156,7 +156,7 @@ class LLVM::Builder is LLVM::Opaque {
 #            LLVMBuildPhi => "pppt",
 #            LLVMBuildCall => "pppppt",
 
-    method call($func, *@args, :$name?) {
+    method call(LLVM::Function $func, *@args, Str :$name?) {
         LLVM::call("BuildCall",
             self,
             $func,
@@ -187,7 +187,7 @@ INIT {
         my $subname := pir::downcase($name);
         $HOW.add_method(
             $subname,
-            method (LLVM::Value $left, LLVM::Value $right, :$name?) {
+            method (LLVM::Value $left, LLVM::Value $right, Str :$name?) {
                 LLVM::Value.create(
                     LLVM::call($call, self, $left, $right, $name)
                 )
@@ -219,7 +219,7 @@ INIT {
     ).kv -> $call, $subname {
         $HOW.add_method(
             $subname,
-            method (LLVM::Value $value, LLVM::Type $type, :$name?) {
+            method (LLVM::Value $value, LLVM::Type $type, Str :$name?) {
                 LLVM::Value.create(
                     LLVM::call("LLVMBuild" ~ $call, self, $value, $type, $name)
                 )
