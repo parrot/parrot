@@ -1,10 +1,10 @@
 # Copyright (C) 2011, Parrot Foundation.
 
-=head1 Name
+=head1 NAME
 
 docs/project/protips.pod - A Collection of Useful Tips for Parrot Hacking
 
-=head1 Description
+=head1 DESCRIPTION
 
 Parrot is a complex project that can fail in mysterious and spectacular ways
 and has a tendency to exhibit surprising performance bottlenecks.  When that
