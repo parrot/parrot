@@ -25,6 +25,12 @@ class LLVM::Type is LLVM::Opaque {
     sub label() { LLVM::Type.create(LLVM::call("LabelType", )) };
     sub opaque() { LLVM::Type.create(LLVM::call("OpaqueType", )) };
 
+    method refine_to(LLVM::Type $to) {
+        LLVM::Type.create(
+            LLVM::call("RefineType", self, $to)
+        );
+    }
+
     # Shortcut for i8*
     sub cstring() { pointer(int8()); }
 };
