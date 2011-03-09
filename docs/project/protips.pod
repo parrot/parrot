@@ -66,6 +66,7 @@ tools/dev/reconfigure.pl exists for that purpose:
 
   perl tools/dev/reconfigure.pl --step=gen::makefile
 
+=cut
 
 __END__
 Local Variables:
