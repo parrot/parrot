@@ -11,8 +11,6 @@ ok( $c, "Constant NULL created");
 ok( $c ~~ LLVM::Value, ".. with proper class");
 
 
-# TODO Add tests for floats
-
 done_testing();
 
 # vim: ft=perl6
