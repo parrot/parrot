@@ -830,10 +830,9 @@ sub find_multi_functions {
 
     foreach my $method ( @{ $self->methods } ) {
         next unless $method->is_multi;
-        my $short_sig    = $method->{MULTI_short_sig};
         my $full_sig     = $pmcname . "," . $method->{MULTI_full_sig};
         my $functionname = 'Parrot_' . $pmcname . '_' . $method->name;
-        push @multi_names, [ $method->symbol, $short_sig, $full_sig,
+        push @multi_names, [ $method->symbol, $full_sig,
                              $pmcname, $functionname, $method ];
     }
     return ( \@multi_names );
@@ -967,12 +966,11 @@ sub init_func {
 
     my $i = 0;
     for my $multi (@$multi_funcs) {
-        my ($name, $ssig, $fsig, $ns, $func) = @$multi;
-        my ($name_str, $ssig_str, $fsig_str, $ns_name)     =
-            map { gen_multi_name($_, $cache) } ($name, $ssig, $fsig, $ns);
+        my ($name, $fsig, $ns, $func) = @$multi;
+        my ($name_str, $fsig_str, $ns_name)     =
+            map { gen_multi_name($_, $cache) } ($name, $fsig, $ns);
 
         for my $s ([$name, $name_str],
-                   [$ssig, $ssig_str],
                    [$fsig, $fsig_str],
                    [$ns,   $ns_name ]) {
             my ($raw_string, $name) = @$s;
@@ -983,7 +981,6 @@ sub init_func {
 
         push @multi_list, <<END_MULTI_LIST;
             _temp_multi_func_list[$i].multi_name = $name_str;
-            _temp_multi_func_list[$i].short_sig = $ssig_str;
             _temp_multi_func_list[$i].full_sig = $fsig_str;
             _temp_multi_func_list[$i].ns_name = $ns_name;
             _temp_multi_func_list[$i].func_ptr = (funcptr_t) $func;
@@ -1490,12 +1487,12 @@ sub gen_switch_vtable {
     # No cookies for DynPMC. At least not now.
     return 1 if $self->is_dynamic;
 
-    # Convert list of multis to name->[(type,,ssig,fsig,ns,func)] hash.
+    # Convert list of multis to name->[(type,fsig,ns,func,method)] hash.
     my %multi_methods;
     foreach (@{$self->find_multi_functions}) {
-        my ($name, $ssig, $fsig, $ns, $func, $method) = @$_;
+        my ($name, $fsig, $ns, $func, $method) = @$_;
         my @sig = split /,/, $fsig;
-        push @{ $multi_methods{ $name } }, [ $sig[1], $ssig, $fsig, $ns, $func, $method ];
+        push @{ $multi_methods{ $name } }, [ $sig[1], $fsig, $ns, $func, $method ];
     }
 
     # vtables
@@ -1538,7 +1535,7 @@ BODY
 sub generate_single_case {
     my ($self, $vt_method_name, $multi, @parameters) = @_;
 
-    my ($type, $ssig, $fsig, $ns, $func, $impl) = @$multi;
+    my ($type, $fsig, $ns, $func, $impl) = @$multi;
     my $case;
 
     # Gather parameters names

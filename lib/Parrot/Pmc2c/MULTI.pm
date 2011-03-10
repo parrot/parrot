@@ -51,13 +51,11 @@ sub rewrite_multi_sub {
     my ( $self, $pmc ) = @_;
     my @param_types = ();
     my @new_params = ();
-    my $short_sig = "JP"; # prepend the short signature interpreter and invocant
 
     # Fixup the parameters, standardizing PMC types and extracting type names
     # for the multi name.
     for my $param ( split /,/, $self->parameters ) {
         my ( $type, $name, $rest ) = split /\s+/, &Parrot::Pmc2c::PCCMETHOD::trim($param), 3;
-        my $sig_char;
 
         die "Invalid MULTI parameter '$param': missing type or name\n"
              unless defined $name;
@@ -76,27 +74,14 @@ sub rewrite_multi_sub {
         # Pass standard parameter types unmodified.
         # All other param types are rewritten as PMCs.
         if ($type eq 'STRING' or $type eq 'PMC' or $type eq 'INTVAL') {
-            $sig_char = substr($type, 0, 1); # short signature takes first character of name
             push @new_params, $param;
         }
         elsif ($type eq 'FLOATVAL') {
-            $sig_char = 'N';
             push @new_params, $param;
         }
         else {
-            $sig_char = 'P';
             push @new_params, "PMC *$name";
         }
-
-        $short_sig .= $sig_char;
-    }
-
-    # prepend the short signature return type
-    if ($self->name =~ /^i_/) {
-        $short_sig = "v" . $short_sig;
-    }
-    else {
-        $short_sig = $self->trans( $self->return_type() ) . $short_sig;
     }
 
     $self->parameters(join (",", @new_params));
@@ -104,7 +89,6 @@ sub rewrite_multi_sub {
     my $sub_name = "multi_" . $self->name . "_" . join ('_', @param_types);
     $self->name($sub_name);
 
-    $self->{MULTI_short_sig} = $short_sig;
     $self->{MULTI_full_sig}  = join(',', @param_types);
     $self->{MULTI} = 1;
 
