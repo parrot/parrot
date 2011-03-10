@@ -86,11 +86,9 @@ sub rewrite_multi_sub {
 
     $self->parameters(join (",", @new_params));
 
-    my $sub_name = "multi_" . $self->name . "_" . join ('_', @param_types);
-    $self->name($sub_name);
-
-    $self->{MULTI_full_sig}  = join(',', @param_types);
-    $self->{MULTI} = 1;
+    $self->{MULTI_sig}      = [@param_types];
+    $self->{MULTI_full_sig} = join(',', @param_types);
+    $self->{MULTI}          = 1;
 
     return 1;
 }
