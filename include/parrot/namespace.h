@@ -23,7 +23,7 @@ PMC * Parrot_ns_find_current_namespace_global(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PMC * Parrot_ns_find_global_from_op(PARROT_INTERP,
     ARGIN(PMC *ns),
     ARGIN_NULLOK(STRING *globalname),

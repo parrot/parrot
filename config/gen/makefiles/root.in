@@ -810,7 +810,6 @@ help :
 	@echo "  bsdlint:           Code checking with bsdlint."
 	@echo "  sunlint:           Code checking with Sun Studio's sunlint."
 	@echo "  splint:            Code checking with splint."
-	@echo "  splint-all:        Splint all of Parrot, for the masochist only."
 	@echo "  headerizer:        Recreate header files for C-source files"
 	@echo "  apilist:           Show list of PARROT_API functions"
 	@echo "  exportlist:        Show list of PARROT_EXPORT functions"
@@ -2645,13 +2644,8 @@ SPLINTFLAGS = \
 	$(SPLINTFLAGS_EVALUATION) \
 	$(SPLINTFLAGS_TYPES) \
 
-SPLINT_SOURCE = `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
-
-splint-all : $(PARROT)
-	$(MKPATH) $(SPLINT_TMP)
-	$(SPLINT) $(CC_INC) "-Iinclude/pmc" "-Icompilers/ast" $(SPLINTFLAGS) \
-	$(SPLINT_SOURCE) \
-	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) compilers/imcc/main.c
+#SPLINT_SOURCE = `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
+SPLINT_SOURCE = `echo src/*.c`
 
 # "splint" is the less-thorough splint target.  For cage cleaning work,
 # you'll probably want to specify SPLINT_SOURCE rather than work on the

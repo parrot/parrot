@@ -306,10 +306,10 @@ void Parrot_str_pin(SHIM_INTERP, ARGMOD(STRING *s))
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
-const STR_VTABLE * Parrot_str_rep_compatible(PARROT_INTERP,
+PARROT_PURE_FUNCTION
+const STR_VTABLE * Parrot_str_rep_compatible(SHIM_INTERP,
     ARGIN(const STRING *a),
     ARGIN(const STRING *b))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
@@ -585,8 +585,7 @@ STRING * Parrot_str_iter_substr(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_str_pin __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_str_rep_compatible __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(a) \
+       PARROT_ASSERT_ARG(a) \
     , PARROT_ASSERT_ARG(b))
 #define ASSERT_ARGS_Parrot_str_repeat __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
