@@ -192,7 +192,7 @@ STRING * Parrot_sprintf_s(PARROT_INTERP, ARGIN(STRING *pat), ...)
 
 PARROT_EXPORT
 void Parrot_vsnprintf(PARROT_INTERP,
-    ARGOUT(char *targ),
+    ARGMOD(char *targ),
     size_t len,
     ARGIN(const char *pat),
     va_list args)
