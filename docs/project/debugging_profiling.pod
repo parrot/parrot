@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-docs/project/protips.pod - A Collection of Useful Tips for Parrot Hacking
+docs/project/debugging_profiling.pod - A Collection of Useful Tips for Parrot Hacking
 
 =head1 DESCRIPTION
 
