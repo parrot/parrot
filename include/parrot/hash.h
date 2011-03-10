@@ -241,7 +241,7 @@ Hash * Parrot_hash_new_pointer_hash(PARROT_INTERP)
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 HashBucket* Parrot_hash_put(PARROT_INTERP,
     ARGMOD(Hash *hash),
     ARGIN_NULLOK(void *key),
