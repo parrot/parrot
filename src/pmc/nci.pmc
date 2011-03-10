@@ -138,8 +138,6 @@ Sets the specified function pointer and siganture as described in the string C<k
 */
 
     VTABLE void set_pointer_keyed(PMC *key, void *func) {
-        Parrot_NCI_attributes * const nci_info   = PARROT_NCI(SELF);
-
         /* Store the original function and signature. */
         SET_ATTR_orig_func(INTERP, SELF, func);
         SET_ATTR_signature(INTERP, SELF, key);
@@ -215,7 +213,7 @@ Returns whether the NCI is defined.
 */
 
     VTABLE INTVAL defined() {
-        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        const Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         return nci_info->orig_func != NULL;
     }
 
@@ -297,7 +295,7 @@ Returns the boolean value of the pointer.
 */
 
     VTABLE INTVAL get_bool() {
-        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        const Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         return (0 != (INTVAL)nci_info->orig_func);
     }
 

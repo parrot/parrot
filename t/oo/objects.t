@@ -1503,7 +1503,7 @@ end:
     ok(0, "'Parent isn\'t a Class' exception not thrown")
     goto end
 handler:
-    .exception_is( "Parent isn't a Class." )
+    .exception_is( "Parent 'Not a class' of 'Astronomical Object 2' isn't a Class." )
 end:
 .end
 

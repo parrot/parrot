@@ -27,8 +27,7 @@ UTF-16 encoding
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
-static UINTVAL utf16_decode(PARROT_INTERP, ARGIN(const utf16_t *p))
-        __attribute__nonnull__(1)
+static UINTVAL utf16_decode(SHIM_INTERP, ARGIN(const utf16_t *p))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -67,11 +66,10 @@ static void utf16_iter_set_and_advance(PARROT_INTERP,
         FUNC_MODIFIES(*str)
         FUNC_MODIFIES(*i);
 
-static void utf16_iter_skip(PARROT_INTERP,
+static void utf16_iter_skip(SHIM_INTERP,
     ARGIN(const STRING *str),
     ARGMOD(String_iter *i),
     INTVAL skip)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*i);
@@ -116,8 +114,7 @@ static STRING * utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_utf16_decode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(p))
+       PARROT_ASSERT_ARG(p))
 #define ASSERT_ARGS_utf16_encode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ptr))
@@ -134,8 +131,7 @@ static STRING * utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     , PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_utf16_iter_skip __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(str) \
+       PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(i))
 #define ASSERT_ARGS_utf16_ord __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -387,7 +383,7 @@ Decodes the codepoint starting at C<p>.
 
 PARROT_WARN_UNUSED_RESULT
 static UINTVAL
-utf16_decode(PARROT_INTERP, ARGIN(const utf16_t *p))
+utf16_decode(SHIM_INTERP, ARGIN(const utf16_t *p))
 {
     ASSERT_ARGS(utf16_decode)
     UINTVAL c = *p;
@@ -507,7 +503,7 @@ Moves the string iterator C<i> by C<skip> characters.
 */
 
 static void
-utf16_iter_skip(PARROT_INTERP,
+utf16_iter_skip(SHIM_INTERP,
     ARGIN(const STRING *str), ARGMOD(String_iter *i), INTVAL skip)
 {
     ASSERT_ARGS(utf16_iter_skip)
