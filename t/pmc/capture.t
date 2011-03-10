@@ -356,9 +356,9 @@ a variety of keys and values.
     $P0 = thaw $S1
 
     $S0 = $P0["foo"]
-    "is"($S0, "foo", "Hash thawed", "todo" => "TT #2047")
+    "is"($S0, "foo", "Hash thawed")
     $S0 = $P0[0]
-    "is"($S0, "bar", "Array thawed", "todo" => "TT #2047")
+    "is"($S0, "bar", "Array thawed")
 .end
 
 # Local Variables:
