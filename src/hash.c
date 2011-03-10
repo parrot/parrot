@@ -1479,7 +1479,7 @@ Puts the key and value into the hash. Note that C<key> is B<not> copied.
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 HashBucket*
 Parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
         ARGIN_NULLOK(void *key), ARGIN_NULLOK(void *value))
