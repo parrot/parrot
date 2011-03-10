@@ -799,9 +799,15 @@ Freeze/thaw Capture
     VTABLE void thaw(PMC *info) {
         PMC *tmp;
         tmp = VTABLE_shift_pmc(INTERP, info);
-        SET_ATTR_array(INTERP, SELF, tmp);
+        if (!PMC_IS_NULL(tmp)) {
+            SET_ATTR_array(INTERP, SELF, tmp);
+            PObj_custom_mark_SET(SELF);
+        }
         tmp = VTABLE_shift_pmc(INTERP, info);
-        SET_ATTR_hash(INTERP, SELF, tmp);
+        if (!PMC_IS_NULL(tmp)) {
+            SET_ATTR_hash(INTERP, SELF, tmp);
+            PObj_custom_mark_SET(SELF);
+        }
     }
 /*
 
