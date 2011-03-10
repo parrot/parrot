@@ -1551,7 +1551,7 @@ sub generate_single_case {
     if ($type eq 'DEFAULT' || $type eq 'PMC') {
         # For default case we have to handle return manually.
         my ($pcc_signature, $retval, $call_tail, $pcc_return)
-                = $self->gen_defaul_case_wrapping($ssig, @parameters);
+                = gen_defaul_case_wrapping($impl);
         my $dispatch = "Parrot_mmd_multi_dispatch_from_c_args(INTERP, \"$vt_method_name\", \"$pcc_signature\", SELF, $parameters$call_tail);";
 
         $case = <<"CASE";
@@ -1592,26 +1592,26 @@ CASE
 # Generate (pcc_signature, retval holder, pcc_call_tail, return statement)
 # for default case in switch.
 sub gen_defaul_case_wrapping {
-    my ($self, $ssig, @parameters) = @_;
+    my $method = shift;
 
-    my $letter = substr($ssig, 0, 1);
-    if ($letter eq 'I') {
+    local $_ = $method->return_type;
+    if (/INTVAL/) {
         return (
-            "PP->" . $letter,
+            "PP->I",
             "INTVAL retval;",
             ', &retval',
             'return retval;',
         );
     }
-    elsif ($letter eq 'S') {
+    elsif (/STRING/) {
         return (
-            "PP->" . $letter,
+            "PP->S",
             "STRING *retval;",
             ', &retval',
             'return retval;',
         );
     }
-    elsif ($letter eq 'P') {
+    elsif (/PMC/) {
         return (
             'PPP->P',
             'PMC *retval = PMCNULL;',
@@ -1619,7 +1619,7 @@ sub gen_defaul_case_wrapping {
             "return retval;",
         );
     }
-    elsif ($letter eq 'v') {
+    elsif (/void\s*$/) {
         return (
             'PP->',
             '',
@@ -1628,7 +1628,7 @@ sub gen_defaul_case_wrapping {
         );
     }
     else {
-        die "Can't handle signature $ssig!";
+        die "Can't handle return type `$_'!";
     }
 }
 
