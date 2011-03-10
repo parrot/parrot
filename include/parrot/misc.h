@@ -63,7 +63,7 @@ INTVAL Parrot_util_range_rand(INTVAL from, INTVAL to, INTVAL how_random);
 
 PARROT_EXPORT
 void Parrot_util_register_move(PARROT_INTERP,
-    int n_regs,
+    size_t n_regs,
     ARGOUT(unsigned char *dest_regs),
     ARGIN(unsigned char *src_regs),
     unsigned char temp_reg,
