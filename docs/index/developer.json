@@ -22,7 +22,7 @@
             "docs/project/core_inclusion.pod",
             "docs/project/git_terminology.pod",
             "docs/project/git_workflow.pod",
-            "docs/project/protips.pod",
+            "docs/project/hacking_tips.pod",
             "docs/project/merge_review_guidelines.pod",
             "docs/project/metacommitter_guide.pod",
             "docs/project/release_manager_guide.pod",
