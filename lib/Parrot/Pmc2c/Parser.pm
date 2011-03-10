@@ -257,19 +257,21 @@ sub find_methods {
                 body        => Parrot::Pmc2c::Emitter->text( $methodblock, $filename, $lineno ),
                 return_type => $returntype,
                 parameters  => $parameters,
-                type        => Parrot::Pmc2c::Method::VTABLE,
                 attrs       => $attrs,
                 decorators  => $decorators,
+                type        => $marker && $marker =~ /MULTI/  ? Parrot::Pmc2c::Method::MULTI      :
+                               $marker && $marker !~ /VTABLE/ ? Parrot::Pmc2c::Method::NON_VTABLE :
+                                                                Parrot::Pmc2c::Method::VTABLE
             }
         );
 
         # METHOD needs FixedIntegerArray header
-        if ( $marker and $marker =~ /METHOD/ ) {
+        if ( $method->type eq Parrot::Pmc2c::Method::NON_VTABLE ) {
             Parrot::Pmc2c::PCCMETHOD::rewrite_pccmethod( $method, $pmc );
             $pmc->set_flag('need_fia_header');
         }
 
-        if ( $marker and $marker =~ /MULTI/ ) {
+        if ( $method->type eq Parrot::Pmc2c::Method::MULTI ) {
             Parrot::Pmc2c::MULTI::rewrite_multi_sub( $method, $pmc );
         }
 
@@ -281,18 +283,13 @@ sub find_methods {
             $class_init = $method;
         }
         else {
-
             # Name-mangle NCI and multi methods to avoid conflict with vtables
-            if ( $marker) {
-                if ( $marker =~ /MULTI/ ) {
-                    $method->type(Parrot::Pmc2c::Method::MULTI);
-                    $method->symbol($methodname);
-                }
-                elsif ( $marker !~ /VTABLE/ ) {
-                    $method->type(Parrot::Pmc2c::Method::NON_VTABLE);
-                    $method->name("nci_$methodname");
-                    $method->symbol($methodname);
-                }
+            if ( $method->type eq Parrot::Pmc2c::Method::MULTI ) {
+                $method->symbol($methodname);
+            }
+            elsif ( $method->type eq Parrot::Pmc2c::Method::NON_VTABLE ) {
+                $method->name("nci_$methodname");
+                $method->symbol($methodname);
             }
 
             $pmc->add_method($method);
