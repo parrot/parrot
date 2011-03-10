@@ -10,11 +10,11 @@ use Parrot::Test tests => 60;
 
 =head1 NAME
 
-t/compilers/data_json/to_parrot.t - test JSON to parrot conversions
+t/compilers/data_json/to_parrot_2.t - test JSON to parrot conversions
 
 =head1 SYNOPSIS
 
-    % prove t/compilers/data_json/to_parrot.t
+    % prove t/compilers/data_json/to_parrot_2.t
 
 =head1 DESCRIPTION
 
