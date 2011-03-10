@@ -56,7 +56,7 @@ op callmethodcc(invar PMC, in STR) :object_base :flow {
     PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
     opcode_t *dest              = NULL;
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
 
     if (!PMC_IS_NULL(method_pmc)) {
         PMC * const signature = Parrot_pcc_get_signature(interp,
@@ -91,7 +91,7 @@ op callmethodcc(invar PMC, invar PMC) :object_base :flow {
     PMC      *       signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, $1);
@@ -111,7 +111,7 @@ op callmethod(invar PMC, in STR, invar PMC) :object_base :flow {
     PMC      *       signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
 
     if (PMC_IS_NULL(method_pmc)) {
         dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND,
@@ -136,7 +136,7 @@ op callmethod(invar PMC, invar PMC, invar PMC) :object_base :flow {
     PMC      *       signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, object);
