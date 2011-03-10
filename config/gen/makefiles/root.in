@@ -2518,10 +2518,11 @@ SPLINTFLAGS_BASE = \
     \
     +indentspaces 4 \
     +locindentspaces 4 \
-    +linelen 120 \
+    +linelen 999 \
     -message-stream-stdout \
     +showdeephistory \
-    -showfunc \
+    +show-func \
+    +show-column \
     -tmpdir $(SPLINT_TMP) \
     \
     +posix-lib \
