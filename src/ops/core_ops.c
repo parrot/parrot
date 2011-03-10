@@ -13155,7 +13155,7 @@ Parrot_invokecc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * dest =  cur_opcode + 2;
     PMC       * const  signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
     if ((!PMC_IS_NULL(signature))) {
         Parrot_pcc_set_object(interp, signature, NULL);
     }
@@ -13171,7 +13171,7 @@ Parrot_invoke_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  p = PREG(1);
     PMC  * const  signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
     if ((!PMC_IS_NULL(signature))) {
         Parrot_pcc_set_object(interp, signature, NULL);
     }
@@ -17487,7 +17487,7 @@ Parrot_callmethodcc_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC       * const  method_pmc = VTABLE_find_method(interp, object, meth);
     opcode_t  * dest = NULL;
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
     if ((!PMC_IS_NULL(method_pmc))) {
         PMC  * const  signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
@@ -17521,7 +17521,7 @@ Parrot_callmethodcc_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC       * const  method_pmc = VTABLE_find_method(interp, object, meth);
     opcode_t  * dest = NULL;
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
     if ((!PMC_IS_NULL(method_pmc))) {
         PMC  * const  signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
@@ -17553,7 +17553,7 @@ Parrot_callmethodcc_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  next =  cur_opcode + 3;
     PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
     if ((!PMC_IS_NULL(signature))) {
         Parrot_pcc_set_object(interp, signature, PREG(1));
     }
@@ -17572,7 +17572,7 @@ Parrot_callmethod_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * dest = NULL;
     PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
     if (PMC_IS_NULL(method_pmc)) {
         dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for invocant of class '%Ss'", meth, VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
     }
@@ -17597,7 +17597,7 @@ Parrot_callmethod_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * dest = NULL;
     PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
     if (PMC_IS_NULL(method_pmc)) {
         dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for invocant of class '%Ss'", meth, VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
     }
@@ -17621,7 +17621,7 @@ Parrot_callmethod_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * dest;
     PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
     if ((!PMC_IS_NULL(signature))) {
         Parrot_pcc_set_object(interp, signature, object);
     }
@@ -22158,7 +22158,7 @@ Parrot_find_sub_not_null_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(sub)) {
         opcode_t  * handler;
 
-        Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
+        Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
         handler = Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_GLOBAL_NOT_FOUND, "Could not find sub %Ss", SREG(2));
         {
             PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22180,7 +22180,7 @@ Parrot_find_sub_not_null_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PMC_IS_NULL(sub)) {
         opcode_t  * handler;
 
-        Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
+        Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
         handler = Parrot_ex_throw_from_op_args(interp, dest, EXCEPTION_GLOBAL_NOT_FOUND, "Could not find sub %Ss", SCONST(2));
         {
             PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));

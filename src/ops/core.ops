@@ -353,7 +353,7 @@ inline op invokecc(invar PMC) :flow {
     PMC      * const signature = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, NULL);
@@ -369,7 +369,7 @@ inline op invoke(invar PMC, invar PMC) :flow {
     PMC * const signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, NULL);
