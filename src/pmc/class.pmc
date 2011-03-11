@@ -542,10 +542,13 @@ make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
 
             if (!PMC_IS_NULL(names))
                 /* remove the HLL namespace name */
-                VTABLE_shift_string(interp, names);
-                PARROT_GC_WRITE_BARRIER(interp, SELF);
-                _class->fullname = Parrot_str_join(interp, CONST_STRING(interp, ";"), names);
-                return _class->fullname;
+                /* Workaround for thawed namespaces which has 0 elements sometimes */
+                if (VTABLE_elements(interp, names) > 1) {
+                    VTABLE_shift_string(interp, names);
+                    PARROT_GC_WRITE_BARRIER(interp, SELF);
+                    _class->fullname = Parrot_str_join(interp, CONST_STRING(interp, ";"), names);
+                    return _class->fullname;
+                }
         }
     }
 
