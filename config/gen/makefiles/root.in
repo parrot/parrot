@@ -2519,6 +2519,7 @@ SPLINTFLAGS_BASE = \
     +indentspaces 4 \
     +locindentspaces 4 \
     +linelen 999 \
+    +bugslimit 1000 \
     -message-stream-stdout \
     +showdeephistory \
     +show-func \
@@ -2645,7 +2646,7 @@ SPLINTFLAGS = \
 	$(SPLINTFLAGS_TYPES) \
 
 #SPLINT_SOURCE = `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@ | sort`
-SPLINT_SOURCE = `echo src/*.c src/{gc,io,packfile,string}/*.c | sort`
+SPLINT_SOURCE = $$(find src/*.c src/{gc,io,packfile,string}/*.c -type f | grep -v extra_nci_thunks.c | grep -v extend_vtable.c | sort)
 
 # "splint" is the less-thorough splint target.  For cage cleaning work,
 # you'll probably want to specify SPLINT_SOURCE rather than work on the
