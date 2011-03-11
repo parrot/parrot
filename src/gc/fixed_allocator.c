@@ -305,9 +305,9 @@ Parrot_gc_pool_new(SHIM_INTERP, size_t object_size)
     newpool->free_list         = NULL;
     newpool->top_arena         = NULL;
     newpool->lo_arena_ptr      = (void *)((size_t)-1);
-    newpool->hi_arena_ptr      = 0;
-    newpool->newfree           = 0;
-    newpool->newlast           = 0;
+    newpool->hi_arena_ptr      = NULL;
+    newpool->newfree           = NULL;
+    newpool->newlast           = NULL;
 
     return newpool;
 }
