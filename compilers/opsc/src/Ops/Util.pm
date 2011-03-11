@@ -6,7 +6,10 @@ Various utility functions.
 
 sub process_recursive($op, &ctor) {
     my $res;
-    if pir::isa($op, 'Capture') {
+    if !pir::defined($op) {
+        $res := $op;
+    }
+    elsif pir::isa($op, 'Capture') {
         $res := &ctor($op);
         pir::push($res, process_recursive($_, &ctor)) for @($op);
         $res{$_} := process_recursive($op{$_}, &ctor) for $op.hash.keys;
