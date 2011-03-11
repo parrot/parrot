@@ -5,7 +5,7 @@ Various utility functions.
 =end Description
 
 sub process_recursive($op, &ctor) {
-    my $res := pir::clone($op);
+    my $res;
     if pir::isa($op, 'Capture') {
         $res := &ctor($op);
         pir::push($res, process_recursive($_, &ctor)) for @($op);
@@ -13,6 +13,9 @@ sub process_recursive($op, &ctor) {
     }
     elsif (pir::does($res, 'array')) {
         $res := $res.map(->$_ { process_recursive($_, &ctor) });
+    }
+    else {
+        $res := pir::clone($op);
     }
     $res;
 }
