@@ -147,7 +147,8 @@ method arg_types($args?)  {
 method arg_dirs($args?)   { self.attr('arg_dirs', $args, defined($args)) }
 
 method arg_type($arg_num) {
-    self<normalized_args>[$arg_num]<type>;
+    my @arg_types := self.arg_types;
+    @arg_types[$arg_num];
 }
 
 method full_name() {
