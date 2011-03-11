@@ -6,7 +6,7 @@ Various utility functions.
 
 sub process_recursive($op, &ctor) {
     my $res;
-    if !pir::defined($op) {
+    if pir::isnull($op) {
         $res := $op;
     }
     elsif pir::isa($op, 'Capture') {
@@ -46,12 +46,12 @@ sub to_capture($op) {
 }
 
 sub strip_source($op) {
-    process_recursive($op, -> $_ {
+    process_recursive($op, -> $c {
         Q:PIR {
-            $P1 = find_lex '$_'
+            $P1 = find_lex '$c'
             delete $P1['source']
         };
-        $_;
+        pir::clone($c);
     });
 }
 
