@@ -351,12 +351,15 @@ static void gc_gms_iterate_live_strings(PARROT_INTERP,
 static void gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
-static void gc_gms_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
+static void gc_gms_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
 
-static void gc_gms_mark_str_header(PARROT_INTERP, ARGIN_NULLOK(STRING *str))
-        __attribute__nonnull__(1);
+static void gc_gms_mark_str_header(PARROT_INTERP, ARGMOD(STRING *str))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*str);
 
 static void gc_gms_maybe_mark_and_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -439,9 +442,10 @@ static void gc_gms_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_sweep_pools(PARROT_INTERP, ARGIN(MarkSweep_GC *self))
+static void gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
 
 static void gc_gms_sweep_string_cb(PARROT_INTERP, ARGIN(PObj *obj))
         __attribute__nonnull__(1)
@@ -464,13 +468,13 @@ static void gc_gms_validate_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_validate_str(PARROT_INTERP, ARGIN(STRING *str))
-        __attribute__nonnull__(1)
+static void gc_gms_validate_str(SHIM_INTERP, ARGIN(STRING *str))
         __attribute__nonnull__(2);
 
-static void gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
+static void gc_gms_write_barrier(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
 
 static int gen2flags(int gen);
 #define ASSERT_ARGS_failed_allocation __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -559,7 +563,8 @@ static int gen2flags(int gen);
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_mark_str_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_gc_gms_maybe_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_pmc_get_youngest_generation \
@@ -631,8 +636,7 @@ static int gen2flags(int gen);
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_validate_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(str))
+       PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_gc_gms_write_barrier __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -1127,8 +1131,7 @@ Sweep generations starting from K:
 
 */
 static void
-gc_gms_sweep_pools(PARROT_INTERP,
-        ARGIN(MarkSweep_GC *self))
+gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
 {
     ASSERT_ARGS(gc_gms_sweep_pools)
 
@@ -1217,12 +1220,12 @@ mark as grey
 */
 
 static void
-gc_gms_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
+gc_gms_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_mark_pmc_header)
     MarkSweep_GC      * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     pmc_alloc_struct  * const item = PMC2PAC(pmc);
-    size_t             gen  = POBJ2GEN(pmc);
+    const size_t gen  = POBJ2GEN(pmc);
 
     PARROT_ASSERT(!PObj_on_free_list_TEST(pmc)
         || !"Resurrecting of dead objects is not supported");
@@ -1257,11 +1260,11 @@ Mark String
 */
 
 static void
-gc_gms_mark_str_header(PARROT_INTERP, ARGIN_NULLOK(STRING *str))
+gc_gms_mark_str_header(PARROT_INTERP, ARGMOD(STRING *str))
 {
     ASSERT_ARGS(gc_gms_mark_str_header)
-    if (str)
-        PObj_live_SET(str);
+
+    PObj_live_SET(str);
 }
 
 
@@ -2039,7 +2042,7 @@ with C<:write> in src/vtable.tbl.
 =cut
 */
 static void
-gc_gms_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
+gc_gms_write_barrier(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_write_barrier)
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
@@ -2346,7 +2349,7 @@ gc_gms_validate_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 }
 
 static void
-gc_gms_validate_str(PARROT_INTERP, ARGIN(STRING *str))
+gc_gms_validate_str(SHIM_INTERP, ARGIN(STRING *str))
 {
     ASSERT_ARGS(gc_gms_validate_str)
 

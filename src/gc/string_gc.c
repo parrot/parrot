@@ -323,7 +323,7 @@ is B<not> changed.
 void
 Parrot_gc_str_allocate_string_storage(PARROT_INTERP,
         ARGIN(String_GC *gc),
-        ARGOUT(STRING *str),
+        ARGMOD(STRING *str),
         size_t size)
 {
     ASSERT_ARGS(Parrot_gc_str_allocate_string_storage)

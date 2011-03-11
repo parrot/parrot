@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -1304,7 +1304,7 @@ C<gc_ms_allocate_fixed_size_storage>
 */
 
 void
-gc_ms_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
+gc_ms_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGFREE_NOTNULL(void *data))
 {
     ASSERT_ARGS(gc_ms_free_fixed_size_storage)
 

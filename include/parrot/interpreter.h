@@ -93,7 +93,7 @@ struct parrot_interp_t;
  * gets its own macro. */
 #define PARROT_INTERP /*@notnull@*/ /*@in@*/ Parrot_Interp interp
 #define NULLOK_INTERP /*@null@*/    /*@in@*/ Parrot_Interp interp
-#define SHIM_INTERP   /*@unused@*/ /*@null@*/ Parrot_Interp interp_unused __attribute__unused__
+#define SHIM_INTERP   /*@unused@*/ /*@notnull@*/ Parrot_Interp interp_unused __attribute__unused__
 
 
 #ifdef PARROT_IN_CORE

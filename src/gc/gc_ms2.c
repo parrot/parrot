@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -84,10 +84,11 @@ static Buffer* gc_ms2_allocate_buffer_header(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 static void gc_ms2_allocate_buffer_storage(PARROT_INTERP,
-    ARGIN(Buffer *str),
+    ARGMOD(Buffer *str),
     size_t size)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*str);
 
 PARROT_CAN_RETURN_NULL
 static void* gc_ms2_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
@@ -119,10 +120,11 @@ static STRING* gc_ms2_allocate_string_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 static void gc_ms2_allocate_string_storage(PARROT_INTERP,
-    ARGIN(STRING *str),
+    ARGMOD(STRING *str),
     size_t size)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*str);
 
 static void gc_ms2_block_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -150,10 +152,9 @@ static void gc_ms2_free_buffer_header(PARROT_INTERP,
 
 static void gc_ms2_free_fixed_size_storage(PARROT_INTERP,
     size_t size,
-    ARGMOD(void *data))
+    ARGFREE_NOTNULL(void *data))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*data);
+        __attribute__nonnull__(3);
 
 static void gc_ms2_free_memory_chunk(SHIM_INTERP, ARGFREE(void *data));
 static void gc_ms2_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
@@ -204,19 +205,24 @@ static void gc_ms2_mark_live_objects(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
+static void gc_ms2_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
 
-static void gc_ms2_mark_str_header(SHIM_INTERP, ARGIN_NULLOK(STRING *s));
+static void gc_ms2_mark_str_header(SHIM_INTERP, ARGMOD(STRING *s))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*s);
+
 static void gc_ms2_pmc_needs_early_collection(PARROT_INTERP, SHIM(PMC *pmc))
         __attribute__nonnull__(1);
 
 static void gc_ms2_reallocate_buffer_storage(PARROT_INTERP,
-    ARGIN(Buffer *str),
+    ARGMOD(Buffer *str),
     size_t size)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*str);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
@@ -232,10 +238,11 @@ static void * gc_ms2_reallocate_memory_chunk_zeroed(SHIM_INTERP,
     size_t oldsize);
 
 static void gc_ms2_reallocate_string_storage(PARROT_INTERP,
-    ARGIN(STRING *str),
+    ARGMOD(STRING *str),
     size_t size)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*str);
 
 static void gc_ms2_sweep_pmc_pool(PARROT_INTERP,
     ARGIN(Pool_Allocator *pool),
@@ -332,7 +339,8 @@ static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
 #define ASSERT_ARGS_gc_ms2_mark_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_gc_ms2_mark_str_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_gc_ms2_mark_str_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_gc_ms2_pmc_needs_early_collection \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -494,7 +502,7 @@ gc_ms2_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 
 
 static void
-gc_ms2_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
+gc_ms2_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGFREE_NOTNULL(void *data))
 {
     ASSERT_ARGS(gc_ms2_free_fixed_size_storage)
     if (data) {
@@ -736,7 +744,7 @@ mark as grey
 */
 
 static void
-gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
+gc_ms2_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_ms2_mark_pmc_header)
     MarkSweep_GC      * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
@@ -896,7 +904,7 @@ Functions for allocating strings/buffers storage.
 */
 
 static void
-gc_ms2_allocate_string_storage(PARROT_INTERP, ARGIN(STRING *str), size_t size)
+gc_ms2_allocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str), size_t size)
 {
     ASSERT_ARGS(gc_ms2_allocate_string_storage)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
@@ -905,7 +913,7 @@ gc_ms2_allocate_string_storage(PARROT_INTERP, ARGIN(STRING *str), size_t size)
 
 
 static void
-gc_ms2_reallocate_string_storage(PARROT_INTERP, ARGIN(STRING *str), size_t size)
+gc_ms2_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str), size_t size)
 {
     ASSERT_ARGS(gc_ms2_reallocate_string_storage)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
@@ -914,7 +922,7 @@ gc_ms2_reallocate_string_storage(PARROT_INTERP, ARGIN(STRING *str), size_t size)
 
 
 static void
-gc_ms2_allocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
+gc_ms2_allocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *str), size_t size)
 {
     ASSERT_ARGS(gc_ms2_allocate_buffer_storage)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
@@ -923,7 +931,7 @@ gc_ms2_allocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
 
 
 static void
-gc_ms2_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
+gc_ms2_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *str), size_t size)
 {
     ASSERT_ARGS(gc_ms2_reallocate_buffer_storage)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
@@ -942,11 +950,11 @@ Marks STRING as live.
 */
 
 static void
-gc_ms2_mark_str_header(SHIM_INTERP, ARGIN_NULLOK(STRING *s))
+gc_ms2_mark_str_header(SHIM_INTERP, ARGMOD(STRING *s))
 {
     ASSERT_ARGS(gc_ms2_mark_str_header)
-    if (s)
-        PObj_live_SET(s);
+
+    PObj_live_SET(s);
 }
 
 
