@@ -175,6 +175,24 @@ Create a clone of this PMC.
 
         return ret;
     }
+
+/*
+
+=item C<METHOD get_multisig()>
+
+Return the MMD signature PMC, if any or C<PMCNULL>.
+
+=cut
+
+*/
+
+    METHOD get_multisig() {
+        PMC *sig;
+        GET_ATTR_mmd_multi_sig(INTERP, SELF, sig);
+        if (PMC_IS_NULL(sig))
+            sig = PMCNULL;
+        RETURN(PMC *sig);
+    }
 }
 
 /*
