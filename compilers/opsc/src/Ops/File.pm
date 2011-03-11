@@ -181,7 +181,7 @@ ops file.
 
 =end
 
-method new(*@files, :$oplib, :$core!, :$nolines, :$quiet? = 0) {
+method new(*@files, :$oplib, :$core, :$nolines, :$quiet? = 0) {
     self<files>   := @files;
     self<core>    := $core;
     self<ops>     := list(); # Ops
