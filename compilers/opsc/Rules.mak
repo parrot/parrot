@@ -28,6 +28,9 @@ $(OPSC_DIR)/gen/Ops/Trans.pir: $(OPSC_DIR)/src/Ops/Trans.pm $(NQP_RX)
 $(OPSC_DIR)/gen/Ops/Trans/C.pir: $(OPSC_DIR)/src/Ops/Trans/C.pm $(NQP_RX)
 	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Trans/C.pm
 
+$(OPSC_DIR)/gen/Ops/Util.pir: $(OPSC_DIR)/src/Ops/Util.pm $(NQP_RX)
+	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Util.pm
+
 # Target to force rebuild opsc from main Makefile
 $(OPSC_DIR)/ops2c.nqp: $(LIBRARY_DIR)/opsc.pbc
 
