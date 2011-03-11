@@ -206,7 +206,7 @@ typedef void (*sweep_cb)(PARROT_INTERP, PObj *obj);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_DOES_NOT_RETURN
-static void failed_allocation(unsigned int line, unsigned long size);
+static void failed_allocation(unsigned int line, size_t size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
@@ -1896,7 +1896,7 @@ size)>
 
 =item C<static void gc_gms_free_memory_chunk(PARROT_INTERP, void *data)>
 
-=item C<static void failed_allocation(unsigned int line, unsigned long size)>
+=item C<static void failed_allocation(unsigned int line, size_t size)>
 
 TODO Write docu.
 
@@ -1980,10 +1980,10 @@ gc_gms_free_memory_chunk(SHIM_INTERP, ARGFREE(void *data))
 
 PARROT_DOES_NOT_RETURN
 static void
-failed_allocation(unsigned int line, unsigned long size)
+failed_allocation(unsigned int line, size_t size)
 {
     ASSERT_ARGS(failed_allocation)
-    fprintf(stderr, "Failed allocation of %lu bytes\n", size);
+    fprintf(stderr, "Failed allocation of %lu bytes\n", (unsigned long)size);
     do_panic(NULL, "Out of mem", __FILE__, line);
 }
 
