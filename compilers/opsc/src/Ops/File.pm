@@ -258,7 +258,7 @@ method compile_ops($str, :$experimental? = 0) {
     my $past     := $compiler.compile($str, :target('past'));
 
     for @($past<ops>) {
-        $_<experimental> := $experimental;
+        $_<experimental> := ?$experimental;
         self<ops>.push($_);
         #say($_.full_name ~ " is number " ~ self<op_order>);
         self<op_order>++;
