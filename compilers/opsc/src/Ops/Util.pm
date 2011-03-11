@@ -14,8 +14,8 @@ sub process_recursive($op, &ctor) {
         pir::push($res, process_recursive($_, &ctor)) for @($op);
         $res{$_} := process_recursive($op{$_}, &ctor) for $op.hash.keys;
     }
-    elsif (pir::does($res, 'array')) {
-        $res := $res.map(->$_ { process_recursive($_, &ctor) });
+    elsif pir::does($op, 'array') {
+        $res := $op.map(->$_ { process_recursive($_, &ctor) });
     }
     else {
         $res := pir::clone($op);
@@ -40,6 +40,7 @@ sub to_capture($op) {
         my $what := ~$_.WHAT;
         $_ := pir::new('Capture');
         $_<WHAT> := $what;
+        $_.hash.delete('source');
         $_
     });
 }
