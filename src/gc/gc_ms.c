@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -1182,6 +1182,7 @@ gc_ms_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
     return attrs;
 }
 
+#if DEBUG_FREE_LIST
 /*
 
 =item C<static INTVAL contained_in_attr_pool(const PMC_Attribute_Pool *pool,
@@ -1212,6 +1213,7 @@ contained_in_attr_pool(ARGIN(const PMC_Attribute_Pool *pool), ARGIN(const void *
 
     return 0;
 }
+#endif
 
 /*
 
@@ -1302,7 +1304,7 @@ C<gc_ms_allocate_fixed_size_storage>
 */
 
 void
-gc_ms_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
+gc_ms_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGFREE_NOTNULL(void *data))
 {
     ASSERT_ARGS(gc_ms_free_fixed_size_storage)
 

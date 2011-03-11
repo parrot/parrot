@@ -13,7 +13,7 @@
 
 #include "parrot/parrot.h"
 
-typedef PMC *(*nci_fb_func_t)(PARROT_INTERP, PMC *user_data, STRING *signature);
+typedef PMC *(*nci_fb_func_t)(PARROT_INTERP, PMC *user_data, PMC *signature);
 typedef void (*nci_thunk_t)(PARROT_INTERP, PMC *, PMC *);
 typedef void (*native_pcc_method_t)(PARROT_INTERP);
 
@@ -54,13 +54,13 @@ void Parrot_nci_load_extra_thunks(PARROT_INTERP);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
-PMC * build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
+PMC * build_call_func(PARROT_INTERP, ARGIN(PMC *sig))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_build_call_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(signature))
+    , PARROT_ASSERT_ARG(sig))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/nci/api.c */
 
@@ -79,6 +79,7 @@ void Parrot_nci_libffi_register(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_EXPORT
 PMC * Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

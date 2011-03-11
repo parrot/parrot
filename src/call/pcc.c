@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -302,7 +302,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     ASSERT_ARGS(Parrot_pcc_invoke_from_sig_object)
 
     opcode_t    *dest;
-    UINTVAL      n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    const UINTVAL n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     PMC         *ctx  = Parrot_push_context(interp, n_regs_used);
     PMC * const  ret_cont = pmc_new(interp, enum_class_Continuation);
 
@@ -317,7 +317,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     /* PIR Subs need runops to run their opcodes. Methods and NCI subs
      * don't. */
     if (dest && do_run_ops(interp, sub_obj)) {
-        Parrot_runcore_t *old_core = interp->run_core;
+        Parrot_runcore_t * const old_core = interp->run_core;
         const opcode_t offset = dest - interp->code->base.data;
 
         runops(interp, offset);

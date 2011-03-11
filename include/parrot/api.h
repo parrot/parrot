@@ -17,6 +17,13 @@
 
 typedef Parrot_PMC (*imcc_hack_func_t)(Parrot_PMC, Parrot_String, int, const char **);
 
+/* Forward declaration of Parrot_confess. We can't include exceptions.h yet */
+PARROT_EXPORT
+void Parrot_confess(
+    ARGIN(const char *cond),
+    ARGIN(const char *file),
+    unsigned int line);
+
 #define PARROT_API PARROT_EXPORT
 
 /* having a modified version of PARROT_ASSERT which resolves as an integer
@@ -233,11 +240,30 @@ Parrot_Int Parrot_api_set_warnings(Parrot_PMC interp_pmc, Parrot_Int flags);
 PARROT_API
 Parrot_Int Parrot_api_toggle_gc(Parrot_PMC interp_pmc, Parrot_Int on);
 
+Parrot_Int Parrot_api_unwrap_pointer(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pmc,
+    ARGOUT(void ** ptr),
+    ARGOUT(Parrot_Int * size))
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* ptr)
+        FUNC_MODIFIES(* size);
+
 PARROT_API
 Parrot_Int Parrot_api_write_bytecode_to_file(
     Parrot_PMC interp_pmc,
     Parrot_PMC pbc,
     Parrot_String filename);
+
+PARROT_API
+Parrot_Int Parrot_api_wrap_pointer(
+    Parrot_PMC interp_pmc,
+    ARGIN_NULLOK(void *ptr),
+    Parrot_Int size,
+    ARGOUT(Parrot_PMC *pmc))
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*pmc);
 
 #define ASSERT_ARGS_Parrot_api_add_dynext_search_path \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -296,6 +322,11 @@ Parrot_Int Parrot_api_write_bytecode_to_file(
 #define ASSERT_ARGS_Parrot_api_toggle_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_write_bytecode_to_file \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_unwrap_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(ptr) \
+    , PARROT_ASSERT_ARG(size))
+#define ASSERT_ARGS_Parrot_api_wrap_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/api.c */
 

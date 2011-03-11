@@ -808,8 +808,8 @@ Boxes a STRING C<string> into a String PMC.
 
 */
 
+PARROT_EXPORT
 PARROT_HOT
-PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_pmc_box_string(PARROT_INTERP, ARGIN_NULLOK(STRING *string))
@@ -833,8 +833,8 @@ Lookup the PMC type which is used for floating point numbers.
 
 */
 
+PARROT_EXPORT
 PARROT_HOT
-PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_pmc_box_number(PARROT_INTERP, FLOATVAL value)
@@ -857,8 +857,8 @@ Lookup the PMC type which is used for storing native integers.
 
 */
 
+PARROT_EXPORT
 PARROT_HOT
-PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)
@@ -882,6 +882,7 @@ Take a C string array and a count, and box it into a string array PMC
 */
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_pmc_box_c_string_array(PARROT_INTERP, int count, ARGIN(const char **s))
 {

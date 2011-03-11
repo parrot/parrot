@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -278,7 +278,7 @@ Marks the OrderedHash as live.
 */
 
     VTABLE void mark() {
-        Parrot_OrderedHash_attributes * const attrs =
+        const Parrot_OrderedHash_attributes * const attrs =
                 PARROT_ORDEREDHASH(SELF);
 
         if (attrs->hash)
@@ -456,7 +456,7 @@ Sets the PMC value of the element at index C<key> to C<val>.
     }
 
     VTABLE PMC *get_pmc_keyed_str(STRING *key) {
-        PMC *item = VTABLE_get_pmc_keyed_str(INTERP,
+        PMC * const item = VTABLE_get_pmc_keyed_str(INTERP,
             PARROT_ORDEREDHASH(SELF)->hash, key);
 
         if (PMC_IS_NULL(item))
@@ -705,8 +705,7 @@ Deletes the key C<*key> from the hash.
 */
 
     VTABLE void delete_keyed(PMC *key) {
-        Parrot_OrderedHash_attributes *attrs =
-                PARROT_ORDEREDHASH(SELF);
+        Parrot_OrderedHash_attributes * const attrs = PARROT_ORDEREDHASH(SELF);
         PMC *list_entry, *prev, *next;
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
             const INTVAL intval = VTABLE_get_integer(INTERP, key);
@@ -798,7 +797,7 @@ Used to unarchive the hash.
     }
 
     VTABLE void thawfinish(PMC *info) {
-        Parrot_OrderedHash_attributes *attrs = PARROT_ORDEREDHASH(SELF);
+        Parrot_OrderedHash_attributes * const attrs = PARROT_ORDEREDHASH(SELF);
         find_bounds(INTERP, attrs->hash, &attrs->first, &attrs->last);
         SUPER(info);
     }

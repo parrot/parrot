@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -122,6 +122,7 @@ Free all resources used.
 */
 
     VTABLE void init() {
+        UNUSED(INTERP);
         #ifdef ENABLED
         PObj_custom_destroy_SET(SELF);
         #endif
@@ -133,7 +134,7 @@ Free all resources used.
         PObj_custom_destroy_SET(SELF);
         if (VTABLE_isa(INTERP, init, CONST_STRING(INTERP, "String"))) {
             unsigned long length = 0;
-            STRING *name = VTABLE_get_string(INTERP, init);
+            STRING * const name = VTABLE_get_string(INTERP, init);
         #  ifdef MAPW32
         #  else
             mapping = mapfromfilename(interp, name, &length, CAN_READ);
@@ -304,7 +305,7 @@ Map a file by its name. The mode argument can be "r", "w" or "rw",
         if (STRING_IS_NULL(mode))
             flag = CAN_READ;
         else {
-            INTVAL len = Parrot_str_length(INTERP, mode);
+            const INTVAL len = Parrot_str_length(INTERP, mode);
             INTVAL i;
             for (i = 0; i < len; ++i) {
                 switch (STRING_ord(INTERP, mode, i)) {
@@ -383,7 +384,7 @@ Get a string from the buffer content with the specified encoding.
         STRING *result;
         unsigned char *buffer;
         INTVAL size;
-        const STR_VTABLE *encoding = Parrot_find_encoding_by_string(INTERP, encodingname);
+        const STR_VTABLE * const encoding = Parrot_find_encoding_by_string(INTERP, encodingname);
         GET_ATTR_buffer(INTERP, SELF, buffer);
         GET_ATTR_size(INTERP, SELF, size);
         if (pos < 0 || bytelength < 0 || size < 0 || pos + bytelength > size)
@@ -409,7 +410,7 @@ length in codepoints.
     METHOD get_chars(INTVAL pos, INTVAL length, STRING *encodingname)
     {
         #ifdef ENABLED
-        STRING *result = get_encoded_chars(INTERP, SELF, pos, length,
+        STRING * const result = get_encoded_chars(INTERP, SELF, pos, length,
                     Parrot_find_encoding_by_string(INTERP, encodingname));
         RETURN(STRING *result);
         #endif
@@ -429,7 +430,7 @@ in codepoints.
     METHOD get_utf8(INTVAL pos, INTVAL length)
     {
         #ifdef ENABLED
-        STRING *result = get_encoded_chars(INTERP, SELF, pos, length,
+        STRING * const result = get_encoded_chars(INTERP, SELF, pos, length,
                     Parrot_utf8_encoding_ptr);
         RETURN(STRING *result);
         #endif
@@ -534,7 +535,7 @@ mapfromfilename(PARROT_INTERP, ARGIN(STRING *name), ARGMOD(unsigned long *size),
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED, "invalid mmap mode");
     }
     {
-        char * name_str = Parrot_str_to_cstring(interp, name);
+        char * const name_str = Parrot_str_to_cstring(interp, name);
         handle = CreateFile(name_str, openmode, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
             OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         Parrot_str_free_cstring(name_str);
@@ -557,7 +558,7 @@ mapfromfilename(PARROT_INTERP, ARGIN(STRING *name), ARGMOD(unsigned long *size),
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED, "invalid mmap mode");
     }
     {
-        char * name_str = Parrot_str_to_cstring(interp, name);
+        char * const name_str = Parrot_str_to_cstring(interp, name);
         handle = open(name_str, openmode);
         Parrot_str_free_cstring(name_str);
     }
@@ -622,7 +623,6 @@ get_encoded_chars(PARROT_INTERP, ARGIN(PMC *self), INTVAL pos, INTVAL length,
         ARGIN(const STR_VTABLE *encoding))
 {
     ASSERT_ARGS(get_encoded_chars)
-    STRING               *result;
     unsigned char        *buffer;
     INTVAL                size;
 
@@ -652,4 +652,3 @@ get_encoded_chars(PARROT_INTERP, ARGIN(PMC *self), INTVAL pos, INTVAL length,
  * End:
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
-

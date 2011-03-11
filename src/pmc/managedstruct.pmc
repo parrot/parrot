@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -81,9 +81,9 @@ Otherwise, mem_gc_free() is used.
 */
 
     VTABLE void destroy() {
-        void *ptr = PARROT_MANAGEDSTRUCT(SELF)->ptr;
+        void * const ptr = PARROT_MANAGEDSTRUCT(SELF)->ptr;
         if (ptr) {
-            custom_free_func_t free_func = PARROT_MANAGEDSTRUCT(SELF)->custom_free_func;
+            const custom_free_func_t free_func = PARROT_MANAGEDSTRUCT(SELF)->custom_free_func;
             if (free_func) {
                 void *free_data = PARROT_MANAGEDSTRUCT(SELF)->custom_free_priv;
                 free_func(INTERP, ptr, free_data);
@@ -103,7 +103,7 @@ Otherwise, mem_gc_free() is used.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        Parrot_ManagedStruct_attributes * attrs = PARROT_MANAGEDSTRUCT(SELF);
+        Parrot_ManagedStruct_attributes * const attrs = PARROT_MANAGEDSTRUCT(SELF);
 
         if (attrs->ptr && !value) {
             mem_gc_free(INTERP, attrs->ptr);
@@ -143,10 +143,10 @@ of knowing how to make a deep copy of the pointer contents.
 */
 
     VTABLE PMC *clone() {
-        custom_clone_func_t clone_func = PARROT_MANAGEDSTRUCT(SELF)->custom_clone_func;
+        const custom_clone_func_t clone_func = PARROT_MANAGEDSTRUCT(SELF)->custom_clone_func;
         PMC *dest;
         if (clone_func) {
-            void *clone_data = PARROT_MANAGEDSTRUCT(SELF)->custom_clone_priv;
+            void * const clone_data = PARROT_MANAGEDSTRUCT(SELF)->custom_clone_priv;
             return clone_func(INTERP, SELF, clone_data);
         }
         dest = Parrot_pmc_new_init(INTERP, SELF->vtable->base_type,
@@ -165,10 +165,6 @@ of knowing how to make a deep copy of the pointer contents.
 /*
 
 =back
-
-=head1 HISTORY
-
-Initial revision by sean 2002/08/04.
 
 =cut
 

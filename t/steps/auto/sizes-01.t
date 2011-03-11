@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 53;
+use Test::More tests => 43;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::sizes');
@@ -38,8 +38,8 @@ my $step = test_step_constructor_and_description($conf);
 {
     my $stdout;
     my %results = (
-        ptrsize         => 1,
-        intvalsize      => 1,
+        ptr    => 1,
+        intval => 1,
     );
     capture(
         sub { auto::sizes::_handle_intval_ptrsize_discrepancy(\%results); },
@@ -51,8 +51,8 @@ my $step = test_step_constructor_and_description($conf);
 {
     my $stdout;
     my %results = (
-        ptrsize         => 1,
-        intvalsize      => 2,
+        ptr    => 1,
+        intval => 2,
     );
     capture(
         sub { auto::sizes::_handle_intval_ptrsize_discrepancy(\%results); },
@@ -67,9 +67,8 @@ my $step = test_step_constructor_and_description($conf);
 
 {
     my $stdout;
-    my %results = ( shortsize   => 2 );
     capture(
-        sub { auto::sizes::_set_int2($conf, \%results); },
+        sub { auto::sizes::_set_int2($conf, { short => 'short' }, { short => 2 }); },
         \$stdout,
     );
     is($conf->data->get( 'int2_t' ), q{short},
@@ -79,9 +78,8 @@ my $step = test_step_constructor_and_description($conf);
 
 {
     my $stdout;
-    my %results = ( shortsize   => 4 );
     capture(
-        sub { auto::sizes::_set_int2($conf, \%results); },
+        sub { auto::sizes::_set_int2($conf, {}, { short => 4 }); },
         \$stdout,
     );
     is($conf->data->get( 'int2_t' ), q{int},
@@ -94,9 +92,8 @@ my $step = test_step_constructor_and_description($conf);
 
 {
     my $stdout;
-    my %results = ( shortsize   => 4 );
     capture(
-        sub { auto::sizes::_set_int4($conf, \%results); },
+        sub { auto::sizes::_set_int4($conf, { short => 'short' }, { short => 4 }); },
         \$stdout,
     );
     is($conf->data->get( 'int4_t' ), q{short},
@@ -106,9 +103,8 @@ my $step = test_step_constructor_and_description($conf);
 
 {
     my $stdout;
-    my %results = ( intsize   => 4 );
     capture(
-        sub { auto::sizes::_set_int4($conf, \%results); },
+        sub { auto::sizes::_set_int4($conf, { int => 'int' }, { int => 4 }); },
         \$stdout,
     );
     is($conf->data->get( 'int4_t' ), q{int},
@@ -118,9 +114,8 @@ my $step = test_step_constructor_and_description($conf);
 
 {
     my $stdout;
-    my %results = ( longsize   => 4 );
     capture(
-        sub { auto::sizes::_set_int4($conf, \%results); },
+        sub { auto::sizes::_set_int4($conf, { long => 'long' }, { long => 4 }); },
         \$stdout,
     );
     is($conf->data->get( 'int4_t' ), q{long},
@@ -130,9 +125,8 @@ my $step = test_step_constructor_and_description($conf);
 
 {
     my $stdout;
-    my %results = ( );
     capture(
-        sub { auto::sizes::_set_int4($conf, \%results); },
+        sub { auto::sizes::_set_int4($conf, {}, {}); },
         \$stdout,
     );
     is($conf->data->get( 'int4_t' ), q{int},
@@ -145,9 +139,8 @@ my $step = test_step_constructor_and_description($conf);
 
 {
     my $stdout;
-    my %results = ( floatsize => 4 );
     capture(
-        sub { auto::sizes::_set_float4($conf, \%results); },
+        sub { auto::sizes::_set_float4($conf, { float => 'float' }, { float => 4 }); },
         \$stdout,
     );
     is($conf->data->get( 'float4_t' ), q{float},
@@ -157,9 +150,8 @@ my $step = test_step_constructor_and_description($conf);
 
 {
     my $stdout;
-    my %results = ( floatsize => 8 );
     capture(
-        sub { auto::sizes::_set_float4($conf, \%results); },
+        sub { auto::sizes::_set_float4($conf, { float => 'float' }, { float => 8 }); },
         \$stdout,
     );
     is($conf->data->get( 'float4_t' ), q{double},
@@ -172,9 +164,8 @@ my $step = test_step_constructor_and_description($conf);
 
 {
     my $stdout;
-    my %results = ( doublesize => 8 );
     capture(
-        sub { auto::sizes::_set_float8($conf, \%results); },
+        sub { auto::sizes::_set_float8($conf, { double => 'double' }, { double => 8 }); },
         \$stdout,
     );
     is($conf->data->get( 'float8_t' ), q{double},
@@ -194,88 +185,6 @@ my $step = test_step_constructor_and_description($conf);
     like($stdout, qr/conversion ops might fail/s,
         "Got expected warning");
 }
-
-########## _handle_hugeintvalsize() ##########
-
-my (%hugeintval, $intval, $intvalsize);
-
-$conf->data->set( intval => undef );
-$conf->data->set( intvalsize => undef );
-$hugeintval{hugeintvalsize} = undef;
-$intval = q{integer};
-$intvalsize = 4;
-auto::sizes::_handle_hugeintvalsize(
-    $conf,
-    {
-        hugeintval      => \%hugeintval,
-        intval          => $intval,
-        intvalsize      => $intvalsize,
-    },
-);
-is( $conf->data->get( 'hugeintval' ), $intval,
-    "Got expected value for hugeintval");
-is( $conf->data->get( 'hugeintvalsize' ), $intvalsize,
-    "Got expected value for hugeintvalsize");
-$conf->data->set( hugeintval => undef );
-$conf->data->set( hugeintvalsize => undef );
-
-$conf->data->set( intval => undef );
-$conf->data->set( intvalsize => undef );
-$hugeintval{hugeintvalsize} = 4;
-$intval = q{integer};
-$intvalsize = 4;
-auto::sizes::_handle_hugeintvalsize(
-    $conf,
-    {
-        hugeintval      => \%hugeintval,
-        intval          => $intval,
-        intvalsize      => $intvalsize,
-    },
-);
-is( $conf->data->get( 'hugeintval' ), $intval,
-    "Got expected value for hugeintval");
-is( $conf->data->get( 'hugeintvalsize' ), $intvalsize,
-    "Got expected value for hugeintvalsize");
-$conf->data->set( hugeintval => undef );
-$conf->data->set( hugeintvalsize => undef );
-
-$conf->data->set( intval => undef );
-$conf->data->set( intvalsize => undef );
-$hugeintval{hugeintvalsize} = 8;
-$intval = q{integer};
-$intvalsize = 4;
-auto::sizes::_handle_hugeintvalsize(
-    $conf,
-    {
-        hugeintval      => \%hugeintval,
-        intval          => $intval,
-        intvalsize      => $intvalsize,
-    },
-);
-ok( ! defined $conf->data->get( 'hugeintval' ),
-    "Got expected value for hugeintval");
-ok( ! defined $conf->data->get( 'hugeintvalsize' ),
-    "Got expected value for hugeintvalsize");
-$conf->data->set( hugeintval => undef );
-$conf->data->set( hugeintvalsize => undef );
-
-$conf->data->set( intval => undef );
-$conf->data->set( intvalsize => undef );
-
-########## _set_hugefloatval() ##########
-
-my $size = 12;
-auto::sizes::_set_hugefloatval( $conf, $size );
-is( $conf->data->get( 'hugefloatval' ), 'long double',
-    "Got expected type for hugefloatval");
-is( $conf->data->get( 'hugefloatvalsize' ), $size,
-    "Got expected size for hugefloatvalsize");
-
-auto::sizes::_set_hugefloatval( $conf, 0 );
-is( $conf->data->get( 'hugefloatval' ), 'double',
-    "Got expected type for hugefloatval");
-is( $conf->data->get( 'hugefloatvalsize' ), $conf->data->get('doublesize'),
-    "Got expected size for hugefloatvalsize");
 
 ########## _set_intvalmaxmin() ##########
 

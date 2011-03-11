@@ -22,6 +22,6 @@ Summary of my parrot @VERSION@ (r@revision@) configuration:
     ar='@ar@', ranlib='@ranlib@',
     make='@make@', make_set_make='@make_set_make@'
   Types:
-    iv=@iv@, intvalsize=@intvalsize@, intsize=@intsize@, opcode_t=@opcode_t@, opcode_t_size=@opcode_t_size@,
+    iv=@iv@, intvalsize=@intvalsize@, intsize=@intsize@, opcode_t=@opcode_t@, opcode_t_size=@opcodesize@,
     ptrsize=@ptrsize@,  byteorder=@byteorder@, 
     nv=@nv@, numvalsize=@numvalsize@, doublesize=@doublesize@, longdoublesize=@hugefloatvalsize@

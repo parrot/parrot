@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -29,15 +29,15 @@ pmclass OpLib auto_attrs {
     }
 
     VTABLE void init_pmc(PMC *name_pmc) {
-        STRING   *name      = VTABLE_get_string(INTERP, name_pmc);
-        char     *name_cstr = Parrot_str_to_cstring(INTERP, name);
+        STRING   * const name      = VTABLE_get_string(INTERP, name_pmc);
+        char     * const name_cstr = Parrot_str_to_cstring(INTERP, name);
         op_lib_t *oplib     = NULL;
-        int       i;
 
         if (STREQ(name_cstr, PARROT_CORE_OPLIB_NAME)) {
             oplib = PARROT_CORE_OPLIB_INIT(INTERP, 1);
         }
         else {
+            int i;
             for (i = 0; i < INTERP->n_libs; i++) {
                 if (STREQ(name_cstr, INTERP->all_op_libs[i]->name)) {
                     oplib = INTERP->all_op_libs[i];
@@ -58,7 +58,7 @@ pmclass OpLib auto_attrs {
     /* Look up an opnumber given the name of the op. First we look for the
        specific name, then the more general short name. */
     VTABLE INTVAL get_integer_keyed_str(STRING *name) {
-        op_lib_t     *oplib;
+        const op_lib_t *oplib;
         char * const  cstr = Parrot_str_to_cstring(INTERP, name);
         INTVAL        num;
 
@@ -70,7 +70,7 @@ pmclass OpLib auto_attrs {
     }
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
-        STRING *str_key = Parrot_key_string(INTERP, key);
+        STRING * const str_key = Parrot_key_string(INTERP, key);
         return SELF.get_integer_keyed_str(str_key);
     }
 
@@ -104,7 +104,7 @@ pmclass OpLib auto_attrs {
     }
 
     VTABLE INTVAL elements() {
-        op_lib_t *oplib;
+        const op_lib_t *oplib;
         GET_ATTR_oplib(INTERP, SELF, oplib);
         return oplib->op_count;
     }
@@ -121,7 +121,7 @@ pmclass OpLib auto_attrs {
 
     METHOD op_family(STRING *shortname) {
         char * const sname = Parrot_str_to_cstring(INTERP, shortname);
-        op_lib_t  *oplib;
+        const op_lib_t *oplib;
         op_info_t *table;
         PMC *result = PMCNULL;
         INTVAL i;
@@ -140,8 +140,8 @@ pmclass OpLib auto_attrs {
     }
 
     METHOD version() {
-        op_lib_t *oplib;
-        PMC *version_array = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
+        const op_lib_t *oplib;
+        PMC * const version_array = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
         GET_ATTR_oplib(INTERP, SELF, oplib);
         VTABLE_push_integer(INTERP, version_array, oplib->major_version);
         VTABLE_push_integer(INTERP, version_array, oplib->minor_version);

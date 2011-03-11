@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -75,13 +75,13 @@ Marks the current idx/key and the aggregate as live.
 
 */
     VTABLE PMC* clone() {
-        String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
-        PMC         *clone, *str_pmc;
+        String_iter * const iter    = &PARROT_STRINGITERATOR(SELF)->iter;
+        PMC         * const str_pmc = Parrot_pmc_new(INTERP, enum_class_String);
+        PMC         *clone;
         String_iter *clone_iter;
         STRING      *str_val;
         INTVAL       reverse;
 
-        str_pmc = Parrot_pmc_new(INTERP, enum_class_String);
         GET_ATTR_str_val(INTERP, SELF, str_val);
         VTABLE_set_string_native(INTERP, str_pmc, str_val);
         clone = Parrot_pmc_new_init(INTERP, enum_class_StringIterator, str_pmc);

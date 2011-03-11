@@ -55,11 +55,12 @@ static INTVAL string_max_bytes(SHIM_INTERP,
 PARROT_INLINE
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
-static const STR_VTABLE * string_rep_compatible(SHIM_INTERP,
+PARROT_PURE_FUNCTION
+static const STR_VTABLE * string_rep_compatible(
     ARGIN(const STRING *a),
     ARGIN(const STRING *b))
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
@@ -235,8 +236,8 @@ Parrot_str_new_noinit(PARROT_INTERP, UINTVAL capacity)
 
 /*
 
-=item C<static const STR_VTABLE * string_rep_compatible(PARROT_INTERP, const
-STRING *a, const STRING *b)>
+=item C<static const STR_VTABLE * string_rep_compatible(const STRING *a, const
+STRING *b)>
 
 Find the "lowest" possible encoding for the given string. E.g.
 
@@ -252,9 +253,9 @@ Returns NULL, if no compatible string representation can be found.
 PARROT_INLINE
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
+PARROT_PURE_FUNCTION
 static const STR_VTABLE *
-string_rep_compatible(SHIM_INTERP,
-    ARGIN(const STRING *a), ARGIN(const STRING *b))
+string_rep_compatible(ARGIN(const STRING *a), ARGIN(const STRING *b))
 {
     ASSERT_ARGS(string_rep_compatible)
 
@@ -323,12 +324,12 @@ Returns NULL, if no compatible string representation can be found.
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
+PARROT_PURE_FUNCTION
 const STR_VTABLE *
-Parrot_str_rep_compatible(PARROT_INTERP,
-    ARGIN(const STRING *a), ARGIN(const STRING *b))
+Parrot_str_rep_compatible(SHIM_INTERP, ARGIN(const STRING *a), ARGIN(const STRING *b))
 {
     ASSERT_ARGS(Parrot_str_rep_compatible)
-    return string_rep_compatible(interp, a, b);
+    return string_rep_compatible(a, b);
 }
 
 /*
@@ -473,7 +474,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
     ASSERT_STRING_SANITY(a);
     ASSERT_STRING_SANITY(b);
 
-    enc = string_rep_compatible(interp, a, b);
+    enc = string_rep_compatible(a, b);
 
     if (!enc) {
         /* upgrade strings for concatenation */
@@ -1209,7 +1210,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     }
     else {
         /* may have different reps..... */
-        enc = string_rep_compatible(interp, src, rep);
+        enc = string_rep_compatible(src, rep);
 
         if (!enc) {
             if (src->encoding != Parrot_utf8_encoding_ptr)

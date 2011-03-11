@@ -2,20 +2,44 @@ New in 3.2.0
 - Core
   + Full support for Unicode filenames on Linux and Win32
   + The configuration option --cxx is gone
-  + Improved code coverage
   + New Generational GC implemented. To enable it run Configure.pl --gc=gms 
-  + "opsc_full_parse" branch for semantically parse of ops is started
-  + Parallel building is supported ( make -j<number> )
+  + Now op definitions are semantically parsed. It opens possibilities for
+    future optimizations of parrot core.
+  + A statement convert the '.param' PIR systax
+  + A PMC is implemented for low-level buffer access which separate the
+    representation from the pointers
+  + Support added for 'long double', 'long long', and 64-bit to StructView
+  + In math.h are tools available for Inf/NaN
+  + Signature PMCs are used pervasively
 - Languages
   + A few tests in Cardinal are fixed
-  + Minor fixes, refactors and cleaning on Winxed
-  + New predefs replace and push on Winxed
+  + A binary .dmg is created of Rakudo Star for OS X
+  + Winxed
+    - Minor fixes, refactors and cleaning
+    - New predefs replace, push and provide a way to access multiple return
+      values
+    - Operators exits, class and .* (indirect method call) added
+    - $loadlib directive
+    - -o option to installable driver added
+    - Indent generated PIR is added to improve clarity and avoid imcc pitfalls
+      with non indented sub bodys
 - Community
+  + M0 roadmap is in progress
 - Documentation
   + 'make docs' target, which was serving only to generate superfluous POD
     files, has been removed.
   + Svn remnants from PDDs are removed
 - Tests
+  + Added 'make release_check' target so that Release Manager can double-check
+    tarball
+  + Probes added for 'long long' and 64-bit C types
+- Rosella (https://github.com/Whiteknight/Rosella)
+  Rosella is a collection of tools and building blocks for Parrot
+  + A working proxy library is created, that make mostly-transparent custom
+    proxies for many types of Parrot PMCs
+  + A mockobject testing library is created, using the new proxy library
+  + The PLA test suite is updated to use the new Rosella testing tools,
+    including the new mockobjects to test callbacks
 
 New in 3.1.0
 - Core

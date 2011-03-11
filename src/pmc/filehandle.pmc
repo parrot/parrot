@@ -184,7 +184,7 @@ Free structures.
 */
     VTABLE void destroy() {
         if (PARROT_FILEHANDLE(SELF)) {
-            Parrot_FileHandle_attributes *attrs = PARROT_FILEHANDLE(SELF);
+            Parrot_FileHandle_attributes * const attrs = PARROT_FILEHANDLE(SELF);
 
             if (!Parrot_io_is_closed_filehandle(INTERP, SELF)) {
                 if (attrs->flags & PIO_F_SHARED)
@@ -388,7 +388,7 @@ Read a line from the filehandle and return it in a string.
 
 #ifdef PARROT_HAS_READLINE
     /* 4-column indent to get c_indent.t to DTRT */
-        char *prompt_cstring =
+        char * const prompt_cstring =
             (got_prompt ? Parrot_str_to_cstring(INTERP, prompt) : NULL);
         char * const r = readline(prompt_cstring);
         Parrot_str_free_cstring(prompt_cstring);
@@ -409,7 +409,7 @@ Read a line from the filehandle and return it in a string.
         }
 #else
         if (got_prompt) {
-            char *prompt_cstring = Parrot_str_to_cstring(INTERP, prompt);
+            char * const prompt_cstring = Parrot_str_to_cstring(INTERP, prompt);
             fprintf(stderr, "%s", prompt_cstring);
             Parrot_str_free_cstring(prompt_cstring);
         }
@@ -769,7 +769,7 @@ Returns the next byte from the stream, but does not remove it.
 */
 
     METHOD peek() {
-        STRING *s = Parrot_io_peek(INTERP, SELF);
+        STRING * const s = Parrot_io_peek(INTERP, SELF);
         RETURN(STRING* s);
     }
 

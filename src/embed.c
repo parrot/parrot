@@ -896,6 +896,8 @@ Compiles a code string.
 */
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 Parrot_PMC
 Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code),
         ARGOUT(Parrot_String *error))

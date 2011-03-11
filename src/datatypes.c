@@ -93,6 +93,8 @@ header file.
 
 */
 
+#ifndef PARROT_HAS_INF_NAN
+
 PARROT_EXPORT
 FLOATVAL
 Parrot_dt_divide_floatval_by_zero(SHIM_INTERP, FLOATVAL num)
@@ -101,6 +103,8 @@ Parrot_dt_divide_floatval_by_zero(SHIM_INTERP, FLOATVAL num)
     const FLOATVAL zero = 0.0;
     return num / zero;
 }
+
+#endif
 
 
 /*
