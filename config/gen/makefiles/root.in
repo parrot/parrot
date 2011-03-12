@@ -2508,6 +2508,56 @@ SPLINT = splint
 # kept in there after completion.
 SPLINT_TMP = $(TEMPDIR)/splint
 
+# Transfer errors (-mem-trans) are too tough for us right now
+OLD_SPLINTFLAGS_MEMORY_SAFETY = \
+    -mem-trans \
+    -memchecks \
+    +bufferoverflow \
+    +bufferoverflowhigh \
+    +read-only-strings \
+    +read-only-trans \
+    -strict-destroy \
+    -strict-use-released \
+    +use-released \
+    -must-free \
+    -mustfreefresh \
+    -mustfreeonly \
+    +null \
+    +nullptrarith \
+    +nullret \
+    -ptr-arith \
+    +ptr-negate \
+    -zero-ptr \
+
+# Watch for unsafe comparisons
+OLD_SPLINTFLAGS_UNSAFE_COMPARISONS = \
+    +bool-compare \
+    +ptr-compare \
+    +real-compare \
+    +unsigned-compare
+
+# const and other qualifiers
+# Report qualifier mismatches only if dangerous (+relax-quals)
+OLD_SPLINTFLAGS_QUALIFIERS = \
+    +relax-quals
+
+# Symbol definitions
+OLD_SPLINTFLAGS_SYMBOL_DEFINITIONS = \
+    +decl-undef \
+    +incon-defs \
+    +incon-defs-lib \
+
+# Problems with evaluation and control structions
+OLD_SPLINTFLAGS_EVALUATION = \
+    +controlnestdepth 15 \
+    +duplicate-quals \
+
+# Types and stuff
+OLD_SPLINTFLAGS_TYPES = \
+    +ignore-signs \
+    +long-integral \
+    +match-any-integral \
+
 # Splint flags: http://splint.org/manual/html/appB.html
 # The dashes in the names don't make any difference to Splint, but I've
 # made them match how they are in the manual.  Otherwise, you might be
@@ -2569,6 +2619,9 @@ SPLINTFLAGS_TYPE = \
     +charunsignedchar \
     +char-index \
     +char-int \
+    \
+    +format-code \
+    +format-type \
 
 SPLINTFLAGS_MEMORY_MANAGEMENT = \
 
@@ -2576,11 +2629,20 @@ SPLINTFLAGS_SHARING = \
 
 SPLINTFLAGS_FUNCTION_INTERFACE = \
 
+# Macro safety checks
 SPLINTFLAGS_MACRO = \
+    +macro-assign \
+    +macro-empty \
+    +macro-parens \
+    +macro-redef \
+    +macro-stmt \
+    +macro-unrecog \
 
 SPLINTFLAGS_NAMING = \
 
 SPLINTFLAGS_CONTROL_FLOW = \
+    +eval-order \
+    +eval-order-uncon \
 
 SPLINTFLAGS_MEMORY_BOUNDS = \
 
