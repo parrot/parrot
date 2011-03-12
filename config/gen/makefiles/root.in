@@ -2514,7 +2514,7 @@ SPLINT_TMP = $(TEMPDIR)/splint
 # looking for "declundef", except that it's "decl-undef" in the docs.
 SPLINTFLAGS_BASE = \
     +standard \
-    -hints \
+    +hints \
     \
     +indentspaces 4 \
     +locindentspaces 4 \
