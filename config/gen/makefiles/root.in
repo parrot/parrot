@@ -2587,6 +2587,7 @@ SPLINTFLAGS_BOOLEAN_SLOP = \
     -pred-bool-ptr \
     -pred-bool-others \
     -boolops \
+    +bool-int \
 
 # const and other qualifiers
 # Report qualifier mismatches only if dangerous (+relax-quals)
