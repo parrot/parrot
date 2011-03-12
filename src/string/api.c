@@ -1745,8 +1745,12 @@ INTVAL
 Parrot_str_boolean(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_boolean)
-    const INTVAL len = STRING_length(s);
+    INTVAL len;
 
+    if (s == NULL)
+        return 0;
+
+    len = STRING_length(s);
     if (len == 0)
         return 0;
 
