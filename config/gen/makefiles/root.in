@@ -2686,7 +2686,8 @@ SPLINT_SOURCE = $$(find src/*.c src/{io,packfile,string}/*.c -type f | grep -v e
 # entire tree, like so:
 #     make splint SPLINT_SOURCE='src/call/*.c'
 
-splint : all
+#splint : all   # While I am debugging, don't require a full make
+splint :
 	$(MKPATH) $(SPLINT_TMP)
 	$(SPLINT) $(CC_INC) "-Iinclude/pmc" "-Icompilers/ast" $(SPLINTFLAGS) \
 	+partial -DNDEBUG \
