@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 73;
+plan tests => 74;
 
 =head1 NAME
 
@@ -98,7 +98,8 @@ void dotest(Parrot_Interp interp, void *unused)
 {
     Parrot_PMC pmc, pmc2, pmc3, pmc_string, pmc_string2, pmc_string3;
     Parrot_PMC pmc_float, pmc_float2;
-    Parrot_PMC rpa, rpa2;
+    Parrot_PMC rpa, rpa2, fpa, hash;
+    Parrot_PMC key1, key2;
     Parrot_Int type, value, integer, integer2;
     Parrot_Float number, number2;
     Parrot_String string, string2;
@@ -106,9 +107,13 @@ void dotest(Parrot_Interp interp, void *unused)
     type   = Parrot_PMC_typenum(interp, "Integer");
     rpa    = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
     rpa2   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
+    fpa    = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "FixedPMCArray"));
+    hash   = Parrot_hash_new(interp);
     pmc    = Parrot_PMC_new(interp, type);
     pmc2   = Parrot_PMC_new(interp, type);
     pmc3   = Parrot_PMC_new(interp, type);
+    key1   = Parrot_key_new_integer(interp, 42);
+    key2   = Parrot_key_new_integer(interp, 69);
 
     pmc_string = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
     pmc_string2 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
@@ -138,6 +143,16 @@ CODE
     );
 
 }
+
+# actual tests start here
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_defined_keyed_int");
+    integer = Parrot_PMC_defined_keyed_int(interp, rpa, key1);
+    Parrot_printf(interp,"%d\n", integer);
+CODE
+0
+Done!
+OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(freeze|thaw|thawfinish)");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
