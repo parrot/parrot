@@ -71,8 +71,6 @@ SPLINTFLAGS_EVALUATION = \
 
 # Types and stuff
 SPLINTFLAGS_TYPES = \
-    +char-index \
-    +char-int \
     +enum-members \
     +ignore-signs \
     +long-integral \
