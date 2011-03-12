@@ -438,9 +438,9 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     goto L1
   L2:
     .local string TAR_END
-    TAR_END = repeat "\0", BLOCK
-    $S0 = repeat TAR_END, 2
-    fh.'puts'($S0)
+    $I0 = 2 * BLOCK
+    TAR_END = repeat "\0", $I0
+    fh.'puts'(TAR_END)
 .end
 
 =item _error
