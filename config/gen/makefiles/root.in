@@ -2527,7 +2527,6 @@ OLD_SPLINTFLAGS_MEMORY_SAFETY = \
     +nullret \
     -ptr-arith \
     +ptr-negate \
-    -zero-ptr \
 
 # Watch for unsafe comparisons
 OLD_SPLINTFLAGS_UNSAFE_COMPARISONS = \
@@ -2552,11 +2551,6 @@ OLD_SPLINTFLAGS_EVALUATION = \
     +controlnestdepth 15 \
     +duplicate-quals \
 
-# Types and stuff
-OLD_SPLINTFLAGS_TYPES = \
-    +ignore-signs \
-    +long-integral \
-    +match-any-integral \
 
 # Splint flags: http://splint.org/manual/html/appB.html
 # The dashes in the names don't make any difference to Splint, but I've
@@ -2615,6 +2609,7 @@ SPLINTFLAGS_TYPE = \
     +pred-bool-others \
     +pred-assign \
     +ptrnegate \
+    -zero-ptr \
     \
     +charunsignedchar \
     +char-index \
@@ -2622,6 +2617,9 @@ SPLINTFLAGS_TYPE = \
     \
     +format-code \
     +format-type \
+    \
+    +ignore-signs \
+    +long-unsigned-unsigned-integral \
 
 SPLINTFLAGS_MEMORY_MANAGEMENT = \
 
