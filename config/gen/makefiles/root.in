@@ -2548,16 +2548,27 @@ SPLINTFLAGS_NULL_DEREFERENCES = \
     +nullret \
 
 SPLINTFLAGS_USE_BEFORE_DEFINITION = \
+    +usedef \
+    +incondefs \
+    +functionderef \
 
 SPLINTFLAGS_TYPE = \
-    +charunsignedchar \
-    +char-index \
-    +char-int \
     +string-literal-too-long \
     +string-literal-no-room \
     +string-literal-no-room-final-null \
     +string-literal-smaller \
     +enum-members \
+    \
+    -pred-bool \
+    -pred-bool-ptr \
+    -pred-bool-int \
+    +pred-bool-others \
+    +pred-assign \
+    +ptrnegate \
+    \
+    +charunsignedchar \
+    +char-index \
+    +char-int \
 
 SPLINTFLAGS_MEMORY_MANAGEMENT = \
 
