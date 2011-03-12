@@ -7,10 +7,6 @@
 This document specifies M0, the set of microcode-like ops on which Parrot will
 be based, and their requisite runtime environment.
 
-=head2 Version
-
-$Revision$
-
 =head2 Status
 
 This document is a draft under active development.  Nothing is set in stone
