@@ -2138,7 +2138,7 @@ You usually should use Parrot_str_to_encoded_cstring instead.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 char *
-Parrot_str_to_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
+Parrot_str_to_cstring(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_cstring)
 
@@ -2162,7 +2162,7 @@ in a memory leak.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 char *
-Parrot_str_to_encoded_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s),
+Parrot_str_to_encoded_cstring(PARROT_INTERP, ARGIN(const STRING *s),
         ARGIN(const STR_VTABLE *enc))
 {
     ASSERT_ARGS(Parrot_str_to_encoded_cstring)
