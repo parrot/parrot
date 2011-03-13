@@ -1,0 +1,1180 @@
+/usr/local/bin/perl -MExtUtils::Command -e mkpath /tmp/splint
+splint -I./include -I./include/pmc "-Iinclude/pmc" "-Icompilers/ast" +weak +hints +indentspaces 4 +locindentspaces 4 +linelen 999 +bugslimit 1000 -message-stream-stdout +showdeephistory +show-func +show-column -tmpdir /tmp/splint +posix-lib -skip-posix-headers +ansi89-limits +num-struct-fields 255 -show-summary +show-scan +time-dist +cpp-names +ansi-reserved +ansi-reserved-internal -iso-reserved -iso-reserved-internal -include-nest 10  +null +nullret  +usedef +incondefs +functionderef  +string-literal-too-long +string-literal-no-room +string-literal-no-room-final-null +string-literal-smaller +enum-members -pred-bool -pred-bool-ptr -pred-bool-int +pred-bool-others +pred-assign +ptrnegate -zero-ptr +charunsignedchar +char-index +char-int +format-code +format-type +ignore-signs +long-unsigned-unsigned-integral     +macro-assign +macro-empty +macro-parens +macro-redef +macro-stmt +macro-unrecog   +eval-order +eval-order-uncon      \
+	+partial -DNDEBUG \
+	$(find src/*.c src/{io,packfile,string}/*.c -type f | grep -v extra_nci_thunks.c | grep -v extend_vtable.c | sort) \
+		| grep -v 'Source code error generation point'
+Splint 3.1.1 --- 06 Jan 2007
+
+Command Line: Setting +hints redundant with current value
+Command Line: Setting +showfunc redundant with current value
+Command Line: Setting +showcolumn redundant with current value
+Command Line: Setting -showsummary redundant with current value
+Command Line: Setting +nullret redundant with current value
+Command Line: Setting +stringliteraltoolong redundant with current value
+Command Line: Setting +stringliteralnoroom redundant with current value
+Command Line: Setting +stringliteralnoroomfinalnull redundant with current value
+Command Line: Setting -predboolptr redundant with current value
+Command Line: Setting -predboolint redundant with current value
+Command Line: Setting +predassign redundant with current value
+Command Line: Setting +ptrnegate redundant with current value
+Command Line: Setting +charunsignedchar redundant with current value
+Command Line: Setting +charindex redundant with current value
+Command Line: Setting +charint redundant with current value
+Command Line: Setting +formatcode redundant with current value
+Command Line: Setting +formattype redundant with current value
+Command Line: Setting +longunsignedunsignedintegral redundant with current value
+< loading standard library /usr/share/splint/lib/posix.lcd .... >
+< preprocessing .... >
+< checking src/core_pmcs.c >
+include/parrot/multidispatch.h:67:38: Qualifier in used on non-pointer or struct: funcptr_t multi_func_ptr
+   A declaration uses an invalid annotation. (Use -annotationerror to inhibit warning)
+include/parrot/vtable.h:1155:5: Static Parrot_vtable_slot_names[190] initialized to null value: Parrot_vtable_slot_names[190] = NULL
+   A reference with no null annotation is assigned or initialized to NULL.  Use /*@null@*/ to declare the reference as a possibly null pointer. (Use -nullassign to inhibit warning)
+include/parrot/exit.h:48:43: Qualifier in used on non-pointer or struct: exit_handler_f function
+include/parrot/vtable.h:962:42: File static variable Parrot_vtable_slot_names declared but not used
+   A variable is declared but never used. Use /*@unused@*/ in front of declaration to suppress message. (Use -varuse to inhibit warning)
+< checking src/datatypes.c >
+< checking src/debug.c >
+include/parrot/extend.h:75:32: Qualifier in used on non-pointer or struct: void cfunction(Parrot_Interp, void *)
+include/parrot/extend.h:77:32: Qualifier in used on non-pointer or struct: void chandler(Parrot_Interp, PMC *, void *)
+include/parrot/extend.h:185:35: Qualifier in used on non-pointer or struct: void func(void)
+include/parrot/oplib/ops.h:1090:2: Enumerator enum { PARROT_OP_end, PARROT_OP_noop, PARROT_OP_check_events, ..., PARROT_OP_root_new_p_pc_ic } declared with 1071 members (limit is set to 127)
+   Limit on maximum number of members of an enum is exceeded. (Use -numenummembers to inhibit warning)
+src/debug.c:464:9: Function types are inconsistent. Parameter 2 is implicitly non-null, but null in assigned function: &dbg_listbreakpoints
+   Types are incompatible. (Use -type to inhibit warning)
+src/debug.c: (in function close_script_file)
+src/debug.c:754:2: Function returns with null storage derivable from parameter interp->pdb->script_file
+   A possibly null pointer is reachable from a parameter or global variable that is not declared using a /*@null@*/ annotation. (Use -nullstate to inhibit warning)
+    src/debug.c:749:36: Storage interp->pdb->script_file becomes null
+src/debug.c: (in function Parrot_debugger_destroy)
+src/debug.c:822:2: Function returns with null storage derivable from parameter interp->pdb
+    src/debug.c:821:19: Storage interp->pdb becomes null
+src/debug.c: (in function Parrot_debugger_start)
+src/debug.c:884:22: Possibly null storage interp->pdb->cur_opcode derivable from parameter debugger_cmdline (interp)
+    src/debug.c:880:31: Storage interp->pdb->cur_opcode may become null
+src/debug.c:891:2: Function returns with possibly null storage derivable from parameter interp->pdb->cur_opcode
+    src/debug.c:880:31: Storage interp->pdb->cur_opcode may become null
+src/debug.c: (in function PDB_next)
+src/debug.c:1152:30: Possibly null storage command derivable from parameter get_ulong (&command, ...)
+    src/debug.c:1139:87: Storage command may become null
+src/debug.c: (in function PDB_trace)
+src/debug.c:1197:30: Possibly null storage command derivable from parameter get_ulong (&command, ...)
+    src/debug.c:1182:88: Storage command may become null
+src/debug.c: (in function PDB_set_break)
+src/debug.c:1480:34: Possibly null storage command derivable from parameter get_ulong (&command, ...)
+    src/debug.c:1471:92: Storage command may become null
+src/debug.c:1558:26: Arrow access from possibly null pointer line: line->number
+   A possibly null pointer is dereferenced.  Value is either the result of a function which may return null (in which case, code should check it is not null), or a global, parameter or structure field declared with the null qualifier. (Use -nullderef to inhibit warning)
+    src/debug.c:1477:30: Storage line may become null
+src/debug.c:1580:24: Possibly null storage pdb->file derivable from parameter display_breakpoint (pdb, ...)
+src/debug.c:1580:29: Possibly null storage newbreak->condition derivable from parameter display_breakpoint (..., newbreak)
+    src/debug.c:1553:31: Storage newbreak->condition may become null
+src/debug.c:1580:29: Possibly null storage newbreak->prev->next->condition derivable from parameter display_breakpoint (..., newbreak)
+    src/debug.c:1553:31: Storage newbreak->prev->next->condition may become null
+src/debug.c: (in function PDB_delete_condition)
+src/debug.c:1850:2: Function returns with null storage derivable from parameter breakpoint->condition
+    src/debug.c:1849:29: Storage breakpoint->condition becomes null
+src/debug.c: (in function PDB_check_condition)
+src/debug.c:1922:13: Operands of >= have incompatible types (unsigned char, UINTVAL): condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, 0)
+src/debug.c:1944:13: Operands of >= have incompatible types (unsigned char, UINTVAL): condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, 1)
+src/debug.c:1966:13: Operands of >= have incompatible types (unsigned char, UINTVAL): condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, 2)
+src/debug.c:1997:13: Operands of >= have incompatible types (unsigned char, UINTVAL): condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, 3)
+src/debug.c: (in function PDB_break)
+src/debug.c:2099:33: Null storage breakpoint->condition derivable from parameter display_breakpoint (..., breakpoint)
+src/debug.c: (in function PDB_disassemble_op)
+src/debug.c:2324:21: Buffer overflow possible with sprintf.  Recommend using snprintf instead: sprintf
+   Use of function that may lead to buffer overflow. (Use -bufferoverflowhigh to inhibit warning)
+src/debug.c: (in function PDB_disassemble)
+src/debug.c:2584:62: Null storage interp->pdb->file derivable from parameter Parrot_gc_allocate_memory_chunk ((interp), ...)
+    src/debug.c:2579:21: Storage interp->pdb->file becomes null
+src/debug.c:2637:35: Null storage pfile->line->next->label derivable from parameter PDB_free_file (..., pfile)
+    src/debug.c:2614:36: Storage pfile->line->next->label becomes null
+src/debug.c:2637:35: Null storage pfile->line->next->next derivable from parameter PDB_free_file (..., pfile)
+    src/debug.c:2615:36: Storage pfile->line->next->next becomes null
+src/debug.c:2638:20: Function returns with null storage derivable from parameter interp->pdb->file
+    src/debug.c:2579:21: Storage interp->pdb->file becomes null
+src/debug.c:2648:2: Function returns with null storage derivable from parameter interp->pdb->file->line->next->label
+    src/debug.c:2614:36: Storage interp->pdb->file->line->next->label becomes null
+src/debug.c:2648:2: Function returns with null storage derivable from parameter interp->pdb->file->line->next->next
+    src/debug.c:2615:36: Storage interp->pdb->file->line->next->next becomes null
+src/debug.c: (in function PDB_add_label)
+src/debug.c:2695:25: Function returns with possibly null storage derivable from parameter file->label->next
+    src/debug.c:2681:20: Storage file->label->next may become null
+src/debug.c: (in function PDB_load_source)
+src/debug.c:2799:16: Function returns with null storage derivable from parameter interp->pdb->debugee->pdb->file
+    src/debug.c:2783:35: Storage interp->pdb->debugee->pdb->file becomes null
+src/debug.c:2804:83: Null storage interp->pdb->debugee->pdb->file derivable from parameter Parrot_gc_allocate_memory_chunk_with_interior_pointers ((interp), ...)
+    src/debug.c:2783:35: Storage interp->pdb->debugee->pdb->file becomes null
+src/debug.c:2913:2: Function returns with null storage derivable from parameter interp->pdb->debugee->pdb->file
+    src/debug.c:2783:35: Storage interp->pdb->debugee->pdb->file becomes null
+src/debug.c: (in function PDB_get_continuation_backtrace)
+src/debug.c:3424:13: Expression may have undefined behavior.  Left operand calls unconstrained function Parrot_pcc_get_sub; right operand calls unconstrained function Parrot_pcc_get_sub.  The unconstrained functions may modify global state used by the other operand): Parrot_pcc_get_sub(interp, ((Parrot_Continuation_attributes *)(old)->data)->to_ctx) == Parrot_pcc_get_sub(interp, ((Parrot_Continuation_attributes *)(sub)->data)->to_ctx)
+   Code involving a call to function with no modifies or globals clause may have undefined or implementation-dependent behavior (Splint assumes the unconstrained call may modify any reachable state or use any global). Add a specification for the function. (Use -evalorderuncon to inhibit warning)
+src/debug.c: (in function GDB_print_reg)
+src/debug.c:3519:17: Operands of == have incompatible types (char *, char): string == '\0'
+< checking src/dynext.c >
+src/dynext.c: (in function get_path)
+src/dynext.c:273:33: Null storage passed as non-null param: Parrot_dlopen ((char *)NULL, ...)
+   A possibly null pointer is passed as a parameter corresponding to a formal parameter with no /*@null@*/ annotation.  If NULL may be used for this parameter, add a /*@null@*/ annotation to the function parameter declaration. (Use -nullpass to inhibit warning)
+src/dynext.c: (in function Parrot_dyn_dlsym_str)
+src/dynext.c:446:46: Possibly null storage handle passed as non-null param: Parrot_dlsym (handle, ...)
+    src/dynext.c:437:35: Storage handle may become null
+src/dynext.c: (in function Parrot_dyn_load_lib)
+src/dynext.c:684:29: Possibly null storage lib passed as non-null param: get_path (..., lib, ...)
+    src/dynext.c:648:37: Storage lib may become null
+src/dynext.c:684:79: Null storage ext passed as non-null param: get_path (..., ext)
+    src/dynext.c:672:20: Storage ext becomes null
+src/dynext.c:693:41: Possibly null storage lib_name passed as non-null param: run_init_lib (..., lib_name, ...)
+    src/dynext.c:671:20: Storage lib_name may become null
+< checking src/embed.c >
+compilers/imcc/imc.h:273:15: Function IMCC_create_itcall_label inconsistently redeclared to return possibly null storage, previously declared with notnull qualifier
+   A function, variable or constant is redefined with a different type. (Use -incondefs to inhibit warning)
+    compilers/imcc/imc.h:177:15: Declaration of IMCC_create_itcall_label
+src/embed.c: (in function Parrot_disassemble)
+src/embed.c:882:9: Return value (type INTVAL) ignored: Parrot_io_close_...
+   Result returned by function call is not used. If this is intended, can cast result to (void) to eliminate message. (Use -retvalother to inhibit warning)
+< checking src/exceptions.c >
+src/exceptions.c: (in function Parrot_ex_throw_from_op)
+src/exceptions.c:235:68: Null storage passed as non-null param: (resume)->vtable->invoke (..., NULL)
+src/exceptions.c:241:64: Possibly null storage dest passed as non-null param: (handler)->vtable->invoke (..., dest)
+    src/exceptions.c:207:135: Storage dest may become null
+src/exceptions.c: (in function Parrot_ex_throw_from_c)
+src/exceptions.c:376:88: Null storage passed as non-null param: (handler)->vtable->invoke (..., NULL)
+src/exceptions.c: (in function Parrot_ex_update_for_rethrow)
+src/exceptions.c:751:62: Possibly null storage prev_backtrace passed as non-null param: (bt_strings)->vtable->push_string (..., prev_backtrace)
+    src/exceptions.c:745:37: Storage prev_backtrace may become null
+src/exceptions.c: (in function Parrot_ex_build_complete_backtrace_string)
+src/exceptions.c:778:16: Possibly null storage cur_bt returned as non-null: cur_bt
+   Function returns a possibly null pointer, but is not declared using /*@null@*/ annotation of result.  If function may return NULL, add /*@null@*/ annotation to the return value declaration. (Use -nullret to inhibit warning)
+    src/exceptions.c:773:29: Storage cur_bt may become null
+src/exceptions.c:782:56: Possibly null storage cur_bt passed as non-null param: (builder)->vtable->push_string (..., cur_bt)
+    src/exceptions.c:773:29: Storage cur_bt may become null
+< checking src/exit.c >
+src/exit.c:41:101: Qualifier in used on non-pointer or struct: exit_handler_f function
+src/exit.c: (in function Parrot_x_on_exit)
+src/exit.c:51:2: Function returns with possibly null storage derivable from parameter interp->exit_handler_list->arg
+    src/exit.c:48:33: Storage interp->exit_handler_list->arg may become null
+src/exit.c: (in function Parrot_x_jump_out_error)
+src/exit.c:97:23: Null storage interp->final_exception derivable from parameter Parrot_x_jump_out (interp, ...)
+    src/exit.c:96:31: Storage interp->final_exception becomes null
+src/exit.c: (in function Parrot_x_exit)
+src/exit.c:144:23: Null storage interp->exit_handler_list derivable from parameter Parrot_x_jump_out (interp, ...)
+    src/exit.c:143:33: Storage interp->exit_handler_list becomes null
+< checking src/extend.c >
+src/extend.c: (in function Parrot_vfprintf)
+src/extend.c:104:19: Function returns with null storage derivable from parameter interp->lo_var_ptr
+    src/extend.c:102:142: Storage interp->lo_var_ptr becomes null
+src/extend.c: (in function Parrot_PMC_new)
+src/extend.c:210:19: Function returns with null storage derivable from parameter interp->lo_var_ptr
+    src/extend.c:209:142: Storage interp->lo_var_ptr becomes null
+src/extend.c: (in function Parrot_PMC_typenum)
+src/extend.c:232:19: Function returns with null storage derivable from parameter interp->lo_var_ptr
+    src/extend.c:231:142: Storage interp->lo_var_ptr becomes null
+src/extend.c: (in function Parrot_PMC_null)
+src/extend.c:251:12: Null storage returned as non-null: ((PMC *)NULL)
+src/extend.c: (in function Parrot_ext_call)
+src/extend.c:319:9: Variable arg_sig used before definition
+   An rvalue is used that may not be initialized to a value on some execution path. (Use -usedef to inhibit warning)
+src/extend.c:323:59: Variable ret_sig used before definition
+src/extend.c:344:44: Qualifier in used on non-pointer or struct: void cfunction(Parrot_Interp, void *)
+src/extend.c:345:44: Qualifier in used on non-pointer or struct: void chandler(Parrot_Interp, PMC *, void *)
+src/extend.c: (in function Parrot_ext_try)
+src/extend.c:357:34: Possibly null storage data passed as non-null param: (*cfunction) (..., data)
+    src/extend.c:346:43: Storage data may become null
+src/extend.c:372:34: Field jmp.exception used before definition
+src/extend.c:385:52: Possibly null storage data passed as non-null param: (*chandler) (..., data)
+    src/extend.c:346:43: Storage data may become null
+src/extend.c:390:2: Function returns with null storage derivable from parameter interp->lo_var_ptr
+    src/extend.c:388:146: Storage interp->lo_var_ptr becomes null
+src/extend.c: (in function Parrot_new_string)
+src/extend.c:593:19: Function returns with null storage derivable from parameter interp->lo_var_ptr
+    src/extend.c:592:142: Storage interp->lo_var_ptr becomes null
+src/extend.c: (in function Parrot_register_pmc)
+src/extend.c:636:2: Function returns with null storage derivable from parameter interp->lo_var_ptr
+    src/extend.c:635:142: Storage interp->lo_var_ptr becomes null
+src/extend.c: (in function Parrot_unregister_pmc)
+src/extend.c:657:2: Function returns with null storage derivable from parameter interp->lo_var_ptr
+    src/extend.c:656:142: Storage interp->lo_var_ptr becomes null
+src/extend.c: (in function Parrot_register_string)
+src/extend.c:678:2: Function returns with null storage derivable from parameter interp->lo_var_ptr
+    src/extend.c:677:142: Storage interp->lo_var_ptr becomes null
+src/extend.c: (in function Parrot_unregister_string)
+src/extend.c:700:2: Function returns with null storage derivable from parameter interp->lo_var_ptr
+    src/extend.c:699:142: Storage interp->lo_var_ptr becomes null
+src/extend.c:716:39: Qualifier in used on non-pointer or struct: void func(void)
+src/extend.c: (in function Parrot_PMC_newclass)
+src/extend.c:747:19: Function returns with null storage derivable from parameter interp->lo_var_ptr
+    src/extend.c:746:142: Storage interp->lo_var_ptr becomes null
+< checking src/global_setup.c >
+src/global_setup.c:31:6: Function Parrot_gbl_register_core_pmcs defined more than once
+   A function or variable is redefined. One of the declarations should use extern. (Use -redef to inhibit warning)
+    src/core_pmcs.c:303:1: Previous definition of Parrot_gbl_register_core_pmcs
+src/global_setup.c:33:52: Static parrot_config_stored initialized to null value: parrot_config_stored = NULL
+src/global_setup.c:33:52: Static parrot_config_stored initialized to null value: unsigned char * parrot_config_stored = NULL = NULL
+src/global_setup.c:35:42: Static parrot_config_hash_global initialized to null value: parrot_config_hash_global = NULL
+src/global_setup.c:35:42: Static parrot_config_hash_global initialized to null value: PMC * parrot_config_hash_global = NULL = NULL
+< checking src/hash.c >
+src/hash.c: (in function key_hash)
+src/hash.c:478:40: Possibly null storage key passed as non-null param: key_hash_STRING (..., (const STRING *)key, ...)
+    src/hash.c:472:122: Storage key may become null
+src/hash.c:481:41: Possibly null storage key passed as non-null param: key_hash_cstring (..., (const char *)key, ...)
+    src/hash.c:472:122: Storage key may become null
+src/hash.c:484:29: Arrow access from possibly null pointer key: ((PMC *)key)->vtable
+    src/hash.c:472:122: Storage key may become null
+src/hash.c:484:58: Possibly null storage key passed as non-null param: ((PMC *)key)->vtable->hashvalue (..., (PMC *)key)
+    src/hash.c:472:122: Storage key may become null
+src/hash.c: (in function hash_compare)
+src/hash.c:516:44: Possibly null storage a passed as non-null param: hash_compare_string (..., (const STRING *)a, ...)
+    src/hash.c:507:126: Storage a may become null
+src/hash.c:516:63: Possibly null storage b passed as non-null param: hash_compare_string (..., (const STRING *)b)
+    src/hash.c:508:31: Storage b may become null
+src/hash.c:519:40: Possibly null storage a passed as non-null param: hash_compare_string_enc ((const STRING *)a, ...)
+    src/hash.c:507:126: Storage a may become null
+src/hash.c:519:59: Possibly null storage b passed as non-null param: hash_compare_string_enc (..., (const STRING *)b)
+    src/hash.c:508:31: Storage b may become null
+src/hash.c:522:23: Possibly null storage a passed as non-null param: strcmp ((const char *)a, ...)
+    src/hash.c:507:126: Storage a may become null
+src/hash.c:522:40: Possibly null storage b passed as non-null param: strcmp (..., (const char *)b)
+    src/hash.c:508:31: Storage b may become null
+src/hash.c:525:41: Possibly null storage a passed as non-null param: hash_compare_pmc (..., (PMC *)a, ...)
+    src/hash.c:507:126: Storage a may become null
+src/hash.c:525:51: Possibly null storage b passed as non-null param: hash_compare_pmc (..., (PMC *)b)
+    src/hash.c:508:31: Storage b may become null
+src/hash.c: (in function Parrot_hash_thaw)
+src/hash.c:761:47: Variable key used before definition
+src/hash.c:761:17: Return value (type HashBucket *) ignored: Parrot_hash_put(...
+src/hash.c:767:47: Variable key used before definition
+src/hash.c:767:17: Return value (type HashBucket *) ignored: Parrot_hash_put(...
+src/hash.c:773:47: Variable key used before definition
+src/hash.c:773:17: Return value (type HashBucket *) ignored: Parrot_hash_put(...
+src/hash.c:758:16: Case in switch not PARROT_DATA_TYPE member: enum_hash_int
+src/hash.c:764:16: Case in switch not PARROT_DATA_TYPE member: enum_hash_string
+src/hash.c:770:16: Case in switch not PARROT_DATA_TYPE member: enum_hash_pmc
+src/hash.c: (in function Parrot_hash_freeze)
+src/hash.c:831:16: Case in switch not PARROT_DATA_TYPE member: enum_hash_int
+src/hash.c:834:16: Case in switch not PARROT_DATA_TYPE member: enum_hash_string
+src/hash.c:837:16: Case in switch not PARROT_DATA_TYPE member: enum_hash_pmc
+src/hash.c:863:16: Case in switch not PARROT_DATA_TYPE member: enum_hash_int
+src/hash.c:866:16: Case in switch not PARROT_DATA_TYPE member: enum_hash_string
+src/hash.c:869:16: Case in switch not PARROT_DATA_TYPE member: enum_hash_pmc
+src/hash.c: (in function expand_hash)
+src/hash.c:1038:2: Function returns with null storage derivable from parameter hash->free_list->next
+    src/hash.c:1036:20: Storage hash->free_list->next becomes null
+src/hash.c: (in function Parrot_hash_create)
+src/hash.c:1161:12: Null storage hash->index derivable from return value: hash
+    src/hash.c:1157:24: Storage hash->index becomes null
+src/hash.c:1161:12: Null storage hash->buckets derivable from return value: hash
+    src/hash.c:1158:24: Storage hash->buckets becomes null
+src/hash.c:1161:12: Null storage hash->free_list derivable from return value: hash
+    src/hash.c:1159:24: Storage hash->free_list becomes null
+src/hash.c: (in function Parrot_hash_destroy)
+src/hash.c:1209:9: Field hash->buckets used before definition
+src/hash.c:1210:13: Field hash->mask used before definition
+src/hash.c: (in function Parrot_hash_get_bucket)
+src/hash.c:1317:56: Possibly null storage str passed as non-null param: key_hash_STRING (..., str, ...)
+    src/hash.c:1316:36: Storage str may become null
+src/hash.c: (in function parrot_hash_get_bucket_string)
+src/hash.c:1414:43: Arrow access from possibly null pointer s2: s2->strstart
+    src/hash.c:1406:28: Storage s2 may become null
+src/hash.c: (in function parrot_hash_store_value_in_bucket)
+src/hash.c:1468:2: Function returns with possibly null storage derivable from parameter bucket->value
+    src/hash.c:1451:25: Storage bucket->value may become null
+src/hash.c: (in function Parrot_hash_put)
+src/hash.c:1500:47: Possibly null storage s passed as non-null param: key_hash_STRING (..., s, ...)
+    src/hash.c:1499:32: Storage s may become null
+src/hash.c: (in function Parrot_hash_clone_prunable)
+src/hash.c:1593:9: Field dest->buckets used before definition
+src/hash.c:1594:13: Field dest->mask used before definition
+src/hash.c: (in function Parrot_hash_key_to_int)
+src/hash.c:1821:28: Arrow access from possibly null pointer key: ((PMC *)key)->vtable
+    src/hash.c:1811:136: Storage key may become null
+src/hash.c:1821:59: Possibly null storage key passed as non-null param: ((PMC *)key)->vtable->get_integer (..., (PMC *)key)
+    src/hash.c:1811:136: Storage key may become null
+src/hash.c: (in function Parrot_hash_key_to_string)
+src/hash.c:1858:28: Arrow access from possibly null pointer key: ((PMC *)key)->vtable
+    src/hash.c:1847:139: Storage key may become null
+src/hash.c:1858:58: Possibly null storage key passed as non-null param: ((PMC *)key)->vtable->get_string (..., (PMC *)key)
+    src/hash.c:1847:139: Storage key may become null
+src/hash.c:1870:12: Possibly null storage ret returned as non-null: ret
+    src/hash.c:1863:15: Storage ret may become null
+src/hash.c: (in function Parrot_hash_value_from_number)
+src/hash.c:2053:32: Variable tmp initialized to type FLOATVAL, expects INTVAL: value
+src/hash.c: (in function Parrot_hash_value_to_int)
+src/hash.c:2098:29: Arrow access from possibly null pointer value: ((PMC *)value)->vtable
+    src/hash.c:2085:138: Storage value may become null
+src/hash.c:2098:60: Possibly null storage value passed as non-null param: ((PMC *)value)->vtable->get_integer (..., (PMC *)value)
+    src/hash.c:2085:138: Storage value may become null
+src/hash.c: (in function Parrot_hash_value_to_string)
+src/hash.c:2132:30: Arrow access from possibly null pointer value: ((PMC *)value)->vtable
+    src/hash.c:2120:141: Storage value may become null
+src/hash.c:2132:60: Possibly null storage value passed as non-null param: ((PMC *)value)->vtable->get_string (..., (PMC *)value)
+    src/hash.c:2120:141: Storage value may become null
+src/hash.c:2138:12: Possibly null storage ret returned as non-null: ret
+    src/hash.c:2129:15: Storage ret may become null
+src/hash.c: (in function Parrot_hash_value_to_pmc)
+src/hash.c:2172:12: Possibly null storage ret returned as non-null: ret
+    src/hash.c:2166:15: Storage ret may become null
+src/hash.c: (in function Parrot_hash_value_to_number)
+src/hash.c:2196:13: Assignment of INTVAL to FLOATVAL: ret = tmp
+src/hash.c:2200:41: Possibly null storage value passed as non-null param: Parrot_str_to_num (..., (STRING *)value)
+    src/hash.c:2187:141: Storage value may become null
+src/hash.c:2203:29: Arrow access from possibly null pointer value: ((PMC *)value)->vtable
+    src/hash.c:2187:141: Storage value may become null
+src/hash.c:2203:59: Possibly null storage value passed as non-null param: ((PMC *)value)->vtable->get_number (..., (PMC *)value)
+    src/hash.c:2187:141: Storage value may become null
+src/hash.c:65:12: File static function hash_compare_cstring declared but not used
+   A function is declared but not used. Use /*@unused@*/ in front of function header to suppress message. (Use -fcnuse to inhibit warning)
+    src/hash.c:400:1: Definition of hash_compare_cstring
+src/hash.c:74:12: File static function hash_compare_int declared but not used
+    src/hash.c:454:1: Definition of hash_compare_int
+src/hash.c:89:12: File static function hash_compare_pointer declared but not used
+    src/hash.c:344:1: Definition of hash_compare_pointer
+< checking src/hll.c >
+src/hll.c: (in function Parrot_hll_init_HLL)
+src/hll.c:116:5: Return value (type INTVAL) ignored: Parrot_hll_regis...
+src/hll.c: (in function Parrot_hll_register_HLL)
+src/hll.c:173:96: Possibly null storage ns_hash passed as non-null param: (interp->HLL_namespace)->vtable->set_pmc_keyed_int (..., ns_hash)
+    src/hll.c:169:15: Storage ns_hash may become null
+src/hll.c: (in function Parrot_hll_regenerate_HLL_namespaces)
+src/hll.c:464:47: Possibly null storage ns_hash passed as non-null param: (interp->HLL_namespace)->vtable->set_pmc_keyed_int (..., ns_hash)
+    src/hll.c:460:23: Storage ns_hash may become null
+< checking src/install_config.c >
+include/parrot/api.h:22:6: Function Parrot_confess defined more than once
+    src/exceptions.c:563:1: Previous definition of Parrot_confess
+include/parrot/api.h:798:55: Parameter argv inconsistently redeclared as notnull storage, previously declared without notnull qualifier
+    compilers/imcc/imc.h:82:38: Declaration of argv
+src/install_config.c: (in function Parrot_set_config_hash)
+src/install_config.c:3475:58: Null storage config passed as non-null param: Parrot_api_set_configuration_hash (..., config)
+    src/install_config.c:3470:25: Storage config becomes null
+< checking src/io/api.c >
+src/io/api.c: (in function Parrot_io_stdhandle)
+src/io/api.c:140:12: Null storage result returned as non-null: result
+    src/io/api.c:133:20: Storage result becomes null
+src/io/api.c: (in function Parrot_io_fdopen)
+src/io/api.c:266:16: Null storage returned as non-null: ((PMC *)NULL)
+src/io/api.c:271:9: Return value (type INTVAL) ignored: Parrot_io_setlin...
+src/io/api.c: (in function Parrot_io_close_handle)
+src/io/api.c:364:9: Undocumented modification of *(interp->const_cstring_table[47]) possible from call to Parrot_pcc_invoke_method_from_c_args: Parrot_pcc_invoke_method_from_c_args(interp, pmc, (interp)->const_cstring_table[47], "->I", &result)
+   An externally-visible object is modified by a function, but not listed in its modifies clause. (Use -mods to inhibit warning)
+src/io/api.c: (in function Parrot_io_is_closed)
+src/io/api.c:394:9: Undocumented modification of *(interp->const_cstring_table[48]) possible from call to Parrot_pcc_invoke_method_from_c_args: Parrot_pcc_invoke_method_from_c_args(interp, pmc, (interp)->const_cstring_table[48], "->I", &result)
+src/io/api.c: (in function Parrot_io_flush_handle)
+src/io/api.c:421:226: Null storage passed as non-null param: (attr_value)->vtable->set_string_native (..., NULL)
+src/io/api.c:424:9: Undocumented modification of *(interp->const_cstring_table[49]) possible from call to Parrot_pcc_invoke_method_from_c_args: Parrot_pcc_invoke_method_from_c_args(interp, pmc, (interp)->const_cstring_table[49], "->")
+src/io/api.c: (in function get_encoding)
+src/io/api.c:453:12: Possibly null storage encoding returned as non-null: encoding
+    src/io/api.c:451:20: Storage encoding may become null
+src/io/api.c: (in function Parrot_io_reads)
+src/io/api.c:543:17: Return value (type INTVAL) ignored: encoding->partia...
+src/io/api.c:584:9: Undocumented modification of *(interp->const_cstring_table[50]) possible from call to Parrot_pcc_invoke_method_from_c_args: Parrot_pcc_invoke_method_from_c_args(interp, pmc, (interp)->const_cstring_table[50], "I->S", length, &result)
+src/io/api.c:585:12: Possibly null storage result returned as non-null: result
+    src/io/api.c:475:22: Storage result may become null
+src/io/api.c: (in function Parrot_io_readline)
+src/io/api.c:610:27: Variable ignored declared but not used
+src/io/api.c:648:9: Undocumented modification of *(interp->const_cstring_table[51]) possible from call to Parrot_pcc_invoke_method_from_c_args: Parrot_pcc_invoke_method_from_c_args(interp, pmc, (interp)->const_cstring_table[51], "->S", &result)
+src/io/api.c:649:12: Variable result used before definition
+src/io/api.c: (in function Parrot_io_peek)
+src/io/api.c:760:12: Possibly null storage res returned as non-null: res
+    src/io/api.c:756:15: Storage res may become null
+src/io/api.c: (in function Parrot_io_eof)
+src/io/api.c:797:5: Undocumented modification of *(interp->const_cstring_table[52]) possible from call to Parrot_pcc_invoke_method_from_c_args: Parrot_pcc_invoke_method_from_c_args(interp, pmc, (interp)->const_cstring_table[52], "->I", &result)
+src/io/api.c:798:12: Variable result used before definition
+src/io/api.c: (in function Parrot_io_putps)
+src/io/api.c:866:29: Arrow access from possibly null pointer encoding: encoding->to_encoding
+    src/io/api.c:862:24: Storage encoding may become null
+src/io/api.c:872:9: Undocumented modification of *(interp->const_cstring_table[53]) possible from call to Parrot_pcc_invoke_method_from_c_args: Parrot_pcc_invoke_method_from_c_args(interp, pmc, (interp)->const_cstring_table[53], "S->I", s, &result)
+src/io/api.c:872:102: Possibly null storage s passed as non-null param: Parrot_pcc_invoke_method_from_c_args (..., s, ...)
+    src/io/api.c:832:123: Storage s may become null
+src/io/api.c:874:12: Variable result used before definition
+< checking src/io/buffer.c >
+src/io/buffer.c: (in function Parrot_io_init_buffer)
+src/io/buffer.c:52:9: Return value (type INTVAL) ignored: Parrot_io_setlin...
+src/io/buffer.c: (in function Parrot_io_setbuf)
+src/io/buffer.c:82:9: Return value (type INTVAL) ignored: Parrot_io_flush_...
+src/io/buffer.c: (in function Parrot_io_fill_readbuf)
+src/io/buffer.c:240:50: Possibly null storage buf passed as non-null param: Parrot_io_read (..., ((char *)buf), ...)
+    src/io/buffer.c:234:30: Storage buf may become null
+src/io/buffer.c: (in function Parrot_io_read_buffer)
+src/io/buffer.c:284:9: Return value (type INTVAL) ignored: Parrot_io_flush_...
+src/io/buffer.c:296:22: Possibly null storage buffer_next passed as non-null param: memcpy (..., buffer_next, ...)
+    src/io/buffer.c:288:20: Storage buffer_next may become null
+src/io/buffer.c:351:28: Possibly null storage buffer_next passed as non-null param: memcpy (..., buffer_next, ...)
+    src/io/buffer.c:349:20: Storage buffer_next may become null
+src/io/buffer.c: (in function Parrot_io_peek_buffer)
+src/io/buffer.c:391:9: Return value (type INTVAL) ignored: Parrot_io_flush_...
+src/io/buffer.c:412:13: Dereference of possibly null pointer buffer_next: *buffer_next
+    src/io/buffer.c:410:20: Storage buffer_next may become null
+src/io/buffer.c: (in function Parrot_io_readline_buffer)
+src/io/buffer.c:445:9: Return value (type INTVAL) ignored: Parrot_io_flush_...
+src/io/buffer.c:483:40: Possibly null storage buffer_next passed as non-null param: encoding->partial_scan (..., (char *)buffer_next, ...)
+    src/io/buffer.c:465:19: Storage buffer_next may become null
+src/io/buffer.c:483:9: Return value (type INTVAL) ignored: encoding->partia...
+src/io/buffer.c:496:46: Possibly null storage buffer_next passed as non-null param: memcpy (..., buffer_next, ...)
+    src/io/buffer.c:465:19: Storage buffer_next may become null
+src/io/buffer.c:515:42: Possibly null storage buffer_next passed as non-null param: memcpy (..., buffer_next, ...)
+    src/io/buffer.c:465:19: Storage buffer_next may become null
+src/io/buffer.c:552:58: Possibly null storage buffer_next passed as non-null param: memcpy (..., buffer_next, ...)
+    src/io/buffer.c:539:23: Storage buffer_next may become null
+src/io/buffer.c:560:13: Return value (type INTVAL) ignored: encoding->partia...
+src/io/buffer.c: (in function Parrot_io_write_buffer)
+src/io/buffer.c:656:13: Return value (type PIOOFF_T) ignored: Parrot_io_seek((...
+src/io/buffer.c:703:9: Return value (type INTVAL) ignored: Parrot_io_flush_...
+src/io/buffer.c:714:16: Possibly null storage buffer_next passed as non-null param: memcpy (buffer_next, ...)
+    src/io/buffer.c:634:42: Storage buffer_next may become null
+src/io/buffer.c:724:16: Possibly null storage buffer_next passed as non-null param: memcpy (buffer_next, ...)
+    src/io/buffer.c:634:42: Storage buffer_next may become null
+src/io/buffer.c:727:9: Return value (type INTVAL) ignored: Parrot_io_flush_...
+src/io/buffer.c:733:20: Possibly null storage buffer_start passed as non-null param: memcpy (buffer_start, ...)
+    src/io/buffer.c:633:42: Storage buffer_start may become null
+src/io/buffer.c: (in function Parrot_io_seek_buffer)
+src/io/buffer.c:794:5: Return value (type INTVAL) ignored: Parrot_io_flush_...
+< checking src/io/core.c >
+src/io/core.c: (in function Parrot_io_finish)
+src/io/core.c:110:33: Null storage interp->piodata->table derivable from parameter Parrot_gc_free_memory_chunk ((interp), ...)
+    src/io/core.c:109:30: Storage interp->piodata->table becomes null
+src/io/core.c:113:2: Function returns with null storage derivable from parameter interp->piodata
+    src/io/core.c:111:23: Storage interp->piodata becomes null
+< checking src/io/filehandle.c >
+src/io/filehandle.c: (in function Parrot_io_close_filehandle)
+src/io/filehandle.c:541:5: Return value (type INTVAL) ignored: Parrot_io_flush_...
+src/io/filehandle.c:542:5: Return value (type INTVAL) ignored: Parrot_io_flush(...
+src/io/filehandle.c: (in function Parrot_io_flush_filehandle)
+src/io/filehandle.c:603:5: Return value (type INTVAL) ignored: Parrot_io_flush_...
+src/io/filehandle.c:604:5: Return value (type INTVAL) ignored: Parrot_io_flush(...
+< checking src/io/socket_api.c >
+src/io/socket_api.c: (in function Parrot_io_connect_handle)
+src/io/socket_api.c:248:13: Unconstrained functions used in arguments 3 () and 4 () may modify or use global state in undefined way: Parrot_io_connect(interp, io->os_handle, (address)->vtable->get_pointer(interp, address), (address)->vtable->get_integer(interp, address))
+src/io/socket_api.c:249:13: Unconstrained functions used in arguments 4 () and 3 () may modify or use global state in undefined way: Parrot_io_connect(interp, io->os_handle, (address)->vtable->get_pointer(interp, address), (address)->vtable->get_integer(interp, address))
+src/io/socket_api.c: (in function Parrot_io_bind_handle)
+src/io/socket_api.c:306:13: Unconstrained functions used in arguments 3 () and 4 () may modify or use global state in undefined way: Parrot_io_bind(interp, io->os_handle, (address)->vtable->get_pointer(interp, address), (address)->vtable->get_integer(interp, address))
+src/io/socket_api.c:307:13: Unconstrained functions used in arguments 4 () and 3 () may modify or use global state in undefined way: Parrot_io_bind(interp, io->os_handle, (address)->vtable->get_pointer(interp, address), (address)->vtable->get_integer(interp, address))
+src/io/socket_api.c: (in function Parrot_io_accept_handle)
+src/io/socket_api.c:357:16: Null storage returned as non-null: ((PMC *)NULL)
+< checking src/key.c >
+< checking src/library.c >
+src/library.c: (in function path_guarantee_trailing_separator)
+src/library.c:440:63: Expression has undefined behavior (unconstrained function  used in left operand may set global variable path_separator used in right operand): ((path)->encoding)->ord((interp), (path), (-1)) != (UINTVAL)path_separator
+src/library.c:33:17: File static function cnv_to_win32_filesep declared but not used
+< checking src/list.c >
+src/list.c: (in function Parrot_list_append)
+src/list.c:102:2: Function returns with null storage derivable from parameter list->last->prev
+    src/list.c:86:18: Storage list->last->prev becomes null
+src/list.c:102:2: Function returns with null storage derivable from parameter list->last->next
+    src/list.c:86:31: Storage list->last->next becomes null
+src/list.c:102:2: Function returns with null storage derivable from parameter list->first->next
+    src/list.c:86:31: Storage list->first->next becomes null
+src/list.c:102:2: Function returns with null storage derivable from parameter list->first->prev
+    src/list.c:86:18: Storage list->first->prev becomes null
+src/list.c:102:2: Function returns with null storage derivable from parameter item->next
+    src/list.c:86:31: Storage item->next becomes null
+src/list.c:102:2: Function returns with null storage derivable from parameter item->prev
+    src/list.c:86:18: Storage item->prev becomes null
+src/list.c: (in function Parrot_list_remove)
+src/list.c:134:9: Variable prev used in inconsistent state
+    src/list.c:132:9: Storage prev becomes inconsistent (released on one branch)
+src/list.c:135:22: Variable next used in inconsistent state
+    src/list.c:129:9: Storage next becomes inconsistent (released on one branch)
+src/list.c:136:9: Variable next used in inconsistent state
+    src/list.c:129:9: Storage next becomes inconsistent (released on one branch)
+src/list.c: (in function Parrot_list_pop)
+src/list.c:162:686: Variable prev used in inconsistent state
+    src/list.c:162:598: Storage prev becomes inconsistent (released on one branch)
+src/list.c:162:743: Variable next used in inconsistent state
+    src/list.c:162:466: Storage next becomes inconsistent (released on one branch)
+src/list.c:162:774: Variable next used in inconsistent state
+    src/list.c:162:466: Storage next becomes inconsistent (released on one branch)
+< checking src/longopt.c >
+src/longopt.c: (in function longopt_get)
+src/longopt.c:95:18: Function returns with null storage derivable from parameter info_buf->opt_error
+    src/longopt.c:92:47: Storage info_buf->opt_error becomes null
+src/longopt.c:95:18: Function returns with null storage derivable from parameter info_buf->opt_arg
+    src/longopt.c:92:25: Storage info_buf->opt_arg becomes null
+src/longopt.c:101:58: Null storage info_buf->opt_arg derivable from parameter longopt_get_shortopt (..., info_buf)
+    src/longopt.c:92:25: Storage info_buf->opt_arg becomes null
+src/longopt.c:101:58: Null storage info_buf->opt_error derivable from parameter longopt_get_shortopt (..., info_buf)
+    src/longopt.c:92:47: Storage info_buf->opt_error becomes null
+src/longopt.c:109:61: Null storage info_buf->opt_arg derivable from parameter longopt_get_longopt (..., info_buf)
+    src/longopt.c:92:25: Storage info_buf->opt_arg becomes null
+src/longopt.c:109:61: Null storage info_buf->opt_error derivable from parameter longopt_get_longopt (..., info_buf)
+    src/longopt.c:92:47: Storage info_buf->opt_error becomes null
+src/longopt.c:113:58: Null storage info_buf->opt_arg derivable from parameter longopt_get_shortopt (..., info_buf)
+    src/longopt.c:92:25: Storage info_buf->opt_arg becomes null
+src/longopt.c:113:58: Null storage info_buf->opt_error derivable from parameter longopt_get_shortopt (..., info_buf)
+    src/longopt.c:92:47: Storage info_buf->opt_error becomes null
+src/longopt.c: (in function longopt_get_shortopt)
+src/longopt.c:291:33: Function returns with null storage derivable from parameter info_buf->_shortopt_pos
+    src/longopt.c:283:47: Storage info_buf->_shortopt_pos becomes null
+< checking src/misc.c >
+src/misc.c: (in function Parrot_vsprintf_s)
+src/misc.c:66:5: Assignment of va_list to void *: obj.data = (args)
+   Underlying types match, but va_list is an abstract type that is not accessible here.
+src/misc.c: (in function Parrot_secret_snprintf)
+src/misc.c:269:14: Use vsnprintf instead: vsprintf
+src/misc.c:269:14: Undocumented modification of buffer possible from call to vsprintf: vsprintf(buffer, format, ap)
+< checking src/multidispatch.c >
+src/multidispatch.c: (in function Parrot_mmd_find_multi_from_sig_obj)
+src/multidispatch.c:241:12: Possibly null storage returned as non-null: Parrot_mmd_sort_manhattan_by_sig_pmc(interp, candidate_list, invoke_sig)
+src/multidispatch.c: (in function Parrot_mmd_multi_dispatch_from_c_args)
+src/multidispatch.c:274:74: Variable arg_sig used before definition
+src/multidispatch.c:303:59: Variable ret_sig used before definition
+src/multidispatch.c: (in function mmd_build_type_tuple_from_long_sig)
+src/multidispatch.c:441:56: Possibly null storage type_list passed as non-null param: mmd_build_type_tuple_from_type_list (..., type_list)
+    src/multidispatch.c:439:22: Storage type_list may become null
+src/multidispatch.c: (in function mmd_distance)
+src/multidispatch.c:600:68: Null storage long_sig passed as non-null param: mmd_build_type_tuple_from_long_sig (..., long_sig)
+    src/multidispatch.c:599:425: Storage long_sig becomes null
+src/multidispatch.c:611:68: Null storage long_sig passed as non-null param: mmd_build_type_tuple_from_long_sig (..., long_sig)
+    src/multidispatch.c:610:405: Storage long_sig becomes null
+src/multidispatch.c: (in function Parrot_mmd_sort_candidates)
+src/multidispatch.c:782:12: Null storage best_candidate returned as non-null: best_candidate
+    src/multidispatch.c:768:35: Storage best_candidate becomes null
+src/multidispatch.c: (in function Parrot_mmd_add_multi_from_long_sig)
+src/multidispatch.c:979:43: Arrow access from possibly null pointer type_list: (type_list)->vtable
+    src/multidispatch.c:978:31: Storage type_list may become null
+src/multidispatch.c:1019:87: Qualifier in used on non-pointer or struct: funcptr_t multi_func_ptr
+src/multidispatch.c: (in function Parrot_mmd_add_multi_from_c_args)
+src/multidispatch.c:1027:41: Arrow access from possibly null pointer type_list: (type_list)->vtable
+    src/multidispatch.c:1026:29: Storage type_list may become null
+< checking src/namespace.c >
+src/namespace.c: (in function get_namespace_pmc)
+src/namespace.c:299:59: Possibly null storage nsroot passed as non-null param: Parrot_ns_make_namespace_keyed_str (..., nsroot, ...)
+    src/namespace.c:292:14: Storage nsroot may become null
+src/namespace.c:303:55: Possibly null storage nsroot passed as non-null param: Parrot_ns_make_namespace_keyed (..., nsroot, ...)
+    src/namespace.c:292:14: Storage nsroot may become null
+src/namespace.c: (in function Parrot_ns_get_namespace_keyed_str)
+src/namespace.c:391:51: Possibly null storage str_key passed as non-null param: internal_ns_keyed_str (..., str_key, ...)
+    src/namespace.c:388:37: Storage str_key may become null
+src/namespace.c: (in function Parrot_ns_make_namespace_autobase)
+src/namespace.c:463:15: Arrow access from possibly null pointer key: (key)->vtable
+    src/namespace.c:459:105: Storage key may become null
+src/namespace.c: (in function Parrot_ns_get_name)
+src/namespace.c:492:12: Variable names used before definition
+src/namespace.c: (in function Parrot_ns_get_global)
+src/namespace.c:524:70: Possibly null storage globalname passed as non-null param: (ns)->vtable->get_pointer_keyed_str (..., globalname)
+    src/namespace.c:518:124: Storage globalname may become null
+src/namespace.c: (in function Parrot_ns_set_global)
+src/namespace.c:544:10: Arrow access from possibly null pointer ns: (ns)->vtable
+    src/namespace.c:540:92: Storage ns may become null
+src/namespace.c:544:52: Possibly null storage globalname passed as non-null param: (ns)->vtable->set_pmc_keyed_str (..., globalname, ...)
+    src/namespace.c:541:37: Storage globalname may become null
+src/namespace.c:544:65: Possibly null storage val passed as non-null param: (ns)->vtable->set_pmc_keyed_str (..., val)
+    src/namespace.c:541:74: Storage val may become null
+src/namespace.c: (in function Parrot_ns_find_namespace_global)
+src/namespace.c:583:73: Possibly null storage globalname passed as non-null param: (ns)->vtable->get_pointer_keyed_str (..., globalname)
+    src/namespace.c:568:66: Storage globalname may become null
+src/namespace.c: (in function Parrot_ns_store_global)
+src/namespace.c:633:52: Possibly null storage globalname passed as non-null param: (ns)->vtable->set_pmc_keyed_str (..., globalname, ...)
+    src/namespace.c:626:37: Storage globalname may become null
+src/namespace.c:633:65: Possibly null storage val passed as non-null param: (ns)->vtable->set_pmc_keyed_str (..., val)
+    src/namespace.c:626:74: Storage val may become null
+src/namespace.c: (in function Parrot_ns_store_sub)
+src/namespace.c:744:45: Possibly null storage ns passed as non-null param: store_sub_in_multi (..., ns)
+    src/namespace.c:737:10: Storage ns may become null
+< checking src/nci_test.c >
+src/nci_test.c:147:8: Variable int_cb_D4 redefined
+    src/nci_test.c:138:10: Previous definition of int_cb_D4
+src/nci_test.c:148:8: Variable nci_dlvar_char redefined
+    src/nci_test.c:139:10: Previous definition of nci_dlvar_char
+src/nci_test.c:149:8: Variable nci_dlvar_short redefined
+    src/nci_test.c:140:10: Previous definition of nci_dlvar_short
+src/nci_test.c:150:8: Variable nci_dlvar_int redefined
+    src/nci_test.c:141:10: Previous definition of nci_dlvar_int
+src/nci_test.c:151:8: Variable nci_dlvar_long redefined
+    src/nci_test.c:142:10: Previous definition of nci_dlvar_long
+src/nci_test.c:152:8: Variable nci_dlvar_float redefined
+    src/nci_test.c:143:10: Previous definition of nci_dlvar_float
+src/nci_test.c:153:8: Variable nci_dlvar_double redefined
+    src/nci_test.c:144:10: Previous definition of nci_dlvar_double
+src/nci_test.c:154:8: Variable nci_dlvar_cstring redefined
+    src/nci_test.c:145:10: Previous definition of nci_dlvar_cstring
+src/nci_test.c: (in function nci_pi)
+src/nci_test.c:684:18: Struct tag struct yt defined more than once
+    src/nci_test.c:668:18: Previous definition of struct yt
+src/nci_test.c:686:14: Struct tag struct xt defined more than once
+    src/nci_test.c:670:14: Previous definition of struct xt
+src/nci_test.c:705:18: Struct tag struct yt defined more than once
+    src/nci_test.c:668:18: Previous definition of struct yt
+src/nci_test.c:706:14: Struct tag struct xt defined more than once
+    src/nci_test.c:670:14: Previous definition of struct xt
+src/nci_test.c:718:16: Null storage returned as non-null: NULL
+src/nci_test.c:723:12: Null storage returned as non-null: NULL
+src/nci_test.c:991:37: Parameter double_me inconsistently redeclared as notnull storage, previously declared without notnull qualifier
+    src/nci_test.c:87:24: Declaration of double_me
+src/nci_test.c:991:76: Parameter triple_me inconsistently redeclared as notnull storage, previously declared without notnull qualifier
+    src/nci_test.c:87:31: Declaration of triple_me
+src/nci_test.c:1012:40: Parameter my_data inconsistently redeclared as notnull storage, previously declared without notnull qualifier
+    src/nci_test.c:104:19: Declaration of my_data
+src/nci_test.c:1119:42: Parameter outOpaque inconsistently redeclared as allocated param, previously declared as unknown param
+    src/nci_test.c:106:18: Declaration of outOpaque
+src/nci_test.c:1119:42: Parameter outOpaque inconsistently redeclared as notnull storage, previously declared without notnull qualifier
+    src/nci_test.c:106:18: Declaration of outOpaque
+src/nci_test.c:1139:39: Parameter inOpaque inconsistently redeclared as notnull storage, previously declared without notnull qualifier
+    src/nci_test.c:107:17: Declaration of inOpaque
+src/nci_test.c: (in function nci_ttt)
+src/nci_test.c:1162:5: Buffer overflow possible with sprintf.  Recommend using snprintf instead: sprintf
+src/nci_test.c:1162:13: Possibly null storage s passed as non-null param: sprintf (s, ...)
+    src/nci_test.c:1161:15: Storage s may become null
+< checking src/null_config.c >
+src/null_config.c:13:5: Function Parrot_set_config_hash defined more than once
+    src/install_config.c:3476:1: Previous definition of Parrot_set_config_hash
+src/null_config.c:14:23: Function Parrot_get_config_hash_bytes defined more than once
+    src/install_config.c:3459:1: Previous definition of Parrot_get_config_hash_bytes
+src/null_config.c:15:5: Function Parrot_get_config_hash_length defined more than once
+    src/install_config.c:3465:1: Previous definition of Parrot_get_config_hash_length
+src/null_config.c:22:1: Function Parrot_get_config_hash_bytes defined more than once
+    src/install_config.c:3459:1: Previous definition of Parrot_get_config_hash_bytes
+src/null_config.c:28:1: Function Parrot_get_config_hash_length defined more than once
+    src/install_config.c:3465:1: Previous definition of Parrot_get_config_hash_length
+src/null_config.c:34:1: Function Parrot_set_config_hash defined more than once
+    src/install_config.c:3476:1: Previous definition of Parrot_set_config_hash
+src/null_config.c: (in function Parrot_set_config_hash)
+src/null_config.c:41:58: Null storage config passed as non-null param: Parrot_api_set_configuration_hash (..., config)
+    src/null_config.c:36:25: Storage config becomes null
+< checking src/oo.c >
+src/oo.c: (in function Parrot_oo_extract_methods_from_namespace)
+src/oo.c:165:11: Variable methods used before definition
+src/oo.c:179:11: Variable vtable_overrides used before definition
+src/oo.c: (in function get_pmc_proxy)
+src/oo.c:372:16: Null storage returned as non-null: ((PMC *)NULL)
+src/oo.c:382:56: Possibly null storage parrot_hll passed as non-null param: Parrot_ns_make_namespace_keyed_str (..., parrot_hll, ...)
+    src/oo.c:380:34: Storage parrot_hll may become null
+src/oo.c:384:32: Arrow access from possibly null pointer pmc_ns: (pmc_ns)->vtable
+    src/oo.c:382:13: Storage pmc_ns may become null
+src/oo.c: (in function Parrot_oo_register_type)
+src/oo.c:687:17: Possibly null storage passed as non-null param: Parrot_ex_throw_from_c_args (..., Parrot_str_escape(interp, classname))
+src/oo.c: (in function invalidate_type_caches)
+src/oo.c:834:2: Function returns with null storage derivable from parameter interp->caches->idx[]
+    src/oo.c:833:21: Storage interp->caches->idx[] becomes null
+src/oo.c: (in function C3_merge)
+src/oo.c:1121:14: Arrow access from possibly null pointer result: (result)->vtable
+    src/oo.c:1120:14: Storage result may become null
+src/oo.c: (in function Parrot_ComputeMRO_C3)
+src/oo.c:1190:18: Arrow access from possibly null pointer merge_list: (merge_list)->vtable
+    src/oo.c:1173:18: Storage merge_list may become null
+src/oo.c: (in function Parrot_ComposeRole)
+src/oo.c:1249:10: Variable methods used before definition
+src/oo.c:1393:27: Variable roles_of_role used before definition
+src/oo.c:38:13: File static function debug_trace_find_meth declared but not used
+< checking src/packfile/api.c >
+include/parrot/embed.h:30:1: Function Parrot_x_exit defined more than once
+    src/exit.c:145:1: Previous definition of Parrot_x_exit
+compilers/imcc/imc.h:82:38: Parameter argv inconsistently redeclared as possibly null storage, previously declared with notnull qualifier
+    include/parrot/api.h:798:55: Declaration of argv
+compilers/imcc/imc.h:177:15: Function IMCC_create_itcall_label inconsistently redeclared to return notnull storage, previously declared without notnull qualifier
+    compilers/imcc/imc.h:177:15: Declaration of IMCC_create_itcall_label
+src/packfile/api.c: (in function PackFile_destroy)
+src/packfile/api.c:538:12: Function returns with null storage derivable from parameter pf->header
+    src/packfile/api.c:534:18: Storage pf->header becomes null
+src/packfile/api.c:538:12: Function returns with null storage derivable from parameter pf->dirp
+    src/packfile/api.c:536:18: Storage pf->dirp becomes null
+src/packfile/api.c: (in function do_1_sub_pragma)
+src/packfile/api.c:705:13: Undocumented modification of interp->resume_flag: interp->resume_flag = RESUME_INITIAL
+src/packfile/api.c:706:13: Undocumented modification of interp->lo_var_ptr: interp->lo_var_ptr = lo_var_ptr
+src/packfile/api.c:714:13: Return value (type PMC *) ignored: run_sub(interp, ...
+src/packfile/api.c:717:13: Undocumented modification of interp->resume_flag: interp->resume_flag = RESUME_INITIAL
+src/packfile/api.c:728:13: Return value (type PMC *) ignored: run_sub(interp, ...
+src/packfile/api.c:739:13: Return value (type PMC *) ignored: run_sub(interp, ...
+src/packfile/api.c:740:13: Undocumented modification of interp->resume_flag: interp->resume_flag = RESUME_INITIAL
+src/packfile/api.c: (in function find_const_iter)
+src/packfile/api.c:819:9: Return value (type INTVAL) ignored: PackFile_map_seg...
+src/packfile/api.c: (in function mark_const_subs)
+src/packfile/api.c:865:9: Return value (type INTVAL) ignored: PackFile_map_seg...
+src/packfile/api.c: (in function PackFile_unpack)
+src/packfile/api.c:1155:26: Undocumented modification of packed possible from call to PF_fetch_opcode (through alias cursor): PF_fetch_opcode(self, &cursor)
+src/packfile/api.c:1164:15: Undocumented modification of packed possible from call to PF_fetch_opcode (through alias cursor): PF_fetch_opcode(self, &cursor)
+src/packfile/api.c:1165:15: Undocumented modification of packed possible from call to PF_fetch_opcode (through alias cursor): PF_fetch_opcode(self, &cursor)
+src/packfile/api.c:1166:15: Undocumented modification of packed possible from call to PF_fetch_opcode (through alias cursor): PF_fetch_opcode(self, &cursor)
+src/packfile/api.c: (in function PackFile_set_header)
+src/packfile/api.c:1323:5: Assignment of size_t to unsigned char: header->wordsize = sizeof(opcode_t)
+   To allow arbitrary integral types to match any integral type, use +matchanyintegral.
+src/packfile/api.c: (in function PackFile_new)
+src/packfile/api.c:1413:40: Null storage pf->cur_cs derivable from parameter pf_register_standard_funcs (..., pf)
+    src/packfile/api.c:1412:18: Storage pf->cur_cs becomes null
+src/packfile/api.c:1426:12: Null storage pf->fetch_op derivable from return value: pf
+    src/packfile/api.c:1422:5: Storage pf->fetch_op becomes null
+src/packfile/api.c:1426:12: Null storage pf->fetch_iv derivable from return value: pf
+    src/packfile/api.c:1423:5: Storage pf->fetch_iv becomes null
+src/packfile/api.c:1426:12: Null storage pf->fetch_nv derivable from return value: pf
+    src/packfile/api.c:1424:5: Storage pf->fetch_nv becomes null
+src/packfile/api.c: (in function default_unpack)
+src/packfile/api.c:1469:22: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:1470:22: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:1471:22: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:1472:22: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:1502:29: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c: (in function pf_register_standard_funcs)
+src/packfile/api.c:1582:9: Function types are inconsistent. Parameter 2 is defined, but unknown in assigned function: directory_new
+src/packfile/api.c:1582:9: Function types are inconsistent. Parameter 2 is notnull, but null in assigned function: directory_new
+src/packfile/api.c:1582:9: Function types are inconsistent. Parameter 3 is defined, but unknown in assigned function: directory_new
+src/packfile/api.c:1582:9: Function types are inconsistent. Parameter 3 is notnull, but null in assigned function: directory_new
+src/packfile/api.c:1582:9: Function types are inconsistent. Parameter 4 is implicitly non-null, but null in assigned function: directory_new
+src/packfile/api.c:1586:9: Function types are inconsistent. Parameter 2 is allocated, but defined in assigned function: directory_unpack
+src/packfile/api.c:1591:9: Function types are inconsistent. Parameter 2 is defined, but unknown in assigned function: PackFile_Segment_new
+src/packfile/api.c:1591:9: Function types are inconsistent. Parameter 2 is notnull, but null in assigned function: PackFile_Segment_new
+src/packfile/api.c:1591:9: Function types are inconsistent. Parameter 3 is defined, but unknown in assigned function: PackFile_Segment_new
+src/packfile/api.c:1591:9: Function types are inconsistent. Parameter 3 is notnull, but null in assigned function: PackFile_Segment_new
+src/packfile/api.c:1591:9: Function types are inconsistent. Parameter 4 is implicitly non-null, but null in assigned function: PackFile_Segment_new
+src/packfile/api.c:1600:9: Function types are inconsistent. Parameter 2 is defined, but unknown in assigned function: const_new
+src/packfile/api.c:1600:9: Function types are inconsistent. Parameter 2 is notnull, but null in assigned function: const_new
+src/packfile/api.c:1600:9: Function types are inconsistent. Parameter 3 is defined, but unknown in assigned function: const_new
+src/packfile/api.c:1600:9: Function types are inconsistent. Parameter 3 is notnull, but null in assigned function: const_new
+src/packfile/api.c:1600:9: Function types are inconsistent. Parameter 4 is implicitly non-null, but null in assigned function: const_new
+src/packfile/api.c:1604:9: Function types are inconsistent. Parameter 2 is allocated, but defined in assigned function: PackFile_ConstTable_unpack
+src/packfile/api.c:1609:9: Function types are inconsistent. Parameter 2 is defined, but unknown in assigned function: byte_code_new
+src/packfile/api.c:1609:9: Function types are inconsistent. Parameter 2 is notnull, but null in assigned function: byte_code_new
+src/packfile/api.c:1609:9: Function types are inconsistent. Parameter 3 is defined, but unknown in assigned function: byte_code_new
+src/packfile/api.c:1609:9: Function types are inconsistent. Parameter 3 is notnull, but null in assigned function: byte_code_new
+src/packfile/api.c:1609:9: Function types are inconsistent. Parameter 4 is implicitly non-null, but null in assigned function: byte_code_new
+src/packfile/api.c:1611:9: Function types are inconsistent. Parameter 1 is defined, but unknown in assigned function: byte_code_packed_size
+src/packfile/api.c:1612:9: Function types are inconsistent. Parameter 1 is defined, but unknown in assigned function: byte_code_pack
+src/packfile/api.c:1613:9: Function types are inconsistent. Parameter 2 is allocated, but defined in assigned function: byte_code_unpack
+src/packfile/api.c:1618:9: Function types are inconsistent. Parameter 2 is defined, but unknown in assigned function: pf_debug_new
+src/packfile/api.c:1618:9: Function types are inconsistent. Parameter 2 is notnull, but null in assigned function: pf_debug_new
+src/packfile/api.c:1618:9: Function types are inconsistent. Parameter 3 is defined, but unknown in assigned function: pf_debug_new
+src/packfile/api.c:1618:9: Function types are inconsistent. Parameter 3 is notnull, but null in assigned function: pf_debug_new
+src/packfile/api.c:1618:9: Function types are inconsistent. Parameter 4 is implicitly non-null, but null in assigned function: pf_debug_new
+src/packfile/api.c:1620:9: Function types are inconsistent. Parameter 1 is defined, but unknown in assigned function: pf_debug_packed_size
+src/packfile/api.c:1627:9: Function types are inconsistent. Parameter 4 is implicitly non-null, but null in assigned function: PackFile_Annotations_new
+src/packfile/api.c:1629:9: Function types are inconsistent. Parameter 1 is defined, but unknown in assigned function: PackFile_Annotations_packed_size
+src/packfile/api.c:1630:9: Function types are inconsistent. Parameter 1 is defined, but unknown in assigned function: PackFile_Annotations_pack
+src/packfile/api.c: (in function directory_unpack)
+src/packfile/api.c:2086:25: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(pf, &cursor)
+src/packfile/api.c:2096:24: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(pf, &cursor)
+src/packfile/api.c:2105:28: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(pf, &cursor)
+src/packfile/api.c:2106:28: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(pf, &cursor)
+src/packfile/api.c:2119:24: Null storage returned as non-null: NULL
+src/packfile/api.c:2149:16: Arrow access from possibly null pointer pf: pf->src
+    src/packfile/api.c:2080:38: Storage pf may become null
+src/packfile/api.c: (in function default_destroy)
+src/packfile/api.c:2472:10: Field self->pf used before definition
+src/packfile/api.c:2472:35: Field self->data used before definition
+src/packfile/api.c:2473:47: Field self->data used before definition
+src/packfile/api.c: (in function byte_code_destroy)
+src/packfile/api.c:2551:47: Function Parrot_gc_free_memory_chunk expects arg 2 to be void * gets op_func_t *: (byte_code->op_func_table)
+src/packfile/api.c: (in function byte_code_unpack)
+src/packfile/api.c:2722:36: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:2724:36: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:2728:36: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:2735:36: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:2753:40: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:2754:40: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:2755:40: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:2793:41: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:2801:32: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:2802:32: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c: (in function pf_debug_unpack)
+src/packfile/api.c:2980:27: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:2980:43: Field self->pf used before definition
+src/packfile/api.c:2989:39: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:2990:39: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(self->pf, &cursor)
+src/packfile/api.c:2994:45: Field debug->base.name used before definition
+src/packfile/api.c:2996:70: Field self->dir used before definition
+src/packfile/api.c:3001:24: Field self->name used before definition
+src/packfile/api.c: (in function Parrot_new_debug_seg)
+src/packfile/api.c:3082:35: Undocumented modification of *(interp->code->base.dir) possible from call to PackFile_Segment_new_seg (through alias *dir): PackFile_Segment_new_seg(interp, dir, PF_DEBUG_SEG, name, add)
+src/packfile/api.c: (in function find_constants)
+src/packfile/api.c:3365:13: Return value (type HashBucket *) ignored: Parrot_hash_put(...
+src/packfile/api.c: (in function PackFile_ConstTable_clear)
+src/packfile/api.c:3450:12: Function returns with null storage derivable from parameter self->num.constants
+    src/packfile/api.c:3432:31: Storage self->num.constants becomes null
+src/packfile/api.c:3450:12: Function returns with null storage derivable from parameter self->str.constants
+    src/packfile/api.c:3437:31: Storage self->str.constants becomes null
+src/packfile/api.c:3450:12: Function returns with null storage derivable from parameter self->pmc.constants
+    src/packfile/api.c:3442:31: Storage self->pmc.constants becomes null
+src/packfile/api.c:3450:12: Function returns with null storage derivable from parameter self->string_hash
+    src/packfile/api.c:3447:29: Storage self->string_hash becomes null
+src/packfile/api.c: (in function PackFile_Constant_unpack_pmc)
+src/packfile/api.c:3609:12: Possibly null storage pmc returned as non-null: pmc
+    src/packfile/api.c:3605:41: Storage pmc may become null
+src/packfile/api.c: (in function PackFile_Annotations_unpack)
+src/packfile/api.c:3746:22: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(seg->pf, &cursor)
+src/packfile/api.c:3746:38: Field seg->pf used before definition
+src/packfile/api.c:3753:22: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(seg->pf, &cursor)
+src/packfile/api.c:3754:41: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(seg->pf, &cursor)
+src/packfile/api.c:3755:22: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(seg->pf, &cursor)
+src/packfile/api.c:3756:22: Undocumented modification of cursor possible from call to PF_fetch_opcode: PF_fetch_opcode(seg->pf, &cursor)
+src/packfile/api.c:3760:45: Field self->base.name used before definition
+src/packfile/api.c:3763:33: Field self->base.dir used before definition
+src/packfile/api.c: (in function PackFile_Annotations_lookup)
+src/packfile/api.c:4004:20: Null storage returned as non-null: ((PMC *)NULL)
+src/packfile/api.c:4009:20: Null storage returned as non-null: ((PMC *)NULL)
+src/packfile/api.c:4022:20: Null storage returned as non-null: ((PMC *)NULL)
+src/packfile/api.c: (in function Parrot_load_language)
+src/packfile/api.c:4161:5: Return value (type STRING *) ignored: parrot_split_pat...
+src/packfile/api.c: (in function Parrot_load_bytecode)
+src/packfile/api.c:4248:5: Return value (type STRING *) ignored: parrot_split_pat...
+src/packfile/api.c:4272:5: Return value (type STRING *) ignored: parrot_split_pat...
+src/packfile/api.c: (in function PackFile_fixup_subs)
+src/packfile/api.c:4309:2: Function returns with null storage derivable from parameter interp->lo_var_ptr
+    src/packfile/api.c:4308:142: Storage interp->lo_var_ptr becomes null
+src/packfile/api.c: (in function PackFile_read_pbc)
+src/packfile/api.c:4401:17: Return value (type INTVAL) ignored: Parrot_io_close(...
+src/packfile/api.c:4417:9: Return value (type INTVAL) ignored: Parrot_io_close(...
+src/packfile/api.c:4438:37: Function mmap expects arg 1 to be void * gets int: 0
+src/packfile/api.c:4438:37: Null storage passed as non-null param: mmap (0, ...)
+src/packfile/api.c:4485:9: Return value (type INTVAL) ignored: Parrot_io_close(...
+< checking src/packfile/object_serialization.c >
+src/packfile/object_serialization.c: (in function Parrot_freeze_pbc)
+src/packfile/object_serialization.c:92:14: Undocumented modification of *cursor possible from call to PF_store_buf: PF_store_buf(cursor, image)
+< checking src/packfile/output.c >
+src/packfile/output.c: (in function update_backref_hash)
+src/packfile/output.c:187:13: Return value (type HashBucket *) ignored: Parrot_hash_put(...
+src/packfile/output.c:197:13: Return value (type HashBucket *) ignored: Parrot_hash_put(...
+src/packfile/output.c: (in function PackFile_ConstTable_pack)
+src/packfile/output.c:279:12: Possibly null storage cursor returned as non-null: cursor
+    src/packfile/output.c:273:19: Storage cursor may become null
+< checking src/packfile/pf_items.c >
+src/packfile/pf_items.c: (in function PF_fetch_buf)
+src/packfile/pf_items.c:1197:31: Conditional clauses are not of same type: pf->header->wordsize (unsigned char), sizeof(opcode_t) (size_t)
+src/packfile/pf_items.c: (in function PF_fetch_string)
+src/packfile/pf_items.c:1299:40: Conditional clauses are not of same type: pf->header->wordsize (unsigned char), sizeof(opcode_t) (size_t)
+src/packfile/pf_items.c:1303:16: Null storage returned as non-null: ((STRING *)NULL)
+src/packfile/pf_items.c: (in function PF_store_string)
+src/packfile/pf_items.c:1369:48: Null storage passed as non-null param: Parrot_encoding_number_of_str (NULL, ...)
+src/packfile/pf_items.c: (in function PackFile_assign_transforms)
+src/packfile/pf_items.c:1530:32: Operands of != have incompatible types (unsigned char, size_t): pf->header->wordsize != sizeof(opcode_t)
+src/packfile/byteorder.h:93:1: File static function fetch_iv_be declared but not used
+    src/packfile/byteorder.h:118:1: Definition of fetch_iv_be
+src/packfile/byteorder.h:134:1: File static function fetch_op_be declared but not used
+    src/packfile/byteorder.h:156:1: Definition of fetch_op_be
+src/packfile/byteorder.h:172:1: File static function fetch_op_le declared but not used
+    src/packfile/byteorder.h:194:1: Definition of fetch_op_le
+src/packfile/byteorder.h:324:1: File static function fetch_buf_le_12 declared but not used
+    src/packfile/byteorder.h:342:1: Definition of fetch_buf_le_12
+src/packfile/byteorder.h:356:1: File static function fetch_buf_be_12 declared but not used
+    src/packfile/byteorder.h:374:1: Definition of fetch_buf_be_12
+src/packfile/byteorder.h:388:1: File static function fetch_buf_le_16 declared but not used
+    src/packfile/byteorder.h:410:1: Definition of fetch_buf_le_16
+src/packfile/byteorder.h:460:1: File static function fetch_buf_le_32 declared but not used
+    src/packfile/byteorder.h:498:1: Definition of fetch_buf_le_32
+src/packfile/byteorder.h:512:1: File static function fetch_buf_be_32 declared but not used
+    src/packfile/byteorder.h:550:1: Definition of fetch_buf_be_32
+src/packfile/pf_items.c:43:13: File static function cvt_num12_num16 declared but not used
+src/packfile/pf_items.c:50:13: File static function cvt_num12_num16_le declared but not used
+src/packfile/pf_items.c:64:13: File static function cvt_num12_num8_le declared but not used
+src/packfile/pf_items.c:71:13: File static function cvt_num16_num12 declared but not used
+src/packfile/pf_items.c:78:13: File static function cvt_num16_num12_be declared but not used
+src/packfile/pf_items.c:99:13: File static function cvt_num16_num8_le declared but not used
+src/packfile/pf_items.c:106:13: File static function cvt_num8_num12 declared but not used
+src/packfile/pf_items.c:113:13: File static function cvt_num8_num12_be declared but not used
+src/packfile/pf_items.c:120:13: File static function cvt_num8_num16 declared but not used
+src/packfile/pf_items.c:127:13: File static function cvt_num8_num16_be declared but not used
+src/packfile/pf_items.c:134:13: File static function cvt_num8_num16_le declared but not used
+< checking src/parrot_config.c >
+src/parrot_config.c:13:5: Function Parrot_set_config_hash defined more than once
+    src/install_config.c:3476:1: Previous definition of Parrot_set_config_hash
+src/parrot_config.c:14:23: Function Parrot_get_config_hash_bytes defined more than once
+    src/install_config.c:3459:1: Previous definition of Parrot_get_config_hash_bytes
+src/parrot_config.c:15:5: Function Parrot_get_config_hash_length defined more than once
+    src/install_config.c:3465:1: Previous definition of Parrot_get_config_hash_length
+src/parrot_config.c:3457:1: Function Parrot_get_config_hash_bytes defined more than once
+    src/install_config.c:3459:1: Previous definition of Parrot_get_config_hash_bytes
+src/parrot_config.c:3463:1: Function Parrot_get_config_hash_length defined more than once
+    src/install_config.c:3465:1: Previous definition of Parrot_get_config_hash_length
+src/parrot_config.c:3469:1: Function Parrot_set_config_hash defined more than once
+    src/install_config.c:3476:1: Previous definition of Parrot_set_config_hash
+src/parrot_config.c: (in function Parrot_set_config_hash)
+src/parrot_config.c:3476:58: Null storage config passed as non-null param: Parrot_api_set_configuration_hash (..., config)
+    src/parrot_config.c:3471:25: Storage config becomes null
+< checking src/pbc_disassemble.c >
+src/pbc_disassemble.c:37:5: Enum member enum_DIS_BARE defined more than once
+    include/parrot/embed.h:22:5: Previous definition of enum_DIS_BARE
+src/pbc_disassemble.c:38:5: Enum member enum_DIS_HEADER defined more than once
+    include/parrot/embed.h:23:5: Previous definition of enum_DIS_HEADER
+src/pbc_disassemble.c:39:2: Enum tag enum defined more than once
+    include/parrot/embed.h:24:2: Previous definition of enum
+src/pbc_disassemble.c:39:3: Datatype Parrot_disassemble_options defined more than once
+    include/parrot/embed.h:24:3: Previous definition of Parrot_disassemble_options
+src/pbc_disassemble.c:66:39: Initializer block for options[0].opt_long has 1 element, but declared as longopt_string_t [10]: "--header-only"
+   Initializer does not define all elements of a declared array. (Use -initallelements to inhibit warning)
+src/pbc_disassemble.c:67:39: Initializer block for options[1].opt_long has 1 element, but declared as longopt_string_t [10]: "--help"
+src/pbc_disassemble.c:68:39: Initializer block for options[2].opt_long has 1 element, but declared as longopt_string_t [10]: "--bare"
+src/pbc_disassemble.c:69:39: Initializer block for options[3].opt_long has 1 element, but declared as longopt_string_t [10]: "--output"
+src/pbc_disassemble.c:70:39: Initializer block for options[4].opt_long has 1 element, but declared as longopt_string_t [10]: NULL
+src/pbc_disassemble.c:70:41: Static options[4].opt_long[0] initialized to null value: options[4].opt_long[0] = NULL
+src/pbc_disassemble.c: (in function main)
+src/pbc_disassemble.c:93:44: Local opt.opt_arg initialized to null value: opt.opt_arg = NULL
+src/pbc_disassemble.c:93:50: Local opt.opt_error initialized to null value: opt.opt_error = NULL
+src/pbc_disassemble.c:93:56: Local opt._shortopt_pos initialized to null value: opt._shortopt_pos = NULL
+src/pbc_disassemble.c:96:139: Arrow access from possibly null pointer initargs: (initargs)->stacktop
+    src/pbc_disassemble.c:96:64: Storage initargs may become null
+src/pbc_disassemble.c:98:39: Null storage passed as non-null param: Parrot_api_make_interpreter (NULL, ...)
+src/pbc_disassemble.c:130:5: Return value (type Parrot_Int) ignored: Parrot_api_strin...
+src/pbc_disassemble.c:92:9: Variable debug declared but not used
+src/pbc_disassemble.c: (in function show_last_error_and_exit)
+src/pbc_disassemble.c:165:9: Return value (type Parrot_Int) ignored: Parrot_api_strin...
+src/pbc_disassemble.c:167:9: Return value (type Parrot_Int) ignored: Parrot_api_strin...
+src/pbc_disassemble.c:169:9: Return value (type Parrot_Int) ignored: Parrot_api_strin...
+src/pbc_disassemble.c:171:9: Return value (type Parrot_Int) ignored: Parrot_api_strin...
+< checking src/pmc.c >
+src/pmc.c: (in function Parrot_pmc_new)
+src/pmc.c:161:73: Null storage passed as non-null param: (classobj)->vtable->instantiate (..., ((PMC *)NULL))
+src/pmc.c: (in function Parrot_pmc_reuse_noinit)
+src/pmc.c:277:13: Return value (type void *) ignored: Parrot_gc_alloca...
+src/pmc.c: (in function Parrot_pmc_reuse_by_class)
+src/pmc.c:322:13: Return value (type void *) ignored: Parrot_gc_alloca...
+src/pmc.c: (in function get_new_pmc_header)
+src/pmc.c:419:57: Null storage passed as non-null param: (vtable->get_pointer) (..., NULL)
+src/pmc.c:459:9: Return value (type void *) ignored: Parrot_gc_alloca...
+src/pmc.c: (in function Parrot_pmc_new_noinit)
+src/pmc.c:487:69: Null storage passed as non-null param: (classobj)->vtable->instantiate (..., ((PMC *)NULL))
+src/pmc.c: (in function Parrot_pmc_new_init_int)
+src/pmc.c:584:80: Null storage passed as non-null param: (classobj)->vtable->instantiate (..., ((PMC *)NULL))
+src/pmc.c: (in function Parrot_pmc_new_constant_init)
+src/pmc.c:616:45: Possibly null storage init passed as non-null param: (pmc)->vtable->init_pmc (..., init)
+    src/pmc.c:612:118: Storage init may become null
+src/pmc.c: (in function Parrot_pmc_box_string)
+src/pmc.c:820:54: Possibly null storage string passed as non-null param: (ret)->vtable->set_string_native (..., string)
+    src/pmc.c:815:96: Storage string may become null
+src/pmc.c: (in function Parrot_pmc_gc_register)
+src/pmc.c:1062:88: Null storage passed as non-null param: (interp->gc_registry)->vtable->set_pmc_keyed (..., ((PMC *)NULL))
+< checking src/pointer_array.c >
+src/pointer_array.c: (in function Parrot_pa_destroy)
+src/pointer_array.c:73:25: Arrow access from possibly null pointer self: self->total_chunks
+    src/pointer_array.c:69:118: Storage self may become null
+src/pointer_array.c:73:21: Field self->total_chunks used before definition
+src/pointer_array.c:74:22: Field self->chunks used before definition
+src/pointer_array.c:74:22: Unallocated storage self->chunks[] passed as out parameter: self->chunks[i]
+src/pointer_array.c:75:18: Unallocated storage self->chunks passed as out parameter: self->chunks
+< checking src/scheduler.c >
+src/scheduler.c: (in function Parrot_cx_check_tasks)
+src/scheduler.c:105:9: Undocumented modification of *(interp->scheduler) possible from call to Parrot_cx_handle_tasks: Parrot_cx_handle_tasks(interp, interp->scheduler)
+src/scheduler.c: (in function Parrot_cx_delete_handler_local)
+src/scheduler.c:525:9: Return value (type PMC *) ignored: (handlers)->vtab...
+src/scheduler.c:549:92: Null storage passed as non-null param: (handlers)->vtable->set_pmc_keyed_int (..., ((PMC *)NULL))
+src/scheduler.c:555:92: Null storage passed as non-null param: (handlers)->vtable->set_pmc_keyed_int (..., ((PMC *)NULL))
+src/scheduler.c: (in function Parrot_cx_schedule_sleep)
+src/scheduler.c:1033:41: Null storage passed as non-null param: pthread_cond_init (..., NULL)
+src/scheduler.c:1034:37: Null storage passed as non-null param: pthread_mutex_init (..., NULL)
+src/scheduler.c:1036:9: Variable time_struct used before definition
+< checking src/spf_render.c >
+src/spf_render.c: (in function handle_flags)
+src/spf_render.c:202:25: Variable ignored declared but not used
+src/spf_render.c: (in function gen_sprintf_call)
+src/spf_render.c:282:18: Buffer overflow possible with sprintf.  Recommend using snprintf instead: sprintf
+src/spf_render.c:290:18: Buffer overflow possible with sprintf.  Recommend using snprintf instead: sprintf
+src/spf_render.c: (in function canonicalize_exponent)
+src/spf_render.c:328:23: Variable len used before definition
+< checking src/spf_vtable.c >
+src/spf_vtable.c:419:5: Global va_core.data initialized to null value: va_core.data = NULL
+src/spf_vtable.c:419:14: Function types are inconsistent. Parameter 2 is implicitly non-null, but null in assigned function: getchr_va
+src/spf_vtable.c:420:32: Function types are inconsistent. Parameter 1 is defined, but unknown in assigned function: getptr_va
+src/spf_vtable.c:420:32: Function types are inconsistent. Parameter 2 is implicitly non-null, but null in assigned function: getptr_va
+src/spf_vtable.c:623:5: Global pmc_core.data initialized to null value: pmc_core.data = NULL
+src/spf_vtable.c:623:14: Function types are inconsistent. Parameter 2 is implicitly non-null, but null in assigned function: getchr_pmc
+src/spf_vtable.c:624:19: Function types are inconsistent. Parameter 2 is implicitly non-null, but null in assigned function: getstring_pmc
+src/spf_vtable.c:624:34: Function types are inconsistent. Parameter 2 is implicitly non-null, but null in assigned function: getptr_pmc
+< checking src/string/api.c >
+src/string/api.c: (in function Parrot_str_init)
+src/string/api.c:178:71: Field __ptr_u.__ptr used before definition
+src/string/api.c:177:9: Return value (type HashBucket *) ignored: Parrot_hash_put(...
+src/string/api.c: (in function Parrot_str_finish)
+src/string/api.c:204:33: Null storage interp->const_cstring_table derivable from parameter Parrot_deinit_encodings (interp)
+    src/string/api.c:203:39: Storage interp->const_cstring_table becomes null
+src/string/api.c:207:2: Function returns with null storage derivable from parameter interp->const_cstring_table
+    src/string/api.c:203:39: Storage interp->const_cstring_table becomes null
+src/string/api.c: (in function Parrot_str_clone)
+src/string/api.c:355:16: Null storage returned as non-null: ((STRING *)NULL)
+src/string/api.c: (in function Parrot_str_copy)
+src/string/api.c:398:16: Null storage returned as non-null: ((STRING *)NULL)
+src/string/api.c: (in function Parrot_str_concat)
+src/string/api.c:461:16: Null storage returned as non-null: ((STRING *)NULL)
+src/string/api.c:467:44: Possibly null storage b passed as non-null param: Parrot_str_copy (..., b)
+    src/string/api.c:453:47: Storage b may become null
+src/string/api.c:471:44: Possibly null storage a passed as non-null param: Parrot_str_copy (..., a)
+    src/string/api.c:452:98: Storage a may become null
+src/string/api.c:477:33: Null storage a passed as non-null param: string_rep_compatible (a, ...)
+    src/string/api.c:452:98: Storage a becomes null
+src/string/api.c:477:36: Null storage b passed as non-null param: string_rep_compatible (..., b)
+    src/string/api.c:453:47: Storage b becomes null
+src/string/api.c: (in function Parrot_str_new_from_buffer)
+src/string/api.c:604:19: Function returns with null storage derivable from parameter buffer->_bufstart
+    src/string/api.c:602:27: Storage buffer->_bufstart becomes null
+src/string/api.c: (in function Parrot_str_new_constant)
+src/string/api.c:637:5: Return value (type HashBucket *) ignored: Parrot_hash_put(...
+src/string/api.c: (in function Parrot_str_from_platform_cstring)
+src/string/api.c:719:16: Null storage returned as non-null: ((STRING *)NULL)
+src/string/api.c:733:51: Unconstrained function Parrot_str_platform_strlen used in argument 3 may set global variable Parrot_platform_encoding_ptr used by argument 4: Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(interp, c), Parrot_platform_encoding_ptr, 0)
+src/string/api.c: (in function Parrot_str_extract_chars)
+src/string/api.c:794:5: Return value (type INTVAL) ignored: encoding->partia...
+src/string/api.c: (in function Parrot_str_indexed)
+src/string/api.c:864:17: Arrow access from possibly null pointer s: (s)->encoding
+    src/string/api.c:862:13: Storage s may become null
+src/string/api.c: (in function Parrot_str_find_index)
+src/string/api.c:896:19: Arrow access from possibly null pointer src: (src)->encoding
+    src/string/api.c:894:15: Storage src may become null
+src/string/api.c: (in function Parrot_str_substr)
+src/string/api.c:1045:19: Arrow access from possibly null pointer src: (src)->encoding
+    src/string/api.c:1043:15: Storage src may become null
+src/string/api.c: (in function Parrot_str_compare)
+src/string/api.c:1330:18: Arrow access from possibly null pointer s1: (s1)->encoding
+    src/string/api.c:1328:14: Storage s1 may become null
+src/string/api.c:1330:56: Possibly null storage s2 passed as non-null param: ((s1)->encoding)->compare (..., (s2))
+    src/string/api.c:1323:137: Storage s2 may become null
+src/string/api.c: (in function Parrot_str_not_equal)
+src/string/api.c:1356:19: Arrow access from possibly null pointer s1: (s1)->encoding
+    src/string/api.c:1354:14: Storage s1 may become null
+src/string/api.c:1356:55: Possibly null storage s2 passed as non-null param: ((s1)->encoding)->equal (..., (s2))
+    src/string/api.c:1349:139: Storage s2 may become null
+src/string/api.c: (in function Parrot_str_equal)
+src/string/api.c:1386:18: Arrow access from possibly null pointer s1: (s1)->encoding
+    src/string/api.c:1384:14: Storage s1 may become null
+src/string/api.c:1386:54: Possibly null storage s2 passed as non-null param: ((s1)->encoding)->equal (..., (s2))
+    src/string/api.c:1379:135: Storage s2 may become null
+src/string/api.c: (in function Parrot_str_bitwise_or)
+src/string/api.c:1592:370: Dereference of null pointer curr1: *curr1
+    src/string/api.c:1589:44: Storage curr1 becomes null
+src/string/api.c:1592:379: Dereference of null pointer curr2: *curr2
+    src/string/api.c:1589:85: Storage curr2 becomes null
+src/string/api.c:1592:426: Dereference of null pointer curr1: *curr1
+    src/string/api.c:1589:44: Storage curr1 becomes null
+src/string/api.c:1592:499: Dereference of null pointer curr2: *curr2
+    src/string/api.c:1589:85: Storage curr2 becomes null
+src/string/api.c: (in function Parrot_str_bitwise_xor)
+src/string/api.c:1658:370: Dereference of null pointer curr1: *curr1
+    src/string/api.c:1655:44: Storage curr1 becomes null
+src/string/api.c:1658:379: Dereference of null pointer curr2: *curr2
+    src/string/api.c:1655:85: Storage curr2 becomes null
+src/string/api.c:1658:426: Dereference of null pointer curr1: *curr1
+    src/string/api.c:1655:44: Storage curr1 becomes null
+src/string/api.c:1658:499: Dereference of null pointer curr2: *curr2
+    src/string/api.c:1655:85: Storage curr2 becomes null
+src/string/api.c: (in function Parrot_str_to_num)
+src/string/api.c:1919:19: Variable m_is_safe name is not a macro variable (it is a local variable), but matches the macro variable namespace prefix "m_"
+   A variable declared outside a macro body starts with the macrovarprefix. (Use either -macrovarprefixexclude or -namechecks to inhibit warning)
+src/string/api.c:1942:17: Assignment of unsigned long int to FLOATVAL: f = c - '0'
+src/string/api.c:1955:18: Body of if clause of if statement is empty
+   If statement has no body. (Use -ifempty to inhibit warning)
+src/string/api.c:1977:21: Assignment of INTVAL to FLOATVAL: f = m
+src/string/api.c:1984:21: Assignment of INTVAL to FLOATVAL: f = m
+src/string/api.c:2059:45: Function pow expects arg 2 to be double gets int: d_length
+   To allow all numeric types to match, use +relaxtypes.
+src/string/api.c:2067:28: Function pow expects arg 2 to be double gets INTVAL: e
+src/string/api.c:2069:28: Function pow expects arg 2 to be double gets INTVAL: e
+src/string/api.c: (in function Parrot_str_to_cstring)
+src/string/api.c:2145:54: Arrow access from possibly null pointer s: s->encoding
+    src/string/api.c:2141:102: Storage s may become null
+src/string/api.c: (in function Parrot_str_to_hashval)
+src/string/api.c:2325:17: Arrow access from possibly null pointer s: (s)->encoding
+    src/string/api.c:2323:13: Storage s may become null
+src/string/api.c: (in function Parrot_str_unescape_string)
+src/string/api.c:2621:29: Assignment of INTVAL to char: digbuf[digcount++] = c
+src/string/api.c:2632:29: Assignment of INTVAL to char: digbuf[digcount] = c
+src/string/api.c:2653:25: Assignment of INTVAL to char: digbuf[digcount] = c
+src/string/api.c:2665:25: Assignment of INTVAL to char: digbuf[digcount] = c
+src/string/api.c:2673:21: Assignment of INTVAL to char: digbuf[0] = c
+src/string/api.c:2679:25: Assignment of INTVAL to char: digbuf[digcount] = c
+< checking src/string/encoding.c >
+src/string/encoding.c: (in function Parrot_str_internal_register_encoding_names)
+src/string/encoding.c:363:13: Expression may have undefined behavior (unconstrained function Parrot_str_new_constant used in right operand may set global variable encodings used in left operand): encodings[n]->name_str = Parrot_str_new_constant(interp, encodings[n]->name)
+src/string/encoding.c:365:20: Expression may have undefined behavior (unconstrained function Parrot_str_new_constant used in right operand may set global variable unicode_str used in left operand): unicode_str = Parrot_str_new_constant(interp, "unicode")
+src/string/encoding.c:366:20: Expression may have undefined behavior (unconstrained function Parrot_str_new_constant used in right operand may set global variable fixed_8_str used in left operand): fixed_8_str = Parrot_str_new_constant(interp, "fixed_8")
+src/string/encoding.c:367:20: Expression may have undefined behavior (unconstrained function Parrot_str_new_constant used in right operand may set global variable platform_str used in left operand): platform_str = Parrot_str_new_constant(interp, "platform")
+src/string/encoding.c: (in function Parrot_register_encoding)
+src/string/encoding.c:395:21: Expression may have undefined behavior (unconstrained function Parrot_gc_allocate_memory_chunk_with_interior_pointers used in right operand may set global variable encodings used in left operand): encodings = (STR_VTABLE **)Parrot_gc_allocate_memory_chunk_with_interior_pointers((interp), sizeof(STR_VTABLE *))
+src/string/encoding.c:397:21: Expression may have undefined behavior (unconstrained function Parrot_gc_reallocate_memory_chunk_with_interior_pointers used in right operand may set global variable encodings used in left operand): encodings = (STR_VTABLE **)Parrot_gc_reallocate_memory_chunk_with_interior_pointers((interp), (encodings), (n + 1) * sizeof(STR_VTABLE *), (n) * sizeof(STR_VTABLE *))
+src/string/encoding.c: (in function Parrot_encodings_init)
+src/string/encoding.c:423:5: Return value (type INTVAL) ignored: Parrot_register_...
+src/string/encoding.c:424:5: Return value (type INTVAL) ignored: Parrot_register_...
+src/string/encoding.c:425:5: Return value (type INTVAL) ignored: Parrot_register_...
+src/string/encoding.c:426:5: Return value (type INTVAL) ignored: Parrot_register_...
+src/string/encoding.c:427:5: Return value (type INTVAL) ignored: Parrot_register_...
+src/string/encoding.c:428:5: Return value (type INTVAL) ignored: Parrot_register_...
+src/string/encoding.c:429:5: Return value (type INTVAL) ignored: Parrot_register_...
+< checking src/sub.c >
+src/sub.c: (in function Parrot_sub_full_sub_name)
+src/sub.c:96:28: Arrow access from possibly null pointer ns_array: (ns_array)->vtable
+    src/sub.c:90:24: Storage ns_array may become null
+src/sub.c:98:54: Possibly null storage ns_array passed as non-null param: Parrot_str_join (..., ns_array)
+    src/sub.c:90:24: Storage ns_array may become null
+src/sub.c: (in function Parrot_sub_context_get_info)
+src/sub.c:193:17: Possible undocumented modification of interp->const_cstring_table[95] through alias info->file: info->file = Parrot_debug_pc_to_filename(interp, debug, i)
+src/sub.c: (in function Parrot_sub_capture_lex)
+src/sub.c:414:72: Arrow access from possibly null pointer: (Parrot_pcc_get_sub(interp, ctx))->vtable
+src/sub.c:414:314: Arrow access from possibly null pointer: ((Parrot_pcc_get_sub(interp, ctx)))->data
+src/sub.c:414:444: Possibly null storage passed as non-null param: Parrot_get_sub_pmc_from_subclass (..., (Parrot_pcc_get_sub(interp, ctx)))
+src/sub.c: (in function Parrot_sub_continuation_rewind_environment)
+src/sub.c:523:21: Possibly null storage passed as non-null param: Parrot_io_eprintf (..., Parrot_sub_full_sub_name(interp, sub))
+< checking src/thread.c >
+src/thread.c: (in function make_local_copy)
+src/thread.c:185:61: Possibly null storage copy passed as non-null param: (ret_val)->vtable->push_pmc (..., copy)
+    src/thread.c:184:31: Storage copy may become null
+src/thread.c:196:52: Arrow access from possibly null pointer ret_val: (ret_val)->vtable
+    src/thread.c:195:33: Storage ret_val may become null
+src/thread.c: (in function make_local_args_copy)
+src/thread.c:287:70: Possibly null storage copy passed as non-null param: (ret_val)->vtable->set_pmc_keyed_int (..., copy)
+    src/thread.c:284:28: Storage copy may become null
+src/thread.c: (in function pt_shared_fixup)
+src/thread.c:350:12: Possibly null storage pmc->_metadata derivable from return value: pmc
+    src/thread.c:348:30: Storage pmc->_metadata may become null
+src/thread.c: (in function pt_thread_wait_with)
+src/thread.c:389:9: Undocumented modification of interp->thread_data->state: interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC
+src/thread.c:400:5: Undocumented modification of interp->thread_data->state: interp->thread_data->state |= THREAD_STATE_GC_WAKEUP
+src/thread.c:406:5: Undocumented modification of interp->thread_data->state: interp->thread_data->state &= ~THREAD_STATE_GC_WAKEUP
+src/thread.c: (in function thread_func)
+src/thread.c:493:69: Arrow access from possibly null pointer self: (self)->data
+    src/thread.c:490:32: Storage self may become null
+src/thread.c: (in function pt_clone_code)
+src/thread.c:577:5: Return value (type PackFile_ByteCode *) ignored: Parrot_switch_to...
+src/thread.c: (in function pt_ns_clone)
+src/thread.c:607:27: Field dest_ns->vtable used before definition
+src/thread.c:616:32: Field dest_ns->vtable used before definition
+src/thread.c:627:25: Variable val_sub used before definition
+src/thread.c:629:79: Possibly null storage copy passed as non-null param: (dest_ns)->vtable->set_pmc_keyed_str (..., copy)
+    src/thread.c:619:36: Storage copy may become null
+src/thread.c: (in function pt_thread_run)
+src/thread.c:752:127: Possibly null storage passed as non-null param: (thread_interp_pmc)->vtable->set_attr_str (..., pt_transfer_sub(thread_interp, interp, sub))
+src/thread.c:751:72: Possibly null storage passed as non-null param: (thread_interp_pmc)->vtable->set_pmc (..., make_local_args_copy(thread_interp, interp, arg))
+src/thread.c: (in function pt_suspend_all_for_gc)
+src/thread.c:1060:9: Return value (type PMC *) ignored: Parrot_cx_delete...
+src/thread.c: (in function pt_thread_join)
+src/thread.c:1189:118: Function types are inconsistent. Parameter 1 is unknown, but defined in assigned function: ((mutex_unlock))
+src/thread.c:1189:118: Function types are inconsistent. Parameter 1 is implicitly non-null, but notnull in assigned function: ((mutex_unlock))
+src/thread.c:1189:356: Unrecognized (possibly system) identifier: __builtin_expect
+   Identifier used in code has not been declared. (Message repeated for future uses in this file.)  Use +gnuextensions to make Splint recognize some keywords that are gnu extensions. (Use -sysunrecog to inhibit warning)
+src/thread.c:1206:44: Possibly null storage parent_ret passed as non-null param: Parrot_pmc_gc_register (..., parent_ret)
+    src/thread.c:1200:26: Storage parent_ret may become null
+src/thread.c: (in function pt_add_to_interpreters)
+src/thread.c:1405:32: Expression may have undefined behavior (unconstrained function mem_sys_allocate used in right operand may set global variable interpreter_array used in left operand): interpreter_array = (Interp **)mem_sys_allocate(sizeof(Interp *))
+src/thread.c:1409:26: Expression may have undefined behavior (unconstrained function mem_sys_allocate_zeroed used in right operand may set global variable shared_gc_info used in left operand): shared_gc_info = (Shared_gc_info *)mem_sys_allocate_zeroed(sizeof((*shared_gc_info)))
+src/thread.c:1441:25: Expression may have undefined behavior (unconstrained function mem_sys_realloc used in right operand may set global variable interpreter_array used in left operand): interpreter_array = (Interp **)mem_sys_realloc((interpreter_array), ((n_interpreters + 1) * sizeof(Interp *)))
+src/thread.c: (in function pt_gc_start_mark)
+src/thread.c:1489:63: Arrow access from possibly null pointer info: info->gc_block_level
+    src/thread.c:1488:12: Storage info may become null
+< checking src/utils.c >
+src/utils.c:47:36: Function parameter buf declared as manifest array (size constant is meaningless)
+   A formal parameter is declared as an array with size.  The size of the array is ignored in this context, since the array formal parameter is treated as a pointer. (Use -fixedformalarray to inhibit warning)
+src/utils.c:48:32: Function parameter buf declared as manifest array (size constant is meaningless)
+src/utils.c:51:32: Function parameter buf declared as manifest array (size constant is meaningless)
+src/utils.c:64:33: Function parameter X declared as manifest array (size constant is meaningless)
+src/utils.c:243:21: Function parameter X declared as manifest array (size constant is meaningless)
+src/utils.c:276:20: Function parameter buf declared as manifest array (size constant is meaningless)
+src/utils.c:313:20: Function parameter buf declared as manifest array (size constant is meaningless)
+src/utils.c:333:20: Function parameter buf declared as manifest array (size constant is meaningless)
+src/utils.c: (in function Parrot_util_register_move)
+src/utils.c:841:28: Array element dest_regs[0] used before definition
+src/utils.c:856:13: Operands of > have incompatible types (unsigned char, size_t): src_regs[i] > max_reg
+src/utils.c:858:13: Operands of > have incompatible types (unsigned char, size_t): dest_regs[i] > max_reg
+src/utils.c:858:13: Value dest_regs[] used before definition
+src/utils.c:878:27: Value dest_regs[] used before definition
+< checking src/vtables.c >
+src/vtables.c: (in function Parrot_vtbl_destroy_vtable)
+src/vtables.c:100:9: Field vtable->ro_variant_vtable used before definition
+src/vtables.c:105:40: Field vtable->isa_hash used before definition
+src/vtables.c:111:22: Unallocated storage ro_vtable passed as out parameter: ro_vtable
+src/vtables.c:115:9: Field vtable->isa_hash used before definition
+< checking src/warnings.c >
+src/warnings.c: (in function print_pbc_location)
+src/warnings.c:55:13: Possibly null storage passed as non-null param: Parrot_io_eprintf (..., Parrot_sub_Context_infostr(interp, ((interp)->ctx)))
+src/warnings.c: (in function print_warning)
+src/warnings.c:73:9: Return value (type INTVAL) ignored: Parrot_io_puts(i...
+src/warnings.c:75:9: Return value (type INTVAL) ignored: Parrot_io_putps(...
+src/warnings.c: (in function Parrot_warn_deprecated)
+src/warnings.c:144:9: Return value (type INTVAL) ignored: print_warning(in...
+src/warnings.c: (in function Parrot_warn_experimental)
+src/warnings.c:169:9: Return value (type INTVAL) ignored: print_warning(in...
+< global checks >
+< cleaning .......... >
+
+Finished checking --- 609 code warnings
+    Time distribution (percent): initialize 0.00 / pre-process 4.18 / c check 95.77 / finalize 0.05 
