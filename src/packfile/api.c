@@ -3624,8 +3624,8 @@ C<add>.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment *
-PackFile_Annotations_new(PARROT_INTERP, SHIM(struct PackFile *pf),
-        SHIM(STRING *name), SHIM(int add))
+PackFile_Annotations_new(PARROT_INTERP, ARGMOD(struct PackFile *pf),
+        ARGIN(STRING *name), SHIM(int add))
 {
     ASSERT_ARGS(PackFile_Annotations_new)
 

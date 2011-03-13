@@ -532,10 +532,13 @@ void PackFile_Annotations_add_entry(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment * PackFile_Annotations_new(PARROT_INTERP,
-    SHIM(struct PackFile *pf),
-    SHIM(STRING *name),
+    ARGMOD(struct PackFile *pf),
+    ARGIN(STRING *name),
     NULLOK(int add))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pf);
 
 PARROT_EXPORT
 void PackFile_ConstTable_clear(PARROT_INTERP,
@@ -867,7 +870,9 @@ PackFile * Parrot_pf_get_current_packfile(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_Annotations_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pf) \
+    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_PackFile_ConstTable_clear __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
