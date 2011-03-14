@@ -355,12 +355,16 @@ they'll be the same thing under Lorito).
 M0's ffi should be amenable to interpretation, compilation to machine code
 (including jitting) and compilation to static C.  Where possible, M0's design
 should not impose any constraints that preclude efficient implementation of any
-of type of interpreter.
+of type of interpreter.  Part of this means avoiding the assumption that the
+basic mechanism of foreign function calls is a thunk.
 
 =head3 Possible Implementations
 
 NOTE: This suggestion omits the mechanism for creating and destroying the space
 where an ffi thunk is stored.  We need to figure out what this would look like.
+
+NOTE: define "thunk" as it's used in Parrotland.  Different fields and
+languages use it differently.
 
 M0's FFI will need to implement similar functionality to dlfunc and dlvar in
 the form of a minimal set of atoms which are sufficient to expose that
@@ -411,6 +415,16 @@ set_arg thunk, FFI_UINT32, arg0
 set_arg thunk, FFI_UINT32, arg1
 ccall thunk
 say ret  # will print "120"
+
+=head3 Other Possible Implementations:
+
+#always use explicit signature, avoids assumption that thunks are the underlying mechanism
+gen_call $P0, [INT32, INT32, $I0, INT32, $I1]
+callc 'multiply_int32', $P0"
+
+#more objecty version of above
+$P0 = <funcptr>;
+callc $P0, [INT32, INT32, $I0, INT32, $I1]
 
 
 =head2 Concurrency
