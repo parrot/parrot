@@ -394,9 +394,9 @@ arg0 = 12
 arg1 = 10
 lib = dlopen "libmath.so"
 thunk = dlfunc lib, "multiply_int32"
-set_ret thunk, ret, FFI_UINT32
-set_arg thunk, arg0, FFI_UINT32
-set_arg thunk, arg1, FFI_UINT32
+set_ret thunk, FFI_UINT32, ret
+set_arg thunk, FFI_UINT32, arg0
+set_arg thunk, FFI_UINT32, arg1
 ccall thunk
 say ret  # will print "120"
 
