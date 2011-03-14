@@ -350,13 +350,56 @@ they'll be the same thing under Lorito).
 
 =head2 FFI
 
-describe FFI here.  This will become especially important when we start
-integrating Lorito with the rest of Parrot and want to be able to call into C
-code from M0 and vice versa.
+M0's FFI will need to implement similar functionality to dlfunc and dlvar in
+the form of a minimal set of atoms which are sufficient to expose that
+functionality.
 
-M0 will need to implement similar functionality to dlfunc and dlvar, but most
-likely the atoms to build up that functionality, since they contain too much
-magic to be M0 ops.
+M0 will know enough about FFI to create a reusable thunk that takes M0 values,
+sets up the C function call according to C calling conventions (Q: which ones?)
+and calls it.  M0 will have three ops to support this: set_arg and set_return
+to indicate which M0 registers are to be used in the call, and ccall to call
+the C function through the generated thunk.
+
+=item * set_arg thunk_handle, arg_type, arg_src
+
+set_arg takes three arguments: a thunk handle (or possibly a pointer to a
+region of memory), an argument type and an argument source.  The thunk handle
+indicate which thunk is being operated on; it can be any value that uniquely
+identifies a thunk.  arg_type is a constant indicating the type of the
+argument.  The values of this argument will be similar to those used by libffi
+(https://github.com/atgreen/libffi/blob/master/doc/libffi.info ).  arg_src
+indicates which M0 INSP register should be used to populate or recieve the
+value of the approrpiate argument.
+set_arg will need to keep track of the last arg to be set internally.
+
+=item * set_ret thunk_handle, arg_type, arg_dest
+
+set_ret is similar to set_arg, except that it always sets the type and
+destination of the return value from the thunk.
+
+=item * ccall thunk_handle
+
+ccall uses an existing thunk to call into a C function.
+
+example code for calling no arg, no ret function:
+.local int lib, thunk
+lib = dlopen 'libhello.so'
+thunk = dlfunc lib, "hello_func"
+ccall thunk
+
+example code for calling 2 int32 arg, 1 int32 return
+.local int ret, arg0, arg1
+.local int lib, thunk
+arg0 = 12
+arg1 = 10
+lib = dlopen "libmath.so"
+thunk = dlfunc lib, "multiply_int32"
+set_ret thunk, ret, FFI_UINT32
+set_arg thunk, arg0, FFI_UINT32
+set_arg thunk, arg1, FFI_UINT32
+ccall thunk
+say ret  # will print "120"
+
 
 =head2 Concurrency
 
