@@ -350,6 +350,18 @@ they'll be the same thing under Lorito).
 
 =head2 FFI
 
+=head3 FFI considerations
+
+M0's ffi should be amenable to interpretation, compilation to machine code
+(including jitting) and compilation to static C.  Where possible, M0's design
+should not impose any constraints that preclude efficient implementation of any
+of type of interpreter.
+
+=head3 Possible Implementations
+
+NOTE: This suggestion omits the mechanism for creating and destroying the space
+where an ffi thunk is stored.  We need to figure out what this would look like.
+
 M0's FFI will need to implement similar functionality to dlfunc and dlvar in
 the form of a minimal set of atoms which are sufficient to expose that
 functionality.
