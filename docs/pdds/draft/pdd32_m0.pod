@@ -73,6 +73,12 @@ EH    - exception handler address (bytecode segment and offset)
 EX    - exception payload
 caller - calling context
 
+=item * thunk
+
+When discussing M0, C<thunk> refers to small generated functions that convert
+between different calling conventions.  These are also referred to as wrappers
+or "glue code".
+
 =back
 
 =head2 Design Goals
