@@ -23,6 +23,7 @@ ok( $function ~~ LLVM::Function, ".. with proper type");
 my $bb := $function.append_basic_block("the_block");
 ok( pir::defined($bb), "BasicBlock appended");
 ok( $bb ~~ LLVM::BasicBlock, ".. with proper type");
+is( $bb.name, "the_block", ".. with name");
 
 my $builder := LLVM::Builder.create();
 ok( pir::defined($builder), "LLVM::Builder created");
