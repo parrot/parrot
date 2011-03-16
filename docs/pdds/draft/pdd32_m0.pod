@@ -424,6 +424,13 @@ say ret  # will print "120"
 
 =head3 Other Possible Implementations:
 
+An alternative approach is to specify the entire signature at once.  This has
+the advantage of making allocation simpler (since the length is known once the
+op is parsed) and of making life simple for M0 implementations which compile
+directly to C and don't need an explicit ffi, but it also complicates to the
+parser and necessitates additional complexity in the bytecode format to support
+signature storage.
+
 #always use explicit signature, avoids assumption that thunks are the underlying mechanism
 gen_call $P0, [INT32, INT32, $I0, INT32, $I1]
 callc 'multiply_int32', $P0"
