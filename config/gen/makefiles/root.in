@@ -2516,14 +2516,16 @@ SPLINT_TMP = $(TEMPDIR)/splint
 # looking for "declundef", except that it's "decl-undef" in the docs.
 SPLINTFLAGS_BASE = \
     +standard \
-    -hints \
+    +hints \
     \
     +indentspaces 4 \
     +locindentspaces 4 \
-    +linelen 120 \
+    +linelen 999 \
+    +bugslimit 1000 \
     -message-stream-stdout \
     +showdeephistory \
-    -showfunc \
+    +show-func \
+    +show-column \
     -tmpdir $(SPLINT_TMP) \
     \
     +posix-lib \
@@ -2587,6 +2589,7 @@ SPLINTFLAGS_BOOLEAN_SLOP = \
     -pred-bool-ptr \
     -pred-bool-others \
     -boolops \
+    +bool-int \
 
 # const and other qualifiers
 # Report qualifier mismatches only if dangerous (+relax-quals)
@@ -2646,7 +2649,7 @@ SPLINTFLAGS = \
 	$(SPLINTFLAGS_TYPES) \
 
 #SPLINT_SOURCE = `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@ | sort`
-SPLINT_SOURCE = `echo src/*.c src/{gc,io,packfile,string}/*.c | sort`
+SPLINT_SOURCE = $$(find src/*.c src/{io,packfile,string}/*.c -type f | grep -v extra_nci_thunks.c | grep -v extend_vtable.c | sort)
 
 # "splint" is the less-thorough splint target.  For cage cleaning work,
 # you'll probably want to specify SPLINT_SOURCE rather than work on the

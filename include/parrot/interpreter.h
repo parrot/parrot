@@ -93,7 +93,7 @@ struct parrot_interp_t;
  * gets its own macro. */
 #define PARROT_INTERP /*@notnull@*/ /*@in@*/ Parrot_Interp interp
 #define NULLOK_INTERP /*@null@*/    /*@in@*/ Parrot_Interp interp
-#define SHIM_INTERP   /*@unused@*/ /*@null@*/ Parrot_Interp interp_unused __attribute__unused__
+#define SHIM_INTERP   /*@unused@*/ /*@notnull@*/ Parrot_Interp interp_unused __attribute__unused__
 
 
 #ifdef PARROT_IN_CORE
@@ -165,9 +165,6 @@ struct _handler_node_t; /* forward def - exit.h */
 /* The actual interpreter structure */
 struct parrot_interp_t {
     PMC                 *ctx;                 /* current Context */
-
-    struct Memory_Pools *mem_pools;           /* Pointer to this interpreter's
-                                               * arena */
 
     struct GC_Subsystem *gc_sys;              /* functions and data specific
                                                  to current GC subsystem*/

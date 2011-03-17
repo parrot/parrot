@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -44,13 +44,19 @@ A separate compacting garbage collector is used to keep track of them.
 
 =item F<src/gc/gc_ms2.c>
 
+=item F<src/gc/gc_gms.c>
+
 =item F<src/gc/gc_inf.c>
 
 These files are the individual GC cores which implement the primary tracing
-and sweeping logic. gc_ms.c is the mark & sweep collector core which is used in
-Parrot by default. gc_ms2.c implements a generational mark & sweep allocator.
-gc_inf.c implements an "infinite" allocator which never frees any memory.  The
-infinite allocator is not recommended except for debugging.
+and sweeping logic.
+gc_ms.c is the mark & sweep collector core,
+gc_ms2.c implements a generational mark & sweep allocator,
+gc_gms.c implements a generational, non-compacting, mark and sweep allocator,
+gc_inf.c implements an "infinite" allocator which never frees any memory.
+The infinite allocator is not recommended except for debugging.
+The default is currently gc_ms2.c but is expected to move to gc_gms.c
+after RELEASE_3_3_0.
 
 =item F<src/gc/mark_sweep.c>
 
@@ -212,6 +218,12 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         break;
       case GMS:
         Parrot_gc_gms_init(interp, args);
+        break;
+      default:
+        /* add a default to supress compiler warnings
+         * should never get here as the above if statemewnt
+         * would catch any invalid GC types and exit
+         */
         break;
     }
 
