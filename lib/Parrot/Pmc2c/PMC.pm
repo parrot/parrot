@@ -788,7 +788,7 @@ sub post_method_gen {
         $body .= "PMC *_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));\n";
 
         # pcc params
-        $body .= "Parrot_pcc_fill_params_from_c_args(interp, _call_obj, \"$pcc_args\", &_self" .
+        $body .= "Parrot_pcc_fill_params_from_c_args(interp, _call_obj, \"Pi$pcc_args\", &_self" .
                     (join '', map { ", &$_" } @parameters) . ");\n";
 
         # C call
@@ -797,8 +797,17 @@ sub post_method_gen {
         $body .= $method->full_method_name($self->name) . "($parameters);\n";
 
         # pcc return
-        $body .= "Parrot_pcc_build_call_from_c_args(interp, _call_obj, " .
-                    "\"$pcc_ret\", _result);\n" if $need_result;
+        $body .= <<EOC if $need_result;
+{
+    /*
+     * Use the result of Parrot_pcc_build_call_from_c_args because it is marked
+     * PARROT_WARN_UNUSED_RESULT. Then explicitly don't use the result.
+     * This apparently makes sense.
+     */
+    PMC *unused = Parrot_pcc_build_call_from_c_args(interp, _call_obj, "$pcc_ret", _result);
+    UNUSED(unused);
+}
+EOC
 
         $new_method->body(Parrot::Pmc2c::Emitter->text($body));
         $self->add_method($new_method);
@@ -1021,10 +1030,9 @@ sub init_func {
         }
 
         push @multi_list, <<END_MULTI_LIST;
-            _temp_multi_func_list[$i].multi_name = $name_str;
-            _temp_multi_func_list[$i].full_sig = $fsig_str;
-            _temp_multi_func_list[$i].ns_name = $ns_name;
-            _temp_multi_func_list[$i].func_ptr = (funcptr_t) $func;
+_temp_func = Parrot_pmc_new(interp, enum_class_NativePCCMethod);
+VTABLE_set_pointer_keyed_str(interp, _temp_func, CONST_STRING(interp, "->"), (void *)${func}_pcc);
+Parrot_mmd_add_multi_from_long_sig(interp, $name_str, $fsig_str, _temp_func);
 END_MULTI_LIST
         $i++;
 
@@ -1219,11 +1227,8 @@ EOC
     if ( @$multi_funcs ) {
         # Don't const the list, breaks some older C compilers
         $cout .= $multi_strings . <<"EOC";
-
-            multi_func_list _temp_multi_func_list[$multi_list_size];
+        PMC *_temp_func;
 $multi_list
-            Parrot_mmd_add_multi_list_from_c_args(interp,
-                _temp_multi_func_list, $multi_list_size);
 EOC
     }
 
