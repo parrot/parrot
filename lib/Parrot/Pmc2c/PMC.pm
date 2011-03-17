@@ -762,6 +762,47 @@ sub post_method_gen {
         $method->body(Parrot::Pmc2c::Emitter->text($body) );
     }
 
+    # generate PCC-variants for multis
+    foreach ( @{ $self->find_multi_functions } ) {
+        my ($name, $fsig, $ns, $func, $method) = @$_;
+        (my $new_name = $method->full_method_name($self->name) . '_pcc') =~ s/.*?_multi_/multi_/;
+        my $new_method = $method->clone({
+                            name        => $new_name,
+                            type        => "MULTI_PCC",
+                            parameters  => '',
+                            return_type => 'void'
+        });
+
+        # Get parameters. Strip type from param
+        my @parameters = map { /\s*\*?(\S+)$/; $1 } (split /,/, $method->parameters);
+
+        my $need_result = $method->return_type && $method->return_type !~ 'void';
+
+        (my $pcc_sig) = $method->pcc_signature;
+        my ($pcc_args, $pcc_ret) = $pcc_sig =~ /(.*)->(.*)/;
+
+        # Get paramete storage. Types are already provided, but we need semi-colon delimitation.
+        (my $body = $method->parameters) =~ s/,/;/g;
+        $body .= ";\n";
+        $body .= $method->return_type . " _result;\n" if $need_result;
+        $body .= "PMC *_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));\n";
+
+        # pcc params
+        $body .= "Parrot_pcc_fill_params_from_c_args(interp, _call_obj, \"$pcc_args\", &_self" .
+                    (join '', map { ", &$_" } @parameters) . ");\n";
+
+        # C call
+        $body .= "_result = " if $need_result;
+        my $parameters = join ', ', 'INTERP', 'SELF', @parameters;
+        $body .= $method->full_method_name($self->name) . "($parameters);\n";
+
+        # pcc return
+        $body .= "Parrot_pcc_build_call_from_c_args(interp, _call_obj, " .
+                    "\"$pcc_ret\", _result);\n" if $need_result;
+
+        $new_method->body(Parrot::Pmc2c::Emitter->text($body));
+        $self->add_method($new_method);
+    }
 }
 =item C<gen_methods()>
 
