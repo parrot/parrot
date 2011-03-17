@@ -705,7 +705,7 @@ imcc_get_packfile_pmc(imc_info_t * imcc, PackFile * pf)
     ASSERT_ARGS(imcc_get_packfile_pmc)
     PMC * const ptr = Parrot_pmc_new(imcc->interp, enum_class_PtrObj);
     VTABLE_set_pointer(imcc->interp, ptr, pf);
-    SETATTR_PtrObj_mark(imcc->interp, ptr, imcc_mark_packfile_ptr);
+    PTROBJ_SET_MARK(imcc->interp, ptr, imcc_mark_packfile_ptr);
     return ptr;
 }
 
