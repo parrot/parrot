@@ -1,7 +1,7 @@
 class LLVM::BasicBlock is LLVM::Value {
     method next () {
         LLVM::BasicBlock.create(
-            LLVM::call("GetNextBasicBlock), self)
+            LLVM::call("GetNextBasicBlock", self)
         );
     }
 };
