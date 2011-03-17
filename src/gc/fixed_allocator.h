@@ -80,11 +80,12 @@ void Parrot_gc_fixed_allocator_destroy(PARROT_INTERP,
 PARROT_EXPORT
 void Parrot_gc_fixed_allocator_free(PARROT_INTERP,
     ARGIN(Fixed_Allocator *allocator),
-    ARGFREE_NOTNULL(void *data),
+    ARGMOD(void *data),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*data);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL

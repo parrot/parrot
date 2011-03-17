@@ -777,6 +777,40 @@ Mark the array.
 
 /*
 
+=item C<void freeze()>
+
+=item C<void thaw()>
+
+Freeze/thaw Capture
+
+=cut
+
+*/
+
+    VTABLE void freeze(PMC *info) {
+        PMC *array, *hash;
+        GET_ATTR_array(INTERP, SELF, array);
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        VTABLE_push_pmc(INTERP, info, array);
+        VTABLE_push_pmc(INTERP, info, hash);
+    }
+
+    VTABLE void thaw(PMC *info) {
+        PMC *tmp;
+        tmp = VTABLE_shift_pmc(INTERP, info);
+        if (!PMC_IS_NULL(tmp)) {
+            SET_ATTR_array(INTERP, SELF, tmp);
+            PObj_custom_mark_SET(SELF);
+        }
+        tmp = VTABLE_shift_pmc(INTERP, info);
+        if (!PMC_IS_NULL(tmp)) {
+            SET_ATTR_hash(INTERP, SELF, tmp);
+            PObj_custom_mark_SET(SELF);
+        }
+    }
+/*
+
 =back
 
 =head2 Methods

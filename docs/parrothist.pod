@@ -123,5 +123,6 @@ Starred release numbers indicate supported releases.
 
  cotto       3.0.0 *        2011-Jan-18     "Beef Stew"
  mikehh      3.1.0          2011-Feb-15     "Budgerigar"
+ Gerd        3.2.0          2011-Mar-15     "Nanday Parakeet"
 
 =cut

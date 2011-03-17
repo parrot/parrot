@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -523,7 +523,9 @@ hash_compare(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(void *a),
 
     if (hash->key_type == Hash_key_type_PMC)
         return hash_compare_pmc(interp, (PMC *)a, (PMC *) b);
-    /* XXX When this function can take const pointers, hash_compare() can take const pointers, too */
+    /*
+     * XXX When this function can take const pointers, hash_compare() can take const pointers, too
+     */
 
     return 1;
 }
@@ -1479,7 +1481,7 @@ Puts the key and value into the hash. Note that C<key> is B<not> copied.
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 HashBucket*
 Parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
         ARGIN_NULLOK(void *key), ARGIN_NULLOK(void *value))

@@ -328,6 +328,6 @@ mentioned in some of the early Parrot documents.
 
 =head1 SEE ALSO
 
-F<packfile.c>, F<packfile.h>, F<packout.c>, F<packdump.c>, F<pf/*.c>, and the
+F<packfile.c>, F<packfile.h>, F<packdump.c>, F<pf/*.c>, and the
 B<pbc_dump> utility F<pbc_dump.c>.
 

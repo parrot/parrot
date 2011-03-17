@@ -331,64 +331,65 @@ files or streams into an archive file (C<.tar.gz>).
 
 .sub '_mk_meta' :method
     .param pmc aggregate
-    $S0 = "---"
-    $S0 .= "\nfile_attributes:"
-    $P0 = aggregate.'descriptions'()
-    $P1 = iter $P0
+    $P0 = new 'StringBuilder'
+    push $P0, "---"
+    push $P0, "\nfile_attributes:"
+    $P1 = aggregate.'descriptions'()
+    $P2 = iter $P1
   L1:
-    unless $P1 goto L2
-    $S1 = shift $P1
+    unless $P2 goto L2
+    $S2 = shift $P2
     .local pmc parser
-    parser = aggregate.'parsers'($S1)
-    $S0 .= "\n  -"
-    $S0 .= "\n    description: "
-    $S0 .= $S1
+    parser = aggregate.'parsers'($S2)
+    push $P0, "\n  -"
+    push $P0, "\n    description: "
+    push $P0, $S2
     $N0 = parser.'start_time'()
-    $S0 .= "\n    start_time: "
-    $S1 = $N0
-    $S0 .= $S1
+    push $P0, "\n    start_time: "
+    $S0 = $N0
+    push $P0, $S0
     $N0 = parser.'end_time'()
-    $S0 .= "\n    stop_time: "
-    $S1 = $N0
-    $S0 .= $S1
+    push $P0, "\n    stop_time: "
+    $S0 = $N0
+    push $P0, $S0
     goto L1
   L2:
-    $S0 .= "\nfile_order:"
-    $P1 = iter $P0
+    push $P0, "\nfile_order:"
+    $P2 = iter $P1
   L3:
-    unless $P1 goto L4
-    $S1 = shift $P1
-    $S0 .= "\n  - "
-    $S0 .= $S1
+    unless $P2 goto L4
+    $S2 = shift $P2
+    push $P0, "\n  - "
+    push $P0, $S2
     goto L3
   L4:
     $I0 = aggregate.'start_time'()
-    $S0 .= "\nstart_time: "
-    $S1 = $I0
-    $S0 .= $S1
+    push $P0, "\nstart_time: "
+    $S0 = $I0
+    push $P0, $S0
     $I0 = aggregate.'end_time'()
-    $S0 .= "\nstop_time: "
-    $S1 = $I0
-    $S0 .= $S1
-    $P0 = getattribute self, 'archive_extra_props'
-    if null $P0 goto L5
-    $S0 .= "\nextra_properties:"
-    $P1 = iter $P0
+    push $P0, "\nstop_time: "
+    $S0 = $I0
+    push $P0, $S0
+    $P1 = getattribute self, 'archive_extra_props'
+    if null $P1 goto L5
+    push $P0, "\nextra_properties:"
+    $P2 = iter $P1
   L6:
-    unless $P1 goto L5
+    unless $P2 goto L5
     .local string key, value
-    key = shift $P1
-    value = $P0[key]
+    key = shift $P2
+    value = $P1[key]
     if value == '' goto L6
-    $S0 .= "\n  "
-    $S0 .= key
-    $S0 .= ": '"
-    $S0 .= value
-    $S0 .= "'"
+    push $P0, "\n  "
+    push $P0, key
+    push $P0, ": '"
+    push $P0, value
+    push $P0, "'"
     goto L6
   L5:
-    $S0 .= "\n"
-    .return ($S0)
+    push $P0, "\n"
+    .return ($P0)
 .end
 
 =back

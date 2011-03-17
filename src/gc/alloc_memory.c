@@ -245,6 +245,8 @@ PARROT_DOES_NOT_RETURN
 static void
 panic_failed_allocation(unsigned int line, unsigned long size)
 {
+    ASSERT_ARGS(panic_failed_allocation)
+
     fprintf(stderr, "Failed allocation of %lu bytes\n", size);
     do_panic(NULL, "Out of mem", __FILE__, line);
 }
@@ -264,6 +266,8 @@ PARROT_DOES_NOT_RETURN
 static void
 panic_zero_byte_allocation(unsigned int line, ARGIN(const char *func))
 {
+    ASSERT_ARGS(panic_zero_byte_allocation)
+
     fprintf(stderr, "Zero-byte allocation not allowed in %s", func);
     do_panic(NULL, "Out of mem", __FILE__, line);
 }

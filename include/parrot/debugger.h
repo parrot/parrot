@@ -225,7 +225,7 @@ void PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 STRING * Parrot_dbg_get_exception_backtrace(PARROT_INTERP,
     ARGMOD(PMC * exception))
         __attribute__nonnull__(1)

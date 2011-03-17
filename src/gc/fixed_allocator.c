@@ -53,9 +53,11 @@ static void * pool_allocate(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
 
 static void pool_free(SHIM_INTERP,
     ARGMOD(Pool_Allocator *pool),
-    ARGFREE(void *data))
+    ARGMOD(void *data))
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pool);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pool)
+        FUNC_MODIFIES(*data);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -85,7 +87,8 @@ static int pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_pool_free __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(pool))
+       PARROT_ASSERT_ARG(pool) \
+    , PARROT_ASSERT_ARG(data))
 #define ASSERT_ARGS_pool_is_maybe_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(ptr))
@@ -205,12 +208,12 @@ PARROT_EXPORT
 void
 Parrot_gc_fixed_allocator_free(PARROT_INTERP,
         ARGIN(Fixed_Allocator *allocator),
-        ARGFREE_NOTNULL(void *data), size_t size)
+        ARGMOD(void *data), size_t size)
 {
     ASSERT_ARGS(Parrot_gc_fixed_allocator_free)
 
     /* We always align size to 4/8 bytes. */
-    size_t index = (size - 1) / sizeof (void*);
+    const size_t index = (size - 1) / sizeof (void*);
 
     PARROT_ASSERT(allocator->pools[index]);
 
@@ -305,9 +308,9 @@ Parrot_gc_pool_new(SHIM_INTERP, size_t object_size)
     newpool->free_list         = NULL;
     newpool->top_arena         = NULL;
     newpool->lo_arena_ptr      = (void *)((size_t)-1);
-    newpool->hi_arena_ptr      = 0;
-    newpool->newfree           = 0;
-    newpool->newlast           = 0;
+    newpool->hi_arena_ptr      = NULL;
+    newpool->newfree           = NULL;
+    newpool->newlast           = NULL;
 
     return newpool;
 }
@@ -467,7 +470,7 @@ pool_allocate(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
 }
 
 static void
-pool_free(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGFREE(void *data))
+pool_free(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGMOD(void *data))
 {
     ASSERT_ARGS(pool_free)
     Pool_Allocator_Free_List * const item = (Pool_Allocator_Free_List *)data;
