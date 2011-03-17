@@ -240,6 +240,7 @@ Parrot_Int Parrot_api_set_warnings(Parrot_PMC interp_pmc, Parrot_Int flags);
 PARROT_API
 Parrot_Int Parrot_api_toggle_gc(Parrot_PMC interp_pmc, Parrot_Int on);
 
+PARROT_API
 Parrot_Int Parrot_api_unwrap_pointer(
     Parrot_PMC interp_pmc,
     Parrot_PMC pmc,
@@ -251,12 +252,6 @@ Parrot_Int Parrot_api_unwrap_pointer(
         FUNC_MODIFIES(* size);
 
 PARROT_API
-Parrot_Int Parrot_api_write_bytecode_to_file(
-    Parrot_PMC interp_pmc,
-    Parrot_PMC pbc,
-    Parrot_String filename);
-
-PARROT_API
 Parrot_Int Parrot_api_wrap_pointer(
     Parrot_PMC interp_pmc,
     ARGIN_NULLOK(void *ptr),
@@ -264,6 +259,12 @@ Parrot_Int Parrot_api_wrap_pointer(
     ARGOUT(Parrot_PMC *pmc))
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*pmc);
+
+PARROT_API
+Parrot_Int Parrot_api_write_bytecode_to_file(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pbc,
+    Parrot_String filename);
 
 #define ASSERT_ARGS_Parrot_api_add_dynext_search_path \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -320,13 +321,13 @@ Parrot_Int Parrot_api_wrap_pointer(
        PARROT_ASSERT_ARG(corename))
 #define ASSERT_ARGS_Parrot_api_set_warnings __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_toggle_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_api_write_bytecode_to_file \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_unwrap_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ptr) \
     , PARROT_ASSERT_ARG(size))
 #define ASSERT_ARGS_Parrot_api_wrap_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_Parrot_api_write_bytecode_to_file \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/api.c */
 

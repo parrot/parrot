@@ -97,6 +97,10 @@ void imcc_destroy(ARGMOD(imc_info_t * imcc))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(* imcc);
 
+PMC * imcc_get_packfile_pmc(imc_info_t * imcc, PackFile * pf);
+void imcc_mark_packfile_ptr(PARROT_INTERP, PMC * ptr_pmc, void * ptr_raw)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_imcc_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(fullname))
@@ -125,6 +129,9 @@ void imcc_destroy(ARGMOD(imc_info_t * imcc))
     , PARROT_ASSERT_ARG(source))
 #define ASSERT_ARGS_imcc_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_imcc_get_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_imcc_mark_packfile_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/main.c */
 

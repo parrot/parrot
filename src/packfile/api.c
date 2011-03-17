@@ -828,40 +828,32 @@ find_const_iter(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
         break;
     }
 
-
     return 0;
 }
 
-
 /*
 
-=item C<void mark_const_subs(PARROT_INTERP)>
-
-Iterates over all directories and PackFile_Segments, finding and marking any
-constant Subs.
+=item C<void Parrot_pf_mark_packfile(PARROT_INTERP, PackFile * pf)>
 
 =cut
 
 */
 
 void
-mark_const_subs(PARROT_INTERP)
+Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD(PackFile * pf))
 {
-    ASSERT_ARGS(mark_const_subs)
+    ASSERT_ARGS(Parrot_pf_mark_packfile)
 
-    PackFile * const self = interp->initial_pf;
-
-    if (!self)
+    if (!pf)
         return;
     else {
         /* locate top level dir */
-        PackFile_Directory * const dir = &self->directory;
+        PackFile_Directory * const dir = &pf->directory;
 
         /* iterate over all dir/segs */
         PackFile_map_segments(interp, dir, find_const_iter, NULL);
     }
 }
-
 
 /*
 
