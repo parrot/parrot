@@ -400,7 +400,7 @@ PARROT_API
 Parrot_Int Parrot_api_string_import_binary(
     ARGIN(Parrot_PMC interp_pmc),
     ARGIN(const unsigned char *bytes),
-    ARGIN_NULLOK(Parrot_Int length),
+    Parrot_Int length,
     ARGIN(const char *encoding_name),
     ARGOUT(Parrot_String *out))
         __attribute__nonnull__(1)
@@ -496,13 +496,13 @@ Parrot_Int Parrot_api_pmc_deserialize(
 PARROT_API
 Parrot_Int Parrot_api_pmc_deserialize_bytes(
     ARGIN(Parrot_PMC interp_pmc),
-    ARGIN(const unsigned char * const fpmc),
-    ARGIN_NULLOK(Parrot_Int length),
-    ARGOUT(Parrot_PMC * pmc))
+    ARGIN(const unsigned char *fpmc),
+    Parrot_Int length,
+    ARGOUT(Parrot_PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(* pmc);
+        FUNC_MODIFIES(*pmc);
 
 PARROT_API
 Parrot_Int Parrot_api_pmc_find_method(
@@ -556,12 +556,12 @@ PARROT_API
 Parrot_Int Parrot_api_pmc_get_keyed_int(
     ARGIN(Parrot_PMC interp_pmc),
     ARGIN(Parrot_PMC pmc),
-    ARGIN_NULLOK(Parrot_Int key),
-    ARGOUT(Parrot_PMC * value))
+    Parrot_Int key,
+    ARGOUT(Parrot_PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(* value);
+        FUNC_MODIFIES(*value);
 
 PARROT_API
 Parrot_Int Parrot_api_pmc_get_keyed_string(
@@ -637,7 +637,7 @@ PARROT_API
 Parrot_Int Parrot_api_pmc_set_float(
     ARGIN(Parrot_PMC interp_pmc),
     ARGIN(Parrot_PMC pmc),
-    ARGIN_NULLOK(Parrot_Float value))
+    Parrot_Float value)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -645,7 +645,7 @@ PARROT_API
 Parrot_Int Parrot_api_pmc_set_integer(
     ARGIN(Parrot_PMC interp_pmc),
     ARGIN(Parrot_PMC pmc),
-    ARGIN_NULLOK(Parrot_Int value))
+    Parrot_Int value)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -660,7 +660,7 @@ PARROT_API
 Parrot_Int Parrot_api_pmc_set_keyed_int(
     ARGIN(Parrot_PMC interp_pmc),
     ARGIN(Parrot_PMC pmc),
-    ARGIN_NULLOK(Parrot_Int key),
+    Parrot_Int key,
     ARGIN(Parrot_PMC value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -690,7 +690,7 @@ PARROT_API
 Parrot_Int Parrot_api_pmc_wrap_string_array(
     ARGIN(Parrot_PMC interp_pmc),
     Parrot_Int argc,
-    ARGIN_NULLOK(const char ** argv),
+    ARGIN(const char ** argv),
     ARGOUT(Parrot_PMC * args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(4)
