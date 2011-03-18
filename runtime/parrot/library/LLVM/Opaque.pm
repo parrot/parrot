@@ -13,6 +13,15 @@ class LLVM::Opaque {
     method defined() is pirflags<:vtable('get_bool')> {
         pir::defined($!ptr);
     }
+
+    multi method ACCEPTS($lhs) {
+        0;
+    }
+
+    # Check that two objects wrap same LLVM ref.
+    multi method ACCEPTS(LLVM::Opaque $lhs) {
+        pir::get_addr__ip(self.unwrap) == pir::get_addr__ip($lhs.unwrap);
+    }
 };
 
 # vim: ft=perl6
