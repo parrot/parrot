@@ -10,6 +10,9 @@ ok( $b, "LLVM::Builder created");
 $b.DESTROY();
 ok( !$b, "LLVM::Builder destroyed");
 
+# Create builder again.
+$b := LLVM::Builder.create();
+
 # We need Module and Function to test Builder.
 my $m  := LLVM::Module.create("Test");
 my $f  := $m.add_function("hello", LLVM::Type::int32());
@@ -20,7 +23,7 @@ ok(1, "Builder positioned");
 
 my $res;
 $res := $b.ret();
-ok($res ~~ LLVM::Value, "void return created")
+ok($res ~~ LLVM::Value, "void return created");
 
 
 done_testing();
