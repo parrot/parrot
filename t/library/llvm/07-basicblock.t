@@ -10,7 +10,11 @@ my $bb := $f.append_basic_block();
 
 ok( $bb ~~ LLVM::BasicBlock, "BasicBlock created");
 
-# TODO Add tests for navigation.
+# Add next block to Function and check that first.next is second
+my $bb2 := $f.append_basic_block();
+ok( $bb.next() ~~ $bb2, "first.next == second");
+
+
 
 
 done_testing();
