@@ -1,6 +1,5 @@
-/* nci/signatures.c
+/*
 Copyright (C) 2010-2011, Parrot Foundation.
-
 
 =head1 NAME
 
@@ -46,7 +45,7 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
 
     size_t i;
 
-    PMC *sig_pmc = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
+    PMC * const sig_pmc = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
 
     for (i = 0; i < sig_length; ++i) {
         const INTVAL c = Parrot_str_indexed(interp, sig_str, i);
@@ -152,11 +151,11 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
 {
     ASSERT_ARGS(Parrot_nci_sig_to_pcc)
 
-    size_t sig_len = VTABLE_elements(interp, sig_pmc);
+    const size_t sig_len = VTABLE_elements(interp, sig_pmc);
 
     /* PCC sigs are 1 char long except for array slurpy, named slurpy (not possible with NCI),
        and invocant */
-    size_t buf_len = sig_len + 2 + 1;
+    const size_t buf_len = sig_len + 2 + 1;
 
     /* avoid malloc churn on common signatures */
     char         static_buf[16];

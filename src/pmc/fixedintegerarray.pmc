@@ -315,7 +315,7 @@ unecessary string temporaries.
         INTVAL size;
         GET_ATTR_int_array(INTERP, SELF, int_array);
         GET_ATTR_size(INTERP, SELF, size);
-        return Parrot_hsh_hash_buffer((const unsigned char *)int_array,
+        return Parrot_hash_buffer((const unsigned char *)int_array,
                                         size * sizeof (INTVAL), INTERP->hash_seed);
     }
 

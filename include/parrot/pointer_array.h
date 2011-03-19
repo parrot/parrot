@@ -63,9 +63,8 @@ do {                                                                \
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void Parrot_pa_destroy(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+void Parrot_pa_destroy(PARROT_INTERP, ARGFREE(Parrot_Pointer_Array *self))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
@@ -86,6 +85,7 @@ int Parrot_pa_is_owned(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Parrot_Pointer_Array * Parrot_pa_new(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -101,19 +101,18 @@ void Parrot_pa_remove(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 size_t Parrot_pa_count_allocated(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array *self))
+    ARGIN(const Parrot_Pointer_Array *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 size_t Parrot_pa_count_used(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array *self))
+    ARGIN(const Parrot_Pointer_Array *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_Parrot_pa_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pa_insert __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \

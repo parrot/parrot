@@ -89,9 +89,7 @@ sub is_mmd {
 
 sub is_multi {
     my ($self) = @_;
-
-    return 1 if $self->{MULTI};
-    return 0;
+    return $self->type eq MULTI;
 }
 
 sub pmc_unused {

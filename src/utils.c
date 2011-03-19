@@ -760,9 +760,9 @@ process_cycle_without_exit(int node_index, ARGIN(const parrot_prm_context *c))
 
 /*
 
-=item C<void Parrot_util_register_move(PARROT_INTERP, int n_regs, unsigned char
-*dest_regs, unsigned char *src_regs, unsigned char temp_reg, reg_move_func mov,
-reg_move_func mov_alt, void *info)>
+=item C<void Parrot_util_register_move(PARROT_INTERP, size_t n_regs, unsigned
+char *dest_regs, unsigned char *src_regs, unsigned char temp_reg, reg_move_func
+mov, reg_move_func mov_alt, void *info)>
 
 Move C<n_regs> from the given register list C<src_regs> to C<dest_regs>.
 
@@ -816,7 +816,7 @@ TODO: Add tests for the above conditions.
 PARROT_EXPORT
 void
 Parrot_util_register_move(PARROT_INTERP,
-        int n_regs,
+        size_t n_regs,
         ARGOUT(unsigned char *dest_regs),
         ARGIN(unsigned char *src_regs),
         unsigned char temp_reg,

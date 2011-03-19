@@ -1,5 +1,5 @@
-/* nci.c
-Copyright (C) 2001-2009, Parrot Foundation.
+/*
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -45,7 +45,6 @@ build_call_func(PARROT_INTERP, ARGIN(PMC *sig))
     PMC    * const iglobals = interp->iglobals;
     PMC    *nci_funcs;
     PMC    *thunk;
-    INTVAL  hv;
 
     if (PMC_IS_NULL(iglobals))
         PANIC(interp, "iglobals isn't created yet");
@@ -58,12 +57,13 @@ build_call_func(PARROT_INTERP, ARGIN(PMC *sig))
 
     if (PMC_IS_NULL(thunk)) {
         /* try to dynamically build a thunk */
-        PMC *nci_fb_cb = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FB_CB);
+        PMC * const nci_fb_cb = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FB_CB);
         if (!PMC_IS_NULL(nci_fb_cb)) {
-            void *cb_ptr = VTABLE_get_pointer(interp, nci_fb_cb);
-            nci_fb_func_t cb = (nci_fb_func_t)D2FPTR(cb_ptr);
+            void * const cb_ptr = VTABLE_get_pointer(interp, nci_fb_cb);
+            const nci_fb_func_t cb = (nci_fb_func_t)D2FPTR(cb_ptr);
             if (cb_ptr) {
-                PMC *nci_fb_ud = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FB_UD);
+                PMC * const nci_fb_ud =
+                    VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FB_UD);
                 thunk = cb(interp, nci_fb_ud, sig);
             }
         }

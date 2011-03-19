@@ -263,10 +263,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->initial_pf          = PackFile_new(interp, 0);
     interp->code                = NULL;
 
-    /* And a dynamic environment stack */
-    /* TODO: We should really consider removing this (TT #876) */
-    interp->dynamic_env = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
-
     /* create exceptions list */
     interp->current_runloop_id    = 0;
     interp->current_runloop_level = 0;

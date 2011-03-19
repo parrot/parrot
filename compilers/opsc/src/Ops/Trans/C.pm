@@ -212,11 +212,9 @@ static op_info_t {self.op_info($emitter)}[{self<num_entries>}] = | ~ q|{
             !! '{ 0 }';
 
         $fh.print('  { ' ~ qq|/* $index */
-    /* type $type, */
     "$name",
     "$full_name",
     "$func_name",
-    /* "",  body */
     $jump,
     $arg_count,
     $arg_types,

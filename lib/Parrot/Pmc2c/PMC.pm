@@ -762,6 +762,56 @@ sub post_method_gen {
         $method->body(Parrot::Pmc2c::Emitter->text($body) );
     }
 
+    # generate PCC-variants for multis
+    foreach ( @{ $self->find_multi_functions } ) {
+        my ($name, $fsig, $ns, $func, $method) = @$_;
+        (my $new_name = $method->full_method_name($self->name) . '_pcc') =~ s/.*?_multi_/multi_/;
+        my $new_method = $method->clone({
+                            name        => $new_name,
+                            type        => "MULTI_PCC",
+                            parameters  => '',
+                            return_type => 'void'
+        });
+
+        # Get parameters. Strip type from param
+        my @parameters = map { /\s*\*?(\S+)$/; $1 } (split /,/, $method->parameters);
+
+        my $need_result = $method->return_type && $method->return_type !~ 'void';
+
+        (my $pcc_sig) = $method->pcc_signature;
+        my ($pcc_args, $pcc_ret) = $pcc_sig =~ /(.*)->(.*)/;
+
+        # Get paramete storage. Types are already provided, but we need semi-colon delimitation.
+        (my $body = $method->parameters) =~ s/,/;/g;
+        $body .= ";\n";
+        $body .= $method->return_type . " _result;\n" if $need_result;
+        $body .= "PMC *_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));\n";
+
+        # pcc params
+        $body .= "Parrot_pcc_fill_params_from_c_args(interp, _call_obj, \"Pi$pcc_args\", &_self" .
+                    (join '', map { ", &$_" } @parameters) . ");\n";
+
+        # C call
+        $body .= "_result = " if $need_result;
+        my $parameters = join ', ', 'INTERP', 'SELF', @parameters;
+        $body .= $method->full_method_name($self->name) . "($parameters);\n";
+
+        # pcc return
+        $body .= <<EOC if $need_result;
+{
+    /*
+     * Use the result of Parrot_pcc_build_call_from_c_args because it is marked
+     * PARROT_WARN_UNUSED_RESULT. Then explicitly don't use the result.
+     * This apparently makes sense.
+     */
+    PMC *unused = Parrot_pcc_build_call_from_c_args(interp, _call_obj, "$pcc_ret", _result);
+    UNUSED(unused);
+}
+EOC
+
+        $new_method->body(Parrot::Pmc2c::Emitter->text($body));
+        $self->add_method($new_method);
+    }
 }
 =item C<gen_methods()>
 
@@ -830,10 +880,9 @@ sub find_multi_functions {
 
     foreach my $method ( @{ $self->methods } ) {
         next unless $method->is_multi;
-        my $short_sig    = $method->{MULTI_short_sig};
         my $full_sig     = $pmcname . "," . $method->{MULTI_full_sig};
         my $functionname = 'Parrot_' . $pmcname . '_' . $method->name;
-        push @multi_names, [ $method->symbol, $short_sig, $full_sig,
+        push @multi_names, [ $method->symbol, $full_sig,
                              $pmcname, $functionname, $method ];
     }
     return ( \@multi_names );
@@ -967,12 +1016,11 @@ sub init_func {
 
     my $i = 0;
     for my $multi (@$multi_funcs) {
-        my ($name, $ssig, $fsig, $ns, $func) = @$multi;
-        my ($name_str, $ssig_str, $fsig_str, $ns_name)     =
-            map { gen_multi_name($_, $cache) } ($name, $ssig, $fsig, $ns);
+        my ($name, $fsig, $ns, $func) = @$multi;
+        my ($name_str, $fsig_str, $ns_name)     =
+            map { gen_multi_name($_, $cache) } ($name, $fsig, $ns);
 
         for my $s ([$name, $name_str],
-                   [$ssig, $ssig_str],
                    [$fsig, $fsig_str],
                    [$ns,   $ns_name ]) {
             my ($raw_string, $name) = @$s;
@@ -982,11 +1030,9 @@ sub init_func {
         }
 
         push @multi_list, <<END_MULTI_LIST;
-            _temp_multi_func_list[$i].multi_name = $name_str;
-            _temp_multi_func_list[$i].short_sig = $ssig_str;
-            _temp_multi_func_list[$i].full_sig = $fsig_str;
-            _temp_multi_func_list[$i].ns_name = $ns_name;
-            _temp_multi_func_list[$i].func_ptr = (funcptr_t) $func;
+_temp_func = Parrot_pmc_new(interp, enum_class_NativePCCMethod);
+VTABLE_set_pointer_keyed_str(interp, _temp_func, CONST_STRING(interp, "->"), (void *)${func}_pcc);
+Parrot_mmd_add_multi_from_long_sig(interp, $name_str, $fsig_str, _temp_func);
 END_MULTI_LIST
         $i++;
 
@@ -1181,11 +1227,8 @@ EOC
     if ( @$multi_funcs ) {
         # Don't const the list, breaks some older C compilers
         $cout .= $multi_strings . <<"EOC";
-
-            multi_func_list _temp_multi_func_list[$multi_list_size];
+        PMC *_temp_func;
 $multi_list
-            Parrot_mmd_add_multi_list_from_c_args(interp,
-                _temp_multi_func_list, $multi_list_size);
 EOC
     }
 
@@ -1490,12 +1533,12 @@ sub gen_switch_vtable {
     # No cookies for DynPMC. At least not now.
     return 1 if $self->is_dynamic;
 
-    # Convert list of multis to name->[(type,,ssig,fsig,ns,func)] hash.
+    # Convert list of multis to name->[(type,fsig,ns,func,method)] hash.
     my %multi_methods;
     foreach (@{$self->find_multi_functions}) {
-        my ($name, $ssig, $fsig, $ns, $func, $method) = @$_;
+        my ($name, $fsig, $ns, $func, $method) = @$_;
         my @sig = split /,/, $fsig;
-        push @{ $multi_methods{ $name } }, [ $sig[1], $ssig, $fsig, $ns, $func, $method ];
+        push @{ $multi_methods{ $name } }, [ $sig[1], $fsig, $ns, $func, $method ];
     }
 
     # vtables
@@ -1538,7 +1581,7 @@ BODY
 sub generate_single_case {
     my ($self, $vt_method_name, $multi, @parameters) = @_;
 
-    my ($type, $ssig, $fsig, $ns, $func, $impl) = @$multi;
+    my ($type, $fsig, $ns, $func, $impl) = @$multi;
     my $case;
 
     # Gather parameters names
@@ -1551,7 +1594,7 @@ sub generate_single_case {
     if ($type eq 'DEFAULT' || $type eq 'PMC') {
         # For default case we have to handle return manually.
         my ($pcc_signature, $retval, $call_tail, $pcc_return)
-                = $self->gen_defaul_case_wrapping($ssig, @parameters);
+                = gen_defaul_case_wrapping($impl);
         my $dispatch = "Parrot_mmd_multi_dispatch_from_c_args(INTERP, \"$vt_method_name\", \"$pcc_signature\", SELF, $parameters$call_tail);";
 
         $case = <<"CASE";
@@ -1592,26 +1635,26 @@ CASE
 # Generate (pcc_signature, retval holder, pcc_call_tail, return statement)
 # for default case in switch.
 sub gen_defaul_case_wrapping {
-    my ($self, $ssig, @parameters) = @_;
+    my $method = shift;
 
-    my $letter = substr($ssig, 0, 1);
-    if ($letter eq 'I') {
+    local $_ = $method->return_type;
+    if (/INTVAL/) {
         return (
-            "PP->" . $letter,
+            "PP->I",
             "INTVAL retval;",
             ', &retval',
             'return retval;',
         );
     }
-    elsif ($letter eq 'S') {
+    elsif (/STRING/) {
         return (
-            "PP->" . $letter,
+            "PP->S",
             "STRING *retval;",
             ', &retval',
             'return retval;',
         );
     }
-    elsif ($letter eq 'P') {
+    elsif (/PMC/) {
         return (
             'PPP->P',
             'PMC *retval = PMCNULL;',
@@ -1619,7 +1662,7 @@ sub gen_defaul_case_wrapping {
             "return retval;",
         );
     }
-    elsif ($letter eq 'v') {
+    elsif (/void\s*$/) {
         return (
             'PP->',
             '',
@@ -1628,7 +1671,7 @@ sub gen_defaul_case_wrapping {
         );
     }
     else {
-        die "Can't handle signature $ssig!";
+        die "Can't handle return type `$_'!";
     }
 }
 

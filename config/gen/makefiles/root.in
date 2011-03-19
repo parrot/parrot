@@ -808,7 +808,6 @@ help :
 	@echo "  bsdlint:           Code checking with bsdlint."
 	@echo "  sunlint:           Code checking with Sun Studio's sunlint."
 	@echo "  splint:            Code checking with splint."
-	@echo "  splint-all:        Splint all of Parrot, for the masochist only."
 	@echo "  headerizer:        Recreate header files for C-source files"
 	@echo "  apilist:           Show list of PARROT_API functions"
 	@echo "  exportlist:        Show list of PARROT_EXPORT functions"
@@ -2501,8 +2500,8 @@ bsdlint : $(PARROT)
 	$(LINT) $(CC_INC) "-Iinclude/pmc" $(BSD_LINT_FLAGS) $(BSD_LINT_EXCLUSIONS) $(LINTABLE_CFILES)
 
 # For checking with splint see also
-# http:////trac.parrot.org/parrot/wiki/splint
-# Splint: http:////splint.org
+# http://trac.parrot.org/parrot/wiki/splint
+# Splint: http://splint.org
 SPLINT = splint
 
 # Temp directory for splint.  Add +keep to splintflags if you want work files
@@ -2515,14 +2514,16 @@ SPLINT_TMP = $(TEMPDIR)/splint
 # looking for "declundef", except that it's "decl-undef" in the docs.
 SPLINTFLAGS_BASE = \
     +standard \
-    -hints \
+    +hints \
     \
     +indentspaces 4 \
     +locindentspaces 4 \
-    +linelen 120 \
+    +linelen 999 \
+    +bugslimit 1000 \
     -message-stream-stdout \
     +showdeephistory \
-    -showfunc \
+    +show-func \
+    +show-column \
     -tmpdir $(SPLINT_TMP) \
     \
     +posix-lib \
@@ -2545,12 +2546,14 @@ SPLINTFLAGS_BASE = \
 # Memory safety checks
 # Transfer errors (-mem-trans) are too tough for us right now
 SPLINTFLAGS_MEMORY_SAFETY = \
+    -mem-trans \
+    -memchecks \
     +bufferoverflow \
     +bufferoverflowhigh \
     +read-only-strings \
     +read-only-trans \
-    +strict-destroy \
-    +strict-use-released \
+    -strict-destroy \
+    -strict-use-released \
     +use-released \
     -must-free \
     -mustfreefresh \
@@ -2561,7 +2564,6 @@ SPLINTFLAGS_MEMORY_SAFETY = \
     -ptr-arith \
     +ptr-negate \
     -zero-ptr \
-    -mem-trans
 
 # Macro safety checks
 SPLINTFLAGS_MACRO_SAFETY = \
@@ -2585,6 +2587,7 @@ SPLINTFLAGS_BOOLEAN_SLOP = \
     -pred-bool-ptr \
     -pred-bool-others \
     -boolops \
+    +bool-int \
 
 # const and other qualifiers
 # Report qualifier mismatches only if dangerous (+relax-quals)
@@ -2643,13 +2646,8 @@ SPLINTFLAGS = \
 	$(SPLINTFLAGS_EVALUATION) \
 	$(SPLINTFLAGS_TYPES) \
 
-SPLINT_SOURCE = `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
-
-splint-all : $(PARROT)
-	$(MKPATH) $(SPLINT_TMP)
-	$(SPLINT) $(CC_INC) "-Iinclude/pmc" "-Icompilers/ast" $(SPLINTFLAGS) \
-	$(SPLINT_SOURCE) \
-	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) compilers/imcc/main.c
+#SPLINT_SOURCE = `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@ | sort`
+SPLINT_SOURCE = $$(find src/*.c src/{io,packfile,string}/*.c -type f | grep -v extra_nci_thunks.c | grep -v extend_vtable.c | sort)
 
 # "splint" is the less-thorough splint target.  For cage cleaning work,
 # you'll probably want to specify SPLINT_SOURCE rather than work on the

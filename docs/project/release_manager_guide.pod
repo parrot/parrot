@@ -346,9 +346,9 @@ the resources/ and html/ directories created in docs/.
 ssh into the parrotvm, and in the
 webroot for docs.parrot.org, expand these into a release directory (e.g.
 1.4.0). in <webroot>/parrot, there are symbolic links for latest, supported,
-and devel. Update the devel symlink to point to your new directory.
-If this is a supported release, also update the supported symlink. Do not delete
-any old copies of the docs, don't update the other symlinks.
+and devel. Update the C<latest> symlink to point to your new directory.
+If this is a supported release, also update the C<supported> symlink.
+Do not delete any old copies of the docs, don't update the other symlinks.
 
 =back
 
@@ -448,7 +448,6 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
 Versions with a asterisk (*) are supported releases.
 
- - Mar 15, 2011 - 3.2   - gerd
  - Apr 19, 2011 - 3.3*  - whiteknight
  - May 17, 2011 - 3.4   - gerd
  - Jun 21, 2011 - 3.5   - cotto

@@ -381,6 +381,7 @@ Returns the class or role PMC that is associated with this namespace.
 */
 
     PMC *get_class() {
+        UNUSED(INTERP);
         return PARROT_NAMESPACE(SELF)->_class;
     }
 
@@ -691,6 +692,7 @@ Return the name of this namespace part.
 
     VTABLE STRING *get_string() {
         const Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
+        UNUSED(INTERP);
         return nsinfo->name;
     }
 

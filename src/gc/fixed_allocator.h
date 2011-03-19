@@ -67,7 +67,7 @@ void * Parrot_gc_fixed_allocator_allocate(PARROT_INTERP,
 
 PARROT_EXPORT
 size_t Parrot_gc_fixed_allocator_allocated_memory(PARROT_INTERP,
-    ARGIN(Fixed_Allocator *allocator))
+    ARGIN(const Fixed_Allocator *allocator))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -80,11 +80,12 @@ void Parrot_gc_fixed_allocator_destroy(PARROT_INTERP,
 PARROT_EXPORT
 void Parrot_gc_fixed_allocator_free(PARROT_INTERP,
     ARGIN(Fixed_Allocator *allocator),
-    ARGFREE_NOTNULL(void *data),
+    ARGMOD(void *data),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*data);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
@@ -98,8 +99,9 @@ void * Parrot_gc_pool_allocate(PARROT_INTERP, ARGMOD(Pool_Allocator * pool))
         FUNC_MODIFIES(* pool);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 size_t Parrot_gc_pool_allocated_size(SHIM_INTERP,
-    ARGIN(Pool_Allocator *pool))
+    ARGIN(const Pool_Allocator *pool))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -116,6 +118,8 @@ void Parrot_gc_pool_free(PARROT_INTERP,
         FUNC_MODIFIES(*pool);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 int Parrot_gc_pool_is_maybe_owned(SHIM_INTERP,
     ARGMOD(Pool_Allocator *pool),
     ARGMOD(void *ptr))
@@ -125,6 +129,7 @@ int Parrot_gc_pool_is_maybe_owned(SHIM_INTERP,
         FUNC_MODIFIES(*ptr);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 int Parrot_gc_pool_is_owned(SHIM_INTERP,
     ARGMOD(Pool_Allocator *pool),
     ARGMOD(void *ptr))

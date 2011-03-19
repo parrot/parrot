@@ -84,26 +84,9 @@ method op ($/, $key?) {
         # Handle op body
         $OP.push($<op_body>.ast);
 
-        if $OP.need_write_barrier {
-            $OP[0].push(
-                PAST::Op.new(
-                    :pasttype<call>,
-                    :name<PARROT_GC_WRITE_BARRIER>,
-                    PAST::Var.new(
-                        :name<interp>
-                    ),
-                    PAST::Op.new(
-                        :pasttype<call>,
-                        :name<CURRENT_CONTEXT>,
-                        PAST::Var.new(
-                            :name<interp>
-                        )
-                    )
-                )
-            );
-        }
-
         if !$OP<flags><flow> {
+            $OP[0].push(self.make_write_barrier) if $OP.need_write_barrier;
+
             my $goto_next := PAST::Op.new(
                 :pasttype('macro'),
                 :name('goto_offset'),
@@ -264,13 +247,22 @@ method op_macro:sym<expr offset>($/) {
 }
 
 method op_macro:sym<goto offset>($/) {
-    make PAST::Op.new(
+    $OP.add_jump('PARROT_JUMP_RELATIVE');
+
+    my $past := PAST::Op.new(
         :pasttype<macro>,
         :name<goto_offset>,
         $<arg>.ast,
     );
 
-    $OP.add_jump('PARROT_JUMP_RELATIVE');
+    if $OP.need_write_barrier {
+        $past := PAST::Block.new(
+            self.make_write_barrier,
+            $past,
+        );
+    }
+
+    make $past;
 }
 
 method op_macro:sym<expr address>($/) {
@@ -282,31 +274,45 @@ method op_macro:sym<expr address>($/) {
 }
 
 method op_macro:sym<goto address>($/) {
-    make PAST::Op.new(
+    my $past := PAST::Op.new(
         :pasttype<macro>,
         :name<goto_address>,
         $<arg>.ast,
     );
-}
 
-method op_macro:sym<expr next>($/) {
-    my $past := PAST::Op.new(
-        :pasttype<macro>,
-        :name<expr_offset>,
-        self.opsize,
-    );
+    if $OP.need_write_barrier {
+        $past := PAST::Block.new(
+            self.make_write_barrier,
+            $past,
+        );
+    }
 
     make $past;
 }
 
+method op_macro:sym<expr next>($/) {
+    make PAST::Op.new(
+        :pasttype<macro>,
+        :name<expr_offset>,
+        self.opsize,
+    );
+}
+
 method op_macro:sym<goto next>($/) {
+    $OP.add_jump('PARROT_JUMP_RELATIVE');
+
     my $past := PAST::Op.new(
         :pasttype<macro>,
         :name<goto_offset>,
         self.opsize,
     );
 
-    $OP.add_jump('PARROT_JUMP_RELATIVE');
+    if $OP.need_write_barrier {
+        $past := PAST::Block.new(
+            self.make_write_barrier,
+            $past,
+        );
+    }
 
     make $past;
 }
@@ -329,6 +335,8 @@ method op_macro:sym<restart next> ($/) {
             )
         ),
     );
+
+    $past.unshift(self.make_write_barrier) if $OP.need_write_barrier;
 
     make $past;
 }
@@ -633,6 +641,23 @@ method opsize () {
     make PAST::Val.new(
         :value($OP.size),
         :returns('int'),
+    );
+}
+
+method make_write_barrier () {
+    make PAST::Op.new(
+        :pasttype<call>,
+        :name<PARROT_GC_WRITE_BARRIER>,
+        PAST::Var.new(
+            :name<interp>
+        ),
+        PAST::Op.new(
+            :pasttype<call>,
+            :name<CURRENT_CONTEXT>,
+            PAST::Var.new(
+                :name<interp>
+            )
+        )
     );
 }
 
