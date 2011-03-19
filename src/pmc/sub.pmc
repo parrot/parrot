@@ -448,7 +448,7 @@ Invokes the subroutine.
         PARROT_CONTINUATION(ccont)->from_ctx = context;
 
         /* if this is an outer sub, then we need to set sub->ctx
-         * to the new context (refcounted) */
+         * to the new context */
         if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER) {
             PARROT_GC_WRITE_BARRIER(interp, SELF);
             sub->ctx = context;
