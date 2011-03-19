@@ -94,6 +94,7 @@ typedef enum {
     CURRENT_RUNCORE,
 
     /* interpinfo_p constants */
+    CURRENT_CTX,
     CURRENT_SUB,
     CURRENT_CONT,
     CURRENT_OBJECT,
