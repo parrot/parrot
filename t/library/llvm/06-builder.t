@@ -21,6 +21,8 @@ my $bb := $f.append_basic_block();
 $b.set_position($bb);
 ok(1, "Builder positioned");
 
+ok( $b.get_insert_block() ~~ $bb, ".. to proper BasicBlock");
+
 my $res;
 $res := $b.ret();
 ok($res ~~ LLVM::Value, "void return created");

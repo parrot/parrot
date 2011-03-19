@@ -29,6 +29,12 @@ class LLVM::Builder is LLVM::Opaque {
     }
 
 #            LLVMGetInsertBlock              => "pp",
+    method get_insert_block() {
+        LLVM::BasicBlock.create(
+            LLVM::call("GetInsertBlock", self)
+        );
+    }
+
 #            LLVMClearInsertionPosition      => "vp",
 #            LLVMInsertIntoBuilder           => "vpp",
 #            LLVMInsertIntoBuilderWithName   => "vppt",
