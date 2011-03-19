@@ -4241,17 +4241,19 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
             "\"load_bytecode\" no file name");
 
-    /* Block GC, see TT #1990 */
-    Parrot_block_GC_mark(interp);
-
     parrot_split_path_ext(interp, file_str, &wo_ext, &ext);
 
     /* check if wo_ext is loaded */
     is_loaded_hash = VTABLE_get_pmc_keyed_int(interp,
         interp->iglobals, IGLOBALS_PBC_LIBS);
 
+    /* Block GC, see TT #1990 */
+    Parrot_block_GC_mark(interp);
+
     if (VTABLE_exists_keyed_str(interp, is_loaded_hash, wo_ext))
         return;
+
+    Parrot_unblock_GC_mark(interp);
 
     pbc = CONST_STRING(interp, "pbc");
 
@@ -4262,7 +4264,6 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
 
     path = Parrot_locate_runtime_file_str(interp, file_str, file_type);
     if (!path) {
-        Parrot_unblock_GC_mark(interp);
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
             "\"load_bytecode\" couldn't find file '%Ss'", file_str);
     }
@@ -4286,8 +4287,6 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
     }
 
     Parrot_pop_context(interp);
-
-    Parrot_unblock_GC_mark(interp);
 }
 
 
