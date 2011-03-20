@@ -1,0 +1,45 @@
+=head1 NAME
+
+jitted.ops - Small subset of ops for JIT testing purpose.
+
+Just because all ops parsing will take _a huge_ amount of time...
+
+=cut
+
+op noop() {
+}
+
+op end() :flow {
+    goto ADDRESS(0);
+}
+
+op set(out STR, in STR) {
+    $1 = $2;
+}
+
+op set(out INT, in INT) {
+    $1 = $2;
+}
+
+op say(in INT) :base_io {
+    Parrot_io_printf(interp, "%ld", (INTVAL)$1);
+    Parrot_io_printf(interp, "\n");
+}
+
+op say(in STR) :base_io {
+    STRING * const s = $1;
+    if (s && s->bufused)
+        Parrot_io_printf(interp, "%Ss", s);
+    Parrot_io_printf(interp, "\n");
+}
+
+op add(inout INT, in INT) :base_core {
+    $1 += $2;
+}
+
+
+op branch(in LABEL) :base_loop :flow {
+    goto OFFSET($1);
+}
+
+
