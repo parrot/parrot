@@ -10,6 +10,11 @@ $c := LLVM::Constant::null(LLVM::Type::cstring());
 ok( $c, "Constant NULL created");
 ok( $c ~~ LLVM::Value, ".. with proper class");
 
+my $i;
+
+$i := LLVM::Constant::integer(42);
+ok( $i, "Constant Integer created");
+ok( $i ~~ LLVM::Value, ".. with proper class");
 
 done_testing();
 
