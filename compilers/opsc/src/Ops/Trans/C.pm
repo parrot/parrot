@@ -196,19 +196,13 @@ static op_info_t {self.op_info($emitter)}[{self<num_entries>}] = | ~ q|{
 
         ## 0 inserted if arrays are empty to prevent msvc compiler errors
         my $arg_types := +$op.arg_types
-            ?? '{ ' ~ join( ", ",
-                |map( -> $t { sprintf( "PARROT_ARG_%s", uc($t) ) }, |$op.arg_types)
-            ) ~ ' }'
+            ?? '{ ' ~ $op.arg_types.map(->$t { sprintf("PARROT_ARG_%s", uc($t)) }).join(", ") ~ ' }'
             !! '{ (arg_type_t) 0 }';
-        my $arg_dirs := $op<normalized_args>
-            ?? '{ ' ~ join(", ",
-                |map( -> $d { %arg_dir_mapping{$d<direction>} }, |$op<normalized_args>)
-            ) ~ ' }'
+        my $arg_dirs  := $op.normalized_args
+            ?? '{ ' ~ $op.normalized_args.map(->$d { %arg_dir_mapping{$d<direction>} }).join(", ") ~ ' }'
             !! '{ (arg_dir_t) 0 }';
-        my $labels := $op<normalized_args>
-            ?? '{ ' ~ join(", ",
-                |map( -> $d { $d<is_label> ?? 1 !! 0 }, |$op<normalized_args>)
-            ) ~ ' }'
+        my $labels    := $op.normalized_args
+            ?? '{ ' ~ $op.normalized_args.map(->$d { $d<is_label> ?? 1 !! 0 }).join(", ") ~ ' }'
             !! '{ 0 }';
 
         $fh.print('  { ' ~ qq|/* $index */
