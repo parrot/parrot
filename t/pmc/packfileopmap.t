@@ -117,10 +117,12 @@ Tests the PackfileOpMap PMC.
 
     $I0 = opmap['cmod_i_i_i']
     is($I0, 1, "Can map cmod_i_i_i from math_ops")
+    .return ()
 
   no_math_ops:
     pop_eh
-
+    skip(2, 'No math_ops library')
+    .return ()
 .end
 
 
