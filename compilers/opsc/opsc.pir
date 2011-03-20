@@ -11,6 +11,7 @@
 .include 'compilers/opsc/gen/Ops/Emitter.pir'
 .include 'compilers/opsc/gen/Ops/Trans.pir'
 .include 'compilers/opsc/gen/Ops/Trans/C.pir'
+.include 'compilers/opsc/gen/Ops/Trans/JIT.pir'
 
 .include 'compilers/opsc/gen/Ops/Op.pir'
 .include 'compilers/opsc/gen/Ops/OpLib.pir'

@@ -28,6 +28,9 @@ $(OPSC_DIR)/gen/Ops/Trans.pir: $(OPSC_DIR)/src/Ops/Trans.pm $(NQP_RX)
 $(OPSC_DIR)/gen/Ops/Trans/C.pir: $(OPSC_DIR)/src/Ops/Trans/C.pm $(NQP_RX)
 	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Trans/C.pm
 
+$(OPSC_DIR)/gen/Ops/Trans/JIT.pir: $(OPSC_DIR)/src/Ops/Trans/JIT.pm $(NQP_RX)
+	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Trans/JIT.pm
+
 $(OPSC_DIR)/gen/Ops/Renumberer.pir: $(OPSC_DIR)/src/Ops/Renumberer.pm $(NQP_RX)
 	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Renumberer.pm
 
