@@ -212,11 +212,15 @@ proposal: M0's binary representation will be composed of a fixed header, a
 single directory segment and a bunch of segment triplets describing a chunk
 of bytecode:
 
+=over 4
+
 =item * a bytecode segment containing the ops
 
 =item * a variables table segment containing the objects that the segment needs
 
 =item * a metadata segment that carries any extra data like HLL line numbers, function names, annotations and custom data.
+
+=back
 
 We should design the binary format of M0 in a way that allows it to be mmapped
 by an interpreter.
@@ -334,16 +338,16 @@ The types that ops attribute to register values will be based on the position
 of the register in an M0 context's register set.  For example if an M0 context
 has 25 registers (which it won't), their types might be as follows:
 
-number  type
-0       current context
-1       PC
-2       EH
-3       EX
-4       calling context
-5-9     I
-10-14   N
-15-19   S
-20-24   P
+    number  type
+    0       current context
+    1       PC
+    2       EH
+    3       EX
+    4       calling context
+    5-9     I
+    10-14   N
+    15-19   S
+    20-24   P
 
 This means that an op which is passed the wrong value could pretty easily cause
 chaos by clobbering the PC or changing the pointer to the current context.
@@ -387,6 +391,8 @@ and calls it.  M0 will have three ops to support this: set_arg and set_return
 to indicate which M0 registers are to be used in the call, and ccall to call
 the C function through the generated.
 
+=over 4
+
 =item * func_handle = new_fnh arg_count
 
 This allocates a new function handle which can deal with the specified number
@@ -417,41 +423,43 @@ destination of the return value from the function invocation.
 ccall uses an existing function handle to call into a C function.
 
 example code for calling no arg, no ret function:
-.local int lib, fnh
-lib = dlopen 'libhello.so'
-fnh = new_fhn 0
-dlfunc fnh, lib, "hello_func"
-ccall fnh
-free_fnh fnh
+    .local int lib, fnh
+    lib = dlopen 'libhello.so'
+    fnh = new_fhn 0
+    dlfunc fnh, lib, "hello_func"
+    ccall fnh
+    free_fnh fnh
 
 example code for calling 2 int32 arg, 1 int32 return
-.local int ret, arg0, arg1
-.local int lib, fnh
-arg0 = 12
-arg1 = 10
-lib = dlopen "libmath.so"
-fnh = new_fnh 3
-dlfunc fnh, lib, "multiply_int32"
-set_ret fnh, FFI_UINT32, ret
-set_arg fnh, FFI_UINT32, arg0
-set_arg fnh, FFI_UINT32, arg1
-ccall fnh
-say ret  # will print "120"
-free_fnh fnh
+    .local int ret, arg0, arg1
+    .local int lib, fnh
+    arg0 = 12
+    arg1 = 10
+    lib = dlopen "libmath.so"
+    fnh = new_fnh 3
+    dlfunc fnh, lib, "multiply_int32"
+    set_ret fnh, FFI_UINT32, ret
+    set_arg fnh, FFI_UINT32, arg0
+    set_arg fnh, FFI_UINT32, arg1
+    ccall fnh
+    say ret  # will print "120"
+    free_fnh fnh
 
 example code for calling 2 int32 arg, 1 int32 return
-.local int ret, arg0, arg1
-.local int lib, fnh
-arg0 = 12
-arg1 = 10
-fnh = new_fnh 3
-cfunc fnh, "multiply_int32"
-set_ret fnh, FFI_UINT32, ret
-set_arg fnh, FFI_UINT32, arg0
-set_arg fnh, FFI_UINT32, arg1
-ccall fnh
-say ret  # will print "120"
-free_fnh fnh
+    .local int ret, arg0, arg1
+    .local int lib, fnh
+    arg0 = 12
+    arg1 = 10
+    fnh = new_fnh 3
+    cfunc fnh, "multiply_int32"
+    set_ret fnh, FFI_UINT32, ret
+    set_arg fnh, FFI_UINT32, arg0
+    set_arg fnh, FFI_UINT32, arg1
+    ccall fnh
+    say ret  # will print "120"
+    free_fnh fnh
+
+=back
 
 =head2 Concurrency
 
