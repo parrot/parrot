@@ -8,7 +8,7 @@ pir::loadlib("llvm_engine");
 
 Q:PIR { .include "test_more.pir" };
 
-my $pir    := 't/jit/data/02.pir';
+my $pir    := 't/jit/data/03.pir';
 my $pbc    := subst($pir, / 'pir' $/, 'pbc');
 
 # Generate PBC file
@@ -39,10 +39,6 @@ my $oplib := pir::new__psp("OpLib", "core_ops");
 my $interp  := pir::new("ParrotInterpreter");
 my $context := pir::new("CallContext");
 
-my %jit_context := hash(
-    bc => $bc,
-);
-
 # Parse "jitted.ops"
 my $ops_file := Ops::File.new("t/jit/jitted.ops",
     :oplib($oplib),
@@ -53,13 +49,23 @@ my $ops_file := Ops::File.new("t/jit/jitted.ops",
 # Convert it to hash for faster lookup. Also cleanup a bit.
 my %parsed_op;
 for $ops_file.ops -> $op {
-    $op := Ops::Util::strip_source($op);
+    #$op := Ops::Util::strip_source($op);
     %parsed_op{$op.full_name} := $op;
 };
+
+my $trans := Ops::Trans::JIT.new;
 
 # Just dump content of PBC file with "disassemble"
 my $total := +$bc;
 my $i := 0;
+
+my %jit_context := hash(
+    bc          => $bc,
+    trans       => $trans,
+    cur_opcode  => $i,
+    constants   => $dir{ 'CONSTANT_' ~ $pir },
+);
+
 while ($i < $total) {
     # Mapped op
     my $id     := $bc[$i];
@@ -69,7 +75,22 @@ while ($i < $total) {
 
     # Get op
     my $op     := $oplib{$opname};
-    my $args   := Q:PIR {
+    # Op itself
+    say("# $i $opname");
+
+    #_dumper(%parsed_op{ $opname });
+    my $parsed_op := %parsed_op{ $opname };
+    my $jitted_op := $parsed_op.source( %jit_context );
+
+    say($jitted_op);
+
+    # Next op
+    $i := $i + 1 + count_args($op, %jit_context);
+    %jit_context<cur_opcode> := $i;
+}
+
+sub count_args($op, %jit_context) {
+    Q:PIR {
         .local pmc op
         .local int s
         find_lex op, '$op'
@@ -77,22 +98,6 @@ while ($i < $total) {
         %r = box s
     };
 
-    # Op itself
-    print("\t$i $opname");
-
-    # Args
-    while ($args) {
-        $i++;
-        $args--;
-        print(" {$bc[$i]}");
-    }
-
-    say("");
-
-    _dumper(%parsed_op{ $opname });
-
-    # Next op
-    $i++;
 }
 
 # vim: ft=perl6
