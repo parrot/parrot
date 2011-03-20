@@ -108,7 +108,6 @@ method defines($emitter) {
     return qq|
 /* defines - Ops::Trans::C */
 #define REL_PC     ((size_t)(cur_opcode - (opcode_t *)interp->code->base.data))
-#define CUR_OPCODE cur_opcode
 #define IREG(i) REG_INT(interp, cur_opcode[i])
 #define NREG(i) REG_NUM(interp, cur_opcode[i])
 #define PREG(i) REG_PMC(interp, cur_opcode[i])
@@ -116,7 +115,6 @@ method defines($emitter) {
 #define ICONST(i) cur_opcode[i]
 #define NCONST(i) Parrot_pcc_get_num_constants(interp, interp->ctx)[cur_opcode[i]]
 #define SCONST(i) Parrot_pcc_get_str_constants(interp, interp->ctx)[cur_opcode[i]]
-#undef  PCONST
 #define PCONST(i) Parrot_pcc_get_pmc_constants(interp, interp->ctx)[cur_opcode[i]]
 
 static int get_op(PARROT_INTERP, const char * name, int full);
