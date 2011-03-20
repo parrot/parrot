@@ -81,7 +81,6 @@ allocate more chunks
 static void
 allocate_more_chunks(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 {
-    ASSERT_ARGS(allocate_more_chunks)
     self->current_chunk = self->total_chunks++;
     mem_realloc_n_typed(self->chunks,
             self->total_chunks,
@@ -105,8 +104,6 @@ Insert pointer into the array.
 static inline void *
 Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
-    ASSERT_ARGS(Parrot_pa_insert)
-
     Parrot_Pointer_Array_Chunk   *chunk;
     void                         *ret;
 
@@ -152,8 +149,6 @@ Remove pointer from array.
 static inline void
 Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
-    ASSERT_ARGS(Parrot_pa_remove)
-
     /* Mark sell to avoid iterating over */
     *(UINTVAL*)ptr = ((UINTVAL)self->next_free) | 1;
     self->next_free = (void**)ptr;
