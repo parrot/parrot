@@ -107,7 +107,7 @@ Insert pointer into the array.
 
 */
 
-static inline void *
+static void *
 Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
     Parrot_Pointer_Array_Chunk   *chunk;
@@ -154,7 +154,7 @@ Remove pointer from array.
 
 */
 
-static inline void
+static void
 Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
     /* Mark sell to avoid iterating over */
