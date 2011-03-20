@@ -10,7 +10,13 @@ Q:PIR { .include "test_more.pir" };
 
 my $pir    := 't/jit/data/02.pir';
 my $pbc    := subst($pir, / 'pir' $/, 'pbc');
-my $handle := open($pbc, :r, :bin);
+
+# Generate PBC file
+my @args   := list("./parrot", "-o", $pbc, $pir);
+my $res    := pir::spawnw__ip(@args);
+
+# Load PBC into memory
+my $handle   := open($pbc, :r, :bin);
 my $contents := $handle.readall;
 $handle.close();
 
@@ -30,6 +36,7 @@ ok( pir::defined($opmap), "Got OpMap");
 
 my $oplib := pir::new__psp("OpLib", "core_ops");
 
+# Just dump content of PBC file with "disassemble"
 my $total := +$bc;
 my $i := 0;
 while ($i < $total) {
