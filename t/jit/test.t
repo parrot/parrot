@@ -55,17 +55,41 @@ for $ops_file.ops -> $op {
 
 my $trans := Ops::Trans::JIT.new;
 
-# Just dump content of PBC file with "disassemble"
 my $total := +$bc;
 my $i := 0;
 
+# JIT context.
 my %jit_context := hash(
+    level       => 1,
     bc          => $bc,
     trans       => $trans,
-    cur_opcode  => $i,
+    cur_opcode  => 0,
     constants   => $dir{ 'CONSTANT_' ~ $pir },
+
+    basic_blocks => hash(), # offset->basic_block
 );
 
+# Enumerate ops and create BasicBlock for each.
+while ($i < $total) {
+    # Mapped op
+    my $id     := $bc[$i];
+
+    # Real opname
+    my $opname := $opmap[$id];
+
+    # Get op
+    my $op     := $oplib{$opname};
+
+    %jit_context<basic_blocks>{$i} := hash(
+        label => "L$i",
+    );
+
+    # Next op
+    $i := $i + 1 + count_args($op, %jit_context);
+}
+
+# "JIT" Sub
+$i := 0;
 while ($i < $total) {
     # Mapped op
     my $id     := $bc[$i];
@@ -82,12 +106,21 @@ while ($i < $total) {
     my $parsed_op := %parsed_op{ $opname };
     my $jitted_op := $parsed_op.source( %jit_context );
 
-    say($jitted_op);
+    %jit_context<basic_blocks>{$i}<body> := $jitted_op;
+    #say($jitted_op);
 
     # Next op
     $i := $i + 1 + count_args($op, %jit_context);
     %jit_context<cur_opcode> := $i;
 }
+
+# Dump
+for %jit_context<basic_blocks>.keys.sort -> $id {
+    my $b := %jit_context<basic_blocks>{$id};
+    print($b<label> ~ ": ");
+    say($b<body>);
+}
+
 
 sub count_args($op, %jit_context) {
     Q:PIR {

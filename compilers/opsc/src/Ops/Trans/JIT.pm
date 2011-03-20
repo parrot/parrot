@@ -68,6 +68,11 @@ our method access_arg:type<kic> ($num, %ctx) {
 }
 
 
+method goto_offset($offset, %ctx) {
+    #"return (opcode_t *)cur_opcode + $offset";
+    'goto L' ~ (%ctx<cur_opcode> + $offset);
+}
+
 =item opcode_at
 Return opcode at offset.
 
