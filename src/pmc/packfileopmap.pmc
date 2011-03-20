@@ -177,6 +177,8 @@ Get Op PMC by name.
 /*
 =item C<get_string_keyed_int()>
 
+=item C<get_pmc_keyed_int()>
+
 Lookup op name by mapped id.
 
 =cut
@@ -185,6 +187,10 @@ Lookup op name by mapped id.
         PMC *ops;
         GET_ATTR_ops(INTERP, SELF, ops);
         return VTABLE_get_string_keyed_int(INTERP, ops, key);
+    }
+
+    VTABLE PMC* get_pmc_keyed_int(INTVAL key) {
+        Parrot_pmc_box_string(INTERP, STATICSELF.get_string_keyed_int(key));
     }
 
 
