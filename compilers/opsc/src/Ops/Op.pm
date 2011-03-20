@@ -126,6 +126,8 @@ method name($name?) { self.attr('name', $name, defined($name)) }
 
 method args($args?) { self.attr('args', $args, defined($args)) }
 
+method normalized_args($args?) { self.attr('normalized_args', $args, defined($args)) }
+
 method need_write_barrier() {
     my $need := 0;
     # We need write barriers only for (in)out PMC|STR
