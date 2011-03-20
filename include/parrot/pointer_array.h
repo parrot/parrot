@@ -65,6 +65,10 @@ Inline functions for faster access.
 
 */
 
+#define ASSERT_ARGS_allocate_more_chunks __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+     , PARROT_ASSERT_ARG(self))
+
 /*
 
 =over 4
