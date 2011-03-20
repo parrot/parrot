@@ -307,7 +307,7 @@ our multi method to_c(PAST::Var $var, %c) {
     }
     elsif $var.scope eq 'register' {
         my $n := +$var.name;
-        %c<trans>.access_arg( self.arg_type($n - 1), $n);
+        %c<trans>.access_arg( self.arg_type($n - 1), $n, %c);
     }
     else {
         # Just ordinary variable
@@ -345,9 +345,10 @@ our method to_c:pasttype<macro> (PAST::Op $chunk, %c) {
     my $ret := Q:PIR<
         $P0 = find_lex '$trans'
         $P1 = find_lex '$name'
+        $P2 = find_lex '%c'
         $S0 = $P1
         $P1 = find_lex '$children'
-        %r  = $P0.$S0($P1)
+        %r  = $P0.$S0($P1, $P2)
     >;
     #pir::say('RET ' ~ $ret);
     return $ret;

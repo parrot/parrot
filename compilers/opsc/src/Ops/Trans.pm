@@ -43,15 +43,15 @@ method getop($emitter)   { '( int (*)(PARROT_INTERP, const char *, int) )NULL' }
 
 our %arg_maps := {};
 
-method access_arg($type, $num) { die('...'); }
+method access_arg($type, $num, %ctx) { die('...'); }
 
-method restart_address($addr) { die('...'); }
-method restart_offset($offset) { die('...'); }
+method restart_address($addr, %ctx) { die('...'); }
+method restart_offset($offset, %ctx) { die('...'); }
 
-method goto_address($addr) { die('...'); }
-method goto_offset($offset) { die('...'); }
+method goto_address($addr, %ctx) { die('...'); }
+method goto_offset($offset, %ctx) { die('...'); }
 
-method expr_address($addr) { die('...'); }
-method expr_offset($offset) { die('...'); }
+method expr_address($addr, %ctx) { die('...'); }
+method expr_offset($offset, %ctx) { die('...'); }
 
 # vim: expandtab shiftwidth=4 ft=perl6:

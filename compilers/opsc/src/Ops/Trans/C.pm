@@ -78,27 +78,27 @@ method emit_c_op_funcs_header_part($fh) {
     }
 }
 
-method access_arg($type, $num) {
+method access_arg($type, $num, %ctx) {
     my $access := self<arg_maps>{$type};
     die("unrecognized arg type '$type'") unless $access;
     subst($access, /NUM/, $num);
 }
 
-method restart_address($addr) {
+method restart_address($addr, %ctx) {
     "interp->resume_offset = $addr; interp->resume_flag = 1;";
 }
 
-method restart_offset($offset) {
+method restart_offset($offset, %ctx) {
     "interp->resume_offset = REL_PC + $offset; interp->resume_flag = 1;";
 }
 
-method goto_address($addr) { "return (opcode_t *)$addr"; }
+method goto_address($addr, %ctx) { "return (opcode_t *)$addr"; }
 
-method goto_offset($offset) { "return (opcode_t *)cur_opcode + $offset"; }
+method goto_offset($offset, %ctx) { "return (opcode_t *)cur_opcode + $offset"; }
 
-method expr_address($addr) { $addr; }
+method expr_address($addr, %ctx) { $addr; }
 
-method expr_offset($offset) { " cur_opcode + $offset"; }
+method expr_offset($offset, %ctx) { " cur_opcode + $offset"; }
 
 =begin
 
