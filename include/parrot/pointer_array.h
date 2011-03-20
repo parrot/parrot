@@ -82,7 +82,9 @@ allocate more chunks
 
 */
 
-static void
+static
+PARROT_INLINE
+void
 allocate_more_chunks(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 {
     ASSERT_ARGS(allocate_more_chunks)
@@ -107,7 +109,9 @@ Insert pointer into the array.
 
 */
 
-static void *
+static
+PARROT_INLINE
+void *
 Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
     Parrot_Pointer_Array_Chunk   *chunk;
@@ -154,7 +158,9 @@ Remove pointer from array.
 
 */
 
-static void
+static
+PARROT_INLINE
+void
 Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
     /* Mark sell to avoid iterating over */
