@@ -127,6 +127,36 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
         return bc;
     }
 
+/*
+=item C<void set_pointer()>
+
+Initialize PackfileBytecodeSegment from PackFile_Bytecode*
+
+=cut
+*/
+    VTABLE void set_pointer(void *pointer) {
+        const PackFile_ByteCode * const pfseg =
+                (const PackFile_ByteCode *)pointer;
+        opcode_t i, j;
+        PMC     *op_map;
+
+        GET_ATTR_op_map(INTERP, SELF, op_map);
+
+        /* Recreate OpMapping */
+        for (i = 0; i < pfseg->op_mapping.n_libs; i++) {
+            PackFile_ByteCode_OpMappingEntry entry = pfseg->op_mapping.libs[i];
+            for (j = 0; j < entry.n_ops; j++) {
+                opcode_t lib_op = entry.lib_ops[j];
+                VTABLE_get_integer_keyed_str(INTERP, op_map,
+                    Parrot_str_from_platform_cstring(INTERP, entry.lib->op_info_table[lib_op].full_name));
+            }
+        }
+
+        /* TODO. Figure out how to generate OpLibs and where to store them */
+
+        SUPER(pointer);
+    }
+
 
 /*
 
