@@ -36,6 +36,27 @@ ok( pir::defined($opmap), "Got OpMap");
 
 my $oplib := pir::new__psp("OpLib", "core_ops");
 
+my $interp  := pir::new("ParrotInterpreter");
+my $context := pir::new("CallContext");
+
+my %jit_context := hash(
+    bc => $bc,
+);
+
+# Parse "jitted.ops"
+my $ops_file := Ops::File.new("t/jit/jitted.ops",
+    :oplib($oplib),
+    :core(0),
+    :quiet(0),
+);
+
+# Convert it to hash for faster lookup. Also cleanup a bit.
+my %parsed_op;
+for $ops_file.ops -> $op {
+    $op := Ops::Util::strip_source($op);
+    %parsed_op{$op.full_name} := $op;
+};
+
 # Just dump content of PBC file with "disassemble"
 my $total := +$bc;
 my $i := 0;
@@ -67,6 +88,8 @@ while ($i < $total) {
     }
 
     say("");
+
+    _dumper(%parsed_op{ $opname });
 
     # Next op
     $i++;
