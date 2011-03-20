@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -65,23 +65,30 @@ Inline functions for faster access.
 
 */
 
+#define ASSERT_ARGS_allocate_more_chunks __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+     , PARROT_ASSERT_ARG(self))
+
 /*
+
+=over 4
 
 =item C<static void allocate_more_chunks(PARROT_INTERP, Parrot_Pointer_Array
 *self)>
 
 allocate more chunks
 
-=back
-
 =cut
 
 */
 
-static void
+static
+PARROT_INLINE
+void
 allocate_more_chunks(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 {
     ASSERT_ARGS(allocate_more_chunks)
+
     self->current_chunk = self->total_chunks++;
     mem_realloc_n_typed(self->chunks,
             self->total_chunks,
@@ -93,8 +100,8 @@ allocate_more_chunks(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 
 /*
 
-=item C<void * Parrot_pa_insert(PARROT_INTERP, Parrot_Pointer_Array *self, void
-*ptr)>
+=item C<static void * Parrot_pa_insert(PARROT_INTERP, Parrot_Pointer_Array
+*self, void *ptr)>
 
 Insert pointer into the array.
 
@@ -102,11 +109,11 @@ Insert pointer into the array.
 
 */
 
-static inline void *
+static
+PARROT_INLINE
+void *
 Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
-    ASSERT_ARGS(Parrot_pa_insert)
-
     Parrot_Pointer_Array_Chunk   *chunk;
     void                         *ret;
 
@@ -140,20 +147,22 @@ Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
 
 /*
 
-=item C<void Parrot_pa_remove(PARROT_INTERP, Parrot_Pointer_Array *self, void
-*ptr)>
+=item C<static void Parrot_pa_remove(PARROT_INTERP, Parrot_Pointer_Array *self,
+void *ptr)>
 
 Remove pointer from array.
+
+=back
 
 =cut
 
 */
 
-static inline void
+static
+PARROT_INLINE
+void
 Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
-    ASSERT_ARGS(Parrot_pa_remove)
-
     /* Mark sell to avoid iterating over */
     *(UINTVAL*)ptr = ((UINTVAL)self->next_free) | 1;
     self->next_free = (void**)ptr;
