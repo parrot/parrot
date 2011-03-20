@@ -278,7 +278,7 @@ Generate C code for op using the specified transform,
 
 method get_body( %context ) {
 
-    %context<level> := 0;
+    %context<level> := 0 unless %context<level>;
 
     #work through the op_body tree
     self.join_children(self, %context);
