@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -67,12 +67,12 @@ Inline functions for faster access.
 
 /*
 
+=over 4
+
 =item C<static void allocate_more_chunks(PARROT_INTERP, Parrot_Pointer_Array
 *self)>
 
 allocate more chunks
-
-=back
 
 =cut
 
@@ -81,6 +81,8 @@ allocate more chunks
 static void
 allocate_more_chunks(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 {
+    ASSERT_ARGS(allocate_more_chunks)
+
     self->current_chunk = self->total_chunks++;
     mem_realloc_n_typed(self->chunks,
             self->total_chunks,
@@ -92,8 +94,8 @@ allocate_more_chunks(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 
 /*
 
-=item C<void * Parrot_pa_insert(PARROT_INTERP, Parrot_Pointer_Array *self, void
-*ptr)>
+=item C<static inline void * Parrot_pa_insert(PARROT_INTERP,
+Parrot_Pointer_Array *self, void *ptr)>
 
 Insert pointer into the array.
 
@@ -137,10 +139,12 @@ Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
 
 /*
 
-=item C<void Parrot_pa_remove(PARROT_INTERP, Parrot_Pointer_Array *self, void
-*ptr)>
+=item C<static inline void Parrot_pa_remove(PARROT_INTERP, Parrot_Pointer_Array
+*self, void *ptr)>
 
 Remove pointer from array.
+
+=back
 
 =cut
 
