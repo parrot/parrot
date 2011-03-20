@@ -327,25 +327,25 @@ describe structs here, as far as they're relevant to m0
 There are four register types, Integer, Numeric, PMC and String. The string
 type will merely be syntax sugar for accessing a PMC.
 
-question: how will ops deal with types?
-options:
-1 - ops are hard-coded per-type, registers contain no type info
-2 - ops deal with whatever type they get, registers have type flags built-in (or built in to the op)
-    e.g. op looks like this:
-    byte : op
-    byte : ctx
-    byte : arg0
-    byte : arg1
-    byte : arg2
-    3b   : arg0 flags (001 -> I, 010 -> N, ...)
-    3b   : arg1 flags
-    3b   : arg2 flags
-3 - ops don't know about types, registers numbers are typed by convention
-    0-19 -> I, 20 -> 39 -> N, ...
-4 - register numbers mean different things depending on the op
-    add 2, 3, 5 -> add $I2, $I3, $I5
-    say 2, 3, 5 -> say $P2, $S3, $S5
-5 - ???
+M0 registers will not have innate types; they'll be nothing more than a
+collection of bits which are interpreted by M0's ops as having a certain type.
+The types that ops attribute to register values will be based on the position
+of the register in an M0 context's register set.  For example if an M0 context
+has 25 registers (which it won't), their types might be as follows:
+
+number  type
+0       current context
+1       PC
+2       EH
+3       EX
+4       calling context
+5-9     I
+10-14   N
+15-19   S
+20-24   P
+
+This means that an op which is passed the wrong value could pretty easily cause
+chaos by clobbering the PC or changing the pointer to the current context.
 
 =head2 MOP interaction
 
@@ -436,7 +436,6 @@ set_arg fnh, FFI_UINT32, arg0
 set_arg fnh, FFI_UINT32, arg1
 ccall fnh
 say ret  # will print "120"
-
 
 =head2 Concurrency
 
