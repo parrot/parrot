@@ -320,7 +320,8 @@ Will some memory be protected in M0?
 
 =head2 structs
 
-describe structs here, as far as they're relevant to m0
+Structs (as implemented in C) will be an abstraction on top of M0.  M0 will not
+be concerned with the directly.
 
 =head2 Types
 
@@ -364,7 +365,17 @@ should not impose any constraints that preclude efficient implementation of any
 of type of interpreter.  Part of this means avoiding the assumption that the
 basic mechanism of foreign function calls is a thunk.
 
-=head3 Possible Implementations
+The proposed mechanism for abstracting ffi calls is a function handle.  This is
+an implementation-defined opaque data structure that can be populated through a
+common interface.  The interface allows an foreign function to be looked up,
+given arguments from M0 registers and invoked.
+
+The reason for this abstraction is that we expect M0 to be implemented in a
+variety of ways and need an abstraction that will make sense for both a
+JavaScript M0 implementation, a C-based interpreter that executes ops directly
+and a jitting compiler that emits native code.
+
+=head3 Implementation
 
 M0's FFI will need to implement similar functionality to dlfunc and dlvar in
 the form of a minimal set of atoms which are sufficient to expose that
@@ -374,7 +385,16 @@ M0 will know enough about FFI to create a reusable handle that takes M0 values,
 sets up the C function call according to C calling conventions (Q: which ones?)
 and calls it.  M0 will have three ops to support this: set_arg and set_return
 to indicate which M0 registers are to be used in the call, and ccall to call
-the C function through the generated .
+the C function through the generated.
+
+=item * func_handle = new_fnh arg_count
+
+This allocates a new function handle which can deal with the specified number
+of arguments.  Its internals are implementation-specific.
+
+=item * free_fnh fhn
+
+This op destroys an existing function handle.
 
 =item * set_arg func_handle, arg_type, arg_src
 
@@ -399,9 +419,10 @@ ccall uses an existing function handle to call into a C function.
 example code for calling no arg, no ret function:
 .local int lib, fnh
 lib = dlopen 'libhello.so'
-fnh = newfhn 0
+fnh = new_fhn 0
 dlfunc fnh, lib, "hello_func"
 ccall fnh
+free_fnh fnh
 
 example code for calling 2 int32 arg, 1 int32 return
 .local int ret, arg0, arg1
@@ -409,26 +430,28 @@ example code for calling 2 int32 arg, 1 int32 return
 arg0 = 12
 arg1 = 10
 lib = dlopen "libmath.so"
-fnh = newfnh 3
+fnh = new_fnh 3
 dlfunc fnh, lib, "multiply_int32"
 set_ret fnh, FFI_UINT32, ret
 set_arg fnh, FFI_UINT32, arg0
 set_arg fnh, FFI_UINT32, arg1
 ccall fnh
 say ret  # will print "120"
+free_fnh fnh
 
 example code for calling 2 int32 arg, 1 int32 return
 .local int ret, arg0, arg1
 .local int lib, fnh
 arg0 = 12
 arg1 = 10
-fnh = newfnh 3
+fnh = new_fnh 3
 cfunc fnh, "multiply_int32"
 set_ret fnh, FFI_UINT32, ret
 set_arg fnh, FFI_UINT32, arg0
 set_arg fnh, FFI_UINT32, arg1
 ccall fnh
 say ret  # will print "120"
+free_fnh fnh
 
 =head2 Concurrency
 
