@@ -264,26 +264,21 @@ C<$trans> (a subclass of C<Ops::Trans>).
 
 =end
 
-method source( $trans ) {
-
-    my $prelude := $trans.body_prelude;
-    return $prelude ~ self.get_body( $trans );
+method source( %ctx ) {
+    %ctx<trans>.body_prelude ~ self.get_body( %ctx );
 }
 
 =begin
 
-=item C<get_body($trans)>
+=item C<get_body( %ctx )>
 
 Generate C code for op using the specified transform,
 
 =end
 
-method get_body( $trans ) {
+method get_body( %context ) {
 
-    my %context := hash(
-        trans => $trans,
-        level => 0,
-    );
+    %context<level> := 0;
 
     #work through the op_body tree
     self.join_children(self, %context);

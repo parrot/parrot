@@ -45,6 +45,10 @@ method prepare_ops($emitter, $ops_file) {
     my @op_funcs;
     my @op_func_table;
 
+    my %ctx := hash(
+        trans => self,
+    );
+
     for $ops_file.ops -> $op {
         #say("# preparing " ~ $op);
         my $func_name := $op.func_name( self );
@@ -52,7 +56,7 @@ method prepare_ops($emitter, $ops_file) {
         my $prototype := $emitter.sym_export
                 ~ " opcode_t * $func_name(opcode_t *, PARROT_INTERP);\n";
 
-        my $src := $op.source( self );
+        my $src := $op.source( %ctx );
 
         @op_func_table.push(sprintf( "  %-50s /* %6ld */\n", "$func_name,", $index ));
 
