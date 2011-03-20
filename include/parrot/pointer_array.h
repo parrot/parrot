@@ -100,8 +100,8 @@ allocate_more_chunks(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 
 /*
 
-=item C<static inline void * Parrot_pa_insert(PARROT_INTERP,
-Parrot_Pointer_Array *self, void *ptr)>
+=item C<static void * Parrot_pa_insert(PARROT_INTERP, Parrot_Pointer_Array
+*self, void *ptr)>
 
 Insert pointer into the array.
 
@@ -147,8 +147,8 @@ Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
 
 /*
 
-=item C<static inline void Parrot_pa_remove(PARROT_INTERP, Parrot_Pointer_Array
-*self, void *ptr)>
+=item C<static void Parrot_pa_remove(PARROT_INTERP, Parrot_Pointer_Array *self,
+void *ptr)>
 
 Remove pointer from array.
 
