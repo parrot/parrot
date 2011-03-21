@@ -1,4 +1,4 @@
-class LLVM::Type is LLVM::Opaque {
+class LLVM::Type is LLVM::Value {
 
     multi sub int1()      { LLVM::Type.create(LLVM::call("Int1Type", )) }
     multi sub int8()      { LLVM::Type.create(LLVM::call("Int8Type", )) }
@@ -66,12 +66,16 @@ class LLVM::Type is LLVM::Opaque {
         my $pmc_forward := opaque();
         my $pmc := struct(
             UINTVAL(),              # Parrot_UInt    flags;
-            pointer(opaque()),      # VTABLE         *vtable;
-            pointer(void()),        # DPOINTER       *data;
-            pointer($pmc_forward)   # PMC            *_metadata;
+            pointer(VTABLE()),      # VTABLE         *vtable;
+            pointer(int8()),        # DPOINTER       *data;
+            pointer($pmc_forward),  # PMC            *_metadata;
         );
         $pmc_forward.refine_to($pmc);
         $pmc;
+    }
+
+    sub VTABLE () {
+        struct();
     }
 
 };
