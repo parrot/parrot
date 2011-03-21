@@ -70,7 +70,34 @@ our method access_arg:type<kic> ($num, %ctx) {
 
 method goto_offset($offset, %ctx) {
     #"return (opcode_t *)cur_opcode + $offset";
-    'goto L' ~ (%ctx<cur_opcode> + $offset);
+    #'goto L' ~ (%ctx<cur_opcode> + $offset);
+    my $target  := %ctx<cur_opcode> + $offset;
+    my $jump_to := %ctx<basic_blocks>{$target}<bb>;
+
+    pir::die("No target found") unless pir::defined($jump_to);
+    pir::die("Crappy target") unless $jump_to ~~ LLVM::BasicBlock;
+
+    # TODO Handle non-existing block.
+    my $builder := %ctx<builder>;
+    $builder.br($jump_to);
+
+    # Preserve interace contract.
+    'goto L' ~ $target;
+}
+
+method goto_address($address, %ctx) {
+    # XXX Actually handle goto
+    my $builder := %ctx<builder>;
+    my $retval  := %ctx<retval>;
+    $builder.store(
+        LLVM::Constant::null(
+            LLVM::Type::pointer(LLVM::Type::int32())
+        ),
+        $retval,
+    );
+    $builder.br(%ctx<leave>);
+
+    "";
 }
 
 =item opcode_at
