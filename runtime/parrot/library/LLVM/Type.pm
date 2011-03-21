@@ -53,13 +53,24 @@ class LLVM::Type is LLVM::Value {
     sub INTVAL ()   { int32(); }
     sub UINTVAL ()  { int32(); }
     sub FLOATVAL () { double(); }
-    sub STRING ()   { $STRING; }
-    sub PMC ()      { $PMC; }
-    sub VTABLE ()   { $VTABLE; }
+
+    sub STRING ()       { $STRING; }
+    sub STRING_PTR ()   { $STRING_PTR; }
+    sub PMC ()          { $PMC; }
+    sub PMC_PTR ()      { $PMC_PTR; }
+    sub VTABLE ()       { $VTABLE; }
+    sub VTABLE_PTR ()   { $VTABLE_PTR; }
+    sub INTERP ()       { $INTERP; }
+    sub INTERP_PTR ()   { $INTERP_PTR; }
 
     our $STRING;
+    our $STRING_PTR;
     our $PMC;
+    our $PMC_PTR;
     our $VTABLE;
+    our $VTABLE_PTR;
+    our $INTERP;
+    our $INTERP_PTR;
 
     INIT {
         # Create STRING
@@ -73,12 +84,17 @@ class LLVM::Type is LLVM::Value {
             UINTVAL(),          # UINTVAL     hashval;
             pointer(opaque()),  # const struct _str_vtable *encoding;
         );
+        $STRING_PTR := pointer($STRING);
 
         # It will be used in VTABLE and PMC
         my $pmc_forward := opaque();
+        my $interp_forward := opaque();
 
         # Create VTABLE
-        $VTABLE := struct();
+        $VTABLE := struct(
+            # Not handled...
+        );
+        $VTABLE_PTR := pointer($VTABLE);
 
         # Create PMC
         $PMC := struct(
@@ -88,6 +104,16 @@ class LLVM::Type is LLVM::Value {
             pointer($pmc_forward),  # PMC            *_metadata;
         );
         $pmc_forward.refine_to($PMC);
+        $PMC_PTR := pointer($PMC);
+
+        # Create INTERP
+        $INTERP := struct(
+            $PMC_PTR,   # *ctx;  /* current Context */
+
+            # Other fields aren't handled yet.
+        );
+        $INTERP_PTR := pointer($INTERP);
+        $interp_forward.refine_to($INTERP);
     }
 };
 
