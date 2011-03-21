@@ -54,9 +54,7 @@ for $ops_file.ops -> $op {
 };
 
 my $trans := Ops::Trans::JIT.new;
-
-my $total := +$bc;
-my $i := 0;
+ok( 1, "Got Ops::Trans::JIT" );
 
 # JIT context.
 my %jit_context := hash(
@@ -68,7 +66,52 @@ my %jit_context := hash(
 
     basic_blocks => hash(), # offset->basic_block
 );
+ok( %jit_context, "jit_context" );
 
+# Create few structures. Better to load from compiled bytecode.
+my $module  := LLVM::Module.create("foo");
+my $builder := LLVM::Builder.create();
+
+my $pmc_struct    := LLVM::Type::PMC();
+ok( 1, "PMC" );
+$module.add_type_name("struct.PMC", $pmc_struct);
+
+my $interp_struct := LLVM::Type::struct(
+    LLVM::Type::pointer($pmc_struct),    # context
+    # All othere fields aren't handled yet
+);
+ok( 1, "interp" );
+$module.add_type_name("struct.parrot_interp_t", $interp_struct);
+
+my $opcode_ptr_type := LLVM::Type::pointer(LLVM::Type::UINTVAL());
+ok( 1, "opcode_t *");
+$module.add_type_name("opcode_ptr", $opcode_ptr_type);
+
+
+# Generate JITted function for Sub.
+my $jitted_sub := $module.add_function(
+    "foo",
+    $opcode_ptr_type,
+    $opcode_ptr_type,
+    LLVM::Type::pointer($interp_struct),
+);
+
+#$module.dump();
+
+# Handle arguments
+my $entry := $jitted_sub.append_basic_block("entry");
+# Create explicit return
+my $leave := $jitted_sub.append_basic_block("leave");
+
+# TODO Handle args.
+$builder.set_position($entry);
+
+#$module.dump();
+
+my $total := +$bc;
+my $i := 0;
+
+my $last_bb := $leave;
 # Enumerate ops and create BasicBlock for each.
 while ($i < $total) {
     # Mapped op
@@ -80,6 +123,9 @@ while ($i < $total) {
     # Get op
     my $op     := $oplib{$opname};
 
+    say("# $opname");
+    $last_bb := $leave.insert_before("L$i");
+
     %jit_context<basic_blocks>{$i} := hash(
         label => "L$i",
     );
@@ -87,6 +133,8 @@ while ($i < $total) {
     # Next op
     $i := $i + 1 + count_args($op, %jit_context);
 }
+
+$module.dump();
 
 # "JIT" Sub
 $i := 0;
@@ -117,8 +165,8 @@ while ($i < $total) {
 # Dump
 for %jit_context<basic_blocks>.keys.sort -> $id {
     my $b := %jit_context<basic_blocks>{$id};
-    print($b<label> ~ ": ");
-    say($b<body>);
+    #print($b<label> ~ ": ");
+    #say($b<body>);
 }
 
 
