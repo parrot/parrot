@@ -13,12 +13,27 @@ class LLVM::Type is LLVM::Value {
     sub fp128()    { LLVM::Type.create(LLVM::call("FP128Type")) }
     sub ppcfp128() { LLVM::Type.create(LLVM::call("PPCFP128Type")) }
 
-    sub struct(*@parts, :$packed?) {
-        LLVM::Type.create(LLVM::call("StructType", LLVM::to_array(@parts), +@parts, $packed));
+    sub function(LLVM::Type $return, *@args, :$va_args?) {
+        LLVM::Type.create(
+            LLVM::call("FunctionType",
+                $return,                        # return
+                LLVM::to_array(@args),          # parameters
+                +@args,                         # number of parameters
+                +$va_args,                      # is var args
+            )
+        )
     }
 
-    sub pointer($type, :$address_space?) {
-        LLVM::Type.create(LLVM::call("PointerType", $type, $address_space));
+    sub struct(*@parts, :$packed?) {
+        LLVM::Type.create(
+            LLVM::call("StructType", LLVM::to_array(@parts), +@parts, $packed)
+        );
+    }
+
+    sub pointer(LLVM::Type $type, :$address_space?) {
+        LLVM::Type.create(
+            LLVM::call("PointerType", $type, $address_space)
+        );
     }
 
     sub void() { LLVM::Type.create(LLVM::call("VoidType", )) };
