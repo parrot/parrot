@@ -97,6 +97,15 @@ my $opcode_ptr_type := LLVM::Type::pointer(LLVM::Type::UINTVAL());
 ok( 1, "opcode_t *");
 $module.add_type_name("opcode_ptr", $opcode_ptr_type);
 
+# Add few function definitions. Preferably loaded from bitcode.
+$module.add_function(
+    "Parrot_io_printf",
+    LLVM::Type::INTVAL(),
+    LLVM::Type::pointer($interp_struct),
+    LLVM::Type::cstring(),
+    :va_args<1>
+);
+
 
 # Generate JITted function for Sub.
 my $jitted_sub := $module.add_function(
