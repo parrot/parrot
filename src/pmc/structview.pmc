@@ -367,6 +367,8 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
                     byte_cursor      = (bit_cursor + 1) / 8;
                     bit_cursor       = (bit_cursor + 1) % 8;
                     break;
+                  default:
+                      break;
                 }
                 break;
               case enum_type_union:
@@ -425,7 +427,11 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
                   case unaligned_access:
                     elt->access = unaligned_access;
                     break;
+                  default:
+                      break;
                 }
+              default:
+                  break;
             }
         }
 
@@ -496,6 +502,8 @@ Get/Set an integer-type element from a struct-pointer PMC.
 #endif
 #undef CASE_RET1
 #undef CASE_RET2
+              default:
+                  break;
             }
             break;
           case unaligned_access:
@@ -570,6 +578,8 @@ Get/Set an integer-type element from a struct-pointer PMC.
 #endif
 #undef CASE_SET1
 #undef CASE_SET2
+              default:
+                  break;
             }
             break;
           case unaligned_access:
@@ -644,6 +654,8 @@ Get/Set a float-like element from a struct-pointer PMC.
                 return *(double *)ptr;
               case enum_type_longdouble:
                 return *(long double *)ptr;
+              default:
+                  break;
             }
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
@@ -669,6 +681,8 @@ Get/Set a float-like element from a struct-pointer PMC.
               case enum_type_longdouble:
                 *(long double *)ptr = n;
                 return;
+              default:
+                  break;
             }
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
@@ -696,6 +710,8 @@ Get/Set a string element from a struct-pointer PMC.
             switch (elts[i].type) {
               case enum_type_STRING:
                 return *(STRING **)ptr;
+              default:
+                  break;
             }
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
@@ -712,6 +728,8 @@ Get/Set a string element from a struct-pointer PMC.
               case enum_type_STRING:
                 *(STRING **)ptr = s;
                 return;
+              default:
+                  break;
             }
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
@@ -758,8 +776,12 @@ any other type of element.
                             (INTVAL)*(void **)ptr);
                     VTABLE_set_integer_native(INTERP, ret, elts[i].size);
                     return ret;
+                  default:
+                      break;
                 }
             }
+          default:
+              break;
         }
     }
 
@@ -800,8 +822,12 @@ any other type of element.
                                 "Type `%Ss' unsuitable for buffer assignment",
                                 p->vtable->whoami);
                     }
+                  default:
+                      break;
                 }
             }
+          default:
+              break;
         }
     }
 
