@@ -1,7 +1,7 @@
 class LLVM::Value is LLVM::Opaque {
     method typeof() {
         LLVM::Type.create(
-            LLVM::Call("TypeOf", self)
+            LLVM::call("TypeOf", self)
         );
     }
 
