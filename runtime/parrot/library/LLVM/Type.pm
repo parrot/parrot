@@ -50,21 +50,20 @@ class LLVM::Type is LLVM::Value {
     sub cstring() { pointer(int8()); }
 
     # Shortcuts for Parrot's types. TODO Get from _config()
-    sub INTVAL () {
-        int32();
-    }
+    sub INTVAL ()   { int32(); }
+    sub UINTVAL ()  { int32(); }
+    sub FLOATVAL () { double(); }
+    sub STRING ()   { $STRING; }
+    sub PMC ()      { $PMC; }
+    sub VTABLE ()   { $VTABLE; }
 
-    sub UINTVAL () {
-        int32();
-    }
+    our $STRING;
+    our $PMC;
+    our $VTABLE;
 
-    sub FLOATVAL () {
-        double();
-    }
-
-    # TODO Made "static"
-    sub STRING () {
-        struct(
+    INIT {
+        # Create STRING
+        $STRING := struct(
             UINTVAL(),          # Parrot_UInt flags;
             pointer(void()),    # void *     _bufstart;
             UINTVAL(),          # size_t     _buflen;
@@ -74,25 +73,22 @@ class LLVM::Type is LLVM::Value {
             UINTVAL(),          # UINTVAL     hashval;
             pointer(opaque()),  # const struct _str_vtable *encoding;
         );
-    }
 
-    # TODO Made "static"
-    sub PMC () {
+        # It will be used in VTABLE and PMC
         my $pmc_forward := opaque();
-        my $pmc := struct(
+
+        # Create VTABLE
+        $VTABLE := struct();
+
+        # Create PMC
+        $PMC := struct(
             UINTVAL(),              # Parrot_UInt    flags;
             pointer(VTABLE()),      # VTABLE         *vtable;
             pointer(int8()),        # DPOINTER       *data;
             pointer($pmc_forward),  # PMC            *_metadata;
         );
-        $pmc_forward.refine_to($pmc);
-        $pmc;
+        $pmc_forward.refine_to($PMC);
     }
-
-    sub VTABLE () {
-        struct();
-    }
-
 };
 
 # vim: ft=perl6
