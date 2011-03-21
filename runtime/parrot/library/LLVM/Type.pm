@@ -33,6 +33,47 @@ class LLVM::Type is LLVM::Opaque {
 
     # Shortcut for i8*
     sub cstring() { pointer(int8()); }
+
+    # Shortcuts for Parrot's types. TODO Get from _config()
+    sub INTVAL () {
+        int32();
+    }
+
+    sub UINTVAL () {
+        int32();
+    }
+
+    sub FLOATVAL () {
+        double();
+    }
+
+    # TODO Made "static"
+    sub STRING () {
+        struct(
+            UINTVAL(),          # Parrot_UInt flags;
+            pointer(void()),    # void *     _bufstart;
+            UINTVAL(),          # size_t     _buflen;
+            cstring(),          # char       *strstart;
+            UINTVAL(),          # UINTVAL     bufused;
+            UINTVAL(),          # UINTVAL     strlen;
+            UINTVAL(),          # UINTVAL     hashval;
+            pointer(opaque()),  # const struct _str_vtable *encoding;
+        );
+    }
+
+    # TODO Made "static"
+    sub PMC () {
+        my $pmc_forward := opaque();
+        my $pmc := struct(
+            UINTVAL(),              # Parrot_UInt    flags;
+            pointer(opaque()),      # VTABLE         *vtable;
+            pointer(void()),        # DPOINTER       *data;
+            pointer($pmc_forward)   # PMC            *_metadata;
+        );
+        $pmc_forward.refine_to($pmc);
+        $pmc;
+    }
+
 };
 
 # vim: ft=perl6

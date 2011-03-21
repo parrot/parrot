@@ -34,14 +34,10 @@ my $ptr := LLVM::Type::pointer(LLVM::Type::int8());
 ok( $ptr, "i8* created");
 ok( $type ~~ LLVM::Type, ".. with proper class");
 
-$ptr := LLVM::Type::cstring();
-ok( $ptr, "shortcut i8* created");
-ok( $type ~~ LLVM::Type, ".. with proper class");
-
 # TODO Add tests for floats
 
 # Refine
-# Create struc: struct foo { foo *next}
+# Create struc: struct foo { foo *next }
 # "something"
 my $abstract := LLVM::Type::opaque();
 
@@ -58,6 +54,43 @@ ok( 1, "Refine done");
 #my $m := LLVM::Module.create("foo");
 #$m.add_type_name("struct.foo", $concrete);
 #$m.dump();
+
+# Shortcuts.
+
+$ptr := LLVM::Type::cstring();
+ok( $ptr, "shortcut i8* created");
+ok( $type ~~ LLVM::Type, ".. with proper class");
+
+$ptr := LLVM::Type::INTVAL();
+ok( $ptr, "INTVAL created");
+ok( $type ~~ LLVM::Type, ".. with proper class");
+
+$ptr := LLVM::Type::FLOATVAL();
+ok( $ptr, "FLOATVAL created");
+ok( $type ~~ LLVM::Type, ".. with proper class");
+
+$ptr := LLVM::Type::STRING();
+ok( $ptr, "STRING created");
+ok( $type ~~ LLVM::Type, ".. with proper class");
+
+# my $m := LLVM::Module.create("foo");
+# $m.add_type_name("struct.STRING", $ptr);
+# $m.dump()
+#
+# %1 = type opaque
+# %struct.STRING = type { i32, void*, i32, i8*, i32, i32, i32, %1* }
+
+$ptr := LLVM::Type::PMC();
+ok( $ptr, "PMC created");
+ok( $type ~~ LLVM::Type, ".. with proper class");
+
+# my $m := LLVM::Module.create("foo");
+# $m.add_type_name("struct.PMC", $ptr);
+# $m.dump();
+#
+# %0 = type opaque
+# %struct.PMC = type { i32, %0*, void*, %struct.PMC* }
+
 
 done_testing();
 
