@@ -364,15 +364,17 @@ STRING * Parrot_str_titlecase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-char * Parrot_str_to_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
-        __attribute__nonnull__(1);
+char * Parrot_str_to_cstring(PARROT_INTERP, ARGIN(const STRING *s))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 char * Parrot_str_to_encoded_cstring(PARROT_INTERP,
-    ARGIN_NULLOK(const STRING *s),
+    ARGIN(const STRING *s),
     ARGIN(const STR_VTABLE *enc))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
@@ -604,9 +606,11 @@ STRING * Parrot_str_iter_substr(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_str_titlecase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_to_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_str_to_encoded_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s) \
     , PARROT_ASSERT_ARG(enc))
 #define ASSERT_ARGS_Parrot_str_to_hashval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
