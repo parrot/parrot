@@ -42,4 +42,18 @@ op branch(in LABEL) :base_loop :flow {
     goto OFFSET($1);
 }
 
+inline op eq(in INT, in INT, inconst LABEL) :base_core {
+    if ($1 == $2) {
+        goto OFFSET($3);
+    }
+}
+
+inline op dec(inout INT) :base_core {
+    $1--;
+}
+
+inline op inc(inout INT) :base_core {
+    $1++;
+}
+
 
