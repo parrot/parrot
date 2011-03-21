@@ -46,9 +46,10 @@ my $ops_file := Ops::File.new("t/jit/jitted.ops",
 # Convert it to hash for faster lookup. Also cleanup a bit.
 my %parsed_op;
 for $ops_file.ops -> $op {
-    #$op := Ops::Util::strip_source($op);
+    Ops::Util::strip_source($op);
     %parsed_op{$op.full_name} := $op;
 };
+#_dumper(%parsed_op);
 
 my $trans := Ops::Trans::JIT.new;
 ok( 1, "Got Ops::Trans::JIT" );
@@ -137,9 +138,10 @@ my $interp_addr := $builder.store(
 my $retval := $builder.alloca($opcode_ptr_type).name("retval");
 %jit_context<retval> := $retval;
 
-my $cur_ctx := $builder.alloca(LLVM::Type::pointer(LLVM::Type::PMC())).name("CUR_CTX");
+my $cur_ctx := $builder.struct_gep($interp, 0, "CUR_CTX");
 %jit_context<cur_ctx> := $cur_ctx;
 
+# Load current context from interp
 
 # Create default return.
 $builder.set_position($leave);
