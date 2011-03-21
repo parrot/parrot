@@ -36,9 +36,6 @@ ok( pir::defined($opmap), "Got OpMap");
 
 my $oplib := pir::new__psp("OpLib", "core_ops");
 
-my $interp  := pir::new("ParrotInterpreter");
-my $context := pir::new("CallContext");
-
 # Parse "jitted.ops"
 my $ops_file := Ops::File.new("t/jit/jitted.ops",
     :oplib($oplib),
@@ -72,15 +69,25 @@ ok( %jit_context, "jit_context" );
 my $module  := LLVM::Module.create("foo");
 my $builder := LLVM::Builder.create();
 
+my $vtable_struct := LLVM::Type::VTABLE();
+$module.add_type_name("struct.VTABLE", $vtable_struct);
+ok( 1, "VTABLE" );
+
+#$module.dump();
+$module.verify(LLVM::VERIFYER_FAILURE_ACTION::PRINT_MESSAGE);
+
 my $pmc_struct    := LLVM::Type::PMC();
 ok( 1, "PMC" );
 $module.add_type_name("struct.PMC", $pmc_struct);
+
+#$module.dump();
+$module.verify(LLVM::VERIFYER_FAILURE_ACTION::PRINT_MESSAGE);
 
 my $interp_struct := LLVM::Type::struct(
     LLVM::Type::pointer($pmc_struct),    # context
     # All othere fields aren't handled yet
 );
-ok( 1, "interp" );
+ok( 1, "interp_struct" );
 $module.add_type_name("struct.parrot_interp_t", $interp_struct);
 
 my $opcode_ptr_type := LLVM::Type::pointer(LLVM::Type::UINTVAL());
@@ -95,6 +102,7 @@ my $jitted_sub := $module.add_function(
     $opcode_ptr_type,
     LLVM::Type::pointer($interp_struct),
 );
+%jit_context<jitted_sub> := $jitted_sub;
 
 #$module.dump();
 
@@ -106,12 +114,40 @@ my $leave := $jitted_sub.append_basic_block("leave");
 # TODO Handle args.
 $builder.set_position($entry);
 
-#$module.dump();
+my $cur_opcode := $jitted_sub.param(0);
+$cur_opcode.name("cur_opcode");
+my $cur_opcode_addr := $builder.store(
+    $cur_opcode,
+    $builder.alloca($cur_opcode.typeof()).name("cur_opcode_addr")
+);
+%jit_context<cur_opcode_addr> := $cur_opcode_addr;
+
+my $interp     := $jitted_sub.param(1);
+$interp.name("interp");
+my $interp_addr := $builder.store(
+    $interp,
+    $builder.alloca($interp.typeof()).name("interp_addr")
+);
+%jit_context<interp_addr> := $interp_addr;
+
+my $retval := $builder.alloca($opcode_ptr_type).name("retval");
+%jit_context<retval> := $retval;
+
+
+# Create default return.
+$builder.set_position($leave);
+$builder.ret(
+    $builder.load($retval)
+);
+
+
+
+$module.dump();
+#$module.verify(LLVM::VERIFYER_FAILURE_ACTION::PRINT_MESSAGE);
 
 my $total := +$bc;
 my $i := 0;
 
-my $last_bb := $leave;
 # Enumerate ops and create BasicBlock for each.
 while ($i < $total) {
     # Mapped op
@@ -124,10 +160,10 @@ while ($i < $total) {
     my $op     := $oplib{$opname};
 
     say("# $opname");
-    $last_bb := $leave.insert_before("L$i");
-
+    my $bb := $leave.insert_before("L$i");
     %jit_context<basic_blocks>{$i} := hash(
         label => "L$i",
+        bb    => $bb,
     );
 
     # Next op
@@ -135,6 +171,12 @@ while ($i < $total) {
 }
 
 $module.dump();
+
+# Branch from "entry" BB to next one.
+$builder.set_position($entry);
+$builder.br($entry.next);
+
+$module.verify(LLVM::VERIFYER_FAILURE_ACTION::PRINT_MESSAGE);
 
 # "JIT" Sub
 $i := 0;
