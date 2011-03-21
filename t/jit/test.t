@@ -69,6 +69,8 @@ ok( %jit_context, "jit_context" );
 my $module  := LLVM::Module.create("foo");
 my $builder := LLVM::Builder.create();
 
+%jit_context<builder> := $builder;
+
 my $vtable_struct := LLVM::Type::VTABLE();
 $module.add_type_name("struct.VTABLE", $vtable_struct);
 ok( 1, "VTABLE" );
@@ -110,6 +112,7 @@ my $jitted_sub := $module.add_function(
 my $entry := $jitted_sub.append_basic_block("entry");
 # Create explicit return
 my $leave := $jitted_sub.append_basic_block("leave");
+%jit_context<leave> := $leave;
 
 # TODO Handle args.
 $builder.set_position($entry);
@@ -130,8 +133,12 @@ my $interp_addr := $builder.store(
 );
 %jit_context<interp_addr> := $interp_addr;
 
+# Few helper values
 my $retval := $builder.alloca($opcode_ptr_type).name("retval");
 %jit_context<retval> := $retval;
+
+my $cur_ctx := $builder.alloca(LLVM::Type::pointer(LLVM::Type::PMC())).name("CUR_CTX");
+%jit_context<cur_ctx> := $cur_ctx;
 
 
 # Create default return.
@@ -142,7 +149,7 @@ $builder.ret(
 
 
 
-$module.dump();
+#$module.dump();
 #$module.verify(LLVM::VERIFYER_FAILURE_ACTION::PRINT_MESSAGE);
 
 my $total := +$bc;
@@ -170,13 +177,13 @@ while ($i < $total) {
     $i := $i + 1 + count_args($op, %jit_context);
 }
 
-$module.dump();
+#$module.dump();
 
 # Branch from "entry" BB to next one.
 $builder.set_position($entry);
 $builder.br($entry.next);
 
-$module.verify(LLVM::VERIFYER_FAILURE_ACTION::PRINT_MESSAGE);
+#$module.verify(LLVM::VERIFYER_FAILURE_ACTION::PRINT_MESSAGE);
 
 # "JIT" Sub
 $i := 0;
@@ -192,17 +199,24 @@ while ($i < $total) {
     # Op itself
     say("# $i $opname");
 
+    # Position Builder to previousely created BB.
+    $builder.set_position(%jit_context<basic_blocks>{$i}<bb>);
+
     #_dumper(%parsed_op{ $opname });
     my $parsed_op := %parsed_op{ $opname };
     my $jitted_op := $parsed_op.source( %jit_context );
 
-    %jit_context<basic_blocks>{$i}<body> := $jitted_op;
+    #%jit_context<basic_blocks>{$i}<body> := $jitted_op;
     #say($jitted_op);
 
     # Next op
     $i := $i + 1 + count_args($op, %jit_context);
     %jit_context<cur_opcode> := $i;
 }
+
+$module.dump();
+$module.verify(LLVM::VERIFYER_FAILURE_ACTION::PRINT_MESSAGE);
+ok( 1, "Module verified");
 
 # Dump
 for %jit_context<basic_blocks>.keys.sort -> $id {
