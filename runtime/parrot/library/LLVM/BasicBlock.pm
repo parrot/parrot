@@ -5,6 +5,12 @@ class LLVM::BasicBlock is LLVM::Value {
         );
     }
 
+    method prev () {
+        LLVM::BasicBlock.create(
+            LLVM::call("GetPreviousBasicBlock", self)
+        );
+    }
+
 
     method insert_before($name) {
         LLVM::BasicBlock.create(
