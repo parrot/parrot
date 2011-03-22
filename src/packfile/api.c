@@ -4435,7 +4435,7 @@ again:
             return NULL;
         }
 
-        program_code = (char *)mmap(0, (size_t)program_size,
+        program_code = (char *)mmap(NULL, (size_t)program_size,
                         PROT_READ, MAP_SHARED, io, (off_t)0);
 
         if (program_code == (void *)MAP_FAILED) {
