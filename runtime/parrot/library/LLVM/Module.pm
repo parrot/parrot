@@ -30,6 +30,19 @@ class LLVM::Module is LLVM::Opaque {
         );
     }
 
+    method first_function() {
+        LLVM::Function.create(
+            LLVM::call("GetFirstFunction", self)
+        );
+    }
+
+    method last_function() {
+        LLVM::Function.create(
+            LLVM::call("GetLastFunction", self)
+        );
+    }
+
+
 #/** See Module::addTypeName. */
     # LLVMAddTypeName => "Iptp",
     method add_type_name(Str $name, $type) {
