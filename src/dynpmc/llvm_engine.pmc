@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <llvm-c/Core.h>
 #include <llvm-c/ExecutionEngine.h>
+#include <llvm-c/BitReader.h>
 
 pmclass LLVM_Engine dynpmc group llvm auto_attrs {
     ATTR PMC *ptr;
@@ -32,5 +33,24 @@ pmclass LLVM_Engine dynpmc group llvm auto_attrs {
             );
         VTABLE_set_pointer_keyed_str(interp, ret, signature, f);
         RETURN(PMC* ret);
+    }
+
+    METHOD load_module(STRING *path) {
+        char *err;
+        LLVMMemoryBufferRef buf;
+        LLVMModuleRef module;
+        PMC *ptr =  Parrot_pmc_new(INTERP, enum_class_Ptr);
+        const char *cpath = Parrot_str_to_cstring(INTERP, path);
+
+
+        if (LLVMCreateMemoryBufferWithContentsOfFile(cpath, &buf, &err) != 0) {
+            fprintf(stderr, err);
+        };
+        if (LLVMGetBitcodeModule(buf, &module, &err) != 0) {
+            fprintf(stderr, err);
+        }
+        LLVMDisposeMemoryBuffer(buf);
+        VTABLE_set_pointer(INTERP, ptr, module);
+        RETURN(PMC* ptr);
     }
 };
