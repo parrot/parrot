@@ -62,7 +62,7 @@ class LLVM::Module is LLVM::Opaque {
 # BitReader
     # from file
     method read(Str $path){
-        my $engine := pir::new__psp("LLVM_Engine", self);
+        my $engine := pir::new("LLVM_Engine");
         my $module := $engine.load_module($path);
         self.wrap($module);
     }
