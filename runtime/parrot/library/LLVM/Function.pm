@@ -60,6 +60,15 @@ class LLVM::Function is LLVM::Value {
     =item *
     SetParamAlignment => "vpi",
 
+    =item *
+    GetReturnType => "pp",
+
+    method return_type() {
+        LLVM::Type.create(
+            LLVM::call("GetReturnType", self)
+        );
+    }
+
     method next() {
         LLVM::Function.create(
             LLVM::call("GetNextFunction", self)
