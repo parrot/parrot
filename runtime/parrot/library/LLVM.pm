@@ -921,6 +921,12 @@ typedef enum {
 # for debugging. */
             VerifyFunction => "ipi",
 
+####### BitWriter.h
+            WriteBitcodeToFile => "ipt", 
+####### BitReader.h
+            GetBitcodeModule =>  "vPpB",
+####### Core.h
+            LLVMCreateMemoryBufferWithContentsOfFile => "vPB",
         );
 
         for %funcs.kv -> $name, $signature {
