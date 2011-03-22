@@ -18,7 +18,7 @@ class LLVM::BasicBlock is LLVM::Value {
     }
 
     method as_value() {
-        LLVM::BasicBlock.create(
+        LLVM::Value.create(
             LLVM::call("BasicBlockAsValue", self)
         );
     }
