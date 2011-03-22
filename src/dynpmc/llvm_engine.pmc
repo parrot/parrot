@@ -8,14 +8,25 @@
 pmclass LLVM_Engine dynpmc group llvm auto_attrs {
     ATTR PMC *ptr;
 
+    VTABLE void class_init() {
+        LLVMInitializeNativeTarget();
+        LLVMLinkInJIT();
+    }
+
+    VTABLE void init() {
+        /* Do nothing */
+    }
+
     VTABLE void init_pmc(PMC *module) {
         PMC *ptr;
         LLVMExecutionEngineRef engine;
+        LLVMCreateJITCompilerForModule(
+                &engine,
+                (LLVMModuleRef)VTABLE_get_pointer(INTERP, module),
+                0,
+                NULL
+        );
 
-        LLVMInitializeNativeTarget();
-        LLVMLinkInJIT();
-
-        LLVMCreateJITCompilerForModule(&engine, VTABLE_get_pointer(INTERP, module), 0, NULL);
         ptr = Parrot_pmc_new(INTERP, enum_class_Ptr);
         VTABLE_set_pointer(INTERP, ptr, engine);
         SET_ATTR_ptr(INTERP, SELF, ptr);
@@ -49,6 +60,8 @@ pmclass LLVM_Engine dynpmc group llvm auto_attrs {
         if (LLVMGetBitcodeModule(buf, &module, &err) != 0) {
             fprintf(stderr, err);
         }
+
+        Parrot_str_free_cstring(cpath);
         LLVMDisposeMemoryBuffer(buf);
         VTABLE_set_pointer(INTERP, ptr, module);
         RETURN(PMC* ptr);
