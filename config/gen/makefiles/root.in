@@ -62,6 +62,7 @@ INC_DIR         = include/parrot
 
 # directory with Parrot modules
 LIBRARY_DIR     = runtime/parrot/library
+LLVM_LIBRARY_DIR     = runtime/parrot/library/LLVM
 
 ###############################################################################
 #
@@ -346,8 +347,18 @@ FLUID_FILES_2 = \
     $(LIBRARY_DIR)/ProfTest/Want.pbc \
     $(LIBRARY_DIR)/YAML/Tiny.pbc \
     $(LIBRARY_DIR)/LLVM.pbc \
+    $(LIBRARY_DIR)/LLVM.pir \
+    $(LLVM_LIBRARY_DIR)/BasicBlock.pir \
+    $(LLVM_LIBRARY_DIR)/Builder.pir \
+    $(LLVM_LIBRARY_DIR)/Constant.pir \
+    $(LLVM_LIBRARY_DIR)/Context.pir \
+    $(LLVM_LIBRARY_DIR)/Function.pir \
+    $(LLVM_LIBRARY_DIR)/Module.pir \
+    $(LLVM_LIBRARY_DIR)/Opaque.pir \
+    $(LLVM_LIBRARY_DIR)/PassManager.pir \
+    $(LLVM_LIBRARY_DIR)/Type.pir \
+    $(LLVM_LIBRARY_DIR)/Value.pir \
     runtime/parrot/include/parrotlib.pbc
-
 
 ###############################################################################
 #

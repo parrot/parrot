@@ -267,6 +267,8 @@
 /runtime/parrot/library/Digest/*.pbc
 /runtime/parrot/library/Getopt/Obj.pbc
 /runtime/parrot/library/HTTP/*.pbc
+/runtime/parrot/library/LLVM.pir
+/runtime/parrot/library/LLVM/*.pir
 /runtime/parrot/library/LWP/*.pbc
 /runtime/parrot/library/MIME/*.pbc
 /runtime/parrot/library/Math/*.pbc
