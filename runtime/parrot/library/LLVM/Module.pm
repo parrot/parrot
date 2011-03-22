@@ -1,7 +1,7 @@
 #! nqp
-=begin Description
-LLVM Module.
-=end Description
+#=begin Description
+#LLVM Module.
+#=end Description
 
 
 class LLVM::Module is LLVM::Opaque {
@@ -30,6 +30,19 @@ class LLVM::Module is LLVM::Opaque {
         );
     }
 
+    method first_function() {
+        LLVM::Function.create(
+            LLVM::call("GetFirstFunction", self)
+        );
+    }
+
+    method last_function() {
+        LLVM::Function.create(
+            LLVM::call("GetLastFunction", self)
+        );
+    }
+
+
 #/** See Module::addTypeName. */
     # LLVMAddTypeName => "Iptp",
     method add_type_name(Str $name, $type) {
@@ -45,6 +58,25 @@ class LLVM::Module is LLVM::Opaque {
     method get_type_name(Str $name) {
         LLVM::call("GetTypeByName", self, $name);
     }
+
+# BitReader
+    # from file
+    method read(Str $path){
+        my $engine := pir::new("LLVM_Engine");
+        my $module := $engine.load_module($path);
+        self.wrap($module);
+    }
+
+    # from STDIN
+    #multi method read(){
+    #}
+
+# BitWriter
+    # to path
+    method write(Str $path){
+        LLVM::call("WriteBitcodeToFile", self, $path);
+    }
+
 };
 
 # vim: ft=perl6

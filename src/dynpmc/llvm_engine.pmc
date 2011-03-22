@@ -3,18 +3,30 @@
 #include <limits.h>
 #include <llvm-c/Core.h>
 #include <llvm-c/ExecutionEngine.h>
+#include <llvm-c/BitReader.h>
 
 pmclass LLVM_Engine dynpmc group llvm auto_attrs {
     ATTR PMC *ptr;
 
-    VTABLE void init_pmc(PMC *module) {
-        PMC *ptr;
-        LLVMExecutionEngineRef engine; 
-
+    VTABLE void class_init() {
         LLVMInitializeNativeTarget();
         LLVMLinkInJIT();
+    }
 
-        LLVMCreateJITCompilerForModule(&engine, VTABLE_get_pointer(INTERP, module), 0, NULL);
+    VTABLE void init() {
+        /* Do nothing */
+    }
+
+    VTABLE void init_pmc(PMC *module) {
+        PMC *ptr;
+        LLVMExecutionEngineRef engine;
+        LLVMCreateJITCompilerForModule(
+                &engine,
+                (LLVMModuleRef)VTABLE_get_pointer(INTERP, module),
+                0,
+                NULL
+        );
+
         ptr = Parrot_pmc_new(INTERP, enum_class_Ptr);
         VTABLE_set_pointer(INTERP, ptr, engine);
         SET_ATTR_ptr(INTERP, SELF, ptr);
@@ -32,5 +44,43 @@ pmclass LLVM_Engine dynpmc group llvm auto_attrs {
             );
         VTABLE_set_pointer_keyed_str(interp, ret, signature, f);
         RETURN(PMC* ret);
+    }
+
+    METHOD load_module(STRING *path) {
+        char               *err = NULL;
+        LLVMMemoryBufferRef buf;
+        LLVMModuleRef       module;
+        PMC                *ptr         = Parrot_pmc_new(INTERP, enum_class_Ptr);
+        char               *cpath       = Parrot_str_to_cstring(INTERP, path);
+        PMC                *exception   = PMCNULL;
+
+        if (LLVMCreateMemoryBufferWithContentsOfFile(cpath, &buf, &err) != 0) {
+            exception = Parrot_ex_build_exception(
+                INTERP, EXCEPT_error, EXCEPTION_EXTERNAL_ERROR,
+                Parrot_str_from_platform_cstring(INTERP, err)
+            );
+            goto cleanup;
+        };
+
+        if (LLVMParseBitcode(buf, &module, &err) != 0) {
+            exception = Parrot_ex_build_exception(
+                INTERP, EXCEPT_error, EXCEPTION_EXTERNAL_ERROR,
+                Parrot_str_from_platform_cstring(INTERP, err)
+            );
+            goto cleanup;
+        }
+
+        VTABLE_set_pointer(INTERP, ptr, module);
+
+      cleanup:
+        Parrot_str_free_cstring(cpath);
+        LLVMDisposeMemoryBuffer(buf);
+        if (err)
+            LLVMDisposeMessage(err);
+
+        if (!PMC_IS_NULL(exception))
+            Parrot_ex_throw_from_c(INTERP, exception);
+
+        RETURN(PMC* ptr);
     }
 };

@@ -60,6 +60,17 @@ class LLVM::Function is LLVM::Value {
     =item *
     SetParamAlignment => "vpi",
 
+    method next() {
+        LLVM::Function.create(
+            LLVM::call("GetNextFunction", self)
+        );
+    }
+
+    method prev() {
+        LLVM::Function.create(
+            LLVM::call("GetPreviousFunction", self)
+        );
+    }
 };
 
 # vim: ft=perl6

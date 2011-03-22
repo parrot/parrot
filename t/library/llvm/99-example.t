@@ -144,6 +144,27 @@ $call   := $engine.create_call($f2, "tt");
 $res    := $call("Hello from Parrot!\n");
 is($res, "Hello from Parrot!\n", "Got same string back in optimized build");
 
+$module.write("/tmp/parrot-llvm.bit");
+ok(1, "Module serialized");
+
+my $module1 := LLVM::Module.create("HELLO_resurected");
+$module1.read("/tmp/parrot-llvm.bit");
+
+ok($module1, "Module loaded from file");
+
+#$module1.verify(LLVM::VERIFYER_FAILURE_ACTION::PRINT_ERROR);
+
+my $function1 := $module1.last_function;
+ok($function1, "Last function found");
+
+my $engine1 := pir::new__psp("LLVM_Engine", $module1);
+ok(1, "Engine created");
+
+my $call1   := $engine.create_call($function1, "i");
+my $res1    := -1;
+$res1       := $call("resurected\n");
+ok(1, "Function called");
+is($res1, "resurected\n", "Proper answer found");
 
 done_testing();
 
