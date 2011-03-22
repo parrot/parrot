@@ -51,13 +51,14 @@ pmclass LLVM_Engine dynpmc group llvm auto_attrs {
         LLVMMemoryBufferRef buf;
         LLVMModuleRef module;
         PMC *ptr =  Parrot_pmc_new(INTERP, enum_class_Ptr);
-        const char *cpath = Parrot_str_to_cstring(INTERP, path);
+        char *cpath = Parrot_str_to_cstring(INTERP, path);
 
 
         if (LLVMCreateMemoryBufferWithContentsOfFile(cpath, &buf, &err) != 0) {
             fprintf(stderr, err);
         };
-        if (LLVMGetBitcodeModule(buf, &module, &err) != 0) {
+
+        if (LLVMParseBitcode(buf, &module, &err) != 0) {
             fprintf(stderr, err);
         }
 
