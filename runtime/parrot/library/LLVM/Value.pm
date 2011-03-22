@@ -1,7 +1,7 @@
 class LLVM::Value is LLVM::Opaque {
     method typeof() {
         LLVM::Type.create(
-            LLVM::Call("TypeOf", self)
+            LLVM::call("TypeOf", self)
         );
     }
 
@@ -11,6 +11,7 @@ class LLVM::Value is LLVM::Opaque {
 
     multi method name($name) {
         LLVM::call("SetValueName", self, $name);
+        self;
     }
 
     method dump() {

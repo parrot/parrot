@@ -1,4 +1,4 @@
-class LLVM::Type is LLVM::Opaque {
+class LLVM::Type is LLVM::Value {
 
     multi sub int1()      { LLVM::Type.create(LLVM::call("Int1Type", )) }
     multi sub int8()      { LLVM::Type.create(LLVM::call("Int8Type", )) }
@@ -13,12 +13,27 @@ class LLVM::Type is LLVM::Opaque {
     sub fp128()    { LLVM::Type.create(LLVM::call("FP128Type")) }
     sub ppcfp128() { LLVM::Type.create(LLVM::call("PPCFP128Type")) }
 
-    sub struct(*@parts, :$packed?) {
-        LLVM::Type.create(LLVM::call("StructType", LLVM::to_array(@parts), +@parts, $packed));
+    sub function(LLVM::Type $return, *@args, :$va_args?) {
+        LLVM::Type.create(
+            LLVM::call("FunctionType",
+                $return,                        # return
+                LLVM::to_array(@args),          # parameters
+                +@args,                         # number of parameters
+                +$va_args,                      # is var args
+            )
+        )
     }
 
-    sub pointer($type, :$address_space?) {
-        LLVM::Type.create(LLVM::call("PointerType", $type, $address_space));
+    sub struct(*@parts, :$packed?) {
+        LLVM::Type.create(
+            LLVM::call("StructType", LLVM::to_array(@parts), +@parts, $packed)
+        );
+    }
+
+    sub pointer(LLVM::Type $type, :$address_space?) {
+        LLVM::Type.create(
+            LLVM::call("PointerType", $type, $address_space)
+        );
     }
 
     sub void() { LLVM::Type.create(LLVM::call("VoidType", )) };
@@ -66,12 +81,16 @@ class LLVM::Type is LLVM::Opaque {
         my $pmc_forward := opaque();
         my $pmc := struct(
             UINTVAL(),              # Parrot_UInt    flags;
-            pointer(opaque()),      # VTABLE         *vtable;
-            pointer(void()),        # DPOINTER       *data;
-            pointer($pmc_forward)   # PMC            *_metadata;
+            pointer(VTABLE()),      # VTABLE         *vtable;
+            pointer(int8()),        # DPOINTER       *data;
+            pointer($pmc_forward),  # PMC            *_metadata;
         );
         $pmc_forward.refine_to($pmc);
         $pmc;
+    }
+
+    sub VTABLE () {
+        struct();
     }
 
 };

@@ -34,6 +34,23 @@ my $ptr := LLVM::Type::pointer(LLVM::Type::int8());
 ok( $ptr, "i8* created");
 ok( $type ~~ LLVM::Type, ".. with proper class");
 
+# FunctionType
+# void foo()
+$type := LLVM::Type::function(LLVM::Type::void());
+ok( $type ~~ LLVM::Type, "void (*)()");
+
+# int foo(...)
+$type := LLVM::Type::function(LLVM::Type::int8(), :va_args<1>);
+ok( $type ~~ LLVM::Type, "int (*)(...)");
+
+# int foo(int, i8*, ...)
+$type := LLVM::Type::function(
+    LLVM::Type::int8(),
+    LLVM::Type::int8(), LLVM::Type::cstring(),
+    :va_args<1>
+);
+ok( $type ~~ LLVM::Type, "int (*)(int, char*, ...)");
+
 # TODO Add tests for floats
 
 # Refine

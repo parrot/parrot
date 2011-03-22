@@ -23,14 +23,11 @@ class LLVM::Module is LLVM::Opaque {
     }
 
     method add_function ($name, $return, *@args, :$va_args?) {
-        my $type := LLVM::call("FunctionType", 
-            $return,                        # return
-            LLVM::to_array(@args),          # parameters
-            +@args,                         # number of parameters
-            +$va_args,                      # is var args
+        LLVM::Function.create(
+            LLVM::call("AddFunction", self, $name,
+                LLVM::Type::function($return, |@args, :va_args($va_args))
+            )
         );
-
-        LLVM::Function.create(LLVM::call("AddFunction", self, $name, $type));
     }
 
 #/** See Module::addTypeName. */
