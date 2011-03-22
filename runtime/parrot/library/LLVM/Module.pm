@@ -30,6 +30,12 @@ class LLVM::Module is LLVM::Opaque {
         );
     }
 
+    method find_function(Str $name) {
+        LLVM::Function.create(
+            LLVM::call("GetNamedFunction", self, $name)
+        )
+    }
+
     method first_function() {
         LLVM::Function.create(
             LLVM::call("GetFirstFunction", self)

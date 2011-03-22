@@ -24,6 +24,8 @@ ok( $lf, "Last function fetched" );
 ok( $ff.next() ~~ $lf, "first.next == last" );
 ok( $lf.prev() ~~ $ff, "last.prev == first" );
 
+my $hello := $module.find_function("hello");
+ok( $hello ~~ $f1, "Function found by name" );
 
 # Types
 my $type_name := "struct.FOO";
