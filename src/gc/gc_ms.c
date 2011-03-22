@@ -53,11 +53,12 @@ static void gc_ms_add_free_object(PARROT_INTERP,
         FUNC_MODIFIES(*pool);
 
 static void gc_ms_alloc_objects(PARROT_INTERP,
-    ARGIN(Memory_Pools *mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*pool);
 
 PARROT_CANNOT_RETURN_NULL
@@ -1649,9 +1650,7 @@ objects to the pool's free list for later allocation.
 */
 
 static void
-gc_ms_alloc_objects(PARROT_INTERP,
-        ARGIN(Memory_Pools *mem_pools),
-        ARGMOD(Fixed_Size_Pool *pool))
+gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools), ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_alloc_objects)
     /* Setup memory for the new objects */
