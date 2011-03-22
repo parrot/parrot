@@ -11,10 +11,28 @@ class LLVM::BasicBlock is LLVM::Value {
         );
     }
 
+    method parent () {
+        LLVM::BasicBlock.create(
+            LLVM::call("GetBasicBlockParent", self)
+        );
+    }
+
+    method as_value() {
+        LLVM::BasicBlock.create(
+            LLVM::call("BasicBlockAsValue", self)
+        );
+    }
+
 
     method insert_before($name) {
         LLVM::BasicBlock.create(
             LLVM::call("InsertBasicBlock", self, $name)
+        );
+    }
+
+    method delete() {
+        LLVM::BasicBlock.create(
+            LLVM::call("DeleteBasicBlock", self)
         );
     }
 };
