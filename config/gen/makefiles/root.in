@@ -67,6 +67,7 @@ RUN_INC_DIR     = runtime/parrot/include
 
 # directories with Parrot modules
 LIBRARY_DIR     = runtime/parrot/library
+LLVM_LIBRARY_DIR     = runtime/parrot/library/LLVM
 
 # directories for frontend
 FR_DIR          = frontend
@@ -355,6 +356,17 @@ FLUID_FILES_2 = \
 	$(LIBRARY_DIR)/ProfTest/Want.pbc \
 	$(LIBRARY_DIR)/YAML/Tiny.pbc \
 	$(LIBRARY_DIR)/LLVM.pbc \
+	$(LIBRARY_DIR)/LLVM.pir \
+	$(LLVM_LIBRARY_DIR)/BasicBlock.pir \
+	$(LLVM_LIBRARY_DIR)/Builder.pir \
+	$(LLVM_LIBRARY_DIR)/Constant.pir \
+	$(LLVM_LIBRARY_DIR)/Context.pir \
+	$(LLVM_LIBRARY_DIR)/Function.pir \
+	$(LLVM_LIBRARY_DIR)/Module.pir \
+	$(LLVM_LIBRARY_DIR)/Opaque.pir \
+	$(LLVM_LIBRARY_DIR)/PassManager.pir \
+	$(LLVM_LIBRARY_DIR)/Type.pir \
+	$(LLVM_LIBRARY_DIR)/Value.pir \
 	$(RUN_INC_DIR)/parrotlib.pbc \
 	$(FRPTWO_DIR)/prt0.pbc*
 
