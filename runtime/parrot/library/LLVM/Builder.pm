@@ -73,9 +73,8 @@ class LLVM::Builder is LLVM::Opaque {
 
 #            LLVMBuildAggregateRet           => "ppp3",
     method aggregate_ret(LLVM::Value *@vals) {
-        my $vals_llvm := LLVM::to_array(@vals);
         LLVM::Value.create(
-            LLVM::call("BuildAggregateRet", self, $vals_llvm, +@vals)
+            LLVM::call("BuildAggregateRet", self, LLVM::to_array(@vals), +@vals)
         );
     }
 
@@ -102,9 +101,8 @@ class LLVM::Builder is LLVM::Opaque {
 
 #            LLVMBuildInvoke                 => "ppppippt",
     method invoke(LLVM::Function $func, *@args, LLVM::BasicBlock $then, LLVM::BasicBlock $catch, Str :$name?) {
-        my $args_llvm := LLVM::to_array(@args);
         LLVM::Value.create(
-            LLVM::call("BuildInvoke", self, $func, $args_llvm, +@args, $then, $catch, $name)
+            LLVM::call("BuildInvoke", self, $func, LLVM::to_array(@args), +@args, $then, $catch, $name)
         );
     }
 
@@ -195,9 +193,8 @@ class LLVM::Builder is LLVM::Opaque {
 
 #            LLVMBuildGEP                => "ppppit",
     method gep(LLVM::Type $type, *@indices, Str :$name?) {
-        my $args := LLVM::to_array(@indices);
         LLVM::Value.create(
-            LLVM::call("BuildGEP", self, $type, $args, +@indices, $name // "")
+            LLVM::call("BuildGEP", self, $type, LLVM::to_array(@indices), +@indices, $name // "")
         );
     }
 
@@ -210,9 +207,8 @@ class LLVM::Builder is LLVM::Opaque {
 
 #            LLVMBuildInBoundsGEP        => "ppppit",
     method inbounds_gep(LLVM::Type $type, *@indices, :$name?) {
-        my $args := LLVM::to_array(@indices);
         LLVM::Value.create(
-            LLVM::call("BuildInBoundsGEP", self, $type, $args, +@indices, $name // "")
+            LLVM::call("BuildInBoundsGEP", self, $type, LLVM::to_array(@indices), +@indices, $name // "")
         );
     }
 
