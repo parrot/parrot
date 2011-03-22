@@ -9,7 +9,7 @@ pmclass LLVM_Engine dynpmc group llvm auto_attrs {
 
     VTABLE void init_pmc(PMC *module) {
         PMC *ptr;
-        LLVMExecutionEngineRef engine; 
+        LLVMExecutionEngineRef engine;
 
         LLVMInitializeNativeTarget();
         LLVMLinkInJIT();
