@@ -47,24 +47,40 @@ pmclass LLVM_Engine dynpmc group llvm auto_attrs {
     }
 
     METHOD load_module(STRING *path) {
-        char *err;
+        char               *err = NULL;
         LLVMMemoryBufferRef buf;
-        LLVMModuleRef module;
-        PMC *ptr =  Parrot_pmc_new(INTERP, enum_class_Ptr);
-        char *cpath = Parrot_str_to_cstring(INTERP, path);
-
+        LLVMModuleRef       module;
+        PMC                *ptr         = Parrot_pmc_new(INTERP, enum_class_Ptr);
+        char               *cpath       = Parrot_str_to_cstring(INTERP, path);
+        PMC                *exception   = PMCNULL;
 
         if (LLVMCreateMemoryBufferWithContentsOfFile(cpath, &buf, &err) != 0) {
-            fprintf(stderr, err);
+            exception = Parrot_ex_build_exception(
+                INTERP, EXCEPT_error, EXCEPTION_EXTERNAL_ERROR,
+                Parrot_str_from_platform_cstring(INTERP, err)
+            );
+            goto cleanup;
         };
 
         if (LLVMParseBitcode(buf, &module, &err) != 0) {
-            fprintf(stderr, err);
+            exception = Parrot_ex_build_exception(
+                INTERP, EXCEPT_error, EXCEPTION_EXTERNAL_ERROR,
+                Parrot_str_from_platform_cstring(INTERP, err)
+            );
+            goto cleanup;
         }
 
+        VTABLE_set_pointer(INTERP, ptr, module);
+
+      cleanup:
         Parrot_str_free_cstring(cpath);
         LLVMDisposeMemoryBuffer(buf);
-        VTABLE_set_pointer(INTERP, ptr, module);
+        if (err)
+            LLVMDisposeMessage(err);
+
+        if (!PMC_IS_NULL(exception))
+            Parrot_ex_throw_from_c(INTERP, exception);
+
         RETURN(PMC* ptr);
     }
 };
