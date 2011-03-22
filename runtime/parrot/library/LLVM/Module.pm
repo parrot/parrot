@@ -45,18 +45,21 @@ class LLVM::Module is LLVM::Opaque {
 
 #/** See Module::addTypeName. */
     # LLVMAddTypeName => "Iptp",
-    method add_type_name(Str $name, $type) {
-        LLVM::call("AddTypeName", self, $name, $type);
+    method add_type(Str $name, LLVM::Type $type) {
+        # Reverse response.
+        !LLVM::call("AddTypeName", self, $name, $type);
     }
 
     # LLVMDeleteTypeName => "vpt",
-    method delete_type_name(Str $name) {
+    method delete_type(Str $name) {
         LLVM::call("DeleteTypeName", self, $name);
     }
 
     # LLVMGetTypeByName => "ppt",
-    method get_type_name(Str $name) {
-        LLVM::call("GetTypeByName", self, $name);
+    method get_type(Str $name) {
+        LLVM::Type.create(
+            LLVM::call("GetTypeByName", self, $name)
+        )
     }
 
 # BitReader

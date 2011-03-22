@@ -25,6 +25,27 @@ ok( $ff.next() ~~ $lf, "first.next == last" );
 ok( $lf.prev() ~~ $ff, "last.prev == first" );
 
 
+# Types
+my $type_name := "struct.FOO";
+my $added := $module.add_type($type_name, LLVM::Type::struct());
+ok( $added, "Type added" );
+
+$added := $module.add_type($type_name, LLVM::Type::struct());
+nok( $added, "Duplicated type not added" );
+
+my $type := $module.get_type($type_name);
+ok( $type, "Type found" );
+ok( $type ~~ LLVM::Type, ".. with proper type");
+
+
+$module.delete_type($type_name);
+ok( 1, "Type deleted" );
+
+$type := $module.get_type($type_name);
+ok( !$type, "Deleted type not found" );
+
+
+
 done_testing();
 
 # vim: ft=perl6
