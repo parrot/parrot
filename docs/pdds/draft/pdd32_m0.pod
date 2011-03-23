@@ -134,9 +134,9 @@ the op set is complete, we will look at how a representative selection of PIR's
 existing core ops and the dynops used by HLLs could be reimplemented in terms
 of M0 ops.
 
-=over
+=head3 Math/numeric ops (10 ops)
 
-=item * print  - prints a string to a file handle
+=over
 
 =item * add_i - add two integer registers
 
@@ -146,17 +146,25 @@ of M0 ops.
 
 =item * mult_n - multiply two numeric registers
 
-=item * set  - sets a register to a value (type-ignorant)
+=item * int2num - coerce integer to numeric
+
+=item * num2int - coerce numeric to integer
+
+=item * shr - right circular bitshift
+
+=item * shl - leftward circular bitshift
 
 =item * cmp_i - integer comparison
 
 =item * cmp_n - numeric comparison
 
-=item * alloc - allocate memory
+=back
 
-=item * free - free memory
+=head3 Memory ops (4 ops)
 
-=item * exit - exit with the given status
+=over
+
+=item * set  - sets a register to a value (type-ignorant)
 
 =item * memset - set a region of memory to a value stored in a register
 
@@ -164,13 +172,39 @@ of M0 ops.
 
 =item * get_var - point a register at the first byte of a variable on the variables table
 
-=item * shr - right circular bitshift
+=back
 
-=item * shl - leftward circular bitshift
+=head3 FFI ops (7 ops)
 
-=item * int2num - coerce integer to numeric
+=over
 
-=item * num2int - coerce numeric to integer
+=item * new_fnh - allocate a function handle
+
+=item * free_fnh - destroy a function handle
+
+=item * dlopen - open a library handle
+
+=item * dlsym - look up a function by name
+
+=item * set_arg - set an argument on a function handle
+
+=item * set_ret - set a return value on a function handle
+
+=item * ccall - invoke a function handle
+
+=back
+
+=head3 Temporary ops (4 ops)
+
+=over
+
+=item * print  - prints a string to a file handle
+
+=item * alloc - allocate memory (go through ffi)
+
+=item * free - free memory (go through ffi)
+
+=item * exit - exit with the given status (go through ffi)
 
 =back
 
