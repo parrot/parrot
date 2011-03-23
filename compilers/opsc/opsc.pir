@@ -17,6 +17,8 @@
 .include 'compilers/opsc/gen/Ops/File.pir'
 .include 'compilers/opsc/gen/Ops/Renumberer.pir'
 
+.include 'compilers/opsc/lasm.pir'
+
 
 .namespace []
 .sub 'main' :main

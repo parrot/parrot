@@ -1,4 +1,4 @@
-$(LIBRARY_DIR)/opsc.pbc: $(NQP_RX) $(OPSC_SOURCES) $(NQPRX_LIB_SETTING)
+$(LIBRARY_DIR)/opsc.pbc: $(NQP_RX) $(OPSC_SOURCES) $(NQPRX_LIB_SETTING) $(OPSC_DIR)/lasm.pir
 	$(PARROT) -o $(LIBRARY_DIR)/opsc.pbc $(OPSC_DIR)/opsc.pir
 
 $(OPSC_DIR)/gen/Ops/Compiler.pir: $(OPSC_DIR)/src/Ops/Compiler.pm $(NQP_RX)
@@ -31,6 +31,11 @@ $(OPSC_DIR)/gen/Ops/Trans/C.pir: $(OPSC_DIR)/src/Ops/Trans/C.pm $(NQP_RX)
 $(OPSC_DIR)/gen/Ops/Renumberer.pir: $(OPSC_DIR)/src/Ops/Renumberer.pm $(NQP_RX)
 	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Renumberer.pm
 
+
+$(OPSC_DIR)/lasm.pir: $(OPSC_DIR)/lasm.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/lasm.nqp
+
+
 # Target to force rebuild opsc from main Makefile
 $(OPSC_DIR)/ops2c.nqp: $(LIBRARY_DIR)/opsc.pbc
 
@@ -38,6 +43,14 @@ $(OPS2C): $(OPSC_DIR)/ops2c.nqp $(LIBRARY_DIR)/opsc.pbc $(NQP_RX) $(PBC_TO_EXE)
 	$(NQP_RX) --target=pir $(OPSC_DIR)/ops2c.nqp >ops2c.pir
 	$(PARROT) -o ops2c.pbc ops2c.pir
 	$(PBC_TO_EXE) ops2c.pbc
+
+# Target to force rebuild opsc from main Makefile
+$(OPSC_DIR)/ops2lasm.nqp: $(LIBRARY_DIR)/opsc.pbc
+
+$(OPS2LASM): $(OPSC_DIR)/ops2lasm.nqp $(LIBRARY_DIR)/opsc.pbc $(NQP_RX) $(PBC_TO_EXE)
+	$(NQP_RX) --target=pir $(OPSC_DIR)/ops2lasm.nqp >ops2lasm.pir
+	$(PARROT) -o ops2lasm.pbc ops2lasm.pir
+	$(PBC_TO_EXE) ops2lasm.pbc
 
 $(INSTALLABLEOPS2C): $(OPS2C) src/install_config$(O)
 	$(PBC_TO_EXE) ops2c.pbc --install

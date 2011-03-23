@@ -530,6 +530,7 @@ NQP_RX              = .@slash@parrot-nqp$(EXE)
 NCI_THUNK_GEN       = .@slash@parrot_nci_thunk_gen$(EXE)
 PROVE               = .@slash@parrot-prove$(EXE)
 OPS2C               = .@slash@ops2c$(EXE)
+OPS2LASM            = .@slash@ops2lasm$(EXE)
 
 # Installable executables
 INSTALLABLEPARROT    = .@slash@installable_parrot$(EXE)
