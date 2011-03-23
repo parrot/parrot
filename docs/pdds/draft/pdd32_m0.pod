@@ -146,9 +146,7 @@ of M0 ops.
 
 =item * mult_n - multiply two numeric registers
 
-=item * set  - sets a register to a value
-
-=item * get  - gets the value of a register
+=item * set  - sets a register to a value (type-ignorant)
 
 =item * cmp_i - integer comparison
 
@@ -158,9 +156,13 @@ of M0 ops.
 
 =item * free - free memory
 
+=item * exit - exit with the given status
+
 =item * memset - set a region of memory to a value stored in a register
 
 =item * memget - get a region from memory and copy it into a register
+
+=item * get_var - point a register at the first byte of a variable on the variables table
 
 =item * shr - right circular bitshift
 
