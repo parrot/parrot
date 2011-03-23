@@ -146,9 +146,9 @@ of M0 ops.
 
 =item * mult_n - multiply two numeric registers
 
-=item * int2num - coerce integer to numeric
+=item * iton - coerce integer to numeric
 
-=item * num2int - coerce numeric to integer
+=item * ntoi - coerce numeric to integer
 
 =item * shr - right circular bitshift
 
@@ -174,21 +174,15 @@ of M0 ops.
 
 =back
 
-=head3 FFI ops (7 ops)
+=head3 FFI ops (4 ops)
 
 =over
 
-=item * new_fnh - allocate a function handle
+=item * csym - look up a function by name (use this to find Parrot_dlopen/Parrot_dlsym)
 
-=item * free_fnh - destroy a function handle
+=item * ccall_arg - set an argument for a ccall
 
-=item * dlopen - open a library handle
-
-=item * dlsym - look up a function by name
-
-=item * set_arg - set an argument on a function handle
-
-=item * set_ret - set a return value on a function handle
+=item * ccall_ret - get a return value from a ccall
 
 =item * ccall - invoke a function handle
 
@@ -244,9 +238,9 @@ hand; it's just fine if it's painful to do so for non-trivial use cases.
 
 =head2 Binary Representation
 
-proposal: M0's binary representation will be composed of a fixed header, a
-single directory segment and a bunch of segment triplets describing a chunk
-of bytecode:
+M0's binary representation will be composed of a fixed header, a single
+directory segment and a bunch of segment triplets describing a chunk of
+bytecode:
 
 =over 4
 
@@ -429,29 +423,14 @@ the C function through the generated.
 
 =over 4
 
-=item * new_fnh func_handle, arg_count
+=item * csym sym, "function_name"
 
-This allocates a new function handle which can deal with the specified number
-of arguments.  Its internals are implementation-specific.
+This op looks up the function pointer for C<function_name> in the C function
+namespace and puts the pointer into C<sym>.
 
-=item * free_fnh func_handle
+=item * set_arg arg_type, arg_src
 
-This op destroys an existing function handle.
-
-=item * dlopen lib, 'libfoo.so'
-
-This op calls the libc dlopen function and returns an opaque handle for the
-library.  This handle is used by C<dlfunc> to find a a function pointer.
-
-=item * dlfunc func_handle, lib, "function_name"
-
-This op looks up the function pointer for C<function_name> in the library for
-which C<lib> is a handle, and puts the pointer into the function handle
-C<func_handle>.
-
-=item * set_arg func_handle, arg_type, arg_src
-
-set_arg takes three arguments: a ffi function handle, an argument type and an
+set_arg takes tw arguments: a ffi function handle, an argument type and an
 argument source.  The function handle indicate which function is being operated
 on; its value and internals are implementation-dependent.  C<arg_type> is a
 constant indicating the type of the argument.  The values of this argument will
@@ -470,12 +449,19 @@ destination of the return value from the function invocation.
 ccall uses an existing function handle to call into a C function.
 
 example code for calling no arg, no ret function:
-    .local int lib, fnh
-    lib = dlopen lib, 'libhello.so'
-    fnh = new_fhn 0
-    dlfunc fnh, lib, "hello_func"
-    ccall fnh
-    free_fnh fnh
+    .local int lib, 
+    dlopen_fp = csym "Parrot_dlopen"
+    dlsym_fp  = csym "Parrot_dlsym"
+    set_arg FFI_POINTER, "libhello.so" #hand-waving
+    ccall dlopen_fp
+    set_ret FFI_POINTER, libhello
+
+    set_arg FFI_POINTER, "hello_func" #more hand-waving
+    ccall dlsym_fp
+    set_ret FFI_POINTER, hello_func
+
+    #no argument, no return value
+    ccall hello_func
 
 example code for calling 2 int32 arg, 1 int32 return
     .local int ret, arg0, arg1
