@@ -395,14 +395,25 @@ the C function through the generated.
 
 =over 4
 
-=item * func_handle = new_fnh arg_count
+=item * new_fnh func_handle, arg_count
 
 This allocates a new function handle which can deal with the specified number
 of arguments.  Its internals are implementation-specific.
 
-=item * free_fnh fhn
+=item * free_fnh func_handle
 
 This op destroys an existing function handle.
+
+=item * dlopen lib, 'libfoo.so'
+
+This op calls the libc dlopen function and returns an opaque handle for the
+library.  This handle is used by C<dlfunc> to find a a function pointer.
+
+=item * dlfunc func_handle, lib, "function_name"
+
+This op looks up the function pointer for C<function_name> in the library for
+which C<lib> is a handle, and puts the pointer into the function handle
+C<func_handle>.
 
 =item * set_arg func_handle, arg_type, arg_src
 
@@ -420,13 +431,13 @@ the approrpiate argument.
 set_ret is similar to set_arg, except that it always sets the type and
 destination of the return value from the function invocation.
 
-=item * ccall function_handle
+=item * ccall func_handle
 
 ccall uses an existing function handle to call into a C function.
 
 example code for calling no arg, no ret function:
     .local int lib, fnh
-    lib = dlopen 'libhello.so'
+    lib = dlopen lib, 'libhello.so'
     fnh = new_fhn 0
     dlfunc fnh, lib, "hello_func"
     ccall fnh
