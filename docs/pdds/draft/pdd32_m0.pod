@@ -393,104 +393,95 @@ they'll be the same thing under Lorito).
 
 =head3 FFI considerations
 
-M0's ffi should be amenable to interpretation, compilation to machine code
-(including jitting) and compilation to static C.  Where possible, M0's design
-should not impose any constraints that preclude efficient implementation of any
-of type of interpreter.  Part of this means avoiding the assumption that the
-basic mechanism of foreign function calls is a thunk.
-
-The proposed mechanism for abstracting ffi calls is a function handle.  This is
-an implementation-defined opaque data structure that can be populated through a
-common interface.  The interface allows an foreign function to be looked up,
-given arguments from M0 registers and invoked.
-
-The reason for this abstraction is that we expect M0 to be implemented in a
-variety of ways and need an abstraction that will make sense for both a
-JavaScript M0 implementation, a C-based interpreter that executes ops directly
-and a jitting compiler that emits native code.
+M0's FFI should be amenable to interpretation both by intperpreters implemented
+in C and high-level languages such as Python or Perl, to direct compilation to
+machine code, to jitting and to compilation to static C.  Where possible, M0's
+design should not impose any constraints that preclude efficient implementation
+of any of type of interpreter.
 
 =head3 Implementation
 
-M0's FFI will need to implement similar functionality to dlfunc and dlvar in
-the form of a minimal set of atoms which are sufficient to expose that
-functionality.
+M0's FFI will implement similar functionality to dlfunc and dlvar in the form
+of a minimal set of atoms which are sufficient to emulate that functionality.
 
-M0 will know enough about FFI to create a reusable handle that takes M0 values,
-sets up the C function call according to C calling conventions (Q: which ones?)
-and calls it.  M0 will have three ops to support this: set_arg and set_return
-to indicate which M0 registers are to be used in the call, and ccall to call
-the C function through the generated.
+M0 will know enough about FFI to build a static call frame and call a C
+function pointer according to C calling conventions.  M0 will have four ops to
+support this: C<csym>, C<ccall_arg>, C<ccall_ret> and C<ccall>.  These are
+documented below.
 
 =over 4
 
 =item * csym sym, "function_name"
 
-This op looks up the function pointer for C<function_name> in the C function
-namespace and puts the pointer into C<sym>.
+C<csym> looks up the function pointer for C<function_name> in the C function
+namespace and puts the pointer into the register C<sym>.
 
-=item * set_arg arg_type, arg_src
+=item * ccall_arg arg_type, arg_src
 
-set_arg takes tw arguments: a ffi function handle, an argument type and an
-argument source.  The function handle indicate which function is being operated
-on; its value and internals are implementation-dependent.  C<arg_type> is a
-constant indicating the type of the argument.  The values of this argument will
-be similar to those used by libffi
+C<set_arg> takes two arguments: an argument type and an argument source.
+C<arg_type> is a constant indicating the type of the argument.  The possible
+values of C<arg_type> will be similar to those used by libffi
 (https://github.com/atgreen/libffi/blob/master/doc/libffi.info ).  C<arg_src>
-indicates which M0 register should be used to populate or recieve the value of
-the approrpiate argument.
+indicates which M0 register should be used to populate the value of the
+current argument.
 
-=item * set_ret func_handle, arg_type, arg_dest
+=item * ccall_ret arg_type, arg_dest
 
-set_ret is similar to set_arg, except that it always sets the type and
-destination of the return value from the function invocation.
+C<ccall_ret> is similar to C<ccall_arg>, except that it copies the return value
+of the previously-called function into the register indicated by C<arg_dest>.
 
 =item * ccall func_handle
 
-ccall uses an existing function handle to call into a C function.
+C<ccall> uses an existing function pointer to call a C function.  It assumes
+that arguments have been set up correctly.  Hilarity and segfaults are likely
+to result from breaking this assumption.
 
 example code for calling no arg, no ret function:
-    .local int lib, 
     dlopen_fp = csym "Parrot_dlopen"
     dlsym_fp  = csym "Parrot_dlsym"
-    set_arg FFI_POINTER, "libhello.so" #hand-waving
+    ccall_arg FFI_POINTER, "libhello.so" #hand-waving
     ccall dlopen_fp
-    set_ret FFI_POINTER, libhello
+    ccall_ret FFI_POINTER, libhello
 
-    set_arg FFI_POINTER, "hello_func" #more hand-waving
+    ccall_arg FFI_POINTER, "hello_func" #more hand-waving
     ccall dlsym_fp
-    set_ret FFI_POINTER, hello_func
+    ccall_ret FFI_POINTER, hello_func
 
     #no argument, no return value
     ccall hello_func
 
 example code for calling 2 int32 arg, 1 int32 return
-    .local int ret, arg0, arg1
-    .local int lib, fnh
-    arg0 = 12
-    arg1 = 10
-    lib = dlopen "libmath.so"
-    fnh = new_fnh 3
-    dlfunc fnh, lib, "multiply_int32"
-    set_ret fnh, FFI_UINT32, ret
-    set_arg fnh, FFI_UINT32, arg0
-    set_arg fnh, FFI_UINT32, arg1
-    ccall fnh
-    say ret  # will print "120"
-    free_fnh fnh
+    #dlsym_fp is a pointer to Parrot_dlsym
+    #dlopen_fp is a pointeer to Parrot_dlopen
 
-example code for calling 2 int32 arg, 1 int32 return
-    .local int ret, arg0, arg1
-    .local int lib, fnh
+    ccall_arg FFI_POINTER, "libmath.so"
+    ccall dlopen_fp
+    ccall_ret FFI_POINTER, libmath
+
+    ccall_arg FFI_POINTER, libmath
+    ccall_arg FFI_POINTER, "multiply_int32"
+    ccall dlsym_fp
+    ccall_ret FFI_POINTER, multiply_fp
+
     arg0 = 12
     arg1 = 10
-    fnh = new_fnh 3
-    cfunc fnh, "multiply_int32"
-    set_ret fnh, FFI_UINT32, ret
-    set_arg fnh, FFI_UINT32, arg0
-    set_arg fnh, FFI_UINT32, arg1
-    ccall fnh
+
+    ccall_arg FFI_UINT32, arg0
+    ccall_arg FFI_UINT32, arg1
+    ccall multiply_fp
+    ccall_ret FFI_UINT32, ret
+
     say ret  # will print "120"
-    free_fnh fnh
+
+example code for calling 2 int32 arg, 1 int32 return, internal function
+    arg0 = 12
+    arg1 = 10
+    csym func, "Parrot_multiply_ints"
+    ccall_arg FFI_UINT32, arg0
+    ccall_arg FFI_UINT32, arg1
+    ccall func
+    ccall_ret FFI_UINT32, ret
+    say ret  # will print "120"
 
 =back
 
