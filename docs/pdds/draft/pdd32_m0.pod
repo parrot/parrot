@@ -237,45 +237,49 @@ The header will look like:
 
 directory:
 
-  opcode_t, number of opcode_t-sized units in this segment
-  opcode_t, type of m0 directory segment
+  opcode_t : number of opcode_t-sized units in this segment
+  opcode_t : M0_DIR_SEG
   [
-    opcode_t : offset of bytecode segment
-    opcode_t : offset of vartable segment
-    opcode_t : offset of metadata segment
+    opcode_t : offset of first byte of bytecode segment
+    opcode_t : offset of first byte of vartable segment
+    opcode_t : offset of first byte of metadata segment
   ]
 
-m0-bytecode - ops (many per file)
+bytecode segment: This segment contains a series of executable ops.
 
   opcode_t : number of opcode_t-sized units in this segment
-  opcode_t : type of m0 bytecode segment
+  opcode_t : M0_BC_SEG
   [
-    opcode_t : ops
+    char : opcode
+    char : ctx_arg
+    char : arg1
+    char : arg2
+    char : arg3
+    ...  : padding (maybe)
   ]
 
-m0-vartable - constants table, but they're not necessarily constants: first
-context has these, other contexts get COW'd copies (one per bytecode segment)
+variables segment:  Any data lives here and is loaded into registers as needed.
 
   opcode_t : number of opcode_t-sized units in this segment
-  opcode_t : type of m0 variables table segment
+  opcode_t : M0_VARS_SEG
   [
-    opcode_t: offset within segment to name
-    opcode_t: pointer to object data
+    opcode_t : number of bytes in variable data
+    ...      : variable data
   ]
 
-m0-metadata - anything else (line numbers, function names, annotations, etc)
-(one per bytecode segment)
+metadata segment: Any data about the bytecode that might come in handy is
+tracked here.  The actual data will live in the variables segment; this table
+just provides a way to map those values to names and bytecode offsets.
 
   opcode_t : number of opcode_t-sized units in this segment
-  opcode_t : type of m0 metadata segment
+  opcode_t : M0_META_SEG
   [
-    opcode_t : data (idk)
+    opcode_t : bytecode offset relative to the start of the current bc seg where this data becomes effective
+    opcode_t : offset into vartable for the name of this piece of metadata
+    opcode_t : offset into vartable for the value of this piece of metadata
   ]
 
 =head2 Binary instruction format
-
-describe the binary encoding of a single M0 instruction and how it should be
-interpreteted.
 
 Initially, M0 ops will be packed without any padding.  Once we have a
 representative sample of running M0 code, we will benchmark various padding
@@ -298,15 +302,6 @@ accomplish the following:
 =item * increment the pc, if needed
 
 =back
-
-=head2 metadata
-
-describe metadata here, e.g. debugging information, aggregate op tracking
-info, whatever
-
-=head2 Op Composition
-
-M0 will not support op composition unless necessary.
 
 =head2 Objects
 
@@ -351,6 +346,11 @@ has 25 registers (which it won't), their types might be as follows:
 
 This means that an op which is passed the wrong value could pretty easily cause
 chaos by clobbering the PC or changing the pointer to the current context.
+
+=head2 Immediate Values
+
+M0 supports loading values from the variables table into registers via the
+C<load> instruction.
 
 =head2 MOP interaction
 
@@ -476,6 +476,10 @@ complete implementation of Lorito but do not need to be directly addressed by
 M0 VM implementations.
 
 <this space intentionally left blank, for now>
+
+=head2 Op Composition
+
+<this space for rent>
 
 =head2 Implementation
 
