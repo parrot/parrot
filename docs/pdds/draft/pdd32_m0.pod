@@ -393,7 +393,7 @@ they'll be the same thing under Lorito).
 
 =head3 FFI considerations
 
-M0's FFI should be amenable to interpretation both by intperpreters implemented
+M0's FFI should be amenable to interpretation both by interpreters implemented
 in C and high-level languages such as Python or Perl, to direct compilation to
 machine code, to jitting and to compilation to static C.  Where possible, M0's
 design should not impose any constraints that preclude efficient implementation
