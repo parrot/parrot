@@ -57,10 +57,16 @@ such as garbage collection and Parrot's calling conventions.
 This is the lowest-level set of ops supported by an M0-compliant VM.  These
 ops are a subset of the C<M0> specification.
 
+=item * MOP
+
+Meta object protocol.
+
 =item * Lorito
 
-Lorito refers to the combination of C<M0>, a meta-object model and the way
-that they're used as a foundation for Parrot.
+Lorito refers to C<M0> and the levels above it, such as C<M1> which is written
+in C<M0> ops, and possibily an C<M2> level which is written in C<M1> ops. More
+specifically it refers to a new implementation of Parrot internals. A new MOP
+is planned for Lorito and it will most probably live at the C<M1> op level.
 
 =item * Lorito Context
 
@@ -69,11 +75,20 @@ at the M0 level. You could say that it is the "secret sauce" of M0. The exact
 details of the Lorito Context PMC are still in flux.
 
 A Context will contain:
-INSP registers (fixed number of each)
-PC    - currently executing instruction (bytecode segment and offset)
-EH    - exception handler address (bytecode segment and offset)
-EX    - exception payload
-caller - calling context
+
+=over 4
+
+=item * INSP registers (fixed number of each) TODO: How many? Spillage?
+
+=item * PC    - currently executing instruction (bytecode segment and offset)
+
+=item * EH    - exception handler address (bytecode segment and offset)
+
+=item * EX    - exception payload
+
+=item * caller - calling context
+
+=back 4
 
 =item * thunk
 
