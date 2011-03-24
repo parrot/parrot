@@ -4,8 +4,10 @@
 
 =head2 Abstract
 
-This document specifies M0, the set of microcode-like ops on which Parrot will
-be based, and their requisite runtime environment.
+This document specifies M0, the set of microcode-like opcodes (ops) on which
+a future implementation of Parrot internals will be based. This document
+also specifies how these ops will interact with other subsystems and their
+requisite runtime environment.
 
 =head2 Status
 
