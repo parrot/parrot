@@ -367,7 +367,7 @@ Will some memory be protected in M0?
 =head2 structs
 
 Structs (as implemented in C) will be an abstraction on top of M0.  M0 will not
-be concerned with the directly.
+be concerned with them directly.
 
 =head2 Types
 
@@ -401,10 +401,10 @@ C<get_var> instruction.
 
 =head2 MOP interaction
 
-describe this here - the mop is mostly a higher-level concern than M0 cares
-about, but M0 will need to describe how PMCs and strings behave.  To make that
-happen, M0 needs to have some minimal concept of a pmc (and an object, since
-they'll be the same thing under Lorito).
+A MOP will be implemented at the C<M1> level, so C<M0> must merely make it this
+possible. The C<M0> does not and should not understand any structures at higher
+levels. This will loosely couple C<M0> and C<M1> and allow them to evolve
+independently.
 
 =head2 FFI
 
@@ -517,8 +517,11 @@ live in an external shared library) with the same signature as above.
 
 =head2 Concurrency
 
-describe what primitives will be needed to allow data sharing and
+This section will describe primitives that will be needed to allow data sharing and
 synchronization between contexts.
+
+The Actor model of concurrency currently looks promising http://en.wikipedia.org/wiki/Actor_model .
+One implementation of the Actor model on the JVM is Akka : http://akka.io/
 
 =head1 Lorito
 
@@ -528,6 +531,8 @@ This section covers the parts of Lorito that are not directly relevant to
 someone implementing an M0-compatible VM.  These topics are important to a
 complete implementation of Lorito but do not need to be directly addressed by
 M0 VM implementations.
+
+Shouldn't this be a different spec document? Perhaps PDD33 for M1 ?
 
 <this space intentionally left blank, for now>
 
