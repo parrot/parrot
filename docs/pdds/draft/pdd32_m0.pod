@@ -158,7 +158,7 @@ the op set is complete, we will look at how a representative selection of PIR's
 existing core ops and the dynops used by HLLs could be reimplemented in terms
 of M0 ops.
 
-=head3 Math/numeric ops (10 ops)
+=head3 Math/numeric ops (12 ops)
 
 =over
 
@@ -166,21 +166,43 @@ of M0 ops.
 
 =item * add_n - add two numeric registers
 
+=item * sub_i - subtract two integer registers
+
+=item * sub_n - subtract two numeric registers
+
 =item * mult_i - multiply two integer registers
 
 =item * mult_n - multiply two numeric registers
+
+=item * div_i - divide two integer registers
+
+=item * div_n - divide two numeric registers
+
+=item * mod_i - remainder of of $2/$1 (integer)
+
+=item * mod_n - remainder of of $2/$1 (numeric)
 
 =item * iton - coerce integer to numeric
 
 =item * ntoi - coerce numeric to integer
 
-=item * shr - right circular bitshift
+=back
 
-=item * shl - leftward circular bitshift
+=over
 
-=item * cmp_i - integer comparison
+=head3 Bitwise ops (6 ops)
 
-=item * cmp_n - numeric comparison
+=item * ashr - right bitshift with sign extension
+
+=item * lshr - right bitshift without sign extension
+
+=item * shl - left bitshift
+
+=item * and - bitwise AND
+
+=item * or - bitwise OR
+
+=item * xor - bitwise exclusive OR
 
 =back
 
