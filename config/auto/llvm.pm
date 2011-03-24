@@ -75,6 +75,17 @@ sub runstep {
         if ($lib =~ /lib(LLVM.*)\.(so|dll)/){
             $conf->data->set( llvm_ldflags  => "-l$1" );
         }
+        else {
+            if ($verbose) {
+                print "Found 'lli' version $version\n";
+            }
+        }
+    }
+    else {
+        print "Unable to extract version for LLVM component 'lli'\n"
+            if $verbose;
+        $self->_handle_result( $conf, 0 );
+        return 1;
     }
 
     $self->_handle_result($conf, $rv);
