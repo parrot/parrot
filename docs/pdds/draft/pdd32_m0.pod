@@ -74,22 +74,6 @@ This refers to a Lorito Context PMC, which is the most important datastructure
 at the M0 level. You could say that it is the "secret sauce" of M0. The exact
 details of the Lorito Context PMC are still in flux.
 
-A Context will contain:
-
-=over 4
-
-=item * INSP registers (fixed number of each) TODO: How many? Spillage?
-
-=item * PC    - currently executing instruction (bytecode segment and offset)
-
-=item * EH    - exception handler address (bytecode segment and offset)
-
-=item * EX    - exception payload
-
-=item * caller - calling context
-
-=back 4
-
 =item * thunk
 
 When discussing M0, C<thunk> refers to small generated functions that convert
@@ -136,6 +120,29 @@ be in continuation-passing-style.
 This document only covers M0 and the minimum VM necessary to support it.
 Anything beyond that, e.g. the meta-object model or layout of contexts, is
 beyond its scope.
+
+=head2 Contexts
+
+This is the central datastructure at the M0 level.  It will contain most of
+the= state that is needed to execute M0 bytecode.  A pointer to the current
+context will be passed to each op as the implicit first argument, though this
+pointer (or equivalent) will not be stored in bytecode.
+
+A Context will contain:
+
+=over 4
+
+=item * INSP registers (fixed number of each) TODO: How many? Spillage?
+
+=item * PC    - currently executing instruction (bytecode segment and offset)
+
+=item * EH    - exception handler address (bytecode segment and offset)
+
+=item * EX    - exception payload
+
+=item * caller - calling context
+
+=back
 
 =head2 List of Ops
 
@@ -292,17 +299,18 @@ directory:
     opcode_t : offset of first byte of metadata segment
   ]
 
-bytecode segment: This segment contains a series of executable ops.
+bytecode segment: This segment contains a series of executable ops.  A pointer
+(or its equivalent for a non-C language) to the current context will be passed
+as the first argument to any op, but this pointer will not be stored in
+bytecode.
 
   opcode_t : number of opcode_t-sized units in this segment
   opcode_t : M0_BC_SEG
   [
     char : opcode
-    char : ctx_arg
     char : arg1
     char : arg2
     char : arg3
-    ...  : padding (maybe)
   ]
 
 variables segment:  Any data lives here and is loaded into registers as needed.
