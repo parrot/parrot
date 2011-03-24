@@ -112,7 +112,7 @@ gets ops for the sake of efficiency or ease of use, it has failed its design
 goals.
 
 There will be no stacks in M0, not even for argument passing. Everything must
-be in Continuation-Passing-Style.
+be in continuation-passing-style.
 
 =head2 Scope
 
@@ -380,7 +380,7 @@ chaos by clobbering the PC or changing the pointer to the current context.
 =head2 Immediate Values
 
 M0 supports loading values from the variables table into registers via the
-C<load> instruction.
+C<get_var> instruction.
 
 =head2 MOP interaction
 
@@ -436,54 +436,67 @@ C<ccall> uses an existing function pointer to call a C function.  It assumes
 that arguments have been set up correctly.  Hilarity and segfaults are likely
 to result from breaking this assumption.
 
-example code for calling no arg, no ret function:
+=back
+
+=head3 Examples
+
+The following example code calls a function called C<hello_func>, which takes
+no arguments and has no return value, in the library C<libhello.so>.  The use
+of strings as direct arguments is a simplification for explanatory purposes.
+In actual M0 bytecode, the string would be an index into the variables table. 
+
     dlopen_fp = csym "Parrot_dlopen"
     dlsym_fp  = csym "Parrot_dlsym"
     ccall_arg FFI_POINTER, "libhello.so" #hand-waving
-    ccall dlopen_fp
+    ccall     dlopen_fp
     ccall_ret FFI_POINTER, libhello
 
     ccall_arg FFI_POINTER, "hello_func" #more hand-waving
-    ccall dlsym_fp
+    ccall     dlsym_fp
     ccall_ret FFI_POINTER, hello_func
 
-    #no argument, no return value
     ccall hello_func
 
-example code for calling 2 int32 arg, 1 int32 return
+This example shows how to call a function "multiply_int32" which take two
+32-bit int arguments and returns an value of the same type and lives in
+"libmath.so".  It assumes that dlsym_fp and dlopen_fp have been initialized as
+in the first example.
+
     #dlsym_fp is a pointer to Parrot_dlsym
     #dlopen_fp is a pointeer to Parrot_dlopen
 
     ccall_arg FFI_POINTER, "libmath.so"
-    ccall dlopen_fp
+    ccall     dlopen_fp
     ccall_ret FFI_POINTER, libmath
 
     ccall_arg FFI_POINTER, libmath
     ccall_arg FFI_POINTER, "multiply_int32"
-    ccall dlsym_fp
+    ccall     dlsym_fp
     ccall_ret FFI_POINTER, multiply_fp
 
-    arg0 = 12
-    arg1 = 10
+    set       arg0, 12
+    set       arg1, 10
 
     ccall_arg FFI_UINT32, arg0
     ccall_arg FFI_UINT32, arg1
-    ccall multiply_fp
+    ccall     multiply_fp
     ccall_ret FFI_UINT32, ret
 
     say ret  # will print "120"
 
-example code for calling 2 int32 arg, 1 int32 return, internal function
-    arg0 = 12
-    arg1 = 10
-    csym func, "Parrot_multiply_ints"
+This example shows how to call an internal function (i.e. one that does not
+live in an external shared library) with the same signature as above.
+
+    set       arg0, 12
+    set       arg1, 10
+    csym      func, "Parrot_multiply_ints"
+
     ccall_arg FFI_UINT32, arg0
     ccall_arg FFI_UINT32, arg1
-    ccall func
+    ccall     func
     ccall_ret FFI_UINT32, ret
-    say ret  # will print "120"
 
-=back
+    say ret  # will print "120"
 
 =head2 Concurrency
 
