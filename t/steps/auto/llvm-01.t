@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use File::Temp qw( tempdir );
-use Test::More tests =>  41;
+use Test::More tests =>  39;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::llvm');
@@ -84,21 +84,8 @@ is( $step->result(), 'no', "Got expected 'no' result" );
 ok( ! $conf->data->get( 'has_llvm' ),
     "'has_llvm' set to false  value, as expected" );
 
-###### _examine_llvm_gcc_version() #####
+##### 4 internal methods #####
 my $verbose = 0;
-my $rv;
-
-$rv = $step->_examine_llvm_gcc_version($conf, $verbose);
-like($rv, qr/^1|0$/,
-    "Got a valid return value from _examine_llvm_gcc_version()");
-
-my $prog = 'lli';
-$rv = $step->_examine_llvm_component_version( $conf, $verbose, $prog );
-like($rv, qr/^1|0$/,
-    "Got a valid return value from _examine_llvm_component_version()");
-
-##### 4 methods #####
-$verbose = 0;
 
 $step->set_result( undef );
 $step->_handle_failure_to_compile_into_bitcode( $conf, $verbose );
