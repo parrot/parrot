@@ -30,13 +30,14 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $verbose = $conf->options->get( 'verbose' );
+    my $llvm_config = $conf->options->get( 'llvm-config' ) || 'llvm-config';
 
     # We will run various probes for LLVM.  If the probes are unsuccessful, we
     # will set_result to 'no', set 'has_llvm' to '', then return from
     # runstep() with a value of 1.  If a given probe does not rule out LLVM,
     # we will proceed onward.
 
-    my $llvm_bindir = `llvm-config --bindir`;
+    my $llvm_bindir = `$llvm_config --bindir`;
     chomp $llvm_bindir;
     if (! $llvm_bindir ) {
         $self->_handle_result( $conf, 0 );
@@ -46,6 +47,26 @@ sub runstep {
     chomp(@output = `"$llvm_bindir/lli" --version`);
     my $rv = $self->version_check($conf, \@output, $verbose);
     return 1 unless $rv;
+
+    #  Find cc flags 
+    my $ccflags = `$llvm_config --cflags`;
+    chomp $ccflags;
+    # do not include optimizatin level
+    $ccflags =~ s/-O[^ ]*//; 
+    $conf->data->add( ' ', ccflags => $ccflags );
+    
+    # Find lib 
+    my $ldd = `ldd "$llvm_bindir/lli"`;
+    if ($ldd =~ /(libLLVM[^ ]+)/gms){
+        my $lib  = $1;
+        $conf->data->set( llvm_shared => $lib );
+        if ($lib =~ /lib(LLVM.*)\.(so|dll)/){
+            $conf->data->add( ' ', libs   => "-l$1" );
+        }
+    }
+
+    $self->_handle_result($conf, 1);
+    return 1;
 
     # Having gotten this far,  we will take a simple C file, compile it into
     # an LLVM bitcode file, execute it as bitcode, then compile it to native
