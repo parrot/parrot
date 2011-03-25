@@ -380,6 +380,27 @@ accomplish the following:
 
 =back
 
+=head2 Control Flow
+
+Control flow will be done by modifying the current context's PC.   A basic
+example of how to do this is below:
+
+    i = 0
+    max = 10
+  loop_start:
+    #if i == max, goto loop_end
+    delta = cmp max, i    #delta is 1 if max != i
+    jump  = mul_i jump, 4 #jump  is 4 if max != i, 0 otherwise
+
+    PC    = add_i PC + jump
+    PC    = loop_end      #this instruction is skipped if max != i
+
+    #do some kind of interesting work here
+
+    i     = add_i i, 1
+    PC    = loop_start
+  loop_end:
+    
 =head2 Objects
 
 In Lorito, we'll still have INSP registers like PIR, but the S registers will
