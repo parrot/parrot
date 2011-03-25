@@ -61,7 +61,7 @@ sub runstep {
         my $lib  = $1;
         $conf->data->set( llvm_shared => $lib );
         if ($lib =~ /lib(LLVM.*)\.(so|dll)/){
-            $conf->data->add( ' ', libs   => "-l$1" );
+            $conf->data->set( llvm_ldflags  => "-l$1" );
         }
     }
 
