@@ -270,26 +270,26 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
               case enum_type_short:
               case enum_type_int:
               case enum_type_long:
-#if HAS_LONGLONG
+#if PARROT_HAS_LONGLONG
               case enum_type_longlong:
 #endif
               case enum_type_int8:
               case enum_type_int16:
               case enum_type_int32:
-#if HAS_INT64
+#if PARROT_HAS_INT64
               case enum_type_int64:
 #endif
               case enum_type_uchar:
               case enum_type_ushort:
               case enum_type_uint:
               case enum_type_ulong:
-#if HAS_LONGLONG
+#if PARROT_HAS_LONGLONG
               case enum_type_ulonglong:
 #endif
               case enum_type_uint8:
               case enum_type_uint16:
               case enum_type_uint32:
-#if HAS_INT64
+#if PARROT_HAS_INT64
               case enum_type_uint64:
 #endif
 
@@ -326,11 +326,11 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
                 break;
 
               /* locally unsupported types */
-#if !HAS_LONGLONG
+#if !PARROT_HAS_LONGLONG
               case enum_type_longlong:
               case enum_type_ulonglong:
 #endif
-#if !HAS_INT64
+#if !PARROT_HAS_INT64
               case enum_type_int64:
               case enum_type_uint64:
 #endif
@@ -402,13 +402,13 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
                           case enum_type_ushort:
                           case enum_type_uint:
                           case enum_type_ulong:
-#if HAS_LONGLONG
+#if PARROT_HAS_LONGLONG
                           case enum_type_ulonglong:
 #endif
                           case enum_type_uint8:
                           case enum_type_uint16:
                           case enum_type_uint32:
-#if HAS_INT64
+#if PARROT_HAS_INT64
                           case enum_type_uint64:
 #endif
                             elt->access = unaligned_access;
@@ -486,7 +486,7 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 CASE_RET1(short);
                 CASE_RET1(int);
                 CASE_RET1(long);
-#if HAS_LONGLONG
+#if PARROT_HAS_LONGLONG
                 CASE_RET2(long long,          longlong);
                 CASE_RET2(unsigned long long, ulonglong);
 #endif
@@ -496,7 +496,7 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 CASE_RET2(Parrot_UInt2, uint16);
                 CASE_RET2(Parrot_Int4,  int32);
                 CASE_RET2(Parrot_UInt4, uint32);
-#if HAS_INT64
+#if PARROT_HAS_INT64
                 CASE_RET2(Parrot_Int8,  int64);
                 CASE_RET2(Parrot_UInt8, uint64);
 #endif
@@ -562,7 +562,7 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 CASE_SET1(short);
                 CASE_SET1(int);
                 CASE_SET1(long);
-#if HAS_LONGLONG
+#if PARROT_HAS_LONGLONG
                 CASE_SET2(long long,          longlong);
                 CASE_SET2(unsigned long long, ulonglong);
 #endif
@@ -572,7 +572,7 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 CASE_SET2(Parrot_UInt2, uint16);
                 CASE_SET2(Parrot_Int4,  int32);
                 CASE_SET2(Parrot_UInt4, uint32);
-#if HAS_INT64
+#if PARROT_HAS_INT64
                 CASE_SET2(Parrot_Int8,  int64);
                 CASE_SET2(Parrot_UInt8, uint64);
 #endif
