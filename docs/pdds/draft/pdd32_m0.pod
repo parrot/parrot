@@ -124,7 +124,7 @@ beyond its scope.
 =head2 Contexts
 
 This is the central datastructure at the M0 level.  It will contain most of
-the= state that is needed to execute M0 bytecode.  A pointer to the current
+the state that is needed to execute M0 bytecode.  A pointer to the current
 context will be passed to each op as the implicit first argument, though this
 pointer (or equivalent) will not be stored in bytecode.
 
@@ -203,6 +203,14 @@ of M0 ops.
 =item * or - bitwise OR
 
 =item * xor - bitwise exclusive OR
+
+=back
+
+=head3 Control Flow (2 ops - maybe)
+
+=item * goto - go to an offset in the current bytecode segment
+
+=item * goto_cs - go to an offset in another bytecode segment
 
 =back
 
@@ -356,6 +364,13 @@ just provides a way to map those values to names and bytecode offsets.
     opcode_t : offset into vartable for the value of this piece of metadata
   ]
 
+=head2 Bytecode Segment Identification
+
+In order to get useful work done, M0 will need a way to unambiguously refer to
+bytecode segments and to look up which function (or generic unit of code)
+corresponds to which bytecode segment.  Figure this out.  UUIDs might come in
+handy.
+
 =head2 Binary instruction format
 
 Initially, M0 ops will be packed without any padding.  Once we have a
@@ -382,8 +397,10 @@ accomplish the following:
 
 =head2 Control Flow
 
-Control flow will be done by modifying the current context's PC.   A basic
-example of how to do this is below:
+The current proposal is that control flow be done by modifying the current
+context's PC.   A basic example of how to do this is below.  Note that this
+method of control flow may not result in efficient jitted code.  Explict
+control flow may be a better idea.
 
     i = 0
     max = 10
