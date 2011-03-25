@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use File::Temp qw( tempdir );
-use Test::More tests =>  39;
+use Test::More tests =>  49;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::llvm');
@@ -63,9 +63,7 @@ $step = test_step_constructor_and_description($conf);
     SKIP: {
         skip 'No sense testing for verbose output if LLVM not present',
         2 unless ( $step->result() =~ /yes/ );
-        like( $stdout, qr/llvm-gcc/s,
-            "Got expected verbose output" );
-        like( $stdout, qr/Low Level Virtual Machine/s,
+        like( $stdout, qr/version/s,
             "Got expected verbose output" );
     }
 }
@@ -84,9 +82,82 @@ is( $step->result(), 'no', "Got expected 'no' result" );
 ok( ! $conf->data->get( 'has_llvm' ),
     "'has_llvm' set to false  value, as expected" );
 
-##### 4 internal methods #####
+my @output = (
+    '',
+    'llvm version 2.7',
+);
 my $verbose = 0;
+ok( $step->version_check($conf, \@output, $verbose),
+    "Got expected return value: version_check() with sufficient version" );
 
+$output[1] = 'llvm version 1.0';
+$verbose = 0;
+ok( ! $step->version_check($conf, \@output, $verbose),
+    "Got expected return value: version_check() with insufficient version" );
+is( $step->result(), 'no',
+    "Got expected result: insufficient version" );
+ok( ! $conf->data->get( 'has_llvm' ),
+    "'has_llvm' not set: insufficient version" );
+
+$output[1] = 'llvm version 2.7',
+$verbose = 1;
+{
+    my ($stdout, $stderr);
+    capture(
+        sub { $step->version_check($conf, \@output, $verbose); },
+        \$stdout,
+        \$stderr,
+    );
+    like(
+        $stdout,
+        qr/Found 'lli' version/,
+        "Got expected verbose output: version_check() with sufficient version"
+    );
+}
+$output[1] = 'llvm version 1.0';
+$verbose = 1;
+{
+    my ($stdout, $stderr);
+    capture(
+        sub { $step->version_check($conf, \@output, $verbose); },
+        \$stdout,
+        \$stderr,
+    );
+    like(
+        $stdout,
+        qr/LLVM component 'lli' must be at least version/,
+        "Got expected verbose output: version_check() with insufficient version"
+    );
+}
+
+$output[1] = 'foobar';
+$verbose = 0;
+ok( ! $step->version_check($conf, \@output, $verbose),
+    "Got expected return value: version_check() with version not found" );
+is( $step->result(), 'no',
+    "Got expected result: version not found" );
+ok( ! $conf->data->get( 'has_llvm' ),
+    "'has_llvm' not set: version not found" );
+
+$output[1] = 'foobar';
+$verbose = 1;
+{
+    my ($stdout, $stderr);
+    capture(
+        sub { $step->version_check($conf, \@output, $verbose); },
+        \$stdout,
+        \$stderr,
+    );
+    like(
+        $stdout,
+        qr/Unable to extract version for LLVM component/,
+        "Got expected verbose output: version_check() with version not detected"
+    );
+}
+
+##### 4 internal methods #####
+
+$verbose = 0;
 $step->set_result( undef );
 $step->_handle_failure_to_compile_into_bitcode( $conf, $verbose );
 is( $step->result(), 'no',

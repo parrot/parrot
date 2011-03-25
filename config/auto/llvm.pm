@@ -31,10 +31,10 @@ sub runstep {
 
     my $verbose = $conf->options->get( 'verbose' );
 
-    # We will run various probes for LLVM.  If the probes are unsuccessful, we will
-    # set_result to 'no', set 'has_llvm' to '', then return from runstep()
-    # with a value of 1.  If a given probe does not rule out LLVM, we will
-    # proceed onward.
+    # We will run various probes for LLVM.  If the probes are unsuccessful, we
+    # will set_result to 'no', set 'has_llvm' to '', then return from
+    # runstep() with a value of 1.  If a given probe does not rule out LLVM,
+    # we will proceed onward.
 
     my $llvm_bindir = `llvm-config --bindir`;
     chomp $llvm_bindir;
@@ -42,31 +42,10 @@ sub runstep {
         $self->_handle_result( $conf, 0 );
         return 1;
     }
-    my (@output, $version);
+    my @output;
     chomp(@output = `"$llvm_bindir/lli" --version`);
-    if ( $output[1] =~ m/llvm\sversion\s(\d+\.\d+)/s ) {
-        $version = $1;
-        if ($version < $self->{lli_min_version}) {
-            if ($verbose) {
-                my $msg = "LLVM component 'lli' must be at least version ";
-                $msg .= "$self->{lli_min_version}; found version $version\n";
-                print $msg;
-            }
-            $self->_handle_result( $conf, 0 );
-            return 1;
-        }
-        else {
-            if ($verbose) {
-                print "Found 'lli' version $version\n";
-            }
-        }
-    }
-    else {
-        print "Unable to extract version for LLVM component 'lli'\n"
-            if $verbose;
-        $self->_handle_result( $conf, 0 );
-        return 1;
-    }
+    my $rv = $self->version_check($conf, \@output, $verbose);
+    return 1 unless $rv;
 
     # Having gotten this far,  we will take a simple C file, compile it into
     # an LLVM bitcode file, execute it as bitcode, then compile it to native
@@ -83,7 +62,7 @@ sub runstep {
     eval {
         system(qq{llvm-gcc -O3 -emit-llvm $fullcfile -c -o $bcfile});
     };
-    my $rv = '';
+    $rv = '';
     if ($@) {
         $rv = $self->_handle_failure_to_compile_into_bitcode(
             $conf,
@@ -152,6 +131,35 @@ sub runstep {
     );
     $conf->cc_clean();
     return 1;
+}
+
+sub version_check {
+    my ($self, $conf, $outputref, $verbose) = @_;
+    my $version;
+    if ( $outputref->[1] =~ m/llvm\sversion\s(\d+\.\d+)/s ) {
+        $version = $1;
+        if ($version < $self->{lli_min_version}) {
+            if ($verbose) {
+                my $msg = "LLVM component 'lli' must be at least version ";
+                $msg .= "$self->{lli_min_version}; found version $version\n";
+                print $msg;
+            }
+            $self->_handle_result( $conf, 0 );
+            return;
+        }
+        else {
+            if ($verbose) {
+                print "Found 'lli' version $version\n";
+            }
+            return 1;
+        }
+    }
+    else {
+        print "Unable to extract version for LLVM component 'lli'\n"
+            if $verbose;
+        $self->_handle_result( $conf, 0 );
+        return;
+    }
 }
 
 sub _handle_failure_to_compile_into_bitcode {
