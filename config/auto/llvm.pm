@@ -57,9 +57,10 @@ sub runstep {
     
     # Find lib 
     my $ldd = `ldd "$llvm_bindir/lli"`;
-    if ($ldd =~ /(libLLVM[^ ]+)/gms){
+    if ($ldd =~ /(libLLVM[^ ]+)(.*)/m){
         my $lib  = $1;
-        $conf->data->set( llvm_shared => $lib );
+        my $path = (split(' ',$2))[1];
+        $conf->data->set( llvm_shared => $path );
         if ($lib =~ /lib(LLVM.*)\.(so|dll)/){
             $conf->data->set( llvm_ldflags  => "-l$1" );
         }
