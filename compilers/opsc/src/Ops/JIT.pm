@@ -156,6 +156,8 @@ method _create_jit_context($start) {
         cur_opcode  => $start,
 
         basic_blocks => hash(), # offset->basic_block
+
+        _module     => $!module, # abstraction leak for testing purpose only!
     );
 }
 
@@ -275,6 +277,8 @@ method _jit_ops(%jit_context) {
         my $opname := $!opmap[$id];      # Real opname
         my $op     := $!oplib{$opname};  # Get op
 
+        say("# jit $opname ");
+
         # Position Builder to previousely created BB.
         $!builder.set_position(%jit_context<basic_blocks>{$i}<bb>);
 
@@ -282,8 +286,10 @@ method _jit_ops(%jit_context) {
         my $jitted_op := self.process($parsed_op, %jit_context);
 
         # Next op
-        $i := $i + _opsize($op, %jit_context);
+        $i := $i + _opsize(%jit_context, $op);
         %jit_context<cur_opcode> := $i;
+
+        $keep_going   := self._keep_going($opname);
     }
 
     %jit_context;
@@ -393,9 +399,11 @@ our method process:pasttype<undef> (PAST::Op $chunk, %c) {
 }
 
 our multi method process(PAST::Stmts $chunk, %c) {
+    self.process($_, %c) for @($chunk);
 }
 
 our multi method process(PAST::Block $chunk, %c) {
+    self.process($_, %c) for @($chunk);
 }
 
 our multi method process(String $str, %c) {
@@ -403,9 +411,28 @@ our multi method process(String $str, %c) {
 
 
 our method process:macro<goto_offset>(PAST::Op $chunk, %c) {
+    my $offset  := ~$chunk[0].value; # FIXME
+    say("# macro<goto_offset> '$offset'");
+    my $target  := %c<cur_opcode> + $offset;
+    my $jump_to := %c<basic_blocks>{$target}<bb>;
+
+    pir::die("No target found") unless pir::defined($jump_to);
+    pir::die("Crappy target") unless $jump_to ~~ LLVM::BasicBlock;
+
+    # TODO Handle non-existing block.
+    $!builder.br($jump_to);
 }
 
 our method process:macro<goto_address>(PAST::Op $chunk, %c) {
+    say("# macro<goto_address>");
+    # FIXME
+    $!builder.store(
+        LLVM::Constant::null(
+            LLVM::Type::pointer(LLVM::Type::int32())
+        ),
+        %c<retval>,
+    );
+    $!builder.br(%c<leave>);
 }
 
 our method process:macro<expr_offset>(PAST::Op $chunk, %c) {

@@ -56,5 +56,13 @@ while $bb {
 # C<end> added automatically by IMCC.
 is( $count, 6, "We have 6 BasicBlocks" );
 
+%jit_context := $jitter._jit_ops(%jit_context);
+ok( 1, "Sub jitted" );
+
+#$sub.dump();
+
+%jit_context<_module>.verify();
+ok( 1, "Module verifyed" );
+
 done_testing();
 # vim: ft=perl6
