@@ -37,9 +37,11 @@ sub runstep {
     # runstep() with a value of 1.  If a given probe does not rule out LLVM,
     # we will proceed onward.
 
-    my $llvm_bindir = `$llvm_config --bindir`;
+    my $llvm_bindir = capture_output( qw| llvm-config --bindir | ) || '';
     chomp $llvm_bindir;
     if (! $llvm_bindir ) {
+        print "Unable to find directory for 'llvm-config' executable\n"
+            if $verbose;
         $self->_handle_result( $conf, 0 );
         return 1;
     }
