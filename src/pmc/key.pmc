@@ -323,6 +323,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
             switch (flags) {
               case KEY_integer_FLAG | KEY_register_FLAG:
               case KEY_string_FLAG  | KEY_register_FLAG:
+              case KEY_pmc_FLAG     | KEY_register_FLAG:
               case KEY_integer_FLAG:
                 SET_ATTR_int_key(INTERP, k, VTABLE_shift_integer(INTERP, info));
                 break;
