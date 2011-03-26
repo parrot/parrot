@@ -10,6 +10,7 @@ class Ops::JIT;
 
 # Ops::OpsFile
 has $!ops_file;
+has %!ops;
 
 # OpLib
 has $!oplib;
@@ -27,7 +28,15 @@ method new(Str $pbc, Ops::File $ops_file, OpLib $oplib) {
     $!ops_file := $ops_file;
     $!oplib    := $oplib;
 
+    # Generate lookup hash by opname.
+    for $ops_file.ops -> $op {
+        Ops::Util::strip_source($op);
+        %!ops{$op.full_name} := $op;
+    };
+
     self._load_pbc($pbc);
+
+    self._init_llvm();
 }
 
 =item load_pbc
@@ -67,9 +76,25 @@ method _load_pbc(Str $file) {
     $!opmap := $!bytecode.opmap() // die("Couldn't load OpMap");
 }
 
+=item _init_llvm
+Initialize LLVM
 
+method _init_llvm() {
+}
+
+=begin Processing
+
+We start from single Ops::Op. Then recursively process chunks. 
+
+=end Processing
+
+=item process(Ops::Op, %c) -> Bool.
+Process single Op. Return false if we should stop JITting. Dies if can't handle op.
+We stop on :flow ops because PCC will interrupt "C" flow and our PCC is way too
+complext to implement it in JITter.
 
 method process(Ops::Op $op, %c) {
+    self.process($_, %c) for @($op);
 }
 
 # Recursively process body chunks returning string.
@@ -81,8 +106,17 @@ our multi method process(PAST::Var $var, %c) {
     die('!!!');
 }
 
+=item process(PAST::Op)
+Dispatch deeper.
+
+our multi method process(PAST::Op $chunk, %c) {
+    my $type := $chunk.pasttype // 'undef';
+    my $sub  := pir::find_sub_not_null__ps('process:pasttype<' ~ $type ~ '>');
+    $sub(self, $chunk, %c);
+}
+
 our method process:pasttype<inline> (PAST::Op $chunk, %c) {
-    die('!!!');
+    die("Can't handle 'inline' chunks");
 }
 
 our method process:pasttype<macro> (PAST::Op $chunk, %c) {
@@ -114,9 +148,6 @@ our method process:pasttype<switch> (PAST::Op $chunk, %c) {
 }
 
 our method process:pasttype<undef> (PAST::Op $chunk, %c) {
-}
-
-our multi method process(PAST::Op $chunk, %c) {
 }
 
 our multi method process(PAST::Stmts $chunk, %c) {
