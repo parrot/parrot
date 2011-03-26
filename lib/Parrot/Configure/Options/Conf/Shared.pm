@@ -31,6 +31,7 @@ our @shared_valid_options = qw{
     gc
     help
     hintsfile
+    llvm-config
     icu-config
     icuheaders
     icushared

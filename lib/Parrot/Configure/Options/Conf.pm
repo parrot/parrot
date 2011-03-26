@@ -106,6 +106,13 @@ External Library Options:
    --without-pcre       Build parrot without pcre support
    --without-zlib       Build parrot without zlib support
 
+LLVM Options: 
+
+   --llvm-config=/path/to/llvm-config
+                        Location of the script used for LLVM autodetection.
+                        You just need to specify this option if llvm-config
+                        is not in your PATH.
+
 ICU Options:
 
    For using a system ICU, these options can be used:

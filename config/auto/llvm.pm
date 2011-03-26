@@ -20,22 +20,9 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Is minimum version of LLVM installed};
-    $data{result}      = q{};
-    $data{'llvm-gcc'} = {
-        head => 'llvm-gcc',
-        min_version => 4,
-    };
-    $data{llvm_components} = {
-        'lli'         => {
-            head => 'Low Level Virtual Machine',
-            min_version => '2.7',
-        },
-        'llc'         => {
-            head => 'Low Level Virtual Machine',
-            min_version => '2.7',
-        },
-    };
+    $data{description}      = q{Is minimum version of LLVM installed};
+    $data{result}           = q{};
+    $data{lli_min_version}  = 2.7;
     return \%data;
 }
 
@@ -43,32 +30,44 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $verbose = $conf->options->get( 'verbose' );
+    my $llvm_config = $conf->options->get( 'llvm-config' ) || 'llvm-config';
 
-    # We will run various tests which, if they show that we don't have what we
-    # need for LLVM, will return 0.  If the return value is 0, we will
-    # set_result to 'no', set 'has_llvm' to '', then return from runstep()
-    # with a value of 1.  If a given step does not rule out LLVM, we will
-    # proceed to the next step.
-    my $rv = '';
+    # We will run various probes for LLVM.  If the probes are unsuccessful, we
+    # will set_result to 'no', set 'has_llvm' to '', then return from
+    # runstep() with a value of 1.  If a given probe does not rule out LLVM,
+    # we will proceed onward.
 
-    # First, we make sure we have at least major version 4 of 'llvm-gcc'
-    $rv = $self->_examine_llvm_gcc_version( $conf, $verbose );
-    if (! $rv) {
-        $conf->cc_clean();
+    my $llvm_bindir = `$llvm_config --bindir`;
+    chomp $llvm_bindir;
+    if (! $llvm_bindir ) {
+        $self->_handle_result( $conf, 0 );
         return 1;
     }
+    my @output;
+    chomp(@output = `"$llvm_bindir/lli" --version`);
+    my $rv = $self->version_check($conf, \@output, $verbose);
+    return 1 unless $rv;
 
-    # Next, we see whether we can run each of two LLVM component executables:
-    # 'lli' and 'llc'.  Even if we can run them, we will need at least version
-    # 2.7 of LLVM.
-
-    foreach my $prog ( keys %{ $self->{llvm_components} } ) {
-        $rv = $self->_examine_llvm_component_version( $conf, $verbose, $prog );
-        if (! $rv) {
-            $conf->cc_clean();
-            return 1;
+    #  Find cc flags 
+    my $ccflags = `$llvm_config --cflags`;
+    chomp $ccflags;
+    # do not include optimizatin level
+    $ccflags =~ s/-O[^ ]*//; 
+    $conf->data->add( ' ', ccflags => $ccflags );
+    
+    # Find lib 
+    my $ldd = `ldd "$llvm_bindir/lli"`;
+    if ($ldd =~ /(libLLVM[^ ]+)(.*)/m){
+        my $lib  = $1;
+        my $path = (split(' ',$2))[1];
+        $conf->data->set( llvm_shared => $path );
+        if ($lib =~ /lib(LLVM.*)\.(so|dll)/){
+            $conf->data->set( llvm_ldflags  => "-l$1" );
         }
     }
+
+    $self->_handle_result($conf, 1);
+    return 1;
 
     # Having gotten this far,  we will take a simple C file, compile it into
     # an LLVM bitcode file, execute it as bitcode, then compile it to native
@@ -85,13 +84,14 @@ sub runstep {
     eval {
         system(qq{llvm-gcc -O3 -emit-llvm $fullcfile -c -o $bcfile});
     };
+    $rv = '';
     if ($@) {
         $rv = $self->_handle_failure_to_compile_into_bitcode(
             $conf,
             $verbose,
         );
         if (! $rv) {
-            $conf->cc_clean();
+            uconf->cc_clean();
             return 1;
         }
     }
@@ -155,78 +155,33 @@ sub runstep {
     return 1;
 }
 
-sub _examine_llvm_gcc_version {
-    my ($self, $conf, $verbose ) = @_;
-    my $output = capture_output(
-        $self->{'llvm-gcc'}->{head},
-        '--version',
-    );
-    if (! $output) {
-        $self->_handle_result( $conf, 0 );
-        return 0;
-    }
-    else {
-        my @line = split /\n+/, $output;
-        my @version;
-        if ( $line[0] =~ m/\b(\d+)\.(\d+)\.(\d+)\b/ ) {
-            @version = ($1, $2, $3);
-            if ($version[0] < $self->{'llvm-gcc'}->{min_version}) {
-                print "'llvm-gcc' must be at least major version $self->{llvm_components}->{'llvm-gcc'}->{min_version}\n"
-                    if $verbose;
-                $self->_handle_result( $conf, 0 );
-                return 0;
+sub version_check {
+    my ($self, $conf, $outputref, $verbose) = @_;
+    my $version;
+    if ( $outputref->[1] =~ m/llvm\sversion\s(\d+\.\d+)/s ) {
+        $version = $1;
+        if ($version < $self->{lli_min_version}) {
+            if ($verbose) {
+                my $msg = "LLVM component 'lli' must be at least version ";
+                $msg .= "$self->{lli_min_version}; found version $version\n";
+                print $msg;
             }
+            $self->_handle_result( $conf, 0 );
+            return;
         }
         else {
-            print "Unable to extract llvm-gcc major, minor and patch versions\n"
-                if $verbose;
-            $self->_handle_result( $conf, 0 );
-            return 0;
+            if ($verbose) {
+                print "Found 'lli' version $version\n";
+            }
+            return 1;
         }
-        if ($verbose) {
-            print "Found 'llvm-gcc' version ";
-            print join('.' => @version), "\n";
-        }
-    }
-    return 1;
-}
-
-sub _examine_llvm_component_version {
-    my $self = shift;
-    my ( $conf, $verbose, $prog ) = @_;
-    my $output = capture_output( $prog, '--version' );
-    if (! $output) {
-        $self->_handle_result( $conf, 0 );
-        return 0;
     }
     else {
-        my $version;
-        if ( $output =~ m/llvm\sversion\s(\d+\.\d+)/s ) {
-            $version = $1;
-            if ($version < $self->{llvm_components}->{$prog}->{min_version}) {
-                if ($verbose) {
-                    my $msg = "LLVM component '$prog' must be at least version ";
-                    $msg .= "$self->{llvm_components}->{$prog}->{min_version};";
-                    $msg .= " found version $version\n";
-                    print $msg;
-                }
-                $self->_handle_result( $conf, 0 );
-                return 0;
-            }
-            else {
-                if ($verbose) {
-                    print "Found '$prog' version $version\n";
-                }
-            }
-        }
-        else {
-            print "Unable to extract version for LLVM component '$prog'\n"
-                if $verbose;
-            $self->_handle_result( $conf, 0 );
-            return 0;
-        }
+        print "Unable to extract version for LLVM component 'lli'\n"
+            if $verbose;
+        $self->_handle_result( $conf, 0 );
+        return;
     }
-    return 1;
 }
 
 sub _handle_failure_to_compile_into_bitcode {

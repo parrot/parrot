@@ -106,7 +106,13 @@ typedef enum {
 
 
             #### Bind functions
-        my $lib   := pir::loadlib("/usr/lib/libLLVM-2.7.so.1");
+        my $parrot_config:= Q:PIR {
+                    .include 'iglobals.pasm'
+                    .local pmc i
+                    i = getinterp
+                    %r = i[.IGLOBALS_CONFIG_HASH]
+                };
+        my $lib   := pir::loadlib__ps($parrot_config<llvm_shared>);
         my %funcs := hash(
 #/*===-- Error handling ----------------------------------------------------===*/
 
