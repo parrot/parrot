@@ -23,6 +23,7 @@ has $!opmap;
 
 # LLVM stuff
 has $!module;
+has $!builder;
 
 =item new
 Create new JITter for given PBC and OpsFile.
@@ -88,6 +89,8 @@ method _init_llvm() {
     # llvm-gcc-4.2 -emit-llvm -O0 -Iinclude -I/usr/include/i486-linux-gnu -o t/jit/jitted_ops.bc -c t/jit/jitted_ops.c
     $!module := LLVM::Module.create('JIT');
     $!module.read("t/jit/jitted_ops.bc") // die("Couldn't read t/jit/jitted_ops.bc");
+
+    $!builder := LLVM::Builder.create();
 }
 
 =begin Processing
