@@ -31,23 +31,6 @@ my $jitter := Ops::JIT.new($pbc, $ops_file, $oplib);
 ok( 1, "JITter created");
 
 =begin
-my $dir := $pf.get_directory();
-ok( pir::defined($dir), "Got PF Directory");
-
-my $bc := $dir{'BYTECODE_' ~ $pir};
-ok( pir::defined($bc), "Got bytecode" );
-
-my $opmap := $bc.opmap();
-ok( pir::defined($opmap), "Got OpMap");
-
-# Convert it to hash for faster lookup. Also cleanup a bit.
-my %parsed_op;
-for $ops_file.ops -> $op {
-    Ops::Util::strip_source($op);
-    %parsed_op{$op.full_name} := $op;
-};
-#_dumper(%parsed_op);
-
 my $trans := Ops::Trans::JIT.new;
 ok( 1, "Got Ops::Trans::JIT" );
 
