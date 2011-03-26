@@ -215,8 +215,6 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     }
 }
 
-=cut
-
 /*
  * Local variables:
  *   c-file-style: "parrot"
