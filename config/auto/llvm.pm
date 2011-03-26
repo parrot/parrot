@@ -55,6 +55,7 @@ sub runstep {
             last;
         }
     }
+ LLVM whatsoever.
     if (! $llvm_bindir ) {
         print "Unable to find directory for 'llvm-config' executable\n"
             if $verbose;
