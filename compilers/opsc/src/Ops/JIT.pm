@@ -133,32 +133,48 @@ method jit($start) {
     $!opcode_ptr_type := LLVM::Type::pointer(LLVM::Type::UINTVAL());
 
 
-    # Generate JITted function for Sub.
-    my $jitted_sub := self._create_jitted_function();
+    # jit_context hold state for currently jitting ops.
+    my %jit_context := self._create_jit_context($start);
+
+    # Generate JITted function for Sub. I use "functional" approach
+    # when functions doesn't have side-effects. This is main reason
+    # for having such signature.
+    %jit_context := self._create_jitted_function(%jit_context, $start);
 
 }
 
-method _create_jitted_function () {
+method _create_jit_context($start) {
+    hash(
+        bytecode    => $!bytecode,
+        constants   => $!constants,
+        cur_opcode  => $start,
+
+        basic_blocks => hash(), # offset->basic_block
+    );
+}
+
+method _create_jitted_function (%jit_context, $start) {
 
     # Generate JITted function for Sub.
     my $jitted_sub := $!module.add_function(
-        "foo",
+        "jitted$start",
         $!opcode_ptr_type,
         $!opcode_ptr_type,
         LLVM::Type::pointer($!interp_struct),
     );
-    #%jit_context<jitted_sub> := $jitted_sub;
+    %jit_context<jitted_sub> := $jitted_sub;
 
     #$module.dump();
 
     # Handle arguments
     my $entry := $jitted_sub.append_basic_block("entry");
+    %jit_context<entry> := $entry;
+
     # Create explicit return
     my $leave := $jitted_sub.append_basic_block("leave");
+    %jit_context<leave> := $leave;
 
-    #%jit_context<leave> := $leave;
-
-    # TODO Handle args.
+    # Handle args.
     $!builder.set_position($entry);
 
     my $cur_opcode := $jitted_sub.param(0);
@@ -167,7 +183,7 @@ method _create_jitted_function () {
         $cur_opcode,
         $!builder.alloca($cur_opcode.typeof()).name("cur_opcode_addr")
     );
-    #%jit_context<cur_opcode_addr> := $cur_opcode_addr;
+    %jit_context<cur_opcode_addr> := $cur_opcode_addr;
 
     my $interp := $jitted_sub.param(1);
     $interp.name("interp");
@@ -175,14 +191,14 @@ method _create_jitted_function () {
         $interp,
         $!builder.alloca($interp.typeof()).name("interp_addr")
     );
-    #%jit_context<interp_addr> := $interp_addr;
+    %jit_context<interp_addr> := $interp_addr;
 
     # Few helper values
     my $retval := $!builder.alloca($!opcode_ptr_type).name("retval");
-    #%jit_context<retval> := $retval;
+    %jit_context<retval> := $retval;
 
     my $cur_ctx := $!builder.struct_gep($interp, 0, "CUR_CTX");
-    #%jit_context<cur_ctx> := $cur_ctx;
+    %jit_context<cur_ctx> := $cur_ctx;
 
     # Load current context from interp
 
@@ -192,7 +208,7 @@ method _create_jitted_function () {
         $!builder.load($retval)
     );
 
-    $jitted_sub;
+    %jit_context;
 }
 
 
