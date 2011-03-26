@@ -43,15 +43,14 @@ method _load_pbc(Str $file) {
     $!packfile.unpack($contents);
 
     # Find Bytecode and Constants segments.
-    my $dir := $!packfile.get_directory();
-    die unless pir::defined($dir);
+    my $dir := $!packfile.get_directory() // die("Couldn't find directory in Packfile");
 
     # Types:
     # 2 Constants.
     # 3 Bytecode.
     # 4 DEBUG
     for $dir -> $it {
-        say("Segment { $it.key } => { $it.value.type }");
+        #say("Segment { $it.key } => { $it.value.type }");
         my $segment := $it.value;
         if $segment.type == 2 {
             $!constants := $segment;
@@ -67,6 +66,8 @@ method _load_pbc(Str $file) {
 
     $!opmap := $!bytecode.opmap() // die("Couldn't load OpMap");
 }
+
+
 
 method process(Ops::Op $op, %c) {
 }
