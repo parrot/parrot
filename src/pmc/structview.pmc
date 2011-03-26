@@ -54,11 +54,13 @@ END_PMC_HEADER_PREAMBLE
     PMC        *ptr_pmc;                                           \
     void       *ptr, *base_ptr;                                    \
     INTVAL      i;                                                 \
+    PMC        *orig_k = (k);                                      \
     GETATTR_StructView_n_elts((interp), (s), n_elts);              \
     GETATTR_StructView_elts((interp), (s), elts);                  \
     ptr_pmc = Parrot_key_pmc((interp), (k));                       \
     (k)     = Parrot_key_next((interp), (k));                      \
     i       = Parrot_key_integer((interp), (k));                   \
+    (k)     = orig_k;                                              \
     if (i < 0 || n_elts <= i)                                      \
         Parrot_ex_throw_from_c_args((interp), NULL, 0,             \
                 "Struct index out of bounds (%d)",                 \
