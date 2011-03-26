@@ -2606,7 +2606,8 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     break;
                 case 'x':
                     digcount = 0;
-                    if (itersrc.bytepos >= srclen) break;
+                    if (itersrc.bytepos >= srclen)
+                        break;
                     c = STRING_iter_get_and_advance(interp, src, &itersrc);
                     if (c == '{') {
                         /* \x{h..h} 1..8 hex digits */
