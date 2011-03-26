@@ -21,6 +21,8 @@ package Parrot::SHA1;
 use strict;
 use warnings;
 use File::Spec;
+use lib qw( lib );
+use Parrot::Configure::Utils qw( print_to_cache );
 
 our $cache = q{.parrot_current_sha1};
 
@@ -41,26 +43,18 @@ sub _handle_update {
     my $args = shift;
     if (! defined $args->{sha1}) {
         $args->{sha1} = 'unknown';
-        _print_to_cache($args->{cache}, $args->{sha1});
+        print_to_cache($args->{cache}, $args->{sha1});
         return $args->{sha1};
     }
     else {
         if (defined ($args->{prev}) && ($args->{sha1} ne $args->{prev})) {
-            _print_to_cache($args->{cache}, $args->{sha1});
+            print_to_cache($args->{cache}, $args->{sha1});
             return $args->{sha1};
         }
         else {
             return $args->{current};
         }
     }
-}
-
-sub _print_to_cache {
-    my ($cache, $sha1) = @_;
-    open my $FH, ">", $cache
-        or die "Unable to open handle to $cache for writing: $!";
-    print {$FH} "$sha1\n";
-    close $FH or die "Unable to close handle to $cache after writing: $!";
 }
 
 sub _get_sha1 {

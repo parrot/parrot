@@ -23,6 +23,8 @@ package Parrot::Git::Describe;
 use strict;
 use warnings;
 use File::Spec;
+use lib qw( lib );
+use Parrot::Configure::Utils qw( print_to_cache );
 
 our $cache = q{.parrot_current_git_describe};
 
@@ -44,26 +46,18 @@ sub _handle_update {
     my $args = shift;
     if (! defined $args->{git_describe}) {
         $args->{git_describe} = 'unknown';
-        _print_to_cache($args->{cache}, $args->{git_describe});
+        print_to_cache($args->{cache}, $args->{git_describe});
         return $args->{git_describe};
     }
     else {
         if (defined ($args->{prev}) && ($args->{git_describe} ne $args->{prev})) {
-            _print_to_cache($args->{cache}, $args->{git_describe});
+            print_to_cache($args->{cache}, $args->{git_describe});
             return $args->{git_describe};
         }
         else {
             return $args->{current};
         }
     }
-}
-
-sub _print_to_cache {
-    my ($cache, $git_describe) = @_;
-    open my $FH, ">", $cache
-        or die "Unable to open handle to $cache for writing: $!";
-    print {$FH} "$git_describe\n";
-    close $FH or die "Unable to close handle to $cache after writing: $!";
 }
 
 sub _get_git_describe {
@@ -78,7 +72,7 @@ sub _get_git_describe {
         if ( !$git_describe && (-d '.git') ) {
             $git_describe = `git describe --tags`;
             chomp( $git_describe );
-            _print_to_cache($cache, $git_describe);
+            print_to_cache($cache, $git_describe);
         }
     }
     return $git_describe;

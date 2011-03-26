@@ -38,6 +38,7 @@ our @EXPORT_OK = qw(
     prompt copy_if_diff move_if_diff integrate
     capture_output check_progs _slurp
     _run_command _build_compile_command
+    print_to_cache
 );
 our %EXPORT_TAGS = (
     inter => [qw(prompt integrate)],
@@ -301,6 +302,14 @@ alias for C<Parrot::BuildUtil::slurp_file>.
 =cut
 
 *_slurp = \&Parrot::BuildUtil::slurp_file;
+
+sub print_to_cache {
+    my ($cache, $value) = @_;
+    open my $FH, ">", $cache
+        or die "Unable to open handle to $cache for writing: $!";
+    print {$FH} "$value\n";
+    close $FH or die "Unable to close handle to $cache after writing: $!";
+}
 
 =back
 
