@@ -4283,8 +4283,13 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
     is_loaded_hash = VTABLE_get_pmc_keyed_int(interp,
         interp->iglobals, IGLOBALS_PBC_LIBS);
 
+    /* Block GC, see TT #1990 */
+    Parrot_block_GC_mark(interp);
+
     if (VTABLE_exists_keyed_str(interp, is_loaded_hash, wo_ext))
         return;
+
+    Parrot_unblock_GC_mark(interp);
 
     pbc = CONST_STRING(interp, "pbc");
 
