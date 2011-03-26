@@ -33,6 +33,7 @@ typedef int (*reg_move_func)(PARROT_INTERP, unsigned char d, unsigned char s, vo
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL Parrot_util_byte_index(SHIM_INTERP,
     ARGIN(const STRING *base),
     ARGIN(const STRING *search),
@@ -42,6 +43,7 @@ INTVAL Parrot_util_byte_index(SHIM_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL Parrot_util_byte_rindex(SHIM_INTERP,
     ARGIN(const STRING *base),
     ARGIN(const STRING *search),

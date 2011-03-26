@@ -203,7 +203,7 @@ constant table into a contiguous region of memory.
 
 PARROT_EXPORT
 size_t
-PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
+PackFile_ConstTable_pack_size(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
 {
     ASSERT_ARGS(PackFile_ConstTable_pack_size)
     opcode_t i;
@@ -250,7 +250,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t *
 PackFile_ConstTable_pack(PARROT_INTERP,
-        ARGIN(PackFile_Segment *seg), ARGMOD(opcode_t *cursor))
+        ARGMOD(PackFile_Segment *seg), ARGOUT(opcode_t *cursor))
 {
     ASSERT_ARGS(PackFile_ConstTable_pack)
     PackFile_ConstTable * const self = (PackFile_ConstTable *)seg;

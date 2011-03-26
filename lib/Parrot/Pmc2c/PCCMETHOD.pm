@@ -546,6 +546,14 @@ sub process_parameter {
     return ($type, @arg_names);
 }
 
+sub mangle_name {
+    my ( $self, $pmc ) = @_;
+    $self->symbol( $self->name );
+    $self->name( $self->type eq Parrot::Pmc2c::Method::MULTI()   ?
+                    (join '_', 'multi', $self->name, @{ $self->{MULTI_sig} }) :
+                    "nci_@{[$self->name]}" );
+}
+
 1;
 
 # Local Variables:

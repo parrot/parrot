@@ -68,8 +68,9 @@ static opcode_t * byte_code_pack(SHIM_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static size_t byte_code_packed_size(SHIM_INTERP,
-    ARGIN(PackFile_Segment *self))
-        __attribute__nonnull__(2);
+    ARGMOD(PackFile_Segment *self))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -173,11 +174,12 @@ static PackFile_Segment * directory_new(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static opcode_t * directory_pack(PARROT_INTERP,
-    ARGIN(PackFile_Segment *self),
+    ARGMOD(PackFile_Segment *self),
     ARGOUT(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self)
         FUNC_MODIFIES(*cursor);
 
 PARROT_WARN_UNUSED_RESULT
@@ -302,8 +304,9 @@ static opcode_t * pf_debug_pack(PARROT_INTERP,
         FUNC_MODIFIES(*cursor);
 
 static size_t pf_debug_packed_size(SHIM_INTERP,
-    ARGIN(PackFile_Segment *self))
-        __attribute__nonnull__(2);
+    ARGMOD(PackFile_Segment *self))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -2371,7 +2374,7 @@ Packs the directory C<self>, using the given cursor.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static opcode_t *
-directory_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cursor))
+directory_pack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cursor))
 {
     ASSERT_ARGS(directory_pack)
     PackFile_Directory * const dir      = (PackFile_Directory *)self;
@@ -2641,7 +2644,7 @@ C<PackFile_ByteCode>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static size_t
-byte_code_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *self))
+byte_code_packed_size(SHIM_INTERP, ARGMOD(PackFile_Segment *self))
 {
     ASSERT_ARGS(byte_code_packed_size)
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
@@ -2686,7 +2689,7 @@ static opcode_t *
 byte_code_pack(SHIM_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cursor))
 {
     ASSERT_ARGS(byte_code_pack)
-    PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
+    const PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
     int i;
     unsigned int u;
 
@@ -2924,7 +2927,7 @@ units.
 */
 
 static size_t
-pf_debug_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *self))
+pf_debug_packed_size(SHIM_INTERP, ARGMOD(PackFile_Segment *self))
 {
     ASSERT_ARGS(pf_debug_packed_size)
     PackFile_Debug * const debug = (PackFile_Debug *)self;
@@ -3648,8 +3651,8 @@ C<add>.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment *
-PackFile_Annotations_new(PARROT_INTERP, SHIM(struct PackFile *pf),
-        SHIM(STRING *name), SHIM(int add))
+PackFile_Annotations_new(PARROT_INTERP, ARGMOD(struct PackFile *pf),
+        ARGIN(STRING *name), SHIM(int add))
 {
     ASSERT_ARGS(PackFile_Annotations_new)
 
@@ -3700,7 +3703,7 @@ segment.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 size_t
-PackFile_Annotations_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *seg))
+PackFile_Annotations_packed_size(SHIM_INTERP, ARGMOD(PackFile_Segment *seg))
 {
     ASSERT_ARGS(PackFile_Annotations_packed_size)
     const PackFile_Annotations * const self = (PackFile_Annotations *)seg;
@@ -3723,7 +3726,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t *
 PackFile_Annotations_pack(SHIM_INTERP, ARGIN(PackFile_Segment *seg),
-        ARGMOD(opcode_t *cursor))
+        ARGOUT(opcode_t *cursor))
 {
     ASSERT_ARGS(PackFile_Annotations_pack)
     const PackFile_Annotations * const self = (PackFile_Annotations *)seg;
@@ -3757,7 +3760,7 @@ Unpacks this segment from the bytecode.
 
 PARROT_CANNOT_RETURN_NULL
 const opcode_t *
-PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
+PackFile_Annotations_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *seg),
         ARGIN(const opcode_t *cursor))
 {
     ASSERT_ARGS(PackFile_Annotations_unpack)
@@ -4475,7 +4478,7 @@ again:
             return NULL;
         }
 
-        program_code = (char *)mmap(0, (size_t)program_size,
+        program_code = (char *)mmap(NULL, (size_t)program_size,
                         PROT_READ, MAP_SHARED, io, (off_t)0);
 
         if (program_code == (void *)MAP_FAILED) {

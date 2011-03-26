@@ -448,7 +448,7 @@ Invokes the subroutine.
         PARROT_CONTINUATION(ccont)->from_ctx = context;
 
         /* if this is an outer sub, then we need to set sub->ctx
-         * to the new context (refcounted) */
+         * to the new context */
         if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER) {
             PARROT_GC_WRITE_BARRIER(interp, SELF);
             sub->ctx = context;
@@ -473,7 +473,9 @@ Invokes the subroutine.
             PMC *c       = context;
             PMC *outer_c = Parrot_pcc_get_outer_ctx(INTERP, c);
 
-            for (c = context; PMC_IS_NULL(outer_c); c = outer_c) {
+            for (c = context;
+                 PMC_IS_NULL(outer_c);
+                 c = outer_c, outer_c = Parrot_pcc_get_outer_ctx(INTERP, c)) {
 
                 PMC *outer_pmc;
                 Parrot_Sub_attributes *current_sub, *outer_sub;

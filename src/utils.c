@@ -580,6 +580,7 @@ Returns an offset value if it is found, or -1 if no match.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL
 Parrot_util_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
         ARGIN(const STRING *search), UINTVAL start_offset)
@@ -629,6 +630,7 @@ Returns offset value or -1 (if no match).
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL
 Parrot_util_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
         ARGIN(const STRING *search), UINTVAL start_offset)

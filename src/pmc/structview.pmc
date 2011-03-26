@@ -54,11 +54,13 @@ END_PMC_HEADER_PREAMBLE
     PMC        *ptr_pmc;                                           \
     void       *ptr, *base_ptr;                                    \
     INTVAL      i;                                                 \
+    PMC        *orig_k = (k);                                      \
     GETATTR_StructView_n_elts((interp), (s), n_elts);              \
     GETATTR_StructView_elts((interp), (s), elts);                  \
     ptr_pmc = Parrot_key_pmc((interp), (k));                       \
     (k)     = Parrot_key_next((interp), (k));                      \
     i       = Parrot_key_integer((interp), (k));                   \
+    (k)     = orig_k;                                              \
     if (i < 0 || n_elts <= i)                                      \
         Parrot_ex_throw_from_c_args((interp), NULL, 0,             \
                 "Struct index out of bounds (%d)",                 \
@@ -121,10 +123,11 @@ deallocate_ptrobj(SHIM_INTERP, SHIM(PMC *obj), ARGFREE(void *ptr))
 }
 
 pmclass StructView auto_attrs {
-    ATTR size_t      n_elts;
-    ATTR elt_desc_t *elts;
-    ATTR size_t      align;
-    ATTR size_t      size;
+    ATTR PARROT_DATA_TYPE  pack_type;
+    ATTR size_t            n_elts;
+    ATTR elt_desc_t       *elts;
+    ATTR size_t            align;
+    ATTR size_t            size;
 
 /*
 
@@ -245,8 +248,9 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
         elt_ary = mem_gc_allocate_n_zeroed_typed(INTERP, n_elts, elt_desc_t);
         PObj_custom_destroy_SET(SELF);
 
-        SET_ATTR_elts(INTERP,   SELF, elt_ary);
-        SET_ATTR_n_elts(INTERP, SELF, n_elts);
+        SET_ATTR_pack_type(INTERP, SELF, pack_type);
+        SET_ATTR_elts(INTERP,      SELF, elt_ary);
+        SET_ATTR_n_elts(INTERP,    SELF, n_elts);
 
         for (/* i already initialized */ j = 0; i < init_len && j < n_elts; i += incr, j++) {
             elt_desc_t * const elt = &elt_ary[j];
@@ -270,26 +274,26 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
               case enum_type_short:
               case enum_type_int:
               case enum_type_long:
-#if HAS_LONGLONG
+#if PARROT_HAS_LONGLONG
               case enum_type_longlong:
 #endif
               case enum_type_int8:
               case enum_type_int16:
               case enum_type_int32:
-#if HAS_INT64
+#if PARROT_HAS_INT64
               case enum_type_int64:
 #endif
               case enum_type_uchar:
               case enum_type_ushort:
               case enum_type_uint:
               case enum_type_ulong:
-#if HAS_LONGLONG
+#if PARROT_HAS_LONGLONG
               case enum_type_ulonglong:
 #endif
               case enum_type_uint8:
               case enum_type_uint16:
               case enum_type_uint32:
-#if HAS_INT64
+#if PARROT_HAS_INT64
               case enum_type_uint64:
 #endif
 
@@ -326,11 +330,11 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
                 break;
 
               /* locally unsupported types */
-#if !HAS_LONGLONG
+#if !PARROT_HAS_LONGLONG
               case enum_type_longlong:
               case enum_type_ulonglong:
 #endif
-#if !HAS_INT64
+#if !PARROT_HAS_INT64
               case enum_type_int64:
               case enum_type_uint64:
 #endif
@@ -367,6 +371,8 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
                     byte_cursor      = (bit_cursor + 1) / 8;
                     bit_cursor       = (bit_cursor + 1) % 8;
                     break;
+                  default:
+                      break;
                 }
                 break;
               case enum_type_union:
@@ -400,13 +406,13 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
                           case enum_type_ushort:
                           case enum_type_uint:
                           case enum_type_ulong:
-#if HAS_LONGLONG
+#if PARROT_HAS_LONGLONG
                           case enum_type_ulonglong:
 #endif
                           case enum_type_uint8:
                           case enum_type_uint16:
                           case enum_type_uint32:
-#if HAS_INT64
+#if PARROT_HAS_INT64
                           case enum_type_uint64:
 #endif
                             elt->access = unaligned_access;
@@ -425,7 +431,11 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
                   case unaligned_access:
                     elt->access = unaligned_access;
                     break;
+                  default:
+                      break;
                 }
+              default:
+                  break;
             }
         }
 
@@ -480,7 +490,7 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 CASE_RET1(short);
                 CASE_RET1(int);
                 CASE_RET1(long);
-#if HAS_LONGLONG
+#if PARROT_HAS_LONGLONG
                 CASE_RET2(long long,          longlong);
                 CASE_RET2(unsigned long long, ulonglong);
 #endif
@@ -490,12 +500,14 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 CASE_RET2(Parrot_UInt2, uint16);
                 CASE_RET2(Parrot_Int4,  int32);
                 CASE_RET2(Parrot_UInt4, uint32);
-#if HAS_INT64
+#if PARROT_HAS_INT64
                 CASE_RET2(Parrot_Int8,  int64);
                 CASE_RET2(Parrot_UInt8, uint64);
 #endif
 #undef CASE_RET1
 #undef CASE_RET2
+              default:
+                  break;
             }
             break;
           case unaligned_access:
@@ -554,7 +566,7 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 CASE_SET1(short);
                 CASE_SET1(int);
                 CASE_SET1(long);
-#if HAS_LONGLONG
+#if PARROT_HAS_LONGLONG
                 CASE_SET2(long long,          longlong);
                 CASE_SET2(unsigned long long, ulonglong);
 #endif
@@ -564,12 +576,14 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 CASE_SET2(Parrot_UInt2, uint16);
                 CASE_SET2(Parrot_Int4,  int32);
                 CASE_SET2(Parrot_UInt4, uint32);
-#if HAS_INT64
+#if PARROT_HAS_INT64
                 CASE_SET2(Parrot_Int8,  int64);
                 CASE_SET2(Parrot_UInt8, uint64);
 #endif
 #undef CASE_SET1
 #undef CASE_SET2
+              default:
+                  break;
             }
             break;
           case unaligned_access:
@@ -644,6 +658,8 @@ Get/Set a float-like element from a struct-pointer PMC.
                 return *(double *)ptr;
               case enum_type_longdouble:
                 return *(long double *)ptr;
+              default:
+                  break;
             }
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
@@ -669,6 +685,8 @@ Get/Set a float-like element from a struct-pointer PMC.
               case enum_type_longdouble:
                 *(long double *)ptr = n;
                 return;
+              default:
+                  break;
             }
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
@@ -696,6 +714,8 @@ Get/Set a string element from a struct-pointer PMC.
             switch (elts[i].type) {
               case enum_type_STRING:
                 return *(STRING **)ptr;
+              default:
+                  break;
             }
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
@@ -712,6 +732,8 @@ Get/Set a string element from a struct-pointer PMC.
               case enum_type_STRING:
                 *(STRING **)ptr = s;
                 return;
+              default:
+                  break;
             }
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
@@ -758,8 +780,12 @@ any other type of element.
                             (INTVAL)*(void **)ptr);
                     VTABLE_set_integer_native(INTERP, ret, elts[i].size);
                     return ret;
+                  default:
+                      break;
                 }
             }
+          default:
+              break;
         }
     }
 
@@ -800,8 +826,12 @@ any other type of element.
                                 "Type `%Ss' unsuitable for buffer assignment",
                                 p->vtable->whoami);
                     }
+                  default:
+                      break;
                 }
             }
+          default:
+              break;
         }
     }
 
@@ -892,6 +922,193 @@ Allocate an instance, or an array of instances when C<n> has been provided.
         SETATTR_PtrObj_destroy(INTERP, ret, deallocate_ptrobj);
 
         RETURN(PMC ret);
+    }
+
+/*
+
+=item C<METHOD array_offs(PMC *array, INTVAL n)>
+
+Return a C<Ptr> to the C<n>th element of an array of structs.
+
+=cut
+
+*/
+
+    METHOD array_offs(PMC *array, INTVAL n) {
+        void   *p          = VTABLE_get_pointer(INTERP, array);
+        INTVAL  array_size = VTABLE_get_integer(INTERP, array);
+        PMC    *ret;
+        size_t  size, align;
+        GET_ATTR_size(INTERP, SELF, size);
+        GET_ATTR_align(INTERP, SELF, align);
+
+        /* sanity checks */
+        if (!p)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    "Attempt to dereference null pointer");
+        if (array_size && array_size < size * n)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    "Buffer length too small for struct array "
+                        "(at least %d required, got %d)",
+                    size * n, array_size);
+        if ((size_t)p != ALIGN_UP((size_t)p, align))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    "Attempt to dereference unaligned pointer "
+                        "(%x, required alignement: %d)",
+                    p, align);
+
+        size = ALIGN_UP(size, align);
+        ret = Parrot_pmc_new_init_int(INTERP, enum_class_Ptr, (INTVAL)((char *)p + size * n));
+
+        RETURN(PMC ret);
+    }
+
+/*
+
+=item C<METHOD elt_offs(PMC *array, INTVAL n)>
+
+Return a C<Ptr> to the C<n>th element of a struct.
+
+=cut
+
+*/
+
+    METHOD elt_offs(PMC *array, INTVAL n) {
+        void       *p = VTABLE_get_pointer(INTERP, array);
+        PMC        *ret;
+        size_t      n_elts;
+        elt_desc_t *elts;
+        GET_ATTR_n_elts(INTERP, SELF, n_elts);
+        GET_ATTR_elts(INTERP, SELF, elts);
+
+        /* sanity checks */
+        if (n < 0 || n_elts <= n)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    "Struct index out of bounds (%d)", n);
+        if (!p)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    "Attempt to dereference null pointer");
+        {
+            size_t buf_size = VTABLE_get_integer(INTERP, array);
+            size_t self_size;
+            GET_ATTR_size(INTERP, SELF, self_size);
+            if (buf_size && buf_size < self_size)
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                        "Buffer length too small for struct "
+                            "(at least %d required, got %d)",
+                        self_size, buf_size);
+        }
+        {
+            size_t align;
+            GET_ATTR_align(INTERP, SELF, align);
+            if ((size_t)p != ALIGN_UP((size_t)p, align))
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                        "Attempt to dereference unaligned pointer "
+                            "(%x, required alignement: %d)",
+                        p, align);
+        }
+
+        p   = ((char *)p) + elts[n].byte_offset;
+        ret = Parrot_pmc_new_init_int(INTERP, enum_class_Ptr, (INTVAL)p);
+
+        RETURN(PMC ret);
+    }
+
+
+
+/*
+
+=item C<METHOD get_shape()>
+
+Obtain an integer array which describes the shape of this object.
+
+The returned array is of the same format as the one used for C<StructView.init_pmc>.
+
+=cut
+
+*/
+
+    METHOD get_shape() {
+        int i, j;
+        size_t            n;
+        elt_desc_t       *elts;
+        PARROT_DATA_TYPE  pack_type;
+        PMC              *result;
+
+        GET_ATTR_n_elts(INTERP, SELF, n);
+        GET_ATTR_elts(INTERP, SELF, elts);
+        GET_ATTR_pack_type(INTERP, SELF, pack_type);
+
+        switch (pack_type) {
+          case enum_type_struct:
+          case enum_type_union:
+            result = Parrot_pmc_new_init_int(INTERP, enum_class_ResizableIntegerArray, n + 2);
+            VTABLE_set_integer_keyed_int(INTERP, result, 0, pack_type);
+            VTABLE_set_integer_keyed_int(INTERP, result, 1, n);
+            break;
+          case enum_type_sized:
+            result = Parrot_pmc_new_init_int(INTERP, enum_class_ResizableIntegerArray, n * 3 + 4);
+            {
+                size_t s;
+                VTABLE_set_integer_keyed_int(INTERP, result, 0, pack_type);
+                VTABLE_set_integer_keyed_int(INTERP, result, 1, n);
+                GET_ATTR_size(INTERP, SELF, s);
+                VTABLE_set_integer_keyed_int(INTERP, result, 2, s);
+                GET_ATTR_align(INTERP, SELF, s);
+                VTABLE_set_integer_keyed_int(INTERP, result, 3, s);
+            }
+            break;
+        }
+
+        for (i = 1, j = 1; i <= n; i++) {
+            switch (pack_type) {
+              case enum_type_struct:
+              case enum_type_union:
+                VTABLE_set_integer_keyed_int(INTERP, result, i + j, elts[i - 1].type);
+                if (elts[i - 1].type == enum_type_sized) {
+                    VTABLE_set_integer_keyed_int(interp, result, i + ++j, elts[i - 1].size);
+                    VTABLE_set_integer_keyed_int(interp, result, i + ++j, 0);
+                }
+                break;
+              case enum_type_sized:
+                VTABLE_set_integer_keyed_int(INTERP, result, i * 3 + j, elts[i - 1].type);
+                if (elts[i - 1].type == enum_type_sized) {
+                    VTABLE_set_integer_keyed_int(interp, result, i * 3 + ++j, elts[i - 1].size);
+                    VTABLE_set_integer_keyed_int(interp, result, i * 3 + ++j, 0);
+                }
+                VTABLE_set_integer_keyed_int(INTERP,
+                                             result, i * 3 + j + 1, elts[i - 1].byte_offset);
+                VTABLE_set_integer_keyed_int(INTERP,
+                                             result, i * 3 + j + 2, elts[i - 1].bit_offset);
+            }
+        }
+
+        RETURN(PMC result);
+    }
+
+/*
+
+=item C<void freeze(PMC *v)>
+
+=item C<void thaw(PMC *v)>
+
+Implement the freeze/thaw API.
+
+=cut
+
+*/
+
+    VTABLE void freeze(PMC *v) {
+        PMC *shape;
+        Parrot_pcc_invoke_method_from_c_args(INTERP, SELF, CONST_STRING(INTERP, "get_shape"),
+                "->P", &shape);
+        VTABLE_freeze(INTERP, shape, v);
+    }
+
+    VTABLE void thaw(PMC *v) {
+        PMC *shape = Parrot_pmc_new_noinit(INTERP, enum_class_ResizableIntegerArray);
+        VTABLE_thaw(INTERP, shape, v);
+        SELF.init_pmc(shape);
     }
 }
 
