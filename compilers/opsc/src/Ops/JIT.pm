@@ -222,7 +222,7 @@ method _create_basic_blocks(%jit_context) {
     my $bc          := %jit_context<bytecode>;
     my $entry       := %jit_context<entry>;
     my $leave       := %jit_context<leave>;
-    my $i           := 0;
+    my $i           := %jit_context<start>;
     my $total       := +$bc - %jit_context<start>;
     my $keep_going  := 1;
 
@@ -247,13 +247,7 @@ method _create_basic_blocks(%jit_context) {
         # Next op
         $i := $i + 1 + _count_args(%jit_context, $op);
 
-        # If this is non-special :flow op - stop.
-        my $parsed_op := %!ops{ $opname };
-        $keep_going   := $parsed_op
-                         && (
-                             _op_is_special($opname)
-                             || !$parsed_op<flags><flow>
-                         );
+        $keep_going   := self._keep_going($opname);
 
         #say("# keep_going $keep_going { $parsed_op<flags>.keys.join(',') }");
     }
@@ -292,6 +286,14 @@ sub _op_is_special($name) {
     || $name eq 'set_returns_pc';
 }
 
+=item _keep_going
+Should we continue processing ops? If this is non-special :flow op - stop now.
+
+method _keep_going($opname) {
+    # If this is non-special :flow op - stop.
+    my $parsed_op := %!ops{ $opname };
+    $parsed_op && ( _op_is_special($opname) || !$parsed_op<flags><flow> );
+}
 
 =item process(Ops::Op, %c) -> Bool.
 Process single Op. Return false if we should stop JITting. Dies if can't handle op.
