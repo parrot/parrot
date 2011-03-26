@@ -1430,6 +1430,25 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
     return pf;
 }
 
+/*
+
+=item C<PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile * pf)>
+
+Get a new PMC to hold the PackFile* structure. The exact type of PMC returned
+is not important, and consuming code should not rely on any particular type
+being returned. The only guarantees which are made by this interface are that:
+
+1) The PackFile* structure can be retrieved by VTABLE_get_pointer
+2) The PackFile* structure is marked for GC when the PMC is marked for GC
+
+=item C<void mark_packfile_pmc(PARROT_INTERP, PMC * pmc, PackFile *pf)>
+
+Mark the PackFile PMC for GC
+
+=cut
+
+*/
+
 PARROT_EXPORT
 PMC *
 Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile * pf)
