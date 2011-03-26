@@ -45,6 +45,16 @@ while $bb {
 
 is( $count, 2, "We have 2 BasicBlocks" );
 
+%jit_context := $jitter._create_basic_blocks(%jit_context);
+$count := 0;
+$bb := $sub.first_basic_block;
+while $bb {
+    $count++;
+    $bb := $bb.next;
+}
+
+# C<end> added automatically by IMCC.
+is( $count, 6, "We have 6 BasicBlocks" );
 
 done_testing();
 # vim: ft=perl6

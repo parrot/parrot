@@ -152,6 +152,7 @@ method _create_jit_context($start) {
     hash(
         bytecode    => $!bytecode,
         constants   => $!constants,
+        start       => $start,
         cur_opcode  => $start,
 
         basic_blocks => hash(), # offset->basic_block
@@ -214,6 +215,76 @@ method _create_jitted_function (%jit_context, $start) {
     );
 
     %jit_context;
+}
+
+method _create_basic_blocks(%jit_context) {
+
+    my $bc          := %jit_context<bytecode>;
+    my $leave       := %jit_context<leave>;
+    my $i           := 0;
+    my $total       := +$bc - %jit_context<start>;
+    my $keep_going  := 1;
+
+    # Enumerate ops and create BasicBlock for each.
+    while $keep_going && ($i < $total) {
+        # Mapped op
+        my $id     := $bc[$i];
+
+        # Real opname
+        my $opname := $!opmap[$id];
+
+        # Get op
+        my $op     := $!oplib{$opname};
+
+        say("# $opname");
+        my $bb := $leave.insert_before("L$i");
+        %jit_context<basic_blocks>{$i} := hash(
+            label => "L$i",
+            bb    => $bb,
+        );
+
+        # Next op
+        $i := $i + 1 + _count_args(%jit_context, $op);
+
+        # If this is non-special :flow op - stop.
+        my $parsed_op := %!ops{ $opname };
+        $keep_going   := $parsed_op
+                         && (
+                             _op_is_special($opname)
+                             || !$parsed_op<flags><flow>
+                         );
+
+        #say("# keep_going $keep_going { $parsed_op<flags>.keys.join(',') }");
+    }
+
+    %jit_context;
+}
+
+=item _count_args
+Calculate number of op's args. In most cases it's predefined for op. For 4
+exceptions C<set_args>, C<get_results>, C<get_params>, C<set_returns> we have
+to calculate it in run-time..
+
+sub _count_args(%jit_context, $op) {
+    die("NYI") if _op_is_special(~$op);
+
+    Q:PIR {
+        .local pmc op
+        .local int s
+        find_lex op, '$op'
+        s = elements op
+        %r = box s
+    };
+}
+
+=item _op_is_special
+Check that op has vaiable length
+
+sub _op_is_special($name) {
+    $name eq 'set_args_pc'
+    || $name eq 'get_results_pc'
+    || $name eq 'get_params_pc'
+    || $name eq 'set_returns_pc';
 }
 
 
