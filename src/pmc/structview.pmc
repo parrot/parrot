@@ -121,10 +121,11 @@ deallocate_ptrobj(SHIM_INTERP, SHIM(PMC *obj), ARGFREE(void *ptr))
 }
 
 pmclass StructView auto_attrs {
-    ATTR size_t      n_elts;
-    ATTR elt_desc_t *elts;
-    ATTR size_t      align;
-    ATTR size_t      size;
+    ATTR PARROT_DATA_TYPE  pack_type;
+    ATTR size_t            n_elts;
+    ATTR elt_desc_t       *elts;
+    ATTR size_t            align;
+    ATTR size_t            size;
 
 /*
 
@@ -245,8 +246,9 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
         elt_ary = mem_gc_allocate_n_zeroed_typed(INTERP, n_elts, elt_desc_t);
         PObj_custom_destroy_SET(SELF);
 
-        SET_ATTR_elts(INTERP,   SELF, elt_ary);
-        SET_ATTR_n_elts(INTERP, SELF, n_elts);
+        SET_ATTR_pack_type(INTERP, SELF, pack_type);
+        SET_ATTR_elts(INTERP,      SELF, elt_ary);
+        SET_ATTR_n_elts(INTERP,    SELF, n_elts);
 
         for (/* i already initialized */ j = 0; i < init_len && j < n_elts; i += incr, j++) {
             elt_desc_t * const elt = &elt_ary[j];
@@ -918,6 +920,99 @@ Allocate an instance, or an array of instances when C<n> has been provided.
         SETATTR_PtrObj_destroy(INTERP, ret, deallocate_ptrobj);
 
         RETURN(PMC ret);
+    }
+
+/*
+
+=item C<METHOD get_shape()>
+
+Obtain an integer array which describes the shape of this object.
+
+The returned array is of the same format as the one used for C<StructView.init_pmc>.
+
+=cut
+
+*/
+
+    METHOD get_shape() {
+        int i, j;
+        size_t            n;
+        elt_desc_t       *elts;
+        PARROT_DATA_TYPE  pack_type;
+        PMC              *result;
+
+        GET_ATTR_n_elts(INTERP, SELF, n);
+        GET_ATTR_elts(INTERP, SELF, elts);
+        GET_ATTR_pack_type(INTERP, SELF, pack_type);
+
+        switch (pack_type) {
+          case enum_type_struct:
+          case enum_type_union:
+            result = Parrot_pmc_new_init_int(INTERP, enum_class_ResizableIntegerArray, n + 2);
+            VTABLE_set_integer_keyed_int(INTERP, result, 0, pack_type);
+            VTABLE_set_integer_keyed_int(INTERP, result, 1, n);
+            break;
+          case enum_type_sized:
+            result = Parrot_pmc_new_init_int(INTERP, enum_class_ResizableIntegerArray, n * 3 + 4);
+            {
+                size_t s;
+                VTABLE_set_integer_keyed_int(INTERP, result, 0, pack_type);
+                VTABLE_set_integer_keyed_int(INTERP, result, 1, n);
+                GET_ATTR_size(INTERP, SELF, s);
+                VTABLE_set_integer_keyed_int(INTERP, result, 2, s);
+                GET_ATTR_align(INTERP, SELF, s);
+                VTABLE_set_integer_keyed_int(INTERP, result, 3, s);
+            }
+            break;
+        }
+
+        for (i = 1, j = 1; i <= n; i++) {
+            switch (pack_type) {
+              case enum_type_struct:
+              case enum_type_union:
+                VTABLE_set_integer_keyed_int(INTERP, result, i + j, elts[i - 1].type);
+                if (elts[i - 1].type == enum_type_sized) {
+                    VTABLE_set_integer_keyed_int(interp, result, i + ++j, elts[i - 1].size);
+                    VTABLE_set_integer_keyed_int(interp, result, i + ++j, 0);
+                }
+                break;
+              case enum_type_sized:
+                VTABLE_set_integer_keyed_int(INTERP, result, i * 3 + j, elts[i - 1].type);
+                if (elts[i - 1].type == enum_type_sized) {
+                    VTABLE_set_integer_keyed_int(interp, result, i * 3 + ++j, elts[i - 1].size);
+                    VTABLE_set_integer_keyed_int(interp, result, i * 3 + ++j, 0);
+                }
+                VTABLE_set_integer_keyed_int(INTERP, result, i * 3 + j + 1, elts[i - 1].byte_offset);
+                VTABLE_set_integer_keyed_int(INTERP, result, i * 3 + j + 2, elts[i - 1].bit_offset);
+            }
+        }
+
+        RETURN(PMC result);
+    }
+
+/*
+
+=item C<void freeze(PMC *v)>
+
+=item C<void thaw(PMC *v)>
+
+Implement the freeze/thaw API.
+
+=cut
+
+*/
+
+    VTABLE void freeze(PMC *v) {
+        PMC *shape;
+        Parrot_pcc_invoke_method_from_c_args(INTERP, SELF, CONST_STRING(INTERP, "get_shape"),
+                "->P", &shape);
+        VTABLE_freeze(INTERP, shape, v);
+    }
+
+    VTABLE void thaw(PMC *v) {
+        PMC *shape = Parrot_pmc_new_noinit(INTERP, enum_class_ResizableIntegerArray);
+        VTABLE_thaw(INTERP, shape, v);
+        SELF.init_pmc(shape);
     }
 }
 
