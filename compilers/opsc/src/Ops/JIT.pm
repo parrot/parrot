@@ -245,7 +245,7 @@ method _create_basic_blocks(%jit_context) {
         );
 
         # Next op
-        $i := $i + 1 + _count_args(%jit_context, $op);
+        $i := $i + _opsize(%jit_context, $op);
 
         $keep_going   := self._keep_going($opname);
 
@@ -264,10 +264,10 @@ Calculate number of op's args. In most cases it's predefined for op. For 4
 exceptions C<set_args>, C<get_results>, C<get_params>, C<set_returns> we have
 to calculate it in run-time..
 
-sub _count_args(%jit_context, $op) {
+sub _opsize(%jit_context, $op) {
     die("NYI") if _op_is_special(~$op);
 
-    Q:PIR {
+    1 + Q:PIR {
         .local pmc op
         .local int s
         find_lex op, '$op'
