@@ -80,6 +80,24 @@ class LLVM::Function is LLVM::Value {
             LLVM::call("GetPreviousFunction", self)
         );
     }
+
+    method entry_basic_block () {
+        LLVM::BasicBlock.create(
+            LLVM::call("GetEntryBasicBlock", self)
+        );
+    }
+
+    method first_basic_block () {
+        LLVM::BasicBlock.create(
+            LLVM::call("GetFirstBasicBlock", self)
+        );
+    }
+
+    method last_basic_block () {
+        LLVM::BasicBlock.create(
+            LLVM::call("GetLastBasicBlock", self)
+        );
+    }
 };
 
 # vim: ft=perl6
