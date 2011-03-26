@@ -44,6 +44,8 @@ method new(Str $pbc, Ops::File $ops_file, OpLib $oplib) {
     self._load_pbc($pbc);
 
     self._init_llvm();
+
+    self;
 }
 
 =item load_pbc
@@ -141,6 +143,7 @@ method jit($start) {
     # for having such signature.
     %jit_context := self._create_jitted_function(%jit_context, $start);
 
+    self;
 }
 
 method _create_jit_context($start) {
