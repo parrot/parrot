@@ -924,6 +924,98 @@ Allocate an instance, or an array of instances when C<n> has been provided.
 
 /*
 
+=item C<METHOD array_offs(PMC *array, INTVAL n)>
+
+Return a C<Ptr> to the C<n>th element of an array of structs.
+
+=cut
+
+*/
+
+    METHOD array_offs(PMC *array, INTVAL n) {
+        void   *p          = VTABLE_get_pointer(INTERP, array);
+        INTVAL  array_size = VTABLE_get_integer(INTERP, array);
+        PMC    *ret;
+        size_t  size, align;
+        GET_ATTR_size(INTERP, SELF, size);
+        GET_ATTR_align(INTERP, SELF, align);
+
+        /* sanity checks */
+        if (!p)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    "Attempt to dereference null pointer");
+        if (array_size && array_size < size * n)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    "Buffer length too small for struct array "
+                        "(at least %d required, got %d)",
+                    size * n, array_size);
+        if ((size_t)p != ALIGN_UP((size_t)p, align))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    "Attempt to dereference unaligned pointer "
+                        "(%x, required alignement: %d)",
+                    p, align);
+
+        size = ALIGN_UP(size, align);
+        ret = Parrot_pmc_new_init_int(INTERP, enum_class_Ptr, (INTVAL)((char *)p + size * n));
+
+        RETURN(PMC ret);
+    }
+
+/*
+
+=item C<METHOD elt_offs(PMC *array, INTVAL n)>
+
+Return a C<Ptr> to the C<n>th element of a struct.
+
+=cut
+
+*/
+
+    METHOD elt_offs(PMC *array, INTVAL n) {
+        void       *p = VTABLE_get_pointer(INTERP, array);
+        PMC        *ret;
+        size_t      n_elts;
+        elt_desc_t *elts;
+        GET_ATTR_n_elts(INTERP, SELF, n_elts);
+        GET_ATTR_elts(INTERP, SELF, elts);
+
+        /* sanity checks */
+        if (n < 0 || n_elts <= n)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    "Struct index out of bounds (%d)", n);
+        if (!p)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    "Attempt to dereference null pointer");
+        {
+            size_t buf_size = VTABLE_get_integer(INTERP, array);
+            size_t self_size;
+            GET_ATTR_size(INTERP, SELF, self_size);
+            if (buf_size && buf_size < self_size)
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                        "Buffer length too small for struct "
+                            "(at least %d required, got %d)",
+                        self_size, buf_size);
+        }
+        {
+            size_t align;
+            GET_ATTR_align(INTERP, SELF, align);
+            if ((size_t)p != ALIGN_UP((size_t)p, align))
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                        "Attempt to dereference unaligned pointer "
+                            "(%x, required alignement: %d)",
+                        p, align);
+        }
+
+        p   = ((char *)p) + elts[n].byte_offset;
+        ret = Parrot_pmc_new_init_int(INTERP, enum_class_Ptr, (INTVAL)p);
+
+        RETURN(PMC ret);
+    }
+
+
+
+/*
+
 =item C<METHOD get_shape()>
 
 Obtain an integer array which describes the shape of this object.
