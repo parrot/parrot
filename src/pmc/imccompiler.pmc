@@ -11,8 +11,6 @@ A compiler object to wrap IMCC
 
 =head2 Functions
 
-=over 4
-
 =cut
 
 */
@@ -216,6 +214,8 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         /* TODO: This */
     }
 }
+
+=cut
 
 /*
  * Local variables:
