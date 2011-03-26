@@ -259,6 +259,36 @@ method _create_basic_blocks(%jit_context) {
     %jit_context;
 }
 
+=item _jit
+JIT opcodes.
+
+method _jit_ops(%jit_context) {
+    # "JIT" Sub
+    my $bc          := %jit_context<bytecode>;
+    my $i           := %jit_context<start>;
+    my $total       := +$bc - %jit_context<start>;
+    my $keep_going  := 1;
+
+    # Enumerate ops and create BasicBlock for each.
+    while $keep_going && ($i < $total) {
+        my $id     := $bc[$i];          # Mapped op
+        my $opname := $!opmap[$id];      # Real opname
+        my $op     := $!oplib{$opname};  # Get op
+
+        # Position Builder to previousely created BB.
+        $!builder.set_position(%jit_context<basic_blocks>{$i}<bb>);
+
+        my $parsed_op := %!ops{ $opname };
+        my $jitted_op := self.process($parsed_op, %jit_context);
+
+        # Next op
+        $i := $i + _opsize($op, %jit_context);
+        %jit_context<cur_opcode> := $i;
+    }
+
+    %jit_context;
+}
+
 =item _count_args
 Calculate number of op's args. In most cases it's predefined for op. For 4
 exceptions C<set_args>, C<get_results>, C<get_params>, C<set_returns> we have
