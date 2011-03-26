@@ -96,6 +96,13 @@ method _init_llvm() {
     $!module.read("t/jit/jitted_ops.bc") // die("Couldn't read t/jit/jitted_ops.bc");
 
     $!builder := LLVM::Builder.create();
+
+    # Shortcuts for types
+    $!interp_struct_type := $!module.get_type("struct.parrot_interp_t")
+                            // die("Couldn't find parrot_interp_t definition");
+
+    $!opcode_ptr_type := LLVM::Type::pointer(LLVM::Type::UINTVAL());
+
 }
 
 =begin Processing
@@ -129,11 +136,6 @@ Any other ways?
 JIT bytecode starting from C<$start> position.
 
 method jit($start) {
-    $!interp_struct := $!module.get_type("struct.parrot_interp_t")
-                         // die("Couldn't find parrot_interp_t definition");
-
-    $!opcode_ptr_type := LLVM::Type::pointer(LLVM::Type::UINTVAL());
-
 
     # jit_context hold state for currently jitting ops.
     my %jit_context := self._create_jit_context($start);
@@ -163,7 +165,7 @@ method _create_jitted_function (%jit_context, $start) {
         "jitted$start",
         $!opcode_ptr_type,
         $!opcode_ptr_type,
-        LLVM::Type::pointer($!interp_struct),
+        LLVM::Type::pointer($!interp_struct_type),
     );
     %jit_context<jitted_sub> := $jitted_sub;
 

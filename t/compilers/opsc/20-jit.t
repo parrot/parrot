@@ -25,7 +25,16 @@ my $ops_file := Ops::File.new("t/jit/jitted.ops",
 
 my $jitter := Ops::JIT.new($pbc, $ops_file, $oplib);
 
-ok( 1, "JITter created");
+ok( 1, "Ops::JIT created");
+
+my %jit_context := $jitter._create_jit_context(0);
+ok( %jit_context, "JIT context created");
+
+# Handle our single function
+%jit_context := $jitter._create_jitted_function(%jit_context, 0);
+ok( %jit_context<jitted_sub>, "JITted function created");
+
+
 
 
 done_testing();
