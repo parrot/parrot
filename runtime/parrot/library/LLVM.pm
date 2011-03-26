@@ -41,6 +41,7 @@ module LLVM {
 
     INIT {
         pir::load_bytecode("nqp-setting.pbc");
+        pir::loadlib("llvm_engine");
 
         #### Bind enums
 
