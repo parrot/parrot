@@ -295,6 +295,8 @@ method _keep_going($opname) {
     $parsed_op && ( _op_is_special($opname) || !$parsed_op<flags><flow> );
 }
 
+
+
 =item process(Ops::Op, %c) -> Bool.
 Process single Op. Return false if we should stop JITting. Dies if can't handle op.
 We stop on :flow ops because PCC will interrupt "C" flow and our PCC is way too
@@ -306,11 +308,11 @@ method process(Ops::Op $op, %c) {
 
 # Recursively process body chunks returning string.
 our multi method process(PAST::Val $val, %c) {
-    die('!!!');
+    #die('!!!');
 }
 
 our multi method process(PAST::Var $var, %c) {
-    die('!!!');
+    #die('!!!');
 }
 
 =item process(PAST::Op)
@@ -327,6 +329,9 @@ our method process:pasttype<inline> (PAST::Op $chunk, %c) {
 }
 
 our method process:pasttype<macro> (PAST::Op $chunk, %c) {
+    my $name := $chunk.name // die("Strange macro");
+    my $sub  := pir::find_sub_not_null__ps('process:macro<' ~ $name ~ '>');
+    $sub(self, $chunk, %c);
 }
 
 our method process:pasttype<macro_define> (PAST::Op $chunk, %c) {
@@ -364,6 +369,19 @@ our multi method process(PAST::Block $chunk, %c) {
 }
 
 our multi method process(String $str, %c) {
+}
+
+
+our method process:macro<goto_offset>(PAST::Op $chunk, %c) {
+}
+
+our method process:macro<goto_address>(PAST::Op $chunk, %c) {
+}
+
+our method process:macro<expr_offset>(PAST::Op $chunk, %c) {
+}
+
+our method process:macro<expr_address>(PAST::Op $chunk, %c) {
 }
 
 
