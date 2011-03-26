@@ -12,7 +12,8 @@ OPSC_SOURCES_GENERATED = \
 	$(OPSC_DIR)/gen/Ops/OpLib.pir \
 	$(OPSC_DIR)/gen/Ops/File.pir \
 	$(OPSC_DIR)/gen/Ops/Renumberer.pir \
-	$(OPSC_DIR)/gen/Ops/Util.pir
+	$(OPSC_DIR)/gen/Ops/Util.pir \
+	$(OPSC_DIR)/gen/Ops/JIT.pir
 
 OPSC_SOURCES = \
 	$(OPSC_DIR)/opsc.pir \
