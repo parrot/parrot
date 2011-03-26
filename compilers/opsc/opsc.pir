@@ -20,6 +20,8 @@
 
 .include 'compilers/opsc/gen/Ops/Util.pir'
 
+.include 'compilers/opsc/gen/Ops/JIT.pir'
+
 .namespace []
 .sub 'main' :main
     .param pmc args
