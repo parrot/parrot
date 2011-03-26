@@ -25,6 +25,9 @@ has $!opmap;
 has $!module;
 has $!builder;
 
+has $!interp_struct_type;
+has $!opcode_ptr_type;
+
 =item new
 Create new JITter for given PBC and OpsFile.
 
@@ -124,8 +127,73 @@ Any other ways?
 JIT bytecode starting from C<$start> position.
 
 method jit($start) {
+    $!interp_struct := $!module.get_type("struct.parrot_interp_t")
+                         // die("Couldn't find parrot_interp_t definition");
+
+    $!opcode_ptr_type := LLVM::Type::pointer(LLVM::Type::UINTVAL());
+
+
+    # Generate JITted function for Sub.
+    my $jitted_sub := self._create_jitted_function();
+
 }
 
+method _create_jitted_function () {
+
+    # Generate JITted function for Sub.
+    my $jitted_sub := $!module.add_function(
+        "foo",
+        $!opcode_ptr_type,
+        $!opcode_ptr_type,
+        LLVM::Type::pointer($!interp_struct),
+    );
+    #%jit_context<jitted_sub> := $jitted_sub;
+
+    #$module.dump();
+
+    # Handle arguments
+    my $entry := $jitted_sub.append_basic_block("entry");
+    # Create explicit return
+    my $leave := $jitted_sub.append_basic_block("leave");
+
+    #%jit_context<leave> := $leave;
+
+    # TODO Handle args.
+    $!builder.set_position($entry);
+
+    my $cur_opcode := $jitted_sub.param(0);
+    $cur_opcode.name("cur_opcode");
+    my $cur_opcode_addr := $!builder.store(
+        $cur_opcode,
+        $!builder.alloca($cur_opcode.typeof()).name("cur_opcode_addr")
+    );
+    #%jit_context<cur_opcode_addr> := $cur_opcode_addr;
+
+    my $interp := $jitted_sub.param(1);
+    $interp.name("interp");
+    my $interp_addr := $!builder.store(
+        $interp,
+        $!builder.alloca($interp.typeof()).name("interp_addr")
+    );
+    #%jit_context<interp_addr> := $interp_addr;
+
+    # Few helper values
+    my $retval := $!builder.alloca($!opcode_ptr_type).name("retval");
+    #%jit_context<retval> := $retval;
+
+    my $cur_ctx := $!builder.struct_gep($interp, 0, "CUR_CTX");
+    #%jit_context<cur_ctx> := $cur_ctx;
+
+    # Load current context from interp
+
+    # Create default return.
+    $!builder.set_position($leave);
+    $!builder.ret(
+        $!builder.load($retval)
+    );
+
+    $jitted_sub;
+}
 
 
 =item process(Ops::Op, %c) -> Bool.
@@ -199,4 +267,9 @@ our multi method process(PAST::Block $chunk, %c) {
 our multi method process(String $str, %c) {
 }
 
+
+INIT {
+    pir::load_bytecode("LLVM.pbc");
+    pir::load_bytecode("nqp-setting.pbc");
+}
 # vim: ft=perl6
