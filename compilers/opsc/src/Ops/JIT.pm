@@ -95,9 +95,38 @@ method _init_llvm() {
 
 =begin Processing
 
-We start from single Ops::Op. Then recursively process chunks. 
+We process bytecode from $start position. $end isn't required because last op
+in any sub will be :flow op. E.g. C<returncc> or C<end>.
+
+1. We create new LLVM::Function for jitted bytecode. Including prologue and
+epilogue.
+
+2. Iterate over ops and create LLVM::BasicBlock for each. This step is
+required for handling "local branches" - C<branch>, C<lt>, etc.
+
+3. Iterate over ops again and jit every op. We can stop early for various
+reasons - non-local jump, unhandled construct, etc. 
+
+4. For the rest of non-processed ops we just remove BasicBlocks.
+
+5. Run LLVM optimizer.
+
+6. JIT new function.
+
+7. ... add dynop lib to interp? Store new function in it and alter bytecode?
+Any other ways?
+
+8. Invoke function.
 
 =end Processing
+
+=item jit($start)
+JIT bytecode starting from C<$start> position.
+
+method jit($start) {
+}
+
+
 
 =item process(Ops::Op, %c) -> Bool.
 Process single Op. Return false if we should stop JITting. Dies if can't handle op.
