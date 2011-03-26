@@ -220,6 +220,7 @@ method _create_jitted_function (%jit_context, $start) {
 method _create_basic_blocks(%jit_context) {
 
     my $bc          := %jit_context<bytecode>;
+    my $entry       := %jit_context<entry>;
     my $leave       := %jit_context<leave>;
     my $i           := 0;
     my $total       := +$bc - %jit_context<start>;
@@ -256,6 +257,10 @@ method _create_basic_blocks(%jit_context) {
 
         #say("# keep_going $keep_going { $parsed_op<flags>.keys.join(',') }");
     }
+
+    # Branch from "entry" BB to next one.
+    $!builder.set_position($entry);
+    $!builder.br($entry.next);
 
     %jit_context;
 }
