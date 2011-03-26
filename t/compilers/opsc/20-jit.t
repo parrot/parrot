@@ -28,13 +28,22 @@ my $jitter := Ops::JIT.new($pbc, $ops_file, $oplib);
 ok( 1, "Ops::JIT created");
 
 my %jit_context := $jitter._create_jit_context(0);
-ok( %jit_context, "JIT context created");
+ok( %jit_context, "JIT context created" );
 
 # Handle our single function
 %jit_context := $jitter._create_jitted_function(%jit_context, 0);
-ok( %jit_context<jitted_sub>, "JITted function created");
+my $sub := %jit_context<jitted_sub>;
+ok( $sub, "JITted function created" );
 
+# We should have "entry" & "leave" blocks.
+my $count := 0;
+my $bb := $sub.first_basic_block;
+while $bb {
+    $count++;
+    $bb := $bb.next;
+}
 
+is( $count, 2, "We have 2 BasicBlocks" );
 
 
 done_testing();
