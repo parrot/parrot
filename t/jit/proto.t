@@ -4,7 +4,6 @@ pir::load_bytecode("opsc.pbc");
 pir::load_bytecode("LLVM.pbc");
 pir::load_bytecode("nqp-setting.pbc");
 pir::load_bytecode("dumper.pbc");
-pir::loadlib("llvm_engine");
 
 Q:PIR { .include "test_more.pir" };
 
@@ -31,8 +30,6 @@ my $jitter := Ops::JIT.new($pbc, $ops_file, $oplib);
 ok( 1, "JITter created");
 
 =begin
-my $trans := Ops::Trans::JIT.new;
-ok( 1, "Got Ops::Trans::JIT" );
 
 # JIT context.
 my %jit_context := hash(
@@ -44,100 +41,6 @@ my %jit_context := hash(
 
     basic_blocks => hash(), # offset->basic_block
 );
-ok( %jit_context, "jit_context" );
-
-# Create few structures. Better to load from compiled bytecode.
-my $module  := LLVM::Module.create("foo");
-my $builder := LLVM::Builder.create();
-
-%jit_context<builder> := $builder;
-
-my $vtable_struct := LLVM::Type::VTABLE();
-$module.add_type_name("struct.VTABLE", $vtable_struct);
-ok( 1, "VTABLE" );
-
-#$module.dump();
-$module.verify(LLVM::VERIFYER_FAILURE_ACTION::PRINT_MESSAGE);
-
-my $pmc_struct    := LLVM::Type::PMC();
-ok( 1, "PMC" );
-$module.add_type_name("struct.PMC", $pmc_struct);
-
-#$module.dump();
-$module.verify(LLVM::VERIFYER_FAILURE_ACTION::PRINT_MESSAGE);
-
-my $interp_struct := LLVM::Type::struct(
-    LLVM::Type::pointer($pmc_struct),    # context
-    # All othere fields aren't handled yet
-);
-ok( 1, "interp_struct" );
-$module.add_type_name("struct.parrot_interp_t", $interp_struct);
-
-my $opcode_ptr_type := LLVM::Type::pointer(LLVM::Type::UINTVAL());
-ok( 1, "opcode_t *");
-$module.add_type_name("opcode_ptr", $opcode_ptr_type);
-
-# Add few function definitions. Preferably loaded from bitcode.
-$module.add_function(
-    "Parrot_io_printf",
-    LLVM::Type::INTVAL(),
-    LLVM::Type::pointer($interp_struct),
-    LLVM::Type::cstring(),
-    :va_args<1>
-);
-
-
-# Generate JITted function for Sub.
-my $jitted_sub := $module.add_function(
-    "foo",
-    $opcode_ptr_type,
-    $opcode_ptr_type,
-    LLVM::Type::pointer($interp_struct),
-);
-%jit_context<jitted_sub> := $jitted_sub;
-
-#$module.dump();
-
-# Handle arguments
-my $entry := $jitted_sub.append_basic_block("entry");
-# Create explicit return
-my $leave := $jitted_sub.append_basic_block("leave");
-%jit_context<leave> := $leave;
-
-# TODO Handle args.
-$builder.set_position($entry);
-
-my $cur_opcode := $jitted_sub.param(0);
-$cur_opcode.name("cur_opcode");
-my $cur_opcode_addr := $builder.store(
-    $cur_opcode,
-    $builder.alloca($cur_opcode.typeof()).name("cur_opcode_addr")
-);
-%jit_context<cur_opcode_addr> := $cur_opcode_addr;
-
-my $interp     := $jitted_sub.param(1);
-$interp.name("interp");
-my $interp_addr := $builder.store(
-    $interp,
-    $builder.alloca($interp.typeof()).name("interp_addr")
-);
-%jit_context<interp_addr> := $interp_addr;
-
-# Few helper values
-my $retval := $builder.alloca($opcode_ptr_type).name("retval");
-%jit_context<retval> := $retval;
-
-my $cur_ctx := $builder.struct_gep($interp, 0, "CUR_CTX");
-%jit_context<cur_ctx> := $cur_ctx;
-
-# Load current context from interp
-
-# Create default return.
-$builder.set_position($leave);
-$builder.ret(
-    $builder.load($retval)
-);
-
 
 
 #$module.dump();
