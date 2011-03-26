@@ -256,7 +256,7 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->all_op_libs         = NULL;
     interp->evc_func_table      = NULL;
     interp->evc_func_table_size = 0;
-    interp->initial_pf          = PackFile_new(interp, 0);
+    interp->initial_pf          = NULL;
     interp->code                = NULL;
 
     /* create exceptions list */

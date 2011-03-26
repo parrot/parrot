@@ -339,9 +339,8 @@ Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
             "Could not load packfile");
     do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
     Parrot_block_GC_mark(interp);
-    *pbc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+    *pbc = Parrot_pf_get_packfile_pmc(interp, pf);
     Parrot_unblock_GC_mark(interp);
-    VTABLE_set_pointer(interp, *pbc, pf);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -374,8 +373,7 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
             "Could not unpack packfile");
     do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
-    *pbcpmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
-    VTABLE_set_pointer(interp, *pbcpmc, pf);
+    *pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf);
     Parrot_unblock_GC_mark(interp);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }

@@ -34,7 +34,6 @@ IMCC helpers.
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_callcontext.h"
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_ptrobj.h"
 #include "pbc.h"
 #include "parser.h"
 #include "optimizer.h"
@@ -581,13 +580,15 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     imc_cleanup(imcc, NULL);
 
     IMCC_info(imcc, 1, "%ld lines compiled.\n", imcc->line);
-    PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, NULL);
-    PackFile_fixup_subs(imcc->interp, PBC_POSTCOMP, NULL);
+    {
+        PMC * packfilepmc = NULL;
+        if (success && pf_raw)
+            packfilepmc = Parrot_pf_get_packfile_pmc(imcc->interp, pf_raw);
+        PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, packfilepmc);
+        PackFile_fixup_subs(imcc->interp, PBC_POSTCOMP, packfilepmc);
 
-    /* TODO: Return a real PackFile PMC */
-    if (success && pf_raw)
-        return imcc_get_packfile_pmc(imcc, pf_raw);
-    return PMCNULL;
+        return packfilepmc ? packfilepmc : NULL;
+    }
 }
 
 /*
@@ -697,24 +698,6 @@ imcc_destroy_macro_values(ARGMOD(void *value))
 
     mem_sys_free(m->expansion);
     mem_sys_free(m);
-}
-
-PMC *
-imcc_get_packfile_pmc(imc_info_t * imcc, PackFile * pf)
-{
-    ASSERT_ARGS(imcc_get_packfile_pmc)
-    PMC * const ptr = Parrot_pmc_new(imcc->interp, enum_class_PtrObj);
-    VTABLE_set_pointer(imcc->interp, ptr, pf);
-    PTROBJ_SET_MARK(imcc->interp, ptr, imcc_mark_packfile_ptr);
-    return ptr;
-}
-
-void
-imcc_mark_packfile_ptr(PARROT_INTERP, PMC * ptr_pmc, void * ptr_raw)
-{
-    ASSERT_ARGS(imcc_mark_packfile_ptr)
-    PackFile * const pf = (PackFile*) ptr_raw;
-    Parrot_pf_mark_packfile(interp, pf);
 }
 
 /*

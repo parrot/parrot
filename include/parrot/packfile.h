@@ -769,6 +769,10 @@ void Parrot_pf_execute_bytecode_program(PARROT_INTERP,
         FUNC_MODIFIES(*args);
 
 PARROT_EXPORT
+PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile * pf)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 void Parrot_pf_set_current_packfile(PARROT_INTERP,
     ARGIN(PackFile * const pf))
         __attribute__nonnull__(1)
@@ -957,6 +961,8 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD(PackFile * pf))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf) \
     , PARROT_ASSERT_ARG(args))
+#define ASSERT_ARGS_Parrot_pf_get_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pf_set_current_packfile \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

@@ -224,11 +224,11 @@ Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), INTVAL is_pasm,
         ARGOUT(STRING **error))
 {
     ASSERT_ARGS(Parrot_compile_file)
-    PMC *result = NULL;
-    UINTVAL regs_used[4] = {3, 3, 3, 3};
-    PMC * const newcontext = Parrot_push_context(interp, regs_used);
-    STRING * compiler_s = is_pasm ? CONST_STRING(interp, "PASM") : CONST_STRING(interp, "PIR");
-    PMC * compiler = Parrot_get_compiler(interp, compiler_s);
+    PMC *result               = NULL;
+    UINTVAL regs_used[4]      = {3, 3, 3, 3};
+    PMC * const newcontext    = Parrot_push_context(interp, regs_used);
+    STRING * const compiler_s = is_pasm ? CONST_STRING(interp, "PASM") : CONST_STRING(interp, "PIR");
+    PMC * compiler   = Parrot_get_compiler(interp, compiler_s);
     imc_info_t *imcc = (imc_info_t *) VTABLE_get_pointer(interp, compiler);
     PackFile * pf = NULL;
 

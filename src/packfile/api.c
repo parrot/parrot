@@ -34,6 +34,7 @@ about the structure of the frozen bytecode.
 #include "pmc/pmc_key.h"
 #include "pmc/pmc_callcontext.h"
 #include "pmc/pmc_parrotlibrary.h"
+#include "pmc/pmc_ptrobj.h"
 #include "parrot/oplib/core_ops.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
@@ -146,6 +147,11 @@ static const opcode_t * default_unpack(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*self);
 
+static void destroy_packfile_pmc(PARROT_INTERP,
+    PMC * ptr_pmc,
+    void * ptr_raw)
+        __attribute__nonnull__(1);
+
 static void directory_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -239,6 +245,9 @@ static void mark_1_ct_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ct);
+
+static void mark_packfile_pmc(PARROT_INTERP, PMC * ptr_pmc, void * ptr_raw)
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -384,6 +393,8 @@ static int sub_pragma(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(cursor))
+#define ASSERT_ARGS_destroy_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_directory_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -426,6 +437,8 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_mark_1_ct_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
+#define ASSERT_ARGS_mark_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_append __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_Constant_unpack_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -1412,6 +1425,29 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
     pf->fetch_nv = (packfile_fetch_nv_t)NULL;
 
     return pf;
+}
+
+PARROT_EXPORT
+PMC *
+Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile * pf)
+{
+    ASSERT_ARGS(Parrot_pf_get_packfile_pmc)
+    PMC * const ptr = Parrot_pmc_new(interp, enum_class_PtrObj);
+    VTABLE_set_pointer(interp, ptr, pf);
+    PTROBJ_SET_MARK(interp, ptr, mark_packfile_pmc);
+
+    /* TODO: We shouldn't need to register this here. But, this is a cheap
+             fix to make sure packfiles aren't getting collected prematurely */
+    Parrot_pmc_gc_register(interp, ptr);
+    return ptr;
+}
+
+static void
+mark_packfile_pmc(PARROT_INTERP, PMC * ptr_pmc, void * ptr_raw)
+{
+    ASSERT_ARGS(mark_packfile_pmc)
+    PackFile * const pf = (PackFile*) ptr_raw;
+    Parrot_pf_mark_packfile(interp, pf);
 }
 
 /*
@@ -4241,9 +4277,6 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
             "\"load_bytecode\" no file name");
 
-    /* Block GC, see TT #1990 */
-    Parrot_block_GC_mark(interp);
-
     parrot_split_path_ext(interp, file_str, &wo_ext, &ext);
 
     /* check if wo_ext is loaded */
@@ -4261,11 +4294,9 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
         file_type = PARROT_RUNTIME_FT_SOURCE;
 
     path = Parrot_locate_runtime_file_str(interp, file_str, file_type);
-    if (!path) {
-        Parrot_unblock_GC_mark(interp);
+    if (!path)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
             "\"load_bytecode\" couldn't find file '%Ss'", file_str);
-    }
 
     /* remember wo_ext => full_path mapping */
     VTABLE_set_string_keyed_str(interp, is_loaded_hash, wo_ext, path);
@@ -4286,8 +4317,6 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
     }
 
     Parrot_pop_context(interp);
-
-    Parrot_unblock_GC_mark(interp);
 }
 
 

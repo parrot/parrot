@@ -85,6 +85,7 @@ implementation, and malloc wrappers for various purposes. These are unused.
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
 #include "gc_private.h"
+#include "fixed_allocator.h"
 
 /* HEADERIZER HFILE: include/parrot/gc_api.h */
 
@@ -675,6 +676,7 @@ Parrot_gc_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_gc_mark_and_sweep)
     interp->gc_sys->do_gc_mark(interp, flags);
+
 }
 
 /*
@@ -961,6 +963,7 @@ Parrot_block_GC_sweep(PARROT_INTERP)
     ASSERT_ARGS(Parrot_block_GC_sweep)
     if (interp->gc_sys->block_sweep)
         interp->gc_sys->block_sweep(interp);
+
 }
 
 PARROT_EXPORT
