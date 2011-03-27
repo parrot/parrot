@@ -295,7 +295,9 @@ method _jit_ops(%jit_context) {
         $!builder.set_position(%jit_context<basic_blocks>{$i}<bb>);
 
         my $parsed_op := %!ops{ $opname };
-        my $jitted_op := self.process($parsed_op, %jit_context);
+        # Meh... Multidispatch passed it to process(PAST::Block) instead of
+        # Ops::Op. process_op is workaround for it.
+        my $jitted_op := self.process_op($parsed_op, %jit_context);
 
         # Next op
         $i := $i + _opsize(%jit_context, $op);
@@ -350,8 +352,11 @@ Process single Op. Return false if we should stop JITting. Dies if can't handle 
 We stop on :flow ops because PCC will interrupt "C" flow and our PCC is way too
 complext to implement it in JITter.
 
-method process(Ops::Op $op, %c) {
+method process_op(Ops::Op $op, %c) {
+    say("# Handling { $op.full_name }");
+    %c<op> := $op;
     self.process($_, %c) for @($op);
+    %c.delete('op');
 }
 
 # Recursively process body chunks returning string.
