@@ -493,6 +493,8 @@ our method process:pasttype<switch> (PAST::Op $chunk, %c) {
 }
 
 our method process:pasttype<undef> (PAST::Op $chunk, %c) {
+    # TODO Handle .returns.
+    self.process_children($chunk, %c)[0];
 }
 
 our multi method process(PAST::Stmts $chunk, %c) {
