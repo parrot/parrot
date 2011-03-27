@@ -27,7 +27,7 @@ my $cwd = cwd();
     my $libdir = qq{$tdir/lib};
     ok( (File::Path::mkpath( [ $libdir ], 0, 0777 )), "Able to make libdir");
 
-    # Can't get it to work with this. Why do we need it?
+    # Cannot get it to work with this. Why do we need it?
     #local @INC;
 
     unshift @INC, $libdir;
