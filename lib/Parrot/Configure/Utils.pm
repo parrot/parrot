@@ -294,14 +294,14 @@ sub check_progs {
     return;
 }
 
-=item C<_slurp($filename)>
+=item C<print_to_cache( $cachefile, $value )>
 
-Slurps C<$filename> into memory and returns it as a string.  This is just an
-alias for C<Parrot::BuildUtil::slurp_file>.
+Opens a handle to write to the file specified in the first argument. Prints
+the value specified in the second argument, followed by a newline.  Typically,
+this will be a hidden file in the user's top-level parrot directory.
+Implicitly returns true value upon success; C<die>s otherwise.
 
 =cut
-
-*_slurp = \&Parrot::BuildUtil::slurp_file;
 
 sub print_to_cache {
     my ($cache, $value) = @_;
@@ -310,6 +310,15 @@ sub print_to_cache {
     print {$FH} "$value\n";
     close $FH or die "Unable to close handle to $cache after writing: $!";
 }
+
+=item C<_slurp($filename)>
+
+Slurps C<$filename> into memory and returns it as a string.  This is just an
+alias for C<Parrot::BuildUtil::slurp_file>.
+
+=cut
+
+*_slurp = \&Parrot::BuildUtil::slurp_file;
 
 =back
 

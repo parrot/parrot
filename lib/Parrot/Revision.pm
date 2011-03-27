@@ -77,7 +77,7 @@ sub _get_revision {
     }
     else {
         $revision = 1;
-        _print_to_cache($cache, $revision);
+        print_to_cache($cache, $revision);
     }
     return $revision;
 }

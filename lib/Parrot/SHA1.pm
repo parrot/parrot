@@ -69,7 +69,7 @@ sub _get_sha1 {
         if ( !$sha1 && (-d '.git') ) {
              $sha1 = `git rev-parse HEAD`;
              chomp($sha1);
-             _print_to_cache($cache, $sha1);
+             print_to_cache($cache, $sha1);
         }
     }
     return $sha1;
