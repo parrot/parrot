@@ -375,9 +375,71 @@ our multi method process(PAST::Var $var, %c) {
     if $var.isdecl {
     }
     else {
-        %c<variables>{ $var.name } // die("Unknown variable { $var.name }");
+        if $var.scope eq 'register' {
+            my $num  := $var.name;
+            my $type := %c<op>.arg_type($num - 1);
+            say("# Handling '$type' register");
+            my $sub  := pir::find_sub_not_null__ps('access_arg:type<' ~ $type ~ '>');
+            $sub(self, $num, %c);
+        }
+        else {
+            %c<variables>{ $var.name } // die("Unknown variable { $var.name }");
+        }
     }
 }
+
+our method access_arg:type<i> ($num, %ctx) {
+}
+
+our method access_arg:type<n> ($num, %ctx) {
+}
+
+our method access_arg:type<p> ($num, %ctx) {
+}
+
+our method access_arg:type<s> ($num, %ctx) {
+}
+
+our method access_arg:type<k> ($num, %ctx) {
+}
+
+our method access_arg:type<ki> ($num, %ctx) {
+}
+
+our method access_arg:type<ic> ($num, %ctx) {
+    say("# $num <ic> { self._opcode_at($num, %ctx) }");
+    LLVM::Constant::integer(self._opcode_at($num, %ctx));
+}
+
+our method access_arg:type<sc> ($num, %ctx) {
+    my $c := %ctx<constants>;
+    my $i := self._opcode_at($num, %ctx);
+    my $res := Q:PIR{
+        .local string s
+        .local int    I
+        .local pmc    c
+        .local pmc    i
+        find_lex c, '$c'
+        find_lex i, '$i'
+        I = i
+        s = c[I]
+        %r = box s
+    };
+    say("# $num<sc> '$res'");
+    $!builder.global_string_ptr($res, :name<.SCONST>);
+}
+
+#        :nc("NCONST(NUM)"),
+#        :pc("PCONST(NUM)"),
+#        :sc("SCONST(NUM)"),
+#        :kc("PCONST(NUM)"),
+#        :kic("ICONST(NUM)")
+
+our method access_arg:type<kic> ($num, %ctx) {
+    self._opcode_at($num, %ctx);
+}
+
+
 
 =item process(PAST::Op)
 Dispatch deeper.
@@ -485,6 +547,14 @@ sub _dequote($str) {
     my $length := pir::length($str);
     pir::substr($str, 1, $length - 2);
 }
+
+=item opcode_at
+Return opcode at offset.
+
+method _opcode_at($offset, %ctx) {
+    %ctx<bytecode>[%ctx<cur_opcode> + $offset];
+}
+
 
 INIT {
     pir::load_bytecode("LLVM.pbc");
