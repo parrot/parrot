@@ -24,7 +24,7 @@ use strict;
 use warnings;
 use File::Spec;
 use lib qw( lib );
-use Parrot::Configure::Utils qw( print_to_cache );
+use Parrot::Configure::Utils qw( :cache );
 
 our $cache = q{.parrot_current_git_describe};
 
@@ -63,10 +63,7 @@ sub _handle_update {
 sub _get_git_describe {
     my $git_describe = 0;
     if (-f $cache) {
-        open my $FH, '<', $cache
-            or die "Unable to open $cache for reading: $!";
-        chomp($git_describe = <$FH>);
-        close $FH or die "Unable to close $cache after reading: $!";
+        $git_describe = read_from_cache($cache);
     }
     else {
         if ( !$git_describe && (-d '.git') ) {
