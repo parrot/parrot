@@ -244,6 +244,7 @@ Returns the special C<NULL> PMC.
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
+PARROT_CAN_RETURN_NULL
 Parrot_PMC
 Parrot_PMC_null(void)
 {

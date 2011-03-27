@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -53,11 +53,12 @@ static void gc_ms_add_free_object(PARROT_INTERP,
         FUNC_MODIFIES(*pool);
 
 static void gc_ms_alloc_objects(PARROT_INTERP,
-    ARGIN(Memory_Pools *mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*pool);
 
 PARROT_CANNOT_RETURN_NULL
@@ -389,11 +390,11 @@ Parrot_gc_ms_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_gc_ms_init)
 
-    interp->mem_pools = mem_internal_allocate_zeroed_typed(Memory_Pools);
-    interp->mem_pools->num_sized          = 0;
-    interp->mem_pools->num_attribs        = 0;
-    interp->mem_pools->attrib_pools       = NULL;
-    interp->mem_pools->sized_header_pools = NULL;
+    Memory_Pools *mem_pools = mem_internal_allocate_zeroed_typed(Memory_Pools);
+    mem_pools->num_sized          = 0;
+    mem_pools->num_attribs        = 0;
+    mem_pools->attrib_pools       = NULL;
+    mem_pools->sized_header_pools = NULL;
 
     interp->gc_sys->finalize_gc_system      = gc_ms_finalize;
     interp->gc_sys->destroy_child_interp    = gc_ms_destroy_child_interp;
@@ -452,13 +453,13 @@ Parrot_gc_ms_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
 
     interp->gc_sys->iterate_live_strings = gc_ms_iterate_live_strings;
 
-    /* gc_private is @objects */
-    interp->gc_sys->gc_private       = Parrot_list_new(interp);
+    /* gc_private is Memory_Pools */
+    interp->gc_sys->gc_private       = mem_pools;
 
 
-    Parrot_gc_str_initialize(interp, &interp->mem_pools->string_gc);
-    initialize_fixed_size_pools(interp, interp->mem_pools);
-    Parrot_gc_initialize_fixed_size_pools(interp, interp->mem_pools,
+    Parrot_gc_str_initialize(interp, &mem_pools->string_gc);
+    initialize_fixed_size_pools(interp, mem_pools);
+    Parrot_gc_initialize_fixed_size_pools(interp, mem_pools,
                                           GC_NUM_INITIAL_FIXED_SIZE_POOLS);
 }
 
@@ -475,16 +476,17 @@ static void
 gc_ms_finalize(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms_finalize)
+    Memory_Pools *mem_pools = (Memory_Pools*)interp->gc_sys->gc_private;
 
     /* buffer headers, PMCs */
-    Parrot_gc_destroy_header_pools(interp, interp->mem_pools);
+    Parrot_gc_destroy_header_pools(interp, mem_pools);
 
     /* memory pools in resources */
-    Parrot_gc_str_finalize(interp, &interp->mem_pools->string_gc);
+    Parrot_gc_str_finalize(interp, &mem_pools->string_gc);
 
     /* mem subsystem is dead now */
-    mem_internal_free(interp->mem_pools);
-    interp->mem_pools = NULL;
+    mem_internal_free(mem_pools);
+    interp->gc_sys->gc_private = NULL;
 }
 
 /*
@@ -504,8 +506,8 @@ gc_ms_destroy_child_interp(ARGMOD(Interp *dest_interp), ARGIN(Interp *source_int
 {
     ASSERT_ARGS(gc_ms_destroy_child_interp)
 
-    Memory_Pools * const dest_arena   = dest_interp->mem_pools;
-    Memory_Pools * const source_arena = source_interp->mem_pools;
+    Memory_Pools * const dest_arena   = (Memory_Pools*)dest_interp->gc_sys->gc_private;
+    Memory_Pools * const source_arena = (Memory_Pools*)source_interp->gc_sys->gc_private;
     Parrot_gc_merge_memory_pools(dest_interp, dest_arena, source_arena);
 }
 
@@ -565,7 +567,7 @@ static void
 gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms_mark_and_sweep)
-    Memory_Pools * const mem_pools = interp->mem_pools;
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     int total_free = 0;
 
     if (mem_pools->gc_mark_block_level)
@@ -587,7 +589,7 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     /* tell the threading system that we're doing GC mark */
     pt_gc_start_mark(interp);
-    Parrot_gc_run_init(interp, interp->mem_pools);
+    Parrot_gc_run_init(interp, mem_pools);
 
     /* Now go trace the PMCs. returning true means we did a complete trace.
        false means it was a lazy trace. */
@@ -599,7 +601,7 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
         /* We've done the mark, now do the sweep. Pass the sweep callback
            function to the PMC pool and all the sized pools. */
-       header_pools_iterate_callback(interp, interp->mem_pools,
+       header_pools_iterate_callback(interp, mem_pools,
             POOL_BUFFER | POOL_PMC, (void *)&total_free, gc_ms_sweep_cb);
 
     }
@@ -639,7 +641,8 @@ void
 gc_ms_compact_memory_pool(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms_compact_memory_pool)
-    Parrot_gc_str_compact_pool(interp, &interp->mem_pools->string_gc);
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    Parrot_gc_str_compact_pool(interp, &mem_pools->string_gc);
 }
 
 /*
@@ -665,28 +668,32 @@ void
 gc_ms_allocate_string_storage(PARROT_INTERP, ARGIN(STRING *str), size_t size)
 {
     ASSERT_ARGS(gc_ms_allocate_string_storage)
-    Parrot_gc_str_allocate_string_storage(interp, &interp->mem_pools->string_gc, str, size);
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    Parrot_gc_str_allocate_string_storage(interp, &mem_pools->string_gc, str, size);
 }
 
 void
 gc_ms_reallocate_string_storage(PARROT_INTERP, ARGIN(STRING *str), size_t size)
 {
     ASSERT_ARGS(gc_ms_reallocate_string_storage)
-    Parrot_gc_str_reallocate_string_storage(interp, &interp->mem_pools->string_gc, str, size);
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    Parrot_gc_str_reallocate_string_storage(interp, &mem_pools->string_gc, str, size);
 }
 
 void
 gc_ms_allocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
 {
     ASSERT_ARGS(gc_ms_allocate_buffer_storage)
-    Parrot_gc_str_allocate_buffer_storage(interp, &interp->mem_pools->string_gc, str, size);
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    Parrot_gc_str_allocate_buffer_storage(interp, &mem_pools->string_gc, str, size);
 }
 
 void
 gc_ms_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
 {
     ASSERT_ARGS(gc_ms_reallocate_buffer_storage)
-    Parrot_gc_str_reallocate_buffer_storage(interp, &interp->mem_pools->string_gc, str, size);
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    Parrot_gc_str_reallocate_buffer_storage(interp, &mem_pools->string_gc, str, size);
 }
 
 /*
@@ -701,7 +708,8 @@ static void
 gc_ms_mark_special(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(gc_ms_mark_special)
-    mark_special(interp, interp->mem_pools, pmc);
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    mark_special(interp, mem_pools, pmc);
 }
 
 /*
@@ -718,8 +726,9 @@ void
 gc_ms_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_ms_pmc_needs_early_collection)
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     PObj_needs_early_gc_SET(pmc);
-    ++interp->mem_pools->num_early_gc_PMCs;
+    ++mem_pools->num_early_gc_PMCs;
 }
 
 /*
@@ -768,11 +777,12 @@ gc_ms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms_allocate_pmc_header)
 
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     Fixed_Size_Pool * const pool = flags & PObj_constant_FLAG
-            ? interp->mem_pools->constant_pmc_pool
-            : interp->mem_pools->pmc_pool;
+            ? mem_pools->constant_pmc_pool
+            : mem_pools->pmc_pool;
 
-    return (PMC *)pool->get_free_object(interp, interp->mem_pools, pool);
+    return (PMC *)pool->get_free_object(interp, mem_pools, pool);
 }
 
 /*
@@ -788,13 +798,15 @@ static void
 gc_ms_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_ms_free_pmc_header)
-    Fixed_Size_Pool * const pool = (PObj_constant_TEST(pmc)) ?
-        interp->mem_pools->constant_pmc_pool : interp->mem_pools->pmc_pool;
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    Fixed_Size_Pool * const pool = (PObj_constant_TEST(pmc))
+                                   ? mem_pools->constant_pmc_pool
+                                   : mem_pools->pmc_pool;
 
     Parrot_pmc_destroy(interp, pmc);
 
     PObj_flags_SETTO((PObj *)pmc, PObj_on_free_list_FLAG);
-    pool->add_free_object(interp, interp->mem_pools, pool, (PObj *)pmc);
+    pool->add_free_object(interp, mem_pools, pool, (PObj *)pmc);
     ++pool->num_free_objects;
 }
 
@@ -846,7 +858,8 @@ static int
 gc_ms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_ms_is_pmc_ptr)
-    return contained_in_pool(interp->mem_pools->pmc_pool, ptr);
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    return contained_in_pool(mem_pools->pmc_pool, ptr);
 }
 
 /*
@@ -864,11 +877,12 @@ static int
 gc_ms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_ms_is_string_ptr)
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     UINTVAL        i;
 
-    for (i = 0; i < interp->mem_pools->num_sized; ++i) {
-        if (interp->mem_pools->sized_header_pools[i]
-            &&  contained_in_pool(interp->mem_pools->sized_header_pools[i], ptr))
+    for (i = 0; i < mem_pools->num_sized; ++i) {
+        if (mem_pools->sized_header_pools[i]
+            &&  contained_in_pool(mem_pools->sized_header_pools[i], ptr))
             return 1;
     }
 
@@ -893,11 +907,12 @@ gc_ms_allocate_string_header(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms_allocate_string_header)
 
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     Fixed_Size_Pool * const pool = flags & PObj_constant_FLAG
-            ? interp->mem_pools->constant_string_header_pool
-            : interp->mem_pools->string_header_pool;
+            ? mem_pools->constant_string_header_pool
+            : mem_pools->string_header_pool;
 
-    STRING * const s = (STRING *)pool->get_free_object(interp, interp->mem_pools, pool);
+    STRING * const s = (STRING *)pool->get_free_object(interp, mem_pools, pool);
     memset(s, 0, sizeof (STRING));
     return s;
 }
@@ -916,10 +931,11 @@ static void
 gc_ms_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
 {
     ASSERT_ARGS(gc_ms_free_string_header)
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     if (!PObj_constant_TEST(s)) {
-        Fixed_Size_Pool * const pool = interp->mem_pools->string_header_pool;
+        Fixed_Size_Pool * const pool = mem_pools->string_header_pool;
         PObj_flags_SETTO((PObj *)s, PObj_on_free_list_FLAG);
-        pool->add_free_object(interp, interp->mem_pools, pool, s);
+        pool->add_free_object(interp, mem_pools, pool, s);
         ++pool->num_free_objects;
     }
 }
@@ -965,9 +981,10 @@ gc_ms_allocate_bufferlike_header(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_ms_allocate_bufferlike_header)
 
-    Fixed_Size_Pool * const pool = get_bufferlike_pool(interp, interp->mem_pools, size);
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    Fixed_Size_Pool * const pool = get_bufferlike_pool(interp, mem_pools, size);
 
-    return (Buffer *)pool->get_free_object(interp, interp->mem_pools, pool);
+    return (Buffer *)pool->get_free_object(interp, mem_pools, pool);
 }
 
 /*
@@ -987,8 +1004,9 @@ gc_ms_free_bufferlike_header(PARROT_INTERP, ARGMOD(Buffer *obj),
     size_t size)
 {
     ASSERT_ARGS(gc_ms_free_bufferlike_header)
-    Fixed_Size_Pool * const pool = get_bufferlike_pool(interp, interp->mem_pools, size);
-    pool->add_free_object(interp, interp->mem_pools, pool, obj);
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    Fixed_Size_Pool * const pool = get_bufferlike_pool(interp, mem_pools, size);
+    pool->add_free_object(interp, mem_pools, pool, obj);
 }
 
 /*
@@ -1173,9 +1191,10 @@ static void *
 gc_ms_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_ms_allocate_pmc_attributes)
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     const size_t attr_size = pmc->vtable->attr_size;
     PMC_Attribute_Pool * const pool = Parrot_gc_get_attribute_pool(interp,
-            interp->mem_pools, attr_size);
+            mem_pools, attr_size);
     void * const attrs = Parrot_gc_get_attributes_from_pool(interp, pool);
     memset(attrs, 0, attr_size);
     PMC_data(pmc) = attrs;
@@ -1228,12 +1247,13 @@ void
 gc_ms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_ms_free_pmc_attributes)
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     void * const data = PMC_data(pmc);
 
     if (data) {
         const size_t attr_size = pmc->vtable->attr_size;
         const size_t item_size = attr_size < sizeof (void *) ? sizeof (void *) : attr_size;
-        PMC_Attribute_Pool ** const pools = interp->mem_pools->attrib_pools;
+        PMC_Attribute_Pool ** const pools = mem_pools->attrib_pools;
         const size_t idx = item_size - sizeof (void *);
         gc_ms_free_attributes_from_pool(pools[idx], data);
     }
@@ -1279,16 +1299,17 @@ void *
 gc_ms_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_ms_allocate_fixed_size_storage)
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     PMC_Attribute_Pool *pool = NULL;
     const size_t idx = (size < sizeof (void *)) ? 0 : (size - sizeof (void *));
 
     /* get the pool directly, if possible, for great speed */
-    if (interp->mem_pools->num_attribs > idx)
-        pool = interp->mem_pools->attrib_pools[idx];
+    if (mem_pools->num_attribs > idx)
+        pool = mem_pools->attrib_pools[idx];
 
     /* otherwise create it */
     if (!pool)
-        pool = Parrot_gc_get_attribute_pool(interp, interp->mem_pools, size);
+        pool = Parrot_gc_get_attribute_pool(interp, mem_pools, size);
 
     return Parrot_gc_get_attributes_from_pool(interp, pool);
 }
@@ -1304,12 +1325,13 @@ C<gc_ms_allocate_fixed_size_storage>
 */
 
 void
-gc_ms_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
+gc_ms_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGFREE_NOTNULL(void *data))
 {
     ASSERT_ARGS(gc_ms_free_fixed_size_storage)
 
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     const size_t idx   = size - sizeof (void *);
-    PMC_Attribute_Pool ** const pools = interp->mem_pools->attrib_pools;
+    PMC_Attribute_Pool ** const pools = mem_pools->attrib_pools;
     gc_ms_free_attributes_from_pool(pools[idx], data);
 }
 
@@ -1426,12 +1448,13 @@ static int
 gc_ms_trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)
 {
     ASSERT_ARGS(gc_ms_trace_active_PMCs)
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
 
-    if (!Parrot_gc_trace_root(interp, interp->mem_pools, trace))
+    if (!Parrot_gc_trace_root(interp, mem_pools, trace))
         return 0;
 
     pt_gc_mark_root_finished(interp);
-    interp->mem_pools->gc_trace_ptr  = NULL;
+    mem_pools->gc_trace_ptr  = NULL;
     return 1;
 
 }
@@ -1511,6 +1534,7 @@ gc_ms_more_traceable_objects(PARROT_INTERP,
         ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_more_traceable_objects)
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
 
     if (pool->skip == GC_ONE_SKIP)
         pool->skip = GC_NO_SKIP;
@@ -1523,7 +1547,7 @@ gc_ms_more_traceable_objects(PARROT_INTERP,
        If gc is disabled, then we must check the free list directly. */
     if ((!pool->free_list || pool->num_free_objects < pool->replenish_level)
         && !pool->newfree)
-        (*pool->alloc_objects) (interp, interp->mem_pools, pool);
+        (*pool->alloc_objects) (interp, mem_pools, pool);
 }
 
 /*
@@ -1626,9 +1650,7 @@ objects to the pool's free list for later allocation.
 */
 
 static void
-gc_ms_alloc_objects(PARROT_INTERP,
-        ARGIN(Memory_Pools *mem_pools),
-        ARGMOD(Fixed_Size_Pool *pool))
+gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools), ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_alloc_objects)
     /* Setup memory for the new objects */
@@ -1696,7 +1718,8 @@ static void
 gc_ms_block_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms_block_GC_mark)
-    ++interp->mem_pools->gc_mark_block_level;
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    ++mem_pools->gc_mark_block_level;
     Parrot_shared_gc_block(interp);
 }
 
@@ -1704,8 +1727,9 @@ static void
 gc_ms_unblock_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms_unblock_GC_mark)
-    if (interp->mem_pools->gc_mark_block_level) {
-        --interp->mem_pools->gc_mark_block_level;
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    if (mem_pools->gc_mark_block_level) {
+        --mem_pools->gc_mark_block_level;
         Parrot_shared_gc_unblock(interp);
     }
 }
@@ -1714,29 +1738,33 @@ static void
 gc_ms_block_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms_block_GC_sweep)
-    ++interp->mem_pools->gc_sweep_block_level;
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    ++mem_pools->gc_sweep_block_level;
 }
 
 static void
 gc_ms_unblock_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms_unblock_GC_sweep)
-    if (interp->mem_pools->gc_sweep_block_level)
-        --interp->mem_pools->gc_sweep_block_level;
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    if (mem_pools->gc_sweep_block_level)
+        --mem_pools->gc_sweep_block_level;
 }
 
 static unsigned int
 gc_ms_is_blocked_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms_is_blocked_GC_mark)
-    return interp->mem_pools->gc_mark_block_level;
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    return mem_pools->gc_mark_block_level;
 }
 
 static unsigned int
 gc_ms_is_blocked_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms_is_blocked_GC_sweep)
-    return interp->mem_pools->gc_sweep_block_level;
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    return mem_pools->gc_sweep_block_level;
 }
 
 /*
@@ -1754,7 +1782,7 @@ gc_ms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
 {
     ASSERT_ARGS(gc_ms_get_gc_info)
 
-    Memory_Pools * const mem_pools = interp->mem_pools;
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     switch (which) {
         case ACTIVE_PMCS:
             return mem_pools->pmc_pool->total_objects -
@@ -1884,7 +1912,7 @@ gc_ms_iterate_live_strings(PARROT_INTERP,
 {
     ASSERT_ARGS(gc_ms_iterate_live_strings)
 
-    Memory_Pools * const mem_pools = interp->mem_pools;
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     INTVAL j;
 
     /* Run through all the Buffer header pools and invoke callback */

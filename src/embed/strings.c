@@ -241,12 +241,12 @@ Supported encodings are: "ascii", "iso-8859-1", "binary", "utf8", "utf16",
 PARROT_API
 Parrot_Int
 Parrot_api_string_import_binary(ARGIN(Parrot_PMC interp_pmc), ARGIN(const unsigned char *bytes),
-        ARGIN_NULLOK(Parrot_Int length), ARGIN(const char *encoding_name),
+        Parrot_Int length, ARGIN(const char *encoding_name),
         ARGOUT(Parrot_String *out))
 {
     ASSERT_ARGS(Parrot_api_string_import_binary)
     EMBED_API_CALLIN(interp_pmc, interp)
-    const STR_VTABLE *encoding = Parrot_find_encoding(interp, encoding_name);
+    const STR_VTABLE * const encoding = Parrot_find_encoding(interp, encoding_name);
     *out = Parrot_str_new_init(interp, (const char *)bytes, length,
                 encoding, 0);
     EMBED_API_CALLOUT(interp_pmc, interp);
@@ -289,4 +289,3 @@ Parrot_api_string_byte_length(Parrot_PMC interp_pmc, Parrot_String str,
  * End:
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
-

@@ -58,7 +58,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $gc = $conf->options->get('gc') || 'gms';
+    my $gc = $conf->options->get('gc') || 'ms2';
     $conf->debug(" ($gc) ");
 
     my @known_gcs = qw<gms ms ms2 inf>;
@@ -71,8 +71,8 @@ sub runstep {
         $self->set_result($gc);
     }
     else {
-        $conf->data->set(gc_type => 'GMS');
-        $self->set_result('gms');
+        $conf->data->set(gc_type => 'MS2');
+        $self->set_result('ms2');
     }
     $conf->data->set(gc_flag => ''); # Compatibility with parrot-3.1.0 and earlier
 

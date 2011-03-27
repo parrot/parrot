@@ -16,12 +16,8 @@ a variety of keys and values.
 
 =cut
 
-.const int TESTS = 55
-
 .sub 'test' :main
     .include 'test_more.pir'
-
-    plan(TESTS)
 
     test_new_capture()
     empty_capture_tests()
@@ -33,6 +29,10 @@ a variety of keys and values.
     test_keyed_int_delegation()
     test_list_delegation()
     test_set_capture()
+
+    test_freeze_thaw()
+
+    "done_testing"()
 .end
 
 .sub 'test_new_capture'
@@ -340,6 +340,27 @@ a variety of keys and values.
         ok(1, "Bad set_pmc handled properly")
     finally:
 .end
+
+.sub 'test_freeze_thaw'
+    $P0 = new ["Capture"]
+    $P0["foo"] = "foo"
+    $P0[0]     = "bar"
+
+    # Sanity check
+    $S0 = $P0["foo"]
+    "is"($S0, "foo")
+    $S0 = $P0[0]
+    "is"($S0, "bar")
+
+    $S1 = freeze $P0
+    $P0 = thaw $S1
+
+    $S0 = $P0["foo"]
+    "is"($S0, "foo", "Hash thawed")
+    $S0 = $P0[0]
+    "is"($S0, "bar", "Array thawed")
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

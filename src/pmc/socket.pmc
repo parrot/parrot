@@ -282,6 +282,7 @@ connected socket object.]
 
     METHOD connect(PMC * address) {
         Parrot_io_connect_handle(INTERP, SELF, address);
+        RETURN(INTVAL 0);
     }
 
 /*
@@ -352,6 +353,7 @@ bound socket object.]
 
     METHOD bind(PMC *host) {
         Parrot_io_bind_handle(INTERP, SELF, host);
+        RETURN(INTVAL 0);
     }
 
 /*
@@ -371,6 +373,7 @@ the socket object.
 
     METHOD listen(INTVAL backlog) {
         Parrot_io_listen_handle(INTERP, SELF, backlog);
+        RETURN(INTVAL 0);
     }
 
 /*

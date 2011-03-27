@@ -1,11 +1,11 @@
 #!perl
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 # auto/llvm-01.t
 
 use strict;
 use warnings;
 use File::Temp qw( tempdir );
-use Test::More tests =>  56;
+use Test::More tests =>  48;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::llvm');
@@ -63,9 +63,7 @@ $step = test_step_constructor_and_description($conf);
     SKIP: {
         skip 'No sense testing for verbose output if LLVM not present',
         2 unless ( $step->result() =~ /yes/ );
-        like( $stdout, qr/llvm-gcc/s,
-            "Got expected verbose output" );
-        like( $stdout, qr/Low Level Virtual Machine/s,
+        like( $stdout, qr/version/s,
             "Got expected verbose output" );
     }
 }
@@ -84,171 +82,104 @@ is( $step->result(), 'no', "Got expected 'no' result" );
 ok( ! $conf->data->get( 'has_llvm' ),
     "'has_llvm' set to false  value, as expected" );
 
-##### _handle_component_version_output() #####
+my @output = (
+    '',
+    'llvm version 2.7',
+);
+my $verbose = 0;
+ok( $step->version_check($conf, \@output, $verbose),
+    "Got expected return value: version_check() with sufficient version" );
 
-my ($prog, $output, $llvm_lacking, $verbose);
-$prog = [ 'llvm-gcc'    => 'llvm-gcc' ];
-
+$output[1] = 'llvm version 1.0';
 $verbose = 0;
+ok( ! $step->version_check($conf, \@output, $verbose),
+    "Got expected return value: version_check() with insufficient version" );
+is( $step->result(), 'no',
+    "Got expected result: insufficient version" );
+ok( ! $conf->data->get( 'has_llvm' ),
+    "'has_llvm' not set: insufficient version" );
 
-$output = 'llvm-gcc';
-$llvm_lacking = 0;
-$llvm_lacking = auto::llvm::_handle_component_version_output(
-    $prog, $output, $llvm_lacking, $verbose
-);
-ok( ! $llvm_lacking, "llvm reported as not lacking" );
-
-$output = 'foobar';
-$llvm_lacking = 0;
-$llvm_lacking = auto::llvm::_handle_component_version_output(
-    $prog, $output, $llvm_lacking, $verbose
-);
-ok( $llvm_lacking, "llvm reported as lacking: wrong output" );
-
-$output = undef;
-$llvm_lacking = 0;
-$llvm_lacking = auto::llvm::_handle_component_version_output(
-    $prog, $output, $llvm_lacking, $verbose
-);
-ok( $llvm_lacking, "llvm reported as lacking: output undefined" );
-
+$output[1] = 'llvm version 2.7',
 $verbose = 1;
-
-my ($stdout, $stderr);
-my $exp = $prog->[0];
-
-$output = 'llvm-gcc';
-$llvm_lacking = 0;
-capture(
-    sub {
-        $llvm_lacking = auto::llvm::_handle_component_version_output(
-            $prog, $output, $llvm_lacking, $verbose
-        );
-    },
-    \$stdout,
-    \$stderr,
-);
-ok( ! $llvm_lacking, "llvm reported as not lacking" );
-like( $stdout, qr/$output/, "Got expected verbose output: llvm not lacking" );
-
-$output = 'foobar';
-$llvm_lacking = 0;
-capture(
-    sub {
-        $llvm_lacking = auto::llvm::_handle_component_version_output(
-            $prog, $output, $llvm_lacking, $verbose
-        );
-    },
-    \$stdout,
-    \$stderr,
-);
-ok( $llvm_lacking, "llvm reported as lacking: wrong output" );
-like(
-    $stdout,
-    qr/Could not get expected '--version' output for $exp/,
-    "Got expected verbose output: llvm lacking",
-);
-
-$output = undef;
-$llvm_lacking = 0;
-capture(
-    sub {
-        $llvm_lacking = auto::llvm::_handle_component_version_output(
-            $prog, $output, $llvm_lacking, $verbose
-        );
-    },
-    \$stdout,
-    \$stderr,
-);
-ok( $llvm_lacking, "llvm reported as lacking: output undefined" );
-like(
-    $stdout,
-    qr/Could not get expected '--version' output for $exp/,
-    "Got expected verbose output: llvm lacking",
-);
-
-##### _examine_llvm_gcc_version() #####
-
-$output = '';
-$llvm_lacking = 0;
-$verbose = 0;
-$llvm_lacking =
-    auto::llvm::_examine_llvm_gcc_version( $output, $llvm_lacking, $verbose );
-ok( $llvm_lacking, "_examine_llvm_gcc_version() reported LLVM lacking" );
-
-$output = 'foobar';
-$llvm_lacking = 0;
-$verbose = 0;
-$llvm_lacking =
-    auto::llvm::_examine_llvm_gcc_version( $output, $llvm_lacking, $verbose );
-ok( $llvm_lacking, "_examine_llvm_gcc_version() reported LLVM lacking" );
-
-$output = '3.2.1';
-$llvm_lacking = 0;
-$verbose = 0;
-$llvm_lacking =
-    auto::llvm::_examine_llvm_gcc_version( $output, $llvm_lacking, $verbose );
-ok( $llvm_lacking, "_examine_llvm_gcc_version() reported LLVM lacking" );
-
-$output = '4.2.1';
-$llvm_lacking = 0;
-$verbose = 0;
-$llvm_lacking =
-    auto::llvm::_examine_llvm_gcc_version( $output, $llvm_lacking, $verbose );
-ok( ! $llvm_lacking, "_examine_llvm_gcc_version() reported LLVM not lacking" );
-
-$output = 'foobar';
-$llvm_lacking = 0;
+{
+    my ($stdout, $stderr);
+    capture(
+        sub { $step->version_check($conf, \@output, $verbose); },
+        \$stdout,
+        \$stderr,
+    );
+    like(
+        $stdout,
+        qr/Found 'lli' version/,
+        "Got expected verbose output: version_check() with sufficient version"
+    );
+}
+$output[1] = 'llvm version 1.0';
 $verbose = 1;
-capture(
-    sub { $llvm_lacking = auto::llvm::_examine_llvm_gcc_version(
-            $output, $llvm_lacking, $verbose ); },
-    \$stdout,
-    \$stderr,
-);
-ok( $llvm_lacking, "_examine_llvm_gcc_version() reported LLVM lacking" );
-like(
-    $stdout,
-    qr/Unable to extract llvm-gcc major, minor and patch versions/,
-    "Got expected verbose output from _examine_llvm_gcc_version()",
-);
+{
+    my ($stdout, $stderr);
+    capture(
+        sub { $step->version_check($conf, \@output, $verbose); },
+        \$stdout,
+        \$stderr,
+    );
+    like(
+        $stdout,
+        qr/LLVM component 'lli' must be at least version/,
+        "Got expected verbose output: version_check() with insufficient version"
+    );
+}
 
-$output = '3.2.1';
-$llvm_lacking = 0;
-$verbose = 1;
-capture(
-    sub { $llvm_lacking = auto::llvm::_examine_llvm_gcc_version(
-            $output, $llvm_lacking, $verbose ); },
-    \$stdout,
-    \$stderr,
-);
-ok( $llvm_lacking, "_examine_llvm_gcc_version() reported LLVM lacking" );
-like(
-    $stdout,
-    qr/llvm-gcc must be at least major version 4/,
-    "Got expected verbose output from _examine_llvm_gcc_version()",
-);
-
-##### 4 methods #####
+$output[1] = 'foobar';
 $verbose = 0;
+ok( ! $step->version_check($conf, \@output, $verbose),
+    "Got expected return value: version_check() with version not found" );
+is( $step->result(), 'no',
+    "Got expected result: version not found" );
+ok( ! $conf->data->get( 'has_llvm' ),
+    "'has_llvm' not set: version not found" );
 
+$output[1] = 'foobar';
+$verbose = 1;
+{
+    my ($stdout, $stderr);
+    capture(
+        sub { $step->version_check($conf, \@output, $verbose); },
+        \$stdout,
+        \$stderr,
+    );
+    like(
+        $stdout,
+        qr/Unable to extract version for LLVM component/,
+        "Got expected verbose output: version_check() with version not detected"
+    );
+}
+
+##### 4 internal methods #####
+
+$verbose = 0;
 $step->set_result( undef );
 $step->_handle_failure_to_compile_into_bitcode( $conf, $verbose );
-is( $step->result(), 'no', "Got expected result" );
+is( $step->result(), 'no',
+    "Got expected result: _handle_failure_to_compile_into_bitcode()" );
 
 $step->set_result( undef );
 $step->_handle_failure_to_execute_bitcode( $conf, $verbose );
-is( $step->result(), 'no', "Got expected result" );
+is( $step->result(), 'no',
+    "Got expected result: _handle_failure_to_execute_bitcode()" );
 
 $step->set_result( undef );
 $step->_handle_failure_to_compile_to_assembly( $conf, $verbose );
-is( $step->result(), 'no', "Got expected result" );
+is( $step->result(), 'no',
+    "Got expected result: _handle_failure_to_compile_to_assembly()" );
 
 $step->set_result( undef );
 $step->_handle_failure_to_assemble_assembly( $conf, $verbose );
-is( $step->result(), 'no', "Got expected result" );
+is( $step->result(), 'no',
+    "Got expected result: _handle_failure_to_assemble_assembly()" );
 
 $verbose = 1;
+my ($stdout, $stderr);
 capture(
     sub { $step->_handle_failure_to_compile_into_bitcode( $conf, $verbose ); },
     \$stdout,
@@ -291,6 +222,7 @@ like( $stdout,
 
 ##### _handle_native_assembly_output() #####
 
+my $output = '';
 {
     local $@ = '';
     $output = 'hello world';

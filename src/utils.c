@@ -594,6 +594,7 @@ Returns an offset value if it is found, or -1 if no match.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL
 Parrot_util_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
         ARGIN(const STRING *search), UINTVAL start_offset)
@@ -643,6 +644,7 @@ Returns offset value or -1 (if no match).
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL
 Parrot_util_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
         ARGIN(const STRING *search), UINTVAL start_offset)
@@ -760,9 +762,9 @@ process_cycle_without_exit(int node_index, ARGIN(const parrot_prm_context *c))
 
 /*
 
-=item C<void Parrot_util_register_move(PARROT_INTERP, int n_regs, unsigned char
-*dest_regs, unsigned char *src_regs, unsigned char temp_reg, reg_move_func mov,
-reg_move_func mov_alt, void *info)>
+=item C<void Parrot_util_register_move(PARROT_INTERP, size_t n_regs, unsigned
+char *dest_regs, unsigned char *src_regs, unsigned char temp_reg, reg_move_func
+mov, reg_move_func mov_alt, void *info)>
 
 Move C<n_regs> from the given register list C<src_regs> to C<dest_regs>.
 
@@ -816,7 +818,7 @@ TODO: Add tests for the above conditions.
 PARROT_EXPORT
 void
 Parrot_util_register_move(PARROT_INTERP,
-        int n_regs,
+        size_t n_regs,
         ARGOUT(unsigned char *dest_regs),
         ARGIN(unsigned char *src_regs),
         unsigned char temp_reg,
@@ -825,8 +827,8 @@ Parrot_util_register_move(PARROT_INTERP,
         ARGIN(void *info))
 {
     ASSERT_ARGS(Parrot_util_register_move)
-    int i;
-    int max_reg       = 0;
+    size_t i;
+    size_t max_reg    = 0;
     int* nb_succ      = NULL;
     int* backup       = NULL;
     int* reg_to_index = NULL;

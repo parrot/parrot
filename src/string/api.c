@@ -55,11 +55,12 @@ static INTVAL string_max_bytes(SHIM_INTERP,
 PARROT_INLINE
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
-static const STR_VTABLE * string_rep_compatible(SHIM_INTERP,
+PARROT_PURE_FUNCTION
+static const STR_VTABLE * string_rep_compatible(
     ARGIN(const STRING *a),
     ARGIN(const STRING *b))
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
@@ -235,8 +236,8 @@ Parrot_str_new_noinit(PARROT_INTERP, UINTVAL capacity)
 
 /*
 
-=item C<static const STR_VTABLE * string_rep_compatible(PARROT_INTERP, const
-STRING *a, const STRING *b)>
+=item C<static const STR_VTABLE * string_rep_compatible(const STRING *a, const
+STRING *b)>
 
 Find the "lowest" possible encoding for the given string. E.g.
 
@@ -252,9 +253,9 @@ Returns NULL, if no compatible string representation can be found.
 PARROT_INLINE
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
+PARROT_PURE_FUNCTION
 static const STR_VTABLE *
-string_rep_compatible(SHIM_INTERP,
-    ARGIN(const STRING *a), ARGIN(const STRING *b))
+string_rep_compatible(ARGIN(const STRING *a), ARGIN(const STRING *b))
 {
     ASSERT_ARGS(string_rep_compatible)
 
@@ -323,17 +324,17 @@ Returns NULL, if no compatible string representation can be found.
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
+PARROT_PURE_FUNCTION
 const STR_VTABLE *
-Parrot_str_rep_compatible(PARROT_INTERP,
-    ARGIN(const STRING *a), ARGIN(const STRING *b))
+Parrot_str_rep_compatible(SHIM_INTERP, ARGIN(const STRING *a), ARGIN(const STRING *b))
 {
     ASSERT_ARGS(Parrot_str_rep_compatible)
-    return string_rep_compatible(interp, a, b);
+    return string_rep_compatible(a, b);
 }
 
 /*
 
-=item C<STRING* Parrot_str_clone(PARROT_INTERP, const STRING *s)>
+=item C<STRING * Parrot_str_clone(PARROT_INTERP, const STRING *s)>
 
 Helper function to clone string.
 
@@ -342,9 +343,9 @@ Helper function to clone string.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING*
-Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
+PARROT_CAN_RETURN_NULL
+STRING *
+Parrot_str_clone(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_clone)
     size_t  alloc_size;
@@ -384,10 +385,10 @@ Creates and returns a shallow copy of the specified Parrot string.
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
+Parrot_str_copy(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_copy)
     STRING *d;
@@ -446,7 +447,7 @@ returned. If both strings are C<NULL>, return C<STRINGNULL>.
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 STRING *
 Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
             ARGIN_NULLOK(const STRING *b))
@@ -473,7 +474,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
     ASSERT_STRING_SANITY(a);
     ASSERT_STRING_SANITY(b);
 
-    enc = string_rep_compatible(interp, a, b);
+    enc = string_rep_compatible(a, b);
 
     if (!enc) {
         /* upgrade strings for concatenation */
@@ -1209,7 +1210,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     }
     else {
         /* may have different reps..... */
-        enc = string_rep_compatible(interp, src, rep);
+        enc = string_rep_compatible(src, rep);
 
         if (!enc) {
             if (src->encoding != Parrot_utf8_encoding_ptr)
@@ -1744,8 +1745,12 @@ INTVAL
 Parrot_str_boolean(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_boolean)
-    const INTVAL len = STRING_length(s);
+    INTVAL len;
 
+    if (s == NULL)
+        return 0;
+
+    len = STRING_length(s);
     if (len == 0)
         return 0;
 
@@ -2133,7 +2138,7 @@ You usually should use Parrot_str_to_encoded_cstring instead.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 char *
-Parrot_str_to_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
+Parrot_str_to_cstring(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_cstring)
 
@@ -2157,7 +2162,7 @@ in a memory leak.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 char *
-Parrot_str_to_encoded_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s),
+Parrot_str_to_encoded_cstring(PARROT_INTERP, ARGIN(const STRING *s),
         ARGIN(const STR_VTABLE *enc))
 {
     ASSERT_ARGS(Parrot_str_to_encoded_cstring)
@@ -2601,7 +2606,8 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     break;
                 case 'x':
                     digcount = 0;
-                    if (itersrc.bytepos >= srclen) break;
+                    if (itersrc.bytepos >= srclen)
+                        break;
                     c = STRING_iter_get_and_advance(interp, src, &itersrc);
                     if (c == '{') {
                         /* \x{h..h} 1..8 hex digits */

@@ -334,6 +334,7 @@ USAGE
 
 %s
 #include "parrot/parrot.h"
+#include "parrot/nci.h"
 #include "pmc/pmc_nci.h"
 
 
@@ -458,7 +459,9 @@ HEADER
         $S0 = 'sprintf'(<<'TEMPLATE', fn_name, key)
     temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)%s);
-    VTABLE_set_pmc_keyed_str(interp, nci_funcs, CONST_STRING(interp, "%s"), temp_pmc);
+    VTABLE_set_pmc_keyed(interp, nci_funcs,
+        Parrot_nci_parse_signature(interp, string_from_literal(interp, "%s")),
+        temp_pmc);
 
 TEMPLATE
         code = concat code, $S0

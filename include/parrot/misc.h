@@ -33,6 +33,7 @@ typedef int (*reg_move_func)(PARROT_INTERP, unsigned char d, unsigned char s, vo
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL Parrot_util_byte_index(SHIM_INTERP,
     ARGIN(const STRING *base),
     ARGIN(const STRING *search),
@@ -42,6 +43,7 @@ INTVAL Parrot_util_byte_index(SHIM_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL Parrot_util_byte_rindex(SHIM_INTERP,
     ARGIN(const STRING *base),
     ARGIN(const STRING *search),
@@ -63,7 +65,7 @@ INTVAL Parrot_util_range_rand(INTVAL from, INTVAL to, INTVAL how_random);
 
 PARROT_EXPORT
 void Parrot_util_register_move(PARROT_INTERP,
-    int n_regs,
+    size_t n_regs,
     ARGOUT(unsigned char *dest_regs),
     ARGIN(unsigned char *src_regs),
     unsigned char temp_reg,
@@ -192,7 +194,7 @@ STRING * Parrot_sprintf_s(PARROT_INTERP, ARGIN(STRING *pat), ...)
 
 PARROT_EXPORT
 void Parrot_vsnprintf(PARROT_INTERP,
-    ARGOUT(char *targ),
+    ARGMOD(char *targ),
     size_t len,
     ARGIN(const char *pat),
     va_list args)

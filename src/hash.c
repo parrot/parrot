@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -39,7 +39,7 @@ C<< hash->buckets >> bucket store points to this region.
 
 static void allocate_buckets(PARROT_INTERP,
     ARGMOD(Hash *hash),
-    ARGIN_NULLOK(const UINTVAL size))
+    UINTVAL size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*hash);
@@ -95,9 +95,10 @@ PARROT_PURE_FUNCTION
 PARROT_INLINE
 static int hash_compare_string(PARROT_INTERP,
     ARGIN(const void *search_key),
-    ARGIN_NULLOK(const void *bucket_key))
+    ARGIN(const void *bucket_key))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 static int hash_compare_string_enc(
@@ -184,7 +185,8 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 #define ASSERT_ARGS_hash_compare_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_hash_compare_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(search_key))
+    , PARROT_ASSERT_ARG(search_key) \
+    , PARROT_ASSERT_ARG(bucket_key))
 #define ASSERT_ARGS_hash_compare_string_enc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(search_key) \
     , PARROT_ASSERT_ARG(bucket_key))
@@ -215,6 +217,31 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
     , PARROT_ASSERT_ARG(hash))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
+
+/*
+
+=item C<size_t Parrot_hash_buffer(const unsigned char *buf, size_t len, size_t
+hashval)>
+
+Compute the hash of a buffer.
+
+=cut
+
+*/
+
+PARROT_HOT
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+size_t
+Parrot_hash_buffer(ARGIN_NULLOK(const unsigned char *buf), size_t len, size_t hashval)
+{
+    ASSERT_ARGS(Parrot_hash_buffer)
+    while (len--) {
+        hashval += hashval << 5;
+        hashval += *buf++;
+    }
+    return hashval;
+}
 
 /*
 
@@ -258,12 +285,11 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
 static int
-hash_compare_string(PARROT_INTERP, ARGIN(const void *search_key),
-        ARGIN_NULLOK(const void *bucket_key))
+hash_compare_string(PARROT_INTERP, ARGIN(const void *search_key), ARGIN(const void *bucket_key))
 {
     ASSERT_ARGS(hash_compare_string)
-    STRING const *s1 = (STRING const *)search_key;
-    STRING const *s2 = (STRING const *)bucket_key;
+    const STRING * const s1 = (const STRING *)search_key;
+    const STRING * const s2 = (const STRING *)bucket_key;
 
     return !STRING_equal(interp, s1, s2);
 }
@@ -284,12 +310,12 @@ static int
 hash_compare_string_enc(ARGIN(const void *search_key), ARGIN(const void *bucket_key))
 {
     ASSERT_ARGS(hash_compare_string_enc)
-    STRING const *s1 = (STRING const *)search_key;
-    STRING const *s2 = (STRING const *)bucket_key;
+    const STRING * const s1 = (const STRING *)search_key;
+    const STRING * const s2 = (const STRING *)bucket_key;
 
     if (s1->hashval != s2->hashval)
         return 1;
-    if (s1 && s2 && s1->encoding != s2->encoding)
+    if (s1->encoding != s2->encoding)
         return 1;
     else
         return memcmp(s1->strstart, s2->strstart, s1->bufused);
@@ -449,10 +475,10 @@ key_hash(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(void *key))
 
     if (hash->key_type == Hash_key_type_STRING
     ||  hash->key_type == Hash_key_type_STRING_enc)
-        return key_hash_STRING(interp, (STRING *)key, hash->seed);
+        return key_hash_STRING(interp, (const STRING *)key, hash->seed);
 
     if (hash->key_type == Hash_key_type_cstring)
-        return key_hash_cstring(interp, (char *)key, hash->seed);
+        return key_hash_cstring(interp, (const char *)key, hash->seed);
 
     if (hash->key_type == Hash_key_type_PMC)
         return VTABLE_hashvalue(interp, (PMC *)key);
@@ -487,16 +513,19 @@ hash_compare(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(void *a),
         return 0;
 
     if (hash->key_type == Hash_key_type_STRING)
-        return hash_compare_string(interp, (STRING *)a, (STRING *)b);
+        return hash_compare_string(interp, (const STRING *)a, (const STRING *)b);
 
     if (hash->key_type == Hash_key_type_STRING_enc)
-        return hash_compare_string_enc((STRING *)a, (STRING *)b);
+        return hash_compare_string_enc((const STRING *)a, (const STRING *)b);
 
     if (hash->key_type == Hash_key_type_cstring)
-        return strcmp((char *)a, (char *)b);
+        return strcmp((const char *)a, (const char *)b);
 
     if (hash->key_type == Hash_key_type_PMC)
         return hash_compare_pmc(interp, (PMC *)a, (PMC *) b);
+    /*
+     * XXX When this function can take const pointers, hash_compare() can take const pointers, too
+     */
 
     return 1;
 }
@@ -817,8 +846,7 @@ Parrot_hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
 
 /*
 
-=item C<static void allocate_buckets(PARROT_INTERP, Hash *hash, const UINTVAL
-size)>
+=item C<static void allocate_buckets(PARROT_INTERP, Hash *hash, UINTVAL size)>
 
 Allocate sized buckets and index storage for a hash
 
@@ -827,7 +855,7 @@ Allocate sized buckets and index storage for a hash
 */
 
 static void
-allocate_buckets(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN_NULLOK(const UINTVAL size))
+allocate_buckets(PARROT_INTERP, ARGMOD(Hash *hash), UINTVAL size)
 {
     ASSERT_ARGS(allocate_buckets)
 
@@ -1453,7 +1481,7 @@ Puts the key and value into the hash. Note that C<key> is B<not> copied.
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 HashBucket*
 Parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
         ARGIN_NULLOK(void *key), ARGIN_NULLOK(void *value))
