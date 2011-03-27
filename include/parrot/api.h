@@ -19,10 +19,10 @@ typedef int (*imcc_hack_func_t)(Parrot_PMC, Parrot_String, int, const char **, P
 
 /* Forward declaration of Parrot_confess. We can't include exceptions.h yet */
 PARROT_EXPORT
-void Parrot_confess(
-    ARGIN(const char *cond),
-    ARGIN(const char *file),
-    unsigned int line);
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+void
+Parrot_confess(ARGIN(const char *cond), ARGIN(const char *file), unsigned int line);
 
 #define PARROT_API PARROT_EXPORT
 
