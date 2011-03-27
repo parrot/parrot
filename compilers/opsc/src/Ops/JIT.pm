@@ -165,6 +165,7 @@ method _create_jit_context($start) {
         cur_opcode  => $start,
 
         basic_blocks => hash(), # offset->basic_block
+        variables    => hash(), # name -> LLVM::Value
 
         _module     => $!module, # abstraction leak for testing purpose only!
     );
@@ -201,6 +202,7 @@ method _create_jitted_function (%jit_context, $start) {
         $!builder.alloca($cur_opcode.typeof()).name("cur_opcode_addr")
     );
     %jit_context<cur_opcode_addr> := $cur_opcode_addr;
+    %jit_context<variables><cur_opcode> := $cur_opcode;
 
     my $interp := $jitted_sub.param(1);
     $interp.name("interp");
@@ -209,6 +211,7 @@ method _create_jitted_function (%jit_context, $start) {
         $!builder.alloca($interp.typeof()).name("interp_addr")
     );
     %jit_context<interp_addr> := $interp_addr;
+    %jit_context<variables><interp> := $interp;
 
     # Few helper values
     my $retval := $!builder.alloca($!opcode_ptr_type).name("retval");
