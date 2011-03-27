@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use File::Spec;
 use lib qw( lib );
-use Parrot::Configure::Utils qw( print_to_cache );
+use Parrot::Configure::Utils qw( :cache );
 
 our $cache = q{.parrot_current_sha1};
 
@@ -60,10 +60,7 @@ sub _handle_update {
 sub _get_sha1 {
     my $sha1 = 0;
     if (-f $cache) {
-        open my $FH, '<', $cache
-            or die "Unable to open $cache for reading: $!";
-        chomp($sha1 = <$FH>);
-        close $FH or die "Unable to close $cache after reading: $!";
+        $sha1 = read_from_cache($cache);
     }
     else {
         if ( !$sha1 && (-d '.git') ) {
