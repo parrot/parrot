@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use File::Temp qw( tempdir );
-use Test::More tests =>  48;
+use Test::More tests =>  49;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::llvm');
