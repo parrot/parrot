@@ -638,37 +638,23 @@ non-zero value if it does.
 */
 
     VTABLE INTVAL can(STRING *method_name) {
-        PMC * const classobj = VTABLE_get_class(INTERP, SELF);
-        STRING * const vtable_meth_name = CONST_STRING(INTERP, "can");
-        PMC * const method = Parrot_oo_find_vtable_override(INTERP, classobj,
-                vtable_meth_name);
-
-        if (!PMC_IS_NULL(method)) {
-            INTVAL result = 0;
-            Parrot_ext_call(INTERP, method, "PiS->I", SELF, method_name, &result);
-            return result;
-        }
-        else {
-            /* If we don't have an override just fall back to seeing if we
-               have a method of that name defined */
-            PMC * const m = VTABLE_find_method(INTERP, SELF, method_name);
-            return !PMC_IS_NULL(m);
-        }
+        PMC * const m = VTABLE_find_method(INTERP, SELF, method_name);
+        return !PMC_IS_NULL(m);
     }
 
 
 /*
 
-=item C<INTVAL isa_pmc(PMC *classname)>
+=item C<INTVAL isa_pmc(PMC *lookup)>
 
-Returns whether the object's class is or inherits from C<*classname>.
+Returns whether the object's class is or inherits from C<lookup>.
 
 =cut
 
 */
 
     VTABLE INTVAL isa_pmc(PMC *lookup) {
-        PMC * method;
+        PMC * method = PMCNULL;
 
         if (PMC_IS_NULL(lookup))
             return 0;
