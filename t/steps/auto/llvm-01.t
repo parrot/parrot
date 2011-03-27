@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use File::Temp qw( tempdir );
-use Test::More tests =>  49;
+use Test::More tests =>  48;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::llvm');
@@ -62,7 +62,7 @@ $step = test_step_constructor_and_description($conf);
         "Result was either 'yes' or 'no'" );
     SKIP: {
         skip 'No sense testing for verbose output if LLVM not present',
-        2 unless ( $step->result() =~ /yes/ );
+        1 unless ( $step->result() =~ /yes/ );
         like( $stdout, qr/version/s,
             "Got expected verbose output" );
     }
