@@ -334,7 +334,7 @@ Parrot_str_rep_compatible(SHIM_INTERP, ARGIN(const STRING *a), ARGIN(const STRIN
 
 /*
 
-=item C<STRING* Parrot_str_clone(PARROT_INTERP, const STRING *s)>
+=item C<STRING * Parrot_str_clone(PARROT_INTERP, const STRING *s)>
 
 Helper function to clone string.
 
@@ -343,9 +343,9 @@ Helper function to clone string.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING*
-Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
+PARROT_CAN_RETURN_NULL
+STRING *
+Parrot_str_clone(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_clone)
     size_t  alloc_size;
@@ -385,10 +385,10 @@ Creates and returns a shallow copy of the specified Parrot string.
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
+Parrot_str_copy(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_copy)
     STRING *d;
@@ -447,7 +447,7 @@ returned. If both strings are C<NULL>, return C<STRINGNULL>.
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 STRING *
 Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
             ARGIN_NULLOK(const STRING *b))
@@ -2606,7 +2606,8 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     break;
                 case 'x':
                     digcount = 0;
-                    if (itersrc.bytepos >= srclen) break;
+                    if (itersrc.bytepos >= srclen)
+                        break;
                     c = STRING_iter_get_and_advance(interp, src, &itersrc);
                     if (c == '{') {
                         /* \x{h..h} 1..8 hex digits */
