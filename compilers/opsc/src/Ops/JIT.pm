@@ -25,6 +25,9 @@ has $!opmap;
 has $!module;
 has $!builder;
 
+# Predefined functions from $!module
+has %!functions;
+
 has $!interp_struct_type;
 has $!opcode_ptr_type;
 
@@ -103,6 +106,12 @@ method _init_llvm() {
 
     $!opcode_ptr_type := LLVM::Type::pointer(LLVM::Type::UINTVAL());
 
+    # Create lookup hash for functions, declared in $!module;
+    my $f := $!module.first_function;
+    while $f {
+        %!functions{ $f.name } := $f;
+        $f := $f.next;
+    }
 }
 
 =begin Processing
