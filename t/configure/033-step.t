@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 33;
+use Test::More tests => 34;
 use Carp;
 use Cwd;
 use File::Basename qw(basename dirname);
@@ -207,7 +207,7 @@ like(
         "Got expected verbose output for executable program" );
 }
 
-# print_to_cache()
+# print_to_cache(); read_from_cache()
 
 {
     my ( $fh, $file ) = tempfile( UNLINK => 1 );
@@ -217,6 +217,9 @@ like(
     is( Parrot::Configure::Utils::_slurp($file),
         "$value\n",
         "Correct value printed to cachefile"
+    );
+    is( read_from_cache( $file ), $value,
+        "Got expected value from read_from_cache()"
     );
 }
 
