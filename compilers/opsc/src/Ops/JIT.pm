@@ -154,7 +154,13 @@ method jit($start) {
     # for having such signature.
     %jit_context := self._create_jitted_function(%jit_context, $start);
 
-    self;
+    %jit_context := self._create_basic_blocks(%jit_context);
+
+    %jit_context := self._jit_ops(%jit_context);
+
+    %jit_context := self._optimize(%jit_context);
+
+    %jit_context;
 }
 
 method _create_jit_context($start) {
@@ -544,6 +550,16 @@ method process_children(PAST::Op $chunk, %c) {
     # XXX .grep is temporaty solution for unhandled chunks.
     @($chunk).map(->$_{ self.process($_, %c) }).grep(->$_{ pir::defined($_) });
 }
+
+
+method _optimize(%c) {
+    # Let's optimize it.
+    my $pass := LLVM::PassManager.create(:optimize);
+    $pass.run($!module);
+
+    %c;
+}
+
 
 sub _dequote($str) {
     my $length := pir::length($str);
