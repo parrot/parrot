@@ -19,6 +19,7 @@ use File::Copy;
 use File::Path ();
 use File::Temp qw| tempdir |;
 use lib qw( lib );
+use Parrot::Configure::Utils qw( print_to_cache );
 
 my $cwd = cwd();
 {
@@ -67,10 +68,7 @@ sub setup_cache {
         "Able to copy Parrot::BuildUtil");
 
     my $cache = q{.parrot_current_rev};
-    open my $FH, ">", $cache
-        or croak "Unable to open $cache for writing";
-    print $FH qq{$rev\n};
-    close $FH or croak "Unable to close $cache after writing";
+    print_to_cache($cache, $rev);
     return ($cache, $libdir);
 }
 

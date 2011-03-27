@@ -18,6 +18,7 @@ use File::Copy;
 use File::Path ();
 use File::Temp qw| tempdir |;
 use lib ( './lib' );
+use Parrot::Configure::Utils qw( print_to_cache );
 
 my $cwd = cwd();
 {
@@ -50,10 +51,7 @@ my $cwd = cwd();
         "Able to copy Parrot::Git::Describe");
 
     my $cache = q{.parrot_current_git_describe};
-    open my $FH, ">", $cache
-        or croak "Unable to open $cache for writing";
-    print $FH qq{$git_describe\n};
-    close $FH or croak "Unable to close $cache after writing";
+    print_to_cache( $cache, $git_describe );
 
     require Parrot::Git::Describe;
     no warnings 'once';

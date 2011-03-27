@@ -32,7 +32,7 @@ use strict;
 use warnings;
 use File::Spec;
 use lib qw( lib );
-use Parrot::Configure::Utils qw( print_to_cache );
+use Parrot::Configure::Utils qw( :cache );
 
 our $cache = q{.parrot_current_rev};
 
@@ -70,10 +70,7 @@ sub _handle_update {
 sub _get_revision {
     my $revision;
     if (-f $cache) {
-        open my $FH, '<', $cache
-            or die "Unable to open $cache for reading: $!";
-        chomp($revision = <$FH>);
-        close $FH or die "Unable to close $cache after reading: $!";
+        $revision = read_from_cache($cache);
     }
     else {
         $revision = 1;

@@ -38,14 +38,15 @@ our @EXPORT_OK = qw(
     prompt copy_if_diff move_if_diff integrate
     capture_output check_progs _slurp
     _run_command _build_compile_command
-    print_to_cache
+    print_to_cache read_from_cache
 );
 our %EXPORT_TAGS = (
     inter => [qw(prompt integrate)],
     auto  => [
         qw(capture_output check_progs)
     ],
-    gen => [qw( copy_if_diff move_if_diff )]
+    gen => [qw( copy_if_diff move_if_diff )],
+    cache => [qw( print_to_cache read_from_cache ) ],
 );
 
 =item C<_run_command($command, $out, $err)>
@@ -309,6 +310,24 @@ sub print_to_cache {
         or die "Unable to open handle to $cache for writing: $!";
     print {$FH} "$value\n";
     close $FH or die "Unable to close handle to $cache after writing: $!";
+}
+
+=item C<read_from_cache( $cachefile )>
+
+Opens a handle to read from the file specified in the first argument. This is
+assumed to be a file consisting of a single string, optionally terminated with
+a newline.  The string is returned.
+
+=cut
+
+sub read_from_cache {
+    my ($cache) = @_;
+    my $value;
+    open my $FH, '<', $cache
+        or die "Unable to open $cache for reading: $!";
+    chomp($value = <$FH>);
+    close $FH or die "Unable to close $cache after reading: $!";
+    return $value;
 }
 
 =item C<_slurp($filename)>

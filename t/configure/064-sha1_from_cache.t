@@ -18,6 +18,7 @@ use File::Copy;
 use File::Path ();
 use File::Temp qw| tempdir |;
 use lib qw( lib );
+use Parrot::Configure::Utils qw( print_to_cache );
 
 my $cwd = cwd();
 {
@@ -64,10 +65,7 @@ sub setup_cache {
         "Able to copy Parrot::SHA1");
 
     my $cache = q{.parrot_current_sha1};
-    open my $FH, ">", $cache
-        or croak "Unable to open $cache for writing";
-    print $FH qq{$sha1\n};
-    close $FH or croak "Unable to close $cache after writing";
+    print_to_cache( $cache, $sha1 );
     return ($cache, $libdir);
 }
 
