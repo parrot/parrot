@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 # auto/infnan-01.t
 
 use strict;
@@ -33,7 +33,7 @@ ok($step->runstep($conf), "${pkg}::runstep() returned true value");
 ok( defined($conf->data->get( 'HAS_INF_NAN' )),
    "Value set for HAS_INF_NAN" );
 like( $step->result(), qr/yes|no/,
-   "Got appropriate value for step result" ); 
+   "Got appropriate value for step result" );
 
 ###### _handle_infnan #####
 my $infnan = 0;

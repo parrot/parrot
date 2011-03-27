@@ -1,4 +1,4 @@
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -50,14 +50,14 @@ sub runstep {
     my $rv = $self->version_check($conf, \@output, $verbose);
     return 1 unless $rv;
 
-    #  Find cc flags 
+    #  Find cc flags
     my $ccflags = `$llvm_config --cflags`;
     chomp $ccflags;
     # do not include optimizatin level
-    $ccflags =~ s/-O[^ ]*//; 
+    $ccflags =~ s/-O[^ ]*//;
     $conf->data->add( ' ', ccflags => $ccflags );
-    
-    # Find lib 
+
+    # Find lib
     my $ldd = `ldd "$llvm_bindir/lli"`;
     if ($ldd =~ /(libLLVM[^ ]+)(.*)/m){
         my $lib  = $1;

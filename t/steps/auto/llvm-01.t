@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 # auto/llvm-01.t
 
 use strict;
