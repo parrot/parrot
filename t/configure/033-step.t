@@ -1,10 +1,10 @@
 #!perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
 
-use Test::More tests => 31;
+use Test::More tests => 33;
 use Carp;
 use Cwd;
 use File::Basename qw(basename dirname);
@@ -205,6 +205,19 @@ like(
     like( $stdout, qr/checking for program/s, "Got expected verbose output" );
     like( $stdout, qr/$prog(\.EXE)? is executable/s,
         "Got expected verbose output for executable program" );
+}
+
+# print_to_cache()
+
+{
+    my ( $fh, $file ) = tempfile( UNLINK => 1 );
+    my $value = 'foobar';
+    ok( print_to_cache( $file, $value ),
+        "print_to_cache() returned true value" );
+    is( Parrot::Configure::Utils::_slurp($file),
+        "$value\n",
+        "Correct value printed to cachefile"
+    );
 }
 
 # _slurp(), not exported
