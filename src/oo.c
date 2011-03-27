@@ -48,7 +48,7 @@ static INTVAL fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
         __attribute__nonnull__(2);
 
 PARROT_INLINE
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC * get_pmc_proxy(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
@@ -359,7 +359,7 @@ For internal use only.
 */
 
 PARROT_INLINE
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC *
 get_pmc_proxy(PARROT_INTERP, INTVAL type)
