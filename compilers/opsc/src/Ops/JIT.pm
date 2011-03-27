@@ -356,11 +356,22 @@ method process(Ops::Op $op, %c) {
 
 # Recursively process body chunks returning string.
 our multi method process(PAST::Val $val, %c) {
-    #die('!!!');
+    my $type := $val.returns;
+    if $type eq 'string' {
+        $!builder.global_string_ptr(_dequote($val.value), :name<.str>);
+    }
+    else {
+    }
 }
 
 our multi method process(PAST::Var $var, %c) {
     #die('!!!');
+    #LLVM::Constant::();
+    if $var.isdecl {
+    }
+    else {
+        %c<variables>{ $var.name } // die("Unknown variable { $var.name }");
+    }
 }
 
 =item process(PAST::Op)
@@ -390,6 +401,13 @@ our method process:pasttype<macro_if> (PAST::Op $chunk, %c) {
 }
 
 our method process:pasttype<call> (PAST::Op $chunk, %c) {
+    my $function := %!functions{ $chunk.name };
+
+    say("# Unknown function { $chunk.name }")
+        && return undef
+        unless pir::defined($function);
+
+    $!builder.call($function, |self.process_children($chunk, %c));
 }
 
 our method process:pasttype<if> (PAST::Op $chunk, %c) {
@@ -453,6 +471,15 @@ our method process:macro<expr_offset>(PAST::Op $chunk, %c) {
 our method process:macro<expr_address>(PAST::Op $chunk, %c) {
 }
 
+method process_children(PAST::Op $chunk, %c) {
+    # XXX .grep is temporaty solution for unhandled chunks.
+    @($chunk).map(->$_{ self.process($_, %c) }).grep(->$_{ pir::defined($_) });
+}
+
+sub _dequote($str) {
+    my $length := pir::length($str);
+    pir::substr($str, 1, $length - 2);
+}
 
 INIT {
     pir::load_bytecode("LLVM.pbc");
