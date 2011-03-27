@@ -416,7 +416,8 @@ Invokes the subroutine.
         pc                   = sub->seg->base.data + sub->start_offs;
         INTERP->current_cont = NULL;
 
-        if (ccont == NEED_CONTINUATION) {
+        /* XXX. PMC_IS_NULL is (temporary?) workaround for JIT prototype */
+        if (ccont == NEED_CONTINUATION || PMC_IS_NULL(ccont)) {
             ccont = pmc_new(INTERP, enum_class_Continuation);
             VTABLE_set_pointer(INTERP, ccont, next);
         }
