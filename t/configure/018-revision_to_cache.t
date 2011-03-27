@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 # 018-revision_to_cache.t
 
 use strict;
@@ -47,7 +47,7 @@ my $cwd = cwd();
     ok( (copy qq{$cwd/lib/Parrot/BuildUtil.pm},
         qq{$libdir/Parrot/BuildUtil.pm}),
         "Able to copy Parrot::BuildUtil");
-    
+
     require Parrot::Revision;
     no warnings 'once';
     TODO: {
