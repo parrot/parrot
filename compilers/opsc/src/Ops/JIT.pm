@@ -227,11 +227,35 @@ method _create_jitted_function (%jit_context, $start) {
     my $retval := $!builder.alloca($!opcode_ptr_type).name("retval");
     %jit_context<retval> := $retval;
 
-    my $cur_ctx := $!builder.struct_gep($interp, 0, "CUR_CTX");
-    %jit_context<variables><!CUR_CTX> := $!builder.load($cur_ctx);
+    # Load current context from interp
+    my $cur_ctx := $!builder.struct_gep($interp, 0);
+    %jit_context<variables><!CUR_CTX> := $!builder.load($cur_ctx, 'CUR_CTX');
     %jit_context<cur_ctx> := $cur_ctx;
 
-    # Load current context from interp
+    # Constants
+    %jit_context<str_constants> := $!builder.call(
+        #"Parrot_pcc_get_str_constants_func",
+        %!functions<Parrot_pcc_get_str_constants_func>,
+        %jit_context<variables><interp>,
+        %jit_context<variables><!CUR_CTX>,
+        :name('str_constants')
+    );
+
+    %jit_context<num_constants> := $!builder.call(
+        #"Parrot_pcc_get_str_constants_func",
+        %!functions<Parrot_pcc_get_num_constants_func>,
+        %jit_context<variables><interp>,
+        %jit_context<variables><!CUR_CTX>,
+        :name('num_constants')
+    );
+
+#    %jit_context<pmc_constants> := $!builder.call(
+#        #"Parrot_pcc_get_str_constants_func",
+#        %!functions<Parrot_pcc_get_pmc_constants_func>,
+#        %jit_context<variables><interp>,
+#        %jit_context<variables><!CUR_CTX>,
+#    );
+
 
     # Create default return.
     $!builder.set_position($leave);
@@ -439,16 +463,9 @@ our method access_arg:type<sc> ($num, %ctx) {
     $!debug && say("# $num<sc> '$res'");
     #$!builder.global_string_ptr($res, :name<.SCONST>);
 
-    my $strings := $!builder.call(
-        #"Parrot_pcc_get_str_constants_func",
-        %!functions<Parrot_pcc_get_str_constants_func>,
-        %ctx<variables><interp>,
-        %ctx<variables><!CUR_CTX>,
-    );
-
     $!builder.load(
         $!builder.inbounds_gep(
-            $strings,
+            %ctx<str_constants>,
             LLVM::Constant::integer(self._opcode_at($num, %ctx))
         )
     );
