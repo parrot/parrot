@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -341,6 +341,59 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 /*
  *  Command functions and help dispatch
  */
+
+/*
+
+=item C<static int nomoreargs(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_assign(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_break(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_continue(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_delete(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_echo(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_enable(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_eval(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_gcdebug(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_help(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_info(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_list(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_listbreakpoints(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_load(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_next(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_print(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_quit(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_run(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_script(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_stack(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_trace(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_watch(PDB_t *pdb, const char *cmd)>
+
+These are command and help dispatch functions
+
+=cut
+
+*/
+
 
 typedef void (* debugger_func_t)(ARGIN(PDB_t *pdb), ARGIN(const char *cmd));
 
