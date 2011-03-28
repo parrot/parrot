@@ -1345,7 +1345,7 @@ The two result strings should be passed in as references to a C string.
 
 void
 Parrot_pcc_split_signature_string(ARGIN(const char *signature),
-        ARGMOD(const char **arg_sig), ARGMOD(const char **return_sig))
+        ARGMOD(const char **arg_sig), ARGOUT(const char **return_sig))
 {
     ASSERT_ARGS(Parrot_pcc_split_signature_string)
     const char *cur;
