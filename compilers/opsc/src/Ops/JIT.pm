@@ -471,6 +471,26 @@ our method access_arg:type<sc> ($num, %ctx) {
     );
 }
 
+our method access_arg:type<nc> ($num, %ctx) {
+    my $c := %ctx<constants>;
+    my $i := self._opcode_at($num, %ctx);
+    my $res := Q:PIR{
+        .local num    n
+        .local int    I
+        .local pmc    c
+        .local pmc    i
+        find_lex c, '$c'
+        find_lex i, '$i'
+        I = i
+        n = c[I]
+        %r = box n
+    };
+    $!debug && say("# $num<nc> '$res'");
+    #$!builder.global_string_ptr($res, :name<.SCONST>);
+
+    LLVM::Constant::real($res);
+}
+
 #        :nc("NCONST(NUM)"),
 #        :pc("PCONST(NUM)"),
 #        :sc("SCONST(NUM)"),
