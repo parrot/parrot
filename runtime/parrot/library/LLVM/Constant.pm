@@ -16,18 +16,18 @@ module LLVM::Constant {
         LLVM::Value.create(LLVM::call("ConstPointerNull", $type));
     }
 
-    sub string(LLVM::Type $str) {
+    sub string($str) {
         LLVM::Value.create(LLVM::call("ConstString", ~$str, pir::length($str), 0));
     }
 
-    sub integer(LLVM::Type $int, $radix?) {
+    sub integer($int, $radix?) {
         LLVM::Value.create(LLVM::call("ConstInt", LLVM::Type::int($radix // 32), +$int, 1));
     }
 
-    sub real(LLVM::Type $double) {
+    sub real($double) {
         LLVM::Value.create(LLVM::call("ConstReal", LLVM::Type::double(), +$double));
-
     }
+
 };
 
 # vim: ft=perl6
