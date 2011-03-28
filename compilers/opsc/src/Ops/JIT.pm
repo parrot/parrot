@@ -241,22 +241,6 @@ method _create_jitted_function (%jit_context, $start) {
         :name('str_constants')
     );
 
-    %jit_context<num_constants> := $!builder.call(
-        #"Parrot_pcc_get_str_constants_func",
-        %!functions<Parrot_pcc_get_num_constants_func>,
-        %jit_context<variables><interp>,
-        %jit_context<variables><!CUR_CTX>,
-        :name('num_constants')
-    );
-
-#    %jit_context<pmc_constants> := $!builder.call(
-#        #"Parrot_pcc_get_str_constants_func",
-#        %!functions<Parrot_pcc_get_pmc_constants_func>,
-#        %jit_context<variables><interp>,
-#        %jit_context<variables><!CUR_CTX>,
-#    );
-
-
     # Create default return.
     $!builder.set_position($leave);
     $!builder.ret(
