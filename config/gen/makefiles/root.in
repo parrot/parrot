@@ -170,7 +170,6 @@ GEN_CONFIGS = \
 #IF(has_glut):    src/glut_callbacks.c \
     src/core_pmcs.c \
     config_lib.pir \
-    parrot.pc \
     compilers/imcc/imcc.y.flag \
     compilers/imcc/imcc.l.flag
 

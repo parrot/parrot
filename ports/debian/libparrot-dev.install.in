@@ -1,3 +1,2 @@
 usr/include/parrot/@VERSION@/parrot/*
 usr/lib/libparrot.a
-usr/lib/pkgconfig/parrot/@VERSION@/parrot.pc
