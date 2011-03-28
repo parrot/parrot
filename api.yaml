@@ -448,6 +448,14 @@
     - 'completed'
   ticket:  'https://trac.parrot.org/parrot/ticket/451'
 -
+  name:  'pkg-config support'
+  eligible:  '3.1'
+  note:  'Use "parrot_config" instead.'
+  tags: 
+    - 'deprecated'
+    - 'library'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1853'
+-
   name:  'Parrot_ext_try function'
   tags: 
     - 'experimental'
