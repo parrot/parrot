@@ -148,7 +148,7 @@ Any other ways?
 =item jit($start)
 JIT bytecode starting from C<$start> position.
 
-method jit($start) {
+method jit($start, :$optimize = 1) {
 
     # jit_context hold state for currently jitting ops.
     my %jit_context := self._create_jit_context($start);
@@ -162,7 +162,7 @@ method jit($start) {
 
     %jit_context := self._jit_ops(%jit_context);
 
-    %jit_context := self._optimize(%jit_context);
+    %jit_context := self._optimize(%jit_context) if $optimize;
 
     %jit_context;
 }
@@ -408,6 +408,7 @@ our multi method process(PAST::Var $var, %c) {
 }
 
 our method access_arg:type<i> ($num, %ctx) {
+    $!builder.load(self.get_int_reg($num, %ctx));
 }
 
 our method access_arg:type<n> ($num, %ctx) {
@@ -540,7 +541,26 @@ our method process:pasttype<switch> (PAST::Op $chunk, %c) {
 
 our method process:pasttype<undef> (PAST::Op $chunk, %c) {
     # TODO Handle .returns.
-    self.process_children($chunk, %c)[0];
+    my $pirop := $chunk.pirop;
+
+    if $pirop {
+        if $pirop eq '=' {
+            # Shortcut for register dereferencing.
+            # $n == *(get_register(n)). So, we are shortcuting it to store
+            # value directly in register.
+            $!builder.store(
+                self.process($chunk[1], %c),
+                (($chunk[0] ~~ PAST::Var) && ($chunk[0].scope eq 'register'))
+                    ?? self.get_register($chunk[0], %c)
+                    !! self.process($chunk[0], %c)
+            );
+        }
+    }
+    elsif $chunk.returns {
+        self.process_children($chunk, %c)[0];
+    }
+    else {
+    }
 }
 
 our multi method process(PAST::Stmts $chunk, %c) {
@@ -611,6 +631,80 @@ Return opcode at offset.
 
 method _opcode_at($offset, %ctx) {
     %ctx<bytecode>[%ctx<cur_opcode> + $offset];
+}
+
+method get_register(PAST::Var $var, %c) {
+    my $num  := +$var.name - 1;
+    my $type := %c<op>.arg_type($num);
+    say("# type $type");
+    if $type eq 'i' {
+        self.get_int_reg($num, %c);
+    }
+    elsif $type eq 'n' {
+        self.get_num_reg($num, %c);
+    }
+    elsif $type eq 's' {
+        self.get_str_reg($num, %c);
+    }
+    elsif $type eq 'p' {
+        self.get_str_reg($num, %c);
+    }
+    else {
+        die("Horribly");
+    }
+}
+
+# TODO Optimize it for direct access.
+method get_int_reg($num, %c) {
+    my $r := self._opcode_at($num, %c);
+    my $n := ".I$r";
+    %c<variables>{$n} := $!builder.call(
+        %!functions<Parrot_pcc_get_INTVAL_reg>,
+        %c<variables><interp>,
+        %c<variables><!CUR_CTX>,
+        LLVM::Constant::integer(self._opcode_at($num, %c)),
+        :name($n)
+    ) unless pir::defined(%c<variables>{$n});
+    %c<variables>{$n};
+}
+
+method get_num_reg($num, %c) {
+    my $r := self._opcode_at($num, %c);
+    my $n := ".N$r";
+    %c<variables>{$n} := $!builder.call(
+        %!functions<Parrot_pcc_get_FLOATVAL_reg>,
+        %c<variables><interp>,
+        %c<variables><!CUR_CTX>,
+        LLVM::Constant::integer($r),
+        :name($n)
+    ) unless pir::defined(%c<variables>{$n});
+    %c<variables>{$n};
+}
+
+method get_str_reg($num, %c) {
+    my $r := self._opcode_at($num, %c);
+    my $n := ".S$r";
+    %c<variables>{$n} := $!builder.call(
+        %!functions<Parrot_pcc_get_STRING_reg>,
+        %c<variables><interp>,
+        %c<variables><!CUR_CTX>,
+        LLVM::Constant::integer($r),
+        :name($n)
+    ) unless pir::defined(%c<variables>{$n});
+    %c<variables>{$n};
+}
+
+method get_pmc_reg($num, %c) {
+    my $r := self._opcode_at($num, %c);
+    my $n := ".P$r";
+    $!builder.call(
+        %!functions<Parrot_pcc_get_PMC_reg>,
+        %c<variables><interp>,
+        %c<variables><!CUR_CTX>,
+        LLVM::Constant::integer($r),
+        :name($n)
+    ) unless pir::defined(%c<variables>{$n});
+    %c<variables>{$n};
 }
 
 
