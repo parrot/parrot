@@ -28,8 +28,8 @@ op say(in INT) :base_io {
 
 op say(in STR) :base_io {
     STRING * const s = $1;
-    if (s && s->bufused)
-        Parrot_io_printf(interp, "%Ss", s);
+    /* if (s && s->bufused) */
+        Parrot_io_printf(interp, "%Ss", $1);
     Parrot_io_printf(interp, "\n");
 }
 
