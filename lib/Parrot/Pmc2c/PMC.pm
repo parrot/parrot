@@ -203,7 +203,6 @@ sub unimplemented_vtable {
 sub normal_unimplemented_vtable {
     my ( $self, $vt_meth ) = @_;
     return 0 if $vt_meth eq 'class_init';
-    return 0 if $self->vtable->is_mmd($vt_meth);
     return 0 if $self->has_method($vt_meth);
     return 1;
 }
@@ -382,12 +381,6 @@ sub super_method {
             $self->super_attrs( $vt_meth, $super_method->attrs );
 
             $self->inherit_attrs($vt_meth) if $self->get_method($vt_meth);
-
-            my $super_mmd_rights = $super_method->mmd_rights;
-            if ( $super_mmd_rights && @{$super_mmd_rights} ) {
-                $self->{super_mmd_rights}{$vt_meth}{$super_pmc_name} =
-                    $super_mmd_rights;
-            }
         }
         else {
             $super_pmc_name = $super_pmc;
@@ -939,7 +932,6 @@ sub vtable_decl {
 
     my @vt_methods;
     foreach my $vt_method ( @{ $self->vtable->methods } ) {
-        next if $vt_method->is_mmd;
         push @vt_methods,
             $self->build_full_c_vt_method_name( $vt_method->name );
     }
