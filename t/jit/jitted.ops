@@ -33,6 +33,28 @@ op say(in STR) :base_io {
     Parrot_io_printf(interp, "\n");
 }
 
+inline op say(in NUM) :base_io {
+    Parrot_io_printf(interp, "%.15g\n", $1);
+}
+
+op say(invar PMC) :base_io {
+    PMC * const p = $1;
+
+    if (PMC_IS_NULL(p)) {
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+             EXCEPTION_UNEXPECTED_NULL,
+            "Null PMC in say");
+        goto ADDRESS(handler);
+    }
+    else {
+        STRING * const s = VTABLE_get_string(interp, p);
+        if (s)
+            Parrot_io_printf(interp, "%Ss", s);
+        Parrot_io_printf(interp, "\n");
+    }
+}
+
+
 op add(inout INT, in INT) :base_core {
     $1 += $2;
 }
