@@ -206,9 +206,9 @@ class LLVM::Builder is LLVM::Opaque {
     }
 
 #            LLVMBuildInBoundsGEP        => "ppppit",
-    method inbounds_gep(LLVM::Type $type, *@indices, :$name?) {
+    method inbounds_gep(LLVM::Value $ptr, *@indices, :$name?) {
         LLVM::Value.create(
-            LLVM::call("BuildInBoundsGEP", self, $type, LLVM::to_array(@indices), +@indices, $name // "")
+            LLVM::call("BuildInBoundsGEP", self, $ptr, LLVM::to_array(@indices), +@indices, $name // "")
         );
     }
 
