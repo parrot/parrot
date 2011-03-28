@@ -1904,7 +1904,7 @@ Converts a numeric Parrot STRING to a floating point number.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 FLOATVAL
-Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
+Parrot_str_to_num(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_num)
     FLOATVAL      f         = 0.0;
@@ -2037,7 +2037,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
     /* Support for non-canonical NaN and Inf */
     /* charpos <= 2 because for "-i" iter already advanced to next char */
     if (check_nan && (iter.charpos <= 2)) {
-        STRING *t = Parrot_str_upcase(interp, s);
+        STRING * const t = Parrot_str_upcase(interp, s);
         if (STRING_equal(interp, t, CONST_STRING(interp, "NAN")))
             return PARROT_FLOATVAL_NAN_QUIET;
         else if (STRING_equal(interp, t, CONST_STRING(interp, "INF"))
@@ -2241,7 +2241,7 @@ Parrot_str_pin(SHIM_INTERP, ARGMOD(STRING *s))
 {
     ASSERT_ARGS(Parrot_str_pin)
     const size_t size = Buffer_buflen(s);
-    char  *memory = (char *)mem_internal_allocate(size);
+    char * const memory = (char *)mem_internal_allocate(size);
 
     mem_sys_memcopy(memory, Buffer_bufstart(s), size);
     Buffer_bufstart(s) = memory;
@@ -2315,7 +2315,7 @@ Identical to the STRING_hash macro.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 size_t
-Parrot_str_to_hashval(PARROT_INTERP, ARGIN(const STRING *s))
+Parrot_str_to_hashval(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_hashval)
 

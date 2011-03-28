@@ -378,9 +378,8 @@ char * Parrot_str_to_encoded_cstring(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-size_t Parrot_str_to_hashval(PARROT_INTERP, ARGIN(const STRING *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+size_t Parrot_str_to_hashval(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -389,9 +388,8 @@ INTVAL Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-FLOATVAL Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+FLOATVAL Parrot_str_to_num(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
@@ -610,13 +608,11 @@ STRING * Parrot_str_iter_substr(PARROT_INTERP,
     , PARROT_ASSERT_ARG(s) \
     , PARROT_ASSERT_ARG(enc))
 #define ASSERT_ARGS_Parrot_str_to_hashval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_to_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_to_num __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_to_platform_cstring \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
