@@ -224,6 +224,7 @@ method _create_jitted_function (%jit_context, $start) {
     %jit_context<retval> := $retval;
 
     my $cur_ctx := $!builder.struct_gep($interp, 0, "CUR_CTX");
+    %jit_context<variables><!CUR_CTX> := $!builder.load($cur_ctx);
     %jit_context<cur_ctx> := $cur_ctx;
 
     # Load current context from interp
@@ -369,7 +370,7 @@ method process_op(Ops::Op $op, %c) {
 our multi method process(PAST::Val $val, %c) {
     my $type := $val.returns;
     if $type eq 'string' {
-        $!builder.global_string_ptr(_dequote($val.value), :name<.str>);
+        $!builder.global_string_ptr($val.value, :name<.str>);
     }
     else {
     }
@@ -432,7 +433,21 @@ our method access_arg:type<sc> ($num, %ctx) {
         %r = box s
     };
     say("# $num<sc> '$res'");
-    $!builder.global_string_ptr($res, :name<.SCONST>);
+    #$!builder.global_string_ptr($res, :name<.SCONST>);
+
+    my $strings := $!builder.call(
+        #"Parrot_pcc_get_str_constants_func",
+        %!functions<Parrot_pcc_get_str_constants_func>,
+        %ctx<variables><interp>,
+        %ctx<variables><!CUR_CTX>,
+    );
+
+    $!builder.load(
+        $!builder.inbounds_gep(
+            $strings,
+            LLVM::Constant::integer(self._opcode_at($num, %ctx))
+        )
+    );
 }
 
 #        :nc("NCONST(NUM)"),

@@ -4,7 +4,7 @@
 pir::load_bytecode("opsc.pbc");
 
 # Some preparation
-my $pir    := 't/compilers/opsc/data/02.pir';
+my $pir    := 't/compilers/opsc/data/03.pir';
 my $pbc    := subst($pir, / 'pir' $/, 'pbc');
 
 # Generate PBC file
@@ -26,8 +26,11 @@ my $jitter := Ops::JIT.new($pbc, $ops_file, $oplib);
 my $start := 0;
 my %jit_context := $jitter.jit($start);
 my $module := %jit_context<_module>;
-$module.verify();
+
+#%jit_context<jitted_sub>.dump();
 #$module.dump();
+
+$module.verify();
 
 # Create interp and seed it with bytecode
 my $this_interp := pir::getinterp();
@@ -48,7 +51,6 @@ my $call := $engine.create_call(%jit_context<jitted_sub>, "ppp");
 say("================= INVOKE ===================");
 $pc := $call($pc, $interp);
 say("=================  DONE  ===================");
-
 
 
 sub func($name, $sig) {
