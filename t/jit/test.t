@@ -4,6 +4,7 @@
 pir::load_bytecode("opsc.pbc");
 
 # Some preparation
+my $debug  := 0;
 my $pir    := 't/compilers/opsc/data/03.pir';
 my $pbc    := subst($pir, / 'pir' $/, 'pbc');
 
@@ -18,10 +19,10 @@ my $oplib := pir::new__psp("OpLib", "core_ops");
 my $ops_file := Ops::File.new("t/jit/jitted.ops",
     :oplib($oplib),
     :core(0),
-    :quiet(0),
+    :quiet(!$debug),
 );
 
-my $jitter := Ops::JIT.new($pbc, $ops_file, $oplib);
+my $jitter := Ops::JIT.new($pbc, $ops_file, $oplib, debug => $debug);
 
 my $start := 0;
 my %jit_context := $jitter.jit($start);

@@ -8,6 +8,9 @@ LLVM JITter?
 
 class Ops::JIT;
 
+# Debug outputs.
+has $!debug;
+
 # Ops::OpsFile
 has $!ops_file;
 has %!ops;
@@ -34,7 +37,8 @@ has $!opcode_ptr_type;
 =item new
 Create new JITter for given PBC and OpsFile.
 
-method new(Str $pbc, Ops::File $ops_file, OpLib $oplib) {
+method new(Str $pbc, Ops::File $ops_file, OpLib $oplib, :$debug?) {
+    $!debug    := ?$debug;
     $!ops_file := $ops_file;
     $!oplib    := $oplib;
 
@@ -258,7 +262,7 @@ method _create_basic_blocks(%jit_context) {
         # Get op
         my $op     := $!oplib{$opname};
 
-        say("# $opname");
+        $!debug && say("# $opname");
         my $bb := $leave.insert_before("L$i");
         %jit_context<basic_blocks>{$i} := hash(
             label => "L$i",
@@ -296,7 +300,7 @@ method _jit_ops(%jit_context) {
         my $opname := $!opmap[$id];      # Real opname
         my $op     := $!oplib{$opname};  # Get op
 
-        say("# jit $opname ");
+        $!debug && say("# jit $opname ");
 
         # Position Builder to previousely created BB.
         $!builder.set_position(%jit_context<basic_blocks>{$i}<bb>);
@@ -360,7 +364,7 @@ We stop on :flow ops because PCC will interrupt "C" flow and our PCC is way too
 complext to implement it in JITter.
 
 method process_op(Ops::Op $op, %c) {
-    say("# Handling { $op.full_name }");
+    $!debug && say("# Handling { $op.full_name }");
     %c<op> := $op;
     self.process($_, %c) for @($op);
     %c.delete('op');
@@ -385,7 +389,7 @@ our multi method process(PAST::Var $var, %c) {
         if $var.scope eq 'register' {
             my $num  := $var.name;
             my $type := %c<op>.arg_type($num - 1);
-            say("# Handling '$type' register");
+            $!debug && say("# Handling '$type' register");
             my $sub  := pir::find_sub_not_null__ps('access_arg:type<' ~ $type ~ '>');
             $sub(self, $num, %c);
         }
@@ -414,7 +418,7 @@ our method access_arg:type<ki> ($num, %ctx) {
 }
 
 our method access_arg:type<ic> ($num, %ctx) {
-    say("# $num <ic> { self._opcode_at($num, %ctx) }");
+    $!debug && say("# $num <ic> { self._opcode_at($num, %ctx) }");
     LLVM::Constant::integer(self._opcode_at($num, %ctx));
 }
 
@@ -432,7 +436,7 @@ our method access_arg:type<sc> ($num, %ctx) {
         s = c[I]
         %r = box s
     };
-    say("# $num<sc> '$res'");
+    $!debug && say("# $num<sc> '$res'");
     #$!builder.global_string_ptr($res, :name<.SCONST>);
 
     my $strings := $!builder.call(
@@ -532,7 +536,7 @@ our multi method process(String $str, %c) {
 
 our method process:macro<goto_offset>(PAST::Op $chunk, %c) {
     my $offset  := ~$chunk[0].value; # FIXME
-    say("# macro<goto_offset> '$offset'");
+    $!debug && say("# macro<goto_offset> '$offset'");
     my $target  := %c<cur_opcode> + $offset;
     my $jump_to := %c<basic_blocks>{$target}<bb>;
 
@@ -544,7 +548,7 @@ our method process:macro<goto_offset>(PAST::Op $chunk, %c) {
 }
 
 our method process:macro<goto_address>(PAST::Op $chunk, %c) {
-    say("# macro<goto_address>");
+    $!debug && say("# macro<goto_address>");
     # FIXME
     $!builder.store(
         LLVM::Constant::null(
