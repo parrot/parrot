@@ -286,7 +286,9 @@ method get_body( %context ) {
 
 # Recursively process body chunks returning string.
 our multi method to_c(PAST::Val $val, %c) {
-    $val.value;
+    $val.returns eq 'string'
+        ?? '"' ~ subst($val.value, /\n/, '\n', :global) ~ '"' # FIXME other quoted
+        !! $val.value;
 }
 
 our multi method to_c(PAST::Var $var, %c) {

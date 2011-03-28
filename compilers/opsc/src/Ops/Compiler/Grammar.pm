@@ -93,7 +93,7 @@ token op_body {
 
 proto token quote { <...> }
 token quote:sym<apos> { <?[']> <quote_EXPR: ':q'>  }
-token quote:sym<dblq> { <?["]> <quote_EXPR: ':q'> }
+token quote:sym<dblq> { <?["]> <quote_EXPR: ':qq'> }
 
 proto rule op_macro { <...> }
 rule op_macro:sym<goto offset>  { 'goto' 'OFFSET' '(' <arg=.EXPR> ')' }

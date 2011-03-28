@@ -246,6 +246,9 @@ method op_body($/) {
     make $<blockoid>.ast;
 }
 
+method quote:sym<apos>($/) { make $<quote_EXPR>.ast; }
+method quote:sym<dblq>($/) { make $<quote_EXPR>.ast; }
+
 method op_macro:sym<expr offset>($/) {
     make PAST::Op.new(
         :pasttype<macro>,
@@ -521,7 +524,7 @@ method term:sym<int> ($/) {
 
 method term:sym<str> ($/) {
     make PAST::Val.new(
-        :value(~$<quote>),
+        :value($<quote>.ast.value),
         :returns<string>
     );
 }
