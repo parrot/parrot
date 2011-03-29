@@ -321,20 +321,35 @@ The header will look like:
   0x?        : 1 byte for endianness
   xxxxx      : padding
 
-directory:
+The directory segment will be a list of offsets to the starts of chunks within
+the file.  It will have the following structure:
 
   opcode_t : number of opcode_t-sized units in this segment
   opcode_t : M0_DIR_SEG
   [
-    opcode_t : offset of first byte of bytecode segment
-    opcode_t : offset of first byte of vartable segment
-    opcode_t : offset of first byte of metadata segment
+    opcode_t : offset of a chunk header
+    opcode_t : size of chunk name
+    [
+      opcode_t : chunk name
+    ]
   ]
 
-bytecode segment: This segment contains a series of executable ops.  A pointer
-(or its equivalent for a non-C language) to the current context will be passed
-as the first argument to any op, but this pointer will not be stored in
-bytecode.
+A chunk will consist of a chunk directory segment, a bytecode segment, a
+variables segment, a metadata segment, a chunk name and a unique identifier.
+
+  opcode_t : number of opcode_t-sized units in this segment
+  opcode_t : M0_CHUNKDIR_SEG
+  opcode_t : offset of bytecode segment
+  opcode_t : offset of variables segment
+  opcode_t : offset of metadata segment
+  opcode_t : size of chunk name
+  [ 
+    opcode_t : chunk name
+  ]
+
+The bytecode segment contains a series of executable ops.  A pointer (or its
+equivalent for a non-C language) to the current context will be passed as the
+first argument to any op, but this pointer will not be stored in bytecode.
 
   opcode_t : number of opcode_t-sized units in this segment
   opcode_t : M0_BC_SEG
@@ -345,7 +360,8 @@ bytecode.
     char : arg3
   ]
 
-variables segment:  Any data lives here and is loaded into registers as needed.
+The variables segment will contain any data needed to execute the bytecode.
+Data will be explictly loaded into registers as needed.
 
   opcode_t : number of opcode_t-sized units in this segment
   opcode_t : M0_VARS_SEG
@@ -354,9 +370,9 @@ variables segment:  Any data lives here and is loaded into registers as needed.
     ...      : variable data
   ]
 
-metadata segment: Any data about the bytecode that might come in handy is
-tracked here.  The actual data will live in the variables segment; this table
-just provides a way to map those values to names and bytecode offsets.
+The metadata segment contains any data about the bytecode that might come in
+handy.  The actual data will live in the variables segment; this table just
+provides a way to map values to names and bytecode offsets.
 
   opcode_t : number of opcode_t-sized units in this segment
   opcode_t : M0_META_SEG
