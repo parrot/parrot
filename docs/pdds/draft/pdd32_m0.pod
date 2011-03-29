@@ -288,10 +288,65 @@ These are too high-level and can be written in terms of simpler ops:
 
 =head2 Textual Representation
 
-Describe what the textual form of M0 will look like.  The emphasis should be
-on ease of consumption.  We won't be writing a large amount of M0 code by
-hand; it's just fine if it's painful to do so for non-trivial use cases.
+M0's textual format will mirror its binary representation.  It will consist of
+a series of named chunks with the following format.  Any line beginning with an
+octothorpe (#) is a comment and will be ignored.
 
+=head3 Chunk Format
+
+A chunk consists of a chunk identifier, a variables chunk, a metadata chunk and
+a bytecode chunk.
+
+=head3 Chunk Identifier
+
+A chunk identifier consists of a single line beginning with '.chunk', followed
+by a chunk name.  The name consists of a quote-delimited utf-8 string.
+  
+  .chunk "chunk_name"
+
+=head3 Variables Table
+
+The initial variables table is a numbered list of chunks of data.  Data can be
+either an integer, a floating point number, a quote-delimited utf-8 string or
+arbitrary data in hex notation.  For simplicity's sake, strings will only
+support escaping double-quotes.  Any other data should be stored as a hex
+string.  This space is used to initialize the variables table.  Any variables
+used by the metadata table and the bytecode segment will be stored here.
+
+  .variables
+  0 1234
+  1 1.12345e-12
+  2 "asdfasdfs"
+  3 "hello, \"world\""
+  4 0x00ffbeef
+  5 "line"
+  6 23
+
+=head3 Metadata
+
+The metadata segment consists of triplets of integers mapping a name and a
+bytecode offset to a value.  The first number is an offset into the bytecode
+segment.  This is the instruction at which the metadata first takes effect.
+The second number is the offset into the variables table that contains the name
+of the metadata entry.  The third is the offset into the variables table that
+contains the value.
+
+  .metadata
+  #at pc 1234, "line" is 3
+  1243 5 6
+
+=head3 Ops
+
+The ops segment consists of a list of mnemonics for instructions and their
+arguments.  All instructions take three int arguments between 0 and 255, even
+if they aren't all used.
+
+  .code
+    set   1, 3, 9
+    add_i 3, 2, 3
+    cmp_i 2, 3, 3
+    goto  0, 0, 0
+  
 =head2 Binary Representation
 
 M0's binary representation will be composed of a fixed header, a single
@@ -300,11 +355,11 @@ bytecode:
 
 =over 4
 
-=item * a bytecode segment containing the ops
-
 =item * a variables table segment containing the objects that the segment needs
 
 =item * a metadata segment that carries any extra data like HLL line numbers, function names, annotations and custom data.
+
+=item * a code segment containing the ops
 
 =back
 
@@ -347,19 +402,6 @@ variables segment, a metadata segment, a chunk name and a unique identifier.
     opcode_t : chunk name
   ]
 
-The bytecode segment contains a series of executable ops.  A pointer (or its
-equivalent for a non-C language) to the current context will be passed as the
-first argument to any op, but this pointer will not be stored in bytecode.
-
-  opcode_t : number of opcode_t-sized units in this segment
-  opcode_t : M0_BC_SEG
-  [
-    char : opcode
-    char : arg1
-    char : arg2
-    char : arg3
-  ]
-
 The variables segment will contain any data needed to execute the bytecode.
 Data will be explictly loaded into registers as needed.
 
@@ -382,12 +424,18 @@ provides a way to map values to names and bytecode offsets.
     opcode_t : offset into vartable for the value of this piece of metadata
   ]
 
-=head2 Bytecode Segment Identification
+The bytecode segment contains a series of executable ops.  A pointer (or its
+equivalent for a non-C language) to the current context will be passed as the
+first argument to any op, but this pointer will not be stored in bytecode.
 
-In order to get useful work done, M0 will need a way to unambiguously refer to
-bytecode segments and to look up which function (or generic unit of code)
-corresponds to which bytecode segment.  Figure this out.  UUIDs might come in
-handy.
+  opcode_t : number of opcode_t-sized units in this segment
+  opcode_t : M0_BC_SEG
+  [
+    char : opcode
+    char : arg1
+    char : arg2
+    char : arg3
+  ]
 
 =head2 Binary instruction format
 
