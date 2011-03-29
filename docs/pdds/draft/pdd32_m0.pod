@@ -345,7 +345,7 @@ argument.  C<$2> is ignored.
 C<ccall_ret> is similar to C<ccall_arg>, except that it copies the return value
 of the previously-called function into C<*$1>.  C<$2> is ignored.
 
-=item * ccall - invoke a function 
+=item * ccall - invoke a function
 
 C<ccall> uses the function pointer in C<*$0> to call a C function, assuming that
 its arguments have been set up correctly.  C<$1> and C<$2> are ignored.
@@ -522,7 +522,7 @@ variables segment, a metadata segment, a chunk name and a unique identifier.
   opcode_t : offset of variables segment
   opcode_t : offset of metadata segment
   opcode_t : size of chunk name
-  [ 
+  [
     opcode_t : chunk name
   ]
 
@@ -567,7 +567,7 @@ Initially, M0 ops will be packed without any padding.  Once we have a
 representative sample of running M0 code, we will benchmark various padding
 strategies to find which have the best performance characteristics for a
 typical expected workload.  A viable M0 interpreter implemented in a low-level
-langauge like C will be needed to properly test this. 
+langauge like C will be needed to properly test this.
 
 =head3 Opcode Numbers
 
@@ -740,7 +740,7 @@ to result from breaking this assumption.
 The following example code calls a function called C<hello_func>, which takes
 no arguments and has no return value, in the library C<libhello.so>.  The use
 of strings as direct arguments is a simplification for explanatory purposes.
-In actual M0 bytecode, the string would be an index into the variables table. 
+In actual M0 bytecode, the string would be an index into the variables table.
 
     dlopen_fp = csym "Parrot_dlopen"
     dlsym_fp  = csym "Parrot_dlsym"
