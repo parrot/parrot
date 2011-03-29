@@ -178,6 +178,8 @@ method _create_jit_context($start) {
         start       => $start,
         cur_opcode  => $start,
 
+        lhs         => 0,
+
         basic_blocks => hash(), # offset->basic_block
         variables    => hash(), # name -> LLVM::Value
 
@@ -404,7 +406,8 @@ our multi method process(PAST::Var $var, %c) {
         }
         else {
             $res := %c<variables>{ $var.name } // die("Unknown variable { $var.name }");
-            $res := $!builder.load($res);
+            $res := $!builder.load($res) unless %c<lhs>;
+            $res;
         }
     }
 
@@ -412,9 +415,10 @@ our multi method process(PAST::Var $var, %c) {
 
 }
 
-our method access_arg:type<i> ($num, %ctx) {
-    my $res := self.get_int_reg($num, %ctx);
-    $res := $!builder.load($res);
+our method access_arg:type<i> ($num, %c) {
+    my $res := self.get_int_reg($num, %c);
+    $res := $!builder.load($res) unless %c<lhs>;
+    $res;
 }
 
 our method access_arg:type<n> ($num, %ctx) {
@@ -432,14 +436,16 @@ our method access_arg:type<k> ($num, %ctx) {
 our method access_arg:type<ki> ($num, %ctx) {
 }
 
-our method access_arg:type<ic> ($num, %ctx) {
-    $!debug && say("# $num <ic> { self._opcode_at($num, %ctx) }");
-    LLVM::Constant::integer(self._opcode_at($num, %ctx));
+our method access_arg:type<ic> ($num, %c) {
+    $!debug && say("# $num <ic> { self._opcode_at($num, %c) }");
+    LLVM::Constant::integer(self._opcode_at($num, %c));
 }
 
-our method access_arg:type<sc> ($num, %ctx) {
-    my $c := %ctx<constants>;
-    my $i := self._opcode_at($num, %ctx);
+our method access_arg:type<sc> ($num, %c) {
+    die("Wrong LHS mode") if %c<lhs>;
+
+    my $c := %c<constants>;
+    my $i := self._opcode_at($num, %c);
     my $res := Q:PIR{
         .local string s
         .local int    I
@@ -453,19 +459,21 @@ our method access_arg:type<sc> ($num, %ctx) {
     };
     $!debug && say("# $num<sc> '$res'");
 
-    _dumper(%ctx<str_constants>);
+    $!debug && _dumper(%c<str_constants>);
 
     $!builder.load(
         $!builder.inbounds_gep(
-            %ctx<str_constants>,
-            LLVM::Constant::integer(self._opcode_at($num, %ctx))
+            %c<str_constants>,
+            LLVM::Constant::integer(self._opcode_at($num, %c))
         )
     );
 }
 
-our method access_arg:type<nc> ($num, %ctx) {
-    my $c := %ctx<constants>;
-    my $i := self._opcode_at($num, %ctx);
+our method access_arg:type<nc> ($num, %c) {
+    die("Wrong LHS mode") if %c<lhs>;
+
+    my $c := %c<constants>;
+    my $i := self._opcode_at($num, %c);
     my $res := Q:PIR{
         .local num    n
         .local int    I
@@ -552,14 +560,15 @@ our method process:pasttype<undef> (PAST::Op $chunk, %c) {
 
     if $pirop {
         if $pirop eq '=' {
-            # Shortcut for register dereferencing.
-            # $n == *(get_register(n)). So, we are shortcuting it to store
-            # value directly in register.
+            # Switch processing to "lhs assignment".
+            # This will disable "loading" of variables.
+            %c<lhs>++;
+            my $lhs := self.process($chunk[0], %c);
+            %c<lhs>--;
+
             $!builder.store(
                 self.process($chunk[1], %c),
-                (($chunk[0] ~~ PAST::Var) && ($chunk[0].scope eq 'register'))
-                    ?? self.get_register($chunk[0], %c)
-                    !! self.process($chunk[0], %c)
+                $lhs
             );
         }
     }
