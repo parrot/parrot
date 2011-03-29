@@ -172,6 +172,31 @@ of M0 ops.
 In descriptions, C<$0> refers to the value of the first op, C<$1> to the second
 and C<$2> to the third.
 
+=head3 Control Flow (4 ops)
+
+=item * noop - do nothing
+
+Explicitly do nothing.  C<$0>, C<$1> and C<$2> are ignored.
+
+=item * goto - go to an offset in the current bytecode segment
+
+Unconditionally transfer control flow to the bytecode offset in C<*$0> within
+the current bytecode segment.  C<$1> and C<$2> are ignored.
+
+=item * goto_if_eq - go to an offset in the current bytecode segment if the last two arguments are equal
+
+Transfer control flow to the bytecode offset in C<*$0> within the current
+bytecode segment iff the values of C<*$1> and C<*$2> are the same.
+
+=item * goto_cs - go to an offset in another bytecode segment
+
+Unconditionally transfer control flow to the bytecode offset in C<*$0> within
+the current bytecode segment specified in C<*$1>.  If C<*$2> is 0, C<*$1> is
+treated as the number of a chunk.  If C<*$2> is non-zero, C<*$1> is treated as
+a string which contains the name of the chunk.
+
+=back
+
 =head3 Math/numeric ops (12 ops)
 
 =over
@@ -254,27 +279,6 @@ Store C<*$1> | C<*$2> into C<*$0>.
 =item * xor - bitwise exclusive OR
 
 Store C<*$1> ^ C<*$2> into C<*$0>.
-
-=back
-
-=head3 Control Flow (3 ops)
-
-=item * goto - go to an offset in the current bytecode segment
-
-Unconditionally transfer control flow to the bytecode offset in C<*$0> within
-the current bytecode segment.  C<$1> and C<$2> are ignored.
-
-=item * goto_if_eq - go to an offset in the current bytecode segment if the last two arguments are equal
-
-Transfer control flow to the bytecode offset in C<*$0> within the current
-bytecode segment iff the values of C<*$1> and C<*$2> are the same.
-
-=item * goto_cs - go to an offset in another bytecode segment
-
-Unconditionally transfer control flow to the bytecode offset in C<*$0> within
-the current bytecode segment specified in C<*$1>.  If C<*$2> is 0, C<*$1> is
-treated as the number of a chunk.  If C<*$2> is non-zero, C<*$1> is treated as
-a string which contains the name of the chunk.
 
 =back
 
@@ -562,6 +566,51 @@ representative sample of running M0 code, we will benchmark various padding
 strategies to find which have the best performance characteristics for a
 typical expected workload.  A viable M0 interpreter implemented in a low-level
 langauge like C will be needed to properly test this. 
+
+=head3 Opcode Numbers
+
+
+In the interest of compatibility between implementations, the following is a
+canonical list of the ops an M0 implementation must implement and the numbers
+they must correspond to.  Other values should cause the interpreter to fail
+cleanly.
+
+    0x00 noop
+    0x01 goto
+    0x02 goto_if_eq
+    0x03 goto_cs
+    0x04 add_i
+    0x05 add_n
+    0x06 sub_i
+    0x07 sub_n
+    0x08 mult_i
+    0x09 mult_n
+    0x0A div_i
+    0x0B div_n
+    0x0C mod_i
+    0x0D mod_n
+    0x0E iton
+    0x0F ntoi
+    0x10 ashr
+    0x11 lshr
+    0x12 shl
+    0x13 and
+    0x14 or
+    0x15 xor
+    0x16 set
+    0x17 set_mem
+    0x18 get_mem
+    0x19 get_var
+    0x1A csym
+    0x1B ccall_arg
+    0x1C ccall_ret
+    0x1D ccall
+    0x1E print_s
+    0x1F print_i
+    0x20 print_n
+    0x21 alloc
+    0x22 free
+    0x23 exit
 
 =head2 M0 Runloop
 
