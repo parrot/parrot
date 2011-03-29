@@ -571,7 +571,6 @@ langauge like C will be needed to properly test this.
 
 =head3 Opcode Numbers
 
-
 In the interest of compatibility between implementations, the following is a
 canonical list of the ops an M0 implementation must implement and the numbers
 they must correspond to.  Other values should cause the interpreter to fail
@@ -644,7 +643,7 @@ values from memory with memget() and changed with memset().
 
 Will some memory be protected in M0?
 
-=head2 structs
+=head2 Structs
 
 Structs (as implemented in C) will be an abstraction on top of M0.  M0 will not
 be concerned with them directly.
@@ -657,8 +656,9 @@ type will merely be syntax sugar for accessing a PMC.
 M0 registers will not have innate types; they'll be nothing more than a
 collection of bits which are interpreted by M0's ops as having a certain type.
 The types that ops attribute to register values will be based on the position
-of the register in an M0 context's register set.  For example if an M0 context
-has 25 registers (which it won't), their types might be as follows:
+of the register in an M0 context's register set.  The proposed structure uses
+the first 8 registers for context-specific information and has 62 of each
+primitive type:
 
     number  type
     0       current context
@@ -666,18 +666,14 @@ has 25 registers (which it won't), their types might be as follows:
     2       EH
     3       EX
     4       calling context
-    5-9     I
-    10-14   N
-    15-19   S
-    20-24   P
+    5-7     reserved
+    8-70    I0 - I61
+    71-132  N0 - N61
+    133-194 S0 - S61
+    195-256 P0 - P61
 
 This means that an op which is passed the wrong value could pretty easily cause
 chaos by clobbering the PC or changing the pointer to the current context.
-
-=head2 Immediate Values
-
-M0 supports loading values from the variables table into registers via the
-C<get_var> instruction.
 
 =head2 MOP interaction
 
