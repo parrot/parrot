@@ -122,7 +122,7 @@ class LLVM::PassManager is LLVM::Opaque {
         LLVM::call("DisposePassManager", self);
     }
 
-    multi method add(Str $name) {
+    multi method add($name) {
         my $m := %LLVM::F{"Add" ~ $name};
         pir::die("Unknown pass $name") unless pir::defined($m);
         $m(self);
