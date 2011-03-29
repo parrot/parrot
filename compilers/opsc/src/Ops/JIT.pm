@@ -665,54 +665,41 @@ method get_register(PAST::Var $var, %c) {
 method get_int_reg($num, %c) {
     my $r := self._opcode_at($num, %c);
     my $n := ".I$r";
-    %c<variables>{$n} := $!builder.call(
-        %!functions<Parrot_pcc_get_INTVAL_reg>,
-        $!builder.load(%c<variables><interp>),
-        $!builder.load(%c<variables><.CUR_CTX>),
-        LLVM::Constant::integer(self._opcode_at($num, %c)),
-        :name($n)
-    ) unless pir::defined(%c<variables>{$n});
-
+    self._lazy_load_register($n, $r, "Parrot_pcc_get_INTVAL_reg", %c);
     %c<variables>{$n};
 }
 
 method get_num_reg($num, %c) {
     my $r := self._opcode_at($num, %c);
     my $n := ".N$r";
-    %c<variables>{$n} := $!builder.call(
-        %!functions<Parrot_pcc_get_FLOATVAL_reg>,
-        $!builder.load(%c<variables><interp>),
-        $!builder.load(%c<variables><.CUR_CTX>),
-        LLVM::Constant::integer($r),
-        :name($n)
-    ) unless pir::defined(%c<variables>{$n});
+    self._lazy_load_register($n, $r, "Parrot_pcc_get_FLOATVAL_reg", %c);
     %c<variables>{$n};
 }
 
 method get_str_reg($num, %c) {
     my $r := self._opcode_at($num, %c);
     my $n := ".S$r";
-    %c<variables>{$n} := $!builder.call(
-        %!functions<Parrot_pcc_get_STRING_reg>,
-        $!builder.load(%c<variables><interp>),
-        $!builder.load(%c<variables><.CUR_CTX>),
-        LLVM::Constant::integer($r),
-        :name($n)
-    ) unless pir::defined(%c<variables>{$n});
+    self._lazy_load_register($n, $r, "Parrot_pcc_get_STRING_reg", %c);
     %c<variables>{$n};
 }
 
 method get_pmc_reg($num, %c) {
     my $r := self._opcode_at($num, %c);
     my $n := ".P$r";
-    $!builder.call(
-        %!functions<Parrot_pcc_get_PMC_reg>,
-        $!builder.load(%c<variables><interp>),
-        $!builder.load(%c<variables><.CUR_CTX>),
-        LLVM::Constant::integer($r),
-        :name($n)
-    ) unless pir::defined(%c<variables>{$n});
+    self._lazy_load_register($n, $r, "Parrot_pcc_get_PMC_reg", %c);
     %c<variables>{$n};
+}
+
+method _lazy_load_register($name, $r, $func, %c) {
+    if ! %c<variables>{$name} {
+        %c<variables>{$name} := $!builder.call(
+            %!functions{$func},
+            $!builder.load(%c<variables><interp>),
+            $!builder.load(%c<variables><.CUR_CTX>),
+            LLVM::Constant::integer($r),
+            :name($name)
+        );
+    }
 }
 
 
