@@ -157,12 +157,16 @@ method jit($start, :$optimize = 1) {
     # when functions doesn't have side-effects. This is main reason
     # for having such signature.
     %jit_context := self._create_jitted_function(%jit_context, $start);
+    %jit_context<jitted_sub>.dump;
 
     %jit_context := self._create_basic_blocks(%jit_context);
+    %jit_context<jitted_sub>.dump;
 
     %jit_context := self._jit_ops(%jit_context);
+    %jit_context<jitted_sub>.dump;
 
     %jit_context := self._optimize(%jit_context) if $optimize;
+    %jit_context<jitted_sub>.dump;
 
     %jit_context;
 }
@@ -205,43 +209,41 @@ method _create_jitted_function (%jit_context, $start) {
     # Handle args.
     $!builder.set_position($entry);
 
+    $!debug && say("# cur_opcode");
     my $cur_opcode := $jitted_sub.param(0);
     $cur_opcode.name("cur_opcode");
-    my $cur_opcode_addr := $!builder.store(
-        $cur_opcode,
-        $!builder.alloca($cur_opcode.typeof()).name("cur_opcode_addr")
-    );
-    %jit_context<cur_opcode_addr> := $cur_opcode_addr;
-    %jit_context<variables><cur_opcode> := $cur_opcode;
+    my $cur_opcode_addr := $!builder.alloca($cur_opcode.typeof()).name("cur_opcode_addr");
+    %jit_context<variables><cur_opcode> := $cur_opcode_addr;
+    $!builder.store($cur_opcode, $cur_opcode_addr);
 
+    $!debug && say("# interp");
     my $interp := $jitted_sub.param(1);
     $interp.name("interp");
-    my $interp_addr := $!builder.store(
-        $interp,
-        $!builder.alloca($interp.typeof()).name("interp_addr")
-    );
-    %jit_context<interp_addr> := $interp_addr;
-    %jit_context<variables><interp> := $interp;
+    my $interp_addr := $!builder.alloca($interp.typeof()).name("interp_addr");
+    $!builder.store($interp, $interp_addr);
+    %jit_context<variables><interp> := $interp_addr;
 
     # Few helper values
+    $!debug && say("# retval");
     my $retval := $!builder.alloca($!opcode_ptr_type).name("retval");
-    %jit_context<retval> := $retval;
+    %jit_context<variables><retval> := $retval;
 
+    $!debug && say("# .CUR_CTX");
     # Load current context from interp
-    my $cur_ctx := $!builder.struct_gep($interp, 0);
-    %jit_context<variables><!CUR_CTX> := $!builder.load($cur_ctx, 'CUR_CTX');
-    %jit_context<cur_ctx> := $cur_ctx;
+    my $cur_ctx := $!builder.struct_gep($interp, 0, '.CUR_CTX');
+    %jit_context<variables><.CUR_CTX> := $cur_ctx;
 
     # Constants
+    $!debug && say("# str_constants");
     %jit_context<str_constants> := $!builder.call(
-        #"Parrot_pcc_get_str_constants_func",
         %!functions<Parrot_pcc_get_str_constants_func>,
-        %jit_context<variables><interp>,
-        %jit_context<variables><!CUR_CTX>,
-        :name('str_constants')
+        $!builder.load(%jit_context<variables><interp>),
+        $!builder.load(%jit_context<variables><.CUR_CTX>),
+        :name('.str_constants')
     );
 
     # Create default return.
+    $!debug && say("# default leave");
     $!builder.set_position($leave);
     $!builder.ret(
         $!builder.load($retval)
@@ -389,8 +391,7 @@ our multi method process(PAST::Val $val, %c) {
 }
 
 our multi method process(PAST::Var $var, %c) {
-    #die('!!!');
-    #LLVM::Constant::();
+    my $res;
     if $var.isdecl {
     }
     else {
@@ -399,16 +400,21 @@ our multi method process(PAST::Var $var, %c) {
             my $type := %c<op>.arg_type($num - 1);
             $!debug && say("# Handling '$type' register");
             my $sub  := pir::find_sub_not_null__ps('access_arg:type<' ~ $type ~ '>');
-            $sub(self, $num, %c);
+            $res := $sub(self, $num, %c);
         }
         else {
-            %c<variables>{ $var.name } // die("Unknown variable { $var.name }");
+            $res := %c<variables>{ $var.name } // die("Unknown variable { $var.name }");
+            $res := $!builder.load($res);
         }
     }
+
+    return undef unless $res;
+
 }
 
 our method access_arg:type<i> ($num, %ctx) {
-    $!builder.load(self.get_int_reg($num, %ctx));
+    my $res := self.get_int_reg($num, %ctx);
+    $res := $!builder.load($res);
 }
 
 our method access_arg:type<n> ($num, %ctx) {
@@ -446,7 +452,8 @@ our method access_arg:type<sc> ($num, %ctx) {
         %r = box s
     };
     $!debug && say("# $num<sc> '$res'");
-    #$!builder.global_string_ptr($res, :name<.SCONST>);
+
+    _dumper(%ctx<str_constants>);
 
     $!builder.load(
         $!builder.inbounds_gep(
@@ -595,7 +602,7 @@ our method process:macro<goto_address>(PAST::Op $chunk, %c) {
         LLVM::Constant::null(
             LLVM::Type::pointer(LLVM::Type::int32())
         ),
-        %c<retval>,
+        %c<variables><retval>,
     );
     $!builder.br(%c<leave>);
 }
@@ -660,11 +667,12 @@ method get_int_reg($num, %c) {
     my $n := ".I$r";
     %c<variables>{$n} := $!builder.call(
         %!functions<Parrot_pcc_get_INTVAL_reg>,
-        %c<variables><interp>,
-        %c<variables><!CUR_CTX>,
+        $!builder.load(%c<variables><interp>),
+        $!builder.load(%c<variables><.CUR_CTX>),
         LLVM::Constant::integer(self._opcode_at($num, %c)),
         :name($n)
     ) unless pir::defined(%c<variables>{$n});
+
     %c<variables>{$n};
 }
 
@@ -673,8 +681,8 @@ method get_num_reg($num, %c) {
     my $n := ".N$r";
     %c<variables>{$n} := $!builder.call(
         %!functions<Parrot_pcc_get_FLOATVAL_reg>,
-        %c<variables><interp>,
-        %c<variables><!CUR_CTX>,
+        $!builder.load(%c<variables><interp>),
+        $!builder.load(%c<variables><.CUR_CTX>),
         LLVM::Constant::integer($r),
         :name($n)
     ) unless pir::defined(%c<variables>{$n});
@@ -686,8 +694,8 @@ method get_str_reg($num, %c) {
     my $n := ".S$r";
     %c<variables>{$n} := $!builder.call(
         %!functions<Parrot_pcc_get_STRING_reg>,
-        %c<variables><interp>,
-        %c<variables><!CUR_CTX>,
+        $!builder.load(%c<variables><interp>),
+        $!builder.load(%c<variables><.CUR_CTX>),
         LLVM::Constant::integer($r),
         :name($n)
     ) unless pir::defined(%c<variables>{$n});
@@ -699,13 +707,14 @@ method get_pmc_reg($num, %c) {
     my $n := ".P$r";
     $!builder.call(
         %!functions<Parrot_pcc_get_PMC_reg>,
-        %c<variables><interp>,
-        %c<variables><!CUR_CTX>,
+        $!builder.load(%c<variables><interp>),
+        $!builder.load(%c<variables><.CUR_CTX>),
         LLVM::Constant::integer($r),
         :name($n)
     ) unless pir::defined(%c<variables>{$n});
     %c<variables>{$n};
 }
+
 
 
 INIT {
