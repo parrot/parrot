@@ -43,16 +43,12 @@ class LLVM::Builder is LLVM::Opaque {
     }
 
 #            LLVMInsertIntoBuilder           => "vpp",
-    multi method insert_into_builder(LLVM::Value $val) {
-        LLVM::BasicBlock.create(
-            LLVM::call("InsertIntoBuilder", self, $val)
-        );
-    }
-
 #            LLVMInsertIntoBuilderWithName   => "vppt",
-    multi method insert_into_builder_with_name(LLVM::Value $val, $name?) {
+    multi method insert_into_builder(LLVM::Value $val, :$name?) {
         LLVM::BasicBlock.create(
-            LLVM::call("InsertIntoBuilderWithName", self, $val, $name)
+            $name
+                ?? LLVM::call("InsertIntoBuilderWithName", self, $val, $name)
+                !! LLVM::call("InsertIntoBuilder", self, $val)
         );
     }
 
