@@ -174,6 +174,8 @@ and C<$2> to the third.
 
 =head3 Control Flow (4 ops)
 
+=over
+
 =item * noop - do nothing
 
 Explicitly do nothing.  C<$0>, C<$1> and C<$2> are ignored.
@@ -249,9 +251,9 @@ and store the result in C<*$0>.  C<$2> is ignored.
 
 =back
 
-=over
-
 =head3 Bitwise ops (6 ops)
+
+=over
 
 =item * ashr - right bitshift with sign extension
 
@@ -423,7 +425,7 @@ a bytecode chunk.
 
 A chunk identifier consists of a single line beginning with '.chunk', followed
 by a chunk name.  The name consists of a quote-delimited utf-8 string.
-  
+
   .chunk "chunk_name"
 
 =head3 Variables Table
@@ -468,7 +470,7 @@ if they aren't all used.
     add_i 3, 2, 3
     cmp_i 2, 3, 3
     goto  0, 0, 0
-  
+
 =head2 Binary Representation
 
 M0's binary representation will be composed of a fixed header, a single
