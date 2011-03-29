@@ -30,7 +30,7 @@ class LLVM::Module is LLVM::Opaque {
         );
     }
 
-    method find_function(Str $name) {
+    multi method find_function($name) {
         LLVM::Function.create(
             LLVM::call("GetNamedFunction", self, $name)
         )
@@ -51,18 +51,18 @@ class LLVM::Module is LLVM::Opaque {
 
 #/** See Module::addTypeName. */
     # LLVMAddTypeName => "Iptp",
-    method add_type(Str $name, LLVM::Type $type) {
+    multi method add_type($name, LLVM::Type $type) {
         # Reverse response.
         !LLVM::call("AddTypeName", self, $name, $type);
     }
 
     # LLVMDeleteTypeName => "vpt",
-    method delete_type(Str $name) {
+    multi method delete_type($name) {
         LLVM::call("DeleteTypeName", self, $name);
     }
 
     # LLVMGetTypeByName => "ppt",
-    method get_type(Str $name) {
+    multi method get_type($name) {
         LLVM::Type.create(
             LLVM::call("GetTypeByName", self, $name)
         )
@@ -70,7 +70,7 @@ class LLVM::Module is LLVM::Opaque {
 
 # BitReader
     # from file
-    method read(Str $path){
+    multi method read($path){
         my $engine := pir::new("LLVM_Engine");
         my $module := $engine.load_module($path);
         self.wrap($module);
@@ -82,7 +82,7 @@ class LLVM::Module is LLVM::Opaque {
 
 # BitWriter
     # to path
-    method write(Str $path){
+    multi method write($path){
         LLVM::call("WriteBitcodeToFile", self, $path);
     }
 

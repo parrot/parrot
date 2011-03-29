@@ -1,11 +1,11 @@
 class LLVM::Type is LLVM::Value {
 
-    multi sub int1()      { LLVM::Type.create(LLVM::call("Int1Type", )) }
-    multi sub int8()      { LLVM::Type.create(LLVM::call("Int8Type", )) }
-    multi sub int16()     { LLVM::Type.create(LLVM::call("Int16Type", )) }
-    multi sub int32()     { LLVM::Type.create(LLVM::call("Int32Type", )) }
-    multi sub int64()     { LLVM::Type.create(LLVM::call("Int64Type", )) }
-    multi sub int($radix) { LLVM::Type.create(LLVM::call("IntType", $radix)) }
+    sub int1()      { LLVM::Type.create(LLVM::call("Int1Type", )) }
+    sub int8()      { LLVM::Type.create(LLVM::call("Int8Type", )) }
+    sub int16()     { LLVM::Type.create(LLVM::call("Int16Type", )) }
+    sub int32()     { LLVM::Type.create(LLVM::call("Int32Type", )) }
+    sub int64()     { LLVM::Type.create(LLVM::call("Int64Type", )) }
+    sub int($radix) { LLVM::Type.create(LLVM::call("IntType", $radix)) }
 
     sub float()    { LLVM::Type.create(LLVM::call("FloatType")) }
     sub double()   { LLVM::Type.create(LLVM::call("DoubleType")) }
@@ -13,7 +13,7 @@ class LLVM::Type is LLVM::Value {
     sub fp128()    { LLVM::Type.create(LLVM::call("FP128Type")) }
     sub ppcfp128() { LLVM::Type.create(LLVM::call("PPCFP128Type")) }
 
-    sub function(LLVM::Type $return, *@args, :$va_args?) {
+    multi sub function(LLVM::Type $return, *@args, :$va_args?) {
         LLVM::Type.create(
             LLVM::call("FunctionType",
                 $return,                        # return
@@ -30,7 +30,7 @@ class LLVM::Type is LLVM::Value {
         );
     }
 
-    sub pointer(LLVM::Type $type, :$address_space?) {
+    multi sub pointer(LLVM::Type $type, :$address_space?) {
         LLVM::Type.create(
             LLVM::call("PointerType", $type, $address_space)
         );
@@ -40,7 +40,7 @@ class LLVM::Type is LLVM::Value {
     sub label() { LLVM::Type.create(LLVM::call("LabelType", )) };
     sub opaque() { LLVM::Type.create(LLVM::call("OpaqueType", )) };
 
-    method refine_to(LLVM::Type $to) {
+    multi method refine_to(LLVM::Type $to) {
         LLVM::Type.create(
             LLVM::call("RefineType", self, $to)
         );
