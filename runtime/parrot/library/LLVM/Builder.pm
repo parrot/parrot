@@ -43,14 +43,14 @@ class LLVM::Builder is LLVM::Opaque {
     }
 
 #            LLVMInsertIntoBuilder           => "vpp",
-    method insert_into_builder(LLVM::Value $val) {
+    multi method insert_into_builder(LLVM::Value $val) {
         LLVM::BasicBlock.create(
             LLVM::call("InsertIntoBuilder", self, $val)
         );
     }
 
 #            LLVMInsertIntoBuilderWithName   => "vppt",
-    method insert_into_builder_with_name(LLVM::Value $val, Str $name?) {
+    multi method insert_into_builder_with_name(LLVM::Value $val, $name?) {
         LLVM::BasicBlock.create(
             LLVM::call("InsertIntoBuilderWithName", self, $val, $name)
         );
@@ -72,49 +72,49 @@ class LLVM::Builder is LLVM::Opaque {
     }
 
 #            LLVMBuildAggregateRet           => "ppp3",
-    method aggregate_ret(LLVM::Value *@vals) {
+    multi method aggregate_ret(LLVM::Value *@vals) {
         LLVM::Value.create(
             LLVM::call("BuildAggregateRet", self, LLVM::to_array(@vals), +@vals)
         );
     }
 
 #            LLVMBuildBr                     => "ppp",
-    method br(LLVM::BasicBlock $to) {
+    multi method br(LLVM::BasicBlock $to) {
         LLVM::Value.create(
             LLVM::call("BuildBr", self, $to)
         );
     }
 
 #            LLVMBuildCondBr                 => "ppppp",
-    method cond_br(LLVM::Value $if, LLVM::BasicBlock $then, LLVM::BasicBlock $else) {
+    multi method cond_br(LLVM::Value $if, LLVM::BasicBlock $then, LLVM::BasicBlock $else) {
         LLVM::Value::create(
             LLVM::call("BuildCondBr", self, $if, $then, $else)
         );
     }
 
 #            LLVMBuildSwitch                 => "ppppi",
-    method switch(LLVM::Value $v, LLVM::BasicBlock $else, Int $num_cases) {
+    multi method switch(LLVM::Value $v, LLVM::BasicBlock $else, $num_cases) {
         LLVM::Value::create(
             LLVM::call("BuildSwitch", self, $v, $else, $num_cases)
         );
     }
 
 #            LLVMBuildInvoke                 => "ppppippt",
-    method invoke(LLVM::Function $func, *@args, LLVM::BasicBlock $then, LLVM::BasicBlock $catch, Str :$name?) {
+    multi method invoke(LLVM::Function $func, *@args, LLVM::BasicBlock $then, LLVM::BasicBlock $catch, :$name?) {
         LLVM::Value.create(
             LLVM::call("BuildInvoke", self, $func, LLVM::to_array(@args), +@args, $then, $catch, $name)
         );
     }
 
 #            LLVMBuildUnwind                 => "pp",
-    method unwind(){
+    method unwind() {
          LLVM::Value::create(
             LLVM::call("BuildUnwind", self)
         );
     }
 
 #            LLVMBuildUnreachable            => "pp",
-    method unreachable(){
+    method unreachable() {
          LLVM::Value::create(
             LLVM::call("BuildUnreachable", self)
         );
@@ -122,7 +122,7 @@ class LLVM::Builder is LLVM::Opaque {
 
 #            # Add a case to the switch instruction */
 #            LLVMAddCase => "vppp",
-    method add_case(LLVM::Value $switch, LLVM::Value $val, LLVM::BasicBlock $dest) {
+    multi method add_case(LLVM::Value $switch, LLVM::Value $val, LLVM::BasicBlock $dest) {
         LLVM::Value::create(
             LLVM::call("BuildAddCase", $switch, $val, $dest)
         )
@@ -131,14 +131,14 @@ class LLVM::Builder is LLVM::Opaque {
 #            # Arithmetic is generated in INIT block.
 
 #            LLVMBuildNeg => "pppt",
-    method neg(LLVM::Value $v, Str $name?) {
+    multi method neg(LLVM::Value $v, $name?) {
         LLVM::Value.create(
             LLVM::call("BuildNeg", self, $v, $name)
         );
     }
 
 #            LLVMBuildNot => "pppt",
-    method not(LLVM::Value $v, Str $name?) {
+    multi method not(LLVM::Value $v, $name?) {
         LLVM::Value.create(
             LLVM::call("BuildNot", self, $v, $name)
         );
@@ -146,80 +146,80 @@ class LLVM::Builder is LLVM::Opaque {
 
 #            # Memory
 #            LLVMBuildMalloc             => "pppt",
-    method malloc(LLVM::Type $type, Str $name?) {
+    multi method malloc(LLVM::Type $type, $name?) {
         LLVM::Value.create(
             LLVM::call("BuildMalloc", self, $type, $name)
         );
     }
 
 #            LLVMBuildArrayMalloc        => "ppppt",
-    method array_malloc(LLVM::Type $type, LLVM::Value $n, Str $name?) {
+    multi method array_malloc(LLVM::Type $type, LLVM::Value $n, $name?) {
         LLVM::Value.create(
             LLVM::call("BuildArrayMalloc", self, $type, $n, $name)
         );
     }
 
 #            LLVMBuildAlloca             => "pppt",
-    method alloca(LLVM::Type $type, Str $name?) {
+    multi method alloca(LLVM::Type $type, $name?) {
         LLVM::Value.create(
             LLVM::call("BuildAlloca", self, $type, $name)
         );
     }
 #            LLVMBuildArrayAlloca        => "ppppt",
-    method array_alloca(LLVM::Type $type, LLVM::Value $n, Str $name?) {
+    multi method array_alloca(LLVM::Type $type, LLVM::Value $n, $name?) {
         LLVM::Value.create(
             LLVM::call("BuildArrayAlloca", self, $type, $n, $name)
         );
     }
 #            LLVMBuildFree               => "ppp",
-    method free(LLVM::Value $ptr) {
+    multi method free(LLVM::Value $ptr) {
         LLVM::Value.create(
             LLVM::call("BuildFree", self, $ptr)
         );
     }
 
 #            LLVMBuildLoad               => "pppt",
-    method load(LLVM::Value $ptr, Str $name?) {
+    multi method load(LLVM::Value $ptr, $name?) {
         LLVM::Value.create(
             LLVM::call("BuildLoad", self, $ptr, $name)
         );
     }
 #            LLVMBuildStore              => "pppp",
-    method store(LLVM::Value $value, LLVM::Value $ptr) {
+    multi method store(LLVM::Value $value, LLVM::Value $ptr) {
         LLVM::Value.create(
             LLVM::call("BuildStore", self, $value, $ptr)
         );
     }
 
 #            LLVMBuildGEP                => "ppppit",
-    method gep(LLVM::Type $type, *@indices, Str :$name?) {
+    multi method gep(LLVM::Value $type, *@indices, :$name?) {
         LLVM::Value.create(
             LLVM::call("BuildGEP", self, $type, LLVM::to_array(@indices), +@indices, $name // "")
         );
     }
 
 #            LLVMBuildStructGEP          => "ppppt",
-    method struct_gep(LLVM::Type $ptr, Int $idx, Str $name?) {
+    multi method struct_gep(LLVM::Value $ptr, $idx, $name?) {
         LLVM::Value.create(
             LLVM::call("BuildStructGEP", self, $ptr, $idx, $name)
         );
     }
 
 #            LLVMBuildInBoundsGEP        => "ppppit",
-    method inbounds_gep(LLVM::Type $type, *@indices, :$name?) {
+    multi method inbounds_gep(LLVM::Value $ptr, *@indices, :$name?) {
         LLVM::Value.create(
             LLVM::call("BuildInBoundsGEP", self, $type, LLVM::to_array(@indices), +@indices, $name // "")
         );
     }
 
 #            LLVMBuildGlobalString       => "pptt",
-    method global_string(Str $value, Str :$name?) {
+    multi method global_string($value, :$name?) {
         LLVM::Value.create(
             LLVM::call("BuildGlobalString", self, $value, $name)
         );
     }
 #            LLVMBuildGlobalStringPtr    => "pptt",
-    method global_string_ptr(Str $value, Str :$name?) {
+    multi method global_string_ptr($value, :$name?) {
         LLVM::Value.create(
             LLVM::call("BuildGlobalStringPtr", self, $value, $name)
         );
@@ -229,14 +229,14 @@ class LLVM::Builder is LLVM::Opaque {
 
 #            # Comparisons
 #            LLVMBuildICmp => "ppippt",
-    method icmp(Int $op, LLVM::Value $left, LLVM::Value $right, Str :$name?) {
+    multi method icmp($op, LLVM::Value $left, LLVM::Value $right, :$name?) {
         LLVM::Value.create(
             LLVM::call("BuildICmp", $op, $left, $right, $name)
         )
     }
 
 #            LLVMBuildFCmp => "ppippt",
-    method fcmp(Int $op, LLVM::Value $left, LLVM::Value $right, Str :$name?) {
+    multi method fcmp($op, LLVM::Value $left, LLVM::Value $right, :$name?) {
         LLVM::Value.create(
             LLVM::call("BuildFCmp", $op, $left, $right, $name)
         )
@@ -244,14 +244,14 @@ class LLVM::Builder is LLVM::Opaque {
 
 #            # Miscellaneous instructions
 #            LLVMBuildPhi => "pppt",
-    method phi(LLVM::Type $type, Str $name?){
+    multi method phi(LLVM::Type $type, $name?){
         LLVM::Value.create(
             LLVM::call("BuildFhi", self, $type, $name)
         )
     }
 
 #            LLVMBuildCall => "pppppt",
-    method call(LLVM::Function $func, *@args, Str :$name?) {
+    multi method call(LLVM::Function $func, *@args, :$name?) {
         LLVM::call("BuildCall",
             self,
             $func,
@@ -261,69 +261,69 @@ class LLVM::Builder is LLVM::Opaque {
         );
     }
 #            LLVMBuildSelect => "pppppt",
-    method select(LLVM::Value $if, LLVM::BasicBlock $then, LLVM::BasicBlock $else, Str $name?) {
+    multi method select(LLVM::Value $if, LLVM::BasicBlock $then, LLVM::BasicBlock $else, $name?) {
         LLVM::Value::create(
             LLVM::call("BuildSelect", self, $if, $then, $else, $name)
         );
     }
 
 #            LLVMBuildVAArg => "ppppt",
-    method va_arg(LLVM::Value $list, LLVM::Type $type, Str $name?) {
+    multi method va_arg(LLVM::Value $list, LLVM::Type $type, $name?) {
         LLVM::Value::create(
             LLVM::call("BuildVAARG", self, $list, $type, $name)
         );
     }
 
 #            LLVMBuildExtractElement => "ppppt",
-    method extract_element(LLVM::Value $vector, LLVM::Value $index, Str $name?) {
+    multi method extract_element(LLVM::Value $vector, LLVM::Value $index, $name?) {
         LLVM::Value::create(
             LLVM::call("BuildExtractElement", self, $vector, $index, $name)
         );
     }
     
 #            LLVMBuildInsertElement => "pppppt",
-    method insert_element(LLVM::Value $vector, LLVM::Value $val, LLVM::Value $index, Str $name?) {
+    multi method insert_element(LLVM::Value $vector, LLVM::Value $val, LLVM::Value $index, $name?) {
         LLVM::Value::create(
             LLVM::call("BuildInsertElement", self, $vector, $val, $index, $name)
         );
     }
 
 #            LLVMBuildShuffleVector => "pppppt",
-    method shuffle_vector(LLVM::Value $v1, LLVM::Value $v2, LLVM::Value $mask, Str $name?) {
+    multi method shuffle_vector(LLVM::Value $v1, LLVM::Value $v2, LLVM::Value $mask, $name?) {
         LLVM::Value::create(
             LLVM::call("BuildShuffleVector", self, $v1, $v2, $mask, $name)
         );
     }
 
 #            LLVMBuildExtractValue => "ppp3t",
-    method extract_value(LLVM::Value $aggr, Int $index, Str $name?) {
+    multi method extract_value(LLVM::Value $aggr, $index, $name?) {
         LLVM::Value::create(
             LLVM::call("BuildExtractValue", self, $aggr, $index, $name)
         );
     }
 
 #            LLVMBuildInsertValue => "pppp3t",
-    method insert_value(LLVM::Value $aggr, LLVM::Value $val, Int $index, Str $name?) {
+    multi method insert_value(LLVM::Value $aggr, LLVM::Value $val, $index, $name?) {
         LLVM::Value::create(
             LLVM::call("BuildInsertValue", self, $aggr, $val, $index, $name)
         );
     }
 
 #            LLVMBuildIsNull => "pppt",
-    method is_null(LLVM::Value $val, Str $name?) {
+    multi method is_null(LLVM::Value $val, $name?) {
         LLVM::Value::create(
             LLVM::call("BuildIsNull", self, $val, $name)
         );
     }
 
 #            LLVMBuildIsNotNull => "pppt",
-    method is_not_null(LLVM::Value $val, Str $name?) {
+    multi method is_not_null(LLVM::Value $val, $name?) {
         LLVM::Value::create(
             LLVM::call("BuildIsNotNull", self, $val, $name)
         );
     }
 #            LLVMBuildPtrDiff => "ppppt",
-    method ptr_diff(LLVM::Value $ptr1, LLVM::Value $ptr2, Str $name?) {
+    multi method ptr_diff(LLVM::Value $ptr1, LLVM::Value $ptr2, $name?) {
         LLVM::Value::create(
             LLVM::call("BuildPtrDiff", self, $ptr1, $ptr2, $name)
         );
@@ -339,7 +339,7 @@ INIT {
         my $subname := pir::downcase($name);
         $HOW.add_method(
             $subname,
-            method (LLVM::Value $left, LLVM::Value $right, Str :$name?) {
+            method (LLVM::Value $left, LLVM::Value $right, :$name?) {
                 LLVM::Value.create(
                     LLVM::call($call, self, $left, $right, $name)
                 )
@@ -371,7 +371,7 @@ INIT {
     ).kv -> $call, $subname {
         $HOW.add_method(
             $subname,
-            method (LLVM::Value $value, LLVM::Type $type, Str :$name?) {
+            method (LLVM::Value $value, LLVM::Type $type, :$name?) {
                 LLVM::Value.create(
                     LLVM::call("LLVMBuild" ~ $call, self, $value, $type, $name)
                 )
