@@ -144,6 +144,17 @@ A Context will contain:
 
 =back
 
+=head2 Registers
+
+An M0 register may have one of 256 values.  This means that registers can point
+at one of 256 different places in the variables table, which will support up to
+65536 slots.   Registers can be pointed at different slots with the C<get_var>
+instruction, which will interpret its second and third arguments as the index
+into the variables table.
+
+In this documentation, as in C, C<$0> refers to the value in register 0, where
+C<*$0> refers to the value that register 0 points at.
+
 =head2 List of Ops
 
 M0 ops are very low-level and provide the simplest possible way of interacting
@@ -158,33 +169,58 @@ the op set is complete, we will look at how a representative selection of PIR's
 existing core ops and the dynops used by HLLs could be reimplemented in terms
 of M0 ops.
 
+In descriptions, C<$0> refers to the value of the first op, C<$1> to the second
+and C<$2> to the third.
+
 =head3 Math/numeric ops (12 ops)
 
 =over
 
-=item * add_i - add two integer registers
+=item * add_i - integer addition
 
 =item * add_n - add two numeric registers
+
+Treat C<*$1> and C<*$2> as integer or floating-point values, add them and store
+the result in C<*$0>.
 
 =item * sub_i - subtract two integer registers
 
 =item * sub_n - subtract two numeric registers
 
+Treat C<*$1> and C<*$2> as integer or floating-point values, subtract C<*$2>
+from C<*$1> and store the result in C<*$0>.
+
 =item * mult_i - multiply two integer registers
 
 =item * mult_n - multiply two numeric registers
+
+Treat C<*$1> and C<*$2> as integer or floating-point values, multiply C<*$1> by
+C<*$2> and store the result in C<*$0>.
 
 =item * div_i - divide two integer registers
 
 =item * div_n - divide two numeric registers
 
+Treat C<*$1> and C<$*2> as integer or floating-point values, divide C<$*1> by
+C<$*2> and store the result in C<$*0>.
+
 =item * mod_i - remainder of of $2/$1 (integer)
 
 =item * mod_n - remainder of of $2/$1 (numeric)
 
-=item * iton - coerce integer to numeric
+Treat C<*$1> and C<*$2> as integer or floating-point values, divide C<*$1> by
+C<*$2> and store the remainder in C<*$0>.  Division by zero will make the the
+M0 interpreter sad.
 
-=item * ntoi - coerce numeric to integer
+=item * iton - convert integer to numeric
+
+Assume that C<*$1> is an integer value, convert it to a floating-point value
+and store the result in C<*$0>.  C<$2> is ignored.
+
+=item * ntoi - convert numeric to integer
+
+Assume that C<*$1> is a floating-point value, convert it to an integer value
+and store the result in C<*$0>.  C<$2> is ignored.
 
 =back
 
@@ -194,15 +230,30 @@ of M0 ops.
 
 =item * ashr - right bitshift with sign extension
 
+Shift the value in C<*$1> right by the number of bits in C<*$2>, with sign
+extension, and store the result in C<*$0>.
+
 =item * lshr - right bitshift without sign extension
+
+Shift the value in C<*$1> right by the number of bits in C<$*2>, without sign
+extension, and store the result in C<$*0>.
 
 =item * shl - left bitshift
 
+Shift the value in C<*$1> left by the number of bits in C<*$2> and store the
+result in C<*$0>.
+
 =item * and - bitwise AND
+
+Store C<*$1> & C<*$2> into C<*$0>.
 
 =item * or - bitwise OR
 
+Store C<*$1> | C<*$2> into C<*$0>.
+
 =item * xor - bitwise exclusive OR
+
+Store C<*$1> ^ C<*$2> into C<*$0>.
 
 =back
 
@@ -210,9 +261,20 @@ of M0 ops.
 
 =item * goto - go to an offset in the current bytecode segment
 
+Unconditionally transfer control flow to the bytecode offset in C<*$0> within
+the current bytecode segment.  C<$1> and C<$2> are ignored.
+
 =item * goto_if_eq - go to an offset in the current bytecode segment if the last two arguments are equal
 
+Transfer control flow to the bytecode offset in C<*$0> within the current
+bytecode segment iff the values of C<*$1> and C<*$2> are the same.
+
 =item * goto_cs - go to an offset in another bytecode segment
+
+Unconditionally transfer control flow to the bytecode offset in C<*$0> within
+the current bytecode segment specified in C<*$1>.  If C<*$2> is 0, C<*$1> is
+treated as the number of a chunk.  If C<*$2> is non-zero, C<*$1> is treated as
+a string which contains the name of the chunk.
 
 =back
 
@@ -220,13 +282,33 @@ of M0 ops.
 
 =over
 
-=item * set - sets a register to a value (type-ignorant)
+=item * set - sets a register to a value
 
-=item * memset - set a region of memory to a value stored in a register
+Set C<*$0> to whatever is in C<*$1>.  C<*$2> is ignored.
 
-=item * memget - get a region from memory and copy it into a register
+=item * set_mem - set a region of memory
 
-=item * get_var - point a register at the first byte of a variable on the variables table
+Write C<*$2> byte-sized values from C<*$1> to the memory location starting at
+C<*$0>.  Segfaults may result.  Be careful.
+
+=item * get_mem - get a region from memory
+
+Write C<*$2> byte-sized values from the memory location starting at C<*$1> to
+C<*$0>.  Segfaults may result.  Be careful.
+
+=item * get_var - point a register at a variables table slot
+
+Point C<*$0> at a slot on the variables table.  C<$1> contains the low byte,
+C<$2> contains the high byte.  Both C<$1> and C<$2> are treated as 1-byte
+immediate values.
+
+Examples:
+
+  #point register 0 at variable 123 (123 * 1 + 256 * 0)
+  get_var 0, 123, 0
+
+  #point register 3 at variable 257 (2   * 1 + 256 * 1)
+  get_var 3, 1, 1
 
 =back
 
@@ -234,27 +316,63 @@ of M0 ops.
 
 =over
 
-=item * csym - look up a function by name (use this to find Parrot_dlopen/Parrot_dlsym)
+=item * csym - look up a function by name
+
+Look up the function pointer for using the name in C<*$1> in the C function
+namespace and put the pointer into C<*$0>.  C<$2> is ignored.  C<*$1> is assumed
+to point at a C string.
+
+Note that this function wraps the C<csym> C function.  Use it to access
+C<Parrot_dlopen> and C<Parrot_dlsym> to deal wih dynamic libraries.
 
 =item * ccall_arg - set an argument for a ccall
 
+Take two arguments: an argument type in C<$0> and an argument source in C<$1>.
+C<$0> is an immediate constant indicating the type of the argument.  The
+possible values of C<$0> will be similar to those used by libffi
+(https://github.com/atgreen/libffi/blob/master/doc/libffi.info ).  C<$1>
+indicates which M0 register should be used to populate the value of the current
+argument.  C<$2> is ignored.
+
 =item * ccall_ret - get a return value from a ccall
 
-=item * ccall - invoke a function handle
+C<ccall_ret> is similar to C<ccall_arg>, except that it copies the return value
+of the previously-called function into C<*$1>.  C<$2> is ignored.
+
+=item * ccall - invoke a function 
+
+C<ccall> uses the function pointer in C<*$0> to call a C function, assuming that
+its arguments have been set up correctly.  C<$1> and C<$2> are ignored.
 
 =back
 
-=head3 Temporary ops (4 ops)
+=head3 Temporary ops (6 ops)
 
 =over
 
-=item * print  - prints a string to a file handle
+=item * print_s  - prints a string
+
+Print the string at C<*$1> to the filehandle C<*$0>.
+
+=item * print_i  - prints an int
+
+Print the integer at C<*$1> to the filehandle C<*$0>.
+
+=item * print_n  - prints a number
+
+Print the floating-point number at C<*$1> to the filehandle C<*$0>.
 
 =item * alloc - allocate memory (go through ffi)
 
+Allocate C<*$1> bytes, store them in C<*$0>.  C<$2> is ignored.
+
 =item * free - free memory (go through ffi)
 
+Free the region of memory at C<*$0>.  C<$1> and C<$2> are ignored.
+
 =item * exit - exit with the given status (go through ffi)
+
+Call C's C<exit> function with C<*$0>.  C<$1> and C<$2> are ignored.
 
 =back
 
@@ -546,7 +664,7 @@ namespace and puts the pointer into the register C<sym>.
 
 =item * ccall_arg arg_type, arg_src
 
-C<set_arg> takes two arguments: an argument type and an argument source.
+C<ccall_arg> takes two arguments: an argument type and an argument source.
 C<arg_type> is a constant indicating the type of the argument.  The possible
 values of C<arg_type> will be similar to those used by libffi
 (https://github.com/atgreen/libffi/blob/master/doc/libffi.info ).  C<arg_src>
@@ -558,7 +676,7 @@ current argument.
 C<ccall_ret> is similar to C<ccall_arg>, except that it copies the return value
 of the previously-called function into the register indicated by C<arg_dest>.
 
-=item * ccall func_handle
+=item * ccall fp
 
 C<ccall> uses an existing function pointer to call a C function.  It assumes
 that arguments have been set up correctly.  Hilarity and segfaults are likely
