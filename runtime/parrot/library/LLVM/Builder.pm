@@ -252,13 +252,15 @@ class LLVM::Builder is LLVM::Opaque {
 
 #            LLVMBuildCall => "pppppt",
     multi method call(LLVM::Function $func, *@args, :$name?) {
-        LLVM::call("BuildCall",
-            self,
-            $func,
-            LLVM::to_array(@args),
-            +@args,
-            $name // ""
-        );
+        LLVM::Value.create(
+            LLVM::call("BuildCall",
+                self,
+                $func,
+                LLVM::to_array(@args),
+                +@args,
+                $name // ""
+            )
+        )
     }
 #            LLVMBuildSelect => "pppppt",
     multi method select(LLVM::Value $if, LLVM::BasicBlock $then, LLVM::BasicBlock $else, $name?) {
