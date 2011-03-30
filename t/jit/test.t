@@ -4,7 +4,7 @@
 pir::load_bytecode("opsc.pbc");
 
 # Some preparation
-my $debug  := 0;
+my $debug  := 1;
 my $pir    := 't/compilers/opsc/data/03.pir';
 my $pbc    := subst($pir, / 'pir' $/, 'pbc');
 
