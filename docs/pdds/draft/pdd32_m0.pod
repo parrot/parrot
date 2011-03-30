@@ -13,7 +13,7 @@ requisite runtime environment.
 
 This document is a draft under active development.  Nothing is set in stone
 yet.  If you would like to suggest improvements, please talk with cotto,
-bacek, atrodo, chromatic or dukeleto.
+bacek, atrodo or dukeleto.
 
 =head2 M0 Milestones
 
