@@ -622,37 +622,24 @@ our method process:pirop<=> (PAST::Op $chunk, %c) {
 }
 
 our method process:pirop<++> (PAST::Op $chunk, %c) {
-    %c<lhs>++;
-    my $var   := self.process($chunk[0], %c);
-    my $value := $!builder.load($var);
-    %c<lhs>--;
-
-    $!builder.store(
-        $!builder.add($value, LLVM::Constant::integer(1)),
-        $var
-    );
-
-    # postfix uses previous value. reload var for prefix
-    $chunk.name ~~ /postfix/
-        ?? $value
-        !! $!builder.load($var);
+    self._process_prefix_postfix($chunk, %c, 1);
 }
 
 our method process:pirop<--> (PAST::Op $chunk, %c) {
+    self._process_prefix_postfix($chunk, %c, -1);
+}
+
+method _process_prefix_postfix (PAST::Op $chunk, %c, $delta) {
     %c<lhs>++;
     my $var   := self.process($chunk[0], %c);
     my $value := $!builder.load($var);
     %c<lhs>--;
 
-    $!builder.store(
-        $!builder.sub($value, LLVM::Constant::integer(1)),
-        $var
-    );
+    my $res := $!builder.add($value, LLVM::Constant::integer($delta)),
+    $!builder.store($res, $var);
 
     # postfix uses previous value. reload var for prefix
-    $chunk.name ~~ /postfix/
-        ?? $value
-        !! $!builder.load($var);
+    $chunk.name ~~ /postfix/ ?? $value !! $res;
 }
 
 
