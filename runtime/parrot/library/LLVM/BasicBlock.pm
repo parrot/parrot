@@ -35,6 +35,18 @@ class LLVM::BasicBlock is LLVM::Value {
             LLVM::call("DeleteBasicBlock", self)
         );
     }
+
+    method first_instruction() {
+        LLVM::Value.create(
+            LLVM::call("GetFirstInstruction", self)
+        );
+    }
+
+    method last_instruction() {
+        LLVM::Value.create(
+            LLVM::call("GetLastInstruction", self)
+        );
+    }
 };
 
 # vim: ft=perl6
