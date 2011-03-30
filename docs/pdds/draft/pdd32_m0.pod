@@ -550,6 +550,12 @@ The metadata segment contains any data about the bytecode that might come in
 handy.  The actual data will live in the variables table; this segment just
 provides a way to map values to names and bytecode offsets.
 
+{{{
+Should entries in the variables table referenced by the metadata segment
+somehow be marked as constant?  It's almost certainly incorrect to change them
+at runtime.
+}}}
+
   opcode_t : number of opcode_t-sized units in this segment
   opcode_t : M0_META_SEG
   [
@@ -672,7 +678,7 @@ type:
     2       EH  - current exception handler
     3       EX  - exception being thrown, if any
     4       PCX - calling (parent) context
-    5       VS  - pointer to variables table
+    5       VAR - pointer to variables table
     6       MDS - pointer to metadata segment
     7       BCS - pointer to bytecode segment
     8-69    I0 - I61
