@@ -544,6 +544,39 @@ our method process:pasttype<call> (PAST::Op $chunk, %c) {
 }
 
 our method process:pasttype<if> (PAST::Op $chunk, %c) {
+    # Build ICmp by comparing value with 0.
+    my $val  := self.process($chunk[0], %c);
+    my $cond := $!builder.icmp(
+        LLVM::INT_PREDICATE.NE,
+        $val,
+        LLVM::Constant::null(
+            $val.typeof,
+        ),
+    );
+
+    $!debug && $!jitted_sub.dump();
+
+    my $next_block := $!builder.get_insert_block.next();
+
+    # Generate then/else/continue blocks.
+    my $then_block := $next_block.insert_before("then");
+    my $else_block := $next_block.insert_before("else");
+    my $end_block  := $next_block.insert_before("endif");
+
+    #$!builder.set_position($if_block);
+    $!builder.cond_br($cond, $then_block, $else_block);
+
+    $!builder.set_position($then_block);
+    self.process($chunk[1], %c);
+    $!builder.br($end_block);
+
+    # else is optional
+    $!builder.set_position($else_block);
+    self.process($chunk[2], %c) if $chunk[2];
+    $!builder.br($end_block);
+
+    # Continue 
+    $!builder.set_position($end_block);
 }
 
 our method process:pasttype<while> (PAST::Op $chunk, %c) {
