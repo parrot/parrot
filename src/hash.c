@@ -707,7 +707,7 @@ Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
     const Hash_key_type     key_type    = (Hash_key_type)VTABLE_shift_integer(interp, info);
     const PARROT_DATA_TYPE  entry_type  = (PARROT_DATA_TYPE)VTABLE_shift_integer(interp, info);
     size_t                  entry_index;
-    Hash *hash = Parrot_hash_create_sized(interp, entry_type, key_type, num_entries);
+    Hash * const hash = Parrot_hash_create_sized(interp, entry_type, key_type, num_entries);
 
     /* special case for great speed */
     if (key_type   == Hash_key_type_STRING
