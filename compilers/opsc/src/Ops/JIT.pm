@@ -665,7 +665,6 @@ our multi method process(String $str, %c) {
 
 
 our method process:macro<goto_offset>(PAST::Op $chunk, %c) {
-    _dumper($chunk);
     my $offset;
     my $child := $chunk[0];
     if $child ~~ PAST::Val {
