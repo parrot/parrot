@@ -147,9 +147,6 @@ instruction, which will interpret its second and third arguments as the index
 into the variables table.  The variables table serves both as a runtime
 scratchpad and as a location for data which is extracted from bytecode to live.
 
-In this documentation, as in C, C<$0> refers to the value in register 0, where
-C<*$0> refers to the value that register 0 points at.
-
 =head2 List of Ops
 
 M0 ops are very low-level and provide the simplest possible way of interacting
@@ -164,8 +161,13 @@ the op set is complete, we will look at how a representative selection of PIR's
 existing core ops and the dynops used by HLLs could be reimplemented in terms
 of M0 ops.
 
-In descriptions, C<$0> refers to the value of the first op, C<$1> to the second
-and C<$2> to the third.
+In descriptions, C<$0> refers to the value of the first argument to an op,
+C<$1> to the second and C<$2> to the third.  Any op can operate on any
+register; types are only by convention.  As far as an M0 VM is conerned, the
+256 ops are nothing more than an array of 256 opcode_t-sized chunks of data.
+
+In this documentation, as in C, C<$0> refers to the value of a certain
+register, where C<*$0> refers to what that register points at.
 
 =head3 Control Flow (4 ops)
 
