@@ -27,6 +27,7 @@ has $!opmap;
 # LLVM stuff
 has $!module;
 has $!builder;
+has $!jitted_sub;
 
 # Predefined functions from $!module
 has %!functions;
@@ -157,16 +158,19 @@ method jit($start, :$optimize = 1) {
     # when functions doesn't have side-effects. This is main reason
     # for having such signature.
     %jit_context := self._create_jitted_function(%jit_context, $start);
-    %jit_context<jitted_sub>.dump;
+    $!debug && $!jitted_sub.dump;
 
     %jit_context := self._create_basic_blocks(%jit_context);
-    %jit_context<jitted_sub>.dump;
+    $!debug && $!jitted_sub.dump;
 
     %jit_context := self._jit_ops(%jit_context);
-    %jit_context<jitted_sub>.dump;
+    $!debug && $!jitted_sub.dump;
 
+    # Verify module berofre optimizatio.
+    $!module.verify();
     %jit_context := self._optimize(%jit_context) if $optimize;
-    %jit_context<jitted_sub>.dump;
+
+    $!debug && $!jitted_sub.dump;
 
     %jit_context;
 }
@@ -190,36 +194,36 @@ method _create_jit_context($start) {
 method _create_jitted_function (%jit_context, $start) {
 
     # Generate JITted function for Sub.
-    my $jitted_sub := $!module.add_function(
+    $!jitted_sub := $!module.add_function(
         "jitted$start",
         $!opcode_ptr_type,
         $!opcode_ptr_type,
         LLVM::Type::pointer($!interp_struct_type),
     );
-    %jit_context<jitted_sub> := $jitted_sub;
+    %jit_context<jitted_sub> := $!jitted_sub;
 
     #$module.dump();
 
     # Handle arguments
-    my $entry := $jitted_sub.append_basic_block("entry");
+    my $entry := $!jitted_sub.append_basic_block("entry");
     %jit_context<entry> := $entry;
 
     # Create explicit return
-    my $leave := $jitted_sub.append_basic_block("leave");
+    my $leave := $!jitted_sub.append_basic_block("leave");
     %jit_context<leave> := $leave;
 
     # Handle args.
     $!builder.set_position($entry);
 
     $!debug && say("# cur_opcode");
-    my $cur_opcode := $jitted_sub.param(0);
+    my $cur_opcode := $!jitted_sub.param(0);
     $cur_opcode.name("cur_opcode");
     my $cur_opcode_addr := $!builder.alloca($cur_opcode.typeof()).name("cur_opcode_addr");
     %jit_context<variables><cur_opcode> := $cur_opcode_addr;
     $!builder.store($cur_opcode, $cur_opcode_addr);
 
     $!debug && say("# interp");
-    my $interp := $jitted_sub.param(1);
+    my $interp := $!jitted_sub.param(1);
     $interp.name("interp");
     my $interp_addr := $!builder.alloca($interp.typeof()).name("interp_addr");
     $!builder.store($interp, $interp_addr);
