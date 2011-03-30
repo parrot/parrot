@@ -802,6 +802,33 @@ live in an external shared library) with the same signature as above.
 
     say ret  # will print "120"
 
+=head3 Constants
+
+These are the constants which an M0-compliant FFI implementation should deal
+with.  They are based on the types used by libffi.
+
+    FFI_VOID
+    FFI_UINT
+    FFI_SINT
+    FFI_UINT16
+    FFI_SINT16
+    FFI_UINT32
+    FFI_SINT32
+    FFI_UINT64
+    FFI_SINT64
+    FFI_FLOAT
+    FFI_DOUBLE
+    FFI_UCHAR
+    FFI_SCHAR
+    FFI_USHORT
+    FFI_SSHORT
+    FFI_UINT
+    FFI_SINT
+    FFI_ULONG
+    FFI_SLONG
+    FFI_LONGDOUBLE
+    FFI_POINTER
+
 =head2 Concurrency
 
 This section will describe primitives that will be needed to allow data sharing and
