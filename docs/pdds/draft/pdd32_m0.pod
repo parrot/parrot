@@ -413,7 +413,8 @@ octothorpe (#) is a comment and will be ignored.
 =head3 Chunk Format
 
 A chunk consists of a chunk identifier, a variables chunk, a metadata chunk and
-a bytecode chunk.
+a bytecode chunk.  A chunk represents self-contained computational units,
+approximately analogous to a function.
 
 =head3 Chunk Identifier
 
@@ -668,8 +669,10 @@ primitive type:
     1       PC  - current instruction within the current bytecode segment
     2       EH  - current exception handler
     3       EX  - exception being thrown, if any
-    4       CCX - calling context
-    5-7     reserved
+    4       PCX - calling (parent) context
+    5       VS  - pointer to variables segment
+    6       MDS - pointer to metadata segment
+    7       BCS - pointer to bytecode segment
     8-70    I0 - I61
     71-132  N0 - N61
     133-194 S0 - S61
