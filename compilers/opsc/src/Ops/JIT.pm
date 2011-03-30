@@ -288,7 +288,7 @@ method _create_basic_blocks(%jit_context) {
         # Next op
         $i := $i + _opsize(%jit_context, $op);
 
-        $keep_going   := self._keep_going($opname);
+        $keep_going   := 1; #self._keep_going($opname);
 
         #say("# keep_going $keep_going { $parsed_op<flags>.keys.join(',') }");
     }
@@ -330,7 +330,7 @@ method _jit_ops(%jit_context) {
         $i := $i + _opsize(%jit_context, $op);
         %jit_context<cur_opcode> := $i;
 
-        $keep_going   := self._keep_going($opname);
+        $keep_going   := 1; #self._keep_going($opname);
     }
 
     %jit_context;
