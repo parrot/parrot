@@ -1,5 +1,5 @@
 /* misc.h
- *  Copyright (C) 2001-2008, Parrot Foundation.
+ *  Copyright (C) 2001-2011, Parrot Foundation.
  *  Overview:
  *     Miscellaneous functions, mainly the Parrot_sprintf family
  *  Data Structure and Algorithms:
@@ -22,7 +22,12 @@
 
 #define FLOAT_IS_ZERO(f) ((f) == 0.0)
 
+/*
+ * "System snprintf" can be not good enough. For example mingw-wrapped VS
+ * _snprintf. Undef "snprintf" before possible shadowing of system one.
+ */
 #ifndef PARROT_HAS_C99_SNPRINTF
+#  undef snprintf
 #  define snprintf Parrot_secret_snprintf
 #endif
 
