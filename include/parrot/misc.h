@@ -23,6 +23,7 @@
 #define FLOAT_IS_ZERO(f) ((f) == 0.0)
 
 #ifndef PARROT_HAS_C99_SNPRINTF
+#  undef snprintf
 #  define snprintf Parrot_secret_snprintf
 #endif
 
