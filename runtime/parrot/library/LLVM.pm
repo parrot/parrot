@@ -46,13 +46,13 @@ module LLVM {
         #### Bind enums
 
         # For enums we generate new class and bunch of methods.
-        sub generate_enum_class($name, $from, @values, &inc?) {
+        sub generate_enum_class($name, $from, @values, &inc? = -> $_ { $_ := $_ + 1 }) {
             my $enum  := P6metaclass.new_class($name);
             my $how   := $enum.HOW;
             for @values {
                 my $c := +$from; # Force clone of $count.
                 $how.add_method( $_, method () { $c }, to => $enum);
-                $from := &inc ?? &inc($from) !! $from++;
+                $from := &inc($from);
             }
         };
 
