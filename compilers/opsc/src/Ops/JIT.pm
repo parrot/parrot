@@ -596,18 +596,9 @@ our method process:pasttype<undef> (PAST::Op $chunk, %c) {
     my $pirop := $chunk.pirop;
 
     if $pirop {
-        if $pirop eq '=' {
-            # Switch processing to "lhs assignment".
-            # This will disable "loading" of variables.
-            %c<lhs>++;
-            my $lhs := self.process($chunk[0], %c);
-            %c<lhs>--;
-
-            $!builder.store(
-                self.process($chunk[1], %c),
-                $lhs
-            );
-        }
+        # Redispatch to process:pirop<foo>
+        my $sub  := pir::find_sub_not_null__ps('process:pirop<' ~ $pirop ~ '>');
+        $sub(self, $chunk, %c);
     }
     elsif $chunk.returns {
         self.process_children($chunk, %c)[0];
@@ -615,6 +606,38 @@ our method process:pasttype<undef> (PAST::Op $chunk, %c) {
     else {
     }
 }
+
+# Methods for pirop processing
+our method process:pirop<=> (PAST::Op $chunk, %c) {
+    # Switch processing to "lhs assignment".
+    # This will disable "loading" of variables.
+    %c<lhs>++;
+    my $lhs := self.process($chunk[0], %c);
+    %c<lhs>--;
+
+    $!builder.store(
+        self.process($chunk[1], %c),
+        $lhs
+    );
+}
+
+our method process:pirop<++> (PAST::Op $chunk, %c) {
+    %c<lhs>++;
+    my $var   := self.process($chunk[0], %c);
+    my $value := $!builder.load($var);
+    %c<lhs>--;
+
+    $!builder.store(
+        $!builder.add($value, LLVM::Constant::integer(1)),
+        $var
+    );
+
+    # postfix++ uses previous value. reload var for prefix
+    $chunk.name ~~ /postfix/
+        ?? $value
+        !! $!builder.load($var);
+}
+
 
 our multi method process(PAST::Stmts $chunk, %c) {
     self.process($_, %c) for @($chunk);
