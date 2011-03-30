@@ -665,8 +665,23 @@ our multi method process(String $str, %c) {
 
 
 our method process:macro<goto_offset>(PAST::Op $chunk, %c) {
-    my $offset  := ~$chunk[0].value; # FIXME
-    $!debug && say("# macro<goto_offset> '$offset'");
+    _dumper($chunk);
+    my $offset;
+    my $child := $chunk[0];
+    if $child ~~ PAST::Val {
+        $offset := ~$child.value;
+    }
+    elsif $child ~~ PAST::Var {
+        if $child.scope eq 'register' {
+            my $num  := $child.name;
+            my $type := %c<op>.arg_type($num - 1);
+            if $type == 'ic' {
+                $offset := self._opcode_at($num, %c);
+            }
+        }
+    }
+
+    $!debug && say("# macro<goto_offset> '$offset' { %c<cur_opcode> }");
     my $target  := %c<cur_opcode> + $offset;
     my $jump_to := %c<basic_blocks>{$target}<bb>;
 
