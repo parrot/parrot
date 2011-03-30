@@ -621,6 +621,14 @@ our method process:pirop<=> (PAST::Op $chunk, %c) {
     );
 }
 
+our method process:pirop<==> (PAST::Op $chunk, %c) {
+    $!builder.icmp(
+        LLVM::INT_PREDICATE.EQ,
+        self.process($chunk[0], %c),
+        self.process($chunk[1], %c)
+    );
+}
+
 our method process:pirop<++> (PAST::Op $chunk, %c) {
     self._process_prefix_postfix($chunk, %c, 1);
 }
