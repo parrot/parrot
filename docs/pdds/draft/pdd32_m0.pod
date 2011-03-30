@@ -113,7 +113,7 @@ will ensure immunity from stack-smashing attacks and related programming
 errors.  It will also eliminate the nested (inferior) runloop problem and opens
 up interesting possibilities for an Erlang-like concurrency implementation.
 
-=head2 Scope
+=head2 Scope of This Document
 
 This document only covers M0 and the minimum VM necessary to support it.
 Anything beyond that, e.g. the meta-object model or layout of contexts, is
@@ -124,23 +124,8 @@ beyond its scope.
 This is the central datastructure at the M0 level.  It will contain most of
 the state that is needed to execute M0 bytecode.  A pointer to the current
 context will be passed to each op as the implicit first argument, though this
-pointer (or equivalent) will not be stored in bytecode.
-
-A Context will contain:
-
-=over 4
-
-=item * INSP registers (fixed number of each)
-
-=item * PC    - currently executing instruction (bytecode segment and offset)
-
-=item * EH    - exception handler address (bytecode segment and offset)
-
-=item * EX    - exception payload
-
-=item * caller - calling context
-
-=back
+pointer (or equivalent) will not be stored in bytecode.  It layout is described
+in detail in the C<Register Types and Context Structure> section.
 
 =head2 Registers
 
@@ -661,18 +646,18 @@ Will some memory be protected in M0?
 Structs (as implemented in C) will be an abstraction on top of M0.  M0 will not
 be concerned with them directly.
 
-=head2 Types
+=head2 Register Types and Context Structure
 
 There are four register types, Integer, Numeric, PMC and String. The string
 type will merely be syntactic sugar for accessing a PMC.  From an M0
 perpsective, S and P registers will be treated as opaque pointers
 
 M0 registers will not have innate types; they'll be nothing more than a
-collection of bits which are interpreted by M0's ops as having a certain type.
-The types that ops attribute to register values will be based on the position
-of the register in an M0 context's register set.  The proposed structure uses
-the first 8 registers for context-specific information and has 62 of each
-primitive type:
+collection of bits which are assumed to have a certain type by M0's ops.  The
+types that ops attribute to register values will be based on the position of
+the register in an M0 context's register set.  The proposed structure uses the
+first 8 registers for context-specific information and has 62 of each primitive
+type:
 
     number  type
     0       CX  - current context 
