@@ -130,7 +130,7 @@ A Context will contain:
 
 =over 4
 
-=item * INSP registers (fixed number of each) TODO: How many? Spillage?
+=item * INSP registers (fixed number of each)
 
 =item * PC    - currently executing instruction (bytecode segment and offset)
 
@@ -664,7 +664,8 @@ be concerned with them directly.
 =head2 Types
 
 There are four register types, Integer, Numeric, PMC and String. The string
-type will merely be syntactic sugar for accessing a PMC.
+type will merely be syntactic sugar for accessing a PMC.  From an M0
+perpsective, S and P registers will be treated as opaque pointers
 
 M0 registers will not have innate types; they'll be nothing more than a
 collection of bits which are interpreted by M0's ops as having a certain type.
