@@ -225,16 +225,16 @@ class LLVM::Builder is LLVM::Opaque {
 
 #            # Comparisons
 #            LLVMBuildICmp => "ppippt",
-    multi method icmp($op, LLVM::Value $left, LLVM::Value $right, :$name?) {
+    multi method icmp($op, LLVM::Value $left, LLVM::Value $right, :$name? = "") {
         LLVM::Value.create(
-            LLVM::call("BuildICmp", $op, $left, $right, $name)
+            LLVM::call("BuildICmp", self, $op, $left, $right, $name)
         )
     }
 
 #            LLVMBuildFCmp => "ppippt",
-    multi method fcmp($op, LLVM::Value $left, LLVM::Value $right, :$name?) {
+    multi method fcmp($op, LLVM::Value $left, LLVM::Value $right, :$name? = "") {
         LLVM::Value.create(
-            LLVM::call("BuildFCmp", $op, $left, $right, $name)
+            LLVM::call("BuildFCmp", self, $op, $left, $right, $name)
         )
     }
 
