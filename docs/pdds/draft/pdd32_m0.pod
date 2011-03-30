@@ -74,12 +74,6 @@ This refers to a Lorito Context PMC, which is the most important datastructure
 at the M0 level. You could say that it is the "secret sauce" of M0. The exact
 details of the Lorito Context PMC are still in flux.
 
-=item * thunk
-
-When discussing M0, C<thunk> refers to small generated functions that convert
-between different calling conventions.  These are also referred to as wrappers
-or "glue code".
-
 =back
 
 =head2 Design Goals
