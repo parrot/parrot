@@ -337,7 +337,7 @@ INIT {
         my $subname := pir::downcase($name);
         $HOW.add_method(
             $subname,
-            method (LLVM::Value $left, LLVM::Value $right, :$name?) {
+            multi method (LLVM::Value $left, LLVM::Value $right, :$name?) {
                 LLVM::Value.create(
                     LLVM::call($call, self, $left, $right, $name)
                 )
@@ -369,7 +369,7 @@ INIT {
     ).kv -> $call, $subname {
         $HOW.add_method(
             $subname,
-            method (LLVM::Value $value, LLVM::Type $type, :$name?) {
+            multi method (LLVM::Value $value, LLVM::Type $type, :$name?) {
                 LLVM::Value.create(
                     LLVM::call("LLVMBuild" ~ $call, self, $value, $type, $name)
                 )
