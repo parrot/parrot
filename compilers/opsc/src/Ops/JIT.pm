@@ -632,11 +632,29 @@ our method process:pirop<++> (PAST::Op $chunk, %c) {
         $var
     );
 
-    # postfix++ uses previous value. reload var for prefix
+    # postfix uses previous value. reload var for prefix
     $chunk.name ~~ /postfix/
         ?? $value
         !! $!builder.load($var);
 }
+
+our method process:pirop<--> (PAST::Op $chunk, %c) {
+    %c<lhs>++;
+    my $var   := self.process($chunk[0], %c);
+    my $value := $!builder.load($var);
+    %c<lhs>--;
+
+    $!builder.store(
+        $!builder.sub($value, LLVM::Constant::integer(1)),
+        $var
+    );
+
+    # postfix uses previous value. reload var for prefix
+    $chunk.name ~~ /postfix/
+        ?? $value
+        !! $!builder.load($var);
+}
+
 
 
 our multi method process(PAST::Stmts $chunk, %c) {
