@@ -113,6 +113,10 @@ will ensure immunity from stack-smashing attacks and related programming
 errors.  It will also eliminate the nested (inferior) runloop problem and opens
 up interesting possibilities for an Erlang-like concurrency implementation.
 
+CPS will also allow Parrot to use many pre-existing JIT algorithms, such
+as those described in the paper "Trace Based Compilation in Interpreter-less
+Execution Environments" [TBC].
+
 =head2 Scope of This Document
 
 This document only covers M0 and the minimum VM necessary to support it.
@@ -850,7 +854,7 @@ Shouldn't this be a different spec document? Perhaps PDD33 for M1 ?
 
 =head2 References
 
-<this space intentionally left blank, for now>
+[TBC] - http://www.ics.uci.edu/~franz/Site/pubs-pdf/ICS-TR-10-01.pdf
 
 =cut
 
