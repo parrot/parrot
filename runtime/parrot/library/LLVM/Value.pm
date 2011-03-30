@@ -17,6 +17,94 @@ class LLVM::Value is LLVM::Opaque {
     method dump() {
         LLVM::call("DumpValue", self);
     }
+
+INIT {
+    my @types := <
+        Argument
+        BasicBlock
+        InlineAsm
+        User
+        Constant
+        ConstantAggregateZero
+        ConstantArray
+        ConstantExpr
+        ConstantFP
+        ConstantInt
+        ConstantPointerNull
+        ConstantStruct
+        ConstantVector
+        GlobalValue
+        Function
+        GlobalAlias
+        GlobalVariable
+        UndefValue
+        Instruction
+        BinaryOperator
+        CallInst
+        IntrinsicInst
+        DbgInfoIntrinsic
+        DbgDeclareInst
+        EHSelectorInst
+        MemIntrinsic
+        MemCpyInst
+        MemMoveInst
+        MemSetInst
+        CmpInst
+        FCmpInst
+        ICmpInst
+        ExtractElementInst
+        GetElementPtrInst
+        InsertElementInst
+        InsertValueInst
+        PHINode
+        SelectInst
+        ShuffleVectorInst
+        StoreInst
+        TerminatorInst
+        BranchInst
+        InvokeInst
+        ReturnInst
+        SwitchInst
+        UnreachableInst
+        UnwindInst
+        UnaryInstruction
+        AllocaInst
+        CastInst
+        BitCastInst
+        FPExtInst
+        FPToSIInst
+        FPToUIInst
+        FPTruncInst
+        IntToPtrInst
+        PtrToIntInst
+        SExtInst
+        SIToFPInst
+        TruncInst
+        UIToFPInst
+        ZExtInst
+        ExtractValueInst
+        LoadInst
+        VAArgInst
+    >;
+
+    my $HOW  := LLVM::Value.HOW;
+    my $WHAT := LLVM::Value.WHAT;
+
+    for @types {
+        $HOW.add_method(
+            "isA$_",
+            multi method () {
+                LLVM::Value.create(
+                    LLVM::call("IsA$_", self)
+                )
+            },
+            to => $WHAT
+        );
+    }
 }
+
+}
+
+
 
 # vim: ft=perl6
