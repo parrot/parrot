@@ -247,7 +247,7 @@ NB: this method will destroy all old data!
           case Hash_key_type_STRING_enc:
             new_hash = Parrot_hash_create(INTERP,
                     entry_type,
-                    type);
+                    (Hash_key_type)type);
             break;
 
           default:
