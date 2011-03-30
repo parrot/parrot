@@ -631,6 +631,9 @@ accomplish the following:
 
 =back
 
+Execution of an M0 bytecode file starts with the first op of the first bytecode
+segment in a file and ends when the interpreter exits.
+
 =head2 Objects
 
 In Lorito, we'll still have INSP registers like PIR, but the S registers will
