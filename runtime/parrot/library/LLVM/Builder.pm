@@ -371,7 +371,7 @@ INIT {
             $subname,
             multi method (LLVM::Value $value, LLVM::Type $type, :$name?) {
                 LLVM::Value.create(
-                    LLVM::call("LLVMBuild" ~ $call, self, $value, $type, $name)
+                    LLVM::call("Build" ~ $call, self, $value, $type, $name)
                 )
             },
             to => $WHAT
