@@ -284,13 +284,13 @@ Set C<*$0> to whatever is in C<*$1>.  C<$2> is ignored.
 
 =item * set_mem - set a region of memory
 
-Write C<*$2> byte-sized values from C<*$1> to the memory location starting at
-C<*$0>.  Segfaults may result.  Be careful.
+Write C<*$2> bytes from C<*$1> to the memory location starting at C<*$0>.
+Segfaults may result.  Be careful.
 
 =item * get_mem - get a region from memory
 
-Write C<*$2> byte-sized values from the memory location starting at C<*$1> to
-C<*$0>.  Segfaults may result.  Be careful.
+Write C<*$2> bytes from the memory location starting at C<*$1> to C<*$0>.
+Segfaults may result.  Be careful.
 
 =item * get_var - point a register at a variables table slot
 
@@ -675,10 +675,10 @@ type:
     5       VS  - pointer to variables table
     6       MDS - pointer to metadata segment
     7       BCS - pointer to bytecode segment
-    8-70    I0 - I61
-    71-132  N0 - N61
-    133-194 S0 - S61
-    195-256 P0 - P61
+    8-69    I0 - I61
+    70-131  N0 - N61
+    132-193 S0 - S61
+    194-255 P0 - P61
 
 This means that an op which is passed the wrong value could pretty easily cause
 chaos by clobbering the PC or changing the pointer to the current context.
