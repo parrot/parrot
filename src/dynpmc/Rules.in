@@ -259,7 +259,7 @@ src/dynpmc/select.dump: src/dynpmc/select.pmc vtable.dump $(CLASS_O_FILES)
 $(DYNEXT_DIR)/llvm_engine$(LOAD_EXT): src/dynpmc/llvm_engine$(O)
 	$(LD)  @ld_out@$(DYNEXT_DIR)/llvm_engine$(LOAD_EXT) \
 #IF(cygwin and optimize):		-s \
-		src/dynpmc/llvm_engine$(O) $(LINKARGS) $(LLVM_LDFLAGS)
+		src/dynpmc/llvm_engine$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
 
