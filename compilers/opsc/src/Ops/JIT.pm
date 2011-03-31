@@ -442,52 +442,39 @@ our method access_arg:type<i> ($num, %c) {
     $res;
 }
 
-our method access_arg:type<n> ($num, %ctx) {
+our method access_arg:type<n> ($num, %c) {
+    my $res := self.get_num_reg($num, %c);
+    $res := $!builder.load($res) unless %c<lhs>;
+    $res;
 }
 
-our method access_arg:type<p> ($num, %ctx) {
+our method access_arg:type<p> ($num, %c) {
+    my $res := self.get_pmc_reg($num, %c);
+    $res := $!builder.load($res) unless %c<lhs>;
+    $res;
 }
 
-our method access_arg:type<s> ($num, %ctx) {
+our method access_arg:type<s> ($num, %c) {
+    my $res := self.get_str_reg($num, %c);
+    $res := $!builder.load($res) unless %c<lhs>;
+    $res;
 }
 
-our method access_arg:type<k> ($num, %ctx) {
+our method access_arg:type<k> ($num, %c) {
+    my $res := self.get_pmc_reg($num, %c);
+    $res := $!builder.load($res) unless %c<lhs>;
+    $res;
 }
 
-our method access_arg:type<ki> ($num, %ctx) {
+our method access_arg:type<ki> ($num, %c) {
+    my $res := self.get_int_reg($num, %c);
+    $res := $!builder.load($res) unless %c<lhs>;
+    $res;
 }
 
 our method access_arg:type<ic> ($num, %c) {
     $!debug && say("# $num <ic> { self._opcode_at($num, %c) }");
     LLVM::Constant::integer(self._opcode_at($num, %c));
-}
-
-our method access_arg:type<sc> ($num, %c) {
-    die("Wrong LHS mode") if %c<lhs>;
-
-    my $c := %c<constants>;
-    my $i := self._opcode_at($num, %c);
-    my $res := Q:PIR{
-        .local string s
-        .local int    I
-        .local pmc    c
-        .local pmc    i
-        find_lex c, '$c'
-        find_lex i, '$i'
-        I = i
-        s = c[I]
-        %r = box s
-    };
-    $!debug && say("# $num<sc> '$res'");
-
-    $!debug && _dumper(%c<str_constants>);
-
-    $!builder.load(
-        $!builder.inbounds_gep(
-            %c<str_constants>,
-            LLVM::Constant::integer(self._opcode_at($num, %c))
-        )
-    );
 }
 
 our method access_arg:type<nc> ($num, %c) {
@@ -512,14 +499,34 @@ our method access_arg:type<nc> ($num, %c) {
     LLVM::Constant::real($res);
 }
 
-#        :nc("NCONST(NUM)"),
-#        :pc("PCONST(NUM)"),
-#        :sc("SCONST(NUM)"),
-#        :kc("PCONST(NUM)"),
-#        :kic("ICONST(NUM)")
+our method access_arg:type<pc> ($num, %c) {
+    die("Wrong LHS mode") if %c<lhs>;
 
-our method access_arg:type<kic> ($num, %ctx) {
-    self._opcode_at($num, %ctx);
+    $!debug && _dumper(%c<pmc_constants>);
+
+    $!builder.load(
+        $!builder.inbounds_gep(
+            %c<pmc_constants>,
+            LLVM::Constant::integer(self._opcode_at($num, %c))
+        )
+    );
+}
+
+our method access_arg:type<sc> ($num, %c) {
+    die("Wrong LHS mode") if %c<lhs>;
+
+    $!debug && _dumper(%c<str_constants>);
+
+    $!builder.load(
+        $!builder.inbounds_gep(
+            %c<str_constants>,
+            LLVM::Constant::integer(self._opcode_at($num, %c))
+        )
+    );
+}
+
+our method access_arg:type<kic> ($num, %c) {
+    LLVM::Constant::integer(self._opcode_at($num, %c));
 }
 
 
