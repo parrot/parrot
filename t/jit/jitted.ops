@@ -30,7 +30,7 @@ op say(in STR) :base_io {
     STRING * const s = $1;
     /* if (s && s->bufused) */
     if (s)
-        Parrot_io_printf(interp, "%Ss", $1);
+        Parrot_io_printf(interp, "%Ss", s);
     Parrot_io_printf(interp, "\n");
 }
 
