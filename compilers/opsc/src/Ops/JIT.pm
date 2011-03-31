@@ -416,6 +416,10 @@ our multi method process(PAST::Var $var, %c) {
 
         my $res := $!builder.alloca($type, :name($var.name));
         %c<variables>{ $var.name } := $res;
+
+        if $var.viviself {
+            $!builder.store(self.process($var.viviself, %c), $res);
+        }
     }
     else {
         if $var.scope eq 'register' {
