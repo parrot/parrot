@@ -399,6 +399,23 @@ our multi method process(PAST::Val $val, %c) {
 our multi method process(PAST::Var $var, %c) {
     my $res;
     if $var.isdecl {
+        # There is some challanges here.
+        # .vivibase can be:
+        # 1. Native type. E.g. "int".
+        # 2. Typedefed native type. E.g. "opcode_t".
+        # 3. Struct (pointer)
+        my $vivibase := subst($var.vivibase, / \s* $/, '');
+        $!debug && say("# Variable '$vivibase'");
+
+        # Assume that all types have constructor in LLVM::Type.
+        my $ctor := pir::get_hll_global__pps(<LLVM Type>, $vivibase);
+        my $type := $ctor();
+        if $var<pointer> {
+            $type := LLVM::Type::pointer($type);
+        }
+
+        my $res := $!builder.alloca($type, :name($var.name));
+        %c<variables>{ $var.name } := $res;
     }
     else {
         if $var.scope eq 'register' {

@@ -53,10 +53,10 @@ say("================= INVOKE ===================");
 $pc := $call($pc, $interp);
 say("=================  DONE  ===================");
 
+#%jit_context<_module>.dump();
 
 sub func($name, $sig) {
     pir::dlfunc__ppss(undef, $name, $sig);
 }
 
-#%jit_context<_module>.dump();
 # vim: ft=perl6
