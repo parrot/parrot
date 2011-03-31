@@ -594,6 +594,7 @@ Returns an offset value if it is found, or -1 if no match.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL
 Parrot_util_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
         ARGIN(const STRING *search), UINTVAL start_offset)
@@ -643,6 +644,7 @@ Returns offset value or -1 (if no match).
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL
 Parrot_util_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
         ARGIN(const STRING *search), UINTVAL start_offset)
@@ -825,8 +827,8 @@ Parrot_util_register_move(PARROT_INTERP,
         ARGIN(void *info))
 {
     ASSERT_ARGS(Parrot_util_register_move)
-    int i;
-    int max_reg       = 0;
+    size_t i;
+    size_t max_reg    = 0;
     int* nb_succ      = NULL;
     int* backup       = NULL;
     int* reg_to_index = NULL;

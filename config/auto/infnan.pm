@@ -43,6 +43,13 @@ sub runstep {
     }
     $conf->cc_clean();
 
+    $self->_handle_infnan($conf, $infnan);
+
+    return 1;
+}
+
+sub _handle_infnan {
+    my ($self, $conf, $infnan) = @_;
     if ($infnan) {
         $conf->data->set( HAS_INF_NAN => 1 );
         $self->set_result('yes');
@@ -51,8 +58,6 @@ sub runstep {
         $conf->data->set( HAS_INF_NAN => 0 );
         $self->set_result('no');
     }
-
-    return 1;
 }
 
 1;

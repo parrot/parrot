@@ -316,6 +316,9 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
 
     PMC *result;
     switch (what) {
+      case CURRENT_CTX:
+        result = CURRENT_CONTEXT(interp);
+        break;
       case CURRENT_SUB:
         result = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
         break;

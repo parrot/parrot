@@ -49,6 +49,7 @@ my ($stdout, $debug, $debug_validity);
 foreach my $p (
     qw|
         cc
+        cxx
         link
         ld
         ccflags

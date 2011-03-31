@@ -1,5 +1,5 @@
 /* misc.h
- *  Copyright (C) 2001-2008, Parrot Foundation.
+ *  Copyright (C) 2001-2011, Parrot Foundation.
  *  Overview:
  *     Miscellaneous functions, mainly the Parrot_sprintf family
  *  Data Structure and Algorithms:
@@ -22,7 +22,12 @@
 
 #define FLOAT_IS_ZERO(f) ((f) == 0.0)
 
+/*
+ * "System snprintf" can be not good enough. For example mingw-wrapped VS
+ * _snprintf. Undef "snprintf" before possible shadowing of system one.
+ */
 #ifndef PARROT_HAS_C99_SNPRINTF
+#  undef snprintf
 #  define snprintf Parrot_secret_snprintf
 #endif
 
@@ -33,6 +38,7 @@ typedef int (*reg_move_func)(PARROT_INTERP, unsigned char d, unsigned char s, vo
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL Parrot_util_byte_index(SHIM_INTERP,
     ARGIN(const STRING *base),
     ARGIN(const STRING *search),
@@ -42,6 +48,7 @@ INTVAL Parrot_util_byte_index(SHIM_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL Parrot_util_byte_rindex(SHIM_INTERP,
     ARGIN(const STRING *base),
     ARGIN(const STRING *search),

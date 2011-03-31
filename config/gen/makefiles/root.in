@@ -171,7 +171,6 @@ GEN_CONFIGS = \
 #IF(has_glut):    src/glut_callbacks.c \
     src/core_pmcs.c \
     config_lib.pir \
-    parrot.pc \
     compilers/imcc/imcc.y.flag \
     compilers/imcc/imcc.l.flag
 
@@ -2521,12 +2520,56 @@ SPLINT = splint
 # kept in there after completion.
 SPLINT_TMP = $(TEMPDIR)/splint
 
+# Transfer errors (-mem-trans) are too tough for us right now
+OLD_SPLINTFLAGS_MEMORY_SAFETY = \
+    -mem-trans \
+    -memchecks \
+    +bufferoverflow \
+    +bufferoverflowhigh \
+    +read-only-strings \
+    +read-only-trans \
+    -strict-destroy \
+    -strict-use-released \
+    +use-released \
+    -must-free \
+    -mustfreefresh \
+    -mustfreeonly \
+    +null \
+    +nullptrarith \
+    +nullret \
+    -ptr-arith \
+    +ptr-negate \
+
+# Watch for unsafe comparisons
+OLD_SPLINTFLAGS_UNSAFE_COMPARISONS = \
+    +bool-compare \
+    +ptr-compare \
+    +real-compare \
+    +unsigned-compare
+
+# const and other qualifiers
+# Report qualifier mismatches only if dangerous (+relax-quals)
+OLD_SPLINTFLAGS_QUALIFIERS = \
+    +relax-quals
+
+# Symbol definitions
+OLD_SPLINTFLAGS_SYMBOL_DEFINITIONS = \
+    +decl-undef \
+    +incon-defs \
+    +incon-defs-lib \
+
+# Problems with evaluation and control structions
+OLD_SPLINTFLAGS_EVALUATION = \
+    +controlnestdepth 15 \
+    +duplicate-quals \
+
+
 # Splint flags: http://splint.org/manual/html/appB.html
 # The dashes in the names don't make any difference to Splint, but I've
 # made them match how they are in the manual.  Otherwise, you might be
 # looking for "declundef", except that it's "decl-undef" in the docs.
 SPLINTFLAGS_BASE = \
-    +standard \
+    +weak \
     +hints \
     \
     +indentspaces 4 \
@@ -2556,30 +2599,48 @@ SPLINTFLAGS_BASE = \
     -iso-reserved-internal \
     -include-nest 10 \
 
-# Memory safety checks
-# Transfer errors (-mem-trans) are too tough for us right now
-SPLINTFLAGS_MEMORY_SAFETY = \
-    -mem-trans \
-    -memchecks \
-    +bufferoverflow \
-    +bufferoverflowhigh \
-    +read-only-strings \
-    +read-only-trans \
-    -strict-destroy \
-    -strict-use-released \
-    +use-released \
-    -must-free \
-    -mustfreefresh \
-    -mustfreeonly \
+SPLINTFLAGS_NULL_DEREFERENCES = \
     +null \
-    +nullptrarith \
     +nullret \
-    -ptr-arith \
-    +ptr-negate \
+
+SPLINTFLAGS_USE_BEFORE_DEFINITION = \
+    +usedef \
+    +incondefs \
+    +functionderef \
+
+SPLINTFLAGS_TYPE = \
+    +string-literal-too-long \
+    +string-literal-no-room \
+    +string-literal-no-room-final-null \
+    +string-literal-smaller \
+    +enum-members \
+    \
+    -pred-bool \
+    -pred-bool-ptr \
+    -pred-bool-int \
+    +pred-bool-others \
+    +pred-assign \
+    +ptrnegate \
     -zero-ptr \
+    \
+    +charunsignedchar \
+    +char-index \
+    +char-int \
+    \
+    +format-code \
+    +format-type \
+    \
+    +ignore-signs \
+    +long-unsigned-unsigned-integral \
+
+SPLINTFLAGS_MEMORY_MANAGEMENT = \
+
+SPLINTFLAGS_SHARING = \
+
+SPLINTFLAGS_FUNCTION_INTERFACE = \
 
 # Macro safety checks
-SPLINTFLAGS_MACRO_SAFETY = \
+SPLINTFLAGS_MACRO = \
     +macro-assign \
     +macro-empty \
     +macro-parens \
@@ -2587,52 +2648,17 @@ SPLINTFLAGS_MACRO_SAFETY = \
     +macro-stmt \
     +macro-unrecog \
 
-# Watch for unsafe comparisons
-SPLINTFLAGS_UNSAFE_COMPARISONS = \
-    +bool-compare \
-    +ptr-compare \
-    +real-compare \
-    +unsigned-compare
+SPLINTFLAGS_NAMING = \
 
-# But allow us some slop in boolean comparisons
-SPLINTFLAGS_BOOLEAN_SLOP = \
-    -pred-bool-int \
-    -pred-bool-ptr \
-    -pred-bool-others \
-    -boolops \
-    +bool-int \
-
-# const and other qualifiers
-# Report qualifier mismatches only if dangerous (+relax-quals)
-SPLINTFLAGS_QUALIFIERS = \
-    +relax-quals
-
-# Symbol definitions
-SPLINTFLAGS_SYMBOL_DEFINITIONS = \
-    +decl-undef \
-    +incon-defs \
-    +incon-defs-lib \
-
-# Format codes
-SPLINTFLAGS_FORMAT = \
-    +format-code \
-    +format-type \
-
-# Problems with evaluation and control structions
-SPLINTFLAGS_EVALUATION = \
-    +controlnestdepth 15 \
-    +duplicate-quals \
+SPLINTFLAGS_CONTROL_FLOW = \
     +eval-order \
     +eval-order-uncon \
 
-# Types and stuff
-SPLINTFLAGS_TYPES = \
-    +char-index \
-    +char-int \
-    +enum-members \
-    +ignore-signs \
-    +long-integral \
-    +match-any-integral \
+SPLINTFLAGS_MEMORY_BOUNDS = \
+
+SPLINTFLAGS_COMPLETENESS = \
+
+SPLINTFLAGS_MISCELLANEOUS = \
 
 # Other options we'd like to add back
 # +initallelements : Right now, the *.ops files don't initialize all
@@ -2649,25 +2675,35 @@ SPLINTFLAGS_TEST =
 
 SPLINTFLAGS = \
 	$(SPLINTFLAGS_BASE) \
-	$(SPLINTFLAGS_MEMORY_SAFETY) \
-	$(SPLINTFLAGS_MACRO_SAFETY) \
-	$(SPLINTFLAGS_UNSAFE_COMPARISONS) \
-	$(SPLINTFLAGS_BOOLEAN_SLOP) \
-	$(SPLINTFLAGS_QUALIFIERS) \
-	$(SPLINTFLAGS_SYMBOL_DEFINITIONS) \
-	$(SPLINTFLAGS_FORMAT) \
-	$(SPLINTFLAGS_EVALUATION) \
-	$(SPLINTFLAGS_TYPES) \
+	$(SPLINTFLAGS_NULL_DEREFERENCES) \
+	$(SPLINTFLAGS_USE_BEFORE_DEFINITION) \
+	$(SPLINTFLAGS_TYPE) \
+	$(SPLINTFLAGS_MEMORY_MANAGEMENT) \
+	$(SPLINTFLAGS_SHARING) \
+	$(SPLINTFLAGS_FUNCTION_INTERFACE) \
+	$(SPLINTFLAGS_MACRO) \
+	$(SPLINTFLAGS_NAMING) \
+	$(SPLINTFLAGS_CONTROL_FLOW) \
+	$(SPLINTFLAGS_MEMORY_BOUNDS) \
+	$(SPLINTFLAGS_COMPLETENESS) \
+	$(SPLINTFLAGS_MISCELLANEOUS) \
 
 #SPLINT_SOURCE = `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@ | sort`
-SPLINT_SOURCE = $$(find src/*.c src/{io,packfile,string}/*.c -type f | grep -v extra_nci_thunks.c | grep -v extend_vtable.c | sort)
+SPLINT_SOURCE = \
+	$$(find src/*.c src/{gc,io,packfile,string}/*.c -type f | \
+	grep -v src/gc/malloc.c | \
+	grep -v src/gc/malloc_trace.c | \
+	grep -v extra_nci_thunks.c | \
+	grep -v extend_vtable.c | \
+	grep -v nci_test.c | \
+	sort)
 
 # "splint" is the less-thorough splint target.  For cage cleaning work,
 # you'll probably want to specify SPLINT_SOURCE rather than work on the
 # entire tree, like so:
 #     make splint SPLINT_SOURCE='src/call/*.c'
 
-splint : all
+splint :
 	$(MKPATH) $(SPLINT_TMP)
 	$(SPLINT) $(CC_INC) "-Iinclude/pmc" "-Icompilers/ast" $(SPLINTFLAGS) \
 	+partial -DNDEBUG \

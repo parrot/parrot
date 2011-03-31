@@ -446,8 +446,6 @@
 ^/parrot\.ilk/
 ^/parrot\.iss$
 ^/parrot\.iss/
-^/parrot\.pc$
-^/parrot\.pc/
 ^/parrot\.pdb$
 ^/parrot\.pdb/
 ^/parrot_config$

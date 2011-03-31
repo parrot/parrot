@@ -89,7 +89,7 @@ const struct _data_types data_types[] = {
     { "short",      sizeof (short),              ALIGNOF(short) },
     { "int",        sizeof (int),                ALIGNOF(int) },
     { "long",       sizeof (long),               ALIGNOF(long)  },
-#  if HAS_LONGLONG
+#  if PARROT_HAS_LONGLONG
     { "longlong",   sizeof (long long),          ALIGNOF(long long) },
 #  else
     { "longlong",   0,                           0 },
@@ -100,7 +100,7 @@ const struct _data_types data_types[] = {
     { "ushort",     sizeof (unsigned short),     ALIGNOF(unsigned short) },
     { "uint",       sizeof (unsigned int),       ALIGNOF(unsigned int) },
     { "ulong",      sizeof (unsigned long),      ALIGNOF(unsigned long) },
-#  if HAS_LONGLONG
+#  if PARROT_HAS_LONGLONG
     { "ulonglong",  sizeof (unsigned long long), ALIGNOF(unsigned long long) },
 #  else
     { "ulonglong",  0,                           0 },
@@ -115,7 +115,7 @@ const struct _data_types data_types[] = {
     { "int8",       1,                           ALIGNOF(Parrot_Int1) },
     { "int16",      2,                           ALIGNOF(Parrot_Int2) },
     { "int32",      4,                           ALIGNOF(Parrot_Int4) },
-#  if HAS_INT64
+#  if PARROT_HAS_INT64
     { "int64",      8,                           ALIGNOF(Parrot_Int8) },
 #  else
     { "int64",      0,                           0 },
@@ -127,7 +127,7 @@ const struct _data_types data_types[] = {
     { "uint8",      1,                           ALIGNOF(Parrot_Int1) },
     { "uint16",     2,                           ALIGNOF(Parrot_Int2) },
     { "uint32",     4,                           ALIGNOF(Parrot_Int4) },
-#  if HAS_INT64
+#  if PARROT_HAS_INT64
     { "uint64",     8,                           ALIGNOF(Parrot_Int8) },
 #  else
     { "uint64",     0,                           0 },

@@ -106,6 +106,8 @@ Initialize PackfileDirectory from PackFile_Directory.
                 pmc_type = enum_class_PackfileDebug;
                 break;
               case PF_BYTEC_SEG:
+                pmc_type = enum_class_PackfileBytecodeSegment;
+                break;
               case PF_UNKNOWN_SEG:
               default:
                 pmc_type = enum_class_PackfileRawSegment;

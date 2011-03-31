@@ -473,7 +473,9 @@ Invokes the subroutine.
             PMC *c       = context;
             PMC *outer_c = Parrot_pcc_get_outer_ctx(INTERP, c);
 
-            for (c = context; PMC_IS_NULL(outer_c); c = outer_c) {
+            for (c = context;
+                 PMC_IS_NULL(outer_c);
+                 c = outer_c, outer_c = Parrot_pcc_get_outer_ctx(INTERP, c)) {
 
                 PMC *outer_pmc;
                 Parrot_Sub_attributes *current_sub, *outer_sub;

@@ -454,6 +454,7 @@
   tags: 
     - 'deprecated'
     - 'library'
+    - 'completed'
   ticket:  'https://trac.parrot.org/parrot/ticket/1853'
 -
   name:  'Parrot_ext_try function'

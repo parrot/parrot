@@ -239,25 +239,23 @@ NB: this method will destroy all old data!
                                     ? old_hash->entry_type
                                     : enum_type_PMC;
 
-        if (type == Hash_key_type_STRING)
+        switch (type) {
+          case Hash_key_type_int:
+          case Hash_key_type_STRING:
+          case Hash_key_type_PMC:
+          case Hash_key_type_PMC_ptr:
+          case Hash_key_type_STRING_enc:
             new_hash = Parrot_hash_create(INTERP,
                     entry_type,
-                    Hash_key_type_STRING);
-        else if (type == Hash_key_type_int)
-            /* new_int_hash set BOTH keys and values to INTVAL */
-            new_hash = Parrot_hash_create(INTERP,
-                    entry_type,
-                    Hash_key_type_int);
-        else if (type == Hash_key_type_PMC)
-            /* new_int_hash set BOTH keys and values to INTVAL */
-            new_hash = Parrot_hash_create(INTERP,
-                    entry_type,
-                    Hash_key_type_PMC);
-        else
+                    (Hash_key_type)type);
+            break;
+
+          default:
             /* We probably will not implement other types of keys. They are way
              * too dangerous to use from PIR */
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Hash: Unknown key type");
+        }
 
 
         PARROT_HASH(SELF)->hash = new_hash;

@@ -1,8 +1,12 @@
+New in 3.3.0
+- Core
+  + The isa and isa_pmc vtables can be overridden from PIR
+
 New in 3.2.0
 - Core
   + Full support for Unicode filenames on Linux and Win32
   + The configuration option --cxx is gone
-  + New Generational GC implemented. To enable it run Configure.pl --gc=gms 
+  + New Generational GC implemented. To enable it run Configure.pl --gc=gms
   + Now op definitions are semantically parsed. It opens possibilities for
     future optimizations of parrot core.
   + A statement convert the '.param' PIR systax

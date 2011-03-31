@@ -1,11 +1,12 @@
 #!perl
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 # auto/llvm-01.t
 
 use strict;
 use warnings;
 use File::Temp qw( tempdir );
 use Test::More tests =>  49;
+>>>>>>> master
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::llvm');
