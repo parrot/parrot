@@ -96,27 +96,30 @@ sub process_variable($line, %chunk) {
 }
 
 sub convert_hex($data) {
-    my $bits := pir::new('ByteBuffer');
+    my $bytes := pir::new('ByteBuffer');
     while pir::length($data) >= 2 {
         my $char0 := pir::substr($data, 0, 1);
-        my $char1 := pir::substr($data, 1, 2);
-        $data := pir::substr($data, 2);
+        my $char1 := pir::substr($data, 1, 1);
         my $byte := 16*hexval($char0) + hexval($char1);
+        $data := pir::substr($data, 2);
+        pir::push_p_i($bytes, $byte);
     }
 }
 
 sub hexval($c) {
-    my $ord_c := pir::ord($c);
+    my $ord_c := pir::ord(pir::downcase($c));
     my $ord_0 := pir::ord('0');
     my $ord_9 := pir::ord('9');
     my $ord_a := pir::ord('a');
     my $ord_f := pir::ord('f');
 
-    $ord_0 <= $ord_c && $ord_c <= $ord_9 ??
+    my $ret := $ord_0 <= $ord_c && $ord_c <= $ord_9 ??
       $ord_c - $ord_0 !!
       $ord_a <= $ord_c && $ord_c <= $ord_f ??
         $ord_c - $ord_a + 10 !!
           0;
+    say("char $c converts to $ret");
+    $ret;
 }
 
 
