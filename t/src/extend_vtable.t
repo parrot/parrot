@@ -159,11 +159,19 @@ CODE
 Done!
 OUTPUT
 
+# These will most likely be removed soon, but here for completeness
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_share(_ro)");
+    Parrot_PMC_share(interp, pmc);
+    Parrot_PMC_share_ro(interp, pmc);
+CODE
+Done!
+OUTPUT
+
 # TODO: Find PMC where we can call this vtable
 #extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_set_pointer_keyed_int");
 #    Parrot_PMC_set_pointer_keyed_int(interp, rpa2, 0, 42);
 #    Parrot_printf(interp,"42\n");
-CODE
+#CODE
 #42
 #Done!
 #OUTPUT
