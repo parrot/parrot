@@ -56,13 +56,6 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const struct longopt_opt_decl * Parrot_cmd_options(void);
 
-static void Parrot_confess(
-    ARGIN(const char * condition),
-    ARGIN(const char * file),
-    unsigned int line)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void Parrot_version(void);
 static void parseflags(
     Parrot_PMC interp,
@@ -107,9 +100,6 @@ static void usage(ARGMOD(FILE *fp))
 #define ASSERT_ARGS_is_all_hex_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_cmd_options __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_confess __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(condition) \
-    , PARROT_ASSERT_ARG(file))
 #define ASSERT_ARGS_Parrot_version __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_parseflags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(argv) \
@@ -142,11 +132,9 @@ The entry point from the command line into Parrot.
 int
 main(int argc, const char *argv[])
 {
-    int          stacktop;
     Parrot_PMC   interp;
     Parrot_PMC   bytecodepmc;
     Parrot_PMC   argsarray;
-    int          status;
     int          pir_argc;
     const char **pir_argv;
     Parrot_Init_Args *initargs;
@@ -309,24 +297,6 @@ is_all_hex_digits(ARGIN(const char *s))
         if (!isxdigit(*s))
             return 0;
     return 1;
-}
-
-/*
-
-=item C<static void Parrot_confess(const char * condition, const char * file,
-unsigned int line)>
-
-Prints an error
-
-=cut
-
-*/
-
-static void
-Parrot_confess(ARGIN(const char * condition), ARGIN(const char * file),
-        unsigned int line)
-{
-    fprintf(stderr, "Parrot Error: %s (%s:%d)\n", condition, file, line);
 }
 
 /*
@@ -629,8 +599,6 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     }
 
     while ((status = longopt_get(argc, argv, Parrot_cmd_options(), &opt)) > 0) {
-        Parrot_String str;
-
         switch (opt.opt_id) {
           case 'R':
             args->run_core_name = opt.opt_arg;
@@ -703,7 +671,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             break;
           case 'c':
             args->have_pbc_file = 1;
-
+            break;
           case OPT_GC_DEBUG:
           /*
 #if DISABLE_GC_DEBUG

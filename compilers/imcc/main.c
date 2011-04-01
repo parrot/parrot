@@ -1042,7 +1042,6 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
     PackFile_ByteCode * const cs_save = Parrot_pf_get_current_code_segment(interp);
     PackFile_ByteCode        *cs       = NULL;
     struct _imc_info_t       *imc_info = NULL;
-    const char               *ext;
     PIOHANDLE                 fp;
     PMC                      *newcontext;
 
@@ -1058,7 +1057,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
         IMCC_INFO(interp) = imc_info;
     }
 
-    if (Parrot_stat_info_intval(interp, fullname, STAT_ISDIR))
+    if (Parrot_file_stat_intval(interp, fullname, STAT_ISDIR))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
             "imcc_compile_file: '%Ss' is a directory\n", fullname);
 

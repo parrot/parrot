@@ -373,7 +373,7 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
 =item C<INTVAL Parrot_io_peek_buffer(PARROT_INTERP, PMC *filehandle)>
 
 Retrieve the next character in the buffer without modifying the stream.
-Return -1 ar EOF.
+Return -1 or EOF.
 
 =cut
 
@@ -384,7 +384,6 @@ Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_peek_buffer)
     unsigned char *buffer_next;
-    UINTVAL        len          = 1;
     INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
 
     /* write buffer flush */

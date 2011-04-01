@@ -125,7 +125,7 @@ can be cached for later.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_io_stdhandle(PARROT_INTERP, INTVAL fileno, ARGIN_NULLOK(PMC *newhandle))
 {
@@ -253,7 +253,7 @@ OS IO handles (0, 1, 2).
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_io_fdopen(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), PIOHANDLE fd,
         ARGIN(STRING *sflags))
@@ -607,7 +607,6 @@ Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
     STRING *result;
     if (pmc->vtable->base_type == enum_class_FileHandle) {
         INTVAL            flags;
-        size_t            ignored;
 
         GETATTR_FileHandle_flags(interp, pmc, flags);
 
@@ -764,8 +763,9 @@ Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 =item C<INTVAL Parrot_io_eof(PARROT_INTERP, PMC *pmc)>
 
-Returns a boolean value indication whether C<*pmc>'s current read/write
-position is C<EOF>.
+Returns a boolean value indication whether C<*pmc>'s C<EOF> flag is set,
+indicating that an attempt was made to read past the end of the underlying
+filehandle.
 
 =cut
 

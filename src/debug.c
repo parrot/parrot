@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -78,6 +78,90 @@ PARROT_CAN_RETURN_NULL
 static PDB_breakpoint_t * current_breakpoint(ARGIN(PDB_t * pdb))
         __attribute__nonnull__(1);
 
+static void dbg_assign(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_break(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_continue(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_delete(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_echo(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_enable(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_eval(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_gcdebug(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_help(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_info(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_list(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_listbreakpoints(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_load(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_next(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_print(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_quit(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_run(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_script(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_stack(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_trace(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_watch(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void debugger_cmdline(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -105,7 +189,7 @@ PARROT_CAN_RETURN_NULL
 static const DebuggerCmd * get_cmd(ARGIN_NULLOK(const char **cmd));
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static PMC * get_exception_context(PARROT_INTERP, ARGMOD(PMC * exception))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -128,6 +212,10 @@ static void no_such_register(PARROT_INTERP,
     char register_type,
     UINTVAL register_num)
         __attribute__nonnull__(1);
+
+static int nomoreargs(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -153,6 +241,69 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
        PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_current_breakpoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pdb))
+#define ASSERT_ARGS_dbg_assign __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_break __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_continue __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_delete __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_echo __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_enable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_eval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_gcdebug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_listbreakpoints __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_load __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_next __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_print __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_quit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_script __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_stack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_watch __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_debugger_cmdline __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_display_breakpoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -175,6 +326,9 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
        PARROT_ASSERT_ARG(pdb))
 #define ASSERT_ARGS_no_such_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_nomoreargs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_PDB_get_continuation_backtrace \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -188,10 +342,66 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
  *  Command functions and help dispatch
  */
 
-typedef void (* debugger_func_t)(PDB_t * pdb, const char * cmd);
+/*
 
-static int nomoreargs(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+=item C<static int nomoreargs(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_assign(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_break(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_continue(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_delete(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_echo(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_enable(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_eval(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_gcdebug(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_help(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_info(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_list(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_listbreakpoints(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_load(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_next(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_print(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_quit(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_run(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_script(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_stack(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_trace(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_watch(PDB_t *pdb, const char *cmd)>
+
+These are command and help dispatch functions
+
+=cut
+
+*/
+
+
+typedef void (* debugger_func_t)(ARGIN(PDB_t *pdb), ARGIN(const char *cmd));
+
+static int
+nomoreargs(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(nomoreargs)
+
     if (*skip_whitespace(cmd) == '\0')
         return 1;
     else {
@@ -200,50 +410,67 @@ static int nomoreargs(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
     }
 }
 
-static void dbg_assign(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_assign(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_assign)
+
     TRACEDEB_MSG("dbg_assign");
 
     PDB_assign(pdb->debugee, cmd);
 }
 
-static void dbg_break(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_break(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_break)
+
     TRACEDEB_MSG("dbg_break");
 
     PDB_set_break(pdb->debugee, cmd);
 }
 
-static void dbg_continue(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_continue(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_continue)
+
     TRACEDEB_MSG("dbg_continue");
 
     PDB_continue(pdb->debugee, cmd);
 }
 
-static void dbg_delete(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_delete(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_delete)
+
     TRACEDEB_MSG("dbg_delete");
 
     PDB_delete_breakpoint(pdb->debugee, cmd);
 }
 
-static void dbg_disable(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_disable(ARGIN(PDB_t *pdb), ARGIN(const char *cmd)) /* HEADERIZER SKIP */
 {
     TRACEDEB_MSG("dbg_disable");
 
     PDB_disable_breakpoint(pdb->debugee, cmd);
 }
 
-static void dbg_disassemble(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_disassemble(ARGIN(PDB_t *pdb), ARGIN(const char *cmd)) /* HEADERIZER SKIP */
 {
     TRACEDEB_MSG("dbg_disassemble");
 
     PDB_disassemble(pdb->debugee, cmd);
 }
 
-static void dbg_echo(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_echo(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_echo)
+
     TRACEDEB_MSG("dbg_echo");
 
     if (! nomoreargs(pdb, cmd))
@@ -259,18 +486,27 @@ static void dbg_echo(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
     }
 }
 
-static void dbg_enable(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_enable(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_enable)
+
     PDB_enable_breakpoint(pdb->debugee, cmd);
 }
 
-static void dbg_eval(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_eval(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_eval)
+
     PDB_eval(pdb->debugee, cmd);
 }
 
-static void dbg_gcdebug(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_gcdebug(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_gcdebug)
+
     TRACEDEB_MSG("dbg_gcdebug");
 
     if (! nomoreargs(pdb, cmd))
@@ -286,15 +522,21 @@ static void dbg_gcdebug(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
     }
 }
 
-static void dbg_help(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_help(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_help)
+
     TRACEDEB_MSG("dbg_help");
 
     PDB_help(pdb->debugee, cmd);
 }
 
-static void dbg_info(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_info(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_info)
+
     TRACEDEB_MSG("dbg_info");
 
     if (! nomoreargs(pdb, cmd))
@@ -303,43 +545,62 @@ static void dbg_info(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
     PDB_info(pdb->debugger);
 }
 
-static void dbg_list(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_list(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_list)
+
     TRACEDEB_MSG("dbg_list");
 
     PDB_list(pdb->debugee, cmd);
 }
 
-static void dbg_listbreakpoints(PDB_t * pdb, SHIM(const char * cmd)) /* HEADERIZER SKIP */
+static void
+dbg_listbreakpoints(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_listbreakpoints)
+
+    UNUSED(cmd);
     TRACEDEB_MSG("dbg_list");
 
     list_breakpoints(pdb);
 }
 
-static void dbg_load(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_load(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_load)
+
     TRACEDEB_MSG("dbg_load");
 
     PDB_load_source(pdb->debugee, cmd);
 }
 
-static void dbg_next(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_next(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_next)
+
     TRACEDEB_MSG("dbg_next");
 
     PDB_next(pdb->debugee, cmd);
 }
 
-static void dbg_print(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_print(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_print)
+
     TRACEDEB_MSG("dbg_print");
 
     PDB_print(pdb->debugee, cmd);
 }
 
-static void dbg_quit(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_quit(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_quit)
+
     TRACEDEB_MSG("dbg_quit");
 
     if (! nomoreargs(pdb, cmd))
@@ -349,23 +610,32 @@ static void dbg_quit(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
     pdb->state &= ~PDB_STOPPED;
 }
 
-static void dbg_run(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_run(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_run)
+
     TRACEDEB_MSG("dbg_run");
 
     PDB_init(pdb->debugee, cmd);
     PDB_continue(pdb->debugee, NULL);
 }
 
-static void dbg_script(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_script(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_script)
+
     TRACEDEB_MSG("dbg_script");
 
     PDB_script_file(pdb->debugee, cmd);
 }
 
-static void dbg_stack(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_stack(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_stack)
+
     TRACEDEB_MSG("dbg_stack");
 
     if (! nomoreargs(pdb, cmd))
@@ -374,15 +644,21 @@ static void dbg_stack(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
     PDB_backtrace(pdb->debugee);
 }
 
-static void dbg_trace(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_trace(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_trace)
+
     TRACEDEB_MSG("dbg_trace");
 
     PDB_trace(pdb->debugee, cmd);
 }
 
-static void dbg_watch(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void
+dbg_watch(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_watch)
+
     TRACEDEB_MSG("dbg_watch");
 
     PDB_watchpoint(pdb->debugee, cmd);
@@ -556,7 +832,7 @@ struct DebuggerCmdList {
     PARROT_OBSERVER const DebuggerCmd * const cmd;
 };
 
-DebuggerCmdList DebCmdList [] = {
+const DebuggerCmdList DebCmdList [] = {
     { "assign",      'a',  &cmd_assign },
     { "blist",       '\0', &cmd_listbreakpoints },
     { "break",       '\0', &cmd_break },
@@ -846,7 +1122,7 @@ Parrot_debugger_destroy(PARROT_INTERP)
     /* Unfinished.
        Free all debugger allocated resources.
      */
-    PDB_t *pdb = interp->pdb;
+    PDB_t * const pdb = interp->pdb;
 
     TRACEDEB_MSG("Parrot_debugger_destroy");
 
@@ -1960,7 +2236,7 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
         INTVAL   i,  j;
         if (condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, REGNO_INT))
             return 0;
-        i = CTX_REG_INT(ctx, condition->reg);
+        i = CTX_REG_INT(interp, ctx, condition->reg);
 
         if (condition->type & PDB_cond_const)
             j = *(INTVAL *)condition->value;
@@ -1982,7 +2258,7 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 
         if (condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, REGNO_NUM))
             return 0;
-        k = CTX_REG_NUM(ctx, condition->reg);
+        k = CTX_REG_NUM(interp, ctx, condition->reg);
 
         if (condition->type & PDB_cond_const)
             l = *(FLOATVAL *)condition->value;
@@ -2004,7 +2280,7 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 
         if (condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, REGNO_STR))
             return 0;
-        m = CTX_REG_STR(ctx, condition->reg);
+        m = CTX_REG_STR(interp, ctx, condition->reg);
 
         if (condition->type & PDB_cond_notnull)
             return ! STRING_IS_NULL(m);
@@ -2035,7 +2311,7 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 
         if (condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, REGNO_PMC))
             return 0;
-        m = CTX_REG_PMC(ctx, condition->reg);
+        m = CTX_REG_PMC(interp, ctx, condition->reg);
 
         if (condition->type & PDB_cond_notnull)
             return ! PMC_IS_NULL(m);
@@ -2986,9 +3262,9 @@ PDB_assign(PARROT_INTERP, ARGIN(const char *command))
     UINTVAL register_num;
     char reg_type_id;
     int reg_type;
-    PDB_t *pdb       = interp->pdb;
-    Interp *debugger = pdb ? pdb->debugger : interp;
-    Interp *debugee  = pdb ? pdb->debugee : interp;
+    PDB_t  * const pdb      = interp->pdb;
+    Interp * const debugger = pdb ? pdb->debugger : interp;
+    Interp * const debugee  = pdb ? pdb->debugee  : interp;
 
     /* smallest valid commad length is 4, i.e. "I0 1" */
     if (strlen(command) < 4) {
@@ -3267,7 +3543,7 @@ Returns an string containing the backtrace of the interpreter's call chain for a
 
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 STRING *
 Parrot_dbg_get_exception_backtrace(PARROT_INTERP, ARGMOD(PMC * exception))
 {
@@ -3296,7 +3572,7 @@ Returns the context in which the exception was generated.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static PMC *
 get_exception_context(PARROT_INTERP, ARGMOD(PMC * exception))
 {

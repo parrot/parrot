@@ -768,7 +768,7 @@ the value is the NQP pathname
     $S0 = dirname(pir)
     mkpath($S0, 1 :named('verbose'))
     .local string cmd
-    cmd = get_nqp()
+    cmd = get_nqp_rx()
     cmd .= " --target=pir --output="
     cmd .= pir
     cmd .= " "
@@ -4393,6 +4393,14 @@ Return the whole config
 =cut
 
 .sub 'get_nqp'
+    .tailcall get_executable('parrot-nqp')
+.end
+
+=item get_nqp_rx
+
+=cut
+
+.sub 'get_nqp_rx'
     .tailcall get_executable('parrot-nqp')
 .end
 

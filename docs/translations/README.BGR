@@ -1,4 +1,4 @@
-﻿Това е Parrot, версия 2.10.1
+﻿Това е Parrot, версия 3.2.0
 -----------------------------
 
 Parrot is Copyright (C) 2001-2010, Parrot Foundation.
@@ -93,7 +93,7 @@ II.  Получаване на Parrot от github.com
 кой компилатор и линкер да използва.  Например, за компилиране на C файлове с 'cc',
 C++ файлове с 'CC', и линкване на всичко с 'CC', трябва да напишете
 
-    perl Configure.pl --cc=cc --cxx=CC --link=CC --ld=CC
+    perl Configure.pl --cc=cc --link=CC --ld=CC
 
 Вижте "perl Configure.pl --help" за повече опции и docs/configuration.pod
 за повече детайли.

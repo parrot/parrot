@@ -1,6 +1,5 @@
 #!./parrot
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 =head1 NAME
 
@@ -30,6 +29,8 @@ Tests the PackfileOpMap PMC.
     'sanity'()
     'basic'()
     'load_lib'()
+    'reverse_mapping'()
+
     'done_testing'()
 .end
 
@@ -118,12 +119,37 @@ Tests the PackfileOpMap PMC.
 
     $I0 = opmap['cmod_i_i_i']
     is($I0, 1, "Can map cmod_i_i_i from math_ops")
+    .return ()
 
   no_math_ops:
     pop_eh
-
+    skip(2, 'No math_ops library')
+    .return ()
 .end
 
+.sub 'reverse_mapping'
+    .local pmc opmap
+    opmap = new ['PackfileOpMap']
+
+    # Map few ops.
+    $I0 = opmap['say_sc']
+    $I1 = opmap['returncc']
+    $I2 = opmap['issame_i_p_p']
+    $I3 = opmap['cmp_i_i_i']
+
+    $S0 = opmap[$I0]
+    is( $S0, "say_sc", "say_sc")
+
+    $S0 = opmap[$I1]
+    is( $S0, "returncc", "returncc")
+
+    $S0 = opmap[$I2]
+    is( $S0, "issame_i_p_p", "issame_i_p_p")
+
+    $S0 = opmap[$I3]
+    is( $S0, "cmp_i_i_i", "cmp_i_i_i")
+
+.end
 
 # Local Variables:
 #   mode: pir

@@ -7,9 +7,9 @@
 This PDD describes the node types and semantics of the Parrot
 Abstract Syntax Tree representation.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 

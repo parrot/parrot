@@ -1,5 +1,5 @@
-# Copyright (C) 2004-2010, Parrot Foundation.
-# $Id$
+# Copyright (C) 2004-2011, Parrot Foundation.
+#
 
 package Parrot::Headerizer;
 
@@ -244,6 +244,10 @@ sub extract_function_declarations {
 
     # Drop all text after HEADERIZER STOP
     $text =~ s{/\*\s*HEADERIZER STOP.+}{}s;
+
+    # Drop begin/end PMC HEADER sections
+    $text =~ s{BEGIN_PMC_HEADER_PREAMBLE}{}sx;
+    $text =~ s{END_PMC_HEADER_PREAMBLE}{}sx;
 
     # Strip blocks of comments
     $text =~ s{^/\*.*?\*/}{}mxsg;

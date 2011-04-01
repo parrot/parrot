@@ -17,6 +17,23 @@
       },
       {
          "source" : [
+            "docs/project/cage_cleaners_guide.pod",
+            "docs/project/committer_guide.pod",
+            "docs/project/core_inclusion.pod",
+            "docs/project/git_terminology.pod",
+            "docs/project/git_workflow.pod",
+            "docs/project/hacking_tips.pod",
+            "docs/project/merge_review_guidelines.pod",
+            "docs/project/metacommitter_guide.pod",
+            "docs/project/release_manager_guide.pod",
+            "docs/project/ticket_triaging.pod",
+            "docs/project/debian_packaging_guide.pod",
+            "docs/project/ubuntu_packaging_guide.pod"
+         ],
+         "title" : "Project Documentation"
+      },
+      {
+         "source" : [
             "docs/user/pir/*",
             "docs/pmc/array.pod",
             "docs/pmc/struct.pod",

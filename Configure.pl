@@ -266,7 +266,11 @@ Tell Configure that the compiler supports C<inline>.
 
 =item C<--cc=(compiler)>
 
-Specify which compiler to use.
+Specify which C compiler to use.
+
+=item C<--cxx=(compiler)>
+
+Specify which C++ compiler to use.
 
 =item C<--ccflags=(flags)>
 
@@ -275,10 +279,6 @@ Use the given compiler flags.
 =item C<--ccwarn=(flags)>
 
 Use the given compiler warning flags.
-
-=item C<--cxx=(compiler)>
-
-Specify which C++ compiler to use (for ICU).
 
 =item C<--libs=(libs)>
 
@@ -452,7 +452,6 @@ for the purpose of setting environmental variables used in options, like this:
     CX="/usr/bin/g++"
     /usr/local/bin/perl Configure.pl \
         --cc="$CC" \
-        --cxx="$CX" \
         --link="$CX" \
         --ld="$CX"
 
@@ -479,7 +478,6 @@ Parrot configuration options.  Entries in this section must be either
 I<option=value> pairs or be options which will be assigned a true value.
 
     cc=$CC
-    cxx=$CX
     link=$CX
     ld=/usr/bin/g++
     verbose
@@ -585,7 +583,6 @@ configuration file.
     =general
 
     cc=$CC
-    cxx=$CX
     link=$CX
     ld=/usr/bin/g++
 

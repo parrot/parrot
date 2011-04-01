@@ -244,6 +244,7 @@ Returns the special C<NULL> PMC.
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
+PARROT_CAN_RETURN_NULL
 Parrot_PMC
 Parrot_PMC_null(void)
 {
@@ -348,16 +349,38 @@ Parrot_ext_try(PARROT_INTERP,
     ASSERT_ARGS(Parrot_ext_try)
     if (cfunction) {
         Parrot_runloop jmp;
+        Parrot_Context *initialctx, *curctx;
         PARROT_CALLIN_START(interp);
+        initialctx = CONTEXT(interp);
         switch (setjmp(jmp.resume)) {
           case 0: /* try */
             Parrot_ex_add_c_handler(interp, &jmp);
             (*cfunction)(interp, data);
+            curctx = CONTEXT(interp);
+            if (curctx != initialctx) {
+                Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG,
+                        "popping context in Parrot_ext_try");
+                do {
+                    if (curctx == NULL)
+                        do_panic(interp,
+                                "cannot restore context", __FILE__, __LINE__);
+                } while ((curctx = CONTEXT(interp)) != initialctx);
+            }
             Parrot_cx_delete_handler_local(interp, STRINGNULL);
             break;
           default: /* catch */
             {
                 PMC *exception = jmp.exception;
+                curctx = CONTEXT(interp);
+                if (curctx != initialctx) {
+                    Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG,
+                            "popping context in Parrot_ext_try");
+                    do {
+                        if (curctx == NULL)
+                            do_panic(interp,
+                                    "cannot restore context", __FILE__, __LINE__);
+                    } while ((curctx = CONTEXT(interp)) != initialctx);
+                }
                 Parrot_cx_delete_handler_local(interp, STRINGNULL);
                 if (chandler)
                     (*chandler)(interp, exception, data);
@@ -501,6 +524,7 @@ Parrot_set_strreg(PARROT_INTERP, Parrot_Int regnum,
 {
     ASSERT_ARGS(Parrot_set_strreg)
     REG_STR(interp, regnum) = value;
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
 }
 
 /*
@@ -521,6 +545,7 @@ Parrot_set_pmcreg(PARROT_INTERP, Parrot_Int regnum,
 {
     ASSERT_ARGS(Parrot_set_pmcreg)
     REG_PMC(interp, regnum) = value;
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
 }
 
 /*=for api extend Parrot_new_string

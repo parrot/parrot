@@ -56,7 +56,7 @@ op callmethodcc(invar PMC, in STR) :object_base :flow {
     PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
     opcode_t *dest              = NULL;
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
 
     if (!PMC_IS_NULL(method_pmc)) {
         PMC * const signature = Parrot_pcc_get_signature(interp,
@@ -91,7 +91,7 @@ op callmethodcc(invar PMC, invar PMC) :object_base :flow {
     PMC      *       signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, $1);
@@ -111,7 +111,7 @@ op callmethod(invar PMC, in STR, invar PMC) :object_base :flow {
     PMC      *       signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
 
     if (PMC_IS_NULL(method_pmc)) {
         dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND,
@@ -136,7 +136,7 @@ op callmethod(invar PMC, invar PMC, invar PMC) :object_base :flow {
     PMC      *       signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), next);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, object);
@@ -291,7 +291,7 @@ inline op subclass(out PMC, in PMC) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, next,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
         goto ADDRESS(handler);
@@ -306,7 +306,7 @@ inline op subclass(out PMC, in PMC, in STR) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-        opcode_t * handler = Parrot_ex_throw_from_op_args(interp, next,
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, next,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
         goto ADDRESS(handler);
@@ -321,7 +321,7 @@ inline op subclass(out PMC, in PMC, in PMC) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, next,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
         goto ADDRESS(handler);
@@ -349,7 +349,7 @@ op subclass(out PMC, in STR) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, next,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' doesn't exist", $2);
         goto ADDRESS(handler);
@@ -365,7 +365,7 @@ op subclass(out PMC, in STR, in STR) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, next,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' doesn't exist", $2);
         goto ADDRESS(handler);
@@ -381,7 +381,7 @@ op subclass(out PMC, in STR, in PMC) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, next,
             EXCEPTION_NO_CLASS,
             "Class '%Ss' doesn't exist", $2);
         goto ADDRESS(handler);
@@ -543,7 +543,7 @@ inline op inspect(out PMC, in PMC, in STR) :object_classes {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 LICENSE
 

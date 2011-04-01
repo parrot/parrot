@@ -1,6 +1,6 @@
 # Copyright (C) 2007-2011, Parrot Foundation.
 
-=head1 Release Instructions
+=head1 Release Manager Guide
 
 To prepare a release:
 
@@ -164,8 +164,8 @@ Make sure everything works:
 
     make realclean
     perl Configure.pl --test ...
-    make world docs html 2>&1 | tee make_world_docs_html.log
-    make fulltest        2>&1 | tee make_fulltest.log
+    make world html 2>&1 | tee make_world_html.log
+    make fulltest   2>&1 | tee make_fulltest.log
 
 Note that running "make fulltest" takes a while and that separate
 harnesses are being run.
@@ -218,12 +218,27 @@ Untar F<parrot-a.b.c.tar.gz> into another area.
 Make sure everything works:
 
     perl Configure.pl
-    make world docs html 2>&1 | tee make_world_docs_html.log
-    make fulltest        2>&1 | tee make_fulltest.log
+    make world html 2>&1 | tee make_world_html.log
+    make fulltest   2>&1 | tee make_fulltest.log
 
 Verify that the version is correct and doesn't contain the suffix C<devel>:
 
     ./parrot -V
+
+=over 4
+
+=item * C<make release_check>
+
+As an alternative to steps 4, 5 and 6 above, you may wish to call:
+
+    perl Configure.pl
+    make release_check
+
+This target (or, for short, C<make relcheck>), will prepare the tarballs, copy
+the F<.gz> tarball to a temporary directory, and then reconfigure, rebuild,
+retest (through C<make test>) and rerelease.
+
+=back
 
 =item 7.
 
@@ -331,9 +346,9 @@ the resources/ and html/ directories created in docs/.
 ssh into the parrotvm, and in the
 webroot for docs.parrot.org, expand these into a release directory (e.g.
 1.4.0). in <webroot>/parrot, there are symbolic links for latest, supported,
-and devel. Update the devel symlink to point to your new directory.
-If this is a supported release, also update the supported symlink. Do not delete
-any old copies of the docs, don't update the other symlinks.
+and devel. Update the C<latest> symlink to point to your new directory.
+If this is a supported release, also update the C<supported> symlink.
+Do not delete any old copies of the docs, don't update the other symlinks.
 
 =back
 
@@ -433,8 +448,6 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
 Versions with a asterisk (*) are supported releases.
 
- - Feb 15, 2011 - 3.1   - mikehh
- - Mar 15, 2011 - 3.2   - gerd
  - Apr 19, 2011 - 3.3*  - whiteknight
  - May 17, 2011 - 3.4   - gerd
  - Jun 21, 2011 - 3.5   - cotto

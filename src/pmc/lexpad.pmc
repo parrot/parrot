@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2010, Parrot Foundation.
+Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -97,9 +97,9 @@ Return the LexInfo PMC, if any or a Null PMC.
 
     VTABLE INTVAL exists_keyed_str(STRING *name) {
         PMC  *info;
-        Hash *hash;
+        const Hash *hash;
         GET_ATTR_lexinfo(INTERP, SELF, info);
-        hash = (Hash *)VTABLE_get_pointer(INTERP, info);
+        hash = (const Hash *)VTABLE_get_pointer(INTERP, info);
 
         return hash->entries
             ? (Parrot_hash_get_bucket(INTERP, hash, name) != 0)
@@ -113,12 +113,12 @@ Return the LexInfo PMC, if any or a Null PMC.
 
     VTABLE PMC *get_pmc_keyed_str(STRING *name) {
         PMC        *info;
-        Hash       *hash;
+        const Hash *hash;
         PMC        *ctx;
         HashBucket *b;
 
         GET_ATTR_lexinfo(INTERP, SELF, info);
-        hash = (Hash *)VTABLE_get_pointer(INTERP, info);
+        hash = (const Hash *)VTABLE_get_pointer(INTERP, info);
 
         if (!hash->entries)
             return PMCNULL;
@@ -129,7 +129,7 @@ Return the LexInfo PMC, if any or a Null PMC.
             return PMCNULL;
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
-        return CTX_REG_PMC(ctx, (INTVAL)b->value);
+        return CTX_REG_PMC(INTERP, ctx, (INTVAL)b->value);
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *name) {
@@ -139,12 +139,12 @@ Return the LexInfo PMC, if any or a Null PMC.
 
     VTABLE void set_pmc_keyed_str(STRING *name, PMC *value) {
         PMC              * info;
-        Hash             * hash;
+        const Hash       * hash;
         PMC              * ctx;
         HashBucket       * b;
 
         GET_ATTR_lexinfo(INTERP, SELF, info);
-        hash = (Hash *)VTABLE_get_pointer(INTERP, info);
+        hash = (const Hash *)VTABLE_get_pointer(INTERP, info);
         b    = Parrot_hash_get_bucket(INTERP, hash, name);
 
         if (!b)
@@ -152,7 +152,8 @@ Return the LexInfo PMC, if any or a Null PMC.
                 "Lexical '%Ss' not found", name);
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
-        CTX_REG_PMC(ctx, (INTVAL)b->value) = value;
+        CTX_REG_PMC(INTERP, ctx, (INTVAL)b->value) = value;
+        PARROT_GC_WRITE_BARRIER(INTERP, ctx);
     }
 
     VTABLE void set_pmc_keyed(PMC *name, PMC *value) {

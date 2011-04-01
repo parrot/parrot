@@ -6,9 +6,9 @@
 
 Parrot's I/O subsystem.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Definitions
 

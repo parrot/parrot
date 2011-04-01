@@ -26,8 +26,7 @@ UTF-8 (L<http://www.utf-8.com/>).
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static UINTVAL utf8_decode(PARROT_INTERP, ARGIN(const utf8_t *ptr))
-        __attribute__nonnull__(1)
+static UINTVAL utf8_decode(SHIM_INTERP, ARGIN(const utf8_t *ptr))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
@@ -104,8 +103,7 @@ static STRING * utf8_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_utf8_decode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ptr))
+       PARROT_ASSERT_ARG(ptr))
 #define ASSERT_ARGS_utf8_encode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ptr))
@@ -350,14 +348,14 @@ Returns the integer for the UTF-8 character found at C<*ptr>.
 */
 
 static UINTVAL
-utf8_decode(PARROT_INTERP, ARGIN(const utf8_t *ptr))
+utf8_decode(SHIM_INTERP, ARGIN(const utf8_t *ptr))
 {
     ASSERT_ARGS(utf8_decode)
     const utf8_t *u8ptr = ptr;
     UINTVAL c = *u8ptr;
 
     if (UTF8_IS_START(c)) {
-        UINTVAL len = Parrot_utf8skip[c];
+        const UINTVAL len = Parrot_utf8skip[c];
         UINTVAL count;
 
         c &= UTF8_START_MASK(len);

@@ -8,9 +8,9 @@ This PDD describes the conventions for strings in Parrot,
 including but not limited to support for multiple character sets,
 encodings, and languages.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Definitions
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -120,6 +120,9 @@ Initialize the structure.  (Create a blank PackFile object.)
                 PMC_data_typed(SELF, Parrot_Packfile_attributes*);
         PackFile                   *pf;
 
+        /* copy_packfile_header can trigger GC. Set custom_mark flag early */
+        PObj_custom_mark_SET(SELF);
+
         attrs->uuid     = CONST_STRING(INTERP, "");
         attrs->directory = Parrot_pmc_new(INTERP, enum_class_PackfileDirectory);
 
@@ -127,8 +130,6 @@ Initialize the structure.  (Create a blank PackFile object.)
         pf = PackFile_new(INTERP, 0);
         copy_packfile_header(INTERP, SELF, pf);
         PackFile_destroy(INTERP, pf);
-
-        PObj_custom_mark_SET(SELF);
     }
 
 
@@ -160,7 +161,7 @@ Implementation note: all hard stuff done by PackfileDirectory.
 
 */
     VTABLE STRING *get_string() {
-        Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
+        const Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
         PackFile                   * const pf =
                 (PackFile*)VTABLE_get_pointer(INTERP, attrs->directory);
 
@@ -261,7 +262,7 @@ Fetch an integer keyed value from the packfile object.  Valid keys are:
 
 */
     VTABLE INTVAL get_integer_keyed_str(STRING *key) {
-        Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
+        const Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
 
         INTVAL result;
         switch (getAttrEnum(INTERP, key)) {

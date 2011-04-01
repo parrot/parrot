@@ -62,19 +62,31 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
 
 =cut
 
+.include 'iglobals.pasm'
+
 .sub 'new_from_file'
     .param string path
     .local string data
     $P0 = new 'FileHandle'
+    $P0.'encoding'('binary')
     push_eh _handler
     .local string data
     data = $P0.'readall'(path)
     pop_eh
+    $P0 = getinterp
+    $P0 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I0 = $P0['win32']
     .local int mode, uid, gid, mtime
     mode = stat path, .STAT_PLATFORM_MODE
     mode &= 0o777
+    unless $I0 goto L1
+    uid = 0
+    gid = 0
+    goto L2
+  L1:
     uid = stat path, .STAT_UID
     gid = stat path, .STAT_GID
+  L2:
     mtime = stat path, .STAT_MODIFYTIME
     .tailcall new_from_data(path, data, mode :named('mode'), uid :named('uid'), gid :named('gid'), mtime :named('mtime'))
   _handler:
@@ -222,7 +234,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
 =cut
 
 .sub '_format_tar_entry' :method
-    $P0 = new 'ResizableStringArray'
+    $P0 = new 'StringBuilder'
     $P1 = new 'FixedPMCArray'
     set $P1, 1
     .const string f1 = '%06o'
@@ -287,7 +299,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     $P2 = getattribute self, 'prefix'
     $S0 = pad_string_with_null($P2, 155)
     push $P0, $S0
-    $S0 = join '', $P0
+    $S0 = $P0
     $I0 = compute_checksum($S0)
     $P1[0] = $I0
     $S1 = sprintf "%6o\0\0", $P1
@@ -426,9 +438,9 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     goto L1
   L2:
     .local string TAR_END
-    TAR_END = repeat "\0", BLOCK
-    $S0 = repeat TAR_END, 2
-    fh.'puts'($S0)
+    $I0 = 2 * BLOCK
+    TAR_END = repeat "\0", $I0
+    fh.'puts'(TAR_END)
 .end
 
 =item _error
