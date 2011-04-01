@@ -478,6 +478,40 @@ will be output.
   div_i I0, I3, I4
   div_i 8,  11, 12
 
+As a way to filter out visual noise from M0 bytecode assembly listings, the
+value C<x> may be used as an instruction argument to indicate that the
+argument's value is ignored.  C<x> is an alias for 0.
+
+  goto 12, x, x
+
+=head3 Full Example
+
+The following should be a working "hello world" program in M0.
+
+    .chunk "hello"
+    .variables
+    0 1
+    1 "hello, world"
+    2 0x0A00
+    3 0
+    .metadata
+    .bytecode
+    #I0 is 0
+    set_var I0, 0, 0
+    #I1 is "hello" 
+    set_var I1, 1, 0
+    #I2 is "\n" 
+    set_var I2, 2, 0
+    #I3 is 0
+    set_var I3, 3, 0
+    #print "hello" to stdout
+    print_s I0, I1, x
+    #print "\n" to stdout
+    print_s I0, I2, x
+    #exit with status 0
+    exit I3, x, x
+
+
 =head2 Binary Representation
 
 M0's binary representation will be composed of a fixed header, a single
