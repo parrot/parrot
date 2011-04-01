@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 78;
+plan tests => 79;
 
 =head1 NAME
 
@@ -151,6 +151,15 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_string_keyed_int")
     Parrot_printf(interp,"%Ss\n", string);
 CODE
 
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(set|get)_number_keyed");
+    Parrot_PMC_set_number_keyed(interp, rpa, key_int, 42.0);
+    number = Parrot_PMC_get_number_keyed(interp, rpa, key_int);
+    Parrot_printf(interp,"%.02f\n", number);
+CODE
+42.00
 Done!
 OUTPUT
 
