@@ -98,11 +98,13 @@ void dotest(Parrot_Interp interp, void *unused)
 {
     Parrot_PMC pmc, pmc2, pmc3, pmc_string, pmc_string2, pmc_string3;
     Parrot_PMC pmc_float, pmc_float2;
-    Parrot_PMC rpa, rpa2, fpa, hash;
+    Parrot_PMC rpa, rpa2, fpa, hash, hash_iter, continuation;
     Parrot_PMC key_int, key_str;
     Parrot_Int type, value, integer, integer2;
     Parrot_Float number, number2;
     Parrot_String string, string2;
+
+    continuation    = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Continuation"));
 
     type   = Parrot_PMC_typenum(interp, "Integer");
     rpa    = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
@@ -114,6 +116,9 @@ void dotest(Parrot_Interp interp, void *unused)
     pmc3   = Parrot_PMC_new(interp, type);
     key_int   = Parrot_key_new_integer(interp, 42);
     key_str   = Parrot_key_new_cstring(interp, "blarg");
+
+    Parrot_PMC_push_pmc(interp, rpa2, continuation);
+
 
     pmc_string = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
     pmc_string2 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
@@ -145,6 +150,23 @@ CODE
 }
 
 # actual tests start here
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_set_pointer");
+    Parrot_PMC_set_pointer(interp, continuation , 42);
+    Parrot_printf(interp,"42\n");
+CODE
+42
+Done!
+OUTPUT
+
+# TODO: Find PMC where we can call this vtable
+#extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_set_pointer_keyed_int");
+#    Parrot_PMC_set_pointer_keyed_int(interp, rpa2, 0, 42);
+#    Parrot_printf(interp,"42\n");
+CODE
+#42
+#Done!
+#OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_set_pmc");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
