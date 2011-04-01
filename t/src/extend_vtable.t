@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 83;
+plan tests => 86;
 
 =head1 NAME
 
@@ -150,6 +150,16 @@ CODE
 }
 
 # actual tests start here
+
+#Parrot_PMC_splice( PARROT_INTERP, Parrot_PMC pmc, Parrot_PMC value, Parrot_Int offset, Parrot_Int count )
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_splice");
+    Parrot_PMC_splice( interp, rpa, rpa2, 0, 1 );
+    Parrot_printf(interp,"42\n");
+CODE
+42
+Done!
+OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_set_pointer");
     Parrot_PMC_set_pointer(interp, continuation , 42);
