@@ -7,9 +7,9 @@
 This document defines the requirements and implementation strategy for
 Parrot's concurrency models.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 

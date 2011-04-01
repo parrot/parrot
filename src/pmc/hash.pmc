@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -62,12 +62,11 @@ static void entry_type_must_be_pmc(PARROT_INTERP)
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC* get_next_hash(PARROT_INTERP,
-    ARGMOD(Hash *hash),
-    ARGIN(void *key))
+    ARGIN(const Hash *hash),
+    ARGIN(const void *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*hash);
+        __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_cannot_autovivify_nested __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -82,7 +81,8 @@ static PMC* get_next_hash(PARROT_INTERP,
 
 /*
 
-=item C<static PMC* get_next_hash(PARROT_INTERP, Hash *hash, void *key)>
+=item C<static PMC* get_next_hash(PARROT_INTERP, const Hash *hash, const void
+*key)>
 
 Get the next hash for multipart keys. Autovivify a hash if it doesn't exist.
 
@@ -93,10 +93,9 @@ Get the next hash for multipart keys. Autovivify a hash if it doesn't exist.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC*
-get_next_hash(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
+get_next_hash(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(const void *key))
 {
     ASSERT_ARGS(get_next_hash)
-    PMC        *next_hash;
     HashBucket *bucket;
 
     if (hash->entry_type != enum_type_PMC)
@@ -105,11 +104,9 @@ get_next_hash(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
     bucket = Parrot_hash_get_bucket(interp, hash, key);
 
     if (bucket)
-        next_hash = (PMC *)bucket->value;
+        return (PMC *)bucket->value;
     else
         return PMCNULL;
-
-    return next_hash;
 }
 
 pmclass Hash provides hash auto_attrs {
@@ -188,6 +185,14 @@ Creates and returns a clone of the hash.
 
         Parrot_hash_clone(INTERP, (Hash *)SELF.get_pointer(),
                    (Hash *)VTABLE_get_pointer(INTERP, dest));
+        /*
+         * Trigger write barrier.
+         *
+         * If GC was triggered during deep clone of hash than C<dest>
+         * will be moved into Gen1 without making it dirty. So, half
+         * of keys/values will not be marked during next cycle.
+         */
+        PARROT_GC_WRITE_BARRIER(INTERP, dest);
 
         return dest;
     }
@@ -234,25 +239,23 @@ NB: this method will destroy all old data!
                                     ? old_hash->entry_type
                                     : enum_type_PMC;
 
-        if (type == Hash_key_type_STRING)
+        switch (type) {
+          case Hash_key_type_int:
+          case Hash_key_type_STRING:
+          case Hash_key_type_PMC:
+          case Hash_key_type_PMC_ptr:
+          case Hash_key_type_STRING_enc:
             new_hash = Parrot_hash_create(INTERP,
                     entry_type,
-                    Hash_key_type_STRING);
-        else if (type == Hash_key_type_int)
-            /* new_int_hash set BOTH keys and values to INTVAL */
-            new_hash = Parrot_hash_create(INTERP,
-                    entry_type,
-                    Hash_key_type_int);
-        else if (type == Hash_key_type_PMC)
-            /* new_int_hash set BOTH keys and values to INTVAL */
-            new_hash = Parrot_hash_create(INTERP,
-                    entry_type,
-                    Hash_key_type_PMC);
-        else
+                    (Hash_key_type)type);
+            break;
+
+          default:
             /* We probably will not implement other types of keys. They are way
              * too dangerous to use from PIR */
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Hash: Unknown key type");
+        }
 
 
         PARROT_HASH(SELF)->hash = new_hash;
@@ -291,7 +294,7 @@ NB: this method will destroy all old data!
 =cut
 */
     METHOD set_value_type(INTVAL type) {
-        Hash *old_hash = (Hash *)SELF.get_pointer();
+        Hash * const old_hash = (Hash *)SELF.get_pointer();
         Hash *new_hash;
 
         /*
@@ -322,7 +325,7 @@ NB: this method will destroy all old data!
     }
 
     METHOD get_value_type() {
-        INTVAL ret = ((Hash *)SELF.get_pointer())->entry_type;
+        const INTVAL ret = ((Hash *)SELF.get_pointer())->entry_type;
         RETURN(INTVAL ret);
     }
 
@@ -380,7 +383,7 @@ Return a representation of the hash contents.
 
     VTABLE STRING *get_repr() {
         PMC * const iter = VTABLE_get_iter(INTERP, SELF);
-        PMC          *sb = Parrot_pmc_new(INTERP, enum_class_StringBuilder);
+        PMC * const sb   = Parrot_pmc_new(INTERP, enum_class_StringBuilder);
         const INTVAL n   = VTABLE_elements(INTERP, SELF);
         INTVAL       j;
 
@@ -491,7 +494,7 @@ Returns the integer value for the element at C<*key>.
         void * const hash_key = Parrot_hash_key_from_pmc(INTERP, hash, key);
 
         if (PObj_constant_TEST(SELF)
-        && !PObj_constant_TEST((PObj *)key))
+        && !PObj_constant_TEST((const PObj *)key))
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_INVALID_OPERATION,
                 "Used non-constant PMC key in constant hash.");

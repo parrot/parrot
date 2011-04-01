@@ -26,7 +26,7 @@ t/pmc/file.t - Files functions
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/file.t
+    % prove t/dynpmc/file.t
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,4 @@
-Parrot-Version 3.0.0
+Parrot-Version 3.2.0
 --------------------
 
 Parrot ist lizenziert (C) 2001-2011, Parrot Foundation.
@@ -103,7 +103,7 @@ und Linker genau zu spezifizieren. Wenn Sie zum Beispiel das Kompilieren
 von C-Dateien mit 'cc', C++ Dateien mit 'CC' und alles mit 'CC' zusammenbinden
 wollen, müssten Sie eingeben:
 
-    perl Configure.pl --cc=cc --cxx=CC --link=CC --ld=CC
+    perl Configure.pl --cc=cc --link=CC --ld=CC
 
 Mehr Informationen über Optionen gibt das Kommando "perl Configure.pl --help"
 aus. Mehr Details finden Sie in der Datei "docs/configuration.pod".

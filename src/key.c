@@ -477,7 +477,6 @@ Parrot_key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
     STRING * const quote     = CONST_STRING(interp, "'");
     STRING * const P         = CONST_STRING(interp, "P");
     STRING * const S         = CONST_STRING(interp, "S");
-    STRING * const N         = CONST_STRING(interp, "N");
     STRING * const I         = CONST_STRING(interp, "I");
     STRING        *value     = Parrot_str_new(interp, "[ ", 2);
     PMC           *next_key;

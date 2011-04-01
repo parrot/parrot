@@ -152,6 +152,7 @@ PMC *
 Parrot_pmc_new(PARROT_INTERP, INTVAL base_type)
 {
     ASSERT_ARGS(Parrot_pmc_new)
+    PARROT_ASSERT(interp->n_vtable_max > base_type);
     PARROT_ASSERT(interp->vtables[base_type]);
     {
         PMC *const classobj = interp->vtables[base_type]->pmc_class;
@@ -251,6 +252,7 @@ Parrot_pmc_reuse_noinit(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type)
     ASSERT_ARGS(Parrot_pmc_reuse_noinit)
 
     if (pmc->vtable->base_type != new_type) {
+        Parrot_UInt    gc_flags   = pmc->flags & PObj_GC_all_FLAGS;
         VTABLE * const new_vtable = interp->vtables[new_type];
 
         /* Singleton/const PMCs/types are not eligible */
@@ -259,7 +261,14 @@ Parrot_pmc_reuse_noinit(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type)
         /* Free the old PMC resources. */
         Parrot_pmc_destroy(interp, pmc);
 
-        PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG);
+        /*
+         * We can reuse PMC from older generation. Preserve and soil it.
+         *
+         * FIXME It's abstraction leak. And it's really strange idea of reusing
+         * PMCs...
+         */
+        PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG | gc_flags);
+        PARROT_GC_WRITE_BARRIER(interp, pmc);
 
         /* Set the right vtable */
         pmc->vtable = new_vtable;
@@ -799,8 +808,8 @@ Boxes a STRING C<string> into a String PMC.
 
 */
 
+PARROT_EXPORT
 PARROT_HOT
-PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_pmc_box_string(PARROT_INTERP, ARGIN_NULLOK(STRING *string))
@@ -824,8 +833,8 @@ Lookup the PMC type which is used for floating point numbers.
 
 */
 
+PARROT_EXPORT
 PARROT_HOT
-PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_pmc_box_number(PARROT_INTERP, FLOATVAL value)
@@ -848,8 +857,8 @@ Lookup the PMC type which is used for storing native integers.
 
 */
 
+PARROT_EXPORT
 PARROT_HOT
-PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)
@@ -873,6 +882,7 @@ Take a C string array and a count, and box it into a string array PMC
 */
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_pmc_box_c_string_array(PARROT_INTERP, int count, ARGIN(const char **s))
 {
@@ -949,7 +959,6 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
     &&  (_class == _class->vtable->pmc_class))
         interp->vtables[type]->pmc_class = _class;
     else {
-        gc_flag_CLEAR(is_special_PMC, _class);
         PObj_is_PMC_shared_CLEAR(_class);
         interp->vtables[type]->pmc_class = _class;
     }

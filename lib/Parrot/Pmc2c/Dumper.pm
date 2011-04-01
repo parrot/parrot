@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
+# Copyright (C) 2004-2011, Parrot Foundation.
 package Parrot::Pmc2c::Dumper;
 
 use strict;
@@ -143,7 +143,6 @@ sub gen_parent_lookup_info {
 }
 
 =head2 Subroutines
-
 
 =head3 C<gen_parent_reverse_lookup_info()>
 

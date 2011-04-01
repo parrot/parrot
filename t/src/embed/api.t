@@ -11,7 +11,7 @@ use Parrot::Test::Util 'create_tempfile';
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 2;
+plan tests => 3;
 
 =head1 NAME
 
@@ -170,6 +170,76 @@ int main(void) {
 }
 CODE
 executed
+OUTPUT
+
+(undef, $temp_pir)  = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
+open $PIR_FILE, ">", $temp_pir;
+print $PIR_FILE <<'PIR_CODE';
+.sub main :main
+    .param pmc args
+    $P0 = newclass "MyObject"
+.end
+
+.namespace ["MyObject"]
+
+.sub "MyMethod" :method
+    say "executed MyMethod"
+.end
+PIR_CODE
+
+c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_reset_call_signature" );
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/api.h"
+
+int main(void) {
+    Parrot_PMC interp;
+    Parrot_PMC bytecode;
+    int run_pbc;
+    Parrot_String filename;
+    int i;
+    Parrot_String signature_s;
+    Parrot_String callcontext_s, myobject_s, mymethod_s;
+    Parrot_PMC callcontext_sp, myobject_sp;
+    Parrot_PMC callcontext_class, myobject_class;
+    Parrot_PMC callcontext, myobject, mymethod;
+
+    Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+    Parrot_api_string_import(interp, "$temp_pir", &filename);
+    Parrot_api_toggle_gc(interp, 0);
+    Parrot_api_wrap_imcc_hack(interp, filename, 0, NULL, &bytecode, &run_pbc, imcc_run_api);
+    Parrot_api_run_bytecode(interp, bytecode, NULL);
+
+    Parrot_api_string_import_ascii(interp, "Pi->", &signature_s);
+
+    Parrot_api_string_import_ascii(interp, "CallContext", &callcontext_s);
+    Parrot_api_pmc_box_string(interp, callcontext_s, &callcontext_sp);
+    Parrot_api_pmc_get_class(interp, callcontext_sp, &callcontext_class);
+    Parrot_api_pmc_new_from_class(interp, callcontext_class, NULL, &callcontext);
+
+    Parrot_api_string_import_ascii(interp, "MyObject", &myobject_s);
+    Parrot_api_pmc_box_string(interp, myobject_s, &myobject_sp);
+    Parrot_api_pmc_get_class(interp, myobject_sp, &myobject_class);
+    Parrot_api_pmc_new_from_class(interp, myobject_class, NULL, &myobject);
+
+    Parrot_api_string_import_ascii(interp, "MyMethod", &mymethod_s);
+    Parrot_api_pmc_find_method(interp, myobject, mymethod_s, &mymethod);
+
+    for (i = 0; i < 5; i++) {
+        Parrot_api_pmc_set_string(interp, callcontext, signature_s);
+        Parrot_api_pmc_set_keyed_int(interp, callcontext, 0, myobject);
+        Parrot_api_pmc_invoke(interp, mymethod, callcontext);
+        Parrot_api_reset_call_signature(interp, callcontext);
+    }
+    return 0;
+}
+CODE
+executed MyMethod
+executed MyMethod
+executed MyMethod
+executed MyMethod
+executed MyMethod
 OUTPUT
 
 # Local Variables:

@@ -93,10 +93,12 @@ void encoding_ord_error(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL encoding_rindex(PARROT_INTERP,
-    SHIM(const STRING *src),
-    SHIM(const STRING *search_string),
-    NULLOK(INTVAL offset))
-        __attribute__nonnull__(1);
+    ARGIN(const STRING *src),
+    ARGIN(const STRING *search),
+    INTVAL offset)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 STRING * encoding_substr(PARROT_INTERP,
@@ -138,21 +140,19 @@ INTVAL fixed8_equal(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-INTVAL fixed8_find_cclass(PARROT_INTERP,
+INTVAL fixed8_find_cclass(SHIM_INTERP,
     INTVAL flags,
     ARGIN(const STRING *src),
     UINTVAL offset,
     UINTVAL count)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-INTVAL fixed8_find_not_cclass(PARROT_INTERP,
+INTVAL fixed8_find_not_cclass(SHIM_INTERP,
     INTVAL flags,
     ARGIN(const STRING *src),
     UINTVAL offset,
     UINTVAL count)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
@@ -169,25 +169,22 @@ INTVAL fixed8_index(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-INTVAL fixed8_is_cclass(PARROT_INTERP,
+INTVAL fixed8_is_cclass(SHIM_INTERP,
     INTVAL flags,
     ARGIN(const STRING *src),
     UINTVAL offset)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-UINTVAL fixed8_iter_get(PARROT_INTERP,
+UINTVAL fixed8_iter_get(SHIM_INTERP,
     ARGIN(const STRING *str),
     ARGIN(const String_iter *iter),
     INTVAL offset)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-UINTVAL fixed8_iter_get_and_advance(PARROT_INTERP,
+UINTVAL fixed8_iter_get_and_advance(SHIM_INTERP,
     ARGIN(const STRING *str),
     ARGMOD(String_iter *iter))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*iter);
@@ -310,7 +307,9 @@ STRING* unicode_upcase_first(PARROT_INTERP, SHIM(const STRING *src))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_encoding_rindex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(search))
 #define ASSERT_ARGS_encoding_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -330,11 +329,9 @@ STRING* unicode_upcase_first(PARROT_INTERP, SHIM(const STRING *src))
     , PARROT_ASSERT_ARG(lhs) \
     , PARROT_ASSERT_ARG(rhs))
 #define ASSERT_ARGS_fixed8_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
+       PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_fixed8_find_not_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
+       PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_fixed8_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_fixed8_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -342,15 +339,12 @@ STRING* unicode_upcase_first(PARROT_INTERP, SHIM(const STRING *src))
     , PARROT_ASSERT_ARG(src) \
     , PARROT_ASSERT_ARG(search))
 #define ASSERT_ARGS_fixed8_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
+       PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_fixed8_iter_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(str) \
+       PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(iter))
 #define ASSERT_ARGS_fixed8_iter_get_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(str) \
+       PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(iter))
 #define ASSERT_ARGS_fixed8_iter_set_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

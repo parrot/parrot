@@ -53,7 +53,7 @@ IMCC into Parrot and now IMCC is B<the> front-end for the Parrot VM.
 =head2 Parrot is a VM, why does it need IMCC builtin?
 
 Static languages, such as Java, can run on VMs that are dedicated to execution
-of pre-compiled byte code with no problems. Languages such as Perl, Ruby and
+of pre-compiled bytecode with no problems. Languages such as Perl, Ruby and
 Python are not so static. They have support for runtime evaluation and
 compilation and their parsers are always available. These languages run on
 their own "dynamic" interpreters.

@@ -495,7 +495,7 @@ try_load_path(PARROT_INTERP, ARGIN(STRING* path))
     path = cnv_to_win32_filesep(interp, path);
 #endif
 
-    if (Parrot_stat_info_intval(interp, path, STAT_EXISTS)) {
+    if (Parrot_file_stat_intval(interp, path, STAT_EXISTS)) {
         return path;
     }
 

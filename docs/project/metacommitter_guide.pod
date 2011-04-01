@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 Metacommitter Guide
 
@@ -16,13 +16,9 @@ the Metacommitter can add commit rights.
 
 =item 1
 
-Create an account on L<https://trac.parrot.org/parrot>.
+Create an account on L<https://github.com>
 
 =back
-
-You only need to create one account for both the "parrot" and
-"languages" repositories, though the Metacommitter will need to grant
-permissions to the two repositories separately.
 
 =head2 Instructions for the Metacommitter
 
@@ -33,41 +29,18 @@ the Metacommitter can add commit rights.
 
 =item 1
 
-Login to Trac at L<https://trac.parrot.org/parrot/>
+Go to the Parrot Developers Team in the Parrot Github Organization
+L<https://github.com/organizations/parrot/teams/12270>
 
 =item 2
 
-Navigate to the Admin -> Permissions page,
-L<https://trac.parrot.org/parrot/admin/general/perm>
-
-=item 3
-
-If the user is not already in the "developer" group (for access to
-administer tickets), enter the username in the "Add Subject to Group"
-box, and add them to the "developer" group.
-
-
-=item 4
-
-Navigate to the Admin -> Subversion Access page
-L<https://trac.parrot.org/parrot/admin/subversion/svnauthz> and select
-the "parrot_committers" group.
-
-=item 5
-
-Select the username from the "Add Group Member to parrot_committers"
-listbox, and click the "Add" button. (Note that the username won't
-appear in the drop box until they've been granted "developer"
-permissions.)
+Scroll down to the bottom of the page, type in the username of the
+Github user that you want to give commit access, and press "Add".
 
 =back
 
 Congratulate the new member publicly by sending an email to
 parrot-dev@lists.parrot.org, and copying the new committer.
-
-The steps for the "languages" repository and Trac instance are the same,
-except the URLs are L<https://trac.parrot.org/languages/...> and the
-committer group is "languages_committers".
 
 Note that commit messages from the new member will be automatically held
 pending list-admin approval.

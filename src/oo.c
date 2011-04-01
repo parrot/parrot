@@ -48,7 +48,7 @@ static INTVAL fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
         __attribute__nonnull__(2);
 
 PARROT_INLINE
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC * get_pmc_proxy(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
@@ -359,7 +359,7 @@ For internal use only.
 */
 
 PARROT_INLINE
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC *
 get_pmc_proxy(PARROT_INTERP, INTVAL type)
@@ -921,8 +921,8 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
     INTVAL         i;
 
     for (i = 0; i < n; ++i) {
-        PMC * const _class    = VTABLE_get_pmc_keyed_int(interp, mro, i);
-        PMC * const ns        = VTABLE_get_namespace(interp, _class);
+        PMC * const _class_i  = VTABLE_get_pmc_keyed_int(interp, mro, i);
+        PMC * const ns        = VTABLE_get_namespace(interp, _class_i);
         PMC * const class_obj = VTABLE_inspect_str(interp, ns, class_str);
         PMC        *method    = PMCNULL;
         PMC        *method_hash;
@@ -938,7 +938,7 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
         if (PMC_IS_NULL(method))
             method = VTABLE_get_pmc_keyed_str(interp, ns, method_name);
 
-        TRACE_FM(interp, _class, method_name, method);
+        TRACE_FM(interp, _class_i, method_name, method);
 
         if (!PMC_IS_NULL(method))
             return method;

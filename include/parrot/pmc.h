@@ -21,11 +21,30 @@
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_pmc_box_c_string_array(PARROT_INTERP,
     int count,
     ARGIN(const char **s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
+
+PARROT_EXPORT
+PARROT_HOT
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_HOT
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_pmc_box_number(PARROT_INTERP, FLOATVAL value)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_HOT
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_pmc_box_string(PARROT_INTERP, ARGIN_NULLOK(STRING *string))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 void Parrot_pmc_create_mro(PARROT_INTERP, INTVAL type)
@@ -152,24 +171,6 @@ PMC * Parrot_pmc_reuse_init(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-PARROT_HOT
-PARROT_INLINE
-PARROT_CANNOT_RETURN_NULL
-PMC* Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)
-        __attribute__nonnull__(1);
-
-PARROT_HOT
-PARROT_INLINE
-PARROT_CANNOT_RETURN_NULL
-PMC* Parrot_pmc_box_number(PARROT_INTERP, FLOATVAL value)
-        __attribute__nonnull__(1);
-
-PARROT_HOT
-PARROT_INLINE
-PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_pmc_box_string(PARROT_INTERP, ARGIN_NULLOK(STRING *string))
-        __attribute__nonnull__(1);
-
 void Parrot_pmc_free_temporary(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -191,6 +192,12 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pmc_box_c_string_array __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_pmc_box_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pmc_box_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pmc_box_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pmc_create_mro __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pmc_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -241,12 +248,6 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(init))
-#define ASSERT_ARGS_Parrot_pmc_box_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_pmc_box_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_pmc_box_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pmc_free_temporary __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))

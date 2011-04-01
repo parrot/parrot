@@ -34,7 +34,7 @@ pasm_error_output_like( <<"CODE", <<'OUTPUT', '32bit seek: exception (ops)' );
    say "error!"
    end
 CODE
-/seek failed \(32bit\)/
+/seek failed/
 OUTPUT
 
 pasm_error_output_like( <<"CODE", <<'OUTPUT', '64bit seek: exception (ops)' );
@@ -45,7 +45,7 @@ pasm_error_output_like( <<"CODE", <<'OUTPUT', '64bit seek: exception (ops)' );
    say "error!"
    end
 CODE
-/seek failed \(64bit\)/
+/seek failed/
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "peek (ops)" );

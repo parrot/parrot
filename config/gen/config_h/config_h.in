@@ -37,9 +37,17 @@ typedef @int2_t@                Parrot_Int2;
 typedef unsigned @int2_t@       Parrot_UInt2;
 typedef @int4_t@                Parrot_Int4;
 typedef unsigned @int4_t@       Parrot_UInt4;
+#if @HAS_INT64@
+typedef @int8_t@                Parrot_Int8;
+typedef unsigned @int8_t@       Parrot_UInt8;
+#endif
 
 typedef @float4_t@              Parrot_Float4;
 typedef @float8_t@              Parrot_Float8;
+
+/* Required for proper compilation of StructView PMC */
+#define HAS_LONGLONG            @HAS_LONGLONG@
+#define HAS_INT64               @HAS_INT64@
 
 #ifndef PARROT_INTVAL_MIN
 #  define PARROT_INTVAL_MIN              @intvalmin@
@@ -82,6 +90,17 @@ struct PackFile;      typedef struct PackFile * Parrot_PackFile;
 
 #define PARROT_NOINLINE @noinline@
 
+/*
+ * GC_DEFAULT_TYPE selection
+ * MS  -- stop-the-world mark & sweep
+ * INF -- infinite memory "collector"
+ * MS2 -- new style mark & sweep
+ * GMS -- Generational M&S based on MS2
+ */
+#ifndef PARROT_GC_DEFAULT_TYPE
+#  define PARROT_GC_DEFAULT_TYPE @gc_type@
+#endif
+
 #if defined(PARROT_IN_CORE)
 
 /* Put any other symbols here. */
@@ -104,32 +123,13 @@ typedef @hugefloatval@ HUGEFLOATVAL;
 
 #define INTVAL_SIZE @intvalsize@
 #define NUMVAL_SIZE @nvsize@
-#define OPCODE_T_SIZE @opcode_t_size@
+#define OPCODE_T_SIZE @opcodesize@
 #define PTR_SIZE @ptrsize@
 #define SHORT_SIZE @shortsize@
 #define INT_SIZE @intsize@
 #define LONG_SIZE @longsize@
 #define HUGEINTVAL_SIZE @hugeintvalsize@
 #define DOUBLE_SIZE @doublesize@
-
-/* We don't have a portable config for 64-bit
- * registers yet. */
-#if 0
-#  if INTVAL_SIZE >= 8
-typedef Parrot_Int   INTVAL64;
-typedef Parrot_Int   Parrot_Int64;
-#  else
-#    if HUGEINTVAL_SIZE >= 8
-typedef HUGEINTVAL   INTVAL64;
-typedef HUGEINTVAL   Parrot_Int64;
-#    else
-/* No 64-bit type available? */
-typedef union { unsigned char b[8]; } INTVAL64;
-typedef INTVAL64   Parrot_Int64;
-#    endif
-#  endif
-#endif
-
 
 typedef Parrot_Opcode opcode_t;
 typedef size_t ptrcast_t;

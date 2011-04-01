@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -123,10 +123,9 @@ Join the thread, returning whatever its main method returns.
 
 */
     METHOD join() {
-        PMC *ret;
-        INTVAL ttid = VTABLE_get_integer(INTERP, SELF);
+        const INTVAL ttid = VTABLE_get_integer(INTERP, SELF);
+        PMC * const ret = pt_thread_join(INTERP, ttid);
 
-        ret = pt_thread_join(INTERP, ttid);
         /* invalidate self */
         VTABLE_set_integer_native(INTERP, SELF, -1);
 

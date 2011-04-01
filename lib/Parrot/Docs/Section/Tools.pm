@@ -83,7 +83,7 @@ sub new {
             '',
             $self->new_item( '', 'tools/dev/gen_class.pl' ),
             $self->new_item( '', 'tools/dev/nm.pl' ),
-            $self->new_item( '', 'tools/dev/ncidef2pasm.pl' ),
+            $self->new_item( '', 'tools/dev/ncidef2pir.pl' ),
             $self->new_item( '', 'tools/dev/pbc_header.pl' ),
         ),
         $self->new_group(

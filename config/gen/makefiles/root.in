@@ -55,6 +55,7 @@ BUILD_TOOLS_DIR = tools/build
 # directory for developers' tools
 # programs, templates, configuration files NOT invoked by 'make all'
 DEV_TOOLS_DIR = tools/dev
+RELEASE_TOOLS_DIR = tools/release
 
 # directory for header files
 INC_DIR         = include/parrot
@@ -91,7 +92,7 @@ C_LIBS           = @libs@
 CC_SHARED        = @cc_shared@
 CC_O_OUT         = @cc_o_out@
 CC_WARN          = @ccwarn@
-CFLAGS           = $(CC_INC) @ccflags@ @cc_build_call_frames@ @cc_debug@ @gc_flag@ @clock_best@ $(CC_SHARED)
+CFLAGS           = $(CC_INC) @ccflags@ @cc_build_call_frames@ @cc_debug@ @clock_best@ $(CC_SHARED)
 LINK_DYNAMIC     = @link_dynamic@
 LINK             = @link@
 LINKFLAGS        = @linkflags@ @link_debug@ @ld_debug@
@@ -169,7 +170,6 @@ GEN_CONFIGS = \
 #IF(has_glut):    src/glut_callbacks.c \
     src/core_pmcs.c \
     config_lib.pir \
-    parrot.pc \
     compilers/imcc/imcc.y.flag \
     compilers/imcc/imcc.l.flag
 
@@ -398,7 +398,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/multidispatch.h \
 	$(INC_DIR)/library.h \
 	$(INC_DIR)/namespace.h \
-	$(INC_DIR)/stat.h \
 	$(INC_DIR)/hll.h \
 	$(INC_DIR)/pbcversion.h \
 	$(INC_DIR)/pobj.h \
@@ -453,10 +452,12 @@ INTERP_O_FILES = \
     src/extend$(O) \
     src/extend_vtable$(O) \
     src/gc/alloc_memory$(O) \
+    src/gc/alloc_resources$(O) \
     src/gc/api$(O) \
     src/gc/gc_ms$(O) \
     src/gc/gc_inf$(O) \
     src/gc/gc_ms2$(O) \
+    src/gc/gc_gms$(O) \
     src/gc/mark_sweep$(O) \
     src/gc/system$(O) \
     src/gc/fixed_allocator$(O) \
@@ -506,7 +507,6 @@ INTERP_O_FILES = \
     src/longopt$(O) \
     @TEMP_platform_o@ \
     @TEMP_atomic_o@ \
-    @TEMP_gc_o@ \
 
 OPS_FILES = @ops@
 
@@ -545,7 +545,7 @@ INSTALLABLEOPS2C    = .@slash@installable_ops2c$(EXE)
 
 # Libraries
 LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
-#IF(darwin):export DYLD_LIBRARY_PATH := @blib_dir@:$(DYLD_LIBRARY_PATH)
+#IF(darwin):export DYLD_LIBRARY_PATH := @build_dir@/@blib_dir@:$(DYLD_LIBRARY_PATH)
 #IF(win32):LIBPARROT_SHARED  = @libparrot_shared@
 #ELSE:LIBPARROT_SHARED  = @blib_dir@/@libparrot_shared@
 
@@ -572,7 +572,8 @@ EXTRANCITHUNKS_SO   = $(DYNEXT_DIR)/extra_nci_thunks$(LOAD_EXT)
 # This is set to MAKE=$make if your $make command doesn't
 # do it for you.
 @make_set_make@
-MAKE = @make_c@
+MAKE = @make@
+MAKE_C = @make_c@
 
 # These need to be above lines that define suffix rules to be portable
 # (certainly FreeBSD make doesn't grok the pir.pbc rule otherwise)
@@ -610,7 +611,6 @@ all : \
     corevm \
     docs \
 #IF(has_glut):    $(LIBGLUTCB_SO) \
-#IF(has_dynamic_linking): $(EXTRANCITHUNKS_SO) \
     $(DIS) \
     $(PARROT_CONFIG) \
     $(PBC_TO_EXE) \
@@ -622,11 +622,13 @@ all : \
     $(PGE_LIB_PBCS) \
     $(PCT_LIB_PBCS) \
     $(DATA_JSON_LIB_PBCS) \
+    $(JSON_LANG) \
+#IF(has_dynamic_linking):    $(EXTRANCITHUNKS_SO) \
     $(NQP_LIB_PBCS) \
-#IF(has_dynamic_linking): $(DYNOPLIBS_TARGETS) \
-#IF(has_dynamic_linking): $(LIBNCI_TEST_SO) \
+#IF(has_dynamic_linking):    $(DYNOPLIBS_TARGETS) \
+#IF(has_dynamic_linking):    $(LIBNCI_TEST_SO) \
     $(GEN_LIBRARY) \
-    src/install_config$(O) \
+    src/install_config$(O)
 
 # We build DYNPMC_TARGET in corevm. It's kinda hack to test t/pmc/threads.t CLONE_LIBRARIES
 corevm : \
@@ -756,7 +758,6 @@ help :
 	@echo ""
 	@echo "Documentation:"
 	@echo "  help:              Print this help message."
-	@echo "  docs:              Generate documentation from POD in the sources."
 	@echo "  html:              Generate HTML documentation from POD in the sources."
 	@echo "  html-clean:        Remove the HTML documentation."
 	@echo "  htmlhelp:          Compile HTML documentation (CHM format)."
@@ -806,7 +807,6 @@ help :
 	@echo "  bsdlint:           Code checking with bsdlint."
 	@echo "  sunlint:           Code checking with Sun Studio's sunlint."
 	@echo "  splint:            Code checking with splint."
-	@echo "  splint-all:        Splint all of Parrot, for the masochist only."
 	@echo "  headerizer:        Recreate header files for C-source files"
 	@echo "  apilist:           Show list of PARROT_API functions"
 	@echo "  exportlist:        Show list of PARROT_EXPORT functions"
@@ -822,6 +822,7 @@ help :
 	@echo ""
 	@echo "Release:"
 	@echo "  release:           Create a tarball."
+	@echo "  release_check:     Check that the tarball will build on its own."
 	@echo "  win32-inno-installer:  Create MSWin32 setup."
 	@echo ""
 	@echo "Examples:"
@@ -836,7 +837,7 @@ installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(IN
 
 bootstrap-ops : $(OPS2C)
 	$(OPS2C) --core --quiet
-	$(MAKE) .
+	$(MAKE_C) .
 
 runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
 	$(PARROT) -o $@ runtime/parrot/library/parrotlib.pir
@@ -1234,8 +1235,8 @@ runtime/parrot/include/dlopenflags.pasm : $(INC_DIR)/platform_interface.h $(H2IN
 runtime/parrot/include/datatypes.pasm : $(INC_DIR)/datatypes.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/datatypes.h $@
 
-runtime/parrot/include/stat.pasm : $(INC_DIR)/stat.h $(H2INC)
-	$(PERL) $(H2INC) $(INC_DIR)/stat.h $@
+runtime/parrot/include/stat.pasm : $(INC_DIR)/platform_interface.h $(H2INC)
+	$(PERL) $(H2INC) $(INC_DIR)/platform_interface.h $@
 
 runtime/parrot/include/stringinfo.pasm : $(INC_DIR)/string.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/string.h $@
@@ -1295,7 +1296,7 @@ examples/pasm/hello.pbc: examples/pasm/hello.pasm
 #	$(PARROT) -o examples/pasm/hello$(O) examples/pasm/hello.pbc
 #
 #examples/pasm/hello$(EXE): examples/pasm/hello$(O)
-#	$(MAKE) . EXEC=examples/pasm/hello exec
+#	$(MAKE_C) . EXEC=examples/pasm/hello exec
 examples/pasm/hello$(EXE): examples/pasm/hello.pbc $(PBC_TO_EXE)
 	$(PBC_TO_EXE) examples/pasm/hello.pbc
 
@@ -1382,6 +1383,16 @@ src/gc/fixed_allocator$(O) : \
     src/gc/variable_size_pool.h \
     src/gc/fixed_allocator.h \
     src/gc/fixed_allocator.c
+
+src/gc/gc_gms$(O) : \
+	$(PARROT_H_HEADERS) \
+	src/gc/gc_gms.c \
+    $(INC_DIR)/pointer_array.h \
+	src/gc/gc_private.h \
+	src/gc/fixed_allocator.h \
+	src/gc/variable_size_pool.h
+
+src/gc/api$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/api.c
 
 src/gc/variable_size_pool$(O) : $(PARROT_H_HEADERS) \
 	src/gc/variable_size_pool.h src/gc/variable_size_pool.c
@@ -1630,6 +1641,8 @@ src/platform/generic/error$(O) : src/platform/generic/error.c $(PARROT_H_HEADERS
 
 src/platform/generic/exec$(O) : src/platform/generic/exec.c $(PARROT_H_HEADERS)
 
+src/platform/generic/file$(O) : src/platform/generic/file.c $(PARROT_H_HEADERS)
+
 src/platform/generic/hires_timer$(O) : src/platform/generic/hires_timer.c $(PARROT_H_HEADERS)
 
 src/platform/generic/itimer$(O) : src/platform/generic/itimer.c $(PARROT_H_HEADERS)
@@ -1643,8 +1656,6 @@ src/platform/generic/misc$(O) : src/platform/generic/misc.c $(PARROT_H_HEADERS)
 
 src/platform/generic/socket$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_socket.h \
     src/io/io_private.h include/pmc/pmc_sockaddr.h src/platform/generic/socket.c
-
-src/platform/generic/stat$(O) : src/platform/generic/stat.c $(PARROT_H_HEADERS)
 
 src/platform/generic/sysmem$(O) : src/platform/generic/sysmem.c $(PARROT_H_HEADERS)
 
@@ -1669,6 +1680,8 @@ src/platform/win32/env$(O) : src/platform/win32/env.c $(PARROT_H_HEADERS)
 src/platform/win32/error$(O) : src/platform/win32/error.c $(PARROT_H_HEADERS)
 
 src/platform/win32/exec$(O) : src/platform/win32/exec.c $(PARROT_H_HEADERS)
+
+src/platform/win32/file$(O) : src/platform/win32/file.c $(PARROT_H_HEADERS)
 
 src/platform/win32/hires_timer$(O) : src/platform/win32/hires_timer.c $(PARROT_H_HEADERS)
 
@@ -1897,7 +1910,6 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
     include/pmc/pmc_parrotlibrary.h \
     src/io/io_private.h
 
-@TEMP_gc_c@
 
 @TEMP_pmc_build@
 
@@ -1913,18 +1925,6 @@ $(INC_DIR)/vtable.h : src/vtable.tbl $(BUILD_TOOLS_DIR)/vtable_h.pl lib/Parrot/V
 #
 ###############################################################################
 
-#IF(has_perldoc):docs : docs.dummy
-#ELSE:docs : docs.stub
-
-docs.stub:
-	@echo "Perldoc is required, but not detected."
-
-docs.dummy :
-	$(MAKE) docs
-
-docs-clean :
-	$(MAKE) docs clean
-
 #IF(has_perldoc):html : html.dummy
 #ELSE:html : html.stub
 
@@ -1932,10 +1932,10 @@ html.stub:
 	@echo "Perldoc is required, but not detected."
 
 html.dummy :
-	$(MAKE) docs html
+	$(MAKE_C) docs html
 
 html-clean :
-	$(MAKE) docs html-clean
+	$(MAKE_C) docs html-clean
 
 #IF(has_perldoc):htmlhelp : htmlhelp.dummy
 #ELSE:htmlhelp : htmlhelp.stub
@@ -1944,16 +1944,16 @@ htmlhelp.stub:
 	@echo "Perldoc is required, but not detected."
 
 htmlhelp.dummy :
-	$(MAKE) docs htmlhelp
+	$(MAKE_C) docs htmlhelp
 
 htmlhelp-clean :
-	$(MAKE) docs htmlhelp-clean
+	$(MAKE_C) docs htmlhelp-clean
 
 pdf:
-	$(MAKE) docs pdf
+	$(MAKE_C) docs pdf
 
 pdf-clean:
-	$(MAKE) docs pdf-clean
+	$(MAKE_C) docs pdf-clean
 
 ###############################################################################
 #
@@ -1971,7 +1971,7 @@ ext-clean:
 ###############################################################################
 
 editor-clean :
-	$(MAKE) editor clean
+	$(MAKE_C) editor clean
 
 ###############################################################################
 #
@@ -2228,7 +2228,6 @@ clean : \
     test-clean \
     prog-clean \
     dynext-clean \
-#IF(has_perldoc):    docs-clean \
 #IF(has_perldoc):    html-clean \
     examples-clean \
     ext-clean \
@@ -2371,6 +2370,7 @@ test-clean :
     "t/dynoplibs/*.pbc" \
     "t/op/*.pbc" \
     "t/oo/*.pbc" \
+    "t/pir/*.pbc" \
     "t/pmc/*.pbc" \
     "t/dynpmc/*.pbc" \
     "t/stress/*.pbc" \
@@ -2499,28 +2499,74 @@ bsdlint : $(PARROT)
 	$(LINT) $(CC_INC) "-Iinclude/pmc" $(BSD_LINT_FLAGS) $(BSD_LINT_EXCLUSIONS) $(LINTABLE_CFILES)
 
 # For checking with splint see also
-# http:////trac.parrot.org/parrot/wiki/splint
-# Splint: http:////splint.org
+# http://trac.parrot.org/parrot/wiki/splint
+# Splint: http://splint.org
 SPLINT = splint
 
 # Temp directory for splint.  Add +keep to splintflags if you want work files
 # kept in there after completion.
 SPLINT_TMP = $(TEMPDIR)/splint
 
+# Transfer errors (-mem-trans) are too tough for us right now
+OLD_SPLINTFLAGS_MEMORY_SAFETY = \
+    -mem-trans \
+    -memchecks \
+    +bufferoverflow \
+    +bufferoverflowhigh \
+    +read-only-strings \
+    +read-only-trans \
+    -strict-destroy \
+    -strict-use-released \
+    +use-released \
+    -must-free \
+    -mustfreefresh \
+    -mustfreeonly \
+    +null \
+    +nullptrarith \
+    +nullret \
+    -ptr-arith \
+    +ptr-negate \
+
+# Watch for unsafe comparisons
+OLD_SPLINTFLAGS_UNSAFE_COMPARISONS = \
+    +bool-compare \
+    +ptr-compare \
+    +real-compare \
+    +unsigned-compare
+
+# const and other qualifiers
+# Report qualifier mismatches only if dangerous (+relax-quals)
+OLD_SPLINTFLAGS_QUALIFIERS = \
+    +relax-quals
+
+# Symbol definitions
+OLD_SPLINTFLAGS_SYMBOL_DEFINITIONS = \
+    +decl-undef \
+    +incon-defs \
+    +incon-defs-lib \
+
+# Problems with evaluation and control structions
+OLD_SPLINTFLAGS_EVALUATION = \
+    +controlnestdepth 15 \
+    +duplicate-quals \
+
+
 # Splint flags: http://splint.org/manual/html/appB.html
 # The dashes in the names don't make any difference to Splint, but I've
 # made them match how they are in the manual.  Otherwise, you might be
 # looking for "declundef", except that it's "decl-undef" in the docs.
 SPLINTFLAGS_BASE = \
-    +standard \
-    -hints \
+    +weak \
+    +hints \
     \
     +indentspaces 4 \
     +locindentspaces 4 \
-    +linelen 120 \
+    +linelen 999 \
+    +bugslimit 1000 \
     -message-stream-stdout \
     +showdeephistory \
-    -showfunc \
+    +show-func \
+    +show-column \
     -tmpdir $(SPLINT_TMP) \
     \
     +posix-lib \
@@ -2540,29 +2586,48 @@ SPLINTFLAGS_BASE = \
     -iso-reserved-internal \
     -include-nest 10 \
 
-# Memory safety checks
-# Transfer errors (-mem-trans) are too tough for us right now
-SPLINTFLAGS_MEMORY_SAFETY = \
-    +bufferoverflow \
-    +bufferoverflowhigh \
-    +read-only-strings \
-    +read-only-trans \
-    +strict-destroy \
-    +strict-use-released \
-    +use-released \
-    -must-free \
-    -mustfreefresh \
-    -mustfreeonly \
+SPLINTFLAGS_NULL_DEREFERENCES = \
     +null \
-    +nullptrarith \
     +nullret \
-    -ptr-arith \
-    +ptr-negate \
+
+SPLINTFLAGS_USE_BEFORE_DEFINITION = \
+    +usedef \
+    +incondefs \
+    +functionderef \
+
+SPLINTFLAGS_TYPE = \
+    +string-literal-too-long \
+    +string-literal-no-room \
+    +string-literal-no-room-final-null \
+    +string-literal-smaller \
+    +enum-members \
+    \
+    -pred-bool \
+    -pred-bool-ptr \
+    -pred-bool-int \
+    +pred-bool-others \
+    +pred-assign \
+    +ptrnegate \
     -zero-ptr \
-    -mem-trans
+    \
+    +charunsignedchar \
+    +char-index \
+    +char-int \
+    \
+    +format-code \
+    +format-type \
+    \
+    +ignore-signs \
+    +long-unsigned-unsigned-integral \
+
+SPLINTFLAGS_MEMORY_MANAGEMENT = \
+
+SPLINTFLAGS_SHARING = \
+
+SPLINTFLAGS_FUNCTION_INTERFACE = \
 
 # Macro safety checks
-SPLINTFLAGS_MACRO_SAFETY = \
+SPLINTFLAGS_MACRO = \
     +macro-assign \
     +macro-empty \
     +macro-parens \
@@ -2570,51 +2635,17 @@ SPLINTFLAGS_MACRO_SAFETY = \
     +macro-stmt \
     +macro-unrecog \
 
-# Watch for unsafe comparisons
-SPLINTFLAGS_UNSAFE_COMPARISONS = \
-    +bool-compare \
-    +ptr-compare \
-    +real-compare \
-    +unsigned-compare
+SPLINTFLAGS_NAMING = \
 
-# But allow us some slop in boolean comparisons
-SPLINTFLAGS_BOOLEAN_SLOP = \
-    -pred-bool-int \
-    -pred-bool-ptr \
-    -pred-bool-others \
-    -boolops \
-
-# const and other qualifiers
-# Report qualifier mismatches only if dangerous (+relax-quals)
-SPLINTFLAGS_QUALIFIERS = \
-    +relax-quals
-
-# Symbol definitions
-SPLINTFLAGS_SYMBOL_DEFINITIONS = \
-    +decl-undef \
-    +incon-defs \
-    +incon-defs-lib \
-
-# Format codes
-SPLINTFLAGS_FORMAT = \
-    +format-code \
-    +format-type \
-
-# Problems with evaluation and control structions
-SPLINTFLAGS_EVALUATION = \
-    +controlnestdepth 15 \
-    +duplicate-quals \
+SPLINTFLAGS_CONTROL_FLOW = \
     +eval-order \
     +eval-order-uncon \
 
-# Types and stuff
-SPLINTFLAGS_TYPES = \
-    +char-index \
-    +char-int \
-    +enum-members \
-    +ignore-signs \
-    +long-integral \
-    +match-any-integral \
+SPLINTFLAGS_MEMORY_BOUNDS = \
+
+SPLINTFLAGS_COMPLETENESS = \
+
+SPLINTFLAGS_MISCELLANEOUS = \
 
 # Other options we'd like to add back
 # +initallelements : Right now, the *.ops files don't initialize all
@@ -2631,30 +2662,35 @@ SPLINTFLAGS_TEST =
 
 SPLINTFLAGS = \
 	$(SPLINTFLAGS_BASE) \
-	$(SPLINTFLAGS_MEMORY_SAFETY) \
-	$(SPLINTFLAGS_MACRO_SAFETY) \
-	$(SPLINTFLAGS_UNSAFE_COMPARISONS) \
-	$(SPLINTFLAGS_BOOLEAN_SLOP) \
-	$(SPLINTFLAGS_QUALIFIERS) \
-	$(SPLINTFLAGS_SYMBOL_DEFINITIONS) \
-	$(SPLINTFLAGS_FORMAT) \
-	$(SPLINTFLAGS_EVALUATION) \
-	$(SPLINTFLAGS_TYPES) \
+	$(SPLINTFLAGS_NULL_DEREFERENCES) \
+	$(SPLINTFLAGS_USE_BEFORE_DEFINITION) \
+	$(SPLINTFLAGS_TYPE) \
+	$(SPLINTFLAGS_MEMORY_MANAGEMENT) \
+	$(SPLINTFLAGS_SHARING) \
+	$(SPLINTFLAGS_FUNCTION_INTERFACE) \
+	$(SPLINTFLAGS_MACRO) \
+	$(SPLINTFLAGS_NAMING) \
+	$(SPLINTFLAGS_CONTROL_FLOW) \
+	$(SPLINTFLAGS_MEMORY_BOUNDS) \
+	$(SPLINTFLAGS_COMPLETENESS) \
+	$(SPLINTFLAGS_MISCELLANEOUS) \
 
-SPLINT_SOURCE = `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
-
-splint-all : $(PARROT)
-	$(MKPATH) $(SPLINT_TMP)
-	$(SPLINT) $(CC_INC) "-Iinclude/pmc" "-Icompilers/ast" $(SPLINTFLAGS) \
-	$(SPLINT_SOURCE) \
-	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) compilers/imcc/main.c
+#SPLINT_SOURCE = `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@ | sort`
+SPLINT_SOURCE = \
+	$$(find src/*.c src/{gc,io,packfile,string}/*.c -type f | \
+	grep -v src/gc/malloc.c | \
+	grep -v src/gc/malloc_trace.c | \
+	grep -v extra_nci_thunks.c | \
+	grep -v extend_vtable.c | \
+	grep -v nci_test.c | \
+	sort)
 
 # "splint" is the less-thorough splint target.  For cage cleaning work,
 # you'll probably want to specify SPLINT_SOURCE rather than work on the
 # entire tree, like so:
 #     make splint SPLINT_SOURCE='src/call/*.c'
 
-splint : all
+splint :
 	$(MKPATH) $(SPLINT_TMP)
 	$(SPLINT) $(CC_INC) "-Iinclude/pmc" "-Icompilers/ast" $(SPLINTFLAGS) \
 	+partial -DNDEBUG \
@@ -2916,6 +2952,12 @@ release : MANIFEST MANIFEST.generated
 	mv MANIFEST.real MANIFEST
 	rm parrot-$(VERSION)
 
+release_check:
+	make release VERSION=$(SOVERSION)
+	$(PERL) $(RELEASE_TOOLS_DIR)/releasecheck.pl
+
+relcheck : release_check
+
 win32-inno-installer : world installable
 	$(PERL) $(DEV_TOOLS_DIR)/mk_inno.pl
 	$(INNO_SETUP) parrot.iss
@@ -2972,7 +3014,8 @@ src/extra_nci_thunks$(O) : $(PARROT_H_HEADERS) src/extra_nci_thunks.c \
     include/pmc/pmc_nci.h
 	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/extra_nci_thunks.c
 
-$(EXTRANCITHUNKS_SO) : $(LIBPARROT) src/extra_nci_thunks$(O)
+$(EXTRANCITHUNKS_SO) : $(LIBPARROT) $(NQP_RX) $(JSON_LANG) \
+    src/extra_nci_thunks$(O)
 	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \
     @ld_out@$@ src/extra_nci_thunks$(O) \
     $(ALL_PARROT_LIBS)

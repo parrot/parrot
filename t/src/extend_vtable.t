@@ -435,7 +435,7 @@ OUTPUT
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
 
-    integer = Parrot_PMC_get_pointer(interp, pmc);
+    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, pmc);
     if (integer > 0)
         Parrot_printf(interp,"Got pointer!\n", integer);
 CODE

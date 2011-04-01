@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 
 =head1 NAME
 
@@ -390,6 +390,30 @@ yield #2
 yield #3
 yield #4
 yield #5
+OUTPUT
+
+pir_output_is(
+    <<'CODE', <<'OUTPUT',  "Continue coroutine with params");
+.sub 'main' :main
+    coro(1)
+    coro(2)
+    coro(3)
+.end
+.sub coro
+    .param int x
+    .local int y
+    y = 0
+  loop:
+    say x
+    .yield(x)
+    .param int y
+    x += y
+    if y >= 0 goto loop
+.end
+CODE
+1
+3
+6
 OUTPUT
 
 # Local Variables:

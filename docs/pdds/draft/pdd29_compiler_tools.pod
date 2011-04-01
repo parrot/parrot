@@ -6,9 +6,9 @@
 
 This PDD specifies the Parrot Compiler Tools (PCT).
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Definitions
 

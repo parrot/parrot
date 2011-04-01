@@ -1,10 +1,11 @@
-# Copyright (C) 2004-2010, Parrot Foundation.
+# Copyright (C) 2004-2011, Parrot Foundation.
 
 package Parrot::Pmc2c::PCCMETHOD;
 use strict;
 use warnings;
 use Carp qw(longmess croak);
 use Parrot::Pmc2c::PCCMETHOD_BITS;
+use Parrot::Pmc2c::UtilFunctions qw( trim );
 
 =head1 NAME
 
@@ -96,28 +97,6 @@ our $reg_type_info = {
                       at => PARROT_ARG_PMC, },
 };
 
-# Perl trim function to remove whitespace from the start and end of the string
-sub trim {
-    my $string = shift;
-    $string    =~ s/^\s+//;
-    $string    =~ s/\s+$//;
-    return $string;
-}
-
-# Left trim function to remove leading whitespace
-sub ltrim {
-    my $string = shift;
-    $string    =~ s/^\s+//;
-    return $string;
-}
-
-# Right trim function to remove trailing whitespace
-sub rtrim {
-    my $string = shift;
-    $string    =~ s/\s+$//;
-    return $string;
-}
-
 =head3 C<parse_adverb_attributes>
 
   builds and returs an adverb hash from an adverb string such as
@@ -168,41 +147,6 @@ sub gen_arg_pcc_sig {
     return $sig;
 }
 
-sub gen_arg_flags {
-    my ($param) = @_;
-
-    return PARROT_ARG_INTVAL | PARROT_ARG_OPT_FLAG
-        if exists $param->{attrs}{opt_flag};
-
-    my $flag = $reg_type_info->{ $param->{type} }->{at};
-    $flag   |= PARROT_ARG_CONSTANT     if exists $param->{attrs}{constant};
-    $flag   |= PARROT_ARG_OPTIONAL     if exists $param->{attrs}{optional};
-    $flag   |= PARROT_ARG_FLATTEN      if exists $param->{attrs}{flatten};
-    $flag   |= PARROT_ARG_SLURPY_ARRAY if exists $param->{attrs}{slurpy};
-    $flag   |= PARROT_ARG_NAME         if exists $param->{attrs}{name};
-    $flag   |= PARROT_ARG_NAME         if exists $param->{attrs}{named};
-
-    return $flag;
-}
-
-sub gen_arg_accessor {
-    my ( $arg, $arg_type ) = @_;
-    my ( $name, $reg_type, $index ) = @{$arg}{qw( name type index )};
-
-    my $tis  = $reg_type_info->{$reg_type}{s};     #reg_type_info string
-    my $tiss = $reg_type_info->{$reg_type}{ss};    #reg_type_info short string
-
-    if ( 'arg' eq $arg_type ) {
-        return "$tis $name = CTX_REG_$tiss(_ctx, $index);\n";
-    }
-    elsif ( 'result' eq $arg_type ) {
-        return "    $name = CTX_REG_$tiss(_ctx, $index);\n";
-    }
-    else {  #$arg_type eq 'param' or $arg_type eq 'return'
-        return "    CTX_REG_$tiss(_ctx, $index) = $name;\n";
-    }
-}
-
 =head3 C<rewrite_RETURNs($method, $pmc)>
 
 Rewrites the method body performing the various macro substitutions for RETURNs.
@@ -213,6 +157,9 @@ sub rewrite_RETURNs {
     my ( $self, $pmc ) = @_;
     my $method_name    = $self->name;
     my $body           = $self->body;
+    my $wb             = $self->attrs->{manual_wb}
+                         ? ''
+                         : 'PARROT_GC_WRITE_BARRIER(interp, _self);';
 
     my $signature_re   = qr/
       (RETURN       #method name
@@ -239,9 +186,12 @@ sub rewrite_RETURNs {
 
         if ($returns eq 'void') {
             $e->emit( <<"END", __FILE__, __LINE__ + 1 );
+    {
     /*BEGIN RETURN $returns */
+    $wb
     return;
     /*END RETURN $returns */
+    }
 END
             $matched->replace( $match, $e );
             next;
@@ -260,6 +210,7 @@ END
     _ret_object = Parrot_pcc_build_call_from_c_args(interp, _call_object,
         "$returns_signature", $returns_varargs);
     UNUSED(_ret_object);
+    $wb
     return;
     /*END RETURN $returns */
     }
@@ -267,8 +218,11 @@ END
         }
         else { # if ($returns_signature)
             $e->emit( <<"END", __FILE__, __LINE__ + 1 );
+    {
     /*BEGIN RETURN $returns */
+    $wb
     return;
+    }
     /*END RETURN $returns */
 END
         }
@@ -368,20 +322,6 @@ sub process_pccmethod_args {
     return ( $signature, $varargs, $declarations );
 }
 
-sub find_max_regs {
-    my ($n_regs)    = @_;
-    my $n_regs_used = [ 0, 0, 0, 0 ];
-
-    for my $x (@$n_regs) {
-        for my $i ( 0 .. 3 ) {
-            $n_regs_used->[$i] = $n_regs_used->[$i] > $x->[$i]
-                ? $n_regs_used->[$i] : $x->[$i];
-        }
-    }
-
-    return join( ", ", @$n_regs_used );
-}
-
 =head3 C<rewrite_pccmethod()>
 
     rewrite_pccmethod($method, $pmc);
@@ -409,6 +349,10 @@ sub rewrite_pccmethod {
     my ( $params_signature, $params_varargs, $params_declarations ) =
         process_pccmethod_args( $linear_args, 'arg' );
 
+    my $wb             = $self->attrs->{manual_wb}
+                         ? ''
+                         : 'PARROT_GC_WRITE_BARRIER(interp, _self);';
+
     rewrite_RETURNs( $self, $pmc );
     rewrite_pccinvoke( $self, $pmc );
 
@@ -432,9 +376,12 @@ END
     { /* BEGIN PMETHOD BODY */
 END
 
-    $e_post->emit( <<'END', __FILE__, __LINE__ + 1 );
+    $e_post->emit( <<"END", __FILE__, __LINE__ + 1 );
 
     } /* END PMETHOD BODY */
+
+    $wb
+
     } /* END PARAMS SCOPE */
     return;
 END
@@ -599,20 +546,12 @@ sub process_parameter {
     return ($type, @arg_names);
 }
 
-sub make_arg_pmc {
-    my ($args, $name) = @_;
-
-    return '' unless @$args;
-
-    my $code = "    VTABLE_set_integer_native(interp, $name, " . @$args
-             . ");\n";
-
-    for my $i ( 0 .. $#{$args} ) {
-        $code .= "    VTABLE_set_integer_keyed_int(interp, $name, "
-              .  "$i, $args->[$i]);\n";
-    }
-
-    return $code;
+sub mangle_name {
+    my ( $self, $pmc ) = @_;
+    $self->symbol( $self->name );
+    $self->name( $self->type eq Parrot::Pmc2c::Method::MULTI()   ?
+                    (join '_', 'multi', $self->name, @{ $self->{MULTI_sig} }) :
+                    "nci_@{[$self->name]}" );
 }
 
 1;

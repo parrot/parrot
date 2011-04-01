@@ -6,9 +6,9 @@
 
 Summary of the contents of the PDD.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Synopsis I<(optional)>
 

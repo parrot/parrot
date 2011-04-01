@@ -50,16 +50,14 @@ static void * dlopen_string(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING * get_path(PARROT_INTERP,
-    ARGIN(STRING *lib),
+    ARGIN_NULLOK(STRING *lib),
     Parrot_dlopen_flags flags,
     ARGOUT(void **handle),
     ARGIN(const STRING *wo_ext),
-    ARGIN(const STRING *ext))
+    ARGIN_NULLOK(const STRING *ext))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
-        __attribute__nonnull__(6)
         FUNC_MODIFIES(*handle);
 
 PARROT_WARN_UNUSED_RESULT
@@ -71,11 +69,10 @@ static PMC* is_loaded(PARROT_INTERP, ARGIN(STRING *path))
 PARROT_CANNOT_RETURN_NULL
 static PMC * run_init_lib(PARROT_INTERP,
     ARGIN(void *handle),
-    ARGIN(STRING *lib_name),
+    ARGIN_NULLOK(STRING *lib_name),
     ARGIN(STRING *wo_ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 static void set_cstring_prop(PARROT_INTERP,
@@ -108,17 +105,14 @@ static void store_lib_pmc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(path))
 #define ASSERT_ARGS_get_path __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(lib) \
     , PARROT_ASSERT_ARG(handle) \
-    , PARROT_ASSERT_ARG(wo_ext) \
-    , PARROT_ASSERT_ARG(ext))
+    , PARROT_ASSERT_ARG(wo_ext))
 #define ASSERT_ARGS_is_loaded __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
 #define ASSERT_ARGS_run_init_lib __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
-    , PARROT_ASSERT_ARG(lib_name) \
     , PARROT_ASSERT_ARG(wo_ext))
 #define ASSERT_ARGS_set_cstring_prop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -257,8 +251,8 @@ Returns path and handle of a dynamic lib, setting lib_name to just the filestem
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING *
-get_path(PARROT_INTERP, ARGIN(STRING *lib), Parrot_dlopen_flags flags,
-        ARGOUT(void **handle), ARGIN(const STRING *wo_ext), ARGIN(const STRING *ext))
+get_path(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
+        ARGOUT(void **handle), ARGIN(const STRING *wo_ext), ARGIN_NULLOK(const STRING *ext))
 {
     ASSERT_ARGS(get_path)
     PMC * const iglobals  = interp->iglobals;
@@ -466,7 +460,7 @@ necessary initialization routines, if any.
 PARROT_CANNOT_RETURN_NULL
 static PMC *
 run_init_lib(PARROT_INTERP, ARGIN(void *handle),
-        ARGIN(STRING *lib_name), ARGIN(STRING *wo_ext))
+        ARGIN_NULLOK(STRING *lib_name), ARGIN(STRING *wo_ext))
 {
     ASSERT_ARGS(run_init_lib)
     STRING *type;

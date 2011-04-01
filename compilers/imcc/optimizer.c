@@ -1048,12 +1048,12 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
             break;
           case 'S':
           {
-            char * const name = Parrot_str_to_cstring(interp, REG_STR(interp, 0));
+            char * const cstr = Parrot_str_to_cstring(interp, REG_STR(interp, 0));
 
-            r[1] = mk_const(interp, name, r[0]->set);
+            r[1] = mk_const(interp, cstr, r[0]->set);
 
             snprintf(b, sizeof (b), "%p", REG_STR(interp, 0));
-            Parrot_str_free_cstring(name);
+            Parrot_str_free_cstring(cstr);
 
             break;
           }

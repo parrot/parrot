@@ -1,40 +1,12 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
-
-
-=head1 NAME
-
-Parrot::Pmc2c - PMC to C Code Generation
-
-=head1 SYNOPSIS
-
-    use Parrot::Pmc2c;
-
-=head1 DESCRIPTION
-
-C<Parrot::Pmc2c> is used by F<tools/build/pmc2c.pl> to generate C code from PMC files.
-
-=head2 Functions
-
-=over
-
-=cut
-
+# Copyright (C) 2004-2011, Parrot Foundation.
 package Parrot::Pmc2c::PMC::RO;
 use strict;
 use warnings;
 use base qw( Parrot::Pmc2c::PMC );
-
 use Parrot::Pmc2c::Emitter ();
-use Parrot::Pmc2c::PMCEmitter ();
 use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::UtilFunctions qw( return_statement );
 use Text::Balanced 'extract_bracketed';
-
-=item C<make_RO($type)>
-
-Create a RO version of the PMC
-
-=cut
 
 sub new {
     my ( $class, $parent ) = @_;
@@ -107,8 +79,32 @@ EOC
     return $self;
 }
 
-
 1;
+
+=head1 NAME
+
+Parrot::Pmc2c::PMC::RO - Create RO version of PMC
+
+=head1 SYNOPSIS
+
+    use Parrot::Pmc2c::PMC::RO;
+
+=head1 DESCRIPTION
+
+C<Parrot::Pmc2c::PMC::RO> is currently used in F<lib/Parrot/Pmc2c/PMC.pm> and
+F<lib/Parrot/Pmc2c/PMC/default.pm>.
+
+=head2 Functions
+
+=over 4
+
+=item C<new()>
+
+Constructor.
+
+=back
+
+=cut
 
 # Local Variables:
 #   mode: cperl

@@ -100,7 +100,7 @@ explicitement à Configure.pl quel compilateur et relieur doit être utiliser.
 Par exemple, pour compiler les fichiers C avec 'cc', les fichiers C++ avec 'CC'
 et relier le tout avec 'CC', vous devez entrer
 
-    perl Configure.pl --cc=cc --cxx=CC --link=CC --ld=CC
+    perl Configure.pl --cc=cc --link=CC --ld=CC
 
 Reportez vous à "perl Configure.pl --help" pour plus d'options et au fichier
 docs/configuration.pod pour plus de détails.

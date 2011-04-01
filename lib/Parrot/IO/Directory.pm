@@ -309,10 +309,9 @@ C<$recursive> and C<$ignore> function as specified above for C<files()>.
 
 For example:
 
-    $parrot->file_suffixes(1, '^(SVN|icu)$');
+    $parrot->file_suffixes(1, '^(icu)$');
 
-will give you all the suffixes used in Parrot ignoring all SVN and ICU
-files.
+will give you all the suffixes used in Parrot ignoring all ICU files.
 
 Note that if there are files with no suffix then the empty string will
 be included in this list.

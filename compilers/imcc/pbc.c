@@ -1638,12 +1638,19 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg), ARGMOD(PackFile_ByteCode * bc))
             /* don't emit mapped regs in key parts */
             regno = r->color >= 0 ? r->color : -1 - r->color;
 
-            if (r->set == 'I')
+            switch (r->set) {
+              case 'I':
                 Parrot_key_set_register(interp, tail, regno, KEY_integer_FLAG);
-            else if (r->set == 'S')
+                break;
+              case 'S':
                 Parrot_key_set_register(interp, tail, regno, KEY_string_FLAG);
-            else
+                break;
+              case 'P':
+                Parrot_key_set_register(interp, tail, regno, KEY_pmc_FLAG);
+                break;
+              default:
                 IMCC_fatal(interp, 1, "build_key: wrong register set\n");
+            }
 
             IMCC_debug(interp, DEBUG_PBC_CONST,
                     " keypart reg %s %c%d\n",
@@ -1652,6 +1659,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg), ARGMOD(PackFile_ByteCode * bc))
 
           case VT_CONSTP:
             r = r->reg;
+            /* Fall through. */
           case VTCONST:
           case VTCONST|VT_ENCODED:
             switch (r->set) {

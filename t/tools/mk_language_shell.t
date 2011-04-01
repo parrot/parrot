@@ -27,16 +27,18 @@ use Parrot::Test;
 use File::Spec::Functions;
 use File::Path qw/rmtree/;
 
-my $exefile;
+my $build_parrot;
 
 BEGIN {
-    $exefile = catfile( ".", qw/tools dev mk_language_shell.pl/ );
-    unless ( -f $exefile ) {
-        plan skip_all => "$exefile hasn't been built yet.";
+    $build_parrot = catfile($PConfig{build_dir}, $PConfig{test_prog});
+    unless (-e $build_parrot) {
+        plan skip_all => "Parrot binary has not been built yet";
         exit(0);
     }
-    plan tests => 7;
+
 }
+
+plan tests => 7;
 
 output_like(
     "test_parrot_language_$$",
@@ -48,11 +50,7 @@ my $lang_dir = "test_parrot_language_$$";
 my $test_dir = catfile($lang_dir, "t");
 my $src_dir = catfile($lang_dir, "src");
 my $setup = catfile($lang_dir, "setup.pir");
-my $installed_parrot  = catfile($PConfig{bindir}, $PConfig{test_prog});
-my $build_parrot      = catfile($PConfig{build_dir}, $PConfig{test_prog});
-my $parrot_exe = (-e $installed_parrot)
-    ? $installed_parrot
-    : $build_parrot;
+my $parrot_exe   = $build_parrot;
 my $to_dev_null = $^O =~ /Win/ ? "1> NUL 2>&1" : ">/dev/null 2>&1";
 ok(-e $lang_dir, "$lang_dir dir exists");
 ok(-e $test_dir, "$test_dir dir exists");
@@ -90,6 +88,7 @@ Runs mk_language_shell with $keys as the argument and verifies the output.
 
 sub output_like {
     my ($options, $snippet, $desc)  = @_;
+    my $exefile = catfile( ".", qw/tools dev mk_language_shell.pl/ );
 
     my $out = `$^X $exefile $options`;
 

@@ -102,13 +102,15 @@ Parrot_vsprintf_c(PARROT_INTERP, ARGIN(const char *pat), va_list args)
 Similar to C<Parrot_vsprintf()> but with an option to specify the length
 (C<len>) of the returned C string.
 
+If len is zero, then C<targ> is unchanged.
+
 =cut
 
 */
 
 PARROT_EXPORT
 void
-Parrot_vsnprintf(PARROT_INTERP, ARGOUT(char *targ),
+Parrot_vsnprintf(PARROT_INTERP, ARGMOD(char *targ),
                  size_t len, ARGIN(const char *pat), va_list args)
 {
     ASSERT_ARGS(Parrot_vsnprintf)
