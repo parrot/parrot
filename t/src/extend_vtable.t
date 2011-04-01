@@ -148,11 +148,19 @@ CODE
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_string_keyed_int");
     string = Parrot_PMC_get_string_keyed_int(interp, rpa, key_int);
-    Parrot_printf(interp,"%s\n", string);
+    Parrot_printf(interp,"%Ss\n", string);
 CODE
 
 Done!
 OUTPUT
+
+# Why does this coredump?
+#extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_string_keyed_str");
+#    string = Parrot_PMC_get_string_keyed_str(interp, hash, key_str);
+#    Parrot_printf(interp,"%Ss\n", string);
+#CODE
+#Done!
+#OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_defined_keyed_int");
     integer = Parrot_PMC_defined_keyed_int(interp, rpa, key_int);
