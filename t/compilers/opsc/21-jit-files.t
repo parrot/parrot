@@ -44,31 +44,31 @@ sub test_single_file($pir, $oplib, $ops_file, $debug) {
     # Create JITter.
     my $jitter := Ops::JIT.new($pbc, $ops_file, $oplib, debug => $debug);
 
-    my $start := 0;
+    # Create interp and seed it with bytecode
+    my $this_interp := pir::getinterp();
+    func("Parrot_api_load_bytecode_file", "iPSP")($this_interp, $pbc, undef);
+
+    my $interp := pir::new__psp("ParrotInterpreter", $this_interp);
+
+    # Override stdout inside target interp
+    my $new_stdout := pir::new('StringHandle');
+    $new_stdout.open("dummy", "w");
+    func("Parrot_io_stdhandle", "PpiP")($interp, 1, $new_stdout);
+
+    # "Invoke" target Sub inside target interp.
+    my $sub := Q:PIR{ %r = find_sub_not_null "main" };
+
+    my $start       := $sub.start_offs();
+    my $pc          := func("Parrot_PMC_invoke", "ipPP")($interp, $sub, $pc);
+    my $base_offset := $pc - $sub.start_offs();
+
     my %jit_context := $jitter.jit($start);
     my $module := %jit_context<_module>;
     $module.verify();
 
-    # Create interp and seed it with bytecode
-    my $this_interp := pir::getinterp();
-    my $interp := func("make_interpreter", "ppi")($this_interp, 0);
-    func("Parrot_api_load_bytecode_file", "iPSP")($this_interp, $pbc, undef);
-
-    # "Invoke" target Sub inside target interp.
-    my $sub := Q:PIR{ %r = find_sub_not_null "main" };
-    my $pc;
-    $pc := func("Parrot_PMC_invoke", "ppPP")($interp, $sub, $pc);
-
-
     # Some engine
-    my $engine := pir::new__psp("LLVM_Engine", $module);
-    my $call := $engine.create_call(%jit_context<jitted_sub>, "ppp");
-
-    my $new_stdout := pir::new('StringHandle');
-    $new_stdout.open("dummy", "w");
-
-    # Override stdout inside target interp
-    func("Parrot_io_stdhandle", "PpiP")($interp, 1, $new_stdout);
+    my $engine := pir::new("LLVM_Engine", $module);
+    my $call := $engine.create_call(%jit_context<jitted_sub>, "iip");
 
     # Go!
     $pc := $call($pc, $interp);
