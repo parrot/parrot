@@ -1370,7 +1370,8 @@ src/gc/api$(O) : \
     $(PARROT_H_HEADERS) \
     src/gc/gc_private.h \
     src/gc/api.c \
-    src/gc/variable_size_pool.h
+    src/gc/variable_size_pool.h \
+    src/gc/fixed_allocator.h
 
 src/gc/alloc_resources$(O) : \
     $(PARROT_H_HEADERS) \
@@ -1582,6 +1583,7 @@ src/packfile/api$(O) : \
     include/pmc/pmc_sub.h \
     include/pmc/pmc_key.h \
     include/pmc/pmc_parrotlibrary.h \
+    include/pmc/pmc_ptrobj.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/dynext.h \
     $(INC_DIR)/embed.h \
