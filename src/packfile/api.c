@@ -844,6 +844,8 @@ find_const_iter(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
 
 =item C<void Parrot_pf_mark_packfile(PARROT_INTERP, PackFile * pf)>
 
+Mark the contents of a C<PackFile>.
+
 =cut
 
 */
@@ -1434,7 +1436,8 @@ being returned. The only guarantees which are made by this interface are that:
 1) The PackFile* structure can be retrieved by VTABLE_get_pointer
 2) The PackFile* structure is marked for GC when the PMC is marked for GC
 
-=item C<void mark_packfile_pmc(PARROT_INTERP, PMC * pmc, PackFile *pf)>
+=item C<static void mark_packfile_pmc(PARROT_INTERP, PMC * ptr_pmc, void *
+ptr_raw)>
 
 Mark the PackFile PMC for GC
 
