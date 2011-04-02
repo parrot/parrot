@@ -250,7 +250,7 @@ Initializes the interpreter.
         if (!PMC_interp(SELF)) {
             create_interp(SELF, INTERP);
         }
-        PObj_custom_destroy_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
@@ -277,9 +277,26 @@ C<parent> and uses that thread.
         if (!PMC_interp(SELF)) {
             create_interp(SELF, p);
         }
-        PObj_custom_destroy_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
+
+/*
+
+=item C<void mark()>
+
+Marks the PMC.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        if (PMC_data(SELF)) {
+            Parrot_Interp *i = PMC_interp(SELF);
+            Parrot_gc_trace_root(i, NULL, 0);
+        }
+    }
 
 /*
 
