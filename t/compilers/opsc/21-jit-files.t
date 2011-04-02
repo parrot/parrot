@@ -7,14 +7,24 @@ Q:PIR { .include "test_more.pir" };
 pir::load_bytecode("opsc.pbc");
 
 my $debug := 0;
+# OpLib
+my $oplib := pir::new__psp("OpLib", "core_ops");
+
+# Parse "jitted.ops"
+my $ops_file := Ops::File.new("t/jit/jitted.ops",
+    :oplib($oplib),
+    :core(0),
+    :quiet(!$debug),
+);
+
 for <01 02 03 04 06> {
-    test_single_file("t/compilers/opsc/data/$_.pir", $debug);
+    test_single_file("t/compilers/opsc/data/$_.pir", $oplib, $ops_file, $debug);
 }
 
 done_testing();
 
 # JIT and run single PIR file.
-sub test_single_file($pir, $debug) {
+sub test_single_file($pir, $oplib, $ops_file, $debug) {
     # Some preparation
     my $pbc    := subst($pir, / 'pir' $/, 'pbc');
 
@@ -30,16 +40,6 @@ sub test_single_file($pir, $debug) {
         '# END_RESULTS'
     /;
     my $expected := $/[0].join('');
-
-    # OpLib
-    my $oplib := pir::new__psp("OpLib", "core_ops");
-
-    # Parse "jitted.ops"
-    my $ops_file := Ops::File.new("t/jit/jitted.ops",
-        :oplib($oplib),
-        :core(0),
-        :quiet(!$debug),
-    );
 
     # Create JITter.
     my $jitter := Ops::JIT.new($pbc, $ops_file, $oplib, debug => $debug);
