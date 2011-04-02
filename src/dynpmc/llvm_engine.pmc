@@ -5,9 +5,7 @@
 #include <llvm-c/ExecutionEngine.h>
 #include <llvm-c/BitReader.h>
 
-pmclass LLVM_Engine dynpmc group llvm auto_attrs {
-    ATTR PMC *ptr;
-
+pmclass LLVM_Engine dynpmc group llvm manual_attrs {
     VTABLE void class_init() {
         LLVMInitializeNativeTarget();
         LLVMLinkInJIT();
@@ -18,8 +16,8 @@ pmclass LLVM_Engine dynpmc group llvm auto_attrs {
     }
 
     VTABLE void init_pmc(PMC *module) {
-        PMC *ptr;
         LLVMExecutionEngineRef engine;
+
         LLVMCreateJITCompilerForModule(
                 &engine,
                 (LLVMModuleRef)VTABLE_get_pointer(INTERP, module),
@@ -27,19 +25,21 @@ pmclass LLVM_Engine dynpmc group llvm auto_attrs {
                 NULL
         );
 
-        ptr = Parrot_pmc_new(INTERP, enum_class_Ptr);
-        VTABLE_set_pointer(INTERP, ptr, engine);
-        SET_ATTR_ptr(INTERP, SELF, ptr);
+        PMC_data(SELF) = engine;
+        PObj_custom_destroy_SET(SELF);
+    }
+
+    VTABLE void destroy() {
+        LLVMExecutionEngineRef engine = (LLVMExecutionEngineRef)PMC_data(SELF);
+        LLVMDisposeExecutionEngine(engine);
     }
 
     METHOD create_call(PMC *function, STRING *signature) {
-        PMC  *ptr;
         PMC  *ret = Parrot_pmc_new(INTERP, enum_class_NCI);
         void *f;
 
-        GET_ATTR_ptr(INTERP, SELF, ptr);
         f = LLVMGetPointerToGlobal(
-                (LLVMExecutionEngineRef)VTABLE_get_pointer(INTERP, ptr),
+                (LLVMExecutionEngineRef)PMC_data(SELF),
                 (LLVMValueRef)VTABLE_get_pointer(INTERP, function)
             );
         VTABLE_set_pointer_keyed_str(interp, ret, signature, f);
