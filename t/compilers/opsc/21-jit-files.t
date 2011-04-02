@@ -7,7 +7,9 @@ Q:PIR { .include "test_more.pir" };
 pir::load_bytecode("opsc.pbc");
 
 my $debug := 0;
-test_single_file("t/compilers/opsc/data/03.pir", $debug);
+for <01 02 03 04 06> {
+    test_single_file("t/compilers/opsc/data/$_.pir", $debug);
+}
 
 done_testing();
 
