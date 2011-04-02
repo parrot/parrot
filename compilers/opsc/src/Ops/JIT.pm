@@ -288,7 +288,7 @@ method _create_basic_blocks(%jit_context) {
         # Next op
         $i := $i + _opsize(%jit_context, $op);
 
-        $keep_going   := 1; #self._keep_going($opname);
+        $keep_going   := self._keep_going($opname);
 
         #say("# keep_going $keep_going { $parsed_op<flags>.keys.join(',') }");
     }
@@ -330,7 +330,7 @@ method _jit_ops(%jit_context) {
         $i := $i + _opsize(%jit_context, $op);
         %jit_context<cur_opcode> := $i;
 
-        $keep_going   := 1; #self._keep_going($opname);
+        $keep_going   := self._keep_going($opname);
     }
 
     %jit_context;
@@ -369,7 +369,11 @@ Should we continue processing ops? If this is non-special :flow op - stop now.
 method _keep_going($opname) {
     # If this is non-special :flow op - stop.
     my $parsed_op := %!ops{ $opname };
-    $parsed_op && ( _op_is_special($opname) || !$parsed_op<flags><flow> );
+    $parsed_op && (
+        _op_is_special($opname)
+        || $parsed_op<flags><base_loop> # "branch" and "jump"
+        || !$parsed_op<flags><flow>
+    );
 }
 
 
