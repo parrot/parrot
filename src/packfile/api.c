@@ -148,11 +148,6 @@ static const opcode_t * default_unpack(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*self);
 
-static void destroy_packfile_pmc(PARROT_INTERP,
-    PMC * ptr_pmc,
-    void * ptr_raw)
-        __attribute__nonnull__(1);
-
 static void directory_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -396,8 +391,6 @@ static int sub_pragma(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(cursor))
-#define ASSERT_ARGS_destroy_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_directory_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -850,6 +843,8 @@ find_const_iter(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
 /*
 
 =item C<void Parrot_pf_mark_packfile(PARROT_INTERP, PackFile * pf)>
+
+Mark the contents of a C<PackFile>.
 
 =cut
 
@@ -1441,7 +1436,8 @@ being returned. The only guarantees which are made by this interface are that:
 1) The PackFile* structure can be retrieved by VTABLE_get_pointer
 2) The PackFile* structure is marked for GC when the PMC is marked for GC
 
-=item C<void mark_packfile_pmc(PARROT_INTERP, PMC * pmc, PackFile *pf)>
+=item C<static void mark_packfile_pmc(PARROT_INTERP, PMC * ptr_pmc, void *
+ptr_raw)>
 
 Mark the PackFile PMC for GC
 
