@@ -38,6 +38,10 @@ op m0_new_ctx(out PMC) {
     for (i = 0; i < M0_REG_COUNT; i++) {
         VTABLE_set_number_keyed_int(interp, $1, i, 0.0);
     }
+    /* TODO: initialize the variables table */
+    /* TODO: initialize the metadata segment */
+    /* TODO: initialize the bytecode segment (also, figure out how this is
+     *       supposed to work for a dynop-based m0, if at all) */
 }
 
 op m0_cstr_var(invar PMC, in INT, in STR) {
