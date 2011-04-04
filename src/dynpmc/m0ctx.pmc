@@ -1,0 +1,60 @@
+/*
+Copyright (C) 2001-2011, Parrot Foundation.
+
+=head1 NAME
+
+src/dynpmc/m0ctx.pmc - M0 protype context
+
+=head1 DESCRIPTION
+
+quick and dirty test pmc implementing m0 context - stores all types as float
+without casting
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+pmclass m0ctx dynpmc extends FixedFloatArray {
+
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
+        const FLOATVAL f = SELF.get_number_keyed_int(key);
+        return *(*INTVAL)&f;
+    }
+
+    VTABLE INTVAL get_pointer_keyed_int(INTVAL key) {
+        const FLOATVAL f = SELF.get_number_keyed_int(key);
+        return *(*INTVAL)&f;
+    }
+
+
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
+        FLOATVAL f = *(*FLOATVAL)&value;
+        SELF.set_number_keyed_int(key, f);
+    }
+
+    VTABLE void set_pointer_keyed_int(INTVAL key, void *value) {
+        FLOATVAL f = *(*FLOATVAL)&value;
+        SELF.set_number_keyed_int(key, f);
+    }
+
+
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
