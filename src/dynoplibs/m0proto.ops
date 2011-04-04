@@ -32,23 +32,31 @@ Cheats
 
 op m0_new_ctx(out PMC) {
     INTVAL i;
-    $1 = Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
+    $1 = Parrot_pmc_new(interp, enum_class_FixedFloatArray);
     VTABLE_set_integer_native(interp, $1, M0_REG_COUNT);
     for (i = 0; i < M0_REG_COUNT; i++) {
-        VTABLE_set_integer_keyed_int(interp, $1, i, 0);
+        VTABLE_set_number_keyed_int(interp, $1, i, 0.0);
     }
 }
 
 op m0_cstr_var(invar PMC, in INT, in STR) {
     char *cstr;
+    FLOATVAL f;
 
     /* Mmmmm.  Leaks. */
     cstr = Parrot_str_to_cstring(interp, $3);
-    VTABLE_set_integer_keyed_int(interp, $1, $2, (INTVAL)cstr);
+    f = *(FLOATVAL*)&cstr;
+    VTABLE_set_number_keyed_int(interp, $1, $2, f);
 }
 
 op m0_int_var(invar PMC, in INT, in INT) {
-    VTABLE_set_integer_keyed_int(interp, $1, $2, $3);
+    FLOATVAL f;
+    f = *(FLOATVAL*)&$3;
+    VTABLE_set_number_keyed_int(interp, $1, $2, f);
+}
+
+op m0_num_var(invar PMC, in INT, in NUM) {
+    VTABLE_set_number_keyed_int(interp, $1, $2, $3);
 }
 
 =head2 M0 Math/Numeric ops
@@ -56,12 +64,28 @@ op m0_int_var(invar PMC, in INT, in INT) {
 =cut
 
 op m0_add_i(invar PMC, in INT, in INT, in INT) {
-    INTVAL i1, i2, sum;
+    INTVAL i1, i2, i3;
+    FLOATVAL f1, f2, f3;
 
     M0_ASSERT_REGS($2, $3, $4);
-    i1 = VTABLE_get_integer_keyed_int(interp, $1, $3);
-    i2 = VTABLE_get_integer_keyed_int(interp, $1, $4);
-    VTABLE_set_integer_keyed_int(interp, $1, $2, i1 + i2);
+    f1 = VTABLE_get_number_keyed_int(interp, $1, $3);
+    f2 = VTABLE_get_number_keyed_int(interp, $1, $4);
+    i1 = *(INTVAL*)&f1;
+    i2 = *(INTVAL*)&f2;
+    i3 = i1 + i2;
+    f3 = *(FLOATVAL*)&i3;
+
+    VTABLE_set_number_keyed_int(interp, $1, $2, f3);
+}
+
+op m0_add_n(invar PMC, in INT, in INT, in INT) {
+    FLOATVAL f1, f2, f3;
+
+    M0_ASSERT_REGS($2, $3, $4);
+    f1 = VTABLE_get_number_keyed_int(interp, $1, $3);
+    f2 = VTABLE_get_number_keyed_int(interp, $1, $4);
+    f3 = f1 + f2;
+    VTABLE_set_number_keyed_int(interp, $1, $2, f3);
 }
 
 =head2 Temporary ops
@@ -69,19 +93,28 @@ op m0_add_i(invar PMC, in INT, in INT, in INT) {
 =cut
 
 op m0_print_i(invar PMC, in INT, in INT, in INT) {
-    INTVAL i;
+    FLOATVAL f;
 
     M0_ASSERT_REGS($2, $3, $4);
-    i = VTABLE_get_integer_keyed_int(interp, $1, $2);
-    Parrot_printf(interp, "%d", i);
+    f = VTABLE_get_number_keyed_int(interp, $1, $2);
+    Parrot_printf(interp, "%d", *(INTVAL*)&f);
+}
+
+op m0_print_n(invar PMC, in INT, in INT, in INT) {
+    FLOATVAL f;
+
+    M0_ASSERT_REGS($2, $3, $4);
+    f = VTABLE_get_number_keyed_int(interp, $1, $2);
+    Parrot_printf(interp, "%g", f);
 }
 
 op m0_print_s(invar PMC, in INT, in INT, in INT) {
     char *s;
+    FLOATVAL f;
 
     M0_ASSERT_REGS($2, $3, $4);
-    s = (char*)VTABLE_get_integer_keyed_int(interp, $1, $2);
-    Parrot_printf(interp, "%s", s);
+    f = VTABLE_get_number_keyed_int(interp, $1, $2);
+    Parrot_printf(interp, "%s", *(char**)&f);
 }
 
 
