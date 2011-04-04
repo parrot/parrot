@@ -80,3 +80,100 @@ inline op inc(inout INT) :base_core {
 }
 
 
+op set_args(inconst PMC) :flow {
+    opcode_t * const raw_args = CUR_OPCODE;
+    PMC * const signature = $1;
+    PMC * const call_sig = Parrot_pcc_build_sig_object_from_op(interp,
+            PMCNULL, signature, raw_args);
+    INTVAL argc;
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);
+    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);
+    goto OFFSET(argc + 2);
+}
+
+op get_params(inconst PMC) :flow {
+    opcode_t * const raw_params  = CUR_OPCODE;
+    PMC      * const signature   = $1;
+    PMC      * const ctx         = CURRENT_CONTEXT(interp);
+    PMC      * const ccont       = Parrot_pcc_get_continuation(interp, ctx);
+    PMC      * const caller_ctx  = Parrot_pcc_get_caller_ctx(interp, ctx);
+    PMC      * const call_object = Parrot_pcc_get_signature(interp, caller_ctx);
+    INTVAL argc;
+
+    Parrot_pcc_fill_params_from_op(interp, call_object, signature, raw_params,
+            PARROT_ERRORS_PARAM_COUNT_FLAG);
+
+    /* TODO Factor out with Sub.invoke */
+    if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
+        PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
+        Parrot_pcc_dec_recursion_depth(interp, ctx);
+        Parrot_pcc_set_caller_ctx(interp, ctx, Parrot_pcc_get_caller_ctx(interp, caller_ctx));
+    }
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);
+    goto OFFSET(argc + 2);
+}
+
+op set_returns(inconst PMC) :flow {
+    opcode_t * const raw_args  = CUR_OPCODE;
+    PMC      * const signature = $1;
+    PMC      * const call_sig  = Parrot_pcc_build_sig_object_from_op(interp,
+                Parrot_pcc_get_signature(interp,
+                Parrot_pcc_get_caller_ctx(interp, CURRENT_CONTEXT(interp))),
+                    signature, raw_args);
+    INTVAL argc;
+
+    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);
+
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);
+    goto OFFSET(argc + 2);
+}
+
+op get_results(inconst PMC) :flow {
+    opcode_t * const raw_params  = CUR_OPCODE;
+    PMC      * const signature   = $1;
+    PMC             *ctx         = CURRENT_CONTEXT(interp);
+    PMC             *call_object = Parrot_pcc_get_signature(interp, ctx);
+
+    INTVAL argc;
+
+    Parrot_pcc_fill_params_from_op(interp, call_object, signature, raw_params,
+            PARROT_ERRORS_RESULT_COUNT_FLAG);
+
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);
+    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), PMCNULL);
+    goto OFFSET(argc + 2);
+}
+
+inline op invokecc(invar PMC) :flow {
+    PMC      * const p     = $1;
+    opcode_t *dest         = expr NEXT();
+    PMC      * const signature = Parrot_pcc_get_signature(interp,
+                                    CURRENT_CONTEXT(interp));
+
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
+
+    if (!PMC_IS_NULL(signature))
+        Parrot_pcc_set_object(interp, signature, NULL);
+    interp->current_cont   = NEED_CONTINUATION;
+    dest                   = VTABLE_invoke(interp, p, dest);
+
+    goto ADDRESS(dest);
+}
+
+inline op invoke(invar PMC, invar PMC) :flow {
+    opcode_t   *dest       = expr NEXT();
+    PMC * const p          = $1;
+    PMC * const signature  = Parrot_pcc_get_signature(interp,
+                                    CURRENT_CONTEXT(interp));
+
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
+
+    if (!PMC_IS_NULL(signature))
+        Parrot_pcc_set_object(interp, signature, NULL);
+    interp->current_cont   = $2;
+
+    dest = VTABLE_invoke(interp, p, dest);
+    goto ADDRESS(dest);
+}
+
+
