@@ -173,20 +173,19 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
         Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
     }
     else {
-        if (!strcmp(corename, "slow") || !strcmp(corename, "bounds"))
+        if (STREQ(corename, "slow") || STREQ(corename, "bounds"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
-        else if (!strcmp(corename, "fast") ||
-            !strcmp(corename, "jit") || !strcmp(corename, "function"))
+        else if (STREQ(corename, "fast") || STREQ(corename, "jit") || STREQ(corename, "function"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "fast"));
-        else if (!strcmp(corename, "exec"))
+        else if (STREQ(corename, "exec"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "exec"));
-        else if (!strcmp(corename, "trace")) {
+        else if (STREQ(corename, "trace")) {
             Interp_trace_SET(interp, PARROT_TRACE_OPS_FLAG);
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
         }
-        else if (!strcmp(corename, "profiling"))
+        else if (STREQ(corename, "profiling"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "profiling"));
-        else if (!strcmp(corename, "gcdebug"))
+        else if (STREQ(corename, "gcdebug"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "gcdebug"));
         else
             Parrot_ex_throw_from_c_args(interp, NULL, 1, "Invalid runcore type %s", corename);
