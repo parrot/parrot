@@ -54,6 +54,8 @@ class LLVM::Type is LLVM::Value {
     sub UINTVAL ()  { int32(); }
     sub FLOATVAL () { double(); }
 
+    sub opcode_t()      { int32() }
+
     sub STRING ()       { $STRING; }
     sub STRING_PTR ()   { $STRING_PTR; }
     sub PMC ()          { $PMC; }
