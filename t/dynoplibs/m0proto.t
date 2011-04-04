@@ -20,14 +20,13 @@ t/dynoplibs/m0proto.t - prototype m0 dynops
 
 .sub m0_hello_word
     .include "m0proto_names.pir"
-
     .local pmc ctx
     ctx = m0_new_ctx
-    m0_cstr_var ctx, i0, "hello, word"
-    m0_cstr_var ctx, i1, "\n"
+    m0_cstr_var ctx, s0, "hello, word"
+    m0_cstr_var ctx, s1, "\n"
 
-    m0_print_s ctx, i0, x, x
-    m0_print_s ctx, i1, x, x
+    m0_print_s ctx, s0, x, x
+    m0_print_s ctx, s1, x, x
     ok(1, "hello world doesn't crash")
 .end
 
