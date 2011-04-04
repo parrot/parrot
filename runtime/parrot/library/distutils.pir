@@ -4388,6 +4388,14 @@ Return the whole config
     .tailcall get_executable('parrot')
 .end
 
+=item get_nqp
+
+=cut
+
+.sub 'get_nqp'
+    .tailcall get_executable('parrot-nqp')
+.end
+
 =item get_nqp_rx
 
 =cut

@@ -1,0 +1,33 @@
+# Copyright (C) 2011, Parrot Foundation.
+
+# This is the start to rewrite JSON. It starts with rewriting data_json only.
+# data_json depends on the PGE. The rewrite use parrot-nqp.
+
+
+=head1 NAME
+
+JSON, a lightweight data-interchange format.
+
+=head1 SYNOPSIS
+
+The C<from_json> method return a PMC that containing the data structure
+for a given valid JSON (JavaScript Object Notation) string.
+For example:
+
+    .sub 'main' :main
+         .local pmc result
+
+        load_language 'JSON'
+        result = from_json( '[1,2,3]' )
+
+        load_bytecode 'dumper.pbc'
+        _dumper( result, 'JSON' )
+    .end
+
+To generate a JSON representation of a PMC, see
+L<runtime/parrot/library/JSON.pir>.
+
+For more information about the structure of the JSON representation, see
+the documentation at L<http://www.json.org/>.
+
+=cut

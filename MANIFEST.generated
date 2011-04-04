@@ -1,11 +1,11 @@
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
-blib/lib/libparrot.3.0.0.dylib                   [main]lib
+blib/lib/libparrot.3.2.0.dylib                   [main]lib
 blib/lib/libparrot.a                             [main]lib
 blib/lib/libparrot.dylib                         [main]lib
 blib/lib/libparrot.so                            [main]lib
-blib/lib/libparrot.so.3.0.0                      [main]lib
+blib/lib/libparrot.so.3.2.0                      [main]lib
 compilers/data_json/data_json.pbc                [data_json]
 config/gen/call_list/opengl.in                   []
 docs/ops/bit.pod                                 [doc]
@@ -104,6 +104,9 @@ include/pmc/pmc_parrotlibrary.h                  [devel]include
 include/pmc/pmc_parrotthread.h                   [devel]include
 include/pmc/pmc_pmcproxy.h                       [devel]include
 include/pmc/pmc_pointer.h                        [devel]include
+include/pmc/pmc_ptr.h                            [devel]include
+include/pmc/pmc_ptrbuf.h                         [devel]include
+include/pmc/pmc_ptrobj.h                         [devel]include
 include/pmc/pmc_resizablebooleanarray.h          [devel]include
 include/pmc/pmc_resizablefloatarray.h            [devel]include
 include/pmc/pmc_resizableintegerarray.h          [devel]include
@@ -113,12 +116,14 @@ include/pmc/pmc_role.h                           [devel]include
 include/pmc/pmc_scalar.h                         [devel]include
 include/pmc/pmc_scheduler.h                      [devel]include
 include/pmc/pmc_schedulermessage.h               [devel]include
+include/pmc/pmc_select.h                         [devel]include
 include/pmc/pmc_sockaddr.h                       [devel]include
 include/pmc/pmc_socket.h                         [devel]include
 include/pmc/pmc_string.h                         [devel]include
 include/pmc/pmc_stringbuilder.h                  [devel]include
 include/pmc/pmc_stringhandle.h                   [devel]include
 include/pmc/pmc_stringiterator.h                 [devel]include
+include/pmc/pmc_structview.h                     [devel]include
 include/pmc/pmc_sub.h                            [devel]include
 include/pmc/pmc_task.h                           [devel]include
 include/pmc/pmc_threadinterpreter.h              [devel]include
@@ -152,7 +157,6 @@ lib/Parrot/PMC.pm                                [devel]lib
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm               [devel]lib
 libparrot.dll                                    [main]bin
 libparrot.lib                                    [main]bin
-parrot.pc                                        [main]pkgconfig
 runtime/parrot/dynext/bit_ops.bundle             [library]
 runtime/parrot/dynext/bit_ops.dll                [library]
 runtime/parrot/dynext/bit_ops.dylib              [library]
@@ -241,6 +245,7 @@ runtime/parrot/include/timer.pasm                [main]
 runtime/parrot/include/tm.pasm                   [main]
 runtime/parrot/include/vtable_methods.pasm       [main]
 runtime/parrot/include/warnings.pasm             [main]
+runtime/parrot/languages/JSON/JSON.pir           [data_json]
 runtime/parrot/library/Archive/Tar.pbc           [main]
 runtime/parrot/library/Archive/Zip.pbc           [main]
 runtime/parrot/library/CGI/QueryHash.pbc         [main]
@@ -405,6 +410,9 @@ src/pmc/parrotlibrary.dump                       [devel]src
 src/pmc/parrotthread.dump                        [devel]src
 src/pmc/pmcproxy.dump                            [devel]src
 src/pmc/pointer.dump                             [devel]src
+src/pmc/ptr.dump                                 [devel]src
+src/pmc/ptrbuf.dump                              [devel]src
+src/pmc/ptrobj.dump                              [devel]src
 src/pmc/resizablebooleanarray.dump               [devel]src
 src/pmc/resizablefloatarray.dump                 [devel]src
 src/pmc/resizableintegerarray.dump               [devel]src
@@ -414,12 +422,14 @@ src/pmc/role.dump                                [devel]src
 src/pmc/scalar.dump                              [devel]src
 src/pmc/scheduler.dump                           [devel]src
 src/pmc/schedulermessage.dump                    [devel]src
+src/pmc/select.dump                              [devel]src
 src/pmc/sockaddr.dump                            [devel]src
 src/pmc/socket.dump                              [devel]src
 src/pmc/string.dump                              [devel]src
 src/pmc/stringbuilder.dump                       [devel]src
 src/pmc/stringhandle.dump                        [devel]src
 src/pmc/stringiterator.dump                      [devel]src
+src/pmc/structview.dump                          [devel]src
 src/pmc/sub.dump                                 [devel]src
 src/pmc/task.dump                                [devel]src
 src/pmc/threadinterpreter.dump                   [devel]src
@@ -429,4 +439,5 @@ src/pmc/unmanagedstruct.dump                     [devel]src
 src/string_private_cstring.h                     []
 tools/build/dynpmc.pl                            []
 tools/dev/mk_language_shell.pl                   [devel]
+tools/dev/ncidef2pir.pl                          [devel]
 vtable.dump                                      [devel]src

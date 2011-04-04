@@ -7,9 +7,9 @@
 This PDD specifies Parrot's garbage collection and memory management
 subsystems.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Definitions
 

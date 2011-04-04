@@ -52,13 +52,10 @@ pir_exit_code_is( <<'CODE', 0, 'pir exits with success by default' );
 .end
 CODE
 
-TODO: {
-    local $TODO = 'pasm exits with 1 by default';
-    pasm_exit_code_is( <<'CODE', 0, 'exit with success by default' );
-        set I0, 0
+pasm_exit_code_is( <<'CODE', 0, 'exit with success by default' );
+    set I0, 0
+    end
 CODE
-
-}
 
 pir_exit_code_is( <<'CODE', 2, "pir exit code isn't exception type" );
 .sub main :main

@@ -1,0 +1,261 @@
+[package]
+Crypto
+
+[lib]
+libcrypto
+
+[defs]
+v OpenSSL_add_all_algorithms
+v OpenSSL_add_all_digests
+
+#EVP_MAX_MD_SIZE 64)
+#EVP_MAX_MD_SIZE (16+20) /* The SSLv3 md5+sha1 type */
+
+#HMAC_MAX_MD_CBLOCK 128
+#NID_sha1 64
+#SHA1_DIGEST_LENGTH 20
+#SHA256_DIGEST_LENGTH 32
+
+p DH_new
+i DH_generate_key p
+i DH_compute_key  t p p
+i DH_size         p
+i DH_free         p
+
+p BN_new
+i BN_free         p
+p BN_bin2bn       t i p
+i BN_hex2bn       p t
+i BN_dec2bn       p t
+i BN_num_bits     p
+i BN_bn2bin       p t
+i BN_print_fp     p p
+i BN_rand         p i i i
+i BN_cmp          p p
+i BN_is_bit_set   p i
+p BN_value_one
+i BN_sub          p p p
+i BN_clear_free   p
+
+p PEM_read_bio_RSAPrivateKey  p p p p
+p PEM_read_RSAPrivateKey      p p p p
+p PEM_read_bio_PrivateKey     p p p p
+p PEM_read_PrivateKey         p p p p
+
+p PEM_read_bio_RSAPublicKey  p p p p
+p PEM_read_RSAPublicKey      p p p p
+p PEM_read_bio_PublicKey     p p p p
+p PEM_read_PublicKey         p p p p
+
+p BIO_s_file
+p BIO_new_file    t t
+p BIO_new_fp      p i
+p BIO_new_mem_buf t i
+v BIO_free        p
+v BIO_set_fp      p p i
+v BIO_get_fp      p p
+
+i BIO_write_filename pt p t
+i BIO_append_filename   p t
+i BIO_rw_filename       p t
+
+i MD5_Init           p
+i MD5_Update         p t l
+i MD5_Final          t p
+i MD5                t l t
+v MD5_Transform      p t
+i SHA1_Init          p
+i SHA1_Update        p t l
+i SHA1_Final         t p
+i SHA1               t l t
+v SHA1_Transform     p t
+i SHA256_Init        p
+i SHA256_Update      p t l
+
+i SHA256_Final       t p
+i SHA256             t l t
+v SHA256_Transform   p t
+
+i RSA_sign   i t i t 4 p
+i RSA_verify i t i t i p
+i RSA_size   p
+
+v EVP_MD_CTX_init     p
+p EVP_MD_CTX_create
+
+i EVP_DigestInit_ex   p p p
+i EVP_DigestUpdate    p t l
+i EVP_DigestFinal_ex  p t 4
+i EVP_DigestInit      p p
+i EVP_DigestFinal     p t 4
+
+i EVP_MD_CTX_cleanup  p
+v EVP_MD_CTX_destroy  p
+
+i EVP_MD_CTX_copy_ex  p p
+i EVP_MD_CTX_copy     p p
+
+i EVP_MD_type         p
+i EVP_MD_pkey_type    p
+i EVP_MD_size         p
+i EVP_MD_block_size   p
+
+i EVP_MD_CTX_md         p
+i EVP_MD_CTX_size       p
+i EVP_MD_CTX_block_size p
+i EVP_MD_CTX_type       p
+
+p EVP_md_null
+p EVP_md2
+p EVP_md5
+p EVP_sha
+p EVP_sha1
+p EVP_dss
+p EVP_dss1
+p EVP_mdc2
+p EVP_ripemd160
+
+p EVP_get_digestbyname t
+
+i EVP_SignFinal   p t 4 p
+
+
+t HMAC          p t i t i t 4
+v HMAC_CTX_init p
+v HMAC_Init     p t i p
+v HMAC_Init_ex  p t i p p
+v HMAC_Update   p t i
+v HMAC_Final    p t 4
+v HMAC_CTX_cleanup p
+v HMAC_cleanup     p
+
+p EVP_PKEY_new
+v EVP_PKEY_free        p
+i EVP_PKEY_set1_RSA    p p
+i EVP_PKEY_set1_DSA    p p
+i EVP_PKEY_set1_DH     p p
+i EVP_PKEY_set1_EC_KEY p p
+
+p EVP_PKEY_get1_RSA    p
+p EVP_PKEY_get1_DSA    p
+p EVP_PKEY_get1_DH     p
+p EVP_PKEY_get1_EC_KEY p
+
+i EVP_PKEY_assign_RSA    p p
+i EVP_PKEY_assign_DSA    p p
+i EVP_PKEY_assign_DH     p p
+i EVP_PKEY_assign_EC_KEY p p
+
+i EVP_PKEY_type i
+i EVP_PKEY_size p
+
+v EVP_CIPHER_CTX_init p
+i EVP_CIPHER_CTX_cleanup p
+
+p EVP_CIPHER_CTX_new
+v EVP_CIPHER_CTX_free p
+
+i EVP_CIPHER_CTX_set_padding p i
+i EVP_CIPHER_CTX_set_key_length p i
+i EVP_CIPHER_CTX_ctrl p i i p
+
+i EVP_EncryptInit_ex p p p t t
+i EVP_EncryptUpdate  p t 4 t i
+i EVP_EncryptFinal_ex p t 4
+
+i EVP_DecryptInit_ex p p p t t
+i EVP_DecryptUpdate   p t 4 t i
+i EVP_DecryptFinal_ex p t 4
+
+i EVP_CipherInit_ex  p p p t
+i EVP_CipherUpdate   p t 4 t i
+i EVP_CipherFinal_ex p t 4
+
+i EVP_EncryptInit  p p p t t
+i EVP_EncryptFinal p t 4
+
+i EVP_DecryptInit  p p t t
+i EVP_DecryptFinal p t 4
+
+i EVP_CipherInit  p p t t i
+i EVP_CipherFinal p t 4
+
+p EVP_get_cipherbyname t
+
+i EVP_CIPHER_nid        p
+i EVP_CIPHER_block_size p
+i EVP_CIPHER_key_length p
+i EVP_CIPHER_iv_length  p
+i EVP_CIPHER_flags      p
+i EVP_CIPHER_type       p
+
+p EVP_CIPHER_CTX_cipher       p
+i EVP_CIPHER_CTX_nid          p
+i EVP_CIPHER_CTX_block_size   p
+i EVP_CIPHER_CTX_key_length   p
+i EVP_CIPHER_CTX_iv_length    p
+p EVP_CIPHER_CTX_get_app_data p
+i EVP_CIPHER_CTX_set_app_data p p
+i EVP_CIPHER_CTX_type         p
+i EVP_CIPHER_CTX_flags        p
+
+i EVP_CIPHER_param_to_asn1 p p i
+i EVP_CIPHER_asn1_to_param p p i
+
+p EVP_aes_128_cbc
+
+p EVP_enc_null
+p EVP_des_cbc
+p EVP_des_ecb
+p EVP_des_cfb
+p EVP_des_ofb
+p EVP_des_ede_cbc
+p EVP_des_ede
+p EVP_des_ede_ofb
+p EVP_des_ede_cfb
+p EVP_des_ede3_cbc
+p EVP_des_ede3
+p EVP_des_ede3_ofb
+p EVP_des_ede3_cfb
+p EVP_desx_cbc
+p EVP_rc4
+p EVP_rc4_40
+p EVP_idea_cbc
+p EVP_idea_ecb
+p EVP_idea_cfb
+p EVP_idea_ofb
+p EVP_rc2_cbc
+p EVP_rc2_ecb
+p EVP_rc2_cfb
+p EVP_rc2_ofb
+p EVP_rc2_40_cbc
+p EVP_rc2_64_cbc
+p EVP_bf_cbc
+p EVP_bf_ecb
+p EVP_bf_cfb
+p EVP_bf_ofb
+p EVP_cast5_cbc
+p EVP_cast5_ecb
+p EVP_cast5_cfb
+p EVP_cast5_ofb
+p EVP_rc5_32_12_16_cbc
+p EVP_rc5_32_12_16_ecb
+p EVP_rc5_32_12_16_cfb
+p EVP_rc5_32_12_16_ofb
+p EVP_aes_128_ecb
+p EVP_aes_128_cfb1
+p EVP_aes_128_cfb8
+p EVP_aes_128_cfb128
+p EVP_aes_128_ofb
+p EVP_aes_192_ecb
+p EVP_aes_192_cbc
+p EVP_aes_192_cfb1
+p EVP_aes_192_cfb8
+p EVP_aes_192_cfb128
+p EVP_aes_192_ofb
+p EVP_aes_256_ecb
+p EVP_aes_256_cbc
+p EVP_aes_256_cfb1
+p EVP_aes_256_cfb8
+p EVP_aes_256_cfb128
+p EVP_aes_256_ofb

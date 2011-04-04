@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -43,7 +43,6 @@ Initializes the exception handler.
 */
 
     VTABLE void init() {
-        Parrot_ExceptionHandler_attributes * const attrs = PARROT_EXCEPTIONHANDLER(SELF);
         SUPER();
 
         /* an exception handler has no separate context; it's only a snapshot
@@ -199,8 +198,8 @@ Report whether the exception handler can handle a particular type of exception.
                 INTVAL i;
 
                 for (i = 0; i < elems; ++i) {
-                    INTVAL handled_type = VTABLE_get_integer_keyed_int(INTERP,
-                            handled_types, i);
+                    const INTVAL handled_type =
+                        VTABLE_get_integer_keyed_int(INTERP, handled_types, i);
                     if (handled_type == type)
                         RETURN(INTVAL 1);
                 }

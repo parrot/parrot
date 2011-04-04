@@ -166,9 +166,7 @@ PMC *
 Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
 {
     ASSERT_ARGS(Parrot_get_compiler)
-    PMC    * const iglobals = interp->iglobals;
-    PMC    * hash           = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
-                              IGLOBALS_COMPREG_HASH);
+    PMC * const  hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_COMPREG_HASH);
 
     if (PMC_IS_NULL(hash)) {
         /* No compiler has been registered yet */
@@ -318,6 +316,9 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
 
     PMC *result;
     switch (what) {
+      case CURRENT_CTX:
+        result = CURRENT_CONTEXT(interp);
+        break;
       case CURRENT_SUB:
         result = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
         break;

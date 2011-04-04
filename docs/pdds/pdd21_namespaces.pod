@@ -6,9 +6,9 @@
 
 Description and implementation of Parrot namespaces.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 

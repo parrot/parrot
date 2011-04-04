@@ -86,7 +86,7 @@ one.
 
     VTABLE PMC *clone() {
         PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
-        Parrot_Sockaddr_attributes * const old_attrs = PARROT_SOCKADDR(SELF);
+        const Parrot_Sockaddr_attributes * const old_attrs = PARROT_SOCKADDR(SELF);
         Parrot_Sockaddr_attributes * const new_attrs = PARROT_SOCKADDR(dest);
 
         new_attrs->type     = old_attrs->type;
@@ -113,7 +113,7 @@ Returns true if the Sockaddr is defined.
 */
 
     VTABLE INTVAL get_bool() {
-        Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+        const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
 
         return data->pointer ? 1 : 0;
     }
@@ -147,7 +147,7 @@ Returns a pointer to the C<sockaddr_in> or C<sockaddr_in6>.
 */
 
     VTABLE void *get_pointer() {
-        Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+        const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
         return data->pointer;
     }
 
@@ -161,7 +161,7 @@ Returns the string representation of this sockaddr by calling C<getnameinfo(3)>.
 
 */
     VTABLE STRING *get_string() {
-        Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+        const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
 
         if (!data->pointer)
             return Parrot_sprintf_c(interp, "(?)");
@@ -179,7 +179,7 @@ Returns family, type or protocol. Used for debugging.
 
 */
     VTABLE INTVAL get_integer_keyed_int(INTVAL what) {
-        Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+        const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
 
         switch (what) {
           case 0:
@@ -209,4 +209,3 @@ Returns family, type or protocol. Used for debugging.
  * End:
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
-

@@ -32,6 +32,14 @@ D: Building on various platforms.
 N: Ahmed Zawawi
 D: Rakudo builtins
 
+N: Akash Manohar
+U: akashmanohar
+A: SingAlong
+E: akash@akash.im
+D: Fixed PCT tutorial Episode-3
+S: Bangalore, India
+W: http://akash.im
+
 N: Alberto Manuel Brandao Simoes
 U: ambs
 E: ambs@cpan.org
@@ -424,8 +432,9 @@ D: Perl2Pir tests conversion
 D: Miscellaneous codingstd fixes
 
 N: Gerd Pokorra
+A: gerd
 E: pokorra@uni-siegen.de
-D: Release manager for 1.9.0, 2.3.0, 2.5.0, 2.8.0 and 2.9.0
+D: Release manager for 1.9.0, 2.3.0, 2.5.0, 2.8.0, 2.9.0 and 3.2.0
 
 N: Goplat
 D: Win98 and other fixes.
@@ -749,6 +758,7 @@ D: testing parrot and some HLL's
 D: fixing codetest failures
 D: adding function documentation
 D: tracwiki additions
+D: Release manager for 2.7.0, 3.1.0
 E: mike.hind@gmail.com
 
 N: Michael G. Schwern

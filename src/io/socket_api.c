@@ -352,7 +352,6 @@ Parrot_io_accept_handle(PARROT_INTERP, ARGMOD(PMC *pmc))
     Parrot_Socket_attributes *io = PARROT_SOCKET(pmc);
     Parrot_Socket_attributes *new_io;
     PMC       *new_pmc;
-    PIOHANDLE  os_handle;
 
     if (Parrot_io_socket_is_closed(interp, pmc))
         return PMCNULL;

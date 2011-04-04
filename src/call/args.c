@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -58,11 +58,10 @@ static void assign_default_param_value(PARROT_INTERP,
     INTVAL param_index,
     INTVAL param_flags,
     ARGIN(void *arg_info),
-    ARGMOD(struct pcc_funcs_ptr *accessor))
+    ARGIN(const struct pcc_funcs_ptr *accessor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*accessor);
+        __attribute__nonnull__(5);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -95,7 +94,7 @@ static void fill_params(PARROT_INTERP,
     ARGMOD_NULLOK(PMC *call_object),
     ARGIN(PMC *raw_sig),
     ARGIN(void *arg_info),
-    ARGIN(struct pcc_funcs_ptr *accessor),
+    ARGIN(const struct pcc_funcs_ptr *accessor),
     Errors_classes direction)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
@@ -334,6 +333,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
     }
 
     /* this macro is much, much faster than the VTABLE STRING comparisons */
+    PARROT_GC_WRITE_BARRIER(interp, call_object);
     SETATTR_CallContext_arg_flags(interp, call_object, raw_sig);
     GETATTR_FixedIntegerArray_size(interp, raw_sig, arg_count);
     GETATTR_FixedIntegerArray_int_array(interp, raw_sig, int_array);
@@ -352,18 +352,18 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
           case PARROT_ARG_INTVAL:
             VTABLE_push_integer(interp, call_object, constant
                     ? raw_index
-                    : CTX_REG_INT(ctx, raw_index));
+                    : CTX_REG_INT(interp, ctx, raw_index));
             break;
           case PARROT_ARG_FLOATVAL:
             VTABLE_push_float(interp, call_object, constant
                     ? Parrot_pcc_get_num_constant(interp, ctx, raw_index)
-                    : CTX_REG_NUM(ctx, raw_index));
+                    : CTX_REG_NUM(interp, ctx, raw_index));
             break;
           case PARROT_ARG_STRING:
             {
                 STRING * const string_value = constant
                         ? Parrot_pcc_get_string_constant(interp, ctx, raw_index)
-                        : CTX_REG_STR(ctx, raw_index);
+                        : CTX_REG_STR(interp, ctx, raw_index);
 
                 if (arg_flags & PARROT_ARG_NAME) {
                     ++arg_index;
@@ -386,7 +386,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
             {
                 PMC * const pmc_value = constant
                         ? Parrot_pcc_get_pmc_constant(interp, ctx, raw_index)
-                        : CTX_REG_PMC(ctx, raw_index);
+                        : CTX_REG_PMC(interp, ctx, raw_index);
 
                 if (arg_flags & PARROT_ARG_FLATTEN) {
                     dissect_aggregate_arg(interp, call_object, pmc_value);
@@ -436,22 +436,22 @@ extract_named_arg_from_op(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(STRING 
       case PARROT_ARG_INTVAL:
         VTABLE_set_integer_keyed_str(interp, call_object, name, constant
                 ? raw_index
-                : CTX_REG_INT(ctx, raw_index));
+                : CTX_REG_INT(interp, ctx, raw_index));
         break;
       case PARROT_ARG_FLOATVAL:
         VTABLE_set_number_keyed_str(interp, call_object, name, constant
                 ? Parrot_pcc_get_num_constant(interp, ctx, raw_index)
-                : CTX_REG_NUM(ctx, raw_index));
+                : CTX_REG_NUM(interp, ctx, raw_index));
         break;
       case PARROT_ARG_STRING:
         VTABLE_set_string_keyed_str(interp, call_object, name, constant
                 ? Parrot_pcc_get_string_constant(interp, ctx, raw_index)
-                : CTX_REG_STR(ctx, raw_index));
+                : CTX_REG_STR(interp, ctx, raw_index));
         break;
       case PARROT_ARG_PMC:
         VTABLE_set_pmc_keyed_str(interp, call_object, name, constant
                 ? Parrot_pcc_get_pmc_constant(interp, ctx, raw_index)
-                : CTX_REG_PMC(ctx, raw_index));
+                : CTX_REG_PMC(interp, ctx, raw_index));
         break;
       default:
         break;
@@ -485,7 +485,7 @@ dissect_aggregate_arg(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(PMC *aggreg
         }
     }
     else if (VTABLE_does(interp, aggregate, CONST_STRING(interp, "hash"))) {
-        Hash *hash = (Hash *)VTABLE_get_pointer(interp, aggregate);
+        const Hash * const hash = (Hash *)VTABLE_get_pointer(interp, aggregate);
 
         parrot_hash_iterate(hash,
             VTABLE_set_pmc_keyed_str(interp, call_object,
@@ -714,7 +714,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
 /*
 
 =item C<static void fill_params(PARROT_INTERP, PMC *call_object, PMC *raw_sig,
-void *arg_info, struct pcc_funcs_ptr *accessor, Errors_classes direction)>
+void *arg_info, const struct pcc_funcs_ptr *accessor, Errors_classes direction)>
 
 Gets args for the current function call and puts them into position.
 First it gets the positional non-slurpy parameters, then the positional
@@ -728,7 +728,7 @@ slurpy parameters.
 static void
 fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         ARGIN(PMC *raw_sig), ARGIN(void *arg_info),
-        ARGIN(struct pcc_funcs_ptr *accessor),
+        ARGIN(const struct pcc_funcs_ptr *accessor),
         Errors_classes direction)
 {
     ASSERT_ARGS(fill_params)
@@ -1177,7 +1177,7 @@ named_argument_arity_error(PARROT_INTERP, int named_arg_count,
 /*
 
 =item C<static void assign_default_param_value(PARROT_INTERP, INTVAL
-param_index, INTVAL param_flags, void *arg_info, struct pcc_funcs_ptr
+param_index, INTVAL param_flags, void *arg_info, const struct pcc_funcs_ptr
 *accessor)>
 
 Assign an appropriate default value to the parameter depending on its type
@@ -1188,7 +1188,7 @@ Assign an appropriate default value to the parameter depending on its type
 
 static void
 assign_default_param_value(PARROT_INTERP, INTVAL param_index, INTVAL param_flags,
-        ARGIN(void *arg_info), ARGMOD(struct pcc_funcs_ptr *accessor))
+        ARGIN(void *arg_info), ARGIN(const struct pcc_funcs_ptr *accessor))
 {
     ASSERT_ARGS(assign_default_param_value)
     switch (PARROT_ARG_TYPE_MASK_MASK(param_flags)) {
@@ -1235,7 +1235,7 @@ Parrot_pcc_fill_params_from_op(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 {
     ASSERT_ARGS(Parrot_pcc_fill_params_from_op)
 
-    static pcc_funcs_ptr function_pointers = {
+    const static pcc_funcs_ptr function_pointers = {
         (intval_ptr_func_t)intval_param_from_op,
         (numval_ptr_func_t)numval_param_from_op,
         (string_ptr_func_t)string_param_from_op,
@@ -1309,7 +1309,7 @@ Parrot_pcc_fill_params_from_varargs(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_objec
 {
     ASSERT_ARGS(Parrot_pcc_fill_params_from_varargs)
     PMC    *raw_sig  = PMCNULL;
-    static pcc_funcs_ptr function_pointers = {
+    const static pcc_funcs_ptr function_pointers = {
         (intval_ptr_func_t)intval_param_from_c_args,
         (numval_ptr_func_t)numval_param_from_c_args,
         (string_ptr_func_t)string_param_from_c_args,
@@ -1345,7 +1345,7 @@ The two result strings should be passed in as references to a C string.
 
 void
 Parrot_pcc_split_signature_string(ARGIN(const char *signature),
-        ARGMOD(const char **arg_sig), ARGMOD(const char **return_sig))
+        ARGOUT(const char **arg_sig), ARGOUT(const char **return_sig))
 {
     ASSERT_ARGS(Parrot_pcc_split_signature_string)
     const char *cur;
@@ -1520,6 +1520,7 @@ Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP,
 
         GETATTR_CallContext_current_cont(interp, parent, temp);
         SETATTR_CallContext_current_cont(interp, tailcall, temp);
+        PARROT_GC_WRITE_BARRIER(interp, tailcall);
     }
 }
 

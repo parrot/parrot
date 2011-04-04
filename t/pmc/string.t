@@ -20,7 +20,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(154)
+    plan(160)
 
     set_or_get_strings()
     setting_integers()
@@ -766,6 +766,25 @@ TEST:
 
   $I0 = $P0.'reverse_index'('l', 8)
   is( $I0, 3, "search2 3" )
+
+  $P0 = utf8:"string strin \x{12345}-\x{aa}-\x{ab} world"
+  $I0 = $P0.'reverse_index'('', 0)
+  is( $I0, -1, "search empty -1 unicode" )
+
+  $I0 = $P0.'reverse_index'('o', -1)
+  is( $I0, -1, "negative start -1 unicode" )
+
+  $I0 = $P0.'reverse_index'('o', 24)
+  is( $I0, -1, "out of bounds -1 unicode" )
+
+  $I0 = $P0.'reverse_index'('string', 23)
+  is( $I0, 0, "search1 unicode" )
+
+  $I0 = $P0.'reverse_index'(utf16:"\x{aa}-\x{ab}", 15)
+  is( $I0, 15, "search2 unicode" )
+
+  $I0 = $P0.'reverse_index'(utf16:"\x{aa}-\x{ab}", 14)
+  is( $I0, -1, "search3 unicode" )
 .end
 
 .macro exception_is ( M )

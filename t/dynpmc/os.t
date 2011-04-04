@@ -22,7 +22,7 @@ t/pmc/os.t - Files and Dirs
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/os.t
+    % prove t/dynpmc/os.t
 
 =head1 DESCRIPTION
 
@@ -45,6 +45,9 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
         $P0 = loadlib 'os'
         $P1 = new ['OS']
         $S1 = $P1."cwd"()
+        # Unicode downcase needs ICU
+        $I0 = find_encoding "iso-8859-1"
+        $S1 = trans_encoding $S1, $I0
         $S2 = downcase $S1
         print $S2
         print "\n"
@@ -73,7 +76,7 @@ OUT
 
 SKIP:
 {
-    skip 'windows doesn\'t like having the rug pulled from underneath it', 1 if ($MSWin32 || $cygwin);
+    skip 'Some OSes don\'t allow to remove the current directory', 1 if $^O !~ /linux/i;
     mkdir "test-bad-cwd";
 
     pir_error_output_like( <<'CODE', <<"OUT", 'Test bad cwd' );
@@ -86,7 +89,7 @@ SKIP:
             $S0 = $P1.'cwd'()
     .end
 CODE
-/No such file or directory/
+/getcwd failed/
 OUT
 }
 
@@ -108,6 +111,9 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
         $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
+        # Unicode downcase needs ICU
+        $I0 = find_encoding "iso-8859-1"
+        $S1 = trans_encoding $S1, $I0
         $S2 = downcase $S1
         say $S2
 
@@ -115,6 +121,9 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
         $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
+        # Unicode downcase needs ICU
+        $I0 = find_encoding "iso-8859-1"
+        $S1 = trans_encoding $S1, $I0
         $S2 = downcase $S1
         say $S2
 
@@ -162,7 +171,7 @@ pir_error_output_like( <<'CODE', <<"OUT", 'Test bad chdir' );
         $P1."chdir"($S1)
 .end
 CODE
-/No such file or directory/
+/chdir failed/
 OUT
 
 # Test mkdir
@@ -183,6 +192,9 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
         $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
+        # Unicode downcase needs ICU
+        $I0 = find_encoding "iso-8859-1"
+        $S1 = trans_encoding $S1, $I0
         $S2 = downcase $S1
         say $S2
 
@@ -190,6 +202,9 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
         $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
+        # Unicode downcase needs ICU
+        $I0 = find_encoding "iso-8859-1"
+        $S1 = trans_encoding $S1, $I0
         $S2 = downcase $S1
         say $S2
 
@@ -236,7 +251,7 @@ pir_error_output_like( <<'CODE', <<"OUT", 'Test bad mkdir' );
         $P1."mkdir"(".", 0)
 .end
 CODE
-/File exists/i
+/mkdir failed/i
 OUT
 
 # Test remove on a directory
@@ -292,7 +307,7 @@ finally2:
         pop_eh
 .end
 CODE
-/Directory not empty
+/rmdir failed.*
 stat failed/
 OUT
 
@@ -315,6 +330,11 @@ if ( $cygwin ) {
 }
 
 if ( $MSWin32 ) {
+    $s[0] = 0;      # dev: we use dwVolumeSerialNumber instead of drive letter
+    $s[2] = 0777;   # mode: always 0777 on Windows
+    $s[3] = 0;      # nlink: only implemented in fstat for now
+    $s[6] = 0;      # rdev: we use zero instead of drive letter
+    $s[10] = $s[9]; # ctime: equals mtime
     $stat = sprintf("0x%08x\n" x 11, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
@@ -322,6 +342,7 @@ if ( $MSWin32 ) {
         $P1 = new ['OS']
         $S1 = "xpto"
         $P2 = $P1."stat"($S1)
+        $P2[0] = 0
 
         $S1 = repeat "0x%08x\n", 11
         $S2 = sprintf $S1, $P2
@@ -360,28 +381,29 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', 'test bad stat');
         $P2 = $P1."stat"("non-existent something")
 .end
 CODE
-/No such file or directory/
+/stat failed/
 OUTPUT
 
-# test readdir
-SKIP: {
-    skip 'not implemented on windows yet', 3 if ( $MSWin32 && $MSVC );
-
-    opendir my $IN, 'docs';
-    my @entries = readdir $IN;
-    closedir $IN;
-    my $entries = join( ' ', @entries ) . "\n";
-    pir_output_is( <<'CODE', $entries, 'Test OS.readdir' );
+opendir my $IN, 'docs';
+my @entries = readdir $IN;
+closedir $IN;
+my $entries = join( ' ', @entries ) . "\n";
+pir_output_is( <<'CODE', $entries, 'Test OS.readdir' );
 .sub main :main
     $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P2 = $P1.'readdir'('docs')
 
     $S0 = join ' ', $P2
+    $I0 = find_encoding 'ascii'
+    $S0 = trans_encoding $S0, $I0
     print $S0
     print "\n"
 .end
 CODE
+
+SKIP: {
+    skip 'not implemented on windows yet', 1 if ( $MSWin32 && $MSVC );
 
     mkdir 'silly-dir-with-silly-names';
     open my $fileh, '>', "silly-dir-with-silly-names/sillyname\x{263A}";
@@ -406,17 +428,17 @@ CODE
 
     unlink "silly-dir-with-silly-names/sillyname\x{263A}";
     rmdir "silly-dir-with-silly-names";
+}
 
-    pir_error_output_like( <<'CODE', <<'OUTPUT', 'Test bad OS.readdir' );
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'Test bad OS.readdir' );
 .sub main :main
     $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P2 = $P1.'readdir'('non-existent directory')
 .end
 CODE
-/No such file or directory/
+/readdir failed/
 OUTPUT
-}
 
 # test rename
 
@@ -449,7 +471,7 @@ pir_error_output_like( <<'CODE', <<"OUT", 'Test bad OS.rename' );
     $P1.'rename'('some silly non-existent file name', 'arglblargl')
 .end
 CODE
-/No such file or directory/
+/rename failed/
 OUT
 
 # test lstat
@@ -482,7 +504,7 @@ SKIP: {
         end
 .end
 CODE
-/${lstat}No such file or directory/
+/${lstat}stat failed/
 OUTPUT
 }
 
@@ -508,7 +530,7 @@ rmdir $xpto if -f $xpto;    # this way next test doesn't fail if this one does
 
 # Test symlink
 SKIP: {
-    skip "Symlinks not available under Windows", 2 if $MSWin32;
+    skip "Admin rights and Vista needed for symlinks on Windows", 2 if $MSWin32;
 
     pir_error_output_like( <<'CODE', <<"OUT", "Test symlink" );
 .sub main :main
@@ -527,8 +549,7 @@ SKIP: {
 .end
 CODE
 /ok
-File exists
-/
+symlink failed/
 OUT
 
     ok( -l "xpto", "symlink was really created" );
@@ -536,10 +557,7 @@ OUT
 }
 
 # Test link to file. May require root permissions
-SKIP: {
-    skip "Hardlinks to files not possible on Windows", 2 if $MSWin32 or $cygwin;
-
-    pir_output_is( <<'CODE', <<"OUT", "Test link" );
+pir_output_is( <<'CODE', <<"OUT", "Test link" );
 .sub main :main
         $P0 = loadlib 'os'
         $P1 = new ['OS']
@@ -556,16 +574,12 @@ CODE
 ok
 OUT
 
-    my $nl = [ stat("myconfig") ]->[3];
-    ok( $nl > 1, "hard link to file was really created" );
-    unlink "xpto" if -f "xpto";
-}
+my $nl = [ stat("myconfig") ]->[3];
+ok( $nl > 1, "hard link to file was really created" );
+unlink "xpto" if -f "xpto";
 
-SKIP: {
-    skip "Hardlinks to files not possible on Windows", 1 if $MSWin32 or $cygwin;
-
-    my $prevnl = [ stat("tools") ]->[3];
-    pir_output_like( <<"CODE", <<"OUT", "Test dirlink" );
+my $prevnl = [ stat("tools") ]->[3];
+pir_output_like( <<"CODE", <<"OUT", "Test dirlink" );
 .sub main :main
     .local pmc os
     .local string xpto, tools
@@ -602,9 +616,8 @@ SKIP: {
     end
 .end
 CODE
-/link.* failed for OS PMC:/
+/link failed/
 OUT
-}
 
 # Test umask
 SKIP: {
@@ -655,7 +668,7 @@ SKIP: {
 .end
 CODE
 /\/
-Too many levels of symbolic links
+chroot failed
 /
 OUT
     rmtree("my-super-chroot", 0, 1);
@@ -720,7 +733,7 @@ OUT
             end
     .end
 CODE
-/No such file or directory/
+/chmod failed/
 OUT
 
 }

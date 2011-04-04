@@ -6,9 +6,9 @@
 
 Parrot's inter-routine calling conventions.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Synopsis
 

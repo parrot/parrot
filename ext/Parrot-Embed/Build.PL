@@ -84,47 +84,8 @@ sub get_path_separator
 sub get_compiler_flags
 {
     my $in_parrot_tree = shift;
-    return get_flags_from_parrot_src() if $in_parrot_tree;
-    return get_flags_from_pkg_config() if $ENV{PKG_CONFIG_PATH};
-}
-
-sub get_flags_from_pkg_config
-{
-    require ExtUtils::PkgConfig;
-    my %pkg_info = ExtUtils::PkgConfig->find( 'parrot' );
-    return @pkg_info{qw( cflags libs )};
-}
-
-sub get_flags_from_parrot_src
-{
-    my $updir   = updir();
-    my $basedir = Cwd::realpath( catdir( cwd(), $updir, $updir ) );
-    my $file    = catfile( $basedir, 'parrot.pc' );
-    open( my $fh, '<', $file ) or die "Cannot read $file: $!\n";
-
-    my %vars;
-    while (<$fh>)
-    {
-        chomp;
-        last unless /\S/;
-    }
-
-    $vars{libdir}     = catdir( $basedir, 'lib' );
-    $vars{includedir} = catdir( $basedir, 'include' );
-
-    while (<$fh>)
-    {
-        chomp;
-        last unless /\S/;
-        my ($var, $value) =  split(/: /, $_);
-        $value            =~ s/\${(\w+)}/$vars{$1}/g;
-        $vars{$var}       =  $value;
-    }
-
-    $vars{Cflags} .= ' -I' . catdir( ($updir) x 2, 'include' );
-    $vars{Libs}   .= $^O =~ /Win32/ ? ' ..\..\libparrot.lib' : " -L$libp";
-
-    return @vars{qw( Cflags Libs )};
+    my $parrot_config = $in_parrot_tree ? "./parrot_config" : "parrot_config";
+    return (`$parrot_config embed-cflags`, `$parrot_config embed-ldflags`);
 }
 
 sub get_paths

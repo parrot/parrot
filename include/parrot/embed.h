@@ -50,6 +50,8 @@ void Parrot_clear_trace(PARROT_INTERP, Parrot_UInt flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 Parrot_PMC Parrot_compile_string(PARROT_INTERP,
     Parrot_String type,
     ARGIN(const char *code),

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -37,8 +37,8 @@ according to the type of C<*value>.
 */
 
     VTABLE void assign_pmc(PMC *value) {
-        INTVAL  self_type = VTABLE_type(INTERP, SELF);
-        INTVAL  val_type  = VTABLE_type(INTERP, value);
+        const INTVAL self_type = VTABLE_type(INTERP, SELF);
+        const INTVAL val_type  = VTABLE_type(INTERP, value);
 
         if (self_type == enum_class_Boolean)
             /* doesn't morph */
@@ -734,8 +734,7 @@ and C<*value>.
 
     MULTI INTVAL cmp_num(PMC *value) {
         /* XXX - Floating-point precision errors possible? */
-        FLOATVAL diff = VTABLE_get_number(INTERP, value) -
-                        SELF.get_number();
+        const FLOATVAL diff = VTABLE_get_number(INTERP, value) - SELF.get_number();
 
         return FLOAT_IS_ZERO(diff) ? 0 : diff < 0.0 ? -1 : 1;
     }
@@ -844,7 +843,7 @@ Sets this PMC as shared and read-only.
 
 */
     VTABLE PMC *share_ro() {
-        PMC         *ret  = pt_shared_fixup(INTERP, SELF);
+        PMC * const ret   = pt_shared_fixup(INTERP, SELF);
         PMC * const _true = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, 1);
 
         /* first set readonly */

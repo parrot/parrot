@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -60,7 +60,7 @@ Marks the object as live.
 */
 
     VTABLE void mark() {
-        Parrot_PackfileAnnotation_attributes * const attrs =
+        const Parrot_PackfileAnnotation_attributes * const attrs =
                 PARROT_PACKFILEANNOTATION(SELF);
 
         Parrot_gc_mark_STRING_alive(INTERP, attrs->name);
@@ -78,7 +78,7 @@ Fetch the offset into the bytecode of the instruction that is being annotated.
 
 */
     METHOD get_offset() {
-        INTVAL offset = PARROT_PACKFILEANNOTATION(SELF)->offset;
+        const INTVAL offset = PARROT_PACKFILEANNOTATION(SELF)->offset;
         RETURN(INTVAL offset);
     }
 
@@ -107,7 +107,7 @@ Fetch the name of the annotation.
 
 */
     METHOD get_name() {
-        STRING * name = PARROT_PACKFILEANNOTATION(SELF)->name;
+        STRING * const name = PARROT_PACKFILEANNOTATION(SELF)->name;
         RETURN(STRING * name);
     }
 
@@ -136,7 +136,7 @@ Fetch the integer value of the annotation.
 
 */
     VTABLE INTVAL get_integer() {
-        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
+        const Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_INT)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Trying to fetch wrong type of value from annotation");

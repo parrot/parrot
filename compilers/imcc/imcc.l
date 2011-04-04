@@ -1214,7 +1214,8 @@ include_file(PARROT_INTERP, ARGIN(STRING *file_name), void *yyscanner)
 
     if (STRING_IS_NULL(s)
     ||  (file = PIO_OPEN(interp, s, PIO_F_READ)) == PIO_INVALID_HANDLE) {
-        IMCC_fataly(interp, EXCEPTION_EXTERNAL_ERROR, strerror(errno));
+        IMCC_fataly(interp, EXCEPTION_EXTERNAL_ERROR,
+            "No such file or directory");
     }
 
     frame->s.file   = file_name;

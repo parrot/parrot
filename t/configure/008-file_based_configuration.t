@@ -11,7 +11,7 @@ BEGIN {
     our $topdir = realpath($Bin) . "/../..";
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 31;
+use Test::More tests => 30;
 use Carp;
 use Parrot::Configure::Options qw| process_options |;
 
@@ -56,8 +56,6 @@ use Parrot::Configure::Options qw| process_options |;
         "Configuring from yourfoobar: debugging turned on");
     is($args->{cc}, $c_compiler,
         "Configuring from yourfoobar: C compiler is $c_compiler");
-    is($args->{cxx}, $cplusplus_compiler,
-        "Configuring from yourfoobar: C++ compiler is $cplusplus_compiler");
     is($args->{link}, $cplusplus_compiler,
         "Configuring from yourfoobar: linker is $cplusplus_compiler");
     is($args->{ld}, $cplusplus_compiler,

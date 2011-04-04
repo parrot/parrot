@@ -43,8 +43,8 @@ typedef struct _Parrot_GC_Init_Args {
 typedef enum _gc_sys_type_enum {
     MS,  /* mark and sweep */
     INF, /* infinite memory core */
-    TMS, /* tricolor mark and sweep */
-    MS2
+    MS2,
+    GMS
 } gc_sys_type_enum;
 
 /* pool iteration */
@@ -94,6 +94,7 @@ typedef enum {
     CURRENT_RUNCORE,
 
     /* interpinfo_p constants */
+    CURRENT_CTX,
     CURRENT_SUB,
     CURRENT_CONT,
     CURRENT_OBJECT,
@@ -522,16 +523,11 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/api.c */
 
-#if defined(NDEBUG) && defined(PARROT_IN_CORE)
-#  define Parrot_gc_mark_STRING_alive(interp, obj) \
-          do if (! STRING_IS_NULL(obj)) PObj_live_SET(obj); while (0)
-#else
-#  define Parrot_gc_mark_STRING_alive(interp, obj) Parrot_gc_mark_STRING_alive_fun((interp), (obj))
-#endif
+# define Parrot_gc_mark_STRING_alive(interp, obj) Parrot_gc_mark_STRING_alive_fun((interp), (obj))
 
 #if defined(PARROT_IN_CORE)
 #  define Parrot_gc_mark_PMC_alive(interp, obj) \
-      do if (!PMC_IS_NULL(obj) && !PObj_live_TEST(obj)) Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
+      do if (!PMC_IS_NULL(obj)) Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
       while (0)
 #else
 #  define Parrot_gc_mark_PMC_alive(interp, obj) Parrot_gc_mark_PMC_alive_fun((interp), (obj))

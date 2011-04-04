@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -44,7 +44,7 @@ Create empty PackfileRawSegment.
 */
 
     VTABLE void init() {
-        Parrot_PackfileRawSegment_attributes * attrs =
+        Parrot_PackfileRawSegment_attributes * const attrs =
                 PMC_data_typed(SELF, Parrot_PackfileRawSegment_attributes*);
 
         attrs->opcodes = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
@@ -114,11 +114,11 @@ Initialize PackfileRawSegment from PackFile_Segment
 */
 
     VTABLE void *get_pointer() {
-        PackFile_Segment * pfseg =
+        PackFile_Segment * const pfseg =
                 (PackFile_Segment*)mem_gc_allocate_zeroed_typed(INTERP, PackFile_ByteCode);
-        Parrot_PackfileRawSegment_attributes * const attrs =
+        const Parrot_PackfileRawSegment_attributes * const attrs =
                 PARROT_PACKFILERAWSEGMENT(SELF);
-        PMC * opcodes = attrs->opcodes;
+        PMC * const opcodes = attrs->opcodes;
         size_t i;
 
         pfseg->type = attrs->type;
@@ -160,6 +160,10 @@ Get the number of elements in the array.
 
 =item C<INTVAL get_integer_keyed_int(INTVAL key)>
 
+=item C<INTVAL get_pmc_keyed_int(INTVAL key)>
+
+=item C<INTVAL get_pmc_keyed(PMC *key)>
+
 Fetch an integer's worth of data from the segment.
 
 =cut
@@ -168,6 +172,14 @@ Fetch an integer's worth of data from the segment.
     VTABLE INTVAL get_integer_keyed_int(INTVAL key)  {
         return VTABLE_get_integer_keyed_int(INTERP,
                 PARROT_PACKFILERAWSEGMENT(SELF)->opcodes, key);
+    }
+
+    VTABLE PMC *get_pmc_keyed_int(INTVAL index)  {
+        return Parrot_pmc_box_integer(INTERP, STATICSELF.get_integer_keyed_int(index));
+    }
+
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
+        return STATICSELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
     }
 
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -173,15 +173,17 @@ Returns the number of remaining elements in the array.
 */
 
     VTABLE INTVAL elements() {
-        INTVAL reverse, pos, length;
+        INTVAL reverse;
 
         GET_ATTR_reverse(INTERP, SELF, reverse);
 
         if (reverse) {
+            INTVAL pos;
             GET_ATTR_pos(INTERP, SELF, pos);
             return pos;
         }
         else {
+            INTVAL pos, length;
             GET_ATTR_length(INTERP, SELF, length);
             GET_ATTR_pos(INTERP, SELF, pos);
             return length - pos;

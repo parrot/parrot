@@ -69,7 +69,6 @@ DYNPMC_H_FILES_MIN = \
     include/parrot/pobj.h \
     include/parrot/scheduler.h \
     include/parrot/settings.h \
-    include/parrot/stat.h \
     include/parrot/string.h \
     include/parrot/string_funcs.h \
     include/parrot/sub.h \

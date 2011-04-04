@@ -244,6 +244,7 @@ Returns the special C<NULL> PMC.
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
+PARROT_CAN_RETURN_NULL
 Parrot_PMC
 Parrot_PMC_null(void)
 {
@@ -370,6 +371,7 @@ Parrot_ext_try(PARROT_INTERP,
           default: /* catch */
             {
                 PMC *exception = jmp.exception;
+                curctx = CONTEXT(interp);
                 if (curctx != initialctx) {
                     Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG,
                             "popping context in Parrot_ext_try");
@@ -522,6 +524,7 @@ Parrot_set_strreg(PARROT_INTERP, Parrot_Int regnum,
 {
     ASSERT_ARGS(Parrot_set_strreg)
     REG_STR(interp, regnum) = value;
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
 }
 
 /*
@@ -542,6 +545,7 @@ Parrot_set_pmcreg(PARROT_INTERP, Parrot_Int regnum,
 {
     ASSERT_ARGS(Parrot_set_pmcreg)
     REG_PMC(interp, regnum) = value;
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
 }
 
 /*=for api extend Parrot_new_string
