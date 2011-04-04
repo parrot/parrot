@@ -8,22 +8,15 @@
 
 BEGIN_OPS_PREAMBLE
 
-#define M0_REG_COUNT 256
-
-#define M0_ASSERT_REG(r) PARROT_ASSERT(0 <= r && M0_REG_COUNT-1 >= r)
-
+#define M0_REG_COUNT          256
+#define M0_ASSERT_REG(r)      PARROT_ASSERT(0 <= r && M0_REG_COUNT-1 >= r)
 #define M0_ASSERT_REGS(a,b,c) {M0_ASSERT_REG(a);M0_ASSERT_REG(b);M0_ASSERT_REG(c);}
-
-#define M0_REG_RVAL(ctx, reg_n, type) ((type)(((void**)PMC_data(ctx))[reg_n]))
-#define M0_REG_LVAL(ctx, reg_n) (((void**)PMC_data(ctx))[reg_n])
-
-static PMC* m0_structview = NULL;
 
 END_OPS_PREAMBLE
 
 =head1 NAME
 
-m0.ops - Prototype M0 opcodes
+m0_proto.ops - Prototype M0 opcodes
 
 =cut
 
