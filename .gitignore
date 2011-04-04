@@ -319,7 +319,7 @@
 /src/dynoplibs/*.c
 /src/dynoplibs/*.dll
 /src/dynoplibs/*.exp
-/src/dynoplibs/*.h
+/src/dynoplibs/*_ops.h
 /src/dynoplibs/*.ilk
 /src/dynoplibs/*.lib
 /src/dynoplibs/*.manifest

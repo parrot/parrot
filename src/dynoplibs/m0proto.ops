@@ -8,6 +8,7 @@
 
 BEGIN_OPS_PREAMBLE
 
+#include "m0proto_const.h"
 #define M0_REG_COUNT          256
 #define M0_ASSERT_REG(r)      PARROT_ASSERT(0 <= r && M0_REG_COUNT-1 >= r)
 #define M0_ASSERT_REGS(a,b,c) {M0_ASSERT_REG(a);M0_ASSERT_REG(b);M0_ASSERT_REG(c);}
