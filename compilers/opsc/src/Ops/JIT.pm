@@ -114,7 +114,14 @@ method _init_llvm() {
     # Create lookup hash for functions, declared in $!module;
     my $f := $!module.first_function;
     while $f {
-        %!functions{ $f.name } := $f;
+        my $name := $f.name;
+        %!functions{ $name } := $f;
+
+        # XXX PCC functions are aliased. And we don't have "cpp" (yet?)
+        if $name ~~ / '_func' $/ {
+            $name := pir::substr($name, 0, pir::length($name) - 5);
+            %!functions{ $name } := $f;
+        }
         $f := $f.next;
     }
 }
@@ -224,6 +231,9 @@ method _create_jitted_function (%jit_context, $start) {
     %jit_context<variables><cur_opcode> := $cur_opcode_addr;
     $!builder.store($cur_opcode, $cur_opcode_addr);
 
+    # '#define CUR_OPCODE cur_opcode'
+    %jit_context<variables><CUR_OPCODE> := $cur_opcode_addr;
+
     $!debug && say("# interp");
     my $interp := $!jitted_sub.param(1);
     $interp.name("interp");
@@ -249,6 +259,16 @@ method _create_jitted_function (%jit_context, $start) {
         $!builder.load(%jit_context<variables><.CUR_CTX>),
         :name('.str_constants')
     );
+
+    $!debug && say("# pmc_constants");
+    %jit_context<pmc_constants> := $!builder.call(
+        %!functions<Parrot_pcc_get_pmc_constants_func>,
+        $!builder.load(%jit_context<variables><interp>),
+        $!builder.load(%jit_context<variables><.CUR_CTX>),
+        :name('.pmc_constants')
+    );
+
+    %jit_context<variables><PMCNULL> := $!module.get_global(:name<PMCNULL>);
 
     # Create default return.
     $!debug && say("# default leave");
