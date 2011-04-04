@@ -18,26 +18,26 @@ without casting
 
 */
 
-pmclass m0ctx dynpmc extends FixedFloatArray {
+pmclass m0ctx dynpmc extends FixedFloatArray auto_attrs {
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
-        const FLOATVAL f = SELF.get_number_keyed_int(key);
-        return *(*INTVAL)&f;
+        FLOATVAL f = SELF.get_number_keyed_int(key);
+        return *(INTVAL*)&f;
     }
 
-    VTABLE INTVAL get_pointer_keyed_int(INTVAL key) {
-        const FLOATVAL f = SELF.get_number_keyed_int(key);
-        return *(*INTVAL)&f;
+    VTABLE void *get_pointer_keyed_int(INTVAL key) {
+        FLOATVAL f = SELF.get_number_keyed_int(key);
+        return *(void**)&f;
     }
 
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        FLOATVAL f = *(*FLOATVAL)&value;
+        FLOATVAL f = *(FLOATVAL*)&value;
         SELF.set_number_keyed_int(key, f);
     }
 
     VTABLE void set_pointer_keyed_int(INTVAL key, void *value) {
-        FLOATVAL f = *(*FLOATVAL)&value;
+        FLOATVAL f = *(FLOATVAL*)&value;
         SELF.set_number_keyed_int(key, f);
     }
 
