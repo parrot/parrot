@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2009, Parrot Foundation.
+ * Copyright (C) 2002-2011, Parrot Foundation.
  */
 
 /*
@@ -78,6 +78,13 @@ static void bb_remove_edge(ARGMOD(IMC_Unit *unit), ARGMOD(Edge *edge))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*edge);
+
+PARROT_WARN_UNUSED_RESULT
+static int blocks_are_connected(
+    ARGIN(const Basic_block *from),
+    ARGIN(const Basic_block *to))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 static int check_invoke_type(
@@ -159,6 +166,9 @@ static void sort_loops(ARGMOD(imc_info_t *imcc), ARGIN(IMC_Unit *unit))
 #define ASSERT_ARGS_bb_remove_edge __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(edge))
+#define ASSERT_ARGS_blocks_are_connected __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(from) \
+    , PARROT_ASSERT_ARG(to))
 #define ASSERT_ARGS_check_invoke_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit) \
@@ -477,12 +487,12 @@ bb_findadd_edge(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
         ARGIN(Basic_block *from), ARGIN(const SymReg *label))
 {
     ASSERT_ARGS(bb_findadd_edge)
-    Instruction         *ins;
     const SymReg * const r = find_sym(imcc, label->name);
 
     if (r && (r->type & VTADDRESS) && r->first_ins)
         bb_add_edge(imcc, unit, from, unit->bb_list[r->first_ins->bbindex]);
     else {
+        const Instruction *ins;
         IMCC_debug(imcc, DEBUG_CFG, "register branch %d ", from->end);
         for (ins = from->end; ins; ins = ins->prev) {
             if ((ins->type & ITBRANCH)
@@ -502,8 +512,8 @@ bb_findadd_edge(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
 
 /*
 
-=item C<int blocks_are_connected(const Basic_block *from, const Basic_block
-*to)>
+=item C<static int blocks_are_connected(const Basic_block *from, const
+Basic_block *to)>
 
 Returns true or false whether the given blocks are linked.
 
@@ -512,10 +522,8 @@ Returns true or false whether the given blocks are linked.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-int
-blocks_are_connected(ARGIN(const Basic_block *from),
-                     ARGIN(const Basic_block *to))
+static int
+blocks_are_connected(ARGIN(const Basic_block *from), ARGIN(const Basic_block *to))
 {
     ASSERT_ARGS(blocks_are_connected)
     const Edge *pred = to->pred_list;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2009, Parrot Foundation.
+ * Copyright (C) 2002-2011, Parrot Foundation.
  */
 
 
@@ -47,14 +47,6 @@ typedef struct _loop_info {
 
 /* HEADERIZER BEGIN: compilers/imcc/cfg.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-int blocks_are_connected(
-    ARGIN(const Basic_block *from),
-    ARGIN(const Basic_block *to))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 void build_cfg(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -115,9 +107,6 @@ void search_predecessors_not_in(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*s);
 
-#define ASSERT_ARGS_blocks_are_connected __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(from) \
-    , PARROT_ASSERT_ARG(to))
 #define ASSERT_ARGS_build_cfg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit))
