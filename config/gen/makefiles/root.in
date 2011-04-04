@@ -203,6 +203,7 @@ GEN_PASM_INCLUDES = \
 	runtime/parrot/include/interpinfo.pasm \
 	runtime/parrot/include/tm.pasm \
 	runtime/parrot/include/pmctypes.pasm \
+	runtime/parrot/include/m0proto_const.pasm \
 
 GEN_PM_INCLUDES = \
 	lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm
@@ -1265,6 +1266,8 @@ runtime/parrot/include/errors.pasm : $(INC_DIR)/warnings.h $(H2INC)
 runtime/parrot/include/tm.pasm : src/utils.c $(H2INC)
 	$(PERL) $(H2INC) src/utils.c $@
 
+runtime/parrot/include/m0proto_const.pasm : src/dynoplibs/m0proto_const.h $(H2INC)
+	$(PERL) $(H2INC) src/dynoplibs/m0proto_const.h $@
 
 ###############################################################################
 #
