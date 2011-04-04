@@ -112,6 +112,7 @@ method defines($emitter) {
     return qq|
 /* defines - Ops::Trans::C */
 #define REL_PC     ((size_t)(cur_opcode - (opcode_t *)interp->code->base.data))
+#define CUR_OPCODE cur_opcode
 #define IREG(i) REG_INT(interp, cur_opcode[i])
 #define NREG(i) REG_NUM(interp, cur_opcode[i])
 #define PREG(i) REG_PMC(interp, cur_opcode[i])
