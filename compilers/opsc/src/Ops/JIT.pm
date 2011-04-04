@@ -308,7 +308,7 @@ method _create_basic_blocks(%jit_context) {
         );
 
         # Next op
-        $i := $i + _opsize(%jit_context, $op);
+        $i := $i + self._opsize(%jit_context, $op);
 
         $keep_going   := self._keep_going($opname);
 
@@ -349,7 +349,7 @@ method _jit_ops(%jit_context) {
         my $jitted_op := self.process_op($parsed_op, %jit_context);
 
         # Next op
-        $i := $i + _opsize(%jit_context, $op);
+        $i := $i + self._opsize(%jit_context, $op);
         %jit_context<cur_opcode> := $i;
 
         $keep_going   := self._keep_going($opname);
@@ -363,10 +363,19 @@ Calculate number of op's args. In most cases it's predefined for op. For 4
 exceptions C<set_args>, C<get_results>, C<get_params>, C<set_returns> we have
 to calculate it in run-time..
 
-sub _opsize(%jit_context, $op) {
-    die("NYI") if _op_is_special(~$op);
+method _opsize(%c, $op) {
+    if _op_is_special(~$op) {
+        $!debug && say("Checking special op size");
+        my $id := self._opcode_at(1, %c);
+        $!debug && say("PCC constant $id");
+        my $fia := %c<constants>[$id];
 
-    1 + pir::elements($op);
+        $!debug && say("_opize { 2 + pir::elements($fia) }");
+        2 + pir::elements($fia);
+    }
+    else {
+        1 + pir::elements($op);
+    }
 }
 
 =item _op_is_special
