@@ -46,9 +46,9 @@ sub test_single_file($pir, $oplib, $ops_file, $debug) {
 
     # Create interp and seed it with bytecode
     my $this_interp := pir::getinterp();
-    my $pbc_ums     := pir::new('UnManagedStruct');
     # Parrot_api_load_bytecode_file do something weird with interp->api_jmp_buf
     # which prevent clean exit from parrot.
+    #my $pbc_ums     := pir::new('UnManagedStruct');
     #func("Parrot_api_load_bytecode_file", "iPSP")($this_interp, $pbc, $pbc_ums);
     func("PackFile_read_pbc", "ppSi")($this_interp, $pbc, 0);
 
