@@ -1,0 +1,101 @@
+/*
+ * Copyright (C) 2010-2011, Parrot Foundation.
+ */
+
+/*
+** lorito.ops
+*/
+
+BEGIN_OPS_PREAMBLE
+
+#define M0_REG_COUNT 256
+
+#define M0_ASSERT_REG(r) PARROT_ASSERT(0 <= r && M0_REG_COUNT-1 >= r)
+
+#define M0_ASSERT_REGS(a,b,c) {M0_ASSERT_REG(a);M0_ASSERT_REG(b);M0_ASSERT_REG(c);}
+
+#define M0_REG_RVAL(ctx, reg_n, type) ((type)(((void**)PMC_data(ctx))[reg_n]))
+#define M0_REG_LVAL(ctx, reg_n) (((void**)PMC_data(ctx))[reg_n])
+
+static PMC* m0_structview = NULL;
+
+END_OPS_PREAMBLE
+
+=head1 NAME
+
+m0.ops - Prototype M0 opcodes
+
+=cut
+
+=head1 DESCRIPTION
+
+M0 opcodes
+
+=head2
+
+Cheats
+
+=cut
+
+op m0_new_ctx(out PMC) {
+    INTVAL i;
+    $1 = Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
+    VTABLE_set_integer_native(interp, $1, M0_REG_COUNT);
+    for (i = 0; i < M0_REG_COUNT; i++) {
+        VTABLE_set_integer_keyed_int(interp, $1, i, 0);
+    }
+}
+
+op m0_cstr_var(invar PMC, in INT, in STR) {
+    char *cstr;
+
+    /* Mmmmm.  Leaks. */
+    cstr = Parrot_str_to_cstring(interp, $3);
+    VTABLE_set_integer_keyed_int(interp, $1, $2, (INTVAL)cstr);
+}
+
+op m0_int_var(invar PMC, in INT, in INT) {
+    VTABLE_set_integer_keyed_int(interp, $1, $2, $3);
+}
+
+=head2 M0 Math/Numeric ops
+
+=cut
+
+op m0_add_i(invar PMC, in INT, in INT, in INT) {
+    INTVAL i1, i2, sum;
+
+    M0_ASSERT_REGS($2, $3, $4);
+    i1 = VTABLE_get_integer_keyed_int(interp, $1, $3);
+    i2 = VTABLE_get_integer_keyed_int(interp, $1, $4);
+    VTABLE_set_integer_keyed_int(interp, $1, $2, i1 + i2);
+}
+
+=head2 Temporary ops
+
+=cut
+
+op m0_print_i(invar PMC, in INT, in INT, in INT) {
+    INTVAL i;
+
+    M0_ASSERT_REGS($2, $3, $4);
+    i = VTABLE_get_integer_keyed_int(interp, $1, $2);
+    Parrot_printf(interp, "%d", i);
+}
+
+op m0_print_s(invar PMC, in INT, in INT, in INT) {
+    char *s;
+
+    M0_ASSERT_REGS($2, $3, $4);
+    s = (char*)VTABLE_get_integer_keyed_int(interp, $1, $2);
+    Parrot_printf(interp, "%s", s);
+}
+
+
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
