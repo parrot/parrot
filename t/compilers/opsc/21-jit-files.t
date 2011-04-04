@@ -43,6 +43,9 @@ sub test_single_file($pir, $oplib, $ops_file, $debug) {
 
     # Create JITter.
     my $jitter := Ops::JIT.new($pbc, $ops_file, $oplib, debug => $debug);
+    my $module := $jitter.module;
+    # Some engine
+    my $engine := pir::new("LLVM_Engine", $module);
 
     # Create interp and seed it with bytecode
     my $this_interp := pir::getinterp();
@@ -68,13 +71,9 @@ sub test_single_file($pir, $oplib, $ops_file, $debug) {
 
     # Runcore loop
     while ($pc) {
-        # XXX Move _module out of context.
         my %jit_context := $jitter.jit($start);
-        my $module := %jit_context<_module>;
         $module.verify();
 
-        # Some engine
-        my $engine := pir::new("LLVM_Engine", $module);
         my $call := $engine.create_call(%jit_context<jitted_sub>, "iip");
 
         # Go!

@@ -175,6 +175,10 @@ method jit($start, :$optimize = 1) {
     %jit_context;
 }
 
+method module() {
+    $!module;
+}
+
 method _create_jit_context($start) {
     hash(
         bytecode    => $!bytecode,
@@ -186,8 +190,6 @@ method _create_jit_context($start) {
 
         basic_blocks => hash(), # offset->basic_block
         variables    => hash(), # name -> LLVM::Value
-
-        _module     => $!module, # abstraction leak for testing purpose only!
     );
 }
 
