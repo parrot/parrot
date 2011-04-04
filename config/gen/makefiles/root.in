@@ -2654,7 +2654,7 @@ SPLINTFLAGS = \
 
 #SPLINT_SOURCE = `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@ | sort`
 SPLINT_SOURCE = \
-	$$(find src/*.c src/{gc,io,packfile,string}/*.c -type f | \
+	$$(find src/*.c src/gc/*.c src/io/*.c src/packfile/*.c src/string/*.c -type f | \
 	grep -v src/gc/malloc.c | \
 	grep -v src/gc/malloc_trace.c | \
 	grep -v extra_nci_thunks.c | \
