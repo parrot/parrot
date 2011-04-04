@@ -344,13 +344,7 @@ to calculate it in run-time..
 sub _opsize(%jit_context, $op) {
     die("NYI") if _op_is_special(~$op);
 
-    1 + Q:PIR {
-        .local pmc op
-        .local int s
-        find_lex op, '$op'
-        s = elements op
-        %r = box s
-    };
+    1 + pir::elements($op);
 }
 
 =item _op_is_special
@@ -488,19 +482,10 @@ our method access_arg:type<ic> ($num, %c) {
 our method access_arg:type<nc> ($num, %c) {
     die("Wrong LHS mode") if %c<lhs>;
 
-    my $c := %c<constants>;
-    my $i := self._opcode_at($num, %c);
-    my $res := Q:PIR{
-        .local num    n
-        .local int    I
-        .local pmc    c
-        .local pmc    i
-        find_lex c, '$c'
-        find_lex i, '$i'
-        I = i
-        n = c[I]
-        %r = box n
-    };
+    my $c   := %c<constants>;
+    my $i   := self._opcode_at($num, %c);
+    my $res := pir::set__NQi($c, $i);
+
     $!debug && say("# $num<nc> '$res'");
     #$!builder.global_string_ptr($res, :name<.SCONST>);
 
