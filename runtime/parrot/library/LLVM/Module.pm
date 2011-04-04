@@ -86,6 +86,28 @@ class LLVM::Module is LLVM::Opaque {
         LLVM::call("WriteBitcodeToFile", self, $path);
     }
 
+
+#/* Operations on global variables */
+#            AddGlobal => "pppt",
+#            AddGlobalInAddressSpace => "pppti",
+#            GetNamedGlobal => "ppt",
+#            GetFirstGlobal => "pp",
+#            GetLastGlobal => "pp",
+#            GetNextGlobal => "pp",
+#            GetPreviousGlobal => "pp",
+#            DeleteGlobal => "vp",
+#            GetInitializer => "vp",
+#            SetInitializer => "vpp",
+#            IsThreadLocal => "ip",
+#            SetThreadLocal => "vpi",
+#            IsGlobalConstant => "ip",
+#            SetGlobalConstant => "vpi",
+    multi method get_global(:$name) {
+        LLVM::Value.create(
+            LLVM::call("GetNamedGlobal", self, $name)
+        )
+    }
+
 };
 
 # vim: ft=perl6
