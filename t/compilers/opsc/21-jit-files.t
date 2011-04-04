@@ -64,18 +64,23 @@ sub test_single_file($pir, $oplib, $ops_file, $debug) {
 
     my $start       := $sub.start_offs();
     my $pc          := func("Parrot_PMC_invoke", "ipPP")($interp, $sub, $pc);
-    my $base_offset := $pc - $sub.start_offs();
+    my $base_offset := $pc - $start;
 
-    my %jit_context := $jitter.jit($start);
-    my $module := %jit_context<_module>;
-    $module.verify();
+    # Runcore loop
+    while ($pc) {
+        # XXX Move _module out of context.
+        my %jit_context := $jitter.jit($start);
+        my $module := %jit_context<_module>;
+        $module.verify();
 
-    # Some engine
-    my $engine := pir::new("LLVM_Engine", $module);
-    my $call := $engine.create_call(%jit_context<jitted_sub>, "iip");
+        # Some engine
+        my $engine := pir::new("LLVM_Engine", $module);
+        my $call := $engine.create_call(%jit_context<jitted_sub>, "iip");
 
-    # Go!
-    $pc := $call($pc, $interp);
+        # Go!
+        $pc    := $call($pc, $interp);
+        $start := $pc - $base_offset;
+    }
 
     is($new_stdout.readall(), $expected, $pir);
 }
