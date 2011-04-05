@@ -112,11 +112,6 @@ static void verify_file_names(
     ARGIN_NULLOK(const char * input),
     ARGIN_NULLOK(const char * output));
 
-static void write_bytecode_file(
-    Parrot_PMC interp,
-    Parrot_String filename,
-    Parrot_PMC pbc);
-
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_help_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_is_all_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -142,7 +137,6 @@ static void write_bytecode_file(
 #define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(fp))
 #define ASSERT_ARGS_verify_file_names __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_write_bytecode_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -252,8 +246,8 @@ run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *
     }
     else {
         const Parrot_Int pasm_mode = flags->have_pasm_file;
-        Parrot_PMC compiler = pasm_mode ? pasm_compiler : pir_compiler;
-        Parrot_PMC pbc = NULL;
+        const Parrot_PMC compiler = pasm_mode ? pasm_compiler : pir_compiler;
+        Parrot_PMC pbc;
 
         if (!imcc_compile_file_api(interp, compiler, sourcefile, &pbc))
             show_last_error_and_exit(interp);
@@ -290,25 +284,6 @@ load_bytecode_file(Parrot_PMC interp, Parrot_String filename)
     if (!Parrot_api_load_bytecode_file(interp, filename, &bytecode))
         show_last_error_and_exit(interp);
     return bytecode;
-}
-
-/*
-
-=item C<static void write_bytecode_file(Parrot_PMC interp, Parrot_String
-filename, Parrot_PMC pbc)>
-
-Write a packfile PMC to a .pbc file.
-
-=cut
-
-*/
-
-static void
-write_bytecode_file(Parrot_PMC interp, Parrot_String filename, Parrot_PMC pbc)
-{
-    ASSERT_ARGS(write_bytecode_file)
-    if (!Parrot_api_write_bytecode_to_file(interp, pbc, filename))
-        show_last_error_and_exit(interp);
 }
 
 /*
@@ -700,7 +675,6 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
 {
     ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
-    const char * infile = NULL;
     const char * outfile = NULL;
     int status;
     int result = 1;
