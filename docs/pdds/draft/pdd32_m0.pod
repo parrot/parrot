@@ -135,7 +135,7 @@ in detail in the C<Register Types and Context Structure> section.
 
 An M0 register may have one of 256 values.  This means that registers can point
 at one of 256 different places in the variables table, which will support up to
-65536 slots.   Registers can be pointed at different slots with the C<get_var>
+65536 slots.   Registers can be pointed at different slots with the C<load_var>
 instruction, which will interpret its second and third arguments as the index
 into the variables table.  The variables table serves both as a runtime
 scratchpad and as a location for data which is extracted from bytecode to live.
@@ -282,17 +282,17 @@ Store C<*$1> ^ C<*$2> into C<*$0>.
 
 Set C<*$0> to whatever is in C<*$1>.  C<$2> is ignored.
 
-=item * set_mem - set a region of memory
+=item * store_mem - set a region of memory
 
 Write C<*$2> bytes from C<*$1> to the memory location starting at C<*$0>.
 Segfaults may result.  Be careful.
 
-=item * get_mem - get a region from memory
+=item * load_mem - get a region from memory
 
 Write C<*$2> bytes from the memory location starting at C<*$1> to C<*$0>.
 Segfaults may result.  Be careful.
 
-=item * get_var - point a register at a variables table slot
+=item * load_var - point a register at a variables table slot
 
 Point C<*$0> at a slot on the variables table.  C<$1> contains the low byte of
 the index, C<$2> contains the high byte.  Both C<$1> and C<$2> are treated as
@@ -305,10 +305,10 @@ scratchpad.
 Examples:
 
   #point register 0 at variable 123 (123 * 1 + 256 * 0)
-  get_var 0, 123, 0
+  load_var 0, 123, 0
 
   #point register 3 at variable 257 (2   * 1 + 256 * 1)
-  get_var 3, 2, 1
+  load_var 3, 2, 1
 
 =back
 
@@ -643,7 +643,7 @@ are not require to have any defined semantics.
     0x16 set
     0x17 set_mem
     0x18 get_mem
-    0x19 get_var
+    0x19 load_var
     0x1A csym
     0x1B ccall_arg
     0x1C ccall_ret
