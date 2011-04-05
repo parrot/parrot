@@ -32,6 +32,8 @@ t/dynoplibs/m0proto.t - prototype m0 dynops
 
     m0_print_s  ctx, s0, x, x
     m0_print_s  ctx, s1, x, x
+    m0_free     ctx, s0, x, x
+    m0_free     ctx, s1, x, x
     ok(1, "hello world doesn't crash")
 .end
 
@@ -60,6 +62,7 @@ t/dynoplibs/m0proto.t - prototype m0 dynops
     m0_add_n    ctx, n0, n0, n1
     m0_print_n  ctx, n0, x,  x
     m0_print_s  ctx, s0, x,  x
+    m0_free     ctx, s0, x, x
 
     ok(1, "num addition doesn't crash")
 .end
@@ -77,20 +80,21 @@ t/dynoplibs/m0proto.t - prototype m0 dynops
 
     m0_alloc     ctx, i1, i0,  x
     m0_set       ctx, i3, i1,  x
-    m0_print_i   ctx, i3, x, x
     #write some bytes to the allocated memory
     m0_copy_byte ctx, i3, 255, x
     m0_add_i     ctx, i3, i3,  i2
-    m0_print_i   ctx, i3, x, x
     m0_copy_byte ctx, i3, 255, x
     m0_add_i     ctx, i3, i3,  i2
-    m0_print_i   ctx, i3, x, x
     m0_copy_byte ctx, i3, 255, x
     m0_add_i     ctx, i3, i3,  i2
-    m0_print_i   ctx, i3, x, x
     m0_copy_byte ctx, i3, 255, x
     m0_add_i     ctx, i3, i3,  i2
+
+    #test copying data with copy_mem
+    m0_alloc     ctx, i4, i0,  x
+    m0_copy_mem  ctx, i4, i1,  i0
     m0_free      ctx, i1, x,   x
+    m0_free      ctx, i4, x,   x
     ok(1, "alloc/free doesn't crash")
 .end
 
