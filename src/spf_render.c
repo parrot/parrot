@@ -196,9 +196,7 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGIN(STRING *str),
             if (info->flags & FLAG_ZERO
                 && (STRING_ord(interp, str, 0) == '-' ||
                     STRING_ord(interp, str, 0) == '+')) {
-                STRING *temp = NULL;
-                STRING *ignored;
-                temp = STRING_substr(interp, str, 1, len-1);
+                STRING * const temp = STRING_substr(interp, str, 1, len-1);
                 str = Parrot_str_chopn(interp, str, -1);
                 str = Parrot_str_concat(interp, str, fill);
                 str = Parrot_str_concat(interp, str, temp);
