@@ -1058,6 +1058,8 @@ The returned array is of the same format as the one used for C<StructView.init_p
                 VTABLE_set_integer_keyed_int(INTERP, result, 3, s);
             }
             break;
+          default:
+              break;
         }
 
         for (i = 1, j = 1; i <= n; i++) {
@@ -1080,6 +1082,9 @@ The returned array is of the same format as the one used for C<StructView.init_p
                                              result, i * 3 + j + 1, elts[i - 1].byte_offset);
                 VTABLE_set_integer_keyed_int(INTERP,
                                              result, i * 3 + j + 2, elts[i - 1].bit_offset);
+
+              default:
+                  break;
             }
         }
 

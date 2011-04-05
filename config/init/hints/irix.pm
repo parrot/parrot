@@ -26,12 +26,15 @@ sub runstep {
     $conf->data->set( libs => $libs );
 
     my $cc   = $conf->data->get('cc');
+    my $cxx  = $conf->data->get('cxx');
     my $ld   = $conf->data->get('ld');
     my $link = $conf->data->get('link');
     if ( $cc =~ /cc -64/ ) {
+        $cxx  = 'CC -64';
         $ld   = 'CC -64';
         $link = 'CC -64';
         $conf->data->set(
+            cxx  => $cxx,
             ld   => $ld,
             link => $link,
         );

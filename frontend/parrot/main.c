@@ -699,6 +699,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
         ARGMOD(struct init_args_t * args))
 {
     ASSERT_ARGS(parseflags)
+    const char *ext;
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     const char * infile = NULL;
     const char * outfile = NULL;
@@ -856,39 +857,11 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     *pgm_argc = argc - opt.opt_index;
     *pgm_argv = argv + opt.opt_index;
 
-    {
-        const char * sourcefile = (*pgm_argv)[0];
-        const char * ext = strrchr(sourcefile, '.');
-        if (sourcefile && ext && !strcmp(ext, ".pbc"))
-            args->have_pbc_file = 1;
-        else if (sourcefile && ext && !strcmp(ext, ".pasm"))
-            args->have_pasm_file = 1;
-        verify_file_names(sourcefile, outfile);
-        if (!Parrot_api_string_import(interp, sourcefile, &args->sourcefile))
-            show_last_error_and_exit(interp);
-    }
-}
+    args->sourcefile = (*pgm_argv)[0];
 
-/*
-
-=item C<static void verify_file_names(const char * input, const char * output)>
-
-Verify that the input and output filenames are sane and are not the same.
-
-=cut
-
-*/
-
-static void
-verify_file_names(ARGIN_NULLOK(const char * input), ARGIN_NULLOK(const char * output))
-{
-    ASSERT_ARGS(verify_file_names)
-    const char is_stdin = (input == NULL);
-    const char is_stdout = (output == NULL);
-    if (!is_stdin && !is_stdout && !strcmp(input, output)) {
-        fprintf(stderr, "Input and output files are the same");
-        exit(EXIT_FAILURE);
-    }
+    ext = strrchr(args->sourcefile, '.');
+    if (ext && (strcmp(ext, ".pbc") == 0))
+        args->have_pbc_file = 1;
 }
 
 /*

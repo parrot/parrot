@@ -74,7 +74,8 @@ sub _get_programs {
     my ($conf, $ask) = @_;
     # Set each variable individually so that hints files can use them as
     # triggers to help pick the correct defaults for later answers.
-    my ( $cc, $link, $ld, $ccflags, $linkflags, $ar, $arflags, $ldflags, $libs, $lex, $yacc );
+    my ( $cc, $cxx, $link, $ld, $ccflags, $linkflags, $ldflags, $arflags);
+    my ( $libs, $lex, $yacc, $ar );
     $cc = integrate( $conf->data->get('cc'), $conf->options->get('cc') );
     $cc = prompt( "What C compiler do you want to use?", $cc )
         if $ask;
@@ -136,6 +137,9 @@ sub _get_programs {
         if $ask;
     $conf->data->set( libs => $libs );
 
+    $cxx = integrate( $conf->data->get('cxx'), $conf->options->get('cxx') );
+    $cxx = prompt( "What C++ compiler do you want to use?", $cxx ) if $ask;
+    $conf->data->set( cxx => $cxx );
     return ($conf, $cc);
 }
 

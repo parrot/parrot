@@ -266,7 +266,11 @@ Tell Configure that the compiler supports C<inline>.
 
 =item C<--cc=(compiler)>
 
-Specify which compiler to use.
+Specify which C compiler to use.
+
+=item C<--cxx=(compiler)>
+
+Specify which C++ compiler to use.
 
 =item C<--ccflags=(flags)>
 

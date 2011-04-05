@@ -7,6 +7,7 @@
             "docs/memory_internals.pod",
             "docs/vtables.pod",
             "docs/embed.pod",
+            "docs/embed_new.pod",
             "docs/porting_intro.pod"
          ],
          "title" : "Internals"
