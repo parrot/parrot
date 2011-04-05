@@ -538,7 +538,7 @@ that name instead of the C<.sub> name.
     # ...
   .end
 
-=end PIR
+=end PIR_INVALID
 
 The marked C<.sub> overrides a vtable function, and is not stored in the
 namespace. By default, it overrides a vtable function with the same name

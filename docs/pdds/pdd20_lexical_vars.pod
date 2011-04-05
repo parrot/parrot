@@ -133,7 +133,7 @@ dynamically using the C<set_outer> method.
        # ...
     .end
 
-=end PIR
+=end PIR_INVALID
 
 The value of C<:outer> identifies a subroutine by its C<:subid>
 flag; subroutine definitions that do not have an explicit C<:subid>

@@ -430,7 +430,7 @@ C<buffer_type> setting: unbuffered, line-buffered, or fully-buffered.
 
   unless $P0 goto iter_end
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 Returns a boolean value for the iterator, C<true> if there is more data
 to pull from the I/O object, C<false> if the iterator has reached the

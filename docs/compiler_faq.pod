@@ -606,7 +606,7 @@ C<pop_eh>.
     pop_eh
     # ok
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 An exception handler is called with one argument, which is the exception object.
 The message of the exception can be easily extracted, as follows:
