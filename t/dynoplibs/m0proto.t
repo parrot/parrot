@@ -70,10 +70,27 @@ t/dynoplibs/m0proto.t - prototype m0 dynops
     ctx = m0_new_ctx
 
     m0_int_var ctx, 0, 128
+    m0_int_var ctx, 1, 1
 
-    m0_load_var ctx, i0, 0,  0
-    m0_alloc    ctx, i1, i0, x
-    m0_free     ctx, i1, x,  x
+    m0_load_var  ctx, i0, 0,   0
+    m0_load_var  ctx, i2, 1,   0
+
+    m0_alloc     ctx, i1, i0,  x
+    m0_set       ctx, i3, i1,  x
+    m0_print_i   ctx, i3, x, x
+    #write some bytes to the allocated memory
+    m0_copy_byte ctx, i3, 255, x
+    m0_add_i     ctx, i3, i3,  i2
+    m0_print_i   ctx, i3, x, x
+    m0_copy_byte ctx, i3, 255, x
+    m0_add_i     ctx, i3, i3,  i2
+    m0_print_i   ctx, i3, x, x
+    m0_copy_byte ctx, i3, 255, x
+    m0_add_i     ctx, i3, i3,  i2
+    m0_print_i   ctx, i3, x, x
+    m0_copy_byte ctx, i3, 255, x
+    m0_add_i     ctx, i3, i3,  i2
+    m0_free      ctx, i1, x,   x
     ok(1, "alloc/free doesn't crash")
 .end
 

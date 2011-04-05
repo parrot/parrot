@@ -189,6 +189,29 @@ op m0_copy_mem(invar PMC, in INT, in INT, in INT) {
     memmove(mem_dst, mem_src, mem_size);
 }
 
+=item B<m0_copy_byte>
+
+Use the value in register $2 as a destination pointer and $3 as a byte count.
+Write that byte to whatever $2 points at.
+
+=cut
+
+op m0_copy_byte(invar PMC, in INT, in INT, in INT) {
+    char  byte    = (char)$3;
+    char *mem_dst = (char*)VTABLE_get_pointer_keyed_int(interp, $1, $2);
+    *mem_dst      = byte;
+}
+
+=item B<m0_set>
+
+Copy the value in $3 to the value in $2.
+
+=cut
+
+op m0_set(invar PMC, in INT, in INT, in INT) {
+    FLOATVAL f = VTABLE_get_number_keyed_int(interp, $1, $3);
+    VTABLE_set_number_keyed_int(interp, $1, $2, f);
+}
 =head2 Temporary ops
 
 =item C<m0_alloc>
