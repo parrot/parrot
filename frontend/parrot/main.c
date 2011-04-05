@@ -584,6 +584,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
         ARGMOD(struct init_args_t * args))
 {
     ASSERT_ARGS(parseflags)
+    const char *ext;
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int status;
     int result = 1;
@@ -730,11 +731,10 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     *pgm_argv = argv + opt.opt_index;
 
     args->sourcefile = (*pgm_argv)[0];
-    {
-        const char * ext = strrchr(args->sourcefile, '.');
-        if (ext && !strcmp(ext, ".pbc"))
-            args->have_pbc_file = 1;
-    }
+
+    ext = strrchr(args->sourcefile, '.');
+    if (ext && (strcmp(ext, ".pbc") == 0))
+        args->have_pbc_file = 1;
 }
 /*
 
