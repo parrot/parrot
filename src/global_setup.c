@@ -79,7 +79,7 @@ Parrot_gbl_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
 
 /*
 
-=item C<void Parrot_set_config_hash_pmc(PARROT_INTERP, PMC * config)>
+=item C<void Parrot_set_config_hash_pmc(PARROT_INTERP, PMC *config)>
 
 Called by embed API with the pmc hash which will be used in subsequently created
 Interpreters.
@@ -89,7 +89,7 @@ Interpreters.
 */
 
 void
-Parrot_set_config_hash_pmc(PARROT_INTERP, ARGMOD(PMC * config))
+Parrot_set_config_hash_pmc(PARROT_INTERP, ARGIN(PMC *config))
 {
     ASSERT_ARGS(Parrot_set_config_hash_pmc)
     parrot_config_hash_global = config;
@@ -112,7 +112,7 @@ static void
 Parrot_gbl_set_config_hash_interpreter(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_gbl_set_config_hash_interpreter)
-    PMC *iglobals = interp->iglobals;
+    PMC * const iglobals = interp->iglobals;
 
     PMC *config_hash = parrot_config_hash_global;
     if (config_hash == NULL)
