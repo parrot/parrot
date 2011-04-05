@@ -56,6 +56,14 @@ op m0_num_var(invar PMC, in INT, in NUM) {
     VTABLE_set_number_keyed_int(interp, var_table, $2, $3);
 }
 
+op m0_reg_i(out INT, invar PMC, in INT) {
+    $1 = VTABLE_get_integer_keyed_int(interp, $2, $3);
+}
+
+op m0_reg_n(out NUM, invar PMC, in INT) {
+    $1 = VTABLE_get_number_keyed_int(interp, $2, $3);
+}
+
 =head2 M0 Math/Numeric ops
 
 =cut
@@ -89,6 +97,18 @@ op m0_load_var(invar PMC, in INT, in INT, in INT) {
     VTABLE_set_number_keyed_int(interp, $1, $2, val);
 }
 
+op m0_copy_mem(invar PMC, in INT, in INT, in INT) {
+    INTVAL mem_size = VTABLE_get_integer_keyed_int(interp, $1, $4);
+    void *mem_src   = VTABLE_get_pointer_keyed_int(interp, $1, $3);
+    void *mem_tgt   = VTABLE_get_pointer_keyed_int(interp, $1, $2);
+    memmove(mem_tgt, mem_src, mem_size);
+}
+
+op m0_copy_intval(invar PMC, in INT, in INT, in INT) {
+    INTVAL  value   = VTABLE_get_integer_keyed_int(interp, $1, $3);
+    INTVAL *mem_tgt = (INTVAL*)VTABLE_get_pointer_keyed_int(interp, $1, $2);
+    *mem_tgt = value; 
+}
 
 =head2 Temporary ops
 
@@ -106,6 +126,7 @@ op m0_alloc(invar PMC, in INT, in INT, in INT) {
 op m0_free(invar PMC, in INT, in INT, in INT) {
     void *data;
 
+    M0_ASSERT_REGS($2, $3, $4);
     data = VTABLE_get_pointer_keyed_int(interp, $1, $2);
     mem_sys_free(data);
 }
