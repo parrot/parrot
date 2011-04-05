@@ -282,12 +282,12 @@ Store C<*$2> ^ C<*$3> into C<*$1>.
 
 Set C<*$1> to whatever is in C<*$2>.  C<$3> is ignored.
 
-=item * store_mem - set a region of memory
+=item * copy_byte - write a byte to memory
 
-Write C<*$3> bytes from C<*$2> to the memory location starting at C<*$1>.
-Segfaults may result.  Be careful.
+Write the byte in C<$2> to the memory location starting at C<*$1>.  Segfaults
+may result.  Be careful.
 
-=item * load_mem - get a region from memory
+=item * copy_mem - copy data to/from memory
 
 Write C<*$3> bytes from the memory location starting at C<*$2> to C<*$1>.
 Segfaults may result.  Be careful.
@@ -617,6 +617,8 @@ In the interest of compatibility between implementations, the following is a
 canonical list of the ops an M0 implementation must implement and the numbers
 they must correspond to.  Other opcode numbers are implementation-specific and
 are not require to have any defined semantics.
+NOTE: This section is not current.  Updating it is not likely to be useful
+until we're reasonably confident that we have a final set of ops.
 
     0x00 noop
     0x01 goto
