@@ -243,8 +243,11 @@ static void mark_1_ct_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ct);
 
-static void mark_packfile_pmc(PARROT_INTERP, PMC * ptr_pmc, void * ptr_raw)
-        __attribute__nonnull__(1);
+static void mark_packfile_pmc(PARROT_INTERP,
+    SHIM(PMC *ptr_pmc),
+    ARGIN(void *ptr_raw))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -434,7 +437,8 @@ static int sub_pragma(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
 #define ASSERT_ARGS_mark_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ptr_raw))
 #define ASSERT_ARGS_PackFile_append __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_Constant_unpack_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -1427,7 +1431,7 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
 
 /*
 
-=item C<PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile * pf)>
+=item C<PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile *pf)>
 
 Get a new PMC to hold the PackFile* structure. The exact type of PMC returned
 is not important, and consuming code should not rely on any particular type
@@ -1436,8 +1440,8 @@ being returned. The only guarantees which are made by this interface are that:
 1) The PackFile* structure can be retrieved by VTABLE_get_pointer
 2) The PackFile* structure is marked for GC when the PMC is marked for GC
 
-=item C<static void mark_packfile_pmc(PARROT_INTERP, PMC * ptr_pmc, void *
-ptr_raw)>
+=item C<static void mark_packfile_pmc(PARROT_INTERP, PMC *ptr_pmc, void
+*ptr_raw)>
 
 Mark the PackFile PMC for GC
 
@@ -1446,8 +1450,9 @@ Mark the PackFile PMC for GC
 */
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile * pf)
+Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
 {
     ASSERT_ARGS(Parrot_pf_get_packfile_pmc)
     PMC * const ptr = Parrot_pmc_new(interp, enum_class_PtrObj);
@@ -1461,7 +1466,7 @@ Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile * pf)
 }
 
 static void
-mark_packfile_pmc(PARROT_INTERP, PMC * ptr_pmc, void * ptr_raw)
+mark_packfile_pmc(PARROT_INTERP, SHIM(PMC *ptr_pmc), ARGIN(void *ptr_raw))
 {
     ASSERT_ARGS(mark_packfile_pmc)
     PackFile * const pf = (PackFile*) ptr_raw;

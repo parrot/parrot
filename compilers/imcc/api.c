@@ -33,6 +33,8 @@ IMCC call-in routines for use with the Parrot embedding API
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static PMC * get_compreg_pmc(PARROT_INTERP, int is_pasm, int add_compreg)
         __attribute__nonnull__(1);
 
@@ -84,8 +86,7 @@ is 1, register that compiler with Parrot under the name "PIR".
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Int
-imcc_get_pir_compreg_api(Parrot_PMC interp_pmc, int add_compreg,
-        Parrot_PMC *compiler)
+imcc_get_pir_compreg_api(Parrot_PMC interp_pmc, int add_compreg, ARGOUT(Parrot_PMC *compiler))
 {
     ASSERT_ARGS(imcc_get_pir_compreg_api)
     IMCC_API_CALLIN(interp_pmc, interp)
@@ -109,10 +110,8 @@ is 1, register that compiler with Parrot under the name "PASM".
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
 Parrot_Int
-imcc_get_pasm_compreg_api(Parrot_PMC interp_pmc, int add_compreg,
-        Parrot_PMC *compiler)
+imcc_get_pasm_compreg_api(Parrot_PMC interp_pmc, int add_compreg, ARGOUT(Parrot_PMC *compiler))
 {
     ASSERT_ARGS(imcc_get_pasm_compreg_api)
     IMCC_API_CALLIN(interp_pmc, interp)
@@ -134,6 +133,8 @@ C<add_compreg> is 1.
 =cut
 */
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static PMC *
 get_compreg_pmc(PARROT_INTERP, int is_pasm, int add_compreg)
 {
@@ -158,10 +159,10 @@ Compile a file using the given IMCCompiler PMC.
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 Parrot_Int
 imcc_compile_file_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
-        Parrot_String file, Parrot_PMC *pbc)
+        Parrot_String file, ARGOUT(Parrot_PMC *pbc))
 {
     ASSERT_ARGS(imcc_compile_file_api)
     IMCC_API_CALLIN(interp_pmc, interp)
@@ -188,7 +189,7 @@ the preprocessed text is dumped directly to stdout.
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 Parrot_Int
 imcc_preprocess_file_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
         Parrot_String file)

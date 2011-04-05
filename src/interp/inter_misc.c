@@ -447,6 +447,7 @@ Do not use with any other type of PMC.
 */
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 Interp *
 Parrot_int_get_interp_from_pmc(ARGIN(PMC * interp_pmc))
 {

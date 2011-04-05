@@ -485,6 +485,7 @@ PMC * Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 Interp * Parrot_int_get_interp_from_pmc(ARGIN(PMC * interp_pmc))
         __attribute__nonnull__(1);
 

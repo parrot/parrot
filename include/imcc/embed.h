@@ -77,11 +77,12 @@ void imcc_set_verbosity(ARGMOD(imc_info_t *imcc), INTVAL verbose)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*imcc);
 
+PARROT_IGNORABLE_RESULT
+PARROT_CANNOT_RETURN_NULL
 imc_info_t * exit_reentrant_compile(
-    ARGMOD(imc_info_t * imcc),
+    ARGIN(imc_info_t *imcc),
     ARGMOD_NULLOK(struct _imc_info_t *new_info))
         __attribute__nonnull__(1)
-        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*new_info);
 
 PARROT_CANNOT_RETURN_NULL
@@ -93,10 +94,7 @@ PMC * imcc_compile_string(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*imcc);
 
-void imcc_destroy(ARGMOD(imc_info_t * imcc))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(* imcc);
-
+void imcc_destroy(ARGFREE(imc_info_t * imcc));
 #define ASSERT_ARGS_imcc_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(fullname))
@@ -123,8 +121,7 @@ void imcc_destroy(ARGMOD(imc_info_t * imcc))
 #define ASSERT_ARGS_imcc_compile_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(source))
-#define ASSERT_ARGS_imcc_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_imcc_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/main.c */
 

@@ -74,6 +74,8 @@ static yyscan_t imcc_get_scanner(ARGMOD(imc_info_t *imcc))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*imcc);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC * imcc_run_compilation_internal(
     ARGMOD(imc_info_t *imcc),
     ARGIN(STRING *source),
@@ -83,6 +85,8 @@ static PMC * imcc_run_compilation_internal(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*imcc);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC * imcc_run_compilation_reentrant(
     ARGMOD(imc_info_t *imcc),
     ARGIN(STRING *fullname),
@@ -94,9 +98,8 @@ static PMC * imcc_run_compilation_reentrant(
 
 PARROT_CAN_RETURN_NULL
 static struct _imc_info_t* prepare_reentrant_compile(
-    ARGMOD(imc_info_t * imcc))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(* imcc);
+    ARGIN(imc_info_t *imcc))
+        __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_do_pre_process __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
@@ -513,6 +516,8 @@ may be a recursive compilation inside an existing compilation sequence.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC *
 imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
         int is_file, int is_pasm)
@@ -539,6 +544,8 @@ All compilations go through this function.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC *
 imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
         int is_file, int is_pasm)
@@ -593,15 +600,15 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 
 /*
 
-=item C<static struct _imc_info_t* prepare_reentrant_compile(imc_info_t * imcc)>
+=item C<static struct _imc_info_t* prepare_reentrant_compile(imc_info_t *imcc)>
 
 Prepare IMCC for a reentrant compile. Push a new imc_info_t structure onto the
 list and set the new one as the current one. Return the new info structure.
 returns NULL if not in a reentrant situation. The return value of this I<MUST>
 be passed to C<exit_reentrant_compile>.
 
-=item C<imc_info_t * exit_reentrant_compile(imc_info_t * imcc, struct
-_imc_info_t *new_info)>
+=item C<imc_info_t * exit_reentrant_compile(imc_info_t *imcc, struct _imc_info_t
+*new_info)>
 
 Exit reentrant compile. Restore compiler state back to what it was for the
 previous compile, if any.
@@ -610,10 +617,10 @@ previous compile, if any.
 
 PARROT_CAN_RETURN_NULL
 static struct _imc_info_t*
-prepare_reentrant_compile(ARGMOD(imc_info_t * imcc))
+prepare_reentrant_compile(ARGIN(imc_info_t *imcc))
 {
     ASSERT_ARGS(prepare_reentrant_compile)
-    struct _imc_info_t * new_info = imcc;
+    struct _imc_info_t *new_info = imcc;
     if (imcc->last_unit) {
         /* a reentrant compile */
         new_info        = (imc_info_t*) calloc(1, sizeof (imc_info_t));
@@ -627,9 +634,10 @@ prepare_reentrant_compile(ARGMOD(imc_info_t * imcc))
     return new_info;
 }
 
+PARROT_IGNORABLE_RESULT
+PARROT_CANNOT_RETURN_NULL
 imc_info_t *
-exit_reentrant_compile(ARGMOD(imc_info_t * imcc),
-        ARGMOD_NULLOK(struct _imc_info_t *new_info))
+exit_reentrant_compile(ARGIN(imc_info_t *imcc), ARGMOD_NULLOK(struct _imc_info_t *new_info))
 {
     ASSERT_ARGS(exit_reentrant_compile)
     if (new_info && new_info->prev == imcc) {
@@ -654,7 +662,7 @@ Deallocate memory associated with IMCC.
 */
 
 void
-imcc_destroy(ARGMOD(imc_info_t * imcc))
+imcc_destroy(ARGFREE(imc_info_t * imcc))
 {
     ASSERT_ARGS(imcc_destroy)
     Hash * const macros = imcc->macros;
