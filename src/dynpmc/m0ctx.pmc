@@ -1,6 +1,7 @@
 /*
 Copyright (C) 2001-2011, Parrot Foundation.
 
+
 =head1 NAME
 
 src/dynpmc/m0ctx.pmc - M0 protype context
@@ -18,11 +19,32 @@ without casting
 
 */
 
+#include "../dynoplibs/m0proto_const.h"
+
 pmclass m0ctx dynpmc extends FixedFloatArray auto_attrs {
+
+    VTABLE void init() {
+        INTVAL i;
+        PMC *var_table, *meta_seg;
+        SUPER();
+        SELF.set_integer_native(M0_REG_COUNT);
+        for (i = 0; i < M0_REG_COUNT; i++) {
+            SELF.set_number_keyed_int(i, (FLOATVAL)0);
+        }
+        var_table = Parrot_pmc_new(interp, enum_class_ResizableFloatArray);
+        meta_seg  = Parrot_pmc_new(interp, enum_class_ResizableFloatArray);
+        SELF.set_pointer_keyed_int(M0_VAR, (void*)var_table);
+        SELF.set_pointer_keyed_int(M0_MDS, (void*)meta_seg);
+    }
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
         FLOATVAL f = SELF.get_number_keyed_int(key);
         return *(INTVAL*)&f;
+    }
+
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+        FLOATVAL f = SELF.get_number_keyed_int(key);
+        return *(PMC**)&f;
     }
 
     VTABLE void *get_pointer_keyed_int(INTVAL key) {
@@ -32,6 +54,11 @@ pmclass m0ctx dynpmc extends FixedFloatArray auto_attrs {
 
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
+        FLOATVAL f = *(FLOATVAL*)&value;
+        SELF.set_number_keyed_int(key, f);
+    }
+
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
         FLOATVAL f = *(FLOATVAL*)&value;
         SELF.set_number_keyed_int(key, f);
     }

@@ -23,9 +23,11 @@ t/dynoplibs/m0proto.t - prototype m0 dynops
     .include "m0proto_names.pir"
     .local pmc ctx
     ctx = m0_new_ctx
-    m0_cstr_var ctx, s0, "hello, word"
-    m0_cstr_var ctx, s1, "\n"
+    m0_cstr_var ctx, 0, "hello, word\n"
+    m0_cstr_var ctx, 1, "\n"
 
+    m0_get_var ctx, s0, 0, 0
+    m0_get_var ctx, s1, 1, 0
     m0_print_s ctx, s0, x, x
     m0_print_s ctx, s1, x, x
     ok(1, "hello world doesn't crash")
@@ -35,12 +37,15 @@ t/dynoplibs/m0proto.t - prototype m0 dynops
     .include "m0proto_names.pir"
     .local pmc ctx
     ctx = m0_new_ctx
-    m0_cstr_var ctx, s0, "\n"
-    m0_int_var  ctx, i0, 1234567
-    m0_int_var  ctx, i1, 1
+    m0_cstr_var ctx, 0, "\n"
+    m0_int_var  ctx, 1, 1234567
+    m0_int_var  ctx, 2, 1
+    m0_num_var  ctx, 3, 1.01
+    m0_num_var  ctx, 4, 2.002
 
-    m0_num_var  ctx, n0, 1.01
-    m0_num_var  ctx, n1, 2.002
+    m0_get_var  ctx, s0, 0, 0
+    m0_get_var  ctx, i0, 1, 0
+    m0_get_var  ctx, i1, 2, 0
 
     m0_add_i    ctx, i0, i0, i1
     m0_print_i  ctx, i1, x,  x
@@ -48,6 +53,8 @@ t/dynoplibs/m0proto.t - prototype m0 dynops
 
     ok(1, "int addition doesn't crash")
 
+    m0_get_var  ctx, n0, 3, 0
+    m0_get_var  ctx, n1, 4, 0
     m0_add_n    ctx, n0, n0, n1
     m0_print_n  ctx, n0, x,  x
     m0_print_s  ctx, s0, x,  x

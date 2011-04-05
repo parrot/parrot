@@ -5,6 +5,8 @@
 #ifndef PARROT_M0PROTO_CONST_H_GUARD
 #define PARROT_M0PROTO_CONST_H_GUARD
 
+#define M0_REG_COUNT          256
+
 /* &gen_from_enum(m0proto_const.pasm) */
 typedef enum {
     M0_CX = 0, /* current context */
