@@ -32,7 +32,7 @@ pmclass m0ctx dynpmc extends FixedFloatArray auto_attrs {
             SELF.set_number_keyed_int(i, (FLOATVAL)0);
         }
         var_table = Parrot_pmc_new(interp, enum_class_ResizableFloatArray);
-        meta_seg  = Parrot_pmc_new(interp, enum_class_ResizableFloatArray);
+        meta_seg  = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
         SELF.set_pointer_keyed_int(M0_VAR, (void*)var_table);
         SELF.set_pointer_keyed_int(M0_MDS, (void*)meta_seg);
     }

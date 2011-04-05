@@ -94,6 +94,22 @@ op m0_load_var(invar PMC, in INT, in INT, in INT) {
 
 =cut
 
+op m0_alloc(invar PMC, in INT, in INT, in INT) {
+    INTVAL  data_size;
+    void   *data;
+    M0_ASSERT_REGS($2, $3, $4);
+    data_size = VTABLE_get_integer_keyed_int(interp, $1, $3);
+    data      = mem_sys_allocate(data_size);
+    VTABLE_set_pointer_keyed_int(interp, $1, $2, data);
+}
+
+op m0_free(invar PMC, in INT, in INT, in INT) {
+    void *data;
+
+    data = VTABLE_get_pointer_keyed_int(interp, $1, $2);
+    mem_sys_free(data);
+}
+
 op m0_print_i(invar PMC, in INT, in INT, in INT) {
     M0_ASSERT_REGS($2, $3, $4);
     Parrot_printf(interp, "%d", VTABLE_get_integer_keyed_int(interp, $1, $2));

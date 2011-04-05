@@ -13,9 +13,10 @@ t/dynoplibs/m0proto.t - prototype m0 dynops
     .include 'test_more.pir'
     $P0 = loadlib 'm0ctx'
 
-    plan(3)
+    plan(4)
     'm0_hello_word'()
     'm0_maths'()
+    'm0_alloc_free'()
 
 .end
 
@@ -61,6 +62,19 @@ t/dynoplibs/m0proto.t - prototype m0 dynops
     m0_print_s  ctx, s0, x,  x
 
     ok(1, "num addition doesn't crash")
+.end
+
+.sub m0_alloc_free
+    .include "m0proto_names.pir"
+    .local pmc ctx
+    ctx = m0_new_ctx
+
+    m0_int_var ctx, 0, 128
+
+    m0_load_var ctx, i0, 0,  0
+    m0_alloc    ctx, i1, i0, x
+    m0_free     ctx, i1, x,  x
+    ok(1, "alloc/free doesn't crash")
 .end
 
 
