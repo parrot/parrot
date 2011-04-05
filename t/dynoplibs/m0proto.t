@@ -11,6 +11,7 @@ t/dynoplibs/m0proto.t - prototype m0 dynops
 
 .sub main :main
     .include 'test_more.pir'
+    $P0 = loadlib 'm0ctx'
 
     plan(3)
     'm0_hello_word'()
