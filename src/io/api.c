@@ -607,7 +607,6 @@ Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
     STRING *result;
     if (pmc->vtable->base_type == enum_class_FileHandle) {
         INTVAL            flags;
-        size_t            ignored;
 
         GETATTR_FileHandle_flags(interp, pmc, flags);
 
