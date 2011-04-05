@@ -154,13 +154,13 @@ the op set is complete, we will look at how a representative selection of PIR's
 existing core ops and the dynops used by HLLs could be reimplemented in terms
 of M0 ops.
 
-In descriptions, C<$0> refers to the value of the first argument to an op,
-C<$1> to the second and C<$2> to the third.  Any op can operate on any
+In descriptions, C<$1> refers to the value of the first argument to an op,
+C<$2> to the second and C<$3> to the third.  Any op can operate on any
 register; types are only by convention.  As far as an M0 VM is conerned, the
 256 ops are nothing more than an array of 256 opcode_t-sized chunks of data.
 
-In this documentation, as in C, C<$0> refers to the value of a certain
-register, where C<*$0> refers to what that register points at.
+In this documentation, as in C, C<$1> refers to the value of a certain
+register, where C<*$1> refers to what that register points at.
 
 =head3 Control Flow (4 ops)
 
@@ -168,23 +168,23 @@ register, where C<*$0> refers to what that register points at.
 
 =item * noop - do nothing
 
-Explicitly do nothing.  C<$0>, C<$1> and C<$2> are ignored.
+Explicitly do nothing.  C<$1>, C<$2> and C<$3> are ignored.
 
 =item * goto - go to an offset in the current bytecode segment
 
-Unconditionally transfer control flow to the bytecode offset in C<*$0> within
-the current bytecode segment.  C<$1> and C<$2> are ignored.
+Unconditionally transfer control flow to the bytecode offset in C<*$1> within
+the current bytecode segment.  C<$2> and C<$3> are ignored.
 
 =item * goto_if_eq - go to an offset in the current bytecode segment if the last two arguments are equal
 
-Transfer control flow to the bytecode offset in C<*$0> within the current
-bytecode segment iff the values of C<*$1> and C<*$2> are the same.
+Transfer control flow to the bytecode offset in C<*$1> within the current
+bytecode segment iff the values of C<*$2> and C<*$3> are the same.
 
 =item * goto_cs - go to an offset in another bytecode segment
 
-Unconditionally transfer control flow to the bytecode offset in C<*$0> within
-the current bytecode segment specified in C<*$1>.  If C<*$2> is 0, C<*$1> is
-treated as the number of a chunk.  If C<*$2> is non-zero, C<*$1> is treated as
+Unconditionally transfer control flow to the bytecode offset in C<*$1> within
+the current bytecode segment specified in C<*$2>.  If C<*$3> is 0, C<*$1> is
+treated as the number of a chunk.  If C<*$3> is non-zero, C<*$2> is treated as
 a string which contains the name of the chunk.
 
 =back
@@ -197,47 +197,47 @@ a string which contains the name of the chunk.
 
 =item * add_n - add two numeric registers
 
-Treat C<*$1> and C<*$2> as integer or floating-point values, add them and store
-the result in C<*$0>.
+Treat C<*$2> and C<*$3> as integer or floating-point values, add them and store
+the result in C<*$1>.
 
 =item * sub_i - subtract two integer registers
 
 =item * sub_n - subtract two numeric registers
 
-Treat C<*$1> and C<*$2> as integer or floating-point values, subtract C<*$2>
-from C<*$1> and store the result in C<*$0>.
+Treat C<*$2> and C<*$3> as integer or floating-point values, subtract C<*$2>
+from C<*$2> and store the result in C<*$1>.
 
 =item * mult_i - multiply two integer registers
 
 =item * mult_n - multiply two numeric registers
 
-Treat C<*$1> and C<*$2> as integer or floating-point values, multiply C<*$1> by
-C<*$2> and store the result in C<*$0>.
+Treat C<*$2> and C<*$3> as integer or floating-point values, multiply C<*$1> by
+C<*$3> and store the result in C<*$1>.
 
 =item * div_i - divide two integer registers
 
 =item * div_n - divide two numeric registers
 
-Treat C<*$1> and C<$*2> as integer or floating-point values, divide C<$*1> by
+Treat C<*$2> and C<$*2> as integer or floating-point values, divide C<$*1> by
 C<$*2> and store the result in C<$*0>.
 
-=item * mod_i - remainder of of $2/$1 (integer)
+=item * mod_i - remainder of of $3/$2 (integer)
 
-=item * mod_n - remainder of of $2/$1 (numeric)
+=item * mod_n - remainder of of $3/$2 (numeric)
 
-Treat C<*$1> and C<*$2> as integer or floating-point values, divide C<*$1> by
-C<*$2> and store the remainder in C<*$0>.  Division by zero will make the the
+Treat C<*$2> and C<*$3> as integer or floating-point values, divide C<*$1> by
+C<*$3> and store the remainder in C<*$1>.  Division by zero will make the the
 M0 interpreter sad.
 
 =item * iton - convert integer to numeric
 
-Assume that C<*$1> is an integer value, convert it to a floating-point value
-and store the result in C<*$0>.  C<$2> is ignored.
+Assume that C<*$2> is an integer value, convert it to a floating-point value
+and store the result in C<*$1>.  C<$3> is ignored.
 
 =item * ntoi - convert numeric to integer
 
-Assume that C<*$1> is a floating-point value, convert it to an integer value
-and store the result in C<*$0>.  C<$2> is ignored.
+Assume that C<*$2> is a floating-point value, convert it to an integer value
+and store the result in C<*$1>.  C<$3> is ignored.
 
 =back
 
@@ -247,30 +247,30 @@ and store the result in C<*$0>.  C<$2> is ignored.
 
 =item * ashr - right bitshift with sign extension
 
-Shift the value in C<*$1> right by the number of bits in C<*$2>, with sign
-extension, and store the result in C<*$0>.
+Shift the value in C<*$2> right by the number of bits in C<*$3>, with sign
+extension, and store the result in C<*$1>.
 
 =item * lshr - right bitshift without sign extension
 
-Shift the value in C<*$1> right by the number of bits in C<$*2>, without sign
+Shift the value in C<*$2> right by the number of bits in C<$*2>, without sign
 extension, and store the result in C<$*0>.
 
 =item * shl - left bitshift
 
-Shift the value in C<*$1> left by the number of bits in C<*$2> and store the
-result in C<*$0>.
+Shift the value in C<*$2> left by the number of bits in C<*$3> and store the
+result in C<*$1>.
 
 =item * and - bitwise AND
 
-Store C<*$1> & C<*$2> into C<*$0>.
+Store C<*$2> & C<*$3> into C<*$1>.
 
 =item * or - bitwise OR
 
-Store C<*$1> | C<*$2> into C<*$0>.
+Store C<*$2> | C<*$3> into C<*$1>.
 
 =item * xor - bitwise exclusive OR
 
-Store C<*$1> ^ C<*$2> into C<*$0>.
+Store C<*$2> ^ C<*$3> into C<*$1>.
 
 =back
 
@@ -280,22 +280,22 @@ Store C<*$1> ^ C<*$2> into C<*$0>.
 
 =item * set - sets a register to a value
 
-Set C<*$0> to whatever is in C<*$1>.  C<$2> is ignored.
+Set C<*$1> to whatever is in C<*$2>.  C<$3> is ignored.
 
 =item * store_mem - set a region of memory
 
-Write C<*$2> bytes from C<*$1> to the memory location starting at C<*$0>.
+Write C<*$3> bytes from C<*$2> to the memory location starting at C<*$1>.
 Segfaults may result.  Be careful.
 
 =item * load_mem - get a region from memory
 
-Write C<*$2> bytes from the memory location starting at C<*$1> to C<*$0>.
+Write C<*$3> bytes from the memory location starting at C<*$2> to C<*$1>.
 Segfaults may result.  Be careful.
 
 =item * load_var - point a register at a variables table slot
 
-Point C<*$0> at a slot on the variables table.  C<$1> contains the low byte of
-the index, C<$2> contains the high byte.  Both C<$1> and C<$2> are treated as
+Point C<*$1> at a slot on the variables table.  C<$2> contains the low byte of
+the index, C<$3> contains the high byte.  Both C<$2> and C<$2> are treated as
 1-byte immediate values.
 
 The variables table is intended to serve both as a location where data from
@@ -318,8 +318,8 @@ Examples:
 
 =item * csym - look up a function by name
 
-Look up the function pointer for using the name in C<*$1> in the C function
-namespace and put the pointer into C<*$0>.  C<$2> is ignored.  C<*$1> is assumed
+Look up the function pointer for using the name in C<*$2> in the C function
+namespace and put the pointer into C<*$1>.  C<$3> is ignored.  C<*$2> is assumed
 to point at a C string.
 
 Note that this function wraps the C<csym> C function.  Use it to access
@@ -327,22 +327,22 @@ C<Parrot_dlopen> and C<Parrot_dlsym> to deal wih dynamic libraries.
 
 =item * ccall_arg - set an argument for a ccall
 
-Take two arguments: an argument type in C<*$0> and an argument source in C<$1>.
-C<*$0> is an immediate constant indicating the type of the argument.  The
-possible values of C<*$0> will be similar to those used by libffi
-(https://github.com/atgreen/libffi/blob/master/doc/libffi.info ).  C<$1>
+Take two arguments: an argument type in C<*$1> and an argument source in C<$2>.
+C<*$1> is an immediate constant indicating the type of the argument.  The
+possible values of C<*$1> will be similar to those used by libffi
+(https://github.com/atgreen/libffi/blob/master/doc/libffi.info ).  C<$2>
 indicates which M0 register should be used to populate the value of the current
-argument.  C<$2> is ignored.
+argument.  C<$3> is ignored.
 
 =item * ccall_ret - get a return value from a ccall
 
 C<ccall_ret> is similar to C<ccall_arg>, except that it copies the return value
-of the previously-called function into C<*$1>.  C<$2> is ignored.
+of the previously-called function into C<*$2>.  C<$3> is ignored.
 
 =item * ccall - invoke a function
 
-C<ccall> uses the function pointer in C<*$0> to call a C function, assuming that
-its arguments have been set up correctly.  C<$1> and C<$2> are ignored.
+C<ccall> uses the function pointer in C<*$1> to call a C function, assuming that
+its arguments have been set up correctly.  C<$2> and C<$3> are ignored.
 
 =back
 
@@ -352,27 +352,27 @@ its arguments have been set up correctly.  C<$1> and C<$2> are ignored.
 
 =item * print_s  - prints a string
 
-Print the string at C<*$1> to the filehandle C<*$0>.
+Print the string at C<*$2> to the filehandle C<*$1>.
 
 =item * print_i  - prints an int
 
-Print the integer at C<*$1> to the filehandle C<*$0>.
+Print the integer at C<*$2> to the filehandle C<*$1>.
 
 =item * print_n  - prints a number
 
-Print the floating-point number at C<*$1> to the filehandle C<*$0>.
+Print the floating-point number at C<*$2> to the filehandle C<*$1>.
 
 =item * alloc - allocate memory (go through ffi)
 
-Allocate C<*$1> bytes, store them in C<*$0>.  C<$2> is ignored.
+Allocate C<*$2> bytes, store them in C<*$1>.  C<$3> is ignored.
 
 =item * free - free memory (go through ffi)
 
-Free the region of memory at C<*$0>.  C<$1> and C<$2> are ignored.
+Free the region of memory at C<*$1>.  C<$2> and C<$3> are ignored.
 
 =item * exit - exit with the given status (go through ffi)
 
-Call C's C<exit> function with C<*$0>.  C<$1> and C<$2> are ignored.
+Call C's C<exit> function with C<*$1>.  C<$2> and C<$3> are ignored.
 
 =back
 
