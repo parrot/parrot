@@ -704,6 +704,8 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     const char * outfile = NULL;
     int status;
     int result = 1;
+    const char *sourcefile;
+
     args->run_core_name = "slow";
     args->write_packfile = 0;
     args->execute_packfile = 1;
@@ -856,17 +858,19 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     *pgm_argc = argc - opt.opt_index;
     *pgm_argv = argv + opt.opt_index;
 
-    {
-        const char * sourcefile = (*pgm_argv)[0];
-        const char * ext = strrchr(sourcefile, '.');
-        if (sourcefile && ext && !strcmp(ext, ".pbc"))
-            args->have_pbc_file = 1;
-        else if (sourcefile && ext && !strcmp(ext, ".pasm"))
-            args->have_pasm_file = 1;
-        verify_file_names(sourcefile, outfile);
-        if (!Parrot_api_string_import(interp, sourcefile, &args->sourcefile))
-            show_last_error_and_exit(interp);
+    sourcefile = (*pgm_argv)[0];
+    if (sourcefile) {
+        const char * const ext = strrchr(sourcefile, '.');
+        if (ext) {
+            if (strcmp(ext, ".pbc") == 0)
+                args->have_pbc_file = 1;
+            else if (strcmp(ext, ".pasm") == 0)
+                args->have_pasm_file = 1;
+        }
     }
+    verify_file_names(sourcefile, outfile);
+    if (!Parrot_api_string_import(interp, sourcefile, &args->sourcefile))
+        show_last_error_and_exit(interp);
 }
 
 /*
@@ -885,7 +889,7 @@ verify_file_names(ARGIN_NULLOK(const char * input), ARGIN_NULLOK(const char * ou
     ASSERT_ARGS(verify_file_names)
     const char is_stdin = (input == NULL);
     const char is_stdout = (output == NULL);
-    if (!is_stdin && !is_stdout && !strcmp(input, output)) {
+    if (!is_stdin && !is_stdout && (strcmp(input, output)==0)) {
         fprintf(stderr, "Input and output files are the same");
         exit(EXIT_FAILURE);
     }
