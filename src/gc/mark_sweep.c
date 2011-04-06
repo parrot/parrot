@@ -40,12 +40,13 @@ static void free_buffer(PARROT_INTERP,
         FUNC_MODIFIES(*b);
 
 static void free_pmc_in_pool(PARROT_INTERP,
-    ARGIN(Memory_Pools *mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     SHIM(Fixed_Size_Pool *pool),
     ARGMOD(PObj *p))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*p);
 
 PARROT_WARN_UNUSED_RESULT
@@ -60,7 +61,7 @@ static Fixed_Size_Pool * new_fixed_size_obj_pool(
     size_t object_size,
     size_t objects_per_alloc);
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static Fixed_Size_Pool * new_pmc_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -493,7 +494,7 @@ Creates and initializes a new pool for PMCs and returns it.
 
 */
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static Fixed_Size_Pool *
 new_pmc_pool(PARROT_INTERP)
@@ -522,10 +523,8 @@ method if one is available.
 */
 
 static void
-free_pmc_in_pool(PARROT_INTERP,
-        ARGIN(Memory_Pools *mem_pools),
-        SHIM(Fixed_Size_Pool *pool),
-        ARGMOD(PObj *p))
+free_pmc_in_pool(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools),
+        SHIM(Fixed_Size_Pool *pool), ARGMOD(PObj *p))
 {
     ASSERT_ARGS(free_pmc_in_pool)
     PMC    * const pmc        = (PMC *)p;
