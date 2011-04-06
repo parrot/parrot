@@ -467,7 +467,7 @@ Parrot_gc_str_free_buffer_storage(SHIM_INTERP,
     if (mem_pool) {
         /* Update Memory_Block usage */
         if (PObj_is_movable_TESTALL(b)) {
-            INTVAL *buffer_flags = Buffer_bufflagsptr(b);
+            const INTVAL * const buffer_flags = Buffer_bufflagsptr(b);
 
             /* Mask low 2 bits used for flags */
             Memory_Block * block = Buffer_pool(b);
