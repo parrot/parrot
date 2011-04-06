@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -381,7 +381,7 @@ filehandle PMC.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_is_closed(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_io_is_closed(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_is_closed)
     INTVAL result = 1;
@@ -526,7 +526,7 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
 
             /* Read and append remaining bytes in case of a partial result */
             if (needed > 0) {
-                INTVAL rest_read = Parrot_io_read_buffer(interp, pmc,
+                const INTVAL rest_read = Parrot_io_read_buffer(interp, pmc,
                                         result->strstart + bytes_read, needed);
 
                 if (rest_read < needed)
@@ -1009,7 +1009,7 @@ Parrot_io_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_getfd(PARROT_INTERP, PMC *pmc)>
+=item C<PIOHANDLE Parrot_io_getfd(PARROT_INTERP, const PMC *pmc)>
 
 Returns C<*pmc>'s file descriptor, or C<0> if it is not defined.
 
@@ -1020,7 +1020,7 @@ Returns C<*pmc>'s file descriptor, or C<0> if it is not defined.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
-Parrot_io_getfd(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_io_getfd(PARROT_INTERP, ARGIN(const PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_getfd)
     return Parrot_io_get_os_handle(interp, pmc);
@@ -1039,7 +1039,7 @@ Returns a boolean value indicating whether C<*pmc> is a console/tty.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_is_tty_handle(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_io_is_tty_handle(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_is_tty_handle)
     if (Parrot_io_is_closed(interp, pmc))
