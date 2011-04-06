@@ -31,12 +31,13 @@ throughout the rest of Parrot.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void free_buffer(PARROT_INTERP,
-    ARGIN(Memory_Pools *mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     SHIM(Fixed_Size_Pool *pool),
     ARGMOD(Buffer *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*b);
 
 static void free_pmc_in_pool(PARROT_INTERP,
@@ -644,15 +645,13 @@ reuse later.
 */
 
 static void
-free_buffer(PARROT_INTERP,
-        ARGIN(Memory_Pools *mem_pools),
-        SHIM(Fixed_Size_Pool *pool),
-        ARGMOD(Buffer *b))
+free_buffer(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools),
+        SHIM(Fixed_Size_Pool *pool), ARGMOD(Buffer *b))
 {
     ASSERT_ARGS(free_buffer)
 
     /* If there is no allocated buffer - bail out */
-    if (!Buffer_buflen(b))
+    if (Buffer_buflen(b) == 0)
         return;
 
     Parrot_gc_str_free_buffer_storage(interp, &mem_pools->string_gc, b);
