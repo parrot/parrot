@@ -409,6 +409,14 @@ inline op noop(out PMC, in INT) {
     foo = bar[42];
 }», "Array access");
 
+
+parse_ok($c, q«
+inline op noop(out PMC, in INT) {
+    foo = (p);
+}», "Enclosed EXPR");
+
+
+
 done_testing();
 
 
