@@ -391,6 +391,9 @@ reg_sort_f(ARGIN(const void *a), ARGIN(const void *b))
     const SymReg * const ra = *(const SymReg * const *)a;
     const SymReg * const rb = *(const SymReg * const *)b;
 
+    if (!ra->first_ins || !rb->first_ins)
+        return 0;
+    
     if (ra->first_ins->index < rb->first_ins->index)
         return -1;
 
@@ -473,7 +476,7 @@ build_reglist(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
     /* we might have unused symbols here, from optimizations */
     for (i = count = unused = 0; i < n_symbols; i++) {
-        if (!unit->reglist[i]->first_ins)
+        if (!unit->reglist[i]->first_ins && !(unit->reglist[i]->usage & U_LEXICAL))
             unused++;
         else if (i == count)
             count++;
@@ -668,7 +671,7 @@ allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
                         "allocate %s sym %c '%s'  color %d\n",
                         usage & U_LEXICAL ? "Lexical" : "Non-vol",
                         (int)r->set, r->name, r->color);
-
+                
                 unit->first_avail[j] = first_reg;
 
                 /* don't lose this set; we must free it */
@@ -716,7 +719,7 @@ vanilla_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         SymReg *r;
         for (r = hsh->data[i]; r; r = r->next) {
             /* TODO Ignore non-volatiles */
-            if (REG_NEEDS_ALLOC(r) && r->use_count)
+            if (REG_NEEDS_ALLOC(r))
                 r->color = -1;
         }
     }
@@ -732,7 +735,7 @@ vanilla_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             for (r = hsh->data[i]; r; r = r->next) {
                 if (r->set != reg_set)
                     continue;
-                if (REG_NEEDS_ALLOC(r) && (r->color == -1) && r->use_count) {
+                if (REG_NEEDS_ALLOC(r) && (r->color == -1)) {
                     if (set_contains(avail, first_reg))
                         first_reg = first_avail(interp, unit, reg_set, NULL);
 
