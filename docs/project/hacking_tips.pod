@@ -41,6 +41,10 @@ when debugging a PMC or STRING, you'll see this:
   <INSERT AWESOME GDB 7.1 OUTPUT HERE>
 Note that you'll need gdb 7.1 or later for this to work.
 
+=head4 Links
+
+L<http://blog.ksplice.com/2011/01/8-gdb-tricks/>
+
 =head2 Debugging Parrot (internal tools)
 
 When it crashes, Parrot make an effort to provide a PIR-level backtrace in
