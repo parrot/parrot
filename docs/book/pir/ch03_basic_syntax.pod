@@ -175,7 +175,7 @@ not predeclare register variables:
 X<named variables>
 PIR also has named variables; the C<.local>
 directive declares them. As with register variables, there are four valid types:
-C<int>, C<num>, C<string>, and C<pmc>. You I<must> declare named variables; 
+C<int>, C<num>, C<string>, and C<pmc>. You I<must> declare named variables;
 once declared, they behave exactly the same as register variables.
 
 =begin PIR_FRAGMENT
@@ -262,7 +262,7 @@ X<conditional branch>
 Variations on the basic C<goto> check whether a particular condition is
 true or false before jumping:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
 
   if $I0 > 5 goto GREET
 

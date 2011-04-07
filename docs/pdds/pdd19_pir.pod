@@ -57,7 +57,7 @@ identifiers.
     A42
 
 Opcode names are not reserved words in PIR, and may be used as variable names.
-For example, you can define a local variable named C<print>.  
+For example, you can define a local variable named C<print>.
 Note that currently, by using an opcode name as a local variable name, the
 variable will I<hide> the opcode name, effectively making the opcode unusable.
 In the future this will be resolved.
@@ -528,7 +528,7 @@ that name instead of the C<.sub> name.
 
 =item :vtable
 
-=begin PIR
+=begin PIR_INVALID
 
   .sub bar :vtable
     # ...
@@ -538,7 +538,7 @@ that name instead of the C<.sub> name.
     # ...
   .end
 
-=end PIR
+=end PIR_INVALID
 
 The marked C<.sub> overrides a vtable function, and is not stored in the
 namespace. By default, it overrides a vtable function with the same name
@@ -1232,7 +1232,7 @@ in the file. Other sub modifiers include C<:load>, C<:init>, etc.
 
       # ...
       .local pmc xy
-      .return(xy) 
+      .return(xy)
     .end
 
 =end PIR

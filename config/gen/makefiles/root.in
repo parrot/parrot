@@ -1369,7 +1369,8 @@ src/gc/api$(O) : \
     $(PARROT_H_HEADERS) \
     src/gc/gc_private.h \
     src/gc/api.c \
-    src/gc/variable_size_pool.h
+    src/gc/variable_size_pool.h \
+    src/gc/fixed_allocator.h
 
 src/gc/alloc_resources$(O) : \
     $(PARROT_H_HEADERS) \
@@ -1522,29 +1523,16 @@ src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
 src/interp/inter_misc$(O) : $(PARROT_H_HEADERS) \
 	src/interp/inter_misc.c \
 	src/interp/inter_misc.str \
-	compilers/imcc/imc.h \
-	compilers/imcc/cfg.h \
-	compilers/imcc/debug.h \
-	compilers/imcc/instructions.h \
-	compilers/imcc/sets.h \
-	compilers/imcc/symreg.h \
-	compilers/imcc/unit.h \
-	$(INC_DIR)/oplib/ops.h \
-	$(INC_DIR)/runcore_api.h
+	include/imcc/embed.h \
+        include/imcc/yyscanner.h \
+	$(INC_DIR)/runcore_api.h \
+        include/pmc/pmc_parrotinterpreter.h
 
 src/interp/inter_create$(O) : $(PARROT_H_HEADERS) \
 	$(INC_DIR)/oplib/core_ops.h \
 	src/gc/gc_private.h \
 	src/interp/inter_create.c \
 	src/interp/inter_create.str \
-	compilers/imcc/imc.h \
-	compilers/imcc/cfg.h \
-	compilers/imcc/debug.h \
-	compilers/imcc/instructions.h \
-	compilers/imcc/sets.h \
-	compilers/imcc/symreg.h \
-	compilers/imcc/unit.h \
-	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/runcore_api.h \
         src/gc/variable_size_pool.h
 
@@ -1576,6 +1564,7 @@ frontend/parrot/main$(O) : \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/has_header.h \
     $(INC_DIR)/longopt.h \
+    include/imcc/api.h \
     frontend/parrot/main.c
 
 src/multidispatch$(O) : \
@@ -1593,14 +1582,7 @@ src/packfile/api$(O) : \
     include/pmc/pmc_sub.h \
     include/pmc/pmc_key.h \
     include/pmc/pmc_parrotlibrary.h \
-    compilers/imcc/imc.h \
-    compilers/imcc/cfg.h \
-    compilers/imcc/debug.h \
-    compilers/imcc/instructions.h \
-    compilers/imcc/sets.h \
-    compilers/imcc/symreg.h \
-    compilers/imcc/unit.h \
-    $(INC_DIR)/oplib/ops.h \
+    include/pmc/pmc_ptrobj.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/dynext.h \
     $(INC_DIR)/embed.h \
@@ -1714,14 +1696,9 @@ src/embed$(O) : \
     $(INC_DIR)/runcore_api.h \
     $(INC_DIR)/extend_vtable.h \
     $(INC_DIR)/oplib/core_ops.h \
-    compilers/imcc/imc.h \
-    compilers/imcc/cfg.h \
-    compilers/imcc/debug.h \
-    compilers/imcc/instructions.h \
-    compilers/imcc/sets.h \
-    compilers/imcc/symreg.h \
-    compilers/imcc/unit.h \
-    include/pmc/pmc_sub.h
+    include/pmc/pmc_sub.h \
+    include/imcc/embed.h \
+    include/imcc/yyscanner.h \
 
 src/embed/api$(O) : \
     $(PARROT_H_HEADERS) \
@@ -2348,7 +2325,6 @@ dynext-clean :
 # or is there an automatic xargs?
 test-clean :
 	$(RM_F) t/compilers/data_json/*.pir
-	$(RM_F) t/compilers/imcc/imcpasm/*.pir
 	$(RM_F) t/compilers/imcc/syn/*.pir t/compilers/imcc/syn/*.pasm
 	$(RM_F) t/compilers/imcc/reg/*.pir t/compilers/imcc/reg/*.pasm
 	$(RM_F) t/compilers/pct/*.pir

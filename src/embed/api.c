@@ -169,7 +169,7 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
     ASSERT_ARGS(Parrot_api_set_runcore)
     EMBED_API_CALLIN(interp_pmc, interp)
     if (trace) {
-        Parrot_pcc_trace_flags_on(interp, interp->ctx, trace);
+        Interp_trace_SET(interp, PARROT_TRACE_OPS_FLAG);
         Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
     }
     else {
@@ -336,9 +336,8 @@ Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
             "Could not load packfile");
     do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
     Parrot_block_GC_mark(interp);
-    *pbc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+    *pbc = Parrot_pf_get_packfile_pmc(interp, pf);
     Parrot_unblock_GC_mark(interp);
-    VTABLE_set_pointer(interp, *pbc, pf);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -371,8 +370,7 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
             "Could not unpack packfile");
     do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
-    *pbcpmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
-    VTABLE_set_pointer(interp, *pbcpmc, pf);
+    *pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf);
     Parrot_unblock_GC_mark(interp);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
@@ -517,6 +515,46 @@ Parrot_api_serialize_bytecode_pmc(Parrot_PMC interp_pmc, Parrot_PMC pbc,
         *bc = Parrot_str_new_init(interp, (const char *)packed, size,
                 Parrot_binary_encoding_ptr, 0);
     }
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+/*
+
+=item C<Parrot_Int Parrot_api_write_bytecode_to_file(Parrot_PMC interp_pmc,
+Parrot_PMC pbc, Parrot_String filename)>
+
+Write out a PackFile PMC to a .pbc file
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_write_bytecode_to_file(Parrot_PMC interp_pmc, Parrot_PMC pbc,
+        Parrot_String filename)
+{
+    ASSERT_ARGS(Parrot_api_write_bytecode_to_file)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    PMC * filepmc = PMCNULL;
+    PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
+    if (!pf)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not get packfile.");
+    else {
+        PIOHANDLE fp = PIO_OPEN(interp, filename, PIO_F_WRITE);
+        if (fp == PIO_INVALID_HANDLE)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Cannot open output file %Ss", filename);
+        else {
+            const Parrot_Int size = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
+            opcode_t * const packed = (opcode_t*)mem_sys_allocate(size);
+            PackFile_pack(interp, pf, packed);
+            PIO_WRITE(interp, fp, (char *)packed, size);
+        }
+        PIO_CLOSE(interp, fp);
+    }
+
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -704,35 +742,6 @@ Parrot_api_set_configuration_hash(Parrot_PMC interp_pmc, Parrot_PMC confighash)
     Parrot_set_config_hash_pmc(interp, confighash);
     Parrot_lib_update_paths_from_config_hash(interp);
     EMBED_API_CALLOUT(interp_pmc, interp);
-}
-
-/*
-
-=item C<Parrot_Int Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc,
-Parrot_String sourcefile, int argc, const char **argv, Parrot_PMC* bytecodepmc,
-int *result, imcc_hack_func_t func)>
-
-WARNING: This is an evil hack to provide a wrapper around IMCC to catch unhandled
-exceptions without having to assume IMCC is linked in with libparrot. Delete this
-as soon as we don't need it anymore.
-
-This function returns a true value if this call is successful and false value
-otherwise.
-
-=cut
-
-*/
-
-PARROT_API
-Parrot_Int
-Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, ARGIN(Parrot_String sourcefile),
-    int argc, ARGIN_NULLOK(const char **argv), ARGMOD(Parrot_PMC* bytecodepmc),
-    ARGOUT(int *result), imcc_hack_func_t func)
-{
-    ASSERT_ARGS(Parrot_api_wrap_imcc_hack)
-    EMBED_API_CALLIN(interp_pmc, interp)
-    *result = func(interp_pmc, sourcefile, argc, argv, bytecodepmc);
-    EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
 /*

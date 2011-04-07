@@ -30,7 +30,7 @@ BEGIN {
         plan( skip_all => "Test::Builder::Tester not installed\n" );
         exit 0;
     }
-    plan( tests => 120 );
+    plan( tests => 112 );
 }
 
 use lib qw( . lib ../lib ../../lib );
@@ -71,8 +71,6 @@ can_ok( 'Parrot::Test', $_ ) for ( qw/
     pir_error_output_like           pir_error_output_unlike
     pir_output_is                   pir_output_isnt
     pir_output_like                 pir_output_unlike
-    pir_2_pasm_is                   pir_2_pasm_isnt
-    pir_2_pasm_like                 pir_2_pasm_unlike
     generate_languages_functions
     per_test
     plan
@@ -309,10 +307,10 @@ $err = <<"ERR";
 # Expected error but exited cleanly
 # Received:
 # foo
-# 
+#
 # Expected:
 # /bar/
-# 
+#
 ERR
 chomp $err;
 test_err($err);
@@ -358,44 +356,6 @@ OUTPUT
     test_test($desc);
 }
 
-##### PIR-to-PASM output test functions #####
-
-my $pir_2_pasm_code = <<'ENDOFCODE';
-.sub _test :main
-   noop
-   end
-.end
-ENDOFCODE
-
-pir_2_pasm_is( <<CODE, <<'OUT', "pir_2_pasm:  added return - end" );
-$pir_2_pasm_code
-CODE
-# IMCC does produce b0rken PASM files
-# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
-_test:
-  noop
-  end
-OUT
-
-pir_2_pasm_isnt( <<CODE, <<'OUT', "pir_2_pasm:  added return - end" );
-$pir_2_pasm_code
-CODE
-_test:
-  noop
-  bend
-OUT
-
-pir_2_pasm_like( <<CODE, <<'OUT', "pir_2_pasm:  added return - end" );
-$pir_2_pasm_code
-CODE
-/noop\s+end/s
-OUT
-
-pir_2_pasm_unlike( <<CODE, <<'OUT', "pir_2_pasm:  added return - end" );
-$pir_2_pasm_code
-CODE
-/noop\s+bend/s
-OUT
 
 my $file = q{t/perl/testlib/hello.pasm};
 my $expected = qq{Hello World\n};

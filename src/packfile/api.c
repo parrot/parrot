@@ -29,12 +29,12 @@ about the structure of the frozen bytecode.
 #include "parrot/extend.h"
 #include "parrot/dynext.h"
 #include "parrot/runcore_api.h"
-#include "../compilers/imcc/imc.h"
 #include "api.str"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_key.h"
 #include "pmc/pmc_callcontext.h"
 #include "pmc/pmc_parrotlibrary.h"
+#include "pmc/pmc_ptrobj.h"
 #include "parrot/oplib/core_ops.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
@@ -86,7 +86,7 @@ static void clone_constant(PARROT_INTERP, ARGIN(PMC **c))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void compile_file(PARROT_INTERP, ARGIN(STRING *path))
+static void compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -242,6 +242,12 @@ static void mark_1_ct_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ct);
+
+static void mark_packfile_pmc(PARROT_INTERP,
+    SHIM(PMC *ptr_pmc),
+    ARGIN(void *ptr_raw))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -430,6 +436,9 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_mark_1_ct_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
+#define ASSERT_ARGS_mark_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ptr_raw))
 #define ASSERT_ARGS_PackFile_append __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_Constant_unpack_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -832,40 +841,34 @@ find_const_iter(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
         break;
     }
 
-
     return 0;
 }
 
-
 /*
 
-=item C<void mark_const_subs(PARROT_INTERP)>
+=item C<void Parrot_pf_mark_packfile(PARROT_INTERP, PackFile * pf)>
 
-Iterates over all directories and PackFile_Segments, finding and marking any
-constant Subs.
+Mark the contents of a C<PackFile>.
 
 =cut
 
 */
 
 void
-mark_const_subs(PARROT_INTERP)
+Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD(PackFile * pf))
 {
-    ASSERT_ARGS(mark_const_subs)
+    ASSERT_ARGS(Parrot_pf_mark_packfile)
 
-    PackFile * const self = interp->initial_pf;
-
-    if (!self)
+    if (!pf)
         return;
     else {
         /* locate top level dir */
-        PackFile_Directory * const dir = &self->directory;
+        PackFile_Directory * const dir = &pf->directory;
 
         /* iterate over all dir/segs */
         PackFile_map_segments(interp, dir, find_const_iter, NULL);
     }
 }
-
 
 /*
 
@@ -1424,6 +1427,50 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
     pf->fetch_nv = (packfile_fetch_nv_t)NULL;
 
     return pf;
+}
+
+/*
+
+=item C<PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile *pf)>
+
+Get a new PMC to hold the PackFile* structure. The exact type of PMC returned
+is not important, and consuming code should not rely on any particular type
+being returned. The only guarantees which are made by this interface are that:
+
+1) The PackFile* structure can be retrieved by VTABLE_get_pointer
+2) The PackFile* structure is marked for GC when the PMC is marked for GC
+
+=item C<static void mark_packfile_pmc(PARROT_INTERP, PMC *ptr_pmc, void
+*ptr_raw)>
+
+Mark the PackFile PMC for GC
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
+{
+    ASSERT_ARGS(Parrot_pf_get_packfile_pmc)
+    PMC * const ptr = Parrot_pmc_new(interp, enum_class_PtrObj);
+    VTABLE_set_pointer(interp, ptr, pf);
+    PTROBJ_SET_MARK(interp, ptr, mark_packfile_pmc);
+
+    /* TODO: We shouldn't need to register this here. But, this is a cheap
+             fix to make sure packfiles aren't getting collected prematurely */
+    Parrot_pmc_gc_register(interp, ptr);
+    return ptr;
+}
+
+static void
+mark_packfile_pmc(PARROT_INTERP, SHIM(PMC *ptr_pmc), ARGIN(void *ptr_raw))
+{
+    ASSERT_ARGS(mark_packfile_pmc)
+    PackFile * const pf = (PackFile*) ptr_raw;
+    Parrot_pf_mark_packfile(interp, pf);
 }
 
 /*
@@ -4048,7 +4095,7 @@ push_context(PARROT_INTERP)
 
 /*
 
-=item C<static void compile_file(PARROT_INTERP, STRING *path)>
+=item C<static void compile_file(PARROT_INTERP, STRING *path, INTVAL is_pasm)>
 
 Compile a PIR or PASM file from source.
 
@@ -4057,19 +4104,24 @@ Compile a PIR or PASM file from source.
 */
 
 static void
-compile_file(PARROT_INTERP, ARGIN(STRING *path))
+compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
 {
     ASSERT_ARGS(compile_file)
 
     STRING *err;
+    PackFile_ByteCode * const cur_code = interp->code;
     PackFile_ByteCode * const cs =
-        (PackFile_ByteCode *)Parrot_compile_file(interp, path, &err);
+        (PackFile_ByteCode *)Parrot_compile_file(interp, path, is_pasm, &err);
 
-    if (cs)
+    if (cs) {
+        interp->code = cur_code;
         do_sub_pragmas(interp, cs, PBC_LOADED, NULL);
-    else
+    }
+    else {
+        interp->code = cur_code;
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
                 "compiler returned NULL ByteCode '%Ss' - %Ss", path, err);
+    }
 
 }
 
@@ -4178,8 +4230,11 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 
     if (STRING_equal(interp, found_ext, pbc))
         load_file(interp, path);
-    else
-        compile_file(interp, path);
+    else {
+        const STRING * pasm_s = CONST_STRING(interp, "pasm");
+        const INTVAL is_pasm = STRING_equal(interp, found_ext, pasm_s);
+        compile_file(interp, path, is_pasm);
+    }
 
     Parrot_pop_context(interp);
 }
@@ -4278,8 +4333,11 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
 
     if (STRING_equal(interp, found_ext, pbc))
         load_file(interp, path);
-    else
-        compile_file(interp, path);
+    else {
+        const STRING * pasm_s = CONST_STRING(interp, "pasm");
+        const INTVAL is_pasm = STRING_equal(interp, ext, pasm_s);
+        compile_file(interp, path, is_pasm);
+    }
 
     Parrot_pop_context(interp);
 }

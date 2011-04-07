@@ -135,11 +135,6 @@ typedef struct warnings_t {
     Warnings_classes classes;
 } *Warnings;
 
-/* Forward declaration for imc_info_t -- the actual struct is
- * defined in imcc/imc.h */
-struct _imc_info_t;
-
-
 struct _Thread_data;    /* in thread.h */
 struct _Caches;         /* caches .h */
 
@@ -200,7 +195,6 @@ struct parrot_interp_t {
     PackFile_ByteCode  *code;                 /* The code we are executing */
     struct PackFile    *initial_pf;           /* first created PF  */
 
-    struct _imc_info_t *imc_info;             /* imcc data */
     Hash               *op_hash;              /* mapping from op names to op_info_t */
 
     PDB_t *pdb;                               /* debug /trace system */
@@ -466,12 +460,13 @@ STRING* interpinfo_s(PARROT_INTERP, INTVAL what)
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-void * Parrot_compile_file(PARROT_INTERP,
+PackFile_ByteCode * Parrot_compile_file(PARROT_INTERP,
     ARGIN(STRING *fullname),
+    INTVAL is_pasm,
     ARGOUT(STRING **error))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         FUNC_MODIFIES(*error);
 
 PARROT_EXPORT
@@ -488,6 +483,11 @@ PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+Interp * Parrot_int_get_interp_from_pmc(ARGIN(PMC * interp_pmc))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 void Parrot_mark_method_writes(PARROT_INTERP,
@@ -543,6 +543,9 @@ void register_nci_method(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_get_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(type))
+#define ASSERT_ARGS_Parrot_int_get_interp_from_pmc \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp_pmc))
 #define ASSERT_ARGS_Parrot_mark_method_writes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
