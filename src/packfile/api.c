@@ -244,9 +244,10 @@ static void mark_1_ct_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
         FUNC_MODIFIES(*ct);
 
 static void mark_packfile_pmc(PARROT_INTERP,
-    SHIM(PMC *ptr_pmc),
+    ARGIN(PMC *ptr_pmc),
     ARGIN(void *ptr_raw))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
@@ -438,6 +439,7 @@ static int sub_pragma(PARROT_INTERP,
     , PARROT_ASSERT_ARG(ct))
 #define ASSERT_ARGS_mark_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ptr_pmc) \
     , PARROT_ASSERT_ARG(ptr_raw))
 #define ASSERT_ARGS_PackFile_append __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -1466,10 +1468,12 @@ Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
 }
 
 static void
-mark_packfile_pmc(PARROT_INTERP, SHIM(PMC *ptr_pmc), ARGIN(void *ptr_raw))
+mark_packfile_pmc(PARROT_INTERP, ARGIN(PMC *ptr_pmc), ARGIN(void *ptr_raw))
 {
     ASSERT_ARGS(mark_packfile_pmc)
     PackFile * const pf = (PackFile*) ptr_raw;
+    UNUSED(ptr_pmc);
+
     Parrot_pf_mark_packfile(interp, pf);
 }
 
