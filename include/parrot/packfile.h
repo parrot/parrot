@@ -123,8 +123,7 @@ typedef struct PackFile_Header {
 *    include it as first element of every derivated Segment
 */
 
-typedef struct PackFile_Segment * (*PackFile_Segment_new_func_t)
-    (PARROT_INTERP, ARGMOD(struct PackFile *), ARGIN(STRING *), int add);
+typedef struct PackFile_Segment * (*PackFile_Segment_new_func_t)(PARROT_INTERP);
 
 typedef void (*PackFile_Segment_destroy_func_t)
     (PARROT_INTERP, ARGMOD(struct PackFile_Segment *));
@@ -531,14 +530,8 @@ void PackFile_Annotations_add_entry(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PackFile_Segment * PackFile_Annotations_new(PARROT_INTERP,
-    ARGMOD(struct PackFile *pf),
-    ARGIN(STRING *name),
-    NULLOK(int add))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pf);
+PackFile_Segment * PackFile_Annotations_new(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 void PackFile_ConstTable_clear(PARROT_INTERP,
@@ -652,10 +645,7 @@ void PackFile_Segment_dump(PARROT_INTERP, ARGIN(PackFile_Segment *self))
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PackFile_Segment * PackFile_Segment_new(PARROT_INTERP,
-    SHIM(PackFile *pf),
-    SHIM(STRING *name),
-    NULLOK(int add))
+PackFile_Segment * PackFile_Segment_new(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -878,9 +868,7 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD(PackFile * pf))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_Annotations_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pf) \
-    , PARROT_ASSERT_ARG(name))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_ConstTable_clear __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))

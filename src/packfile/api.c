@@ -49,10 +49,7 @@ static void byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PackFile_Segment * byte_code_new(PARROT_INTERP,
-    SHIM(PackFile *pf),
-    SHIM(STRING *name),
-    SHIM(int add))
+static PackFile_Segment * byte_code_new(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -97,10 +94,7 @@ static void const_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static PackFile_Segment * const_new(PARROT_INTERP,
-    SHIM(PackFile *pf),
-    SHIM(STRING *name),
-    SHIM(int add))
+static PackFile_Segment * const_new(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -160,10 +154,7 @@ static void directory_dump(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PackFile_Segment * directory_new(PARROT_INTERP,
-    SHIM(PackFile *pf),
-    SHIM(STRING *name),
-    SHIM(int add))
+static PackFile_Segment * directory_new(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -285,10 +276,7 @@ static void pf_debug_dump(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PackFile_Segment * pf_debug_new(PARROT_INTERP,
-    SHIM(PackFile *pf),
-    SHIM(STRING *name),
-    SHIM(int add))
+static PackFile_Segment * pf_debug_new(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -1640,10 +1628,10 @@ pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
 
     static const PackFile_funcs defaultf = {
         PackFile_Segment_new,
-        (PackFile_Segment_destroy_func_t)     NULLfunc,
-        (PackFile_Segment_packed_size_func_t) NULLfunc,
-        (PackFile_Segment_pack_func_t)        NULLfunc,
-        (PackFile_Segment_unpack_func_t)      NULLfunc,
+        (PackFile_Segment_destroy_func_t)     NULL,
+        (PackFile_Segment_packed_size_func_t) NULL,
+        (PackFile_Segment_pack_func_t)        NULL,
+        (PackFile_Segment_unpack_func_t)      NULL,
         default_dump
     };
 
@@ -1716,7 +1704,7 @@ PackFile_Segment_new_seg(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
     ASSERT_ARGS(PackFile_Segment_new_seg)
     PackFile * const                  pf  = dir->base.pf;
     const PackFile_Segment_new_func_t f   = pf->PackFuncs[type].new_seg;
-    PackFile_Segment * const          seg = (f)(interp, pf, name, add);
+    PackFile_Segment * const          seg = (f)(interp);
 
     segment_init(seg, pf, name);
     seg->type = type;
@@ -2049,8 +2037,7 @@ PackFile_Segment_dump(PARROT_INTERP, ARGIN(PackFile_Segment *self))
 
 =over 4
 
-=item C<static PackFile_Segment * directory_new(PARROT_INTERP, PackFile *pf,
-STRING *name, int add)>
+=item C<static PackFile_Segment * directory_new(PARROT_INTERP)>
 
 Returns a new C<PackFile_Directory> cast as a C<PackFile_Segment>.
 
@@ -2061,7 +2048,7 @@ Returns a new C<PackFile_Directory> cast as a C<PackFile_Segment>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Segment *
-directory_new(PARROT_INTERP, SHIM(PackFile *pf), SHIM(STRING *name), SHIM(int add))
+directory_new(PARROT_INTERP)
 {
     ASSERT_ARGS(directory_new)
 
@@ -2475,8 +2462,7 @@ segment_init(ARGOUT(PackFile_Segment *self), ARGIN(PackFile *pf),
 
 /*
 
-=item C<PackFile_Segment * PackFile_Segment_new(PARROT_INTERP, PackFile *pf,
-STRING *name, int add)>
+=item C<PackFile_Segment * PackFile_Segment_new(PARROT_INTERP)>
 
 Creates a new default section.
 
@@ -2488,7 +2474,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment *
-PackFile_Segment_new(PARROT_INTERP, SHIM(PackFile *pf), SHIM(STRING *name), SHIM(int add))
+PackFile_Segment_new(PARROT_INTERP)
 {
     ASSERT_ARGS(PackFile_Segment_new)
     PackFile_Segment * const seg = mem_gc_allocate_zeroed_typed(interp, PackFile_Segment);
@@ -2632,10 +2618,9 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 
 /*
 
-=item C<static PackFile_Segment * byte_code_new(PARROT_INTERP, PackFile *pf,
-STRING *name, int add)>
+=item C<static PackFile_Segment * byte_code_new(PARROT_INTERP)>
 
-Creates a new C<PackFile_ByteCode> segment.  Ignores C<pf>, C<name>, and C<add>.
+Creates a new C<PackFile_ByteCode> segment.
 
 =cut
 
@@ -2644,7 +2629,7 @@ Creates a new C<PackFile_ByteCode> segment.  Ignores C<pf>, C<name>, and C<add>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Segment *
-byte_code_new(PARROT_INTERP, SHIM(PackFile *pf), SHIM(STRING *name), SHIM(int add))
+byte_code_new(PARROT_INTERP)
 {
     ASSERT_ARGS(byte_code_new)
     PackFile_ByteCode * const byte_code = mem_gc_allocate_zeroed_typed(interp, PackFile_ByteCode);
@@ -2914,11 +2899,9 @@ pf_debug_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 
 /*
 
-=item C<static PackFile_Segment * pf_debug_new(PARROT_INTERP, PackFile *pf,
-STRING *name, int add)>
+=item C<static PackFile_Segment * pf_debug_new(PARROT_INTERP)>
 
-Creates and returns a new C<PackFile_Debug> segment.  Ignores C<pf>, C<name>,
-and C<add> ignored.
+Creates and returns a new C<PackFile_Debug> segment.
 
 =cut
 
@@ -2927,7 +2910,7 @@ and C<add> ignored.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Segment *
-pf_debug_new(PARROT_INTERP, SHIM(PackFile *pf), SHIM(STRING *name), SHIM(int add))
+pf_debug_new(PARROT_INTERP)
 {
     ASSERT_ARGS(pf_debug_new)
     PackFile_Debug * const debug = mem_gc_allocate_zeroed_typed(interp, PackFile_Debug);
@@ -3589,8 +3572,7 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
 
 /*
 
-=item C<static PackFile_Segment * const_new(PARROT_INTERP, PackFile *pf, STRING
-*name, int add)>
+=item C<static PackFile_Segment * const_new(PARROT_INTERP)>
 
 Returns a new C<PackFile_ConstTable> segment.
 
@@ -3601,7 +3583,7 @@ Returns a new C<PackFile_ConstTable> segment.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Segment *
-const_new(PARROT_INTERP, SHIM(PackFile *pf), SHIM(STRING *name), SHIM(int add))
+const_new(PARROT_INTERP)
 {
     ASSERT_ARGS(const_new)
     PackFile_ConstTable * const const_table =
@@ -3663,11 +3645,9 @@ PackFile_Constant_unpack_pmc(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
 
 /*
 
-=item C<PackFile_Segment * PackFile_Annotations_new(PARROT_INTERP, struct
-PackFile *pf, STRING *name, int add)>
+=item C<PackFile_Segment * PackFile_Annotations_new(PARROT_INTERP)>
 
-Creates a new annotations segment structure. Ignores the parameters C<name> and
-C<add>.
+Creates a new annotations segment structure.
 
 =cut
 
@@ -3675,8 +3655,7 @@ C<add>.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment *
-PackFile_Annotations_new(PARROT_INTERP, ARGMOD(struct PackFile *pf),
-        ARGIN(STRING *name), SHIM(int add))
+PackFile_Annotations_new(PARROT_INTERP)
 {
     ASSERT_ARGS(PackFile_Annotations_new)
 
