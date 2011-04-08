@@ -1,6 +1,8 @@
 New in 3.3.0
 - Core
   + The isa and isa_pmc vtables can be overridden from PIR
+  + IMCC has a new improved external interface
+  + A new IMCCompiler PMC adds PDD31-alike functionality for the PIR and PASM compregs
 
 New in 3.2.0
 - Core
