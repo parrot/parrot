@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2009, Parrot Foundation.
+ * Copyright (C) 2003-2011, Parrot Foundation.
 */
 
 /*
@@ -406,7 +406,7 @@ reg_sort_f(ARGIN(const void *a), ARGIN(const void *b))
 
     if (!ra->first_ins || !rb->first_ins)
         return 0;
-    
+
     if (ra->first_ins->index < rb->first_ins->index)
         return -1;
 
@@ -683,7 +683,7 @@ allocate_uniq(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), int usage)
                         "allocate %s sym %c '%s'  color %d\n",
                         usage & U_LEXICAL ? "Lexical" : "Non-vol",
                         (int)r->set, r->name, r->color);
-                
+
                 unit->first_avail[j] = first_reg;
 
                 /* don't lose this set; we must free it */
