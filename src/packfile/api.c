@@ -298,7 +298,7 @@ static size_t pf_debug_packed_size(SHIM_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const opcode_t * pf_debug_unpack(PARROT_INTERP,
-    ARGOUT(PackFile_Segment *self),
+    ARGMOD(PackFile_Segment *self),
     ARGIN(const opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -1478,7 +1478,7 @@ Registers the C<pack>/C<unpack>/... functions for a packfile type.
 
 PARROT_EXPORT
 void
-PackFile_funcs_register(SHIM_INTERP, ARGOUT(PackFile *pf), UINTVAL type,
+PackFile_funcs_register(SHIM_INTERP, ARGMOD(PackFile *pf), UINTVAL type,
                         const PackFile_funcs funcs)
 {
     ASSERT_ARGS(PackFile_funcs_register)
@@ -2996,7 +2996,7 @@ Unpacks a debug segment into a PackFile_Debug structure, given the cursor.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const opcode_t *
-pf_debug_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(const opcode_t *cursor))
+pf_debug_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode_t *cursor))
 {
     ASSERT_ARGS(pf_debug_unpack)
     PackFile_Debug * const debug = (PackFile_Debug *)self;
@@ -3505,7 +3505,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const opcode_t *
-PackFile_ConstTable_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
+PackFile_ConstTable_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
         ARGIN(const opcode_t *cursor))
 {
     ASSERT_ARGS(PackFile_ConstTable_unpack)
@@ -3763,7 +3763,7 @@ Unpacks this segment from the bytecode.
 
 PARROT_CANNOT_RETURN_NULL
 const opcode_t *
-PackFile_Annotations_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *seg),
+PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
         ARGIN(const opcode_t *cursor))
 {
     ASSERT_ARGS(PackFile_Annotations_unpack)

@@ -126,16 +126,16 @@ typedef struct PackFile_Header {
 typedef struct PackFile_Segment * (*PackFile_Segment_new_func_t)(PARROT_INTERP);
 
 typedef void (*PackFile_Segment_destroy_func_t)
-    (PARROT_INTERP, ARGMOD(struct PackFile_Segment *));
+    (PARROT_INTERP, ARGMOD(struct PackFile_Segment *segp));
 
 typedef size_t (*PackFile_Segment_packed_size_func_t)
-    (PARROT_INTERP, ARGMOD(struct PackFile_Segment *));
+    (PARROT_INTERP, ARGMOD(struct PackFile_Segment *segp));
 
 typedef opcode_t * (*PackFile_Segment_pack_func_t)
-    (PARROT_INTERP, ARGMOD(struct PackFile_Segment *), ARGOUT(opcode_t *dest));
+    (PARROT_INTERP, ARGMOD(struct PackFile_Segment *segp), ARGOUT(opcode_t *dest));
 
 typedef const opcode_t * (*PackFile_Segment_unpack_func_t)
-    (PARROT_INTERP, ARGOUT(struct PackFile_Segment *), ARGIN(const opcode_t *packed));
+    (PARROT_INTERP, ARGMOD(struct PackFile_Segment *segp), ARGIN(const opcode_t *packed));
 
 typedef void (*PackFile_Segment_dump_func_t)
     (PARROT_INTERP, ARGIN(const struct PackFile_Segment *));
@@ -544,11 +544,12 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const opcode_t * PackFile_ConstTable_unpack(PARROT_INTERP,
-    ARGIN(PackFile_Segment *seg),
+    ARGMOD(PackFile_Segment *seg),
     ARGIN(const opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*seg);
 
 PARROT_EXPORT
 void PackFile_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
@@ -574,7 +575,7 @@ void PackFile_fixup_subs(PARROT_INTERP,
 
 PARROT_EXPORT
 void PackFile_funcs_register(SHIM_INTERP,
-    ARGOUT(PackFile *pf),
+    ARGMOD(PackFile *pf),
     UINTVAL type,
     const PackFile_funcs funcs)
         __attribute__nonnull__(2)
@@ -834,7 +835,7 @@ size_t PackFile_Annotations_packed_size(SHIM_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 const opcode_t * PackFile_Annotations_unpack(PARROT_INTERP,
-    ARGOUT(PackFile_Segment *seg),
+    ARGMOD(PackFile_Segment *seg),
     ARGIN(const opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
