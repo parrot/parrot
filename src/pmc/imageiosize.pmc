@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -232,8 +232,8 @@ Pushes the string C<*v> onto the end of the image.
     VTABLE void push_string(STRING *v) {
         if (PObj_flag_TEST(private1, SELF)) {
             /* store a reference to constant table entry of string */
-            PackFile_ConstTable *table = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
-            int idx = PackFile_ConstTable_rlookup_str(INTERP, table, v);
+            const PackFile_ConstTable * const table = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
+            const int idx = PackFile_ConstTable_rlookup_str(INTERP, table, v);
 
             if (idx >= 0) {
                 STATICSELF.push_integer(idx);
@@ -307,9 +307,9 @@ hasn't been seen yet, it is also pushed onto the todo list.
 
         STATICSELF.push_pmc(p);
         {
-            PMC *todo = PARROT_IMAGEIOSIZE(SELF)->todo;
+            PMC * const todo = PARROT_IMAGEIOSIZE(SELF)->todo;
             while (VTABLE_elements(INTERP, todo)) {
-                PMC *current = VTABLE_shift_pmc(INTERP, todo);
+                PMC * const current = VTABLE_shift_pmc(INTERP, todo);
                 VTABLE_freeze(INTERP, current, SELF);
                 VTABLE_visit(INTERP,  current, SELF);
                 SELF.push_pmc(PMC_metadata(current));

@@ -1029,10 +1029,9 @@ size_t PackFile_ConstTable_pack_size(PARROT_INTERP,
         FUNC_MODIFIES(*seg);
 
 PARROT_EXPORT
-int PackFile_ConstTable_rlookup_num(PARROT_INTERP,
+int PackFile_ConstTable_rlookup_num(SHIM_INTERP,
     ARGIN(const PackFile_ConstTable *ct),
     FLOATVAL n)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -1082,8 +1081,7 @@ opcode_t PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
     , PARROT_ASSERT_ARG(seg))
 #define ASSERT_ARGS_PackFile_ConstTable_rlookup_num \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ct))
+       PARROT_ASSERT_ARG(ct))
 #define ASSERT_ARGS_PackFile_ConstTable_rlookup_pmc \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
