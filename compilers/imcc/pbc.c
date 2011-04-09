@@ -85,8 +85,9 @@ add_const_pmc_sub(
         FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*r);
 
-PARROT_WARN_UNUSED_RESULT
-static int add_const_str(
+PARROT_IGNORABLE_RESULT
+static int /*@alt void@*/
+add_const_str(
     ARGMOD(imc_info_t * imcc),
     ARGIN(STRING *s),
     ARGIN(PackFile_ByteCode * const bc))
@@ -199,10 +200,9 @@ static int get_old_size(
         FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*ins_line);
 
-static void imcc_globals_destroy(PARROT_INTERP,
+static void imcc_globals_destroy(SHIM_INTERP,
     SHIM(int ex),
     ARGMOD(void *param))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*param);
 
@@ -328,8 +328,7 @@ static void verify_signature(
     , PARROT_ASSERT_ARG(bc) \
     , PARROT_ASSERT_ARG(ins_line))
 #define ASSERT_ARGS_imcc_globals_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(param))
+       PARROT_ASSERT_ARG(param))
 #define ASSERT_ARGS_init_fixedintegerarray_from_string \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
@@ -372,7 +371,7 @@ Frees memory allocated for IMCC globals for one particular compilation unit.
 */
 
 static void
-imcc_globals_destroy(PARROT_INTERP, SHIM(int ex), ARGMOD(void *param))
+imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), ARGMOD(void *param))
 {
     ASSERT_ARGS(imcc_globals_destroy)
     imc_info_t * const imcc = (imc_info_t*)param;
@@ -1113,41 +1112,37 @@ Adds a constant string to constant_table.
 
 */
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 static int
 add_const_str(ARGMOD(imc_info_t * imcc), ARGIN(STRING *s),
         ARGIN(PackFile_ByteCode * const bc))
 {
     ASSERT_ARGS(add_const_str)
     PackFile_ConstTable * const ct = bc->const_table;
-    int i = PackFile_ConstTable_rlookup_str(imcc->interp, ct, s);
+    const int i = PackFile_ConstTable_rlookup_str(imcc->interp, ct, s);
 
     if (i >= 0)
         return i;
 
 
-    /* otherwise... */
-    {
-        if (!ct->str.constants)
-            ct->str.constants = mem_gc_allocate_n_zeroed_typed(imcc->interp,
-                    1, STRING *);
+    if (!ct->str.constants)
+        ct->str.constants = mem_gc_allocate_n_zeroed_typed(imcc->interp, 1, STRING *);
 
-        else
-            ct->str.constants = mem_gc_realloc_n_typed_zeroed(imcc->interp,
-                    ct->str.constants, ct->str.const_count + 1, ct->str.const_count, STRING *);
+    else
+        ct->str.constants = mem_gc_realloc_n_typed_zeroed(imcc->interp,
+                ct->str.constants, ct->str.const_count + 1, ct->str.const_count, STRING *);
 
-        /* initialize rlookup cache */
-        if (!ct->string_hash)
-            ct->string_hash = Parrot_hash_create(imcc->interp, enum_type_INTVAL,
-                    Hash_key_type_STRING_enc);
+    /* initialize rlookup cache */
+    if (!ct->string_hash)
+        ct->string_hash = Parrot_hash_create(imcc->interp, enum_type_INTVAL,
+                Hash_key_type_STRING_enc);
 
-        ct->str.constants[ct->str.const_count] = s;
+    ct->str.constants[ct->str.const_count] = s;
 
-        Parrot_hash_put(imcc->interp, ct->string_hash, s,
-            (void *)ct->str.const_count);
+    Parrot_hash_put(imcc->interp, ct->string_hash, s,
+        (void *)ct->str.const_count);
 
-        return ct->str.const_count++;
-    }
+    return ct->str.const_count++;
 }
 
 
@@ -1266,8 +1261,8 @@ create_lexinfo(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
 {
     ASSERT_ARGS(create_lexinfo)
     PMC                 *lex_info    = NULL;
-    SymHash             *hsh         = &unit->hash;
-    PackFile_ConstTable *ct          = bc->const_table;
+    const SymHash             * const hsh = &unit->hash;
+    const PackFile_ConstTable * const ct  = bc->const_table;
     const INTVAL lex_info_id = Parrot_hll_get_ctx_HLL_type(imcc->interp,
                                         enum_class_LexInfo);
     unsigned int i;
@@ -1640,11 +1635,11 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
          * store the sub's strings
          */
         {
-            PMC *strings = Parrot_freeze_strings(imcc->interp, sub_pmc);
-            int        n = VTABLE_elements(imcc->interp, strings);
+            PMC * const strings = Parrot_freeze_strings(imcc->interp, sub_pmc);
+            const int n = VTABLE_elements(imcc->interp, strings);
 
             for (i = 0; i < n; i++) {
-                int unused = add_const_str(imcc,
+                add_const_str(imcc,
                     VTABLE_get_string_keyed_int(imcc->interp, strings, i), interp_code);
             }
         }
