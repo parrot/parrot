@@ -248,6 +248,13 @@ static PackFile * PackFile_append(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static PackFile * PackFile_append_pmc(PARROT_INTERP,
+    ARGIN(PMC * const pf_pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC * PackFile_Constant_unpack_pmc(PARROT_INTERP,
     ARGIN(PackFile_ConstTable *constt),
@@ -431,6 +438,9 @@ static int sub_pragma(PARROT_INTERP,
     , PARROT_ASSERT_ARG(ptr_raw))
 #define ASSERT_ARGS_PackFile_append __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_PackFile_append_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pf_pmc))
 #define ASSERT_ARGS_PackFile_Constant_unpack_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(constt) \
@@ -4090,11 +4100,10 @@ static void
 compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
 {
     ASSERT_ARGS(compile_file)
-
-    STRING *err;
     PackFile_ByteCode * const cur_code = interp->code;
-    PackFile_ByteCode * const cs =
-        (PackFile_ByteCode *)Parrot_compile_file(interp, path, is_pasm, &err);
+    PMC * const pf_pmc = Parrot_compile_file(interp, path, is_pasm);
+    PackFile * const pf = (PackFile*) VTABLE_get_pointer(interp, pf_pmc);
+    PackFile_ByteCode * const cs = pf->cur_cs;
 
     if (cs) {
         interp->code = cur_code;
@@ -4103,7 +4112,7 @@ compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
     else {
         interp->code = cur_code;
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-                "compiler returned NULL ByteCode '%Ss' - %Ss", path, err);
+                "compiler returned NULL ByteCode '%Ss'", path);
     }
 
 }
@@ -4123,11 +4132,9 @@ static void
 load_file(PARROT_INTERP, ARGIN(STRING *path))
 {
     ASSERT_ARGS(load_file)
-    char * const filename = Parrot_str_to_cstring(interp, path);
 
-    PackFile * pf = Parrot_pbc_read(interp, filename, 0);
+    PackFile * pf = PackFile_read_pbc(interp, path, 0);
     pf = PackFile_append(interp, pf);
-    Parrot_str_free_cstring(filename);
 
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -4229,6 +4236,11 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 Reads and appends a PBC it to the current directory.  Fixes up sub addresses in
 newly loaded bytecode and runs C<:load> subs.
 
+=item C<static PackFile * PackFile_append_pmc(PARROT_INTERP, PMC * const
+pf_pmc)>
+
+Append a packfile PMC to the current interpreter packfile.
+
 =cut
 
 */
@@ -4257,6 +4269,14 @@ PackFile_append(PARROT_INTERP, ARGIN_NULLOK(PackFile * const pf))
     return pf;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static PackFile *
+PackFile_append_pmc(PARROT_INTERP, ARGIN(PMC * const pf_pmc))
+{
+    PackFile * const pf = (PackFile *) VTABLE_get_pointer(interp, pf_pmc);
+    return PackFile_append(interp, pf);
+}
 
 /*
 

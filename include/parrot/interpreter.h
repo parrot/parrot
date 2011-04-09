@@ -460,14 +460,11 @@ STRING* interpinfo_s(PARROT_INTERP, INTVAL what)
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PackFile_ByteCode * Parrot_compile_file(PARROT_INTERP,
+PMC * Parrot_compile_file(PARROT_INTERP,
     ARGIN(STRING *fullname),
-    INTVAL is_pasm,
-    ARGOUT(STRING **error))
+    INTVAL is_pasm)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*error);
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 void Parrot_compreg(PARROT_INTERP,
@@ -534,8 +531,7 @@ void register_nci_method(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(fullname) \
-    , PARROT_ASSERT_ARG(error))
+    , PARROT_ASSERT_ARG(fullname))
 #define ASSERT_ARGS_Parrot_compreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(type) \
