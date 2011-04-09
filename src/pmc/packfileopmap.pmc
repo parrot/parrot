@@ -190,7 +190,7 @@ Lookup op name by mapped id.
     }
 
     VTABLE PMC* get_pmc_keyed_int(INTVAL key) {
-        Parrot_pmc_box_string(INTERP, STATICSELF.get_string_keyed_int(key));
+        return Parrot_pmc_box_string(INTERP, STATICSELF.get_string_keyed_int(key));
     }
 
 
