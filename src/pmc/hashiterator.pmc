@@ -52,20 +52,18 @@ Generic iterator for traversing Hash.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void advance_to_next(PARROT_INTERP, ARGMOD(PMC *self))
+static void advance_to_next(ARGMOD(PMC *self))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
 
 #define ASSERT_ARGS_advance_to_next __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
+       PARROT_ASSERT_ARG(self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
 
-=item C<static void advance_to_next(PARROT_INTERP, PMC *self)>
+=item C<static void advance_to_next(PMC *self)>
 
 Advance to next position. Return found (if any) HashBucket.
 
@@ -74,7 +72,7 @@ Advance to next position. Return found (if any) HashBucket.
 */
 
 static void
-advance_to_next(PARROT_INTERP, ARGMOD(PMC *self))
+advance_to_next(ARGMOD(PMC *self))
 {
     ASSERT_ARGS(advance_to_next)
     Parrot_HashIterator_attributes * const attrs  = PARROT_HASHITERATOR(self);
@@ -267,7 +265,7 @@ the next one.
         PMC        *ret;
 
         /* Move to next bucket */
-        advance_to_next(INTERP, SELF);
+        advance_to_next(SELF);
 
         if (attrs->elements < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
@@ -288,7 +286,7 @@ the next one.
         Parrot_HashIterator_attributes * const attrs = PARROT_HASHITERATOR(SELF);
 
         /* Move to next bucket */
-        advance_to_next(INTERP, SELF);
+        advance_to_next(SELF);
 
         if (attrs->elements < 0)
             return CONST_STRING(INTERP, "");
