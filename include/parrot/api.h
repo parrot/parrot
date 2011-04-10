@@ -40,6 +40,7 @@ Parrot_confess(ARGIN(const char *cond), ARGIN(const char *file), unsigned int li
 #  define PARROT_ASSERT_MSG(x, s) /*@-noeffect@*/((void)0)/*@=noeffect@*/
 #  define ASSERT_ARGS(a)
 #else
+#  define PARROT_ASSERTS_ON 1
 #  define PARROT_ASSERT(x) (x) ? ((void)0) : Parrot_confess(#x, __FILE__, __LINE__)
 #  define PARROT_ASSERT_ARG(x) ((x) ? (0) : (Parrot_confess(#x, __FILE__, __LINE__), 0))
 #  define PARROT_FAILURE(x) Parrot_confess((x), __FILE__, __LINE__)
