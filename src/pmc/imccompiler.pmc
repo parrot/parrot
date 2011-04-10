@@ -19,6 +19,21 @@ A compiler object to wrap IMCC
 #include "imcc/yyscanner.h"
 #include "pmc/pmc_sub.h"
 
+/*
+
+=over 4
+
+=item C<static PMC * get_packfile_eval_pmc(PARROT_INTERP, PMC * pf_pmc, INTVAL
+current_eval)>
+
+get eval_pmc info from packfile
+
+=back
+
+=cut
+
+*/
+
 static PMC *
 get_packfile_eval_pmc(PARROT_INTERP, PMC * pf_pmc, INTVAL current_eval)
 {
