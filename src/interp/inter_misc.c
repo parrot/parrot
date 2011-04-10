@@ -234,6 +234,7 @@ Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), INTVAL is_pasm)
     Parrot_pcc_set_HLL(interp, newcontext, 0);
     Parrot_pcc_set_sub(interp, newcontext, 0);
 
+
     imcc_reset(imcc);
     result = imcc_compile_file(imcc, fullname, is_pasm);
     if (PMC_IS_NULL(result)) {

@@ -929,6 +929,8 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
             PMC_get_sub(interp, sub_pmc, sub);
             sub->eval_pmc = eval_pmc;
 
+            if (action == 0)
+                continue;
             if (((PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK)
             ||   (Sub_comp_get_FLAGS(sub) & SUB_COMP_FLAG_MASK))
             &&    sub_pragma(interp, action, sub_pmc)) {

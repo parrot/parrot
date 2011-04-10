@@ -19,6 +19,22 @@ A compiler object to wrap IMCC
 #include "imcc/yyscanner.h"
 #include "pmc/pmc_sub.h"
 
+static PMC *
+get_packfile_eval_pmc(PARROT_INTERP, PMC * pf_pmc, INTVAL current_eval)
+{
+    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pf_pmc);
+    PMC * const eval_pmc = Parrot_pmc_new(interp, enum_class_Eval);
+    Parrot_Sub_attributes *sub_data;
+
+    PMC_get_sub(interp, eval_pmc, sub_data);
+    sub_data->seg = pf->cur_cs;
+    sub_data->start_offs = 0;
+    sub_data->end_offs = pf->cur_cs->base.size;
+    sub_data->name = Parrot_sprintf_c(interp, "EVAL_%d", current_eval);
+    PackFile_fixup_subs(interp, PBC_MAIN, eval_pmc);
+    return eval_pmc;
+}
+
 /* HEADERIZER HFILE: none */
 
 pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
@@ -54,7 +70,6 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         PMC * cont = INTERP->current_cont;
         PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
         PackFile_ByteCode * const cur_code = interp->code;
-        PackFile * pf = NULL;
         STRING * code = STRINGNULL;
         PMC * result = PMCNULL;
         PMC * eval_pmc = PMCNULL;
@@ -73,19 +88,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             Parrot_unblock_GC_mark(interp);
             Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
-        pf = (PackFile*)VTABLE_get_pointer(INTERP, result);
-        {
-            Parrot_Sub_attributes *sub_data;
-
-            eval_pmc = Parrot_pmc_new(INTERP, enum_class_Eval);
-            PMC_get_sub(INTERP, eval_pmc, sub_data);
-            sub_data->seg = pf->cur_cs;
-            sub_data->start_offs = 0;
-            sub_data->end_offs = pf->cur_cs->base.size;
-            sub_data->name = Parrot_sprintf_c(INTERP, "EVAL_%d", attrs->current_eval);
-            attrs->current_eval++;
-            PackFile_fixup_subs(INTERP, PBC_MAIN, eval_pmc);
-        }
+        eval_pmc = get_packfile_eval_pmc(interp, result, attrs->current_eval++);
 
         Parrot_pop_context(interp);
         Parrot_unblock_GC_mark(interp);
@@ -134,14 +137,34 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         PMC * pf = PMCNULL;
+        PMC * eval_pmc = PMCNULL;
         imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
+        UINTVAL regs_used[4] = {3, 3, 3, 3};
+        PMC * const newcontext = Parrot_push_context(interp, regs_used);
+        PackFile_ByteCode * const old_bc = interp->code;
+
         if (has_target)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "IMCCompiler: compiler does not support the target option");
+
+        Parrot_block_GC_mark(interp);
+        Parrot_pcc_set_HLL(interp, newcontext, 0);
+        Parrot_pcc_set_sub(interp, newcontext, 0);
+
         /* TODO: Handle outer_ctx */
         pf = imcc_compile_string(imcc, source, attrs->is_pasm);
-        imcc_reset(imcc);
-        RETURN(PMC *pf);
+        if (PMC_IS_NULL(pf)) {
+            STRING * const msg = imcc_last_error_message(imcc);
+            INTVAL code = imcc_last_error_code(imcc);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
+        }
+        eval_pmc = get_packfile_eval_pmc(interp, pf, attrs->current_eval++);
+
+        Parrot_pop_context(interp);
+        Parrot_unblock_GC_mark(interp);
+        interp->code = old_bc;
+
+        RETURN(PMC *eval_pmc);
     }
 
     METHOD compile_file(STRING *filename,
@@ -153,6 +176,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
         UINTVAL regs_used[4] = {3, 3, 3, 3};
         PMC * const newcontext = Parrot_push_context(interp, regs_used);
+        PackFile_ByteCode * const old_bc = interp->code;
 
         if (has_target)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -172,6 +196,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
 
         Parrot_pop_context(interp);
         Parrot_unblock_GC_mark(interp);
+        interp->code = old_bc;
 
         RETURN(PMC *pf);
     }
