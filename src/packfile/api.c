@@ -4276,6 +4276,8 @@ PARROT_CAN_RETURN_NULL
 static PackFile *
 PackFile_append_pmc(PARROT_INTERP, ARGIN(PMC * const pf_pmc))
 {
+    ASSERT_ARGS(PackFile_append_pmc)
+
     PackFile * const pf = (PackFile *) VTABLE_get_pointer(interp, pf_pmc);
     return PackFile_append(interp, pf);
 }
