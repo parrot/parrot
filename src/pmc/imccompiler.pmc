@@ -201,7 +201,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         RETURN(PMC *pf);
     }
 
-    METHOD eval(STRING *source,
+    /*METHOD eval(STRING *source,
             STRING *target :named("target") :optional, INTVAL has_target :opt_flag,
             PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag)
     {
@@ -211,10 +211,8 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         if (has_target)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "IMCCompiler: compiler does not support the target option");
-        /* TODO: Handle outer_ctx */
         pf = imcc_compile_string(imcc, source, attrs->is_pasm);
-        /* TODO: Execute it */
-    }
+    }*/
 
     METHOD preprocess(STRING *code) {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
@@ -222,22 +220,25 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         imcc_preprocess(imcc, code);
     }
 
-    METHOD parse_name(STRING *name) {
+    /*METHOD parse_name(STRING *name) {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "IMCCompiler: parse_name is not supported");
-    }
+    }*/
 
-    METHOD load_module(STRING *name) {
-        /* TODO: This */
-    }
+    /* TODO: This */
+    /*METHOD load_module(STRING *name) {
 
-    METHOD get_module(STRING *name) {
-        /* TODO: This */
-    }
+    }*/
 
-    METHOD get_exports(PMC *module) {
-        /* TODO: This */
-    }
+    /* TODO: This */
+    /*METHOD get_module(STRING *name) {
+
+    }*/
+
+    /* TODO: This */
+    /*METHOD get_exports(PMC *module) {
+
+    }*/
 }
 
 /*
