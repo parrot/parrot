@@ -2313,6 +2313,9 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header))
 
 #ifdef DETAIL_MEMORY_DEBUG
     gc_gms_print_stats_always(interp, header, gen);
+#else
+    UNUSED(interp);
+    UNUSED(header);
 #endif
 
 }
@@ -2353,7 +2356,11 @@ gc_gms_validate_str(SHIM_INTERP, ARGIN(STRING *str))
 {
     ASSERT_ARGS(gc_gms_validate_str)
 
+#ifdef PARROT_ASSERTS_ON
     PARROT_ASSERT(!PObj_on_free_list_TEST(str));
+#else
+    UNUSED(str);
+#endif
 }
 
 static void
@@ -2376,6 +2383,8 @@ gc_gms_validate_objects(PARROT_INTERP)
             PMC * const pmc = &((pmc_alloc_struct *)ptr)->pmc;
             PObj_live_CLEAR(pmc););
     }
+#else
+    UNUSED(interp);
 #endif
 }
 
