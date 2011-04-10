@@ -63,7 +63,6 @@ check_seen(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *v))
 pmclass ImageIOSize auto_attrs {
     ATTR PMC                        *seen; /* seen hash */
     ATTR PMC                        *todo; /* todo list */
-    ATTR struct PackFile            *pf;
     ATTR struct PackFile_ConstTable *pf_ct;
     ATTR INTVAL                      size;
 
@@ -90,7 +89,6 @@ Initializes the PMC.
 */
     VTABLE void init() {
         PARROT_IMAGEIOSIZE(SELF)->todo  = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        PARROT_IMAGEIOSIZE(SELF)->pf    = PackFile_new(INTERP, 0);
         PARROT_IMAGEIOSIZE(SELF)->pf_ct = NULL;
         PARROT_IMAGEIOSIZE(SELF)->size  = 0;
 
@@ -100,7 +98,7 @@ Initializes the PMC.
 
         PObj_flag_CLEAR(private1, SELF);
 
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_mark_SET(SELF);
     }
 
 /*
@@ -114,7 +112,6 @@ Initializes the PMC with a pre-existing C<PackFile_ConstTable>.
 */
     VTABLE void init_pmc(PMC *pf_ct) {
         PARROT_IMAGEIOSIZE(SELF)->todo  = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        PARROT_IMAGEIOSIZE(SELF)->pf    = PackFile_new(INTERP, 0);
         PARROT_IMAGEIOSIZE(SELF)->pf_ct =
             (PackFile_ConstTable *)VTABLE_get_pointer(INTERP, pf_ct);
         PARROT_IMAGEIOSIZE(SELF)->size  = 0;
@@ -125,22 +122,9 @@ Initializes the PMC with a pre-existing C<PackFile_ConstTable>.
 
         PObj_flag_SET(private1, SELF);
 
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_mark_SET(SELF);
     }
 
-
-/*
-
-=item C<void destroy()>
-
-Destroys the PMC.
-
-=cut
-
-*/
-    VTABLE void destroy() {
-        PackFile_destroy(INTERP, PARROT_IMAGEIOSIZE(SELF)->pf);
-    }
 
 /*
 
