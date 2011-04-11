@@ -53,7 +53,7 @@ sub runstep {
     #  Find cc flags
     my $ccflags = `$llvm_config --cflags`;
     chomp $ccflags;
-    # do not include optimizatin level
+    # do not include optimization level
     $ccflags =~ s/-O[^ ]*//;
     $conf->data->add( ' ', ccflags => $ccflags );
 
