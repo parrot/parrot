@@ -1143,7 +1143,7 @@ purpose is to eliminate duplicate code in C<fetch>, hence the code is
 void
 Parrot_stock_fetch(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(PMC *key))
 {
-    ASSERT_ARGS(Parrot_stock_fetch);
+    ASSERT_ARGS(Parrot_stock_fetch)
 
     if (PMC_IS_NULL(pmc)) {
         PMC * const classobj = Parrot_oo_get_class(interp, key);
@@ -1154,11 +1154,9 @@ Parrot_stock_fetch(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(PMC *key))
             const INTVAL type = Parrot_pmc_get_type(interp, key);
 
             if (type <= 0) {
-                opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp, expr NEXT(), EXCEPTION_NO_CLASS,
-                    "Class '%Ss' not found", VTABLE_get_repr(interp, key));
-
-                goto ADDRESS(dest);
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_NO_CLASS, "Class '%Ss' not found",
+                    VTABLE_get_repr(interp, key));
             }
 
             pmc = Parrot_pmc_new(interp, type);
@@ -1177,9 +1175,9 @@ purpose is to eliminate duplicate code in C<vivify>, hence the code is
 */
 
 void
-Parrot_stock_vivify(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(PMC *key))
+Parrot_stock_vivify(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *key))
 {
-    ASSERT_ARGS(Parrot_stock_vivify);
+    ASSERT_ARGS(Parrot_stock_vivify)
 
     PMC * const classobj = Parrot_oo_get_class(interp, key);
 
@@ -1189,11 +1187,9 @@ Parrot_stock_vivify(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(PMC *key))
         const INTVAL type = Parrot_pmc_get_type(interp, key);
 
         if (type <= 0) {
-            opcode_t *dest = Parrot_ex_throw_from_op_args(
-                interp, expr NEXT(), EXCEPTION_NO_CLASS,
-                "Class '%Ss' not found", VTABLE_get_repr(interp, key));
-
-            goto ADDRESS(dest);
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_NO_CLASS, "Class '%Ss' not found",
+                    VTABLE_get_repr(interp, key));
         }
 
         pmc = Parrot_pmc_new(interp, type);

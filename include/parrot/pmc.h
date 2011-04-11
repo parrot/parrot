@@ -195,10 +195,9 @@ void Parrot_stock_fetch(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-void Parrot_stock_vivify(PARROT_INTERP,
-    ARGIN_NULLOK(PMC *pmc),
-    ARGIN(PMC *key))
+void Parrot_stock_vivify(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *key))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_Parrot_pmc_box_c_string_array __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -276,6 +275,7 @@ void Parrot_stock_vivify(PARROT_INTERP,
     , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_Parrot_stock_vivify __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(key))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pmc.c */
