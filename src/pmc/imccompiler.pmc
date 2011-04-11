@@ -19,6 +19,19 @@ A compiler object to wrap IMCC
 #include "imcc/yyscanner.h"
 #include "pmc/pmc_sub.h"
 
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static PMC * get_packfile_eval_pmc(PARROT_INTERP,
+    PMC * pf_pmc,
+    INTVAL current_eval)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_get_packfile_eval_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /*
 
 =over 4
