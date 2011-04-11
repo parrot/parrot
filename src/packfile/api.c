@@ -775,6 +775,12 @@ mark_1_ct_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
     ASSERT_ARGS(mark_1_ct_seg)
     opcode_t i;
 
+    if (ct->string_hash)
+        Parrot_hash_mark(interp, ct->string_hash);
+
+    if (ct->pmc_hash)
+        Parrot_hash_mark(interp, ct->pmc_hash);
+
     for (i = 0; i < ct->str.const_count; i++)
         Parrot_gc_mark_STRING_alive(interp, ct->str.constants[i]);
 
