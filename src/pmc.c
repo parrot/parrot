@@ -1132,6 +1132,76 @@ Parrot_pmc_type_does(PARROT_INTERP, ARGIN(const STRING *role), INTVAL type)
 
 /*
 
+=item C<void Parrot_stock_fetch(PARROT_INTERP, PMC *pmc, PMC *key)>
+
+Called by the C<fetch> opcode. Should NOT be called directly. It's only 
+purpose is to eliminate duplicate code in C<fetch>, hence the code is 
+"stock". Think of "stock" as in stock merchandise.
+
+*/
+
+void
+Parrot_stock_fetch(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(PMC *key))
+{
+    ASSERT_ARGS(Parrot_stock_fetch);
+
+    if (PMC_IS_NULL(pmc)) {
+        PMC * const classobj = Parrot_oo_get_class(interp, key);
+
+        if (!PMC_IS_NULL(classobj))
+            pmc = VTABLE_instantiate(interp, classobj, PMCNULL);
+        else {
+            const INTVAL type = Parrot_pmc_get_type(interp, key);
+
+            if (type <= 0) {
+                opcode_t *dest = Parrot_ex_throw_from_op_args(
+                    interp, expr NEXT(), EXCEPTION_NO_CLASS,
+                    "Class '%Ss' not found", VTABLE_get_repr(interp, key));
+
+                goto ADDRESS(dest);
+            }
+
+            pmc = Parrot_pmc_new(interp, type);
+		}
+	}
+}
+
+/*
+
+=item C<void Parrot_stock_vivify(PARROT_INTERP, PMC *pmc, PMC *key)>
+
+Called by the C<vivify> opcode. Should NOT be called directly. It's only 
+purpose is to eliminate duplicate code in C<vivify>, hence the code is 
+"stock". Think of "stock" as in stock merchandise.
+
+*/
+
+void
+Parrot_stock_vivify(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(PMC *key))
+{
+    ASSERT_ARGS(Parrot_stock_vivify);
+
+    PMC * const classobj = Parrot_oo_get_class(interp, key);
+
+    if (!PMC_IS_NULL(classobj))
+        pmc = VTABLE_instantiate(interp, classobj, PMCNULL);
+    else {
+        const INTVAL type = Parrot_pmc_get_type(interp, key);
+
+        if (type <= 0) {
+            opcode_t *dest = Parrot_ex_throw_from_op_args(
+                interp, expr NEXT(), EXCEPTION_NO_CLASS,
+                "Class '%Ss' not found", VTABLE_get_repr(interp, key));
+
+            goto ADDRESS(dest);
+        }
+
+        pmc = Parrot_pmc_new(interp, type);
+    }
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO
