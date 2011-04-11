@@ -861,7 +861,7 @@ Mark the contents of a C<PackFile>.
 */
 
 void
-Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD(PackFile * pf))
+Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
 {
     ASSERT_ARGS(Parrot_pf_mark_packfile)
 
