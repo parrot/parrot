@@ -427,6 +427,9 @@ our multi method process(PAST::Val $val, %c) {
     if $type eq 'string' {
         $!builder.global_string_ptr($val.value, :name<.str>);
     }
+    elsif $type eq 'int' {
+        LLVM::Constant::integer($val.value);
+    }
     else {
     }
 }
