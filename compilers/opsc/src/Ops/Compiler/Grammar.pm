@@ -330,7 +330,7 @@ token arg {
 
 # Casting. TODO Figure out precedence.
 token prefix:sym<( )> {
-    '(' <type_declarator> ')' <before <EXPR> >
+    '(' <type_declarator> ')' <.ws> <before <EXPR> >
     <O('%casting')>
 }
 
