@@ -61,7 +61,7 @@ ok( 1, "Sub jitted" );
 
 #$sub.dump();
 
-%jit_context<_module>.verify();
+$jitter.module.verify();
 ok( 1, "Module verifyed" );
 
 done_testing();
