@@ -1,0 +1,277 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+
+=head1 NAME
+
+src/pmc/imccompiler.pmc - A compiler object to wrap IMCC
+
+=head1 DESCRIPTION
+
+A compiler object to wrap IMCC
+
+=head2 Functions
+
+=cut
+
+*/
+
+#include "imcc/embed.h"
+#include "imcc/yyscanner.h"
+#include "pmc/pmc_sub.h"
+
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static PMC * get_packfile_eval_pmc(PARROT_INTERP,
+    PMC * pf_pmc,
+    INTVAL current_eval)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_get_packfile_eval_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+/*
+
+=over 4
+
+=item C<static PMC * get_packfile_eval_pmc(PARROT_INTERP, PMC * pf_pmc, INTVAL
+current_eval)>
+
+get eval_pmc info from packfile
+
+=back
+
+=cut
+
+*/
+
+static PMC *
+get_packfile_eval_pmc(PARROT_INTERP, PMC * pf_pmc, INTVAL current_eval)
+{
+    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pf_pmc);
+    PMC * const eval_pmc = Parrot_pmc_new(interp, enum_class_Eval);
+    Parrot_Sub_attributes *sub_data;
+
+    PMC_get_sub(interp, eval_pmc, sub_data);
+    sub_data->seg = pf->cur_cs;
+    sub_data->start_offs = 0;
+    sub_data->end_offs = pf->cur_cs->base.size;
+    sub_data->name = Parrot_sprintf_c(interp, "EVAL_%d", current_eval);
+    PackFile_fixup_subs(interp, PBC_MAIN, eval_pmc);
+    return eval_pmc;
+}
+
+/* HEADERIZER HFILE: none */
+
+pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
+    ATTR void *imcc_info;
+    ATTR INTVAL is_pasm; /* 0 = PIR, 1 = PASM */
+    ATTR INTVAL current_eval;
+
+    VTABLE void init() {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            "IMCCompiler: Must initialize with an integer argument 0 (PIR) or 1 (PASM)");
+    }
+
+    VTABLE void init_pmc(PMC *init) {
+        const INTVAL type = VTABLE_get_integer(INTERP, init);
+        VTABLE_init_int(INTERP, SELF, type);
+    }
+
+    VTABLE void init_int(INTVAL is_pasm) {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        if (is_pasm != 0 && is_pasm != 1)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "IMCCompiler: Must have type 0 (PIR) or 1 (PASM)");
+        attrs->is_pasm = is_pasm;
+        attrs->imcc_info = (void*) imcc_new(INTERP);
+        attrs->current_eval = 0;
+    }
+
+    /* provided to emulate the current NCI compreg */
+    VTABLE opcode_t* invoke(void* next) {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        imc_info_t * const imcc = (imc_info_t*) attrs->imcc_info;
+        PMC * const ctx = CURRENT_CONTEXT(INTERP);
+        PMC * cont = INTERP->current_cont;
+        PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+        PackFile_ByteCode * const cur_code = interp->code;
+        STRING * code = STRINGNULL;
+        PMC * result = PMCNULL;
+        PMC * eval_pmc = PMCNULL;
+        UINTVAL regs_used[4] = {3, 3, 3, 3};
+        PMC * const newcontext = Parrot_push_context(interp, regs_used);
+
+        Parrot_block_GC_mark(interp);
+        Parrot_pcc_set_sub(interp, newcontext, 0);
+
+        Parrot_pcc_fill_params_from_c_args(INTERP, call_object, "S", &code);
+        imcc_reset(imcc);
+        result = imcc_compile_string(imcc, code, attrs->is_pasm);
+        if (PMC_IS_NULL(result)) {
+            STRING * const msg = imcc_last_error_message(imcc);
+            INTVAL code = imcc_last_error_code(imcc);
+            Parrot_unblock_GC_mark(interp);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
+        }
+        eval_pmc = get_packfile_eval_pmc(interp, result, attrs->current_eval++);
+
+        Parrot_pop_context(interp);
+        Parrot_unblock_GC_mark(interp);
+
+        /* Handle the case where we we've been tailcalled into. See NCI.invoke
+           for more details */
+        if (cont && cont != NEED_CONTINUATION
+        && (PObj_get_FLAGS(cont) & SUB_FLAG_TAILCALL)) {
+            cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
+            next = VTABLE_invoke(INTERP, cont, next);
+        }
+
+        /* TODO: What do we do with this return value? Can we ignore it? */
+        Parrot_pcc_build_call_from_c_args(INTERP, call_object, "P", eval_pmc);
+        interp->code = cur_code;
+        return (opcode_t*)next;
+    }
+
+    VTABLE void *get_pointer() {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        return attrs->imcc_info;
+    }
+
+    VTABLE INTVAL get_integer() {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        return attrs->is_pasm;
+    }
+
+    VTABLE STRING *get_string() {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        if (attrs->is_pasm)
+            return CONST_STRING(INTERP, "PASM");
+        else
+            return CONST_STRING(INTERP, "PIR");
+    }
+
+    VTABLE void destroy() {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        imcc_destroy((imc_info_t*)(attrs->imcc_info));
+        attrs->imcc_info = NULL;
+    }
+
+    METHOD compile(STRING *source,
+            STRING *target :named("target") :optional, INTVAL has_target :opt_flag,
+            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag)
+    {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        PMC * pf = PMCNULL;
+        PMC * eval_pmc = PMCNULL;
+        imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
+        UINTVAL regs_used[4] = {3, 3, 3, 3};
+        PMC * const newcontext = Parrot_push_context(interp, regs_used);
+        PackFile_ByteCode * const old_bc = interp->code;
+
+        if (has_target)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "IMCCompiler: compiler does not support the target option");
+
+        Parrot_block_GC_mark(interp);
+        Parrot_pcc_set_HLL(interp, newcontext, 0);
+        Parrot_pcc_set_sub(interp, newcontext, 0);
+
+        /* TODO: Handle outer_ctx */
+        pf = imcc_compile_string(imcc, source, attrs->is_pasm);
+        if (PMC_IS_NULL(pf)) {
+            STRING * const msg = imcc_last_error_message(imcc);
+            INTVAL code = imcc_last_error_code(imcc);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
+        }
+        eval_pmc = get_packfile_eval_pmc(interp, pf, attrs->current_eval++);
+
+        Parrot_pop_context(interp);
+        Parrot_unblock_GC_mark(interp);
+        interp->code = old_bc;
+
+        RETURN(PMC *eval_pmc);
+    }
+
+    METHOD compile_file(STRING *filename,
+            STRING *target :named("target") :optional, INTVAL has_target :opt_flag,
+            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag)
+    {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        PMC * pf = PMCNULL;
+        imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
+        UINTVAL regs_used[4] = {3, 3, 3, 3};
+        PMC * const newcontext = Parrot_push_context(interp, regs_used);
+        PackFile_ByteCode * const old_bc = interp->code;
+
+        if (has_target)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "IMCCompiler: compiler does not support the target option");
+
+        Parrot_block_GC_mark(interp);
+        Parrot_pcc_set_HLL(interp, newcontext, 0);
+        Parrot_pcc_set_sub(interp, newcontext, 0);
+
+        /* TODO: Handle outer_ctx */
+        pf = imcc_compile_file(imcc, filename, attrs->is_pasm);
+        if (PMC_IS_NULL(pf)) {
+            STRING * const msg = imcc_last_error_message(imcc);
+            INTVAL code = imcc_last_error_code(imcc);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
+        }
+
+        Parrot_pop_context(interp);
+        Parrot_unblock_GC_mark(interp);
+        interp->code = old_bc;
+
+        RETURN(PMC *pf);
+    }
+
+    /*METHOD eval(STRING *source,
+            STRING *target :named("target") :optional, INTVAL has_target :opt_flag,
+            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag)
+    {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        PMC * pf = PMCNULL;
+        imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
+        if (has_target)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "IMCCompiler: compiler does not support the target option");
+        pf = imcc_compile_string(imcc, source, attrs->is_pasm);
+    }*/
+
+    METHOD preprocess(STRING *code) {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
+        imcc_preprocess(imcc, code);
+    }
+
+    /*METHOD parse_name(STRING *name) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+                "IMCCompiler: parse_name is not supported");
+    }*/
+
+    /* TODO: This */
+    /*METHOD load_module(STRING *name) {
+
+    }*/
+
+    /* TODO: This */
+    /*METHOD get_module(STRING *name) {
+
+    }*/
+
+    /* TODO: This */
+    /*METHOD get_exports(PMC *module) {
+
+    }*/
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

@@ -45,6 +45,10 @@ typedef unsigned @int8_t@       Parrot_UInt8;
 typedef @float4_t@              Parrot_Float4;
 typedef @float8_t@              Parrot_Float8;
 
+/* Required for proper compilation of StructView PMC */
+#define HAS_LONGLONG            @HAS_LONGLONG@
+#define HAS_INT64               @HAS_INT64@
+
 #ifndef PARROT_INTVAL_MIN
 #  define PARROT_INTVAL_MIN              @intvalmin@
 #endif

@@ -31,21 +31,23 @@ throughout the rest of Parrot.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void free_buffer(PARROT_INTERP,
-    ARGIN(Memory_Pools *mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     SHIM(Fixed_Size_Pool *pool),
     ARGMOD(Buffer *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*b);
 
 static void free_pmc_in_pool(PARROT_INTERP,
-    ARGIN(Memory_Pools *mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     SHIM(Fixed_Size_Pool *pool),
     ARGMOD(PObj *p))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*p);
 
 PARROT_WARN_UNUSED_RESULT
@@ -60,7 +62,7 @@ static Fixed_Size_Pool * new_fixed_size_obj_pool(
     size_t object_size,
     size_t objects_per_alloc);
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static Fixed_Size_Pool * new_pmc_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -193,7 +195,7 @@ Parrot_gc_trace_root(PARROT_INTERP,
     Parrot_gc_mark_PMC_alive(interp, interp->scheduler);
 
     /* s. packfile.c */
-    mark_const_subs(interp);
+    Parrot_pf_mark_packfile(interp, interp->initial_pf);
 
     /* mark caches and freelists */
     mark_object_cache(interp);
@@ -493,7 +495,7 @@ Creates and initializes a new pool for PMCs and returns it.
 
 */
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static Fixed_Size_Pool *
 new_pmc_pool(PARROT_INTERP)
@@ -522,10 +524,8 @@ method if one is available.
 */
 
 static void
-free_pmc_in_pool(PARROT_INTERP,
-        ARGIN(Memory_Pools *mem_pools),
-        SHIM(Fixed_Size_Pool *pool),
-        ARGMOD(PObj *p))
+free_pmc_in_pool(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools),
+        SHIM(Fixed_Size_Pool *pool), ARGMOD(PObj *p))
 {
     ASSERT_ARGS(free_pmc_in_pool)
     PMC    * const pmc        = (PMC *)p;
@@ -645,15 +645,13 @@ reuse later.
 */
 
 static void
-free_buffer(PARROT_INTERP,
-        ARGIN(Memory_Pools *mem_pools),
-        SHIM(Fixed_Size_Pool *pool),
-        ARGMOD(Buffer *b))
+free_buffer(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools),
+        SHIM(Fixed_Size_Pool *pool), ARGMOD(Buffer *b))
 {
     ASSERT_ARGS(free_buffer)
 
     /* If there is no allocated buffer - bail out */
-    if (!Buffer_buflen(b))
+    if (Buffer_buflen(b) == 0)
         return;
 
     Parrot_gc_str_free_buffer_storage(interp, &mem_pools->string_gc, b);

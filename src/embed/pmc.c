@@ -458,6 +458,27 @@ Parrot_api_pmc_box_integer(Parrot_PMC interp_pmc, Parrot_Int value,
 
 /*
 
+=item C<Parrot_Int Parrot_api_pmc_push(Parrot_PMC interp_pmc, Parrot_PMC pmc,
+Parrot_PMC item)>
+
+Push a PMC C<item> onto aggregate PMC C<pmc>.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_push(Parrot_PMC interp_pmc, Parrot_PMC pmc, Parrot_PMC item)
+{
+    ASSERT_ARGS(Parrot_api_pmc_push)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    VTABLE_push_pmc(interp, pmc, item);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+/*
+
 =item C<Parrot_Int Parrot_api_add_exception_handler(Parrot_PMC interp_pmc,
 Parrot_PMC handler)>
 

@@ -777,9 +777,9 @@ Parrot_io_seek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     if (buffer_flags & PIO_BF_READBUF
     &&  whence != SEEK_END) {
         /* Try to seek inside the read buffer */
-        unsigned char *buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
-        unsigned char *buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-        unsigned char *buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
+        unsigned char * const buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
+        unsigned char *       buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
+        unsigned char * const buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
 
         if (offset >= file_pos - (buffer_next - buffer_start)
         &&  offset <  file_pos + (buffer_end  - buffer_next)) {

@@ -28,8 +28,7 @@ spec.
 
 #include "pmc/pmc_packfileopmap.h"
 
-pmclass PackfileBytecodeSegment auto_attrs extends PackfileSegment {
-    ATTR PMC    *ops;       /* RIA of executable opcodes */
+pmclass PackfileBytecodeSegment auto_attrs extends PackfileRawSegment {
     ATTR PMC    *op_map;    /* OpMap PMC */
     ATTR INTVAL  main_sub;  /* Index of :main sub */
 
@@ -51,7 +50,6 @@ Initialize PackfileBytecodeSegment.
         PObj_custom_mark_SET(SELF);
 
         attrs->op_map = Parrot_pmc_new(INTERP, enum_class_PackfileOpMap);
-        attrs->ops    = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
 
         SUPER();
     }
@@ -70,9 +68,6 @@ Marks the object as live.
         PMC *tmp;
 
         GET_ATTR_op_map(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_ops(INTERP, SELF, tmp);
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
 
         SUPER();
@@ -104,7 +99,7 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
         GET_ATTR_main_sub(INTERP, SELF, bc->main_sub);
 
         /* Copy ops into ByteCode */
-        GET_ATTR_ops(INTERP, SELF, ops);
+        GET_ATTR_opcodes(INTERP, SELF, ops);
         bc->base.size = VTABLE_get_integer(INTERP, ops);
         bc->base.data = mem_gc_allocate_n_typed(INTERP, bc->base.size, opcode_t);
 
@@ -130,6 +125,37 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
         /* Don't free "mapping". Caller will do it */
 
         return bc;
+    }
+
+/*
+=item C<void set_pointer()>
+
+Initialize PackfileBytecodeSegment from PackFile_Bytecode*
+
+=cut
+*/
+    VTABLE void set_pointer(void *pointer) {
+        const PackFile_ByteCode * const pfseg =
+                (const PackFile_ByteCode *)pointer;
+        opcode_t i, j;
+        PMC     *op_map;
+
+        GET_ATTR_op_map(INTERP, SELF, op_map);
+
+        /* Recreate OpMapping */
+        for (i = 0; i < pfseg->op_mapping.n_libs; i++) {
+            PackFile_ByteCode_OpMappingEntry entry = pfseg->op_mapping.libs[i];
+            for (j = 0; j < entry.n_ops; j++) {
+                opcode_t lib_op = entry.lib_ops[j];
+                VTABLE_get_integer_keyed_str(INTERP, op_map,
+                    Parrot_str_from_platform_cstring(INTERP,
+                                                     entry.lib->op_info_table[lib_op].full_name));
+            }
+        }
+
+        /* TODO. Figure out how to generate OpLibs and where to store them */
+
+        SUPER(pointer);
     }
 
 
@@ -161,87 +187,22 @@ an op and the remaining PMCs being Integers.
                  VTABLE_get_string_keyed_int(INTERP, p, 0));
 
         /* add the things to attrs->ops */
-        VTABLE_push_integer(INTERP, attrs->ops, op_num);
+        VTABLE_push_integer(INTERP, attrs->opcodes, op_num);
         arr_size = VTABLE_elements(INTERP, p);
 
         for (i = 1; i < arr_size; i++){
-            VTABLE_push_integer(INTERP, attrs->ops,
+            VTABLE_push_integer(INTERP, attrs->opcodes,
                     VTABLE_get_integer_keyed_int(INTERP, p, i));
         }
     }
 
 /*
+=item C<PMC* main_sub()>
 
-=item C<INTVAL get_integer_keyed_int(INTVAL key)>
-
-=item C<INTVAL get_pmc_keyed_int(INTVAL key)>
-
-=item C<INTVAL get_pmc_keyed(PMC *key)>
-
-Fetch an integer's worth of data from the segment.
+Return :main Sub for this segment.
 
 =cut
-
 */
-    VTABLE INTVAL get_integer_keyed_int(INTVAL key)  {
-        return VTABLE_get_integer_keyed_int(INTERP,
-                PARROT_PACKFILEBYTECODESEGMENT(SELF)->ops, key);
-    }
-
-    VTABLE PMC *get_pmc_keyed_int(INTVAL index)  {
-        return Parrot_pmc_box_integer(INTERP, STATICSELF.get_integer_keyed_int(index));
-    }
-
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
-        return STATICSELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
-    }
-
-
-/*
-
-=item C<INTVAL elements()>
-
-=item C<INTVAL get_integer()>
-
-=item C<INTVAL get_number()>
-
-Get the number of elements in the array.
-
-=cut
-
-*/
-    VTABLE INTVAL elements() {
-        return VTABLE_elements(INTERP,
-                PARROT_PACKFILEBYTECODESEGMENT(SELF)->ops);
-    }
-
-    VTABLE INTVAL get_integer() {
-        return STATICSELF.elements();
-    }
-
-    VTABLE FLOATVAL get_number() {
-        return STATICSELF.elements();
-    }
-
-/*
-
-=item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
-
-Set an integer's worth of data in the segment.
-
-=cut
-
-*/
-    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value)  {
-        VTABLE_set_integer_keyed_int(INTERP,
-            PARROT_PACKFILEBYTECODESEGMENT(SELF)->ops, key, value);
-    }
-
-    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
-        SELF.set_integer_keyed_int(
-            VTABLE_get_integer(INTERP, key),
-            VTABLE_get_integer(INTERP, value));
-    }
 
 
     METHOD main_sub(INTVAL main_sub :optional, INTVAL got_main :opt_flag) {

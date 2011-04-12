@@ -160,6 +160,10 @@ Get the number of elements in the array.
 
 =item C<INTVAL get_integer_keyed_int(INTVAL key)>
 
+=item C<INTVAL get_pmc_keyed_int(INTVAL key)>
+
+=item C<INTVAL get_pmc_keyed(PMC *key)>
+
 Fetch an integer's worth of data from the segment.
 
 =cut
@@ -168,6 +172,14 @@ Fetch an integer's worth of data from the segment.
     VTABLE INTVAL get_integer_keyed_int(INTVAL key)  {
         return VTABLE_get_integer_keyed_int(INTERP,
                 PARROT_PACKFILERAWSEGMENT(SELF)->opcodes, key);
+    }
+
+    VTABLE PMC *get_pmc_keyed_int(INTVAL index)  {
+        return Parrot_pmc_box_integer(INTERP, STATICSELF.get_integer_keyed_int(index));
+    }
+
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
+        return STATICSELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
     }
 
 

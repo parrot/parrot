@@ -40,11 +40,13 @@ feature.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
-        __attribute__nonnull__(1);
+static PMC* new_hll_entry(PARROT_INTERP, ARGIN(STRING *entry_name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_new_hll_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(entry_name))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -69,7 +71,7 @@ Used by Parrot_hll_register_HLL.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC*
-new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
+new_hll_entry(PARROT_INTERP, ARGIN(STRING *entry_name))
 {
     ASSERT_ARGS(new_hll_entry)
     PMC * const hll_info = interp->HLL_info;

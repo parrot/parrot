@@ -43,6 +43,10 @@ pmclass Opcode auto_attrs {
         return attrs->op_number;
     }
 
+    VTABLE FLOATVAL get_number() {
+        return STATICSELF.get_integer();
+    }
+
     VTABLE void set_integer_native(INTVAL value) {
         Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
         if (attrs->info)

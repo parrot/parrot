@@ -48,8 +48,12 @@ Compile bytecode to executable.
 const void * get_program_code(void);
 int Parrot_set_config_hash(Parrot_PMC interp_pmc);
 static void show_last_error_and_exit(Parrot_PMC interp);
-static void
-    print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline);
+static void print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline);
+static void setup_pir_compregs(Parrot_PMC interp);
+static PMC * get_class_pmc(Parrot_PMC interp, const char *name);
+static void get_imcc_compiler_pmc(Parrot_PMC interp, Parrot_PMC class_pmc, Parrot_Int is_pasm);
+
+
     #define TRACE 0
 HEADER
 
@@ -94,6 +98,8 @@ HEADER
                 fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
                 show_last_error_and_exit(interp);
             }
+
+            setup_pir_compregs(interp);
 
             if (!Parrot_api_pmc_wrap_string_array(interp, argc, argv, &argsarray)) {
                 fprintf(stderr, "PARROT VM: Could not build args array");
@@ -141,6 +147,46 @@ HEADER
                 fprintf(vector, "%s%s", msg_raw, newline ? "\n" : "");
                 Parrot_api_string_free_exported_ascii(interp, msg_raw);
             }
+        }
+
+        static void
+        setup_pir_compregs(Parrot_PMC interp)
+        {
+            Parrot_PMC class_pmc = get_class_pmc(interp, "IMCCompiler");
+            get_imcc_compiler_pmc(interp, class_pmc, 0);
+            get_imcc_compiler_pmc(interp, class_pmc, 1);
+        }
+
+        PARROT_CANNOT_RETURN_NULL
+        static PMC *
+        get_class_pmc(Parrot_PMC interp, ARGIN(const char *name))
+        {
+            Parrot_String name_s = NULL;
+            Parrot_PMC name_pmc = NULL;
+            Parrot_PMC class_pmc = NULL;
+            if (!(Parrot_api_string_import_ascii(interp, name, &name_s) &&
+                  Parrot_api_pmc_box_string(interp, name_s, &name_pmc) &&
+                  Parrot_api_pmc_get_class(interp, name_pmc, &class_pmc)))
+                show_last_error_and_exit(interp);
+            return class_pmc;
+        }
+
+        PARROT_CANNOT_RETURN_NULL
+        static void
+        get_imcc_compiler_pmc(Parrot_PMC interp, Parrot_PMC class_pmc, Parrot_Int is_pasm)
+        {
+            Parrot_PMC is_pasm_pmc = NULL;
+            Parrot_PMC compiler_pmc = NULL;
+            const char *name = is_pasm ? "PASM" : "PIR";
+            Parrot_String name_s = NULL;
+
+            if (!Parrot_api_pmc_box_integer(interp, is_pasm, &is_pasm_pmc))
+                show_last_error_and_exit(interp);
+            if (!Parrot_api_pmc_new_from_class(interp, class_pmc, is_pasm_pmc, &compiler_pmc))
+                show_last_error_and_exit(interp);
+            if (!(Parrot_api_string_import_ascii(interp, name, &name_s) &&
+                  Parrot_api_set_compiler(interp, name_s, compiler_pmc)))
+                show_last_error_and_exit(interp);
         }
 
 MAIN

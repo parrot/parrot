@@ -1,8 +1,7 @@
 /* io.h
- *  Copyright (C) 2001-2010, Parrot Foundation.
+ *  Copyright (C) 2001-2011, Parrot Foundation.
  *  Overview:
  *      Parrot IO subsystem
- *  Data Structure and Algorithms:
  *  History:
  *      Originally written by Melvin Smith
  *      Refactored by Juergen Boemmels
@@ -132,7 +131,7 @@ Parrot_io_eprintf(
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PMC * Parrot_io_fdopen(PARROT_INTERP,
     ARGIN_NULLOK(PMC *pmc),
     PIOHANDLE fd,
@@ -169,24 +168,21 @@ Parrot_io_fprintf(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PIOHANDLE Parrot_io_getfd(PARROT_INTERP, ARGMOD(PMC *pmc))
+PIOHANDLE Parrot_io_getfd(PARROT_INTERP, ARGIN(const PMC *pmc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_io_is_closed(PARROT_INTERP, ARGMOD(PMC *pmc))
+INTVAL Parrot_io_is_closed(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_io_is_tty_handle(PARROT_INTERP, ARGMOD(PMC *pmc))
+INTVAL Parrot_io_is_tty_handle(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -288,7 +284,7 @@ PMC * Parrot_io_STDERR(PARROT_INTERP)
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PMC * Parrot_io_stdhandle(PARROT_INTERP,
     INTVAL fileno,
     ARGIN_NULLOK(PMC *newhandle))
@@ -558,7 +554,7 @@ PIOOFF_T Parrot_io_get_file_position(SHIM_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-INTVAL Parrot_io_get_flags(SHIM_INTERP, ARGIN(PMC *filehandle))
+INTVAL Parrot_io_get_flags(SHIM_INTERP, ARGIN(const PMC *filehandle))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT

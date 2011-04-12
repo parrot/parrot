@@ -595,7 +595,7 @@ close $TEMP;
 # compile to pbc
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pir);
 
-c_output_is( <<"CODE", <<'OUTPUT', 'eval code through a parrot sub - #39669' );
+c_output_is( <<"CODE", <<'OUTPUT', 'eval code through a parrot sub - #39669', todo => "Must explicitly set a PIR compreg");
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
@@ -623,7 +623,7 @@ CODE
 Hello from foo!
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'compile string in a fresh interp - #39986' );
+c_output_is( <<'CODE', <<'OUTPUT', 'compile string in a fresh interp - #39986', todo => "Must explicitly set a PIR compreg" );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>

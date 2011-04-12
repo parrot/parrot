@@ -236,8 +236,8 @@ void Parrot_pcc_parse_signature_string(PARROT_INTERP,
 
 void Parrot_pcc_split_signature_string(
     ARGIN(const char *signature),
-    ARGMOD(const char **arg_sig),
-    ARGMOD(const char **return_sig))
+    ARGOUT(const char **arg_sig),
+    ARGOUT(const char **return_sig))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

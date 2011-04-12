@@ -1,5 +1,5 @@
 /* compiler.h
- *  Copyright (C) 2007-2010, Parrot Foundation.
+ *  Copyright (C) 2007-2011, Parrot Foundation.
  *  Overview:
  *     defines compiler capabilities
  */
@@ -111,7 +111,11 @@
 /* UNUSED() is the old way we handled shim arguments Should still be
    used in cases where the argument should, at some point be used.
  */
-#define UNUSED(a) /*@-noeffect*/if (0) (void)(a)/*@=noeffect*/;
+#ifdef __clang__
+#  define UNUSED(a) (void)(a);
+#else
+#  define UNUSED(a) /*@-noeffect*/if (0) (void)(a)/*@=noeffect*/;
+#endif
 
 #ifdef PARROT_HAS_HEADER_SAL
 /*

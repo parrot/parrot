@@ -70,6 +70,7 @@ include/pmc/pmc_imageiofreeze.h                  [devel]include
 include/pmc/pmc_imageiosize.h                    [devel]include
 include/pmc/pmc_imageiostrings.h                 [devel]include
 include/pmc/pmc_imageiothaw.h                    [devel]include
+include/pmc/pmc_imccompiler.h                    [devel]include
 include/pmc/pmc_integer.h                        [devel]include
 include/pmc/pmc_iterator.h                       [devel]include
 include/pmc/pmc_key.h                            [devel]include
@@ -157,7 +158,6 @@ lib/Parrot/PMC.pm                                [devel]lib
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm               [devel]lib
 libparrot.dll                                    [main]bin
 libparrot.lib                                    [main]bin
-parrot.pc                                        [main]pkgconfig
 runtime/parrot/dynext/bit_ops.bundle             [library]
 runtime/parrot/dynext/bit_ops.dll                [library]
 runtime/parrot/dynext/bit_ops.dylib              [library]
@@ -377,6 +377,7 @@ src/pmc/imageiofreeze.dump                       [devel]src
 src/pmc/imageiosize.dump                         [devel]src
 src/pmc/imageiostrings.dump                      [devel]src
 src/pmc/imageiothaw.dump                         [devel]src
+src/pmc/imccompiler.dump                         [devel]src
 src/pmc/integer.dump                             [devel]src
 src/pmc/iterator.dump                            [devel]src
 src/pmc/key.dump                                 [devel]src
@@ -440,4 +441,5 @@ src/pmc/unmanagedstruct.dump                     [devel]src
 src/string_private_cstring.h                     []
 tools/build/dynpmc.pl                            []
 tools/dev/mk_language_shell.pl                   [devel]
+tools/dev/ncidef2pir.pl                          [devel]
 vtable.dump                                      [devel]src

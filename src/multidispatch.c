@@ -142,7 +142,7 @@ static int Parrot_mmd_maybe_candidate(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static PMC * Parrot_mmd_sort_candidates(PARROT_INTERP,
     ARGIN(PMC *arg_tuple),
     ARGIN(PMC *cl))
@@ -760,7 +760,7 @@ candidate.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static PMC *
 Parrot_mmd_sort_candidates(PARROT_INTERP, ARGIN(PMC *arg_tuple), ARGIN(PMC *cl))
 {
@@ -1284,10 +1284,10 @@ Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     ARGIN(const char *name), ARGIN(PMC *types))
 {
     ASSERT_ARGS(Parrot_mmd_cache_lookup_by_types)
-    const STRING * const key = mmd_cache_key_from_types(interp, name, types);
+    STRING * const key = mmd_cache_key_from_types(interp, name, types);
 
     if (key)
-        return VTABLE_get_pmc_keyed_str(interp, cache, (STRING *) key);
+        return VTABLE_get_pmc_keyed_str(interp, cache, key);
 
     return PMCNULL;
 }

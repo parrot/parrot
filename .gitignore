@@ -64,7 +64,6 @@
 /parrot-prove.*
 /parrot.ilk
 /parrot.iss
-/parrot.pc
 /parrot.pdb
 /parrot_config
 /parrot_config.c
@@ -387,10 +386,6 @@
 /t/compilers/data_json/*.pir
 /t/compilers/data_json/*_pbcexe
 /t/compilers/imcc/*.pbc
-/t/compilers/imcc/imcpasm/*.pasm
-/t/compilers/imcc/imcpasm/*.pbc
-/t/compilers/imcc/imcpasm/*.pir
-/t/compilers/imcc/imcpasm/*_pbcexe
 /t/compilers/imcc/reg/*.pasm
 /t/compilers/imcc/reg/*.pbc
 /t/compilers/imcc/reg/*.pir

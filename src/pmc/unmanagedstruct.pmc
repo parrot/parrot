@@ -651,7 +651,7 @@ set_string(PARROT_INTERP, ARGOUT(char *p), int type, ARGIN(STRING *value))
     if (type == enum_type_cstr) {
         /* assuming 0-terminated C-string here;
          * we can't use Parrot_str_to_cstring easily */
-        char *cstr  = (char *)Buffer_bufstart(value);
+        char * const cstr  = (char *)Buffer_bufstart(value);
         *(char **)p = cstr;
     }
     else
@@ -997,7 +997,7 @@ Returns the floating-point value at index C<ix>.
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
         int   type;
-        char * const p = char_offset_int(INTERP, SELF, key, &type);
+        const char * const p = char_offset_int(INTERP, SELF, key, &type);
         return ret_float(INTERP, p, type);
     }
 
@@ -1013,7 +1013,7 @@ Returns the floating-point value associated with C<*key>.
 
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
         int   type;
-        char * const p = char_offset_key(INTERP, SELF, key, &type);
+        const char * const p = char_offset_key(INTERP, SELF, key, &type);
         return ret_float(INTERP, p, type);
     }
 

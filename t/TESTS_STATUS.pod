@@ -77,8 +77,7 @@ This rearranges B<PASM> code to make it run faster.
 
 =item Status
 
-B<Good>. Most optimizations are well-tested.
-Tests under B<t/compilers/imcc/imcpasm/>.
+Untested. IMCC no longer has the ability to output PASM code, only PBC.
 
 =back
 

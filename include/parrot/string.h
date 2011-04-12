@@ -19,7 +19,6 @@
 #include "parrot/compiler.h"
 #include "parrot/pobj.h"
 #include "parrot/cclass.h"
-#include "parrot/parrot.h"
 
 #define STREQ(x, y)  (strcmp((x), (y))==0)
 #define STRNEQ(x, y) (strcmp((x), (y))!=0)

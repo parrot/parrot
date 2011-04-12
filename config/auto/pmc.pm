@@ -340,6 +340,8 @@ sub get_includes {
           $include = "src/pmc/" . $include;
         } elsif ($include =~ m/^pmc\/pmc_/) { # local pmc header
           $include = "include/" . $include;
+        } elsif ($include =~ m/^imcc/) { # IMCC header.
+            $include = "include/" . $include;
         } elsif ($include =~ m{^\.\./}) { # relative to include/ dir...
           $include =~ s{^\.\./}{};
         }

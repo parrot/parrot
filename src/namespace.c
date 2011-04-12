@@ -456,7 +456,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_ns_make_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
+Parrot_ns_make_namespace_autobase(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(Parrot_ns_make_namespace_autobase)
     PMC *base_ns;
@@ -537,7 +537,7 @@ Set the global named C<globalname> in the namespace C<ns> to the value C<val>.
 
 PARROT_EXPORT
 void
-Parrot_ns_set_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
+Parrot_ns_set_global(PARROT_INTERP, ARGIN(PMC *ns),
         ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
 {
     ASSERT_ARGS(Parrot_ns_set_global)

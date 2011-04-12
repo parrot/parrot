@@ -860,7 +860,6 @@ Files included in the =parrot-devel= package:
  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Test/Util.pm
  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Test/Util/Runloop.pm
  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Vtable.pm
- /usr/lib/pkgconfig/parrot.pc
 
 Files included in the =parrot-docs= package:
 

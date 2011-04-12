@@ -71,7 +71,8 @@ typedef int (*pool_iter_fn)(PARROT_INTERP, struct Memory_Pools *, struct Fixed_S
 typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Memory_Pools *, struct Fixed_Size_Pool *, void *);
 typedef void * (*get_free_object_fn_type)(PARROT_INTERP, struct Memory_Pools *, struct Fixed_Size_Pool *);
 typedef void (*alloc_objects_fn_type)(PARROT_INTERP, struct Memory_Pools *, struct Fixed_Size_Pool *);
-typedef void (*gc_object_fn_type)(PARROT_INTERP, struct Memory_Pools *, struct Fixed_Size_Pool *, PObj *);
+typedef void (*gc_object_fn_type)(PARROT_INTERP, ARGMOD(struct Memory_Pools *),
+                ARGIN(struct Fixed_Size_Pool *), ARGMOD(PObj *));
 
 
 /* &gen_from_enum(interpinfo.pasm) prefix(INTERPINFO_) */
@@ -94,6 +95,7 @@ typedef enum {
     CURRENT_RUNCORE,
 
     /* interpinfo_p constants */
+    CURRENT_CTX,
     CURRENT_SUB,
     CURRENT_CONT,
     CURRENT_OBJECT,
