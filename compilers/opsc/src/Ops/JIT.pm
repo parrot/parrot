@@ -101,7 +101,8 @@ method _init_llvm() {
     # ./ops2c -d t/jit/jitted.ops
     # llvm-gcc-4.2 -emit-llvm -O0 -Iinclude -I/usr/include/i486-linux-gnu -o t/jit/jitted_ops.bc -c t/jit/jitted_ops.c
     $!module := LLVM::Module.create('JIT');
-    $!module.read("t/jit/jitted_ops.bc") // die("Couldn't read t/jit/jitted_ops.bc");
+    $!module.read("t/jit/jitted_ops.bc")
+             // die("Couldn't read t/jit/jitted_ops.bc");
 
     $!builder := LLVM::Builder.create();
 
@@ -343,7 +344,9 @@ method _jit_ops(%jit_context) {
         # Position Builder to previousely created BB.
         $!builder.set_position(%jit_context<basic_blocks>{$i}<bb>);
 
-        my $parsed_op := %!ops{ $opname };
+        my $parsed_op := %!ops{ $opname }
+                         // die("Op $opname isn't jitted");
+
         # Meh... Multidispatch passed it to process(PAST::Block) instead of
         # Ops::Op. process_op is workaround for it.
         my $jitted_op := self.process_op($parsed_op, %jit_context);
@@ -434,7 +437,7 @@ our multi method process(PAST::Var $var, %c) {
         # 2. Typedefed native type. E.g. "opcode_t".
         # 3. Struct (pointer)
         my $vivibase := subst($var.vivibase, / \s* $/, '');
-        $!debug && say("# Variable '$vivibase'");
+        $!debug && say("# Variable '{ $var.name }' type '$vivibase'");
 
         # Assume that all types have constructor in LLVM::Type.
         my $ctor := pir::get_hll_global__pps(<LLVM Type>, $vivibase);
@@ -447,6 +450,8 @@ our multi method process(PAST::Var $var, %c) {
         %c<variables>{ $var.name } := $res;
 
         if $var.viviself {
+            $!debug && say("# Initialize it");
+            $!debug && _dumper($var.viviself);
             $!builder.store(self.process($var.viviself, %c), $res);
         }
     }
@@ -602,8 +607,6 @@ our method process:pasttype<if> (PAST::Op $chunk, %c) {
         ),
     );
 
-    $!debug && $!jitted_sub.dump();
-
     my $next_block := $!builder.get_insert_block.next();
 
     # Generate then/else/continue blocks.
@@ -664,7 +667,7 @@ our method process:pirop<=> (PAST::Op $chunk, %c) {
     %c<lhs>--;
 
     $!builder.store(
-        self.process($chunk[1], %c),
+        self.process($chunk[1], %c) // die("Can't do it"),
         $lhs
     );
 }
