@@ -307,10 +307,10 @@ $err = <<"ERR";
 # Expected error but exited cleanly
 # Received:
 # foo
-#
+# 
 # Expected:
 # /bar/
-#
+# 
 ERR
 chomp $err;
 test_err($err);
