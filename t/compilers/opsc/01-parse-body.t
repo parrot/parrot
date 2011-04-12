@@ -21,6 +21,12 @@ inline op noop() {
 
 parse_ok($c, q|
 inline op noop() {
+    foo ();
+}
+|, "Simple call with space parsed");
+
+parse_ok($c, q|
+inline op noop() {
     foo(42);
 }
 |, "Complex call op parsed");
@@ -277,7 +283,7 @@ inline op noop(out PMC, in INT) {
 
 parse_ok($c, q«
 inline op noop(out PMC, in INT) {
-    $1 = foo() ? bar() : baz ();
+    $1 = foo() ? bar() : quux ();
 }», "Ternary op");
 
 
