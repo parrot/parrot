@@ -309,10 +309,15 @@ token postcircumfix:sym<[ ]> {
     <O('%methodop')>
 }
 
-#token postfix:sym«->» { <sym> <identifier> <O('%methodop :pirop<arrow>')> }
-#token postfix:sym«.»  { <sym> <identifier> <O('%methodop :pirop<dotty>')> }
-token infix:sym«->» { <sym> <O('%dotty :pirop<arrow>')> }
-token infix:sym«.»  { <sym> <O('%dotty :pirop<dotty>')> }
+token postcircumfix:sym<( )> {
+    '(' <.ws> <arglist> ')'
+    <O('%methodop')>
+}
+
+token postfix:sym«->» { <sym> <identifier> <O('%methodop :pirop<arrow>')> }
+token postfix:sym«.»  { <sym> <identifier> <O('%methodop :pirop<dotty>')> }
+#token infix:sym«->» { <sym> <O('%dotty :pirop<arrow>')> }
+#token infix:sym«.»  { <sym> <O('%dotty :pirop<dotty>')> }
 
 # XXX Check precedence
 token postfix:sym<--> { <sym> <O('%autoincrement :pirop<-->')> }

@@ -304,8 +304,14 @@ our multi method to_c(PAST::Var $var, %c) {
         }
         $res;
     }
-    elsif $var.scope eq 'keyed' {
+    elsif $var.scope eq 'keyed_int' {
         self.to_c($var[0], %c) ~ '[' ~ self.to_c($var[1], %c) ~ ']';
+    }
+    elsif $var.scope eq 'keyed_arrow' {
+        self.to_c($var[0], %c) ~ '->' ~ self.to_c($var[1], %c);
+    }
+    elsif $var.scope eq 'keyed_dotty' {
+        self.to_c($var[0], %c) ~ '.' ~ self.to_c($var[1], %c);
     }
     elsif $var.scope eq 'register' {
         my $n := +$var.name;

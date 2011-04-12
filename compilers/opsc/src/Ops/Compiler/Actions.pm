@@ -633,18 +633,38 @@ method circumfix:sym<( )> ($/) {
 }
 
 method postcircumfix:sym<[ ]> ($/) {
-    make PAST::Var.new(
-        $<EXPR>.ast,
-        :scope('keyed'),
-    );
+    make PAST::Var.new($<EXPR>.ast, :scope('keyed_int'));
 }
 
+method postcircumfix:sym<( )> ($/) {
+    make $<arglist>.ast;
+}
+
+method arglist($/) {
+    my $past := PAST::Op.new( :pasttype('call'), :node($/) );
+
+    if ($<arg>) {
+        $past.push($_.ast) for $<arg>;
+    }
+
+    make $past;
+}
 
 # For casting we just set "returns" of EXPR.
 method prefix:sym<( )> ($/) {
     make PAST::Op.new(
         :returns(~$<type_declarator>),
     );
+}
+
+method postfix:sym«->» ($/) {
+    #<sym> <identifier> <O('%methodop :pirop<arrow>')>
+    make PAST::Var.new( ~$<identifier>, :scope('keyed_arrow'));
+}
+
+method postfix:sym«.» ($/) {
+    #<sym> <identifier> <O('%methodop :pirop<arrow>')>
+    make PAST::Var.new( ~$<identifier>, :scope('keyed_dotty'));
 }
 
 # Helper method for generating PAST::Val with opsize
