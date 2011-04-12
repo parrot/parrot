@@ -104,6 +104,9 @@ method _init_llvm() {
     $!module.read("t/jit/jitted_ops.bc")
              // die("Couldn't read t/jit/jitted_ops.bc");
 
+    # Copy actual types from loaded module.
+    LLVM::Type::initialize_from_module($!module);
+
     $!builder := LLVM::Builder.create();
 
     # Shortcuts for types
