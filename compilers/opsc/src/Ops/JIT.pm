@@ -766,20 +766,25 @@ our method process:macro<goto_offset>(PAST::Op $chunk, %c) {
 
 our method process:macro<goto_address>(PAST::Op $chunk, %c) {
     $!debug && say("# macro<goto_address>");
+    $!debug && _dumper($chunk[0]);
     # FIXME
     $!builder.store(
-        LLVM::Constant::null(
-            LLVM::Type::pointer(LLVM::Type::int32())
-        ),
+        self.process($chunk[0], %c),
         %c<variables><retval>,
     );
     $!builder.br(%c<leave>);
 }
 
 our method process:macro<expr_offset>(PAST::Op $chunk, %c) {
+    LLVM::Constant::null(
+        LLVM::Type::pointer(LLVM::Type::opcode_t())
+    );
 }
 
 our method process:macro<expr_address>(PAST::Op $chunk, %c) {
+    LLVM::Constant::null(
+        LLVM::Type::pointer(LLVM::Type::opcode_t())
+    );
 }
 
 method process_children(PAST::Op $chunk, %c) {
