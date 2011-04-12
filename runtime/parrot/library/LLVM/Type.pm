@@ -122,11 +122,11 @@ class LLVM::Type is LLVM::Value {
         $INTERP := $m.get_type("struct.parrot_interp_t");
         $INTERP_PTR := pointer($INTERP);
 
-        $PMC := $m.get_type("struct.PMC");
-        $PMC_PTR := pointer($PMC);
+        #$PMC := $m.get_type("struct.PMC");
+        #$PMC_PTR := pointer($PMC);
 
-        $STRING := $m.get_type("struct.parrot_string_t");
-        $STRING_PTR := pointer($STRING);
+        #$STRING := $m.get_type("struct.parrot_string_t");
+        #$STRING_PTR := pointer($STRING);
     }
 };
 
