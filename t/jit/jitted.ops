@@ -4,6 +4,8 @@ jitted.ops - Small subset of ops for JIT testing purpose.
 
 Just because all ops parsing will take _a huge_ amount of time...
 
+#include "parrot/parrot.h"
+
 =cut
 
 op noop() {
@@ -13,13 +15,81 @@ op end() :flow {
     goto ADDRESS(0);
 }
 
-op set(out STR, in STR) {
+inline op set(out INT, in INT) :base_core {
     $1 = $2;
 }
 
-op set(out INT, in INT) {
+inline op set(out INT, in NUM) :base_core {
+    $1 = (INTVAL)($2);
+}
+
+inline op set(out INT, in STR) :base_core {
+    $1 = Parrot_str_to_int(interp, $2);
+}
+
+inline op set(out NUM, in NUM) :base_core {
     $1 = $2;
 }
+
+inline op set(out NUM, in INT) :base_core {
+    $1 = (FLOATVAL)$2;
+}
+
+inline op set(out NUM, in STR) :base_core {
+    $1 = Parrot_str_to_num(interp, $2);
+}
+
+inline op set(out NUM, invar PMC) :base_core {
+    $1 = VTABLE_get_number(interp, $2);
+}
+
+inline op set(out STR, invar PMC) :base_core {
+    $1 = VTABLE_get_string(interp, $2);
+}
+
+inline op set(out STR, invar STR) :base_core {
+    $1 = $2;
+}
+
+inline op set(out STR, inconst STR) :base_core {
+    $1 = $2;
+}
+
+inline op set(out STR, in INT) :base_core {
+    $1 = Parrot_str_from_int(interp, $2);
+}
+
+inline op set(out STR, in NUM) :base_core {
+    $1 = Parrot_str_from_num(interp, $2);
+}
+
+inline op set(out PMC, inconst PMC) :base_core {
+    $1 = $2;
+}
+
+inline op set(out PMC, invar PMC) :base_core {
+    $1 = $2;
+}
+
+inline op set(invar PMC, in INT) :base_core {
+    VTABLE_set_integer_native(interp, $1, $2);
+}
+
+inline op set(invar PMC, in NUM) :base_core {
+    VTABLE_set_number_native(interp, $1, $2);
+}
+
+inline op set(invar PMC, invar STR) :base_core {
+    VTABLE_set_string_native(interp, $1, $2);
+}
+
+inline op set(invar PMC, inconst STR) :base_core {
+    VTABLE_set_string_native(interp, $1, $2);
+}
+inline op set(out INT, invar PMC) :base_core {
+    $1 = VTABLE_get_integer(interp, $2);
+}
+
 
 op say(in INT) :base_io {
     Parrot_io_printf(interp, "%ld", (INTVAL)$1);
