@@ -170,6 +170,7 @@ OUTPUT
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_find_method");
     type   = Parrot_PMC_typenum(interp, "Class");
     pmc    = Parrot_PMC_new(interp, type);
+    string = createstring(interp,"foo");
     pmc2   = Parrot_PMC_find_method(interp, pmc, string);
     Parrot_printf(interp,"42\n");
 CODE
