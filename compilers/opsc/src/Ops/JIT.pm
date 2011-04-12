@@ -707,6 +707,22 @@ method _process_prefix_postfix (PAST::Op $chunk, %c, $delta) {
     $chunk.name ~~ /postfix/ ?? $value !! $res;
 }
 
+our method process:pirop<arrow> (PAST::Op $chunk, %c) {
+    my $old := +%c<lhs>;
+    %c<lhs> := 0;
+    my $lhs := self.process($chunk[0], %c);
+    %c<lhs> := $old;
+
+    $!debug && say("# pirop<arrow>");
+    $!debug && _dumper($chunk[1]);
+    $!debug && $lhs.dump();
+
+    # XXX FIXME We have to choose field properly!!!
+    my $res := $!builder.struct_gep($lhs, 0);
+    $res.dump();
+
+    $res;
+}
 
 
 our multi method process(PAST::Stmts $chunk, %c) {
