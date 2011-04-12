@@ -50,6 +50,8 @@ get eval_pmc info from packfile
 static PMC *
 get_packfile_eval_pmc(PARROT_INTERP, PMC * pf_pmc, INTVAL current_eval)
 {
+    ASSERT_ARGS(get_packfile_eval_pmc)
+
     PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pf_pmc);
     PMC * const eval_pmc = Parrot_pmc_new(interp, enum_class_Eval);
     Parrot_Sub_attributes *sub_data;
