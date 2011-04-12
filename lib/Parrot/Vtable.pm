@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -132,7 +132,18 @@ sub vtbl_defs {
 
     for my $entry ( @{$vtable} ) {
         next if ( $entry->[4] =~ /MMD_/ );
-        my $args = join( ", ", 'PARROT_INTERP', 'PMC* pmc', split( /\s*,\s*/, $entry->[2] ) );
+
+        # Put arg annotations on points if appropriate
+        my @args = split( /\s*,\s*/, $entry->[2] );
+        for my $arg ( @args ) {
+            if ( $arg =~ /^STRING\b/ ) {
+                # It would be nice if we could const STRINGs but they might have to calculate a hashval.
+                $arg = "ARGMOD($arg)";
+            }
+        }
+
+        # The source PMC can always get modified.
+        my $args = join( ', ', 'PARROT_INTERP', 'ARGMOD(PMC *pmc)', @args);
         $defs .= "typedef $entry->[0] (*$entry->[1]_method_t)($args);\n";
     }
 
