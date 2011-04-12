@@ -101,7 +101,9 @@ is( $op.arg_types.join('_'), 'i_pc_nc', "Second variant correct");
 
 # Check body munching.
 $op := @ops[0];
-ok( $op.get_body($trans) ~~ /'return (opcode_t *)cur_opcode + 1'/ , "goto NEXT appended for non :flow ops");
+my %c;
+%c<trans> := $trans;
+ok( $op.get_body(%c) ~~ /'return (opcode_t *)cur_opcode + 1'/ , "goto NEXT appended for non :flow ops");
 
 # Check write barriers.
 ok( !$op.need_write_barrier, "Write Barrier is not required");
@@ -113,7 +115,7 @@ ok( $op.need_write_barrier, "'inout STR' Write Barrier");
 $op := @ops[5];
 ok( $op.need_write_barrier, "Write Barrier calculated properly");
 
-ok( $op.get_body($trans) ~~ /PARROT_GC_WRITE_BARRIER/, "We have Write Barrier inserted into op");
+ok( $op.get_body(%c) ~~ /PARROT_GC_WRITE_BARRIER/, "We have Write Barrier inserted into op");
 
 done_testing();
 
