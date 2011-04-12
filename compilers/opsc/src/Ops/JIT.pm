@@ -419,6 +419,8 @@ method process_op(Ops::Op $op, %c) {
     %c<op> := $op;
     self.process($_, %c) for @($op);
     %c.delete('op');
+
+    $!debug && $!jitted_sub.dump();
 }
 
 # Recursively process body chunks returning string.
@@ -595,11 +597,13 @@ our method process:pasttype<macro_if> (PAST::Op $chunk, %c) {
 our method process:pasttype<call> (PAST::Op $chunk, %c) {
     my $function := %!functions{ $chunk.name };
 
-    say("# Unknown function { $chunk.name }")
-        && return undef
-        unless pir::defined($function);
-
-    $!builder.call($function, |self.process_children($chunk, %c));
+    if pir::defined($function) {
+        $!debug && say("# Jitting { $chunk.name }");
+        $!builder.call($function, |self.process_children($chunk, %c));
+    }
+    else {
+        say("# Unknown function { $chunk.name }");
+    }
 }
 
 our method process:pasttype<if> (PAST::Op $chunk, %c) {
