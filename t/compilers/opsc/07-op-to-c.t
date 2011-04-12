@@ -6,11 +6,13 @@ Q:PIR{ .include "test_more.pir" };
 
 my $compiler := pir::compreg__Ps('Ops');
 my $trans    := Ops::Trans::C.new;
+my %c;
+%c<trans>    := $trans;
 
 for get_test_data() -> $test {
     try {
         my $past := $compiler.compile($test[1], target => 'past');
-        my $body := $past<ops>[0].get_body($trans);
+        my $body := $past<ops>[0].get_body(%c);
         diag( $body );
         ok( $body ~~ $test[2], $test[0]);
 
