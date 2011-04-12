@@ -110,12 +110,12 @@ void dotest(Parrot_Interp interp, void *unused)
     rpa    = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
     rpa2   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
     fpa    = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "FixedPMCArray"));
-    hash   = Parrot_hash_new(interp);
+    hash   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Hash"));
     pmc    = Parrot_PMC_new(interp, type);
     pmc2   = Parrot_PMC_new(interp, type);
     pmc3   = Parrot_PMC_new(interp, type);
-    key_int   = Parrot_key_new_integer(interp, 42);
-    key_str   = Parrot_key_new_cstring(interp, "blarg");
+    key_int   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Key"));
+    Parrot_PMC_set_integer_native(interp, key_int, 42);
 
     Parrot_PMC_push_pmc(interp, rpa2, continuation);
 
@@ -188,7 +188,7 @@ Done!
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_set_pointer");
-    Parrot_PMC_set_pointer(interp, continuation , 42);
+    Parrot_PMC_set_pointer(interp, continuation , (void *)42);
     Parrot_printf(interp,"42\n");
 CODE
 42
@@ -239,7 +239,7 @@ Done!
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_string_keyed_int");
-    string = Parrot_PMC_get_string_keyed_int(interp, rpa, key_int);
+    string = Parrot_PMC_get_string_keyed_int(interp, rpa, 42);
     Parrot_printf(interp,"%Ss\n", string);
 CODE
 
@@ -283,6 +283,7 @@ Done!
 OUTPUT
 
 # Why does this coredump?
+# Because key_str should be a Parrot_String not a Key PMC
 #extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_string_keyed_str");
 #    string = Parrot_PMC_get_string_keyed_str(interp, hash, key_str);
 #    Parrot_printf(interp,"%Ss\n", string);
@@ -291,7 +292,7 @@ OUTPUT
 #OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_defined_keyed_int");
-    integer = Parrot_PMC_defined_keyed_int(interp, rpa, key_int);
+    integer = Parrot_PMC_defined_keyed_int(interp, rpa, 42);
     Parrot_printf(interp,"%d\n", integer);
 CODE
 0
@@ -302,8 +303,8 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(set|get)_number_keyed
     number  = 42.0;
     number2 = 17.8;
     Parrot_printf(interp,"%.2f\n", number2);
-    Parrot_PMC_set_number_keyed_int(interp, rpa, key_int, number);
-    number2 = Parrot_PMC_get_number_keyed_int(interp, rpa, key_int);
+    Parrot_PMC_set_number_keyed_int(interp, rpa, 42, number);
+    number2 = Parrot_PMC_get_number_keyed_int(interp, rpa, 42);
     Parrot_printf(interp,"%.2f\n", number2);
 CODE
 17.80
