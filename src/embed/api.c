@@ -542,8 +542,9 @@ Parrot_api_write_bytecode_to_file(Parrot_PMC interp_pmc, Parrot_PMC pbc,
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile.");
     else {
+        PIOHANDLE fp;
         Parrot_block_GC_mark(interp);
-        PIOHANDLE fp = PIO_OPEN(interp, filename, PIO_F_WRITE);
+        fp = PIO_OPEN(interp, filename, PIO_F_WRITE);
         if (fp == PIO_INVALID_HANDLE) {
             Parrot_unblock_GC_mark(interp);
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
