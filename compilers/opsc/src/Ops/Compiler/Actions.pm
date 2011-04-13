@@ -6,9 +6,29 @@ class Ops::Compiler::Actions is HLL::Actions;
 our $OP;
 our $OPLIB;
 
+# Macro substitutors.
+our %MACROS;
+
 INIT {
     pir::load_bytecode("nqp-setting.pbc");
+    pir::load_bytecode("dumper.pbc");
     $OPLIB := 0;
+
+    # VTABLE_get_number(interp, pmc) -> pmc->vtable->get_number(interp, pmc)
+    %MACROS<VTABLE_get_number> := PAST::Op.new(
+        :pasttype<call>,
+        PAST::Var.new(
+            :scope<keyed_arrow>,
+            PAST::Var.new(
+                :scope<keyed_arrow>,
+                PAST::Var.new(:name<1>, :scope<macro_arg>),
+                "vtable",
+            ),
+            "get_number",
+        ),
+        PAST::Var.new(:name<0>, :scope<macro_arg>),
+        PAST::Var.new(:name<1>, :scope<macro_arg>),
+    );
 }
 
 method TOP($/) {
@@ -484,16 +504,54 @@ method term:sym<identifier> ($/) {
 }
 
 method term:sym<call> ($/) {
-    my $past := PAST::Op.new(
-        :pasttype('call'),
-        :name(~$<identifier>),
-    );
+    my $name := ~$<identifier>;
+    my $past;
 
-    if ($<arglist><arg>) {
-        $past.push($_.ast) for $<arglist><arg>;
+    if %MACROS.exists($name) {
+        say("Cloning $name");
+        my @args;
+        if ($<arglist><arg>) {
+            @args.push($_.ast) for $<arglist><arg>;
+        }
+
+        $past := demacrofy(%MACROS{$name}, @args);
+
+        say("PAST");
+        _dumper($past);
+    }
+    else {
+        $past := PAST::Op.new(
+            :pasttype('call'),
+            :name(~$<identifier>),
+        );
+
+        if ($<arglist><arg>) {
+            $past.push($_.ast) for $<arglist><arg>;
+        }
     }
 
     make $past;
+}
+
+sub demacrofy($op, @args) {
+    my $res;
+    if $op ~~ PAST::Var && $op.scope eq 'macro_arg' {
+        say("Cloning arg { $op.name }");
+        _dumper(@args[ $op.name ]);
+        $res := deep_clone(@args[ $op.name ]);
+    }
+    elsif pir::isa($op, 'Capture') {
+        $res := $op.WHAT.new;
+        pir::push($res, demacrofy($_, @args)) for @($op);
+        $res{$_} := demacrofy($op{$_}, @args) for $op.hash.keys;
+    }
+    elsif pir::does($op, 'array') {
+        $res := $op.map(->$_ { demacrofy($_, @args) });
+    }
+    else {
+        $res := pir::clone($op);
+    }
+    $res;
 }
 
 method arg ($/) {
