@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 89;
+plan tests => 90;
 
 =head1 NAME
 
@@ -282,14 +282,13 @@ CODE
 Done!
 OUTPUT
 
-# Why does this coredump?
-# Because key_str should be a Parrot_String not a Key PMC
-#extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_string_keyed_str");
-#    string = Parrot_PMC_get_string_keyed_str(interp, hash, key_str);
-#    Parrot_printf(interp,"%Ss\n", string);
-#CODE
-#Done!
-#OUTPUT
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_string_keyed_str");
+    string = Parrot_PMC_get_string_keyed_str(interp, hash, string);
+    Parrot_printf(interp,"%Ss\n", string);
+CODE
+
+Done!
+OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_defined_keyed_int");
     integer = Parrot_PMC_defined_keyed_int(interp, rpa, 42);
