@@ -395,8 +395,9 @@ our method to_c:pasttype<macro_if> (PAST::Op $chunk, %c) {
     @res.join('');
 }
 our method to_c:pasttype<call> (PAST::Op $chunk, %c) {
+    my $name := $chunk.name // self.to_c(@($chunk).shift, %c);
     join('',
-        $chunk.name,
+        $name,
         '(',
         # Handle args.
         self.join_children($chunk, %c, ', '),

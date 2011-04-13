@@ -139,6 +139,17 @@ inline op noop(in PMC) :flow {
             / 'foo[bar]' /
         ],
 
+        [
+            'postcircumfix()',
+            q«
+inline op noop(in PMC) :flow {
+    $1->vtable->foo(interp, $1);
+}
+            »,
+            / '->vtable->foo(interp' /
+        ],
+
+
 
     );
 }
