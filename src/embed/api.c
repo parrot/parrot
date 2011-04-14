@@ -536,7 +536,6 @@ Parrot_api_write_bytecode_to_file(Parrot_PMC interp_pmc, Parrot_PMC pbc,
 {
     ASSERT_ARGS(Parrot_api_write_bytecode_to_file)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PMC * filepmc = PMCNULL;
     PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
