@@ -21,6 +21,15 @@ list(
 )
 );
 
+parse_ok($c, "Multiline #define",
+q«
+#define FOO \
+        bar
+»,
+list(
+    hash( path => 'body/c_macro/0/name', value => 'FOO'),
+)
+);
 
 
 done_testing();

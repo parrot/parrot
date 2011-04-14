@@ -12,6 +12,7 @@ rule TOP {
 }
 
 rule body {
+    #<?DEBUG>
     <c_macro>*
     [
         <.pod_ws>
@@ -108,7 +109,7 @@ rule op_macro:sym<restart next> { 'restart' 'NEXT' '(' ')' }
 proto rule c_macro { <...> }
 
 token c_macro:sym<define> {
-    ^^ '#' \h* <sym> \h+ <name=.identifier> \h+ <c_macro_args>? <body=.nonl>?
+    ^^ '#' \h* <sym> \h+ <name=.identifier> <c_macro_args>? \h+ <.unsp>? <body=.nonl>?
 }
 
 token c_macro:sym<ifdef> {
@@ -135,7 +136,11 @@ token c_macro_args {
 }
 
 token nonl {
-    \N+
+    [ \N <.unsp>? ]+
+}
+
+token unsp {
+    \\ \v
 }
 
 
