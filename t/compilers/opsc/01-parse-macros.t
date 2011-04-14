@@ -31,6 +31,17 @@ list(
 )
 );
 
+parse_ok($c, "Multiline #define with args",
+q«
+#define VTABLE_foo(i, p) \
+        (p)->vtable->foo(i, p)
+»,
+list(
+    hash( path => 'body/c_macro/0/name', value => 'VTABLE_foo'),
+)
+);
+
+
 
 done_testing();
 
