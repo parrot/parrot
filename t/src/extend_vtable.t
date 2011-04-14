@@ -167,6 +167,14 @@ CODE
 Done!
 OUTPUT
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_defined_keyed");
+    integer = Parrot_PMC_defined_keyed(interp, rpa, key_int);
+    Parrot_printf(interp,"%d\n", integer);
+CODE
+0
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_find_method");
     type   = Parrot_PMC_typenum(interp, "Class");
     pmc    = Parrot_PMC_new(interp, type);
@@ -496,7 +504,6 @@ CODE
 42
 Done!
 OUTPUT
-
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_add_float" );
     Parrot_PMC_set_integer_native(interp, pmc, -42);
