@@ -136,9 +136,7 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
         interp->parent_interpreter = NULL;
         emergency_interp           = interp;
 
-#if PARROT_CATCH_NULL
         PMCNULL                    = NULL;
-#endif
 
         /*
          * we need a global mutex to protect the interpreter array
