@@ -330,14 +330,13 @@ Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
 {
     ASSERT_ARGS(Parrot_api_load_bytecode_file)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PackFile * const pf = PackFile_read_pbc(interp, filename, 0);
-    if (!pf)
+    *pbc = PackFile_read_pbc(interp, filename, 0);
+    PackFile *pf;
+    if (PMC_IS_NULL(*pbc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
             "Could not load packfile");
+    pf = (PackFile*)VTABLE_get_pointer(interp, *pbc);
     do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
-    Parrot_block_GC_mark(interp);
-    *pbc = Parrot_pf_get_packfile_pmc(interp, pf);
-    Parrot_unblock_GC_mark(interp);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
