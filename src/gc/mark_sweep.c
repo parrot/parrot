@@ -195,7 +195,7 @@ Parrot_gc_trace_root(PARROT_INTERP,
     Parrot_gc_mark_PMC_alive(interp, interp->scheduler);
 
     /* s. packfile.c */
-    Parrot_pf_mark_packfile(interp, interp->initial_pf);
+    Parrot_gc_mark_PMC_alive(interp, interp->current_pf);
 
     /* mark caches and freelists */
     mark_object_cache(interp);
