@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 97;
+plan tests => 98;
 
 =head1 NAME
 
@@ -151,6 +151,21 @@ CODE
 
 # actual tests start here
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_string_keyed_int");
+    string = Parrot_PMC_get_string_keyed_int(interp, rpa, 42);
+    Parrot_printf(interp,"%Ss\n", string);
+CODE
+
+Done!
+OUTPUT
+
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pmc_keyed_int");
+    pmc2 = Parrot_PMC_get_pmc_keyed_int(interp, rpa, 0);
+CODE
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_delete_keyed_int");
     Parrot_PMC_delete_keyed_int(interp, rpa, 0);
 CODE
@@ -274,13 +289,6 @@ CODE
 Done!
 OUTPUT
 
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_string_keyed_int");
-    string = Parrot_PMC_get_string_keyed_int(interp, rpa, 42);
-    Parrot_printf(interp,"%Ss\n", string);
-CODE
-
-Done!
-OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(set|get)_number_keyed");
     Parrot_PMC_set_number_keyed(interp, rpa, key_int, 42.0);
