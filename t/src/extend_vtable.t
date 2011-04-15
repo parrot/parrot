@@ -151,11 +151,23 @@ CODE
 
 # actual tests start here
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_delete_keyed_int");
+    Parrot_PMC_delete_keyed_int(interp, rpa, 0);
+CODE
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_exists_keyed_int");
     integer = Parrot_PMC_exists_keyed_int(interp, rpa, 0);
     Parrot_printf(interp,"%d\n", integer);
 CODE
 0
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_delete_keyed");
+    Parrot_PMC_delete_keyed(interp, rpa, key_int);
+CODE
 Done!
 OUTPUT
 
