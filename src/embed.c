@@ -426,7 +426,8 @@ void
 Parrot_pbc_load(PARROT_INTERP, ARGIN(Parrot_PackFile pf))
 {
     ASSERT_ARGS(Parrot_pbc_load)
-    Parrot_pf_set_current_packfile(interp, pf);
+    //Parrot_pf_set_current_packfile(interp, pf);
+    PARROT_ASSERT(!"Bad idea");
 }
 
 /*
@@ -446,6 +447,7 @@ int
 Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
 {
     ASSERT_ARGS(Parrot_load_bytecode_file)
+#if 0
     PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
 
     Parrot_warn_experimental(interp, "Parrot_load_bytecode_file is experimental");
@@ -453,6 +455,8 @@ Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
         return 0;
     Parrot_pf_set_current_packfile(interp, pf);
     return 1;
+#endif
+    return 0;
 }
 
 /*

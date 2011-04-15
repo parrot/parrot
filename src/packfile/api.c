@@ -1760,7 +1760,7 @@ create_seg(PARROT_INTERP, ARGMOD(PackFile_Directory *dir), pack_file_types t,
 
 /*
 
-=item C<PackFile * Parrot_pf_get_current_packfile(PARROT_INTERP)>
+=item C<PMC * Parrot_pf_get_current_packfile(PARROT_INTERP)>
 
 Get the interpreter's currently active PackFile
 
@@ -1770,11 +1770,11 @@ Get the interpreter's currently active PackFile
 
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
-PackFile *
+PMC *
 Parrot_pf_get_current_packfile(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_pf_get_current_packfile)
-    return interp->initial_pf;
+    return interp->current_pf;
 }
 
 /*
@@ -1798,7 +1798,7 @@ Parrot_pf_get_current_code_segment(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_pf_set_current_packfile(PARROT_INTERP, PackFile * const pf)>
+=item C<void Parrot_pf_set_current_packfile(PARROT_INTERP, PMC *pf)>
 
 Set's the current packfile for the interpreter.
 
@@ -1808,15 +1808,17 @@ Set's the current packfile for the interpreter.
 
 PARROT_EXPORT
 void
-Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PackFile * const pf))
+Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pf))
 {
     ASSERT_ARGS(Parrot_pf_set_current_packfile)
-    if (!pf)
+    PackFile *p;
+    if (PMC_IS_NULL(pf))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Cannot set null packfile");
 
-    interp->initial_pf = pf;
-    interp->code       = pf->cur_cs;
+    interp->current_pf = pf;
+    p                  = (PackFile *)VTABLE_get_pointer(interp, pf);
+    interp->code       = p->cur_cs;
 }
 
 /*
@@ -1840,7 +1842,7 @@ PF_create_default_segs(PARROT_INTERP, ARGIN(STRING *file_name), int add, int set
 {
     ASSERT_ARGS(PF_create_default_segs)
     PackFile_ByteCode * const bc = Parrot_pf_create_default_segments(interp,
-        interp->initial_pf, file_name, add);
+        interp->current_pf, file_name, add);
     if (set_def)
         interp->code = bc;
     return bc;
@@ -1848,8 +1850,8 @@ PF_create_default_segs(PARROT_INTERP, ARGIN(STRING *file_name), int add, int set
 
 /*
 
-=item C<PackFile_ByteCode * Parrot_pf_create_default_segments(PARROT_INTERP,
-PackFile * const pf, STRING * file_name, int add)>
+=item C<PackFile_ByteCode * Parrot_pf_create_default_segments(PARROT_INTERP, PMC
+* const pf_pmc, STRING * file_name, int add)>
 
 Create the default seguments for the given packfile. Return the ByteCode
 segment created.
@@ -1862,10 +1864,12 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode *
-Parrot_pf_create_default_segments(PARROT_INTERP, ARGIN(PackFile * const pf),
+Parrot_pf_create_default_segments(PARROT_INTERP, ARGIN(PMC * const pf_pmc),
         ARGIN(STRING * file_name), int add)
 {
     ASSERT_ARGS(Parrot_pf_create_default_segments)
+
+    PackFile *pf = (PackFile *)VTABLE_get_pointer(interp, pf_pmc);
     PackFile_ByteCode * const cur_cs =
         (PackFile_ByteCode *)create_seg(interp, &pf->directory,
             PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME, file_name, add);
@@ -3128,7 +3132,7 @@ Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
                 ? interp->code->base.dir
                 : cs->base.dir
                     ? cs->base.dir
-                    : &interp->initial_pf->directory;
+                    : &((PackFile*)VTABLE_get_pointer(interp, interp->current_pf))->directory;
 
         name = Parrot_sprintf_c(interp, "%Ss_DB", cs->base.name);
         debug = (PackFile_Debug *)PackFile_Segment_new_seg(interp, dir,
@@ -4259,17 +4263,20 @@ static PackFile *
 PackFile_append(PARROT_INTERP, ARGIN_NULLOK(PackFile * const pf))
 {
     ASSERT_ARGS(PackFile_append)
-    PARROT_ASSERT(interp->initial_pf);
+    PARROT_ASSERT(!PMC_IS_NULL(interp->current_pf));
 
     if (pf) {
+        PackFile *current_pf = (PackFile *)VTABLE_get_pointer(interp, interp->current_pf);
         if (!interp->code) {
             STRING * const name = CONST_STRING(interp, "dummy");
             interp->code = Parrot_pf_create_default_segments(interp,
-                interp->initial_pf, name, 1);
+                interp->current_pf, name, 1);
             PARROT_ASSERT(interp->code);
         }
-        PackFile_add_segment(interp, &interp->initial_pf->directory,
+
+        PackFile_add_segment(interp, &current_pf->directory,
                 &pf->directory.base);
+        PARROT_GC_WRITE_BARRIER(interp, interp->current_pf);
 
         do_sub_pragmas(interp, pf->cur_cs, PBC_LOADED, NULL);
     }
@@ -4561,7 +4568,7 @@ again:
 
 /*
 
-=item C<void Parrot_pf_execute_bytecode_program(PARROT_INTERP, PackFile *pf, PMC
+=item C<void Parrot_pf_execute_bytecode_program(PARROT_INTERP, PMC *pbc, PMC
 *args)>
 
 Execute a PackFile* as if it were a main program.
@@ -4572,13 +4579,14 @@ Execute a PackFile* as if it were a main program.
 
 PARROT_EXPORT
 void
-Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PackFile *pf), ARGMOD(PMC *args))
+Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc), ARGMOD(PMC *args))
 {
     ASSERT_ARGS(Parrot_pf_execute_bytecode_program)
     PMC * main_sub;
+    PackFile *pf = (PackFile*)VTABLE_get_pointer(interp, pbc);
 
     if (pf->cur_cs)
-        Parrot_pf_set_current_packfile(interp, pf);
+        Parrot_pf_set_current_packfile(interp, pbc);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
 
     /* TODO: Ask the PackFile for the main sub directly, instead of relying on

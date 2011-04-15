@@ -411,7 +411,8 @@ Parrot_api_ready_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile.");
     if (pf->cur_cs)
-        Parrot_pf_set_current_packfile(interp, pf);
+        Parrot_pf_set_current_packfile(interp, pbc);
+
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
     *main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
     Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
@@ -451,7 +452,7 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
             "Could not get packfile.");
     if (!mainargs)
         mainargs = PMCNULL;
-    Parrot_pf_execute_bytecode_program(interp, pf, mainargs);
+    Parrot_pf_execute_bytecode_program(interp, pbc, mainargs);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -479,7 +480,7 @@ Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile.");
     if (pf->cur_cs)
-        Parrot_pf_set_current_packfile(interp, pf);
+        Parrot_pf_set_current_packfile(interp, pbc);
     /* TODO: Break up the dependency with emebed.c */
     Parrot_disassemble(interp, outfile, (Parrot_disassemble_options)opts);
     EMBED_API_CALLOUT(interp_pmc, interp);

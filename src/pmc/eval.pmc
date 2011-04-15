@@ -172,11 +172,13 @@ Invokes the first subroutine in the eval code.
         }
 
         /* XXX Quick and dirty fix for TT #995 */
+        #if 0
         if ((struct PackFile *)cur_cs == INTERP->initial_pf
                 || cur_cs == INTERP->code) {
             SUPER();
             return;
         }
+        #endif
 
         seg = (PackFile_Segment *)cur_cs->const_table;
         if (seg) {

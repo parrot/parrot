@@ -2264,7 +2264,8 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
     int        ok = 0;
     int        i;
     op_lib_t *core_ops = PARROT_GET_CORE_OPLIB(imcc->interp);
-    PackFile * const interp_pf = Parrot_pf_get_current_packfile(imcc->interp);
+    PMC * const interp_pf_pmc = Parrot_pf_get_current_packfile(imcc->interp);
+    PackFile * const interp_pf = (PackFile*)VTABLE_get_pointer(imcc->interp, interp_pf_pmc);
     PackFile_ByteCode * const interp_code = Parrot_pf_get_current_code_segment(imcc->interp);
 
     /* first instruction, do initialisation ... */
