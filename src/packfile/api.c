@@ -1463,9 +1463,18 @@ PMC *
 Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
 {
     ASSERT_ARGS(Parrot_pf_get_packfile_pmc)
-    PMC * const ptr = Parrot_pmc_new(interp, enum_class_PtrObj);
+    PMC *ptr;
+
+    /* We have to block GC here. */
+    /* XXX We should never-ever have raw PackFile* laying around */
+    /* XXX But it require a lot of effort to cleanup codebase */
+    Parrot_block_GC_mark(interp);
+
+    ptr = Parrot_pmc_new(interp, enum_class_PtrObj);
     VTABLE_set_pointer(interp, ptr, pf);
     PTROBJ_SET_MARK(interp, ptr, mark_packfile_pmc);
+
+    Parrot_unblock_GC_mark(interp);
 
     /* TODO: We shouldn't need to register this here. But, this is a cheap
              fix to make sure packfiles aren't getting collected prematurely */
