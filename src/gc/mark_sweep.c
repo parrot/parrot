@@ -197,7 +197,7 @@ Parrot_gc_trace_root(PARROT_INTERP,
 
 /*
 
-=item C<void mark_interp(PARROT_INTERP)>
+=item C<static void mark_interp(PARROT_INTERP)>
 
 Mark an interpreter and all direct children.
 
