@@ -243,12 +243,6 @@ static void mark_packfile_pmc(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PackFile * PackFile_append(PARROT_INTERP,
-    ARGIN_NULLOK(PackFile * const pf))
-        __attribute__nonnull__(1);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
 static PackFile * PackFile_append_pmc(PARROT_INTERP,
     ARGIN(PMC * const pf_pmc))
         __attribute__nonnull__(1)
@@ -436,8 +430,6 @@ static int sub_pragma(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ptr_pmc) \
     , PARROT_ASSERT_ARG(ptr_raw))
-#define ASSERT_ARGS_PackFile_append __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_append_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf_pmc))
@@ -4160,8 +4152,7 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
     ASSERT_ARGS(load_file)
 
     PMC * pf_pmc = PackFile_read_pbc(interp, path, 0);
-    PackFile *pf = (PackFile*)VTABLE_get_pointer(interp, pf_pmc);
-    pf = PackFile_append(interp, pf);
+    PackFile *pf = PackFile_append_pmc(interp, pf_pmc);
 
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -4258,26 +4249,25 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 
 /*
 
-=item C<static PackFile * PackFile_append(PARROT_INTERP, PackFile * const pf)>
-
-Reads and appends a PBC it to the current directory.  Fixes up sub addresses in
-newly loaded bytecode and runs C<:load> subs.
-
 =item C<static PackFile * PackFile_append_pmc(PARROT_INTERP, PMC * const
 pf_pmc)>
 
-Append a packfile PMC to the current interpreter packfile.
+Reads and appends a PBC it to the current directory.  Fixes up sub addresses in
+newly loaded bytecode and runs C<:load> subs.
 
 =cut
 
 */
 
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PackFile *
-PackFile_append(PARROT_INTERP, ARGIN_NULLOK(PackFile * const pf))
+PackFile_append_pmc(PARROT_INTERP, ARGIN(PMC * const pf_pmc))
 {
-    ASSERT_ARGS(PackFile_append)
+    ASSERT_ARGS(PackFile_append_pmc)
+
+    PackFile * const pf = (PackFile *) VTABLE_get_pointer(interp, pf_pmc);
     PARROT_ASSERT(!PMC_IS_NULL(interp->current_pf));
 
     if (pf) {
@@ -4293,23 +4283,10 @@ PackFile_append(PARROT_INTERP, ARGIN_NULLOK(PackFile * const pf))
                 &pf->directory.base);
         PARROT_GC_WRITE_BARRIER(interp, interp->current_pf);
 
-        do_sub_pragmas(interp, pf->cur_cs, PBC_LOADED, NULL);
+        do_sub_pragmas(interp, pf_pmc, PBC_LOADED, NULL);
     }
 
     return pf;
-}
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PackFile *
-PackFile_append_pmc(PARROT_INTERP, ARGIN(PMC * const pf_pmc))
-{
-    ASSERT_ARGS(PackFile_append_pmc)
-
-    PackFile * const pf = (PackFile *) VTABLE_get_pointer(interp, pf_pmc);
-    PackFile * const rs = PackFile_append(interp, pf);
-    PARROT_GC_WRITE_BARRIER(interp, pf_pmc);
-    return rs;
 }
 
 /*
