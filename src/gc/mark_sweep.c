@@ -162,7 +162,6 @@ Parrot_gc_trace_root(PARROT_INTERP,
         Parrot_gc_trace_type trace)
 {
     ASSERT_ARGS(Parrot_gc_trace_root)
-    PObj    *obj;
 
     /* note: adding locals here did cause increased GC runs */
     Parrot_sub_mark_context_start();
