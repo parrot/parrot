@@ -54,7 +54,7 @@ Parrot_pcc_get_context_struct_func(SHIM_INTERP, ARGIN_NULLOK(PMC *ctx))
 
 =item C<PMC ** Parrot_pcc_get_pmc_constants_func(PARROT_INTERP, PMC *ctx)>
 
-=item C<void Parrot_pcc_set_constants_func(PARROT_INTERP, PMC *ctx, struct
+=item C<void Parrot_pcc_set_constants_func(PARROT_INTERP, PMC *ctx, const struct
 PackFile_ConstTable *ct)>
 
 Get/set constants from context.
@@ -97,8 +97,8 @@ Parrot_pcc_get_pmc_constants_func(SHIM_INTERP, ARGIN(PMC *ctx))
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 void
-Parrot_pcc_set_constants_func(PARROT_INTERP, ARGIN(PMC *ctx),
-        ARGIN(struct PackFile_ConstTable *ct))
+Parrot_pcc_set_constants_func(SHIM_INTERP, ARGIN(PMC *ctx),
+        ARGIN(const struct PackFile_ConstTable *ct))
 {
     ASSERT_ARGS(Parrot_pcc_set_constants_func)
     Parrot_Context * const c = CONTEXT_STRUCT(ctx);
@@ -495,7 +495,8 @@ Parrot_pcc_set_object_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *obj
 
 =item C<opcode_t* Parrot_pcc_get_pc_func(PARROT_INTERP, PMC *ctx)>
 
-=item C<void Parrot_pcc_set_pc_func(PARROT_INTERP, PMC *ctx, opcode_t *pc)>
+=item C<void Parrot_pcc_set_pc_func(PARROT_INTERP, const PMC *ctx, opcode_t
+*pc)>
 
 Get/set program counter of Sub invocation.
 
@@ -517,7 +518,7 @@ Parrot_pcc_get_pc_func(SHIM_INTERP, ARGIN(PMC *ctx))
 
 PARROT_EXPORT
 void
-Parrot_pcc_set_pc_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(opcode_t *pc))
+Parrot_pcc_set_pc_func(PARROT_INTERP, ARGIN(const PMC *ctx), ARGIN_NULLOK(opcode_t *pc))
 {
     ASSERT_ARGS(Parrot_pcc_set_pc_func)
     Parrot_Context * const c = CONTEXT_STRUCT(ctx);

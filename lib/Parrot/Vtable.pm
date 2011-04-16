@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -66,14 +66,14 @@ Returns a reference to an array containing
 
   [ return_type method_name parameters section MMD_type attributes ]
 
-for each vtable function defined in C<$file>. If C<$file> is unspecified it
-defaults to F<src/vtable.tbl>.  If it is not an MMD method, C<MMD_type> is -1.
+for each vtable function defined in C<$file>.  If it is not an MMD method,
+C<MMD_type> is -1.
 
 =cut
 
 sub parse_vtable {
 
-    my $file    = defined $_[0] ? shift() : 'src/vtable.tbl';
+    my $file    = shift;
     my $vtable  = [];
     my $mmd     = [];
     my $fh      = FileHandle->new( $file, O_RDONLY ) or die "Can't open $file for reading: $!\n";
@@ -132,7 +132,18 @@ sub vtbl_defs {
 
     for my $entry ( @{$vtable} ) {
         next if ( $entry->[4] =~ /MMD_/ );
-        my $args = join( ", ", 'PARROT_INTERP', 'PMC* pmc', split( /\s*,\s*/, $entry->[2] ) );
+
+        # Put arg annotations on points if appropriate
+        my @args = split( /\s*,\s*/, $entry->[2] );
+        for my $arg ( @args ) {
+            if ( $arg =~ /^STRING\b/ ) {
+                # It would be nice if we could const STRINGs but they might have to calculate a hashval.
+                $arg = "ARGMOD($arg)";
+            }
+        }
+
+        # The source PMC can always get modified.
+        my $args = join( ', ', 'PARROT_INTERP', 'ARGMOD(PMC *pmc)', @args);
         $defs .= "typedef $entry->[0] (*$entry->[1]_method_t)($args);\n";
     }
 
