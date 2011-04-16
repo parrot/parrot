@@ -4147,7 +4147,8 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
 {
     ASSERT_ARGS(load_file)
 
-    PackFile * pf = PackFile_read_pbc(interp, path, 0);
+    PMC * pf_pmc = PackFile_read_pbc(interp, path, 0);
+    PackFile *pf = (PackFile*)VTABLE_get_pointer(interp, pf_pmc);
     pf = PackFile_append(interp, pf);
 
     if (!pf)
@@ -4565,7 +4566,7 @@ again:
         PIO_CLOSE(interp, io);
 #endif
 
-    return pf;
+    return Parrot_pf_get_packfile_pmc(interp, pf);
 }
 
 /*
