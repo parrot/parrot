@@ -1883,14 +1883,17 @@ Parrot_pf_create_default_segments(PARROT_INTERP, ARGIN(PMC * const pf_pmc),
     PackFile_ByteCode * const cur_cs =
         (PackFile_ByteCode *)create_seg(interp, &pf->directory,
             PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME, file_name, add);
+    PARROT_GC_WRITE_BARRIER(interp, pf_pmc);
 
     PARROT_ASSERT(cur_cs);
 
     cur_cs->const_table  =
         (PackFile_ConstTable *)create_seg(interp, &pf->directory,
             PF_CONST_SEG, CONSTANT_SEGMENT_NAME, file_name, add);
+    PARROT_GC_WRITE_BARRIER(interp, pf_pmc);
 
     cur_cs->const_table->code = cur_cs;
+
 
     return cur_cs;
 }
@@ -4304,7 +4307,9 @@ PackFile_append_pmc(PARROT_INTERP, ARGIN(PMC * const pf_pmc))
     ASSERT_ARGS(PackFile_append_pmc)
 
     PackFile * const pf = (PackFile *) VTABLE_get_pointer(interp, pf_pmc);
-    return PackFile_append(interp, pf);
+    PackFile * const rs = PackFile_append(interp, pf);
+    PARROT_GC_WRITE_BARRIER(interp, pf_pmc);
+    return rs;
 }
 
 /*
