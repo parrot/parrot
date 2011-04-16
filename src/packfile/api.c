@@ -1819,6 +1819,7 @@ Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pf))
     interp->current_pf = pf;
     p                  = (PackFile *)VTABLE_get_pointer(interp, pf);
     interp->code       = p->cur_cs;
+    PARROT_GC_WRITE_BARRIER(interp, pf);
 }
 
 /*
@@ -3133,6 +3134,7 @@ Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
                 : cs->base.dir
                     ? cs->base.dir
                     : &((PackFile*)VTABLE_get_pointer(interp, interp->current_pf))->directory;
+        PARROT_GC_WRITE_BARRIER(interp, interp->current_pf);
 
         name = Parrot_sprintf_c(interp, "%Ss_DB", cs->base.name);
         debug = (PackFile_Debug *)PackFile_Segment_new_seg(interp, dir,
