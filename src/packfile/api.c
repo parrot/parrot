@@ -889,8 +889,8 @@ packfile_main(ARGIN(PackFile_ByteCode *bc))
 
 /*
 
-=item C<void do_sub_pragmas(PARROT_INTERP, PackFile_ByteCode *self,
-pbc_action_enum_t action, PMC *eval_pmc)>
+=item C<void do_sub_pragmas(PARROT_INTERP, PMC *pfpmc, pbc_action_enum_t action,
+PMC *eval_pmc)>
 
 C<action> is one of C<PBC_PBC>, C<PBC_LOADED>, C<PBC_INIT>, or C<PBC_MAIN>.
 These determine which subs get executed at this point. Some rules:
@@ -910,10 +910,12 @@ alive by living subs.
 
 PARROT_EXPORT
 void
-do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
+do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
                pbc_action_enum_t action, ARGIN_NULLOK(PMC *eval_pmc))
 {
     ASSERT_ARGS(do_sub_pragmas)
+    PackFile            * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
+    PackFile_ByteCode   * const self = pf->cur_cs;
     PackFile_ConstTable * const ct = self->const_table;
     opcode_t i;
 
@@ -935,8 +937,10 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
                 PMC * const result = do_1_sub_pragma(interp, sub_pmc, action);
 
                 /* replace Sub PMC with computation results */
-                if (action == PBC_IMMEDIATE && !PMC_IS_NULL(result))
+                if (action == PBC_IMMEDIATE && !PMC_IS_NULL(result)) {
                     ct->pmc.constants[i] = result;
+                    PARROT_GC_WRITE_BARRIER(interp, pfpmc);
+                }
             }
         }
     }
@@ -4125,7 +4129,7 @@ compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
 
     if (cs) {
         interp->code = cur_code;
-        do_sub_pragmas(interp, cs, PBC_LOADED, NULL);
+        do_sub_pragmas(interp, pf_pmc, PBC_LOADED, NULL);
     }
     else {
         interp->code = cur_code;
@@ -4376,7 +4380,7 @@ PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, ARGIN_NULLOK(PMC *eva
 {
     ASSERT_ARGS(PackFile_fixup_subs)
     PARROT_CALLIN_START(interp);
-    do_sub_pragmas(interp, interp->code, what, eval);
+    do_sub_pragmas(interp, interp->current_pf, what, eval);
     PARROT_CALLIN_END(interp);
 }
 
@@ -4399,6 +4403,7 @@ PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
 {
     ASSERT_ARGS(PackFile_read_pbc)
     PackFile  *pf;
+    PMC       *pfpmc;
     char      *program_code;
     STRING    * const stdin_filename = CONST_STRING(interp, "-");
     PIOHANDLE  io             = PIO_INVALID_HANDLE;
@@ -4544,9 +4549,11 @@ again:
         return NULL;
     }
 
+    pfpmc = Parrot_pf_get_packfile_pmc(interp, pf);
+
     /* Set :main routine */
     if (!(pf->options & PFOPT_HEADERONLY))
-        do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
+        do_sub_pragmas(interp, pfpmc, PBC_PBC, NULL);
 
     /* Prederefing the sub/the bytecode is done in switch_to_cs before
      * actual usage of the segment */
@@ -4557,7 +4564,7 @@ again:
         PIO_CLOSE(interp, io);
 #endif
 
-    return Parrot_pf_get_packfile_pmc(interp, pf);
+    return pfpmc;
 }
 
 /*

@@ -501,7 +501,7 @@ void PackFile_ConstTable_dump(PARROT_INTERP,
 
 PARROT_EXPORT
 void do_sub_pragmas(PARROT_INTERP,
-    ARGIN(PackFile_ByteCode *self),
+    ARGIN(PMC *pfpmc),
     pbc_action_enum_t action,
     ARGIN_NULLOK(PMC *eval_pmc))
         __attribute__nonnull__(1)
@@ -857,7 +857,7 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
 
 #define ASSERT_ARGS_do_sub_pragmas __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
+    , PARROT_ASSERT_ARG(pfpmc))
 #define ASSERT_ARGS_PackFile_add_segment __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dir) \
