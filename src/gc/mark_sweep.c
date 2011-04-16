@@ -195,9 +195,20 @@ Parrot_gc_trace_root(PARROT_INTERP,
     return 1;
 }
 
+/*
+
+=item C<void mark_interp(PARROT_INTERP)>
+
+Mark an interpreter and all direct children.
+
+=cut
+
+*/
+
 static void
 mark_interp(PARROT_INTERP)
 {
+    ASSERT_ARGS(mark_interp)
     PObj *obj;
     /* mark the list of iglobals */
     Parrot_gc_mark_PMC_alive(interp, interp->iglobals);
