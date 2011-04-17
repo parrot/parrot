@@ -407,6 +407,11 @@ E.g.
 Use this option if you want imcc's parser and lexer files to be generated.
 Needs a working parser and lexer.
 
+=item C<--with-llvm>
+
+Use this option if you have a recent version of LLVM installed and wish Parrot
+to link to it.
+
 =back
 
 =head1 CONFIGURATION-FILE INTERFACE
