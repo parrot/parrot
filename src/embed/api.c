@@ -604,6 +604,10 @@ Parrot_api_add_library_search_path(Parrot_PMC interp_pmc,
     ASSERT_ARGS(Parrot_api_add_library_search_path)
     EMBED_API_CALLIN(interp_pmc, interp)
     Parrot_lib_add_path_from_cstring(interp, path, PARROT_LIB_PATH_LIBRARY);
+
+    /* EXPERIMENTAL. This line has been added experimentally because it is a
+       missing feature, and it may go away at any time without warning. */
+    Parrot_lib_add_path_from_cstring(interp, path, PARROT_LIB_PATH_LANG);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
