@@ -369,7 +369,7 @@ do_pre_process(ARGMOD(imc_info_t *imcc), ARGIN(STRING * sourcefile),
 
     /* TODO: THIS! */
 
-    IMCC_push_parser_state(imcc, sourcefile, 0);
+    IMCC_push_parser_state(imcc, sourcefile, 1, 0);
     c = yylex(&val, yyscanner, imcc); /* is reset at end of while loop */
     while (c) {
         switch (c) {
@@ -569,7 +569,7 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 
     Parrot_pf_set_current_packfile(imcc->interp, packfilepmc);
 
-    IMCC_push_parser_state(imcc, source, is_pasm);
+    IMCC_push_parser_state(imcc, source, is_file, is_pasm);
 
     success = imcc_compile_buffer_safe(imcc, yyscanner, source, is_file, is_pasm);
 
