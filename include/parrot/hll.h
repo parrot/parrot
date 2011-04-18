@@ -1,19 +1,11 @@
 /* hll.h
- *  Copyright (C) 2005-2007, Parrot Foundation.
+ *  Copyright (C) 2005-2011, Parrot Foundation.
  *  Overview:
  *     This is the API header for the HLL subsystem
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
  */
 
 #ifndef PARROT_HLL_H_GUARD
 #define PARROT_HLL_H_GUARD
-
-/* Temporary defines to help keep some symbols around during the rename
-   transition. TT #443. Can be removed after 2.11 */
-#define Parrot_get_ctx_HLL_namespace Parrot_hll_get_ctx_HLL_namespace
 
 /* this invalid HLL type means "no HLL" when passed to the below functions */
 #define PARROT_HLL_NONE -1
@@ -36,12 +28,13 @@ INTVAL Parrot_hll_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_hll_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
-        __attribute__nonnull__(1);
+INTVAL Parrot_hll_get_HLL_id(PARROT_INTERP, ARGIN(STRING *hll_name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_hll_get_HLL_name(PARROT_INTERP, INTVAL id)
         __attribute__nonnull__(1);
 
@@ -62,7 +55,10 @@ void Parrot_hll_regenerate_HLL_namespaces(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-INTVAL Parrot_hll_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
+PARROT_IGNORABLE_RESULT
+INTVAL /*@alt void@*/
+Parrot_hll_register_HLL(PARROT_INTERP,
+    ARGIN(STRING *hll_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -82,7 +78,8 @@ void Parrot_hll_init_HLL(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_hll_get_ctx_HLL_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_hll_get_HLL_id __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(hll_name))
 #define ASSERT_ARGS_Parrot_hll_get_HLL_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_hll_get_HLL_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
