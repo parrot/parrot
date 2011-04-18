@@ -195,10 +195,11 @@ static PMC* do_1_sub_pragma(PARROT_INTERP,
         FUNC_MODIFIES(*sub_pmc);
 
 static INTVAL find_const_iter(PARROT_INTERP,
-    ARGIN(PackFile_Segment *seg),
+    ARGMOD(PackFile_Segment *seg),
     ARGIN_NULLOK(void *user_data))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*seg);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -814,8 +815,7 @@ use only.
 */
 
 static INTVAL
-find_const_iter(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
-                               ARGIN_NULLOK(void *user_data))
+find_const_iter(PARROT_INTERP, ARGMOD(PackFile_Segment *seg), ARGIN_NULLOK(void *user_data))
 {
     ASSERT_ARGS(find_const_iter)
 
