@@ -310,8 +310,9 @@ The run loop. Process the command-line arguments and dump accordingly.
 int
 main(int argc, const char **argv)
 {
-    PackFile   *pf;
-    Interp     *interp;
+    Parrot_PackFile  pfpmc;
+    PackFile        *pf;
+    Interp          *interp;
 
     const char *file            = NULL;
     int         terse           = 0;
@@ -363,14 +364,16 @@ main(int argc, const char **argv)
     argc -= opt.opt_index;
     argv += opt.opt_index;
 
-    pf = Parrot_pbc_read(interp, *argv, options);
+    pfpmc = Parrot_pbc_read(interp, *argv, options);
 
-    if (!pf) {
+    if (PMC_IS_NULL(pfpmc)) {
         printf("Can't read PBC\n");
         return 1;
     }
 
-    Parrot_pbc_load(interp, pf);
+    Parrot_pbc_load(interp, pfpmc);
+    pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
+
 
     if (convert) {
         size_t   size  = PackFile_pack_size(interp,

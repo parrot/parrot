@@ -109,6 +109,8 @@ Get and set the pointer value.
             GET_ATTR_ptr(INTERP, SELF, ptr);
         else
             ptr = PMC_data(SELF);
+        /* We are returning raw pointer. Someone can write into it */
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return ptr;
     }
 

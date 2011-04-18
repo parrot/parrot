@@ -193,7 +193,7 @@ struct parrot_interp_t {
     size_t             resume_offset;
 
     PackFile_ByteCode  *code;                 /* The code we are executing */
-    struct PackFile    *initial_pf;           /* first created PF  */
+    PMC                *current_pf;           /* Current PF  */
 
     Hash               *op_hash;              /* mapping from op names to op_info_t */
 
