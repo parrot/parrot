@@ -18,6 +18,20 @@ class LLVM::Value is LLVM::Opaque {
         LLVM::call("DumpValue", self);
     }
 
+    method has_metadata() {
+        LLVM::call("HasMetadata", self);
+    }
+
+    method get_metadata($kind_id) {
+        LLVM::Value.create(
+            LLVM::call("GetMetadata", self, $kind_id)
+        );
+    }
+
+    multi method set_metadata($kind_id, LLVM::Value $node) {
+        LLVM::call("SetMetadata", self, $kind_id, $node);
+    };
+
 INIT {
     my @types := <
         Argument
