@@ -366,7 +366,7 @@ main(int argc, const char **argv)
 
     pfpmc = Parrot_pbc_read(interp, *argv, options);
 
-    if (PMC_IS_NULL(pfpmc)) {
+    if (pfpmc == NULL) {
         printf("Can't read PBC\n");
         return 1;
     }
