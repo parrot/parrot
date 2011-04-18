@@ -22,13 +22,17 @@ A compiler object to wrap IMCC
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static PMC * get_packfile_eval_pmc(PARROT_INTERP,
-    PMC * pf_pmc,
+    ARGIN(PMC *pf_pmc),
     INTVAL current_eval)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_get_packfile_eval_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pf_pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -36,7 +40,7 @@ static PMC * get_packfile_eval_pmc(PARROT_INTERP,
 
 =over 4
 
-=item C<static PMC * get_packfile_eval_pmc(PARROT_INTERP, PMC * pf_pmc, INTVAL
+=item C<static PMC * get_packfile_eval_pmc(PARROT_INTERP, PMC *pf_pmc, INTVAL
 current_eval)>
 
 get eval_pmc info from packfile
@@ -47,8 +51,10 @@ get eval_pmc info from packfile
 
 */
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static PMC *
-get_packfile_eval_pmc(PARROT_INTERP, PMC * pf_pmc, INTVAL current_eval)
+get_packfile_eval_pmc(PARROT_INTERP, ARGIN(PMC *pf_pmc), INTVAL current_eval)
 {
     ASSERT_ARGS(get_packfile_eval_pmc)
 
@@ -102,8 +108,8 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         PackFile_ByteCode * const cur_code = interp->code;
         STRING * code = STRINGNULL;
         PMC * result = PMCNULL;
-        PMC * eval_pmc = PMCNULL;
-        UINTVAL regs_used[4] = {3, 3, 3, 3};
+        PMC * eval_pmc;
+        const UINTVAL regs_used[4] = {3, 3, 3, 3};
         PMC * const newcontext = Parrot_push_context(interp, regs_used);
 
         Parrot_block_GC_mark(interp);
@@ -114,7 +120,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         result = imcc_compile_string(imcc, code, attrs->is_pasm);
         if (PMC_IS_NULL(result)) {
             STRING * const msg = imcc_last_error_message(imcc);
-            INTVAL code = imcc_last_error_code(imcc);
+            const INTVAL code = imcc_last_error_code(imcc);
             Parrot_unblock_GC_mark(interp);
             Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
@@ -138,17 +144,17 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     }
 
     VTABLE void *get_pointer() {
-        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        const Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         return attrs->imcc_info;
     }
 
     VTABLE INTVAL get_integer() {
-        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        const Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         return attrs->is_pasm;
     }
 
     VTABLE STRING *get_string() {
-        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        const Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         if (attrs->is_pasm)
             return CONST_STRING(INTERP, "PASM");
         else
@@ -166,7 +172,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag)
     {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
-        PMC * pf = PMCNULL;
+        PMC * pf;
         PMC * eval_pmc = PMCNULL;
         imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
         UINTVAL regs_used[4] = {3, 3, 3, 3};
@@ -220,7 +226,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         pf = imcc_compile_file(imcc, filename, attrs->is_pasm);
         if (PMC_IS_NULL(pf)) {
             STRING * const msg = imcc_last_error_message(imcc);
-            INTVAL code = imcc_last_error_code(imcc);
+            const INTVAL code = imcc_last_error_code(imcc);
             Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
 
@@ -245,7 +251,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     }*/
 
     METHOD preprocess(STRING *code) {
-        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        const Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
         imcc_preprocess(imcc, code);
     }
