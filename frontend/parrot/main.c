@@ -491,7 +491,7 @@ help(void)
     "       --gc-min-threshold=KB\n"
     "       --gc-debug\n"
     "       --leak-test|--destroy-at-end\n"
-    "    -g --gc ms|inf set GC type\n"
+    "    -g --gc ms2|gms|ms|inf set GC type\n"
     "    -. --wait    Read a keystroke before starting\n"
     "       --runtime-prefix\n"
     "   <Compiler options>\n"
