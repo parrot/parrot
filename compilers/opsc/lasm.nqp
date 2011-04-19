@@ -133,4 +133,11 @@ method handle_var($var)
     my $type := self<cur_opsop><args>[$reg-1]<type>;
     return '$O' ~ %reg_map{$type} ~ $reg;
   }
+  if (!defined($var<scope>))
+  {
+    if ($var<name> eq "interp")
+    {
+      return "\$P10";
+    }
+  }
 }
