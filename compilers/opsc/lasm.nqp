@@ -81,6 +81,23 @@ method handle_op($op)
 
       self<fh>.print("  $dest = $rhs;\n");
     }
+    if ($op<pirop> eq '+=')
+    {
+      my $dest := self.handle_node($op[0]);
+      my $rhs  := self.handle_node($op[1]);
+
+      self<fh>.print("  $dest = ADD $dest, $rhs;\n");
+    }
+    if ($op<pirop> eq '+')
+    {
+      my $dest := '$';# ~ %reg_map{$type} ~ "1";
+      my $src1 := self.handle_node($op[0]);
+      my $src2 := self.handle_node($op[1]);
+
+      self<fh>.print("  $dest = ADD $src1, $src2;\n");
+
+      return $dest;
+    }
     return;
   }
 
