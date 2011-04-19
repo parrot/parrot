@@ -448,7 +448,6 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
 Versions with a asterisk (*) are supported releases.
 
- - Apr 19, 2011 - 3.3*  - whiteknight
  - May 17, 2011 - 3.4   - gerd
  - Jun 21, 2011 - 3.5   - cotto
  - Jul 19, 2011 - 3.6*  - kid51
