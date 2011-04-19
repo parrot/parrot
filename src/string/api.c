@@ -31,8 +31,6 @@ members, beside setting C<bufstart>/C<buflen> for external strings.
 /* for parrot/interpreter.h */
 STRING *STRINGNULL;
 
-#define DEBUG_HASH_SEED 0
-
 #define nonnull_encoding_name(s) (s) ? (s)->encoding->name : "null string"
 #define ASSERT_STRING_SANITY(s) \
     PARROT_ASSERT((s)->encoding); \
@@ -130,11 +128,7 @@ Parrot_str_init(PARROT_INTERP)
     /* interp is initialized from zeroed memory, so this is fine */
     else if (interp->hash_seed == 0) {
         /* TT #64 - use an entropy source once available */
-        Parrot_util_srand(Parrot_intval_time());
-        interp->hash_seed = Parrot_util_uint_rand(0);
-#if DEBUG_HASH_SEED
-        fprintf(stderr, "HASH SEED: %x\n", interp->hash_seed);
-#endif
+        interp->hash_seed = Parrot_intval_time();
     }
 
     /* initialize the constant string table */
