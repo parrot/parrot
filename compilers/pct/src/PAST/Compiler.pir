@@ -854,23 +854,11 @@ Return the POST representation of a C<PAST::Block>.
     ##  pir-encode name and namespace
     .local string blockreg, blockref
     blockreg = self.'uniquereg'('P')
-    if ns goto block_ns
     blockref = concat ".const 'Sub' ", blockreg
     blockref = concat blockref, ' = '
     $P0 = bpost.'subid'()
     $S0 = self.'escape'($P0)
     blockref = concat blockref, $S0
-    goto have_blockref
-  block_ns:
-    $P0 = get_hll_global ['POST'], 'Compiler'
-    blockref = concat 'get_hll_global ', blockreg
-    $S0 = $P0.'key_pir'(ns)
-    blockref = concat blockref, ', '
-    blockref = concat blockref, $S0
-    $S0 = self.'escape'(name)
-    blockref = concat blockref, ', '
-    blockref = concat blockref, $S0
-  have_blockref:
 
     ##  determine the outer POST::Sub for the new one
     .local pmc outerpost
