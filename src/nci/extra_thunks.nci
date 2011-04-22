@@ -44,14 +44,8 @@
 # mod_parrot
 i    ip
 i    p
-i    tp
-t    p
-t    pt
 v    p
-v    pit
-v    ptt
 i    Vppp
-v    pt
 
 v
 v    i
@@ -67,25 +61,15 @@ v    pp
 i    P
 
 # Added for TclLibrary
-t    p3
 i    pp3p
 i    pp3
 i    ppd
-i    ptii
 i    pipi
-t    ptti
-t    pti
-t    pttti
-
-# crypt
-t    tt
 
 i          # void function returning int like fork()
 i    i3i   # POSIX's waitpid
 
 # win32
-l     lttl
-
 i     pip
 i     piS
 S     i
@@ -131,47 +115,19 @@ i    p    #  unsigned int mysql_field_count(MYSQL *mysql)
 l    p    #! my_ulonglong mysql_affected_rows(MYSQL *mysql)
 l    p    #! my_ulonglong mysql_insert_id(MYSQL *mysql)
 i    p    #  unsigned int mysql_errno(MYSQL *mysql)
-t    p    #  const char * mysql_error(MYSQL *mysql)
-t    p    #  const char * mysql_info(MYSQL *mysql)
 l    p    #  unsigned long mysql_thread_id(MYSQL *mysql)
-t    p    #  const char * mysql_character_set_name(MYSQL *mysql)
 p    p    #  MYSQL * mysql_init(MYSQL *mysql)
 
-i    pttttt      #  int mysql_ssl_set(MYSQL *mysql, const char *key,
-#                        const char *cert, const char *ca, const char *capath,
-#                        const char *cipher)
-c    pttt        #  my_bool mysql_change_user(MYSQL *mysql, const char *user,
-#                        const char *passwd, const char *db)
-p    pttttiti    #  MYSQL * mysql_real_connect(MYSQL *mysql, const char *host,
-#                               const char *user, const char *passwd,
-#                               const char *db, unsigned int port,
-#                               const char *unix_socket,
-#                               unsigned int clientflag)
 v    p     #  void mysql_close(MYSQL *sock)
-i    pt    #  int mysql_select_db(MYSQL *mysql, const char *db)
-i    pt    #  int mysql_query(MYSQL *mysql, const char *q)
-i    ptl   #  int mysql_real_query(MYSQL *mysql, const char *q,
-#                                  unsigned long length)
 i    p     #  int mysql_shutdown(MYSQL *mysql)
 i    p     #  int mysql_dump_debug_info(MYSQL *mysql)
 i    pi    #  int mysql_refresh(MYSQL *mysql, unsigned int refresh_options)
 i    pl    #  int mysql_kill(MYSQL *mysql,unsigned long pid)
 i    p     #  int mysql_ping(MYSQL *mysql)
-t    p     #  const char * mysql_stat(MYSQL *mysql)
-t    p     #  const char * mysql_get_server_info(MYSQL *mysql)
-t    p     #  const char * mysql_get_client_info(void)
 l          #  unsigned long mysql_get_client_version(void)
-t    p     #  const char * mysql_get_host_info(MYSQL *mysql)
-t    p     #  unsigned int mysql_get_proto_info(MYSQL *mysql)
-p    pt    #  MYSQL_RES * mysql_list_dbs(MYSQL *mysql,const char *wild)
-p    pt    #  MYSQL_RES * mysql_list_tables(MYSQL *mysql,const char *wild)
-p    ptt   #  MYSQL_RES * mysql_list_fields(MYSQL *mysql, const char *table,
-#                                           const char *wild)
 p    p     #  MYSQL_RES * mysql_list_processes(MYSQL *mysql)
 p    p     #  MYSQL_RES * mysql_store_result(MYSQL *mysql)
 p    p     #  MYSQL_RES * mysql_use_result(MYSQL *mysql)
-i    pit   #  int mysql_options(MYSQL *mysql,enum mysql_option option,
-#                               const char *arg)
 v    p     #  void mysql_free_result(MYSQL_RES *result)
 v    pl    #  void mysql_data_seek(MYSQL_RES *result, my_ulonglong offset)
 p    pp    #  MYSQL_ROW_OFFSET mysql_row_seek(MYSQL_RES *result,
@@ -182,46 +138,18 @@ i    pi    #  MYSQL_FIELD_OFFSET mysql_field_seek(MYSQL_RES *result,
 p    p     #  MYSQL_ROW mysql_fetch_row(MYSQL_RES *result)
 l    p     #  unsigned long * mysql_fetch_lengths(MYSQL_RES *result)
 p    p     #  MYSQL_FIELD * mysql_fetch_field(MYSQL_RES *result)
-l    ttl   #  unsigned long mysql_escape_string(char *to,const char *from, unsigned long from_length)
-l    pttl  #  unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,const char *from, unsigned long length)
-v    t     #  void mysql_debug(const char *debug)
 # --- end mysqlclient library ---
 
-# My mysql does not fit with the previous section
-p    pttttitl
-#  MYSQL * mysql_real_connect(MYSQL *mysql, const char *host,
-#                               const char *user,
-#                               const char *passwd,
-#                               const char *db,
-#                               unsigned int port,
-#                               const char *unix_socket,
-#                               unsigned long clientflag)
-
-# Used by library/pcre.pir
-p    tiB3P
-p    tip3P
-i    pPtiiipi
-
 # Oddball ones for postgres
-p    ptippppi    PQexecParams
 p    pi33ipi     PQfn
-p    pttip       PQprepage
-p    ptipppi     PQexecPrepared
 p    ppP         PQsetNoticeReceiver
 
 # Used by SDL
 p    iiil
 i    ppl
 v    pip
-p    pti
 i    ppp
 # added by RNH for the RenderXXX_XXXX text routines 
-p    ptii
-
-# Used by SDL::Font
-p    ti
-p    ptp
-i    pt33
 
 # t/pmc/nci.t
 c
@@ -246,10 +174,7 @@ i    iiilsp
 i    iil
 i    iili
 i    iip
-i    iit
-i    iiti
 i    ilsp
-i    iti
 i    l
 i    li
 i    lp
@@ -270,10 +195,7 @@ i    piiiiii
 i    piiilsp
 i    piil
 i    piili
-i    piit
-i    piiti
 i    pilsp
-i    pit
 i    pl
 i    pli
 i    pll
@@ -285,17 +207,12 @@ i    ppi
 i    ppiiiiiiii
 i    pppp
 i    psp
-i    pt
-i    pti
-i    pitl
 i    s
 i    s22
 i    s222
 i    sp
 i    sss
 i    ssss
-i    t
-i    ti
 i    4
 i    4i
 i    42p
@@ -317,33 +234,17 @@ p    iiii
 p    iiiiii
 p    iiiiiiii
 p    p
-p    pt
 p    pi
 p    pii
 p    piiii
-p    t
-p    tpp
-p    ttttttt
 
 s
-
-t
-t    i
-t    ii
-t    p
-t    pi
-t    pii
-t    pt
-t    t
-t    tl4
-t    t4
 
 i    sc
 s    sc
 c    sc
 i    iii
 i    i3
-t    B
 v    P
 v    pP
 p    ip
@@ -362,7 +263,6 @@ i    ppiii
 i    ppiiii
 i    ppiiiii
 i    ppiiiiii
-i    ppt
 i    pppi
 i    pppii
 i    pppiiii
@@ -376,7 +276,4 @@ v    V
 v    VVV
 
 # Testing SQLite
-i    tV
-i    ptiVp
 i    pid
-i    pitii
