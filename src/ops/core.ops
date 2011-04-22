@@ -504,8 +504,8 @@ op set_returns(inconst PMC) :flow {
 op get_results(inconst PMC) :flow {
     opcode_t * const raw_params  = CUR_OPCODE;
     PMC      * const signature   = $1;
-    PMC             *ctx         = CURRENT_CONTEXT(interp);
-    PMC             *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC      * const ctx         = CURRENT_CONTEXT(interp);
+    PMC      * const call_object = Parrot_pcc_get_signature(interp, ctx);
 
     INTVAL argc;
 
@@ -1275,7 +1275,7 @@ inline op loadlib(out PMC, in STR, in PMC) {
 
 op dlfunc(out PMC, invar PMC, in STR, in STR) {
     void         *dl_handle = NULL;
-    void         *ptr       = NULL;
+    void         *ptr;
     funcptr_t     p;
 
     if (!PMC_IS_NULL($2)
@@ -1288,7 +1288,7 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
     p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
-        const char * err = Parrot_dlerror();
+        const char * const err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
                 "Symbol '%Ss' not found: %s\n", $3, err ? err : "unknown reason");
         $1 = Parrot_pmc_new(interp, enum_class_Undef);
@@ -1301,7 +1301,7 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
 
 op dlfunc(out PMC, invar PMC, in STR, invar PMC) {
     void         *dl_handle = NULL;
-    void         *ptr       = NULL;
+    void         *ptr;
     funcptr_t     p;
 
     if (!PMC_IS_NULL($2)
@@ -1314,7 +1314,7 @@ op dlfunc(out PMC, invar PMC, in STR, invar PMC) {
     p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
-        const char * err = Parrot_dlerror();
+        const char * const err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
                 "Symbol '%Ss' not found: %s\n", $3, err ? err : "unknown reason");
         $1 = Parrot_pmc_new(interp, enum_class_Undef);
@@ -1327,7 +1327,7 @@ op dlfunc(out PMC, invar PMC, in STR, invar PMC) {
 
 op dlvar(out PMC, invar PMC, in STR) {
     void *        dl_handle = NULL;
-    void *        p         = NULL;
+    void *        p;
 
     if (!PMC_IS_NULL($2)
     && $2->vtable->base_type == enum_class_ParrotLibrary
