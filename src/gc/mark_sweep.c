@@ -50,6 +50,9 @@ static void free_pmc_in_pool(PARROT_INTERP,
         FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*p);
 
+static void mark_interp(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Fixed_Size_Pool * new_bufferlike_pool(PARROT_INTERP,
@@ -84,6 +87,8 @@ static Fixed_Size_Pool * new_string_pool(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(p))
+#define ASSERT_ARGS_mark_interp __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_new_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_new_fixed_size_obj_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -157,7 +162,6 @@ Parrot_gc_trace_root(PARROT_INTERP,
         Parrot_gc_trace_type trace)
 {
     ASSERT_ARGS(Parrot_gc_trace_root)
-    PObj    *obj;
 
     /* note: adding locals here did cause increased GC runs */
     Parrot_sub_mark_context_start();
@@ -174,6 +178,38 @@ Parrot_gc_trace_root(PARROT_INTERP,
             = interp->iglobals;
     }
 
+
+    if (trace == GC_TRACE_FULL)
+        trace_system_areas(interp, mem_pools);
+
+    mark_interp(interp);
+
+    /* quick check to see if we have already marked all impatient PMCs. If we
+       have, return 0 and exit here. This will alert other parts of the GC
+       that if we are in a lazy run we can just stop it. */
+    if (mem_pools
+        && mem_pools->lazy_gc
+        && mem_pools->num_early_PMCs_seen >= mem_pools->num_early_gc_PMCs)
+        return 0;
+
+    return 1;
+}
+
+/*
+
+=item C<static void mark_interp(PARROT_INTERP)>
+
+Mark an interpreter and all direct children.
+
+=cut
+
+*/
+
+static void
+mark_interp(PARROT_INTERP)
+{
+    ASSERT_ARGS(mark_interp)
+    PObj *obj;
     /* mark the list of iglobals */
     Parrot_gc_mark_PMC_alive(interp, interp->iglobals);
 
@@ -195,7 +231,7 @@ Parrot_gc_trace_root(PARROT_INTERP,
     Parrot_gc_mark_PMC_alive(interp, interp->scheduler);
 
     /* s. packfile.c */
-    Parrot_pf_mark_packfile(interp, interp->initial_pf);
+    Parrot_gc_mark_PMC_alive(interp, interp->current_pf);
 
     /* mark caches and freelists */
     mark_object_cache(interp);
@@ -221,18 +257,8 @@ Parrot_gc_trace_root(PARROT_INTERP,
     if (!PMC_IS_NULL(interp->final_exception))
         Parrot_gc_mark_PMC_alive(interp, interp->final_exception);
 
-    if (trace == GC_TRACE_FULL)
-        trace_system_areas(interp, mem_pools);
-
-    /* quick check to see if we have already marked all impatient PMCs. If we
-       have, return 0 and exit here. This will alert other parts of the GC
-       that if we are in a lazy run we can just stop it. */
-    if (mem_pools
-        && mem_pools->lazy_gc
-        && mem_pools->num_early_PMCs_seen >= mem_pools->num_early_gc_PMCs)
-        return 0;
-
-    return 1;
+    if (interp->parent_interpreter)
+        mark_interp(interp->parent_interpreter);
 }
 
 

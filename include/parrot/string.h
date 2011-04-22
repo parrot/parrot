@@ -119,10 +119,14 @@ typedef STRING * (*str_vtable_downcase_first_t)(PARROT_INTERP, ARGIN(const STRIN
 typedef STRING * (*str_vtable_titlecase_first_t)(PARROT_INTERP, ARGIN(const STRING *src));
 
 /* iterator functions */
-typedef UINTVAL  (*str_vtable_iter_get_t)(PARROT_INTERP, const STRING *str, const String_iter *i, INTVAL offset);
-typedef void     (*str_vtable_iter_skip_t)(PARROT_INTERP, const STRING *str, String_iter *i, INTVAL skip);
-typedef UINTVAL  (*str_vtable_iter_get_and_advance_t)(PARROT_INTERP, const STRING *str, String_iter *i);
-typedef void     (*str_vtable_iter_set_and_advance_t)(PARROT_INTERP, STRING *str, String_iter *i, UINTVAL c);
+typedef UINTVAL  (*str_vtable_iter_get_t)(PARROT_INTERP, ARGIN(const STRING *str),
+                    ARGIN(const String_iter *i), INTVAL offset);
+typedef void     (*str_vtable_iter_skip_t)(PARROT_INTERP, ARGIN(const STRING *str),
+                    ARGIN(String_iter *i), INTVAL skip);
+typedef UINTVAL  (*str_vtable_iter_get_and_advance_t)(PARROT_INTERP,
+                    ARGIN(const STRING *str), ARGMOD(String_iter *i));
+typedef void     (*str_vtable_iter_set_and_advance_t)(PARROT_INTERP, ARGIN(STRING *str),
+                    ARGMOD(String_iter *i), UINTVAL c);
 
 struct _str_vtable {
     int         num;

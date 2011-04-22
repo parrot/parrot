@@ -136,9 +136,7 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
         interp->parent_interpreter = NULL;
         emergency_interp           = interp;
 
-#if PARROT_CATCH_NULL
         PMCNULL                    = NULL;
-#endif
 
         /*
          * we need a global mutex to protect the interpreter array
@@ -256,7 +254,7 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->all_op_libs         = NULL;
     interp->evc_func_table      = NULL;
     interp->evc_func_table_size = 0;
-    interp->initial_pf          = NULL;
+    interp->current_pf          = PMCNULL;
     interp->code                = NULL;
 
     /* create exceptions list */
@@ -424,9 +422,9 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
     destroy_runloop_jump_points(interp);
 
-    /* packfile */
-    if (interp->initial_pf)
-        PackFile_destroy(interp, interp->initial_pf);
+    /* XXX Fix abstraction leak. packfile */
+    if (!PMC_IS_NULL(interp->current_pf))
+        PackFile_destroy(interp, (PackFile*) VTABLE_get_pointer(interp, interp->current_pf));
 
     /* cache structure */
     destroy_object_cache(interp);

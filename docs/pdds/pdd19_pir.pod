@@ -491,11 +491,11 @@ and the file C<foo.pir> contains:
 =begin PIR
 
     .sub foo :immediate
-        print '42'
+        $I0 = 4
     .end
 
     .sub bar :postcomp
-        print '43'
+        $I0 = 3
     .end
 
 =end PIR

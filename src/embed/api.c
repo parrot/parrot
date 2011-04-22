@@ -330,14 +330,11 @@ Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
 {
     ASSERT_ARGS(Parrot_api_load_bytecode_file)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PackFile * const pf = PackFile_read_pbc(interp, filename, 0);
-    if (!pf)
+    *pbc = PackFile_read_pbc(interp, filename, 0);
+    if (PMC_IS_NULL(*pbc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
             "Could not load packfile");
-    do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
-    Parrot_block_GC_mark(interp);
-    *pbc = Parrot_pf_get_packfile_pmc(interp, pf);
-    Parrot_unblock_GC_mark(interp);
+    do_sub_pragmas(interp, *pbc, PBC_PBC, NULL);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -369,8 +366,8 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
     if (!PackFile_unpack(interp, pf, (const opcode_t *)pbc, bytecode_size))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
             "Could not unpack packfile");
-    do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
     *pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf);
+    do_sub_pragmas(interp, *pbcpmc, PBC_PBC, NULL);
     Parrot_unblock_GC_mark(interp);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
@@ -411,7 +408,8 @@ Parrot_api_ready_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile.");
     if (pf->cur_cs)
-        Parrot_pf_set_current_packfile(interp, pf);
+        Parrot_pf_set_current_packfile(interp, pbc);
+
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
     *main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
     Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
@@ -451,7 +449,7 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
             "Could not get packfile.");
     if (!mainargs)
         mainargs = PMCNULL;
-    Parrot_pf_execute_bytecode_program(interp, pf, mainargs);
+    Parrot_pf_execute_bytecode_program(interp, pbc, mainargs);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -479,7 +477,7 @@ Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile.");
     if (pf->cur_cs)
-        Parrot_pf_set_current_packfile(interp, pf);
+        Parrot_pf_set_current_packfile(interp, pbc);
     /* TODO: Break up the dependency with emebed.c */
     Parrot_disassemble(interp, outfile, (Parrot_disassemble_options)opts);
     EMBED_API_CALLOUT(interp_pmc, interp);
@@ -536,16 +534,19 @@ Parrot_api_write_bytecode_to_file(Parrot_PMC interp_pmc, Parrot_PMC pbc,
 {
     ASSERT_ARGS(Parrot_api_write_bytecode_to_file)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PMC * filepmc = PMCNULL;
     PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile.");
     else {
-        PIOHANDLE fp = PIO_OPEN(interp, filename, PIO_F_WRITE);
-        if (fp == PIO_INVALID_HANDLE)
+        PIOHANDLE fp;
+        Parrot_block_GC_mark(interp);
+        fp = PIO_OPEN(interp, filename, PIO_F_WRITE);
+        if (fp == PIO_INVALID_HANDLE) {
+            Parrot_unblock_GC_mark(interp);
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot open output file %Ss", filename);
+        }
         else {
             const Parrot_Int size = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
             opcode_t * const packed = (opcode_t*)mem_sys_allocate(size);
@@ -553,6 +554,7 @@ Parrot_api_write_bytecode_to_file(Parrot_PMC interp_pmc, Parrot_PMC pbc,
             PIO_WRITE(interp, fp, (char *)packed, size);
         }
         PIO_CLOSE(interp, fp);
+        Parrot_unblock_GC_mark(interp);
     }
 
     EMBED_API_CALLOUT(interp_pmc, interp)
@@ -602,6 +604,10 @@ Parrot_api_add_library_search_path(Parrot_PMC interp_pmc,
     ASSERT_ARGS(Parrot_api_add_library_search_path)
     EMBED_API_CALLIN(interp_pmc, interp)
     Parrot_lib_add_path_from_cstring(interp, path, PARROT_LIB_PATH_LIBRARY);
+
+    /* EXPERIMENTAL. This line has been added experimentally because it is a
+       missing feature, and it may go away at any time without warning. */
+    Parrot_lib_add_path_from_cstring(interp, path, PARROT_LIB_PATH_LANG);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 

@@ -63,9 +63,6 @@ typedef @float8_t@              Parrot_Float8;
 #  define PARROT_FLOATVAL_MAX            @floatvalmax@
 #endif
 
-/* Temporary until we find a way to make it work in the right place. */
-struct PackFile;      typedef struct PackFile * Parrot_PackFile;
-
 /* Symbol export and import decoration. At the time of writing, note that
  * PARROT_IN_CORE won't always imply !PARROT_IN_EXTENSION. */
 #if defined(PARROT_IN_EXTENSION)

@@ -2012,6 +2012,8 @@ SRC_TEST_FILES = \
     t/src/*.t \
     t/src/embed/*.t
 TOOLS_TEST_FILES = $(TOOLS_TESTS_DIR)/tools/*.t
+GC_TEST_FILES = \
+    t/compilers/opsc/*.t
 
 # pbc files used for several tests;
 # not needed for build, hence this target is not included in 'all'
@@ -2164,6 +2166,9 @@ manifest_tests :
 
 examples_tests : test_prep
 	$(PERL) t/harness $(EXAMPLES_TEST_FILES)
+
+gc_tests : test_prep
+	$(PERL) t/harness $(GC_TEST_FILES)
 
 # moretests: Good to use before branch merges
 moretests: test_prep \
