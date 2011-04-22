@@ -277,7 +277,6 @@ nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
       case enum_nci_sig_intval: return &ffi_type_parrot_intval;
 
       case enum_nci_sig_string:
-      case enum_nci_sig_cstring:
       case enum_nci_sig_bufref:
                                 return &ffi_type_pointer;
 
@@ -399,13 +398,6 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
               case enum_nci_sig_string:
                 translation_pointers[i] = pcc_arg[j++].s;
                 values[i]               = &translation_pointers[i];
-                break;
-              case enum_nci_sig_cstring:
-                translation_pointers[i] = STRING_IS_NULL(pcc_arg[j].s) ?
-                    (char *)NULL :
-                    Parrot_str_to_cstring(interp, pcc_arg[j].s);
-                j++;
-                values[i] = &translation_pointers[i];
                 break;
               case enum_nci_sig_bufref:
                 translation_pointers[i] = STRING_IS_NULL(pcc_arg[j].s) ?
@@ -532,12 +524,6 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                         call_object,
                         s, final_destination.p);
                 break;
-            case enum_nci_sig_cstring:
-                final_destination.s = Parrot_str_new(interp, *(char **)return_data, 0);
-                ret_object = Parrot_pcc_build_call_from_c_args(interp,
-                        call_object,
-                        s, final_destination.s);
-                break;
             case enum_nci_sig_float:
                 final_destination.n = *(float *)return_data;
 
@@ -574,11 +560,6 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
     for (i = 0; i < nci->arity; i++) {
         switch (VTABLE_get_integer_keyed_int(interp, nci->signature, i + 1)) {
             case enum_nci_sig_bufref:
-                if (translation_pointers[i]) {
-                    Parrot_str_free_cstring((char*)translation_pointers[i]);
-                }
-                break;
-            case enum_nci_sig_cstring:
                 if (translation_pointers[i]) {
                     Parrot_str_free_cstring((char*)translation_pointers[i]);
                 }
