@@ -9,12 +9,9 @@ EXPORTS
     nci_fff
     nci_i
     nci_iiii
-    nci_ii3
     nci_isc
     nci_ip
     nci_ipP
-    nci_i33
-    nci_i4i
     nci_l
     nci_p
     nci_pi
@@ -28,7 +25,6 @@ EXPORTS
     nci_vP
     nci_vpii
     nci_vv
-    nci_vVi
     nci_vp
     nci_cb_C1
     nci_cb_C2

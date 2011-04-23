@@ -35,7 +35,7 @@ SKIP: {
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
         plan skip_all => "Please make libnci_test$PConfig{load_ext}";
     }
-    plan tests => 65;
+    plan tests => 58;
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'load library fails' );
 .sub test :main
@@ -723,47 +723,6 @@ OUTPUT
 CODE
 10 20 30
 2
-OUTPUT
-
-    pasm_output_is( <<'CODE', <<'OUTPUT', "nci_i4i" );
-.pcc_sub :main main:
-  loadlib P1, "libnci_test"
-  dlfunc P0, P1, "nci_i4i", "i4i"
-  new P5, ['Integer']
-  set P5, -6
-  set I5, -7
-  set_args "0,0", P5,I5
-  invokecc P0
-  get_results "0", I5
-  print I5
-  print "\n"
-  end
-CODE
-42
-OUTPUT
-
-    pasm_output_is( <<'CODE', <<'OUTPUT', "nci_ii3" );
-.pcc_sub :main main:
-.include "datatypes.pasm"
-  loadlib P1, "libnci_test"
-  dlfunc P0, P1, "nci_ii3", "ii3"
-  set I5, -6
-
-  new P5, ['Integer']
-  set P5, -7
-
-  set_args "0,0", I5,P5
-  invokecc P0
-  get_results "0", I5
-
-  print I5
-  print "\n"
-  print P5
-  print "\n"
-  end
-CODE
-42
-4711
 OUTPUT
 
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_pi - struct with ints" );
@@ -2077,36 +2036,6 @@ W: 420
 H: 430
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_i33 - out parameters and return values' );
-.pcc_sub :main main:
-
-.include "datatypes.pasm"
-  new P2, ['Integer']
-  set P2, 3
-  new P3, ['Integer']
-  set P3, 2
-
-  loadlib P1, "libnci_test"
-  set_args "0,0", P2, P3
-  dlfunc P0, P1, "nci_i33", "i33"
-  invokecc P0
-  get_results "0", I5
-
-  print "Double: "
-  print P2
-  print "\nTriple: "
-  print P3
-  print "\nSum: "
-  print I5
-  print "\n"
-
-  end
-CODE
-Double: 6
-Triple: 6
-Sum: 12
-OUTPUT
-
 pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_vpii - nested structs' );
 .pcc_sub :main main:
 
@@ -2471,24 +2400,6 @@ CODE
 42
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "conversion I <-> P" );
-.sub test :main
-    .local string library_name
-    library_name = 'libnci_test'
-    .local pmc libnci_test
-    libnci_test = loadlib  library_name
-    .local pmc mult
-    mult = dlfunc libnci_test, "nci_i4i", "i4i"
-    .local pmc i, j
-    i = new ['Integer']
-    i = 2
-    j = mult( 21, i )       # call signature is PI
-    say j
-.end
-CODE
-42
-OUTPUT
-
 pir_output_is(
     << 'CODE', << 'OUTPUT', 'nested structs should be independent' );
 .include 'datatypes.pasm'
@@ -2604,33 +2515,6 @@ CODE
 3
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "nci_vVi - void** out parameter" );
-.sub test :main
-    .local string library_name
-    library_name = 'libnci_test'
-    .local pmc libnci_test
-    libnci_test = loadlib  library_name
-
-    .local pmc nci_vVi
-    nci_vVi = dlfunc libnci_test, "nci_vVi", "vVi"
-
-    .local pmc nci_vp
-    nci_vp = dlfunc libnci_test, "nci_vp", "vp"
-
-    .local pmc opaque
-    null opaque
-    nci_vp(opaque)
-
-    opaque = new ['Pointer']
-    $I0 = 10
-    nci_vVi(opaque, $I0)
-    nci_vp(opaque)
-.end
-CODE
-got null
-got 10
-OUTPUT
-
 pir_output_is( << 'CODE', << 'OUTPUT', "nci_vfff - v_fff parameter" );
 .sub test :main
     .local string library_name
@@ -2647,54 +2531,6 @@ CODE
 1
 1
 1
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "nci_vV - char** out parameter" );
-.sub test :main
-    .local string library_name
-    library_name = 'libnci_test'
-    .local pmc libnci_test
-    libnci_test = loadlib  library_name
-
-    .local pmc nci_vV
-    nci_vV = dlfunc libnci_test, "nci_vV", "vV"
-
-    .local pmc char_s_s
-    char_s_s = new ['Pointer']
-    nci_vV(char_s_s)
-    $S0 = char_s_s
-    print $S0
-.end
-CODE
-Hello bright new world
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "nci_vVV - multiple char** out parameters" );
-.sub test :main
-    .local string library_name
-    library_name = 'libnci_test'
-    .local pmc libnci_test
-    libnci_test = loadlib  library_name
-
-    .local pmc nci_vVVV
-    nci_vVVV = dlfunc libnci_test, "nci_vVVV", "vVVV"
-
-    .local pmc char_s_s1, char_s_s2, char_s_s3
-    char_s_s1 = new ['Pointer']
-    char_s_s2 = new ['Pointer']
-    char_s_s3 = new ['Pointer']
-    nci_vVVV(char_s_s1, char_s_s2, char_s_s3)
-    $S1 = char_s_s1
-    print $S1
-    $S1 = char_s_s2
-    print $S1
-    $S1 = char_s_s3
-    print $S1
-.end
-CODE
-Hello bright new world!
-It is a beautiful day!
-Go suck a lemon.
 OUTPUT
 
 # Local Variables:

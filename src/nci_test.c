@@ -80,11 +80,8 @@ PARROT_DYNEXT_EXPORT float  nci_fff(float, float);
 PARROT_DYNEXT_EXPORT int    nci_i(void);
 PARROT_DYNEXT_EXPORT int    nci_ib(int *);
 PARROT_DYNEXT_EXPORT int    nci_iiii(int, int, int);
-PARROT_DYNEXT_EXPORT int    nci_ii3(int, int *);
 PARROT_DYNEXT_EXPORT int    nci_ip(void *);
 PARROT_DYNEXT_EXPORT int    nci_isc(short, char);
-PARROT_DYNEXT_EXPORT int    nci_i33(int *, int *);
-PARROT_DYNEXT_EXPORT int    nci_i4i(long *, int);
 PARROT_DYNEXT_EXPORT long   nci_l(void);
 PARROT_DYNEXT_EXPORT int *  nci_p(void);
 PARROT_DYNEXT_EXPORT void * nci_pi(int);
@@ -98,12 +95,9 @@ PARROT_DYNEXT_EXPORT void   nci_v(void);
 PARROT_DYNEXT_EXPORT void   nci_vP(void *);
 PARROT_DYNEXT_EXPORT void   nci_vpii(Outer *, int, int);
 PARROT_DYNEXT_EXPORT void   nci_vv(void);
-PARROT_DYNEXT_EXPORT void   nci_vVi(Opaque**, int);
 PARROT_DYNEXT_EXPORT void   nci_vp(Opaque*);
 PARROT_DYNEXT_EXPORT char * nci_ttt(char *, char *);
 PARROT_DYNEXT_EXPORT void   nci_vfff(float, float, float);
-PARROT_DYNEXT_EXPORT void   nci_vV(const char **);
-PARROT_DYNEXT_EXPORT void   nci_vVVV(const char **, const char **, const char **);
 
 /* Declarations for callback tests */
 
@@ -399,46 +393,6 @@ nci_iiii(int i1, int i2, int i3)
     fflush(stderr);
 
     return 2;
-}
-
-/*
-
-=item C<PARROT_DYNEXT_EXPORT int nci_i4i(long * l, int i)>
-
-Returns the product of C<*l> and C<i>, as an int.
-
-=cut
-
-*/
-
-PARROT_DYNEXT_EXPORT
-PARROT_PURE_FUNCTION
-int
-nci_i4i(long * l, int i)
-{
-
-    return (int) (*l * i);
-}
-
-/*
-
-=item C<PARROT_DYNEXT_EXPORT int nci_ii3(int a, int *bp)>
-
-Multiplies C<a> and C<*bp> together and returns the result. Updates C<*bp>
-to the value  4711.
-
-=cut
-
-*/
-
-PARROT_DYNEXT_EXPORT
-int
-nci_ii3(int a, int *bp)
-{
-    int r = a * *bp;
-    *bp = 4711;
-
-    return r;
 }
 
 /*
@@ -868,26 +822,6 @@ nci_pip(int count, Rect_Like *rects)
 
 /*
 
-=item C<PARROT_DYNEXT_EXPORT int nci_i33(int *double_me, int *triple_me)>
-
-Doubles C<double_me> and triples C<triple_me>. Returns their sum.
-
-=cut
-
-*/
-
-PARROT_DYNEXT_EXPORT
-int
-nci_i33(ARGMOD(int *double_me), ARGMOD(int *triple_me))
-{
-    *double_me *= 2;
-    *triple_me *= 3;
-
-    return (*double_me + *triple_me);
-}
-
-/*
-
 =item C<PARROT_DYNEXT_EXPORT void nci_vpii(Outer *my_data, int my_x, int my_y)>
 
 Updates data in structure pointer C<my_data> with the given data C<my_x> and
@@ -996,25 +930,6 @@ nci_vv(void)
 
 /*
 
-=item C<PARROT_DYNEXT_EXPORT void nci_vVi(Opaque **outOpaque, int x)>
-
-Test an NCI opaque struct out value.
-
-=cut
-
-*/
-
-PARROT_DYNEXT_EXPORT
-void
-nci_vVi(ARGOUT(Opaque **outOpaque), int x)
-{
-    static Opaque opaque;
-    opaque.x = x;
-    *outOpaque = &opaque;
-}
-
-/*
-
 =item C<PARROT_DYNEXT_EXPORT void nci_vp(Opaque *inOpaque)>
 
 Test that a previously generated opaque struct gets passed back
@@ -1093,45 +1008,6 @@ nci_vfff(float l1, float l2, float l3)
     validate_float(l1, 3456.54);
     validate_float(l2, 10.1999);
     validate_float(l3, 14245.567);
-}
-
-
-/*
-
-=item C<PARROT_DYNEXT_EXPORT void nci_vV(const char **ptr)>
-
-Sets C<*ptr> to "Hello bright new world\n".
-
-=cut
-
-*/
-
-PARROT_DYNEXT_EXPORT
-void
-nci_vV(const char **ptr)
-{
-    *ptr = "Hello bright new world\n";
-}
-
-/*
-
-=item C<PARROT_DYNEXT_EXPORT void nci_vVVV(const char **ptr1, const char **ptr2,
-const char **ptr3)>
-
-Sets C<*ptr1> to "Hello bright new world!\n", C<*ptr2> to "It is a beautiful
-day!\n", and C<*ptr3> to "Go suck a lemon.\n".
-
-=cut
-
-*/
-
-PARROT_DYNEXT_EXPORT
-void
-nci_vVVV(const char **ptr1, const char **ptr2, const char **ptr3)
-{
-    *ptr1 = "Hello bright new world!\n";
-    *ptr2 = "It is a beautiful day!\n";
-    *ptr3 = "Go suck a lemon.\n";
 }
 
 #ifdef TEST
