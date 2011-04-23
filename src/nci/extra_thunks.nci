@@ -40,7 +40,6 @@
 i    ip
 i    p
 v    p
-i    Vppp
 
 v
 v    i
@@ -245,7 +244,6 @@ p    ip
 i    33
 v    pii
 
-v    Vi
 v    p
 
 # Testing xlib
@@ -264,10 +262,6 @@ i    ppppiiiiii
 
 # Testing OpenGL
 v    fff
-
-# Testing Pointer PMC use
-v    V
-v    VVV
 
 # Testing SQLite
 i    pid

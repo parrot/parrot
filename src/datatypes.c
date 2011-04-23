@@ -40,14 +40,19 @@ INTVAL
 Parrot_dt_get_datatype_enum(PARROT_INTERP, ARGIN(STRING *type_name))
 {
     ASSERT_ARGS(Parrot_dt_get_datatype_enum)
-    char *type = Parrot_str_to_cstring(interp, type_name);
+    char *type;
     int flags = 0;
     int i;
+
+    if (STRING_IS_NULL(type_name) || STRING_IS_EMPTY(type_name))
+        return enum_type_undef;
 
     if ('&' == Parrot_str_indexed(interp, type_name, Parrot_str_length(interp, type_name) - 1)) {
         type_name  = Parrot_str_substr(interp, type_name, 0, Parrot_str_length(interp, type_name) - 1);
         flags     |= enum_type_ref_flag;
     }
+    
+    type = Parrot_str_to_cstring(interp, type_name);
 
     for (i = enum_first_type; i < enum_last_type; ++i) {
         if (STREQ(data_types[i - enum_first_type].name, type)) {

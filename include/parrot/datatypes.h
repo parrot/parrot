@@ -54,6 +54,8 @@ typedef enum {
     enum_type_uint32,
     enum_type_uint64,
 
+    enum_type_void,
+
     enum_type_ptr,              /* native pointer */
     enum_type_cstr,             /* c string */
     enum_type_struct_ptr,       /* pointer to another struct */
@@ -134,6 +136,8 @@ const struct _data_types data_types[] = {
 #  else
     { "uint64",     0,                           0 },
 #  endif
+
+    { "void",       0,                          0 },
 
     { "ptr",        sizeof (void *),             ALIGNOF(void *) },
     { "cstr",       sizeof (char *),             ALIGNOF(char *) },

@@ -17,29 +17,6 @@ typedef PMC *(*nci_fb_func_t)(PARROT_INTERP, PMC *user_data, PMC *signature);
 typedef void (*nci_thunk_t)(PARROT_INTERP, PMC *, PMC *);
 typedef void (*native_pcc_method_t)(PARROT_INTERP);
 
-typedef enum {
-    enum_nci_sig_void,
-
-    enum_nci_sig_float,
-    enum_nci_sig_double,
-    enum_nci_sig_numval,
-
-    enum_nci_sig_char,
-    enum_nci_sig_short,
-    enum_nci_sig_int,
-    enum_nci_sig_long,
-    enum_nci_sig_intval,
-
-    enum_nci_sig_string,
-
-    enum_nci_sig_ptr,
-    enum_nci_sig_pmc,
-    enum_nci_sig_ptrref,
-    enum_nci_sig_shortref,
-    enum_nci_sig_intref,
-    enum_nci_sig_longref
-} nci_sig_elem_t;
-
 void Parrot_nci_load_core_thunks(PARROT_INTERP);
 void Parrot_nci_load_extra_thunks(PARROT_INTERP);
 

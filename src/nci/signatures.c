@@ -49,63 +49,63 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
 
     for (i = 0; i < sig_length; ++i) {
         const INTVAL c = Parrot_str_indexed(interp, sig_str, i);
-        nci_sig_elem_t e;
+        PARROT_DATA_TYPE e;
 
         PARROT_ASSERT(c == (char)c);
 
         switch ((char)c) {
           case 'f':
-            e = enum_nci_sig_float;
+            e = enum_type_float;
             break;
           case 'd':
-            e = enum_nci_sig_double;
+            e = enum_type_double;
             break;
           case 'N':
-            e = enum_nci_sig_numval;
+            e = enum_type_FLOATVAL;
             break;
 
           case 'c':   /* char */
-            e = enum_nci_sig_char;
+            e = enum_type_char;
             break;
           case 's':   /* short */
-            e = enum_nci_sig_short;
+            e = enum_type_short;
             break;
           case 'i':   /* int */
-            e = enum_nci_sig_int;
+            e = enum_type_int;
             break;
           case 'l':   /* long */
-            e = enum_nci_sig_long;
+            e = enum_type_long;
             break;
           case 'I':   /* INTVAL */
-            e = enum_nci_sig_intval;
+            e = enum_type_INTVAL;
             break;
 
           case 'S':
-            e = enum_nci_sig_string;
+            e = enum_type_STRING;
             break;
 
           case 'p':   /* push pmc->data */
-            e = enum_nci_sig_ptr;
+            e = enum_type_ptr;
             break;
           case 'O':   /* PMC invocant */
           case 'P':   /* push PMC * */
-            e = enum_nci_sig_pmc;
+            e = enum_type_PMC;
             break;
           case 'V':   /* push PMC * */
-            e = enum_nci_sig_ptrref;
+            e = enum_type_ptr   | enum_type_ref_flag;
             break;
-          case '2':
-            e = enum_nci_sig_shortref;
+            case '2':
+            e = enum_type_short | enum_type_ref_flag;
             break;
-          case '3':
-            e = enum_nci_sig_intref;
+            case '3':
+            e = enum_type_int   | enum_type_ref_flag;
             break;
-          case '4':
-            e = enum_nci_sig_longref;
+            case '4':
+            e = enum_type_long  | enum_type_ref_flag;
             break;
 
           case 'v':
-            e = enum_nci_sig_void;
+            e = enum_type_void;
             break;
           default:
             Parrot_ex_throw_from_c_args(interp, NULL,
@@ -118,7 +118,7 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
     }
 
     if (VTABLE_elements(interp, sig_pmc) < 1)
-        VTABLE_push_integer(interp, sig_pmc, enum_nci_sig_void);
+        VTABLE_push_integer(interp, sig_pmc, enum_type_void);
 
     return sig_pmc;
 }
@@ -155,35 +155,35 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
     size_t i;
 
     for (i = 0; i < sig_len; i++) {
-        const nci_sig_elem_t e = (nci_sig_elem_t)VTABLE_get_integer_keyed_int(interp, sig_pmc, i);
+        const PARROT_DATA_TYPE e = (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, sig_pmc, i);
 
         switch (e) {
-          case enum_nci_sig_void:
+          case enum_type_void:
             /* null return */
             if (i == 0)
                 sig_buf[i] = '\0';
             break;
-          case enum_nci_sig_float:
-          case enum_nci_sig_double:
-          case enum_nci_sig_numval:
+          case enum_type_float:
+          case enum_type_double:
+          case enum_type_FLOATVAL:
             sig_buf[i] = 'N';
             break;
-          case enum_nci_sig_char:
-          case enum_nci_sig_short:
-          case enum_nci_sig_int:
-          case enum_nci_sig_long:
-          case enum_nci_sig_intval:
+          case enum_type_char:
+          case enum_type_short:
+          case enum_type_int:
+          case enum_type_long:
+          case enum_type_INTVAL:
             sig_buf[i] = 'I';
             break;
-          case enum_nci_sig_string:
+          case enum_type_STRING:
             sig_buf[i] = 'S';
             break;
-          case enum_nci_sig_ptr:
-          case enum_nci_sig_pmc:
-          case enum_nci_sig_ptrref:
-          case enum_nci_sig_shortref:
-          case enum_nci_sig_intref:
-          case enum_nci_sig_longref:
+          case enum_type_ptr:
+          case enum_type_PMC:
+          case enum_type_ptr   | enum_type_ref_flag:
+          case enum_type_short | enum_type_ref_flag:
+          case enum_type_int   | enum_type_ref_flag:
+          case enum_type_long  | enum_type_ref_flag:
             sig_buf[i] = 'P';
             break;
           default:

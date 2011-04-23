@@ -106,7 +106,7 @@ static PMC * init_thunk_pmc(PARROT_INTERP, ARGMOD(ffi_thunk_t *thunk_data))
         FUNC_MODIFIES(*thunk_data);
 
 PARROT_CAN_RETURN_NULL
-static ffi_type * nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
+static ffi_type * nci_to_ffi_type(PARROT_INTERP, PARROT_DATA_TYPE nci_t)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_build_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -230,14 +230,14 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
     {
         INTVAL     argc  = VTABLE_elements(interp, sig) - 1;
         ffi_type  *ret_t = nci_to_ffi_type(interp,
-                                (nci_sig_elem_t)VTABLE_get_integer_keyed_int(interp, sig, 0));
+                                (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, sig, 0));
         ffi_type **arg_t =  thunk_data->arg_types =
                             mem_gc_allocate_n_zeroed_typed(interp, argc, ffi_type *);
         int        i;
 
         for (i = 0; i < argc; i++)
             arg_t[i] = nci_to_ffi_type(interp,
-                            (nci_sig_elem_t)VTABLE_get_integer_keyed_int(interp, sig, i + 1));
+                            (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, sig, i + 1));
 
         if (ffi_prep_cif(&thunk_data->cif, FFI_DEFAULT_ABI, argc, ret_t, arg_t) != FFI_OK)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
@@ -250,7 +250,7 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
 
 /*
 
-=item C<static ffi_type * nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)>
+=item C<static ffi_type * nci_to_ffi_type(PARROT_INTERP, PARROT_DATA_TYPE nci_t)>
 
 Convert an NCI type specification into the corresponding LibFFI type.
 
@@ -260,31 +260,31 @@ Convert an NCI type specification into the corresponding LibFFI type.
 
 PARROT_CAN_RETURN_NULL
 static ffi_type *
-nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
+nci_to_ffi_type(PARROT_INTERP, PARROT_DATA_TYPE nci_t)
 {
     ASSERT_ARGS(nci_to_ffi_type)
     switch (nci_t) {
-      case enum_nci_sig_void:   return &ffi_type_void;
+      case enum_type_void:     return &ffi_type_void;
 
-      case enum_nci_sig_float:  return &ffi_type_float;
-      case enum_nci_sig_double: return &ffi_type_double;
-      case enum_nci_sig_numval: return &ffi_type_parrot_numval;
+      case enum_type_float:    return &ffi_type_float;
+      case enum_type_double:   return &ffi_type_double;
+      case enum_type_FLOATVAL: return &ffi_type_parrot_numval;
 
-      case enum_nci_sig_char:   return &ffi_type_schar;
-      case enum_nci_sig_short:  return &ffi_type_sshort;
-      case enum_nci_sig_int:    return &ffi_type_sint;
-      case enum_nci_sig_long:   return &ffi_type_slong;
-      case enum_nci_sig_intval: return &ffi_type_parrot_intval;
+      case enum_type_char:     return &ffi_type_schar;
+      case enum_type_short:    return &ffi_type_sshort;
+      case enum_type_int:      return &ffi_type_sint;
+      case enum_type_long:     return &ffi_type_slong;
+      case enum_type_INTVAL:   return &ffi_type_parrot_intval;
 
-      case enum_nci_sig_string:
+      case enum_type_STRING:
                                 return &ffi_type_pointer;
 
-      case enum_nci_sig_ptr:
-      case enum_nci_sig_pmc:
-      case enum_nci_sig_ptrref:
-      case enum_nci_sig_shortref:
-      case enum_nci_sig_intref:
-      case enum_nci_sig_longref:
+      case enum_type_ptr:
+      case enum_type_PMC:
+      case enum_type_ptr   | enum_type_ref_flag:
+      case enum_type_short | enum_type_ref_flag:
+      case enum_type_int   | enum_type_ref_flag:
+      case enum_type_long  | enum_type_ref_flag:
                                 return &ffi_type_pointer;
 
       default:
@@ -393,16 +393,16 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
         for (i = 0, j = 0; i < nci->arity; i++) {
             pmc_holder_t *pmc_holder;
             switch (VTABLE_get_integer_keyed_int(interp, nci->signature, i + 1)) {
-              case enum_nci_sig_string:
+              case enum_type_STRING:
                 translation_pointers[i] = pcc_arg[j++].s;
                 values[i]               = &translation_pointers[i];
                 break;
-              case enum_nci_sig_char:
+              case enum_type_char:
                 translation_pointers[i]            = mem_internal_allocate_zeroed_typed(char);
                 *(char *)(translation_pointers[i]) = (char)pcc_arg[j++].i;
                 values[i]                          = translation_pointers[i];
                 break;
-              case enum_nci_sig_shortref:
+              case enum_type_short | enum_type_ref_flag:
                 pmc_holder              = mem_internal_allocate_zeroed_typed(pmc_holder_t);
                 translation_pointers[i] = pmc_holder;
                 pmc_holder->pmc         = pcc_arg[j].p;
@@ -411,12 +411,12 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 j++;
                 values[i]               = &pmc_holder->ptr;
                 break;
-              case enum_nci_sig_short:
+              case enum_type_short:
                 translation_pointers[i]           = mem_internal_allocate_zeroed_typed(short);
                 *(short *)translation_pointers[i] = (short)pcc_arg[j++].i;
                 values[i]                         = translation_pointers[i];
                 break;
-              case enum_nci_sig_intref:
+              case enum_type_int | enum_type_ref_flag:
                 pmc_holder              = mem_internal_allocate_zeroed_typed(pmc_holder_t);
                 translation_pointers[i] = pmc_holder;
                 pmc_holder->pmc         = pcc_arg[j].p;
@@ -425,12 +425,12 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 j++;
                 values[i]               = &pmc_holder->ptr;
                 break;
-              case enum_nci_sig_int:
+              case enum_type_int:
                 translation_pointers[i]           = mem_internal_allocate_zeroed_typed(int);
                 *(int *)(translation_pointers[i]) = (int)pcc_arg[j++].i;
                 values[i]                         = translation_pointers[i];
                 break;
-              case enum_nci_sig_longref:
+              case enum_type_long | enum_type_ref_flag:
                 pmc_holder              = mem_internal_allocate_zeroed_typed(pmc_holder_t);
                 translation_pointers[i] = pmc_holder;
                 pmc_holder->pmc         = pcc_arg[j].p;
@@ -439,12 +439,12 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 j++;
                 values[i]               = &pmc_holder->ptr;
                 break;
-              case enum_nci_sig_long:
+              case enum_type_long:
                 translation_pointers[i]            = mem_internal_allocate_zeroed_typed(long);
                 *(long *)(translation_pointers[i]) = (long)pcc_arg[j++].i;
                 values[i]                          = translation_pointers[i];
                 break;
-              case enum_nci_sig_ptrref:
+              case enum_type_ptr | enum_type_ref_flag:
                 pmc_holder              = mem_internal_allocate_zeroed_typed(pmc_holder_t);
                 translation_pointers[i] = pmc_holder;
                 pmc_holder->pmc         = pcc_arg[j].p;
@@ -455,27 +455,27 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 j++;
                 values[i]               = &pmc_holder->ptr;
                 break;
-              case enum_nci_sig_pmc:
+              case enum_type_PMC:
                 translation_pointers[i] = pcc_arg[j++].p;
                 values[i]               = &translation_pointers[i];
                 break;
-              case enum_nci_sig_ptr:
+              case enum_type_ptr:
                 translation_pointers[i] = PMC_IS_NULL(pcc_arg[j].p) ?
                     (void *)NULL : VTABLE_get_pointer(interp, pcc_arg[j].p);
                 j++;
                 values[i]               = &translation_pointers[i];
                 break;
-              case enum_nci_sig_float:
+              case enum_type_float:
                 translation_pointers[i]           = mem_internal_allocate_zeroed_typed(float);
                 *(float *)translation_pointers[i] = (float)pcc_arg[j++].n;
                 values[i]                         = translation_pointers[i];
                 break;
-              case enum_nci_sig_double:
+              case enum_type_double:
                 translation_pointers[i]            = mem_internal_allocate_zeroed_typed(double);
                 *(double *)translation_pointers[i] = (double)pcc_arg[j++].n;
                 values[i]                          = translation_pointers[i];
                 break;
-              case enum_nci_sig_numval:
+              case enum_type_FLOATVAL:
                 translation_pointers[i] = mem_internal_allocate_zeroed_typed(FLOATVAL);
                 *(FLOATVAL *)translation_pointers[i] = pcc_arg[j++].n;
                 values[i]                            = translation_pointers[i];
@@ -503,7 +503,7 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
         parrot_var_t  final_destination;
         s = Parrot_str_to_cstring(interp, nci->pcc_return_signature);
         switch (VTABLE_get_integer_keyed_int(interp, nci->signature, 0)) {
-            case enum_nci_sig_ptr:
+            case enum_type_ptr:
                 final_destination.p = PMCNULL;
 
                 if (*(void **)return_data != NULL) {
@@ -514,7 +514,7 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                         call_object,
                         s, final_destination.p);
                 break;
-            case enum_nci_sig_float:
+            case enum_type_float:
                 final_destination.n = *(float *)return_data;
 
                 ret_object = Parrot_pcc_build_call_from_c_args(interp,
@@ -549,35 +549,35 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
      */
     for (i = 0; i < nci->arity; i++) {
         switch (VTABLE_get_integer_keyed_int(interp, nci->signature, i + 1)) {
-            case enum_nci_sig_shortref:
+            case enum_type_short | enum_type_ref_flag:
                 VTABLE_set_integer_native(interp,
                         ((pmc_holder_t*)translation_pointers[i])->pmc,
                         ((pmc_holder_t*)translation_pointers[i])->s);
                 mem_sys_free(translation_pointers[i]);
                 break;
-            case enum_nci_sig_intref:
+            case enum_type_int | enum_type_ref_flag:
                 VTABLE_set_integer_native(interp,
                         ((pmc_holder_t*)translation_pointers[i])->pmc,
                         ((pmc_holder_t*)translation_pointers[i])->i);
                 mem_sys_free(translation_pointers[i]);
                 break;
-            case enum_nci_sig_longref:
+            case enum_type_long | enum_type_ref_flag:
                 VTABLE_set_integer_native(interp,
                         ((pmc_holder_t*)translation_pointers[i])->pmc,
                         ((pmc_holder_t*)translation_pointers[i])->l);
                 mem_sys_free(translation_pointers[i]);
                 break;
-            case enum_nci_sig_ptrref:
+            case enum_type_ptr | enum_type_ref_flag:
                 VTABLE_set_pointer(interp,
                         ((pmc_holder_t*)translation_pointers[i])->pmc,
                         ((pmc_holder_t*)translation_pointers[i])->p);
                 mem_sys_free(translation_pointers[i]);
                 break;
-            case enum_nci_sig_double:
-            case enum_nci_sig_char:
-            case enum_nci_sig_short:
-            case enum_nci_sig_int:
-            case enum_nci_sig_long:
+            case enum_type_double:
+            case enum_type_char:
+            case enum_type_short:
+            case enum_type_int:
+            case enum_type_long:
                 if (translation_pointers[i]) {
                     mem_sys_free(translation_pointers[i]);
                 }
