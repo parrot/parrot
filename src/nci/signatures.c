@@ -91,18 +91,6 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
           case 'P':   /* push PMC * */
             e = enum_type_PMC;
             break;
-          case 'V':   /* push PMC * */
-            e = enum_type_ptr   | enum_type_ref_flag;
-            break;
-            case '2':
-            e = enum_type_short | enum_type_ref_flag;
-            break;
-            case '3':
-            e = enum_type_int   | enum_type_ref_flag;
-            break;
-            case '4':
-            e = enum_type_long  | enum_type_ref_flag;
-            break;
 
           case 'v':
             e = enum_type_void;
@@ -180,10 +168,6 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
             break;
           case enum_type_ptr:
           case enum_type_PMC:
-          case enum_type_ptr   | enum_type_ref_flag:
-          case enum_type_short | enum_type_ref_flag:
-          case enum_type_int   | enum_type_ref_flag:
-          case enum_type_long  | enum_type_ref_flag:
             sig_buf[i] = 'P';
             break;
           default:
