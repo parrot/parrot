@@ -17,23 +17,9 @@ Copyright (C) 2010, Parrot Foundation.
 #include <string.h>
 
 int main(int argc, char *argv[]) {
-#ifdef _WIN32
-    struct WSAData sockinfo;
-#endif
-    struct addrinfo  hints;
-    struct addrinfo *ai;
 
-#ifdef _WIN32
-    WSAStartup(2, &sockinfo);
-#endif
-
-    memset(&hints, 0, sizeof (struct addrinfo));
-    hints.ai_family   = PF_INET6;
-    hints.ai_protocol = IPPROTO_TCP;
-
-    getaddrinfo(NULL, "1234", &hints, &ai);
-
-    printf("OK\n");
+    if (socket(AF_INET6, SOCK_STREAM, 0) > 0)
+        printf("OK\n");
 
     return EXIT_SUCCESS;
 }
