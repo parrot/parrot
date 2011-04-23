@@ -277,7 +277,6 @@ nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
       case enum_nci_sig_intval: return &ffi_type_parrot_intval;
 
       case enum_nci_sig_string:
-      case enum_nci_sig_bufref:
                                 return &ffi_type_pointer;
 
       case enum_nci_sig_ptr:
@@ -398,14 +397,6 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
               case enum_nci_sig_string:
                 translation_pointers[i] = pcc_arg[j++].s;
                 values[i]               = &translation_pointers[i];
-                break;
-              case enum_nci_sig_bufref:
-                translation_pointers[i] = STRING_IS_NULL(pcc_arg[j].s) ?
-                    (char *)NULL :
-                    Parrot_str_to_cstring(interp, pcc_arg[j].s);
-                j++;
-                middle_man[i]           = &translation_pointers[i];
-                values[i]               = &middle_man[i];
                 break;
               case enum_nci_sig_char:
                 translation_pointers[i]            = mem_internal_allocate_zeroed_typed(char);
@@ -559,11 +550,6 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
      */
     for (i = 0; i < nci->arity; i++) {
         switch (VTABLE_get_integer_keyed_int(interp, nci->signature, i + 1)) {
-            case enum_nci_sig_bufref:
-                if (translation_pointers[i]) {
-                    Parrot_str_free_cstring((char*)translation_pointers[i]);
-                }
-                break;
             case enum_nci_sig_shortref:
                 VTABLE_set_integer_native(interp,
                         ((pmc_holder_t*)translation_pointers[i])->pmc,

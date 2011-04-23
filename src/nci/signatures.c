@@ -107,10 +107,6 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
             e = enum_nci_sig_pmcinv;
             break;
 
-          case 'B': /* buffer (void**) pass &Buffer_bufstart(SReg) */
-            e = enum_nci_sig_bufref;
-            break;
-
           case 'v':
             e = enum_nci_sig_void;
             break;
@@ -186,7 +182,6 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
             sig_buf[j++] = 'I';
             break;
           case enum_nci_sig_string:
-          case enum_nci_sig_bufref:
             sig_buf[j++] = 'S';
             break;
           case enum_nci_sig_ptr:
