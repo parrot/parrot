@@ -63,7 +63,9 @@ typedef enum {
 
     enum_type_sized,
 
-    enum_last_type              /* + one */
+    enum_last_type,             /* + one */
+
+    enum_type_ref_flag = 0x40   /* call-by-reference */
 } PARROT_DATA_TYPE;
 
 /* &end_gen */
@@ -176,8 +178,7 @@ FLOATVAL Parrot_dt_divide_floatval_by_zero(SHIM_INTERP, FLOATVAL num);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_dt_get_datatype_enum(PARROT_INTERP,
-    ARGIN(const STRING *type_name))
+INTVAL Parrot_dt_get_datatype_enum(PARROT_INTERP, ARGIN(STRING *type_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
