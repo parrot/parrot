@@ -204,6 +204,7 @@ Done!
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_number_keyed_str");
+    string = createstring(interp,"foo");
     number = Parrot_PMC_get_number_keyed_str(interp, hash, string);
     Parrot_printf(interp,"%.6f\n", number);
 CODE
@@ -212,6 +213,7 @@ Done!
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_integer_keyed_str");
+    string = createstring(interp,"foo");
     integer = Parrot_PMC_get_integer_keyed_str(interp, hash, string);
     Parrot_printf(interp,"%d\n", integer);
 CODE
@@ -220,6 +222,7 @@ Done!
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_exists_keyed_str");
+    string = createstring(interp,"foo");
     integer = Parrot_PMC_exists_keyed_str(interp, hash, string);
     Parrot_printf(interp,"%d\n", integer);
 CODE
@@ -350,6 +353,7 @@ Done!
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_delete_keyed_str");
+    string = createstring(interp,"foo");
     Parrot_PMC_delete_keyed_str(interp, hash, string);
 CODE
 Done!
