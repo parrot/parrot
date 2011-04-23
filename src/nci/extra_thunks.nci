@@ -23,7 +23,6 @@
 
 # PMC register stuff
 # P - pointer to a PMC-register
-# O - pointer to PMC-register (object)
 # p - data pointer from PMC (on store into a new UnManagedStruct PMC)
 # 2 - pointer to short
 # 3 - pointer to int

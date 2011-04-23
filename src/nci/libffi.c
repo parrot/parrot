@@ -281,7 +281,6 @@ nci_to_ffi_type(PARROT_INTERP, nci_sig_elem_t nci_t)
 
       case enum_nci_sig_ptr:
       case enum_nci_sig_pmc:
-      case enum_nci_sig_pmcinv:
       case enum_nci_sig_ptrref:
       case enum_nci_sig_shortref:
       case enum_nci_sig_intref:
@@ -379,8 +378,8 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
         Parrot_str_free_cstring(pcc_sig);
     }
 
-    {
-        values = mem_gc_allocate_n_zeroed_typed(interp, nci->arity, void *);
+    if (nci->arity) {
+        values     = mem_gc_allocate_n_zeroed_typed(interp, nci->arity, void *);
         middle_man = mem_gc_allocate_n_zeroed_typed(interp, nci->arity, void *);
 
         /*
@@ -588,9 +587,12 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
         }
     }
 
-    mem_gc_free(interp, middle_man);
+    if (nci->arity) {
+        mem_gc_free(interp, middle_man);
+        mem_gc_free(interp, values);
+    }
+
     mem_gc_free(interp, return_data);
-    mem_gc_free(interp, values);
 }
 
 

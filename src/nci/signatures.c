@@ -87,6 +87,7 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
           case 'p':   /* push pmc->data */
             e = enum_nci_sig_ptr;
             break;
+          case 'O':   /* PMC invocant */
           case 'P':   /* push PMC * */
             e = enum_nci_sig_pmc;
             break;
@@ -101,10 +102,6 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
             break;
           case '4':
             e = enum_nci_sig_longref;
-            break;
-
-          case 'O':   /* push PMC * invocant */
-            e = enum_nci_sig_pmcinv;
             break;
 
           case 'v':
@@ -146,9 +143,8 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
 
     const size_t sig_len = VTABLE_elements(interp, sig_pmc);
 
-    /* PCC sigs are 1 char long except for array slurpy, named slurpy (not possible with NCI),
-       and invocant */
-    const size_t buf_len = sig_len + 2 + 1;
+    /* PCC sigs are 1 char long except for array slurpy, named slurpy (not possible with NCI), */
+    const size_t buf_len = sig_len + 1;
 
     /* avoid malloc churn on common signatures */
     char         static_buf[16];
@@ -156,33 +152,31 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
                             static_buf :
                             (char *)mem_sys_allocate(buf_len);
 
-    size_t i, j;
+    size_t i;
 
-    for (i = 0, j = 0; i < sig_len; i++) {
+    for (i = 0; i < sig_len; i++) {
         const nci_sig_elem_t e = (nci_sig_elem_t)VTABLE_get_integer_keyed_int(interp, sig_pmc, i);
-
-        PARROT_ASSERT(j < buf_len - 1);
 
         switch (e) {
           case enum_nci_sig_void:
             /* null return */
-            if (j == 0)
-                sig_buf[j++] = '\0';
+            if (i == 0)
+                sig_buf[i] = '\0';
             break;
           case enum_nci_sig_float:
           case enum_nci_sig_double:
           case enum_nci_sig_numval:
-            sig_buf[j++] = 'N';
+            sig_buf[i] = 'N';
             break;
           case enum_nci_sig_char:
           case enum_nci_sig_short:
           case enum_nci_sig_int:
           case enum_nci_sig_long:
           case enum_nci_sig_intval:
-            sig_buf[j++] = 'I';
+            sig_buf[i] = 'I';
             break;
           case enum_nci_sig_string:
-            sig_buf[j++] = 'S';
+            sig_buf[i] = 'S';
             break;
           case enum_nci_sig_ptr:
           case enum_nci_sig_pmc:
@@ -190,23 +184,18 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
           case enum_nci_sig_shortref:
           case enum_nci_sig_intref:
           case enum_nci_sig_longref:
-            sig_buf[j++] = 'P';
-            break;
-          case enum_nci_sig_pmcinv:
-            sig_buf[j++] = 'P';
-            sig_buf[j++] = 'i';
+            sig_buf[i] = 'P';
             break;
           default:
             break;
         }
     }
 
-    PARROT_ASSERT(j < buf_len);
-    sig_buf[j + 1] = '\0';
+    sig_buf[i + 1] = '\0';
 
     *ret_sig    = Parrot_str_new(interp, sig_buf, 1);
-    *params_sig = j - 1 ?
-                Parrot_str_new(interp, &sig_buf[1], j - 1) :
+    *params_sig = i - 1 ?
+                Parrot_str_new(interp, &sig_buf[1], i - 1) :
                 CONST_STRING(interp, "");
 
     if (sig_buf != static_buf)
