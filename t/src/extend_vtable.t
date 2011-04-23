@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 103;
+plan tests => 104;
 
 =head1 NAME
 
@@ -150,6 +150,15 @@ CODE
 }
 
 # actual tests start here
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_does_pmc" );
+    pmc2   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Role"));
+    integer = Parrot_PMC_does_pmc(interp,pmc,pmc2);
+    Parrot_printf(interp,"%d\n", (int) integer);
+CODE
+0
+Done!
+OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_repr");
     string = Parrot_PMC_get_repr(interp, rpa);
@@ -1530,6 +1539,7 @@ CODE
 0
 Done!
 OUTPUT
+
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_assign_pmc" );
     Parrot_PMC_set_integer_native(interp, pmc, -42);
