@@ -70,7 +70,7 @@ typedef struct Opaque {
 
 */
 
-PARROT_DYNEXT_EXPORT int    call_back(const char *str);
+PARROT_DYNEXT_EXPORT int    call_back(PARROT_INTERP, PMC *);
 PARROT_DYNEXT_EXPORT char   nci_c(void);
 PARROT_DYNEXT_EXPORT char   nci_csc(short, char);
 PARROT_DYNEXT_EXPORT double nci_d(void);
@@ -83,7 +83,6 @@ PARROT_DYNEXT_EXPORT int    nci_iiii(int, int, int);
 PARROT_DYNEXT_EXPORT int    nci_ii3(int, int *);
 PARROT_DYNEXT_EXPORT int    nci_ip(void *);
 PARROT_DYNEXT_EXPORT int    nci_isc(short, char);
-PARROT_DYNEXT_EXPORT int    nci_it(void *);
 PARROT_DYNEXT_EXPORT int    nci_i33(int *, int *);
 PARROT_DYNEXT_EXPORT int    nci_i4i(long *, int);
 PARROT_DYNEXT_EXPORT long   nci_l(void);
@@ -95,9 +94,6 @@ PARROT_DYNEXT_EXPORT void   nci_pip(int, Rect_Like *);
 PARROT_DYNEXT_EXPORT void * nci_pp(void *);
 PARROT_DYNEXT_EXPORT short  nci_s(void);
 PARROT_DYNEXT_EXPORT short  nci_ssc(short, char);
-PARROT_DYNEXT_EXPORT char * nci_t(void);
-PARROT_DYNEXT_EXPORT char * nci_tB(void **);
-PARROT_DYNEXT_EXPORT char * nci_tt(char *);
 PARROT_DYNEXT_EXPORT void   nci_v(void);
 PARROT_DYNEXT_EXPORT void   nci_vP(void *);
 PARROT_DYNEXT_EXPORT void   nci_vpii(Outer *, int, int);
@@ -141,7 +137,6 @@ PARROT_DYNEXT_EXPORT int    nci_dlvar_int;
 PARROT_DYNEXT_EXPORT long   nci_dlvar_long;
 PARROT_DYNEXT_EXPORT float  nci_dlvar_float;
 PARROT_DYNEXT_EXPORT double nci_dlvar_double;
-PARROT_DYNEXT_EXPORT char   nci_dlvar_cstring[];
 
 int    int_cb_D4           = -55555;
 int    nci_dlvar_char      = 22;
@@ -150,7 +145,6 @@ int    nci_dlvar_int       = -4444;
 long   nci_dlvar_long      = -7777777;
 float  nci_dlvar_float     = -333.0;
 double nci_dlvar_double    = -55555.55555;
-char   nci_dlvar_cstring[] = "This is a C-string.\n";
 
 
 /* Function definitions */
@@ -331,25 +325,6 @@ nci_ip(void *p)
     return (int) (sp->d + sp->f + sp->i);
 }
 
-/*
-
-=item C<PARROT_DYNEXT_EXPORT int nci_it(void *p)>
-
-Prints the first two characters in C<p>, in reversed order.  Returns 2.
-
-=cut
-
-*/
-
-PARROT_DYNEXT_EXPORT
-int
-nci_it(void *p)
-{
-    fprintf(stderr, "%c%c\n", ((char*) p)[1], ((char *) p)[0]);
-    fflush(stderr);
-
-    return 2;
-}
 
 /*
 
@@ -385,70 +360,6 @@ int *
 nci_p(void)
 {
     return &nci_dlvar_int;
-}
-
-/*
-
-=item C<PARROT_DYNEXT_EXPORT char * nci_t(void)>
-
-Returns the value of C<nci_dlvar_cstring>.
-
-=cut
-
-*/
-
-PARROT_DYNEXT_EXPORT
-PARROT_CONST_FUNCTION
-char *
-nci_t(void)
-{
-    return nci_dlvar_cstring;
-}
-
-/*
-
-=item C<PARROT_DYNEXT_EXPORT char * nci_tt(char *p)>
-
-Returns "xx worked", where "xx" is replaced with the first two character values
-of C<p>, in reverse order.
-
-=cut
-
-*/
-
-static char s[] = "xx worked\n";
-
-PARROT_DYNEXT_EXPORT
-char *
-nci_tt(char *p)
-{
-    s[0] = p[1];
-    s[1] = p[0];
-
-    return s;
-}
-
-/*
-
-=item C<PARROT_DYNEXT_EXPORT char * nci_tB(void **p)>
-
-Returns "xx done", where "xx" is replaced with the first two character values
-of C<p>, in reverse order.
-
-=cut
-
-*/
-
-static char B[] = "xx done\n";
-
-PARROT_DYNEXT_EXPORT
-char *
-nci_tB(void **p)
-{
-    B[0] = (*(char**) p)[1];
-    B[1] = (*(char**) p)[0];
-
-    return B;
 }
 
 /*
@@ -532,7 +443,7 @@ nci_ii3(int a, int *bp)
 
 /*
 
-=item C<PARROT_DYNEXT_EXPORT int call_back(const char *str)>
+=item C<PARROT_DYNEXT_EXPORT int call_back(PARROT_INTERP, PMC *)>
 
 writes the string C<str> to stdout and returns the value 4711.
 
@@ -542,10 +453,13 @@ writes the string C<str> to stdout and returns the value 4711.
 
 PARROT_DYNEXT_EXPORT
 int
-call_back(const char *str)
+call_back(PARROT_INTERP, PMC *str_pmc)
 {
-    puts(str);
+    STRING *str  = VTABLE_get_string(interp, str_pmc);
+    char   *cstr = Parrot_str_to_cstring(interp, str);
+    puts(cstr);
     fflush(stdout);
+    Parrot_str_free_cstring(cstr);
 
     return 4711;
 }
@@ -628,7 +542,7 @@ nci_pi(int test)
       case 5:
         {
             static struct {
-                int (*f)(const char *);
+                int (*f)(PARROT_INTERP, PMC *);
             } t = {
                 call_back
             };

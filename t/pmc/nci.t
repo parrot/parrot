@@ -35,7 +35,7 @@ SKIP: {
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
         plan skip_all => "Please make libnci_test$PConfig{load_ext}";
     }
-    plan tests => 72;
+    plan tests => 65;
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'load library fails' );
 .sub test :main
@@ -391,31 +391,6 @@ libnci_test was successfully loaded
 -4444
 OUTPUT
 
-    pir_output_is( << 'CODE', << "OUTPUT", "nci_t - return a C-string" );
-
-.include "datatypes.pasm"
-
-.sub test :main
-
-    # load library
-    .local pmc libnci_test
-    libnci_test = loadlib "libnci_test"
-    unless libnci_test goto NOT_LOADED
-    print "libnci_test was successfully loaded\n"
-
-    # calling a function in libnci_test
-    .local pmc nci_t
-    dlfunc nci_t, libnci_test, "nci_t", "t"
-    .local string nci_t_out
-    ( nci_t_out ) = nci_t( )
-    print nci_t_out
-NOT_LOADED:
-.end
-CODE
-libnci_test was successfully loaded
-This is a C-string.
-OUTPUT
-
     pir_output_is( << 'CODE', << "OUTPUT", "nci_s - return a short in an INTEGER register" );
 
 .include "datatypes.pasm"
@@ -674,88 +649,6 @@ dlfunced
 ok 1
 OUTPUT
 
-    pir_output_is( <<'CODE', <<'OUTPUT', "nci_it" );
-.loadlib 'io_ops'
-.sub 'main' :main
-  loadlib $P1, "libnci_test"
-  printerr "loaded\n"
-  dlfunc $P0, $P1, "nci_it", "it"
-  printerr "dlfunced\n"
-  set $S5, "ko\n"
-  set_args "0", $S5
-  invokecc $P0
-  get_results "0", $I5
-  ne $I5, 2, nok_1
-  printerr "ok 2\n"
-  end
-nok_1: printerr "nok 1\n"
-  printerr $I5
-  printerr "\n"
-  end
-nok_2: printerr "nok 2\n"
-.end
-CODE
-loaded
-dlfunced
-ok
-ok 2
-OUTPUT
-
-    pir_output_is( <<'CODE', <<'OUTPUT', "nci_it" );
-
-.include "datatypes.pasm"
-.loadlib 'io_ops'
-
-.sub test :main
-  loadlib $P1, "libnci_test"
-  printerr "loaded\n"
-  .local pmc nci_it
-  nci_it = dlfunc $P1, "nci_it", "it"
-  printerr "dlfunced\n"
-  ( $I5 ) = nci_it( "ko" )
-  ne $I5, 2, nok_1
-  printerr "ok "
-  printerr $I5
-  printerr "\n"
-  end
-nok_1: printerr "nok 1\n"
-  printerr $I5
-  printerr "\n"
-  end
-nok_2: printerr "nok 2\n"
-.end
-
-CODE
-loaded
-dlfunced
-ok
-ok 2
-OUTPUT
-
-    pasm_output_is( <<'CODE', <<'OUTPUT', "nci_tt" );
-.pcc_sub :main main:
-  loadlib P1, "libnci_test"
-  print "loaded\n"
-  dlfunc P0, P1, "nci_tt", "tt"
-  print "dlfunced\n"
-  set S5, "ko\n"
-  set_args "0", S5
-  invokecc P0
-  get_results "0", S5
-  print S5
-  end
-nok_1: print "nok 1\n"
-  print I5
-  print "\n"
-  end
-nok_2: print "nok 2\n"
-  end
-CODE
-loaded
-dlfunced
-ok worked
-OUTPUT
-
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_dd - stress test" );
 .pcc_sub :main main:
   loadlib P1, "libnci_test"
@@ -871,20 +764,6 @@ OUTPUT
 CODE
 42
 4711
-OUTPUT
-
-    pasm_output_is( <<'CODE', <<'OUTPUT', "nci_tB" );
-.pcc_sub :main main:
-  loadlib P1, "libnci_test"
-  dlfunc P0, P1, "nci_tB", "tB"
-  set S5, "ko\n"
-  set_args "0", S5
-  invokecc P0
-  get_results "0", S5
-  print S5
-  end
-CODE
-ok done
 OUTPUT
 
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_pi - struct with ints" );
@@ -1145,33 +1024,30 @@ CODE
 77
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<'OUTPUT', "nci_pi - func_ptr* with signature" );
-.pcc_sub :main main:
-  loadlib P1, "libnci_test"
-  dlfunc P0, P1, "nci_pi", "pi"
-  # this test function returns a struct { int (*f)(char *) }
-  set_args "0", 5
-  invokecc P0
-  get_results "0", P5
-  new P2, ['ResizablePMCArray']
+    pir_output_is( <<'CODE', <<'OUTPUT', "nci_pi - func_ptr* with signature" );
 .include "datatypes.pasm"
-  push P2, .DATATYPE_FUNC_PTR
+.sub main :main
+  $P1 = loadlib "libnci_test"
+  $P0 = dlfunc $P1, "nci_pi", "pi"
+  $P5 = $P0(5) # this test function returns a struct { int (*f)(char *) }
+
+  $P2 = new ['ResizablePMCArray']
+  push $P2, .DATATYPE_FUNC_PTR
   # attach function signature property to this type
-  set P1, P2[-1]
-  new P3, ['String']
-  set P3, "it"
-  setprop P1, "_signature", P3
-  push P2, 0
-  push P2, 0
-  assign P5, P2
+  $P1 = $P2[-1]
+  $P3 = new ['String']
+  $P3 = "ipP"
+  setprop $P1, "_signature", $P3
+  push $P2, 0
+  push $P2, 0
+  assign $P5, $P2
   # now we get a callable NCI PMC
-  set P0, P5[0]
-  set_args "0", "hello call_back"
-  invokecc P0
-  get_results "0", I5
-  print I5
-  print "\n"
-  end
+  $P0 = $P5[0]
+  $P1 = getinterp
+  $P2 = box "hello call_back"
+  $I5 = $P0($P1, $P2)
+  say $I5
+.end
 CODE
 hello call_back
 4711
@@ -2595,24 +2471,6 @@ CODE
 42
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "conversion S <-> P" );
-.sub test :main
-    .local string library_name
-    library_name = 'libnci_test'
-    .local pmc libnci_test
-    libnci_test = loadlib  library_name
-    .local pmc reverse
-    reverse = dlfunc libnci_test, "nci_tt", "tt"
-    .local pmc s, t
-    s = new ['String']
-    s = "ko"
-    t = reverse( s )
-    print t
-.end
-CODE
-ok worked
-OUTPUT
-
 pir_output_is( << 'CODE', << 'OUTPUT', "conversion I <-> P" );
 .sub test :main
     .local string library_name
@@ -2771,24 +2629,6 @@ pir_output_is( << 'CODE', << 'OUTPUT', "nci_vVi - void** out parameter" );
 CODE
 got null
 got 10
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "nci_ttt - t_tt parameter" );
-.sub test :main
-    .local string library_name
-    library_name = 'libnci_test'
-    .local pmc libnci_test
-    libnci_test = loadlib  library_name
-
-    .local pmc nci_ttt
-    nci_ttt = dlfunc libnci_test, "nci_ttt", "ttt"
-
-    $S0 = nci_ttt("Hello", "Waldo")
-    say $S0
-.end
-CODE
-Waldo, Waldo, Hello
-Waldo, Waldo, Hello
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "nci_vfff - v_fff parameter" );
