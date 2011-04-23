@@ -260,7 +260,7 @@ my %NCI_TYPE = (
     float        => 'f',
     double       => 'd',
 
-    'char*'      => 't',
+    'char*'      => 'p',
 
     'short*'     => 'p',
     'int*'       => 'p',
@@ -301,9 +301,7 @@ my %PCC_CAST = (
     P => '',
 );
 
-my %OVERRIDE = (
-    'glutInit'  => 'v3p',
-);
+my %OVERRIDE = ();
 
 my @IGNORE = (
     # Most of these are limitations of this module or Parrot NCI
