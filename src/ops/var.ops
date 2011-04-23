@@ -150,7 +150,8 @@ op find_caller_lex(out PMC, in STR) {
         if (!PMC_IS_NULL(lex_pad)) {
             result = VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
         }
-        if (!result) result = PMCNULL;
+        if (!result)
+            result = PMCNULL;
     }
     $1 = result;
 }
@@ -456,7 +457,7 @@ errors settings. See B<errorson>.
 
 op find_name(out PMC, in STR) {
     if (!$2) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION,
                 "Tried to find null name");
         goto ADDRESS(handler);
@@ -473,8 +474,8 @@ found.
 =cut
 
 inline op find_sub_not_null(out PMC, in STR) :base_core {
-    opcode_t *dest = expr NEXT();
-    PMC *sub = Parrot_ns_find_named_item(interp, $2, dest);
+    opcode_t * const dest = expr NEXT();
+    PMC      * const sub  = Parrot_ns_find_named_item(interp, $2, dest);
 
     if (PMC_IS_NULL(sub)) {
         opcode_t *handler;
@@ -493,7 +494,7 @@ inline op find_sub_not_null(out PMC, in STR) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 LICENSE
 

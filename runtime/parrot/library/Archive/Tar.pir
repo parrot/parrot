@@ -1,4 +1,4 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Archive/Tar
 
 Partial port of Archive::Tar (version 1.60)
 
-See L<http://search.cpan.org/~bingos/Archive-Tar/>
+See L<http://search.cpan.org/dist/Archive-Tar/>
 
 =cut
 

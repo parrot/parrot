@@ -1,4 +1,4 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ TAP/Parser
 
 Simplified port of TAP::Parser (version 3.21)
 
-See L<http://search.cpan.org/~andya/Test-Harness/>
+See L<http://search.cpan.org/dist/Test-Harness/>
 
 =head3 Class TAP;Parser;Result
 
