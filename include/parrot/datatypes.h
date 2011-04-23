@@ -17,13 +17,13 @@
 
 /* &gen_from_enum(datatypes.pasm) subst(s/enum_type_(\w+)/uc("DATATYPE_$1")/e) */
 typedef enum {
-    enum_type_undef,            /* illegal */
-    enum_first_type = -100,
+    enum_type_undef = 0,        /* illegal */
+    enum_first_type = 1,
 
-    enum_type_INTVAL = -100,    /* parrot types */
+    enum_type_INTVAL = 1,       /* parrot types */
     enum_type_FLOATVAL,
     enum_type_STRING,
-    enum_type_PMC,              /* actual PMCs have positive class numbers */
+    enum_type_PMC,
 
     enum_type_char,             /* native integer types */
     enum_type_short,
@@ -62,8 +62,8 @@ typedef enum {
     enum_type_func_ptr,         /* a function pointer */
 
     enum_type_sized,
-    enum_last_type              /* + one */
 
+    enum_last_type              /* + one */
 } PARROT_DATA_TYPE;
 
 /* &end_gen */
