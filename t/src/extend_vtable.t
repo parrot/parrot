@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 100;
+plan tests => 105;
 
 =head1 NAME
 
@@ -151,6 +151,15 @@ CODE
 
 # actual tests start here
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_does_pmc" );
+    pmc2   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Role"));
+    integer = Parrot_PMC_does_pmc(interp,pmc,pmc2);
+    Parrot_printf(interp,"%d\n", (int) integer);
+CODE
+0
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_repr");
     string = Parrot_PMC_get_repr(interp, rpa);
     Parrot_printf(interp,"%Ss\n", string);
@@ -195,6 +204,7 @@ Done!
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_number_keyed_str");
+    string = createstring(interp,"foo");
     number = Parrot_PMC_get_number_keyed_str(interp, hash, string);
     Parrot_printf(interp,"%.6f\n", number);
 CODE
@@ -203,6 +213,7 @@ Done!
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_integer_keyed_str");
+    string = createstring(interp,"foo");
     integer = Parrot_PMC_get_integer_keyed_str(interp, hash, string);
     Parrot_printf(interp,"%d\n", integer);
 CODE
@@ -211,6 +222,7 @@ Done!
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_exists_keyed_str");
+    string = createstring(interp,"foo");
     integer = Parrot_PMC_exists_keyed_str(interp, hash, string);
     Parrot_printf(interp,"%d\n", integer);
 CODE
@@ -341,10 +353,19 @@ Done!
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_delete_keyed_str");
+    string = createstring(interp,"foo");
     Parrot_PMC_delete_keyed_str(interp, hash, string);
 CODE
 Done!
 OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pmc_keyed_str");
+    string = createstring(interp,"foo");
+    pmc2 = Parrot_PMC_get_pmc_keyed_str(interp, hash, string);
+CODE
+Done!
+OUTPUT
+
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_string_keyed_str");
     string = createstring(interp,"foo");
@@ -355,8 +376,33 @@ CODE
 Done!
 OUTPUT
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_defined_keyed");
+    integer = Parrot_PMC_defined_keyed(interp, hash, key_int);
+    Parrot_printf(interp,"%d\n", integer);
+CODE
+0
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_defined_keyed_int");
     integer = Parrot_PMC_defined_keyed_int(interp, rpa, 42);
+    Parrot_printf(interp,"%d\n", integer);
+CODE
+0
+Done!
+OUTPUT
+
+# TODO: Improve this test
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_delete_keyed_str");
+    string = createstring(interp,"foo");
+    Parrot_PMC_delete_keyed_str(interp, hash, string);
+CODE
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_defined_keyed_str");
+    string = createstring(interp,"foo");
+    integer = Parrot_PMC_defined_keyed_str(interp, hash, string);
     Parrot_printf(interp,"%d\n", integer);
 CODE
 0
@@ -1506,6 +1552,7 @@ CODE
 0
 Done!
 OUTPUT
+
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_assign_pmc" );
     Parrot_PMC_set_integer_native(interp, pmc, -42);
