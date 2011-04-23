@@ -24,9 +24,6 @@
 # PMC register stuff
 # P - pointer to a PMC-register
 # p - data pointer from PMC (on store into a new UnManagedStruct PMC)
-# 2 - pointer to short
-# 3 - pointer to int
-# 4 - pointer to long
 
 # void stuff
 # v - void
@@ -55,13 +52,10 @@ v    pp
 i    P
 
 # Added for TclLibrary
-i    pp3p
-i    pp3
 i    ppd
 i    pipi
 
 i          # void function returning int like fork()
-i    i3i   # POSIX's waitpid
 
 # win32
 i     pip
@@ -135,7 +129,6 @@ p    p     #  MYSQL_FIELD * mysql_fetch_field(MYSQL_RES *result)
 # --- end mysqlclient library ---
 
 # Oddball ones for postgres
-p    pi33ipi     PQfn
 p    ppP         PQsetNoticeReceiver
 
 # Used by SDL
@@ -161,8 +154,6 @@ i
 i    d
 i    i
 i    ii
-i    ii4
-i    ii4i
 i    iiii
 i    iiilsp
 i    iil
@@ -174,16 +165,8 @@ i    li
 i    lp
 i    lsp
 i    p
-i    p33
-i    p333
-i    p333333
-i    p4
-i    p42p
-i    p4i
 i    pi
 i    pii
-i    pii4
-i    pii4i
 i    piii
 i    piiiiii
 i    piiilsp
@@ -202,23 +185,15 @@ i    ppiiiiiiii
 i    pppp
 i    psp
 i    s
-i    s22
-i    s222
 i    sp
 i    sss
 i    ssss
-i    4
-i    4i
-i    42p
 
 l
 l    ii
-l    l4
 l    p
 l    pi
 l    pii
-l    p33l
-l    33l
 
 p
 p    i
@@ -237,11 +212,9 @@ i    sc
 s    sc
 c    sc
 i    iii
-i    i3
 v    P
 v    pP
 p    ip
-i    33
 v    pii
 
 v    p
