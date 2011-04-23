@@ -20,10 +20,6 @@
 
 # STR register stuff
 # S - pointer to a STRING-register
-# t - character string (0-terminated)
-# Buffers are not valid return parameters,
-# use 'p' when the native function returns a pointer value
-# B - void **
 
 # PMC register stuff
 # P - pointer to a PMC-register
@@ -227,7 +223,6 @@ l    p33l
 l    33l
 
 p
-p    B
 p    i
 p    ii
 p    iiii
