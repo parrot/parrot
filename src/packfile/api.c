@@ -4588,11 +4588,11 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc), ARGMOD(PMC *
 
     if (pf->cur_cs)
         Parrot_pf_set_current_packfile(interp, pbc);
+
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
 
-    /* TODO: Ask the PackFile for the main sub directly, instead of relying on
-             it being stored in the current context */
-    main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+    if (pf->cur_cs)
+        main_sub = packfile_main(pf->cur_cs);
 
     /* if no sub was marked being :main, we create a dummy sub with offset 0 */
 
