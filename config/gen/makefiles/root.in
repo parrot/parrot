@@ -88,6 +88,7 @@ YACC             = @yacc@
 LEX              = @lex@
 AS               = @as@
 CC               = @cc@
+CXX              = @cxx@
 CC_INC           = @cc_inc@
 C_LIBS           = @libs@
 CC_SHARED        = @cc_shared@
@@ -595,6 +596,9 @@ MAKE_C = @make_c@
 
 .c$(O) : # suffix rule (limited support)
 	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) -Isrc/ @cc_o_out@$@ -c $<
+
+.cpp$(O) : # suffix rule (limited support)
+	$(CXX) $(CFLAGS) $(CXXFLAGS) @optimize@ -I$(@D) -Isrc/ @cc_o_out@$@ -c $<
 
 #UNLESS(win32):.s$(O) : # suffix rule (limited support)
 #UNLESS(win32):	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) @cc_o_out@$@ -c $<
