@@ -986,26 +986,25 @@ OUTPUT
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_pi - func_ptr* with signature" );
 .include "datatypes.pasm"
 .sub main :main
-  $P1 = loadlib "libnci_test"
-  $P0 = dlfunc $P1, "nci_pi", "pi"
-  $P5 = $P0(5) # this test function returns a struct { int (*f)(char *) }
+    .local pmc struct_ptr
+    $P1      = loadlib "libnci_test"
+    $P0      = dlfunc $P1, "nci_pi", "pi"
+    struct_ptr = $P0(5) # this test function returns a struct { int (*f)(char *) }
 
-  $P2 = new ['ResizablePMCArray']
-  push $P2, .DATATYPE_FUNC_PTR
-  # attach function signature property to this type
-  $P1 = $P2[-1]
-  $P3 = new ['String']
-  $P3 = "ipP"
-  setprop $P1, "_signature", $P3
-  push $P2, 0
-  push $P2, 0
-  assign $P5, $P2
-  # now we get a callable NCI PMC
-  $P0 = $P5[0]
-  $P1 = getinterp
-  $P2 = box "hello call_back"
-  $I5 = $P0($P1, $P2)
-  say $I5
+    .local pmc sv
+    sv = new [ 'StructView' ], [ .DATATYPE_STRUCT; 1; .DATATYPE_PTR ]
+    .local pmc func_ptr
+    func_ptr = sv[struct_ptr; 0]
+
+    .local pmc func
+    func = new ['NCI']
+    func[ .DATATYPE_INT; .DATATYPE_PTR; .DATATYPE_PMC ] = func_ptr
+    # func["ipP"] = func_ptr
+
+    $P1 = getinterp
+    $P2 = box "hello call_back"
+    $I5 = func($P1, $P2)
+    say $I5
 .end
 CODE
 hello call_back
