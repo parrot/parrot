@@ -582,7 +582,7 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
             arg_t = VTABLE_get_integer_keyed_int(interp, nci->signature, j);
             if (arg_t & enum_type_ref_flag) {
                 prep_pcc_ret_arg(interp, arg_t & ~enum_type_ref_flag,
-                                    &pcc_retv[i], &call_arg[i + 3], nci_arg[i]);
+                                    &pcc_retv[i], &call_arg[i + 3], nci_arg[j - 1]);
                 i++;
             }
         }
