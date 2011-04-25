@@ -29,11 +29,7 @@ members, beside setting C<bufstart>/C<buflen> for external strings.
 #include "api.str"
 
 /* for parrot/interpreter.h */
-#if PARROT_CATCH_NULL
 STRING *STRINGNULL;
-#endif
-
-#define DEBUG_HASH_SEED 0
 
 #define nonnull_encoding_name(s) (s) ? (s)->encoding->name : "null string"
 #define ASSERT_STRING_SANITY(s) \
@@ -132,11 +128,7 @@ Parrot_str_init(PARROT_INTERP)
     /* interp is initialized from zeroed memory, so this is fine */
     else if (interp->hash_seed == 0) {
         /* TT #64 - use an entropy source once available */
-        Parrot_util_srand(Parrot_intval_time());
-        interp->hash_seed = Parrot_util_uint_rand(0);
-#if DEBUG_HASH_SEED
-        fprintf(stderr, "HASH SEED: %x\n", interp->hash_seed);
-#endif
+        interp->hash_seed = Parrot_intval_time();
     }
 
     /* initialize the constant string table */
@@ -156,12 +148,10 @@ Parrot_str_init(PARROT_INTERP)
     interp->const_cstring_hash  = const_cstring_hash;
     Parrot_encodings_init(interp);
 
-#if PARROT_CATCH_NULL
     /* initialize STRINGNULL, but not in the constant table */
     STRINGNULL = Parrot_str_new_init(interp, NULL, 0,
                        Parrot_null_encoding_ptr,
                        PObj_constant_FLAG);
-#endif
 
     interp->const_cstring_table =
         mem_gc_allocate_n_zeroed_typed(interp, n_parrot_cstrings, STRING *);
@@ -334,7 +324,7 @@ Parrot_str_rep_compatible(SHIM_INTERP, ARGIN(const STRING *a), ARGIN(const STRIN
 
 /*
 
-=item C<STRING* Parrot_str_clone(PARROT_INTERP, const STRING *s)>
+=item C<STRING * Parrot_str_clone(PARROT_INTERP, const STRING *s)>
 
 Helper function to clone string.
 
@@ -343,9 +333,9 @@ Helper function to clone string.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING*
-Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
+PARROT_CAN_RETURN_NULL
+STRING *
+Parrot_str_clone(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_clone)
     size_t  alloc_size;
@@ -385,10 +375,10 @@ Creates and returns a shallow copy of the specified Parrot string.
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
+Parrot_str_copy(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_copy)
     STRING *d;
@@ -447,7 +437,7 @@ returned. If both strings are C<NULL>, return C<STRINGNULL>.
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 STRING *
 Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
             ARGIN_NULLOK(const STRING *b))
@@ -1745,8 +1735,12 @@ INTVAL
 Parrot_str_boolean(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_boolean)
-    const INTVAL len = STRING_length(s);
+    INTVAL len;
 
+    if (s == NULL)
+        return 0;
+
+    len = STRING_length(s);
     if (len == 0)
         return 0;
 
@@ -1900,7 +1894,7 @@ Converts a numeric Parrot STRING to a floating point number.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 FLOATVAL
-Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
+Parrot_str_to_num(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_num)
     FLOATVAL      f         = 0.0;
@@ -2033,7 +2027,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
     /* Support for non-canonical NaN and Inf */
     /* charpos <= 2 because for "-i" iter already advanced to next char */
     if (check_nan && (iter.charpos <= 2)) {
-        STRING *t = Parrot_str_upcase(interp, s);
+        STRING * const t = Parrot_str_upcase(interp, s);
         if (STRING_equal(interp, t, CONST_STRING(interp, "NAN")))
             return PARROT_FLOATVAL_NAN_QUIET;
         else if (STRING_equal(interp, t, CONST_STRING(interp, "INF"))
@@ -2134,7 +2128,7 @@ You usually should use Parrot_str_to_encoded_cstring instead.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 char *
-Parrot_str_to_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
+Parrot_str_to_cstring(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_cstring)
 
@@ -2158,7 +2152,7 @@ in a memory leak.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 char *
-Parrot_str_to_encoded_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s),
+Parrot_str_to_encoded_cstring(PARROT_INTERP, ARGIN(const STRING *s),
         ARGIN(const STR_VTABLE *enc))
 {
     ASSERT_ARGS(Parrot_str_to_encoded_cstring)
@@ -2237,7 +2231,7 @@ Parrot_str_pin(SHIM_INTERP, ARGMOD(STRING *s))
 {
     ASSERT_ARGS(Parrot_str_pin)
     const size_t size = Buffer_buflen(s);
-    char  *memory = (char *)mem_internal_allocate(size);
+    char * const memory = (char *)mem_internal_allocate(size);
 
     mem_sys_memcopy(memory, Buffer_bufstart(s), size);
     Buffer_bufstart(s) = memory;
@@ -2311,7 +2305,7 @@ Identical to the STRING_hash macro.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 size_t
-Parrot_str_to_hashval(PARROT_INTERP, ARGIN(const STRING *s))
+Parrot_str_to_hashval(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_hashval)
 
@@ -2602,7 +2596,8 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                     break;
                 case 'x':
                     digcount = 0;
-                    if (itersrc.bytepos >= srclen) break;
+                    if (itersrc.bytepos >= srclen)
+                        break;
                     c = STRING_iter_get_and_advance(interp, src, &itersrc);
                     if (c == '{') {
                         /* \x{h..h} 1..8 hex digits */

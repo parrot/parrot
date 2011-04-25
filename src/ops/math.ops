@@ -342,7 +342,7 @@ inline op fdiv(out INT, in INT, in INT) :base_core {
 }
 
 inline op fdiv(out NUM, in NUM, in NUM) :base_core {
-    FLOATVAL den = $3;
+    const FLOATVAL den = $3;
     if (FLOAT_IS_ZERO(den)) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_DIV_BY_ZERO,

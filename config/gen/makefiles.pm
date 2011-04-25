@@ -56,7 +56,6 @@ sub _init {
         'editor/Makefile'            =>
             { SOURCE => 'config/gen/makefiles/editor.in' },
 
-        'parrot.pc'     => { SOURCE => 'config/gen/makefiles/parrot_pc.in' },
         'docs/Makefile' => { SOURCE => 'config/gen/makefiles/docs.in' },
     };
     return \%data;

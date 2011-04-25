@@ -114,9 +114,9 @@ pcf_P_JOl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 
 }
 static void
-pcf_P_Jt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+pcf_P_JS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
-    typedef PMC *(* func_t)(PARROT_INTERP, char *);
+    typedef PMC *(* func_t)(PARROT_INTERP, STRING *);
     func_t fn_pointer;
     void *orig_func;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
@@ -124,17 +124,17 @@ pcf_P_Jt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
-    char *t_1; STRING *ts_1;
+    STRING * t_1;
     UNUSED(ret_object);
     UNUSED(return_data); /* Potentially unused, at least */
-    Parrot_pcc_fill_params_from_c_args(interp, call_object, "S", &ts_1);
-    t_1 = STRING_IS_NULL(ts_1) ? (char *)NULL : Parrot_str_to_cstring(interp, ts_1);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "S", &t_1);
+    
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1);
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
-if (!STRING_IS_NULL(ts_1)) Parrot_str_free_cstring(t_1);
+
 }
 static void
 pcf_S_JOS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -1202,9 +1202,9 @@ Parrot_nci_load_core_thunks(PARROT_INTERP)
         temp_pmc);
 
     temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
-    VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_P_Jt);
+    VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_P_JS);
     VTABLE_set_pmc_keyed(interp, nci_funcs,
-        Parrot_nci_parse_signature(interp, string_from_literal(interp, "PJt")),
+        Parrot_nci_parse_signature(interp, string_from_literal(interp, "PJS")),
         temp_pmc);
 
     temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);

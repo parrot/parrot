@@ -503,13 +503,6 @@ runops_fast_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), NULL);
 
     while (pc) {
-        /* TODO
-         * Decide do we need check here.
-         * Fast-core cause segfaults even on test suite
-        if (pc < code_start || pc >= code_end)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                "attempt to access code outside of current code segment");
-        */
         DO_OP(pc, interp);
     }
 

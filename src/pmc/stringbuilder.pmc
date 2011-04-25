@@ -155,7 +155,6 @@ Append string to current buffer.
     VTABLE void push_string(STRING *s) {
         STRING           *buffer;
         size_t            total_size;
-        const STR_VTABLE *enc;
 
         /* Early return on NULL strings */
         if (STRING_IS_NULL(s))
@@ -170,7 +169,7 @@ Append string to current buffer.
             buffer->encoding = s->encoding;
         }
         else {
-            enc = Parrot_str_rep_compatible(interp, buffer, s);
+            const STR_VTABLE * const enc = Parrot_str_rep_compatible(interp, buffer, s);
 
             if (enc) {
                 buffer->encoding = enc;

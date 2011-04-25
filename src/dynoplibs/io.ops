@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010, Parrot Foundation.
+ * Copyright (C) 2010-2011, Parrot Foundation.
 ** io.ops
 */
 
@@ -182,8 +182,7 @@ op tell(out INT, invar PMC) :base_io {
 
 op tell(out INT, out INT, invar PMC) :base_io {
     if ($3) {
-        PIOOFF_T pos;
-        pos = Parrot_io_tell_handle(interp, $3);
+        const PIOOFF_T pos = Parrot_io_tell_handle(interp, $3);
         $1 = (INTVAL)(pos >> 31);
         $2 = (INTVAL)(pos & 0xffffffff);
     }

@@ -999,11 +999,19 @@ typedef enum {
             GetBitcodeModule =>  "vPpB",
 ####### Core.h
             LLVMCreateMemoryBufferWithContentsOfFile => "vPB",
+
         );
 
         for %funcs.kv -> $name, $signature {
             %F{$name} := pir::dlfunc__ppss($lib, "LLVM" ~ $name, $signature);
         }
+
+####### Parrot added functions
+        %F<DumpModuleToString> := pir::dlfunc__ppss(undef, "Parrot_LLVMDumpModuleToString", "SJp")
+                                  // die("Ooops");
+        %F<DumpValueToString>  := pir::dlfunc__ppss(undef, "Parrot_LLVMDumpValueToString", "SJp");
+        %F<DumpTypeToString>   := pir::dlfunc__ppss(undef, "Parrot_LLVMDumpTypeToString", "SJp");
+
     }
 }
 

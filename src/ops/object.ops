@@ -1,6 +1,5 @@
 /*
 
-
 object.ops
 
 */
@@ -107,7 +106,7 @@ op callmethod(invar PMC, in STR, invar PMC) :object_base :flow {
     opcode_t * const next       = expr NEXT();
 
     PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
-    opcode_t *dest              = NULL;
+    opcode_t *dest;
     PMC      *       signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 

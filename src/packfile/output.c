@@ -203,7 +203,7 @@ constant table into a contiguous region of memory.
 
 PARROT_EXPORT
 size_t
-PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
+PackFile_ConstTable_pack_size(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
 {
     ASSERT_ARGS(PackFile_ConstTable_pack_size)
     opcode_t i;
@@ -250,7 +250,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t *
 PackFile_ConstTable_pack(PARROT_INTERP,
-        ARGIN(PackFile_Segment *seg), ARGMOD(opcode_t *cursor))
+        ARGMOD(PackFile_Segment *seg), ARGOUT(opcode_t *cursor))
 {
     ASSERT_ARGS(PackFile_ConstTable_pack)
     PackFile_ConstTable * const self = (PackFile_ConstTable *)seg;
@@ -298,8 +298,7 @@ Reverse lookup a constant in the constant table.
 
 PARROT_EXPORT
 int
-PackFile_ConstTable_rlookup_num(PARROT_INTERP,
-    ARGIN(const PackFile_ConstTable *ct), FLOATVAL n)
+PackFile_ConstTable_rlookup_num(SHIM_INTERP, ARGIN(const PackFile_ConstTable *ct), FLOATVAL n)
 {
     ASSERT_ARGS(PackFile_ConstTable_rlookup_num)
     int i;
@@ -322,7 +321,7 @@ PackFile_ConstTable_rlookup_str(PARROT_INTERP,
     int i;
 
     if (ct->string_hash) {
-        HashBucket *bucket = Parrot_hash_get_bucket(interp, ct->string_hash, s);
+        const HashBucket * const bucket = Parrot_hash_get_bucket(interp, ct->string_hash, s);
         if (bucket) {
             i = (int)PTR2INTVAL(bucket->value);
             return i;

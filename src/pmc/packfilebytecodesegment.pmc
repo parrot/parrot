@@ -148,7 +148,8 @@ Initialize PackfileBytecodeSegment from PackFile_Bytecode*
             for (j = 0; j < entry.n_ops; j++) {
                 opcode_t lib_op = entry.lib_ops[j];
                 VTABLE_get_integer_keyed_str(INTERP, op_map,
-                    Parrot_str_from_platform_cstring(INTERP, entry.lib->op_info_table[lib_op].full_name));
+                    Parrot_str_from_platform_cstring(INTERP,
+                                                     entry.lib->op_info_table[lib_op].full_name));
             }
         }
 

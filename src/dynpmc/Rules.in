@@ -218,7 +218,7 @@ src/dynpmc/subproxy.dump: src/dynpmc/subproxy.pmc vtable.dump $(CLASS_O_FILES)
 
 
 $(DYNEXT_DIR)/llvm_engine$(LOAD_EXT): src/dynpmc/llvm_engine$(O)
-	$(LD)  @ld_out@$(DYNEXT_DIR)/llvm_engine$(LOAD_EXT) src/dynpmc/llvm_engine$(O) $(LINKARGS) $(LINKFLAGS) $(LLVM_LDFLAGS)
+	$(LD)  @ld_out@$(DYNEXT_DIR)/llvm_engine$(LOAD_EXT) src/dynpmc/llvm_engine$(O) $(LINKARGS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
 

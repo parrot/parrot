@@ -18,6 +18,7 @@ our @shared_valid_options = qw{
     ccwarn
     configure_trace
     coveragedir
+    cxx
     darwin_no_fink
     darwin_no_macports
     datadir
@@ -71,6 +72,7 @@ our @shared_valid_options = qw{
     verbose
     verbose-step
     version
+    with-llvm
     without-crypto
     without-core-nci-thunks
     without-extra-nci-thunks

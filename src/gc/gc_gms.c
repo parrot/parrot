@@ -225,11 +225,11 @@ static void* gc_gms_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void * gc_gms_allocate_memory_chunk(SHIM_INTERP, size_t size);
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void * gc_gms_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size);
 
 PARROT_MALLOC
@@ -400,13 +400,13 @@ static void gc_gms_reallocate_buffer_storage(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void * gc_gms_reallocate_memory_chunk(SHIM_INTERP,
     ARGFREE(void *from),
     size_t size);
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void * gc_gms_reallocate_memory_chunk_zeroed(SHIM_INTERP,
     ARGFREE(void *data),
     size_t newsize,
@@ -1906,7 +1906,7 @@ TODO Write docu.
 */
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void *
 gc_gms_allocate_memory_chunk(SHIM_INTERP, size_t size)
 {
@@ -1921,7 +1921,7 @@ gc_gms_allocate_memory_chunk(SHIM_INTERP, size_t size)
 }
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void *
 gc_gms_reallocate_memory_chunk(SHIM_INTERP, ARGFREE(void *from), size_t size)
 {
@@ -1943,7 +1943,7 @@ gc_gms_reallocate_memory_chunk(SHIM_INTERP, ARGFREE(void *from), size_t size)
 }
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void *
 gc_gms_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size)
 {
@@ -1958,7 +1958,7 @@ gc_gms_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size)
 }
 
 PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static void *
 gc_gms_reallocate_memory_chunk_zeroed(SHIM_INTERP, ARGFREE(void *data),
         size_t newsize, size_t oldsize)
@@ -2313,6 +2313,9 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header))
 
 #ifdef DETAIL_MEMORY_DEBUG
     gc_gms_print_stats_always(interp, header, gen);
+#else
+    UNUSED(interp);
+    UNUSED(header);
 #endif
 
 }
@@ -2353,7 +2356,11 @@ gc_gms_validate_str(SHIM_INTERP, ARGIN(STRING *str))
 {
     ASSERT_ARGS(gc_gms_validate_str)
 
+#ifdef PARROT_ASSERTS_ON
     PARROT_ASSERT(!PObj_on_free_list_TEST(str));
+#else
+    UNUSED(str);
+#endif
 }
 
 static void
@@ -2376,6 +2383,8 @@ gc_gms_validate_objects(PARROT_INTERP)
             PMC * const pmc = &((pmc_alloc_struct *)ptr)->pmc;
             PObj_live_CLEAR(pmc););
     }
+#else
+    UNUSED(interp);
 #endif
 }
 

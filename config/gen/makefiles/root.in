@@ -88,6 +88,7 @@ YACC             = @yacc@
 LEX              = @lex@
 AS               = @as@
 CC               = @cc@
+CXX              = @cxx@
 CC_INC           = @cc_inc@
 C_LIBS           = @libs@
 CC_SHARED        = @cc_shared@
@@ -171,7 +172,6 @@ GEN_CONFIGS = \
 #IF(has_glut):    src/glut_callbacks.c \
     src/core_pmcs.c \
     config_lib.pir \
-    parrot.pc \
     compilers/imcc/imcc.y.flag \
     compilers/imcc/imcc.l.flag
 
@@ -268,7 +268,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/dumper.pbc \
     $(LIBRARY_DIR)/yaml_dumper.pbc \
     $(LIBRARY_DIR)/YAML/Tiny.pbc \
-    $(LIBRARY_DIR)/LLVM.pbc \
+#IF(has_llvm):    $(LIBRARY_DIR)/LLVM.pbc \
     $(LIBRARY_DIR)/Getopt/Obj.pbc \
     $(LIBRARY_DIR)/HTTP/Message.pbc \
     $(LIBRARY_DIR)/Iter.pbc \
@@ -522,6 +522,9 @@ INTERP_O_FILES = \
     @TEMP_platform_o@ \
     @TEMP_atomic_o@ \
 
+LLVM_O_FILES = \
+	src/llvm_extra$(O)
+
 OPS_FILES = @ops@
 
 ###############################################################################
@@ -597,6 +600,9 @@ MAKE_C = @make_c@
 .c$(O) : # suffix rule (limited support)
 	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) -Isrc/ @cc_o_out@$@ -c $<
 
+.cpp$(O) : # suffix rule (limited support)
+	$(CXX) $(CFLAGS) $(CXXFLAGS) @optimize@ -I$(@D) -Isrc/ @cc_o_out@$@ -c $<
+
 #UNLESS(win32):.s$(O) : # suffix rule (limited support)
 #UNLESS(win32):	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) @cc_o_out@$@ -c $<
 
@@ -637,10 +643,10 @@ all : \
     $(PCT_LIB_PBCS) \
     $(DATA_JSON_LIB_PBCS) \
     $(JSON_LANG) \
-#IF(has_dynamic_linking): $(EXTRANCITHUNKS_SO) \
+#IF(has_dynamic_linking):    $(EXTRANCITHUNKS_SO) \
     $(NQP_LIB_PBCS) \
-#IF(has_dynamic_linking): $(DYNOPLIBS_TARGETS) \
-#IF(has_dynamic_linking): $(LIBNCI_TEST_SO) \
+#IF(has_dynamic_linking):    $(DYNOPLIBS_TARGETS) \
+#IF(has_dynamic_linking):    $(LIBNCI_TEST_SO) \
     $(GEN_LIBRARY) \
     src/install_config$(O)
 
@@ -992,6 +998,7 @@ O_FILES = \
     $(IO_O_FILES) \
     $(CLASS_O_FILES) \
     $(ENCODING_O_FILES) \
+#IF(has_llvm):    $(LLVM_O_FILES) \
     $(IMCC_O_FILES)
 
 lib_deps_object : $(O_FILES)
@@ -1383,7 +1390,8 @@ src/gc/api$(O) : \
     $(PARROT_H_HEADERS) \
     src/gc/gc_private.h \
     src/gc/api.c \
-    src/gc/variable_size_pool.h
+    src/gc/variable_size_pool.h \
+    src/gc/fixed_allocator.h
 
 src/gc/alloc_resources$(O) : \
     $(PARROT_H_HEADERS) \
@@ -1536,29 +1544,16 @@ src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
 src/interp/inter_misc$(O) : $(PARROT_H_HEADERS) \
 	src/interp/inter_misc.c \
 	src/interp/inter_misc.str \
-	compilers/imcc/imc.h \
-	compilers/imcc/cfg.h \
-	compilers/imcc/debug.h \
-	compilers/imcc/instructions.h \
-	compilers/imcc/sets.h \
-	compilers/imcc/symreg.h \
-	compilers/imcc/unit.h \
-	$(INC_DIR)/oplib/ops.h \
-	$(INC_DIR)/runcore_api.h
+	include/imcc/embed.h \
+        include/imcc/yyscanner.h \
+	$(INC_DIR)/runcore_api.h \
+        include/pmc/pmc_parrotinterpreter.h
 
 src/interp/inter_create$(O) : $(PARROT_H_HEADERS) \
 	$(INC_DIR)/oplib/core_ops.h \
 	src/gc/gc_private.h \
 	src/interp/inter_create.c \
 	src/interp/inter_create.str \
-	compilers/imcc/imc.h \
-	compilers/imcc/cfg.h \
-	compilers/imcc/debug.h \
-	compilers/imcc/instructions.h \
-	compilers/imcc/sets.h \
-	compilers/imcc/symreg.h \
-	compilers/imcc/unit.h \
-	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/runcore_api.h \
         src/gc/variable_size_pool.h
 
@@ -1590,6 +1585,7 @@ frontend/parrot/main$(O) : \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/has_header.h \
     $(INC_DIR)/longopt.h \
+    include/imcc/api.h \
     frontend/parrot/main.c
 
 src/multidispatch$(O) : \
@@ -1607,14 +1603,7 @@ src/packfile/api$(O) : \
     include/pmc/pmc_sub.h \
     include/pmc/pmc_key.h \
     include/pmc/pmc_parrotlibrary.h \
-    compilers/imcc/imc.h \
-    compilers/imcc/cfg.h \
-    compilers/imcc/debug.h \
-    compilers/imcc/instructions.h \
-    compilers/imcc/sets.h \
-    compilers/imcc/symreg.h \
-    compilers/imcc/unit.h \
-    $(INC_DIR)/oplib/ops.h \
+    include/pmc/pmc_ptrobj.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/dynext.h \
     $(INC_DIR)/embed.h \
@@ -1728,14 +1717,9 @@ src/embed$(O) : \
     $(INC_DIR)/runcore_api.h \
     $(INC_DIR)/extend_vtable.h \
     $(INC_DIR)/oplib/core_ops.h \
-    compilers/imcc/imc.h \
-    compilers/imcc/cfg.h \
-    compilers/imcc/debug.h \
-    compilers/imcc/instructions.h \
-    compilers/imcc/sets.h \
-    compilers/imcc/symreg.h \
-    compilers/imcc/unit.h \
-    include/pmc/pmc_sub.h
+    include/pmc/pmc_sub.h \
+    include/imcc/embed.h \
+    include/imcc/yyscanner.h \
 
 src/embed/api$(O) : \
     $(PARROT_H_HEADERS) \
@@ -2049,6 +2033,8 @@ SRC_TEST_FILES = \
     t/src/*.t \
     t/src/embed/*.t
 TOOLS_TEST_FILES = $(TOOLS_TESTS_DIR)/tools/*.t
+GC_TEST_FILES = \
+    t/compilers/opsc/*.t
 
 # pbc files used for several tests;
 # not needed for build, hence this target is not included in 'all'
@@ -2201,6 +2187,9 @@ manifest_tests :
 
 examples_tests : test_prep
 	$(PERL) t/harness $(EXAMPLES_TEST_FILES)
+
+gc_tests : test_prep
+	$(PERL) t/harness $(GC_TEST_FILES)
 
 # moretests: Good to use before branch merges
 moretests: test_prep \
@@ -2362,7 +2351,6 @@ dynext-clean :
 # or is there an automatic xargs?
 test-clean :
 	$(RM_F) t/compilers/data_json/*.pir
-	$(RM_F) t/compilers/imcc/imcpasm/*.pir
 	$(RM_F) t/compilers/imcc/syn/*.pir t/compilers/imcc/syn/*.pasm
 	$(RM_F) t/compilers/imcc/reg/*.pir t/compilers/imcc/reg/*.pasm
 	$(RM_F) t/compilers/pct/*.pir
@@ -2521,12 +2509,56 @@ SPLINT = splint
 # kept in there after completion.
 SPLINT_TMP = $(TEMPDIR)/splint
 
+# Transfer errors (-mem-trans) are too tough for us right now
+OLD_SPLINTFLAGS_MEMORY_SAFETY = \
+    -mem-trans \
+    -memchecks \
+    +bufferoverflow \
+    +bufferoverflowhigh \
+    +read-only-strings \
+    +read-only-trans \
+    -strict-destroy \
+    -strict-use-released \
+    +use-released \
+    -must-free \
+    -mustfreefresh \
+    -mustfreeonly \
+    +null \
+    +nullptrarith \
+    +nullret \
+    -ptr-arith \
+    +ptr-negate \
+
+# Watch for unsafe comparisons
+OLD_SPLINTFLAGS_UNSAFE_COMPARISONS = \
+    +bool-compare \
+    +ptr-compare \
+    +real-compare \
+    +unsigned-compare
+
+# const and other qualifiers
+# Report qualifier mismatches only if dangerous (+relax-quals)
+OLD_SPLINTFLAGS_QUALIFIERS = \
+    +relax-quals
+
+# Symbol definitions
+OLD_SPLINTFLAGS_SYMBOL_DEFINITIONS = \
+    +decl-undef \
+    +incon-defs \
+    +incon-defs-lib \
+
+# Problems with evaluation and control structions
+OLD_SPLINTFLAGS_EVALUATION = \
+    +controlnestdepth 15 \
+    +duplicate-quals \
+
+
 # Splint flags: http://splint.org/manual/html/appB.html
 # The dashes in the names don't make any difference to Splint, but I've
 # made them match how they are in the manual.  Otherwise, you might be
 # looking for "declundef", except that it's "decl-undef" in the docs.
 SPLINTFLAGS_BASE = \
-    +standard \
+    +weak \
     +hints \
     \
     +indentspaces 4 \
@@ -2556,30 +2588,48 @@ SPLINTFLAGS_BASE = \
     -iso-reserved-internal \
     -include-nest 10 \
 
-# Memory safety checks
-# Transfer errors (-mem-trans) are too tough for us right now
-SPLINTFLAGS_MEMORY_SAFETY = \
-    -mem-trans \
-    -memchecks \
-    +bufferoverflow \
-    +bufferoverflowhigh \
-    +read-only-strings \
-    +read-only-trans \
-    -strict-destroy \
-    -strict-use-released \
-    +use-released \
-    -must-free \
-    -mustfreefresh \
-    -mustfreeonly \
+SPLINTFLAGS_NULL_DEREFERENCES = \
     +null \
-    +nullptrarith \
     +nullret \
-    -ptr-arith \
-    +ptr-negate \
+
+SPLINTFLAGS_USE_BEFORE_DEFINITION = \
+    +usedef \
+    +incondefs \
+    +functionderef \
+
+SPLINTFLAGS_TYPE = \
+    +string-literal-too-long \
+    +string-literal-no-room \
+    +string-literal-no-room-final-null \
+    +string-literal-smaller \
+    +enum-members \
+    \
+    -pred-bool \
+    -pred-bool-ptr \
+    -pred-bool-int \
+    +pred-bool-others \
+    +pred-assign \
+    +ptrnegate \
     -zero-ptr \
+    \
+    +charunsignedchar \
+    +char-index \
+    +char-int \
+    \
+    +format-code \
+    +format-type \
+    \
+    +ignore-signs \
+    +long-unsigned-unsigned-integral \
+
+SPLINTFLAGS_MEMORY_MANAGEMENT = \
+
+SPLINTFLAGS_SHARING = \
+
+SPLINTFLAGS_FUNCTION_INTERFACE = \
 
 # Macro safety checks
-SPLINTFLAGS_MACRO_SAFETY = \
+SPLINTFLAGS_MACRO = \
     +macro-assign \
     +macro-empty \
     +macro-parens \
@@ -2587,52 +2637,17 @@ SPLINTFLAGS_MACRO_SAFETY = \
     +macro-stmt \
     +macro-unrecog \
 
-# Watch for unsafe comparisons
-SPLINTFLAGS_UNSAFE_COMPARISONS = \
-    +bool-compare \
-    +ptr-compare \
-    +real-compare \
-    +unsigned-compare
+SPLINTFLAGS_NAMING = \
 
-# But allow us some slop in boolean comparisons
-SPLINTFLAGS_BOOLEAN_SLOP = \
-    -pred-bool-int \
-    -pred-bool-ptr \
-    -pred-bool-others \
-    -boolops \
-    +bool-int \
-
-# const and other qualifiers
-# Report qualifier mismatches only if dangerous (+relax-quals)
-SPLINTFLAGS_QUALIFIERS = \
-    +relax-quals
-
-# Symbol definitions
-SPLINTFLAGS_SYMBOL_DEFINITIONS = \
-    +decl-undef \
-    +incon-defs \
-    +incon-defs-lib \
-
-# Format codes
-SPLINTFLAGS_FORMAT = \
-    +format-code \
-    +format-type \
-
-# Problems with evaluation and control structions
-SPLINTFLAGS_EVALUATION = \
-    +controlnestdepth 15 \
-    +duplicate-quals \
+SPLINTFLAGS_CONTROL_FLOW = \
     +eval-order \
     +eval-order-uncon \
 
-# Types and stuff
-SPLINTFLAGS_TYPES = \
-    +char-index \
-    +char-int \
-    +enum-members \
-    +ignore-signs \
-    +long-integral \
-    +match-any-integral \
+SPLINTFLAGS_MEMORY_BOUNDS = \
+
+SPLINTFLAGS_COMPLETENESS = \
+
+SPLINTFLAGS_MISCELLANEOUS = \
 
 # Other options we'd like to add back
 # +initallelements : Right now, the *.ops files don't initialize all
@@ -2649,25 +2664,35 @@ SPLINTFLAGS_TEST =
 
 SPLINTFLAGS = \
 	$(SPLINTFLAGS_BASE) \
-	$(SPLINTFLAGS_MEMORY_SAFETY) \
-	$(SPLINTFLAGS_MACRO_SAFETY) \
-	$(SPLINTFLAGS_UNSAFE_COMPARISONS) \
-	$(SPLINTFLAGS_BOOLEAN_SLOP) \
-	$(SPLINTFLAGS_QUALIFIERS) \
-	$(SPLINTFLAGS_SYMBOL_DEFINITIONS) \
-	$(SPLINTFLAGS_FORMAT) \
-	$(SPLINTFLAGS_EVALUATION) \
-	$(SPLINTFLAGS_TYPES) \
+	$(SPLINTFLAGS_NULL_DEREFERENCES) \
+	$(SPLINTFLAGS_USE_BEFORE_DEFINITION) \
+	$(SPLINTFLAGS_TYPE) \
+	$(SPLINTFLAGS_MEMORY_MANAGEMENT) \
+	$(SPLINTFLAGS_SHARING) \
+	$(SPLINTFLAGS_FUNCTION_INTERFACE) \
+	$(SPLINTFLAGS_MACRO) \
+	$(SPLINTFLAGS_NAMING) \
+	$(SPLINTFLAGS_CONTROL_FLOW) \
+	$(SPLINTFLAGS_MEMORY_BOUNDS) \
+	$(SPLINTFLAGS_COMPLETENESS) \
+	$(SPLINTFLAGS_MISCELLANEOUS) \
 
 #SPLINT_SOURCE = `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@ | sort`
-SPLINT_SOURCE = $$(find src/*.c src/{io,packfile,string}/*.c -type f | grep -v extra_nci_thunks.c | grep -v extend_vtable.c | sort)
+SPLINT_SOURCE = \
+	$$(find src/*.c src/gc/*.c src/io/*.c src/packfile/*.c src/string/*.c -type f | \
+	grep -v src/gc/malloc.c | \
+	grep -v src/gc/malloc_trace.c | \
+	grep -v extra_nci_thunks.c | \
+	grep -v extend_vtable.c | \
+	grep -v nci_test.c | \
+	sort)
 
 # "splint" is the less-thorough splint target.  For cage cleaning work,
 # you'll probably want to specify SPLINT_SOURCE rather than work on the
 # entire tree, like so:
 #     make splint SPLINT_SOURCE='src/call/*.c'
 
-splint : all
+splint :
 	$(MKPATH) $(SPLINT_TMP)
 	$(SPLINT) $(CC_INC) "-Iinclude/pmc" "-Icompilers/ast" $(SPLINTFLAGS) \
 	+partial -DNDEBUG \

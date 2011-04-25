@@ -172,11 +172,13 @@ Invokes the first subroutine in the eval code.
         }
 
         /* XXX Quick and dirty fix for TT #995 */
+        #if 0
         if ((struct PackFile *)cur_cs == INTERP->initial_pf
                 || cur_cs == INTERP->code) {
             SUPER();
             return;
         }
+        #endif
 
         seg = (PackFile_Segment *)cur_cs->const_table;
         if (seg) {
@@ -313,18 +315,20 @@ Unarchives the code.
     VTABLE void thaw(PMC *info) {
         STRING    * const packed = VTABLE_shift_string(INTERP, info);
         PackFile         *pf;
+        PMC              *pfpmc;
         Parrot_Sub_attributes *sub;
         size_t            i;
 
         SUPER(info);
         pf = PackFile_new(INTERP, 0);
+        pfpmc = Parrot_pf_get_packfile_pmc(INTERP, pf);
 
         if (!PackFile_unpack(INTERP, pf, (opcode_t *)packed->strstart,
                 packed->strlen))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 "couldn't unpack packfile");
 
-        do_sub_pragmas(INTERP, pf->cur_cs, PBC_PBC, SELF);
+        do_sub_pragmas(INTERP, pfpmc, PBC_PBC, SELF);
 
         for (i = 0; i < pf->directory.num_segments; ++i) {
             PackFile_Segment * const seg = pf->directory.segments[i];

@@ -1,8 +1,26 @@
+New in 3.4.0
+- Core
+  + The Generational Mark and Sweep garbage collector is the new default.
+
+New in 3.3.0
+- Core
+  + The isa and isa_pmc vtables can now be overridden from PIR
+  + IMCC has a new improved external interface
+  + A new IMCCompiler PMC adds prototype PDD31-alike functionality for the PIR and PASM compilers
+  + New --with-llvm option to Configure.pl, which will link to LLVM if it is available
+- Community
+  + Parrot Virtual Machine was accepted into Google Summer of Code 2011
+- Ecosystem
+  + Rosella adds a stable "Event" library to implement a publish/subscribe mechanism
+- Tests
+  + The test coverage of the extend_vtable subsystem was greatly increased
+
+
 New in 3.2.0
 - Core
   + Full support for Unicode filenames on Linux and Win32
   + The configuration option --cxx is gone
-  + New Generational GC implemented. To enable it run Configure.pl --gc=gms 
+  + New Generational GC implemented. To enable it run Configure.pl --gc=gms
   + Now op definitions are semantically parsed. It opens possibilities for
     future optimizations of parrot core.
   + A statement convert the '.param' PIR systax
