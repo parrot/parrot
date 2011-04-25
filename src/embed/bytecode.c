@@ -156,6 +156,7 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
 {
     ASSERT_ARGS(Parrot_api_run_bytecode)
     EMBED_API_CALLIN(interp_pmc, interp)
+    PMC * const current_pf = Parrot_pf_get_current_packfile(interp);
 
     /* Debugging mode nonsense. */
     if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
@@ -164,7 +165,10 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     }
     if (!mainargs)
         mainargs = PMCNULL;
+
     Parrot_pf_execute_bytecode_program(interp, pbc, mainargs);
+    if (!PMC_IS_NULL(current_pf))
+        Parrot_pf_set_current_packfile(interp, current_pf);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
