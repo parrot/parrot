@@ -56,9 +56,10 @@ ok( 1, "return created");
 
 ok( $module.verify, "Module verified");
 
-# This will dump to stderr.
-$module.dump();
+$s := $module.dump();
+diag( $s );
 ok(1, "LLVM::Module dumped");
+ok( $s ~~ / 'define i32 @hello' /, ".. with function definition");
 
 my $engine := pir::new__psp("LLVM_Engine", $module);
 my $call   := $engine.create_call($function, "i");
