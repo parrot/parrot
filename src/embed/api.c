@@ -436,17 +436,12 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
 {
     ASSERT_ARGS(Parrot_api_run_bytecode)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
 
     /* Debugging mode nonsense. */
     if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
          Parrot_io_eprintf(interp, "*** Parrot VM: %Ss core ***\n",
                  interp->run_core->name);
     }
-
-    if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
-            "Could not get packfile.");
     if (!mainargs)
         mainargs = PMCNULL;
     Parrot_pf_execute_bytecode_program(interp, pbc, mainargs);

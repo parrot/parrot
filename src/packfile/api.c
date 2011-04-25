@@ -4586,6 +4586,10 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc), ARGMOD(PMC *
     PMC * main_sub;
     PackFile *pf = (PackFile*)VTABLE_get_pointer(interp, pbc);
 
+    if (!pf)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not get packfile.");
+
     if (pf->cur_cs)
         Parrot_pf_set_current_packfile(interp, pbc);
 
