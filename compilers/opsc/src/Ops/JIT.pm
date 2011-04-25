@@ -629,12 +629,12 @@ our method process:pasttype<if> (PAST::Op $chunk, %c) {
 
     $!builder.set_position($then_block);
     self.process($chunk[1], %c);
-    $!builder.br($end_block) unless $!builder.get_insert_block.last_instruction.isATerminatorInst();
+    $!builder.br($end_block) unless $!builder.get_insert_block.last_instruction.is_terminator_inst();
 
     # else is optional
     $!builder.set_position($else_block);
     self.process($chunk[2], %c) if $chunk[2];
-    $!builder.br($end_block) unless $!builder.get_insert_block.last_instruction.isATerminatorInst();
+    $!builder.br($end_block) unless $!builder.get_insert_block.last_instruction.is_terminator_inst();
 
     # Continue 
     $!builder.set_position($end_block);
