@@ -28,21 +28,25 @@ src/llvm_extra.c - Extra functions to extend LLVM C API.
 
 
 /* Helper method for LLVMDumpXXXToString() methods. */
+template <typename T, typename O>
+void do_print(T ptr, O &buf)
+{
+    ptr->print(buf);
+}
+
+template <typename O>
+void do_print(llvm::Module *ptr, O &buf)
+{
+    ptr->print(buf, NULL);
+}
+
+
 template <typename Type>
 STRING *dump_to_string(PARROT_INTERP, Type obj)
 {
     std::string s;
     llvm::raw_string_ostream buf(s);
-    llvm::unwrap(obj)->print(buf);
-    return Parrot_str_from_platform_cstring(interp, s.c_str());
-}
-
-template <>
-STRING *dump_to_string(PARROT_INTERP, LLVMModuleRef obj)
-{
-    std::string s;
-    llvm::raw_string_ostream buf(s);
-    llvm::unwrap(obj)->print(buf, NULL);
+    do_print(llvm::unwrap(obj), buf);
     return Parrot_str_from_platform_cstring(interp, s.c_str());
 }
 
