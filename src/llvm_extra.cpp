@@ -28,8 +28,8 @@ src/llvm_extra.c - Extra functions to extend LLVM C API.
 
 
 /* Helper method for LLVMDumpXXXToString() methods. */
-template <typename W>
-STRING *do_print(PARROT_INTERP, W obj)
+template <typename Type>
+STRING *dump_to_string(PARROT_INTERP, Type obj)
 {
     std::string s;
     llvm::raw_string_ostream buf(s);
@@ -37,28 +37,31 @@ STRING *do_print(PARROT_INTERP, W obj)
     return Parrot_str_from_platform_cstring(interp, s.c_str());
 }
 
+template <>
+STRING *dump_to_string(PARROT_INTERP, LLVMModuleRef obj)
+{
+    std::string s;
+    llvm::raw_string_ostream buf(s);
+    llvm::unwrap(obj)->print(buf, NULL);
+    return Parrot_str_from_platform_cstring(interp, s.c_str());
+}
+
 PARROT_EXPORT
 STRING *Parrot_LLVMDumpModuleToString(PARROT_INTERP, LLVMModuleRef module)
 {
-    // Unfortunatelly Module.print requires additional
-    // llvm::AssemblyAnnotationWriter* without defaulting it to NULL.
-    // return do_print(interp, module);
-    std::string s;
-    llvm::raw_string_ostream buf(s);
-    llvm::unwrap(module)->print(buf, NULL);
-    return Parrot_str_from_platform_cstring(interp, s.c_str());
+    return dump_to_string(interp, module);
 }
 
 PARROT_EXPORT
 STRING *Parrot_LLVMDumpTypeToString(PARROT_INTERP, LLVMTypeRef type)
 {
-    return do_print(interp, type);
+    return dump_to_string(interp, type);
 }
 
 PARROT_EXPORT
 STRING *Parrot_LLVMDumpValueToString(PARROT_INTERP, LLVMValueRef value)
 {
-    return do_print(interp, value);
+    return dump_to_string(interp, value);
 }
 
 
