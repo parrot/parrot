@@ -39,6 +39,11 @@ my $type := $module.get_type($type_name);
 ok( $type, "Type found" );
 ok( $type ~~ LLVM::Type, ".. with proper type");
 
+# Check module dump.
+my $s := $module.dump();
+diag( $s );
+ok( $s ~~ / struct.FOO /, ".. dump has struct definition");
+
 
 $module.delete_type($type_name);
 ok( 1, "Type deleted" );
