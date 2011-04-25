@@ -125,6 +125,26 @@ Initializes the NCI with a C<NULL> function pointer.
 
 /*
 
+=item C<void set_pmc_keyed(PMC *key, PMC *p)>
+
+=item C<void set_pmc_keyed_str(STRING *key, PMC *p)>
+
+Call the equivalent C<set_pointer*> function.
+
+=cut
+
+*/
+
+    VTABLE void set_pmc_keyed(PMC *key, PMC *p) {
+        STATICSELF.set_pointer_keyed(key, VTABLE_get_pointer(INTERP, p));
+    }
+
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *p) {
+        STATICSELF.set_pointer_keyed_str(key, VTABLE_get_pointer(INTERP, p));
+    }
+
+/*
+
 =item C<void set_pointer_keyed(PMC *key, void *func)>
 
 Sets the specified function pointer and signature (C<*key>).
