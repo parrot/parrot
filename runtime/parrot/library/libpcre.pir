@@ -24,9 +24,17 @@ See 'library/pcre.pir' for details on the user interface.
     .local pmc PCRE_NCI_compile
     PCRE_NCI_compile = get_hll_global ['PCRE'; 'NCI'], 'PCRE_compile'
 
+    .local pmc pat_cstr
+    $P0 = dlfunc NULL, "Parrot_str_to_cstring", "ppS"
+    $P1 = getinterp
+    pat_cstr = $P0($P1, pat)
+
     .local pmc code, errmsgptr
     .local int erroffs
-    (code, errmsgptr, erroffs) = PCRE_NCI_compile( pat, options, NULL, 0, NULL )
+    (code, errmsgptr, erroffs) = PCRE_NCI_compile( pat_cstr, options, NULL, 0, NULL )
+
+    $P0 = dlfunc NULL, "Parrot_str_free_cstring", "vp"
+    $P0(pat_cstr)
 
     .local string errmsg
     errmsg = ""
@@ -54,9 +62,10 @@ RETURN:
     .local pmc NULL
     NULL = null
 
-    ## osize -- 1/(2/3) * 4 * 2
+    ## osize -- 2 * sizeof (int)
+    ## on 32 bit systems
     .local int osize
-    osize = 12
+    osize = 8
 
     ## number of result pairs
     .local int num_result_pairs
@@ -69,7 +78,6 @@ RETURN:
     ovector = new 'ManagedStruct'
     ovector = ovector_length
 
-    ## on 32 bit systems
     .local pmc PCRE_NCI_exec
     PCRE_NCI_exec = get_hll_global ['PCRE'; 'NCI'], 'PCRE_exec'
 
@@ -79,7 +87,7 @@ RETURN:
     s_cstr = $P0($P1, s)
 
     .local int ok
-    ok = PCRE_NCI_exec( regex, NULL, s_cstr, len, start, options, ovector, 10 )
+    ok = PCRE_NCI_exec( regex, NULL, s_cstr, len, start, options, ovector, num_result_pairs )
 
     $P0 = dlfunc NULL, "Parrot_str_free_cstring", "vp"
     $P0(s_cstr)
