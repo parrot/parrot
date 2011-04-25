@@ -299,11 +299,13 @@ CODE
 Done!
 OUTPUT
 
-# TODO: Improve this test
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_set_pmc_keyed");
     Parrot_PMC_set_integer_native(interp, pmc2, 99);
     Parrot_PMC_set_pmc_keyed(interp, rpa, key_int, pmc2);
+    pmc3 = Parrot_PMC_get_pmc_keyed(interp, rpa, key_int);
+    Parrot_printf(interp,"%P\n", pmc3);
 CODE
+99
 Done!
 OUTPUT
 
