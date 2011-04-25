@@ -535,6 +535,9 @@ INTERP_O_FILES = \
 	src/longopt$(O) \
 	@TEMP_platform_o@ \
 
+LLVM_O_FILES = \
+	src/llvm_extra$(O)
+
 OPS_FILES = @ops@
 
 ###############################################################################
@@ -1101,6 +1104,7 @@ O_FILES = \
 	$(IO_O_FILES) \
 	$(CLASS_O_FILES) \
 	$(ENCODING_O_FILES) \
+#IF(has_llvm):	$(LLVM_O_FILES) \
 	$(IMCC_O_FILES)
 
 lib_deps_object : $(O_FILES)
