@@ -870,6 +870,10 @@ Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
 
 /*
 
+=item C<PMC * Parrot_pf_get_packfile_main_sub(PARROT_INTERP, PMC * pbc)>
+
+Get the main function of the bytecode segment, if any.
+
 =item C<static PMC * packfile_main(PackFile_ByteCode *bc)>
 
 Access the main function of a bytecode segment.
@@ -877,6 +881,17 @@ Access the main function of a bytecode segment.
 =cut
 
 */
+
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pf_get_packfile_main_sub(PARROT_INTERP, ARGIN(PMC * pbc))
+{
+    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pbc);
+    if (pf == NULL || pf->cur_cs == NULL || pf->cur_cs->const_table == NULL)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Null or invalid PackFile");
+    return packfile_main(pf->cur_cs);
+}
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
