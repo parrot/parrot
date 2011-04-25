@@ -212,7 +212,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
         UINTVAL regs_used[4] = {3, 3, 3, 3};
         PMC * const newcontext = Parrot_push_context(interp, regs_used);
-        PackFile_ByteCode * const old_bc = interp->code;
+        PMC * const old_pf = Parrot_pf_get_current_packfile(interp);
 
         if (has_target)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -232,7 +232,8 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
 
         Parrot_pop_context(interp);
         Parrot_unblock_GC_mark(interp);
-        interp->code = old_bc;
+        if (!PMC_IS_NULL(old_pf))
+            Parrot_pf_set_current_packfile(interp, old_pf);
 
         RETURN(PMC *pf);
     }

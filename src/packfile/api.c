@@ -1818,7 +1818,7 @@ Parrot_pf_get_current_code_segment(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_pf_set_current_packfile(PARROT_INTERP, PMC *pf)>
+=item C<void Parrot_pf_set_current_packfile(PARROT_INTERP, PMC *pbc)>
 
 Set's the current packfile for the interpreter.
 
@@ -1828,18 +1828,18 @@ Set's the current packfile for the interpreter.
 
 PARROT_EXPORT
 void
-Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pf))
+Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
 {
     ASSERT_ARGS(Parrot_pf_set_current_packfile)
-    PackFile *p;
-    if (PMC_IS_NULL(pf))
+    if (PMC_IS_NULL(pbc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Cannot set null packfile");
-
-    interp->current_pf = pf;
-    p                  = (PackFile *)VTABLE_get_pointer(interp, pf);
-    interp->code       = p->cur_cs;
-    PARROT_GC_WRITE_BARRIER(interp, pf);
+    else {
+        PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
+        interp->current_pf = pbc;
+        interp->code       = pf->cur_cs;
+        PARROT_GC_WRITE_BARRIER(interp, pbc);
+    }
 }
 
 /*
