@@ -207,7 +207,7 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
             sig_buf[j++] = ncidt_to_pcc(interp, t & ~enum_type_ref_flag);
     }
 
-    *ret_sig = argc ? Parrot_str_new(interp, sig_buf, retc) : CONST_STRING(interp, "");
+    *ret_sig = retc ? Parrot_str_new(interp, sig_buf, retc) : CONST_STRING(interp, "");
     if (sig_buf != static_buf)
         mem_sys_free(sig_buf);
 }
