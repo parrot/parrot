@@ -266,7 +266,11 @@ Tell Configure that the compiler supports C<inline>.
 
 =item C<--cc=(compiler)>
 
-Specify which compiler to use.
+Specify which C compiler to use.
+
+=item C<--cxx=(compiler)>
+
+Specify which C++ compiler to use.
 
 =item C<--ccflags=(flags)>
 
@@ -402,6 +406,11 @@ E.g.
 
 Use this option if you want imcc's parser and lexer files to be generated.
 Needs a working parser and lexer.
+
+=item C<--with-llvm>
+
+Use this option if you have a recent version of LLVM installed and wish Parrot
+to link to it.
 
 =back
 

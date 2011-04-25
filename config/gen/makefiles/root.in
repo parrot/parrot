@@ -636,10 +636,10 @@ all : \
     $(PCT_LIB_PBCS) \
     $(DATA_JSON_LIB_PBCS) \
     $(JSON_LANG) \
-#IF(has_dynamic_linking): $(EXTRANCITHUNKS_SO) \
+#IF(has_dynamic_linking):    $(EXTRANCITHUNKS_SO) \
     $(NQP_LIB_PBCS) \
-#IF(has_dynamic_linking): $(DYNOPLIBS_TARGETS) \
-#IF(has_dynamic_linking): $(LIBNCI_TEST_SO) \
+#IF(has_dynamic_linking):    $(DYNOPLIBS_TARGETS) \
+#IF(has_dynamic_linking):    $(LIBNCI_TEST_SO) \
     $(GEN_LIBRARY) \
     src/install_config$(O)
 
@@ -1382,7 +1382,8 @@ src/gc/api$(O) : \
     $(PARROT_H_HEADERS) \
     src/gc/gc_private.h \
     src/gc/api.c \
-    src/gc/variable_size_pool.h
+    src/gc/variable_size_pool.h \
+    src/gc/fixed_allocator.h
 
 src/gc/alloc_resources$(O) : \
     $(PARROT_H_HEADERS) \
@@ -1535,29 +1536,16 @@ src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
 src/interp/inter_misc$(O) : $(PARROT_H_HEADERS) \
 	src/interp/inter_misc.c \
 	src/interp/inter_misc.str \
-	compilers/imcc/imc.h \
-	compilers/imcc/cfg.h \
-	compilers/imcc/debug.h \
-	compilers/imcc/instructions.h \
-	compilers/imcc/sets.h \
-	compilers/imcc/symreg.h \
-	compilers/imcc/unit.h \
-	$(INC_DIR)/oplib/ops.h \
-	$(INC_DIR)/runcore_api.h
+	include/imcc/embed.h \
+        include/imcc/yyscanner.h \
+	$(INC_DIR)/runcore_api.h \
+        include/pmc/pmc_parrotinterpreter.h
 
 src/interp/inter_create$(O) : $(PARROT_H_HEADERS) \
 	$(INC_DIR)/oplib/core_ops.h \
 	src/gc/gc_private.h \
 	src/interp/inter_create.c \
 	src/interp/inter_create.str \
-	compilers/imcc/imc.h \
-	compilers/imcc/cfg.h \
-	compilers/imcc/debug.h \
-	compilers/imcc/instructions.h \
-	compilers/imcc/sets.h \
-	compilers/imcc/symreg.h \
-	compilers/imcc/unit.h \
-	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/runcore_api.h \
         src/gc/variable_size_pool.h
 
@@ -1589,6 +1577,7 @@ frontend/parrot/main$(O) : \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/has_header.h \
     $(INC_DIR)/longopt.h \
+    include/imcc/api.h \
     frontend/parrot/main.c
 
 src/multidispatch$(O) : \
@@ -1606,14 +1595,7 @@ src/packfile/api$(O) : \
     include/pmc/pmc_sub.h \
     include/pmc/pmc_key.h \
     include/pmc/pmc_parrotlibrary.h \
-    compilers/imcc/imc.h \
-    compilers/imcc/cfg.h \
-    compilers/imcc/debug.h \
-    compilers/imcc/instructions.h \
-    compilers/imcc/sets.h \
-    compilers/imcc/symreg.h \
-    compilers/imcc/unit.h \
-    $(INC_DIR)/oplib/ops.h \
+    include/pmc/pmc_ptrobj.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/dynext.h \
     $(INC_DIR)/embed.h \
@@ -1727,14 +1709,9 @@ src/embed$(O) : \
     $(INC_DIR)/runcore_api.h \
     $(INC_DIR)/extend_vtable.h \
     $(INC_DIR)/oplib/core_ops.h \
-    compilers/imcc/imc.h \
-    compilers/imcc/cfg.h \
-    compilers/imcc/debug.h \
-    compilers/imcc/instructions.h \
-    compilers/imcc/sets.h \
-    compilers/imcc/symreg.h \
-    compilers/imcc/unit.h \
-    include/pmc/pmc_sub.h
+    include/pmc/pmc_sub.h \
+    include/imcc/embed.h \
+    include/imcc/yyscanner.h \
 
 src/embed/api$(O) : \
     $(PARROT_H_HEADERS) \
@@ -2048,6 +2025,8 @@ SRC_TEST_FILES = \
     t/src/*.t \
     t/src/embed/*.t
 TOOLS_TEST_FILES = $(TOOLS_TESTS_DIR)/tools/*.t
+GC_TEST_FILES = \
+    t/compilers/opsc/*.t
 
 # pbc files used for several tests;
 # not needed for build, hence this target is not included in 'all'
@@ -2200,6 +2179,9 @@ manifest_tests :
 
 examples_tests : test_prep
 	$(PERL) t/harness $(EXAMPLES_TEST_FILES)
+
+gc_tests : test_prep
+	$(PERL) t/harness $(GC_TEST_FILES)
 
 # moretests: Good to use before branch merges
 moretests: test_prep \
@@ -2361,7 +2343,6 @@ dynext-clean :
 # or is there an automatic xargs?
 test-clean :
 	$(RM_F) t/compilers/data_json/*.pir
-	$(RM_F) t/compilers/imcc/imcpasm/*.pir
 	$(RM_F) t/compilers/imcc/syn/*.pir t/compilers/imcc/syn/*.pasm
 	$(RM_F) t/compilers/imcc/reg/*.pir t/compilers/imcc/reg/*.pasm
 	$(RM_F) t/compilers/pct/*.pir
@@ -2690,7 +2671,7 @@ SPLINTFLAGS = \
 
 #SPLINT_SOURCE = `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@ | sort`
 SPLINT_SOURCE = \
-	$$(find src/*.c src/{gc,io,packfile,string}/*.c -type f | \
+	$$(find src/*.c src/gc/*.c src/io/*.c src/packfile/*.c src/string/*.c -type f | \
 	grep -v src/gc/malloc.c | \
 	grep -v src/gc/malloc_trace.c | \
 	grep -v extra_nci_thunks.c | \

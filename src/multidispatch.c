@@ -1284,10 +1284,10 @@ Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     ARGIN(const char *name), ARGIN(PMC *types))
 {
     ASSERT_ARGS(Parrot_mmd_cache_lookup_by_types)
-    const STRING * const key = mmd_cache_key_from_types(interp, name, types);
+    STRING * const key = mmd_cache_key_from_types(interp, name, types);
 
     if (key)
-        return VTABLE_get_pmc_keyed_str(interp, cache, (STRING *) key);
+        return VTABLE_get_pmc_keyed_str(interp, cache, key);
 
     return PMCNULL;
 }

@@ -189,7 +189,7 @@ PARROT_CAN_RETURN_NULL
 static const DebuggerCmd * get_cmd(ARGIN_NULLOK(const char **cmd));
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC * get_exception_context(PARROT_INTERP, ARGMOD(PMC * exception))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -3543,7 +3543,7 @@ Returns an string containing the backtrace of the interpreter's call chain for a
 
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_dbg_get_exception_backtrace(PARROT_INTERP, ARGMOD(PMC * exception))
 {
@@ -3572,7 +3572,7 @@ Returns the context in which the exception was generated.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC *
 get_exception_context(PARROT_INTERP, ARGMOD(PMC * exception))
 {
@@ -3607,8 +3607,8 @@ PDB_backtrace(PARROT_INTERP)
 {
     ASSERT_ARGS(PDB_backtrace)
     /* information about the current sub */
-    PMC *sub = interpinfo_p(interp, CURRENT_SUB);
-    PMC *ctx = CURRENT_CONTEXT(interp);
+    PMC * const sub = interpinfo_p(interp, CURRENT_SUB);
+    PMC * const ctx = CURRENT_CONTEXT(interp);
     STRING * const bt = PDB_get_continuation_backtrace(interp, sub, ctx);
     Parrot_io_eprintf(interp, "%Ss", bt);
 }

@@ -15,7 +15,7 @@
 #include "parrot/config.h"
 #include "parrot/core_types.h"
 
-typedef int (*imcc_hack_func_t)(Parrot_PMC, Parrot_String, int, const char **, Parrot_PMC*);
+typedef Parrot_PMC (*imcc_hack_func_t)(Parrot_PMC, Parrot_String, int, const char **);
 
 /* Forward declaration of Parrot_confess. We can't include exceptions.h yet */
 PARROT_EXPORT
@@ -40,6 +40,7 @@ Parrot_confess(ARGIN(const char *cond), ARGIN(const char *file), unsigned int li
 #  define PARROT_ASSERT_MSG(x, s) /*@-noeffect@*/((void)0)/*@=noeffect@*/
 #  define ASSERT_ARGS(a)
 #else
+#  define PARROT_ASSERTS_ON 1
 #  define PARROT_ASSERT(x) (x) ? ((void)0) : Parrot_confess(#x, __FILE__, __LINE__)
 #  define PARROT_ASSERT_ARG(x) ((x) ? (0) : (Parrot_confess(#x, __FILE__, __LINE__), 0))
 #  define PARROT_FAILURE(x) Parrot_confess((x), __FILE__, __LINE__)
@@ -252,21 +253,6 @@ Parrot_Int Parrot_api_unwrap_pointer(
         FUNC_MODIFIES(* size);
 
 PARROT_API
-Parrot_Int Parrot_api_wrap_imcc_hack(
-    Parrot_PMC interp_pmc,
-    ARGIN(Parrot_String sourcefile),
-    int argc,
-    ARGIN_NULLOK(const char **argv),
-    ARGMOD(Parrot_PMC* bytecodepmc),
-    ARGOUT(int *result),
-    imcc_hack_func_t func)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(5)
-        __attribute__nonnull__(6)
-        FUNC_MODIFIES(* bytecodepmc)
-        FUNC_MODIFIES(*result);
-
-PARROT_API
 Parrot_Int Parrot_api_wrap_pointer(
     Parrot_PMC interp_pmc,
     ARGIN_NULLOK(void *ptr),
@@ -274,6 +260,12 @@ Parrot_Int Parrot_api_wrap_pointer(
     ARGOUT(Parrot_PMC *pmc))
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*pmc);
+
+PARROT_API
+Parrot_Int Parrot_api_write_bytecode_to_file(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pbc,
+    Parrot_String filename);
 
 #define ASSERT_ARGS_Parrot_api_add_dynext_search_path \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -333,12 +325,10 @@ Parrot_Int Parrot_api_wrap_pointer(
 #define ASSERT_ARGS_Parrot_api_unwrap_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ptr) \
     , PARROT_ASSERT_ARG(size))
-#define ASSERT_ARGS_Parrot_api_wrap_imcc_hack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(sourcefile) \
-    , PARROT_ASSERT_ARG(bytecodepmc) \
-    , PARROT_ASSERT_ARG(result))
 #define ASSERT_ARGS_Parrot_api_wrap_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_Parrot_api_write_bytecode_to_file \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/api.c */
 
@@ -631,6 +621,12 @@ Parrot_Int Parrot_api_pmc_null(
         FUNC_MODIFIES(*pmctonull);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_push(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pmc,
+    Parrot_PMC item);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_serialize(
     Parrot_PMC interp_pmc,
     Parrot_PMC object,
@@ -759,6 +755,7 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
 #define ASSERT_ARGS_Parrot_api_pmc_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(pmctonull))
+#define ASSERT_ARGS_Parrot_api_pmc_push __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_pmc_serialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(frozen))
 #define ASSERT_ARGS_Parrot_api_pmc_set_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -789,13 +786,6 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
     , PARROT_ASSERT_ARG(args))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/pmc.c */
-
-/* Forward declaration because IMCC is still part of libparrot */
-
-PARROT_API
-int
-imcc_run_api(ARGMOD(Parrot_PMC interp_pmc), ARGIN(Parrot_String sourcefile),
-        int argc, ARGIN(const char **argv), ARGOUT(PMC **pbcpmc));
 
 #endif /* PARROT_API_H_GUARD */
 

@@ -72,6 +72,7 @@ our @shared_valid_options = qw{
     verbose
     verbose-step
     version
+    with-llvm
     without-crypto
     without-core-nci-thunks
     without-extra-nci-thunks

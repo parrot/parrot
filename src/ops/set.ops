@@ -404,7 +404,7 @@ inline op copy(inout PMC, invar PMC) :base_mem {
         /* Preserve the metadata on the destination. */
         PMC   * const meta  = VTABLE_getprops(interp, $1);
         /* We have to preserve GC flags of original PMC */
-        Parrot_UInt   gc_flags = $1->flags & PObj_GC_all_FLAGS;
+        const Parrot_UInt gc_flags = $1->flags & PObj_GC_all_FLAGS;
 
         /* avoid leaks and unreachable memory by destroying the destination PMC */
         Parrot_pmc_destroy(interp, $1);
@@ -490,7 +490,7 @@ inline op null(out NUM) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 LICENSE
 

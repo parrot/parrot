@@ -12,11 +12,11 @@ NCI/Utils.pir - Utility functions to make Parrot NCI work easier
     use FooTK:from<parrot>;
 
     sub MAIN(*@ARGS is rw) {
-	# Call toolkit's init function, overwriting @ARGS with mangled copy
+        # Call toolkit's init function, overwriting @ARGS with mangled copy
         @ARGS = call_toolkit_init(&fooInit, @ARGS, $*PROGRAM_NAME);
 
-	# Alternately, you can save both the original @ARGS and mangled copy
-	my @mangled_args = call_toolkit_init(&fooInit, @ARGS);
+        # Alternately, you can save both the original @ARGS and mangled copy
+        my @mangled_args = call_toolkit_init(&fooInit, @ARGS);
 
         # ...
     }
@@ -26,20 +26,20 @@ NCI/Utils.pir - Utility functions to make Parrot NCI work easier
         .param pmc argv
 
         # Load this library and the NCI wrapper for a framework/toolkit
-	load_bytecode 'NCI/Utils.pbc'
-	load_bytecode 'FooTK.pbc'
+        load_bytecode 'NCI/Utils.pbc'
+        load_bytecode 'FooTK.pbc'
 
-	# Find Subs for call_toolkit_init() and the toolkit's init function
+        # Find Subs for call_toolkit_init() and the toolkit's init function
         .local pmc call_toolkit_init, fooInit
-	call_toolkit_init = get_global ['NCI';'Utils'], 'call_toolkit_init'
-	fooInit           = get_global ['FooTK'],       'fooInit'
+        call_toolkit_init = get_global ['NCI';'Utils'], 'call_toolkit_init'
+        fooInit           = get_global ['FooTK'],       'fooInit'
 
-	# Call toolkit's init function, overwriting argv with mangled copy
-	argv = call_toolkit_init(fooInit, argv)
+        # Call toolkit's init function, overwriting argv with mangled copy
+        argv = call_toolkit_init(fooInit, argv)
 
-	# Alternately, you can save both the original argv and mangled copy
-	.local pmc mangled_argv
-	mangled_argv = call_toolkit_init(fooInit, argv)
+        # Alternately, you can save both the original argv and mangled copy
+        .local pmc mangled_argv
+        mangled_argv = call_toolkit_init(fooInit, argv)
 
         # ...
     .end

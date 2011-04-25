@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use File::Temp qw( tempdir );
-use Test::More tests =>  49;
+use Test::More tests =>  57;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::llvm');
@@ -36,15 +36,40 @@ $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
 my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
-like( $step->result(), qr/yes|no/,
-  "Result was either 'yes' or 'no'" );
+like( $step->result(), qr/no/,
+  "LLVM not requested; hence result is 'no'" );
+ok( ! $conf->data->get( 'has_llvm' ),
+    "'has_llvm' set to false value, as expected" );
 
 $conf->replenish($serialized);
 
-########## --verbose ##########
-
 ($args, $step_list_ref) = process_options( {
     argv => [ q{--verbose} ],
+    mode => q{configure},
+} );
+
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+{
+    my $stdout;
+    my $ret = capture(
+        sub { $step->runstep($conf) },
+        \$stdout
+    );
+    ok( $ret, "runstep() returned true value" );
+    like( $step->result(), qr/no/,
+      "LLVM not requested; hence result is 'no'" );
+    ok( ! $conf->data->get( 'has_llvm' ),
+        "'has_llvm' set to false value, as expected" );
+    like( $stdout, qr/LLVM not requested/s,
+        "LLVM not requested; got expected verbose output" );
+}
+
+########### --verbose ##########
+
+($args, $step_list_ref) = process_options( {
+    argv => [ q{--verbose}, q{--with-llvm} ],
     mode => q{configure},
 } );
 

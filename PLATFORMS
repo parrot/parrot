@@ -54,7 +54,7 @@ netbsd4.0-arm-gcc-4.1.2           Y    ?     Y   Y   Y    Y     ?  20090518
 netbsd4.0-i386-gcc-4.1.2          Y    ?     Y   Y   Y    Y     ?  20090517
 netbsd4.0-ppc-gcc-4.1.2       B   Y    ?     Y   Y   Y    Y     ?  20090519
 netbsd4.0-sparc64-gcc-4.1.2  B8   Y    -     Y   Y   Y    Y     ?  20090519
-netbsd4.0-x86_64-gcc-4.1.2    8   Y    ?     Y   Y   Y    Y     ?  20090519
+netbsd4.0-x86_64-gcc-4.1.2    8   Y    ?     Y   Y   Y    Y     ?  20110418
 netbsd5.0-i386-gcc-4.1.3          Y    ?     Y   Y   Y    Y     ?  20090519
 netbsd5.0-ppc-gcc-4.1.3       B   Y    ?     Y   Y   Y    Y     ?  20090517
 netbsd5.0-mipseb32-gcc-4.1.3  B   Y    ?     Y   Y   Y    Y     ?  20090518

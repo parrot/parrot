@@ -26,8 +26,7 @@ numbered.  You probably want src/embed/api.c
 #include "pmc/pmc_callcontext.h"
 #include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
-
-#include "../compilers/imcc/imc.h"
+#include "imcc/embed.h"
 
 #include "embed.str"
 
@@ -447,6 +446,7 @@ int
 Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
 {
     ASSERT_ARGS(Parrot_load_bytecode_file)
+#if 0
     PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
 
     Parrot_warn_experimental(interp, "Parrot_load_bytecode_file is experimental");
@@ -454,6 +454,11 @@ Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
         return 0;
     Parrot_pf_set_current_packfile(interp, pf);
     return 1;
+#else
+    UNUSED(interp);
+    UNUSED(filename);
+#endif
+    return 0;
 }
 
 /*
@@ -574,7 +579,7 @@ set_current_sub(PARROT_INTERP)
      */
 
     for (i = 0; i < ct->pmc.const_count; i++) {
-        PMC *sub_pmc = ct->pmc.constants[i];
+        PMC * const sub_pmc = ct->pmc.constants[i];
         if (VTABLE_isa(interp, sub_pmc, SUB)) {
             Parrot_Sub_attributes *sub;
 
@@ -728,7 +733,7 @@ print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
         Parrot_io_fprintf(interp, output, "STR_CONST(%d): %S\n", i, ct->str.constants[i]);
 
     for (i = 0; i < ct->pmc.const_count; i++) {
-        PMC *c = ct->pmc.constants[i];
+        PMC * const c = ct->pmc.constants[i];
         Parrot_io_fprintf(interp, output, "PMC_CONST(%d): ", i);
 
         switch (c->vtable->base_type) {
@@ -904,17 +909,31 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code)
         ARGOUT(Parrot_String *error))
 {
     ASSERT_ARGS(Parrot_compile_string)
-    /* For the benefit of embedders that do not load any pbc
-     * before compiling a string */
+    PMC * const compiler = Parrot_get_compiler(interp, type);
 
-    if (STRING_equal(interp, CONST_STRING(interp, "PIR"), type))
-        return IMCC_compile_pir_s(interp, code, error);
+    /* XXX error is not being set */
+    if (PMC_IS_NULL(compiler)) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not find compiler %Ss", type);
+    }
+    else {
+        PMC *result;
+        STRING * const code_s = Parrot_str_new(interp, code, 0);
+        imc_info_t * imcc     = (imc_info_t*) VTABLE_get_pointer(interp, compiler);
+        const INTVAL is_pasm  = VTABLE_get_integer(interp, compiler);
 
-    if (STRING_equal(interp, CONST_STRING(interp, "PASM"), type))
-        return IMCC_compile_pasm_s(interp, code, error);
+        Parrot_block_GC_mark(interp);
+        result = imcc_compile_string(imcc, code_s, is_pasm);
+        if (PMC_IS_NULL(result)) {
+            STRING * const msg = imcc_last_error_message(imcc);
+            const INTVAL code  = imcc_last_error_code(imcc);
 
-    *error = Parrot_str_new(interp, "Invalid interpreter type", 0);
-    return NULL;
+            Parrot_unblock_GC_mark(interp);
+            Parrot_ex_throw_from_c_args(interp, NULL, code, "%Ss", msg);
+        }
+        Parrot_unblock_GC_mark(interp);
+        return result;
+    }
 }
 
 /*

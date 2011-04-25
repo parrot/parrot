@@ -7,7 +7,11 @@ config/auto/llvm - Check whether the Low Level Virtual Machine is present
 =head1 DESCRIPTION
 
 Determines whether the Low Level Virtual Machine (LLVM) is installed and
-functional on the system.  It is OK when it doesn't exist.
+functional on the system.  It is okay when it is not present.  When a
+sufficiently up-to-date version of LLVM is present, you will need to
+specify C<--with-llvm> as an option to C<perl Configure.pl> in order to tell
+Parrot to link to LLVM, I<i.e.,> building without LLVM is Parrot's default
+setting.
 
 =cut
 
@@ -30,13 +34,17 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $verbose = $conf->options->get( 'verbose' );
-    my $llvm_config = $conf->options->get( 'llvm-config' ) || 'llvm-config';
+    unless ( $conf->options->get( 'with-llvm' ) ) {
+        $self->_handle_result( $conf, 0 );
+        print "LLVM not requested\n" if $verbose;
+        return 1;
+    }
 
     # We will run various probes for LLVM.  If the probes are unsuccessful, we
     # will set_result to 'no', set 'has_llvm' to '', then return from
     # runstep() with a value of 1.  If a given probe does not rule out LLVM,
     # we will proceed onward.
-
+    my $llvm_config = $conf->options->get( 'llvm-config' ) || 'llvm-config';
     my $llvm_bindir = capture_output( "$llvm_config --bindir" ) || '';
     chomp $llvm_bindir;
     if (! $llvm_bindir ) {
@@ -54,9 +62,9 @@ sub runstep {
     my $ccflags = `$llvm_config --cflags`;
     chomp $ccflags;
     # do not include optimizatin level
-    $ccflags =~ s/-O[^ ]*//; 
+    $ccflags =~ s/-O[^ ]*//;
     $conf->data->add( ' ', ccflags => $ccflags );
-    
+
     # Find lib 
     my $ldd = `ldd "$llvm_bindir/lli"`;
     if ($ldd =~ /(libLLVM[^ ]+)(.*)/m){
