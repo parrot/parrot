@@ -15,7 +15,7 @@ class LLVM::Value is LLVM::Opaque {
     }
 
     method dump() {
-        LLVM::call("DumpValue", self);
+        LLVM::call("DumpValueToString", self);
     }
 
 INIT {
