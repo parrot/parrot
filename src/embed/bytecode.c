@@ -87,7 +87,7 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
             "Could not unpack packfile");
     }
     *pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf);
-    do_sub_pragmas(interp, *pbcpmc, PBC_PBC, pbcpmc);
+    do_sub_pragmas(interp, *pbcpmc, PBC_PBC, *pbcpmc);
     Parrot_unblock_GC_mark(interp);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
