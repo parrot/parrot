@@ -18,36 +18,27 @@ See 'library/pcre.pir' for details on the user interface.
     .param string pat
     .param int options
 
-    .local string error
-    .local pmc PCRE_NCI_compile
-    .local int error_size
-
     .local pmc NULL
-    null NULL
+    NULL = null
 
-    .local pmc errptr
-    errptr= new 'Integer'
-
-    ## error message string size
-    error_size= 500
-
-    ## allocate space in string for error message
-    repeat error, " ", error_size
-
+    .local pmc PCRE_NCI_compile
     PCRE_NCI_compile = get_hll_global ['PCRE'; 'NCI'], 'PCRE_compile'
 
-    .local pmc code
+    .local pmc code, errmsgptr
+    .local int erroffs
+    (code, errmsgptr, erroffs) = PCRE_NCI_compile( pat, options, NULL, 0, NULL )
 
-    code = PCRE_NCI_compile( pat, options, error, errptr, NULL )
+    .local string errmsg
+    errmsg = ""
 
-    .local int is_code_defined
-    is_code_defined = defined code
-    unless is_code_defined goto RETURN
+    unless_null code, RETURN
 
-    error = ""
+    $P0 = dlfunc NULL, "Parrot_str_new", "SppI"
+    $P1 = getinterp
+    errmsg = $P0($P1, errmsgptr, 0)
 
 RETURN:
-    .return( code, error, errptr )
+    .return( code, errmsg, erroffs )
 .end
 
 
@@ -61,7 +52,7 @@ RETURN:
     length len, s
 
     .local pmc NULL
-    null NULL
+    NULL = null
 
     ## osize -- 1/(2/3) * 4 * 2
     .local int osize
@@ -82,9 +73,16 @@ RETURN:
     .local pmc PCRE_NCI_exec
     PCRE_NCI_exec = get_hll_global ['PCRE'; 'NCI'], 'PCRE_exec'
 
-    .local int ok
+    .local pmc s_cstr
+    $P0 = dlfunc NULL, "Parrot_str_to_cstring", "ppS"
+    $P1 = getinterp
+    s_cstr = $P0($P1, s)
 
-    ok = PCRE_NCI_exec( regex, NULL, s, len, start, options, ovector, 10 )
+    .local int ok
+    ok = PCRE_NCI_exec( regex, NULL, s_cstr, len, start, options, ovector, 10 )
+
+    $P0 = dlfunc NULL, "Parrot_str_free_cstring", "vp"
+    $P0(s_cstr)
 
     .return( ok, ovector )
 .end
