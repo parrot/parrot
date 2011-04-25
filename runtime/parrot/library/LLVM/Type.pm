@@ -46,6 +46,10 @@ class LLVM::Type is LLVM::Value {
         );
     }
 
+    method dump() {
+        LLVM::call("DumpTypeToString", self);
+    }
+
     # Shortcut for i8*
     sub cstring() { pointer(int8()); }
 

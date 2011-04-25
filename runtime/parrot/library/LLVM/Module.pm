@@ -19,7 +19,7 @@ class LLVM::Module is LLVM::Opaque {
     }
 
     method dump() {
-        LLVM::call("DumpModule", self);
+        LLVM::call("DumpModuleToString", self);
     }
 
     method add_function ($name, $return, *@args, :$va_args?) {
