@@ -1,4 +1,4 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -9,8 +9,8 @@ TAP/Harness
 Simplified port of TAP::Harness (version 3.21)
 and TAP::Harness::Archive (version 0.14)
 
-See L<http://search.cpan.org/~andya/Test-Harness/>
-end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
+See L<http://search.cpan.org/dist/Test-Harness/>
+end L<http://search.cpan.org/dist/TAP-Harness-Archive/>.
 
 =head3 Class TAP;Harness
 

@@ -870,6 +870,10 @@ Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
 
 /*
 
+=item C<PMC * Parrot_pf_get_packfile_main_sub(PARROT_INTERP, PMC * pbc)>
+
+Get the main function of the bytecode segment, if any.
+
 =item C<static PMC * packfile_main(PackFile_ByteCode *bc)>
 
 Access the main function of a bytecode segment.
@@ -877,6 +881,18 @@ Access the main function of a bytecode segment.
 =cut
 
 */
+
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pf_get_packfile_main_sub(PARROT_INTERP, ARGIN(PMC * pbc))
+{
+    ASSERT_ARGS(Parrot_pf_get_packfile_main_sub)
+    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pbc);
+    if (pf == NULL || pf->cur_cs == NULL || pf->cur_cs->const_table == NULL)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Null or invalid PackFile");
+    return packfile_main(pf->cur_cs);
+}
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
@@ -1803,7 +1819,7 @@ Parrot_pf_get_current_code_segment(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_pf_set_current_packfile(PARROT_INTERP, PMC *pf)>
+=item C<void Parrot_pf_set_current_packfile(PARROT_INTERP, PMC *pbc)>
 
 Set's the current packfile for the interpreter.
 
@@ -1813,18 +1829,18 @@ Set's the current packfile for the interpreter.
 
 PARROT_EXPORT
 void
-Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pf))
+Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
 {
     ASSERT_ARGS(Parrot_pf_set_current_packfile)
-    PackFile *p;
-    if (PMC_IS_NULL(pf))
+    if (PMC_IS_NULL(pbc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Cannot set null packfile");
-
-    interp->current_pf = pf;
-    p                  = (PackFile *)VTABLE_get_pointer(interp, pf);
-    interp->code       = p->cur_cs;
-    PARROT_GC_WRITE_BARRIER(interp, pf);
+    else {
+        PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
+        interp->current_pf = pbc;
+        interp->code       = pf->cur_cs;
+        PARROT_GC_WRITE_BARRIER(interp, pbc);
+    }
 }
 
 /*
@@ -4583,16 +4599,17 @@ void
 Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc), ARGMOD(PMC *args))
 {
     ASSERT_ARGS(Parrot_pf_execute_bytecode_program)
+    PMC * const current_pf = Parrot_pf_get_current_packfile(interp);
     PMC * main_sub;
     PackFile *pf = (PackFile*)VTABLE_get_pointer(interp, pbc);
 
-    if (pf->cur_cs)
-        Parrot_pf_set_current_packfile(interp, pbc);
-    PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+    if (!pf || !pf->cur_cs)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not get packfile.");
 
-    /* TODO: Ask the PackFile for the main sub directly, instead of relying on
-             it being stored in the current context */
-    main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+    Parrot_pf_set_current_packfile(interp, pbc);
+    PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+    main_sub = packfile_main(pf->cur_cs);
 
     /* if no sub was marked being :main, we create a dummy sub with offset 0 */
 
@@ -4604,6 +4621,9 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc), ARGMOD(PMC *
 
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, args);
     Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", args);
+
+    if (!PMC_IS_NULL(current_pf))
+        Parrot_pf_set_current_packfile(interp, current_pf);
 }
 
 

@@ -35,8 +35,6 @@ use Parrot::Pmc2c::UtilFunctions qw(
     gen_multi_name
 );
 use Text::Balanced 'extract_bracketed';
-use Parrot::Pmc2c::PCCMETHOD ();
-use Parrot::Pmc2c::MULTI ();
 use Parrot::Pmc2c::PMC::RO ();
 
 sub create {

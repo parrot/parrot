@@ -145,12 +145,10 @@ PIOHANDLE
 Parrot_io_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
 {
     struct stat  buf;
-    int          oflags;
     PIOHANDLE    fd;
-    char        *spath;
 
-    oflags = convert_flags_to_unix(flags);
-    spath  = Parrot_str_to_platform_cstring(interp, path);
+    const int oflags   = convert_flags_to_unix(flags);
+    char * const spath = Parrot_str_to_platform_cstring(interp, path);
 
     while ((fd = open(spath, oflags, DEFAULT_OPEN_MODE)) < 0
     &&      errno == EINTR)
@@ -183,7 +181,7 @@ Duplicates file handle C<handle>.
 
 PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
-Parrot_io_dup(PARROT_INTERP, PIOHANDLE handle)
+Parrot_io_dup(SHIM_INTERP, PIOHANDLE handle)
 {
     return dup(handle);
 }
@@ -240,7 +238,7 @@ Closes C<*io>'s file descriptor.
 */
 
 INTVAL
-Parrot_io_close(PARROT_INTERP, PIOHANDLE file_descriptor)
+Parrot_io_close(SHIM_INTERP, PIOHANDLE file_descriptor)
 {
     INTVAL result = 0;
 
@@ -332,7 +330,7 @@ XXX: Is it necessary to C<sync()> here?
 */
 
 INTVAL
-Parrot_io_flush(PARROT_INTERP, PIOHANDLE os_handle)
+Parrot_io_flush(SHIM_INTERP, PIOHANDLE os_handle)
 {
     return fsync(os_handle);
 }
@@ -350,8 +348,7 @@ C<buffer>.
 */
 
 size_t
-Parrot_io_read(PARROT_INTERP, PIOHANDLE os_handle,
-        ARGMOD(char *buf), size_t len)
+Parrot_io_read(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(char *buf), size_t len)
 {
 
     for (;;) {
@@ -427,8 +424,7 @@ descriptor to C<offset> bytes from the location indicated by C<whence>.
 */
 
 PIOOFF_T
-Parrot_io_seek(PARROT_INTERP, PIOHANDLE os_handle,
-        PIOOFF_T offset, INTVAL whence)
+Parrot_io_seek(SHIM_INTERP, PIOHANDLE os_handle, PIOOFF_T offset, INTVAL whence)
 {
     const PIOOFF_T pos = lseek(os_handle, offset, whence);
 
@@ -446,7 +442,7 @@ Returns the current read/write position on C<*io>'s file descriptor.
 */
 
 PIOOFF_T
-Parrot_io_tell(PARROT_INTERP, PIOHANDLE os_handle)
+Parrot_io_tell(SHIM_INTERP, PIOHANDLE os_handle)
 {
     const PIOOFF_T pos = lseek(os_handle, (PIOOFF_T)0, SEEK_CUR);
 
