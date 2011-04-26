@@ -239,3 +239,6 @@ v    fff
 
 # Testing SQLite
 i    pid
+
+# PCRE
+p    pS
