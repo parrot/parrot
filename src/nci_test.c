@@ -397,7 +397,7 @@ nci_iiii(int i1, int i2, int i3)
 
 /*
 
-=item C<PARROT_DYNEXT_EXPORT int call_back(PARROT_INTERP, PMC *)>
+=item C<PARROT_DYNEXT_EXPORT int call_back(PARROT_INTERP, PMC *str_pmc)>
 
 writes the string C<str> to stdout and returns the value 4711.
 
