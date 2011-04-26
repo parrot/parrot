@@ -485,7 +485,7 @@ method term:sym<call> ($/) {
     my $name := ~$<identifier>;
     my $past;
 
-    if $CPP && $CPP.is_macro($name) {
+    if pir::defined($CPP) && $CPP.is_macro($name) {
         say("Cloning $name");
         my @args;
         if ($<arglist><arg>) {
