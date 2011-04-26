@@ -239,7 +239,7 @@ latin1_upcase(PARROT_INTERP, ARGIN(const STRING *src))
     UINTVAL offset;
     STRING * const result = Parrot_str_clone(interp, src);
 
-    if (!result->strlen)
+    if (result->strlen == 0)
         return result;
 
     buffer = (unsigned char *)result->strstart;
@@ -276,7 +276,7 @@ latin1_downcase(PARROT_INTERP, ARGIN(const STRING *src))
     UINTVAL offset;
     STRING * const result = Parrot_str_clone(interp, src);
 
-    if (!result->strlen)
+    if (result->strlen == 0)
         return result;
 
     buffer = (unsigned char *)result->strstart;
@@ -314,7 +314,7 @@ latin1_titlecase(PARROT_INTERP, ARGIN(const STRING *src))
     UINTVAL        offset;
     STRING * const result = Parrot_str_clone(interp, src);
 
-    if (!result->strlen)
+    if (result->strlen == 0)
         return result;
 
     buffer = (unsigned char *)result->strstart;
@@ -358,7 +358,7 @@ latin1_upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
     unsigned int   c;
     STRING * const result = Parrot_str_clone(interp, src);
 
-    if (!result->strlen)
+    if (result->strlen == 0)
         return result;
 
     buffer = (unsigned char *)result->strstart;
@@ -393,7 +393,7 @@ latin1_downcase_first(PARROT_INTERP, ARGIN(const STRING *src))
     unsigned int   c;
     STRING * const result = Parrot_str_clone(interp, src);
 
-    if (!result->strlen)
+    if (result->strlen == 0)
         return result;
 
     buffer = (unsigned char *)result->strstart;
