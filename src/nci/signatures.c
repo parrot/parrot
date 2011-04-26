@@ -183,7 +183,7 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
 
     const size_t sig_len = VTABLE_elements(interp, sig_pmc);
 
-    size_t argc = sig_len - 1;
+    const size_t argc = sig_len - 1;
     size_t retc = 0;
 
     /* avoid malloc churn on common signatures */
