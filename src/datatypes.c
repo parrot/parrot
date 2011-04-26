@@ -84,10 +84,12 @@ STRING *
 Parrot_dt_get_datatype_name(PARROT_INTERP, INTVAL type)
 {
     ASSERT_ARGS(Parrot_dt_get_datatype_name)
-    char   *s;
+    const char *s;
     STRING *str;
-    int is_ref  = type &  enum_type_ref_flag;
-    type       &=        ~enum_type_ref_flag;
+
+    const int is_ref = type & enum_type_ref_flag;
+
+    type &= ~enum_type_ref_flag;
 
     s = (type < enum_first_type || type >= enum_last_type)
             ? "illegal"
