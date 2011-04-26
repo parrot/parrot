@@ -198,7 +198,7 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
 
     for (i = 0; i < argc; i++) {
         t          = (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, sig_pmc, i + 1);
-        sig_buf[i] = ncidt_to_pcc(interp, t & ~enum_type_ref_flag);
+        sig_buf[i] = ncidt_to_pcc(interp, (PARROT_DATA_TYPE)(t & ~enum_type_ref_flag));
         if (t & enum_type_ref_flag)
             retc++;
     }
@@ -225,7 +225,7 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
     for (i = 0; j < retc; i++) {
         t = (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, sig_pmc, i + 1);
         if (t & enum_type_ref_flag)
-            sig_buf[j++] = ncidt_to_pcc(interp, t & ~enum_type_ref_flag);
+            sig_buf[j++] = ncidt_to_pcc(interp, (PARROT_DATA_TYPE)(t & ~enum_type_ref_flag));
     }
 
     *ret_sig = retc ? Parrot_str_new(interp, sig_buf, retc) : CONST_STRING(interp, "");

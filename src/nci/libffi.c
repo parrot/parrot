@@ -487,7 +487,8 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
         nci_arg_ptr = mem_gc_allocate_n_zeroed_typed(interp, nci->arity, void *);
 
         for (i = 0; i < nci->arity; i++) {
-            PARROT_DATA_TYPE t = VTABLE_get_integer_keyed_int(interp, nci->signature, i + 1);
+            PARROT_DATA_TYPE t = (PARROT_DATA_TYPE)
+                                    VTABLE_get_integer_keyed_int(interp, nci->signature, i + 1);
             switch (t & ~enum_type_ref_flag) {
               case enum_type_char:
                 nci_val[i].c   = pcc_arg[i].i;
@@ -573,16 +574,17 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
         call_arg[2] = &pcc_ret_sig;
 
         /* populate return slot (non-existant if void) */
-        if (enum_type_void != (arg_t = VTABLE_get_integer_keyed_int(interp, nci->signature, 0))) {
+        if (enum_type_void !=
+            (arg_t = (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, nci->signature, 0))) {
             prep_pcc_ret_arg(interp, arg_t, &pcc_retv[i], &call_arg[i + 3], return_data);
             i++;
         }
 
         /* also return call-by-reference arguments (if any) */
         for (j = 1; i < pcc_retc; j++) {
-            arg_t = VTABLE_get_integer_keyed_int(interp, nci->signature, j);
+            arg_t = (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, nci->signature, j);
             if (arg_t & enum_type_ref_flag) {
-                prep_pcc_ret_arg(interp, arg_t & ~enum_type_ref_flag,
+                prep_pcc_ret_arg(interp, (PARROT_DATA_TYPE)(arg_t & ~enum_type_ref_flag),
                                     &pcc_retv[i], &call_arg[i + 3], nci_arg[j - 1]);
                 i++;
             }
