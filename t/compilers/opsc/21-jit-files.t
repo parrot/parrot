@@ -15,6 +15,7 @@ my $ops_file := Ops::File.new("t/jit/jitted.ops",
     :oplib($oplib),
     :core(0),
     :quiet(!$debug),
+    :cpp(Ops::Compiler::Preprocessor.new),
 );
 
 for <01 02 03 04 06> {
