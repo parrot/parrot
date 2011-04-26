@@ -52,11 +52,16 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
 {
     ASSERT_ARGS(Parrot_nci_parse_signature)
 
-    const size_t sig_length = Parrot_str_byte_length(interp, sig_str);
-
+    const size_t  sig_length = Parrot_str_byte_length(interp, sig_str);
+    PMC          *sig_pmc    = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray,
+                                                                sig_length);
     size_t i;
 
-    PMC * const sig_pmc = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
+    if (!sig_length) {
+        sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, 1);
+        VTABLE_set_integer_keyed_int(interp, sig_pmc, 0, enum_type_void);
+        return sig_pmc;
+    }
 
     for (i = 0; i < sig_length; ++i) {
         const INTVAL c = Parrot_str_indexed(interp, sig_str, i);
@@ -113,11 +118,8 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
             break;
         }
 
-        VTABLE_push_integer(interp, sig_pmc, e);
+        VTABLE_set_integer_keyed_int(interp, sig_pmc, i, e);
     }
-
-    if (VTABLE_elements(interp, sig_pmc) < 1)
-        VTABLE_push_integer(interp, sig_pmc, enum_type_void);
 
     return sig_pmc;
 }
