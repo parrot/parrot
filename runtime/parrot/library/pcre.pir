@@ -117,7 +117,7 @@ LIB_LOADED:
     $I0    = .DATATYPE_INT | .DATATYPE_REF_FLAG
     $P0[4] = $I0                                # int *erroffset
     $P0[5] = .DATATYPE_PTR                      # const unsigned char *tableptr
-    pcre_function = dlfunc libpcre, 'pcre_compile', $P0 
+    pcre_function = dlfunc libpcre, 'pcre_compile', $P0
     set_hll_global ['PCRE'; 'NCI'], 'PCRE_compile', pcre_function
 
     #int pcre_exec(const pcre *code, const pcre_extra *extra,

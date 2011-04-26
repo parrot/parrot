@@ -52,7 +52,7 @@ Parrot_dt_get_datatype_enum(PARROT_INTERP, ARGIN(STRING *type_name))
                                         Parrot_str_length(interp, type_name) - 1);
         flags     |= enum_type_ref_flag;
     }
-    
+
     type = Parrot_str_to_cstring(interp, type_name);
 
     for (i = enum_first_type; i < enum_last_type; ++i) {

@@ -59,7 +59,7 @@
 
     .return ($S0)
 .end
-    
+
 .sub __postgres_init :load
     $P1 = loadlib 'libpq'
     if $P1 goto has_lib
