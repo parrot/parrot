@@ -333,7 +333,7 @@ Helper function to clone string.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_str_clone(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
@@ -375,7 +375,7 @@ Creates and returns a shallow copy of the specified Parrot string.
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
 Parrot_str_copy(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
@@ -437,7 +437,7 @@ returned. If both strings are C<NULL>, return C<STRINGNULL>.
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
             ARGIN_NULLOK(const STRING *b))
@@ -743,6 +743,7 @@ string.
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 char *
 Parrot_str_to_platform_cstring(PARROT_INTERP, ARGIN(const STRING *s))
 {
@@ -1158,7 +1159,7 @@ A negative offset is allowed to replace from the end.
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
 Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
@@ -2361,7 +2362,7 @@ this as I<\x{hh...hh}>.
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_str_escape(PARROT_INTERP, ARGIN_NULLOK(const STRING *src))
 {
@@ -2383,7 +2384,7 @@ but limits the length of the output (used for trace output of strings).
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_str_escape_truncate(PARROT_INTERP,
         ARGIN_NULLOK(const STRING *src), UINTVAL limit)
@@ -2989,16 +2990,16 @@ Normalizes the string.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_str_compose(PARROT_INTERP, ARGIN_NULLOK(const STRING *src))
 {
     ASSERT_ARGS(Parrot_str_compose)
 
     if (STRING_IS_NULL(src))
-        return NULL;
+        return STRINGNULL;
 
-    if (!src->strlen)
+    if (src->strlen == 0)
         return CONST_STRING(interp, "");
 
     return STRING_compose(interp, src);
@@ -3074,7 +3075,7 @@ Returns PMCNULL if the string or the delimiter is NULL.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_str_split(PARROT_INTERP,
     ARGIN_NULLOK(const STRING *delim), ARGIN_NULLOK(const STRING *str))
