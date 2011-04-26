@@ -382,7 +382,7 @@ prep_pcc_ret_arg(PARROT_INTERP, PARROT_DATA_TYPE t, parrot_var_t *pv, void **rv,
         break;
       case enum_type_ptr:
         if (*(void **)val) {
-            pv->p = Parrot_pmc_new(interp, enum_class_Ptr);
+            pv->p = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
             VTABLE_set_pointer(interp, pv->p, *(void **)val);
         }
         else {
