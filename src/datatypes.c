@@ -48,7 +48,8 @@ Parrot_dt_get_datatype_enum(PARROT_INTERP, ARGIN(STRING *type_name))
         return enum_type_undef;
 
     if ('&' == Parrot_str_indexed(interp, type_name, Parrot_str_length(interp, type_name) - 1)) {
-        type_name  = Parrot_str_substr(interp, type_name, 0, Parrot_str_length(interp, type_name) - 1);
+        type_name  = Parrot_str_substr(interp, type_name, 0,
+                                        Parrot_str_length(interp, type_name) - 1);
         flags     |= enum_type_ref_flag;
     }
     
