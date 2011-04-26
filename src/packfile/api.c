@@ -886,6 +886,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_pf_get_packfile_main_sub(PARROT_INTERP, ARGIN(PMC * pbc))
 {
+    ASSERT_ARGS(Parrot_pf_get_packfile_main_sub)
     PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pbc);
     if (pf == NULL || pf->cur_cs == NULL || pf->cur_cs->const_table == NULL)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
