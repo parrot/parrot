@@ -181,7 +181,7 @@ ops file.
 
 =end
 
-method new(*@files, :$oplib, :$core, :$nolines, :$quiet? = 0) {
+method new(*@files, :$oplib, :$core, :$nolines, :$quiet? = 0, :$cpp?) {
     self<files>   := @files;
     self<core>    := $core;
     self<ops>     := list(); # Ops
@@ -196,6 +196,10 @@ method new(*@files, :$oplib, :$core, :$nolines, :$quiet? = 0) {
     }
     else {
         self<file> := @files[0];
+    }
+
+    if pir::defined($cpp) {
+        self<compiler>.set_cpp($cpp);
     }
 
     self._set_version();

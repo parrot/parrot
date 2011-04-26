@@ -13,4 +13,8 @@ method set_oplib($oplib) {
     $Ops::Compiler::Actions::OPLIB := $oplib;
 }
 
+method set_cpp($cpp) {
+    $Ops::Compiler::Actions::CPP := $cpp;
+}
+
 # vim: ft=perl6 expandtab shiftwidth=4:
