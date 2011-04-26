@@ -471,6 +471,10 @@ our multi method process(PAST::Var $var, %c) {
             my $sub  := pir::find_sub_not_null__ps('access_arg:type<' ~ $type ~ '>');
             $res := $sub(self, $num, %c);
         }
+        elsif $var.scope eq 'keyed_arrow' {
+            $!debug && _dumper($var);
+            die("keyed_arrow NYI");
+        }
         else {
             $res := %c<variables>{ $var.name } // die("Unknown variable { $var.name }");
             $res := $!builder.load($res) unless %c<lhs>;

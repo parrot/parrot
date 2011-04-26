@@ -56,6 +56,19 @@ sub demacrofy($op, @args) {
 
 INIT {
 
+    # PMC_IS_NULL(pmc) NYI
+    %MACROS<PMC_IS_NULL> := PAST::Val.new(
+        :value(0),
+        :returns<int>
+    );
+
+    # CURRENT_CONTEXT(interp) -> inter->ctx
+    %MACROS<CURRENT_CONTEXT> := PAST::Var.new(
+        :scope<keyed_arrow>,
+        PAST::Var.new(:name<0>, :scope<macro_arg>),
+        "ctx",
+    );
+
     # VTABLE_get_number(interp, pmc) -> pmc->vtable->get_number(interp, pmc)
     %MACROS<VTABLE_get_number> := PAST::Op.new(
         :pasttype<call>,
