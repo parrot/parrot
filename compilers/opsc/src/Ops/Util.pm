@@ -55,4 +55,10 @@ sub strip_source($op) {
     });
 }
 
+sub deep_clone($thingy) {
+    process_recursive($thingy, -> $_ {
+        $_.WHAT.new;
+    });
+}
+
 # vim: ft=perl6
