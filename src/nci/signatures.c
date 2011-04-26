@@ -24,6 +24,17 @@ signatures.
 
 /* HEADERIZER HFILE: include/parrot/nci.h */
 
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static char ncidt_to_pcc(PARROT_INTERP, PARROT_DATA_TYPE t)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_ncidt_to_pcc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /*
 
 =item C<PMC * Parrot_nci_parse_signature(PARROT_INTERP, STRING *sig_str)>
@@ -111,10 +122,20 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
     return sig_pmc;
 }
 
+/*
+
+=item C<static char ncidt_to_pcc(PARROT_INTERP, PARROT_DATA_TYPE t)>
+
+Lookup the appropriate PCC signature item to use for a given NCI type.
+
+=cut
+
+*/
+
 static char
 ncidt_to_pcc(PARROT_INTERP, PARROT_DATA_TYPE t)
 {
-    // ASSERT_ARGS(ncidt_to_pcc)
+    ASSERT_ARGS(ncidt_to_pcc)
 
     switch (t) {
       case enum_type_float:

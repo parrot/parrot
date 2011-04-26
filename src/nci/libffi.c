@@ -285,7 +285,8 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
 
 /*
 
-=item C<static ffi_type * nci_to_ffi_type(PARROT_INTERP, PARROT_DATA_TYPE nci_t)>
+=item C<static ffi_type * nci_to_ffi_type(PARROT_INTERP, PARROT_DATA_TYPE
+nci_t)>
 
 Convert an NCI type specification into the corresponding LibFFI type.
 
