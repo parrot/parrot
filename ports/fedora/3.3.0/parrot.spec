@@ -1,12 +1,12 @@
 Name:           parrot
-Version:        2.11.0
+Version:        3.3.0
 Release:        1%{?dist}
 Summary:        A virtual machine
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            http://www.parrot.org/
 
-Source0:        ftp://ftp.parrot.org/pub/parrot/releases/devel/%{version}/parrot-%{version}.tar.gz
+Source0:        ftp://ftp.parrot.org/pub/parrot/releases/stable/%{version}/parrot-%{version}.tar.gz
 Source1:        %{name}.desk.in.tar.gz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -18,6 +18,7 @@ BuildRequires:  libicu-devel
 BuildRequires:  perl(Test::Harness)
 BuildRequires:  perl(Test::Simple)
 BuildRequires:  perl(Devel::Cover)
+BuildRequires:  perl(JSON)
 BuildRequires:  procps
 BuildRequires:  ctags
 BuildRequires:  openssl-devel
@@ -50,7 +51,7 @@ BuildArch:      noarch
 Summary:        Parrot Virtual Machine development headers and libraries
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
-Requires:       pkgconfig, vim-common
+Requires:       vim-common
 
 #--
 
@@ -63,6 +64,7 @@ Requires:       perl(File::Which) >= 0.05
 Requires:       perl(Parrot::OpLib::core)
 # It is necessary to have installed the package "perl-Perl-Critic" to install
 # the parrot-tools
+Provides:       perl(Parrot::Pmc2c) = %{version}
 Provides:       perl(Parrot::Pmc2c::MethodEmitter) = %{version}
 Provides:       perl(Parrot::Pmc2c::PCCMETHOD_BITS) = %{version}
 Provides:       perl(Parrot::Pmc2c::PMCEmitter) = %{version}
@@ -116,9 +118,9 @@ chmod +x %{__perl_provides}
 
 # there are problems in this version with the optimize="-O2" option building on
 # ppc64 and ppc with nqp-rx
-%ifarch ppc64 ppc
-    RPM_OPT_FLAGS=`echo "$RPM_OPT_FLAGS" | %{__perl} -pi -e 's/-O2//'`
-%endif
+#%%ifarch ppc64 ppc
+#    RPM_OPT_FLAGS=`echo "$RPM_OPT_FLAGS" | %%{__perl} -pi -e 's/-O2//'`
+#%%endif
 
 %{__perl} Configure.pl \
     --prefix=%{_usr} \
@@ -127,19 +129,16 @@ chmod +x %{__perl_provides}
     --infodir=%{_datadir}/info \
     --mandir=%{_mandir} \
     --cc="%{__cc}" \
-    --cxx=%{__cxx} \
     --optimize="$RPM_OPT_FLAGS" \
     --parrot_is_shared \
     --disable-rpath \
-    --pkgconfigdir=pkgconfig \
     --lex=%{_bindir}/flex
 
 # The LD_LIBRARY_PATH hack is needed for "miniparrot"
 # to find his parrot-library in "blib/lib" 
 export LD_LIBRARY_PATH=$( pwd )/blib/lib
 
-# pbc_to_exe would not build if %%{_smp_mflags} would used
-make
+make %{_smp_mflags}
 make html pdf
 
 
@@ -263,7 +262,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc ChangeLog CREDITS NEWS PBC_COMPAT PLATFORMS README
 %doc RESPONSIBLE_PARTIES TODO LICENSE
-%doc README.deutsch README.espanol README.polski
 %{_bindir}/parrot
 %{_libdir}/parrot/
 %exclude %{_libdir}/parrot/%{version}/tools
@@ -292,7 +290,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/parrot
 %{_libdir}/libparrot.so
 %exclude %{_libdir}/libparrot.a
-%{_libdir}/pkgconfig/*
 %{_mandir}/man1/parrot_config.1.gz
 %{_mandir}/man1/parrot_debugger.1.gz
 %{_mandir}/man1/pbc_disassemble.1.gz
@@ -314,9 +311,30 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Apr 22 2011 Gerd Pokorra <gp@zimt.uni-siegen.de> 3.3.0-1
+- updated to 3.3.0
+- change to use make with _smp_mflags
+- remove pkgconfig depedency, configuration and files
+- remove configuration option: --cxx
+
+* Fri Apr 15 2011 Paul Howarth <xxxxxxx@city-fan.org> 3.0.0-5
+- add provides filter for rpm 4.9 onwards
+
+* Mon Mar 07 2011 Caolán McNamara <xxxxx@redhat.com> 3.0.0-4
+- rebuild for icu 4.6
+
+* Tue Feb 08 2011 Fedora Release Engineering <xxxxxx@lists.fedoraproject.org> - 3.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
+* Fri Jan 28 2011 Gerd Pokorra <gp@zimt.uni-siegen.de> 3.0.0-2
+- add Provides perl(Parrot::Pmc2c)
+
+* Wed Jan 19 2011 Gerd Pokorra <gp@zimt.uni-siegen.de> 3.0.0-1
+- updated to 3.0.0
+
 * Wed Dec 22 2010 Gerd Pokorra <gp@zimt.uni-siegen.de> 2.11.0-1
 - updated to 2.11.0
-- added BuildRequires perl(Devel::Cover), procps
+- added BuildRequires perl(Devel::Cover), perl(JSON), procps
 
 * Wed Jul 21 2010 Gerd Pokorra <gp@zimt.uni-siegen.de> 2.6.0-1
 - updated to 2.6.0
