@@ -732,6 +732,11 @@ our method process:pirop<arrow> (PAST::Op $chunk, %c) {
     $res;
 }
 
+our method process:pirop<!> (PAST::Op $chunk, %c) {
+    $!debug && _dumper($chunk);
+
+    $!builder.not( self.process($chunk[0], %c) );
+}
 
 our multi method process(PAST::Stmts $chunk, %c) {
     self.process($_, %c) for @($chunk);
