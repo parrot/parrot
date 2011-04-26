@@ -54,6 +54,9 @@ PMC * Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+STRING * Parrot_nci_describe_sig(PARROT_INTERP, PMC *sig)
+        __attribute__nonnull__(1);
+
 void Parrot_nci_sig_to_pcc(PARROT_INTERP,
     ARGIN(PMC *sig_pmc),
     ARGOUT(STRING **params_sig),
@@ -68,6 +71,8 @@ void Parrot_nci_sig_to_pcc(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_nci_parse_signature __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sig_str))
+#define ASSERT_ARGS_Parrot_nci_describe_sig __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_nci_sig_to_pcc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sig_pmc) \

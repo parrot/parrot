@@ -76,7 +76,7 @@ build_call_func(PARROT_INTERP, ARGIN(PMC *sig))
 
     Parrot_ex_throw_from_c_args(interp, NULL,
         EXCEPTION_UNIMPLEMENTED,
-        "No NCI thunk available for signature '%Ss'", VTABLE_get_repr(interp, sig));
+        "No NCI thunk available for signature `%Ss'", Parrot_nci_describe_sig(interp, sig));
 }
 
 /*

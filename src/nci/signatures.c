@@ -235,6 +235,41 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
 
 /*
 
+=item C<STRING * Parrot_nci_describe_sig(PARROT_INTERP, PMC *sig)>
+
+Provide a descriptive string for a signature.
+
+=cut
+
+*/
+
+STRING *
+Parrot_nci_describe_sig(PARROT_INTERP, PMC *sig)
+{
+    ASSERT_ARGS(Parrot_nci_describe_sig)
+
+    STRING *s;
+    size_t  n = VTABLE_elements(interp, sig);
+    size_t  i;
+
+    /* return value */
+    s = Parrot_dt_get_datatype_name(interp, VTABLE_get_integer_keyed_int(interp, sig, 0));
+
+    /* arguments */
+    s = Parrot_str_concat(interp, s, CONST_STRING(interp, " ("));
+    for (i = 1; i < n; i++) {
+        s = Parrot_str_concat(interp, s, Parrot_dt_get_datatype_name(interp,
+                                            VTABLE_get_integer_keyed_int(interp, sig, i)));
+        if (i < n - 1)
+            s = Parrot_str_concat(interp, s, CONST_STRING(interp, ", "));
+    }
+    s = Parrot_str_concat(interp, s, CONST_STRING(interp, ")"));
+
+    return s;
+}
+
+/*
+
 =back
 
 =cut
