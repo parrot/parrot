@@ -1055,7 +1055,7 @@ Parrot_str_iter_substr(PARROT_INTERP,
     ARGIN(const String_iter *l), ARGIN_NULLOK(const String_iter *r))
 {
     ASSERT_ARGS(Parrot_str_iter_substr)
-    STRING *dest = Parrot_str_copy(interp, str);
+    STRING * const dest = Parrot_str_copy(interp, str);
 
     dest->strstart = (char *)dest->strstart + l->bytepos;
 
