@@ -409,7 +409,7 @@ special value C<PARROT_HLL_NONE>, return the global root namespace.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_hll_get_HLL_namespace(PARROT_INTERP, int hll_id)
 {
