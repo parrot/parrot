@@ -554,7 +554,7 @@ CODA
     n = elements sig
 
     loop:
-        unless i < n goto end_loop 
+        unless i < n goto end_loop
 
         sig_elt = sig[i]
         if sig_elt == .DATATYPE_VOID goto next
@@ -952,7 +952,7 @@ REGEX
     .yield ($P3)
     goto match_line
 .end
-    
+
 #}}}
 
 # gen_sigtable {{{
