@@ -152,6 +152,30 @@ CODE
 
 # actual tests start here
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_cmp_pmc" );
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+    Parrot_PMC_set_integer_native(interp, pmc2, 17);
+
+    pmc3 = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
+    Parrot_printf(interp,"%P\n", pmc3 );
+
+    Parrot_PMC_set_integer_native(interp, pmc, 17);
+    Parrot_PMC_set_integer_native(interp, pmc2, 42);
+
+    pmc3 = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
+    Parrot_printf(interp,"%P\n", pmc3 );
+
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+
+    pmc3 = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
+    Parrot_printf(interp,"%P\n", pmc3 );
+CODE
+1
+-1
+0
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_does_pmc" );
     pmc2   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Role"));
     integer = Parrot_PMC_does_pmc(interp,pmc,pmc2);
@@ -1390,29 +1414,6 @@ Done!
 OUTPUT
 
 
-#extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_cmp_pmc" );
-#    Parrot_PMC_set_integer_native(interp, pmc, 42);
-#    Parrot_PMC_set_integer_native(interp, pmc2, 17);
-#
-#    pmc3 = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
-#    Parrot_printf(interp,"%P\n", pmc3 );
-#
-#    Parrot_PMC_set_integer_native(interp, pmc, 17);
-#    Parrot_PMC_set_integer_native(interp, pmc2, 42);
-#
-#    pmc3 = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
-#    Parrot_printf(interp,"%P\n", pmc3 );
-#
-#    Parrot_PMC_set_integer_native(interp, pmc, 42);
-#
-#    pmc3 = Parrot_PMC_cmp_pmc(interp, pmc, pmc2);
-#    Parrot_printf(interp,"%P\n", pmc3 );
-#CODE
-#1
-#-1
-#0
-#Done!
-#OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_cmp_num" );
     Parrot_PMC_set_integer_native(interp, pmc, 42);
