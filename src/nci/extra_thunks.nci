@@ -242,3 +242,10 @@ i    pid
 
 # PCRE
 p    pS
+ptr  (ptr, int, ptr&, int&, ptr)
+int  (ptr, ptr, ptr,  int,  int, int, ptr, int)
+
+# tools/dev/nci_thunk_gen.pir
+PMC    (ptr, STRING)
+INTVAL (ptr, STRING)
+STRING (ptr, INTVAL)
