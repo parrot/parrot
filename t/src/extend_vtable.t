@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 105;
+plan tests => 106;
 
 =head1 NAME
 
@@ -99,7 +99,7 @@ void dotest(Parrot_Interp interp, void *unused)
     Parrot_PMC pmc, pmc2, pmc3, pmc_string, pmc_string2, pmc_string3;
     Parrot_PMC pmc_float, pmc_float2;
     Parrot_PMC rpa, rpa2, fpa, hash, hash_iter, continuation;
-    Parrot_PMC key_int, key_str;
+    Parrot_PMC key_int, key_str, hashkey;
     Parrot_Int type, value, integer, integer2;
     Parrot_Float number, number2;
     Parrot_String string, string2;
@@ -129,9 +129,10 @@ void dotest(Parrot_Interp interp, void *unused)
 
 $code
 
-    /* TODO: Properly test these */
+    /* TODO: Properly test this */
     Parrot_PMC_destroy(interp, pmc);
 
+    /* TODO: Shouldn't we also be destroying all the other PMCs ? */
     Parrot_destroy(interp);
     printf("Done!\\n");
 }
@@ -280,14 +281,15 @@ CODE
 Done!
 OUTPUT
 
-# TODO: Find PMC where we can call this vtable
-#extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_set_pointer_keyed_int");
-#    Parrot_PMC_set_pointer_keyed_int(interp, rpa2, 0, 42);
-#    Parrot_printf(interp,"42\n");
-#CODE
-#42
-#Done!
-#OUTPUT
+# TODO: Improve this test
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_set_pointer_keyed_int");
+    hashkey   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "HashIteratorKey"));
+    Parrot_PMC_set_pointer_keyed_int(interp, hashkey, 0, (void*) 42);
+    Parrot_printf(interp,"42\n");
+CODE
+42
+Done!
+OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_set_pmc");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
