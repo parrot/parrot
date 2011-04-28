@@ -859,7 +859,12 @@ $(PBC_TO_EXE) : $(DEV_TOOLS_DIR)/pbc_to_exe.pir runtime/parrot/library/config.pi
 	$(PARROT) -o pbc_to_exe.pbc $(DEV_TOOLS_DIR)/pbc_to_exe.pir
 	$(PARROT) pbc_to_exe.pbc pbc_to_exe.pbc
 
-parrot_nci_thunk_gen.pbc : $(DEV_TOOLS_DIR)/nci_thunk_gen.pir $(DATA_JSON_LIB_PBCS) $(PARROT)
+parrot_nci_thunk_gen.pbc : \
+    $(DEV_TOOLS_DIR)/nci_thunk_gen.pir \
+    $(DATA_JSON_LIB_PBCS) $(PARROT) \
+    $(DYNEXT_DIR)/bit_ops$(LOAD_EXT) \
+    runtime/parrot/include/hash_key_type.pasm \
+    runtime/parrot/include/datatypes.pasm
 	$(PARROT) -o parrot_nci_thunk_gen.pbc $(DEV_TOOLS_DIR)/nci_thunk_gen.pir
 
 $(NCI_THUNK_GEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE)
