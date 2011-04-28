@@ -367,7 +367,7 @@ HEAD
 
         .local pmc sig
         sig = sigs[i]
-        $S0 = 'sig_to_fn_code'(sig :flat)
+        $S0 = 'sig_to_fn_code'(sig)
         code = concat code, $S0
 
         inc i
@@ -445,23 +445,46 @@ HEADER
     i = 0
     n = sigs
     loop:
-        if i >= n goto end_loop
+        unless i < n goto end_loop
 
         .local pmc sig
         sig = shift sigs
 
         .local string fn_name
-        fn_name = 'sig_to_fn_name'(sig :flat)
+        fn_name = 'sig_to_fn_name'(sig)
 
-        .local string key
-        key = join '', sig
+        .local pmc sb
+        sb = new ['StringBuilder']
+        push sb, "{ "
 
-        $S0 = 'sprintf'(<<'TEMPLATE', fn_name, key)
-    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
-    VTABLE_set_pointer(interp, temp_pmc, (void *)%s);
-    VTABLE_set_pmc_keyed(interp, nci_funcs,
-        Parrot_nci_parse_signature(interp, string_from_literal(interp, "%s")),
-        temp_pmc);
+        $I0 = 0
+        $I1 = elements sig
+
+        array_loop:
+            unless $I0 < $I1 goto end_array_loop
+            $I2 = sig[$I0]
+            $S1 = $I2
+            push sb, $S1
+            push sb, ", "
+            inc $I0
+            goto array_loop
+        end_array_loop:
+
+        push sb, "}"
+        $S0 = sb
+
+        $S0 = 'sprintf'(<<'TEMPLATE', $I1, $S0, fn_name)
+    {
+        const int n = %s;
+        static const int sig[] = %s;
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)%s);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
 
 TEMPLATE
         code = concat code, $S0
@@ -491,22 +514,22 @@ CODA
 # sig_to_* {{{
 
 .sub 'sig_to_fn_code'
-    .param pmc args :slurpy
+    .param pmc sig
 
     .local string fn_decl
-    fn_decl = 'sig_to_fn_decl'(args :flat)
+    fn_decl = 'sig_to_fn_decl'(sig)
 
     .local string var_decls
-    var_decls = 'sig_to_var_decls'(args :flat)
+    var_decls = 'sig_to_var_decls'(sig)
 
     .local string preamble
-    preamble = 'sig_to_preamble'(args :flat)
+    preamble = 'sig_to_preamble'(sig)
 
     .local string call
-    call = 'sig_to_call'(args :flat)
+    call = 'sig_to_call'(sig)
 
     .local string postamble
-    postamble = 'sig_to_postamble'(args :flat)
+    postamble = 'sig_to_postamble'(sig)
 
     .local string fn_code
     fn_code = 'sprintf'("%s{\n%s%s%s%s}\n", fn_decl, var_decls, preamble, call, postamble)
@@ -515,15 +538,16 @@ CODA
 .end
 
 .sub 'sig_to_postamble'
-    .param string ret
-    .param string params
+    .param pmc sig
 
     .local string final_assign
-    $P0 = 'map_from_sig_table'(ret, 'ret_assign')
+    $I0 = sig[0]
+    $P0 = 'map_from_sig_table'('ret_assign', $I0)
     final_assign = $P0[0]
 
     .local string extra_postamble
-    $P0 = 'map_from_sig_table'(params, 'postamble_tmpl')
+    $P0 = 'map_from_sig_table'('postamble_tmpl', sig :flat)
+    $S0 = shift $P0
     'fill_tmpls_ascending_ints'($P0)
     extra_postamble = join "\n", $P0
 
@@ -536,15 +560,15 @@ TEMPLATE
 .end
 
 .sub 'sig_to_call'
-    .param string ret
-    .param string params
+    .param pmc sig
 
     .local string return_assign
-    $P0 = 'map_from_sig_table'(ret, 'func_call_assign')
+    $I0 = sig[0]
+    $P0 = 'map_from_sig_table'('func_call_assign', $I0)
     return_assign = $P0[0]
 
     .local string ret_cast
-    $P0 = 'map_from_sig_table'(ret, 'as_return')
+    $P0 = 'map_from_sig_table'('as_return', $I0)
     ret_cast = $P0[0]
     if ret_cast == 'void' goto void_fn
         ret_cast = 'sprintf'('(%s)', ret_cast)
@@ -554,7 +578,8 @@ TEMPLATE
     end_ret_cast:
 
     .local string call_params
-    $P0 = 'map_from_sig_table'(params, 'call_param_tmpl')
+    $P0 = 'map_from_sig_table'('call_param_tmpl', sig :flat)
+    $S0 = shift $P0
     'fill_tmpls_ascending_ints'($P0)
     call_params = join ', ', $P0
 
@@ -568,27 +593,27 @@ TEMPLATE
 .end
 
 .sub 'sig_to_preamble'
-    .param string ret
-    .param string params
+    .param pmc sig
 
-    unless params goto return
-
-    .local string sig
-    $P0 = 'map_from_sig_table'(params, 'sig_char')
-    sig = join "", $P0
+    .local string pcc_sig
+    $P0     = 'map_from_sig_table'('sig_char', sig :flat)
+    $S0     = shift $P0
+    pcc_sig = join "", $P0
 
     .local string fill_params
-    $P0 = 'map_from_sig_table'(params, 'fill_params_tmpl')
+    $P0 = 'map_from_sig_table'('fill_params_tmpl', sig :flat)
+    $S0 = shift $P0
     'fill_tmpls_ascending_ints'($P0)
     fill_params = join "", $P0
 
     .local string extra_preamble
-    $P0 = 'map_from_sig_table'(params, 'preamble_tmpl')
+    $P0 = 'map_from_sig_table'('preamble_tmpl', sig :flat)
+    $S0 = shift $P0
     'fill_tmpls_ascending_ints'($P0)
     extra_preamble = join "", $P0
 
     .local string preamble
-    preamble = 'sprintf'(<<'TEMPLATE', sig, fill_params, extra_preamble)
+    preamble = 'sprintf'(<<'TEMPLATE', pcc_sig, fill_params, extra_preamble)
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "%s"%s);
     %s
 TEMPLATE
@@ -598,15 +623,16 @@ TEMPLATE
 .end
 
 .sub 'sig_to_var_decls'
-    .param string ret
-    .param string params
+    .param pmc sig
 
     .local string ret_csig
-    $P0 = 'map_from_sig_table'(ret, 'as_return')
+    $I0 = sig[0]
+    $P0 = 'map_from_sig_table'('as_return', $I0)
     ret_csig = $P0[0]
 
     .local string params_csig
-    $P0 = 'map_from_sig_table'(params, 'as_proto')
+    $P0 = 'map_from_sig_table'('as_proto', sig :flat)
+    $S0 = shift $P0
     params_csig = join ', ', $P0
     if params_csig goto end_default_params_csig_to_void
         params_csig = 'void'
@@ -614,14 +640,14 @@ TEMPLATE
 
     .local string ret_tdecl
     ret_tdecl = ""
-    $P0 = 'map_from_sig_table'(ret, 'return_type')
+    $P0 = 'map_from_sig_table'('return_type', $I0)
     $S0 = $P0[0]
     unless $S0 goto end_ret_type
     if $S0 == 'void' goto end_ret_type
         $S0 = 'sprintf'("%s return_data;\n", $S0)
         ret_tdecl = concat ret_tdecl, $S0
     end_ret_type:
-    $P0 = 'map_from_sig_table'(ret, 'final_dest')
+    $P0 = 'map_from_sig_table'('final_dest', $I0)
     $S0 = $P0[0]
     unless $S0 goto end_final_dest
         $S0 = concat $S0, "\n"
@@ -629,7 +655,8 @@ TEMPLATE
     end_final_dest:
 
     .local string params_tdecl
-    $P0 = 'map_from_sig_table'(params, 'temp_tmpl')
+    $P0 = 'map_from_sig_table'('temp_tmpl', sig :flat)
+    $S0 = shift $P0
     'fill_tmpls_ascending_ints'($P0)
     $P0 = 'grep_for_true'($P0)
     params_tdecl = join ";\n    ", $P0
@@ -652,10 +679,10 @@ TEMPLATE
 .end
 
 .sub 'sig_to_fn_decl'
-    .param pmc sig :slurpy
+    .param pmc sig
     .local string storage_class, fn_name, fn_decl
     storage_class = 'read_from_opts'(.THUNK_STORAGE_CLASS)
-    fn_name = 'sig_to_fn_name'(sig :flat)
+    fn_name = 'sig_to_fn_name'(sig)
     fn_decl = 'sprintf'(<<'TEMPLATE', storage_class, fn_name)
 %s void
 %s(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -664,42 +691,36 @@ TEMPLATE
 .end
 
 .sub 'sig_to_fn_name'
-    .param string ret
-    .param string params
+    .param pmc sig
 
-    .local string fix_params
-    $P0 = 'map_from_sig_table'(params, 'cname')
-    fix_params = join '', $P0
-
-
-    $S0 = 'sprintf'('%s_%s', ret, fix_params)
+    $P0 = 'map_from_sig_table'('cname', sig :flat)
+    $S0 = join '_', $P0
     $S1 = 'read_from_opts'(.THUNK_NAME_PROTO)
     $S2 = 'sprintf'($S1, $S0)
+
     .return ($S2)
 .end
 
 .sub 'map_from_sig_table'
-    .param string sig
     .param string field_name
+    .param pmc    sig :slurpy
 
     .local pmc sig_table
     sig_table = get_global .SIG_TABLE_GLOBAL_NAME
 
-    $P0 = split '', sig
+    .local int i, n
+    i = 0
+    n = elements sig
 
     .local pmc result
-    result = new ['ResizableStringArray']
-    $I0 = $P0
-    result = $I0
+    result = new ['ResizableStringArray'], n
 
-    $I0 = $P0
-    $I1 = 0
     loop:
-        if $I1 >= $I0 goto end_loop
-        $S0 = $P0[$I1]
+        unless i < n goto end_loop
+        $S0 = sig[i]
         $S1 = sig_table[$S0; field_name]
-        result[$I1] = $S1
-        inc $I1
+        result[i] = $S1
+        inc i
         goto loop
     end_loop:
 
@@ -710,11 +731,14 @@ TEMPLATE
 
 # read_sigs {{{
 
+.include 'hash_key_type.pasm'
+
 .sub 'read_sigs'
     .local pmc stdin, seen, sigs
     $P0 = getinterp
     stdin = $P0.'stdin_handle'()
     seen  = new ['Hash']
+    seen.'set_key_type'(.Hash_key_type_PMC)
     sigs  = new ['ResizablePMCArray']
 
     .local int no_warn_dups
@@ -725,34 +749,27 @@ TEMPLATE
     read_loop:
         unless stdin goto end_read_loop
 
-        .local string ret_sig, param_sig, full_sig
-        (ret_sig, param_sig) = 'read_one_sig'(stdin)
+        .local pmc sig
+        sig = 'read_one_sig'(stdin)
         inc lineno
-        full_sig = concat ret_sig, param_sig
 
         # filter out empty sigs (and empty lines)
-        unless full_sig goto read_loop
+        if_null sig, read_loop
 
         # de-dup sigs
-        $I0 = seen[full_sig]
+        $I0 = seen[sig]
         unless $I0 goto unseen
             if no_warn_dups goto end_dup_warn
-                $S0 = 'sprintf'(<<'ERROR', full_sig, lineno, $I0)
+                $S0 = get_repr sig
+                $S0 = 'sprintf'(<<'ERROR', $S0, lineno, $I0)
 Ignored signature '%s' on line %d (previously seen on line %d)
 ERROR
-                $P0 = getinterp
-                $P1 = $P0.'stderr_handle'()
-                $P1.'print'($S0)
+                'warn'($S0)
             end_dup_warn:
             goto read_loop
         unseen:
-        seen[full_sig] = lineno
+        seen[sig] = lineno
 
-        .local pmc sig
-        sig = new ['ResizableStringArray']
-        sig = 2
-        sig[0] = ret_sig
-        sig[1] = param_sig
         push sigs, sig
 
         goto read_loop
@@ -764,113 +781,179 @@ ERROR
 .sub 'read_one_sig'
     .param pmc fh
 
+    load_bytecode 'String/Utils.pbc'
+    .local pmc chomp
+    chomp = get_global ['String';'Utils'], 'chomp'
+
+    # init pcre
+    load_bytecode 'pcre.pbc'
+    $P0 = get_global ['PCRE'], 'init'
+    $P0()
+
+    .local pmc pcre_comp, pcre_match, pcre_dollar
+    pcre_comp   = get_global ['PCRE'], 'compile'
+    pcre_match  = get_global ['PCRE'], 'match'
+    pcre_dollar = get_global ['PCRE'], 'dollar'
+
+    .local pmc empty_line_regex, old_style_sig_line_regex, new_style_sig_line_regex
+    .local pmc old_style_sig_item_regex, new_style_sig_item_regex
+    .local string pcre_errstr, pcre_errint
+
+    .const int pcre_extended = 0x00000008
+
+    $S0 = "^ [[:space:]]* (?: [#] .* )? $"
+    (empty_line_regex, pcre_errstr, pcre_errint) = pcre_comp($S0, pcre_extended)
+    if pcre_errint goto pcre_comp_err
+
+    $S0 = "^ [[:space:]]* ( (?: [INSPcsilfdpv] [[:space:]]* )+ ) (?: [#] .* )? $"
+    (old_style_sig_line_regex, pcre_errstr, pcre_errint) = pcre_comp($S0, pcre_extended)
+    if pcre_errint goto pcre_comp_err
+
+    $S0 = ".*? ([INSPcsilfdpv])"
+    (old_style_sig_item_regex, pcre_errstr, pcre_errint) = pcre_comp($S0, pcre_extended)
+    if pcre_errint goto pcre_comp_err
+
+    $S0 = <<'REGEX'
+^ [[:space:]]* ( [[:word:]]+  [[:space:]]* [(] [[:space:]]*
+    (?:
+                             [[:word:]]+ [&]? [[:space:]]*
+        (?: [,] [[:space:]]* [[:word:]]+ [&]? [[:space:]]* )*
+    )?
+[)] ) [[:space:]]* (?: [#] .* )? $
+REGEX
+    (new_style_sig_line_regex, pcre_errstr, pcre_errint) = pcre_comp($S0, pcre_extended)
+    if pcre_errint goto pcre_comp_err
+
+    $S0 = ".*? ([[:word:]]+ [&]?)"
+    (new_style_sig_item_regex, pcre_errstr, pcre_errint) = pcre_comp($S0, pcre_extended)
+    if pcre_errint goto pcre_comp_err
+
+    goto match_line
+
+  pcre_comp_err:
+    $S0 = 'sprintf'("Error in PCRE compilation: `%Ss' (%d)", pcre_errstr, pcre_errint)
+    die $S0
+
+  match_line:
     .local string line
     line = fh.'readline'()
+    line = chomp(line)
 
-    # handle comments
-    $I0 = index line, '#'
-    if $I0 < 0 goto end_comment
-        line = substr line, 0, $I0
-    end_comment:
+    .local int ok
+    .local pmc match
 
-    # convert whitespace into spaces
-    .const 'Sub' $P0 = 'alternate_whitespaces'
-    $P1 = iter $P0
-    outer_whitespace_loop:
-        unless $P1 goto end_outer_whitespace_loop
-        $S0 = shift $P1
+    (ok, match) = pcre_match(empty_line_regex, line, 0, 0)
+    if ok > 0 goto return
 
-        inner_whitespace_loop:
-            $I0 = index line, $S0
-            if $I0 < 0 goto end_inner_whitespace_loop
-            line = replace line, $I0, 1, ' '
-            goto inner_whitespace_loop
-        end_inner_whitespace_loop:
+    (ok, match) = pcre_match(old_style_sig_line_regex, line, 0, 0)
+    if ok > 0 goto old_style_sig
 
-        goto outer_whitespace_loop
-    end_outer_whitespace_loop:
+    (ok, match) = pcre_match(new_style_sig_line_regex, line, 0, 0)
+    if ok > 0 goto new_style_sig
 
-    # turn multiple spaces into a single space
-    multispace_loop:
-        $I0 = index line, '  '
-        if $I0 < 0 goto end_multispace_loop
-        $S0  = substr line, $I0, 2
-        line = replace line, $I0, 2, ' '
-        goto multispace_loop
-    end_multispace_loop:
+    say ok
 
-    # remove leading whitespace
-    $S0 = substr line, 0, 1
-    unless $S0 == ' ' goto end_leading
-        $S0  = substr line, 0, 1
-        line = replace line, 0, 1, ' '
-    end_leading:
+    $S0 = 'sprintf'("Invalid signature line: `%Ss'", line)
+    die $S0
 
-    # handle empty (or whitespace only) lines
-    if line == '' goto ret
-    if line == ' ' goto ret
+  old_style_sig:
+    $S0 = pcre_dollar( line, ok, match, 1 )
+    $P0 = 'comb'($S0, old_style_sig_item_regex)
+    $S0 = join '', $P0
+    $P1 = null
+    $P1 = dlfunc $P1, "Parrot_nci_parse_signature", "PpS"
+    $P0 = getinterp
+    $P3 = $P1($P0, $S0)
+    goto return
 
-    # remove trailing whitespace
-    $S0 = substr line, -1, 1
-    unless $S0 == ' ' goto end_trailing
-        $S0  = substr line, -1, 1
-        line = replace line, -1, 1, ''
-    end_trailing:
+  new_style_sig:
+    $S0 = pcre_dollar( line, ok, match, 1 )
+    $P0 = 'comb'($S0, new_style_sig_item_regex)
+    $P1 = null
+    $P1 = dlfunc $P1, "Parrot_dt_get_datatype_enum", "IpS"
+    $P2 = getinterp
+    $I0 = 0
+    $I1 = elements $P0
+    $P3 = new ['FixedIntegerArray'], $I1
+    get_type_enum_loop:
+        unless $I0 < $I1 goto end_get_type_enum_loop
+        $S0 = $P0[$I0]
+        $I2 = $P1($P2, $S0)
+        $P3[$I0] = $I2
+        inc $I0
+        goto get_type_enum_loop
+    end_get_type_enum_loop:
+    goto return
 
-    # read the signature
-    .local string ret_sig, param_sig
-    $P0 = split ' ', line
-    ret_sig   = $P0[0]
-    param_sig = $P0[1]
-
-  ret:
-    .return (ret_sig, param_sig)
+  return:
+    .yield ($P3)
+    goto match_line
 .end
-
+    
 #}}}
 
 # gen_sigtable {{{
 
+.include 'datatypes.pasm'
+
 .sub 'gen_sigtable'
-    .const string json_table = <<'JSON'
-{
-    "p": { "as_proto":   "void *",
-           "final_dest": "PMC * final_destination = PMCNULL;",
-           "temp_tmpl": "PMC *t_%i",
-           "sig_char":   "P",
-           "call_param_tmpl": "PMC_IS_NULL((PMC*)t_%i) ? (void *)NULL : VTABLE_get_pointer(interp, t_%i)",
-           "ret_assign": "if (return_data != NULL) {
-                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
-                             VTABLE_set_pointer(interp, final_destination, return_data);
-                          }
-                          ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, \"P\", final_destination);" },
-    "i": { "as_proto": "int", "sig_char": "I",    "return_type": "INTVAL" },
-    "l": { "as_proto": "long",   "sig_char": "I", "return_type": "INTVAL" },
-    "c": { "as_proto": "char",   "sig_char": "I", "return_type": "INTVAL" },
-    "s": { "as_proto": "short",  "sig_char": "I", "return_type": "INTVAL" },
-    "f": { "as_proto": "float",  "sig_char": "N", "return_type": "FLOATVAL" },
-    "d": { "as_proto": "double", "sig_char": "N", "return_type": "FLOATVAL" },
-    "v": { "as_proto": "void",
-           "return_type": "void *",
-           "sig_char": "v",
-           "ret_assign": "",
-           "func_call_assign": "" },
-    "P": { "as_proto": "PMC *", "sig_char": "P" },
-    "O": { "as_proto": "PMC *", "sig_char": "P" },
-    "S": { "as_proto": "STRING *", "sig_char": "S" },
-    "I": { "as_proto": "INTVAL", "sig_char": "I" },
-    "N": { "as_proto": "FLOATVAL", "sig_char": "N" }
-}
-JSON
-
-    # decode table
-    .local pmc compiler
-    load_language 'data_json'
-    compiler = compreg 'data_json'
-
     .local pmc table
-    $P0 = compiler.'compile'(json_table)
-    table = $P0()
+    table = new ['Hash']
+    table.'set_key_type'(.Hash_key_type_int)
+
+    $P1 = 'from_json'(<<'JSON')
+{ "as_proto":   "void *",
+  "final_dest": "PMC * final_destination = PMCNULL;",
+  "temp_tmpl": "PMC *t_%i",
+  "sig_char":   "P",
+  "call_param_tmpl": "PMC_IS_NULL((PMC*)t_%i) ? (void *)NULL : VTABLE_get_pointer(interp, t_%i)",
+  "ret_assign":
+      "if (return_data != NULL) {
+          final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+          VTABLE_set_pointer(interp, final_destination, return_data);
+       }
+       ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, \"P\", final_destination);" }
+JSON
+    table[.DATATYPE_PTR]  = $P1
+
+    $P1 = 'from_json'('{ "as_proto": "int", "sig_char": "I", "return_type": "INTVAL" }')
+    table[.DATATYPE_INT]  = $P1
+
+    $P1 = 'from_json'('{ "as_proto": "long", "sig_char": "I", "return_type": "INTVAL" }')
+    table[.DATATYPE_LONG] = $P1
+
+    $P1 = 'from_json'('{ "as_proto": "char", "sig_char": "I", "return_type": "INTVAL" }')
+    table[.DATATYPE_CHAR] = $P1
+
+    $P1 = 'from_json'('{ "as_proto": "short", "sig_char": "I", "return_type": "INTVAL" }')
+    table[.DATATYPE_SHORT] = $P1
+
+    $P1 = 'from_json'('{ "as_proto": "float", "sig_char": "N", "return_type": "FLOATVAL" }')
+    table[.DATATYPE_FLOAT] = $P1
+
+    $P1 = 'from_json'('{ "as_proto": "double", "sig_char": "N", "return_type": "FLOATVAL" }')
+    table[.DATATYPE_DOUBLE] = $P1
+
+    $P1 = 'from_json'(<<'JSON')
+{ "as_proto": "void",
+  "return_type": "void *",
+  "sig_char": "v",
+  "ret_assign": "",
+  "func_call_assign": "" }
+JSON
+    table[.DATATYPE_VOID] = $P1
+
+    $P1 = 'from_json'('{ "as_proto": "PMC *", "sig_char": "P" }')
+    table[.DATATYPE_PMC] = $P1
+
+    $P1 = 'from_json'('{ "as_proto": "STRING *", "sig_char": "S" }')
+    table[.DATATYPE_STRING] = $P1
+
+    $P1 = 'from_json'('{ "as_proto": "INTVAL", "sig_char": "I" }')
+    table[.DATATYPE_INTVAL] = $P1
+
+    $P1 = 'from_json'('{ "as_proto": "FLOATVAL", "sig_char": "N" }')
+    table[.DATATYPE_FLOATVAL] = $P1
 
     # fixup table
     .local pmc table_iter
@@ -878,21 +961,20 @@ JSON
   iter_loop:
     unless table_iter goto iter_end
 
-    .local string k
+    .local int k
     .local pmc v
-    k = shift table_iter
-    v = table[k]
+    $S0 = shift table_iter
+    k   = $S0
+    v   = table[k]
 
-    $I0 = exists v['cname']
-    if $I0 goto has_cname
-        v['cname'] = k
-    has_cname:
+    $P0 = null
+    $P0 = dlfunc $P0, "Parrot_dt_get_datatype_name", "SpI"
+    $P1 = getinterp
+    $S0 = $P0($P1, k)
+    v['cname'] = $S0
 
-    $I0 = exists v['as_return']
-    if $I0 goto has_as_return
-        $S0 = v['as_proto']
-        v['as_return'] = $S0
-    has_as_return:
+    $S0 = v['as_proto']
+    v['as_return'] = $S0
 
     $I0 = exists v['return_type']
     if $I0 goto has_return_type
@@ -938,6 +1020,17 @@ JSON
   iter_end:
 
     set_global .SIG_TABLE_GLOBAL_NAME, table
+.end
+
+.sub 'from_json'
+    .param string json_str
+
+    .local pmc compiler
+    load_language 'data_json'
+    compiler = compreg 'data_json'
+
+    $P0 = compiler.'compile'(json_str)
+    .tailcall $P0()
 .end
 
 # }}}
@@ -1077,6 +1170,43 @@ JSON
     push $P0, "\n"
     push $P0, "\r"
     .return ($P0)
+.end
+
+.sub 'comb'
+    .param string s
+    .param pmc    pat
+
+    .local pmc pcre_match, pcre_dollar
+    pcre_match  = get_global ['PCRE'], 'match'
+    pcre_dollar = get_global ['PCRE'], 'dollar'
+
+    .local pmc items
+    items = new ['ResizableStringArray']
+
+    .local int i
+    i = 0
+
+  match_loop:
+    .local int ok
+    .local pmc match
+    (ok, match) = pcre_match( pat, s, i, 0 )
+    unless ok > 0 goto return
+    $S0 = pcre_dollar( s, ok, match, 1)
+    push items, $S0
+    $S0 = pcre_dollar( s, ok, match, 0)
+    $I0 = bytelength $S0
+    i += $I0
+    goto match_loop
+
+  return:
+    .return (items)
+.end
+
+.sub 'warn'
+    .param string msg
+    $P0 = getinterp
+    $P1 = $P0.'stderr_handle'()
+    $P1.'print'(msg)
 .end
 
 # }}}
