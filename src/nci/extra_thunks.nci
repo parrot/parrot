@@ -129,7 +129,7 @@ p    p     #  MYSQL_FIELD * mysql_fetch_field(MYSQL_RES *result)
 # --- end mysqlclient library ---
 
 # Oddball ones for postgres
-p    ppP         PQsetNoticeReceiver
+p    ppP         # PQsetNoticeReceiver
 
 # Used by SDL
 p    iiil
