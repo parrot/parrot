@@ -25,6 +25,10 @@ F<docs/pdds/pdd16_native_call.pod>.
 
 =cut
 
+.loadlib 'bit_ops'
+.include 'hash_key_type.pasm'
+.include 'datatypes.pasm'
+
 .macro_const VERSION 0.01
 
 .macro_const SIG_TABLE_GLOBAL_NAME  'signature_table'
@@ -540,23 +544,62 @@ CODA
 .sub 'sig_to_postamble'
     .param pmc sig
 
-    .local string final_assign
-    $I0 = sig[0]
-    $P0 = 'map_from_sig_table'('ret_assign', $I0)
-    final_assign = $P0[0]
+    .local pmc postamble, pcc_sig, pcc_retv
+    postamble = new ['ResizableStringArray']
+    pcc_sig   = new ['ResizableStringArray']
+    pcc_retv  = new ['ResizableStringArray']
 
-    .local string extra_postamble
-    $P0 = 'map_from_sig_table'('postamble_tmpl', sig :flat)
-    $S0 = shift $P0
-    'fill_tmpls_ascending_ints'($P0)
-    extra_postamble = join "\n", $P0
+    .local int i, n, sig_elt
+    i = 0
+    n = elements sig
 
-    .local string postamble
-    postamble = 'sprintf'(<<'TEMPLATE', final_assign, extra_postamble)
-    %s
-    %s
+    loop:
+        unless i < n goto end_loop 
+
+        sig_elt = sig[i]
+        if sig_elt == .DATATYPE_VOID goto next
+
+        $I1 = iseq i, 0
+        $I2 = band sig_elt, .DATATYPE_REF_FLAG
+        $I3 = or $I1, $I2
+        unless $I3 goto next
+
+        $P0 = 'map_from_sig_table'('postamble_tmpl', sig_elt)
+        $S0 = $P0[0]
+        $S0 = 'fill_tmpl_int'($S0, i)
+        push postamble, $S0
+
+        $P0 = 'map_from_sig_table'('sig_char', sig_elt)
+        $S0 = $P0[0]
+        $S0 = 'fill_tmpl_int'($S0, i)
+        push pcc_sig, $S0
+
+        $S0 = "t_%i"
+        $S0 = 'fill_tmpl_int'($S0, i)
+        push pcc_retv, $S0
+
+      next:
+        inc i
+        goto loop
+    end_loop:
+
+    $I0 = elements pcc_sig
+    unless $I0 goto empty_ret
+
+    $S0 = join ";\n    ",   postamble
+    $S1 = join '',   pcc_sig
+    $S2 = join ', ', pcc_retv
+    $S3 = 'sprintf'(<<'TEMPLATE', $S0, $S1, $S2)
+    %s;
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "%s", %s);
 TEMPLATE
-    .return (postamble)
+    .return ($S3)
+
+  empty_ret:
+    $S0 = <<'RET'
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "");
+RET
+    .return ($S0)
 .end
 
 .sub 'sig_to_call'
@@ -567,27 +610,33 @@ TEMPLATE
     $P0 = 'map_from_sig_table'('func_call_assign', $I0)
     return_assign = $P0[0]
 
-    .local string ret_cast
-    $P0 = 'map_from_sig_table'('as_return', $I0)
-    ret_cast = $P0[0]
-    if ret_cast == 'void' goto void_fn
-        ret_cast = 'sprintf'('(%s)', ret_cast)
-        goto end_ret_cast
-    void_fn:
-        ret_cast = ''
-    end_ret_cast:
-
+    .local int i, n
     .local string call_params
-    $P0 = 'map_from_sig_table'('call_param_tmpl', sig :flat)
-    $S0 = shift $P0
-    'fill_tmpls_ascending_ints'($P0)
+    i = 1
+    n = elements sig
+    dec n
+    $P0 = 'xtimes'('v_%i', n)
+    'fill_tmpls_ascending_ints'($P0, 1)
+    loop:
+        unless i <= n goto end_loop
+        $I0 = sig[i]
+        $I1 = band $I0, .DATATYPE_REF_FLAG
+        unless $I1 goto next
+        $I0 = i - 1
+        $S0 = $P0[$I0]
+        $S0 = concat "&", $S0
+        $P0[$I0] = $S0
+      next:
+        inc i
+        goto loop
+    end_loop:
     call_params = join ', ', $P0
 
     .local string call
-    call = 'sprintf'(<<'TEMPLATE', return_assign, ret_cast, call_params)
+    call = 'sprintf'(<<'TEMPLATE', return_assign, call_params)
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
-    %s %s(*fn_pointer)(%s);
+    %s (*fn_pointer)(%s);
 TEMPLATE
     .return (call)
 .end
@@ -601,21 +650,22 @@ TEMPLATE
     pcc_sig = join "", $P0
 
     .local string fill_params
-    $P0 = 'map_from_sig_table'('fill_params_tmpl', sig :flat)
-    $S0 = shift $P0
-    'fill_tmpls_ascending_ints'($P0)
-    fill_params = join "", $P0
+    $I0 = elements sig
+    dec $I0
+    $P0 = 'xtimes'(', &t_%i', $I0)
+    'fill_tmpls_ascending_ints'($P0, 1)
+    fill_params = join '', $P0
 
     .local string extra_preamble
     $P0 = 'map_from_sig_table'('preamble_tmpl', sig :flat)
     $S0 = shift $P0
-    'fill_tmpls_ascending_ints'($P0)
-    extra_preamble = join "", $P0
+    'fill_tmpls_ascending_ints'($P0, 1)
+    extra_preamble = join ";\n    ", $P0
 
     .local string preamble
     preamble = 'sprintf'(<<'TEMPLATE', pcc_sig, fill_params, extra_preamble)
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "%s"%s);
-    %s
+    %s;
 TEMPLATE
 
   return:
@@ -627,52 +677,50 @@ TEMPLATE
 
     .local string ret_csig
     $I0 = sig[0]
-    $P0 = 'map_from_sig_table'('as_return', $I0)
+    $P0 = 'map_from_sig_table'('c_type', $I0)
     ret_csig = $P0[0]
 
+    .local int i, n
+    i = 1
+    n = elements sig
+
     .local string params_csig
-    $P0 = 'map_from_sig_table'('as_proto', sig :flat)
+    $P0 = 'map_from_sig_table'('c_type', sig :flat)
     $S0 = shift $P0
+    by_ref_loop:
+        unless i < n goto end_by_ref_loop
+        $I0 = sig[i]
+        $I1 = band $I0, .DATATYPE_REF_FLAG
+        unless $I1 goto next
+        $I0 = i - 1
+        $S0 = $P0[$I0]
+        $S0 = concat $S0, '*'
+        $P0[$I0] = $S0
+      next:
+        inc i
+        goto by_ref_loop
+    end_by_ref_loop:
     params_csig = join ', ', $P0
     if params_csig goto end_default_params_csig_to_void
         params_csig = 'void'
     end_default_params_csig_to_void:
 
-    .local string ret_tdecl
-    ret_tdecl = ""
-    $P0 = 'map_from_sig_table'('return_type', $I0)
-    $S0 = $P0[0]
-    unless $S0 goto end_ret_type
-    if $S0 == 'void' goto end_ret_type
-        $S0 = 'sprintf'("%s return_data;\n", $S0)
-        ret_tdecl = concat ret_tdecl, $S0
-    end_ret_type:
-    $P0 = 'map_from_sig_table'('final_dest', $I0)
-    $S0 = $P0[0]
-    unless $S0 goto end_final_dest
-        $S0 = concat $S0, "\n"
-        ret_tdecl = concat ret_tdecl, $S0
-    end_final_dest:
-
     .local string params_tdecl
     $P0 = 'map_from_sig_table'('temp_tmpl', sig :flat)
-    $S0 = shift $P0
-    'fill_tmpls_ascending_ints'($P0)
+    'fill_tmpls_ascending_ints'($P0, 0)
     $P0 = 'grep_for_true'($P0)
     params_tdecl = join ";\n    ", $P0
 
     .local string var_decls
-    var_decls = 'sprintf'(<<'TEMPLATE', ret_csig, params_csig, ret_tdecl, params_tdecl)
+    var_decls = 'sprintf'(<<'TEMPLATE', ret_csig, params_csig, params_tdecl)
     typedef %s(* func_t)(%s);
     func_t fn_pointer;
     void *orig_func;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC *       ret_object  = PMCNULL;
-    %s
     %s;
     UNUSED(ret_object);
-    UNUSED(return_data); /* Potentially unused, at least */
 TEMPLATE
 
     .return (var_decls)
@@ -692,8 +740,23 @@ TEMPLATE
 
 .sub 'sig_to_fn_name'
     .param pmc sig
+    .local int i, n
 
     $P0 = 'map_from_sig_table'('cname', sig :flat)
+    i   = 0
+    n   = elements sig
+    loop:
+        unless i < n goto end_loop
+        $I0 = sig[i]
+        $I1 = band $I0, .DATATYPE_REF_FLAG
+        unless $I1 goto next
+        $S0    = $P0[i]
+        $S0    = concat $S0, 'ref'
+        $P0[i] = $S0
+      next:
+        inc i
+        goto loop
+    end_loop:
     $S0 = join '_', $P0
     $S1 = 'read_from_opts'(.THUNK_NAME_PROTO)
     $S2 = 'sprintf'($S1, $S0)
@@ -717,8 +780,10 @@ TEMPLATE
 
     loop:
         unless i < n goto end_loop
-        $S0 = sig[i]
-        $S1 = sig_table[$S0; field_name]
+        $I0 = sig[i]
+        $I1 = bnot .DATATYPE_REF_FLAG
+        $I2 = band $I0, $I1
+        $S1 = sig_table[$I2; field_name]
         result[i] = $S1
         inc i
         goto loop
@@ -730,8 +795,6 @@ TEMPLATE
 # }}}
 
 # read_sigs {{{
-
-.include 'hash_key_type.pasm'
 
 .sub 'read_sigs'
     .local pmc stdin, seen, sigs
@@ -894,65 +957,63 @@ REGEX
 
 # gen_sigtable {{{
 
-.include 'datatypes.pasm'
-
 .sub 'gen_sigtable'
     .local pmc table
     table = new ['Hash']
     table.'set_key_type'(.Hash_key_type_int)
 
     $P1 = 'from_json'(<<'JSON')
-{ "as_proto":   "void *",
-  "final_dest": "PMC * final_destination = PMCNULL;",
-  "temp_tmpl": "PMC *t_%i",
+{ "c_type":   "void *",
+  "pcc_type": "PMC  *",
+  "preamble_tmpl": "v_%i = PMC_IS_NULL(t_%i) ? NULL : VTABLE_get_pointer(interp, t_%i);",
   "sig_char":   "P",
-  "call_param_tmpl": "PMC_IS_NULL((PMC*)t_%i) ? (void *)NULL : VTABLE_get_pointer(interp, t_%i)",
-  "ret_assign":
-      "if (return_data != NULL) {
-          final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
-          VTABLE_set_pointer(interp, final_destination, return_data);
+  "postamble_tmpl":
+      "if (v_%i != NULL) {
+          t_%i = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+          VTABLE_set_pointer(interp, t_%i, v_%i);
        }
-       ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, \"P\", final_destination);" }
+       else {
+           t_%i = PMCNULL;
+       }" }
 JSON
     table[.DATATYPE_PTR]  = $P1
 
-    $P1 = 'from_json'('{ "as_proto": "int", "sig_char": "I", "return_type": "INTVAL" }')
+    $P1 = 'from_json'('{ "c_type": "int", "sig_char": "I", "pcc_type": "INTVAL" }')
     table[.DATATYPE_INT]  = $P1
 
-    $P1 = 'from_json'('{ "as_proto": "long", "sig_char": "I", "return_type": "INTVAL" }')
+    $P1 = 'from_json'('{ "c_type": "long", "sig_char": "I", "pcc_type": "INTVAL" }')
     table[.DATATYPE_LONG] = $P1
 
-    $P1 = 'from_json'('{ "as_proto": "char", "sig_char": "I", "return_type": "INTVAL" }')
+    $P1 = 'from_json'('{ "c_type": "char", "sig_char": "I", "pcc_type": "INTVAL" }')
     table[.DATATYPE_CHAR] = $P1
 
-    $P1 = 'from_json'('{ "as_proto": "short", "sig_char": "I", "return_type": "INTVAL" }')
+    $P1 = 'from_json'('{ "c_type": "short", "sig_char": "I", "pcc_type": "INTVAL" }')
     table[.DATATYPE_SHORT] = $P1
 
-    $P1 = 'from_json'('{ "as_proto": "float", "sig_char": "N", "return_type": "FLOATVAL" }')
+    $P1 = 'from_json'('{ "c_type": "float", "sig_char": "N", "pcc_type": "FLOATVAL" }')
     table[.DATATYPE_FLOAT] = $P1
 
-    $P1 = 'from_json'('{ "as_proto": "double", "sig_char": "N", "return_type": "FLOATVAL" }')
+    $P1 = 'from_json'('{ "c_type": "double", "sig_char": "N", "pcc_type": "FLOATVAL" }')
     table[.DATATYPE_DOUBLE] = $P1
 
     $P1 = 'from_json'(<<'JSON')
-{ "as_proto": "void",
-  "return_type": "void *",
+{ "c_type": "void",
   "sig_char": "v",
   "ret_assign": "",
   "func_call_assign": "" }
 JSON
     table[.DATATYPE_VOID] = $P1
 
-    $P1 = 'from_json'('{ "as_proto": "PMC *", "sig_char": "P" }')
+    $P1 = 'from_json'('{ "c_type": "PMC *", "pcc_type": "PMC *", "sig_char": "P" }')
     table[.DATATYPE_PMC] = $P1
 
-    $P1 = 'from_json'('{ "as_proto": "STRING *", "sig_char": "S" }')
+    $P1 = 'from_json'('{ "c_type": "STRING *", "pcc_type": "STRING *", "sig_char": "S" }')
     table[.DATATYPE_STRING] = $P1
 
-    $P1 = 'from_json'('{ "as_proto": "INTVAL", "sig_char": "I" }')
+    $P1 = 'from_json'('{ "c_type": "INTVAL", "pcc_type": "INTVAL", "sig_char": "I" }')
     table[.DATATYPE_INTVAL] = $P1
 
-    $P1 = 'from_json'('{ "as_proto": "FLOATVAL", "sig_char": "N" }')
+    $P1 = 'from_json'('{ "c_type": "FLOATVAL", "pcc_type": "FLOATVAL", "sig_char": "N" }')
     table[.DATATYPE_FLOATVAL] = $P1
 
     # fixup table
@@ -973,15 +1034,6 @@ JSON
     $S0 = $P0($P1, k)
     v['cname'] = $S0
 
-    $S0 = v['as_proto']
-    v['as_return'] = $S0
-
-    $I0 = exists v['return_type']
-    if $I0 goto has_return_type
-        $S0 = v['as_proto']
-        v['return_type'] = $S0
-    has_return_type:
-
     $I0 = exists v['ret_assign']
     $I1 = exists v['sig_char']
     $I1 = !$I1
@@ -996,25 +1048,29 @@ JSON
 
     $I0 = exists v['func_call_assign']
     if $I0 goto has_func_call_assign
-        v['func_call_assign'] = 'return_data = '
+        v['func_call_assign'] = 'v_0 = '
     has_func_call_assign:
 
-    $I0 = exists v['temp_tmpl']
-    if $I0 goto has_temp_tmpl
-        $S0 = v['return_type']
-        $S0 = concat $S0, " t_%i"
+    $I1 = exists v['preamble_tmpl']
+    if $I1 goto end_preamble_tmpl
+        v['preamble_tmpl'] = "v_%i = t_%i"
+    end_preamble_tmpl:
+
+    $I1 = exists v['postamble_tmpl']
+    if $I1 goto end_postamble_tmpl
+        v['postamble_tmpl'] = "t_%i = v_%i"
+    end_postamble_tmpl:
+
+
+    $I0 = exists v['c_type']
+    $I1 = exists v['pcc_type']
+    $I2 = and $I0, $I1
+    unless $I2 goto end_temp_tmpl
+        $S0 = v['c_type']
+        $S1 = v['pcc_type']
+        $S0 = 'sprintf'("%s t_%%i; %s v_%%i", $S1, $S0)
         v['temp_tmpl'] = $S0
-    has_temp_tmpl:
-
-    $I0 = exists v['fill_params_tmpl']
-    if $I0 goto has_fill_params_tmpl
-        v['fill_params_tmpl'] = ', &t_%i'
-    has_fill_params_tmpl:
-
-    $I0 = exists v['call_param_tmpl']
-    if $I0 goto has_call_param_tmpl
-        v['call_param_tmpl'] = 't_%i'
-    has_call_param_tmpl:
+    end_temp_tmpl:
 
     goto iter_loop
   iter_end:
@@ -1046,6 +1102,7 @@ JSON
 
 .sub 'fill_tmpls_ascending_ints'
     .param pmc tmpls
+    .param int start
     .local int idx, n
 
     idx = 0
@@ -1053,13 +1110,21 @@ JSON
     loop:
         if idx >= n goto end_loop
         $S0 = tmpls[idx]
-        $I0 = 'printf_arity'($S0)
-        $P0 = 'xtimes'(idx, $I0)
-        $S1 = sprintf $S0, $P0
+        $I0 = start + idx
+        $S1 = 'fill_tmpl_int'($S0, $I0)
         tmpls[idx] = $S1
         inc idx
         goto loop
     end_loop:
+.end
+
+.sub 'fill_tmpl_int'
+    .param string tmpl
+    .param int    i
+    $I0 = 'printf_arity'(tmpl)
+    $P0 = 'xtimes'(i, $I0)
+    $S0 = sprintf tmpl, $P0
+    .return ($S0)
 .end
 
 .sub 'printf_arity'
