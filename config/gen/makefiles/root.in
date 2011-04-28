@@ -562,7 +562,6 @@ ALL_PARROT_LIBS     = @libparrot_linkflags@ $(ICU_SHARED) $(C_LIBS)
 DYNEXT_DIR          = runtime/parrot/dynext
 LIBNCI_TEST_SO      = $(DYNEXT_DIR)/libnci_test$(LOAD_EXT)
 LIBGLUTCB_SO        = $(DYNEXT_DIR)/libglutcb$(LOAD_EXT)
-EXTRANCITHUNKS_SO   = $(DYNEXT_DIR)/extra_nci_thunks$(LOAD_EXT)
 
 ###############################################################################
 #
@@ -624,7 +623,6 @@ all : \
     $(PCT_LIB_PBCS) \
     $(DATA_JSON_LIB_PBCS) \
     $(JSON_LANG) \
-#IF(has_dynamic_linking):    $(EXTRANCITHUNKS_SO) \
     $(NQP_LIB_PBCS) \
 #IF(has_dynamic_linking):    $(DYNOPLIBS_TARGETS) \
 #IF(has_dynamic_linking):    $(LIBNCI_TEST_SO) \
@@ -2281,7 +2279,6 @@ prog-clean :
     src/glut_nci_thunks$(O) \
     $(LIBGLUTCB_SO) \
     src/extra_nci_thunks$(O) \
-    $(EXTRANCITHUNKS_SO) \
     install_config.fpmc
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --init
 	$(RM_F) \
@@ -2320,7 +2317,6 @@ archclean: dynext-clean
     src/glut_callbacks$(O) \
     $(LIBGLUTCB_SO) \
     src/extra_nci_thunks$(O) \
-    $(EXTRANCITHUNKS_SO) \
     $(LIBPARROT_STATIC) \
     $(LIBPARROT_SHARED)
 
@@ -3010,12 +3006,6 @@ bootstrap-nci : src/nci/core_thunks.nci src/nci/extra_thunks.nci $(NCI_THUNK_GEN
 src/extra_nci_thunks$(O) : $(PARROT_H_HEADERS) src/extra_nci_thunks.c \
     include/pmc/pmc_nci.h
 	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/extra_nci_thunks.c
-
-$(EXTRANCITHUNKS_SO) : $(LIBPARROT) $(NQP_RX) $(JSON_LANG) \
-    src/extra_nci_thunks$(O)
-	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \
-    @ld_out@$@ src/extra_nci_thunks$(O) \
-    $(ALL_PARROT_LIBS)
 
 # emacs etags
 # this needs exuberant-ctags
