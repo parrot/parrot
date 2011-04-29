@@ -260,7 +260,7 @@ my %NCI_TYPE = (
     float        => 'f',
     double       => 'd',
 
-    'char*'      => 't',
+    'char*'      => 'p',
 
     'short*'     => 'p',
     'int*'       => 'p',
@@ -301,9 +301,7 @@ my %PCC_CAST = (
     P => '',
 );
 
-my %OVERRIDE = (
-    'glutInit'  => 'v3p',
-);
+my %OVERRIDE = ();
 
 my @IGNORE = (
     # Most of these are limitations of this module or Parrot NCI
@@ -797,9 +795,9 @@ sub gen_opengl_wrappers {
 $autogen_header
 
 # GLUT callbacks
-v    JP
-v    JPi
-v    JPii
+v    pP
+v    pPi
+v    pPii
 
 # Generated signatures
 HEADER
@@ -826,65 +824,65 @@ HEADER
     .local pmc glutcb_funcs
     glutcb_funcs = new 'ResizableStringArray'
     push glutcb_funcs, 'Parrot_glut_nci_loader'
-    push glutcb_funcs, 'vJ'
+    push glutcb_funcs, 'vp'
     push glutcb_funcs, 'glutcbCloseFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbDisplayFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbIdleFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbMenuDestroyFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbOverlayDisplayFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbWMCloseFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbEntryFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbMenuStateFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbVisibilityFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbWindowStatusFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbButtonBoxFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbDialsFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbMotionFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbPassiveMotionFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbReshapeFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbSpaceballButtonFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbTabletMotionFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbKeyboardFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbKeyboardUpFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbMenuStatusFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbSpaceballMotionFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbSpaceballRotateFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbSpecialFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbSpecialUpFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbMouseFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbMouseWheelFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbTabletButtonFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'vpP'
     push glutcb_funcs, 'glutcbTimerFunc'
-    push glutcb_funcs, 'vJPii'
+    push glutcb_funcs, 'vpPii'
     push glutcb_funcs, 'glutcbJoystickFunc'
-    push glutcb_funcs, 'vJPi'
+    push glutcb_funcs, 'vpPi'
 
     .return (glutcb_funcs)
 .end
