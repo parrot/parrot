@@ -58,6 +58,10 @@ class LLVM::Type is LLVM::Value {
         )
     }
 
+    method kind() {
+        LLVM::call("GetTypeKind", self)
+    }
+
     # Shortcut for i8*
     sub cstring() { pointer(int8()); }
 

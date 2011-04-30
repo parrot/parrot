@@ -104,6 +104,27 @@ typedef enum {
 =end
         generate_enum_class("LLVM::VERIFYER_FAILURE_ACTION", 0, <ABORT_PROCESSING PRINT_MESSAGE RETURN_STATUS>);
 
+=begin
+typedef enum {
+  LLVMVoidTypeKind,        /**< type with no size */
+  LLVMFloatTypeKind,       /**< 32 bit floating point type */
+  LLVMDoubleTypeKind,      /**< 64 bit floating point type */
+  LLVMX86_FP80TypeKind,    /**< 80 bit floating point type (X87) */
+  LLVMFP128TypeKind,       /**< 128 bit floating point type (112-bit mantissa)*/
+  LLVMPPC_FP128TypeKind,   /**< 128 bit floating point type (two 64-bits) */
+  LLVMLabelTypeKind,       /**< Labels */
+  LLVMIntegerTypeKind,     /**< Arbitrary bit width integers */
+  LLVMFunctionTypeKind,    /**< Functions */
+  LLVMStructTypeKind,      /**< Structures */
+  LLVMArrayTypeKind,       /**< Arrays */
+  LLVMPointerTypeKind,     /**< Pointers */
+  LLVMOpaqueTypeKind,      /**< Opaque: type with unknown structure */
+  LLVMVectorTypeKind,      /**< SIMD 'packed' format, or other vector type */
+  LLVMMetadataTypeKind,    /**< Metadata */
+  LLVMUnionTypeKind        /**< Unions */
+} LLVMTypeKind;
+=end
+        generate_enum_class("LLVM::TYPE_KIND", 0, <VOID FLOAT DOUBLE X86_FP80 FP128 PPC_FP128 LABEL INTEGER FUNCTION STRUCT ARRAY POINTER OPAQUE VECTOR METADATA UNION>);
 
             #### Bind functions
         my $parrot_config:= Q:PIR {
@@ -159,7 +180,7 @@ typedef enum {
 #/*===-- Types -------------------------------------------------------------===*/
 
 #/** See llvm::LLVMTypeKind::getTypeID. */
-            GetTypeKind => "pp",
+            GetTypeKind => "ip",
 
 #/** See llvm::LLVMType::getContext. */
             GetTypeContext => "pp",

@@ -116,6 +116,13 @@ ok( $type ~~ LLVM::Type, ".. with proper class");
 # %0 = type opaque
 # %struct.PMC = type { i32, %0*, void*, %struct.PMC* }
 
+# Check for TypeKind
+my $kind := LLVM::Type::void().kind();
+is( $kind, LLVM::TYPE_KIND.VOID(), "VoidTypeKind");
+
+# cstring is pointer(i8)
+$kind := LLVM::Type::cstring().kind();
+is( $kind, LLVM::TYPE_KIND.POINTER, "PointerTypeKind");
 
 done_testing();
 
