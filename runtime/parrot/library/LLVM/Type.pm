@@ -50,6 +50,14 @@ class LLVM::Type is LLVM::Value {
         LLVM::call("DumpTypeToString", self);
     }
 
+
+    # Valid only for SequantialTypes: Array, Pointer and Vector
+    method element_type() {
+        LLVM::Type.create(
+            LLVM::call("GetElementType", self)
+        )
+    }
+
     # Shortcut for i8*
     sub cstring() { pointer(int8()); }
 

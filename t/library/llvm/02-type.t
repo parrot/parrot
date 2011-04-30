@@ -14,6 +14,10 @@ $type := LLVM::Type::int8();
 ok( $type, "int8 created");
 ok( $type ~~ LLVM::Type, ".. with proper class");
 
+# Check smartmatch.
+ok(  LLVM::Type::int8() ~~ LLVM::Type::int8(), "Same type matched" );
+nok( LLVM::Type::int1() ~~ LLVM::Type::int8(), "Not same type matched" );
+
 $type := LLVM::Type::int16();
 ok( $type, "int16 created");
 ok( $type ~~ LLVM::Type, ".. with proper class");
@@ -33,6 +37,10 @@ ok( $type ~~ LLVM::Type, ".. with proper class");
 my $ptr := LLVM::Type::pointer(LLVM::Type::int8());
 ok( $ptr, "i8* created");
 ok( $type ~~ LLVM::Type, ".. with proper class");
+
+$type := $ptr.element_type();
+ok( $type, ".. original ElementType fetched" );
+ok( $type ~~ LLVM::Type::int8(), ".. correct one");
 
 # FunctionType
 # void foo()
