@@ -35,6 +35,9 @@ has %!functions;
 has $!interp_struct_type;
 has $!opcode_ptr_type;
 
+# type->name mapping.
+has %!types;
+
 =item new
 Create new JITter for given PBC and OpsFile.
 
@@ -128,6 +131,9 @@ method _init_llvm() {
         }
         $f := $f.next;
     }
+
+    # TODO: Generate lookup map for Type-to-Name.
+    %!types := $!module.get_types;
 }
 
 =begin Processing
@@ -472,8 +478,40 @@ our multi method process(PAST::Var $var, %c) {
             $res := $sub(self, $num, %c);
         }
         elsif $var.scope eq 'keyed_arrow' {
-            $!debug && _dumper($var);
-            die("keyed_arrow NYI");
+            my $old := +%c<lhs>;
+            %c<lhs> := 0;
+            my $lhs := self.process($var[0], %c);
+            %c<lhs> := $old;
+
+            if $!debug {
+                say("# keyed_arrow");
+                say($lhs.dump());
+                _dumper($var[1]);
+            }
+
+            # Figure out underlying type.
+            $!debug && say("Kind " ~ $lhs.typeof.kind);
+            die("Not a pointer") unless $lhs.typeof.kind == LLVM::TYPE_KIND.POINTER;
+
+            my $element_type := $lhs.typeof.element_type;
+            $!debug && say("ElementType " ~ $element_type.kind);
+            die("Not a struct") unless $element_type.kind == LLVM::TYPE_KIND.STRUCT;
+
+            my $struct_type;
+            for %!types.kv -> $k, $v {
+                if pir::get_addr__ip($v) == pir::get_addr__ip($element_type) {
+                    $struct_type := $k;
+                }
+            }
+            die("Couldn't find struct definition") unless defined($struct_type);
+            $!debug && say("Struct $struct_type");
+
+            die("NYI");
+
+            # XXX FIXME We have to choose field properly!!!
+            my $res := $!builder.struct_gep($lhs, 0);
+            $res.dump();
+
         }
         else {
             $res := %c<variables>{ $var.name } // die("Unknown variable { $var.name }");
