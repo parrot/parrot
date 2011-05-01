@@ -31,7 +31,7 @@
 /*.sto
 /*.suo
 /*.tmp
-/*.sw?
+*.sw?
 /*.vcproj*
 /.git
 /.parrot_current_rev
