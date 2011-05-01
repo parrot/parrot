@@ -57,6 +57,14 @@ such as garbage collection and Parrot's calling conventions.
 This is the lowest-level set of ops supported by an M0-compliant VM.  These
 ops are a subset of the C<M0> specification.
 
+=item * chunk
+
+A chunk is a self-contained unit of code.  Chunks correspond roughly to
+functions and have a variables table, a metadata segment and a bytecode
+segment.  The variables table is used to store any persistent data.  The
+metadata segment stores information about the code, for example annotations or
+variable names.  The bytecode segment contains the executable ops.  
+
 =item * MOP
 
 Meta object protocol.
@@ -658,11 +666,21 @@ until we're reasonably confident that we have a final set of ops.
     0x22 free
     0x23 exit
 
-=head2 M0 Runloop
 
-The runloop is the part of the interpreter that executes ops directly.  It
-doesn't much matter how those ops are executed, but the runloop does need to
-accomplish the following:
+=head2 Execution
+
+Execution of an binary M0 file beings with the first op in the bytecode segment
+of the first chunk.  Each op consists of a 1-byte op number and 3 byte-sized
+arguments.  The op number is used as an offset into a table of function
+pointers (or something equivalent).  The current context is passed as the first
+argument to all op functions.  The remaining three bytes of the op are passed
+to the op function directly.  It is up to the op function how to interpret
+these values.
+
+=head3 M0 Runloop
+
+The runloop is the part of the interpreter that executes ops directly.  The
+runloop does need to accomplish the following:
 
 =over
 
