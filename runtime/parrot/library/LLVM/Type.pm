@@ -1,4 +1,25 @@
-class LLVM::Type is LLVM::Value {
+class LLVM::Type is LLVM::Opaque {
+
+    multi method refine_to(LLVM::Type $to) {
+        LLVM::Type.create(
+            LLVM::call("RefineType", self, $to)
+        );
+    }
+
+    method dump() {
+        LLVM::call("DumpTypeToString", self);
+    }
+
+    method element_type() {
+        LLVM::Type.create(
+            LLVM::call("GetElementType", self)
+        );
+    }
+
+    method kind() {
+        LLVM::call("GetTypeKind", self);
+    }
+
 
     sub int1()      { LLVM::Type.create(LLVM::call("Int1Type", )) }
     sub int8()      { LLVM::Type.create(LLVM::call("Int8Type", )) }
