@@ -1033,6 +1033,7 @@ typedef enum {
         %F<DumpValueToString>  := pir::dlfunc__ppss(undef, "Parrot_LLVMDumpValueToString", "SJp");
         %F<DumpTypeToString>   := pir::dlfunc__ppss(undef, "Parrot_LLVMDumpTypeToString", "SJp");
 
+        %F<GetTypeNames>       := pir::dlfunc__ppss(undef, "Parrot_LLVMGetTypeNames", "PJp");
     }
 }
 

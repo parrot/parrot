@@ -68,6 +68,10 @@ class LLVM::Module is LLVM::Opaque {
         )
     }
 
+    multi method get_types() {
+        LLVM::call("GetTypeNames", self);
+    }
+
 # BitReader
     # from file
     multi method read($path){
