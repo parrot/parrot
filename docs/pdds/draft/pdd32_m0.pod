@@ -135,7 +135,7 @@ in detail in the C<Register Types and Context Structure> section.
 
 An M0 register may have one of 256 values.  This means that registers can point
 at one of 256 different places in the variables table, which will support up to
-65536 slots.   Registers can be pointed at different slots with the C<load_var>
+65536 slots.   Registers can be pointed at different slots with the C<set_var>
 instruction, which will interpret its second and third arguments as the index
 into the variables table.  The variables table serves both as a runtime
 scratchpad and as a location for data which is extracted from bytecode to live.
@@ -292,10 +292,10 @@ may result.  Be careful.
 Write C<*$3> bytes from the memory location starting at C<*$2> to C<*$1>.
 Segfaults may result.  Be careful.
 
-=item * load_var - point a register at a variables table slot
+=item * set_var - point a register at a variables table slot
 
-Point C<*$1> at a slot on the variables table.  C<$2> contains the low byte of
-the index, C<$3> contains the high byte.  Both C<$2> and C<$2> are treated as
+Point C<*$1> at a slot in the variables table. C<$2> contains the high byte of
+the index, C<$3> contains the low byte.  Both C<$2> and C<$2> are treated as
 1-byte immediate values.
 
 The variables table is intended to serve both as a location where data from
@@ -304,11 +304,11 @@ scratchpad.
 
 Examples:
 
-  #point register 0 at variable 123 (123 * 1 + 256 * 0)
-  load_var 0, 123, 0
+  # point register 0 at variable 123 (0 * 256 + 123 * 1)
+  set_var 0, 0, 123
 
-  #point register 3 at variable 257 (2   * 1 + 256 * 1)
-  load_var 3, 2, 1
+  # point register 3 at variable 257 (4 * 256 + 2 * 1)
+  set_var 3, 4, 2
 
 =back
 
@@ -499,11 +499,11 @@ The following should be a working "hello world" program in M0.
     #I0 is 0
     set_var I0, 0, 0
     #I1 is "hello" 
-    set_var I1, 1, 0
+    set_var I1, 0, 1
     #I2 is "\n" 
-    set_var I2, 2, 0
+    set_var I2, 0, 2
     #I3 is 0
-    set_var I3, 3, 0
+    set_var I3, 0, 3
     #print "hello" to stdout
     # x is arbitrary
     print_s I0, I1, x
@@ -646,7 +646,7 @@ until we're reasonably confident that we have a final set of ops.
     0x16 set
     0x17 set_mem
     0x18 get_mem
-    0x19 load_var
+    0x19 set_var
     0x1A csym
     0x1B ccall_arg
     0x1C ccall_ret
