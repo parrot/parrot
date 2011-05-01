@@ -7,6 +7,7 @@
 .include 'compilers/opsc/gen/Ops/Compiler/Grammar.pir'
 .include 'compilers/opsc/gen/Ops/Compiler/Actions.pir'
 .include 'compilers/opsc/gen/Ops/Compiler/Preprocessor.pir'
+.include 'compilers/opsc/gen/Ops/Compiler/Structs.pir'
 .include 'compilers/opsc/gen/Ops/Compiler.pir'
 
 .include 'compilers/opsc/gen/Ops/Emitter.pir'

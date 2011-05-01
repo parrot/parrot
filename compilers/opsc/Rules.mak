@@ -13,6 +13,9 @@ $(OPSC_DIR)/gen/Ops/Compiler/Grammar.pir: $(OPSC_DIR)/src/Ops/Compiler/Grammar.p
 $(OPSC_DIR)/gen/Ops/Compiler/Preprocessor.pir: $(OPSC_DIR)/src/Ops/Compiler/Preprocessor.pm $(NQP_RX)
 	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Compiler/Preprocessor.pm
 
+$(OPSC_DIR)/gen/Ops/Compiler/Structs.pir: $(OPSC_DIR)/src/Ops/Compiler/Structs.pm $(NQP_RX)
+	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Compiler/Structs.pm
+
 $(OPSC_DIR)/gen/Ops/Emitter.pir: $(OPSC_DIR)/src/Ops/Emitter.pm $(NQP_RX)
 	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Emitter.pm
 

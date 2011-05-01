@@ -5,6 +5,7 @@ OPSC_SOURCES_GENERATED = \
 	$(OPSC_DIR)/gen/Ops/Compiler/Actions.pir \
 	$(OPSC_DIR)/gen/Ops/Compiler/Grammar.pir \
 	$(OPSC_DIR)/gen/Ops/Compiler/Preprocessor.pir \
+	$(OPSC_DIR)/gen/Ops/Compiler/Structs.pir \
 	$(OPSC_DIR)/gen/Ops/Emitter.pir \
 	$(OPSC_DIR)/gen/Ops/Trans.pir \
 	$(OPSC_DIR)/gen/Ops/Trans/C.pir \
