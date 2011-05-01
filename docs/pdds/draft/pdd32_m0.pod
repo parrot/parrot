@@ -505,6 +505,7 @@ The following should be a working "hello world" program in M0.
     #I3 is 0
     set_var I3, 3, 0
     #print "hello" to stdout
+    # x is arbitrary
     print_s I0, I1, x
     #print "\n" to stdout
     print_s I0, I2, x
