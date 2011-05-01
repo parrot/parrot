@@ -695,6 +695,14 @@ runloop does need to accomplish the following:
 Execution of an M0 bytecode file starts with the first op of the first bytecode
 segment in a file and ends when the interpreter exits.
 
+=head2 Interaction Between Bytecode Segments
+
+This section will specify the following:
+ * how to reliably transfer control flow between chunks
+ * how to reliably map between sub names and chunks
+ * how values from one sub are accessed by another (arguments/returns)
+
+
 =head2 Objects
 
 In Lorito, we'll still have INSP registers like PIR, but the S registers will
