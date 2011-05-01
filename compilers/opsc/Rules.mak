@@ -1,4 +1,4 @@
-$(LIBRARY_DIR)/opsc.pbc: $(NQP_RX) $(OPSC_SOURCES) $(NQPRX_LIB_SETTING)
+$(LIBRARY_DIR)/opsc.pbc: $(NQP_RX) $(OPSC_SOURCES) $(NQPRX_LIB_SETTING) runtime/parrot/library/LLVM.pbc
 	$(PARROT) -o $(LIBRARY_DIR)/opsc.pbc $(OPSC_DIR)/opsc.pir
 
 $(OPSC_DIR)/gen/Ops/Compiler.pir: $(OPSC_DIR)/src/Ops/Compiler.pm $(NQP_RX)
