@@ -506,10 +506,14 @@ our multi method process(PAST::Var $var, %c) {
             die("Couldn't find struct definition") unless defined($struct_type);
             $!debug && say("Struct $struct_type");
 
-            die("NYI");
+            my $struct := %Ops::Compiler::STRUCT{ $struct_type };
+            die("Unknown struct $struct_type") unless defined($struct);
 
-            # XXX FIXME We have to choose field properly!!!
-            my $res := $!builder.struct_gep($lhs, 0);
+            my $field := ~$var[1];
+            die("Unknow field $field in $struct_type") unless $struct.exists($field);
+
+            $!debug && say("Mapped $struct_type->$field to { $struct{ $field } }");
+            my $res := $!builder.struct_gep($lhs, $struct{ $field });
             $res.dump();
 
         }
@@ -521,7 +525,7 @@ our multi method process(PAST::Var $var, %c) {
     }
 
     return undef unless $res;
-
+    $res;
 }
 
 our method access_arg:type<i> ($num, %c) {
