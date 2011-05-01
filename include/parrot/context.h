@@ -88,7 +88,7 @@ UINTVAL Parrot_pcc_errors_test_func(SHIM_INTERP,
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_caller_ctx_func(SHIM_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_caller_ctx_func(SHIM_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -100,100 +100,103 @@ Parrot_Context* Parrot_pcc_get_context_struct_func(SHIM_INTERP,
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_continuation_func(SHIM_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_continuation_func(SHIM_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_handlers_func(SHIM_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_handlers_func(SHIM_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
-INTVAL Parrot_pcc_get_HLL_func(SHIM_INTERP, ARGIN(PMC *ctx))
+INTVAL Parrot_pcc_get_HLL_func(SHIM_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
-PMC* Parrot_pcc_get_lex_pad_func(SHIM_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_lex_pad_func(SHIM_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_namespace_func(SHIM_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_namespace_func(SHIM_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 FLOATVAL Parrot_pcc_get_num_constant_func(SHIM_INTERP,
-    ARGIN(PMC *ctx),
+    ARGIN(const PMC *ctx),
     INTVAL idx)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_PURE_FUNCTION
-FLOATVAL * Parrot_pcc_get_num_constants_func(SHIM_INTERP, ARGIN(PMC *ctx))
+FLOATVAL * Parrot_pcc_get_num_constants_func(SHIM_INTERP,
+    ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_object_func(SHIM_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_object_func(SHIM_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_outer_ctx_func(SHIM_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_outer_ctx_func(SHIM_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-opcode_t* Parrot_pcc_get_pc_func(SHIM_INTERP, ARGIN(PMC *ctx))
+opcode_t* Parrot_pcc_get_pc_func(SHIM_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 PMC* Parrot_pcc_get_pmc_constant_func(SHIM_INTERP,
-    ARGIN(PMC *ctx),
+    ARGIN(const PMC *ctx),
     INTVAL idx)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_PURE_FUNCTION
-PMC ** Parrot_pcc_get_pmc_constants_func(SHIM_INTERP, ARGIN(PMC *ctx))
+PMC ** Parrot_pcc_get_pmc_constants_func(SHIM_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
-UINTVAL Parrot_pcc_get_recursion_depth_func(SHIM_INTERP, ARGIN(PMC *ctx))
+UINTVAL Parrot_pcc_get_recursion_depth_func(SHIM_INTERP,
+    ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_signature_func(SHIM_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_signature_func(SHIM_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_PURE_FUNCTION
-STRING ** Parrot_pcc_get_str_constants_func(SHIM_INTERP, ARGIN(PMC *ctx))
+STRING ** Parrot_pcc_get_str_constants_func(SHIM_INTERP,
+    ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 STRING* Parrot_pcc_get_string_constant_func(SHIM_INTERP,
-    ARGIN(PMC *ctx),
+    ARGIN(const PMC *ctx),
     INTVAL idx)
         __attribute__nonnull__(2);
 
@@ -314,7 +317,7 @@ UINTVAL Parrot_pcc_warnings_on_func(SHIM_INTERP,
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
-    ARGIN(PMC *ctx),
+    ARGIN(const PMC *ctx),
     UINTVAL flags)
         __attribute__nonnull__(2);
 
