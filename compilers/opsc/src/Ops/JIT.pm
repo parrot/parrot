@@ -652,7 +652,13 @@ our method process:pasttype<macro_if> (PAST::Op $chunk, %c) {
 }
 
 our method process:pasttype<call> (PAST::Op $chunk, %c) {
-    my $function := %!functions{ $chunk.name };
+    my $function;
+    if $chunk.name {
+        $function := %!functions{ $chunk.name };
+    }
+    else {
+        $function := self.process($chunk.shift, %c);
+    }
 
     if pir::defined($function) {
         $!debug && say("# Jitting { $chunk.name }");
