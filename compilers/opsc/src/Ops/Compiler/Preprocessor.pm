@@ -84,6 +84,22 @@ INIT {
         PAST::Var.new(:name<0>, :scope<macro_arg>),
         PAST::Var.new(:name<1>, :scope<macro_arg>),
     );
+
+    %MACROS<VTABLE_invoke> := PAST::Op.new(
+        :pasttype<call>,
+        PAST::Var.new(
+            :scope<keyed_arrow>,
+            PAST::Var.new(
+                :scope<keyed_arrow>,
+                PAST::Var.new(:name<1>, :scope<macro_arg>),
+                "vtable",
+            ),
+            "invoke",
+        ),
+        PAST::Var.new(:name<0>, :scope<macro_arg>),
+        PAST::Var.new(:name<1>, :scope<macro_arg>),
+        PAST::Var.new(:name<2>, :scope<macro_arg>),
+    );
 }
 
 # Local Variables:
