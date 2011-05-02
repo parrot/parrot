@@ -558,24 +558,11 @@ the file.  It will have the following structure:
   opcode_t : M0_DIR_SEG
   opcode_t : number of opcode_t-sized units in this segment
   [
-    opcode_t : offset of a chunk header
+    opcode_t : offset of a variables segment
     opcode_t : size of chunk name
     [
       opcode_t : chunk name
     ]
-  ]
-
-A chunk will consist of a chunk directory segment, a bytecode segment, a
-variables segment, a metadata segment and a chunk name.
-
-  opcode_t : M0_CHUNKDIR_SEG
-  opcode_t : number of opcode_t-sized units in this segment
-  opcode_t : offset of variables segment relative to the start of the file
-  opcode_t : offset of metadata segment relative to the start of the file
-  opcode_t : offset of bytecode segment relative to the start of the file
-  opcode_t : size of chunk name
-  [
-    opcode_t : chunk name
   ]
 
 The variables segment will contain any data needed to execute the bytecode.
@@ -623,10 +610,9 @@ first argument to every op, but this pointer will not be stored in bytecode.
 =head3 Segment Numbers
 
 M0_DIR_SEG       0x01
-M0_CHUNKDIR_SEG  0x02
-M0_VARS_SEG      0x03
-M0_META_SEG      0x04
-M0_BC_SEG        0x05
+M0_VARS_SEG      0x02
+M0_META_SEG      0x03
+M0_BC_SEG        0x04
 
 =head3 Opcode Numbers
 
