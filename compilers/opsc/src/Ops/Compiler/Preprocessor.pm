@@ -69,23 +69,27 @@ INIT {
         "ctx",
     );
 
-    # VTABLE_get_number(interp, pmc) -> pmc->vtable->get_number(interp, pmc)
-    %MACROS<VTABLE_get_number> := PAST::Op.new(
-        :pasttype<call>,
-        PAST::Var.new(
-            :scope<keyed_arrow>,
-            PAST::Var.new(
-                :scope<keyed_arrow>,
-                PAST::Var.new(:name<1>, :scope<macro_arg>),
-                "vtable",
-            ),
-            "get_number",
-        ),
+    # PMC_data(pmc) -> pmc->data
+    %MACROS<PMC_data> := PAST::Var.new(
+        :scope<keyed_arrow>,
         PAST::Var.new(:name<0>, :scope<macro_arg>),
-        PAST::Var.new(:name<1>, :scope<macro_arg>),
+        "data",
     );
 
-    %MACROS<VTABLE_invoke> := PAST::Op.new(
+    # GETATTR_FixedIntegerArray_size used in ops for performance reason
+    # NB: There is simplified version of it.
+    %MACROS<GETATTR_FixedIntegerArray_size> := PAST::Op.new(
+    );
+
+    # VTABLE_get_number(interp, pmc) -> pmc->vtable->get_number(interp, pmc)
+    %MACROS<VTABLE_get_number> := _generate_vtable_macro("get_number", 2);
+    %MACROS<VTABLE_invoke>     := _generate_vtable_macro("invoke", 3);
+
+}
+
+# Helper sub for generating VTABLE_foo macros.
+sub _generate_vtable_macro($name, $arity) {
+    my $past := PAST::Op.new(
         :pasttype<call>,
         PAST::Var.new(
             :scope<keyed_arrow>,
@@ -94,12 +98,20 @@ INIT {
                 PAST::Var.new(:name<1>, :scope<macro_arg>),
                 "vtable",
             ),
-            "invoke",
+            $name,
         ),
-        PAST::Var.new(:name<0>, :scope<macro_arg>),
-        PAST::Var.new(:name<1>, :scope<macro_arg>),
-        PAST::Var.new(:name<2>, :scope<macro_arg>),
     );
+
+    my $i := 0;
+    while ($arity) {
+        $past.push(PAST::Var.new(:name(+$i), :scope<macro_arg>));
+        $arity--;
+        $i++;
+    }
+
+    _dumper($past);
+
+    $past;
 }
 
 # Local Variables:
