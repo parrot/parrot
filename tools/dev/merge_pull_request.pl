@@ -55,20 +55,20 @@ called 'awesome_feature'.
 
 =cut
 
-my $num    = shift or die "Must give a pull request number to merge!";
-my $repo   = shift || 'parrot';
-my $branch = shift;
+my $num          = shift or die "Must give a pull request number to merge!";
+my $repo         = shift || 'parrot';
+my $merge_branch = shift;
 
-merge_pull_request($num, $repo, $branch);
+merge_pull_request($num, $repo, $merge_branch);
 
 sub merge_pull_request {
-    my ($num) = @_;
-    $branch ||= "pull_request_$num";
+    my ($num, $repo, $merge_branch) = @_;
+    $merge_branch ||= "pull_request_$num";
 
     chomp( my $branch = qx{ git rev-parse --symbolic-full-name HEAD } );
     my $status = qx{ git status -u };
 
-    system("git checkout -b $branch");
+    system("git checkout -b $merge_branch");
 
     my $stashed = stash_if_necessary($repo, $status);
     system("wget --no-check-certificate https://github.com/parrot/$repo/pull/$num.patch");
