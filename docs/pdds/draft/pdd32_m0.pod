@@ -620,6 +620,14 @@ first argument to every op, but this pointer will not be stored in bytecode.
     char : arg3
   ]
 
+=head3 Segment Numbers
+
+M0_DIR_SEG       0x01
+M0_CHUNKDIR_SEG  0x02
+M0_VARS_SEG      0x03
+M0_META_SEG      0x04
+M0_BC_SEG        0x05
+
 =head3 Opcode Numbers
 
 In the interest of compatibility between implementations, the following is a
@@ -665,7 +673,6 @@ until we're reasonably confident that we have a final set of ops.
     0x21 alloc
     0x22 free
     0x23 exit
-
 
 =head2 Execution
 
