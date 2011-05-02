@@ -737,12 +737,17 @@ our method process:pirop<=> (PAST::Op $chunk, %c) {
     # This will disable "loading" of variables.
     %c<lhs>++;
     my $lhs := self.process($chunk[0], %c);
+    if !defined($lhs) {
+        _dumper($chunk);
+        die("Horribly");
+    }
     %c<lhs>--;
 
-    $!builder.store(
-        self.process($chunk[1], %c) // die("Can't do it"),
-        $lhs
-    );
+    my $rhs := self.process($chunk[1], %c) // die("Can't do it");
+    $!debug && say("LHS " ~ $lhs.dump());
+    $!debug && say("RHS " ~ $rhs.dump());
+
+    $!builder.store($rhs, $lhs);
 }
 
 our method process:pirop<==> (PAST::Op $chunk, %c) {
