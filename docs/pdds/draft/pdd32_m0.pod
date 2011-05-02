@@ -462,14 +462,14 @@ name of the metadata entry.  The third is the offset into the variables table
 that contains the value.
 
   .metadata
-  #at pc 1234, "line" is 3
+  #at pc 1234, "line" is 23
   1243 5 6
 
 =head3 Ops
 
 The ops segment consists of a list of mnemonics for instructions and their
 arguments.  All instructions take three int arguments between 0 and 255, even
-if they aren't all used.  
+if they aren't all used.
 
   .code
     set   1, 3, 9
