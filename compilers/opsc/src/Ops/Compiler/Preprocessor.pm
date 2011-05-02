@@ -109,8 +109,6 @@ sub _generate_vtable_macro($name, $arity) {
         $i++;
     }
 
-    _dumper($past);
-
     $past;
 }
 
