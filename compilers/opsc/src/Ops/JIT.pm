@@ -280,6 +280,15 @@ method _create_jitted_function (%jit_context, $start) {
 
     %jit_context<variables><PMCNULL> := $!module.get_global(:name<PMCNULL>);
 
+    # NULL isn't variable. But treat it as variable simplify life.
+    %jit_context<variables><NULL> := LLVM::Constant::null(LLVM::Type::pointer(LLVM::Type::void()));
+
+    # It's actually macro, but Preprocessor supports only "function" macros.
+    %jit_context<variables><NEED_CONTINUATION> := LLVM::Constant::int_to_ptr(
+        LLVM::Constant::integer(1),
+        LLVM::Type::PMC_PTR(),
+    );
+
     # Create default return.
     $!debug && say("# default leave");
     $!builder.set_position($leave);
