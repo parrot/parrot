@@ -104,7 +104,7 @@ sub m0b_build_bytes {
         my $bc_seg   = m0b_bc_seg(   $_{bytecode} );
         my $offset   = length($m0b_bytes);
         $m0b_bytes .= $vars_seg . $meta_seg . $bc_seg;
-        #XXX: insert offset of vars segment into dir segment
+        #TODO: insert offset of vars segment into dir segment
     }
 
     return $m0b_bytes;
@@ -169,6 +169,7 @@ sub m0b_vars_seg {
 
     my $vars_bytes = '';
 
+    #TODO: actually populate variables segment
     #for each variable
       #write a 4-byte value of the size of the data
       #write the data
@@ -193,6 +194,7 @@ sub m0b_meta_seg {
     
     my $metadata_bytes = '';
 
+    #TODO: actually populate metadata segment
     #for each entry
         #get the index of the key
         #get the index of the value
