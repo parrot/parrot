@@ -418,6 +418,12 @@ M0's textual format will mirror its binary representation.  It will consist of
 a series of named chunks with the following format.  Any line beginning with an
 octothorpe (#) is a comment and will be ignored.
 
+The first line that is not a comment or empty defines the version of M0 that
+is being used. This is so that if ops are added in the future, we can differentiate
+between different versions of M0 source code and bytecode.
+
+The current version is 0.
+
 =head3 Chunk Format
 
 A chunk consists of a chunk identifier, a variables chunk, a metadata chunk and
@@ -496,6 +502,7 @@ argument's value is ignored.  C<x> is an alias for 0.
 
 The following should be a working "hello world" program in M0.
 
+    .version 0
     .chunk "hello"
     .variables
     0 1
@@ -541,6 +548,8 @@ functions and have the following segments:
 NOTE: We should design the binary format of M0 in a way that allows it to be mmapped
 by an interpreter.
 }}}
+
+TODO: Where does the M0 version number go?
 
 The header has the following structure:
 
@@ -915,7 +924,11 @@ Shouldn't this be a different spec document? Perhaps PDD33 for M1 ?
 
 =head2 Implementation
 
-<this space intentionally left blank, for now>
+The newest prototype of this spec is being worked on in the 'm0-prototype'
+branch:
+
+    https://github.com/parrot/parrot/tree/m0-prototype
+
 
 =head2 References
 
