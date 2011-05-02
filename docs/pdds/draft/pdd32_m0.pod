@@ -570,9 +570,9 @@ variables segment, a metadata segment and a chunk name.
 
   opcode_t : M0_CHUNKDIR_SEG
   opcode_t : number of opcode_t-sized units in this segment
-  opcode_t : offset of variables segment
-  opcode_t : offset of metadata segment
-  opcode_t : offset of bytecode segment
+  opcode_t : offset of variables segment relative to the start of the file
+  opcode_t : offset of metadata segment relative to the start of the file
+  opcode_t : offset of bytecode segment relative to the start of the file
   opcode_t : size of chunk name
   [
     opcode_t : chunk name
