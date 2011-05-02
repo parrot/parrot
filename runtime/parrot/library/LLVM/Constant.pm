@@ -28,6 +28,9 @@ module LLVM::Constant {
         LLVM::Value.create(LLVM::call("ConstReal", LLVM::Type::double(), +$double));
     }
 
+    multi sub int_to_ptr(LLVM::Value $value, LLVM::Type $type) {
+        LLVM::Value.create( LLVM::call("ConstIntToPtr", $value, $type));
+    }
 };
 
 # vim: ft=perl6
