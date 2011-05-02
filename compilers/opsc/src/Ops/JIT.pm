@@ -500,7 +500,7 @@ our multi method process(PAST::Var $var, %c) {
 
             # Figure out underlying type.
             $!debug && say("Kind " ~ $lhs.typeof.kind);
-            die("Not a pointer") unless $lhs.typeof.kind == LLVM::TYPE_KIND.POINTER;
+            die("Not a pointer { $lhs.dump }") unless $lhs.typeof.kind == LLVM::TYPE_KIND.POINTER;
 
             my $element_type := $lhs.typeof.element_type;
             $!debug && say("ElementType " ~ $element_type.kind);
