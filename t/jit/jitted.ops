@@ -8,6 +8,17 @@ Just because all ops parsing will take _a huge_ amount of time...
 
 =cut
 
+BEGIN_OPS_PREAMBLE
+
+#include "parrot/dynext.h"
+#include "parrot/embed.h"
+#include "parrot/runcore_api.h"
+#include "pmc/pmc_continuation.h"
+#include "pmc/pmc_fixedintegerarray.h"
+#include "pmc/pmc_parrotlibrary.h"
+
+END_OPS_PREAMBLE
+
 op noop() {
 }
 
