@@ -1,4 +1,5 @@
 # THIS IS INVALID M0 FOR TESTING PURPOSES ONLY
+.version 0
 
 # This defines a M0 chunk, which a triplet consisting of
 # a variable table, metadata and a bytecode segment

@@ -34,7 +34,19 @@ sub assemble {
     my $source = slurp($file);
     $source    = remove_junk($source);
 
+    my $version = parse_version($source);
+
     parse_next_chunk($source);
+}
+
+sub parse_version {
+    my ($source) = @_;
+    if ($source =~ /\.version\s+(?<version>\d+)/) {
+        return $+{version};
+    } else {
+        say "M0 version missing!";
+        die "Bailing out";
+    }
 }
 
 sub parse_next_chunk {
