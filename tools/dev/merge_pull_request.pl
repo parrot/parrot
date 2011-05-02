@@ -50,11 +50,6 @@ sub stash_if_necessary {
     unless ($status =~ m/(nothing to commit|nothing added to commit)/) {
         print "Stashing work in $repo\n";
         system("git stash");
-        if( $? ) {
-            handle_errors($?);
-            print "Stashing failed!\n";
-            return 0;
-        }
         return 1;
     }
     else {
