@@ -132,11 +132,10 @@ PARROT_COLD
 PARROT_DOES_NOT_RETURN
 static void named_argument_arity_error(PARROT_INTERP,
     int named_arg_count,
-    ARGMOD_NULLOK(Hash *named_used_list),
+    ARGFREE(Hash *named_used_list),
     ARGIN(PMC *named_arg_list))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*named_used_list);
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 static FLOATVAL numval_constant_from_op(PARROT_INTERP,
@@ -1144,7 +1143,7 @@ PARROT_COLD
 PARROT_DOES_NOT_RETURN
 static void
 named_argument_arity_error(PARROT_INTERP, int named_arg_count,
-        ARGMOD_NULLOK(Hash *named_used_list), ARGIN(PMC *named_arg_list))
+        ARGFREE(Hash *named_used_list), ARGIN(PMC *named_arg_list))
 {
     ASSERT_ARGS(named_argument_arity_error)
     INTVAL named_arg_index;
@@ -1494,8 +1493,8 @@ Parrot_pcc_parse_signature_string(PARROT_INTERP, ARGIN(STRING *signature),
 
 /*
 
-=item C<void Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP, PMC *
-parent, PMC * tailcall)>
+=item C<void Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP, PMC *parent,
+PMC *tailcall)>
 
 merge in signatures for tailcall
 
@@ -1504,8 +1503,7 @@ merge in signatures for tailcall
 */
 
 void
-Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP,
-        ARGMOD_NULLOK(PMC * parent), ARGMOD_NULLOK(PMC * tailcall))
+Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP, ARGMOD(PMC *parent), ARGMOD(PMC *tailcall))
 {
     ASSERT_ARGS(Parrot_pcc_merge_signature_for_tailcall)
     if (PMC_IS_NULL(parent) || PMC_IS_NULL(tailcall) || (parent == tailcall))
@@ -1795,7 +1793,7 @@ clone_key_arg(PARROT_INTERP, ARGIN(PMC *key))
     if (key->vtable->base_type != enum_class_Key)
         return key;
 
-    for (t = key; t; t=Parrot_key_next(interp, t)) {
+    for (t = key; !PMC_IS_NULL(t); t=Parrot_key_next(interp, t)) {
         /* register keys have to be cloned */
         if (PObj_get_FLAGS(key) & KEY_register_FLAG) {
             return VTABLE_clone(interp, key);

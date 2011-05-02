@@ -216,11 +216,13 @@ void Parrot_pcc_fill_params_from_varargs(PARROT_INTERP,
         FUNC_MODIFIES(*args);
 
 void Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP,
-    ARGMOD_NULLOK(PMC * parent),
-    ARGMOD_NULLOK(PMC * tailcall))
+    ARGMOD(PMC *parent),
+    ARGMOD(PMC *tailcall))
         __attribute__nonnull__(1)
-        FUNC_MODIFIES(* parent)
-        FUNC_MODIFIES(* tailcall);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*parent)
+        FUNC_MODIFIES(*tailcall);
 
 PARROT_CAN_RETURN_NULL
 void Parrot_pcc_parse_signature_string(PARROT_INTERP,
@@ -279,7 +281,9 @@ void Parrot_pcc_split_signature_string(
     , PARROT_ASSERT_ARG(args))
 #define ASSERT_ARGS_Parrot_pcc_merge_signature_for_tailcall \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(parent) \
+    , PARROT_ASSERT_ARG(tailcall))
 #define ASSERT_ARGS_Parrot_pcc_parse_signature_string \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
