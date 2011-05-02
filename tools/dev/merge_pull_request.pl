@@ -28,8 +28,10 @@ tools/dev/merge_pull_request.pl - Merge Github Pull Requests
 
 =cut
 
-my $num = shift or die "Must give a pull request number to merge!";
-merge_pull_request($num);
+my $num  = shift or die "Must give a pull request number to merge!";
+my $repo = shift || 'parrot';
+
+merge_pull_request($num, $repo);
 
 sub merge_pull_request {
     my ($num) = @_;
@@ -38,8 +40,8 @@ sub merge_pull_request {
     my $status = qx{ git status -u };
     system("git checkout -b pull_request_$num");
 
-    my $stashed = stash_if_necessary('parrot', $status);
-    system("wget --no-check-certificate https://github.com/parrot/parrot/pull/$num.patch");
+    my $stashed = stash_if_necessary($repo, $status);
+    system("wget --no-check-certificate https://github.com/parrot/$repo/pull/$num.patch");
     system("git am --signoff $num.patch");
 }
 
