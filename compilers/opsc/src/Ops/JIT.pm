@@ -522,19 +522,21 @@ our multi method process(PAST::Var $var, %c) {
             die("Unknow field $field in $struct_type") unless $struct.exists($field);
 
             $!debug && say("Mapped $struct_type->$field to { $struct{ $field } }");
-            my $res := $!builder.struct_gep($lhs, $struct{ $field });
-            $res.dump();
-
+            $res := $!builder.struct_gep($lhs, $struct{ $field });
+            $!debug && say("GEP " ~ $res.dump());
         }
         else {
             $res := %c<variables>{ $var.name } // die("Unknown variable { $var.name }");
-            $res := $!builder.load($res) unless %c<lhs>;
-            $res;
         }
+
+        $res := $!builder.load($res) unless %c<lhs>;
     }
 
-    return undef unless $res;
-    $res;
+    return undef if $var.isdecl;
+    return $res if defined($res);
+
+    _dumper($var);
+    die("Can't handle PAST::Var");
 }
 
 our method access_arg:type<i> ($num, %c) {
