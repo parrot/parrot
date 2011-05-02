@@ -550,6 +550,12 @@ sub remove_junk {
 
     return $source;
 }
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
 
 __DATA__
 0x00 noop

@@ -148,3 +148,9 @@ END {
         unlink $hello_m0b, $hello2_m0b;
     }
 }
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
