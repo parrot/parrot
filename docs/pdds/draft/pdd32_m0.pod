@@ -555,8 +555,8 @@ The header has the following structure:
 The directory segment will be a list of offsets to the starts of chunks within
 the file.  It will have the following structure:
 
-  opcode_t : number of opcode_t-sized units in this segment
   opcode_t : M0_DIR_SEG
+  opcode_t : number of opcode_t-sized units in this segment
   [
     opcode_t : offset of a chunk header
     opcode_t : size of chunk name
@@ -568,8 +568,8 @@ the file.  It will have the following structure:
 A chunk will consist of a chunk directory segment, a bytecode segment, a
 variables segment, a metadata segment and a chunk name.
 
-  opcode_t : number of opcode_t-sized units in this segment
   opcode_t : M0_CHUNKDIR_SEG
+  opcode_t : number of opcode_t-sized units in this segment
   opcode_t : offset of bytecode segment
   opcode_t : offset of variables segment
   opcode_t : offset of metadata segment
@@ -582,8 +582,8 @@ The variables segment will contain any data needed to execute the bytecode.
 Data will used to poplate the variables table and explictly loaded into
 registers as needed.
 
-  opcode_t : number of opcode_t-sized units in this segment
   opcode_t : M0_VARS_SEG
+  opcode_t : number of opcode_t-sized units in this segment
   [
     opcode_t : number of bytes in variable data
     ...      : variable data
@@ -599,8 +599,8 @@ somehow be marked as constant?  It's almost certainly incorrect to change them
 at runtime.
 }}}
 
-  opcode_t : number of opcode_t-sized units in this segment
   opcode_t : M0_META_SEG
+  opcode_t : number of opcode_t-sized units in this segment
   [
     opcode_t : bytecode offset relative to the start of the current bc seg where this data becomes effective
     opcode_t : offset into variables table for the name of this piece of metadata
@@ -611,8 +611,8 @@ The bytecode segment contains a series of executable ops.  A pointer (or its
 equivalent for a non-C language) to the current context will be passed as the
 first argument to every op, but this pointer will not be stored in bytecode.
 
-  opcode_t : number of opcode_t-sized units in this segment
   opcode_t : M0_BC_SEG
+  opcode_t : number of opcode_t-sized units in this segment
   [
     char : opcode
     char : arg1
