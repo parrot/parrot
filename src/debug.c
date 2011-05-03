@@ -467,6 +467,8 @@ dbg_delete(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 static void
 dbg_disable(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_disable)
+
     TRACEDEB_MSG("dbg_disable");
 
     PDB_disable_breakpoint(pdb->debugee, cmd);
@@ -475,6 +477,8 @@ dbg_disable(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 static void
 dbg_disassemble(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_disassemble)
+
     TRACEDEB_MSG("dbg_disassemble");
 
     PDB_disassemble(pdb->debugee, cmd);
