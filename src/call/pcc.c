@@ -237,6 +237,8 @@ PARROT_WARN_UNUSED_RESULT
 static int
 is_invokable(PARROT_INTERP, ARGIN(PMC *sub_obj))
 {
+    ASSERT_ARGS(is_invokable)
+
     if (VTABLE_isa(interp, sub_obj, CONST_STRING(interp, "Sub")))
         return 1;
     else
