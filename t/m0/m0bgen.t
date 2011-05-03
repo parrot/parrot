@@ -40,22 +40,22 @@ my $m0_interp = '';
 
 my $m0b_data = [
     { 
-      name     => 'chunk_0',
-      vars     => [],
-      metadata => [],
-      bytecode => [],
+      name => 'chunk_0', 
+      vars => [], 
+      meta => [],
+      bc   => 1,  # number of ops to generate (all null)
     },
     { 
-      name     => 'chunk_1',
-      vars     => [],
-      metadata => [],
-      bytecode => [],
+      name => 'chunk_1',
+      vars => [],
+      meta => [],
+      bc   => 0,
     },
     { 
-      name     => 'chunk_2',
-      vars     => [],
-      metadata => [],
-      bytecode => [],
+      name => 'chunk_2',
+      vars => [],
+      meta => [],
+      bc   => 0,
     },
 ];
 
@@ -99,9 +99,9 @@ sub m0b_build_bytes {
 
     for (@$chunks) {
         my $vars = $_{vars};
-        my $meta_seg = m0b_meta_seg( $_{metadata}, $vars );
+        my $meta_seg = m0b_meta_seg( $_{meta}, $vars );
         my $vars_seg = m0b_vars_seg( $vars );
-        my $bc_seg   = m0b_bc_seg(   $_{bytecode} );
+        my $bc_seg   = m0b_bc_seg(   $_{bc} );
         my $offset   = length($m0b_bytes);
         $m0b_bytes .= $vars_seg . $meta_seg . $bc_seg;
         #TODO: insert offset of vars segment into dir segment
@@ -113,26 +113,43 @@ sub m0b_build_bytes {
 
 =item C<m0b_dir_seg>
 
-Generate a directory for 
+Generate a directory for the given set of chunks, assuming that the directory
+segment's first byte is at $offset.
 
 =cut
 
 sub m0b_dir_seg {
-    my ($chunks) = @_;
+    my ($chunks, $offset) = @_;
 
     my $dir_bytes = '';
 
     for (@$chunks) {
         #add 4 null bytes as a placeholder for the offset of the vars segment
-        $dir_bytes .= pack('xxxx');
+        my $chunk_length = m0b_chunk_length($_);
+        $dir_bytes .= pack('L', $chunk_length + $offset);
         $dir_bytes .= pack('L', length($_->{name}));
         $dir_bytes .= $_->{name};
+        $offset += $chunk_length;
     }
 
     my $seg_bytes =  pack('L', $M0_DIR_SEG);
     $seg_bytes    .= pack('L', length($dir_bytes));
     $seg_bytes    .= $dir_bytes;
     return $seg_bytes;
+}
+
+
+=item C<m0b_chunk_length>
+
+Calculate the number of bytes in a chunk.
+
+=cut
+
+sub m0b_chunk_length {
+    my ($chunk) = @_;
+    return m0b_bc_seg_length($chunk->{bc})
+         + m0b_vars_seg_length($chunk->{vars})
+         + m0b_meta_seg_length($chunk->{meta});
 }
 
 
@@ -154,6 +171,23 @@ sub m0b_bc_seg {
     $seg_bytes    .= $bytecode_bytes;
     return $seg_bytes;
 }
+
+
+=item C<m0b_bc_seg_length>
+
+Calculate the size of an M0 bytecode segment.
+
+=cut
+
+sub m0b_bc_seg_length {
+    my ($size) = @_;
+
+    my $seg_length = 8; # 4 for segment identifier, 4 for size
+    $seg_length += $size * 4;
+
+    return $seg_length;
+}
+
 
 =item C<m0b_vars_seg>
 
@@ -180,6 +214,27 @@ sub m0b_vars_seg {
     return $seg_bytes;
 }
 
+
+=item C<m0b_vars_seg_length>
+
+Calculate the number of bytes that a variables segment will occupy.
+
+=cut
+
+sub m0b_vars_seg_length {
+    my ($vars) = @_;
+
+    my $seg_length = 8; # 4 for segment identifier, 4 for size
+
+    #TODO: actually populate variables segment
+    #for each variable
+      #write a 4-byte value of the size of the data
+      #write the data
+
+    return $seg_length;
+}
+
+
 =item C<m0b_meta_seg>
 
 Generate the binary version of an M0 metadata segment, using the values in the
@@ -205,6 +260,28 @@ sub m0b_meta_seg {
     $seg_bytes    .= pack("L", length($metadata_bytes));
     $seg_bytes    .= $metadata_bytes;
     return $seg_bytes;
+}
+
+
+
+=item C<m0b_meta_seg_length>
+
+Calculate the number of bytes that a metadata segment will occupy.
+
+=cut
+
+sub m0b_meta_seg_length {
+    my ($metadata, $var_seg) = @_;
+    
+    my $seg_length = 8; # 4 for segment identifier, 4 for size
+
+    #for each entry
+        #get the index of the key
+        #get the index of the value
+        #append the offset, key and value to $metadata_bytes
+        #increase size by 12
+
+    return $seg_length;
 }
 
 
