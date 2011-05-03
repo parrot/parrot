@@ -157,6 +157,7 @@ sub can_parse {
     m0b_build_file($data, $file);
     my $status = system($interp, $file);
     is($status, 0, $msg);
+    unlink($file);
 }
 
 =item C<m0b_build_file>
