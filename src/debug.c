@@ -368,6 +368,10 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 
 =item C<static void dbg_delete(PDB_t *pdb, const char *cmd)>
 
+=item C<static void dbg_disable(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_disassemble(PDB_t *pdb, const char *cmd)>
+
 =item C<static void dbg_echo(PDB_t *pdb, const char *cmd)>
 
 =item C<static void dbg_enable(PDB_t *pdb, const char *cmd)>
