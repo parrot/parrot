@@ -212,8 +212,13 @@ sub m0b_header {
     #m0b magic number
     my $m0b_header = "asdfasdf";
 
-    #intval size, floatval size, opcode_t size, void* size, endianness
-    $m0b_header .= pack('CCCCCxxx', 4, 8, 4, 4, 0);
+    $m0b_header .= pack('C', 0); # version
+    $m0b_header .= pack('C', 4); # intval size
+    $m0b_header .= pack('C', 8); # floatval size
+    $m0b_header .= pack('C', 4); # opcode_t size
+    $m0b_header .= pack('C', 4); # void* size
+    $m0b_header .= pack('C', 0); # endianness
+    $m0b_header .= pack('xx');   # padding
 
     return $m0b_header;
 }
