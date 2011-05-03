@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use feature 'say';
 use Test::More;
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 7;
 use Data::Dumper;
 
 =head1 NAME
