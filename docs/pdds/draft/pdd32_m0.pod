@@ -554,6 +554,7 @@ TODO: Where does the M0 version number go?
 The header has the following structure:
 
   'asdfasdf' : 8-byte magic number (copy from pbc)
+  0x00       : 1 byte version number (currently 0)
   0x?        : 1 byte number of bytes in an I registers
   0x?        : 1 byte number of bytes in an N register
   0x?        : 1 byte number of bytes in a opcode_t
