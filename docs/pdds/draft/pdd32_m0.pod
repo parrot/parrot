@@ -549,8 +549,6 @@ NOTE: We should design the binary format of M0 in a way that allows it to be mma
 by an interpreter.
 }}}
 
-TODO: Where does the M0 version number go?
-
 The header has the following structure:
 
   'asdfasdf' : 8-byte magic number (copy from pbc)
