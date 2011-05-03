@@ -365,6 +365,20 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=over 4
+
+=item C<static void failed_allocation(unsigned int line, unsigned long size)>
+
+Report error if allocation failed
+
+=back
+
+=cut
+
+*/
+
 PARROT_DOES_NOT_RETURN
 static void
 failed_allocation(unsigned int line, unsigned long size)
