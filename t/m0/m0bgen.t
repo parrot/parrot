@@ -37,32 +37,127 @@ my $M0_BC_SEG       = 0x04;
 
 # basic test with one chunk containing all empty segments
 
-my $m0_interp = '';
+my $m0_interp = 'false';
 
 my $m0b_data = [
     { 
-      name => 'chunk_0', 
-      vars => [], 
-      meta => [],
-      bc   => 1,  # number of ops to generate (all null)
-    },
-    { 
-      name => 'chunk_1',
+      name => 'chunk_0',
       vars => [],
-      meta => [],
+      meta => {},
       bc   => 0,
     },
-#    { 
-#      name => 'chunk_2',
-#      vars => [],
-#      meta => [],
-#      bc   => 0,
-#    },
 ];
 
-m0b_build_file($m0b_data, "test.m0b");
+can_parse($m0_interp, $m0b_data, "very minimal bytecode file" );
 
 
+
+$m0b_data = [
+    { 
+      name => 'chunk_0', 
+      vars => [ qw(quux flub buuuz) ],
+      vars => [],
+      meta => {},
+      bc   => 0,
+    },
+];
+
+can_parse($m0_interp, $m0b_data, "minimal bytecode with some variables" );
+
+
+$m0b_data = [
+    { 
+      name => 'chunk_0', 
+      vars => [],
+      meta => { 0 => {line => 3, file => 'awesome'},
+                3 => {cow  => 4},
+              },
+      bc   => 0,  # number of ops to generate (all null)
+    },
+];
+
+can_parse($m0_interp, $m0b_data, "minimal bytecode file with a metadata segment" );
+
+
+$m0b_data = [
+    { 
+      name => 'chunk_0', 
+      vars => [ qw(quux flub buuuz) ],
+      meta => { 0 => {line => 3, file => 'awesome'},
+                3 => {cow  => 4},
+              },
+      bc   => 0,  # number of ops to generate (all null)
+    },
+];
+
+can_parse($m0_interp, $m0b_data, "bytecode file with metadata and vars" );
+
+
+$m0b_data = [
+    { 
+      name => 'chunk_0', 
+      vars => [ ],
+      meta => { },
+      bc   => 99,  
+    },
+];
+
+can_parse($m0_interp, $m0b_data, "bytecode file with null ops" );
+
+
+$m0b_data = [
+    { 
+      name => 'chunk_0', 
+      vars => [ qw(quux flub buuuz) ],
+      meta => { 0 => {line => 3, file => 'awesome'},
+                3 => {cow  => 4},
+              },
+      bc   => 99,  # number of ops to generate (all null)
+    },
+];
+
+can_parse($m0_interp, $m0b_data, "bytecode file with metadata, vars and null ops" );
+
+
+$m0b_data = [
+    { 
+      name => 'chunk_0', 
+      vars => [ qw(quux flub buuuz) ],
+      meta => { 0 => {line => 3, file => 'awesome'},
+                3 => {cow  => 4},
+              },
+      bc   => 11,  # number of ops to generate (all null)
+    },
+    { 
+      name => 'chunk_2', 
+      vars => [ qw(quux2 flub2 buuuz2) ],
+      meta => { 0 => {line2 => 32, file2 => 'awesome2'},
+                3 => {cow2  => 42},
+              },
+      bc   => 22,  # number of ops to generate (all null)
+    },
+    { 
+      name => 'chunk_3', 
+      vars => [ qw(quux3 flub3 buuuz3) ],
+      meta => { 03 => {line3 => 33, file3 => 'awesome3'},
+                33 => {cow3  => 43},
+              },
+      bc   => 33,  # number of ops to generate (all null)
+    },
+];
+
+can_parse($m0_interp, $m0b_data, "bytecode file with several chunks" );
+
+
+
+
+sub can_parse {
+    my ($interp, $data, $msg) = @_;
+    my $file = 'temp.m0b';
+    m0b_build_file($data, $file);
+    my $status = system($interp, $file);
+    is($status, 0, $msg);
+}
 
 =item C<m0b_build_file>
 
@@ -89,16 +184,15 @@ Generate the binary version of an M0 chunk directory segment.
 
 sub m0b_build_bytes {
     my ($chunks) = @_;
-    
 
     my $m0b_bytes = m0b_header();
     $m0b_bytes .= m0b_dir_seg( $chunks );
 
     for (@$chunks) {
-        my $vars = $_{vars};
-        my $meta_seg = m0b_meta_seg( $_{meta}, $vars );
+        my $vars = $_->{vars};
+        my $meta_seg = m0b_meta_seg( $_->{meta}, $vars );
         my $vars_seg = m0b_vars_seg( $vars );
-        my $bc_seg   = m0b_bc_seg(   $_{bc} );
+        my $bc_seg   = m0b_bc_seg(   $_->{bc} );
         $m0b_bytes .= $vars_seg . $meta_seg . $bc_seg;
     }
     #say "bytecode contains ".length($m0b_bytes)." bytes";
@@ -254,16 +348,16 @@ NOTE: Currently this generates an empty variables segment.
 sub m0b_vars_seg {
     my ($vars) = @_;
 
-    my $vars_bytes = '';
+    my $seg_bytes  = pack("L", $M0_VARS_SEG);
+    $seg_bytes    .= pack("L", m0b_vars_seg_length($vars));
 
-    #TODO: actually populate variables segment
     #for each variable
-      #write a 4-byte value of the size of the data
-      #write the data
+    for (@$vars) {
+        my $var_length = length($_);
+        $seg_bytes .= pack("L", $M0_VARS_SEG);
+        $seg_bytes .= $_;
+    }
 
-    my $seg_bytes =  pack("L", $M0_VARS_SEG);
-    $seg_bytes    .= pack("L", length($vars_bytes));
-    $seg_bytes    .= $vars_bytes;
     return $seg_bytes;
 }
 
@@ -279,10 +373,12 @@ sub m0b_vars_seg_length {
 
     my $seg_length = 8; # 4 for segment identifier, 4 for size
 
-    #TODO: actually populate variables segment
-    #for each variable
-      #write a 4-byte value of the size of the data
-      #write the data
+    for (@$vars) {
+        my $var_length = length($_);
+        $seg_length += 4; # storage of size of variable
+        $seg_length += length($_);
+        #say "after adding var '$_', length is $seg_length";
+    }
 
     #say "vars seg length is $seg_length";
     return $seg_length;
@@ -301,18 +397,20 @@ NOTE: Currently generates an empty metadata segment.
 sub m0b_meta_seg {
     my ($metadata, $var_seg) = @_;
     
-    my $metadata_bytes = '';
-
-    #TODO: actually populate metadata segment
-    #for each entry
-        #get the index of the key
-        #get the index of the value
-        #append the offset, key and value to $metadata_bytes
-        #increase size by 12
-
     my $seg_bytes =  pack("L", $M0_META_SEG);
-    $seg_bytes    .= pack("L", length($metadata_bytes));
-    $seg_bytes    .= $metadata_bytes;
+    $seg_bytes    .= pack("L", m0b_meta_seg_length($metadata));
+
+    #for each entry
+    for my $offset (keys %$metadata) {
+        for my $key (keys %{$metadata->{$offset}}) {
+            my $key_idx = m0b_get_val_idx($key, $var_seg);
+            my $val_idx = m0b_get_val_idx($metadata->{$offset}{$key}, $var_seg);
+            $seg_bytes .= pack('L', $offset);
+            $seg_bytes .= pack('L', $key_idx);
+            $seg_bytes .= pack('L', $val_idx);
+        }
+    }
+
     return $seg_bytes;
 }
 
@@ -325,15 +423,15 @@ Calculate the number of bytes that a metadata segment will occupy.
 =cut
 
 sub m0b_meta_seg_length {
-    my ($metadata, $var_seg) = @_;
+    my ($metadata) = @_;
     
     my $seg_length = 8; # 4 for segment identifier, 4 for size
 
-    #for each entry
-        #get the index of the key
-        #get the index of the value
-        #append the offset, key and value to $metadata_bytes
-        #increase size by 12
+    for my $offset (keys %$metadata) {
+        for (keys %{$metadata->{$offset}}) {
+            $seg_length += 12;
+        }
+    }
 
     #say "metadata seg length is $seg_length";
     return $seg_length;
@@ -348,13 +446,14 @@ return the index.
 =cut
 
 sub m0b_get_val_idx {
-    my ($val, $seg) = @_;
+    my ($val, $vars) = @_;
 
     my $val_idx = -1;
-    for (my $i = 0; $i < scalar(@$seg); $i++) {
-        return $i if ($seg->[$i] eq $val);
+    for (my $i = 0; $i < scalar(@$vars); $i++) {
+        return $i if ($vars->[$i] eq $val);
     }
-    return push(@$seg, $val)-1;
+    #say "added '$val' to vars";
+    return push(@$vars, $val)-1;
 }
 
 # Local Variables:
