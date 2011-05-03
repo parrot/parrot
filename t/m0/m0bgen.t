@@ -4,6 +4,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+use feature 'say';
 use Test::More;
 use Parrot::Test tests => 1;
 use Data::Dumper;
@@ -51,12 +52,12 @@ my $m0b_data = [
       meta => [],
       bc   => 0,
     },
-    { 
-      name => 'chunk_2',
-      vars => [],
-      meta => [],
-      bc   => 0,
-    },
+#    { 
+#      name => 'chunk_2',
+#      vars => [],
+#      meta => [],
+#      bc   => 0,
+#    },
 ];
 
 m0b_build_file($m0b_data, "test.m0b");
@@ -89,12 +90,8 @@ Generate the binary version of an M0 chunk directory segment.
 sub m0b_build_bytes {
     my ($chunks) = @_;
     
-    #m0b magic number
-    my $m0b_header = "asdfasdf";
-    #intval size, floatval size, opcode_t size, void* size, endianness
-    $m0b_header .= pack('CCCCCxxx', 4, 8, 4, 4, 0);
 
-    my $m0b_bytes = $m0b_header;
+    my $m0b_bytes = m0b_header();
     $m0b_bytes .= m0b_dir_seg( $chunks );
 
     for (@$chunks) {
@@ -102,14 +99,42 @@ sub m0b_build_bytes {
         my $meta_seg = m0b_meta_seg( $_{meta}, $vars );
         my $vars_seg = m0b_vars_seg( $vars );
         my $bc_seg   = m0b_bc_seg(   $_{bc} );
-        my $offset   = length($m0b_bytes);
         $m0b_bytes .= $vars_seg . $meta_seg . $bc_seg;
-        #TODO: insert offset of vars segment into dir segment
     }
+    #say "bytecode contains ".length($m0b_bytes)." bytes";
 
     return $m0b_bytes;
 }
 
+
+=item C<m0b_header>
+
+Generate an M0 bytecode header.
+
+=cut
+
+sub m0b_header {
+
+    #m0b magic number
+    my $m0b_header = "asdfasdf";
+
+    #intval size, floatval size, opcode_t size, void* size, endianness
+    $m0b_header .= pack('CCCCCxxx', 4, 8, 4, 4, 0);
+
+    return $m0b_header;
+}
+
+
+=item C<m0b_header_length>
+
+Return the number of bytes in an M0 bytecode header.
+
+=cut
+
+sub m0b_header_length {
+    return 8  # magic number
+         + 8; # config data
+}
 
 =item C<m0b_dir_seg>
 
@@ -119,17 +144,20 @@ segment's first byte is at $offset.
 =cut
 
 sub m0b_dir_seg {
-    my ($chunks, $offset) = @_;
+    my ($chunks) = @_;
 
     my $dir_bytes = '';
+    my $offset = m0b_header_length();
+    #say "offset of header is $offset";
+    $offset += m0b_dir_seg_length($chunks);
+    #say "offset of first chunk is $offset";
 
     for (@$chunks) {
-        #add 4 null bytes as a placeholder for the offset of the vars segment
-        my $chunk_length = m0b_chunk_length($_);
-        $dir_bytes .= pack('L', $chunk_length + $offset);
+        $dir_bytes .= pack('L', $offset);
         $dir_bytes .= pack('L', length($_->{name}));
         $dir_bytes .= $_->{name};
-        $offset += $chunk_length;
+        $offset    += m0b_chunk_length($_);
+        #say "offset of next chunk is $offset";
     }
 
     my $seg_bytes =  pack('L', $M0_DIR_SEG);
@@ -139,6 +167,27 @@ sub m0b_dir_seg {
 }
 
 
+=item C<m0b_dir_seg_length>
+
+Calculate the number of bytes in a directory segment, using the chunk names in
+$chunks.
+
+=cut
+
+sub m0b_dir_seg_length {
+    my ($chunks) = @_;
+
+    my $seg_length = 8; # 4 bytes for identifier, 4 for length
+
+    for (@$chunks) {
+        $seg_length += 4; # offset into the m0b file
+        $seg_length += 4; # size of name
+        $seg_length += length($_->{name});
+    }
+
+    return $seg_length;
+}
+
 =item C<m0b_chunk_length>
 
 Calculate the number of bytes in a chunk.
@@ -147,9 +196,12 @@ Calculate the number of bytes in a chunk.
 
 sub m0b_chunk_length {
     my ($chunk) = @_;
-    return m0b_bc_seg_length($chunk->{bc})
+    my $chunk_length =
+           m0b_bc_seg_length($chunk->{bc})
          + m0b_vars_seg_length($chunk->{vars})
          + m0b_meta_seg_length($chunk->{meta});
+    #say "chunk length is $chunk_length";
+    return $chunk_length;
 }
 
 
@@ -185,6 +237,7 @@ sub m0b_bc_seg_length {
     my $seg_length = 8; # 4 for segment identifier, 4 for size
     $seg_length += $size * 4;
 
+    #say "bytecode seg length is $seg_length";
     return $seg_length;
 }
 
@@ -231,6 +284,7 @@ sub m0b_vars_seg_length {
       #write a 4-byte value of the size of the data
       #write the data
 
+    #say "vars seg length is $seg_length";
     return $seg_length;
 }
 
@@ -281,6 +335,7 @@ sub m0b_meta_seg_length {
         #append the offset, key and value to $metadata_bytes
         #increase size by 12
 
+    #say "metadata seg length is $seg_length";
     return $seg_length;
 }
 
