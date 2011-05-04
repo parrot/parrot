@@ -564,6 +564,7 @@ The directory segment will be a list of offsets to the starts of chunks within
 the file.  It will have the following structure:
 
   opcode_t : M0_DIR_SEG
+  opcode_t : number of chunks in this segment
   opcode_t : number of opcode_t-sized units in this segment
   [
     opcode_t : offset of a variables segment
@@ -578,6 +579,7 @@ Data will used to poplate the variables table and explictly loaded into
 registers as needed.
 
   opcode_t : M0_VARS_SEG
+  opcode_t : number of variables in this segment
   opcode_t : number of opcode_t-sized units in this segment
   [
     opcode_t : number of bytes in variable data
@@ -595,6 +597,7 @@ at runtime.
 }}}
 
   opcode_t : M0_META_SEG
+  opcode_t : number of entries in this segment
   opcode_t : number of opcode_t-sized units in this segment
   [
     opcode_t : bytecode offset relative to the start of the current bc seg where this data becomes effective
@@ -607,6 +610,7 @@ equivalent for a non-C language) to the current context will be passed as the
 first argument to every op, but this pointer will not be stored in bytecode.
 
   opcode_t : M0_BC_SEG
+  opcode_t : number of ops in this segment
   opcode_t : number of opcode_t-sized units in this segment
   [
     char : opcode
