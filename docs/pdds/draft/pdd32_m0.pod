@@ -703,6 +703,9 @@ This section will specify the following:
  * how to reliably map between sub names and chunks
  * how values from one sub are accessed by another (arguments/returns)
 
+=head2 Exceptions and Exception Handling
+
+TODO: describe this here
 
 =head2 Objects
 
