@@ -94,6 +94,14 @@ static void dbg_delete(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void dbg_disable(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void dbg_disassemble(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void dbg_echo(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -253,6 +261,12 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 #define ASSERT_ARGS_dbg_delete __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pdb) \
     , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_disable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_dbg_disassemble __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pdb) \
+    , PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_dbg_echo __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pdb) \
     , PARROT_ASSERT_ARG(cmd))
@@ -354,6 +368,10 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 
 =item C<static void dbg_delete(PDB_t *pdb, const char *cmd)>
 
+=item C<static void dbg_disable(PDB_t *pdb, const char *cmd)>
+
+=item C<static void dbg_disassemble(PDB_t *pdb, const char *cmd)>
+
 =item C<static void dbg_echo(PDB_t *pdb, const char *cmd)>
 
 =item C<static void dbg_enable(PDB_t *pdb, const char *cmd)>
@@ -451,16 +469,20 @@ dbg_delete(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 }
 
 static void
-dbg_disable(ARGIN(PDB_t *pdb), ARGIN(const char *cmd)) /* HEADERIZER SKIP */
+dbg_disable(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_disable)
+
     TRACEDEB_MSG("dbg_disable");
 
     PDB_disable_breakpoint(pdb->debugee, cmd);
 }
 
 static void
-dbg_disassemble(ARGIN(PDB_t *pdb), ARGIN(const char *cmd)) /* HEADERIZER SKIP */
+dbg_disassemble(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(dbg_disassemble)
+
     TRACEDEB_MSG("dbg_disassemble");
 
     PDB_disassemble(pdb->debugee, cmd);

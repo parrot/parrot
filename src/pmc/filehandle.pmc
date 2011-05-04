@@ -482,7 +482,7 @@ filehandle when finished.
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot readall on a new file from an already open filehandle");
 
-            filehandle  = Parrot_io_open_handle(INTERP, PMCNULL, name, NULL);
+            filehandle  = Parrot_io_open_handle(INTERP, PMCNULL, name, STRINGNULL);
 
             PARROT_ASSERT(filehandle->vtable->base_type == enum_class_FileHandle);
 
