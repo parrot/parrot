@@ -155,8 +155,6 @@ parrot_init_library_paths(PARROT_INTERP)
         if (!STRING_IS_NULL(envvar) && !STRING_IS_EMPTY(envvar))
             VTABLE_push_string(interp, paths, envvar);
     }
-    entry = CONST_STRING(interp, "./");
-    VTABLE_push_string(interp, paths, entry);
 
     /* define library paths */
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
@@ -168,15 +166,11 @@ parrot_init_library_paths(PARROT_INTERP)
         if (!STRING_IS_NULL(envvar) && !STRING_IS_EMPTY(envvar))
             VTABLE_push_string(interp, paths, envvar);
     }
-    entry = CONST_STRING(interp, "./");
-    VTABLE_push_string(interp, paths, entry);
 
     /* define languages paths */
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_LANG, paths);
-    entry = CONST_STRING(interp, "./");
-    VTABLE_push_string(interp, paths, entry);
 
     /* define dynext paths */
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
