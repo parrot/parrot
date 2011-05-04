@@ -246,23 +246,20 @@ segment's first byte is at $offset.
 sub m0b_dir_seg {
     my ($chunks) = @_;
 
-    my $dir_bytes = '';
-    my $offset = m0b_header_length();
-    #say "offset of header is $offset";
-    $offset += m0b_dir_seg_length($chunks);
-    #say "offset of first chunk is $offset";
+    my $offset     = m0b_header_length();
+    my $seg_bytes  = pack('L', $M0_DIR_SEG);
+    $seg_bytes    .= pack('L', scalar @$chunks);
+    $seg_bytes    .= pack('L', m0b_dir_seg_length($chunks));
+    $offset       += m0b_dir_seg_length($chunks);
 
     for (@$chunks) {
-        $dir_bytes .= pack('L', $offset);
-        $dir_bytes .= pack('L', length($_->{name}));
-        $dir_bytes .= $_->{name};
+        $seg_bytes .= pack('L', $offset);
+        $seg_bytes .= pack('L', length($_->{name}));
+        $seg_bytes .= $_->{name};
         $offset    += m0b_chunk_length($_);
         #say "offset of next chunk is $offset";
     }
 
-    my $seg_bytes =  pack('L', $M0_DIR_SEG);
-    $seg_bytes    .= pack('L', length($dir_bytes));
-    $seg_bytes    .= $dir_bytes;
     return $seg_bytes;
 }
 
@@ -277,7 +274,7 @@ $chunks.
 sub m0b_dir_seg_length {
     my ($chunks) = @_;
 
-    my $seg_length = 8; # 4 bytes for identifier, 4 for length
+    my $seg_length = 12; # 4 bytes for identifier, 4 for count, 4 for length
 
     for (@$chunks) {
         $seg_length += 4; # offset into the m0b file
@@ -314,13 +311,14 @@ Generate the binary version of an M0 bytecode segment, using "\0" for the bytes.
 sub m0b_bc_seg {
     my ($size) = @_;
 
-    my $bytecode_bytes = '';
 
-    $bytecode_bytes = pack('CCCC', 0, 0, 0, 0);
+    my $seg_bytes   = pack('L', $M0_BC_SEG);
+    $seg_bytes     .= pack('L', $size);
+    $seg_bytes     .= pack('L', m0b_bc_seg_length($size));
+    while ($size--) {
+        $seg_bytes .= pack('CCCC', 0, 0, 0, 0);
+    }
 
-    my $seg_bytes =  pack('L', $M0_BC_SEG);
-    $seg_bytes    .= pack('L', length($bytecode_bytes));
-    $seg_bytes    .= $bytecode_bytes;
     return $seg_bytes;
 }
 
@@ -334,7 +332,7 @@ Calculate the size of an M0 bytecode segment.
 sub m0b_bc_seg_length {
     my ($size) = @_;
 
-    my $seg_length = 8; # 4 for segment identifier, 4 for size
+    my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
     $seg_length += $size * 4;
 
     #say "bytecode seg length is $seg_length";
@@ -355,6 +353,7 @@ sub m0b_vars_seg {
     my ($vars) = @_;
 
     my $seg_bytes  = pack("L", $M0_VARS_SEG);
+    $seg_bytes    .= pack("L", scalar @$vars);
     $seg_bytes    .= pack("L", m0b_vars_seg_length($vars));
 
     #for each variable
@@ -377,7 +376,7 @@ Calculate the number of bytes that a variables segment will occupy.
 sub m0b_vars_seg_length {
     my ($vars) = @_;
 
-    my $seg_length = 8; # 4 for segment identifier, 4 for size
+    my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
 
     for (@$vars) {
         my $var_length = length($_);
@@ -403,7 +402,13 @@ NOTE: Currently generates an empty metadata segment.
 sub m0b_meta_seg {
     my ($metadata, $var_seg) = @_;
     
-    my $seg_bytes =  pack("L", $M0_META_SEG);
+    my $entry_count = 0;
+    for my $offset (keys %$metadata) {
+        $entry_count += keys %{$metadata->{$offset}};
+    }
+
+    my $seg_bytes  = pack("L", $M0_META_SEG);
+    $seg_bytes    .= pack("L", $entry_count);
     $seg_bytes    .= pack("L", m0b_meta_seg_length($metadata));
 
     #for each entry
@@ -431,7 +436,7 @@ Calculate the number of bytes that a metadata segment will occupy.
 sub m0b_meta_seg_length {
     my ($metadata) = @_;
     
-    my $seg_length = 8; # 4 for segment identifier, 4 for size
+    my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
 
     for my $offset (keys %$metadata) {
         for (keys %{$metadata->{$offset}}) {
