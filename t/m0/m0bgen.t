@@ -211,7 +211,7 @@ Generate an M0 bytecode header.
 sub m0b_header {
 
     #m0b magic number
-    my $m0b_header = "asdfasdf";
+    my $m0b_header = "\376M0B\r\n\032\n";
 
     $m0b_header .= pack('C', 0); # version
     $m0b_header .= pack('C', 4); # intval size
