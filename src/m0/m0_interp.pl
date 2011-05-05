@@ -57,8 +57,9 @@ sub new_interp {
         \&m0_opfunc_noop,
         \&m0_opfunc_say_i,
     ];
-    $interp->{config} = [];
+    $interp->{config} = {};
     $interp->{contexts} = [];
+    $interp->{chunk_info} = [];
     return $interp;
 }
 
@@ -73,9 +74,10 @@ sub load_m0b {
     my ($interp, $filename) = @_;
 
     my $m0b = slurp($filename);
-    parse_m0b_header($interp, $m0b);
-    parse_m0b_dirseg($interp, $m0b);
-    parse_m0b_chunks($interp, $m0b);
+    my $cursor = 0;
+    parse_m0b_header($interp, $m0b, \$cursor);
+    parse_m0b_dirseg($interp, $m0b, \$cursor);
+    parse_m0b_chunks($interp, $m0b, \$cursor);
 }
 
 sub m0_opfunc_noop { }
@@ -93,30 +95,47 @@ Verify that an M0 bytecode header is valid.
 =cut
 
 sub parse_m0b_header {
-    my ($interp, $m0b) = @_;
+    my ($interp, $m0b, $cursor) = @_;
+
     # verify magic number
-    # verify that M0 version matches what's expected
+    my $m0b_magic = get_bytes($m0b, $cursor, 8);
+    my $real_magic = "\376M0B\r\n\032\n";
+    if ($real_magic cmp $m0b_magic) {
+      die "magic number mismatch";
+    }
+    
+    # verify that the interp understands this version of the m0b format
+    my $m0_version = ord(get_bytes($m0b, $cursor, 1));
+    if ($m0_version != 0) {
+      die "can't read m0b version $m0_version";
+    }
+
     # ignore everything else
+    get_bytes($m0b, $cursor, 7);
+    # TODO: store config info in $interp->{config}
 }
 
 sub parse_m0b_dirseg {
-    my ($interp, $m0b) = @_;
+    my ($interp, $m0b, $cursor) = @_;
 
-    # start at byte 0x10
     # verify the segment identifier
-    # store the number of bytes in this segment
-    # current byte is 24
-    # while current_byte <= (16 + size)
+    # store number of bytes in this segment
+    # store number of entries in this segment
+    # while cursor <= (24 + size)
         # store the offset of the variables chunk
         # store the size of the chunk name
         # get the bytes of the chunk name
         # store the name of the chunk in $interp->{chunks}[$n]{name}
+        # move the cursor to the next directory entry
 }
 
 sub parse_m0b_chunks {
-    my ($interp, $m0b) = @_;
+    my ($interp, $m0b, $cursor) = @_;
 
+    my @chunks = [];
+    my $chunk_count = 000;
     # for each chunk
+        my $chunk;
         # read the variables segment
         # for each variable
             # stick the variable into the next slot
@@ -129,4 +148,11 @@ sub parse_m0b_chunks {
         # for each op
             # break the op into 4 ints
             # store the ints in the next slot
+}
+
+sub get_bytes {
+    my ($data, $cursor, $count) = @_;
+    my $s = substr($data, $$cursor, $count);
+    $$cursor += $count;
+    return $s;
 }
