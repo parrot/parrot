@@ -198,7 +198,7 @@ void
 create_initial_context(PARROT_INTERP)
 {
     ASSERT_ARGS(create_initial_context)
-    const static UINTVAL num_regs[] = {32, 32, 32, 32};
+    static const UINTVAL num_regs[] = {32, 32, 32, 32};
     PMC *ignored;
 
     /* Create some initial free_list slots. */

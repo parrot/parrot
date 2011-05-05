@@ -1234,7 +1234,7 @@ Parrot_pcc_fill_params_from_op(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 {
     ASSERT_ARGS(Parrot_pcc_fill_params_from_op)
 
-    const static pcc_funcs_ptr function_pointers = {
+    static const pcc_funcs_ptr function_pointers = {
         (intval_ptr_func_t)intval_param_from_op,
         (numval_ptr_func_t)numval_param_from_op,
         (string_ptr_func_t)string_param_from_op,
@@ -1308,7 +1308,7 @@ Parrot_pcc_fill_params_from_varargs(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_objec
 {
     ASSERT_ARGS(Parrot_pcc_fill_params_from_varargs)
     PMC    *raw_sig  = PMCNULL;
-    const static pcc_funcs_ptr function_pointers = {
+    static const pcc_funcs_ptr function_pointers = {
         (intval_ptr_func_t)intval_param_from_c_args,
         (numval_ptr_func_t)numval_param_from_c_args,
         (string_ptr_func_t)string_param_from_c_args,
