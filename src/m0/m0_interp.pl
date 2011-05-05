@@ -24,6 +24,13 @@ use Data::Dumper;
 
 my $file = shift || die "Usage: $0 foo.m0b";
 
+use constant {
+    M0_DIR_SEG  => 0x01,
+    M0_VARS_SEG => 0x02,
+    M0_META_SEG => 0x03,
+    M0_BC_SEG   => 0x04,
+};
+
 run_m0b($file);
 
 
@@ -105,50 +112,125 @@ sub parse_m0b_header {
     }
     
     # verify that the interp understands this version of the m0b format
-    my $m0_version = ord(get_bytes($m0b, $cursor, 1));
-    if ($m0_version != 0) {
-      die "can't read m0b version $m0_version";
+    my $m0b_version = ord get_bytes($m0b, $cursor, 1);
+    if ($m0b_version != 0) {
+      die "can't read m0b version $m0b_version";
     }
+    $interp->{config}{m0b_version} = $m0b_version;
 
     # ignore everything else
-    get_bytes($m0b, $cursor, 7);
-    # TODO: store config info in $interp->{config}
+    $interp->{config}{ireg_size}     = ord get_bytes($m0b, $cursor, 1);
+    $interp->{config}{nreg_size}     = ord get_bytes($m0b, $cursor, 1);
+    $interp->{config}{opcode_t_size} = ord get_bytes($m0b, $cursor, 1);
+    $interp->{config}{pointer_size}  = ord get_bytes($m0b, $cursor, 1);
+    $interp->{config}{endianness}    = ord get_bytes($m0b, $cursor, 1);
+
+    # ignore padding bytes
+    get_bytes($m0b, $cursor, 2);
 }
 
 sub parse_m0b_dirseg {
     my ($interp, $m0b, $cursor) = @_;
 
     # verify the segment identifier
-    # store number of bytes in this segment
-    # store number of entries in this segment
-    # while cursor <= (24 + size)
-        # store the offset of the variables chunk
-        # store the size of the chunk name
-        # get the bytes of the chunk name
-        # store the name of the chunk in $interp->{chunks}[$n]{name}
-        # move the cursor to the next directory entry
+    my $seg_ident = unpack("L",get_bytes($m0b, $cursor, 4));
+    if ($seg_ident != M0_DIR_SEG) {
+        die "didn't find M0 directory segment";
+    }
+
+    my $seg_entry_count = unpack("L", get_bytes($m0b, $cursor, 4));
+    my $seg_byte_count  = unpack("L", get_bytes($m0b, $cursor, 4));
+    my $chunks_found = 0;
+    while ($chunks_found < $seg_entry_count) {
+        my $vars_seg_offset   = unpack("L", get_bytes($m0b, $cursor, 4));
+        my $chunk_name_length = unpack("L", get_bytes($m0b, $cursor, 4));
+        my $chunk_name        = unpack("a[$chunk_name_length]", get_bytes($m0b, $cursor, $chunk_name_length));
+        $interp->{chunk_info}[$chunks_found]{name} = $chunk_name;
+        $chunks_found++;
+    }
 }
 
 sub parse_m0b_chunks {
     my ($interp, $m0b, $cursor) = @_;
 
-    my @chunks = [];
-    my $chunk_count = 000;
-    # for each chunk
+    for my $chunk_num (1 .. scalar @{$interp->{chunk_info}}) {
         my $chunk;
-        # read the variables segment
-        # for each variable
-            # stick the variable into the next slot
-
-        # read the metadata segment
-        # for each metadata entry
-            # add the mapping to the right offset (use offsets into the variables table, not direct values)
-
-        # read the bytecode segment
-        # for each op
-            # break the op into 4 ints
-            # store the ints in the next slot
+        
+        my $vars = m0b_parse_vars_seg($interp, $m0b, $cursor);
+        my $meta = m0b_parse_meta_seg($interp, $m0b, $cursor);
+        my $bc   = m0b_parse_bc_seg(  $interp, $m0b, $cursor);
+    }
 }
+
+
+sub m0b_parse_vars_seg {
+    my ($interp, $m0b, $cursor) = @_;
+
+    my $vars = [];
+    # verify the segment identifier
+    my $seg_ident = unpack("L", get_bytes($m0b, $cursor, 4));
+    if ($seg_ident != M0_VARS_SEG) {
+        die "didn't find M0 variables segment";
+    }
+
+    my $var_count  = unpack("L", get_bytes($m0b, $cursor, 4));
+    my $byte_count = unpack("L", get_bytes($m0b, $cursor, 4));
+    while (scalar(@$vars) < $var_count) {
+        my $var_length = unpack("L", get_bytes($m0b, $cursor, 4));
+        my $var        = unpack("a[$var_length]", get_bytes($m0b, $cursor, $var_length));
+        push @$vars, $var;
+    }
+    return $vars;
+}
+
+
+sub m0b_parse_meta_seg {
+    my ($interp, $m0b, $cursor) = @_;
+
+    my $metadata = {};
+    # verify the segment identifier
+    my $seg_ident = unpack("L", get_bytes($m0b, $cursor, 4));
+    if ($seg_ident != M0_META_SEG) {
+        die "didn't find M0 metadata segment";
+    }
+
+    my $entry_count   = unpack("L", get_bytes($m0b, $cursor, 4));
+    my $byte_count    = unpack("L", get_bytes($m0b, $cursor, 4));
+    my $entries_found = 0;
+    while ($entries_found < $entry_count) {
+        my $offset   = unpack("L", get_bytes($m0b, $cursor, 4));
+        my $name_idx = unpack("L", get_bytes($m0b, $cursor, 4));
+        my $val_idx  = unpack("L", get_bytes($m0b, $cursor, 4));
+        $metadata->{$offset}{$name_idx} = $val_idx;
+        $entries_found++;
+    }
+    return $metadata;
+}
+
+
+sub m0b_parse_bc_seg {
+    my ($interp, $m0b, $cursor) = @_;
+
+    my $ops = [];
+    # verify the segment identifier
+    my $seg_ident = unpack("L", get_bytes($m0b, $cursor, 4));
+    if ($seg_ident != M0_BC_SEG) {
+        die "didn't find M0 bytecode segment";
+    }
+
+    my $op_count   = unpack("L", get_bytes($m0b, $cursor, 4));
+    my $byte_count = unpack("L", get_bytes($m0b, $cursor, 4));
+    while (scalar(@$ops) < $op_count) {
+        my $op = ord get_bytes($m0b, $cursor, 1);
+        my $a1 = ord get_bytes($m0b, $cursor, 1);
+        my $a2 = ord get_bytes($m0b, $cursor, 1);
+        my $a3 = ord get_bytes($m0b, $cursor, 1);
+        push @$ops, [$op, $a1, $a2, $a3];
+    }
+    return $ops;
+}
+
+
 
 sub get_bytes {
     my ($data, $cursor, $count) = @_;
