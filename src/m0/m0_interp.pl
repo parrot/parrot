@@ -31,6 +31,7 @@ use constant {
     M0_BC_SEG   => 0x04,
 };
 
+# context mnemonics
 use constant {
     INTERP => 0,
     PC     => 1,
@@ -290,7 +291,15 @@ use constant {
     P61    => 255,
 };
 
+# interp mnemonics
 
+use constant {
+  OP_FUNCS   => 0,
+  CHUNKS     => 1,
+  CHUNK_INFO => 2,
+  CONTEXTS   => 3,
+  CONFIG     => 4,
+};
 
 
 run_m0b($file);
@@ -322,14 +331,14 @@ where most of the interesting work takes place.
 sub new_interp {
     my $interp;
 
-    $interp->{op_funcs} = [
+    $interp->[OP_FUNCS] = [
         \&m0_opfunc_noop,
         \&m0_opfunc_say_i,
     ];
-    $interp->{config} = {};
-    $interp->{contexts} = [];
-    $interp->{chunk_info} = [];
-    $interp->{chunks} = [];
+    $interp->[CONFIG] = {};
+    $interp->[CONTEXTS] = [];
+    $interp->[CHUNK_INFO] = [];
+    $interp->[CHUNKS] = [];
     return $interp;
 }
 
@@ -349,9 +358,9 @@ sub new_context {
     $ctx->[EH]     = {};
     $ctx->[EX]     = {};
     $ctx->[PCX]    = {};
-    $ctx->[VAR]    = $interp->{chunks}[0]{vars};
-    $ctx->[MDS]    = $interp->{chunks}[0]{meta};
-    $ctx->[BCS]    = $interp->{chunks}[0]{bc};
+    $ctx->[VAR]    = $interp->[CHUNKS][0]{vars};
+    $ctx->[MDS]    = $interp->[CHUNKS][0]{meta};
+    $ctx->[BCS]    = $interp->[CHUNKS][0]{bc};
 
     return $ctx;
 }
@@ -373,7 +382,7 @@ sub run_ops {
             exit;
         }
         my $op_num  = $ctx->[BCS][$init_pc][0];
-        my $op_func = $ctx->[INTERP]{op_funcs}[$op_num];
+        my $op_func = $ctx->[INTERP][OP_FUNCS][$op_num];
         my $a1 = $ctx->[BCS][$init_pc][1];
         my $a2 = $ctx->[BCS][$init_pc][2];
         my $a3 = $ctx->[BCS][$init_pc][3];
@@ -433,14 +442,14 @@ sub parse_m0b_header {
     if ($m0b_version != 0) {
       die "can't read m0b version $m0b_version";
     }
-    $interp->{config}{m0b_version} = $m0b_version;
+    $interp->[CONFIG]{m0b_version} = $m0b_version;
 
     # store the rest of the config information in the interp
-    $interp->{config}{ireg_size}     = ord get_bytes($m0b, $cursor, 1);
-    $interp->{config}{nreg_size}     = ord get_bytes($m0b, $cursor, 1);
-    $interp->{config}{opcode_t_size} = ord get_bytes($m0b, $cursor, 1);
-    $interp->{config}{pointer_size}  = ord get_bytes($m0b, $cursor, 1);
-    $interp->{config}{endianness}    = ord get_bytes($m0b, $cursor, 1);
+    $interp->[CONFIG]{ireg_size}     = ord get_bytes($m0b, $cursor, 1);
+    $interp->[CONFIG]{nreg_size}     = ord get_bytes($m0b, $cursor, 1);
+    $interp->[CONFIG]{opcode_t_size} = ord get_bytes($m0b, $cursor, 1);
+    $interp->[CONFIG]{pointer_size}  = ord get_bytes($m0b, $cursor, 1);
+    $interp->[CONFIG]{endianness}    = ord get_bytes($m0b, $cursor, 1);
 
     # ignore padding bytes
     get_bytes($m0b, $cursor, 2);
@@ -462,7 +471,7 @@ sub parse_m0b_dirseg {
         my $vars_seg_offset   = unpack("L", get_bytes($m0b, $cursor, 4));
         my $chunk_name_length = unpack("L", get_bytes($m0b, $cursor, 4));
         my $chunk_name        = unpack("a[$chunk_name_length]", get_bytes($m0b, $cursor, $chunk_name_length));
-        $interp->{chunk_info}[$chunks_found]{name} = $chunk_name;
+        $interp->[CHUNK_INFO][$chunks_found]{name} = $chunk_name;
         $chunks_found++;
     }
 }
@@ -470,12 +479,12 @@ sub parse_m0b_dirseg {
 sub parse_m0b_chunks {
     my ($interp, $m0b, $cursor) = @_;
 
-    for my $chunk_name (@{$interp->{chunk_info}}) {
+    for my $chunk_name (@{$interp->[CHUNK_INFO]}) {
         my $chunk;
         $chunk->{vars} = m0b_parse_vars_seg($interp, $m0b, $cursor);
         $chunk->{meta} = m0b_parse_meta_seg($interp, $m0b, $cursor);
         $chunk->{bc}   = m0b_parse_bc_seg(  $interp, $m0b, $cursor);
-        push @{$interp->{chunks}}, $chunk;
+        push @{$interp->[CHUNKS]}, $chunk;
     }
 }
 
