@@ -67,6 +67,7 @@ sub new_interp {
     $interp->{config} = {};
     $interp->{contexts} = [];
     $interp->{chunk_info} = [];
+    $interp->{chunks} = [];
     return $interp;
 }
 
@@ -118,7 +119,7 @@ sub parse_m0b_header {
     }
     $interp->{config}{m0b_version} = $m0b_version;
 
-    # ignore everything else
+    # store the rest of the config information in the interp
     $interp->{config}{ireg_size}     = ord get_bytes($m0b, $cursor, 1);
     $interp->{config}{nreg_size}     = ord get_bytes($m0b, $cursor, 1);
     $interp->{config}{opcode_t_size} = ord get_bytes($m0b, $cursor, 1);
@@ -153,12 +154,12 @@ sub parse_m0b_dirseg {
 sub parse_m0b_chunks {
     my ($interp, $m0b, $cursor) = @_;
 
-    for my $chunk_num (1 .. scalar @{$interp->{chunk_info}}) {
+    for my $chunk_name (@{$interp->{chunk_info}}) {
         my $chunk;
-        
-        my $vars = m0b_parse_vars_seg($interp, $m0b, $cursor);
-        my $meta = m0b_parse_meta_seg($interp, $m0b, $cursor);
-        my $bc   = m0b_parse_bc_seg(  $interp, $m0b, $cursor);
+        $chunk->{vars} = m0b_parse_vars_seg($interp, $m0b, $cursor);
+        $chunk->{meta} = m0b_parse_meta_seg($interp, $m0b, $cursor);
+        $chunk->{bc}   = m0b_parse_bc_seg(  $interp, $m0b, $cursor);
+        push @{$interp->{chunks}}, $chunk;
     }
 }
 
