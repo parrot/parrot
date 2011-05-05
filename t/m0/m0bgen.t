@@ -189,11 +189,11 @@ sub m0b_build_bytes {
     my $m0b_bytes = m0b_header();
     $m0b_bytes .= m0b_dir_seg( $chunks );
 
-    for (@$chunks) {
-        my $vars = $_->{vars};
-        my $meta_seg = m0b_meta_seg( $_->{meta}, $vars );
+    for my $chunk (@$chunks) {
+        my $vars = $chunk->{vars};
+        my $meta_seg = m0b_meta_seg( $chunk->{meta}, $vars );
         my $vars_seg = m0b_vars_seg( $vars );
-        my $bc_seg   = m0b_bc_seg(   $_->{bc} );
+        my $bc_seg   = m0b_bc_seg(   $chunk->{bc} );
         $m0b_bytes .= $vars_seg . $meta_seg . $bc_seg;
     }
     #say "bytecode contains ".length($m0b_bytes)." bytes";
@@ -359,7 +359,7 @@ sub m0b_vars_seg {
     #for each variable
     for (@$vars) {
         my $var_length = length($_);
-        $seg_bytes .= pack("L", $M0_VARS_SEG);
+        $seg_bytes .= pack("L", $var_length);
         $seg_bytes .= $_;
     }
 
