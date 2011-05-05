@@ -744,7 +744,7 @@ first 8 registers for context-specific information and has 62 of each primitive
 type:
 
     number  type
-    0       CX  - current context 
+    0       INTERP - global interpreter data (see below)
     1       PC  - current instruction within the current bytecode segment
     2       EH  - current exception handler
     3       EX  - exception being thrown, if any
@@ -759,6 +759,19 @@ type:
 
 This means that an op which is passed the wrong value could pretty easily cause
 chaos by clobbering the PC or changing the pointer to the current context.
+
+=head2 Interpreter Data
+
+While most of the interesting parts of runtime data will live in a context, it
+still make sense to store some data in a global interpreter data structure.
+This will include the following items, stored in the same way as context data.
+
+    number  name       description
+    0       OP_FUNCS   array of functions that implement ops
+    1       CHUNKS     array of all loaded chunks
+    2       CHUNK_INFO array of chunk metadata (currently just names)
+    3       CONTEXTS   array of all known contexts
+    4       CONFIG     static global config data
 
 =head2 MOP interaction
 
