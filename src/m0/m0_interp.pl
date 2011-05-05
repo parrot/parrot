@@ -345,10 +345,15 @@ sub new_context {
     my $ctx = [];
 
     $ctx->[INTERP] = $interp;
+    $ctx->[PC]     = {seg => 0, instr => 0};
+    $ctx->[EH]     = {};
+    $ctx->[EX]     = {};
+    $ctx->[PCX]    = {};
+    $ctx->[VAR]    = $interp->{chunks}[0]{vars};
+    $ctx->[MDS]    = $interp->{chunks}[0]{meta};
+    $ctx->[BCS]    = $interp->{chunks}[0]{bc};
 
-
-
-
+    return $ctx;
 }
 
 
