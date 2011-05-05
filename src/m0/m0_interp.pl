@@ -308,7 +308,7 @@ sub run_m0b {
     my $interp = new_interp();
     load_m0b($interp, $filename);
     my $ctx = new_context($interp);
-    #run_ops($ctx);
+    run_ops($ctx);
 }
 
 
@@ -322,7 +322,7 @@ where most of the interesting work takes place.
 sub new_interp {
     my $interp;
 
-    $interp->{opfuncs} = [
+    $interp->{op_funcs} = [
         \&m0_opfunc_noop,
         \&m0_opfunc_say_i,
     ];
@@ -354,6 +354,37 @@ sub new_context {
     $ctx->[BCS]    = $interp->{chunks}[0]{bc};
 
     return $ctx;
+}
+
+
+=item C<run_ops>
+
+Run ops until there aren't ops left to run.
+
+=cut
+
+sub run_ops {
+    my ($ctx) = @_;
+    
+    while (1) {
+        my $init_pc = $ctx->[PC]{instr};
+        my $instr_count = scalar(@{$ctx->[BCS]});
+        if ($ctx->[PC]{instr} >= $instr_count){
+            exit;
+        }
+        my $op_num  = $ctx->[BCS][$init_pc][0];
+        my $op_func = $ctx->[INTERP]{op_funcs}[$op_num];
+        my $a1 = $ctx->[BCS][$init_pc][1];
+        my $a2 = $ctx->[BCS][$init_pc][2];
+        my $a3 = $ctx->[BCS][$init_pc][3];
+        &$op_func($ctx, $a1, $a2, $a3);
+        my $final_pc = $ctx->[PC]{instr};
+
+        # allow ops to change control flow
+        if ($init_pc == $final_pc) {
+            $ctx->[PC]{instr}++;
+        }
+    }
 }
 
 
