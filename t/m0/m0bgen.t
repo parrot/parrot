@@ -37,7 +37,7 @@ my $M0_BC_SEG       = 0x04;
 
 # basic test with one chunk containing all empty segments
 
-my $m0_interp = 'false';
+my $m0_interp = "$^X src/m0/m0_interp.pl";
 
 my $m0b_data = [
     { 
@@ -155,7 +155,7 @@ sub can_parse {
     my ($interp, $data, $msg) = @_;
     my $file = 'temp.m0b';
     m0b_build_file($data, $file);
-    my $status = system($interp, $file);
+    my $status = system(split(' ',$interp), $file);
     is($status, 0, $msg);
     unlink($file);
 }
