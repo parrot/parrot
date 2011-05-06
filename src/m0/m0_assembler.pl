@@ -27,20 +27,29 @@ my $file_metadata = {
     total_chunks => 0,
 };
 
+
 assemble($file);
 
 sub assemble {
     my ($file) = @_;
-    my $source  = slurp($file);
-    $source     = remove_junk($source);
 
-    my $version = parse_version($source);
-
-    say "Parsing M0 v$version";
-
-    my $chunk = parse_next_chunk($source);
-
+    my $ops      = parse_op_data();
+    my $source   = slurp($file);
+    $source      = remove_junk($source);
+    my $version  = parse_version($source);
+    my $chunk    = parse_next_chunk($source);
     my $bytecode = generate_bytecode($chunk);
+}
+
+sub parse_op_data {
+    my $ops;
+    while (<DATA>) {
+        chomp;
+        my ($num, $name) = split / /, $_;
+        $ops->{$name} = $num;
+    }
+    say "Parsed data for " . scalar(keys %$ops) . " ops";
+    return $ops;
 }
 
 sub generate_bytecode {
@@ -59,6 +68,12 @@ sub generate_bytecode {
     }
 }
 
+sub opname_to_num {
+    my ($ops, $opname) = @_;
+
+    return $ops->{$opname};
+}
+
 sub parse_version {
     my ($source) = @_;
     if ($source =~ /\.version\s+(?<version>\d+)/) {
@@ -67,6 +82,7 @@ sub parse_version {
         say "Invalid M0: No version";
         exit 1;
     }
+    say "Parsing M0 v" . $+{version};
 
     return $+{version};
 }

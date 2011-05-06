@@ -21,7 +21,7 @@ use warnings;
 use Test::More;
 use File::Spec::Functions;
 
-plan tests => 6;
+plan tests => 7;
 
 my $exefile = catfile( ".", qw/src m0 m0_assembler.pl/ );
 
@@ -35,6 +35,12 @@ output_like(
     catfile(qw/t m0 hello.m0/),
     qr/Parsing M0 v0/,
     'detect M0 v0'
+);
+
+output_like(
+    catfile(qw/t m0 hello.m0/),
+    qr/Parsed data for 36 ops/,
+    'Parse data for the correct number of ops'
 );
 
 output_like(
