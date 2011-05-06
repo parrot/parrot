@@ -34,7 +34,8 @@ sub assemble {
     my $source  = slurp($file);
     $source     = remove_junk($source);
 
-    #my $version = parse_version($source);
+    my $version = parse_version($source);
+    say "Parsing M0 v$version";
 
     parse_next_chunk($source);
 }
