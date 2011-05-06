@@ -1,4 +1,6 @@
+# THIS IS INVALID M0 FOR TESTING PURPOSES ONLY
 .version 0
+
 # This defines a M0 chunk, which a triplet consisting of
 # a variable table, metadata and a bytecode segment
 # Comments like this and empty lines are ignored.
@@ -9,11 +11,14 @@
 0 1
 1 "hello world"
 
-# This defines our metadata.
+.bytecode
+
+
 .metadata
 
-# This defines a textual representation of the bytecode
-.bytecode
+
+
+
 
 set_var S0, 0, 1
 set_var I0, 0, 0
