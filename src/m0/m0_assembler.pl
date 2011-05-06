@@ -31,12 +31,36 @@ assemble($file);
 
 sub assemble {
     my ($file) = @_;
-    my $source = slurp($file);
-    $source    = remove_junk($source);
+    my $source  = slurp($file);
+    $source     = remove_junk($source);
 
     my $version = parse_version($source);
 
-    parse_next_chunk($source);
+    say "Parsing M0 v$version";
+
+    my $chunk = parse_next_chunk($source);
+
+    my $bytecode = generate_bytecode($chunk);
+}
+
+sub generate_bytecode {
+    my ($chunk) = @_;
+
+    my $b = $chunk->{bytecode};
+
+    # iterate over textual representation of bytecode
+    # use variable table to generate binary bytecode
+}
+
+sub parse_version {
+    my ($source) = @_;
+    if ($source =~ /\.version\s+(?<version>\d+)/) {
+
+    } else {
+        die "Invalid M0: No version";
+    }
+
+    return $+{version};
 }
 
 sub parse_version {
@@ -60,6 +84,8 @@ sub parse_next_chunk {
         print "Invalid M0 at chunk " . $file_metadata->{total_chunks};
         die "Bailing out";
     }
+    # force a hash ref via the magic plus
+    return +{ %+ };
 }
 
 # This cleans M0 code of comments and unnecessary whitespace

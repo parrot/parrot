@@ -1,4 +1,3 @@
-.version 0
 # THIS IS INVALID M0 FOR TESTING PURPOSES ONLY
 .version 0
 
@@ -7,17 +6,18 @@
 # Comments like this and empty lines are ignored.
 .chunk
 
-# This defines our metadata, incorrectly, before the variable table
-.metadata
-
 # This defines our variable table
 .variables
 0 1
 1 "hello world"
 
-
-# This defines a textual representation of the bytecode
 .bytecode
+
+
+.metadata
+
+
+
 
 
 set_var S0, 0, 1
