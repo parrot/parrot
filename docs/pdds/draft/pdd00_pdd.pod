@@ -7,73 +7,54 @@
 This document defines the content and format of Parrot Design Documents
 (PDDs).
 
-
-
-
-
 =head2 Synopsis
 
 Not applicable.
 
 =head2 Description
 
-PDDs are living documents, which should be maintained to reflect the current
-and contemplated design of Parrot.
+PDDs are living design documents, intended to express the intended ideal
+designs of Parrot. What our ideal designs are may change from time to time,
+especially when the "best" solution is not obvious, or when the current state
+of the art has advanced and exposed new alternatives.
 
 The key aspects of Parrot's design are its interface to the outside world --
 its feature set -- and its internal structure, both in code and in the broader
-project.  Thus, PDDs describe Parrot's:
+project. PDDs should describe the ideal designs towards which Parrot is
+progressing. In the rare instances where a system is 100% perfect in every
+conceivable way, the PDD should provide an accurate overview of that system.
+In all other cases, a non-draft PDD is the authoritative version of what
+Parrot should be and what it should provide. If Parrot and a PDD disagree,
+the PDD should be considered correct.
 
-=over 4
+PDDs should typically not discuss the implementation details, low-level
+details, specific functions, macros, or data structures, or other things of a
+similar nature. Those things are transient and may be open to frequent
+modifications. Those types of documentation will be located elsewhere.
 
-=item *
-
-I<Codable interfaces>: headers, functions, macros, file formats, etc.
-
-=item *
-
-I<Structural requirements> that the implementation must obey: resource usage,
-portability, modularity, interdependency, etc.
-
-=item *
-
-I<Abstract models> that the implementation expresses or conforms to.  These
-models are in some sense meta-designs, because they provide guidance for the
-evolution of the current design.
-
-=item *
-
-More? - FIXME
-
-=back
-
-PDDs don't generally discuss the implementation details.  Low-level
-implementation documentation, the maintainer's guides, should go in the
-relevant F<docs/dev/*.pod> file.
-
-PDDs may document design trade-offs, i.e. the paths not chosen. In many cases
-they don't, just to keep the PDDs relatively short and readable. The history
-of Parrot's design is retrievable from the source repository.
+PDDs may document design trade-offs, i.e. the paths not chosen and the reasons
+why. Sometimes, for conciseness and readability, PDDs won't go into much
+about all unused alternatives. The history of the evolution of Parrot design
+is located in the source code repository, and won't typically be discussed
+in the PDDs. The exact reasoning which lead to certain designs also likely
+won't be discussed in the PDDs.
 
 =head2 Implementation
 
-All newly created PDDs will adhere to the PDD standard current as of the time
-of proposal. An example of the currently accepted layout is given in
-F<docs/pdds/pdd_template.pod>, which should be used as a template for any
-future PDDs.
+All PDDs should use the template at F<docs/pdds/pdd_template.pod>, and should
+follow the guidelines of this document. This document may also be used as
+an example of proper formatting and style.
 
 =head3 Format
 
-All PDDs will be written in POD parseable by the current stable release of
-Perl 5. Although XML is a viable solution and has its vocal supporters, and
-although Parrot is intended to be used by many groups outside of the Perl
-community, we have chosen POD for its simplicity and ease of reading in
-plaintext form.  Conversion to other formats (e.g. HTML) is encouraged, but
-the master version must be POD.
+For consistency with other documentation found throughout the Parrot
+repository, PDDs will use Perl5 flavored POD markup.
 
-All PDDs will be written in English.  The choice of British, American, or
-Other is up to the author.  Translation to other languages, like all Perl
-documentation, is encouraged.  (See S<L<"PDD TRANSLATIONS">>.)
+The canonical versions of all PDDs will be written in English. It is up to
+the discretion of the individual authors and contributors whether American
+or English or other dialects are to be used. PDDs are design documents for
+technical software, and do not need to be held to the same standards of style
+or consistency as fine literature.
 
 PDDs should be word-wrapped at column 78.  For Emacs variants, this can be
 arranged by putting these lines at the end of the file, after "=cut":
@@ -99,7 +80,16 @@ A quick blurb explaining the purpose of the PDD.
 
 =item Synopsis I<(optional)>:
 
-Code snippets showing the semantics of the PDD (if applicable).
+Code snippets showing the semantics of the PDD (if applicable). Notice that
+the code snippets might be pseudocode or inaccurate. The exact format of
+code, including naming conventions, function signatures, data structures and
+macros is beyond the scope of these documents. All code in PDDs should be
+treated as pseudocode.
+
+Snippets of certain code, like PIR or PASM snippets, are expected to either
+compile (but not necessarily be executed) as is or to be marked as invalid
+syntax. Other code, such as C code or pseudo codes is not expected to compile
+as is.
 
 =item Description:
 
@@ -112,43 +102,41 @@ A major section of the PDD that encapsulates a free-form discussion of any and
 all applicable information related to the final observations, conclusions, and
 what-have-you that required writing the document in the first place.
 
-=item Attachments:
-
-References to supporting files that should be considered part of the PDD.
-Text files and image files may be in any widely accepted format, which is
-rather subjective.  Violators may be prosecuted.
-
-Text files and image files should only provide supplemental information; no
-fair hiding all the info in an attachment just to not have to write an
-implementation section.
-
 =item References:
 
 References to additional sources of information, but not those necessary for
-the PDD itself.
+the PDD itself. These could include links to other sources of discussion or
+information which might be relevant for understanding or implementing the
+designs discussed in the PDD.
 
 =back
 
-The PDD author may add any additional sections he or she wishes.
+The PDD author may add any additional sections as needed.
 
 =head3 Submission Criteria
 
 Proposed PDDs should be submitted to the parrot-dev mailing list (located
-at parrot-dev@lists.parrot.org) for discussion, criticism and general
-kibitzing.
+at parrot-dev@lists.parrot.org) for discussion and feedback. Major updates
+or modifications to a PDD should likewise be posted for discussion. Small
+clarifications, copy edits, or changes which do not significantly alter the
+meaning of the document do not require review.
+
+In many cases, a new PDD or an old PDD undergoing major revision will be
+located in the drafts directory.
 
 Acceptance of a particular PDD is ultimately up to the Parrot Architect.
 
+In a case where the PDD is deemed inadequate for Parrot developers to follow
+as a guide, or where the actual implementation of Parrot exceeds the design
+specifications, the PDD can be moved to the drafts directory for review and
+modification.
+
 =head3 PDD Translations
 
-Translations of PDDs into other languages should meet these guidelines:
-
-=over 4
-
-=item *
-
-The C<Version> section should include an additional note of the translated
-version.
+Translations are notoriously difficult to keep up to date with the standard
+English versions. Translations of PDDs into other languages should include a
+C<Version> section with an additional note of specific revision of the
+original document.
 
 =back
 
