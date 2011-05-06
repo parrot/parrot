@@ -353,6 +353,8 @@ sub new_context {
     my ($interp) = @_;
     my $ctx = [];
 
+    $ctx->[$_] = 0 for (0 .. 255);
+
     $ctx->[INTERP] = $interp;
     $ctx->[PC]     = {seg => 0, instr => 0};
     $ctx->[EH]     = {};
