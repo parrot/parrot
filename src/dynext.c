@@ -230,7 +230,7 @@ dlopen_string(PARROT_INTERP, Parrot_dlopen_flags flags, ARGIN(const STRING *path
     ASSERT_ARGS(dlopen_string)
 
     char * const pathstr = Parrot_str_to_cstring(interp, path);
-    void *       handle  = Parrot_dlopen(pathstr, flags);
+    void * const handle  = Parrot_dlopen(pathstr, flags);
     Parrot_str_free_cstring(pathstr);
     return handle;
 }
@@ -295,7 +295,7 @@ get_path(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
                 if (*handle)
                     return path;
                 else {
-                    const char *err = Parrot_dlerror();
+                    const char * const err = Parrot_dlerror();
                     Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
                                 "Couldn't load '%Ss': %s\n",
                             full_name, err ? err : "unknown reason");
@@ -362,7 +362,7 @@ get_path(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
     }
     /* And after-finally,  let the OS use his own search */
     {
-        const char *err = Parrot_dlerror();
+        const char * const err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
                     "Couldn't load '%Ss': %s\n",
                     lib, err ? err : "unknown reason");
@@ -470,7 +470,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
 
     UINTVAL regs_used[]     = { 2, 2, 2, 2 }; /* Arbitrary values */
     const int parrot_hll_id = 0;
-    PMC * context = Parrot_push_context(interp, regs_used);
+    PMC * const context = Parrot_push_context(interp, regs_used);
     Parrot_pcc_set_HLL(interp, context, parrot_hll_id);
     Parrot_pcc_set_namespace(interp, context,
             Parrot_hll_get_HLL_namespace(interp, parrot_hll_id));
