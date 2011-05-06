@@ -11,16 +11,16 @@ use Data::Dumper;
 
 =head1 NAME
 
-t/m0/m0bgen.t - M0 bytecode parser tests
+t/m0/m0_bytecode_loading.t - M0 bytecode loading tests
 
 =head1 SYNOPSIS
 
-    % prove t/m0/m0bgen.t
+    % prove t/m0/m0_bytecode_loading.t
 
 =head1 DESCRIPTION
 
 Test the M0 bytecode interpreter by generating simple known-good hard-coded M0
-bytecode files.
+bytecode files and ensuring that the interpreter loads them correctly.
 
 Note that although this code behaves superficially like an assembler, it is not
 and never will be an assembler.  Its only purpose is to generate superficially
