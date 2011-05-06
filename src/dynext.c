@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -69,10 +69,11 @@ static PMC* is_loaded(PARROT_INTERP, ARGIN(STRING *path))
 PARROT_CANNOT_RETURN_NULL
 static PMC * run_init_lib(PARROT_INTERP,
     ARGIN(void *handle),
-    ARGIN_NULLOK(STRING *lib_name),
+    ARGIN(STRING *lib_name),
     ARGIN(STRING *wo_ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 static void set_cstring_prop(PARROT_INTERP,
@@ -113,6 +114,7 @@ static void store_lib_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_run_init_lib __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(lib_name) \
     , PARROT_ASSERT_ARG(wo_ext))
 #define ASSERT_ARGS_set_cstring_prop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -459,8 +461,7 @@ necessary initialization routines, if any.
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-run_init_lib(PARROT_INTERP, ARGIN(void *handle),
-        ARGIN_NULLOK(STRING *lib_name), ARGIN(STRING *wo_ext))
+run_init_lib(PARROT_INTERP, ARGIN(void *handle), ARGIN(STRING *lib_name), ARGIN(STRING *wo_ext))
 {
     ASSERT_ARGS(run_init_lib)
     STRING *type;
