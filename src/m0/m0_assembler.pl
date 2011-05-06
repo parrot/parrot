@@ -50,6 +50,13 @@ sub generate_bytecode {
 
     # iterate over textual representation of bytecode
     # use variable table to generate binary bytecode
+    my @lines = split /\n/, $b;
+    for my $line (@lines) {
+        if ($line =~ m/^(?<opname>\S+)\s+(?<arg1>\S+),(?<arg2>\S+),(?<arg3>\S+)\s+$/) {
+        } else {
+            say "Invalid M0 bytecode segment: $line";
+        }
+    }
 }
 
 sub parse_version {

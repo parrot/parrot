@@ -21,7 +21,7 @@ use warnings;
 use Test::More;
 use File::Spec::Functions;
 
-plan tests => 5;
+plan tests => 6;
 
 my $exefile = catfile( ".", qw/src m0 m0_assembler.pl/ );
 
@@ -53,6 +53,12 @@ output_like(
     catfile(qw/t m0 invalid_version.m0/),
     qr/Invalid M0: No version/ms,
     'detect invalid version'
+);
+
+output_like(
+    catfile(qw/t m0 invalid_bytecode.m0/),
+    qr/Invalid M0 bytecode/ms,
+    'detect invalid bytecode'
 );
 
 sub output_like {
