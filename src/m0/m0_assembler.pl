@@ -57,20 +57,11 @@ sub parse_version {
     if ($source =~ /\.version\s+(?<version>\d+)/) {
 
     } else {
-        die "Invalid M0: No version";
+        say "Invalid M0: No version";
+        exit 1;
     }
 
     return $+{version};
-}
-
-sub parse_version {
-    my ($source) = @_;
-    if ($source =~ /\.version\s+(?<version>\d+)/) {
-        return $+{version};
-    } else {
-        say "M0 version missing!";
-        die "Bailing out";
-    }
 }
 
 sub parse_next_chunk {
@@ -82,7 +73,7 @@ sub parse_next_chunk {
         # captures are in %+
     } else {
         print "Invalid M0 at chunk " . $file_metadata->{total_chunks};
-        die "Bailing out";
+        exit 1;
     }
     # force a hash ref via the magic plus
     return +{ %+ };
