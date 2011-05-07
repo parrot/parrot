@@ -21,33 +21,36 @@ use warnings;
 use Test::More;
 use File::Spec::Functions;
 
-plan tests => 10;
+plan tests => 11;
 
 
 my $exefile = catfile( ".", qw/src m0 m0_assembler.pl/ );
+my $hello_m0  = catfile(qw/t m0 hello.m0/);
+my $hello_m0b = catfile(qw/t m0 hello.m0b/);
 
 output_like(
-    catfile(qw/t m0 hello.m0/),
+    $hello_m0,
     qr/Parsing chunk/,
     'parse hello.m0'
 );
 
-ok(-e catfile(qw/t m0 hello.m0b/), 'created hello.m0b');
+ok(-e $hello_m0b, 'created hello.m0b');
+ok(-s $hello_m0b >= 16, 'hello.m0b is at least 16 bytes (size of M0 header)');
 
 output_like(
-    catfile(qw/t m0 hello.m0/),
+    $hello_m0,
     qr/Parsing M0 v0/,
     'detect M0 v0'
 );
 
 output_like(
-    catfile(qw/t m0 hello.m0/),
+    $hello_m0,
     qr/Parsing M0 v0/,
     'detect M0 v0'
 );
 
 output_like(
-    catfile(qw/t m0 hello.m0/),
+    $hello_m0,
     qr/Parsed data for 36 ops/,
     'Parse data for the correct number of ops'
 );
