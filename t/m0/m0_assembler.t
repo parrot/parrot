@@ -21,11 +21,13 @@ use warnings;
 use Test::More;
 use File::Spec::Functions;
 
-plan tests => 13;
+plan tests => 16;
 
-my $exefile = catfile( ".", qw/src m0 m0_assembler.pl/ );
-my $hello_m0  = catfile(qw/t m0 hello.m0/);
-my $hello_m0b = catfile(qw/t m0 hello.m0b/);
+my $exefile    = catfile( ".", qw/src m0 m0_assembler.pl/ );
+my $hello_m0   = catfile(qw/t m0 hello.m0/);
+my $hello_m0b  = catfile(qw/t m0 hello.m0b/);
+my $hello2_m0  = catfile(qw/t m0 hello2.m0/);
+my $hello2_m0b = catfile(qw/t m0 hello2.m0/);
 
 output_like(
     $hello_m0,
@@ -35,6 +37,15 @@ output_like(
 
 ok(-e $hello_m0b, 'created hello.m0b');
 ok(-s $hello_m0b >= 16, 'hello.m0b is at least 16 bytes (size of M0 header)');
+
+output_like(
+    $hello2_m0,
+    qr/Parsing chunk/,
+    'parse hello2.m0, which has an empty string for a chunk name'
+);
+ok(-e $hello2_m0b, 'created hello2.m0b');
+ok(-s $hello2_m0b >= 16, 'hello2.m0b is at least 16 bytes (size of M0 header)');
+
 
 output_like(
     $hello_m0,

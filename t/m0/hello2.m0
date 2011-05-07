@@ -1,0 +1,20 @@
+.version 0
+# This defines a M0 chunk, which a triplet consisting of
+# a variable table, metadata and a bytecode segment
+# Comments like this and empty lines are ignored.
+.chunk ""
+
+# This defines our variable table
+.variables
+0 1
+1 "hello world"
+
+# This defines our metadata.
+.metadata
+
+# This defines a textual representation of the bytecode
+.bytecode
+
+set_var S0, 0, 1
+set_var I0, 0, 0
+print_s I0, S0, 42
