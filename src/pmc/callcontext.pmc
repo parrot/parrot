@@ -42,8 +42,8 @@ typedef struct Pcc_cell
     Parrot_gc_free_fixed_size_storage((i), sizeof (Pcc_cell), (c))
 
 #define CLONE_CELL(i, c, c_new) do { \
-    c_new  = ALLOC_CELL(i); \
-    *c_new = *c; \
+    (c_new)  = ALLOC_CELL(i); \
+    *(c_new) = *(c); \
 } while (0)
 
 #define CELL_TYPE_MASK(c) (c)->type
