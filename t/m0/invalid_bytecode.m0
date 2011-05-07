@@ -1,6 +1,6 @@
 # THIS IS INVALID M0 FOR TESTING PURPOSES ONLY
 .version 0
-.chunk
+.chunk "invalid"
 .variables
 0 1
 1 "hello world"

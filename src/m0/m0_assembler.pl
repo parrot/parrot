@@ -169,9 +169,9 @@ Calculate the number of bytes in a chunk.
 sub m0b_chunk_length {
     my ($chunk) = @_;
     my $chunk_length =
-           m0b_bc_seg_length($chunk->{bc})
-         + m0b_vars_seg_length($chunk->{vars})
-         + m0b_meta_seg_length($chunk->{meta});
+           m0b_bc_seg_length(length $chunk->{bytecode})
+         + m0b_vars_seg_length($chunk->{variables})
+         + m0b_meta_seg_length($chunk->{metadata});
     #say "chunk length is $chunk_length";
     return $chunk_length;
 }
@@ -203,12 +203,13 @@ sub m0b_vars_seg_length {
 
     my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
 
-    for (@$vars) {
-        my $var_length = length($_);
-        $seg_length += 4; # storage of size of variable
-        $seg_length += length($_);
-        #say "after adding var '$_', length is $seg_length";
-    }
+    #TODO: Make this work
+    #for (@$vars) {
+    #    my $var_length = length($_);
+    #    $seg_length += 4; # storage of size of variable
+    #    $seg_length += length($_);
+    #    #say "after adding var '$_', length is $seg_length";
+    #}
 
     #say "vars seg length is $seg_length";
     return $seg_length;
@@ -225,11 +226,12 @@ sub m0b_meta_seg_length {
     
     my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
 
-    for my $offset (keys %$metadata) {
-        for (keys %{$metadata->{$offset}}) {
-            $seg_length += 12;
-        }
-    }
+    #TODO
+    #for my $offset (keys %$metadata) {
+    #    for (keys %{$metadata->{$offset}}) {
+    #        $seg_length += 12;
+    #    }
+    #}
 
     #say "metadata seg length is $seg_length";
     return $seg_length;
@@ -259,7 +261,7 @@ sub parse_next_chunk {
     $file_metadata->{total_chunks}++;
     say "Parsing chunk #" . $file_metadata->{total_chunks};
 
-    if ( $source =~ /\.chunk\n\.variables\n(?<variables>.*)\n\.metadata\n(?<metadata>.*)\.bytecode\n(?<bytecode>.*)/ms ) {
+    if ( $source =~ /\.chunk\s+"(?<name>\w+)"\n\.variables\n(?<variables>.*)\n\.metadata\n(?<metadata>.*)\.bytecode\n(?<bytecode>.*)/ms ) {
         # captures are in %+
     } else {
         print "Invalid M0 at chunk " . $file_metadata->{total_chunks};
