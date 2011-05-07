@@ -21,7 +21,6 @@ use feature 'say';
 use autodie qw/:all/;
 use File::Slurp qw/slurp write_file/;
 use Data::Dumper;
-#use Carp::Always;
 
 my $file = shift || die "Usage: $0 foo.m0";
 my $file_metadata = {
@@ -261,7 +260,12 @@ sub parse_next_chunk {
     $file_metadata->{total_chunks}++;
     say "Parsing chunk #" . $file_metadata->{total_chunks};
 
-    if ( $source =~ /\.chunk\s+"(?<name>\w+)"\n\.variables\n(?<variables>.*)\n\.metadata\n(?<metadata>.*)\.bytecode\n(?<bytecode>.*)/ms ) {
+    if ( $source =~ /
+        \.chunk\s+"(?<name>\w*)"\n
+        \.variables\n(?<variables>.*)\n
+        \.metadata\n(?<metadata>.*)
+        \.bytecode\n(?<bytecode>.*)
+    /msx ) {
         # captures are in %+
     } else {
         print "Invalid M0 at chunk " . $file_metadata->{total_chunks};

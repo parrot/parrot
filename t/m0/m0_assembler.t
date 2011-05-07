@@ -17,17 +17,18 @@ Tests the M0 assembler that lives at src/m0/m0_assembler.pl .
 
 use strict;
 use warnings;
+#use Carp::Always;
 
 use Test::More;
 use File::Spec::Functions;
 
-plan tests => 16;
+plan tests => 17;
 
 my $exefile    = catfile( ".", qw/src m0 m0_assembler.pl/ );
 my $hello_m0   = catfile(qw/t m0 hello.m0/);
 my $hello_m0b  = catfile(qw/t m0 hello.m0b/);
 my $hello2_m0  = catfile(qw/t m0 hello2.m0/);
-my $hello2_m0b = catfile(qw/t m0 hello2.m0/);
+my $hello2_m0b = catfile(qw/t m0 hello2.m0b/);
 
 output_like(
     $hello_m0,
@@ -36,15 +37,21 @@ output_like(
 );
 
 ok(-e $hello_m0b, 'created hello.m0b');
-ok(-s $hello_m0b >= 16, 'hello.m0b is at least 16 bytes (size of M0 header)');
+ok(-e $hello_m0b && -s $hello_m0b >= 16, 'hello.m0b is at least 16 bytes (size of M0 header)');
 
 output_like(
     $hello2_m0,
     qr/Parsing chunk/,
     'parse hello2.m0, which has an empty string for a chunk name'
 );
+
+output_unlike(
+    $hello2_m0,
+    qr/Invalid M0/,
+    'parse hello2.m0, which has an empty string for a chunk name. No "Invalid M0"'
+);
 ok(-e $hello2_m0b, 'created hello2.m0b');
-ok(-s $hello2_m0b >= 16, 'hello2.m0b is at least 16 bytes (size of M0 header)');
+ok(-e $hello2_m0b && -s $hello2_m0b >= 16, 'hello2.m0b is at least 16 bytes (size of M0 header)');
 
 
 output_like(
@@ -113,8 +120,19 @@ sub output_like {
     return;
 }
 
+sub output_unlike {
+    my ($options, $snippet, $desc)  = @_;
+
+    my $out = `$^X $exefile $options`;
+
+    unlike( $out, $snippet, $desc );
+
+    return;
+}
+
+
 END {
     unless ($ENV{POSTMORTEM}) {
-        unlink(catfile(qw/t m0 hello.m0b/));
+        unlink $hello_m0b, $hello2_m0b;
     }
 }
