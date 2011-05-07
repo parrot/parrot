@@ -42,7 +42,7 @@ sub assemble {
     my $bytecode = $header . generate_bytecode_for_chunk($chunk);
 
     my $bytecode_file = $file . 'b';
-
+    say "Writing bytecode to $bytecode_file";
     write_file $bytecode_file, $bytecode;
 }
 
@@ -89,7 +89,7 @@ sub generate_bytecode_for_chunk {
     # use variable table to generate binary bytecode
     my @lines = split /\n/, $b;
     for my $line (@lines) {
-        if ($line =~ m/^(?<opname>\S+)\s+(?<arg1>\S+),(?<arg2>\S+),(?<arg3>\S+)\s+$/) {
+        if ($line =~ m/^(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
         } else {
             say "Invalid M0 bytecode segment: $line";
             exit 1;
