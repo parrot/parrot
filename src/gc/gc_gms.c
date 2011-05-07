@@ -1520,10 +1520,9 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     PObj             * const obj  = (PObj *)ptr;
     pmc_alloc_struct * const item = PMC2PAC(ptr);
-    size_t            i;
 
     /* Not aligned pointers aren't pointers */
-    if (!obj || !item || ((int)obj & 3) || ((int)item & 3))
+    if (!obj || !item || ((size_t)obj & 3) || ((size_t)item & 3))
         return 0;
 
     if (!Parrot_gc_pool_is_maybe_owned(interp, self->pmc_allocator, item))
@@ -1669,10 +1668,9 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     PObj             * const obj  = (PObj *)ptr;
     string_alloc_struct * const item = STR2PAC(ptr);
-    size_t            i;
 
     /* Not aligned pointers aren't pointers */
-    if (!obj || !item || ((int)obj & 3) || ((int)item & 3))
+    if (!obj || !item || ((size_t)obj & 3) || ((size_t)item & 3))
         return 0;
 
     if (!Parrot_gc_pool_is_maybe_owned(interp, self->string_allocator, item))
