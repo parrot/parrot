@@ -829,12 +829,12 @@ CallContext.
                 INTVAL type;
 
                 switch (c[i].type) {
-                    case INTCELL:    type = enum_type_INTVAL;   break;
-                    case FLOATCELL:  type = enum_type_FLOATVAL; break;
-                    case STRINGCELL: type = enum_type_STRING;   break;
+                    case INTCELL:    type = -enum_type_INTVAL;   break;
+                    case FLOATCELL:  type = -enum_type_FLOATVAL; break;
+                    case STRINGCELL: type = -enum_type_STRING;   break;
                     case PMCCELL:
                         type = PMC_IS_NULL(c[i].u.p)
-                             ? (INTVAL) enum_type_PMC
+                             ? (INTVAL)-enum_type_PMC
                              : VTABLE_type(INTERP, c[i].u.p);
                         break;
                     default:

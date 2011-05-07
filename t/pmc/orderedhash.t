@@ -745,7 +745,10 @@ CODE
 2
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "set, get, exists compound keys" );
+SKIP: {
+    skip( "odd, tightly-coupled, defacto behaviour is not worth testing", 1 );
+
+    pir_output_is( << 'CODE', << 'OUTPUT', "set, get, exists compound keys" );
 
 .sub _main :main
     .local pmc hash, hash_inside
@@ -823,6 +826,7 @@ ok - delete
 exists: 0
 elements: 2
 OUTPUT
+}
 
 pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 

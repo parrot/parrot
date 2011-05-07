@@ -53,6 +53,17 @@ build_call_func(PARROT_INTERP, ARGIN(PMC *sig))
     if (PMC_IS_NULL(nci_funcs))
         PANIC(interp, "iglobals.nci_funcs isn't created_yet");
 
+    /* signatures are FIA internally */
+    if (sig->vtable->base_type != enum_class_FixedIntegerArray) {
+        size_t  i;
+        size_t  n       = VTABLE_elements(interp, sig);
+        PMC    *new_sig = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, new_sig, i,
+                                            VTABLE_get_integer_keyed_int(interp, sig, i));
+        sig = new_sig;
+    }
+
     thunk = VTABLE_get_pmc_keyed(interp, nci_funcs, sig);
 
     if (PMC_IS_NULL(thunk)) {
@@ -76,7 +87,7 @@ build_call_func(PARROT_INTERP, ARGIN(PMC *sig))
 
     Parrot_ex_throw_from_c_args(interp, NULL,
         EXCEPTION_UNIMPLEMENTED,
-        "No NCI thunk available for signature '%Ss'", VTABLE_get_repr(interp, sig));
+        "No NCI thunk available for signature `%Ss'", Parrot_nci_describe_sig(interp, sig));
 }
 
 /*
