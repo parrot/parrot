@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -397,7 +397,7 @@ nci_iiii(int i1, int i2, int i3)
 
 /*
 
-=item C<PARROT_DYNEXT_EXPORT int call_back(PARROT_INTERP, PMC *str_pmc)>
+=item C<PARROT_DYNEXT_EXPORT int call_back(PARROT_INTERP, char *cstr)>
 
 writes the string C<str> to stdout and returns the value 4711.
 
