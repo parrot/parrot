@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use feature 'say';
 use autodie qw/:all/;
-use File::Slurp qw/slurp/;
+use File::Slurp qw/slurp write_file/;
 use Data::Dumper;
 
 my $file = shift || die "Usage: $0 foo.m0";
@@ -38,7 +38,35 @@ sub assemble {
     $source      = remove_junk($source);
     my $version  = parse_version($source);
     my $chunk    = parse_next_chunk($source);
-    my $bytecode = generate_bytecode_for_chunk($chunk);
+    my $header   = m0b_header();
+    my $bytecode = $header . generate_bytecode_for_chunk($chunk);
+
+    my $bytecode_file = $file . 'b';
+
+    write_file $bytecode_file, $bytecode;
+}
+
+
+=item C<m0b_header>
+
+Generate an M0 bytecode header. (Borrowed from t/m0/m0_bytecode_loading.t)
+
+=cut
+
+sub m0b_header {
+
+    #m0b magic number
+    my $m0b_header = "\376M0B\r\n\032\n";
+
+    $m0b_header .= pack('C', 0); # version
+    $m0b_header .= pack('C', 4); # intval size
+    $m0b_header .= pack('C', 8); # floatval size
+    $m0b_header .= pack('C', 4); # opcode_t size
+    $m0b_header .= pack('C', 4); # void* size
+    $m0b_header .= pack('C', 0); # endianness
+    $m0b_header .= pack('xx');   # padding
+
+    return $m0b_header;
 }
 
 sub parse_op_data {
@@ -64,6 +92,7 @@ sub generate_bytecode_for_chunk {
         if ($line =~ m/^(?<opname>\S+)\s+(?<arg1>\S+),(?<arg2>\S+),(?<arg3>\S+)\s+$/) {
         } else {
             say "Invalid M0 bytecode segment: $line";
+            exit 1;
         }
     }
 }

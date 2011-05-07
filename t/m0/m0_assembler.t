@@ -21,7 +21,8 @@ use warnings;
 use Test::More;
 use File::Spec::Functions;
 
-plan tests => 7;
+plan tests => 9;
+
 
 my $exefile = catfile( ".", qw/src m0 m0_assembler.pl/ );
 
@@ -30,6 +31,8 @@ output_like(
     qr/Parsing chunk/,
     'parse hello.m0'
 );
+
+ok(-e catfile(qw/t m0 hello.m0b/), 'created hello.m0b');
 
 output_like(
     catfile(qw/t m0 hello.m0/),
@@ -67,6 +70,8 @@ output_like(
     'detect invalid bytecode'
 );
 
+ok(!-e catfile(qw/t m0 invalid_bytecode.m0b/), 'invalid_bytece.m0b was not created');
+
 sub output_like {
     my ($options, $snippet, $desc)  = @_;
 
@@ -75,4 +80,10 @@ sub output_like {
     like( $out, $snippet, $desc );
 
     return;
+}
+
+END {
+    unless ($ENV{POSTMORTEM}) {
+        unlink(catfile(qw/t m0 hello.m0b/));
+    }
 }
