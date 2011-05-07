@@ -1520,10 +1520,11 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     pmc_alloc_struct * const item = PMC2PAC(ptr);
     size_t            i;
 
-    if (!obj || !item)
+    /* Not aligned pointers aren't pointers */
+    if (!obj || !item || ((int)obj & 3) || ((int)item & 3))
         return 0;
 
-    if (!Parrot_gc_pool_is_owned(interp, self->pmc_allocator, item))
+    if (!Parrot_gc_pool_is_maybe_owned(interp, self->pmc_allocator, item))
         return 0;
 
     /* black or white objects marked already. */
@@ -1538,11 +1539,12 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     if (PObj_GC_on_dirty_list_TEST(&item->pmc))
         return 0;
 
-    for (i = 0; i < MAX_GENERATIONS; i++) {
-        /* Pool.is_owned isn't precise enough (yet) */
-        if (Parrot_pa_is_owned(interp, self->objects[i], item, item->ptr))
-            return 1;
-    }
+    if (!Parrot_gc_pool_is_owned(interp, self->pmc_allocator, item))
+        return 0;
+
+    /* Pool.is_owned isn't precise enough (yet) */
+    if (Parrot_pa_is_owned(interp, self->objects[POBJ2GEN(obj)], item, item->ptr))
+        return 1;
 
     return 0;
 }
@@ -1667,10 +1669,11 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     string_alloc_struct * const item = STR2PAC(ptr);
     size_t            i;
 
-    if (!obj || !item)
+    /* Not aligned pointers aren't pointers */
+    if (!obj || !item || ((int)obj & 3) || ((int)item & 3))
         return 0;
 
-    if (!Parrot_gc_pool_is_owned(interp, self->string_allocator, item))
+    if (!Parrot_gc_pool_is_maybe_owned(interp, self->string_allocator, item))
         return 0;
 
     /* black or white objects marked already. */
@@ -1681,11 +1684,12 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     if (POBJ2GEN(&item->str) > self->gen_to_collect)
         return 0;
 
-    /* Pool.is_owned isn't precise enough (yet) */
-    for (i = 0; i < MAX_GENERATIONS; i++) {
-        if (Parrot_pa_is_owned(interp, self->strings[i], item, item->ptr))
-            return 1;
-    }
+    if (!Parrot_gc_pool_is_owned(interp, self->string_allocator, item))
+        return 0;
+
+    if (Parrot_pa_is_owned(interp, self->strings[POBJ2GEN(obj)], item, item->ptr))
+        return 1;
+
     return 0;
 }
 
