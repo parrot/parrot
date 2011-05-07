@@ -680,8 +680,8 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_gc_gms_init)
     struct MarkSweep_GC *self;
-    size_t nursery_size = args->nursery_size 
-                        ? args->nursery_size 
+    size_t nursery_size = args->nursery_size
+                        ? args->nursery_size
                         : GC_DEFAULT_NURSERY_SIZE;
 
     /* We have to transfer ownership of memory to parent interp in threaded parrot */

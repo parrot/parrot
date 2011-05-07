@@ -87,7 +87,7 @@ HEADER
             Parrot_Init_Args *initargs;
             GET_INIT_STRUCT(initargs);
             initargs->gc_system = GCCORE;
-            
+
             program_code_addr = (const unsigned char *)get_program_code();
             if (!program_code_addr)
                 exit(EXIT_FAILURE);
@@ -223,7 +223,7 @@ MAIN
     .param pmc outfh
     .param pmc args :slurpy
     $S0 = args[1]
-    
+
     if null $S0 goto define_null
         $S0 = sprintf "#define %s \"%s\"\n", args
         goto done_define
