@@ -117,7 +117,7 @@ TBD
  *  1. Maximum number is 8 due limit number of bits in PMC.flags.
  *  2. Don't forget to update gc_gms_select_generation_to_collect after changing it!
  */
-#define MAX_GENERATIONS     8
+#define MAX_GENERATIONS     4
 
 /* We allocate additional space in front of PObj* to store additional pointer */
 typedef struct pmc_alloc_struct {
@@ -777,7 +777,7 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
          * Will be configured/dynamically adjusted in future. For now it gives
          * good performance overrall.
          */
-        self->gc_threshold = Parrot_sysmem_amount(interp) / 100;
+        self->gc_threshold = Parrot_sysmem_amount(interp) * 2 / 100;
 
         Parrot_gc_str_initialize(interp, &self->string_gc);
     }
@@ -922,7 +922,7 @@ gc_gms_select_generation_to_collect(PARROT_INTERP)
     /* TODO Use less naive approach. E.g. count amount of allocated memory in
      * older generations */
     size_t runs = interp->gc_sys->stats.gc_mark_runs;
-    if (runs % 100000000 == 0)
+/*    if (runs % 100000000 == 0)
         return 8;
     if (runs % 10000000 == 0)
         return 7;
@@ -930,7 +930,7 @@ gc_gms_select_generation_to_collect(PARROT_INTERP)
         return 6;
     if (runs % 100000 == 0)
         return 5;
-    if (runs % 10000 == 0)
+*/    if (runs % 10000 == 0)
         return 4;
     if (runs % 1000 == 0)
         return 3;
