@@ -96,7 +96,7 @@ HEADER
                   Parrot_set_config_hash(interp) &&
                   Parrot_api_set_executable_name(interp, argv[0]) &&
                   Parrot_api_set_runcore(interp, RUNCORE, TRACE))) {
-                fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
+                fprintf(stderr, "PARROT VM: Could not initialize new interpreter\n");
                 show_last_error_and_exit(interp);
             }
 
@@ -107,7 +107,7 @@ HEADER
                 show_last_error_and_exit(interp);
             }
             if (!Parrot_api_load_bytecode_bytes(interp, program_code_addr, bytecode_size, &pbc)) {
-                fprintf(stderr, "PARROT VM: Could not load bytecode");
+                fprintf(stderr, "PARROT VM: Could not load bytecode\n");
                 show_last_error_and_exit(interp);
             }
             if (!Parrot_api_run_bytecode(interp, pbc, argsarray)) {
