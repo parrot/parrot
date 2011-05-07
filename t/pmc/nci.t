@@ -998,12 +998,19 @@ OUTPUT
 
     .local pmc func
     func = new ['NCI']
-    func[ .DATATYPE_INT; .DATATYPE_PTR; .DATATYPE_PMC ] = func_ptr
+    func[ .DATATYPE_INT; .DATATYPE_PTR; .DATATYPE_PTR ] = func_ptr
     # func["ipP"] = func_ptr
 
+    .local pmc str_to_cstr, free_cstr
+    $P1 = null
+    str_to_cstr = dlfunc $P1, "Parrot_str_to_cstring", 'ppS'
+    free_cstr   = dlfunc $P1, "Parrot_str_free_cstring", 'vp'
+
     $P1 = getinterp
-    $P2 = box "hello call_back"
+    $S0 = "hello call_back"
+    $P2 = str_to_cstr($P1, $S0)
     $I5 = func($P1, $P2)
+    free_cstr($P2)
     say $I5
 .end
 CODE

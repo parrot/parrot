@@ -70,7 +70,7 @@ typedef struct Opaque {
 
 */
 
-PARROT_DYNEXT_EXPORT int    call_back(PARROT_INTERP, PMC *);
+PARROT_DYNEXT_EXPORT int    call_back(PARROT_INTERP, char *);
 PARROT_DYNEXT_EXPORT char   nci_c(void);
 PARROT_DYNEXT_EXPORT char   nci_csc(short, char);
 PARROT_DYNEXT_EXPORT double nci_d(void);
@@ -407,14 +407,10 @@ writes the string C<str> to stdout and returns the value 4711.
 
 PARROT_DYNEXT_EXPORT
 int
-call_back(PARROT_INTERP, PMC *str_pmc)
+call_back(PARROT_INTERP, char *cstr)
 {
-    STRING *str  = VTABLE_get_string(interp, str_pmc);
-    char   *cstr = Parrot_str_to_cstring(interp, str);
     puts(cstr);
     fflush(stdout);
-    Parrot_str_free_cstring(cstr);
-
     return 4711;
 }
 
@@ -496,7 +492,7 @@ nci_pi(int test)
       case 5:
         {
             static struct {
-                int (*f)(PARROT_INTERP, PMC *);
+                int (*f)(PARROT_INTERP, char *);
             } t = {
                 call_back
             };
