@@ -38,7 +38,7 @@ sub assemble {
     $source      = remove_junk($source);
     my $version  = parse_version($source);
     my $chunk    = parse_next_chunk($source);
-    my $bytecode = generate_bytecode($chunk);
+    my $bytecode = generate_bytecode_for_chunk($chunk);
 }
 
 sub parse_op_data {
@@ -52,7 +52,7 @@ sub parse_op_data {
     return $ops;
 }
 
-sub generate_bytecode {
+sub generate_bytecode_for_chunk {
     my ($chunk) = @_;
 
     my $b = $chunk->{bytecode};

@@ -11,7 +11,7 @@ t/tools/m0_assembler.t - Test the M0 assembler prototype
 
 =head1 DESCRIPTION
 
-Tests the assembler.
+Tests the M0 assembler that lives at src/m0/m0_assembler.pl .
 
 =cut
 
