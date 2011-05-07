@@ -749,8 +749,8 @@ Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
                 break;
             }
           default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "unimplemented key type");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "unimplemented key type %i", (int)key_type);
             break;
         }
 
@@ -774,8 +774,8 @@ Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
                 break;
             }
           default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "unimplemented value type");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "unimplemented value type %i", (int)entry_type);
             break;
         }
     }
@@ -823,8 +823,8 @@ Parrot_hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
             VTABLE_push_pmc(interp, info, (PMC *)_bucket->key);
             break;
           default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "unimplemented key type");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "unimplemented key type %i", (int)key_type);
             break;
         }
         switch (entry_type) {
@@ -838,8 +838,8 @@ Parrot_hash_freeze(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *info))
             VTABLE_push_pmc(interp, info, (PMC *)_bucket->value);
             break;
           default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "unimplemented value type");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "unimplemented value type %i", (int)entry_type);
             break;
         });
 }
@@ -1625,7 +1625,7 @@ Parrot_hash_clone_prunable(PARROT_INTERP, ARGIN(const Hash *hash),
 
           default:
             valtmp = NULL; /* avoid warning */
-            Parrot_ex_throw_from_c_args(interp, NULL, -1,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                     "hash corruption: type = %d\n", hash->entry_type);
         };
         if (key) {
