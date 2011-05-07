@@ -1558,8 +1558,7 @@ Creates and returns a clone of the signature.
             parrot_hash_iterate(dest_hash,
                 Pcc_cell *tmp;
                 CLONE_CELL(INTERP, (Pcc_cell *)_bucket->value, tmp);
-                _bucket->value = tmp;
-            );
+                _bucket->value = tmp;);
         }
 
         return dest;
