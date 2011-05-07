@@ -650,7 +650,7 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
                 initargs->gc_nursery_size = strtoul(opt.opt_arg, NULL, 10);
 
                 if (initargs->gc_nursery_size > 50) {
-                    fprintf(stderr, "error: maximum GC nursery size is 50\%\n");
+                    fprintf(stderr, "error: maximum GC nursery size is 50%%\n");
                     exit(EXIT_FAILURE);
                 }
             }
