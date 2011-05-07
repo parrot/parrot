@@ -487,11 +487,14 @@ help(void)
     printf(
     "    -w --warnings\n"
     "    -G --no-gc\n"
+    "    -g --gc ms2|gms|ms|inf set GC type\n"
+    "       <GC MS2 options>\n"
     "       --gc-dynamic-threshold=percentage    maximum memory wasted by GC\n"
     "       --gc-min-threshold=KB\n"
+    "       <GC GMS options>\n"
+    "       --gc-nursery-size=percent of sysmem  size of gen0 (default 2)\n"
     "       --gc-debug\n"
     "       --leak-test|--destroy-at-end\n"
-    "    -g --gc ms2|gms|ms|inf set GC type\n"
     "    -. --wait    Read a keystroke before starting\n"
     "       --runtime-prefix\n"
     "   <Compiler options>\n"
@@ -540,6 +543,7 @@ Parrot_cmd_options(void)
         { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
         { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
         { 'g', 'g', OPTION_required_FLAG, { "--gc" } },
+        { '\0', OPT_GC_NURSERY_SIZE, OPTION_required_FLAG, { "--gc-nursery-size" } },
         { '\0', OPT_GC_DYNAMIC_THRESHOLD, OPTION_required_FLAG, { "--gc-dynamic-threshold" } },
         { '\0', OPT_GC_MIN_THRESHOLD, OPTION_required_FLAG, { "--gc-min-threshold" } },
         { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
@@ -641,6 +645,22 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
                 exit(EXIT_FAILURE);
             }
             break;
+          case OPT_GC_NURSERY_SIZE:
+            if (opt.opt_arg && is_all_digits(opt.opt_arg)) {
+                initargs->gc_nursery_size = strtoul(opt.opt_arg, NULL, 10);
+
+                if (initargs->gc_nursery_size > 50) {
+                    fprintf(stderr, "error: maximum GC nursery size is 50\%\n");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else {
+                fprintf(stderr, "error: invalid GC nursery size specified:"
+                        "'%s'\n", opt.opt_arg);
+                exit(EXIT_FAILURE);
+            }
+            break;
+
           case OPT_HASH_SEED:
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
                 initargs->hash_seed = strtoul(opt.opt_arg, NULL, 16);
@@ -702,6 +722,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             args->run_core_name = opt.opt_arg;
             break;
           case 'g':
+          case OPT_GC_NURSERY_SIZE:
           case OPT_GC_DYNAMIC_THRESHOLD:
           case OPT_GC_MIN_THRESHOLD:
             /* Handled in parseflags_minimal */

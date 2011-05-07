@@ -680,6 +680,9 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_gc_gms_init)
     struct MarkSweep_GC *self;
+    size_t nursery_size = args->nursery_size 
+                        ? args->nursery_size 
+                        : GC_DEFAULT_NURSERY_SIZE;
 
     /* We have to transfer ownership of memory to parent interp in threaded parrot */
     interp->gc_sys->finalize_gc_system = NULL; /* gc_gms_finalize; */
@@ -772,12 +775,11 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         self->fixed_size_allocator = Parrot_gc_fixed_allocator_new(interp);
 
         /*
-         * Collect every 1/100 of avaliable memory.
+         * Collect every nursery_size/100 of system memory.
          *
-         * Will be configured/dynamically adjusted in future. For now it gives
-         * good performance overrall.
+         * Configured by runtime parameter (default 2%).
          */
-        self->gc_threshold = Parrot_sysmem_amount(interp) * 2 / 100;
+        self->gc_threshold = Parrot_sysmem_amount(interp) * nursery_size / 100;
 
         Parrot_gc_str_initialize(interp, &self->string_gc);
     }

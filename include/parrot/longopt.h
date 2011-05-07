@@ -48,6 +48,7 @@ struct longopt_opt_info {
 #define OPT_HASH_SEED             133
 #define OPT_GC_DYNAMIC_THRESHOLD  134
 #define OPT_GC_MIN_THRESHOLD      135
+#define OPT_GC_NURSERY_SIZE       136
 
 /* HEADERIZER BEGIN: src/longopt.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

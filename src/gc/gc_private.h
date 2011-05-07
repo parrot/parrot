@@ -48,6 +48,8 @@ extern void *flush_reg_store(void);
 #define GC_SIZE_THRESHOLD                      1024  * 1024
 #define GC_DEFAULT_DYNAMIC_THRESHOLD           75
 #define GC_DEFAULT_MIN_THRESHOLD               4 * 1024 * 1024
+/* promills of system memory */
+#define GC_DEFAULT_NURSERY_SIZE                2 
 
 #define PMC_HEADERS_PER_ALLOC     4096 * 10 / sizeof (PMC)
 #define BUFFER_HEADERS_PER_ALLOC  4096      / sizeof (Buffer)
