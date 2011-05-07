@@ -72,6 +72,9 @@ Creates an identical copy of the Capture.
             SET_ATTR_hash(INTERP, dest, hash);
         }
 
+        /* clone of parts can trigger GC. Explicitely WB dest */
+        PARROT_GC_WRITE_BARRIER(INTERP, dest);
+
         return dest;
     }
 
