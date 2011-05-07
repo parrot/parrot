@@ -1547,8 +1547,14 @@ Creates and returns a clone of the signature.
         if (!PMC_IS_NULL(return_flags))
             SET_ATTR_return_flags(INTERP, dest, VTABLE_clone(INTERP, return_flags));
 
-        if (hash)
+        if (hash) {
+            /*
+                FIXME We can't just blindly clone this hash. We'll double-free
+                allocated Pcc_cells. Which leads to very-very nasty results.
+            */
+            PARROT_ASSERT(!"Sorry.");
             Parrot_hash_clone(INTERP, hash, get_hash(INTERP, dest));
+        }
 
         return dest;
     }
