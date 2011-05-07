@@ -262,9 +262,9 @@ sub parse_next_chunk {
 
     if ( $source =~ /
         \.chunk\s+"(?<name>\w*)"\n
-        \.variables\n(?<variables>.*)\n
-        \.metadata\n(?<metadata>.*)
-        \.bytecode\n(?<bytecode>.*)
+        \.variables\s*(?<variables>.*)
+        \.metadata\s*(?<metadata>.*)
+        \.bytecode\s*(?<bytecode>.*)
     /msx ) {
         # captures are in %+
     } else {
