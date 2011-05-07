@@ -63,7 +63,7 @@ A chunk is a self-contained unit of code.  Chunks correspond roughly to
 functions and have a variables table, a metadata segment and a bytecode
 segment.  The variables table is used to store any persistent data.  The
 metadata segment stores information about the code, for example annotations or
-variable names.  The bytecode segment contains the executable ops.  
+variable names.  The bytecode segment contains the executable ops.
 
 =item * MOP
 
@@ -433,7 +433,8 @@ approximately analogous to a function.
 =head3 Chunk Identifier
 
 A chunk identifier consists of a single line beginning with '.chunk', followed
-by a chunk name.  The name consists of a quote-delimited utf-8 string.
+by a chunk name.  The name consists of a double quote-delimited utf-8 string
+which must be unique. The empty string is allowed as a chunk name.
 
   .chunk "chunk_name"
 
@@ -471,13 +472,13 @@ that contains the value.
   #at pc 1234, "line" is 23
   1243 5 6
 
-=head3 Ops
+=head3 Bytecode
 
-The ops segment consists of a list of mnemonics for instructions and their
+The bytecode segment consists of a list of mnemonics for instructions and their
 arguments.  All instructions take three int arguments between 0 and 255, even
 if they aren't all used.
 
-  .code
+  .bytecode
     set   1, 3, 9
     add_i 3, 2, 3
     cmp_i 2, 3, 3
@@ -513,9 +514,9 @@ The following should be a working "hello world" program in M0.
     .bytecode
     #I0 is 0
     set_var I0, 0, 0
-    #I1 is "hello" 
+    #I1 is "hello"
     set_var I1, 0, 1
-    #I2 is "\n" 
+    #I2 is "\n"
     set_var I2, 0, 2
     #I3 is 0
     set_var I3, 0, 3
@@ -546,7 +547,7 @@ functions and have the following segments:
 
 {{{
 NOTE: We should design the binary format of M0 in a way that allows it to be mmapped
-by an interpreter.
+by an interpreter. Which considerations does this imply?
 }}}
 
 The header has the following structure:
@@ -632,6 +633,7 @@ In the interest of compatibility between implementations, the following is a
 canonical list of the ops an M0 implementation must implement and the numbers
 they must correspond to.  Other opcode numbers are implementation-specific and
 are not require to have any defined semantics.
+
 NOTE: This section is not current.  Updating it is not likely to be useful
 until we're reasonably confident that we have a final set of ops.
 
