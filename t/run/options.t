@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 31;
+use Test::More tests => 35;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -61,33 +61,33 @@ say "first"
 END_PIR
 is( `"$PARROT" -E "$first_pir_file" $redir`, $expected_preprocesses_pir, 'option -E' );
 is( `"$PARROT" --pre-process-only "$first_pir_file" $redir`,
-    $expected_preprocesses_pir, 'option --pre-process-only' );
+$expected_preprocesses_pir, 'option --pre-process-only' );
 
 # Test the trace option
 is( `"$PARROT" -t "$first_pir_file" $redir`, "first\n", 'option -t' );
 is( `"$PARROT" --trace "$first_pir_file" $redir`, "first\n", 'option --trace' );
 is( `"$PARROT" -t "$first_pir_file" "$second_pir_file" $redir`, "second\n",
-    'option -t with flags' );
+'option -t with flags' );
 is( `"$PARROT" --trace "$first_pir_file" "$second_pir_file" $redir`,
-    "second\n", 'option --trace with flags' );
+"second\n", 'option --trace with flags' );
 
 ## test the -R & --runcore options
 {
-    my $cmd;
+my $cmd;
 
-    ## this test assumes these cores work on all platforms (a safe assumption)
-    for my $val (qw/ slow fast bounds trace /) {
-        for my $opt ( '-R ', '--runcore ', '--runcore=' ) {
-            $cmd = qq{"$PARROT" $opt$val "$second_pir_file" $redir};
-            is( qx{$cmd}, "second\n", "<$opt$val> option)" ) or diag $cmd;
-        }
+## this test assumes these cores work on all platforms (a safe assumption)
+for my $val (qw/ slow fast bounds trace /) {
+    for my $opt ( '-R ', '--runcore ', '--runcore=' ) {
+        $cmd = qq{"$PARROT" $opt$val "$second_pir_file" $redir};
+        is( qx{$cmd}, "second\n", "<$opt$val> option)" ) or diag $cmd;
     }
+}
 
-    $cmd = qq{"$PARROT" -D 8 -R slow "$second_pir_file" $redir};
-    is( qx{$cmd}, "second\n", "-r option <$cmd>" );
+$cmd = qq{"$PARROT" -D 8 -R slow "$second_pir_file" $redir};
+is( qx{$cmd}, "second\n", "-r option <$cmd>" );
 
-    $cmd = qq{"$PARROT" -D 8 -R slow "$second_pir_file" 2>&1};
-    like( qx{$cmd}, qr/Parrot VM: slow core/, "-r option <$cmd>" );
+$cmd = qq{"$PARROT" -D 8 -R slow "$second_pir_file" 2>&1};
+like( qx{$cmd}, qr/Parrot VM: slow core/, "-r option <$cmd>" );
 }
 
 ## TT #1150 test remaining options
@@ -99,8 +99,22 @@ like( qx{$PARROT --runtime-prefix}, qr/^.+$/, "--runtime-prefix" );
 my $output = qx{$PARROT --gc-dynamic-threshold 2>&1 };
 my $exit   = $? & 127;
 like( $output, qr/--gc-dynamic-threshold needs an argument/,
-                 '--gc-dynamic-threshold needs argument warning' );
+             '--gc-dynamic-threshold needs argument warning' );
 is( $exit, 0, '... and should not crash' );
+
+# GC nursery-size check for warning error and mask off "did it crash?" bits
+$output = qx{$PARROT --gc-nursery-size 2>&1 };
+$exit   = $? & 127;
+like( $output, qr/--gc-nursery-size needs an argument/,
+                 '--gc-nursery-size needs argument warning' );
+is( $exit, 0, '... and should not crash' );
+
+$output = qx{$PARROT --gc-nursery-size=51 2>&1 };
+$exit   = $? & 127;
+like( $output, qr/maximum GC nursery size is 50%/,
+                 '--gc-nursery-size max warning' );
+is( $exit, 0, '... and should not crash' );
+
 
 # Test --leak-test
 is( qx{$PARROT --leak-test "$first_pir_file"}, "first\n", '--leak-test' );
