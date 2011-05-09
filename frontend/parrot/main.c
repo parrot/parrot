@@ -388,7 +388,7 @@ PARROT_PURE_FUNCTION
 static int
 is_float(ARGIN(const char *s))
 {
-    ASSERT_ARGS(is_all_digits)
+    ASSERT_ARGS(is_float)
     for (; *s; ++s)
         if (!(isdigit((unsigned char)*s) || (*s=='.')))
             return 0;
