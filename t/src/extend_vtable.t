@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 106;
+plan tests => 107;
 
 =head1 NAME
 
@@ -129,13 +129,14 @@ void dotest(Parrot_Interp interp, void *unused)
 
 $code
 
-    /* TODO: Shouldn't we also be destroying all the other PMCs ? */
+    /*  TODO: Shouldn't we also be destroying all the other PMCs ?
     Parrot_PMC_destroy(interp, pmc);
     Parrot_PMC_destroy(interp, pmc_string);
     Parrot_PMC_destroy(interp, pmc_string2);
     Parrot_PMC_destroy(interp, pmc_string3);
     Parrot_PMC_destroy(interp, pmc_float);
     Parrot_PMC_destroy(interp, pmc_float2);
+    */
 
     /* TODO: Properly test this */
     Parrot_destroy(interp);
@@ -520,6 +521,15 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_role");
     Parrot_PMC_remove_role(interp, pmc, pmc2);
     Parrot_printf(interp,"42\n");
     */
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_getprop");
+    string = createstring(interp, "_struct");
+    pmc = Parrot_PMC_getprop(interp,continuation , string);
+    Parrot_printf(interp,"42\n");
 CODE
 42
 Done!
