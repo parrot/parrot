@@ -129,10 +129,15 @@ void dotest(Parrot_Interp interp, void *unused)
 
 $code
 
-    /* TODO: Properly test this */
-    Parrot_PMC_destroy(interp, pmc);
-
     /* TODO: Shouldn't we also be destroying all the other PMCs ? */
+    Parrot_PMC_destroy(interp, pmc);
+    Parrot_PMC_destroy(interp, pmc_string);
+    Parrot_PMC_destroy(interp, pmc_string2);
+    Parrot_PMC_destroy(interp, pmc_string3);
+    Parrot_PMC_destroy(interp, pmc_float);
+    Parrot_PMC_destroy(interp, pmc_float2);
+
+    /* TODO: Properly test this */
     Parrot_destroy(interp);
     printf("Done!\\n");
 }
