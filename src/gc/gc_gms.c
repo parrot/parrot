@@ -1088,7 +1088,7 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                     SET_GEN_FLAGS(pmc, i + 1);
 
                     Parrot_pa_remove(interp, self->objects[i], item->ptr);
-                    /* If this was freshly allocated object in C stack - move it to difty list */
+                    /* If this was freshly allocated object in C stack - move it to dirty list */
                     if (PObj_GC_soil_root_TEST(pmc)) {
                         item->ptr = Parrot_pa_insert(interp, self->dirty_list, item);
                         PObj_GC_soil_root_CLEAR(pmc);
