@@ -36,7 +36,7 @@
 typedef struct _Parrot_GC_Init_Args {
     void *stacktop;
     const char *system;
-    Parrot_Int nursery_size;
+    Parrot_Float4 nursery_size;
     Parrot_Int dynamic_threshold;
     Parrot_Int min_threshold;
 } Parrot_GC_Init_Args;

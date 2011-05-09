@@ -58,7 +58,7 @@ Parrot_confess(ARGIN(const char *cond), ARGIN(const char *file), unsigned int li
 typedef struct _Parrot_Init_Args {
     void *stacktop;
     const char *gc_system;
-    Parrot_Int gc_nursery_size;
+    Parrot_Float4 gc_nursery_size;
     Parrot_Int gc_dynamic_threshold;
     Parrot_Int gc_min_threshold;
     Parrot_UInt hash_seed;
