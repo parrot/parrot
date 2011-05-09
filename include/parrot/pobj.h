@@ -186,9 +186,6 @@ typedef enum PObj_enum {
                                  | PObj_GC_need_write_barrier_FLAG,
 
 /* PMC specific FLAGs */
-    /* call object finalizer */
-    PObj_need_finalize_FLAG     = POBJ_FLAG(27),
-
     /* true if this is connected by some route to a needs_early_gc object */
     PObj_needs_early_gc_FLAG    = POBJ_FLAG(28),
 
