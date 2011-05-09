@@ -425,14 +425,6 @@ static void gc_gms_seal_object(PARROT_INTERP, ARGIN(PMC *pmc))
 static size_t gc_gms_select_generation_to_collect(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void gc_gms_soil_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void gc_gms_soil_roots(PARROT_INTERP, ARGIN(MarkSweep_GC *self))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void gc_gms_str_get_youngest_generation(PARROT_INTERP,
     ARGIN(STRING *str))
         __attribute__nonnull__(1)
@@ -604,12 +596,6 @@ static int gen2flags(int gen);
 #define ASSERT_ARGS_gc_gms_select_generation_to_collect \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_gms_soil_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_gc_gms_soil_roots __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_gc_gms_str_get_youngest_generation \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -861,21 +847,6 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     gc_gms_check_sanity(interp);
 
     /*
-     * Before sweeping pools move all _root_ objects from Gen0 into dirty_list.
-     *
-     * Main reason for it:
-     *   PMC *res = Parrot_pmc_new(interp);
-     *   <do something to fill a lot of guts. E.g. Hash.clone>
-     *   return *res;
-     *
-     * C<Hash.clone> can trigger GC. C<res> _will_ not be sealed by any automatic
-     * methods (e.g. pmc2c vtable overrides).
-     *
-     * We will soil objects only from C stack.
-     */
-    gc_gms_soil_roots(interp, self);
-
-    /*
     7. Sweep generations starting from K:
         - Destroy all dead objects
         - Move live objects into generation max(K+1, N)
@@ -1082,58 +1053,6 @@ gc_gms_process_work_list(PARROT_INTERP,
 
 /*
 
-=item C<static void gc_gms_soil_pmc(PARROT_INTERP, PMC *pmc)>
-
-Mark single nursery PMC as dirty. Part of Step 7.
-
-=cut
-
-*/
-
-static void
-gc_gms_soil_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
-{
-    ASSERT_ARGS(gc_gms_soil_pmc)
-    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    pmc_alloc_struct  *item = PMC2PAC(pmc);
-    size_t             gen  = POBJ2GEN(pmc);
-
-    /* If object is dirty already */
-    if (PObj_GC_on_dirty_list_TEST(pmc))
-        return;
-
-    /* Older objects are covered by other steps */
-    if (gen)
-        return;
-
-    Parrot_pa_remove(interp, self->objects[0], item->ptr);
-    item->ptr = Parrot_pa_insert(interp, self->dirty_list, item);
-
-    /* Move to next generation */
-    SET_GEN_FLAGS(pmc, 1);
-    PObj_GC_on_dirty_list_SET(pmc);
-    PObj_live_CLEAR(pmc);
-}
-
-/*
-
-=item C<static void gc_gms_soil_roots(PARROT_INTERP, MarkSweep_GC *self)>
-
-Mark all nursery PMCs on C-stack as durty. Part of Step 7.
-
-*/
-
-static void
-gc_gms_soil_roots(PARROT_INTERP, ARGIN(MarkSweep_GC *self))
-{
-    ASSERT_ARGS(gc_gms_soil_roots)
-    interp->gc_sys->mark_pmc_header = gc_gms_soil_pmc;
-    Parrot_gc_trace_root(interp, NULL, GC_TRACE_SYSTEM_ONLY);
-    interp->gc_sys->mark_pmc_header = gc_gms_mark_pmc_header;
-}
-
-/*
-
 =item C<static void gc_gms_sweep_pools(PARROT_INTERP, MarkSweep_GC *self)>
 
 Sweep generations starting from K:
@@ -1166,10 +1085,19 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                 PObj_live_CLEAR(pmc);
 
                 if (move_to_old) {
-                    Parrot_pa_remove(interp, self->objects[i], item->ptr);
-                    item->ptr = Parrot_pa_insert(interp, self->objects[i + 1], item);
                     SET_GEN_FLAGS(pmc, i + 1);
-                    gc_gms_seal_object(interp, pmc);
+
+                    Parrot_pa_remove(interp, self->objects[i], item->ptr);
+                    /* If this was freshly allocated object in C stack - move it to difty list */
+                    if (PObj_GC_soil_root_TEST(pmc)) {
+                        item->ptr = Parrot_pa_insert(interp, self->dirty_list, item);
+                        PObj_GC_soil_root_CLEAR(pmc);
+                        PObj_GC_on_dirty_list_SET(pmc);
+                    }
+                    else {
+                        item->ptr = Parrot_pa_insert(interp, self->objects[i + 1], item);
+                        gc_gms_seal_object(interp, pmc);
+                    }
                 }
             }
             else if (!PObj_constant_TEST(pmc)) {
@@ -1556,8 +1484,13 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         return 0;
 
     /* Pool.is_owned isn't precise enough (yet) */
-    if (Parrot_pa_is_owned(interp, self->objects[POBJ2GEN(obj)], item, item->ptr))
+    if (Parrot_pa_is_owned(interp, self->objects[POBJ2GEN(obj)], item, item->ptr)) {
+        if (POBJ2GEN(obj) == 0) {
+            /* This is freshly allocated object on C stack. Soil it after GC run */
+            PObj_GC_soil_root_SET(&item->pmc);
+        }
         return 1;
+    }
 
     return 0;
 }
