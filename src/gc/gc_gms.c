@@ -990,7 +990,19 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
         }
         else {
             /* Survival */
-            if ((gen <= self->gen_to_collect) && (gen < MAX_GENERATIONS - 1)) {
+            /* This check used to be
+             * if ((gen <= self->gen_to_collect) && (gen < MAX_GENERATIONS - 1))
+             * Unfortunatelly it's wrong.
+             * Consider this:
+             * A1* -> B1* -> C0. (Object in generation notation. Star denotes "dirt
+             * During gen0 collecting will "sink" A object, but not B. This picture
+             * A2 -> B1* -> C1
+             * After collecting gen1 we'll sink all of them:
+             * A3 -> B2 -> C2.
+             * And after collecting of gen2 we'll collect B and C incorrectly.
+             * Because A(3) will be in older generation than B and C.
+             */
+            if (gen < MAX_GENERATIONS - 1) {
                 SET_GEN_FLAGS(pmc, gen + 1);
             }
         };);
