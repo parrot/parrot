@@ -39,7 +39,6 @@ our @shared_valid_options = qw{
     infodir
     inline
     intval
-    buildframes
     ld
     ldflags
     lex

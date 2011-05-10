@@ -359,10 +359,6 @@ Use the given type for opcodes.
 
 Use the given ops files.
 
-=item C<--buildframes>
-
-Dynamically build NCI call frames.
-
 =back
 
 =head2 International Components For Unicode (ICU) Options
@@ -624,7 +620,6 @@ configuration file.
     auto::isreg
     auto::arch
     auto::jit
-    auto::frames
     auto::cpu
     auto::inline
     auto::gc
