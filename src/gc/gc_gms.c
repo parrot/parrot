@@ -666,7 +666,7 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_gc_gms_init)
     struct MarkSweep_GC *self;
-    Parrot_Float4 nursery_size = args->nursery_size
+    const Parrot_Float4 nursery_size = (args->nursery_size > 0)
                         ? args->nursery_size
                         : GC_DEFAULT_NURSERY_SIZE;
 
