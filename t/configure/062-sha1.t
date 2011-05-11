@@ -1,13 +1,13 @@
 #! perl
 # Copyright (C) 2010, Parrot Foundation.
-# 062-sha1_to_cache.t
+# 062-sha1.t
 
 use strict;
 use warnings;
 
 use Test::More;
 if (-e 'DEVELOPING' and ! -e 'Makefile') {
-    plan tests =>  8;
+    plan tests =>  7;
 }
 else {
     plan skip_all =>
@@ -40,9 +40,6 @@ my $cwd = cwd();
                 "Got git hash for sha1 number");
         };
     }
-    my $cache = q{.parrot_current_sha1};
-    my $size = -s $cache;
-    cmp_ok( $size , '>', 0, "Cache for sha1 number was created and nonempty : $size bytes");
 
     chdir $tdir;
     unlink qq{$libdir/Parrot/SHA1.pm}
@@ -54,11 +51,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-062-sha1_to_cache.t - test Parrot::SHA1
+062-sha1.t - test Parrot::SHA1
 
 =head1 SYNOPSIS
 
-    % prove t/configure/062-sha1_to_cache.t
+    % prove t/configure/062-sha1.t
 
 =head1 DESCRIPTION
 
