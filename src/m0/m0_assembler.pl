@@ -44,12 +44,21 @@ sub assemble {
     my $chunk    = parse_next_chunk($source);
     my $header   = m0b_header();
     my $bytecode = $header . generate_bytecode_for_chunk($ops, $chunk);
+    write_bytecode($file, $bytecode);
+}
 
+=item C<write_bytecode($file, $bytecode)>
+
+Write the M0 bytecode $bytecode to the file $file.
+
+=cut
+
+sub write_bytecode {
+    my ($file, $bytecode) = @_;
     my $bytecode_file = $file . 'b';
     say "Writing bytecode to $bytecode_file";
     write_file $bytecode_file, $bytecode;
 }
-
 
 =item C<m0b_header>
 
