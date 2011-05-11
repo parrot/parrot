@@ -124,6 +124,10 @@ END
 
     while (<$IN>) {
         if (/\@PCONFIG\@/) {
+
+            print {$OUT} qq(    set \$P0["git_describe"], .PARROT_GIT_DESCRIBE\n);
+            print {$OUT} qq(    set \$P0["sha1"], .PARROT_SHA1\n);
+
             for my $k ( sort { lc $a cmp lc $b || $a cmp $b } $conf->data->keys ) {
                 next if exists $p5_keys{$k};
                 next if $k =~ /_provisional$/;
