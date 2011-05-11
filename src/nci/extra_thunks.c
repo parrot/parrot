@@ -2888,6 +2888,8 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
     nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS);
     PARROT_ASSERT(!(PMC_IS_NULL(nci_funcs)));
 
+    Parrot_ex_throw_from_c_args(interp, 0, NULL, "Test");
+
     {
         const int n = 3;
         static const int sig[] = { 7, 7, 29, };
