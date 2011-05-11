@@ -842,6 +842,7 @@ runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PAR
 
 runtime/parrot/include/config.fpmc : myconfig config_lib.pir \
     runtime/parrot/include/datatypes.pasm $(MINIPARROT)
+	$(PERL) tools/build/gen_version.pl >runtime/parrot/include/parrot_version.pir
 	$(MINIPARROT) -Iruntime/parrot/include config_lib.pir > $@
 
 $(PARROT) : frontend/parrot/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
@@ -875,7 +876,6 @@ $(PROVE) : parrot-prove.pbc $(PARROT) $(PBC_TO_EXE)
 	$(PBC_TO_EXE) parrot-prove.pbc
 
 $(PARROT_CONFIG) : $(DEV_TOOLS_DIR)/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
-	$(PERL) tools/build/gen_version.pl >runtime/parrot/include/parrot_version.pir
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
 	$(PARROT) pbc_to_exe.pbc parrot_config.pbc
 
