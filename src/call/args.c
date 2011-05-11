@@ -133,7 +133,7 @@ PARROT_DOES_NOT_RETURN
 static void named_argument_arity_error(PARROT_INTERP,
     int named_arg_count,
     ARGFREE(Hash *named_used_list),
-    ARGIN(PMC *named_arg_list))
+    ARGIN(Hash *named_arg_list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
@@ -966,16 +966,17 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         if (param_flags & PARROT_ARG_SLURPY_ARRAY) {
             PMC * const collect_named = Parrot_pmc_new(interp,
                     Parrot_hll_get_ctx_HLL_type(interp, enum_class_Hash));
-            PMC * const named_arg_list = VTABLE_get_attr_str(interp, call_object, CONST_STRING(interp, "named"));
+            Hash *h;
+            /* Early exit to avoid vtable call */
+            GETATTR_CallContext_hash(interp, call_object, h);
 
-            if (!PMC_IS_NULL(named_arg_list)) {
-                const INTVAL named_arg_count = VTABLE_elements(interp, named_arg_list);
+            if (h && h->entries) {
+                const INTVAL named_arg_count = h->entries;
                 INTVAL named_arg_index;
 
                 /* Named argument iteration. */
-                for (named_arg_index = 0; named_arg_index < named_arg_count; ++named_arg_index) {
-                    STRING * const name = VTABLE_get_string_keyed_int(interp,
-                            named_arg_list, named_arg_index);
+                parrot_hash_iterate(h,
+                    STRING * const name = (STRING *)_bucket->key;
 
                     if ((named_used_list == NULL)
                     || !Parrot_hash_exists(interp, named_used_list, name)) {
@@ -991,8 +992,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                         Parrot_hash_put(interp, named_used_list, name, (void *)1);
 
                         ++named_count;
-                    }
-                }
+                    });
             }
 
             *accessor->pmc(interp, arg_info, param_index) = collect_named;
@@ -1113,15 +1113,9 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             return;
         }
 
-        named_arg_list = VTABLE_get_attr_str(interp, call_object, CONST_STRING(interp, "named"));
-
-        if (!PMC_IS_NULL(named_arg_list)) {
-            const INTVAL named_arg_count = VTABLE_elements(interp, named_arg_list);
-
-            if (named_used_list == NULL || named_arg_count > named_count)
-                named_argument_arity_error(interp, named_arg_count,
-                                           named_used_list, named_arg_list);
-        }
+        if (named_used_list == NULL || h->entries > named_count)
+            named_argument_arity_error(interp, h->entries,
+                                       named_used_list, h);
     }
     if (named_used_list != NULL)
         Parrot_hash_destroy(interp, named_used_list);
@@ -1130,7 +1124,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 /*
 
 =item C<static void named_argument_arity_error(PARROT_INTERP, int
-named_arg_count, Hash *named_used_list, PMC *named_arg_list)>
+named_arg_count, Hash *named_used_list, Hash *named_arg_list)>
 
 In the case of a mismatch between passed and expected named arguments, throw
 a helpful exception.
@@ -1143,7 +1137,7 @@ PARROT_COLD
 PARROT_DOES_NOT_RETURN
 static void
 named_argument_arity_error(PARROT_INTERP, int named_arg_count,
-        ARGFREE(Hash *named_used_list), ARGIN(PMC *named_arg_list))
+        ARGFREE(Hash *named_used_list), ARGIN(Hash *named_arg_list))
 {
     ASSERT_ARGS(named_argument_arity_error)
     INTVAL named_arg_index;
@@ -1156,9 +1150,8 @@ named_argument_arity_error(PARROT_INTERP, int named_arg_count,
     }
 
     /* Named argument iteration. */
-    for (named_arg_index = 0; named_arg_index < named_arg_count; ++named_arg_index) {
-        STRING * const name = VTABLE_get_string_keyed_int(interp,
-                named_arg_list, named_arg_index);
+    parrot_hash_iterate(named_arg_list,
+        STRING * const name = (STRING *)_bucket->key;
 
         if (!parrot_hash_exists(interp, named_used_list, name)) {
             Parrot_hash_destroy(interp, named_used_list);
@@ -1166,8 +1159,8 @@ named_argument_arity_error(PARROT_INTERP, int named_arg_count,
                     EXCEPTION_INVALID_OPERATION,
                     "too many named arguments: '%S' not used",
                     name);
-        }
-    }
+        };)
+
     Parrot_hash_destroy(interp, named_used_list);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
         "Invalid named arguments, unspecified error");
