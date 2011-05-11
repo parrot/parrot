@@ -1,6 +1,7 @@
 New in 3.4.0
 - Core
   + The Generational Mark and Sweep garbage collector is the new default.
+  + The --gc-nursery-size command line argument was added.
 
 New in 3.3.0
 - Core

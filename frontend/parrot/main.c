@@ -57,6 +57,11 @@ PARROT_PURE_FUNCTION
 static int is_all_hex_digits(ARGIN(const char *s))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+static int is_float(ARGIN(const char *s))
+        __attribute__nonnull__(1);
+
 PARROT_CAN_RETURN_NULL
 static PMC * load_bytecode_file(Parrot_PMC interp, Parrot_String filename);
 
@@ -117,6 +122,8 @@ static void verify_file_names(
 #define ASSERT_ARGS_is_all_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_is_all_hex_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_is_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_load_bytecode_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_cmd_options __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -369,6 +376,28 @@ is_all_digits(ARGIN(const char *s))
     ASSERT_ARGS(is_all_digits)
     for (; *s; ++s)
         if (!isdigit((unsigned char)*s))
+            return 0;
+    return 1;
+}
+
+/*
+=item C<static int is_float(const char *s)>
+
+Tests all characters in a string are decimal digits or dot.
+Returns 1 if true, 0 as soon as a non-decimal found
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+static int
+is_float(ARGIN(const char *s))
+{
+    ASSERT_ARGS(is_float)
+    for (; *s; ++s)
+        if (!(isdigit((unsigned char)*s) || (*s=='.')))
             return 0;
     return 1;
 }
@@ -653,8 +682,8 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
             }
             break;
           case OPT_GC_NURSERY_SIZE:
-            if (opt.opt_arg && is_all_digits(opt.opt_arg)) {
-                initargs->gc_nursery_size = strtoul(opt.opt_arg, NULL, 10);
+            if (opt.opt_arg && is_float(opt.opt_arg)) {
+                initargs->gc_nursery_size = (float)strtod(opt.opt_arg, NULL);
 
                 if (initargs->gc_nursery_size > 50) {
                     fprintf(stderr, "error: maximum GC nursery size is 50%%\n");
