@@ -131,6 +131,7 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
     Parrot_jump_buff env;
     if (setjmp(env)) {
         interp_raw->api_jmp_buf = NULL;
+        *interp = NULL;
         return !interp_raw->exit_code;
     }
     else {

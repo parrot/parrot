@@ -168,10 +168,17 @@ main(int argc, const char *argv[])
     /* Parse minimal subset of flags */
     parseflags_minimal(initargs, argc, argv);
 
-    if (!(Parrot_api_make_interpreter(NULL, 0, initargs, &interp) &&
-          Parrot_set_config_hash(interp) &&
+    if (!Parrot_api_make_interpreter(NULL, 0, initargs, &interp)) {
+        fprintf(stderr, "PARROT VM: Could not allocate new interpreter\n");
+        if (interp != NULL)
+            show_last_error_and_exit(interp);
+        else
+            fprintf(stderr, "PARROT VM: No interpreter. Cannot get error details\n");
+        exit(EXIT_FAILURE);
+    }
+    if (!(Parrot_set_config_hash(interp) &&
           Parrot_api_set_executable_name(interp, argv[0]))) {
-        fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
+        fprintf(stderr, "PARROT VM: Could not initialize new interpreter\n");
         show_last_error_and_exit(interp);
     }
 
