@@ -93,6 +93,21 @@ sub parse_op_data {
     return $ops;
 }
 
+=item to_bytecode
+
+Take a hash containing an opname and three arguments (arg1, arg2, arg3) and
+return the bytecode represenation of the operation.
+
+=cut
+
+
+sub to_bytecode {
+    my ($ops,$op) = @_;
+    my $bytecode = '';
+    warn $op->{opname} . '=>' . opname_to_num($ops, $op->{opname});
+    return $bytecode;
+}
+
 sub generate_bytecode_for_chunk {
     my ($ops, $chunk) = @_;
 
@@ -100,13 +115,15 @@ sub generate_bytecode_for_chunk {
     my $tb       = $chunk->{bytecode};
     my $bytecode = '';
 
+    # First, add the directory segment
+    $bytecode = m0b_dir_seg([ $chunk ]);
+
     # iterate over textual representation of bytecode
     # use variable table to generate binary bytecode
     my @lines = split /\n/, $tb;
     for my $line (@lines) {
         if ($line =~ m/^(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
-            # warn $+{opname} . '=>' . opname_to_num($ops, $+{opname});
-            $bytecode = m0b_dir_seg([ $chunk ]);
+            $bytecode .= to_bytecode($ops,\%+);
         } else {
             say "Invalid M0 bytecode segment: $line";
             exit 1;
