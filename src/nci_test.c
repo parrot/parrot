@@ -796,7 +796,7 @@ nci_cb_D4(cb_D4_func times_ten, void* user_data)
 
 /*
 
-=item C<PARROT_DYNEXT_EXPORT void nci_pip(int count, Rect_Like *rects)>
+=item C<PARROT_DYNEXT_EXPORT void nci_pip(int count, const Rect_Like *rects)>
 
 Prints a count integer and the coordinates of 4 rectangles.
 
@@ -925,7 +925,7 @@ nci_vv(void)
 
 /*
 
-=item C<PARROT_DYNEXT_EXPORT void nci_vp(Opaque *inOpaque)>
+=item C<PARROT_DYNEXT_EXPORT void nci_vp(const Opaque *inOpaque)>
 
 Test that a previously generated opaque struct gets passed back
 to an NCI function correctly.
