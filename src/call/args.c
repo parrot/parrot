@@ -971,9 +971,6 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             GETATTR_CallContext_hash(interp, call_object, h);
 
             if (h && h->entries) {
-                const INTVAL named_arg_count = h->entries;
-                INTVAL named_arg_index;
-
                 /* Named argument iteration. */
                 parrot_hash_iterate(h,
                     STRING * const name = (STRING *)_bucket->key;
@@ -1103,7 +1100,6 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
     /* Double check that all named arguments were assigned to parameters. */
     if (err_check) {
-        PMC  *named_arg_list;
         Hash *h;
         /* Early exit to avoid vtable call */
         GETATTR_CallContext_hash(interp, call_object, h);
@@ -1140,7 +1136,6 @@ named_argument_arity_error(PARROT_INTERP, int named_arg_count,
         ARGFREE(Hash *named_used_list), ARGIN(Hash *named_arg_list))
 {
     ASSERT_ARGS(named_argument_arity_error)
-    INTVAL named_arg_index;
 
     if (named_used_list == NULL) {
         Parrot_ex_throw_from_c_args(interp, NULL,
