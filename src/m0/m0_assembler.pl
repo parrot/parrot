@@ -104,7 +104,17 @@ return the bytecode represenation of the operation.
 sub to_bytecode {
     my ($ops,$op) = @_;
     my $bytecode = '';
-    warn $op->{opname} . '=>' . opname_to_num($ops, $op->{opname});
+    my $opnumber = opname_to_num($ops, $op->{opname});
+    warn $op->{opname} . '=>' . $opnumber;
+    $bytecode .= pack('h', $opnumber);
+
+    # TODO: This is wrong, but close.
+    # We must look up things in our variable table and replace
+    # the integer arguments, which are indexes into our variable table, 
+    # with their values
+    $bytecode .= pack('C', $op->{arg1});
+    $bytecode .= pack('C', $op->{arg2});
+    $bytecode .= pack('C', $op->{arg3});
     return $bytecode;
 }
 
