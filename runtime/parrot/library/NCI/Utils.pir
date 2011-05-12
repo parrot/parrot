@@ -101,17 +101,14 @@ this will tend to make the toolkit init function much happier.
     cnul = chr 0
 
     # Calculate argc
-    .local int count
-    .local pmc argc
-    count = orig_argv
-    argc  = new 'Integer'
-    argc  = count
+    .local int argc
+    argc = elements orig_argv
 
     # Declare structure of a raw C string array with proper element count
     .local pmc argv_decl
     argv_decl = new 'ResizablePMCArray'
     push argv_decl, .DATATYPE_CSTR
-    push argv_decl, count
+    push argv_decl, argc
     push argv_decl, 0
     # XXX: This is unportably wrong; it assumes sizeof(INT) = sizeof(PTR)
     push argv_decl, .DATATYPE_INT
@@ -124,7 +121,7 @@ this will tend to make the toolkit init function much happier.
     argv = new 'ManagedStruct', argv_decl
     i = 0
   argv_loop:
-    unless i < count goto add_null
+    unless i < argc goto add_null
     # It seems like this should be possible in one op
     $S0 = orig_argv[i]
     concat $S0, $S0, cnul
@@ -136,17 +133,15 @@ this will tend to make the toolkit init function much happier.
     argv[1] = 0
 
     # Call the NCI framework init function
-    init_func(argc, argv)
+    argc = init_func(argc, argv)
 
     # Build a new_argv array to match the init function's return
-    .local int new_count
     .local pmc new_argv
-    new_count = argc
     new_argv  = new 'ResizableStringArray'
     # If program_name was supplied separately from argv, skip it on output
     i = has_program_name
   new_argv_loop:
-    unless i < new_count goto done
+    unless i < argc goto done
     $S0 = argv[0;i]
     push new_argv, $S0
     inc i
