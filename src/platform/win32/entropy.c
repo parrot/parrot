@@ -56,7 +56,7 @@ Parrot_get_entropy(PARROT_INTERP) {
         else
             PANIC(interp, msg);
     }
-    CryptReleaseContext(hCryptProv, 0)
+    CryptReleaseContext(hCryptProv, 0);
     return entropy;
 }
 
