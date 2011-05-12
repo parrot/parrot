@@ -489,7 +489,7 @@ dissect_aggregate_arg(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(PMC *aggreg
         parrot_hash_iterate(hash,
             VTABLE_set_pmc_keyed_str(interp, call_object,
                 (STRING *)_bucket->key,
-                Parrot_hash_value_to_pmc(interp, hash, _bucket->value));)
+                Parrot_hash_value_to_pmc(interp, hash, _bucket->value)););
     }
     else {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -1154,7 +1154,7 @@ named_argument_arity_error(PARROT_INTERP, int named_arg_count,
                     EXCEPTION_INVALID_OPERATION,
                     "too many named arguments: '%S' not used",
                     name);
-        };)
+        };);
 
     Parrot_hash_destroy(interp, named_used_list);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,

@@ -99,14 +99,14 @@ struct _hash {
 }
 
 #define parrot_hash_iterate(_hash, _code)                                   \
-{                                                                           \
+do {                                                                        \
     if ((_hash)->key_type == Hash_key_type_int                              \
     ||  (_hash)->key_type == Hash_key_type_cstring                          \
     ||  (_hash)->key_type == Hash_key_type_ptr)                             \
         parrot_hash_iterate_indexed((_hash), _code)                         \
     else                                                                    \
         parrot_hash_iterate_linear((_hash), _code)                          \
-}
+} while (0)
 
 typedef void (*value_free)(ARGFREE(void *));
 
