@@ -127,7 +127,7 @@ Parrot_str_init(PARROT_INTERP)
 
     /* interp is initialized from zeroed memory, so this is fine */
     else if (interp->hash_seed == 0) {
-        interp->hash_seed = Parrot_platform_get_entropy();
+        interp->hash_seed = Parrot_get_entropy(interp);
     }
 
     /* initialize the constant string table */
