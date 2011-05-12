@@ -114,7 +114,7 @@ successful and false value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_pmc_null(ARGIN(Parrot_PMC interp_pmc), ARGMOD(Parrot_PMC *pmctonull))
+Parrot_api_pmc_null(ARGIN(Parrot_PMC interp_pmc), ARGOUT(Parrot_PMC *pmctonull))
 {
     ASSERT_ARGS(Parrot_api_pmc_null)
     EMBED_API_CALLIN(interp_pmc, interp)

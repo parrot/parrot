@@ -622,7 +622,7 @@ Parrot_Int Parrot_api_pmc_new_from_class(
 PARROT_API
 Parrot_Int Parrot_api_pmc_null(
     ARGIN(Parrot_PMC interp_pmc),
-    ARGMOD(Parrot_PMC *pmctonull))
+    ARGOUT(Parrot_PMC *pmctonull))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmctonull);
