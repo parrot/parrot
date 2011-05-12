@@ -440,7 +440,7 @@ usage(ARGMOD(FILE *fp))
 {
     ASSERT_ARGS(usage)
     fprintf(fp,
-            "parrot -[acEGhprtvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
+            "parrot -[acEGhrtvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
             "[-O [level]] [-R runcore] [-o FILE] <file>\n");
 }
 
