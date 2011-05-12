@@ -232,7 +232,8 @@ alternating function names and Parrot NCI signatures.
     unless list_iter goto done
     func_name = shift list_iter
     signature = shift list_iter
-    function  = dlfunc library, func_name, signature
+    $P0       = '_parse_signature'(signature)
+    function  = dlfunc library, func_name, $P0
     unless first_arg_interp goto done_interp_wrap
         .const 'Sub' $P0 = '_call_with_interp'
         $P0 = clone $P0
@@ -256,6 +257,32 @@ alternating function names and Parrot NCI signatures.
     goto call
 .end
 
+.sub _parse_signature :anon
+    .param string sig
+
+    .local pmc get_datatype_enum
+    $P0 = null
+    get_datatype_enum = dlfunc $P0, 'Parrot_dt_get_datatype_enum', 'IpS'
+
+    .local int i, n
+    .local pmc sig_ary, retv
+    sig_ary = split ',', sig
+    n = elements sig_ary
+    retv = new ['FixedIntegerArray'], n
+
+    i = 0
+    loop:
+        unless i < n goto end_loop
+        $S0 = sig_ary[i]
+        $P0 = getinterp
+        $I0 = get_datatype_enum($P0, $S0)
+        retv[i] = $I0
+        inc i
+        goto loop
+    end_loop:
+
+    .return (retv)
+.end
 
 =back
 
