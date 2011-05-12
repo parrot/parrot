@@ -1,5 +1,5 @@
 /* context.h
- *  Copyright (C) 2009-2010, Parrot Foundation.
+ *  Copyright (C) 2009-2011, Parrot Foundation.
  *  Overview:
  *     Context
  */
@@ -542,38 +542,38 @@ UINTVAL Parrot_pcc_warnings_test_func(SHIM_INTERP,
 #  define Parrot_pcc_set_continuation(i, c, value) do { \
         CONTEXT_STRUCT(c)->current_cont = (value);      \
         PARROT_GC_WRITE_BARRIER((i), (c));              \
-    } while(0)
+    } while (0)
 #  define Parrot_pcc_set_caller_ctx(i, c, value) do {   \
         CONTEXT_STRUCT(c)->caller_ctx = (value);        \
         PARROT_GC_WRITE_BARRIER((i), (c));              \
-    } while(0)
+    } while (0)
 #  define Parrot_pcc_set_namespace(i, c, value) do {    \
         CONTEXT_STRUCT(c)->current_namespace = (value); \
         PARROT_GC_WRITE_BARRIER((i), (c));              \
-    } while(0)
+    } while (0)
 #  define Parrot_pcc_set_object(i, c, value) do {       \
         CONTEXT_STRUCT(c)->current_object = (value);    \
         PARROT_GC_WRITE_BARRIER((i), (c));              \
-    } while(0)
+    } while (0)
 #  define Parrot_pcc_set_lex_pad(i, c, value) do {      \
         CONTEXT_STRUCT(c)->lex_pad = (value);           \
         PARROT_GC_WRITE_BARRIER((i), (c));              \
-    } while(0)
+    } while (0)
 #  define Parrot_pcc_set_handlers(i, c, value) do {     \
         CONTEXT_STRUCT(c)->handlers = (value);          \
         PARROT_GC_WRITE_BARRIER((i), (c));              \
-    } while(0)
+    } while (0)
 #  define Parrot_pcc_set_outer_ctx(i, c, value) do {    \
         CONTEXT_STRUCT(c)->outer_ctx = (value);         \
         PARROT_GC_WRITE_BARRIER((i), (c));              \
-    } while(0)
+    } while (0)
 #  define Parrot_pcc_set_signature(i, c, value) do {    \
         CONTEXT_STRUCT(c)->current_sig = (value);       \
         PARROT_GC_WRITE_BARRIER((i), (c));              \
-    } while(0)
+    } while (0)
 #  define Parrot_pcc_set_context(i, c)   do {           \
         CURRENT_CONTEXT(i) = (c);                       \
-    } while(0)
+    } while (0)
 #else
 #  define Parrot_pcc_set_continuation(i, c, value) Parrot_pcc_set_continuation_func((i), (c), (value))
 #  define Parrot_pcc_set_caller_ctx(i, c, value) Parrot_pcc_set_caller_ctx_func((i), (c), (value))
