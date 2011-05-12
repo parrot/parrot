@@ -87,16 +87,15 @@ PARROT_DYNEXT_EXPORT int *  nci_p(void);
 PARROT_DYNEXT_EXPORT void * nci_pi(int);
 PARROT_DYNEXT_EXPORT void * nci_pii(int, int);
 PARROT_DYNEXT_EXPORT void * nci_piiii(int, int, int, int);
-PARROT_DYNEXT_EXPORT void   nci_pip(int, Rect_Like *);
+PARROT_DYNEXT_EXPORT void   nci_pip(int, ARGIN(const Rect_Like *));
 PARROT_DYNEXT_EXPORT void * nci_pp(void *);
 PARROT_DYNEXT_EXPORT short  nci_s(void);
 PARROT_DYNEXT_EXPORT short  nci_ssc(short, char);
 PARROT_DYNEXT_EXPORT void   nci_v(void);
 PARROT_DYNEXT_EXPORT void   nci_vP(void *);
-PARROT_DYNEXT_EXPORT void   nci_vpii(Outer *, int, int);
+PARROT_DYNEXT_EXPORT void   nci_vpii(ARGMOD(Outer *), int, int);
 PARROT_DYNEXT_EXPORT void   nci_vv(void);
-PARROT_DYNEXT_EXPORT void   nci_vp(Opaque*);
-PARROT_DYNEXT_EXPORT char * nci_ttt(char *, char *);
+PARROT_DYNEXT_EXPORT void   nci_vp(ARGIN(const Opaque*));
 PARROT_DYNEXT_EXPORT void   nci_vfff(float, float, float);
 
 /* Declarations for callback tests */
@@ -312,7 +311,7 @@ nci_ip(void *p)
         int i;
         char *s;
     } dfi;
-    dfi *sp = (dfi*) p;
+    const dfi * const sp = (const dfi*) p;
     puts(sp->s);
     fflush(stdout);
 
@@ -651,7 +650,7 @@ PARROT_DYNEXT_EXPORT
 void
 nci_cb_C1(cb_C1_func cb, void* user_data)
 {
-    const char *result = "succeeded";
+    const char * const result = "succeeded";
     /* call the cb synchronously */
     (cb)(result, user_data);
 
@@ -717,7 +716,7 @@ PARROT_DYNEXT_EXPORT
 void
 nci_cb_D1(cb_D1_func cb, void* user_data)
 {
-    const char *result = "succeeded";
+    const char * const result = "succeeded";
     /* call the cb synchronously */
     (cb)(user_data, result);
 
@@ -807,7 +806,7 @@ Prints a count integer and the coordinates of 4 rectangles.
 
 PARROT_DYNEXT_EXPORT
 void
-nci_pip(int count, Rect_Like *rects)
+nci_pip(int count, ARGIN(const Rect_Like *rects))
 {
     int i;
     printf("Count: %d\n", count);
@@ -937,32 +936,12 @@ to an NCI function correctly.
 
 PARROT_DYNEXT_EXPORT
 void
-nci_vp(ARGIN(Opaque *inOpaque))
+nci_vp(ARGIN(const Opaque *inOpaque))
 {
     if (inOpaque)
         printf("got %d\n", inOpaque->x);
     else
         printf("got null\n");
-}
-
-/*
-
-=item C<PARROT_DYNEXT_EXPORT char * nci_ttt(char *s1, char *s2)>
-
-Prints and returns "s2, s2, s1"
-
-=cut
-
-*/
-
-PARROT_DYNEXT_EXPORT
-char *
-nci_ttt(char *s1, char *s2)
-{
-    char* s = (char*) malloc((2 * strlen(s2)) + strlen(s1) + 5);
-    sprintf(s, "%s, %s, %s", s2, s2, s1);
-    printf("%s\n", s);
-    return s;
 }
 
 /*
