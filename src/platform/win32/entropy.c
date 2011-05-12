@@ -39,7 +39,7 @@ INTVAL
 Parrot_platform_get_entropy(PARROT_INTERP) {
     HCRYPTPROV hCryptProv;
     INTVAL     entropy;
-    if (!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL, 0)){
+    if (!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)){
         /* ... */
     }
     if (!CryptGenRandom(hCryptProv, sizeof(INTVAL), &entropy)) {
