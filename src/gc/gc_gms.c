@@ -895,7 +895,8 @@ gc_gms_select_generation_to_collect(PARROT_INTERP)
     /* TODO Use less naive approach. E.g. count amount of allocated memory in
      * older generations */
     size_t runs = interp->gc_sys->stats.gc_mark_runs;
-/*    if (runs % 100000000 == 0)
+/*  
+    if (runs % 100000000 == 0)
         return 8;
     if (runs % 10000000 == 0)
         return 7;
@@ -903,8 +904,9 @@ gc_gms_select_generation_to_collect(PARROT_INTERP)
         return 6;
     if (runs % 100000 == 0)
         return 5;
-*/    if (runs % 10000 == 0)
+    if (runs % 10000 == 0)
         return 4;
+*/
     if (runs % 1000 == 0)
         return 3;
     if (runs % 100 == 0)
