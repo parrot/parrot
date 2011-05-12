@@ -36,7 +36,7 @@ Get one INTVAL worth of entropy from the system.
 */
 
 INTVAL
-Parrot_platform_get_entropy(void) {
+Parrot_platform_get_entropy(PARROT_INTERP) {
     HCRYPTPROV hCryptProv;
     INTVAL     entropy;
     if (!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL, 0)){
