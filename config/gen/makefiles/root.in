@@ -2672,9 +2672,7 @@ SPLINT_SOURCE = \
 	$$(find src/*.c src/gc/*.c src/io/*.c src/packfile/*.c src/string/*.c -type f | \
 	grep -v src/gc/malloc.c | \
 	grep -v src/gc/malloc_trace.c | \
-	grep -v extra_nci_thunks.c | \
 	grep -v extend_vtable.c | \
-	grep -v nci_test.c | \
 	sort)
 
 # "splint" is the less-thorough splint target.  For cage cleaning work,
