@@ -783,10 +783,19 @@ TEMPLATE
         $I0 = sig[i]
         $I1 = bnot .DATATYPE_REF_FLAG
         $I2 = band $I0, $I1
+        $I1 = exists sig_table[$I2]
+        unless $I1 goto unsupported_type
         $S1 = sig_table[$I2; field_name]
         result[i] = $S1
         inc i
         goto loop
+    unsupported_type:
+        $P0 = null
+        $P0 = dlfunc $P0, "Parrot_dt_get_datatype_name", "SpI"
+        $P1 = getinterp
+        $S0 = $P0($P1, $I0)
+        $S0 = 'sprintf'("Unsupported type: `%s'", $S0)
+        die $S0
     end_loop:
 
     .return (result)
