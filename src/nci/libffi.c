@@ -59,7 +59,7 @@ typedef union parrot_var_t {
 } parrot_var_t;
 
 typedef union nci_var_t {
-    float   f; double   d;
+    float   f; double   d; long double ld;
     char    c; short    s; int i; long l;
     void   *p;
     INTVAL  I; FLOATVAL N; STRING *S; PMC *P;
@@ -300,28 +300,29 @@ nci_to_ffi_type(PARROT_INTERP, PARROT_DATA_TYPE nci_t)
 {
     ASSERT_ARGS(nci_to_ffi_type)
     switch (nci_t) {
-      case enum_type_void:     return &ffi_type_void;
+      case enum_type_void:       return &ffi_type_void;
 
-      case enum_type_float:    return &ffi_type_float;
-      case enum_type_double:   return &ffi_type_double;
-      case enum_type_FLOATVAL: return &ffi_type_parrot_numval;
+      case enum_type_float:      return &ffi_type_float;
+      case enum_type_double:     return &ffi_type_double;
+      case enum_type_longdouble: return &ffi_type_longdouble;
+      case enum_type_FLOATVAL:   return &ffi_type_parrot_numval;
 
-      case enum_type_char:     return &ffi_type_schar;
-      case enum_type_short:    return &ffi_type_sshort;
-      case enum_type_int:      return &ffi_type_sint;
-      case enum_type_long:     return &ffi_type_slong;
-      case enum_type_INTVAL:   return &ffi_type_parrot_intval;
+      case enum_type_char:       return &ffi_type_schar;
+      case enum_type_short:      return &ffi_type_sshort;
+      case enum_type_int:        return &ffi_type_sint;
+      case enum_type_long:       return &ffi_type_slong;
+      case enum_type_INTVAL:     return &ffi_type_parrot_intval;
 
       case enum_type_STRING:
       case enum_type_ptr:
       case enum_type_PMC:
-                               return &ffi_type_pointer;
+                                 return &ffi_type_pointer;
 
       default:
         if (nci_t & enum_type_ref_flag)
-                               return &ffi_type_pointer;
+                                 return &ffi_type_pointer;
         else
-                               return NULL;
+                                 return NULL;
     }
 }
 
@@ -345,6 +346,10 @@ prep_pcc_ret_arg(PARROT_INTERP, PARROT_DATA_TYPE t, parrot_var_t *pv, void **rv,
         break;
       case enum_type_double:
         pv->n = *(double *)val;
+        *rv   = &pv->n;
+        break;
+      case enum_type_longdouble:
+        pv->n = *(long double *)val;
         *rv   = &pv->n;
         break;
       case enum_type_FLOATVAL:
@@ -518,6 +523,10 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
               case enum_type_double:
                 nci_val[i].d   = pcc_arg[i].n;
                 nci_arg_ptr[i] = &nci_val[i].d;
+                break;
+              case enum_type_longdouble:
+                nci_val[i].ld  = pcc_arg[i].n;
+                nci_arg_ptr[i] = &nci_val[i].ld;
                 break;
               case enum_type_FLOATVAL:
                 nci_val[i].N   = pcc_arg[i].n;
