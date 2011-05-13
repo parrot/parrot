@@ -45,7 +45,7 @@ use base qw(Parrot::Configure::Step);
 use Parrot::Configure::Utils ':gen';
 
 # taken from List::MoreUtils
-sub any (&@) {
+sub any {
     my $f = shift;
     return if ! @_;
     for (@_) {
@@ -754,7 +754,7 @@ sub gen_opengl_wrappers {
                     push @nci_sig, $NCI_TYPE{$param};
                 }
 
-                if (any { $_ eq 'void' } @nci_sig[1..$#nci_sig]) {
+                if (any sub { $_ eq 'void' }, @nci_sig[1..$#nci_sig]) {
                     $fail{$file}++;
                     warn "In OpenGL header '$file', prototype '$name', there is a void parameter; original prototype:\n  $orig\n"
                       if $verbose;
