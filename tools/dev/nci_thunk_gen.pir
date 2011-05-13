@@ -1002,6 +1002,18 @@ JSON
     $P1 = 'from_json'('{ "c_type": "long long", "sig_char": "I", "pcc_type": "INTVAL" }')
     table[.DATATYPE_LONGLONG] = $P1
 
+    $P1 = 'from_json'('{ "c_type": "Parrot_Int1", "sig_char": "I", "pcc_type": "INTVAL" }')
+    table[.DATATYPE_INT8] = $P1
+
+    $P1 = 'from_json'('{ "c_type": "Parrot_Int2", "sig_char": "I", "pcc_type": "INTVAL" }')
+    table[.DATATYPE_INT16] = $P1
+
+    $P1 = 'from_json'('{ "c_type": "Parrot_Int4", "sig_char": "I", "pcc_type": "INTVAL" }')
+    table[.DATATYPE_INT32] = $P1
+
+    $P1 = 'from_json'('{ "c_type": "Parrot_Int8", "sig_char": "I", "pcc_type": "INTVAL" }')
+    table[.DATATYPE_INT64] = $P1
+
     $P1 = 'from_json'('{ "c_type": "float", "sig_char": "N", "pcc_type": "FLOATVAL" }')
     table[.DATATYPE_FLOAT] = $P1
 

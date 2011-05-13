@@ -72,6 +72,10 @@ typedef union nci_var_t {
 #if PARROT_HAS_LONGLONG
     long long ll;
 #endif
+    Parrot_Int1 i8; Parrot_Int2 i16; Parrot_Int4 i32;
+#if PARROT_HAS_INT64
+    Parrot_Int8 i64;
+#endif
     void   *p;
     INTVAL  I; FLOATVAL N; STRING *S; PMC *P;
 } nci_var_t;
@@ -324,8 +328,12 @@ nci_to_ffi_type(PARROT_INTERP, PARROT_DATA_TYPE nci_t)
       case enum_type_long:       return &ffi_type_slong;
 #if PARROT_HAS_LONGLONG
       case enum_type_longlong:   return &ffi_type_slonglong;
-#else
-      case enum_type_longlong:   return NULL;
+#endif
+      case enum_type_int8:       return &ffi_type_sint8;
+      case enum_type_int16:      return &ffi_type_sint16;
+      case enum_type_int32:      return &ffi_type_sint32;
+#if PARROT_HAS_INT64
+      case enum_type_int64:      return &ffi_type_sint64;
 #endif
       case enum_type_INTVAL:     return &ffi_type_parrot_intval;
 
@@ -392,6 +400,24 @@ prep_pcc_ret_arg(PARROT_INTERP, PARROT_DATA_TYPE t, parrot_var_t *pv, void **rv,
 #if PARROT_HAS_LONGLONG
       case enum_type_longlong:
         pv->i = *(long long *)val;
+        *rv   = &pv->i;
+        break;
+#endif
+      case enum_type_int8:
+        pv->i = *(Parrot_Int1 *)val;
+        *rv   = &pv->i;
+        break;
+      case enum_type_int16:
+        pv->i = *(Parrot_Int2 *)val;
+        *rv   = &pv->i;
+        break;
+      case enum_type_int32:
+        pv->i = *(Parrot_Int4 *)val;
+        *rv   = &pv->i;
+        break;
+#if PARROT_HAS_INT64
+      case enum_type_int64:
+        pv->i = *(Parrot_Int8 *)val;
         *rv   = &pv->i;
         break;
 #endif
@@ -537,6 +563,24 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
               case enum_type_longlong:
                 nci_val[i].ll  = pcc_arg[i].i;
                 nci_arg_ptr[i] = &nci_val[i].ll;
+                break;
+#endif
+              case enum_type_int8:
+                nci_val[i].i8  = pcc_arg[i].i;
+                nci_arg_ptr[i] = &nci_val[i].i8;
+                break;
+              case enum_type_int16:
+                nci_val[i].i16 = pcc_arg[i].i;
+                nci_arg_ptr[i] = &nci_val[i].i16;
+                break;
+              case enum_type_int32:
+                nci_val[i].i32 = pcc_arg[i].i;
+                nci_arg_ptr[i] = &nci_val[i].i32;
+                break;
+#if PARROT_HAS_INT64
+              case enum_type_int64:
+                nci_val[i].i64 = pcc_arg[i].i;
+                nci_arg_ptr[i] = &nci_val[i].i64;
                 break;
 #endif
               case enum_type_INTVAL:
