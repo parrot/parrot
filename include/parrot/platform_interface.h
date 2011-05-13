@@ -399,6 +399,13 @@ UINTVAL Parrot_get_user_id(void);
 PARROT_EXPORT
 size_t Parrot_sysmem_amount(Interp*);
 
+/*
+ * Entropy
+ */
+
+PARROT_EXPORT
+INTVAL Parrot_get_entropy(PARROT_INTERP);
+
 #endif /* PARROT_PLATFORM_INTERFACE_H_GUARD */
 
 /*
