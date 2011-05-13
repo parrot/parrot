@@ -45,7 +45,7 @@ use base qw(Parrot::Configure::Step);
 use Parrot::Configure::Utils ':gen';
 
 # taken from List::MoreUtils
-sub any (&@) {
+sub any {
     my $f = shift;
     return if ! @_;
     for (@_) {
@@ -258,12 +258,10 @@ my %C_TYPE = (
 
 my %NCI_TYPE = (
     ( map {( $_ => $_ )}
-        qw[ void char short int long float double ] ),
+        qw[ void char short int long longlong float double longdouble ] ),
 
     size_t       => 'long',
     ptrdiff_t    => 'long',
-    # Requires TT #1182
-    # longlong     => 'L',
 
     ( map {( "$_*" => 'ptr', "$_**" => 'ptr' )}
         qw[ void char short int long ptrdiff_t longlong float double ] ),
@@ -335,23 +333,6 @@ my @IGNORE = (
     'DescribePixelFormat',
     'GetPixelFormat',
     'SetPixelFormat',
-
-    # Can't handle longlong until TT #1182 is done
-    'glBufferAddressRangeNV',
-    'glClientWaitSync',
-    'glUniformui64NV',
-    'glProgramUniformui64NV',
-    'glPresentFrameKeyedNV',
-    'glPresentFrameDualFillNV',
-    'glWaitSync',
-    'glXSwapBuffersMscOML',
-    'glXWaitForMscOML',
-    'glXWaitForSbcOML',
-    'wglGetSyncValuesOML',
-    'wglSwapBuffersMscOML',
-    'wglSwapLayerBuffersMscOML',
-    'wglWaitForMscOML',
-    'wglWaitForSbcOML',
 
     # Can't handle weird data types specified only in proprietary headers
     'glXCreateGLXVideoSourceSGIX',
@@ -754,7 +735,7 @@ sub gen_opengl_wrappers {
                     push @nci_sig, $NCI_TYPE{$param};
                 }
 
-                if (any { $_ eq 'void' } @nci_sig[1..$#nci_sig]) {
+                if (any sub { $_ eq 'void' }, @nci_sig[1..$#nci_sig]) {
                     $fail{$file}++;
                     warn "In OpenGL header '$file', prototype '$name', there is a void parameter; original prototype:\n  $orig\n"
                       if $verbose;

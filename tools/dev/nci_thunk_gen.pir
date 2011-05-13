@@ -783,10 +783,19 @@ TEMPLATE
         $I0 = sig[i]
         $I1 = bnot .DATATYPE_REF_FLAG
         $I2 = band $I0, $I1
+        $I1 = exists sig_table[$I2]
+        unless $I1 goto unsupported_type
         $S1 = sig_table[$I2; field_name]
         result[i] = $S1
         inc i
         goto loop
+    unsupported_type:
+        $P0 = null
+        $P0 = dlfunc $P0, "Parrot_dt_get_datatype_name", "SpI"
+        $P1 = getinterp
+        $S0 = $P0($P1, $I0)
+        $S0 = 'sprintf'("Unsupported type: `%s'", $S0)
+        die $S0
     end_loop:
 
     .return (result)
@@ -978,22 +987,40 @@ REGEX
 JSON
     table[.DATATYPE_PTR]  = $P1
 
-    $P1 = 'from_json'('{ "c_type": "int", "sig_char": "I", "pcc_type": "INTVAL" }')
-    table[.DATATYPE_INT]  = $P1
-
-    $P1 = 'from_json'('{ "c_type": "long", "sig_char": "I", "pcc_type": "INTVAL" }')
-    table[.DATATYPE_LONG] = $P1
-
     $P1 = 'from_json'('{ "c_type": "char", "sig_char": "I", "pcc_type": "INTVAL" }')
     table[.DATATYPE_CHAR] = $P1
 
     $P1 = 'from_json'('{ "c_type": "short", "sig_char": "I", "pcc_type": "INTVAL" }')
     table[.DATATYPE_SHORT] = $P1
 
+    $P1 = 'from_json'('{ "c_type": "int", "sig_char": "I", "pcc_type": "INTVAL" }')
+    table[.DATATYPE_INT]  = $P1
+
+    $P1 = 'from_json'('{ "c_type": "long", "sig_char": "I", "pcc_type": "INTVAL" }')
+    table[.DATATYPE_LONG] = $P1
+
+    $P1 = 'from_json'('{ "c_type": "long long", "sig_char": "I", "pcc_type": "INTVAL" }')
+    table[.DATATYPE_LONGLONG] = $P1
+
+    $P1 = 'from_json'('{ "c_type": "Parrot_Int1", "sig_char": "I", "pcc_type": "INTVAL" }')
+    table[.DATATYPE_INT8] = $P1
+
+    $P1 = 'from_json'('{ "c_type": "Parrot_Int2", "sig_char": "I", "pcc_type": "INTVAL" }')
+    table[.DATATYPE_INT16] = $P1
+
+    $P1 = 'from_json'('{ "c_type": "Parrot_Int4", "sig_char": "I", "pcc_type": "INTVAL" }')
+    table[.DATATYPE_INT32] = $P1
+
+    $P1 = 'from_json'('{ "c_type": "Parrot_Int8", "sig_char": "I", "pcc_type": "INTVAL" }')
+    table[.DATATYPE_INT64] = $P1
+
     $P1 = 'from_json'('{ "c_type": "float", "sig_char": "N", "pcc_type": "FLOATVAL" }')
     table[.DATATYPE_FLOAT] = $P1
 
     $P1 = 'from_json'('{ "c_type": "double", "sig_char": "N", "pcc_type": "FLOATVAL" }')
+    table[.DATATYPE_DOUBLE] = $P1
+
+    $P1 = 'from_json'('{ "c_type": "long double", "sig_char": "N", "pcc_type": "FLOATVAL" }')
     table[.DATATYPE_DOUBLE] = $P1
 
     $P1 = 'from_json'(<<'JSON')
