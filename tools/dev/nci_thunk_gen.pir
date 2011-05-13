@@ -987,17 +987,20 @@ REGEX
 JSON
     table[.DATATYPE_PTR]  = $P1
 
+    $P1 = 'from_json'('{ "c_type": "char", "sig_char": "I", "pcc_type": "INTVAL" }')
+    table[.DATATYPE_CHAR] = $P1
+
+    $P1 = 'from_json'('{ "c_type": "short", "sig_char": "I", "pcc_type": "INTVAL" }')
+    table[.DATATYPE_SHORT] = $P1
+
     $P1 = 'from_json'('{ "c_type": "int", "sig_char": "I", "pcc_type": "INTVAL" }')
     table[.DATATYPE_INT]  = $P1
 
     $P1 = 'from_json'('{ "c_type": "long", "sig_char": "I", "pcc_type": "INTVAL" }')
     table[.DATATYPE_LONG] = $P1
 
-    $P1 = 'from_json'('{ "c_type": "char", "sig_char": "I", "pcc_type": "INTVAL" }')
-    table[.DATATYPE_CHAR] = $P1
-
-    $P1 = 'from_json'('{ "c_type": "short", "sig_char": "I", "pcc_type": "INTVAL" }')
-    table[.DATATYPE_SHORT] = $P1
+    $P1 = 'from_json'('{ "c_type": "long long", "sig_char": "I", "pcc_type": "INTVAL" }')
+    table[.DATATYPE_LONGLONG] = $P1
 
     $P1 = 'from_json'('{ "c_type": "float", "sig_char": "N", "pcc_type": "FLOATVAL" }')
     table[.DATATYPE_FLOAT] = $P1

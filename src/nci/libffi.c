@@ -40,6 +40,14 @@ This file implements a native call frame (thunk) factory using libffi.
 #  error "unhandled NUMVAL_SIZE value"
 #endif
 
+#if PARROT_HAS_LONGLONG
+#  if (LONGLONG_SIZE == 8)
+#    define ffi_type_slonglong ffi_type_sint64
+#  else
+#    error "unhandled long long size"
+#  endif
+#endif
+
 typedef struct ffi_thunk_t {
     ffi_cif    cif;
     ffi_type **arg_types;
@@ -61,6 +69,9 @@ typedef union parrot_var_t {
 typedef union nci_var_t {
     float   f; double   d; long double ld;
     char    c; short    s; int i; long l;
+#if PARROT_HAS_LONGLONG
+    long long ll;
+#endif
     void   *p;
     INTVAL  I; FLOATVAL N; STRING *S; PMC *P;
 } nci_var_t;
@@ -311,6 +322,11 @@ nci_to_ffi_type(PARROT_INTERP, PARROT_DATA_TYPE nci_t)
       case enum_type_short:      return &ffi_type_sshort;
       case enum_type_int:        return &ffi_type_sint;
       case enum_type_long:       return &ffi_type_slong;
+#if PARROT_HAS_LONGLONG
+      case enum_type_longlong:   return &ffi_type_slonglong;
+#else
+      case enum_type_longlong:   return NULL;
+#endif
       case enum_type_INTVAL:     return &ffi_type_parrot_intval;
 
       case enum_type_STRING:
@@ -373,6 +389,12 @@ prep_pcc_ret_arg(PARROT_INTERP, PARROT_DATA_TYPE t, parrot_var_t *pv, void **rv,
         pv->i = *(long *)val;
         *rv   = &pv->i;
         break;
+#if PARROT_HAS_LONGLONG
+      case enum_type_longlong:
+        pv->i = *(long long *)val;
+        *rv   = &pv->i;
+        break;
+#endif
       case enum_type_INTVAL:
         pv->i = *(INTVAL *)val;
         *rv   = &pv->i;
@@ -511,6 +533,12 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 nci_val[i].l   = pcc_arg[i].i;
                 nci_arg_ptr[i] = &nci_val[i].l;
                 break;
+#if PARROT_HAS_LONGLONG
+              case enum_type_longlong:
+                nci_val[i].ll  = pcc_arg[i].i;
+                nci_arg_ptr[i] = &nci_val[i].ll;
+                break;
+#endif
               case enum_type_INTVAL:
                 nci_val[i].I   = pcc_arg[i].i;
                 nci_arg_ptr[i] = &nci_val[i].I;
