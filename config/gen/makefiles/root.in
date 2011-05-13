@@ -1649,6 +1649,10 @@ src/platform/generic/time$(O) : src/platform/generic/time.c $(PARROT_H_HEADERS)
 
 src/platform/generic/uid$(O) : src/platform/generic/uid.c $(PARROT_H_HEADERS)
 
+src/platform/generic/entropy$(O) : src/platform/generic/entropy.c $(PARROT_H_HEADERS)
+
+src/platform/win32/entropy$(O) : src/platform/win32/entropy.c $(PARROT_H_HEADERS)
+
 src/platform/linux/encoding$(O) : src/platform/linux/encoding.c $(PARROT_H_HEADERS)
 
 src/platform/netbsd/misc$(O) : src/platform/netbsd/misc.c $(PARROT_H_HEADERS)
