@@ -333,7 +333,41 @@ sub new_interp {
 
     $interp->[OP_FUNCS] = [
         \&m0_opfunc_noop,
-        \&m0_opfunc_say_i,
+        \&m0_opfunc_goto,
+        \&m0_opfunc_goto_if_eq,
+        \&m0_opfunc_goto_cs,
+        \&m0_opfunc_add_i,
+        \&m0_opfunc_add_n,
+        \&m0_opfunc_sub_i,
+        \&m0_opfunc_sub_n,
+        \&m0_opfunc_mult_i,
+        \&m0_opfunc_mult_n,
+        \&m0_opfunc_div_i,
+        \&m0_opfunc_div_n,
+        \&m0_opfunc_mod_i,
+        \&m0_opfunc_mod_n,
+        \&m0_opfunc_iton,
+        \&m0_opfunc_ntoi,
+        \&m0_opfunc_ashr,
+        \&m0_opfunc_lshr,
+        \&m0_opfunc_shl,
+        \&m0_opfunc_and,
+        \&m0_opfunc_or,
+        \&m0_opfunc_xor,
+        \&m0_opfunc_set,
+        \&m0_opfunc_copy_byte,
+        \&m0_opfunc_copy_mem,
+        \&m0_opfunc_set_var,
+        \&m0_opfunc_csym,
+        \&m0_opfunc_ccall_arg,
+        \&m0_opfunc_ccall_ret,
+        \&m0_opfunc_ccall,
+        \&m0_opfunc_print_s,
+        \&m0_opfunc_print_i,
+        \&m0_opfunc_print_n,
+        \&m0_opfunc_alloc,
+        \&m0_opfunc_free,
+        \&m0_opfunc_exit,
     ];
     $interp->[CONFIG] = {};
     $interp->[CONTEXTS] = [];
@@ -415,11 +449,184 @@ sub load_m0b {
     parse_m0b_chunks($interp, $m0b, \$cursor);
 }
 
-sub m0_opfunc_noop { }
-
-sub m0_opfunc_say_i {
+sub m0_opfunc_noop {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "HELLO IS THIS THING ON????? $a1, $a2, $a3";
+    say "noop $a1, $a2, $a3";
+}
+
+sub m0_opfunc_goto {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "goto $a1, $a2, $a3";
+}
+
+sub m0_opfunc_goto_if_eq {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "goto_if_eq $a1, $a2, $a3";
+}
+
+sub m0_opfunc_goto_cs {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "goto_cs $a1, $a2, $a3";
+}
+
+sub m0_opfunc_add_i {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "add_i $a1, $a2, $a3";
+}
+
+sub m0_opfunc_add_n {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "add_n $a1, $a2, $a3";
+}
+
+sub m0_opfunc_sub_i {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "sub_i $a1, $a2, $a3";
+}
+
+sub m0_opfunc_sub_n {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "sub_n $a1, $a2, $a3";
+}
+
+sub m0_opfunc_mult_i {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "mult_i $a1, $a2, $a3";
+}
+
+sub m0_opfunc_mult_n {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "mult_n $a1, $a2, $a3";
+}
+
+sub m0_opfunc_div_i {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "div_i $a1, $a2, $a3";
+}
+
+sub m0_opfunc_div_n {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "div_n $a1, $a2, $a3";
+}
+
+sub m0_opfunc_mod_i {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "mod_i $a1, $a2, $a3";
+}
+
+sub m0_opfunc_mod_n {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "mod_n $a1, $a2, $a3";
+}
+
+sub m0_opfunc_iton {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "iton $a1, $a2, $a3";
+}
+
+sub m0_opfunc_ntoi {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "ntoi $a1, $a2, $a3";
+}
+
+sub m0_opfunc_ashr {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "ashr $a1, $a2, $a3";
+}
+
+sub m0_opfunc_lshr {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "lshr $a1, $a2, $a3";
+}
+
+sub m0_opfunc_shl {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "shl $a1, $a2, $a3";
+}
+
+sub m0_opfunc_and {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "and $a1, $a2, $a3";
+}
+
+sub m0_opfunc_or {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "or $a1, $a2, $a3";
+}
+
+sub m0_opfunc_xor {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "xor $a1, $a2, $a3";
+}
+
+sub m0_opfunc_set {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "set $a1, $a2, $a3";
+}
+
+sub m0_opfunc_copy_byte {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "copy_byte $a1, $a2, $a3";
+}
+
+sub m0_opfunc_copy_mem {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "copy_mem $a1, $a2, $a3";
+}
+
+sub m0_opfunc_set_var {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "set_var $a1, $a2, $a3";
+}
+
+sub m0_opfunc_csym {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "csym $a1, $a2, $a3";
+}
+
+sub m0_opfunc_ccall_arg {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "ccall_arg $a1, $a2, $a3";
+}
+
+sub m0_opfunc_ccall_ret {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "ccall_ret $a1, $a2, $a3";
+}
+
+sub m0_opfunc_ccall {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "ccall $a1, $a2, $a3";
+}
+
+sub m0_opfunc_print_s {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "print_s $a1, $a2, $a3";
+}
+
+sub m0_opfunc_print_i {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "print_i $a1, $a2, $a3";
+}
+
+sub m0_opfunc_print_n {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "print_n $a1, $a2, $a3";
+}
+
+sub m0_opfunc_alloc {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "alloc $a1, $a2, $a3";
+}
+
+sub m0_opfunc_free {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "free $a1, $a2, $a3";
+}
+
+sub m0_opfunc_exit {
+    my ($ctx, $a1, $a2, $a3) = @_;
+    say "exit $a1, $a2, $a3";
 }
 
 
