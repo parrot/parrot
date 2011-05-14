@@ -1475,11 +1475,11 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         return 0;
 
     /* If object too old - skip it */
-    if (POBJ2GEN(&item->pmc) > self->gen_to_collect)
+    if (POBJ2GEN(obj) > self->gen_to_collect)
         return 0;
 
     /* Object is on dirty_list. */
-    if (PObj_GC_on_dirty_list_TEST(&item->pmc))
+    if (PObj_GC_on_dirty_list_TEST(obj))
         return 0;
 
     if (!Parrot_gc_pool_is_owned(interp, self->pmc_allocator, item))
@@ -1489,7 +1489,7 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     if (Parrot_pa_is_owned(interp, self->objects[POBJ2GEN(obj)], item, item->ptr)) {
         if (POBJ2GEN(obj) == 0) {
             /* This is freshly allocated object on C stack. Soil it after GC run */
-            PObj_GC_soil_root_SET(&item->pmc);
+            PObj_GC_soil_root_SET(obj);
         }
         return 1;
     }
