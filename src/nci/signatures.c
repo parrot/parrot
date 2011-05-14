@@ -245,8 +245,10 @@ Provide a descriptive string for a signature.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_nci_describe_sig(PARROT_INTERP, PMC *sig)
+Parrot_nci_describe_sig(PARROT_INTERP, ARGIN(PMC *sig))
 {
     ASSERT_ARGS(Parrot_nci_describe_sig)
 
