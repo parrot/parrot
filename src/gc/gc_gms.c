@@ -1384,8 +1384,8 @@ gc_gms_finalize(PARROT_INTERP)
     Parrot_gc_str_finalize(interp, &self->string_gc);
 
     for (i = 0; i < MAX_GENERATIONS; i++) {
-        Parrot_pa_destroy(interp, self->objects[0]);
-        Parrot_pa_destroy(interp, self->strings[0]);
+        Parrot_pa_destroy(interp, self->objects[i]);
+        Parrot_pa_destroy(interp, self->strings[i]);
     }
 
     Parrot_gc_pool_destroy(interp, self->pmc_allocator);
