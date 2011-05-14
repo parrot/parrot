@@ -348,18 +348,18 @@ PMC ** Parrot_pcc_get_PMC_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
-Regs_ni* Parrot_pcc_get_regs_ni(SHIM_INTERP, ARGIN(const PMC *ctx))
+Regs_ni* Parrot_pcc_get_regs_ni(PARROT_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
-Regs_ps* Parrot_pcc_get_regs_ps(SHIM_INTERP, ARGIN(PMC *ctx))
+Regs_ps* Parrot_pcc_get_regs_ps(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
-UINTVAL Parrot_pcc_get_regs_used(SHIM_INTERP,
+UINTVAL Parrot_pcc_get_regs_used(PARROT_INTERP,
     ARGIN(const PMC *ctx),
     int type)
         __attribute__nonnull__(2);
@@ -376,7 +376,7 @@ STRING ** Parrot_pcc_get_STRING_reg(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_sub(SHIM_INTERP, ARGIN(const PMC *ctx))
+PMC* Parrot_pcc_get_sub(PARROT_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -386,7 +386,7 @@ void Parrot_pcc_set_context_func(PARROT_INTERP, ARGIN(PMC *ctx))
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-void Parrot_pcc_set_regs_ni(SHIM_INTERP,
+void Parrot_pcc_set_regs_ni(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(Regs_ni *bp))
         __attribute__nonnull__(2)
@@ -394,14 +394,14 @@ void Parrot_pcc_set_regs_ni(SHIM_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-void Parrot_pcc_set_regs_ps(SHIM_INTERP,
+void Parrot_pcc_set_regs_ps(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(Regs_ps *bp_ps))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_pcc_set_regs_used(SHIM_INTERP,
+void Parrot_pcc_set_regs_used(PARROT_INTERP,
     ARGIN(PMC *ctx),
     int type,
     INTVAL num)
@@ -454,7 +454,7 @@ void Parrot_pcc_free_registers(PARROT_INTERP, ARGIN(PMC *pmcctx))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_pcc_init_context(SHIM_INTERP,
+PMC * Parrot_pcc_init_context(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(PMC *old))
         __attribute__nonnull__(2);

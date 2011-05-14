@@ -54,7 +54,7 @@ static PackFile_Segment * byte_code_new(PARROT_INTERP)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t * byte_code_pack(SHIM_INTERP,
+static opcode_t * byte_code_pack(PARROT_INTERP,
     ARGMOD(PackFile_Segment *self),
     ARGOUT(opcode_t *cursor))
         __attribute__nonnull__(2)
@@ -64,7 +64,7 @@ static opcode_t * byte_code_pack(SHIM_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static size_t byte_code_packed_size(SHIM_INTERP,
+static size_t byte_code_packed_size(PARROT_INTERP,
     ARGMOD(PackFile_Segment *self))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
@@ -292,7 +292,7 @@ static opcode_t * pf_debug_pack(PARROT_INTERP,
         FUNC_MODIFIES(*self)
         FUNC_MODIFIES(*cursor);
 
-static size_t pf_debug_packed_size(SHIM_INTERP,
+static size_t pf_debug_packed_size(PARROT_INTERP,
     ARGMOD(PackFile_Segment *self))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);

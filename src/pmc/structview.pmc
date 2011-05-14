@@ -97,10 +97,7 @@ END_PMC_HEADER_PREAMBLE
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void deallocate_ptrobj(SHIM_INTERP,
-    SHIM(PMC *obj),
-    ARGFREE(void *ptr));
-
+static void deallocate_ptrobj(PARROT_INTERP, PMC *obj, ARGFREE(void *ptr));
 #define ASSERT_ARGS_deallocate_ptrobj __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */

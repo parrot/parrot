@@ -135,7 +135,7 @@ void Parrot_cx_schedule_timer(PARROT_INTERP,
 PARROT_EXPORT
 void Parrot_cx_send_message(PARROT_INTERP,
     ARGIN(STRING *messagetype),
-    SHIM(PMC *payload))
+    PMC *payload)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

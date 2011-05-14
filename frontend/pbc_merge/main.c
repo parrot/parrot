@@ -83,7 +83,7 @@ static void pbc_fixup_bytecode(PARROT_INTERP,
 static void pbc_fixup_constants(PARROT_INTERP,
     ARGMOD(pbc_merge_input **inputs),
     int num_inputs,
-    SHIM(PackFile_ConstTable *ct))
+    PackFile_ConstTable *ct)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*inputs);

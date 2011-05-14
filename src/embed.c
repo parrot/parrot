@@ -39,7 +39,7 @@ static void print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
+static void print_debug(PARROT_INTERP, int status, void *p)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL

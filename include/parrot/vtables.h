@@ -32,7 +32,7 @@ void Parrot_vtbl_initialize_core_vtables(PARROT_INTERP)
 PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-VTABLE * Parrot_vtbl_new_vtable(SHIM_INTERP);
+VTABLE * Parrot_vtbl_new_vtable(PARROT_INTERP);
 
 void Parrot_vtbl_alloc_vtables(PARROT_INTERP)
         __attribute__nonnull__(1);
