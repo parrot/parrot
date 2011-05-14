@@ -100,21 +100,48 @@ return the bytecode represenation of the operation.
 
 =cut
 
+# Ix = 8+x, Nx =  70 + x, Sx = 132 + x, Px = 194 + x
+sub register_name_to_num {
+    my ($register) = @_;
+
+    if( length $register > 3 ){
+       die "Invalid register name: $register";
+    }
+
+    my $num  = substr($register, 1, 2);
+    my $type = substr($register, 0, 1);
+
+    unless ( defined $num && $num >= 0 && $num <= 61 ) {
+       die "Invalid register number: $register";
+    }
+
+    my $reg_rx = qr/^[INSP]/;
+    unless ( $type =~ $reg_rx ) {
+        die "Invalid register type $type in register $register";
+    }
+
+    my $reg_table = {
+        I => sub { $_[0] + 8   },
+        N => sub { $_[0] + 70  },
+        S => sub { $_[0] + 132 },
+        P => sub { $_[0] + 194 },
+    };
+    return $reg_table->{$type}->($num);
+}
 
 sub to_bytecode {
-    my ($ops,$op) = @_;
-    my $bytecode = '';
-    my $opnumber = opname_to_num($ops, $op->{opname});
-    warn $op->{opname} . '=>' . $opnumber;
-    $bytecode .= pack('h', $opnumber);
+    my ($ops,$op)      = @_;
+    my $opnumber       = opname_to_num($ops, $op->{opname});
+    my ($a1, $a2, $a3) = map { $op->{"arg" . $_} } (1 .. 3);
+    my $bytecode       = pack('h', $opnumber);
 
-    # TODO: This is wrong, but close.
-    # We must look up things in our variable table and replace
-    # the integer arguments, which are indexes into our variable table, 
-    # with their values
-    $bytecode .= pack('C', $op->{arg1});
-    $bytecode .= pack('C', $op->{arg2});
-    $bytecode .= pack('C', $op->{arg3});
+    # We need to convert the symbolic register names into numbers
+    # as described in "Register Types and Context Structure" in the M0 spec
+
+    map {
+        $bytecode .= pack('C', $_ =~ /^[INSP]/ ? register_name_to_num($a1) : $_ );
+    } ($a1, $a2, $a3);
+
     return $bytecode;
 }
 
