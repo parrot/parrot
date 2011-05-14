@@ -1384,8 +1384,8 @@ gc_gms_finalize(PARROT_INTERP)
     Parrot_gc_str_finalize(interp, &self->string_gc);
 
     for (i = 0; i < MAX_GENERATIONS; i++) {
-        Parrot_pa_destroy(interp, self->objects[0]);
-        Parrot_pa_destroy(interp, self->strings[0]);
+        Parrot_pa_destroy(interp, self->objects[i]);
+        Parrot_pa_destroy(interp, self->strings[i]);
     }
 
     Parrot_gc_pool_destroy(interp, self->pmc_allocator);
@@ -1462,12 +1462,13 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     PObj             * const obj  = (PObj *)ptr;
     pmc_alloc_struct * const item = PMC2PAC(ptr);
+    size_t                   i;
 
     /* Not aligned pointers aren't pointers */
     if (!obj || !item || ((size_t)obj & 3) || ((size_t)item & 3))
         return 0;
 
-    if (!Parrot_gc_pool_is_maybe_owned(interp, self->pmc_allocator, item))
+    if (!Parrot_gc_pool_is_owned(interp, self->pmc_allocator, item))
         return 0;
 
     /* black or white objects marked already. */
@@ -1475,23 +1476,21 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         return 0;
 
     /* If object too old - skip it */
-    if (POBJ2GEN(&item->pmc) > self->gen_to_collect)
+    if (POBJ2GEN(obj) > self->gen_to_collect)
         return 0;
 
     /* Object is on dirty_list. */
-    if (PObj_GC_on_dirty_list_TEST(&item->pmc))
-        return 0;
-
-    if (!Parrot_gc_pool_is_owned(interp, self->pmc_allocator, item))
+    if (PObj_GC_on_dirty_list_TEST(obj))
         return 0;
 
     /* Pool.is_owned isn't precise enough (yet) */
-    if (Parrot_pa_is_owned(interp, self->objects[POBJ2GEN(obj)], item, item->ptr)) {
-        if (POBJ2GEN(obj) == 0) {
-            /* This is freshly allocated object on C stack. Soil it after GC run */
-            PObj_GC_soil_root_SET(&item->pmc);
+    /* XXX Temporary workaround to see why commit 6f0cfa8 broke win32 */
+    for (i = 0; i < MAX_GENERATIONS; i++) {
+        if (Parrot_pa_is_owned(interp, self->objects[i], item, item->ptr)) {
+            if (POBJ2GEN(obj) == 0)
+                PObj_GC_soil_root_SET(obj);
+            return 1;
         }
-        return 1;
     }
 
     return 0;
@@ -1615,12 +1614,13 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     PObj             * const obj  = (PObj *)ptr;
     string_alloc_struct * const item = STR2PAC(ptr);
+    size_t                      i;
 
     /* Not aligned pointers aren't pointers */
     if (!obj || !item || ((size_t)obj & 3) || ((size_t)item & 3))
         return 0;
 
-    if (!Parrot_gc_pool_is_maybe_owned(interp, self->string_allocator, item))
+    if (!Parrot_gc_pool_is_owned(interp, self->string_allocator, item))
         return 0;
 
     /* black or white objects marked already. */
@@ -1631,11 +1631,10 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     if (POBJ2GEN(&item->str) > self->gen_to_collect)
         return 0;
 
-    if (!Parrot_gc_pool_is_owned(interp, self->string_allocator, item))
-        return 0;
-
-    if (Parrot_pa_is_owned(interp, self->strings[POBJ2GEN(obj)], item, item->ptr))
-        return 1;
+    for (i = 0; i < MAX_GENERATIONS; i++) {
+        if (Parrot_pa_is_owned(interp, self->strings[i], item, item->ptr))
+            return 1;
+    }
 
     return 0;
 }

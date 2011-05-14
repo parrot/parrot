@@ -50,7 +50,7 @@ Parrot_get_entropy(PARROT_INTERP) {
         else
             PANIC(interp, msg);
     }
-    count = fread(&entropy, sizeof(INTVAL), 1, urand_fh);
+    count = fread(&entropy, sizeof (INTVAL), 1, urand_fh);
     if (count != 1) {
         const char* msg = "Couldn't read from /dev/urandom.";
         fclose(urand_fh);
