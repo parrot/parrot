@@ -8,13 +8,13 @@
 /* HEADERIZER BEGIN: compilers/imcc/pbc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void e_pbc_close(ARGMOD(imc_info_t * imcc), SHIM(void *param))
+void e_pbc_close(ARGMOD(imc_info_t * imcc), void *param)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(* imcc);
 
 int e_pbc_emit(
     ARGMOD(imc_info_t * imcc),
-    SHIM(void *param),
+    void *param,
     ARGIN(const IMC_Unit *unit),
     ARGIN(const Instruction *ins))
         __attribute__nonnull__(1)
@@ -24,7 +24,7 @@ int e_pbc_emit(
 
 void e_pbc_end_sub(
     ARGMOD(imc_info_t * imcc),
-    SHIM(void *param),
+    void *param,
     ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
@@ -32,7 +32,7 @@ void e_pbc_end_sub(
 
 void e_pbc_new_sub(
     ARGMOD(imc_info_t * imcc),
-    SHIM(void *param),
+    void *param,
     ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)

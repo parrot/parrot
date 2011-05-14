@@ -348,9 +348,7 @@ void Parrot_destroy(PARROT_INTERP)
 PARROT_CAN_RETURN_NULL
 Interp* Parrot_get_emergency_interp(void);
 
-void Parrot_really_destroy(PARROT_INTERP,
-    NULLOK(int exit_code),
-    SHIM(void *arg))
+void Parrot_really_destroy(PARROT_INTERP, int exit_code, void *arg)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_allocate_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)

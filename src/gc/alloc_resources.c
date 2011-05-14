@@ -81,16 +81,16 @@ static void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
 static int sweep_cb_buf(PARROT_INTERP,
     ARGIN(Memory_Pools *mem_pools),
     ARGFREE(Fixed_Size_Pool *pool),
-    SHIM(int flag),
-    SHIM(void *arg))
+    int flag,
+    void *arg)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static int sweep_cb_pmc(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
-    SHIM(int flag),
-    SHIM(void *arg))
+    int flag,
+    void *arg)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

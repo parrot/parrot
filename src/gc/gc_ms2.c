@@ -79,8 +79,7 @@ static void failed_allocation(unsigned int line, unsigned long size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static Buffer* gc_ms2_allocate_buffer_header(PARROT_INTERP,
-    SHIM(size_t size))
+static Buffer* gc_ms2_allocate_buffer_header(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
 static void gc_ms2_allocate_buffer_storage(PARROT_INTERP,
@@ -96,11 +95,12 @@ static void* gc_ms2_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_ms2_allocate_memory_chunk(SHIM_INTERP, size_t size);
+static void * gc_ms2_allocate_memory_chunk(PARROT_INTERP, size_t size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_ms2_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size);
+static void * gc_ms2_allocate_memory_chunk_zeroed(PARROT_INTERP,
+    size_t size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
@@ -147,7 +147,7 @@ static void gc_ms2_finalize(PARROT_INTERP)
 
 static void gc_ms2_free_buffer_header(PARROT_INTERP,
     ARGFREE(Buffer *s),
-    SHIM(size_t size))
+    size_t size)
         __attribute__nonnull__(1);
 
 static void gc_ms2_free_fixed_size_storage(PARROT_INTERP,
@@ -156,7 +156,7 @@ static void gc_ms2_free_fixed_size_storage(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static void gc_ms2_free_memory_chunk(SHIM_INTERP, ARGFREE(void *data));
+static void gc_ms2_free_memory_chunk(PARROT_INTERP, ARGFREE(void *data));
 static void gc_ms2_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -210,11 +210,11 @@ static void gc_ms2_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
-static void gc_ms2_mark_str_header(SHIM_INTERP, ARGMOD(STRING *s))
+static void gc_ms2_mark_str_header(PARROT_INTERP, ARGMOD(STRING *s))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*s);
 
-static void gc_ms2_pmc_needs_early_collection(PARROT_INTERP, SHIM(PMC *pmc))
+static void gc_ms2_pmc_needs_early_collection(PARROT_INTERP, PMC *pmc)
         __attribute__nonnull__(1);
 
 static void gc_ms2_reallocate_buffer_storage(PARROT_INTERP,
@@ -226,13 +226,13 @@ static void gc_ms2_reallocate_buffer_storage(PARROT_INTERP,
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_ms2_reallocate_memory_chunk(SHIM_INTERP,
+static void * gc_ms2_reallocate_memory_chunk(PARROT_INTERP,
     ARGFREE(void *from),
     size_t size);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static void * gc_ms2_reallocate_memory_chunk_zeroed(SHIM_INTERP,
+static void * gc_ms2_reallocate_memory_chunk_zeroed(PARROT_INTERP,
     ARGFREE(void *data),
     size_t newsize,
     size_t oldsize);

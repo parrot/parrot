@@ -32,7 +32,7 @@ throughout the rest of Parrot.
 
 static void free_buffer(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
-    SHIM(Fixed_Size_Pool *pool),
+    Fixed_Size_Pool *pool,
     ARGMOD(Buffer *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -42,7 +42,7 @@ static void free_buffer(PARROT_INTERP,
 
 static void free_pmc_in_pool(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
-    SHIM(Fixed_Size_Pool *pool),
+    Fixed_Size_Pool *pool,
     ARGMOD(PObj *p))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

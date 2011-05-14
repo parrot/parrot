@@ -43,7 +43,7 @@ Functions controlling Parrot's profiling runcore.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void destroy_basic_output(SHIM_INTERP,
+static void destroy_basic_output(PARROT_INTERP,
     ARGIN(Parrot_profiling_runcore_t *runcore))
         __attribute__nonnull__(2);
 
@@ -128,7 +128,7 @@ static void record_op(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void record_values_ascii_pprof(SHIM_INTERP,
+static void record_values_ascii_pprof(PARROT_INTERP,
     ARGIN(Parrot_profiling_runcore_t * runcore),
     ARGIN(PPROF_DATA *pprof_data),
     ARGIN_NULLOK(Parrot_profiling_line type))

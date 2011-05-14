@@ -76,7 +76,7 @@ static void allocate_registers(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static size_t calculate_registers_size(SHIM_INTERP,
+static size_t calculate_registers_size(PARROT_INTERP,
     ARGIN(const UINTVAL *number_regs_used))
         __attribute__nonnull__(2);
 

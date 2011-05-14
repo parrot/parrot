@@ -210,8 +210,7 @@ static void failed_allocation(unsigned int line, size_t size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static Buffer* gc_gms_allocate_buffer_header(PARROT_INTERP,
-    SHIM(size_t size))
+static Buffer* gc_gms_allocate_buffer_header(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
 static void gc_gms_allocate_buffer_storage(PARROT_INTERP,
@@ -226,11 +225,12 @@ static void* gc_gms_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_gms_allocate_memory_chunk(SHIM_INTERP, size_t size);
+static void * gc_gms_allocate_memory_chunk(PARROT_INTERP, size_t size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_gms_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size);
+static void * gc_gms_allocate_memory_chunk_zeroed(PARROT_INTERP,
+    size_t size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
@@ -246,8 +246,7 @@ static PMC* gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static STRING* gc_gms_allocate_string_header(PARROT_INTERP,
-    SHIM(UINTVAL flags))
+static STRING* gc_gms_allocate_string_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 static void gc_gms_allocate_string_storage(PARROT_INTERP,
@@ -290,7 +289,7 @@ static void gc_gms_finalize(PARROT_INTERP)
 
 static void gc_gms_free_buffer_header(PARROT_INTERP,
     ARGFREE(Buffer *s),
-    SHIM(size_t size))
+    size_t size)
         __attribute__nonnull__(1);
 
 static void gc_gms_free_fixed_size_storage(PARROT_INTERP,
@@ -300,7 +299,7 @@ static void gc_gms_free_fixed_size_storage(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*data);
 
-static void gc_gms_free_memory_chunk(SHIM_INTERP, ARGFREE(void *data));
+static void gc_gms_free_memory_chunk(PARROT_INTERP, ARGFREE(void *data));
 static void gc_gms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -401,13 +400,13 @@ static void gc_gms_reallocate_buffer_storage(PARROT_INTERP,
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_gms_reallocate_memory_chunk(SHIM_INTERP,
+static void * gc_gms_reallocate_memory_chunk(PARROT_INTERP,
     ARGFREE(void *from),
     size_t size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_gms_reallocate_memory_chunk_zeroed(SHIM_INTERP,
+static void * gc_gms_reallocate_memory_chunk_zeroed(PARROT_INTERP,
     ARGFREE(void *data),
     size_t newsize,
     size_t oldsize);
@@ -460,7 +459,7 @@ static void gc_gms_validate_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_validate_str(SHIM_INTERP, ARGIN(STRING *str))
+static void gc_gms_validate_str(PARROT_INTERP, ARGIN(STRING *str))
         __attribute__nonnull__(2);
 
 static void gc_gms_write_barrier(PARROT_INTERP, ARGMOD(PMC *pmc))

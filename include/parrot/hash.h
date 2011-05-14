@@ -182,7 +182,7 @@ void Parrot_hash_destroy(PARROT_INTERP, ARGFREE_NOTNULL(Hash *hash))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_hash_dump(SHIM_INTERP, SHIM(const Hash *hash));
+void Parrot_hash_dump(PARROT_INTERP, const Hash *hash);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -253,7 +253,7 @@ HashBucket* Parrot_hash_put(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-INTVAL Parrot_hash_size(SHIM_INTERP, ARGIN(const Hash *hash))
+INTVAL Parrot_hash_size(PARROT_INTERP, ARGIN(const Hash *hash))
         __attribute__nonnull__(2);
 
 PARROT_HOT

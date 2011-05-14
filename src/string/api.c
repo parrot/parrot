@@ -43,7 +43,7 @@ STRING *STRINGNULL;
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static INTVAL string_max_bytes(SHIM_INTERP,
+static INTVAL string_max_bytes(PARROT_INTERP,
     ARGIN(const STRING *s),
     UINTVAL nchars)
         __attribute__nonnull__(2);
