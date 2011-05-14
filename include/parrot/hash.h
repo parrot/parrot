@@ -182,7 +182,8 @@ void Parrot_hash_destroy(PARROT_INTERP, ARGFREE_NOTNULL(Hash *hash))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_hash_dump(PARROT_INTERP, const Hash *hash);
+void Parrot_hash_dump(PARROT_INTERP, ARGIN(const Hash *hash))
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -424,7 +425,8 @@ STRING* Parrot_hash_value_to_string(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_hash_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
-#define ASSERT_ARGS_Parrot_hash_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_hash_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(hash)))
 #define ASSERT_ARGS_Parrot_hash_exists __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash) \

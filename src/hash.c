@@ -543,7 +543,7 @@ this.
 
 PARROT_EXPORT
 void
-Parrot_hash_dump(SHIM_INTERP, SHIM(const Hash *hash))
+Parrot_hash_dump(SHIM_INTERP, ARGIN(SHIM(const Hash *hash)))
 {
     ASSERT_ARGS(Parrot_hash_dump)
 }
