@@ -2,6 +2,7 @@ New in 3.4.0
 - Core
   + The Generational Mark and Sweep garbage collector is the new default.
   + The --gc-nursery-size command line argument was added.
+  + Parrot now gets entropy from the underlying OS.
   + The NCI subsystem now supports 8, 16, 32 and 64 bit integers.
   + The NCI subsystem now supports "long long" and "long double" signatures.
     Not all platforms/compilers support these non-standard types, so developers
