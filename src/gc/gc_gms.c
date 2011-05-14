@@ -1462,7 +1462,6 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     PObj             * const obj  = (PObj *)ptr;
     pmc_alloc_struct * const item = PMC2PAC(ptr);
-    size_t                   i;
 
     /* Not aligned pointers aren't pointers */
     if (!obj || !item || ((size_t)obj & 3) || ((size_t)item & 3))
@@ -1484,13 +1483,10 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         return 0;
 
     /* Pool.is_owned isn't precise enough (yet) */
-    /* XXX Temporary workaround to see why commit 6f0cfa8 broke win32 */
-    for (i = 0; i < MAX_GENERATIONS; i++) {
-        if (Parrot_pa_is_owned(interp, self->objects[i], item, item->ptr)) {
-            if (POBJ2GEN(obj) == 0)
-                PObj_GC_soil_root_SET(obj);
-            return 1;
-        }
+    if (Parrot_pa_is_owned(interp, self->objects[POBJ2GEN(obj)], item, item->ptr)) {
+        if (POBJ2GEN(obj) == 0)
+            PObj_GC_soil_root_SET(obj);
+        return 1;
     }
 
     return 0;
@@ -1614,7 +1610,6 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     PObj             * const obj  = (PObj *)ptr;
     string_alloc_struct * const item = STR2PAC(ptr);
-    size_t                      i;
 
     /* Not aligned pointers aren't pointers */
     if (!obj || !item || ((size_t)obj & 3) || ((size_t)item & 3))
@@ -1631,10 +1626,8 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     if (POBJ2GEN(&item->str) > self->gen_to_collect)
         return 0;
 
-    for (i = 0; i < MAX_GENERATIONS; i++) {
-        if (Parrot_pa_is_owned(interp, self->strings[i], item, item->ptr))
-            return 1;
-    }
+    if (Parrot_pa_is_owned(interp, self->strings[POBJ2GEN(obj)], item, item->ptr))
+        return 1;
 
     return 0;
 }
