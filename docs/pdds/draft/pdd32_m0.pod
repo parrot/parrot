@@ -622,10 +622,10 @@ first argument to every op, but this pointer will not be stored in bytecode.
 
 =head3 Segment Numbers
 
-M0_DIR_SEG       0x01
-M0_VARS_SEG      0x02
-M0_META_SEG      0x03
-M0_BC_SEG        0x04
+    M0_DIR_SEG       0x01
+    M0_VARS_SEG      0x02
+    M0_META_SEG      0x03
+    M0_BC_SEG        0x04
 
 =head3 Opcode Numbers
 
