@@ -145,7 +145,7 @@ PARROT_IGNORABLE_RESULT
 int /*@alt void@*/
 Parrot_secret_snprintf(
     ARGOUT(char *buffer),
-    const size_t len,
+    size_t len,
     ARGIN(const char *format),
     ...)
         __attribute__nonnull__(1)
