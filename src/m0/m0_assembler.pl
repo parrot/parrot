@@ -108,7 +108,7 @@ sub register_name_to_num {
 
     return 0 if ($register eq 'INTERP');
 
-    my $symbols = { PC => 1, EH  => 2, PCX => 3, VAR => 4,  MDS => 5,  BCS => 6};
+    my $symbols = { PC => 1, EH  => 2, EX => 3, PCX => 4, VAR => 5,  MDS => 6,  BCS => 7 };
 
     if($register !~ /\d+/){
         my $number = $symbols->{$register};
