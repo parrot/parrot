@@ -841,8 +841,12 @@ bootstrap-ops : $(OPS2C)
 runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
 	$(PARROT) -o $@ runtime/parrot/library/parrotlib.pir
 
+runtime/parrot/include/parrot_version.pir: 
+	$(PERL) tools/build/gen_version.pl >runtime/parrot/include/parrot_version.pir
+
 runtime/parrot/include/config.fpmc : myconfig config_lib.pir \
     runtime/parrot/include/datatypes.pasm $(MINIPARROT)
+	# always rebuid parrot_version.pir when building config.fpmc
 	$(PERL) tools/build/gen_version.pl >runtime/parrot/include/parrot_version.pir
 	$(MINIPARROT) -Iruntime/parrot/include config_lib.pir > $@
 
