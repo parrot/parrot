@@ -32,6 +32,8 @@ my $M0_VARS_SEG     = 0x02;
 my $M0_META_SEG     = 0x03;
 my $M0_BC_SEG       = 0x04;
 
+use constant M0_REG_RX => qr/^(([INSP]\d+)|INTERP|PC|EH|PCX|VAR|MDS|BCS)/;
+
 assemble($file);
 
 sub assemble {
@@ -104,6 +106,16 @@ return the bytecode represenation of the operation.
 sub register_name_to_num {
     my ($register) = @_;
 
+    return 0 if ($register eq 'INTERP');
+
+    my $symbols = { PC => 1, EH  => 2, PCX => 3, VAR => 4,  MDS => 5,  BCS => 6};
+
+    if($register !~ /\d+/){
+        my $number = $symbols->{$register};
+        die "Invalid register name: $register" unless $number;
+        return $number;
+    }
+
     if( length $register > 3 ){
        die "Invalid register name: $register";
     }
@@ -115,8 +127,7 @@ sub register_name_to_num {
        die "Invalid register number: $register";
     }
 
-    my $reg_rx = qr/^[INSP]/;
-    unless ( $type =~ $reg_rx ) {
+    unless ( $type =~ m/^[INSP]$/ ) {
         die "Invalid register type $type in register $register";
     }
 
@@ -139,7 +150,7 @@ sub to_bytecode {
     # as described in "Register Types and Context Structure" in the M0 spec
 
     map {
-        $bytecode .= pack('C', $_ =~ /^[INSP]/ ? register_name_to_num($a1) : $_ );
+        $bytecode .= pack('C', $_ =~ M0_REG_RX ? register_name_to_num($a1) : $_ );
     } ($a1, $a2, $a3);
 
     return $bytecode;
