@@ -485,8 +485,8 @@ INTERP_O_FILES = \
     src/nci/api$(O) \
     src/nci/signatures$(O) \
 #IF(has_libffi):    src/nci/libffi$(O) \
-#IF(has_core_nci_thunks):  src/nci/core_thunks$(O) \
-#IF(has_extra_nci_thunks): src/nci/extra_thunks$(O) \
+#IF(has_core_nci_thunks):    src/nci/core_thunks$(O) \
+#IF(has_extra_nci_thunks):    src/nci/extra_thunks$(O) \
     src/oo$(O) \
     src/packfile/object_serialization$(O) \
     src/pmc$(O) \
@@ -636,7 +636,7 @@ corevm : \
     $(PARROT) \
     runtime/parrot/include/parrotlib.pbc \
     runtime/parrot/include/config.fpmc \
-#IF(has_dynamic_linking): $(DYNPMC_TARGETS) \
+#IF(has_dynamic_linking):    $(DYNPMC_TARGETS) \
     $(LIBRARY_DIR)/Test/More.pbc
 
 $(GEN_LIBRARY) : $(PARROT) $(GEN_PASM_INCLUDES)
@@ -687,8 +687,8 @@ STR_FILES = \
     src/multidispatch.str \
     src/namespace.str \
     src/nci/api.str \
-#IF(has_core_nci_thunks):  src/nci/core_thunks.str \
-#IF(has_extra_nci_thunks): src/nci/extra_thunks.str \
+#IF(has_core_nci_thunks):    src/nci/core_thunks.str \
+#IF(has_extra_nci_thunks):    src/nci/extra_thunks.str \
     src/nci/signatures.str \
     src/packfile/api.str \
     src/packfile/object_serialization.str \
@@ -841,7 +841,7 @@ bootstrap-ops : $(OPS2C)
 runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
 	$(PARROT) -o $@ runtime/parrot/library/parrotlib.pir
 
-runtime/parrot/include/parrot_version.pir: 
+runtime/parrot/include/parrot_version.pir:
 	$(PERL) tools/build/gen_version.pl >runtime/parrot/include/parrot_version.pir
 
 runtime/parrot/include/config.fpmc : myconfig config_lib.pir \
