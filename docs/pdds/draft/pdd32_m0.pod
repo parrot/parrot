@@ -315,7 +315,7 @@ Examples:
   # point register 0 at variable 123 (0 * 256 + 123 * 1)
   set_var 0, 0, 123
 
-  # point register 3 at variable 257 (4 * 256 + 2 * 1)
+  # point register 3 at variable 1026 (4 * 256 + 2 * 1)
   set_var 3, 4, 2
 
 =back
