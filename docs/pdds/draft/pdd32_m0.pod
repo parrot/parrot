@@ -595,6 +595,11 @@ provides a way to map values to names and bytecode offsets.
 Should entries in the variables table referenced by the metadata segment
 somehow be marked as constant?  It's almost certainly incorrect to change them
 at runtime.
+
+Adding flags to values in the variables table means adding a little complexity
+and inviting more in the form of more flags.  What about either ignoring the
+problem and saying "Don't do that," or adding an op to get the original value
+of a variables table slot?
 }}}
 
   opcode_t : M0_META_SEG
