@@ -203,6 +203,7 @@ GEN_PASM_INCLUDES = \
 	runtime/parrot/include/interpinfo.pasm \
 	runtime/parrot/include/tm.pasm \
 	runtime/parrot/include/pmctypes.pasm \
+	runtime/parrot/include/parrot_version.pir
 
 GEN_PM_INCLUDES = \
 	lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm
