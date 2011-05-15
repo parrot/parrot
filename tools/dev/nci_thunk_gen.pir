@@ -1021,7 +1021,7 @@ JSON
     table[.DATATYPE_DOUBLE] = $P1
 
     $P1 = 'from_json'('{ "c_type": "long double", "sig_char": "N", "pcc_type": "FLOATVAL" }')
-    table[.DATATYPE_DOUBLE] = $P1
+    table[.DATATYPE_LONGDOUBLE] = $P1
 
     $P1 = 'from_json'(<<'JSON')
 { "c_type": "void",
