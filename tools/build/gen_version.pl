@@ -22,10 +22,6 @@ information about which commit was used to build parrot.
 
 =cut
 
-# force recalculation of SHA1 and git-describe
-unlink($Parrot::SHA1::cache);
-unlink($Parrot::Git::Describe::cache);
-
 my $sha1 = $Parrot::SHA1::current;
 my $describe = $Parrot::Git::Describe::current;
 
