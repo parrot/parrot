@@ -430,18 +430,10 @@ static void gc_gms_str_get_youngest_generation(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
-
-static void gc_gms_sweep_string_cb(PARROT_INTERP, ARGIN(PObj *obj))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 static void gc_gms_unblock_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -600,15 +592,9 @@ static int gen2flags(int gen);
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
-#define ASSERT_ARGS_gc_gms_sweep_pmc_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(obj))
 #define ASSERT_ARGS_gc_gms_sweep_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_gc_gms_sweep_string_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(obj))
 #define ASSERT_ARGS_gc_gms_unblock_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_unblock_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -1494,24 +1480,6 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 
 /*
 
-=item C<static void gc_gms_sweep_pmc_cb(PARROT_INTERP, PObj *obj)>
-
-destroy pmc *obj
-
-=cut
-
-*/
-
-static void
-gc_gms_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
-{
-    ASSERT_ARGS(gc_gms_sweep_pmc_cb)
-    PMC *pmc = (PMC *)obj;
-    Parrot_pmc_destroy(interp, pmc);
-}
-
-/*
-
 =item C<gc_gms_allocate_string_header(PARROT_INTERP, STRING *str)>
 
 =item C<gc_gms_free_string_header(PARROT_INTERP, STRING *s)>
@@ -1690,28 +1658,6 @@ gc_gms_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
     interp->gc_sys->stats.memory_used           += size;
     interp->gc_sys->stats.mem_used_last_collect += size;
 }
-
-/*
-
-=item C<static void gc_gms_sweep_string_cb(PARROT_INTERP, PObj *obj)>
-
-destroy string *obj
-
-=cut
-
-*/
-
-static void
-gc_gms_sweep_string_cb(PARROT_INTERP, ARGIN(PObj *obj))
-{
-    ASSERT_ARGS(gc_gms_sweep_string_cb)
-    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    Buffer       * const str  = (Buffer *)obj;
-    /* Compact string pool here. Or get rid of "shared buffers" and just free storage */
-    if (Buffer_bufstart(str) && !PObj_external_TEST(str))
-        Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, str);
-}
-
 
 /*
 
