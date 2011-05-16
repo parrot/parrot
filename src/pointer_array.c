@@ -14,6 +14,18 @@ src/pointer_array.c - Implementation Pointer Array storage.
 #include "parrot/parrot.h"
 #include "parrot/pointer_array.h"
 
+/*
+Iterators for Pointer_Array. Forward and backward iterators share same struct.
+
+Declared here to maintain "opaque pointer" design pattern.
+*/
+struct Parrot_Pointer_Array_Iterator {
+    Parrot_Pointer_Array       *array;          /* Array to iterate */
+    size_t                      chunk_index;    /* Index of current chunk processed */
+    size_t                      in_chunk_index; /* Position within chunk */
+    Parrot_Pointer_Array_Chunk *chunk;          /* Current chunk */
+};
+
 
 /* HEADERIZER HFILE: include/parrot/pointer_array.h */
 
@@ -151,6 +163,127 @@ Parrot_pa_is_owned(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self),
 
     return 0;
 }
+
+/*
+=item C<Parrot_Pointer_Array_Iterator* Parrot_pa_begin(PARROT_INTERP,
+Parrot_Pointer_Array *self)>
+
+Get iterator starting at first element.
+
+=cut
+*/
+
+PARROT_CANNOT_RETURN_NULL
+Parrot_Pointer_Array_Iterator*
+Parrot_pa_begin(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
+{
+}
+
+/*
+=item C<Parrot_Pointer_Array_Iterator* Parrot_pa_end(PARROT_INTERP,
+Parrot_Pointer_Array *self)>
+
+Get iterator with position next-after-end.
+
+=cut
+*/
+
+PARROT_CANNOT_RETURN_NULL
+Parrot_Pointer_Array_Iterator*
+Parrot_pa_end(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
+{
+}
+
+/*
+=item C<void Parrot_pa_iter_destroy(PARROT_INTERP, Parrot_Pointer_Array_Iterator
+*iter)>
+
+Destroy iterator.
+
+=cut
+*/
+
+void
+Parrot_pa_iter_destroy(PARROT_INTERP, ARGIN(Parrot_Pointer_Array_Iterator *iter))
+{
+}
+
+/*
+=item C<void * Parrot_pa_iter_get(PARROT_INTERP, Parrot_Pointer_Array_Iterator
+*iter)>
+
+Get stored value.
+
+=cut
+*/
+
+PARROT_CAN_RETURN_NULL
+void *
+Parrot_pa_iter_get(PARROT_INTERP, ARGIN(Parrot_Pointer_Array_Iterator *iter))
+{
+}
+
+/*
+=item C<void Parrot_pa_iter_next(PARROT_INTERP, Parrot_Pointer_Array_Iterator
+*iter)>
+
+Advance iterator forward.
+
+=cut
+*/
+
+void
+Parrot_pa_iter_next(PARROT_INTERP, ARGIN(Parrot_Pointer_Array_Iterator *iter))
+{
+}
+
+/*
+=item C<void Parrot_pa_iter_prev(PARROT_INTERP, Parrot_Pointer_Array_Iterator
+*iter)>
+
+Advance iterator backward.
+
+=cut
+*/
+
+void
+Parrot_pa_iter_prev(PARROT_INTERP, ARGIN(Parrot_Pointer_Array_Iterator *iter))
+{
+}
+
+/*
+=item C<INTVAL Parrot_pa_iter_cmp(PARROT_INTERP, Parrot_Pointer_Array_Iterator
+*lhs, Parrot_Pointer_Array_Iterator *rhs)>
+
+Compare iterators. Return 1 if iterators positioned to same element.
+
+=cut
+*/
+
+INTVAL
+Parrot_pa_iter_cmp(PARROT_INTERP,
+        ARGIN(Parrot_Pointer_Array_Iterator *lhs),
+        ARGIN(Parrot_Pointer_Array_Iterator *rhs))
+{
+}
+
+/*
+=item C<INTVAL Parrot_pa_iter_is_empty(PARROT_INTERP,
+Parrot_Pointer_Array_Iterator *iter)>
+
+Check that iterator has some more elements to iterate. Returns 1 if yes.
+
+=cut
+*/
+
+INTVAL
+Parrot_pa_iter_is_empty(PARROT_INTERP,
+        ARGIN(Parrot_Pointer_Array_Iterator *iter))
+{
+}
+
+
+
 
 
 /*
