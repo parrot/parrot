@@ -77,14 +77,15 @@ this will tend to make the toolkit init function much happier.
 
 .include 'datatypes.pasm'
 
-.sub _init_nci_utils :load
-    # Mark all functions for export
-    .local pmc parrot
-    load_language 'parrot'
-    parrot = compreg 'parrot'
-    parrot.'export'('call_toolkit_init')
-    parrot.'export'('call_with_cstring')
-.end
+# TODO: this crashes rakudo
+# .sub _init_nci_utils :load
+#     # Mark all functions for export
+#     .local pmc parrot
+#     load_language 'parrot'
+#     parrot = compreg 'parrot'
+#     parrot.'export'('call_toolkit_init')
+#     parrot.'export'('call_with_cstring')
+# .end
 
 .sub call_toolkit_init
     .param pmc    init_func
