@@ -2117,6 +2117,30 @@ Parrot_str_from_num(PARROT_INTERP, FLOATVAL f)
 
 /*
 
+=item C<char * Parrot_str_to_tied_cstring(PARROT_INTERP, const STRING *s)>
+
+Returns a C string for the specified Parrot string in the current
+representation of the string.  The C string's lifetime is tied to the STRING*.
+It should not be manually freed.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+char *
+Parrot_str_to_tied_cstring(PARROT_INTERP, ARGIN(STRING *s))
+{
+    ASSERT_ARGS(Parrot_str_to_cstring)
+
+    s->tied_cstr = Parrot_str_to_encoded_cstring(interp, s, s->encoding);
+    return s->tied_cstr;
+}
+
+
+/*
+
 =item C<char * Parrot_str_to_cstring(PARROT_INTERP, const STRING *s)>
 
 Returns a C string for the specified Parrot string in the current
