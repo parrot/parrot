@@ -260,6 +260,59 @@ value of C<-1> indicates that the return value should be translated.
     .return (retv :flat)
 .end
 
+=item nci = dlfancy(pmc library, string name, string signature)
+
+Emulates C<dlfunc> op, but extends this to provide functionality for more complex, but
+common, types. Current supported types are:
+
+=over 4
+
+=item t
+
+Translate Parrot strings to C asciiz strings and back. Argument strings belong to Parrot and
+are freed after the call. Return strings belong to the C library and are not freed by Parrot.
+
+=back
+
+=cut
+
+.sub dlfancy
+    .param pmc    lib
+    .param string name
+    .param string sig
+
+    .local pmc cstrings
+    cstrings = new ['ResizableIntegerArray']
+
+    .local string mysig
+    mysig = ''
+
+    $P0 = box sig
+    $P0 = iter $P0
+    $I0 = -1
+    loop:
+        unless $P0 goto end_loop
+        $S0 = shift $P0
+        unless $S0 == 't' goto end_t_translation
+            push cstrings, $I0
+            $S0 = 'p'
+        end_t_translation:
+        mysig = concat mysig, $S0
+        inc $I0
+        goto loop
+    end_loop:
+
+    .local pmc nci
+    nci = dlfunc lib, name, mysig
+    $I0 = defined nci
+    if $I0 goto done_early_ret
+        .return (nci)
+    done_early_ret:
+
+    $P0 = call_with_cstring(nci, cstrings :flat)
+    .return ($P0)
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
