@@ -412,6 +412,7 @@ C<signature> are:
     $S0 = substr argsig, argidx, 1
     if $S0 != 't' goto arg_next
     $P0 = args[argidx]
+    if null $P0 goto arg_next
     $S0 = $P0
     $P0 = 'str_to_cstring'(interp, $S0)
     args[argidx] = $P0
