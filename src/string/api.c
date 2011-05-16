@@ -2129,7 +2129,7 @@ It should not be manually freed.
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-char *
+const char *
 Parrot_str_to_tied_cstring(PARROT_INTERP, ARGIN(STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_cstring)
