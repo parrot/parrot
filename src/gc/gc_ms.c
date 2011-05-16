@@ -953,6 +953,8 @@ gc_ms_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
     Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     if (!PObj_constant_TEST(s)) {
         Fixed_Size_Pool * const pool = mem_pools->string_header_pool;
+        if (s->tied_cstr)
+            mem_internal_free(s->tied_cstr);
         PObj_flags_SETTO((PObj *)s, PObj_on_free_list_FLAG);
         pool->add_free_object(interp, mem_pools, pool, s);
         ++pool->num_free_objects;

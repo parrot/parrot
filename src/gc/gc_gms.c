@@ -1531,6 +1531,9 @@ gc_gms_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
 
         Parrot_pa_remove(interp, self->strings[gen], STR2PAC(s)->ptr);
 
+        if (s->tied_cstr)
+            mem_internal_free(s->tied_cstr);
+
         if (Buffer_bufstart(s) && !PObj_external_TEST(s))
             Parrot_gc_str_free_buffer_storage(interp,
                 &self->string_gc, (Buffer *)s);
