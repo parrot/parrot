@@ -173,6 +173,7 @@ Get iterator starting at first element.
 =cut
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Pointer_Array_Iterator*
 Parrot_pa_begin(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
@@ -188,6 +189,7 @@ Get iterator with position next-after-end.
 =cut
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Pointer_Array_Iterator*
 Parrot_pa_end(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
@@ -203,6 +205,7 @@ Destroy iterator.
 =cut
 */
 
+PARROT_EXPORT
 void
 Parrot_pa_iter_destroy(PARROT_INTERP, ARGIN(Parrot_Pointer_Array_Iterator *iter))
 {
@@ -217,6 +220,7 @@ Get stored value.
 =cut
 */
 
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 void *
 Parrot_pa_iter_get(PARROT_INTERP, ARGIN(Parrot_Pointer_Array_Iterator *iter))
@@ -232,6 +236,7 @@ Advance iterator forward.
 =cut
 */
 
+PARROT_EXPORT
 void
 Parrot_pa_iter_next(PARROT_INTERP, ARGIN(Parrot_Pointer_Array_Iterator *iter))
 {
@@ -246,6 +251,7 @@ Advance iterator backward.
 =cut
 */
 
+PARROT_EXPORT
 void
 Parrot_pa_iter_prev(PARROT_INTERP, ARGIN(Parrot_Pointer_Array_Iterator *iter))
 {
@@ -260,6 +266,7 @@ Compare iterators. Return 1 if iterators positioned to same element.
 =cut
 */
 
+PARROT_EXPORT
 INTVAL
 Parrot_pa_iter_cmp(PARROT_INTERP,
         ARGIN(Parrot_Pointer_Array_Iterator *lhs),
@@ -276,6 +283,7 @@ Check that iterator has some more elements to iterate. Returns 1 if yes.
 =cut
 */
 
+PARROT_EXPORT
 INTVAL
 Parrot_pa_iter_is_empty(PARROT_INTERP,
         ARGIN(Parrot_Pointer_Array_Iterator *iter))

@@ -176,8 +176,22 @@ Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+Parrot_Pointer_Array_Iterator* Parrot_pa_begin(PARROT_INTERP,
+    ARGIN(Parrot_Pointer_Array *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void Parrot_pa_destroy(PARROT_INTERP, ARGFREE(Parrot_Pointer_Array *self))
         __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+Parrot_Pointer_Array_Iterator* Parrot_pa_end(PARROT_INTERP,
+    ARGIN(Parrot_Pointer_Array *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 int Parrot_pa_is_owned(PARROT_INTERP,
@@ -189,16 +203,49 @@ int Parrot_pa_is_owned(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+INTVAL Parrot_pa_iter_cmp(PARROT_INTERP,
+    ARGIN(Parrot_Pointer_Array_Iterator *lhs),
+    ARGIN(Parrot_Pointer_Array_Iterator *rhs))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+void Parrot_pa_iter_destroy(PARROT_INTERP,
+    ARGIN(Parrot_Pointer_Array_Iterator *iter))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+void * Parrot_pa_iter_get(PARROT_INTERP,
+    ARGIN(Parrot_Pointer_Array_Iterator *iter))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+INTVAL Parrot_pa_iter_is_empty(PARROT_INTERP,
+    ARGIN(Parrot_Pointer_Array_Iterator *iter))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+void Parrot_pa_iter_next(PARROT_INTERP,
+    ARGIN(Parrot_Pointer_Array_Iterator *iter))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+void Parrot_pa_iter_prev(PARROT_INTERP,
+    ARGIN(Parrot_Pointer_Array_Iterator *iter))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Parrot_Pointer_Array * Parrot_pa_new(PARROT_INTERP)
         __attribute__nonnull__(1);
-
-PARROT_CANNOT_RETURN_NULL
-Parrot_Pointer_Array_Iterator* Parrot_pa_begin(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array *self))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -213,65 +260,18 @@ size_t Parrot_pa_count_used(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
-Parrot_Pointer_Array_Iterator* Parrot_pa_end(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array *self))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-INTVAL Parrot_pa_iter_cmp(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array_Iterator *lhs),
-    ARGIN(Parrot_Pointer_Array_Iterator *rhs))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-void Parrot_pa_iter_destroy(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array_Iterator *iter))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_CAN_RETURN_NULL
-void * Parrot_pa_iter_get(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array_Iterator *iter))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-INTVAL Parrot_pa_iter_is_empty(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array_Iterator *iter))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-void Parrot_pa_iter_next(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array_Iterator *iter))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-void Parrot_pa_iter_prev(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array_Iterator *iter))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
+#define ASSERT_ARGS_Parrot_pa_begin __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_Parrot_pa_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pa_end __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_Parrot_pa_is_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(orig))
-#define ASSERT_ARGS_Parrot_pa_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_pa_begin __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_Parrot_pa_count_allocated __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_Parrot_pa_count_used __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_Parrot_pa_end __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_Parrot_pa_iter_cmp __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(lhs) \
@@ -291,6 +291,14 @@ void Parrot_pa_iter_prev(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pa_iter_prev __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(iter))
+#define ASSERT_ARGS_Parrot_pa_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pa_count_allocated __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_Parrot_pa_count_used __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pointer_array.c */
 
