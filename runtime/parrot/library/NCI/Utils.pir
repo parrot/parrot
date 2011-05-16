@@ -230,9 +230,9 @@ this will tend to make the toolkit init function much happier.
     trans_loop:
         unless i goto end_trans_loop
         $I0     = shift i
-        $S0     = args[i]
+        $S0     = args[$I0]
         $P0     = str_to_cstring(interp, $S0)
-        args[i] = $P0
+        args[$I0] = $P0
         goto trans_loop
     end_trans_loop:
 
@@ -243,7 +243,7 @@ this will tend to make the toolkit init function much happier.
     free_loop:
         unless i goto end_free_loop
         $I0 = shift i
-        $P0 = args[i]
+        $P0 = args[$I0]
         str_free_cstring($P0)
         goto free_loop
     end_free_loop:
