@@ -29,7 +29,7 @@ Tests atomic operation support.
 
 # generic tests
 
-plan tests => 2;
+plan tests => 3;
 
 c_output_is( <<'CODE', <<'OUTPUT', "Pointer array" );
 
@@ -208,6 +208,38 @@ ok 4
 ok 5
 ok 6
 ok 7
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', "Pointer array (iterators)" );
+
+#include <parrot/parrot.h>
+#include <parrot/embed.h>
+#include <parrot/pointer_array.h>
+#include <stdio.h>
+
+int main(int argc, char* argv[])
+{
+    Interp *interp = Parrot_new(NULL);
+    Parrot_Pointer_Array *pa = Parrot_pa_new(interp);
+    int i, j, k, count = 0;
+    void *pi, *pj, *pk;
+
+    /* Iterator for empty array */
+    Parrot_Pointer_Array_Iterator *forward = Parrot_pa_begin(interp, pa);
+
+    if (forward) {
+        printf("ok 1 - Iterator created\n");
+    }
+
+    if (Parrot_pa_iter_is_empty(interp, forward)) {
+        printf("ok 2 - Iterator is empty\n");
+    }
+
+    return EXIT_SUCCESS;
+}
+CODE
+ok 1 - Iterator created
+ok 2 - Iterator is empty
 OUTPUT
 
 # Local Variables:
