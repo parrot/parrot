@@ -99,6 +99,9 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
           case 'S':
             e = enum_type_STRING;
             break;
+          case 't':
+            e = enum_type_cstr;
+            break;
 
           case 'p':   /* push pmc->data */
             e = enum_type_ptr;
@@ -157,6 +160,7 @@ ncidt_to_pcc(PARROT_INTERP, PARROT_DATA_TYPE t)
 
       case enum_type_ptr:
       case enum_type_PMC:
+      case enum_type_cstr:
         return 'P';
 
       default:

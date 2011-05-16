@@ -339,6 +339,7 @@ nci_to_ffi_type(PARROT_INTERP, PARROT_DATA_TYPE nci_t)
 
       case enum_type_STRING:
       case enum_type_ptr:
+      case enum_type_cstr:
       case enum_type_PMC:
                                  return &ffi_type_pointer;
 
@@ -619,6 +620,13 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                                     VTABLE_get_pointer(interp, pcc_arg[i].p);
                 nci_arg_ptr[i] = &nci_val[i].p;
                 break;
+              case enum_type_cstr:
+                nci_val[i].p   = STRING_IS_NULL(pcc_arg[i].s) ?
+                                    "":
+                                    Parrot_str_to_tied_cstring(interp, pcc_arg[i].s);
+                nci_arg_ptr[i] = &nci_val[i].p;
+                break;
+
 
               default:
                 PARROT_ASSERT("Unhandled NCI signature");
