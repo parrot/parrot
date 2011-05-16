@@ -291,7 +291,7 @@ gc_inf_free_string_header(SHIM_INTERP, ARGFREE(STRING *s))
 {
     ASSERT_ARGS(gc_inf_free_string_header)
     if (s->tied_cstr)
-        mem_internal_free(s->tied_cstr);
+        Parrot_str_free_cstring(s->tied_cstr);
     if (s)
         free(s);
 }
