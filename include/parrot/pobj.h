@@ -93,6 +93,7 @@ struct parrot_string_t {
 
     /*    parrot_string_representation_t representation;*/
     const struct _str_vtable *encoding; /* Pointer to string vtable. */
+    char       *tied_cstr;              /* cstring tied to STRING's lifetime */
 };
 
 /* Here is the Parrot PMC object, "inheriting" from PObj. */

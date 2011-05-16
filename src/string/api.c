@@ -218,6 +218,7 @@ Parrot_str_new_noinit(PARROT_INTERP, UINTVAL capacity)
 
     Parrot_gc_allocate_string_storage(interp, s,
         (size_t)string_max_bytes(interp, s, capacity));
+    s->tied_cstr = NULL;
 
     return s;
 }
@@ -358,6 +359,7 @@ Parrot_str_clone(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
     result->strlen   = s->strlen;
     result->hashval  = s->hashval;
     result->encoding = s->encoding;
+    result->tied_cstr = NULL;
 
     return result;
 }
@@ -682,6 +684,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
     }
     else
         s->strlen = s->bufused = 0;
+    s->tied_cstr = NULL;
 
     return s;
 }
@@ -1245,6 +1248,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     /* Alloctate new string size. */
     Parrot_gc_allocate_string_storage(interp, dest, buf_size);
     dest->bufused = buf_size;
+    dest->tied_cstr = NULL;
 
     /* Copy begin of string */
     mem_sys_memcopy(dest->strstart, src->strstart, start_byte);
@@ -2562,6 +2566,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
     reserved = string_max_bytes(interp, result, srclen);
     Parrot_gc_allocate_string_storage(interp, result, reserved);
     result->bufused = reserved;
+    result->tied_cstr = NULL;
 
     STRING_ITER_INIT(interp, &itersrc);
     STRING_ITER_INIT(interp, &iterdest);
