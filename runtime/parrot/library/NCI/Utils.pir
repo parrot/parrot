@@ -318,6 +318,136 @@ are freed after the call. Return strings belong to the C library and are not fre
     .return ($P0)
 .end
 
+### ncifunc
+
+.sub '' :load :init
+    .local pmc str_to_cstring, str_free_cstring, str_new
+    null $P0
+    str_to_cstring   = dlfunc $P0, 'Parrot_str_to_cstring',   'ppS'
+    str_free_cstring = dlfunc $P0, 'Parrot_str_free_cstring', 'vp'
+    str_new          = dlfunc $P0, 'Parrot_str_new',          'SppI'
+    set_global 'str_to_cstring',   str_to_cstring
+    set_global 'str_free_cstring', str_free_cstring
+    set_global 'str_new',          str_new
+.end
+
+
+=item nci = ncifunc(pmc library, string name, string signature)
+
+Create a NCI function by looking up C<name> in C<library>, assuming
+a calling signature of C<signature>.  The supported types of
+C<signature> are:
+    p = pmc
+    i = int
+    f = float
+    t = null-terminated array of char
+    ...
+
+=cut
+
+.sub 'ncifunc'
+    .param pmc library
+    .param string name
+    .param string signature
+
+    .local string trsrc, trtgt
+    trsrc = 't'                        # list of letters we translate from
+    trtgt = 'p'                        # list of letters to translate to
+
+    # perform translations for dlfunc opcode
+    .local int siglen, sigidx
+    .local string dlsig
+    siglen = length signature
+    dlsig = ''
+    sigidx = 0
+  dlsig_loop:
+    unless sigidx < siglen goto dlsig_done
+    .local string type
+    type = substr signature, sigidx, 1
+    $I0 = index trsrc, type
+    if $I0 < 0 goto dlsig_next
+    type = substr trtgt, $I0, 1
+  dlsig_next:
+    dlsig = concat dlsig, type
+    inc sigidx
+    goto dlsig_loop
+  dlsig_done:
+
+    # look up the nci function and save as lexical
+    .local pmc func
+    func = dlfunc library, name, dlsig
+
+    # if no transformations needed, no need to wrap!
+    if dlsig != signature goto do_nciwrap
+    .return (func)
+
+  do_nciwrap:
+    .lex 'func', func
+
+    # save the original signature as lexical
+    $P99 = box signature
+    .lex 'signature', $P99
+
+    # clone a wrapper closure and return it
+    .const 'Sub' nciwrap = 'nciwrap'
+    $P0 = newclosure nciwrap
+
+    .return ($P0)
+.end
+
+
+.sub 'nciwrap' :outer('ncifunc')
+    .param pmc args           :slurpy
+
+    .local string signature
+    $P99 = find_lex 'signature'
+    signature = $P99
+
+    .local pmc interp, strfreelist
+    .local string argsig
+    .local int arglen, argidx
+    interp = getinterp
+    argsig = substr signature, 1
+    arglen = length argsig
+    argidx = 0
+    strfreelist = new ['ResizablePMCArray']
+  arg_loop:
+    unless argidx < arglen goto arg_done
+    $S0 = substr argsig, argidx, 1
+    if $S0 != 't' goto arg_next
+    $P0 = args[argidx]
+    $S0 = $P0
+    $P0 = 'str_to_cstring'(interp, $S0)
+    args[argidx] = $P0
+    push strfreelist, $P0
+  arg_next:
+    inc argidx
+    goto arg_loop
+  arg_done:
+
+  nci_call:
+    .local pmc func, retv
+    func = find_lex 'func'
+    (retv :slurpy) = func(args :flat)
+
+  free_loop:
+    unless strfreelist goto free_done
+    $P0 = pop strfreelist
+    'str_free_cstring'($P0)
+    goto free_loop
+  free_done:
+
+    $S0 = substr signature, 0, 1
+    if $S0 == 't' goto nci_ret_t
+    .return (retv :flat)
+
+  nci_ret_t:
+    retv = pop retv                 # get the first value out of the slurpy
+    $S0 = 'str_new'(interp, retv, 0)
+    .return ($S0)
+.end
+
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
