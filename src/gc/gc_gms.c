@@ -842,7 +842,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     gc_gms_check_sanity(interp);
 
-    gc_gms_print_stats_always(interp, "After");
+    gc_gms_print_stats(interp, "After");
 
     Parrot_pa_destroy(interp, self->work_list);
     self->work_list = NULL;
@@ -1287,8 +1287,6 @@ gc_gms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_free_pmc_attributes)
 
-    return;
-
     if (PMC_data(pmc)) {
         MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
         Parrot_gc_fixed_allocator_free(interp, self->fixed_size_allocator,
@@ -1421,6 +1419,8 @@ gc_gms_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_free_pmc_header)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+
+    return;
 
     if (pmc) {
         size_t gen = POBJ2GEN(pmc);
