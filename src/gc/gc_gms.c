@@ -1420,8 +1420,6 @@ gc_gms_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
     ASSERT_ARGS(gc_gms_free_pmc_header)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
-    return;
-
     if (pmc) {
         size_t gen = POBJ2GEN(pmc);
 
@@ -1512,8 +1510,6 @@ static void
 gc_gms_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
 {
     ASSERT_ARGS(gc_gms_free_string_header)
-
-    return;
 
     if (s && !PObj_on_free_list_TEST(s)) {
         MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
