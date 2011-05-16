@@ -126,6 +126,8 @@ i    pi    #  MYSQL_FIELD_OFFSET mysql_field_seek(MYSQL_RES *result,
 p    p     #  MYSQL_ROW mysql_fetch_row(MYSQL_RES *result)
 l    p     #  unsigned long * mysql_fetch_lengths(MYSQL_RES *result)
 p    p     #  MYSQL_FIELD * mysql_fetch_field(MYSQL_RES *result)
+
+ptr (ptr, ptr, ptr, ptr, ptr, int, ptr, int) # mysql_real_connect
 # --- end mysqlclient library ---
 
 # Oddball ones for postgres
