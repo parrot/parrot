@@ -877,7 +877,7 @@ ERROR
     (empty_line_regex, pcre_errstr, pcre_errint) = pcre_comp($S0, pcre_extended)
     if pcre_errint goto pcre_comp_err
 
-    $S0 = "^ [[:space:]]* ( (?: [INSPcsilfdpv] [[:space:]]* )+ ) (?: [#] .* )? $"
+    $S0 = "^ [[:space:]]* ( (?: [INSPcsilfdptv] [[:space:]]* )+ ) (?: [#] .* )? $"
     (old_style_sig_line_regex, pcre_errstr, pcre_errint) = pcre_comp($S0, pcre_extended)
     if pcre_errint goto pcre_comp_err
 
@@ -986,6 +986,15 @@ REGEX
        }" }
 JSON
     table[.DATATYPE_PTR]  = $P1
+
+    $P1 = 'from_json'(<<'JSON')
+{ "c_type":   "char *",
+  "pcc_type": "STRING  *",
+  "preamble_tmpl": "v_%i = STRING_IS_NULL(t_%i) ? '' : Parrot_str_get_tied_cstring(interp, t_%i);",
+  "sig_char":   "t"
+       }
+JSON
+    table[.DATATYPE_CSTR]  = $P1
 
     $P1 = 'from_json'('{ "c_type": "char", "sig_char": "I", "pcc_type": "INTVAL" }')
     table[.DATATYPE_CHAR] = $P1
