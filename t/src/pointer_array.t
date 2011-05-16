@@ -263,6 +263,14 @@ int main(int argc, char* argv[])
 
     is(&i, Parrot_pa_iter_get(interp, forward), "Got first item");
 
+    Parrot_pa_iter_next(interp, forward);
+    is(&j, Parrot_pa_iter_get(interp, forward), "Got second item");
+
+    Parrot_pa_iter_next(interp, forward);
+    is(&k, Parrot_pa_iter_get(interp, forward), "Got third item");
+
+    ok(Parrot_pa_iter_is_empty(interp, forward), "Iterator is now empty");
+
     return EXIT_SUCCESS;
 }
 CODE
@@ -271,6 +279,9 @@ ok 2 - Iterator is empty
 ok 3 - Iterator destroyed
 ok 4 - Iterator is not empty
 ok 5 - Got first item
+ok 6 - Got second item
+ok 7 - Got third item
+ok 8 - Iterator is now empty
 OUTPUT
 
 # Local Variables:
