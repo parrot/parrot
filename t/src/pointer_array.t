@@ -254,9 +254,9 @@ int main(int argc, char* argv[])
     ok(1, "Iterator destroyed");
 
     /* Put _few_ values into PA and check it */
-    Parrot_pa_insert(interp, pa, &i);
-    Parrot_pa_insert(interp, pa, &j);
-    Parrot_pa_insert(interp, pa, &k);
+    pi = Parrot_pa_insert(interp, pa, &i);
+    pj = Parrot_pa_insert(interp, pa, &j);
+    pk = Parrot_pa_insert(interp, pa, &k);
 
     forward = Parrot_pa_begin(interp, pa);
     ok(!Parrot_pa_iter_is_empty(interp, forward), "Iterator is not empty");
@@ -272,6 +272,24 @@ int main(int argc, char* argv[])
     Parrot_pa_iter_next(interp, forward);
     ok(Parrot_pa_iter_is_empty(interp, forward), "Iterator is now empty");
 
+    Parrot_pa_iter_destroy(interp, forward);
+
+    /* Iterate over deleted elements */
+    Parrot_pa_remove(interp, pa, pj);
+    forward = Parrot_pa_begin(interp, pa);
+    ok(forward != NULL, "Iterator created");
+
+    is(&i, *Parrot_pa_iter_get(interp, forward), "Got first item");
+
+    Parrot_pa_iter_next(interp, forward);
+    is(&k, *Parrot_pa_iter_get(interp, forward), "Got second item");
+
+    Parrot_pa_iter_next(interp, forward);
+    ok(Parrot_pa_iter_is_empty(interp, forward), "Iterator is now empty");
+
+    Parrot_pa_iter_destroy(interp, forward);
+
+
     return EXIT_SUCCESS;
 }
 CODE
@@ -283,6 +301,10 @@ ok 5 - Got first item
 ok 6 - Got second item
 ok 7 - Got third item
 ok 8 - Iterator is now empty
+ok 9 - Iterator created
+ok 10 - Got first item
+ok 11 - Got second item
+ok 12 - Iterator is now empty
 OUTPUT
 
 # Local Variables:

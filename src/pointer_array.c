@@ -253,14 +253,19 @@ Parrot_pa_iter_next(PARROT_INTERP, ARGIN(Parrot_Pointer_Array_Iterator *iter))
 {
     PARROT_ASSERT(!Parrot_pa_iter_is_empty(interp, iter) && "Advance empty iterator");
 
-    /* XXX We don't support PA with removed elements (yet) */
+    /* Manual tail-call optimization. Just in case if compiler doesn't support it */
+  restart:
 
     /* Advance with chunk */
     iter->in_chunk_index++;
 
     /* Chunk isn't finished yet */
-    if (iter->in_chunk_index < CELL_PER_CHUNK - iter->chunk->num_free)
+    if (iter->in_chunk_index < CELL_PER_CHUNK - iter->chunk->num_free) {
+        /* but it can reach removed element */
+        if ((UINTVAL)(iter->chunk->data[iter->in_chunk_index]) & 1)
+            goto restart;
         return;
+    }
 
     /* Switch to new chunk */
     iter->chunk_index++;
@@ -274,6 +279,10 @@ Parrot_pa_iter_next(PARROT_INTERP, ARGIN(Parrot_Pointer_Array_Iterator *iter))
 
     /* Point to start of the chunk */
     iter->chunk = iter->array->chunks[iter->chunk_index];
+
+    /* but it can reach removed element */
+    if ((UINTVAL)(iter->chunk->data[iter->in_chunk_index]) & 1)
+        goto restart;
 
     return;
 }
