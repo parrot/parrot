@@ -204,9 +204,9 @@ value of C<-1> indicates that the return value should be translated.
     $P0 = find_lex 'func'
     $P0 = $P0(args :flat)
     $P1 = null
-    $P1 = dlfunc $P1, 'Parrot_str_new', 'Spi'
+    $P1 = dlfunc $P1, 'Parrot_str_new', 'SppI'
     $P2 = getinterp
-    $S0 = $P1($P2, 0)
+    $S0 = $P1($P2, $P0, 0)
     .return ($S0)
 .end
 
