@@ -77,13 +77,15 @@ this will tend to make the toolkit init function much happier.
 
 .include 'datatypes.pasm'
 
-.sub _init_nci_utils :load
-    # Mark all functions for export
-    .local pmc parrot
-    load_language 'parrot'
-    parrot = compreg 'parrot'
-    parrot.'export'('call_toolkit_init')
-.end
+# TODO: this crashes rakudo
+# .sub _init_nci_utils :load
+#     # Mark all functions for export
+#     .local pmc parrot
+#     load_language 'parrot'
+#     parrot = compreg 'parrot'
+#     parrot.'export'('call_toolkit_init')
+#     parrot.'export'('call_with_cstring')
+# .end
 
 .sub call_toolkit_init
     .param pmc    init_func
@@ -152,6 +154,103 @@ this will tend to make the toolkit init function much happier.
     .return (new_argv)
 .end
 
+.sub call_with_cstring
+    .param pmc func
+    .param pmc cstrings :slurpy
+
+    .local pmc cstr_args
+    cstr_args = new ['ResizableIntegerArray']
+
+    .local pmc i
+    i = iter cstrings
+    loop:
+        unless i goto end_loop
+        $I0 = shift i
+        unless $I0 == -1 goto else
+            func = wrap_cstr_ret(func)
+            goto endif
+        else:
+            push cstr_args, $I0
+        endif:
+        goto loop
+    end_loop:
+
+    $I0 = elements cstr_args
+    unless $I0 goto done_wrap_args
+        func = wrap_cstr_args(func, cstr_args)
+    done_wrap_args:
+
+    .return (func)
+.end
+
+.sub 'wrap_cstr_ret' :anon
+    .param pmc func
+    .lex 'func', func
+    .const 'Sub' $P0 = 'wrap_ret_closure'
+    $P0 = newclosure $P0
+    .return ($P0)
+.end
+
+.sub 'wrap_ret_closure' :anon :outer('wrap_cstr_ret')
+    .param pmc args :slurpy
+    $P0 = find_lex 'func'
+    $P0 = $P0(args :flat)
+    $P1 = null
+    $P1 = dlfunc $P1, 'Parrot_str_new', 'Spi'
+    $P2 = getinterp
+    $S0 = $P1($P2, 0)
+    .return ($S0)
+.end
+
+.sub 'wrap_cstr_args' :anon
+    .param pmc func
+    .param pmc cstr_args
+    .lex 'func', func
+    .lex 'cstr_args', cstr_args
+    .const 'Sub' $P0 = 'wrap_args_closure'
+    $P0 = newclosure $P0
+    .return ($P0)
+.end
+
+.sub 'wrap_args_closure' :anon :outer('wrap_cstr_args')
+    .param pmc args :slurpy
+
+    .local pmc func
+    .local pmc cstr_args
+    func      = find_lex 'func'
+    cstr_args = find_lex 'cstr_args'
+
+    .local pmc interp, str_to_cstring, str_free_cstring
+    interp           = getinterp
+    $P0              = null
+    str_to_cstring   = dlfunc $P0, 'Parrot_str_to_cstring',   'ppS'
+    str_free_cstring = dlfunc $P0, 'Parrot_str_free_cstring', 'vp'
+
+    .local pmc i
+    i = iter cstr_args
+    trans_loop:
+        unless i goto end_trans_loop
+        $I0     = shift i
+        $S0     = args[$I0]
+        $P0     = str_to_cstring(interp, $S0)
+        args[$I0] = $P0
+        goto trans_loop
+    end_trans_loop:
+
+    .local pmc retv
+    (retv :slurpy) = func(args :flat)
+
+    i = iter cstr_args
+    free_loop:
+        unless i goto end_free_loop
+        $I0 = shift i
+        $P0 = args[$I0]
+        str_free_cstring($P0)
+        goto free_loop
+    end_free_loop:
+
+    .return (retv :flat)
+.end
 
 # Local Variables:
 #   mode: pir

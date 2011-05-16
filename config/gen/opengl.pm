@@ -287,7 +287,7 @@ my %PCC_CAST = (
 );
 
 my %OVERRIDE = (
-    glutInit => [qw[ void int& ptr ]],
+    glutInit => [[qw[ void int& ptr ]], [0, 0, 0]],
 );
 
 my @IGNORE = (
@@ -716,7 +716,8 @@ sub gen_opengl_wrappers {
             $group = lc $group;
 
             # Convert return and param types to NCI signature
-            my @nci_sig = @{$OVERRIDE{$name} or []};
+            my @nci_sig    = @{${$OVERRIDE{$name} or []}[0] or []};
+            my @cstr_trans = @{${$OVERRIDE{$name} or []}[1] or []};
 
             unless (@nci_sig) {
                 $params = '' if $params eq 'void';
@@ -732,7 +733,8 @@ sub gen_opengl_wrappers {
                           if $verbose;
                         next PROTO;
                     }
-                    push @nci_sig, $NCI_TYPE{$param};
+                    push @nci_sig,    $NCI_TYPE{$param};
+                    push @cstr_trans, $param eq 'char*';
                 }
 
                 if (any sub { $_ eq 'void' }, @nci_sig[1..$#nci_sig]) {
@@ -746,7 +748,7 @@ sub gen_opengl_wrappers {
             # Success!  Save results.
             $pass{$file}++;
             $sigs{join ',', @nci_sig} = [@nci_sig];
-            push @{$funcs{$group}}, [$name, [@nci_sig]];
+            push @{$funcs{$group}}, [$name, [@nci_sig], [@cstr_trans]];
 
             my $nci_sig = '[' . (join ',', @nci_sig) . ']';
             print "$group\t$nci_sig\t$return $name($params);\n"
@@ -796,64 +798,94 @@ HEADER
     glutcb_funcs = new 'ResizableStringArray'
     push glutcb_funcs, 'Parrot_glut_nci_loader'
     push glutcb_funcs, 'void,ptr'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbCloseFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbDisplayFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbIdleFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbMenuDestroyFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbOverlayDisplayFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbWMCloseFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbEntryFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbMenuStateFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbVisibilityFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbWindowStatusFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbButtonBoxFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbDialsFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbMotionFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbPassiveMotionFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbReshapeFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbSpaceballButtonFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbTabletMotionFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbKeyboardFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbKeyboardUpFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbMenuStatusFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbSpaceballMotionFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbSpaceballRotateFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbSpecialFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbSpecialUpFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbMouseFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbMouseWheelFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbTabletButtonFunc'
     push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbTimerFunc'
     push glutcb_funcs, 'void,ptr,PMC,int,int'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbJoystickFunc'
     push glutcb_funcs, 'void,ptr,PMC,int'
+    push glutcb_funcs, ''
 
     .return (glutcb_funcs)
 .end
@@ -874,13 +906,18 @@ SUB_HEADER
 
         my @funcs = sort {$a->[0] cmp $b->[0]} @{$funcs{$group}};
         foreach my $func (@funcs) {
-            my ($name, $sig) = @$func;
+            my ($name, $sig, $cstr) = @$func;
 
-            my $sig_str = join ',', @$sig;
+            my $sig_str  = join ',', @$sig;
+            my $cstr_str = do {
+                my $i = -1;
+                join ',', map $_->[1], grep $_->[0], map [$_, $i++], @$cstr;
+            };
 
             print $funcs <<"FUNCTION"
     push $list_name, '$name'
     push $list_name, '$sig_str'
+    push $list_name, '$cstr_str'
 FUNCTION
         }
         print $funcs <<"SUB_FOOTER";
