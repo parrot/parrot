@@ -269,6 +269,7 @@ int main(int argc, char* argv[])
     Parrot_pa_iter_next(interp, forward);
     is(&k, Parrot_pa_iter_get(interp, forward), "Got third item");
 
+    Parrot_pa_iter_next(interp, forward);
     ok(Parrot_pa_iter_is_empty(interp, forward), "Iterator is now empty");
 
     return EXIT_SUCCESS;
