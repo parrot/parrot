@@ -261,13 +261,13 @@ int main(int argc, char* argv[])
     forward = Parrot_pa_begin(interp, pa);
     ok(!Parrot_pa_iter_is_empty(interp, forward), "Iterator is not empty");
 
-    is(&i, Parrot_pa_iter_get(interp, forward), "Got first item");
+    is(&i, *Parrot_pa_iter_get(interp, forward), "Got first item");
 
     Parrot_pa_iter_next(interp, forward);
-    is(&j, Parrot_pa_iter_get(interp, forward), "Got second item");
+    is(&j, *Parrot_pa_iter_get(interp, forward), "Got second item");
 
     Parrot_pa_iter_next(interp, forward);
-    is(&k, Parrot_pa_iter_get(interp, forward), "Got third item");
+    is(&k, *Parrot_pa_iter_get(interp, forward), "Got third item");
 
     Parrot_pa_iter_next(interp, forward);
     ok(Parrot_pa_iter_is_empty(interp, forward), "Iterator is now empty");

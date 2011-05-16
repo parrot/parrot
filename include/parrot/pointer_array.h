@@ -212,13 +212,12 @@ INTVAL Parrot_pa_iter_cmp(PARROT_INTERP,
 
 PARROT_EXPORT
 void Parrot_pa_iter_destroy(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array_Iterator *iter))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+    ARGFREE(Parrot_Pointer_Array_Iterator *iter))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-void * Parrot_pa_iter_get(PARROT_INTERP,
+void ** Parrot_pa_iter_get(PARROT_INTERP,
     ARGIN(Parrot_Pointer_Array_Iterator *iter))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -277,8 +276,7 @@ size_t Parrot_pa_count_used(PARROT_INTERP,
     , PARROT_ASSERT_ARG(lhs) \
     , PARROT_ASSERT_ARG(rhs))
 #define ASSERT_ARGS_Parrot_pa_iter_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(iter))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pa_iter_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(iter))

@@ -220,20 +220,22 @@ Parrot_pa_iter_destroy(PARROT_INTERP, ARGFREE(Parrot_Pointer_Array_Iterator *ite
 }
 
 /*
-=item C<void * Parrot_pa_iter_get(PARROT_INTERP, Parrot_Pointer_Array_Iterator
+=item C<void ** Parrot_pa_iter_get(PARROT_INTERP, Parrot_Pointer_Array_Iterator
 *iter)>
 
-Get stored value.
+Get I<pointer> to stored value.
+
+We return pointer to be able to update item in-place.
 
 =cut
 */
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-void *
+void **
 Parrot_pa_iter_get(PARROT_INTERP, ARGIN(Parrot_Pointer_Array_Iterator *iter))
 {
-    return iter->chunk->data[iter->in_chunk_index];
+    return &(iter->chunk->data[iter->in_chunk_index]);
 }
 
 /*
