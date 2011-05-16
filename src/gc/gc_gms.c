@@ -119,21 +119,6 @@ TBD
  */
 #define MAX_GENERATIONS     4
 
-/* We allocate additional space in front of PObj* to store additional pointer */
-typedef struct pmc_alloc_struct {
-    void *ptr;
-    PMC   pmc;   /* NB: Value! */
-} pmc_alloc_struct;
-
-typedef struct string_alloc_struct {
-    void    *ptr;
-    STRING   str;   /* NB: Value! */
-} string_alloc_struct;
-
-#define PMC2PAC(p) ((pmc_alloc_struct *)((char*)(p) - sizeof (void *)))
-#define STR2PAC(p) ((string_alloc_struct *)((char*)(p) - sizeof (void *)))
-
-
 /* Get generation from PObj->flags */
 #define POBJ2GEN(pobj)                                                  \
         ((size_t)(((pobj)->flags & PObj_GC_generation_0_FLAG) ? 1 : 0)  \
@@ -730,10 +715,10 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         self = mem_allocate_zeroed_typed(MarkSweep_GC);
 
         self->pmc_allocator = Parrot_gc_pool_new(interp,
-            sizeof (pmc_alloc_struct));
+            sizeof (PMC));
 
         self->string_allocator = Parrot_gc_pool_new(interp,
-            sizeof (string_alloc_struct));
+            sizeof (STRING));
 
         /* Allocate list for gray objects */
         self->work_list  = NULL;
@@ -857,7 +842,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     gc_gms_check_sanity(interp);
 
-    gc_gms_print_stats(interp, "After");
+    gc_gms_print_stats_always(interp, "After");
 
     Parrot_pa_destroy(interp, self->work_list);
     self->work_list = NULL;
@@ -922,13 +907,15 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
 {
     ASSERT_ARGS(gc_gms_cleanup_dirty_list)
 
+    /* Construct new dirty_list from "survival" objects */
+    Parrot_Pointer_Array *new_dirty_list = Parrot_pa_new(interp);
+
     /* Override with special version of mark */
     interp->gc_sys->mark_pmc_header = gc_gms_pmc_get_youngest_generation;
     interp->gc_sys->mark_str_header = gc_gms_str_get_youngest_generation;
 
     POINTER_ARRAY_ITER(dirty_list,
-        pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
-        PMC              *pmc  = &(item->pmc);
+        PMC              *pmc  = (PMC*)ptr;
         size_t            gen  = POBJ2GEN(pmc);
 
         self->youngest_child = gen;
@@ -943,8 +930,6 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
         if (self->youngest_child >= gen) {
             PObj_live_CLEAR(pmc);
             PObj_GC_on_dirty_list_CLEAR(pmc);
-            Parrot_pa_remove(interp, dirty_list, item->ptr);
-            item->ptr = Parrot_pa_insert(interp, self->objects[gen], item);
             gc_gms_seal_object(interp, pmc);
         }
         else {
@@ -964,7 +949,11 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
             if (gen < MAX_GENERATIONS - 1) {
                 SET_GEN_FLAGS(pmc, gen + 1);
             }
+            Parrot_pa_insert(interp, new_dirty_list, pmc);
         };);
+
+    Parrot_pa_destroy(interp, self->dirty_list);
+    self->dirty_list = new_dirty_list;
 
     interp->gc_sys->mark_pmc_header = gc_gms_mark_pmc_header;
     interp->gc_sys->mark_str_header = gc_gms_mark_str_header;
@@ -989,7 +978,7 @@ gc_gms_process_dirty_list(PARROT_INTERP,
     ASSERT_ARGS(gc_gms_process_dirty_list)
 
     POINTER_ARRAY_ITER(dirty_list,
-        PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
+        PMC *pmc = (PMC *)ptr;
 
         if (PObj_custom_mark_TEST(pmc))
             VTABLE_mark(interp, pmc);
@@ -1016,7 +1005,7 @@ gc_gms_process_work_list(PARROT_INTERP,
     ASSERT_ARGS(gc_gms_process_work_list)
 
     POINTER_ARRAY_ITER(work_list,
-        PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
+        PMC *pmc = (PMC *)ptr;
 
         if (PObj_custom_mark_TEST(pmc))
             VTABLE_mark(interp, pmc);
@@ -1025,18 +1014,6 @@ gc_gms_process_work_list(PARROT_INTERP,
             Parrot_gc_mark_PMC_alive(interp, PMC_metadata(pmc)););
 
     gc_gms_print_stats(interp, "Before cleaning work_list");
-
-    /* Move processed objects back to own generation */
-    POINTER_ARRAY_ITER(work_list,
-        pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
-        PMC              *pmc  = &(item->pmc);
-        size_t            gen  = POBJ2GEN(pmc);
-
-        PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc));
-
-        Parrot_pa_remove(interp, work_list, item->ptr);
-        item->ptr = Parrot_pa_insert(interp, self->objects[gen], item););
-
 }
 
 /*
@@ -1058,15 +1035,23 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
 
     INTVAL i;
 
+    /* XXX We should use different codepath for collecting oldest generation */
+    Parrot_Pointer_Array *oldest = NULL;
+    if (self->gen_to_collect + 1 == MAX_GENERATIONS) {
+        oldest = Parrot_pa_new(interp);
+    }
+
     for (i = self->gen_to_collect; i >= 0; i--) {
         /* Don't move to generation beyond last */
         int move_to_old = (i + 1) != MAX_GENERATIONS;
 
         POINTER_ARRAY_ITER(self->objects[i],
-            pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
-            PMC              *pmc  = &(item->pmc);
+            PMC  *pmc  = (PMC *)ptr;
 
-            PARROT_ASSERT(PObj_constant_TEST(pmc) || POBJ2GEN(pmc) == i);
+            /* It can be stale object which was pulled to dirty_list. Skip it */
+            if (POBJ2GEN(pmc) != i) {
+                continue;
+            }
 
             /* Paint live objects white */
             if (PObj_live_TEST(pmc) || PObj_constant_TEST(pmc)) {
@@ -1075,22 +1060,23 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                 if (move_to_old) {
                     SET_GEN_FLAGS(pmc, i + 1);
 
-                    Parrot_pa_remove(interp, self->objects[i], item->ptr);
+                    Parrot_pa_insert(interp, self->objects[i + 1], pmc);
+
                     /* If this was freshly allocated object in C stack - move it to dirty list */
                     if (PObj_GC_soil_root_TEST(pmc)) {
-                        item->ptr = Parrot_pa_insert(interp, self->dirty_list, item);
+                        Parrot_pa_insert(interp, self->dirty_list, pmc);
                         PObj_GC_soil_root_CLEAR(pmc);
                         PObj_GC_on_dirty_list_SET(pmc);
                     }
                     else {
-                        item->ptr = Parrot_pa_insert(interp, self->objects[i + 1], item);
                         gc_gms_seal_object(interp, pmc);
                     }
                 }
+                else {
+                    Parrot_pa_insert(interp, oldest, pmc);
+                }
             }
             else if (!PObj_constant_TEST(pmc)) {
-                Parrot_pa_remove(interp, self->objects[i], item->ptr);
-
                 interp->gc_sys->stats.memory_used -= sizeof (PMC);
 
                 /* this is manual inlining of Parrot_pmc_destroy() */
@@ -1107,9 +1093,22 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                 Parrot_gc_pool_free(interp, self->pmc_allocator, ptr);
             });
 
+        /* We processed not oldest generation. It's techically _empty_ now. */
+        /* XXX We need Parrot_pa_reset which will reuse allocated chunks */
+        if (move_to_old) {
+            Parrot_pa_destroy(interp, self->objects[i]);
+            self->objects[i] = Parrot_pa_new(interp);
+        }
+        else {
+            Parrot_pa_destroy(interp, self->objects[i]);
+            self->objects[i] = oldest;
+
+            /* For next usage with strings */
+            oldest = Parrot_pa_new(interp);
+        }
+
         POINTER_ARRAY_ITER(self->strings[i],
-            string_alloc_struct *item = (string_alloc_struct *)ptr;
-            STRING *str = &(item->str);
+            STRING *str = (STRING *)ptr;
 
             PARROT_ASSERT(!PObj_on_free_list_TEST(str));
 
@@ -1117,14 +1116,15 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
             if (PObj_live_TEST(str) || PObj_constant_TEST(str)) {
                 PObj_live_CLEAR(str);
                 if (move_to_old) {
-                    Parrot_pa_remove(interp, self->strings[i], item->ptr);
-                    item->ptr = Parrot_pa_insert(interp, self->strings[i + 1], item);
+                    Parrot_pa_insert(interp, self->strings[i + 1], str);
                     SET_GEN_FLAGS(str, i + 1);
+                }
+                else {
+                    Parrot_pa_insert(interp, oldest, str);
                 }
             }
 
             else if (!PObj_constant_TEST(str)) {
-                Parrot_pa_remove(interp, self->strings[i], item->ptr);
                 if (Buffer_bufstart(str) && !PObj_external_TEST(str))
                     Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, (Buffer*)str);
 
@@ -1134,6 +1134,18 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
 
                 Parrot_gc_pool_free(interp, self->string_allocator, ptr);
             });
+
+        /* We processed not oldest generation. It's techically _empty_ now. */
+        /* XXX We need Parrot_pa_reset which will reuse allocated chunks */
+        if (move_to_old) {
+            Parrot_pa_destroy(interp, self->strings[i]);
+            self->strings[i] = Parrot_pa_new(interp);
+        }
+        else {
+            Parrot_pa_destroy(interp, self->strings[i]);
+            self->strings[i] = oldest;
+        }
+
     }
 
 }
@@ -1154,7 +1166,6 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_mark_pmc_header)
     MarkSweep_GC      * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    pmc_alloc_struct  * const item = PMC2PAC(pmc);
     const size_t gen  = POBJ2GEN(pmc);
 
     PARROT_ASSERT(!PObj_on_free_list_TEST(pmc)
@@ -1175,8 +1186,7 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
     /* mark it live. */
     PObj_live_SET(pmc);
 
-    Parrot_pa_remove(interp, self->objects[gen], item->ptr);
-    item->ptr = Parrot_pa_insert(interp, self->work_list, item);
+    Parrot_pa_insert(interp, self->work_list, pmc);
 }
 
 /*
@@ -1276,6 +1286,9 @@ static void
 gc_gms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_free_pmc_attributes)
+
+    return;
+
     if (PMC_data(pmc)) {
         MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
         Parrot_gc_fixed_allocator_free(interp, self->fixed_size_allocator,
@@ -1387,7 +1400,7 @@ gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
     ASSERT_ARGS(gc_gms_allocate_pmc_header)
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Pool_Allocator   * const pool = self->pmc_allocator;
-    pmc_alloc_struct *item;
+    PMC                     *pmc;
 
     gc_gms_maybe_mark_and_sweep(interp);
 
@@ -1397,10 +1410,10 @@ gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
     interp->gc_sys->stats.memory_used           += sizeof (PMC);
     interp->gc_sys->stats.mem_used_last_collect += sizeof (PMC);
 
-    item         = (pmc_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
-    item->ptr    = Parrot_pa_insert(interp, self->objects[0], item);
+    pmc = (PMC *)Parrot_gc_pool_allocate(interp, pool);
+    Parrot_pa_insert(interp, self->objects[0], pmc);
 
-    return &(item->pmc);
+    return pmc;
 }
 
 static void
@@ -1418,12 +1431,11 @@ gc_gms_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
         if (PObj_on_free_list_TEST(pmc))
             return;
 
-        Parrot_pa_remove(interp, self->objects[gen], PMC2PAC(pmc)->ptr);
-        PObj_on_free_list_SET(pmc);
+        PObj_flags_SETTO(pmc, b_PObj_on_free_list_FLAG);
 
         Parrot_pmc_destroy(interp, pmc);
 
-        Parrot_gc_pool_free(interp, self->pmc_allocator, PMC2PAC(pmc));
+        Parrot_gc_pool_free(interp, self->pmc_allocator, pmc);
 
         --interp->gc_sys->stats.header_allocs_since_last_collect;
         interp->gc_sys->stats.memory_used           -= sizeof (PMC);
@@ -1447,13 +1459,12 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     ASSERT_ARGS(gc_gms_is_pmc_ptr)
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     PObj             * const obj  = (PObj *)ptr;
-    pmc_alloc_struct * const item = PMC2PAC(ptr);
 
     /* Not aligned pointers aren't pointers */
-    if (!obj || !item || ((size_t)obj & 3) || ((size_t)item & 3))
+    if (!ptr || ((size_t)ptr & 3))
         return 0;
 
-    if (!Parrot_gc_pool_is_owned(interp, self->pmc_allocator, item))
+    if (!Parrot_gc_pool_is_owned(interp, self->pmc_allocator, ptr))
         return 0;
 
     /* black or white objects marked already. */
@@ -1469,7 +1480,7 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         return 0;
 
     /* Pool.is_owned isn't precise enough (yet) */
-    if (Parrot_pa_is_owned(interp, self->objects[POBJ2GEN(obj)], item, item->ptr)) {
+    if (Parrot_pa_is_owned(interp, self->objects[POBJ2GEN(obj)], ptr)) {
         if (POBJ2GEN(obj) == 0)
             PObj_GC_soil_root_SET(obj);
         return 1;
@@ -1502,7 +1513,6 @@ gc_gms_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
     ASSERT_ARGS(gc_gms_allocate_string_header)
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Pool_Allocator   * const pool = self->string_allocator;
-    string_alloc_struct *item;
     STRING           *ret;
 
     gc_gms_maybe_mark_and_sweep(interp);
@@ -1512,11 +1522,11 @@ gc_gms_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
     interp->gc_sys->stats.memory_used           += sizeof (STRING);
     interp->gc_sys->stats.mem_used_last_collect += sizeof (STRING);
 
-    item = (string_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
-    item->ptr = Parrot_pa_insert(interp, self->strings[0], item);
-
-    ret = &(item->str);
+    ret = (STRING *)Parrot_gc_pool_allocate(interp, pool);
     memset(ret, 0, sizeof (STRING));
+
+    Parrot_pa_insert(interp, self->strings[0], ret);
+
     return ret;
 }
 
@@ -1525,11 +1535,11 @@ gc_gms_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
 {
     ASSERT_ARGS(gc_gms_free_string_header)
 
+    return;
+
     if (s && !PObj_on_free_list_TEST(s)) {
         MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
         const size_t         gen = POBJ2GEN(s);
-
-        Parrot_pa_remove(interp, self->strings[gen], STR2PAC(s)->ptr);
 
         if (Buffer_bufstart(s) && !PObj_external_TEST(s))
             Parrot_gc_str_free_buffer_storage(interp,
@@ -1537,7 +1547,7 @@ gc_gms_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
 
         PObj_on_free_list_SET(s);
 
-        Parrot_gc_pool_free(interp, self->string_allocator, STR2PAC(s));
+        Parrot_gc_pool_free(interp, self->string_allocator, s);
 
         --interp->gc_sys->stats.header_allocs_since_last_collect;
         interp->gc_sys->stats.memory_used           -= sizeof (STRING);
@@ -1576,14 +1586,13 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_gms_is_string_ptr)
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    PObj             * const obj  = (PObj *)ptr;
-    string_alloc_struct * const item = STR2PAC(ptr);
+    PObj                    *obj  = (PObj *)ptr;
 
     /* Not aligned pointers aren't pointers */
-    if (!obj || !item || ((size_t)obj & 3) || ((size_t)item & 3))
+    if (!ptr || ((size_t)ptr & 3))
         return 0;
 
-    if (!Parrot_gc_pool_is_owned(interp, self->string_allocator, item))
+    if (!Parrot_gc_pool_is_owned(interp, self->string_allocator, obj))
         return 0;
 
     /* black or white objects marked already. */
@@ -1591,10 +1600,10 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         return 0;
 
     /* If object too old - skip it */
-    if (POBJ2GEN(&item->str) > self->gen_to_collect)
+    if (POBJ2GEN(obj) > self->gen_to_collect)
         return 0;
 
-    if (Parrot_pa_is_owned(interp, self->strings[POBJ2GEN(obj)], item, item->ptr))
+    if (Parrot_pa_is_owned(interp, self->strings[POBJ2GEN(obj)], obj))
         return 1;
 
     return 0;
@@ -1680,7 +1689,7 @@ gc_gms_iterate_live_strings(PARROT_INTERP,
     size_t             i;
     for (i = 0; i < MAX_GENERATIONS; i++) {
         POINTER_ARRAY_ITER(self->strings[i],
-            STRING *s = &((string_alloc_struct *)ptr)->str;
+            STRING *s = (STRING *)ptr;
             callback(interp, (Buffer *)s, data););
     }
 }
@@ -1936,7 +1945,6 @@ gc_gms_write_barrier(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(gc_gms_write_barrier)
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     const size_t             gen  = POBJ2GEN(pmc);
-    pmc_alloc_struct * const item = PMC2PAC(pmc);
 
     if (pmc->flags & PObj_GC_on_dirty_list_FLAG)
         return;
@@ -1944,8 +1952,7 @@ gc_gms_write_barrier(PARROT_INTERP, ARGMOD(PMC *pmc))
     if (!gen)
         return;
 
-    Parrot_pa_remove(interp, self->objects[gen], item->ptr);
-    item->ptr = Parrot_pa_insert(interp, self->dirty_list, item);
+    Parrot_pa_insert(interp, self->dirty_list, pmc);
 
     pmc->flags |= PObj_GC_on_dirty_list_FLAG;
 
@@ -2201,7 +2208,7 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header))
     ASSERT_ARGS(gc_gms_print_stats)
 
 #ifdef DETAIL_MEMORY_DEBUG
-    gc_gms_print_stats_always(interp, header, gen);
+    gc_gms_print_stats_always(interp, header);
 #else
     UNUSED(interp);
     UNUSED(header);
@@ -2269,7 +2276,7 @@ gc_gms_validate_objects(PARROT_INTERP)
 
     for (i = 0; i < MAX_GENERATIONS; i++) {
         POINTER_ARRAY_ITER(self->objects[i],
-            PMC * const pmc = &((pmc_alloc_struct *)ptr)->pmc;
+            PMC * const pmc = (PMC *)ptr;
             PObj_live_CLEAR(pmc););
     }
 #else
