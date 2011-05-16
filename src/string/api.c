@@ -2134,7 +2134,8 @@ Parrot_str_to_tied_cstring(PARROT_INTERP, ARGIN(STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_cstring)
 
-    s->tied_cstr = Parrot_str_to_encoded_cstring(interp, s, s->encoding);
+    if (!s->tied_cstr)
+        s->tied_cstr = Parrot_str_to_encoded_cstring(interp, s, s->encoding);
     return s->tied_cstr;
 }
 
