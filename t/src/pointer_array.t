@@ -235,11 +235,15 @@ int main(int argc, char* argv[])
         printf("ok 2 - Iterator is empty\n");
     }
 
+    Parrot_pa_iter_destroy(interp, forward);
+    printf("ok 3 - Iterator destroyed\n");
+
     return EXIT_SUCCESS;
 }
 CODE
 ok 1 - Iterator created
 ok 2 - Iterator is empty
+ok 3 - Iterator destroyed
 OUTPUT
 
 # Local Variables:

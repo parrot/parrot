@@ -178,6 +178,13 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_Pointer_Array_Iterator*
 Parrot_pa_begin(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
 {
+    Parrot_Pointer_Array_Iterator *iter = mem_gc_allocate_typed(interp, Parrot_Pointer_Array_Iterator);
+    iter->array             = self;
+    iter->chunk_index       = 0;
+    iter->in_chunk_index    = 0;
+    iter->chunk             = self->total_chunks ? self->chunks[0] : NULL;
+
+    return iter;
 }
 
 /*
@@ -207,8 +214,9 @@ Destroy iterator.
 
 PARROT_EXPORT
 void
-Parrot_pa_iter_destroy(PARROT_INTERP, ARGIN(Parrot_Pointer_Array_Iterator *iter))
+Parrot_pa_iter_destroy(PARROT_INTERP, ARGFREE(Parrot_Pointer_Array_Iterator *iter))
 {
+    mem_gc_free(interp, iter);
 }
 
 /*
@@ -288,6 +296,7 @@ INTVAL
 Parrot_pa_iter_is_empty(PARROT_INTERP,
         ARGIN(Parrot_Pointer_Array_Iterator *iter))
 {
+    return 1;
 }
 
 
