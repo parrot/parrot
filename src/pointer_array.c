@@ -296,7 +296,16 @@ INTVAL
 Parrot_pa_iter_is_empty(PARROT_INTERP,
         ARGIN(Parrot_Pointer_Array_Iterator *iter))
 {
-    return 1;
+    if (iter->chunk == NULL)
+        return 1;
+
+    if (iter->chunk_index > iter->array->total_chunks)
+        return 1;
+
+    if (iter->in_chunk_index > CELL_PER_CHUNK - iter->chunk->num_free)
+        return 1;
+
+    return 0;
 }
 
 

@@ -241,6 +241,13 @@ int main(int argc, char* argv[])
     Parrot_pa_iter_destroy(interp, forward);
     ok(1, "Iterator destroyed");
 
+    /* Put _few_ values into PA and check it */
+    Parrot_pa_insert(interp, pa, &i);
+    Parrot_pa_insert(interp, pa, &j);
+    Parrot_pa_insert(interp, pa, &k);
+
+    forward = Parrot_pa_begin(interp, pa);
+    ok(!Parrot_pa_iter_is_empty(interp, forward), "Iterator is not empty");
 
     return EXIT_SUCCESS;
 }
