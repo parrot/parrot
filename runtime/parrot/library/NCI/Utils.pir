@@ -154,6 +154,14 @@ this will tend to make the toolkit init function much happier.
     .return (new_argv)
 .end
 
+=item wrapped_func = call_with_cstring(pmc nci_func, int cstring_arg_index1, ...)
+
+Wraps an NCI function in a closure which translates between Parrot's strings and C's
+asciiz strings. Any number (including 0) of argument indices are accepted. The magic index
+value of C<-1> indicates that the return value should be translated.
+
+=cut
+
 .sub call_with_cstring
     .param pmc func
     .param pmc cstrings :slurpy
