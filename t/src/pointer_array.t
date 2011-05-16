@@ -217,26 +217,30 @@ c_output_is( <<'CODE', <<'OUTPUT', "Pointer array (iterators)" );
 #include <parrot/pointer_array.h>
 #include <stdio.h>
 
+static int test_no = 1;
+void
+ok(int check, const char *msg)
+{
+    if (!check)
+        printf("not ");
+    printf("ok %d - %s\n", test_no++, msg);
+}
+
 int main(int argc, char* argv[])
 {
     Interp *interp = Parrot_new(NULL);
     Parrot_Pointer_Array *pa = Parrot_pa_new(interp);
-    int i, j, k, count = 0;
+    int i = 42, j = 115200, k = 26122012, count = 0;
     void *pi, *pj, *pk;
 
     /* Iterator for empty array */
     Parrot_Pointer_Array_Iterator *forward = Parrot_pa_begin(interp, pa);
 
-    if (forward) {
-        printf("ok 1 - Iterator created\n");
-    }
-
-    if (Parrot_pa_iter_is_empty(interp, forward)) {
-        printf("ok 2 - Iterator is empty\n");
-    }
-
+    ok(forward != NULL, "Iterator created");
+    ok(Parrot_pa_iter_is_empty(interp, forward), "Iterator is empty");
     Parrot_pa_iter_destroy(interp, forward);
-    printf("ok 3 - Iterator destroyed\n");
+    ok(1, "Iterator destroyed");
+
 
     return EXIT_SUCCESS;
 }
