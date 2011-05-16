@@ -25,7 +25,7 @@ Testing Perl 6 objects.
     test_namespace.'export_to'(curr_namespace, exports)
 
     ##  set our plan
-    plan(12)
+    plan(13)
 
     ##  make sure we can load the NCI::Utils library
     push_eh load_fail
@@ -67,37 +67,43 @@ Testing Perl 6 objects.
 
 
     $P0 = ncifunc(libnci_test, 'nci_c', 'c')
-    ( $I0 ) = $P0()
+    $I0 = $P0()
     is( $I0, 22, "nci_c - return char in $I0" )
 
     $P0 = ncifunc(libnci_test, 'nci_l', 'l')
-    ( $I0 ) = $P0()
+    $I0 = $P0()
     is( $I0, -7777777, "nci_l - return long in $I0" )
 
     $P0 = ncifunc(libnci_test, 'nci_s', 's')
-    ( $I0 ) = $P0()
+    $I0 = $P0()
     is($I0, 333, "nci_s - return a short in $I0")
 
     $P0 = ncifunc(libnci_test, 'nci_t', 't')
-    ( $S0 ) = $P0()
+    $S0 = $P0()
     is($S0, "This is a C-string.\n", "nci_t - return a C string")
 
     $P0 = ncifunc(libnci_test, 'nci_isc', 'isc')
     $I1 = 2
     $I2 = 3
-    ( $I0 ) = $P0($I1, $I2)
+    $I0 = $P0($I1, $I2)
     is($I0, 6, "nci_isc - return an int from short + char")
 
     $P0 = ncifunc(libnci_test, 'nci_ssc', 'ssc')
     $I1 = -2
     $I2 = 3
-    ( $I0 ) = $P0($I1, $I2)
+    $I0 = $P0($I1, $I2)
     is($I0, -6, "nci_ssc - return short from short + char")
 
     $P0 = ncifunc(libnci_test, 'nci_tt', 'tt')
     $S0 = "ko"
-    ( $S1 ) = $P0($S0)
+    $S1 = $P0($S0)
     is($S1, "ok worked\n", "nci_tt - flip two characters")
+
+    $P0 = ncifunc(libnci_test, 'nci_pi', 'pi')
+    $I0 = 10 
+    $P1 = $P0($I0)
+    $I1 = isnull $P1
+    ok($I1, "nci_pi(10) - returned a null pointer as PMCNULL")
 
   loadlib_failed:
     .return ()
