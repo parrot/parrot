@@ -238,10 +238,13 @@ value of C<-1> indicates that the return value should be translated.
     i = iter cstr_args
     trans_loop:
         unless i goto end_trans_loop
-        $I0     = shift i
-        $S0     = args[$I0]
-        $P0     = str_to_cstring(interp, $S0)
-        args[$I0] = $P0
+        $I0 = shift i
+        $P0 = args[$I0]
+        if null $P0 goto end_cstr_trans
+            $S0       = $P0
+            $P0       = str_to_cstring(interp, $S0)
+            args[$I0] = $P0
+        end_cstr_trans:
         goto trans_loop
     end_trans_loop:
 
@@ -253,7 +256,9 @@ value of C<-1> indicates that the return value should be translated.
         unless i goto end_free_loop
         $I0 = shift i
         $P0 = args[$I0]
-        str_free_cstring($P0)
+        if null $P0 goto end_cstr_free
+            str_free_cstring($P0)
+        end_cstr_free:
         goto free_loop
     end_free_loop:
 
