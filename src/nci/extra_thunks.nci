@@ -249,3 +249,6 @@ int  (ptr, ptr, ptr,  int,  int, int, ptr, int)
 PMC    (ptr, STRING)
 INTVAL (ptr, STRING)
 STRING (ptr, INTVAL)
+
+# NCI::Utils
+STRING (ptr, ptr, INTVAL)

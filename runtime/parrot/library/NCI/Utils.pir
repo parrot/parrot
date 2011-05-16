@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2009, Parrot Foundation.
+# Copyright (C) 2008-2011, Parrot Foundation.
 
 =head1 TITLE
 
@@ -67,8 +67,6 @@ is performed using a copy.  When calling from an HLL that removes the
 program name from C<argv> automatically, provide the program_name argument
 so that C<call_toolkit_init()> can adjust C<argv> alignment internally;
 this will tend to make the toolkit init function much happier.
-
-=back
 
 =cut
 
@@ -269,8 +267,6 @@ value of C<-1> indicates that the return value should be translated.
 
 Emulates C<dlfunc> op, but extends this to provide functionality for more complex, but
 common, types. Current supported types are:
-
-=over 4
 
 =item t
 
