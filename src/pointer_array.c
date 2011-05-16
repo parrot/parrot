@@ -233,6 +233,7 @@ PARROT_CAN_RETURN_NULL
 void *
 Parrot_pa_iter_get(PARROT_INTERP, ARGIN(Parrot_Pointer_Array_Iterator *iter))
 {
+    return iter->chunk->data[iter->in_chunk_index];
 }
 
 /*

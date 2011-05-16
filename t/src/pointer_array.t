@@ -218,12 +218,24 @@ c_output_is( <<'CODE', <<'OUTPUT', "Pointer array (iterators)" );
 #include <stdio.h>
 
 static int test_no = 1;
-void
+int
 ok(int check, const char *msg)
 {
-    if (!check)
+    int res = 1;
+    if (!check) {
         printf("not ");
+        res = 0;
+    }
     printf("ok %d - %s\n", test_no++, msg);
+    return res;
+}
+
+void
+is(int l, int r, const char *msg)
+{
+    if (!ok(l == r, msg)) {
+        printf("# %d != %d\n", l, r);
+    }
 }
 
 int main(int argc, char* argv[])
@@ -249,12 +261,16 @@ int main(int argc, char* argv[])
     forward = Parrot_pa_begin(interp, pa);
     ok(!Parrot_pa_iter_is_empty(interp, forward), "Iterator is not empty");
 
+    is(&i, Parrot_pa_iter_get(interp, forward), "Got first item");
+
     return EXIT_SUCCESS;
 }
 CODE
 ok 1 - Iterator created
 ok 2 - Iterator is empty
 ok 3 - Iterator destroyed
+ok 4 - Iterator is not empty
+ok 5 - Got first item
 OUTPUT
 
 # Local Variables:
