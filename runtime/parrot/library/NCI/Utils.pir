@@ -440,7 +440,11 @@ C<signature> are:
 
   nci_ret_t:
     retv = pop retv                 # get the first value out of the slurpy
+    if null retv goto nci_ret_t_null
     $S0 = 'str_new'(interp, retv, 0)
+    .return ($S0)
+  nci_ret_t_null:
+    $S0 = null
     .return ($S0)
 .end
 
