@@ -430,18 +430,10 @@ static void gc_gms_str_get_youngest_generation(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
-
-static void gc_gms_sweep_string_cb(PARROT_INTERP, ARGIN(PObj *obj))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 static void gc_gms_unblock_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -600,15 +592,9 @@ static int gen2flags(int gen);
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
-#define ASSERT_ARGS_gc_gms_sweep_pmc_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(obj))
 #define ASSERT_ARGS_gc_gms_sweep_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_gc_gms_sweep_string_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(obj))
 #define ASSERT_ARGS_gc_gms_unblock_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_unblock_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -1384,8 +1370,8 @@ gc_gms_finalize(PARROT_INTERP)
     Parrot_gc_str_finalize(interp, &self->string_gc);
 
     for (i = 0; i < MAX_GENERATIONS; i++) {
-        Parrot_pa_destroy(interp, self->objects[0]);
-        Parrot_pa_destroy(interp, self->strings[0]);
+        Parrot_pa_destroy(interp, self->objects[i]);
+        Parrot_pa_destroy(interp, self->strings[i]);
     }
 
     Parrot_gc_pool_destroy(interp, self->pmc_allocator);
@@ -1467,7 +1453,7 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     if (!obj || !item || ((size_t)obj & 3) || ((size_t)item & 3))
         return 0;
 
-    if (!Parrot_gc_pool_is_maybe_owned(interp, self->pmc_allocator, item))
+    if (!Parrot_gc_pool_is_owned(interp, self->pmc_allocator, item))
         return 0;
 
     /* black or white objects marked already. */
@@ -1475,44 +1461,21 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         return 0;
 
     /* If object too old - skip it */
-    if (POBJ2GEN(&item->pmc) > self->gen_to_collect)
+    if (POBJ2GEN(obj) > self->gen_to_collect)
         return 0;
 
     /* Object is on dirty_list. */
-    if (PObj_GC_on_dirty_list_TEST(&item->pmc))
-        return 0;
-
-    if (!Parrot_gc_pool_is_owned(interp, self->pmc_allocator, item))
+    if (PObj_GC_on_dirty_list_TEST(obj))
         return 0;
 
     /* Pool.is_owned isn't precise enough (yet) */
     if (Parrot_pa_is_owned(interp, self->objects[POBJ2GEN(obj)], item, item->ptr)) {
-        if (POBJ2GEN(obj) == 0) {
-            /* This is freshly allocated object on C stack. Soil it after GC run */
-            PObj_GC_soil_root_SET(&item->pmc);
-        }
+        if (POBJ2GEN(obj) == 0)
+            PObj_GC_soil_root_SET(obj);
         return 1;
     }
 
     return 0;
-}
-
-/*
-
-=item C<static void gc_gms_sweep_pmc_cb(PARROT_INTERP, PObj *obj)>
-
-destroy pmc *obj
-
-=cut
-
-*/
-
-static void
-gc_gms_sweep_pmc_cb(PARROT_INTERP, ARGIN(PObj *obj))
-{
-    ASSERT_ARGS(gc_gms_sweep_pmc_cb)
-    PMC *pmc = (PMC *)obj;
-    Parrot_pmc_destroy(interp, pmc);
 }
 
 /*
@@ -1620,7 +1583,7 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     if (!obj || !item || ((size_t)obj & 3) || ((size_t)item & 3))
         return 0;
 
-    if (!Parrot_gc_pool_is_maybe_owned(interp, self->string_allocator, item))
+    if (!Parrot_gc_pool_is_owned(interp, self->string_allocator, item))
         return 0;
 
     /* black or white objects marked already. */
@@ -1629,9 +1592,6 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 
     /* If object too old - skip it */
     if (POBJ2GEN(&item->str) > self->gen_to_collect)
-        return 0;
-
-    if (!Parrot_gc_pool_is_owned(interp, self->string_allocator, item))
         return 0;
 
     if (Parrot_pa_is_owned(interp, self->strings[POBJ2GEN(obj)], item, item->ptr))
@@ -1698,28 +1658,6 @@ gc_gms_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
     interp->gc_sys->stats.memory_used           += size;
     interp->gc_sys->stats.mem_used_last_collect += size;
 }
-
-/*
-
-=item C<static void gc_gms_sweep_string_cb(PARROT_INTERP, PObj *obj)>
-
-destroy string *obj
-
-=cut
-
-*/
-
-static void
-gc_gms_sweep_string_cb(PARROT_INTERP, ARGIN(PObj *obj))
-{
-    ASSERT_ARGS(gc_gms_sweep_string_cb)
-    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    Buffer       * const str  = (Buffer *)obj;
-    /* Compact string pool here. Or get rid of "shared buffers" and just free storage */
-    if (Buffer_bufstart(str) && !PObj_external_TEST(str))
-        Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, str);
-}
-
 
 /*
 

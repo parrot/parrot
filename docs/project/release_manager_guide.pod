@@ -462,11 +462,10 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
 Versions with a asterisk (*) are supported releases.
 
- - May 17, 2011 - 3.4   - gerd
  - Jun 21, 2011 - 3.5   - cotto
  - Jul 19, 2011 - 3.6*  - kid51
  - Aug 16, 2011 - 3.7   - ??
- - Sep 20, 2011 - 3.8   - ??
+ - Sep 20, 2011 - 3.8   - soh_cah_toa
  - Oct 18, 2011 - 3.9*  - dukeleto
  - Nov 15, 2011 - 3.10  - ??
  - Dec 20, 2011 - 3.11  - cotto

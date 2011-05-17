@@ -1,13 +1,13 @@
 #! perl
 # Copyright (C) 2010-2011, Parrot Foundation.
-# 063-git_describe_to_cache.t
+# 063-git_describe.t
 
 use strict;
 use warnings;
 
 use Test::More;
 if (-e 'DEVELOPING' and ! -e 'Makefile') {
-    plan tests =>  8;
+    plan tests =>  7;
 }
 else {
     plan skip_all =>
@@ -47,9 +47,6 @@ my $cwd = cwd();
             );
         };
     }
-    my $cache = q{.parrot_current_git_describe};
-    my $size = -s $cache;
-    cmp_ok( $size , '>', 0, "Cache for sha1 number was created and nonempty : $size bytes");
 
     chdir $tdir;
     unlink qq{$libdir/Parrot/Git/Describe.pm}
@@ -61,11 +58,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-063-git_describe_to_cache.t - test caching in Parrot::Git::Describe
+063-git_describe.t - test caching in Parrot::Git::Describe
 
 =head1 SYNOPSIS
 
-    % prove t/configure/063-git_describe_to_cache.t
+    % prove t/configure/063-git_describe.t
 
 =head1 DESCRIPTION
 

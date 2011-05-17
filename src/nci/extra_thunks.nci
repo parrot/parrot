@@ -37,6 +37,7 @@
 i    ip
 i    p
 v    p
+v    ppp
 
 v
 v    i
@@ -54,10 +55,14 @@ i    P
 # Added for TclLibrary
 i    ppd
 i    pipi
+p    ppi
+p    pppi
+p    ppppi
 
 i          # void function returning int like fork()
 
 # win32
+l     lppl
 i     pip
 i     piS
 S     i
@@ -94,6 +99,8 @@ S     i
 l    p    #! my_ulonglong mysql_num_rows(MYSQL_RES *res)
 i    p    #  unsigned int mysql_num_fields(MYSQL_RES *res)
 c    p    #  my_bool mysql_eof(MYSQL_RES *res)
+c    pppp # my_bool mysql_change_user(MYSQL *mysql, const char *user,
+# const char *passwd, const char *db)
 p    pi   #  MYSQL_FIELD *mysql_fetch_field_direct(MYSQL_RES *res,
 #               unsigned int fieldnr)
 p    p    #  MYSQL_FIELD * mysql_fetch_fields(MYSQL_RES *res)
@@ -105,7 +112,12 @@ l    p    #! my_ulonglong mysql_insert_id(MYSQL *mysql)
 i    p    #  unsigned int mysql_errno(MYSQL *mysql)
 l    p    #  unsigned long mysql_thread_id(MYSQL *mysql)
 p    p    #  MYSQL * mysql_init(MYSQL *mysql)
+i    pppppp # int mysql_ssl_set(MYSQL *mysql, const char *key,
+# const char *cert, const char *ca, const char *capath,
+# const char *cipher)
 
+l    ppl   #  unsigned long mysql_escape_string(char *to,const char *from, unsigned long from_length)
+l    pppl  #  unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,const char *from, unsigned long length)
 v    p     #  void mysql_close(MYSQL *sock)
 i    p     #  int mysql_shutdown(MYSQL *mysql)
 i    p     #  int mysql_dump_debug_info(MYSQL *mysql)
@@ -126,10 +138,15 @@ i    pi    #  MYSQL_FIELD_OFFSET mysql_field_seek(MYSQL_RES *result,
 p    p     #  MYSQL_ROW mysql_fetch_row(MYSQL_RES *result)
 l    p     #  unsigned long * mysql_fetch_lengths(MYSQL_RES *result)
 p    p     #  MYSQL_FIELD * mysql_fetch_field(MYSQL_RES *result)
+
+ptr (ptr, ptr, ptr, ptr, ptr, int, ptr, int) # mysql_real_connect
 # --- end mysqlclient library ---
 
 # Oddball ones for postgres
 p    ppP         # PQsetNoticeReceiver
+p    ppipppi     # PQexecPrepared
+p    ppippppi    # PQexecParams
+p    pppip       # PQprepage
 
 # Used by SDL
 p    iiil
@@ -137,6 +154,15 @@ i    ppl
 v    pip
 i    ppp
 # added by RNH for the RenderXXX_XXXX text routines 
+p    ppii
+
+
+# Used by SDL::Font
+p    ppp 
+
+
+# used by pcre
+i    ppiipi
 
 # t/pmc/nci.t
 c
@@ -159,6 +185,7 @@ i    iiilsp
 i    iil
 i    iili
 i    iip
+i    iipi
 i    ilsp
 i    l
 i    li
@@ -172,7 +199,10 @@ i    piiiiii
 i    piiilsp
 i    piil
 i    piili
+i    piip
+i    pipl
 i    pilsp
+i    piipi
 i    pl
 i    pli
 i    pll
@@ -205,6 +235,8 @@ p    p
 p    pi
 p    pii
 p    piiii
+p    ppp
+p    ppppppp
 
 s
 
@@ -239,6 +271,7 @@ v    fff
 
 # Testing SQLite
 i    pid
+i    pipii
 
 # PCRE
 p    pS
@@ -249,3 +282,6 @@ int  (ptr, ptr, ptr,  int,  int, int, ptr, int)
 PMC    (ptr, STRING)
 INTVAL (ptr, STRING)
 STRING (ptr, INTVAL)
+
+# NCI::Utils
+STRING (ptr, ptr, INTVAL)

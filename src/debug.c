@@ -74,8 +74,9 @@ static void close_script_file(PARROT_INTERP)
 static unsigned short condition_regtype(ARGIN(const char *cmd))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PDB_breakpoint_t * current_breakpoint(ARGIN(PDB_t * pdb))
+static PDB_breakpoint_t * current_breakpoint(ARGIN(const PDB_t *pdb))
         __attribute__nonnull__(1);
 
 static void dbg_assign(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
@@ -174,7 +175,7 @@ static void debugger_cmdline(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static void display_breakpoint(
-    ARGIN(PDB_t *pdb),
+    ARGIN(const PDB_t *pdb),
     ARGIN(const PDB_breakpoint_t *breakpoint))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -213,7 +214,7 @@ static unsigned long get_ulong(ARGMOD(const char **cmd), unsigned long def)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*cmd);
 
-static void list_breakpoints(ARGIN(PDB_t *pdb))
+static void list_breakpoints(ARGIN(const PDB_t *pdb))
         __attribute__nonnull__(1);
 
 static void no_such_register(PARROT_INTERP,
@@ -1809,8 +1810,7 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
     ASSERT_ARGS(PDB_set_break)
     PDB_t            * const pdb      = interp->pdb;
-    PDB_breakpoint_t *newbreak,
-                     *oldbreak;
+    PDB_breakpoint_t *newbreak;
     PDB_line_t       *line = NULL;
     opcode_t         *breakpos = NULL;
 
@@ -1905,6 +1905,8 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         pdb->breakpoint = newbreak;
     }
     else {
+        PDB_breakpoint_t *oldbreak;
+
         for (oldbreak = pdb->breakpoint; oldbreak->next; oldbreak = oldbreak->next)
             ;
         newbreak->id = oldbreak->id + 1;
@@ -1919,7 +1921,7 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 
 /*
 
-=item C<static void list_breakpoints(PDB_t *pdb)>
+=item C<static void list_breakpoints(const PDB_t *pdb)>
 
 Print all breakpoints for this debugger session to C<pdb->debugger>.
 
@@ -1928,18 +1930,18 @@ Print all breakpoints for this debugger session to C<pdb->debugger>.
 */
 
 static void
-list_breakpoints(ARGIN(PDB_t *pdb))
+list_breakpoints(ARGIN(const PDB_t *pdb))
 {
     ASSERT_ARGS(list_breakpoints)
 
-    PDB_breakpoint_t *breakpoint;
+    if (pdb->breakpoint) {
+        const PDB_breakpoint_t *breakpoint;
 
-    if (pdb->breakpoint)
         for (breakpoint = pdb->breakpoint;
              breakpoint;
              breakpoint = breakpoint->next)
             display_breakpoint(pdb, breakpoint);
-
+    }
     else
         Parrot_io_eprintf(pdb->debugger, "No breakpoints set\n");
 }
@@ -2024,8 +2026,9 @@ PDB_breakpoint_t *
 PDB_find_breakpoint(PARROT_INTERP, ARGIN(const char *command))
 {
     ASSERT_ARGS(PDB_find_breakpoint)
-    const char *oldcmd = command;
+    const char * const oldcmd = command;
     const unsigned long n = get_ulong(&command, 0);
+
     if (command != oldcmd) {
         PDB_breakpoint_t *breakpoint = interp->pdb->breakpoint;
 
@@ -2345,7 +2348,7 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 
 /*
 
-=item C<static PDB_breakpoint_t * current_breakpoint(PDB_t * pdb)>
+=item C<static PDB_breakpoint_t * current_breakpoint(const PDB_t *pdb)>
 
 Returns a pointer to the breakpoint at the current position,
 or NULL if there is none.
@@ -2354,9 +2357,10 @@ or NULL if there is none.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PDB_breakpoint_t *
-current_breakpoint(ARGIN(PDB_t * pdb))
+current_breakpoint(ARGIN(const PDB_t *pdb))
 {
     ASSERT_ARGS(current_breakpoint)
     PDB_breakpoint_t *breakpoint = pdb->breakpoint;
@@ -2897,13 +2901,13 @@ PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
     opcode_t * pc        = interp->code->base.data;
 
     PDB_file_t  *pfile;
-    PDB_line_t  *pline, *newline;
+    PDB_line_t  *pline;
     PDB_label_t *label;
     opcode_t    *code_end;
 
     const unsigned int default_size = 32768;
     size_t space;  /* How much space do we have? */
-    size_t size, alloced, n;
+    size_t alloced, n;
 
     TRACEDEB_MSG("PDB_disassemble");
 
@@ -2924,6 +2928,8 @@ PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
     code_end      = pc + interp->code->base.size;
 
     while (pc != code_end) {
+        size_t size;
+
         /* Grow it early */
         if (space < default_size) {
             alloced += default_size;
@@ -2947,7 +2953,8 @@ PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
         /* Prepare for next line unless there will be no next line. */
 
         if (pc < code_end) {
-            newline              = mem_gc_allocate_zeroed_typed(interp, PDB_line_t);
+            PDB_line_t * const newline = mem_gc_allocate_zeroed_typed(interp, PDB_line_t);
+
             newline->label       = NULL;
             newline->next        = NULL;
             newline->number      = pline->number + 1;
@@ -3889,7 +3896,7 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
 
 /*
 
-=item C<static void display_breakpoint(PDB_t *pdb, const PDB_breakpoint_t
+=item C<static void display_breakpoint(const PDB_t *pdb, const PDB_breakpoint_t
 *breakpoint)>
 
 Displays a breakpoint.
@@ -3899,7 +3906,7 @@ Displays a breakpoint.
 */
 
 static void
-display_breakpoint(ARGIN(PDB_t *pdb), ARGIN(const PDB_breakpoint_t *breakpoint))
+display_breakpoint(ARGIN(const PDB_t *pdb), ARGIN(const PDB_breakpoint_t *breakpoint))
 {
     ASSERT_ARGS(display_breakpoint)
 

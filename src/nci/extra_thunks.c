@@ -99,6 +99,28 @@ pcf_void_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "");
 }
 static void
+pcf_void_ptr_ptr_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef void(* func_t)(void *, void *, void *);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    PMC  * t_3; void * v_3;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPP", &t_1, &t_2, &t_3);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = PMC_IS_NULL(t_3) ? NULL : VTABLE_get_pointer(interp, t_3);;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+     (*fn_pointer)(v_1, v_2, v_3);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "");
+}
+static void
 pcf_void(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(void);
@@ -363,6 +385,102 @@ pcf_int_ptr_int_ptr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
 }
 static void
+pcf_ptr_ptr_ptr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef void *(* func_t)(void *, void *, int);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    PMC  * t_0; void * v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    INTVAL t_3; int v_3;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPI", &t_1, &t_2, &t_3);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = t_3;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3);
+    if (v_0 != NULL) {
+          t_0 = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+          VTABLE_set_pointer(interp, t_0, v_0);
+       }
+       else {
+           t_0 = PMCNULL;
+       };
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", t_0);
+}
+static void
+pcf_ptr_ptr_ptr_ptr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef void *(* func_t)(void *, void *, void *, int);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    PMC  * t_0; void * v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    PMC  * t_3; void * v_3;
+    INTVAL t_4; int v_4;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPPI", &t_1, &t_2, &t_3, &t_4);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = PMC_IS_NULL(t_3) ? NULL : VTABLE_get_pointer(interp, t_3);;
+    v_4 = t_4;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4);
+    if (v_0 != NULL) {
+          t_0 = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+          VTABLE_set_pointer(interp, t_0, v_0);
+       }
+       else {
+           t_0 = PMCNULL;
+       };
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", t_0);
+}
+static void
+pcf_ptr_ptr_ptr_ptr_ptr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef void *(* func_t)(void *, void *, void *, void *, int);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    PMC  * t_0; void * v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    PMC  * t_3; void * v_3;
+    PMC  * t_4; void * v_4;
+    INTVAL t_5; int v_5;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPPPI", &t_1, &t_2, &t_3, &t_4, &t_5);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = PMC_IS_NULL(t_3) ? NULL : VTABLE_get_pointer(interp, t_3);;
+    v_4 = PMC_IS_NULL(t_4) ? NULL : VTABLE_get_pointer(interp, t_4);;
+    v_5 = t_5;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4, v_5);
+    if (v_0 != NULL) {
+          t_0 = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+          VTABLE_set_pointer(interp, t_0, v_0);
+       }
+       else {
+           t_0 = PMCNULL;
+       };
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", t_0);
+}
+static void
 pcf_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(void);
@@ -378,6 +496,32 @@ pcf_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     v_0 =  (*fn_pointer)();
+    t_0 = v_0;
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
+}
+static void
+pcf_long_long_ptr_ptr_long(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef long(* func_t)(long, void *, void *, long);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    INTVAL t_0; long v_0;
+    INTVAL t_1; long v_1;
+    PMC  * t_2; void * v_2;
+    PMC  * t_3; void * v_3;
+    INTVAL t_4; long v_4;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "IPPI", &t_1, &t_2, &t_3, &t_4);
+    v_1 = t_1;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = PMC_IS_NULL(t_3) ? NULL : VTABLE_get_pointer(interp, t_3);;
+    v_4 = t_4;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4);
     t_0 = v_0;
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
 }
@@ -490,6 +634,32 @@ pcf_char_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
 }
 static void
+pcf_char_ptr_ptr_ptr_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef char(* func_t)(void *, void *, void *, void *);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    INTVAL t_0; char v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    PMC  * t_3; void * v_3;
+    PMC  * t_4; void * v_4;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPPP", &t_1, &t_2, &t_3, &t_4);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = PMC_IS_NULL(t_3) ? NULL : VTABLE_get_pointer(interp, t_3);;
+    v_4 = PMC_IS_NULL(t_4) ? NULL : VTABLE_get_pointer(interp, t_4);;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4);
+    t_0 = v_0;
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
+}
+static void
 pcf_ptr_ptr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void *(* func_t)(void *, int);
@@ -542,6 +712,86 @@ pcf_ptr_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
            t_0 = PMCNULL;
        };
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", t_0);
+}
+static void
+pcf_int_ptr_ptr_ptr_ptr_ptr_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef int(* func_t)(void *, void *, void *, void *, void *, void *);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    INTVAL t_0; int v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    PMC  * t_3; void * v_3;
+    PMC  * t_4; void * v_4;
+    PMC  * t_5; void * v_5;
+    PMC  * t_6; void * v_6;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPPPPP", &t_1, &t_2, &t_3, &t_4, &t_5, &t_6);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = PMC_IS_NULL(t_3) ? NULL : VTABLE_get_pointer(interp, t_3);;
+    v_4 = PMC_IS_NULL(t_4) ? NULL : VTABLE_get_pointer(interp, t_4);;
+    v_5 = PMC_IS_NULL(t_5) ? NULL : VTABLE_get_pointer(interp, t_5);;
+    v_6 = PMC_IS_NULL(t_6) ? NULL : VTABLE_get_pointer(interp, t_6);;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4, v_5, v_6);
+    t_0 = v_0;
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
+}
+static void
+pcf_long_ptr_ptr_long(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef long(* func_t)(void *, void *, long);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    INTVAL t_0; long v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    INTVAL t_3; long v_3;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPI", &t_1, &t_2, &t_3);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = t_3;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3);
+    t_0 = v_0;
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
+}
+static void
+pcf_long_ptr_ptr_ptr_long(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef long(* func_t)(void *, void *, void *, long);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    INTVAL t_0; long v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    PMC  * t_3; void * v_3;
+    INTVAL t_4; long v_4;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPPI", &t_1, &t_2, &t_3, &t_4);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = PMC_IS_NULL(t_3) ? NULL : VTABLE_get_pointer(interp, t_3);;
+    v_4 = t_4;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4);
+    t_0 = v_0;
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
 }
 static void
 pcf_int_ptr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
@@ -635,6 +885,46 @@ pcf_ptr_ptr_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", t_0);
 }
 static void
+pcf_ptr_ptr_ptr_ptr_ptr_ptr_int_ptr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef void *(* func_t)(void *, void *, void *, void *, void *, int, void *, int);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    PMC  * t_0; void * v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    PMC  * t_3; void * v_3;
+    PMC  * t_4; void * v_4;
+    PMC  * t_5; void * v_5;
+    INTVAL t_6; int v_6;
+    PMC  * t_7; void * v_7;
+    INTVAL t_8; int v_8;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPPPPIPI", &t_1, &t_2, &t_3, &t_4, &t_5, &t_6, &t_7, &t_8);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = PMC_IS_NULL(t_3) ? NULL : VTABLE_get_pointer(interp, t_3);;
+    v_4 = PMC_IS_NULL(t_4) ? NULL : VTABLE_get_pointer(interp, t_4);;
+    v_5 = PMC_IS_NULL(t_5) ? NULL : VTABLE_get_pointer(interp, t_5);;
+    v_6 = t_6;
+    v_7 = PMC_IS_NULL(t_7) ? NULL : VTABLE_get_pointer(interp, t_7);;
+    v_8 = t_8;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4, v_5, v_6, v_7, v_8);
+    if (v_0 != NULL) {
+          t_0 = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+          VTABLE_set_pointer(interp, t_0, v_0);
+       }
+       else {
+           t_0 = PMCNULL;
+       };
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", t_0);
+}
+static void
 pcf_ptr_ptr_ptr_PMC(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void *(* func_t)(void *, void *, PMC *);
@@ -655,6 +945,118 @@ pcf_ptr_ptr_ptr_PMC(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     v_0 =  (*fn_pointer)(v_1, v_2, v_3);
+    if (v_0 != NULL) {
+          t_0 = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+          VTABLE_set_pointer(interp, t_0, v_0);
+       }
+       else {
+           t_0 = PMCNULL;
+       };
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", t_0);
+}
+static void
+pcf_ptr_ptr_ptr_int_ptr_ptr_ptr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef void *(* func_t)(void *, void *, int, void *, void *, void *, int);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    PMC  * t_0; void * v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    INTVAL t_3; int v_3;
+    PMC  * t_4; void * v_4;
+    PMC  * t_5; void * v_5;
+    PMC  * t_6; void * v_6;
+    INTVAL t_7; int v_7;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPIPPPI", &t_1, &t_2, &t_3, &t_4, &t_5, &t_6, &t_7);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = t_3;
+    v_4 = PMC_IS_NULL(t_4) ? NULL : VTABLE_get_pointer(interp, t_4);;
+    v_5 = PMC_IS_NULL(t_5) ? NULL : VTABLE_get_pointer(interp, t_5);;
+    v_6 = PMC_IS_NULL(t_6) ? NULL : VTABLE_get_pointer(interp, t_6);;
+    v_7 = t_7;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4, v_5, v_6, v_7);
+    if (v_0 != NULL) {
+          t_0 = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+          VTABLE_set_pointer(interp, t_0, v_0);
+       }
+       else {
+           t_0 = PMCNULL;
+       };
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", t_0);
+}
+static void
+pcf_ptr_ptr_ptr_int_ptr_ptr_ptr_ptr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef void *(* func_t)(void *, void *, int, void *, void *, void *, void *, int);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    PMC  * t_0; void * v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    INTVAL t_3; int v_3;
+    PMC  * t_4; void * v_4;
+    PMC  * t_5; void * v_5;
+    PMC  * t_6; void * v_6;
+    PMC  * t_7; void * v_7;
+    INTVAL t_8; int v_8;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPIPPPPI", &t_1, &t_2, &t_3, &t_4, &t_5, &t_6, &t_7, &t_8);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = t_3;
+    v_4 = PMC_IS_NULL(t_4) ? NULL : VTABLE_get_pointer(interp, t_4);;
+    v_5 = PMC_IS_NULL(t_5) ? NULL : VTABLE_get_pointer(interp, t_5);;
+    v_6 = PMC_IS_NULL(t_6) ? NULL : VTABLE_get_pointer(interp, t_6);;
+    v_7 = PMC_IS_NULL(t_7) ? NULL : VTABLE_get_pointer(interp, t_7);;
+    v_8 = t_8;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4, v_5, v_6, v_7, v_8);
+    if (v_0 != NULL) {
+          t_0 = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+          VTABLE_set_pointer(interp, t_0, v_0);
+       }
+       else {
+           t_0 = PMCNULL;
+       };
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", t_0);
+}
+static void
+pcf_ptr_ptr_ptr_ptr_int_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef void *(* func_t)(void *, void *, void *, int, void *);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    PMC  * t_0; void * v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    PMC  * t_3; void * v_3;
+    INTVAL t_4; int v_4;
+    PMC  * t_5; void * v_5;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPPIP", &t_1, &t_2, &t_3, &t_4, &t_5);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = PMC_IS_NULL(t_3) ? NULL : VTABLE_get_pointer(interp, t_3);;
+    v_4 = t_4;
+    v_5 = PMC_IS_NULL(t_5) ? NULL : VTABLE_get_pointer(interp, t_5);;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4, v_5);
     if (v_0 != NULL) {
           t_0 = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
           VTABLE_set_pointer(interp, t_0, v_0);
@@ -763,6 +1165,98 @@ pcf_int_ptr_ptr_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     v_0 =  (*fn_pointer)(v_1, v_2, v_3);
+    t_0 = v_0;
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
+}
+static void
+pcf_ptr_ptr_ptr_int_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef void *(* func_t)(void *, void *, int, int);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    PMC  * t_0; void * v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    INTVAL t_3; int v_3;
+    INTVAL t_4; int v_4;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPII", &t_1, &t_2, &t_3, &t_4);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = t_3;
+    v_4 = t_4;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4);
+    if (v_0 != NULL) {
+          t_0 = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+          VTABLE_set_pointer(interp, t_0, v_0);
+       }
+       else {
+           t_0 = PMCNULL;
+       };
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", t_0);
+}
+static void
+pcf_ptr_ptr_ptr_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef void *(* func_t)(void *, void *, void *);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    PMC  * t_0; void * v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    PMC  * t_3; void * v_3;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPP", &t_1, &t_2, &t_3);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = PMC_IS_NULL(t_3) ? NULL : VTABLE_get_pointer(interp, t_3);;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3);
+    if (v_0 != NULL) {
+          t_0 = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+          VTABLE_set_pointer(interp, t_0, v_0);
+       }
+       else {
+           t_0 = PMCNULL;
+       };
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", t_0);
+}
+static void
+pcf_int_ptr_ptr_int_int_ptr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef int(* func_t)(void *, void *, int, int, void *, int);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    INTVAL t_0; int v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    INTVAL t_3; int v_3;
+    INTVAL t_4; int v_4;
+    PMC  * t_5; void * v_5;
+    INTVAL t_6; int v_6;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPIIPI", &t_1, &t_2, &t_3, &t_4, &t_5, &t_6);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = t_3;
+    v_4 = t_4;
+    v_5 = PMC_IS_NULL(t_5) ? NULL : VTABLE_get_pointer(interp, t_5);;
+    v_6 = t_6;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4, v_5, v_6);
     t_0 = v_0;
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
 }
@@ -1102,6 +1596,32 @@ pcf_int_int_int_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
 }
 static void
+pcf_int_int_int_ptr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef int(* func_t)(int, int, void *, int);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    INTVAL t_0; int v_0;
+    INTVAL t_1; int v_1;
+    INTVAL t_2; int v_2;
+    PMC  * t_3; void * v_3;
+    INTVAL t_4; int v_4;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "IIPI", &t_1, &t_2, &t_3, &t_4);
+    v_1 = t_1;
+    v_2 = t_2;
+    v_3 = PMC_IS_NULL(t_3) ? NULL : VTABLE_get_pointer(interp, t_3);;
+    v_4 = t_4;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4);
+    t_0 = v_0;
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
+}
+static void
 pcf_int_int_long_short_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(int, long, short, void *);
@@ -1384,6 +1904,58 @@ pcf_int_ptr_int_int_long_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
 }
 static void
+pcf_int_ptr_int_int_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef int(* func_t)(void *, int, int, void *);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    INTVAL t_0; int v_0;
+    PMC  * t_1; void * v_1;
+    INTVAL t_2; int v_2;
+    INTVAL t_3; int v_3;
+    PMC  * t_4; void * v_4;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PIIP", &t_1, &t_2, &t_3, &t_4);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = t_2;
+    v_3 = t_3;
+    v_4 = PMC_IS_NULL(t_4) ? NULL : VTABLE_get_pointer(interp, t_4);;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4);
+    t_0 = v_0;
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
+}
+static void
+pcf_int_ptr_int_ptr_long(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef int(* func_t)(void *, int, void *, long);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    INTVAL t_0; int v_0;
+    PMC  * t_1; void * v_1;
+    INTVAL t_2; int v_2;
+    PMC  * t_3; void * v_3;
+    INTVAL t_4; long v_4;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PIPI", &t_1, &t_2, &t_3, &t_4);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = t_2;
+    v_3 = PMC_IS_NULL(t_3) ? NULL : VTABLE_get_pointer(interp, t_3);;
+    v_4 = t_4;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4);
+    t_0 = v_0;
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
+}
+static void
 pcf_int_ptr_int_long_short_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(void *, int, long, short, void *);
@@ -1405,6 +1977,34 @@ pcf_int_ptr_int_long_short_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     v_3 = t_3;
     v_4 = t_4;
     v_5 = PMC_IS_NULL(t_5) ? NULL : VTABLE_get_pointer(interp, t_5);;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4, v_5);
+    t_0 = v_0;
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
+}
+static void
+pcf_int_ptr_int_int_ptr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef int(* func_t)(void *, int, int, void *, int);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    INTVAL t_0; int v_0;
+    PMC  * t_1; void * v_1;
+    INTVAL t_2; int v_2;
+    INTVAL t_3; int v_3;
+    PMC  * t_4; void * v_4;
+    INTVAL t_5; int v_5;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PIIPI", &t_1, &t_2, &t_3, &t_4, &t_5);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = t_2;
+    v_3 = t_3;
+    v_4 = PMC_IS_NULL(t_4) ? NULL : VTABLE_get_pointer(interp, t_4);;
+    v_5 = t_5;
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4, v_5);
@@ -2091,6 +2691,44 @@ pcf_ptr_ptr_int_int_int_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", t_0);
 }
 static void
+pcf_ptr_ptr_ptr_ptr_ptr_ptr_ptr_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef void *(* func_t)(void *, void *, void *, void *, void *, void *, void *);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    PMC  * t_0; void * v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    PMC  * t_3; void * v_3;
+    PMC  * t_4; void * v_4;
+    PMC  * t_5; void * v_5;
+    PMC  * t_6; void * v_6;
+    PMC  * t_7; void * v_7;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPPPPPP", &t_1, &t_2, &t_3, &t_4, &t_5, &t_6, &t_7);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = PMC_IS_NULL(t_3) ? NULL : VTABLE_get_pointer(interp, t_3);;
+    v_4 = PMC_IS_NULL(t_4) ? NULL : VTABLE_get_pointer(interp, t_4);;
+    v_5 = PMC_IS_NULL(t_5) ? NULL : VTABLE_get_pointer(interp, t_5);;
+    v_6 = PMC_IS_NULL(t_6) ? NULL : VTABLE_get_pointer(interp, t_6);;
+    v_7 = PMC_IS_NULL(t_7) ? NULL : VTABLE_get_pointer(interp, t_7);;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4, v_5, v_6, v_7);
+    if (v_0 != NULL) {
+          t_0 = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+          VTABLE_set_pointer(interp, t_0, v_0);
+       }
+       else {
+           t_0 = PMCNULL;
+       };
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", t_0);
+}
+static void
 pcf_short(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef short(* func_t)(void);
@@ -2706,6 +3344,34 @@ pcf_int_ptr_int_double(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
 }
 static void
+pcf_int_ptr_int_ptr_int_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef int(* func_t)(void *, int, void *, int, int);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    INTVAL t_0; int v_0;
+    PMC  * t_1; void * v_1;
+    INTVAL t_2; int v_2;
+    PMC  * t_3; void * v_3;
+    INTVAL t_4; int v_4;
+    INTVAL t_5; int v_5;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PIPII", &t_1, &t_2, &t_3, &t_4, &t_5);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = t_2;
+    v_3 = PMC_IS_NULL(t_3) ? NULL : VTABLE_get_pointer(interp, t_3);;
+    v_4 = t_4;
+    v_5 = t_5;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4, v_5);
+    t_0 = v_0;
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", t_0);
+}
+static void
 pcf_ptr_ptr_STRING(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void *(* func_t)(void *, STRING *);
@@ -2875,6 +3541,30 @@ pcf_STRING_ptr_INTVAL(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     t_0 = v_0;
     ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", t_0);
 }
+static void
+pcf_STRING_ptr_ptr_INTVAL(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef STRING *(* func_t)(void *, void *, INTVAL);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
+    STRING * t_0; STRING * v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    INTVAL t_3; INTVAL v_3;
+    UNUSED(ret_object);
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PPI", &t_1, &t_2, &t_3);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    v_3 = t_3;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2, v_3);
+    t_0 = v_0;
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", t_0);
+}
 
  void
 Parrot_nci_load_extra_thunks(PARROT_INTERP)
@@ -2921,6 +3611,18 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
             VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
         temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_void_ptr);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 4;
+        static const int sig[] = { 28, 29, 29, 29, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_void_ptr_ptr_ptr);
         VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
     }
 
@@ -3069,6 +3771,42 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
     }
 
     {
+        const int n = 4;
+        static const int sig[] = { 29, 29, 29, 7, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_ptr_ptr_ptr_int);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 5;
+        static const int sig[] = { 29, 29, 29, 29, 7, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_ptr_ptr_ptr_ptr_int);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 6;
+        static const int sig[] = { 29, 29, 29, 29, 29, 7, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_ptr_ptr_ptr_ptr_ptr_int);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
         const int n = 1;
         static const int sig[] = { 7, };
         PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
@@ -3077,6 +3815,18 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
             VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
         temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_int);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 5;
+        static const int sig[] = { 8, 8, 29, 29, 8, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_long_long_ptr_ptr_long);
         VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
     }
 
@@ -3141,6 +3891,18 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
     }
 
     {
+        const int n = 5;
+        static const int sig[] = { 5, 29, 29, 29, 29, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_char_ptr_ptr_ptr_ptr);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
         const int n = 3;
         static const int sig[] = { 29, 29, 7, };
         PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
@@ -3161,6 +3923,42 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
             VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
         temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_ptr_ptr);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 7;
+        static const int sig[] = { 7, 29, 29, 29, 29, 29, 29, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_int_ptr_ptr_ptr_ptr_ptr_ptr);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 4;
+        static const int sig[] = { 8, 29, 29, 8, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_long_ptr_ptr_long);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 5;
+        static const int sig[] = { 8, 29, 29, 29, 8, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_long_ptr_ptr_ptr_long);
         VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
     }
 
@@ -3213,6 +4011,18 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
     }
 
     {
+        const int n = 9;
+        static const int sig[] = { 29, 29, 29, 29, 29, 29, 7, 29, 7, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_ptr_ptr_ptr_ptr_ptr_ptr_int_ptr_int);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
         const int n = 4;
         static const int sig[] = { 29, 29, 29, 4, };
         PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
@@ -3221,6 +4031,42 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
             VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
         temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_ptr_ptr_ptr_PMC);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 8;
+        static const int sig[] = { 29, 29, 29, 7, 29, 29, 29, 7, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_ptr_ptr_ptr_int_ptr_ptr_ptr_int);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 9;
+        static const int sig[] = { 29, 29, 29, 7, 29, 29, 29, 29, 7, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_ptr_ptr_ptr_int_ptr_ptr_ptr_ptr_int);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 6;
+        static const int sig[] = { 29, 29, 29, 29, 7, 29, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_ptr_ptr_ptr_ptr_int_ptr);
         VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
     }
 
@@ -3269,6 +4115,42 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
             VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
         temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_int_ptr_ptr_ptr);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 5;
+        static const int sig[] = { 29, 29, 29, 7, 7, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_ptr_ptr_ptr_int_int);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 4;
+        static const int sig[] = { 29, 29, 29, 29, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_ptr_ptr_ptr_ptr);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 7;
+        static const int sig[] = { 7, 29, 29, 7, 7, 29, 7, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_int_ptr_ptr_int_int_ptr_int);
         VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
     }
 
@@ -3454,6 +4336,18 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
 
     {
         const int n = 5;
+        static const int sig[] = { 7, 7, 7, 29, 7, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_int_int_int_ptr_int);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 5;
         static const int sig[] = { 7, 7, 8, 6, 29, };
         PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
         int i;
@@ -3585,6 +4479,30 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
     }
 
     {
+        const int n = 5;
+        static const int sig[] = { 7, 29, 7, 7, 29, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_int_ptr_int_int_ptr);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 5;
+        static const int sig[] = { 7, 29, 7, 29, 8, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_int_ptr_int_ptr_long);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
         const int n = 6;
         static const int sig[] = { 7, 29, 7, 8, 6, 29, };
         PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
@@ -3593,6 +4511,18 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
             VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
         temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_int_ptr_int_long_short_ptr);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 6;
+        static const int sig[] = { 7, 29, 7, 7, 29, 7, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_int_ptr_int_int_ptr_int);
         VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
     }
 
@@ -3897,6 +4827,18 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
     }
 
     {
+        const int n = 8;
+        static const int sig[] = { 29, 29, 29, 29, 29, 29, 29, 29, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_ptr_ptr_ptr_ptr_ptr_ptr_ptr_ptr);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
         const int n = 1;
         static const int sig[] = { 6, };
         PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
@@ -4173,6 +5115,18 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
     }
 
     {
+        const int n = 6;
+        static const int sig[] = { 7, 29, 7, 29, 7, 7, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_int_ptr_int_ptr_int_int);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
         const int n = 3;
         static const int sig[] = { 29, 29, 3, };
         PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
@@ -4241,6 +5195,18 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
             VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
         temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_STRING_ptr_INTVAL);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 4;
+        static const int sig[] = { 3, 29, 29, 1, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_STRING_ptr_ptr_INTVAL);
         VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
     }
 

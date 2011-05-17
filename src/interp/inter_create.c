@@ -199,7 +199,7 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     Parrot_io_init(interp);
 
     /* use the system time as the prng seed */
-    Parrot_util_srand(Parrot_intval_time());
+    Parrot_util_srand(Parrot_get_entropy(interp));
 
     /*
      * Set up the string subsystem

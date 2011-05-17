@@ -59,8 +59,6 @@ my @steps = qw(
     auto::pod2man
     auto::ctags
     auto::revision
-    auto::sha1
-    auto::git_describe
     auto::icu
     auto::libffi
     auto::ipv6
