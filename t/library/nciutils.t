@@ -100,7 +100,7 @@ Testing Perl 6 objects.
     is($S1, "ok worked\n", "nci_tt - flip two characters")
 
     $P0 = ncifunc(libnci_test, 'nci_pi', 'pi')
-    $I0 = 10 
+    $I0 = 10
     $P1 = $P0($I0)
     $I1 = isnull $P1
     ok($I1, "nci_pi(10) - returned a null pointer as PMCNULL")

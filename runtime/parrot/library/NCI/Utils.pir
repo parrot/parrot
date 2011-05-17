@@ -328,6 +328,8 @@ are freed after the call. Return strings belong to the C library and are not fre
 .end
 
 
+=over 4
+
 =item nci = ncifunc(pmc library, string name, string signature)
 
 Create a NCI function by looking up C<name> in C<library>, assuming
@@ -338,6 +340,8 @@ C<signature> are:
     f = float
     t = null-terminated array of char
     ...
+
+=back
 
 =cut
 
