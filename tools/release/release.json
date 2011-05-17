@@ -1,9 +1,9 @@
 {
-    "release.version"  : "3.3.0",
-    "release.name"     : "Fire in the Sky",
+    "release.version"  : "3.4.0",
+    "release.name"     : "Pacific Parakeet",
     "release.day"      : "Tuesday",
-    "release.date"     : "19 April 2011",
-    "release.nextdate" : "17 May 2011",
+    "release.date"     : "17 May 2011",
+    "release.nextdate" : "21 June 2011",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +12,10 @@
     "web.org_root"    :  "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "14 May 2011",
+    "bugday.date"      : "19 June 2011",
 
     "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
-    "wiki.bugday"      : "bug_day_2011_05_14",
+    "wiki.bugday"      : "bug_day_2011_06_19",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/3.3.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/3.4.0/"
 }
