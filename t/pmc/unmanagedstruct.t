@@ -100,7 +100,7 @@ finally3:
     goto finally4
 eh4:
     .get_results($P2)
-    is($P2, "Illegal type in initializer for struct", "error correctly thrown for bad initializer type")
+    is($P2, "Illegal type (-1) in initializer for struct", "error correctly thrown for bad initializer type")
 finally4:
     pop_eh
 
