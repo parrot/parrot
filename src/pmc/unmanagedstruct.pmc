@@ -761,7 +761,7 @@ calc_offsets(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *value), size_t toff)
         if (type < enum_first_type || type >= enum_last_type)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION,
-                "Illegal type in initializer for struct");
+                "Illegal type (%d) in initializer for struct", type);
 
         if (count <= 0) {
             count = 1;
