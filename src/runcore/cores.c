@@ -265,7 +265,7 @@ next opcode, or examine and manipulate data from the executing program.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * runops_debugger_core(PARROT_INTERP,
-    SHIM(Parrot_runcore_t *runcore),
+    Parrot_runcore_t *runcore,
     ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -282,7 +282,7 @@ static opcode_t * runops_exec_core(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * runops_fast_core(PARROT_INTERP,
-    SHIM(Parrot_runcore_t *runcore),
+    Parrot_runcore_t *runcore,
     ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -290,7 +290,7 @@ static opcode_t * runops_fast_core(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * runops_gc_debug_core(PARROT_INTERP,
-    SHIM(Parrot_runcore_t *runcore),
+    Parrot_runcore_t *runcore,
     ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -298,7 +298,7 @@ static opcode_t * runops_gc_debug_core(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * runops_slow_core(PARROT_INTERP,
-    SHIM(Parrot_runcore_t *runcore),
+    Parrot_runcore_t *runcore,
     ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);

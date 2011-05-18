@@ -36,9 +36,10 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_ns_find_named_item(PARROT_INTERP,
     ARGIN(STRING *name),
-    SHIM(void *next))
+    ARGIN(void *next))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -137,7 +138,8 @@ void Parrot_ns_store_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     , PARROT_ASSERT_ARG(ns))
 #define ASSERT_ARGS_Parrot_ns_find_named_item __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(name))
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(next)))
 #define ASSERT_ARGS_Parrot_ns_find_namespace_global \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

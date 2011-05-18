@@ -277,8 +277,9 @@ void PDB_disable_breakpoint(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
-        __attribute__nonnull__(1);
+void PDB_disassemble(PARROT_INTERP, ARGIN(const char *command))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 size_t PDB_disassemble_op(PARROT_INTERP,
     ARGOUT(char *dest),
@@ -335,8 +336,9 @@ void PDB_help(PARROT_INTERP, ARGIN(const char *command))
 void PDB_info(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void PDB_init(PARROT_INTERP, SHIM(const char *command))
-        __attribute__nonnull__(1);
+void PDB_init(PARROT_INTERP, ARGIN(const char *command))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void PDB_list(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
@@ -425,7 +427,8 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(command))
 #define ASSERT_ARGS_PDB_disassemble __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(command)))
 #define ASSERT_ARGS_PDB_disassemble_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dest) \
@@ -455,7 +458,8 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
 #define ASSERT_ARGS_PDB_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PDB_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(command)))
 #define ASSERT_ARGS_PDB_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(command))

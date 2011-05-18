@@ -16,7 +16,7 @@ our @EXPORT_OK = qw(
     no_both_static_and_PARROT_EXPORT
     handle_split_declaration
     asserts_from_args
-    shim_test
+    clean_args_for_declarations
     handle_modified_args
     add_asserts_to_declarations
     add_newline_if_multiline
@@ -41,7 +41,7 @@ Parrot::Headerizer::Functions - Functions used in headerizer programs
         no_both_static_and_PARROT_EXPORT
         handle_split_declaration
         asserts_from_args
-        shim_test
+        clean_args_for_declarations
         handle_modified_args
         add_asserts_to_declarations
         add_newline_if_multiline
@@ -476,42 +476,18 @@ sub asserts_from_args {
     return (@asserts);
 }
 
-=head2 C<shim_test()>
+=head2 C<clean_args_for_declarations()>
 
-=over 4
-
-=item * Purpose
-
-Determine whether an argument needs to include C<SHIM> or <NULLOK>.
-
-=item * Arguments
-
-    @modified_args = shim_test($func, \@args);
-
-List of two elements: hash reference holding function characteristics;
-reference to array holding list of arguments.
-
-=item * Return Value
-
-List of modified arguments.
-
-=back
+Removes SHIM()s from args for putting into declarations.
 
 =cut
 
-sub shim_test {
+sub clean_args_for_declarations {
     my ($func, $argsref) = @_;
     my @args = @{$argsref};
     for my $arg (@args) {
-        if ( $arg =~ m{SHIM\((.+)\)} ) {
-            $arg = $1;
-            if ( $func->{is_static} || ( $arg =~ /\*/ ) ) {
-                $arg = "SHIM($arg)";
-            }
-            else {
-                $arg = "NULLOK($arg)";
-            }
-        }
+        $arg =~ s{SHIM\((.+?)\)}{$1};
+        $arg =~ s{SHIM_INTERP}{PARROT_INTERP};
     }
     return @args;
 }
@@ -550,8 +526,10 @@ sub handle_modified_args {
     }
     else {
         if ( $modified_args[0] =~ /^(?:(?:SHIM|PARROT)_INTERP|Interp)\b/ ) {
-            $decl .= ( shift @modified_args );
-            $decl .= "," if @modified_args;
+            my $arg = shift @modified_args;
+            $arg =~ s/\bSHIM_INTERP/PARROT_INTERP/;
+            $decl .= $arg;
+            $decl .= ',' if @modified_args;
         }
         $argline   = join( ",", map { "\n\t$_" } @modified_args );
         $decl      = "$decl$argline)";

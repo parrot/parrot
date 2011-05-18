@@ -103,21 +103,21 @@ static void fill_params(PARROT_INTERP,
         FUNC_MODIFIES(*call_object);
 
 PARROT_WARN_UNUSED_RESULT
-static INTVAL intval_constant_from_op(SHIM_INTERP,
+static INTVAL intval_constant_from_op(PARROT_INTERP,
     ARGIN(const opcode_t *raw_params),
     INTVAL param_index)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static INTVAL intval_constant_from_varargs(SHIM_INTERP,
-    SHIM(void *data),
-    SHIM(INTVAL index));
+static INTVAL intval_constant_from_varargs(PARROT_INTERP,
+    void *data,
+    INTVAL index);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static INTVAL* intval_param_from_c_args(SHIM_INTERP,
+static INTVAL* intval_param_from_c_args(PARROT_INTERP,
     ARGIN(va_list *args),
-    SHIM(INTVAL param_index))
+    INTVAL param_index)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -145,15 +145,15 @@ static FLOATVAL numval_constant_from_op(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static FLOATVAL numval_constant_from_varargs(SHIM_INTERP,
-    SHIM(void *data),
-    SHIM(INTVAL index));
+static FLOATVAL numval_constant_from_varargs(PARROT_INTERP,
+    void *data,
+    INTVAL index);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static FLOATVAL* numval_param_from_c_args(SHIM_INTERP,
+static FLOATVAL* numval_param_from_c_args(PARROT_INTERP,
     ARGIN(va_list *args),
-    SHIM(INTVAL param_index))
+    INTVAL param_index)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -182,15 +182,15 @@ static PMC* pmc_constant_from_op(PARROT_INTERP,
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* pmc_constant_from_varargs(SHIM_INTERP,
-    SHIM(void *data),
-    SHIM(INTVAL index));
+static PMC* pmc_constant_from_varargs(PARROT_INTERP,
+    void *data,
+    INTVAL index);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PMC** pmc_param_from_c_args(SHIM_INTERP,
+static PMC** pmc_param_from_c_args(PARROT_INTERP,
     ARGIN(va_list *args),
-    SHIM(INTVAL param_index))
+    INTVAL param_index)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -211,15 +211,15 @@ static STRING* string_constant_from_op(PARROT_INTERP,
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static STRING* string_constant_from_varargs(SHIM_INTERP,
-    SHIM(void *data),
-    SHIM(INTVAL index));
+static STRING* string_constant_from_varargs(PARROT_INTERP,
+    void *data,
+    INTVAL index);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING** string_param_from_c_args(SHIM_INTERP,
+static STRING** string_param_from_c_args(PARROT_INTERP,
     ARGIN(va_list *args),
-    SHIM(INTVAL param_index))
+    INTVAL param_index)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
