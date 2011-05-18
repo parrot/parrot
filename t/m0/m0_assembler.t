@@ -17,12 +17,13 @@ Tests the M0 assembler that lives at src/m0/m0_assembler.pl .
 
 use strict;
 use warnings;
+use File::Slurp qw/slurp/;
 #use Carp::Always;
 
 use Test::More;
 use File::Spec::Functions;
 
-plan tests => 17;
+plan tests => 18;
 
 my $exefile    = catfile( ".", qw/src m0 m0_assembler.pl/ );
 my $hello_m0   = catfile(qw/t m0 hello.m0/);
@@ -38,6 +39,10 @@ output_like(
 
 ok(-e $hello_m0b, 'created hello.m0b');
 ok(-e $hello_m0b && -s $hello_m0b >= 16, 'hello.m0b is at least 16 bytes (size of M0 header)');
+
+my $hello_bc = slurp($hello_m0b);
+my $magic_number = substr($hello_bc, 0, 8);
+cmp_ok($magic_number, 'eq', "\376M0B\r\n\032\n", "m0b file has correct magic number");
 
 output_like(
     $hello2_m0,
