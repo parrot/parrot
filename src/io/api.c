@@ -1049,7 +1049,6 @@ Parrot_io_is_tty_handle(PARROT_INTERP, ARGIN(PMC *pmc))
 
 =item C<INTVAL Parrot_io_is_async(PARROT_INTERP, PMC *pmc)>
 
-
 Returns a boolean value indicating whether C<*pmc> is a non-blocking
 
 =cut

@@ -178,7 +178,6 @@ PIOHANDLE Parrot_io_getfd(PARROT_INTERP, ARGIN(const PMC *pmc))
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-<<<<<<< HEAD
 INTVAL Parrot_io_is_async(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -186,10 +185,7 @@ INTVAL Parrot_io_is_async(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_io_is_closed(PARROT_INTERP, ARGMOD(PMC *pmc))
-=======
 INTVAL Parrot_io_is_closed(PARROT_INTERP, ARGIN(PMC *pmc))
->>>>>>> master
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
