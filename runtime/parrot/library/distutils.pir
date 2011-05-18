@@ -109,10 +109,6 @@ core module Pod-Html
 
 PGE/Glob.pbc
 
-=item tempdir (in step 'smoke')
-
-Math/Rand.pbc
-
 =back
 
 =head2 SYSTEM DEPENDENCIES
