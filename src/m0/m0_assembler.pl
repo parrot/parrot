@@ -245,7 +245,7 @@ sub m0b_chunk_length {
            m0b_bc_seg_length(length $chunk->{bytecode})
          + m0b_vars_seg_length($chunk->{variables})
          + m0b_meta_seg_length($chunk->{metadata});
-    #say "chunk length is $chunk_length";
+    say "chunk length is $chunk_length";
     return $chunk_length;
 }
 
@@ -261,7 +261,7 @@ sub m0b_bc_seg_length {
     my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
     $seg_length += $size * 4;
 
-    #say "bytecode seg length is $seg_length";
+    say "bytecode seg length is $seg_length";
     return $seg_length;
 }
 
@@ -277,14 +277,14 @@ sub m0b_vars_seg_length {
     my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
 
     #TODO: Make this work
-    #for (@$vars) {
-    #    my $var_length = length($_);
-    #    $seg_length += 4; # storage of size of variable
-    #    $seg_length += length($_);
-    #    #say "after adding var '$_', length is $seg_length";
-    #}
+    for (@$vars) {
+        my $var_length = length($_);
+        $seg_length += 4; # storage of size of variable
+        $seg_length += length($_);
+        say "after adding var '$_', length is $seg_length";
+    }
 
-    #say "vars seg length is $seg_length";
+    say "vars seg length is $seg_length";
     return $seg_length;
 }
 
@@ -296,7 +296,6 @@ Calculate the number of bytes that a metadata segment will occupy.
 
 sub m0b_meta_seg_length {
     my ($metadata) = @_;
-    
     my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
 
     #TODO
@@ -306,7 +305,7 @@ sub m0b_meta_seg_length {
     #    }
     #}
 
-    #say "metadata seg length is $seg_length";
+    say "metadata seg length is $seg_length";
     return $seg_length;
 }
 
@@ -345,8 +344,20 @@ sub parse_next_chunk {
         print "Invalid M0 at chunk " . $file_metadata->{total_chunks};
         exit 1;
     }
-    # force a hash ref via the magic plus
-    return +{ %+ };
+    my $chunk = { %+ };
+
+    # convert variable data string to an array ref
+    # TODO: this will fail hard on invalid input
+    $chunk->{variables} = [ map { (split(/\s+/,$_,2))[1] } (split /\n/, $+{variables}) ];
+
+    for my $v (@{$chunk->{variables}}) {
+        # remove leading and trailing double quotes which are used to represent strings
+        $v =~ s/(^"|"$)//g;
+
+        # replace escaped double quotes with actual double quotes
+        $v =~ s/\\"/"/g;
+    }
+    return $chunk;
 }
 
 # This cleans M0 code of comments and unnecessary whitespace
