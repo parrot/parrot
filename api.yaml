@@ -1,5 +1,12 @@
 ---
 -
+  name:  'Experimental Select PMC'
+  note:  'The Select PMC is experimental until its interface gets some exercise.  See ticket for more information.'
+  tags: 
+    - 'PMC'
+    - 'experimental'
+  ticket:  'http://trac.parrot.org/parrot/ticket/2034'
+-
   name:  'add write barrier to all PMCs that write in unusual VTABLE functions'
   eligible:  '3.4'
   note:  'VTABLE functions not marked with :write that mutate the PMCs need to use the write barrier.  See ticket for more information.'
@@ -451,11 +458,3 @@
     - 'experimental'
     - 'functions'
   ticket:  'https://trac.parrot.org/parrot/ticket/1996'
--
-  name:  'hashvalue vtable'
-  eligible:  '3.6'
-  note:  'Unused vtable in parrot core'
-  tags:
-    - 'deprecated'
-    - 'vtable'
-  ticket:  'https://trac.parrot.org/parrot/ticket/2027'

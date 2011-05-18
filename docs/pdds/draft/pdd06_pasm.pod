@@ -6,9 +6,9 @@
 
 The format of Parrot's bytecode assembly language.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 

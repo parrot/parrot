@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -42,7 +42,6 @@ sub check_pdd_formatting {
     my $diag = q{};
     my @toolong = ();
     my @sections_needed = qw(
-        Version
         Abstract
         Description
         Implementation

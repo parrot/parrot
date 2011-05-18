@@ -688,6 +688,23 @@ Returns true if the filehandle is at end-of-file, returns false otherwise.
         RETURN(INTVAL flags);
     }
 
+
+/*
+
+=item C<METHOD handle()>
+
+Returns the INTVAL used by the OS to identify this filehandle.
+
+=cut
+
+*/
+
+    METHOD handle() {
+        INTVAL handle;
+        GET_ATTR_os_handle(INTERP, SELF, handle);
+        RETURN(INTVAL handle);
+    }
+
 /*
 
 =item C<METHOD exit_status()>
