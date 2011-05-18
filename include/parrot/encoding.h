@@ -146,7 +146,7 @@ void Parrot_str_internal_register_encoding_names(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(encodingname))
 #define ASSERT_ARGS_Parrot_make_default_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(encodingname) \
+       PARROT_ASSERT_ARG(encodingname_unused) \
     , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_Parrot_new_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

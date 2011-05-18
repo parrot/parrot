@@ -428,7 +428,7 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
     , PARROT_ASSERT_ARG(command))
 #define ASSERT_ARGS_PDB_disassemble __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(command))
+    , PARROT_ASSERT_ARG(command_unused))
 #define ASSERT_ARGS_PDB_disassemble_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dest) \
@@ -459,7 +459,7 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PDB_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(command))
+    , PARROT_ASSERT_ARG(command_unused))
 #define ASSERT_ARGS_PDB_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(command))

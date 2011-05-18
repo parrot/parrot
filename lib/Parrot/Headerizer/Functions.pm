@@ -454,21 +454,18 @@ sub asserts_from_args {
     for my $arg (@args) {
         if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\((.+?)\)} ) {
             my $var = $2;
-            if($var =~ /\(*\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)\s*\(/) {
-                # argument is a function pointer
-                # Is this branch ever reached?
-                $var = $1;
-            }
-            else {
-                # try to isolate the variable's name;
-                # strip off everything before the final space or asterisk.
-                $var =~ s{.+[* ]([^* ]+)$}{$1};
-                # strip off a trailing "[]", if any.
-                $var =~ s{\[\]$}{};
-            }
+            my $was_shimmed = ( $var =~ /SHIM/ );
+
+            # try to isolate the variable's name;
+            # strip off everything before the final space or asterisk.
+            $var =~ s{.+[* ]([^* ]+)$}{$1};
+            # strip off a trailing "[]", if any.
+            $var =~ s{\[\]$}{};
+
+            $var .= '_unused' if $was_shimmed;
             push( @asserts, "PARROT_ASSERT_ARG($var)" );
         }
-        if( $arg eq 'PARROT_INTERP' ) {
+        if ( $arg eq 'PARROT_INTERP' ) {
             push( @asserts, "PARROT_ASSERT_ARG(interp)" );
         }
     }

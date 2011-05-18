@@ -53,7 +53,7 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
     , PARROT_ASSERT_ARG(output))
 #define ASSERT_ARGS_print_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(p))
+    , PARROT_ASSERT_ARG(p_unused))
 #define ASSERT_ARGS_setup_argv __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(argv))

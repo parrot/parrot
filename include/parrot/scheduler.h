@@ -230,7 +230,7 @@ void Parrot_cx_timer_invoke(PARROT_INTERP, ARGIN(PMC *timer))
 #define ASSERT_ARGS_Parrot_cx_send_message __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(messagetype) \
-    , PARROT_ASSERT_ARG(payload))
+    , PARROT_ASSERT_ARG(payload_unused))
 #define ASSERT_ARGS_Parrot_cx_check_tasks __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler))
