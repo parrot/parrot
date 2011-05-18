@@ -216,7 +216,7 @@ int Parrot_vfprintf(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_ext_try __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_find_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(language)))
+       PARROT_ASSERT_ARG(language))
 #define ASSERT_ARGS_Parrot_fprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pio) \

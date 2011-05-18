@@ -452,7 +452,7 @@ sub asserts_from_args {
     my @asserts;
 
     for my $arg (@args) {
-        if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\((.+)\)} ) {
+        if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\((.+?)\)} ) {
             my $var = $2;
             if($var =~ /\(*\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)\s*\(/) {
                 # argument is a function pointer
@@ -602,7 +602,7 @@ sub add_asserts_to_declarations {
         $assert .= " __attribute__unused__ int _ASSERT_ARGS_CHECK = (";
 
         my @asserts = asserts_from_args( @{ $func->{args} } );
-        if(@asserts) {
+        if (@asserts) {
             $assert .= "\\\n       ";
             $assert .= join(" \\\n    , ", @asserts);
         }

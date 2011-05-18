@@ -139,7 +139,7 @@ void Parrot_ns_store_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 #define ASSERT_ARGS_Parrot_ns_find_named_item __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name) \
-    , PARROT_ASSERT_ARG(next)))
+    , PARROT_ASSERT_ARG(next))
 #define ASSERT_ARGS_Parrot_ns_find_namespace_global \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
