@@ -31,6 +31,8 @@ package Parrot::Revision;
 use strict;
 use warnings;
 use File::Spec;
+use lib qw( lib );
+use Parrot::Configure::Utils qw( :cache );
 
 our $cache = q{.parrot_current_rev};
 
@@ -51,12 +53,12 @@ sub _handle_update {
     my $args = shift;
     if (! defined $args->{revision}) {
         $args->{revision} = 'unknown';
-        _print_to_cache($args->{cache}, $args->{revision});
+        print_to_cache($args->{cache}, $args->{revision});
         return $args->{revision};
     }
     else {
         if (defined ($args->{prev}) && ($args->{revision} ne $args->{prev})) {
-            _print_to_cache($args->{cache}, $args->{revision});
+            print_to_cache($args->{cache}, $args->{revision});
             return $args->{revision};
         }
         else {
@@ -65,25 +67,14 @@ sub _handle_update {
     }
 }
 
-sub _print_to_cache {
-    my ($cache, $revision) = @_;
-    open my $FH, ">", $cache
-        or die "Unable to open handle to $cache for writing: $!";
-    print {$FH} "$revision\n";
-    close $FH or die "Unable to close handle to $cache after writing: $!";
-}
-
 sub _get_revision {
     my $revision;
     if (-f $cache) {
-        open my $FH, '<', $cache
-            or die "Unable to open $cache for reading: $!";
-        chomp($revision = <$FH>);
-        close $FH or die "Unable to close $cache after reading: $!";
+        $revision = read_from_cache($cache);
     }
     else {
         $revision = 1;
-        _print_to_cache($cache, $revision);
+        print_to_cache($cache, $revision);
     }
     return $revision;
 }

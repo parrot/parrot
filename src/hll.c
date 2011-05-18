@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2010, Parrot Foundation.
+Copyright (C) 2005-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -40,11 +40,13 @@ feature.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
-        __attribute__nonnull__(1);
+static PMC* new_hll_entry(PARROT_INTERP, ARGIN(STRING *entry_name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_new_hll_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(entry_name))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -69,7 +71,7 @@ Used by Parrot_hll_register_HLL.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC*
-new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
+new_hll_entry(PARROT_INTERP, ARGIN(STRING *entry_name))
 {
     ASSERT_ARGS(new_hll_entry)
     PMC * const hll_info = interp->HLL_info;
@@ -133,6 +135,7 @@ If there is an error, C<-1> is returned.
 */
 
 PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
 INTVAL
 Parrot_hll_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 {
@@ -196,14 +199,14 @@ does not exist, returns -1.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_hll_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
+Parrot_hll_get_HLL_id(PARROT_INTERP, ARGIN(STRING *hll_name))
 {
     ASSERT_ARGS(Parrot_hll_get_HLL_id)
     PMC *       entry;
     PMC * const hll_info = interp->HLL_info;
     INTVAL      i        = -1;
 
-    if (!hll_name)
+    if (STRING_IS_NULL(hll_name))
         return i;
 
     START_READ_HLL_INFO(interp, hll_info);
@@ -234,7 +237,7 @@ that some HLLs are anonymous and so might also return NULL.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_hll_get_HLL_name(PARROT_INTERP, INTVAL id)
 {
@@ -245,7 +248,7 @@ Parrot_hll_get_HLL_name(PARROT_INTERP, INTVAL id)
     PMC         *entry, *name_pmc;
 
     if (id < 0 || id >= nelements)
-        return NULL;
+        return STRINGNULL;
 
     START_READ_HLL_INFO(interp, hll_info);
 
@@ -256,7 +259,7 @@ Parrot_hll_get_HLL_name(PARROT_INTERP, INTVAL id)
 
     /* loadlib-created 'HLL's are nameless */
     if (PMC_IS_NULL(name_pmc))
-        return NULL;
+        return STRINGNULL;
     else
         return VTABLE_get_string(interp, name_pmc);
 }
@@ -283,14 +286,14 @@ Parrot_hll_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Cannot map without an HLL");
     else {
-        PMC *hll_info = interp->HLL_info;
+        PMC * const hll_info = interp->HLL_info;
         const INTVAL n = VTABLE_elements(interp, hll_info);
         if (hll_id >= n)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
                 "no such HLL ID (%vd)", hll_id);
         else {
             PMC  *type_hash;
-            PMC  *entry = VTABLE_get_pmc_keyed_int(interp, hll_info, hll_id);
+            PMC * const entry = VTABLE_get_pmc_keyed_int(interp, hll_info, hll_id);
             PARROT_ASSERT(!PMC_IS_NULL(entry));
             type_hash = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
             PARROT_ASSERT(!PMC_IS_NULL(type_hash));
@@ -406,7 +409,7 @@ special value C<PARROT_HLL_NONE>, return the global root namespace.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_hll_get_HLL_namespace(PARROT_INTERP, int hll_id)
 {

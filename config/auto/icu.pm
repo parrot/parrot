@@ -312,7 +312,7 @@ sub _handle_icushared {
             # on MacOS X there's sometimes an errornous \c at the end of the
             # output line. Remove it.
             # see TT #1722
-            $icushared =~ s/\s\\c\s/ /g;
+            $icushared =~ s/\s\\c\s?/ /g;
         }
     }
 

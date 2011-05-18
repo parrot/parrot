@@ -37,9 +37,17 @@ typedef @int2_t@                Parrot_Int2;
 typedef unsigned @int2_t@       Parrot_UInt2;
 typedef @int4_t@                Parrot_Int4;
 typedef unsigned @int4_t@       Parrot_UInt4;
+#if @HAS_INT64@
+typedef @int8_t@                Parrot_Int8;
+typedef unsigned @int8_t@       Parrot_UInt8;
+#endif
 
 typedef @float4_t@              Parrot_Float4;
 typedef @float8_t@              Parrot_Float8;
+
+/* Required for proper compilation of StructView PMC */
+#define HAS_LONGLONG            @HAS_LONGLONG@
+#define HAS_INT64               @HAS_INT64@
 
 #ifndef PARROT_INTVAL_MIN
 #  define PARROT_INTVAL_MIN              @intvalmin@
@@ -54,9 +62,6 @@ typedef @float8_t@              Parrot_Float8;
 #ifndef PARROT_FLOATVAL_MAX
 #  define PARROT_FLOATVAL_MAX            @floatvalmax@
 #endif
-
-/* Temporary until we find a way to make it work in the right place. */
-struct PackFile;      typedef struct PackFile * Parrot_PackFile;
 
 /* Symbol export and import decoration. At the time of writing, note that
  * PARROT_IN_CORE won't always imply !PARROT_IN_EXTENSION. */
@@ -115,32 +120,16 @@ typedef @hugefloatval@ HUGEFLOATVAL;
 
 #define INTVAL_SIZE @intvalsize@
 #define NUMVAL_SIZE @nvsize@
-#define OPCODE_T_SIZE @opcode_t_size@
+#define OPCODE_T_SIZE @opcodesize@
 #define PTR_SIZE @ptrsize@
 #define SHORT_SIZE @shortsize@
 #define INT_SIZE @intsize@
 #define LONG_SIZE @longsize@
+#if @HAS_LONGLONG@
+#  define LONGLONG_SIZE @longlongsize@
+#endif
 #define HUGEINTVAL_SIZE @hugeintvalsize@
 #define DOUBLE_SIZE @doublesize@
-
-/* We don't have a portable config for 64-bit
- * registers yet. */
-#if 0
-#  if INTVAL_SIZE >= 8
-typedef Parrot_Int   INTVAL64;
-typedef Parrot_Int   Parrot_Int64;
-#  else
-#    if HUGEINTVAL_SIZE >= 8
-typedef HUGEINTVAL   INTVAL64;
-typedef HUGEINTVAL   Parrot_Int64;
-#    else
-/* No 64-bit type available? */
-typedef union { unsigned char b[8]; } INTVAL64;
-typedef INTVAL64   Parrot_Int64;
-#    endif
-#  endif
-#endif
-
 
 typedef Parrot_Opcode opcode_t;
 typedef size_t ptrcast_t;

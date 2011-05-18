@@ -31,70 +31,75 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    $conf->cc_gen('config/auto/sizes/test_c.in');
-    $conf->cc_build();
-    my %results = eval $conf->cc_run();
-    $conf->cc_clean();
+    my %types = (
+        intval     => $conf->data->get('iv'),
+        numval     => $conf->data->get('nv'),
+        opcode     => $conf->data->get('opcode_t'),
+        short      => 'short',
+        int        => 'int',
+        long       => 'long',
+        longlong   => 'long long',
+        ptr        => 'void *',
+        float      => 'float',
+        double     => 'double',
+        longdouble => 'long double',
+    );
 
-    for ( keys %results ) {
-        $conf->data->set( $_ => $results{$_} );
+    my %sizes = map {
+        $_, test_size($conf, $types{$_})
+    } keys %types;
+
+    for ( keys %sizes ) {
+        $conf->data->set( $_ . 'size' => $sizes{$_} );
     }
 
-    _handle_intval_ptrsize_discrepancy(\%results);
+    _handle_intval_ptrsize_discrepancy(\%sizes);
+    _handle_longlong($conf, \%sizes);
 
-    # set fixed sized types
-    _set_int2($conf, \%results);
-
-    _set_int4($conf, \%results);
-
-    _set_float4($conf, \%results);
-
-    _set_float8($conf, \%results);
-
-    my %hugeintval;
-    my $intval     = $conf->data->get('iv');
-    my $intvalsize = $conf->data->get('intvalsize');
-
-    # Get HUGEINTVAL, note that we prefer standard types
-    foreach my $type ( 'long', 'int', 'long long', '__int64' ) {
-
-        $conf->data->set( int8_t => $type );
-        eval {
-            $conf->cc_gen('config/auto/sizes/test2_c.in');
-            $conf->cc_build();
-            %hugeintval = eval $conf->cc_run();
-            $conf->cc_clean();
-        };
-
-        # clear int8_t on error
-        if ( $@ || !exists $hugeintval{hugeintval} ) {
-            $conf->data->set( int8_t => undef );
-            next;
-        }
-
-        if ( $hugeintval{hugeintvalsize} > $intvalsize ) {
-
-            # We found something bigger than intval.
-            $conf->data->set(%hugeintval);
+    # probe for 64-bit integer-types
+    foreach my $type ('int64_t', '__int64') {
+        my $size = test_size($conf, $type);
+        if ($size) {
+            $types{int64} = $type;
+            $sizes{int64} = $size;
             last;
         }
     }
-    _handle_hugeintvalsize(
-        $conf,
-        {
-            hugeintval      => \%hugeintval,
-            intval          => $intval,
-            intvalsize      => $intvalsize,
-        },
+
+    # set fixed sized types
+    _set_int2($conf, \%types, \%sizes);
+
+    _set_int4($conf, \%types, \%sizes);
+
+    _set_int8($conf, \%types, \%sizes);
+
+    _set_float4($conf, \%types, \%sizes);
+
+    _set_float8($conf, \%types, \%sizes);
+
+    # get HUGEINTVAL
+    my $hiv = do {
+        my @t = ('long', 'int', 'longlong', 'int64', 'invtal');
+        my $i = maxind( @sizes{grep exists $sizes{$_}, @t} );
+        $t[$i];
+    };
+
+    $conf->data->set(
+        hugeintval     => $types{$hiv},
+        hugeintvalsize => $sizes{$hiv},
     );
 
-    $conf->cc_clean();
+    # get HUGEFLOATVAL
+    my $hfv = do {
+        my @t = ('float', 'double', 'longdouble', 'numval');
+        my $i = maxind( @sizes{@t} );
+        $t[$i];
+    };
 
-    #get HUGEFLOATVAL
-    my $size = _probe_for_hugefloatval( $conf );
-    _set_hugefloatval( $conf, $size );
-
-    $conf->cc_clean();
+    $conf->data->set(
+        hugefloatval     => $types{$hfv},
+        hugefloatvalsize => $sizes{$hfv},
+    );
 
     _set_intvalmaxmin($conf);
 
@@ -105,9 +110,27 @@ sub runstep {
 
 #################### INTERNAL SUBROUTINES ####################
 
+sub test_size {
+    my ($conf, $type) = @_;
+
+    $conf->data->set( TEMP_type => $type );
+    $conf->cc_gen('config/auto/sizes/test_c.in');
+    eval { $conf->cc_build() };
+    my $ret = $@ ? 0 : eval $conf->cc_run();
+    $conf->cc_clean();
+
+    return $ret;
+}
+
+sub maxind {
+    my $i = 0;
+    $_[$_] <= $_[$i] or $i = $_ for 0..$#_;
+    return $i;
+}
+
 sub _handle_intval_ptrsize_discrepancy {
-    my $resultsref = shift;
-    if ( $resultsref->{ptrsize} != $resultsref->{intvalsize} ) {
+    my $sizesref = shift;
+    if ( $sizesref->{ptr} != $sizesref->{intval} ) {
         print <<"END";
 
 Hmm, I see your chosen INTVAL isn't the same size as your pointers.  Parrot
@@ -116,9 +139,14 @@ END
     }
 }
 
+sub _handle_longlong {
+    my ($conf, $sizesref) = @_;
+    $conf->data->set( HAS_LONGLONG => !!($sizesref->{longlong} > 0) );
+}
+
 sub _set_int2 {
-    my ($conf, $resultsref) = @_;
-    if ( $resultsref->{shortsize} == 2 ) {
+    my ($conf, $typesref, $sizesref) = @_;
+    if ( $sizesref->{short} == 2 ) {
         $conf->data->set( int2_t => 'short' );
     }
     else {
@@ -132,29 +160,45 @@ END
 }
 
 sub _set_int4 {
-    my ($conf, $resultsref) = @_;
-    if ( $resultsref->{shortsize} == 4 ) {
-        $conf->data->set( int4_t => 'short' );
+    my ($conf, $typesref, $sizesref) = @_;
+    foreach my $type (qw[ short int long ]) {
+        if ( $sizesref->{$type} == 4 ) {
+            $conf->data->set( int4_t => $typesref->{$type} );
+            return;
+        }
     }
-    elsif ( $resultsref->{intsize} == 4 ) {
-        $conf->data->set( int4_t => 'int' );
-    }
-    elsif ( $resultsref->{longsize} == 4 ) {
-        $conf->data->set( int4_t => 'long' );
-    }
-    else {
-        $conf->data->set( int4_t => 'int' );
-        print <<'END';
+
+    $conf->data->set( int4_t => 'int' );
+    print <<'END';
 
 Can't find a int type with size 4, conversion ops might fail!
 
 END
+}
+
+sub _set_int8 {
+    my ($conf, $typesref, $sizesref) = @_;
+    foreach my $type (qw[ int long longlong int64 ]) {
+        if ( $sizesref->{$type} == 8 ) {
+            $conf->data->set(
+                int8_t       => $typesref->{$type},
+                HAS_INT64 => 1,
+            );
+            return;
+        }
     }
+
+    $conf->data->set( HAS_INT64 => 0 );
+    print <<'END';
+
+Can't find an int type with size 8, 64-bit support dissabled.
+
+END
 }
 
 sub _set_float4 {
-    my ($conf, $resultsref) = @_;
-    if ( $resultsref->{floatsize} == 4 ) {
+    my ($conf, $typesref, $sizesref) = @_;
+    if ( $sizesref->{float} == 4 ) {
         $conf->data->set( float4_t => 'float' );
     }
     else {
@@ -168,8 +212,8 @@ END
 }
 
 sub _set_float8 {
-    my ($conf, $resultsref) = @_;
-    if ( $resultsref->{doublesize} == 8 ) {
+    my ($conf, $typesref, $sizesref) = @_;
+    if ( $sizesref->{double} == 8 ) {
         $conf->data->set( float8_t => 'double' );
     }
     else {
@@ -179,47 +223,6 @@ sub _set_float8 {
 Can't find a float type with size 8, conversion ops might fail!
 
 END
-    }
-}
-
-sub _handle_hugeintvalsize {
-    my $conf = shift;
-    my $arg = shift;
-    if ( ! defined( $arg->{hugeintval}{hugeintvalsize} )
-        || $arg->{hugeintval}{hugeintvalsize} == $arg->{intvalsize} )
-    {
-
-        # Could not find anything bigger than intval.
-        $conf->data->set(
-            hugeintval     => $arg->{intval},
-            hugeintvalsize => $arg->{intvalsize},
-        );
-    }
-}
-
-sub _probe_for_hugefloatval {
-    my $conf = shift;
-    my $size;
-    $conf->cc_gen('config/auto/sizes/test3_c.in');
-    $conf->cc_build();
-    $size = eval $conf->cc_run();
-    $conf->cc_clean();
-    return $size;
-}
-
-sub _set_hugefloatval {
-    my ( $conf, $size ) = @_;
-    if ( $size ) {
-        $conf->data->set(
-            hugefloatval     => 'long double',
-            hugefloatvalsize => $size
-        );
-    }
-    else {
-        $conf->data->set(
-            hugefloatval     => 'double',
-            hugefloatvalsize => $conf->data->get('doublesize')
-        );
     }
 }
 

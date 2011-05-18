@@ -7,6 +7,7 @@
             "docs/memory_internals.pod",
             "docs/vtables.pod",
             "docs/embed.pod",
+            "docs/embed_new.pod",
             "docs/porting_intro.pod"
          ],
          "title" : "Internals"
@@ -22,6 +23,7 @@
             "docs/project/core_inclusion.pod",
             "docs/project/git_terminology.pod",
             "docs/project/git_workflow.pod",
+            "docs/project/hacking_tips.pod",
             "docs/project/merge_review_guidelines.pod",
             "docs/project/metacommitter_guide.pod",
             "docs/project/release_manager_guide.pod",

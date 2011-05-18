@@ -25,7 +25,7 @@ Infinite memory "collector"
 
 New style mark & sweep
 
-=item gms
+=item gms (default)
 
 Generational M&S based on MS2
 
@@ -69,10 +69,6 @@ sub runstep {
         }
         $conf->data->set(gc_type => uc($gc));
         $self->set_result($gc);
-    }
-    else {
-        $conf->data->set(gc_type => 'GMS');
-        $self->set_result('gms');
     }
     $conf->data->set(gc_flag => ''); # Compatibility with parrot-3.1.0 and earlier
 

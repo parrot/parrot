@@ -1,21 +1,82 @@
+New in 3.4.0
+- Core
+  + The Generational Mark and Sweep garbage collector is the new default.
+  + The --gc-nursery-size command line argument was added.
+  + Parrot now gets entropy from the underlying OS.
+  + The NCI subsystem now supports 8, 16, 32 and 64 bit integers.
+  + The NCI subsystem now supports "long long" and "long double" signatures.
+    Not all platforms/compilers support these non-standard types, so developers
+    are cautioned to take note that using them reduces portability.
+  + Many more OpenGL functions in the Parrot OpenGL bindings are available,
+    which required the above-mentioned signatures.
+  + Bytecode-related embedding api functions moved to src/embed/bytecode.c.
+- Languages
+  + Winxed
+    - Use 'using extern' for module imports.
+    - Improved stage 0 prefix ++ and -- operators.
+    - Allow 'null' in conditional operator.
+    - Several examples are updated.
+- Community
+  + Google Summer of Code Bonding period is going well. Students are mostly done
+    with their classes and much code will flow soon.
+- Documentation
+  + More PCT introductions are available at: http://github.com/benabik/cish
+
+New in 3.3.0
+- Core
+  + The isa and isa_pmc vtables can now be overridden from PIR
+  + IMCC has a new improved external interface
+  + A new IMCCompiler PMC adds prototype PDD31-alike functionality for the PIR and PASM compilers
+  + New --with-llvm option to Configure.pl, which will link to LLVM if it is available
+- Community
+  + Parrot Virtual Machine was accepted into Google Summer of Code 2011
+- Ecosystem
+  + Rosella adds a stable "Event" library to implement a publish/subscribe mechanism
+- Tests
+  + The test coverage of the extend_vtable subsystem was greatly increased
+
 New in 3.2.0
 - Core
   + Full support for Unicode filenames on Linux and Win32
   + The configuration option --cxx is gone
-  + Improved code coverage
-  + New Generational GC implemented. To enable it run Configure.pl --gc=gms 
-  + "opsc_full_parse" branch for semantically parse of ops is started
-  + Parallel building is supported ( make -j<number> )
+  + New Generational GC implemented. To enable it run Configure.pl --gc=gms
+  + Now op definitions are semantically parsed. It opens possibilities for
+    future optimizations of parrot core.
+  + A statement convert the '.param' PIR systax
+  + A PMC is implemented for low-level buffer access which separate the
+    representation from the pointers
+  + Support added for 'long double', 'long long', and 64-bit to StructView
+  + In math.h are tools available for Inf/NaN
+  + Signature PMCs are used pervasively
 - Languages
   + A few tests in Cardinal are fixed
-  + Minor fixes, refactors and cleaning on Winxed
-  + New predefs replace and push on Winxed
+  + A binary .dmg is created of Rakudo Star for OS X
+  + Winxed
+    - Minor fixes, refactors and cleaning
+    - New predefs replace, push and provide a way to access multiple return
+      values
+    - Operators exits, class and .* (indirect method call) added
+    - $loadlib directive
+    - -o option to installable driver added
+    - Indent generated PIR is added to improve clarity and avoid imcc pitfalls
+      with non indented sub bodys
 - Community
+  + M0 roadmap is in progress
 - Documentation
   + 'make docs' target, which was serving only to generate superfluous POD
     files, has been removed.
   + Svn remnants from PDDs are removed
 - Tests
+  + Added 'make release_check' target so that Release Manager can double-check
+    tarball
+  + Probes added for 'long long' and 64-bit C types
+- Rosella (https://github.com/Whiteknight/Rosella)
+  Rosella is a collection of tools and building blocks for Parrot
+  + A working proxy library is created, that make mostly-transparent custom
+    proxies for many types of Parrot PMCs
+  + A mockobject testing library is created, using the new proxy library
+  + The PLA test suite is updated to use the new Rosella testing tools,
+    including the new mockobjects to test callbacks
 
 New in 3.1.0
 - Core

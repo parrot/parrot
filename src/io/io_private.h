@@ -44,9 +44,9 @@ struct _ParrotIOData {
 };
 
 /* redefine PIO_STD* for internal use */
-#define _PIO_STDIN(i)   (((ParrotIOData*)(i)->piodata)->table[PIO_STDIN_FILENO])
-#define _PIO_STDOUT(i)  (((ParrotIOData*)(i)->piodata)->table[PIO_STDOUT_FILENO])
-#define _PIO_STDERR(i)  (((ParrotIOData*)(i)->piodata)->table[PIO_STDERR_FILENO])
+#define _PIO_STDIN(i)   ((i)->piodata->table[PIO_STDIN_FILENO])
+#define _PIO_STDOUT(i)  ((i)->piodata->table[PIO_STDOUT_FILENO])
+#define _PIO_STDERR(i)  ((i)->piodata->table[PIO_STDERR_FILENO])
 
 #endif /* PARROT_IO_PRIVATE_H_GUARD */
 

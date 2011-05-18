@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -459,17 +459,14 @@ Introspection interface. C<key> can be:
         PMC    *nextkey;
         STRING *outer = NULL;
         STRING *item  = Parrot_key_string(INTERP, key);
-        STRING *name  = CONST_STRING(INTERP, "globals");
         int     level = 0;
 
         PMC *ctx;
 
-        if (STRING_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, CONST_STRING(INTERP, "globals")))
             return INTERP->root_namespace;
 
-        name  = CONST_STRING(INTERP, "outer");
-
-        if (STRING_equal(INTERP, item, name)) {
+        if (STRING_equal(INTERP, item, CONST_STRING(INTERP, "outer"))) {
             outer   = item;
             nextkey = Parrot_key_next(INTERP, key);
 
@@ -519,35 +516,23 @@ Introspection interface. C<key> can be:
         if (item == outer)
             return Parrot_pcc_get_sub(INTERP, ctx);
 
-        name = CONST_STRING(INTERP, "context");
-
-        if (STRING_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, CONST_STRING(INTERP, "context")))
             return ctx;
 
-        name = CONST_STRING(INTERP, "sub");
-
-        if (STRING_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, CONST_STRING(INTERP, "sub")))
             return Parrot_pcc_get_sub(INTERP, ctx);
 
-        name = CONST_STRING(INTERP, "lexpad");
-
-        if (STRING_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, CONST_STRING(INTERP, "lexpad")))
             return Parrot_pcc_get_lex_pad(INTERP, ctx);
 
-        name = CONST_STRING(INTERP, "namespace");
-
-        if (STRING_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, CONST_STRING(INTERP, "namespace")))
             return Parrot_pcc_get_namespace(INTERP, ctx);
 
-        name = CONST_STRING(INTERP, "continuation");
-
-        if (STRING_equal(INTERP, item, name))
+        if (STRING_equal(INTERP, item, CONST_STRING(INTERP, "continuation")))
             return VTABLE_clone(INTERP, Parrot_pcc_get_continuation(INTERP, ctx));
 
-        name = CONST_STRING(INTERP, "annotations");
-
-        if (STRING_equal(INTERP, item, name)) {
-            PMC        *sub_pmc = Parrot_pcc_get_sub(INTERP, ctx);
+        if (STRING_equal(INTERP, item, CONST_STRING(INTERP, "annotations"))) {
+            PMC * const sub_pmc = Parrot_pcc_get_sub(INTERP, ctx);
             if (ctx == CURRENT_CONTEXT(INTERP)) {
                 /* We can't know the current program counter for the currently
                  * executing sub, so can't return annotations for that. */
@@ -558,7 +543,7 @@ Introspection interface. C<key> can be:
             &&   sub_pmc->vtable->base_type == enum_class_Sub) {
                 Parrot_Sub_attributes *sub;
                 PackFile_ByteCode     *seg;
-                opcode_t              *pc  = Parrot_pcc_get_pc(INTERP, ctx);
+                opcode_t * const pc = Parrot_pcc_get_pc(INTERP, ctx);
 
                 PMC_get_sub(INTERP, sub_pmc, sub);
                 seg = sub->seg;
@@ -800,7 +785,7 @@ support it.
 */
 
     METHOD getpid() {
-        INTVAL id = Parrot_getpid();
+        const INTVAL id = Parrot_getpid();
         RETURN(INTVAL id);
     }
 

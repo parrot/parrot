@@ -156,7 +156,7 @@ recalculates it before retrieving the next task.
 */
 
     VTABLE PMC *pop_pmc() {
-        Parrot_Scheduler_attributes * core_struct = PARROT_SCHEDULER(SELF);
+        const Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
         PMC *task = PMCNULL;
 
         /* Pull the next valid task off the task list, skipping expired and
@@ -201,7 +201,7 @@ Removes the task with the given task ID from the task list.
 */
 
     VTABLE void delete_keyed_int(INTVAL key) {
-        Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
+        const Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
         STRING                      * const task_id_str = Parrot_str_from_int(INTERP, key);
 
         VTABLE_delete_keyed_str(INTERP, core_struct->task_list, task_id_str);
@@ -388,7 +388,7 @@ Adds a handler to the scheduler.
 */
 
     METHOD add_handler(PMC *handler) {
-        Parrot_Scheduler_attributes *core_struct = PARROT_SCHEDULER(SELF);
+        const Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
         VTABLE_unshift_pmc(INTERP, core_struct->handlers, handler);
     }
 
@@ -451,11 +451,12 @@ PMCNULL.
     METHOD find_handler(PMC *task) {
         STRING * const handled_str = CONST_STRING(INTERP, "handled");
         STRING * const iter_str    = CONST_STRING(INTERP, "handler_iter");
+        STRING * const exception_str = CONST_STRING(INTERP, "Exception");
         PMC    *iter;
 
         /* Exceptions store the handler iterator for rethrow, other kinds of
          * tasks don't (though they could). */
-        if (VTABLE_does(interp, task, CONST_STRING(interp, "Exception"))
+        if (VTABLE_does(interp, task, exception_str)
         &&  VTABLE_get_integer_keyed_str(INTERP, task, handled_str) == -1) {
             iter = VTABLE_get_attr_str(INTERP, task, iter_str);
         }
@@ -472,11 +473,11 @@ PMCNULL.
         while (VTABLE_get_bool(INTERP, iter)) {
             PMC * const handler = VTABLE_shift_pmc(INTERP, iter);
 
-            INTVAL valid_handler = 0;
+            INTVAL valid_handler;
             if (!PMC_IS_NULL(handler)) {
                 (const INTVAL valid_handler) = PCCINVOKE(INTERP, handler, "can_handle", PMC *task);
                 if (valid_handler) {
-                    if (!VTABLE_does(interp, task, CONST_STRING(interp, "Exception")))
+                    if (!VTABLE_does(interp, task, exception_str))
                         VTABLE_set_integer_native(INTERP, handler, 1);
                     RETURN(PMC *handler);
                 }
@@ -515,8 +516,8 @@ If no type argument is passed, counts all handlers.
 
         for (index = 0; index < elements; ++index) {
             const PMC * const handler   = VTABLE_get_pmc_keyed_int(INTERP, handlers, index);
-            STRING    * const exception = CONST_STRING(INTERP, "exception");
-            STRING    * const event     = CONST_STRING(INTERP, "event");
+            const STRING * const exception = CONST_STRING(INTERP, "exception");
+            const STRING * const event     = CONST_STRING(INTERP, "event");
 
             if (!PMC_IS_NULL(handler)) {
                 if ((STRING_equal(INTERP, type, exception)

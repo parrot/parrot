@@ -237,13 +237,15 @@ Use the C<:optional> and C<:opt_flag> pragmas:
 =begin PIR
 
   .sub foo
-     .param pmc arg1       :optional
-     .param int has_arg1   :opt_flag
-     .param pmc arg2       :optional
-     .param int has_arg2   :opt_flag
+      .param pmc arg1       :optional
+      .param int has_arg1   :opt_flag
+      .param pmc arg2       :optional
+      .param int has_arg2   :opt_flag
 
-     if has_arg1 goto got_arg1
-     #...
+      if has_arg1 goto got_arg1
+      # ...
+    got_arg1:
+      # ...
   .end
 
 =end PIR
@@ -597,14 +599,14 @@ Use C<push_eh> to push an exception handler onto the stack. End the set of
 instructions that might throw the exception you're interested in with
 C<pop_eh>.
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
 
     push_eh handler
       die 'whoops'  # or any other code that might throw an exception...
     pop_eh
     # ok
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 An exception handler is called with one argument, which is the exception object.
 The message of the exception can be easily extracted, as follows:

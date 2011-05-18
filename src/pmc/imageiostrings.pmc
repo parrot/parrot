@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -163,10 +163,10 @@ Checks new pmcs for strings.
 
     VTABLE void set_pmc(PMC *p)
     {
-        PMC *todo = PARROT_IMAGEIOSTRINGS(SELF)->todo;
+        PMC * const todo = PARROT_IMAGEIOSTRINGS(SELF)->todo;
         STATICSELF.push_pmc(p);
         while (VTABLE_elements(INTERP, todo)) {
-            PMC *current = VTABLE_shift_pmc(INTERP, todo);
+            PMC * const current = VTABLE_shift_pmc(INTERP, todo);
             VTABLE_freeze(INTERP, current, SELF);
             VTABLE_visit(INTERP,  current, SELF);
             SELF.push_pmc(PMC_metadata(current));

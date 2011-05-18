@@ -1,5 +1,5 @@
 #! nqp
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 class Ops::Trans::C is Ops::Trans;
 
@@ -56,7 +56,7 @@ method prepare_ops($emitter, $ops_file) {
 
         @op_func_table.push(sprintf( "  %-50s /* %6ld */\n", "$func_name,", $index ));
 
-        my $body := join('', $definition, '  {', "\n", $src, '}', "\n\n");
+        my $body := join('', $definition, ' ', $src, "\n\n");
         @op_funcs.push($body);
         @op_protos.push($prototype);
         $index++;
@@ -212,11 +212,9 @@ static op_info_t {self.op_info($emitter)}[{self<num_entries>}] = | ~ q|{
             !! '{ 0 }';
 
         $fh.print('  { ' ~ qq|/* $index */
-    /* type $type, */
     "$name",
     "$full_name",
     "$func_name",
-    /* "",  body */
     $jump,
     $arg_count,
     $arg_types,
@@ -287,8 +285,8 @@ static HOP *hop_buckets;
 static HOP **hop;
 
 static void hop_init(PARROT_INTERP);
-static size_t hash_str(const char *str);
-static void store_op(op_info_t *info, HOP *p, const char *name);
+static size_t hash_str(ARGIN(const char *str));
+static void store_op(ARGIN(op_info_t *info), ARGMOD(HOP *p), ARGIN(const char *name));
 
 /* XXX on changing interpreters, this should be called,
    through a hook */
@@ -321,7 +319,7 @@ size_t hash_str(ARGIN(const char *str))
 }
 
 
-static void store_op(op_info_t *info, HOP *p, const char *name)
+static void store_op(ARGIN(op_info_t *info), ARGMOD(HOP *p), ARGIN(const char *name))
 {
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
 
@@ -330,7 +328,7 @@ static void store_op(op_info_t *info, HOP *p, const char *name)
     hop[hidx]         = p;
 }
 
-static int get_op(PARROT_INTERP, const char *name, int full)
+static int get_op(PARROT_INTERP, ARGIN(const char *name), int full)
 {
     const HOP   *p;
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
@@ -355,8 +353,9 @@ static void hop_init(PARROT_INTERP)
 
     /* allocate the storage all in one chunk
      * yes, this is profligate, but we can tighten it later */
-    HOP *hops = hop_buckets =
+    HOP * const hop_buckets =
         mem_gc_allocate_n_zeroed_typed(interp, [[BS]]op_lib.op_count * 2, HOP );
+    HOP *hops = hop_buckets;
 
     opcode_t i;
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Archive/Zip
 
 Partial port of Archive::Zip (version 1.30)
 
-See L<http://search.cpan.org/~adamk/Archive-Zip/>
+See L<http://search.cpan.org/dist/Archive-Zip/>
 
 =cut
 

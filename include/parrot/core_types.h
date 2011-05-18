@@ -16,6 +16,8 @@ typedef struct parrot_string_t *Parrot_String;
 struct parrot_interp_t;
 typedef struct parrot_interp_t *Parrot_Interp;
 
+typedef Parrot_PMC Parrot_PackFile;
+
 #endif   /* PARROT_CORE_TYPES_H_GUARD */
 
 /*

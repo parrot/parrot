@@ -161,6 +161,9 @@ sub runstep {
 
     return $self->_handle_no_opengl($conf) if $without;
 
+    # opengl depends on thunks which depend on pcre
+    return $self->_handle_no_opengl($conf) unless $conf->data->get('HAS_PCRE');
+
     my $osname = $conf->data->get('osname');
 
     my $extra_libs = $self->_select_lib( {

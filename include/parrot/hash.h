@@ -99,14 +99,14 @@ struct _hash {
 }
 
 #define parrot_hash_iterate(_hash, _code)                                   \
-{                                                                           \
+do {                                                                        \
     if ((_hash)->key_type == Hash_key_type_int                              \
     ||  (_hash)->key_type == Hash_key_type_cstring                          \
     ||  (_hash)->key_type == Hash_key_type_ptr)                             \
         parrot_hash_iterate_indexed((_hash), _code)                         \
     else                                                                    \
         parrot_hash_iterate_linear((_hash), _code)                          \
-}
+} while (0)
 
 typedef void (*value_free)(ARGFREE(void *));
 
@@ -241,7 +241,7 @@ Hash * Parrot_hash_new_pointer_hash(PARROT_INTERP)
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 HashBucket* Parrot_hash_put(PARROT_INTERP,
     ARGMOD(Hash *hash),
     ARGIN_NULLOK(void *key),
@@ -255,6 +255,14 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 INTVAL Parrot_hash_size(SHIM_INTERP, ARGIN(const Hash *hash))
         __attribute__nonnull__(2);
+
+PARROT_HOT
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+size_t Parrot_hash_buffer(
+    ARGIN_NULLOK(const unsigned char *buf),
+    size_t len,
+    size_t hashval);
 
 void Parrot_hash_chash_destroy(PARROT_INTERP, ARGMOD(Hash *hash))
         __attribute__nonnull__(1)
@@ -444,6 +452,7 @@ STRING* Parrot_hash_value_to_string(PARROT_INTERP,
     , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_Parrot_hash_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(hash))
+#define ASSERT_ARGS_Parrot_hash_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_hash_chash_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))

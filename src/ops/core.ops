@@ -353,7 +353,7 @@ inline op invokecc(invar PMC) :flow {
     PMC      * const signature = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, NULL);
@@ -369,7 +369,7 @@ inline op invoke(invar PMC, invar PMC) :flow {
     PMC * const signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, NULL);
@@ -504,8 +504,8 @@ op set_returns(inconst PMC) :flow {
 op get_results(inconst PMC) :flow {
     opcode_t * const raw_params  = CUR_OPCODE;
     PMC      * const signature   = $1;
-    PMC             *ctx         = CURRENT_CONTEXT(interp);
-    PMC             *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC      * const ctx         = CURRENT_CONTEXT(interp);
+    PMC      * const call_object = Parrot_pcc_get_signature(interp, ctx);
 
     INTVAL argc;
 
@@ -1230,6 +1230,8 @@ Make any symbols in the library accessible to other libraries loaded.
 
 =item B<dlfunc>(out PMC, invar PMC, in STR, in STR)
 
+=item B<dlfunc>(out PMC, invar PMC, in STR, invar PMC)
+
 Look up symbol $3 in library $2 with signature $4, and put the
 corresponding sub object in $1. Note that you need the signature so we
 can build or find an appropriate thunking function.
@@ -1273,7 +1275,7 @@ inline op loadlib(out PMC, in STR, in PMC) {
 
 op dlfunc(out PMC, invar PMC, in STR, in STR) {
     void         *dl_handle = NULL;
-    void         *ptr       = NULL;
+    void         *ptr;
     funcptr_t     p;
 
     if (!PMC_IS_NULL($2)
@@ -1286,7 +1288,7 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
     p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
-        const char * err = Parrot_dlerror();
+        const char * const err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
                 "Symbol '%Ss' not found: %s\n", $3, err ? err : "unknown reason");
         $1 = Parrot_pmc_new(interp, enum_class_Undef);
@@ -1297,9 +1299,35 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
     }
 }
 
+op dlfunc(out PMC, invar PMC, in STR, invar PMC) {
+    void         *dl_handle = NULL;
+    void         *ptr;
+    funcptr_t     p;
+
+    if (!PMC_IS_NULL($2)
+    && $2->vtable->base_type == enum_class_ParrotLibrary
+    && VTABLE_defined(interp, $2)) {
+        dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data($2))->dl_handle;
+    }
+
+    ptr = Parrot_dyn_dlsym_str(interp, dl_handle, $3);
+    p = D2FPTR(ptr);
+
+    if (p == NULLfunc) {
+        const char * const err = Parrot_dlerror();
+        Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
+                "Symbol '%Ss' not found: %s\n", $3, err ? err : "unknown reason");
+        $1 = Parrot_pmc_new(interp, enum_class_Undef);
+    }
+    else {
+        $1 = Parrot_pmc_new(interp, enum_class_NCI);
+        VTABLE_set_pointer_keyed(interp, $1, $4, F2DPTR(p));
+    }
+}
+
 op dlvar(out PMC, invar PMC, in STR) {
     void *        dl_handle = NULL;
-    void *        p         = NULL;
+    void *        p;
 
     if (!PMC_IS_NULL($2)
     && $2->vtable->base_type == enum_class_ParrotLibrary

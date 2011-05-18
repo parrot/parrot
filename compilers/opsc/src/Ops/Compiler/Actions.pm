@@ -3,6 +3,7 @@
 
 class Ops::Compiler::Actions is HLL::Actions;
 
+our $OP;
 our $OPLIB;
 
 INIT {
@@ -54,85 +55,66 @@ method preamble($/) {
     );
 }
 
-method op($/) {
+method op ($/, $key?) {
 
-    # Handling flags.
-    my %flags := hash();
-    for $<op_flag> {
-        %flags{~$_<identifier>} := 1;
-    }
+    if $key eq 'start' {
+        # Handling flags.
+        my %flags := hash();
+        for $<op_flag> {
+            %flags{~$_<identifier>} := 1;
+        }
 
-    my @args := @($<signature>.ast);
+        my @args      := @($<signature>.ast);
+        my @norm_args := normalize_args(@args);
 
-    my @norm_args := normalize_args(@args);
-    # We have to clone @norm_args. Otherwise it will be destroyed...
-    my @variants  := expand_args(pir::clone__PP(@norm_args));
-
-    my $op := Ops::Op.new(
-        :name(~$<op_name>),
-    );
-
-    # Flatten PAST::Stmts into Op.
-    for @($<op_body>.ast) {
-        $op.push($_);
-    }
-
-    for $<op_body>.ast<jump> {
-        $op.add_jump($_);
-    }
-    if ~$<op_name> eq 'runinterp' {
-        $op.add_jump('PARROT_JUMP_RELATIVE');
-    }
-    $op<flags> := %flags;
-    $op<args>  := @args;
-    $op<type>  := ~$<op_type>;
-    $op<normalized_args> := @norm_args;
-
-    if $op.need_write_barrier {
-        $op.push(PAST::Op.new(
-                :pasttype<inline>,
-                :inline("    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));\n")
-            ));
-    }
-
-    if !%flags<flow> {
-        my $goto_next := PAST::Op.new(
-            :pasttype('call'),
-            :name('goto_offset'),
-            PAST::Op.new(
-                :pasttype<call>,
-                :name<OPSIZE>,
-            )
+        $OP := Ops::Op.new(
+            :name(~$<op_name>),
         );
 
-        my $nl := "\n";
-        $op.push(PAST::Op.new(
-                :pasttype<inline>,
-                :inline($nl)
-            ));
-        $op.push($goto_next);
-        $op.push(PAST::Op.new(
-                :pasttype<inline>,
-                :inline(";\n"),
-            ));
-    }
-
-    my $past := PAST::Stmts.new(
-        :node($/)
-    );
-
-    if @variants {
-        for @variants {
-            my $new_op := pir::clone__PP($op);
-            $new_op<arg_types> := $_;
-            $past.push($new_op);
+        if ~$<op_name> eq 'runinterp' {
+            $OP.add_jump('PARROT_JUMP_RELATIVE');
         }
+
+        $OP<flags> := %flags;
+        $OP<args>  := @args;
+        $OP<type>  := ~$<op_type>;
+        $OP<normalized_args> := @norm_args;
     }
     else {
-        $past.push($op);
-    }
+        # Handle op body
+        $OP.push($<op_body>.ast);
 
-    make $past;
+        if !$OP<flags><flow> {
+            $OP[0].push(self.make_write_barrier) if $OP.need_write_barrier;
+
+            my $goto_next := PAST::Op.new(
+                :pasttype('macro'),
+                :name('goto_offset'),
+                self.opsize,
+            );
+
+            $OP[0].push($goto_next);
+        }
+
+        my $past := PAST::Stmts.new(
+            :node($/)
+        );
+
+        # We have to clone @norm_args. Otherwise it will be destroyed...
+        my @variants  := expand_args(pir::clone__PP($OP<normalized_args>));
+        if @variants {
+            for @variants {
+                my $new_op := pir::clone__PP($OP);
+                $new_op<arg_types> := $_;
+                $past.push($new_op);
+            }
+        }
+        else {
+            $past.push($OP);
+        }
+
+        make $past;
+    }
 }
 
 # Normalize args
@@ -253,160 +235,430 @@ method op_param($/) {
 }
 
 method op_body($/) {
-    my $past := PAST::Stmts.new(
-        :node($/),
-    );
-    $past<jump> := list();
-    my $prev_words := '';
-    for $<body_word> {
-        if $prev_words && $_<word> {
-            $prev_words := $prev_words ~ ~$_<word>;
-        }
-        elsif $_<word> {
-            $prev_words := ~$_<word>;
-        }
-        else {
-            $past.push(PAST::Op.new(
-                :pasttype('inline'),
-                :inline($prev_words),
-            ));
-            $prev_words := '';
-
-            if $_<macro_param> {
-                $past.push($_<macro_param>.ast);
-            }
-            elsif $_<op_macro> {
-                $past.push($_<op_macro>.ast);
-                for $_<op_macro>.ast<jump> {
-                    $past<jump>.push($_);
-                }
-            }
-        }
-    }
-    if $prev_words {
-        $past.push(PAST::Op.new(
-            :pasttype('inline'),
-            :inline($prev_words)
-        ));
-    }
-    make $past;
+    make $<blockoid>.ast;
 }
 
-method macro_param($/) {
-    make PAST::Var.new(
-        :name(~$<num>),
-        :node($/),
+method op_macro:sym<expr offset>($/) {
+    make PAST::Op.new(
+        :pasttype<macro>,
+        :name<expr_offset>,
+        $<arg>.ast,
     );
 }
 
-method body_word($/) {
-    #say('# body_word: '~ ~$<word>);
-    my $past;
-    if $<word> {
-        $past := PAST::Op.new(
-            :pasttype('inline'),
-            :inline(~$<word>)
+method op_macro:sym<goto offset>($/) {
+    $OP.add_jump('PARROT_JUMP_RELATIVE');
+
+    my $past := PAST::Op.new(
+        :pasttype<macro>,
+        :name<goto_offset>,
+        $<arg>.ast,
+    );
+
+    if $OP.need_write_barrier {
+        $past := PAST::Block.new(
+            self.make_write_barrier,
+            $past,
         );
     }
-    elsif $<macro_param> {
-        $past := $<macro_param>.ast;
-    }
-    elsif $<op_macro> {
-        $past := $<op_macro>.ast;
-    }
-    else {
-        die('horribly');
-    }
-    #_dumper($past);
+
     make $past;
 }
 
-method op_macro($/) {
+method op_macro:sym<expr address>($/) {
+    make PAST::Op.new(
+        :pasttype<macro>,
+        :name<expr_address>,
+        $<arg>.ast,
+    );
+}
+
+method op_macro:sym<goto address>($/) {
+    my $past := PAST::Op.new(
+        :pasttype<macro>,
+        :name<goto_address>,
+        $<arg>.ast,
+    );
+
+    if $OP.need_write_barrier {
+        $past := PAST::Block.new(
+            self.make_write_barrier,
+            $past,
+        );
+    }
+
+    make $past;
+}
+
+method op_macro:sym<expr next>($/) {
+    make PAST::Op.new(
+        :pasttype<macro>,
+        :name<expr_offset>,
+        self.opsize,
+    );
+}
+
+method op_macro:sym<goto next>($/) {
+    $OP.add_jump('PARROT_JUMP_RELATIVE');
+
+    my $past := PAST::Op.new(
+        :pasttype<macro>,
+        :name<goto_offset>,
+        self.opsize,
+    );
+
+    if $OP.need_write_barrier {
+        $past := PAST::Block.new(
+            self.make_write_barrier,
+            $past,
+        );
+    }
+
+    make $past;
+}
+
+
+method op_macro:sym<restart next> ($/) {
     #say('# op_macro');
-    # Generate set of calls to Trans:
-    # goto NEXT()         -> goto_offset(opsize())
-    # goto OFFSET($addr)  -> goto_offset($addr)
-    # goto ADDRESS($addr) -> goto_address($addr)
-    # expr NEXT()         -> expr_offset(opsize())
-    # expr OFFSET($addr)  -> expr_offset($addr)
-    # expr ADDRERR($addr) -> expr_address($addr)
     # restart NEXT()      -> restart_offset(opsize()); goto_address(0)
-    # restart OFFSET()    -> restart_offset($addr); goto_offset($addr)
-    # XXX In trunk "restart ADDRESS" equivalent of "goto ADDRESS".
-    # restart ADDRESS()   -> restart_address($addr); goto_address($addr)
-
-    my $macro_type := ~$<macro_type>;
-    my $macro_dest := ~$<macro_destination>;
-    my $is_next    := $macro_dest eq 'NEXT';
-    my $macro_name := $macro_type ~ '_' ~ lc($is_next ?? 'offset' !! $macro_dest);
-
-    my $past  := PAST::Stmts.new;
-
-    my $macro := PAST::Op.new(
-        :pasttype('call'),
-        :name($macro_name),
-    );
-    $past.push($macro);
-
-    $past<jump> := list();
-
-    if $macro_type ne 'expr' && $macro_dest eq 'OFFSET' {
-        $past<jump>.push('PARROT_JUMP_RELATIVE');
-    }
-
-    if $macro_type eq 'expr' || $macro_type eq 'goto' {
-        if $is_next {
-            $macro.push(PAST::Op.new(
-                :pasttype<call>,
-                :name<OPSIZE>,
-            ));
-        }
-        else {
-            process_op_macro_body_word($/, $macro);
-        }
-    }
-    elsif $macro_type eq 'restart' {
-        if $is_next {
-            $macro.push(PAST::Op.new(
-                :pasttype<call>,
-                :name<OPSIZE>,
-            ));
-        }
-        else {
-            process_op_macro_body_word($/, $macro);
-        }
-
-        $macro := PAST::Op.new(
-            :pasttype<call>,
+    my $past := PAST::Stmts.new(
+        PAST::Op.new(
+            :pasttype<macro>,
+            :name<restart_offset>,
+            self.opsize,
+        ),
+        PAST::Op.new(
+            :pasttype<macro>,
             :name<goto_address>,
+            PAST::Val.new(
+                :value<0>
+            )
+        ),
+    );
+
+    $past.unshift(self.make_write_barrier) if $OP.need_write_barrier;
+
+    make $past;
+}
+
+method blockoid ($/) {
+    my $past := PAST::Block.new(:node($/));
+
+    $past.push($_) for @($<mixed_content>.ast);
+
+    make $past;
+}
+
+method mixed_content ($/) {
+    my $past := PAST::Stmts.new(:node($/));
+
+    @($_.ast).map(-> $_ { $past.push($_) }) for $<declarator>;
+    $past.push($_) for @($<statement_list>.ast);
+
+    make $past;
+}
+
+method declarator ($/) {
+    my $past := PAST::Stmts.new(:node($/));
+    for $<declarator_name> {
+        my $decl := PAST::Var.new(
+            :node($_),
+            :isdecl(1),
+            :name(~$_<variable>),
+            :vivibase(~$<type_declarator>),
         );
-        if $is_next {
-            $macro.push(PAST::Op.new(
-                :pasttype<inline>,
-                :inline<0>,
-            ));
-        }
-        else {
-            process_op_macro_body_word($/, $macro);
-        }
-        $past.push($macro);
-    }
-    else {
-        pir::die("Horribly");
+
+        $decl.viviself($_<EXPR>[0].ast) if $_<EXPR>[0];
+
+        $decl<array_size> := ~$_<array_size><VALUE> if $_<array_size>;
+        $decl<pointer>    := $_<pointer>.join('');
+        $past.push($decl);
     }
 
     make $past;
 }
 
-sub process_op_macro_body_word($/, $macro) {
-    #_dumper($<body_word>);
-    if $<body_word> {
-        for $<body_word> {
-            #say(' word ' ~ $_);
-            my $bit := $_.ast;
-            $macro.push($_.ast) if defined($bit);
-        }
+method statement_list ($/) {
+    my $past := PAST::Stmts.new(:node($/));
+
+    $past.push($_.ast) for $<labeled_statement>;
+
+    # Avoid wrapping single blockoid into Stmts.
+    make (+@($past) == 1) && ($past[0] ~~ PAST::Block)
+        ?? $past[0]
+        !! $past;
+}
+
+method labeled_statement ($/) {
+    # FIXME!!!
+    my $past := $<statement>
+                ?? $<statement>.ast
+                !! PAST::Op.new();
+
+    # FIXME!!! We need some semantics here.
+    $past<label> := ~$<label> if $<label>;
+
+    make $past;
+}
+
+method statement ($/) {
+    my $past;
+
+    if $<statement_control> {
+        $past := $<statement_control>.ast;
     }
+    elsif $<blockoid> {
+        $past := $<blockoid>.ast;
+    }
+    elsif $<EXPR> {
+        $past := $<EXPR>.ast;
+    }
+    elsif $<c_macro> {
+        $past := $<c_macro>.ast;
+    }
+    else {
+        $/.CURSOR.panic("Unknown content in statement");
+    }
+
+    make $past;
+}
+
+method c_macro:sym<define> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<macro_define>,
+        $<name>,
+    );
+
+    $past<macro_args> := $<c_macro_args>[0].ast if $<c_macro_args>;
+    $past<body>       := $<body>[0].ast         if $<body>;
+
+    make $past;
+}
+
+method c_macro:sym<if> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<macro_if>,
+
+        ~$<condition>,  # FIXME! We have to parse condition somehow.
+        $<then>.ast,
+    );
+
+    $past.push($<else>[0].ast) if $<else>;
+
+    make $past;
+}
+
+method c_macro:sym<ifdef> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<macro_if>,
+
+        'defined(' ~ ~$<name> ~ ')',  # FIXME! We have to parse condition somehow.
+        $<then>.ast,
+    );
+
+    $past.push($<else>[0].ast) if $<else>;
+
+    make $past;
+}
+
+method term:sym<concatenate_strings> ($/) {
+    make ~$<identifier> ~ ' ' ~ ~$<quote>;
+}
+
+method term:sym<identifier> ($/) {
+    # XXX Type vs Variable
+    make PAST::Var.new(
+        :name(~$/),
+    );
+}
+
+method term:sym<call> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype('call'),
+        :name(~$<identifier>),
+    );
+
+    if ($<arglist><arg>) {
+        $past.push($_.ast) for $<arglist><arg>;
+    }
+
+    make $past;
+}
+
+method arg ($/) {
+    make $<type_declarator>
+        ?? ~$<type_declarator>
+        !! $<EXPR>.ast;
+}
+
+method term:sym<reg> ($/) {
+    make PAST::Var.new(
+        :name(+$<num>),
+        :node($/),
+        :scope('register'), # Special scope
+    );
+}
+
+method term:sym<macro> ($/) {
+    make $<op_macro>.ast;
+}
+
+method term:sym<int> ($/) {
+    # TODO Handle type
+    make PAST::Val.new(
+        :value(~$/),
+        :returns<int>
+    );
+}
+
+method term:sym<str> ($/) {
+    make PAST::Val.new(
+        :value(~$<quote>),
+        :returns<string>
+    );
+}
+
+method term:sym<float_constant_long> ($/) { # longer to work-around lack of LTM
+    make PAST::Val.new(
+        :value(~$/),
+        :returns<float>
+    );
+}
+
+method infix:sym<?:> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<if>,
+    );
+    # Override to emit ternary ops in .to_c
+    $past<ternary> := 1;
+    make $past;
+}
+
+method statement_control:sym<if> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<if>,
+
+        $<EXPR>.ast,
+        $<then>.ast,
+    );
+
+    $past.push($<else>[0].ast) if $<else>;
+
+    make $past;
+}
+
+method statement_control:sym<while> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<while>,
+
+        $<condition>.ast,
+        $<statement_list>.ast,
+    );
+
+    make $past;
+}
+
+method statement_control:sym<do-while> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<do-while>,
+
+        $<blockoid>.ast,
+        $<condition>.ast,
+    );
+
+    make $past;
+}
+
+method statement_control:sym<for> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<for>,
+
+        $<init> ?? $<init>[0].ast !! undef,
+        $<test> ?? $<test>[0].ast !! undef,
+        $<step> ?? $<step>[0].ast !! undef,
+        $<statement_list>.ast,
+    );
+
+    make $past;
+}
+
+# Not real "C" switch. Just close enough
+method statement_control:sym<switch> ($/) {
+    my $past := PAST::Op.new(
+        :pasttype<switch>,
+        $<test>.ast,
+        $<statement_list>.ast,
+    );
+    make $past;
+}
+
+method statement_control:sym<break> ($/) {
+    my $past := PAST::Op.new();
+    $past<control> := 'break';
+    make $past;
+}
+
+method statement_control:sym<continue> ($/) {
+    my $past := PAST::Op.new();
+    $past<control> := 'continue';
+    make $past;
+}
+
+method statement_or_block ($/) {
+    $<labeled_statement>
+        ?? make PAST::Block.new(
+               $<labeled_statement>.ast
+           )
+        !! make $<blockoid>.ast
+}
+
+method circumfix:sym<( )> ($/) {
+    my $past := $<EXPR>.ast;
+
+    # Indicate that we need wrapping.
+    $past<wrap> := 1;
+
+    make $past;
+}
+
+method postcircumfix:sym<[ ]> ($/) {
+    make PAST::Var.new(
+        $<EXPR>.ast,
+        :scope('keyed'),
+    );
+}
+
+
+# For casting we just set "returns" of EXPR.
+method prefix:sym<( )> ($/) {
+    make PAST::Op.new(
+        :returns(~$<type_declarator>),
+    );
+}
+
+# Helper method for generating PAST::Val with opsize
+method opsize () {
+    make PAST::Val.new(
+        :value($OP.size),
+        :returns('int'),
+    );
+}
+
+method make_write_barrier () {
+    make PAST::Op.new(
+        :pasttype<call>,
+        :name<PARROT_GC_WRITE_BARRIER>,
+        PAST::Var.new(
+            :name<interp>
+        ),
+        PAST::Op.new(
+            :pasttype<call>,
+            :name<CURRENT_CONTEXT>,
+            PAST::Var.new(
+                :name<interp>
+            )
+        )
+    );
 }
 
 # Local Variables:

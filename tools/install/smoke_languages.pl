@@ -9,7 +9,7 @@ use Cwd;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 33;
+use Test::More tests => 34;
 
 =head1 NAME
 
@@ -657,6 +657,16 @@ $exe = "$parrot unl.pbc" unless (-e $exe);
 $out = `$exe $filename`;
 ok($out eq "Hello world\n", "check unlambda");
 unlink($filename);
+}
+
+SKIP:
+{
+$exe = quote(catfile($pwd, $bindir, 'winxed'));
+skip("Winxed", 1) unless (-d "$pwd/$langdir/winxed" || -e $exe);
+chdir("$pwd/$langdir/winxed");
+$exe = "$parrot build/winxed_installed.pbc" unless (-e $exe);
+$out = `$exe -e "print('hello world');"`;
+ok($out eq "hello world", "check winxed");
 }
 
 SKIP:

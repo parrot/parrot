@@ -324,6 +324,7 @@ my $stat;
 
 my $count = $MSWin32 ? 11 : 13;
 my @s = stat('xpto');
+$s[6] = 0; # Parrot does this internally...
 if ( $cygwin ) {
     # Mask inode number (fudge it)
     $s[1] &= 0xffffffff;
@@ -483,6 +484,7 @@ SKIP: {
     skip 'broken test TT #457', 1 if $solaris;
 
     my @s = lstat('xpto');
+    $s[6] = 0; # Parrot does this internally
     if ($cygwin) {
         # Mask inode number (fudge it)
         $s[1] &= 0xffffffff;

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -36,6 +36,8 @@ static void print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
 /*
 
 =item C<static void print_sub_name(PARROT_INTERP, PMC *sub)>
+
+static function to print the name of the sub (for tracing/debugging)
 
 =cut
 
@@ -194,7 +196,7 @@ surboutine is fully constructed but not attached to interpreter.
         /* comp_flags is actually UINTVAL */
         field = CONST_STRING(INTERP, "comp_flags");
         if (VTABLE_exists_keyed_str(INTERP, init, field)) {
-            UINTVAL flags = (UINTVAL)VTABLE_get_integer_keyed_str(INTERP, init, field);
+            const UINTVAL flags = (UINTVAL)VTABLE_get_integer_keyed_str(INTERP, init, field);
             /* Mask comp flags only */
             attrs->comp_flags = flags & SUB_COMP_FLAG_MASK;
         }
@@ -202,7 +204,7 @@ surboutine is fully constructed but not attached to interpreter.
         /* In order to create Sub dynamicaly we have to set PObj flags */
         field = CONST_STRING(INTERP, "pf_flags");
         if (VTABLE_exists_keyed_str(INTERP, init, field)) {
-            UINTVAL flags = (UINTVAL)VTABLE_get_integer_keyed_str(INTERP, init, field);
+            const UINTVAL flags = (UINTVAL)VTABLE_get_integer_keyed_str(INTERP, init, field);
             /* Mask Sub specific flags only */
             PObj_get_FLAGS(SELF) |= flags & SUB_FLAG_PF_MASK;
         }
@@ -446,7 +448,7 @@ Invokes the subroutine.
         PARROT_CONTINUATION(ccont)->from_ctx = context;
 
         /* if this is an outer sub, then we need to set sub->ctx
-         * to the new context (refcounted) */
+         * to the new context */
         if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER) {
             PARROT_GC_WRITE_BARRIER(interp, SELF);
             sub->ctx = context;
@@ -471,7 +473,9 @@ Invokes the subroutine.
             PMC *c       = context;
             PMC *outer_c = Parrot_pcc_get_outer_ctx(INTERP, c);
 
-            for (c = context; PMC_IS_NULL(outer_c); c = outer_c) {
+            for (c = context;
+                 PMC_IS_NULL(outer_c);
+                 c = outer_c, outer_c = Parrot_pcc_get_outer_ctx(INTERP, c)) {
 
                 PMC *outer_pmc;
                 Parrot_Sub_attributes *current_sub, *outer_sub;

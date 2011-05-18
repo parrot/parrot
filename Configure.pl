@@ -66,8 +66,9 @@ $conf->add_steps( @{ $steps_list_ref } );
 # from Parrot::Configure::Data
 $conf->options->set( %{$args} );
 # save the command-line for make reconfig
-$conf->data->set(configure_args => @ARGV ? '"'.join("\" \"", map {qq($_)} @ARGV).'"'
-                                         : '');
+$conf->data->set(configure_args => @ARGV
+    ? '"'.join("\" \"", map {qq($_)} @ARGV).'"'
+    : '');
 
 # Log files created by Configure.pl in MANIFEST.configure.generated
 $conf->{active_configuration} = 1;
@@ -266,7 +267,11 @@ Tell Configure that the compiler supports C<inline>.
 
 =item C<--cc=(compiler)>
 
-Specify which compiler to use.
+Specify which C compiler to use.
+
+=item C<--cxx=(compiler)>
+
+Specify which C++ compiler to use.
 
 =item C<--ccflags=(flags)>
 
@@ -354,10 +359,6 @@ Use the given type for opcodes.
 
 Use the given ops files.
 
-=item C<--buildframes>
-
-Dynamically build NCI call frames.
-
 =back
 
 =head2 International Components For Unicode (ICU) Options
@@ -402,6 +403,11 @@ E.g.
 
 Use this option if you want imcc's parser and lexer files to be generated.
 Needs a working parser and lexer.
+
+=item C<--with-llvm>
+
+Use this option if you have a recent version of LLVM installed and wish Parrot
+to link to it.
 
 =back
 
@@ -614,7 +620,6 @@ configuration file.
     auto::isreg
     auto::arch
     auto::jit
-    auto::frames
     auto::cpu
     auto::inline
     auto::gc

@@ -18,8 +18,11 @@ simplest way to use it is to run
 
 in the distribution's root directory, and follow the prompts.
 
-However, if you do know how to fix the problem you encountered, then think
-about submitting a patch, or (see below) getting commit privileges.
+If you just want to use email to create the bug report, send an email to
+L<tickets@parrot.org>.
+
+If you know how to fix the problem you encountered, then think about 
+submitting a patch, or (see below) getting commit privileges.
 
 =head1 A Note on Random Failures
 

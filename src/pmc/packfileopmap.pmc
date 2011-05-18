@@ -28,9 +28,9 @@ libraries that the ops come from.
 
 
 pmclass PackfileOpMap auto_attrs {
-    ATTR PMC    *op_maps;   /* RPA of Hashes of op lib maps */
-    ATTR PMC    *map_cache; /* Hash mapping full op names to numbers */
-    ATTR INTVAL  op_count;  /* number of mapped ops*/
+    ATTR PMC    *op_maps;       /* RPA of Hashes of op lib maps */
+    ATTR PMC    *map_cache;     /* Hash mapping full op names to numbers */
+    ATTR PMC    *ops;           /* RSA of mapped ops. */
 
 /*
 
@@ -51,7 +51,7 @@ Create empty PackfileOpMap for a given op library.
 
         attrs->op_maps    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         attrs->map_cache  = Parrot_pmc_new(INTERP, enum_class_Hash);
-        attrs->op_count   = 0;
+        attrs->ops        = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
 
         core_ops_pmc = Parrot_pmc_new(INTERP, enum_class_String);
         VTABLE_set_string_native(INTERP, core_ops_pmc, CONST_STRING(INTERP, "core_ops"));
@@ -84,7 +84,7 @@ already in the map, a new map will be created.
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
         STRING *key_str, *oplib_str;
-        PMC    *map_cache, *op_maps;
+        PMC    *map_cache, *op_maps, *ops;
         INTVAL  op_map_count, i;
 
         GET_ATTR_map_cache(INTERP, SELF, map_cache);
@@ -118,13 +118,14 @@ already in the map, a new map will be created.
             table_ops = VTABLE_get_pmc_keyed_str(INTERP, op_map, table_ops_str);
             lib_ops   = VTABLE_get_pmc_keyed_str(INTERP, op_map, lib_ops_str);
 
-            GET_ATTR_op_count(INTERP, SELF, op_count);
+            GET_ATTR_ops(INTERP, SELF, ops);
+            op_count = VTABLE_elements(INTERP, ops);
 
             VTABLE_set_integer_keyed(INTERP, map_cache, key, op_count);
             VTABLE_push_integer(INTERP, table_ops, op_count);
             VTABLE_push_integer(INTERP, lib_ops, op_num);
 
-            SET_ATTR_op_count(INTERP, SELF, op_count + 1);
+            VTABLE_push_string(INTERP, ops, key_str);
 
             return op_count;
         }
@@ -135,7 +136,7 @@ already in the map, a new map will be created.
     }
 
     VTABLE INTVAL get_integer_keyed_str(STRING *str_key) {
-        PMC *pmc_key = Parrot_key_new_string(INTERP, str_key);
+        PMC * const pmc_key = Parrot_key_new_string(INTERP, str_key);
         return SELF.get_integer_keyed(pmc_key);
     }
 
@@ -151,7 +152,7 @@ Get Op PMC by name.
     VTABLE PMC* get_pmc_keyed_str(STRING *name) {
         PMC    *op_maps;
         INTVAL  op_map_count, i;
-        STRING *oplib_str = CONST_STRING(INTERP, "oplib");
+        STRING * const oplib_str = CONST_STRING(INTERP, "oplib");
 
         GET_ATTR_op_maps(INTERP, SELF, op_maps);
         op_map_count = VTABLE_elements(INTERP, op_maps);
@@ -173,6 +174,25 @@ Get Op PMC by name.
         return STATICSELF.get_pmc_keyed_str(Parrot_key_string(INTERP, key));
     }
 
+/*
+=item C<get_string_keyed_int()>
+
+=item C<get_pmc_keyed_int()>
+
+Lookup op name by mapped id.
+
+=cut
+*/
+    VTABLE STRING* get_string_keyed_int(INTVAL key) {
+        PMC *ops;
+        GET_ATTR_ops(INTERP, SELF, ops);
+        return VTABLE_get_string_keyed_int(INTERP, ops, key);
+    }
+
+    VTABLE PMC* get_pmc_keyed_int(INTVAL key) {
+        return Parrot_pmc_box_string(INTERP, STATICSELF.get_string_keyed_int(key));
+    }
+
 
 /*
 
@@ -186,9 +206,14 @@ Marks the object as live.
 
     VTABLE void mark() {
         PMC *tmp;
+
         GET_ATTR_op_maps(INTERP, SELF, tmp);
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
         GET_ATTR_map_cache(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
+        GET_ATTR_ops(INTERP, SELF, tmp);
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
     }
 
@@ -204,9 +229,9 @@ Get the number of filename mappings.
 */
 
     VTABLE INTVAL get_integer() {
-        INTVAL op_count;
-        GET_ATTR_op_count(INTERP, SELF, op_count);
-        return op_count;
+        PMC *ops;
+        GET_ATTR_ops(INTERP, SELF, ops);
+        return VTABLE_elements(INTERP, ops);
     }
 
 /*
@@ -223,7 +248,7 @@ Ensure that an op library is loaded and accessible to this OpMap.
         PMC *op_maps, *ops_info, *oplib, *lib_name_pmc;
         INTVAL i, op_map_count;
         STRING *oplib_name, *lib_ops, *table_ops, *oplib_str;
-        Parrot_PackfileOpMap_attributes *attrs =
+        Parrot_PackfileOpMap_attributes * const attrs =
                 PARROT_PACKFILEOPMAP(SELF);
 
         oplib_name = CONST_STRING(INTERP, "oplib_name");

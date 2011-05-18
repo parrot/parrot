@@ -36,7 +36,8 @@ Return a high-resolution number representing how long Parrot has been running.
 
 */
 
-UHUGEINTVAL Parrot_hires_get_time(void)
+UHUGEINTVAL
+Parrot_hires_get_time(void)
 {
     LARGE_INTEGER ticks;
     QueryPerformanceCounter(&ticks);
@@ -53,7 +54,8 @@ Return the number of nanoseconds that each time unit from Parrot_hires_get_time 
 
 */
 
-UINTVAL Parrot_hires_get_tick_duration(void)
+UINTVAL
+Parrot_hires_get_tick_duration(void)
 {
     LARGE_INTEGER ticks;
     /* QueryPerformanceCounter returns ticks per second, so divide 1 billion by

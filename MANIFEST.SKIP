@@ -446,8 +446,6 @@
 ^/parrot\.ilk/
 ^/parrot\.iss$
 ^/parrot\.iss/
-^/parrot\.pc$
-^/parrot\.pc/
 ^/parrot\.pdb$
 ^/parrot\.pdb/
 ^/parrot_config$
@@ -514,6 +512,8 @@
 ^/runtime/parrot/include/.*\.pasm/
 ^/runtime/parrot/include/.*\.pbc$
 ^/runtime/parrot/include/.*\.pbc/
+^/runtime/parrot/include/.*\.pir$
+^/runtime/parrot/include/.*\.pir/
 ^/runtime/parrot/languages/JSON/JSON\.pir$
 ^/runtime/parrot/languages/JSON/JSON\.pir/
 ^/runtime/parrot/languages/data_json$
@@ -868,14 +868,6 @@
 ^/t/compilers/data_json/.*_pbcexe/
 ^/t/compilers/imcc/.*\.pbc$
 ^/t/compilers/imcc/.*\.pbc/
-^/t/compilers/imcc/imcpasm/.*\.pasm$
-^/t/compilers/imcc/imcpasm/.*\.pasm/
-^/t/compilers/imcc/imcpasm/.*\.pbc$
-^/t/compilers/imcc/imcpasm/.*\.pbc/
-^/t/compilers/imcc/imcpasm/.*\.pir$
-^/t/compilers/imcc/imcpasm/.*\.pir/
-^/t/compilers/imcc/imcpasm/.*_pbcexe$
-^/t/compilers/imcc/imcpasm/.*_pbcexe/
 ^/t/compilers/imcc/reg/.*\.pasm$
 ^/t/compilers/imcc/reg/.*\.pasm/
 ^/t/compilers/imcc/reg/.*\.pbc$
@@ -974,6 +966,8 @@
 ^/t/perl/Parrot_Test_1\.pasm/
 ^/t/perl/Parrot_Test_1\.pir$
 ^/t/perl/Parrot_Test_1\.pir/
+^/t/pir/pbc_fallback_1\.pbc$
+^/t/pir/pbc_fallback_1\.pbc/
 ^/t/pir/pbc_fallback_1\.pir$
 ^/t/pir/pbc_fallback_1\.pir/
 ^/t/pmc/.*\.out$

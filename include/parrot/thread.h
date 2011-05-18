@@ -13,52 +13,17 @@
 
 #include "parrot/parrot.h"
 
-#ifdef _WIN32
-#  include "parrot/thr_windows.h"
+#ifdef PARROT_HAS_THREADS
+#  ifdef _WIN32
+#    include "parrot/thr_windows.h"
+#  else
+#    include "parrot/thr_pthread.h"
+#  endif
 #else
-#  include "parrot/thr_pthread.h"
-#endif
+#  include   "parrot/thr_none.h"
+#endif /* PARROT_HAS_THREADS */
 
 #include "parrot/atomic.h"
-
-#ifndef PARROT_HAS_THREADS
-
-#  define LOCK(m)
-#  define UNLOCK(m)
-#  define COND_WAIT(c, m)
-#  define COND_TIMED_WAIT(c, m, t)
-#  define COND_SIGNAL(c)
-#  define COND_BROADCAST(c)
-
-#  define MUTEX_INIT(m)
-#  define MUTEX_DESTROY(m)
-
-#  define COND_INIT(c)
-#  define COND_DESTROY(c)
-
-#  define THREAD_CREATE_DETACHED(t, func, arg)
-#  define THREAD_CREATE_JOINABLE(t, func, arg)
-
-#  define JOIN(t, ret)
-#  define DETACH(t)
-
-#  define CLEANUP_PUSH(f, a)
-#  define CLEANUP_POP(a)
-
-#  define Parrot_mutex int
-#  define Parrot_cond int
-#  define Parrot_thread int
-
-typedef void (*Cleanup_Handler)(void *);
-
-#  if ! PARROT_HAS_TIMESPEC
-struct timespec {
-    time_t tv_sec;
-    long tv_nsec;
-};
-#  endif /* PARROT_HAS_TIMESPEC */
-
-#endif /* PARROT_HAS_THREADS */
 
 #ifndef YIELD
 #  define YIELD
@@ -155,12 +120,10 @@ VAR_SCOPE Shared_gc_info *shared_gc_info;
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void Parrot_shared_gc_block(PARROT_INTERP)
-        __attribute__nonnull__(1);
+void Parrot_shared_gc_block(SHIM_INTERP);
 
 PARROT_EXPORT
-void Parrot_shared_gc_unblock(PARROT_INTERP)
-        __attribute__nonnull__(1);
+void Parrot_shared_gc_unblock(SHIM_INTERP);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -177,9 +140,7 @@ void pt_clone_globals(Parrot_Interp d, Parrot_Interp s);
 void pt_free_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void pt_gc_mark_root_finished(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
+void pt_gc_mark_root_finished(SHIM_INTERP);
 void pt_gc_start_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -238,10 +199,8 @@ PMC * pt_transfer_sub(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(d);
 
-#define ASSERT_ARGS_Parrot_shared_gc_block __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_shared_gc_unblock __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_shared_gc_block __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_shared_gc_unblock __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_pt_thread_create __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_pt_add_to_interpreters __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -250,8 +209,7 @@ PMC * pt_transfer_sub(
 #define ASSERT_ARGS_pt_clone_globals __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_pt_free_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_pt_gc_mark_root_finished __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_pt_gc_mark_root_finished __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_pt_gc_start_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_pt_gc_stop_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

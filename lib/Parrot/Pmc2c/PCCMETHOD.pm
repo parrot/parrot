@@ -157,6 +157,9 @@ sub rewrite_RETURNs {
     my ( $self, $pmc ) = @_;
     my $method_name    = $self->name;
     my $body           = $self->body;
+    my $wb             = $self->attrs->{manual_wb}
+                         ? ''
+                         : 'PARROT_GC_WRITE_BARRIER(interp, _self);';
 
     my $signature_re   = qr/
       (RETURN       #method name
@@ -185,7 +188,7 @@ sub rewrite_RETURNs {
             $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     {
     /*BEGIN RETURN $returns */
-    PARROT_GC_WRITE_BARRIER(interp, _self);
+    $wb
     return;
     /*END RETURN $returns */
     }
@@ -207,7 +210,7 @@ END
     _ret_object = Parrot_pcc_build_call_from_c_args(interp, _call_object,
         "$returns_signature", $returns_varargs);
     UNUSED(_ret_object);
-    PARROT_GC_WRITE_BARRIER(interp, _self);
+    $wb
     return;
     /*END RETURN $returns */
     }
@@ -217,7 +220,7 @@ END
             $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     {
     /*BEGIN RETURN $returns */
-    PARROT_GC_WRITE_BARRIER(interp, _self);
+    $wb
     return;
     }
     /*END RETURN $returns */
@@ -346,6 +349,10 @@ sub rewrite_pccmethod {
     my ( $params_signature, $params_varargs, $params_declarations ) =
         process_pccmethod_args( $linear_args, 'arg' );
 
+    my $wb             = $self->attrs->{manual_wb}
+                         ? ''
+                         : 'PARROT_GC_WRITE_BARRIER(interp, _self);';
+
     rewrite_RETURNs( $self, $pmc );
     rewrite_pccinvoke( $self, $pmc );
 
@@ -369,11 +376,11 @@ END
     { /* BEGIN PMETHOD BODY */
 END
 
-    $e_post->emit( <<'END', __FILE__, __LINE__ + 1 );
+    $e_post->emit( <<"END", __FILE__, __LINE__ + 1 );
 
     } /* END PMETHOD BODY */
 
-    PARROT_GC_WRITE_BARRIER(interp, _self);
+    $wb
 
     } /* END PARAMS SCOPE */
     return;
@@ -537,6 +544,14 @@ sub process_parameter {
     }
 
     return ($type, @arg_names);
+}
+
+sub mangle_name {
+    my ( $self, $pmc ) = @_;
+    $self->symbol( $self->name );
+    $self->name( $self->type eq Parrot::Pmc2c::Method::MULTI()   ?
+                    (join '_', 'multi', $self->name, @{ $self->{MULTI_sig} }) :
+                    "nci_@{[$self->name]}" );
 }
 
 1;

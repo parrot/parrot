@@ -1,3 +1,4 @@
+Description: Manpage documentation for parrot-nqp
 --- parrot-2.0.0.orig/ext/nqp-rx/parrot-nqp.pod
 +++ parrot-2.0.0/ext/nqp-rx/parrot-nqp.pod
 @@ -0,0 +1,42 @@

@@ -20,143 +20,49 @@
 
 # STR register stuff
 # S - pointer to a STRING-register
-# t - character string (0-terminated)
-# Buffers are not valid return parameters,
-# use 'p' when the native function returns a pointer value
-# b - void *
-# B - void **
 
 # PMC register stuff
 # P - pointer to a PMC-register
-# O - pointer to PMC-register (object)
 # p - data pointer from PMC (on store into a new UnManagedStruct PMC)
-# 2 - pointer to short
-# 3 - pointer to int
-# 4 - pointer to long
 
 # void stuff
 # v - void
-
-# special stuff
-# 0 - insert a NULL (pointer) - doesn't consume a register
-# J - Parrot_Interp param
-# @ - slurpy array
 
 # callback stuff
 # U - Single PMC parameter to pass into callback - user data
 
 # Signatures
 
-# t/src/embed.t
-v    J
-
 # mod_parrot
 i    ip
-i    JPip
-i    JpP
-i    Jpii
 i    p
-i    tp
-p    J
-p    Jp
-t    J
-t    Jpti
-t    p
-t    pt
 v    p
-v    pit
-v    ptt
-v    Jtiiipt
-p    JttPP
-P    Jtpi
-i    Vppp
-v    JpPP
-v    pt
-v    Jpt
+v    ppp
 
 v
-v    Jiiip    # examples/japh/japh11.pasm
 v    i
 v    ii
 v    illllllll
 v    l
 v    p
-v    pbip
 v    pi
 v    piiii
 v    pl
 v    pp
 
-# For python
-i    JPP
-
-# Py_func signatures
-P    JP
-P    JPP
-P    JO
-S    JO
 i    P
 
-# PyBuiltins
-P    JOPP
-P    JOPPP
-v    JOPP
-v    JOPPP
-P    JOPPPP
-P    JOPPPPP
-
-# Added for Tcl
-I    JOSI
-P    JOSII
-
 # Added for TclLibrary
-t    p3
-i    pp3p
-i    pp3
 i    ppd
-i    ptii
 i    pipi
-t    ptti
-t    pti
-t    pttti
-
-# libpast
-p    Ji
-p    Jipp
-p    Jbip
-v    Jp
-v    JS
-
-# crypt
-t    tt
-
-# Sub.__get_regs_used
-I    JOt
-
-# declare_lex_preg
-v    JOSI
-
-# Added for .NET => PIR translator dynamic PMCs.
-S    JOi
-v    JOi
-I    JO
-N    JO
-v    JON
-P    JOi
-v    JOI
-
-# Make lua stop panic'ing.
-P    JOI
-P    JOIS
-S    JOSP
+p    ppi
+p    pppi
+p    ppppi
 
 i          # void function returning int like fork()
-i    i3i   # POSIX's waitpid
-i    ibi   # POSIX's read
 
 # win32
-l     lttl
-
+l     lppl
 i     pip
 i     piS
 S     i
@@ -193,6 +99,8 @@ S     i
 l    p    #! my_ulonglong mysql_num_rows(MYSQL_RES *res)
 i    p    #  unsigned int mysql_num_fields(MYSQL_RES *res)
 c    p    #  my_bool mysql_eof(MYSQL_RES *res)
+c    pppp # my_bool mysql_change_user(MYSQL *mysql, const char *user,
+# const char *passwd, const char *db)
 p    pi   #  MYSQL_FIELD *mysql_fetch_field_direct(MYSQL_RES *res,
 #               unsigned int fieldnr)
 p    p    #  MYSQL_FIELD * mysql_fetch_fields(MYSQL_RES *res)
@@ -202,47 +110,24 @@ i    p    #  unsigned int mysql_field_count(MYSQL *mysql)
 l    p    #! my_ulonglong mysql_affected_rows(MYSQL *mysql)
 l    p    #! my_ulonglong mysql_insert_id(MYSQL *mysql)
 i    p    #  unsigned int mysql_errno(MYSQL *mysql)
-t    p    #  const char * mysql_error(MYSQL *mysql)
-t    p    #  const char * mysql_info(MYSQL *mysql)
 l    p    #  unsigned long mysql_thread_id(MYSQL *mysql)
-t    p    #  const char * mysql_character_set_name(MYSQL *mysql)
 p    p    #  MYSQL * mysql_init(MYSQL *mysql)
+i    pppppp # int mysql_ssl_set(MYSQL *mysql, const char *key,
+# const char *cert, const char *ca, const char *capath,
+# const char *cipher)
 
-i    pttttt      #  int mysql_ssl_set(MYSQL *mysql, const char *key,
-#                        const char *cert, const char *ca, const char *capath,
-#                        const char *cipher)
-c    pttt        #  my_bool mysql_change_user(MYSQL *mysql, const char *user,
-#                        const char *passwd, const char *db)
-p    pttttiti    #  MYSQL * mysql_real_connect(MYSQL *mysql, const char *host,
-#                               const char *user, const char *passwd,
-#                               const char *db, unsigned int port,
-#                               const char *unix_socket,
-#                               unsigned int clientflag)
+l    ppl   #  unsigned long mysql_escape_string(char *to,const char *from, unsigned long from_length)
+l    pppl  #  unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,const char *from, unsigned long length)
 v    p     #  void mysql_close(MYSQL *sock)
-i    pt    #  int mysql_select_db(MYSQL *mysql, const char *db)
-i    pt    #  int mysql_query(MYSQL *mysql, const char *q)
-i    ptl   #  int mysql_real_query(MYSQL *mysql, const char *q,
-#                                  unsigned long length)
 i    p     #  int mysql_shutdown(MYSQL *mysql)
 i    p     #  int mysql_dump_debug_info(MYSQL *mysql)
 i    pi    #  int mysql_refresh(MYSQL *mysql, unsigned int refresh_options)
 i    pl    #  int mysql_kill(MYSQL *mysql,unsigned long pid)
 i    p     #  int mysql_ping(MYSQL *mysql)
-t    p     #  const char * mysql_stat(MYSQL *mysql)
-t    p     #  const char * mysql_get_server_info(MYSQL *mysql)
-t    p     #  const char * mysql_get_client_info(void)
 l          #  unsigned long mysql_get_client_version(void)
-t    p     #  const char * mysql_get_host_info(MYSQL *mysql)
-t    p     #  unsigned int mysql_get_proto_info(MYSQL *mysql)
-p    pt    #  MYSQL_RES * mysql_list_dbs(MYSQL *mysql,const char *wild)
-p    pt    #  MYSQL_RES * mysql_list_tables(MYSQL *mysql,const char *wild)
-p    ptt   #  MYSQL_RES * mysql_list_fields(MYSQL *mysql, const char *table,
-#                                           const char *wild)
 p    p     #  MYSQL_RES * mysql_list_processes(MYSQL *mysql)
 p    p     #  MYSQL_RES * mysql_store_result(MYSQL *mysql)
 p    p     #  MYSQL_RES * mysql_use_result(MYSQL *mysql)
-i    pit   #  int mysql_options(MYSQL *mysql,enum mysql_option option,
-#                               const char *arg)
 v    p     #  void mysql_free_result(MYSQL_RES *result)
 v    pl    #  void mysql_data_seek(MYSQL_RES *result, my_ulonglong offset)
 p    pp    #  MYSQL_ROW_OFFSET mysql_row_seek(MYSQL_RES *result,
@@ -253,47 +138,31 @@ i    pi    #  MYSQL_FIELD_OFFSET mysql_field_seek(MYSQL_RES *result,
 p    p     #  MYSQL_ROW mysql_fetch_row(MYSQL_RES *result)
 l    p     #  unsigned long * mysql_fetch_lengths(MYSQL_RES *result)
 p    p     #  MYSQL_FIELD * mysql_fetch_field(MYSQL_RES *result)
-l    ttl   #  unsigned long mysql_escape_string(char *to,const char *from, unsigned long from_length)
-l    pttl  #  unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,const char *from, unsigned long length)
-v    t     #  void mysql_debug(const char *debug)
+
+ptr (ptr, ptr, ptr, ptr, ptr, int, ptr, int) # mysql_real_connect
 # --- end mysqlclient library ---
 
-# My mysql does not fit with the previous section
-p    pttttitl
-#  MYSQL * mysql_real_connect(MYSQL *mysql, const char *host,
-#                               const char *user,
-#                               const char *passwd,
-#                               const char *db,
-#                               unsigned int port,
-#                               const char *unix_socket,
-#                               unsigned long clientflag)
-
-# Used by library/pcre.pir
-p    tiB3P
-p    tip3P
-i    pPtiiipi
-i    tpiibi
-
 # Oddball ones for postgres
-p    ptippppi    PQexecParams
-p    pi33ipi     PQfn
-p    pttip       PQprepage
-p    ptipppi     PQexecPrepared
-p    ppP         PQsetNoticeReceiver
+p    ppP         # PQsetNoticeReceiver
+p    ppipppi     # PQexecPrepared
+p    ppippppi    # PQexecParams
+p    pppip       # PQprepage
 
 # Used by SDL
 p    iiil
 i    ppl
 v    pip
-p    pti
 i    ppp
 # added by RNH for the RenderXXX_XXXX text routines 
-p    ptii
+p    ppii
+
 
 # Used by SDL::Font
-p    ti
-p    ptp
-i    pt33
+p    ppp 
+
+
+# used by pcre
+i    ppiipi
 
 # t/pmc/nci.t
 c
@@ -308,46 +177,32 @@ f    ff
 f    is
 
 i
-i    b
 i    d
 i    i
 i    ii
-i    ii4
-i    ii4i
 i    iiii
 i    iiilsp
 i    iil
 i    iili
 i    iip
-i    iit
-i    iiti
+i    iipi
 i    ilsp
-i    iti
 i    l
 i    li
 i    lp
 i    lsp
 i    p
-i    p33
-i    p333
-i    p333333
-i    p4
-i    p42p
-i    p4i
-i    pb
 i    pi
 i    pii
-i    pii4
-i    pii4i
 i    piii
 i    piiiiii
 i    piiilsp
 i    piil
 i    piili
-i    piit
-i    piiti
+i    piip
+i    pipl
 i    pilsp
-i    pit
+i    piipi
 i    pl
 i    pli
 i    pll
@@ -359,81 +214,42 @@ i    ppi
 i    ppiiiiiiii
 i    pppp
 i    psp
-i    pt
-i    pti
-i    pitl
 i    s
-i    s22
-i    s222
 i    sp
 i    sss
 i    ssss
-i    t
-i    ti
-i    4
-i    4i
-i    42p
 
 l
 l    ii
-l    l4
 l    p
 l    pi
 l    pii
-l    p33l
-l    33l
 
 p
-p    B
-p    b
-p    Jt
 p    i
 p    ii
 p    iiii
 p    iiiiii
 p    iiiiiiii
 p    p
-p    pt
 p    pi
 p    pii
 p    piiii
-p    t
-p    tpp
-p    ttttttt
+p    ppp
+p    ppppppp
 
 s
 
-t
-t    i
-t    ii
-t    p
-t    pi
-t    pii
-t    pt
-t    t
-t    tl4
-t    t4
-
+i    pP
 i    sc
 s    sc
 c    sc
 i    iii
-i    i3
-t    b
-t    B
 v    P
 v    pP
 p    ip
-i    33
 v    pii
-v    JO
-i    JO
-i    JOi
-i    JOt
-i    Jt
-i    Ji
 
-v    Vi
 v    p
 
 # Testing xlib
@@ -445,7 +261,6 @@ i    ppiii
 i    ppiiii
 i    ppiiiii
 i    ppiiiiii
-i    ppt
 i    pppi
 i    pppii
 i    pppiiii
@@ -454,12 +269,19 @@ i    ppppiiiiii
 # Testing OpenGL
 v    fff
 
-# Testing Pointer PMC use
-v    V
-v    VVV
-
 # Testing SQLite
-i    tV
-i    ptiVp
 i    pid
-i    pitii
+i    pipii
+
+# PCRE
+p    pS
+ptr  (ptr, int, ptr&, int&, ptr)
+int  (ptr, ptr, ptr,  int,  int, int, ptr, int)
+
+# tools/dev/nci_thunk_gen.pir
+PMC    (ptr, STRING)
+INTVAL (ptr, STRING)
+STRING (ptr, INTVAL)
+
+# NCI::Utils
+STRING (ptr, ptr, INTVAL)

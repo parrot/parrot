@@ -64,7 +64,6 @@
 /parrot-prove.*
 /parrot.ilk
 /parrot.iss
-/parrot.pc
 /parrot.pdb
 /parrot_config
 /parrot_config.c
@@ -252,6 +251,7 @@
 /runtime/parrot/include/*.fpmc
 /runtime/parrot/include/*.pasm
 /runtime/parrot/include/*.pbc
+/runtime/parrot/include/*.pir
 /runtime/parrot/languages/JSON/JSON.pir
 /runtime/parrot/languages/data_json
 /runtime/parrot/library/*.pbc
@@ -387,10 +387,6 @@
 /t/compilers/data_json/*.pir
 /t/compilers/data_json/*_pbcexe
 /t/compilers/imcc/*.pbc
-/t/compilers/imcc/imcpasm/*.pasm
-/t/compilers/imcc/imcpasm/*.pbc
-/t/compilers/imcc/imcpasm/*.pir
-/t/compilers/imcc/imcpasm/*_pbcexe
 /t/compilers/imcc/reg/*.pasm
 /t/compilers/imcc/reg/*.pbc
 /t/compilers/imcc/reg/*.pir
@@ -441,6 +437,7 @@
 /t/perl/*.gcda
 /t/perl/*.gcno
 /t/pir/pbc_fallback_1.pir
+/t/pir/pbc_fallback_1.pbc
 /t/pmc/*.out
 /t/pmc/*.pasm
 /t/pmc/*.pbc

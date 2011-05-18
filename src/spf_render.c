@@ -55,12 +55,11 @@ enum {
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void canonicalize_exponent(PARROT_INTERP,
+static void canonicalize_exponent(
     ARGMOD(char *tc),
-    ARGIN(SpfInfo *info))
+    ARGIN(const SpfInfo *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         FUNC_MODIFIES(*tc);
 
 static void gen_sprintf_call(
@@ -97,8 +96,7 @@ static STRING* str_concat_w_flags(PARROT_INTERP,
         FUNC_MODIFIES(*src);
 
 #define ASSERT_ARGS_canonicalize_exponent __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(tc) \
+       PARROT_ASSERT_ARG(tc) \
     , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_gen_sprintf_call __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(out) \
@@ -198,9 +196,7 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGIN(STRING *str),
             if (info->flags & FLAG_ZERO
                 && (STRING_ord(interp, str, 0) == '-' ||
                     STRING_ord(interp, str, 0) == '+')) {
-                STRING *temp = NULL;
-                STRING *ignored;
-                temp = STRING_substr(interp, str, 1, len-1);
+                STRING * const temp = STRING_substr(interp, str, 1, len-1);
                 str = Parrot_str_chopn(interp, str, -1);
                 str = Parrot_str_concat(interp, str, fill);
                 str = Parrot_str_concat(interp, str, temp);
@@ -305,30 +301,29 @@ gen_sprintf_call(ARGOUT(char *out), ARGMOD(SpfInfo *info), int thingy)
 
 /*
 
-=item C<static void canonicalize_exponent(PARROT_INTERP, char *tc, SpfInfo
-*info)>
+=item C<static void canonicalize_exponent(char *tc, const SpfInfo *info)>
 
-   This function is called to canonicalize any exponent in a formatted
-   float. PARROT_SPRINTF_EXP_DIGITS specifies the standard number of
-   exponent digits that we want. Remember that the exponent has the
-   form '...Esddd ', where 's' is the sign, 'ddd' is some number of digits,
-   and there may be trailing spaces
+This function is called to canonicalize any exponent in a formatted
+float. PARROT_SPRINTF_EXP_DIGITS specifies the standard number of exponent
+digits that we want. Remember that the exponent has the form "...Esddd",
+where "s" is the sign, "ddd" is some number of digits, and there may be
+trailing spaces.
 
 =cut
 
 */
 
 static void
-canonicalize_exponent(PARROT_INTERP, ARGMOD(char *tc), ARGIN(SpfInfo *info))
+canonicalize_exponent(ARGMOD(char *tc), ARGIN(const SpfInfo *info))
 {
     ASSERT_ARGS(canonicalize_exponent)
 
     const size_t exp_digits = PARROT_SPRINTF_EXP_DIGITS;
-    size_t len      = strlen(tc),
-           last_pos = len,
-           non0_pos = len,
-           sign_pos = 0,
-           e_pos    = 0;
+    size_t len      = strlen(tc);
+    size_t last_pos = len;
+    size_t non0_pos = len;
+    size_t sign_pos = 0;
+    size_t e_pos    = 0;
     int i;
 
     /* Scan the formatted number backward to find the positions of the
@@ -365,7 +360,7 @@ canonicalize_exponent(PARROT_INTERP, ARGMOD(char *tc), ARGIN(SpfInfo *info))
         /* Close up to eliminate excess exponent digits and
            adjust the length. Don't forget to move the NUL. */
 
-        size_t keep = (last_pos - non0_pos + 1 > exp_digits)
+        const size_t keep = (last_pos - non0_pos + 1 > exp_digits)
                         ? len - non0_pos
                         : exp_digits + (len - last_pos - 1);
 
@@ -829,13 +824,13 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                                 obj->getfloat(interp, info.type, obj);
 
                             /* check for Inf and NaN values */
-                            if (thefloat == PARROT_FLOATVAL_INF_POSITIVE) {
+                            if (PARROT_FLOATVAL_IS_POSINF(thefloat)) {
                                 ts = cstr2pstr(PARROT_CSTRING_INF_POSITIVE);
                             }
-                            else if (thefloat == PARROT_FLOATVAL_INF_NEGATIVE) {
+                            else if (PARROT_FLOATVAL_IS_NEGINF(thefloat)) {
                                 ts = cstr2pstr(PARROT_CSTRING_INF_NEGATIVE);
                             }
-                            else if (thefloat != thefloat) {
+                            else if (PARROT_FLOATVAL_IS_NAN(thefloat)) {
                                 ts = cstr2pstr(PARROT_CSTRING_NAN_QUIET);
                             }
                             else {
@@ -862,7 +857,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
                             if (ch == 'e' || ch == 'E' ||
                                 ch == 'g' || ch == 'G')
-                              canonicalize_exponent(interp, tc, &info);
+                              canonicalize_exponent(tc, &info);
 
                             targ = Parrot_str_concat(interp, targ, cstr2pstr(tc));
                             }

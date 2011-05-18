@@ -104,6 +104,15 @@ sub runstep {
         # with position-independent code suitable for dynamic loading.
         cc_shared => $Config{cccdlflags},    # e.g. -fpic for GNU cc.
 
+        # C++ compiler -- used to compile parts of ICU.  ICU's configure
+        # will try to find a suitable compiler, but it prefers GNU c++ over
+        # a system c++, which might not be appropriate.  This setting
+        # allows you to override ICU's guess, but is otherwise currently
+        # unset.  Ultimately, it should be set to whatever ICU figures
+        # out, or parrot should look for it and always tell ICU what to
+        # use.
+        cxx => 'c++',
+
         # Linker, used to link object files (plus libraries) into
         # an executable.  It is usually $cc on Unix-ish systems.
         # VMS and Win32 might use "Link".
@@ -293,7 +302,9 @@ sub _64_bit_adjustments {
             $archname =~ s/x86_64/i386/;
 
             # adjust gcc?
-            for my $cc (qw(cc link ld)) {
+            ## add parentheses around qw(...)
+            ## to remove deprecation warning in perl 5.14.0
+            for my $cc (qw(cc cxx link ld)) {
                 $conf->data->add( ' ', $cc, '-m32' );
             }
 

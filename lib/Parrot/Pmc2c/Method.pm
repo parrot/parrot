@@ -32,10 +32,8 @@ sub new {
     my $self = {
         (
             attrs       => {},
-            mmds        => [],
             body        => "",
             parameters  => "",
-            mmd_rights  => [],
             parent_name => "",
             decorators  => [],
             pmc_unused  => 0,
@@ -54,14 +52,9 @@ sub clone {
     return $self->new( { ( %{$self}, %{ $self_hash || {} } ) } );
 }
 
-sub mmd_rights {
-    my ($self) = @_;
-    return $self->{mmd_rights};
-}
 
 #getters/setters
-for my $x ( qw( name parent_name type return_type body mmds symbol mmd_prefix mmd_table mmd_name
-    right attrs decorators parameters ) ) {
+for my $x ( qw( name parent_name type return_type body symbol attrs decorators parameters ) ) {
     my $code = <<'EOC';
 sub REPLACE {
     my ( $self, $value ) = @_;
@@ -79,19 +72,9 @@ sub is_vtable {
     return $type eq VTABLE || $type eq VTABLE_ENTRY;
 }
 
-sub is_mmd {
-    my ($self) = @_;
-
-    return 1 if $self->{mmd_name};
-    return 1 if $self->mmds and scalar @{ $self->mmds };
-    return 0;
-}
-
 sub is_multi {
     my ($self) = @_;
-
-    return 1 if $self->{MULTI};
-    return 0;
+    return $self->type eq MULTI;
 }
 
 sub pmc_unused {
@@ -230,12 +213,6 @@ sub generate_body {
     $emit->($body);
     $emit->("}\n");
 
-    if ( $self->mmds ) {
-        for my $mmd ( @{ $self->mmds } ) {
-            $mmd->generate_body($pmc);
-        }
-    }
-
     return 1;
 }
 
@@ -243,12 +220,6 @@ sub generate_headers {
     my ( $self, $pmc ) = @_;
 
     my $hout = $self->decl( $pmc, 'HEADER' );
-
-    if ( $self->mmds ) {
-        for my $mmd ( @{ $self->mmds } ) {
-            $hout .= $mmd->decl( $pmc, 'HEADER' );
-        }
-    }
 
     return $hout;
 }
@@ -285,8 +256,7 @@ sub decl {
         $newl   = "\n";
         $semi   = '';
     }
-    my $pmcarg = 'PMC *_self';
-    $pmcarg    = "SHIM($pmcarg)" if $self->pmc_unused;
+    my $pmcarg = $self->pmc_unused ? 'SHIM(PMC *_self)' : 'ARGMOD(PMC *_self)';
 
     return <<"EOC";
 static $decs $ret${newl}Parrot_${pmcname}_$meth(PARROT_INTERP, $pmcarg$args)$semi

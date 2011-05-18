@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -55,8 +55,6 @@ build_func(PARROT_INTERP, ARGIN(PMC *obj), ARGMOD(Parrot_NCI_attributes *nci))
 {
     ASSERT_ARGS(build_func)
 
-    nci->signature = Parrot_nci_parse_signature(interp, nci->sig_str);
-
     Parrot_nci_sig_to_pcc(interp, nci->signature,
                             &nci->pcc_params_signature,
                             &nci->pcc_return_signature);
@@ -65,7 +63,7 @@ build_func(PARROT_INTERP, ARGIN(PMC *obj), ARGMOD(Parrot_NCI_attributes *nci))
     nci->arity       = VTABLE_elements(interp, nci->signature) - 1;
 
     /* Build call function. */
-    nci->fb_info     = build_call_func(interp, nci->sig_str);
+    nci->fb_info     = build_call_func(interp, nci->signature);
     nci->func        = F2DPTR(VTABLE_get_pointer(interp, nci->fb_info));
     PARROT_GC_WRITE_BARRIER(interp, obj);
 
@@ -76,7 +74,6 @@ build_func(PARROT_INTERP, ARGIN(PMC *obj), ARGMOD(Parrot_NCI_attributes *nci))
 pmclass NCI auto_attrs provides invokable {
     /* NCI thunk handling attributes */
     ATTR PMC       *signature; /* parsed signature */
-    ATTR STRING    *sig_str;   /* signature string */
     ATTR void      *func;      /* function pointer to call */
     ATTR PMC       *fb_info;   /* frame-builder info */
     ATTR void      *orig_func; /* pointer to wrapped function */
@@ -128,27 +125,46 @@ Initializes the NCI with a C<NULL> function pointer.
 
 /*
 
-=item C<void set_pointer_keyed_str(STRING *key, void *func)>
+=item C<void set_pmc_keyed(PMC *key, PMC *p)>
 
-Sets the specified function pointer and signature (C<*key>).
+=item C<void set_pmc_keyed_str(STRING *key, PMC *p)>
+
+Call the equivalent C<set_pointer*> function.
 
 =cut
 
 */
 
-    VTABLE void set_pointer_keyed_str(STRING *key, void *func) {
-        Parrot_NCI_attributes * const nci_info   = PARROT_NCI(SELF);
+    VTABLE void set_pmc_keyed(PMC *key, PMC *p) {
+        STATICSELF.set_pointer_keyed(key, VTABLE_get_pointer(INTERP, p));
+    }
 
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *p) {
+        STATICSELF.set_pointer_keyed_str(key, VTABLE_get_pointer(INTERP, p));
+    }
+
+/*
+
+=item C<void set_pointer_keyed(PMC *key, void *func)>
+
+Sets the specified function pointer and signature (C<*key>).
+
+=item C<void set_pointer_keyed_str(STRING *key, void *func)>
+
+Sets the specified function pointer and siganture as described in the string C<key>.
+
+=cut
+
+*/
+
+    VTABLE void set_pointer_keyed(PMC *key, void *func) {
         /* Store the original function and signature. */
         SET_ATTR_orig_func(INTERP, SELF, func);
+        SET_ATTR_signature(INTERP, SELF, key);
+    }
 
-        /* ensure that the STRING signature is constant */
-        if (!PObj_constant_TEST(key)) {
-            key = Parrot_str_new_init(interp, key->strstart, key->bufused,
-                                      key->encoding, PObj_constant_FLAG);
-        }
-
-        nci_info->sig_str = key;
+    VTABLE void set_pointer_keyed_str(STRING *key, void *func) {
+        SELF.set_pointer_keyed(Parrot_nci_parse_signature(INTERP, key), func);
     }
 
 /*
@@ -168,7 +184,6 @@ Mark any referenced strings and PMCs.
             Parrot_gc_mark_PMC_alive(interp, nci_info->fb_info);
             Parrot_gc_mark_PMC_alive(interp, nci_info->multi_sig);
 
-            Parrot_gc_mark_STRING_alive(interp, nci_info->sig_str);
             Parrot_gc_mark_STRING_alive(interp, nci_info->long_signature);
             Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_params_signature);
             Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_return_signature);
@@ -187,10 +202,9 @@ Creates and returns a clone of the NCI.
 
     VTABLE PMC *clone() {
         Parrot_NCI_attributes * const nci_info_self = PARROT_NCI(SELF);
-        Parrot_NCI_attributes *nci_info_ret;
 
         PMC * const ret     = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
-        nci_info_ret        = PARROT_NCI(ret);
+        Parrot_NCI_attributes * const nci_info_ret = PARROT_NCI(ret);
 
         /* FIXME if data is malloced (JIT/i386!) then we need
          * the length of data here, to memcpy it
@@ -200,7 +214,6 @@ Creates and returns a clone of the NCI.
         nci_info_ret->fb_info               = nci_info_self->fb_info;
         nci_info_ret->orig_func             = nci_info_self->orig_func;
         nci_info_ret->signature             = nci_info_self->signature;
-        nci_info_ret->sig_str               = nci_info_self->sig_str;
         nci_info_ret->pcc_params_signature  = nci_info_self->pcc_params_signature;
         nci_info_ret->pcc_return_signature  = nci_info_self->pcc_params_signature;
         nci_info_ret->arity                 = nci_info_self->arity;
@@ -220,7 +233,7 @@ Returns whether the NCI is defined.
 */
 
     VTABLE INTVAL defined() {
-        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        const Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         return nci_info->orig_func != NULL;
     }
 
@@ -302,7 +315,7 @@ Returns the boolean value of the pointer.
 */
 
     VTABLE INTVAL get_bool() {
-        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        const Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         return (0 != (INTVAL)nci_info->orig_func);
     }
 
@@ -317,13 +330,12 @@ Return the arity of the NCI (the number of arguments).
 */
     METHOD arity() {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
-        INTVAL arity = 0;
 
         if (nci_info) {
             if (!nci_info->func)
                 build_func(INTERP, SELF, nci_info);
             if (nci_info->func) {
-                arity = nci_info->arity;
+                const INTVAL arity = nci_info->arity;
                 RETURN(INTVAL arity);
             }
         }

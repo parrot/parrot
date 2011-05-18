@@ -19,7 +19,7 @@
 #include "parrot/runcore_api.h"
 
 PARROT_EXPORT
-op_lib_t *Parrot_DynOp_core_3_1_0(PARROT_INTERP, long init);
+op_lib_t *Parrot_DynOp_core_3_4_0(PARROT_INTERP, long init);
 
  opcode_t * Parrot_end(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_noop(opcode_t *, PARROT_INTERP);
@@ -127,6 +127,8 @@ op_lib_t *Parrot_DynOp_core_3_1_0(PARROT_INTERP, long init);
  opcode_t * Parrot_dlfunc_p_p_sc_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_dlfunc_p_p_s_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_dlfunc_p_p_sc_sc(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_dlfunc_p_p_s_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_dlfunc_p_p_sc_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_dlvar_p_p_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_dlvar_p_p_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_compreg_s_p(opcode_t *, PARROT_INTERP);

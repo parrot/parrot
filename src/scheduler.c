@@ -512,7 +512,7 @@ handlers.
 
 PARROT_EXPORT
 void
-Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
+Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN_NULLOK(STRING *handler_type))
 {
     ASSERT_ARGS(Parrot_cx_delete_handler_local)
     PMC *handlers  = Parrot_pcc_get_handlers(interp, interp->ctx);

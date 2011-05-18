@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -234,7 +234,7 @@ Returns a string with the zlib version.
 */
 
     METHOD version() {
-        STRING *version = Parrot_str_new_constant(INTERP, zlibVersion());
+        STRING * const version = Parrot_str_new_constant(INTERP, zlibVersion());
         RETURN(STRING *version);
     }
 

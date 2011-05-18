@@ -79,7 +79,7 @@ Parrot_gbl_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
 
 /*
 
-=item C<void Parrot_set_config_hash_pmc(PARROT_INTERP, PMC * config)>
+=item C<void Parrot_set_config_hash_pmc(PARROT_INTERP, PMC *config)>
 
 Called by embed API with the pmc hash which will be used in subsequently created
 Interpreters.
@@ -89,7 +89,7 @@ Interpreters.
 */
 
 void
-Parrot_set_config_hash_pmc(PARROT_INTERP, ARGMOD(PMC * config))
+Parrot_set_config_hash_pmc(PARROT_INTERP, ARGIN(PMC *config))
 {
     ASSERT_ARGS(Parrot_set_config_hash_pmc)
     parrot_config_hash_global = config;
@@ -112,7 +112,7 @@ static void
 Parrot_gbl_set_config_hash_interpreter(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_gbl_set_config_hash_interpreter)
-    PMC *iglobals = interp->iglobals;
+    PMC * const iglobals = interp->iglobals;
 
     PMC *config_hash = parrot_config_hash_global;
     if (config_hash == NULL)
@@ -209,6 +209,7 @@ init_world(PARROT_INTERP)
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_DYN_LIBS, pmc);
 
     pmc = Parrot_pmc_new(interp, enum_class_Hash);
+    VTABLE_set_pointer(interp, pmc, Parrot_hash_create(interp, enum_type_PMC, Hash_key_type_PMC));
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS, pmc);
 #if PARROT_HAS_CORE_NCI_THUNKS
     Parrot_nci_load_core_thunks(interp);

@@ -56,6 +56,7 @@ sub _set_implementations {
         uid.c
         error.c
         asm.s
+        entropy.c
         /;
     my @impl_files;
 

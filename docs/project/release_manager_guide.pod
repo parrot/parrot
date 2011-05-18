@@ -49,6 +49,10 @@ You might also select a name (and optionally a quote) for your release.
 For example, you could select a name from
 L<http://en.wikipedia.org/wiki/List_of_parrots>.
 
+NOTE: Build a recent version of Parrot to have available during the release
+to help with bootstrapping. You must have a version of Parrot built and
+available to you for some of the subsequent steps.
+
 =item 1.
 
 The day of the release has come.
@@ -126,10 +130,20 @@ Give yourself credit for the release in F<CREDITS>.
 
 =item f
 
-To have parrot configured and have run C<make> with the old version number is
-condition for this step. Run C<./ops2c --core> (or C<make bootstrap-ops>,
-ignoring errors) followed by C<make reconfig> and C<make> to update the names
-of version-specific internal functions.
+This is a bootstrapping step, which requires you to have an existing parrot
+executable available, preferrably from the previous release or pre-release
+development version from the master branch.
+
+You *must* do this with a previous version of Parrot built before you updated
+the VERSION file. You *must* update VERSION before doing this step.
+
+Run C<./ops2c --core> (or C<make bootstrap-ops>, ignoring errors) followed
+by C<make reconfig> and C<make> to update the names of version-specific
+internal functions.
+
+This step uses the older Parrot to create new ops core files and routines
+using the new version number. The released version of Parrot requires these
+files and the new VERSION.
 
 =item g
 
@@ -164,8 +178,8 @@ Make sure everything works:
 
     make realclean
     perl Configure.pl --test ...
-    make world docs html 2>&1 | tee make_world_docs_html.log
-    make fulltest        2>&1 | tee make_fulltest.log
+    make world html 2>&1 | tee make_world_html.log
+    make fulltest   2>&1 | tee make_fulltest.log
 
 Note that running "make fulltest" takes a while and that separate
 harnesses are being run.
@@ -218,12 +232,27 @@ Untar F<parrot-a.b.c.tar.gz> into another area.
 Make sure everything works:
 
     perl Configure.pl
-    make world docs html 2>&1 | tee make_world_docs_html.log
-    make fulltest        2>&1 | tee make_fulltest.log
+    make world html 2>&1 | tee make_world_html.log
+    make fulltest   2>&1 | tee make_fulltest.log
 
 Verify that the version is correct and doesn't contain the suffix C<devel>:
 
     ./parrot -V
+
+=over 4
+
+=item * C<make release_check>
+
+As an alternative to steps 4, 5 and 6 above, you may wish to call:
+
+    perl Configure.pl
+    make release_check
+
+This target (or, for short, C<make relcheck>), will prepare the tarballs, copy
+the F<.gz> tarball to a temporary directory, and then reconfigure, rebuild,
+retest (through C<make test>) and rerelease.
+
+=back
 
 =item 7.
 
@@ -331,9 +360,9 @@ the resources/ and html/ directories created in docs/.
 ssh into the parrotvm, and in the
 webroot for docs.parrot.org, expand these into a release directory (e.g.
 1.4.0). in <webroot>/parrot, there are symbolic links for latest, supported,
-and devel. Update the devel symlink to point to your new directory.
-If this is a supported release, also update the supported symlink. Do not delete
-any old copies of the docs, don't update the other symlinks.
+and devel. Update the C<latest> symlink to point to your new directory.
+If this is a supported release, also update the C<supported> symlink.
+Do not delete any old copies of the docs, don't update the other symlinks.
 
 =back
 
@@ -433,13 +462,10 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
 Versions with a asterisk (*) are supported releases.
 
- - Mar 15, 2011 - 3.2   - gerd
- - Apr 19, 2011 - 3.3*  - whiteknight
- - May 17, 2011 - 3.4   - gerd
  - Jun 21, 2011 - 3.5   - cotto
  - Jul 19, 2011 - 3.6*  - kid51
  - Aug 16, 2011 - 3.7   - ??
- - Sep 20, 2011 - 3.8   - ??
+ - Sep 20, 2011 - 3.8   - soh_cah_toa
  - Oct 18, 2011 - 3.9*  - dukeleto
  - Nov 15, 2011 - 3.10  - ??
  - Dec 20, 2011 - 3.11  - cotto

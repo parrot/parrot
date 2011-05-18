@@ -121,6 +121,7 @@ like($@, qr/$ofile doesn't look like an object file/,
          "$tdir/$stub.c" or croak "Unable to copy file for testing";
     $ofile = "$tdir/$stub.o";
     my $expected_cfile = "$tdir/$stub.c";
+    my $expected_cfile_qm = quotemeta $expected_cfile;
     eval {
         my ($sourcefile, $source_code, $hfile) =
             qualify_sourcefile( {
@@ -129,7 +130,7 @@ like($@, qr/$ofile doesn't look like an object file/,
                 is_yacc         => 0,
             } );
     };
-    like($@, qr/can't find HEADERIZER HFILE directive in "$expected_cfile"/,
+    like($@, qr/can't find HEADERIZER HFILE directive in "$expected_cfile_qm"/,
         "Got expected die message for file lacking HEADERIZER HFILE directive" );
 }
 
@@ -159,6 +160,7 @@ like($@, qr/$ofile doesn't look like an object file/,
          "$tdir/$stub.c" or croak "Unable to copy file for testing";
     $ofile = "$tdir/$stub.o";
     my $expected_cfile = "$tdir/$stub.c";
+    my $expected_cfile_qm = quotemeta $expected_cfile;
     eval {
         my ($sourcefile, $source_code, $hfile) =
             qualify_sourcefile( {
@@ -167,7 +169,7 @@ like($@, qr/$ofile doesn't look like an object file/,
                 is_yacc         => 0,
             } );
     };
-    like($@, qr/"$stub" not found \(referenced from "$expected_cfile"\)/,
+    like($@, qr/"$stub" not found \(referenced from "$expected_cfile_qm"\)/,
         "Got expected error message for missing header file" );
 }
 

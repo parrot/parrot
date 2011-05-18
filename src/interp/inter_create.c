@@ -21,7 +21,6 @@ Create or destroy a Parrot interpreter
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
-#include "../compilers/imcc/imc.h"
 #include "pmc/pmc_callcontext.h"
 #include "../gc/gc_private.h"
 #include "inter_create.str"
@@ -137,9 +136,7 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
         interp->parent_interpreter = NULL;
         emergency_interp           = interp;
 
-#if PARROT_CATCH_NULL
         PMCNULL                    = NULL;
-#endif
 
         /*
          * we need a global mutex to protect the interpreter array
@@ -151,7 +148,7 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
      * so the GC_DEBUG stuff is available. */
     interp->flags = flags;
 
-    interp->ctx         = PMCNULL;
+    interp->ctx         = NULL;
     interp->resume_flag = RESUME_INITIAL;
 
     interp->recursion_limit = RECURSION_LIMIT;
@@ -162,9 +159,6 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     /* create exceptions list */
     interp->current_runloop_id    = 0;
     interp->current_runloop_level = 0;
-
-    /* Allocate IMCC info */
-    IMCC_INFO(interp) = mem_internal_allocate_zeroed_typed(imc_info_t);
 
     interp->gc_sys           = mem_internal_allocate_zeroed_typed(GC_Subsystem);
 
@@ -204,14 +198,14 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->piodata = NULL;
     Parrot_io_init(interp);
 
+    /* use the system time as the prng seed */
+    Parrot_util_srand(Parrot_get_entropy(interp));
+
     /*
      * Set up the string subsystem
      * This also generates the constant string tables
      */
     Parrot_str_init(interp);
-
-    /* Set up MMD; MMD cache for builtins. */
-    interp->op_mmd_cache = Parrot_mmd_cache_create(interp);
 
     /* create caches structure */
     init_object_cache(interp);
@@ -222,7 +216,11 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     Parrot_vtbl_initialize_core_vtables(interp);
 
     /* create the root set registry */
-    interp->gc_registry     = Parrot_pmc_new(interp, enum_class_AddrRegistry);
+    interp->gc_registry = Parrot_pmc_new(interp, enum_class_AddrRegistry);
+
+    /* Set up MMD; MMD cache for builtins. */
+    interp->op_mmd_cache = Parrot_mmd_cache_create(interp);
+    Parrot_pmc_gc_register(interp, interp->op_mmd_cache);
 
     Parrot_gbl_init_world_once(interp);
 
@@ -259,12 +257,8 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->all_op_libs         = NULL;
     interp->evc_func_table      = NULL;
     interp->evc_func_table_size = 0;
-    interp->initial_pf          = PackFile_new(interp, 0);
+    interp->current_pf          = PMCNULL;
     interp->code                = NULL;
-
-    /* And a dynamic environment stack */
-    /* TODO: We should really consider removing this (TT #876) */
-    interp->dynamic_env = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     /* create exceptions list */
     interp->current_runloop_id    = 0;
@@ -272,9 +266,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 
     /* setup stdio PMCs */
     Parrot_io_init(interp);
-
-    /* init IMCC compiler */
-    imcc_init(interp);
 
     /* Done. Return and be done with it */
 
@@ -398,9 +389,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
      *      many constant PMCs we'll create
      */
 
-    /* destroy IMCC compiler */
-    imcc_destroy(interp);
-
     /* Now the PIOData gets also cleared */
     Parrot_io_finish(interp);
 
@@ -432,17 +420,14 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
     Parrot_gc_mark_and_sweep(interp, GC_finish_FLAG);
 
-    /* MMD cache */
-    Parrot_mmd_cache_destroy(interp, interp->op_mmd_cache);
-
     /* copies of constant tables */
     Parrot_destroy_constants(interp);
 
     destroy_runloop_jump_points(interp);
 
-    /* packfile */
-    if (interp->initial_pf)
-        PackFile_destroy(interp, interp->initial_pf);
+    /* XXX Fix abstraction leak. packfile */
+    if (!PMC_IS_NULL(interp->current_pf))
+        PackFile_destroy(interp, (PackFile*) VTABLE_get_pointer(interp, interp->current_pf));
 
     /* cache structure */
     destroy_object_cache(interp);

@@ -128,15 +128,20 @@ trace_system_areas(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools))
            register windows. Store the code in a union with a double to
            ensure proper memory alignment. */
         /* TT #271: This needs to be fixed in a variety of ways */
+/* Using inline assember if available instead of the hand-coded version. */
+#  if defined(__GNUC__) && (defined(__sparcv9) || defined(__sparcv9__) || defined(__arch64__))
+        asm("flushw");
+#  else
         static union {
             unsigned int insns[4];
             double align_hack[2];
         } u = { {
-#  ifdef __sparcv9
+#    if defined(__sparcv9) || defined(__sparcv9__) || defined(__arch64__)
+
                             0x81580000, /* flushw */
-#  else
+#    else
                             0x91d02003, /* ta ST_FLUSH_WINDOWS */
-#  endif
+#    endif
                             0x81c3e008, /* retl */
                             0x01000000  /* nop */
         } };
@@ -145,6 +150,7 @@ trace_system_areas(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools))
            Call the new function pointer to flush the register windows. */
         static void (*fn_ptr)(void) = (void (*)(void))&u.align_hack[0];
         fn_ptr();
+#  endif
 
 #elif defined(__ia64__)
 

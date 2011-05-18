@@ -48,6 +48,8 @@ extern void *flush_reg_store(void);
 #define GC_SIZE_THRESHOLD                      1024  * 1024
 #define GC_DEFAULT_DYNAMIC_THRESHOLD           75
 #define GC_DEFAULT_MIN_THRESHOLD               4 * 1024 * 1024
+/* promills of system memory */
+#define GC_DEFAULT_NURSERY_SIZE                2
 
 #define PMC_HEADERS_PER_ALLOC     4096 * 10 / sizeof (PMC)
 #define BUFFER_HEADERS_PER_ALLOC  4096      / sizeof (Buffer)
@@ -131,48 +133,48 @@ typedef struct GC_Subsystem {
 
     /** Function hooks that each subsystem MUST provide */
     void (*finalize_gc_system) (PARROT_INTERP);
-    void (*destroy_child_interp)(Interp *dest_interp, Interp *child_interp);
+    void (*destroy_child_interp)(ARGMOD(Interp *dest_interp), ARGIN(Interp *child_interp));
 
     void (*do_gc_mark)(PARROT_INTERP, UINTVAL flags);
     void (*compact_string_pool)(PARROT_INTERP);
 
-    void (*mark_special)(PARROT_INTERP, PMC *);
-    void (*pmc_needs_early_collection)(PARROT_INTERP, PMC *);
+    void (*mark_special)(PARROT_INTERP, ARGMOD(PMC *pmc));
+    void (*pmc_needs_early_collection)(PARROT_INTERP, ARGMOD(PMC *));
 
-    void (*init_pool)(PARROT_INTERP, struct Fixed_Size_Pool *);
+    void (*init_pool)(PARROT_INTERP, ARGMOD(struct Fixed_Size_Pool *));
 
     PMC* (*allocate_pmc_header)(PARROT_INTERP, UINTVAL flags);
-    void (*free_pmc_header)(PARROT_INTERP, PMC *);
+    void (*free_pmc_header)(PARROT_INTERP, ARGFREE(PMC *));
 
     STRING* (*allocate_string_header)(PARROT_INTERP, UINTVAL flags);
-    void    (*free_string_header)(PARROT_INTERP, STRING*);
+    void    (*free_string_header)(PARROT_INTERP, ARGFREE(STRING *));
 
     Buffer* (*allocate_bufferlike_header)(PARROT_INTERP, size_t size);
-    void    (*free_bufferlike_header)(PARROT_INTERP, Buffer*, size_t size);
+    void    (*free_bufferlike_header)(PARROT_INTERP, ARGFREE(Buffer *), size_t size);
 
-    int  (*is_pmc_ptr)(PARROT_INTERP, void*);
-    int  (*is_string_ptr)(PARROT_INTERP, void*);
-    void (*mark_str_header)(PARROT_INTERP, STRING *);
-    void (*mark_pmc_header)(PARROT_INTERP, PMC *);
+    int  (*is_pmc_ptr)(PARROT_INTERP, ARGIN_NULLOK(void *));
+    int  (*is_string_ptr)(PARROT_INTERP, ARGIN_NULLOK(void *));
+    void (*mark_str_header)(PARROT_INTERP, ARGMOD(STRING *));
+    void (*mark_pmc_header)(PARROT_INTERP, ARGMOD(PMC *));
 
-    void* (*allocate_pmc_attributes)(PARROT_INTERP, PMC *);
-    void (*free_pmc_attributes)(PARROT_INTERP, PMC *);
+    void* (*allocate_pmc_attributes)(PARROT_INTERP, ARGMOD(PMC *));
+    void (*free_pmc_attributes)(PARROT_INTERP, ARGMOD(PMC *));
 
-    void (*allocate_string_storage)(PARROT_INTERP, STRING *str, size_t size);
-    void (*reallocate_string_storage)(PARROT_INTERP, STRING *str, size_t size);
+    void (*allocate_string_storage)(PARROT_INTERP, ARGMOD(STRING *str), size_t size);
+    void (*reallocate_string_storage)(PARROT_INTERP, ARGMOD(STRING *str), size_t size);
 
     void (*allocate_buffer_storage)(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t nsize);
     void (*reallocate_buffer_storage)(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize);
 
     void* (*allocate_fixed_size_storage)(PARROT_INTERP, size_t size);
-    void (*free_fixed_size_storage)(PARROT_INTERP, size_t size, void *);
+    void (*free_fixed_size_storage)(PARROT_INTERP, size_t size, ARGMOD(void *));
 
     void* (*allocate_memory_chunk)(PARROT_INTERP, size_t size);
-    void* (*reallocate_memory_chunk)(PARROT_INTERP, void *data, size_t newsize);
+    void* (*reallocate_memory_chunk)(PARROT_INTERP, ARGFREE(void *data), size_t newsize);
     void* (*allocate_memory_chunk_with_interior_pointers)(PARROT_INTERP, size_t size);
-    void* (*reallocate_memory_chunk_with_interior_pointers)(PARROT_INTERP, void *data,
+    void* (*reallocate_memory_chunk_with_interior_pointers)(PARROT_INTERP, ARGFREE(void *data),
             size_t oldsize, size_t newsize);
-    void (*free_memory_chunk)(PARROT_INTERP, void *data);
+    void (*free_memory_chunk)(PARROT_INTERP, ARGFREE(void *data));
 
     void (*block_mark)(PARROT_INTERP);
     void (*unblock_mark)(PARROT_INTERP);
@@ -196,7 +198,7 @@ typedef struct GC_Subsystem {
     void (*iterate_live_strings)(PARROT_INTERP, string_iterator_callback callback, void *data);
 
     /* Write barrier */
-    void (*write_barrier)(PARROT_INTERP, PMC *);
+    void (*write_barrier)(PARROT_INTERP, ARGMOD(PMC *));
 
     /* Statistic for GC */
     struct GC_Statistics stats;
@@ -551,10 +553,9 @@ void gc_ms_compact_memory_pool(PARROT_INTERP)
 
 void gc_ms_free_fixed_size_storage(PARROT_INTERP,
     size_t size,
-    ARGMOD(void *data))
+    ARGFREE_NOTNULL(void *data))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*data);
+        __attribute__nonnull__(3);
 
 void gc_ms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
@@ -706,7 +707,7 @@ void Parrot_gc_str_allocate_buffer_storage(PARROT_INTERP,
 
 void Parrot_gc_str_allocate_string_storage(PARROT_INTERP,
     ARGIN(String_GC *gc),
-    ARGOUT(STRING *str),
+    ARGMOD(STRING *str),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
