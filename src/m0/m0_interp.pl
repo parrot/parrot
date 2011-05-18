@@ -576,7 +576,9 @@ sub m0_opfunc_copy_mem {
 
 sub m0_opfunc_set_var {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "set_var $a1, $a2, $a3";
+    my $idx = $a2 * 256 + $a3;
+    my $var = $ctx->[VAR][$idx];
+    say "set_var $a1, $a2, $a3 (var = $var)";
 }
 
 sub m0_opfunc_csym {
