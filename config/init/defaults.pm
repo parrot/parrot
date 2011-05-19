@@ -254,7 +254,6 @@ sub runstep {
 
         tempdir => File::Spec->tmpdir,
 
-        PKGCONFIG_DIR => $conf->options->get('pkgconfigdir') || '',
         coveragedir => $conf->options->get('coveragedir') || $build_dir,
     );
 

@@ -2907,7 +2907,6 @@ install-bin: installable
     --destdir=$(DESTDIR) \
     --docdir=$(DOC_DIR) \
     --versiondir=$(VERSION_DIR) \
-    --pkgconfigdir=@PKGCONFIG_DIR@ \
     MANIFEST MANIFEST.generated
 
 install-dev-only: installable
