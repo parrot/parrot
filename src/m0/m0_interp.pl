@@ -24,6 +24,8 @@ use Data::Dumper;
 
 my $file = shift || die "Usage: $0 foo.m0b";
 
+my $debugging = 0;
+
 use constant {
     M0_DIR_SEG  => 0x01,
     M0_VARS_SEG => 0x02,
@@ -56,6 +58,16 @@ use constant {
 
 run_m0b($file);
 
+
+=item C<m0_say>
+
+print out debugging info
+
+=cut
+
+sub m0_say {
+    say @_ if ($debugging);
+}
 
 =item C<run_m0b>
 
@@ -203,127 +215,127 @@ sub load_m0b {
 
 sub m0_opfunc_noop {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "noop $a1, $a2, $a3";
+    m0_say "noop $a1, $a2, $a3";
 }
 
 sub m0_opfunc_goto {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "goto $a1, $a2, $a3";
+    m0_say "goto $a1, $a2, $a3";
 }
 
 sub m0_opfunc_goto_if_eq {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "goto_if_eq $a1, $a2, $a3";
+    m0_say "goto_if_eq $a1, $a2, $a3";
 }
 
 sub m0_opfunc_goto_cs {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "goto_cs $a1, $a2, $a3";
+    m0_say "goto_cs $a1, $a2, $a3";
 }
 
 sub m0_opfunc_add_i {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "add_i $a1, $a2, $a3";
+    m0_say "add_i $a1, $a2, $a3";
 }
 
 sub m0_opfunc_add_n {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "add_n $a1, $a2, $a3";
+    m0_say "add_n $a1, $a2, $a3";
 }
 
 sub m0_opfunc_sub_i {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "sub_i $a1, $a2, $a3";
+    m0_say "sub_i $a1, $a2, $a3";
 }
 
 sub m0_opfunc_sub_n {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "sub_n $a1, $a2, $a3";
+    m0_say "sub_n $a1, $a2, $a3";
 }
 
 sub m0_opfunc_mult_i {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "mult_i $a1, $a2, $a3";
+    m0_say "mult_i $a1, $a2, $a3";
 }
 
 sub m0_opfunc_mult_n {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "mult_n $a1, $a2, $a3";
+    m0_say "mult_n $a1, $a2, $a3";
 }
 
 sub m0_opfunc_div_i {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "div_i $a1, $a2, $a3";
+    m0_say "div_i $a1, $a2, $a3";
 }
 
 sub m0_opfunc_div_n {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "div_n $a1, $a2, $a3";
+    m0_say "div_n $a1, $a2, $a3";
 }
 
 sub m0_opfunc_mod_i {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "mod_i $a1, $a2, $a3";
+    m0_say "mod_i $a1, $a2, $a3";
 }
 
 sub m0_opfunc_mod_n {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "mod_n $a1, $a2, $a3";
+    m0_say "mod_n $a1, $a2, $a3";
 }
 
 sub m0_opfunc_iton {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "iton $a1, $a2, $a3";
+    m0_say "iton $a1, $a2, $a3";
 }
 
 sub m0_opfunc_ntoi {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "ntoi $a1, $a2, $a3";
+    m0_say "ntoi $a1, $a2, $a3";
 }
 
 sub m0_opfunc_ashr {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "ashr $a1, $a2, $a3";
+    m0_say "ashr $a1, $a2, $a3";
 }
 
 sub m0_opfunc_lshr {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "lshr $a1, $a2, $a3";
+    m0_say "lshr $a1, $a2, $a3";
 }
 
 sub m0_opfunc_shl {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "shl $a1, $a2, $a3";
+    m0_say "shl $a1, $a2, $a3";
 }
 
 sub m0_opfunc_and {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "and $a1, $a2, $a3";
+    m0_say "and $a1, $a2, $a3";
 }
 
 sub m0_opfunc_or {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "or $a1, $a2, $a3";
+    m0_say "or $a1, $a2, $a3";
 }
 
 sub m0_opfunc_xor {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "xor $a1, $a2, $a3";
+    m0_say "xor $a1, $a2, $a3";
 }
 
 sub m0_opfunc_set {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "set $a1, $a2, $a3";
+    m0_say "set $a1, $a2, $a3";
 }
 
 sub m0_opfunc_copy_byte {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "copy_byte $a1, $a2, $a3";
+    m0_say "copy_byte $a1, $a2, $a3";
 }
 
 sub m0_opfunc_copy_mem {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "copy_mem $a1, $a2, $a3";
+    m0_say "copy_mem $a1, $a2, $a3";
 }
 
 sub m0_opfunc_set_var {
@@ -331,32 +343,32 @@ sub m0_opfunc_set_var {
     my $idx     = $a2 * 256 + $a3;
     my $var     = $ctx->[VAR][$idx];
     $ctx->[$a1] = $var;
-    say "set_var $a1, $a2, $a3 (var = $var)";
+    m0_say "set_var $a1, $a2, $a3 (var = $var)";
 }
 
 sub m0_opfunc_csym {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "csym $a1, $a2, $a3";
+    m0_say "csym $a1, $a2, $a3";
 }
 
 sub m0_opfunc_ccall_arg {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "ccall_arg $a1, $a2, $a3";
+    m0_say "ccall_arg $a1, $a2, $a3";
 }
 
 sub m0_opfunc_ccall_ret {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "ccall_ret $a1, $a2, $a3";
+    m0_say "ccall_ret $a1, $a2, $a3";
 }
 
 sub m0_opfunc_ccall {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "ccall $a1, $a2, $a3";
+    m0_say "ccall $a1, $a2, $a3";
 }
 
 sub m0_opfunc_print_s {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "print_s $a1, $a2, $a3";
+    m0_say "print_s $a1, $a2, $a3";
     my $var = $ctx->[$a2];
     my $handle = $ctx->[$a1];
     # TODO: print to $handle instead of stdout
@@ -365,27 +377,27 @@ sub m0_opfunc_print_s {
 
 sub m0_opfunc_print_i {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "print_i $a1, $a2, $a3";
+    m0_say "print_i $a1, $a2, $a3";
 }
 
 sub m0_opfunc_print_n {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "print_n $a1, $a2, $a3";
+    m0_say "print_n $a1, $a2, $a3";
 }
 
 sub m0_opfunc_alloc {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "alloc $a1, $a2, $a3";
+    m0_say "alloc $a1, $a2, $a3";
 }
 
 sub m0_opfunc_free {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "free $a1, $a2, $a3";
+    m0_say "free $a1, $a2, $a3";
 }
 
 sub m0_opfunc_exit {
     my ($ctx, $a1, $a2, $a3) = @_;
-    say "exit $a1, $a2, $a3";
+    m0_say "exit $a1, $a2, $a3";
 }
 
 
