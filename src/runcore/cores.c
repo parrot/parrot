@@ -297,6 +297,14 @@ static opcode_t * runops_gc_debug_core(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
+static opcode_t * runops_pdb_core(PARROT_INTERP,
+    SHIM(Parrot_runcore_t *runcore),
+    ARGIN(opcode_t *pc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static opcode_t * runops_slow_core(PARROT_INTERP,
     SHIM(Parrot_runcore_t *runcore),
     ARGIN(opcode_t *pc))
@@ -320,6 +328,9 @@ static opcode_t * runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_runops_gc_debug_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pc))
+#define ASSERT_ARGS_runops_pdb_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_runops_slow_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -479,6 +490,34 @@ Parrot_runcore_debugger_init(PARROT_INTERP)
     Parrot_runcore_register(interp, coredata);
 }
 
+
+/*
+
+=item C<void Parrot_runcore_pdb_init(PARROT_INTERP)>
+
+Registers the pdb runcore with Parrot.
+
+=cut
+
+*/
+void
+Parrot_runcore_pdb_init(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_runcore_pdb_init)
+
+    Parrot_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
+    coredata->name             = CONST_STRING(interp, "pdb");
+    coredata->id               = PARROT_PDB_CORE;
+    coredata->opinit           = PARROT_CORE_OPLIB_INIT;
+    coredata->runops           = runops_pdb_core;
+    coredata->destroy          = NULL;
+    coredata->prepare_run      = NULL;
+    coredata->flags            = 0;
+
+    PARROT_RUNCORE_FUNC_TABLE_SET(coredata);
+
+    Parrot_runcore_register(interp, coredata);
+}
 
 /*
 
@@ -740,7 +779,32 @@ runops_debugger_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcod
     return pc;
 }
 
+/*
 
+=item C<static opcode_t * runops_pdb_core(PARROT_INTERP, Parrot_runcore_t
+*runcore, opcode_t *pc)>
+
+Used by the debugger
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static opcode_t *
+runops_pdb_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
+{
+    ASSERT_ARGS(runops_pdb_core)
+
+    /* disable pc */
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), NULL);
+
+    while (pc) {
+        DO_OP(pc, interp);
+    }
+
+    return pc;
+}
 
 /*
 
