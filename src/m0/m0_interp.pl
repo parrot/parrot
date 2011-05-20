@@ -40,9 +40,10 @@ use constant {
     EH     => 2,
     EX     => 3,
     PCX    => 4,
-    VAR    => 5,
-    MDS    => 6,
-    BCS    => 7,
+    CHUNK  => 5
+    VAR    => 6,
+    MDS    => 7,
+    BCS    => 8,
 };
 
 # interp mnemonics
@@ -156,10 +157,11 @@ sub new_context {
     $ctx->[$_] = 0 for (0 .. 255);
 
     $ctx->[INTERP] = $interp;
-    $ctx->[PC]     = {seg => 0, instr => 0};
+    $ctx->[PC]     = 0;
     $ctx->[EH]     = {};
     $ctx->[EX]     = {};
     $ctx->[PCX]    = {};
+    $ctx->[CHUNK]  = $interp->[CHUNKS][0]{name};
     $ctx->[VAR]    = $interp->[CHUNKS][0]{vars};
     $ctx->[MDS]    = $interp->[CHUNKS][0]{meta};
     $ctx->[BCS]    = $interp->[CHUNKS][0]{bc};
@@ -178,9 +180,9 @@ sub run_ops {
     my ($ctx) = @_;
     
     while (1) {
-        my $init_pc = $ctx->[PC]{instr};
+        my $init_pc = $ctx->[PC];
         my $instr_count = scalar(@{$ctx->[BCS]});
-        if ($ctx->[PC]{instr} >= $instr_count){
+        if ($ctx->[PC] >= $instr_count){
             exit;
         }
         my $op_num  = $ctx->[BCS][$init_pc][0];
@@ -189,11 +191,11 @@ sub run_ops {
         my $a2 = $ctx->[BCS][$init_pc][2];
         my $a3 = $ctx->[BCS][$init_pc][3];
         &$op_func($ctx, $a1, $a2, $a3);
-        my $final_pc = $ctx->[PC]{instr};
+        my $final_pc = $ctx->[PC];
 
         # allow ops to change control flow
         if ($init_pc == $final_pc) {
-            $ctx->[PC]{instr}++;
+            $ctx->[PC]++;
         }
     }
 }
@@ -225,7 +227,7 @@ sub m0_opfunc_goto {
     m0_say "goto $a1, $a2, $a3";
 
     my $offset = $ctx->[$a1];
-    $ctx->[PC]{instr} = $offset;
+    $ctx->[PC] = $offset;
 }
 
 sub m0_opfunc_goto_if_eq {
@@ -235,14 +237,14 @@ sub m0_opfunc_goto_if_eq {
     my $offset = $ctx->[$a1];
     my $v2 = $ctx->[$a2];
     my $v3 = $ctx->[$a3];
-    $ctx->[PC]{instr} = $offset if ($v2 == $v3);
+    $ctx->[PC] = $offset if ($v2 == $v3);
 }
 
 sub m0_opfunc_goto_chunk {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "goto_chunk $a1, $a2, $a3";
 
-    my $chunk_instr = $ctx->[$a1];
+    my $new_pc      = $ctx->[$a1];
     my $chunk_name  = $ctx->[$a2];
     my $interp      = $ctx->[INTERP];
 
@@ -250,11 +252,12 @@ sub m0_opfunc_goto_chunk {
       unless exists $interp->[CHUNK_MAP]{$chunk_name};
 
     my $chunk_num  = $interp->[CHUNK_MAP]{$chunk_name};
+    $ctx->[CHUNK]  = $interp->[CHUNKS][$chunk_num]{name};
     $ctx->[VAR]    = $interp->[CHUNKS][$chunk_num]{vars};
     $ctx->[MDS]    = $interp->[CHUNKS][$chunk_num]{meta};
     $ctx->[BCS]    = $interp->[CHUNKS][$chunk_num]{bc};
-    $ctx->[PC]{seg} = $chunk_num;
-    $ctx->[PC]{instr} = $chunk_instr;
+    $ctx->[PC]     = $new_pc;
+    $ctx->[CHUNK]  = $chunk_name;
 }
 
 sub m0_opfunc_add_i {
@@ -489,6 +492,7 @@ sub parse_m0b_chunks {
         $chunk->{vars} = m0b_parse_vars_seg($interp, $m0b, $cursor);
         $chunk->{meta} = m0b_parse_meta_seg($interp, $m0b, $cursor);
         $chunk->{bc}   = m0b_parse_bc_seg(  $interp, $m0b, $cursor);
+        $chunk->{name} = $chunk_name;
         push @{$interp->[CHUNKS]}, $chunk;
     }
 }
