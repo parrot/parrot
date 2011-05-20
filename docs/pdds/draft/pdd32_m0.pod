@@ -188,7 +188,7 @@ the current bytecode segment.  C<$2> and C<$3> are ignored.
 Transfer control flow to the bytecode offset in C<*$1> within the current
 bytecode segment iff the values of C<*$2> and C<*$3> are the same.
 
-=item * goto_cs - go to an offset in another bytecode segment
+=item * goto_chunk - go to an offset in another chunk
 
 Unconditionally transfer control flow to the bytecode offset C<*$1> within the
 chunk named by the string C<*$2>. C<$3> is ignored.
@@ -646,7 +646,7 @@ until we're reasonably confident that we have a final set of ops.
     0x00 noop
     0x01 goto
     0x02 goto_if_eq
-    0x03 goto_cs
+    0x03 goto_chunk
     0x04 add_i
     0x05 add_n
     0x06 sub_i
