@@ -45,15 +45,7 @@ Nigel Sandever - L<nigelsandever@btconnect.com>
 
 # test string version of spawnw
 
-
-my $perl = "perl";
-my $perl_exists = `perl -V`;
-unless ($perl_exists) {
-    if( -e "/usr/bin/env" ) {
-        $perl = system("/usr/bin/env perl");
-    }
-}
-
+my $perl = $^X;
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "exit code: 0" );
 .pcc_sub :main main:

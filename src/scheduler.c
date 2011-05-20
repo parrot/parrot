@@ -732,7 +732,7 @@ Send a message to a scheduler in a different interpreter/thread.
 
 PARROT_EXPORT
 void
-Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), SHIM(PMC *payload))
+Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN(SHIM(PMC *payload)))
 {
     ASSERT_ARGS(Parrot_cx_send_message)
     if (interp->scheduler) {

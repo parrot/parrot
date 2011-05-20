@@ -369,7 +369,7 @@ do_pre_process(ARGMOD(imc_info_t *imcc), ARGIN(STRING * sourcefile),
 
     /* TODO: THIS! */
 
-    IMCC_push_parser_state(imcc, sourcefile, 0);
+    IMCC_push_parser_state(imcc, sourcefile, 1, 0);
     c = yylex(&val, yyscanner, imcc); /* is reset at end of while loop */
     while (c) {
         switch (c) {
@@ -552,23 +552,24 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 {
     ASSERT_ARGS(imcc_run_compilation_internal)
     yyscan_t yyscanner = imcc_get_scanner(imcc);
-    PackFile * const pf_raw = PackFile_new(imcc->interp, 0);
-    INTVAL success = 0;
+    PackFile * const pf_raw      = PackFile_new(imcc->interp, 0);
+    PMC      * const packfilepmc = Parrot_pf_get_packfile_pmc(imcc->interp, pf_raw);
+    INTVAL           success     = 0;
 
     /* TODO: Don't set current packfile in the interpreter. Leave the
              interpreter alone */
 
     if (is_file)
-        pf_raw->cur_cs = Parrot_pf_create_default_segments(imcc->interp, pf_raw, source, 1);
+        pf_raw->cur_cs = Parrot_pf_create_default_segments(imcc->interp, packfilepmc, source, 1);
     else {
         const INTVAL eval_number = eval_nr++;
         STRING * const evalname = Parrot_sprintf_c(imcc->interp, "EVAL_" INTVAL_FMT, eval_number);
-        pf_raw->cur_cs = Parrot_pf_create_default_segments(imcc->interp, pf_raw, evalname, 1);
+        pf_raw->cur_cs = Parrot_pf_create_default_segments(imcc->interp, packfilepmc, evalname, 1);
     }
 
-    Parrot_pf_set_current_packfile(imcc->interp, pf_raw);
+    Parrot_pf_set_current_packfile(imcc->interp, packfilepmc);
 
-    IMCC_push_parser_state(imcc, source, is_pasm);
+    IMCC_push_parser_state(imcc, source, is_file, is_pasm);
 
     success = imcc_compile_buffer_safe(imcc, yyscanner, source, is_file, is_pasm);
 
@@ -580,6 +581,9 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 
         yylex_destroy(yyscanner);
 
+        /* XXX Parrot_pf_get_packfile_pmc registers PMC */
+        Parrot_pmc_gc_unregister(imcc->interp, packfilepmc);
+
         return PMCNULL;
     }
 
@@ -587,15 +591,11 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     imc_cleanup(imcc, NULL);
 
     IMCC_info(imcc, 1, "%ld lines compiled.\n", imcc->line);
-    {
-        PMC * packfilepmc = NULL;
-        if (success && pf_raw)
-            packfilepmc = Parrot_pf_get_packfile_pmc(imcc->interp, pf_raw);
-        PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, packfilepmc);
-        PackFile_fixup_subs(imcc->interp, PBC_POSTCOMP, packfilepmc);
 
-        return packfilepmc ? packfilepmc : NULL;
-    }
+    PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, packfilepmc);
+    PackFile_fixup_subs(imcc->interp, PBC_POSTCOMP, packfilepmc);
+
+    return packfilepmc;
 }
 
 /*

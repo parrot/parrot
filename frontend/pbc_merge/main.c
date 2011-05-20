@@ -82,8 +82,7 @@ static void pbc_fixup_bytecode(PARROT_INTERP,
 
 static void pbc_fixup_constants(PARROT_INTERP,
     ARGMOD(pbc_merge_input **inputs),
-    int num_inputs,
-    SHIM(PackFile_ConstTable *ct))
+    int num_inputs)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*inputs);
@@ -729,7 +728,7 @@ pbc_fixup_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 /*
 
 =item C<static void pbc_fixup_constants(PARROT_INTERP, pbc_merge_input **inputs,
-int num_inputs, PackFile_ConstTable *ct)>
+int num_inputs)>
 
 Fixup constants. This includes correcting pointers into bytecode.
 
@@ -738,8 +737,7 @@ Fixup constants. This includes correcting pointers into bytecode.
 */
 
 static void
-pbc_fixup_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
-                                int num_inputs, SHIM(PackFile_ConstTable *ct))
+pbc_fixup_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
 {
     ASSERT_ARGS(pbc_fixup_constants)
     int i, j;
@@ -828,7 +826,7 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     pbc_fixup_bytecode(interp, inputs, num_inputs, bc);
 
     /* Walk constants and fix references into bytecode. */
-    pbc_fixup_constants(interp, inputs, num_inputs, ct);
+    pbc_fixup_constants(interp, inputs, num_inputs);
 
     for (i = 0; i < num_inputs; ++i) {
         mem_gc_free(interp, inputs[i]->num.const_map);

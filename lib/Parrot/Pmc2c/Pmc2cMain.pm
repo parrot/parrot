@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
+# Copyright (C) 2004-2011, Parrot Foundation.
 
 package Parrot::Pmc2c::Pmc2cMain;
 
@@ -14,7 +14,6 @@ use Parrot::Pmc2c::VTable ();
 use Parrot::Pmc2c::Dumper 'dump_pmc';
 use Parrot::Pmc2c::Library ();
 use Parrot::Pmc2c::UtilFunctions 'filename';
-use Parrot::Pmc2c::PCCMETHOD ();
 use Parrot::Pmc2c::PMC::default ();
 use Parrot::Pmc2c::PMC::Null ();
 use Parrot::Pmc2c::PMC::Object ();

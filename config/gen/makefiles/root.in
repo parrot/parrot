@@ -92,7 +92,7 @@ C_LIBS           = @libs@
 CC_SHARED        = @cc_shared@
 CC_O_OUT         = @cc_o_out@
 CC_WARN          = @ccwarn@
-CFLAGS           = $(CC_INC) @ccflags@ @cc_build_call_frames@ @cc_debug@ @clock_best@ $(CC_SHARED)
+CFLAGS           = $(CC_INC) @ccflags@ @cc_debug@ @clock_best@ $(CC_SHARED)
 LINK_DYNAMIC     = @link_dynamic@
 LINK             = @link@
 LINKFLAGS        = @linkflags@ @link_debug@ @ld_debug@
@@ -203,6 +203,7 @@ GEN_PASM_INCLUDES = \
 	runtime/parrot/include/interpinfo.pasm \
 	runtime/parrot/include/tm.pasm \
 	runtime/parrot/include/pmctypes.pasm \
+	runtime/parrot/include/parrot_version.pir
 
 GEN_PM_INCLUDES = \
 	lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm
@@ -275,7 +276,6 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/Math/Rand.pbc \
     $(LIBRARY_DIR)/MIME/Base64.pbc \
     $(LIBRARY_DIR)/NCI/Utils.pbc \
-    $(LIBRARY_DIR)/NCI/call_toolkit_init.pbc \
     $(LIBRARY_DIR)/ncurses.pbc \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL.pbc \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL_funcs.pbc \
@@ -444,6 +444,7 @@ INTERP_O_FILES = \
     src/dynext$(O) \
     src/embed$(O) \
     src/embed/api$(O) \
+    src/embed/bytecode$(O) \
     src/embed/strings$(O) \
     src/embed/pmc$(O) \
     src/string/encoding$(O) \
@@ -484,8 +485,8 @@ INTERP_O_FILES = \
     src/nci/api$(O) \
     src/nci/signatures$(O) \
 #IF(has_libffi):    src/nci/libffi$(O) \
-#IF(has_core_nci_thunks):  src/nci/core_thunks$(O) \
-#IF(has_extra_nci_thunks): src/nci/extra_thunks$(O) \
+#IF(has_core_nci_thunks):    src/nci/core_thunks$(O) \
+#IF(has_extra_nci_thunks):    src/nci/extra_thunks$(O) \
     src/oo$(O) \
     src/packfile/object_serialization$(O) \
     src/pmc$(O) \
@@ -561,7 +562,6 @@ ALL_PARROT_LIBS     = @libparrot_linkflags@ $(ICU_SHARED) $(C_LIBS)
 DYNEXT_DIR          = runtime/parrot/dynext
 LIBNCI_TEST_SO      = $(DYNEXT_DIR)/libnci_test$(LOAD_EXT)
 LIBGLUTCB_SO        = $(DYNEXT_DIR)/libglutcb$(LOAD_EXT)
-EXTRANCITHUNKS_SO   = $(DYNEXT_DIR)/extra_nci_thunks$(LOAD_EXT)
 
 ###############################################################################
 #
@@ -623,7 +623,6 @@ all : \
     $(PCT_LIB_PBCS) \
     $(DATA_JSON_LIB_PBCS) \
     $(JSON_LANG) \
-#IF(has_dynamic_linking):    $(EXTRANCITHUNKS_SO) \
     $(NQP_LIB_PBCS) \
 #IF(has_dynamic_linking):    $(DYNOPLIBS_TARGETS) \
 #IF(has_dynamic_linking):    $(LIBNCI_TEST_SO) \
@@ -637,7 +636,7 @@ corevm : \
     $(PARROT) \
     runtime/parrot/include/parrotlib.pbc \
     runtime/parrot/include/config.fpmc \
-#IF(has_dynamic_linking): $(DYNPMC_TARGETS) \
+#IF(has_dynamic_linking):    $(DYNPMC_TARGETS) \
     $(LIBRARY_DIR)/Test/More.pbc
 
 $(GEN_LIBRARY) : $(PARROT) $(GEN_PASM_INCLUDES)
@@ -649,11 +648,13 @@ $(LIBRARY_DIR)/Archive/Zip.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) $(DYNEXT_DIR)/i
 $(LIBRARY_DIR)/Configure/genfile.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
 
 # Message.pbc and distutils.pbc load io_ops to work around TT #1663
-638	$(LIBRARY_DIR)/HTTP/Message.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
+$(LIBRARY_DIR)/HTTP/Message.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
 $(LIBRARY_DIR)/distutils.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
 $(LIBRARY_DIR)/pcre.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
+
+$(LIBRARY_DIR)/uuid.pbc: $(DYNEXT_DIR)/math_ops$(LOAD_EXT)
 
 $(LIBRARY_DIR)/LWP/Protocol.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT) $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
 
@@ -688,8 +689,8 @@ STR_FILES = \
     src/multidispatch.str \
     src/namespace.str \
     src/nci/api.str \
-#IF(has_core_nci_thunks):  src/nci/core_thunks.str \
-#IF(has_extra_nci_thunks): src/nci/extra_thunks.str \
+#IF(has_core_nci_thunks):    src/nci/core_thunks.str \
+#IF(has_extra_nci_thunks):    src/nci/extra_thunks.str \
     src/nci/signatures.str \
     src/packfile/api.str \
     src/packfile/object_serialization.str \
@@ -842,8 +843,13 @@ bootstrap-ops : $(OPS2C)
 runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
 	$(PARROT) -o $@ runtime/parrot/library/parrotlib.pir
 
+runtime/parrot/include/parrot_version.pir:
+	$(PERL) tools/build/gen_version.pl >runtime/parrot/include/parrot_version.pir
+
 runtime/parrot/include/config.fpmc : myconfig config_lib.pir \
     runtime/parrot/include/datatypes.pasm $(MINIPARROT)
+# always rebuid parrot_version.pir when building config.fpmc
+	$(PERL) tools/build/gen_version.pl >runtime/parrot/include/parrot_version.pir
 	$(MINIPARROT) -Iruntime/parrot/include config_lib.pir > $@
 
 $(PARROT) : frontend/parrot/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
@@ -858,7 +864,13 @@ $(PBC_TO_EXE) : $(DEV_TOOLS_DIR)/pbc_to_exe.pir runtime/parrot/library/config.pi
 	$(PARROT) -o pbc_to_exe.pbc $(DEV_TOOLS_DIR)/pbc_to_exe.pir
 	$(PARROT) pbc_to_exe.pbc pbc_to_exe.pbc
 
-parrot_nci_thunk_gen.pbc : $(DEV_TOOLS_DIR)/nci_thunk_gen.pir $(DATA_JSON_LIB_PBCS) $(PARROT)
+parrot_nci_thunk_gen.pbc : \
+    $(DEV_TOOLS_DIR)/nci_thunk_gen.pir \
+    $(DATA_JSON_LIB_PBCS) $(PARROT) \
+    $(DYNEXT_DIR)/bit_ops$(LOAD_EXT) \
+    $(LIBRARY_DIR)/pcre.pbc \
+    runtime/parrot/include/hash_key_type.pasm \
+    runtime/parrot/include/datatypes.pasm
 	$(PARROT) -o parrot_nci_thunk_gen.pbc $(DEV_TOOLS_DIR)/nci_thunk_gen.pir
 
 $(NCI_THUNK_GEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE)
@@ -1645,6 +1657,10 @@ src/platform/generic/time$(O) : src/platform/generic/time.c $(PARROT_H_HEADERS)
 
 src/platform/generic/uid$(O) : src/platform/generic/uid.c $(PARROT_H_HEADERS)
 
+src/platform/generic/entropy$(O) : src/platform/generic/entropy.c $(PARROT_H_HEADERS)
+
+src/platform/win32/entropy$(O) : src/platform/win32/entropy.c $(PARROT_H_HEADERS)
+
 src/platform/linux/encoding$(O) : src/platform/linux/encoding.c $(PARROT_H_HEADERS)
 
 src/platform/netbsd/misc$(O) : src/platform/netbsd/misc.c $(PARROT_H_HEADERS)
@@ -1706,6 +1722,15 @@ src/embed/api$(O) : \
     $(INC_DIR)/embed.h \
     $(INC_DIR)/runcore_api.h \
     src/embed/api.c \
+    src/embed/embed_private.h \
+    include/pmc/pmc_parrotinterpreter.h
+
+src/embed/bytecode$(O) : \
+    $(PARROT_H_HEADERS) \
+    $(INC_DIR)/api.h \
+    $(INC_DIR)/embed.h \
+    $(INC_DIR)/runcore_api.h \
+    src/embed/bytecode.c \
     src/embed/embed_private.h \
     include/pmc/pmc_parrotinterpreter.h
 
@@ -2012,6 +2037,8 @@ SRC_TEST_FILES = \
     t/src/*.t \
     t/src/embed/*.t
 TOOLS_TEST_FILES = $(TOOLS_TESTS_DIR)/tools/*.t
+GC_TEST_FILES = \
+    t/compilers/opsc/*.t
 
 # pbc files used for several tests;
 # not needed for build, hence this target is not included in 'all'
@@ -2165,6 +2192,9 @@ manifest_tests :
 examples_tests : test_prep
 	$(PERL) t/harness $(EXAMPLES_TEST_FILES)
 
+gc_tests : test_prep
+	$(PERL) t/harness $(GC_TEST_FILES)
+
 # moretests: Good to use before branch merges
 moretests: test_prep \
     test \
@@ -2260,7 +2290,6 @@ prog-clean :
     src/glut_nci_thunks$(O) \
     $(LIBGLUTCB_SO) \
     src/extra_nci_thunks$(O) \
-    $(EXTRANCITHUNKS_SO) \
     install_config.fpmc
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --init
 	$(RM_F) \
@@ -2299,7 +2328,6 @@ archclean: dynext-clean
     src/glut_callbacks$(O) \
     $(LIBGLUTCB_SO) \
     src/extra_nci_thunks$(O) \
-    $(EXTRANCITHUNKS_SO) \
     $(LIBPARROT_STATIC) \
     $(LIBPARROT_SHARED)
 
@@ -2656,9 +2684,7 @@ SPLINT_SOURCE = \
 	$$(find src/*.c src/gc/*.c src/io/*.c src/packfile/*.c src/string/*.c -type f | \
 	grep -v src/gc/malloc.c | \
 	grep -v src/gc/malloc_trace.c | \
-	grep -v extra_nci_thunks.c | \
 	grep -v extend_vtable.c | \
-	grep -v nci_test.c | \
 	sort)
 
 # "splint" is the less-thorough splint target.  For cage cleaning work,
@@ -2881,7 +2907,6 @@ install-bin: installable
     --destdir=$(DESTDIR) \
     --docdir=$(DOC_DIR) \
     --versiondir=$(VERSION_DIR) \
-    --pkgconfigdir=@PKGCONFIG_DIR@ \
     MANIFEST MANIFEST.generated
 
 install-dev-only: installable
@@ -2989,12 +3014,6 @@ bootstrap-nci : src/nci/core_thunks.nci src/nci/extra_thunks.nci $(NCI_THUNK_GEN
 src/extra_nci_thunks$(O) : $(PARROT_H_HEADERS) src/extra_nci_thunks.c \
     include/pmc/pmc_nci.h
 	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/extra_nci_thunks.c
-
-$(EXTRANCITHUNKS_SO) : $(LIBPARROT) $(NQP_RX) $(JSON_LANG) \
-    src/extra_nci_thunks$(O)
-	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \
-    @ld_out@$@ src/extra_nci_thunks$(O) \
-    $(ALL_PARROT_LIBS)
 
 # emacs etags
 # this needs exuberant-ctags

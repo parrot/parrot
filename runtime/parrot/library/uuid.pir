@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2009, Parrot Foundation.
+# Copyright (C) 2008-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -6,10 +6,10 @@ uuid.pir - minimalist uuid library
 
 =head1 DESCRIPTION
 
-CURRENTLY, UNUSABLE. NEED A SOURCE OF ENTROPY.
-
 See e2fsprogs/libuuid (ISO-C), UUID (Perl/XS)
 L<http://e2fsprogs.sourceforge.net/>
+
+For discussion about the source of entropy, see TT #64.
 
 =head2 Methods
 
@@ -20,8 +20,9 @@ L<http://e2fsprogs.sourceforge.net/>
 
 .namespace ['uuid']
 
+.loadlib 'math_ops'
+
 .sub '__onload' :anon :load :init
-    load_bytecode 'Math/Rand.pbc'
     $P0 = subclass 'FixedIntegerArray', 'uuid'
 .end
 
@@ -88,31 +89,17 @@ L<http://e2fsprogs.sourceforge.net/>
 
 =item C<generate_random>
 
-CURRENTLY, UNUSABLE. NEED A SOURCE OF ENTROPY.
-
 =cut
 
 .sub 'generate_random'
     .local pmc res
     new res, 'uuid'
     set res, N
-    .local pmc rand
-    rand = get_hll_global [ 'Math'; 'Rand' ], 'rand'
-    .local pmc srand
-    srand = get_hll_global [ 'Math'; 'Rand' ], 'srand'
-    .local int RAND_MAX
-    $P0 = get_hll_global [ 'Math'; 'Rand' ], 'RAND_MAX'
-    RAND_MAX = $P0()
-    inc RAND_MAX
-    time $I0    # less than enough entropy
-    srand($I0)
     .local int i
     i = 0
   L1:
     unless i < N goto L2
-    $I0 = rand()
-    $I0 *= 256
-    $I0 /= RAND_MAX
+    $I0 = rand 255
     res[i] = $I0
     inc i
     goto L1
@@ -132,31 +119,17 @@ CURRENTLY, UNUSABLE. NEED A SOURCE OF ENTROPY.
 
 =item C<generate_time>
 
-CURRENTLY, UNUSABLE. NEED A SOURCE OF ENTROPY.
-
 =cut
 
 .sub 'generate_time'
     .local pmc res
     new res, 'uuid'
     set res, N
-    .local pmc rand
-    rand = get_hll_global [ 'Math'; 'Rand' ], 'rand'
-    .local pmc srand
-    srand = get_hll_global [ 'Math'; 'Rand' ], 'srand'
-     .local int RAND_MAX
-    $P0 = get_hll_global [ 'Math'; 'Rand' ], 'RAND_MAX'
-    RAND_MAX = $P0()
-    inc RAND_MAX
-   time $I0    # less than enough entropy
-    srand($I0)
     .local int i
     i = 10
   L1:
     unless i < N goto L2
-    $I0 = rand()
-    $I0 *= 256
-    $I0 /= RAND_MAX
+    $I0 = rand 255
     res[i] = $I0
     inc i
     goto L1
@@ -168,8 +141,6 @@ CURRENTLY, UNUSABLE. NEED A SOURCE OF ENTROPY.
 .end
 
 =item C<generate>
-
-CURRENTLY, UNUSABLE. NEED A SOURCE OF ENTROPY.
 
 =cut
 

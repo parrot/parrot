@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2010, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -53,8 +53,10 @@ sub gen_methods {
         if ($vt_method_name eq 'find_method') {
             # Generate default_ro_find_method.
             $self->{emitter}->emit(<<'EOC');
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static  PMC *
-Parrot_default_ro_find_method(PARROT_INTERP, PMC *_self, STRING *method_name) {
+Parrot_default_ro_find_method(PARROT_INTERP, ARGMOD(PMC *_self), ARGMOD(STRING *method_name)) {
     /* Use non-readonly find_method. Current vtable is ro variant. So ro_variant contains non-ro variant */
     PMC *const method = _self->vtable->ro_variant_vtable->find_method(interp, _self, method_name);
     if (!PMC_IS_NULL(VTABLE_getprop(interp, method, CONST_STRING_GEN(interp, "write"))))

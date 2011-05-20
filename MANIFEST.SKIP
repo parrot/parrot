@@ -512,6 +512,8 @@
 ^/runtime/parrot/include/.*\.pasm/
 ^/runtime/parrot/include/.*\.pbc$
 ^/runtime/parrot/include/.*\.pbc/
+^/runtime/parrot/include/.*\.pir$
+^/runtime/parrot/include/.*\.pir/
 ^/runtime/parrot/languages/JSON/JSON\.pir$
 ^/runtime/parrot/languages/JSON/JSON\.pir/
 ^/runtime/parrot/languages/data_json$

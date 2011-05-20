@@ -196,7 +196,7 @@ surboutine is fully constructed but not attached to interpreter.
         /* comp_flags is actually UINTVAL */
         field = CONST_STRING(INTERP, "comp_flags");
         if (VTABLE_exists_keyed_str(INTERP, init, field)) {
-            UINTVAL flags = (UINTVAL)VTABLE_get_integer_keyed_str(INTERP, init, field);
+            const UINTVAL flags = (UINTVAL)VTABLE_get_integer_keyed_str(INTERP, init, field);
             /* Mask comp flags only */
             attrs->comp_flags = flags & SUB_COMP_FLAG_MASK;
         }
@@ -204,7 +204,7 @@ surboutine is fully constructed but not attached to interpreter.
         /* In order to create Sub dynamicaly we have to set PObj flags */
         field = CONST_STRING(INTERP, "pf_flags");
         if (VTABLE_exists_keyed_str(INTERP, init, field)) {
-            UINTVAL flags = (UINTVAL)VTABLE_get_integer_keyed_str(INTERP, init, field);
+            const UINTVAL flags = (UINTVAL)VTABLE_get_integer_keyed_str(INTERP, init, field);
             /* Mask Sub specific flags only */
             PObj_get_FLAGS(SELF) |= flags & SUB_FLAG_PF_MASK;
         }

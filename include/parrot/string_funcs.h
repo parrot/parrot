@@ -58,7 +58,7 @@ INTVAL Parrot_str_boolean(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
-UINTVAL Parrot_str_byte_length(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
+UINTVAL Parrot_str_byte_length(PARROT_INTERP, ARGIN_NULLOK(const STRING *s));
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -90,19 +90,19 @@ INTVAL Parrot_str_compare(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_compose(PARROT_INTERP, ARGIN_NULLOK(const STRING *src))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_concat(PARROT_INTERP,
     ARGIN_NULLOK(const STRING *a),
     ARGIN_NULLOK(const STRING *b))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_str_copy(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
@@ -110,7 +110,7 @@ STRING * Parrot_str_copy(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
-const char * Parrot_str_cstring(SHIM_INTERP, ARGIN(const STRING *str))
+const char * Parrot_str_cstring(PARROT_INTERP, ARGIN(const STRING *str))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -127,12 +127,12 @@ INTVAL Parrot_str_equal(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_escape(PARROT_INTERP, ARGIN_NULLOK(const STRING *src))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_escape_truncate(PARROT_INTERP,
     ARGIN_NULLOK(const STRING *src),
     UINTVAL limit)
@@ -231,7 +231,7 @@ INTVAL Parrot_str_is_cclass(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_HOT
 PARROT_PURE_FUNCTION
-INTVAL Parrot_str_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
+INTVAL Parrot_str_is_null(PARROT_INTERP, ARGIN_NULLOK(const STRING *s));
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -245,7 +245,7 @@ STRING* Parrot_str_join(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_str_length(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
+INTVAL Parrot_str_length(PARROT_INTERP, ARGIN_NULLOK(const STRING *s));
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -298,7 +298,7 @@ INTVAL Parrot_str_not_equal(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_str_pin(SHIM_INTERP, ARGMOD(STRING *s))
+void Parrot_str_pin(PARROT_INTERP, ARGMOD(STRING *s))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*s);
 
@@ -306,7 +306,7 @@ PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 PARROT_PURE_FUNCTION
-const STR_VTABLE * Parrot_str_rep_compatible(SHIM_INTERP,
+const STR_VTABLE * Parrot_str_rep_compatible(PARROT_INTERP,
     ARGIN(const STRING *a),
     ARGIN(const STRING *b))
         __attribute__nonnull__(2)
@@ -321,7 +321,7 @@ STRING * Parrot_str_repeat(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_str_replace(PARROT_INTERP,
     ARGIN(const STRING *src),
@@ -340,7 +340,7 @@ STRING * Parrot_str_reverse(PARROT_INTERP, ARGIN(const STRING *src))
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC* Parrot_str_split(PARROT_INTERP,
     ARGIN_NULLOK(const STRING *delim),
     ARGIN_NULLOK(const STRING *str))
@@ -393,6 +393,7 @@ FLOATVAL Parrot_str_to_num(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 char * Parrot_str_to_platform_cstring(PARROT_INTERP, ARGIN(const STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -429,7 +430,7 @@ STRING * Parrot_str_upcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_clone(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
 

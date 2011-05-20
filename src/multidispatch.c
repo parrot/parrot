@@ -401,13 +401,13 @@ mmd_build_type_tuple_from_type_list(PARROT_INTERP, ARGIN(PMC *type_list))
         INTVAL  type;
 
         if (STRING_equal(interp, type_name, CONST_STRING(interp, "DEFAULT")))
-            type = enum_type_PMC;
+            type = -enum_type_PMC;
         else if (STRING_equal(interp, type_name, CONST_STRING(interp, "STRING")))
-            type = enum_type_STRING;
+            type = -enum_type_STRING;
         else if (STRING_equal(interp, type_name, CONST_STRING(interp, "INTVAL")))
-            type = enum_type_INTVAL;
+            type = -enum_type_INTVAL;
         else if (STRING_equal(interp, type_name, CONST_STRING(interp, "FLOATVAL")))
-            type = enum_type_FLOATVAL;
+            type = -enum_type_FLOATVAL;
         else
             type = Parrot_pmc_get_type_str(interp, type_name);
 
@@ -654,25 +654,25 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
          * weighing other things. A direct autobox should be cheaper than an
          * autobox plus type conversion or implicit type acceptance. */
         switch (type_call) {
-          case enum_type_INTVAL:
+          case -enum_type_INTVAL:
             if (type_sig == enum_class_Integer) { dist++; continue; }
-            if (type_sig == enum_type_PMC ||
+            if (type_sig == -enum_type_PMC ||
                 (type_sig >= enum_class_default && type_sig < enum_class_core_max)) {
                 ++dist;
                 type_call = enum_class_Integer;
             }
             break;
-          case enum_type_FLOATVAL:
+          case -enum_type_FLOATVAL:
             if (type_sig == enum_class_Float)   { dist++; continue; }
-            if (type_sig == enum_type_PMC ||
+            if (type_sig == -enum_type_PMC ||
                 (type_sig >= enum_class_default && type_sig < enum_class_core_max)) {
                 ++dist;
                 type_call = enum_class_Float;
             }
             break;
-          case enum_type_STRING:
+          case -enum_type_STRING:
             if (type_sig == enum_class_String)  { dist++; continue; }
-            if (type_sig == enum_type_PMC ||
+            if (type_sig == -enum_type_PMC ||
                 (type_sig >= enum_class_default && type_sig < enum_class_core_max)) {
                 ++dist;
                 type_call = enum_class_String;
@@ -686,12 +686,12 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
          * different native types are very different, except a PMC
          * which matches any PMC
          */
-        if (type_call <= 0 && type_sig == enum_type_PMC) {
+        if (type_call <= 0 && type_sig == -enum_type_PMC) {
             ++dist;
             continue;
         }
 
-        if ((type_sig <= 0 && type_sig != enum_type_PMC) || type_call <= 0) {
+        if ((type_sig <= 0 && type_sig != -enum_type_PMC) || type_call <= 0) {
             dist = MMD_BIG_DISTANCE;
             break;
         }
@@ -718,7 +718,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
          * if the type wasn't in MRO check, if any PMC matches
          * in that case use the distance + 1 (of an any PMC parent)
          */
-        if (j == m && type_sig != enum_type_PMC) {
+        if (j == m && type_sig != -enum_type_PMC) {
             dist = MMD_BIG_DISTANCE;
             break;
         }
@@ -729,12 +729,12 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
         {
             STRING *s1, *s2;
             if (type_sig < 0)
-                s1 = Parrot_dt_get_datatype_name(interp, type_sig);
+                s1 = Parrot_dt_get_datatype_name(interp, -type_sig);
             else
                 s1 = interp->vtables[type_sig]->whoami;
 
             if (type_call < 0)
-                s2 = Parrot_dt_get_datatype_name(interp, type_call);
+                s2 = Parrot_dt_get_datatype_name(interp, -type_call);
             else
                 s2 = interp->vtables[type_call]->whoami;
 

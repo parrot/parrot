@@ -5415,14 +5415,18 @@ scan_file(ARGMOD(imc_info_t *imcc), macro_frame_t *frame, PIOHANDLE file,
 }
 
 void
-IMCC_push_parser_state(ARGMOD(imc_info_t *imcc), STRING *filename, int is_pasm)
+IMCC_push_parser_state(ARGMOD(imc_info_t *imcc), STRING *filename,
+        int is_file, int is_pasm)
 {
     macro_frame_t * const frame = new_frame(imcc);
     frame->s.next = (parser_state_t *)imcc->frames;
     imcc->frames = frame;
     frame->s.line = imcc->line = 1;
     imcc->state = (parser_state_t *)imcc->frames;
-    imcc->state->file = filename;
+    if (is_file)
+        imcc->state->file = filename;
+    else
+        imcc->state->file = Parrot_str_new_constant(imcc->interp, "(file unknown)");
     imcc->state->pasm_file = is_pasm;
 }
 

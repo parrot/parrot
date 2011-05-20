@@ -23,13 +23,13 @@ Common routines for storing and finding elements in namespaces
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC * get_namespace_pmc(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC * internal_ns_keyed(PARROT_INTERP,
     ARGIN(PMC *base_ns),
     ARGIN(PMC *pmc_key),
@@ -39,7 +39,7 @@ static PMC * internal_ns_keyed(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC * internal_ns_keyed_key(PARROT_INTERP,
     ARGIN(PMC *ns),
     ARGIN(PMC *key),
@@ -49,7 +49,7 @@ static PMC * internal_ns_keyed_key(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC * internal_ns_keyed_str(PARROT_INTERP,
     ARGIN(PMC *base_ns),
     ARGIN(STRING *key),
@@ -59,7 +59,7 @@ static PMC * internal_ns_keyed_str(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC * internal_ns_maybe_create(PARROT_INTERP,
     ARGIN(PMC *ns),
     ARGIN(STRING *key),
@@ -124,7 +124,7 @@ is created and returned if it is not found.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC *
 internal_ns_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
     ARGIN(STRING *key), int flags)
@@ -156,7 +156,7 @@ PMCNULL is returned, INTERN_NS_CREAT means a new namespace is created.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC *
 internal_ns_keyed_key(PARROT_INTERP, ARGIN(PMC *ns), ARGIN(PMC *key), int flags)
 {
@@ -196,7 +196,7 @@ means we create the new namespace and return it.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC *
 internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key), int flags)
 {
@@ -245,7 +245,7 @@ internal function only.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC *
 internal_ns_maybe_create(PARROT_INTERP, ARGIN(PMC *ns), ARGIN(STRING *key), int flags)
 {
@@ -279,7 +279,7 @@ NameSpace associated with the sub, return it's HLL NameSpace PMC instead.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC *
 get_namespace_pmc(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
@@ -360,7 +360,7 @@ the namespace, or NULL if not found.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_ns_get_namespace_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key))
 {
@@ -382,7 +382,7 @@ C<str_key>.  Return the namespace, or NULL if not found.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_ns_get_namespace_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
         ARGIN_NULLOK(STRING *str_key))
@@ -406,7 +406,7 @@ array of strings.  Return the namespace.  Errors will result in exceptions.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_ns_make_namespace_keyed(PARROT_INTERP, ARGIN(PMC *base_ns),
         ARGIN(PMC *pmc_key))
@@ -430,7 +430,7 @@ will result in exceptions.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_ns_make_namespace_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
         ARGIN(STRING *str_key))
@@ -454,7 +454,7 @@ root namespace. Return the namespace.  Errors will result in exceptions.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_ns_make_namespace_autobase(PARROT_INTERP, ARGIN(PMC *key))
 {
@@ -513,7 +513,7 @@ NOTE: At present the use of the {get, set}_global functions is mandatory due
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_ns_get_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *globalname))
 {
@@ -551,7 +551,7 @@ Parrot_ns_set_global(PARROT_INTERP, ARGIN(PMC *ns),
 *globalname)>
 
 Search the namespace PMC C<ns> for an object with name C<globalname>.
-Return the object, or NULL if not found.
+Return the object, or PMCNULL if not found.
 
 TT #1222 - For now this function prefers non-namespaces, it will eventually
 entirely use the untyped interface.
@@ -562,7 +562,7 @@ entirely use the untyped interface.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_ns_find_namespace_global(PARROT_INTERP,
         ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *globalname))
@@ -583,7 +583,7 @@ Parrot_ns_find_namespace_global(PARROT_INTERP,
         res = (PMC *)VTABLE_get_pointer_keyed_str(interp, ns, globalname);
     }
 
-    return PMC_IS_NULL(res) ? NULL : res;
+    return PMC_IS_NULL(res) ? PMCNULL : res;
 }
 
 /*
@@ -599,7 +599,7 @@ Finds and returns the data time named C<globalname> in the current namespace.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_ns_find_current_namespace_global(PARROT_INTERP, ARGIN_NULLOK(STRING *globalname))
 {
@@ -647,7 +647,7 @@ PMCNULL. Throw an exception if a NULL name is passed.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_ns_find_global_from_op(PARROT_INTERP, ARGIN(PMC *ns),
         ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(void *next))
@@ -658,8 +658,6 @@ Parrot_ns_find_global_from_op(PARROT_INTERP, ARGIN(PMC *ns),
             "Tried to get null global");
     else {
         PMC * const res = Parrot_ns_find_namespace_global(interp, ns, globalname);
-        if (!res)
-            return PMCNULL;
         return res;
     }
 }
@@ -682,9 +680,9 @@ anywhere, return PMCNULL.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_ns_find_named_item(PARROT_INTERP, ARGIN(STRING *name), SHIM(void *next))
+Parrot_ns_find_named_item(PARROT_INTERP, ARGIN(STRING *name), ARGIN(SHIM(void *next)))
 {
     ASSERT_ARGS(Parrot_ns_find_named_item)
     PMC * const ctx     = CURRENT_CONTEXT(interp);

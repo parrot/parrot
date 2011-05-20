@@ -45,9 +45,37 @@ Note that you'll need gdb 7.1 or later for this to work.
 
 L<http://blog.ksplice.com/2011/01/8-gdb-tricks/>
 
+=head3 Reducing Nondeterminism
+
+When trying to chase down GC bugs, reproducibility is often a major barrier.
+These tools and techniques reduce randomness in a running interpreter and may
+make garbage collection bugs (and other memory-sensitive problems) easier to
+isolate.
+
+=head4 ASLR and VDSO
+
+Disabling address space layout and VDSO can make a program run less randomly.
+Be careful with this, though.  Disabling ASLR also makes certain kinds of
+attacks easier to perform.  Don't do this on a production system, and be sure
+to reenable these settings once you're done debugging.
+
+ sudo sh -c "echo 0 > /proc/sys/kernel/randomize_va_space"
+ sudo sh -c "echo 0 > /proc/sys/vm/vdso_enabled"
+
+=head4 Hash Seed Randomization
+
+Parrot's hashing algorithms use a randomized hash seed.  This makes execution
+of PIR code less vulnerable to an algorithmic complexity attack based on the
+performance of our hashing algorithm, but also means that iteration through an
+unordered hash won't always happen in the same order.  If your bug fails
+intermittently, try passing several different hash seeds to the parrot
+executable until you find one that triggers the bug:
+
+  parrot --hash-seed=0x1234 ./perl6.pbc foo.p6
+
 =head2 Debugging Parrot (internal tools)
 
-When it crashes, Parrot make an effort to provide a PIR-level backtrace in
+When it crashes, Parrot makes an effort to provide a PIR-level backtrace in
 addition the typical C-level backtrace.  This may not be entirely useful
 because libparrot gets its debugging information from imcc, but there's
 potential for it to help.

@@ -80,7 +80,7 @@ PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_HOT
-INTVAL Parrot_pmc_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc));
+INTVAL Parrot_pmc_is_null(PARROT_INTERP, ARGIN_NULLOK(const PMC *pmc));
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -141,11 +141,12 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC * Parrot_pmc_reuse(PARROT_INTERP,
-    ARGIN(PMC *pmc),
+    ARGMOD(PMC *pmc),
     INTVAL new_type,
-    NULLOK(UINTVAL flags))
+    UINTVAL flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -163,13 +164,14 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC * Parrot_pmc_reuse_init(PARROT_INTERP,
-    ARGIN(PMC *pmc),
+    ARGMOD(PMC *pmc),
     INTVAL new_type,
     ARGIN(PMC *init),
-    NULLOK(UINTVAL flags))
+    UINTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*pmc);
 
 void Parrot_pmc_free_temporary(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)

@@ -411,6 +411,7 @@ Done!
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_defined_keyed_str");
+    string = createstring(interp,"foo");
     integer = Parrot_PMC_defined_keyed_str(interp, hash, string);
     Parrot_printf(interp,"%d\n", integer);
 CODE

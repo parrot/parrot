@@ -7,7 +7,11 @@ config/auto/llvm - Check whether the Low Level Virtual Machine is present
 =head1 DESCRIPTION
 
 Determines whether the Low Level Virtual Machine (LLVM) is installed and
-functional on the system.  It is OK when it doesn't exist.
+functional on the system.  It is okay when it is not present.  When a
+sufficiently up-to-date version of LLVM is present, you will need to
+specify C<--with-llvm> as an option to C<perl Configure.pl> in order to tell
+Parrot to link to LLVM, I<i.e.,> building without LLVM is Parrot's default
+setting.
 
 =cut
 
@@ -30,7 +34,11 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $verbose = $conf->options->get( 'verbose' );
-    my $llvm_config = $conf->options->get( 'llvm-config' ) || 'llvm-config';
+    unless ( $conf->options->get( 'with-llvm' ) ) {
+        $self->_handle_result( $conf, 0 );
+        print "LLVM not requested\n" if $verbose;
+        return 1;
+    }
 
     # We will run various probes for LLVM.  If the probes are unsuccessful, we
     # will set_result to 'no', set 'has_llvm' to '', then return from

@@ -38,7 +38,7 @@ typedef void (*compact_f) (Interp *, GC_Statistics *stats, Variable_Size_Pool *)
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static char * aligned_mem(SHIM(const Buffer *buffer), ARGIN(char *mem))
+static char * aligned_mem(const Buffer *buffer, ARGIN(char *mem))
         __attribute__nonnull__(2);
 
 static void alloc_new_block(

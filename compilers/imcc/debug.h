@@ -63,7 +63,7 @@ void IMCC_debug(
 PARROT_DOES_NOT_RETURN
 void IMCC_fatal(
     ARGMOD(imc_info_t * imcc),
-    NULLOK(int code),
+    int code,
     ARGIN(const char *fmt),
     ...)
         __attribute__nonnull__(1)
@@ -83,7 +83,7 @@ void IMCC_fatal_standalone(
 PARROT_DOES_NOT_RETURN
 void IMCC_fataly(
     ARGMOD(imc_info_t * imcc),
-    NULLOK(int code),
+    int code,
     ARGIN(const char *fmt),
     ...)
         __attribute__nonnull__(1)

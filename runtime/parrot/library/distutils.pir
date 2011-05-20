@@ -109,10 +109,6 @@ core module Pod-Html
 
 PGE/Glob.pbc
 
-=item tempdir (in step 'smoke')
-
-Math/Rand.pbc
-
 =back
 
 =head2 SYSTEM DEPENDENCIES
@@ -961,11 +957,14 @@ the value is the PBC pathname
     .local string bin, pbc
     bin = shift $P0
     pbc = hash[bin]
-    $S1 = _mk_path_exe(pbc, exe)
-    $I0 = newer($S1, pbc)
+    $I0 = newer(bin, pbc)
     if $I0 goto L1
     .local string cmd
     cmd = get_executable('pbc_to_exe')
+    cmd .= " --output="
+    cmd .= bin
+    $S0 = get_exe()
+    cmd .= $S0
     cmd .= " "
     cmd .= pbc
     push jobs, cmd

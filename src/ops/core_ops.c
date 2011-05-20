@@ -13303,8 +13303,8 @@ opcode_t *
 Parrot_get_results_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  raw_params = CUR_OPCODE;
     PMC       * const  signature = PCONST(1);
-    PMC              * ctx = CURRENT_CONTEXT(interp);
-    PMC              * call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC       * const  ctx = CURRENT_CONTEXT(interp);
+    PMC       * const  call_object = Parrot_pcc_get_signature(interp, ctx);
     INTVAL   argc;
 
     Parrot_pcc_fill_params_from_op(interp, call_object, signature, raw_params, PARROT_ERRORS_RESULT_COUNT_FLAG);
@@ -14049,7 +14049,7 @@ Parrot_loadlib_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_dlfunc_p_p_s_s(opcode_t *cur_opcode, PARROT_INTERP) {
     void          * dl_handle = NULL;
-    void          * ptr = NULL;
+    void          * ptr;
     funcptr_t       p;
 
     if ((((!PMC_IS_NULL(PREG(2))) && (PREG(2)->vtable->base_type == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
@@ -14059,7 +14059,7 @@ Parrot_dlfunc_p_p_s_s(opcode_t *cur_opcode, PARROT_INTERP) {
     ptr = Parrot_dyn_dlsym_str(interp, dl_handle, SREG(3));
     p = D2FPTR(ptr);
     if ((p == NULLfunc)) {
-        const char  *  err = Parrot_dlerror();
+        const char  * const  err = Parrot_dlerror();
 
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG, "Symbol '%Ss' not found: %s\n", SREG(3), err ? err : "unknown reason");
         PREG(1) = Parrot_pmc_new(interp, enum_class_Undef);
@@ -14076,7 +14076,7 @@ Parrot_dlfunc_p_p_s_s(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_dlfunc_p_p_sc_s(opcode_t *cur_opcode, PARROT_INTERP) {
     void          * dl_handle = NULL;
-    void          * ptr = NULL;
+    void          * ptr;
     funcptr_t       p;
 
     if ((((!PMC_IS_NULL(PREG(2))) && (PREG(2)->vtable->base_type == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
@@ -14086,7 +14086,7 @@ Parrot_dlfunc_p_p_sc_s(opcode_t *cur_opcode, PARROT_INTERP) {
     ptr = Parrot_dyn_dlsym_str(interp, dl_handle, SCONST(3));
     p = D2FPTR(ptr);
     if ((p == NULLfunc)) {
-        const char  *  err = Parrot_dlerror();
+        const char  * const  err = Parrot_dlerror();
 
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG, "Symbol '%Ss' not found: %s\n", SCONST(3), err ? err : "unknown reason");
         PREG(1) = Parrot_pmc_new(interp, enum_class_Undef);
@@ -14103,7 +14103,7 @@ Parrot_dlfunc_p_p_sc_s(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_dlfunc_p_p_s_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     void          * dl_handle = NULL;
-    void          * ptr = NULL;
+    void          * ptr;
     funcptr_t       p;
 
     if ((((!PMC_IS_NULL(PREG(2))) && (PREG(2)->vtable->base_type == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
@@ -14113,7 +14113,7 @@ Parrot_dlfunc_p_p_s_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     ptr = Parrot_dyn_dlsym_str(interp, dl_handle, SREG(3));
     p = D2FPTR(ptr);
     if ((p == NULLfunc)) {
-        const char  *  err = Parrot_dlerror();
+        const char  * const  err = Parrot_dlerror();
 
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG, "Symbol '%Ss' not found: %s\n", SREG(3), err ? err : "unknown reason");
         PREG(1) = Parrot_pmc_new(interp, enum_class_Undef);
@@ -14130,7 +14130,7 @@ Parrot_dlfunc_p_p_s_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_dlfunc_p_p_sc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     void          * dl_handle = NULL;
-    void          * ptr = NULL;
+    void          * ptr;
     funcptr_t       p;
 
     if ((((!PMC_IS_NULL(PREG(2))) && (PREG(2)->vtable->base_type == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
@@ -14140,7 +14140,7 @@ Parrot_dlfunc_p_p_sc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     ptr = Parrot_dyn_dlsym_str(interp, dl_handle, SCONST(3));
     p = D2FPTR(ptr);
     if ((p == NULLfunc)) {
-        const char  *  err = Parrot_dlerror();
+        const char  * const  err = Parrot_dlerror();
 
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG, "Symbol '%Ss' not found: %s\n", SCONST(3), err ? err : "unknown reason");
         PREG(1) = Parrot_pmc_new(interp, enum_class_Undef);
@@ -14157,7 +14157,7 @@ Parrot_dlfunc_p_p_sc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_dlfunc_p_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
     void          * dl_handle = NULL;
-    void          * ptr = NULL;
+    void          * ptr;
     funcptr_t       p;
 
     if ((((!PMC_IS_NULL(PREG(2))) && (PREG(2)->vtable->base_type == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
@@ -14167,7 +14167,7 @@ Parrot_dlfunc_p_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
     ptr = Parrot_dyn_dlsym_str(interp, dl_handle, SREG(3));
     p = D2FPTR(ptr);
     if ((p == NULLfunc)) {
-        const char  *  err = Parrot_dlerror();
+        const char  * const  err = Parrot_dlerror();
 
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG, "Symbol '%Ss' not found: %s\n", SREG(3), err ? err : "unknown reason");
         PREG(1) = Parrot_pmc_new(interp, enum_class_Undef);
@@ -14184,7 +14184,7 @@ Parrot_dlfunc_p_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_dlfunc_p_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     void          * dl_handle = NULL;
-    void          * ptr = NULL;
+    void          * ptr;
     funcptr_t       p;
 
     if ((((!PMC_IS_NULL(PREG(2))) && (PREG(2)->vtable->base_type == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
@@ -14194,7 +14194,7 @@ Parrot_dlfunc_p_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     ptr = Parrot_dyn_dlsym_str(interp, dl_handle, SCONST(3));
     p = D2FPTR(ptr);
     if ((p == NULLfunc)) {
-        const char  *  err = Parrot_dlerror();
+        const char  * const  err = Parrot_dlerror();
 
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG, "Symbol '%Ss' not found: %s\n", SCONST(3), err ? err : "unknown reason");
         PREG(1) = Parrot_pmc_new(interp, enum_class_Undef);
@@ -14211,7 +14211,7 @@ Parrot_dlfunc_p_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_dlvar_p_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     void  *         dl_handle = NULL;
-    void  *         p = NULL;
+    void  *         p;
 
     if ((((!PMC_IS_NULL(PREG(2))) && (PREG(2)->vtable->base_type == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
@@ -14236,7 +14236,7 @@ Parrot_dlvar_p_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_dlvar_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     void  *         dl_handle = NULL;
-    void  *         p = NULL;
+    void  *         p;
 
     if ((((!PMC_IS_NULL(PREG(2))) && (PREG(2)->vtable->base_type == enum_class_ParrotLibrary)) && VTABLE_defined(interp, PREG(2)))) {
         dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data(PREG(2)))->dl_handle;
@@ -16974,7 +16974,7 @@ Parrot_fdiv_i_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_fdiv_n_n_n(opcode_t *cur_opcode, PARROT_INTERP) {
-    FLOATVAL   den = NREG(3);
+    const FLOATVAL   den = NREG(3);
 
     if (FLOAT_IS_ZERO(den)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_DIV_BY_ZERO, "Divide by zero");
@@ -16988,7 +16988,7 @@ Parrot_fdiv_n_n_n(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_fdiv_n_nc_n(opcode_t *cur_opcode, PARROT_INTERP) {
-    FLOATVAL   den = NREG(3);
+    const FLOATVAL   den = NREG(3);
 
     if (FLOAT_IS_ZERO(den)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_DIV_BY_ZERO, "Divide by zero");
@@ -17002,7 +17002,7 @@ Parrot_fdiv_n_nc_n(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_fdiv_n_n_nc(opcode_t *cur_opcode, PARROT_INTERP) {
-    FLOATVAL   den = NCONST(3);
+    const FLOATVAL   den = NCONST(3);
 
     if (FLOAT_IS_ZERO(den)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_DIV_BY_ZERO, "Divide by zero");
@@ -17595,7 +17595,7 @@ Parrot_callmethod_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING    * const  meth = SREG(2);
     opcode_t  * const  next =  cur_opcode + 4;
     PMC       * const  method_pmc = VTABLE_find_method(interp, object, meth);
-    opcode_t  * dest = NULL;
+    opcode_t  * dest;
     PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
@@ -17620,7 +17620,7 @@ Parrot_callmethod_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING    * const  meth = SCONST(2);
     opcode_t  * const  next =  cur_opcode + 4;
     PMC       * const  method_pmc = VTABLE_find_method(interp, object, meth);
-    opcode_t  * dest = NULL;
+    opcode_t  * dest;
     PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
@@ -19963,7 +19963,7 @@ Parrot_copy_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     else {
         PMC    * const  clone = VTABLE_clone(interp, PREG(2));
         PMC    * const  meta = VTABLE_getprops(interp, PREG(1));
-        Parrot_UInt     gc_flags = (PREG(1)->flags & PObj_GC_all_FLAGS);
+        const Parrot_UInt   gc_flags = (PREG(1)->flags & PObj_GC_all_FLAGS);
 
         Parrot_pmc_destroy(interp, PREG(1));
         memmove(PREG(1), clone, sizeof(PMC));
@@ -22151,7 +22151,7 @@ Parrot_set_root_global_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_find_name_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((!SREG(2))) {
-        opcode_t  * handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Tried to find null name");
+        opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Tried to find null name");
 
         PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
@@ -22165,7 +22165,7 @@ Parrot_find_name_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_find_name_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((!SCONST(2))) {
-        opcode_t  * handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Tried to find null name");
+        opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Tried to find null name");
 
         PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
         return (opcode_t *)handler;
@@ -22178,8 +22178,8 @@ Parrot_find_name_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_find_sub_not_null_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
-    opcode_t  * dest =  cur_opcode + 3;
-    PMC  * sub = Parrot_ns_find_named_item(interp, SREG(2), dest);
+    opcode_t  * const  dest =  cur_opcode + 3;
+    PMC       * const  sub = Parrot_ns_find_named_item(interp, SREG(2), dest);
 
     if (PMC_IS_NULL(sub)) {
         opcode_t  * handler;
@@ -22200,8 +22200,8 @@ Parrot_find_sub_not_null_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_find_sub_not_null_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
-    opcode_t  * dest =  cur_opcode + 3;
-    PMC  * sub = Parrot_ns_find_named_item(interp, SCONST(2), dest);
+    opcode_t  * const  dest =  cur_opcode + 3;
+    PMC       * const  sub = Parrot_ns_find_named_item(interp, SCONST(2), dest);
 
     if (PMC_IS_NULL(sub)) {
         opcode_t  * handler;
@@ -23197,7 +23197,7 @@ op_lib_t core_op_lib = {
   PARROT_FUNCTION_CORE,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
   3,    /* major_version */
-  2,    /* minor_version */
+  4,    /* minor_version */
   0,    /* patch_version */
   1071,             /* op_count */
   core_op_info_table,       /* op_info_table */
@@ -23230,8 +23230,8 @@ static HOP *hop_buckets;
 static HOP **hop;
 
 static void hop_init(PARROT_INTERP);
-static size_t hash_str(const char *str);
-static void store_op(op_info_t *info, HOP *p, const char *name);
+static size_t hash_str(ARGIN(const char *str));
+static void store_op(ARGIN(op_info_t *info), ARGMOD(HOP *p), ARGIN(const char *name));
 
 /* XXX on changing interpreters, this should be called,
    through a hook */
@@ -23264,7 +23264,7 @@ size_t hash_str(ARGIN(const char *str))
 }
 
 
-static void store_op(op_info_t *info, HOP *p, const char *name)
+static void store_op(ARGIN(op_info_t *info), ARGMOD(HOP *p), ARGIN(const char *name))
 {
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
 
@@ -23273,7 +23273,7 @@ static void store_op(op_info_t *info, HOP *p, const char *name)
     hop[hidx]         = p;
 }
 
-static int get_op(PARROT_INTERP, const char *name, int full)
+static int get_op(PARROT_INTERP, ARGIN(const char *name), int full)
 {
     const HOP   *p;
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
@@ -23298,8 +23298,9 @@ static void hop_init(PARROT_INTERP)
 
     /* allocate the storage all in one chunk
      * yes, this is profligate, but we can tighten it later */
-    HOP *hops = hop_buckets =
+    HOP * const hop_buckets =
         mem_gc_allocate_n_zeroed_typed(interp, core_op_lib.op_count * 2, HOP );
+    HOP *hops = hop_buckets;
 
     opcode_t i;
 
@@ -23324,7 +23325,7 @@ static void hop_deinit(PARROT_INTERP)
     hop_buckets = NULL;
 }PARROT_EXPORT
 op_lib_t *
-Parrot_DynOp_core_3_2_0(PARROT_INTERP, long init) {
+Parrot_DynOp_core_3_4_0(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 
@@ -23353,7 +23354,7 @@ Parrot_lib_core_ops_load(PARROT_INTERP)
 
 {
     PMC *const lib = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
-    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_3_2_0;
+    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_3_4_0;
     dynop_register(interp, lib);
     return lib;
 }

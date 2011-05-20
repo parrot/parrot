@@ -39,8 +39,9 @@ static void print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
-        __attribute__nonnull__(1);
+static void print_debug(PARROT_INTERP, int status, ARGIN(void *p))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
@@ -51,7 +52,8 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(output))
 #define ASSERT_ARGS_print_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(p_unused))
 #define ASSERT_ARGS_setup_argv __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(argv))
@@ -446,6 +448,7 @@ int
 Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
 {
     ASSERT_ARGS(Parrot_load_bytecode_file)
+#if 0
     PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
 
     Parrot_warn_experimental(interp, "Parrot_load_bytecode_file is experimental");
@@ -453,6 +456,11 @@ Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
         return 0;
     Parrot_pf_set_current_packfile(interp, pf);
     return 1;
+#else
+    UNUSED(interp);
+    UNUSED(filename);
+#endif
+    return 0;
 }
 
 /*
@@ -528,7 +536,7 @@ Prints GC info.
 */
 
 static void
-print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
+print_debug(PARROT_INTERP, SHIM(int status), ARGIN(SHIM(void *p)))
 {
     ASSERT_ARGS(print_debug)
     if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
@@ -573,7 +581,7 @@ set_current_sub(PARROT_INTERP)
      */
 
     for (i = 0; i < ct->pmc.const_count; i++) {
-        PMC *sub_pmc = ct->pmc.constants[i];
+        PMC * const sub_pmc = ct->pmc.constants[i];
         if (VTABLE_isa(interp, sub_pmc, SUB)) {
             Parrot_Sub_attributes *sub;
 
@@ -727,7 +735,7 @@ print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
         Parrot_io_fprintf(interp, output, "STR_CONST(%d): %S\n", i, ct->str.constants[i]);
 
     for (i = 0; i < ct->pmc.const_count; i++) {
-        PMC *c = ct->pmc.constants[i];
+        PMC * const c = ct->pmc.constants[i];
         Parrot_io_fprintf(interp, output, "PMC_CONST(%d): ", i);
 
         switch (c->vtable->base_type) {
@@ -903,22 +911,25 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code)
         ARGOUT(Parrot_String *error))
 {
     ASSERT_ARGS(Parrot_compile_string)
-    PMC * compiler = Parrot_get_compiler(interp, type);
+    PMC * const compiler = Parrot_get_compiler(interp, type);
 
+    /* XXX error is not being set */
     if (PMC_IS_NULL(compiler)) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not find compiler %Ss", type);
     }
     else {
+        PMC *result;
         STRING * const code_s = Parrot_str_new(interp, code, 0);
-        PMC * result = PMCNULL;
-        imc_info_t * imcc = (imc_info_t*) VTABLE_get_pointer(interp, compiler);
-        INTVAL is_pasm = VTABLE_get_integer(interp, compiler);
+        imc_info_t * imcc     = (imc_info_t*) VTABLE_get_pointer(interp, compiler);
+        const INTVAL is_pasm  = VTABLE_get_integer(interp, compiler);
+
         Parrot_block_GC_mark(interp);
         result = imcc_compile_string(imcc, code_s, is_pasm);
         if (PMC_IS_NULL(result)) {
             STRING * const msg = imcc_last_error_message(imcc);
-            INTVAL code = imcc_last_error_code(imcc);
+            const INTVAL code  = imcc_last_error_code(imcc);
+
             Parrot_unblock_GC_mark(interp);
             Parrot_ex_throw_from_c_args(interp, NULL, code, "%Ss", msg);
         }

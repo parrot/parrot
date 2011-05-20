@@ -51,7 +51,7 @@ static void * pool_allocate(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-static void pool_free(SHIM_INTERP,
+static void pool_free(PARROT_INTERP,
     ARGMOD(Pool_Allocator *pool),
     ARGMOD(void *data))
         __attribute__nonnull__(2)

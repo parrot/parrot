@@ -1,8 +1,5 @@
-# This file provides a list of opcodes that could be listed in ops.num but
-# aren't ever to be generated or implemented because they are useless and/or
-# silly.
-#
-# The format is the same as ops.num, only without the numbers.
+# This file provides a list of opcodes that should not ever to be generated or
+# implemented because they are useless and/or silly.
 #
 # NOTE: If you can eliminate a variant by using the "inconst" and "invar"
 #       keywords, DO SO.  It's better never to allow an op to exist than

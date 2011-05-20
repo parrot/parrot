@@ -256,8 +256,7 @@ sub decl {
         $newl   = "\n";
         $semi   = '';
     }
-    my $pmcarg = 'PMC *_self';
-    $pmcarg    = "SHIM($pmcarg)" if $self->pmc_unused;
+    my $pmcarg = $self->pmc_unused ? 'SHIM(PMC *_self)' : 'ARGMOD(PMC *_self)';
 
     return <<"EOC";
 static $decs $ret${newl}Parrot_${pmcname}_$meth(PARROT_INTERP, $pmcarg$args)$semi

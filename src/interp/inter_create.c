@@ -198,6 +198,9 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->piodata = NULL;
     Parrot_io_init(interp);
 
+    /* use the system time as the prng seed */
+    Parrot_util_srand(Parrot_get_entropy(interp));
+
     /*
      * Set up the string subsystem
      * This also generates the constant string tables
@@ -254,7 +257,7 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->all_op_libs         = NULL;
     interp->evc_func_table      = NULL;
     interp->evc_func_table_size = 0;
-    interp->initial_pf          = NULL;
+    interp->current_pf          = PMCNULL;
     interp->code                = NULL;
 
     /* create exceptions list */
@@ -422,9 +425,9 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
     destroy_runloop_jump_points(interp);
 
-    /* packfile */
-    if (interp->initial_pf)
-        PackFile_destroy(interp, interp->initial_pf);
+    /* XXX Fix abstraction leak. packfile */
+    if (!PMC_IS_NULL(interp->current_pf))
+        PackFile_destroy(interp, (PackFile*) VTABLE_get_pointer(interp, interp->current_pf));
 
     /* cache structure */
     destroy_object_cache(interp);

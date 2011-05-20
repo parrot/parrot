@@ -207,7 +207,7 @@ main(int argc, const char *argv[])
         }
         else {
             STRING          *str    = Parrot_str_new(interp, filename, 0);
-            Parrot_PackFile  pf     = PackFile_new(interp, 0);
+            Parrot_PackFile  pf     = Parrot_pf_get_packfile_pmc(interp, PackFile_new(interp, 0));
 
             Parrot_pbc_load(interp, pf);
             Parrot_compile_file(interp, str, 0);
