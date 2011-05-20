@@ -242,11 +242,19 @@ sub m0_opfunc_goto_chunk {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "goto_chunk $a1, $a2, $a3";
 
-    my $chunk_offset = $ctx->[$a1];
-    my $chunk_name   = $ctx->[$a2];
+    my $chunk_instr = $ctx->[$a1];
+    my $chunk_name  = $ctx->[$a2];
+    my $interp      = $ctx->[INTERP];
 
     die "invalid chunk name '$chunk_name' in goto_chunk"
-      unless exists $ctx->[INTERP][CHUNK_MAP]{$chunk_name};
+      unless exists $interp->[CHUNK_MAP]{$chunk_name};
+
+    my $chunk_num  = $interp->[CHUNK_MAP]{$chunk_name};
+    $ctx->[VAR]    = $interp->[CHUNKS][$chunk_num]{vars};
+    $ctx->[MDS]    = $interp->[CHUNKS][$chunk_num]{meta};
+    $ctx->[BCS]    = $interp->[CHUNKS][$chunk_num]{bc};
+    $ctx->[PC]{seg} = $chunk_num;
+    $ctx->[PC]{instr} = $chunk_instr;
 }
 
 sub m0_opfunc_add_i {
