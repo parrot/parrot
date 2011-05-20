@@ -40,7 +40,7 @@ use constant {
     EH     => 2,
     EX     => 3,
     PCX    => 4,
-    CHUNK  => 5
+    CHUNK  => 5,
     VAR    => 6,
     MDS    => 7,
     BCS    => 8,
@@ -396,8 +396,9 @@ sub m0_opfunc_ccall {
 sub m0_opfunc_print_s {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "print_s $a1, $a2, $a3";
-    my $var = $ctx->[$a2];
+
     my $handle = $ctx->[$a1];
+    my $var    = $ctx->[$a2];
     # TODO: print to $handle instead of stdout
     say $var;
 }
