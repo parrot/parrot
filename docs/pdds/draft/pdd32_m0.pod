@@ -436,6 +436,9 @@ which must be unique. The empty string is allowed as a chunk name.
 
   .chunk "chunk_name"
 
+This name is the primary way that code will refer to a chunk.  It is roughly
+analogous to a function's name in an HLL.
+
 =head3 Variables Segment
 
 The variables segment contains a numbered list of chunks of data.  Data can be
