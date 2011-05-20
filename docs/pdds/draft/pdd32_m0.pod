@@ -757,13 +757,17 @@ type:
     2       EH  - current exception handler
     3       EX  - exception being thrown, if any
     4       PCX - calling (parent) context
-    5       VAR - pointer to variables table
-    6       MDS - pointer to metadata segment
-    7       BCS - pointer to bytecode segment
-    8-69    I0 - I61
-    70-131  N0 - N61
-    132-193 S0 - S61
-    194-255 P0 - P61
+    5       CHUNK - the name of the currently-executing chunk
+    6       VAR - pointer to variables table
+    7       MDS - pointer to metadata segment
+    8       BCS - pointer to bytecode segment
+    9       reserved
+    10      reserved 
+    11      reserved
+    12-72   I0 - I60
+    73-133  N0 - N60
+    134-194 S0 - S60
+    195-255 P0 - P60
 
 This means that an op which is passed the wrong value could pretty easily cause
 chaos by clobbering the PC or changing the pointer to the current context.
