@@ -102,13 +102,13 @@ return the bytecode represenation of the operation.
 
 =cut
 
-# Ix = 8+x, Nx =  70 + x, Sx = 132 + x, Px = 194 + x
+# Ix = 12+x, Nx = 73+x, Sx = 134+x, Px = 195+x
 sub register_name_to_num {
     my ($register) = @_;
 
     return 0 if ($register eq 'INTERP');
 
-    my $symbols = { PC => 1, EH  => 2, EX => 3, PCX => 4, VAR => 5,  MDS => 6,  BCS => 7 };
+    my $symbols = { PC => 1, EH  => 2, EX => 3, PCX => 4, CHUNK => 5, VAR => 6,  MDS => 7,  BCS => 8 };
 
     if($register !~ /\d+/){
         my $number = $symbols->{$register};
@@ -132,10 +132,10 @@ sub register_name_to_num {
     }
 
     my $reg_table = {
-        I => sub { $_[0] + 8   },
-        N => sub { $_[0] + 70  },
-        S => sub { $_[0] + 132 },
-        P => sub { $_[0] + 194 },
+        I => sub { $_[0] + 12  },
+        N => sub { $_[0] + 73  },
+        S => sub { $_[0] + 134 },
+        P => sub { $_[0] + 195 },
     };
     return $reg_table->{$type}->($num);
 }
