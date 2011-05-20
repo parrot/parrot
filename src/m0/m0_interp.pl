@@ -51,8 +51,9 @@ use constant {
   OP_FUNCS   => 0,
   CHUNKS     => 1,
   CHUNK_INFO => 2,
-  CONTEXTS   => 3,
-  CONFIG     => 4,
+  CHUNK_MAP  => 3,
+  CONTEXTS   => 4,
+  CONFIG     => 5,
 };
 
 
@@ -99,7 +100,7 @@ sub new_interp {
         \&m0_opfunc_noop,
         \&m0_opfunc_goto,
         \&m0_opfunc_goto_if_eq,
-        \&m0_opfunc_goto_cs,
+        \&m0_opfunc_goto_chunk,
         \&m0_opfunc_add_i,
         \&m0_opfunc_add_n,
         \&m0_opfunc_sub_i,
@@ -136,6 +137,7 @@ sub new_interp {
     $interp->[CONFIG] = {};
     $interp->[CONTEXTS] = [];
     $interp->[CHUNK_INFO] = [];
+    $interp->[CHUNK_MAP] = {};
     $interp->[CHUNKS] = [];
     return $interp;
 }
@@ -236,9 +238,15 @@ sub m0_opfunc_goto_if_eq {
     $ctx->[PC]{instr} = $offset if ($v2 == $v3);
 }
 
-sub m0_opfunc_goto_cs {
+sub m0_opfunc_goto_chunk {
     my ($ctx, $a1, $a2, $a3) = @_;
-    m0_say "goto_cs $a1, $a2, $a3";
+    m0_say "goto_chunk $a1, $a2, $a3";
+
+    my $chunk_offset = $ctx->[$a1];
+    my $chunk_name   = $ctx->[$a2];
+
+    die "invalid chunk name '$chunk_name' in goto_chunk"
+      unless exists $ctx->[INTERP][CHUNK_MAP]{$chunk_name};
 }
 
 sub m0_opfunc_add_i {
@@ -460,6 +468,7 @@ sub parse_m0b_dirseg {
         my $chunk_name_length = unpack("L", get_bytes($m0b, $cursor, 4));
         my $chunk_name        = unpack("a[$chunk_name_length]", get_bytes($m0b, $cursor, $chunk_name_length));
         $interp->[CHUNK_INFO][$chunks_found]{name} = $chunk_name;
+        $interp->[CHUNK_MAP]{$chunk_name} = $chunks_found;
         $chunks_found++;
     }
 }
