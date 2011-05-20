@@ -1044,24 +1044,37 @@ $(INSTALLABLEPROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
 # Parrot Debugger
 #
 
-frontend/parrot_debugger/main$(O) : \
-    $(PARROT_H_HEADERS) \
-    frontend/parrot_debugger/main.c \
-    $(INC_DIR)/runcore_api.h \
-    $(INC_DIR)/embed.h
-
-$(PDB) : frontend/parrot_debugger/main$(O) src/parrot_config$(O) $(LIBPARROT)
-	$(LINK) @ld_out@$@ \
-    frontend/parrot_debugger/main$(O) \
+$(PDB) : frontend/pdb/main$(O) src/parrot_config$(O) $(LIBPARROT)
+	$(CC) -o $@ \
+    frontend/pdb/main$(O) \
     src/parrot_config$(O) \
     $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
+
+frontend/pdb/main.$(O) : \
+    $(PARROT_H_HEADERS) \
+    frontend/pdb/main.c \
+    $(INC_DIR)/runcore_api.h \
+    $(INC_DIR)/embed.h
+	$(CC) -c frontend/pdb/main.c -o $@
+
+#frontend/parrot_debugger/main$(O) : \
+    #$(PARROT_H_HEADERS) \
+    #frontend/parrot_debugger/main.c \
+    #$(INC_DIR)/runcore_api.h \
+    #$(INC_DIR)/embed.h
+
+#$(PDB) : frontend/parrot_debugger/main$(O) src/parrot_config$(O) $(LIBPARROT)
+	#$(LINK) @ld_out@$@ \
+    #frontend/parrot_debugger/main$(O) \
+    #src/parrot_config$(O) \
+    #$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(INSTALLABLEPDB) : frontend/parrot_debugger/main$(O) $(LIBPARROT) src/parrot_config$(O)
-	$(LINK) @ld_out@$@ \
-    frontend/parrot_debugger/main$(O) \
-    src/parrot_config$(O) \
-    @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+#$(INSTALLABLEPDB) : frontend/parrot_debugger/main$(O) $(LIBPARROT) src/parrot_config$(O)
+	#$(LINK) @ld_out@$@ \
+    #frontend/parrot_debugger/main$(O) \
+    #src/parrot_config$(O) \
+    #@rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 #
