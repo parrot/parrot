@@ -221,11 +221,19 @@ sub m0_opfunc_noop {
 sub m0_opfunc_goto {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "goto $a1, $a2, $a3";
+
+    my $offset = $ctx->[$a1];
+    $ctx->[PC]{instr} = $offset;
 }
 
 sub m0_opfunc_goto_if_eq {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "goto_if_eq $a1, $a2, $a3";
+
+    my $offset = $ctx->[$a1];
+    my $v2 = $ctx->[$a2];
+    my $v3 = $ctx->[$a3];
+    $ctx->[PC]{instr} = $offset if ($v2 == $v3);
 }
 
 sub m0_opfunc_goto_cs {
