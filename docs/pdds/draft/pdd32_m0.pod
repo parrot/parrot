@@ -190,10 +190,8 @@ bytecode segment iff the values of C<*$2> and C<*$3> are the same.
 
 =item * goto_cs - go to an offset in another bytecode segment
 
-Unconditionally transfer control flow to the bytecode offset in C<*$1> within
-the current bytecode segment specified in C<*$2>.  If C<*$3> is 0, C<*$1> is
-treated as the number of a chunk.  If C<*$3> is non-zero, C<*$2> is treated as
-a string which contains the name of the chunk.
+Unconditionally transfer control flow to the bytecode offset C<*$1> within the
+chunk named by the string C<*$2>. C<$3> is ignored.
 
 =back
 
