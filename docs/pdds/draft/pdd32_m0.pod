@@ -210,7 +210,7 @@ the result in C<*$1>.
 
 =item * sub_n - subtract two numeric registers
 
-Treat C<*$2> and C<*$3> as integer or floating-point values, subtract C<*$2>
+Treat C<*$2> and C<*$3> as integer or floating-point values, subtract C<*$3>
 from C<*$2> and store the result in C<*$1>.
 
 =item * mult_i - multiply two integer registers
