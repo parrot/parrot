@@ -9,10 +9,6 @@ main(void) {
     Parrot_PMC    *interp;
     Parrot_Init_Args *initargs;
 
-    /* DEBUG */
-    printf("Reached line %d\n", __LINE__);
-    /* DEBUG */
-
     /* Setup default initialization parameters */
     GET_INIT_STRUCT(initargs);
 
@@ -29,6 +25,7 @@ main(void) {
 
     /* Register pdb runcore */
     if (!Parrot_api_set_runcore(interp, "pdb", 0)) {
+        fprintf(stderr, "[ERROR] Failed to register runcore\n");
         exit(EXIT_FAILURE);
     }
 
