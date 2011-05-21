@@ -1045,7 +1045,7 @@ $(INSTALLABLEPROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
 #
 
 $(PDB) : frontend/pdb/main.c $(GEN_HEADERS) $(LIBPARROT) \
-    src/parrot_config$(O) src/longopt$(O) \
+    src/parrot_config$(O) src/longopt$(O)
 	$(CC) -o $@ \
 	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/runcore_api.h \
