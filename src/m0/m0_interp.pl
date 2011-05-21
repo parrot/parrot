@@ -393,6 +393,8 @@ sub m0_opfunc_xor {
 sub m0_opfunc_set {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "set $a1, $a2, $a3";
+    
+    $ctx->[$a1] = $ctx->[$a2];
 }
 
 sub m0_opfunc_copy_byte {
@@ -406,11 +408,12 @@ sub m0_opfunc_copy_mem {
 }
 
 sub m0_opfunc_set_var {
+    $ctx->[$a1] = $var;
+    m0_say "set_var $a1, $a2, $a3 (var = $var)";
+
     my ($ctx, $a1, $a2, $a3) = @_;
     my $idx     = $a2 * 256 + $a3;
     my $var     = $ctx->[VAR][$idx];
-    $ctx->[$a1] = $var;
-    m0_say "set_var $a1, $a2, $a3 (var = $var)";
 }
 
 sub m0_opfunc_csym {
@@ -446,11 +449,21 @@ sub m0_opfunc_print_s {
 sub m0_opfunc_print_i {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "print_i $a1, $a2, $a3";
+
+    my $handle = $ctx->[$a1];
+    my $var    = $ctx->[$a2];
+    # TODO: print to $handle instead of stdout
+    say $var;
 }
 
 sub m0_opfunc_print_n {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "print_n $a1, $a2, $a3";
+
+    my $handle = $ctx->[$a1];
+    my $var    = $ctx->[$a2];
+    # TODO: print to $handle instead of stdout
+    say $var;
 }
 
 sub m0_opfunc_alloc {
@@ -466,6 +479,8 @@ sub m0_opfunc_free {
 sub m0_opfunc_exit {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "exit $a1, $a2, $a3";
+
+    exit($ctx->[$a1]);
 }
 
 
