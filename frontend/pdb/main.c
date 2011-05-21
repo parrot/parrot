@@ -9,6 +9,10 @@ main(void) {
     Parrot_PMC    *interp;
     Parrot_Init_Args *initargs;
 
+    /* DEBUG */
+    printf("Reached line %d\n", __LINE__);
+    /* DEBUG */
+
     /* Setup default initialization parameters */
     GET_INIT_STRUCT(initargs);
 
