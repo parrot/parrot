@@ -1049,7 +1049,7 @@ $(PDB) : frontend/pdb/main.c $(GEN_HEADERS) $(LIBPARROT) \
 	$(CC) -o $@ \
 	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/runcore_api.h \
-	$(INC_DIR)/embed.h
+	$(INC_DIR)/embed.h \
 	$< src/parrot_config$(O) src/longopt$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 
