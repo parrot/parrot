@@ -3,6 +3,7 @@
 #define PARROT_IN_EXTENSION
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "parrot/api.h"
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
@@ -10,14 +11,31 @@
 
 int
 main(void) {
-    Parrot_Interp interp;
+    Parrot_PMC       interp;
+    Parrot_Init_Args initargs;
 
-    interp = Parrot_new(NULL);
+    /* Setup default initialization parameters */
+    GET_INIT_STRUCT(initargs);
 
-    Parrot_api_set_runcore(interp, RUNCORE, PDB);
+    /* Create new interpreter */
+    if (!Parrot_api_make_interpreter(NULL, 0, initargs, &interp)) {
+        fprintf(stderr, "[ERROR] Failed to allocate new interpreter\n");
+
+        if (interp != NULL)
+            show_last_error_and_exit(interp);
+        else
+            fprintf(stderr, "[ERROR] Failed to get error details\n");
+
+        exit(EXIT_FAILURE);
+    }
+
+    /* Register pdb runcore */
+    if (!Parrot_api_set_runcore(interp, "pdb", 0)) {
+        show_last_error_and_exit(interp);
+    }
 
     /* DEBUG */
-    printf("Hello world!\n");
+    printf("Reached line %d\n", __LINE__);
     /* DEBUG */
 
     Parrot_x_exit(interp, 0);

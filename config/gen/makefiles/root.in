@@ -1044,21 +1044,33 @@ $(INSTALLABLEPROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
 # Parrot Debugger
 #
 
+frontend/pdb/main$(O) : \
+    $(PARROT_H_HEADERS) \
+    frontend/pdb/main.c \
+    $(INC_DIR)/runcore_api.h \
+    $(INC_DIR)/embed.h
+
 $(PDB) : frontend/pdb/main$(O) src/parrot_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     frontend/pdb/main$(O) \
     src/parrot_config$(O) \
     $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
-frontend/pdb/main$(O) : \
-    $(PARROT_H_HEADERS) \
-    frontend/pdb/main.c \
-    $(INC_DIR)/runcore_api.h \
-    $(INC_DIR)/embed.h \
-    $(INC_DIR)/api.h
-	$(CC) -o $@ \
-	frontend/pdb/main.c \
-	-I $(INC_DIR)
+#$(PDB) : frontend/pdb/main$(O) src/parrot_config$(O) $(LIBPARROT)
+	#$(LINK) @ld_out@$@ \
+    #frontend/pdb/main$(O) \
+    #src/parrot_config$(O) \
+    #$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
+
+#frontend/pdb/main$(O) : \
+    #$(PARROT_H_HEADERS) \
+    #frontend/pdb/main.c \
+    #$(INC_DIR)/runcore_api.h \
+    #$(INC_DIR)/embed.h \
+    #$(INC_DIR)/api.h
+	#$(CC) -o $@ \
+	#frontend/pdb/main.c \
+	#-I $(INC_DIR)
 
 #$(PDB) : frontend/pdb/main.c $(GEN_HEADERS) $(LIBPARROT) \
     #src/parrot_config$(O) src/longopt$(O)
