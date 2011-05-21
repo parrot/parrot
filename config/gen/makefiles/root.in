@@ -781,6 +781,7 @@ help :
 	@echo "  buildtools_tests:  Test build tool pmc2c.pl."
 	@echo "  manifest_tests:    Test code underlying mk_manifest_and_skip.pl."
 	@echo "  examples_tests:    Test the example scripts."
+	@echo "  m0_tests:   		Run known-good M0 tests."
 	@echo "  moretests:         Run standard suite, examples and most coding standards tests."
 	@echo ""
 	@echo "Smoke Testing:"
@@ -1999,6 +2000,9 @@ DYNOPLIBS_TEST_FILES = $(DYNOPLIBS_TESTS_DIR)/*.t
 DYNPMC_TEST_FILES = $(DYNPMC_TESTS_DIR)/*.t
 EXAMPLES_TEST_FILES = \
     t/examples/*.t
+M0_TEST_FILES = \
+	t/m0/m0_bytecode_loading.t \
+	t/m0/m0_run_hello_m0b.t
 HEADERIZER_TEST_FILES = $(TOOLS_TESTS_DIR)/dev/headerizer/*.t
 LIBRARY_TEST_FILES = @library_tests@
 MANIFEST_TEST_FILES = \
@@ -2176,6 +2180,9 @@ manifest_tests :
 
 examples_tests : test_prep
 	$(PERL) t/harness $(EXAMPLES_TEST_FILES)
+
+m0_tests :
+	$(PERL) t/harness $(M0_TEST_FILES)
 
 gc_tests : test_prep
 	$(PERL) t/harness $(GC_TEST_FILES)
