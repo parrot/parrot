@@ -1044,14 +1044,14 @@ $(INSTALLABLEPROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
 # Parrot Debugger
 #
 
-$(PDB) : 
+$(PDB) : frontend/pdb/main.c $(GEN_HEADERS) $(LIBPARROT) \
+    src/parrot_config$(O) src/longopt$(O) \
 	$(CC) -o $@ \
-    frontend/pdb/main.c \
-    $(PARROT_H_HEADERS) \
-    $(INC_DIR)/runcore_api.h \
-    $(INC_DIR)/embed.h \
-    src/parrot_config$(O) \
-    $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	$(PARROT_H_HEADERS) \
+	$(INC_DIR)/runcore_api.h \
+	$(INC_DIR)/embed.h
+	$< src/parrot_config$(O) src/longopt$(O) \
+	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 
 #frontend/parrot_debugger/main$(O) : \
     #$(PARROT_H_HEADERS) \
