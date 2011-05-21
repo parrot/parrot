@@ -3,6 +3,7 @@
 #define PARROT_IN_EXTENSION
 
 #include <stdio.h>
+#include "parrot/api.h"
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/runcore_api.h"
@@ -13,7 +14,7 @@ main(void) {
 
     interp = Parrot_new(NULL);
 
-    Parrot_api_set_runcore(interp);
+    Parrot_api_set_runcore(interp, RUNCORE, PDB);
 
     /* DEBUG */
     printf("Hello world!\n");
