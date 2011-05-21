@@ -118,7 +118,7 @@ IPv6-related tests for the Socket PMC.
 
 .sub test_server
     .local pmc interp, conf, server, sock, address, result
-    .local string command, str, null_string, part
+    .local string command, str, null_string, part, expected_str
     .local int status, port
 
     interp = getinterp
@@ -149,7 +149,9 @@ IPv6-related tests for the Socket PMC.
     sock.'connect'(address)
 
     str = server.'readline'()
-    is(str, "Connection from ::1:1234\n", 'Server got a connection from ::1:1234')
+    expected_str = "Connection from ::1:" . part
+    expected_str .= "\n"
+    is(str, expected_str, 'Server got a connection')
 
     status = sock.'send'('test message')
     is(status, '12', 'send')
