@@ -109,6 +109,7 @@ else {
             merge      => 0,
             jobs       => $ENV{TEST_JOBS} || 1,
             directives => 1,
+            timer      => $ENV{HARNESS_TIMER} || 0,
         });
     }
     my $results = $harness->runtests(@tests);
