@@ -13,7 +13,7 @@ main(void) {
 
     interp = Parrot_new(NULL);
 
-    Parrot_runcore_pdb_init(interp);
+    Parrot_api_set_runcore(interp);
 
     /* DEBUG */
     printf("Hello world!\n");
