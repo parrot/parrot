@@ -263,91 +263,131 @@ sub m0_opfunc_goto_chunk {
 sub m0_opfunc_add_i {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "add_i $a1, $a2, $a3";
+
+    $ctx->[$a1] = $ctx->[$a2] + $ctx->[$a3];
 }
 
 sub m0_opfunc_add_n {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "add_n $a1, $a2, $a3";
+
+    $ctx->[$a1] = $ctx->[$a2] + $ctx->[$a3];
 }
 
 sub m0_opfunc_sub_i {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "sub_i $a1, $a2, $a3";
+
+    $ctx->[$a1] = $ctx->[$a2] - $ctx->[$a3];
 }
 
 sub m0_opfunc_sub_n {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "sub_n $a1, $a2, $a3";
+
+    $ctx->[$a1] = $ctx->[$a2] - $ctx->[$a3];
 }
 
 sub m0_opfunc_mult_i {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "mult_i $a1, $a2, $a3";
+
+    $ctx->[$a1] = $ctx->[$a2] * $ctx->[$a3];
 }
 
 sub m0_opfunc_mult_n {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "mult_n $a1, $a2, $a3";
+
+    $ctx->[$a1] = $ctx->[$a2] * $ctx->[$a3];
 }
 
 sub m0_opfunc_div_i {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "div_i $a1, $a2, $a3";
+
+    $ctx->[$a1] = int($ctx->[$a2] / $ctx->[$a3]);
 }
 
 sub m0_opfunc_div_n {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "div_n $a1, $a2, $a3";
+
+    $ctx->[$a1] = $ctx->[$a2] / $ctx->[$a3];
 }
 
 sub m0_opfunc_mod_i {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "mod_i $a1, $a2, $a3";
+
+    $ctx->[$a1] = $ctx->[$a2] % $ctx->[$a3];
 }
 
 sub m0_opfunc_mod_n {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "mod_n $a1, $a2, $a3";
+
+    $ctx->[$a1] = $ctx->[$a2] % $ctx->[$a3];
 }
 
 sub m0_opfunc_iton {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "iton $a1, $a2, $a3";
+
+    $ctx->[$a1] = int($ctx->[$a2]);
 }
 
 sub m0_opfunc_ntoi {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "ntoi $a1, $a2, $a3";
+
+    $ctx->[$a1] = $ctx->[$a2];
 }
 
 sub m0_opfunc_ashr {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "ashr $a1, $a2, $a3";
+
+    {
+        # shift right with sign extension
+        use integer;
+        $ctx->[$a1] = $ctx->[$a2] >> $ctx->[$a3];
+    }
 }
 
 sub m0_opfunc_lshr {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "lshr $a1, $a2, $a3";
+
+    $ctx->[$a1] = $ctx->[$a2] >> $ctx->[$a3];
 }
 
 sub m0_opfunc_shl {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "shl $a1, $a2, $a3";
+
+    $ctx->[$a1] = $ctx->[$a2] << $ctx->[$a3];
 }
 
 sub m0_opfunc_and {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "and $a1, $a2, $a3";
+
+    $ctx->[$a1] = $ctx->[$a2] & $ctx->[$a3];
 }
 
 sub m0_opfunc_or {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "or $a1, $a2, $a3";
+
+    $ctx->[$a1] = $ctx->[$a2] | $ctx->[$a3];
 }
 
 sub m0_opfunc_xor {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "xor $a1, $a2, $a3";
+
+    $ctx->[$a1] = $ctx->[$a2] ^ $ctx->[$a3];
 }
 
 sub m0_opfunc_set {
