@@ -12,7 +12,7 @@
 int
 main(void) {
     Parrot_PMC       interp;
-    Parrot_Init_Args initargs;
+    Parrot_Init_Args *initargs;
 
     /* Setup default initialization parameters */
     GET_INIT_STRUCT(initargs);
