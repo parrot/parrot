@@ -555,7 +555,8 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_setprop");
     string = createstring(interp, "_struct");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
     Parrot_PMC_setprop(interp,continuation , string, pmc);
-    Parrot_printf(interp,"42\n");
+    pmc = Parrot_PMC_getprop(interp,continuation , string);
+    Parrot_printf(interp,"%P\n", pmc);
 CODE
 42
 Done!
