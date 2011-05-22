@@ -1,5 +1,5 @@
-#! perl
 # Copyright (C) 2010-2011, Parrot Foundation.
+#! perl
 
 use strict;
 use warnings;
@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 109;
+plan tests => 110;
 
 =head1 NAME
 
@@ -546,6 +546,16 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_role");
     Parrot_PMC_remove_role(interp, pmc, pmc2);
     Parrot_printf(interp,"42\n");
     */
+CODE
+42
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_setprop");
+    string = createstring(interp, "_struct");
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+    Parrot_PMC_setprop(interp,continuation , string, pmc);
+    Parrot_printf(interp,"42\n");
 CODE
 42
 Done!
