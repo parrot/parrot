@@ -127,6 +127,8 @@ t/harness - Parrot Test Harness
 
 =head1 DESCRIPTION
 
+=head2 Command-line Options - Short:
+
 The short command line options are:
 
 =over 4
@@ -171,6 +173,8 @@ See 'parrot --help-debug' for available flags.
 
 =back
 
+=head2 Command-Line Options:  Long
+
 There are also long command line options:
 
 =over 4
@@ -188,6 +192,16 @@ Emit a C<smoke.html> file instead of displaying results.
 Run only the file metadata and basic coding standards tests.
 
 =back
+
+=head2 Impact of Environmental Variables
+
+You may set the following environmental variables to positive integer values
+to get more verbose output, to run tests in parallel, or to get clock times in
+your standard output.
+
+    HARNESS_VERBOSE
+    TEST_JOBS
+    HARNESS_TIMER
 
 =head1 HISTORY
 
