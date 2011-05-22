@@ -5,9 +5,11 @@ INIT {
     @paramfmt[0] := "    .param pmc %0\n";
     @paramfmt[1] := "    .param pmc %0 :optional\n    .param int has_%0 :opt_flag\n";
     @paramfmt[2] := "    .param pmc %0 :slurpy\n";
+    @paramfmt[3] := "    .param pmc %0 :slurpy\n";
     @paramfmt[4] := "    .param pmc %0 :named(%1)\n";
     @paramfmt[5] := "    .param pmc %0 :optional :named(%1)\n    .param int has_%0 :opt_flag\n";
     @paramfmt[6] := "    .param pmc %0 :slurpy :named\n";
+    @paramfmt[7] := "    .param pmc %0 :slurpy :named\n";
     @paramfmt[8] := "    .param pmc %0 :call_sig\n";
 }
 
