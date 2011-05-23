@@ -5,14 +5,14 @@
     .include 'test_more.pir'
     plan(3)
 
-    .include "iglobals.pasm" 
-    .local pmc config_hash, interp 
+    .include "iglobals.pasm"
+    .local pmc config_hash, interp
     .local pmc d, l, r
-    interp = getinterp 
-    config_hash = interp[.IGLOBALS_CONFIG_HASH] 
-    $S0 = config_hash['gmp'] 
+    interp = getinterp
+    config_hash = interp[.IGLOBALS_CONFIG_HASH]
+    $S0 = config_hash['gmp']
     unless $S0 goto no_bigint
-  
+
     $P0 = loadlib "foo_group"
     ok(1, 'inherited add - loadlib')
     l = new "Foo"
