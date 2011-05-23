@@ -39,11 +39,15 @@ IPv6-related tests for the Socket PMC.
 .sub test_bind
     .local pmc sock, addrinfo, addr, it
     .local string str
-    .local int result, count
+    .local string expected_host, expected_port, expected_str
+    .local int count, port
 
     sock = new 'Socket'
     sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    addrinfo = sock.'getaddrinfo'('::1', 1234, .PIO_PROTO_TCP, .PIO_PF_INET6, 1)
+    port = 1234
+    push_eh error_6
+  retry_6:
+    addrinfo = sock.'getaddrinfo'('::1', port, .PIO_PROTO_TCP, .PIO_PF_INET6, 1)
 
     # output addresses for debugging
     it = iter addrinfo
@@ -66,18 +70,49 @@ IPv6-related tests for the Socket PMC.
     if it goto loop
 
     sock.'bind'(addrinfo)
+    goto started_6
 
+  error_6:
+    inc port
+    if port < 1244 goto retry_6
+    pop_eh
+    .local pmc exception
+    .get_results(exception)
+    throw exception
+
+  started_6:
+    pop_eh
     str = sock.'local_address'()
-    is(str, "::1:1234", "local address of bound socket is ::1")
+    expected_port = port  # need to coerce into a string
+    expected_str = "::1:" . expected_port
+    is(str, expected_str, "local address of bound socket is ::1")
 
     sock.'close'()
 
-    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    addrinfo = sock.'getaddrinfo'('127.0.0.1', 1234, .PIO_PROTO_TCP, .PIO_PF_INET, 1)
-    sock.'bind'(addrinfo)
+    # start again with an IPv4 address
+  retry_4:
+    push_eh error_4
 
+    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
+    addrinfo = sock.'getaddrinfo'('127.0.0.1', port, .PIO_PROTO_TCP, .PIO_PF_INET, 1)
+    sock.'bind'(addrinfo)
+    goto started_4
+
+  error_4:
+    inc port
+    if port < 1244 goto retry_4
+    pop_eh
+    .local pmc exception
+    .get_results(exception)
+    throw exception
+
+  started_4:
+    pop_eh
     str = sock.'local_address'()
-    is(str, "127.0.0.1:1234", "local address of bound socket is 127.0.0.1")
+    expected_port = port  # need to coerce into a string
+    expected_str = "127.0.0.1:" . expected_port
+    is(str, expected_str, "local address of bound socket is 127.0.0.1")
+
     sock.'close'()
 .end
 
