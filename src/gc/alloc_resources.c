@@ -151,7 +151,7 @@ buffer_location(PARROT_INTERP, ARGIN(const Buffer *b))
     ASSERT_ARGS(buffer_location)
     Parrot_Context * const ctx = CONTEXT(interp);
     static char reg[10];
-    UINTVAL i;
+    int i;
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
         PObj * const obj = (PObj *)Parrot_pcc_get_STRING_reg(interp, ctx, i);
