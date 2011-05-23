@@ -1,12 +1,5 @@
-#! perl
-# Copyright (C) 2005, Parrot Foundation.
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 10;
-use Parrot::Config;
+#! parrot
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -22,33 +15,44 @@ Tests the Foo PMC.
 
 =cut
 
-pir_output_is( << 'CODE', << 'OUTPUT', "get_integer" );
+# load our Foo test (pseudo) language
+# it defines one PMC type "Foo"
+.HLL "Fool"
+.loadlib "foo_group"
 
 .sub main :main
+    .include 'test_more.pir'
+    plan(12)
+
+    test_get_integer()
+    test_survive_gc()
+    test_loadlib_relative_pathname_no_ext()
+    test_loadlib_absolute_pathname_no_ext()
+    test_loadlib_relative_pathname_and_ext()
+    test_loadlib_absolute_pathname_and_ext()
+    test_inherited_add()
+    test_foo_subclass_isa_integer()
+    test_hll_1()
+    test_hll_2()
+.end
+
+.sub test_get_integer
     loadlib $P1, "foo_group"
     $P1 = new "Foo"
 
     $I1 = $P1
-    print $I1
-    print "\n"
+    is($I1, 42, 'get integer')
 .end
-CODE
-42
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "ParrotLibrary props survive GC" );
-.sub main :main
+.sub test_survive_gc
     loadlib $P1, 'foo_group'
     sweep 1
     $P2 = getprop '_type', $P1
-    say $P2
+    $S0 = $P2
+    is($S0, 'PMC', 'ParrotLibrary props survive GC')
 .end
-CODE
-PMC
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname, no ext" );
-.sub main :main
+.sub test_loadlib_relative_pathname_no_ext 
     ## load a relative pathname without the extension.  loadlib will convert the
     ## '/' characters to '\\' on windows.
     $S0 = "runtime/parrot/dynext/foo_group"
@@ -57,15 +61,10 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname, no ext" 
     ## ensure that we can still make Foo instances.
     $P1 = new "Foo"
     $I1 = $P1
-    print $I1
-    print "\n"
+    is($I1, 42, 'test loadlib with relative pathname, no ext')
 .end
-CODE
-42
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname, no ext" );
-.sub main :main
+.sub test_loadlib_absolute_pathname_no_ext 
     ## get cwd in $S0.
     .include "iglobals.pasm"
     $P11 = getinterp
@@ -81,15 +80,10 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname, no ext" 
     ## ensure that we can still make Foo instances.
     $P1 = new "Foo"
     $I1 = $P1
-    print $I1
-    print "\n"
+    is($I1, 42, 'loadlib with absolute pathname, no ext')
 .end
-CODE
-42
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname & ext" );
-.sub main :main
+.sub test_loadlib_relative_pathname_and_ext
     ## get load_ext in $S0.
     .include "iglobals.pasm"
     $P11 = getinterp
@@ -103,15 +97,10 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname & ext" );
     ## ensure that we can still make Foo instances.
     $P1 = new "Foo"
     $I1 = $P1
-    print $I1
-    print "\n"
+    is($I1, 42, 'loadlib with relative pathname & ext')
 .end
-CODE
-42
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname & ext" );
-.sub main :main
+.sub test_loadlib_absolute_pathname_and_ext
     ## get cwd in $S0, load_ext in $S1.
     .include "iglobals.pasm"
     $P11 = getinterp
@@ -129,43 +118,35 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname & ext" );
     ## ensure that we can still make Foo instances.
     $P1 = new "Foo"
     $I1 = $P1
-    print $I1
-    print "\n"
+    is($I1, 42, 'loadlib with absolute pathname & ext')
 .end
-CODE
-42
-OUTPUT
 
-SKIP: {
-    skip( "No BigInt Lib configured", 1 ) if !$PConfig{gmp};
-
-    pir_output_is( << 'CODE', << 'OUTPUT', "inherited add" );
-.sub _main :main
+.sub test_inherited_add
+    .include "iglobals.pasm" 
+    .local pmc config_hash, interp 
     .local pmc d, l, r
+    interp = getinterp 
+    config_hash = interp[.IGLOBALS_CONFIG_HASH] 
+    $S0 = config_hash['gmp'] 
+    unless $S0 goto no_bigint
+
     $P0 = loadlib "foo_group"
-    print "ok\n"
+    ok(1, 'inherited add - loadlib')
     l = new "Foo"
     l = 42
     r = new 'BigInt'
     r = 0x7ffffff
     d = new 'Undef'
     add d, l, r
-    print d
-    print "\n"
+    is(d, 134217769, 'inherited add')
     $S0 = typeof d
-    print $S0
-    print "\n"
+    is($S0, 'BigInt', 'inherited add - typeof')
+    .return()
+  no_bigint:
+    skip( 3, 'No BigInt Lib configured' )
 .end
-CODE
-ok
-134217769
-BigInt
-OUTPUT
 
-}
-
-pir_output_is( <<'CODE', <<'OUTPUT', "Foo subclass isa Integer" );
-.sub main :main
+.sub test_foo_subclass_isa_integer 
     .local pmc F, f, d, r
     loadlib F, "foo_group"
     f = new "Foo"
@@ -174,44 +155,24 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Foo subclass isa Integer" );
     r = new 'Integer'
     r = 2
     d = f - r
-    print d
-    print "\n"
+    is(d, 144, 'Foo subclass isa Integer')
 .end
-CODE
-144
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', ".HLL 1" );
-# load our Foo test (pseudo) language
-# it defines one PMC type "Foo"
-.HLL "Fool"
-.loadlib "foo_group"
-.sub main :main
+.sub test_hll_1
     new $P1, "Foo"      # load by name
     $I1 = $P1
-    print $I1
-    print "\n"
+    is($I1, 42, '.HLL 1')
 .end
-CODE
-42
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', ".HLL 2" );
-.HLL "Fool"
-.loadlib "foo_group"
-.sub main :main
+.sub test_hll_2
     new $P1, 'Foo'       # load by index
     $I1 = $P1
-    print $I1
-    print "\n"
+    is($I1, 42, '.HLL 2')
 .end
-CODE
-42
-OUTPUT
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
