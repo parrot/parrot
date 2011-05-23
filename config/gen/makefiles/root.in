@@ -2956,7 +2956,7 @@ src/glut_nci_thunks$(O) : $(PARROT_H_HEADERS) \
 $(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
 	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \
     @ld_out@$@ src/glut_callbacks$(O) src/glut_nci_thunks$(O) \
-    @opengl_lib@
+    $(ALL_PARROT_LIBS) @opengl_lib@
 
 src/extra_nci_thunks.c : src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
 	$(NCI_THUNK_GEN) --dynext --no-warn-dups \
