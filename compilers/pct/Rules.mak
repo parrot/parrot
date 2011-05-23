@@ -7,13 +7,13 @@ $(LIBRARY_DIR)/PCT.pbc : $(PARROT) compilers/pct/PCT.pir \
 $(LIBRARY_DIR)/PCT/PAST.pbc : compilers/pct/src/PAST.pir $(PARROT) $(PBC_MERGE) \
     $(LIBRARY_DIR)/PCT/HLLCompiler.pbc \
     compilers/pct/src/PCT/Node.pbc \
-    compilers/pct/src/PAST/Node.pbc \
+    compilers/pct/src/PAST/Nodes.pbc \
     compilers/pct/src/PAST/Compiler.pbc \
     compilers/pct/src/POST/Nodes.pbc \
     compilers/pct/src/POST/Compiler.pbc
 	$(PBC_MERGE) -o $@ \
 	compilers/pct/src/PCT/Node.pbc \
-	compilers/pct/src/PAST/Node.pbc \
+	compilers/pct/src/PAST/Nodes.pbc \
 	compilers/pct/src/PAST/Compiler.pbc \
 	compilers/pct/src/POST/Nodes.pbc \
 	compilers/pct/src/POST/Compiler.pbc
@@ -38,9 +38,6 @@ $(LIBRARY_DIR)/PCT/Dumper.pbc : compilers/pct/src/PCT/Dumper.pir $(PARROT)
 
 compilers/pct/src/PCT/Node.pbc : compilers/pct/src/PCT/Node.pir $(PARROT)
 	$(PARROT) -o $@ compilers/pct/src/PCT/Node.pir
-
-compilers/pct/src/PAST/Node.pbc : compilers/pct/src/PAST/Node.pir $(PARROT)
-	$(PARROT) -o $@ compilers/pct/src/PAST/Node.pir
 
 compilers/pct/src/PAST/Compiler.pbc : compilers/pct/src/PAST/Compiler.pir $(PARROT)
 	$(PARROT) -o $@ compilers/pct/src/PAST/Compiler.pir
@@ -68,6 +65,19 @@ compilers/pct/src/POST/Nodes.pbc : $(PARROT) \
 	$(PARROT) -o $@ \
 		compilers/pct/src/POST/Nodes.pir
 
+compilers/pct/src/PAST/Nodes.pbc : $(PARROT) \
+		compilers/pct/src/PAST/Nodes.pir \
+		compilers/pct/src/PAST/Block.pir \
+		compilers/pct/src/PAST/Control.pir \
+		compilers/pct/src/PAST/Node.pir \
+		compilers/pct/src/PAST/Op.pir \
+		compilers/pct/src/PAST/Stmts.pir \
+		compilers/pct/src/PAST/Val.pir \
+		compilers/pct/src/PAST/Var.pir \
+		compilers/pct/src/PAST/VarList.pir
+	$(PARROT) -o $@ \
+		compilers/pct/src/PAST/Nodes.pir
+
 # It should be special "bootstrap-pct" target
 bootstrap-pct: $(NQP_RX)
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Compiler.pir compilers/pct/src/POST/Compiler.pm
@@ -85,3 +95,11 @@ bootstrap-pct: $(NQP_RX)
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Sub.pir compilers/pct/src/POST/Sub.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Value.pir compilers/pct/src/POST/Value.pm
 
+	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Block.pir compilers/pct/src/PAST/Block.pm
+	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Control.pir compilers/pct/src/PAST/Control.pm
+	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Node.pir compilers/pct/src/PAST/Node.pm
+	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Op.pir compilers/pct/src/PAST/Op.pm
+	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Stmts.pir compilers/pct/src/PAST/Stmts.pm
+	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Val.pir compilers/pct/src/PAST/Val.pm
+	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Var.pir compilers/pct/src/PAST/Var.pm
+	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/VarList.pir compilers/pct/src/PAST/VarList.pm
