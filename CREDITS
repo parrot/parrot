@@ -719,6 +719,10 @@ N: Markus Mayr
 D: Implementation of the Rational PMC
 D: Fixing SDL-bindings and examples
 
+N: Matt Boyle
+U: ligne
+D: Fixes to docs and test-suite.
+
 N: Matt Diephouse
 U: mdiep
 E: matt@diephouse.com
