@@ -14,10 +14,14 @@ $(LIBRARY_DIR)/P6Regex.pbc: $(NQP_STAGE0_DIR)/P6Regex-s0.pir $(PARROT)
 $(LIBRARY_DIR)/nqp-rx.pbc: $(NQP_STAGE0_DIR)/NQP-s0.pir $(PARROT)
 	$(PARROT) -o $@ $(NQP_STAGE0_DIR)/NQP-s0.pir
 
+# Generate pir separately from pbc to break PCT/NQP circularity
+bootstrap-nqp-setting: $(NQP_STATE0_DIR)/nqp-setting.pir
+$(NQP_STATE0_DIR)/nqp-setting.pir: $(NQP_STAGE0_DIR)/nqp-setting.nqp $(LIBRARY_DIR)/nqp-rx.pbc $(NQPRX_LIB_PBCS) $(PARROT)
+	$(PARROT) $(LIBRARY_DIR)/nqp-rx.pbc --target=pir -o $@ $<
+
 ## eventually nqp should be able to generate .pbc files directly
-$(LIBRARY_DIR)/nqp-setting.pbc: $(NQP_STAGE0_DIR)/nqp-setting.nqp $(LIBRARY_DIR)/nqp-rx.pbc $(NQPRX_LIB_PBCS)
-	$(PARROT) $(LIBRARY_DIR)/nqp-rx.pbc --target=pir -o $(NQP_STAGE0_DIR)/nqp-setting.pir $(NQP_STAGE0_DIR)/nqp-setting.nqp
-	$(PARROT) -o $@ $(NQP_STAGE0_DIR)/nqp-setting.pir
+$(LIBRARY_DIR)/nqp-setting.pbc: $(NQP_STAGE0_DIR)/nqp-setting.pir $(PARROT)
+	$(PARROT) -o $@ $<
 
 ## TT #1398 - pbc_to_exe cannot generate a specified target file
 parrot-nqp.pbc : $(LIBRARY_DIR)/nqp-rx.pbc
