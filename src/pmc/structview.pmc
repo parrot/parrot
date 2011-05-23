@@ -812,9 +812,9 @@ any other type of element.
                     break;
                   case enum_type_sized:
                     if (VTABLE_does(INTERP, p, CONST_STRING(INTERP, "buffer"))) {
-                        void   *q  = VTABLE_get_pointer(INTERP, p);
+                        void * const q = VTABLE_get_pointer(INTERP, p);
                         size_t len = VTABLE_get_integer(INTERP, p);
-                        if (!len || len > elts[i].size)
+                        if (len == 0 || len > elts[i].size)
                             len = elts[i].size;
                         memcpy(ptr, q, len);
                         break;
