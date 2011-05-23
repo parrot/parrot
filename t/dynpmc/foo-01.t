@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2005,2011 Parrot Foundation.
+# Copyright (C) 2011, Parrot Foundation.
 
 =head1 NAME
 
