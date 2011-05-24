@@ -178,20 +178,23 @@ register, where C<*$1> refers to what that register points at.
 
 Explicitly do nothing.  C<$1>, C<$2> and C<$3> are ignored.
 
-=item * goto - go to an offset in the current bytecode segment
+=item * goto - go to a fixed offset in the current bytecode segment
 
-Unconditionally transfer control flow to the bytecode offset in C<*$1> within
-the current bytecode segment.  C<$2> and C<$3> are ignored.
+Unconditionally transfer control flow to a fixed offset within the current
+bytecode segment.  The target address is calculated as 256 * C<$1> + C<$*2>.
+C<$3> is ignored.
 
-=item * goto_if_eq - go to an offset in the current bytecode segment if the last two arguments are equal
+=item * goto_if - conditionally go to a fixed offset in the current bytecode segment
 
-Transfer control flow to the bytecode offset in C<*$1> within the current
-bytecode segment iff the values of C<*$2> and C<*$3> are the same.
+Transfer control flow to a fixed offset within the current bytecode segment if
+C<*$3> is a non-zero when treated as an integer.  As with C<goto>, the target
+address is calculated as 256 * C<*$1> + C<*$2>.
 
 =item * goto_chunk - go to an offset in another chunk
 
-Unconditionally transfer control flow to the bytecode offset C<*$1> within the
-chunk named by the string C<*$2>. C<$3> is ignored.
+Unconditionally transfer control flow to a fixed offset within another chunk's
+bytecode segment.  The target address is calculated as 256 * C<$1> + C<$*2>.
+C<*$3> is the name of the target chunk.
 
 =back
 
