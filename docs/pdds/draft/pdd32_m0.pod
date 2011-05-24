@@ -187,7 +187,7 @@ C<$3> is ignored.
 =item * goto_if - conditionally go to a fixed offset in the current bytecode segment
 
 Transfer control flow to a fixed offset within the current bytecode segment if
-C<*$3> is a non-zero when treated as an integer.  As with C<goto>, the target
+C<*$3> is non-zero when treated as an integer.  As with C<goto>, the target
 address is calculated as 256 * C<*$1> + C<*$2>.
 
 =item * goto_chunk - go to an offset in another chunk
@@ -476,7 +476,7 @@ that contains the value.
   #at pc 1234, "line" is 23
   1243 5 6
 
-=head3 Bytecode
+=head3 Bytecode Segment
 
 The bytecode segment consists of a list of mnemonics for instructions and their
 arguments.  All instructions take three int arguments between 0 and 255, even
@@ -488,6 +488,8 @@ if they aren't all used.
     cmp_i 2, 3, 3
     goto  0, 0, 0
 
+=head4 Register Names
+
 Instruction arguments may also use the register names specified in the C<Types>
 section in place of numeric arguments.  This is nothing more than syntactic
 sugar.  The two ops below will assemble to identical bytecode.  When
@@ -495,13 +497,51 @@ disassembling M0 bytecode, it is up to the disassembler to determine which form
 will be output.
 
   div_i I0, I3, I4
-  div_i 8,  11, 12
+  div_i 12, 15, 16
 
 As a way to filter out visual noise from M0 bytecode assembly listings, the
 value C<x> may be used as an instruction argument to indicate that the
 argument's value is ignored.  C<x> is an alias for 0.
 
-  goto 12, x, x
+  goto 0, 12, x
+
+=head4 Labels
+
+In M0's textual bytecode representation, labels may be used to represent
+bytecode offsets within a chunk.  There is at most a one-to-one mapping between
+instructions and labels; an instruction may be prefixed by at most one label
+and the use of a label to identify more than one instruction is invalid.  A
+label consists of an identifer ([a-zA-Z][a-zA-Z9-0-9_]*) and may not have the
+same name as a register (e.g. I0, INTERP, BCS, etc).  
+
+A label may be used as the first argument to C<goto> or C<goto_if> as an
+alternative to specifying the bytecode offset explicitly.  Use of labels with
+any other ops is invalid.
+
+  .bytecode
+  set_var I0, 0, 0
+  set_var I1, 0, 1
+  loop: add_i I0, I0, I1
+  goto  loop, x
+
+Labels exist only in M0's textual representation.  During assembly they are
+translated into an immediate bytecode offset.  For example, the above snippet
+would translate to:
+
+  .bytecode
+  # offset 0, 0
+  set_var I0,  0, 0
+  # offset 1, 0
+  set_var I1,  0, 1
+  # offset 2, 0
+  add_i   I0, I0, 1
+
+  # label "loop" translated to offset 0, 2
+  goto     0,  2, x 
+
+It is explicitly valid to use a label before it has been defined.  This means
+that the assembler must be smart enough to accept undefined labels during
+parsing and fill in their values in bytecode once a chunk is fully parsed.
 
 =head3 Full Example
 
