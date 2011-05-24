@@ -947,11 +947,9 @@ M0 VM implementations.
 
 Shouldn't this be a different spec document? Perhaps PDD33 for M1 ?
 
-<this space intentionally left blank, for now>
-
 =head2 Op Composition
 
-<this space for rent>
+Op composition is considered magic-like and will not be part of M0.
 
 =head2 Implementation
 
