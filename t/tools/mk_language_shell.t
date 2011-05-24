@@ -30,7 +30,7 @@ use File::Path qw/rmtree/;
 my $build_parrot;
 
 BEGIN {
-    $build_parrot = catfile($PConfig{build_dir}, $PConfig{test_prog});
+    $build_parrot = catfile($PConfig{build_dir}, $PConfig{test_prog} . $PConfig{exe});
     unless (-e $build_parrot) {
         plan skip_all => "Parrot binary has not been built yet";
         exit(0);

@@ -1,10 +1,9 @@
 #! perl
-# Copyright (C) 2010, Parrot Foundation.
-# 01_functions.t
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests => 38;
+use Test::More tests => 67;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -24,7 +23,6 @@ use Parrot::Headerizer::Functions qw(
     no_both_static_and_PARROT_EXPORT
     handle_split_declaration
     asserts_from_args
-    shim_test
     handle_modified_args
     add_newline_if_multiline
     add_asserts_to_declarations
@@ -459,7 +457,7 @@ ok( exists $asserts{'PARROT_ASSERT_ARG(item)'}, "Got expected assert" );
 ok( exists $asserts{'PARROT_ASSERT_ARG(interp)'}, "Got expected assert" );
 
 @args = (
-    'ARGFREE_NOTNULL(( _abcDEF123 )())',
+    'ARGFREE_NOTNULL(_abcDEF123)',
     'PARROT_INTERP',
     'ARGIN(Linked_List *list)',
     'ARGIN(List_Item_Header *item)',
@@ -472,105 +470,10 @@ ok( exists $asserts{'PARROT_ASSERT_ARG(item)'}, "Got expected assert" );
 ok( exists $asserts{'PARROT_ASSERT_ARG(interp)'}, "Got expected assert" );
 ok( exists $asserts{'PARROT_ASSERT_ARG(_abcDEF123)'}, "Got expected assert" );
 
-my ($var, $args_ref, $funcs_ref);
-my @modified_args;
-# shim_test
-$var = 'something';
-$args_ref =  [
-    "SHIM($var)",
-    'ARGIN(STRING *sig)',
-];
-$funcs_ref =  {
-    'macros' => [],
-    'return_type' => 'void',
-    'is_api' => undef,
-    'is_inline' => undef,
-    'is_static' => 'static',
-    'args' => $args_ref,
-    'name' => 'pcc_params',
-    'file' => 'src/pmc/nci.c',
-    'is_ignorable' => 0
-};
-$expected = [
-    "SHIM($var)",
-    $args_ref->[1],
-];
-@modified_args = shim_test($funcs_ref, $args_ref);
-is_deeply( [ @modified_args ], $expected,
-    "Got expected args back from shim_test()" );
-
-$var = 'something *else';
-$args_ref =  [
-    "SHIM($var)",
-    'ARGIN(STRING *sig)',
-];
-$funcs_ref =  {
-    'macros' => [],
-    'return_type' => 'void',
-    'is_api' => undef,
-    'is_inline' => undef,
-    'is_static' => undef,
-    'args' => $args_ref,
-    'name' => 'pcc_params',
-    'file' => 'src/pmc/nci.c',
-    'is_ignorable' => 0
-};
-$expected = [
-    "SHIM($var)",
-    $args_ref->[1],
-];
-@modified_args = shim_test($funcs_ref, $args_ref);
-is_deeply( [ @modified_args ], $expected,
-    "Got expected args back from shim_test()" );
-
-$var = 'something';
-$args_ref =  [
-    "SHIM($var)",
-    'ARGIN(STRING *sig)',
-];
-$funcs_ref =  {
-    'macros' => [],
-    'return_type' => 'void',
-    'is_api' => undef,
-    'is_inline' => undef,
-    'is_static' => undef,
-    'args' => $args_ref,
-    'name' => 'pcc_params',
-    'file' => 'src/pmc/nci.c',
-    'is_ignorable' => 0
-};
-$expected = [
-    "NULLOK($var)",
-    $args_ref->[1],
-];
-@modified_args = shim_test($funcs_ref, $args_ref);
-is_deeply( [ @modified_args ], $expected,
-    "Got expected args back from shim_test()" );
-
-$var = 'something';
-$args_ref =  [
-    "SHAM($var)",
-    'ARGIN(STRING *sig)',
-];
-$funcs_ref =  {
-    'macros' => [],
-    'return_type' => 'void',
-    'is_api' => undef,
-    'is_inline' => undef,
-    'is_static' => undef,
-    'args' => $args_ref,
-    'name' => 'pcc_params',
-    'file' => 'src/pmc/nci.c',
-    'is_ignorable' => 0
-};
-$expected = $args_ref;
-@modified_args = shim_test($funcs_ref, $args_ref);
-is_deeply( [ @modified_args ], $expected,
-    "Got expected args back from shim_test()" );
-
 # handle_modified_args()
 my ($decl_in, $decl_out, $multiline);
 
+my @modified_args;
 $decl_in = 'void Parrot_list_append(';
 @modified_args = qw( alpha beta gamma );
 ($decl_out, $multiline) = handle_modified_args(
@@ -597,7 +500,7 @@ ok( $multiline, "Long portion of declaration means multiline" );
 
 $decl_in = 'void Parrot_list_append(';
 @modified_args = (
-  'SHIM_INTERP',
+  'PARROT_INTERP',
   'ARGMOD(Linked_List *list)',
   'ARGMOD(List_Item_Header *item)',
 );
@@ -613,7 +516,7 @@ ok( $multiline, "Long portion of declaration means multiline" );
 
 $decl_in = 'void Parrot_list_append(';
 @modified_args = (
-  'SHIM_INTERP INCURABLY_EXTREMELY_EXTRAORDINARILY_ARGMOD(Linked_List *list)',
+  'PARROT_INTERP INCURABLY_EXTREMELY_EXTRAORDINARILY_ARGMOD(Linked_List *list)',
 );
 $expected = "$decl_in$modified_args[0])";
 ($decl_out, $multiline) = handle_modified_args(
@@ -637,7 +540,7 @@ is( $decl_out, "alpha;",
 
 
 # add_asserts_to_declarations()
-$funcs_ref = [
+my $funcs_ref = [
   {
     'macros' => [
       'PARROT_EXPORT'

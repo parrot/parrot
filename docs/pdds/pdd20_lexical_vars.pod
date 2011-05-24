@@ -127,20 +127,20 @@ In the above example, the definition of the Parrot subroutine implementing
 This is normally a static attribute of a Sub, but can be changed
 dynamically using the C<set_outer> method.
 
-=begin PIR
+=begin PIR_INVALID
 
     .sub 'a' :outer('foo')
        # ...
     .end
 
-=end PIR
+=end PIR_INVALID
 
 The value of C<:outer> identifies a subroutine by its C<:subid>
 flag; subroutine definitions that do not have an explicit C<:subid>
 flag have the name of the Sub as the C<:subid>.
 
-Note that the outer sub B<must> be compiled first; in other words, 
-"foo" must appear before "a" in the source text.  Compilers can 
+Note that the outer sub B<must> be compiled first; in other words,
+"foo" must appear before "a" in the source text.  Compilers can
 easily do this via preorder traversal of lexically-nested subs.
 
 =head4 Capturing the lexical environment
@@ -184,9 +184,9 @@ C<capture_lex> on the newly cloned sub.
 
 When a subroutine is invoked, its newly created call frame
 points to the outer sub's context that was established for
-the sub by the C<capture_lex> opcode above.  When Parrot 
-is asked to access a lexical variable named '$a'  (e.g., 
-via the C<find_lex> opcode), Parrot starts with the current 
+the sub by the C<capture_lex> opcode above.  When Parrot
+is asked to access a lexical variable named '$a'  (e.g.,
+via the C<find_lex> opcode), Parrot starts with the current
 call frame and follows the chain of outer lexical call
 frames until it finds one containing the requested lexical.
 If none of the outer lexical environments define such a
@@ -197,10 +197,10 @@ variable, an exception is thrown.
 If an inner subroutine is invoked that hasn't had a
 C<capture_lex> operation performed on it, then Parrot
 will attempt to dynamically perform the lexical capture
-using the call from from its outer sub.  If the outer sub 
-doesn't have a call frame, as might occur when jumping 
-directly to the inner sub without previously invoking the 
-outer, then Parrot creates a dummy call frame for the 
+using the call from from its outer sub.  If the outer sub
+doesn't have a call frame, as might occur when jumping
+directly to the inner sub without previously invoking the
+outer, then Parrot creates a dummy call frame for the
 outer sub to be used for its inner lexical sub captures
 (until the outer sub is invoked, at which point it receives
 a new call frame).

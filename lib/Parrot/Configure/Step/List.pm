@@ -35,7 +35,6 @@ my @steps = qw(
     auto::va_ptr
     auto::format
     auto::isreg
-    auto::frames
     auto::llvm
     auto::inline
     auto::gc
@@ -60,8 +59,6 @@ my @steps = qw(
     auto::pod2man
     auto::ctags
     auto::revision
-    auto::sha1
-    auto::git_describe
     auto::icu
     auto::libffi
     auto::ipv6

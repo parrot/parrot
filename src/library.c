@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2010, Parrot Foundation.
+Copyright (C) 2004-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -359,7 +359,7 @@ is_abs_path(PARROT_INTERP, ARGIN(const STRING *file))
     if (len >= 3
     &&  isalpha((unsigned char)c)
     &&  STRING_ord(interp, file, 1) == ':') {
-        INTVAL c2 = STRING_ord(interp, file, 2);
+        const INTVAL c2 = STRING_ord(interp, file, 2);
         if (c2 == path_separator || c2 == win32_path_separator)
             return 1;
     }
@@ -541,7 +541,7 @@ try_bytecode_extensions(PARROT_INTERP, ARGIN(STRING* path))
 
     if (!STRING_IS_NULL(test_path)) {
         if (STRING_length(test_path) > 4) {
-            STRING *orig_ext = STRING_substr(interp, test_path, -4, 4);
+            STRING * const orig_ext = STRING_substr(interp, test_path, -4, 4);
             /* First try substituting .pbc for the .pir extension */
             if (STRING_equal(interp, orig_ext, pir_extension)) {
                 STRING * const without_ext = Parrot_str_chopn(interp, test_path, 4);

@@ -26,6 +26,7 @@ Define the the core subsystem for exceptions.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC * build_exception_from_args(PARROT_INTERP,
     int ex_type,
@@ -292,6 +293,7 @@ family of functions.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC *
 build_exception_from_args(PARROT_INTERP, int ex_type,
@@ -434,7 +436,7 @@ PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 void
-Parrot_ex_throw_from_c_args(PARROT_INTERP, SHIM(void *ret_addr),
+Parrot_ex_throw_from_c_args(PARROT_INTERP, ARGIN_NULLOK(SHIM(void *ret_addr)),
         int exitcode, ARGIN(const char *format), ...)
 {
     ASSERT_ARGS(Parrot_ex_throw_from_c_args)

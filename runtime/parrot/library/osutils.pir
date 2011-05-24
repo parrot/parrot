@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2010, Parrot Foundation.
+# Copyright (C) 2009-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -9,6 +9,8 @@ osutils - Parrot OS Utilities
 =over 4
 
 =cut
+
+.loadlib 'math_ops'
 
 .sub '' :init :load :anon
     $P0 = loadlib 'os'
@@ -689,13 +691,7 @@ osutils - Parrot OS Utilities
     .const string TEMPCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
     $P1 = split '', TEMPCHARS
     $I1 = elements $P1
-    load_bytecode 'Math/Rand.pbc'
-    .local pmc rand
-    rand = get_global [ 'Math'; 'Rand' ], 'rand'
-    .local pmc srand
-    srand = get_global [ 'Math'; 'Rand' ], 'srand'
-    $I0 = time
-    srand($I0)
+    dec $I1
   REDO:
     $S1 = ''
     $P2 = split '', $S0
@@ -703,8 +699,7 @@ osutils - Parrot OS Utilities
     unless $P2 goto L2
     $S2 = shift $P2
     unless $S2 == 'X' goto L3
-    $I0 = rand()
-    $I0 = $I0 % $I1
+    $I0 = rand $I1
     $S2 = $P1[$I0]
   L3:
     $S1 .= $S2

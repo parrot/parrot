@@ -44,6 +44,15 @@ use base qw(Parrot::Configure::Step);
 
 use Parrot::Configure::Utils ':gen';
 
+# taken from List::MoreUtils
+sub any {
+    my $f = shift;
+    return if ! @_;
+    for (@_) {
+        return 1 if $f->();
+    }
+    return 0;
+}
 
 my @GLUT_1_CALLBACKS = (
     [ 'Display',          'void' ],
@@ -248,50 +257,26 @@ my %C_TYPE = (
 );
 
 my %NCI_TYPE = (
-    void         => 'v',
-    char         => 'c',
-    short        => 's',
-    int          => 'i',
-    long         => 'l',
-    size_t       => 'l',
-    ptrdiff_t    => 'l',
-    # Requires TT #1182
-    # longlong     => 'L',
-    float        => 'f',
-    double       => 'd',
+    ( map {( $_ => $_ )}
+        qw[ void char short int long longlong float double longdouble ] ),
 
-    'char*'      => 't',
+    size_t       => 'long',
+    ptrdiff_t    => 'long',
 
-    'short*'     => 'p',
-    'int*'       => 'p',
-    'long*'      => 'p',
-    'ptrdiff_t*' => 'p',
-    'longlong*'  => 'p',
-    'float*'     => 'p',
-    'double*'    => 'p',
-    'void*'      => 'p',
+    ( map {( "$_*" => 'ptr', "$_**" => 'ptr' )}
+        qw[ void char short int long ptrdiff_t longlong float double ] ),
 
-    'char**'     => 'p',
-    'short**'    => 'p',
-    'int**'      => 'p',
-    'long**'     => 'p',
-    'longlong**' => 'p',
-    'float**'    => 'p',
-    'double**'   => 'p',
-    'void**'     => 'p',
-
-    'double***'  => 'p',
+    'double***'  => 'ptr',
 );
 
 my %PCC_TYPE = (
-    c => 'I',
-    s => 'I',
-    i => 'I',
-    l => 'I',
-    f => 'N',
-    d => 'N',
-    t => 'S',
-    p => 'P',
+    char   => 'I',
+    short  => 'I',
+    int    => 'I',
+    long   => 'I',
+    float  => 'N',
+    double => 'N',
+    ptr    => 'P',
 );
 
 my %PCC_CAST = (
@@ -302,7 +287,7 @@ my %PCC_CAST = (
 );
 
 my %OVERRIDE = (
-    'glutInit'  => 'v3p',
+    glutInit => [[qw[ void int& ptr ]], [0, 0, 0]],
 );
 
 my @IGNORE = (
@@ -348,23 +333,6 @@ my @IGNORE = (
     'DescribePixelFormat',
     'GetPixelFormat',
     'SetPixelFormat',
-
-    # Can't handle longlong until TT #1182 is done
-    'glBufferAddressRangeNV',
-    'glClientWaitSync',
-    'glUniformui64NV',
-    'glProgramUniformui64NV',
-    'glPresentFrameKeyedNV',
-    'glPresentFrameDualFillNV',
-    'glWaitSync',
-    'glXSwapBuffersMscOML',
-    'glXWaitForMscOML',
-    'glXWaitForSbcOML',
-    'wglGetSyncValuesOML',
-    'wglSwapBuffersMscOML',
-    'wglSwapLayerBuffersMscOML',
-    'wglWaitForMscOML',
-    'wglWaitForSbcOML',
 
     # Can't handle weird data types specified only in proprietary headers
     'glXCreateGLXVideoSourceSGIX',
@@ -748,9 +716,10 @@ sub gen_opengl_wrappers {
             $group = lc $group;
 
             # Convert return and param types to NCI signature
-            my $nci_sig = $OVERRIDE{$name};
+            my @nci_sig    = @{${$OVERRIDE{$name} or []}[0] or []};
+            my @cstr_trans = @{${$OVERRIDE{$name} or []}[1] or []};
 
-            unless ($nci_sig) {
+            unless (@nci_sig) {
                 $params = '' if $params eq 'void';
                 my @params = split /, / => $params;
                 unshift @params, $return;
@@ -764,10 +733,11 @@ sub gen_opengl_wrappers {
                           if $verbose;
                         next PROTO;
                     }
-                    $nci_sig .= $NCI_TYPE{$param};
+                    push @nci_sig,    $NCI_TYPE{$param};
+                    push @cstr_trans, $param eq 'char*';
                 }
 
-                if ($nci_sig =~ /.v/) {
+                if (any sub { $_ eq 'void' }, @nci_sig[1..$#nci_sig]) {
                     $fail{$file}++;
                     warn "In OpenGL header '$file', prototype '$name', there is a void parameter; original prototype:\n  $orig\n"
                       if $verbose;
@@ -777,16 +747,17 @@ sub gen_opengl_wrappers {
 
             # Success!  Save results.
             $pass{$file}++;
-            $sigs{$nci_sig}++;
-            push @{$funcs{$group}}, [$name, $nci_sig];
+            $sigs{join ',', @nci_sig} = [@nci_sig];
+            push @{$funcs{$group}}, [$name, [@nci_sig], [@cstr_trans]];
 
+            my $nci_sig = '[' . (join ',', @nci_sig) . ']';
             print "$group\t$nci_sig\t$return $name($params);\n"
                 if $verbose >= 3;
         }
     }
 
     # PHASE 2: Write unique signatures to NCI signatures file
-    my @sigs = sort keys %sigs;
+    my @sigs = values %sigs;
 
     open my $sigs, '>', $SIGS_FILE
         or die "Could not open NCI signatures file '$SIGS_FILE' for write: $!";
@@ -797,17 +768,17 @@ sub gen_opengl_wrappers {
 $autogen_header
 
 # GLUT callbacks
-v    JP
-v    JPi
-v    JPii
+v    pP
+v    pPi
+v    pPii
 
 # Generated signatures
 HEADER
 
     foreach my $nci_sig (@sigs) {
-        my ($return, $params) = $nci_sig =~ /^(.)(.*)$/;
+        my ($return, @params) = ($$nci_sig[0], @$nci_sig[1..$#$nci_sig]);
 
-        print $sigs "$return    $params\n";
+        print $sigs "$return    (", (join ',', @params), ")\n";
     }
 
     close $sigs;
@@ -826,65 +797,95 @@ HEADER
     .local pmc glutcb_funcs
     glutcb_funcs = new 'ResizableStringArray'
     push glutcb_funcs, 'Parrot_glut_nci_loader'
-    push glutcb_funcs, 'vJ'
+    push glutcb_funcs, 'void,ptr'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbCloseFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbDisplayFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbIdleFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbMenuDestroyFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbOverlayDisplayFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbWMCloseFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbEntryFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbMenuStateFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbVisibilityFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbWindowStatusFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbButtonBoxFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbDialsFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbMotionFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbPassiveMotionFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbReshapeFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbSpaceballButtonFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbTabletMotionFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbKeyboardFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbKeyboardUpFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbMenuStatusFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbSpaceballMotionFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbSpaceballRotateFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbSpecialFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbSpecialUpFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbMouseFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbMouseWheelFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbTabletButtonFunc'
-    push glutcb_funcs, 'vJP'
+    push glutcb_funcs, 'void,ptr,PMC'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbTimerFunc'
-    push glutcb_funcs, 'vJPii'
+    push glutcb_funcs, 'void,ptr,PMC,int,int'
+    push glutcb_funcs, ''
     push glutcb_funcs, 'glutcbJoystickFunc'
-    push glutcb_funcs, 'vJPi'
+    push glutcb_funcs, 'void,ptr,PMC,int'
+    push glutcb_funcs, ''
 
     .return (glutcb_funcs)
 .end
@@ -905,11 +906,18 @@ SUB_HEADER
 
         my @funcs = sort {$a->[0] cmp $b->[0]} @{$funcs{$group}};
         foreach my $func (@funcs) {
-            my ($name, $sig) = @$func;
+            my ($name, $sig, $cstr) = @$func;
+
+            my $sig_str  = join ',', @$sig;
+            my $cstr_str = do {
+                my $i = -1;
+                join ',', map $_->[1], grep $_->[0], map [$_, $i++], @$cstr;
+            };
 
             print $funcs <<"FUNCTION"
     push $list_name, '$name'
-    push $list_name, '$sig'
+    push $list_name, '$sig_str'
+    push $list_name, '$cstr_str'
 FUNCTION
         }
         print $funcs <<"SUB_FOOTER";

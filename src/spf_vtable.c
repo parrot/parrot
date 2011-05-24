@@ -33,7 +33,7 @@ retrieve arguments.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING * getchr_pmc(PARROT_INTERP,
-    SHIM(INTVAL size),
+    INTVAL size,
     ARGMOD(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
@@ -42,7 +42,7 @@ static STRING * getchr_pmc(PARROT_INTERP,
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING * getchr_va(PARROT_INTERP,
-    SHIM(INTVAL size),
+    INTVAL size,
     ARGIN(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -78,22 +78,20 @@ static HUGEINTVAL getint_va(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static void * getptr_pmc(PARROT_INTERP,
-    SHIM(INTVAL size),
+    INTVAL size,
     ARGIN(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static void * getptr_va(SHIM_INTERP,
-    SHIM(INTVAL size),
-    ARGIN(SPRINTF_OBJ *obj))
+static void * getptr_va(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * getstring_pmc(PARROT_INTERP,
-    SHIM(INTVAL size),
+    INTVAL size,
     ARGIN(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);

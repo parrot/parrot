@@ -298,8 +298,7 @@ Reverse lookup a constant in the constant table.
 
 PARROT_EXPORT
 int
-PackFile_ConstTable_rlookup_num(PARROT_INTERP,
-    ARGIN(const PackFile_ConstTable *ct), FLOATVAL n)
+PackFile_ConstTable_rlookup_num(SHIM_INTERP, ARGIN(const PackFile_ConstTable *ct), FLOATVAL n)
 {
     ASSERT_ARGS(PackFile_ConstTable_rlookup_num)
     int i;
@@ -322,7 +321,7 @@ PackFile_ConstTable_rlookup_str(PARROT_INTERP,
     int i;
 
     if (ct->string_hash) {
-        HashBucket *bucket = Parrot_hash_get_bucket(interp, ct->string_hash, s);
+        const HashBucket * const bucket = Parrot_hash_get_bucket(interp, ct->string_hash, s);
         if (bucket) {
             i = (int)PTR2INTVAL(bucket->value);
             return i;
@@ -332,8 +331,7 @@ PackFile_ConstTable_rlookup_str(PARROT_INTERP,
 
     for (i = 0; i < ct->str.const_count; i++) {
         STRING * const sc = ct->str.constants[i];
-        if (STRING_equal(interp, s, sc)
-        &&  s->encoding == sc->encoding) {
+        if ((s->encoding == sc->encoding) && STRING_equal(interp, s, sc)) {
             return i;
         }
     }

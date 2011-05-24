@@ -225,7 +225,7 @@ void PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_dbg_get_exception_backtrace(PARROT_INTERP,
     ARGMOD(PMC * exception))
         __attribute__nonnull__(1)
@@ -277,7 +277,7 @@ void PDB_disable_breakpoint(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
+void PDB_disassemble(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         __attribute__nonnull__(1);
 
 size_t PDB_disassemble_op(PARROT_INTERP,
@@ -335,7 +335,7 @@ void PDB_help(PARROT_INTERP, ARGIN(const char *command))
 void PDB_info(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void PDB_init(PARROT_INTERP, SHIM(const char *command))
+void PDB_init(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         __attribute__nonnull__(1);
 
 void PDB_list(PARROT_INTERP, ARGIN(const char *command))

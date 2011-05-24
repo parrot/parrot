@@ -22,9 +22,9 @@ C<PtrObj> is for object-ish pointers. These augment C<PtrBuf> to afford memory m
 /* HEADERIZER END: static */
 
 BEGIN_PMC_HEADER_PREAMBLE
-typedef PMC *(*ptrobj_clone_func_t)(PARROT_INTERP, PMC *, void *);
-typedef void (*ptrobj_mark_func_t)(PARROT_INTERP, PMC *, void *);
-typedef void (*ptrobj_destroy_func_t)(PARROT_INTERP, PMC *, void *);
+typedef PMC *(*ptrobj_clone_func_t)(PARROT_INTERP, ARGIN(PMC *), ARGIN(void *));
+typedef void (*ptrobj_mark_func_t)(PARROT_INTERP, ARGIN(PMC *), ARGIN(void *));
+typedef void (*ptrobj_destroy_func_t)(PARROT_INTERP, ARGIN(PMC *), ARGIN(void *));
 
 #define PTROBJ_SET_CLONE(i, p, c) do { \
     SETATTR_PtrObj_clone((i), (p), (c)); \
@@ -81,7 +81,7 @@ Get or set the custom C<clone> function.
 
     METHOD clone_func(PMC *func :optional, INTVAL has_func :opt_flag) {
         if (has_func) {
-            void *f = VTABLE_get_pointer(INTERP, func);
+            void * const f = VTABLE_get_pointer(INTERP, func);
             PTROBJ_SET_CLONE(INTERP, SELF, (ptrobj_clone_func_t)f);
             RETURN();
         }
@@ -119,7 +119,7 @@ Get or set the custom C<mark> function.
 
     METHOD mark_func(PMC *func :optional, INTVAL has_func :opt_flag) {
         if (has_func) {
-            void *f = VTABLE_get_pointer(INTERP, func);
+            void * const f = VTABLE_get_pointer(INTERP, func);
             PTROBJ_SET_MARK(INTERP, SELF, (ptrobj_mark_func_t)f);
             RETURN();
         }
@@ -157,7 +157,7 @@ Get or set the custom C<destroy> function.
 
     METHOD destroy_func(PMC *func :optional, INTVAL has_func :opt_flag) {
         if (has_func) {
-            void *f = VTABLE_get_pointer(INTERP, func);
+            void * const f = VTABLE_get_pointer(INTERP, func);
             PTROBJ_SET_DESTROY(INTERP, SELF, (ptrobj_destroy_func_t)f);
             RETURN();
         }

@@ -136,7 +136,7 @@ STRING * Parrot_key_string(PARROT_INTERP, ARGIN(PMC *key))
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_key_type(SHIM_INTERP, ARGIN(const PMC *key))
+INTVAL Parrot_key_type(PARROT_INTERP, ARGIN(const PMC *key))
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_Parrot_key_append __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

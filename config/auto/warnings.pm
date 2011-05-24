@@ -101,6 +101,7 @@ sub _init {
     my @gcc_or_gpp = qw(
         -falign-functions=16
         -funit-at-a-time
+        -fexcess-precision=standard
         -maccumulate-outgoing-args
         -W
         -Wall
@@ -234,6 +235,7 @@ sub _init {
         -Wformat
         -Wformat-security
         -Wmain
+        -Wmaybe-uninitialized
         -Wmissing-declarations
         -Wmissing-prototypes
         -Wpointer-arith

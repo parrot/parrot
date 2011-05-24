@@ -239,7 +239,6 @@ sub _get_special {
         languages/t/harness                             [test]
         lib/File/Which.pm                               [devel]lib
         parrot-config                                   [main]bin
-        src/ops/ops.num                                 [devel]src
         src/vtable.tbl                                  [devel]src
         tools/build/ops2c.pl                            [devel]
         tools/build/pmc2c.pl                            [devel]

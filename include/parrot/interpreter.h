@@ -91,9 +91,9 @@ struct parrot_interp_t;
 
 /* One of the most common shim arguments is the interpreter itself, so it
  * gets its own macro. */
-#define PARROT_INTERP /*@notnull@*/ /*@in@*/ Parrot_Interp interp
-#define NULLOK_INTERP /*@null@*/    /*@in@*/ Parrot_Interp interp
-#define SHIM_INTERP   /*@unused@*/ /*@notnull@*/ Parrot_Interp interp_unused __attribute__unused__
+#define PARROT_INTERP /*@notnull@*/ /*@in@*/ ARGMOD(Parrot_Interp interp)
+#define NULLOK_INTERP /*@null@*/    /*@in@*/ ARGMOD(Parrot_Interp interp)
+#define SHIM_INTERP   /*@unused@*/ /*@notnull@*/ ARGIN(Parrot_Interp interp_unused) __attribute__unused__
 
 
 #ifdef PARROT_IN_CORE
@@ -134,11 +134,6 @@ typedef Parrot_Run_core_t Run_Cores;
 typedef struct warnings_t {
     Warnings_classes classes;
 } *Warnings;
-
-/* Forward declaration for imc_info_t -- the actual struct is
- * defined in imcc/imc.h */
-struct _imc_info_t;
-
 
 struct _Thread_data;    /* in thread.h */
 struct _Caches;         /* caches .h */
@@ -198,9 +193,8 @@ struct parrot_interp_t {
     size_t             resume_offset;
 
     PackFile_ByteCode  *code;                 /* The code we are executing */
-    struct PackFile    *initial_pf;           /* first created PF  */
+    PMC                *current_pf;           /* Current PF  */
 
-    struct _imc_info_t *imc_info;             /* imcc data */
     Hash               *op_hash;              /* mapping from op names to op_info_t */
 
     PDB_t *pdb;                               /* debug /trace system */
@@ -292,27 +286,11 @@ typedef enum {
 } iglobals_enum;
 /* &end_gen */
 
-/* TODO - Make this a config option */
-#ifndef PARROT_CATCH_NULL
-#  ifdef S_SPLINT_S
-#    define PARROT_CATCH_NULL 0
-#  else
-#    define PARROT_CATCH_NULL 1
-#  endif
-#endif
+PARROT_DATA STRING *STRINGNULL; /* a single null STRING */
+#define STRING_IS_NULL(s) ((s) == STRINGNULL || (s) == NULL)
 
-/* Maybe PMC_IS_NULL(interp, pmc) ? */
-#if PARROT_CATCH_NULL
-PARROT_DATA PMC    *PMCNULL;    /* Holds single Null PMC */
-PARROT_DATA STRING *STRINGNULL; /* a single Null STRING */
-#  define PMC_IS_NULL(pmc)  ((pmc) == PMCNULL || (pmc) == NULL)
-#  define STRING_IS_NULL(s) ((s) == STRINGNULL || (s) == NULL)
-#else
-#  define PMCNULL ((PMC *)NULL)
-#  define STRINGNULL ((STRING *)NULL)
-#  define PMC_IS_NULL(pmc)       ((pmc) == NULL)
-#  define STRING_IS_NULL(string) ((string) == NULL)
-#endif /* PARROT_CATCH_NULL */
+PARROT_DATA PMC *PMCNULL;    /* Holds single null PMC */
+#define PMC_IS_NULL(pmc)  ((pmc) == PMCNULL || (pmc) == NULL)
 
 #define STRING_IS_EMPTY(s) ((s)->strlen == 0)
 
@@ -370,9 +348,7 @@ void Parrot_destroy(PARROT_INTERP)
 PARROT_CAN_RETURN_NULL
 Interp* Parrot_get_emergency_interp(void);
 
-void Parrot_really_destroy(PARROT_INTERP,
-    NULLOK(int exit_code),
-    SHIM(void *arg))
+void Parrot_really_destroy(PARROT_INTERP, int exit_code, void *arg)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_allocate_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -466,13 +442,11 @@ STRING* interpinfo_s(PARROT_INTERP, INTVAL what)
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-void * Parrot_compile_file(PARROT_INTERP,
+PMC * Parrot_compile_file(PARROT_INTERP,
     ARGIN(STRING *fullname),
-    ARGOUT(STRING **error))
+    INTVAL is_pasm)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*error);
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 void Parrot_compreg(PARROT_INTERP,
@@ -488,6 +462,11 @@ PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+Interp * Parrot_int_get_interp_from_pmc(ARGIN(PMC * interp_pmc))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 void Parrot_mark_method_writes(PARROT_INTERP,
@@ -534,8 +513,7 @@ void register_nci_method(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(fullname) \
-    , PARROT_ASSERT_ARG(error))
+    , PARROT_ASSERT_ARG(fullname))
 #define ASSERT_ARGS_Parrot_compreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(type) \
@@ -543,6 +521,9 @@ void register_nci_method(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_get_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(type))
+#define ASSERT_ARGS_Parrot_int_get_interp_from_pmc \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp_pmc))
 #define ASSERT_ARGS_Parrot_mark_method_writes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))

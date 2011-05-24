@@ -1,4 +1,4 @@
-#! parrot-nqp
+#! ./parrot-nqp
 
 Q:PIR {
     # We want Test::More features for testing. Not NQP's builtin.

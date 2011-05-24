@@ -449,7 +449,7 @@ Sets the default encoding to C<encoding> with name C<encodingname>.
 
 PARROT_EXPORT
 INTVAL
-Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
+Parrot_make_default_encoding(SHIM_INTERP, ARGIN(SHIM(const char *encodingname)),
         ARGIN(STR_VTABLE *encoding))
 {
     ASSERT_ARGS(Parrot_make_default_encoding)

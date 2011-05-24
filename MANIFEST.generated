@@ -1,11 +1,11 @@
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
-blib/lib/libparrot.3.2.0.dylib                   [main]lib
+blib/lib/libparrot.3.4.0.dylib                   [main]lib
 blib/lib/libparrot.a                             [main]lib
 blib/lib/libparrot.dylib                         [main]lib
 blib/lib/libparrot.so                            [main]lib
-blib/lib/libparrot.so.3.2.0                      [main]lib
+blib/lib/libparrot.so.3.4.0                      [main]lib
 compilers/data_json/data_json.pbc                [data_json]
 config/gen/call_list/opengl.in                   []
 docs/ops/bit.pod                                 [doc]
@@ -70,6 +70,7 @@ include/pmc/pmc_imageiofreeze.h                  [devel]include
 include/pmc/pmc_imageiosize.h                    [devel]include
 include/pmc/pmc_imageiostrings.h                 [devel]include
 include/pmc/pmc_imageiothaw.h                    [devel]include
+include/pmc/pmc_imccompiler.h                    [devel]include
 include/pmc/pmc_integer.h                        [devel]include
 include/pmc/pmc_iterator.h                       [devel]include
 include/pmc/pmc_key.h                            [devel]include
@@ -233,6 +234,7 @@ runtime/parrot/include/iterator.pasm             [main]
 runtime/parrot/include/libpaths.pasm             [main]
 runtime/parrot/include/longopt.pasm              [main]
 runtime/parrot/include/opengl_defines.pasm       [main]
+runtime/parrot/include/parrot_version.pir        [main]
 runtime/parrot/include/parrotlib.pbc             [main]
 runtime/parrot/include/pmctypes.pasm             [main]
 runtime/parrot/include/signal.pasm               [main]
@@ -376,6 +378,7 @@ src/pmc/imageiofreeze.dump                       [devel]src
 src/pmc/imageiosize.dump                         [devel]src
 src/pmc/imageiostrings.dump                      [devel]src
 src/pmc/imageiothaw.dump                         [devel]src
+src/pmc/imccompiler.dump                         [devel]src
 src/pmc/integer.dump                             [devel]src
 src/pmc/iterator.dump                            [devel]src
 src/pmc/key.dump                                 [devel]src
@@ -439,5 +442,4 @@ src/pmc/unmanagedstruct.dump                     [devel]src
 src/string_private_cstring.h                     []
 tools/build/dynpmc.pl                            []
 tools/dev/mk_language_shell.pl                   [devel]
-tools/dev/ncidef2pir.pl                          [devel]
 vtable.dump                                      [devel]src

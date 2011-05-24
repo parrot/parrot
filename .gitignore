@@ -251,6 +251,7 @@
 /runtime/parrot/include/*.fpmc
 /runtime/parrot/include/*.pasm
 /runtime/parrot/include/*.pbc
+/runtime/parrot/include/*.pir
 /runtime/parrot/languages/JSON/JSON.pir
 /runtime/parrot/languages/data_json
 /runtime/parrot/library/*.pbc
@@ -386,10 +387,6 @@
 /t/compilers/data_json/*.pir
 /t/compilers/data_json/*_pbcexe
 /t/compilers/imcc/*.pbc
-/t/compilers/imcc/imcpasm/*.pasm
-/t/compilers/imcc/imcpasm/*.pbc
-/t/compilers/imcc/imcpasm/*.pir
-/t/compilers/imcc/imcpasm/*_pbcexe
 /t/compilers/imcc/reg/*.pasm
 /t/compilers/imcc/reg/*.pbc
 /t/compilers/imcc/reg/*.pir

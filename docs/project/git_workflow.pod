@@ -14,7 +14,7 @@ does one thing, so that it makes it easier to accept/revert some things while
 keeping others. Git provides many powerful tools in the maintenance of
 branches. This document aims to provide everything a Parrot developer needs to
 know about Git to successfully create a branch, work on it, keep it in sync
-with changes on master and finally merge the branch.
+with changes on master and finally merge the branch (or send a pull request).
 
 =head2 Cloning the Git Repository
 

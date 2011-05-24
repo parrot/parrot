@@ -36,10 +36,9 @@ void Parrot_gbl_set_config_hash_internal(
     unsigned int parrot_config_size)
         __attribute__nonnull__(1);
 
-void Parrot_set_config_hash_pmc(PARROT_INTERP, ARGMOD(PMC * config))
+void Parrot_set_config_hash_pmc(PARROT_INTERP, ARGIN(PMC *config))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(* config);
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_init_world __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

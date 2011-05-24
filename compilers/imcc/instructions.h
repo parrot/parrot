@@ -71,19 +71,6 @@ typedef enum {
 } Instruction_Flags;
 #undef INSTRUCTION_BIT
 
-/* Functions */
-/* Globals */
-
-typedef struct _emittert {
-    int (*open)(PARROT_INTERP, void *param);
-    int (*emit)(PARROT_INTERP, void *param, const IMC_Unit *, const Instruction *ins);
-    int (*new_sub)(PARROT_INTERP, void *param, IMC_Unit *);
-    int (*end_sub)(PARROT_INTERP, void *param, IMC_Unit *);
-    int (*close)(PARROT_INTERP, void *param);
-} Emitter;
-
-enum Emitter_type { EMIT_FILE, EMIT_PBC };
-
 /* HEADERIZER BEGIN: compilers/imcc/instructions.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -114,23 +101,29 @@ Instruction * delete_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*ins);
 
-int emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
-        __attribute__nonnull__(1);
+void emit_close(ARGMOD(imc_info_t *imcc), ARGIN_NULLOK(void *param))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*imcc);
 
-int emit_flush(PARROT_INTERP,
+void emit_flush(
+    ARGMOD(imc_info_t * imcc),
     ARGIN_NULLOK(void *param),
     ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc);
 
-int emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
-        __attribute__nonnull__(1);
+void emit_open(ARGMOD(imc_info_t * imcc))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(* imcc);
 
 PARROT_CAN_RETURN_NULL
-Instruction * emitb(PARROT_INTERP,
+Instruction * emitb(
+    ARGMOD(imc_info_t * imcc),
     ARGMOD_NULLOK(IMC_Unit *unit),
     ARGIN_NULLOK(Instruction *i))
         __attribute__nonnull__(1)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit);
 
 void free_ins(ARGMOD(Instruction *ins))
@@ -147,11 +140,13 @@ int get_branch_regno(ARGIN(const Instruction *ins))
 
 PARROT_IGNORABLE_RESULT
 int /*@alt void@*/
-ins_print(PARROT_INTERP,
+ins_print(
+    ARGMOD(imc_info_t * imcc),
     PIOHANDLE io,
     ARGIN(const Instruction *ins))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc);
 
 void insert_ins(
     ARGMOD(IMC_Unit *unit),
@@ -218,14 +213,14 @@ void subst_ins(
        PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(ins))
 #define ASSERT_ARGS_emit_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_emit_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_emit_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_emitb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_free_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ins))
 #define ASSERT_ARGS_get_branch_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -233,7 +228,7 @@ void subst_ins(
 #define ASSERT_ARGS_get_branch_regno __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ins))
 #define ASSERT_ARGS_ins_print __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(ins))
 #define ASSERT_ARGS_insert_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit) \

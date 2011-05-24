@@ -25,7 +25,7 @@ TODO: Add description here.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CONST_FUNCTION
-static size_t calculate_capacity(SHIM_INTERP, size_t needed);
+static size_t calculate_capacity(PARROT_INTERP, size_t needed);
 
 #define ASSERT_ARGS_calculate_capacity __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -155,7 +155,6 @@ Append string to current buffer.
     VTABLE void push_string(STRING *s) {
         STRING           *buffer;
         size_t            total_size;
-        const STR_VTABLE *enc;
 
         /* Early return on NULL strings */
         if (STRING_IS_NULL(s))
@@ -170,7 +169,7 @@ Append string to current buffer.
             buffer->encoding = s->encoding;
         }
         else {
-            enc = Parrot_str_rep_compatible(interp, buffer, s);
+            const STR_VTABLE * const enc = Parrot_str_rep_compatible(interp, buffer, s);
 
             if (enc) {
                 buffer->encoding = enc;

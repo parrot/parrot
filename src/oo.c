@@ -30,7 +30,7 @@ Handles class and object manipulation.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC* C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -48,7 +48,7 @@ static INTVAL fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
         __attribute__nonnull__(2);
 
 PARROT_INLINE
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC * get_pmc_proxy(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
@@ -207,7 +207,7 @@ major way
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
@@ -359,7 +359,7 @@ For internal use only.
 */
 
 PARROT_INLINE
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC *
 get_pmc_proxy(PARROT_INTERP, INTVAL type)
@@ -404,7 +404,7 @@ return it. Otherwise, create a new PMCProxy for the type ID number.
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_get_class_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
@@ -441,7 +441,7 @@ Create a new Class PMC for a new type of the given C<name>.
 
 */
 
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_newclass_from_str(PARROT_INTERP, ARGIN(STRING *name))
@@ -501,7 +501,7 @@ from parents.
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_find_vtable_override(PARROT_INTERP,
@@ -907,7 +907,7 @@ interpreter, and name of the method. Don't use a possible method cache.
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *method_name))
@@ -1038,7 +1038,7 @@ Merge together the MRO of the items in the list.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC*
 C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
 {
@@ -1141,7 +1141,7 @@ F<http://192.220.96.201/dylan/linearization-oopsla96.html>
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
 {

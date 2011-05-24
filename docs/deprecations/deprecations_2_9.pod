@@ -1,0 +1,200 @@
+# Copyright (C) 2011, Parrot Foundation.
+
+=head1 NAME
+
+docs/deprecations/deprecations_2_9.pod - Parrot Deprecations for 2.9
+
+=head1 Parrot Deprecations for 2.9
+
+=head2 Remove charset opcodes and fixed_8 encoding
+
+=head3 Description
+
+Charsets have been merged into encodings. The charset opcodes and the fixed_8
+encoding will be removed.
+
+=head3 Rational
+
+After the charset/encoding merge, they're unneeded.
+
+=head3 Replacment
+
+Use the corresponding encoding opcodes instead.
+
+    /* old code */
+    $I0 = charset $S0
+    $S1 = charsetname $I0
+    $I1 = find_charset "ascii"
+    $S2 = trans_charset $S0, $I1
+
+    /* updated code */
+    $I0 = encoding $S0
+    $S1 = encodingname $I0
+    $I1 = find_encoding "ascii"
+    $S2 = trans_encoding $S0, $I1
+
+The list of supported encodings is:
+
+    ascii
+    iso-8859-1
+    binary
+    utf8
+    utf16
+    ucs2
+    ucs4
+
+Use the 'utf8' encoding instead of the 'unicode' charset. The 'fixed_8'
+encoding is also going away. Use 'ascii' instead.  If you want to test
+for a fixed_8 encoding, you have to compare the encoding to 'ascii',
+'iso-8859-1' and 'binary' separately.
+
+=head2 Remove Parrot_PCCINVOKE
+
+=head3 Description
+
+The C function Parrot_PCCINVOKE has been removed.
+
+See TT #443 and [wiki:PCCMigrationNotes] for details.
+
+=head3 Rational
+
+This function didn't conform to Parrot's naming conventions.
+
+=head3 Replacment
+
+Use Parrot_pcc_invoke_method_from_c_arg instead.
+
+A simple textual substitution is enough to update any code that depends on this
+function.
+
+    /* old code */
+    Parrot_PCCINVOKE(interp, interp->scheduler, CONST_STRING(interp, "count_handlers"), "S->I", handler_type, &count);
+
+    /* updated code */
+    Parrot_pcc_invoke_method_from_c_args(interp, interp->scheduler, CONST_STRING(interp, "count_handlers"), "S->I", handler_type, &count);
+
+See r42129 for more examples.
+
+=head2 Remove Parrot_find_global_s and Parrot_store_global_s
+
+=head3 Description
+
+Parrot_find_global_s and Parrot_store_global_s were removed after they were
+found to be unused.
+
+=head3 Rational
+
+Nothing in Parrot used them and they were therefore untested.
+
+=head3 Replacment
+
+Use the body of one of the old functions in place of its call.
+
+    /* old code */
+    XXX: insert code here
+
+    /* updated code */
+    XXX: insert code here
+
+See r48435 (src/namespace.c changes) for an example of what to replace calls to
+these functions with.
+
+See r42129 for more example
+
+=head2 Change behavior of find_lex opcode
+
+=head3 Description
+
+The find_lex opcode no longer throws an exception when the lexical is not
+found; it returns PMCNULL instead.
+
+=head3 Rational
+
+This is consistent with the other "lookup" opcodes.
+
+=head3 Replacment
+
+If you want to throw an exception, you must check the result of the opcode and
+throw the exception explicitly.
+
+=head2 Remove CodeString PMC
+
+=head3 Description
+
+The CodeString pmc has  been removed.
+
+See TT #1633
+
+=head3 Rational
+
+With the switch to immutable strings, CodeString became very expensive, as it
+did a lot of string concatenations.
+
+=head3 Replacment
+
+As a replacement for the .emit() functionality, instead use .append_format() in
+StringBuilder.  Only difference from emit() is that newlines are not
+automatically appended, so you'll have to add them manually.
+
+Charname_to_ord is now an opcode: find_codepoint.
+
+The other methods that were provided are now part of PCT (and are probably not
+needed directly).
+
+=head2 Eliminate Raw NCI
+
+=head3 Description
+
+It is no longer possible to create an NCI pmc without a corresponding NCI
+signature.
+
+See TT #1549
+
+=head3 Rational
+
+This functionality abused the NCI and went against the initial purpose
+- bridging the gap between parrot and C by translating calling conventions.
+
+This was error prone, generally leading to segfaults.
+
+=head3 Replacment
+
+If you must have an equivalent, take a look at NativePCCMethod. Otherwise,
+enjoy the fact that your segfaults are now most likely "not implemented"
+errors.
+
+=head2 GetRuntimePrefix
+
+=head3 Description
+
+The function Parrot_get_runtime_prefix has been removed.
+
+See TT #1191
+
+=head3 Rational
+
+It returned a char * instead of a Parrot string.
+
+A new function provides better functionality and there is no need to keep this.
+
+=head3 Replacment
+
+Parrot_get_runtime_path
+
+=head2 RemoveIsTty
+
+=head3 Description
+
+The method is_tty in several Handle PMCs has been removed.
+
+See TT #1689
+
+=head3 Rational
+
+There was a inconsistency, some PMCs used is_tty and others isatty. The decision was to keep isatty.
+
+=head3 Replacment
+
+Use isatty.
+
+=cut

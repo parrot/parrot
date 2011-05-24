@@ -114,7 +114,7 @@ successful and false value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_pmc_null(ARGIN(Parrot_PMC interp_pmc), ARGMOD(Parrot_PMC *pmctonull))
+Parrot_api_pmc_null(ARGIN(Parrot_PMC interp_pmc), ARGOUT(Parrot_PMC *pmctonull))
 {
     ASSERT_ARGS(Parrot_api_pmc_null)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -455,6 +455,27 @@ Parrot_api_pmc_box_integer(Parrot_PMC interp_pmc, Parrot_Int value,
 }
 
 /* TODO: Box float */
+
+/*
+
+=item C<Parrot_Int Parrot_api_pmc_push(Parrot_PMC interp_pmc, Parrot_PMC pmc,
+Parrot_PMC item)>
+
+Push a PMC C<item> onto aggregate PMC C<pmc>.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_push(Parrot_PMC interp_pmc, Parrot_PMC pmc, Parrot_PMC item)
+{
+    ASSERT_ARGS(Parrot_api_pmc_push)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    VTABLE_push_pmc(interp, pmc, item);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
 
 /*
 

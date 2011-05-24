@@ -310,8 +310,7 @@ descriptor to the memory starting at C<buffer>.
 */
 
 size_t
-Parrot_io_read(PARROT_INTERP, PIOHANDLE os_handle,
-        ARGMOD(char *buf), size_t len)
+Parrot_io_read(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(char *buf), size_t len)
 {
     DWORD countread;
     BOOL  success = ReadFile(os_handle, (LPVOID)buf, (DWORD)len,

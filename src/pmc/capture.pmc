@@ -72,6 +72,9 @@ Creates an identical copy of the Capture.
             SET_ATTR_hash(INTERP, dest, hash);
         }
 
+        /* clone of parts can trigger GC. Explicitely WB dest */
+        PARROT_GC_WRITE_BARRIER(INTERP, dest);
+
         return dest;
     }
 
@@ -821,7 +824,7 @@ Freeze/thaw Capture
 
 */
 
-    METHOD list() {
+    METHOD list() :manual_wb {
         PMC *array;
         PMC *capt;
 
@@ -843,7 +846,7 @@ Freeze/thaw Capture
         RETURN(PMC *array);
     }
 
-    METHOD hash() {
+    METHOD hash() :manual_wb {
         PMC *hash;
         PMC *capt;
         /* XXX:  This workaround is for when we get here as

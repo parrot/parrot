@@ -74,16 +74,15 @@ Parrot_sysmem_amount(PARROT_INTERP)
      * the header sys/sysctl.h and the appropriate constants.
      */
 
-    int           err = 0;
-    char         *err_msg;
-    unsigned long length = sizeof (memsize);
+    int err;
+    size_t length = sizeof (memsize);
 
     int selection[2] = { CTL_HW, HW_PHYSMEM };
 
     err = sysctl(selection, 2, &memsize, &length, NULL, 0);
 
     if (err) {
-        err_msg = strerror(err);
+        const char * const err_msg = strerror(err);
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
                 "sysctl failed: %s", err_msg);
     }

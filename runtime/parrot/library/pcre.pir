@@ -46,6 +46,7 @@ and is additionally stored as global 'PCRE', 'lib'.
 
 .loadlib 'sys_ops'
 .include "sysinfo.pasm"
+.include 'datatypes.pasm'
 
 .sub init
     .local pmc libpcre
@@ -107,23 +108,52 @@ LIB_LOADED:
     # pcre *pcre_compile(const char *pattern, int options,
     #            const char **errptr, int *erroffset,
     #            const unsigned char *tableptr
-    dlfunc pcre_function, libpcre, 'pcre_compile', 'ptiB3P'
+    $P0 = new ['FixedIntegerArray'], 6
+    $P0[0] = .DATATYPE_PTR                      # pcre*
+    $P0[1] = .DATATYPE_PTR                      # const char *pattern
+    $P0[2] = .DATATYPE_INT                      # int options
+    $I0    = .DATATYPE_PTR | .DATATYPE_REF_FLAG
+    $P0[3] = $I0                                # const char **errptr
+    $I0    = .DATATYPE_INT | .DATATYPE_REF_FLAG
+    $P0[4] = $I0                                # int *erroffset
+    $P0[5] = .DATATYPE_PTR                      # const unsigned char *tableptr
+    pcre_function = dlfunc libpcre, 'pcre_compile', $P0
     set_hll_global ['PCRE'; 'NCI'], 'PCRE_compile', pcre_function
 
     #int pcre_exec(const pcre *code, const pcre_extra *extra,
     #        const char *subject, int length, int startoffset,
     #        int options, int *ovector, int ovecsize);
-    dlfunc pcre_function, libpcre, 'pcre_exec', 'ipPtiiipi'
+    $P0 = new ['FixedIntegerArray'], 9
+    $P0[0] = .DATATYPE_INT # int
+    $P0[1] = .DATATYPE_PTR # const pcre *code
+    $P0[2] = .DATATYPE_PTR # const pcre_extra *extra
+    $P0[3] = .DATATYPE_PTR # const char *subject
+    $P0[4] = .DATATYPE_INT # int length
+    $P0[5] = .DATATYPE_INT # int startoffset
+    $P0[6] = .DATATYPE_INT # int options
+    $P0[7] = .DATATYPE_PTR # int *ovector
+    $P0[8] = .DATATYPE_INT # int ovecsize
+    dlfunc pcre_function, libpcre, 'pcre_exec', $P0
     set_hll_global ['PCRE'; 'NCI'], 'PCRE_exec', pcre_function
 
     #int pcre_copy_substring(const char *subject, int *ovector,
     #        int stringcount, int stringnumber, char *buffer,
     #        int buffersize);
-    dlfunc pcre_function, libpcre, 'pcre_copy_substring', 'itpiibi'
+    $P0 = new ['FixedIntegerArray'], 7
+    $P0[0] = .DATATYPE_INT # int
+    $P0[1] = .DATATYPE_PTR # const char *subject
+    $P0[2] = .DATATYPE_PTR # int *ovector
+    $P0[3] = .DATATYPE_INT # int stringcount
+    $P0[4] = .DATATYPE_INT # int stringnumber
+    $P0[5] = .DATATYPE_PTR # char *buffer
+    $P0[6] = .DATATYPE_INT # buffersize
+    dlfunc pcre_function, libpcre, 'pcre_copy_substring', $P0
     set_hll_global ['PCRE'; 'NCI'], 'PCRE_copy_substring', pcre_function
 
     # const char *pcre_version(void);
-    dlfunc pcre_function, libpcre, 'pcre_version', 't'
+    $P0 = new ['FixedIntegerArray'], 1
+    $P0[0] = .DATATYPE_PTR
+    dlfunc pcre_function, libpcre, 'pcre_version', $P0
     set_hll_global ['PCRE'; 'NCI'], 'PCRE_version', pcre_function
 
     .return( libpcre )

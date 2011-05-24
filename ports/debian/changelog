@@ -1,3 +1,38 @@
+parrot (3.3.0-1) unstable; urgency=low
+  * New upstream release (Closes: #612664)
+  * debian/control.in:
+    - Bumped Standards-Version to 3.9.2.
+  * debian/rules
+    - Patch from upstream explicitly sets mandir to /usr/share/man,
+      to comply with Debian policy (Closes: #610994)
+    - Updated locations of parrot_debugger, pbc_dump, and
+      pbc_merge in new release for manpage generation (patch from
+      Kyle Willmon and Dominique Dumont)
+    - Removed explicit references to quilt, patch application is
+      handled by dpkg-source with source package format "3.0 (quilt)"
+      (patch from Dominique Dumont)
+  * debian/patches:
+    - Removed 04_fix_opsc_man.patch, change included upstream (patch
+      from Kyle Willmon)
+    - Removed 05_fix_gc_ftbfs_ia64.patch, change included
+      upstream (patch from Kyle Willmon and Dominique Dumont)
+    - Added patch description to 03_fix_nqp_man.patch.
+  * debian/copyright:
+    - Updated the format to DEP5 (patch from Dominique Dumont)
+  * debian/source:
+    - Added source package format "3.0 (quilt)" (patch from Dominique
+      Dumont)
+  * debian/README.source:
+    - Removed, no longer needed with source package format "3.0 (quilt)"
+      (patch from Dominique Dumont)
+  * debian/parrot-devel.install:
+    - Removed runtime library Protoobject.pbc, no longer exists upstream.
+  * debian/parrot-doc:
+    - Replaced DEPRECATED.pod with api.yaml, filename and format
+      changed upstream.
+
+ -- Allison Randal <allison@parrot.org>  Sat, 30 Apr 2011 02:39:12 -0700
+
 parrot (2.9.1-1) unstable; urgency=low
   * New upstream release (Closes: #601704)
   * debian/rules:

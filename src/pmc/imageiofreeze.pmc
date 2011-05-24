@@ -273,6 +273,8 @@ Initializes the PMC.
 
 */
     VTABLE void init() {
+        PObj_custom_mark_SET(SELF);
+
         PARROT_IMAGEIOFREEZE(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
         VTABLE_set_pointer(INTERP, PARROT_IMAGEIOFREEZE(SELF)->seen,
             Parrot_hash_new_intval_hash(INTERP));
@@ -281,8 +283,6 @@ Initializes the PMC.
             Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
 
         PObj_flag_CLEAR(private1, SELF);
-
-        PObj_custom_mark_SET(SELF);
     }
 
 

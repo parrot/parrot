@@ -1,6 +1,7 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
 
 .include 'datatypes.pasm'
+.include 'parrot_version.pir'
 
 .sub 'main' :main
     get_params "(0)", $P5
