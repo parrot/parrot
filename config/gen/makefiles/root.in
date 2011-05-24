@@ -2002,6 +2002,7 @@ EXAMPLES_TEST_FILES = \
     t/examples/*.t
 M0_TEST_FILES = \
 	t/m0/m0_bytecode_loading.t \
+	t/m0/m0_assembler.t \
 	t/m0/m0_run_hello_m0b.t
 HEADERIZER_TEST_FILES = $(TOOLS_TESTS_DIR)/dev/headerizer/*.t
 LIBRARY_TEST_FILES = @library_tests@
