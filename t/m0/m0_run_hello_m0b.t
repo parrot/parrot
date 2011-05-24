@@ -17,13 +17,13 @@ t/m0/m0_run_hello_m0b.t - make sure t/m0/hello.m0b doesn't break
 
 =head1 DESCRIPTION
 
-Run hand-assembled hello.m0b.  
+Run the canonically "correct", hand-assembled hello_canon.m0b.
 
 =cut
 
 my $m0_interp = "$^X src/m0/m0_interp.pl";
 
-my $output = `$m0_interp t/m0/hello.m0b`;
+my $output = `$m0_interp t/m0/hello_canon.m0b`;
 
 is($output, "hello world\n", "hello world m0b works");
 
