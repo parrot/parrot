@@ -2,6 +2,8 @@ New in 3.5.0
 - Core
 - Languages
 - Tests
+  + The Parrot test suite harness now understands the HARNESS_TIMER environment
+    variable. Setting it to a true value will show timing results for a test run.
   + IPv6 tests are now parallel testing friendly
 
 New in 3.4.0
