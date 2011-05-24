@@ -196,8 +196,8 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "profiling"));
         else if (STREQ(corename, "gcdebug"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "gcdebug"));
-        else if (STREQ(corename, "pdb"))
-            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "pdb"));
+        else if (STREQ(corename, "hbdb"))
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "hbdb"));
         else
             Parrot_ex_throw_from_c_args(interp, NULL, 1, "Invalid runcore type %s", corename);
     }
