@@ -140,7 +140,7 @@ void Parrot_runcore_fast_init(PARROT_INTERP)
 void Parrot_runcore_gc_debug_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_runcore_pdb_init(PARROT_INTERP)
+void Parrot_runcore_hbdb_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void Parrot_runcore_slow_init(PARROT_INTERP)
@@ -156,7 +156,7 @@ void Parrot_runcore_slow_init(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_runcore_gc_debug_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_runcore_pdb_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_runcore_hbdb_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_runcore_slow_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
