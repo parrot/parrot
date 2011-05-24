@@ -4,16 +4,17 @@
 #include <stdlib.h>
 #include "parrot/api.h"
 
-/* TODO Check for command line arguments         */
-/* TODO Define usage() function */
+/* TODO Check for command line arguments */
+/* TODO Define usage() function          */
 
 int
 main(int argc, char *argv[])
 {
-    Parrot_PMC       interp;
-    Parrot_PMC       *pbc,
-                     *main_sub;
-    Parrot_Init_Args *initargs;
+    Parrot_PMC       interp    = NULL,
+                     pbc       = NULL,
+                     main_sub  = NULL;
+    Parrot_String    file      = NULL;
+    Parrot_Init_Args *initargs = NULL;
 
     /* Setup default initialization parameters */
     GET_INIT_STRUCT(initargs);
@@ -21,6 +22,13 @@ main(int argc, char *argv[])
     /* Create new interpreter */
     if (!Parrot_api_make_interpreter(NULL, 0, initargs, &interp)) {
         fprintf(stderr, "[ERROR] Failed to allocate new interpreter\n");
+        exit(EXIT_FAILURE);
+    }
+
+    /* TODO Check for argv[1] here and call usage() */
+    /* Get bytecode filename */
+    if (!Parrot_api_string_import_ascii(interp, argv[1], &file)) {
+        fprintf(stderr, "[ERROR] Bad filename\n");
         exit(EXIT_FAILURE);
     }
 
@@ -33,17 +41,16 @@ main(int argc, char *argv[])
     }
 
     /* Load bytecode file from command line */
-    /* NOTE Hardcoded string is just a test */
-    if (!Parrot_api_load_bytecode_file(interp, "parrot-nqp.pbc", pbc)) {
-        fprintf(stderr, "[ERROR] Failed to load bytecode in %s", argv[1]);
+    if (!Parrot_api_load_bytecode_file(interp, file, &pbc)) {
+        fprintf(stderr, "[ERROR] Failed to load bytecode in %s\n", argv[1]);
 
         Parrot_api_destroy_interpreter(interp);
         exit(EXIT_FAILURE);
     }
 
     /* Ready bytecode */
-    if (!Parrot_api_ready_bytecode(interp, pbc, main_sub)) {
-        fprintf(stderr, "[ERROR] Failed to prepare byte in %s", argv[1]);
+    if (!Parrot_api_ready_bytecode(interp, pbc, &main_sub)) {
+        fprintf(stderr, "[ERROR] Failed to prepare byte in %s\n", argv[1]);
 
         Parrot_api_destroy_interpreter(interp);
         exit(EXIT_FAILURE);
