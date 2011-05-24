@@ -1,0 +1,25 @@
+.version 0
+.chunk "label_with_goto_after"
+.variables
+0 1
+1 "1..1"
+2 "ok 1 goto works with a label defined after its use"
+3 "n"
+.metadata
+.bytecode
+# test that the assembler generate code for a goto 
+     # I0 = 1
+     set_var I0, 0, 0
+     # S0 = "1..1"
+     set_var S0, 0, 1
+     # S1 = "ok 1"...
+     set_var S1, 0, 2
+     # S2 = "n"
+     set_var S2, 0, 3
+
+     print_s I0, S0, x
+		 goto    no_n, x
+     print_s I0, S2, x
+
+no_n:
+     print_s I0, S1, x
