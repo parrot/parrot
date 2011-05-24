@@ -376,7 +376,7 @@ sub remove_junk {
 __DATA__
 0x00 noop
 0x01 goto
-0x02 goto_if_eq
+0x02 goto_if
 0x03 goto_chunk
 0x04 add_i
 0x05 add_n

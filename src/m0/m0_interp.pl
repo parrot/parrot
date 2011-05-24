@@ -100,7 +100,7 @@ sub new_interp {
     $interp->[OP_FUNCS] = [
         \&m0_opfunc_noop,
         \&m0_opfunc_goto,
-        \&m0_opfunc_goto_if_eq,
+        \&m0_opfunc_goto_if,
         \&m0_opfunc_goto_chunk,
         \&m0_opfunc_add_i,
         \&m0_opfunc_add_n,
@@ -230,9 +230,9 @@ sub m0_opfunc_goto {
     $ctx->[PC] = $offset;
 }
 
-sub m0_opfunc_goto_if_eq {
+sub m0_opfunc_goto_if {
     my ($ctx, $a1, $a2, $a3) = @_;
-    m0_say "goto_if_eq $a1, $a2, $a3";
+    m0_say "goto_if $a1, $a2, $a3";
 
     my $offset = $ctx->[$a1];
     my $v2 = $ctx->[$a2];
