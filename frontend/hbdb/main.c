@@ -5,7 +5,7 @@
 #include "parrot/api.h"
 
 /* TODO Check for command line arguments         */
-/* TODO Change all references to "pdb" to "hbdb" */
+/* TODO Define usage() function */
 
 int
 main(int argc, char *argv[])
@@ -33,7 +33,8 @@ main(int argc, char *argv[])
     }
 
     /* Load bytecode file from command line */
-    if (!Parrot_api_load_bytecode_file(interp, argv[1], pbc)) {
+    /* NOTE Hardcoded string is just a test */
+    if (!Parrot_api_load_bytecode_file(interp, "parrot-nqp.pbc", pbc)) {
         fprintf(stderr, "[ERROR] Failed to load bytecode in %s", argv[1]);
 
         Parrot_api_destroy_interpreter(interp);
