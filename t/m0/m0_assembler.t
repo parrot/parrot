@@ -40,6 +40,8 @@ output_like(
 ok(-e $hello_m0b, 'created hello.m0b');
 ok(-e $hello_m0b && -s $hello_m0b >= 16, 'hello.m0b is at least 16 bytes (size of M0 header)');
 
+is(-s $hello_m0b, 109, 'hello.m0 bytecode should be 109 bytes');
+
 my $hello_bc = slurp($hello_m0b);
 my $magic_number = substr($hello_bc, 0, 8);
 cmp_ok($magic_number, 'eq', "\376M0B\r\n\032\n", "m0b file has correct magic number");
