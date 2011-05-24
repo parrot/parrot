@@ -71,7 +71,7 @@ Parrot_runcore_init(PARROT_INTERP)
     Parrot_runcore_exec_init(interp);
     Parrot_runcore_gc_debug_init(interp);
     Parrot_runcore_debugger_init(interp);
-    Parrot_runcore_pdb_init(interp);
+    Parrot_runcore_hbdb_init(interp);
 
     Parrot_runcore_profiling_init(interp);
 

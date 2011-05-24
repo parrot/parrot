@@ -523,7 +523,7 @@ MINIPARROT          = .@slash@miniparrot$(EXE)
 DIS                 = .@slash@pbc_disassemble$(EXE)
 PDUMP               = .@slash@pbc_dump$(EXE)
 PBC_MERGE           = .@slash@pbc_merge$(EXE)
-PDB                 = .@slash@pdb$(EXE)
+HBDB                = .@slash@hbdb$(EXE)
 PBC_TO_EXE          = .@slash@pbc_to_exe$(EXE)
 PARROT_CONFIG       = .@slash@parrot_config$(EXE)
 NQP_RX              = .@slash@parrot-nqp$(EXE)
@@ -537,7 +537,7 @@ INSTALLABLEDIS       = .@slash@installable_pbc_disassemble$(EXE)
 INSTALLABLEPDUMP     = .@slash@installable_pbc_dump$(EXE)
 INSTALLABLEPBC_MERGE = .@slash@installable_pbc_merge$(EXE)
 INSTALLABLEPBCTOEXE  = .@slash@installable_pbc_to_exe$(EXE)
-INSTALLABLEPDB       = .@slash@installable_pdb$(EXE)
+INSTALLABLEHBDB      = .@slash@installable_hbdb$(EXE)
 INSTALLABLECONFIG    = .@slash@installable_parrot_config$(EXE)
 INSTALLABLENQP       = .@slash@installable_parrot-nqp$(EXE)
 INSTALLABLENCITHUNKGEN = .@slash@installable_parrot_nci_thunk_gen$(EXE)
@@ -615,7 +615,7 @@ all : \
     $(PARROT_CONFIG) \
     $(PBC_TO_EXE) \
     $(PBC_MERGE) \
-    $(PDB) \
+    $(HBDB) \
     $(PDUMP) \
     $(NQP_RX) \
     $(TGE_LIB_PBCS) \
@@ -740,11 +740,11 @@ help :
 	@echo "                     This is the default."
 	@echo ""
 	@echo "  parrot_utils:      ./pbc_dump, ./pbc_disassemble,"
-	@echo "                       ./parrot_debugger, ./pbc_merge,"
+	@echo "                       ./hbdb, ./pbc_merge,"
 	@echo "                       ./pbc_to_exe ./parrot_config"
 	@echo " ./pbc_dump:           Parrot Dumper"
 	@echo " ./pbc_disassemble:    Parrot Disassembler"
-	@echo " ./parrot_debugger:    Parrot Debugger"
+	@echo " ./hbdb:               Parrot Debugger"
 	@echo " ./pbc_merge:          Parrot configuration information"
 	@echo ""
 	@echo "  world:             'all' and 'parrot_utils'."
@@ -832,9 +832,9 @@ help :
 
 world : parrot_utils
 
-parrot_utils : all $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) src/install_config$(O) $(PROVE) $(OPS2C)
+parrot_utils : all $(PDUMP) $(DIS) $(HBDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) src/install_config$(O) $(PROVE) $(OPS2C)
 
-installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPROVE) $(INSTALLABLEOPS2C)
+installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEHBDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPROVE) $(INSTALLABLEOPS2C)
 
 bootstrap-ops : $(OPS2C)
 	$(OPS2C) --core --quiet
@@ -1044,62 +1044,23 @@ $(INSTALLABLEPROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
 # Parrot Debugger
 #
 
-frontend/pdb/main$(O) : \
+frontend/hbdb/main$(O) : \
     $(PARROT_H_HEADERS) \
-    frontend/pdb/main.c \
-    $(INC_DIR)/runcore_api.h \
-    $(INC_DIR)/embed.h
+    frontend/hbdb/main.c \
+    $(INC_DIR)/api.h
 
-$(PDB) : frontend/pdb/main$(O) src/parrot_config$(O) $(LIBPARROT)
+$(HBDB) : frontend/hbdb/main$(O) src/parrot_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
-    frontend/pdb/main$(O) \
+    frontend/hbdb/main$(O) \
     src/parrot_config$(O) \
     $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
-
-#$(PDB) : frontend/pdb/main$(O) src/parrot_config$(O) $(LIBPARROT)
-	#$(LINK) @ld_out@$@ \
-    #frontend/pdb/main$(O) \
-    #src/parrot_config$(O) \
-    #$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
-
-#frontend/pdb/main$(O) : \
-    #$(PARROT_H_HEADERS) \
-    #frontend/pdb/main.c \
-    #$(INC_DIR)/runcore_api.h \
-    #$(INC_DIR)/embed.h \
-    #$(INC_DIR)/api.h
-	#$(CC) -o $@ \
-	#frontend/pdb/main.c \
-	#-I $(INC_DIR)
-
-#$(PDB) : frontend/pdb/main.c $(GEN_HEADERS) $(LIBPARROT) \
-    #src/parrot_config$(O) src/longopt$(O)
-	#$(CC) -o $@ $< \
-	#$(PARROT_H_HEADERS) \
-	#$(INC_DIR)/runcore_api.h \
-	#$(INC_DIR)/embed.h \
-	#$(INC_DIR)/api.h \
-	#src/parrot_config$(O) src/longopt$(O) \
-	#$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
-
-#frontend/parrot_debugger/main$(O) : \
-    #$(PARROT_H_HEADERS) \
-    #frontend/parrot_debugger/main.c \
-    #$(INC_DIR)/runcore_api.h \
-    #$(INC_DIR)/embed.h
-
-#$(PDB) : frontend/parrot_debugger/main$(O) src/parrot_config$(O) $(LIBPARROT)
-	#$(LINK) @ld_out@$@ \
-    #frontend/parrot_debugger/main$(O) \
-    #src/parrot_config$(O) \
-    #$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-#$(INSTALLABLEPDB) : frontend/parrot_debugger/main$(O) $(LIBPARROT) src/parrot_config$(O)
-	#$(LINK) @ld_out@$@ \
-    #frontend/parrot_debugger/main$(O) \
-    #src/parrot_config$(O) \
-    #@rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+$(INSTALLABLEHBDB) : frontend/hbdb/main$(O) $(LIBPARROT) src/parrot_config$(O)
+	$(LINK) @ld_out@$@ \
+    frontend/hbdb/main$(O) \
+    src/parrot_config$(O) \
+    @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 #
@@ -2302,7 +2263,7 @@ prog-clean :
     $(INSTALLABLEPDUMP) \
     $(INSTALLABLEPBC_MERGE) \
     $(INSTALLABLEPBCTOEXE) \
-    $(INSTALLABLEPDB) \
+    $(INSTALLABLEHBDB) \
     $(INSTALLABLECONFIG) \
     $(INSTALLABLENQP) \
     $(INSTALLABLENCITHUNKGEN) \
@@ -2314,7 +2275,7 @@ prog-clean :
     parrot_config$(EXE) parrot_config.c parrot_config$(O) parrot_config.pbc \
     compilers/imcc/main$(O) \
     $(PDUMP) frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) \
-    $(PDB) frontend/parrot_debugger/main$(O) \
+    $(HBDB) frontend/hbdb/main$(O) \
     $(PBC_MERGE) frontend/pbc_merge/main$(O) \
     $(DIS) src/pbc_disassemble$(O)
 	$(RM_F) \
@@ -2346,12 +2307,12 @@ archclean: dynext-clean
     $(INSTALLABLEDIS) \
     $(INSTALLABLEPDUMP) \
     $(INSTALLABLEPBC_MERGE) \
-    $(INSTALLABLEPDB) \
+    $(INSTALLABLEHBDB) \
     $(INSTALLABLECONFIG) \
     $(INSTALLABLENQP) \
     compilers/imcc/main$(O) \
     $(PDUMP) frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) \
-    $(PDB) frontend/parrot_debugger/main$(O) \
+    $(HBDB) frontend/hbdb/main$(O) \
     $(PBC_MERGE) frontend/pbc_merge/main$(O) \
     $(DIS) src/pbc_disassemble$(O) \
     $(PARROT_CONFIG) parrot_config$(O) parrot_config.c \
@@ -2756,7 +2717,7 @@ FULLCOVER_DIRS = \
     src/string \
     src/string/encoding \
     frontend/parrot \
-    frontend/parrot_debugger \
+    frontend/hbdbugger \
     frontend/pbc_dump \
     frontend/pbc_merge \
     $(BUILD_DIR) \
@@ -2804,7 +2765,7 @@ COVER_DIRS = \
     src/string \
     src/string/encoding \
     frontend/parrot \
-    frontend/parrot_debugger \
+    frontend/hbdb \
     frontend/pbc_dump \
     frontend/pbc_merge \
     compilers/imcc
