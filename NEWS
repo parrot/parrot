@@ -1,3 +1,9 @@
+New in 3.5.0
+- Core
+- Languages
+- Tests
+  + IPv6 tests are now parallel testing friendly
+
 New in 3.4.0
 - Core
   + The Generational Mark and Sweep garbage collector is the new default.
