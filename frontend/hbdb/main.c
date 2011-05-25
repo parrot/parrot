@@ -7,6 +7,8 @@
 /* TODO Check for command line arguments */
 /* TODO Define usage() function          */
 
+static void fail(const char *msg);
+
 int
 main(int argc, char *argv[])
 {
@@ -21,39 +23,31 @@ main(int argc, char *argv[])
 
     /* Create new interpreter */
     if (!Parrot_api_make_interpreter(NULL, 0, initargs, &interp)) {
-        fprintf(stderr, "[ERROR] Failed to allocate new interpreter\n");
-        exit(EXIT_FAILURE);
+        fail("Failed to allocate new interpreter");
     }
 
     /* TODO Check for argv[1] here and call usage() */
     /* Get bytecode filename */
     if (!Parrot_api_string_import_ascii(interp, argv[1], &file)) {
-        fprintf(stderr, "[ERROR] Bad filename\n");
-        exit(EXIT_FAILURE);
+        fail("Bad filename");
     }
 
     /* Register hbdb runcore */
     if (!Parrot_api_set_runcore(interp, "hbdb", 0)) {
-        fprintf(stderr, "[ERROR] Failed to register runcore\n");
-
         Parrot_api_destroy_interpreter(interp);
-        exit(EXIT_FAILURE);
+        fail("Failed to register runcore");
     }
 
     /* Load bytecode file from command line */
     if (!Parrot_api_load_bytecode_file(interp, file, &pbc)) {
-        fprintf(stderr, "[ERROR] Failed to load bytecode in %s\n", argv[1]);
-
         Parrot_api_destroy_interpreter(interp);
-        exit(EXIT_FAILURE);
+        fail("Failed to load bytecode");
     }
 
     /* Ready bytecode */
     if (!Parrot_api_ready_bytecode(interp, pbc, &main_sub)) {
-        fprintf(stderr, "[ERROR] Failed to prepare byte in %s\n", argv[1]);
-
         Parrot_api_destroy_interpreter(interp);
-        exit(EXIT_FAILURE);
+        fail("Failed to prepare bytecode");
     }
 
     /* DEBUG */
@@ -62,6 +56,13 @@ main(int argc, char *argv[])
 
     Parrot_api_destroy_interpreter(interp);
     return (0);
+}
+
+static void
+fail(const char *msg)
+{
+    fprintf(stderr, "[ERROR] %s\n", msg);
+    exit(EXIT_FAILURE);
 }
 
 /*
