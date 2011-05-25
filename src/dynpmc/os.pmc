@@ -71,34 +71,7 @@ stat_buf_to_array(PARROT_INTERP, ARGIN(const Parrot_Stat_Buf *buf))
     return array;
 }
 
-static PMC *OS_PMC;
-pmclass OS dynpmc singleton {
-
-/*
-
-=item C<void *get_pointer()>
-
-=item C<void set_pointer(void *ptr)>
-
-These two functions are part of the singleton creation interface. For more
-information see F<src/pmc.c>.
-
-=cut
-
-*/
-
-    void class_init() {
-        OS_PMC = NULL;
-    }
-
-    VTABLE void *get_pointer() {
-        return OS_PMC;
-    }
-
-    VTABLE void set_pointer(void *ptr) {
-        OS_PMC = (PMC *)ptr;
-    }
-
+pmclass OS dynpmc {
 
 /*
 
