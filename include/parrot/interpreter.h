@@ -61,7 +61,7 @@ typedef enum {
     PARROT_GC_DEBUG_CORE    = 0x40,         /* run GC before each op */
     PARROT_DEBUGGER_CORE    = 0x80,         /* used by parrot debugger */
     PARROT_PROFILING_CORE   = 0x160,        /* used by parrot debugger */
-    PARROT_PDB_CORE         = 0x320         /* pdb runcore */
+    PARROT_HBDB_CORE        = 0x320         /* hbdb runcore */
 } Parrot_Run_core_t;
 /* &end_gen */
 
