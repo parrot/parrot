@@ -164,16 +164,42 @@ sub generate_bytecode_for_chunks {
 
     for my $chunk (@$chunks) {
 
-        my $metadata_seg;#  = m0b_metadata_seg($chunk);
-        my $variables_seg;# = m0b_variables_seg($chunk);
+        my $metadata_seg  = m0b_metadata_seg($chunk);
+        my $variables_seg = m0b_variables_seg($chunk);
         my $bytecode_seg  = m0b_bytecode_seg($ops, $chunk);
         $bytecode .= $variables_seg . $metadata_seg . $bytecode_seg;
     }
     return $bytecode;
 }
 
+sub m0b_metadata_seg {
+    my ($chunk) = @_;
+
+    my $entry_count = 0;
+    my $metadata = $chunk->{metadata};
+    my $variables = $chunk->{variables};
+
+    my $bytecode  = pack("L", $M0_META_SEG);
+    $bytecode    .= pack("L", $entry_count);
+    $bytecode    .= pack("L", m0b_meta_seg_length($metadata));
+
+    # TODO: make this work for a non-empty metadata segment
+    #for each entry
+    #for my $offset (keys %$metadata) {
+        #for my $key (keys %{$metadata->{$offset}}) {
+            #my $key_idx = m0b_get_val_idx($key, $variables);
+            #my $val_idx = m0b_get_val_idx($metadata->{$offset}{$key}, $variables);
+            #$bytecode .= pack('L', $offset);
+            #$bytecode .= pack('L', $key_idx);
+            #$bytecode .= pack('L', $val_idx);
+        #}
+    #}
+
+    return $bytecode;
+}
+                          
+
 sub m0b_bytecode_seg {
-    
     my ($ops, $chunk) = @_;
 
     my $size = length $chunk->{bytecode};
@@ -198,6 +224,26 @@ sub m0b_header_length {
     return 8  # magic number
          + 8; # config data
 }
+
+
+sub m0b_variables_seg {
+    my ($chunk) = @_;
+
+    my $variables = $chunk->{variables};
+    my $bytecode  = pack("L", $M0_VARS_SEG);
+    $bytecode    .= pack("L", scalar @$variables);
+    $bytecode    .= pack("L", m0b_vars_seg_length($variables));
+
+    #for each variable
+    for (@$variables) {
+        my $var_length = length($_);
+        $bytecode .= pack("L", $var_length);
+        $bytecode .= $_;
+    }
+
+    return $bytecode;
+}
+                  
 
 =item C<m0b_dir_seg>
 
