@@ -32,7 +32,7 @@ my $M0_VARS_SEG     = 0x02;
 my $M0_META_SEG     = 0x03;
 my $M0_BC_SEG       = 0x04;
 
-use constant M0_REG_RX => qr/^(([INSP]\d+)|INTERP|PC|EH|PCX|VAR|MDS|BCS)/;
+use constant M0_REG_RX => qr/^(([INSP]\d+)|INTERP|PC|EH|PCX|CHUNK|VAR|MDS|BCS)/;
 
 assemble($file);
 
