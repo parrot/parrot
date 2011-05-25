@@ -507,7 +507,7 @@ Parrot_runcore_hbdb_init(PARROT_INTERP)
 
     Parrot_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
     coredata->name             = CONST_STRING(interp, "hbdb");
-    coredata->id               = PARROT_PDB_CORE;
+    coredata->id               = PARROT_HBDB_CORE;
     coredata->opinit           = PARROT_CORE_OPLIB_INIT;
     coredata->runops           = runops_hbdb_core;
     coredata->destroy          = NULL;
