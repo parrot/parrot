@@ -1183,7 +1183,7 @@ Parrot_hash_create_sized(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type
 {
     ASSERT_ARGS(Parrot_hash_create_sized)
 
-    Hash *hash = Parrot_hash_create(interp, val_type, hkey_type);
+    Hash * const hash = Parrot_hash_create(interp, val_type, hkey_type);
     allocate_buckets(interp, hash, size);
     return hash;
 }
