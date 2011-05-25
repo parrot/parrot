@@ -32,7 +32,7 @@ my $M0_VARS_SEG     = 0x02;
 my $M0_META_SEG     = 0x03;
 my $M0_BC_SEG       = 0x04;
 
-use constant M0_REG_RX => qr/^(([INSP]\d+)|INTERP|PC|EH|PCX|CHUNK|VAR|MDS|BCS)/;
+use constant M0_REG_RX => qr/^(([INSP]\d+)|INTERP|PC|EH|PCX|VAR|MDS|BCS)/;
 
 assemble($file);
 
@@ -43,9 +43,9 @@ sub assemble {
     my $source   = slurp($file);
     $source      = remove_junk($source);
     my $version  = parse_version($source);
-    my $chunk    = parse_next_chunk($source);
+    my $chunks   = parse_chunks($source);
     my $header   = m0b_header();
-    my $bytecode = $header . generate_bytecode_for_chunk($ops, $chunk);
+    my $bytecode = $header . generate_bytecode_for_chunks($ops, $chunks);
     write_bytecode($file, $bytecode);
 }
 
@@ -156,25 +156,27 @@ sub to_bytecode {
     return $bytecode;
 }
 
-sub generate_bytecode_for_chunk {
-    my ($ops, $chunk) = @_;
-
-    # textual bytecode
-    my $tb       = $chunk->{bytecode};
-    my $bytecode = '';
+sub generate_bytecode_for_chunks {
+    my ($ops, $chunks) = @_;
 
     # First, add the directory segment
-    $bytecode = m0b_dir_seg([ $chunk ]);
+    my $bytecode = m0b_dir_seg( $chunks );
 
-    # iterate over textual representation of bytecode
-    # use variable table to generate binary bytecode
-    my @lines = split /\n/, $tb;
-    for my $line (@lines) {
-        if ($line =~ m/^(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
-            $bytecode .= to_bytecode($ops,\%+);
-        } else {
-            say "Invalid M0 bytecode segment: $line";
-            exit 1;
+    for my $chunk (@$chunks) {
+
+        # textual bytecode
+        my $tb = $chunk->{bytecode};
+
+        # iterate over textual representation of bytecode
+        # use variable table to generate binary bytecode
+        my @lines = split /\n/, $tb;
+        for my $line (@lines) {
+            if ($line =~ m/^(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
+                $bytecode .= to_bytecode($ops,\%+);
+            } else {
+                say "Invalid M0 bytecode segment: $line";
+                exit 1;
+            }
         }
     }
     return $bytecode;
@@ -328,36 +330,39 @@ sub parse_version {
     return $+{version};
 }
 
-sub parse_next_chunk {
+sub parse_chunks {
     my ($source) = @_;
-    $file_metadata->{total_chunks}++;
-    say "Parsing chunk #" . $file_metadata->{total_chunks};
 
-    if ( $source =~ /
-        \.chunk\s+"(?<name>\w*)"\n
-        \.variables\s*(?<variables>.*)
-        \.metadata\s*(?<metadata>.*)
-        \.bytecode\s*(?<bytecode>.*)
-    /msx ) {
+    my $chunks = [];
+
+    while ( $source =~ /
+        \.chunk\s+"(?<name>\w*?)"\n
+        \.variables\s*(?<variables>.*?)
+        \.metadata\s*(?<metadata>.*?)
+        \.bytecode\s*(?<bytecode>.*?)
+    /gcmsx ) {
         # captures are in %+
-    } else {
-        print "Invalid M0 at chunk " . $file_metadata->{total_chunks};
-        exit 1;
+        $file_metadata->{total_chunks}++;
+        say "Parsed chunk #" . $file_metadata->{total_chunks};
+        my $chunk = { %+ };
+
+        # convert variable data string to an array ref
+        # TODO: this will fail hard on invalid input
+        $chunk->{variables} = [ map { (split(/\s+/,$_,2))[1] } (split /\n/, $+{variables}) ];
+
+        for my $v (@{$chunk->{variables}}) {
+            # remove leading and trailing double quotes which are used to represent strings
+            $v =~ s/(^"|"$)//g;
+
+            # replace escaped double quotes with actual double quotes
+            $v =~ s/\\"/"/g;
+        }
+        push @$chunks, $chunk;
     }
-    my $chunk = { %+ };
-
-    # convert variable data string to an array ref
-    # TODO: this will fail hard on invalid input
-    $chunk->{variables} = [ map { (split(/\s+/,$_,2))[1] } (split /\n/, $+{variables}) ];
-
-    for my $v (@{$chunk->{variables}}) {
-        # remove leading and trailing double quotes which are used to represent strings
-        $v =~ s/(^"|"$)//g;
-
-        # replace escaped double quotes with actual double quotes
-        $v =~ s/\\"/"/g;
-    }
-    return $chunk;
+    #TODO: error checking
+    #    print "Invalid M0 at chunk " . $file_metadata->{total_chunks};
+    #    exit 1;
+    return $chunks;
 }
 
 # This cleans M0 code of comments and unnecessary whitespace
