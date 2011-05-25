@@ -31,7 +31,8 @@
 /*.sto
 /*.suo
 /*.tmp
-/*.sw?
+# vim swap files
+/\.*sw?
 /*.vcproj*
 /.git
 /.parrot_current_rev
