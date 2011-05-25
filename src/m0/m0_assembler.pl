@@ -415,6 +415,11 @@ sub parse_chunks {
             # replace escaped double quotes with actual double quotes
             $v =~ s/\\"/"/g;
         }
+
+        # TODO: stuff $+{bytecode} into $chunk->{bytecode}
+
+        # TODO: stuff $+{metadata} into $chunk->{metadata}
+
         push @$chunks, $chunk;
     }
     #TODO: error checking
