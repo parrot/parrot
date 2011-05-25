@@ -164,19 +164,31 @@ sub generate_bytecode_for_chunks {
 
     for my $chunk (@$chunks) {
 
-        # textual bytecode
-        my $tb = $chunk->{bytecode};
+        my $metadata_seg;#  = m0b_metadata_seg($chunk);
+        my $variables_seg;# = m0b_variables_seg($chunk);
+        my $bytecode_seg  = m0b_bytecode_seg($ops, $chunk);
+        $bytecode .= $variables_seg . $metadata_seg . $bytecode_seg;
+    }
+    return $bytecode;
+}
 
-        # iterate over textual representation of bytecode
-        # use variable table to generate binary bytecode
-        my @lines = split /\n/, $tb;
-        for my $line (@lines) {
-            if ($line =~ m/^(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
-                $bytecode .= to_bytecode($ops,\%+);
-            } else {
-                say "Invalid M0 bytecode segment: $line";
-                exit 1;
-            }
+sub m0b_bytecode_seg {
+    
+    my ($ops, $chunk) = @_;
+
+    my $size = length $chunk->{bytecode};
+    my $bytecode = '';
+    $bytecode  = pack('L', $M0_BC_SEG);
+    $bytecode .= pack('L', $size);
+    $bytecode .= pack('L', m0b_bc_seg_length($size));
+
+    my @lines = split /\n/, $chunk->{bytecode};
+    for my $line (@lines) {
+        if ($line =~ m/^(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
+            $bytecode .= to_bytecode($ops,\%+);
+        } else {
+            say "Invalid M0 bytecode segment: $line";
+            exit 1;
         }
     }
     return $bytecode;
