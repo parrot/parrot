@@ -226,7 +226,7 @@ sub m0_opfunc_goto {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "goto $a1, $a2, $a3";
 
-    my $offset = $ctx->[$a1];
+    my $offset = 256 * $ctx->[$a1] + $ctx->[$a2];
     $ctx->[PC] = $offset;
 }
 
@@ -234,18 +234,17 @@ sub m0_opfunc_goto_if {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "goto_if $a1, $a2, $a3";
 
-    my $offset = $ctx->[$a1];
-    my $v2 = $ctx->[$a2];
-    my $v3 = $ctx->[$a3];
-    $ctx->[PC] = $offset if ($v2 == $v3);
+    my $offset = 256 * $ctx->[$a1] + $ctx->[$a2];
+    my $cond   = $ctx->[$a3];
+    $ctx->[PC] = $offset if ($cond);
 }
 
 sub m0_opfunc_goto_chunk {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "goto_chunk $a1, $a2, $a3";
 
-    my $new_pc      = $ctx->[$a1];
-    my $chunk_name  = $ctx->[$a2];
+    my $new_pc      = 256 * $ctx->[$a1] + $ctx->[$a2];
+    my $chunk_name  = $ctx->[$a3];
     my $interp      = $ctx->[INTERP];
 
     die "invalid chunk name '$chunk_name' in goto_chunk"
