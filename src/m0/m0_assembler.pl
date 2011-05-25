@@ -372,7 +372,7 @@ sub m0b_meta_seg_length {
 sub opname_to_num {
     my ($ops, $opname) = @_;
 
-    return $ops->{$opname};
+    return oct $ops->{$opname};
 }
 
 sub parse_version {
@@ -397,8 +397,8 @@ sub parse_chunks {
         \.chunk\s+"(?<name>\w*?)"\n
         \.variables\s*(?<variables>.*?)
         \.metadata\s*(?<metadata>.*?)
-        \.bytecode\s*(?<bytecode>.*?)
-    /gcmsx ) {
+        \.bytecode\s*(?<bytecode>.*?)(?:\.chunk|$)
+    /gcsx ) {
         # captures are in %+
         $file_metadata->{total_chunks}++;
         say "Parsed chunk #" . $file_metadata->{total_chunks};
@@ -417,8 +417,10 @@ sub parse_chunks {
         }
 
         # TODO: stuff $+{bytecode} into $chunk->{bytecode}
+        $chunk->{bytecode} = $+{bytecode};
 
         # TODO: stuff $+{metadata} into $chunk->{metadata}
+        $chunk->{metadata} = $+{metadata};
 
         push @$chunks, $chunk;
     }
