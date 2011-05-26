@@ -95,6 +95,8 @@ bootstrap-pct: $(NQP_RX)
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Sub.pir compilers/pct/src/POST/Sub.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/POST/Value.pir compilers/pct/src/POST/Value.pm
 
+	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Compiler.pir compilers/pct/src/PAST/Compiler.pm
+
 	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Block.pir compilers/pct/src/PAST/Block.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Control.pir compilers/pct/src/PAST/Control.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Node.pir compilers/pct/src/PAST/Node.pm
