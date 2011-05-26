@@ -103,7 +103,7 @@ void dotest(Parrot_Interp interp, void *unused)
     Parrot_PMC pmc, pmc2, pmc3, pmc_string, pmc_string2, pmc_string3;
     Parrot_PMC pmc_float, pmc_float2;
     Parrot_PMC rpa, rpa2, fpa, hash, hash_iter, continuation;
-    Parrot_PMC key_int, key_str, hashkey, ns;
+    Parrot_PMC key_int, key_str, hashkey, ns, object, klass;
     Parrot_Int type, value, integer, integer2;
     Parrot_Float number, number2;
     Parrot_String string, string2;
@@ -119,6 +119,10 @@ void dotest(Parrot_Interp interp, void *unused)
     pmc2         = Parrot_PMC_new(interp, type);
     pmc3         = Parrot_PMC_new(interp, type);
     key_int      = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Key"));
+    type         = Parrot_PMC_typenum(interp, "Class");
+    klass        = Parrot_PMC_new(interp, type);
+    /* How do we create an Object PMC ?
+    object       = Parrot_PMC_newclass(interp, klass); */
 
     Parrot_PMC_set_integer_native(interp, key_int, 42);
 
@@ -668,6 +672,17 @@ CODE
 Got pointer!
 Done!
 OUTPUT
+
+#TODO: Figure out how to create an Object PMC
+#extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer_keyed_int");
+#    /* Need to create object PMC */
+#    integer = (Parrot_Int) Parrot_PMC_get_pointer_keyed_int(interp, object, 42);
+#    if (integer > 0)
+#        Parrot_printf(interp,"Got pointer_keyed_int!\n", integer);
+#CODE
+#Got pointer_keyed_int!
+#Done!
+#OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer_keyed");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
