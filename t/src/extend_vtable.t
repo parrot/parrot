@@ -131,17 +131,32 @@ void dotest(Parrot_Interp interp, void *unused)
 
 $code
 
+    /* Some tests leave these null, so only destroy them if they aren't,
+       to avoid the dreaded "Null PMC access in destroy()" */
     if ( NOT_NULL(pmc) )
         Parrot_PMC_destroy(interp, pmc);
+    if ( NOT_NULL(pmc2) )
+        Parrot_PMC_destroy(interp, pmc2);
+    if ( NOT_NULL(pmc3) )
+        Parrot_PMC_destroy(interp, pmc3);
+    if ( NOT_NULL(pmc_string) )
+        Parrot_PMC_destroy(interp, pmc_string);
 
-    /*  TODO: Shouldn't we also be destroying all the other PMCs ?
-        Destroying these causes coredumps and whatnot
-    Parrot_PMC_destroy(interp, pmc_string);
-    Parrot_PMC_destroy(interp, pmc_string2);
-    Parrot_PMC_destroy(interp, pmc_string3);
-    Parrot_PMC_destroy(interp, pmc_float);
-    Parrot_PMC_destroy(interp, pmc_float2);
+    /* This causes a double-free
+    if ( NOT_NULL(rpa) )
+        Parrot_PMC_destroy(interp, rpa);
+    if ( NOT_NULL(rpa2) )
+        Parrot_PMC_destroy(interp, rpa2);
     */
+
+    if ( NOT_NULL(pmc_string2) )
+        Parrot_PMC_destroy(interp, pmc_string2);
+    if ( NOT_NULL(pmc_string3) )
+        Parrot_PMC_destroy(interp, pmc_string3);
+    if ( NOT_NULL(pmc_float) )
+        Parrot_PMC_destroy(interp, pmc_float);
+    if ( NOT_NULL(pmc_float2) )
+        Parrot_PMC_destroy(interp, pmc_float2);
 
     /* TODO: Properly test this */
     Parrot_destroy(interp);
