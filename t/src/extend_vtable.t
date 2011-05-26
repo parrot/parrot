@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 113;
+plan tests => 112;
 
 =head1 NAME
 
@@ -94,6 +94,10 @@ sub extend_vtable_output_is
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     c_output_is(
         $common . linedirective(__LINE__) . <<CODE,
+PMC* PMCNULL;
+
+#define NOT_NULL(pmc)  (!((pmc) == PMCNULL || (pmc) == NULL))
+
 void dotest(Parrot_Interp interp, void *unused)
 {
     Parrot_PMC pmc, pmc2, pmc3, pmc_string, pmc_string2, pmc_string3;
@@ -104,33 +108,34 @@ void dotest(Parrot_Interp interp, void *unused)
     Parrot_Float number, number2;
     Parrot_String string, string2;
 
-    continuation    = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Continuation"));
+    type         = Parrot_PMC_typenum(interp, "Integer");
+    continuation = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Continuation"));
+    rpa          = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
+    rpa2         = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
+    fpa          = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "FixedPMCArray"));
+    hash         = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Hash"));
+    pmc          = Parrot_PMC_new(interp, type);
+    pmc2         = Parrot_PMC_new(interp, type);
+    pmc3         = Parrot_PMC_new(interp, type);
+    key_int      = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Key"));
 
-    type   = Parrot_PMC_typenum(interp, "Integer");
-    rpa    = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
-    rpa2   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
-    fpa    = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "FixedPMCArray"));
-    hash   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Hash"));
-    pmc    = Parrot_PMC_new(interp, type);
-    pmc2   = Parrot_PMC_new(interp, type);
-    pmc3   = Parrot_PMC_new(interp, type);
-    key_int   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Key"));
     Parrot_PMC_set_integer_native(interp, key_int, 42);
 
     Parrot_PMC_push_pmc(interp, rpa2, continuation);
 
-
-    pmc_string = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
+    pmc_string  = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
     pmc_string2 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
     pmc_string3 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
-
-    pmc_float  = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"Float"));
-    pmc_float2 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"Float"));
+    pmc_float   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"Float"));
+    pmc_float2  = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"Float"));
 
 $code
 
+    if ( NOT_NULL(pmc) )
+        Parrot_PMC_destroy(interp, pmc);
+
     /*  TODO: Shouldn't we also be destroying all the other PMCs ?
-    Parrot_PMC_destroy(interp, pmc);
+        Destroying these causes coredumps and whatnot
     Parrot_PMC_destroy(interp, pmc_string);
     Parrot_PMC_destroy(interp, pmc_string2);
     Parrot_PMC_destroy(interp, pmc_string3);
@@ -592,17 +597,8 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_setprop");
     string = createstring(interp, "_struct");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
     Parrot_PMC_setprop(interp,continuation , string, pmc);
-    pmc = Parrot_PMC_getprop(interp,continuation , string);
-    Parrot_printf(interp,"%P\n", pmc);
-CODE
-42
-Done!
-OUTPUT
-
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_getprop");
-    string = createstring(interp, "_struct");
-    pmc = Parrot_PMC_getprop(interp,continuation , string);
-    Parrot_printf(interp,"42\n");
+    pmc2 = Parrot_PMC_getprop(interp,continuation ,string);
+    Parrot_printf(interp,"%P\n",pmc2);
 CODE
 42
 Done!
