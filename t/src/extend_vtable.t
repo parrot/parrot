@@ -158,6 +158,8 @@ $code
         Parrot_PMC_destroy(interp, pmc_float);
     if ( NOT_NULL(pmc_float2) )
         Parrot_PMC_destroy(interp, pmc_float2);
+    if ( NOT_NULL(ns) )
+        Parrot_PMC_destroy(interp, ns);
 
     /* TODO: Properly test this */
     Parrot_destroy(interp);
