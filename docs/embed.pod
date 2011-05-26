@@ -1025,8 +1025,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_delprop>
 
-=item C<Parrot_PMC_destroy>
-
 =item C<Parrot_PMC_divide>
 
 =item C<Parrot_PMC_divide_float>

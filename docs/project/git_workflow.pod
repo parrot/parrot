@@ -14,7 +14,7 @@ does one thing, so that it makes it easier to accept/revert some things while
 keeping others. Git provides many powerful tools in the maintenance of
 branches. This document aims to provide everything a Parrot developer needs to
 know about Git to successfully create a branch, work on it, keep it in sync
-with changes on master and finally merge the branch.
+with changes on master and finally merge the branch (or send a pull request).
 
 =head2 Cloning the Git Repository
 
@@ -128,8 +128,10 @@ stuff that will be included in your next commit):
 
   git add foo.c bar.c
 
-The command C<git add> is not only for adding new files, just keep that in mind.
-It tells git "add the state of these files to my staging area."
+The command C<git add> is not only for adding new files, just keep that in
+mind.  It tells git "add the *current* state of these files to my staging
+area." If these files change after you C<git add> them, they will need to be
+added again.
 
 If you are trying to add files that are in .gitignore, you can do that with
 the --force flag:
@@ -368,12 +370,39 @@ ye will.
 
 NOTE: This is not official policy, and could change at any time.
 
+ALSO NOTE: With the introduction of the magical Github Merge Button, doesn't
+this seem like a ridiculous amount of work to accept code from a fork? This
+workflow is still useful if you want to run tests or do any other analysis
+on the pull request.
+
 If you are merging code from non-core committers, Parrot would like to see
 "Signed-off-by" lines on each commit, so it is clear that one person wrote the
 code and someone else is taking responsibility for merging the code.
 
-To merge in a pull request on Github, the following method should be used.
-Follow the first two steps on the Github pull request page, i.e:
+To merge in a pull request on Github, there is the easy way or the hard way.
+The easy way is to use tools/dev/merge_pull_request.pl like so:
+
+    perl $PARROT/tools/dev/merge_pull_request.pl N
+
+where N is the number of the pull request. This will create a branch for the
+pull request and plop you on it, so that tests or other analyses can be run.
+
+This script can be used to merge a pull request for any repo in the Parrot
+Github Organization. For instance, to merge Cardinal Pull request #4:
+
+ perl $PARROT/tools/dev/merge_pull_request.pl 4 cardinal
+
+If you do not want the default branch name, you can specify a third
+argument to specify one:
+
+ perl $PARROT/tools/dev/merge_pull_request.pl 4 cardinal awesome_feature
+
+This will merge pull request #4 in the cardinal repo into a branch
+called 'awesome_feature'.
+
+Run C<perldoc tools/dev/merge_pull_request.pl> for more info.
+
+The hard way: Follow the first two steps on the Github pull request page, i.e:
 
     # 1) Make a new branch to pull stuff into
     git checkout -b someguy-newbranch master

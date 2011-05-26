@@ -457,7 +457,7 @@ ok( exists $asserts{'PARROT_ASSERT_ARG(item)'}, "Got expected assert" );
 ok( exists $asserts{'PARROT_ASSERT_ARG(interp)'}, "Got expected assert" );
 
 @args = (
-    'ARGFREE_NOTNULL(( _abcDEF123 )())',
+    'ARGFREE_NOTNULL(_abcDEF123)',
     'PARROT_INTERP',
     'ARGIN(Linked_List *list)',
     'ARGIN(List_Item_Header *item)',
