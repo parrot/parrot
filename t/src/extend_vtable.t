@@ -121,8 +121,6 @@ void dotest(Parrot_Interp interp, void *unused)
     key_int      = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Key"));
     type         = Parrot_PMC_typenum(interp, "Class");
     klass        = Parrot_PMC_new(interp, type);
-    /* How do we create an Object PMC ?
-    object       = Parrot_PMC_newclass(interp, klass); */
 
     Parrot_PMC_set_integer_native(interp, key_int, 42);
 
@@ -133,6 +131,11 @@ void dotest(Parrot_Interp interp, void *unused)
     pmc_string3 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
     pmc_float   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"Float"));
     pmc_float2  = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"Float"));
+
+    string  = createstring(interp,"Object");
+    Parrot_PMC_assign_string_native(interp, pmc_string, string);
+
+    object       = Parrot_PMC_newclass(interp, pmc_string);
 
 $code
 
@@ -184,6 +187,18 @@ CODE
 }
 
 # actual tests start here
+
+# # Exception is: type 36 severity 2 message 'get_pointer_keyed_int() not implemented in class 'Class''
+
+#extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer_keyed_int");
+#    /* Need to create object PMC */
+#    integer = (Parrot_Int) Parrot_PMC_get_pointer_keyed_int(interp, object, 42);
+#    if (integer > 0)
+#        Parrot_printf(interp,"Got pointer_keyed_int!\n", integer);
+#CODE
+#Got pointer_keyed_int!
+#Done!
+#OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_substr" );
      string  = createstring(interp, "FOO");
@@ -673,16 +688,6 @@ Got pointer!
 Done!
 OUTPUT
 
-#TODO: Figure out how to create an Object PMC
-#extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer_keyed_int");
-#    /* Need to create object PMC */
-#    integer = (Parrot_Int) Parrot_PMC_get_pointer_keyed_int(interp, object, 42);
-#    if (integer > 0)
-#        Parrot_printf(interp,"Got pointer_keyed_int!\n", integer);
-#CODE
-#Got pointer_keyed_int!
-#Done!
-#OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer_keyed");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
