@@ -341,6 +341,21 @@ Returns the ID number of the current user. This is platform-dependent.
         RETURN(INTVAL can);
     }
 
+/*
+
+=item C<exists(STRING *filename)>
+
+Determine if the file exists. Return C<1> if it exists. Return C<0> otherwise.
+
+=cut
+
+*/
+
+    METHOD exists(STRING *filename) {
+        const INTVAL e = Parrot_file_stat_intval(INTERP, filename, STAT_EXISTS);
+        RETURN(INTVAL e);
+    }
+
 }
 
 /*
