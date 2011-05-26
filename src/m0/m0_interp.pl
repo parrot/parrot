@@ -614,7 +614,6 @@ sub m0b_parse_bc_seg {
         my $a1 = ord get_bytes($m0b, $cursor, 1);
         my $a2 = ord get_bytes($m0b, $cursor, 1);
         my $a3 = ord get_bytes($m0b, $cursor, 1);
-        say "op $op";
         push @$ops, [$op, $a1, $a2, $a3];
     }
     return $ops;
