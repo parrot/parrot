@@ -144,13 +144,13 @@ sub to_bytecode {
     my ($ops,$op)      = @_;
     my $opnumber       = opname_to_num($ops, $op->{opname});
     my ($a1, $a2, $a3) = map { $op->{"arg" . $_} } (1 .. 3);
-    my $bytecode       = pack('h', $opnumber);
+    my $bytecode       = pack('C', $opnumber);
 
     # We need to convert the symbolic register names into numbers
     # as described in "Register Types and Context Structure" in the M0 spec
 
     map {
-        $bytecode .= pack('C', $_ =~ M0_REG_RX ? register_name_to_num($a1) : $_ );
+        $bytecode .= pack('C', $_ =~ M0_REG_RX ? register_name_to_num($_) : $_ );
     } ($a1, $a2, $a3);
 
     return $bytecode;
