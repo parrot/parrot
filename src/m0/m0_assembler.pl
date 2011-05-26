@@ -202,11 +202,13 @@ sub m0b_metadata_seg {
 sub m0b_bytecode_seg {
     my ($ops, $chunk) = @_;
 
-    my $size = length $chunk->{bytecode};
+    # op count = number of lines that have words
+    my $op_count = scalar $chunk->{bytecode} =~ /^\s*\w+/m;
+    my $word_count = $op_count * 4;
     my $bytecode = '';
     $bytecode  = pack('L', $M0_BC_SEG);
-    $bytecode .= pack('L', $size);
-    $bytecode .= pack('L', m0b_bc_seg_length($size));
+    $bytecode .= pack('L', $op_count);
+    $bytecode .= pack('L', $word_count);
 
     my @lines = split /\n/, $chunk->{bytecode};
     for my $line (@lines) {
@@ -302,7 +304,7 @@ Calculate the number of bytes in a chunk.
 sub m0b_chunk_length {
     my ($chunk) = @_;
     my $chunk_length =
-           m0b_bc_seg_length(length $chunk->{bytecode})
+           m0b_bc_seg_length($chunk->{bytecode})
          + m0b_vars_seg_length($chunk->{variables})
          + m0b_meta_seg_length($chunk->{metadata});
     say "chunk length is $chunk_length";
@@ -316,10 +318,11 @@ Calculate the size of an M0 bytecode segment.
 =cut
 
 sub m0b_bc_seg_length {
-    my ($size) = @_;
+    my ($bc_seg) = @_;
 
+    my $op_count = $bc_seg =~ /^\s*\w+/m;
     my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
-    $seg_length += $size * 4;
+    $seg_length += $op_count * 4;
 
     say "bytecode seg length is $seg_length";
     return $seg_length;
