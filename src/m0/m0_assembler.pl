@@ -397,10 +397,10 @@ sub parse_chunks {
     my $chunks = [];
 
     while ( $source =~ /
-        \.chunk\s+"(?<name>\w*?)"\n
-        \.variables\s*(?<variables>.*?)
-        \.metadata\s*(?<metadata>.*?)
-        \.bytecode\s*(?<bytecode>.*?)(?:\.chunk|$)
+        (?:\n|^)\.chunk\s+"(?<name>\w*?)"
+        \n\.variables\s*(?<variables>.*?)
+        \n\.metadata\s*(?<metadata>.*?)
+        \n\.bytecode\s*(?<bytecode>.*?)(?:\.chunk|$)
     /gcsx ) {
         # captures are in %+
         $file_metadata->{total_chunks}++;
@@ -419,10 +419,7 @@ sub parse_chunks {
             $v =~ s/\\"/"/g;
         }
 
-        # TODO: stuff $+{bytecode} into $chunk->{bytecode}
         $chunk->{bytecode} = $+{bytecode};
-
-        # TODO: stuff $+{metadata} into $chunk->{metadata}
         $chunk->{metadata} = $+{metadata};
 
         push @$chunks, $chunk;
