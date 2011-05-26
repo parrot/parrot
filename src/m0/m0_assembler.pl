@@ -203,7 +203,8 @@ sub m0b_bytecode_seg {
     my ($ops, $chunk) = @_;
 
     # op count = number of lines that have words
-    my $op_count = scalar $chunk->{bytecode} =~ /^\s*\w+/m;
+    my $op_count = 0;
+    $op_count++ for ($chunk->{bytecode} =~ /^\s*\w+/mg);
     my $word_count = $op_count * 4;
     my $bytecode = '';
     $bytecode  = pack('L', $M0_BC_SEG);
@@ -213,6 +214,7 @@ sub m0b_bytecode_seg {
     my @lines = split /\n/, $chunk->{bytecode};
     for my $line (@lines) {
         if ($line =~ m/^(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
+            say "adding op $+{opname} to bytecode seg";
             $bytecode .= to_bytecode($ops,\%+);
         } else {
             say "Invalid M0 bytecode segment: $line";
@@ -320,7 +322,8 @@ Calculate the size of an M0 bytecode segment.
 sub m0b_bc_seg_length {
     my ($bc_seg) = @_;
 
-    my $op_count = $bc_seg =~ /^\s*\w+/m;
+    my $op_count = 0;
+    $op_count++ for ($bc_seg =~ /^\s*\w+/mg);
     my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
     $seg_length += $op_count * 4;
 
