@@ -317,6 +317,7 @@ sub vtbl_embed {
         }
 
         next if $@;
+        next if $name eq "destroy";
 
         my $signature = join( ', ', @sig );
         my $arguments = join( ', ', @args );

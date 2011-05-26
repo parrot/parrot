@@ -142,38 +142,6 @@ $code
     /* Some tests leave these null, so only destroy them if they aren't,
        to avoid the dreaded "Null PMC access in destroy()" */
 
-    /* These still cause the above error on some platform/compiler combinations.
-    if ( NOT_NULL(pmc) )
-        Parrot_PMC_destroy(interp, pmc);
-    if ( NOT_NULL(pmc2) )
-        Parrot_PMC_destroy(interp, pmc2);
-    if ( NOT_NULL(pmc3) )
-        Parrot_PMC_destroy(interp, pmc3);
-    if ( NOT_NULL(pmc_string) )
-        Parrot_PMC_destroy(interp, pmc_string);
-
-    // This causes a double-free
-    if ( NOT_NULL(rpa) )
-        Parrot_PMC_destroy(interp, rpa);
-    if ( NOT_NULL(rpa2) )
-        Parrot_PMC_destroy(interp, rpa2);
-
-    if ( NOT_NULL(pmc_string2) )
-        Parrot_PMC_destroy(interp, pmc_string2);
-    if ( NOT_NULL(pmc_string3) )
-        Parrot_PMC_destroy(interp, pmc_string3);
-    if ( NOT_NULL(pmc_float) )
-        Parrot_PMC_destroy(interp, pmc_float);
-    if ( NOT_NULL(pmc_float2) )
-        Parrot_PMC_destroy(interp, pmc_float2);
-    if ( NOT_NULL(ns) )
-        Parrot_PMC_destroy(interp, ns);
-    if ( NOT_NULL(object) )
-        Parrot_PMC_destroy(interp, object);
-    if ( NOT_NULL(klass) )
-        Parrot_PMC_destroy(interp, klass);
-    */
-
     /* TODO: Properly test this */
     Parrot_destroy(interp);
     printf("Done!\\n");
