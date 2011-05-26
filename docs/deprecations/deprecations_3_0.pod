@@ -1,0 +1,222 @@
+# Copyright (C) 2011, Parrot Foundation.
+
+=head1 NAME
+
+docs/deprecations/deprecations_3_0.pod - Parrot Deprecations for 3.0
+
+=head1 Parrot Deprecations for 3.0
+
+=head2 PARROT_ERRORS_GLOBALS_FLAG
+
+=head3 Description
+
+The PARROT_ERRORS_GLOBALS_FLAG constant has been removed.
+
+=head3 Rational
+
+This flag does not modify the behaviour of parrot in any way.
+
+=head3 Replacment
+
+Remove all code attempting to set/unset this flag.
+
+It didn't do anything anyways.
+
+=head2 CodeString
+
+=head3 Description
+
+The CodeString PMC has been removed
+
+=head3 Rational
+
+Equivalent and more efficient functionality is available from StringBuilder.
+
+=head3 Replacment
+
+CodeString contains a number of convenience methods in addition to its core
+functionality.
+
+It is easier to replace these first.
+
+=over 4
+
+=item *
+
+CodeString.lineof can be replaced by PGE;Util;line_number
+
+=item *
+
+CodeString.unique can be replaced by PGE;Util;unique, PAST;Compiler;unique, or
+PAST;Compiler;uniquereg
+
+=item *
+
+CodeString.escape can be replaced by PGE;Util;pir_str_escape
+
+=item *
+
+CodeString.key can be replaced by PGE;Util;pir_key_escape
+
+=item *
+
+CodeString.charname_to_ord can be replaced by the find_codepoint opcode
+
+=back
+
+After these replacements, StringBuilder can be substituted for CodeString by
+changing .emit to .append_format. append_format does not add newlines, so these
+must be added to the format string.
+
+=head2 :unique_reg PIR value flag
+
+=head3 Description
+
+The :unique_reg flag on registers in PIR is no longer available.
+
+=head3 Rational
+
+It doesn't do anything.
+
+Also, this is a terrible way to work around register allocator failures if/when
+we get a register allocator.
+
+=head3 Replacment
+
+    s/:unique_reg//g
+
+=head2 .nci_call and .meth_call PIR special forms
+
+Specifying the type of call being performed is no longer required thanks to the
+magic of virtual dispatch.
+
+=head3 Rational
+
+They're old, crufty, and don't do anything that cannot be acheived by .call.
+
+Except obfuscasion of course.
+
+=head3 Replacment
+
+Use .call. It should be a simple text replacement fix.
+
+=head2 Indirect Register Access Ops
+
+=head3 Description
+
+Opcodes that access registers that are not their direct arguments are
+deprecated.
+
+Note, however, that direct arguments does include keys and pcc ops.
+
+Ops that are known to have this behaviour are clear{i,n,s,p} and
+set{i,n,s,p}_ind.
+
+These have been removed. No other core ops are known to have this behaviour.
+If you've created a dynop that has this behaviour, it and code using it is
+subject to breakage without notice (we reserve the right to implement
+optimizers).
+
+=head3 Rational
+
+They don't fit well with the level of the rest of parrot's opcodes.
+They make register lifetime analysis impossible, preventing many optimizations.
+
+=head3 Replacment
+
+If you really are using this, rethink your code. Stop using the register frame
+as an aggregate. Use an object aggregate in stead.
+
+=head2 Exchange Op
+
+=head3 Description
+
+The exchange ops are deprecated.
+
+=head3 Rational
+
+They operate at too low a level to be useful as parrot ops.
+
+=head3 Replacment
+
+You aren't using this. Seriously?
+
+    .macro xchg_int(a, b)
+        $I0 = .a
+        .a = .b
+        .b = $I0
+    .endm
+
+=head2 PIR string literals with charset and encoding are deprecated
+
+=head3 Description
+
+PIR string literals of the form
+
+    encoding:charset:"string"
+
+are deprecated.
+
+=head3 Rational
+
+After the charset/encoding merge, they're unneeded.
+
+=head3 Replacment
+
+They can be replaced with
+
+    encoding:"string"
+
+The encoding should be one of the new unified encodings.
+
+=head2 Remaining string_* functions are deprecated
+
+=head3 Description
+
+The string_* functions have been deprecated for a while.
+
+The remaining functions are:
+
+    string_make
+    string_ord
+    string_chr
+    string_to_cstring_nullable
+    string_max_bytes
+    string_increment
+
+=head3 Rational
+
+They're old cruft.
+
+=head3 Replacment
+
+string_make should be replaced with Parrot_str_new_init.
+You can use Parrot_find_encoding to get an encoding from a cstring.
+
+Replace string_ord with Parrot_str_indexed.
+
+Replace string_chr with Parrot_str_chr.
+
+Replace string_to_cstring_nullable with Parrot_str_to_cstring.
+
+string_max_bytes and string_increment will be removed.
+
+=head2 Method lower in String PMC
+
+=head3 Description
+
+The method lower in the String PMC has been removed.
+
+=head3 Rational
+
+HLLs may need its own version with different name and semantic, having a
+generic one is confusing. For other usages string registers are more
+convenient.
+
+=head3 Replacment
+
+Use string registers and the downcase opcode.
+
+For HLLs, provide its own version in the HLL mapped String type.
+
+=cut

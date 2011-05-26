@@ -127,24 +127,35 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
     Parrot_Interp interp_raw;
     Parrot_GC_Init_Args gc_args;
     const Parrot_Interp parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
+    Parrot_jump_buff env;
     interp_raw = allocate_interpreter(parent_raw, flags);
-    if (args) {
-        gc_args.stacktop          = args->stacktop
-                                  ? args->stacktop : &alt_stacktop;
-        gc_args.system            = args->gc_system;
-        gc_args.dynamic_threshold = args->gc_dynamic_threshold;
-        gc_args.min_threshold     = args->gc_min_threshold;
-
-        if (args->hash_seed)
-            interp_raw->hash_seed = args->hash_seed;
+    if (setjmp(env)) {
+        interp_raw->api_jmp_buf = NULL;
+        *interp = NULL;
+        return !interp_raw->exit_code;
     }
     else {
-        memset(&gc_args, 0, sizeof (Parrot_GC_Init_Args));
-        gc_args.stacktop = &alt_stacktop;
+        interp_raw->api_jmp_buf = &env;
+        if (args) {
+            gc_args.stacktop          = args->stacktop
+                                      ? args->stacktop : &alt_stacktop;
+            gc_args.system            = args->gc_system;
+            gc_args.nursery_size      = args->gc_nursery_size;
+            gc_args.dynamic_threshold = args->gc_dynamic_threshold;
+            gc_args.min_threshold     = args->gc_min_threshold;
+
+            if (args->hash_seed)
+                interp_raw->hash_seed = args->hash_seed;
+        }
+        else {
+            memset(&gc_args, 0, sizeof (Parrot_GC_Init_Args));
+            gc_args.stacktop = &alt_stacktop;
+        }
+        initialize_interpreter(interp_raw, &gc_args);
+        *interp = VTABLE_get_pmc_keyed_int(
+                interp_raw, interp_raw->iglobals, (Parrot_Int)IGLOBALS_INTERPRETER);
     }
-    initialize_interpreter(interp_raw, &gc_args);
-    *interp = VTABLE_get_pmc_keyed_int(
-            interp_raw, interp_raw->iglobals, (Parrot_Int)IGLOBALS_INTERPRETER);
+    interp_raw->api_jmp_buf = NULL;
     return !PMC_IS_NULL(*interp);
 }
 

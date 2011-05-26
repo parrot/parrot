@@ -94,7 +94,7 @@ static PMC* ret_pmc(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static STRING* ret_string(PARROT_INTERP, ARGIN(char *p), int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -474,7 +474,7 @@ Returns the element of type C<type> starting at C<*p> as a Parrot string.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 ret_string(PARROT_INTERP, ARGIN(char *p), int type)
 {
@@ -495,7 +495,7 @@ ret_string(PARROT_INTERP, ARGIN(char *p), int type)
                     Parrot_latin1_encoding_ptr, 0);
         }
         else
-            return NULL;
+            return STRINGNULL;
     }
 
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -761,7 +761,7 @@ calc_offsets(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *value), size_t toff)
         if (type < enum_first_type || type >= enum_last_type)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION,
-                "Illegal type in initializer for struct");
+                "Illegal type (%d) in initializer for struct", type);
 
         if (count <= 0) {
             count = 1;

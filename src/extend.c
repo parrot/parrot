@@ -609,7 +609,7 @@ PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 Parrot_Language
-Parrot_find_language(SHIM_INTERP, SHIM(const char *language))
+Parrot_find_language(SHIM_INTERP, ARGIN(SHIM(const char *language)))
 {
     ASSERT_ARGS(Parrot_find_language)
     return 0;

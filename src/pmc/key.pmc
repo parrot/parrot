@@ -380,6 +380,49 @@ Set key to hold particular register.
         Parrot_key_set_register(INTERP, SELF, reg_no, reg_type);
     }
 
+/*
+
+=item C<INTVAL elements()>
+
+=item C<INTVAL get_integer_keyed_int(INTVAL n)>
+
+=item C<STRING *get_string_keyed_int(INTVAL n)>
+
+=item C<PMC *get_pmc_keyed_init(INTVAL n)>
+
+Aggregate interface.
+
+=cut
+
+*/
+
+    VTABLE INTVAL elements() {
+        INTVAL n = 0;
+        for (; SELF; SELF = PARROT_KEY(SELF)->next_key)
+            n++;
+        return n;
+    }
+
+    VTABLE INTVAL get_integer_keyed_int(INTVAL n) {
+        for (; SELF && n; SELF = PARROT_KEY(SELF)->next_key, n--);
+        if (n)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "Key access out of bounds");
+        return Parrot_key_integer(INTERP, SELF);
+    }
+
+    VTABLE STRING *get_string_keyed_int(INTVAL n) {
+        for (; SELF && n; SELF = PARROT_KEY(SELF)->next_key, n--);
+        if (n)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "Key access out of bounds");
+        return Parrot_key_string(INTERP, SELF);
+    }
+
+    VTABLE PMC *get_pmc_keyed_int(INTVAL n) {
+        for (; SELF && n; SELF = PARROT_KEY(SELF)->next_key, n--);
+        if (n)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "Key access out of bounds");
+        return Parrot_key_pmc(INTERP, SELF);
+    }
 }
 
 /*

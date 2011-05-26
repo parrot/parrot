@@ -54,7 +54,7 @@ static PackFile_Segment * byte_code_new(PARROT_INTERP)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t * byte_code_pack(SHIM_INTERP,
+static opcode_t * byte_code_pack(PARROT_INTERP,
     ARGMOD(PackFile_Segment *self),
     ARGOUT(opcode_t *cursor))
         __attribute__nonnull__(2)
@@ -64,7 +64,7 @@ static opcode_t * byte_code_pack(SHIM_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static size_t byte_code_packed_size(SHIM_INTERP,
+static size_t byte_code_packed_size(PARROT_INTERP,
     ARGMOD(PackFile_Segment *self))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
@@ -292,7 +292,7 @@ static opcode_t * pf_debug_pack(PARROT_INTERP,
         FUNC_MODIFIES(*self)
         FUNC_MODIFIES(*cursor);
 
-static size_t pf_debug_packed_size(SHIM_INTERP,
+static size_t pf_debug_packed_size(PARROT_INTERP,
     ARGMOD(PackFile_Segment *self))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
@@ -4172,17 +4172,22 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
     ASSERT_ARGS(load_file)
 
     PMC * pf_pmc = PackFile_read_pbc(interp, path, 0);
-    PackFile *pf = PackFile_append_pmc(interp, pf_pmc);
-
-    if (!pf)
+    if (!pf_pmc)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                "Unable to append PBC to the current directory");
+                "Unable to load PBC file %Ss", path);
+    else {
+        PackFile *pf = PackFile_append_pmc(interp, pf_pmc);
 
-    mem_gc_free(interp, pf->header);
-    pf->header = NULL;
-    mem_gc_free(interp, pf->dirp);
-    pf->dirp   = NULL;
-    /* no need to free pf here, as directory_destroy will get it */
+        if (!pf)
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "Unable to append PBC to the current directory");
+
+        mem_gc_free(interp, pf->header);
+        pf->header = NULL;
+        mem_gc_free(interp, pf->dirp);
+        pf->dirp   = NULL;
+        /* no need to free pf here, as directory_destroy will get it */
+    }
 }
 
 /*
@@ -4437,7 +4442,7 @@ PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
     else {
         /* can't read a file that doesn't exist */
         if (!Parrot_file_stat_intval(interp, fullname, STAT_EXISTS)) {
-            Parrot_io_eprintf(interp, "Parrot VM: Can't stat %s, code %i.\n",
+            Parrot_io_eprintf(interp, "Parrot VM: Can't stat %Ss, code %i.\n",
                     fullname, errno);
             return NULL;
         }
@@ -4445,7 +4450,7 @@ PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
         /* we may need to relax this if we want to read bytecode from pipes */
         if (!Parrot_file_stat_intval(interp, fullname, STAT_ISREG)) {
             Parrot_io_eprintf(interp,
-                "Parrot VM: '%s', is not a regular file %i.\n",
+                "Parrot VM: '%Ss', is not a regular file %i.\n",
                 fullname, errno);
             return NULL;
         }
@@ -4456,7 +4461,7 @@ PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
         io = PIO_OPEN(interp, fullname, PIO_F_READ);
 
         if (io == PIO_INVALID_HANDLE) {
-            Parrot_io_eprintf(interp, "Parrot VM: Can't open %s, code %i.\n",
+            Parrot_io_eprintf(interp, "Parrot VM: Can't open %Ss, code %i.\n",
                     fullname, errno);
             return NULL;
         }
@@ -4523,7 +4528,7 @@ again:
         io = PIO_OPEN(interp, fullname, PIO_F_READ);
 
         if (io == PIO_INVALID_HANDLE) {
-            Parrot_io_eprintf(interp, "Parrot VM: Can't open %s, code %i.\n",
+            Parrot_io_eprintf(interp, "Parrot VM: Can't open %Ss, code %i.\n",
                     fullname, errno);
             return NULL;
         }
@@ -4560,7 +4565,7 @@ again:
 
     if (!PackFile_unpack(interp, pf, (opcode_t *)program_code,
             (size_t)program_size)) {
-        Parrot_io_eprintf(interp, "Parrot VM: Can't unpack packfile %s.\n",
+        Parrot_io_eprintf(interp, "Parrot VM: Can't unpack packfile %Ss.\n",
                 fullname);
         return NULL;
     }

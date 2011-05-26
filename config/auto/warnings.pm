@@ -235,6 +235,7 @@ sub _init {
         -Wformat
         -Wformat-security
         -Wmain
+        -Wmaybe-uninitialized
         -Wmissing-declarations
         -Wmissing-prototypes
         -Wpointer-arith

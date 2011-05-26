@@ -434,7 +434,7 @@ D: Miscellaneous codingstd fixes
 N: Gerd Pokorra
 A: gerd
 E: pokorra@uni-siegen.de
-D: Release manager for 1.9.0, 2.3.0, 2.5.0, 2.8.0, 2.9.0 and 3.2.0
+D: Release manager for 1.9.0, 2.3.0, 2.5.0, 2.8.0, 2.9.0, 3.2.0 and 3.4.0
 
 N: Goplat
 D: Win98 and other fixes.
@@ -718,6 +718,10 @@ D: httpd.imc, bugfixes
 N: Markus Mayr
 D: Implementation of the Rational PMC
 D: Fixing SDL-bindings and examples
+
+N: Matt Boyle
+U: ligne
+D: Fixes to docs and test-suite.
 
 N: Matt Diephouse
 U: mdiep

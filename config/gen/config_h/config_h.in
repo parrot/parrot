@@ -125,6 +125,9 @@ typedef @hugefloatval@ HUGEFLOATVAL;
 #define SHORT_SIZE @shortsize@
 #define INT_SIZE @intsize@
 #define LONG_SIZE @longsize@
+#if @HAS_LONGLONG@
+#  define LONGLONG_SIZE @longlongsize@
+#endif
 #define HUGEINTVAL_SIZE @hugeintvalsize@
 #define DOUBLE_SIZE @doublesize@
 

@@ -1,5 +1,12 @@
 ---
 -
+  name:     '"Advanced" NCI parameter types'
+  eligible: '3.1'
+  ticket:   'http://trac.parrot.org/parrot/ticket/1931' 
+  tags:
+    - 'deprecated'
+    - 'completed'
+-
   name:     'Pointer, UnManagedStruct, and ManagedStruct'
   eligible: '3.4'
   ticket:   'http://trac.parrot.org/parrot/ticket/2035'

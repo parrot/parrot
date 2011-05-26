@@ -23197,7 +23197,7 @@ op_lib_t core_op_lib = {
   PARROT_FUNCTION_CORE,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
   3,    /* major_version */
-  3,    /* minor_version */
+  4,    /* minor_version */
   0,    /* patch_version */
   1071,             /* op_count */
   core_op_info_table,       /* op_info_table */
@@ -23230,8 +23230,8 @@ static HOP *hop_buckets;
 static HOP **hop;
 
 static void hop_init(PARROT_INTERP);
-static size_t hash_str(const char *str);
-static void store_op(op_info_t *info, HOP *p, const char *name);
+static size_t hash_str(ARGIN(const char *str));
+static void store_op(ARGIN(op_info_t *info), ARGMOD(HOP *p), ARGIN(const char *name));
 
 /* XXX on changing interpreters, this should be called,
    through a hook */
@@ -23264,7 +23264,7 @@ size_t hash_str(ARGIN(const char *str))
 }
 
 
-static void store_op(op_info_t *info, HOP *p, const char *name)
+static void store_op(ARGIN(op_info_t *info), ARGMOD(HOP *p), ARGIN(const char *name))
 {
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
 
@@ -23273,7 +23273,7 @@ static void store_op(op_info_t *info, HOP *p, const char *name)
     hop[hidx]         = p;
 }
 
-static int get_op(PARROT_INTERP, const char *name, int full)
+static int get_op(PARROT_INTERP, ARGIN(const char *name), int full)
 {
     const HOP   *p;
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
@@ -23298,8 +23298,9 @@ static void hop_init(PARROT_INTERP)
 
     /* allocate the storage all in one chunk
      * yes, this is profligate, but we can tighten it later */
-    HOP *hops = hop_buckets =
+    HOP * const hop_buckets =
         mem_gc_allocate_n_zeroed_typed(interp, core_op_lib.op_count * 2, HOP );
+    HOP *hops = hop_buckets;
 
     opcode_t i;
 
@@ -23324,7 +23325,7 @@ static void hop_deinit(PARROT_INTERP)
     hop_buckets = NULL;
 }PARROT_EXPORT
 op_lib_t *
-Parrot_DynOp_core_3_3_0(PARROT_INTERP, long init) {
+Parrot_DynOp_core_3_4_0(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 
@@ -23353,7 +23354,7 @@ Parrot_lib_core_ops_load(PARROT_INTERP)
 
 {
     PMC *const lib = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
-    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_3_3_0;
+    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_3_4_0;
     dynop_register(interp, lib);
     return lib;
 }

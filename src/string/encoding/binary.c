@@ -28,17 +28,17 @@ static STRING * binary_chr(PARROT_INTERP, UINTVAL codepoint)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* binary_error(PARROT_INTERP, SHIM(const STRING *src))
+static STRING* binary_error(PARROT_INTERP, const STRING *src)
         __attribute__nonnull__(1);
 
-static INTVAL binary_partial_scan(SHIM_INTERP,
+static INTVAL binary_partial_scan(PARROT_INTERP,
     ARGIN(const char *buf),
     ARGMOD(Parrot_String_Bounds *bounds))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*bounds);
 
-static void binary_scan(SHIM_INTERP, ARGMOD(STRING *src))
+static void binary_scan(PARROT_INTERP, ARGMOD(STRING *src))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*src);
 

@@ -789,7 +789,7 @@ Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
                 return VTABLE_get_integer(interp, item);
         }
         else
-            return Parrot_dt_get_datatype_enum(interp, name);
+            return -Parrot_dt_get_datatype_enum(interp, name);
     }
 }
 

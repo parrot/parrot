@@ -198,6 +198,9 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->piodata = NULL;
     Parrot_io_init(interp);
 
+    /* use the system time as the prng seed */
+    Parrot_util_srand(Parrot_get_entropy(interp));
+
     /*
      * Set up the string subsystem
      * This also generates the constant string tables

@@ -40,15 +40,12 @@ sub runstep {
 
     my $libs = _strip_ldl_as_needed( $conf->data->get( 'libs' ) );
 
-    _set_deployment_environment();
+    my $deploy_target = _set_deployment_environment();
 
     my $lib_dir = $conf->data->get('build_dir') . "/blib/lib";
     $flagsref->{ldflags} .= ' -L"' . $lib_dir . '"';
 
-    if ($ENV{'MACOSX_DEPLOYMENT_TARGET'} eq '10.6') {
-        $flagsref->{ccflags} .= ' -pipe -fno-common ';
-    }
-    elsif ($ENV{'MACOSX_DEPLOYMENT_TARGET'} eq '10.5') {
+    if ($deploy_target =~ /^10\.(5|6|7)$/) {
         $flagsref->{ccflags} .= ' -pipe -fno-common ';
     }
     else {
@@ -69,7 +66,7 @@ sub runstep {
 
     $conf->data->set(
         darwin              => 1,
-        osx_version         => $ENV{'MACOSX_DEPLOYMENT_TARGET'},
+        osx_version         => $deploy_target,
         osvers              => $osvers,
         ccflags             => $flagsref->{ccflags},
         ldflags             => $flagsref->{ldflags},
@@ -169,6 +166,7 @@ sub _set_deployment_environment {
         $OSX_vers =join '.', (split /[.]/, $OSX_vers)[0,1];
         $ENV{'MACOSX_DEPLOYMENT_TARGET'} = $OSX_vers;
     }
+    return $ENV{'MACOSX_DEPLOYMENT_TARGET'};
 }
 
 sub _probe_for_fink {

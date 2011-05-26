@@ -31,7 +31,8 @@
 /*.sto
 /*.suo
 /*.tmp
-*.sw?
+# vim swap files
+/\.*sw?
 /*.vcproj*
 /.git
 /.parrot_current_rev
@@ -251,6 +252,7 @@
 /runtime/parrot/include/*.fpmc
 /runtime/parrot/include/*.pasm
 /runtime/parrot/include/*.pbc
+/runtime/parrot/include/*.pir
 /runtime/parrot/languages/JSON/JSON.pir
 /runtime/parrot/languages/data_json
 /runtime/parrot/library/*.pbc

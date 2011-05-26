@@ -19,13 +19,6 @@ This code implements the default mark and sweep garbage collector.
 
 #define DEBUG_FREE_LIST 0
 
-PARROT_DOES_NOT_RETURN
-static void failed_allocation(unsigned int line, unsigned long size) /* HEADERIZER SKIP */
-{
-    fprintf(stderr, "Failed allocation of %lu bytes\n", size);
-    do_panic(NULL, "Out of mem", __FILE__, line);
-}
-
 #define PANIC_OUT_OF_MEM(size) failed_allocation(__LINE__, (size))
 
 /* HEADERIZER HFILE: src/gc/gc_private.h */
@@ -40,11 +33,14 @@ static INTVAL contained_in_attr_pool(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_DOES_NOT_RETURN
+static void failed_allocation(unsigned int line, unsigned long size);
+
 static int gc_ms_active_sized_buffers(ARGIN(const Memory_Pools *mem_pools))
         __attribute__nonnull__(1);
 
 static void gc_ms_add_free_object(PARROT_INTERP,
-    SHIM(Memory_Pools *mem_pools),
+    Memory_Pools *mem_pools,
     ARGMOD(Fixed_Size_Pool *pool),
     ARGIN(void *to_add))
         __attribute__nonnull__(1)
@@ -68,11 +64,11 @@ static Buffer * gc_ms_allocate_bufferlike_header(PARROT_INTERP, size_t size)
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_ms_allocate_memory_chunk(SHIM_INTERP, size_t size);
+static void * gc_ms_allocate_memory_chunk(PARROT_INTERP, size_t size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_ms_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size);
+static void * gc_ms_allocate_memory_chunk_zeroed(PARROT_INTERP, size_t size);
 
 PARROT_CANNOT_RETURN_NULL
 static void * gc_ms_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
@@ -125,7 +121,7 @@ static void gc_ms_free_bufferlike_header(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*obj);
 
-static void gc_ms_free_memory_chunk(SHIM_INTERP, ARGFREE(void *data));
+static void gc_ms_free_memory_chunk(PARROT_INTERP, ARGFREE(void *data));
 static void gc_ms_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -176,29 +172,29 @@ static void gc_ms_mark_special(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_ms_mark_str_header(SHIM_INTERP, ARGMOD_NULLOK(STRING *obj))
+static void gc_ms_mark_str_header(PARROT_INTERP, ARGMOD_NULLOK(STRING *obj))
         FUNC_MODIFIES(*obj);
 
 static void gc_ms_more_traceable_objects(PARROT_INTERP,
-    SHIM(Memory_Pools *mem_pools),
+    Memory_Pools *mem_pools,
     ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
 
-static void gc_ms_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
+static void gc_ms_pool_init(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_ms_reallocate_memory_chunk(SHIM_INTERP,
+static void * gc_ms_reallocate_memory_chunk(PARROT_INTERP,
     ARGFREE(void *from),
     size_t size);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static void * gc_ms_reallocate_memory_chunk_zeroed(SHIM_INTERP,
+static void * gc_ms_reallocate_memory_chunk_zeroed(PARROT_INTERP,
     ARGFREE(void *data),
     size_t newsize,
     size_t oldsize);
@@ -206,7 +202,7 @@ static void * gc_ms_reallocate_memory_chunk_zeroed(SHIM_INTERP,
 static int gc_ms_sweep_cb(PARROT_INTERP,
     ARGIN(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
-    SHIM(int flag),
+    int flag,
     ARGMOD(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -238,7 +234,7 @@ PARROT_MALLOC
 static PMC_Attribute_Pool * Parrot_gc_create_attrib_pool(size_t attrib_idx);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC_Attribute_Pool * Parrot_gc_get_attribute_pool(SHIM_INTERP,
+static PMC_Attribute_Pool * Parrot_gc_get_attribute_pool(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
     size_t attrib_size)
         __attribute__nonnull__(2)
@@ -251,7 +247,7 @@ static void * Parrot_gc_get_attributes_from_pool(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* pool);
 
-static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
+static void Parrot_gc_initialize_fixed_size_pools(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
     size_t init_num_pools)
         __attribute__nonnull__(2)
@@ -260,6 +256,7 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
 #define ASSERT_ARGS_contained_in_attr_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(ptr))
+#define ASSERT_ARGS_failed_allocation __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_ms_active_sized_buffers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_gc_ms_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -367,6 +364,28 @@ static void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
        PARROT_ASSERT_ARG(mem_pools))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
+
+/*
+
+=over 4
+
+=item C<static void failed_allocation(unsigned int line, unsigned long size)>
+
+Report error if allocation failed
+
+=back
+
+=cut
+
+*/
+
+PARROT_DOES_NOT_RETURN
+static void
+failed_allocation(unsigned int line, unsigned long size)
+{
+    fprintf(stderr, "Failed allocation of %lu bytes\n", size);
+    do_panic(NULL, "Out of mem", __FILE__, line);
+}
 
 /*
 

@@ -31,9 +31,10 @@ Compile bytecode to executable.
     .local string objfile
     .local string exefile
     .local string runcore
+    .local string gccore
     .local int    install
 
-    (infile, cfile, objfile, exefile, runcore, install) = 'handle_args'(argv)
+    (infile, cfile, objfile, exefile, runcore, gccore, install) = 'handle_args'(argv)
     unless infile > '' goto err_infile
 
   open_outfile:
@@ -73,9 +74,8 @@ HEADER
     'generate_code'(infile, outfh)
   code_end:
 
-    print outfh, '#define RUNCORE "'
-    print outfh, runcore
-    print outfh, "\"\n"
+    'print_define'(outfh, "RUNCORE", runcore)
+    'print_define'(outfh, "GCCORE", gccore)
 
     print outfh, <<'MAIN'
         int main(int argc, const char *argv[])
@@ -86,6 +86,7 @@ HEADER
             const unsigned char *program_code_addr;
             Parrot_Init_Args *initargs;
             GET_INIT_STRUCT(initargs);
+            initargs->gc_system = GCCORE;
 
             program_code_addr = (const unsigned char *)get_program_code();
             if (!program_code_addr)
@@ -95,7 +96,7 @@ HEADER
                   Parrot_set_config_hash(interp) &&
                   Parrot_api_set_executable_name(interp, argv[0]) &&
                   Parrot_api_set_runcore(interp, RUNCORE, TRACE))) {
-                fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
+                fprintf(stderr, "PARROT VM: Could not initialize new interpreter\n");
                 show_last_error_and_exit(interp);
             }
 
@@ -106,7 +107,7 @@ HEADER
                 show_last_error_and_exit(interp);
             }
             if (!Parrot_api_load_bytecode_bytes(interp, program_code_addr, bytecode_size, &pbc)) {
-                fprintf(stderr, "PARROT VM: Could not load bytecode");
+                fprintf(stderr, "PARROT VM: Could not load bytecode\n");
                 show_last_error_and_exit(interp);
             }
             if (!Parrot_api_run_bytecode(interp, pbc, argsarray)) {
@@ -218,6 +219,20 @@ MAIN
     die "cannot close outfile"
 .end
 
+.sub print_define
+    .param pmc outfh
+    .param pmc args :slurpy
+    $S0 = args[1]
+
+    if null $S0 goto define_null
+        $S0 = sprintf "#define %s \"%s\"\n", args
+        goto done_define
+    define_null:
+        $S0 = sprintf "#define %s NULL\n", args
+    done_define:
+    print outfh, $S0
+.end
+
 
 .sub 'handle_args'
     .param pmc argv
@@ -234,6 +249,7 @@ MAIN
     push getopt, 'runcore|R:s'
     push getopt, 'output|o:s'
     push getopt, 'help|h'
+    push getopt, 'gc:s'
 
     $P0 = shift argv # ignore program name
     .local pmc opts
@@ -243,10 +259,15 @@ MAIN
     .local int    install
     .local string runcore
     .local string outfile
+    .local string gccore
     help    = opts['help']
     install = opts['install']
     runcore = opts['runcore']
     outfile = opts['output']
+    gccore  = opts['gc']
+    if gccore != "" goto have_gc_core
+        gccore = null
+    have_gc_core:
 
     unless help goto end_help
         $P0 = getstderr
@@ -257,6 +278,7 @@ pbc_to_exe [options] <file>
     -i --install
     -R --runcore=slow|fast
     -o --output=FILE
+       --gc=ms2|gms
 HELP
         exit 0
     end_help:
@@ -319,7 +341,7 @@ HELP
         die $S0
     done_runcore:
 
-    .return (infile, cfile, objfile, exefile, runcore_code, install)
+    .return (infile, cfile, objfile, exefile, runcore_code, gccore, install)
 .end
 
 .sub 'determine_code_type'

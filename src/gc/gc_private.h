@@ -48,6 +48,8 @@ extern void *flush_reg_store(void);
 #define GC_SIZE_THRESHOLD                      1024  * 1024
 #define GC_DEFAULT_DYNAMIC_THRESHOLD           75
 #define GC_DEFAULT_MIN_THRESHOLD               4 * 1024 * 1024
+/* promills of system memory */
+#define GC_DEFAULT_NURSERY_SIZE                2
 
 #define PMC_HEADERS_PER_ALLOC     4096 * 10 / sizeof (PMC)
 #define BUFFER_HEADERS_PER_ALLOC  4096      / sizeof (Buffer)
@@ -386,13 +388,11 @@ void initialize_fixed_size_pools(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*mem_pools);
 
-void mark_special(PARROT_INTERP,
-    SHIM(Memory_Pools *mem_pools),
-    ARGIN(PMC *obj))
+void mark_special(PARROT_INTERP, Memory_Pools *mem_pools, ARGIN(PMC *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-void Parrot_add_to_free_list(SHIM_INTERP,
+void Parrot_add_to_free_list(PARROT_INTERP,
     ARGMOD(Fixed_Size_Pool *pool),
     ARGMOD(Fixed_Size_Arena *arena))
         __attribute__nonnull__(2)
@@ -413,11 +413,11 @@ void Parrot_append_arena_in_pool(PARROT_INTERP,
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*new_arena);
 
-void Parrot_gc_clear_live_bits(SHIM_INTERP,
+void Parrot_gc_clear_live_bits(PARROT_INTERP,
     ARGIN(const Fixed_Size_Pool *pool))
         __attribute__nonnull__(2);
 
-void Parrot_gc_run_init(SHIM_INTERP, ARGMOD(Memory_Pools *mem_pools))
+void Parrot_gc_run_init(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*mem_pools);
 
@@ -583,12 +583,12 @@ void gc_ms_reallocate_string_storage(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-size_t Parrot_gc_get_info(SHIM_INTERP,
+size_t Parrot_gc_get_info(PARROT_INTERP,
     Interpinfo_enum which,
     ARGIN(GC_Statistics *stats))
         __attribute__nonnull__(3);
 
-void Parrot_gc_ms_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
+void Parrot_gc_ms_init(PARROT_INTERP, Parrot_GC_Init_Args *args)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -639,7 +639,7 @@ int Parrot_gc_ms_needed(PARROT_INTERP)
 /* HEADERIZER BEGIN: src/gc/gc_inf.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void Parrot_gc_inf_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
+void Parrot_gc_inf_init(PARROT_INTERP, Parrot_GC_Init_Args *args)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_gc_inf_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -716,11 +716,11 @@ void Parrot_gc_str_compact_pool(PARROT_INTERP, ARGIN(String_GC *gc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void Parrot_gc_str_finalize(SHIM_INTERP, ARGMOD(String_GC *gc))
+void Parrot_gc_str_finalize(PARROT_INTERP, ARGMOD(String_GC *gc))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*gc);
 
-void Parrot_gc_str_free_buffer_storage(SHIM_INTERP,
+void Parrot_gc_str_free_buffer_storage(PARROT_INTERP,
     ARGIN(String_GC *gc),
     ARGMOD(Buffer *b))
         __attribute__nonnull__(2)

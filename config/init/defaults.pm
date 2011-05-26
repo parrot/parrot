@@ -254,7 +254,6 @@ sub runstep {
 
         tempdir => File::Spec->tmpdir,
 
-        PKGCONFIG_DIR => $conf->options->get('pkgconfigdir') || '',
         coveragedir => $conf->options->get('coveragedir') || $build_dir,
     );
 
@@ -302,7 +301,9 @@ sub _64_bit_adjustments {
             $archname =~ s/x86_64/i386/;
 
             # adjust gcc?
-            for my $cc qw(cc cxx link ld) {
+            ## add parentheses around qw(...)
+            ## to remove deprecation warning in perl 5.14.0
+            for my $cc (qw(cc cxx link ld)) {
                 $conf->data->add( ' ', $cc, '-m32' );
             }
 

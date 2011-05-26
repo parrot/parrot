@@ -126,5 +126,6 @@ Starred release numbers indicate supported releases.
  Gerd        3.2.0          2011-Mar-15     "Nanday Parakeet"
 
  Whiteknight 3.3.0 *        2011-Apr-19     "Fire in the Sky"
+ Gerd        3.4.0          2011-May-17     "Pacific Parakeet"
 
 =cut

@@ -574,7 +574,7 @@ void PackFile_fixup_subs(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void PackFile_funcs_register(SHIM_INTERP,
+void PackFile_funcs_register(PARROT_INTERP,
     ARGMOD(PackFile *pf),
     UINTVAL type,
     const PackFile_funcs funcs)
@@ -818,7 +818,7 @@ PMC * PackFile_Annotations_lookup(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t * PackFile_Annotations_pack(SHIM_INTERP,
+opcode_t * PackFile_Annotations_pack(PARROT_INTERP,
     ARGIN(PackFile_Segment *seg),
     ARGOUT(opcode_t *cursor))
         __attribute__nonnull__(2)
@@ -827,7 +827,7 @@ opcode_t * PackFile_Annotations_pack(SHIM_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-size_t PackFile_Annotations_packed_size(SHIM_INTERP,
+size_t PackFile_Annotations_packed_size(PARROT_INTERP,
     ARGMOD(PackFile_Segment *seg))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*seg);
@@ -1035,7 +1035,7 @@ size_t PackFile_ConstTable_pack_size(PARROT_INTERP,
         FUNC_MODIFIES(*seg);
 
 PARROT_EXPORT
-int PackFile_ConstTable_rlookup_num(SHIM_INTERP,
+int PackFile_ConstTable_rlookup_num(PARROT_INTERP,
     ARGIN(const PackFile_ConstTable *ct),
     FLOATVAL n)
         __attribute__nonnull__(2);

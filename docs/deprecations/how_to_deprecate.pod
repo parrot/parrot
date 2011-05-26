@@ -1,0 +1,135 @@
+# Copyright (C) 2011, Parrot Foundation.
+
+=head1 NAME
+
+docs/deprecations/how_to_deprecate.pod - How to Deprecate Parrot Code
+
+=head1 How to Deprecate Parrot Code
+
+So you've found a crufty bit of code in Parrot that's just screaming to be
+removed.  Welcome to the club.  There's a lot of them.  This page documents
+the proper procedure to go through to get that junk code out of Parrot while
+causing minimal pain to Parrot's users (i.e. people who develop HLLs or
+libraries on top of Parrot).
+
+=head2 Step 1: Give Notice
+
+=over 4
+
+=item *
+
+file a ticket
+
+=item *
+
+add a note to api.yaml
+
+=item *
+
+maybe post to parrot-dev and/or parrot-users depending on the nature of the change
+
+=item *
+
+get some feedback indicating that the change is sane
+
+=item *
+
+set up automatic usage detection using api.yaml regexes (static usage
+detection) and/or Parrot_warn_deprecated (dynamic usage detection)
+
+=back
+
+=head2 Step 2: Wait
+
+=over 4
+
+=item *
+
+pick an eligible release for the deprecation policy
+
+=item *
+
+backwards-incompatible changes can't happen until a stable release has gone out
+the door with a notification of the coming deprecation
+
+=item *
+
+see:
+http://docs.parrot.org/parrot/latest/html/docs/project/support_policy.pod.html
+Parrot Release and Support Policy for more information
+
+=back
+
+=head2 Step 3: Patch
+
+=over 4
+
+=item *
+
+write the code, possibly in a branch
+
+=item *
+
+unless it's highly impractical, maintain backwards-compatibility to ease the
+migration - this also means you can commit your changes immediately and remove
+the deprecated interface later
+
+=item *
+
+test your changes with current HLLs and libraries such as partcl-nqp, Rakudo,
+winxed, Kakapo, etc
+
+=back
+
+=head2 Step 4: Document
+
+=over 4
+
+=item *
+
+add a summary of your change to ParrotDeprecations
+
+=item *
+
+add a complete description to the appropriate version transition deprecations
+page (e.g. [wiki:ParrotDeprecationsFor2.6 ParrotDeprecationsFor2.6])
+
+=item *
+
+walk through the the documentation to ensure that it's sufficient for a user to
+use to upgrade his or her code
+
+=item *
+
+Add the tag of "completed" to the entry in api.yaml
+
+=back
+
+=head2 Step 5: Apply
+
+=over 4
+
+=item *
+
+make sure the HLLs and libraries are ready the deprecation (and submit patches
+if not)
+
+=item *
+
+merge or commit your backwards-incompatible changes to master
+
+=item *
+
+close the deprecation ticket, linking to the wiki transition documentation
+
+=item *
+
+bump PBC_COMPAT and run mk_native_pbc if needed
+
+=item *
+
+that's it
+
+=back
+
+=cut

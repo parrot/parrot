@@ -1,6 +1,34 @@
+New in 3.5.0
+- Core
+- Languages
+- Tests
+  + The Parrot test suite harness now understands the HARNESS_TIMER environment
+    variable. Setting it to a true value will show timing results for a test run.
+  + IPv6 tests are now parallel testing friendly
+
 New in 3.4.0
 - Core
   + The Generational Mark and Sweep garbage collector is the new default.
+  + The --gc-nursery-size command line argument was added.
+  + Parrot now gets entropy from the underlying OS.
+  + The NCI subsystem now supports 8, 16, 32 and 64 bit integers.
+  + The NCI subsystem now supports "long long" and "long double" signatures.
+    Not all platforms/compilers support these non-standard types, so developers
+    are cautioned to take note that using them reduces portability.
+  + Many more OpenGL functions in the Parrot OpenGL bindings are available,
+    which required the above-mentioned signatures.
+  + Bytecode-related embedding api functions moved to src/embed/bytecode.c.
+- Languages
+  + Winxed
+    - Use 'using extern' for module imports.
+    - Improved stage 0 prefix ++ and -- operators.
+    - Allow 'null' in conditional operator.
+    - Several examples are updated.
+- Community
+  + Google Summer of Code Bonding period is going well. Students are mostly done
+    with their classes and much code will flow soon.
+- Documentation
+  + More PCT introductions are available at: http://github.com/benabik/cish
 
 New in 3.3.0
 - Core
@@ -14,7 +42,6 @@ New in 3.3.0
   + Rosella adds a stable "Event" library to implement a publish/subscribe mechanism
 - Tests
   + The test coverage of the extend_vtable subsystem was greatly increased
-
 
 New in 3.2.0
 - Core

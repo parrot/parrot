@@ -97,10 +97,7 @@ END_PMC_HEADER_PREAMBLE
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void deallocate_ptrobj(SHIM_INTERP,
-    SHIM(PMC *obj),
-    ARGFREE(void *ptr));
-
+static void deallocate_ptrobj(PARROT_INTERP, PMC *obj, ARGFREE(void *ptr));
 #define ASSERT_ARGS_deallocate_ptrobj __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -259,7 +256,8 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
             size_t            elt_size, elt_align;
             elt_access_t      elt_access;
 
-            if (elt_type < enum_first_type || enum_last_type <= elt_type)
+            if ((elt_type & ~enum_type_ref_flag) <  enum_first_type
+            ||  (elt_type & ~enum_type_ref_flag) >= enum_last_type)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                         "Invalid type flag for struct element (%d)", elt_type);
 
@@ -345,7 +343,7 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
 
               default:
                 Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
-                        "Unknown struct element type `%s' (index %i)",
+                        "Unknown struct element type `%Ss' (index %i)",
                         Parrot_dt_get_datatype_name(INTERP, elt_type),
                         j);
             }
@@ -814,9 +812,9 @@ any other type of element.
                     break;
                   case enum_type_sized:
                     if (VTABLE_does(INTERP, p, CONST_STRING(INTERP, "buffer"))) {
-                        void   *q  = VTABLE_get_pointer(INTERP, p);
+                        void * const q = VTABLE_get_pointer(INTERP, p);
                         size_t len = VTABLE_get_integer(INTERP, p);
-                        if (!len || len > elts[i].size)
+                        if (len == 0 || len > elts[i].size)
                             len = elts[i].size;
                         memcpy(ptr, q, len);
                         break;

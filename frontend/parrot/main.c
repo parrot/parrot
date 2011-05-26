@@ -57,6 +57,11 @@ PARROT_PURE_FUNCTION
 static int is_all_hex_digits(ARGIN(const char *s))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+static int is_float(ARGIN(const char *s))
+        __attribute__nonnull__(1);
+
 PARROT_CAN_RETURN_NULL
 static PMC * load_bytecode_file(Parrot_PMC interp, Parrot_String filename);
 
@@ -118,6 +123,8 @@ static void verify_file_names(
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_is_all_hex_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_is_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_load_bytecode_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_cmd_options __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_version __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -168,10 +175,17 @@ main(int argc, const char *argv[])
     /* Parse minimal subset of flags */
     parseflags_minimal(initargs, argc, argv);
 
-    if (!(Parrot_api_make_interpreter(NULL, 0, initargs, &interp) &&
-          Parrot_set_config_hash(interp) &&
+    if (!Parrot_api_make_interpreter(NULL, 0, initargs, &interp)) {
+        fprintf(stderr, "PARROT VM: Could not allocate new interpreter\n");
+        if (interp != NULL)
+            show_last_error_and_exit(interp);
+        else
+            fprintf(stderr, "PARROT VM: No interpreter. Cannot get error details\n");
+        exit(EXIT_FAILURE);
+    }
+    if (!(Parrot_set_config_hash(interp) &&
           Parrot_api_set_executable_name(interp, argv[0]))) {
-        fprintf(stderr, "PARROT VM: Could not initialize new interpreter");
+        fprintf(stderr, "PARROT VM: Could not initialize new interpreter\n");
         show_last_error_and_exit(interp);
     }
 
@@ -367,6 +381,28 @@ is_all_digits(ARGIN(const char *s))
 }
 
 /*
+=item C<static int is_float(const char *s)>
+
+Tests all characters in a string are decimal digits or dot.
+Returns 1 if true, 0 as soon as a non-decimal found
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+static int
+is_float(ARGIN(const char *s))
+{
+    ASSERT_ARGS(is_float)
+    for (; *s; ++s)
+        if (!(isdigit((unsigned char)*s) || (*s=='.')))
+            return 0;
+    return 1;
+}
+
+/*
 
 =item C<static int is_all_hex_digits(const char *s)>
 
@@ -384,7 +420,7 @@ is_all_hex_digits(ARGIN(const char *s))
 {
     ASSERT_ARGS(is_all_hex_digits)
     for (; *s; ++s)
-        if (!isxdigit(*s))
+        if (!isxdigit((unsigned char)*s))
             return 0;
     return 1;
 }
@@ -404,7 +440,7 @@ usage(ARGMOD(FILE *fp))
 {
     ASSERT_ARGS(usage)
     fprintf(fp,
-            "parrot -[acEGhprtvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
+            "parrot -[acEGhrtvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
             "[-O [level]] [-R runcore] [-o FILE] <file>\n");
 }
 
@@ -487,11 +523,14 @@ help(void)
     printf(
     "    -w --warnings\n"
     "    -G --no-gc\n"
+    "    -g --gc ms2|gms|ms|inf set GC type\n"
+    "       <GC MS2 options>\n"
     "       --gc-dynamic-threshold=percentage    maximum memory wasted by GC\n"
     "       --gc-min-threshold=KB\n"
+    "       <GC GMS options>\n"
+    "       --gc-nursery-size=percent of sysmem  size of gen0 (default 2)\n"
     "       --gc-debug\n"
     "       --leak-test|--destroy-at-end\n"
-    "    -g --gc ms2|gms|ms|inf set GC type\n"
     "    -. --wait    Read a keystroke before starting\n"
     "       --runtime-prefix\n"
     "   <Compiler options>\n"
@@ -540,6 +579,7 @@ Parrot_cmd_options(void)
         { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
         { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
         { 'g', 'g', OPTION_required_FLAG, { "--gc" } },
+        { '\0', OPT_GC_NURSERY_SIZE, OPTION_required_FLAG, { "--gc-nursery-size" } },
         { '\0', OPT_GC_DYNAMIC_THRESHOLD, OPTION_required_FLAG, { "--gc-dynamic-threshold" } },
         { '\0', OPT_GC_MIN_THRESHOLD, OPTION_required_FLAG, { "--gc-min-threshold" } },
         { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
@@ -641,6 +681,22 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
                 exit(EXIT_FAILURE);
             }
             break;
+          case OPT_GC_NURSERY_SIZE:
+            if (opt.opt_arg && is_float(opt.opt_arg)) {
+                initargs->gc_nursery_size = (float)strtod(opt.opt_arg, NULL);
+
+                if (initargs->gc_nursery_size > 50) {
+                    fprintf(stderr, "error: maximum GC nursery size is 50%%\n");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else {
+                fprintf(stderr, "error: invalid GC nursery size specified:"
+                        "'%s'\n", opt.opt_arg);
+                exit(EXIT_FAILURE);
+            }
+            break;
+
           case OPT_HASH_SEED:
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
                 initargs->hash_seed = strtoul(opt.opt_arg, NULL, 16);
@@ -702,6 +758,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             args->run_core_name = opt.opt_arg;
             break;
           case 'g':
+          case OPT_GC_NURSERY_SIZE:
           case OPT_GC_DYNAMIC_THRESHOLD:
           case OPT_GC_MIN_THRESHOLD:
             /* Handled in parseflags_minimal */

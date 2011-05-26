@@ -30,19 +30,19 @@ PARROT_INLINE
 static void ucs2_check_codepoint(PARROT_INTERP, UINTVAL c)
         __attribute__nonnull__(1);
 
-static size_t ucs2_hash(SHIM_INTERP,
+static size_t ucs2_hash(PARROT_INTERP,
     ARGIN(const STRING *src),
     size_t hashval)
         __attribute__nonnull__(2);
 
-static UINTVAL ucs2_iter_get(SHIM_INTERP,
+static UINTVAL ucs2_iter_get(PARROT_INTERP,
     ARGIN(const STRING *str),
     ARGIN(const String_iter *i),
     INTVAL offset)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static UINTVAL ucs2_iter_get_and_advance(SHIM_INTERP,
+static UINTVAL ucs2_iter_get_and_advance(PARROT_INTERP,
     ARGIN(const STRING *str),
     ARGMOD(String_iter *i))
         __attribute__nonnull__(2)
@@ -59,8 +59,8 @@ static void ucs2_iter_set_and_advance(PARROT_INTERP,
         FUNC_MODIFIES(*str)
         FUNC_MODIFIES(*i);
 
-static void ucs2_iter_skip(SHIM_INTERP,
-    SHIM(const STRING *str),
+static void ucs2_iter_skip(PARROT_INTERP,
+    const STRING *str,
     ARGMOD(String_iter *i),
     INTVAL skip)
         __attribute__nonnull__(3)

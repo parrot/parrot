@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 package Parrot::Configure::Options::Conf;
 
 use strict;
@@ -87,7 +87,6 @@ Parrot Options:
    --ops=(files)        Use the given ops files
 
    --without-threads    Build parrot without thread support
-   --buildframes        Dynamically build NCI call frames
    --without-core-nci-thunks
                         Build parrot without core-required
                         statically compiled NCI call frames
@@ -98,6 +97,7 @@ Parrot Options:
 
 External Library Options:
 
+   --with-llvm          Link to LLVM if it is available
    --without-gettext    Build parrot without gettext support
    --without-gmp        Build parrot without GMP support
    --without-libffi     Build parrot without libffi support
@@ -157,8 +157,6 @@ Install Options:
     --oldincludedir=DIR   C header files for non-gcc [/usr/include]
     --infodir=DIR         info documentation [PREFIX/info]
     --mandir=DIR          man documentation [PREFIX/man]
-    --pkgconfigdir=DIR    subdirectory of <libdir> for pkgconfig
-                              [<libdir>/pkgconfig/<version>]
 
 EOT
     return 1;

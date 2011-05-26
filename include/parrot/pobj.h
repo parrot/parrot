@@ -176,6 +176,9 @@ typedef enum PObj_enum {
     /* Object requires write barrier */
     PObj_GC_need_write_barrier_FLAG = POBJ_FLAG(26),
 
+    /* Object on C stack will require implicit put to dirty list in GMS */
+    PObj_GC_soil_root_FLAG      = POBJ_FLAG(27),
+
     /* For simplify some cleanup/setup */
     PObj_GC_all_generation_FLAGS = PObj_GC_generation_0_FLAG
                                  | PObj_GC_generation_1_FLAG
@@ -186,9 +189,6 @@ typedef enum PObj_enum {
                                  | PObj_GC_need_write_barrier_FLAG,
 
 /* PMC specific FLAGs */
-    /* call object finalizer */
-    PObj_need_finalize_FLAG     = POBJ_FLAG(27),
-
     /* true if this is connected by some route to a needs_early_gc object */
     PObj_needs_early_gc_FLAG    = POBJ_FLAG(28),
 
@@ -300,6 +300,10 @@ typedef enum PObj_enum {
 #define PObj_GC_need_write_barrier_TEST(o)  PObj_flag_TEST(GC_need_write_barrier, o)
 #define PObj_GC_need_write_barrier_SET(o)   PObj_flag_SET(GC_need_write_barrier, o)
 #define PObj_GC_need_write_barrier_CLEAR(o) PObj_flag_CLEAR(GC_need_write_barrier, o)
+
+#define PObj_GC_soil_root_TEST(o)  PObj_flag_TEST(GC_soil_root, o)
+#define PObj_GC_soil_root_SET(o)   PObj_flag_SET(GC_soil_root, o)
+#define PObj_GC_soil_root_CLEAR(o) PObj_flag_CLEAR(GC_soil_root, o)
 
 
 /* some combinations */

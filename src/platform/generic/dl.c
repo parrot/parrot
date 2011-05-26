@@ -91,9 +91,11 @@ void *
 Parrot_dlsym(void *handle, const char *symbol)
 {
 #ifdef PARROT_HAS_HEADER_DLFCN
+    if (!handle)
+        handle = RTLD_DEFAULT;
     return dlsym(handle, symbol);
 #else
-    return 0;
+    return NULL;
 #endif
 }
 

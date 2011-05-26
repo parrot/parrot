@@ -82,7 +82,7 @@ static PMC* mmd_build_type_tuple_from_type_list(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static STRING * mmd_cache_key_from_types(PARROT_INTERP,
     ARGIN(const char *name),
     ARGIN(PMC *types))
@@ -91,7 +91,7 @@ static STRING * mmd_cache_key_from_types(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static STRING * mmd_cache_key_from_values(PARROT_INTERP,
     ARGIN(const char *name),
     ARGIN(PMC *values))
@@ -100,7 +100,7 @@ static STRING * mmd_cache_key_from_values(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static PMC* mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -129,7 +129,7 @@ static void mmd_search_global(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static PMC * Parrot_mmd_get_cached_multi_sig(PARROT_INTERP,
     ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
@@ -142,7 +142,7 @@ static int Parrot_mmd_maybe_candidate(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static PMC * Parrot_mmd_sort_candidates(PARROT_INTERP,
     ARGIN(PMC *arg_tuple),
     ARGIN(PMC *cl))
@@ -321,7 +321,7 @@ Currently only searches the global MULTI namespace.
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_mmd_find_multi_from_long_sig(PARROT_INTERP, ARGIN(STRING *name),
@@ -357,7 +357,7 @@ best one.
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_mmd_sort_manhattan_by_sig_pmc(PARROT_INTERP, ARGIN(PMC *candidates),
@@ -401,13 +401,13 @@ mmd_build_type_tuple_from_type_list(PARROT_INTERP, ARGIN(PMC *type_list))
         INTVAL  type;
 
         if (STRING_equal(interp, type_name, CONST_STRING(interp, "DEFAULT")))
-            type = enum_type_PMC;
+            type = -enum_type_PMC;
         else if (STRING_equal(interp, type_name, CONST_STRING(interp, "STRING")))
-            type = enum_type_STRING;
+            type = -enum_type_STRING;
         else if (STRING_equal(interp, type_name, CONST_STRING(interp, "INTVAL")))
-            type = enum_type_INTVAL;
+            type = -enum_type_INTVAL;
         else if (STRING_equal(interp, type_name, CONST_STRING(interp, "FLOATVAL")))
-            type = enum_type_FLOATVAL;
+            type = -enum_type_FLOATVAL;
         else
             type = Parrot_pmc_get_type_str(interp, type_name);
 
@@ -486,7 +486,7 @@ the signature of a multi variant to which you may be able to dispatch.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static PMC*
 mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
 {
@@ -541,7 +541,7 @@ MMD system expects.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static PMC *
 Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
@@ -554,7 +554,7 @@ Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         multi_sig = sub->multi_signature;
 
         if (multi_sig->vtable->base_type == enum_class_FixedPMCArray) {
-            PMC * const converted_sig = mmd_cvt_to_types(interp, multi_sig);
+            PMC *converted_sig = mmd_cvt_to_types(interp, multi_sig);
 
             if (PMC_IS_NULL(converted_sig))
                 return PMCNULL;
@@ -654,25 +654,25 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
          * weighing other things. A direct autobox should be cheaper than an
          * autobox plus type conversion or implicit type acceptance. */
         switch (type_call) {
-          case enum_type_INTVAL:
+          case -enum_type_INTVAL:
             if (type_sig == enum_class_Integer) { dist++; continue; }
-            if (type_sig == enum_type_PMC ||
+            if (type_sig == -enum_type_PMC ||
                 (type_sig >= enum_class_default && type_sig < enum_class_core_max)) {
                 ++dist;
                 type_call = enum_class_Integer;
             }
             break;
-          case enum_type_FLOATVAL:
+          case -enum_type_FLOATVAL:
             if (type_sig == enum_class_Float)   { dist++; continue; }
-            if (type_sig == enum_type_PMC ||
+            if (type_sig == -enum_type_PMC ||
                 (type_sig >= enum_class_default && type_sig < enum_class_core_max)) {
                 ++dist;
                 type_call = enum_class_Float;
             }
             break;
-          case enum_type_STRING:
+          case -enum_type_STRING:
             if (type_sig == enum_class_String)  { dist++; continue; }
-            if (type_sig == enum_type_PMC ||
+            if (type_sig == -enum_type_PMC ||
                 (type_sig >= enum_class_default && type_sig < enum_class_core_max)) {
                 ++dist;
                 type_call = enum_class_String;
@@ -686,12 +686,12 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
          * different native types are very different, except a PMC
          * which matches any PMC
          */
-        if (type_call <= 0 && type_sig == enum_type_PMC) {
+        if (type_call <= 0 && type_sig == -enum_type_PMC) {
             ++dist;
             continue;
         }
 
-        if ((type_sig <= 0 && type_sig != enum_type_PMC) || type_call <= 0) {
+        if ((type_sig <= 0 && type_sig != -enum_type_PMC) || type_call <= 0) {
             dist = MMD_BIG_DISTANCE;
             break;
         }
@@ -718,7 +718,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
          * if the type wasn't in MRO check, if any PMC matches
          * in that case use the distance + 1 (of an any PMC parent)
          */
-        if (j == m && type_sig != enum_type_PMC) {
+        if (j == m && type_sig != -enum_type_PMC) {
             dist = MMD_BIG_DISTANCE;
             break;
         }
@@ -729,12 +729,12 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
         {
             STRING *s1, *s2;
             if (type_sig < 0)
-                s1 = Parrot_dt_get_datatype_name(interp, type_sig);
+                s1 = Parrot_dt_get_datatype_name(interp, -type_sig);
             else
                 s1 = interp->vtables[type_sig]->whoami;
 
             if (type_call < 0)
-                s2 = Parrot_dt_get_datatype_name(interp, type_call);
+                s2 = Parrot_dt_get_datatype_name(interp, -type_call);
             else
                 s2 = interp->vtables[type_call]->whoami;
 
@@ -760,7 +760,7 @@ candidate.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static PMC *
 Parrot_mmd_sort_candidates(PARROT_INTERP, ARGIN(PMC *arg_tuple), ARGIN(PMC *cl))
 {
@@ -1126,7 +1126,7 @@ Generates an MMD cache key from an array of values.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static STRING *
 mmd_cache_key_from_values(PARROT_INTERP, ARGIN(const char *name),
     ARGIN(PMC *values))
@@ -1145,7 +1145,7 @@ mmd_cache_key_from_values(PARROT_INTERP, ARGIN(const char *name),
         const INTVAL id = VTABLE_type(interp, VTABLE_get_pmc_keyed_int(interp, values, i));
         if (id == 0) {
             mem_gc_free(interp, type_ids);
-            return STRINGNULL;
+            return NULL;
         }
 
         type_ids[i] = id;
@@ -1175,7 +1175,7 @@ Takes an array of values for the call and does a lookup in the MMD cache.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_mmd_cache_lookup_by_values(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     ARGIN(const char *name), ARGIN(PMC *values))
@@ -1227,9 +1227,10 @@ Generates an MMD cache key from an array of types.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static STRING *
-mmd_cache_key_from_types(PARROT_INTERP, ARGIN(const char *name), ARGIN(PMC *types))
+mmd_cache_key_from_types(PARROT_INTERP, ARGIN(const char *name),
+    ARGIN(PMC *types))
 {
     ASSERT_ARGS(mmd_cache_key_from_types)
     /* Build array of type IDs, which we'll then use as a string to key into
@@ -1247,7 +1248,7 @@ mmd_cache_key_from_types(PARROT_INTERP, ARGIN(const char *name), ARGIN(PMC *type
 
         if (id == 0) {
             mem_gc_free(interp, type_ids);
-            return STRINGNULL;
+            return NULL;
         }
 
         type_ids[i] = id;
@@ -1277,7 +1278,7 @@ Takes an array of types for the call and does a lookup in the MMD cache.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     ARGIN(const char *name), ARGIN(PMC *types))

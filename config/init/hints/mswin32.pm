@@ -93,7 +93,8 @@ sub runstep {
             ld_load_flags       => '-dll',
             ld_out              => '-out:',
             ldflags             => '-nologo -nodefaultlib',
-            libs                => 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib ',
+            # advapi32 needed for src/platform/win32/entropy.c
+            libs                => 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib advapi32.lib ',
             libparrot_static    => 'libparrot' . $conf->data->get('a'),
             libparrot_shared    => "libparrot$share_ext",
             ar                  => 'lib',

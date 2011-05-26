@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -38,7 +38,8 @@ typedef void (*compact_f) (Interp *, GC_Statistics *stats, Variable_Size_Pool *)
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static char * aligned_mem(SHIM(const Buffer *buffer), ARGIN(char *mem))
+static char * aligned_mem(ARGIN(const Buffer *buffer), ARGIN(char *mem))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void alloc_new_block(
@@ -126,7 +127,8 @@ static UINTVAL pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_aligned_mem __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(mem))
+       PARROT_ASSERT_ARG(buffer_unused) \
+    , PARROT_ASSERT_ARG(mem))
 #define ASSERT_ARGS_alloc_new_block __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(stats) \
     , PARROT_ASSERT_ARG(pool) \
@@ -665,7 +667,7 @@ memory alignment.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static char *
-aligned_mem(SHIM(const Buffer *buffer), ARGIN(char *mem))
+aligned_mem(ARGIN(SHIM(const Buffer *buffer)), ARGIN(char *mem))
 {
     ASSERT_ARGS(aligned_mem)
     mem += sizeof (void *);
@@ -805,10 +807,10 @@ static void
 move_buffer_callback(PARROT_INTERP, ARGIN(Buffer *b), ARGIN(void *data))
 {
     ASSERT_ARGS(move_buffer_callback)
-    Memory_Block *new_block = (Memory_Block *)data;
+    Memory_Block * const new_block = (Memory_Block *)data;
 
     if (Buffer_buflen(b) && PObj_is_movable_TESTALL(b)) {
-        Memory_Block *old_block = Buffer_pool(b);
+        Memory_Block * const old_block = Buffer_pool(b);
 
         if (!is_block_almost_full(old_block))
             move_one_buffer(interp, new_block, b);
@@ -942,7 +944,7 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
         Buffer_bufstart(old_buf) = Buffer_bufstart(hdr);
     }
     else {
-        char *new_pool_ptr = aligned_mem(old_buf, pool->top);
+        char * const new_pool_ptr = aligned_mem(old_buf, pool->top);
 
         /* Copy our memory to the new pool */
         memcpy(new_pool_ptr, Buffer_bufstart(old_buf), Buffer_buflen(old_buf));

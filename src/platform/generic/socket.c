@@ -338,10 +338,11 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
         /* XXX Check PIO option before doing a name lookup,
          * it may have been toggled off.
          */
-        struct hostent *he = gethostbyname(host);
+        const struct hostent * const he = gethostbyname(host);
 
         if (!he) {
-            Parrot_str_free_cstring(host);
+            if (cstring)
+                Parrot_str_free_cstring(cstring);
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                     "getaddrinfo failed: %s", host);
         }

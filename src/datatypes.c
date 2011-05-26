@@ -26,8 +26,7 @@ F<include/parrot/datatypes.h>.
 
 /*
 
-=item C<INTVAL Parrot_dt_get_datatype_enum(PARROT_INTERP, const STRING
-*type_name)>
+=item C<INTVAL Parrot_dt_get_datatype_enum(PARROT_INTERP, STRING *type_name)>
 
 Return datatype C<enum> for C<STRING*> type_name.
 
@@ -38,16 +37,28 @@ Return datatype C<enum> for C<STRING*> type_name.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_dt_get_datatype_enum(PARROT_INTERP, ARGIN(const STRING *type_name))
+Parrot_dt_get_datatype_enum(PARROT_INTERP, ARGIN(STRING *type_name))
 {
     ASSERT_ARGS(Parrot_dt_get_datatype_enum)
-    char * const type = Parrot_str_to_cstring(interp, type_name);
+    char *type;
+    int flags = 0;
     int i;
+
+    if (STRING_IS_NULL(type_name) || STRING_IS_EMPTY(type_name))
+        return enum_type_undef;
+
+    if ('&' == Parrot_str_indexed(interp, type_name, Parrot_str_length(interp, type_name) - 1)) {
+        type_name  = Parrot_str_substr(interp, type_name, 0,
+                                        Parrot_str_length(interp, type_name) - 1);
+        flags     |= enum_type_ref_flag;
+    }
+
+    type = Parrot_str_to_cstring(interp, type_name);
 
     for (i = enum_first_type; i < enum_last_type; ++i) {
         if (STREQ(data_types[i - enum_first_type].name, type)) {
             Parrot_str_free_cstring(type);
-            return i;
+            return i | flags;
         }
     }
 
@@ -73,13 +84,21 @@ STRING *
 Parrot_dt_get_datatype_name(PARROT_INTERP, INTVAL type)
 {
     ASSERT_ARGS(Parrot_dt_get_datatype_name)
-    const char * const s =
-        (type < enum_first_type || type >= enum_last_type)
+    const char *s;
+    STRING *str;
+
+    const int is_ref = type & enum_type_ref_flag;
+
+    type &= ~enum_type_ref_flag;
+
+    s = (type < enum_first_type || type >= enum_last_type)
             ? "illegal"
             : data_types[type - enum_first_type].name;
 
-    return Parrot_str_new_init(interp, s, strlen(s),
+    str = Parrot_str_new_init(interp, s, strlen(s),
             Parrot_default_encoding_ptr, PObj_external_FLAG);
+
+    return is_ref ? Parrot_str_concat(interp, str, Parrot_str_new(interp, "&", 0)) : str;
 }
 
 /*

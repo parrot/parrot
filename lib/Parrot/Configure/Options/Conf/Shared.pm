@@ -39,7 +39,6 @@ our @shared_valid_options = qw{
     infodir
     inline
     intval
-    buildframes
     ld
     ldflags
     lex
@@ -60,7 +59,6 @@ our @shared_valid_options = qw{
     ops
     optimize
     parrot_is_shared
-    pkgconfigdir
     prefix
     profile
     sbindir
