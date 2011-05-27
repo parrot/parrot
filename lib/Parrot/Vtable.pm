@@ -317,7 +317,9 @@ sub vtbl_embed {
         }
 
         next if $@;
-        next if $name eq "destroy";
+
+        # these are GC internals and should not be exposed
+        next if $name =~ m/^(destroy|mark)$/;
 
         my $signature = join( ', ', @sig );
         my $arguments = join( ', ', @args );
