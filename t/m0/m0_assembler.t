@@ -83,7 +83,7 @@ output_like(
 output_like(
     catfile(qw/t m0 hello_multiversion.m0/),
     qr/Invalid M0/ms,
-    'detect invalid M0'
+    'detect invalid M0 - multiple versions'
 );
 
 output_like(
@@ -101,7 +101,7 @@ output_like(
 output_like(
     catfile(qw/t m0 hello_early_bytecode_segment.m0/),
     qr/Invalid M0/ms,
-    'detect invalid M0'
+    'detect invalid M0 - early bytecode segment'
 );
 
 output_like(
@@ -121,7 +121,7 @@ ok(!-e catfile(qw/t m0 invalid_bytecode.m0b/), 'invalid_bytece.m0b was not creat
 sub output_like {
     my ($options, $snippet, $desc)  = @_;
 
-    my $out = `$^X $exefile $options`;
+    my $out = `$^X $exefile $options 2>&1`;
 
     like( $out, $snippet, $desc );
 
@@ -131,7 +131,7 @@ sub output_like {
 sub output_unlike {
     my ($options, $snippet, $desc)  = @_;
 
-    my $out = `$^X $exefile $options`;
+    my $out = `$^X $exefile $options 2>&1`;
 
     unlike( $out, $snippet, $desc );
 
