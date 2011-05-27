@@ -208,15 +208,30 @@ sub m0b_bytecode_seg {
     $op_count++ for ($chunk->{bytecode} =~ /^\s*\w+/mg);
     my $word_count = $op_count * 4;
     my $bytecode = '';
+    my $pc = 0;
+    my %label_map;
     $bytecode  = pack('L', $M0_BC_SEG);
     $bytecode .= pack('L', $op_count);
     $bytecode .= pack('L', $word_count);
 
     my @lines = split /\n/, $chunk->{bytecode};
+
+    # calculate addresses of labels
     for my $line (@lines) {
-        if ($line =~ m/^(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
+        if ($line =~ m/^(?<label>[a-zA-Z][a-zA-Z0-9_]+):/) {
+            my $label = $+{label};
+            die "Invalid M0: duplicate label '$label' in chunk '$chunk->{name}'"
+                if (exists $label_map{$label});
+            $label_map{ $label } = $pc;
+        }
+        $pc++ if ($line =~ /:\s*\w/);
+    }
+    for my $line (@lines) {
+        if ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
             say "adding op $+{opname} to bytecode seg";
             $bytecode .= to_bytecode($ops,\%+);
+        } elsif ($line =~ m/^(?<label>[a-zA-Z][a-zA-Z0-9_]+):\s*$/) {
+            # ignore
         } else {
             say "Invalid M0 bytecode segment: $line";
             exit 1;
@@ -324,7 +339,12 @@ sub m0b_bc_seg_length {
     my ($bc_seg) = @_;
 
     my $op_count = 0;
-    $op_count++ for ($bc_seg =~ /^\s*\w+/mg);
+    for my $line (split /\n/, $bc_seg) {
+        # strip out labels
+        $line =~ s/^[a-zA-Z][a-zA-Z0-9_]+://;
+        # count any remaining non-empty lines
+        $op_count++ if $line =~ /\w/;
+    }
     my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
     $seg_length += $op_count * 4;
 

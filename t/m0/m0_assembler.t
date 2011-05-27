@@ -23,7 +23,7 @@ use File::Slurp qw/slurp/;
 use Test::More;
 use File::Spec::Functions;
 
-plan tests => 19;
+plan tests => 20;
 
 my $exefile    = catfile( ".", qw/src m0 m0_assembler.pl/ );
 my $hello_m0   = catfile(qw/t m0 hello.m0/);
@@ -112,6 +112,12 @@ output_like(
     catfile(qw/t m0 invalid_bytecode.m0/),
     qr/Invalid M0 bytecode/ms,
     'detect invalid bytecode'
+);
+
+output_like(
+    catfile(qw/t m0 invalid_duplicate_labels.m0/),
+    qr/Invalid M0/ms,
+    'detect duplicate labels'
 );
 
 ok(!-e catfile(qw/t m0 invalid_bytecode.m0b/), 'invalid_bytece.m0b was not created');
