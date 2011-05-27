@@ -158,6 +158,16 @@ CODE
 
 # actual tests start here
 
+# TODO: Should it really return 'default' here?
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_morph");
+    Parrot_PMC_morph(interp, fpa, pmc);
+    string = Parrot_PMC_name(interp, fpa);
+    Parrot_printf(interp, "%S\n", string);
+CODE
+default
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_init_int");
     Parrot_PMC_init_int(interp, fpa, 10);
     Parrot_printf(interp, "%d\n", Parrot_PMC_elements(interp, fpa));
