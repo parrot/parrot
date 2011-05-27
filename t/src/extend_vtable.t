@@ -173,6 +173,7 @@ CODE
 #Done!
 #OUTPUT
 
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_substr" );
      string  = createstring(interp, "FOO");
 
@@ -211,6 +212,8 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal_string");
 CODE
 0
 1
+Done!
+OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_does_pmc" );
     pmc2   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Role"));
