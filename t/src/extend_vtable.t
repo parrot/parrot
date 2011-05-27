@@ -159,6 +159,18 @@ CODE
 
 # actual tests start here
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(set|get)_pmc_keyed_str");
+    string = createstring(interp,"foo");
+    Parrot_PMC_set_integer_native(interp, pmc,  50);
+    Parrot_PMC_set_pmc_keyed_str(interp, hash, string, pmc);
+
+    pmc2 = Parrot_PMC_get_pmc_keyed_str(interp, hash, string);
+    Parrot_printf(interp, "%P\n", pmc2);
+CODE
+50
+Done!
+OUTPUT
+
 # TODO: Should it really return 'default' here?
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_morph");
     Parrot_PMC_morph(interp, fpa, pmc);
@@ -580,12 +592,6 @@ CODE
 Done!
 OUTPUT
 
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pmc_keyed_str");
-    string = createstring(interp,"foo");
-    pmc2 = Parrot_PMC_get_pmc_keyed_str(interp, hash, string);
-CODE
-Done!
-OUTPUT
 
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_string_keyed_str");
