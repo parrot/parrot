@@ -158,6 +158,25 @@ CODE
 
 # actual tests start here
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_isa");
+    integer = Parrot_PMC_isa(interp, pmc, createstring(interp, "Integer") );
+    Parrot_printf(interp, "%d\n", integer);
+
+    integer = Parrot_PMC_isa(interp, pmc, createstring(interp, "Birdpoop") );
+    Parrot_printf(interp, "%d\n", integer);
+CODE
+1
+0
+Done!
+OUTPUT
+
+# TODO: Improve this test
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_getprops");
+    pmc = Parrot_PMC_getprops(interp, continuation);
+CODE
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE',<<'OUTPUT', "Parrot_PMC_i_modulus_float" );
     Parrot_PMC_set_number_native(interp, pmc,  50.0);
 
