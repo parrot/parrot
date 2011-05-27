@@ -959,16 +959,32 @@ CODE
 Done!
 OUTPUT
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_floor_divide" );
+    Parrot_PMC_set_integer_native(interp, pmc,  7);
+    Parrot_PMC_set_integer_native(interp, pmc2, 3);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+
+    Parrot_PMC_i_floor_divide(interp, pmc, pmc2);
+    value = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", (int) value);
+    value = Parrot_PMC_get_integer(interp, pmc2);
+    printf("%d\n", (int) value);
+CODE
+7
+3
+2
+Done!
+OUTPUT
+
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_floor_divide" );
     Parrot_PMC_set_integer_native(interp, pmc,  7);
     Parrot_PMC_set_integer_native(interp, pmc2, 3);
     Parrot_PMC_set_integer_native(interp, pmc3, 0);
 
-    /*
-       We must pass in the destination, but the return
-       value of the function must be used. This is broken.
-    */
     pmc3 = Parrot_PMC_floor_divide(interp, pmc, pmc2, pmc3);
     value = Parrot_PMC_get_integer(interp, pmc);
     printf("%d\n", (int) value);
