@@ -166,6 +166,14 @@ CODE
 Done!
 OUTPUT
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_name");
+    string = Parrot_PMC_name(interp, fpa);
+    Parrot_printf(interp, "%S\n", string);
+CODE
+FixedPMCArray
+Done!
+OUTPUT
+
 # TODO: Improve this test
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_init");
     Parrot_PMC_init(interp, pmc);
