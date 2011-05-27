@@ -1,5 +1,6 @@
 New in 3.5.0
 - Core
+  + Parrot_PMC_destroy and Parrot_PMC_mark were removed from the public extension API
 - Languages
 - Tests
   + The Parrot test suite harness now understands the HARNESS_TIMER environment

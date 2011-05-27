@@ -1209,8 +1209,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_i_subtract_int>
 
-=item C<Parrot_PMC_mark>
-
 =item C<Parrot_PMC_modulus>
 
 =item C<Parrot_PMC_modulus_float>
