@@ -158,6 +158,18 @@ CODE
 
 # actual tests start here
 
+extend_vtable_output_is(<<'CODE',<<'OUTPUT', "Parrot_PMC_modulus_int" );
+    Parrot_PMC_set_integer_native(interp, pmc,  50);
+    Parrot_PMC_set_integer_native(interp, pmc3, 0);
+
+    pmc3 = Parrot_PMC_modulus_int(interp, pmc, 42, pmc3);
+    Parrot_printf(interp, "%P\n%P\n",pmc, pmc3);
+CODE
+50
+8
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_floor_divide_int" );
     Parrot_PMC_set_integer_native(interp, pmc,  7);
     Parrot_PMC_set_integer_native(interp, pmc2, 3);
