@@ -226,7 +226,7 @@ sub m0_opfunc_goto {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "goto $a1, $a2, $a3";
 
-    my $offset = 256 * $ctx->[$a1] + $ctx->[$a2];
+    my $offset = 256 * $a1 + $a2;
     $ctx->[PC] = $offset;
 }
 
@@ -234,7 +234,7 @@ sub m0_opfunc_goto_if {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "goto_if $a1, $a2, $a3";
 
-    my $offset = 256 * $ctx->[$a1] + $ctx->[$a2];
+    my $offset = 256 * $a1 + $a2;
     my $cond   = $ctx->[$a3];
     $ctx->[PC] = $offset if ($cond);
 }
@@ -243,7 +243,7 @@ sub m0_opfunc_goto_chunk {
     my ($ctx, $a1, $a2, $a3) = @_;
     m0_say "goto_chunk $a1, $a2, $a3";
 
-    my $new_pc      = 256 * $ctx->[$a1] + $ctx->[$a2];
+    my $new_pc      = 256 * $a1 + $a2;
     my $chunk_name  = $ctx->[$a3];
     my $interp      = $ctx->[INTERP];
 
