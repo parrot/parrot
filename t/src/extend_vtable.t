@@ -102,7 +102,7 @@ void dotest(Parrot_Interp interp, void *unused)
 {
     Parrot_PMC pmc, pmc2, pmc3, pmc_string, pmc_string2, pmc_string3;
     Parrot_PMC pmc_float, pmc_float2;
-    Parrot_PMC rpa, rpa2, fpa, hash, hash_iter, continuation;
+    Parrot_PMC rpa, rpa2, fpa, hash, hash_iter, continuation, continuation2;
     Parrot_PMC key_int, key_str, hashkey, ns, object, klass;
     Parrot_Int type, value, integer, integer2;
     Parrot_Float number, number2;
@@ -110,6 +110,7 @@ void dotest(Parrot_Interp interp, void *unused)
 
     type         = Parrot_PMC_typenum(interp, "Integer");
     continuation = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Continuation"));
+    continuation2= Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Continuation"));
     rpa          = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
     rpa2         = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
     fpa          = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "FixedPMCArray"));
@@ -165,6 +166,13 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_morph");
     Parrot_printf(interp, "%S\n", string);
 CODE
 default
+Done!
+OUTPUT
+
+# TODO: Improve this test
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_init_pmc");
+    Parrot_PMC_init_pmc(interp, continuation2, continuation);
+CODE
 Done!
 OUTPUT
 
