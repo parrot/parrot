@@ -163,7 +163,6 @@ CODE
 # actual tests start here
 
 # # Exception is: type 36 severity 2 message 'get_pointer_keyed_int() not implemented in class 'Class''
-
 #extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer_keyed_int");
 #    /* Need to create object PMC */
 #    integer = (Parrot_Int) Parrot_PMC_get_pointer_keyed_int(interp, object, 42);
@@ -197,6 +196,21 @@ CODE
 F
 Done!
 OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_is_equal_string");
+    Parrot_PMC_set_string_native(interp, pmc_string, createstring(interp, "foo"));
+    Parrot_PMC_set_string_native(interp, pmc_string2, createstring(interp, "bar"));
+
+    integer = Parrot_PMC_is_equal_string(interp, pmc_string, pmc_string2);
+    Parrot_printf(interp, "%d\n", integer);
+
+    Parrot_PMC_set_string_native(interp, pmc_string2, createstring(interp, "foo"));
+
+    integer = Parrot_PMC_is_equal_string(interp, pmc_string, pmc_string2);
+    Parrot_printf(interp,"%d\n", integer);
+CODE
+0
+1
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_does_pmc" );
     pmc2   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Role"));
