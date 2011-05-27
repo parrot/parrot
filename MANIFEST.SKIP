@@ -62,8 +62,6 @@
 ^/.*\.sto/
 ^/.*\.suo$
 ^/.*\.suo/
-^/.*\.sw?$
-^/.*\.sw?/
 ^/.*\.tmp$
 ^/.*\.tmp/
 ^/.*\.vcproj.*$
@@ -86,6 +84,8 @@
 ^/\.parrot_current_sha1/
 ^/\B\.svn\b$
 ^/\B\.svn\b/
+^/\\..*sw?$
+^/\\..*sw?/
 ^/all_cstring\.str$
 ^/all_cstring\.str/
 ^/blib$
