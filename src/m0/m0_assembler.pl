@@ -218,13 +218,13 @@ sub m0b_bytecode_seg {
 
     # calculate addresses of labels
     for my $line (@lines) {
+        $pc++ if ($line =~ /(?<!#)\w[,\s]+\w/);
         if ($line =~ m/^(?<label>[a-zA-Z][a-zA-Z0-9_]+):/) {
             my $label = $+{label};
             die "Invalid M0: duplicate label '$label' in chunk '$chunk->{name}'"
                 if (exists $label_map{$label});
             $label_map{ $label } = $pc;
         }
-        $pc++ if ($line =~ /:\s*\w/ || $line =~ /,\s*\w\s*,/);
     }
 
     for my $line (@lines) {
@@ -243,7 +243,8 @@ sub m0b_bytecode_seg {
             $x{arg2} = int($label_map{ $+{target_label} } % 255);
             $x{arg3} = 'x';
             $x{opname} = 'goto';
-            say Dumper %x;
+            say "goto arg1 is ".$x{arg1};
+            say "goto arg2 is ".$x{arg2};
             $x{target_label} = $+{target_label};
             say "adding op goto to bytecode seg";
             $bytecode .= to_bytecode($ops,\%x);
