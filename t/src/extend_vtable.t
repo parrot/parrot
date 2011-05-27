@@ -209,6 +209,19 @@ CODE
 Done!
 OUTPUT
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_isa_pmc");
+    integer = Parrot_PMC_isa_pmc(interp, klass, klass);
+    Parrot_printf(interp, "%d\n", integer);
+
+    integer = Parrot_PMC_isa_pmc(interp, pmc, klass);
+    Parrot_printf(interp, "%d\n", integer);
+
+CODE
+1
+0
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_isa");
     integer = Parrot_PMC_isa(interp, pmc, createstring(interp, "Integer") );
     Parrot_printf(interp, "%d\n", integer);
