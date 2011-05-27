@@ -18,11 +18,11 @@ t/src/extend_vtable.t - tests for src/extend_vtable.c
 
 =head1 SYNOPSIS
 
-    % prove t/src/extend_Vtable.t
+    % prove t/src/extend_vtable.t
 
 =head1 DESCRIPTION
 
-Tests for src/extend_vtable.c .
+Tests for the Parrot vtable extension interface, which lives in src/extend_vtable.c .
 
 =cut
 
