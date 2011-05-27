@@ -256,7 +256,7 @@ sub m0b_bytecode_seg {
             my %x;
             $x{arg1} = int($label_map{ $+{target_label} } / 256);
             $x{arg2} = int($label_map{ $+{target_label} } % 255);
-            $x{arg3} = $+{target_label};
+            $x{arg3} = $+{arg3};
             $x{opname} = 'goto_if';
             say "adding op $+{opname} to bytecode seg";
             $bytecode .= to_bytecode($ops,\%x);
