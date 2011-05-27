@@ -166,6 +166,15 @@ CODE
 Done!
 OUTPUT
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_inspect");
+    pmc2 = Parrot_PMC_inspect(interp, pmc);
+    string = Parrot_PMC_name(interp, pmc2);
+    Parrot_printf(interp, "%S\n", string);
+CODE
+Hash
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_name");
     string = Parrot_PMC_name(interp, fpa);
     Parrot_printf(interp, "%S\n", string);
