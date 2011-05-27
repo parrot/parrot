@@ -158,6 +158,22 @@ CODE
 
 # actual tests start here
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_floor_divide_int" );
+    Parrot_PMC_set_integer_native(interp, pmc,  7);
+    Parrot_PMC_set_integer_native(interp, pmc2, 3);
+
+    value = Parrot_PMC_get_integer(interp, pmc);
+    Parrot_printf(interp, "%P\n", pmc);
+
+    Parrot_PMC_i_floor_divide_int(interp, pmc, 3);
+    Parrot_printf(interp, "%P\n%P\n", pmc, pmc2);
+CODE
+7
+2
+3
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_floor_divide" );
     Parrot_PMC_set_integer_native(interp, pmc,  7);
     Parrot_PMC_set_integer_native(interp, pmc2, 3);
