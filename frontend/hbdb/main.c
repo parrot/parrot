@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "parrot/hbdb.h"
 #include "parrot/api.h"
 
 /* TODO Check for command line arguments */
@@ -48,6 +49,12 @@ main(int argc, char *argv[])
     if (!Parrot_api_ready_bytecode(interp, pbc, &main_sub)) {
         Parrot_api_destroy_interpreter(interp);
         fail("Failed to prepare bytecode");
+    }
+
+    /* Run bytecode */
+    if (!Parrot_api_run_bytecode(interp, pbc, NULL)) {
+        Parrot_api_destroy_interpreter(interp);
+        fail("Failed to run bytecode");
     }
 
     /* DEBUG */
