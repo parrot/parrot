@@ -158,6 +158,13 @@ CODE
 
 # actual tests start here
 
+# TODO: Improve this test
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_init");
+    Parrot_PMC_init(interp, pmc);
+CODE
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_isa");
     integer = Parrot_PMC_isa(interp, pmc, createstring(interp, "Integer") );
     Parrot_printf(interp, "%d\n", integer);
