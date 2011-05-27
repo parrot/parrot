@@ -81,7 +81,7 @@ output_like(
 );
 
 output_like(
-    catfile(qw/t m0 hello_invalid.m0/),
+    catfile(qw/t m0 hello_multiversion.m0/),
     qr/Invalid M0/ms,
     'detect invalid M0'
 );
@@ -99,7 +99,7 @@ output_like(
 );
 
 output_like(
-    catfile(qw/t m0 hello_invalid2.m0/),
+    catfile(qw/t m0 hello_early_bytecode_segment.m0/),
     qr/Invalid M0/ms,
     'detect invalid M0'
 );
