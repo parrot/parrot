@@ -158,6 +158,14 @@ CODE
 
 # actual tests start here
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_init_int");
+    Parrot_PMC_init_int(interp, fpa, 10);
+    Parrot_printf(interp, "%d\n", Parrot_PMC_elements(interp, fpa));
+CODE
+10
+Done!
+OUTPUT
+
 # TODO: Improve this test
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_init");
     Parrot_PMC_init(interp, pmc);
