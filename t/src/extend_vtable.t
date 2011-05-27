@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 133;
+plan tests => 134;
 
 =head1 NAME
 
@@ -158,6 +158,22 @@ CODE
 }
 
 # actual tests start here
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(get|set)_attr_str");
+    type   = Parrot_PMC_typenum(interp, "Exception");
+    pmc    = Parrot_PMC_new(interp, type);
+    Parrot_PMC_set_integer_native(interp, pmc2, 42);
+
+    string = createstring(interp,"payload");
+
+    Parrot_PMC_set_attr_str(interp, pmc, string, pmc2);
+    pmc3   = Parrot_PMC_get_attr_str(interp, pmc, string);
+
+    Parrot_printf(interp, "%P\n", pmc3);
+CODE
+42
+Done!
+OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(get|set)_attr_keyed");
     type   = Parrot_PMC_typenum(interp, "Exception");
