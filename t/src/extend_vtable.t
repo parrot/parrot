@@ -962,7 +962,6 @@ OUTPUT
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_floor_divide" );
     Parrot_PMC_set_integer_native(interp, pmc,  7);
     Parrot_PMC_set_integer_native(interp, pmc2, 3);
-    Parrot_PMC_set_integer_native(interp, pmc3, 0);
 
     value = Parrot_PMC_get_integer(interp, pmc);
     printf("%d\n", (int) value);
@@ -996,6 +995,18 @@ CODE
 7
 3
 2
+Done!
+OUTPUT
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_floor_divide_float" );
+    Parrot_PMC_set_integer_native(interp, pmc,  7);
+    number = 3.0;
+
+    Parrot_PMC_i_floor_divide_float(interp, pmc, number);
+    number = Parrot_PMC_get_number(interp, pmc);
+    printf("%.2f\n", number);
+CODE
+2.00
 Done!
 OUTPUT
 
