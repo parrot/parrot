@@ -139,10 +139,6 @@ void dotest(Parrot_Interp interp, void *unused)
 
 $code
 
-    /* Some tests leave these null, so only destroy them if they aren't,
-       to avoid the dreaded "Null PMC access in destroy()" */
-
-    /* TODO: Properly test this */
     Parrot_destroy(interp);
     printf("Done!\\n");
 }
