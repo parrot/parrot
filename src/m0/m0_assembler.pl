@@ -32,7 +32,7 @@ my $M0_VARS_SEG     = 0x02;
 my $M0_META_SEG     = 0x03;
 my $M0_BC_SEG       = 0x04;
 
-use constant M0_REG_RX => qr/^(([INSP]\d+)|INTERP|PC|EH|PCX|VAR|MDS|BCS)/;
+use constant M0_REG_RX => qr/^(([INSP]\d+)|INTERP|PC|EH|PCX|VAR|MDS|BCS|x)/;
 
 assemble($file);
 
@@ -109,11 +109,11 @@ sub register_name_to_num {
 
     return 0 if ($register eq 'INTERP');
 
-    my $symbols = { PC => 1, EH  => 2, EX => 3, PCX => 4, CHUNK => 5, VAR => 6,  MDS => 7,  BCS => 8 };
+    my $symbols = { PC => 1, EH  => 2, EX => 3, PCX => 4, CHUNK => 5, VAR => 6,  MDS => 7,  BCS => 8, x => 0 };
 
     if($register !~ /\d+/){
         my $number = $symbols->{$register};
-        die "Invalid register name: $register" unless $number;
+        die "Invalid register name: $register" unless exists $symbols->{$register};
         return $number;
     }
 
@@ -230,10 +230,39 @@ sub m0b_bytecode_seg {
         if ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
             say "adding op $+{opname} to bytecode seg";
             $bytecode .= to_bytecode($ops,\%+);
+        }
+        # special case for goto with a label
+        elsif ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*goto\s+(?<target_label>\w+)\s*(,\s*\w+\s*)?$/) {
+            say "adding op goto to bytecode seg";
+            if (!exists $label_map{ $+{target_label} } ) {
+                die "Invalid M0 - attempt to use undefined label $+{target_label}";
+            }
+            my %x;
+            $x{arg1} = $label_map{ $+{target_label} } / 256;
+            $x{arg2} = $label_map{ $+{target_label} } % 255;
+            $x{arg3} = 'x';
+            $x{opname} = 'goto';
+            $x{target_label} = $+{target_label};
+            say "adding op goto to bytecode seg";
+            $bytecode .= to_bytecode($ops,\%x);
+        }
+        elsif ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*goto_if\s+(?<target_label>[a-zA-Z][a-zA-Z0-9_])\s*,(?<arg3>\w+)\s*$/) {
+            say "adding op goto_if to bytecode seg";
+            if (!exists $label_map{ $+{target_label} } ) {
+                die "Invalid M0 - attempt to use undefined label $+{target_label}";
+            }
+            my %x;
+            $x{arg1} = $label_map{ $+{target_label} } / 256;
+            $x{arg2} = $label_map{ $+{target_label} } % 255;
+            $x{arg3} = $+{target_label};
+            $x{opname} = 'goto_if';
+            say "adding op $+{opname} to bytecode seg";
+            $bytecode .= to_bytecode($ops,\%x);
         } elsif ($line =~ m/^(?<label>[a-zA-Z][a-zA-Z0-9_]+):\s*$/) {
             # ignore
+        } elsif ($line =~ m/^\s*#/) {
         } else {
-            say "Invalid M0 bytecode segment: $line";
+            say "Invalid M0 bytecode segment: '$line'";
             exit 1;
         }
     }
@@ -342,6 +371,8 @@ sub m0b_bc_seg_length {
     for my $line (split /\n/, $bc_seg) {
         # strip out labels
         $line =~ s/^[a-zA-Z][a-zA-Z0-9_]+://;
+        # strip out comments
+        $line =~ s/^\s*#.*$//;
         # count any remaining non-empty lines
         $op_count++ if $line =~ /\w/;
     }
@@ -404,7 +435,7 @@ sub opname_to_num {
 
 sub parse_version {
     my ($lines, $cursor) = @_;
-    $$cursor++ while ($lines->[$$cursor] =~ /^#/ || $lines->[$$cursor] =~ /^\s*$/);
+    $$cursor++ while ($lines->[$$cursor] =~ /^\s*#/ || $lines->[$$cursor] =~ /^\s*$/);
     if ($lines->[$$cursor] !~ /\.version\s+(?<version>\d+)/) {
         say "Invalid M0: No version";
         exit 1;
@@ -427,7 +458,7 @@ sub parse_chunks {
 
         my $line = $lines->[$$cursor];
 
-        $$cursor++ && next if ($line =~ /^#/ || $line =~ /^\s*$/);
+        $$cursor++ && next if ($line =~ /^\s*#/ || $line =~ /^\s*$/);
 
         if ($state eq 'none') {
             if ($line =~ /^\.chunk\s+"(?<name>\w*?)"$/) {
@@ -509,7 +540,7 @@ sub remove_junk {
     my ($source) = @_;
 
     # Remove comments and lines that are solely whitespace
-    $source =~ s/^(#.*|\s+)$//mg;
+    $source =~ s/^(\s*#.*|\s+)$//mg;
 
     # Remove repeated newlines
     $source =~ s/^\n+//mg;
