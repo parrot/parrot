@@ -432,7 +432,13 @@ sub parse_chunks {
                 $state = 'metadata';
             }
             elsif ($line =~ /^\d+\s+(.*)$/) {
-                push @variables, $1;
+                my $v = $1;
+                # remove leading and trailing double quotes which are used to represent strings
+                $v =~ s/(^"|"$)//g;
+                
+                # replace escaped double quotes with actual double quotes
+                $v =~ s/\\"/"/g;
+                push @variables, $v;
             }
             else {
                 die "Invalid M0: expected variables segment data or metadata segment start, got '$line' at line $$cursor";
