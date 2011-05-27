@@ -41,9 +41,10 @@ sub assemble {
 
     my $ops      = parse_op_data();
     my $source   = slurp($file);
-    $source      = remove_junk($source);
-    my $version  = parse_version($source);
-    my $chunks   = parse_chunks($source);
+    my $lines    = [ split(/\n/, $source) ];
+    my $cursor   = 0;
+    my $version  = parse_version($lines, \$cursor);
+    my $chunks   = parse_chunks($lines, \$cursor);
     my $header   = m0b_header();
     my $bytecode = $header . generate_bytecode_for_chunks($ops, $chunks);
     write_bytecode($file, $bytecode);
@@ -288,10 +289,10 @@ sub m0b_dir_seg_length {
 
     my $seg_length = 12; # 4 bytes for identifier, 4 for count, 4 for length
 
-    for (@$chunks) {
+    for my $chunk (@$chunks) {
         $seg_length += 4; # offset into the m0b file
         $seg_length += 4; # size of name
-        $seg_length += length($_->{name});
+        $seg_length += length($chunk->{name});
     }
 
     return $seg_length;
@@ -382,54 +383,96 @@ sub opname_to_num {
 }
 
 sub parse_version {
-    my ($source) = @_;
-    if ($source =~ /\.version\s+(?<version>\d+)/) {
-
-    } else {
+    my ($lines, $cursor) = @_;
+    if ($lines->[$$cursor] !~ /\.version\s+(?<version>\d+)/) {
         say "Invalid M0: No version";
         exit 1;
     }
     say "Parsing M0 v" . $+{version};
+    $$cursor++;
 
     return $+{version};
 }
 
 sub parse_chunks {
-    my ($source) = @_;
+    my ($lines, $cursor) = @_;
 
     my $chunks = [];
+    my %chunk;
+    my (@variables, @metadata, @bytecode);
+    my $state = 'none';
 
-    while ( $source =~ /
-        (?:\n|^)\.chunk\s+"(?<name>\w*?)"
-        \n\.variables\s*(?<variables>.*?)
-        \n\.metadata\s*(?<metadata>.*?)
-        \n\.bytecode\s*(?<bytecode>.*?)(?:\.chunk|$)
-    /gcsx ) {
-        # captures are in %+
-        $file_metadata->{total_chunks}++;
-        say "Parsed chunk #" . $file_metadata->{total_chunks};
-        my $chunk = { %+ };
+    while (exists $lines->[$$cursor]) {
 
-        # convert variable data string to an array ref
-        # TODO: this will fail hard on invalid input
-        $chunk->{variables} = [ map { (split(/\s+/,$_,2))[1] } (split /\n/, $+{variables}) ];
+        my $line = $lines->[$$cursor];
 
-        for my $v (@{$chunk->{variables}}) {
-            # remove leading and trailing double quotes which are used to represent strings
-            $v =~ s/(^"|"$)//g;
+        $$cursor++ && next if ($line =~ /^#/ || $line =~ /^\s*$/);
 
-            # replace escaped double quotes with actual double quotes
-            $v =~ s/\\"/"/g;
+        if ($state eq 'none') {
+            if ($line =~ /^\.chunk\s+"(?<name>\w*?)"$/) {
+                $chunk{name} = $+{name}; 
+                $state = 'chunk start';
+            }
+            else {
+                die "expected chunk name, got '$line' at line $$cursor";
+            }
         }
-
-        $chunk->{bytecode} = $+{bytecode};
-        $chunk->{metadata} = $+{metadata};
-
-        push @$chunks, $chunk;
+        elsif ($state eq 'chunk start') {
+            if ($line =~ /^\.variables\w*?$/ ) {
+                $state = 'variables';
+            }
+            else {
+                die "expected variables segment start, got '$line' at line $$cursor";
+            }
+        }
+        elsif ($state eq 'variables') {
+            if ($line =~ /^\.metadata\w*?$/) {
+                $state = 'metadata';
+            }
+            elsif ($line =~ /^\d+\s+(.*)$/) {
+                push @variables, $1;
+            }
+            else {
+                die "expected variables segment data or metadata segment start, got '$line' at line $$cursor";
+            }
+        }
+        elsif ($state eq 'metadata') {
+            if ($line =~ /^\.bytecode\w*?$/) {
+                $state = 'bytecode';
+            }
+            elsif ($line =~ /(\d+)\s+(\d+)\s+(\d+)\s*$/) {
+                push @metadata, $line;
+            }
+            else {
+                die "expected metadata segment data or bytecode segment start, got '$line' at line $$cursor";
+            }
+        }
+        elsif ($state eq 'bytecode') {
+            if ($line =~ /^\.chunk\s+"(?<name>\w*?)$/) {
+                $chunk{variables} = join("\n", @variables);
+                $chunk{metadata}  = join("\n", @metadata);
+                $chunk{bytecode}  = join("\n", @bytecode);
+                push @$chunks, {%chunk};
+                (@variables, @metadata, @bytecode) = ([],[],[]);
+                %chunk = {};
+                $chunk{name} = $+{name}; 
+                $state = 'chunk start';
+            }
+            elsif ($line =~ /^[^\.].*/) {
+                push @bytecode, $line;
+            }
+            else {
+                die "expected bytecode segment data or start of new chunk, got '$line' at line $$cursor";
+            }
+        }
+        $$cursor++;
     }
-    #TODO: error checking
-    #    print "Invalid M0 at chunk " . $file_metadata->{total_chunks};
-    #    exit 1;
+
+    $chunk{variables} = [@variables];
+    $chunk{metadata}  = join("\n", @metadata);
+    $chunk{bytecode}  = join("\n", @bytecode);
+    push @$chunks, {%chunk};
+
     return $chunks;
 }
 
