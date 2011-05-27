@@ -128,6 +128,7 @@ typedef Parrot_Run_core_t Run_Cores;
 #include "parrot/oplib.h"
 
 #include "parrot/debugger.h"
+#include "parrot/hbdb.h"
 #include "parrot/multidispatch.h"
 #include "parrot/call.h"
 #include "parrot/gc_api.h"

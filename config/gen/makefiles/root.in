@@ -404,6 +404,7 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/has_header.h \
 	$(INC_DIR)/oplib.h \
 	$(INC_DIR)/feature.h \
+    $(INC_DIR)/hbdb.h \
 	$(INC_DIR)/debugger.h \
 	$(INC_DIR)/core_types.h \
 	$(INC_DIR)/core_pmcs.h \

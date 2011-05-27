@@ -26,6 +26,8 @@
  * Node type in linked list of breakpoints.
  */
 
+typedef struct hbdb_breakpoint hbdb_breakpoint;
+
 typedef struct hbdb_breakpoint {
     unsigned long           id;
     opcode_t                *pc;
