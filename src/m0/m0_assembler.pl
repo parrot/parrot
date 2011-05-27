@@ -224,8 +224,9 @@ sub m0b_bytecode_seg {
                 if (exists $label_map{$label});
             $label_map{ $label } = $pc;
         }
-        $pc++ if ($line =~ /:\s*\w/);
+        $pc++ if ($line =~ /:\s*\w/ || $line =~ /,\s*\w\s*,/);
     }
+
     for my $line (@lines) {
         if ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
             say "adding op $+{opname} to bytecode seg";
@@ -238,10 +239,11 @@ sub m0b_bytecode_seg {
                 die "Invalid M0 - attempt to use undefined label $+{target_label}";
             }
             my %x;
-            $x{arg1} = $label_map{ $+{target_label} } / 256;
-            $x{arg2} = $label_map{ $+{target_label} } % 255;
+            $x{arg1} = int($label_map{ $+{target_label} } / 256);
+            $x{arg2} = int($label_map{ $+{target_label} } % 255);
             $x{arg3} = 'x';
             $x{opname} = 'goto';
+            say Dumper %x;
             $x{target_label} = $+{target_label};
             say "adding op goto to bytecode seg";
             $bytecode .= to_bytecode($ops,\%x);
@@ -252,8 +254,8 @@ sub m0b_bytecode_seg {
                 die "Invalid M0 - attempt to use undefined label $+{target_label}";
             }
             my %x;
-            $x{arg1} = $label_map{ $+{target_label} } / 256;
-            $x{arg2} = $label_map{ $+{target_label} } % 255;
+            $x{arg1} = int($label_map{ $+{target_label} } / 256);
+            $x{arg2} = int($label_map{ $+{target_label} } % 255);
             $x{arg3} = $+{target_label};
             $x{opname} = 'goto_if';
             say "adding op $+{opname} to bytecode seg";
