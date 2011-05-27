@@ -1188,15 +1188,23 @@ CODE
 Done!
 OUTPUT
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_divide_int" );
+    Parrot_PMC_set_integer_native(interp, pmc,  42);
+    integer = 21;
+
+    Parrot_PMC_i_divide_int(interp, pmc, integer);
+    integer = Parrot_PMC_get_integer(interp, pmc);
+    printf("%d\n", integer);
+CODE
+2
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_divide_int" );
     Parrot_PMC_set_integer_native(interp, pmc,  42);
     Parrot_PMC_set_integer_native(interp, pmc3, 0);
     integer = 21;
 
-    /*
-       We must pass in the destination, but the return
-       value of the function must be used. This is broken.
-    */
     pmc3 = Parrot_PMC_divide_int(interp, pmc, integer, pmc3);
     integer = Parrot_PMC_get_integer(interp, pmc3);
     printf("%d\n", integer);
