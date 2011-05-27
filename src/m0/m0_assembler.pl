@@ -384,6 +384,7 @@ sub opname_to_num {
 
 sub parse_version {
     my ($lines, $cursor) = @_;
+    $$cursor++ while ($lines->[$$cursor] =~ /^#/ || $lines->[$$cursor] =~ /^\s*$/);
     if ($lines->[$$cursor] !~ /\.version\s+(?<version>\d+)/) {
         say "Invalid M0: No version";
         exit 1;
@@ -412,39 +413,40 @@ sub parse_chunks {
             if ($line =~ /^\.chunk\s+"(?<name>\w*?)"$/) {
                 $chunk{name} = $+{name}; 
                 $state = 'chunk start';
+                say "Parsing chunk #".scalar @$chunks;
             }
             else {
-                die "expected chunk name, got '$line' at line $$cursor";
+                die "Invalid M0: expected chunk name, got '$line' at line $$cursor";
             }
         }
         elsif ($state eq 'chunk start') {
-            if ($line =~ /^\.variables\w*?$/ ) {
+            if ($line =~ /^\.variables\s*?$/ ) {
                 $state = 'variables';
             }
             else {
-                die "expected variables segment start, got '$line' at line $$cursor";
+                die "Invalid M0: expected variables segment start, got '$line' at line $$cursor";
             }
         }
         elsif ($state eq 'variables') {
-            if ($line =~ /^\.metadata\w*?$/) {
+            if ($line =~ /^\.metadata\s*?$/) {
                 $state = 'metadata';
             }
             elsif ($line =~ /^\d+\s+(.*)$/) {
                 push @variables, $1;
             }
             else {
-                die "expected variables segment data or metadata segment start, got '$line' at line $$cursor";
+                die "Invalid M0: expected variables segment data or metadata segment start, got '$line' at line $$cursor";
             }
         }
         elsif ($state eq 'metadata') {
-            if ($line =~ /^\.bytecode\w*?$/) {
+            if ($line =~ /^\.bytecode\s*?$/) {
                 $state = 'bytecode';
             }
             elsif ($line =~ /(\d+)\s+(\d+)\s+(\d+)\s*$/) {
                 push @metadata, $line;
             }
             else {
-                die "expected metadata segment data or bytecode segment start, got '$line' at line $$cursor";
+                die "Invalid M0: expected metadata segment data or bytecode segment start, got '$line' at line $$cursor";
             }
         }
         elsif ($state eq 'bytecode') {
@@ -462,7 +464,7 @@ sub parse_chunks {
                 push @bytecode, $line;
             }
             else {
-                die "expected bytecode segment data or start of new chunk, got '$line' at line $$cursor";
+                die "Invalid M0: expected bytecode segment data or start of new chunk, got '$line' at line $$cursor";
             }
         }
         $$cursor++;
