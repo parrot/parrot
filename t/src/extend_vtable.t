@@ -158,6 +158,23 @@ CODE
 
 # actual tests start here
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_floor_divide" );
+    Parrot_PMC_set_integer_native(interp, pmc,  7);
+    Parrot_PMC_set_integer_native(interp, pmc2, 3);
+
+    value = Parrot_PMC_get_integer(interp, pmc);
+    Parrot_printf(interp, "%P\n", pmc);
+
+    Parrot_PMC_i_floor_divide(interp, pmc, pmc2);
+    Parrot_printf(interp, "%P\n%P\n", pmc, pmc2);
+CODE
+7
+2
+3
+Done!
+OUTPUT
+
+
 # # Exception is: type 36 severity 2 message 'get_pointer_keyed_int() not implemented in class 'Class''
 #extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer_keyed_int");
 #    /* Need to create object PMC */
@@ -955,25 +972,6 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_neg" );
     printf("%d\n", (int) value);
 CODE
 42
-Done!
-OUTPUT
-
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_floor_divide" );
-    Parrot_PMC_set_integer_native(interp, pmc,  7);
-    Parrot_PMC_set_integer_native(interp, pmc2, 3);
-
-    value = Parrot_PMC_get_integer(interp, pmc);
-    printf("%d\n", (int) value);
-
-    Parrot_PMC_i_floor_divide(interp, pmc, pmc2);
-    value = Parrot_PMC_get_integer(interp, pmc);
-    printf("%d\n", (int) value);
-    value = Parrot_PMC_get_integer(interp, pmc2);
-    printf("%d\n", (int) value);
-CODE
-7
-3
-2
 Done!
 OUTPUT
 
