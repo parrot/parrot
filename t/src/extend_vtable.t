@@ -159,6 +159,16 @@ CODE
 
 # actual tests start here
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(get|set)_integer_keyed_str");
+    string = createstring(interp,"foo");
+    Parrot_PMC_set_integer_keyed_str(interp, hash, string, 42);
+    integer = Parrot_PMC_get_integer_keyed_str(interp, hash, string);
+    Parrot_printf(interp,"%d\n", integer);
+CODE
+42
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(set|get)_number_keyed_str");
     string = createstring(interp,"foo");
     Parrot_PMC_set_number_keyed_str(interp, hash, string, 42.00);
@@ -444,14 +454,6 @@ Done!
 OUTPUT
 
 
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_integer_keyed_str");
-    string = createstring(interp,"foo");
-    integer = Parrot_PMC_get_integer_keyed_str(interp, hash, string);
-    Parrot_printf(interp,"%d\n", integer);
-CODE
-0
-Done!
-OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_exists_keyed_str");
     string = createstring(interp,"foo");
