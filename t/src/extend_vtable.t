@@ -158,6 +158,16 @@ CODE
 
 # actual tests start here
 
+extend_vtable_output_is(<<'CODE',<<'OUTPUT', "Parrot_PMC_i_modulus_float" );
+    Parrot_PMC_set_number_native(interp, pmc,  50.0);
+
+    Parrot_PMC_i_modulus_float(interp, pmc, 42.0);
+    Parrot_printf(interp, "%.2f\n",Parrot_PMC_get_number(interp, pmc));
+CODE
+8.00
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE',<<'OUTPUT', "Parrot_PMC_modulus_float" );
     Parrot_PMC_set_number_native(interp, pmc,  50.0);
     Parrot_PMC_set_number_native(interp, pmc3, 0.0);
