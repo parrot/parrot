@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 137;
+plan tests => 139;
 
 =head1 NAME
 
@@ -240,6 +240,19 @@ default
 Done!
 OUTPUT
 
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_repeat_int");
+    string  = createstring(interp, "BAR");
+    Parrot_PMC_assign_string_native(interp, pmc_string, string);
+
+    pmc_string = Parrot_PMC_repeat_int(interp, pmc_string, 3, pmc_string);
+    string = Parrot_PMC_name(interp, pmc_string);
+    Parrot_printf(interp, "%S\n%P\n", string, pmc_string);
+CODE
+String
+BARBARBAR
+Done!
+OUTPUT
+
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_repeat_int");
     string  = createstring(interp, "BAR");
     Parrot_PMC_assign_string_native(interp, pmc_string, string);
@@ -253,6 +266,20 @@ BARBARBAR
 Done!
 OUTPUT
 
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_repeat");
+    string  = createstring(interp, "FOO");
+    Parrot_PMC_assign_string_native(interp, pmc_string, string);
+
+    Parrot_PMC_set_integer_native(interp, pmc,  5);
+    pmc_string = Parrot_PMC_repeat(interp, pmc_string, pmc, pmc_string);
+    string = Parrot_PMC_name(interp, pmc_string);
+    Parrot_printf(interp, "%S\n%P\n", string, pmc_string);
+CODE
+String
+FOOFOOFOOFOOFOO
+Done!
+OUTPUT
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_repeat");
     string  = createstring(interp, "FOO");
     Parrot_PMC_assign_string_native(interp, pmc_string, string);
