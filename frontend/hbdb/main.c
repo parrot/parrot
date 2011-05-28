@@ -2,9 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "parrot/parrot.h"
-
 #include "parrot/hbdb.h"
 #include "parrot/api.h"
 
