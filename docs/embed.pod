@@ -1179,8 +1179,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_instantiate>
 
-=item C<Parrot_PMC_invoke>
-
 =item C<Parrot_PMC_i_pow>
 
 =item C<Parrot_PMC_i_pow_float>
