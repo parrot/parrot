@@ -12,7 +12,7 @@ DYNPMC_TARGETS =                                      \
     $(DYNEXT_DIR)/rotest$(LOAD_EXT)                   \
     $(DYNEXT_DIR)/rational$(LOAD_EXT)                 \
     $(DYNEXT_DIR)/subproxy$(LOAD_EXT)		      \
-    $(DYNEXT_DIR)/llvm_engine$(LOAD_EXT)
+#IF(has_llvm):    $(DYNEXT_DIR)/llvm_engine$(LOAD_EXT)
 
 DYNPMC_FOO =            \
     src/dynpmc/foo.pmc  \
