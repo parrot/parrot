@@ -104,7 +104,7 @@ method op ($/, $key?) {
         my @variants  := expand_args(pir::clone__PP($OP<normalized_args>));
         if @variants {
             for @variants {
-                my $new_op := deep_clone($OP);
+                my $new_op := pir::clone__PP($OP);
                 $new_op<arg_types> := $_;
                 $past.push($new_op);
             }
@@ -115,12 +115,6 @@ method op ($/, $key?) {
 
         make $past;
     }
-}
-
-sub deep_clone($thingy) {
-    Ops::Util::process_recursive($thingy, -> $_ {
-        $_.WHAT.new;
-    });
 }
 
 # Normalize args
@@ -172,8 +166,6 @@ sub normalize_args(@args) {
         else {
             $res<direction> := 'o';
         }
-
-        #$arg<type> := $res<type>;
 
         @result.push($res);
     }

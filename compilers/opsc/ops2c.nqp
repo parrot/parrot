@@ -58,54 +58,17 @@ sub MAIN() {
                     )
                  !! undef;
 
-    my $f;
-    my $do_dump_file := 0;
-    my $do_load      := 1;
-    my $dump_file := $core ?? 'src/ops/ops.dump' !! @files[0] ~ ".dump";
-    if $opts<dump> {
-        try {
-            my $fh   := open($dump_file, :r, :bin);
-            my $dump := $fh.readall;
-            $fh.close();
-
-            $f := pir::thaw__ps($dump);
-            $do_load := 0;
-
-            CATCH {
-                $quiet || pir::say("# Caught $!");
-                $do_dump_file := 1;
-                $f := undef;
-            };
-        }
-    }
-
-    if $do_load {
-        $f := Ops::File.new(|@files,
-            :oplib($lib),
-            :core($core),
-            :quiet($quiet),
-        );
-    }
-
-    if $do_dump_file {
-        $quiet || say("Dumping");
-        my $capture := Ops::Util::strip_source($f);
-        my $frozen  := pir::freeze__sp($capture);
-
-        my $fh := open($dump_file, :w, :bin);
-        $fh.print($frozen);
-        $fh.close();
-    }
+    my $f := Ops::File.new(|@files, :oplib($lib), :core($core), :quiet($quiet));
 
     $quiet || say("# Ops parsed in { pir::sprintf__ssp("%.3f", [pir::time__N() - $start_time] ) } seconds.");
+ 
+    my $emitter := Ops::Emitter.new(
+        :ops_file($f), :trans($trans),
+        :script('ops2c.nqp'), :file(@files[0]),
+        :flags( hash( core => $core, quiet => $quiet ) ),
+    );
 
     unless $debug {
-        my $emitter := Ops::Emitter.new(
-            :ops_file($f), :trans($trans),
-            :script('ops2c.nqp'), :file(@files[0]),
-            :flags( hash( core => $core, quiet => $quiet ) ),
-        );
-
         $emitter.print_ops_num_files() if $core;
         $emitter.print_c_header_files();
         $emitter.print_c_source_file();
@@ -134,9 +97,6 @@ sub get_options() {
 
     # suppress timing and debug output on stdout
     $getopts.add_option('quiet', 'q');
-
-    # Use .dump files with parsed ops.
-    $getopts.add_option('dump', 'D');
 
     $getopts.get_options(pir::getinterp__p()[2]);
 }
