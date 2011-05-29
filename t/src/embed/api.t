@@ -216,6 +216,10 @@ int main(void) {
     imcc_compile_file_api(interp, pir_compiler, filename, &bytecode);
     Parrot_api_run_bytecode(interp, bytecode, NULL);
 
+    Parrot_api_set_warnings(interp, 0);
+    Parrot_api_add_library_search_path(interp, ".");
+    Parrot_api_add_dynext_search_path(interp, ".");
+
     Parrot_api_string_import_ascii(interp, "Pi->", &signature_s);
 
     Parrot_api_string_import_ascii(interp, "CallContext", &callcontext_s);
