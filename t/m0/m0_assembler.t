@@ -120,7 +120,7 @@ output_like(
     'detect duplicate labels'
 );
 
-ok(!-e catfile(qw/t m0 invalid_bytecode.m0b/), 'invalid_bytece.m0b was not created');
+ok(!-e catfile(qw/t m0 invalid_bytecode.m0b/), 'invalid_bytecode.m0b was not created');
 
 sub output_like {
     my ($options, $snippet, $desc)  = @_;
