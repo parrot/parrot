@@ -20,23 +20,31 @@ bacek, atrodo or dukeleto.
 This is a list of things that we expect the M0 VM to be able to do as this
 spec progresses.  They're pretty basic, but that's the idea behind M0.
 
+Completed milestones:
+
 =over
 
 =item * print 42 (hard-coded instructions are fine at this point)
 
 =item * assemble an M0 assembly listing into M0 bytecode
 
-=item * disassemble binary M0 bytecode into an M0 assembly listing
-
 =item * print "hello, world\n"
 
 =item * add two integer registers, store the result
 
-=item * calculate the sum of a 10-element array of ints
+=back
+
+Incomplete milestones:
+
+=over
 
 =item * calculate the hash of a hard-coded string (any non-trivial algorithm)
 
 =item * call a function with an argument, return a value
+
+=item * calculate the sum of a 10-element array of ints
+
+=item * disassemble binary M0 bytecode into an M0 assembly listing
 
 =back
 
