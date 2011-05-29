@@ -987,6 +987,19 @@ synchronization between contexts.
 The Actor model of concurrency currently looks promising http://en.wikipedia.org/wiki/Actor_model .
 One implementation of the Actor model on the JVM is Akka : http://akka.io/
 
+=head2 Security
+
+M0 will have security mechanisms such that an optional cryptographic hash of
+the bytecode will be stored in the metadata portion of a bytecode file.  This
+will not be tied to any one crypto algorithm, and crypto algorithms which are
+portable and run on all platforms that Parrot supports are likely candidates
+for a default. This part of the spec is still in flux. One option we have is to
+specify a textual string such as "SHA1" and store the accompanying hash. Then
+the M0 interpreter will verify the SHA1 sum matches and give a loud error and
+bomb out if it doesn't.
+
+TODO: Are we storing crypto hashes in M0 source and bytecode, or only bytecode?
+
 =head1 Lorito
 
 =head2 Description
