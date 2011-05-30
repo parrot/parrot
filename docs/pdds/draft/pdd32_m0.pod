@@ -68,8 +68,8 @@ ops are a subset of the C<M0> specification.
 =item * chunk
 
 A chunk is a self-contained unit of code.  Chunks correspond roughly to
-functions and have a variables table, a metadata segment and a bytecode
-segment.  The variables table is used to store any persistent data.  The
+functions and have a constants table, a metadata segment and a bytecode
+segment.  The constants table is used to store any persistent data.  The
 metadata segment stores information about the code, for example annotations or
 variable names.  The bytecode segment contains the executable ops.
 
@@ -155,12 +155,7 @@ chosen to better reflect common usage and hopefully reduce confusion.
 
 =head2 Registers
 
-An M0 register may have one of 256 values.  This means that registers can point
-at one of 256 different places in the variables table, which will support up to
-65536 slots.   Registers can be pointed at different slots with the C<set_var>
-instruction, which will interpret its second and third arguments as the index
-into the variables table.  The variables table serves both as a runtime
-scratchpad and as a location for data which is extracted from bytecode to live.
+An M0 VM has 256 registers, each of which is large enough to hold an INSP value.
 
 =head2 List of Ops
 
@@ -297,7 +292,7 @@ Store C<*$2> ^ C<*$3> into C<*$1>.
 
 =back
 
-=head3 Memory ops (7 ops)
+=head3 Memory/GC ops (4 ops)
 
 =over
 
@@ -320,37 +315,46 @@ Free the region of memory at C<*$1>.  C<$2> and C<$3> are ignored.  This is a
 direct interface to the underlying implementation's C<free()> implementation
 (or equivalent) and does not go through ffi.
 
-=item * set - sets a register to a value
-
-Set C<*$1> to whatever is in C<*$2>.  C<$3> is ignored.
-
-=item * copy_byte - write a byte to memory
-
-Write the byte in C<$2> to the memory location starting at C<*$1>.  Segfaults
-may result.  Be careful.
-
 =item * copy_mem - copy data to/from memory
 
 Write C<*$3> bytes from the memory location starting at C<*$2> to C<*$1>.
 Segfaults may result.  Be careful.
 
-=item * set_var - point a register at a variables table slot
+=back
 
-Point C<*$1> at a slot in the variables table. C<$2> contains the high byte of
+=head3 Register ops (3)
+
+=item * set - sets a register to a value
+
+Set C<*$1> to whatever is in C<*$2>.  C<$3> is ignored.
+
+=item * load_cref - point a register at a constants table slot
+
+Point C<*$1> at a slot in the cosntants table. C<$2> contains the high byte of
 the index, C<$3> contains the low byte.  Both C<$2> and C<$2> are treated as
-1-byte immediate values.
+1-byte immediate values.  Writing to the constants table is invalid.  Code that
+needs a modifiable version of a value from the constants table must first copy
+it into an allocated region of memory.
 
-The variables table is intended to serve both as a location where data from
-bytecode can be accessed and as a reasonably large (256^2 slots) runtime
-scratchpad.
+The constants table is serves as a location where constant data stored in
+bytecode can be accessed.
 
 Examples:
 
-  # point register 0 at variable 123 (0 * 256 + 123 * 1)
-  set_var 0, 0, 123
+  # point register 0 at constant 123 (0 * 256 + 123 * 1)
+  load_cref 0, 0, 123
 
-  # point register 3 at variable 1026 (4 * 256 + 2 * 1)
-  set_var 3, 4, 2
+  # point register 3 at constant 1026 (4 * 256 + 2 * 1)
+  load_cref 3, 4, 2
+
+=item * load_cval - copy a value from the constants table into a register
+
+Copy a value from the constants table directly into a register.  This will copy
+a register-sized number of bytes into C<*$1>, using C<$2> and C<$3> as the
+index into the constants table, similar to C<load_cref>.  This is used to copy
+constant-sized values such as integer and numeric values into a register.
+Using C<load_cval> on a non-numeric constant is not valid and may be checked in
+the future.
 
 =back
 
@@ -452,7 +456,7 @@ The current version is 0.
 
 =head3 Chunk Format
 
-A chunk consists of a chunk identifier, a variables chunk, a metadata chunk and
+A chunk consists of a chunk identifier, a constants chunk, a metadata chunk and
 a bytecode chunk.  A chunk represents self-contained computational units,
 approximately analogous to a function.
 
@@ -467,19 +471,16 @@ which must be unique. The empty string is allowed as a chunk name.
 This name is the primary way that code will refer to a chunk.  It is roughly
 analogous to a function's name in an HLL.
 
-=head3 Variables Segment
+=head3 Constants Segment
 
-The variables segment contains a numbered list of chunks of data.  Data can be
+The constants segment contains a numbered list of chunks of data.  Data can be
 either an integer, a floating point number, a quote-delimited utf-8 string or
 arbitrary data in hex notation.  For simplicity's sake, strings will only
 support escaping double-quotes.  Any other data should be stored as a hex
-string.  This space is used to initialize the variables table.  Any data 
-used by the metadata segment and the bytecode segment will be stored here.
+string.  This data is accessible through the C<load_const> op.  Any constant
+data used by the metadata segment and the bytecode segment will be stored here.
 
-The deserialized version of the variables segment is referred to as the
-variables table.
-
-  .variables
+  .constants
   0 1234
   1 1.12345e-12
   2 "asdfasdfs"
@@ -493,9 +494,9 @@ variables table.
 The metadata segment consists of triplets of integers mapping a name and a
 bytecode offset to a value.  The first number is an offset into the bytecode
 segment.  This is the instruction at which the metadata first takes effect.
-The second number is the offset into the variables table that contains the
-name of the metadata entry.  The third is the offset into the variables table 
-that contains the value.
+The second number is the offset into the constants table that contains the name
+of the metadata entry.  The third is the offset into the constants table that
+contains the value.
 
   .metadata
   #at pc 1234, "line" is 23
@@ -574,7 +575,7 @@ The following should be a working "hello world" program in M0.
 
     .version 0
     .chunk "hello"
-    .variables
+    .constants
     0 1
     1 "hello, world"
     2 0x0A00
@@ -606,7 +607,7 @@ functions and have the following segments:
 
 =over 4
 
-=item * a variables segment containing the data that the segment needs
+=item * a constants segment containing the data that the segment needs
 
 =item * a metadata segment that carries any extra data like HLL line numbers, function names, annotations and custom data
 
@@ -637,47 +638,35 @@ the file.  It will have the following structure:
   opcode_t : number of chunks in this segment
   opcode_t : number of opcode_t-sized units in this segment
   [
-    opcode_t : offset of a variables segment
+    opcode_t : offset of a constants segment
     opcode_t : size of chunk name
     [
       opcode_t : chunk name
     ]
   ]
 
-The variables segment will contain any data needed to execute the bytecode.
-Data will used to poplate the variables table and explictly loaded into
-registers as needed.
+The constants segment will contain any data needed to execute the bytecode.
+Data in constants table must be explictly loaded into registers as needed.
 
   opcode_t : M0_VARS_SEG
-  opcode_t : number of variables in this segment
+  opcode_t : number of constants in this segment
   opcode_t : number of opcode_t-sized units in this segment
   [
-    opcode_t : number of bytes in variable data
-    ...      : variable data
+    opcode_t : number of bytes in constant data
+    ...      : constant data
   ]
 
 The metadata segment contains any data about the bytecode that might come in
-handy.  The actual data will live in the variables table; this segment just
+handy.  The actual data will live in the constants table; this segment just
 provides a way to map values to names and bytecode offsets.
-
-{{{
-Should entries in the variables table referenced by the metadata segment
-somehow be marked as constant?  It's almost certainly incorrect to change them
-at runtime.
-
-Adding flags to values in the variables table means adding a little complexity
-and inviting more in the form of more flags.  What about either ignoring the
-problem and saying "Don't do that," or adding an op to get the original value
-of a variables table slot?
-}}}
 
   opcode_t : M0_META_SEG
   opcode_t : number of entries in this segment
   opcode_t : number of opcode_t-sized units in this segment
   [
     opcode_t : bytecode offset relative to the start of the current bc seg where this data becomes effective
-    opcode_t : offset into variables table for the name of this piece of metadata
-    opcode_t : offset into variables table for the value of this piece of metadata
+    opcode_t : offset into constants table for the name of this piece of metadata
+    opcode_t : offset into constants table for the value of this piece of metadata
   ]
 
 The bytecode segment contains a series of executable ops.  A pointer (or its
@@ -737,10 +726,10 @@ until we're reasonably confident that we have a final set of ops.
          gc_alloc
          sys_alloc
          sys_free
+         copy_mem 
          set
-         set_mem
-         get_mem
-         set_var
+         load_cref
+         load_cval
          csym
          ccall_arg
          ccall_ret
@@ -830,7 +819,7 @@ type:
     3       EX  - exception being thrown, if any
     4       PCF - parent call frame
     5       CHUNK - the name of the currently-executing chunk
-    6       VAR - pointer to variables table
+    6       CONST - pointer to constants table
     7       MDS - pointer to metadata segment
     8       BCS - pointer to bytecode segment
     9       reserved
@@ -923,7 +912,7 @@ to result from breaking this assumption.
 The following example code calls a function called C<hello_func>, which takes
 no arguments and has no return value, in the library C<libhello.so>.  The use
 of strings as direct arguments is a simplification for explanatory purposes.
-In actual M0 bytecode, the string would be an index into the variables table.
+In actual M0 bytecode, the string would be an index into the constants table.
 
     dlopen_fp = csym "Parrot_dlopen"
     dlsym_fp  = csym "Parrot_dlsym"
