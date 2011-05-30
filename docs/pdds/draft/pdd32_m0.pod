@@ -297,9 +297,28 @@ Store C<*$2> ^ C<*$3> into C<*$1>.
 
 =back
 
-=head3 Memory ops (4 ops)
+=head3 Memory ops (7 ops)
 
 =over
+
+=item * gc_alloc - allocate memory from the GC
+
+Allocate C<*$2> bytes, store the pointer C<*$1>.  C<*$3> contains flags
+indicating any special properties required of the returned chunk of memory.  A
+pointer returned by C<gc_alloc> does not need to be freed.
+
+=item * sys_alloc - allocate memory using malloc or its equivalent
+
+Allocate C<*$2> bytes, store the pointer C<*$1>.  C<$3> is ignored.  The
+pointer returned by C<sys_alloc> must be released with C<sys_free> to avoid
+memory leaks.  This is a direct interface to the underlying implementation's
+C<malloc()> implementation (or equivalent) and does not go through ffi.
+
+=item * sys_free - free memory using free() or its equivalent
+
+Free the region of memory at C<*$1>.  C<$2> and C<$3> are ignored.  This is a
+direct interface to the underlying implementation's C<free()> implementation
+(or equivalent) and does not go through ffi.
 
 =item * set - sets a register to a value
 
@@ -369,7 +388,7 @@ its arguments have been set up correctly.  C<$2> and C<$3> are ignored.
 
 =back
 
-=head3 Temporary ops (6 ops)
+=head3 Temporary ops (3 ops)
 
 =over
 
@@ -384,14 +403,6 @@ Print the integer at C<*$2> to the filehandle C<*$1>.
 =item * print_n  - prints a number
 
 Print the floating-point number at C<*$2> to the filehandle C<*$1>.
-
-=item * alloc - allocate memory (go through ffi)
-
-Allocate C<*$2> bytes, store them in C<*$1>.  C<$3> is ignored.
-
-=item * free - free memory (go through ffi)
-
-Free the region of memory at C<*$1>.  C<$2> and C<$3> are ignored.
 
 =item * exit - exit with the given status (go through ffi)
 
@@ -723,20 +734,23 @@ until we're reasonably confident that we have a final set of ops.
     0x13 and
     0x14 or
     0x15 xor
-    0x16 set
-    0x17 set_mem
-    0x18 get_mem
-    0x19 set_var
-    0x1A csym
-    0x1B ccall_arg
-    0x1C ccall_ret
-    0x1D ccall
-    0x1E print_s
-    0x1F print_i
-    0x20 print_n
-    0x21 alloc
-    0x22 free
-    0x23 exit
+         gc_alloc
+         sys_alloc
+         sys_free
+         set
+         set_mem
+         get_mem
+         set_var
+         csym
+         ccall_arg
+         ccall_ret
+         ccall
+         print_s
+         print_i
+         print_n
+         alloc
+         free
+         exit
 
 =head2 Execution
 
@@ -860,6 +874,10 @@ in C and high-level languages such as Python or Perl, to direct compilation to
 machine code, to jitting and to compilation to static C.  Where possible, M0's
 design should not impose any constraints that preclude efficient implementation
 of any of type of interpreter.
+
+M0 must be implemented such that only programs which make direct use of ffi
+require it to be presence.  An M0 program which does not make use of FFI should
+run without modification on an implementation that does not support ffi.
 
 =head3 Implementation
 
