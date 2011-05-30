@@ -1,5 +1,28 @@
 /* Copyright (C) 2001-2010, Parrot Foundation. */
 
+/*
+
+=head1 NAME
+
+hbdb - The Honey Bee Debugger
+
+=head1 SYNOPSIS
+
+hbdb program
+
+=head1 DESCRIPTION
+
+The Honey Bee Debugger (hbdb) is the standard debugger for the Parrot virtual
+machine.
+
+=head1 STATIC FUNCTIONS
+
+=over 4
+
+=cut
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "parrot/parrot.h"
@@ -8,9 +31,18 @@
 
 /* TODO Check for command line arguments */
 /* TODO Define usage() function          */
-/* TODO Add perldoc                      */
 
 static void fail(Parrot_PMC interp);
+
+/*
+
+=item C<int main(int argc, char *argv[])>
+
+Entry point of C<hbdb>. Reads source code from file in C<argv[1]>.
+
+=cut
+
+*/
 
 int
 main(int argc, char *argv[])
@@ -67,6 +99,17 @@ main(int argc, char *argv[])
     return (0);
 }
 
+/*
+
+=item C<static void fail(Parrot_PMC interp)>
+
+Called when an API function fails. Prints an error message and exits with
+the status code C<EXIT_FAILURE>.
+
+=cut
+
+*/
+
 static void
 fail(Parrot_PMC interp)
 {
@@ -88,6 +131,23 @@ fail(Parrot_PMC interp)
 
     exit(exit_code);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<src/hbdb.c>, F<include/parrot/hbdb.h>
+
+=head1 HISTORY
+
+The initial version of C<hbdb> was written by Kevin Polulak (soh_cah_toa) as
+part of Google Summer of Code 2011.
+
+=cut
+
+*/
 
 /*
  * Local variables:
