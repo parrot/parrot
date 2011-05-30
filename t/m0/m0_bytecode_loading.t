@@ -37,7 +37,7 @@ my $M0_BC_SEG       = 0x04;
 
 # basic test with one chunk containing all empty segments
 
-my $m0_interp = "$^X src/m0/m0_interp.pl";
+my $m0_interp = "$^X src/m0/perl5/m0_interp.pl";
 
 my $m0b_data = [
     { 

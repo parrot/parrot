@@ -21,7 +21,7 @@ Run the canonically "correct", hand-assembled hello_canon.m0b.
 
 =cut
 
-my $m0_interp = "$^X src/m0/m0_interp.pl";
+my $m0_interp = "$^X src/m0/perl5/m0_interp.pl";
 
 my $output = `$m0_interp t/m0/hello_canon.m0b`;
 

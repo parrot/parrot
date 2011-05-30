@@ -25,7 +25,7 @@ use File::Spec::Functions;
 
 plan tests => 21;
 
-my $exefile    = catfile( ".", qw/src m0 m0_assembler.pl/ );
+my $exefile    = catfile( ".", qw/src m0 perl5 m0_assembler.pl/ );
 my $hello_m0   = catfile(qw/t m0 hello.m0/);
 my $hello_m0b  = catfile(qw/t m0 hello.m0b/);
 my $hello2_m0  = catfile(qw/t m0 hello2.m0/);

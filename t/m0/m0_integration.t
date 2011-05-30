@@ -32,7 +32,7 @@ sub interp_output_like {
     my ($file, $regex, $desc)  = @_;
 
     assemble($file);
-    my $interp    = catfile( ".", qw/src m0 m0_interp.pl/ );
+    my $interp    = catfile( ".", qw/src m0 perl5 m0_interp.pl/ );
 
     my $out = `$^X $interp ${file}b 2>&1`;
     like($out, $regex, $desc);
@@ -42,7 +42,7 @@ sub interp_output_like {
 
 sub assemble {
     my ($options) = @_;
-    my $assembler    = catfile( ".", qw/src m0 m0_assembler.pl/ );
+    my $assembler    = catfile( ".", qw/src m0 perl5 m0_assembler.pl/ );
     my $out = `$^X $assembler $options 2>&1`;
     return $out;
 }
