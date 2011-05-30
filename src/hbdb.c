@@ -4,7 +4,7 @@
 
 /* DEBUG */
 void
-test(void)
+hbdb_test(void)
 {
     printf("Hello world!\n");
 }

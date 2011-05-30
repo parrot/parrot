@@ -784,7 +784,7 @@ runops_debugger_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcod
 =item C<static opcode_t * runops_hbdb_core(PARROT_INTERP, Parrot_runcore_t
 *runcore, opcode_t *pc)>
 
-Used by the debugger
+Used by hbdb.
 
 =cut
 
@@ -798,6 +798,10 @@ runops_hbdb_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t 
 
     /* disable pc */
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), NULL);
+
+    /* DEBUG */
+    hbdb_test();
+    /* DEBUG */
 
     while (pc) {
         DO_OP(pc, interp);
