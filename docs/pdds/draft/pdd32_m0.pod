@@ -84,11 +84,13 @@ in C<M0> ops, and possibily an C<M2> level which is written in C<M1> ops. More
 specifically it refers to a new implementation of Parrot internals. A new MOP
 is planned for Lorito and it will most probably live at the C<M1> op level.
 
-=item * Lorito Context
+=item * Call Frame
 
-This refers to a Lorito Context PMC, which is the most important datastructure
-at the M0 level. You could say that it is the "secret sauce" of M0. The exact
-details of the Lorito Context PMC are still in flux.
+This refers to an M0 call frame structure, which is the central datastructure
+at the M0 level.  A call frame contains all the state of an executing chunk,
+including PC, active exception handlers, INSP registers, parent call frame and
+so forth.  When M0 code implements continuation-passing style, the call frame
+is what acts as the continuation.
 
 =back
 
@@ -136,16 +138,20 @@ Execution Environments" [TBC].
 =head2 Scope of This Document
 
 This document only covers M0 and the minimum VM necessary to support it.
-Anything beyond that, e.g. the meta-object model or layout of contexts, is
-beyond its scope.
+Anything beyond that, e.g. the meta-object model or in-memory layout of call
+frames, is beyond its scope.
 
-=head2 Contexts
+=head2 Call Frames
 
-This is the central datastructure at the M0 level.  It will contain most of
-the state that is needed to execute M0 bytecode.  A pointer to the current
-context will be passed to each op as the implicit first argument, though this
-pointer (or equivalent) will not be stored in bytecode.  It layout is described
-in detail in the C<Register Types and Context Structure> section.
+This is the central data structure at the M0 level.  The call frame graph
+contains most of the state that is needed to execute M0 bytecode.  A pointer to
+the current call frame will be passed to each op as the implicit first
+argument, though this pointer (or equivalent) will not be stored in bytecode.
+It layout is described in detail in the C<Register Types and Call Frame
+Structure> section.
+
+Call frames were previously referred to as contexts.  The name "call frame" was
+chosen to better reflect common usage and hopefully reduce confusion.
 
 =head2 Registers
 
@@ -402,18 +408,18 @@ These are too high-level and can be written in terms of simpler ops:
        * set default values
 =item * store - store a register in a PMC, or vice versa
 
-=item * get_cc - Get the current Lorito context
+=item * get_cf - Get the current Lorito call frame
 
-=item * invoke_cc - Invoke the current Lorito context
-       * set return PC in context
+=item * invoke_cf - Invoke the current Lorito call frame
+       * set return PC in call frame
        * switch code segment, if necessary
-       * get (new) current PC from context
+       * get (new) current PC from call frame
 
-=item * new_ctx - Create a new Lorito context
+=item * new_cf - Create a new Lorito call frame
        * allocate memory
        * set default values
 
-=item * load_bytecode - load bytecode into the current Lorito context
+=item * load_bytecode - load bytecode into the current Lorito call frame
        * allocate memory
        * make a couple of system calls (hand-waving here)
 
@@ -664,8 +670,9 @@ of a variables table slot?
   ]
 
 The bytecode segment contains a series of executable ops.  A pointer (or its
-equivalent for a non-C language) to the current context will be passed as the
-first argument to every op, but this pointer will not be stored in bytecode.
+equivalent for a non-C language) to the current call frame will be passed as
+the first argument to every op, but this pointer will not be stored in
+bytecode.
 
   opcode_t : M0_BC_SEG
   opcode_t : number of ops in this segment
@@ -736,10 +743,10 @@ until we're reasonably confident that we have a final set of ops.
 Execution of an binary M0 file beings with the first op in the bytecode segment
 of the first chunk.  Each op consists of a 1-byte op number and 3 byte-sized
 arguments.  The op number is used as an offset into a table of function
-pointers (or something equivalent).  The current context is passed as the first
-argument to all op functions.  The remaining three bytes of the op are passed
-to the op function directly.  It is up to the op function how to interpret
-these values.
+pointers (or something equivalent).  The current call frame is passed as the
+first argument to all op functions.  The remaining three bytes of the op are
+passed to the op function directly.  It is up to the op function how to
+interpret these values.
 
 =head3 M0 Runloop
 
@@ -789,7 +796,7 @@ Will some memory be protected in M0?
 Structs (as implemented in C) will be an abstraction on top of M0.  M0 will not
 be concerned with them directly.
 
-=head2 Register Types and Context Structure
+=head2 Register Types and Call Frame Structure
 
 There are four register types, Integer, Numeric, PMC and String. The string
 type will merely be syntactic sugar for accessing a PMC.  From an M0
@@ -798,8 +805,8 @@ perpsective, S and P registers will be treated as opaque pointers
 M0 registers will not have innate types; they'll be nothing more than a
 collection of bits which are assumed to have a certain type by M0's ops.  The
 types that ops attribute to register values will be based on the position of
-the register in an M0 context's register set.  The proposed structure uses the
-first 8 registers for context-specific information and has 62 of each primitive
+the register in an M0 call frame's register set.  The proposed structure uses the
+first 8 registers for information specific to the call frame and has 60 of each primitive
 type:
 
     number  type
@@ -807,7 +814,7 @@ type:
     1       PC  - current instruction within the current bytecode segment
     2       EH  - current exception handler
     3       EX  - exception being thrown, if any
-    4       PCX - calling (parent) context
+    4       PCF - parent call frame
     5       CHUNK - the name of the currently-executing chunk
     6       VAR - pointer to variables table
     7       MDS - pointer to metadata segment
@@ -821,20 +828,21 @@ type:
     195-255 P0 - P60
 
 This means that an op which is passed the wrong value could pretty easily cause
-chaos by clobbering the PC or changing the pointer to the current context.
+chaos by clobbering the PC or changing the pointer to the current call frame.
 
 =head2 Interpreter Data
 
-While most of the interesting parts of runtime data will live in a context, it
-still make sense to store some data in a global interpreter data structure.
-This will include the following items, stored in the same way as context data.
+While most of the interesting parts of runtime data will live in a call frame,
+it still make sense to store some data in a global interpreter data structure.
+This will include the following items, stored in the same way as call frame
+data.
 
-    number  name       description
-    0       OP_FUNCS   array of functions that implement ops
-    1       CHUNKS     array of all loaded chunks
-    2       CHUNK_INFO array of chunk metadata (currently just names)
-    3       CONTEXTS   array of all known contexts
-    4       CONFIG     static global config data
+    number  name        description
+    0       OP_FUNCS    array of functions that implement ops
+    1       CHUNKS      array of all loaded chunks
+    2       CHUNK_INFO  array of chunk metadata (currently just names)
+    3       CALL_FRAMES array of all initial call frames
+    4       CONFIG      static global config data
 
 =head2 MOP interaction
 
@@ -982,7 +990,7 @@ with.  They are based on the types used by libffi.
 =head2 Concurrency
 
 This section will describe primitives that will be needed to allow data sharing and
-synchronization between contexts.
+synchronization between call frames.
 
 The Actor model of concurrency currently looks promising http://en.wikipedia.org/wiki/Actor_model .
 One implementation of the Actor model on the JVM is Akka : http://akka.io/
@@ -990,7 +998,7 @@ One implementation of the Actor model on the JVM is Akka : http://akka.io/
 =head2 Security
 
 M0 will have security mechanisms such that an optional cryptographic hash of
-the bytecode will be stored in the metadata portion of a bytecode file.  This
+the bytecode will be stored in a dedicated chunk in the bytecode file.  This
 will not be tied to any one crypto algorithm, and crypto algorithms which are
 portable and run on all platforms that Parrot supports are likely candidates
 for a default. This part of the spec is still in flux. One option we have is to
