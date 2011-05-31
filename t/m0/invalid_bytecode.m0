@@ -1,7 +1,7 @@
 # THIS IS INVALID M0 FOR TESTING PURPOSES ONLY
 .version 0
 .chunk "invalid"
-.variables
+.constants
 0 1
 1 "hello world"
 .metadata

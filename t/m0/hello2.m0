@@ -4,9 +4,9 @@
 # Comments like this and empty lines are ignored.
 .chunk ""
 
-# This defines our variable table
+# This defines our constants table
 # The space at the end of the next line is important!
-.variables 
+.constants 
 0 1
 1 "hello world"
 
