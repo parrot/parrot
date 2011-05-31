@@ -32,7 +32,7 @@ my $M0_CONST_SEG    = 0x02;
 my $M0_META_SEG     = 0x03;
 my $M0_BC_SEG       = 0x04;
 
-use constant M0_REG_RX => qr/^(([INSP]\d+)|INTERP|PC|EH|PCF|CONST|MDS|BCS|REGSZ|SPILLCF|x)/;
+use constant M0_REG_RX => qr/^(([INSP]\d+)|INTERP|PC|EH|PCF|CONSTS|MDS|BCS|REGSZ|SPILLCF|x)/;
 
 assemble($file);
 
@@ -114,7 +114,7 @@ sub register_name_to_num {
         EH      => 2, 
         PCF     => 3, 
         CHUNK   => 4, 
-        CONST   => 5,  
+        CONSTS  => 5,  
         MDS     => 6,  
         BCS     => 7, 
         REGSZ   => 8, 
