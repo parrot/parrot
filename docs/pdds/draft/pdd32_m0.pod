@@ -756,7 +756,33 @@ This section will specify the following:
 
 =head2 Exceptions and Exception Handling
 
-TODO: describe this here
+The exception system is based around call frames, just as regular control flow
+is.  Exception handlers should be static constructs so that they only have a
+runtime cost when exceptions are thrown.  Exception handlers are attached to a
+call frame's EH register.
+
+Exception handlers must be chainable.  When a handler cannot handle an
+exception, it must invoke its parent handler (preferably tailcalling).  If it
+has no parent handler, it must look through previous call frames until it finds
+one.  There must be a default top-level exception handler that handles all
+exceptions.  The top-level exception handler should  print some debugging
+information to stderr and exit with a non-zero exit code.
+
+{{{
+Does it make sense to require M0 interpreter implementations to install the
+default exception handler?
+}}}
+
+An exception is a chunk that knows how to do a few things.  It needs to look
+through the call chain for the first exception handler and invoke it, passing
+any relevant data to the handler.  An exception may be resumed by invoking its
+parent call frame
+
+Throwing an exception means creating a context, looking up a handler and
+invoking the handler with the exception as an argument.  If an exception
+handler refuses to handle an exception, the handler is responsible for finding
+the next handler.  The exception's responsibilities end when the first handler
+is invoked.
 
 =head2 Objects
 
@@ -817,8 +843,8 @@ type:
     6       MDS - pointer to metadata segment
     7       BCS - pointer to bytecode segment
     8       REGSZ - number of bytes in a register (hard-coded)
-    9       SPC4RNT - this space for rent
-    10      SPC4RNT2 - this space for rent too
+    9       RETPC - return PC
+    10      SPC4RNT - this space for rent
     11      SPILLCF - overflow call frame (see C<Register Spilling>)
     12-72   I0 - I60
     73-133  N0 - N60
@@ -1008,7 +1034,8 @@ specify a textual string such as "SHA1" and store the accompanying hash. Then
 the M0 interpreter will verify the SHA1 sum matches and give a loud error and
 bomb out if it doesn't.
 
-TODO: Are we storing crypto hashes in M0 source and bytecode, or only bytecode?
+If implemented, hashes will only be stored in bytecode and will be generated as
+an optional post-processing step on the m0b file.
 
 =head1 Lorito
 
