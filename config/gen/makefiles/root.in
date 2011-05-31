@@ -442,7 +442,7 @@ INTERP_O_FILES = \
     src/core_pmcs$(O) \
     src/datatypes$(O) \
     src/debug$(O) \
-    src/hbdb$(0) \
+    src/hbdb$(O) \
     src/dynext$(O) \
     src/embed$(O) \
     src/embed/api$(O) \

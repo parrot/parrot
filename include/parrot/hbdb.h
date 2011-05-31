@@ -73,6 +73,19 @@ typedef struct {
     unsigned long     script_line;
 } hbdb_t;
 
+/* HEADERIZER BEGIN: src/hbdb.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+INTVAL hbdb_get_line_number(PARROT_INTERP, ARGIN(PMC *context_pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_hbdb_get_line_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(context_pmc))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/hbdb.c */
+
 #endif /* PARROT_HBDB_H_GUARD */
 
 /*

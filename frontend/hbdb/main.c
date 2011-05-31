@@ -47,10 +47,10 @@ Entry point of C<hbdb>. Reads source code from file in C<argv[1]>.
 int
 main(int argc, char *argv[])
 {
-    Parrot_PMC       interp    = NULL,
-                     pbc       = NULL,
-                     main_sub  = NULL;
-    Parrot_String    file      = NULL;
+    Parrot_PMC        interp   = NULL,
+                      pbc      = NULL,
+                      main_sub = NULL;
+    Parrot_String     file     = NULL;
     Parrot_Init_Args *initargs = NULL;
 
     /* Setup default initialization parameters */
