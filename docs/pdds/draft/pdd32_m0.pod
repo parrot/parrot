@@ -704,23 +704,23 @@ until we're reasonably confident that we have a final set of ops.
     0x13 and
     0x14 or
     0x15 xor
-         gc_alloc
-         sys_alloc
-         sys_free
-         copy_mem 
-         set
-         set_imm
-         deref
-         csym
-         ccall_arg
-         ccall_ret
-         ccall
-         print_s
-         print_i
-         print_n
-         alloc
-         free
-         exit
+    0x16 gc_alloc
+    0x17 sys_alloc
+    0x18 sys_free
+    0x19 copy_mem 
+    0x1A set
+    0x1B set_imm
+    0x1C deref
+    0x1D csym
+    0x1E ccall_arg
+    0x1F ccall_ret
+    0x20 ccall
+    0x21 print_s
+    0x22 print_i
+    0x23 print_n
+    0x24 alloc
+    0x25 free
+    0x26 exit
 
 =head2 Execution
 
