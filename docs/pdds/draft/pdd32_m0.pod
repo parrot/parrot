@@ -324,37 +324,18 @@ Segfaults may result.  Be careful.
 
 =head3 Register ops (3)
 
-=item * set - sets a register to a value
+=item * set - set a register to a value
 
 Set C<*$1> to whatever is in C<*$2>.  C<$3> is ignored.
 
-=item * load_cref - point a register at a constants table slot
+=item * set_imm - set a register to a hard-coded value from the bytecode stream
 
-Point C<*$1> at a slot in the cosntants table. C<$2> contains the high byte of
-the index, C<$3> contains the low byte.  Both C<$2> and C<$2> are treated as
-1-byte immediate values.  Writing to the constants table is invalid.  Code that
-needs a modifiable version of a value from the constants table must first copy
-it into an allocated region of memory.
+Set C<*$1> to C<$2> * 256 +  C<$3>.
 
-The constants table is serves as a location where constant data stored in
-bytecode can be accessed.
+=item * deref - dereference a register
 
-Examples:
-
-  # point register 0 at constant 123 (0 * 256 + 123 * 1)
-  load_cref 0, 0, 123
-
-  # point register 3 at constant 1026 (4 * 256 + 2 * 1)
-  load_cref 3, 4, 2
-
-=item * load_cval - copy a value from the constants table into a register
-
-Copy a value from the constants table directly into a register.  This will copy
-a register-sized number of bytes into C<*$1>, using C<$2> and C<$3> as the
-index into the constants table, similar to C<load_cref>.  This is used to copy
-constant-sized values such as integer and numeric values into a register.
-Using C<load_cval> on a non-numeric constant is not valid and may be checked in
-the future.
+Treat C<*$3> as index and C<*$2> as a register set.  Set C<*$1> to the value at
+address C<*$2> + C<*$3>.
 
 =back
 
@@ -648,7 +629,7 @@ the file.  It will have the following structure:
 The constants segment will contain any data needed to execute the bytecode.
 Data in constants table must be explictly loaded into registers as needed.
 
-  opcode_t : M0_VARS_SEG
+  opcode_t : M0_CONST_SEG
   opcode_t : number of constants in this segment
   opcode_t : number of opcode_t-sized units in this segment
   [
@@ -687,7 +668,7 @@ bytecode.
 =head3 Segment Numbers
 
     M0_DIR_SEG       0x01
-    M0_VARS_SEG      0x02
+    M0_CONST_SEG     0x02
     M0_META_SEG      0x03
     M0_BC_SEG        0x04
 
@@ -728,8 +709,8 @@ until we're reasonably confident that we have a final set of ops.
          sys_free
          copy_mem 
          set
-         load_cref
-         load_cval
+         set_imm
+         deref
          csym
          ccall_arg
          ccall_ret
@@ -838,9 +819,9 @@ type:
     5       CONST - pointer to constants table
     6       MDS - pointer to metadata segment
     7       BCS - pointer to bytecode segment
-    8       reserved
-    9       reserved 
-    10      reserved 
+    8       REGSZ - number of bytes in a register (hard-coded)
+    9       SPC4RNT - this space for rent
+    10      SPC4RNT2 - this space for rent too
     11      SPILLCF - overflow call frame (see C<Register Spilling>)
     12-72   I0 - I60
     73-133  N0 - N60
