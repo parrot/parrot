@@ -789,10 +789,27 @@ vtable interface, which is really just looking up an integer index in memory.
 
 =head2 Memory Model
 
-Memory can be allocated with alloc() and freed with free(). One can retrieve
-values from memory with memget() and changed with memset().
+Memory can be allocated with C<sys_alloc> and C<gc_alloc> and freed with
+C<sys_free>, if needed.  C<copy_mem> is used to copy values into and out of
+memory.
 
+{{{
 Will some memory be protected in M0?
+}}}
+
+=head2 Register Spilling
+
+In the event that the register allocator runs out of registers and needs to
+spill, an overflow call frame can be created and stored in the SPILLCF
+register.  The overflow call frame will contain a copy of all INSP registers
+and the SPILLCF register itself.  To despill, the register allocator must copy
+all values fromt the overflow call frame between SPILLCF and the last INSP
+register (P60) into the current call frame.
+
+This method ensures that all objects referenced by the call frame will remain
+reachable by the GC and that an arbitrary amount of register spilling is
+possible, if needed.  Register spilling is a last resort, and it is not
+expected to be a common occurance.
 
 =head2 Structs
 
@@ -816,15 +833,15 @@ type:
     0       INTERP - global interpreter data (see below)
     1       PC  - current instruction within the current bytecode segment
     2       EH  - current exception handler
-    3       EX  - exception being thrown, if any
-    4       PCF - parent call frame
-    5       CHUNK - the name of the currently-executing chunk
-    6       CONST - pointer to constants table
-    7       MDS - pointer to metadata segment
-    8       BCS - pointer to bytecode segment
-    9       reserved
+    3       PCF - parent call frame
+    4       CHUNK - the name of the currently-executing chunk
+    5       CONST - pointer to constants table
+    6       MDS - pointer to metadata segment
+    7       BCS - pointer to bytecode segment
+    8       reserved
+    9       reserved 
     10      reserved 
-    11      reserved
+    11      SPILLCF - overflow call frame - see C<Register Spilling>
     12-72   I0 - I60
     73-133  N0 - N60
     134-194 S0 - S60
