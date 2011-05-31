@@ -28,11 +28,11 @@ my $file_metadata = {
 };
 
 my $M0_DIR_SEG      = 0x01;
-my $M0_VARS_SEG     = 0x02;
+my $M0_CONST_SEG    = 0x02;
 my $M0_META_SEG     = 0x03;
 my $M0_BC_SEG       = 0x04;
 
-use constant M0_REG_RX => qr/^(([INSP]\d+)|INTERP|PC|EH|PCX|VAR|MDS|BCS|x)/;
+use constant M0_REG_RX => qr/^(([INSP]\d+)|INTERP|PC|EH|PCF|CONST|MDS|BCS|REGSZ|SPILLCF|x)/;
 
 assemble($file);
 
@@ -107,9 +107,29 @@ return the bytecode represenation of the operation.
 sub register_name_to_num {
     my ($register) = @_;
 
-    return 0 if ($register eq 'INTERP');
+    my $symbols = { 
+        # call frame values
+        INTERP  => 0,
+        PC      => 1, 
+        EH      => 2, 
+        PCF     => 3, 
+        CHUNK   => 4, 
+        CONST   => 5,  
+        MDS     => 6,  
+        BCS     => 7, 
+        REGSZ   => 8, 
+        SPILLCF => 11,
 
-    my $symbols = { PC => 1, EH  => 2, EX => 3, PCX => 4, CHUNK => 5, VAR => 6,  MDS => 7,  BCS => 8, x => 0 };
+        # global interp values
+        OP_FUNCS    => 0,
+        CHUNKS      => 1,
+        CHUNK_INFO  => 2,
+        CALL_FRAMES => 3,
+        CONFIG      => 4,
+
+        # convenience
+        x => 0,
+    };
 
     if($register !~ /\d+/){
         my $number = $symbols->{$register};
@@ -282,7 +302,7 @@ sub m0b_variables_seg {
     my ($chunk) = @_;
 
     my $variables = $chunk->{variables};
-    my $bytecode  = pack("L", $M0_VARS_SEG);
+    my $bytecode  = pack("L", $M0_CONST_SEG);
     $bytecode    .= pack("L", scalar @$variables);
     $bytecode    .= pack("L", m0b_vars_seg_length($variables));
 
@@ -433,6 +453,8 @@ sub m0b_meta_seg_length {
 sub opname_to_num {
     my ($ops, $opname) = @_;
 
+    die "Invalid M0: unknown op '$opname'" if (! exists $ops->{$opname});
+
     return oct $ops->{$opname};
 }
 
@@ -580,17 +602,20 @@ __DATA__
 0x13 and
 0x14 or
 0x15 xor
-0x16 set
-0x17 set_mem
-0x18 get_mem
-0x19 set_var
-0x1A csym
-0x1B ccall_arg
-0x1C ccall_ret
-0x1D ccall
-0x1E print_s
-0x1F print_i
-0x20 print_n
-0x21 alloc
-0x22 free
-0x23 exit
+0x16 gc_alloc
+0x17 sys_alloc
+0x18 sys_free
+0x19 copy_mem 
+0x1A set
+0x1B set_imm
+0x1C deref
+0x1D csym
+0x1E ccall_arg
+0x1F ccall_ret
+0x20 ccall
+0x21 print_s
+0x22 print_i
+0x23 print_n
+0x24 alloc
+0x25 free
+0x26 exit
