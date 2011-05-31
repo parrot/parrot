@@ -813,7 +813,7 @@ type:
     2       EH  - current exception handler
     3       PCF - parent call frame
     4       CHUNK - the name of the currently-executing chunk
-    5       CONST - pointer to constants table
+    5       CONSTS - pointer to constants segment
     6       MDS - pointer to metadata segment
     7       BCS - pointer to bytecode segment
     8       REGSZ - number of bytes in a register (hard-coded)
