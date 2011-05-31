@@ -830,7 +830,7 @@ first 8 registers for information specific to the call frame and has 60 of each 
 type:
 
     number  type
-    0       INTERP - global interpreter data (see below)
+    0       INTERP - global interpreter data (see C<Interpreter Data>)
     1       PC  - current instruction within the current bytecode segment
     2       EH  - current exception handler
     3       PCF - parent call frame
@@ -841,7 +841,7 @@ type:
     8       reserved
     9       reserved 
     10      reserved 
-    11      SPILLCF - overflow call frame - see C<Register Spilling>
+    11      SPILLCF - overflow call frame (see C<Register Spilling>)
     12-72   I0 - I60
     73-133  N0 - N60
     134-194 S0 - S60
