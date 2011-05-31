@@ -422,6 +422,8 @@ sub m0_opfunc_set {
 sub m0_opfunc_set_imm {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "set_imm $a1, $a2, $a3";
+
+    $cf->[$a1] = $a2 * 256 + $a3;
 }
 
 sub m0_opfunc_deref {
