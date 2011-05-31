@@ -40,7 +40,7 @@ use constant {
     EH      => 2,
     PCF     => 3,
     CHUNK   => 4,
-    CONST   => 5,
+    CONSTS  => 5,
     MDS     => 6,
     BCS     => 7,
     REGSZ   => 8,
@@ -121,10 +121,13 @@ sub new_interp {
         \&m0_opfunc_and,
         \&m0_opfunc_or,
         \&m0_opfunc_xor,
-        \&m0_opfunc_set,
-        \&m0_opfunc_copy_byte,
+        \&m0_opfunc_gc_alloc,
+        \&m0_opfunc_sys_alloc,
+        \&m0_opfunc_sys_free,
         \&m0_opfunc_copy_mem,
-        \&m0_opfunc_set_var,
+        \&m0_opfunc_set,
+        \&m0_opfunc_set_imm,
+        \&m0_opfunc_deref,
         \&m0_opfunc_csym,
         \&m0_opfunc_ccall_arg,
         \&m0_opfunc_ccall_ret,
@@ -132,8 +135,6 @@ sub new_interp {
         \&m0_opfunc_print_s,
         \&m0_opfunc_print_i,
         \&m0_opfunc_print_n,
-        \&m0_opfunc_alloc,
-        \&m0_opfunc_free,
         \&m0_opfunc_exit,
     ];
     $interp->[CONFIG] = {};
@@ -254,7 +255,7 @@ sub m0_opfunc_goto_chunk {
 
     my $chunk_num  = $interp->[CHUNK_MAP]{$chunk_name};
     $cf->[CHUNK]  = $interp->[CHUNKS][$chunk_num]{name};
-    $cf->[CONST]  = $interp->[CHUNKS][$chunk_num]{consts};
+    $cf->[CONSTS] = $interp->[CHUNKS][$chunk_num]{consts};
     $cf->[MDS]    = $interp->[CHUNKS][$chunk_num]{meta};
     $cf->[BCS]    = $interp->[CHUNKS][$chunk_num]{bc};
     $cf->[PC]     = $new_pc;
@@ -391,6 +392,26 @@ sub m0_opfunc_xor {
     $cf->[$a1] = $cf->[$a2] ^ $cf->[$a3];
 }
 
+sub m0_opfunc_gc_alloc {
+    my ($cf, $a1, $a2, $a3) = @_;
+    m0_say "gc_alloc $a1, $a2, $a3";
+}
+
+sub m0_opfunc_sys_alloc {
+    my ($cf, $a1, $a2, $a3) = @_;
+    m0_say "sys_alloc $a1, $a2, $a3";
+}
+
+sub m0_opfunc_sys_free {
+    my ($cf, $a1, $a2, $a3) = @_;
+    m0_say "sys_free $a1, $a2, $a3";
+}
+
+sub m0_opfunc_copy_mem{
+    my ($cf, $a1, $a2, $a3) = @_;
+    m0_say "copy_mem $a1, $a2, $a3";
+}
+
 sub m0_opfunc_set {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "set $a1, $a2, $a3";
@@ -398,22 +419,14 @@ sub m0_opfunc_set {
     $cf->[$a1] = $cf->[$a2];
 }
 
-sub m0_opfunc_copy_byte {
+sub m0_opfunc_set_imm {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "copy_byte $a1, $a2, $a3";
+    m0_say "set_imm $a1, $a2, $a3";
 }
 
-sub m0_opfunc_copy_mem {
+sub m0_opfunc_deref {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "copy_mem $a1, $a2, $a3";
-}
-
-sub m0_opfunc_set_var {
-    my ($cf, $a1, $a2, $a3) = @_;
-    my $idx     = $a2 * 256 + $a3;
-    my $const   = $cf->[CONST][$idx];
-    $cf->[$a1]  = $const;
-    m0_say "set_var $a1, $a2, $a3 (const = $const)";
+    m0_say "deref $a1, $a2, $a3";
 }
 
 sub m0_opfunc_csym {
@@ -566,7 +579,7 @@ sub m0b_parse_const_seg {
 
     my $const_count = unpack("L", get_bytes($m0b, $cursor, 4));
     my $byte_count  = unpack("L", get_bytes($m0b, $cursor, 4));
-    while (scalar(@$consts < $const_count) {
+    while (scalar(@$consts < $const_count)) {
         my $const_length = unpack("L", get_bytes($m0b, $cursor, 4));
         my $const        = unpack("a[$const_length]", get_bytes($m0b, $cursor, $const_length));
         say "found constant of length $const_length: '$const'";
