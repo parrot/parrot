@@ -424,6 +424,8 @@
 /t/library/*.pbc
 /t/library/*.pir
 /t/library/*_pbcexe*
+/t/m0/*.m0b
+/t/m0/integration/*.m0b
 /t/native_pbc/*_pbcexe*
 /t/oo/*.pbc
 /t/oo/*.pir
