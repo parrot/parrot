@@ -679,9 +679,6 @@ canonical list of the ops an M0 implementation must implement and the numbers
 they must correspond to.  Other opcode numbers are implementation-specific and
 are not require to have any defined semantics.
 
-NOTE: This section is not current.  Updating it is not likely to be useful
-until we're reasonably confident that we have a final set of ops.
-
     0x00 noop
     0x01 goto
     0x02 goto_if
