@@ -186,9 +186,9 @@ sub generate_bytecode_for_chunks {
     for my $chunk (@$chunks) {
 
         my $metadata_seg  = m0b_metadata_seg($chunk);
-        my $variables_seg = m0b_variables_seg($chunk);
+        my $constants_seg = m0b_constants_seg($chunk);
         my $bytecode_seg  = m0b_bytecode_seg($ops, $chunk);
-        $bytecode .= $variables_seg . $metadata_seg . $bytecode_seg;
+        $bytecode .= $constants_seg . $metadata_seg . $bytecode_seg;
     }
     return $bytecode;
 }
@@ -197,8 +197,8 @@ sub m0b_metadata_seg {
     my ($chunk) = @_;
 
     my $entry_count = 0;
-    my $metadata = $chunk->{metadata};
-    my $variables = $chunk->{variables};
+    my $metadata  = $chunk->{metadata};
+    my $constants = $chunk->{constants};
 
     my $bytecode  = pack("L", $M0_META_SEG);
     $bytecode    .= pack("L", $entry_count);
@@ -208,8 +208,8 @@ sub m0b_metadata_seg {
     #for each entry
     #for my $offset (keys %$metadata) {
         #for my $key (keys %{$metadata->{$offset}}) {
-            #my $key_idx = m0b_get_val_idx($key, $variables);
-            #my $val_idx = m0b_get_val_idx($metadata->{$offset}{$key}, $variables);
+            #my $key_idx = m0b_get_val_idx($key, $constants);
+            #my $val_idx = m0b_get_val_idx($metadata->{$offset}{$key}, $constants);
             #$bytecode .= pack('L', $offset);
             #$bytecode .= pack('L', $key_idx);
             #$bytecode .= pack('L', $val_idx);
@@ -298,18 +298,18 @@ sub m0b_header_length {
 }
 
 
-sub m0b_variables_seg {
+sub m0b_constants_seg {
     my ($chunk) = @_;
 
-    my $variables = $chunk->{variables};
+    my $constants = $chunk->{constants};
     my $bytecode  = pack("L", $M0_CONST_SEG);
-    $bytecode    .= pack("L", scalar @$variables);
-    $bytecode    .= pack("L", m0b_vars_seg_length($variables));
+    $bytecode    .= pack("L", scalar @$constants);
+    $bytecode    .= pack("L", m0b_const_seg_length($constants));
 
-    #for each variable
-    for (@$variables) {
-        my $var_length = length($_);
-        $bytecode .= pack("L", $var_length);
+    #for each constant
+    for (@$constants) {
+        my $const_length = length($_);
+        $bytecode .= pack("L", $const_length);
         $bytecode .= $_;
     }
 
@@ -375,7 +375,7 @@ sub m0b_chunk_length {
     my ($chunk) = @_;
     my $chunk_length =
            m0b_bc_seg_length($chunk->{bytecode})
-         + m0b_vars_seg_length($chunk->{variables})
+         + m0b_const_seg_length($chunk->{constants})
          + m0b_meta_seg_length($chunk->{metadata});
     say "chunk length is $chunk_length";
     return $chunk_length;
@@ -406,26 +406,26 @@ sub m0b_bc_seg_length {
     return $seg_length;
 }
 
-=item C<m0b_vars_seg_length>
+=item C<m0b_const_seg_length>
 
-Calculate the number of bytes that a variables segment will occupy.
+Calculate the number of bytes that a constants segment will occupy.
 
 =cut
 
-sub m0b_vars_seg_length {
-    my ($vars) = @_;
+sub m0b_const_seg_length {
+    my ($consts) = @_;
 
     my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
 
     #TODO: Make this work
-    for (@$vars) {
-        my $var_length = length($_);
-        $seg_length += 4; # storage of size of variable
+    for (@$consts) {
+        my $const_length = length($_);
+        $seg_length += 4; # storage of size of constant
         $seg_length += length($_);
-        say "after adding var '$_', length is $seg_length";
+        say "after adding constant '$_', length is $seg_length";
     }
 
-    say "vars seg length is $seg_length";
+    say "consts seg length is $seg_length";
     return $seg_length;
 }
 
@@ -476,7 +476,7 @@ sub parse_chunks {
 
     my $chunks = [];
     my %chunk;
-    my (@variables, @metadata, @bytecode);
+    my (@constants, @metadata, @bytecode);
     my $state = 'none';
 
     while (exists $lines->[$$cursor]) {
@@ -496,28 +496,28 @@ sub parse_chunks {
             }
         }
         elsif ($state eq 'chunk start') {
-            if ($line =~ /^\.variables\s*?$/ ) {
-                $state = 'variables';
+            if ($line =~ /^\.constants\s*?$/ ) {
+                $state = 'constants';
             }
             else {
-                die "Invalid M0: expected variables segment start, got '$line' at line $$cursor";
+                die "Invalid M0: expected constants segment start, got '$line' at line $$cursor";
             }
         }
-        elsif ($state eq 'variables') {
+        elsif ($state eq 'constants') {
             if ($line =~ /^\.metadata\s*?$/) {
                 $state = 'metadata';
             }
             elsif ($line =~ /^\d+\s+(.*)$/) {
-                my $v = $1;
+                my $c = $1;
                 # remove leading and trailing double quotes which are used to represent strings
-                $v =~ s/(^"|"$)//g;
+                $c =~ s/(^"|"$)//g;
                 
                 # replace escaped double quotes with actual double quotes
-                $v =~ s/\\"/"/g;
-                push @variables, $v;
+                $c =~ s/\\"/"/g;
+                push @constants, $c;
             }
             else {
-                die "Invalid M0: expected variables segment data or metadata segment start, got '$line' at line $$cursor";
+                die "Invalid M0: expected constants segment data or metadata segment start, got '$line' at line $$cursor";
             }
         }
         elsif ($state eq 'metadata') {
@@ -533,11 +533,11 @@ sub parse_chunks {
         }
         elsif ($state eq 'bytecode') {
             if ($line =~ /^\.chunk\s+"(?<name>\w*?)$/) {
-                $chunk{variables} = join("\n", @variables);
+                $chunk{constants} = join("\n", @constants);
                 $chunk{metadata}  = join("\n", @metadata);
                 $chunk{bytecode}  = join("\n", @bytecode);
                 push @$chunks, {%chunk};
-                (@variables, @metadata, @bytecode) = ([],[],[]);
+                (@constants, @metadata, @bytecode) = ([],[],[]);
                 %chunk = {};
                 $chunk{name} = $+{name}; 
                 $state = 'chunk start';
@@ -552,7 +552,7 @@ sub parse_chunks {
         $$cursor++;
     }
 
-    $chunk{variables} = [@variables];
+    $chunk{constants} = [@constants];
     $chunk{metadata}  = join("\n", @metadata);
     $chunk{bytecode}  = join("\n", @bytecode);
     push @$chunks, {%chunk};
