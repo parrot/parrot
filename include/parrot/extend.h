@@ -25,8 +25,6 @@
    but that would be really annoying */
 #if defined(PARROT_IN_CORE)
 
-#define Parrot_Language Parrot_Int
-
 /* Macro to save off the original stack pointer for GC scanning. If
    the stacktop was NULL, then set it to the address of the cached
    pointer, which is on the stack and as good a thing as any to use as

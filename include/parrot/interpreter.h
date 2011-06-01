@@ -98,7 +98,6 @@ struct parrot_interp_t;
 
 #ifdef PARROT_IN_CORE
 
-#define Parrot_Language Parrot_Int
 #define Parrot_Vtable struct _vtable*
 
 typedef Parrot_Interp_flag Interp_flags;
