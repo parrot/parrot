@@ -115,5 +115,6 @@ method to_pmc(%context) {
     @res;
 }
 
+# Copyright (C) 2011, Parrot Foundation.
 
 # vim: expandtab shiftwidth=4 ft=perl6

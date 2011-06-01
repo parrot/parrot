@@ -32,4 +32,6 @@ multi method modifier()       { self.attr('modifier', undef,  0); }
 
 multi method declared()    { 0 };
 
+# Copyright (C) 2011, Parrot Foundation.
+
 # vim: expandtab shiftwidth=4 ft=perl6

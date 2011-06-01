@@ -18,5 +18,6 @@ multi method declared()       { self.attr('declared', undef,  0); }
 multi method regno($param) { self.attr('regno', $param, 1); }
 multi method regno()       { self.attr('regno', undef,  0); }
 
+# Copyright (C) 2011, Parrot Foundation.
 
 # vim: expandtab shiftwidth=4 ft=perl6

@@ -21,5 +21,6 @@ method sub($name, $value?) {
     %subs{$name};
 }
 
+# Copyright (C) 2011, Parrot Foundation.
 
 # vim: expandtab shiftwidth=4 ft=perl6

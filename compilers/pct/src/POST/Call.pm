@@ -24,5 +24,6 @@ Type of call. One of C<call>, C<tailcall>, C<return>, C<yield>, C<results>.
 multi method calltype($param)   { self.attr('calltype', $param, 1); }
 multi method calltype()         { self.attr('calltype', undef,  0); }
 
+# Copyright (C) 2011, Parrot Foundation.
 
 # vim: expandtab shiftwidth=4 ft=perl6

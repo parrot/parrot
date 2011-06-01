@@ -999,5 +999,6 @@ INIT {
     #pir::load_bytecode('nqp-setting.pbc');
 }
 
+# Copyright (C) 2011, Parrot Foundation.
 
 # vim: expandtab shiftwidth=4 ft=perl6
