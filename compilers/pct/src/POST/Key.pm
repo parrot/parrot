@@ -22,7 +22,7 @@ string parts.
 # KEY_register_FLAG       = PObj_private4_FLAG == 0x10
 
 # This method is so ugly due workaround for PCC "mis-behavior".
-# PCC will try to clone fresh Key which can reference non-existing 
+# PCC will try to clone fresh Key which can reference non-existing
 # registers, etc.
 method to_pmc(%context) {
     my @keys;

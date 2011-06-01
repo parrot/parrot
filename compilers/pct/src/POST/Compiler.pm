@@ -790,7 +790,7 @@ method build_pcc_call($opname, @args, %context) {
     my @op := list($opname, $sig_idx);
 
     for @args -> $arg {
-        # Handle :named params 
+        # Handle :named params
         if pir::isa__ips($arg.modifier, "Hash") {
             my $name := $arg.modifier<named> // $arg.name;
             @op.push(
