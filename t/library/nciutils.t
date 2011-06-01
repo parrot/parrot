@@ -29,12 +29,14 @@ Testing Perl 6 objects.
     $P0 = getinterp
     $P1 = $P0[.IGLOBALS_CONFIG_HASH]
     $I1 = $P1['HAS_EXTRA_NCI_THUNKS']
-    if $I1 == 1 goto have_extra_nci_thunks
+    if $I1 == 1 goto have_enough_nci
+    $I1 = $P1['HAS_LIBFFI']
+    if $I1 == 1 goto have_enough_nci
 
     skip_all('No NCI thunks')
     exit 0
 
-  have_extra_nci_thunks:
+  have_enough_nci:
     ##  set our plan
     plan(13)
 
