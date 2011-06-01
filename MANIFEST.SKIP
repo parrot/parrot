@@ -328,8 +328,6 @@
 ^/ext/Parrot-Embed/pm_to_blib/
 ^/ext/Parrot-Embed/t/.*\.pbc$
 ^/ext/Parrot-Embed/t/.*\.pbc/
-^/ext/nqp-rx/src/stage0/nqp-setting\.pir$
-^/ext/nqp-rx/src/stage0/nqp-setting\.pir/
 ^/frontend/parrot/.*\.gcda$
 ^/frontend/parrot/.*\.gcda/
 ^/frontend/parrot/.*\.gcno$
