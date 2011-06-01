@@ -15,15 +15,26 @@ Testing Perl 6 objects.
 
 =cut
 
+.include 'iglobals.pasm'
+
 .sub 'main' :main
     load_bytecode 'Test/More.pbc'
 
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace ['Test';'More']
-    exports        = split ' ', 'plan diag ok nok is todo'
+    exports        = split ' ', 'plan diag ok nok is todo skip_all'
     test_namespace.'export_to'(curr_namespace, exports)
 
+    $P0 = getinterp
+    $P1 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I1 = $P1['HAS_EXTRA_NCI_THUNKS']
+    if $I1 == 1 goto have_extra_nci_thunks
+
+    skip_all('No NCI thunks')
+    exit 0
+
+  have_extra_nci_thunks:
     ##  set our plan
     plan(13)
 
