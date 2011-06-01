@@ -553,7 +553,7 @@ This is to exclude automatically generated PIR-language files Parrot might have.
 
 sub is_pir_exemption {
     my ( $self, $file ) = @_;
-    return $file->path =~ m{/ext/};
+    return $file->path =~ m{/ext/|compilers/pct/src/(PAST|POST)/};
 }
 
 
