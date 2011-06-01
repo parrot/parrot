@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -30,6 +30,32 @@ Tests the extension API.
 
 =cut
 
+
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_get_root_namespace' );
+
+#include <stdio.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_Interp interp  = Parrot_new(NULL);
+    Parrot_PMC    ns;
+
+    /* Interpreter set-up */
+    if (interp) {
+        ns  = Parrot_get_root_namespace(interp);
+
+        Parrot_printf(interp,"%P\n", ns);
+        Parrot_destroy(interp);
+    }
+    return 0;
+}
+
+CODE
+
+OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'set/get_intreg' );
 
