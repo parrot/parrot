@@ -756,6 +756,11 @@ This section will specify the following:
 
 =head2 Exceptions and Exception Handling
 
+{{{
+NOTE: This section is in flux.  It's all open for discussion and should by no
+means be considered final.
+}}}
+
 The exception system is based around call frames, just as regular control flow
 is.  Exception handlers should be static constructs so that they only have a
 runtime cost when exceptions are thrown.  Exception handlers are attached to a
