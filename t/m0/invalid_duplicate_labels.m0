@@ -11,6 +11,6 @@
 .metadata
 
 .bytecode
-label1:  set_var S0, 0, 1
-label1:  set_var I0, 0, 0
+label1:  set_imm S0, 0, 1
+label1:  set_imm I0, 0, 0
          print_s I0, S0

@@ -6,4 +6,4 @@
 1 "hello world"
 .metadata
 .bytecode
-set_var S0, 0, 1, 42, 42, A, JUNK
+deref S0, 0, 1, 42, 42, A, JUNK

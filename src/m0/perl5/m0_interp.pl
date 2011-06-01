@@ -429,6 +429,8 @@ sub m0_opfunc_set_imm {
 sub m0_opfunc_deref {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "deref $a1, $a2, $a3";
+
+    $cf->[$a1] = $cf->[$a2][ $cf->[$a3] ];
 }
 
 sub m0_opfunc_csym {
@@ -584,7 +586,7 @@ sub m0b_parse_const_seg {
     while (scalar(@$consts < $const_count)) {
         my $const_length = unpack("L", get_bytes($m0b, $cursor, 4));
         my $const        = unpack("a[$const_length]", get_bytes($m0b, $cursor, $const_length));
-        say "found constant of length $const_length: '$const'";
+        #say "found constant of length $const_length: '$const'";
         push @$consts, $const;
     }
     return $consts;
