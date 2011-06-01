@@ -52,7 +52,7 @@ CODE
 OUTPUT
 
 
-c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_get_root_namespace' );
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_get_root_namespace/Parrot_(un)register_pmc' );
 #include <stdio.h>
 #include "parrot/embed.h"
 #include "parrot/extend.h"
@@ -66,6 +66,8 @@ main(int argc, const char *argv[])
     /* Interpreter set-up */
     if (interp) {
         ns  = Parrot_get_root_namespace(interp);
+        Parrot_register_pmc(interp, ns);
+        Parrot_unregister_pmc(interp, ns);
 
         Parrot_printf(interp,"%P\n", ns);
         Parrot_destroy(interp);
