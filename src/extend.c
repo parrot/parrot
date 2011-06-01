@@ -596,27 +596,6 @@ Parrot_new_string(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
 
 /*
 
-=item C<Parrot_Language Parrot_find_language(PARROT_INTERP, const char
-*language)>
-
-Find the magic language token for a language, by language name.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_PURE_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-Parrot_Language
-Parrot_find_language(SHIM_INTERP, ARGIN(SHIM(const char *language)))
-{
-    ASSERT_ARGS(Parrot_find_language)
-    return 0;
-}
-
-/*
-
 =item C<void Parrot_register_pmc(PARROT_INTERP, Parrot_PMC pmc)>
 
 Add a reference of the PMC to the interpreter's GC registry. This prevents PMCs
