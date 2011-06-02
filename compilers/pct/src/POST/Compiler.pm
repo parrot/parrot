@@ -76,10 +76,11 @@ method to_pir($post, *%adverbs) {
     my $CODE    := pir::new('StringBuilder');
     my $LINE    := 0;
 
-    unless pir::isa($post, POST::Sub) {
+    unless $post.isa(POST::Sub) {
         $post := POST::Sub.new($post, :name<anon>);
     }
     $newself.pir($post);
+    $CODE;
 }
 
 =item pir_children(node)
