@@ -239,30 +239,39 @@ separating them with commas:
 
 =item .lex <string constant>, <reg>
 
-Declare a lexical variable that is an alias for a PMC register. For example,
-given this preamble:
+Declare a lexical variable that is an alias for a PMC register. For example
+the following two snippets have an identical effect:
 
 =begin PIR_FRAGMENT
 
     .lex '$a', $P0
     $P1 = new 'Integer'
+    $P0 = $P1
 
 =end PIR_FRAGMENT
 
-    These two opcodes have an identical effect:
-
 =begin PIR_FRAGMENT
 
-    $P0 = $P1
+    .lex '$a', $P0
+    $P1 = new 'Integer'
     store_lex '$a', $P1
 
 =end PIR_FRAGMENT
 
-    And these two opcodes also have an identical effect:
+    And these two snippets also have an identical effect:
 
 =begin PIR_FRAGMENT
 
+    .lex '$a', $P0
+    $P1 = new 'Integer'
     $P1 = $P0
+
+=end PIR_FRAGMENT
+
+=begin PIR_FRAGMENT
+
+    .lex '$a', $P0
+    $P1 = new 'Integer'
     $P1 = find_lex '$a'
 
 =end PIR_FRAGMENT
