@@ -144,6 +144,8 @@ Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, ARGIN(PMC *sub_obj),
 Adds the given PMC as an invocant to the given CallContext PMC.  You should
 never have to use this, and it should go away with interp->current_object.
 
+=cut
+
 */
 
 static void
