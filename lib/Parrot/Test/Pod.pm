@@ -72,6 +72,7 @@ our %second_analysis_subs = (
                         | t/configure/testlib/bdefectivefoobar
                         | examples/config/file/configwithfatalstep
                         | compilers/opsc
+                        | compilers/pct
                     }x
                 ) {
                     delete $files_needing_analysis->{ $file };
