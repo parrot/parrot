@@ -63,20 +63,14 @@ storing in a symbol table, etc.).
 =end item
 
 method loadinit($value?) {
-    Q:PIR {
-        .local pmc value
-        value = find_lex '$value'
-        .local int has_value
-        has_value = defined value
-        if has_value goto getset_value
-        $I0 = exists self['loadinit']
-        if $I0 goto getset_value
-        $P0 = get_hll_global ['PAST'], 'Stmts'
-        value = $P0.'new'()
-        has_value = 1
-        getset_value:
-        .tailcall self.'attr'('loadinit', value, has_value)
+    my $has_value := pir::defined($value);
+
+    unless $has_value || pir::exists(self, 'loadinit') {
+        $value := PAST::Stmts.new();
+        $has_value := 1;
     }
+
+    self.attr('loadinit', $value, $has_value);
 }
 
 
@@ -137,37 +131,26 @@ attribute hash for symbol C<name>.
 =end item
 
 method symbol( $name, *%attr ) {
-    Q:PIR {
-        .local pmc name
-        name = find_lex '$name'
-        .local pmc attr
-        attr = find_lex '%attr'
-        .local pmc symtable
-        symtable = self['symtable']
-        unless null symtable goto have_symtable
-        symtable = new 'Hash'
-        self['symtable'] = symtable
-        have_symtable:
-        .local pmc symbol
-        symbol = symtable[name]
-        if null symbol goto symbol_empty
-        unless attr goto attr_done
-        .local pmc it
-        it = iter attr
-        attr_loop:
-        unless it goto attr_done
-        $S0 = shift it
-        $P0 = attr[$S0]
-        symbol[$S0] = $P0
-        goto attr_loop
-        attr_done:
-        .return (symbol)
-        symbol_empty:
-        unless attr goto symbol_done
-        symtable[name] = attr
-        symbol_done:
-        .return (attr)
+    my %symtable := self<symtable>;
+
+    unless pir::defined(%symtable) {
+        %symtable := {};
+        self<symtable> := %symtable;
     }
+
+    my %symbol := %symtable{$name};
+    if pir::defined(%symbol) {
+        if %attr {
+            %symbol{$_} := %attr{$_} for %attr;
+        }
+        return %symbol;
+    }
+
+    if %attr {
+        %symtable{$name} := %attr;
+    }
+
+    return %attr;
 }
 
 
@@ -233,30 +216,21 @@ If C<subid> is provided, then sets the subid for this block.
 Returns the current subid for the block, generating a unique
 subid for the block if one does not already exist.
 
+our $subid_suffix;
+
 method subid($value?) {
-    Q:PIR {
-        .local pmc value
-        value = find_lex '$value'
-        .local int has_value
-        has_value = defined value
-        if has_value goto getset_value
-        $I0 = exists self['subid']
-        if $I0 goto getset_value
-        value = self.'unique'()
-        .local pmc suffix
-        suffix = get_global '$!subid_suffix'
-        unless null suffix goto have_suffix
-        $N0 = time
-        $S0 = $N0
-        $S0 = concat '_', $S0
-        suffix = box $S0
-        set_global '$!subid_suffix', suffix
-        have_suffix:
-        value .= suffix
-        has_value = 1
-        getset_value:
-        .tailcall self.'attr'('subid', value, has_value)
+    my $has_value := pir::defined($value);
+
+    unless $has_value || pir::exists(self, 'subid') {
+        $value := self.unique();
+
+        $subid_suffix := '_' ~ pir::time__N unless pir::defined($subid_suffix);
+
+        $value := $value ~ $subid_suffix;
+        $has_value := 1;
     }
+
+    self.attr('subid', $value, $has_value);
 }
 
 
