@@ -564,18 +564,6 @@ sub parse_chunks {
     return $chunks;
 }
 
-# This cleans M0 code of comments and unnecessary whitespace
-sub remove_junk {
-    my ($source) = @_;
-
-    # Remove comments and lines that are solely whitespace
-    $source =~ s/^(\s*#.*|\s+)$//mg;
-
-    # Remove repeated newlines
-    $source =~ s/^\n+//mg;
-
-    return $source;
-}
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
