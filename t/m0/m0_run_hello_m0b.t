@@ -23,7 +23,7 @@ Run the canonically "correct", hand-assembled hello_canon.m0b.
 
 my $m0_interp = "$^X src/m0/perl5/m0_interp.pl";
 
-my $output = `$m0_interp t/m0/integration/hello_canon.m0b`;
+my $output = `$m0_interp t/m0/basic/hello_canon.m0b`;
 
 is($output, "hello world\n", "hello world m0b works");
 
