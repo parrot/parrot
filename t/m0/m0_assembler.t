@@ -26,10 +26,10 @@ use File::Spec::Functions;
 plan tests => 21;
 
 my $exefile    = catfile( ".", qw/src m0 perl5 m0_assembler.pl/ );
-my $hello_m0   = catfile(qw/t m0 hello.m0/);
-my $hello_m0b  = catfile(qw/t m0 hello.m0b/);
-my $hello2_m0  = catfile(qw/t m0 hello2.m0/);
-my $hello2_m0b = catfile(qw/t m0 hello2.m0b/);
+my $hello_m0   = catfile(qw/t m0 integration hello.m0/);
+my $hello_m0b  = catfile(qw/t m0 integration hello.m0b/);
+my $hello2_m0  = catfile(qw/t m0 integration hello2.m0/);
+my $hello2_m0b = catfile(qw/t m0 integration hello2.m0b/);
 
 output_like(
     $hello_m0,
@@ -79,54 +79,54 @@ output_like(
 );
 
 output_like(
-    catfile(qw/t m0 hello_multiversion.m0/),
+    catfile(qw/t m0 invalid hello_multiversion.m0/),
     qr/Invalid M0/ms,
     'detect invalid M0 - multiple versions'
 );
 
 output_like(
-    catfile(qw/t m0 invalid_chunk_name.m0/),
+    catfile(qw/t m0 invalid invalid_chunk_name.m0/),
     qr/Invalid M0/ms,
     'detect invalid chunk M0'
 );
 
 output_like(
-    catfile(qw/t m0 invalid_chunk_name2.m0/),
+    catfile(qw/t m0 invalid invalid_chunk_name2.m0/),
     qr/Invalid M0/ms,
     'detect invalid chunk M0'
 );
 
 output_like(
-    catfile(qw/t m0 hello_early_bytecode_segment.m0/),
+    catfile(qw/t m0 invalid hello_early_bytecode_segment.m0/),
     qr/Invalid M0/ms,
     'detect invalid M0 - early bytecode segment'
 );
 
 output_like(
-    catfile(qw/t m0 invalid_version.m0/),
+    catfile(qw/t m0 invalid invalid_version.m0/),
     qr/Invalid M0: No version/ms,
     'detect invalid version'
 );
 
 output_like(
-    catfile(qw/t m0 invalid_bytecode.m0/),
+    catfile(qw/t m0 invalid invalid_bytecode.m0/),
     qr/Invalid M0 bytecode/ms,
     'detect invalid bytecode'
 );
 
 output_like(
-    catfile(qw/t m0 invalid_duplicate_labels.m0/),
+    catfile(qw/t m0 invalid invalid_duplicate_labels.m0/),
     qr/Invalid M0/ms,
     'detect duplicate labels'
 );
 
 output_like(
-    catfile(qw/t m0 invalid_chunk_names_collide.m0/),
+    catfile(qw/t m0 invalid invalid_chunk_names_collide.m0/),
     qr/Invalid M0/ms,
     'detect colliding chunk names',
 );
 
-ok(!-e catfile(qw/t m0 invalid_bytecode.m0b/), 'invalid_bytecode.m0b was not created');
+ok(!-e catfile(qw/t m0 invalid invalid_bytecode.m0b/), 'invalid_bytecode.m0b was not created');
 
 sub output_like {
     my ($options, $snippet, $desc)  = @_;
