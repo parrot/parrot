@@ -28,11 +28,15 @@ use Data::Dumper;
 
 my @m0_files = glob catfile( '.', qw/t m0 integration *.m0/);
 
-plan tests => scalar @m0_files;
-
+plan tests => 2 * scalar @m0_files;
 
 for my $file (@m0_files) {
-    test_m0_file($file);
+    if($file =~ m/add_n/) {
+        local $TODO = "set_imm N0, 0, 42.0 gets flagged as an invalid M0 line";
+        test_m0_file($file);
+    } else {
+        test_m0_file($file);
+    }
 }
 
 sub test_m0_file {
@@ -52,6 +56,7 @@ sub assemble {
     my ($options) = @_;
     my $assembler    = catfile( ".", qw/src m0 perl5 m0_assembler.pl/ );
     my $out = `$^X $assembler $options 2>&1`;
+    is($?, 0, "Got a successful exit code assembling $options") or diag $out;
     return $out;
 }
 
