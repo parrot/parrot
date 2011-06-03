@@ -1,0 +1,34 @@
+.version 0
+.chunk "noop"
+.constants
+0 "1..1"
+1 "n"
+2 "ok 1 add_i: 9 + 90 = 99"
+.metadata
+.bytecode
+
+    set_imm S0, 0, 0
+    deref   S0, CONSTS, S0
+    set_imm I0, 0, 1
+    print_s I0, S0, x
+
+    set_imm I1, 0,  9
+    set_imm I2, 0,  90
+    add_i   I2, I2, I1
+    set_imm I3, 0,  99
+    sub_i   I3, I3, I2
+       
+    goto_if addi_nok, I3   
+    goto    addi_ok, x
+
+addi_nok:
+    set_imm S0, 0, 1
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+addi_ok:
+    set_imm S0, 0, 2
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+    

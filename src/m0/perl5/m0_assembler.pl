@@ -271,7 +271,7 @@ sub m0b_bytecode_seg {
             say "adding op goto to bytecode seg";
             $bytecode .= to_bytecode($ops,\%x);
         }
-        elsif ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*goto_if\s+(?<target_label>[a-zA-Z][a-zA-Z0-9_])\s*,(?<arg3>\w+)\s*$/) {
+        elsif ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*goto_if\s+(?<target_label>[a-zA-Z][a-zA-Z0-9_]*)\s*,\s*(?<arg3>\w+)\s*$/) {
             say "adding op goto_if to bytecode seg";
             if (!exists $label_map{ $+{target_label} } ) {
                 die "Invalid M0 - attempt to use undefined label $+{target_label}";
@@ -287,7 +287,7 @@ sub m0b_bytecode_seg {
             # ignore
         } elsif ($line =~ m/^\s*#/) {
         } else {
-            say "Invalid M0 bytecode segment: '$line'";
+            say "Invalid M0 bytecode line: '$line'";
             exit 1;
         }
     }
