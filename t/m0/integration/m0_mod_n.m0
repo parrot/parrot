@@ -1,0 +1,38 @@
+.version 0
+.chunk "truffleshuffle"
+.constants
+0 "1..1"
+1 "n"
+2 "ok 1 mod_n: 42.0 % 5.0 = 2.0
+3 42.0
+4 5.0
+5 2.0
+.metadata
+.bytecode
+
+    set_imm S0, 0, 0
+    deref   S0, CONSTS, S0
+    set_imm I0, 0, 1
+    print_s I0, S0, x
+
+    set_imm N0, 0, 3
+    deref   N0, CONSTS, N0
+    set_imm N1, 0, 4
+    deref   N1, CONSTS, N1
+    mod_n   N2, N0, N1
+    set_imm N3, 0,  5
+    deref   N3, CONSTS, N3
+    sub_n   N4, N3, N2
+
+    goto_if modn_nok, N4
+    goto    modn_ok, x
+
+modn_nok:
+    set_imm S0, 0, 1
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+modn_ok:
+    set_imm S0, 0, 2
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
