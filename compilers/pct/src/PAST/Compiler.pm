@@ -569,40 +569,27 @@ method node_as_post($node, %options) {
 Return the POST representation of a C<PAST::Control>.
 
 multi method as_post(PAST::Control $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
+    my  $ishandled := POST::Label.new(result=>self.unique(   'handled_'));
+    my $nothandled := POST::Label.new(result=>self.unique('nothandled_'));
 
-        .local pmc ops, children, ishandled, nothandled
-        .local string handled
-        $P0 = get_hll_global ['POST'], 'Label'
-        $S0 = self.'unique'('handled_')
-        ishandled = $P0.'new'('result'=>$S0)
-        $S0 = self.'unique'('nothandled_')
-        nothandled = $P0.'new'('result'=>$S0)
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops = $P0.'new'('node'=>node)
-        .local string rtype
-        rtype = options['rtype']
-        $P0 = node.'list'()
-        $I0 = elements $P0
-        $S0 = repeat 'v', $I0
-        $S0 = concat $S0, rtype
-        ops.'push_pirop'('.local pmc exception')
-        ops.'push_pirop'('.get_results (exception)')
-        children = self.'post_children'(node, 'signature'=>$S0)
-        ops.'push'(children)
-        handled = self.'uniquereg'('I')
-        ops.'push_pirop'('set', handled, 'exception["handled"]')
-        ops.'push_pirop'('ne', handled, 1, nothandled)
-        ops.'push'(ishandled)
-        ops.'push_pirop'('return', 'exception')
-        ops.'push'(nothandled)
-        ops.'push_pirop'('rethrow', 'exception')
-        .return (ops)
-    }
+    my $ops := POST::Ops.new(node=>$node);
+
+    my $signature := pir::repeat('v', +$node.list());
+    $signature := $signature ~ %options<rtype>;
+
+    $ops.push_pirop('.local pmc exception');
+    $ops.push_pirop('.get_results (exception)');
+    my $children := self.post_children($node, signature => $signature);
+    $ops.push($children);
+    my $handled := self.uniquereg('I');
+
+    $ops.push_pirop('set', $handled, 'exception["handled"]');
+    $ops.push_pirop('ne',  $handled, 1, $nothandled);
+    $ops.push($ishandled);
+    $ops.push_pirop('return', 'exception');
+    $ops.push($nothandled);
+    $ops.push_pirop('rethrow', 'exception');
+    $ops;
 }
 
 method wrap_handlers($child, $ehs, *%options) {
