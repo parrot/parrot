@@ -249,13 +249,13 @@ M0 interpreter sad.
 
 =item * iton - convert integer to numeric
 
-Assume that C<*$2> is an integer value, convert it to a floating-point value
-and store the result in C<*$1>.  C<$3> is ignored.
+Assume that C<*$1> is an integer value, convert it to a floating-point value
+and store the result in C<*$2>.  C<$3> is ignored.
 
 =item * ntoi - convert numeric to integer
 
-Assume that C<*$2> is a floating-point value, convert it to an integer value
-and store the result in C<*$1>.  C<$3> is ignored.
+Assume that C<*$1> is a floating-point value, convert it to an integer value
+and store the result in C<*$2>.  C<$3> is ignored.
 
 =back
 
