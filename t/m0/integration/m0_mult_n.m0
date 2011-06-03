@@ -3,10 +3,10 @@
 .constants
 0 "1..1"
 1 "n"
-2 "ok 1 sub_n: 42.0 -  5.0 = 37.0
+2 "ok 1 mult_n: 42.0 *  5.0 = 210.0
 3 42.0
 4 5.0
-5 37.0
+5 210.0
 .metadata
 .bytecode
 
@@ -19,20 +19,20 @@
     deref   N0, CONSTS, N0
     set_imm N1, 0, 4
     deref   N1, CONSTS, N1
-    sub_n   N2, N0, N1
+    mult_n  N2, N1, N0
     set_imm N3, 0,  5
     deref   N3, CONSTS, N3
     sub_n   N4, N3, N2
 
-    goto_if subn_nok, N4
-    goto    subn_ok, x
+    goto_if multn_nok, N4
+    goto    multn_ok, x
 
-subn_nok:
+multn_nok:
     set_imm S0, 0, 1
     deref   S0, CONSTS, S0
     print_s I0, S0, x
 
-subn_ok:
+multn_ok:
     set_imm S0, 0, 2
     deref   S0, CONSTS, S0
     print_s I0, S0, x

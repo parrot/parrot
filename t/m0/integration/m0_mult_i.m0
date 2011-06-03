@@ -3,7 +3,7 @@
 .constants
 0 "1..1"
 1 "n"
-2 "ok 1 sub_i: 99 - 9 = 90"
+2 "ok 1 mult_i: 9 * 11 = 99"
 .metadata
 .bytecode
 
@@ -13,20 +13,20 @@
     print_s I0, S0, x
 
     set_imm I1, 0,  9
-    set_imm I2, 0,  99
-    sub_i   I2, I2, I1
-    set_imm I3, 0,  90
+    set_imm I2, 0,  11
+    mult_i  I2, I2, I1
+    set_imm I3, 0,  99
     sub_i   I3, I3, I2
        
-    goto_if subi_nok, I3   
-    goto    subi_ok, x
+    goto_if multi_nok, I3   
+    goto    multi_ok, x
 
-subi_nok:
+multi_nok:
     set_imm S0, 0, 1
     deref   S0, CONSTS, S0
     print_s I0, S0, x
 
-subi_ok:
+multi_ok:
     set_imm S0, 0, 2
     deref   S0, CONSTS, S0
     print_s I0, S0, x
