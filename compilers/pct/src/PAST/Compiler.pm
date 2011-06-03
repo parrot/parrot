@@ -1642,39 +1642,22 @@ the second child.  (N.B.: This particular pasttype is a candidate for
 being refactored out using thunks of some sort.)
 
 multi method def_or(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
+    my $ops := POST::Ops.new(node => $node, result => self.unique('$P'));
 
-        .local pmc ops
-        $P0 = get_hll_global ['POST'], 'Ops'
-        $S0 = self.'unique'('$P')
-        ops = $P0.'new'('node'=>node, 'result'=>$S0)
+    my $lpost := self.as_post($node[0], rtype => 'P');
+    $ops.push($lpost);
+    $ops.push_pirop('set', $ops, $lpost);
 
-        .local pmc lpast, lpost
-        lpast = node[0]
-        lpost = self.'as_post'(lpast, 'rtype'=>'P')
-        ops.'push'(lpost)
-        ops.'push_pirop'('set', ops, lpost)
+    my $endlabel := POST::Label.new(result => self.unique('default_'));
 
-        .local pmc endlabel
-        $P0 = get_hll_global ['POST'], 'Label'
-        $S0 = self.'unique'('default_')
-        endlabel = $P0.'new'('result'=>$S0)
-
-        $S0 = self.'unique'('$I')
-        ops.'push_pirop'('defined', $S0, ops)
-        ops.'push_pirop'('if', $S0, endlabel)
-        .local pmc rpast, rpost
-        rpast = node[1]
-        rpost = self.'as_post'(rpast, 'rtype'=>'P')
-        ops.'push'(rpost)
-        ops.'push_pirop'('set', ops, rpost)
-        ops.'push'(endlabel)
-        .return (ops)
-    }
+    my $reg := self.unique('$I');
+    $ops.push_pirop('defined', $reg, $ops);
+    $ops.push_pirop('if', $reg, $endlabel);
+    my $rpost := self.as_post($node[1], rtype => 'P');
+    $ops.push($rpost);
+    $ops.push_pirop('set', $ops, $rpost);
+    $ops.push($endlabel);
+    $ops;
 }
 
 
