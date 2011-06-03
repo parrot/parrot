@@ -225,20 +225,18 @@ sub m0b_bytecode_seg {
 
     # op count = number of lines that have words
     my $op_count = 0;
-    $op_count++ for ($chunk->{bytecode} =~ /^\s*\w+/mg);
     my $word_count = $op_count * 4;
     my $bytecode = '';
     my $pc = 0;
     my %label_map;
-    $bytecode  = pack('L', $M0_BC_SEG);
-    $bytecode .= pack('L', $op_count);
-    $bytecode .= pack('L', $word_count);
-
     my @lines = split /\n/, $chunk->{bytecode};
 
     # calculate addresses of labels
     for my $line (@lines) {
-        $pc++ if ($line =~ /(?<!#)\w[,\s]+\w/);
+        if ($line =~ /(?<!#)\w[,\s]+\w/) {
+            $pc++;
+            $op_count++;
+        }
         if ($line =~ m/^(?<label>[a-zA-Z][a-zA-Z0-9_]+):/) {
             my $label = $+{label};
             die "Invalid M0: duplicate label '$label' in chunk '$chunk->{name}'"
@@ -246,6 +244,10 @@ sub m0b_bytecode_seg {
             $label_map{ $label } = $pc;
         }
     }
+
+    $bytecode  = pack('L', $M0_BC_SEG);
+    $bytecode .= pack('L', $op_count);
+    $bytecode .= pack('L', $word_count);
 
     for my $line (@lines) {
         if ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
