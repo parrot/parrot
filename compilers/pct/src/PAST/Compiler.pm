@@ -1881,40 +1881,21 @@ multi method as_post(PAST::Var $node, *%options) {
 
 
 method vivify($node, $ops, $fetchop, $storeop) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc ops
-        ops = find_lex '$ops'
-        .local pmc fetchop
-        fetchop = find_lex '$fetchop'
-        .local pmc storeop
-        storeop = find_lex '$storeop'
+    my $viviself := $node.viviself();
+    my $vivipost := self.as_vivipost($viviself, rtype => 'P');
+    my $result   := $vivipost.result();
+    $result := self.uniquereg('P') if $result eq '';
 
-        .local pmc viviself, vivipost, vivilabel
-        viviself = node.'viviself'()
-        vivipost = self.'as_vivipost'(viviself, 'rtype'=>'P')
-        $I0 = isa vivipost, 'String'
-        .local string result
-        result = vivipost.'result'()
-        unless result == '' goto have_result
-        result = self.'uniquereg'('P')
-      have_result:
-        ops.'result'(result)
-        ops.'push'(fetchop)
-        unless viviself goto vivipost_done
-        $P0 = get_hll_global ['POST'], 'Label'
-        vivilabel = $P0.'new'('name'=>'vivify_')
-        ops.'push_pirop'('unless_null', ops, vivilabel)
-        ops.'push'(vivipost)
-        $I0 = node.'lvalue'()
-        unless $I0 goto vivipost_stored
-        ops.'push'(storeop)
-      vivipost_stored:
-        ops.'push'(vivilabel)
-      vivipost_done:
-        .return (ops)
+    $ops.result($result);
+    $ops.push($fetchop);
+    if $viviself {
+        my $vivilabel := POST::Label.new(name => 'vivify_');
+        $ops.push_pirop('unless_null', $ops, $vivilabel);
+        $ops.push($vivipost);
+        $ops.push($storeop) if $node.lvalue();
+        $ops.push($vivilabel);
     }
+    $ops;
 }
 
 
