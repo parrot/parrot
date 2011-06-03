@@ -1728,28 +1728,19 @@ Return the POST representation of a C<PAST::Op>
 node with a 'pasttype' of bind.
 
 multi method bind(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
+    my $lpast := $node[0];
+    my $rpast := $node[1];
 
-        .local pmc ops, lpast, rpast, lpost, rpost
-        lpast = node[0]
-        rpast = node[1]
+    my $ops := POST::Ops.new(node => $node);
+    my $rpost := self.as_post($rpast, rtype => 'P');
+    $rpost := self.coerce($rpost, 'P');
+    $ops.push($rpost);
 
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops = $P0.'new'('node'=>node)
-        rpost = self.'as_post'(rpast, 'rtype'=>'P')
-        rpost = self.'coerce'(rpost, 'P')
-        ops.'push'(rpost)
-
-        lpast.'lvalue'(1)
-        lpost = self.'as_post'(lpast, 'bindpost'=>rpost)
-        ops.'push'(lpost)
-        ops.'result'(lpost)
-        .return (ops)
-    }
+    $lpast.lvalue(1);
+    my $lpost := self.as_post($lpast, bindpost => $rpost);
+    $ops.push($lpost);
+    $ops.result($lpost);
+    $ops;
 }
 
 
