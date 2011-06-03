@@ -1767,21 +1767,8 @@ multi method inline(PAST::Op $node, *%options) {
     # This method replaces %r and %t even inside strings, which
     # broke the original PIR code for this function.
     my $ops := self.post_children($node, signature => 'vP');
-    my $inline := Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc inline_pmc
-        .local string inline
-        inline_pmc = node.'inline'()
-        $I0 = does inline_pmc, 'array'
-        if $I0 goto inline_array
-        %r = inline_pmc
-        goto have_inline
-      inline_array:
-        inline = join "\n", inline_pmc
-        %r = box inline
-      have_inline:
-    };
+    my $inline := $node.inline();
+    $inline := pir::join("\n", $inline) if pir::does($inline, 'array');
 
     my $result := '';
     my $i := pir::index($inline, '%t');
