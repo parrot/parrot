@@ -2004,98 +2004,65 @@ multi method package(PAST::Var $node, $bindpost) {
 
 
 multi method lexical(PAST::Var $node, $bindpost) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc bindpost
-        bindpost = find_lex '$bindpost'
+    my $name := self.escape($node.name());
+    my $isdecl := $node.isdecl();
 
-        .local string name
-        $P0 = get_hll_global ['POST'], 'Ops'
-        name = node.'name'()
-        name = self.'escape'(name)
+    if $bindpost {
+        my $pirop := $isdecl ?? '.lex' !! 'store_lex';
+        return POST::Op.new($name, $bindpost,
+            pirop => $pirop, result => $bindpost);
+    }
 
-        .local int isdecl
-        isdecl = node.'isdecl'()
+    my $ops := POST::Ops.new(node => $node);
 
-        if bindpost goto lexical_bind
-
-      lexical_post:
-        if isdecl goto lexical_decl
-        .local pmc ops, fetchop, storeop
-        ops = $P0.'new'('node'=>node)
-        $P0 = get_hll_global ['POST'], 'Op'
-        fetchop = $P0.'new'(ops, name, 'pirop'=>'find_lex')
-        storeop = $P0.'new'(name, ops, 'pirop'=>'store_lex')
-        .tailcall self.'vivify'(node, ops, fetchop, storeop)
-
-      lexical_decl:
-        ops = $P0.'new'('node'=>node)
-        .local pmc viviself, vivipost
-        viviself = node.'viviself'()
-        vivipost = self.'as_vivipost'(viviself, 'rtype'=>'P')
-        ops.'push'(vivipost)
-        ops.'push_pirop'('.lex', name, vivipost)
-        ops.'result'(vivipost)
-        .return (ops)
-
-      lexical_bind:
-        $P0 = get_hll_global ['POST'], 'Op'
-        if isdecl goto lexical_bind_decl
-        .tailcall $P0.'new'(name, bindpost, 'pirop'=>'store_lex', 'result'=>bindpost)
-      lexical_bind_decl:
-        .tailcall $P0.'new'(name, bindpost, 'pirop'=>'.lex', 'result'=>bindpost)
+    if $isdecl {
+        my $viviself := $node.viviself();
+        my $vivipost := self.as_vivipost($viviself, rtype => 'P');
+        $ops.push($vivipost);
+        $ops.push_pirop('.lex', $name, $vivipost);
+        $ops.result($vivipost);
+        return $ops;
+    } else {
+        my $fetchop := POST::Op.new($ops, $name, pirop => 'find_lex');
+        my $storeop := POST::Op.new($name, $ops, pirop => 'store_lex');
+        return self.vivify($node, $ops, $fetchop, $storeop);
     }
 }
 
 
 multi method contextual(PAST::Var $node, $bindpost) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc bindpost
-        bindpost = find_lex '$bindpost'
-        # If we've requested a contextual in a block that
-        # explicitly declares the variable as a different type,
-        # treat it as that type.
-        .local string name
-        name = node.'name'()
-        $P0 = find_dynamic_lex '@*BLOCKPAST'
-        $P0 = $P0[0]
-        $P0 = $P0.'symtable'()
-        unless $P0 goto contextual
-        $P0 = $P0[name]
-        if null $P0 goto contextual
-        $S0 = $P0['scope']
-        unless $S0 goto contextual
-        if $S0 == 'contextual' goto contextual
-        .tailcall self.$S0(node, bindpost)
+    # If we've requested a contextual in a block that
+    # explicitly declares the variable as a different type,
+    # treat it as that type.
 
-      contextual:
-        # If this is a declaration, treat it like a normal lexical
-        .local int isdecl
-        isdecl = node.'isdecl'()
-        if isdecl goto contextual_lex
+    my $name := $node.name();
 
-        name = self.'escape'(name)
-        if bindpost goto contextual_bind
-
-      contextual_post:
-        .local pmc ops, fetchop, storeop
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops = $P0.'new'('node'=>node)
-        $P0 = get_hll_global ['POST'], 'Op'
-        fetchop = $P0.'new'(ops, name, 'pirop'=>'find_dynamic_lex')
-        storeop = $P0.'new'(name, ops, 'pirop'=>'store_dynamic_lex')
-        .tailcall self.'vivify'(node, ops, fetchop, storeop)
-
-      contextual_bind:
-        $P0 = get_hll_global ['POST'], 'Op'
-        .tailcall $P0.'new'(name, bindpost, 'pirop'=>'store_dynamic_lex', 'result'=>bindpost)
-
-      contextual_lex:
-        .tailcall self.'lexical'(node, bindpost)
+    my %symtable := @*BLOCKPAST[0].symtable();
+    if pir::defined(%symtable) {
+        %symtable := %symtable{$name};
+        if pir::defined(%symtable) {
+            my $scope := %symtable<scope>;
+            if $scope && $scope ne 'contextual' {
+                return self."$scope"($node, $bindpost);
+            }
+        }
     }
+
+    # If this is a declaration, treat it like a normal lexical
+    return self.lexical($node, $bindpost) if $node.isdecl();
+
+    $name := self.escape($name);
+    
+    if $bindpost {
+        return POST::Op.new($name, $bindpost,
+            pirop  => 'store_dynamic_lex',
+            result => $bindpost);
+    }
+
+    my $ops     := POST::Ops.new(node => $node);
+    my $fetchop := POST::Op.new($ops, $name, pirop => 'find_dynamic_lex');
+    my $storeop := POST::Op.new($ops, $name, pirop => 'store_dynamic_lex');
+    self.vivify($node, $ops, $fetchop, $storeop);
 }
 
 
