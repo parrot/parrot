@@ -336,14 +336,14 @@ sub m0_opfunc_iton {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "iton $a1, $a2, $a3";
 
-    $cf->[$a1] = int($cf->[$a2]);
+    $cf->[$a2] = int($cf->[$a1]);
 }
 
 sub m0_opfunc_ntoi {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "ntoi $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2];
+    $cf->[$a2] = $cf->[$a1];
 }
 
 sub m0_opfunc_ashr {
