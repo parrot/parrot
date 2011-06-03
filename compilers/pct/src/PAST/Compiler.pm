@@ -156,54 +156,32 @@ INIT {
 =item to_post(node [, 'option'=>option, ...])
 Compile the abstract syntax tree given by C<past> into POST.
 
+our @?BLOCK;
+
 method to_post($past, *%options) {
-    Q:PIR {
-        .local pmc past
-        past = find_lex '$past'
-        .local pmc options
-        options = find_lex '%options'
+    %!symtable := {};
 
-        .local pmc symtable
-        symtable = new 'Hash'
-        setattribute self, '%!symtable', symtable
-
-        .local pmc blockpast
-        blockpast = get_global '@?BLOCK'
-        unless null blockpast goto have_blockpast
-        blockpast = new 'ResizablePMCArray'
-        set_global '@?BLOCK', blockpast
-      have_blockpast:
-        .lex '@*BLOCKPAST', blockpast
-        null $P99
-        .lex '$*SUB', $P99
-        $P1 = self.'as_post'(past, 'rtype'=>'v')
-        .return ($P1)
+    unless pir::defined(@?BLOCK) {
+        @?BLOCK := [];
     }
+
+    my @*BLOCKPAST := @?BLOCK;
+    my $*SUB := pir::null__P;
+
+    self.as_post($past, rtype => 'v');
 }
 
 =item escape(str)
 Return C<str> as a PIR constant string.
 
 method escape($str) {
-    Q:PIR {
-        .local pmc pstr
-        .local string str
-        pstr = find_lex '$str'
-        str = pstr
-        .local string estr
-        estr = escape str
-        $I0 = index estr, "\\x"
-        if $I0 >= 0 goto unicode_prefix
-        $I0 = index estr, "\\u"
-        if $I0 >= 0 goto unicode_prefix
-        estr = concat '"', estr
-        goto done
-      unicode_prefix:
-        estr = concat 'unicode:"', estr
-      done:
-        estr = concat estr, '"'
-        .return (estr)
+    my $estr := pir::escape__SS($str);
+    if pir::index($estr, '\x') >= 0 || pir::index($estr, '\u') > 0 {
+        $estr := 'unicode:"' ~ $estr;
+    } else {
+        $estr := '"' ~ $estr;
     }
+    $estr := $estr ~ '"';
 }
 
 =item unique([STR fmt])
@@ -212,23 +190,8 @@ If C<fmt> is provided, then it will be used as a prefix to the
 unique number.
 
 method unique($fmt?) {
-    Q:PIR {
-        .local pmc pfmt
-        .local string fmt
-        pfmt = find_lex '$fmt'
-        fmt = pfmt
-        .local int has_fmt
-        has_fmt = defined pfmt
-
-        if has_fmt goto unique_1
-        fmt = ''
-      unique_1:
-        $P0 = get_global '$serno'
-        $S0 = $P0
-        $S0 = concat fmt, $S0
-        inc $P0
-        .return ($S0)
-    }
+    $fmt := '' unless pir::defined($fmt);
+    $fmt := $fmt ~ $serno++;
 }
 
 =item uniquereg(rtype)
@@ -236,26 +199,15 @@ Generate a unique register based on C<rtype>, where C<rtype>
 is one of the signature flags described above.
 
 method uniquereg($rtype) {
-    Q:PIR {
-        .local pmc prtype
-        .local string rtype
-        prtype = find_lex '$rtype'
-        rtype = prtype
-        unless rtype goto err_nortype
-        if rtype == 'v' goto reg_void
-        .local string reg
-        reg = 'P'
-        $I0 = index 'Ss~Nn+Ii', rtype
-        if $I0 < 0 goto reg_psin
-        reg = substr 'SSSNNNII', $I0, 1
-      reg_psin:
-        reg = concat '$', reg
-        .tailcall self.'unique'(reg)
-      reg_void:
-        .return ('')
-      err_nortype:
-        self.'panic'('rtype not set')
-    }
+    self.panic('rtype not set') unless $rtype;
+
+    return '' if $rtype eq 'v';
+
+    my $reg := 'P';
+    my $i := pir::index('Ss~Nn+Ii', $rtype);
+    $reg := pir::substr('SSSNNNII', $i, 1) unless $i < 0;
+    $reg := '$' ~ $reg;
+    self.unique($reg);
 }
 
 =item coerce(post, rtype)
@@ -523,34 +475,22 @@ We use this to throw a more useful exception in case any non-PAST
 nodes make it into the tree.
 
 multi method as_post($node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .param pmc options
-        options = find_lex '%options'
-        unless null node goto not_null_node
-        self.'panic'("PAST::Compiler can't compile a null node")
-        not_null_node:
+    my $what;
 
-        $S0 = typeof node
-        self.'panic'("PAST::Compiler can't compile node of type ", $S0)
+    if pir::isnull($node) {
+        $what := 'a null node';
+    } else {
+        $what := 'node of type ' ~ pir::typeof($node);
     }
+
+    self.panic("PAST::Compiler can't compile " ~ $what);
 }
 
 =item as_post(Undef)
 Return an empty POST node that can be used to hold a (PMC) result.
 
 multi method as_post(Undef $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
-        .local string result
-        $P0 = get_hll_global ['POST'], 'Ops'
-        result = self.'uniquereg'('P')
-        .tailcall $P0.'new'('result'=>result)
-    }
+    POST::Ops.new(result => self.uniquereg('P'));
 }
 
 
@@ -561,44 +501,16 @@ Handle Integer, Float, and String nodes in the PAST tree, by
 generating a constant or an appropriate register setting.
 
 multi method as_post(Integer $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
-        $P0 = get_hll_global ['POST'], 'Ops'
-        $P0 = $P0.'new'( 'result'=>node )
-        $S0 = options['rtype']
-        .tailcall self.'coerce'($P0, $S0)
-    }
+    self.coerce(POST::Ops.new(result => $node), %options<rtype>);
 }
 
 multi method as_post(Float $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .param pmc options
-        options = find_lex '%options'
-        $P0 = get_hll_global ['POST'], 'Ops'
-        $P0 = $P0.'new'( 'result'=>node )
-        $S0 = options['rtype']
-        .tailcall self.'coerce'($P0, $S0)
-    }
+    self.coerce(POST::Ops.new(result => $node), %options<rtype>);
 }
 
 multi method as_post(String $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
-        .local string value
-        value = self.'escape'(node)
-        $P0 = get_hll_global ['POST'], 'Ops'
-        $P0 = $P0.'new'( 'result'=>value )
-        $S0 = options['rtype']
-        .tailcall self.'coerce'($P0, $S0)
-    }
+    my $value := self.escape($node);
+    self.coerce(POST::Ops.new(result => $value), %options<rtype>);
 }
 
 
@@ -1325,13 +1237,7 @@ multi method if(PAST::Op $node, *%options) {
 }
 
 multi method unless(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
-        .tailcall self.'if'(node, options :flat :named)
-    }
+    self.if($node, |%options);
 }
 
 
