@@ -2209,45 +2209,29 @@ multi method attribute(PAST::Var $node, $bindpost) {
 
 
 multi method register(PAST::Var $node, $bindpost) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc bindpost
-        bindpost = find_lex '$bindpost'
+    my $name := $node.name();
 
-        .local string name
-        name = node.'name'()
-        if name goto have_name
-        name = self.'uniquereg'('P')
-        node.'name'(name)
-      have_name:
-
-        .local pmc ops
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops = $P0.'new'('result'=>name, 'node'=>node)
-
-        .local int isdecl
-        isdecl = node.'isdecl'()
-        unless isdecl goto decl_done
-        ops.'push_pirop'('.local pmc', ops)
-      decl_done:
-
-        if bindpost goto register_bind
-
-        .local pmc viviself, vivipost
-        viviself = node.'viviself'()
-        unless viviself goto end
-        vivipost = self.'as_vivipost'(viviself, 'rtype'=>'P')
-        ops.'push'(vivipost)
-        ops.'push_pirop'('set', ops, vivipost)
-        goto end
-
-      register_bind:
-        ops.'push_pirop'('set', ops, bindpost)
-
-      end:
-        .return (ops)
+    unless $name {
+        $name := self.uniquereg('P');
+        $node.name($name);
     }
+    
+    my $ops := POST::Ops.new(result => $name, node => $node);
+
+    $ops.push_pirop('.local pmc', $ops) if $node.isdecl();
+
+    if $bindpost {
+        $ops.push_pirop('set', $ops, $bindpost);
+    } else {
+        my $viviself := $node.viviself();
+        if $viviself {
+            my $vivipost := self.as_vivipost($viviself, rtype => 'P');
+            $ops.push($vivipost);
+            $ops.push_pirop('set', $ops, $vivipost);
+        }
+    }
+
+    $ops;
 }
 
 
