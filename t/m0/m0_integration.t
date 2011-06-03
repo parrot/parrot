@@ -31,12 +31,7 @@ my @m0_files = glob catfile( '.', qw/t m0 integration *.m0/);
 plan tests => 2 * scalar @m0_files;
 
 for my $file (@m0_files) {
-    if($file =~ m/add_n/) {
-        local $TODO = "set_imm N0, 0, 42.0 gets flagged as an invalid M0 line";
-        test_m0_file($file);
-    } else {
-        test_m0_file($file);
-    }
+    test_m0_file($file);
 }
 
 sub test_m0_file {

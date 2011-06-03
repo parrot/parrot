@@ -126,16 +126,14 @@ output_like(
     'detect invalid registers',
 );
 
-{ local $TODO = "borks on Z42 invalid register";
     my $file = catfile(qw/t m0 invalid invalid_register_type.m0/),
 output_like(
     catfile(qw/t m0 invalid invalid_register_type.m0/),
-    qr/Invalid register type/,
+    qr/Invalid register/,
     'detect invalid register types',
 );
     ok(!-e "${file}b", "invalid bytecode file was not generated");
 
-}
 
 output_like(
     catfile(qw/t m0 invalid invalid_register_number.m0/),

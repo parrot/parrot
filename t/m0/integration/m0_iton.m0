@@ -11,6 +11,9 @@
 .bytecode
 
     set_imm I1, 0, 99
+    set_imm S0, 0, 0
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
     set_imm I0, 0, 1
 
     set_imm N0, 0, 3

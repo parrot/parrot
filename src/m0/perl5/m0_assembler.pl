@@ -171,7 +171,9 @@ sub to_bytecode {
     # as described in "Register Types and Context Structure" in the M0 spec
 
     map {
-        $bytecode .= pack('C', $_ =~ M0_REG_RX ? register_name_to_num($_) : $_ );
+        my $reg = $_ =~ M0_REG_RX ? register_name_to_num($_) : $_;
+        die "Invalid register '$reg'" if ($reg !~ /^\d+$/);
+        $bytecode .= pack('C', $reg );
     } ($a1, $a2, $a3);
 
     return $bytecode;
