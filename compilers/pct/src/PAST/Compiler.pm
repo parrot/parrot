@@ -549,29 +549,18 @@ multi method as_post(PAST::Node $node, *%options) {
 
 # Origionally used via :subid('Node.as_post');
 method node_as_post($node, %options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
+    my $rtype := %options<rtype>;
 
-        .local pmc ops
-        .local string rtype
-        rtype = options['rtype']
-        $P0 = node.'list'()
-        $I0 = elements $P0
-        $S0 = repeat 'v', $I0
-        $S0 = concat $S0, rtype
-        ops = self.'post_children'(node, 'signature'=>$S0)
-        $P0 = ops[-1]
-        ops.'result'($P0)
-        .local pmc eh
-        eh = node.'handlers'()
-        unless eh, no_eh
-        ops = self.'wrap_handlers'(ops, eh, 'rtype'=>rtype)
-      no_eh:
-        .return (ops)
-    }
+    my $signature := pir::repeat('v', +$node.list());
+    $signature := $signature ~ $rtype;
+
+    my $ops := self.post_children($node, signature => $signature);
+    $ops.result($ops[-1]);
+
+    my $eh := $node.handlers();
+    $ops := self.wrap_handlers($ops, $eh, rtype => $rtype) if $eh;
+
+    $ops;
 }
 
 =head3 C<PAST::Control>
