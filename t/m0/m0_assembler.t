@@ -23,7 +23,7 @@ use File::Slurp qw/slurp/;
 use Test::More;
 use File::Spec::Functions;
 
-plan tests => 23;
+plan tests => 24;
 
 my $exefile    = catfile( ".", qw/src m0 perl5 m0_assembler.pl/ );
 my $hello_m0   = catfile(qw/t m0 basic hello.m0/);
@@ -125,6 +125,14 @@ output_like(
     qr/Invalid register name: S999/,
     'detect invalid registers',
 );
+
+{ local $TODO = "borks on Z42 invalid register";
+output_like(
+    catfile(qw/t m0 invalid invalid_register_type.m0/),
+    qr/Invalid register type/,
+    'detect invalid register types',
+);
+}
 
 output_like(
     catfile(qw/t m0 invalid invalid_register_number.m0/),
