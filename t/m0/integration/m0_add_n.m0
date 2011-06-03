@@ -4,6 +4,9 @@
 0 "1..1"
 1 "n"
 2 "ok 1 add_n: 42.0 +  5.0 = 47.0
+3 42.0
+4 5.0
+5 47.0
 .metadata
 .bytecode
 
@@ -12,13 +15,16 @@
     set_imm I0, 0, 1
     print_s I0, S0, x
 
-    set_imm N1, 0, 42.0
-    set_imm N2, 0, 5.0
-    add_n   N2, N2, N1
-    set_imm N3, 0,  47
-    sub_i   N3, N3, N2
+    set_imm N0, 0, 3
+    deref   N0, CONSTS, N0
+    set_imm N1, 0, 4
+    deref   N1, CONSTS, N1
+    add_n   N2, N1, N0
+    set_imm N3, 0,  5
+    deref   N3, CONSTS, N3
+    sub_n   N4, N3, N2
 
-    goto_if addn_nok, I3
+    goto_if addn_nok, N4
     goto    addn_ok, x
 
 addn_nok:
