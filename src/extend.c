@@ -244,6 +244,7 @@ Returns the special C<NULL> PMC.
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
+PARROT_CAN_RETURN_NULL
 Parrot_PMC
 Parrot_PMC_null(void)
 {
@@ -326,6 +327,68 @@ Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_call_obj);
 }
 
+/*
+
+=item C<void Parrot_ext_try(PARROT_INTERP, void (*cfunction(Parrot_Interp, void
+*)), void (*chandler(Parrot_Interp, PMC *, void *)), void *data)>
+
+Executes the cfunction argument wrapped in a exception handler.
+If the function throws, the provided handler function is invoked
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_ext_try(PARROT_INTERP,
+                ARGIN_NULLOK(void (*cfunction)(Parrot_Interp, void *)),
+                ARGIN_NULLOK(void (*chandler)(Parrot_Interp, PMC *, void *)),
+                ARGIN_NULLOK(void *data))
+{
+    ASSERT_ARGS(Parrot_ext_try)
+    if (cfunction) {
+        Parrot_runloop jmp;
+        Parrot_Context *initialctx, *curctx;
+        PARROT_CALLIN_START(interp);
+        initialctx = CONTEXT(interp);
+        switch (setjmp(jmp.resume)) {
+          case 0: /* try */
+            Parrot_ex_add_c_handler(interp, &jmp);
+            (*cfunction)(interp, data);
+            curctx = CONTEXT(interp);
+            if (curctx != initialctx) {
+                Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG,
+                        "popping context in Parrot_ext_try");
+                do {
+                    if (curctx == NULL)
+                        do_panic(interp,
+                                "cannot restore context", __FILE__, __LINE__);
+                } while ((curctx = CONTEXT(interp)) != initialctx);
+            }
+            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+            break;
+          default: /* catch */
+            {
+                PMC *exception = jmp.exception;
+                curctx = CONTEXT(interp);
+                if (curctx != initialctx) {
+                    Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG,
+                            "popping context in Parrot_ext_try");
+                    do {
+                        if (curctx == NULL)
+                            do_panic(interp,
+                                    "cannot restore context", __FILE__, __LINE__);
+                    } while ((curctx = CONTEXT(interp)) != initialctx);
+                }
+                Parrot_cx_delete_handler_local(interp, STRINGNULL);
+                if (chandler)
+                    (*chandler)(interp, exception, data);
+            }
+        }
+        PARROT_CALLIN_END(interp);
+    }
+}
 
 /*
 
@@ -461,6 +524,7 @@ Parrot_set_strreg(PARROT_INTERP, Parrot_Int regnum,
 {
     ASSERT_ARGS(Parrot_set_strreg)
     REG_STR(interp, regnum) = value;
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
 }
 
 /*
@@ -481,6 +545,7 @@ Parrot_set_pmcreg(PARROT_INTERP, Parrot_Int regnum,
 {
     ASSERT_ARGS(Parrot_set_pmcreg)
     REG_PMC(interp, regnum) = value;
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
 }
 
 /*=for api extend Parrot_new_string
@@ -527,27 +592,6 @@ Parrot_new_string(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
 
     PARROT_CALLIN_END(interp);
     return retval;
-}
-
-/*
-
-=item C<Parrot_Language Parrot_find_language(PARROT_INTERP, const char
-*language)>
-
-Find the magic language token for a language, by language name.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_PURE_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-Parrot_Language
-Parrot_find_language(SHIM_INTERP, SHIM(const char *language))
-{
-    ASSERT_ARGS(Parrot_find_language)
-    return 0;
 }
 
 /*

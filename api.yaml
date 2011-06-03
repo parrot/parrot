@@ -1,0 +1,478 @@
+---
+-
+  name:     '"Advanced" NCI parameter types'
+  eligible: '3.1'
+  ticket:   'http://trac.parrot.org/parrot/ticket/1931' 
+  tags:
+    - 'deprecated'
+    - 'completed'
+-
+  name:     'Pointer, UnManagedStruct, and ManagedStruct'
+  eligible: '3.4'
+  ticket:   'http://trac.parrot.org/parrot/ticket/2035'
+-
+  name:  'add write barrier to all PMCs that write in unusual VTABLE functions'
+  eligible:  '3.4'
+  note:  'VTABLE functions not marked with :write that mutate the PMCs need to use the write barrier.  See ticket for more information.'
+  tags:
+    - 'C'
+    - 'deprecated'
+  ticket:  'http://trac.parrot.org/parrot/ticket/2010'
+-
+  name:  '":init" Sub flag'
+  eligible:  '3.4'
+  note:  'At this point, ":init" is a no-op, and will therefore be removed.'
+  tags:
+    - 'PIR'
+    - 'syntax'
+    - 'deprecated'
+  detection:
+    regex:
+      pir: '^ ".sub" .+ ":init"'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1896'
+-
+  name:  '":load" and ":init" Sub flags doing different things'
+  eligible:  '3.1'
+  note:  'Currently, ":init" and ":load" flagged Subs get called depending on the way a PIR file has been loaded. This distinction is silly and will cease to be. The ":load" flag will be triggered both for scenarios. ":init" becomes a no-op for a deprecation cycle (see below).'
+  tags:
+    - 'deprecated'
+    - 'PIR'
+    - 'syntax'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1895'
+-
+  name:  ':main Sub behaviour and selection.'
+  eligible:  '2.7'
+  note:  'Currently, if no :main sub is found, the first .sub in a file is used as main. Also, arguments are passed to the main sub regardless of the .param declarations in that sub. After this change, if no sub is marked with :main, an exception will be raised. Multiple :main declarations will be still be allowed, and all but the first will be ignored. This change will also force all subs, including :main, to have their arguments checked - to allow an arbitrary number of arguments, have this be the only .param declaration in the sub.'
+  tags:
+    - 'deprecated'
+    - 'PIR'
+    - 'syntax'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1705'
+-
+  name:  'Action methods in rules'
+  note:  'Per Synopsis 5, all regexes will have an implied {*} token at the end which cause invocation of an action method if a ":action" object is supplied.'
+  tags:
+    - 'deprecated'
+    - 'compiler'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/843'
+-
+  name:  'Archive::Tar & Archive::Zip'
+  tags:
+    - 'library'
+    - 'experimental'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1598'
+-
+  name:  'Assigning to registers in parrot_debugger'
+  tags:
+    - 'debugger'
+    - 'experimental'
+-
+  name:  'Auto-vivification of nested aggregates'
+  eligible:  '2.4'
+  note:  'E.g. will not auto-vivify nested hashes and return PMCNULL early.'
+  tags:
+    - 'deprecated'
+    - 'PMC'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1561'
+-
+  name:  'C API coding standards cleanup'
+  eligible:  '1.1'
+  note:  'All C API functions that aren''t currently named according to the ''Parrot_<system>_*'' scheme will be renamed. A list of renamed functions will be kept in the ticket at:'
+  tags:
+    - 'deprecated'
+    - 'functions'
+  ticket:  'https://trac.parrot.org/parrot/ticket/443'
+-
+  name:  'Complex PMC'
+  eligible:  '3.1'
+  note:  'This perennially broken PMC will be removed.'
+  tags:
+    - 'deprecated'
+    - 'PMC'
+  detection:
+    regex:
+      pir: 'new\s\[?\''Complex\''\]?'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1892'
+-
+  name:  'Cross-HLL library loading'
+  tags:
+    - 'library'
+    - 'experimental'
+  ticket:  'https://trac.parrot.org/parrot/ticket/754'
+-
+  name:  'GC timely destruction'
+  eligible:  '3.1'
+  note:  'All PIR ops and internal semantics related to timely destruction of PMCs is deprecated.'
+  tags:
+    - 'deprecated'
+    - 'functions'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1800'
+-
+  name:  'GC_SYS_NAME option to interpinfo_s_i'
+  note:  'Ability to get the string name of the current GC core from the interpinfo_s_i. See r43900 and r43904 for details.'
+  tags:
+    - 'Opcodes'
+    - 'experimental'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1581'
+-
+  name:  'IPv6 Support'
+  tags:
+    - 'experimental'
+  ticket:
+  note:  'IPv6 support is still being perfected and being made portable'
+-
+  name:  'JSON and Config;JSON'
+  eligible:  '1.5'
+  tags:
+    - 'deprecated'
+    - 'library'
+  ticket:  'https://trac.parrot.org/parrot/ticket/508'
+-
+  name:  'LWP, https::Message, URI & URI::Escape'
+  tags:
+    - 'library'
+    - 'experimental'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1637'
+-
+  name:  'ManagedStruct reallocations based on shape changes'
+  eligible:  '2.4'
+  note:  'Since shape changes may simply be used for re-interpreting data, and may also occur in several steps, re-allocating after any one shape change may be undesirable. In stead, an explicit allocate/reallocate method will be provided.'
+  tags:
+    - 'deprecated'
+    - 'PMC'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1554'
+-
+  name:  'MappedByteArray PMC'
+  tags:
+    - 'PMC'
+    - 'experimental'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1877'
+-
+  name:  'Meta-model implementation used by PCT'
+  eligible:  '2.7'
+  note:  'PCT is set to switch to a new meta-model implementation for its classes and objects. This will most likely only affect those who rely on the interface of what is returned from .HOW, or rely on PCT objects exhibiting various other peculiarities of the P6object implementation. (Even when that is the case, the HOW API will not be changing too drastically, so for most PCT users there should be little to no upheavel.)'
+  ticket:
+  tags:
+    - 'deprecated'
+    - 'compiler'
+-
+  name:  'Method unescape on String'
+  note:  'This is a helper method for testing of Parrot_str_unescape_string.'
+  tags:
+    - 'PMC'
+    - 'experimental'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1628'
+-
+  name:  'NCI_FB_CB and NCI_FB_UD in iglobals'
+  note:  'Hooks allowing a runtime-loadable dynamic frame builder.'
+  tags:
+    - 'opcodes'
+    - 'experimental'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1582'
+-
+  name:  'OpenGL bindings and libraries'
+  tags:
+    - 'library'
+    - 'experimental'
+  ticket:  'https://trac.parrot.org/parrot/ticket/852'
+-
+  name:  'Overriding vtable invoke in PIR objects'
+  note:  'The VTABLE invoke in object.pmc puts SELF at the start of the signature call arguments when there is no current object and is not already here. This allows the usage of $P0() instead of $P0($P0).'
+  tags:
+    - 'PMC'
+    - 'experimental'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/103'
+-
+  name:  'PARROT_LIBRARY and PARROT_INCLUDE environment variables'
+  note:  'A way to provide an equivalent of -L and -I parrot command line options to language that doesn''t support it.'
+  tags:
+    - 'library'
+    - 'experimental'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1429'
+-
+  name:  'PAST::Val node generation'
+  eligible:  '1.5'
+  note:  'The PAST::Compiler may generate the code for PAST::Val nodes (i.e., constants) at the beginning of the block (Parrot sub) instead of the location where they occur in the PAST tree.'
+  tags:
+    - 'deprecated'
+    - 'compiler'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/868'
+-
+  name:  'PCT::HLLCompiler from Perl 5''s Test::Harness'
+  eligible:  '1.1'
+  note:  'In order to facilitate using PCT::HLLCompiler with test harnesses, the ''command_line'' method of PCT::HLLCompiler object exits silently if it detects that it is being run in a sample run from Perl''s Test::Harness. Currently this detection is done by checking the second command line argument for @INC; future releases may use a different detection mechanism or eliminate it altogether.'
+  tags:
+    - 'deprecated'
+    - 'compiler'
+  ticket:  'https://trac.parrot.org/parrot/ticket/463'
+-
+  name:  'PCT::HLLCompiler stages'
+  eligible:  '1.1'
+  note:  'The interface of various methods for adding, removing, and modifying the list stages in a PCT::HLLCompiler object is subject to change. The existing actual stages will remain; only the mechanism for specifying the order of individual stages is likely to change.'
+  tags:
+    - 'deprecated'
+    - 'compiler'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/462'
+-
+  name:  'PMC Attributes Allocation Functions'
+  note:  'These items and related helper functions are added as experimental support for <https://trac.parrot.org/parrot/ticket/1506>'
+  tags:
+    - 'functions'
+    - 'experimental'
+    - 'completed'
+-
+  name:  'PMC numbering'
+  tags:
+    - 'bytecode'
+    - 'experimental'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/451'
+-
+  name:  'PackfileDebug'
+  tags:
+    - 'PMC'
+    - 'experimental'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1599'
+-
+  name:  'Parrot_load_bytecode_file'
+  note:  'Load a .pbc file into the interpreter. Experimental.'
+  tags:
+    - 'functions'
+    - 'experimental'
+-
+  name:  'Parrot_str_unescape_string'
+  note:  'This function is an experimental addition to enhance and maybe replace Parrot_str_unescape'
+  tags:
+    - 'functions'
+    - 'experimental'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1628'
+-
+  name:  'Protoobject'
+  eligible:  '2.7'
+  note:  'Use P6Object instead.'
+  tags:
+    - 'deprecated'
+    - 'library'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1337'
+-
+  name:  'STRING COW'
+  eligible:  '2.4'
+  note:  'COW strings are to be removed. All "inplace" string modification functions and all "inplace" string ops are deprecated.'
+  tags:
+    - 'deprecated'
+    - 'functions'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1540'
+-
+  name:  'STRING Out parameters in Parrot_str_* functions'
+  eligible:  '2.1'
+  note:  'All STRING modification functions will return a STRING pointer; capture and use this rather than relying on in-place modification of an existing pointer.'
+  tags:
+    - 'deprecated'
+    - 'functions'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1584'
+-
+  name:  'Threads and Parallelism'
+  tags:
+    - 'experimental'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1601'
+-
+  name:  'UnManagedStruct get_integer, set_integer_native'
+  eligible:  '2.4'
+  note:  'These will no longer refer to the byte length of the buffer, but to the number of times the struct is repeated; emulating an array of structs.'
+  tags:
+    - 'deprecated'
+    - 'PMC'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1553'
+-
+  name:  'UnManagedStruct handling nested structure'
+  eligible:  '2.4'
+  note:  'UnManagedStruct will be simplified to only support flat structures. This means that elements which themselves have structure - struct pointers and function pointers will be stored as "void *" and "void (*)(void)" respectively. To use these, they will need to be cast to the appropriate signature on access.'
+  tags:
+    - 'PMC'
+    - 'deprecated'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1551'
+-
+  name:  'UnManagedStruct initializer structure'
+  eligible:  '2.4'
+  note:  'The initializer structure will cease to be an array of triples. Instead, an array of flags (no counts or offsets), or a string representation of the same information may be used.'
+  tags:
+    - 'deprecated'
+    - 'PMC'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1552'
+-
+  name:  'charset, charsetname, find_charset, trans_charset'
+  eligible:  '2.10'
+  note:  'These opcodes will be removed. The corresponding encoding opcodes should be used instead.'
+  tags:
+    - 'deprecated'
+    - 'opcodes'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1778'
+-
+  name:  'continuation-based ExceptionHandlers'
+  eligible:  '2.1'
+  tags:
+    - 'deprecated'
+    - 'PIR'
+    - 'syntax'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1091'
+-
+  name:  'dlfunc and new_callback signature string format'
+  eligible:  '2.4'
+  note:  'These will be changed to allow more flexibility in types.'
+  tags:
+    - 'deprecated'
+    - 'opcodes'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1565'
+-
+  name:  'finalize'
+  note:  'Finalize exception handler, unrolling inner runloops if needed.'
+  tags:
+    - 'opcodes'
+    - 'experimental'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1635'
+-
+  name:  'fixed_8 encoding'
+  eligible:  '2.10'
+  note:  'The ''fixed_8'' encoding is going away. Use ''ascii'' instead. If you want to test for a fixed_8 encoding, you have to compare the encoding to ''ascii'', ''iso-8859-1'' and ''binary'' separately.'
+  tags:
+    - 'deprecated'
+    - 'opcodes'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1778'
+-
+  name:  'get_addr and set_addr'
+  eligible:  '1.5'
+  note:  'These opcodes are being repurposed. They will always return a unique memory address of the PMC. Uses of get_addr and set_addr that would set label values for Sub, Exception, and related PMC types will instead be handled by get_label and set_label.'
+  tags:
+    - 'deprecated'
+    - 'opcodes'
+  ticket:  'https://trac.parrot.org/parrot/ticket/218'
+-
+  name:  'get_results opcode order and features'
+  eligible:  '2.1'
+  note:  'get_results no longer used to fetch exception object.'
+  tags:
+    - 'deprecated'
+    - 'opcodes'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1406'
+-
+  name:  'implicit optional named parameters'
+  eligible:  '2.1'
+  tags:
+    - 'completed'
+    - 'deprecated'
+    - 'PIR'
+    - 'syntax'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1103'
+-
+  name:  'inplace string updates.'
+  eligible:  '2.4'
+  note:  'All "inplace" string update ops are deprecated. E.g. "chopn_s", etc. Part of COW removal.'
+  tags:
+    - 'deprecated'
+    - 'opcodes'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1540'
+-
+  name:  'loadlib_p_s_p'
+  note:  'Ability to use non-default dynamic loading behaviour.'
+  tags:
+    - 'opcodes'
+    - 'experimental'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1583'
+-
+  name:  'logical PMC ops'
+  eligible:  '2.7'
+  note:  'These fall out from the logical vtables deprecation.'
+  tags:
+    - 'deprecated'
+    - 'opcodes'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1655'
+-
+  name:  'logical_* vtables'
+  eligible:  '2.7'
+  note:  'These can be replaced by ''get_bool'' and intval ops unless you''re using them for things that aren''t really logical ops (don''t do that!). Logical vtables are removed in r49012, and logical ops on PMCs are converted to use ''get_bool'' internally. Rakudo seems to depend on logical ops on PMC.'
+  tags:
+    - 'deprecated'
+    - 'PMC'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1655'
+-
+  name:  'mmd_cvt_to_types'
+  eligible:  '1.1'
+  tags:
+    - 'deprecated'
+    - 'functions'
+  ticket:  'https://trac.parrot.org/parrot/ticket/907'
+-
+  name:  'multiple dispatch within core PMC'
+  eligible:  '1.1'
+  tags:
+    - 'deprecated'
+    - 'PMC'
+  ticket:  'https://trac.parrot.org/parrot/ticket/452'
+-
+  name:  'new_callback_p_p_p_s'
+  eligible:  '2.4'
+  note:  'To be replaced with new_callback_p_p_p_p_s.'
+  tags:
+    - 'deprecated'
+    - 'opcodes'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1548'
+-
+  name:  'opcode numbering'
+  tags:
+    - 'bytecode'
+    - 'experimental'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/451'
+-
+  name:  'open and close opcodes will be removed'
+  eligible:  '2.7'
+  note:  'These opcodes will be removed. The open/close methods on File or the FileHandle PMC should be used instead.'
+  tags:
+    - 'deprecated'
+    - 'opcodes'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1697'
+-
+  name:  'packfile structure'
+  tags:
+    - 'bytecode'
+    - 'experimental'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/451'
+-
+  name:  'pkg-config support'
+  eligible:  '3.1'
+  note:  'Use "parrot_config" instead.'
+  tags:
+    - 'deprecated'
+    - 'library'
+    - 'completed'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1853'
+-
+  name:  'Parrot_ext_try function'
+  tags:
+    - 'experimental'
+    - 'functions'
+  ticket:  'https://trac.parrot.org/parrot/ticket/1996'
+-
+  name:  'LANG search path with -L'
+  tags:
+    - 'experimental'
+    - 'api'
+    - 'library'
+  ticket:  ''

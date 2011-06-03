@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -84,20 +84,6 @@ Gets the result PMC after a thaw.
 
 /*
 
-=item C<VTABLE PMC *get_iter()>
-
-Get the C<todo> list for this freeze/thaw for iterating over.
-
-=cut
-
-*/
-
-    VTABLE PMC *get_iter() {
-        return PARROT_IMAGEIOSTRINGS(SELF)->todo;
-    }
-
-/*
-
 =item C<VTABLE INTVAL get_integer()>
 
 Returns the flags describing the visit action
@@ -177,8 +163,14 @@ Checks new pmcs for strings.
 
     VTABLE void set_pmc(PMC *p)
     {
+        PMC * const todo = PARROT_IMAGEIOSTRINGS(SELF)->todo;
         STATICSELF.push_pmc(p);
-        Parrot_visit_loop_visit(INTERP, SELF);
+        while (VTABLE_elements(INTERP, todo)) {
+            PMC * const current = VTABLE_shift_pmc(INTERP, todo);
+            VTABLE_freeze(INTERP, current, SELF);
+            VTABLE_visit(INTERP,  current, SELF);
+            SELF.push_pmc(PMC_metadata(current));
+        }
     }
 
 /*

@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -16,9 +16,11 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'test_more.pir'
-    plan(84)
+    plan(88)
     test_setting_array_size()
     test_assign_from_another()
     test_assign_self()
@@ -49,6 +51,13 @@ out-of-bounds test. Checks INT and PMC keys.
     test_invalid_init_tt1509()
 .end
 
+.sub exists_out_of_bounds
+    .local pmc fpa
+    fpa = new ['FixedPMCArray']
+    fpa = 5
+    $I0 = exists fpa[5]
+.end
+
 .sub test_exists
     .local pmc fpa
     fpa = new ['FixedPMCArray']
@@ -64,6 +73,9 @@ out-of-bounds test. Checks INT and PMC keys.
     fpa[$P1] = 99
     $I0 = exists fpa[$P1]
     ok($I0,'FixedPMCArray element existence')
+
+    .const 'Sub' out_of_bounds = 'exists_out_of_bounds'
+    throws_type(out_of_bounds, .EXCEPTION_OUT_OF_BOUNDS, 'exists ouf of bounds')
 .end
 
 .sub test_sort
@@ -170,6 +182,22 @@ out-of-bounds test. Checks INT and PMC keys.
     is_deeply(fpa, test3 )
 .end
 
+.sub cannot_auto_num
+    $P0 = new ['FixedPMCArray']
+    $P0 = 1
+    $P0[0;0] = 1.2
+.end
+
+.sub cannot_auto_pmc
+    .local pmc matrix, row, value
+    matrix = new ['FixedPMCArray'], 1
+    #row = new ['FixedPMCArray'], 1
+    #matrix[0] = row
+    value = new ['Integer']
+    matrix[0;0] = value
+    ok(1, "Check")
+.end
+
 .sub test_multi_keys
     .local pmc    matrix, row
     .local pmc    elem_in_pmc
@@ -235,14 +263,16 @@ out-of-bounds test. Checks INT and PMC keys.
     elem_out_string = matrix[0;0]
     is(elem_out_string,128)
 
-    throws_substring(<<'CODE', 'Cannot autovivify nested arrays', 'Autovivification of nested arrays fails')
-    .sub main
-        $P0 = new ['FixedPMCArray']
-        $P0 = 1
-        $P0[0;0] = 1.2
-    .end
-CODE
+    .const 'Sub' cannot_auto_num = 'cannot_auto_num'
+    throws_type(cannot_auto_num, .EXCEPTION_INVALID_OPERATION, 'Autovivification of nested arrays fails - num')
 
+    .const 'Sub' cannot_auto_pmc = 'cannot_auto_pmc'
+    throws_type(cannot_auto_pmc, .EXCEPTION_INVALID_OPERATION, 'Autovivification of nested arrays fails - pmc')
+
+    null $P1
+    matrix[0] = $P1
+    elem_out_pmc = matrix[0; 0]
+    is_null(elem_out_pmc, 'Attempt to recurse null element gives null')
 .end
 
 .sub test_equality
@@ -281,6 +311,9 @@ CODE
 
     is(fpa1,fpa2)
 
+    .local pmc nofpa
+    nofpa = new ['FixedStringArray']
+    isnt(fpa1, nofpa, 'Not equal to a different type')
 .end
 
 .sub test_elements

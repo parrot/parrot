@@ -154,16 +154,18 @@ Base class for harness output delegates
 
 .sub '_format_name' :method
     .param string name
-    $P0 = getattribute self, '_longest'
-    $I0 = $P0
+    $P0 = new 'StringBuilder'
+    push $P0, name
+    push $P0, ' '
+    $P1 = getattribute self, '_longest'
+    $I0 = $P1
     $I0 += 2
     $I1 = length name
     $I0 -= $I1
     $S0 = repeat '.', $I0
-    $S0 = ' ' . $S0
-    $S0 .= ' '
-    $S1 = name . $S0
-    .return ($S1)
+    push $P0, $S0
+    push $P0, ' '
+    .return ($P0)
 .end
 
 .sub 'open_test' :method

@@ -1,0 +1,231 @@
+# Copyright (C) 2011, Parrot Foundation.
+
+=head1 NAME
+
+docs/deprecations/deprecations.pod - Parrot Deprecations
+
+=head1 Parrot Deprecations
+
+This page exists to systematically document all deprecations that apply to core
+Parrot code.
+
+We don't hate our users and while we love ripping out crufty old code, we also
+don't want anyone developing code on top of Parrot to dread paying the
+"upgrade tax" when moving from one supported version to the next.
+
+The idea behind this page is that by following the instructions for each version
+transition, developers of HLLs and libraries can have a well-known and
+deterministic upgrade path.
+
+Any new deprecations must be described on the appropriate page and summarized
+here before being committed to master.  This deprecation policy will be
+instituted shortly before the 2.6 release.
+
+Although we will attempt to add notices for previous version transitions, these
+lists may be incomplete.
+
+Notifications for the 2.6->2.9 transition and later will be complete.
+
+For instructions on how to deprecate Parrot code, please see:
+ F<how-to-deprecate.pod>.
+
+=head2 Changes Between 3.3 and 3.6
+
+=over 4
+
+=item *
+
+Special Purpose NCI Parameter Types
+
+- moderate impact expected:
+  some NCI-using code needs to be rewritten
+
+=back
+
+=head2 Changes Between 3.0 and 3.3
+
+=over 4
+
+=item *
+
+pkg-config Support
+
+- low impact expected:
+  feature has been unusable since at least 1.0
+
+
+=back
+
+=head2 Changes Between 2.9 and 3.0
+
+This list is a summary.  A more complete description and migration path for each
+change is at F<deprecations_3_0.pod>.
+
+Any deprecations occurring after the 2.9.0 release require an accompanying
+notice here and F<deprecations_3_0.pod>, so the list should
+be exhaustive.
+
+If you find a deprecation that should be listed here, file a ticket
+ L<http://trac.parrot.org/parrot/newticket>
+or hop on #parrot on irc.parrot.org and let us know.
+
+=over 4
+
+=item *
+
+PARROT_ERRORS_GLOBALS_FLAG
+
+- low impact expected: no-op removal
+
+=item *
+
+CodeString.  TT #1633
+
+- high impact expected:
+  PGE interface changed. user updates required.
+
+=item *
+
+unique_reg PIR flag.  TT #1622
+
+- low impact expected:
+  equivalent functionality available by text substitution.
+
+=item *
+
+PIRspecialforms .nci_call and .meth_call.  TT #1623 TT #1624
+
+- low impact expected: no known users.
+
+=item *
+
+Indirect Register Access Ops.  TT #1642
+
+- low impact expected: no known users.
+
+=item *
+
+Exchange Op.  TT #1643
+
+- low impact expected: no known users.
+
+=item *
+
+PIR string literals with charset and encoding are deprecated.  TT #1808
+
+- medium impact expected:
+  the conversion is straightforward.
+
+=item *
+
+Remaining string_* functions are deprecated.  TT #1809
+
+- medium impact expected:
+  these functions have been deprecated for a while.
+
+=item *
+
+Method lower in String PMC.  TT #1606
+
+- low impact expected:
+  has been deprecated for a while.
+
+=item *
+
+Final removal of mutable strings leftovers.  TT #1540.
+
+- Op C<concat_s_s> was removed.
+  Trivial change to C<concat_s_s_s>
+  or slightly better solution to refactor with StringBuilder.
+
+=back
+
+=head2 Changes Between 2.6 and 2.9
+
+This list is a summary.  A more complete description and migration path for
+each change is at F<deprecations_2_9.pod>.
+
+If you find a deprecation that should be listed here, file a ticket
+ L<http://trac.parrot.org/parrot/newticket>
+or hop on #parrot on irc.parrot.org and let us know.
+
+=over 4
+
+=item *
+
+Remove charset opcodes. TT #1778
+
+- low impact expected: the conversion to encoding opcodes is straightforward.
+
+
+=item *
+
+Remove ParrotPCCINVOKE.
+
+- negligible impact expected:
+  this function has been deprecated for a long time.
+
+=item *
+Remove Parrot_find_global_s and Parrot_store_global_s  TT #1660
+
+- low impact expected: these functions were used rarely outside Parrot.
+
+=item *
+
+Change find_lex opcode behaviour.
+
+- low impact expected: this function has been deprecated for awhile.
+
+=item *
+
+Eliminate Raw NCI.
+
+- negligible impact expected:
+  this functionality has little use that doesn't result in a segfault
+
+=item *
+
+Remove Parrot_get_runtime_prefix.  TT #1191
+
+- Zero impact expected, it's been unused since long time.
+=item *
+
+RemoveIsTty Remove is_tty methods.  #1689
+
+- negligible impact expected.
+
+=back
+
+=head2 Changes Between 2.3 and 2.6
+
+This list is a summary.  A more complete description and migration path for
+each change is at F<deprecations_2_6.pod>.
+
+=over 4
+
+=item *
+
+Remove sizeof op.
+
+No replacement currently exists.  TT #633
+
+- negligible impact expected: this op was not widely used
+
+=item *
+
+Replace STRING_is_null with Parrot_str_is_null  TT #1585
+
+- moderate impact expected: simple textual substitution for C code dealing
+  with STRING* values
+
+=item *
+
+Remove in-place substr op variants.  TT #1450
+
+- high impact expected: most PIR code dealing with string substitution will
+  need to be updated
+
+
+=back
+
+=cut

@@ -1,0 +1,1129 @@
+# Copyright (C) 2001-2009, Parrot Foundation.
+
+=head1 PDD 13: Bytecode
+
+=head2 Abstract
+
+This PDD describes the file format for Parrot Bytecode (PBC) files and the
+interface through which they may be manipulated programmatically.
+
+
+
+
+
+=head2 Synopsis
+
+Parrot bytecode is a binary representation of instructions and data for
+execution on the virtual machine.
+
+=head2 Description
+
+PBC, Parrot bytecode, is the binary format used internally by the Parrot VM to
+store the data necessary to execute a compiled PIR program.  The sequence of
+instructions making up a Parrot program, a constants table, an annotations
+table and any ancillary data are stored in a PBC.  These files usually have
+the extension C<.pbc>.
+
+The PBC format is designed so that any valid PBC file can be read and executed
+by Parrot on any platform, but may be encoded more optimally for a particular
+platform.
+
+It is possible to add arbitrary annotations to the instruction sequence, for
+example line numbers in high level languages and other debug data.
+
+PMCs are be used to represent packfiles and packfile segments to provide a
+programmatic interface, both to Parrot programs and Parrot internals.
+
+=head2 Implementation
+
+=head3 Packfiles
+
+This section of the documentation describes the format of Parrot packfiles.
+These contain the bytecode (sequence of instructions), constants table, fixup
+table, debug data, annotations and possibly more.
+
+Note that, unless otherwise stated, all offsets and lengths are given in terms
+of Parrot opcodes, not bytes. An opcode corresponds to the word size, defined
+as long. The ptrsize is silently assumed to be the same as the opcode size.
+
+
+=head4 Packfile Header
+
+PBC files start with a variable length header. All data in this header is
+stored as strings or in a single byte so endianness and word size need not be
+considered when reading it.
+
+Note that in this section only, offsets and lengths are in bytes.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 8      | 0xFE 0x50 0x42 0x43 0x0D 0x0A 0x1A 0x0A                |
+  |        |        | Parrot "Magic String" to identify a PBC file. In C,    |
+  |        |        | this is the string C<\376PBC\r\n\032\n> or             |
+  |        |        | C<\xfe\x50\x42\x43\x0d\x0a\x1a\x0a>.                   |
+  +--------+--------+--------------------------------------------------------+
+  | 8      | 1      | Word size in bytes of words making up the segments of  |
+  |        |        | the PBC file. Must be one of:                          |
+  |        |        |    0x04 - 4 byte (32-bit) words                        |
+  |        |        |    0x08 - 8 byte (64-bit) words                        |
+  +--------+--------+--------------------------------------------------------+
+  | 9      | 1      | Byte order within the words making up the segments of  |
+  |        |        | the PBC file. Must be one of:                          |
+  |        |        |    0x00 - Little Endian                                |
+  |        |        |    0x01 - Big Endian                                   |
+  +--------+--------+--------------------------------------------------------+
+  | 10     | 1      | The encoding of floating point numbers in the file.    |
+  |        |        | Must be one of:                                        |
+  |        |        |    0x00 - IEEE 754 8 byte double                       |
+  |        |        |    0x01 - i386 little endian 12 byte long double       |
+  |        |        |    0x02 - IEEE 754 16 byte long double                 |
+  +--------+--------+--------------------------------------------------------+
+  | 11     | 1      | Major version number of the version of Parrot that     |
+  |        |        | wrote this bytecode file. For example, if Parrot 0.9.5 |
+  |        |        | wrote it, this byte would have the value 0.            |
+  +--------+--------+--------------------------------------------------------+
+  | 12     | 1      | Minor version number of the version of Parrot that     |
+  |        |        | wrote this bytecode file. For example, if Parrot 0.9.5 |
+  |        |        | wrote it, this byte would have the value 9.            |
+  +--------+--------+--------------------------------------------------------+
+  | 13     | 1      | Patch version number of the version of Parrot that     |
+  |        |        | wrote this bytecode file. For example, if Parrot 0.9.5 |
+  |        |        | wrote it, this byte would have the value 5.            |
+  +--------+--------+--------------------------------------------------------+
+  | 14     | 1      | Major version number of the bytecode file format. See  |
+  |        |        | the section below on bytecode file format version      |
+  |        |        | numbers.                                               |
+  +--------+--------+--------------------------------------------------------+
+  | 15     | 1      | Minor version number of the bytecode file format. See  |
+  |        |        | the section below on bytecode file format version      |
+  |        |        | numbers.                                               |
+  +--------+--------+--------------------------------------------------------+
+  | 16     | 1      | The type of the UUID associated with this packfile.    |
+  |        |        | Must be one of:                                        |
+  |        |        |    0x00 - No UUID                                      |
+  |        |        |    0x01 - MD5                                          |
+  +--------+--------+--------------------------------------------------------+
+  | 17     | 1      | Length of the UUID associated with this packfile. May  |
+  |        |        | be zero if the type of the UUID is 0x00. Maximum       |
+  |        |        | value is 255.                                          |
+  +--------+--------+--------------------------------------------------------+
+  | 18     | u      | A UUID of u bytes in length, where u was specified as  |
+  |        |        | the length of the UUID in the previous field. Be sure  |
+  |        |        | that UUIDs are stored and read as strings. The UUID is |
+  |        |        | computed by applying the hash function specified in    |
+  |        |        | the UUID type field over the entire packfile not       |
+  |        |        | including this header and its trailing zero padding.   |
+  +--------+--------+--------------------------------------------------------+
+  | 18 + u | n      | Zero-padding to make the total header length a         |
+  |        |        | multiple of 16 bytes in length.                        |
+  |        |        |    n = u % 16 ? 16 - (u % 16) : 0                      |
+  +--------+--------+--------------------------------------------------------+
+
+Everything beyond the header is an opcode, with word length and byte ordering
+as defined in the header.  If the word length and byte ordering of the machine
+that is reading the PBC file do not match these, it needs to transform the
+words making up the rest of the packfile.
+
+=over 4
+
+=item * Bytecode File Version Numbers
+
+The bytecode file version number exists to decouple the format of the bytecode
+file from the version of the Parrot implementation that is reading/writing it.
+It has a major and a minor part.
+
+The major version number should be incremented whenever there is a change to
+the layout of bytecode files. This includes new segments, changes to segment
+headers or changes to the format of the data held within a segment.
+
+The minor version number should be incremented in all other cases when a
+change is made that means a previous version of Parrot would not be able to
+run the program encoded in the packfile. This includes:
+
+=over 4
+
+=item Opcode renumbering
+
+=item Addition of new opcodes and removal of existing ones
+
+=item Addition of new core PMCs and removal of existing ones
+
+=item Changes to the interface (externally visible behaviour) of an opcode or
+PMC
+
+=back
+
+Parrot currently exits when reading an incompatible bytecode file
+version number. It is possible for a single version of Parrot to support
+reading and writing more than one bytecode file format, but this is not
+currently implemented. Future versions of Parrot may also provide a
+bytecode migration tool, to convert a bytecode file to a more recent
+format.
+
+The bytecode format versions are listed in the PBC_COMPAT file, sorted
+with the latest version first in the file:
+
+  MAJOR.MINOR DATE NAME DESCRIPTION
+
+=back
+
+We should be aware that some systems such as a Sparc/PPC 64-bit use strict
+8-byte ptr_alignment per default, and all C<(opcode_t*)cursor++> or
+C<(opcode_t*)cursor +=> advances must ensure that the cursor ptr is 8-byte
+aligned. We enforce 16-byte alignment at the start and end of all segments
+and ptrsize alignment for all items (strings, integers, and opcode_t ops),
+but not in-between, esp. with 4-byte integers and 4-byte opcode_t pointers.
+
+So we relax pointer alignment strictness on Sparc64, but may add a
+C<--64compat> option to parrot in the future to produce 8-byte aligned data.
+Operations on aligned pointers are much faster than on un-aligned pointers.
+
+
+=head4 Directory Format Header
+
+Packfiles contain a directory describing the segments that it contains.
+This header specifies the format of the directory.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 1      | The format of the directory. Must be:                  |
+  |        |        |    0x01 - Directory Format 1                           |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 3      | Must be:                                               |
+  |        |        |    0x00 0x00 0x00 - Reserved                           |
+  +--------+--------+--------------------------------------------------------+
+
+Currently only C<Format 1> exists. In the future, the format of the
+directory may change. A single version of Parrot may then become capable of
+generating and reading files of more than one directory format. This header
+enables Parrot to detect whether it is able to read the directory segment in
+the packfile.
+
+This header must be followed immediately by a directory segment.
+
+
+=head4 Packfile Segment Header
+
+All segments, regardless of type, start with a 1 opcode segment header. All
+other segments below are prefixed with this.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 1      | The total size of the segment in opcodes, including    |
+  |        |        | this header.                                           |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | Internal type of the segment                           |
+  +--------+--------+--------------------------------------------------------+
+  | 2      | 1      | Internal id                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 3      | 1      | Size of the following op array, 0 if none              |
+  +--------+--------+--------------------------------------------------------+
+
+
+=head4 Segment Padding
+
+All segments must have trailing zero (NULL) values appended so they are a
+multiple of 16 bytes in length. (This allows wordsize support of up to
+128 bits.)
+
+
+=head4 Directory Segment
+
+This segment lists the other segments that make up the packfile and where in
+the file they are located. It must occur immediately after the directory
+format header. Only one of these segments may occur in a packfile. In the
+future, a hierarchy of directories may be allowed.
+
+The directory segment adds one additional header after the standard packfile
+header data, which specifies the number of entries in the directory.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | The number of entries in the directory.                |
+  +--------+--------+--------------------------------------------------------+
+
+Following this are C<n> variable length entries formatted as described in the
+following table. Offsets are in words, but are given relative to the start of
+an individual entry.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 1      | The type of the segment. Must be one of the following: |
+  |        |        |    0x00 - Reserved (Directory Segment)                 |
+  |        |        |    0x01 - Default Segment                              |
+  |        |        |    0x02 - Fixup Segment                                |
+  |        |        |    0x03 - Constant Table Segment                       |
+  |        |        |    0x04 - Bytecode Segment                             |
+  |        |        |    0x05 - PIR Debug Segment                            |
+  |        |        |    0x06 - Annotations Segment                          |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | n      | The name of the segment, as a (NULL terminated) ASCII  |
+  |        |        | C string. This must be padded with trailing NULL       |
+  |        |        | (zero) values to be a full word in size.               |
+  +--------+--------+--------------------------------------------------------+
+  | n + 1  | 1      | The offset to the segment, relative to the start of    |
+  |        |        | the packfile. Specified as a number of words, where    |
+  |        |        | the word size is that specified in the header. (Parrot |
+  |        |        | may need to do some computation to transform this to   |
+  |        |        | an offset in terms of its own word size.) As segments  |
+  |        |        | must always be aligned on 16-byte boundaries, this     |
+  |        |        | scheme scales up to 128-bit platforms.                 |
+  +--------+--------+--------------------------------------------------------+
+  | n + 2  | 1      | The length of the segment, including its header, in    |
+  |        |        | words. This must match the length stored at the start  |
+  |        |        | of the header of the segment the entry is describing.  |
+  +--------+--------+--------------------------------------------------------+
+
+
+=head4 Default Segment
+
+The default segment has no additional headers. It will, if possible, be memory
+mapped. More than one may exist in the packfile, and they are identified by
+name. They may be used for storing any data that does not fit into any other
+segment, for example the source code from a high level language (HLL).
+
+
+=head4 Bytecode Segment
+
+This segment has no additional headers. It stores a stream of instructions in
+bytecode format, with the length given in the last field of the segment
+header.
+
+Instructions have variable length. Each instruction starts with an operation
+code (opcode).
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 1      | A valid Parrot opcode, as specified in the opcode      |
+  |        |        | list include/parrot/oplib/ops.h.                       |
+  +--------+--------+--------------------------------------------------------+
+
+Zero or more operands follow the opcode. All opcodes take a fixed number of
+operands.  An individual operand is always one word in length and may be of
+one of the following forms.
+
+  +------------------+-------------------------------------------------------+
+  | Operand Type     | Description                                           |
+  +------------------+-------------------------------------------------------+
+  | Register         | An integer specifying a register number.              |
+  +------------------+-------------------------------------------------------+
+  | Integer Constant | An integer that is the constant itself. That is, the  |
+  |                  | constant is stored directly in the instruction        |
+  |                  | stream. Storing integer constants of length greater   |
+  |                  | than 32 bits has undefined behaviour and should be    |
+  |                  | considered unportable.                                |
+  +------------------+-------------------------------------------------------+
+  | Number Constant  | An index into the constants table.                    |
+  +------------------+-------------------------------------------------------+
+  | String Constant  | An index into the constants table.                    |
+  +------------------+-------------------------------------------------------+
+  | PMC Constant     | An index into the constants table.                    |
+  +------------------+-------------------------------------------------------+
+
+
+=head4 Constants Segment
+
+This segment stores number, string and PMC constants.
+
+The first element is the number of constants contained.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 2      | 1      | The number of constants in the table.                  |
+  +--------+--------+--------------------------------------------------------+
+
+Following this are C<n> constants, each with a single word header specifying
+the type of constant that follows.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 1      | The type of the constant. Must be one of:              |
+  |        |        |    0x00 - No constant                                  |
+  |        |        |    0x6E - Number constant (ASCII 'n')                  |
+  |        |        |    0x73 - String constant (ASCII 's')                  |
+  |        |        |    0x70 - PMC constant (ASCII 'p')                     |
+  |        |        |    0x6B - Key constant (ASCII 'k')                     |
+  +--------+--------+--------------------------------------------------------+
+
+All constants that are not a multiple of the word size in length must be
+padded with trailing zero bytes up to a word size boundary.
+
+=over 4
+
+=item * Number Constants
+
+The number is stored in the format defined in the Packfile header. Any padding
+that is needed will follow.
+
+=item * String Constants
+
+String constants are stored in the following format, with offsets relative to
+the start of the constant including its type.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | Flags, copied from the string structure.               |
+  +--------+--------+--------------------------------------------------------+
+  | 2      | 1      | Character set; either the index of a built-in one or a |
+  |        |        | dynamically loaded one whose index is in a range given |
+  |        |        | in the dependencies table. Note that dynamically       |
+  |        |        | loaded character sets are not currently supported.     |
+  +--------+--------+--------------------------------------------------------+
+  | 3      | 1      | Encoding, either the index of a built-in one or a      |
+  |        |        | dynamically loaded one whose index is in a range given |
+  |        |        | in the dependencies table. Note that dynamically       |
+  |        |        | loaded encodings are not currently supported.          |
+  +--------+--------+--------------------------------------------------------+
+  | 4      | 1      | Length of the string data in bytes.                    |
+  +--------+--------+--------------------------------------------------------+
+  | 5      | n      | String data with trailing zero padding as required.    |
+  +--------+--------+--------------------------------------------------------+
+
+Note: The encoding and charset are currently packed together with the Flags,
+using an unique field of Length 1.
+
+
+=item * PMC Constants
+
+PMCs that can be saved in packfiles as constants implement the freeze and thaw
+vtable functions. Their frozen data is placed in a string, stored in the same
+format as a string constant.
+
+=item * Key Constants
+
+Key constants are made up a number of components, where one component is a
+"dimension" in the key. The number of components in the key is stored at the
+start of the constant.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | Number of key components that follow.                  |
+  +--------+--------+--------------------------------------------------------+
+
+Following this are C<n> entries of two words each that specify the key's
+type and value. The key value may be a register or another constant, but not
+another key constant. All constants other than integer constants are indexes
+into the constants table.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 1      | Type of the key. Must be one of:                       |
+  |        |        |    0x00 - Integer register                             |
+  |        |        |    0x01 - String register                              |
+  |        |        |    0x02 - PMC register                                 |
+  |        |        |    0x03 - Number register                              |
+  |        |        |    0x10 - Integer constant                             |
+  |        |        |    0x11 - String constant (constant table index)       |
+  |        |        |    0x12 - PMC constant (constant table index)          |
+  |        |        |    0x13 - Number constant (constant table index)       |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | Value of the key.                                      |
+  +--------+--------+--------------------------------------------------------+
+
+=back
+
+=head4 Fixup Segment
+
+The fixup segment maps names of subs to offsets in the bytecode stream.
+
+The number of fixup table entries, n, is given by the last field of the
+segment header.
+
+This is followed by n fixup table entries, of variable length, that take the
+following form.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 1      | Type of the fixup. Must be:                            |
+  |        |        |    0x01 - Subroutine fixup constant string             |
+  |        |        |    0x02 - Subroutine fixup ascii string                |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | -      | The label that is being fixed up. A string constant,   |
+  |        |        | stored as an index into the constants table in the 01  |
+  |        |        | case, a NULL terminated ASCII string padded to word    |
+  |        |        | length with zeroes in the 02.                          |
+  +--------+--------+--------------------------------------------------------+
+  | -      | 1      | This is an index into the constants table for the sub  |
+  |        |        | PMC corresponding to the label.                        |
+  +--------+--------+--------------------------------------------------------+
+
+
+=head4 PIR Debug Segment
+
+This segment stores the filenames and line numbers of PIR code that was
+compiled to bytecode. The segment comes in two parts.
+
+=over 4
+
+=item A list of mappings between instructions in the bytecode and line
+numbers, with one entry per instruction
+
+=item A list of mappings between offsets in the bytecode and filenames,
+indicating that the bytecode from that point on until the next entry was
+generated from the PIR found in the given filename
+
+=back
+
+The length of the table of line number mappings is given by the last field
+of the segment header.
+
+Then comes the table:
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 1      | Line number for the offset in the bytecode.            |
+  +--------+--------+--------------------------------------------------------+
+
+Then comes an opcode with n, the number of file mappings.
+
+Then come n mappings.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 1      | Offset in the bytecode.                                |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | A string constant holding the filename, stored as an   |
+  |        |        | index into the constants table.                        |
+  +--------+--------+--------------------------------------------------------+
+
+
+=head4 Annotations Segment
+
+Annotations allow any instruction in the bytecode stream to have zero or more
+key/value pairs associated with it. These can be retrieved at runtime. High
+level languages can use annotations to store file names, line numbers, column
+numbers and any other data, for debug purposes or otherwise, that they need.
+
+The segment comes in three parts:
+
+=over 4
+
+=item A list of annotation keys (for example, "line" and "file").
+
+=item An annotation groups table, used to group together annotations for a
+particular HLL source file (an annotation group starting clears all active
+annotations, so they will not spill over between source files; it also
+allows for faster lookup of annotations).
+
+{{ TODO: Does it clear all annotations, or all annotation groups? }}
+
+=item A list of indexes into the bytecode stream and key/value pairings (for
+example, starting at instruction 235, the annotation "line" has value "42").
+
+=back
+
+The last field of the segment header is not used.
+
+The first word in the segment supplies the number of keys.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | Number of annotation key entries that follow.          |
+  |        |        |    n                                                   |
+  +--------+--------+--------------------------------------------------------+
+
+Following this are C<n> annotation key entries. There is one entry per key
+(such as "line" or "file"), but the bytecode may be annotated many times
+with that key. Key entries take the following format.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 1      | Index into the constants table of a string containing  |
+  |        |        | the name of the key.                                   |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | The type of value that is stored with the key.         |
+  |        |        |    0x00 - Integer                                      |
+  |        |        |    0x01 - String Constant                              |
+  |        |        |    0x02 - Number Constant                              |
+  |        |        |    0x03 - PMC Constant                                 |
+  +--------+--------+--------------------------------------------------------+
+
+The annotation groups table comes next. This starts with a single integer to
+specify the number of entries in the table.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | Number of annotation group entries that follow.        |
+  +--------+--------+--------------------------------------------------------+
+
+A group entry maps an offset in the bytecode segment to an offset in the list
+of annotations (that is, offset 0 refers to the first word following this
+table). The list of offsets into the bytecode segment (and by the definition
+of this segment, the offsets into the annotations list) must be in ascending
+order.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 1      | Offset into the bytecode segment where the             |
+  |        |        | instructions for a particular high level source file   |
+  |        |        | start.                                                 |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | Offset into the annotations list specifying where the  |
+  |        |        | annotations for the given instruction start.           |
+  +--------+--------+--------------------------------------------------------+
+
+The rest of the segment is made up of a sequence of bytecode offset to key and
+value mappings. First comes the number of them that follow:
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | Number of bytecode to keypair mappings that follow.    |
+  |        |        |    n                                                   |
+  +--------+--------+--------------------------------------------------------+
+
+Then there are n entries of the following format:
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 1      | Offset into the bytecode segment, in words, of the     |
+  |        |        | instruction being annotated. At runtime, this will     |
+  |        |        | correspond to the program counter.                     |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | The key of the annotation, specified as an index into  |
+  |        |        | the zero-based list of keys specified in the first     |
+  |        |        | part of the segment. That is, if key "line" was the    |
+  |        |        | first entry and "file" the second, they would have     |
+  |        |        | indices 0 and 1 respectively.                          |
+  +--------+--------+--------------------------------------------------------+
+  | 2      | 2      | The value of the annotation. If the annotation type    |
+  |        |        | (specified with the key) is an integer, the value is   |
+  |        |        | placed directly into this word. Otherwise, an index    |
+  |        |        | into the constants table is used.                      |
+  +--------+--------+--------------------------------------------------------+
+
+Note that the value of an annotation with a particular key is taken to apply
+to all following instructions up to the point of a new value being specified
+for that key with another annotation. This means that if 20 instructions make
+up the compiled form of a single line of code, only one line annotation is
+required. Note that this also implies that annotations must be placed in
+the same order as the instructions.
+
+=head3 Packfile PMCs
+
+A packfile can be represented in memory by Parrot as a tree of PMCs. These
+provide a programmatic way to construct and walk packfiles, both for the
+Parrot internals and from programs running on the Parrot VM.
+
+{{ TODO... ManagedStruct and UnmanagedStruct may be helpful for these;
+consider switching these PMCs over to use them at some point. }}
+
+
+=head4 Packfile.pmc
+
+This PMC represents the packfile overall. It will be constructed by the VM
+when reading a packfile. It implements the following methods and vtable
+functions.
+
+=over 4
+
+=item * C<get_string> (vtable)
+
+Serializes this packfile data structure into a bytestream ready to be written
+to disk (that is, maps from PMCs to on-disk representation).
+
+=item * C<set_string_native> (vtable)
+
+Takes a string containing an entire packfile in the on-disk format, attempts
+to unpack it into a tree of Packfile PMCs and sets this Packfile PMC to
+represent the top of that tree (that is, maps from on-disk representation to a
+tree of PMCs).
+
+=item * C<get_integer_keyed_str> (vtable)
+
+Used to get data about fields in the header that have an integer value. Valid
+keys are:
+
+=over 4
+
+=item wordsize
+
+=item byteorder
+
+=item fptype
+
+=item version_major
+
+=item version_minor
+
+=item version_patch
+
+=item bytecode_major
+
+=item bytecode_minor
+
+=item uuid_type
+
+=back
+
+=item * C<get_string_keyed_str> (vtable)
+
+Used to get data about fields in the header that have a string value. Valid
+keys are:
+
+=over 4
+
+=item uuid
+
+=back
+
+=item * C<set_integer_keyed_str> (vtable)
+
+Used to set fields in the packfile header. Some fields are not allowed to be
+written since they are determined by the VM when serializing the packfile for
+storage on disk. The fields that may be set are:
+
+=over 4
+
+=item version_major
+
+=item version_minor
+
+=item version_patch
+
+=item uuid_type
+
+=back
+
+Be very careful when setting a version number; you should usually trust the VM
+to do the right thing with this.
+
+Setting the uuid_type will not result in immediate re-computation of the
+UUID, but rather will only cause it to be computed using the selected
+algorithm when the packfile is serialized (by calling the C<get_string>
+vtable function). Setting an invalid uuid_type value will cause an exception
+to be thrown immediately.
+
+=item * C<get_directory()>
+
+Returns the PackfileDirectory PMC that represents the directory segment at the
+start of the packfile.
+
+=back
+
+=head4 PackfileSegment.pmc
+
+An abstract PMC that is the base class for all other segments. It has two
+abstract methods, which are to be implemented by all subclasses. They will not
+be listed under the method list for other segment PMCs to save space.
+
+=over 4
+
+=item * C<STRING* pack()>
+
+Packs the segment into the on-disk format and returns a string holding it.
+
+=item * C<unpack(STRING*)>
+
+Takes the packed representation for a segment of the given type and then
+unpacks it, setting this PMC to represent that segment as a result of the
+unpacking. If an error occurs during the unpacking process, an exception will
+be thrown.
+
+=back
+
+=head4 PackfileDirectory.pmc (isa PackfileSegment)
+
+This PMC represents a directory segment. Essentially it is an hash of
+PackfileSegment PMCs. It implements the following methods:
+
+=over 4
+
+=item * C<elements> (vtable)
+
+Gets the number of segments listed in the directory.
+
+=item * C<get_pmc_keyed_str> (vtable)
+
+Searches the directory for a segment with the given name and, if one exists,
+returns a PackfileSegment PMC (or one of its subclasses) representing it.
+
+=item * C<set_pmc_keyed_str> (vtable)
+
+Adds a PackfileSegment PMC (or a subclass of it) to the directory with the
+name specified by the key. This is the only way to add another segment to the
+directory. If a segment of the given name already exists in the directory, it
+will be replaced with the supplied PMC.
+
+=item * C<delete_keyed_str> (vtable)
+
+Removes the PackfileSegment PMC from the directory which has the name
+specified by the key.  This is the only way to remove a segment from the
+directory.
+
+=item * C<get_iter> (vtable)
+
+Returns iterator for existing keys.
+
+=back
+
+=head4 PackfileRawSegment.pmc (isa PackfileSegment)
+
+This PMC presents a segment of a packfile as an array of integers. This is the
+lowest possible level of access to a segment, and covers both the default and
+bytecode segment types. It implements the following methods:
+
+=over 4
+
+=item * C<get_type>
+
+Get type of PackfileRawSegment.
+
+=item * C<set_type>
+
+Set type of PackfileRawSegment.
+
+=item * C<get_iter>
+
+Returns iterator for Segment.
+
+=item * C<get_integer_keyed_int> (vtable)
+
+Reads the integer at the specified offset into the segment, excluding the data
+in the common segment header but including the data making up additional
+fields in the header for a specific type of segment.
+
+=item * C<set_integer_keyed_int> (vtable)
+
+Stores an integer at the specified offset into the segment. Will throw an
+exception if the segment is memory mapped.
+
+=item * C<elements> (vtable)
+
+Gets the length of the segment in words, excluding the length of the common
+segment but including the data making up additional fields in the header for a
+specific type of segment.
+
+=back
+
+=head4 PackfileConstantTable.pmc (isa PackfileSegment)
+
+This PMC represents a constants table. It provides access to constants through
+the keyed integer interface (the interpreter may choose to access underlying
+structures directly to improve performance, however).
+
+The table of constants can be added to using the keyed set methods; it will
+grow automatically.
+
+The PMC implements the following methods:
+
+=over 4
+
+=item * C<get_iter>
+
+Returns iterator for stored Constants.
+
+=item * C<elements> (vtable)
+
+Gets the number of constants contained in the table.
+
+=item * C<get_number_keyed_int> (vtable)
+
+Gets the value of the number constant at the specified index in the constants
+table. If the constant at that position in the table is not a number, an
+exception will be thrown.
+
+=item * C<get_string_keyed_int> (vtable)
+
+Gets the value of the string constant at the specified index in the constants
+table. If the constant at that position in the table is not a string, an
+exception will be thrown.
+
+=item * C<get_pmc_keyed_int> (vtable)
+
+Gets the value of the PMC or key constant at the specified index in the
+constants table. If the constant at that position in the table is not a PMC
+or key, an exception will be thrown.
+
+=item * C<set_number_keyed_int> (vtable)
+
+Sets the value of the number constant at the specified index in the constants
+table. If the constant at that position in the table is not already a number
+constant, an exception will be thrown. If it does not exist, the table will be
+extended.
+
+=item * C<set_string_keyed_int> (vtable)
+
+Sets the value of the string constant at the specified index in the constants
+table. If the constant at that position in the table is not already a string
+constant, an exception will be thrown. If it does not exist, the table will be
+extended.
+
+=item * C<set_pmc_keyed_int> (vtable)
+
+Sets the value of the PMC or key constant at the specified index in the
+constants table. If the constant at that position in the table is not already
+a PMC or key constant, an exception will be thrown. If it does not exist, the
+table will be extended.
+
+=item * C<int get_type(int)>
+
+Returns an integer value denoting the type of the constant at the specified
+index. Possible values are:
+
+  +--------+-----------------------------------------------------------------+
+  | Value  | Constant Type                                                   |
+  +--------+-----------------------------------------------------------------+
+  | 0x00   | No Constant                                                     |
+  +--------+-----------------------------------------------------------------+
+  | 0x6E   | Number Constant                                                 |
+  +--------+-----------------------------------------------------------------+
+  | 0x73   | String Constant                                                 |
+  +--------+-----------------------------------------------------------------+
+  | 0x70   | PMC Constant                                                    |
+  +--------+-----------------------------------------------------------------+
+  | 0x6B   | Key Constant                                                    |
+  +--------+-----------------------------------------------------------------+
+
+=back
+
+=head4 PackfileFixupTable.pmc (isa PackfileSegment)
+
+This PMC provides a keyed integer interface to the fixup table. Each entry in
+the table is represented by a PackfileFixupEntry PMC. It implements the
+following methods:
+
+=over 4
+
+=item * C<get_iter> (vtable)
+
+Returns iterator for stored fixup entries.
+
+=item * C<elements> (vtable)
+
+Gets the number of entries in the fixup table.
+
+=item * C<get_pmc_keyed_int> (vtable)
+
+Gets a PackfileFixupEntry PMC for the fixup entry at the position given in
+the key. If the index is out of range, an exception will be thrown.
+
+=item * C<set_pmc_keyed_int> (vtable)
+
+Used to add a PackfileFixupEntry PMC to the fixups table or to replace an
+existing one. If the PMC that is supplied is not of type PackfileFixupEntry,
+an exception will thrown.
+
+=back
+
+=head4 PackfileFixupEntry.pmc
+
+This PMC represents an entry in the fixup table. It implements the following
+methods.
+
+=over 4
+
+=item * C<get_string> (vtable)
+
+Gets the label field of the fixup entry.
+
+=item * C<set_string_native> (vtable)
+
+Sets the label field of the fixup entry.
+
+=item * C<get_integer> (vtable)
+
+Gets the offset field of the fixup entry.
+
+=item * C<set_integer_native> (vtable)
+
+Sets the offset field of the fixup entry.
+
+=item * C<int get_type()>
+
+Gets the type of the fixup entry. See the entries table for possible fixup
+types.
+
+=item * C<set_type(int)>
+
+Sets the type of the fixup entry. See the entries table for possible fixup
+types. Specifying an invalid type will result in an exception.
+
+=back
+
+=head4 PackfileAnnotations.pmc (isa PackfileSegment)
+
+This PMC represents the bytecode annotations table. The following methods are
+implemented:
+
+=over 4
+
+=item * C<elements> (vtable)
+
+Gets the number of annotations in the table.
+
+=item * C<get_iter> (vtable)
+
+Get iterator for stored annotations.
+
+=item * C<get_pmc_keyed_int> (vtable)
+
+Gets the annotation at the specified index. If there is no annotation at that
+index, an exception will be thrown. The PMC that is returned will always be a
+PackfileAnnotation PMC.
+
+=item * C<set_pmc_keyed_int> (vtable)
+
+Sets the annotation at the specified index. If there is no annotation at that
+index, it is added to the list of annotations. An exception will be thrown
+unless all of the following conditions are met:
+
+=over 4
+
+=item - The type of the PMC passed is PackfileAnnotation
+
+=item - The entry at the previous index is defined
+
+=item - The offset of the previous entry is less than this entry
+
+=item - The offset of the next entry, if it exists, is greater than this entry
+
+=back
+
+=back
+
+=head4 PackfileAnnotation.pmc
+
+This PMC represents an individual bytecode annotation entry in the annotations
+segment. It implements the following methods:
+
+=over 4
+
+=item * C<int get_offset()>
+
+Gets the offset into the bytecode of the instruction that is being annotated.
+
+=item * C<set_offset(int)>
+
+Sets the offset into the bytecode of the instruction that is being annotated.
+
+=item * C<int get_name()>
+
+Gets the name of the annotation.
+
+=item * C<int set_name()>
+
+Sets the name of the annotation.
+
+=item * C<get_integer> (vtable)
+
+Gets the integer value of the annotation.
+
+=item * C<set_integer> (vtable)
+
+Sets the integer value of the annotation.
+
+=item * C<get_string> (vtable)
+
+Gets the string value of the annotation.
+
+=item * C<set_string> (vtable)
+
+Sets the string value of the annotation.
+
+=item * C<get_number> (vtable)
+
+Gets the number value of the annotation.
+
+=item * C<set_number> (vtable)
+
+Sets the number value of the annotation.
+
+=back
+
+=head2 Language Notes
+
+None.
+
+=head2 Attachments
+
+None.
+
+=head2 Footnotes
+
+=head3 Changes From Previous Versions
+
+A number of things in this PDD differ from the older implementation,
+and few items with the more convenient PMC access are not yet implemented.
+This section details these changes from the old implementation
+and some of the reasoning behind them.
+
+=head4 Packfile Header
+
+The format of the packfile header changed completely, based upon a
+proposal at
+L<http://groups.google.com/group/perl.perl6.internals/browse_thread/thread/1f1af615edec7449/ebfdbb5180a9d813?lnk=gst>
+and the requirement to have a UUID. The old INT field in the previous header
+format is used nowhere in Parrot and was removed, the parrot patch version
+number along with the major and minor was added. The opcode type is also gone
+due to non-use. The opcode type is always long.
+
+The version number now reflects the earliest version of Parrot that is capable
+of running the bytecode file, to enable cross-version compatibility that will
+be needed in the future.
+
+
+=head4 Segment Header
+
+Having the type associated with the segment inside the VM is fine, but since
+it is in the directory segment anyway it seems odd to duplicate it here. Also
+removed the id (did not seem to be used anywhere) and the second size (always
+computable by knowing the size of this header, so it appears redundant).
+
+
+=head4 Fixup Segment
+
+We need to support unicode sub names, so fixup labels should be an index into
+the constants table to the relevant string instead of just a C string as they
+are now.
+
+
+=head4 Annotations Segment
+
+This is new and replaces and builds upon the debug segment. See here for some
+on-list discussion:
+
+L<http://groups.google.com/group/perl.perl6.internals/browse_thread/thread/b0d36dafb42d96c4/4d6ad2ad2243e677?lnk=gst&rnum=2#4d6ad2ad2243e677>
+
+
+=head4 Packfile PMCs
+
+This idea will see packfiles and segments within them being represented by
+PMCs, easing memory management and providing an interface to packfiles for
+Parrot programs.
+
+Here are mailing list comments that provide one of the motivations or hints
+of the original proposal.
+
+L<http://groups.google.com/group/perl.perl6.internals/browse_thread/thread/778ea0ac4c8676f7/b249306b543b040a?lnk=gst&q=packfile+PMCs&rnum=2#b249306b543b040a>
+
+=head2 References
+
+None.
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
+vim: expandtab shiftwidth=4:

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -55,13 +55,12 @@ main(int argc, char* argv[])
     Interp *interp;
 
     interp = Parrot_new(NULL);
-    if (!interp) {
-        return 1;
+    if (interp) {
+        Parrot_x_on_exit(interp, ex1, 0);
+        Parrot_x_on_exit(interp, ex2, 0);
+        Parrot_x_on_exit(interp, ex3, 0);
+        Parrot_x_exit(interp, 0);
     }
-    Parrot_x_on_exit(interp, ex1, 0);
-    Parrot_x_on_exit(interp, ex2, 0);
-    Parrot_x_on_exit(interp, ex3, 0);
-    Parrot_x_exit(interp, 0);
     exit(0);
 }
 CODE

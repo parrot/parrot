@@ -369,13 +369,10 @@ cvt_num16_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
     memset(dest, 0, 12);
     /* simply copy over sign + exp */
-    TRACE_PRINTF_2(("  cvt_num16_num12: sign+exp=0x%2x\n", src[15]));
     dest[11] = src[15];
     dest[12] = src[14];
     /* and trunc the rest */
     memcpy(&dest[10], &src[13], 10);
-    TRACE_PRINTF_2(("  cvt_num16_num12: mantissa=0x%10x, double=%lf\n",
-                    src[13], (long double)*dest));
 }
 #endif
 
@@ -433,13 +430,10 @@ cvt_num12_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
     memset(dest, 0, 16);
     /* simply copy over sign + exp */
-    TRACE_PRINTF_2(("  cvt_num12_num16: sign+exp=0x%2x\n", src[11]));
     dest[15] = src[11];
     dest[14] = src[12];
     /* and trunc the rest */
     memcpy(&dest[13], &src[9], 10);
-    TRACE_PRINTF_2(("  cvt_num12_num15: mantissa=0x%10x, double=%lf\n",
-                    src[19], (long double)*dest));
 }
 #endif
 /*
@@ -572,7 +566,6 @@ cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     double d;
     memcpy(&d, src, 8);
     ld = (long double)d; /* TODO: test compiler cast */
-    /*TRACE_PRINTF_2(("  cvt_num8_num16: d=%f, ld=%lf\n", d, ld));*/
     memcpy(dest, &ld, 16);
 }
 #endif
@@ -599,7 +592,6 @@ cvt_num8_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     double d;
     memcpy(&d, src, 8);
     ld = (long double)d; /* compiler cast */
-    /*TRACE_PRINTF_2(("  cvt_num8_num12: ld=%lf, d=%f\n", ld, d));*/
     memcpy(dest, &ld, 12);
 }
 #endif
@@ -625,7 +617,6 @@ cvt_num8_num12_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ASSERT_ARGS(cvt_num8_num12_be)
     unsigned char b[8];
     fetch_buf_be_8(b, src);
-    /*TRACE_PRINTF_2(("  cvt_num8_num12_be: 0x%8x\n", b));*/
     cvt_num8_num12(dest, b);
 }
 #endif
@@ -650,7 +641,6 @@ cvt_num8_num16_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ASSERT_ARGS(cvt_num8_num16_le)
     unsigned char b[8];
     fetch_buf_be_8(b, src);  /* TODO test endianize */
-    TRACE_PRINTF_2(("  cvt_num8_num16_le: 0x%8x\n", b));
     cvt_num8_num16(dest, b);
 }
 #endif
@@ -675,7 +665,6 @@ cvt_num12_num16_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ASSERT_ARGS(cvt_num12_num16_le)
     unsigned char b[12];
     fetch_buf_be_12(b, src);  /* TODO test endianize */
-    TRACE_PRINTF_2(("  cvt_num12_num16_le: 0x%8x\n", b));
     cvt_num12_num16(dest, b);
 }
 #endif
@@ -700,7 +689,6 @@ cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ASSERT_ARGS(cvt_num12_num8_le)
     unsigned char b[12];
     fetch_buf_le_12(b, src);  /* TODO test endianize */
-    TRACE_PRINTF_2(("  cvt_num12_num8_le: 0x%12x\n", b));
     cvt_num12_num8(dest, b);
     exit_fatal(1, "cvt_num12_num8_le: long double conversion unsupported");
 }
@@ -727,7 +715,6 @@ cvt_num16_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ASSERT_ARGS(cvt_num16_num8_le)
     unsigned char b[16];
     fetch_buf_le_16(b, src);
-    TRACE_PRINTF_2(("  cvt_num16_num8_le: 0x%16x\n", b));
     cvt_num16_num8(dest, b);
     exit_fatal(1, "cvt_num16_num8_le: long double conversion unsupported");
 }
@@ -753,7 +740,6 @@ cvt_num16_num8_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ASSERT_ARGS(cvt_num16_num8_be)
     unsigned char b[16];
     fetch_buf_be_16(b, src);
-    TRACE_PRINTF_2(("  cvt_num16_num8_be: 0x%16x\n", b));
     cvt_num16_num8(dest, b);
 }
 #endif
@@ -778,7 +764,6 @@ cvt_num16_num12_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ASSERT_ARGS(cvt_num16_num12_be)
     unsigned char b[16];
     fetch_buf_be_16(b, src);
-    TRACE_PRINTF_2(("  cvt_num16_num12_be: 0x%16x\n", b));
     cvt_num16_num12(dest, b);
 }
 #endif
@@ -1033,8 +1018,7 @@ PF_fetch_integer(ARGIN(PackFile *pf), ARGIN(const opcode_t **stream))
     if (!pf->fetch_iv)
         return *(*stream)++;
     i = (pf->fetch_iv)(*((const unsigned char **)stream));
-    TRACE_PRINTF_VAL(("  PF_fetch_integer: 0x%x (%d) at 0x%x\n", i, i,
-                      OFFS(pf, *stream)));
+
     /* XXX assume sizeof (opcode_t) == sizeof (INTVAL) on the
      * machine producing this PBC.
      *
@@ -1106,25 +1090,19 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
     FLOATVAL f;
     double d;
     if (!pf || !pf->fetch_nv) {
-        TRACE_PRINTF(("PF_fetch_number: Native [%d bytes]\n",
-                      sizeof (FLOATVAL)));
         memcpy(&f, (const char *)*stream, sizeof (FLOATVAL));
-        TRACE_PRINTF_VAL(("PF_fetch_number: %f at 0x%x\n", f, OFFS(pf, *stream)));
         (*stream) += (sizeof (FLOATVAL) + sizeof (opcode_t) - 1)/
             sizeof (opcode_t);
         return f;
     }
     f = (FLOATVAL) 0;
-    TRACE_PRINTF(("PF_fetch_number at 0x%x: Converting...\n", OFFS(pf, *stream)));
     /* 12->8 has a messy cast. */
     if (NUMVAL_SIZE == 8 && pf->header->floattype == FLOATTYPE_12) {
         (pf->fetch_nv)((unsigned char *)&d, (const unsigned char *) *stream);
         f = d;
-        TRACE_PRINTF_VAL(("PF_fetch_number: cast %f\n", f));
     }
     else {
         (pf->fetch_nv)((unsigned char *)&f, (const unsigned char *) *stream);
-        TRACE_PRINTF_VAL(("PF_fetch_number: %f\n", f));
     }
     if (pf->header->floattype == FLOATTYPE_8) {
         *((const unsigned char **) (stream)) += 8;
@@ -1331,10 +1309,6 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 
     size = (size_t)PF_fetch_opcode(pf, cursor);
 
-    TRACE_PRINTF(("PF_fetch_string(): flags=0x%04x, ", flags));
-    TRACE_PRINTF(("encoding_nr=%ld, ", encoding_nr));
-    TRACE_PRINTF(("size=%ld.\n", size));
-
     encoding = Parrot_get_encoding(interp, encoding_nr);
     if (!encoding)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
@@ -1346,19 +1320,9 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
     else
         s = CONST_STRING(interp, "");
 
-    /* print only printable characters */
-    TRACE_PRINTF_VAL(("PF_fetch_string(): string is '%s' at 0x%x\n",
-                      s->strstart, OFFS(pf, *cursor)));
-
-    TRACE_PRINTF_ALIGN(("-s ROUND_UP_B: cursor=0x%x, size=%d, wordsize=%d\n",
-                        (const char *)*cursor + size, size, wordsize));
-
     size = ROUND_UP_B(size, wordsize);
-
-    TRACE_PRINTF(("PF_fetch_string(): round size up to %ld.\n", size));
     *((const unsigned char **) (cursor)) += size;
 
-    TRACE_PRINTF_ALIGN(("+s ROUND_UP_B: cursor=0x%x, size=%d\n", *cursor, size));
     return s;
 }
 
@@ -1381,10 +1345,6 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
     ASSERT_ARGS(PF_store_string)
     opcode_t padded_size = s->bufused;
     char *charcursor;
-
-#if TRACE_PACKFILE == 3
-    Parrot_io_eprintf(NULL, "PF_store_string(): size is %ld...\n", s->bufused);
-#endif
 
     if (padded_size % sizeof (opcode_t)) {
         padded_size += sizeof (opcode_t) - (padded_size % sizeof (opcode_t));
@@ -1499,16 +1459,8 @@ PF_fetch_cstring(PARROT_INTERP, ARGIN(PackFile *pf), ARGIN(const opcode_t **curs
     char * const p = mem_gc_allocate_n_typed(interp, str_len, char);
     const int wordsize = pf->header->wordsize;
 
-    TRACE_PRINTF(("PF_fetch_cstring(): size is %ld...\n", str_len));
     strcpy(p, (const char*) (*cursor));
-    TRACE_PRINTF_VAL(("PF_fetch_cstring(): string is '%s' at 0x%x\n",
-                      p, OFFS(pf, *cursor)));
-    TRACE_PRINTF_ALIGN(("-s ROUND_UP_B: cursor=0x%x, size=%d, wordsize=%d (cstring)\n",
-                        *cursor, str_len, wordsize));
     *((const unsigned char **) (cursor)) += ROUND_UP_B(str_len, wordsize);
-    TRACE_PRINTF_ALIGN(("+s ROUND_UP_B: cursor=0x%x, offset=0x%x\n",
-                        *cursor, OFFS(pf, *cursor)));
-
     return p;
 }
 

@@ -26,8 +26,7 @@ numbered.  You probably want src/embed/api.c
 #include "pmc/pmc_callcontext.h"
 #include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
-
-#include "../compilers/imcc/imc.h"
+#include "imcc/embed.h"
 
 #include "embed.str"
 
@@ -40,8 +39,9 @@ static void print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
-        __attribute__nonnull__(1);
+static void print_debug(PARROT_INTERP, int status, ARGIN(void *p))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
@@ -52,7 +52,8 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(output))
 #define ASSERT_ARGS_print_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(p_unused))
 #define ASSERT_ARGS_setup_argv __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(argv))
@@ -404,180 +405,10 @@ Parrot_PackFile
 Parrot_pbc_read(PARROT_INTERP, ARGIN_NULLOK(const char *fullname), const int debug)
 {
     ASSERT_ARGS(Parrot_pbc_read)
-    PackFile *pf;
-    char     *program_code;
-    FILE     *io        = NULL;
-    INTVAL    is_mapped = 0;
-    INTVAL    program_size;
+    STRING *str = Parrot_str_new(interp, fullname, 0);
 
-#ifdef PARROT_HAS_HEADER_SYSMMAN
-    int       fd        = -1;
-#endif
-
-    if (!fullname || STREQ(fullname, "-")) {
-        /* read from STDIN */
-        io = stdin;
-
-        /* read 1k at a time */
-        program_size = 0;
-    }
-    else {
-        STRING * const fs = Parrot_str_new_init(interp, fullname, strlen(fullname),
-            Parrot_default_encoding_ptr, 0);
-
-        /* can't read a file that doesn't exist */
-        if (!Parrot_stat_info_intval(interp, fs, STAT_EXISTS)) {
-            Parrot_io_eprintf(interp, "Parrot VM: Can't stat %s, code %i.\n",
-                    fullname, errno);
-            return NULL;
-        }
-
-        /* we may need to relax this if we want to read bytecode from pipes */
-        if (!Parrot_stat_info_intval(interp, fs, STAT_ISREG)) {
-            Parrot_io_eprintf(interp,
-                "Parrot VM: '%s', is not a regular file %i.\n",
-                fullname, errno);
-            return NULL;
-        }
-
-        program_size = Parrot_stat_info_intval(interp, fs, STAT_FILESIZE);
-
-#ifndef PARROT_HAS_HEADER_SYSMMAN
-        io = fopen(fullname, "rb");
-
-        if (!io) {
-            Parrot_io_eprintf(interp, "Parrot VM: Can't open %s, code %i.\n",
-                    fullname, errno);
-            return NULL;
-        }
-#endif  /* PARROT_HAS_HEADER_SYSMMAN */
-
-    }
-#ifdef PARROT_HAS_HEADER_SYSMMAN
-again:
-#endif
-    /* if we've opened a file (or stdin) with PIO, read it in */
-    if (io) {
-        char  *cursor;
-        size_t chunk_size = program_size > 0 ? program_size : 1024;
-        INTVAL wanted     = program_size;
-        size_t read_result;
-
-        program_code = mem_gc_allocate_n_typed(interp, chunk_size, char);
-        cursor       = program_code;
-        program_size = 0;
-
-        while ((read_result = fread(cursor, 1, chunk_size, io)) > 0) {
-            program_size += read_result;
-
-            if (program_size == wanted)
-                break;
-
-            chunk_size   = 1024;
-            program_code = mem_gc_realloc_n_typed(interp, program_code,
-                    program_size + chunk_size, char);
-
-            if (!program_code) {
-                Parrot_io_eprintf(interp,
-                            "Parrot VM: Could not reallocate buffer "
-                            "while reading packfile from PIO.\n");
-                fclose(io);
-                return NULL;
-            }
-
-            cursor = (char *)(program_code + program_size);
-        }
-
-        if (ferror(io)) {
-            Parrot_io_eprintf(interp,
-             "Parrot VM: Problem reading packfile from PIO:  code %d.\n",
-                        ferror(io));
-            fclose(io);
-            mem_gc_free(interp, program_code);
-            return NULL;
-        }
-
-        fclose(io);
-    }
-    else {
-        /* if we've gotten here, we opted not to use PIO to read the file.
-         * use mmap */
-
-#ifdef PARROT_HAS_HEADER_SYSMMAN
-
-        /* check that fullname isn't NULL, just in case */
-        if (!fullname)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                "Trying to open a NULL filename");
-
-        fd = open(fullname, O_RDONLY | O_BINARY);
-
-        if (!fd) {
-            Parrot_io_eprintf(interp, "Parrot VM: Can't open %s, code %i.\n",
-                    fullname, errno);
-            return NULL;
-        }
-
-        program_code = (char *)mmap(0, (size_t)program_size,
-                        PROT_READ, MAP_SHARED, fd, (off_t)0);
-
-        if (program_code == (void *)MAP_FAILED) {
-            Parrot_warn(interp, PARROT_WARNINGS_IO_FLAG,
-                    "Parrot VM: Can't mmap file %s, code %i.\n",
-                    fullname, errno);
-
-            /* try again, now with IO reading the file */
-            io = fopen(fullname, "rb");
-            if (!io) {
-                Parrot_io_eprintf(interp,
-                    "Parrot VM: Can't open %s, code %i.\n", fullname, errno);
-                return NULL;
-            }
-            goto again;
-        }
-
-        is_mapped = 1;
-
-#else   /* PARROT_HAS_HEADER_SYSMMAN */
-
-        Parrot_io_eprintf(interp, "Parrot VM: uncaught error occurred reading "
-                    "file or mmap not available.\n");
-        return NULL;
-
-#endif  /* PARROT_HAS_HEADER_SYSMMAN */
-
-    }
-
-    /* Now that we have the bytecode, let's unpack it. */
-
-    pf = PackFile_new(interp, is_mapped);
-
-    /* Make the cmdline option available to the unpackers */
-    pf->options = debug;
-
-    if (!PackFile_unpack(interp, pf, (opcode_t *)program_code,
-            (size_t)program_size)) {
-        Parrot_io_eprintf(interp, "Parrot VM: Can't unpack packfile %s.\n",
-                fullname);
-        return NULL;
-    }
-
-    /* Set :main routine */
-    if (!(pf->options & PFOPT_HEADERONLY))
-        do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
-
-    /* Prederefing the sub/the bytecode is done in switch_to_cs before
-     * actual usage of the segment */
-
-#ifdef PARROT_HAS_HEADER_SYSMMAN
-    /* the man page states that it's ok to close a mmaped file */
-    if (fd >= 0)
-        close(fd);
-#endif
-
-    return pf;
+    return PackFile_read_pbc(interp, str, debug);
 }
-
 
 /*
 
@@ -597,13 +428,7 @@ void
 Parrot_pbc_load(PARROT_INTERP, ARGIN(Parrot_PackFile pf))
 {
     ASSERT_ARGS(Parrot_pbc_load)
-    if (!pf) {
-        Parrot_io_eprintf(interp, "Invalid packfile\n");
-        return;
-    }
-
-    interp->initial_pf = pf;
-    interp->code       = pf->cur_cs;
+    Parrot_pf_set_current_packfile(interp, pf);
 }
 
 /*
@@ -623,13 +448,19 @@ int
 Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
 {
     ASSERT_ARGS(Parrot_load_bytecode_file)
+#if 0
     PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
 
     Parrot_warn_experimental(interp, "Parrot_load_bytecode_file is experimental");
     if (!pf)
         return 0;
-    Parrot_pbc_load(interp, pf);
+    Parrot_pf_set_current_packfile(interp, pf);
     return 1;
+#else
+    UNUSED(interp);
+    UNUSED(filename);
+#endif
+    return 0;
 }
 
 /*
@@ -705,7 +536,7 @@ Prints GC info.
 */
 
 static void
-print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
+print_debug(PARROT_INTERP, SHIM(int status), ARGIN(SHIM(void *p)))
 {
     ASSERT_ARGS(print_debug)
     if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
@@ -750,7 +581,7 @@ set_current_sub(PARROT_INTERP)
      */
 
     for (i = 0; i < ct->pmc.const_count; i++) {
-        PMC *sub_pmc = ct->pmc.constants[i];
+        PMC * const sub_pmc = ct->pmc.constants[i];
         if (VTABLE_isa(interp, sub_pmc, SUB)) {
             Parrot_Sub_attributes *sub;
 
@@ -904,7 +735,7 @@ print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
         Parrot_io_fprintf(interp, output, "STR_CONST(%d): %S\n", i, ct->str.constants[i]);
 
     for (i = 0; i < ct->pmc.const_count; i++) {
-        PMC *c = ct->pmc.constants[i];
+        PMC * const c = ct->pmc.constants[i];
         Parrot_io_fprintf(interp, output, "PMC_CONST(%d): ", i);
 
         switch (c->vtable->base_type) {
@@ -983,7 +814,7 @@ Parrot_disassemble(PARROT_INTERP,
     PMC *output;
 
     if (outfile != NULL) {
-        output = Parrot_io_open(interp, PMCNULL,
+        output = Parrot_io_open_handle(interp, PMCNULL,
                 Parrot_str_new(interp, outfile, 0),
                 Parrot_str_new_constant(interp, "tw"));
     }
@@ -1055,59 +886,9 @@ Parrot_disassemble(PARROT_INTERP,
         ++op_code_seq_num;
     }
     if (outfile != NULL)
-        Parrot_io_close(interp, output);
+        Parrot_io_close_handle(interp, output);
 
     return;
-}
-
-
-/*
-
-=item C<void Parrot_run_native(PARROT_INTERP, native_func_t func)>
-
-Runs the C function C<func> through the program C<[enternative, end]>.  This
-ensures that the function runs with the same setup as in other run loops.
-
-This function is used in some of the source tests in F<t/src> which use
-the interpreter outside a runloop.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_run_native(PARROT_INTERP, native_func_t func)
-{
-    ASSERT_ARGS(Parrot_run_native)
-    op_lib_t *core_ops  = PARROT_GET_CORE_OPLIB(interp);
-    PackFile * const pf = PackFile_new(interp, 0);
-    static opcode_t program_code[2] = {
-        0, /* enternative */
-        1  /* end */
-    };
-
-    static op_func_t op_func_table[2];
-    op_func_table[0] = core_ops->op_func_table[PARROT_OP_enternative];
-    op_func_table[1] = core_ops->op_func_table[PARROT_OP_end];
-
-
-    pf->cur_cs = (PackFile_ByteCode *)
-        (pf->PackFuncs[PF_BYTEC_SEG].new_seg)(interp, pf,
-                Parrot_str_new_constant(interp, "code"), 1);
-    pf->cur_cs->base.data     = program_code;
-    pf->cur_cs->base.size     = 2;
-    pf->cur_cs->op_func_table = op_func_table;
-    /* TODO fill out cur_cs with op_mapping */
-
-    Parrot_pbc_load(interp, pf);
-
-    run_native = func;
-
-    if (interp->code && interp->code->const_table)
-        Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
-
-    runops(interp, interp->resume_offset);
 }
 
 
@@ -1123,31 +904,38 @@ Compiles a code string.
 */
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 Parrot_PMC
 Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code),
         ARGOUT(Parrot_String *error))
 {
     ASSERT_ARGS(Parrot_compile_string)
-    /* For the benefit of embedders that do not load any pbc
-     * before compiling a string */
+    PMC * const compiler = Parrot_get_compiler(interp, type);
 
-    if (!interp->initial_pf) {
-        /* SIDE EFFECT: PackFile_new_dummy sets interp->initial_pf */
-        interp->initial_pf = PackFile_new_dummy(interp, CONST_STRING(interp, "compile_string"));
-        /* Assumption: there is no valid reason to fail to create it.
-         * If the assumption changes, replace the assertion with a
-         * runtime check */
-        PARROT_ASSERT(interp->initial_pf);
+    /* XXX error is not being set */
+    if (PMC_IS_NULL(compiler)) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not find compiler %Ss", type);
     }
+    else {
+        PMC *result;
+        STRING * const code_s = Parrot_str_new(interp, code, 0);
+        imc_info_t * imcc     = (imc_info_t*) VTABLE_get_pointer(interp, compiler);
+        const INTVAL is_pasm  = VTABLE_get_integer(interp, compiler);
 
-    if (STRING_equal(interp, CONST_STRING(interp, "PIR"), type))
-        return IMCC_compile_pir_s(interp, code, error);
+        Parrot_block_GC_mark(interp);
+        result = imcc_compile_string(imcc, code_s, is_pasm);
+        if (PMC_IS_NULL(result)) {
+            STRING * const msg = imcc_last_error_message(imcc);
+            const INTVAL code  = imcc_last_error_code(imcc);
 
-    if (STRING_equal(interp, CONST_STRING(interp, "PASM"), type))
-        return IMCC_compile_pasm_s(interp, code, error);
-
-    *error = Parrot_str_new(interp, "Invalid interpreter type", 0);
-    return NULL;
+            Parrot_unblock_GC_mark(interp);
+            Parrot_ex_throw_from_c_args(interp, NULL, code, "%Ss", msg);
+        }
+        Parrot_unblock_GC_mark(interp);
+        return result;
+    }
 }
 
 /*

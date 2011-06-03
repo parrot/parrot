@@ -403,6 +403,8 @@ inline op copy(inout PMC, invar PMC) :base_mem {
         PMC   * const clone = VTABLE_clone(interp, $2);
         /* Preserve the metadata on the destination. */
         PMC   * const meta  = VTABLE_getprops(interp, $1);
+        /* We have to preserve GC flags of original PMC */
+        const Parrot_UInt gc_flags = $1->flags & PObj_GC_all_FLAGS;
 
         /* avoid leaks and unreachable memory by destroying the destination PMC */
         Parrot_pmc_destroy(interp, $1);
@@ -410,6 +412,10 @@ inline op copy(inout PMC, invar PMC) :base_mem {
         /* the source PMC knows how to clone itself, but we must reuse the
          * destination header */
         memmove($1, clone, sizeof (PMC));
+
+        /* Restore old flags and soil destination. We've changed it */
+        $1->flags |= gc_flags;
+        PARROT_GC_WRITE_BARRIER(interp, $1);
 
         /* don't let the clone's destruction destroy the destination's data */
         PObj_custom_destroy_CLEAR(clone);
@@ -484,7 +490,7 @@ inline op null(out NUM) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 LICENSE
 

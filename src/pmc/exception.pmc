@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -65,6 +65,7 @@ typedef enum {
     attr_handler_iter,
     attr_handler_ctx,
     attr_thrower,
+    attr_bt_strings,
     attr_NONE = -1
 } AttrEnum;
 
@@ -83,7 +84,7 @@ static AttrEnum getAttrEnum(PARROT_INTERP, ARGIN(const STRING *name))
 /* HEADERIZER END: static */
 
 
-pmclass Exception auto_attrs {
+pmclass Exception provides Exception auto_attrs {
 
     ATTR INTVAL          id;           /* The task ID in the scheduler. */
     ATTR FLOATVAL        birthtime;    /* The creation time stamp of the exception. */
@@ -98,6 +99,7 @@ pmclass Exception auto_attrs {
     ATTR PMC            *handler_iter; /* An iterator of handlers (for rethrow). */
     ATTR PMC            *handler_ctx;  /* A stored context for handler iterator. */
     ATTR PMC            *thrower;      /* The position we were at when thrown. */
+    ATTR PMC            *bt_strings;   /* A cache of old backtraces, for rethrows */
 
 /*
 
@@ -126,6 +128,7 @@ Initializes the exception with default values.
         SET_ATTR_handler_iter(INTERP, SELF, PMCNULL);
         SET_ATTR_handler_ctx(INTERP, SELF, PMCNULL);
         SET_ATTR_thrower(INTERP, SELF, PMCNULL);
+        SET_ATTR_bt_strings(INTERP, SELF, PMCNULL);
     }
 
 /*
@@ -199,6 +202,7 @@ information.
         INTVAL   severity;
         INTVAL   type;
         INTVAL   exit_code;
+        PMC      *bt_strings;
         GET_ATTR_id(INTERP, SELF, id);
         SET_ATTR_id(INTERP, dest, id);
         GET_ATTR_message(INTERP, SELF, message);
@@ -209,6 +213,11 @@ information.
         SET_ATTR_type(INTERP, dest, type);
         GET_ATTR_exit_code(INTERP, SELF, exit_code);
         SET_ATTR_exit_code(INTERP, dest, exit_code);
+        GET_ATTR_bt_strings(INTERP, SELF, bt_strings);
+        if (!PMC_IS_NULL(bt_strings)) {
+            bt_strings = VTABLE_clone(INTERP, bt_strings);
+            SET_ATTR_bt_strings(INTERP, SELF, bt_strings);
+        }
 
         GET_ATTR_payload(INTERP, SELF, payload);
         if (!PMC_IS_NULL(payload)) {
@@ -292,6 +301,7 @@ Mark any active exception data as live.
         Parrot_gc_mark_PMC_alive(INTERP, core_struct->handler_iter);
         Parrot_gc_mark_PMC_alive(INTERP, core_struct->handler_ctx);
         Parrot_gc_mark_PMC_alive(INTERP, core_struct->thrower);
+        Parrot_gc_mark_PMC_alive(INTERP, core_struct->bt_strings);
     }
 
 /*
@@ -669,7 +679,7 @@ Retrieve an attribute value for the exception object.
             break;
           case attr_message:
             {
-            STRING *message = SELF.get_string();
+            STRING * const message = SELF.get_string();
             value = Parrot_pmc_new(INTERP, enum_class_String);
             VTABLE_set_string_native(INTERP, value, message);
             }
@@ -696,6 +706,9 @@ Retrieve an attribute value for the exception object.
             break;
           case attr_thrower:
             GET_ATTR_thrower(INTERP, SELF, value);
+            break;
+          case attr_bt_strings:
+            GET_ATTR_bt_strings(INTERP, SELF, value);
             break;
           case attr_NONE:
             /* If unknown attribute name, throw an exception. */
@@ -765,6 +778,9 @@ Set an attribute value for the exception object.
             break;
           case attr_thrower:
             SET_ATTR_thrower(INTERP, SELF, value);
+            break;
+          case attr_bt_strings:
+            SET_ATTR_bt_strings(INTERP, SELF, value);
             break;
           case attr_NONE:
             /* If unknown attribute name, throw an exception. */
@@ -885,6 +901,16 @@ sub, or for the point of the call a level deeper for the rest.
         RETURN(PMC *result);
     }
 
+    METHOD backtrace_strings() {
+        PMC * bt_strings = PMCNULL;
+        STRING * const bt = Parrot_dbg_get_exception_backtrace(INTERP, SELF);
+        GET_ATTR_bt_strings(INTERP, SELF, bt_strings);
+        if (PMC_IS_NULL(bt_strings))
+            bt_strings = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        VTABLE_unshift_string(INTERP, bt_strings, bt);
+        RETURN(PMC *bt_strings);
+    }
+
 
 /*
 
@@ -940,6 +966,8 @@ getAttrEnum(PARROT_INTERP, ARGIN(const STRING *name))
         r = attr_handler_ctx;
     else if (STRING_equal(interp, name, CONST_STRING(interp, "thrower")))
         r = attr_thrower;
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "bt_strings")))
+        r = attr_bt_strings;
     else
         r = attr_NONE;
     return r;

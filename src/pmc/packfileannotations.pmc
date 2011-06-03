@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -36,9 +36,6 @@ pmclass PackfileAnnotations auto_attrs extends PackfileSegment {
     /* ConstantTable used for names lookup */
     ATTR PMC *const_table;
 
-    /* Annotations group: two RIA for a now */
-    ATTR PMC *gr_byte;
-    ATTR PMC *gr_entries;
     /* RPA of Annotation */
     ATTR PMC *annotations;
 
@@ -52,7 +49,7 @@ Initialize PackfileAnnotations.
 
 */
     VTABLE void init() {
-        Parrot_PackfileAnnotations_attributes * attrs =
+        Parrot_PackfileAnnotations_attributes * const attrs =
                 PMC_data_typed(SELF, Parrot_PackfileAnnotations_attributes*);
 
         attrs->annotations = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
@@ -75,12 +72,10 @@ Marks the object as live.
 */
 
     VTABLE void mark() {
-        Parrot_PackfileAnnotations_attributes * attrs =
+        Parrot_PackfileAnnotations_attributes * const attrs =
                 PARROT_PACKFILEANNOTATIONS(SELF);
 
         Parrot_gc_mark_PMC_alive(INTERP, attrs->const_table);
-        Parrot_gc_mark_PMC_alive(INTERP, attrs->gr_byte);
-        Parrot_gc_mark_PMC_alive(INTERP, attrs->gr_entries);
         Parrot_gc_mark_PMC_alive(INTERP, attrs->annotations);
 
         SUPER();
@@ -142,9 +137,9 @@ thrown unless all of the following criteria are met:
 
 */
     VTABLE void set_pmc_keyed_int(INTVAL index, PMC *annotation)  {
-        Parrot_PackfileAnnotations_attributes * attrs =
+        const Parrot_PackfileAnnotations_attributes * const attrs =
                 PARROT_PACKFILEANNOTATIONS(SELF);
-        Parrot_PackfileAnnotation_attributes  * entity_attrs =
+        const Parrot_PackfileAnnotation_attributes  * const entity_attrs =
                 PARROT_PACKFILEANNOTATION(annotation);
         INTVAL dummy;
 
@@ -161,12 +156,6 @@ thrown unless all of the following criteria are met:
                 Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                     "get_or_create_constant", "PS->I", attrs->const_table,
                     entity_attrs->str_value, &dummy);
-                break;
-
-            case PF_ANNOTATION_KEY_TYPE_NUM:
-                Parrot_mmd_multi_dispatch_from_c_args(INTERP,
-                    "get_or_create_constant", "PN->I", attrs->const_table,
-                    entity_attrs->num_value, &dummy);
                 break;
 
             default:
@@ -189,15 +178,13 @@ PackfileAnnotationKeys.
 */
 
     METHOD set_directory(PMC *directory) {
-        Parrot_PackfileAnnotations_attributes *attrs =
+        Parrot_PackfileAnnotations_attributes * const attrs =
                 PARROT_PACKFILEANNOTATIONS(SELF);
-        STRING *name;
-        PMC    *segment;
 
-        PMC *iter = VTABLE_get_iter(INTERP, directory);
+        PMC * const iter = VTABLE_get_iter(INTERP, directory);
         while (VTABLE_get_bool(INTERP, iter)) {
-            name = VTABLE_shift_string(INTERP, iter);
-            segment = VTABLE_get_pmc_keyed_str(INTERP, directory, name);
+            STRING * const name = VTABLE_shift_string(INTERP, iter);
+            PMC * const segment = VTABLE_get_pmc_keyed_str(INTERP, directory, name);
             if (VTABLE_isa(INTERP, segment,
                     Parrot_str_new_constant(INTERP, "PackfileConstantTable"))) {
                 attrs->const_table = segment;
@@ -216,61 +203,52 @@ Initialize PackfileAnnotations from PackFile_Annotations*.
 
 */
     VTABLE void set_pointer(void *pointer) {
-        PackFile_Annotations * a = (PackFile_Annotations*)pointer;
-        Parrot_PackfileAnnotations_attributes *attrs =
+        PackFile_Annotations * const a = (PackFile_Annotations*)pointer;
+        Parrot_PackfileAnnotations_attributes * const attrs =
                 PARROT_PACKFILEANNOTATIONS(SELF);
-        opcode_t  i;
-        PMC      *annotation;
         Parrot_PackfileAnnotation_attributes *annotation_attrs;
+        opcode_t i;
 
-        /* Copy annotations groups */
-        if (a->num_groups > 0) {
-            attrs->gr_byte  = Parrot_pmc_new_init_int(INTERP,
-                    enum_class_ResizableIntegerArray, a->num_groups);
-            attrs->gr_entries = Parrot_pmc_new_init_int(INTERP,
-                    enum_class_ResizableIntegerArray, a->num_groups);
-            for (i = 0; i < a->num_groups; ++i) {
-                VTABLE_set_integer_keyed_int(INTERP, attrs->gr_byte, i,
-                        a->groups[i].bytecode_offset);
-                VTABLE_set_integer_keyed_int(INTERP, attrs->gr_entries, i,
-                        a->groups[i].entries_offset);
-            }
-        }
+        if (!attrs->const_table)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_MALFORMED_PACKFILE, "No constant table");
+
 
         /* Copy annotations to own array */
-        VTABLE_set_integer_native(INTERP, attrs->annotations, a->num_entries);
-        for (i = 0; i < a->num_entries; ++i) {
-            PackFile_Annotations_Entry *entry = a->entries + i;
-            PackFile_Annotations_Key   *key   = a->keys + entry->key;
-            annotation = Parrot_pmc_new(INTERP, enum_class_PackfileAnnotation);
+        VTABLE_set_integer_native(INTERP, attrs->annotations, 0); /* truncate */
+        for (i = 0; i < a->num_keys; ++i) {
+            PackFile_Annotations_Key * const key = &a->keys[i];
+            opcode_t j;
 
-            /* Poke directly to annotation attributes. */
-            annotation_attrs         = PARROT_PACKFILEANNOTATION(annotation);
-            annotation_attrs->offset = entry->bytecode_offset;
-            if (! attrs->const_table)
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
-                        EXCEPTION_MALFORMED_PACKFILE, "No constant table");
+            for (j = 0; j < (opcode_t)key->len; j++) {
+                PMC * const annotation = Parrot_pmc_new(INTERP, enum_class_PackfileAnnotation);
+                const opcode_t offs = a->base.data[(key->start + j) * 2 + ANN_ENTRY_OFF];
+                const opcode_t val  = a->base.data[(key->start + j) * 2 + ANN_ENTRY_VAL];
 
-            annotation_attrs->name   = VTABLE_get_string_keyed_int(INTERP,
-                    attrs->const_table, key->name);
-            switch (key->type) {
-                case PF_ANNOTATION_KEY_TYPE_INT:
-                    VTABLE_set_integer_native(INTERP, annotation, entry->value);
-                    break;
-                case PF_ANNOTATION_KEY_TYPE_STR:
-                    VTABLE_set_string_native(INTERP, annotation,
-                        VTABLE_get_string_keyed_int(INTERP, attrs->const_table, entry->value));
-                    break;
-                case PF_ANNOTATION_KEY_TYPE_NUM:
-                    VTABLE_set_number_native(INTERP, annotation,
-                        VTABLE_get_number_keyed_int(INTERP, attrs->const_table, entry->value));
-                    break;
-                default:
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_MALFORMED_PACKFILE,
-                            "Unknown value type %d in Packfile Annotation", key->type);
+                /* Poke directly to annotation attributes. */
+                annotation_attrs         = PARROT_PACKFILEANNOTATION(annotation);
+                annotation_attrs->offset = offs;
+                annotation_attrs->name   = VTABLE_get_string_keyed_int(INTERP,
+                                            attrs->const_table, key->name);
+                switch (key->type) {
+                    case PF_ANNOTATION_KEY_TYPE_INT:
+                        VTABLE_set_integer_native(INTERP, annotation, val);
+                        break;
+                    case PF_ANNOTATION_KEY_TYPE_STR:
+                        VTABLE_set_string_native(INTERP, annotation,
+                            VTABLE_get_string_keyed_int(INTERP, attrs->const_table, val));
+                        break;
+                    case PF_ANNOTATION_KEY_TYPE_PMC:
+                        VTABLE_set_pmc(INTERP, annotation,
+                            VTABLE_get_pmc_keyed_int(INTERP, attrs->const_table, val));
+                        break;
+                    default:
+                        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                                "Unknown value type %d in Packfile Annotation", key->type);
+                }
+
+                VTABLE_push_pmc(INTERP, attrs->annotations, annotation);
             }
-
-            VTABLE_set_pmc_keyed_int(INTERP, attrs->annotations, i, annotation);
         }
     }
 
@@ -284,34 +262,16 @@ Create PackFile_Annotations* from self.
 
 */
     VTABLE void *get_pointer() {
-        Parrot_PackfileAnnotations_attributes *attrs =
+        Parrot_PackfileAnnotations_attributes * const attrs =
                 PARROT_PACKFILEANNOTATIONS(SELF);
-        PackFile_Annotations *res = mem_gc_allocate_zeroed_typed(INTERP,
-                PackFile_Annotations);
+        PackFile_Annotations * const res =
+            mem_gc_allocate_zeroed_typed(INTERP, PackFile_Annotations);
         INTVAL                i, num;
         PMC                  *keys;             /* Temporary representation of Keys */
-        PMC                  *names;            /* Constants for Key's names */
-        PMC                  *types;            /* Types of Keys */
-        INTVAL                key_id;
-        INTVAL                last_key_id;
         INTVAL                name_id;
+        INTVAL                value_id;
 
         res->base.type = PF_ANNOTATIONS_SEG;
-
-        /* Create annotations groups */
-        num = PMC_IS_NULL(attrs->gr_byte) ?
-            (INTVAL)0 : VTABLE_elements(INTERP, attrs->gr_byte);
-        res->num_groups = num;
-        if (num > 0) {
-            res->groups = mem_gc_allocate_n_zeroed_typed(interp,
-                    num, PackFile_Annotations_Group);
-            for (i = 0; i < num; ++i) {
-                res->groups[i].bytecode_offset =
-                        VTABLE_get_integer_keyed_int(INTERP, attrs->gr_byte, i);
-                res->groups[i].entries_offset =
-                        VTABLE_get_integer_keyed_int(INTERP, attrs->gr_entries, i);
-            }
-        }
 
         /*
             Create keys. Hash will be created in next structure:
@@ -331,14 +291,9 @@ Create PackFile_Annotations* from self.
             ]
         */
         keys        = Parrot_pmc_new(INTERP, enum_class_Hash);
-        names       = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
-        types       = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
-        last_key_id = -1;
 
         /* Iterate over stored annotations and create Key if required. */
         num = VTABLE_elements(INTERP, attrs->annotations);
-        res->num_entries = num;
-        res->entries = mem_gc_allocate_n_typed(INTERP, num, PackFile_Annotations_Entry);
         for (i = 0; i < num; ++i) {
             PMC  * const entity = VTABLE_get_pmc_keyed_int(INTERP, attrs->annotations, i);
             const Parrot_PackfileAnnotation_attributes * const entity_attrs =
@@ -356,60 +311,34 @@ Create PackFile_Annotations* from self.
                 VTABLE_set_pmc_keyed_str(INTERP, keys, entity_attrs->name, key_array);
             }
 
-            /* PackfileAnnotation.value_type exactly the same as key.type */
-            key_id = VTABLE_get_integer_keyed_int(INTERP, key_array, entity_attrs->value_type);
+            /* lookup constant for name. */
+            Parrot_mmd_multi_dispatch_from_c_args(INTERP, "get_or_create_constant",
+                        "PS->I", attrs->const_table, entity_attrs->name, &name_id);
 
-            /* If key_id is -1 it means we have to create new key. */
-            if (key_id == -1) {
-                key_id = ++last_key_id;
-                VTABLE_set_integer_keyed_int(INTERP, key_array, entity_attrs->value_type, key_id);
-
-                /* Store type */
-                VTABLE_set_integer_keyed_int(INTERP, types, key_id, entity_attrs->value_type);
-
-
-                /* Store constant for name. */
-                Parrot_mmd_multi_dispatch_from_c_args(INTERP, "get_or_create_constant",
-                            "PS->I", attrs->const_table, entity_attrs->name, &name_id);
-
-                VTABLE_set_integer_keyed_int(INTERP, names, key_id, name_id);
-            }
-
-            /* At this point we have create (if nesassary) key and name constant. */
-            /* Start storing real entity */
-
-            res->entries[i].bytecode_offset = entity_attrs->offset;
-            res->entries[i].key             = key_id;
-
-            /* Handle value */
+            /* lookup value */
             switch (entity_attrs->value_type) {
                 case PF_ANNOTATION_KEY_TYPE_INT:
-                    res->entries[i].value = entity_attrs->int_value;
+                    value_id = entity_attrs->int_value;
                     break;
                 case PF_ANNOTATION_KEY_TYPE_STR:
                     Parrot_mmd_multi_dispatch_from_c_args(INTERP, "get_or_create_constant",
                             "PS->I", attrs->const_table, entity_attrs->str_value,
-                            &res->entries[i].value);
+                            &value_id);
                     break;
-                case PF_ANNOTATION_KEY_TYPE_NUM:
+                case PF_ANNOTATION_KEY_TYPE_PMC:
                     Parrot_mmd_multi_dispatch_from_c_args(INTERP, "get_or_create_constant",
-                            "PN->I", attrs->const_table, entity_attrs->num_value,
-                            &res->entries[i].value);
+                            "PP->I", attrs->const_table, entity_attrs->pmc_value,
+                            &value_id);
                     break;
                 default:
                     Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_MALFORMED_PACKFILE,
                             "Unknown value type in PackfileAnnotation");
             }
-        }
 
-        /* Time to pack keys */
-        num = VTABLE_elements(INTERP, types);
-        res->num_keys = num;
-        res->keys = mem_gc_allocate_n_zeroed_typed(INTERP, num,
-                PackFile_Annotations_Key);
-        for (i = 0; i < num; ++i) {
-            res->keys[i].name = VTABLE_get_integer_keyed_int(INTERP, names, i);
-            res->keys[i].type = VTABLE_get_integer_keyed_int(INTERP, types, i);
+            /* store entity */
+            PackFile_Annotations_add_entry(interp, res, entity_attrs->offset, name_id,
+                    entity_attrs->value_type, value_id);
+
         }
 
         return res;

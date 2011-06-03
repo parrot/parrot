@@ -247,7 +247,7 @@ personal taste):
  Squaak for Parrot VM.
  >
 
-Add code to the file squaak.pir to achieve this.
+Add code to the file ~/src/squaak/src/Squaak/Compiler.pm to achieve this.
 
 Hint 1: Look in the INIT block.
 

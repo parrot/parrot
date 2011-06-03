@@ -8,7 +8,6 @@ config/auto/cpu/i386/auto.pm
 
 Test for cmpxchg ASM functionality. Creates these Config entries
 
- TEMP_generated => 'files ...'   for inclusion in platform.c or platform.h
  i386_has_gcc_cmpxchg_c   => 1
 
 =cut
@@ -48,7 +47,6 @@ sub _handle_cc_run_ok {
         "HAS_i386_$suffix" => '1',
     );
     $conf->debug(" (\U$suffix) ");
-    $conf->data->add( ' ', TEMP_generated => $path_f );
 }
 
 1;

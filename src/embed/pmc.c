@@ -77,7 +77,7 @@ Parrot_api_pmc_deserialize(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String fpm
 /*
 
 =item C<Parrot_Int Parrot_api_pmc_deserialize_bytes(Parrot_PMC interp_pmc, const
-unsigned char * const fpmc, Parrot_Int length, Parrot_PMC * pmc)>
+unsigned char *fpmc, Parrot_Int length, Parrot_PMC *pmc)>
 
 Deserializes the PMC contained in C<fpmc> buffer of C<length> and stores it in
 C<pmc>. This function returns a true value if this call is successful and false
@@ -89,9 +89,8 @@ value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_pmc_deserialize_bytes(ARGIN(Parrot_PMC interp_pmc),
-        ARGIN(const unsigned char * const fpmc), ARGIN_NULLOK(Parrot_Int length),
-        ARGOUT(Parrot_PMC * pmc))
+Parrot_api_pmc_deserialize_bytes(ARGIN(Parrot_PMC interp_pmc), ARGIN(const unsigned char *fpmc),
+        Parrot_Int length, ARGOUT(Parrot_PMC *pmc))
 {
     ASSERT_ARGS(Parrot_api_pmc_deserialize_bytes)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -115,7 +114,7 @@ successful and false value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_pmc_null(ARGIN(Parrot_PMC interp_pmc), ARGMOD(Parrot_PMC *pmctonull))
+Parrot_api_pmc_null(ARGIN(Parrot_PMC interp_pmc), ARGOUT(Parrot_PMC *pmctonull))
 {
     ASSERT_ARGS(Parrot_api_pmc_null)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -221,7 +220,7 @@ Parrot_api_pmc_get_keyed(Parrot_PMC interp_pmc, Parrot_PMC pmc,
 /*
 
 =item C<Parrot_Int Parrot_api_pmc_get_keyed_int(Parrot_PMC interp_pmc,
-Parrot_PMC pmc, Parrot_Int key, Parrot_PMC * value)>
+Parrot_PMC pmc, Parrot_Int key, Parrot_PMC *value)>
 
 Stores the integer value of whatever is stored at the element of the C<pmc>
 indexed by C<key>. This function returns a true value if this call is successful
@@ -234,7 +233,7 @@ and false value otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_pmc_get_keyed_int(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc),
-        ARGIN_NULLOK(Parrot_Int key), ARGOUT(Parrot_PMC * value))
+        Parrot_Int key, ARGOUT(Parrot_PMC *value))
 {
     ASSERT_ARGS(Parrot_api_pmc_get_keyed_int)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -304,7 +303,7 @@ if this call is successful and false value otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_pmc_set_integer(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc),
-        ARGIN_NULLOK(Parrot_Int value))
+        Parrot_Int value)
 {
     ASSERT_ARGS(Parrot_api_pmc_set_integer)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -327,7 +326,7 @@ if this call is successful and false value otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_pmc_set_float(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc),
-        ARGIN_NULLOK(Parrot_Float value))
+        Parrot_Float value)
 {
     ASSERT_ARGS(Parrot_api_pmc_set_float)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -374,7 +373,7 @@ otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_pmc_set_keyed_int(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc),
-        ARGIN_NULLOK(Parrot_Int key), ARGIN(Parrot_PMC value))
+        Parrot_Int key, ARGIN(Parrot_PMC value))
 {
     ASSERT_ARGS(Parrot_api_pmc_set_keyed_int)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -459,6 +458,27 @@ Parrot_api_pmc_box_integer(Parrot_PMC interp_pmc, Parrot_Int value,
 
 /*
 
+=item C<Parrot_Int Parrot_api_pmc_push(Parrot_PMC interp_pmc, Parrot_PMC pmc,
+Parrot_PMC item)>
+
+Push a PMC C<item> onto aggregate PMC C<pmc>.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_push(Parrot_PMC interp_pmc, Parrot_PMC pmc, Parrot_PMC item)
+{
+    ASSERT_ARGS(Parrot_api_pmc_push)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    VTABLE_push_pmc(interp, pmc, item);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+/*
+
 =item C<Parrot_Int Parrot_api_add_exception_handler(Parrot_PMC interp_pmc,
 Parrot_PMC handler)>
 
@@ -521,22 +541,12 @@ value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_pmc_wrap_string_array(ARGIN(Parrot_PMC interp_pmc), ARGIN_NULLOK(Parrot_Int argc),
+Parrot_api_pmc_wrap_string_array(ARGIN(Parrot_PMC interp_pmc), Parrot_Int argc,
         ARGIN(const char ** argv), ARGOUT(Parrot_PMC * args))
 {
     ASSERT_ARGS(Parrot_api_pmc_wrap_string_array)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PMC * const userargv = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
-
-    if (argv != NULL && argc > 0) {
-        Parrot_Int i = 0;
-        for (; i < argc; ++i) {
-            /* Run through argv, adding everything to the array */
-            STRING * const arg = Parrot_str_from_platform_cstring(interp, argv[i]);
-            VTABLE_push_string(interp, userargv, arg);
-        }
-    }
-    *args = userargv;
+    *args = Parrot_pmc_box_c_string_array(interp, argc, argv);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 

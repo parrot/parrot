@@ -44,6 +44,34 @@ sub runstep {
     $self->_handle_bsd_stat($conf, $bsd_stat);
     $conf->cc_clean();
 
+    my $stat_atim = 0;
+
+    $conf->cc_gen('config/auto/stat/test_atim_c.in');
+    eval { $conf->cc_build(); };
+    if (!$@) {
+        my $output = eval { $conf->cc_run() };
+        if (!$@ && $output =~ /OK/) {
+            $stat_atim = 1;
+        }
+    }
+    $conf->cc_clean();
+
+    $conf->data->set( HAS_STAT_ATIM => $stat_atim );
+
+    my $stat_atimespec = 0;
+
+    $conf->cc_gen('config/auto/stat/test_atimespec_c.in');
+    eval { $conf->cc_build(); };
+    if (!$@) {
+        my $output = eval { $conf->cc_run() };
+        if (!$@ && $output =~ /OK/) {
+            $stat_atimespec = 1;
+        }
+    }
+    $conf->cc_clean();
+
+    $conf->data->set( HAS_STAT_ATIMESPEC => $stat_atimespec );
+
     return 1;
 }
 

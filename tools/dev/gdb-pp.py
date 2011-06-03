@@ -1,3 +1,4 @@
+# Copyright (C) 2011, Parrot Foundation.
 from gdb.printing import PrettyPrinter, SubPrettyPrinter
 import gdb.types
 import gdb

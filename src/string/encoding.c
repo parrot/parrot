@@ -23,6 +23,7 @@ STR_VTABLE *Parrot_platform_encoding_ptr = NULL;
 
 static STR_VTABLE **encodings;
 static int          n_encodings;
+static STRING      *platform_str;
 /* for backwards compatibility */
 static STRING      *unicode_str;
 static STRING      *fixed_8_str;
@@ -106,6 +107,9 @@ Parrot_find_encoding(SHIM_INTERP, ARGIN(const char *encodingname))
     /* backwards compatibility */
     if (strcmp(encodingname, "unicode") == 0)
         return Parrot_utf8_encoding_ptr;
+
+    if (strcmp(encodingname, "platform") == 0)
+        return Parrot_platform_encoding_ptr;
 
     return NULL;
 }
@@ -222,6 +226,12 @@ Parrot_encoding_number(PARROT_INTERP, ARGIN(const STRING *encodingname))
     else if (STRING_equal(interp, encodingname, fixed_8_str)) {
         for (i = 0; i < n; ++i) {
             if (STREQ(encodings[i]->name, "ascii"))
+                return i;
+        }
+    }
+    else if (STRING_equal(interp, encodingname, platform_str)) {
+        for (i = 0; i < n; ++i) {
+            if (encodings[i] == Parrot_platform_encoding_ptr)
                 return i;
         }
     }
@@ -351,9 +361,10 @@ Parrot_str_internal_register_encoding_names(PARROT_INTERP)
     for (n = 0; n < n_encodings; ++n)
         encodings[n]->name_str =
             Parrot_str_new_constant(interp, encodings[n]->name);
-    /* Can't use CONST_STRING here, not setup yet? */
-    unicode_str = Parrot_str_new_constant(interp, "unicode");
-    fixed_8_str = Parrot_str_new_constant(interp, "fixed_8");
+    /* Can't use CONST_STRING here, not setup yet */
+    unicode_str  = Parrot_str_new_constant(interp, "unicode");
+    fixed_8_str  = Parrot_str_new_constant(interp, "fixed_8");
+    platform_str = Parrot_str_new_constant(interp, "platform");
 }
 
 /*
@@ -438,7 +449,7 @@ Sets the default encoding to C<encoding> with name C<encodingname>.
 
 PARROT_EXPORT
 INTVAL
-Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
+Parrot_make_default_encoding(SHIM_INTERP, ARGIN(SHIM(const char *encodingname)),
         ARGIN(STR_VTABLE *encoding))
 {
     ASSERT_ARGS(Parrot_make_default_encoding)

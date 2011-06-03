@@ -10,24 +10,20 @@ RM_RF   = @rm_rf@
 PERLDOC_BIN = @perldoc@
 VERSION = @VERSION@@DEVEL@
 
-# long list of .pod files
-POD = @TEMP_pod@
-
 #
 # Targets
 #
-
-# The default target
-all: packfile-c.pod $(POD)
-
 # This is a listing of all targets, that are meant to be called by users
 # Most of them are proxied in the root makefile parrot/Makefile
 help :
 	@echo ""
-	@echo "Following targets are available to the user:"
+	@echo "Following targets are available:"
 	@echo ""
-	@echo "all:             Generate documentation from .pod files or from the sources."
+	@echo "help             Generate this usage statement."
 	@echo "                 This is the default target."
+	@echo ""
+	@echo "html             Generate html documentation"
+	@echo "html-clean       Remove html documentation"
 	@echo ""
 	@echo "htmlhelp:        windows only, generate a .chm file."
 	@echo "htmlhelp-clean:  Remove generated .chm"
@@ -35,21 +31,10 @@ help :
 	@echo "pdf:             Generate a PDF from the html docs"
 	@echo "pdf-clean:       Remove generated pdf"
 	@echo ""
-	@echo "   clean:        Remove the generated documentation."
+	@echo "   clean:        Invoke all clean targets"
 	@echo ""
 
-$(POD): doc-prep
-
-doc-prep:
-	$(MKPATH) ops
-	$(TOUCH) doc-prep
-
-packfile-c.pod: ../src/packfile/api.c
-#IF(new_perldoc):	$(PERLDOC_BIN) -ud packfile-c.pod ../src/packfile/api.c
-#ELSE:	$(PERLDOC_BIN) -u ../src/packfile/api.c > packfile-c.pod
-
-clean:
-	$(RM_F) packfile-c.pod $(POD) doc-prep
+clean: htmlhelp-clean html-clean
 
 html:
 	$(PERL) -I../lib ../tools/docs/make_html_docs.pl --version=$(VERSION)
@@ -77,8 +62,6 @@ htmlhelp: html
 
 htmlhelp-clean:
 #IF(win32):	$(RM_F) "html/*.hhc" "html/*.hhk" "html/*.hhp" "html/*.chm"
-
-@TEMP_pod_build@
 
 # Local variables:
 #   mode: makefile

@@ -7,9 +7,9 @@
 This PDD describes the native call interface, and the function signatures used
 to describe those functions.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 
@@ -279,7 +279,7 @@ it call back into Parrot.
     fun = dlfunc lib, "sayhello", "vpP"
 
     # do the NCI call, foo_callback is invoked from C
-    fun()
+    fun(callback_sub, userdata)
 
   .end
 

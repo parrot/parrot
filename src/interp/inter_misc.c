@@ -20,11 +20,11 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 
 #include "parrot/parrot.h"
 #include "inter_misc.str"
-#include "../compilers/imcc/imc.h"
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_callcontext.h"
-
+#include "pmc/pmc_parrotinterpreter.h"
 #include "parrot/has_header.h"
+#include "imcc/embed.h"
 
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 
@@ -130,7 +130,7 @@ Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type), ARGIN(Parrot_compiler_func_t 
     ASSERT_ARGS(Parrot_compreg)
     PMC    * const iglobals = interp->iglobals;
     PMC    * const nci      = Parrot_pmc_new(interp, enum_class_NCI);
-    STRING * const sc       = CONST_STRING(interp, "PJt");
+    STRING * const sc       = CONST_STRING(interp, "PJS");
     PMC    * hash           = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                               IGLOBALS_COMPREG_HASH);
 
@@ -166,9 +166,7 @@ PMC *
 Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
 {
     ASSERT_ARGS(Parrot_get_compiler)
-    PMC    * const iglobals = interp->iglobals;
-    PMC    * hash           = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
-                              IGLOBALS_COMPREG_HASH);
+    PMC * const  hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_COMPREG_HASH);
 
     if (PMC_IS_NULL(hash)) {
         /* No compiler has been registered yet */
@@ -210,8 +208,8 @@ Parrot_set_compiler(PARROT_INTERP, ARGIN(STRING *type), ARGIN(PMC *compiler))
 
 /*
 
-=item C<void * Parrot_compile_file(PARROT_INTERP, const char *fullname, STRING
-**error)>
+=item C<PMC * Parrot_compile_file(PARROT_INTERP, STRING *fullname, INTVAL
+is_pasm)>
 
 Compile code file.
 
@@ -221,11 +219,34 @@ Compile code file.
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-void *
-Parrot_compile_file(PARROT_INTERP, ARGIN(const char *fullname), ARGOUT(STRING **error))
+PMC *
+Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), INTVAL is_pasm)
 {
     ASSERT_ARGS(Parrot_compile_file)
-    return imcc_compile_file(interp, fullname, error);
+    PMC *result               = NULL;
+    UINTVAL regs_used[4]      = {3, 3, 3, 3};
+    PMC * const newcontext    = Parrot_push_context(interp, regs_used);
+    STRING * const compiler_s = is_pasm ? CONST_STRING(interp, "PASM") : CONST_STRING(interp, "PIR");
+    PMC * compiler   = Parrot_get_compiler(interp, compiler_s);
+    imc_info_t *imcc = (imc_info_t *) VTABLE_get_pointer(interp, compiler);
+
+    Parrot_block_GC_mark(interp);
+    Parrot_pcc_set_HLL(interp, newcontext, 0);
+    Parrot_pcc_set_sub(interp, newcontext, 0);
+
+
+    imcc_reset(imcc);
+    result = imcc_compile_file(imcc, fullname, is_pasm);
+    if (PMC_IS_NULL(result)) {
+        STRING * const msg = imcc_last_error_message(imcc);
+        INTVAL code = imcc_last_error_code(imcc);
+        Parrot_ex_throw_from_c_args(interp, NULL, code, "%Ss", msg);
+    }
+
+    Parrot_pop_context(interp);
+    Parrot_unblock_GC_mark(interp);
+
+    return result;
 }
 
 /*
@@ -249,6 +270,9 @@ interpinfo(PARROT_INTERP, INTVAL what)
     switch (what) {
       case TOTAL_MEM_ALLOC:
         ret = Parrot_gc_total_memory_allocated(interp);
+        break;
+      case TOTAL_MEM_USED:
+        ret = Parrot_gc_total_memory_used(interp);
         break;
       case GC_MARK_RUNS:
         ret = Parrot_gc_count_mark_runs(interp);
@@ -315,6 +339,9 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
 
     PMC *result;
     switch (what) {
+      case CURRENT_CTX:
+        result = CURRENT_CONTEXT(interp);
+        break;
       case CURRENT_SUB:
         result = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
         break;
@@ -403,6 +430,30 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
                 "illegal argument in interpinfo");
     }
 }
+
+/*
+
+=item C<Interp * Parrot_int_get_interp_from_pmc(PMC * interp_pmc)>
+
+C<interp_pmc> is a ParrotInterpreter PMC. Extract the raw C<Interp*> from it
+without needing an existing C<Interp *> reference.
+
+Do not use with any other type of PMC.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+Interp *
+Parrot_int_get_interp_from_pmc(ARGIN(PMC * interp_pmc))
+{
+    ASSERT_ARGS(Parrot_int_get_interp_from_pmc)
+    PARROT_ASSERT(interp_pmc->vtable->base_type == enum_class_ParrotInterpreter);
+    return ((Parrot_ParrotInterpreter_attributes*)interp_pmc->data)->interp;
+}
+
 
 /*
  * Local variables:

@@ -15,10 +15,12 @@ Tests the C<String> PMC.
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'test_more.pir'
 
-    plan(153)
+    plan(160)
 
     set_or_get_strings()
     setting_integers()
@@ -58,6 +60,7 @@ Tests the C<String> PMC.
     out_of_bounds_substr_negative_offset()
     exception_to_int_2()
     exception_to_int_3()
+    exception_to_int_noalphanum()
     assign_null_string()
     access_keyed()
     exists_keyed()
@@ -763,6 +766,25 @@ TEST:
 
   $I0 = $P0.'reverse_index'('l', 8)
   is( $I0, 3, "search2 3" )
+
+  $P0 = utf8:"string strin \x{12345}-\x{aa}-\x{ab} world"
+  $I0 = $P0.'reverse_index'('', 0)
+  is( $I0, -1, "search empty -1 unicode" )
+
+  $I0 = $P0.'reverse_index'('o', -1)
+  is( $I0, -1, "negative start -1 unicode" )
+
+  $I0 = $P0.'reverse_index'('o', 24)
+  is( $I0, -1, "out of bounds -1 unicode" )
+
+  $I0 = $P0.'reverse_index'('string', 23)
+  is( $I0, 0, "search1 unicode" )
+
+  $I0 = $P0.'reverse_index'(utf16:"\x{aa}-\x{ab}", 15)
+  is( $I0, 15, "search2 unicode" )
+
+  $I0 = $P0.'reverse_index'(utf16:"\x{aa}-\x{ab}", 14)
+  is( $I0, -1, "search3 unicode" )
 .end
 
 .macro exception_is ( M )
@@ -812,6 +834,18 @@ handler:
         $I0 = s.'to_int'(37)
 handler:
     .exception_is( 'invalid conversion to int - bad base 37' )
+.end
+
+.sub to_int_noalnum
+    .local pmc s
+    s = new ['String']
+    s = "?"
+    $I0 = s.'to_int'(10)
+.end
+
+.sub exception_to_int_noalphanum
+    .const 'Sub' noalnum = 'to_int_noalnum'
+    throws_type(noalnum, .EXCEPTION_INVALID_OPERATION, 'to_int - no aplhanumeric')
 .end
 
 .sub assign_null_string

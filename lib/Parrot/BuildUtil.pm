@@ -106,7 +106,7 @@ sub generated_file_header {
     my ( $filename, $style ) = @_;
 
     die qq{unknown style "$style"}
-        if $style !~ m/\A(?:perl|c)\z/;
+        unless ($style eq 'perl' or $style eq 'c');
 
     require File::Spec;
     my $script = File::Spec->abs2rel($0);
@@ -152,10 +152,10 @@ sub get_bc_version {
             last;
         }
     }
+    close $IN or die "Couldn't close $compat_file";
     unless ( defined $bc_major ) {
         die "No bytecode version found in '$compat_file'.";
     }
-    close $IN;
     return ( $bc_major, $bc_minor );
 }
 

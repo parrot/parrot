@@ -30,7 +30,7 @@ Handles class and object manipulation.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC* C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -207,7 +207,7 @@ major way
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
@@ -404,7 +404,7 @@ return it. Otherwise, create a new PMCProxy for the type ID number.
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_get_class_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
@@ -441,7 +441,7 @@ Create a new Class PMC for a new type of the given C<name>.
 
 */
 
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_newclass_from_str(PARROT_INTERP, ARGIN(STRING *name))
@@ -501,7 +501,7 @@ from parents.
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_find_vtable_override(PARROT_INTERP,
@@ -907,7 +907,7 @@ interpreter, and name of the method. Don't use a possible method cache.
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *method_name))
@@ -921,8 +921,8 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
     INTVAL         i;
 
     for (i = 0; i < n; ++i) {
-        PMC * const _class    = VTABLE_get_pmc_keyed_int(interp, mro, i);
-        PMC * const ns        = VTABLE_get_namespace(interp, _class);
+        PMC * const _class_i  = VTABLE_get_pmc_keyed_int(interp, mro, i);
+        PMC * const ns        = VTABLE_get_namespace(interp, _class_i);
         PMC * const class_obj = VTABLE_inspect_str(interp, ns, class_str);
         PMC        *method    = PMCNULL;
         PMC        *method_hash;
@@ -938,7 +938,7 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
         if (PMC_IS_NULL(method))
             method = VTABLE_get_pmc_keyed_str(interp, ns, method_name);
 
-        TRACE_FM(interp, _class, method_name, method);
+        TRACE_FM(interp, _class_i, method_name, method);
 
         if (!PMC_IS_NULL(method))
             return method;
@@ -1038,7 +1038,7 @@ Merge together the MRO of the items in the list.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC*
 C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
 {
@@ -1141,7 +1141,7 @@ F<http://192.220.96.201/dylan/linearization-oopsla96.html>
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
 {

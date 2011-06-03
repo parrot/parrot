@@ -109,10 +109,6 @@ core module Pod-Html
 
 PGE/Glob.pbc
 
-=item tempdir (in step 'smoke')
-
-Math/Rand.pbc
-
 =back
 
 =head2 SYSTEM DEPENDENCIES
@@ -768,7 +764,7 @@ the value is the NQP pathname
     $S0 = dirname(pir)
     mkpath($S0, 1 :named('verbose'))
     .local string cmd
-    cmd = get_nqp()
+    cmd = get_nqp_rx()
     cmd .= " --target=pir --output="
     cmd .= pir
     cmd .= " "
@@ -961,11 +957,14 @@ the value is the PBC pathname
     .local string bin, pbc
     bin = shift $P0
     pbc = hash[bin]
-    $S1 = _mk_path_exe(pbc, exe)
-    $I0 = newer($S1, pbc)
+    $I0 = newer(bin, pbc)
     if $I0 goto L1
     .local string cmd
     cmd = get_executable('pbc_to_exe')
+    cmd .= " --output="
+    cmd .= bin
+    $S0 = get_exe()
+    cmd .= $S0
     cmd .= " "
     cmd .= pbc
     push jobs, cmd
@@ -2147,11 +2146,20 @@ the server. The default is "parrot-autobot:qa_rocks"
   L6:
     archive = get_value('prove_archive', "report.tar.gz" :named('default'), kv :flat :named)
     harness.'archive'(archive)
+    .local pmc extra_props
     $I0 = exists kv['smolder_extra_properties']
     unless $I0 goto L7
-    $P0 = kv['smolder_extra_properties']
-    harness.'extra_props'($P0)
+    extra_props = kv['smolder_extra_properties']
+    goto L8
   L7:
+    extra_props = new 'Hash'
+  L8:
+    $I0 = exists extra_props['Submitter']
+    if $I0 goto L9
+    $S0 = get_submitter()
+    extra_props['Submitter'] = $S0
+  L9:
+    harness.'extra_props'(extra_props)
     aggregate = harness.'runtests'(files)
     print "creat "
     say archive
@@ -4384,6 +4392,14 @@ Return the whole config
 =cut
 
 .sub 'get_nqp'
+    .tailcall get_executable('parrot-nqp')
+.end
+
+=item get_nqp_rx
+
+=cut
+
+.sub 'get_nqp_rx'
     .tailcall get_executable('parrot-nqp')
 .end
 

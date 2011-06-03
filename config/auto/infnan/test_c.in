@@ -1,0 +1,26 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+seeing if INFINITY and NAN are defined
+
+*/
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+
+int
+main(int argc, char **argv) {
+    double inf = INFINITY;
+    double nan = NAN;
+    printf("OK: %d %d\n", isinf(inf), isnan(nan));
+    return EXIT_SUCCESS;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

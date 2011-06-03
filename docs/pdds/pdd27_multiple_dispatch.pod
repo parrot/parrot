@@ -6,9 +6,9 @@
 
 This PDD defines Parrot's multiple dispatch system.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Definitions
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 32;
 
 =head1 NAME
 
@@ -253,10 +253,16 @@ pasm_output_is( <<'CODE', <<OUT, "defined_keyed" );
     set P3, 1
     defined I0, P0[P3]
     print I0
+
+    null P1
+    set P0[1], P1
+    defined I0, P0[1]
+    print I0
+
     print "\n"
     end
 CODE
-0000001110
+00000011100
 OUT
 
 pasm_output_is( <<'CODE', <<OUT, "delete" );
@@ -274,6 +280,8 @@ pasm_output_is( <<'CODE', <<OUT, "delete" );
     set P0["j"], P1
 
     delete P0["a"]
+
+    delete P0["idontexist"]
 
     iter P2, P0
     set P2, .ITERATE_FROM_START_KEYS
@@ -604,23 +612,37 @@ pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_pmc_keyed_int (negative 
     .local pmc hash1
     hash1 = new ['OrderedHash']
 
-    push hash1, 6
+    push hash1, 999 # hash[0]
+    push hash1, 1   # hash[1]
+    push hash1, 999 # hash[2]
 
-    .local pmc integer1
-    integer1 = new ['Integer']
-    integer1 = 5
+    .local pmc integer0, integer2
+    integer0 = new ['Integer']
+    integer0 = 0
 
-    hash1[-1] = integer1
-    $P0 = hash1[-1]
+    hash1[-4] = integer0 # modify hash[0] to 0
 
+    integer2 = new ['Integer']
+    integer2 = 2
+
+    hash1[-1] = integer2 # modify hash[2] to 2
+
+    $P0 = hash1[-4]
+    print $P0
+    $P0 = hash1[0]
+    print $P0
+    $P0 = hash1[1]
+    print $P0
+    $P0 = hash1[2]
     print $P0
     print "\n"
     end
 .end
 CODE
-5
+0012
 OUTPUT
 
+# actually Parrot_OrderedHash_delete_keyed is used
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash delete_keyed_str" );
 
 .sub _main :main
@@ -722,6 +744,89 @@ pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash get_number" );
 CODE
 2
 OUTPUT
+
+SKIP: {
+    skip( "odd, tightly-coupled, defacto behaviour is not worth testing", 1 );
+
+    pir_output_is( << 'CODE', << 'OUTPUT', "set, get, exists compound keys" );
+
+.sub _main :main
+    .local pmc hash, hash_inside
+    hash = new ['OrderedHash']
+    hash_inside = new ['OrderedHash']
+
+    hash_inside["aa"] = "aa"
+    hash["a"] = hash_inside
+    hash["a";"ab"] = "ab"
+    hash["a";"ac"] = "ac"
+    hash["a";"ad"] = "ad"
+    hash["b"] = "b"
+    hash["c"] = "c"
+    hash["d"] = "d"
+    print "ok - set\n"
+
+    print "elements: "
+    $I0 = elements hash
+    print $I0
+    print "\n"
+
+    print "get: "
+    $P2 = hash["a";"aa"]
+    print $P2
+    $P2 = hash["a";"ab"]
+    print $P2
+    print "\n"
+
+    print "exists: "
+    exists $I0, hash[0;0]
+    print $I0
+    exists $I0, hash[2]
+    print $I0
+    exists $I0, hash["a"; "ab"]
+    print $I0
+    exists $I0, hash["a"; "ac"]
+    print $I0
+    exists $I0, hash["a"; 0]
+    print $I0
+    exists $I0, hash["a"; 1]
+    print $I0
+
+    exists $I0, hash["zzzz"; "zzzz"]
+    print $I0
+    exists $I0, hash[99]
+    print $I0
+    exists $I0, hash[0;99]
+    print $I0
+    print "\n"
+
+    delete hash[0;0]
+    print "ok - delete\n"
+
+    print "exists: "
+    exists $I0, hash[0;0]
+    print $I0
+    print "\n"
+
+    delete hash["b"]
+    delete hash["c"]
+
+    print "elements: "
+    $I0 = elements hash
+    print $I0
+    print "\n"
+
+    end
+.end
+CODE
+ok - set
+elements: 4
+get: 11
+exists: 111111000
+ok - delete
+exists: 0
+elements: 2
+OUTPUT
+}
 
 pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 

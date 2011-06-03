@@ -50,6 +50,8 @@ void Parrot_clear_trace(PARROT_INTERP, Parrot_UInt flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 Parrot_PMC Parrot_compile_string(PARROT_INTERP,
     Parrot_String type,
     ARGIN(const char *code),
@@ -103,10 +105,6 @@ PARROT_CAN_RETURN_NULL
 Parrot_PackFile Parrot_pbc_read(PARROT_INTERP,
     ARGIN_NULLOK(const char *fullname),
     const int debug)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_run_native(PARROT_INTERP, native_func_t func)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -193,8 +191,6 @@ PMC* set_current_sub(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_Parrot_pbc_read __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_run_native __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_runcode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

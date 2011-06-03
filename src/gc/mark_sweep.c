@@ -31,30 +31,33 @@ throughout the rest of Parrot.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void free_buffer(PARROT_INTERP,
-    ARGIN(Memory_Pools *mem_pools),
-    SHIM(Fixed_Size_Pool *pool),
+    ARGMOD(Memory_Pools *mem_pools),
+    Fixed_Size_Pool *pool,
     ARGMOD(Buffer *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*b);
 
 static void free_pmc_in_pool(PARROT_INTERP,
-    ARGIN(Memory_Pools *mem_pools),
-    SHIM(Fixed_Size_Pool *pool),
+    ARGMOD(Memory_Pools *mem_pools),
+    Fixed_Size_Pool *pool,
     ARGMOD(PObj *p))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*p);
+
+static void mark_interp(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Fixed_Size_Pool * new_bufferlike_pool(PARROT_INTERP,
-    ARGIN(const Memory_Pools *mem_pools),
     size_t actual_buffer_size)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -62,7 +65,7 @@ static Fixed_Size_Pool * new_fixed_size_obj_pool(
     size_t object_size,
     size_t objects_per_alloc);
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static Fixed_Size_Pool * new_pmc_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -84,9 +87,10 @@ static Fixed_Size_Pool * new_string_pool(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(p))
+#define ASSERT_ARGS_mark_interp __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_new_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_new_fixed_size_obj_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_new_pmc_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -158,7 +162,6 @@ Parrot_gc_trace_root(PARROT_INTERP,
         Parrot_gc_trace_type trace)
 {
     ASSERT_ARGS(Parrot_gc_trace_root)
-    PObj    *obj;
 
     /* note: adding locals here did cause increased GC runs */
     Parrot_sub_mark_context_start();
@@ -175,6 +178,38 @@ Parrot_gc_trace_root(PARROT_INTERP,
             = interp->iglobals;
     }
 
+
+    if (trace == GC_TRACE_FULL)
+        trace_system_areas(interp, mem_pools);
+
+    mark_interp(interp);
+
+    /* quick check to see if we have already marked all impatient PMCs. If we
+       have, return 0 and exit here. This will alert other parts of the GC
+       that if we are in a lazy run we can just stop it. */
+    if (mem_pools
+        && mem_pools->lazy_gc
+        && mem_pools->num_early_PMCs_seen >= mem_pools->num_early_gc_PMCs)
+        return 0;
+
+    return 1;
+}
+
+/*
+
+=item C<static void mark_interp(PARROT_INTERP)>
+
+Mark an interpreter and all direct children.
+
+=cut
+
+*/
+
+static void
+mark_interp(PARROT_INTERP)
+{
+    ASSERT_ARGS(mark_interp)
+    PObj *obj;
     /* mark the list of iglobals */
     Parrot_gc_mark_PMC_alive(interp, interp->iglobals);
 
@@ -186,9 +221,6 @@ Parrot_gc_trace_root(PARROT_INTERP,
     /* mark the current context. */
     Parrot_gc_mark_PMC_alive(interp, CURRENT_CONTEXT(interp));
 
-    /* mark the dynamic environment. */
-    Parrot_gc_mark_PMC_alive(interp, interp->dynamic_env);
-
     /* mark the vtables: the data, Class PMCs, etc. */
     Parrot_vtbl_mark_vtables(interp);
 
@@ -199,7 +231,7 @@ Parrot_gc_trace_root(PARROT_INTERP,
     Parrot_gc_mark_PMC_alive(interp, interp->scheduler);
 
     /* s. packfile.c */
-    mark_const_subs(interp);
+    Parrot_gc_mark_PMC_alive(interp, interp->current_pf);
 
     /* mark caches and freelists */
     mark_object_cache(interp);
@@ -225,18 +257,8 @@ Parrot_gc_trace_root(PARROT_INTERP,
     if (!PMC_IS_NULL(interp->final_exception))
         Parrot_gc_mark_PMC_alive(interp, interp->final_exception);
 
-    if (trace == GC_TRACE_FULL)
-        trace_system_areas(interp, mem_pools);
-
-    /* quick check to see if we have already marked all impatient PMCs. If we
-       have, return 0 and exit here. This will alert other parts of the GC
-       that if we are in a lazy run we can just stop it. */
-    if (mem_pools
-        && mem_pools->lazy_gc
-        && mem_pools->num_early_PMCs_seen >= mem_pools->num_early_gc_PMCs)
-        return 0;
-
-    return 1;
+    if (interp->parent_interpreter)
+        mark_interp(interp->parent_interpreter);
 }
 
 
@@ -281,7 +303,6 @@ Parrot_gc_sweep_pool(PARROT_INTERP,
             if (PObj_live_TEST(b)) {
                 ++total_used;
                 PObj_live_CLEAR(b);
-                PObj_get_FLAGS(b) &= ~PObj_custom_GC_FLAG;
             }
             else if (!PObj_on_free_list_TEST(b)) {
                 /* it must be dead */
@@ -361,11 +382,9 @@ mark_special(PARROT_INTERP, SHIM(Memory_Pools *mem_pools), ARGIN(PMC *obj))
 {
     ASSERT_ARGS(mark_special)
 
-    PObj_get_FLAGS(obj) |= PObj_custom_GC_FLAG;
-
     /* clearing the flag is much more expensive then testing */
     if (!PObj_needs_early_gc_TEST(obj))
-        PObj_high_priority_gc_CLEAR(obj);
+        PObj_needs_early_gc_CLEAR(obj);
 
     /* mark properties */
     Parrot_gc_mark_PMC_alive(interp, PMC_metadata(obj));
@@ -483,7 +502,6 @@ Parrot_append_arena_in_pool(PARROT_INTERP,
         new_arena->prev->next = new_arena;
 
     pool->last_Arena = new_arena;
-    interp->gc_sys->stats.header_allocs_since_last_collect += size;
     interp->gc_sys->stats.memory_allocated += size;
 }
 
@@ -503,7 +521,7 @@ Creates and initializes a new pool for PMCs and returns it.
 
 */
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static Fixed_Size_Pool *
 new_pmc_pool(PARROT_INTERP)
@@ -532,10 +550,8 @@ method if one is available.
 */
 
 static void
-free_pmc_in_pool(PARROT_INTERP,
-        ARGIN(Memory_Pools *mem_pools),
-        SHIM(Fixed_Size_Pool *pool),
-        ARGMOD(PObj *p))
+free_pmc_in_pool(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools),
+        SHIM(Fixed_Size_Pool *pool), ARGMOD(PObj *p))
 {
     ASSERT_ARGS(free_pmc_in_pool)
     PMC    * const pmc        = (PMC *)p;
@@ -551,8 +567,8 @@ free_pmc_in_pool(PARROT_INTERP,
 
 /*
 
-=item C<static Fixed_Size_Pool * new_bufferlike_pool(PARROT_INTERP, const
-Memory_Pools *mem_pools, size_t actual_buffer_size)>
+=item C<static Fixed_Size_Pool * new_bufferlike_pool(PARROT_INTERP, size_t
+actual_buffer_size)>
 
 Creates a new pool for buffer-like structures. This is called from
 C<get_bufferlike_pool()>, and should probably not be called directly.
@@ -564,9 +580,7 @@ C<get_bufferlike_pool()>, and should probably not be called directly.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Fixed_Size_Pool *
-new_bufferlike_pool(PARROT_INTERP,
-        ARGIN(const Memory_Pools *mem_pools),
-        size_t actual_buffer_size)
+new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
 {
     ASSERT_ARGS(new_bufferlike_pool)
     const int num_headers          = BUFFER_HEADERS_PER_ALLOC;
@@ -633,7 +647,7 @@ new_string_pool(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools), INTVAL constant)
     ASSERT_ARGS(new_string_pool)
     Fixed_Size_Pool *pool;
     if (constant) {
-        pool           = new_bufferlike_pool(interp, mem_pools, sizeof (STRING));
+        pool = new_bufferlike_pool(interp, sizeof (STRING));
         pool->gc_object = NULL;
     }
     else
@@ -657,15 +671,13 @@ reuse later.
 */
 
 static void
-free_buffer(PARROT_INTERP,
-        ARGIN(Memory_Pools *mem_pools),
-        SHIM(Fixed_Size_Pool *pool),
-        ARGMOD(Buffer *b))
+free_buffer(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools),
+        SHIM(Fixed_Size_Pool *pool), ARGMOD(Buffer *b))
 {
     ASSERT_ARGS(free_buffer)
 
     /* If there is no allocated buffer - bail out */
-    if (!Buffer_buflen(b))
+    if (Buffer_buflen(b) == 0)
         return;
 
     Parrot_gc_str_free_buffer_storage(interp, &mem_pools->string_gc, b);
@@ -713,7 +725,7 @@ get_bufferlike_pool(PARROT_INTERP,
     }
 
     if (sized_pools[idx] == NULL)
-        sized_pools[idx] = new_bufferlike_pool(interp, mem_pools, buffer_size);
+        sized_pools[idx] = new_bufferlike_pool(interp, buffer_size);
 
     return sized_pools[idx];
 }

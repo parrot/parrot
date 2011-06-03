@@ -1,5 +1,5 @@
-#!perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+#! perl
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -26,16 +26,13 @@ The returned value is actually returned from the 'waitpid' system call.
 In order to get the exit code from the spawned process, it needs to be right
 shifted by 8 bit.
 
-TT #1271: Do not rely on the existence of Perl5 here. Spawn Parrot or some
-other program which will exist on the target platform
-
 =head1 TODO
 
 Test negative return codes.
 
 =head1 SEE ALSO
 
-The special variable $? in Perl5.
+The special variable $? in Perl 5.
 
 =head1 AUTHOR
 
@@ -48,43 +45,45 @@ Nigel Sandever - L<nigelsandever@btconnect.com>
 
 # test string version of spawnw
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 0" );
+my $perl = $^X;
+
+pasm_output_is( <<"CODE", <<'OUTPUT', "exit code: 0" );
 .pcc_sub :main main:
-        set     S1, 'perl -e "exit(0)"'
+        set     S1, '$perl -e "exit(0)"'
         set     I1, 99
         spawnw  I1, S1
         shr     I2, I1, 8
         print   "return code: "
         print   I2
-        print   "\n"
+        print   "\\n"
         end
 CODE
 return code: 0
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 123" );
+pasm_output_is( <<"CODE", <<'OUTPUT', "exit code: 123" );
 .pcc_sub :main main:
-        set     S1, 'perl -e "exit(123)"'
+        set     S1, '$perl -e "exit(123)"'
         set     I1, 99
         spawnw  I1, S1
         shr     I2, I1, 8
         print   "return code: "
         print   I2
-        print   "\n"
+        print   "\\n"
         end
 CODE
 return code: 123
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 3" );
+pasm_output_is( <<"CODE", <<'OUTPUT', "exit code: 3" );
 .pcc_sub :main main:
-        set     S1, 'perl -e "exit(3)"'
+        set     S1, '$perl -e "exit(3)"'
         set     I1, 99
         spawnw  I1, S1
         shr     I2, I1, 8
         print   "return code: "
         print   I2
-        print   "\n"
+        print   "\\n"
         end
 CODE
 return code: 3
@@ -92,11 +91,11 @@ OUTPUT
 
 # test array version of spawnw
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 0" );
+pasm_output_is( <<"CODE", <<'OUTPUT', "exit code: 0" );
 .pcc_sub :main main:
         new     P0, 'ResizablePMCArray'
         set     P0, 3
-        set     P0[0], "perl"
+        set     P0[0], "$perl"
         set     P0[1], "-e"
         set     P0[2], "exit(0)"
         set     I1, 99
@@ -104,17 +103,17 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 0" );
         shr     I2, I1, 8
         print   "return code: "
         print   I2
-        print   "\n"
+        print   "\\n"
         end
 CODE
 return code: 0
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 123" );
+pasm_output_is( <<"CODE", <<'OUTPUT', "exit code: 123" );
 .pcc_sub :main main:
         new     P0, 'ResizablePMCArray'
         set     P0, 3
-        set     P0[0], "perl"
+        set     P0[0], "$perl"
         set     P0[1], "-e"
         set     P0[2], "exit(123)"
         set     I1, 99
@@ -122,17 +121,17 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 123" );
         shr     I2, I1, 8
         print   "return code: "
         print   I2
-        print   "\n"
+        print   "\\n"
         end
 CODE
 return code: 123
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 3" );
+pasm_output_is( <<"CODE", <<'OUTPUT', "exit code: 3" );
 .pcc_sub :main main:
         new     P0, 'ResizablePMCArray'
         set     P0, 3
-        set     P0[0], "perl"
+        set     P0[0], "$perl"
         set     P0[1], "-e"
         set     P0[2], "exit(3)"
         set     I1, 99
@@ -140,34 +139,34 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 3" );
         shr     I2, I1, 8
         print   "return code: "
         print   I2
-        print   "\n"
+        print   "\\n"
         end
 CODE
 return code: 3
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "grow argv buffer" );
+pir_output_is( <<"CODE", <<'OUTPUT', "grow argv buffer" );
 .sub test :main
         .local pmc args
 
-        $S0 = "exit length(qq{"
-        $I0 = 0
+        \$S0 = "exit length(qq{"
+        \$I0 = 0
 loop:
-        if $I0 >= 1000 goto end
-        $S0 = concat $S0, "A"
-        inc $I0
+        if \$I0 >= 1000 goto end
+        \$S0 = concat \$S0, "A"
+        inc \$I0
         branch loop
 end:
-        $S0 = concat $S0, "}) / 100"
+        \$S0 = concat \$S0, "}) / 100"
         new args, 'ResizablePMCArray'
-        push args, "perl"
+        push args, "$perl"
         push args, "-e"
-        push args, $S0
-        $I0 = spawnw args
-        shr $I1, $I0, 8
+        push args, \$S0
+        \$I0 = spawnw args
+        shr \$I1, \$I0, 8
         print   "return code: "
-        print   $I1
-        print   "\n"
+        print   \$I1
+        print   "\\n"
         end
 .end
 CODE

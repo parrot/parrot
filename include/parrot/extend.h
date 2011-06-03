@@ -25,8 +25,6 @@
    but that would be really annoying */
 #if defined(PARROT_IN_CORE)
 
-#define Parrot_Language Parrot_Int
-
 /* Macro to save off the original stack pointer for GC scanning. If
    the stacktop was NULL, then set it to the address of the cached
    pointer, which is on the stack and as good a thing as any to use as
@@ -71,10 +69,14 @@ void Parrot_ext_call(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-PARROT_PURE_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-Parrot_Language Parrot_find_language(SHIM_INTERP,
-    SHIM(const char *language));
+void Parrot_ext_try(PARROT_INTERP,
+    ARGIN_NULLOK(void (*cfunction)(Parrot_Interp,
+    void *)),
+    ARGIN_NULLOK(void (*chandler)(Parrot_Interp,
+    PMC *,
+    void *)),
+    ARGIN_NULLOK(void *data))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 int Parrot_fprintf(PARROT_INTERP,
@@ -133,6 +135,7 @@ Parrot_PMC Parrot_PMC_newclass(PARROT_INTERP, Parrot_PMC classtype)
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
+PARROT_CAN_RETURN_NULL
 Parrot_PMC Parrot_PMC_null(void);
 
 PARROT_EXPORT
@@ -201,7 +204,8 @@ int Parrot_vfprintf(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_pmc) \
     , PARROT_ASSERT_ARG(signature))
-#define ASSERT_ARGS_Parrot_find_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_ext_try __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_fprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pio) \

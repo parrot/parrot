@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2009, Parrot Foundation.
+Copyright (C) 2008-2011, Parrot Foundation.
 
 =pod
 
@@ -235,7 +235,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void init() {
       #ifdef PARROT_HAS_GMP
-        Parrot_Rational_attributes *attrs =
+        Parrot_Rational_attributes * const attrs =
             PARROT_RATIONAL(SELF);
         attrs->rational = mem_gc_allocate_zeroed_typed(INTERP, RATIONAL);
         mpq_init(RT(SELF));
@@ -397,7 +397,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE INTVAL get_bool() {
       #ifdef PARROT_HAS_GMP
-        if (mpq_cmp_si(RT(SELF), 0, 0))
+        if (mpq_cmp_si(RT(SELF), 0, 1) == 0)
             return 0;
         else
             return 1;

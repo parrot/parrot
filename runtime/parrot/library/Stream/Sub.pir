@@ -19,7 +19,7 @@ version 0.1
     ...
 
     .sub _test :method
-	self."write"( "hello, world" )
+        self."write"( "hello, world" )
     .end
 
 =head1 DESCRIPTION

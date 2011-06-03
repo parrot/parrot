@@ -431,7 +431,6 @@ class OpfuncGenerator:
             'debug_load',
             'debug_print',
             'die',
-            'enternative',
             'exit',
             'gc_debug',
             'if',
@@ -458,7 +457,6 @@ class OpfuncGenerator:
             'trap',
             'unless',
             'unpin',
-            'wrapper__',
             'yield',
             ]
 

@@ -38,8 +38,13 @@ typedef enum Parrot_profiling_line {
     PPROF_LINE_END_OF_RUNLOOP
 } Parrot_profiling_line;
 
-typedef void (*profiling_output_fn)(ARGIN(Parrot_profiling_runcore_t*), ARGIN(PPROF_DATA*), ARGIN_NULLOK(Parrot_profiling_line));
-typedef        profiling_output_fn Parrot_profiling_output_fn;
+typedef void (*profiling_store_fn)  (PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t*), ARGIN(PPROF_DATA*), ARGIN_NULLOK(Parrot_profiling_line));
+typedef void (*profiling_init_fn)   (PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t*));
+typedef void (*profiling_destroy_fn)(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t*));
+
+#define RUNCORE_init(i, r)        ((r)->output.init    ? (r)->output.init((i), (r))            : (void)NULL)
+#define RUNCORE_store(i, r, d, l) ((r)->output.store   ? (r)->output.store((i), (r), (d), (l)) : (void)NULL)
+#define RUNCORE_destroy(i, r)     ((r)->output.destroy ? (r)->output.destroy((i), (r))         : (void)NULL)
 
 typedef enum Parrot_profiling_datatype {
 
@@ -65,6 +70,12 @@ typedef enum Parrot_profiling_datatype {
     PPROF_DATA_MAX = 3
 } Parrot_profiling_datatype;
 
+typedef struct profiling_output_t {
+    profiling_init_fn    init;
+    profiling_store_fn   store;
+    profiling_destroy_fn destroy;
+} Parrot_profiling_output;
+
 struct profiling_runcore_t {
     STRING                      *name;
     int                          id;
@@ -75,7 +86,7 @@ struct profiling_runcore_t {
     INTVAL                       flags;
 
     /* end of common members */
-    Parrot_profiling_output_fn output_fn;
+    Parrot_profiling_output output;
     UHUGEINTVAL     runcore_start;
     UHUGEINTVAL     op_start;
     UHUGEINTVAL     op_finish;
@@ -136,18 +147,9 @@ struct profiling_runcore_t {
 /* HEADERIZER BEGIN: src/runcore/profiling.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_CAN_RETURN_NULL
-void * destroy_profiling_core(PARROT_INTERP,
-    ARGIN(Parrot_profiling_runcore_t *runcore))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 void Parrot_runcore_profiling_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_destroy_profiling_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore))
 #define ASSERT_ARGS_Parrot_runcore_profiling_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

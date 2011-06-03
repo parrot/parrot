@@ -19,7 +19,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(47)
+    plan(53)
     test_bool()
     test_int()
     test_new_int()
@@ -40,6 +40,8 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     test_throw_serialized()
     test_backtrace()
     test_annotations()
+    test_subclass_throw()
+    test_subclass_finalize()
 .end
 
 .sub test_bool
@@ -291,7 +293,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     .return()
 
   handler:
-    say "i am the decider"
+    diag("i am the decider")
 .end
 
 .sub test_push_eh_throw
@@ -315,7 +317,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     .return()
 
   handler:
-    say "i am the decider"
+    diag("i am the decider")
 .end
 
 .sub test_die
@@ -469,6 +471,65 @@ _handler:
     is($I0, 0, 'got annotations from unthrow Exception')
     $I0 = ann
     is($I0, 0, 'annotations from unthrow Exception are empty')
+.end
+
+.sub test_subclass_throw
+    $P1 = get_class ["Exception"]
+    $P2 = subclass $P1, "MyException"
+    $P3 = new $P2
+    $S0 = typeof $P3
+    is ($S0, "MyException", "can create a subclass")
+    $S0 = $P3
+    is ($S0, "MyException", "really is a subclass, with :vtable override")
+
+    push_eh my_handler
+    throw $P3
+    pop_eh
+    ok(0, "Could not throw MyException")
+    .return()
+  my_handler:
+    .get_results($P4)
+    pop_eh
+    $S0 = typeof $P4
+    is ($S0, "MyException", "received a MyException object")
+    $S0 = $P4
+    is ($S0, "MyException", "really is a subclass, with :vtable override")
+    .return()
+.end
+
+.sub test_subclass_finalize
+    $P0 = newclass "MyBuggyObject"
+    $P3 = new $P0
+    push_eh my_handler
+    $S0 = $P3
+    pop_eh
+    ok(0, "MyBuggyObject not as buggy as advertised")
+    .return()
+  my_handler:
+    .get_results($P4)
+    $S0 = typeof $P4
+    is ($S0, "MyException", "received a MyException object")
+    $S0 = $P4
+    is ($S0, "MyException", "really is a subclass, with :vtable override")
+    finalize $P4
+    .return()
+.end
+
+.namespace ["MyException"]
+
+.sub get_string :vtable("get_string") :method
+    .return("MyException")
+.end
+
+.namespace ["MyBuggyObject"]
+
+.sub get_string :vtable("get_string") :method
+    $P0 = new ["MyException"]
+    diag("throwing")
+    throw $P0
+    diag("this didn't work!")
+    ok(0, "Oops! We shouldn't ever end up here unless finalize fails")
+    exit 1
 .end
 
 # Local Variables:

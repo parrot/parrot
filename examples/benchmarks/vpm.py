@@ -1,4 +1,5 @@
 #! python
+# Copyright (C) 2004-2011, Parrot Foundation.
 
 import string
 

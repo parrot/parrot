@@ -1,3 +1,4 @@
+# Copyright (C) 2011, Parrot Foundation.
 import gdb.printing
 import sys
 

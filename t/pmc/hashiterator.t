@@ -150,6 +150,10 @@ well.
     .local pmc hash, it, value
     .local int check
 
+    # Make sure we get used memory with garbage content and not fresh
+    # zeroed pages
+    sweep 1
+
     hash = new ['Hash']
     hash = .Hash_key_type_int
     hash[1] = 'a'

@@ -230,6 +230,7 @@ sub install_files {
                 use Config;
                 if ($Config{d_symlink} && $Config{d_readlink}) {
                     # copy as symbolic link
+                    unlink($dest);
                     symlink(readlink($src), $dest);
                     # by success take next file, else the file will be
                     # copied with the command after the eval block of

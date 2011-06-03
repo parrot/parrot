@@ -32,6 +32,14 @@ D: Building on various platforms.
 N: Ahmed Zawawi
 D: Rakudo builtins
 
+N: Akash Manohar
+U: akashmanohar
+A: SingAlong
+E: akash@akash.im
+D: Fixed PCT tutorial Episode-3
+S: Bangalore, India
+W: http://akash.im
+
 N: Alberto Manuel Brandao Simoes
 U: ambs
 E: ambs@cpan.org
@@ -57,7 +65,7 @@ U: heimdall
 E: Nattfodd@gmail.com
 
 N: Allison Randal
-D: Architect (0.4.6...) & Lead Developer
+D: Architect (0.4.6 - 2.8.0) & Lead Developer
 E: allison@parrot.org
 U: allison
 
@@ -92,7 +100,7 @@ E: yDNA@cpan.org
 N: Andrew Whitworth
 D: Internals development
 D: Documentation
-D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0 and 2.11.0
+D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0, 2.11.0 and 3.3.0
 E: wknight8111@gmail.com
 U: Whiteknight
 
@@ -192,6 +200,11 @@ D: Early contributions under the name Brent Dax.
 E: brent@brentdax.com
 W: http://www.brentdax.com/
 
+N: Brian Gernhardt
+E: brian.gernhardt@mail.rit.edu
+D: GSoC Student, PCT
+U: benabik
+
 U: bdwheele
 N: Brian Wheeler
 E: bdwheele@indiana.edu
@@ -224,8 +237,8 @@ U: creiss
 E: creiss@cc.gatech.edu
 
 N: Chip Salzenberg
-D: Release manager emeritus (0.4.6-0.4.7)
-D: Architect emeritus (0.1.2-0.4.5)
+D: Release manager emeritus (0.4.6 - 0.4.7)
+D: Architect emeritus (0.1.2 - 0.4.5)
 U: chip
 E: chip@pobox.com
 
@@ -243,12 +256,11 @@ D: Rakudo patches
 
 N: Christoph Otto
 U: cotto
-D: Patch for key flags in pdd08
+D: Architect (2.9.0 - current)
 D: Range check in Env PMC
 A: christoph_googleacct@mksig.org
 A: christop...@mksig.org
 A: Christoph Otto
-D: Pipp, Lorito taskmaster
 E: christoph@mksig.org
 
 N: chromatic
@@ -305,7 +317,7 @@ D: improve pbc_disassemble's test coverage
 
 N: Dan Sugalski
 U: dan
-D: Architect emeritus (0.0.1-0.1.1)
+D: Architect emeritus (0.0.1 - 0.1.1)
 E: dan@sidhe.org
 W: http://www.sidhe.org/~dan/blog/
 
@@ -425,8 +437,9 @@ D: Perl2Pir tests conversion
 D: Miscellaneous codingstd fixes
 
 N: Gerd Pokorra
+A: gerd
 E: pokorra@uni-siegen.de
-D: Release manager for 1.9.0, 2.3.0, 2.5.0, 2.8.0 and 2.9.0
+D: Release manager for 1.9.0, 2.3.0, 2.5.0, 2.8.0, 2.9.0, 3.2.0 and 3.4.0
 
 N: Goplat
 D: Win98 and other fixes.
@@ -711,6 +724,10 @@ N: Markus Mayr
 D: Implementation of the Rational PMC
 D: Fixing SDL-bindings and examples
 
+N: Matt Boyle
+U: ligne
+D: Fixes to docs and test-suite.
+
 N: Matt Diephouse
 U: mdiep
 E: matt@diephouse.com
@@ -750,6 +767,7 @@ D: testing parrot and some HLL's
 D: fixing codetest failures
 D: adding function documentation
 D: tracwiki additions
+D: Release manager for 2.7.0, 3.1.0
 E: mike.hind@gmail.com
 
 N: Michael G. Schwern

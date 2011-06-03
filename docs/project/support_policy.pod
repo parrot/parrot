@@ -1,4 +1,4 @@
-# Copyright (C) 2009, The Parrot Foundation.
+# Copyright (C) 2009-2011, The Parrot Foundation.
 
 =pod
 
@@ -58,7 +58,7 @@ features we will also regularly deprecate features and remove them. To
 ease the burden of these changes on the users, our policy is to notify
 users of these deprecations in at least one supported release before
 removal and to provide users with a reasonable upgrade path. Deprecation
-notices are listed in the file L<DEPRECATED.pod>, together with a version
+notices are listed in the file L<api.yaml>, together with a version
 number to help us track when the feature is safe to remove.  The suggested
 upgrade paths for deprecated features can be found on the ParrotDeprecations
 wiki page. Note that deprecation removals that are committed without an
@@ -74,10 +74,14 @@ next supported release. We sometimes delay removing deprecated features
 for various reasons, including dependencies by other parts of the core.
 
 The developer releases have more flexibility in feature removal, while still
-meeting the deprecation requirements for support releases. A feature that has a
-deprecation notification in the 2.0 release may be removed from any monthly
+meeting the deprecation requirements for support releases. A feature that has
+a deprecation notification in the 2.0 release may be removed from any monthly
 developer release between 2.0 and the next supported release, though we're
 likely to stagger the removals.
+
+api.yaml is the definitive source of information about deprecations. If
+conflicting information is presented on the wiki, in tickets or elsewhere,
+api.yaml should be considered correct.
 
 =head2 Deprecation Notifications
 
@@ -108,10 +112,17 @@ very rare.
 =head2 Experimental Features
 
 From time to time, we may add features to get feedback on their utility and
-design.  Marking them as "Experimental" in F<DEPRECATED.pod> indicates that we
+design.  Marking them as "Experimental" in F<api.yaml> indicates that we
 may modify or remove them without official deprecation notices.  Use them at
 your own risk--and please provide feedback through official channels if you use
 them successfully or otherwise.
+
+=head2 Changes Requiring Users to Add Code
+
+Internal changes to Parrot which require users to add code in order to continue
+functioning normally also fall under our support policy.  An example of this
+kind of change is the addition of the generational gc, which required a write
+barrier on VTABLE functions which modified the contents of a PMC.
 
 =head2 Supported Older Versions
 
@@ -202,6 +213,8 @@ backwards-incompatible change requires deprecation:
 
 =item * API changes in the compiler tools
 
+=item * changes to Parrot that require HLLs or libraries to add code
+
 =back
 
 Please note that these features I<do not> require deprecation notices:
@@ -215,7 +228,7 @@ of the public API (listed in docs/embed.pod)
 
 =item * Parrot internals hidden behind a public API
 
-=item * Items otherwise eligible but marked as "experimental" in F<DEPRECATED.pod>
+=item * Items otherwise eligible but marked as "experimental" in F<api.yaml>
 
 =back
 

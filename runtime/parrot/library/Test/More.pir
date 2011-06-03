@@ -22,6 +22,9 @@ Test::More - Parrot extension for testing modules
     # run your tests
     ok( 1 )
     ok( 0, 'failing test with diagnostic' )
+    ok( 0, 'failing test with diagnostic', 'todo' => 'and a TODO comment' )
+
+    nok( 1, 'failing test with diagnostic', 'todo' => 'and a TODO comment' )
 
     is( 100, 100 )
     is( 200, 100, 'failing integer compare with diagnostic' )
@@ -41,7 +44,12 @@ Test::More - Parrot extension for testing modules
 
     like( 'foo', 'f o**{2}', 'passing regex compare with diagnostic' )
     skip(1, 'reason for skipping')
+
+    # old way
     todo(0, 'this is a failed test', 'reason for todo')
+
+    # better way
+    is(0, 'FAIL', todo => 'failure reason')
 
     $P0 = get_class "Squirrel"
     $P0.new()

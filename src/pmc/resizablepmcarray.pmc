@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -63,7 +63,7 @@ do_shift(ARGIN(PMC *arr))
 {
     ASSERT_ARGS(do_shift)
     INTVAL    size = PMC_size(arr);
-    PMC     **item = PMC_array(arr);
+    PMC ** const item = PMC_array(arr);
 
     PMC_size(arr) = --size;
     mem_sys_memmove(item, item + 1, size * sizeof (PMC *));
@@ -87,6 +87,25 @@ do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
 
 pmclass ResizablePMCArray extends FixedPMCArray auto_attrs provides array {
     ATTR INTVAL resize_threshold; /* max size before array needs resizing */
+
+/*
+
+=item C<void init_int(INTVAL size)>
+
+Initializes the array.
+
+=cut
+
+*/
+
+    VTABLE void init_int(INTVAL size) {
+        if (size < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    _("ResizeblePMCArray: Cannot set array size to a negative number (%d)"), size);
+        SUPER(size);
+        if (size > 0)
+            PMC_threshold(SELF) = size;
+    }
 
 /*
 
@@ -127,12 +146,12 @@ Resizes the array to C<size> elements.
             return;
         }
         else {
-            INTVAL i, cur, needed;
+            INTVAL i, cur;
             i = cur = PMC_threshold(SELF);
             if (cur < 8192)
                 cur = (size < 2 * cur) ? (2 * cur) : size;
             else {
-                needed = size - cur;
+                const INTVAL needed = size - cur;
                 cur   += needed + 4096;
                 cur   &= ~0xfff;
             }
@@ -172,7 +191,7 @@ TODO: Check whether there is already an element that can be shifted
 */
 
     VTABLE FLOATVAL shift_float() {
-        INTVAL   size = PMC_size(SELF);
+        const INTVAL size = PMC_size(SELF);
         FLOATVAL value;
 
         if (0 == size)
@@ -184,7 +203,7 @@ TODO: Check whether there is already an element that can be shifted
     }
 
     VTABLE INTVAL shift_integer() {
-        INTVAL size = PMC_size(SELF);
+        const INTVAL size = PMC_size(SELF);
         INTVAL value;
 
         if (0 == size)
@@ -196,7 +215,7 @@ TODO: Check whether there is already an element that can be shifted
     }
 
     VTABLE PMC *shift_pmc() {
-        INTVAL size = PMC_size(SELF);
+        const INTVAL size = PMC_size(SELF);
         PMC   *data;
 
         if (0 == size)
@@ -208,7 +227,7 @@ TODO: Check whether there is already an element that can be shifted
     }
 
     VTABLE STRING *shift_string() {
-        INTVAL   size = PMC_size(SELF);
+        const INTVAL size = PMC_size(SELF);
         STRING  *value;
 
         if (0 == size)

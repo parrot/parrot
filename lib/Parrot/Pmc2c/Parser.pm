@@ -1,17 +1,15 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
-
 package Parrot::Pmc2c::Parser;
-
+# Copyright (C) 2004-2011, Parrot Foundation.
 use strict;
 use warnings;
-
 use base qw( Exporter );
-
 our @EXPORT_OK = qw( parse_pmc extract_balanced );
 use Parrot::Pmc2c::PMC ();
 use Parrot::Pmc2c::Attribute ();
 use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::Emitter ();
+use Parrot::Pmc2c::PCCMETHOD ();
+use Parrot::Pmc2c::MULTI ();
 use Parrot::Pmc2c::UtilFunctions qw(count_newlines filename slurp);
 use Text::Balanced 'extract_bracketed';
 use File::Basename qw(basename);
@@ -22,12 +20,18 @@ Parrot::Pmc2c::Parser - PMC Parser
 
 =head1 SYNOPSIS
 
-    use Parrot::Pmc2c::Parser;
+    use Parrot::Pmc2c::Parser qw(
+        parse_pmc
+        extract_balanced
+    );
 
 =head1 DESCRIPTION
 
-Parrot::Pmc2c::Parser parses a sudo C syntax into a perl hash that is then dumped.
+Parrot::Pmc2c::Parser parses a pseudo-C syntax into a perl hash that is then dumped.
 
+=head1 SUBROUTINES
+
+This package exports two subroutines on request only.
 
 =head2 C<parse_pmc()>
 
@@ -51,7 +55,7 @@ Filename of the pmc to parse.
 
 B<Return Values:>  Reference to a Parrot::Pmc2c::PMC object
 
-B<Comments:>  Called by C<dump_pmc()>.
+B<Comments:>  Called by C<Parrot::Pmc2c::Dumper::dump_pmc()>.
 
 =cut
 
@@ -62,7 +66,7 @@ sub parse_pmc {
     $filename = $pmc2cMain->find_file( filename( $filename, '.pmc' ), 1 );
     my $code  = slurp($filename);
 
-    my ( $preamble, $pmcname, $flags, $parents, $pmcbody, $post, $chewed_lines ) =
+    my ( $preamble, $hdr_preamble, $pmcname, $flags, $parents, $pmcbody, $post, $chewed_lines ) =
         parse_top_level($code);
 
     my $filebase = basename($filename);
@@ -71,6 +75,7 @@ sub parse_pmc {
         unless lc($filebase) eq lc($pmcname);
     my $pmc = Parrot::Pmc2c::PMC->create($pmcname);
     $pmc->preamble( Parrot::Pmc2c::Emitter->text( $preamble, $filename, 1 ) );
+    $pmc->hdr_preamble($hdr_preamble);
     $pmc->name($pmcname);
     $pmc->set_filename($filename);
     $pmc->set_flags($flags);
@@ -89,6 +94,7 @@ sub parse_pmc {
     $pmc->add_method($class_init) if $class_init;
     $pmc->vtable( $pmc2cMain->read_dump("vtable.pmc") );
     $pmc->pre_method_gen();
+    $pmc->post_method_gen();
 
     return $pmc;
 }
@@ -253,20 +259,27 @@ sub find_methods {
                 body        => Parrot::Pmc2c::Emitter->text( $methodblock, $filename, $lineno ),
                 return_type => $returntype,
                 parameters  => $parameters,
-                type        => Parrot::Pmc2c::Method::VTABLE,
                 attrs       => $attrs,
                 decorators  => $decorators,
+                type        => $marker && $marker =~ /MULTI/  ? Parrot::Pmc2c::Method::MULTI      :
+                               $marker && $marker !~ /VTABLE/ ? Parrot::Pmc2c::Method::NON_VTABLE :
+                                                                Parrot::Pmc2c::Method::VTABLE
             }
         );
 
         # METHOD needs FixedIntegerArray header
-        if ( $marker and $marker =~ /METHOD/ ) {
+        if ( $method->type eq Parrot::Pmc2c::Method::NON_VTABLE ) {
             Parrot::Pmc2c::PCCMETHOD::rewrite_pccmethod( $method, $pmc );
             $pmc->set_flag('need_fia_header');
         }
-
-        if ( $marker and $marker =~ /MULTI/ ) {
+        elsif ( $method->type eq Parrot::Pmc2c::Method::MULTI ) {
             Parrot::Pmc2c::MULTI::rewrite_multi_sub( $method, $pmc );
+        }
+
+        if ( $method->type eq Parrot::Pmc2c::Method::NON_VTABLE
+        ||   $method->type eq Parrot::Pmc2c::Method::MULTI ) {
+            # Name-mangle NCI and multi methods to avoid conflict with vtables
+            Parrot::Pmc2c::PCCMETHOD::mangle_name( $method, $pmc );
         }
 
         # PCCINVOKE needs FixedIntegerArray header
@@ -277,24 +290,6 @@ sub find_methods {
             $class_init = $method;
         }
         else {
-
-            # Name-mangle NCI and multi methods to avoid conflict with vtables
-            if ( $marker) {
-                if ( $marker =~ /MULTI/ ) {
-                    $method->type(Parrot::Pmc2c::Method::MULTI);
-                    $method->symbol($methodname);
-                }
-                elsif ( $marker !~ /VTABLE/ ) {
-                    $method->type(Parrot::Pmc2c::Method::NON_VTABLE);
-                    $method->name("nci_$methodname");
-                    $method->symbol($methodname);
-                }
-            }
-
-            # To be deprecated
-            parse_mmds( $method, $filename, $lineno )
-                if $methodblock =~ /\bMMD_(\w+):/;
-
             $pmc->add_method($method);
         }
 
@@ -309,56 +304,6 @@ sub find_methods {
     return ($lineno, $class_init);
 }
 
-sub parse_mmds {
-    my ( $method, $filename, $lineno ) = @_;
-    my $mmd_methods         = [];
-    my $body_text           = $method->body;
-    my $default_body        = $body_text;
-    my $default_body_lineno = $lineno;
-
-    # now split into MMD if necessary:
-    while ( $body_text =~ s/(\bMMD_(\w+):\s*)// ) {
-
-        $lineno       += count_newlines($1);
-        my $right_type = $2;
-
-        $method->add_mmd_rights($right_type);
-
-        ( my $mmd_part, $body_text ) = extract_bracketed_body_text( $body_text, '{' );
-
-        die "Empty MMD body near '$body_text'" unless $mmd_part;
-        my $mmd_part_lines = count_newlines($mmd_part);
-
-        # remove whitespace at end of last line
-        $mmd_part =~ s/\n\s*$/\n/s;
-
-        if ( $right_type eq 'DEFAULT' ) {
-            $default_body        = $mmd_part;
-            $default_body_lineno = $lineno;
-        }
-        else {
-            my $mmd_method = Parrot::Pmc2c::Method->new(
-                {
-                    name        => $method->name . "_$right_type",
-                    parent_name => $method->parent_name,
-                    body        => Parrot::Pmc2c::Emitter->text( $mmd_part, $filename, $lineno ),
-                    return_type => $method->return_type,
-                    parameters  => $method->parameters,
-                    type        => Parrot::Pmc2c::Method::VTABLE,
-                    attrs       => $method->attrs,
-                    right       => $right_type,
-                }
-            );
-
-            push @{$mmd_methods}, $mmd_method;
-        }
-
-        $lineno += $mmd_part_lines;
-    }
-    $method->mmds($mmd_methods);
-    $method->body( Parrot::Pmc2c::Emitter->text( $default_body, $filename, $default_body_lineno ) );
-}
-
 sub strip_outer_brackets {
     my ($method_body) = @_;
     die "First character in $method_body is not a {"
@@ -370,28 +315,26 @@ sub strip_outer_brackets {
     return substr $method_body, 1, -1;
 }
 
-sub extract_bracketed_body_text {
-    my ( $body_text, $bracketed ) = @_;
-    my ( $extracted, $remaining ) = extract_bracketed( $body_text, $bracketed );
-    return ( strip_outer_brackets($extracted), $remaining );
-}
-
 =head2 C<parse_top_level()>
 
-    my ($preamble, $pmcname, $flags, $parents, $pmcbody, $post, $chewed_lines)
+    my ($preamble, $hdr_preamble, $pmcname, $flags, $parents, $pmcbody, $post, $chewed_lines)
         = parse_top_level(\$code);
 
 B<Purpose:>  Extract a pmc signature from the code ref.
 
 B<Argument:>  PMC file contents slurped by C<parse_pmc()>.
 
-B<Return Values:>  List of seven elements:
+B<Return Values:>  List of eight elements:
 
 =over 4
 
 =item *
 
 the code found before the pmc signature;
+
+=item *
+
+the code declared to be the header preamble. will be included at the start of the header.
 
 =item *
 
@@ -430,7 +373,15 @@ sub parse_top_level {
 
     my $top_level_re = qr{
         ^                 # beginning of line
-        (.*?)             # preamble
+        (?:
+            (.*?)         # preamble 1
+            ^ BEGIN_PMC_HEADER_PREAMBLE \s*
+            ^ (.*?)       # header preamble
+            ^ END_PMC_HEADER_PREAMBLE \s*
+            ^ (.*?)       # preamble 2
+        |   (.*?)         # preamble 3
+        )
+
         ^
         (
             \s*
@@ -443,7 +394,11 @@ sub parse_top_level {
         \{                # pmc body beginning marker
     }smx;
     $code =~ s[$top_level_re][{]smx or die "No pmclass found\n";
-    my ( $preamble, $pmc_signature, $pmcname, $attributes ) = ( $1, $2, $3, $4 );
+    my ( $hdr_preamble, $pmc_signature, $pmcname, $attributes ) = ( $2, $5, $6, $7 );
+    my $preamble = do {
+        no warnings 'uninitialized';
+        $1 . $3 . $4;
+    };
 
     my $chewed_lines         = count_newlines($pmc_signature);
     my ( $flags, $parents )  = parse_flags( $attributes, $pmcname );
@@ -452,7 +407,8 @@ sub parse_top_level {
     # trim out the { }
     $body = strip_outer_brackets($body);
 
-    return ( $preamble, $pmcname, $flags, $parents, $body, $postamble, $chewed_lines );
+    return ( $preamble, $hdr_preamble, $pmcname, $flags, $parents,
+            $body, $postamble, $chewed_lines );
 }
 
 our %has_value  = map { $_ => 1 } qw(does group hll);

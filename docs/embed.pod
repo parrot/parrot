@@ -160,7 +160,7 @@ The default. No flags.
 
 =item PARROT_BOUNDS_FLAG
 
-True if byte code bounds should be tracked.
+True if bytecode bounds should be tracked.
 
 =item PARROT_GC_DEBUG_FLAG
 
@@ -1025,8 +1025,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_delprop>
 
-=item C<Parrot_PMC_destroy>
-
 =item C<Parrot_PMC_divide>
 
 =item C<Parrot_PMC_divide_float>
@@ -1181,8 +1179,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_instantiate>
 
-=item C<Parrot_PMC_invoke>
-
 =item C<Parrot_PMC_i_pow>
 
 =item C<Parrot_PMC_i_pow_float>
@@ -1210,8 +1206,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_PMC_i_subtract_float>
 
 =item C<Parrot_PMC_i_subtract_int>
-
-=item C<Parrot_PMC_mark>
 
 =item C<Parrot_PMC_modulus>
 
@@ -1434,8 +1428,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_run_callback>
 
 =item C<Parrot_runcode>
-
-=item C<Parrot_run_native>
 
 =item C<Parrot_schedule_event>
 

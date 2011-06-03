@@ -2,17 +2,21 @@
     "text.news" : true,
     "text.text" : "
 
-On behalf of the Parrot team, I'm proud to announce Parrot @release.version@
-\"@release.name@.\" Parrot (@web.root@) is a virtual machine aimed
+On behalf of the Parrot team, I'm proud to announce Parrot @release.version@, also known
+as \"@release.name@\".  Parrot (@web.root@) is a virtual machine aimed
 at running all dynamic languages.
 
-Parrot @release.version@ is available on Parrot's FTP site, or by following the
-download instructions at @web.root@@web.source@.  For those who would like to
-develop on Parrot, or help develop Parrot itself, we recommend using Git to
+Parrot @release.version@ is available on Parrot's FTP site
+(@ftp.path@), or by following the
+download instructions at @web.root@@web.source@.  For those who would like
+to develop on Parrot, or help develop Parrot itself, we recommend using Git to
 retrieve the source code to get the latest and best Parrot code.
 
 Parrot @release.version@ News:
 @NEWS@
+
+The SHA256 message digests for the downloadable tarballs are:
+@add corresponding lines@
 
 Many thanks to all our contributors for making this possible, and our sponsors
 for supporting this project.  Our next scheduled release is @release.nextdate@.
@@ -23,15 +27,15 @@ Enjoy!
 
     "html.news" : true,
     "html.text" : "
-<p>On behalf of the Parrot team, I'm proud to announce Parrot @release.version@
-&quot;@release.name@.&quot; <a href=\"@web.root@\">Parrot</a>
+<p>On behalf of the Parrot team, I'm proud to announce Parrot @release.version@,
+also known as &quot;@release.name@&quot;. <a href=\"@web.root@\">Parrot</a>
 is a virtual machine aimed at running all dynamic languages.</p>
 
 <p>Parrot @release.version@ is available on <a href=\"@ftp.path@\">Parrot's FTP
 site</a>, or by <a href=\"@web.root@@web.source@\">following the download
 instructions</a>. For those who want to hack on Parrot or languages that run on top of Parrot,
 we recommend <a href=\"@web.org_root@\">our organization page</a> on GitHub,
-or you can go directly to the official Parrot Git repo on <a href="\@web.repository@\">Github</a>
+or you can go directly to the official Parrot Git repo on <a href=\"@web.repository@\">Github</a>
 
 To clone the the Parrot Git repo into a directory called 'parrot', use the following:
 <pre>
@@ -46,6 +50,10 @@ argument to clone:
 
 <p>Parrot @release.version@ News:<br/>
 <pre>@NEWS@</pre></p>
+
+<p>The SHA256 message digests for the downloadable tarballs are:</p>
+<pre>@add corresponding lines@
+</pre>
 
 <p>Thanks to all our contributors for making this possible, and our sponsors
 for supporting this project.  Our next release is @release.nextdate@.</p>
@@ -73,7 +81,7 @@ Check the list at:
 
 https://trac.parrot.org/parrot/report/3
 
-Which contains all the tickets I'd like to see resolved in @version@. To
+Which contains all the tickets I'd like to see resolved in @release.version@. To
 see all the open tickets, use:
 
 https://trac.parrot.org/parrot/report

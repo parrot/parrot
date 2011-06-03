@@ -133,12 +133,6 @@ BEGIN {
 
 =over 4
 
-=item C<is_svn_co()>
-
-=item C<is_git_co()>
-
-Check the type of checkout.
-
 =item C<c_header_file_directories()>
 
 =item C<c_source_file_directories()>
@@ -152,6 +146,8 @@ Check the type of checkout.
 =item C<pir_source_file_directories()>
 
 =item C<pmc_source_file_directories()>
+
+=item C<python_source_file_directories()>
 
 =item C<yacc_source_file_directories()>
 
@@ -171,6 +167,8 @@ Returns the directories which contain source files of the appropriate filetype.
 
 =item C<pmc_source_file_with_name()>
 
+=item C<python_source_file_with_name()>
+
 =item C<yacc_source_file_with_name()>
 
 Returns the source file with the specified name and of the appropriate filetype.
@@ -188,6 +186,8 @@ Returns the source file with the specified name and of the appropriate filetype.
 =item C<pir_source_files()>
 
 =item C<pmc_source_files()>
+
+=item C<python_source_files()>
 
 =item C<yacc_source_files()>
 
@@ -213,6 +213,7 @@ BEGIN {
                 shebang     => qr/^#!\s*perl/,
                 shebang_ext => qr/.t$/,
             },
+            python => { file_exts => ['py'] },
         },
         header => { c => { file_exts => ['h'] }, },
     );
@@ -298,26 +299,6 @@ BEGIN {
             };
         }
     }
-}
-
-=item C<is_svn_co()>
-
-Returns true if this is a subversion checkout of Parrot.
-
-=cut
-
-sub is_svn_co {
-    return shift->directory_exists_with_name('.svn');
-}
-
-=item C<is_git_co()>
-
-Returns true if this is a git checkout of Parrot.
-
-=cut
-
-sub is_git_co {
-    return shift->directory_exists_with_name('.git');
 }
 
 =item C<get_make_language_files()>
@@ -533,7 +514,8 @@ sub is_perl {
     open my $file_handle, '<', $filename
         or $self->_croak("Could not open $filename for reading");
     my $line = <$file_handle>;
-    close $file_handle;
+    close $file_handle
+        or $self->_croak("Could not close $filename after reading");
 
     return 1 if $line && $line =~ /^#!.*perl/;
 
@@ -601,7 +583,8 @@ sub is_pir {
     open my $file_handle, '<', $filename
         or $self->_croak("Could not open $filename for reading");
     my $line = <$file_handle>;
-    close $file_handle;
+    close $file_handle
+        or $self->_croak("Could not close $filename for reading");
 
     if ( $line && $line =~ /^#!.*parrot(?:\s|$)/ ) {
         # something that specifies a pir or pbc is probably a HLL, skip it
@@ -721,6 +704,36 @@ sub perl_module_file_with_name {
     return;
 }
 
+=item C<get_python_language_files()>
+
+Returns the Python language source files within Parrot.
+
+At the current time, these files are limited to examples and tools that are
+useful to Parrot developers.
+
+Returns a list of Parrot::Docs::File objects.
+
+=cut
+
+sub get_python_language_files {
+    my $self = shift;
+
+    my @files = ( $self->python_source_files,);
+
+    my @python_language_files = ();
+    foreach my $file (@files) {
+        next if $self->is_python_exemption($file);
+        push @python_language_files, $file;
+    }
+
+    return @python_language_files;
+}
+
+sub is_python_exemption {
+    my ($self, $file) = @_;
+    return;
+}
+
 =item C<docs_directory()>
 
 Returns the documentation directory.
@@ -760,7 +773,7 @@ sub generated_files {
 
     return {
         map { File::Spec->catfile( $path, $_ ) => $generated->{$_} }
-            keys %$generated
+            keys %{$generated}
     };
 }
 
@@ -782,7 +795,7 @@ sub slurp {
         local $/;
         $buf = <$fh>;
     }
-    close $fh;
+    close $fh or die "Cannot close $path after reading: $!\n";
 
     return $buf;
 }

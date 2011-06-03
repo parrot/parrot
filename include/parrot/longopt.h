@@ -40,13 +40,15 @@ struct longopt_opt_info {
 
 #define LONGOPT_OPT_INFO_INIT { 1, 0, NULL, NULL, NULL }
 
-#define OPT_GC_DEBUG       128
-#define OPT_DESTROY_FLAG   129
-#define OPT_HELP_DEBUG     130
-#define OPT_PBC_OUTPUT     131
-#define OPT_RUNTIME_PREFIX 132
-#define OPT_HASH_SEED      133
-#define OPT_GC_THRESHOLD   134
+#define OPT_GC_DEBUG              128
+#define OPT_DESTROY_FLAG          129
+#define OPT_HELP_DEBUG            130
+#define OPT_PBC_OUTPUT            131
+#define OPT_RUNTIME_PREFIX        132
+#define OPT_HASH_SEED             133
+#define OPT_GC_DYNAMIC_THRESHOLD  134
+#define OPT_GC_MIN_THRESHOLD      135
+#define OPT_GC_NURSERY_SIZE       136
 
 /* HEADERIZER BEGIN: src/longopt.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

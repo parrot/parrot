@@ -7,7 +7,6 @@ CX=/usr/bin/g++
 =general
 
 cc=$XYZ
-cxx=$CX
 link=$CX
 ld=/usr/bin/g++
 
@@ -66,6 +65,7 @@ auto::snprintf
 auto::ctags
 auto::revision
 auto::icu
+auto::platform
 gen::config_h
 gen::core_pmcs
 gen::crypto
@@ -73,7 +73,6 @@ gen::opengl
 gen::call_list
 gen::languages
 gen::makefiles
-gen::platform
 gen::config_pm
 
 =cut

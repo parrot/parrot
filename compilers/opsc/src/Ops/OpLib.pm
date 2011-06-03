@@ -45,9 +45,8 @@ Reference to a 'seen-hash' of skipped opcodes.
     # ...
   },
 
-As F<src/ops/ops.skip> states, these are "... opcodes that could be listed in
-F<[src/ops/]ops.num> but aren't ever to be generated or implemented because
-they are useless and/or silly."
+As F<src/ops/ops.skip> states, these are "... opcodes that should not ever to be
+generated or implemented because they are useless and/or silly."
 
 =back
 
@@ -83,7 +82,7 @@ method new(:$skip_file, :$quiet? = 0) {
 
 =item C<load_op_map_files>
 
-Load ops.num and ops.skip files.
+Load ops.skip.
 
 =end METHODS
 

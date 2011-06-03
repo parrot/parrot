@@ -4,14 +4,14 @@ Priority: optional
 Maintainer: Debian Parrot Maintainers <pkg-parrot-devel@lists.alioth.debian.org>
 Uploaders: Allison Randal <allison@parrot.org>, Nuno Carvalho <mestre.smash@gmail.com>, Patrick Michaud <pmichaud@pobox.com>
 Build-Depends: debhelper (>= 5.0.0), perl, perl-doc, libreadline-dev, quilt
-Standards-Version: 3.9.1
+Standards-Version: 3.9.2
 
 Package: parrot
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, parrot-minimal (= ${binary:Version})
 Suggests: parrot-doc
 Provides: parrot-test, parrot-data-dumper
-Description: A virtual machine for dynamic languages
+Description: virtual machine for dynamic languages
  Parrot is a bytecode-based virtual machine designed for dynamic languages.
  Parrot hosts a variety of language implementations, including Tcl, Javascript,
  Ruby, Lua, Scheme, PHP, Python, Perl 6, and a .NET bytecode translator.
@@ -21,12 +21,12 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Conflicts: parrot ( << 1.0.0 )
 Replaces: parrot ( << 1.0.0 )
-Description: A minimal install of the Parrot VM
+Description: minimal install of the Parrot VM
  This package contains the core Parrot virtual machine. It's all that you need
  to get up and running in the average use case, and is sufficient to run most
  language implementations.
 
-Package: libparrot2.9.1
+Package: libparrot3.3.0
 Architecture: any
 Section: libs
 Depends: ${shlibs:Depends}, ${misc:Depends}
@@ -37,7 +37,7 @@ Description: Parrot shared library
 Package: libparrot-dev
 Architecture: any
 Section: libdevel
-Depends: ${misc:Depends}, libparrot2.9.1 (= ${binary:Version}), parrot
+Depends: ${misc:Depends}, libparrot3.3.0 (= ${binary:Version}), parrot
 Description: Parrot shared library development files
  This package contains header files and a static library, needed to develop
  applications which embed Parrot.

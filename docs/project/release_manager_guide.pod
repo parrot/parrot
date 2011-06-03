@@ -1,6 +1,6 @@
-# Copyright (C) 2007-2010, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 
-=head1 Release Instructions
+=head1 Release Manager Guide
 
 To prepare a release:
 
@@ -35,7 +35,7 @@ A couple of days in advance: announce the new release to
 parrot-dev@lists.parrot.org and to the IRC channel #parrot. Ask whether
 there are any showstopping bugs. Check in again with the language
 project leads. It's also good to ask for updates to F<NEWS>, F<CREDITS>,
-F<PLATFORMS>, F<RESPONSIBLE_PARTIES>, F<DEPRECATED.pod> and
+F<PLATFORMS>, F<RESPONSIBLE_PARTIES>, F<api.yaml> and
 L<https://trac.parrot.org/parrot/wiki/Languages>.
 
 On the Saturday before a release you should notify other developers to stop
@@ -49,6 +49,10 @@ You might also select a name (and optionally a quote) for your release.
 For example, you could select a name from
 L<http://en.wikipedia.org/wiki/List_of_parrots>.
 
+NOTE: Build a recent version of Parrot to have available during the release
+to help with bootstrapping. You must have a version of Parrot built and
+available to you for some of the subsequent steps.
+
 =item 1.
 
 The day of the release has come.
@@ -59,14 +63,15 @@ Make sure you have the most recent version of the master branch:
 Also be sure you do not have any local commits that have not yet
 been pushed out and tested thoroughly. You can check for this with
 
-    git log ..origin/master
+    git log origin/master..
 
 If there is no output from that command, then your local master
 and the master on origin are in sync.
 
 =item 2.
 
-Update files with version-specific information:
+Update files with version-specific information, but before doing this you
+should have parrot configured and have run C<make> with the old version:
 
 =over 4
 
@@ -125,10 +130,20 @@ Give yourself credit for the release in F<CREDITS>.
 
 =item f
 
-To have parrot configured and have run C<make> with the old version number is
-condition for this step. Run C<./ops2c --core> (or C<make bootstrap-ops>,
-ignoring errors) followed by C<make reconfig> and C<make> to update the names
-of version-specific internal functions.
+This is a bootstrapping step, which requires you to have an existing parrot
+executable available, preferrably from the previous release or pre-release
+development version from the master branch.
+
+You *must* do this with a previous version of Parrot built before you updated
+the VERSION file. You *must* update VERSION before doing this step.
+
+Run C<./ops2c --core> (or C<make bootstrap-ops>, ignoring errors) followed
+by C<make reconfig> and C<make> to update the names of version-specific
+internal functions.
+
+This step uses the older Parrot to create new ops core files and routines
+using the new version number. The released version of Parrot requires these
+files and the new VERSION.
 
 =item g
 
@@ -163,8 +178,8 @@ Make sure everything works:
 
     make realclean
     perl Configure.pl --test ...
-    make world docs html 2>&1 | tee make_world_docs_html.log
-    make fulltest        2>&1 | tee make_fulltest.log
+    make world html 2>&1 | tee make_world_html.log
+    make fulltest   2>&1 | tee make_fulltest.log
 
 Note that running "make fulltest" takes a while and that separate
 harnesses are being run.
@@ -217,12 +232,27 @@ Untar F<parrot-a.b.c.tar.gz> into another area.
 Make sure everything works:
 
     perl Configure.pl
-    make world docs html 2>&1 | tee make_world_docs_html.log
-    make fulltest        2>&1 | tee make_fulltest.log
+    make world html 2>&1 | tee make_world_html.log
+    make fulltest   2>&1 | tee make_fulltest.log
 
 Verify that the version is correct and doesn't contain the suffix C<devel>:
 
     ./parrot -V
+
+=over 4
+
+=item * C<make release_check>
+
+As an alternative to steps 4, 5 and 6 above, you may wish to call:
+
+    perl Configure.pl
+    make release_check
+
+This target (or, for short, C<make relcheck>), will prepare the tarballs, copy
+the F<.gz> tarball to a temporary directory, and then reconfigure, rebuild,
+retest (through C<make test>) and rerelease.
+
+=back
 
 =item 7.
 
@@ -330,9 +360,9 @@ the resources/ and html/ directories created in docs/.
 ssh into the parrotvm, and in the
 webroot for docs.parrot.org, expand these into a release directory (e.g.
 1.4.0). in <webroot>/parrot, there are symbolic links for latest, supported,
-and devel. Update the devel symlink to point to your new directory.
-If this is a supported release, also update the supported symlink. Do not delete
-any old copies of the docs.
+and devel. Update the C<latest> symlink to point to your new directory.
+If this is a supported release, also update the C<supported> symlink.
+Do not delete any old copies of the docs, don't update the other symlinks.
 
 =back
 
@@ -351,8 +381,9 @@ following channels (and any others you can think of):
 =item a
 
 Send a text email to parrot-dev, parrot-users, perl6-language, perl6-announce,
-perl5-porters, etc.  You should also include LWN.net in this mailing; email to
-C<lwn> at that domain.
+perl5-porters, etc.  (Note: perl6-internals is no longer in use, so you don't
+need to mail that list.)  You should also include LWN.net in this mailing;
+email to C<lwn> at that domain.
 
 =item b
 
@@ -391,8 +422,8 @@ can have their milestone unset.
 
 =item 13.
 
-Add the version to Trac so new bug reports can be filed against your
-buggy code. L<https://trac.parrot.org/parrot/admin/ticket/versions>.
+Add the version to Trac so new bug reports can be filed against the release.
+L<https://trac.parrot.org/parrot/admin/ticket/versions>.
 
 Make the latest released version the default version for new reports.
 
@@ -429,13 +460,15 @@ The calendar of releases is available at the comp.lang.parrot google calendar,
 visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
- - Jan 18, 2011 - 3.0*  - cotto
- - Feb 15, 2011 - 3.1   - mikehh
- - Mar 15, 2011 - 3.2   - gerd
- - Apr 19, 2011 - 3.3*  - ??
- - May 17, 2011 - 3.4   - ??
- - Jun 21, 2011 - 3.5   - ??
+Versions with a asterisk (*) are supported releases.
+
+ - Jun 21, 2011 - 3.5   - cotto
  - Jul 19, 2011 - 3.6*  - kid51
+ - Aug 16, 2011 - 3.7   - ??
+ - Sep 20, 2011 - 3.8   - soh_cah_toa
+ - Oct 18, 2011 - 3.9*  - dukeleto
+ - Nov 15, 2011 - 3.10  - ??
+ - Dec 20, 2011 - 3.11  - cotto
 
 =cut
 

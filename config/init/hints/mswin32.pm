@@ -13,7 +13,6 @@ sub runstep {
     my $ccflags   = $conf->option_or_data('ccflags');
     my $cc        = $conf->option_or_data('cc');
     my $share_ext = $conf->option_or_data('share_ext');
-    my $version   = $conf->option_or_data('VERSION');
 
     # Later in the Parrot::Configure::runsteps() process,
     # inter::progs will merge the command-line overrides with the defaults.
@@ -94,7 +93,8 @@ sub runstep {
             ld_load_flags       => '-dll',
             ld_out              => '-out:',
             ldflags             => '-nologo -nodefaultlib',
-            libs                => 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib ',
+            # advapi32 needed for src/platform/win32/entropy.c
+            libs                => 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib advapi32.lib ',
             libparrot_static    => 'libparrot' . $conf->data->get('a'),
             libparrot_shared    => "libparrot$share_ext",
             ar                  => 'lib',
@@ -202,14 +202,20 @@ sub runstep {
         );
     }
     elsif ($is_mingw) {
+        # when using mingw gcc, parrot needs at least Windows2000, but WindowsME.
+        my @os_version = Win32::GetOSVersion();
+        my $winver = (($os_version[4] >=2 && $os_version[1]>=5)
+            || ($os_version[4] = 1 && $os_version[1] = 4))? 'Windows2000' : 'WindowsNT4';
+
         my $make = $conf->data->get(qw(make));
+
         if ( $make =~ /nmake/i ) {
 
             # ActiveState Perl
             $conf->data->set(
                 a       => '.a',
                 ar      => 'ar',
-                ccflags => '-DWIN32 ',
+                ccflags => "-DWIN32 -DWINVER=$winver ",
                 ld      => 'g++',
                 ldflags => '',
                 libs =>
@@ -223,7 +229,7 @@ sub runstep {
 
             # strawberry Perl
             $conf->data->set(
-                ccflags   => '-DWIN32 ',
+                ccflags   => "-DWIN32 -DWINVER=$winver ",
                 ldflags   => '',
                 linkflags => '',
                 optimize  => '',
@@ -232,6 +238,7 @@ sub runstep {
         elsif ( $make =~ /mingw32-make/i ) {
             ; # Vanilla Perl
             $conf->data->set(
+                ccflags   => "-DWINVER=$winver ",
                 make      => 'mingw32-make',
                 make_c    => 'mingw32-make -C',
             );

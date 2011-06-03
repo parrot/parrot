@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2010, Parrot Foundation.
+Copyright (C) 2005-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -292,6 +292,7 @@ add_multi_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
                 add_to_class(interp, nsinfo, classobj, method_name, value);
 
                 GETATTR_NameSpace_hash(interp, SELF, hash);
+                PARROT_GC_WRITE_BARRIER(interp, SELF);
 
                 Parrot_hash_put(interp, hash,
                     Parrot_hash_key_from_string(interp, hash, key),
@@ -342,11 +343,11 @@ Initialize a C<NameSpace> PMC.
 */
 
     VTABLE void init() {
+        SUPER();
         PARROT_NAMESPACE(SELF)->vtable  = PMCNULL;
         PARROT_NAMESPACE(SELF)->methods = PMCNULL;
         PARROT_NAMESPACE(SELF)->_class  = PMCNULL;
-        SELF.set_pointer(Parrot_hash_new(INTERP));
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_mark_SET(SELF);
     }
 
 /*
@@ -361,9 +362,7 @@ Marks the namespace as live.
     VTABLE void mark() {
         Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
 
-        if (nsinfo->hash)
-            Parrot_hash_mark(INTERP, nsinfo->hash);
-
+        SUPER();
         Parrot_gc_mark_PMC_alive(INTERP, nsinfo->parent);
         Parrot_gc_mark_PMC_alive(INTERP, nsinfo->_class);
         Parrot_gc_mark_PMC_alive(INTERP, nsinfo->vtable);
@@ -382,6 +381,7 @@ Returns the class or role PMC that is associated with this namespace.
 */
 
     PMC *get_class() {
+        UNUSED(INTERP);
         return PARROT_NAMESPACE(SELF)->_class;
     }
 
@@ -466,7 +466,7 @@ really a public API.
 
         if (val_is_NS) {
             /* TODO - this hack needs to go */
-            Parrot_NameSpace_attributes *nsinfo = PARROT_NAMESPACE(value);
+            Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(value);
             nsinfo->parent = SELF;  /* set parent */
             nsinfo->name   = key;   /* and name */
 
@@ -692,6 +692,7 @@ Return the name of this namespace part.
 
     VTABLE STRING *get_string() {
         const Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
+        UNUSED(INTERP);
         return nsinfo->name;
     }
 
@@ -1143,7 +1144,8 @@ Return the parent NameSpace or PMCNULL, if none.
 */
 
     METHOD get_parent() {
-        PMC *parent = PARROT_NAMESPACE(SELF)->parent ? PARROT_NAMESPACE(SELF)->parent : PMCNULL;
+        PMC * const parent = PARROT_NAMESPACE(SELF)->parent ?
+                                 PARROT_NAMESPACE(SELF)->parent : PMCNULL;
         RETURN(PMC *parent);
     }
 

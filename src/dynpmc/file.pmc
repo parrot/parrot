@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -25,8 +25,6 @@ C<File> is a singleton class which provides access to File functions.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
-/* TT #1050 apparently, strerror_r is thread-safe and should be used instead.*/
-
 static PMC *File_PMC;
 pmclass File dynpmc singleton {
 
@@ -43,14 +41,23 @@ information see F<src/pmc.c>.
 
 */
     void class_init() {
+        UNUSED(INTERP);
+        UNUSED(entry);
+
         File_PMC = NULL;
     }
 
     VTABLE void *get_pointer() {
+        UNUSED(INTERP);
+        UNUSED(SELF);
+
         return File_PMC;
     }
 
     VTABLE void set_pointer(void *ptr) {
+        UNUSED(INTERP);
+        UNUSED(SELF);
+
         File_PMC = (PMC *)ptr;
     }
 
@@ -65,19 +72,9 @@ Returns a true value (1) if the supplied file or directory exists.
 */
 
     METHOD exists(STRING *path) {
-        struct stat info;
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-#ifdef WIN32
-        const int error = stat(cpath, &info);
-#else
-        const int error = lstat(cpath, &info);
-#endif
-        Parrot_str_free_cstring(cpath);
+        const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_EXISTS);
 
-        if (error)
-            RETURN(INTVAL 0);
-
-        RETURN(INTVAL 1);
+        RETURN(INTVAL res);
     }
 
 /*
@@ -91,25 +88,9 @@ Returns a true value (1) if the supplied path is a directory.
 */
 
     METHOD is_dir(STRING *path) {
-        struct stat info;
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-#ifdef WIN32
-        const int error = stat(cpath, &info);
-#else
-        const int error = lstat(cpath, &info);
-#endif
-        Parrot_str_free_cstring(cpath);
+        const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISDIR);
 
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-
-        if (S_ISDIR(info.st_mode))
-            RETURN(INTVAL 1);
-        else
-            RETURN(INTVAL 0);
+        RETURN(INTVAL res);
     }
 
 /*
@@ -123,25 +104,9 @@ Returns a true value (1) if the supplied path is a plain file.
 */
 
     METHOD is_file(STRING *path) {
-        struct stat info;
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-#ifdef WIN32
-        int error   = stat(cpath, &info);
-#else
-        int error   = lstat(cpath, &info);
-#endif
-        Parrot_str_free_cstring(cpath);
+        const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISREG);
 
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-
-        if (S_ISREG(info.st_mode))
-            RETURN(INTVAL 1);
-        else
-            RETURN(INTVAL 0);
+        RETURN(INTVAL res);
     }
 
 /*
@@ -155,28 +120,9 @@ Returns a true value (1) if the supplied path is a link.
 */
 
     METHOD is_link(STRING *path) {
-#ifdef WIN32
-        /* I love win32 implementations */
-        RETURN(INTVAL 0);
-#else
-        struct stat info;
+        const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISLNK);
 
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-        const int    error = lstat(cpath, &info);
-
-        Parrot_str_free_cstring(cpath);
-
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-
-        if (S_ISLNK(info.st_mode))
-            RETURN(INTVAL 1);
-        else
-            RETURN(INTVAL 0);
-#endif
+        RETURN(INTVAL res);
     }
 
 /*
@@ -251,18 +197,7 @@ Rename a file C<from> to the path C<to>.
 */
 
     METHOD rename(STRING *from, STRING *to) {
-        char * const cfrom = Parrot_str_to_cstring(INTERP, from);
-        char * const   cto = Parrot_str_to_cstring(INTERP, to);
-        const int    error = rename(cfrom, cto);
-
-        Parrot_str_free_cstring(cfrom);
-        Parrot_str_free_cstring(cto);
-
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
+        Parrot_file_rename(INTERP, from, to);
     }
 }
 
@@ -270,7 +205,7 @@ Rename a file C<from> to the path C<to>.
 
 =back
 
-=head1 SEE ALS0
+=head1 SEE ALSO
 
    stat(2), rename(2)
 

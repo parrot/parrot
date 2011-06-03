@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -24,51 +24,50 @@ components.
 =item F<src/gc/api.c>
 
 This is the main API file which provides access to functions which are used by
-the rest of Parrot core. In the long term, only the functions provided in this
-file should be visible to files outside the src/gc/ directory. Because this
-represents a public-facing API, the functions in this file are not related by
-theme.
+the rest of Parrot core.  Only the functions provided in this file should be
+visible to files outside the src/gc/ directory.  Because this represents a
+public-facing API, the functions in this file are not related by theme.
 
 =item F<src/gc/alloc_memory.c>
 
 This file provides a number of functions and macros for allocating memory from
-the OS. These are typically wrapper functions with error-handling capabilities
-over malloc, calloc, or realloc.
-
-=item F<src/gc/alloc_register.c>
-
-This file implements the custom management and interface logic for
-Parrot_Context structures. The functions in this file are publicly available
-and are used throughout Parrot core for interacting with contexts and registers
+the OS. These are typically wrapper functions around malloc, calloc and realloc
+with additional error-handling code.
 
 =item F<src/gc/alloc_resources.c>
 
 This file implements handling logic for strings and arbitrary-sized memory
-buffers. String storage is managed by special Variable_Size_Pool structures, and use
-a separate compacting garbage collector to keep track of them.
-
-=item F<src/gc/incremental_ms.c>
-
-=item F<src/gc/generational_ms.c>
+buffers.  String storage is managed by special Variable_Size_Pool structures.
+A separate compacting garbage collector is used to keep track of them.
 
 =item F<src/gc/gc_ms.c>
 
+=item F<src/gc/gc_ms2.c>
+
+=item F<src/gc/gc_gms.c>
+
+=item F<src/gc/gc_inf.c>
+
 These files are the individual GC cores which implement the primary tracing
-and sweeping logic. gc_ms.c is the mark & sweep collector core which is used in
-Parrot by default. generational_ms.c is an experimental and incomplete
-generational core.  incremental_ms.c is an experimental and incomplete
-incremental collector core.
+and sweeping logic.
+gc_ms.c is the mark & sweep collector core,
+gc_ms2.c implements a generational mark & sweep allocator,
+gc_gms.c implements a generational, non-compacting, mark and sweep allocator,
+gc_inf.c implements an "infinite" allocator which never frees any memory.
+The infinite allocator is not recommended except for debugging.
+The default is currently gc_ms2.c but is expected to move to gc_gms.c
+after RELEASE_3_3_0.
 
 =item F<src/gc/mark_sweep.c>
 
-This file implements some routines that are commonly needed by the various GC
-cores and provide an abstraction layer that a GC core can use to interact with
-some of the architecture of Parrot.
+This file implements some generic utility functions that are commonly needed by
+various GC cores and provide an abstraction layer that a GC core can use to
+interact with some of the architecture of Parrot.
 
 =item F<src/gc/system.c>
 
-This file implements logic for tracing processor registers and the system stack.
-Here there be dragons.
+This file implements low-level logic for tracing processor registers and the
+system stack.  Here be dragons.
 
 =item F<src/gc/malloc.c>
 
@@ -92,42 +91,9 @@ implementation, and malloc wrappers for various purposes. These are unused.
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
 #include "gc_private.h"
+#include "fixed_allocator.h"
 
 /* HEADERIZER HFILE: include/parrot/gc_api.h */
-
-/* HEADERIZER BEGIN: static */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: static */
-
-#if ! DISABLE_GC_DEBUG
-
-#endif
-
-/*
-
-=item C<void Parrot_gc_set_system_type(PARROT_INTERP, const char *name)>
-
-Sets the type specified by C<name> of garbage collector.
-
-=cut
-
-*/
-
-
-PARROT_EXPORT
-void
-Parrot_gc_set_system_type(PARROT_INTERP, ARGIN(const char *name))
-{
-    ASSERT_ARGS(Parrot_gc_set_system_type)
-    if (STREQ(name, "MS"))
-        interp->gc_sys->sys_type = MS;
-    if (STREQ(name, "MS2"))
-        interp->gc_sys->sys_type = MS2;
-    if (STREQ(name, "INF"))
-        interp->gc_sys->sys_type = INF;
-}
 
 /*
 
@@ -158,7 +124,7 @@ Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
         interp->gc_sys->mark_pmc_header(interp, (PMC*) obj);
     }
     else {
-        interp->gc_sys->mark_pobj_header(interp, obj);
+        interp->gc_sys->mark_str_header(interp, (STRING*) obj);
     }
 }
 
@@ -177,7 +143,8 @@ void
 Parrot_gc_mark_PMC_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(PMC *obj))
 {
     ASSERT_ARGS(Parrot_gc_mark_PMC_alive_fun)
-    interp->gc_sys->mark_pmc_header(interp, obj);
+    if (obj)
+        interp->gc_sys->mark_pmc_header(interp, obj);
 }
 
 /*
@@ -195,12 +162,13 @@ void
 Parrot_gc_mark_STRING_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(STRING *obj))
 {
     ASSERT_ARGS(Parrot_gc_mark_STRING_alive_fun)
-    interp->gc_sys->mark_pobj_header(interp, (PObj*)obj);
+    if (obj)
+        interp->gc_sys->mark_str_header(interp, obj);
 }
 
 /*
 
-=item C<void Parrot_gc_initialize(PARROT_INTERP, void *stacktop)>
+=item C<void Parrot_gc_initialize(PARROT_INTERP, Parrot_GC_Init_Args *args)>
 
 Initializes the memory allocator and the garbage collection subsystem.
 Calls the initialization function associated with each collector, which
@@ -213,28 +181,52 @@ stack scanning during a garbage collection run.
 
 */
 
+PARROT_EXPORT
 void
-Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
+Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_gc_initialize)
 
-    interp->lo_var_ptr                    = stacktop;
+    interp->lo_var_ptr = args->stacktop;
 
-    /*Call appropriate initialization function for GC subsystem*/
+    interp->gc_sys->sys_type = PARROT_GC_DEFAULT_TYPE;
+
+    if (args->system != NULL) {
+        if (STREQ(args->system, "gms"))
+            interp->gc_sys->sys_type = GMS;
+        else if (STREQ(args->system, "ms2"))
+            interp->gc_sys->sys_type = MS2;
+        else if (STREQ(args->system, "ms"))
+            interp->gc_sys->sys_type = MS;
+        else if (STREQ(args->system, "inf"))
+            interp->gc_sys->sys_type = INF;
+        else {
+            /* Can't throw exception before GC is initialized */
+            fprintf(stderr, "Unknown GC type '%s'\n", args->system);
+            exit(EXIT_FAILURE);
+        }
+    }
+
     switch (interp->gc_sys->sys_type) {
       case MS:
-        Parrot_gc_ms_init(interp);
+        Parrot_gc_ms_init(interp, args);
         break;
       case INF:
-        Parrot_gc_inf_init(interp);
+        Parrot_gc_inf_init(interp, args);
         break;
       case MS2:
-        Parrot_gc_ms2_init(interp);
+        Parrot_gc_ms2_init(interp, args);
+        break;
+      case GMS:
+        Parrot_gc_gms_init(interp, args);
         break;
       default:
-        /*die horribly because of invalid GC core specified*/
+        /* add a default to supress compiler warnings
+         * should never get here as the above if statemewnt
+         * would catch any invalid GC types and exit
+         */
         break;
-    };
+    }
 
     /* Assertions that GC subsystem has complete API */
     PARROT_ASSERT(interp->gc_sys->do_gc_mark);
@@ -285,6 +277,7 @@ routine.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_finalize(PARROT_INTERP)
 {
@@ -309,6 +302,7 @@ flags for the objects and initializes the PMC data pointer to C<NULL>.
 
 */
 
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
@@ -339,6 +333,7 @@ Adds the given PMC to the free list for later reuse.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
@@ -359,6 +354,7 @@ C<NULL>.
 
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
@@ -388,6 +384,7 @@ Adds the given STRING to the free list for later reuse.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
 {
@@ -408,6 +405,7 @@ to create ListChunk objects in src/list.c.
 
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Buffer *
@@ -429,6 +427,7 @@ it and use it again.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_free_bufferlike_header(PARROT_INTERP, ARGMOD(Buffer *obj),
     size_t size)
@@ -450,6 +449,7 @@ so the size may be rounded up or down to guarantee that this alignment holds.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP,
     ARGOUT(Buffer *buffer), size_t size)
@@ -473,6 +473,7 @@ memory is not cleared.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer),
     size_t newsize)
@@ -495,6 +496,7 @@ is B<not> changed.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_allocate_string_storage(PARROT_INTERP, ARGOUT(STRING *str),
     size_t size)
@@ -516,6 +518,7 @@ new buffer location, C<str-E<gt>bufused> is B<not> changed.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
     size_t newsize)
@@ -535,6 +538,7 @@ set.
 
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void *
 Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
@@ -552,6 +556,7 @@ flag set.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
@@ -569,6 +574,7 @@ managed and needs to be freed with C<Parrot_gc_free_fixed_size_storage>
 
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void *
 Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
@@ -587,6 +593,7 @@ C<Parrot_gc_allocate_fixed_size_storage>
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
 {
@@ -675,11 +682,13 @@ headers. Performs a complete mark & sweep run of the GC.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_gc_mark_and_sweep)
     interp->gc_sys->do_gc_mark(interp, flags);
+
 }
 
 /*
@@ -692,6 +701,7 @@ Compact string pool if supported by GC.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_compact_memory_pool(PARROT_INTERP)
 {
@@ -711,6 +721,7 @@ Merges the header pools of C<source_interp> into those of C<dest_interp>.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_destroy_child_interp(ARGMOD(Interp *dest_interp),
     ARGIN(Interp *source_interp))
@@ -730,6 +741,7 @@ Returns the number of actively used sized buffers.
 
 */
 
+PARROT_EXPORT
 int
 Parrot_gc_active_sized_buffers(PARROT_INTERP)
 {
@@ -747,6 +759,7 @@ Returns the total number of sized buffers that we are managing.
 
 */
 
+PARROT_EXPORT
 int
 Parrot_gc_total_sized_buffers(PARROT_INTERP)
 {
@@ -764,6 +777,7 @@ Return the number of actively used PMCs.
 
 */
 
+PARROT_EXPORT
 int
 Parrot_gc_active_pmcs(PARROT_INTERP)
 {
@@ -781,6 +795,7 @@ Return the total number of PMCs that we are managing.
 
 */
 
+PARROT_EXPORT
 int
 Parrot_gc_total_pmcs(PARROT_INTERP)
 {
@@ -804,7 +819,13 @@ Return the number of lazy mark runs the GC has performed.
 
 =item C<size_t Parrot_gc_total_memory_allocated(PARROT_INTERP)>
 
-Return the total number of memory allocations made by the GC.
+Return the total number of bytes allocated by the GC.
+
+=item C<size_t Parrot_gc_total_memory_used(PARROT_INTERP)>
+
+Return the total number of bytes used. This is lower than the allocated
+memory because of fragmentation and freed memory that is not returned
+to the OS.
 
 =item C<size_t Parrot_gc_headers_alloc_since_last_collect(PARROT_INTERP)>
 
@@ -822,6 +843,7 @@ Returns the number of PMCs that are marked as needing timely destruction.
 
 */
 
+PARROT_EXPORT
 size_t
 Parrot_gc_count_mark_runs(PARROT_INTERP)
 {
@@ -829,6 +851,7 @@ Parrot_gc_count_mark_runs(PARROT_INTERP)
     return interp->gc_sys->get_gc_info(interp, GC_MARK_RUNS);
 }
 
+PARROT_EXPORT
 size_t
 Parrot_gc_count_collect_runs(PARROT_INTERP)
 {
@@ -836,6 +859,7 @@ Parrot_gc_count_collect_runs(PARROT_INTERP)
     return interp->gc_sys->get_gc_info(interp, GC_COLLECT_RUNS);
 }
 
+PARROT_EXPORT
 size_t
 Parrot_gc_count_lazy_mark_runs(PARROT_INTERP)
 {
@@ -843,6 +867,7 @@ Parrot_gc_count_lazy_mark_runs(PARROT_INTERP)
     return interp->gc_sys->get_gc_info(interp, GC_LAZY_MARK_RUNS);
 }
 
+PARROT_EXPORT
 size_t
 Parrot_gc_total_memory_allocated(PARROT_INTERP)
 {
@@ -850,6 +875,15 @@ Parrot_gc_total_memory_allocated(PARROT_INTERP)
     return interp->gc_sys->get_gc_info(interp, TOTAL_MEM_ALLOC);
 }
 
+PARROT_EXPORT
+size_t
+Parrot_gc_total_memory_used(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_gc_total_memory_used)
+    return interp->gc_sys->get_gc_info(interp, TOTAL_MEM_USED);
+}
+
+PARROT_EXPORT
 size_t
 Parrot_gc_headers_alloc_since_last_collect(PARROT_INTERP)
 {
@@ -857,6 +891,7 @@ Parrot_gc_headers_alloc_since_last_collect(PARROT_INTERP)
     return interp->gc_sys->get_gc_info(interp, HEADER_ALLOCS_SINCE_COLLECT);
 }
 
+PARROT_EXPORT
 size_t
 Parrot_gc_mem_alloc_since_last_collect(PARROT_INTERP)
 {
@@ -864,6 +899,7 @@ Parrot_gc_mem_alloc_since_last_collect(PARROT_INTERP)
     return interp->gc_sys->get_gc_info(interp, MEM_ALLOCS_SINCE_COLLECT);
 }
 
+PARROT_EXPORT
 UINTVAL
 Parrot_gc_total_copied(PARROT_INTERP)
 {
@@ -871,6 +907,7 @@ Parrot_gc_total_copied(PARROT_INTERP)
     return interp->gc_sys->get_gc_info(interp, TOTAL_COPIED);
 }
 
+PARROT_EXPORT
 UINTVAL
 Parrot_gc_impatient_pmcs(PARROT_INTERP)
 {
@@ -938,6 +975,7 @@ Parrot_block_GC_sweep(PARROT_INTERP)
     ASSERT_ARGS(Parrot_block_GC_sweep)
     if (interp->gc_sys->block_sweep)
         interp->gc_sys->block_sweep(interp);
+
 }
 
 PARROT_EXPORT
@@ -971,6 +1009,7 @@ Parrot_is_blocked_GC_sweep(PARROT_INTERP)
         return 0;
 }
 
+PARROT_EXPORT
 void
 Parrot_gc_completely_unblock(PARROT_INTERP)
 {
@@ -983,6 +1022,25 @@ Parrot_gc_completely_unblock(PARROT_INTERP)
 
 /*
 
+=item C<void Parrot_gc_write_barrier(PARROT_INTERP, PMC *pmc)>
+
+Write barrier for PMC.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_gc_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
+{
+    ASSERT_ARGS(Parrot_gc_write_barrier)
+    if (interp->gc_sys->write_barrier)
+        interp->gc_sys->write_barrier(interp, pmc);
+}
+
+/*
+
 =item C<void Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, PMC *pmc)>
 
 Mark a PMC as needing timely destruction
@@ -991,6 +1049,7 @@ Mark a PMC as needing timely destruction
 
 */
 
+PARROT_EXPORT
 void
 Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
@@ -1009,6 +1068,7 @@ Retrieve the name of the currently active GC system.
 
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_gc_sys_name(PARROT_INTERP)
@@ -1025,6 +1085,9 @@ Parrot_gc_sys_name(PARROT_INTERP)
         case MS2:
             name = Parrot_str_new(interp, "ms2", 3);
             break;
+        case GMS:
+            name = Parrot_str_new(interp, "gms", 3);
+            break;
         default:
             name = Parrot_str_new(interp, "unknown", 7);
             break;
@@ -1032,6 +1095,7 @@ Parrot_gc_sys_name(PARROT_INTERP)
     PARROT_ASSERT(name != NULL);
     return name;
 }
+
 
 /*
 

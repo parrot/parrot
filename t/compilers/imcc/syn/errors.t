@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ use Parrot::Test;
 plan skip_all => 'No reason to compile invalid PBC here'
     if $ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} =~ m/--run-pbc/;
 
-plan tests => 7;
+plan tests => 8;
 
 ## tests for imcc error messages
 
@@ -92,8 +92,56 @@ pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'warn about failing .loadl
     say "WTF"
 .end
 END_PIR
-/^error:imcc:loadlib.*nosuch/
+/error:imcc:loadlib.*nosuch/
 END_EXPECTED
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "Multi-stage rethrows produce an informative backtrace");
+.sub main :main
+    push_eh _handler
+    'foo'()
+    say "not caught"
+    .return()
+  _handler:
+    .get_results($P0)
+    say "caught in main"
+    pop_eh
+    rethrow $P0
+.end
+
+.sub 'foo'
+    push_eh _handler
+    'bar'()
+    say "not caught"
+    .return()
+  _handler:
+    .get_results($P0)
+    say "caught in foo"
+    pop_eh
+    rethrow $P0
+.end
+
+.sub 'bar'
+    push_eh _handler
+    'baz'()
+    say "not caught"
+    .return()
+  _handler:
+    .get_results($P0)
+    say "caught in bar"
+    pop_eh
+    rethrow $P0
+.end
+
+.sub 'baz'
+    $P1 = new ['Exception']
+    $P1["message"] = "This is an exception"
+    throw $P1
+    say "not caught"
+    .return()
+.end
+CODE
+/thrown from/
+OUTPUT
 
 # Local Variables:
 #   mode: cperl

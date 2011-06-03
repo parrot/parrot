@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -233,6 +233,7 @@ ARGIN(PMC *method))
 
     if (PMC_IS_NULL(cache)) {
         cache = Parrot_pmc_new(interp, enum_class_Hash);
+        PARROT_GC_WRITE_BARRIER(interp, _class);
         SETATTR_Class_meth_cache(interp, _class, cache);
     }
 
@@ -635,27 +636,40 @@ non-zero value if it does.
 =cut
 
 */
+
     VTABLE INTVAL can(STRING *method_name) {
-        /* Just use find_method and see it if finds anything. */
-        const PMC * const method =
-            VTABLE_find_method(INTERP, SELF, method_name);
-        return !PMC_IS_NULL(method);
+        PMC * const m = VTABLE_find_method(INTERP, SELF, method_name);
+        return !PMC_IS_NULL(m);
     }
 
 
 /*
 
-=item C<INTVAL isa_pmc(PMC *classname)>
+=item C<INTVAL isa_pmc(PMC *lookup)>
 
-Returns whether the object's class is or inherits from C<*classname>.
+Returns whether the object's class is or inherits from C<lookup>.
 
 =cut
 
 */
 
     VTABLE INTVAL isa_pmc(PMC *lookup) {
+        PMC * method = PMCNULL;
+
         if (PMC_IS_NULL(lookup))
             return 0;
+        else {
+            PMC * const classobj = VTABLE_get_class(INTERP, SELF);
+            STRING * const vtable_meth_name = CONST_STRING(INTERP, "isa_pmc");
+            method = Parrot_oo_find_vtable_override(INTERP, classobj,
+                vtable_meth_name);
+        }
+
+        if (!PMC_IS_NULL(method)) {
+            INTVAL result = 0;
+            Parrot_ext_call(INTERP, method, "PiP->I", SELF, lookup, &result);
+            return result;
+        }
 
         if (SUPER(lookup))
             return 1;
@@ -676,13 +690,21 @@ Returns whether the class is or inherits from C<*classname>.
 */
 
     VTABLE INTVAL isa(STRING *classname) {
-        if (SELF->vtable->whoami == classname
-        ||  STRING_equal(INTERP, SELF->vtable->whoami, classname))
-            return 1;
-        else {
-            PMC *_class = PARROT_OBJECT(SELF)->_class;
-            return VTABLE_isa(INTERP, _class, classname);
+        PMC * const classobj = VTABLE_get_class(INTERP, SELF);
+        STRING * const vtable_meth_name = CONST_STRING(INTERP, "isa");
+        PMC * const method = Parrot_oo_find_vtable_override(INTERP, classobj,
+                vtable_meth_name);
+
+        if (!PMC_IS_NULL(method)) {
+            INTVAL result = 0;
+            Parrot_ext_call(INTERP, method, "PiS->I", SELF, classname, &result);
+            return result;
         }
+        else if (SELF->vtable->whoami == classname
+                || STRING_equal(INTERP, SELF->vtable->whoami, classname))
+            return 1;
+        else
+            return VTABLE_isa(INTERP, classobj, classname);
     }
 
 
@@ -775,8 +797,8 @@ Invokes the object (if this vtable function is overridden).
                 Parrot_oo_find_vtable_override_for_class(INTERP, cur_class,
                                                          meth_name);
             if (!PMC_IS_NULL(meth)) {
-                /* Experimental code. See DEPRECATED.pod */
-                PMC *call_sig =
+                /* Experimental code. See api.yaml */
+                PMC * const call_sig =
                     Parrot_pcc_get_signature(INTERP, CURRENT_CONTEXT(INTERP));
 
                 if ((VTABLE_elements(INTERP, call_sig) == 0
