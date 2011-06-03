@@ -1748,22 +1748,12 @@ multi method bind(PAST::Op $node, *%options) {
 Implement a 'copy' assignment (at least until we get the 'copy' opcode).
 
 multi method copy(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
-        .local pmc rpast, rpost, lpast, lpost
-        rpast = node[1]
-        lpast = node[0]
-        rpost = self.'as_post'(rpast, 'rtype'=>'P')
-        lpost = self.'as_post'(lpast, 'rtype'=>'P')
-        .local pmc ops, alabel
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops = $P0.'new'(rpost, lpost, 'node'=>node, 'result'=>lpost)
-        ops.'push_pirop'('copy', lpost, rpost)
-        .return (ops)
-    }
+    my $rpost := self.as_post($node[1], rtype => 'P');
+    my $lpost := self.as_post($node[0], rtype => 'P');
+    my $ops := POST::Ops.new($rpost, $lpost,
+        node => $node, result => $lpost);
+    $ops.push_pirop('copy', $lpost, $rpost);
+    $ops;
 }
 
 
