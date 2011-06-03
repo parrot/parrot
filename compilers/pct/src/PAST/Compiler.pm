@@ -1091,13 +1091,7 @@ Return the POST representation of a C<PAST::Op> node
 to invoke a method on a PMC.
 
 multi method callmethod(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
-        .tailcall self.'call'(node, options :flat :named)
-    }
+    self.call($node, |%options);
 }
 
 
@@ -1349,33 +1343,15 @@ multi method while(PAST::Op $node, *%options) {
 }
 
 multi method until(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
-        .tailcall self.'while'(node, options :flat :named, 'testop'=>'if')
-    }
+    self.while($node, |%options, testop => 'if');
 }
 
 multi method repeat_while(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
-        .tailcall self.'while'(node, options :flat :named, 'bodyfirst'=>1)
-    }
+    self.while($node, |%options, bodyfirst => 1);
 }
 
 multi method repeat_until(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
-        .tailcall self.'while'(node, options :flat :named, 'testop'=>'if', 'bodyfirst'=>1)
-    }
+    self.while($node, |%options, testop => 'if', bodyfirst => 1);
 }
 
 
@@ -1511,14 +1487,7 @@ no statements are generated.
 =cut
 
 multi method null(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
-        $P0 = get_hll_global ['POST'], 'Ops'
-        .tailcall $P0.'new'('node'=>node)
-    }
+    POST::Ops.new(node => $node);
 }
 
 
@@ -2282,13 +2251,7 @@ multi method keyed(PAST::Var $node, $bindpost, $keyrtype?) {
 
 
 multi method keyed_int(PAST::Var $node, $bindpost) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc bindpost
-        bindpost = find_lex '$bindpost'
-        .tailcall self.'keyed'(node, bindpost, 'i')
-    }
+    self.keyed($node, $bindpost, 'i');
 }
 
 
