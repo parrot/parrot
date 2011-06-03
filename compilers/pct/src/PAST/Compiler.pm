@@ -929,43 +929,29 @@ this is handled by redispatching to a method corresponding to
 the node's "pasttype" attribute.
 
 multi method as_post(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
-
-        ##  see if we set first child's lvalue
-        $I0 = node.'lvalue'()
-        unless $I0 goto have_lvalue
-        $P0 = node[0]
-        if null $P0 goto have_lvalue
-        $I1 = exists $P0['lvalue']
-        if $I1 goto have_lvalue
-        $P0.'lvalue'($I0)
-      have_lvalue:
-
-        .local string pasttype
-        pasttype = node.'pasttype'()
-        unless pasttype goto post_pirop
-        $P0 = find_method self, pasttype
-        .tailcall self.$P0(node, options :flat :named)
-
-      post_pirop:
-        .local pmc pirop
-        pirop = node.'pirop'()
-        unless pirop goto post_inline
-        .tailcall self.'pirop'(node, options :flat :named)
-
-      post_inline:
-        .local pmc inline
-        inline = node.'inline'()
-        unless inline goto post_call
-        .tailcall self.'inline'(node, options :flat :named)
-
-      post_call:
-        .tailcall self.'call'(node, options :flat :named)
+    ## see if we set first child's lvalue
+    my $lvalue := $node.lvalue();
+    my $child := $node[0];
+    if $lvalue && pir::defined($child) && !pir::exists($child, 'lvalue') {
+        $child.lvalue($lvalue);
     }
+
+    my $pasttype := $node.pasttype();
+    if $pasttype {
+        return self."$pasttype"($node, |%options);
+    }
+
+    my $pirop := $node.pirop();
+    if $pirop {
+        return self.pirop($node, |%options);
+    }
+
+    my $inline := $node.inline();
+    if $inline {
+        return self.inline($node, |%options);
+    }
+
+    self.call($node, |%options);
 }
 
 
