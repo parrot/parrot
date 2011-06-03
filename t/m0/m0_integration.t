@@ -23,20 +23,28 @@ use File::Slurp qw/slurp/;
 
 use Test::More;
 use File::Spec::Functions;
+use TAP::Parser;
+use Data::Dumper;
 
-plan tests => 1;
+my @m0_files = glob catfile( '.', qw/t m0 integration *.m0/);
 
-interp_output_like("t/m0/integration/m0_noop.m0", qr/1\.\.1\nok 1/, "m0_noop");
+plan tests => scalar @m0_files;
 
-sub interp_output_like {
-    my ($file, $regex, $desc)  = @_;
+
+for my $file (@m0_files) {
+    test_m0_file($file);
+}
+
+sub test_m0_file {
+    my ($file)  = @_;
 
     assemble($file);
     my $interp    = catfile( ".", qw/src m0 perl5 m0_interp.pl/ );
 
-    my $out = `$^X $interp ${file}b 2>&1`;
-    like($out, $regex, $desc);
-
+    my $tap = `$^X $interp ${file}b 2>&1`;
+    my $parser = TAP::Parser->new( {tap => $tap} );
+    $parser->run;
+    is($parser->has_problems, 0, "$file passes");
     return;
 }
 

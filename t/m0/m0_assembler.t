@@ -26,10 +26,10 @@ use File::Spec::Functions;
 plan tests => 21;
 
 my $exefile    = catfile( ".", qw/src m0 perl5 m0_assembler.pl/ );
-my $hello_m0   = catfile(qw/t m0 integration hello.m0/);
-my $hello_m0b  = catfile(qw/t m0 integration hello.m0b/);
-my $hello2_m0  = catfile(qw/t m0 integration hello2.m0/);
-my $hello2_m0b = catfile(qw/t m0 integration hello2.m0b/);
+my $hello_m0   = catfile(qw/t m0 basic hello.m0/);
+my $hello_m0b  = catfile(qw/t m0 basic hello.m0b/);
+my $hello2_m0  = catfile(qw/t m0 basic hello2.m0/);
+my $hello2_m0b = catfile(qw/t m0 basic hello2.m0b/);
 
 output_like(
     $hello_m0,
