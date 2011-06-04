@@ -311,6 +311,10 @@ Store C<*$2> ^ C<*$3> into C<*$1>.
 Allocate C<*$2> bytes, store the pointer C<*$1>.  C<*$3> contains flags
 indicating any special properties required of the returned chunk of memory.  A
 pointer returned by C<gc_alloc> does not need to be freed.
+{{{
+    TODO: define what flags are valid for C<*$3> and what criteria exist for
+    adding new ones
+}}}
 
 =item * sys_alloc - allocate memory using malloc or its equivalent
 
@@ -321,9 +325,9 @@ C<malloc()> implementation (or equivalent) and does not go through ffi.
 
 =item * sys_free - free memory using free() or its equivalent
 
-Free the region of memory at C<*$1>.  C<$2> and C<$3> are ignored.  This is a
-direct interface to the underlying implementation's C<free()> implementation
-(or equivalent) and does not go through ffi.
+Free the region of memory which C<*$1> points at.  C<$2> and C<$3> are ignored.
+This is a direct interface to the underlying implementation's C<free()>
+implementation (or equivalent) and does not go through ffi.
 
 =item * copy_mem - copy data to/from memory
 
