@@ -1,0 +1,40 @@
+.version 0
+.chunk "goto_chunk_main"
+.constants
+0 "1..2"
+1 "ok 1 control flow hits first chunk
+2 "goto_chunk_helper"
+3 "nok 2 control flow goes past goto_chunk"
+.metadata
+.bytecode
+
+    # print "1..2"
+    set_imm S0, 0, 0
+    deref   S0, CONSTS, S0
+    set_imm I0, 0, 1
+    print_s I0, S0, x
+
+    # print "ok 1 "....
+    set_imm S1, 0, 1
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+
+    # goto_chunk "goto_chunk_helper"
+    set_imm S1, 0, 2
+    deref   S1, CONSTS, S1
+    goto_chunk 0, 0, S1
+
+    # print "nok 2"....
+    set_imm S1, 0, 3
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+
+.chunk "goto_chunk_helper"
+.constants
+0 "ok 2 control flow hits first chunk
+.metadata
+.bytecode
+    set_imm S0, 0, 0
+    deref   S0, CONSTS, S0
+    set_imm I0, 0, 1
+    print_s I0, S0, x

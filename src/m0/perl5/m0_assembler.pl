@@ -426,7 +426,7 @@ sub m0b_const_seg_length {
         my $const_length = length($_);
         $seg_length += 4; # storage of size of constant
         $seg_length += length($_);
-        say "after adding constant '$_', length is $seg_length";
+        #say "after adding constant '$_', length is $seg_length";
     }
 
     say "consts seg length is $seg_length";
@@ -536,13 +536,13 @@ sub parse_chunks {
             }
         }
         elsif ($state eq 'bytecode') {
-            if ($line =~ /^\.chunk\s+"(?<name>\w*?)$/) {
-                $chunk{constants} = join("\n", @constants);
+            if ($line =~ /^\.chunk\s+"(?<name>\w*?)"\s*$/) {
+                $chunk{constants} = [@constants];
                 $chunk{metadata}  = join("\n", @metadata);
                 $chunk{bytecode}  = join("\n", @bytecode);
                 push @$chunks, {%chunk};
-                (@constants, @metadata, @bytecode) = ([],[],[]);
-                %chunk = {};
+                (@constants, @metadata, @bytecode) = ((),(),());
+                %chunk = ();
                 $chunk{name} = $+{name}; 
                 $state = 'chunk start';
             }
