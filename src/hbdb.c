@@ -1,7 +1,24 @@
 /* Copyright (C) 2001-2010, Parrot Foundation. */
 
+/*
+
+=head1 NAME
+
+src/hbdb.c - The Honey Bee Debugger
+
+=head1 DESCRIPTION
+
+This file contains functions used by the C<hbdb> debugger.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=cut
+
+*/
+
 /* TODO Remove unnecessary header files */
-/* TODO Add perldoc                     */
 
 #include "parrot/runcore_api.h"
 #include "parrot/extend.h"
@@ -39,6 +56,23 @@ hbdb_get_line_number(PARROT_INTERP, ARGIN(PMC *context_pmc))
 
     return line_num;
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<frontend/hbdb/main.c>, F<include/parrot/hbdb.h>
+
+=head1 HISTORY
+
+The initial version of C<hbdb> was written by Kevin Polulak (soh_cah_toa) as
+part of Google Summer of Code 2011.
+
+=cut
+
+*/
 
 /*
  * Local variables:
