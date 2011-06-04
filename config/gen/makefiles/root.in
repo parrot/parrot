@@ -2019,6 +2019,7 @@ EXAMPLES_TEST_FILES = \
 M0_TEST_FILES = \
 	t/m0/m0_bytecode_loading.t \
 	t/m0/m0_assembler.t \
+	t/m0/m0_interp.t \
 	t/m0/m0_run_hello_m0b.t \
 	t/m0/m0_integration.t
 HEADERIZER_TEST_FILES = $(TOOLS_TESTS_DIR)/dev/headerizer/*.t

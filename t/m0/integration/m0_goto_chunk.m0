@@ -31,7 +31,7 @@
 
 .chunk "goto_chunk_helper"
 .constants
-0 "ok 2 control flow hits first chunk
+0 "ok 2 control flow hits second chunk
 .metadata
 .bytecode
     set_imm S0, 0, 0
