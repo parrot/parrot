@@ -34,8 +34,8 @@ machine.
 
 /* TODO Define usage() function          */
 
-static void fail       (Parrot_PMC interp);
-static void load_bytecode(Parrot_PMC interp, Parrot_String file, Parrot_PMC *pbc);
+static void fail         (Parrot_PMC interp);
+static void load_bytecode(Parrot_PMC interp, const char * const file, Parrot_PMC *pbc);
 
 /*
 
@@ -50,10 +50,11 @@ Entry point of C<hbdb>. Reads source code from file in C<argv[1]>.
 int
 main(int argc, char *argv[])
 {
+    char             *file     = NULL;
+
     Parrot_PMC        interp   = NULL,
                       pbc      = NULL,
                       main_sub = NULL;
-    Parrot_String     file     = NULL;
     Parrot_Init_Args *initargs = NULL;
 
     /* Setup default initialization parameters */
@@ -70,11 +71,8 @@ main(int argc, char *argv[])
         fail(interp);
     }
 
-    /* TODO Check for file w/o relying on it being in argv[1] */
     /* Get filename */
-    if (!Parrot_api_string_import_ascii(interp, argv[1], &file)) {
-        fail(interp);
-    }
+    file = argv[argc - 1];
 
     /* Load bytecode */
     if (file) {
@@ -139,7 +137,7 @@ fail(Parrot_PMC interp)
 
 /*
 
-=item C<static void load_bytecode(Parrot_PMC interp, Parrot_String file, Parrot_PMC *pbc)>
+=item C<static void load_bytecode(Parrot_PMC interp, const char * const file, Parrot_PMC *pbc)>
 
 If C<file> is a C<.pbc> file, the bytecode is loaded and stored in C<pbc>. Otherwise, it must
 be compiled first and then loaded into C<pbc>.
@@ -149,8 +147,15 @@ be compiled first and then loaded into C<pbc>.
 */
 
 static void
-load_bytecode(Parrot_PMC interp, Parrot_String file, Parrot_PMC *pbc)
+load_bytecode(Parrot_PMC interp, const char * const file, Parrot_PMC *pbc)
 {
+    Parrot_String ps_file;
+
+    /* Get filename */
+    if (!Parrot_api_string_import_ascii(interp, file, &ps_file)) {
+        fail(interp);
+    }
+
     /* Compile file if it's not already bytecode */
     if (!strcmp(strrchr(file, '.'), "pbc")) {
         Parrot_PMC pir_compreg = NULL;
@@ -160,15 +165,16 @@ load_bytecode(Parrot_PMC interp, Parrot_String file, Parrot_PMC *pbc)
             fail(interp);
 
         /* Compile file */
-        if (!imcc_compile_file_api(interp, pir_compreg, file, pbc))
+        if (!imcc_compile_file_api(interp, pir_compreg, ps_file, pbc))
             fail(interp);
     }
 
     /* Load bytecode */
-    if (!Parrot_api_load_bytecode_file(interp, file, pbc)) {
+    if (!Parrot_api_load_bytecode_file(interp, ps_file, pbc)) {
         Parrot_api_destroy_interpreter(interp);
         fail(interp);
     }
+}
 
 /*
 
