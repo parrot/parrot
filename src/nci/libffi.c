@@ -86,9 +86,7 @@ typedef union nci_var_t {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
-static PMC * build_ffi_thunk(PARROT_INTERP,
-    SHIM(PMC *user_data),
-    ARGIN(PMC *sig))
+static PMC * build_ffi_thunk(PARROT_INTERP, PMC *user_data, ARGIN(PMC *sig))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -110,7 +108,7 @@ static PMC * clone_ffi_thunk(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static void free_ffi_thunk(PARROT_INTERP,
-    SHIM(void *thunk_func),
+    void *thunk_func,
     ARGFREE(void *thunk_data))
         __attribute__nonnull__(1);
 

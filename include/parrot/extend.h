@@ -25,8 +25,6 @@
    but that would be really annoying */
 #if defined(PARROT_IN_CORE)
 
-#define Parrot_Language Parrot_Int
-
 /* Macro to save off the original stack pointer for GC scanning. If
    the stacktop was NULL, then set it to the address of the cached
    pointer, which is on the stack and as good a thing as any to use as
@@ -79,13 +77,6 @@ void Parrot_ext_try(PARROT_INTERP,
     void *)),
     ARGIN_NULLOK(void *data))
         __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_PURE_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-Parrot_Language Parrot_find_language(PARROT_INTERP,
-    ARGIN(const char *language))
-        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 int Parrot_fprintf(PARROT_INTERP,
@@ -215,8 +206,6 @@ int Parrot_vfprintf(PARROT_INTERP,
     , PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_ext_try __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_find_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(language_unused))
 #define ASSERT_ARGS_Parrot_fprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pio) \

@@ -358,7 +358,6 @@
 /src/nci/*.o
 /src/nci/*.obj
 /src/nci/*.str
-/src/ops/*.c
 /src/ops/*.o
 /src/ops/*.obj
 /src/packfile/*.o
