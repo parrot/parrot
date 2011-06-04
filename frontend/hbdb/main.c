@@ -24,15 +24,18 @@ machine.
 */
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
+
 #include "parrot/parrot.h"
 #include "parrot/hbdb.h"
 #include "parrot/api.h"
+#include "imcc/api.h"
 
-/* TODO Check for command line arguments */
 /* TODO Define usage() function          */
 
-static void fail(Parrot_PMC interp);
+static void fail       (Parrot_PMC interp);
+static void load_bytecode(Parrot_PMC interp, Parrot_String file, Parrot_PMC *pbc);
 
 /*
 
@@ -61,22 +64,24 @@ main(int argc, char *argv[])
         fail(NULL);
     }
 
-    /* TODO Check for argv[1] here and call usage() */
-    /* Get bytecode filename */
-    if (!Parrot_api_string_import_ascii(interp, argv[1], &file)) {
-        fail(interp);
-    }
-
     /* Register hbdb runcore */
     if (!Parrot_api_set_runcore(interp, "hbdb", 0)) {
         Parrot_api_destroy_interpreter(interp);
         fail(interp);
     }
 
-    /* Load bytecode file from command line */
-    if (!Parrot_api_load_bytecode_file(interp, file, &pbc)) {
-        Parrot_api_destroy_interpreter(interp);
+    /* TODO Check for file w/o relying on it being in argv[1] */
+    /* Get filename */
+    if (!Parrot_api_string_import_ascii(interp, argv[1], &file)) {
         fail(interp);
+    }
+
+    /* Load bytecode */
+    if (file) {
+        load_bytecode(interp, file, &pbc);
+    }
+    else { /* No file specified */
+        /* TODO Use parrot_debugger's technique for faking bytecode */
     }
 
     /* Ready bytecode */
@@ -131,6 +136,39 @@ fail(Parrot_PMC interp)
 
     exit(exit_code);
 }
+
+/*
+
+=item C<static void load_bytecode(Parrot_PMC interp, Parrot_String file, Parrot_PMC *pbc)>
+
+If C<file> is a C<.pbc> file, the bytecode is loaded and stored in C<pbc>. Otherwise, it must
+be compiled first and then loaded into C<pbc>.
+
+=cut
+
+*/
+
+static void
+load_bytecode(Parrot_PMC interp, Parrot_String file, Parrot_PMC *pbc)
+{
+    /* Compile file if it's not already bytecode */
+    if (!strcmp(strrchr(file, '.'), "pbc")) {
+        Parrot_PMC pir_compreg = NULL;
+
+        /* Create and register a PIR IMCCompiler PMC */
+        if (!imcc_get_pir_compreg_api(interp, 1, &pir_compreg))
+            fail(interp);
+
+        /* Compile file */
+        if (!imcc_compile_file_api(interp, pir_compreg, file, pbc))
+            fail(interp);
+    }
+
+    /* Load bytecode */
+    if (!Parrot_api_load_bytecode_file(interp, file, pbc)) {
+        Parrot_api_destroy_interpreter(interp);
+        fail(interp);
+    }
 
 /*
 
