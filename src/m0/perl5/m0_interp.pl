@@ -24,7 +24,7 @@ use Data::Dumper;
 
 my $file = shift || die "Usage: $0 foo.m0b";
 
-my $debugging = 0;
+my $debugging = exists $ENV{M0DEBUG} ? 1 : 0;
 
 use constant {
     M0_DIR_SEG   => 0x01,
@@ -244,11 +244,12 @@ sub m0_opfunc_goto_if {
 
 sub m0_opfunc_goto_chunk {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "goto_chunk $a1, $a2, $a3";
 
     my $new_pc      = 256 * $a1 + $a2;
     my $chunk_name  = $cf->[$a3];
     my $interp      = $cf->[INTERP];
+
+    m0_say "goto_chunk $a1, $a2, $a3 (chunk = '$chunk_name')";
 
     die "invalid chunk name '$chunk_name' in goto_chunk"
       unless exists $interp->[CHUNK_MAP]{$chunk_name};
@@ -586,7 +587,7 @@ sub m0b_parse_const_seg {
     while (scalar(@$consts < $const_count)) {
         my $const_length = unpack("L", get_bytes($m0b, $cursor, 4));
         my $const        = unpack("a[$const_length]", get_bytes($m0b, $cursor, $const_length));
-        #say "found constant of length $const_length: '$const'";
+        m0_say "found constant of length $const_length: '$const'";
         push @$consts, $const;
     }
     return $consts;
