@@ -32,16 +32,15 @@ machine.
 #include "parrot/api.h"
 #include "imcc/api.h"
 
-/* TODO Define usage() function          */
-
 static void fail         (Parrot_PMC interp);
 static void load_bytecode(Parrot_PMC interp, const char * const file, Parrot_PMC *pbc);
+static void usage        (void);
 
 /*
 
 =item C<int main(int argc, char *argv[])>
 
-Entry point of C<hbdb>. Reads source code from file in C<argv[1]>.
+Entry point of C<hbdb>.
 
 =cut
 
@@ -73,6 +72,8 @@ main(int argc, char *argv[])
 
     /* Get filename */
     file = argv[argc - 1];
+
+    usage();
 
     /* Load bytecode */
     if (file) {
@@ -151,7 +152,7 @@ load_bytecode(Parrot_PMC interp, const char * const file, Parrot_PMC *pbc)
 {
     Parrot_String ps_file;
 
-    /* Get filename */
+    /* Convert file's type to Parrot_String */
     if (!Parrot_api_string_import_ascii(interp, file, &ps_file)) {
         fail(interp);
     }
@@ -174,6 +175,30 @@ load_bytecode(Parrot_PMC interp, const char * const file, Parrot_PMC *pbc)
         Parrot_api_destroy_interpreter(interp);
         fail(interp);
     }
+}
+
+/*
+
+=item C<static void usage(void)>
+
+Displays a helpful message about standard usage and an explanation of all
+the command line arguments and switches.
+
+=cut
+
+*/
+
+static void
+usage(void)
+{
+    puts("Usage: hbdb [options] [file]\n");
+    puts("Options:");
+    puts("    -h, --help      Displays help information");
+    puts("    -l, --license   Displays license information\n");
+    puts("File:");
+    puts("    Must be either a bytecode file (.pbc) or PIR file (.pir)");
+
+    exit(EXIT_SUCCESS);
 }
 
 /*
