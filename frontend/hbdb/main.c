@@ -30,11 +30,19 @@ machine.
 #include "parrot/parrot.h"
 #include "parrot/hbdb.h"
 #include "parrot/api.h"
+#include "parrot/longopt.h"
 #include "imcc/api.h"
 
 static void fail         (Parrot_PMC interp);
+static void license      (void);
 static void load_bytecode(Parrot_PMC interp, const char * const file, Parrot_PMC *pbc);
 static void usage        (void);
+
+static struct longopt_opt_decl options[] = {
+    { 'h', 'h', OPTION_optional_FLAG, { "--help"    } },
+    { 'l', 'l', OPTION_optional_FLAG, { "--license" } },
+    {   0,   0, OPTION_optional_FLAG, { NULL        } }
+};
 
 /*
 
@@ -47,14 +55,31 @@ Entry point of C<hbdb>.
 */
 
 int
-main(int argc, char *argv[])
+main(int argc, const char *argv[])
 {
-    char             *file     = NULL;
+    char                   *file;
+    int                     status;
+    struct longopt_opt_info opt      = LONGOPT_OPT_INFO_INIT;
 
-    Parrot_PMC        interp   = NULL,
-                      pbc      = NULL,
-                      main_sub = NULL;
-    Parrot_Init_Args *initargs = NULL;
+    Parrot_PMC              interp   = NULL,
+                            pbc      = NULL,
+                            main_sub = NULL;
+    Parrot_Init_Args       *initargs = NULL;
+
+    /* Parse command-line arguments */
+    while ((status = longopt_get(argc, argv, options, &opt)) > 0) {
+        switch(opt.opt_id) {
+            case 'l':
+                license();
+                exit(EXIT_SUCCESS);
+                break;
+            case 'h':
+                /* Fall through is intentional */
+            default:
+                usage();
+                break;
+        }
+    }
 
     /* Setup default initialization parameters */
     GET_INIT_STRUCT(initargs);
@@ -72,8 +97,6 @@ main(int argc, char *argv[])
 
     /* Get filename */
     file = argv[argc - 1];
-
-    usage();
 
     /* Load bytecode */
     if (file) {
@@ -138,6 +161,28 @@ fail(Parrot_PMC interp)
 
 /*
 
+=item C<static void license(void)>
+
+Displays a message about licensing information and resources.
+
+=cut
+
+*/
+
+static void
+license(void)
+{
+    const char *info = "Copyright (C) 2001-2010, Parrot Foundation.\n"
+                       "This program is distributed under the terms of the "
+                       "Artistic License 2.0\n\n"
+                       "For further information, please see LICENSE or visit "
+                       "http://www.perlfoundation.org/attachment/legal/artistic-2_0.txt";
+
+    puts(info);
+}
+
+/*
+
 =item C<static void load_bytecode(Parrot_PMC interp, const char * const file, Parrot_PMC *pbc)>
 
 If C<file> is a C<.pbc> file, the bytecode is loaded and stored in C<pbc>. Otherwise, it must
@@ -182,7 +227,7 @@ load_bytecode(Parrot_PMC interp, const char * const file, Parrot_PMC *pbc)
 =item C<static void usage(void)>
 
 Displays a helpful message about standard usage and an explanation of all
-the command line arguments and switches.
+the command-line arguments and switches.
 
 =cut
 

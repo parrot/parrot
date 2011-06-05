@@ -1049,12 +1049,15 @@ $(INSTALLABLEPROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
 frontend/hbdb/main$(O) : \
     $(PARROT_H_HEADERS) \
     frontend/hbdb/main.c \
+    $(INC_DIR)/hbdb.h \
     $(INC_DIR)/api.h \
-    $(INC_DIR)/hbdb.h
+    $(INC_DIR)/longopt.h \
+    include/imcc/api.h
 
 $(HBDB) : frontend/hbdb/main$(O) src/parrot_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     frontend/hbdb/main$(O) \
+    src/longopt$(O) \
     src/parrot_config$(O) \
     $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
@@ -1062,6 +1065,7 @@ $(HBDB) : frontend/hbdb/main$(O) src/parrot_config$(O) $(LIBPARROT)
 $(INSTALLABLEHBDB) : frontend/hbdb/main$(O) $(LIBPARROT) src/parrot_config$(O)
 	$(LINK) @ld_out@$@ \
     frontend/hbdb/main$(O) \
+    src/longopt$(O) \
     src/parrot_config$(O) \
     @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
