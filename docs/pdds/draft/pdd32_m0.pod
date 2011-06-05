@@ -621,7 +621,6 @@ The header has the following structure:
   0x00       : 1 byte version number (currently 0)
   0x?        : 1 byte number of bytes in an I registers
   0x?        : 1 byte number of bytes in an N register
-  0x?        : 1 byte number of bytes in a opcode_t
   0x?        : 1 byte number of bytes in a pointer
   0x?        : 1 byte for endianness
   xxxxx      : padding
@@ -629,39 +628,39 @@ The header has the following structure:
 The directory segment will be a list of offsets to the starts of chunks within
 the file.  It will have the following structure:
 
-  opcode_t : M0_DIR_SEG
-  opcode_t : number of chunks in this segment
-  opcode_t : number of opcode_t-sized units in this segment
+  uint32 : M0_DIR_SEG
+  uint32 : number of chunks in this segment
+  uint32 : number of bytes in this segment (including this header)
   [
-    opcode_t : offset of a constants segment
-    opcode_t : size of chunk name
+    uint32 : offset of a constants segment
+    uint32 : size of chunk name in bytes
     [
-      opcode_t : chunk name
+      char : chunk name
     ]
   ]
 
 The constants segment will contain any data needed to execute the bytecode.
 Data in constants table must be explictly loaded into registers as needed.
 
-  opcode_t : M0_CONST_SEG
-  opcode_t : number of constants in this segment
-  opcode_t : number of opcode_t-sized units in this segment
+  uint32 : M0_CONST_SEG
+  uint32 : number of constants in this segment
+  uint32 : number of bytes in this segment (including this header)
   [
-    opcode_t : number of bytes in constant data
-    ...      : constant data
+    uint32 : number of bytes in constant data
+    ...    : constant data
   ]
 
 The metadata segment contains any data about the bytecode that might come in
 handy.  The actual data will live in the constants table; this segment just
 provides a way to map values to names and bytecode offsets.
 
-  opcode_t : M0_META_SEG
-  opcode_t : number of entries in this segment
-  opcode_t : number of opcode_t-sized units in this segment
+  uint32 : M0_META_SEG
+  uint32 : number of entries in this segment
+  uint32 : number of bytes in this segment (including this header)
   [
-    opcode_t : bytecode offset relative to the start of the current bc seg where this data becomes effective
-    opcode_t : offset into constants table for the name of this piece of metadata
-    opcode_t : offset into constants table for the value of this piece of metadata
+    uint32 : bytecode offset relative to the start of the current bc seg where this data becomes effective
+    uint32 : offset into constants table for the name of this piece of metadata
+    uint32 : offset into constants table for the value of this piece of metadata
   ]
 
 The bytecode segment contains a series of executable ops.  A pointer (or its
@@ -669,9 +668,9 @@ equivalent for a non-C language) to the current call frame will be passed as
 the first argument to every op, but this pointer will not be stored in
 bytecode.
 
-  opcode_t : M0_BC_SEG
-  opcode_t : number of ops in this segment
-  opcode_t : number of opcode_t-sized units in this segment
+  uint32 : M0_BC_SEG
+  uint32 : number of ops in this segment
+  uint32 : number of bytes in this segment (including this header)
   [
     char : opcode
     char : arg1
