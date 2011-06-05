@@ -34,9 +34,22 @@ This file contains functions used by the C<hbdb> debugger.
 
 /*
 
+=item C<void hbdb_get_command()>
+
+Displays the user prompt.
+
+*/
+
+void
+hbdb_get_command()
+{
+}
+
+/*
+
 =item C<INTVAL hbdb_get_line_number(PARROT_INTERP, PMC *context_pmc)>
 
-Return the line number for the current context
+Returns the line number for the current context
 
 =cut
 
