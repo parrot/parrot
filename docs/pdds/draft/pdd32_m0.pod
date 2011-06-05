@@ -843,7 +843,19 @@ be concerned with them directly.
 
 There are four register types, Integer, Numeric, PMC and String. The string
 type will merely be syntactic sugar for accessing a PMC.  From an M0
-perpsective, S and P registers will be treated as opaque pointers
+perpsective, S and P registers will be treated as opaque pointers.
+
+Each M0 register will be 8 bytes (or have equivalent precision).  A compliant
+call frame will use 2KB (8*265B).
+{{{
+    NOTE: This is still up for debate.  2K per call frame can get expensive on
+    embedded systems, especially if all registers aren't used.  Given that
+    there's a well-defined mechanism for register spilling, it's an option to
+    reduce the number of registers in a call frame if it turns out that typical
+    generated M0 code does just fine with 32, 25 or fewer registers of each
+    type.  All this may be a premature optimization though.
+
+}}}
 
 M0 registers will not have innate types; they'll be nothing more than a
 collection of bits which are assumed to have a certain type by M0's ops.  The
