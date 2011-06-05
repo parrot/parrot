@@ -443,6 +443,9 @@ Engage in multiple dispatch with the listed types.
 See F<docs/pdds/pdd27_multi_dispatch.pod> for more information on the
 multiple dispatch system.
 
+When used in combination with B<:method> (below), the first type (C<type1>)
+refers to the type of the invocant (C<self>).
+
 =item :immediate
 
 Execute this subroutine immediately after being compiled, which is analogous
