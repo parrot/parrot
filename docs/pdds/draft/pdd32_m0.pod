@@ -622,7 +622,7 @@ The header has the following structure:
   0x?        : 1 byte number of bytes in an I registers
   0x?        : 1 byte number of bytes in an N register
   0x?        : 1 byte number of bytes in a pointer
-  0x?        : 1 byte for endianness
+  0x?        : 1 byte for endianness (1 for big, 0 for little)
   xxxxx      : padding
 
 The directory segment will be a list of offsets to the starts of chunks within
