@@ -760,12 +760,29 @@ runloop does need to accomplish the following:
 Execution of an M0 bytecode file starts with the first op of the first bytecode
 segment in a file and ends when the interpreter exits.
 
-=head2 Interaction Between Bytecode Segments
+=head2 M0 Chunk Calling Conventions
+
+In M0, chunks are roughly analogous to functions.  This section describes the
+recommended implemenation and motivation for M0 calling conventions between
+chunks.
+
+=head3 Basic Building Blocks
+
+Control flow in M0 is based around C<goto> and C<goto_if> for intra-chunk
+control flow and C<goto_chunk> for moving between chunks.  While this is all
+that's strictly necessary for Turing completeness, a bit more complexity is
+needed to effectively implement constructs such as continuations, exceptions
+(and exception handlers), coroutines and so forth.  The recommended structure
+for non-trivial control flow is continuation-passing style, with M0's call
+frame structure serving as the continuation.  Members elements of a call frame
+may be manipulated using the C<set>, C<set_imm>, C<set_ref> and C<deref> ops.
 
 This section will specify the following:
  * how to reliably transfer control flow between chunks
  * how to reliably map between sub names and chunks
  * how values from one sub are accessed by another (arguments/returns)
+ * whether the caller or callee is responsible for call frame setup/teardow
+ * how to properly initialize a call frame
 
 =head2 Exceptions and Exception Handling
 
