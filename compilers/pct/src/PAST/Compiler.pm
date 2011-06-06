@@ -593,84 +593,55 @@ multi method as_post(PAST::Control $node, *%options) {
 }
 
 method wrap_handlers($child, $ehs, *%options) {
-    Q:PIR {
-        .local pmc child
-        child = find_lex '$child'
-        .local pmc ehs
-        ehs = find_lex '$ehs'
-        .local pmc options
-        options = find_lex '%options'
+    my $rtype := %options<rtype>;
 
-        .local string rtype
-        rtype = options['rtype']
+    my $node;
+    my $ops  := POST::Ops.new(node => $node);
+    my $pops := POST::Ops.new(node => $node);
+    my $tail := POST::Ops.new(node => $node);
+    my $skip := POST::Label.new(result => self.unique('skip_handler_'));
 
-        .local pmc it, node, ops, pops, tail, skip
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops = $P0.'new'('node'=>node)
-        $P0 = get_hll_global ['POST'], 'Ops'
-        pops = $P0.'new'('node'=>node)
-        $P0 = get_hll_global ['POST'], 'Ops'
-        tail = $P0.'new'('node'=>node)
-        $P0 = get_hll_global ['POST'], 'Label'
-        $S0 = self.'unique'('skip_handler_')
-        skip = $P0.'new'('result'=>$S0)
+    for $ehs {
+        $node := $_;
+        my $label   := POST::Label.new(self.unique('control_'));
+        my $ehreg   := self.uniquereg('P');
 
-        it = iter ehs
-      handler_loop:
-        unless it, handler_loop_done
-        node = shift it
+        $ops.push_pirop('new', $ehreg, "'ExceptionHandler'");
+        $ops.push_pirop('set_label', $ehreg, $label);
 
-        .local pmc ehpir, label, controltypes, subpost
-        .local string ehreg, type
-        $P0 = get_hll_global ['POST'], 'Label'
-        $S0 = self.'unique'('control_')
-        label = $P0.'new'('result'=>$S0)
+        my $type := $node.handle_types();
+        if $type && %controltypes{$type} {
+            my @types := pir::split(',', $type);
+            $ops.push_pirop('callmethod', '"handle_types"', $ehreg, |@types);
+            $*SUB.add_directive('.include "except_types.pasm"');
+        }
 
-        subpost = find_dynamic_lex '$*SUB'
+        $type := $node.handle_types_except();
+        if $type && %controltypes{$type} {
+            my @types := pir::split(',', $type);
+            $ops.push_pirop('callmethod', '"handle_types_except"',
+                $ehreg, |@types);
+            $*SUB.add_directive('.include "except_types.pasm"');
+        }
 
-        ehreg = self.'uniquereg'('P')
-        ops.'push_pirop'('new', ehreg, "'ExceptionHandler'")
-        ops.'push_pirop'('set_label', ehreg, label)
-        controltypes = get_global '%controltypes'
-        type = node.'handle_types'()
-        unless type, handle_types_done
-        type = controltypes[type]
-        unless type, handle_types_done
-        $P0 = split ',', type
-        ops.'push_pirop'('callmethod', '"handle_types"', ehreg, $P0 :flat)
-        subpost.'add_directive'('.include "except_types.pasm"')
-      handle_types_done:
-        type = node.'handle_types_except'()
-        unless type, handle_types_except_done
-        type = controltypes[type]
-        unless type, handle_types_except_done
-        $P0 = split ',', type
-        ops.'push_pirop'('callmethod', '"handle_types_except"', ehreg, $P0 :flat)
-        subpost.'add_directive'('.include "except_types.pasm"')
-      handle_types_except_done:
-        ops.'push_pirop'('push_eh', ehreg)
+        $ops.push_pirop('push_eh', ehreg);
 
         # Add one pop_eh for every handler we push_eh
-        pops.'push_pirop'('pop_eh')
+        $pops.push_pirop('pop_eh');
 
         # Push the handler itself
-        tail.'push'(label)
-        ehpir = self.'as_post'(node, 'rtype'=>rtype)
-        tail.'push'(ehpir)
-
-        goto handler_loop
-      handler_loop_done:
-
-        ops.'push'(child)
-
-
-        ops.'push'(pops)
-        ops.'push_pirop'('goto', skip)
-        ops.'push'(tail)
-        ops.'push'(skip)
-
-        .return (ops)
+        $tail.push($label);
+        $tail.push(self.as_post($node, rtype => $rtype));
     }
+
+    $ops.push($child);
+
+    $ops.push($pops);
+    $ops.push_pirop('gogo', $skip);
+    $ops.push($tail);
+    $ops.push($skip);
+
+    $ops;
 }
 
 =head3 C<PAST::Block>
