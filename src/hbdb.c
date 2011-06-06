@@ -8,7 +8,7 @@ src/hbdb.c - The Honey Bee Debugger
 
 =head1 DESCRIPTION
 
-This file contains functions used by the C<hbdb> debugger.
+This file contains functions and types used by the C<hbdb> debugger.
 
 =head1 FUNCTIONS
 
@@ -19,6 +19,11 @@ This file contains functions used by the C<hbdb> debugger.
 */
 
 /* TODO Remove unnecessary header files */
+/* TODO Perldoc section for types       */
+
+#include <stdio.h>
+
+#include "parrot/hbdb.h"
 
 #include "parrot/runcore_api.h"
 #include "parrot/extend.h"
@@ -32,24 +37,43 @@ This file contains functions used by the C<hbdb> debugger.
 
 /* HEADERIZER HFILE: include/parrot/hbdb.h */
 
+typedef void (*cmd_func_t)(ARGIN(hbdb_t *hbdb), ARGIN(const char * const cmd));
+
+typedef struct cmd      cmd;
+typedef struct cmd_list cmd_list;
+
+struct cmd {
+    cmd_func_t         c_func;
+    const char * const c_help;
+};
+
+struct cmd_list {
+    const char * const cl_name;
+    const char * const cl_short;
+    const cmd  * const cl_cmd;        
+};
+
+/* TODO Insert command list definition here */
+
 /*
 
-=item C<void hbdb_get_command()>
+=item C<void hbdb_get_command(void)>
 
 Displays the user prompt.
 
 */
 
 void
-hbdb_get_command()
+hbdb_get_command(void)
 {
+    fflush(stdout);
 }
 
 /*
 
 =item C<INTVAL hbdb_get_line_number(PARROT_INTERP, PMC *context_pmc)>
 
-Returns the line number for the current context
+Returns the line number for the current context.
 
 =cut
 

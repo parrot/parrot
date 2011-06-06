@@ -76,10 +76,12 @@ typedef struct {
 /* HEADERIZER BEGIN: src/hbdb.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+void hbdb_get_command(void);
 INTVAL hbdb_get_line_number(PARROT_INTERP, ARGIN(PMC *context_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_hbdb_get_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_hbdb_get_line_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(context_pmc))
